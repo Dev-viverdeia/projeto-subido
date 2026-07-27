@@ -91,7 +91,10 @@ export function SiteHeader() {
 
       <header className={styles.wrap} data-visible={visible ? '' : undefined} inert={!visible}>
         <div className={styles.bar}>
-          <a href="#conteudo" className={styles.brand} aria-label="Início">
+          {/* "Voltar ao topo", não "Início": o href é uma âncora para o topo desta
+              página, não navegação para a home. Leitor de tela que anuncia "Início" e
+              não sai do lugar é promessa quebrada. */}
+          <a href="#conteudo" className={styles.brand} aria-label="Voltar ao topo">
             <SubidoLogo size={17} />
           </a>
 

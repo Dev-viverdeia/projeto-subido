@@ -283,7 +283,20 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-/** TODO(preço): valores reais dos três tiers. */
+/**
+ * TODO(preço): valores reais dos três tiers.
+ *
+ * DESTINO DOS CTAs (`ctaHref`) — hoje os três vão para a tela de login.
+ * O acesso é por CONVITE gerado após a compra, no mesmo modelo da plataforma de
+ * referência: não há auto-cadastro, então login é a única porta que existe. Quando o
+ * checkout entrar, a URL de cada plano vem para cá — o componente não muda.
+ *
+ * TODO(contato): o Enterprise carrega o rótulo "Falar com o time" apontando para o
+ * login, o que NÃO é o destino certo — falta o canal comercial (WhatsApp ou e-mail),
+ * que também está pendente no rodapé. Rótulo e destino se reconciliam quando o canal
+ * existir. É dívida conhecida, não descuido: melhor um destino que abre do que uma
+ * âncora morta, mas os dois precisam casar antes de a página ir a tráfego pago.
+ */
 export const PLANS: Plan[] = [
   {
     id: 'starter',
@@ -297,6 +310,7 @@ export const PLANS: Plan[] = [
       'Mentoria em grupo',
     ],
     cta: 'Assinar agora',
+    ctaHref: '/entrar',
   },
   {
     id: 'pro',
@@ -310,6 +324,7 @@ export const PLANS: Plan[] = [
       'Certificação e vitrine no HUB',
     ],
     cta: 'Assinar agora',
+    ctaHref: '/entrar',
     featured: true,
   },
   {
@@ -324,6 +339,7 @@ export const PLANS: Plan[] = [
       'Onboarding e suporte dedicados',
     ],
     cta: 'Falar com o time',
+    ctaHref: '/entrar',
   },
 ];
 

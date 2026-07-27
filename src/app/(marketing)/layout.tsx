@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { construirJsonLd } from '@/lib/seo/jsonld';
 import { AttributionBoot } from './_components/chrome/AttributionBoot';
 import { ConsentNotice } from './_components/chrome/ConsentNotice';
-import { SiteHeader } from './_components/chrome/SiteHeader';
 import { SmoothScroll } from './_components/chrome/SmoothScroll';
 
 /**
@@ -52,9 +51,13 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <a href="#conteudo" className="via-skip-link">
         Pular para o conteúdo
       </a>
+      {/* O SiteHeader NÃO mora aqui: `(legal)` é um route group aninhado neste, então
+          um header montado no layout vai junto para /termos, /privacidade e /reembolso —
+          rotas onde as âncoras dele não têm alvo. Ele é montado na landing (page.tsx).
+          SmoothScroll, AttributionBoot e ConsentNotice ficam: valem em qualquer rota
+          desta árvore (um clique pago pode aterrissar direto numa página legal). */}
       <SmoothScroll />
       <AttributionBoot />
-      <SiteHeader />
       {children}
       <ConsentNotice />
     </>

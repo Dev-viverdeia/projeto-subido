@@ -75,7 +75,7 @@ export function PricingSection() {
               </ul>
 
               <TrackedCta
-                href={plan.id === 'enterprise' ? '#contato' : '#checkout'}
+                href={plan.ctaHref}
                 local="planos"
                 plano={plan.id}
                 className={plan.featured ? styles.ctaPrimary : styles.ctaGhost}

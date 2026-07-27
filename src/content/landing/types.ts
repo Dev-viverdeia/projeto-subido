@@ -40,6 +40,14 @@ export interface Plan {
   priceMonthly: number | null;
   features: string[];
   cta: string;
+  /**
+   * Destino do CTA. OBRIGATÓRIO de propósito: até aqui o destino era um ternário
+   * dentro do JSX (`id === 'enterprise' ? '#contato' : '#checkout'`) apontando para
+   * duas âncoras que nunca existiram, e os três botões de compra da página não faziam
+   * nada. Sendo campo do dado e não opcional, um quarto plano não consegue nascer com
+   * destino presumido — o compilador cobra a decisão.
+   */
+  ctaHref: string;
   featured?: boolean;
 }
 

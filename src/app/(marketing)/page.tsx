@@ -1,4 +1,5 @@
 import { PILLARS } from '@/content/landing';
+import { SiteHeader } from './_components/chrome/SiteHeader';
 import { HeroSection } from './_components/hero/HeroSection';
 import { CredibilityStrip } from './_components/proof/CredibilityStrip';
 import { PillarsIndex } from './_components/pillars/PillarsIndex';
@@ -29,10 +30,18 @@ import { FinalCtaSection } from './_components/cta/FinalCtaSection';
  *   ESCURO   HUB                 ← o destino, logo antes do preço: justifica o valor
  *   claro    resultados · comparação · planos+garantia · quem faz · perguntas
  *   ESCURO   CTA final + rodapé
+ *
+ * O SiteHeader mora AQUI, e não no layout do grupo, porque `(legal)` é um route group
+ * ANINHADO em `(marketing)`: no layout, a barra fixa era renderizada também em /termos,
+ * /privacidade e /reembolso — onde suas seis âncoras de seção e o CTA "Ver planos" não
+ * têm alvo e o clique não fazia nada. Montado na própria landing, o nav passa a existir
+ * exatamente onde seus alvos existem, e as páginas legais deixam de baixar um client
+ * component com scroll-spy que nunca teve o que observar.
  */
 export default function LandingPage() {
   return (
     <main id="conteudo">
+      <SiteHeader />
       <HeroSection />
       <CredibilityStrip />
       <PillarsIndex />
