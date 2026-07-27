@@ -1,0 +1,90 @@
+.header {
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+/* A medida de leitura mora no ELEMENTO, nunca no container.
+   `ch` é relativo ao font-size de quem o declara: no container, que herda 16px do
+   body, `20ch` vale ~180px e esmaga o título em sete linhas. No <h2>, onde o
+   font-size é o do display, os mesmos 20ch valem a medida que se queria. */
+.title {
+  max-width: 20ch;
+}
+
+.header--wide .title {
+  max-width: 26ch;
+}
+
+.center {
+  justify-items: center;
+  text-align: center;
+  margin-inline: auto;
+}
+
+/* --- Eyebrow ------------------------------------------------------------------
+   18px em mono com o device dos parênteses. O rótulo de 11px que estava aqui antes
+   era medo: sem presença, ele não organiza a página, só ocupa espaço. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.light .eyebrow {
+  color: var(--via-accent-ink);
+}
+
+.dark .eyebrow {
+  color: var(--via-accent);
+}
+
+/* Régua que sai do rótulo e corre até a margem — dá ao eyebrow um eixo horizontal
+   e amarra a seção à grade. */
+.rule {
+  flex: 1;
+  height: 1px;
+  min-width: var(--via-space-8);
+}
+
+.light .rule {
+  background: var(--via-border-hairline);
+}
+
+.dark .rule {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* --- Título -------------------------------------------------------------------- */
+.light .title {
+  color: var(--via-text-primary);
+}
+
+.dark .title {
+  color: var(--via-white);
+}
+
+.title em {
+  font-style: italic;
+  font-weight: inherit;
+}
+
+.light .title em {
+  color: var(--via-text-muted);
+}
+
+.dark .title em {
+  color: #8fa0b8;
+}
+
+/* --- Subtítulo ----------------------------------------------------------------- */
+.sub {
+  max-width: 46ch;
+}
+
+.light .sub {
+  color: var(--via-text-body);
+}
+
+.dark .sub {
+  color: var(--via-gray-300);
+}

@@ -1,0 +1,42 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.item {
+  padding-block: var(--via-space-3);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  border-top: 1px solid transparent;
+}
+
+.item:first-child {
+  border-top: none;
+}
+
+.light .item {
+  color: var(--via-text-body);
+  border-top-color: var(--via-border-hairline);
+}
+
+.dark .item {
+  color: var(--via-gray-300);
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Números dentro da lista herdam o tratamento mono. */
+.item strong {
+  font-family: var(--via-font-mono);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.light .item strong {
+  color: var(--via-text-primary);
+}
+
+.dark .item strong {
+  color: var(--via-white);
+}

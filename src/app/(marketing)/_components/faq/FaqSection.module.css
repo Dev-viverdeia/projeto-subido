@@ -1,0 +1,127 @@
+.list {
+  margin-top: var(--via-space-12);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.item {
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.question {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: var(--via-space-4);
+  padding-block: var(--via-space-5);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--via-t-fast);
+}
+
+/* Remove o triângulo nativo do WebKit — o indicador é o nosso. */
+.question::-webkit-details-marker {
+  display: none;
+}
+
+.question:hover {
+  color: var(--via-accent-ink);
+}
+
+.question:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
+  border-radius: var(--via-radius-xs);
+}
+
+.index {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-faint);
+}
+
+.questionText {
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--via-ls-tight);
+  color: inherit;
+  text-wrap: pretty;
+}
+
+/* Indicador em cruz: gira 45° para virar × quando aberto. Só transform. */
+.icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  align-self: center;
+  transition: transform var(--via-t);
+}
+
+.icon::before,
+.icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: currentColor;
+}
+
+.icon::before {
+  width: 14px;
+  height: 1.5px;
+}
+
+.icon::after {
+  width: 1.5px;
+  height: 14px;
+}
+
+.item[open] .icon {
+  transform: rotate(45deg);
+}
+
+.item[open] .question {
+  color: var(--via-text-primary);
+}
+
+.answer {
+  padding: 0 0 var(--via-space-6) calc(var(--via-space-4) + 2ch);
+  max-width: 62ch;
+}
+
+.answer p {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}
+
+/* A altura de <details> não é animável sem JS, e animar height é proibido pelo design
+   system de qualquer forma. O conteúdo entra com fade+deslocamento, que é transform
+   e opacity — e o resultado lê igual. */
+.item[open] .answer {
+  animation: answer-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes answer-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item[open] .answer {
+    animation: none;
+  }
+  .icon {
+    transition: none;
+  }
+}

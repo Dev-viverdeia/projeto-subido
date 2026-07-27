@@ -1,0 +1,56 @@
+.grid {
+  margin-top: var(--via-space-12);
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+@media (min-width: 860px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--via-space-6);
+  }
+}
+
+/* A régua de topo em vez de borda completa: o card não vira caixa, continua sendo
+   uma coluna de texto com um eixo. */
+.card {
+  display: grid;
+  gap: var(--via-space-4);
+  align-content: start;
+  padding-top: var(--via-space-6);
+  border-top: 1px solid var(--via-navy);
+}
+
+.index {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-label);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-wide);
+  color: var(--via-accent-ink);
+}
+
+.cardTitle {
+  color: var(--via-text-primary);
+  max-width: 18ch;
+}
+
+.cardBody {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  max-width: 48ch;
+  text-wrap: pretty;
+}
+
+/* Mais quieto que os cards e numa medida estreita: lê como nota do autor, não como
+   terceira opção. */
+.disqualifier {
+  margin: var(--via-space-12) 0 0;
+  max-width: var(--via-narrow);
+  padding-left: var(--via-space-5);
+  border-left: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-muted);
+}

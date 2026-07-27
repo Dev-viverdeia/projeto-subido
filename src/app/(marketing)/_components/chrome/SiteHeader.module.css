@@ -1,0 +1,196 @@
+/* Sentinela: uma faixa de 1px de largura que COBRE TODA A ALTURA DO HERO.
+
+   A versão anterior era um ponto de 1px logo abaixo do hero, e não funcionava: com
+   `threshold: 0`, sair de "abaixo da viewport" para "acima da viewport" num salto de
+   âncora não é mudança de estado de interseção — os dois são "não intersectando" — e
+   o observer simplesmente nunca disparava. Resultado: a barra não aparecia depois de
+   navegar pelo menu.
+
+   Cobrindo a altura do hero, o estado no topo é "intersectando" e em qualquer ponto
+   abaixo é "não intersectando". Aí a transição é real e sempre dispara. */
+.sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100svh;
+  pointer-events: none;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--via-z-sticky);
+
+  /* Escondida de verdade: `visibility` a tira da árvore de foco, e o `inert` no JSX
+     cobre navegadores que ainda não respeitam isso em elementos transladados. */
+  visibility: hidden;
+  transform: translate3d(0, -100%, 0);
+  transition:
+    transform 320ms var(--via-ease-out),
+    visibility 0s linear 320ms;
+
+  /* O vidro só existe sobre a banda clara; sobre navy ele some, então a barra carrega
+     o próprio fundo. */
+  background: rgba(250, 253, 255, 0.72);
+  backdrop-filter: var(--via-blur-md);
+  -webkit-backdrop-filter: var(--via-blur-md);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.header[data-visible] {
+  visibility: visible;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 320ms var(--via-ease-out),
+    visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: visibility 0s linear 0s;
+  }
+  .header[data-visible] {
+    transition: none;
+  }
+}
+
+/* Sem backdrop-filter, translucidez vira ilegibilidade. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header {
+    background: var(--via-bg);
+  }
+}
+
+.inner {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  height: 64px;
+  padding-inline: var(--via-space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding-inline: var(--via-space-8);
+  }
+}
+
+/* O wordmark do VIA tem proporção 12:1, então a escala precisa cair bastante em tela
+   estreita: a 0,82 o lockup somado ao CTA passava de 375px e cortava o botão. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  color: var(--via-text-primary);
+  text-decoration: none;
+  flex: none;
+  min-width: 0;
+  --lockup-scale: 0.6;
+}
+
+@media (min-width: 420px) {
+  .brand {
+    --lockup-scale: 0.72;
+  }
+}
+
+@media (min-width: 560px) {
+  .brand {
+    --lockup-scale: 1;
+  }
+}
+
+/* --- Navegação -----------------------------------------------------------------
+   Some abaixo de 900px: com quatro âncoras e um CTA não há largura para ambos, e o
+   CTA é quem precisa ganhar. Os pilares continuam alcançáveis pelo índice da página. */
+.nav {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--via-space-6);
+  }
+}
+
+.link {
+  position: relative;
+  padding-block: var(--via-space-2);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  transition: color var(--via-t-fast);
+}
+
+.link:hover {
+  color: var(--via-text-primary);
+}
+
+/* Estado ativo: régua fina embaixo, em accent. É o item que o scroll-spy marcou, e
+   ele carrega aria-current — a indicação não é só visual. */
+.link[aria-current] {
+  color: var(--via-text-primary);
+}
+
+.link[aria-current]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--via-accent);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
+  border-radius: var(--via-radius-xs);
+}
+
+/* --- CTA ------------------------------------------------------------------------ */
+.cta {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44px é o alvo de toque mínimo. Os 34px anteriores vinham do padding sozinho. */
+  min-height: 44px;
+  padding: 10px 20px;
+  white-space: nowrap;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition:
+    transform var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+/* Navy, não accent: sobre a banda clara o accent puro rende 2,70:1 e reprova AA.
+   O accent trabalha nos CTAs que vivem sobre banda escura (hero e CTA final). */
+.cta:hover {
+  background: var(--via-navy-deep);
+  transform: translate3d(0, -1px, 0);
+}
+
+.cta:active {
+  transform: translate3d(0, 0, 0) scale(0.98);
+}
+
+@media (max-width: 419px) {
+  .cta {
+    padding: 10px 16px;
+    font-size: var(--via-fs-xs);
+  }
+}

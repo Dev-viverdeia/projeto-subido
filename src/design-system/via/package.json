@@ -1,0 +1,7 @@
+{
+  "name": "design-system-via-vendored",
+  "private": true,
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

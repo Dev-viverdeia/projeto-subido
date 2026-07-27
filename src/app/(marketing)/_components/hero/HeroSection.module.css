@@ -1,0 +1,249 @@
+.hero {
+  position: relative;
+  color: var(--via-white);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--via-space-12) var(--via-space-16);
+  overflow: hidden;
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--via-container);
+  margin-inline: auto;
+  padding-inline: var(--via-space-5);
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding-inline: var(--via-space-8);
+  }
+}
+
+/* --- Topo: lockup à esquerda, carimbo à direita ------------------------------- */
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-bottom: var(--via-space-6);
+  margin-bottom: var(--via-space-6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.lockup {
+  color: var(--via-white);
+  /* O wordmark do VIA tem proporção 12:1. Sem reduzir a altura no mobile ele ocupa
+     309 dos 335px disponíveis e empurra o carimbo para fora da viewport. */
+  --lockup-scale: 0.72;
+}
+
+.since {
+  color: var(--via-gray-400);
+  white-space: nowrap;
+}
+
+/* Abaixo de 560px não há largura para os dois: o carimbo sai. Ele é ornamento
+   editorial, não informação — e ficava cortado pela borda. */
+@media (max-width: 559px) {
+  .since {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .top {
+    padding-bottom: var(--via-space-8);
+    margin-bottom: var(--via-space-8);
+  }
+
+  .lockup {
+    --lockup-scale: 1;
+  }
+}
+
+/* --- Título ------------------------------------------------------------------
+   Ocupa a largura toda, como capa. É o oposto do split 56/44 de SaaS: aqui o tipo
+   é o elemento visual, não um acompanhamento do print do produto. */
+.title {
+  max-width: 15ch;
+}
+
+.strong {
+  color: var(--via-white);
+}
+
+/* Hierarquia por tom SÓLIDO. Não é opacidade — opacidade suja o preto do fundo. */
+.soft {
+  color: #8fa0b8;
+}
+
+/* --- Grade inferior ----------------------------------------------------------- */
+.grid {
+  margin-top: var(--via-space-10);
+  display: grid;
+  gap: var(--via-space-8);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: var(--via-space-16);
+    align-items: end;
+  }
+}
+
+.lead {
+  display: grid;
+  gap: var(--via-space-6);
+  align-content: end;
+}
+
+.sub {
+  color: var(--via-gray-300);
+  max-width: 46ch;
+}
+
+/* --- Ações -------------------------------------------------------------------
+   CTAs desenhados aqui em vez de usar o Button do DS: o rótulo precisa do device
+   de roll, e o pill do DS foi calibrado para densidade de aplicação, não para a
+   presença que uma capa pede. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+}
+
+/* No mobile os dois botões empilhavam com larguras diferentes, o que lê como
+   desalinho e não como hierarquia. Largura total iguala os dois e ainda aumenta a
+   área de toque. */
+@media (max-width: 559px) {
+  .actions {
+    display: grid;
+    gap: var(--via-space-2);
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    justify-content: center;
+  }
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px 28px;
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    transform var(--via-t-fast),
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+/* O accent é destaque pontual — exatamente o que o manual da CST reserva para ele.
+   Rótulo em navy escuro: branco sobre #00A2FF reprova AA (2,76:1). */
+.ctaPrimary {
+  background: var(--via-accent);
+  color: var(--cst-navy-deep);
+  box-shadow: 0 12px 32px -12px rgba(0, 162, 255, 0.7);
+}
+
+.ctaPrimary:hover {
+  background: var(--via-accent-deep);
+  transform: translate3d(0, -2px, 0);
+}
+
+.ctaSecondary {
+  color: var(--via-white);
+  border-color: rgba(255, 255, 255, 0.26);
+}
+
+.ctaSecondary:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: translate3d(0, -2px, 0);
+}
+
+.ctaPrimary:active,
+.ctaSecondary:active {
+  transform: translate3d(0, 0, 0) scale(0.985);
+}
+
+/* --- Trust row ---------------------------------------------------------------- */
+.trust {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  letter-spacing: -0.01em;
+  color: var(--via-gray-400);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0;
+  row-gap: var(--via-space-1);
+}
+
+/* Cada item carrega o próprio separador, então precisa quebrar como bloco — senão
+   a linha nova começa com um "/" órfão. */
+.trust > span {
+  white-space: nowrap;
+}
+
+.dot {
+  margin-inline: var(--via-space-2);
+  opacity: 0.45;
+}
+
+.media {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .media {
+    margin-inline: calc(var(--via-space-5) * -1);
+  }
+}
+
+/* --- Dica de scroll ----------------------------------------------------------- */
+.scrollHint {
+  position: absolute;
+  left: 50%;
+  bottom: var(--via-space-6);
+  transform: translateX(-50%);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+  animation: hint 2.6s var(--via-ease) infinite;
+}
+
+@keyframes hint {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-50%, 5px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollHint {
+    animation: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .scrollHint {
+    display: none;
+  }
+}

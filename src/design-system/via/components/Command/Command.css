@@ -1,0 +1,226 @@
+/* ============================================
+   Command · Cmd+K palette · keyboard-first
+   ============================================ */
+
+.via-cmd-root {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 14vh;
+  padding-inline: 16px;
+}
+
+.via-cmd-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(10, 31, 59, 0.32), rgba(10, 31, 59, 0.46));
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  animation: via-cmd-scrim-in .26s var(--via-ease-snap) both;
+}
+
+.via-cmd {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  background: var(--via-glass-card);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--via-border-soft);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 0 0 0.5px var(--via-navy-10),
+    0 40px 80px -16px var(--via-navy-30),
+    0 16px 32px -12px var(--via-navy-18);
+  overflow: hidden;
+  animation: via-cmd-in .32s var(--via-ease-out) both;
+  display: flex;
+  flex-direction: column;
+  max-height: min(72vh, 640px);
+  isolation: isolate;
+}
+
+/* Atmosphere radial */
+.via-cmd::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px 220px at 0% 0%, var(--via-navy-04), transparent 60%),
+    radial-gradient(380px 200px at 100% 100%, var(--via-navy-03), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.via-cmd__head {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--via-navy-08, rgba(10,31,59,0.08));
+  color: var(--via-ink-3, #6B7891);
+  flex-shrink: 0;
+}
+.via-cmd__head input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--via-font, inherit);
+  font-size: var(--via-fs-body);
+  color: var(--via-text-primary);
+  padding: 2px 0;
+}
+.via-cmd__head input::placeholder { color: var(--via-ink-3, #6B7891); }
+
+.via-cmd__close {
+  background: transparent;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--via-ink-3, #6B7891);
+  border-radius: 6px;
+  transition: background 120ms ease, color 120ms ease;
+}
+.via-cmd__close:hover { background: var(--via-navy-04, rgba(10,31,59,0.04)); color: var(--via-text-primary); }
+
+.via-cmd__list {
+  overflow-y: auto;
+  padding: 8px;
+  flex: 1;
+}
+
+.via-cmd__empty {
+  margin: 0;
+  padding: 32px 16px;
+  text-align: center;
+  font-size: var(--via-fs-caption);
+  color: var(--via-ink-3, #6B7891);
+}
+
+.via-cmd__group { margin-bottom: 4px; }
+.via-cmd__group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-0_5);
+}
+.via-cmd__heading {
+  display: block;
+  padding: 8px 10px 4px;
+  font-family: var(--via-font, inherit);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-ink-3, #6B7891);
+}
+
+.via-cmd__group li {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.via-cmd__group li.on,
+.via-cmd__group li:hover {
+  background: var(--via-navy-04, rgba(10,31,59,0.04));
+}
+.via-cmd__icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--via-navy-04, rgba(10,31,59,0.04));
+  color: var(--via-text-primary);
+  flex-shrink: 0;
+}
+.via-cmd__label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.via-cmd__label strong {
+  font-family: var(--via-font, inherit);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  letter-spacing: -0.004em;
+}
+.via-cmd__label em {
+  font-style: normal;
+  font-size: var(--via-fs-xs);
+  color: var(--via-ink-3, #6B7891);
+  margin-top: 2px;
+}
+
+.via-cmd__kbd {
+  font-family: var(--via-mono, var(--via-font-mono, ui-monospace, monospace));
+  font-size: var(--via-fs-micro);
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--via-navy-04, rgba(10,31,59,0.04));
+  color: var(--via-ink-2, #5E6B82);
+  border: 0.5px solid var(--via-navy-08, rgba(10,31,59,0.08));
+  flex-shrink: 0;
+}
+
+.via-cmd__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3_5);
+  padding: 9px 14px;
+  border-top: 0.5px solid var(--via-navy-08, rgba(10,31,59,0.08));
+  background: var(--via-gray-50, #F7F8FA);
+  font-size: var(--via-fs-label);
+  color: var(--via-ink-3, #6B7891);
+  flex-shrink: 0;
+}
+.via-cmd__foot kbd {
+  font-family: var(--via-mono, var(--via-font-mono, ui-monospace, monospace));
+  font-size: var(--via-fs-micro);
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--via-navy-04);
+  border: 0.5px solid var(--via-navy-12);
+  margin-right: 4px;
+  color: var(--via-ink-2, #5E6B82);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+}
+
+@keyframes via-cmd-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes via-cmd-scrim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .via-cmd, .via-cmd-scrim { animation: none !important; }
+}
+
+@media (max-width: 520px) {
+  .via-cmd-root { padding-top: 8vh; padding-inline: 12px; }
+  .via-cmd__foot { flex-wrap: wrap; gap: var(--via-space-2_5); }
+}

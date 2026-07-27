@@ -1,0 +1,11 @@
+# Pre-commit — FAST (~2s) and low-friction, by design.
+#
+# 1. lint-staged (eslint --fix + prettier) — NON-BLOCKING.
+#    A slow or blocking hook is how people learn to pass --no-verify.
+# 2. check-single-lockfile — BLOCKING. ~50ms, deterministic, no false positives.
+#
+# The heavy typecheck (~30s) is deliberately left out: it is a MERGE gate, not a
+# commit gate. Gates at the exit door, not at every step.
+
+npx lint-staged || echo "⚠ eslint: erros residuais — commit segue; rode 'npm run lint'"
+node scripts/check-single-lockfile.mjs

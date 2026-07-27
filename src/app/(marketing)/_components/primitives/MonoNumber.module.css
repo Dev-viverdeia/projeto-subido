@@ -1,0 +1,28 @@
+.number {
+  display: inline-block;
+  font-family: var(--via-font-mono);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-tight);
+  line-height: var(--via-lh-snug);
+}
+
+.lg {
+  font-size: clamp(1.75rem, 1.2rem + 2vw, var(--via-fs-h1));
+}
+
+.md {
+  font-size: var(--via-fs-h3);
+}
+
+.sm {
+  font-size: var(--via-fs-h4);
+}
+
+.light {
+  color: var(--via-text-primary);
+}
+
+.dark {
+  color: var(--via-white);
+}

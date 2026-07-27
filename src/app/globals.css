@@ -1,0 +1,123 @@
+/* ==============================================================================
+   Ordem da cascata. Este é o único lugar onde ela é declarada.
+
+   ATENÇÃO: os caminhos são RELATIVOS de propósito. O Turbopack resolve @import de
+   CSS por node resolution, não pelos paths do tsconfig — um "@/..." aqui falha em
+   silêncio, sem erro de build e sem estilo aplicado.
+   ============================================================================== */
+
+/* 1 · Design system vendorizado (NÃO EDITAR — ver PROVENANCE.md) */
+@import '../design-system/via/styles/tokens.css';
+@import '../design-system/via/base/via-base.css';
+@import '../design-system/via/styles/form-fields.css';
+
+/* 2 · Fusão de marca Viver de IA × Subido. Precisa vir DEPOIS dos tokens. */
+@import '../styles/brand.css';
+
+/* 3 · Motion de entrada. Ver o comentário do arquivo: nada de opacity:0 no base. */
+@import '../styles/reveal.css';
+@import '../styles/motion.css';
+@import '../styles/type.css';
+
+/* 4 · Ponte next/font → tokens do design system.
+   Precisa vir depois de tokens.css, que declara --via-font com a família literal. */
+:root {
+  --via-font: var(--font-geist), 'Inter', system-ui, -apple-system, sans-serif;
+  --via-font-display: var(--font-geist), 'Inter', system-ui, -apple-system, sans-serif;
+  --via-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Escala de empilhamento — o DS não define z-index, e sem uma escala única
+     cada componente inventa a sua. */
+  --via-z-sticky: 40;
+  --via-z-dock: 45;
+  --via-z-overlay: 1000;
+  --via-z-modal: 1100;
+  --via-z-toast: 1200;
+  --via-z-tooltip: 1300;
+}
+
+/* 5 · Reset mínimo específico da app (o DS já cobre html/body/tipografia base) */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--via-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  /* Âncoras de seção não podem ficar embaixo da barra fixa. */
+  scroll-padding-top: 88px;
+
+  /* OBRIGATÓRIO com Lenis, e o conflito é silencioso.
+     O design system vendorizado declara `scroll-behavior: smooth` (via-base.css:38).
+     Com ele ligado, o Lenis e o navegador disputam o controle do scroll e o resultado
+     é que TODA âncora para de rolar: o hash muda, a URL muda, a página fica parada —
+     sem nenhum erro no console. A suavidade agora é responsabilidade do Lenis.
+     Como não se edita o DS vendorizado, o override mora aqui. */
+  scroll-behavior: auto;
+}
+
+/* Visível só para leitor de tela. `clip-path` em vez do antigo `clip`, e sem
+   `display:none` — que removeria o texto da árvore de acessibilidade também. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — visível só ao receber foco por teclado. */
+.via-skip-link {
+  position: absolute;
+  left: var(--via-space-4);
+  top: var(--via-space-4);
+  z-index: var(--via-z-tooltip);
+  padding: var(--via-space-2) var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--via-t);
+}
+
+.via-skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Acessibilidade: alvo do skip link. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 2px;
+}
+
+/* Sobre banda escura o anel navy some — aqui o accent CST é a cor legível. */
+.via-mesh-navy :where(a, button, input, [tabindex]):focus-visible,
+.via-glass-dark :where(a, button, input, [tabindex]):focus-visible {
+  outline-color: var(--via-accent);
+}
+
+/* Rede de segurança global. Cada componente ainda trata reduced-motion por conta
+   própria; isto é o piso, não o teto. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

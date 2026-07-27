@@ -1,0 +1,116 @@
+/* ============================================
+   <Checkbox> · editorial · indeterminate-aware
+   ============================================ */
+.via-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--via-space-2_5);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--via-font, 'Geist', system-ui, sans-serif);
+}
+
+.via-checkbox.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.via-checkbox__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.via-checkbox__box {
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--via-glass-card);
+  border: 1px solid var(--via-border, #D0D5DD);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--via-dur) ease,
+    border-color var(--via-dur) ease,
+    box-shadow var(--via-dur) ease,
+    transform 0.18s ease;
+  margin-top: 1px;
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 1px 2px var(--via-navy-04);
+}
+
+/* Alvo de toque generoso (>= WCAG AA) sem alterar o visual.
+   Altura 28px evita sobreposição com a linha vizinha em listas densas. */
+.via-checkbox__box::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+}
+
+.via-checkbox:hover:not(.is-disabled) .via-checkbox__box {
+  border-color: var(--via-navy-30);
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 2px 6px -2px var(--via-navy-10);
+}
+
+.via-checkbox__icon {
+  color: var(--via-white);
+  opacity: 0;
+  transform: scale(0.5) rotate(-12deg);
+  transition:
+    opacity var(--via-dur) ease,
+    transform 0.3s var(--via-ease-spring);
+}
+
+.via-checkbox__input:checked + .via-checkbox__box,
+.via-checkbox__input:indeterminate + .via-checkbox__box {
+  background: linear-gradient(180deg, var(--via-navy), var(--via-navy-deep));
+  border-color: var(--via-navy, #0A1F3B);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.10) inset,
+    0 2px 6px -2px var(--via-navy-25);
+}
+
+.via-checkbox__input:checked + .via-checkbox__box .via-checkbox__icon,
+.via-checkbox__input:indeterminate + .via-checkbox__box .via-checkbox__icon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.via-checkbox__input:focus-visible + .via-checkbox__box {
+  outline: 2px solid var(--via-navy-60);
+  outline-offset: 2px;
+}
+
+.via-checkbox__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-0_5);
+  min-width: 0;
+}
+
+.via-checkbox__label {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: -0.008em;
+  color: var(--via-text-primary);
+  line-height: 1.4;
+}
+
+.via-checkbox__desc {
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+  color: var(--via-ink-2, #5E6B82);
+}

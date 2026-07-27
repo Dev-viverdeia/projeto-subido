@@ -1,0 +1,155 @@
+.grid {
+  display: grid;
+  gap: var(--via-space-12);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    gap: var(--via-space-16);
+    align-items: start;
+  }
+}
+
+.copy {
+  display: grid;
+  gap: var(--via-space-7);
+  align-content: start;
+}
+
+/* Pill canônica do design system: 11px, peso 500, sem caixa alta, sem dot. */
+.pill {
+  justify-self: start;
+  padding: 4px 11px;
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-label);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-accent);
+  background: var(--via-accent-soft);
+  border: 1px solid var(--via-accent-hairline);
+}
+
+/* --- Timeline ------------------------------------------------------------------
+   Dois marcos preenchidos e um em contorno. A assimetria é o argumento: mostra que
+   a maior parte da promessa já é verificável hoje. */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-4);
+}
+
+@media (min-width: 640px) {
+  .timeline {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--via-space-5);
+  }
+}
+
+.step {
+  display: grid;
+  gap: var(--via-space-2);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.done {
+  border-top-color: var(--via-accent);
+}
+
+.marker {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--via-radius-pill);
+}
+
+.done .marker {
+  background: var(--via-accent);
+  color: var(--cst-navy-deep);
+}
+
+.pending .marker {
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.stepLabel {
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+}
+
+.stepStatus {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  color: var(--via-gray-400);
+}
+
+.done .stepStatus {
+  color: var(--via-accent);
+}
+
+.criteria {
+  margin: 0;
+  max-width: 52ch;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  color: var(--via-gray-300);
+  padding-left: var(--via-space-5);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- Prévia do diretório --------------------------------------------------------- */
+.preview {
+  min-width: 0;
+}
+
+.previewFrame {
+  position: relative;
+  padding: var(--via-space-5);
+  border-radius: var(--via-radius-lg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--via-shadow-glass-dark);
+  backdrop-filter: var(--via-blur-md);
+}
+
+.previewLabel {
+  display: block;
+  margin-bottom: var(--via-space-4);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--via-space-3);
+}
+
+@media (min-width: 480px) {
+  .previewGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.profile {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--via-radius-sm);
+  overflow: hidden;
+}
+
+.disclaimer {
+  margin: var(--via-space-16) 0 0;
+  padding-top: var(--via-space-5);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  max-width: 70ch;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-loose);
+  color: var(--via-gray-400);
+}

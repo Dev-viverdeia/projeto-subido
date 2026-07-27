@@ -1,0 +1,89 @@
+# Gate de merge.
+#
+# POR QUE ESTE ARQUIVO EXISTE COMO ESTÁ
+# Na plataforma de referência, o CI nunca rodava `lint` — e o resultado foram 418
+# `console.log` em src apesar do checklist de merge proibi-los, mais 69 cores hardcoded
+# sobrevivendo a uma regra que morava num arquivo `.eslintrc` órfão que nada carregava.
+# A lição: uma convenção que não roda no CI é sugestão, e sugestão não sobrevive a prazo.
+#
+# Por isso aqui TUDO que é convenção tem um passo. Nada é `continue-on-error`.
+
+name: validate-pr
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # ~50ms. Impede que um segundo lockfile entre no repo — a origem da confusão
+      # de cinco lockfiles da referência.
+      - name: Um lockfile só
+        run: node scripts/check-single-lockfile.mjs
+
+      # Prova que src/design-system/via/ ainda é um espelho do upstream pinado, e não
+      # um fork. É o que torna o vendoring seguro.
+      - name: Integridade do design system
+        run: node scripts/check-ds-drift.mjs
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formatação
+        run: npm run format:check
+
+      - name: Testes
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # A landing precisa sair como ○ (Static). Se virar ƒ (Dynamic), alguma coisa
+      # chamou cookies()/headers()/searchParams em (marketing), ou o matcher do proxy
+      # vazou — e cada clique de anúncio passa a pagar um cold start de Node.
+      - name: A landing continua estática
+        run: |
+          if grep -qE '^\s*ƒ\s+/\s*$' .next/build-output.txt 2>/dev/null; then
+            echo "✗ / virou dinâmica"; exit 1
+          fi
+          node -e "
+            const fs=require('fs');
+            const p='.next/prerender-manifest.json';
+            if(!fs.existsSync(p)){console.error('✗ prerender-manifest ausente');process.exit(1)}
+            const m=JSON.parse(fs.readFileSync(p,'utf8'));
+            if(!m.routes || !('/' in m.routes)){
+              console.error('✗ / não está pré-renderizada');process.exit(1)
+            }
+            console.log('✓ / é estática');
+          "
+
+      # Nenhum ref de projeto Supabase fora do módulo de env.
+      - name: Sem credencial hardcoded
+        run: |
+          if grep -rEn '[a-z]{20}\.supabase\.co' src/ --include='*.ts' --include='*.tsx' \
+             | grep -v 'src/lib/env.ts'; then
+            echo "✗ URL do Supabase hardcoded fora de src/lib/env.ts"; exit 1
+          fi
+          echo "✓ nenhuma URL hardcoded"

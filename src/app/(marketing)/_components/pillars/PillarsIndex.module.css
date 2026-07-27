@@ -1,0 +1,92 @@
+.grid {
+  list-style: none;
+  margin: var(--via-space-12) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-4);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.item {
+  display: grid;
+}
+
+.card {
+  position: relative;
+  display: grid;
+  gap: var(--via-space-2);
+  align-content: start;
+  padding: var(--via-space-6) var(--via-space-5) var(--via-space-10);
+  border-radius: var(--via-radius-md);
+  border: 1px solid var(--via-border-hairline);
+  background: var(--via-surface);
+  text-decoration: none;
+  box-shadow: var(--via-shadow-xs);
+  /* Só transform e box-shadow — nunca `transition: all`. */
+  transition:
+    transform var(--via-t-fast),
+    box-shadow var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.card:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow: var(--via-shadow-md);
+  border-color: var(--via-border);
+}
+
+.index {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-wide);
+  color: var(--via-text-faint);
+}
+
+.name {
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-text-primary);
+}
+
+.teaser {
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.jump {
+  position: absolute;
+  left: var(--via-space-5);
+  bottom: var(--via-space-5);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--via-radius-pill);
+  color: var(--via-text-faint);
+  background: var(--via-bg-2);
+  transition:
+    transform var(--via-t-fast),
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.card:hover .jump {
+  transform: translate3d(0, 2px, 0);
+  color: var(--via-accent-ink);
+  background: var(--via-accent-soft);
+}

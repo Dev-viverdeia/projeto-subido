@@ -1,0 +1,288 @@
+.layout {
+  margin-top: var(--via-space-12);
+  display: grid;
+  gap: var(--via-space-12);
+}
+
+@media (min-width: 1080px) {
+  .layout {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: var(--via-space-14);
+    align-items: start;
+  }
+}
+
+/* --- Ancoragem ------------------------------------------------------------------
+   Números alinhados à direita em mono tabular: a coluna soma visualmente, que é
+   exatamente a operação que o leitor precisa fazer sozinho. */
+.stack {
+  display: grid;
+  gap: var(--via-space-5);
+  align-content: start;
+}
+
+.stackLead {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.stackList {
+  margin: 0;
+  display: grid;
+}
+
+.stackRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--via-space-4);
+  padding-block: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-body);
+}
+
+.stackRow dt {
+  min-width: 0;
+}
+
+.stackRow dd {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--via-text-primary);
+}
+
+.stackTotal {
+  border-bottom: none;
+  border-top: 1px solid var(--via-navy);
+  margin-top: var(--via-space-1);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.reveal {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+  max-width: 32ch;
+}
+
+/* --- Planos ---------------------------------------------------------------------- */
+.plans {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-4);
+}
+
+@media (min-width: 640px) and (max-width: 1079px) {
+  .plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Enterprise ocupa a linha inteira quando sobra sozinho. */
+  .plans > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1080px) {
+  .plans {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.plan {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: var(--via-space-4);
+  padding: var(--via-space-6);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  box-shadow: var(--via-shadow-xs);
+}
+
+/* O destacado ganha a tinta navy, não uma cor nova. */
+.featured {
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+  box-shadow: var(--via-shadow-lg);
+}
+
+.planHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.planName {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.featured .planName {
+  color: var(--via-white);
+}
+
+/* Pill canônica: 11px, peso 500, sem caixa alta, sem dot. */
+.badge {
+  padding: 4px 11px;
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-label);
+  font-weight: var(--via-fw-medium);
+  color: var(--cst-navy-deep);
+  background: var(--via-accent);
+  white-space: nowrap;
+}
+
+.planPitch {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.featured .planPitch {
+  color: var(--via-gray-300);
+}
+
+.price {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-1);
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.featured .price {
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+}
+
+.priceValue,
+.priceTodo {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h2);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-text-primary);
+}
+
+.priceTodo {
+  font-size: var(--via-fs-h3);
+  color: var(--via-text-faint);
+}
+
+.featured .priceValue,
+.featured .priceTodo {
+  color: var(--via-white);
+}
+
+.priceUnit {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.featured .priceUnit {
+  color: var(--via-gray-300);
+}
+
+.features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-2);
+  align-content: start;
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--via-space-2);
+  align-items: start;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.feature svg {
+  margin-top: 2px;
+  color: var(--via-accent-ink);
+}
+
+.featured .feature {
+  color: var(--via-gray-300);
+}
+
+.featured .feature svg {
+  color: var(--via-accent);
+}
+
+/* --- CTAs ------------------------------------------------------------------------ */
+.ctaPrimary,
+.ctaGhost {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 13px 22px;
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    transform var(--via-t-fast),
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.ctaPrimary {
+  background: var(--via-accent);
+  color: var(--cst-navy-deep);
+}
+
+.ctaPrimary:hover {
+  background: var(--via-accent-deep);
+  transform: translate3d(0, -2px, 0);
+}
+
+.ctaGhost {
+  color: var(--via-text-primary);
+  border-color: var(--via-border);
+}
+
+.ctaGhost:hover {
+  border-color: var(--via-navy);
+  transform: translate3d(0, -2px, 0);
+}
+
+/* --- Garantia --------------------------------------------------------------------- */
+.guarantee {
+  margin-top: var(--via-space-14);
+  max-width: var(--via-content);
+  padding-top: var(--via-space-6);
+  border-top: 1px solid var(--via-navy);
+  display: grid;
+  gap: var(--via-space-3);
+}
+
+.guaranteeTitle {
+  color: var(--via-text-primary);
+}
+
+.guaranteeBody {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  max-width: 56ch;
+}

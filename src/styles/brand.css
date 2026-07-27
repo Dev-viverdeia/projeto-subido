@@ -1,0 +1,168 @@
+/* ==============================================================================
+   VIVER DE IA × SUBIDO — camada de fusão de marca
+   ------------------------------------------------------------------------------
+   Este arquivo é carregado DEPOIS de design-system/via/styles/tokens.css e
+   redefine apenas os tokens cromáticos. O design system vendorizado NUNCA é
+   editado — é isso que mantém `npm run check:ds-drift` significativo.
+
+   A TESE DA FUSÃO
+   Os dois sistemas são complementares, não concorrentes:
+
+     · O Viver de IA traz a ARQUITETURA — superfície clara, hierarquia editorial,
+       vidro + atmosfera + sombra navy, escalas de espaço/raio/motion, Geist.
+     · A Comunidade Subido traz a CROMÁTICA — o navy institucional, o branco frio
+       e, principalmente, um ACCENT que o VIA nunca teve (lá o "accent" era o
+       próprio navy).
+
+   O manual da CST resolve sozinho o maior risco da fusão. Ele diz, textualmente:
+
+     "Utilize o azul #00A2FF de forma pontual. Não é recomendado aplicá-lo em
+      grandes áreas, especialmente em fundos. Esse tom deve ser reservado para
+      elementos de destaque."
+     "A cor preta não pertence à paleta da marca Comunidade Subido."
+
+   Essa é exatamente a disciplina do VIA: hierarquia por peso editorial e cor
+   sólida, nunca por inundação de cor. A restrição não é uma concessão — é a
+   regra que faz as duas marcas caberem no mesmo sistema.
+
+   E a física concorda com o manual (medido, não estimado):
+
+     #00A2FF sobre #FAFDFF ....  2,70:1  ✗ reprova AA até para texto grande
+     #00A2FF sobre #0B162D ....  6,52:1  ✓ passa AA com folga
+     #0B162D sobre #FAFDFF .... 17,62:1  ✓ (o VIA original fazia 16,51:1)
+
+   Ou seja: o azul elétrico é, fisicamente, uma cor de destaque sobre escuro.
+   Para o caso raro de texto accent sobre claro existe --via-accent-ink (#0072BE,
+   4,95:1), e só para isso.
+
+   CONSEQUÊNCIA NO LAYOUT
+   A landing alterna três momentos escuros (hero, HUB, CTA final) num corpo claro.
+   As bandas escuras são o território da CST — navy institucional com o azul
+   pontual. O corpo editorial claro é o território do VIA. O próprio ritmo de
+   bandas passa a ser o mecanismo de co-branding, o que vale muito mais do que
+   repetir um lockup em toda seção.
+   ============================================================================== */
+
+:root {
+  /* ---- Paleta institucional CST (fonte: manual da marca) -------------------- */
+  --cst-blue: #00a2ff; /* accent · uso PONTUAL, nunca em grandes áreas */
+  --cst-navy: #0b162d; /* azul-marinho institucional */
+  --cst-navy-deep: #040b1a; /* azul-marinho escuro institucional */
+  --cst-white: #fafdff; /* branco institucional (levemente frio) */
+
+  /* ---- Marca → tokens VIA -------------------------------------------------- */
+  --via-navy: var(--cst-navy);
+  --via-navy-deep: var(--cst-navy-deep);
+  --via-navy-darker: #02060f; /* derivado · banda mais profunda */
+
+  /* Azuis intermediários das radiais do mesh, derivados da navy CST mantendo a
+     mesma relação de luminância que o VIA usava. */
+  --via-blue: #122348;
+  --via-blue-soft: #183063;
+
+  /* ---- Accent (a peça que o VIA não tinha) --------------------------------- */
+  --via-accent: var(--cst-blue);
+  --via-accent-deep: #0086d6;
+  --via-accent-ink: #0072be; /* única variante legível sobre claro · 4,95:1 */
+  --via-accent-soft: rgba(0, 162, 255, 0.14);
+  --via-accent-hairline: rgba(0, 162, 255, 0.28);
+
+  /* ---- Superfícies claras -------------------------------------------------- */
+  --via-bg: var(--cst-white);
+  --via-bg-2: #f2f6fb;
+  --via-bg-3: #e9eff7;
+  --via-surface: #ffffff; /* cartão continua branco puro: o vidro precisa do topo */
+  --via-surface-elev: #ffffff;
+  --via-surface-onnavy: linear-gradient(180deg, #ffffff 0%, var(--cst-white) 100%);
+
+  /* ---- Hairlines e sombras, re-tingidas com a navy CST ---------------------- */
+  --via-border: rgba(11, 22, 45, 0.16);
+  --via-border-soft: rgba(11, 22, 45, 0.05);
+  --via-border-hairline: #e2e9f2;
+
+  --via-shadow-xs: 0 1px 2px rgba(11, 22, 45, 0.04);
+  --via-shadow-sm: 0 2px 6px rgba(11, 22, 45, 0.05), 0 1px 2px rgba(11, 22, 45, 0.03);
+  --via-shadow-md: 0 6px 18px rgba(11, 22, 45, 0.07), 0 1px 3px rgba(11, 22, 45, 0.04);
+  --via-shadow-lg: 0 16px 40px rgba(11, 22, 45, 0.1), 0 2px 8px rgba(11, 22, 45, 0.05);
+  --via-shadow-xl: 0 32px 80px rgba(11, 22, 45, 0.14), 0 4px 16px rgba(11, 22, 45, 0.06);
+  --via-shadow-focus: 0 0 0 3px rgba(11, 22, 45, 0.15);
+  --via-shadow-glass-light:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+    0 12px 32px rgba(11, 22, 45, 0.08), 0 2px 8px rgba(11, 22, 45, 0.04);
+
+  /* Anel de foco visível SOBRE superfície escura — aqui o accent trabalha. */
+  --via-shadow-focus-onnavy: 0 0 0 3px rgba(0, 162, 255, 0.45);
+
+  /* ---- Atmosferas ---------------------------------------------------------- */
+  /* O mesh escuro é a assinatura da CST dentro do sistema do VIA. A última radial
+     carrega um traço do accent — é a única presença dele em área grande, a ~10%,
+     onde funciona como luz e não como preenchimento. */
+  --via-mesh-navy:
+    radial-gradient(ellipse 60% 70% at 12% 0%, rgba(24, 48, 99, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 95% 8%, rgba(18, 35, 72, 0.5) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 80% at 100% 100%, rgba(4, 11, 26, 0.85) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 65% at 4% 96%, rgba(0, 162, 255, 0.1) 0%, transparent 58%),
+    linear-gradient(135deg, #0b162d 0%, #040b1a 100%);
+
+  --via-mesh-light:
+    radial-gradient(ellipse 60% 70% at 12% 0%, rgba(18, 35, 72, 0.26) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 95% 8%, rgba(24, 48, 99, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 80% at 100% 100%, rgba(11, 22, 45, 0.3) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 5% 100%, rgba(0, 162, 255, 0.08) 0%, transparent 55%),
+    linear-gradient(135deg, #ccd6e2 0%, #a7b4c6 100%);
+
+  --via-glow-navy:
+    0 0 0 1px rgba(11, 22, 45, 0.05), 0 8px 24px rgba(11, 22, 45, 0.2),
+    0 16px 48px rgba(11, 22, 45, 0.14);
+  --via-glow-navy-strong:
+    0 0 0 1px rgba(11, 22, 45, 0.1), 0 16px 48px rgba(11, 22, 45, 0.3),
+    0 32px 80px rgba(11, 22, 45, 0.2);
+}
+
+/* ------------------------------------------------------------------------------
+   CTA primário sobre banda escura.
+
+   O `.via-btn--primary` do design system é preenchido com navy — foi desenhado para
+   superfície CLARA. Sobre a banda escura ele fica navy-sobre-navy e praticamente
+   desaparece. Esta é a correção de sistema, não um ajuste pontual.
+
+   O accent é a resposta certa e é brand-legal: o manual da CST reserva o #00A2FF
+   para "elementos de destaque", e um CTA é a definição disso — área pequena, intenção
+   alta. Não é preenchimento de grande área, que é o que o manual proíbe.
+
+   O rótulo é navy escuro, não branco: medido, branco sobre #00A2FF dá 2,76:1 e
+   reprova AA. Navy escuro dá 7,13:1.
+
+   A especificidade (0,2,0) vence a regra do DS (0,1,0) sem precisar de !important,
+   e o shine sweep e o press ficam de pé porque moram em `.via-btn`.
+   ------------------------------------------------------------------------------ */
+.via-mesh-navy .via-btn--primary,
+.via-glass-dark .via-btn--primary {
+  background: var(--via-accent);
+  border-color: var(--via-accent);
+  color: var(--cst-navy-deep);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.12) inset,
+    0 10px 24px -8px rgba(0, 162, 255, 0.55);
+}
+
+.via-mesh-navy .via-btn--primary:hover:not(:disabled),
+.via-glass-dark .via-btn--primary:hover:not(:disabled) {
+  background: var(--via-accent-deep);
+  border-color: var(--via-accent-deep);
+}
+
+/* Seleção de texto — navy CST em vez do navy VIA original. */
+::selection {
+  background: rgba(11, 22, 45, 0.92);
+  color: var(--cst-white);
+}
+
+/* Sobre banda escura, a seleção usa o accent: é onde ele é legível e onde a
+   marca CST está em casa. */
+.via-mesh-navy ::selection,
+.via-glass-dark ::selection {
+  background: rgba(0, 162, 255, 0.85);
+  color: var(--cst-navy-deep);
+}

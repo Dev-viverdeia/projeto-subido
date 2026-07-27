@@ -1,0 +1,116 @@
+.grid {
+  list-style: none;
+  margin: var(--via-space-12) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1080px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: var(--via-space-5);
+  padding: var(--via-space-6);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  box-shadow: var(--via-shadow-xs);
+  transition:
+    transform var(--via-t-fast),
+    box-shadow var(--via-t-fast);
+}
+
+.card:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow: var(--via-shadow-md);
+}
+
+.quote {
+  margin: 0;
+}
+
+/* Itálico editorial: marca que a voz é de outra pessoa, sem precisar de aspas
+   decorativas gigantes. */
+.quoteText {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-style: italic;
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}
+
+/* O resultado é o que a seção existe para mostrar, então tem tratamento de número. */
+.outcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.outcomeValue {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h4);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-text-primary);
+}
+
+.outcomeTime {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  color: var(--via-accent-ink);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--via-radius-pill);
+  overflow: hidden;
+}
+
+.identity {
+  display: grid;
+}
+
+.name {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.role {
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-muted);
+}
+
+.note {
+  margin: var(--via-space-8) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-faint);
+  padding-left: var(--via-space-4);
+  border-left: 2px solid var(--via-coral);
+}

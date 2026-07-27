@@ -1,0 +1,92 @@
+.groups {
+  display: grid;
+  gap: var(--via-space-10);
+}
+
+/* A hairline vertical entre os dois blocos só existe quando eles estão lado a lado.
+   Colocação EXPLÍCITA de coluna: com o ::before ocupando a coluna 2 e os grupos em
+   auto-placement, o primeiro grupo era empurrado para depois da régua e a metade
+   esquerda ficava vazia. */
+@media (min-width: 900px) {
+  .groups {
+    grid-template-columns: 1fr 1px 1fr;
+    gap: var(--via-space-12);
+    align-items: start;
+  }
+
+  .groups::before {
+    content: '';
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    background: var(--via-border-hairline);
+  }
+
+  .group:first-of-type {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .group:last-of-type {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+.source {
+  margin: 0 0 var(--via-space-5);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-label);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
+.stats {
+  margin: 0;
+  display: grid;
+  gap: var(--via-space-6);
+}
+
+@media (min-width: 560px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--via-space-5);
+  }
+}
+
+.stat {
+  display: grid;
+  gap: var(--via-space-1);
+  align-content: start;
+}
+
+/* Números em mono tabular, navy sólido. São a prova — recebem tratamento de
+   protagonista, não de legenda. */
+.value {
+  font-family: var(--via-font-mono);
+  /* Teto de 34px: cada número divide um terço de METADE da faixa (~200px). A 40px,
+     "+R$ 400 mi" quebrava em duas linhas e desalinhava a régua dos rótulos. */
+  font-size: clamp(1.5rem, 1.15rem + 1.1vw, 2.125rem);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--via-ls-tight);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+}
+
+.label {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 24ch;
+}
+
+.note {
+  margin: var(--via-space-10) 0 0;
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-faint);
+}

@@ -1,0 +1,37 @@
+.split {
+  display: grid;
+  gap: var(--via-space-10);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--via-space-16);
+  }
+
+  /* A alternância só existe a partir daqui. Em coluna única ela só embaralharia a
+     ordem de leitura, então some. */
+  .flip .copy {
+    order: 2;
+  }
+
+  .flip .media {
+    order: 1;
+  }
+}
+
+.copy {
+  display: grid;
+  gap: var(--via-space-8);
+  align-content: start;
+  min-width: 0;
+}
+
+.facts {
+  max-width: 46ch;
+}
+
+.media {
+  min-width: 0;
+}

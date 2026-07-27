@@ -1,0 +1,93 @@
+.grid {
+  margin-top: var(--via-space-12);
+  display: grid;
+  gap: var(--via-space-12);
+}
+
+/* Colunas de largura IGUAL — é a gramática visual que comunica a paridade. */
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--via-space-12);
+  }
+}
+
+.person {
+  display: grid;
+  gap: var(--via-space-6);
+  align-content: start;
+}
+
+@media (min-width: 560px) {
+  .person {
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: var(--via-space-6);
+  }
+}
+
+.portrait {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--via-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--via-border-hairline);
+  box-shadow: var(--via-shadow-md);
+}
+
+@media (max-width: 559px) {
+  .portrait {
+    max-width: 160px;
+  }
+}
+
+.body {
+  display: grid;
+  gap: var(--via-space-3);
+  align-content: start;
+  min-width: 0;
+}
+
+.name {
+  color: var(--via-text-primary);
+}
+
+.role {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  letter-spacing: var(--via-ls-wide);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
+.credentials {
+  list-style: none;
+  margin: var(--via-space-1) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--via-space-1);
+}
+
+.credentials li {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+  padding-block: var(--via-space-1);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+/* Citação em itálico com régua: marca que a voz muda de dono. */
+.quote {
+  margin: var(--via-space-3) 0 0;
+  padding-left: var(--via-space-4);
+  border-left: 2px solid var(--via-navy);
+}
+
+.quote p {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-style: italic;
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}

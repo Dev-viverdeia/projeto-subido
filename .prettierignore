@@ -1,0 +1,9 @@
+# Generated / vendored — integrity is enforced by check-ds-drift.mjs, not by formatting.
+src/design-system/via/
+src/lib/supabase/types.generated.ts
+.next/
+node_modules/
+package-lock.json
+
+# Estado de ferramenta (inclui worktrees git em commits antigos).
+.claude/

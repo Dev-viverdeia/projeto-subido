@@ -1,0 +1,132 @@
+/* ==============================================================================
+   Devices de motion — todos em CSS, todos acima da dobra.
+
+   A biblioteca (Motion) só entra ABAIXO da dobra, para coreografia ligada ao
+   scroll. O hero não pode depender de JS de terceiro para aparecer.
+
+   Regra que continua valendo: `opacity: 0` nunca é default. Todo estado escondido
+   vive sob `.js-reveal`, que só entra quando há JS e o usuário não pediu redução de
+   movimento.
+   ============================================================================== */
+
+/* --- 1 · Mask reveal por linha -------------------------------------------------
+   O device mais impactante da referência, e o mais barato: cada linha vive numa
+   janela com overflow hidden e sobe de baixo. Como a copy é dado tipado, as linhas
+   são AUTORAIS — nós escolhemos onde quebra, o que é melhor tipografia do que
+   deixar o navegador decidir. */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  /* O padding evita que descendentes (g, j, p, q) sejam cortados pela janela. */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.mask-line > span {
+  display: block;
+  will-change: transform;
+}
+
+.js-reveal .mask-line > span {
+  transform: translate3d(0, 110%, 0);
+}
+
+/* Três formas de disparar, na ordem em que aparecem na página:
+     · `--now`            → hero, anima no mount
+     · `[data-revealed]`  → o próprio MaskReveal é a sentinela
+     · descendente        → um <Reveal mode="trigger"> pai é a sentinela */
+.js-reveal .mask-reveal[data-revealed] .mask-line > span,
+.js-reveal [data-revealed] .mask-line > span,
+.js-reveal .mask-reveal--now .mask-line > span {
+  transform: translate3d(0, 0, 0);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--line-i, 0) * 90ms);
+}
+
+/* --- 2 · Fade-up escalonado ---------------------------------------------------- */
+.js-reveal .rise {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+}
+
+.js-reveal .rise--now,
+.js-reveal [data-revealed] > .rise,
+.js-reveal .rise[data-revealed] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--rise-i, 0) * 80ms);
+}
+
+/* --- 3 · Label roll no hover ---------------------------------------------------
+   Toda a referência faz isto: o rótulo é duplicado e sobe na janela no hover. É o
+   que faz cada elemento interativo parecer construído em vez de estilizado.
+   Duas cópias bastam — a terceira que se vê no DOM deles é folga de marquee. */
+.roll {
+  --roll-lh: 1.2;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: var(--roll-lh);
+  /* A janela precisa ter EXATAMENTE a altura de uma linha. Sem isto ela cresce para
+     caber as duas cópias e o clone fica visível empilhado sob o original. */
+  height: calc(1em * var(--roll-lh));
+}
+
+.roll__track {
+  display: block;
+  transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.roll__item {
+  display: block;
+  height: calc(1em * var(--roll-lh));
+  line-height: var(--roll-lh);
+}
+
+/* O clone é escondido de leitor de tela — é ornamento, não conteúdo. */
+:is(a, button):hover .roll__track,
+:is(a, button):focus-visible .roll__track {
+  transform: translate3d(0, -50%, 0);
+}
+
+/* --- 4 · Underline que cresce da esquerda -------------------------------------- */
+.ul-grow {
+  position: relative;
+  text-decoration: none;
+}
+
+.ul-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.12em;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ul-grow:hover::after,
+.ul-grow:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* --- 5 · Reduced motion --------------------------------------------------------
+   A classe .js-reveal nem chega a entrar quando o usuário pede redução, então os
+   estados escondidos acima não existem. Isto aqui zera o que é hover/idle. */
+@media (prefers-reduced-motion: reduce) {
+  .roll__track,
+  .ul-grow::after {
+    transition: none;
+  }
+
+  .ul-grow::after {
+    transform: scaleX(1);
+  }
+}

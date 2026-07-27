@@ -1,0 +1,31 @@
+/* ==============================================================================
+   Sentinela de entrada.
+
+   Este arquivo NÃO tem estado visual — só documenta o contrato. Os estados
+   escondidos moram em motion.css, em CLASSES (`.rise`, `.mask-line`).
+
+   Por que separado: um mesmo elemento precisa poder ser a sentinela do
+   IntersectionObserver e ter a própria animação (uma máscara, por exemplo). Quando
+   o estado escondido morava no atributo `[data-reveal]`, virar sentinela implicava
+   receber o fade — e os dois brigavam.
+
+   Contrato:
+     data-reveal      → "sou sentinela do IO"        (não pinta nada)
+     data-revealed    → "já entrei em tela"          (aplicado pelo Reveal)
+     .rise            → estado escondido de fade-up  (visual)
+     .mask-line       → estado escondido de máscara  (visual)
+
+   A REGRA QUE IMPORTA MAIS QUE TODAS:
+   `opacity: 0` nunca é default de CSS. Todo estado escondido vive sob `.js-reveal`,
+   classe que um script inline só adiciona quando (a) o JS roda e (b) o usuário não
+   pediu redução de movimento. Sem JS, com JS desligado, com reduced-motion ou para
+   o Googlebot, a página nasce inteira e visível — enviar `opacity: 0` no CSS base é
+   a forma mais comum de uma landing bonita subir invisível para o buscador.
+   ============================================================================== */
+
+/* Enquanto a transição corre, promove a camada; o componente remove no
+   `transitionend`. Deixar `will-change` ligado permanentemente promove dezenas de
+   camadas e custa mais memória do que economiza em pintura. */
+.js-reveal [data-animating] {
+  will-change: opacity, transform;
+}

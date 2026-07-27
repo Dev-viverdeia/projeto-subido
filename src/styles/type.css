@@ -1,0 +1,131 @@
+/* ==============================================================================
+   Escala editorial.
+
+   O design system nasceu para a aplicação logada, onde o maior tamanho é 5rem
+   (80px). Uma landing de conversão precisa de outra ordem de grandeza: a referência
+   que estamos perseguindo roda display a 150px com entrelinha 1.0 e peso 400.
+
+   O ponto que separa isso de "texto grande" é a combinação:
+     · tamanho alto  +  entrelinha ~0,95  +  peso 450, NUNCA bold
+     · tracking negativo que aperta conforme o tamanho sobe
+   Tipo grande e leve lê como editorial. Tipo grande e bold lê como banner.
+   ============================================================================== */
+
+:root {
+  /* 44 → 112px.
+     A referência roda 150px, mas o hero dela não tem CTA para caber na dobra — é
+     portfólio, não funil. Aqui o teto é o maior tamanho em que as 4 linhas do título
+     MAIS o CTA primário cabem em 900px de altura. Impacto tipográfico não pode custar
+     a visibilidade do botão numa página que recebe clique pago. */
+  --type-hero: clamp(2.75rem, 1.4rem + 4.6vw, 7rem);
+  /* 34 → 60px · para cabeçalho que ocupa a LARGURA TOTAL da seção */
+  --type-display: clamp(2.125rem, 1.5rem + 2.4vw, 3.75rem);
+  /* 28 → 42px · para cabeçalho dentro de COLUNA (metade da grade) */
+  --type-title: clamp(1.75rem, 1.4rem + 1.4vw, 2.625rem);
+  /* 22 → 30px · sub-cabeçalho e cards */
+  --type-subtitle: clamp(1.375rem, 1.2rem + 0.7vw, 1.875rem);
+  /* 17 → 21px */
+  --type-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.3125rem);
+
+  /* Labels em mono com PRESENÇA. 11px era medo; a referência usa 18px. */
+  --type-label: 1.125rem;
+  --type-label-sm: 0.9375rem;
+
+  --lh-hero: 0.95;
+  --lh-display: 1.03;
+  --lh-title: 1.08;
+  --lh-subtitle: 1.15;
+
+  /* O tracking aperta conforme o tamanho sobe — sem isso, tipo grande "abre". */
+  --ls-hero: -0.04em;
+  --ls-display: -0.035em;
+  --ls-title: -0.03em;
+}
+
+/* --- Display ------------------------------------------------------------------
+   REGRA DE USO — errar isto é o que produz título quebrando em sete linhas:
+
+     .t-hero      → só o hero, largura total da página
+     .t-display   → cabeçalho que ocupa a LARGURA TOTAL da seção
+     .t-title     → cabeçalho dentro de COLUNA (metade da grade)
+     .t-subtitle  → card, item de lista, sub-bloco
+
+   O clamp escala com a VIEWPORT, mas o título vive numa COLUNA. Um display de 88px
+   numa coluna de 600px sempre quebra feio, por mais que a viewport seja larga — por
+   isso o tamanho é escolhido pelo contexto, não só pelo nível hierárquico. */
+.t-hero,
+.t-display,
+.t-title,
+.t-subtitle {
+  font-family: var(--via-font-display);
+  font-weight: 450;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.t-hero {
+  font-size: var(--type-hero);
+  line-height: var(--lh-hero);
+  letter-spacing: var(--ls-hero);
+}
+
+.t-display {
+  font-size: var(--type-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+}
+
+.t-title {
+  font-size: var(--type-title);
+  line-height: var(--lh-title);
+  letter-spacing: var(--ls-title);
+}
+
+.t-subtitle {
+  font-size: var(--type-subtitle);
+  line-height: var(--lh-subtitle);
+  letter-spacing: -0.022em;
+}
+
+/* Ênfase é itálico editorial, nunca peso. */
+.t-hero em,
+.t-display em,
+.t-title em,
+.t-subtitle em {
+  font-style: italic;
+  font-weight: inherit;
+}
+
+/* --- Label em mono ------------------------------------------------------------
+   O device dos parênteses vem da referência e resolve um problema real: dá ao
+   rótulo um começo e um fim visuais, então ele pode ser grande sem virar título. */
+.t-label {
+  font-family: var(--via-font-mono);
+  font-size: var(--type-label);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.t-label--sm {
+  font-size: var(--type-label-sm);
+}
+
+.t-label::before {
+  content: '( ';
+}
+
+.t-label::after {
+  content: ' )';
+}
+
+/* --- Lead --------------------------------------------------------------------- */
+.t-lead {
+  font-size: var(--type-lead);
+  line-height: 1.45;
+  letter-spacing: -0.011em;
+  text-wrap: pretty;
+  margin: 0;
+}

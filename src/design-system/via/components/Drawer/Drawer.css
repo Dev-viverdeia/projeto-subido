@@ -1,0 +1,176 @@
+/* ============================================
+   <Drawer> · sheet lateral · right | left | bottom
+   ============================================ */
+.via-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+}
+
+.via-drawer-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 60% 40%, rgba(10, 31, 59, 0.42), rgba(10, 31, 59, 0.58));
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  animation: via-drawer-scrim-in .3s var(--via-ease-snap);
+  pointer-events: auto;
+}
+
+@keyframes via-drawer-scrim-in {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to   { opacity: 1; backdrop-filter: blur(10px) saturate(120%); }
+}
+
+.via-drawer {
+  position: absolute;
+  background: var(--via-glass-card);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid var(--via-border-soft, rgba(10, 31, 59, 0.08));
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 0 0 0.5px var(--via-navy-08),
+    0 32px 72px -16px var(--via-navy-40),
+    0 16px 32px -12px var(--via-navy-20);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+/* Atmosphere radial sutil */
+.via-drawer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px 280px at 0% 0%, var(--via-navy-04), transparent 60%),
+    radial-gradient(420px 280px at 100% 100%, var(--via-navy-03), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Right (default) */
+.via-drawer--right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 18px 0 0 18px;
+  animation: via-drawer-in-right .3s var(--via-ease-snap);
+}
+
+@keyframes via-drawer-in-right {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* Left */
+.via-drawer--left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 0 18px 18px 0;
+  animation: via-drawer-in-left .3s var(--via-ease-snap);
+}
+
+@keyframes via-drawer-in-left {
+  from { transform: translateX(-24px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* Bottom · útil pra mobile */
+.via-drawer--bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 18px 18px 0 0;
+  animation: via-drawer-in-bottom .3s var(--via-ease-snap);
+  max-height: 85vh;
+}
+
+@keyframes via-drawer-in-bottom {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Sizes */
+.via-drawer--right.via-drawer--sm,
+.via-drawer--left.via-drawer--sm { width: 320px; max-width: 90vw; }
+.via-drawer--right.via-drawer--md,
+.via-drawer--left.via-drawer--md { width: 420px; max-width: 90vw; }
+.via-drawer--right.via-drawer--lg,
+.via-drawer--left.via-drawer--lg { width: 560px; max-width: 95vw; }
+
+.via-drawer--bottom.via-drawer--sm { max-height: 40vh; }
+.via-drawer--bottom.via-drawer--md { max-height: 60vh; }
+.via-drawer--bottom.via-drawer--lg { max-height: 80vh; }
+
+/* Head */
+.via-drawer__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--via-border-soft, rgba(10, 31, 59, 0.08));
+}
+
+.via-drawer__head h2 {
+  margin: 0 0 4px;
+  font-family: var(--via-display, 'Geist', system-ui, sans-serif);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: -0.018em;
+  color: var(--via-text-primary);
+}
+
+.via-drawer__head p {
+  margin: 0;
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+  color: var(--via-ink-2, #5E6B82);
+}
+
+.via-drawer__close {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--via-ink-3, #6B7891);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.via-drawer__close:hover {
+  background: var(--via-navy-05);
+  color: var(--via-text-primary);
+  border-color: var(--via-border-soft, rgba(10, 31, 59, 0.08));
+}
+
+/* Body */
+.via-drawer__body {
+  flex: 1;
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+  color: var(--via-text, var(--via-gray-700));
+  font-size: var(--via-fs-caption);
+  line-height: 1.6;
+}
+
+/* Foot */
+.via-drawer__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-2_5);
+  padding: 14px 20px;
+  border-top: 1px solid var(--via-border-soft, rgba(10, 31, 59, 0.08));
+  background: var(--via-navy-02);
+}

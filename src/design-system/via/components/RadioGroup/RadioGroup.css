@@ -1,0 +1,121 @@
+/* ============================================
+   <RadioGroup> · editorial · vertical stack
+   ============================================ */
+.via-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  font-family: var(--via-font, 'Geist', system-ui, sans-serif);
+}
+
+.via-radio {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.via-radio.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.via-radio__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.via-radio__circle {
+  position: relative;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--via-glass-card);
+  border: 1px solid var(--via-border, #D0D5DD);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color var(--via-dur) ease,
+    box-shadow var(--via-dur) ease,
+    background var(--via-dur) ease;
+  margin-top: 1px;
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 1px 2px var(--via-navy-04);
+}
+
+/* Alvo de toque generoso (>= WCAG AA) sem alterar o visual.
+   Altura 28px evita sobreposição com a linha vizinha em listas densas. */
+.via-radio__circle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+}
+
+.via-radio:hover:not(.is-disabled) .via-radio__circle {
+  border-color: var(--via-navy-30);
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 2px 6px -2px var(--via-navy-10);
+}
+
+.via-radio__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--via-text-primary), var(--via-text-body));
+  transform: scale(0);
+  transition: transform 0.32s var(--via-ease-spring);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 1px 2px var(--via-navy-30);
+}
+
+.via-radio__input:checked + .via-radio__circle {
+  border-color: var(--via-text-primary);
+  background: var(--via-glass-card);
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 0 0 3px var(--via-navy-08),
+    0 2px 6px -2px var(--via-navy-12);
+}
+
+.via-radio__input:checked + .via-radio__circle .via-radio__dot {
+  transform: scale(1);
+}
+
+.via-radio__input:focus-visible + .via-radio__circle {
+  outline: 2px solid var(--via-navy-60);
+  outline-offset: 2px;
+}
+
+.via-radio__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-0_5);
+  min-width: 0;
+}
+
+.via-radio__label {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: -0.008em;
+  color: var(--via-text-primary);
+  line-height: 1.4;
+}
+
+.via-radio__desc {
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+  color: var(--via-ink-2, #5E6B82);
+}
