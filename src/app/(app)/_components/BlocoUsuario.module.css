@@ -1,0 +1,71 @@
+.bloco {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
+}
+
+.identidade {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  /* min-width:0 em toda a cadeia — sem isso o flex item se recusa a encolher abaixo
+     do conteúdo e o e-mail longo empurra o botão de sair para fora da sidebar. */
+  min-width: 0;
+  flex: 1;
+  padding: var(--via-space-2);
+  border-radius: var(--via-radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--via-t-fast);
+}
+
+.identidade:hover {
+  background: var(--via-bg-2);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nome,
+.email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nome {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.email {
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.sair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 40px de alvo; o ícone tem 16. */
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: var(--via-radius-md);
+  color: var(--via-text-muted);
+  transition:
+    background-color var(--via-t-fast),
+    color var(--via-t-fast);
+}
+
+.sair:hover {
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
