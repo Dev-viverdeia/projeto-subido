@@ -60,39 +60,6 @@
   transition-delay: calc(var(--rise-i, 0) * 80ms);
 }
 
-/* --- 3 · Label roll no hover ---------------------------------------------------
-   Toda a referência faz isto: o rótulo é duplicado e sobe na janela no hover. É o
-   que faz cada elemento interativo parecer construído em vez de estilizado.
-   Duas cópias bastam — a terceira que se vê no DOM deles é folga de marquee. */
-.roll {
-  --roll-lh: 1.2;
-  display: inline-block;
-  position: relative;
-  overflow: hidden;
-  vertical-align: bottom;
-  line-height: var(--roll-lh);
-  /* A janela precisa ter EXATAMENTE a altura de uma linha. Sem isto ela cresce para
-     caber as duas cópias e o clone fica visível empilhado sob o original. */
-  height: calc(1em * var(--roll-lh));
-}
-
-.roll__track {
-  display: block;
-  transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.roll__item {
-  display: block;
-  height: calc(1em * var(--roll-lh));
-  line-height: var(--roll-lh);
-}
-
-/* O clone é escondido de leitor de tela — é ornamento, não conteúdo. */
-:is(a, button):hover .roll__track,
-:is(a, button):focus-visible .roll__track {
-  transform: translate3d(0, -50%, 0);
-}
-
 /* --- 4 · Underline que cresce da esquerda -------------------------------------- */
 .ul-grow {
   position: relative;
@@ -121,7 +88,6 @@
    A classe .js-reveal nem chega a entrar quando o usuário pede redução, então os
    estados escondidos acima não existem. Isto aqui zera o que é hover/idle. */
 @media (prefers-reduced-motion: reduce) {
-  .roll__track,
   .ul-grow::after {
     transition: none;
   }

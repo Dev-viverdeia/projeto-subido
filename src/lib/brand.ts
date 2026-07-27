@@ -29,6 +29,12 @@ export const BRAND = {
   navyDarker: '#02060F',
   /** Única variante do accent legível sobre superfície clara — 4,95:1. */
   accentInk: '#0072BE',
+  /** Segundo tom sólido do título sobre banda escura (não é opacidade). */
+  softInk: '#8FA0B8',
+  /** Texto de apoio sobre banda escura. */
+  mutedInk: '#98A2B3',
+  /** Branco puro — o vidro e a tinta sobre navy precisam dele, não do branco frio. */
+  white: '#FFFFFF',
 } as const;
 
 /**

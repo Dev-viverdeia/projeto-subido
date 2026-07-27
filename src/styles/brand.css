@@ -1,35 +1,39 @@
 /* ==============================================================================
-   VIVER DE IA × SUBIDO — camada de fusão de marca
+   SUBIDO — camada de marca
    ------------------------------------------------------------------------------
    Este arquivo é carregado DEPOIS de design-system/via/styles/tokens.css e
    redefine apenas os tokens cromáticos. O design system vendorizado NUNCA é
    editado — é isso que mantém `npm run check:ds-drift` significativo.
 
-   A TESE DA FUSÃO
-   Os dois sistemas são complementares, não concorrentes:
+   A DIVISÃO DE TRABALHO
+   Duas camadas complementares, não concorrentes:
 
-     · O Viver de IA traz a ARQUITETURA — superfície clara, hierarquia editorial,
+     · O DS VENDORIZADO traz a ARQUITETURA — superfície clara, hierarquia editorial,
        vidro + atmosfera + sombra navy, escalas de espaço/raio/motion, Geist.
-     · A Comunidade Subido traz a CROMÁTICA — o navy institucional, o branco frio
-       e, principalmente, um ACCENT que o VIA nunca teve (lá o "accent" era o
-       próprio navy).
+     · A MARCA SUBIDO traz a CROMÁTICA — o navy institucional, o branco frio e,
+       principalmente, um ACCENT que o DS não tinha (lá o "accent" era o próprio
+       navy).
 
-   O manual da CST resolve sozinho o maior risco da fusão. Ele diz, textualmente:
+   O prefixo `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do
+   design system. Não são marca: não aparecem em copy, alt, aria-label, metadata
+   nem asset. A marca do produto é Subido, e só.
+
+   O manual da marca resolve sozinho o maior risco desta camada. Ele diz, textualmente:
 
      "Utilize o azul #00A2FF de forma pontual. Não é recomendado aplicá-lo em
       grandes áreas, especialmente em fundos. Esse tom deve ser reservado para
       elementos de destaque."
      "A cor preta não pertence à paleta da marca Comunidade Subido."
 
-   Essa é exatamente a disciplina do VIA: hierarquia por peso editorial e cor
-   sólida, nunca por inundação de cor. A restrição não é uma concessão — é a
-   regra que faz as duas marcas caberem no mesmo sistema.
+   Essa é exatamente a disciplina do design system: hierarquia por peso editorial e
+   cor sólida, nunca por inundação de cor. A restrição não é uma concessão — é a
+   regra que faz a cromática da marca caber na arquitetura herdada.
 
    E a física concorda com o manual (medido, não estimado):
 
      #00A2FF sobre #FAFDFF ....  2,70:1  ✗ reprova AA até para texto grande
      #00A2FF sobre #0B162D ....  6,52:1  ✓ passa AA com folga
-     #0B162D sobre #FAFDFF .... 17,62:1  ✓ (o VIA original fazia 16,51:1)
+     #0B162D sobre #FAFDFF .... 17,62:1  ✓
 
    Ou seja: o azul elétrico é, fisicamente, uma cor de destaque sobre escuro.
    Para o caso raro de texto accent sobre claro existe --via-accent-ink (#0072BE,
@@ -37,30 +41,28 @@
 
    CONSEQUÊNCIA NO LAYOUT
    A landing alterna três momentos escuros (hero, HUB, CTA final) num corpo claro.
-   As bandas escuras são o território da CST — navy institucional com o azul
-   pontual. O corpo editorial claro é o território do VIA. O próprio ritmo de
-   bandas passa a ser o mecanismo de co-branding, o que vale muito mais do que
-   repetir um lockup em toda seção.
+   As bandas escuras marcam os momentos de decisão — navy institucional com o azul
+   pontual; o corpo claro carrega o argumento editorial.
    ============================================================================== */
 
 :root {
-  /* ---- Paleta institucional CST (fonte: manual da marca) -------------------- */
+  /* ---- Paleta institucional Subido (fonte: manual da marca) ----------------- */
   --cst-blue: #00a2ff; /* accent · uso PONTUAL, nunca em grandes áreas */
   --cst-navy: #0b162d; /* azul-marinho institucional */
   --cst-navy-deep: #040b1a; /* azul-marinho escuro institucional */
   --cst-white: #fafdff; /* branco institucional (levemente frio) */
 
-  /* ---- Marca → tokens VIA -------------------------------------------------- */
+  /* ---- Marca → tokens do design system -------------------------------------- */
   --via-navy: var(--cst-navy);
   --via-navy-deep: var(--cst-navy-deep);
   --via-navy-darker: #02060f; /* derivado · banda mais profunda */
 
-  /* Azuis intermediários das radiais do mesh, derivados da navy CST mantendo a
-     mesma relação de luminância que o VIA usava. */
+  /* Azuis intermediários das radiais do mesh, derivados da navy institucional
+     mantendo a mesma relação de luminância do design system de origem. */
   --via-blue: #122348;
   --via-blue-soft: #183063;
 
-  /* ---- Accent (a peça que o VIA não tinha) --------------------------------- */
+  /* ---- Accent (a peça que o design system não tinha) ------------------------ */
   --via-accent: var(--cst-blue);
   --via-accent-deep: #0086d6;
   --via-accent-ink: #0072be; /* única variante legível sobre claro · 4,95:1 */
@@ -75,7 +77,16 @@
   --via-surface-elev: #ffffff;
   --via-surface-onnavy: linear-gradient(180deg, #ffffff 0%, var(--cst-white) 100%);
 
-  /* ---- Hairlines e sombras, re-tingidas com a navy CST ---------------------- */
+  /* ---- Hairlines e sombras, re-tingidas com a navy institucional ---------------------- */
+  /* CORREÇÃO DE ACESSIBILIDADE — não é ajuste de gosto.
+     O `--via-text-faint` do design system (#98A2B3) rende 2,52:1 sobre o branco e
+     2,37:1 sobre o tint: reprova AA (4,5:1) com folga. Ele pinta índices numerados,
+     notas de fonte e preços — tudo texto pequeno, onde a régua é a mais dura.
+     #667085 passa nos dois fundos (4,87 e 4,58) e mantém a hierarquia:
+       faint 4,58  <  muted 6,51  <  body 9,64  <  primary 16,58
+     O tom "quieto" continua quieto; só deixou de ser ilegível. */
+  --via-text-faint: #667085;
+
   --via-border: rgba(11, 22, 45, 0.16);
   --via-border-soft: rgba(11, 22, 45, 0.05);
   --via-border-hairline: #e2e9f2;
@@ -94,7 +105,7 @@
   --via-shadow-focus-onnavy: 0 0 0 3px rgba(0, 162, 255, 0.45);
 
   /* ---- Atmosferas ---------------------------------------------------------- */
-  /* O mesh escuro é a assinatura da CST dentro do sistema do VIA. A última radial
+  /* O mesh escuro é a assinatura da marca dentro do sistema herdado. A última radial
      carrega um traço do accent — é a única presença dele em área grande, a ~10%,
      onde funciona como luz e não como preenchimento. */
   --via-mesh-navy:
@@ -126,7 +137,7 @@
    superfície CLARA. Sobre a banda escura ele fica navy-sobre-navy e praticamente
    desaparece. Esta é a correção de sistema, não um ajuste pontual.
 
-   O accent é a resposta certa e é brand-legal: o manual da CST reserva o #00A2FF
+   O accent é a resposta certa e é brand-legal: o manual da marca reserva o #00A2FF
    para "elementos de destaque", e um CTA é a definição disso — área pequena, intenção
    alta. Não é preenchimento de grande área, que é o que o manual proíbe.
 
@@ -153,14 +164,14 @@
   border-color: var(--via-accent-deep);
 }
 
-/* Seleção de texto — navy CST em vez do navy VIA original. */
+/* Seleção de texto — navy institucional. */
 ::selection {
   background: rgba(11, 22, 45, 0.92);
   color: var(--cst-white);
 }
 
 /* Sobre banda escura, a seleção usa o accent: é onde ele é legível e onde a
-   marca CST está em casa. */
+   marca está em casa. */
 .via-mesh-navy ::selection,
 .via-glass-dark ::selection {
   background: rgba(0, 162, 255, 0.85);

@@ -1,8 +1,8 @@
 import { FINAL_CTA, HERO } from '@/content/landing';
-import { CoBrandLockup } from '../chrome/CoBrandLockup';
 import { MaskReveal } from '../primitives/MaskReveal';
-import { Roll } from '../primitives/Roll';
 import { Reveal } from '../primitives/Reveal';
+import { TrackedCta } from '../primitives/TrackedCta';
+import { SiteFooter } from './SiteFooter';
 import styles from './FinalCtaSection.module.css';
 
 /**
@@ -12,8 +12,6 @@ import styles from './FinalCtaSection.module.css';
  * que merece o mesmo device do hero, porque é o mesmo momento — pedir a decisão.
  */
 export function FinalCtaSection() {
-  const year = 2026;
-
   return (
     <section className={`${styles.section} via-noise`} aria-labelledby="cta-final-title">
       <div className={styles.inner}>
@@ -26,9 +24,9 @@ export function FinalCtaSection() {
         />
 
         <Reveal index={1} className={styles.actions}>
-          <a href={FINAL_CTA.cta.href} className={styles.cta}>
-            <Roll>{FINAL_CTA.cta.label}</Roll>
-          </a>
+          <TrackedCta href={FINAL_CTA.cta.href} local="final" className={styles.cta}>
+            {FINAL_CTA.cta.label}
+          </TrackedCta>
           <p className={styles.trust}>
             {HERO.trust.map((item, i) => (
               <span key={item}>
@@ -40,31 +38,7 @@ export function FinalCtaSection() {
         </Reveal>
       </div>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.brand}>
-            <CoBrandLockup size={16} />
-            <p className={styles.partnership}>Viver de IA e Comunidade Subido — parceria</p>
-          </div>
-
-          <nav className={styles.links} aria-label="Rodapé">
-            <a href="/termos" className="ul-grow">
-              Termos de uso
-            </a>
-            <a href="/privacidade" className="ul-grow">
-              Privacidade
-            </a>
-            <a href="/reembolso" className="ul-grow">
-              Política de reembolso
-            </a>
-          </nav>
-
-          <p className={styles.legal}>
-            {/* TODO(legal): CNPJ, razão social e endereço da entidade que emite a nota. */}
-            TODO(legal) · CNPJ · endereço · © {year}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </section>
   );
 }

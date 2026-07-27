@@ -6,5 +6,5 @@ export { HairlineList, type HairlineListProps } from './HairlineList';
 export { DeviceFrame, type DeviceFrameProps } from './DeviceFrame';
 export { AssetPlaceholder, type AssetPlaceholderProps } from './AssetPlaceholder';
 export { MaskReveal, type MaskRevealProps } from './MaskReveal';
-export { Roll } from './Roll';
 export { Parallax, type ParallaxProps } from './Parallax';
+export { TrackedCta, type TrackedCtaProps } from './TrackedCta';

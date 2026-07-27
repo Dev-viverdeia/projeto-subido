@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Favicon: a marca do Subido sobre a navy institucional.
+       A 16px o balão + seta é a forma mais reconhecível da marca — o wordmark tem
+       proporção larga demais e vira um borrão nesse tamanho.
+       O balão é ampliado e centrado com folga própria, porque a silhueta do logotipo
+       completo (com rabicho) desequilibra dentro de um quadrado pequeno. -->
+  <rect width="128" height="128" rx="28" fill="#0B162D" />
+  <g transform="translate(26 24) scale(0.76)">
+    <path
+      d="M27 0 H73 A27 27 0 0 1 100 27 V55 A27 27 0 0 1 73 82 H21 L2 100 V27 A27 27 0 0 1 27 0 Z M38.5 23 H73 V57.5 H62.5 V41 L41 62.5 L33.2 54.7 L54.7 33.2 H38.5 Z"
+      fill-rule="evenodd"
+      fill="#00A2FF"
+    />
+  </g>
+</svg>

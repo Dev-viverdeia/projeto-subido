@@ -1,4 +1,7 @@
 import type { ReactNode } from 'react';
+import { construirJsonLd } from '@/lib/seo/jsonld';
+import { AttributionBoot } from './_components/chrome/AttributionBoot';
+import { ConsentNotice } from './_components/chrome/ConsentNotice';
 import { SiteHeader } from './_components/chrome/SiteHeader';
 import { SmoothScroll } from './_components/chrome/SmoothScroll';
 
@@ -25,16 +28,35 @@ import { SmoothScroll } from './_components/chrome/SmoothScroll';
  */
 const ENABLE_MOTION = `try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-reveal')}}catch(e){}`;
 
+/**
+ * Consent Mode v2 — NEGADO POR PADRÃO, e antes de qualquer tag.
+ *
+ * Precisa rodar inline e cedo: se a declaração chegar depois do GTM, as primeiras
+ * tags já dispararam sem consentimento, e aí não há aviso de cookie que conserte.
+ * O componente de consentimento só emite o `update`.
+ */
+const CONSENT_DEFAULT = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`;
+
 export default function MarketingLayout({ children }: { children: ReactNode }) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
   return (
     <>
+      <script dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULT }} />
       <script dangerouslySetInnerHTML={{ __html: ENABLE_MOTION }} />
+      <script
+        type="application/ld+json"
+        // Gerado do MESMO dado que renderiza a página — ver lib/seo/jsonld.ts.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(construirJsonLd(siteUrl)) }}
+      />
       <a href="#conteudo" className="via-skip-link">
         Pular para o conteúdo
       </a>
       <SmoothScroll />
+      <AttributionBoot />
       <SiteHeader />
       {children}
+      <ConsentNotice />
     </>
   );
 }

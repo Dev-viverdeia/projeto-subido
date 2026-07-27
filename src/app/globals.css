@@ -11,7 +11,7 @@
 @import '../design-system/via/base/via-base.css';
 @import '../design-system/via/styles/form-fields.css';
 
-/* 2 · Fusão de marca Viver de IA × Subido. Precisa vir DEPOIS dos tokens. */
+/* 2 · Camada de marca Subido. Precisa vir DEPOIS dos tokens. */
 @import '../styles/brand.css';
 
 /* 3 · Motion de entrada. Ver o comentário do arquivo: nada de opacity:0 no base. */

@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react';
 import { PLANS, PRICING_META, GUARANTEE } from '@/content/landing';
-import { Section, SectionHeader, Reveal, Roll } from '../primitives';
+import { Section, SectionHeader, Reveal, TrackedCta } from '../primitives';
 import styles from './PricingSection.module.css';
 
 /**
@@ -74,12 +74,14 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <a
+              <TrackedCta
                 href={plan.id === 'enterprise' ? '#contato' : '#checkout'}
+                local="planos"
+                plano={plan.id}
                 className={plan.featured ? styles.ctaPrimary : styles.ctaGhost}
               >
-                <Roll>{plan.cta}</Roll>
-              </a>
+                {plan.cta}
+              </TrackedCta>
             </Reveal>
           ))}
         </ul>

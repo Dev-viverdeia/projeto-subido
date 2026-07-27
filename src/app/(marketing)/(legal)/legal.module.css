@@ -1,0 +1,83 @@
+.page {
+  background: var(--via-bg);
+  min-height: 100svh;
+  padding-block: var(--via-space-20) var(--via-space-24);
+}
+
+.doc {
+  max-width: var(--via-content);
+  margin-inline: auto;
+  padding-inline: var(--via-space-5);
+}
+
+@media (min-width: 768px) {
+  .doc {
+    padding-inline: var(--via-space-8);
+  }
+}
+
+.doc :global(h1) {
+  font-family: var(--via-font-display);
+  font-size: var(--type-display);
+  font-weight: 450;
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  color: var(--via-text-primary);
+  margin: 0 0 var(--via-space-6);
+  max-width: 20ch;
+}
+
+.doc :global(h2) {
+  font-family: var(--via-font-display);
+  font-size: var(--type-subtitle);
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  color: var(--via-text-primary);
+  margin: var(--via-space-10) 0 var(--via-space-3);
+}
+
+.doc :global(p),
+.doc :global(li) {
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-body);
+  margin: 0 0 var(--via-space-4);
+  text-wrap: pretty;
+}
+
+.doc :global(ul) {
+  padding-left: var(--via-space-5);
+  margin: 0 0 var(--via-space-4);
+}
+
+.doc :global(a) {
+  color: var(--via-accent-ink);
+}
+
+/* Marcador de pendência: visível de propósito, para não subir em produção sem que
+   alguém tenha lido. */
+.doc :global(.todo) {
+  display: block;
+  margin: 0 0 var(--via-space-8);
+  padding: var(--via-space-4) var(--via-space-5);
+  border-left: 2px solid var(--via-coral);
+  background: var(--via-bg-2);
+  border-radius: 0 var(--via-radius-sm) var(--via-radius-sm) 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.doc :global(.voltar) {
+  display: inline-block;
+  margin-bottom: var(--via-space-8);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+  text-decoration: none;
+}
+
+.doc :global(.voltar:hover) {
+  color: var(--via-text-primary);
+}

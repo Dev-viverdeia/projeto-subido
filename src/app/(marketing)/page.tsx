@@ -19,11 +19,10 @@ import { FinalCtaSection } from './_components/cta/FinalCtaSection';
  * árvore — qualquer um dos três tiraria a rota do shell estático e transformaria um
  * hit de CDN de ~40ms numa invocação de função Node, a cada clique pago.
  *
- * RITMO DE BANDAS — o mecanismo de co-branding da página.
- * Exatamente TRÊS momentos escuros num corpo claro. Banda escura é território da
- * Comunidade Subido (navy institucional + accent pontual); corpo editorial claro é
- * território do Viver de IA. Isso comunica a parceria melhor do que repetir um lockup
- * em toda seção — e é por isso que o lockup aparece só em quatro lugares.
+ * RITMO DE BANDAS — a estrutura de leitura da página.
+ * Exatamente TRÊS momentos escuros num corpo claro. As bandas escuras marcam os três
+ * momentos de decisão (abertura, destino, chamada final); o corpo claro é o argumento
+ * editorial. É o ritmo que dá respiro a uma página de 11 mil pixels.
  *
  *   ESCURO   hero
  *   claro    credibilidade · contexto · pilares (índice + 01–04) · caminhos

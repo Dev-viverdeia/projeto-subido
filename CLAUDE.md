@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ---
 
-# Viver de IA × Subido — convenções do projeto
+# Subido — convenções do projeto
 
 > **Este é o ÚNICO arquivo de instruções do projeto.** `AGENTS.md` é um symlink para cá.
 > A plataforma de referência mantinha três arquivos (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`)
@@ -27,10 +27,14 @@ o typecheck pesado é gate de merge.
 
 ## O produto
 
-Plataforma B2C de assinatura, joint venture entre Viver de IA e Pedro Sobral, que forma
-**implementadores de IA**. Quatro pilares — Soluções, Formações, Builder, Mentorias — e um HUB
-onde empresas contratam os formados. A porta de entrada é uma **landing page pública de
-conversão** alimentada por tráfego pago.
+Plataforma B2C de assinatura da **Comunidade Subido de Tráfego** que forma **implementadores
+de IA**. Quatro pilares — Soluções, Formações, Builder, Mentorias — e um HUB onde empresas
+contratam os formados. A porta de entrada é uma **landing page pública de conversão**
+alimentada por tráfego pago.
+
+**A marca do produto é Subido, e só.** O design system que serve de base tem outra origem
+(ver abaixo), mas isso é infraestrutura interna: nenhuma outra marca é nomeada, assinada ou
+exibida no produto.
 
 ## Stack
 
@@ -63,14 +67,18 @@ a landing rodar com ~zero JS do DS. Consequências:
 - Ícones `lucide-react` em Server Component custam zero JS. **Ícone mora em Server Component.**
 - Consulte `src/design-system/via/DS_CLIENT.json` para a classificação de cada componente.
 
-### A fusão Viver de IA × Subido
+### Marca e design system
 
-A camada de fusão mora em `src/styles/brand.css`, carregada **depois** dos tokens do DS.
+A camada de marca mora em `src/styles/brand.css`, carregada **depois** dos tokens do DS.
 O design system vendorizado nunca é editado — é isso que mantém o `check-ds-drift` válido.
 
-Os dois sistemas são complementares: o **VIA traz a arquitetura** (superfície clara, hierarquia
-editorial, vidro + atmosfera + sombra navy, escalas, Geist) e a **CST traz a cromática** (navy
-institucional, branco frio e — o que o VIA não tinha — um **accent**).
+O DS vendorizado (`src/design-system/via/`, prefixo `--via-*`) vem de um repositório de origem
+diferente e fornece a ARQUITETURA visual: superfície clara, hierarquia editorial, vidro +
+atmosfera + sombra navy, escalas, Geist. A camada de marca sobrescreve a CROMÁTICA com a paleta
+institucional do Subido — navy, branco frio e o accent.
+
+> O prefixo `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do design system.
+> Não são marca e não devem aparecer em copy, `alt`, `aria-label`, metadata ou asset.
 
 | Token              | Valor     | Origem                                        |
 | ------------------ | --------- | --------------------------------------------- |

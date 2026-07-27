@@ -3,15 +3,15 @@ import { Section, SectionHeader, Reveal, AssetPlaceholder } from '../primitives'
 import styles from './AuthoritySection.module.css';
 
 /**
- * Autoridade — os dois lados com PESO IDÊNTICO.
+ * Autoridade — quem responde pelo produto.
  *
- * Mesma largura de coluna, mesmo tamanho de tipo, mesmo tratamento de retrato. A
- * gramática visual diz "joint venture", que é o que é: se um dos lados aparecesse
- * maior, a página viraria o lançamento de um deles com o outro de carona.
+ * As colunas têm largura e tratamento idênticos de propósito: o rosto conhecido e a
+ * direção técnica pesam igual. Dar mais espaço ao rosto conhecido transformaria a
+ * página num lançamento pessoal, e o que se vende aqui é a plataforma.
  *
  * O Sobral não aparece no hero de propósito — o topo pertence ao produto. Rosto dele
- * lá em cima faria disto "um lançamento do Sobral", e o posicionamento é o inverso:
- * uma plataforma do Viver de IA que ele avaliza.
+ * lá em cima faria disto um lançamento pessoal, e o posicionamento é o de produto:
+ * a plataforma que ele constrói.
  *
  * TODO(asset): retratos em duotone #02162A → #E4E7EC ASSADO NA EXPORTAÇÃO, nunca via
  * filter CSS — filter custa paint a cada frame e não cacheia.

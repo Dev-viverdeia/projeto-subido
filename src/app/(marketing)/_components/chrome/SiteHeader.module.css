@@ -1,13 +1,9 @@
-/* Sentinela: uma faixa de 1px de largura que COBRE TODA A ALTURA DO HERO.
+/* Sentinela: faixa de 1px de largura que COBRE TODA A ALTURA DO HERO.
 
-   A versão anterior era um ponto de 1px logo abaixo do hero, e não funcionava: com
-   `threshold: 0`, sair de "abaixo da viewport" para "acima da viewport" num salto de
-   âncora não é mudança de estado de interseção — os dois são "não intersectando" — e
-   o observer simplesmente nunca disparava. Resultado: a barra não aparecia depois de
-   navegar pelo menu.
-
-   Cobrindo a altura do hero, o estado no topo é "intersectando" e em qualquer ponto
-   abaixo é "não intersectando". Aí a transição é real e sempre dispara. */
+   Não é um ponto: com `threshold: 0`, sair de "abaixo da viewport" para "acima" num
+   salto de âncora não é mudança de estado de interseção — os dois são "não
+   intersectando" — e o observer nunca dispararia. Cobrindo o hero, o estado no topo é
+   "intersectando" e abaixo é "não", então a transição é real e sempre dispara. */
 .sentinel {
   position: absolute;
   top: 0;
@@ -17,175 +13,347 @@
   pointer-events: none;
 }
 
-.header {
+/* ==============================================================================
+   Wrapper fixo. Não tem superfície — só posiciona e afasta das bordas.
+   A moldura arredondada é a barra interna, o que permite animar apenas
+   propriedades de PINTURA (fundo, sombra, raio) e nunca layout.
+   ============================================================================== */
+.wrap {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: var(--via-z-sticky);
+  padding: var(--via-space-3) var(--via-space-4);
+  pointer-events: none;
 
-  /* Escondida de verdade: `visibility` a tira da árvore de foco, e o `inert` no JSX
-     cobre navegadores que ainda não respeitam isso em elementos transladados. */
   visibility: hidden;
-  transform: translate3d(0, -100%, 0);
-  transition:
-    transform 320ms var(--via-ease-out),
-    visibility 0s linear 320ms;
 
-  /* O vidro só existe sobre a banda clara; sobre navy ele some, então a barra carrega
-     o próprio fundo. */
-  background: rgba(250, 253, 255, 0.72);
-  backdrop-filter: var(--via-blur-md);
-  -webkit-backdrop-filter: var(--via-blur-md);
-  border-bottom: 1px solid var(--via-border-hairline);
+  /* SÓ TRANSFORM — sem opacity, e isso não é preferência de estilo.
+     `opacity < 1` num ancestral cria um grupo composto: o filho passa a amostrar o
+     grupo em vez da página, e o `backdrop-filter` da barra deixa de ter o que borrar.
+     O vidro simplesmente não acontece durante (e às vezes depois) da transição.
+     A entrada sobe de fora da tela, então não há nada a esmaecer. */
+  transform: translate3d(0, -130%, 0);
+  transition:
+    transform 460ms var(--via-ease-out),
+    visibility 0s linear 460ms;
 }
 
-.header[data-visible] {
+.wrap[data-visible] {
   visibility: visible;
   transform: translate3d(0, 0, 0);
   transition:
-    transform 320ms var(--via-ease-out),
+    transform 520ms var(--via-ease-out),
     visibility 0s;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .header {
-    transition: visibility 0s linear 0s;
+@media (min-width: 768px) {
+  .wrap {
+    padding: var(--via-space-4) var(--via-space-6);
   }
-  .header[data-visible] {
-    transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap,
+  .wrap[data-visible] {
+    transition: visibility 0s;
+    transform: none;
+  }
+}
+
+/* ==============================================================================
+   A barra: pílula de vidro.
+
+   A assinatura do design system é GLASS + ATMOSFÉRICO + SOMBRA NAVY — não glow. As
+   quatro camadas abaixo são exatamente isso:
+     1. sheen branco no topo (inset)  → a luz batendo na borda superior do vidro
+     2. sheen inferior mais fraco     → a espessura do material
+     3. hairline navy                 → assenta a peça sobre o fundo
+     4. sombra navy difusa            → profundidade, sem brilho
+   ============================================================================== */
+.bar {
+  pointer-events: auto;
+  max-width: var(--via-container);
+  margin-inline: auto;
+  height: 60px;
+  padding-inline: var(--via-space-3) var(--via-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+
+  border-radius: var(--via-radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 253, 255, 0.74) 100%);
+  /* SEM o prefixo -webkit- escrito à mão. Declarando os dois, o otimizador de CSS
+     (Lightning) descartou justamente a versão SEM prefixo e manteve só a webkit —
+     o que apaga o vidro no Firefox, que suporta apenas a padrão. Declarando só a
+     padrão, o próprio build gera o prefixo onde for preciso. */
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    0 1px 0 rgba(11, 22, 45, 0.05),
+    0 14px 34px -10px rgba(11, 22, 45, 0.22),
+    0 3px 10px -3px rgba(11, 22, 45, 0.08);
+}
+
+@media (min-width: 768px) {
+  .bar {
+    height: 64px;
+    padding-inline: var(--via-space-4);
   }
 }
 
 /* Sem backdrop-filter, translucidez vira ilegibilidade. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .header {
+  .bar {
     background: var(--via-bg);
   }
 }
 
-.inner {
-  max-width: var(--via-container);
-  margin-inline: auto;
-  height: 64px;
-  padding-inline: var(--via-space-5);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-5);
-}
-
-@media (min-width: 768px) {
-  .inner {
-    padding-inline: var(--via-space-8);
-  }
-}
-
-/* O wordmark do VIA tem proporção 12:1, então a escala precisa cair bastante em tela
-   estreita: a 0,82 o lockup somado ao CTA passava de 375px e cortava o botão. */
+/* --- Marca --------------------------------------------------------------------- */
 .brand {
   display: inline-flex;
   align-items: center;
+  padding-inline: var(--via-space-3);
   color: var(--via-text-primary);
   text-decoration: none;
   flex: none;
   min-width: 0;
-  --lockup-scale: 0.6;
+  --logo-scale: 0.58;
 }
 
 @media (min-width: 420px) {
   .brand {
-    --lockup-scale: 0.72;
+    --logo-scale: 0.68;
   }
 }
 
-@media (min-width: 560px) {
+@media (min-width: 900px) {
   .brand {
-    --lockup-scale: 1;
+    --logo-scale: 0.86;
   }
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
+  border-radius: var(--via-radius-pill);
 }
 
 /* --- Navegação -----------------------------------------------------------------
    Some abaixo de 900px: com quatro âncoras e um CTA não há largura para ambos, e o
-   CTA é quem precisa ganhar. Os pilares continuam alcançáveis pelo índice da página. */
+   CTA é quem precisa ganhar. */
 .nav {
   display: none;
 }
 
-@media (min-width: 900px) {
+/* Com SEIS itens o ponto de corte sobe: abaixo de 1120px eles espremeriam o CTA,
+   que é quem precisa ganhar. As seções continuam alcançáveis pelo índice da página. */
+@media (min-width: 1120px) {
   .nav {
     display: flex;
     align-items: center;
-    gap: var(--via-space-6);
+    gap: 2px;
   }
 }
 
+/* MONO no nav, Geist no CTA.
+   A página inteira usa Geist Mono para rótulo (eyebrows, números, carimbos), e a
+   navegação pertence a essa família de elementos: ela nomeia seções, não conversa.
+   O contraste com o CTA em Geist é o que faz o botão ler como ação e o menu como
+   índice — em vez de tudo virar a mesma voz tipográfica em tamanhos diferentes. */
 .link {
   position: relative;
-  padding-block: var(--via-space-2);
-  font-size: var(--via-fs-caption);
+  /* 44px de altura mínima: com padding sozinho o item ficava em 37px, abaixo do alvo
+     de toque recomendado. O padding lateral continua controlando a largura. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--via-radius-pill);
+  font-family: var(--via-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: -0.022em;
   color: var(--via-text-muted);
   text-decoration: none;
-  transition: color var(--via-t-fast);
+  transition:
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
 }
 
 .link:hover {
   color: var(--via-text-primary);
+  background: rgba(11, 22, 45, 0.045);
 }
 
-/* Estado ativo: régua fina embaixo, em accent. É o item que o scroll-spy marcou, e
-   ele carrega aria-current — a indicação não é só visual. */
+/* Estado ativo: pílula de tinta navy suave com um ponto accent. É o item que o
+   scroll-spy marcou, e ele carrega aria-current — a indicação não é só visual. */
 .link[aria-current] {
   color: var(--via-text-primary);
+  background: rgba(11, 22, 45, 0.06);
 }
 
-.link[aria-current]::after {
+.link[aria-current]::before {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
-  height: 2px;
-  border-radius: 2px;
+  left: 6px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: var(--via-radius-pill);
   background: var(--via-accent);
+}
+
+.link[aria-current] {
+  padding-left: 18px;
 }
 
 .link:focus-visible {
   outline: 2px solid var(--via-navy);
-  outline-offset: 4px;
-  border-radius: var(--via-radius-xs);
+  outline-offset: 2px;
 }
 
-/* --- CTA ------------------------------------------------------------------------ */
+/* --- Ações da direita: login + CTA ----------------------------------------------
+   O login é link de texto, o CTA é botão preenchido. A diferença de peso é o que
+   mantém o clique pago indo para a conversão sem esconder a porta de quem já assina. */
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex: none;
+}
+
+.login {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.login:hover {
+  color: var(--via-text-primary);
+  background: rgba(11, 22, 45, 0.045);
+}
+
+.login:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 2px;
+}
+
+/* Abaixo de 420px o login sai: com logo + login + CTA não há largura, e o CTA é
+   quem precisa ganhar. Quem já assina chega pelo app, não pela landing. */
+@media (max-width: 419px) {
+  .login {
+    display: none;
+  }
+}
+
+/* --- CTA ------------------------------------------------------------------------
+   Sem o "roll" de rótulo que duplicava o texto no DOM. No lugar dele, três coisas
+   que não exigem clonar conteúdo: um sheen que varre a superfície, a seta que
+   desliza, e o levantar de 1px. Tudo transform e opacity. */
 .cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* 44px é o alvo de toque mínimo. Os 34px anteriores vinham do padding sozinho. */
+  gap: var(--via-space-2);
   min-height: 44px;
   padding: 10px 20px;
   white-space: nowrap;
   border-radius: var(--via-radius-pill);
-  background: var(--via-navy);
+  /* Navy, não accent: sobre superfície clara o accent puro rende 2,70:1 e reprova AA.
+     O accent trabalha nos CTAs que vivem sobre banda escura. */
+  background: linear-gradient(180deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
   color: var(--via-white);
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-medium);
+  font-size: 0.8125rem;
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: -0.014em;
   text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 6px 16px -6px rgba(11, 22, 45, 0.5);
   transition:
     transform var(--via-t-fast),
-    background-color var(--via-t-fast);
+    box-shadow var(--via-t-fast),
+    filter var(--via-t-fast);
 }
 
-/* Navy, não accent: sobre a banda clara o accent puro rende 2,70:1 e reprova AA.
-   O accent trabalha nos CTAs que vivem sobre banda escura (hero e CTA final). */
+/* Sheen: uma faixa de luz que atravessa a superfície no hover. É o mesmo device do
+   Button do design system, e substitui o roll sem tocar no conteúdo. */
+.cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.16) 45%,
+    transparent 70%
+  );
+  transform: translateX(-185%);
+  transition: transform 700ms var(--via-ease-out);
+}
+
+.cta:hover::after,
+.cta:focus-visible::after {
+  transform: translateX(185%);
+}
+
+.ctaArrow {
+  flex: none;
+  transition: transform var(--via-t-fast);
+}
+
+.cta:hover .ctaArrow {
+  transform: translate3d(2px, -2px, 0);
+}
+
 .cta:hover {
-  background: var(--via-navy-deep);
   transform: translate3d(0, -1px, 0);
+  filter: brightness(1.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 10px 24px -8px rgba(11, 22, 45, 0.58);
 }
 
 .cta:active {
   transform: translate3d(0, 0, 0) scale(0.98);
+  filter: brightness(1);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta::after {
+    display: none;
+  }
+  .ctaArrow {
+    transition: none;
+  }
 }
 
 @media (max-width: 419px) {

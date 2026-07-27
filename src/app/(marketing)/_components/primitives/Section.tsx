@@ -5,9 +5,8 @@ import styles from './Section.module.css';
  * O ritmo de bandas da landing.
  *
  * A página alterna exatamente TRÊS momentos escuros (hero, HUB, CTA final) num corpo
- * claro. Isso não é decoração: banda escura é território da Comunidade Subido, corpo
- * editorial claro é território do Viver de IA. O próprio ritmo é o mecanismo de
- * co-branding — vale mais do que repetir um lockup em toda seção.
+ * claro. Isso não é decoração: as bandas escuras marcam os momentos de decisão, e o
+ * corpo claro carrega o argumento. É o que dá respiro a uma página longa.
  *
  * Landing genérica alterna fundo mecanicamente e usa seções todas do mesmo tamanho.
  * Aqui o tom e a largura são escolhas por seção, e é isso que faz a página respirar.

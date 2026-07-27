@@ -1,51 +1,67 @@
-import { HERO } from '@/content/landing';
-import { CoBrandLockup } from '../chrome/CoBrandLockup';
+import Link from 'next/link';
+import { HERO, NAV, HEADER_LOGIN } from '@/content/landing';
+import { SubidoLogo } from '../chrome/SubidoLogo';
 import { MaskReveal } from '../primitives/MaskReveal';
-import { Roll } from '../primitives/Roll';
+import { TrackedCta } from '../primitives/TrackedCta';
 import { HeroVideoFacade } from './HeroVideoFacade';
+import { HeroPortrait } from './HeroPortrait';
 import styles from './HeroSection.module.css';
 
 /**
- * Banda escura 1 de 3 — território da Comunidade Subido.
+ * Banda escura 1 de 3 — a abertura.
  *
- * PESO ZERO DE BIBLIOTECA. O mask reveal roda em CSS disparado no mount, os CTAs
- * são âncoras, e o único JS é o facade do vídeo. Toda a coreografia ligada a scroll
- * (e o Lenis) vive abaixo da dobra — é assim que dá para ter motion de estúdio sem
- * pagar com o LCP da página que recebe o clique pago.
+ * PESO ZERO DE BIBLIOTECA. O mask reveal roda em CSS disparado no mount, os CTAs são
+ * âncoras, e o único JS é o facade do vídeo. Toda a coreografia ligada a scroll (e o
+ * Lenis) vive abaixo da dobra — é assim que dá para ter motion de estúdio sem pagar
+ * com o LCP da página que recebe o clique pago.
  *
- * A composição é a de uma capa editorial: o título ocupa a largura toda e o resto
- * se organiza embaixo, em vez do split 56/44 genérico de SaaS que estava aqui antes.
+ * COMPOSIÇÃO: duas colunas de verdade, não um título full-width com sobras embaixo.
+ * O argumento inteiro (rótulo → título → lead → CTA → confiança) mora à esquerda, e a
+ * direita carrega a figura. Isso resolve o vazio vertical que havia entre o título e a
+ * linha de baixo, e dá ao hero a simetria de uma capa.
  */
 export function HeroSection() {
   return (
     <section className={`${styles.hero} via-mesh-navy via-noise`} aria-labelledby="hero-title">
       <div className={styles.inner}>
-        <header className={styles.top}>
-          <span className={`${styles.lockup} rise rise--now`} style={{ ['--rise-i' as string]: 0 }}>
-            <CoBrandLockup size={18} />
+        {/* Header estático: a mesma navegação da barra fixa, no estado de repouso.
+            Transparente sobre o hero, tinta branca, hairline em gradiente que nasce
+            e morre no nada — é o que separa uma régua de 1px de uma borda de caixa. */}
+        <header className={`${styles.top} rise rise--now`} style={{ ['--rise-i' as string]: 0 }}>
+          <span className={styles.logo}>
+            <SubidoLogo size={19} />
           </span>
-          <span
-            className={`t-label t-label--sm ${styles.since} rise rise--now`}
-            style={{ ['--rise-i' as string]: 1 }}
-          >
-            {HERO.since}
-          </span>
+
+          <nav className={styles.nav} aria-label="Seções da página">
+            {NAV.map((item) => (
+              <a key={item.id} href={`#${item.id}`} className={styles.navLink}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className={styles.topoDireita}>
+            <span className={`t-label t-label--sm ${styles.since}`}>{HERO.since}</span>
+            <Link href={HEADER_LOGIN.href} className={styles.login}>
+              {HEADER_LOGIN.label}
+            </Link>
+          </div>
         </header>
 
-        {/* Linhas autorais: nós escolhemos a quebra. Dois tons SÓLIDOS fazem a
-            hierarquia — nunca opacidade, nunca peso. */}
-        <MaskReveal
-          as="h1"
-          id="hero-title"
-          className={`t-hero ${styles.title}`}
-          trigger="now"
-          offset={1}
-          lines={HERO.titleLines}
-          toneClass={{ strong: styles.strong, soft: styles.soft }}
-        />
-
         <div className={styles.grid}>
-          <div className={styles.lead}>
+          <div className={styles.copy}>
+            {/* Linhas autorais: nós escolhemos a quebra. Dois tons SÓLIDOS fazem a
+                hierarquia — nunca opacidade, nunca peso. */}
+            <MaskReveal
+              as="h1"
+              id="hero-title"
+              className={`t-hero ${styles.title}`}
+              trigger="now"
+              offset={1}
+              lines={HERO.titleLines}
+              toneClass={{ strong: styles.strong, soft: styles.soft }}
+            />
+
             <p
               className={`t-lead ${styles.sub} rise rise--now`}
               style={{ ['--rise-i' as string]: 5 }}
@@ -57,17 +73,21 @@ export function HeroSection() {
               className={`${styles.actions} rise rise--now`}
               style={{ ['--rise-i' as string]: 6 }}
             >
-              <a href={HERO.ctaPrimary.href} className={styles.ctaPrimary}>
-                <Roll>{HERO.ctaPrimary.label}</Roll>
-              </a>
-              <a href={HERO.ctaSecondary.href} className={styles.ctaSecondary}>
-                <Roll>{HERO.ctaSecondary.label}</Roll>
-              </a>
+              <TrackedCta href={HERO.ctaPrimary.href} local="hero" className={styles.ctaPrimary}>
+                {HERO.ctaPrimary.label}
+              </TrackedCta>
+              <TrackedCta
+                href={HERO.ctaSecondary.href}
+                local="hero"
+                className={styles.ctaSecondary}
+              >
+                {HERO.ctaSecondary.label}
+              </TrackedCta>
             </div>
 
+            {/* O separador vem DEPOIS do item, não antes: quando a linha quebra, ela
+                começa com o rótulo em vez de com um "/" órfão. */}
             <p className={`${styles.trust} rise rise--now`} style={{ ['--rise-i' as string]: 7 }}>
-              {/* O separador vem DEPOIS do item, não antes: quando a linha quebra,
-                  ela começa com o rótulo em vez de com um "/" órfão. */}
               {HERO.trust.map((item, i) => (
                 <span key={item}>
                   {item}
@@ -77,8 +97,20 @@ export function HeroSection() {
             </p>
           </div>
 
-          <div className={`${styles.media} rise rise--now`} style={{ ['--rise-i' as string]: 6 }}>
-            <HeroVideoFacade caption={HERO.videoCaption} />
+          <div className={`${styles.figure} rise rise--now`} style={{ ['--rise-i' as string]: 4 }}>
+            {/* Contêiner próprio da figura: o card do vídeo se posiciona em relação
+                AO RETRATO, não à coluna. Sem isso, mover o retrato para a direita
+                deixaria o card para trás, no meio da coluna de texto. */}
+            <div className={styles.figureInner}>
+              <HeroPortrait />
+
+              {/* O vídeo não disputa a coluna com o retrato: se apoia nele, sobreposto
+                  ao canto inferior esquerdo. A camada é o que dá profundidade à
+                  composição sem precisar de 3D. */}
+              <div className={styles.videoCard}>
+                <HeroVideoFacade caption={HERO.videoCaption} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

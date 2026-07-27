@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { NAV, HEADER_CTA } from '@/content/landing';
-import { CoBrandLockup } from './CoBrandLockup';
-import { Roll } from '../primitives/Roll';
+import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { NAV, HEADER_CTA, HEADER_LOGIN } from '@/content/landing';
+import { SubidoLogo } from './SubidoLogo';
+import { TrackedCta } from '../primitives/TrackedCta';
 import styles from './SiteHeader.module.css';
 
 /**
@@ -33,13 +35,18 @@ export function SiteHeader() {
     const el = sentinel.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        // A sentinela cobre a altura do hero (ver o CSS): "intersectando" significa
-        // que ainda há hero em tela. Como não se rola acima de zero, sair da
-        // interseção só pode significar "passou do hero" — não é preciso testar sinal
-        // de coordenada, e o estado é sempre o atual.
-        setVisible(!entry.isIntersecting);
+      () => {
+        // DUAS defesas, porque cada uma cobre uma falha diferente:
+        //
+        //  · a sentinela COBRE a altura do hero (ver o CSS) — sem isso, um salto de
+        //    âncora que pula de "abaixo da viewport" para "acima" não muda o estado
+        //    de interseção e o observer nunca dispara;
+        //  · a geometria é lida AO VIVO e o `entry` é ignorado — `boundingClientRect`
+        //    é um retrato de quando a observação foi enfileirada, e num salto longo
+        //    chega desatualizado, escondendo a barra logo após navegar pelo menu.
+        //
+        // `bottom <= 0` = a sentinela inteira já passou por cima: saímos do hero.
+        setVisible(el.getBoundingClientRect().bottom <= 0);
       },
       { threshold: 0 },
     );
@@ -82,10 +89,10 @@ export function SiteHeader() {
     <>
       <div ref={sentinel} className={styles.sentinel} aria-hidden="true" />
 
-      <header className={styles.header} data-visible={visible ? '' : undefined} inert={!visible}>
-        <div className={styles.inner}>
+      <header className={styles.wrap} data-visible={visible ? '' : undefined} inert={!visible}>
+        <div className={styles.bar}>
           <a href="#conteudo" className={styles.brand} aria-label="Início">
-            <CoBrandLockup size={15} />
+            <SubidoLogo size={17} />
           </a>
 
           <nav className={styles.nav} aria-label="Seções da página">
@@ -96,14 +103,21 @@ export function SiteHeader() {
                 className={styles.link}
                 aria-current={active === item.id ? 'location' : undefined}
               >
-                <Roll>{item.label}</Roll>
+                {item.label}
               </a>
             ))}
           </nav>
 
-          <a href={HEADER_CTA.href} className={styles.cta}>
-            <Roll>{HEADER_CTA.label}</Roll>
-          </a>
+          <div className={styles.acoes}>
+            <Link href={HEADER_LOGIN.href} className={styles.login}>
+              {HEADER_LOGIN.label}
+            </Link>
+
+            <TrackedCta href={HEADER_CTA.href} local="header" className={styles.cta}>
+              {HEADER_CTA.label}
+              <ArrowUpRight size={15} strokeWidth={2.2} className={styles.ctaArrow} aria-hidden />
+            </TrackedCta>
+          </div>
         </div>
       </header>
     </>

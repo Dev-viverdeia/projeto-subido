@@ -1,0 +1,111 @@
+/* Canto inferior ESQUERDO: o direito é a zona do polegar no mobile e onde um dock de
+   CTA moraria. `fixed` para não causar layout shift. */
+.wrap {
+  position: fixed;
+  left: var(--via-space-4);
+  right: var(--via-space-4);
+  bottom: var(--via-space-4);
+  z-index: var(--via-z-toast);
+  max-width: 420px;
+
+  display: grid;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border-radius: var(--via-radius-lg);
+
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(250, 253, 255, 0.86) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 18px 44px -12px rgba(11, 22, 45, 0.3),
+    0 4px 12px -4px rgba(11, 22, 45, 0.1);
+
+  animation: consent-in 420ms var(--via-ease-out) both;
+}
+
+@keyframes consent-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap {
+    animation: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .wrap {
+    background: var(--via-bg);
+  }
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.link {
+  color: var(--via-accent-ink);
+}
+
+.acoes {
+  display: flex;
+  gap: var(--via-space-2);
+  justify-content: flex-end;
+}
+
+.primario,
+.secundario {
+  min-height: 40px;
+  padding-inline: var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    transform var(--via-t-fast),
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.primario {
+  background: linear-gradient(180deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
+  color: var(--via-white);
+}
+
+.primario:hover {
+  transform: translate3d(0, -1px, 0);
+  filter: brightness(1.12);
+}
+
+/* As duas opções têm o MESMO peso visual de propósito: um "só essenciais" apagado ao
+   lado de um "aceitar" gritante é dark pattern, e a LGPD exige que recusar seja tão
+   fácil quanto aceitar. */
+.secundario {
+  background: transparent;
+  color: var(--via-text-body);
+  border-color: var(--via-border);
+}
+
+.secundario:hover {
+  border-color: var(--via-navy);
+  transform: translate3d(0, -1px, 0);
+}
+
+.primario:focus-visible,
+.secundario:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+}

@@ -1,0 +1,73 @@
+.wrap {
+  position: relative;
+  margin: 0;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  isolation: isolate;
+}
+
+/* 1 · Halo — a luz que separa a silhueta do fundo.
+   Elipse alta e difusa, com um traço do accent no miolo. Sem ela o recorte cola no
+   mesh e a foto parece adesivo colado sobre a página. */
+.halo {
+  position: absolute;
+  z-index: -2;
+  left: 50%;
+  bottom: 0;
+  width: 118%;
+  height: 92%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 50% 55% at 50% 55%, rgba(0, 162, 255, 0.16) 0%, transparent 62%),
+    radial-gradient(ellipse 62% 62% at 50% 58%, rgba(46, 76, 118, 0.42) 0%, transparent 70%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+/* 3 · Sombra de contato — a elipse escura que dá peso ao corpo e cria o "chão". */
+.contact {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: -8px;
+  width: 62%;
+  height: 42px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(2, 6, 15, 0.75) 0%, transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.subject {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  /* Sem aspect-ratio fixo: o sujeito PREENCHE a altura disponível da coluna. Com uma
+     proporção travada ele ficava baixo e sobrava vazio em cima. */
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+}
+
+/* Enquanto é placeholder, a moldura precisa de forma própria — um recorte real não
+   tem borda, então o marcador ganha uma. */
+.subject > div {
+  border-radius: var(--via-radius-lg) var(--via-radius-lg) 0 0;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-bottom: none;
+}

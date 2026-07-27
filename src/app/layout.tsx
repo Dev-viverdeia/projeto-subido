@@ -14,13 +14,30 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: {
-    default: 'Viver de IA × Subido — a assinatura para virar implementador de IA',
-    template: '%s · Viver de IA × Subido',
+    default: 'Subido — a assinatura para virar implementador de IA',
+    template: '%s · Subido',
   },
   description:
-    'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou. Uma parceria Viver de IA e Comunidade Subido.',
-  applicationName: 'Viver de IA × Subido',
+    'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou. Da Comunidade Subido de Tráfego.',
+  applicationName: 'Subido',
   robots: { index: true, follow: true },
+  /**
+   * Canonical na URL LIMPA — inegociável.
+   * Cada clique de anúncio chega com uma query diferente (utm, gclid, gbraid…). Sem
+   * canonical fixo, cada combinação vira uma URL indexável distinta e o Google passa
+   * a ver dezenas de duplicatas competindo entre si.
+   */
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'Subido',
+    url: '/',
+    title: 'Subido — a assinatura para virar implementador de IA',
+    description:
+      'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou.',
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export const viewport: Viewport = {

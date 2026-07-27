@@ -4,7 +4,7 @@
   min-height: 100svh;
   display: flex;
   align-items: center;
-  padding-block: var(--via-space-12) var(--via-space-16);
+  padding-block: var(--via-space-10) var(--via-space-14);
   overflow: hidden;
 }
 
@@ -21,22 +21,96 @@
   }
 }
 
-/* --- Topo: lockup à esquerda, carimbo à direita ------------------------------- */
+/* --- Header estático ----------------------------------------------------------
+   O estado de REPOUSO da mesma navegação que vira pílula de vidro ao rolar. */
 .top {
+  position: relative;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
   padding-bottom: var(--via-space-6);
-  margin-bottom: var(--via-space-6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  margin-bottom: var(--via-space-8);
 }
 
-.lockup {
+/* Hairline em GRADIENTE: nasce e morre no nada, em vez de bater nas duas margens.
+   É a diferença entre uma régua tipográfica e a borda de uma caixa. */
+.top::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.22) 12%,
+    rgba(255, 255, 255, 0.22) 82%,
+    transparent 100%
+  );
+}
+
+.logo {
   color: var(--via-white);
-  /* O wordmark do VIA tem proporção 12:1. Sem reduzir a altura no mobile ele ocupa
-     309 dos 335px disponíveis e empurra o carimbo para fora da viewport. */
-  --lockup-scale: 0.72;
+  flex: none;
+  /* O wordmark do VIA tem proporção 12:1. Sem reduzir no mobile ele ocupa quase toda
+     a largura e empurra o resto para fora da viewport. */
+  --logo-scale: 0.66;
+}
+
+/* --- Nav do hero --------------------------------------------------------------- */
+.nav {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--via-space-2);
+  }
+}
+
+/* Mesma família do nav da barra fixa: mono, porque nomeia seções em vez de conversar.
+   Ver o comentário em SiteHeader.module.css. */
+.navLink {
+  position: relative;
+  /* 44px de altura mínima: com padding sozinho o item ficava em 37px, abaixo do alvo
+     de toque recomendado. O padding lateral continua controlando a largura. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--via-radius-pill);
+  font-family: var(--via-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  color: var(--via-gray-300);
+  text-decoration: none;
+  transition:
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.navLink:hover {
+  color: var(--via-white);
+  /* Vidro claríssimo sobre a banda navy: a mesma linguagem da pílula fixa, em dose
+     mínima. */
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--via-accent);
+  outline-offset: 2px;
+}
+
+.topoDireita {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  flex: none;
 }
 
 .since {
@@ -44,8 +118,37 @@
   white-space: nowrap;
 }
 
-/* Abaixo de 560px não há largura para os dois: o carimbo sai. Ele é ornamento
-   editorial, não informação — e ficava cortado pela borda. */
+/* Sobre a banda escura o login é branco sobre navy — legível e discreto, sem virar
+   um segundo CTA. */
+.login {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border-radius: var(--via-radius-pill);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition:
+    border-color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.login:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.login:focus-visible {
+  outline: 2px solid var(--via-accent);
+  outline-offset: 2px;
+}
+
+/* Abaixo de 560px não há largura: o carimbo sai. É ornamento editorial, não
+   informação, e ficava cortado pela borda da viewport. */
 @media (max-width: 559px) {
   .since {
     display: none;
@@ -54,20 +157,22 @@
 
 @media (min-width: 768px) {
   .top {
-    padding-bottom: var(--via-space-8);
-    margin-bottom: var(--via-space-8);
+    padding-bottom: var(--via-space-7);
+    margin-bottom: var(--via-space-10);
   }
 
-  .lockup {
-    --lockup-scale: 1;
+  .logo {
+    --logo-scale: 1;
   }
 }
 
 /* --- Título ------------------------------------------------------------------
-   Ocupa a largura toda, como capa. É o oposto do split 56/44 de SaaS: aqui o tipo
-   é o elemento visual, não um acompanhamento do print do produto. */
+   Vive na coluna de texto. O tipo continua sendo o elemento visual dominante — o
+   retrato acompanha, não compete. */
+/* SEM max-width: as quebras são AUTORAIS (ver o conteúdo). Um limite em `ch` aqui
+   competiria com elas e reintroduziria quebra automática no meio da linha. */
 .title {
-  max-width: 15ch;
+  max-width: none;
 }
 
 .strong {
@@ -79,25 +184,96 @@
   color: #8fa0b8;
 }
 
-/* --- Grade inferior ----------------------------------------------------------- */
+/* --- Grade principal -----------------------------------------------------------
+   Duas colunas a partir de 1024px. Abaixo disso empilha, e o retrato vem DEPOIS do
+   CTA: no mobile a decisão precisa chegar antes da figura. */
 .grid {
-  margin-top: var(--via-space-10);
   display: grid;
-  gap: var(--via-space-8);
+  gap: var(--via-space-10);
+  align-items: stretch;
 }
 
 @media (min-width: 1024px) {
   .grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-    gap: var(--via-space-16);
-    align-items: end;
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+    gap: var(--via-space-12);
   }
 }
 
-.lead {
+.copy {
   display: grid;
-  gap: var(--via-space-6);
-  align-content: end;
+  gap: var(--via-space-7);
+  align-content: center;
+  min-width: 0;
+}
+
+/* --- Figura: retrato + card de vídeo sobreposto -------------------------------- */
+.figure {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  /* Encostado à direita: a figura procura a borda da página, não o centro da coluna. */
+  justify-content: flex-end;
+  /* A figura OCUPA A ALTURA da linha da grade, em vez de ficar pendurada na base.
+     Ancorá-la só embaixo com margem negativa grande empurrava o conjunto para o
+     rodapé do hero e deixava metade da coluna vazia. */
+  align-self: stretch;
+  /* Sangra o suficiente para o recorte ter "chão", sem afundar a composição. */
+  margin-bottom: calc(var(--via-space-6) * -1);
+}
+
+@media (max-width: 1023px) {
+  .figure {
+    margin-bottom: calc(var(--via-space-8) * -1);
+    min-height: 380px;
+  }
+}
+
+/* O contêiner da figura tem a largura do retrato, então o card do vídeo se ancora
+   nele e acompanha qualquer deslocamento lateral. */
+.figureInner {
+  position: relative;
+  width: min(100%, 470px);
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+@media (min-width: 1280px) {
+  .figure {
+    /* Sangra em direção à borda da viewport: a figura ganha ar e o olho corre do
+       texto para ela sem esbarrar numa margem simétrica. */
+    margin-right: calc(var(--via-space-10) * -1);
+  }
+}
+
+/* Card do vídeo apoiado no retrato, não ao lado dele. A sobreposição é o que dá
+   profundidade à cena sem 3D nem vídeo de fundo. */
+.videoCard {
+  position: absolute;
+  left: -22%;
+  bottom: var(--via-space-10);
+  width: min(258px, 62%);
+  z-index: 2;
+}
+
+@media (max-width: 1023px) {
+  .videoCard {
+    position: static;
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+    margin-top: var(--via-space-6);
+  }
+}
+
+@media (max-width: 1023px) {
+  .figure {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .sub {
@@ -198,16 +374,6 @@
 .dot {
   margin-inline: var(--via-space-2);
   opacity: 0.45;
-}
-
-.media {
-  min-width: 0;
-}
-
-@media (max-width: 767px) {
-  .media {
-    margin-inline: calc(var(--via-space-5) * -1);
-  }
 }
 
 /* --- Dica de scroll ----------------------------------------------------------- */

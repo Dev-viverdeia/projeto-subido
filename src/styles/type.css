@@ -12,12 +12,13 @@
    ============================================================================== */
 
 :root {
-  /* 44 → 112px.
-     A referência roda 150px, mas o hero dela não tem CTA para caber na dobra — é
-     portfólio, não funil. Aqui o teto é o maior tamanho em que as 4 linhas do título
-     MAIS o CTA primário cabem em 900px de altura. Impacto tipográfico não pode custar
-     a visibilidade do botão numa página que recebe clique pago. */
-  --type-hero: clamp(2.75rem, 1.4rem + 4.6vw, 7rem);
+  /* 40 → 64px.
+     O teto é ditado pela LARGURA DA COLUNA, não pela viewport: com o retrato ocupando
+     a direita, o texto vive em ~607px, e a linha mais longa do título ("decidiram usar
+     IA.") precisa de ~700px a 89px. Acima de 64px ela quebra sozinha e destrói as
+     quebras autorais que o mask reveal depende.
+     O impacto agora vem da composição inteira — tipo + figura — e não do tipo sozinho. */
+  --type-hero: clamp(2.5rem, 1.5rem + 2.6vw, 4rem);
   /* 34 → 60px · para cabeçalho que ocupa a LARGURA TOTAL da seção */
   --type-display: clamp(2.125rem, 1.5rem + 2.4vw, 3.75rem);
   /* 28 → 42px · para cabeçalho dentro de COLUNA (metade da grade) */

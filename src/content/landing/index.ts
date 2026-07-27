@@ -2,7 +2,7 @@ import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
 
 /**
  * TODO(conteúdo) — o que ainda precisa vir de vocês antes do tráfego pago ligar:
- *   · números reais do Viver de IA (marcados como [N] abaixo)
+ *   · números reais da plataforma (marcados como [N] abaixo)
  *   · preços dos três planos
  *   · data prevista do HUB
  *   · depoimentos reais OU autorização para usar os da Comunidade Subido, rotulados
@@ -10,7 +10,7 @@ import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
  */
 
 export const HERO = {
-  eyebrow: 'Viver de IA × Comunidade Subido',
+  eyebrow: 'Comunidade Subido de Tráfego',
   since: 'Parceria · 2026',
   scrollHint: 'Role para ver',
   /** Linhas AUTORAIS: a quebra é decisão de composição, não acaso de largura — e é o
@@ -45,9 +45,9 @@ export const PROOF: StatGroup[] = [
     ],
   },
   {
-    source: 'Viver de IA',
+    source: 'A plataforma',
     stats: [
-      { value: '[N]', label: 'empresas atendidas em implementação' },
+      { value: '[N]', label: 'empresas com implementação entregue' },
       { value: '103', label: 'soluções publicadas' },
       { value: '[N]', label: 'implementações rodando em produção' },
     ],
@@ -55,7 +55,7 @@ export const PROOF: StatGroup[] = [
 ];
 
 export const PROOF_NOTE =
-  'Números informados por Comunidade Subido e Viver de IA · atualizados em [mês/ano].';
+  'Números informados pela Comunidade Subido de Tráfego · atualizados em [mês/ano].';
 
 /**
  * Navegação do header.
@@ -66,8 +66,10 @@ export const PROOF_NOTE =
  */
 export const NAV = [
   { id: 'pilares', label: 'A assinatura' },
+  { id: 'caminhos', label: 'Para quem é' },
   { id: 'hub', label: 'HUB' },
   { id: 'resultados', label: 'Resultados' },
+  { id: 'quem-faz', label: 'Quem faz' },
   { id: 'perguntas', label: 'Perguntas' },
 ] as const;
 
@@ -83,6 +85,16 @@ export const NAV = [
  * cabe em 375px, onde o rótulo longo estourava a viewport.
  */
 export const HEADER_CTA = { label: 'Ver planos', href: '#planos' } as const;
+
+/**
+ * Entrada de quem JÁ é assinante.
+ *
+ * Fica separada do CTA e com peso visual menor de propósito: a landing existe para
+ * converter quem ainda não assinou. Um "Entrar" tão forte quanto o CTA rouba o clique
+ * de quem chegou pelo anúncio — mas escondê-lo também é errado, porque assinante que
+ * não acha o login vira ticket de suporte.
+ */
+export const HEADER_LOGIN = { label: 'Entrar', href: '/entrar' } as const;
 
 export const PILLARS: Pillar[] = [
   {
@@ -226,10 +238,10 @@ export const AUTHORITY = {
         'Eu passei oito anos ensinando gente a vender tráfego. O próximo serviço que as empresas vão comprar é implementação de IA — e quase ninguém tá pronto pra entregar.',
     },
     {
-      name: '[Fundador Viver de IA]',
-      role: 'Viver de IA',
+      name: '[Nome do responsável técnico]',
+      role: 'Direção da plataforma',
       credentials: ['[N] implementações entregues', '103 soluções publicadas', '[N] empresas'],
-      quote: '[TODO: citação do fundador sobre o porquê desta parceria.]',
+      quote: '[TODO: citação sobre por que a plataforma existe e o que ela entrega.]',
     },
   ],
 } as const;
@@ -374,6 +386,53 @@ export const FAQ: FaqItem[] = [
     a: '[TODO: delimitar os dois produtos. A Comunidade Subido é sobre tráfego pago; esta assinatura é sobre implementação de IA. Deixar claro se um inclui o outro.]',
   },
 ];
+
+/**
+ * Rodapé.
+ *
+ * Rodapé de produto pago não é enfeite: é onde mora a informação que a lei exige e a
+ * que o comprador procura quando está decidindo. Três colunas resolvem os três
+ * motivos de alguém chegar ao fim da página — navegar de volta, falar com alguém, e
+ * conferir as regras.
+ */
+export const FOOTER = {
+  tagline:
+    'A assinatura que forma implementadores de IA. Soluções prontas, formações, gerador de projeto e mentoria.',
+  colunas: [
+    {
+      titulo: 'Navegar',
+      links: [
+        { label: 'A assinatura', href: '#pilares' },
+        { label: 'Para quem é', href: '#caminhos' },
+        { label: 'HUB de implementadores', href: '#hub' },
+        { label: 'Resultados', href: '#resultados' },
+        { label: 'Planos', href: '#planos' },
+        { label: 'Perguntas', href: '#perguntas' },
+      ],
+    },
+    {
+      titulo: 'Falar com a gente',
+      links: [
+        // TODO(contato): número e e-mail reais.
+        { label: 'WhatsApp do suporte', href: 'https://wa.me/TODO', external: true },
+        { label: 'suporte@[TODO].com.br', href: 'mailto:suporte@TODO', external: true },
+        { label: 'Sou empresa e quero contratar', href: '#hub' },
+      ],
+    },
+    {
+      titulo: 'Legal',
+      links: [
+        { label: 'Termos de uso', href: '/termos' },
+        { label: 'Política de privacidade', href: '/privacidade' },
+        { label: 'Política de reembolso', href: '/reembolso' },
+      ],
+    },
+  ],
+  /** TODO(legal): obrigatórios para venda online no Brasil (CDC art. 33 e Decreto 7.962). */
+  razaoSocial: '[Razão Social LTDA]',
+  cnpj: 'CNPJ [00.000.000/0001-00]',
+  endereco: '[Endereço completo — logradouro, nº, cidade/UF, CEP]',
+} as const;
 
 export const FINAL_CTA = {
   /** Linhas autorais, como no hero: é o mesmo momento — pedir a decisão. */

@@ -1,0 +1,154 @@
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.inner {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  padding: var(--via-space-12) var(--via-space-5) var(--via-space-10);
+  display: grid;
+  gap: var(--via-space-10);
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding-inline: var(--via-space-8);
+  }
+}
+
+/* A marca segura uma coluna própria e mais larga: ela é o âncora do bloco, e as
+   colunas de links se distribuem no restante. */
+@media (min-width: 900px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr);
+    gap: var(--via-space-16);
+    align-items: start;
+    padding-block: var(--via-space-16) var(--via-space-12);
+  }
+}
+
+.brand {
+  display: grid;
+  gap: var(--via-space-4);
+  justify-items: start;
+  color: var(--via-white);
+}
+
+.tagline {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-loose);
+  color: var(--via-gray-400);
+  max-width: 40ch;
+}
+
+/* --- Colunas de links ----------------------------------------------------------- */
+.colunas {
+  display: grid;
+  gap: var(--via-space-8);
+}
+
+@media (min-width: 560px) {
+  .colunas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--via-space-6);
+  }
+}
+
+.coluna {
+  display: grid;
+  gap: var(--via-space-4);
+  align-content: start;
+}
+
+/* Mono, como todo rótulo da página. O <h2> é semântico — cada coluna é uma nav com
+   nome próprio, então leitor de tela anuncia "navegação Legal" em vez de despejar
+   quinze links soltos. */
+.colunaTitulo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-accent);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  /* 44px de alvo de toque, sem depender de padding vertical que desalinharia a
+     coluna. O padding lateral negativo devolve o alinhamento à margem. */
+  min-height: 40px;
+  padding-inline: var(--via-space-2);
+  margin-inline: calc(var(--via-space-2) * -1);
+  border-radius: var(--via-radius-sm);
+  font-size: var(--via-fs-caption);
+  color: var(--via-gray-300);
+  text-decoration: none;
+  transition:
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.link:hover {
+  color: var(--via-white);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--via-accent);
+  outline-offset: 2px;
+}
+
+.link svg {
+  opacity: 0.55;
+}
+
+/* --- Faixa legal ----------------------------------------------------------------
+   Razão social, CNPJ e endereço são EXIGÊNCIA para venda online no Brasil
+   (CDC art. 33 e Decreto 7.962/2013), não rodapé decorativo. */
+.legal {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legalInner {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  padding: var(--via-space-6) var(--via-space-5);
+  display: grid;
+  gap: var(--via-space-3);
+}
+
+@media (min-width: 768px) {
+  .legalInner {
+    padding-inline: var(--via-space-8);
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: var(--via-space-8);
+  }
+}
+
+.razao,
+.copy {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+  color: var(--via-gray-400);
+}
+
+@media (min-width: 768px) {
+  .copy {
+    text-align: right;
+  }
+}
