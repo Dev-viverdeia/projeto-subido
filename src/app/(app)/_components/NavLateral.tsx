@@ -34,7 +34,7 @@ export function NavLateral({
       <ul className={styles.lista}>
         {visiveis.map((item) => {
           /* Prefixo, não igualdade: `/solucoes/automacao` precisa manter "Soluções"
-             aceso. O `/` no fim evita que `/hub` case com um futuro `/hubs`. */
+             aceso. O `/` no fim evita que `/conta` case com um futuro `/contas`. */
           const ativo = caminho === item.href || caminho.startsWith(`${item.href}/`);
 
           return (

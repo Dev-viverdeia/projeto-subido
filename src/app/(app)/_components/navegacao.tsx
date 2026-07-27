@@ -1,4 +1,4 @@
-import { Blocks, Boxes, Building2, GraduationCap, House, Users } from 'lucide-react';
+import { Blocks, Boxes, GraduationCap, House, Users } from 'lucide-react';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
@@ -55,11 +55,5 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/mentorias'],
     icone: <Users size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
-  },
-  {
-    href: '/hub',
-    rotulo: ROTULOS['/hub'],
-    icone: <Building2 size={TAMANHO} strokeWidth={TRACO} />,
-    noDock: false,
   },
 ];

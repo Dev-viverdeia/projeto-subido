@@ -42,7 +42,6 @@ export const config = {
     '/formacoes/:path*',
     '/builder/:path*',
     '/mentorias/:path*',
-    '/hub/:path*',
     '/conta/:path*',
   ],
 };

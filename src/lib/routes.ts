@@ -12,7 +12,6 @@ export const ROTAS_APP = [
   '/formacoes',
   '/builder',
   '/mentorias',
-  '/hub',
   '/conta',
 ] as const;
 
@@ -36,7 +35,6 @@ export const ROTULOS: Record<RotaApp, string> = {
   '/formacoes': 'Formações',
   '/builder': 'Builder',
   '/mentorias': 'Mentorias',
-  '/hub': 'HUB',
   '/conta': 'Conta',
 };
 
@@ -45,7 +43,7 @@ export const ROTULOS: Record<RotaApp, string> = {
  *
  * Por prefixo, para que `/solucoes/automacao-de-atendimento` continue dizendo
  * "Soluções" — a mesma regra que acende o item na navegação. A barra no fim evita
- * que `/hub` case com um futuro `/hubs`.
+ * que `/conta` case com um futuro `/contas`.
  */
 export function rotuloDaRota(caminho: string): string | null {
   const rota = ROTAS_APP.find((r) => caminho === r || caminho.startsWith(`${r}/`));
