@@ -70,6 +70,19 @@
     align-items: center;
     gap: var(--via-space-2);
   }
+
+  /* Grade de três colunas com as laterais IGUAIS (1fr · auto · 1fr) em vez de
+     `space-between`. Com space-between a posição do nav depende da largura do que
+     está à direita, então trocar o que mora ali desloca o nav — o eixo da página
+     não pode ficar refém do rótulo de um link. */
+  .top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .login {
+    justify-self: end;
+  }
 }
 
 /* Mesma família do nav da barra fixa: mono, porque nomeia seções em vez de conversar.
@@ -106,18 +119,6 @@
   outline-offset: 2px;
 }
 
-.topoDireita {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-  flex: none;
-}
-
-.since {
-  color: var(--via-gray-400);
-  white-space: nowrap;
-}
-
 /* Sobre a banda escura o login é branco sobre navy — legível e discreto, sem virar
    um segundo CTA. */
 .login {
@@ -145,14 +146,6 @@
 .login:focus-visible {
   outline: 2px solid var(--via-accent);
   outline-offset: 2px;
-}
-
-/* Abaixo de 560px não há largura: o carimbo sai. É ornamento editorial, não
-   informação, e ficava cortado pela borda da viewport. */
-@media (max-width: 559px) {
-  .since {
-    display: none;
-  }
 }
 
 @media (min-width: 768px) {

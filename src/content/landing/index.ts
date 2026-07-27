@@ -11,7 +11,6 @@ import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
 
 export const HERO = {
   eyebrow: 'Comunidade Subido de Tráfego',
-  since: 'Parceria · 2026',
   scrollHint: 'Role para ver',
   /** Linhas AUTORAIS: a quebra é decisão de composição, não acaso de largura — e é o
    *  que torna o mask reveal determinístico. Dois tons sólidos fazem a hierarquia.

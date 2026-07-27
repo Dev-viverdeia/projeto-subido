@@ -40,12 +40,9 @@ export function HeroSection() {
             ))}
           </nav>
 
-          <div className={styles.topoDireita}>
-            <span className={`t-label t-label--sm ${styles.since}`}>{HERO.since}</span>
-            <Link href={HEADER_LOGIN.href} className={styles.login}>
-              {HEADER_LOGIN.label}
-            </Link>
-          </div>
+          <Link href={HEADER_LOGIN.href} className={styles.login}>
+            {HEADER_LOGIN.label}
+          </Link>
         </header>
 
         <div className={styles.grid}>
