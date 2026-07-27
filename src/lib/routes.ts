@@ -1,0 +1,56 @@
+/**
+ * Fonte da verdade das rotas.
+ *
+ * Existe para que a navegação, os redirects e o matcher do proxy não divirjam. O
+ * matcher é o caso especial — leia o aviso em `src/proxy.ts` antes de mexer nele.
+ */
+
+/** Rotas do grupo `(app)` — exigem sessão. Toda rota daqui É coberta pelo proxy. */
+export const ROTAS_APP = [
+  '/inicio',
+  '/solucoes',
+  '/formacoes',
+  '/builder',
+  '/mentorias',
+  '/hub',
+  '/conta',
+] as const;
+
+export type RotaApp = (typeof ROTAS_APP)[number];
+
+/** Rotas do grupo `(auth)` — públicas, mas redirecionam quem já tem sessão. */
+export const ROTA_ENTRAR = '/entrar';
+export const ROTA_CRIAR_CONTA = '/criar-conta';
+export const ROTA_RECUPERAR_SENHA = '/recuperar-senha';
+export const ROTA_NOVA_SENHA = '/nova-senha';
+export const ROTA_CALLBACK = '/auth/callback';
+
+/** Para onde vai quem acabou de entrar e não pediu nada específico. */
+export const ROTA_POS_LOGIN: RotaApp = '/inicio';
+
+/** Nome do parâmetro que carrega o destino pretendido através do login. */
+export const PARAM_PROXIMO = 'proximo';
+
+/**
+ * Valida o destino de pós-login.
+ *
+ * Um `?proximo=` que chega pela URL é entrada de usuário, e entrada de usuário que
+ * vira `redirect()` é um open redirect: `?proximo=https://phishing.exemplo` faria a
+ * NOSSA tela de login despachar a pessoa autenticada para o site de outro. É a
+ * mesma classe de falha do `returnUrl` que já rendeu CVE em vários produtos.
+ *
+ * A regra aqui é allowlist, não sanitização: o valor precisa ser exatamente uma das
+ * rotas conhecidas (ou um filho dela). Qualquer outra coisa — URL absoluta, `//host`,
+ * `/\host`, path desconhecido — cai no destino padrão.
+ */
+export function destinoSeguro(valor: string | null | undefined): string {
+  if (!valor || !valor.startsWith('/')) return ROTA_POS_LOGIN;
+
+  /* `//evil.com` e `/\evil.com` são tratados como protocol-relative pelos browsers
+     e escapariam de um teste que só olhasse o primeiro caractere. */
+  if (valor.startsWith('//') || valor.startsWith('/\\')) return ROTA_POS_LOGIN;
+
+  const permitida = ROTAS_APP.some((rota) => valor === rota || valor.startsWith(`${rota}/`));
+
+  return permitida ? valor : ROTA_POS_LOGIN;
+}
