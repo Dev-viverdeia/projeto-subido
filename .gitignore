@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Claude Code — estado local
 .claude/worktrees/
+
+# Exceção: o exemplo é documentação, precisa estar no repo.
+!.env.example

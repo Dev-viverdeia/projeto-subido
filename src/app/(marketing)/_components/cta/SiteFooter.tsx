@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { FOOTER } from '@/content/landing';
-import { SubidoLogo } from '../chrome/SubidoLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import styles from './SiteFooter.module.css';
 
 /**

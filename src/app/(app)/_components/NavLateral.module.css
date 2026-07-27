@@ -1,0 +1,121 @@
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  text-decoration: none;
+  color: var(--via-text-muted);
+  border-radius: var(--via-radius-md);
+  /* Só transform e opacity animam; cor troca seca. `transition: all` é banido. */
+  transition:
+    background-color var(--via-t-fast),
+    color var(--via-t-fast);
+}
+
+.icone {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* ---- Sidebar (desktop) ------------------------------------------------------- */
+.lateral {
+  display: none;
+}
+
+.lateral .lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+.lateral .item {
+  padding: var(--via-space-3) var(--via-space-4);
+  font-size: var(--via-fs-sm);
+}
+
+.lateral .item:hover {
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+
+/* Ativo por peso e cor sólida — nunca por opacidade. */
+.lateral .item[aria-current='page'] {
+  background: var(--via-bg-3);
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* ---- Dock (mobile) ----------------------------------------------------------- */
+.dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--via-z-dock);
+  background: var(--via-surface);
+  border-top: 1px solid var(--via-border-hairline);
+  /* Barra de gestos do iOS: sem isto o último item fica embaixo dela. */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: var(--via-shadow-md);
+}
+
+.dock .lista {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.dock .item {
+  flex-direction: column;
+  gap: var(--via-space-1);
+  /* 56px de altura mínima — acima dos 44px de alvo de toque recomendados. */
+  min-height: 56px;
+  justify-content: center;
+  padding: var(--via-space-2) var(--via-space-1);
+  border-radius: 0;
+  font-size: var(--via-fs-micro);
+  text-align: center;
+}
+
+.dock .item[aria-current='page'] {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* Marcador do item ativo. `transform: scaleX` em vez de trocar `width`: largura
+   dispara layout a cada frame. */
+.dock .item[aria-current='page'] .icone::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: 2px;
+  background: var(--via-accent-ink);
+}
+
+.dock .item {
+  position: relative;
+}
+
+.dock .rotulo {
+  /* Em 320px, "Formações" ainda cabe; garantir que nada estoure a coluna. */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .lateral {
+    display: block;
+  }
+
+  .dock {
+    display: none;
+  }
+}

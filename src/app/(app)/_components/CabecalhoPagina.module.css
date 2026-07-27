@@ -1,0 +1,48 @@
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  margin-bottom: var(--via-space-8);
+  padding-bottom: var(--via-space-6);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.textos {
+  min-width: 0;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h2);
+  line-height: var(--via-lh-tight);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.descricao {
+  margin: var(--via-space-3) 0 0;
+  max-width: 68ch;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-muted);
+}
+
+.acao {
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .cabecalho {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--via-space-8);
+  }
+
+  .acao {
+    /* Alinha o botão com a linha de base do título, não com o topo da caixa. */
+    padding-top: var(--via-space-1);
+  }
+}

@@ -45,8 +45,20 @@ jobs:
       - name: Integridade do design system
         run: node scripts/check-ds-drift.mjs
 
+      # `PageProps<'/rota'>` e `LayoutProps<'/'>` são tipos GLOBAIS gerados pelo
+      # Next em .next/types/, que é gitignored. Num checkout limpo eles não
+      # existem, e tanto o tsc quanto o eslint com type-checking reprovam com
+      # "Cannot find name 'PageProps'" — um erro que não reproduz em nenhuma
+      # máquina que já rodou `next dev` ou `next build` alguma vez.
+      #
+      # O passo é explícito aqui, e os scripts `typecheck`/`lint` do package.json
+      # também chamam o typegen por conta própria: o CI não pode depender da ordem
+      # dos passos, e o dev não pode depender do CI.
+      - name: Gerar tipos de rota
+        run: npx next typegen
+
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Lint
         run: npm run lint

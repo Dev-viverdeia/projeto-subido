@@ -1,0 +1,48 @@
+.cartao {
+  max-width: var(--via-content);
+}
+
+.subtitulo {
+  margin: 0 0 var(--via-space-5);
+  font-size: var(--via-fs-label);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: 0.01em;
+  color: var(--via-text-primary);
+}
+
+.lista {
+  margin: 0;
+  display: grid;
+  gap: var(--via-space-4);
+}
+
+.linha {
+  display: grid;
+  gap: var(--via-space-1);
+}
+
+.rotulo {
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.valor {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-body);
+  /* E-mail longo não pode empurrar a largura do cartão. */
+  overflow-wrap: anywhere;
+}
+
+.espaco {
+  margin-top: var(--via-space-8);
+  max-width: var(--via-content);
+}
+
+@media (min-width: 640px) {
+  .linha {
+    grid-template-columns: 160px 1fr;
+    gap: var(--via-space-4);
+    align-items: baseline;
+  }
+}

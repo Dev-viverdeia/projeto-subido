@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { NAV, HEADER_CTA, HEADER_LOGIN } from '@/content/landing';
-import { SubidoLogo } from './SubidoLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { TrackedCta } from '../primitives/TrackedCta';
 import styles from './SiteHeader.module.css';
 

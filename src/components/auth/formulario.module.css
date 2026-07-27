@@ -1,0 +1,94 @@
+.cabecalho {
+  margin-bottom: var(--via-space-8);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  line-height: var(--via-lh-tight);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.subtitulo {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-muted);
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.aviso {
+  margin-bottom: var(--via-space-5);
+}
+
+/* "Esqueci minha senha" abaixo do campo, à direita. O Input do DS renderiza o
+   próprio rótulo, então não há espaço livre acima para pendurar o atalho. */
+.linhaAtalho {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--via-space-2);
+}
+
+.atalho {
+  /* Alvo de toque. Medido antes: 20px de altura — abaixo dos 24px que a WCAG 2.5.8
+     exige em AA. `inline-flex` + `min-height` resolvem sem mexer no tamanho da
+     fonte; o `margin-block` negativo devolve o espaço que o padding tomou, para o
+     ritmo vertical não mudar. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-2);
+  margin-block: calc(var(--via-space-3) * -1);
+  margin-inline-end: calc(var(--via-space-2) * -1);
+
+  font-size: var(--via-fs-xs);
+  /* Único azul legível sobre superfície clara — o --via-accent reprova AA aqui
+     (2,70:1). Ver a tabela de contraste em src/styles/brand.css. */
+  color: var(--via-accent-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.atalho:hover {
+  text-decoration: underline;
+}
+
+.acao {
+  margin-top: var(--via-space-3);
+}
+
+.alternativa {
+  margin: var(--via-space-8) 0 0;
+  padding-top: var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  text-align: center;
+}
+
+/* Link dentro de frase: padding aumenta a área clicável de um elemento inline sem
+   alterar a altura da linha, então o alvo cresce e o texto não se mexe. */
+.alternativa a {
+  padding: var(--via-space-3) var(--via-space-1);
+  color: var(--via-accent-ink);
+  text-decoration: none;
+}
+
+.alternativa a:hover {
+  text-decoration: underline;
+}
+
+.legal {
+  margin: var(--via-space-5) 0 0;
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-faint);
+}

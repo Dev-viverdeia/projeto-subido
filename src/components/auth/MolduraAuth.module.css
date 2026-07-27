@@ -1,0 +1,105 @@
+/* Mobile primeiro: uma coluna, painel escuro como faixa de topo.
+   O split só faz sentido quando há largura para as duas colunas respirarem. */
+.grade {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100dvh;
+}
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-8);
+  padding: var(--via-space-6) var(--via-space-5);
+  /* `isolation` cria o contexto de empilhamento que o ::after do .via-noise precisa
+     para ficar contido no painel em vez de subir para a página. */
+  isolation: isolate;
+}
+
+.marca {
+  color: var(--via-white);
+  text-decoration: none;
+  /* Alvo de toque de 44px sem inflar a caixa visual do lockup. */
+  padding-block: var(--via-space-2);
+  align-self: flex-start;
+}
+
+.painelTexto {
+  display: none;
+}
+
+.frase {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h2);
+  line-height: var(--via-lh-tight);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+/* Ênfase é itálico, nunca peso 700 — ver as leis estéticas no CLAUDE.md. */
+.frase em {
+  font-style: italic;
+}
+
+/* ⚠ TEXTO SOBRE BANDA ESCURA USA A ESCALA `--via-gray-*`, NUNCA `--via-text-*`.
+   Os tokens `--via-text-soft/muted/faint` valem para superfície CLARA: lá "mais
+   quieto" significa mais ESCURO. Sobre a navy a relação inverte e eles viram texto
+   quase do tom do fundo. Medido nesta tela: `--via-text-soft` (#636D80) sobre
+   #0B162D dá 3,45:1 — reprova AA a 14px. `--via-gray-300` dá ~12:1 e
+   `--via-gray-400` dá 6,99:1. É a mesma escala que as bandas escuras da landing
+   já usam (ver HeroSection e HubSection). */
+.apoio {
+  margin: var(--via-space-5) 0 0;
+  max-width: 44ch;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  /* Hierarquia por cor sólida, não por opacity. */
+  color: var(--via-gray-300);
+}
+
+.rodape {
+  display: none;
+  margin: 0;
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0.02em;
+  /* Mesma regra do bloco acima: escala gray, não text. 6,99:1 sobre a navy. */
+  color: var(--via-gray-400);
+}
+
+.area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--via-space-10) var(--via-space-5) var(--via-space-16);
+  background: var(--via-bg);
+}
+
+.caixa {
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (min-width: 900px) {
+  .grade {
+    grid-template-rows: none;
+    /* 5fr/7fr em vez de 1fr/1fr: a coluna do formulário precisa de mais ar, e o
+       painel editorial lê melhor estreito. */
+    grid-template-columns: 5fr 7fr;
+  }
+
+  .painel {
+    justify-content: space-between;
+    padding: var(--via-space-12) var(--via-space-10);
+  }
+
+  .painelTexto,
+  .rodape {
+    display: block;
+  }
+
+  .area {
+    padding: var(--via-space-12);
+  }
+}

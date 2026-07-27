@@ -7,3 +7,8 @@ package-lock.json
 
 # Estado de ferramenta (inclui worktrees git em commits antigos).
 .claude/
+
+# Estado do Supabase CLI. Já ignorado pelo supabase/.gitignore, mas o prettier
+# tem a própria lista — sem esta linha o `format:check` do CI reprova por causa
+# de um arquivo que nem está no repo.
+supabase/.temp/

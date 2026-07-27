@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { HERO, NAV, HEADER_LOGIN } from '@/content/landing';
-import { SubidoLogo } from '../chrome/SubidoLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { MaskReveal } from '../primitives/MaskReveal';
 import { TrackedCta } from '../primitives/TrackedCta';
 import { HeroVideoFacade } from './HeroVideoFacade';
