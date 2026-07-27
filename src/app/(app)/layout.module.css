@@ -28,6 +28,9 @@
   align-items: center;
   /* Impede que o lockup encolha quando o e-mail do usuário é longo. */
   flex-shrink: 0;
+  /* O lockup tem 14px de altura; como link, essa era a área clicável inteira —
+     abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */
+  min-height: 44px;
 }
 
 .sidebar {
@@ -67,7 +70,11 @@
   }
 
   .marcaSidebar {
-    padding: var(--via-space-2) var(--via-space-3);
+    /* Só padding vertical. O horizontal comeria da largura útil justamente onde o
+       lockup já é o elemento mais largo da coluna — e o alinhamento à esquerda com
+       os itens de navegação é aproximado de propósito: o glifo do wordmark tem
+       sidebearing próprio, então casar as caixas desalinharia o que se vê. */
+    padding-block: var(--via-space-2);
   }
 
   .rodapeSidebar {

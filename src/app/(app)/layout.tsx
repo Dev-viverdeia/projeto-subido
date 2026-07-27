@@ -48,14 +48,20 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
         <header className={styles.barraTopo}>
           <Link href="/inicio" className={styles.marca} aria-label="Ir para o início">
-            <CoBrandLockup size={15} />
+            <CoBrandLockup size={13} />
           </Link>
-          <BlocoUsuario nome={nome} email={email} />
+          {/* `compacto`: só o avatar. Com nome e e-mail a barra media 540px em
+              375px de viewport e a página ganhava scroll horizontal. */}
+          <BlocoUsuario nome={nome} email={email} compacto />
         </header>
 
         <aside className={styles.sidebar}>
           <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-            <CoBrandLockup size={16} />
+            {/* 13, não 16. O wordmark tem proporção ~12:1, então a altura da
+                cap-height multiplica por doze na largura: a 16 o lockup mede 275px
+                e a sidebar oferece 232px úteis — ele vazava 39px para dentro do
+                conteúdo. A 13 mede 223px e sobra folga. */}
+            <CoBrandLockup size={13} />
           </Link>
 
           <NavLateral itens={ITENS_NAV} variante="lateral" />
