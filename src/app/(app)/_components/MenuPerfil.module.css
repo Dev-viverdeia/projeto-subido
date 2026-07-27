@@ -1,0 +1,142 @@
+.raiz {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* --- Gatilho ------------------------------------------------------------------ */
+.gatilho {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 40px;
+  padding: var(--via-space-1) var(--via-space-2);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--via-radius-pill);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
+  /* Nunca 700 para dar destaque — a lei estética do projeto. */
+  font-weight: var(--via-fw-medium);
+  transition:
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.gatilho:hover,
+.gatilho[aria-expanded='true'] {
+  background: var(--via-bg-2);
+  border-color: var(--via-border-soft);
+}
+
+.nomeGatilho {
+  /* Nome longo não pode empurrar o cabeçalho. */
+  max-width: 15ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seta {
+  color: var(--via-text-faint);
+  /* Só transform anima. Nunca height/width, nunca `transition: all`. */
+  transition: transform var(--via-t-fast);
+}
+
+.seta[data-aberto] {
+  transform: rotate(180deg);
+}
+
+/* --- Painel ------------------------------------------------------------------- */
+.painel {
+  position: absolute;
+  top: calc(100% + var(--via-space-2));
+  right: 0;
+  z-index: var(--via-z-overlay);
+  min-width: 248px;
+
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-lg);
+  /* Sombra navy do sistema — a assinatura é vidro + atmosfera + sombra, não glow. */
+  box-shadow: var(--via-shadow-lg);
+  overflow: hidden;
+
+  animation: entrar 140ms ease-out;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    /* transform e opacity apenas: as duas únicas propriedades que o compositor
+       anima sem recalcular layout a cada frame. */
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel {
+    animation: none;
+  }
+}
+
+.identidade {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  /* Um degrau de superfície separa identidade de ações sem precisar de régua. */
+  background: var(--via-bg-2);
+}
+
+.nome {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.email {
+  font-size: var(--via-fs-xs);
+  /* Hierarquia por cor sólida, nunca por opacidade. */
+  color: var(--via-text-muted);
+  /* O e-mail é o texto mais largo do painel e não pode alargá-lo indefinidamente. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itens {
+  padding: var(--via-space-2);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  width: 100%;
+  min-height: 40px;
+  padding: var(--via-space-2) var(--via-space-3);
+
+  background: none;
+  border: none;
+  border-radius: var(--via-radius-md);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
+  text-align: left;
+  text-decoration: none;
+  transition: background-color var(--via-t-fast);
+}
+
+.item:hover {
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+
+.item svg {
+  color: var(--via-text-faint);
+  flex-shrink: 0;
+}
+
+.item:hover svg {
+  color: var(--via-text-muted);
+}

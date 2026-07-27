@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
 import { ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
-import { BlocoUsuario } from './_components/BlocoUsuario';
+import { CabecalhoApp } from './_components/CabecalhoApp';
 import styles from './layout.module.css';
 
 /**
@@ -46,30 +46,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           Pular para o conteúdo
         </a>
 
-        <header className={styles.barraTopo}>
-          <Link href="/inicio" className={styles.marca} aria-label="Ir para o início">
-            <SubidoLogo size={13} />
-          </Link>
-          {/* `compacto`: só o avatar. Com nome e e-mail a barra media 540px em
-              375px de viewport e a página ganhava scroll horizontal. */}
-          <BlocoUsuario nome={nome} email={email} compacto />
-        </header>
-
         <aside className={styles.sidebar}>
           <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-            {/* 13, não 16. O wordmark tem proporção ~12:1, então a altura da
-                cap-height multiplica por doze na largura: a 16 o lockup mede 275px
-                e a sidebar oferece 232px úteis — ele vazava 39px para dentro do
-                conteúdo. A 13 mede 223px e sobra folga. */}
-            <SubidoLogo size={13} />
+            <SubidoLogo size={18} />
           </Link>
 
           <NavLateral itens={ITENS_NAV} variante="lateral" />
-
-          <div className={styles.rodapeSidebar}>
-            <BlocoUsuario nome={nome} email={email} />
-          </div>
         </aside>
+
+        {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
+            (usa usePathname) e receber o SVG pronto do servidor evita puxar a marca
+            para o bundle do browser. Só aparece no mobile — em desktop a sidebar
+            já carrega a marca, e repetir seria a segunda vez na mesma tela. */}
+        <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} />
 
         <main className={styles.conteudo} id="conteudo">
           {children}

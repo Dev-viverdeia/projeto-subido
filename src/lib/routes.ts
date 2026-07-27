@@ -18,6 +18,40 @@ export const ROTAS_APP = [
 
 export type RotaApp = (typeof ROTAS_APP)[number];
 
+/**
+ * Nome de cada seção, em um lugar só.
+ *
+ * Mora aqui — e não em `navegacao.tsx`, junto dos itens de menu — porque o
+ * cabeçalho precisa do rótulo e é Client Component (usa `usePathname`). Importar
+ * `navegacao.tsx` de lá arrastaria o `lucide-react` inteiro para o bundle do
+ * browser, já que aquele módulo carrega os ícones como JSX. Strings puras
+ * atravessam a fronteira sem custo.
+ *
+ * `Record<RotaApp, string>` é o que garante a cobertura: acrescentar uma rota em
+ * ROTAS_APP sem dar nome a ela vira erro de tipo, não um cabeçalho vazio.
+ */
+export const ROTULOS: Record<RotaApp, string> = {
+  '/inicio': 'Início',
+  '/solucoes': 'Soluções',
+  '/formacoes': 'Formações',
+  '/builder': 'Builder',
+  '/mentorias': 'Mentorias',
+  '/hub': 'HUB',
+  '/conta': 'Conta',
+};
+
+/**
+ * Rótulo da seção a que um caminho pertence.
+ *
+ * Por prefixo, para que `/solucoes/automacao-de-atendimento` continue dizendo
+ * "Soluções" — a mesma regra que acende o item na navegação. A barra no fim evita
+ * que `/hub` case com um futuro `/hubs`.
+ */
+export function rotuloDaRota(caminho: string): string | null {
+  const rota = ROTAS_APP.find((r) => caminho === r || caminho.startsWith(`${r}/`));
+  return rota ? ROTULOS[rota] : null;
+}
+
 /** Rotas do grupo `(auth)` — públicas, mas redirecionam quem já tem sessão. */
 export const ROTA_ENTRAR = '/entrar';
 export const ROTA_CRIAR_CONTA = '/criar-conta';

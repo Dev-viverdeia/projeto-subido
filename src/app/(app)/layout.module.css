@@ -1,36 +1,10 @@
-/* Mobile primeiro: barra no topo, conteúdo, dock no rodapé (o dock é fixed e mora
-   no NavLateral.module.css). A sidebar só existe a partir de 1024px. */
+/* Mobile primeiro: cabeçalho, conteúdo e o dock fixo (que mora no
+   NavLateral.module.css). A sidebar só existe a partir de 1024px. */
 .shell {
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 100dvh;
   background: var(--via-bg);
-}
-
-.barraTopo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  padding: var(--via-space-3) var(--via-space-4);
-  background: var(--via-surface);
-  border-bottom: 1px solid var(--via-border-hairline);
-  position: sticky;
-  top: 0;
-  z-index: var(--via-z-sticky);
-}
-
-.marca,
-.marcaSidebar {
-  color: var(--via-navy);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  /* Impede que o lockup encolha quando o e-mail do usuário é longo. */
-  flex-shrink: 0;
-  /* O lockup tem 14px de altura; como link, essa era a área clicável inteira —
-     abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */
-  min-height: 44px;
 }
 
 .sidebar {
@@ -46,21 +20,29 @@
 }
 
 @media (min-width: 1024px) {
-  .shell {
-    grid-template-rows: none;
-    grid-template-columns: 264px 1fr;
-  }
+  /* 240px, não 264. A sidebar carrega seis rótulos curtos e um logotipo pequeno —
+     a largura extra não estava sendo usada por nada, e cada pixel dela sai do
+     conteúdo, que é onde o trabalho acontece.
 
-  .barraTopo {
-    display: none;
+     SEM `grid-template-areas` DE PROPÓSITO. O cabeçalho é um componente com CSS
+     Module próprio, e daqui não há como alcançar a classe dele para lhe atribuir
+     uma área. Em vez disso a sidebar é posicionada explicitamente nas duas linhas
+     e o resto cai por auto-placement, na ordem do DOM: cabeçalho na linha 1 da
+     coluna 2, conteúdo na linha 2. Menos acoplamento, mesmo resultado. */
+  .shell {
+    grid-template-columns: 240px 1fr;
   }
 
   .sidebar {
+    grid-column: 1;
+    grid-row: 1 / -1;
+
     display: flex;
     flex-direction: column;
     gap: var(--via-space-6);
-    /* `sticky` + `h-screen` em vez de `fixed`: a sidebar continua no fluxo do grid,
-       então o conteúdo não precisa de margin-left mágica para não ficar embaixo. */
+    /* `sticky` + altura de viewport em vez de `fixed`: a sidebar continua no fluxo
+       do grid, então o conteúdo não precisa de margin-left mágica para não ficar
+       embaixo dela. */
     position: sticky;
     top: 0;
     height: 100dvh;
@@ -69,22 +51,19 @@
     border-right: 1px solid var(--via-border-hairline);
   }
 
-  .marcaSidebar {
-    /* Só padding vertical. O horizontal comeria da largura útil justamente onde o
-       lockup já é o elemento mais largo da coluna — e o alinhamento à esquerda com
-       os itens de navegação é aproximado de propósito: o glifo do wordmark tem
-       sidebearing próprio, então casar as caixas desalinharia o que se vê. */
-    padding-block: var(--via-space-2);
-  }
-
-  .rodapeSidebar {
-    /* Empurra o bloco de usuário para o fim da coluna. */
-    margin-top: auto;
-    padding-top: var(--via-space-4);
-    border-top: 1px solid var(--via-border-hairline);
-  }
-
   .conteudo {
-    padding: var(--via-space-10) var(--via-space-10) var(--via-space-16);
+    padding: var(--via-space-8) var(--via-space-8) var(--via-space-16);
   }
+}
+
+.marcaSidebar {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  color: var(--via-navy);
+  text-decoration: none;
+  /* O logotipo é baixo; como link, a caixa dele seria a área clicável inteira e
+     ficaria abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */
+  min-height: 44px;
+  padding-inline: var(--via-space-2);
 }

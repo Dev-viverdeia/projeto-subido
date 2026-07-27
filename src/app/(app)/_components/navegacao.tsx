@@ -1,5 +1,5 @@
 import { Blocks, Boxes, Building2, GraduationCap, House, Users } from 'lucide-react';
-import type { RotaApp } from '@/lib/routes';
+import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
   href: RotaApp;
@@ -28,37 +28,37 @@ const TRACO = 1.8;
 export const ITENS_NAV: ItemNav[] = [
   {
     href: '/inicio',
-    rotulo: 'Início',
+    rotulo: ROTULOS['/inicio'],
     icone: <House size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/solucoes',
-    rotulo: 'Soluções',
+    rotulo: ROTULOS['/solucoes'],
     icone: <Boxes size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/formacoes',
-    rotulo: 'Formações',
+    rotulo: ROTULOS['/formacoes'],
     icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/builder',
-    rotulo: 'Builder',
+    rotulo: ROTULOS['/builder'],
     icone: <Blocks size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/mentorias',
-    rotulo: 'Mentorias',
+    rotulo: ROTULOS['/mentorias'],
     icone: <Users size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/hub',
-    rotulo: 'HUB',
+    rotulo: ROTULOS['/hub'],
     icone: <Building2 size={TAMANHO} strokeWidth={TRACO} />,
     noDock: false,
   },

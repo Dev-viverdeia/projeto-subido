@@ -1,0 +1,82 @@
+.cabecalho {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 60px;
+  padding-inline: var(--via-space-4);
+
+  position: sticky;
+  top: 0;
+  z-index: var(--via-z-sticky);
+
+  /* VIDRO — a assinatura do sistema é glass + atmosfera + sombra navy, nunca glow.
+     `--via-glass-bar` é o token que o DS reserva para barra/chrome: translúcido de
+     verdade, pensado para o conteúdo passar DESFOCADO por baixo. O `saturate`
+     compensa a dessaturação que o blur provoca, senão o que rola sob o cabeçalho
+     parece desbotar.
+
+     ⚠ NÃO ACRESCENTE `-webkit-backdrop-filter` AQUI.
+     O Lightning CSS (minificador do Turbopack) já faz o prefixing sozinho a partir
+     do browserslist. Com a duplicata manual escrita ao lado, ele descarta AS DUAS
+     declarações: medido no CSSOM, `backdrop-filter` saía `none` e sobrava só o
+     fundo a 60% — ou seja, o texto do conteúdo passando nítido por trás do
+     cabeçalho, sem nenhum aviso em build, lint ou tipo. O ConsentNotice da landing
+     nunca teve o problema justamente por trazer só a linha sem prefixo. */
+  background: var(--via-glass-bar);
+  backdrop-filter: blur(14px) saturate(1.6);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+/* Sem suporte a backdrop-filter, um fundo translúcido deixaria o conteúdo passar
+   nítido por trás e virar sopa. Aí o branco é sólido. */
+@supports not (backdrop-filter: blur(1px)) {
+  .cabecalho {
+    background: var(--via-surface);
+  }
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 44px;
+  color: var(--via-navy);
+  text-decoration: none;
+}
+
+.secao {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-muted);
+  /* Some antes de qualquer outra coisa quando falta largura. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: none;
+}
+
+.direita {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  /* Empurra o perfil para a direita sem precisar de space-between, que brigaria
+     com o rótulo de seção quando ele aparece. */
+  margin-left: auto;
+}
+
+@media (min-width: 1024px) {
+  .cabecalho {
+    min-height: 68px;
+    padding-inline: var(--via-space-8);
+  }
+
+  /* A marca vive na sidebar em desktop; repeti-la aqui seria a segunda vez na
+     mesma tela. O lugar dela passa a ser do rótulo de seção. */
+  .marca {
+    display: none;
+  }
+
+  .secao {
+    display: block;
+  }
+}
