@@ -1,5 +1,5 @@
 import { HERO } from '@/content/landing';
-import { CoBrandLockup } from '../chrome/CoBrandLockup';
+import { CoBrandLockup } from '@/components/brand/CoBrandLockup';
 import { MaskReveal } from '../primitives/MaskReveal';
 import { Roll } from '../primitives/Roll';
 import { HeroVideoFacade } from './HeroVideoFacade';

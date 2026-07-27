@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { NAV, HEADER_CTA } from '@/content/landing';
-import { CoBrandLockup } from './CoBrandLockup';
+import { CoBrandLockup } from '@/components/brand/CoBrandLockup';
 import { Roll } from '../primitives/Roll';
 import styles from './SiteHeader.module.css';
 
