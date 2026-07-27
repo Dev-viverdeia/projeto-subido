@@ -1,4 +1,4 @@
-import { Blocks, Boxes, GraduationCap, House, Users } from 'lucide-react';
+import { Blocks, Boxes, GraduationCap, House, ShieldCheck, Users } from 'lucide-react';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
@@ -57,3 +57,21 @@ export const ITENS_NAV: ItemNav[] = [
     noDock: true,
   },
 ];
+
+/**
+ * Item extra, só para quem tem papel de admin.
+ *
+ * Fica FORA de ITENS_NAV porque o layout monta a lista por sessão: um membro
+ * comum nunca recebe este objeto no payload, então nem o rótulo nem o destino
+ * vazam para quem não pode entrar. Esconder por CSS deixaria a rota descoberta no
+ * HTML de todo mundo.
+ *
+ * Não entra no dock: em 375px cabem cinco, e nenhum deles pode ser um item que a
+ * maioria dos usuários não enxerga.
+ */
+export const ITEM_ADMIN: ItemNav = {
+  href: '/admin',
+  rotulo: ROTULOS['/admin'],
+  icone: <ShieldCheck size={TAMANHO} strokeWidth={TRACO} />,
+  noDock: false,
+};

@@ -1,0 +1,22 @@
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-md);
+  background: var(--via-bg-2);
+}
+
+.aviso {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-body);
+  max-width: 52ch;
+}
+
+.botoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}

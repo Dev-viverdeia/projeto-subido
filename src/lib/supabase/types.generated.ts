@@ -22,6 +22,118 @@ export type Database = {
   }
   public: {
     Tables: {
+      aulas: {
+        Row: {
+          criado_em: string
+          duracao_seg: number | null
+          id: string
+          modulo_id: string
+          ordem: number
+          titulo: string
+          video_url: string | null
+        }
+        Insert: {
+          criado_em?: string
+          duracao_seg?: number | null
+          id?: string
+          modulo_id: string
+          ordem?: number
+          titulo: string
+          video_url?: string | null
+        }
+        Update: {
+          criado_em?: string
+          duracao_seg?: number | null
+          id?: string
+          modulo_id?: string
+          ordem?: number
+          titulo?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aulas_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      formacoes: {
+        Row: {
+          atualizado_em: string
+          capa_url: string | null
+          criado_em: string
+          criado_por: string | null
+          id: string
+          ordem: number
+          publicado_em: string | null
+          resumo: string
+          slug: string
+          status: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          capa_url?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string
+          slug: string
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          capa_url?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo?: string
+        }
+        Relationships: []
+      }
+      modulos: {
+        Row: {
+          criado_em: string
+          formacao_id: string
+          id: string
+          ordem: number
+          titulo: string
+        }
+        Insert: {
+          criado_em?: string
+          formacao_id: string
+          id?: string
+          ordem?: number
+          titulo: string
+        }
+        Update: {
+          criado_em?: string
+          formacao_id?: string
+          id?: string
+          ordem?: number
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "modulos_formacao_id_fkey"
+            columns: ["formacao_id"]
+            isOneToOne: false
+            referencedRelation: "formacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           atualizado_em: string
@@ -43,6 +155,89 @@ export type Database = {
           criado_em?: string
           id?: string
           nome?: string
+        }
+        Relationships: []
+      }
+      solucao_itens: {
+        Row: {
+          conteudo: string
+          id: string
+          ordem: number
+          solucao_id: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          conteudo?: string
+          id?: string
+          ordem?: number
+          solucao_id: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          conteudo?: string
+          id?: string
+          ordem?: number
+          solucao_id?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solucao_itens_solucao_id_fkey"
+            columns: ["solucao_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solucoes: {
+        Row: {
+          atualizado_em: string
+          capa_url: string | null
+          categoria: string | null
+          criado_em: string
+          criado_por: string | null
+          id: string
+          ordem: number
+          publicado_em: string | null
+          resumo: string
+          slug: string
+          status: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          video_url: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          capa_url?: string | null
+          categoria?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string
+          slug: string
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          video_url?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          capa_url?: string | null
+          categoria?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -76,6 +271,7 @@ export type Database = {
     }
     Enums: {
       papel_usuario: "membro" | "mentor" | "admin"
+      status_publicacao: "rascunho" | "publicado" | "arquivado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -204,6 +400,7 @@ export const Constants = {
   public: {
     Enums: {
       papel_usuario: ["membro", "mentor", "admin"],
+      status_publicacao: ["rascunho", "publicado", "arquivado"],
     },
   },
 } as const

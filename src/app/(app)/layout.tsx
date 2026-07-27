@@ -5,7 +5,8 @@ import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
-import { ITENS_NAV } from './_components/navegacao';
+import { ehAdmin } from '@/lib/auth/papeis';
+import { ITEM_ADMIN, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
 import styles from './layout.module.css';
@@ -39,6 +40,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
      @ é um fallback previsível — melhor que "Usuário" e melhor que vazio. */
   const nome = nomeBruto || email.split('@')[0] || 'Sua conta';
 
+  /* A lista é montada por sessão: quem não é admin não recebe o item no payload
+     RSC — nem o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no
+     HTML de todo mundo. */
+  const itens = (await ehAdmin()) ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV;
+
   return (
     <QueryProvider>
       <div className={styles.shell}>
@@ -51,7 +57,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             <SubidoLogo size={18} />
           </Link>
 
-          <NavLateral itens={ITENS_NAV} variante="lateral" />
+          <NavLateral itens={itens} variante="lateral" />
         </aside>
 
         {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
@@ -64,7 +70,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
 
-        <NavLateral itens={ITENS_NAV} variante="dock" />
+        <NavLateral itens={itens} variante="dock" />
       </div>
     </QueryProvider>
   );

@@ -13,6 +13,11 @@ export const ROTAS_APP = [
   '/builder',
   '/mentorias',
   '/conta',
+  /* Área administrativa. Entra aqui — e não numa lista separada — porque para o
+     proxy ela é igual às outras: exige sessão. Quem tem sessão mas não é admin é
+     barrado depois, no layout de /admin, onde dá para consultar o papel. O proxy
+     roda antes de qualquer consulta ao banco e não tem como saber isso. */
+  '/admin',
 ] as const;
 
 export type RotaApp = (typeof ROTAS_APP)[number];
@@ -36,6 +41,7 @@ export const ROTULOS: Record<RotaApp, string> = {
   '/builder': 'Builder',
   '/mentorias': 'Mentorias',
   '/conta': 'Conta',
+  '/admin': 'Administração',
 };
 
 /**

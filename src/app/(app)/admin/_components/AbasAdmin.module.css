@@ -1,0 +1,51 @@
+.abas {
+  display: flex;
+  gap: var(--via-space-1);
+  /* Trilho da barra de abas. A linha inteira vive aqui e cada aba ativa a
+     sobrepõe — assim as abas inativas ficam ancoradas numa régua contínua em vez
+     de flutuarem. */
+  border-bottom: 1px solid var(--via-border-hairline);
+  /* Em telas estreitas as abas rolam em vez de quebrar linha ou espremer. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.abas::-webkit-scrollbar {
+  display: none;
+}
+
+.aba {
+  position: relative;
+  padding: var(--via-space-3) var(--via-space-4);
+  white-space: nowrap;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  border-radius: var(--via-radius-md) var(--via-radius-md) 0 0;
+  transition:
+    color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.aba:hover {
+  color: var(--via-text-primary);
+  background: var(--via-bg-2);
+}
+
+/* Hierarquia por peso editorial e cor sólida — nunca por opacidade. */
+.aba[aria-current='page'] {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* O sublinhado do ativo cobre a hairline do trilho. `bottom: -1px` é o que faz a
+   linha da aba ficar exatamente EM CIMA da borda do container, e não 1px acima. */
+.aba[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--via-space-3);
+  bottom: -1px;
+  height: 2px;
+  background: var(--via-navy);
+  border-radius: 2px 2px 0 0;
+}

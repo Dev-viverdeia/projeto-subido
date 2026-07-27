@@ -1,0 +1,22 @@
+-- =============================================================================
+-- REMOVER A POLICY DE LISTAGEM DO BUCKET `capas`
+--
+-- Follow-up de 20260727204500 — aquela já foi aplicada e não se edita.
+--
+-- O QUE O LINTER PEGOU
+-- Um bucket PÚBLICO serve cada objeto pela URL pública direta; ele não precisa de
+-- policy de SELECT em `storage.objects` para isso. A policy que eu criei fazia
+-- outra coisa além do pretendido: dava `list` do bucket inteiro a qualquer um,
+-- inclusive anônimo. Ou seja, em vez de "quem tem o link vê a imagem", virava
+-- "qualquer um enumera todas as capas, inclusive as de conteúdo em rascunho que
+-- ainda não foi publicado".
+--
+-- Enumerar capas de rascunho é vazamento de roadmap: os nomes dos arquivos
+-- entregam o que está por vir antes do anúncio.
+--
+-- Sem a policy, a URL pública continua funcionando exatamente igual — o acesso por
+-- URL de bucket público não passa por RLS. As três policies de escrita continuam,
+-- porque escrita SEMPRE passa.
+-- =============================================================================
+
+drop policy "capas são públicas para leitura" on storage.objects;

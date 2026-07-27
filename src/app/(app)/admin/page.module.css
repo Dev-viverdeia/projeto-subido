@@ -1,0 +1,44 @@
+.grade {
+  display: grid;
+  gap: var(--via-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  max-width: var(--via-content);
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  height: 100%;
+}
+
+.icone {
+  display: inline-flex;
+  color: var(--via-text-muted);
+  margin-bottom: var(--via-space-2);
+}
+
+.titulo {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+/* Número em mono e tabular: no grid, dígitos de larguras diferentes fariam os
+   cartões dançarem quando a contagem mudasse de 9 para 10. */
+.numero {
+  font-family: var(--via-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--via-fs-h2);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+}
+
+.detalhe {
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-faint);
+}

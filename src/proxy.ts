@@ -43,5 +43,6 @@ export const config = {
     '/builder/:path*',
     '/mentorias/:path*',
     '/conta/:path*',
+    '/admin/:path*',
   ],
 };

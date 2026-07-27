@@ -1,0 +1,124 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+  max-width: var(--via-content);
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+/* Casa com o `.via-input__label` do design system para que os campos nativos
+   (textarea, select) não destoem dos Input do DS na mesma coluna. */
+.rotulo {
+  font-size: var(--via-fs-label);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.textarea,
+.select {
+  width: 100%;
+  padding: var(--via-space-3) var(--via-space-4);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-body);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-md);
+  transition: border-color var(--via-t-fast);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: var(--via-lh-loose);
+}
+
+.textarea:focus,
+.select:focus {
+  border-color: var(--via-navy);
+}
+
+.erro {
+  margin: 0;
+  font-size: var(--via-fs-xs);
+  /* Coral do DS para erro; sobre superfície clara é a variante legível. */
+  color: var(--via-churn-ink, var(--via-text-primary));
+}
+
+.dica {
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-faint);
+}
+
+/* --- Capa -------------------------------------------------------------------- */
+.capaPreview {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.capaPreview img {
+  width: 160px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--via-radius-md);
+  border: 1px solid var(--via-border-hairline);
+}
+
+.capaVazia {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+}
+
+/* `display:none` removeria o input da árvore de acessibilidade e o clique
+   programático deixaria de funcionar em alguns browsers. Fora da tela, ele
+   continua sendo um input de verdade. */
+.arquivoOculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Ações ------------------------------------------------------------------- */
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.cancelar {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  /* Alvo de toque de 44px sem alterar o desenho. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-2);
+}
+
+.cancelar:hover {
+  color: var(--via-text-primary);
+  text-decoration: underline;
+}

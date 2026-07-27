@@ -1,0 +1,72 @@
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-lg);
+  overflow: hidden;
+  background: var(--via-surface);
+}
+
+.lista > li + li {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.linha {
+  display: grid;
+  /* O título ocupa o que sobra; pill e data têm largura própria e não encolhem. */
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  padding: var(--via-space-4) var(--via-space-5);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--via-t-fast);
+}
+
+.linha:hover {
+  background: var(--via-bg-2);
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titulo {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slug {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data {
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-faint);
+  white-space: nowrap;
+}
+
+/* Em 375px a data é a informação mais dispensável da linha — some antes de
+   qualquer coisa começar a espremer. */
+@media (max-width: 520px) {
+  .data {
+    display: none;
+  }
+
+  .linha {
+    grid-template-columns: 1fr auto;
+  }
+}
