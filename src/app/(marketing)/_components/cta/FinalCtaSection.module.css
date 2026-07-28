@@ -80,3 +80,10 @@
   margin-inline: var(--via-space-2);
   opacity: 0.45;
 }
+
+/* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
+   zero): a box-shadow desta classe o apagava. Medido: foco sem NADA visível.
+   Compõe com a sombra de repouso para o elemento não achatar ao focar. */
+.cta:focus-visible {
+  box-shadow: var(--app-ring-onnavy);
+}

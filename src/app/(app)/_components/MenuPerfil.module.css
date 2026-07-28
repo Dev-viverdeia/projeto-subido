@@ -144,3 +144,10 @@
 .item:hover svg {
   color: var(--via-text-muted);
 }
+
+/* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
+   zero): a box-shadow desta classe o apagava, e o foco ficava invisível.
+   Gatilho do menu de perfil — porta de saída da conta, alcançável só por teclado em leitor de tela. */
+.gatilho:focus-visible {
+  box-shadow: var(--app-ring);
+}

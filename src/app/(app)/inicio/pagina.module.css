@@ -154,3 +154,10 @@
     transition: none;
   }
 }
+
+/* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
+   zero): a box-shadow desta classe o apagava. Medido: foco sem NADA visível.
+   Compõe com a sombra de repouso para o elemento não achatar ao focar. */
+.mentoria:focus-visible {
+  box-shadow: var(--app-ring);
+}

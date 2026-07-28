@@ -177,6 +177,29 @@ de uma escala de 14 degraus não é escala, são 14 opções.
 hairline e a superfície **andarem juntas**. `--app-elev-{1,2,3}-{bg,line,shadow}` — repouso,
 erguido, sobreposto. Usar a sombra de um nível com a hairline de outro é o desvio.
 
+**6 · Foco é um ESTADO do sistema, não um detalhe de componente.** `--app-ring` (claro) e
+`--app-ring-onnavy` (sobre banda escura). Componha com a sombra de repouso —
+`var(--app-ring), var(--app-elev-1-shadow)` — para o elemento não achatar ao receber foco.
+
+**A armadilha, agora com número:** o anel do DS é `box-shadow` e o de `globals.css` usa
+`:where()`, que tem especificidade ZERO. Qualquer `.classe { box-shadow: … }` num interativo
+o apaga, e nada reprova — nem tsc, nem eslint, nem build. Medido no navegador com
+`:focus-visible` ativo e a transição terminada: **oito seletores** estavam sem anel nenhum,
+incluindo os quatro cards de pilar e o CTA primário do hero — o botão que recebe o clique pago.
+`check:identidade` agora reprova `box-shadow` + `:hover` sem `:focus-visible`.
+
+> Ao medir foco, dois erros custam caro e os dois aconteceram aqui: `el.focus()` **não** dispara
+> `:focus-visible` (o navegador exige modalidade de teclado), e ler o computed no meio da
+> transição devolve o valor interpolado. Meça com `transition: none`, ou logo após um Tab real.
+
+**O que ainda NÃO está no nível:** **23 breakpoints distintos** (419, 420, 480, 520, 559, 560,
+599, 640, 720, 767, 768, 860, 900, 1023, 1024, 1079, 1080, 1099, 1120, 1279, 1280, 1439, 1800).
+Isso não é sistema responsivo, são 23 decisões independentes. A escala canônica é
+**600 · 768 · 900 · 1080 · 1280 · 1440** (e `n−1` para `max-width`). A migração é **por tela, ao
+tocá-la** — trocar 23 breakpoints de uma vez muda o layout de toda a plataforma e exige
+verificação visual que a área logada ainda não permite sem sessão. Não está gateado de propósito:
+gate com 23 exceções não é gate.
+
 ### Como compor uma seção
 
 Esta é a parte construtiva: o que fazer, não só o que evitar.

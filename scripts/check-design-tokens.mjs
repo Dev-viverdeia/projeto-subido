@@ -99,6 +99,49 @@ function temEscape(linhas, i) {
   return linhas.slice(topo, i + 1).some((l) => /token-ok:/.test(l));
 }
 
+/**
+ * REGRA ESTRUTURAL — anel de foco morto.
+ *
+ * Não dá para pegar isto com regex por linha: o defeito é a AUSÊNCIA de uma regra
+ * em outro lugar do arquivo. Um seletor que declara `box-shadow` e tem `:hover`
+ * (prova de que é interativo) precisa declarar o próprio `:focus-visible`, porque
+ * o anel do DS é box-shadow e o de `globals.css` usa `:where()` — especificidade
+ * ZERO. Qualquer box-shadow de classe o apaga, e o build passa verde.
+ *
+ * Medido antes deste gate, com `:focus-visible` ativo e a transição terminada:
+ * `.card` do PillarsIndex ficava com `outline: none` e sombra de foco resolvendo
+ * `rgba(0,0,0,0) 0px 0px 0px 0px`. Seis seletores assim, incluindo os quatro
+ * cards de pilar da landing — invisíveis para quem navega por teclado.
+ */
+function anelDeFocoMorto(linhas) {
+  const texto = linhas.join('\n');
+  const porBase = new Map();
+
+  for (const [, sel, corpo] of texto.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    for (const parte of sel.split(',')) {
+      const limpo = parte.trim().split('*/').pop().trim();
+      const base = limpo.replace(/:(hover|focus-visible|focus|active)\b.*$/, '');
+      if (!base || base.startsWith('@')) continue;
+      const d = porBase.get(base) ?? { sombra: false, hover: false, foco: false, linha: 0 };
+      if (/box-shadow/.test(corpo)) d.sombra = true;
+      if (/:hover\b/.test(limpo)) d.hover = true;
+      if (/:focus-visible\b/.test(limpo)) d.foco = true;
+      if (!d.linha) d.linha = linhas.findIndex((l) => l.includes(base)) + 1;
+      porBase.set(base, d);
+    }
+  }
+
+  return [...porBase.entries()]
+    .filter(([, d]) => d.sombra && d.hover && !d.foco)
+    .map(([base, d]) => ({ base, linha: d.linha }));
+}
+
+const REGRA_FOCO = {
+  id: 'anel-de-foco-morto',
+  porque: 'box-shadow de classe apaga o anel do DS — o foco fica INVISÍVEL e o build passa verde',
+  use: '<seletor>:focus-visible { box-shadow: var(--app-ring), <sombra de repouso> }',
+};
+
 const arquivos = globSync(ALVOS, { cwd: RAIZ, exclude: IGNORADOS });
 
 const achados = [];
@@ -129,6 +172,11 @@ for (const rel of arquivos) {
     }
     return fora;
   };
+
+  for (const { base, linha } of anelDeFocoMorto(linhas)) {
+    if (temEscape(linhas, linha - 1)) continue;
+    achados.push({ arquivo: rel, linha, regra: REGRA_FOCO, trecho: base });
+  }
 
   linhas.forEach((linha, i) => {
     const codigo = codigoDe(linha);

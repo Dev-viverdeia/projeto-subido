@@ -267,6 +267,25 @@
   --app-elev-3-line: var(--via-border);
   --app-elev-3-shadow: var(--via-shadow-xl);
 
+  /* ---- FOCO · o estado que some sem ninguém notar ----------------------------
+     O anel do DS é um `box-shadow`, e o de `globals.css` usa `:where()` — que tem
+     especificidade ZERO. Resultado: qualquer `.classe { box-shadow: … }` num
+     elemento interativo APAGA o anel, e o build passa verde porque nada disso é
+     erro de sintaxe.
+
+     Não é hipótese. Medido no navegador, com `:focus-visible` ativo e a transição
+     terminada, em `.card` do PillarsIndex: `outline: none` e a sombra de foco
+     resolvendo `rgba(0,0,0,0) 0px 0px 0px 0px` — quem navega por teclado nos
+     quatro cards de pilar não via absolutamente nada. Seis seletores estavam
+     assim. O CLAUDE.md já descrevia essa armadilha; faltava alguém verificar.
+
+     Por isso o anel é TOKEN: a correção é uma declaração, não seis cópias que
+     divergem na primeira vez que alguém mexer. Componha com a sombra de repouso
+     (`var(--app-ring), var(--app-elev-1-shadow)`) para o card não achatar ao
+     receber foco. `check:identidade` reprova quem reintroduzir o problema. */
+  --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-60);
+  --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-accent);
+
   /* ---- Cinza sobre banda escura ---------------------------------------------
      `#8fa0b8` aparecia literal em três seções da landing (hero, SectionHeader e
      CTA final) porque não havia token para "cinza claro legível sobre navy".
