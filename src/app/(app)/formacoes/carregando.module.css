@@ -1,19 +1,15 @@
-/* Espelha CatalogoFormacoes.module.css — ver a nota lá. */
+/* Espelha CatalogoFormacoes.module.css à risca — skeleton com contagem de
+   colunas ou proporção de capa diferente da grade real faz a tela pular no fim
+   do load. */
 .grade {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
 }
 
-@media (min-width: 1700px) {
+@media (min-width: 1600px) {
   .grade {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1279px) {
-  .grade {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -37,7 +33,7 @@
 }
 
 .capa {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 10;
 }
 
 .corpo {

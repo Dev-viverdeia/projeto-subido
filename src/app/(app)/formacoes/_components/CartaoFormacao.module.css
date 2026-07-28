@@ -24,9 +24,12 @@
     0 0 0 4px var(--via-navy-60);
 }
 
+/* 16:10 e não 3:4. O retrato pedia 400px de altura por card e, num catálogo que
+   começa com duas formações, virava um retângulo alto e vazio. A paisagem
+   também é o formato em que uma capa de curso costuma ser produzida. */
 .capa {
   position: relative;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--via-navy-deep);
 }
@@ -43,24 +46,15 @@
   transform: scale(1.05);
 }
 
-/* Pôster sintético: a banda navy com o título faz o papel da capa até o admin
-   subir a arte — visivelmente da casa, nunca imagem de banco. */
+/* Capa sintética: marca gráfica, NUNCA o título — ele já vive no corpo do card,
+   e repetir era o mesmo texto duas vezes na mesma caixa. */
 .sintetica {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-end;
-  padding: var(--via-space-4);
-}
-
-.sinteticaTitulo {
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h4);
-  font-weight: 560;
-  letter-spacing: -0.015em;
-  line-height: var(--via-lh-snug);
-  color: var(--via-white);
-  text-wrap: balance;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.22);
 }
 
 /* Sheen de topo — a assinatura de vidro, em dose de capa. */
@@ -77,11 +71,33 @@
   opacity: 1;
 }
 
+/* Selo de concluída na capa: sai do rodapé, onde disputava espaço com a
+   contagem, e vira reconhecimento visível de longe. */
+.selo {
+  position: absolute;
+  top: var(--via-space-2_5);
+  right: var(--via-space-2_5);
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding-inline: var(--via-space-2_5);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-white);
+  color: var(--via-navy);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  box-shadow: var(--via-shadow-sm);
+}
+
 .corpo {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
   padding: var(--via-space-4);
+  /* Empurra rodapé e barra para a base quando os cards são igualados por
+     `grid-auto-rows: 1fr` — títulos de tamanhos diferentes não desalinham a
+     contagem de um card para o outro. */
+  flex: 1;
 }
 
 .titulo {
@@ -97,10 +113,29 @@
   overflow: hidden;
 }
 
-.meta {
+/* O resumo dá substância ao card: antes era capa + título + contagem, e a caixa
+   ficava com mais área de imagem do que de informação. */
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+  color: var(--via-text-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.rodape {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  justify-content: space-between;
   gap: var(--via-space-2);
+  margin-top: auto;
+  padding-top: var(--via-space-1);
+}
+
+.meta {
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -109,9 +144,11 @@
 }
 
 .pct {
-  margin-left: auto;
-  color: var(--via-navy);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
+  color: var(--via-navy);
+  font-variant-numeric: tabular-nums;
 }
 
 .trilho {

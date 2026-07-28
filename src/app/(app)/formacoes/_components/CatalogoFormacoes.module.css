@@ -41,6 +41,9 @@
   color: var(--via-text-muted);
   cursor: pointer;
   border-bottom: 1px solid transparent;
+  /* "A–Z" quebrava em duas linhas quando a régua apertava: o traço do meio é um
+     ponto de quebra válido para o navegador. */
+  white-space: nowrap;
   transition:
     color var(--via-t-fast),
     border-color var(--via-t-fast);
@@ -57,21 +60,26 @@
 
 /* Pôsteres pedem mais colunas que cards de texto: 4 → 3 → 2 → 1. O piso
    atmosférico atrás da grade é a assinatura em dose homeopática. */
-/* Pôster 3:4 engorda em DUAS dimensões: 385px de largura viram 513 de altura, e
-   a grade deixa de ser catálogo para virar mural. A quinta coluna segura o pôster
-   em 304px (405 de altura), dentro da faixa de 240–320 do desenho. */
+/* Sem o "piso atmosférico" que existia atrás da grade: ele fazia sentido com o
+   catálogo cheio, mas com duas formações a caixa colorida se estendia por toda a
+   largura e lia como container VAZIO — o defeito ficava maior que o efeito.
+   Card com contorno próprio já se sustenta no fundo da página.
+
+   Colunas: a capa virou 16:10, então cada card quer MAIS largura que o pôster
+   3:4 de antes — 3 colunas por padrão e 4 quando sobra espaço, em vez de 4 e 5. */
 .grade {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
-  padding: var(--via-space-5) var(--via-space-4) var(--via-space-6);
-  margin-inline: calc(var(--via-space-4) * -1);
-  border-radius: var(--via-radius-lg);
-  background: var(--via-navy-02);
-  /* Pôsteres também precisam de altura idêntica: a barra de progresso só existe
-     em quem já começou, então um card com barra e outro sem produzem fileiras
-     desiguais — e num grid de capas o desalinho é ainda mais visível. */
+  /* Altura idêntica: a barra de progresso só existe em quem já começou, então um
+     card com barra e outro sem produziriam fileiras desiguais. */
   grid-auto-rows: 1fr;
+}
+
+@media (min-width: 1600px) {
+  .grade {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* Filho direto = wrapper de motion (sem classe). Ver a nota em CatalogoSolucoes. */
@@ -82,18 +90,6 @@
 .grade > * > * {
   flex: 1;
   min-width: 0;
-}
-
-@media (min-width: 1700px) {
-  .grade {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1279px) {
-  .grade {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 1023px) {
