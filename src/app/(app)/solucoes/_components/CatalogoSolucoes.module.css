@@ -14,8 +14,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-hairline);
-  padding-bottom: var(--via-space-1);
 }
 
 .reguaDireita {
@@ -79,6 +77,23 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
+  /* TODOS os cards com a MESMA altura, não só os da mesma linha. Sem isto o grid
+     dá a cada linha a altura do seu conteúdo mais alto: um título de duas linhas
+     na primeira fileira e de uma na segunda produzem fileiras desiguais. `1fr`
+     iguala todas as linhas pela mais alta do conjunto. */
+  grid-auto-rows: 1fr;
+}
+
+/* O filho direto da grade é o wrapper de motion (sem classe própria). Ele precisa
+   virar caixa flex para o card esticar até a altura da célula — a alternativa,
+   `height: 100%` no card, dependeria de o wrapper ter altura definida. */
+.grade > * {
+  display: flex;
+}
+
+.grade > * > * {
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 1800px) {

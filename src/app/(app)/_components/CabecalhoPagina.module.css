@@ -4,7 +4,6 @@
   gap: var(--via-space-4);
   margin-bottom: var(--via-space-8);
   padding-bottom: var(--via-space-6);
-  border-bottom: 1px solid var(--via-border-hairline);
 }
 
 .textos {

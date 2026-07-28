@@ -292,13 +292,23 @@ export function CatalogoSolucoes({
         </div>
       )}
 
-      {totalPaginas > 1 && (
+      {/* O rodapé aparece sempre que há resultado: a CONTAGEM é informação em
+          qualquer tamanho de catálogo ("estou vendo tudo?"). Só o controle de
+          páginas é condicional — com uma página, setas desabilitadas seriam
+          cromo morto. */}
+      {filtradas.length > 0 && (
         <div className={styles.rodapePaginas}>
           <p className={styles.mostrando}>
             Mostrando {(paginaVisivel - 1) * POR_PAGINA + 1}–
             {Math.min(paginaVisivel * POR_PAGINA, filtradas.length)} de {filtradas.length}
           </p>
-          <Pagination page={paginaVisivel} totalPages={totalPaginas} onPageChange={irParaPagina} />
+          {totalPaginas > 1 && (
+            <Pagination
+              page={paginaVisivel}
+              totalPages={totalPaginas}
+              onPageChange={irParaPagina}
+            />
+          )}
         </div>
       )}
     </div>

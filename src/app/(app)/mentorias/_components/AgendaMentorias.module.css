@@ -9,8 +9,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-hairline);
-  padding-bottom: var(--via-space-1);
 }
 
 .contagem {

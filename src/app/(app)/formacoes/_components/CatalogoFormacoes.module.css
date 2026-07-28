@@ -11,8 +11,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-hairline);
-  padding-bottom: var(--via-space-3);
 }
 
 .reguaDireita {
@@ -70,6 +68,20 @@
   margin-inline: calc(var(--via-space-4) * -1);
   border-radius: var(--via-radius-lg);
   background: var(--via-navy-02);
+  /* Pôsteres também precisam de altura idêntica: a barra de progresso só existe
+     em quem já começou, então um card com barra e outro sem produzem fileiras
+     desiguais — e num grid de capas o desalinho é ainda mais visível. */
+  grid-auto-rows: 1fr;
+}
+
+/* Filho direto = wrapper de motion (sem classe). Ver a nota em CatalogoSolucoes. */
+.grade > * {
+  display: flex;
+}
+
+.grade > * > * {
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 1700px) {

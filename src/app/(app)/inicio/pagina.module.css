@@ -130,6 +130,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
   max-width: 1300px;
+  /* Todos os cards com altura idêntica. Aqui o card é filho DIRETO da grade (não
+     há wrapper de motion, como no catálogo), então `1fr` + o `stretch` padrão do
+     grid já bastam — nenhuma regra extra de flex. */
+  grid-auto-rows: 1fr;
 }
 
 @media (max-width: 1279px) {
