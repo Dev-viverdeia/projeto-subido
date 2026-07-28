@@ -40,11 +40,9 @@ export default async function InicioPage() {
 
   return (
     <div className={styles.pagina}>
-      <div className={entrada.bloco}>
-        <CabecalhoPagina titulo={nome ? `Bem-vindo, ${nome}` : 'Início'} oculto />
-      </div>
+      <CabecalhoPagina titulo={nome ? `Bem-vindo, ${nome}` : 'Início'} oculto />
 
-      <div className={`${entrada.bloco} ${entrada.atraso1} ${styles.linhaTopo}`}>
+      <div className={`${entrada.bloco} ${styles.linhaTopo}`}>
         <RetomadaFormacao formacoes={formacoes} />
 
         {proximaMentoria && (
@@ -69,7 +67,7 @@ export default async function InicioPage() {
 
       {recentes.length > 0 && (
         <section
-          className={`${entrada.bloco} ${entrada.atraso2} ${styles.secao}`}
+          className={`${entrada.bloco} ${entrada.atraso1} ${styles.secao}`}
           aria-labelledby="inicio-solucoes"
         >
           <div className={styles.secaoTopo}>

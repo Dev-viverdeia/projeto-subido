@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Alert } from '@/design-system/via';
 import { gerarAgendaExemplo } from '@/content/mentorias';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
@@ -10,10 +9,21 @@ import styles from './pagina.module.css';
 export const metadata: Metadata = { title: 'Mentorias' };
 
 /**
- * Agenda de mentorias — nesta fase, com dados de DEMONSTRAÇÃO declarados como
- * tal no Alert abaixo. A rota é dinâmica, então `new Date()` aqui é o instante
- * real de cada visita; a agenda de exemplo se posiciona em volta dele para
- * todos os estados da matriz ficarem visíveis.
+ * Agenda de mentorias.
+ *
+ * A rota é dinâmica, então `new Date()` aqui é o instante real de cada visita; a
+ * agenda de exemplo se posiciona em volta dele para todos os estados da matriz
+ * ficarem visíveis.
+ *
+ * TODO(backend) — A AGENDA AINDA É DE DEMONSTRAÇÃO. O aviso visível que dizia
+ * isso foi removido a pedido, e com ele a única indicação, para quem usa, de que
+ * estas sessões são exemplo. Enquanto `gerarAgendaExemplo` for a fonte, esta tela
+ * NÃO pode ir ao ar para assinante: ou a tabela real entra antes, ou o aviso
+ * volta. Horário, vagas e lotação aqui são inventados, e a tela inteira se apoia
+ * em atribuição.
+ *
+ * O cabeçalho fica FORA do `entrada.bloco`: oculto ele não tem o que animar, e um
+ * wrapper de altura zero continua sendo item flex e comeria o `gap` da página.
  */
 export default async function MentoriasPage({ searchParams }: PageProps<'/mentorias'>) {
   const agora = new Date();
@@ -22,18 +32,9 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
 
   return (
     <div className={styles.pagina}>
+      <CabecalhoPagina titulo="Mentorias" oculto />
+
       <div className={entrada.bloco}>
-        <CabecalhoPagina titulo="Mentorias" oculto />
-      </div>
-
-      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
-        <Alert tone="info" title="Agenda de demonstração">
-          As sessões abaixo são exemplos para você conhecer o fluxo. A agenda real entra quando o
-          calendário for ligado ao banco — junto com a sala de vídeo dentro da plataforma.
-        </Alert>
-      </div>
-
-      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
         <MentoriasVista sessoes={sessoes} agoraIso={agora.toISOString()} vistaInicial={vista} />
       </div>
     </div>
