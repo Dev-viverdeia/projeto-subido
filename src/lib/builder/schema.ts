@@ -135,12 +135,18 @@ export type RespostaClarificacao = z.infer<typeof RespostaClarificacao>;
  * ideia é o que impede um prompt de tamanho arbitrário chegar à API paga.
  * ------------------------------------------------------------------------- */
 
+/**
+ * 4000 caracteres, e o teto é generoso de propósito: os exemplos do compositor
+ * são briefings de ~330, e um briefing longo produz um projeto melhor do que
+ * cinco perguntas de clarificação conseguiriam recuperar. O limite existe para
+ * a chamada paga não ficar sem fronteira, não para economizar caractere.
+ */
 export const PedidoPerguntas = z.object({
   ideia: z
     .string()
     .trim()
     .min(20, { error: 'Descreva a ideia com um pouco mais de detalhe.' })
-    .max(2000),
+    .max(4000),
 });
 
 export const PedidoGeracao = z.object({

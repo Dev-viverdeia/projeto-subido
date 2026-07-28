@@ -112,6 +112,12 @@ function temEscape(linhas, i) {
  * `.card` do PillarsIndex ficava com `outline: none` e sombra de foco resolvendo
  * `rgba(0,0,0,0) 0px 0px 0px 0px`. Seis seletores assim, incluindo os quatro
  * cards de pilar da landing — invisíveis para quem navega por teclado.
+ *
+ * `:focus-within` CONTA COMO DECLARAÇÃO DE FOCO. É o padrão certo para invólucro
+ * que embrulha um único focável — a caixa do compositor do Builder põe o anel
+ * nela e deixa o textarea sem moldura, para o conjunto ler como um objeto só.
+ * O que este gate procura é a AUSÊNCIA de qualquer declaração de foco; quem
+ * escreveu `:focus-within` decidiu onde o anel mora.
  */
 function anelDeFocoMorto(linhas) {
   const texto = linhas.join('\n');
@@ -120,12 +126,14 @@ function anelDeFocoMorto(linhas) {
   for (const [, sel, corpo] of texto.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     for (const parte of sel.split(',')) {
       const limpo = parte.trim().split('*/').pop().trim();
-      const base = limpo.replace(/:(hover|focus-visible|focus|active)\b.*$/, '');
+      /* A ordem importa: `focus-visible` e `focus-within` antes de `focus`, ou a
+         alternativa curta casa primeiro e deixa o sufixo na base. */
+      const base = limpo.replace(/:(hover|focus-visible|focus-within|focus|active)\b.*$/, '');
       if (!base || base.startsWith('@')) continue;
       const d = porBase.get(base) ?? { sombra: false, hover: false, foco: false, linha: 0 };
       if (/box-shadow/.test(corpo)) d.sombra = true;
       if (/:hover\b/.test(limpo)) d.hover = true;
-      if (/:focus-visible\b/.test(limpo)) d.foco = true;
+      if (/:focus-(visible|within)\b/.test(limpo)) d.foco = true;
       if (!d.linha) d.linha = linhas.findIndex((l) => l.includes(base)) + 1;
       porBase.set(base, d);
     }

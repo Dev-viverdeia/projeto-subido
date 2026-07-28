@@ -1,27 +1,40 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
-import { ArrowRight } from 'lucide-react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from 'react';
+import { ArrowUp } from 'lucide-react';
+import { EXEMPLOS } from './exemplos';
 import styles from './Compositor.module.css';
 
 const MINIMO = 20;
-const MAXIMO = 2000;
+const MAXIMO = 4000;
 
 /**
- * O campo da ideia — a única entrada do Builder.
+ * O compositor — a tela inicial do Builder.
  *
- * TEXTAREA PRÓPRIA, NÃO `Input` DO DS
- * O DS não tem textarea, e o `Input` é uma linha. A ideia de um cliente não cabe
- * numa linha, e um campo de uma linha ensina a escrever pouco — o que produz
- * projeto raso. O tamanho do campo É a instrução.
+ * COMPOSIÇÃO CENTRADA E CLARA, e a versão anterior errava justamente nisso.
+ * Ela era uma banda navy de largura total com o texto encostado à esquerda: peso
+ * de seção de landing numa tela cuja única função é receber uma frase. Aqui a
+ * página inteira É o campo, então a hierarquia certa é editorial e centrada —
+ * pergunta, campo, exemplos — com a superfície clara que o resto da plataforma
+ * usa. Sem banda escura nenhuma: o accent não é legível sobre claro, e nesta
+ * tela ele não tem o que destacar.
  *
- * SEM CHAVE, O BOTÃO NEM APARECE
- * `temChave` chega do servidor. Sem ela, o campo fica desabilitado e a tela diz o
- * que falta — em vez de aceitar a ideia, girar um spinner e falhar no fim.
+ * OS EXEMPLOS NÃO SÃO DECORAÇÃO. Campo em branco com limite de 4000 caracteres
+ * não diz o que é uma boa descrição. Cada chip preenche o campo com um briefing
+ * real — volume, quem opera, o que já existe —, que é exatamente o que a
+ * entrevista do passo seguinte vai perguntar se faltar.
  */
 export function Compositor({ temChave }: { temChave: boolean }) {
   const router = useRouter();
+  const campoRef = useRef<HTMLTextAreaElement>(null);
   const [ideia, setIdeia] = useState('');
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
@@ -32,10 +45,30 @@ export function Compositor({ temChave }: { temChave: boolean }) {
      dela. Sem o segundo, o botão volta ao normal por uns instantes enquanto a
      próxima tela carrega — e o campo parece ter perdido o clique. */
   const ocupado = enviando || navegando;
+  const bloqueado = !temChave || curta || ocupado;
 
-  async function enviar(evento: React.FormEvent) {
-    evento.preventDefault();
-    if (curta || ocupado) return;
+  const atalho = useTeclaDeComando();
+
+  /**
+   * O CAMPO CRESCE COM O TEXTO. Medido a 375px com um dos exemplos dentro: com
+   * altura fixa o texto rolava por baixo do rodapé e a última linha visível
+   * ficava cortada ao meio — parecia defeito de renderização, não conteúdo
+   * rolando. Crescendo até o teto, o briefing típico cabe inteiro e o corte só
+   * acontece em texto muito longo, onde rolar já é esperado.
+   *
+   * `height: auto` antes de ler `scrollHeight` é obrigatório: sem isso a altura
+   * anterior vira o piso da medição e o campo só cresce, nunca encolhe. Os
+   * limites vivem no CSS (`min-height`/`max-height`), que ganham do inline.
+   */
+  useEffect(() => {
+    const campo = campoRef.current;
+    if (!campo) return;
+    campo.style.height = 'auto';
+    campo.style.height = `${campo.scrollHeight}px`;
+  }, [ideia]);
+
+  async function enviar() {
+    if (bloqueado) return;
 
     setEnviando(true);
     setErro(null);
@@ -50,11 +83,11 @@ export function Compositor({ temChave }: { temChave: boolean }) {
       const corpo: unknown = await resposta.json();
 
       if (!resposta.ok) {
-        const mensagem =
+        setErro(
           typeof corpo === 'object' && corpo !== null && 'erro' in corpo
             ? String(corpo.erro)
-            : 'Não foi possível continuar. Tente de novo.';
-        setErro(mensagem);
+            : 'Não foi possível continuar. Tente de novo.',
+        );
         return;
       }
 
@@ -67,66 +100,136 @@ export function Compositor({ temChave }: { temChave: boolean }) {
     }
   }
 
+  function usarExemplo(texto: string) {
+    setIdeia(texto);
+    /* Foca e leva o cursor para o fim: o exemplo é ponto de partida para editar,
+       não formulário para enviar como veio. */
+    const campo = campoRef.current;
+    if (campo) {
+      campo.focus();
+      requestAnimationFrame(() => campo.setSelectionRange(texto.length, texto.length));
+    }
+  }
+
   return (
-    <form
-      className={styles.compositor}
-      onSubmit={(evento) => {
-        void enviar(evento);
-      }}
-    >
-      <div className={styles.sheen} aria-hidden="true" />
-
-      <p className={styles.eyebrow}>Builder</p>
-      <h2 className={styles.titulo}>Descreva a ideia do cliente.</h2>
-      <p className={styles.apoio}>
-        O Builder pergunta o que falta para projetar e devolve o projeto inteiro: arquitetura,
-        ferramentas, passo a passo, prompts, riscos e a conta da economia.
-      </p>
-
-      <label className={styles.rotulo} htmlFor="ideia-do-cliente">
-        A ideia, com o contexto que você já tem
-      </label>
-      {/* Placeholder curto por MEDIDA: a 375px o campo mostra 4 linhas, e o
-          exemplo anterior ocupava 8 — era cortado no meio de uma palavra.
-          Exemplo cortado ensina pior que exemplo curto. */}
-      <textarea
-        id="ideia-do-cliente"
-        className={styles.campo}
-        value={ideia}
-        onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
-        disabled={!temChave || ocupado}
-        rows={5}
-        placeholder="Ex.: clínica que perde agendamento no WhatsApp fora do horário e quer marcar consulta sozinha."
-        aria-describedby="ideia-contador"
-      />
-
-      <div className={styles.rodape}>
-        <p className={styles.contador} id="ideia-contador">
-          <span className={styles.numero}>{ideia.trim().length}</span>
-          <span className={styles.barra}>/</span>
-          {MAXIMO}
-          {curta ? <span className={styles.dica}> · mínimo {MINIMO}</span> : null}
+    <div className={styles.tela}>
+      <header className={styles.cabecalho}>
+        <p className={styles.eyebrow}>Builder</p>
+        <h2 className={styles.titulo}>
+          O que o seu cliente precisa <em>resolver</em>?
+        </h2>
+        {/* As duas frases têm comprimento parecido de propósito: com `balance` e a
+            medida em 46ch, a quebra cai no ponto final em vez de deixar uma
+            palavra órfã abrindo a segunda linha. */}
+        <p className={styles.apoio}>
+          Descreva o problema como o cliente te contou.{' '}
+          <em>O projeto de implementação é o que volta.</em>
         </p>
+      </header>
 
-        <button type="submit" className={styles.acao} disabled={!temChave || curta || ocupado}>
-          {ocupado ? 'Lendo a ideia…' : 'Formular o projeto'}
-          <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
-        </button>
-      </div>
+      <form
+        className={styles.caixa}
+        onSubmit={(evento) => {
+          evento.preventDefault();
+          void enviar();
+        }}
+      >
+        <label className="sr-only" htmlFor="ideia-do-cliente">
+          O problema do cliente, com o contexto que você já tem
+        </label>
+        <textarea
+          id="ideia-do-cliente"
+          ref={campoRef}
+          className={styles.campo}
+          value={ideia}
+          onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
+          onKeyDown={(evento) => {
+            /* ⌘/Ctrl + Enter envia; Enter sozinho continua quebrando linha. Num
+               campo de briefing, Enter-para-enviar corta a frase no meio. */
+            if (evento.key === 'Enter' && (evento.metaKey || evento.ctrlKey)) {
+              evento.preventDefault();
+              void enviar();
+            }
+          }}
+          disabled={!temChave || ocupado}
+          rows={6}
+          placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
+        />
+
+        <div className={styles.rodape}>
+          <p className={styles.contador} aria-hidden="true">
+            <span className={styles.escrito}>{ideia.trim().length}</span>
+            <span className={styles.barra}>/</span>
+            {MAXIMO}
+          </p>
+
+          <div className={styles.acoes}>
+            <span className={styles.atalho} aria-hidden="true">
+              {atalho} Enter
+            </span>
+            <button
+              type="submit"
+              className={styles.enviar}
+              disabled={bloqueado}
+              aria-label={ocupado ? 'Lendo a ideia' : 'Formular o projeto'}
+            >
+              <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </form>
 
       {erro ? (
-        <p className={styles.erro} role="alert">
+        <p className={styles.aviso} role="alert">
           {erro}
         </p>
       ) : null}
 
       {!temChave ? (
-        <p className={styles.pendencia}>
+        <p className={styles.aviso}>
           O Builder está sem chave de modelo configurada (<code>ANTHROPIC_API_KEY</code>). Enquanto
           ela não entrar no ambiente, a geração não roda — e nada aqui vai inventar uma solução para
           preencher a tela.
         </p>
       ) : null}
-    </form>
+
+      <section className={styles.exemplos}>
+        <h3 className={styles.divisor}>
+          <span>ou comece por um exemplo</span>
+        </h3>
+
+        <ul className={styles.chips}>
+          {EXEMPLOS.map((exemplo) => (
+            <li key={exemplo.rotulo}>
+              <button
+                type="button"
+                className={styles.chip}
+                onClick={() => usarExemplo(exemplo.texto)}
+                disabled={!temChave || ocupado}
+              >
+                {exemplo.rotulo}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+/**
+ * `⌘` no Mac, `Ctrl` no resto — e isso só se sabe no cliente.
+ *
+ * `useSyncExternalStore` com snapshot de servidor é o padrão da casa para valor
+ * que o servidor não tem: o HTML sai com "Ctrl", a hidratação bate, e o React
+ * troca depois sem warning. `useEffect` + `setState` faria o mesmo com um passo
+ * a mais e sem a garantia de consistência.
+ */
+function useTeclaDeComando(): string {
+  const inscrever = useCallback(() => () => {}, []);
+  return useSyncExternalStore(
+    inscrever,
+    () => (/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl'),
+    () => 'Ctrl',
   );
 }

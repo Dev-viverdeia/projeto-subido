@@ -1,6 +1,6 @@
-/* O compositor é uma banda de composição, não uma coluna de leitura — cresce até
-   o canvas da área logada. O que NÃO cresce é o texto dentro dele: a medida vive
-   nos elementos (`max-width` em `ch`), como manda a regra. */
+/* A PÁGINA usa o canvas — quem NÃO cresce é o compositor, que tem coluna própria
+   de 720 (ver Compositor.module.css). Conter a página inteira em 720 encolheria
+   junto a grade do histórico, que é grade e pede área. */
 .pagina {
   max-width: var(--app-canvas);
   margin-inline: auto;
@@ -9,19 +9,14 @@
   gap: var(--app-gap-section);
 }
 
+/* Folga grande antes do histórico: ele é o segundo assunto da tela, e o
+   compositor precisa terminar antes de o olho encontrar o próximo. */
 .historico {
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
-}
-
-.tituloSecao {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  padding-bottom: var(--via-space-3);
-  border-bottom: 1px solid var(--via-border-hairline);
+  padding-top: var(--app-gap-section);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .eyebrow {

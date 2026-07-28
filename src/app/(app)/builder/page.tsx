@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { Blocks } from 'lucide-react';
-import { EmptyState } from '@/design-system/via';
 import { chaveDoModelo } from '@/lib/env';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
@@ -12,19 +10,24 @@ import styles from './pagina.module.css';
 export const metadata: Metadata = { title: 'Builder' };
 
 /**
- * Pilar 03 — o implementador descreve a ideia do cliente e recebe o projeto.
+ * Pilar 03 — o implementador descreve o problema do cliente e recebe o projeto.
  *
- * A tela tem dois momentos e nenhum a mais: COMPOR (a banda escura) e RELER (o
- * histórico). A entrevista e o documento moram em `/builder/[id]` porque a linha
- * já existe no banco quando as perguntas voltam — a URL passa a ser o estado, e
- * fechar a aba no meio deixa de perder o trabalho.
+ * A TELA INICIAL É SÓ O COMPOSITOR. A entrevista e o documento moram em
+ * `/builder/[id]` porque a linha já existe no banco quando as perguntas voltam:
+ * a URL passa a ser o estado, e fechar a aba no meio deixa de perder o trabalho.
+ *
+ * O HISTÓRICO SÓ APARECE QUANDO EXISTE. Um `EmptyState` embaixo do compositor
+ * diria "nenhum projeto ainda" para quem está olhando o campo onde se cria o
+ * primeiro — ocupa a dobra para não informar nada. Sem projetos, a pergunta fica
+ * sozinha na tela, que é o estado certo para uma tela de criação.
  *
  * `chaveDoModelo()` é lido AQUI, no servidor, e desce como booleano. A chave nunca
  * atravessa a fronteira; o que atravessa é o fato de ela existir — o suficiente
  * para a tela dizer a verdade antes de aceitar a ideia.
  */
 export default async function BuilderPage() {
-  const [itens, temChave] = [await listarSolucoesDoBuilder(), chaveDoModelo() !== null];
+  const itens = await listarSolucoesDoBuilder();
+  const temChave = chaveDoModelo() !== null;
 
   return (
     <div className={styles.pagina}>
@@ -34,24 +37,16 @@ export default async function BuilderPage() {
         <Compositor temChave={temChave} />
       </div>
 
-      <section className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}>
-        <div className={styles.tituloSecao}>
+      {itens.length > 0 ? (
+        <section className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}>
           <h2 className={styles.eyebrow}>
-            Projetos
-            {itens.length > 0 ? <span className={styles.total}>{itens.length}</span> : null}
+            Seus projetos
+            <span className={styles.total}>{itens.length}</span>
           </h2>
-        </div>
 
-        {itens.length > 0 ? (
           <HistoricoBuilder itens={itens} />
-        ) : (
-          <EmptyState
-            icon={<Blocks size={20} strokeWidth={1.8} />}
-            title="Nenhum projeto ainda"
-            description="O primeiro projeto aparece aqui assim que você descrever uma ideia acima."
-          />
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }

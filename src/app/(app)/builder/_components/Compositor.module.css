@@ -1,98 +1,129 @@
-/* A ÚNICA superfície escura da tela — a regra é uma por tela, e aqui ela é o
-   campo de entrada, não um enfeite: o Builder é o pilar onde a pessoa ESCREVE, e
-   a banda escura é o que separa o ato de compor do ato de reler o histórico. */
-.compositor {
-  position: relative;
-  overflow: hidden;
+/* A tela do compositor é uma COLUNA DE LEITURA centrada, não um bloco de largura
+   total. O canvas de 1600 serve grade e mosaico; aqui existe uma pergunta, um
+   campo e três exemplos — esticar isso pela tela inteira só afasta o olho do
+   único lugar onde ele precisa ir. */
+.tela {
+  max-width: 720px;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  border-radius: var(--app-radius-surface);
-  border: 1px solid var(--via-navy-16);
-  background: var(--via-mesh-navy);
-  padding: clamp(24px, 3.6vw, 40px);
-  box-shadow: var(--via-glow-navy);
+  align-items: stretch;
+  /* Empurra o bloco para o terço superior em vez de colar no topo. `vh` e não
+     valor fixo: em tela baixa o campo continua acima da dobra. */
+  padding-block-start: clamp(16px, 6vh, 72px);
 }
 
-.sheen {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.14);
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--via-space-4);
+  margin-bottom: var(--app-gap-section);
 }
 
 .eyebrow {
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.688rem;
-  letter-spacing: var(--app-ls-eyebrow);
+  letter-spacing: var(--via-ls-label);
   text-transform: uppercase;
-  /* Accent sobre navy dá 6,52:1 — é aqui que ele é legível, e só aqui. */
-  color: var(--via-accent);
+  color: var(--via-text-faint);
 }
 
+/* Escala fluida com TETO: acima de ~52px a pergunta quebra em três linhas e a
+   composição centrada perde o eixo. */
 .titulo {
-  margin: var(--via-space-3) 0 0;
+  margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(1.5rem, 3.2vw, 2rem);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-snug);
-  color: var(--via-white);
-  /* A medida vive no ELEMENTO de texto, nunca no container: `ch` é relativo ao
-     font-size de quem declara. */
-  max-width: 22ch;
+  font-size: clamp(2rem, 1.2rem + 2.6vw, 3.25rem);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
   text-wrap: balance;
+  /* A medida mora no elemento de texto — `ch` é relativo ao font-size de quem
+     declara, e num container que herda 16px este valor valeria outra coisa. */
+  max-width: 18ch;
+}
+
+/* Ênfase é itálico editorial, nunca peso 700. A face itálica do Geist já está
+   carregada e esta tela não está no caminho crítico de LCP. */
+.titulo em {
+  font-style: italic;
 }
 
 .apoio {
-  margin: var(--via-space-3) 0 0;
-  font-size: var(--via-fs-body);
+  margin: 0;
+  font-size: var(--via-fs-h4);
   line-height: var(--via-lh-normal);
-  /* Sobre banda escura a escala INVERTE: gray-300 dá 12,2:1; `text-muted` daria
-     3,45:1 e reprovaria AA. */
-  color: var(--via-gray-300);
-  max-width: 64ch;
+  color: var(--via-text-muted);
+  max-width: 46ch;
+  text-wrap: balance;
 }
 
-.rotulo {
-  margin-top: var(--via-space-6);
-  margin-bottom: var(--via-space-2);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-caption);
-  color: var(--via-gray-400);
+.apoio em {
+  font-style: italic;
+  color: var(--via-text-primary);
 }
 
-/* Raio concêntrico: a superfície externa é 28 com padding de 24–40; o campo fica
-   no degrau de card (20) para a curva interna não brigar com a externa. */
+/* ---- A caixa ---------------------------------------------------------------- */
+
+.caixa {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.caixa:hover {
+  border-color: var(--app-elev-2-line);
+}
+
+/* O ANEL VIVE NA CAIXA, não no textarea. Só existe um elemento focável dentro
+   dela, então o indicador continua inequívoco — e o campo sem moldura própria é
+   o que faz a caixa inteira ler como um objeto só, em vez de um input dentro de
+   um card. Compõe com a sombra de repouso para a caixa não achatar ao focar. */
+.caixa:focus-within {
+  border-color: var(--via-navy-16);
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+/* `min-height` e `max-height` são o piso e o teto do campo que cresce sozinho
+   (ver o efeito em Compositor.tsx). Ambos ganham do `height` inline que o JS
+   escreve, então os limites moram aqui e a medida do conteúdo mora lá. */
 .campo {
   width: 100%;
-  min-height: 132px;
-  resize: vertical;
-  padding: var(--via-space-4);
-  border-radius: var(--app-radius-card);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--via-white);
+  min-height: 148px;
+  max-height: 46vh;
+  overflow-y: auto;
+  resize: none;
+  padding: var(--via-space-5) var(--via-space-5) var(--via-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--via-text-primary);
   font-family: inherit;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
   letter-spacing: var(--app-ls-body);
-  transition:
-    border-color var(--app-t-state),
-    background-color var(--app-t-state);
 }
 
 .campo::placeholder {
-  color: var(--via-gray-onnavy);
+  color: var(--via-text-faint);
 }
 
-.campo:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.22);
+/* O anel é da caixa; repetir aqui dentro daria dois anéis concêntricos. */
+.campo:focus-visible {
+  outline: none;
 }
 
 .campo:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .rodape {
@@ -100,109 +131,177 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  flex-wrap: wrap;
-  margin-top: var(--via-space-4);
+  padding: var(--via-space-2) var(--via-space-4) var(--via-space-4) var(--via-space-5);
 }
 
-/* Número é prova: mono, tabular e tinta sólida. */
 .contador {
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-gray-400);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-.numero {
-  color: var(--via-gray-300);
+.escrito {
+  color: var(--via-text-muted);
 }
 
-/* gray-400 e não gray-500. Medido no ponto mais CLARO do mesh (o canto superior
-   esquerdo, onde a radial de rgba(24,48,99,.55) está no auge): gray-500 dá
-   2,89:1 e reprova AA a 10px; gray-400 dá 5,90:1. A hierarquia do contador vem
-   do gray-300 no número, não de um cinza que some. */
 .barra {
-  padding-inline: 2px;
-  color: var(--via-gray-400);
+  padding-inline: 3px;
 }
 
-.dica {
-  color: var(--via-gray-400);
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
 }
 
-/* CTA accent — o único preenchimento accent do produto, e ele só existe porque
-   está sobre escuro. O rótulo é NAVY (7,13:1); branco sobre accent dá 2,76:1. */
-.acao {
+.atalho {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
+}
+
+/* Botão circular, navy sólido. Accent está fora de questão: sobre claro ele dá
+   2,70:1 e reprova AA até para texto grande. */
+.enviar {
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-2);
-  min-height: var(--app-h-control);
-  padding-inline: var(--via-space-5);
+  justify-content: center;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  flex-shrink: 0;
   border: 0;
   border-radius: var(--via-radius-pill);
-  background: var(--via-accent);
-  color: var(--via-navy-deep);
-  font-family: inherit;
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-sm);
+  background: var(--via-navy);
+  color: var(--via-white);
   cursor: pointer;
   transition:
     transform var(--app-t-touch),
-    filter var(--app-t-touch);
+    background-color var(--app-t-state);
 }
 
-.acao:hover:not(:disabled) {
+.enviar:hover:not(:disabled) {
   transform: translateY(-1px);
-  filter: brightness(1.08);
 }
 
-.acao:active:not(:disabled) {
+.enviar:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.acao:disabled {
+.enviar:disabled {
   cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--via-gray-400);
+  background: var(--via-navy-08);
+  color: var(--via-text-faint);
 }
 
-.erro,
-.pendencia {
-  margin: var(--via-space-4) 0 0;
+.enviar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* ---- Avisos ------------------------------------------------------------------ */
+
+.aviso {
+  margin: var(--app-gap-stack) 0 0;
   padding: var(--via-space-3) var(--via-space-4);
   border-radius: var(--app-radius-control);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
-  color: var(--via-gray-300);
-  max-width: 72ch;
+  color: var(--via-text-muted);
 }
 
-.pendencia code {
+.aviso code {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-xs);
-  color: var(--via-white);
+  color: var(--via-text-primary);
+}
+
+/* ---- Exemplos ----------------------------------------------------------------- */
+
+.exemplos {
+  margin-top: var(--app-gap-section);
+}
+
+/* Rótulo com filete dos dois lados. `::before`/`::after` em `flex: 1` faz a linha
+   se ajustar ao texto sem largura mágica. */
+.divisor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  margin: 0 0 var(--app-gap-block);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.divisor::before,
+.divisor::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--via-border-hairline);
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--app-gap-stack);
+}
+
+.chip {
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-surface);
+  color: var(--via-text-muted);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--via-navy-16);
+  color: var(--via-text-primary);
+  transform: translateY(-1px);
+}
+
+.chip:disabled {
+  cursor: not-allowed;
+  color: var(--via-text-faint);
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .campo,
-  .acao {
+  .caixa,
+  .enviar,
+  .chip {
     transition: none;
   }
 
-  .acao:hover:not(:disabled) {
+  .enviar:hover:not(:disabled),
+  .chip:hover:not(:disabled) {
     transform: none;
   }
-}
-
-/* O anel do DS é box-shadow e o do globals.css usa `:where()` (especificidade
-   zero): qualquer box-shadow de classe o apagaria. Sobre banda escura o anel é o
-   token on-navy. Fica por último no arquivo, de propósito. */
-.campo:focus-visible,
-.acao:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring-onnavy);
 }
