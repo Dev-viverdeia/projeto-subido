@@ -46,9 +46,22 @@
     position: sticky;
     top: 0;
     height: 100dvh;
-    padding: var(--via-space-6) var(--via-space-4);
-    background: var(--via-surface);
-    border-right: 1px solid var(--via-border-hairline);
+    /* 12 e não 16 no inline: põe o ícone do item de nav em x=24, alinhado com a
+       marca, que também recua para 12. Eram os dois únicos elementos da coluna e
+       estavam desalinhados em 8px. */
+    padding: var(--via-space-6) var(--via-space-3);
+    /* A sidebar RECUA. Superfície branca ao lado do fundo `--via-bg` mede 1,02:1 —
+       branco sobre branco, e o fio de 1px era o único separador da tela inteira.
+       Rebaixada, ela vira a calha em que o item ativo afunda e o hover se ergue. */
+    background: var(--via-bg-3);
+    /* O hairline TAMBÉM tinha que mudar: o `--via-border-hairline` (#E2E9F2) sobre
+       a calha nova daria 1,06:1 e viraria CSS morto. O `--via-border` é o fio de
+       tinta navy e mede 1,40:1 dos dois lados. Plano e linha ficam mais fortes ao
+       mesmo tempo, em vez de um comprar do outro. */
+    border-right: 1px solid var(--via-border);
+    /* A folga entre a marca e a lista: a marca já carrega ~10px de ar próprio
+       dentro do min-height de 44px, então 24 lia como 34. */
+    gap: var(--via-space-4);
   }
 
   .conteudo {
@@ -65,5 +78,7 @@
   /* O logotipo é baixo; como link, a caixa dele seria a área clicável inteira e
      ficaria abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */
   min-height: 44px;
-  padding-inline: var(--via-space-2);
+  /* 12 para casar com o padding-inline da sidebar: marca e ícones de nav passam a
+     nascer no mesmo x=24. */
+  padding-inline: var(--via-space-3);
 }

@@ -30,24 +30,57 @@
 .lateral .lista {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1);
+  /* 6px e não 4: o anel de foco projeta 4px para fora da caixa. Com gap 4 ele
+     encosta no vizinho; com 6 sobram 2px de folga. */
+  gap: var(--via-space-1_5);
 }
 
 .lateral .item {
-  padding: var(--via-space-3) var(--via-space-4);
+  padding-block: var(--via-space-2_5);
+  padding-inline: var(--via-space-3);
+  /* Sem line-height declarado, o item herdava `--via-lh-loose` (1.65), que é token
+     de PROSA: 14px × 1,65 + 24 de padding dava 47px de altura para uma linha de
+     navegação. Com `snug` quem passa a governar é o min-height, que é a medida que
+     a gente quis. */
+  min-height: 44px;
+  line-height: var(--via-lh-snug);
   font-size: var(--via-fs-sm);
+  /* Explícito para que o degrau até o ativo (500) exista de verdade: os dois
+     estados vinham com peso 500 e a diferença era só um cinza pálido. */
+  font-weight: var(--via-fw-regular);
 }
 
+/* Três planos, três direções. O repouso fica na calha rebaixada da sidebar, o hover
+   SOBE para o branco da superfície, e o ativo AFUNDA na banda navy. É a assinatura
+   do design system — plano e sombra navy — em vez de um degrau de cinza. */
 .lateral .item:hover {
-  background: var(--via-bg-2);
+  background: var(--via-surface);
   color: var(--via-text-primary);
 }
 
-/* Ativo por peso e cor sólida — nunca por opacidade. */
 .lateral .item[aria-current='page'] {
-  background: var(--via-bg-3);
-  color: var(--via-text-primary);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-weight: var(--via-fw-medium);
+}
+
+/* O anel de foco do DS é um `box-shadow` (via-base.css:46), não um outline — a regra
+   do globals.css usa `:where()`, que tem especificidade zero, e perde. Consequência:
+   QUALQUER box-shadow num seletor de classe apaga o anel. Por isso o foco é
+   redeclarado aqui, com especificidade maior e POR ÚLTIMO no arquivo: sem isto, o
+   item mais navegado da tela fica sem indicação de foco para quem usa teclado. */
+.lateral .item:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--via-white),
+    0 0 0 4px var(--via-navy-60);
+}
+
+/* Sobre a banda navy o anel branco desaparece contra o próprio chip: a folga interna
+   passa a ser navy e o anel externo, branco. */
+.lateral .item[aria-current='page']:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--via-navy),
+    0 0 0 4px var(--via-white);
 }
 
 /* ---- Dock (mobile) ----------------------------------------------------------- */

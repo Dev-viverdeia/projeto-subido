@@ -24,7 +24,16 @@
      nunca teve o problema justamente por trazer só a linha sem prefixo. */
   background: var(--via-glass-bar);
   backdrop-filter: blur(14px) saturate(1.6);
-  border-bottom: 1px solid var(--via-border-hairline);
+  /* Fio de tinta navy, igual ao da sidebar. O `--via-border-hairline` (#E2E9F2) era
+     coerente quando a sidebar também era branca; com a calha rebaixada os dois
+     únicos fios da tela precisam ser o mesmo fio, senão o chrome lê como dois
+     sistemas. */
+  border-bottom: 1px solid var(--via-border);
+  /* A assinatura do sistema é vidro + atmosfera + SOMBRA NAVY, e a sombra era a
+     única das três que faltava aqui: a barra ficava colada no conteúdo em vez de
+     pairar sobre ele. `xs` de propósito — 0 1px 2px a 4% é o degrau mais baixo que
+     existe, o suficiente para separar sem virar caixa. */
+  box-shadow: var(--via-shadow-xs);
 }
 
 /* Sem suporte a backdrop-filter, um fundo translúcido deixaria o conteúdo passar
