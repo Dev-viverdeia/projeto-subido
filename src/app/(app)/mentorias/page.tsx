@@ -23,10 +23,7 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
   return (
     <div className={styles.pagina}>
       <div className={entrada.bloco}>
-        <CabecalhoPagina
-          titulo="Mentorias"
-          descricao="Encontros em grupo toda semana. Você chega com o problema real e sai com o próximo passo."
-        />
+        <CabecalhoPagina titulo="Mentorias" oculto />
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>

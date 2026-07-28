@@ -47,10 +47,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <CabecalhoPagina
-        titulo="Administração"
-        descricao="Cadastre e publique o conteúdo dos pilares. Só quem tem papel de admin chega aqui."
-      />
+      <CabecalhoPagina titulo="Administração" oculto />
 
       <div className={styles.grade}>
         {cartoes.map((c) => (

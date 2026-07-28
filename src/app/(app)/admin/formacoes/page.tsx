@@ -21,12 +21,12 @@ export default async function AdminFormaçõesPage() {
     <>
       <CabecalhoPagina
         titulo="Formações"
-        descricao="Rascunho fica invisível para os assinantes. Publicado entra no catálogo."
         acao={
           <Link href="/admin/formacoes/nova">
             <Button variant="primary">Nova formação</Button>
           </Link>
         }
+        oculto
       />
       <ListaConteudo itens={data ?? []} baseHref="/admin/formacoes" rotuloSingular="formação" />
     </>

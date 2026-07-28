@@ -18,8 +18,8 @@ export default async function SolucoesPage({ searchParams }: PageProps<'/solucoe
       <div className={entrada.bloco}>
         <CabecalhoPagina
           titulo="Soluções de IA"
-          descricao="O que implementar, com o passo a passo de quem já implementou. Você escolhe uma, segue as etapas e termina com algo rodando."
           acao={<ContadorCatalogo total={solucoes.length} rotulo="soluções publicadas" />}
+          oculto
         />
       </div>
 

@@ -7,10 +7,7 @@ export const metadata: Metadata = { title: 'Nova formação · Administração' 
 export default function NovaFormaçõesPage() {
   return (
     <>
-      <CabecalhoPagina
-        titulo="Nova formação"
-        descricao="Nasce como rascunho. Nada aparece para assinante até o status virar publicado."
-      />
+      <CabecalhoPagina titulo="Nova formação" oculto />
       <FormularioConteudo tipo="formacao" />
     </>
   );

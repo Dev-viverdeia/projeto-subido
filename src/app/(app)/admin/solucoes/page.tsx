@@ -21,12 +21,12 @@ export default async function AdminSoluçõesPage() {
     <>
       <CabecalhoPagina
         titulo="Soluções de IA"
-        descricao="Rascunho fica invisível para os assinantes. Publicado entra no catálogo."
         acao={
           <Link href="/admin/solucoes/nova">
             <Button variant="primary">Nova solução</Button>
           </Link>
         }
+        oculto
       />
       <ListaConteudo itens={data ?? []} baseHref="/admin/solucoes" rotuloSingular="solução" />
     </>

@@ -7,10 +7,7 @@ export const metadata: Metadata = { title: 'Nova solução · Administração' }
 export default function NovaSoluçõesPage() {
   return (
     <>
-      <CabecalhoPagina
-        titulo="Nova solução"
-        descricao="Nasce como rascunho. Nada aparece para assinante até o status virar publicado."
-      />
+      <CabecalhoPagina titulo="Nova solução" oculto />
       <FormularioConteudo tipo="solucao" />
     </>
   );

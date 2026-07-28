@@ -37,6 +37,15 @@
   flex-shrink: 0;
 }
 
+/* Modo `oculto` COM ação: o título saiu, o botão e o contador ficam. Sem altura
+   própria e sem margem — quem manda no ritmo da página é o gap dela, e uma
+   margem aqui somaria com ele (foi o que já produziu 80px de vão órfão neste
+   arquivo uma vez). */
+.somenteAcao {
+  display: flex;
+  justify-content: flex-end;
+}
+
 @media (min-width: 768px) {
   .cabecalho {
     flex-direction: row;

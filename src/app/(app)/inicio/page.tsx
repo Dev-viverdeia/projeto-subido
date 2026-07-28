@@ -41,10 +41,7 @@ export default async function InicioPage() {
   return (
     <div className={styles.pagina}>
       <div className={entrada.bloco}>
-        <CabecalhoPagina
-          titulo={nome ? `Bem-vindo, ${nome}` : 'Início'}
-          descricao="Seu progresso, as próximas mentorias e o que você deixou pela metade."
-        />
+        <CabecalhoPagina titulo={nome ? `Bem-vindo, ${nome}` : 'Início'} oculto />
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1} ${styles.linhaTopo}`}>

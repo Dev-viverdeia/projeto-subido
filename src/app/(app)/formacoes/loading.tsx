@@ -7,10 +7,7 @@ import pagina from './pagina.module.css';
 export default function CarregandoFormacoes() {
   return (
     <div className={pagina.pagina}>
-      <CabecalhoPagina
-        titulo="Formações"
-        descricao="Trilhas completas em vídeo, feitas para quem vai implementar — não para quem vai comentar."
-      />
+      <CabecalhoPagina titulo="Formações" oculto />
       <div className={styles.grade} role="status" aria-label="Carregando as formações">
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className={styles.poster} aria-hidden="true">

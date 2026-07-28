@@ -18,8 +18,8 @@ export default async function FormacoesPage({ searchParams }: PageProps<'/formac
       <div className={entrada.bloco}>
         <CabecalhoPagina
           titulo="Formações"
-          descricao="Trilhas completas em vídeo, feitas para quem vai implementar — não para quem vai comentar."
           acao={<ContadorCatalogo total={formacoes.length} rotulo="formações publicadas" />}
+          oculto
         />
       </div>
 

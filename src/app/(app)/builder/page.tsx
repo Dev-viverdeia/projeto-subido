@@ -16,10 +16,7 @@ export const metadata: Metadata = { title: 'Builder' };
 export default function BuilderPage() {
   return (
     <>
-      <CabecalhoPagina
-        titulo="Builder"
-        descricao="Descreva a ideia e receba o projeto montado: análise de viabilidade, arquitetura, stack de ferramentas, plano de ação e estimativa de economia."
-      />
+      <CabecalhoPagina titulo="Builder" oculto />
 
       <EmptyState
         icon={<Blocks size={20} strokeWidth={1.8} />}

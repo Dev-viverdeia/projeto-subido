@@ -26,7 +26,7 @@ export default async function ContaPage() {
 
   return (
     <>
-      <CabecalhoPagina titulo="Conta" descricao="Seus dados, sua assinatura e seus certificados." />
+      <CabecalhoPagina titulo="Conta" oculto />
 
       <Card variant="default" className={styles.cartao}>
         <h2 className={styles.subtitulo}>Dados de acesso</h2>

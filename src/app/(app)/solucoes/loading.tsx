@@ -9,10 +9,7 @@ import styles from './pagina.module.css';
 export default function CarregandoSolucoes() {
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina
-        titulo="Soluções de IA"
-        descricao="O que implementar, com o passo a passo de quem já implementou. Você escolhe uma, segue as etapas e termina com algo rodando."
-      />
+      <CabecalhoPagina titulo="Soluções de IA" oculto />
       <EsqueletoCatalogo />
     </div>
   );
