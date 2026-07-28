@@ -60,6 +60,48 @@ export type Database = {
           },
         ]
       }
+      builder_solucoes: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          documento: Json | null
+          dono: string
+          erro: string | null
+          id: string
+          ideia_original: string
+          modelo: string | null
+          respostas: Json
+          status: Database["public"]["Enums"]["status_builder"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          documento?: Json | null
+          dono: string
+          erro?: string | null
+          id?: string
+          ideia_original: string
+          modelo?: string | null
+          respostas?: Json
+          status?: Database["public"]["Enums"]["status_builder"]
+          titulo?: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          documento?: Json | null
+          dono?: string
+          erro?: string | null
+          id?: string
+          ideia_original?: string
+          modelo?: string | null
+          respostas?: Json
+          status?: Database["public"]["Enums"]["status_builder"]
+          titulo?: string
+        }
+        Relationships: []
+      }
       formacoes: {
         Row: {
           atualizado_em: string
@@ -271,6 +313,7 @@ export type Database = {
     }
     Enums: {
       papel_usuario: "membro" | "mentor" | "admin"
+      status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
       status_publicacao: "rascunho" | "publicado" | "arquivado"
     }
     CompositeTypes: {
@@ -400,6 +443,7 @@ export const Constants = {
   public: {
     Enums: {
       papel_usuario: ["membro", "mentor", "admin"],
+      status_builder: ["rascunho", "gerando", "pronta", "falhou"],
       status_publicacao: ["rascunho", "publicado", "arquivado"],
     },
   },

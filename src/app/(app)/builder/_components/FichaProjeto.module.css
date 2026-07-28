@@ -1,0 +1,505 @@
+.ficha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+/* ---- Cabeçalho ------------------------------------------------------------ */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* O "·" NÃO tem classe e não tem cor própria: ele separa CAMPOS (projeto · data
+   · modelo), então é informação e herda a cor do eyebrow. Em `--via-border` dava
+   1,40:1 e sumia — a linha lia como três coisas grudadas. Baixar por opacidade
+   também está fora: a hierarquia desta casa é por peso e cor SÓLIDA. */
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h1);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  /* A medida mora no elemento de texto, não no container. */
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+/* 18px — um degrau acima do corpo. A escala do DS não tem "lead"; `h4` É esse
+   degrau, e inventar um token novo aqui seria criar uma segunda escala. */
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 62ch;
+}
+
+/* Filete à esquerda em vez de card: o diagnóstico é uma anotação sobre o título,
+   não um bloco autônomo. Mais uma superfície aqui empurraria a execução para
+   baixo da dobra. */
+.viabilidade {
+  margin-top: var(--via-space-3);
+  padding-left: var(--via-space-5);
+  border-left: 2px solid var(--via-navy-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  max-width: 68ch;
+}
+
+.viabilidadeTopo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.viabilidadeRotulo {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.viabilidadeTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+}
+
+/* ---- Grade ---------------------------------------------------------------- */
+
+/* Mesmo acoplamento quebrado da ficha de solução: a coluna de execução tem TETO
+   de 900px e a largura que sobra vai para o painel, que ganha corpo em vez de a
+   linha de texto esticar. */
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 900px) minmax(280px, 1fr);
+  gap: var(--via-space-8);
+  align-items: start;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-8);
+  min-width: 0;
+}
+
+.lateral {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+@media (max-width: 1099px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lateral {
+    position: static;
+  }
+}
+
+/* ---- Seções da coluna principal ------------------------------------------- */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.secaoTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: var(--via-space-1);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  font-size: 0.625rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.prosa {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-primary);
+  max-width: 72ch;
+  white-space: pre-line;
+}
+
+/* ---- Etapas --------------------------------------------------------------- */
+
+.etapas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  overflow: hidden;
+}
+
+.etapa {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: var(--via-space-4);
+  padding: var(--via-space-4) var(--via-space-5);
+  transition: background-color var(--app-t-state);
+}
+
+.etapa:hover {
+  background: var(--via-navy-03);
+}
+
+.etapa + .etapa {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--via-lh-snug);
+  padding-top: 2px;
+}
+
+.etapaCorpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.etapaTitulo {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+}
+
+.etapaTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 68ch;
+}
+
+.etapaFerramentas {
+  margin: var(--via-space-1) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+}
+
+/* ---- Prompts -------------------------------------------------------------- */
+
+.prompts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-grid);
+}
+
+.prompt {
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  overflow: hidden;
+}
+
+.promptTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.promptTitulo {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+/* O prompt é para COPIAR: fonte mono, quebra preservada, e rolagem própria em
+   vez de estourar a coluna. */
+.promptTexto {
+  margin: 0;
+  padding: var(--via-space-4);
+  max-height: 320px;
+  overflow: auto;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--via-navy-03);
+}
+
+/* ---- Painéis da lateral ---------------------------------------------------- */
+
+.painel {
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.painelTitulo {
+  margin: 0 0 var(--via-space-4);
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.ferramentas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.ferramenta + .ferramenta {
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.ferramentaTopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+}
+
+.ferramentaNome {
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+/* Custo é o dado que decide se o cliente topa — mono, e sem semáforo: os três
+   níveis se distinguem por INTENSIDADE de navy, não por verde/amarelo/vermelho. */
+.custo {
+  flex-shrink: 0;
+  padding: 2px var(--via-space-2);
+  border-radius: var(--app-radius-track);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  background: var(--via-navy-03);
+  color: var(--via-text-faint);
+}
+
+.custo[data-custo='freemium'] {
+  background: var(--via-navy-08);
+  color: var(--via-text-muted);
+}
+
+.custo[data-custo='paga'] {
+  background: var(--via-navy-16);
+  color: var(--via-navy);
+}
+
+.ferramentaPapel {
+  margin: var(--via-space-1) 0 0;
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+/* ---- Economia -------------------------------------------------------------- */
+
+.economia {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  margin: 0 0 var(--via-space-4);
+}
+
+.economiaNumero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h1);
+  letter-spacing: var(--app-ls-h1);
+  line-height: 1;
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.economiaUnidade {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.economiaRotulo {
+  margin: 0 0 var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.premissas {
+  margin: 0;
+  padding-left: var(--via-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+/* ---- Fechamento ------------------------------------------------------------ */
+
+/* Superfície própria e largura total: é a parte que sustenta a credibilidade do
+   resto. Duas colunas de peso IGUAL — nem risco nem fronteira é nota de rodapé
+   do outro. */
+.fechamento {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--via-space-8);
+  padding: clamp(24px, 3.2vw, 40px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-03);
+}
+
+.fechamentoColuna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  min-width: 0;
+}
+
+.fechamentoTitulo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.riscos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.risco + .risco {
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.riscoTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  max-width: 56ch;
+}
+
+/* A mitigação é a resposta ao risco — indentada por filete, para a relação entre
+   as duas linhas ser visível sem precisar de rótulo. */
+.mitigacao {
+  margin: var(--via-space-2) 0 0;
+  padding-left: var(--via-space-3);
+  border-left: 1px solid var(--via-navy-16);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 56ch;
+}
+
+.fora {
+  margin: 0;
+  padding-left: var(--via-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+  max-width: 56ch;
+}
+
+.nota {
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-faint);
+  max-width: 56ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etapa {
+    transition: none;
+  }
+}

@@ -1,0 +1,125 @@
+/* GRADE GANHA COLUNA, nunca card mais gordo. O card foi desenhado para 340–420;
+   a 1600 com 3 colunas ele iria a 520 e o resumo de duas linhas viraria faixa. */
+.grade {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+@media (min-width: 1280px) {
+  .grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1440px) {
+  .grade {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  height: 100%;
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  text-decoration: none;
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.data {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  /* Duas linhas: com três, um card fica muito mais alto que o vizinho e a
+     fileira inteira acompanha. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.ideia {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* `margin-top: auto` cola o rodapé na base independentemente do tamanho do
+   texto — é o que mantém a fileira alinhada sem altura fixa. */
+.abrir {
+  margin-top: auto;
+  padding-top: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+  transition: transform var(--app-t-touch);
+}
+
+.cartao:hover .abrir {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao,
+  .abrir {
+    transition: none;
+  }
+
+  .cartao:hover {
+    transform: none;
+  }
+
+  .cartao:hover .abrir {
+    transform: none;
+  }
+}
+
+/* Redeclarado porque a box-shadow de repouso do card apagaria o anel do DS
+   (que é box-shadow com especificidade zero). Compõe com a sombra para o card
+   não achatar ao receber foco. */
+.cartao:focus-visible {
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}

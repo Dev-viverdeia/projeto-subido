@@ -340,6 +340,12 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
 
 `tsc + eslint + build = 0` não detecta nenhuma destas. Todas custaram um bug em produção ou perto.
 
+- **`var()` de token que não existe não dá erro em lugar nenhum — a declaração inteira é
+  descartada e a propriedade cai na herança.** `--via-fs-lead` foi inventado por analogia com
+  outros design systems; a escala do DS tem `h4` (18px) e não tem "lead". O resumo da ficha do
+  Builder ficou em 16px herdados, sem aviso, com tsc/eslint/build verdes. **`check:identidade`
+  reprova token fantasma** — `var(--x, fallback)` passa, porque o fallback declara que a ausência
+  é esperada.
 - **Nunca escreva `-webkit-backdrop-filter` ao lado da versão sem prefixo. Declare só
   `backdrop-filter`.** O Lightning CSS já prefixa pelo browserslist e, ao achar a duplicata manual,
   **descarta as duas**. Medido no CSSOM: saía `none`, com o conteúdo passando nítido por trás da

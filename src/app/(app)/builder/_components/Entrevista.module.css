@@ -1,0 +1,309 @@
+/* A entrevista é LEITURA E ESCRITA em coluna — largura de conteúdo, não de
+   canvas. Uma pergunta de 90 caracteres numa linha de 1600px força o olho a
+   varrer a tela inteira para achar o campo que fica embaixo dela. */
+.entrevista {
+  max-width: var(--via-content);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+/* A ideia original fica visível durante toda a entrevista: são as respostas DELA
+   que estão sendo dadas, e rolar de volta para reler é atrito puro. */
+.contexto {
+  padding: var(--app-pad-card-tight) var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--via-border-hairline);
+  /* Fundo levemente rebaixado: é citação, não campo. */
+  background: var(--via-navy-03);
+}
+
+.contextoRotulo {
+  margin: 0 0 var(--via-space-1);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.contextoTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 60ch;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  transition: border-color var(--app-t-state);
+}
+
+/* `focus-within` e não `hover`: numa lista de campos, o que importa é onde o
+   cursor de texto está, não onde o mouse passou. */
+.item:focus-within {
+  border-color: var(--app-elev-2-line);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--via-lh-snug);
+  padding-top: 2px;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.pergunta {
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  cursor: pointer;
+}
+
+.porque {
+  margin: 0 0 var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 58ch;
+}
+
+/* Raio concêntrico: item 20, padding 20 → o campo fica no degrau de controle. */
+.campo {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  padding: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  border: 1px solid var(--via-border);
+  background: var(--via-bg);
+  color: var(--via-text-primary);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  transition: border-color var(--app-t-state);
+}
+
+.campo::placeholder {
+  color: var(--via-text-faint);
+}
+
+.campo:hover {
+  border-color: var(--via-navy-16);
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.progresso {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.contagem {
+  color: var(--via-text-primary);
+}
+
+.aviso {
+  color: var(--via-text-faint);
+  text-transform: none;
+  letter-spacing: var(--app-ls-micro);
+}
+
+/* Sobre CLARO o preenchimento é navy — accent sobre branco dá 2,70:1 e reprova
+   AA até para texto grande. O accent desta tela vive na banda escura do `/builder`. */
+.acao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-5);
+  border: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  cursor: pointer;
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+.acao:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--via-shadow-md);
+}
+
+.acao:active {
+  transform: translateY(0);
+}
+
+.erro {
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+}
+
+/* ---- Espera --------------------------------------------------------------- */
+
+.espera {
+  max-width: var(--via-content);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: clamp(28px, 4vw, 48px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--via-border-hairline);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+/* A ÚNICA delícia da tela — um pulso lento, não um spinner de biblioteca. É
+   ambiente, não interação: fica em `animation`, e some inteiro em reduced-motion
+   dando lugar a um ponto sólido. */
+.pulso {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent-ink);
+  animation: respirar 1800ms var(--via-ease) infinite;
+}
+
+@keyframes respirar {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.35;
+  }
+}
+
+.esperaTitulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  color: var(--via-text-primary);
+}
+
+.esperaTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 56ch;
+}
+
+/* Número protagonista: mono, tabular, três casas reservadas para o contador não
+   empurrar o "s" a cada dezena. */
+.cronometro {
+  margin: var(--via-space-2) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--app-ls-h2);
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.relogio {
+  min-width: 3ch;
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .campo,
+  .acao {
+    transition: none;
+  }
+
+  .acao:hover {
+    transform: none;
+  }
+
+  .pulso {
+    animation: none;
+  }
+}
+
+/* Por último: qualquer box-shadow de classe apaga o anel do DS (`:where()`, zero
+   de especificidade). O botão tem sombra no hover — por isso é redeclarado. */
+.campo:focus-visible,
+.acao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}

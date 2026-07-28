@@ -1,0 +1,208 @@
+/* A ÚNICA superfície escura da tela — a regra é uma por tela, e aqui ela é o
+   campo de entrada, não um enfeite: o Builder é o pilar onde a pessoa ESCREVE, e
+   a banda escura é o que separa o ato de compor do ato de reler o histórico. */
+.compositor {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--via-navy-16);
+  background: var(--via-mesh-navy);
+  padding: clamp(24px, 3.6vw, 40px);
+  box-shadow: var(--via-glow-navy);
+}
+
+.sheen {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* Accent sobre navy dá 6,52:1 — é aqui que ele é legível, e só aqui. */
+  color: var(--via-accent);
+}
+
+.titulo {
+  margin: var(--via-space-3) 0 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  /* A medida vive no ELEMENTO de texto, nunca no container: `ch` é relativo ao
+     font-size de quem declara. */
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+.apoio {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  /* Sobre banda escura a escala INVERTE: gray-300 dá 12,2:1; `text-muted` daria
+     3,45:1 e reprovaria AA. */
+  color: var(--via-gray-300);
+  max-width: 64ch;
+}
+
+.rotulo {
+  margin-top: var(--via-space-6);
+  margin-bottom: var(--via-space-2);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-gray-400);
+}
+
+/* Raio concêntrico: a superfície externa é 28 com padding de 24–40; o campo fica
+   no degrau de card (20) para a curva interna não brigar com a externa. */
+.campo {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  padding: var(--via-space-4);
+  border-radius: var(--app-radius-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--via-white);
+  font-family: inherit;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-body);
+  transition:
+    border-color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.campo::placeholder {
+  color: var(--via-gray-onnavy);
+}
+
+.campo:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.campo:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+  margin-top: var(--via-space-4);
+}
+
+/* Número é prova: mono, tabular e tinta sólida. */
+.contador {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-gray-400);
+  font-variant-numeric: tabular-nums;
+}
+
+.numero {
+  color: var(--via-gray-300);
+}
+
+/* gray-400 e não gray-500. Medido no ponto mais CLARO do mesh (o canto superior
+   esquerdo, onde a radial de rgba(24,48,99,.55) está no auge): gray-500 dá
+   2,89:1 e reprova AA a 10px; gray-400 dá 5,90:1. A hierarquia do contador vem
+   do gray-300 no número, não de um cinza que some. */
+.barra {
+  padding-inline: 2px;
+  color: var(--via-gray-400);
+}
+
+.dica {
+  color: var(--via-gray-400);
+}
+
+/* CTA accent — o único preenchimento accent do produto, e ele só existe porque
+   está sobre escuro. O rótulo é NAVY (7,13:1); branco sobre accent dá 2,76:1. */
+.acao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-5);
+  border: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+  color: var(--via-navy-deep);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  cursor: pointer;
+  transition:
+    transform var(--app-t-touch),
+    filter var(--app-t-touch);
+}
+
+.acao:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.acao:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.acao:disabled {
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--via-gray-400);
+}
+
+.erro,
+.pendencia {
+  margin: var(--via-space-4) 0 0;
+  padding: var(--via-space-3) var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-gray-300);
+  max-width: 72ch;
+}
+
+.pendencia code {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  color: var(--via-white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campo,
+  .acao {
+    transition: none;
+  }
+
+  .acao:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* O anel do DS é box-shadow e o do globals.css usa `:where()` (especificidade
+   zero): qualquer box-shadow de classe o apagaria. Sobre banda escura o anel é o
+   token on-navy. Fica por último no arquivo, de propósito. */
+.campo:focus-visible,
+.acao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}

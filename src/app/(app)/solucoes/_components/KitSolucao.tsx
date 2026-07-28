@@ -1,6 +1,6 @@
 import { Wrench } from 'lucide-react';
 import type { ItemSolucao } from '@/lib/conteudo/queries';
-import { BotaoCopiar } from './BotaoCopiar';
+import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import styles from './KitSolucao.module.css';
 
 /**

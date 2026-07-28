@@ -72,3 +72,20 @@ export function serverEnv() {
 
   return parsed.data;
 }
+
+/**
+ * Chave do modelo de linguagem — do BUILDER, e só dele.
+ *
+ * OPCIONAL de propósito, e é a única variável assim no arquivo.
+ * Todas as outras derrubam o boot quando faltam, porque sem elas nada funciona.
+ * Esta derruba um pilar só: sem ela a plataforma inteira roda, e apenas o Builder
+ * não gera. Fazer o boot falhar por causa dela impediria de desenvolver Soluções,
+ * Formações e Mentorias numa máquina que nunca vai chamar a Anthropic.
+ *
+ * Quem chama trata o `null` DIZENDO que falta a chave — nunca simulando uma
+ * resposta. Uma solução inventada apresentada como gerada é pior que um erro.
+ */
+export function chaveDoModelo(): string | null {
+  const chave = process.env.ANTHROPIC_API_KEY;
+  return chave && chave.length > 0 ? chave : null;
+}

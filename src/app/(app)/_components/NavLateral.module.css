@@ -46,9 +46,11 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  /* Sobre o trilho a escala inverte: gray-500 é o degrau mais quieto que ainda
-     se lê. `text-faint` some aqui. */
-  color: var(--via-gray-500);
+  /* Sobre o trilho a escala inverte, e o degrau mais quieto que ainda PASSA é o
+     gray-400. Medido no topo do --app-mesh-trilho (#16294d): gray-500 dá 2,89:1
+     e reprova AA a 10px — era um chute com cara de decisão; gray-400 dá 5,59:1.
+     `text-faint` some aqui. */
+  color: var(--via-gray-400);
 }
 
 .lateral .lista {

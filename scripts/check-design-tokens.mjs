@@ -142,7 +142,56 @@ const REGRA_FOCO = {
   use: '<seletor>:focus-visible { box-shadow: var(--app-ring), <sombra de repouso> }',
 };
 
+/**
+ * REGRA ESTRUTURAL — token fantasma.
+ *
+ * `var(--via-fs-lead)` não existe. O navegador não avisa: a declaração inteira é
+ * descartada como inválida e a propriedade cai na herança. Medido: o resumo da
+ * ficha do Builder ficou em 16px herdados onde a intenção era 18 — sem erro em
+ * lugar nenhum, com tsc, eslint e build todos verdes.
+ *
+ * A escala do DS tem `h4` (18px) e não tem "lead". Um token inventado não vira
+ * erro, vira uma diferença de tamanho que ninguém consegue explicar depois.
+ *
+ * O conjunto de DEFINIDOS é deliberadamente largo — qualquer `--x:` em qualquer
+ * CSS do repo, mais os que nascem em `style={{ '--x': … }}` no TSX (é assim que
+ * o card de formação passa o campo de luz por slug). Largo porque o alvo é o
+ * ERRO DE DIGITAÇÃO, não a disciplina de onde o token nasce; falso positivo aqui
+ * custaria mais que o defeito.
+ *
+ * `var(--x, fallback)` passa: quem escreveu um fallback declarou que a ausência
+ * é esperada.
+ */
+function tokensDefinidos() {
+  const definidos = new Set();
+
+  for (const rel of globSync(['src/**/*.css'], { cwd: RAIZ })) {
+    const texto = readFileSync(new URL(rel, new URL('..', import.meta.url)), 'utf8');
+    for (const [, nome] of texto.matchAll(/(--[a-zA-Z0-9_-]+)\s*:/g)) definidos.add(nome);
+  }
+
+  /* Qualquer `'--x'` citado em TS/TSX conta como definido. São dois caminhos
+     legítimos e nenhum dos dois se parece com uma declaração CSS:
+       · `style={{ ['--logo-h' as string]: … }}` — variável passada por prop;
+       · `variable: '--font-geist'` do next/font — o nome que o Next injeta.
+     Nomear um token no TypeScript é sempre deliberado; erro de digitação em
+     `var()` no CSS é que é acidente. */
+  for (const rel of globSync(['src/**/*.ts', 'src/**/*.tsx'], { cwd: RAIZ })) {
+    const texto = readFileSync(new URL(rel, new URL('..', import.meta.url)), 'utf8');
+    for (const [, nome] of texto.matchAll(/['"](--[a-zA-Z0-9_-]+)['"]/g)) definidos.add(nome);
+  }
+
+  return definidos;
+}
+
+const REGRA_FANTASMA = {
+  id: 'token-fantasma',
+  porque: 'var() de token inexistente — a declaração some em silêncio e o valor vira herança',
+  use: 'confira o nome na escala real (tokens.css / brand.css), ou dê um fallback ao var()',
+};
+
 const arquivos = globSync(ALVOS, { cwd: RAIZ, exclude: IGNORADOS });
+const DEFINIDOS = tokensDefinidos();
 
 const achados = [];
 for (const rel of arquivos) {
@@ -181,6 +230,13 @@ for (const rel of arquivos) {
   linhas.forEach((linha, i) => {
     const codigo = codigoDe(linha);
     if (!codigo.trim()) return;
+
+    /* `var(--x)` sem vírgula = sem fallback. Com fallback, a ausência do token é
+       uma decisão de quem escreveu, não um erro de digitação. */
+    for (const [, nome] of codigo.matchAll(/var\(\s*(--[a-zA-Z0-9_-]+)\s*\)/g)) {
+      if (DEFINIDOS.has(nome) || temEscape(linhas, i)) continue;
+      achados.push({ arquivo: rel, linha: i + 1, regra: REGRA_FANTASMA, trecho: nome });
+    }
 
     for (const regra of REGRAS) {
       // Regra que só vale em certas declarações: a linha precisa ser uma delas,
