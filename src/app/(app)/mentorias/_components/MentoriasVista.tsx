@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { mentorPorId } from '@/content/mentorias';
 import { Button, Modal } from '@/design-system/via';
+import { TRILHAS } from '@/content/mentorias/types';
 import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
 import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
 import { AgendaMentorias } from './AgendaMentorias';
@@ -137,16 +138,69 @@ export function MentoriasVista({
       >
         {detalhe && (
           <div className={styles.detalhe}>
-            <p className={styles.detalheMeta}>
-              {rotuloDoDia(detalhe.inicioIso, agora).mono} · {horaCurta(detalhe.inicioIso)}–
-              {horaCurta(detalhe.fimIso)} · {duracaoMin(detalhe)} min · {detalhe.inscritos}/
-              {detalhe.vagas} vagas
-            </p>
+            {/* Os quatro dados viram uma TIRA com rótulo, não uma frase em mono.
+                Numa linha só, "TER 28 JUL · 19:00–20:30 · 90 MIN · 22/30 VAGAS"
+                obriga a pessoa a decodificar a posição para saber o que é cada
+                número. Com rótulo, cada um se lê sozinho. */}
+            <dl className={styles.ficha}>
+              <div className={styles.fichaItem}>
+                <dt className={styles.fichaRotulo}>Quando</dt>
+                <dd className={styles.fichaValor}>{rotuloDoDia(detalhe.inicioIso, agora).mono}</dd>
+              </div>
+              <div className={styles.fichaItem}>
+                <dt className={styles.fichaRotulo}>Horário</dt>
+                <dd className={styles.fichaValor}>
+                  {horaCurta(detalhe.inicioIso)}–{horaCurta(detalhe.fimIso)}
+                </dd>
+              </div>
+              <div className={styles.fichaItem}>
+                <dt className={styles.fichaRotulo}>Duração</dt>
+                <dd className={styles.fichaValor}>{duracaoMin(detalhe)} min</dd>
+              </div>
+              <div className={styles.fichaItem}>
+                <dt className={styles.fichaRotulo}>Vagas</dt>
+                <dd className={styles.fichaValor}>
+                  {detalhe.inscritos}/{detalhe.vagas}
+                </dd>
+              </div>
+            </dl>
+
+            {/* Ocupação como BARRA: 22/30 é um número que só significa alguma
+                coisa depois de uma divisão. A barra faz a divisão pelo leitor. */}
+            <div className={styles.ocupacao}>
+              <div className={styles.ocupacaoTrilho} aria-hidden="true">
+                <div
+                  className={styles.ocupacaoCheia}
+                  style={{
+                    transform: `scaleX(${Math.min(1, detalhe.inscritos / detalhe.vagas)})`,
+                  }}
+                />
+              </div>
+              <span className={styles.ocupacaoTexto}>
+                {detalhe.vagas - detalhe.inscritos > 0
+                  ? `${detalhe.vagas - detalhe.inscritos} vagas livres`
+                  : 'sem vagas'}
+              </span>
+            </div>
+
             <p className={styles.detalheTexto}>{detalhe.descricao}</p>
+
+            {/* Ficha do mentor: monograma, nome e credencial numa caixa própria.
+                É onde a headline mora — na lista ela repetia a mesma frase em
+                cada linha; aqui é lida uma vez, no momento em que importa. */}
             {mentorDoDetalhe && (
-              <p className={styles.detalheMentor}>
-                {mentorDoDetalhe.nome} — {mentorDoDetalhe.headline}
-              </p>
+              <div className={styles.mentorCartao} data-trilha={mentorDoDetalhe.trilha}>
+                <span className={styles.mentorMonograma} aria-hidden="true">
+                  {mentorDoDetalhe.iniciais}
+                </span>
+                <span className={styles.mentorTextos}>
+                  <span className={styles.mentorNome}>{mentorDoDetalhe.nome}</span>
+                  <span className={styles.mentorHeadline}>{mentorDoDetalhe.headline}</span>
+                </span>
+                <span className={styles.mentorTrilha}>
+                  {TRILHAS[mentorDoDetalhe.trilha].rotulo}
+                </span>
+              </div>
             )}
             {estadoComInscricao(detalhe) === 'checkin-aberto' && (
               <Button

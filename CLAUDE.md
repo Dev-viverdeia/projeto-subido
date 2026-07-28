@@ -325,6 +325,16 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
   acontece. Entrada de barra de vidro é só `transform`.
 - `prefers-reduced-motion` sempre honrado, e "honrado" significa **conteúdo no estado final**, não
   animação rápida.
+- **Cascata de entrada usa `animation-fill-mode: backwards`, NUNCA `forwards`.** `forwards` retém o
+  valor **animado**, e um `to { transform: none }` interpolado resolve para `matrix(1,0,0,1,0,0)` —
+  a matriz identidade. Visualmente é nada; para o CSS é um transform, e **transform cria containing
+  block para `position: fixed` de qualquer descendente**. Medido na área logada: o `Modal` do DS
+  (que renderiza na árvore, não em portal) ancorava na seção em vez da viewport — a 375 nascia
+  348px abaixo do centro, com o CTA 234px fora da tela e nada rolando até ele.
+  **Escrever `to { transform: none }` não resolve** — o problema é a retenção, não o valor. Com
+  `backwards`, o `from` só vale durante o atraso e a animação, e o estado final é o do próprio
+  elemento. De quebra, o estado base deixa de precisar de `opacity: 0` no CSS, o que resolve a
+  regra acima em vez de contorná-la.
 
 ### Armadilhas que passam com o build verde
 

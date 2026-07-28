@@ -286,6 +286,20 @@
   --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-60);
   --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-accent);
 
+  /* ---- "AO VIVO" É UM SINAL SÓ ----------------------------------------------
+     Medido na tela: o mesmo estado tinha TRÊS cores. O Pill do DS pintava coral
+     (#B85C5C), o item da agenda pintava verde (--via-success) e a célula do
+     calendário pintava accent. Nada disso foi escolhido junto — cada um chutou o
+     seu, que é o mesmo defeito das nove durações, agora em cor.
+
+     A cor certa é o accent: o CLAUDE.md já lista "dot de ao vivo" entre os usos
+     legítimos dele, e verde/vermelho de semáforo é banido pela seção de Voz.
+
+     O DS lê `var(--via-coral, #B85C5C)` — ele mesmo oferece o gancho, então o
+     token resolve o dot sem override de seletor. O halo e o anel são literais
+     dentro do DS e precisam do override abaixo. */
+  --via-coral: var(--via-accent);
+
   /* ---- Cinza sobre banda escura ---------------------------------------------
      `#8fa0b8` aparecia literal em três seções da landing (hero, SectionHeader e
      CTA final) porque não havia token para "cinza claro legível sobre navy".
@@ -343,4 +357,18 @@
 .via-glass-dark ::selection {
   background: rgba(0, 162, 255, 0.85);
   color: var(--cst-navy-deep);
+}
+
+/* O halo e o anel do pulso do Pill live são literais dentro do DS e não seguem o
+   `--via-coral`. Aqui eles passam a acompanhar o accent.
+
+   O halo saiu: a assinatura da marca é glass + atmosférico + sombra navy, NÃO
+   glow. O anel pulsante do `::after` já comunica "ao vivo" sozinho — o brilho era
+   o segundo sinal para a mesma coisa. */
+.via-pill__live-dot {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+}
+
+.via-pill__live-dot::after {
+  background: var(--via-accent-hairline);
 }

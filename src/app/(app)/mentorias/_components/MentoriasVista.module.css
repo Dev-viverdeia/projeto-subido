@@ -23,11 +23,81 @@
   gap: var(--via-space-3);
 }
 
-.detalheMeta {
+/* Tira de dados com RÓTULO. A frase em mono ("TER 28 JUL · 19:00–20:30 · 90 MIN
+   · 22/30 VAGAS") obrigava a decodificar a POSIÇÃO para saber o que era cada
+   número; com rótulo cada um se lê sozinho. Colunas por conteúdo, não fixas —
+   largura fixa em rótulo é chute com aparência de decisão. */
+/* FLEX, não `auto-fit`: `minmax(max-content, 1fr)` não dá ao auto-fit um mínimo
+   definido para calcular a contagem, e a tira colapsava para uma coluna dentro do
+   modal — os quatro dados empilhavam. Flex com wrap encaixa quantos couberem e
+   quebra sozinho quando não cabem. */
+.ficha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-gap-stack) var(--app-gap-block);
   margin: 0;
+  padding-bottom: var(--app-gap-stack);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.fichaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* Nem cresce nem encolhe: o valor é curto e conhecido, e deixar crescer abriria
+     vãos entre rótulo e dado. */
+  flex: 0 0 auto;
+}
+
+.fichaRotulo {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-faint);
+}
+
+.fichaValor {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+  white-space: nowrap;
+}
+
+/* Ocupação como barra: 22/30 é um número que só significa alguma coisa depois de
+   uma divisão — a barra faz a divisão pelo leitor. `scaleX`, nunca `width`. */
+.ocupacao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.ocupacaoTrilho {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-10);
+  overflow: hidden;
+}
+
+.ocupacaoCheia {
+  width: 100%;
+  height: 100%;
+  background: var(--via-navy);
+  transform-origin: left;
+  transition: transform var(--app-t-scene);
+}
+
+.ocupacaoTexto {
+  flex: none;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -38,10 +108,93 @@
   color: var(--via-text-body);
 }
 
-.detalheMentor {
-  margin: 0;
+/* Ficha do mentor. É AQUI que a headline mora: na lista ela repetia a mesma
+   frase em cada uma das 34 linhas; aqui é lida uma vez, no momento em que
+   importa. A barra de trilha é a mesma gramática da célula e do item. */
+.mentorCartao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card-tight);
+  border: 1px solid var(--via-border-hairline);
+  border-left: 2px solid var(--via-navy-40);
+  border-radius: 0 var(--app-radius-chip) var(--app-radius-chip) 0;
+  background: var(--via-bg-2);
+}
+
+.mentorCartao[data-trilha='implementacao'] {
+  border-left-color: var(--via-navy);
+}
+
+.mentorCartao[data-trilha='trafego'] {
+  border-left-color: var(--via-blue-soft);
+}
+
+.mentorCartao[data-trilha='comercial'] {
+  border-left-color: var(--via-navy-40);
+}
+
+.mentorCartao[data-trilha='produto'] {
+  border-left-color: var(--via-navy-25);
+}
+
+/* Monograma, não silhueta: silhueta genérica lê como pessoa real cuja foto não
+   carregou, e não há pessoa aqui — há um papel. */
+.mentorMonograma {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-indent: var(--app-ls-eyebrow);
+}
+
+.mentorTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mentorNome {
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+.mentorHeadline {
   font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-text-muted);
+}
+
+.mentorTrilha {
+  flex: none;
+  padding: 3px var(--via-space-2_5);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .mentorTrilha {
+    display: none;
+  }
 }
 
 .confirmarTexto {

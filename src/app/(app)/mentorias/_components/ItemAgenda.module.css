@@ -1,3 +1,22 @@
+/* Barra de trilha à esquerda, a MESMA gramática da célula do calendário e do
+   item do painel: quem viu uma reconhece a outra sem aprender nada novo. Por
+   INTENSIDADE de navy, nunca cor nova. */
+.item[data-trilha='implementacao'] {
+  border-left: 2px solid var(--via-navy);
+}
+
+.item[data-trilha='trafego'] {
+  border-left: 2px solid var(--via-blue-soft);
+}
+
+.item[data-trilha='comercial'] {
+  border-left: 2px solid var(--via-navy-40);
+}
+
+.item[data-trilha='produto'] {
+  border-left: 2px solid var(--via-navy-25);
+}
+
 .item {
   display: flex;
   align-items: center;
@@ -25,9 +44,13 @@
     0 0 0 4px var(--via-navy-60);
 }
 
+/* Não usa o atalho `border-color`: ele tem a MESMA especificidade das regras de
+   trilha e vem depois, então apagava a barra justamente no item ao vivo — o que
+   mais precisa dela. Só as três bordas que não são a barra. */
 .item[data-ao-vivo] {
   background: var(--via-navy-03);
-  border-color: var(--via-navy-16);
+  border-block-color: var(--via-navy-16);
+  border-inline-end-color: var(--via-navy-16);
   box-shadow: var(--via-shadow-sm);
 }
 
@@ -122,14 +145,17 @@
   font-size: 0.656rem;
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-success);
+  /* TEXTO accent sobre claro usa a variante -ink (4,95:1); o accent puro dá
+     2,70:1 e reprova. O DOT logo abaixo pode usar o accent puro porque é SINAL,
+     e sinal não tem régua de leitura. A distinção é a regra do accent inteira. */
+  color: var(--via-accent-ink);
 }
 
 .dot {
   width: 7px;
   height: 7px;
   border-radius: var(--via-radius-pill);
-  background: var(--via-success);
+  background: var(--via-accent);
   animation: item-pulso 1.6s ease-in-out infinite;
 }
 

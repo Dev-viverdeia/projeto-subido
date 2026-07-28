@@ -3,17 +3,33 @@
  * Uso: `className={entrada.bloco}` + um dos atrasos. Quatro batidas no máximo —
  * cabeçalho, régua, grade, rodapé. Mais que isso vira desfile.
  *
- * `to { transform: none }` e NÃO `translateY(0)`: transform residual cria
- * containing block e qualquer overlay `position: fixed` de um filho (painel de
- * filtros, modal) passaria a se ancorar na seção em vez da viewport.
+ * `backwards`, NUNCA `forwards`. Três coisas dependem disso, e a primeira só
+ * apareceu medindo:
  *
- * `animation-fill-mode: forwards` mantém `opacity` aplicada após o fim — isso cria
- * stacking context; se um filho precisar sobrepor vizinhos (dropdown), dê
- * `position: relative; z-index` ao bloco. */
+ * 1 · TRANSFORM RESIDUAL. `forwards` retém o valor ANIMADO, e o `transform: none`
+ *     do último keyframe é interpolado — resolve para `matrix(1,0,0,1,0,0)`, a
+ *     matriz identidade. Visualmente é nada; para o CSS é um transform, e transform
+ *     cria containing block para `position: fixed` de qualquer descendente.
+ *     Medido: o Modal do DS (que renderiza na árvore, não em portal) ancorava na
+ *     seção em vez da viewport — a 375 ele nascia 348px abaixo do centro, com o
+ *     CTA "Fazer check-in" 234px fora da tela e nada rolando até ele.
+ *     Escrever `to { transform: none }` NÃO resolve: o problema é a retenção.
+ *     Com `backwards` nenhum valor animado sobra depois do fim.
+ *
+ * 2 · O ESTADO BASE DEIXA DE SER INVISÍVEL. Com `forwards` o elemento precisava de
+ *     `opacity: 0` no CSS, e a regra da casa é clara: nunca `opacity: 0` como
+ *     default de CSS, senão a página sobe invisível se a animação não rodar. Com
+ *     `backwards` o estado normal é `opacity: 1` e o `from` só vale durante a
+ *     animação e o atraso.
+ *
+ * 3 · Sem `forwards` não sobra `opacity` aplicada, então o bloco também para de
+ *     criar stacking context por conta própria.
+ */
 
 .bloco {
-  opacity: 0;
-  animation: entrada-subir 440ms var(--via-ease) forwards;
+  /* Estado NORMAL, não o inicial: quem pinta o estado inicial é o `from`. */
+  opacity: 1;
+  animation: entrada-subir 440ms var(--via-ease) backwards;
 }
 
 .atraso1 {
@@ -26,14 +42,12 @@
   animation-delay: 240ms;
 }
 
+/* Sem `to`: o estado final é o do próprio elemento, e é justamente isso que
+   impede a matriz identidade de sobrar. */
 @keyframes entrada-subir {
   from {
     opacity: 0;
     transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -41,6 +55,5 @@
 @media (prefers-reduced-motion: reduce) {
   .bloco {
     animation: none;
-    opacity: 1;
   }
 }

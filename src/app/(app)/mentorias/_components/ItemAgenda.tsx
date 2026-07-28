@@ -41,6 +41,7 @@ export function ItemAgenda({
     <article
       className={styles.item}
       data-ao-vivo={estado === 'ao-vivo' ? '' : undefined}
+      data-trilha={mentor?.trilha}
       role="button"
       tabIndex={0}
       onClick={aoAbrirDetalhe}
@@ -60,10 +61,13 @@ export function ItemAgenda({
 
       <div className={styles.centro}>
         <p className={styles.titulo}>{sessao.titulo}</p>
+        {/* Só o NOME. A headline ("Encontro semanal em grupo · Comunidade
+            Subido") ocupava 232px repetindo a mesma frase em cada uma das 34
+            linhas — em lista, informação idêntica em toda linha é ruído, não
+            contexto. Ela vive na ficha da sessão, onde é lida uma vez. */}
         <div className={styles.mentor}>
           <Avatar initials={mentor?.iniciais ?? '—'} size="xs" />
           <span className={styles.mentorNome}>{mentor?.nome}</span>
-          <span className={styles.mentorHeadline}>· {mentor?.headline}</span>
         </div>
       </div>
 
