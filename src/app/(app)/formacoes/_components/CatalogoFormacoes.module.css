@@ -4,23 +4,23 @@
   gap: var(--via-space-4);
 }
 
+/* Tudo que é CONTROLE fica à esquerda, na ordem em que se decide: primeiro o
+   recorte (situação), depois a busca, depois a ordem. A contagem é resultado —
+   `margin-left: auto` a manda para a ponta oposta, longe da primeira leitura.
+   `align-items: center` com as abas junto: elas têm padding-bottom próprio para
+   o sublinhado, então o `baseline` desalinharia busca e ordenação. */
 .regua {
   position: relative;
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--via-space-4);
-}
-
-.reguaDireita {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
+  flex-wrap: wrap;
 }
 
 .contagem {
   margin: 0;
+  margin-left: auto;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   color: var(--via-text-faint);
@@ -107,9 +107,5 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--via-space-2);
-  }
-
-  .reguaDireita {
-    justify-content: space-between;
   }
 }
