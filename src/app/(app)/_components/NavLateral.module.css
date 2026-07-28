@@ -50,37 +50,38 @@
   font-weight: var(--via-fw-regular);
 }
 
-/* Três planos, três direções. O repouso fica na calha rebaixada da sidebar, o hover
-   SOBE para o branco da superfície, e o ativo AFUNDA na banda navy. É a assinatura
-   do design system — plano e sombra navy — em vez de um degrau de cinza. */
+/* SOBRE O TRILHO NAVY a escala de cinza INVERTE (a armadilha mais cara do repo,
+   registrada no CLAUDE.md): nunca text-muted/soft aqui — o repouso é gray-400
+   (6,99:1), o hover ergue para o branco sobre vidro claríssimo, e o ativo é o
+   PILL BRANCO com tinta navy (17,9:1) — a mesma linguagem do CTA da landing
+   sobre banda escura. */
+.lateral .item {
+  color: var(--via-gray-400);
+}
+
 .lateral .item:hover {
-  background: var(--via-surface);
-  color: var(--via-text-primary);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--via-white);
 }
 
 .lateral .item[aria-current='page'] {
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: var(--via-white);
+  color: var(--via-navy);
   font-weight: var(--via-fw-medium);
+  box-shadow: var(--via-shadow-sm);
 }
 
 /* O anel de foco do DS é um `box-shadow` (via-base.css:46), não um outline — a regra
    do globals.css usa `:where()`, que tem especificidade zero, e perde. Consequência:
    QUALQUER box-shadow num seletor de classe apaga o anel. Por isso o foco é
-   redeclarado aqui, com especificidade maior e POR ÚLTIMO no arquivo: sem isto, o
-   item mais navegado da tela fica sem indicação de foco para quem usa teclado. */
+   redeclarado aqui, POR ÚLTIMO no arquivo — e sobre a banda escura o anel é o
+   token de foco on-navy da marca (accent translúcido, legível sobre navy). */
 .lateral .item:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--via-white),
-    0 0 0 4px var(--via-navy-60);
+  box-shadow: var(--via-shadow-focus-onnavy);
 }
 
-/* Sobre a banda navy o anel branco desaparece contra o próprio chip: a folga interna
-   passa a ser navy e o anel externo, branco. */
 .lateral .item[aria-current='page']:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--via-navy),
-    0 0 0 4px var(--via-white);
+  box-shadow: var(--via-shadow-sm), var(--via-shadow-focus-onnavy);
 }
 
 /* ---- Dock (mobile) ----------------------------------------------------------- */

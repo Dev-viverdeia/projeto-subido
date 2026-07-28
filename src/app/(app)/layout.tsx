@@ -40,10 +40,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
      @ é um fallback previsível — melhor que "Usuário" e melhor que vazio. */
   const nome = nomeBruto || email.split('@')[0] || 'Sua conta';
 
-  /* A lista é montada por sessão: quem não é admin não recebe o item no payload
-     RSC — nem o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no
-     HTML de todo mundo. */
-  const itens = (await ehAdmin()) ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV;
+  /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
+     o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
+     todo mundo. */
+  const admin = await ehAdmin();
 
   return (
     <QueryProvider>
@@ -52,12 +52,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           Pular para o conteúdo
         </a>
 
-        <aside className={styles.sidebar}>
+        {/* O trilho navy: a banda escura da landing e das telas de sessão, em pé.
+            A marca azul sobre a navy é o mesmo quadro de /entrar — o produto
+            inteiro abre e fecha na mesma assinatura. O item de admin é UTILITÁRIO,
+            não pilar: mora ancorado no pé do trilho, separado por hairline. */}
+        <aside className={`${styles.sidebar} via-mesh-navy via-noise`}>
           <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
             <SubidoLogo size={18} />
           </Link>
 
-          <NavLateral itens={itens} variante="lateral" />
+          <NavLateral itens={ITENS_NAV} variante="lateral" />
+
+          {admin && (
+            <div className={styles.rodapeSidebar}>
+              <NavLateral itens={[ITEM_ADMIN]} variante="lateral" />
+            </div>
+          )}
         </aside>
 
         {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
@@ -70,7 +80,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
 
-        <NavLateral itens={itens} variante="dock" />
+        {/* O dock nunca carrega o admin (noDock) — a lista base basta. */}
+        <NavLateral itens={ITENS_NAV} variante="dock" />
       </div>
     </QueryProvider>
   );

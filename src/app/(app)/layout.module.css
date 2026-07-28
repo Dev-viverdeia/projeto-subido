@@ -50,18 +50,27 @@
        marca, que também recua para 12. Eram os dois únicos elementos da coluna e
        estavam desalinhados em 8px. */
     padding: var(--via-space-6) var(--via-space-3);
-    /* A sidebar RECUA. Superfície branca ao lado do fundo `--via-bg` mede 1,02:1 —
-       branco sobre branco, e o fio de 1px era o único separador da tela inteira.
-       Rebaixada, ela vira a calha em que o item ativo afunda e o hover se ergue. */
-    background: var(--via-bg-3);
-    /* O hairline TAMBÉM tinha que mudar: o `--via-border-hairline` (#E2E9F2) sobre
-       a calha nova daria 1,06:1 e viraria CSS morto. O `--via-border` é o fio de
-       tinta navy e mede 1,40:1 dos dois lados. Plano e linha ficam mais fortes ao
-       mesmo tempo, em vez de um comprar do outro. */
-    border-right: 1px solid var(--via-border);
+    /* O TRILHO NAVY — o fundo vem das classes `via-mesh-navy via-noise` no JSX:
+       a mesma banda escura do hero da landing e do painel de /entrar. É a
+       assinatura da marca em pé, e o único contexto em que o azul institucional
+       da marca é plenamente legível (6,5:1). */
+    /* Hairline CLARA na aresta: o fio navy de antes seria invisível sobre a
+       própria navy. */
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    /* Sombra navy direcional para dentro do canvas — vidro + atmosfera + sombra,
+       nunca glow. */
+    box-shadow: 12px 0 32px -18px rgba(11, 22, 45, 0.45);
     /* A folga entre a marca e a lista: a marca já carrega ~10px de ar próprio
        dentro do min-height de 44px, então 24 lia como 34. */
     gap: var(--via-space-4);
+  }
+
+  /* O admin ancora o PÉ do trilho — utilitário, separado dos pilares por uma
+     hairline clara. Também resolve o vazio de ~450px que a coluna tinha. */
+  .rodapeSidebar {
+    margin-top: auto;
+    padding-top: var(--via-space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .conteudo {
@@ -73,7 +82,9 @@
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  color: var(--via-navy);
+  /* Sobre a navy, o wordmark é BRANCO (via currentColor); a marca segue azul
+     institucional pela variante brand — o mesmo quadro de /entrar. */
+  color: var(--via-white);
   text-decoration: none;
   /* O logotipo é baixo; como link, a caixa dele seria a área clicável inteira e
      ficaria abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */

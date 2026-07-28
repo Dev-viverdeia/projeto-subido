@@ -53,10 +53,15 @@
   text-decoration: none;
 }
 
+/* Eyebrow mono — a mesma família dos rótulos de seção da landing e dos cards.
+   Nomeia a seção; quem conversa é o h1 da página, logo abaixo. */
 .secao {
-  font-size: var(--via-fs-sm);
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
   font-weight: var(--via-fw-medium);
-  color: var(--via-text-muted);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
   /* Some antes de qualquer outra coisa quando falta largura. */
   overflow: hidden;
   text-overflow: ellipsis;

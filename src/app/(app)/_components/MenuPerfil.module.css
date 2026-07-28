@@ -4,15 +4,19 @@
 }
 
 /* --- Gatilho ------------------------------------------------------------------ */
+/* Pill com moldura desde o repouso: sobre a barra de vidro, um gatilho sem
+   borda lia como texto solto. A hairline dá a ele corpo de CONTROLE — e o hover
+   só escurece a moldura, sem inventar preenchimento novo. */
 .gatilho {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
   min-height: 40px;
-  padding: var(--via-space-1) var(--via-space-2);
-  background: none;
-  border: 1px solid transparent;
+  padding: var(--via-space-1) var(--via-space-2_5) var(--via-space-1) var(--via-space-1);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-pill);
+  box-shadow: var(--via-shadow-xs);
   color: var(--via-text-body);
   font-size: var(--via-fs-sm);
   /* Nunca 700 para dar destaque — a lei estética do projeto. */
@@ -25,7 +29,7 @@
 .gatilho:hover,
 .gatilho[aria-expanded='true'] {
   background: var(--via-bg-2);
-  border-color: var(--via-border-soft);
+  border-color: var(--via-navy-25);
 }
 
 .nomeGatilho {
