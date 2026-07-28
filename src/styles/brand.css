@@ -286,6 +286,25 @@
   --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-60);
   --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-accent);
 
+  /* ---- CAMPO DO TRILHO LATERAL ----------------------------------------------
+     A sidebar usava o `--via-mesh-navy`, cuja base desce até #040B1A — quase
+     preto. E preto não pertence à paleta da marca: o manual é explícito, e metade
+     da coluna estava lá.
+
+     Este campo é próprio dela: começa mais claro NO TOPO (a luz vem de cima, e é
+     onde os itens de navegação vivem) e assenta na navy institucional embaixo.
+     Medido: #16294D contra o gray-400 dos rótulos dá 5,59:1, e contra o branco do
+     item ativo 14,40 — os dois passam AA com folga, e a coluna deixa de ser um
+     buraco preto ao lado de um canvas claro.
+
+     O accent aparece a 10% no alto — a mesma dose do mesh da landing, onde ele
+     funciona como LUZ e não como preenchimento. É a única presença dele em área
+     grande que o manual da marca admite. */
+  --app-mesh-trilho:
+    radial-gradient(ellipse 95% 40% at 18% 0%, rgba(0, 162, 255, 0.1) 0%, transparent 62%),
+    radial-gradient(ellipse 75% 38% at 100% 10%, rgba(24, 48, 99, 0.5) 0%, transparent 64%),
+    linear-gradient(180deg, #16294d 0%, #0f1c39 42%, #0b162d 100%);
+
   /* ---- "AO VIVO" É UM SINAL SÓ ----------------------------------------------
      Medido na tela: o mesmo estado tinha TRÊS cores. O Pill do DS pintava coral
      (#B85C5C), o item da agenda pintava verde (--via-success) e a célula do

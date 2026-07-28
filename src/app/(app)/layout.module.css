@@ -50,10 +50,12 @@
        marca, que também recua para 12. Eram os dois únicos elementos da coluna e
        estavam desalinhados em 8px. */
     padding: var(--via-space-6) var(--via-space-3);
-    /* O TRILHO NAVY — o fundo vem das classes `via-mesh-navy via-noise` no JSX:
-       a mesma banda escura do hero da landing e do painel de /entrar. É a
-       assinatura da marca em pé, e o único contexto em que o azul institucional
-       da marca é plenamente legível (6,5:1). */
+    /* O TRILHO — campo PRÓPRIO (`--app-mesh-trilho`), não o mesh da landing.
+       Aquele desce até #040B1A, quase preto, e preto não pertence à paleta: a
+       coluna virava um buraco ao lado de um canvas claro. Este começa mais claro
+       no topo, onde os itens vivem, e assenta na navy institucional embaixo.
+       O grão continua vindo da classe `via-noise` no JSX. */
+    background: var(--app-mesh-trilho);
     /* Hairline CLARA na aresta: o fio navy de antes seria invisível sobre a
        própria navy. */
     border-right: 1px solid rgba(255, 255, 255, 0.08);

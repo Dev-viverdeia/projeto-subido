@@ -56,16 +56,21 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             A marca azul sobre a navy é o mesmo quadro de /entrar — o produto
             inteiro abre e fecha na mesma assinatura. O item de admin é UTILITÁRIO,
             não pilar: mora ancorado no pé do trilho, separado por hairline. */}
-        <aside className={`${styles.sidebar} via-mesh-navy via-noise`}>
+        <aside className={`${styles.sidebar} via-noise`}>
           <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
             <SubidoLogo size={18} />
           </Link>
 
-          <NavLateral itens={ITENS_NAV} variante="lateral" />
+          <NavLateral itens={ITENS_NAV} variante="lateral" rotuloGrupo="Plataforma" />
 
           {admin && (
             <div className={styles.rodapeSidebar}>
-              <NavLateral itens={[ITEM_ADMIN]} variante="lateral" />
+              <NavLateral
+                itens={[ITEM_ADMIN]}
+                variante="lateral"
+                grupo="admin"
+                rotuloGrupo="Gestão"
+              />
             </div>
           )}
         </aside>
