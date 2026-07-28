@@ -42,18 +42,18 @@
 }
 
 /* ── Ferramentas ───────────────────────────────────────────────────────────── */
-/* Mesma superfície do passo a passo — as duas colunas passam a ter corpo, em vez
-   de uma lista solta ao lado de um card de prompt. */
+/* Grade que ACOMPANHA a largura do painel: com o kit em 668px as ferramentas
+   caem em duas colunas; num trilho de 280 voltam a uma. Cada ferramenta é um
+   card fechado em vez de linha com divisor — divisor só funciona em coluna
+   única, e a mesma regra do catálogo vale aqui: largura a mais vira COLUNA, não
+   linha esticada. */
 .listaFerramentas {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-surface);
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--via-space-2_5);
 }
 
 .ferramenta {
@@ -61,10 +61,9 @@
   align-items: flex-start;
   gap: var(--via-space-3);
   padding: var(--via-space-3);
-}
-
-.ferramenta + .ferramenta {
-  border-top: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
 }
 
 .tile {
@@ -101,13 +100,18 @@
 }
 
 /* ── Prompts ───────────────────────────────────────────────────────────────── */
+/* Mesma lógica das ferramentas, com mínimo maior (prompt é bloco de texto e não
+   sobrevive a coluna estreita) e `auto-FIT` em vez de fill: com um prompt só, o
+   fill deixaria a trilha vazia ao lado e o card ocuparia meia largura; o fit
+   colapsa a trilha e ele preenche o painel. */
 .listaPrompts {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--via-space-3);
+  align-items: start;
 }
 
 .prompt {
