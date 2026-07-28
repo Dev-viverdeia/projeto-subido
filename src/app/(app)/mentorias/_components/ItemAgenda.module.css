@@ -1,22 +1,3 @@
-/* Barra de trilha à esquerda, a MESMA gramática da célula do calendário e do
-   item do painel: quem viu uma reconhece a outra sem aprender nada novo. Por
-   INTENSIDADE de navy, nunca cor nova. */
-.item[data-trilha='implementacao'] {
-  border-left: 2px solid var(--via-navy);
-}
-
-.item[data-trilha='trafego'] {
-  border-left: 2px solid var(--via-blue-soft);
-}
-
-.item[data-trilha='comercial'] {
-  border-left: 2px solid var(--via-navy-40);
-}
-
-.item[data-trilha='produto'] {
-  border-left: 2px solid var(--via-navy-25);
-}
-
 .item {
   display: flex;
   align-items: center;
@@ -44,13 +25,9 @@
     0 0 0 4px var(--via-navy-60);
 }
 
-/* Não usa o atalho `border-color`: ele tem a MESMA especificidade das regras de
-   trilha e vem depois, então apagava a barra justamente no item ao vivo — o que
-   mais precisa dela. Só as três bordas que não são a barra. */
 .item[data-ao-vivo] {
   background: var(--via-navy-03);
-  border-block-color: var(--via-navy-16);
-  border-inline-end-color: var(--via-navy-16);
+  border-color: var(--via-navy-16);
   box-shadow: var(--via-shadow-sm);
 }
 

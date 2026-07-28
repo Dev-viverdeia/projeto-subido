@@ -41,7 +41,6 @@ export function ItemAgenda({
     <article
       className={styles.item}
       data-ao-vivo={estado === 'ao-vivo' ? '' : undefined}
-      data-trilha={mentor?.trilha}
       role="button"
       tabIndex={0}
       onClick={aoAbrirDetalhe}
