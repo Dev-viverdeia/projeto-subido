@@ -1,41 +1,21 @@
+/* LARGURA CONTIDA, e é a regra falando, não timidez.
+   Esta tela é LEITURA (vídeo + passos + kit), não grade — pela regra do
+   CLAUDE.md ela não acompanha o `--app-canvas`. O histórico é a prova: em 1280
+   o vídeo tinha 488px de altura e a tela funcionava; quando o canvas subiu para
+   1600, a coluna principal foi a 1188 e o vídeo a 668px, empurrando o primeiro
+   passo para fora da dobra. 1280 põe a coluna em 868 e o vídeo em 488. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: var(--via-container);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--via-space-5);
 }
 
-/* ── Hero: argumento à esquerda, vídeo à direita ──────────────────────────────
-   A ÚNICA superfície escura da tela — a âncora que faltava. O vídeo entra aqui
-   em vez de abrir a coluna principal: a 1188px ele ficava com 668px de altura e
-   empurrava o primeiro passo para fora da dobra, numa tela cujo produto É o
-   passo a passo. Na coluna de ~600 do hero ele cai para ~340 e divide o palco
-   com o argumento — a mesma composição do hero da landing. */
-.hero {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
-  align-items: center;
-  gap: clamp(24px, 3vw, 48px);
-  padding: clamp(24px, 3vw, 40px);
-  border-radius: var(--via-radius-lg);
-  box-shadow: var(--via-glow-navy);
-}
-
-.sheen {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.14);
-}
-
-.heroTexto {
+.topo {
   display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-  min-width: 0;
+  align-items: center;
+  gap: var(--via-space-4);
 }
 
 .eyebrow {
@@ -44,62 +24,62 @@
   font-size: 0.688rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--via-accent);
+  color: var(--via-text-faint);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
 }
 
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-size: var(--via-fs-h2);
   font-weight: 560;
   letter-spacing: -0.02em;
   line-height: var(--via-lh-snug);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-wrap: balance;
-  /* A medida vive no ELEMENTO, não no container — é o que deixa o hero ser largo. */
-  max-width: 22ch;
+  max-width: 26ch;
 }
 
 .resumo {
   margin: 0;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  /* Sobre banda escura a escala inverte: gray-300 (12,2:1), nunca text-muted. */
-  color: var(--via-gray-300);
-  max-width: 54ch;
+  color: var(--via-text-muted);
+  max-width: 62ch;
 }
 
+/* A ficha em uma linha — o mesmo dado do rodapé do card no catálogo, para quem
+   chegou aqui saber o tamanho da empreitada antes de rolar. */
 .meta {
   margin: var(--via-space-1) 0 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: 0.06em;
-  color: var(--via-gray-400);
+  letter-spacing: 0.04em;
+  color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-.heroVideo {
-  min-width: 0;
-}
-
-/* ── Corpo: passo a passo + kit ───────────────────────────────────────────────
-   NÃO usa o canvas cheio, e é a regra falando: a linha de passo é conteúdo de
-   LEITURA (texto capado em 62ch), e a 1188px sobravam ~570px de vão à direita de
-   cada passo. 1200 deixa a coluna de passos em ~790 — medida de leitura com
-   folga para o título do passo respirar. Hero largo + corpo contido é composição
-   editorial: quem carrega a largura da tela é a banda escura. */
-.corpo {
+.grade {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(280px, 30%, 360px);
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 26vw, 360px);
   gap: var(--via-space-8);
   align-items: start;
-  max-width: 1200px;
 }
 
 .principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
   min-width: 0;
 }
 
+/* Sticky sob o cabeçalho do shell (68px + folga). A coluna rola junto quando é
+   mais alta que a viewport — `align-items: start` no pai é o que permite. */
 .lateral {
   position: sticky;
   top: calc(68px + var(--via-space-5));
@@ -109,22 +89,7 @@
 }
 
 @media (max-width: 1099px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Empilhado, o vídeo vem DEPOIS do argumento: quem abriu a ficha quer saber o
-     que é antes de decidir assistir. */
-  .heroVideo {
-    order: 2;
-  }
-
-  .titulo,
-  .resumo {
-    max-width: none;
-  }
-
-  .corpo {
+  .grade {
     grid-template-columns: minmax(0, 1fr);
   }
 

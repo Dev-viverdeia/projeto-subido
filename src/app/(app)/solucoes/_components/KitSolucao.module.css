@@ -42,19 +42,25 @@
 }
 
 /* ── Ferramentas ───────────────────────────────────────────────────────────── */
+/* Mesma superfície do passo a passo — as duas colunas passam a ter corpo, em vez
+   de uma lista solta ao lado de um card de prompt. */
 .listaFerramentas {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  overflow: hidden;
 }
 
 .ferramenta {
   display: flex;
   align-items: flex-start;
   gap: var(--via-space-3);
-  padding-block: var(--via-space-2_5);
+  padding: var(--via-space-3);
 }
 
 .ferramenta + .ferramenta {

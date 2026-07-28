@@ -32,17 +32,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* O passo a passo ganha SUPERFÍCIE — é o produto desta tela e estava flutuando
+   direto no fundo da página, enquanto o currículo do curso mora num card. O
+   contorno dá corpo à coluna e alinha as duas telas na mesma gramática. */
 .lista {
   list-style: none;
   margin: 0;
   padding: 0;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  overflow: hidden;
 }
 
 .passo {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-columns: 36px minmax(0, 1fr);
   gap: var(--via-space-4);
-  padding-block: var(--via-space-4);
+  padding: var(--via-space-4) var(--via-space-5);
+  transition: background-color var(--via-t-fast);
+}
+
+/* Realce ao passar o mouse: numa lista de execução, saber em que linha você está
+   vale mais que em uma lista de leitura. */
+.passo:hover {
+  background: var(--via-navy-03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passo {
+    transition: none;
+  }
 }
 
 .passo + .passo {
