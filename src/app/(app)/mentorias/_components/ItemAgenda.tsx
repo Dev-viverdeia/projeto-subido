@@ -1,6 +1,7 @@
 'use client';
 
 import { Avatar, Button } from '@/design-system/via';
+import { mentorPorId } from '@/content/mentorias';
 import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
 import { duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './ItemAgenda.module.css';
@@ -33,6 +34,7 @@ export function ItemAgenda({
   aoFazerCheckin: () => void;
   aoCancelarCheckin: () => void;
 }) {
+  const mentor = mentorPorId(sessao.mentorId);
   const lotada = estado === 'lotada';
 
   return (
@@ -59,9 +61,9 @@ export function ItemAgenda({
       <div className={styles.centro}>
         <p className={styles.titulo}>{sessao.titulo}</p>
         <div className={styles.mentor}>
-          <Avatar initials={sessao.mentor.nome.slice(0, 2)} size="xs" />
-          <span className={styles.mentorNome}>{sessao.mentor.nome}</span>
-          <span className={styles.mentorHeadline}>· {sessao.mentor.headline}</span>
+          <Avatar initials={mentor?.iniciais ?? '—'} size="xs" />
+          <span className={styles.mentorNome}>{mentor?.nome}</span>
+          <span className={styles.mentorHeadline}>· {mentor?.headline}</span>
         </div>
       </div>
 

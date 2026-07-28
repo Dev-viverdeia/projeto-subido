@@ -1,6 +1,7 @@
 'use client';
 
 import { Avatar, Button, Pill } from '@/design-system/via';
+import { mentorPorId } from '@/content/mentorias';
 import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
 import { comecaEm, duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './CartaoProxima.module.css';
@@ -24,6 +25,7 @@ export function CartaoProxima({
   aoFazerCheckin: () => void;
 }) {
   const aoVivo = estado === 'ao-vivo';
+  const mentor = mentorPorId(sessao.mentorId);
   const dia = rotuloDoDia(sessao.inicioIso, agora);
   const contagem = comecaEm(sessao, agora);
 
@@ -50,10 +52,10 @@ export function CartaoProxima({
         <h2 className={styles.titulo}>{sessao.titulo}</h2>
 
         <div className={styles.mentor}>
-          <Avatar initials={sessao.mentor.nome.slice(0, 2)} size="sm" />
+          <Avatar initials={mentor?.iniciais ?? '—'} size="sm" />
           <div className={styles.mentorTextos}>
-            <p className={styles.mentorNome}>{sessao.mentor.nome}</p>
-            <p className={styles.mentorHeadline}>{sessao.mentor.headline}</p>
+            <p className={styles.mentorNome}>{mentor?.nome}</p>
+            <p className={styles.mentorHeadline}>{mentor?.headline}</p>
           </div>
         </div>
 

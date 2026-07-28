@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { mentorPorId } from '@/content/mentorias';
 import { Button, Modal } from '@/design-system/via';
 import type { MentoriaExemplo } from '@/content/mentorias/types';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
@@ -176,7 +177,7 @@ export function AgendaMentorias({
             </p>
             <p className={styles.detalheTexto}>{detalhe.descricao}</p>
             <p className={styles.detalheMentor}>
-              Com {detalhe.mentor.nome} — {detalhe.mentor.headline}
+              Com {mentorPorId(detalhe.mentorId)?.nome} — {mentorPorId(detalhe.mentorId)?.headline}
             </p>
             {estadoComInscricao(detalhe) === 'checkin-aberto' && (
               <Button
