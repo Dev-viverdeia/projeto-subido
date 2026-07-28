@@ -1,8 +1,7 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  border-radius: var(--via-radius-lg);
-  overflow: hidden;
+  border-radius: var(--via-radius-xl);
   background: var(--via-surface);
   border: 1px solid var(--via-border-hairline);
   box-shadow: var(--via-shadow-sm);
@@ -14,7 +13,7 @@
 }
 
 .cartao:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--via-shadow-lg);
 }
 
@@ -24,16 +23,23 @@
     0 0 0 4px var(--via-navy-60);
 }
 
-/* 16:10 — horizontal, e maior porque a grade caiu para 3 colunas: a 1600 a capa
-   passa de 241 para 325px de altura. A referência usa retrato 3:4, mas lá TODA
-   formação tem arte própria com o nome do produto e o instrutor; aqui, enquanto
-   as capas não existem, um retrato de 490px é um retângulo vazio alto. Quando as
-   artes chegarem, trocar a proporção é uma linha. */
-.capa {
+/* A moldura é o acabamento: o pôster fica ENCAIXADO, com folga e raio próprios
+   (xl por fora, lg por dentro — o raio interno é sempre menor, senão os cantos
+   não ficam concêntricos). Sem esta folga o card vira um retângulo com foto
+   colada no topo, que é exatamente a diferença entre o nosso e o da referência. */
+.moldura {
+  padding: var(--via-space-2);
+}
+
+/* 3:4 — retrato, como a referência. A 1600 com 4 colunas o pôster fica 369×492:
+   a proporção que faz o card ler como pôster e não como banner. */
+.poster {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
+  border-radius: var(--via-radius-lg);
   background: var(--via-navy-deep);
+  isolation: isolate;
 }
 
 .imagem {
@@ -41,46 +47,71 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 480ms var(--via-ease);
+  transition: transform 620ms var(--via-ease);
 }
 
 .cartao:hover .imagem {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
-/* Capa sintética: repete a LINGUAGEM da referência (eyebrow "Formação" em mono
-   espaçado sobre a banda navy), nunca o TÍTULO — ele vive no corpo, e repetir
-   punha o mesmo texto duas vezes na mesma caixa. */
+/* Capa sintética: campo navy com luz e grão. Não desenha marca nem repete texto
+   — quem compõe o pôster é a legenda ancorada na base.
+
+   A POSIÇÃO DA LUZ VARIA POR FORMAÇÃO: as quatro `--luz/--eco` e o ângulo vêm
+   do slug, interpolados no TSX (`campoDoSlug`). O `--via-mesh-navy` do DS tem
+   foco fixo, e pôsteres com o mesmo foco leem como cópias do mesmo retângulo
+   escuro — a assinatura de grade gerada. Como os valores vêm do slug, a mesma
+   formação tem sempre o mesmo campo: varia entre cards, nunca entre visitas.
+   Só navy e azul da paleta; nenhuma cor nova entra por aqui.
+
+   Os valores abaixo são o piso, para o caso de o pôster renderizar sem os
+   custom properties inline. */
 .sintetica {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --luz-x: 16%;
+  --luz-y: 6%;
+  --eco-x: 92%;
+  --eco-y: 38%;
+  --base-ang: 150deg;
+  /* Alfa importa: em cor cheia a luz vira BLOB — um círculo azul recortado no
+     meio do campo. O DS acerta em ~55%/40%, que é onde o gradiente lê como
+     atmosfera. `color-mix` mantém a luz amarrada ao token: se a marca trocar o
+     azul, o pôster acompanha.
+
+     Sem @supports de propósito. Verificado na build: o Lightning CSS deixa o
+     `color-mix` passar intacto (não resolve, porque o argumento é `var()`) e não
+     gera fallback. Onde não houver suporte, a declaração inteira cai e sobra o
+     `background: var(--via-navy-deep)` do `.poster` — campo chapado, título
+     ainda legível. Degradação benigna, ao contrário do backdrop-filter, que sem
+     suporte vira texto sobre conteúdo. */
+  background:
+    radial-gradient(
+      ellipse 72% 62% at var(--luz-x) var(--luz-y),
+      color-mix(in srgb, var(--via-blue-soft) 52%, transparent),
+      transparent 66%
+    ),
+    radial-gradient(
+      ellipse 58% 54% at var(--eco-x) var(--eco-y),
+      color-mix(in srgb, var(--via-blue) 34%, transparent),
+      transparent 62%
+    ),
+    linear-gradient(var(--base-ang), var(--via-navy) 0%, var(--via-navy-deep) 100%);
 }
 
-.sinteticaEyebrow {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: 0.42em;
-  /* O letterspacing empurra o texto para a direita; o recuo recentra. */
-  text-indent: 0.42em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.32);
-}
-
-/* Sheen de topo — a assinatura de vidro, em dose de capa. */
-.veu {
+/* Garante branco legível sobre QUALQUER imagem que o admin subir. Sem opacidade
+   no elemento: a transparência mora nos stops, então o gradiente não vira um
+   grupo composto capaz de matar o backdrop-filter de um vizinho. */
+.scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, transparent 42%);
-  opacity: 0;
-  transition: opacity 320ms var(--via-ease);
+  background: linear-gradient(
+    180deg,
+    transparent 30%,
+    rgba(2, 22, 42, 0.55) 62%,
+    rgba(2, 22, 42, 0.94) 100%
+  );
   pointer-events: none;
-}
-
-.cartao:hover .veu {
-  opacity: 1;
 }
 
 .selo {
@@ -99,27 +130,46 @@
   box-shadow: var(--via-shadow-sm);
 }
 
-.corpo {
+/* Legenda do pôster: ancorada na base, dois tons SÓLIDOS. Sobre banda escura a
+   escala de cinza inverte — gray-400 dá 6,99:1; text-muted reprovaria AA. */
+.legenda {
+  position: absolute;
+  inset: auto 0 0 0;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-2);
-  padding: var(--via-space-5) var(--via-space-5) var(--via-space-4);
-  /* Empurra a tira de meta para a base quando `grid-auto-rows: 1fr` iguala os
-     cards — títulos de tamanhos diferentes não desalinham a tira entre cards. */
-  flex: 1;
+  gap: var(--via-space-1_5);
+  padding: var(--via-space-4);
+}
+
+.eyebrow {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--via-gray-400);
 }
 
 .titulo {
   margin: 0;
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-h4);
   font-weight: 560;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.014em;
   line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
+  color: var(--via-white);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-4) 0;
+  /* Empurra a tira de meta para a base quando `grid-auto-rows: 1fr` iguala os
+     cards — resumos de tamanhos diferentes não desalinham a tira entre cards. */
+  flex: 1;
 }
 
 .resumo {
@@ -133,14 +183,12 @@
   overflow: hidden;
 }
 
-/* Tira de meta com ícone + número, como na referência. */
 .tira {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--via-space-4);
   margin-top: auto;
-  padding-top: var(--via-space-2);
 }
 
 .item {
@@ -164,7 +212,7 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  padding: 0 var(--via-space-5) var(--via-space-4);
+  padding: var(--via-space-3) var(--via-space-4) var(--via-space-4);
 }
 
 .trilho {
@@ -201,10 +249,27 @@
   font-weight: var(--via-fw-medium);
 }
 
+/* Duas colunas no telefone (como a referência): pôster é conteúdo de varredura,
+   e uma coluna só faria UM card ocupar a tela inteira. Nessa largura o resumo
+   caberia em ~28 caracteres por linha — vira ruído, e o título já está no
+   pôster. Some o resumo, não a informação. */
+@media (max-width: 599px) {
+  .resumo {
+    display: none;
+  }
+
+  .titulo {
+    font-size: var(--via-fs-body);
+  }
+
+  .legenda {
+    padding: var(--via-space-3);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cartao,
   .imagem,
-  .veu,
   .preenchido {
     transition: none;
   }

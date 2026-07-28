@@ -1,10 +1,16 @@
-/* Espelha CatalogoFormacoes.module.css à risca — skeleton com contagem de
-   colunas ou proporção de capa diferente da grade real faz a tela pular no fim
-   do load. */
+/* Espelha CatalogoFormacoes.module.css e CartaoFormacao.module.css à risca —
+   skeleton com contagem de colunas, proporção de pôster ou moldura diferente da
+   grade real faz a tela pular no fim do load. */
 .grade {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--via-space-5);
+}
+
+@media (max-width: 1439px) {
+  .grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1023px) {
@@ -15,24 +21,28 @@
 
 @media (max-width: 599px) {
   .grade {
-    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-3);
   }
 }
 
 .poster {
   border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-lg);
-  overflow: hidden;
+  border-radius: var(--via-radius-xl);
   background: var(--via-surface);
 }
 
+/* A moldura de 8px é parte da anatomia do card real: sem ela o skeleton mede
+   menos que o card e a grade encolhe no fim do load. */
 .capa {
-  aspect-ratio: 16 / 10;
+  margin: var(--via-space-2);
+  aspect-ratio: 3 / 4;
+  border-radius: var(--via-radius-lg);
+  overflow: hidden;
 }
 
 .corpo {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
-  padding: var(--via-space-4);
+  padding: var(--via-space-2) var(--via-space-4) var(--via-space-4);
 }

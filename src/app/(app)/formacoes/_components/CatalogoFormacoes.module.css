@@ -58,22 +58,22 @@
   border-bottom-color: var(--via-navy);
 }
 
-/* Pôsteres pedem mais colunas que cards de texto: 4 → 3 → 2 → 1. O piso
-   atmosférico atrás da grade é a assinatura em dose homeopática. */
 /* Sem o "piso atmosférico" que existia atrás da grade: ele fazia sentido com o
    catálogo cheio, mas com duas formações a caixa colorida se estendia por toda a
    largura e lia como container VAZIO — o defeito ficava maior que o efeito.
    Card com contorno próprio já se sustenta no fundo da página.
 
-   Colunas: TRÊS, teto. Cards maiores é o pedido, e a 1600 três colunas dão 520px
-   de largura com capa de 325 de altura — a presença que a referência tem. Uma
-   quarta coluna devolveria o card a 385 e o efeito se perderia. */
+   PÔSTER 3:4 ENGORDA EM DUAS DIMENSÕES, então ganha coluna antes de tudo — é a
+   regra da casa e é o que a referência faz (4 colunas em xl, 5 em 2xl). A 1600
+   com 4 colunas o card fica 385 de largura e ~630 de altura: retrato de verdade.
+   Com 3 colunas o pôster iria a 504 de largura e 672 de altura, e a fileira
+   sozinha passaria da viewport — catálogo em que não cabe uma segunda fileira é
+   um catálogo pior. */
 .grade {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--via-space-5);
-  /* Altura idêntica: a barra de progresso só existe em quem já começou, então um
-     card com barra e outro sem produziriam fileiras desiguais. */
+  /* Altura idêntica: resumos de 1 ou 2 linhas produziriam fileiras desiguais. */
   grid-auto-rows: 1fr;
 }
 
@@ -87,15 +87,23 @@
   min-width: 0;
 }
 
+@media (max-width: 1439px) {
+  .grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1023px) {
   .grade {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+/* Continua em DUAS colunas no telefone, como a referência: pôster é conteúdo de
+   varredura, e uma coluna só faria um card ocupar a tela inteira. */
 @media (max-width: 599px) {
   .grade {
-    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-3);
   }
 
   .regua {
