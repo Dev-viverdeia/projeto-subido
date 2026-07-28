@@ -24,9 +24,11 @@
     0 0 0 4px var(--via-navy-60);
 }
 
-/* 16:10 e não 3:4. O retrato pedia 400px de altura por card e, num catálogo que
-   começa com duas formações, virava um retângulo alto e vazio. A paisagem
-   também é o formato em que uma capa de curso costuma ser produzida. */
+/* 16:10 — horizontal, e maior porque a grade caiu para 3 colunas: a 1600 a capa
+   passa de 241 para 325px de altura. A referência usa retrato 3:4, mas lá TODA
+   formação tem arte própria com o nome do produto e o instrutor; aqui, enquanto
+   as capas não existem, um retrato de 490px é um retângulo vazio alto. Quando as
+   artes chegarem, trocar a proporção é uma linha. */
 .capa {
   position: relative;
   aspect-ratio: 16 / 10;
@@ -46,15 +48,25 @@
   transform: scale(1.05);
 }
 
-/* Capa sintética: marca gráfica, NUNCA o título — ele já vive no corpo do card,
-   e repetir era o mesmo texto duas vezes na mesma caixa. */
+/* Capa sintética: repete a LINGUAGEM da referência (eyebrow "Formação" em mono
+   espaçado sobre a banda navy), nunca o TÍTULO — ele vive no corpo, e repetir
+   punha o mesmo texto duas vezes na mesma caixa. */
 .sintetica {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.22);
+}
+
+.sinteticaEyebrow {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: 0.42em;
+  /* O letterspacing empurra o texto para a direita; o recuo recentra. */
+  text-indent: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.32);
 }
 
 /* Sheen de topo — a assinatura de vidro, em dose de capa. */
@@ -71,16 +83,14 @@
   opacity: 1;
 }
 
-/* Selo de concluída na capa: sai do rodapé, onde disputava espaço com a
-   contagem, e vira reconhecimento visível de longe. */
 .selo {
   position: absolute;
-  top: var(--via-space-2_5);
-  right: var(--via-space-2_5);
+  top: var(--via-space-3);
+  right: var(--via-space-3);
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding-inline: var(--via-space-2_5);
+  height: 24px;
+  padding-inline: var(--via-space-3);
   border-radius: var(--via-radius-pill);
   background: var(--via-white);
   color: var(--via-navy);
@@ -93,18 +103,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
-  padding: var(--via-space-4);
-  /* Empurra rodapé e barra para a base quando os cards são igualados por
-     `grid-auto-rows: 1fr` — títulos de tamanhos diferentes não desalinham a
-     contagem de um card para o outro. */
+  padding: var(--via-space-5) var(--via-space-5) var(--via-space-4);
+  /* Empurra a tira de meta para a base quando `grid-auto-rows: 1fr` iguala os
+     cards — títulos de tamanhos diferentes não desalinham a tira entre cards. */
   flex: 1;
 }
 
 .titulo {
   margin: 0;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   font-weight: 560;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
   display: -webkit-box;
@@ -113,8 +122,6 @@
   overflow: hidden;
 }
 
-/* O resumo dá substância ao card: antes era capa + título + contagem, e a caixa
-   ficava com mais área de imagem do que de informação. */
 .resumo {
   margin: 0;
   font-size: var(--via-fs-caption);
@@ -126,32 +133,42 @@
   overflow: hidden;
 }
 
-.rodape {
+/* Tira de meta com ícone + número, como na referência. */
+.tira {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--via-space-2);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-4);
   margin-top: auto;
-  padding-top: var(--via-space-1);
+  padding-top: var(--via-space-2);
 }
 
-.meta {
-  margin: 0;
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.item svg {
   color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
+  flex: none;
 }
 
-.pct {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-navy);
-  font-variant-numeric: tabular-nums;
+/* Fecha o card encostado na base — trilho de largura total, percentual à direita. */
+.progresso {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: 0 var(--via-space-5) var(--via-space-4);
 }
 
 .trilho {
+  flex: 1;
   height: 3px;
   border-radius: var(--via-radius-xs);
   background: var(--via-navy-10);
@@ -165,6 +182,23 @@
   background: var(--via-navy);
   transform-origin: left;
   transition: transform 480ms var(--via-ease);
+}
+
+.pct {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  /* 0% fica na tinta mais quieta; quem já começou ganha a navy sólida. Assim o
+     trilho existe sempre (o card não muda de altura ao começar) sem que o zero
+     grite tanto quanto um progresso real. */
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  min-width: 4ch;
+  text-align: right;
+}
+
+.pct[data-comecou] {
+  color: var(--via-navy);
+  font-weight: var(--via-fw-medium);
 }
 
 @media (prefers-reduced-motion: reduce) {

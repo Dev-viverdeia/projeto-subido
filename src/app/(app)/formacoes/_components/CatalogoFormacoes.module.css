@@ -65,8 +65,9 @@
    largura e lia como container VAZIO — o defeito ficava maior que o efeito.
    Card com contorno próprio já se sustenta no fundo da página.
 
-   Colunas: a capa virou 16:10, então cada card quer MAIS largura que o pôster
-   3:4 de antes — 3 colunas por padrão e 4 quando sobra espaço, em vez de 4 e 5. */
+   Colunas: TRÊS, teto. Cards maiores é o pedido, e a 1600 três colunas dão 520px
+   de largura com capa de 325 de altura — a presença que a referência tem. Uma
+   quarta coluna devolveria o card a 385 e o efeito se perderia. */
 .grade {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -74,12 +75,6 @@
   /* Altura idêntica: a barra de progresso só existe em quem já começou, então um
      card com barra e outro sem produziriam fileiras desiguais. */
   grid-auto-rows: 1fr;
-}
-
-@media (min-width: 1600px) {
-  .grade {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
 
 /* Filho direto = wrapper de motion (sem classe). Ver a nota em CatalogoSolucoes. */

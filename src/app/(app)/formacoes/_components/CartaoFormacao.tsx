@@ -6,24 +6,46 @@ import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoFormacao.module.css';
 
 /**
- * Card de formação — capa 16:10 + corpo, deliberadamente diferente do card de
- * solução (que é só texto): dois pilares, duas fisionomias.
+ * Card de formação, na linguagem da plataforma de referência: capa grande,
+ * TIRA DE META com ícones logo abaixo e a barra de progresso fechando o card
+ * com o percentual à direita.
  *
- * A CAPA SINTÉTICA NÃO REPETE O TÍTULO. Ela mostrava o título e o corpo mostrava
- * de novo, logo abaixo — o mesmo texto duas vezes no mesmo card. Sem `capa_url`
- * entra uma marca gráfica (três barras = os módulos empilhados) sobre a banda
- * navy: uma capa que parece decidida, não um placeholder, e o título vive num
- * lugar só — o que também vale quando a capa REAL não trouxer texto.
+ * A capa fica HORIZONTAL (16:10) e não no retrato 3:4 da referência: lá toda
+ * formação tem arte própria com o nome do produto e o instrutor, e o retrato
+ * carrega essa arte. Aqui as capas ainda não existem — um retrato de 490px sem
+ * arte é um retângulo vazio alto. Quando as artes chegarem, trocar a proporção é
+ * uma linha.
  *
- * A barra de progresso só EXISTE quando há progresso (regra: nunca inventar
- * dado; 0% para quem nunca abriu é ruído, não informação).
+ * A capa sintética não repete o TÍTULO (ele vive no corpo): repete a LINGUAGEM
+ * da referência — o eyebrow "Formação" em mono espaçado sobre a banda navy.
+ *
+ * Ícones em SVG inline: este componente é client (usa progresso local), e
+ * importar lucide aqui arrastaria a biblioteca para o bundle do browser.
  */
-function MarcaDaCapa() {
+function IconeModulos() {
   return (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
-      <rect x="8" y="12" width="36" height="7" rx="3.5" fill="currentColor" />
-      <rect x="8" y="23" width="28" height="7" rx="3.5" fill="currentColor" />
-      <rect x="8" y="34" width="18" height="7" rx="3.5" fill="currentColor" />
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path
+        d="M7 1.5 12.5 4 7 6.5 1.5 4 7 1.5Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M1.5 7 7 9.5 12.5 7M1.5 10 7 12.5 12.5 10"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconeAulas() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
+      <path d="m5.8 4.7 3.4 2.3-3.4 2.3z" fill="currentColor" />
     </svg>
   );
 }
@@ -42,7 +64,7 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
           <img src={formacao.capa_url} alt="" className={styles.imagem} loading="lazy" />
         ) : (
           <div className={`${styles.sintetica} via-mesh-navy via-noise`}>
-            <MarcaDaCapa />
+            <span className={styles.sinteticaEyebrow}>Formação</span>
           </div>
         )}
         <span className={styles.veu} aria-hidden="true" />
@@ -53,22 +75,32 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
         <h3 className={styles.titulo}>{formacao.titulo}</h3>
         {formacao.resumo && <p className={styles.resumo}>{formacao.resumo}</p>}
 
-        <div className={styles.rodape}>
-          <p className={styles.meta}>
-            {formacao.modulos} {formacao.modulos === 1 ? 'módulo' : 'módulos'} · {formacao.aulas}{' '}
-            {formacao.aulas === 1 ? 'aula' : 'aulas'}
-          </p>
-          {feitas > 0 && !concluida && <span className={styles.pct}>{pct}%</span>}
+        {/* Tira de meta: ícone + número, como na referência. Mono e tabular para
+            os números não dançarem entre um card e outro. */}
+        <div className={styles.tira}>
+          <span className={styles.item}>
+            <IconeModulos />
+            {formacao.modulos} {formacao.modulos === 1 ? 'módulo' : 'módulos'}
+          </span>
+          <span className={styles.item}>
+            <IconeAulas />
+            {formacao.aulas} {formacao.aulas === 1 ? 'aula' : 'aulas'}
+          </span>
         </div>
+      </div>
 
-        {feitas > 0 && (
-          <div className={styles.trilho} aria-hidden="true">
-            <div
-              className={styles.preenchido}
-              style={{ transform: `scaleX(${Math.max(0.02, pct / 100)})` }}
-            />
-          </div>
-        )}
+      {/* Fecha o card, encostado na base: trilho de largura total com o
+          percentual à direita — o mesmo desenho da referência. */}
+      <div className={styles.progresso}>
+        <div className={styles.trilho} aria-hidden="true">
+          <div
+            className={styles.preenchido}
+            style={{ transform: `scaleX(${feitas > 0 ? Math.max(0.02, pct / 100) : 0})` }}
+          />
+        </div>
+        <span className={styles.pct} data-comecou={feitas > 0 ? '' : undefined}>
+          {pct}%
+        </span>
       </div>
     </Link>
   );
