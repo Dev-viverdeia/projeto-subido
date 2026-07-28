@@ -27,7 +27,7 @@
 }
 
 .soft {
-  color: #8fa0b8;
+  color: var(--via-gray-onnavy);
 }
 
 .actions {

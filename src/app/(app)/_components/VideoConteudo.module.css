@@ -51,7 +51,7 @@
   color: var(--via-navy-deep);
   padding-left: 4px;
   box-shadow: var(--via-shadow-lg);
-  transition: transform 240ms var(--via-ease);
+  transition: transform var(--app-t-touch);
 }
 
 .capa:hover .orbe {
@@ -86,7 +86,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
 

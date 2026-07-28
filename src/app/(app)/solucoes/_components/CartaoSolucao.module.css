@@ -11,8 +11,8 @@
   color: inherit;
   text-decoration: none;
   transition:
-    transform 260ms var(--via-ease),
-    box-shadow 260ms var(--via-ease);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -42,7 +42,7 @@
   background: var(--via-navy-08);
   color: var(--via-navy);
   margin-bottom: var(--via-space-3);
-  transition: transform 320ms var(--via-ease);
+  transition: transform var(--app-t-touch);
 }
 
 .cartao:hover .glifo {
@@ -53,7 +53,7 @@
   margin: 0 0 var(--via-space-1);
   font-family: var(--via-font-mono);
   font-size: 0.656rem;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -62,7 +62,7 @@
   margin: 0 0 var(--via-space-1_5);
   font-size: var(--via-fs-body);
   font-weight: 560;
-  letter-spacing: -0.012em;
+  letter-spacing: var(--app-ls-body);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
   display: -webkit-box;
@@ -130,8 +130,8 @@
   opacity: 0;
   transform: translateX(-6px);
   transition:
-    opacity 240ms var(--via-ease),
-    transform 240ms var(--via-ease);
+    opacity var(--app-t-touch),
+    transform var(--app-t-touch);
 }
 
 .cartao:hover .abrir,

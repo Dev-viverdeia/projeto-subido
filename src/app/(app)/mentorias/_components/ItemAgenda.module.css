@@ -10,8 +10,8 @@
   box-shadow: var(--via-shadow-xs);
   cursor: pointer;
   transition:
-    transform 200ms var(--via-ease),
-    box-shadow 200ms var(--via-ease);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
 }
 
 .item:hover {
@@ -72,7 +72,7 @@
   margin: 0;
   font-size: var(--via-fs-sm);
   font-weight: 560;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--app-ls-sm);
   color: var(--via-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -120,7 +120,7 @@
   gap: var(--via-space-1_5);
   font-family: var(--via-font-mono);
   font-size: 0.656rem;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-success);
 }

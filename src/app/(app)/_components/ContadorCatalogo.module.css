@@ -21,7 +21,7 @@
 .rotulo {
   font-family: var(--via-font-mono);
   font-size: 0.656rem;
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
   white-space: nowrap;

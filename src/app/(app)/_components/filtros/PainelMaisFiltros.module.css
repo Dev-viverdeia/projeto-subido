@@ -92,7 +92,7 @@
   font-family: var(--via-font-mono);
   font-size: 0.656rem;
   font-weight: var(--via-fw-medium);
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -134,7 +134,7 @@
   color: var(--via-text-body);
   text-align: left;
   cursor: pointer;
-  transition: background-color 140ms var(--via-ease);
+  transition: background-color var(--app-t-state);
 }
 
 .opcao:hover {
@@ -158,8 +158,8 @@
   background: var(--via-surface);
   color: var(--via-white);
   transition:
-    background-color 140ms var(--via-ease),
-    border-color 140ms var(--via-ease);
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
 }
 
 .opcao[data-marcada] .caixa {

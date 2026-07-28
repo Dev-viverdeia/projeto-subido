@@ -12,8 +12,8 @@
   color: inherit;
   text-decoration: none;
   transition:
-    transform 240ms var(--via-ease),
-    box-shadow 240ms var(--via-ease);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -38,7 +38,7 @@
 .rotulo {
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }

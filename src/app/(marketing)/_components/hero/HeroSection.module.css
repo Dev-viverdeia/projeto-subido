@@ -99,7 +99,7 @@
   font-family: var(--via-font-mono);
   font-size: 0.8125rem;
   font-weight: 400;
-  letter-spacing: -0.022em;
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-gray-300);
   text-decoration: none;
   transition:
@@ -174,7 +174,7 @@
 
 /* Hierarquia por tom SÓLIDO. Não é opacidade — opacidade suja o preto do fundo. */
 .soft {
-  color: #8fa0b8;
+  color: var(--via-gray-onnavy);
 }
 
 /* --- Grade principal -----------------------------------------------------------
@@ -307,7 +307,7 @@
   border-radius: var(--via-radius-pill);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--app-ls-sm);
   text-decoration: none;
   border: 1px solid transparent;
   transition:
@@ -349,7 +349,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-xs);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--app-ls-xs);
   color: var(--via-gray-400);
   display: flex;
   flex-wrap: wrap;

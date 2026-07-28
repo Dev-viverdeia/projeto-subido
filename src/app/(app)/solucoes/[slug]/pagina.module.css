@@ -21,7 +21,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.688rem;
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -37,7 +37,7 @@
   font-family: var(--via-font-display);
   font-size: var(--via-fs-h2);
   font-weight: 560;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
   text-wrap: balance;
@@ -58,7 +58,7 @@
   margin: var(--via-space-1) 0 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--app-ls-eyebrow);
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }

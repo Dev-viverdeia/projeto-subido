@@ -28,8 +28,8 @@
   color: inherit;
   text-decoration: none;
   transition:
-    transform 240ms var(--via-ease),
-    box-shadow 240ms var(--via-ease);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -57,7 +57,7 @@
   gap: var(--via-space-2);
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -105,7 +105,7 @@
   margin: 0;
   font-size: var(--via-fs-h4);
   font-weight: 560;
-  letter-spacing: -0.015em;
+  letter-spacing: var(--app-ls-h4);
   color: var(--via-text-primary);
 }
 

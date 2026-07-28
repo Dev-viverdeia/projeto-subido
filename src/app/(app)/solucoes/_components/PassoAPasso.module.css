@@ -12,7 +12,7 @@
   font-family: var(--via-font-mono);
   font-size: 0.688rem;
   font-weight: var(--via-fw-medium);
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -88,7 +88,7 @@
   margin: 0;
   font-size: var(--via-fs-body);
   font-weight: 560;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--app-ls-body);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
 }

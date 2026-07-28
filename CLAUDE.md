@@ -112,6 +112,71 @@ se inverte: `--via-text-soft` (#636D80) sobre `#0B162D` dá **3,45:1** e reprova
   **2,52:1** sobre branco e pinta justamente índices, notas de fonte e preços — texto pequeno.
   Não volte ao valor do DS.
 
+### A identidade: as quatro famílias além da cor
+
+Por muito tempo esta camada foi **cromática e só** — 32 dos 245 tokens do DS, todos de cor e
+sombra, zero de tipografia, forma, densidade ou movimento. Era por isso que o produto lia como o
+design system de origem com outra paleta: **a identidade mora exatamente nas famílias que a marca
+não tocava.**
+
+E o diagnóstico não foi de gosto, foi contagem. O DS oferece 4 durações de transição e 6 valores
+de tracking; os módulos do app usavam **9 durações e 5 trackings inventados** — sete componentes
+faziam o **mesmo hover de card** com sete durações diferentes (260/240/200/240/260/240/240).
+**Valor que varia sem motivo é o que lê como "não preparado"**, antes de qualquer ornamento.
+
+`npm run check:identidade` reprova quem não obedecer. Escape legítimo: `/* token-ok: motivo */`
+em qualquer lugar da regra — a casa não proíbe desviar, proíbe desviar **sem o porquê escrito**.
+
+**1 · Movimento — a duração é função do TAMANHO DO QUE MUDA.**
+
+| Token            |       | Para                                          |
+| ---------------- | ----- | --------------------------------------------- |
+| `--app-t-state`  | 120ms | cor, opacidade, borda — nada se desloca       |
+| `--app-t-touch`  | 180ms | hover e press — deslocamento de 2–8px         |
+| `--app-t-reveal` | 320ms | entrada, layout, accordion — o elemento chega |
+| `--app-t-scene`  | 480ms | overlay, drawer, percurso longo               |
+
+A regra que faz disso linguagem: **estado e entrada nunca compartilham duração.** Quando um hover
+e uma revelação levam o mesmo tempo, a interface lê chapada — tudo responde igual, nada tem peso
+diferente. Os pares já carregam o easing (`snap` responde ao dedo, `out` desacelera e para).
+
+**E há TRÊS categorias de movimento; só uma é sistemática.** `transition` é interação — é o
+vocabulário de resposta que a pessoa aprende, e tem que ser o mesmo em toda parte. `animation`
+é ambiente (o pulso de "ao vivo") ou coreografia (a cascata da landing): **autoral**, governado
+pela regra oposta — cada ato recebe uma micro-interação diferente, ou nenhuma. Por isso o gate
+cobre `transition` e não toca em `animation`.
+
+**2 · Tipografia — o tracking é função do TAMANHO, não escolha por componente.**
+`--app-ls-hero` (−0.034em) … `--app-ls-micro` (+0.012em), um por degrau da escala. Corpo grande
+precisa de negativo, corpo pequeno de positivo; `--app-ls-caption` (13px) é onde a curva vira.
+
+- **Mono caixa-alta tem dois valores, e a diferença é de PAPEL:** `--app-ls-eyebrow` (0.14em)
+  dentro de card, `--via-ls-label` (0.18em) para rótulo de seção isolado. A 0.18em dentro de um
+  card o rótulo já lê como pill decorativa, que a seção de Voz bane.
+- **Caixa-alta por CONTEÚDO conta como caixa-alta.** `HOJE · 19:00 · 90 MIN · 12/30 VAGAS` não
+  tem `text-transform` e mesmo assim precisa do tracking de eyebrow: a necessidade vem da forma
+  das letras, não da propriedade CSS. Uma auditoria que só procura `uppercase` erra esse caso.
+- `src/styles/type.css` fica **fora** do gate: é a camada que DEFINE a tipografia fluida da
+  landing, onde `clamp()` não mapeia para degrau fixo. Policia-se o consumo, não a definição —
+  e é por isso que as quebras autorais do hero sobreviveram à migração.
+
+**3 · Forma — raio por PAPEL:** `--app-radius-surface` (28, superfície que contém outra) ·
+`-card` (20) · `-control` (12) · `-chip` (8) · `-track` (4). `pill` só para o que é pílula por
+natureza.
+
+E a regra que mais separa acabamento de descuido, porque quase ninguém a enuncia:
+**raio aninhado = raio externo − padding.** Cantos concêntricos. Um pôster de raio 20 dentro de
+um card de raio 28 com 8px de folga está certo (28−8=20); o mesmo pôster com raio 28 está errado,
+e o olho percebe antes de a pessoa saber dizer o quê.
+
+**4 · Densidade:** `--app-pad-card` (20) · `-tight` (16) · `--app-gap-stack` (12) · `-block` (24)
+· `-grid` (20) · `-section` (40) · `--app-h-control` (38px). Espaço escolhido livremente dentro
+de uma escala de 14 degraus não é escala, são 14 opções.
+
+**5 · Elevação é um TRIPLO.** O que separa "premium" de "ok" não é a sombra: é a sombra, a
+hairline e a superfície **andarem juntas**. `--app-elev-{1,2,3}-{bg,line,shadow}` — repouso,
+erguido, sobreposto. Usar a sombra de um nível com a hairline de outro é o desvio.
+
 ### Como compor uma seção
 
 Esta é a parte construtiva: o que fazer, não só o que evitar.
@@ -277,7 +342,8 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
 - **Banidos visuais**: dourado/âmbar/amarelo, roxo "IA", magenta, neon, gradiente quente "premium",
   `Sparkles`, emoji decorativo, caps-lock com letterspacing alto em pills, dot decorativo antes de
   texto, verde/vermelho de semáforo. Cyan segue banido como _decoração_.
-- **Cores só por token.** Hex literal é erro de lint.
+- **Cores só por token.** Hex literal reprova em `check:identidade` (não é regra de
+  eslint — era o que o texto dizia antes de o gate existir).
 - **Nunca Lexend**, **nunca headline caixa-alta condensada** — a tipografia é Geist, sempre.
 - A assinatura é **glass + atmosférico + sombra navy** — **não glow**.
 - **Ênfase é `<em>` itálico. Nunca `font-weight: 700`.** Exceção única: o `<h1>` do hero, elemento
@@ -341,10 +407,10 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
 
 ## Gates
 
-| Momento          | O que roda                                                                                                                                             |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| pre-commit (~2s) | `lint-staged` (não-bloqueante) + `check-single-lockfile` (bloqueante)                                                                                  |
-| PR               | lockfile · **ds-drift** · `tsc --noEmit` · `eslint .` · `prettier --check` · testes · build · Playwright · Lighthouse budget · grep de ref do Supabase |
+| Momento          | O que roda                                                                                                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pre-commit (~2s) | `lint-staged` (não-bloqueante) + `check-single-lockfile` (bloqueante)                                                                                                   |
+| PR               | lockfile · **ds-drift** · **identidade** · `tsc --noEmit` · `eslint .` · `prettier --check` · testes · build · Playwright · Lighthouse budget · grep de ref do Supabase |
 
 Nenhuma regra de lint é `warn`. Se não é aplicado no CI, é sugestão — e sugestão não sobrevive.
 

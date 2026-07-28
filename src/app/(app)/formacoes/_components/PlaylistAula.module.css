@@ -35,7 +35,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -97,7 +97,7 @@
 .chevron {
   flex: none;
   color: var(--via-text-muted);
-  transition: transform 280ms var(--via-ease);
+  transition: transform var(--app-t-reveal);
 }
 
 .chevron[data-aberto] {
@@ -107,7 +107,7 @@
 .dobra {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 320ms var(--via-ease);
+  transition: grid-template-rows var(--app-t-reveal);
 }
 
 .dobra[data-aberto] {

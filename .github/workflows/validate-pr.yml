@@ -45,6 +45,14 @@ jobs:
       - name: Integridade do design system
         run: node scripts/check-ds-drift.mjs
 
+      # A camada de marca só existe se for obrigatória. Medido antes deste gate: o
+      # DS oferecia 4 durações de transição e 6 trackings, e os módulos do app
+      # usavam 9 durações e 5 trackings inventados — sete componentes faziam o
+      # MESMO hover de card com sete durações diferentes. Valor que varia sem
+      # motivo é o que lê como "não preparado", e nenhum lint pegava.
+      - name: Identidade (tokens de movimento, tipografia e cor)
+        run: node scripts/check-design-tokens.mjs
+
       # Server Component importando FUNÇÃO de módulo `'use client'` quebra a rota em
       # runtime — e passa por tsc, eslint E build, porque rota dinâmica não é
       # pré-renderizada e a chamada só acontece quando alguém abre a página.

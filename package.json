@@ -26,7 +26,8 @@
     "check:ds-drift": "node scripts/check-ds-drift.mjs",
     "check:lockfile": "node scripts/check-single-lockfile.mjs",
     "check:fronteira": "node scripts/check-client-boundary.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:identidade": "node scripts/check-design-tokens.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs}": [

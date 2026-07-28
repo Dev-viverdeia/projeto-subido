@@ -63,7 +63,7 @@
   display: none;
   margin: 0;
   font-size: var(--via-fs-micro);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--app-ls-micro);
   /* Mesma regra do bloco acima: escala gray, não text. 6,99:1 sobre a navy. */
   color: var(--via-gray-400);
 }

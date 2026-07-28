@@ -31,7 +31,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.688rem;
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-accent);
 }
@@ -41,7 +41,7 @@
   font-family: var(--via-font-display);
   font-size: clamp(1.625rem, 3.4vw, 2.5rem);
   font-weight: 560;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-snug);
   color: var(--via-white);
   text-wrap: balance;
@@ -87,7 +87,7 @@
   height: 100%;
   background: var(--via-accent);
   transform-origin: left;
-  transition: transform 480ms var(--via-ease);
+  transition: transform var(--app-t-scene);
 }
 
 .pct {
@@ -120,7 +120,7 @@
   margin: 0;
   font-size: var(--via-fs-h4);
   font-weight: 560;
-  letter-spacing: -0.015em;
+  letter-spacing: var(--app-ls-h4);
   color: var(--via-text-primary);
 }
 
@@ -141,7 +141,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
@@ -168,7 +168,7 @@
   height: 100%;
   background: var(--via-navy);
   transform-origin: left;
-  transition: transform 480ms var(--via-ease);
+  transition: transform var(--app-t-scene);
 }
 
 .fio {

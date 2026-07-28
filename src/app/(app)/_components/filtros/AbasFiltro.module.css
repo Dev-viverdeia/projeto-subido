@@ -22,11 +22,11 @@
   font-family: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-regular);
-  letter-spacing: -0.011em;
+  letter-spacing: var(--app-ls-h4);
   color: var(--via-text-muted);
   white-space: nowrap;
   cursor: pointer;
-  transition: color 240ms var(--via-ease);
+  transition: color var(--app-t-state);
 }
 
 .aba:hover {

@@ -70,7 +70,7 @@
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--app-ls-eyebrow);
   color: var(--via-text-faint);
 }
 

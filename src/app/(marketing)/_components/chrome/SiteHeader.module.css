@@ -36,15 +36,15 @@
      A entrada sobe de fora da tela, então não há nada a esmaecer. */
   transform: translate3d(0, -130%, 0);
   transition:
-    transform 460ms var(--via-ease-out),
-    visibility 0s linear 460ms;
+    transform var(--app-t-scene),
+    visibility 0s linear var(--app-motion-scene);
 }
 
 .wrap[data-visible] {
   visibility: visible;
   transform: translate3d(0, 0, 0);
   transition:
-    transform 520ms var(--via-ease-out),
+    transform var(--app-t-scene),
     visibility 0s;
 }
 
@@ -177,7 +177,7 @@
   font-family: var(--via-font-mono);
   font-size: 0.8125rem;
   font-weight: 400;
-  letter-spacing: -0.022em;
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-text-muted);
   text-decoration: none;
   transition:
@@ -285,7 +285,7 @@
   color: var(--via-white);
   font-size: 0.8125rem;
   font-weight: var(--via-fw-semibold);
-  letter-spacing: -0.014em;
+  letter-spacing: var(--app-ls-caption);
   text-decoration: none;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -311,7 +311,7 @@
     transparent 70%
   );
   transform: translateX(-185%);
-  transition: transform 700ms var(--via-ease-out);
+  transition: transform var(--app-t-scene);
 }
 
 .cta:hover::after,

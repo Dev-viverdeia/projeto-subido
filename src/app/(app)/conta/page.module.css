@@ -6,7 +6,7 @@
   margin: 0 0 var(--via-space-5);
   font-size: var(--via-fs-label);
   font-weight: var(--via-fw-medium);
-  letter-spacing: 0.01em;
+  letter-spacing: var(--app-ls-label);
   color: var(--via-text-primary);
 }
 

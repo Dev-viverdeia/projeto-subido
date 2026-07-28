@@ -150,6 +150,132 @@
      Formulário e prosa NÃO usam este token — continuam em `--via-content` (760),
      porque ali a página INTEIRA é uma coluna de leitura. */
   --app-canvas: 1600px;
+
+  /* ============================================================================
+     IDENTIDADE SUBIDO — as quatro famílias que a camada de marca não tocava
+     ----------------------------------------------------------------------------
+     Até aqui esta camada era CROMÁTICA e só: 32 dos 245 tokens do DS, todos de cor
+     e sombra, zero de tipografia, forma, densidade ou movimento. Era por isso que
+     o produto lia como o design system de origem com outra paleta — a identidade
+     mora exatamente nas famílias que a marca nunca teve permissão de tocar.
+
+     O diagnóstico não foi de gosto, foi contagem. O DS oferece 4 durações e 6
+     valores de tracking; os módulos do app usavam 9 durações inventadas
+     (240/260/140/480/320/460/280/200/80ms) e 5 trackings soltos. VALOR QUE VARIA
+     SEM MOTIVO é o que lê como "não preparado" — antes de qualquer ornamento.
+
+     Então o que segue não é ornamento: é a disciplina que faz o acabamento
+     existir. `npm run check:identidade` reprova quem não obedecer.
+     ============================================================================ */
+
+  /* ---- MOVIMENTO ------------------------------------------------------------
+     A duração é função do TAMANHO DO QUE MUDA, não do gosto de cada componente:
+     deslocamento maior precisa de mais tempo para ser lido como movimento e não
+     como salto.
+
+     A regra que transforma isto em linguagem: ESTADO E ENTRADA NUNCA COMPARTILHAM
+     DURAÇÃO. Quando um hover e uma revelação levam o mesmo tempo, a interface
+     lê chapada — tudo responde igual, nada tem peso diferente. */
+  --app-motion-state: 120ms; /* cor, opacidade, borda · nada se desloca      */
+  --app-motion-touch: 180ms; /* hover e press · deslocamento de 2–4px         */
+  --app-motion-reveal: 320ms; /* entrada, layout, accordion · o elemento chega */
+  --app-motion-scene: 480ms; /* overlay, drawer · o contexto inteiro troca    */
+
+  /* Pares prontos, para o easing não ser reinventado junto com a duração.
+     `snap` responde ao dedo; `out` desacelera e para — é o que faz algo que
+     CHEGA parecer que chegou, em vez de parecer que foi empurrado. */
+  --app-t-state: var(--app-motion-state) var(--via-ease-snap);
+  --app-t-touch: var(--app-motion-touch) var(--via-ease-snap);
+  --app-t-reveal: var(--app-motion-reveal) var(--via-ease-out);
+  --app-t-scene: var(--app-motion-scene) var(--via-ease-out);
+
+  /* ---- TIPOGRAFIA · tracking ótico ------------------------------------------
+     O tracking é função do TAMANHO. Corpo grande precisa de negativo (as letras
+     parecem soltas quando crescem) e corpo pequeno precisa de positivo (elas se
+     apertam quando encolhem). Uma face bem desenhada como a Geist já compensa
+     parte disso, mas não toda — e a diferença entre "texto digitado" e "texto
+     composto" é justamente esta curva.
+
+     Um valor por degrau da escala do DS, para o tracking deixar de ser escolha
+     por componente. Antes: `0.13em` em 10 lugares, `-0.01em` em 6, mais
+     `-0.022em`, `0.12em`, `0.1em` — cinco decisões para o mesmo problema. */
+  --app-ls-hero: -0.034em; /* 80px */
+  --app-ls-display: -0.028em; /* 56px */
+  --app-ls-h1: -0.024em; /* 40px */
+  --app-ls-h2: -0.02em; /* 32px */
+  --app-ls-h3: -0.016em; /* 24px */
+  --app-ls-h4: -0.012em; /* 18px */
+  --app-ls-body: -0.006em; /* 16px */
+  --app-ls-sm: -0.002em; /* 14px */
+  --app-ls-caption: 0; /* 13px · o ponto de virada da curva */
+  --app-ls-xs: 0.004em; /* 12px */
+  --app-ls-label: 0.008em; /* 11px */
+  --app-ls-micro: 0.012em; /* 10px */
+
+  /* Mono caixa-alta (eyebrow, meta, rótulo de dado) é outro problema: a caixa
+     alta não tem ascendente nem descendente para criar ritmo, então precisa do
+     espaço lateral. UM valor, não cinco. O `--via-ls-label` do DS (0.18em) fica
+     para rótulo isolado; dentro de card, 0.18em já lê como pill decorativa —
+     que o CLAUDE.md bane. */
+  --app-ls-eyebrow: 0.14em;
+
+  /* ---- FORMA · raio por PAPEL, não por gosto ---------------------------------
+     O DS oferece 7 raios e nada dizia qual pertence a quê — daí `pill` aparecer
+     38 vezes e `md` 22, sem regra. Nomear pelo PAPEL faz a forma parar de ser
+     escolha estética a cada componente.
+
+     E a regra que mais separa acabamento de descuido, porque quase ninguém a
+     enuncia: RAIO ANINHADO = RAIO EXTERNO − PADDING. Cantos concêntricos. Um
+     pôster de raio 20 dentro de um card de raio 28 com 8px de folga está certo
+     (28−8=20); o mesmo pôster com raio 28 dentro do mesmo card está errado, e o
+     olho percebe antes de a pessoa saber dizer o quê. */
+  --app-radius-surface: var(--via-radius-xl); /* 28 · superfície que contém outra */
+  --app-radius-card: var(--via-radius-lg); /* 20 · card, painel, mídia          */
+  --app-radius-control: var(--via-radius-md); /* 12 · input, select, botão        */
+  --app-radius-chip: var(--via-radius-sm); /* 8  · chip inline, tile           */
+  --app-radius-track: var(--via-radius-xs); /* 4  · trilho, marcador            */
+
+  /* ---- DENSIDADE · o ritmo ---------------------------------------------------
+     Espaço escolhido livremente dentro de uma escala de 14 degraus não é escala,
+     é 14 opções. Estes são os degraus que a área logada usa; sair deles é o
+     desvio que precisa de motivo. */
+  --app-pad-card: var(--via-space-5); /* 20 · respiro interno padrão        */
+  --app-pad-card-tight: var(--via-space-4); /* 16 · card denso, item de lista     */
+  --app-gap-stack: var(--via-space-3); /* 12 · entre linhas de um bloco      */
+  --app-gap-block: var(--via-space-6); /* 24 · entre blocos de uma tela      */
+  --app-gap-grid: var(--via-space-5); /* 20 · entre cards de uma grade      */
+  --app-gap-section: var(--via-space-10); /* 40 · entre seções                  */
+  --app-h-control: 38px; /* altura única de busca/pill/botão   */
+
+  /* ---- ELEVAÇÃO · o triplo ---------------------------------------------------
+     O que mais separa "premium" de "ok" não é a sombra: é a sombra, a hairline e
+     a superfície ANDAREM JUNTAS. Sombra escolhida sozinha produz caixas que
+     flutuam sem material; as três juntas produzem um sistema em que a distância
+     do plano é legível.
+
+     Três níveis, e só. Cada nível é um conjunto — usar a sombra de um com a
+     hairline de outro é o desvio. */
+  --app-elev-1-bg: var(--via-surface); /* repouso · card na página       */
+  --app-elev-1-line: var(--via-border-hairline);
+  --app-elev-1-shadow: var(--via-shadow-sm);
+
+  --app-elev-2-bg: var(--via-surface); /* erguido · hover, card ativo    */
+  --app-elev-2-line: var(--via-border);
+  --app-elev-2-shadow: var(--via-shadow-lg);
+
+  --app-elev-3-bg: var(--via-surface-elev); /* sobreposto · popover, modal    */
+  --app-elev-3-line: var(--via-border);
+  --app-elev-3-shadow: var(--via-shadow-xl);
+
+  /* ---- Cinza sobre banda escura ---------------------------------------------
+     `#8fa0b8` aparecia literal em três seções da landing (hero, SectionHeader e
+     CTA final) porque não havia token para "cinza claro legível sobre navy".
+     Medido: 6,76:1 sobre --cst-navy e 7,39:1 sobre --cst-navy-deep. É uma cor de
+     trabalho, não um acidente, então vira token.
+
+     Sobre CLARO ele dá 2,61:1 e reprova — este token é de banda escura e só,
+     como manda a inversão da escala de cinza descrita no CLAUDE.md. */
+  --via-gray-onnavy: #8fa0b8;
 }
 
 /* ------------------------------------------------------------------------------

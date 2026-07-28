@@ -12,7 +12,7 @@
   font-family: var(--via-font-mono);
   font-size: 0.688rem;
   font-weight: var(--via-fw-medium);
-  letter-spacing: 0.13em;
+  letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }

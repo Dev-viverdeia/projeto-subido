@@ -46,7 +46,7 @@
   min-width: 0;
   font-size: var(--via-fs-sm);
   font-weight: 560;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--app-ls-sm);
   color: var(--via-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -66,7 +66,7 @@
 .chevron {
   flex: none;
   color: var(--via-text-muted);
-  transition: transform 280ms var(--via-ease);
+  transition: transform var(--app-t-reveal);
 }
 
 .chevron[data-aberto] {
@@ -78,7 +78,7 @@
 .dobra {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 320ms var(--via-ease);
+  transition: grid-template-rows var(--app-t-reveal);
 }
 
 .dobra[data-aberto] {

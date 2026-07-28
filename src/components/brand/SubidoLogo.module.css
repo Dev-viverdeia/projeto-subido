@@ -23,6 +23,8 @@
   font-family: var(--via-font);
   font-size: calc(var(--h) * 1.12);
   font-weight: var(--via-fw-bold);
+  /* token-ok: o tracking do logotipo é parte do desenho da marca,
+     não do sistema tipográfico do produto. */
   letter-spacing: -0.035em;
   line-height: 1;
 }
