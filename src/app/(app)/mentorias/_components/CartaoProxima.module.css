@@ -1,0 +1,129 @@
+.cartao {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--via-radius-lg);
+  border: 1px solid var(--via-navy-16);
+  padding: clamp(22px, 3.4vw, 32px);
+  box-shadow: var(--via-glow-navy);
+  transition:
+    transform 240ms var(--via-ease),
+    box-shadow 240ms var(--via-ease);
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--via-glow-navy-strong);
+}
+
+/* Ao vivo, a moldura acende — borda viva no tom do Pill live do DS. */
+.cartao[data-ao-vivo] {
+  border-color: rgba(31, 138, 91, 0.42);
+}
+
+.sheen {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  max-width: 68ch;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-accent);
+}
+
+.contagem {
+  color: var(--via-gray-400);
+  letter-spacing: 0.08em;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+  font-weight: 560;
+  letter-spacing: -0.018em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+.mentor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+}
+
+.mentorTextos {
+  display: flex;
+  flex-direction: column;
+}
+
+.mentorNome {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+}
+
+.mentorHeadline {
+  margin: 0;
+  font-size: var(--via-fs-micro);
+  color: var(--via-gray-400);
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0.06em;
+  color: var(--via-gray-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--via-space-1);
+}
+
+.confirmado {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding-inline: var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+.aviso {
+  margin: 0;
+  font-size: var(--via-fs-micro);
+  color: var(--via-gray-400);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao {
+    transition: none;
+  }
+}

@@ -1,0 +1,147 @@
+.pagina {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+}
+
+.linhaTopo {
+  display: flex;
+  align-items: stretch;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+}
+
+/* Teaser da mentoria — mesma família da retomada: pill de vidro, uma linha. */
+.mentoria {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  max-width: 420px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-glass-card);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--via-shadow-xs);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 240ms var(--via-ease),
+    box-shadow 240ms var(--via-ease);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .mentoria {
+    background: var(--via-surface);
+  }
+}
+
+.mentoria:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--via-shadow-md);
+}
+
+.mentoriaTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mentoriaRotulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.mentoriaTitulo {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mentoriaMeta {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mentoriaSeta {
+  flex: none;
+  color: var(--via-text-muted);
+  transition: transform var(--via-t-fast);
+}
+
+.mentoria:hover .mentoriaSeta {
+  transform: translateX(2px);
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.secaoTopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.secaoTitulo {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  color: var(--via-text-primary);
+}
+
+.verTodas {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  transition: color var(--via-t-fast);
+}
+
+.verTodas:hover {
+  color: var(--via-text-primary);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-5);
+}
+
+@media (max-width: 1279px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mentoria,
+  .mentoriaSeta {
+    transition: none;
+  }
+}

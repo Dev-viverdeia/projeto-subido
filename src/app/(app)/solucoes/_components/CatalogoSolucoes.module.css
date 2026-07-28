@@ -1,0 +1,118 @@
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+/* A régua de descoberta: abas à esquerda, busca + facetas à direita, sobre uma
+   hairline única. `fill-mode: forwards` da cascata cria stacking context — o
+   z-index garante que o painel de facetas abra SOBRE a grade. */
+.regua {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  padding-bottom: var(--via-space-1);
+}
+
+.reguaDireita {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex: none;
+}
+
+.linhaMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  /* Âncora do scroll da paginação: para sob o cabeçalho sticky, não atrás. */
+  scroll-margin-top: 84px;
+}
+
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.ordenacao {
+  display: flex;
+  gap: var(--via-space-3);
+}
+
+.ordenar {
+  border: none;
+  background: transparent;
+  padding: var(--via-space-1) 0;
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  /* Borda sempre presente (transparente no repouso) — trocar borda por nada
+     causaria 1px de layout shift a cada clique. */
+  border-bottom: 1px solid transparent;
+  transition:
+    color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.ordenar:hover {
+  color: var(--via-text-body);
+}
+
+.ordenar[data-ativo] {
+  color: var(--via-text-primary);
+  border-bottom-color: var(--via-navy);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-5);
+}
+
+@media (max-width: 1279px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .regua {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--via-space-2);
+    padding-bottom: var(--via-space-3);
+  }
+
+  .reguaDireita {
+    justify-content: space-between;
+  }
+}
+
+.rodapePaginas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+}
+
+.mostrando {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}

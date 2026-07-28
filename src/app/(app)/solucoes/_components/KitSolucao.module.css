@@ -1,0 +1,149 @@
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: var(--via-space-1);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  font-size: 0.625rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.vazio {
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px dashed var(--via-border);
+  border-radius: var(--via-radius-md);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-faint);
+}
+
+/* ── Ferramentas ───────────────────────────────────────────────────────────── */
+.listaFerramentas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ferramenta {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding-block: var(--via-space-2_5);
+}
+
+.ferramenta + .ferramenta {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: var(--via-radius-sm);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+}
+
+.ferramentaTextos {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ferramentaNome {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.ferramentaPara {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+/* ── Prompts ───────────────────────────────────────────────────────────────── */
+.listaPrompts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.prompt {
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  overflow: hidden;
+}
+
+.promptCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2_5) var(--via-space-3);
+}
+
+.promptNome {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O texto do prompt é DADO, não prosa: mono, fundo rebaixado, rolagem própria
+   depois de ~9 linhas para um prompt longo não engolir a coluna. */
+.promptTexto {
+  margin: 0;
+  padding: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-03);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  line-height: 1.6;
+  color: var(--via-text-body);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  max-height: 176px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}

@@ -1,42 +1,102 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Boxes } from 'lucide-react';
-import { Button, EmptyState } from '@/design-system/via';
+import { Pill } from '@/design-system/via';
+import { gerarAgendaExemplo } from '@/content/mentorias';
+import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
+import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
+import entrada from '../_components/entrada.module.css';
+import { RetomadaFormacao } from '../formacoes/_components/RetomadaFormacao';
+import { horaCurta, rotuloDoDia } from '../mentorias/_components/estadoMentoria';
+import { CartaoSolucao } from '../solucoes/_components/CartaoSolucao';
+import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Início' };
 
 /**
- * Painel de entrada.
- *
- * Hoje é só a moldura: sem tabela no banco, qualquer "continue de onde parou" seria
- * dado inventado — e dado inventado numa tela de produto vira captura de tela, e
- * captura de tela vira expectativa. O estado vazio diz a verdade e ainda assim
- * empurra para a próxima ação.
+ * O painel de entrada compõe os três pilares SEM inventar número: a retomada só
+ * aparece com progresso local real, as soluções são as últimas publicadas do
+ * banco, e a mentoria de demonstração carrega o próprio rótulo.
  */
-export default function InicioPage() {
-  return (
-    <>
-      <CabecalhoPagina
-        titulo="Início"
-        descricao="Seu progresso, as próximas mentorias e o que você deixou pela metade."
-      />
+export default async function InicioPage() {
+  const supabase = await createClient();
+  const [{ data }, solucoes, formacoes] = await Promise.all([
+    supabase.auth.getClaims(),
+    listarSolucoes(),
+    listarFormacoes(),
+  ]);
 
-      <EmptyState
-        icon={<Boxes size={20} strokeWidth={1.8} />}
-        title="Você ainda não começou nenhuma implementação"
-        description="Escolha uma solução, siga o passo a passo e termine com algo rodando. É por aí que a maioria começa."
-        action={
-          <Link href="/solucoes">
-            <Button variant="primary">Ver soluções</Button>
+  const claims = data?.claims;
+  const meta = (claims?.user_metadata ?? {}) as { nome?: string };
+  const nome = meta.nome?.split(' ')[0] ?? null;
+
+  const agora = new Date();
+  const proximaMentoria = gerarAgendaExemplo(agora)
+    .filter((s) => new Date(s.fimIso).getTime() > agora.getTime())
+    .sort((a, b) => a.inicioIso.localeCompare(b.inicioIso))[0];
+
+  const recentes = solucoes.slice(0, 3);
+
+  return (
+    <div className={styles.pagina}>
+      <div className={entrada.bloco}>
+        <CabecalhoPagina
+          titulo={nome ? `Bem-vindo, ${nome}` : 'Início'}
+          descricao="Seu progresso, as próximas mentorias e o que você deixou pela metade."
+        />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso1} ${styles.linhaTopo}`}>
+        <RetomadaFormacao formacoes={formacoes} />
+
+        {proximaMentoria && (
+          <Link href="/mentorias" className={styles.mentoria}>
+            <span className={styles.mentoriaTextos}>
+              <span className={styles.mentoriaRotulo}>
+                Próxima mentoria
+                <Pill size="sm">demonstração</Pill>
+              </span>
+              <span className={styles.mentoriaTitulo}>{proximaMentoria.titulo}</span>
+              <span className={styles.mentoriaMeta}>
+                {rotuloDoDia(proximaMentoria.inicioIso, agora).principal} ·{' '}
+                {horaCurta(proximaMentoria.inicioIso)}
+              </span>
+            </span>
+            <span className={styles.mentoriaSeta} aria-hidden="true">
+              →
+            </span>
           </Link>
-        }
-        secondary={
-          <Link href="/formacoes">
-            <Button variant="ghost">Começar uma formação</Button>
-          </Link>
-        }
-      />
-    </>
+        )}
+      </div>
+
+      {recentes.length > 0 && (
+        <section
+          className={`${entrada.bloco} ${entrada.atraso2} ${styles.secao}`}
+          aria-labelledby="inicio-solucoes"
+        >
+          <div className={styles.secaoTopo}>
+            <h2 id="inicio-solucoes" className={styles.secaoTitulo}>
+              Últimas soluções
+            </h2>
+            <Link href="/solucoes" className={styles.verTodas}>
+              Ver todas →
+            </Link>
+          </div>
+          <div className={styles.grade}>
+            {recentes.map((solucao) => (
+              <CartaoSolucao
+                key={solucao.id}
+                solucao={solucao}
+                icone={
+                  (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) ||
+                  ICONE_CATEGORIA_PADRAO
+                }
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }

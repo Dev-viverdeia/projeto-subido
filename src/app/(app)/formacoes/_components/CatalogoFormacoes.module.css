@@ -1,0 +1,98 @@
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.regua {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  padding-bottom: var(--via-space-3);
+}
+
+.reguaDireita {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.ordenacao {
+  display: flex;
+  gap: var(--via-space-3);
+}
+
+.ordenar {
+  border: none;
+  background: transparent;
+  padding: var(--via-space-1) 0;
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition:
+    color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.ordenar:hover {
+  color: var(--via-text-body);
+}
+
+.ordenar[data-ativo] {
+  color: var(--via-text-primary);
+  border-bottom-color: var(--via-navy);
+}
+
+/* Pôsteres pedem mais colunas que cards de texto: 4 → 3 → 2 → 1. O piso
+   atmosférico atrás da grade é a assinatura em dose homeopática. */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--via-space-5);
+  padding: var(--via-space-5) var(--via-space-4) var(--via-space-6);
+  margin-inline: calc(var(--via-space-4) * -1);
+  border-radius: var(--via-radius-lg);
+  background: var(--via-navy-02);
+}
+
+@media (max-width: 1279px) {
+  .grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1023px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .regua {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--via-space-2);
+  }
+
+  .reguaDireita {
+    justify-content: space-between;
+  }
+}

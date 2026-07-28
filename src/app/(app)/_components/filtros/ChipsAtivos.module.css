@@ -1,0 +1,47 @@
+.trilho {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  height: 26px;
+  padding: 0 var(--via-space-2) 0 var(--via-space-2_5);
+  border: 1px solid var(--via-navy-16);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-05);
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.chip:hover {
+  background: var(--via-navy-10);
+  border-color: var(--via-navy-25);
+}
+
+.limparTudo {
+  border: none;
+  background: transparent;
+  padding: var(--via-space-1) var(--via-space-1_5);
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color var(--via-t-fast);
+}
+
+.limparTudo:hover {
+  color: var(--via-text-primary);
+}

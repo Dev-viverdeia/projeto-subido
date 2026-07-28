@@ -1,24 +1,42 @@
 import type { Metadata } from 'next';
-import { Users } from 'lucide-react';
-import { EmptyState } from '@/design-system/via';
+import { Alert } from '@/design-system/via';
+import { gerarAgendaExemplo } from '@/content/mentorias';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import entrada from '../_components/entrada.module.css';
+import { AgendaMentorias } from './_components/AgendaMentorias';
+import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Mentorias' };
 
-/** Pilar 04. Encontros em grupo semanais + sessões individuais por crédito. */
+/**
+ * Agenda de mentorias — nesta fase, com dados de DEMONSTRAÇÃO declarados como
+ * tal no Alert abaixo. A rota é dinâmica, então `new Date()` aqui é o instante
+ * real de cada visita; a agenda de exemplo se posiciona em volta dele para
+ * todos os estados da matriz ficarem visíveis.
+ */
 export default function MentoriasPage() {
-  return (
-    <>
-      <CabecalhoPagina
-        titulo="Mentorias"
-        descricao="Encontros em grupo toda semana e sessões individuais por crédito. Você chega com o problema real e sai com o próximo passo."
-      />
+  const agora = new Date();
+  const sessoes = gerarAgendaExemplo(agora);
 
-      <EmptyState
-        icon={<Users size={20} strokeWidth={1.8} />}
-        title="Nenhum encontro agendado"
-        description="A agenda, os créditos e as gravações aparecem aqui quando o calendário estiver conectado."
-      />
-    </>
+  return (
+    <div className={styles.pagina}>
+      <div className={entrada.bloco}>
+        <CabecalhoPagina
+          titulo="Mentorias"
+          descricao="Encontros em grupo toda semana. Você chega com o problema real e sai com o próximo passo."
+        />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
+        <Alert tone="info" title="Agenda de demonstração">
+          As sessões abaixo são exemplos para você conhecer o fluxo. A agenda real entra quando o
+          calendário for ligado ao banco — junto com a sala de vídeo dentro da plataforma.
+        </Alert>
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
+        <AgendaMentorias sessoes={sessoes} agoraIso={agora.toISOString()} />
+      </div>
+    </div>
   );
 }

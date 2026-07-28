@@ -1,0 +1,132 @@
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.filtro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  padding-bottom: var(--via-space-1);
+}
+
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.vazio {
+  margin: 0;
+  padding: var(--via-space-6) var(--via-space-4);
+  border: 1px dashed var(--via-border);
+  border-radius: var(--via-radius-md);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  text-align: center;
+}
+
+.dias {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Trilho de data à esquerda — o dia é uma COLUNA, não um cabeçalho de largura
+   inteira: a lista lê como agenda, não como feed. */
+.dia {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: var(--via-space-4);
+  padding-block: var(--via-space-4);
+}
+
+.dia + .dia {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.trilhoData {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diaPrincipal {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  color: var(--via-text-primary);
+}
+
+.diaMono {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  color: var(--via-text-faint);
+}
+
+.itens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2_5);
+  min-width: 0;
+}
+
+/* ── Modais ────────────────────────────────────────────────────────────────── */
+.detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.detalheMeta {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.detalheTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.detalheMentor {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+}
+
+.confirmarTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.confirmarAcoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+}
+
+@media (max-width: 767px) {
+  .dia {
+    display: block;
+  }
+
+  .trilhoData {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--via-space-2);
+    margin-bottom: var(--via-space-2_5);
+  }
+}

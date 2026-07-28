@@ -1,24 +1,35 @@
 import type { Metadata } from 'next';
-import { GraduationCap } from 'lucide-react';
-import { EmptyState } from '@/design-system/via';
+import { listarFormacoes } from '@/lib/conteudo/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { ContadorCatalogo } from '../_components/ContadorCatalogo';
+import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
+import entrada from '../_components/entrada.module.css';
+import { CatalogoFormacoes } from './_components/CatalogoFormacoes';
+import { RetomadaFormacao } from './_components/RetomadaFormacao';
+import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Formações' };
 
-/** Pilar 02. Trilha → módulos → aulas, com progresso salvo e certificado. */
-export default function FormacoesPage() {
-  return (
-    <>
-      <CabecalhoPagina
-        titulo="Formações"
-        descricao="Do primeiro conceito à entrega para cliente. Trilhas completas em vídeo, com progresso salvo e retomada de onde você parou."
-      />
+export default async function FormacoesPage({ searchParams }: PageProps<'/formacoes'>) {
+  const [formacoes, params] = await Promise.all([listarFormacoes(), searchParams]);
 
-      <EmptyState
-        icon={<GraduationCap size={20} strokeWidth={1.8} />}
-        title="As trilhas ainda não estão conectadas"
-        description="Curso, módulos, aulas e progresso vêm do banco. A tela está pronta para recebê-los."
-      />
-    </>
+  return (
+    <div className={styles.pagina}>
+      <div className={entrada.bloco}>
+        <CabecalhoPagina
+          titulo="Formações"
+          descricao="Trilhas completas em vídeo, feitas para quem vai implementar — não para quem vai comentar."
+          acao={<ContadorCatalogo total={formacoes.length} rotulo="formações publicadas" />}
+        />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
+        <RetomadaFormacao formacoes={formacoes} />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
+        <CatalogoFormacoes formacoes={formacoes} filtrosIniciais={lerFiltrosIniciais(params)} />
+      </div>
+    </div>
   );
 }

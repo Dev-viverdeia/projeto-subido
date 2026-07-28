@@ -1,0 +1,82 @@
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: var(--via-space-1);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  font-size: 0.625rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.passo {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--via-space-4);
+  padding-block: var(--via-space-4);
+}
+
+.passo + .passo {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--via-lh-snug);
+  padding-top: 2px;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+.tituloPasso {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 62ch;
+}

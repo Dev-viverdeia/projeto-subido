@@ -1,0 +1,222 @@
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
+}
+
+/* ── Hero — a única superfície escura da tela ─────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--via-radius-lg);
+  padding: clamp(26px, 4vw, 44px);
+  box-shadow: var(--via-glow-navy);
+}
+
+.sheen {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.heroTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  max-width: 62ch;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-accent);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(1.625rem, 3.4vw, 2.5rem);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  /* Cinza da banda escura — nunca --via-text-muted aqui (3,45:1, reprova). */
+  color: var(--via-gray-300);
+  max-width: 56ch;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-gray-400);
+  font-variant-numeric: tabular-nums;
+}
+
+.progresso {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  max-width: 360px;
+}
+
+.trilho {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--via-radius-xs);
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.preenchido {
+  width: 100%;
+  height: 100%;
+  background: var(--via-accent);
+  transform-origin: left;
+  transition: transform 480ms var(--via-ease);
+}
+
+.pct {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-gray-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.cta {
+  margin-top: var(--via-space-2);
+}
+
+/* ── Corpo: currículo + resumo sticky ─────────────────────────────────────── */
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--via-space-7);
+  align-items: start;
+}
+
+.curriculo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  min-width: 0;
+}
+
+.tituloSecao {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  color: var(--via-text-primary);
+}
+
+.lateral {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--via-space-5);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  box-shadow: var(--via-shadow-xs);
+}
+
+.lateralEyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.lateralPct {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 1.875rem;
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  color: var(--via-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.lateralTrilho {
+  height: 4px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-10);
+  overflow: hidden;
+}
+
+.lateralPreenchido {
+  width: 100%;
+  height: 100%;
+  background: var(--via-navy);
+  transform-origin: left;
+  transition: transform 480ms var(--via-ease);
+}
+
+.fio {
+  margin: var(--via-space-2) 0;
+  border: none;
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.lateralRotulo {
+  margin: 0;
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.lateralAula {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  line-height: var(--via-lh-snug);
+}
+
+.lateralTexto {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.lateralCta {
+  margin-top: var(--via-space-2);
+  text-decoration: none;
+}
+
+@media (max-width: 1099px) {
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* No mobile o resumo some — hero e currículo já contam a mesma história. */
+  .lateral {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preenchido,
+  .lateralPreenchido {
+    transition: none;
+  }
+}

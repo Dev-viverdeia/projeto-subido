@@ -1,0 +1,214 @@
+.lateral {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  max-height: calc(100vh - 68px - var(--via-space-8));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-md);
+  background: var(--via-surface);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.movel {
+  display: none;
+}
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.topo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.modulos {
+  display: flex;
+  flex-direction: column;
+}
+
+.modulo + .modulo {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.gatilho {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--via-t-fast);
+}
+
+.gatilho:hover {
+  background: var(--via-navy-03);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.nomeModulo {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--via-fs-caption);
+  font-weight: 560;
+  color: var(--via-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: none;
+  color: var(--via-text-muted);
+  transition: transform 280ms var(--via-ease);
+}
+
+.chevron[data-aberto] {
+  transform: rotate(180deg);
+}
+
+.dobra {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms var(--via-ease);
+}
+
+.dobra[data-aberto] {
+  grid-template-rows: 1fr;
+}
+
+.aulas {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.linha {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+  min-height: 40px;
+  padding: var(--via-space-1_5) var(--via-space-4) var(--via-space-1_5) var(--via-space-5);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--via-t-fast);
+}
+
+.linha:hover {
+  background: var(--via-navy-04);
+}
+
+.linha[data-atual] {
+  background: var(--via-navy-06);
+}
+
+.linha[data-atual]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--via-navy);
+}
+
+.pontoStatus {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-border);
+  background: transparent;
+}
+
+.pontoStatus[data-status='concluida'] {
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+}
+
+.pontoStatus[data-status='atual'] {
+  border-color: var(--via-navy);
+}
+
+.tituloAula {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linha[data-status='concluida'] .tituloAula {
+  color: var(--via-text-muted);
+}
+
+.linha[data-atual] .tituloAula {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+.duracao {
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1023px) {
+  .lateral {
+    display: none;
+  }
+
+  .movel {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dobra,
+  .chevron {
+    transition: none;
+  }
+}

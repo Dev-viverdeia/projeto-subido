@@ -1,0 +1,155 @@
+.cartao {
+  display: flex;
+  flex-direction: column;
+  min-height: 196px;
+  padding: var(--via-space-5);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-lg);
+  background: var(--via-glass-card);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--via-shadow-sm);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 260ms var(--via-ease),
+    box-shadow 260ms var(--via-ease);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
+  }
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--via-shadow-lg);
+}
+
+.cartao:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--via-white),
+    0 0 0 4px var(--via-navy-60);
+}
+
+.glifo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--via-radius-md);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  margin-bottom: var(--via-space-3);
+  transition: transform 320ms var(--via-ease);
+}
+
+.cartao:hover .glifo {
+  transform: scale(1.08);
+}
+
+.eyebrow {
+  margin: 0 0 var(--via-space-1);
+  font-family: var(--via-font-mono);
+  font-size: 0.656rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.titulo {
+  margin: 0 0 var(--via-space-1_5);
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+  color: var(--via-text-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.ferramentas {
+  margin: var(--via-space-3) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mais {
+  color: var(--via-text-faint);
+}
+
+.vao {
+  flex: 1;
+  min-height: var(--via-space-3);
+}
+
+.fio {
+  margin: 0 0 var(--via-space-3);
+  border: none;
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.contagens {
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Abrir →" só aparece no hover — convite, não botão. Some via opacidade + slide,
+   nunca via display (que não transiciona). */
+.abrir {
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 240ms var(--via-ease),
+    transform 240ms var(--via-ease);
+}
+
+.cartao:hover .abrir,
+.cartao:focus-visible .abrir {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao,
+  .glifo,
+  .abrir {
+    transition: none;
+  }
+
+  /* Sem motion, o convite fica sempre visível — sumir sem transição é pisca. */
+  .abrir {
+    opacity: 1;
+    transform: none;
+  }
+}

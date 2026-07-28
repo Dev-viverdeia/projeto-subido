@@ -1,0 +1,140 @@
+.cartao {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--via-radius-lg);
+  overflow: hidden;
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  box-shadow: var(--via-shadow-sm);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 260ms var(--via-ease),
+    box-shadow 260ms var(--via-ease);
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--via-shadow-lg);
+}
+
+.cartao:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--via-white),
+    0 0 0 4px var(--via-navy-60);
+}
+
+.capa {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--via-navy-deep);
+}
+
+.imagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 480ms var(--via-ease);
+}
+
+.cartao:hover .imagem {
+  transform: scale(1.05);
+}
+
+/* Pôster sintético: a banda navy com o título faz o papel da capa até o admin
+   subir a arte — visivelmente da casa, nunca imagem de banco. */
+.sintetica {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--via-space-4);
+}
+
+.sinteticaTitulo {
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+/* Sheen de topo — a assinatura de vidro, em dose de capa. */
+.veu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, transparent 42%);
+  opacity: 0;
+  transition: opacity 320ms var(--via-ease);
+  pointer-events: none;
+}
+
+.cartao:hover .veu {
+  opacity: 1;
+}
+
+.corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.pct {
+  margin-left: auto;
+  color: var(--via-navy);
+  font-weight: var(--via-fw-medium);
+}
+
+.trilho {
+  height: 3px;
+  border-radius: var(--via-radius-xs);
+  background: var(--via-navy-10);
+  overflow: hidden;
+}
+
+/* `scaleX`, nunca `width`: largura dispara layout a cada frame de transição. */
+.preenchido {
+  width: 100%;
+  height: 100%;
+  background: var(--via-navy);
+  transform-origin: left;
+  transition: transform 480ms var(--via-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao,
+  .imagem,
+  .veu,
+  .preenchido {
+    transition: none;
+  }
+}

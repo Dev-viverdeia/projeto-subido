@@ -1,0 +1,37 @@
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  min-height: 32px;
+  padding: 0 var(--via-space-3) 0 var(--via-space-2_5);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-surface);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-body);
+  cursor: pointer;
+  transition:
+    border-color var(--via-t-fast),
+    background-color var(--via-t-fast);
+}
+
+.voltar:hover {
+  border-color: var(--via-navy-40);
+  background: var(--via-navy-03);
+}
+
+.voltar svg {
+  transition: transform var(--via-t-fast);
+}
+
+.voltar:hover svg {
+  transform: translateX(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voltar svg {
+    transition: none;
+  }
+}

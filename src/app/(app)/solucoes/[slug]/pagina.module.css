@@ -1,0 +1,84 @@
+.pagina {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding-bottom: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h2);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+  max-width: 26ch;
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 62ch;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 26vw, 380px);
+  gap: var(--via-space-8);
+  align-items: start;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
+  min-width: 0;
+}
+
+/* Sticky sob o cabeçalho do shell (68px + folga). A coluna rola junto quando é
+   mais alta que a viewport — `align-items: start` no pai é o que permite. */
+.lateral {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+}
+
+@media (max-width: 1099px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lateral {
+    position: static;
+  }
+}

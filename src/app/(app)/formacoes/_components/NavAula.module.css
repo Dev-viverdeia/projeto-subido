@@ -1,0 +1,40 @@
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.feita {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 40px;
+  padding-inline: var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+/* No mobile a barra gruda no rodapé com vidro. `bottom` respeita o dock fixo do
+   shell (56px) + a área segura do iOS. */
+@media (max-width: 767px) {
+  .barra {
+    position: sticky;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    margin-inline: calc(var(--via-space-4) * -1);
+    padding: var(--via-space-2_5) var(--via-space-4);
+    background: var(--via-glass-bar);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border-top: 1px solid var(--via-border-hairline);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .barra {
+      background: var(--via-surface);
+    }
+  }
+}

@@ -1,0 +1,10 @@
+/* O <main> do shell não impõe largura — cada tela escolhe a sua. Catálogo é
+   conteúdo de ÁREA (grade), então usa o container largo; /conta e admin usam
+   --via-content porque são prosa e formulário. */
+.pagina {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+}

@@ -1,0 +1,46 @@
+/* Cascata de entrada das telas do aluno — CSS puro, zero biblioteca.
+ *
+ * Uso: `className={entrada.bloco}` + um dos atrasos. Quatro batidas no máximo —
+ * cabeçalho, régua, grade, rodapé. Mais que isso vira desfile.
+ *
+ * `to { transform: none }` e NÃO `translateY(0)`: transform residual cria
+ * containing block e qualquer overlay `position: fixed` de um filho (painel de
+ * filtros, modal) passaria a se ancorar na seção em vez da viewport.
+ *
+ * `animation-fill-mode: forwards` mantém `opacity` aplicada após o fim — isso cria
+ * stacking context; se um filho precisar sobrepor vizinhos (dropdown), dê
+ * `position: relative; z-index` ao bloco. */
+
+.bloco {
+  opacity: 0;
+  animation: entrada-subir 440ms var(--via-ease) forwards;
+}
+
+.atraso1 {
+  animation-delay: 80ms;
+}
+.atraso2 {
+  animation-delay: 160ms;
+}
+.atraso3 {
+  animation-delay: 240ms;
+}
+
+@keyframes entrada-subir {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Honrar reduced-motion = conteúdo no estado FINAL, não animação rápida. */
+@media (prefers-reduced-motion: reduce) {
+  .bloco {
+    animation: none;
+    opacity: 1;
+  }
+}

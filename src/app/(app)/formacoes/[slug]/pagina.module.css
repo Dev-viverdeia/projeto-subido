@@ -1,0 +1,7 @@
+.pagina {
+  max-width: 1240px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}

@@ -1,0 +1,58 @@
+.trilho {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Alinha o TEXTO da primeira aba com a margem esquerda do conteúdo — o padding
+     da aba existe para a área de toque, não para empurrar o texto. */
+  margin-inline-start: calc(var(--via-space-3) * -1);
+}
+
+.trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.aba {
+  position: relative;
+  flex: none;
+  padding: var(--via-space-2_5) var(--via-space-3) var(--via-space-3_5);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: -0.011em;
+  color: var(--via-text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 240ms var(--via-ease);
+}
+
+.aba:hover {
+  color: var(--via-text-body);
+}
+
+.aba[data-ativa] {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* O anel de foco do DS é um box-shadow e seria cortado pelo overflow do trilho;
+   aqui o foco é o mesmo desenho, por dentro. */
+.aba:focus-visible {
+  box-shadow:
+    inset 0 0 0 2px var(--via-white),
+    inset 0 0 0 4px var(--via-navy-60);
+  border-radius: var(--via-radius-sm);
+}
+
+.sublinhado {
+  position: absolute;
+  bottom: 6px;
+  left: var(--via-space-3);
+  right: var(--via-space-3);
+  height: 2px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+}

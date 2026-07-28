@@ -1,0 +1,27 @@
+.copiar {
+  flex: none;
+  min-height: 28px;
+  padding-inline: var(--via-space-2_5);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-surface);
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-body);
+  cursor: pointer;
+  transition:
+    border-color var(--via-t-fast),
+    background-color var(--via-t-fast),
+    color var(--via-t-fast);
+}
+
+.copiar:hover {
+  border-color: var(--via-navy-40);
+}
+
+.copiar[data-copiado] {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
