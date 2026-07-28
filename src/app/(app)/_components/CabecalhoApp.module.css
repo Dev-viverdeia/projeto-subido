@@ -53,15 +53,19 @@
   text-decoration: none;
 }
 
-/* Eyebrow mono — a mesma família dos rótulos de seção da landing e dos cards.
-   Nomeia a seção; quem conversa é o h1 da página, logo abaixo. */
+/* O NOME DA SEÇÃO É O TÍTULO DA TELA, não um eyebrow.
+   Enquanto a página tinha um <h1> próprio logo abaixo, este rótulo era eco e
+   pedia discrição — 11px em mono, tinta faint. Com o título de página removido,
+   ele passou a ser a ÚNICA coisa que diz onde a pessoa está, e 11px em tinta
+   quieta não sustenta esse papel: o topo da tela ficava sem âncora.
+   Vira título de verdade — corpo de h3, caixa normal, tinta primária. */
 .secao {
-  font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
   font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
   /* Some antes de qualquer outra coisa quando falta largura. */
   overflow: hidden;
   text-overflow: ellipsis;
@@ -80,7 +84,9 @@
 
 @media (min-width: 1024px) {
   .cabecalho {
-    min-height: 68px;
+    /* +12px: o rótulo virou título de h3 e a barra de 68 o espremia contra as
+       duas hairlines. */
+    min-height: 80px;
     padding-inline: var(--via-space-8);
   }
 

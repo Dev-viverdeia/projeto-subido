@@ -17,9 +17,12 @@ import styles from './CabecalhoApp.module.css';
  * cabeçalho continua colado. No mobile, onde não há sidebar, o lugar da esquerda é
  * do logotipo.
  *
- * Nada de título de página duplicado: o `<h1>` mora no CabecalhoPagina, dentro do
- * conteúdo, e dois títulos na mesma tela é o começo de uma hierarquia que ninguém
- * mais consegue ler.
+ * O RÓTULO É O TÍTULO DA TELA. Enquanto as páginas tinham um `<h1>` visível logo
+ * abaixo, ele era eco e vivia discreto. Com o título de página removido, ele
+ * virou a única coisa que diz onde a pessoa está — então ganhou corpo de título.
+ *
+ * Continua `aria-hidden`, e isso NÃO mudou: o `<h1>` da página segue existindo,
+ * agora como `sr-only`. Quem usa leitor de tela ouve o nome uma vez, não duas.
  *
  * `logo` chega como PROP, já renderizado no servidor. O SubidoLogo é Server
  * Component e desenha SVG; recebê-lo pronto evita arrastar a marca e o

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { listarFormacoes } from '@/lib/conteudo/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
-import { ContadorCatalogo } from '../_components/ContadorCatalogo';
 import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoFormacoes } from './_components/CatalogoFormacoes';
@@ -15,19 +14,13 @@ export default async function FormacoesPage({ searchParams }: PageProps<'/formac
 
   return (
     <div className={styles.pagina}>
-      <div className={entrada.bloco}>
-        <CabecalhoPagina
-          titulo="Formações"
-          acao={<ContadorCatalogo total={formacoes.length} rotulo="formações publicadas" />}
-          oculto
-        />
-      </div>
+      <CabecalhoPagina titulo="Formações" oculto />
 
-      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
+      <div className={entrada.bloco}>
         <RetomadaFormacao formacoes={formacoes} />
       </div>
 
-      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
         <CatalogoFormacoes formacoes={formacoes} filtrosIniciais={lerFiltrosIniciais(params)} />
       </div>
     </div>
