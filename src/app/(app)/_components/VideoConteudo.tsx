@@ -13,12 +13,27 @@ import styles from './VideoConteudo.module.css';
  * Sem `videoUrl`, a moldura diz a verdade ("vídeo em produção") em vez de fingir
  * player — placeholder honesto é regra da casa, não falta de capricho.
  */
-export function VideoConteudo({ videoUrl, titulo }: { videoUrl: string | null; titulo: string }) {
+export function VideoConteudo({
+  videoUrl,
+  titulo,
+  /**
+   * `sobreEscuro` para quando a moldura vive DENTRO de uma banda navy: ali a
+   * borda `--via-navy-22` some (navy sobre navy) e a sombra não tem o que
+   * escurecer. Troca por hairline clara — o fundo navy-deep já é mais escuro que
+   * o mesh, então a moldura lê como tela recuada.
+   */
+  tom = 'padrao',
+}: {
+  videoUrl: string | null;
+  titulo: string;
+  tom?: 'padrao' | 'sobreEscuro';
+}) {
   const [tocando, setTocando] = useState(false);
+  const moldura = `${styles.moldura} ${tom === 'sobreEscuro' ? styles.sobreEscuro : ''}`;
 
   if (!videoUrl) {
     return (
-      <div className={`${styles.moldura} via-mesh-navy via-noise`}>
+      <div className={`${moldura} via-mesh-navy via-noise`}>
         <div className={styles.vazio}>
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
             <rect
@@ -40,7 +55,7 @@ export function VideoConteudo({ videoUrl, titulo }: { videoUrl: string | null; t
 
   if (tocando) {
     return (
-      <div className={styles.moldura}>
+      <div className={moldura}>
         <iframe
           className={styles.player}
           src={videoUrl}
@@ -55,7 +70,7 @@ export function VideoConteudo({ videoUrl, titulo }: { videoUrl: string | null; t
   return (
     <button
       type="button"
-      className={`${styles.moldura} ${styles.capa} via-mesh-navy via-noise`}
+      className={`${moldura} ${styles.capa} via-mesh-navy via-noise`}
       onClick={() => setTocando(true)}
       aria-label={`Assistir: ${titulo}`}
     >

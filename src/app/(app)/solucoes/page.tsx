@@ -8,7 +8,7 @@ import entrada from '../_components/entrada.module.css';
 import { CatalogoSolucoes } from './_components/CatalogoSolucoes';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Soluções' };
+export const metadata: Metadata = { title: 'Soluções de IA' };
 
 export default async function SolucoesPage({ searchParams }: PageProps<'/solucoes'>) {
   const [solucoes, params] = await Promise.all([listarSolucoes(), searchParams]);
@@ -17,7 +17,7 @@ export default async function SolucoesPage({ searchParams }: PageProps<'/solucoe
     <div className={styles.pagina}>
       <div className={entrada.bloco}>
         <CabecalhoPagina
-          titulo="Soluções"
+          titulo="Soluções de IA"
           descricao="O que implementar, com o passo a passo de quem já implementou. Você escolhe uma, segue as etapas e termina com algo rodando."
           acao={<ContadorCatalogo total={solucoes.length} rotulo="soluções publicadas" />}
         />

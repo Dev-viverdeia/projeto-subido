@@ -1,9 +1,14 @@
+/* ESPAÇAMENTO ABAIXO — cuidado ao mexer, ele SOMA com o gap da página.
+   O `padding-bottom` daqui existia só para afastar o texto da hairline que este
+   cabeçalho tinha; com a linha removida, virou vão órfão. Somando com o antigo
+   `margin-bottom: 32` e o `gap: 24` da página, davam 80px entre a descrição e a
+   régua de filtros — e no admin, onde o wrapper já tem `gap: 32`, davam 64.
+   Ficou uma folga modesta: quem manda no ritmo é o gap de cada página. */
 .cabecalho {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-4);
-  margin-bottom: var(--via-space-8);
-  padding-bottom: var(--via-space-6);
+  margin-bottom: var(--via-space-4);
 }
 
 .textos {

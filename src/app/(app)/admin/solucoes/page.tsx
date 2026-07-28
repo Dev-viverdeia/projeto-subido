@@ -20,7 +20,7 @@ export default async function AdminSoluçõesPage() {
   return (
     <>
       <CabecalhoPagina
-        titulo="Soluções"
+        titulo="Soluções de IA"
         descricao="Rascunho fica invisível para os assinantes. Publicado entra no catálogo."
         acao={
           <Link href="/admin/solucoes/nova">
