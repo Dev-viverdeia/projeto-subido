@@ -20,14 +20,19 @@ export interface RevealProps {
 }
 
 /**
- * O único primitivo de motion da landing.
+ * O primitivo de motion SEM biblioteca — ~40 linhas e um IntersectionObserver.
  *
- * Não existe biblioteca de animação neste projeto: todo o vocabulário da página é
- * reveal na entrada, hover-lift, dois count-ups, uma marquee e uma digitação.
- * `framer-motion` custaria 35–50 kB gz na página LCP-crítica de um funil pago para
- * entregar isso. Aqui são ~40 linhas e um IntersectionObserver.
+ * Existe biblioteca de animação neste projeto (`motion`), mas ela é restrita ao
+ * `Parallax`, que só roda abaixo da dobra. Este componente é o que atende tudo
+ * acima dela: o reveal de entrada custaria 35–50 kB gz em `motion` para entregar
+ * `opacity` e `translateY`, na página que recebe o clique pago.
  *
- * Também não há nenhum listener de `scroll` nesta página — é o que protege o INP.
+ * O vocabulário de motion da landing hoje é: este reveal, o mask reveal do hero
+ * (CSS puro), o count-up da faixa de credibilidade e o parallax dos pilares.
+ * Se você acrescentar um device novo, acrescente aqui também — comentário que
+ * lista o que existe e erra a lista ensina o próximo agente a mentir sobre o repo.
+ *
+ * Nenhum listener de `scroll` em lugar nenhum — é o que protege o INP.
  */
 export function Reveal({
   children,
