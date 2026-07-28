@@ -56,16 +56,23 @@
   max-width: 62ch;
 }
 
-.acao {
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-wrap: wrap;
   margin-top: var(--via-space-2);
+}
+
+/* Sair do beco é a ação principal — preenchimento navy. "Verificar de novo" fica
+   em contorno: depois de quatro minutos sem resposta, insistir é a exceção. */
+.acao,
+.secundaria {
   display: inline-flex;
   align-items: center;
   min-height: var(--app-h-control);
   padding-inline: var(--via-space-5);
-  border: 1px solid var(--via-border);
   border-radius: var(--via-radius-pill);
-  background: var(--via-surface);
-  color: var(--via-text-primary);
   font-family: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
@@ -73,12 +80,45 @@
   cursor: pointer;
   transition:
     border-color var(--app-t-state),
+    background-color var(--app-t-state),
     transform var(--app-t-touch);
 }
 
-.acao:hover {
+.acao {
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.acao:disabled {
+  cursor: not-allowed;
   border-color: var(--via-navy-16);
+  background: var(--via-navy-16);
+  color: var(--via-text-faint);
+}
+
+.secundaria {
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+}
+
+.acao:hover:not(:disabled),
+.secundaria:hover {
   transform: translateY(-1px);
+}
+
+.secundaria:hover {
+  border-color: var(--via-navy-16);
+}
+
+/* Nenhum dos dois tem box-shadow própria, então o anel do DS sobreviveria — mas
+   ele é `:where()` e some ao primeiro `box-shadow` que alguém adicionar aqui.
+   Declarado explicitamente para não depender disso. */
+.acao:focus-visible,
+.secundaria:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -86,11 +126,13 @@
     animation: none;
   }
 
-  .acao {
+  .acao,
+  .secundaria {
     transition: none;
   }
 
-  .acao:hover {
+  .acao:hover:not(:disabled),
+  .secundaria:hover {
     transform: none;
   }
 }

@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Pill } from '@/design-system/via';
+import { apagarSolucao } from '@/lib/builder/actions';
+import { paraMarkdown } from '@/lib/builder/markdown';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
+import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import entrada from '../../_components/entrada.module.css';
+import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
 import { Entrevista } from '../_components/Entrevista';
 import { EstadoGeracao } from '../_components/EstadoGeracao';
 import { FichaProjeto } from '../_components/FichaProjeto';
@@ -21,6 +25,10 @@ import styles from './pagina.module.css';
  * `falhou` VOLTA PARA A ENTREVISTA, não para uma tela de erro sem saída: as
  * respostas continuam gravadas, e a ação certa depois de uma falha é gerar de
  * novo — não redigitar tudo.
+ *
+ * O MARKDOWN É MONTADO NO SERVIDOR. Serializar no cliente arrastaria a função
+ * inteira para o bundle por causa de um botão; aqui o custo é uma string que já
+ * viaja no payload do RSC.
  */
 export async function generateMetadata({ params }: PageProps<'/builder/[id]'>): Promise<Metadata> {
   const { id } = await params;
@@ -38,13 +46,29 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
     <div className={styles.pagina}>
       <div className={styles.topo}>
         <BotaoVoltar fallback="/builder" rotulo="Builder" />
-        <Pill variant={VARIANTE_STATUS[solucao.status]} size="sm">
-          {ROTULO_STATUS[solucao.status]}
-        </Pill>
+
+        <div className={styles.acoes}>
+          <Pill variant={VARIANTE_STATUS[solucao.status]} size="sm">
+            {ROTULO_STATUS[solucao.status]}
+          </Pill>
+
+          {solucao.documento ? (
+            <BotaoCopiar
+              texto={paraMarkdown(solucao.documento)}
+              rotuloDoQue="o projeto inteiro em Markdown"
+            />
+          ) : null}
+
+          <BotaoExcluir
+            id={solucao.id}
+            acao={apagarSolucao}
+            descricao="Apagar este projeto é definitivo: não há lixeira nem cópia em outra tela. A ideia original e as respostas da entrevista vão junto."
+          />
+        </div>
       </div>
 
       <div className={entrada.bloco}>
-        {solucao.status === 'gerando' ? <EstadoGeracao /> : null}
+        {solucao.status === 'gerando' ? <EstadoGeracao id={solucao.id} /> : null}
 
         {solucao.status === 'falhou' && solucao.erro ? (
           <p className={styles.falha} role="alert">
