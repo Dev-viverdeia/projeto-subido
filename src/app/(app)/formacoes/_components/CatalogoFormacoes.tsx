@@ -6,7 +6,8 @@ import { Button, EmptyState } from '@/design-system/via';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import { BuscaCatalogo } from '../../_components/filtros/BuscaCatalogo';
 import { useDebounce } from '../../_components/filtros/useDebounce';
-import { atualizarUrlFiltros, type FiltrosIniciais } from '../../_components/filtros/urlFiltros';
+import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
+import type { FiltrosIniciais } from '../../_components/filtros/urlFiltros';
 import { CartaoFormacao } from './CartaoFormacao';
 import styles from './CatalogoFormacoes.module.css';
 

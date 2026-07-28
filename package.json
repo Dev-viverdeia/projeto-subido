@@ -25,6 +25,7 @@
     "vendor:via": "node scripts/vendor-via.mjs",
     "check:ds-drift": "node scripts/check-ds-drift.mjs",
     "check:lockfile": "node scripts/check-single-lockfile.mjs",
+    "check:fronteira": "node scripts/check-client-boundary.mjs",
     "prepare": "husky"
   },
   "lint-staged": {

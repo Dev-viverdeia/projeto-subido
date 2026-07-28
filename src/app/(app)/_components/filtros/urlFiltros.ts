@@ -1,27 +1,20 @@
-'use client';
-
 /**
- * Espelha o estado dos filtros na URL SEM navegar.
+ * Leitura dos filtros a partir da URL. **MÓDULO NEUTRO — sem `'use client'`.**
  *
- * `history.replaceState` direto, e não `router.replace`: a rota é dinâmica, e um
- * replace do router dispararia uma re-renderização de servidor por tecla digitada.
- * O Next ≥15 assume atualizações rasas feitas pela History API nativa.
+ * POR QUE ISTO IMPORTA (custou duas telas quebradas em runtime)
+ * Este arquivo já teve `'use client'` no topo, junto do `atualizarUrlFiltros`.
+ * A diretiva marca o MÓDULO INTEIRO como client, e as páginas RSC de /solucoes e
+ * /formacoes chamam `lerFiltrosIniciais(params)` durante o render do servidor:
+ * o Next lança "Attempted to call lerFiltrosIniciais() from the server but it's
+ * on the client" e a rota inteira cai no error boundary.
  *
- * Duas regras herdadas da plataforma de referência (bugs reais de lá):
- *  · apagar SÓ as chaves próprias — um clique pago chega com `utm_*` na URL, e
- *    limpar tudo destruiria a atribuição;
- *  · valor `null`/vazio remove a chave, para a URL limpa continuar limpa.
+ * Nem `tsc` nem `eslint` veem a fronteira client/server, e o `npm run build`
+ * passou VERDE porque as duas rotas são dinâmicas (ƒ) — não são pré-renderizadas,
+ * então a chamada nunca aconteceu durante o build. Só quebra quando alguém abre a
+ * página. É por isso que a escrita na URL (que toca `window`) mora noutro arquivo:
+ * a fronteira agora é a NATUREZA do código, não a memória de quem edita.
  */
-export function atualizarUrlFiltros(valores: Record<string, string | null>) {
-  const url = new URL(window.location.href);
-  for (const [chave, valor] of Object.entries(valores)) {
-    if (valor === null || valor === '') url.searchParams.delete(chave);
-    else url.searchParams.set(chave, valor);
-  }
-  window.history.replaceState(window.history.state, '', url);
-}
 
-/** Lê os filtros iniciais de `searchParams` (RSC) com defaults seguros. */
 export type FiltrosIniciais = {
   q: string;
   categoria: string;
@@ -29,6 +22,7 @@ export type FiltrosIniciais = {
   ordem: 'recentes' | 'alfabetica';
 };
 
+/** Lê os filtros iniciais de `searchParams` (RSC) com defaults seguros. */
 export function lerFiltrosIniciais(params: {
   [chave: string]: string | string[] | undefined;
 }): FiltrosIniciais {

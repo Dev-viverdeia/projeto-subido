@@ -10,7 +10,8 @@ import { BuscaCatalogo } from '../../_components/filtros/BuscaCatalogo';
 import { ChipsAtivos } from '../../_components/filtros/ChipsAtivos';
 import { PainelMaisFiltros } from '../../_components/filtros/PainelMaisFiltros';
 import { useDebounce } from '../../_components/filtros/useDebounce';
-import { atualizarUrlFiltros, type FiltrosIniciais } from '../../_components/filtros/urlFiltros';
+import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
+import type { FiltrosIniciais } from '../../_components/filtros/urlFiltros';
 import { CartaoSolucao } from './CartaoSolucao';
 import styles from './CatalogoSolucoes.module.css';
 
