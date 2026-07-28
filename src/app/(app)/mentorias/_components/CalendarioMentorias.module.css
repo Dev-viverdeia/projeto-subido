@@ -1,0 +1,372 @@
+/* GRADE precisa de área, LISTA precisa de medida — a regra de largura da casa,
+   com as duas naturezas na mesma tela. A grade do mês tem 7 colunas FIXAS: ela
+   não pode ganhar coluna quando sobra espaço, só engordar a célula. Sozinha a
+   1600 daria células de 228px quase vazias; com o painel ao lado, o que sobraria
+   vira informação. */
+.raiz {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 400px);
+  gap: var(--app-gap-block);
+  align-items: start;
+}
+
+.grade {
+  min-width: 0;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap-stack);
+  margin-bottom: var(--app-gap-stack);
+}
+
+.mes {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+/* `capitalize` sobe TODA palavra e produzia "Julho De 2026" / "Terça-Feira, 28 De
+   Julho". Só a primeira letra deve subir — e `::first-letter` faz isso sem tocar
+   o resto da frase. */
+.mes::first-letter {
+  text-transform: uppercase;
+}
+
+.navegacao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.hoje {
+  height: calc(var(--app-h-control) - 6px);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-surface);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-body);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.hoje:hover {
+  background: var(--via-bg-2);
+  border-color: var(--via-border);
+}
+
+.seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--app-h-control) - 6px);
+  height: calc(var(--app-h-control) - 6px);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.seta:hover {
+  background: var(--via-bg-2);
+  border-color: var(--via-border);
+}
+
+.semana,
+.celulas {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.semana {
+  gap: 1px;
+  margin-bottom: var(--via-space-1_5);
+}
+
+.diaSemana {
+  padding-inline: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* A grade é uma superfície só, dividida por hairlines de 1px vindas do gap — não
+   42 caixas com borda, que dobrariam a linha em cada encontro de células. */
+.celulas {
+  gap: 1px;
+  background: var(--via-border-hairline);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  overflow: hidden;
+}
+
+.celula {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1_5);
+  /* Altura FIXA e seis semanas sempre: a grade não pode mudar de altura ao
+     navegar entre meses — é o que mais denuncia calendário improvisado. */
+  min-height: 96px;
+  padding: var(--via-space-2);
+  border: none;
+  background: var(--via-surface);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.celula:hover {
+  background: var(--via-bg-2);
+}
+
+.celula[data-fora] {
+  background: var(--via-bg-2);
+}
+
+.celula[data-fora] .numero,
+.celula[data-fora] .marca {
+  color: var(--via-text-faint);
+}
+
+/* Selecionado é SUPERFÍCIE, hoje é TINTA. Dois sinais de naturezas diferentes
+   podem coexistir na mesma célula sem competir — que é exatamente o caso do dia
+   de hoje quando ele está selecionado. */
+.celula[data-sel] {
+  background: var(--via-navy-05, var(--via-bg-3));
+  box-shadow: inset 0 0 0 2px var(--via-navy);
+}
+
+.celula:focus-visible {
+  z-index: 1;
+  box-shadow: var(--app-ring);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-body);
+}
+
+.celula[data-hoje] .numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  margin: -2px 0 -2px -4px;
+  padding-inline: 5px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-weight: var(--via-fw-medium);
+}
+
+/* Dot de "ao vivo" no canto — o accent sobre superfície clara reprova para TEXTO,
+   mas aqui ele não é texto: é um sinal de 6px, e sinal não tem régua de leitura.
+   Ver a regra do accent no CLAUDE.md. */
+.pontoVivo {
+  position: absolute;
+  top: var(--via-space-2);
+  right: var(--via-space-2);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+}
+
+.marcas {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.marca {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-1_5);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.marcaHora {
+  color: var(--via-text-body);
+}
+
+.marcaTrilha {
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mais {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
+}
+
+/* ── Painel do dia ─────────────────────────────────────────────────────────── */
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  /* Acompanha a rolagem da grade, que é alta. */
+  position: sticky;
+  top: var(--app-gap-block);
+}
+
+.painelData {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+.painelData::first-letter {
+  text-transform: uppercase;
+}
+
+.painelVazio {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+  color: var(--via-text-muted);
+}
+
+.painelLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.painelItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-3);
+  width: 100%;
+  padding: var(--via-space-2_5) var(--via-space-2);
+  margin-inline: calc(var(--via-space-2) * -1);
+  border: none;
+  border-radius: var(--app-radius-chip);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.painelItem:hover {
+  background: var(--via-bg-2);
+}
+
+.itemHora {
+  flex: none;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+}
+
+.itemTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemTitulo {
+  font-size: var(--via-fs-caption);
+  line-height: 1.4;
+  color: var(--via-text-body);
+}
+
+.itemMentor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.itemVivo {
+  color: var(--via-accent-ink);
+}
+
+.itemFeito,
+.itemPassado {
+  color: var(--via-text-muted);
+}
+
+@media (max-width: 1099px) {
+  .raiz {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .painel {
+    position: static;
+  }
+}
+
+@media (max-width: 767px) {
+  .celula {
+    min-height: 72px;
+    padding: var(--via-space-1_5);
+  }
+
+  /* A 375 a célula tem ~46px úteis: hora + sigla não cabem lado a lado, e o
+     número do dia é o que a pessoa procura. Some a marca, fica o ponto. */
+  .marca {
+    display: none;
+  }
+
+  .marcas::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: var(--via-radius-pill);
+    background: var(--via-navy-60);
+  }
+
+  .celula:not(:has(.marca)) .marcas::before {
+    display: none;
+  }
+}

@@ -45,12 +45,15 @@ export function rotuloDoDia(dataIso: string, agora: Date): RotuloDia {
   const principal =
     dias === 0 ? 'Hoje' : dias === 1 ? 'Amanhã' : semana.charAt(0).toUpperCase() + semana.slice(1);
 
+  /* pt-BR devolve "ter., 28 de jul.". A versão anterior trocava TODO espaço por
+     " · " e produzia "TER · 28 · DE · JUL" — o "de" virava um campo. Tira o "de"
+     primeiro; só a vírgula vira separador. */
   const curto = data
     .toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })
     .replace(/\./g, '')
+    .replace(/\s+de\s+/g, ' ')
     .toUpperCase()
-    .replace(/,?\s+/g, ' · ')
-    .replace(/ · (\d)/, ' · $1');
+    .replace(/,\s*/, ' · ');
 
   return { principal, mono: curto };
 }

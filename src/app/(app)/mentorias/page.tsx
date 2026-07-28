@@ -3,7 +3,8 @@ import { Alert } from '@/design-system/via';
 import { gerarAgendaExemplo } from '@/content/mentorias';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
-import { AgendaMentorias } from './_components/AgendaMentorias';
+import { lerVistaInicial } from '../_components/filtros/urlFiltros';
+import { MentoriasVista } from './_components/MentoriasVista';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Mentorias' };
@@ -14,8 +15,9 @@ export const metadata: Metadata = { title: 'Mentorias' };
  * real de cada visita; a agenda de exemplo se posiciona em volta dele para
  * todos os estados da matriz ficarem visíveis.
  */
-export default function MentoriasPage() {
+export default async function MentoriasPage({ searchParams }: PageProps<'/mentorias'>) {
   const agora = new Date();
+  const vista = lerVistaInicial(await searchParams);
   const sessoes = gerarAgendaExemplo(agora);
 
   return (
@@ -35,7 +37,7 @@ export default function MentoriasPage() {
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso2}`}>
-        <AgendaMentorias sessoes={sessoes} agoraIso={agora.toISOString()} />
+        <MentoriasVista sessoes={sessoes} agoraIso={agora.toISOString()} vistaInicial={vista} />
       </div>
     </div>
   );

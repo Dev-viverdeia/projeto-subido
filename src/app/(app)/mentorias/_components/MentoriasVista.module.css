@@ -1,0 +1,58 @@
+/* O shell: cartão da próxima, chrome de vista, miolo. O respiro entre eles é o
+   ritmo de BLOCO — o de grade seria apertado demais para separar três coisas de
+   naturezas diferentes. */
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+/* A régua de vista fica sozinha na linha, alinhada à esquerda: é o controle mais
+   alto da hierarquia da tela, e dividir a linha com outro controle o rebaixaria
+   ao mesmo nível do filtro que vive DENTRO da agenda. */
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: var(--app-gap-stack);
+}
+
+/* ── Modais, compartilhados pelas duas vistas ─────────────────────────────── */
+.detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.detalheMeta {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.detalheTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.detalheMentor {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+}
+
+.confirmarTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+}
+
+.confirmarAcoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+}

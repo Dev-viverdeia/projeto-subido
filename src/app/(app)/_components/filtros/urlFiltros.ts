@@ -40,3 +40,17 @@ export function lerFiltrosIniciais(params: {
     ordem: ordem === 'alfabetica' ? 'alfabetica' : 'recentes',
   };
 }
+
+/**
+ * Vista inicial da tela de mentorias, lida da URL no servidor.
+ *
+ * A vista ENTRA na URL (ao contrário do progresso local das formações) porque é
+ * uma escolha de leitura, não um estado do dispositivo: um link para o calendário
+ * do mês reproduz o calendário do mês no aparelho de quem recebe.
+ */
+export function lerVistaInicial(params: {
+  [chave: string]: string | string[] | undefined;
+}): 'agenda' | 'calendario' {
+  const v = Array.isArray(params.vista) ? params.vista[0] : params.vista;
+  return v === 'calendario' ? 'calendario' : 'agenda';
+}

@@ -81,47 +81,6 @@
   min-width: 0;
 }
 
-/* ── Modais ────────────────────────────────────────────────────────────────── */
-.detalhe {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-}
-
-.detalheMeta {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.detalheTexto {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-body);
-}
-
-.detalheMentor {
-  margin: 0;
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-muted);
-}
-
-.confirmarTexto {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-body);
-}
-
-.confirmarAcoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--via-space-2);
-}
-
 @media (max-width: 767px) {
   .dia {
     display: block;

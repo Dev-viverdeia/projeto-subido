@@ -1,0 +1,82 @@
+/* Controle segmentado: o trilho é a superfície recuada, o polegar é a superfície
+   ERGUIDA. É o triplo de elevação fazendo o trabalho — fundo, hairline e sombra
+   andando juntos —, e não uma sombra escolhida sozinha. */
+.trilho {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-bg-2);
+  border: 1px solid var(--via-border-hairline);
+}
+
+.opcao {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* O trilho inteiro fecha em --app-h-control: 3px de folga em cima e embaixo. */
+  height: calc(var(--app-h-control) - 6px);
+  padding-inline: var(--via-space-4);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-muted);
+  border-radius: var(--via-radius-pill);
+  white-space: nowrap;
+  transition: color var(--app-t-state);
+}
+
+.opcao:hover {
+  color: var(--via-text-body);
+}
+
+.opcao[data-ativa] {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* O polegar fica ATRÁS: animar o fundo em vez do texto é o que impede o rótulo
+   de tremer durante a troca. */
+.polegar {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.conteudo {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.conteudo svg {
+  flex: none;
+  /* O ícone fica um degrau mais quieto que o rótulo — no mesmo tom os dois
+     competem e o rótulo perde. Tom sólido, nunca opacidade. */
+  color: var(--via-text-faint);
+}
+
+.opcao[data-ativa] .conteudo svg {
+  color: var(--via-navy);
+}
+
+@media (max-width: 599px) {
+  .trilho {
+    width: 100%;
+  }
+
+  .opcao {
+    flex: 1;
+  }
+}
