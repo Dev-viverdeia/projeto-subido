@@ -46,7 +46,13 @@ export function EstadoGeracao({ id }: { id: string }) {
 
   return (
     <div className={styles.estado} role="status" aria-live="polite">
-      <div className={styles.pulso} data-parado={desistiu ? '' : undefined} aria-hidden="true" />
+      {/* O ponto ganha RÓTULO. Sozinho acima do título ele lia como sujeira de
+          renderização; na linha do eyebrow ele vira o mesmo padrão de rótulo
+          que o resto do produto usa, e o estado fica escrito além de pulsar. */}
+      <p className={styles.estagio}>
+        <span className={styles.pulso} data-parado={desistiu ? '' : undefined} aria-hidden="true" />
+        {desistiu ? 'Sem resposta' : 'Gerando'}
+      </p>
 
       <h2 className={styles.titulo}>
         {desistiu ? 'A geração não respondeu' : 'Este projeto está sendo escrito'}
@@ -62,10 +68,11 @@ export function EstadoGeracao({ id }: { id: string }) {
           andando ou travada. Um pulso sozinho não distingue as duas coisas. */}
       {!desistiu ? (
         <p className={styles.cronometro}>
-          <span className={styles.relogio}>
-            {String(tentativas * (INTERVALO / 1000)).padStart(3, '0')}
-          </span>
-          s
+          {/* Um nó de texto só. Com o "s" num irmão do `<span>`, a fronteira do
+              inline-block abria um vão visível entre o número e a unidade —
+              "168 s". `padStart(3)` + `tabular-nums` já travam a largura, então
+              o `min-width` que existia para isso era redundante. */}
+          {`${String(tentativas * (INTERVALO / 1000)).padStart(3, '0')}s`}
         </p>
       ) : null}
 

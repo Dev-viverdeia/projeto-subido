@@ -85,14 +85,22 @@ export function Entrevista({
       <div className={styles.cabecalho}>
         <h2 className={styles.titulo}>O que falta para projetar</h2>
         <p className={styles.subtitulo}>
-          Cada resposta muda a arquitetura. O que você não souber, deixe em branco — em branco é
-          melhor que chute.
+          Cada resposta muda a arquitetura. Deixe em branco o que não souber: lacuna atrapalha menos
+          que chute.
         </p>
       </div>
 
+      {/* `data-respondida` é a única pista de PROGRESSO dentro da lista. Sem ela o
+          rodapé dizia "1 de 3 respondidas" e o olho não achava QUAL — três cards
+          idênticos. A distinção é por cor sólida no número, não por ícone: a lista
+          é de texto, e um check seria o único glifo da tela. */}
       <ol className={styles.lista}>
         {respostas.map((item, indice) => (
-          <li key={item.pergunta} className={styles.item}>
+          <li
+            key={item.pergunta}
+            className={styles.item}
+            data-respondida={item.resposta.trim().length > 0 ? '' : undefined}
+          >
             <span className={styles.numero}>{String(indice + 1).padStart(2, '0')}</span>
 
             <div className={styles.corpo}>

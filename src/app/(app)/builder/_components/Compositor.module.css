@@ -1,9 +1,22 @@
-/* A tela do compositor é uma COLUNA DE LEITURA centrada, não um bloco de largura
-   total. O canvas de 1600 serve grade e mosaico; aqui existe uma pergunta, um
-   campo e três exemplos — esticar isso pela tela inteira só afasta o olho do
-   único lugar onde ele precisa ir. */
+/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
+   arquivo já estão corrigidas.
+   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
+   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
+   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
+   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
+   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
+   medir de novo. */
+
+/* UM EIXO PARA O ARCO DE CRIAÇÃO INTEIRO.
+   Compor, responder a entrevista e esperar são três momentos de um percurso só, e
+   os três vivem nesta mesma coluna centrada (`--via-content`). Antes, o compositor
+   era centrado e a entrevista nascia encostada à esquerda com 488px de calha morta
+   à direita — medido: 273/288 contra 32/488. O olho perdia o eixo entre um passo e
+   o seguinte.
+   Só a FICHA abre para o canvas, e aí a mudança de largura passa a significar algo:
+   o documento entregue é maior que o texto que o pediu. */
 .tela {
-  max-width: 720px;
+  max-width: var(--via-content);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -44,7 +57,7 @@
   text-wrap: balance;
   /* A medida mora no elemento de texto — `ch` é relativo ao font-size de quem
      declara, e num container que herda 16px este valor valeria outra coisa. */
-  max-width: 18ch;
+  max-width: 15ch;
 }
 
 /* Ênfase é itálico editorial, nunca peso 700. A face itálica do Geist já está

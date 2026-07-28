@@ -1,5 +1,21 @@
+/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
+   arquivo já estão corrigidas.
+   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
+   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
+   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
+   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
+   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
+   medir de novo. */
+
+/* `text-wrap: pretty` nos textos secundários: a medida certa não impede a ÓRFÃ.
+   Medido nesta tela — "…compensa a API oficial / paga.", "…não tem onde /
+   encaixar." Uma palavra sozinha na última linha lê como erro de composição, e
+   `pretty` a puxa para cima sem mexer na largura. Só o último punhado de linhas é
+   reflowado, então não custa layout. */
+
 .estado {
   max-width: var(--via-content);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -14,9 +30,22 @@
 /* O mesmo pulso da espera na entrevista — é a mesma situação, e dois efeitos
    diferentes para o mesmo estado leriam como duas coisas diferentes. Parado, ele
    vira um ponto sólido e apagado: a ausência de movimento é a informação. */
+.estagio {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
 .pulso {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
   border-radius: var(--via-radius-pill);
   background: var(--via-accent-ink);
   animation: respirar 1800ms var(--via-ease) infinite;
@@ -50,11 +79,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.relogio {
-  min-width: 3ch;
-  display: inline-block;
-}
-
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);
@@ -69,7 +93,8 @@
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 62ch;
+  max-width: 50ch;
+  text-wrap: pretty;
 }
 
 .acoes {

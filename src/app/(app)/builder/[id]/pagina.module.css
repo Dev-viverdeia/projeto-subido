@@ -1,9 +1,18 @@
+/* A LARGURA DA PÁGINA SEGUE O ESTADO, e não é capricho: o topo (voltar, status,
+   ações) precisa dividir o eixo com o conteúdo. Com a barra em 1200 e a entrevista
+   em 760 centrada, o "Voltar" ficava 240px à esquerda do primeiro card e a tela
+   lia como dois documentos empilhados. */
 .pagina {
   max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
+}
+
+/* Entrevista, falha e espera são coluna; só a ficha usa o canvas. */
+.pagina[data-coluna] {
+  max-width: var(--via-content);
 }
 
 .topo {
@@ -30,7 +39,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
-  max-width: var(--via-content);
   margin: 0 0 var(--app-gap-block);
   padding: var(--app-pad-card);
   border-radius: var(--app-radius-card);

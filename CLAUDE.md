@@ -249,6 +249,18 @@ destrói as quebras autorais.
 font-size de quem declara: `20ch` num container que herda 16px vale ~180px e esmaga o título em
 sete linhas; no `<h2>`, vale a medida pretendida.
 
+**E o `ch` do Geist MENTE por ~30% — a unidade é a largura do glifo `0`, que nesta fonte é bem
+mais estreito que a média das minúsculas.** Medido no navegador (largura da caixa ÷ glifo médio),
+na ficha do Builder: `72ch` entregava **94 caracteres** por linha, `68ch` dava 89, `62ch` dava 81 —
+todos acima da faixa confortável de **45–75**, e nenhum lint pega isso. O fator é constante, então
+o alvo real é **caracteres ÷ 1,3**: ~52ch para 68 caracteres. Ao escrever uma medida nova, meça;
+não copie o número de outro arquivo achando que 65ch dá 65 caracteres.
+
+**Órfã não é problema de medida, é de quebra.** Com a medida certa ainda sobrava "…compensa a API
+oficial / paga." — uma palavra sozinha na última linha lê como erro de composição. `text-wrap:
+pretty` nos textos secundários resolve sem mexer na largura, e só reflowa o último punhado de
+linhas. `balance` fica para títulos de poucas linhas.
+
 **4 · Hierarquia por peso editorial e cor SÓLIDA.** Nunca por opacidade — opacidade sobre banda
 escura derruba o contraste abaixo de AA e some no mobile em luz forte. Dois tons sólidos fazem o
 trabalho que a opacidade fingiria fazer.

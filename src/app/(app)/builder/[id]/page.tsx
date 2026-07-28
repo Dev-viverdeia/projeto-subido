@@ -42,8 +42,11 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
 
   if (!solucao) notFound();
 
+  /* Ficha usa o canvas; entrevista, espera e falha usam a coluna — ver o CSS. */
+  const emColuna = solucao.status !== 'pronta';
+
   return (
-    <div className={styles.pagina}>
+    <div className={styles.pagina} data-coluna={emColuna ? '' : undefined}>
       <div className={styles.topo}>
         <BotaoVoltar fallback="/builder" rotulo="Builder" />
 

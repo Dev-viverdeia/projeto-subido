@@ -1,8 +1,24 @@
+/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
+   arquivo já estão corrigidas.
+   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
+   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
+   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
+   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
+   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
+   medir de novo. */
+
+/* `text-wrap: pretty` nos textos secundários: a medida certa não impede a ÓRFÃ.
+   Medido nesta tela — "…compensa a API oficial / paga.", "…não tem onde /
+   encaixar." Uma palavra sozinha na última linha lê como erro de composição, e
+   `pretty` a puxa para cima sem mexer na largura. Só o último punhado de linhas é
+   reflowado, então não custa layout. */
+
 /* A entrevista é LEITURA E ESCRITA em coluna — largura de conteúdo, não de
    canvas. Uma pergunta de 90 caracteres numa linha de 1600px força o olho a
    varrer a tela inteira para achar o campo que fica embaixo dela. */
 .entrevista {
   max-width: var(--via-content);
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
@@ -55,7 +71,8 @@
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 60ch;
+  max-width: 52ch;
+  text-wrap: pretty;
 }
 
 .lista {
@@ -82,6 +99,12 @@
    cursor de texto está, não onde o mouse passou. */
 .item:focus-within {
   border-color: var(--app-elev-2-line);
+}
+
+/* Respondida: o número sai do cinza e vira tinta. É a mesma regra do resto da
+   casa — hierarquia por cor SÓLIDA, nunca por opacidade. */
+.item[data-respondida] .numero {
+  color: var(--via-text-primary);
 }
 
 .numero {
@@ -114,7 +137,8 @@
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 58ch;
+  max-width: 50ch;
+  text-wrap: pretty;
 }
 
 /* Raio concêntrico: item 20, padding 20 → o campo fica no degrau de controle. */

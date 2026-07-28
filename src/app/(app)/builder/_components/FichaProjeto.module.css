@@ -1,3 +1,18 @@
+/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
+   arquivo já estão corrigidas.
+   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
+   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
+   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
+   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
+   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
+   medir de novo. */
+
+/* `text-wrap: pretty` nos textos secundários: a medida certa não impede a ÓRFÃ.
+   Medido nesta tela — "…compensa a API oficial / paga.", "…não tem onde /
+   encaixar." Uma palavra sozinha na última linha lê como erro de composição, e
+   `pretty` a puxa para cima sem mexer na largura. Só o último punhado de linhas é
+   reflowado, então não custa layout. */
+
 .ficha {
   display: flex;
   flex-direction: column;
@@ -39,7 +54,7 @@
   line-height: var(--via-lh-tight);
   color: var(--via-text-primary);
   /* A medida mora no elemento de texto, não no container. */
-  max-width: 20ch;
+  max-width: 26ch;
   text-wrap: balance;
 }
 
@@ -50,7 +65,8 @@
   font-size: var(--via-fs-h4);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 62ch;
+  max-width: 48ch;
+  text-wrap: pretty;
 }
 
 /* Filete à esquerda em vez de card: o diagnóstico é uma anotação sobre o título,
@@ -63,7 +79,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
-  max-width: 68ch;
+  max-width: 52ch;
 }
 
 .viabilidadeTopo {
@@ -89,12 +105,17 @@
 
 /* ---- Grade ---------------------------------------------------------------- */
 
-/* Mesmo acoplamento quebrado da ficha de solução: a coluna de execução tem TETO
-   de 900px e a largura que sobra vai para o painel, que ganha corpo em vez de a
-   linha de texto esticar. */
+/* 780 E NÃO 900, e o número saiu de medir o conteúdo em vez de copiar a ficha de
+   solução. Lá o 900 existe por causa do vídeo 16:9; aqui não há vídeo, e nada na
+   coluna quer 900: a prosa para em 54ch (~700px) e o texto de etapa em 52ch, que
+   com o número e o padding do card fecha ~756. Com 900, o texto de cada etapa
+   terminava ~285px antes da borda do card — a lista lia frouxa, com um rio de
+   vazio à direita.
+   O que sobra vai para o painel, que sai de 280 e passa a ter corpo para as
+   descrições de ferramenta respirarem. */
 .grade {
   display: grid;
-  grid-template-columns: minmax(0, 900px) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 780px) minmax(280px, 1fr);
   gap: var(--via-space-8);
   align-items: start;
 }
@@ -165,7 +186,7 @@
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-loose);
   color: var(--via-text-primary);
-  max-width: 72ch;
+  max-width: 54ch;
   white-space: pre-line;
 }
 
@@ -227,7 +248,8 @@
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 68ch;
+  max-width: 52ch;
+  text-wrap: pretty;
 }
 
 .etapaFerramentas {
@@ -362,6 +384,7 @@
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
+  text-wrap: pretty;
 }
 
 /* ---- Economia -------------------------------------------------------------- */
@@ -463,7 +486,8 @@
   letter-spacing: var(--app-ls-sm);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
-  max-width: 56ch;
+  max-width: 44ch;
+  text-wrap: pretty;
 }
 
 /* A mitigação é a resposta ao risco — indentada por filete, para a relação entre
@@ -475,7 +499,8 @@
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 56ch;
+  max-width: 44ch;
+  text-wrap: pretty;
 }
 
 .fora {
@@ -487,7 +512,7 @@
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-primary);
-  max-width: 56ch;
+  max-width: 44ch;
 }
 
 .nota {
@@ -495,7 +520,7 @@
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
   color: var(--via-text-faint);
-  max-width: 56ch;
+  max-width: 44ch;
 }
 
 @media (prefers-reduced-motion: reduce) {
