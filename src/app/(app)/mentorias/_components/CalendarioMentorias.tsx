@@ -3,19 +3,14 @@
 import { useMemo, useState } from 'react';
 import { mentorPorId } from '@/content/mentorias';
 import { TRILHAS } from '@/content/mentorias/types';
+import type { Trilha } from '@/content/mentorias/types';
 import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
 import { chaveDoDia, horaCurta } from './estadoMentoria';
 import styles from './CalendarioMentorias.module.css';
 
 const SEMANA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 
-type Celula = {
-  chave: string;
-  dia: number;
-  iso: string;
-  doMes: boolean;
-  hoje: boolean;
-};
+type Celula = { chave: string; dia: number; iso: string; doMes: boolean; hoje: boolean };
 
 /** Seis semanas SEMPRE — cinco faria a grade mudar de altura ao trocar de mês. */
 function montarGrade(ano: number, mes: number, agora: Date): Celula[] {
@@ -48,18 +43,23 @@ function IconeSeta({ direcao }: { direcao: 'anterior' | 'proximo' }) {
 }
 
 /**
- * Vista de CALENDÁRIO: grade do mês à esquerda, sessões do dia escolhido à
- * direita.
+ * Vista de CALENDÁRIO: grade do mês à esquerda, dia escolhido à direita.
  *
- * A divisão é a regra de largura da casa aplicada a duas coisas de naturezas
- * diferentes na mesma tela: a GRADE precisa de área (7 colunas fixas que só
- * podem crescer em célula), a LISTA do dia precisa de MEDIDA. Uma grade de mês
- * ocupando 1600px de largura vira células de 228 quase vazias; com o painel ao
- * lado, o espaço que sobraria vira informação.
+ * ALINHAMENTO — as duas CAIXAS alinham entre si.
+ * O painel é uma superfície com borda; a grade de células também. Antes o painel
+ * começava no topo do TÍTULO do mês, 67px acima da grade, e as duas caixas ficavam
+ * desencontradas. A correção é estrutural, não uma margem chutada: `.raiz` tem TRÊS
+ * linhas (cabeçalho · dias da semana · células) e o painel mora na terceira, ao lado
+ * das células. Assim o alinhamento sobrevive a mudar o tamanho do título ou a
+ * altura da linha de dias da semana — margem fixa não sobreviveria.
  *
- * A célula mostra no máximo DUAS sessões e um "+N". Empilhar todas faria as
- * linhas da grade terem alturas diferentes conforme o mês — e grade que muda de
- * altura ao navegar é a coisa que mais denuncia calendário improvisado.
+ * A GRADE precisa de área (7 colunas fixas que só engordam a célula), a LISTA do
+ * dia precisa de medida. É a regra de largura da casa com as duas naturezas na
+ * mesma tela.
+ *
+ * A célula mostra no máximo DUAS sessões e um "+N": empilhar todas faria as linhas
+ * terem alturas diferentes conforme o mês, e grade que muda de altura ao navegar é
+ * o que mais denuncia calendário improvisado.
  */
 export function CalendarioMentorias({
   sessoes,
@@ -67,7 +67,7 @@ export function CalendarioMentorias({
   estadoDaSessao,
   aoAbrirDetalhe,
 }: {
-  /** TODAS as sessões, inclusive as encerradas: navegar para trás tem que mostrar o passado. */
+  /** TODAS as sessões, inclusive encerradas: navegar para trás tem que mostrar o passado. */
   sessoes: MentoriaExemplo[];
   agora: Date;
   estadoDaSessao: (s: MentoriaExemplo) => EstadoMentoria;
@@ -93,8 +93,38 @@ export function CalendarioMentorias({
     year: 'numeric',
   });
 
-  const doDia = porDia.get(selecionado) ?? [];
+  /* Memoizado porque entra na dependência do `proximaDepois`: `?? []` cria um
+     array novo a cada render e invalidaria o memo de baixo sempre. */
+  const doDia = useMemo(() => porDia.get(selecionado) ?? [], [porDia, selecionado]);
   const dataSelecionada = grade.find((c) => c.chave === selecionado);
+
+  /* Dia vazio não é beco sem saída: aponta a próxima sessão DEPOIS dele. É a
+     diferença entre "não tem nada" e "não tem aqui, tem ali". */
+  const proximaDepois = useMemo(() => {
+    if (doDia.length > 0 || !dataSelecionada) return null;
+    const limite = new Date(dataSelecionada.iso);
+    limite.setHours(23, 59, 59, 999);
+    return (
+      sessoes
+        .filter((s) => new Date(s.inicioIso).getTime() > limite.getTime())
+        .sort((a, b) => a.inicioIso.localeCompare(b.inicioIso))[0] ?? null
+    );
+  }, [doDia, dataSelecionada, sessoes]);
+
+  /* Quantas sessões cada trilha tem no mês VISÍVEL. Alimenta a legenda, que
+     existe porque a célula mostra siglas (IMP/TRF/COM/PRD) e sigla sem legenda é
+     charada. E resolve, com informação de verdade, a calha morta que sobrava sob
+     o painel do dia. */
+  const porTrilhaNoMes = useMemo(() => {
+    const conta = new Map<Trilha, number>();
+    for (const s of sessoes) {
+      const d = new Date(s.inicioIso);
+      if (d.getFullYear() !== ref.ano || d.getMonth() !== ref.mes) continue;
+      const t = mentorPorId(s.mentorId)?.trilha;
+      if (t) conta.set(t, (conta.get(t) ?? 0) + 1);
+    }
+    return conta;
+  }, [sessoes, ref]);
 
   const andar = (passo: number) => {
     const d = new Date(ref.ano, ref.mes + passo, 1);
@@ -107,130 +137,188 @@ export function CalendarioMentorias({
   };
 
   const noMesAtual = ref.ano === agora.getFullYear() && ref.mes === agora.getMonth();
+  const dataObj = dataSelecionada ? new Date(dataSelecionada.iso) : null;
+
+  const irPara = (s: MentoriaExemplo) => {
+    const d = new Date(s.inicioIso);
+    setRef({ ano: d.getFullYear(), mes: d.getMonth() });
+    setSelecionado(chaveDoDia(s.inicioIso));
+  };
 
   return (
     <div className={styles.raiz}>
-      <div className={styles.grade}>
-        <header className={styles.cabecalho}>
-          <h3 className={styles.mes}>{nomeMes}</h3>
-          <div className={styles.navegacao}>
-            {!noMesAtual && (
-              <button type="button" className={styles.hoje} onClick={voltarParaHoje}>
-                Hoje
-              </button>
-            )}
-            <button
-              type="button"
-              className={styles.seta}
-              onClick={() => andar(-1)}
-              aria-label="Mês anterior"
-            >
-              <IconeSeta direcao="anterior" />
+      <header className={styles.cabecalho}>
+        <h3 className={styles.mes}>{nomeMes}</h3>
+        <div className={styles.navegacao}>
+          {!noMesAtual && (
+            <button type="button" className={styles.hoje} onClick={voltarParaHoje}>
+              Hoje
             </button>
-            <button
-              type="button"
-              className={styles.seta}
-              onClick={() => andar(1)}
-              aria-label="Próximo mês"
-            >
-              <IconeSeta direcao="proximo" />
-            </button>
-          </div>
-        </header>
-
-        <div className={styles.semana} aria-hidden="true">
-          {SEMANA.map((d) => (
-            <span key={d} className={styles.diaSemana}>
-              {d}
-            </span>
-          ))}
+          )}
+          <button
+            type="button"
+            className={styles.seta}
+            onClick={() => andar(-1)}
+            aria-label="Mês anterior"
+          >
+            <IconeSeta direcao="anterior" />
+          </button>
+          <button
+            type="button"
+            className={styles.seta}
+            onClick={() => andar(1)}
+            aria-label="Próximo mês"
+          >
+            <IconeSeta direcao="proximo" />
+          </button>
         </div>
+      </header>
 
-        <div className={styles.celulas} role="grid" aria-label={`Sessões de ${nomeMes}`}>
-          {grade.map((c) => {
-            const lista = porDia.get(c.chave) ?? [];
-            const aoVivo = lista.some((s) => estadoDaSessao(s) === 'ao-vivo');
-            return (
-              <button
-                key={c.chave}
-                type="button"
-                role="gridcell"
-                className={styles.celula}
-                data-fora={!c.doMes ? '' : undefined}
-                data-hoje={c.hoje ? '' : undefined}
-                data-sel={c.chave === selecionado ? '' : undefined}
-                aria-selected={c.chave === selecionado}
-                onClick={() => setSelecionado(c.chave)}
-              >
-                <span className={styles.numero}>{c.dia}</span>
-                {aoVivo && <span className={styles.pontoVivo} aria-hidden="true" />}
-
-                <span className={styles.marcas}>
-                  {lista.slice(0, 2).map((s) => {
-                    const mentor = mentorPorId(s.mentorId);
-                    return (
-                      <span key={s.id} className={styles.marca}>
-                        <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
-                        <span className={styles.marcaTrilha}>{mentor?.iniciais}</span>
-                      </span>
-                    );
-                  })}
-                  {lista.length > 2 && <span className={styles.mais}>+{lista.length - 2}</span>}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      <div className={styles.semana} aria-hidden="true">
+        {SEMANA.map((d) => (
+          <span key={d} className={styles.diaSemana}>
+            {d}
+          </span>
+        ))}
       </div>
 
-      <aside className={styles.painel} aria-live="polite">
-        <p className={styles.painelData}>
-          {dataSelecionada
-            ? new Date(dataSelecionada.iso).toLocaleDateString('pt-BR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })
-            : ''}
-        </p>
+      <div className={styles.celulas} role="grid" aria-label={`Sessões de ${nomeMes}`}>
+        {grade.map((c) => {
+          const lista = porDia.get(c.chave) ?? [];
+          const aoVivo = lista.some((s) => estadoDaSessao(s) === 'ao-vivo');
+          return (
+            <button
+              key={c.chave}
+              type="button"
+              role="gridcell"
+              className={styles.celula}
+              data-fora={!c.doMes ? '' : undefined}
+              data-hoje={c.hoje ? '' : undefined}
+              data-sel={c.chave === selecionado ? '' : undefined}
+              aria-selected={c.chave === selecionado}
+              onClick={() => setSelecionado(c.chave)}
+            >
+              <span className={styles.topo}>
+                <span className={styles.numero}>{c.dia}</span>
+                {aoVivo && <span className={styles.pontoVivo} aria-hidden="true" />}
+              </span>
 
-        {doDia.length === 0 ? (
-          <p className={styles.painelVazio}>
-            Sem mentoria neste dia. Escolha outro no calendário — os dias com sessão trazem o
-            horário na célula.
-          </p>
-        ) : (
-          <ul className={styles.painelLista}>
-            {doDia.map((s) => {
-              const mentor = mentorPorId(s.mentorId);
-              const estado = estadoDaSessao(s);
-              return (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    className={styles.painelItem}
-                    onClick={() => aoAbrirDetalhe(s.id)}
-                  >
-                    <span className={styles.itemHora}>{horaCurta(s.inicioIso)}</span>
-                    <span className={styles.itemTextos}>
-                      <span className={styles.itemTitulo}>{s.titulo}</span>
-                      <span className={styles.itemMentor}>
-                        {mentor ? TRILHAS[mentor.trilha].rotulo : ''}
-                        {estado === 'ao-vivo' && <span className={styles.itemVivo}>ao vivo</span>}
-                        {estado === 'inscrito' && (
-                          <span className={styles.itemFeito}>check-in feito</span>
-                        )}
-                        {estado === 'encerrada' && (
-                          <span className={styles.itemPassado}>encerrada</span>
-                        )}
-                      </span>
+              <span className={styles.marcas}>
+                {lista.slice(0, 2).map((s) => {
+                  const mentor = mentorPorId(s.mentorId);
+                  return (
+                    <span key={s.id} className={styles.marca} data-trilha={mentor?.trilha}>
+                      <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
+                      <span className={styles.marcaTrilha}>{mentor?.iniciais}</span>
                     </span>
-                  </button>
-                </li>
-              );
-            })}
+                  );
+                })}
+                {lista.length > 2 && <span className={styles.mais}>+{lista.length - 2} mais</span>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <aside className={styles.coluna}>
+        <div className={styles.painel} aria-live="polite">
+          {/* Carimbo de data: o número é o protagonista, como num calendário de mesa. */}
+          <div className={styles.carimbo}>
+            <span className={styles.carimboDia}>{dataObj?.getDate()}</span>
+            <span className={styles.carimboTextos}>
+              <span className={styles.carimboSemana}>
+                {dataObj?.toLocaleDateString('pt-BR', { weekday: 'long' })}
+              </span>
+              <span className={styles.carimboMes}>
+                {dataObj?.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+              </span>
+            </span>
+          </div>
+
+          <p className={styles.contagem}>
+            {doDia.length === 0
+              ? 'sem mentoria'
+              : `${doDia.length} ${doDia.length === 1 ? 'mentoria' : 'mentorias'}`}
+          </p>
+
+          {doDia.length === 0 ? (
+            <div className={styles.vazio}>
+              <p className={styles.vazioTexto}>
+                Nenhuma sessão neste dia. Os dias com mentoria trazem o horário na célula.
+              </p>
+              {proximaDepois && (
+                <button
+                  type="button"
+                  className={styles.proxima}
+                  onClick={() => irPara(proximaDepois)}
+                >
+                  <span className={styles.proximaRotulo}>Próxima</span>
+                  <span className={styles.proximaData}>
+                    {new Date(proximaDepois.inicioIso)
+                      .toLocaleDateString('pt-BR', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                      })
+                      .replace(/\./g, '')}{' '}
+                    · {horaCurta(proximaDepois.inicioIso)}
+                  </span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <ul className={styles.lista}>
+              {doDia.map((s) => {
+                const mentor = mentorPorId(s.mentorId);
+                const estado = estadoDaSessao(s);
+                return (
+                  <li key={s.id}>
+                    <button
+                      type="button"
+                      className={styles.item}
+                      data-trilha={mentor?.trilha}
+                      data-estado={estado}
+                      onClick={() => aoAbrirDetalhe(s.id)}
+                    >
+                      <span className={styles.itemHoras}>
+                        <span className={styles.itemInicio}>{horaCurta(s.inicioIso)}</span>
+                        <span className={styles.itemFim}>{horaCurta(s.fimIso)}</span>
+                      </span>
+                      <span className={styles.itemTextos}>
+                        <span className={styles.itemTitulo}>{s.titulo}</span>
+                        <span className={styles.itemRodape}>
+                          {mentor ? TRILHAS[mentor.trilha].rotulo : ''}
+                          {estado === 'ao-vivo' && <span className={styles.selo}>ao vivo</span>}
+                          {estado === 'inscrito' && (
+                            <span className={styles.selo}>check-in feito</span>
+                          )}
+                          {estado === 'lotada' && <span className={styles.selo}>lotada</span>}
+                          {estado === 'encerrada' && <span className={styles.selo}>encerrada</span>}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
+        {/* A legenda existe porque a célula mostra SIGLA. Sigla sem legenda é
+            charada — e a contagem do mês transforma a explicação em dado. */}
+        <div className={styles.legenda}>
+          <p className={styles.legendaTitulo}>Trilhas em {nomeMes.split(' de ')[0]}</p>
+          <ul className={styles.legendaLista}>
+            {(Object.keys(TRILHAS) as Trilha[]).map((t) => (
+              <li key={t} className={styles.legendaItem} data-trilha={t}>
+                <span className={styles.legendaBarra} aria-hidden="true" />
+                <span className={styles.legendaSigla}>{TRILHAS[t].sigla}</span>
+                <span className={styles.legendaRotulo}>{TRILHAS[t].rotulo}</span>
+                <span className={styles.legendaContagem}>{porTrilhaNoMes.get(t) ?? 0}</span>
+              </li>
+            ))}
           </ul>
-        )}
+        </div>
       </aside>
     </div>
   );

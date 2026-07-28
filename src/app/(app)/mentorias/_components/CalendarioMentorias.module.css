@@ -1,38 +1,41 @@
-/* GRADE precisa de área, LISTA precisa de medida — a regra de largura da casa,
-   com as duas naturezas na mesma tela. A grade do mês tem 7 colunas FIXAS: ela
-   não pode ganhar coluna quando sobra espaço, só engordar a célula. Sozinha a
-   1600 daria células de 228px quase vazias; com o painel ao lado, o que sobraria
-   vira informação. */
+/* TRÊS LINHAS, e é isso que resolve o alinhamento.
+   O painel é uma caixa com borda; a grade de células também. Antes o painel
+   começava no topo do TÍTULO do mês — 67px acima da grade — e as duas caixas
+   ficavam desencontradas. Pôr o painel na MESMA linha das células faz o
+   alinhamento sobreviver a mudar o corpo do título ou a altura da linha de dias
+   da semana. Uma margem fixa de 67px não sobreviveria a nenhum dos dois.
+
+   Colunas: a GRADE tem 7 colunas fixas e só engorda a célula; a LISTA do dia tem
+   medida. O painel encolheu de 400 para ~360 porque a célula é quem estava
+   apertada — a 121px de largura o horário e a sigla disputavam a linha. */
 .raiz {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 400px);
-  gap: var(--app-gap-block);
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 23vw, 360px);
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--app-gap-block);
   align-items: start;
 }
 
-.grade {
-  min-width: 0;
-}
-
 .cabecalho {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--app-gap-stack);
+  min-height: var(--app-h-control);
   margin-bottom: var(--app-gap-stack);
 }
 
 .mes {
   margin: 0;
-  font-size: var(--via-fs-h4);
+  font-size: var(--via-fs-h3);
   font-weight: 560;
-  letter-spacing: var(--app-ls-h4);
+  letter-spacing: var(--app-ls-h3);
   color: var(--via-text-primary);
 }
 
-/* `capitalize` sobe TODA palavra e produzia "Julho De 2026" / "Terça-Feira, 28 De
-   Julho". Só a primeira letra deve subir — e `::first-letter` faz isso sem tocar
-   o resto da frase. */
+/* `capitalize` sobe TODA palavra e produzia "Julho De 2026". Só a primeira. */
 .mes::first-letter {
   text-transform: uppercase;
 }
@@ -77,12 +80,14 @@
   cursor: pointer;
   transition:
     background-color var(--app-t-state),
-    border-color var(--app-t-state);
+    border-color var(--app-t-state),
+    color var(--app-t-state);
 }
 
 .seta:hover {
-  background: var(--via-bg-2);
-  border-color: var(--via-border);
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+  color: var(--via-white);
 }
 
 .semana,
@@ -92,12 +97,16 @@
 }
 
 .semana {
+  grid-column: 1;
+  grid-row: 2;
   gap: 1px;
-  margin-bottom: var(--via-space-1_5);
+  padding-bottom: var(--via-space-2);
 }
 
+/* Alinhado ao número do dia, e não centralizado: a coluna inteira lê como uma
+   coluna quando o rótulo e o dado começam no mesmo x. */
 .diaSemana {
-  padding-inline: var(--via-space-2);
+  padding-inline: var(--via-space-3);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -105,25 +114,28 @@
   color: var(--via-text-faint);
 }
 
-/* A grade é uma superfície só, dividida por hairlines de 1px vindas do gap — não
-   42 caixas com borda, que dobrariam a linha em cada encontro de células. */
+/* A grade é UMA superfície dividida por hairlines vindas do gap — não 42 caixas
+   com borda, que dobrariam a linha em cada encontro de células. */
 .celulas {
+  grid-column: 1;
+  grid-row: 3;
   gap: 1px;
   background: var(--via-border-hairline);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-card);
   overflow: hidden;
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .celula {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1_5);
+  gap: var(--via-space-2);
   /* Altura FIXA e seis semanas sempre: a grade não pode mudar de altura ao
-     navegar entre meses — é o que mais denuncia calendário improvisado. */
-  min-height: 96px;
-  padding: var(--via-space-2);
+     navegar entre meses. */
+  min-height: 112px;
+  padding: var(--via-space-2_5) var(--via-space-2);
   border: none;
   background: var(--via-surface);
   font-family: inherit;
@@ -140,17 +152,16 @@
   background: var(--via-bg-2);
 }
 
-.celula[data-fora] .numero,
-.celula[data-fora] .marca {
+.celula[data-fora] .numero {
   color: var(--via-text-faint);
 }
 
-/* Selecionado é SUPERFÍCIE, hoje é TINTA. Dois sinais de naturezas diferentes
-   podem coexistir na mesma célula sem competir — que é exatamente o caso do dia
-   de hoje quando ele está selecionado. */
+/* Selecionado é SUPERFÍCIE, hoje é TINTA — dois sinais de naturezas diferentes
+   que coexistem sem competir, que é o caso do dia de hoje quando selecionado.
+   O anel é INSET para não ser recortado pelo overflow da grade. */
 .celula[data-sel] {
-  background: var(--via-navy-05, var(--via-bg-3));
-  box-shadow: inset 0 0 0 2px var(--via-navy);
+  background: var(--via-navy-05);
+  box-shadow: inset 0 0 0 1.5px var(--via-navy);
 }
 
 .celula:focus-visible {
@@ -158,10 +169,17 @@
   box-shadow: var(--app-ring);
 }
 
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+}
+
 .numero {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-caption);
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
   font-variant-numeric: tabular-nums;
   color: var(--via-text-body);
 }
@@ -170,9 +188,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  margin: -2px 0 -2px -4px;
+  min-width: 24px;
+  height: 24px;
+  margin: -3px 0 -3px -5px;
   padding-inline: 5px;
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
@@ -180,15 +198,12 @@
   font-weight: var(--via-fw-medium);
 }
 
-/* Dot de "ao vivo" no canto — o accent sobre superfície clara reprova para TEXTO,
-   mas aqui ele não é texto: é um sinal de 6px, e sinal não tem régua de leitura.
-   Ver a regra do accent no CLAUDE.md. */
+/* Dot de "ao vivo": o accent sobre claro reprova para TEXTO, mas isto não é
+   texto — é um sinal de 6px, e sinal não tem régua de leitura. */
 .pontoVivo {
-  position: absolute;
-  top: var(--via-space-2);
-  right: var(--via-space-2);
   width: 6px;
   height: 6px;
+  flex: none;
   border-radius: var(--via-radius-pill);
   background: var(--via-accent);
 }
@@ -196,25 +211,49 @@
 .marcas {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
+/* A marca é um EVENTO, não uma linha de texto: superfície própria e uma barra de
+   trilha na borda esquerda. É o que faz a célula ler como calendário e não como
+   lista de horários soltos. */
 .marca {
   display: flex;
   align-items: baseline;
   gap: var(--via-space-1_5);
+  padding: 2px var(--via-space-1_5) 2px var(--via-space-2);
+  border-left: 2px solid var(--via-navy-40);
+  border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
+  background: var(--via-navy-05);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-micro);
   font-variant-numeric: tabular-nums;
-  color: var(--via-text-muted);
   white-space: nowrap;
   overflow: hidden;
 }
 
+/* Trilha por INTENSIDADE de navy, nunca por cor nova — categoria que vira cor é
+   como uma paleta ganha seis tons que ninguém aprovou. */
+.marca[data-trilha='implementacao'] {
+  border-left-color: var(--via-navy);
+}
+
+.marca[data-trilha='trafego'] {
+  border-left-color: var(--via-blue-soft);
+}
+
+.marca[data-trilha='comercial'] {
+  border-left-color: var(--via-navy-40);
+}
+
+.marca[data-trilha='produto'] {
+  border-left-color: var(--via-navy-25);
+}
+
 .marcaHora {
-  color: var(--via-text-body);
+  color: var(--via-text-primary);
 }
 
 .marcaTrilha {
@@ -224,14 +263,38 @@
   text-overflow: ellipsis;
 }
 
+.celula[data-fora] .marca {
+  background: transparent;
+  border-left-color: var(--via-navy-20);
+}
+
+.celula[data-fora] .marcaHora {
+  color: var(--via-text-faint);
+}
+
 .mais {
+  padding-left: var(--via-space-2);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-micro);
   color: var(--via-text-faint);
 }
 
-/* ── Painel do dia ─────────────────────────────────────────────────────────── */
+/* ── Coluna da direita ─────────────────────────────────────────────────────── */
+/* Duas caixas empilhadas. Antes havia só a do dia, e sobravam ~400px de calha
+   morta sob ela — a mesma calha que a regra de largura da casa manda transformar
+   em informação. A legenda não é enchimento: a célula mostra SIGLA, e sigla sem
+   legenda é charada. */
+.coluna {
+  grid-column: 2;
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+  position: sticky;
+  top: var(--app-gap-block);
+}
+
 .painel {
   display: flex;
   flex-direction: column;
@@ -241,31 +304,152 @@
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
-  /* Acompanha a rolagem da grade, que é alta. */
-  position: sticky;
-  top: var(--app-gap-block);
 }
 
-.painelData {
+/* ── Legenda das trilhas ───────────────────────────────────────────────────── */
+.legenda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card-tight) var(--app-pad-card);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--via-bg-2);
+}
+
+.legendaTitulo {
   margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.legendaLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2_5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendaItem {
+  display: grid;
+  grid-template-columns: 2px max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: var(--via-space-2_5);
+}
+
+.legendaBarra {
+  height: 14px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-40);
+}
+
+.legendaItem[data-trilha='implementacao'] .legendaBarra {
+  background: var(--via-navy);
+}
+
+.legendaItem[data-trilha='trafego'] .legendaBarra {
+  background: var(--via-blue-soft);
+}
+
+.legendaItem[data-trilha='comercial'] .legendaBarra {
+  background: var(--via-navy-40);
+}
+
+.legendaItem[data-trilha='produto'] .legendaBarra {
+  background: var(--via-navy-25);
+}
+
+.legendaSigla {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-primary);
+}
+
+.legendaRotulo {
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Zero fica na tinta mais quieta: a trilha existe, só não tem sessão no mês. */
+.legendaContagem {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-body);
+  min-width: 2ch;
+  text-align: right;
+}
+
+/* Carimbo de data: o NÚMERO é o protagonista, como num calendário de mesa. É o
+   que dá presença ao painel sem precisar de ornamento. */
+.carimbo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding-bottom: var(--app-gap-stack);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.carimboDia {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h1);
+  line-height: 1;
+  letter-spacing: var(--app-ls-h1);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+  /* Reserva a largura de dois dígitos: sem isso o carimbo salta de 9 para 10. */
+  min-width: 2ch;
+  text-align: right;
+}
+
+.carimboTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.carimboSemana {
   font-size: var(--via-fs-sm);
   font-weight: 560;
   letter-spacing: var(--app-ls-sm);
   color: var(--via-text-primary);
 }
 
-.painelData::first-letter {
+.carimboSemana::first-letter {
   text-transform: uppercase;
 }
 
-.painelVazio {
-  margin: 0;
-  font-size: var(--via-fs-caption);
-  line-height: 1.55;
-  color: var(--via-text-muted);
+.carimboMes {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
 }
 
-.painelLista {
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.lista {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-1);
@@ -274,15 +458,17 @@
   list-style: none;
 }
 
-.painelItem {
+/* O item repete a gramática da marca na célula: barra de trilha à esquerda,
+   horário em mono. Quem viu a célula reconhece o item sem aprender nada novo. */
+.item {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   gap: var(--via-space-3);
   width: 100%;
-  padding: var(--via-space-2_5) var(--via-space-2);
-  margin-inline: calc(var(--via-space-2) * -1);
+  padding: var(--via-space-2_5) var(--via-space-3);
   border: none;
-  border-radius: var(--app-radius-chip);
+  border-left: 2px solid var(--via-navy-40);
+  border-radius: 0 var(--app-radius-chip) var(--app-radius-chip) 0;
   background: transparent;
   font-family: inherit;
   text-align: left;
@@ -290,23 +476,57 @@
   transition: background-color var(--app-t-state);
 }
 
-.painelItem:hover {
+.item:hover {
   background: var(--via-bg-2);
 }
 
-.itemHora {
+.item[data-trilha='implementacao'] {
+  border-left-color: var(--via-navy);
+}
+
+.item[data-trilha='trafego'] {
+  border-left-color: var(--via-blue-soft);
+}
+
+.item[data-trilha='comercial'] {
+  border-left-color: var(--via-navy-40);
+}
+
+.item[data-trilha='produto'] {
+  border-left-color: var(--via-navy-25);
+}
+
+/* Encerrada continua legível, só perde ênfase — some seria esconder histórico. */
+.item[data-estado='encerrada'] .itemTitulo,
+.item[data-estado='encerrada'] .itemInicio {
+  color: var(--via-text-muted);
+}
+
+.itemHoras {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   flex: none;
   font-family: var(--via-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.itemInicio {
   font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-caption);
-  font-variant-numeric: tabular-nums;
   color: var(--via-text-primary);
+}
+
+.itemFim {
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
 }
 
 .itemTextos {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
@@ -316,9 +536,10 @@
   color: var(--via-text-body);
 }
 
-.itemMentor {
+.itemRodape {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--via-space-2);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -327,46 +548,129 @@
   color: var(--via-text-faint);
 }
 
-.itemVivo {
-  color: var(--via-accent-ink);
+.selo {
+  padding: 1px var(--via-space-1_5);
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-05);
+  color: var(--via-text-muted);
 }
 
-.itemFeito,
-.itemPassado {
+.item[data-estado='ao-vivo'] .selo {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+/* ── Dia vazio ─────────────────────────────────────────────────────────────── */
+.vazio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+}
+
+.vazioTexto {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
   color: var(--via-text-muted);
+}
+
+/* Dia vazio não é beco sem saída: leva para a próxima sessão depois dele. */
+.proxima {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2_5) var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.proxima:hover {
+  background: var(--via-bg-2);
+  border-color: var(--via-border);
+}
+
+.proximaRotulo {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.proximaData {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  color: var(--via-text-primary);
 }
 
 @media (max-width: 1099px) {
   .raiz {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    row-gap: var(--app-gap-block);
   }
 
-  .painel {
+  .coluna {
+    grid-column: 1;
+    grid-row: 4;
     position: static;
   }
 }
 
 @media (max-width: 767px) {
   .celula {
-    min-height: 72px;
-    padding: var(--via-space-1_5);
+    min-height: 78px;
+    padding: var(--via-space-2) var(--via-space-1_5);
   }
 
-  /* A 375 a célula tem ~46px úteis: hora + sigla não cabem lado a lado, e o
-     número do dia é o que a pessoa procura. Some a marca, fica o ponto. */
+  .diaSemana {
+    padding-inline: var(--via-space-1_5);
+  }
+
+  /* A 375 a célula tem ~44px úteis: horário e sigla não cabem lado a lado, e o
+     número do dia é o que a pessoa procura. A marca vira uma barra de presença —
+     mantém a trilha na cor, perde o texto. */
   .marca {
-    display: none;
-  }
-
-  .marcas::before {
-    content: '';
-    width: 5px;
-    height: 5px;
+    height: 4px;
+    padding: 0;
+    border-left-width: 0;
     border-radius: var(--via-radius-pill);
-    background: var(--via-navy-60);
+    background: var(--via-navy-40);
   }
 
-  .celula:not(:has(.marca)) .marcas::before {
+  .marca[data-trilha='implementacao'] {
+    background: var(--via-navy);
+  }
+
+  .marca[data-trilha='trafego'] {
+    background: var(--via-blue-soft);
+  }
+
+  .marca[data-trilha='comercial'] {
+    background: var(--via-navy-40);
+  }
+
+  .marca[data-trilha='produto'] {
+    background: var(--via-navy-25);
+  }
+
+  .marcaHora,
+  .marcaTrilha,
+  .mais {
     display: none;
+  }
+
+  .carimboDia {
+    font-size: var(--via-fs-h2);
   }
 }

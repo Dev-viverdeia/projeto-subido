@@ -168,22 +168,43 @@ export function gerarAgendaExemplo(agora: Date): MentoriaExemplo[] {
      seis células preenchidas e trinta vazias — e uma grade quase vazia não prova
      nada sobre a tela. Cadência por trilha, ancorada no agora e determinística. */
   const recorrentes: MentoriaExemplo[] = [];
-  const cadencia: Array<{ trilha: Trilha; mentorId: string; passoDias: number; hora: number }> = [
-    { trilha: 'implementacao', mentorId: 'mentor-implementacao', passoDias: 7, hora: 19 },
-    { trilha: 'trafego', mentorId: 'mentor-trafego', passoDias: 7, hora: 20 },
-    { trilha: 'comercial', mentorId: 'mentor-comercial', passoDias: 14, hora: 19 },
-    { trilha: 'produto', mentorId: 'mentor-produto', passoDias: 30, hora: 18 },
+  /* Cada trilha tem seu DIA DA SEMANA. Antes a cadência era contada a partir do
+     `agora`, então toda trilha caía no mesmo dia e o mês inteiro empilhava numa
+     coluna só — um calendário com sessões só às terças lê como dado inventado,
+     porque é. `diaSemana`: 0=dom … 6=sáb. */
+  const cadencia: Array<{
+    trilha: Trilha;
+    mentorId: string;
+    diaSemana: number;
+    passoDias: number;
+    hora: number;
+  }> = [
+    {
+      trilha: 'implementacao',
+      mentorId: 'mentor-implementacao',
+      diaSemana: 2,
+      passoDias: 7,
+      hora: 19,
+    },
+    { trilha: 'trafego', mentorId: 'mentor-trafego', diaSemana: 4, passoDias: 7, hora: 20 },
+    { trilha: 'comercial', mentorId: 'mentor-comercial', diaSemana: 3, passoDias: 14, hora: 19 },
+    { trilha: 'produto', mentorId: 'mentor-produto', diaSemana: 1, passoDias: 30, hora: 18 },
   ];
 
-  for (const { trilha, mentorId, passoDias, hora } of cadencia) {
+  for (const { trilha, mentorId, diaSemana, passoDias, hora } of cadencia) {
     const temas = TEMAS[trilha];
+    /* Âncora = o dia-da-semana da trilha na semana do `agora`. Tudo se conta a
+       partir dele, então a trilha ocupa SEMPRE a mesma coluna do calendário —
+       que é como uma agenda recorrente de verdade se comporta. */
+    const ancora = new Date(agora);
+    ancora.setDate(ancora.getDate() + ((diaSemana - ancora.getDay() + 7) % 7));
     /* Janela em DIAS, não em passos: com passos, a trilha mensal cobria dez meses
        enquanto a semanal cobria dois, e o calendário ficava ralo nas pontas. Aqui
        toda trilha cobre a mesma faixa — ~6 semanas atrás, ~10 à frente. */
     const antes = Math.ceil(42 / passoDias);
     const depois = Math.ceil(70 / passoDias);
     for (let n = -antes; n <= depois; n += 1) {
-      const dia = new Date(agora);
+      const dia = new Date(ancora);
       dia.setDate(dia.getDate() + n * passoDias);
       dia.setHours(hora, 0, 0, 0);
       // Não colide com as sessões da matriz, que mandam nas primeiras 72h.
