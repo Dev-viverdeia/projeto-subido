@@ -27,7 +27,11 @@
     "check:lockfile": "node scripts/check-single-lockfile.mjs",
     "check:fronteira": "node scripts/check-client-boundary.mjs",
     "prepare": "husky",
-    "check:identidade": "node scripts/check-design-tokens.mjs"
+    "check:identidade": "node scripts/check-design-tokens.mjs",
+    "gen:schema-edge": "node scripts/gerar-schema-edge.mjs",
+    "check:schema-edge": "node scripts/gerar-schema-edge.mjs --check",
+    "check:edge": "deno check supabase/functions/builder/index.ts",
+    "deploy:edge": "npm run gen:schema-edge && supabase functions deploy builder --project-ref fopljjqxituhajzwjrjt"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs}": [

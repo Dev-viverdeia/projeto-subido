@@ -1,47 +1,40 @@
-import 'server-only';
-
-import Anthropic from '@anthropic-ai/sdk';
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
-import { chaveDoModelo } from '@/lib/env';
-import { DocumentoSolucao, PerguntasClarificacao, type RespostaClarificacao } from './schema';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.115.0';
+import { zodOutputFormat } from 'npm:@anthropic-ai/sdk@0.115.0/helpers/zod';
+import { DocumentoSolucao, PerguntasClarificacao, type RespostaClarificacao } from './schema.ts';
 
 /**
- * As duas chamadas ao modelo que o Builder faz.
+ * As duas chamadas ao modelo que o Builder faz — agora em Deno.
+ *
+ * POR QUE ISTO MORA NUMA EDGE FUNCTION E NÃO NO NEXT
+ * Decisão de produto: a chave da Anthropic vive nos secrets do Supabase. Um
+ * Route Handler da Vercel lê `process.env` do processo do Next e nunca enxergaria
+ * aquele cofre — não é permissão, é endereço. Trazer a geração para cá é o que
+ * faz o secret ser efetivamente lido.
+ *
+ * O PREÇO, DITO POR EXTENSO: o app Next deixa de saber se a chave existe. Antes a
+ * tela desabilitava o campo e explicava a pendência ANTES de aceitar a ideia;
+ * agora a ausência só aparece na primeira chamada, como erro. É a consequência
+ * direta de o segredo sair do alcance de quem desenha a tela.
  *
  * MODELO
  * `claude-opus-5`. O Builder produz o documento que um implementador leva para o
  * cliente — arquitetura, riscos, estimativa. É o uso mais sensível a qualidade de
- * raciocínio da plataforma inteira, e o lugar errado para economizar um degrau de
- * modelo.
+ * raciocínio da plataforma, e o lugar errado para economizar um degrau de modelo.
  *
  * SAÍDA ESTRUTURADA, NÃO TOOL-USE FORÇADO
  * `output_config.format` constrange a RESPOSTA ao schema. A plataforma de
  * referência força uma tool com `tool_choice` para o mesmo efeito — era o caminho
- * disponível quando ela foi escrita. `messages.parse()` devolve o objeto já
- * validado, então não há `JSON.parse` nem try/catch de forma.
+ * disponível quando ela foi escrita.
  *
- * STREAMING NA GERAÇÃO
- * O documento é longo e a chamada leva dezenas de segundos; sem streaming ela
- * corre contra o timeout HTTP do SDK. `.stream()` + `.finalMessage()` mantém a
- * conexão viva. As perguntas são curtas e não precisam.
- *
- * A VALIDAÇÃO É DO SDK, NÃO NOSSA
- * `zodOutputFormat` guarda o schema Zod DENTRO do formato: ao montar a mensagem
- * final, o SDK roda o `safeParse` completo — inclusive os `min`/`max` que a saída
- * estruturada não suporta e remove do JSON Schema enviado. Um documento com uma
- * etapa só nunca chega em `parsed_output`; vira `AnthropicError`. Por isso não há
- * `JSON.parse` nem revalidação nossa aqui: seria a mesma checagem duas vezes.
- *
- * PENSAMENTO
- * Não passo `thinking`: no Opus 5 ele já vem ligado por padrão. Passar
- * `{type:'disabled'}` para economizar seria trocar a qualidade do raciocínio pelo
- * troco — e ainda esbarraria no teto de effort.
+ * A VALIDAÇÃO É DO SDK. `zodOutputFormat` guarda o schema Zod dentro do formato e
+ * roda o `safeParse` completo ao montar a mensagem final — inclusive os `min`/`max`
+ * que o JSON Schema enviado não carrega. Documento com uma etapa só nunca chega
+ * em `parsed_output`; vira `AnthropicError`.
  */
 
-/** Exportado porque fica gravado em cada solução — ver decisão 4 da migration. */
+/** Fica gravado em cada solução — ver decisão 4 da migration. */
 export const MODELO = 'claude-opus-5';
 
-/** Erro que a rota sabe traduzir em mensagem para o implementador. */
 export class ErroDoBuilder extends Error {
   constructor(
     message: string,
@@ -53,10 +46,10 @@ export class ErroDoBuilder extends Error {
 }
 
 function cliente(): Anthropic {
-  const apiKey = chaveDoModelo();
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) {
     throw new ErroDoBuilder(
-      'O Builder ainda não tem chave de modelo configurada (ANTHROPIC_API_KEY). ' +
+      'O Builder está sem chave de modelo nos secrets do projeto (ANTHROPIC_API_KEY). ' +
         'Sem ela a geração não roda — e nada aqui vai inventar uma solução para ' +
         'preencher a tela.',
       'sem-chave',
@@ -83,10 +76,8 @@ Regras de voz, sem exceção:
 /**
  * PRIMEIRA CHAMADA — as perguntas que faltam.
  *
- * O implementador descreve a ideia em uma frase; o que falta para projetar varia
- * por caso. Perguntas fixas gastariam turnos com o que já foi dito e deixariam de
- * fora o que importa naquele caso. Duas a cinco, e o teto é de propósito: acima
- * disso o wizard é abandonado no meio.
+ * Curta de propósito: ela roda de forma SÍNCRONA, dentro do request, e precisa
+ * responder bem antes do idle timeout de 150s da plataforma.
  */
 export async function gerarPerguntas(ideia: string): Promise<PerguntasClarificacao> {
   const anthropic = cliente();
@@ -110,8 +101,7 @@ não insumo de projeto.`,
 
     if (resposta.stop_reason === 'refusal') {
       throw new ErroDoBuilder(
-        'O modelo recusou esta ideia. Reescreva descrevendo o processo de negócio ' +
-          'a ser automatizado.',
+        'O modelo recusou esta ideia. Reescreva descrevendo o processo de negócio a ser automatizado.',
         'recusa',
       );
     }
@@ -127,8 +117,10 @@ não insumo de projeto.`,
 /**
  * SEGUNDA CHAMADA — o projeto inteiro.
  *
- * Recebe a ideia e as respostas juntas. O schema garante a forma; o que o prompt
- * carrega é o CRITÉRIO — o que faz um documento ser útil em vez de completo.
+ * Roda em TAREFA DE FUNDO (ver `builder/gerar.ts`), depois de a resposta HTTP
+ * já ter sido devolvida. O teto que vale aqui não é o idle timeout de 150s e sim o
+ * wall clock do isolate: 400s no plano pro. A geração leva de 1 a 3 minutos, então
+ * a folga é real, mas não é infinita — daí `max_tokens` calibrado e não no talo.
  */
 export async function gerarDocumento(
   ideia: string,
@@ -142,15 +134,16 @@ export async function gerarDocumento(
     .join('\n\n');
 
   try {
-    /* `.stream()` e não `.create()`: o documento é longo e a chamada leva dezenas
-       de segundos — sem streaming ela corre contra o timeout HTTP do SDK. */
+    /* `.stream()` e não `.create()`: sem streaming a chamada corre contra o
+       timeout HTTP do próprio SDK, que é independente dos limites da plataforma. */
     const stream = anthropic.messages.stream({
       model: MODELO,
       /* Somando os `max` do schema, o documento inteiro cabe em ~15k tokens. O
-         teto é bem acima disso porque o pensamento adaptativo também consome
-         `max_tokens`: apertar aqui não deixa a geração mais barata quando ela é
-         curta — só corta o documento no meio quando ela é longa. */
-      max_tokens: 64000,
+         teto é acima disso porque o pensamento adaptativo também consome
+         `max_tokens` — mas não é 64k como na versão da Vercel: aqui existe o wall
+         clock de 400s, e teto alto demais é convite para a geração ser cortada
+         pelo relógio em vez de terminar. */
+      max_tokens: 32000,
       system: `${VOZ}
 
 Sua tarefa é escrever o projeto COMPLETO de implementação.
@@ -181,8 +174,7 @@ O que faz este documento valer:
 
     if (mensagem.stop_reason === 'refusal') {
       throw new ErroDoBuilder(
-        'O modelo recusou gerar este projeto. Reescreva a ideia em termos do ' +
-          'processo de negócio a ser automatizado.',
+        'O modelo recusou gerar este projeto. Reescreva a ideia em termos do processo de negócio a ser automatizado.',
         'recusa',
       );
     }
@@ -196,7 +188,7 @@ O que faz este documento valer:
 }
 
 /** Erro da API vira mensagem que o implementador entende — nunca stack cru. */
-function traduzir(erro: unknown): ErroDoBuilder {
+export function traduzir(erro: unknown): ErroDoBuilder {
   if (erro instanceof ErroDoBuilder) return erro;
 
   if (erro instanceof Anthropic.RateLimitError) {
@@ -207,17 +199,16 @@ function traduzir(erro: unknown): ErroDoBuilder {
   }
   if (erro instanceof Anthropic.AuthenticationError) {
     return new ErroDoBuilder(
-      'A chave do modelo foi recusada. Verifique a configuração.',
+      'A chave do modelo foi recusada pelo provedor. Confira o secret ANTHROPIC_API_KEY do projeto.',
       'sem-chave',
     );
   }
   if (erro instanceof Anthropic.APIError) {
     return new ErroDoBuilder(`O modelo respondeu com erro ${erro.status}.`, 'falha');
   }
-  /* `AnthropicError` que NÃO é `APIError` é falha de validação do schema — o SDK
-     lança daqui quando o JSON não passa no Zod, o que na prática significa
-     documento cortado no meio. Merece frase própria: a ação certa é tentar de
-     novo, e não reescrever a ideia. */
+  /* `AnthropicError` que não é `APIError` é falha de validação do schema — na
+     prática, documento cortado no meio. A ação certa é tentar de novo, não
+     reescrever a ideia. */
   if (erro instanceof Anthropic.AnthropicError) {
     return new ErroDoBuilder(
       'O documento voltou incompleto e não passou na validação. Tente gerar de novo.',

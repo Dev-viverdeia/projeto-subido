@@ -74,18 +74,16 @@ export function serverEnv() {
 }
 
 /**
- * Chave do modelo de linguagem — do BUILDER, e só dele.
+ * NÃO PROCURE A CHAVE DA ANTHROPIC AQUI.
  *
- * OPCIONAL de propósito, e é a única variável assim no arquivo.
- * Todas as outras derrubam o boot quando faltam, porque sem elas nada funciona.
- * Esta derruba um pilar só: sem ela a plataforma inteira roda, e apenas o Builder
- * não gera. Fazer o boot falhar por causa dela impediria de desenvolver Soluções,
- * Formações e Mentorias numa máquina que nunca vai chamar a Anthropic.
+ * Ela vive nos SECRETS DO SUPABASE e é lida por `Deno.env.get` dentro das Edge
+ * Functions do Builder (`supabase/functions/builder-*`). Este arquivo lê o
+ * ambiente do processo do Next, que nunca enxerga aquele cofre.
  *
- * Quem chama trata o `null` DIZENDO que falta a chave — nunca simulando uma
- * resposta. Uma solução inventada apresentada como gerada é pior que um erro.
+ * A consequência, para quem for mexer na tela: o app não tem como saber se a
+ * chave existe, então o compositor NÃO desabilita o campo por falta dela. A
+ * ausência aparece como erro na primeira chamada, com o nome do secret na
+ * mensagem. Uma versão anterior desabilitava o campo lendo `process.env` — se
+ * você reencontrar essa ideia, ela só funcionava quando a geração morava na
+ * Vercel.
  */
-export function chaveDoModelo(): string | null {
-  const chave = process.env.ANTHROPIC_API_KEY;
-  return chave && chave.length > 0 ? chave : null;
-}

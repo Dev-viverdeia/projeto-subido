@@ -33,6 +33,10 @@ export default tseslint.config(
       // Vendored + generated. Its integrity is a drift check, not a lint pass.
       'src/design-system/via/**',
       'src/lib/supabase/types.generated.ts',
+      // Deno, não Node: `npm:`/`jsr:` nos imports, `.ts` no caminho e globais
+      // (`Deno`, `EdgeRuntime`) que este config não conhece. Quem as checa é o
+      // `deno check` do `npm run check:edge`.
+      'supabase/functions/**',
     ],
   },
 

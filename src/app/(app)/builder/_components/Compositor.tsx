@@ -10,6 +10,7 @@ import {
   useTransition,
 } from 'react';
 import { ArrowUp } from 'lucide-react';
+import { pedirPerguntas } from '@/lib/builder/invocar';
 import { EXEMPLOS } from './exemplos';
 import styles from './Compositor.module.css';
 
@@ -31,8 +32,15 @@ const MAXIMO = 4000;
  * não diz o que é uma boa descrição. Cada chip preenche o campo com um briefing
  * real — volume, quem opera, o que já existe —, que é exatamente o que a
  * entrevista do passo seguinte vai perguntar se faltar.
+ *
+ * A CHAVE NÃO É MAIS CONFERIDA AQUI, e é uma perda assumida. Enquanto a geração
+ * morava na Vercel, o servidor lia `process.env` e desabilitava o campo ANTES de
+ * aceitar a ideia. Agora o segredo vive nos secrets do Supabase, fora do alcance
+ * do Next: o campo fica sempre habilitado e a ausência aparece na primeira
+ * chamada, como erro com o nome do secret. É o preço direto de mover a geração
+ * para a Edge Function.
  */
-export function Compositor({ temChave }: { temChave: boolean }) {
+export function Compositor() {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
   const [ideia, setIdeia] = useState('');
@@ -45,7 +53,7 @@ export function Compositor({ temChave }: { temChave: boolean }) {
      dela. Sem o segundo, o botão volta ao normal por uns instantes enquanto a
      próxima tela carrega — e o campo parece ter perdido o clique. */
   const ocupado = enviando || navegando;
-  const bloqueado = !temChave || curta || ocupado;
+  const bloqueado = curta || ocupado;
 
   const atalho = useTeclaDeComando();
 
@@ -73,31 +81,18 @@ export function Compositor({ temChave }: { temChave: boolean }) {
     setEnviando(true);
     setErro(null);
 
-    try {
-      const resposta = await fetch('/api/builder/perguntas', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ideia: ideia.trim() }),
-      });
+    const { dados, falha } = await pedirPerguntas(ideia.trim());
 
-      const corpo: unknown = await resposta.json();
-
-      if (!resposta.ok) {
-        setErro(
-          typeof corpo === 'object' && corpo !== null && 'erro' in corpo
-            ? String(corpo.erro)
-            : 'Não foi possível continuar. Tente de novo.',
-        );
-        return;
-      }
-
-      const { id } = corpo as { id: string };
-      iniciarNavegacao(() => router.push(`/builder/${id}`));
-    } catch {
-      setErro('A conexão caiu no meio. Tente de novo.');
-    } finally {
+    if (falha) {
+      setErro(falha.mensagem);
       setEnviando(false);
+      return;
     }
+
+    /* `setEnviando(false)` NÃO acontece no caminho feliz: a navegação começa
+       aqui e o componente sai da tela. Zerar o estado antes disso devolveria o
+       botão ao normal por um instante, e o clique pareceria perdido. */
+    iniciarNavegacao(() => router.push(`/builder/${dados.id}`));
   }
 
   function usarExemplo(texto: string) {
@@ -151,7 +146,7 @@ export function Compositor({ temChave }: { temChave: boolean }) {
               void enviar();
             }
           }}
-          disabled={!temChave || ocupado}
+          disabled={ocupado}
           rows={6}
           placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
         />
@@ -185,14 +180,6 @@ export function Compositor({ temChave }: { temChave: boolean }) {
         </p>
       ) : null}
 
-      {!temChave ? (
-        <p className={styles.aviso}>
-          O Builder está sem chave de modelo configurada (<code>ANTHROPIC_API_KEY</code>). Enquanto
-          ela não entrar no ambiente, a geração não roda — e nada aqui vai inventar uma solução para
-          preencher a tela.
-        </p>
-      ) : null}
-
       <section className={styles.exemplos}>
         <h3 className={styles.divisor}>
           <span>ou comece por um exemplo</span>
@@ -205,7 +192,7 @@ export function Compositor({ temChave }: { temChave: boolean }) {
                 type="button"
                 className={styles.chip}
                 onClick={() => usarExemplo(exemplo.texto)}
-                disabled={!temChave || ocupado}
+                disabled={ocupado}
               >
                 {exemplo.rotulo}
               </button>

@@ -41,5 +41,15 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next", "e2e"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "e2e",
+    /* As Edge Functions do Builder rodam em DENO, não em Node: importam por
+       `npm:` e `jsr:`, usam `.ts` no caminho, e falam com globais que só existem
+       lá (`Deno`, `EdgeRuntime`). Este tsconfig descreve o app Next — apontá-lo
+       para aqueles arquivos produz uma dúzia de erros que não são erros. Quem os
+       checa é o `deno check` do `npm run check:edge`. */
+    "supabase/functions"
+  ]
 }

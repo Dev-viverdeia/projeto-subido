@@ -39,6 +39,22 @@
   }
 }
 
+/* Número protagonista: mono, tabular, três casas reservadas para o contador não
+   empurrar o "s" a cada dezena. Veio da Entrevista, que deixou de ter espera. */
+.cronometro {
+  margin: var(--via-space-2) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--app-ls-h2);
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.relogio {
+  min-width: 3ch;
+  display: inline-block;
+}
+
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);

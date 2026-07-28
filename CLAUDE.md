@@ -433,6 +433,33 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
 - **Nunca exponha `error.message` cru do PostgREST** ao usuário. Use `handleError`.
 - Env só por `@/lib/env`. **Nunca hardcode URL ou ref do Supabase** — há grep no CI.
 
+### O Builder roda em Edge Function, e isso muda três regras
+
+A chave da Anthropic mora nos **secrets do Supabase**, não no `.env.local` nem na Vercel. Secret
+do Supabase só é injetado no runtime Deno das Edge Functions — um Route Handler do Next lê
+`process.env` do processo dele e **nunca enxerga aquele cofre**. Não é permissão, é endereço. Foi
+por isso que a geração migrou para `supabase/functions/builder/`.
+
+- **O app não sabe se a chave existe.** A tela não desabilita mais o campo por falta dela; a
+  ausência aparece na primeira chamada, como erro com o nome do secret. É o preço de o segredo
+  sair do alcance de quem desenha a tela — e está dito no comentário do `Compositor`.
+- **A geração é TAREFA DE FUNDO, não request longo.** A plataforma derruba com 504 qualquer função
+  que não responda em **150s** (`request idle timeout`) e a geração leva de 1 a 3 minutos. A rota
+  responde `202` em milissegundos e continua em `EdgeRuntime.waitUntil`, cujo teto é o wall clock
+  do isolate — **400s no plano pro**. De quebra, fechar a aba deixou de cancelar a geração. Quem
+  conta a espera é o banco: a tela repete o RSC até o `status` mudar.
+- **Nada de `SUPABASE_SERVICE_ROLE_KEY` nas funções.** Elas repassam o `Authorization` do chamador,
+  então a RLS continua sendo a barreira. Com service role, `dono` viraria um campo que o código
+  precisa lembrar de conferir. O JWT vale ~1h e a geração leva minutos — não é preciso escalar
+  privilégio para gravar o resultado depois.
+- **O schema Zod tem um dono só.** `src/lib/builder/schema.ts` é a fonte; o arquivo do Deno é
+  GERADO dela (`npm run gen:schema-edge`), trocando apenas o especificador do import. `npm run
+check:schema-edge` reprova se estiver atrasado. Dois arquivos que "precisam ser iguais" é
+  exatamente a história que abre este documento.
+- `supabase/functions/**` fica **fora** do `tsconfig` e do eslint: é Deno, com `npm:`/`jsr:` nos
+  imports, `.ts` no caminho e globais que o config do Next não conhece. Quem checa é o
+  `npm run check:edge` (precisa do Deno instalado).
+
 ## Banco
 
 - Helpers de policy vivem no schema **`private`**, com `security definer` e

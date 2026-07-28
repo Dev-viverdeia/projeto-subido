@@ -412,3 +412,24 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# =============================================================================
+# EDGE FUNCTIONS
+#
+# `builder` é uma função só com rota interna (`/builder/perguntas`,
+# `/builder/gerar`) — ver supabase/functions/builder/index.ts. Elas compartilham
+# CORS, cliente do chamador, schema e cliente da Anthropic; duas funções seriam
+# dois bundles com o mesmo peso e dois cold starts.
+#
+# `verify_jwt = true`: a plataforma valida o token ANTES de a função rodar. É a
+# primeira das duas barreiras — a segunda é a RLS, que continua valendo porque a
+# função repassa o Authorization do chamador em vez de usar service role.
+#
+# O SECRET `ANTHROPIC_API_KEY` mora no painel do projeto (Edge Functions →
+# Secrets), NÃO no .env.local. O app Next não o enxerga, e é por isso que a tela
+# não consegue mais avisar da ausência antes da primeira chamada.
+# =============================================================================
+[functions.builder]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/builder/index.ts"

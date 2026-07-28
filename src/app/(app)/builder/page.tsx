@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { chaveDoModelo } from '@/lib/env';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
@@ -21,20 +20,19 @@ export const metadata: Metadata = { title: 'Builder' };
  * primeiro — ocupa a dobra para não informar nada. Sem projetos, a pergunta fica
  * sozinha na tela, que é o estado certo para uma tela de criação.
  *
- * `chaveDoModelo()` é lido AQUI, no servidor, e desce como booleano. A chave nunca
- * atravessa a fronteira; o que atravessa é o fato de ela existir — o suficiente
- * para a tela dizer a verdade antes de aceitar a ideia.
+ * A CHAVE DO MODELO NÃO É CONFERIDA AQUI. Ela vive nos secrets do Supabase e é
+ * lida dentro da Edge Function; o processo do Next não enxerga aquele cofre. A
+ * ausência aparece na primeira chamada, com o nome do secret na mensagem.
  */
 export default async function BuilderPage() {
   const itens = await listarSolucoesDoBuilder();
-  const temChave = chaveDoModelo() !== null;
 
   return (
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Builder" oculto />
 
       <div className={entrada.bloco}>
-        <Compositor temChave={temChave} />
+        <Compositor />
       </div>
 
       {itens.length > 0 ? (

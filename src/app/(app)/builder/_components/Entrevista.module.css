@@ -172,7 +172,8 @@
 }
 
 /* Sobre CLARO o preenchimento é navy — accent sobre branco dá 2,70:1 e reprova
-   AA até para texto grande. O accent desta tela vive na banda escura do `/builder`. */
+   AA até para texto grande. Não há banda escura em nenhuma tela do Builder, então
+   o accent simplesmente não aparece neste pilar. */
 .acao {
   display: inline-flex;
   align-items: center;
@@ -202,6 +203,12 @@
   transform: translateY(0);
 }
 
+.acao:disabled {
+  cursor: not-allowed;
+  background: var(--via-navy-16);
+  color: var(--via-text-faint);
+}
+
 .erro {
   margin: 0;
   padding: var(--via-space-3) var(--via-space-4);
@@ -213,77 +220,6 @@
   color: var(--via-text-primary);
 }
 
-/* ---- Espera --------------------------------------------------------------- */
-
-.espera {
-  max-width: var(--via-content);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--via-space-3);
-  padding: clamp(28px, 4vw, 48px);
-  border-radius: var(--app-radius-surface);
-  border: 1px solid var(--via-border-hairline);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-/* A ÚNICA delícia da tela — um pulso lento, não um spinner de biblioteca. É
-   ambiente, não interação: fica em `animation`, e some inteiro em reduced-motion
-   dando lugar a um ponto sólido. */
-.pulso {
-  width: 12px;
-  height: 12px;
-  border-radius: var(--via-radius-pill);
-  background: var(--via-accent-ink);
-  animation: respirar 1800ms var(--via-ease) infinite;
-}
-
-@keyframes respirar {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.6);
-    opacity: 0.35;
-  }
-}
-
-.esperaTitulo {
-  margin: 0;
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h3);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  color: var(--via-text-primary);
-}
-
-.esperaTexto {
-  margin: 0;
-  font-size: var(--via-fs-body);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 56ch;
-}
-
-/* Número protagonista: mono, tabular, três casas reservadas para o contador não
-   empurrar o "s" a cada dezena. */
-.cronometro {
-  margin: var(--via-space-2) 0 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-h2);
-  letter-spacing: var(--app-ls-h2);
-  color: var(--via-text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.relogio {
-  min-width: 3ch;
-  display: inline-block;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .item,
   .campo,
@@ -293,10 +229,6 @@
 
   .acao:hover {
     transform: none;
-  }
-
-  .pulso {
-    animation: none;
   }
 }
 

@@ -12,11 +12,14 @@ const TENTATIVAS = 40;
 const INTERVALO = 6000;
 
 /**
- * O estado `gerando` visto de FORA da aba que disparou a geração.
+ * A ÚNICA tela de espera do Builder.
  *
- * Quem clicou em "Gerar" vê o cronômetro da própria `Entrevista`. Esta tela é o
- * outro caso: recarregou, voltou depois, abriu em outro dispositivo. O status no
- * banco é a única fonte, então a página se re-renderiza sozinha até ele mudar.
+ * Era o caso de borda — "alguém abriu de outra aba uma solução que está gerando" —
+ * e virou o caso principal quando a geração foi para uma tarefa de fundo da Edge
+ * Function: a chamada responde em milissegundos e ninguém mais fica segurando a
+ * conexão. Quem clicou em "Gerar" chega aqui pelo `router.refresh()`, e quem
+ * fechou a aba encontra o mesmo estado ao voltar. O status no banco é a única
+ * fonte, então a página se re-renderiza sozinha até ele mudar.
  *
  * `router.refresh()` e não polling de API: o RSC já lê o status, e refazer a
  * renderização do servidor é a mesma consulta que a página faria de qualquer
@@ -52,8 +55,19 @@ export function EstadoGeracao({ id }: { id: string }) {
       <p className={styles.texto}>
         {desistiu
           ? 'Ela ficou marcada como em andamento por tempo demais, o que normalmente significa que a chamada morreu no meio. Suas respostas continuam salvas — volte à entrevista e gere de novo.'
-          : 'A geração começou em outro momento e ainda não terminou. Esta tela se atualiza sozinha assim que o projeto ficar pronto.'}
+          : 'Arquitetura, ferramentas, passo a passo, prompts, riscos e a conta da economia. Leva de um a três minutos, e continua rodando mesmo se você fechar a aba — o projeto vai estar aqui quando você voltar.'}
       </p>
+
+      {/* Número protagonista: o tempo decorrido é o que diz se a espera está
+          andando ou travada. Um pulso sozinho não distingue as duas coisas. */}
+      {!desistiu ? (
+        <p className={styles.cronometro}>
+          <span className={styles.relogio}>
+            {String(tentativas * (INTERVALO / 1000)).padStart(3, '0')}
+          </span>
+          s
+        </p>
+      ) : null}
 
       {desistiu ? (
         <form action={voltarParaEntrevista} className={styles.acoes}>

@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { pedirGeracao } from '@/lib/builder/invocar';
 import type { RespostaClarificacao } from '@/lib/builder/schema';
 import styles from './Entrevista.module.css';
 
@@ -18,6 +19,12 @@ import styles from './Entrevista.module.css';
  * escrever "não sei" cinco vezes — resposta pior que campo vazio, porque entra no
  * prompt como se fosse informação. O que falta é DITO, com número, e a decisão
  * fica com quem conhece o cliente.
+ *
+ * ESTE COMPONENTE NÃO TEM MAIS TELA DE ESPERA, e a razão é arquitetural. A Edge
+ * Function aceita o pedido e responde em milissegundos: quem gera é uma tarefa de
+ * fundo, e quem conta a espera é o `EstadoGeracao`, que lê o status do banco.
+ * Manter aqui um segundo cronômetro seria duas telas de espera para a mesma
+ * espera — e elas divergiriam no primeiro reload.
  */
 export function Entrevista({
   id,
@@ -30,20 +37,11 @@ export function Entrevista({
 }) {
   const router = useRouter();
   const [respostas, setRespostas] = useState(perguntas);
-  const [gerando, setGerando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [segundos, setSegundos] = useState(0);
 
   const respondidas = respostas.filter((r) => r.resposta.trim().length > 0).length;
   const vazias = respostas.length - respondidas;
-
-  /* Cronômetro da espera. A geração leva dezenas de segundos e um spinner sem
-     número não diz se está andando ou travado — o tempo decorrido diz. */
-  useEffect(() => {
-    if (!gerando) return;
-    const timer = setInterval(() => setSegundos((s) => s + 1), 1000);
-    return () => clearInterval(timer);
-  }, [gerando]);
 
   function responder(indice: number, valor: string) {
     setRespostas((atual) =>
@@ -53,55 +51,23 @@ export function Entrevista({
 
   async function gerar(evento: React.FormEvent) {
     evento.preventDefault();
-    if (gerando) return;
+    if (enviando) return;
 
-    setGerando(true);
-    setSegundos(0);
+    setEnviando(true);
     setErro(null);
 
-    try {
-      const resposta = await fetch('/api/builder/gerar', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ id, respostas }),
-      });
+    const { falha } = await pedirGeracao(id, respostas);
 
-      const corpo: unknown = await resposta.json();
-
-      if (!resposta.ok) {
-        setErro(
-          typeof corpo === 'object' && corpo !== null && 'erro' in corpo
-            ? String(corpo.erro)
-            : 'A geração falhou. Tente de novo.',
-        );
-        setGerando(false);
-        return;
-      }
-
-      /* `refresh()` e não `push()`: a URL já é a certa. O servidor re-renderiza a
-         mesma rota, agora com status `pronta`, e a ficha entra no lugar do
-         formulário sem uma navegação que a pessoa não pediu. */
-      router.refresh();
-    } catch {
-      setErro('A conexão caiu no meio. O projeto pode ter sido gerado — recarregue a página.');
-      setGerando(false);
+    if (falha) {
+      setErro(falha.mensagem);
+      setEnviando(false);
+      return;
     }
-  }
 
-  if (gerando) {
-    return (
-      <div className={styles.espera} role="status" aria-live="polite">
-        <div className={styles.pulso} aria-hidden="true" />
-        <h2 className={styles.esperaTitulo}>Escrevendo o projeto.</h2>
-        <p className={styles.esperaTexto}>
-          Arquitetura, ferramentas, passo a passo, prompts, riscos e a conta da economia. Leva de um
-          a três minutos — a aba pode ficar aberta.
-        </p>
-        <p className={styles.cronometro}>
-          <span className={styles.relogio}>{String(segundos).padStart(3, '0')}</span>s
-        </p>
-      </div>
-    );
+    /* `refresh()` e não `push()`: a URL já é a certa. O servidor re-renderiza a
+       mesma rota, agora com status `gerando`, e o `EstadoGeracao` assume a espera.
+       `enviando` não é zerado — este formulário está de saída. */
+    router.refresh();
   }
 
   return (
@@ -156,8 +122,8 @@ export function Entrevista({
           ) : null}
         </p>
 
-        <button type="submit" className={styles.acao}>
-          Gerar o projeto
+        <button type="submit" className={styles.acao} disabled={enviando}>
+          {enviando ? 'Iniciando…' : 'Gerar o projeto'}
           <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>

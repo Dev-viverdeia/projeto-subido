@@ -11,16 +11,12 @@ import styles from './pagina.module.css';
  * texto enquanto a consulta ainda corre — quem chegou para criar um projeto não
  * espera nada, e quem chegou para reler o histórico vê a lista entrar embaixo,
  * sem a tela inteira trocar de pele.
- *
- * `temChave={false}` porque este componente não sabe: a leitura da env é da
- * página. Vale um instante com o campo desabilitado, e não o contrário — habilitar
- * por otimismo seria aceitar uma ideia que talvez não tenha para onde ir.
  */
 export default function CarregandoBuilder() {
   return (
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Builder" oculto />
-      <Compositor temChave={false} />
+      <Compositor />
     </div>
   );
 }
