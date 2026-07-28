@@ -31,9 +31,15 @@
   text-align: center;
 }
 
+/* A LISTA não acompanha o canvas — e isso é a regra, não exceção.
+   O item da agenda é uma linha só: hora (48) + título + mentor + CTA (~160).
+   Acima de ~1080 o miolo vira vão morto entre o título e o botão. Grade ganha
+   coluna quando sobra espaço; lista tem medida de varredura, igual a prosa.
+   O hero acima segue usando o canvas inteiro — card com mesh gosta de largura. */
 .dias {
   display: flex;
   flex-direction: column;
+  max-width: 1080px;
 }
 
 /* Trilho de data à esquerda — o dia é uma COLUNA, não um cabeçalho de largura

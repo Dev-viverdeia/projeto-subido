@@ -2,7 +2,7 @@
    conteúdo de ÁREA (grade), então usa o container largo; /conta e admin usam
    --via-content porque são prosa e formulário. */
 .pagina {
-  max-width: var(--via-container);
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;

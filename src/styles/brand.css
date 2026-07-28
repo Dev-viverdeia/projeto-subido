@@ -128,6 +128,28 @@
   --via-glow-navy-strong:
     0 0 0 1px rgba(11, 22, 45, 0.1), 0 16px 48px rgba(11, 22, 45, 0.3),
     0 32px 80px rgba(11, 22, 45, 0.2);
+
+  /* ----------------------------------------------------------------------------
+     LARGURA DA ÁREA LOGADA
+     O `--via-container` (1280) do design system foi dimensionado para a LANDING,
+     onde a página ocupa a viewport inteira. Na plataforma o trilho já come 240px
+     antes de o conteúdo começar, então 1280 vira teto cedo demais:
+
+       viewport 1600 → 16px desperdiçados
+       viewport 1920 → 336px
+       viewport 2560 → 976px
+
+     `--app-canvas` é a largura das telas de ÁREA (catálogos, detalhe, agenda).
+     Isto só é seguro porque a medida de leitura mora no ELEMENTO de texto — o
+     `<p>` tem seu `ch`, o container não. Ver a regra em CLAUDE.md.
+
+     O teto de 1600 não é timidez: acima disso uma fileira de cards ultrapassa o
+     percurso confortável do olho, e o h1 fica sozinho no topo de uma banda larga
+     demais. O que sobra vira calha, de propósito.
+
+     Formulário e prosa NÃO usam este token — continuam em `--via-content` (760),
+     porque ali a página INTEIRA é uma coluna de leitura. */
+  --app-canvas: 1600px;
 }
 
 /* ------------------------------------------------------------------------------

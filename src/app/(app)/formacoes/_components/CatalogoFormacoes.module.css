@@ -59,6 +59,9 @@
 
 /* Pôsteres pedem mais colunas que cards de texto: 4 → 3 → 2 → 1. O piso
    atmosférico atrás da grade é a assinatura em dose homeopática. */
+/* Pôster 3:4 engorda em DUAS dimensões: 385px de largura viram 513 de altura, e
+   a grade deixa de ser catálogo para virar mural. A quinta coluna segura o pôster
+   em 304px (405 de altura), dentro da faixa de 240–320 do desenho. */
 .grade {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -67,6 +70,12 @@
   margin-inline: calc(var(--via-space-4) * -1);
   border-radius: var(--via-radius-lg);
   background: var(--via-navy-02);
+}
+
+@media (min-width: 1700px) {
+  .grade {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1279px) {

@@ -1,5 +1,11 @@
+/* NÃO usa o canvas cheio, e isso é a regra, não descuido: a coluna principal
+   desta tela é o CURRÍCULO — uma lista de linhas de uma linha só. A 1600 ela
+   ficaria com 1292px para um título de módulo de ~300px de texto; o resto seria
+   vão entre o título e a contagem. 1308 põe o currículo em 1000px, que é a
+   medida de varredura da linha. O hero acima ocupa a largura inteira da página,
+   porque banda com mesh gosta de área. */
 .pagina {
-  max-width: 1240px;
+  max-width: 1308px;
   margin-inline: auto;
   display: flex;
   flex-direction: column;

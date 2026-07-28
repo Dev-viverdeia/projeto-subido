@@ -72,10 +72,19 @@
   border-bottom-color: var(--via-navy);
 }
 
+/* Largura maior GANHA COLUNA, não engorda card: a 1600 com 3 colunas o card iria
+   a 520px e o resumo de 2 linhas viraria uma faixa. Com 4, fica em 385px — dentro
+   da faixa de 340–420 em que o card foi desenhado. */
 .grade {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
+}
+
+@media (min-width: 1800px) {
+  .grade {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1279px) {

@@ -1,5 +1,5 @@
 .pagina {
-  max-width: var(--via-container);
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -121,10 +121,15 @@
   color: var(--via-text-primary);
 }
 
+/* Teaser de TRÊS cards — contagem fixa, então coluna a mais deixaria buraco na
+   fileira. Em vez de ganhar coluna, esta grade PARA de crescer: 3 × 420 (topo da
+   faixa de desenho do card) + 2 × 20 de gap = 1300. O que sobra do canvas vira
+   calha à direita, e a fileira nunca fica com card de 520px nem com vão. */
 .grade {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-5);
+  max-width: 1300px;
 }
 
 @media (max-width: 1279px) {

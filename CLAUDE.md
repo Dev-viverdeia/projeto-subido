@@ -129,6 +129,29 @@ justificar por que vira um quarto momento de decisão.
 | `content` (760) | prosa editorial, FAQ — coisas que precisam de linha curta |
 | `narrow` (560)  | desqualificador, garantia — coisas que precisam de foco   |
 
+**Na ÁREA LOGADA a largura é `--app-canvas` (1600), não `--via-container`.** O 1280 do DS foi
+dimensionado para a landing, onde a página ocupa a viewport inteira; na plataforma o trilho já
+come 240px antes de o conteúdo começar. Medido: a 1920 sobravam **336px** de calha morta à
+direita, a 2560 sobravam 976. Formulário e prosa (`/conta`, `/admin`) ficam em `--via-content` —
+ali a página INTEIRA é uma coluna de leitura.
+
+**E a regra que torna a largura segura, porque separa os dois casos que parecem um:**
+
+- **GRADE ganha COLUNA.** Nunca card mais gordo. A 1600 com 3 colunas o card de solução iria a
+  520px e o resumo de duas linhas viraria faixa; com 4, fica em 385 — dentro da faixa de 340–420
+  em que foi desenhado. Pôster 3:4 engorda em duas dimensões (385 de largura = 513 de altura),
+  então ganha a quinta coluna antes. **Skeleton repete os mesmos breakpoints da grade real** —
+  contagem diferente faz a tela pular no fim do load.
+- **LISTA tem MEDIDA, igual a prosa.** O item da agenda é uma linha só (hora + título + mentor +
+  CTA): acima de ~1080 o miolo vira vão morto entre o título e o botão. Lista não acompanha o
+  canvas; o hero acima dela acompanha, porque card com mesh gosta de largura.
+- **Contagem FIXA de cards não ganha coluna** — deixaria buraco na fileira. Em vez disso a grade
+  para de crescer numa largura DERIVADA: o teaser de 3 cards do `/inicio` para em
+  `3 × 420 + 2 × 20 = 1300`.
+
+Nada disso funciona sem o item 3 abaixo: é a medida de leitura viver no elemento de texto que
+permite o container ser largo.
+
 Classe tipográfica pela mesma lógica: `.t-display` = cabeçalho de largura total; `.t-title` =
 cabeçalho dentro de coluna. O `clamp()` escala com a viewport, mas **o título vive numa coluna** —
 por isso `--type-hero` tem teto de `4rem`. Acima disso a linha mais longa do hero quebra sozinha e
