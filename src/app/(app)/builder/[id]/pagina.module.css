@@ -2,8 +2,14 @@
    ações) precisa dividir o eixo com o conteúdo. Com a barra em 1200 e a entrevista
    em 760 centrada, o "Voltar" ficava 240px à esquerda do primeiro card e a tela
    lia como dois documentos empilhados. */
+/* LARGURA DERIVADA, não o canvas de 1600. A ficha é um documento de contagem FIXA
+   de colunas (prosa + painel), então ela não ganha coluna ao sobrar espaço — para
+   numa largura que sai da soma das trilhas de `.grade`: 780 da prosa + 32 de gap +
+   380 do painel. Com o canvas inteiro sobravam 408px de calha morta à direita a
+   1920, porque nenhuma das duas trilhas cresce para preenchê-la.
+   Os três termos vivem em `FichaProjeto.module.css`; mexer lá pede mexer aqui. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: calc(780px + var(--via-space-8) + 380px);
   margin-inline: auto;
   display: flex;
   flex-direction: column;

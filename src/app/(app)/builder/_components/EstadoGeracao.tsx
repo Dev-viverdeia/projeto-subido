@@ -6,9 +6,13 @@ import { useFormStatus } from 'react-dom';
 import { voltarParaEntrevista } from '@/lib/builder/actions';
 import styles from './EstadoGeracao.module.css';
 
-/** ~4 minutos de tentativas. Além disso a geração não voltou mais — e insistir
- *  em silêncio é pior que dizer que parou. */
-const TENTATIVAS = 40;
+/** 70 × 6s = 420s, logo ACIMA do wall clock de 400s do isolate da Edge Function.
+ *  A tela não pode desistir antes do backend: com os 40 anteriores ela parava em
+ *  240s e dizia "não respondeu" enquanto o isolate ainda tinha 160s de vida para
+ *  gravar o resultado — desistência que o banco poderia desmentir um minuto depois.
+ *  Medido: as gerações reais deste briefing levaram 165s e 166s, então 420s é teto
+ *  de segurança, não a espera esperada. */
+const TENTATIVAS = 70;
 const INTERVALO = 6000;
 
 /**
