@@ -1,26 +1,26 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  border-radius: var(--via-radius-xl);
+  border-radius: var(--app-radius-card);
   background: var(--via-surface);
   border: 1px solid var(--via-border-hairline);
-  box-shadow: var(--via-shadow-sm);
+  box-shadow: var(--via-shadow-xs);
   color: inherit;
   text-decoration: none;
   transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .cartao:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--via-shadow-lg);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--via-shadow-sm);
+  text-decoration: none;
 }
 
 .cartao:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--via-white),
-    0 0 0 4px var(--via-navy-60);
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
+  text-decoration: none;
 }
 
 /* A moldura é o acabamento: o pôster fica ENCAIXADO, com folga e raio próprios
@@ -31,13 +31,13 @@
   padding: var(--via-space-2);
 }
 
-/* 3:4 — retrato, como a referência. A 1600 com 4 colunas o pôster fica 369×492:
-   a proporção que faz o card ler como pôster e não como banner. */
+/* Retrato mais contido: preserva a leitura de capa sem transformar cada formação
+   em uma coluna excessivamente alta. */
 .poster {
   position: relative;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--via-radius-lg);
+  border-radius: var(--app-radius-control);
   background: var(--via-navy-deep);
   isolation: isolate;
 }
@@ -47,11 +47,6 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform var(--app-t-scene);
-}
-
-.cartao:hover .imagem {
-  transform: scale(1.06);
 }
 
 /* Capa sintética: campo navy com luz e grão. Não desenha marca nem repete texto
@@ -158,7 +153,7 @@
   color: var(--via-white);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
@@ -187,14 +182,13 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--via-space-4);
+  gap: 0;
   margin-top: auto;
 }
 
 .item {
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-1_5);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
@@ -202,9 +196,10 @@
   white-space: nowrap;
 }
 
-.item svg {
-  color: var(--via-text-faint);
-  flex: none;
+.item + .item::before {
+  content: '/';
+  margin-inline: var(--via-space-2);
+  color: var(--via-border-strong);
 }
 
 /* Fecha o card encostado na base — trilho de largura total, percentual à direita. */
@@ -249,10 +244,8 @@
   font-weight: var(--via-fw-medium);
 }
 
-/* Duas colunas no telefone (como a referência): pôster é conteúdo de varredura,
-   e uma coluna só faria UM card ocupar a tela inteira. Nessa largura o resumo
-   caberia em ~28 caracteres por linha — vira ruído, e o título já está no
-   pôster. Some o resumo, não a informação. */
+/* Duas colunas no telefone preservam a varredura do catálogo. Nessa largura o
+   resumo vira ruído, e o título já está na capa; some o resumo, não a informação. */
 @media (max-width: 599px) {
   .resumo {
     display: none;
@@ -269,7 +262,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
-  .imagem,
   .preenchido {
     transition: none;
   }

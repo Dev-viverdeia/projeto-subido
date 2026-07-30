@@ -113,7 +113,7 @@
   align-items: center;
   min-height: var(--app-h-control);
   padding-inline: var(--via-space-5);
-  border-radius: var(--via-radius-pill);
+  border-radius: var(--app-radius-control);
   font-family: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
@@ -121,8 +121,7 @@
   cursor: pointer;
   transition:
     border-color var(--app-t-state),
-    background-color var(--app-t-state),
-    transform var(--app-t-touch);
+    background-color var(--app-t-state);
 }
 
 .acao {
@@ -144,9 +143,8 @@
   color: var(--via-text-primary);
 }
 
-.acao:hover:not(:disabled),
-.secundaria:hover {
-  transform: translateY(-1px);
+.acao:hover:not(:disabled) {
+  background: var(--via-navy-deep);
 }
 
 .secundaria:hover {
@@ -170,10 +168,5 @@
   .acao,
   .secundaria {
     transition: none;
-  }
-
-  .acao:hover:not(:disabled),
-  .secundaria:hover {
-    transform: none;
   }
 }

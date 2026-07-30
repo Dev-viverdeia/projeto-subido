@@ -3,20 +3,26 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
 }
 
 .cabecalho {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: var(--via-space-5);
-  flex-wrap: wrap;
+  gap: var(--via-space-3);
+}
+
+.navegacao {
+  display: flex;
+  align-items: center;
 }
 
 .textos {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1);
+  gap: var(--via-space-1_5);
+  max-width: 760px;
   min-width: 0;
 }
 
@@ -35,7 +41,7 @@
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+  font-size: clamp(var(--via-fs-h3), 2.4vw, var(--via-fs-h2));
   font-weight: 560;
   letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-snug);

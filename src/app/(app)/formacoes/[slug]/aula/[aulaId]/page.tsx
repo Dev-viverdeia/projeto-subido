@@ -33,7 +33,10 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
   return (
     <div className={styles.pagina}>
       <header className={`${styles.cabecalho} ${entrada.bloco}`}>
-        <BotaoVoltar fallback={`/formacoes/${slug}`} rotulo={formacao.titulo} />
+        <div className={styles.navegacao}>
+          <BotaoVoltar fallback={`/formacoes/${slug}`} rotulo="Voltar à formação" />
+        </div>
+
         <div className={styles.textos}>
           <p className={styles.eyebrow}>
             {formacao.titulo} · {modulo.titulo}

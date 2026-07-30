@@ -5,7 +5,6 @@ import { gerarAgendaExemplo } from '@/content/mentorias';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
-import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
 import entrada from '../_components/entrada.module.css';
 import { RetomadaFormacao } from '../formacoes/_components/RetomadaFormacao';
 import { horaCurta, rotuloDoDia } from '../mentorias/_components/estadoMentoria';
@@ -80,14 +79,7 @@ export default async function InicioPage() {
           </div>
           <div className={styles.grade}>
             {recentes.map((solucao) => (
-              <CartaoSolucao
-                key={solucao.id}
-                solucao={solucao}
-                icone={
-                  (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) ||
-                  ICONE_CATEGORIA_PADRAO
-                }
-              />
+              <CartaoSolucao key={solucao.id} solucao={solucao} />
             ))}
           </div>
         </section>

@@ -1,26 +1,50 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--app-gap-grid);
 }
 
-/* Tudo que é CONTROLE fica à esquerda, na ordem em que se decide: primeiro o
-   recorte (situação), depois a busca, depois a ordem. A contagem é resultado —
-   `margin-left: auto` a manda para a ponta oposta, longe da primeira leitura.
-   `align-items: center` com as abas junto: elas têm padding-bottom próprio para
-   o sublinhado, então o `baseline` desalinharia busca e ordenação. */
+.painelDescoberta {
+  --catalogo-busca-largura: 300px;
+  --catalogo-controle-altura: 40px;
+  --catalogo-controle-borda: var(--via-border-hairline);
+  --catalogo-controle-raio: var(--app-radius-control);
+  --catalogo-controle-fonte: var(--via-fs-caption);
+  --catalogo-aba-padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
+  --catalogo-aba-fonte: var(--via-fs-caption);
+  --catalogo-aba-sublinhado: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding-bottom: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
 .regua {
   position: relative;
   z-index: 10;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--via-space-4);
-  flex-wrap: wrap;
+  min-height: 46px;
+}
+
+.reguaDireita {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.linhaMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
 }
 
 .contagem {
   margin: 0;
-  margin-left: auto;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   color: var(--via-text-faint);
@@ -29,24 +53,28 @@
 
 .ordenacao {
   display: flex;
-  gap: var(--via-space-3);
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
 }
 
 .ordenar {
+  min-height: 28px;
+  padding: var(--via-space-1) var(--via-space-2_5);
   border: none;
+  border-radius: calc(var(--app-radius-control) - 2px);
   background: transparent;
-  padding: var(--via-space-1) 0;
   font-family: inherit;
   font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
-  cursor: pointer;
-  border-bottom: 1px solid transparent;
-  /* "A–Z" quebrava em duas linhas quando a régua apertava: o traço do meio é um
-     ponto de quebra válido para o navegador. */
   white-space: nowrap;
+  cursor: pointer;
   transition:
     color var(--via-t-fast),
-    border-color var(--via-t-fast);
+    background-color var(--via-t-fast);
 }
 
 .ordenar:hover {
@@ -55,29 +83,20 @@
 
 .ordenar[data-ativo] {
   color: var(--via-text-primary);
-  border-bottom-color: var(--via-navy);
+  background: var(--via-bg-2);
 }
 
-/* Sem o "piso atmosférico" que existia atrás da grade: ele fazia sentido com o
-   catálogo cheio, mas com duas formações a caixa colorida se estendia por toda a
-   largura e lia como container VAZIO — o defeito ficava maior que o efeito.
-   Card com contorno próprio já se sustenta no fundo da página.
+.ordenar:focus-visible {
+  box-shadow: var(--app-ring);
+}
 
-   PÔSTER 3:4 ENGORDA EM DUAS DIMENSÕES, então ganha coluna antes de tudo — é a
-   regra da casa e é o que a referência faz (4 colunas em xl, 5 em 2xl). A 1600
-   com 4 colunas o card fica 385 de largura e ~630 de altura: retrato de verdade.
-   Com 3 colunas o pôster iria a 504 de largura e 672 de altura, e a fileira
-   sozinha passaria da viewport — catálogo em que não cabe uma segunda fileira é
-   um catálogo pior. */
 .grade {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--via-space-5);
-  /* Altura idêntica: resumos de 1 ou 2 linhas produziriam fileiras desiguais. */
   grid-auto-rows: 1fr;
 }
 
-/* Filho direto = wrapper de motion (sem classe). Ver a nota em CatalogoSolucoes. */
 .grade > * {
   display: flex;
 }
@@ -99,8 +118,6 @@
   }
 }
 
-/* Continua em DUAS colunas no telefone, como a referência: pôster é conteúdo de
-   varredura, e uma coluna só faria um card ocupar a tela inteira. */
 @media (max-width: 599px) {
   .grade {
     gap: var(--via-space-3);
@@ -110,5 +127,11 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--via-space-2);
+    padding-bottom: var(--via-space-2);
+  }
+
+  .reguaDireita,
+  .reguaDireita > * {
+    width: 100%;
   }
 }

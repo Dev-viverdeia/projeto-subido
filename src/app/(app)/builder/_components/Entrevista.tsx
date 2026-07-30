@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { pedirGeracao } from '@/lib/builder/invocar';
 import type { RespostaClarificacao } from '@/lib/builder/schema';
 import styles from './Entrevista.module.css';
@@ -132,7 +131,6 @@ export function Entrevista({
 
         <button type="submit" className={styles.acao} disabled={enviando}>
           {enviando ? 'Iniciando…' : 'Gerar o projeto'}
-          <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 

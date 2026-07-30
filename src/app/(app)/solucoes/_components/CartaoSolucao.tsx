@@ -1,57 +1,52 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoSolucao.module.css';
 
 /**
- * Card do catálogo de soluções — SEM capa, de propósito. O texto carrega o card
- * (decisão herdada da plataforma de referência), e a categoria entra como
- * intensidade de navy no chip-glifo, nunca como cor nova.
- *
- * O `icone` chega JÁ RENDERIZADO do servidor (padrão navegacao.tsx): este arquivo
- * é client por viver dentro da grade animada, e importar lucide aqui arrastaria a
- * biblioteca para o bundle.
+ * Card editorial inteiramente tipográfico. Soluções não dependem de imagem,
+ * screenshot ou ícone: categoria, título, resumo e metadados criam a hierarquia.
  *
  * Raiz é `<Link>`, não `<div onClick>` — ctrl+clique, botão do meio e "abrir em
  * nova aba" são de graça.
  */
-export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icone: ReactNode }) {
+export function CartaoSolucao({ solucao }: { solucao: SolucaoResumo }) {
   const ferramentas = solucao.ferramentas;
-  const visiveis = ferramentas.slice(0, 3);
+  const visiveis = ferramentas.slice(0, 2);
   const extras = ferramentas.length - visiveis.length;
 
   return (
     <Link href={`/solucoes/${solucao.slug}`} className={styles.cartao}>
-      <span className={styles.glifo} aria-hidden="true">
-        {icone}
-      </span>
-
-      {solucao.categoria && <p className={styles.eyebrow}>{solucao.categoria}</p>}
+      <p className={styles.categoria}>{solucao.categoria || 'Solução de IA'}</p>
 
       <h3 className={styles.titulo}>{solucao.titulo}</h3>
       {solucao.resumo && <p className={styles.resumo}>{solucao.resumo}</p>}
 
       {visiveis.length > 0 && (
-        <p className={styles.ferramentas}>
-          {visiveis.join(' · ')}
-          {extras > 0 && <span className={styles.mais}> +{extras}</span>}
-        </p>
+        <div className={styles.ferramentas} aria-label="Ferramentas usadas">
+          {visiveis.map((ferramenta) => (
+            <span key={ferramenta} className={styles.ferramenta}>
+              {ferramenta}
+            </span>
+          ))}
+          {extras > 0 && <span className={styles.mais}>+{extras}</span>}
+        </div>
       )}
 
       <span className={styles.vao} />
-      <hr className={styles.fio} />
 
       <footer className={styles.rodape}>
-        <span className={styles.contagens}>
-          {solucao.etapas > 0 && `${solucao.etapas} etapas`}
-          {solucao.etapas > 0 && ferramentas.length > 0 && ' · '}
-          {ferramentas.length > 0 &&
-            `${ferramentas.length} ${ferramentas.length === 1 ? 'ferramenta' : 'ferramentas'}`}
+        <span className={styles.metricas}>
+          {solucao.etapas > 0 && <span className={styles.metrica}>{solucao.etapas} etapas</span>}
+          {ferramentas.length > 0 && (
+            <span className={styles.metrica}>
+              {ferramentas.length} {ferramentas.length === 1 ? 'ferramenta' : 'ferramentas'}
+            </span>
+          )}
         </span>
         <span className={styles.abrir} aria-hidden="true">
-          Abrir →
+          Ver solução
         </span>
       </footer>
     </Link>

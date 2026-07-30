@@ -36,9 +36,12 @@ export default async function BuilderPage() {
       </div>
 
       {itens.length > 0 ? (
-        <section className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}>
-          <h2 className={styles.eyebrow}>
-            Seus projetos
+        <section
+          className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}
+          aria-labelledby="builder-projetos"
+        >
+          <h2 className={styles.eyebrow} id="builder-projetos">
+            Projetos recentes
             <span className={styles.total}>{itens.length}</span>
           </h2>
 

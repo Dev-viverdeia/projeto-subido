@@ -103,47 +103,50 @@ export function CatalogoFormacoes({
 
   return (
     <div className={styles.raiz}>
-      {/* FILTROS À ESQUERDA, acima da grade. A contagem vai para a ponta direita:
-          ela é resultado, não controle — e misturada aos filtros competia com
-          eles pela primeira leitura. */}
-      <div className={styles.regua}>
-        <AbasFiltro
-          abas={[
-            { id: 'todas', rotulo: 'Todas' },
-            { id: 'andamento', rotulo: 'Em andamento' },
-            { id: 'concluidas', rotulo: 'Concluídas' },
-          ]}
-          ativa={situacao}
-          aoMudar={(id) => setSituacao(id as typeof situacao)}
-          layoutId="formacoes-situacao"
-          ariaLabel="Filtrar por situação"
-        />
+      <div className={styles.painelDescoberta}>
+        <div className={styles.regua}>
+          <AbasFiltro
+            abas={[
+              { id: 'todas', rotulo: 'Todas' },
+              { id: 'andamento', rotulo: 'Em andamento' },
+              { id: 'concluidas', rotulo: 'Concluídas' },
+            ]}
+            ativa={situacao}
+            aoMudar={(id) => setSituacao(id as typeof situacao)}
+            layoutId="formacoes-situacao"
+            ariaLabel="Filtrar por situação"
+          />
 
-        <BuscaCatalogo valor={busca} aoMudar={setBusca} placeholder="Buscar formação" />
-
-        <div className={styles.ordenacao} role="group" aria-label="Ordenar">
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'recentes' ? '' : undefined}
-            onClick={() => setOrdem('recentes')}
-          >
-            Recentes
-          </button>
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'alfabetica' ? '' : undefined}
-            onClick={() => setOrdem('alfabetica')}
-          >
-            A–Z
-          </button>
+          <div className={styles.reguaDireita}>
+            <BuscaCatalogo valor={busca} aoMudar={setBusca} placeholder="Buscar formação" />
+          </div>
         </div>
 
-        <p className={styles.contagem} aria-live="polite">
-          {visiveis.length} {visiveis.length === 1 ? 'formação' : 'formações'}
-          {haFiltro && visiveis.length !== formacoes.length && ` de ${formacoes.length}`}
-        </p>
+        <div className={styles.linhaMeta}>
+          <p className={styles.contagem} aria-live="polite">
+            {visiveis.length} {visiveis.length === 1 ? 'formação' : 'formações'}
+            {haFiltro && visiveis.length !== formacoes.length && ` de ${formacoes.length}`}
+          </p>
+
+          <div className={styles.ordenacao} role="group" aria-label="Ordenar">
+            <button
+              type="button"
+              className={styles.ordenar}
+              data-ativo={ordem === 'recentes' ? '' : undefined}
+              onClick={() => setOrdem('recentes')}
+            >
+              Recentes
+            </button>
+            <button
+              type="button"
+              className={styles.ordenar}
+              data-ativo={ordem === 'alfabetica' ? '' : undefined}
+              onClick={() => setOrdem('alfabetica')}
+            >
+              A–Z
+            </button>
+          </div>
+        </div>
       </div>
 
       {visiveis.length === 0 ? (

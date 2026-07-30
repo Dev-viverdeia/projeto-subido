@@ -1,30 +1,24 @@
 .pill {
   display: flex;
   align-items: center;
-  gap: var(--via-space-4);
-  max-width: 380px;
-  padding: var(--via-space-3) var(--via-space-4);
+  gap: var(--via-space-5);
+  width: 100%;
+  padding: var(--via-space-4) var(--via-space-5);
   border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-glass-card);
-  backdrop-filter: blur(14px) saturate(1.3);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface);
   box-shadow: var(--via-shadow-xs);
   color: inherit;
   text-decoration: none;
   transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .pill {
-    background: var(--via-surface);
-  }
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .pill:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--via-shadow-md);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--via-shadow-sm);
+  text-decoration: none;
 }
 
 .textos {
@@ -37,10 +31,10 @@
 
 .rotulo {
   font-family: var(--via-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-text-faint);
+  color: var(--via-accent-ink);
 }
 
 .titulo {
@@ -60,7 +54,7 @@
 }
 
 .trilho {
-  width: 56px;
+  width: min(220px, 22vw);
   height: 3px;
   flex: none;
   border-radius: var(--via-radius-xs);
@@ -76,19 +70,15 @@
   transform-origin: left;
 }
 
-.seta {
+.acao {
   flex: none;
-  color: var(--via-text-muted);
-  transition: transform var(--via-t-fast);
-}
-
-.pill:hover .seta {
-  transform: translateX(2px);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pill,
-  .seta {
+  .pill {
     transition: none;
   }
 }
@@ -98,4 +88,22 @@
    Compõe com a sombra de repouso para o elemento não achatar ao focar. */
 .pill:focus-visible {
   box-shadow: var(--app-ring);
+}
+
+@media (max-width: 599px) {
+  .pill {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--via-space-3);
+    padding: var(--via-space-4);
+  }
+
+  .textos {
+    flex-basis: calc(100% - 72px);
+  }
+
+  .trilho {
+    order: 3;
+    width: 100%;
+  }
 }

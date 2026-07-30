@@ -7,52 +7,20 @@ import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoFormacao.module.css';
 
 /**
- * Card de formação em PÔSTER VERTICAL 3:4, na anatomia da plataforma de
- * referência: o pôster é ENCAIXADO dentro do card, com margem e raio próprios —
- * um pôster montado sobre uma superfície, não uma foto colada no topo. É essa
- * moldura de 8px que dá o acabamento; sem ela o card é um retângulo com imagem.
+ * Card de formação em pôster vertical 4:5. A capa é encaixada dentro do card,
+ * com margem e raio próprios — um pôster montado sobre uma superfície, não uma
+ * foto colada no topo.
  *
  * O TÍTULO VIVE NO PÔSTER, sobre um scrim que desce até a base. Foi o que
- * resolveu o retrato: um 3:4 com o texto todo embaixo tem um vazio alto no meio
- * (era o defeito da versão anterior), e um 3:4 com o título ancorado na base lê
- * como pôster editorial. E, principalmente, é UMA anatomia só — funciona igual
+ * resolve o retrato: com o título ancorado na base, a capa lê como peça editorial
+ * sem criar uma área vazia excessiva. E, principalmente, é uma anatomia só — funciona igual
  * com capa real e com capa sintética, em vez de duas montagens diferentes
  * convivendo na mesma grade.
  *
  * O scrim não é decoração: é o que garante contraste de branco sobre uma imagem
  * que o admin sobe e que ninguém controla.
  *
- * Ícones em SVG inline: este componente é client (usa progresso local), e
- * importar lucide aqui arrastaria a biblioteca para o bundle do browser.
  */
-function IconeModulos() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path
-        d="M7 1.5 12.5 4 7 6.5 1.5 4 7 1.5Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M1.5 7 7 9.5 12.5 7M1.5 10 7 12.5 12.5 10"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function IconeAulas() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
-      <path d="m5.8 4.7 3.4 2.3-3.4 2.3z" fill="currentColor" />
-    </svg>
-  );
-}
-
 /**
  * Campo de luz do pôster sintético, derivado do SLUG — não do índice na grade.
  * Assim a mesma formação tem sempre o mesmo pôster, esteja ela em primeiro ou em
@@ -128,15 +96,13 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
       <div className={styles.corpo}>
         {formacao.resumo && <p className={styles.resumo}>{formacao.resumo}</p>}
 
-        {/* Tira de meta: ícone + número. Mono e tabular para os números não
-            dançarem entre um card e outro. */}
+        {/* Metadados tipográficos, sem outra camada de ícones competindo com a
+            capa. Mono e tabular mantêm a grade estável. */}
         <div className={styles.tira}>
           <span className={styles.item}>
-            <IconeModulos />
             {formacao.modulos} {formacao.modulos === 1 ? 'módulo' : 'módulos'}
           </span>
           <span className={styles.item}>
-            <IconeAulas />
             {formacao.aulas} {formacao.aulas === 1 ? 'aula' : 'aulas'}
           </span>
         </div>

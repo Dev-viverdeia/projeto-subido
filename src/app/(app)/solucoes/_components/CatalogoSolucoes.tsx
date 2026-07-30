@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Button, EmptyState, Pagination } from '@/design-system/via';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
@@ -34,13 +33,9 @@ function normalizar(texto: string): string {
  */
 export function CatalogoSolucoes({
   solucoes,
-  icones,
-  iconePadrao,
   filtrosIniciais,
 }: {
   solucoes: SolucaoResumo[];
-  icones: Record<string, ReactNode>;
-  iconePadrao: ReactNode;
   filtrosIniciais: FiltrosIniciais;
 }) {
   const [busca, setBusca] = useState(filtrosIniciais.q);
@@ -187,65 +182,84 @@ export function CatalogoSolucoes({
 
   return (
     <div className={styles.raiz}>
-      <div className={styles.regua}>
-        <AbasFiltro
-          abas={abas}
-          ativa={categoria}
-          aoMudar={setCategoria}
-          layoutId="solucoes-aba-ativa"
-          ariaLabel="Filtrar por categoria"
-        />
-        <div className={styles.reguaDireita}>
-          <BuscaCatalogo
-            valor={busca}
-            aoMudar={setBusca}
-            placeholder="Busque por nome, ferramenta ou área"
-          />
-          <PainelMaisFiltros
-            titulo="Ferramentas"
-            opcoes={facetasFerramentas}
-            selecionadas={ferramentasSel}
-            aoAlternar={(id) =>
-              setFerramentasSel((atual) =>
-                atual.includes(id) ? atual.filter((f) => f !== id) : [...atual, id],
-              )
-            }
-            aoLimpar={() => setFerramentasSel([])}
-          />
+      <section className={styles.apresentacao} aria-labelledby="solucoes-titulo">
+        <div className={styles.apresentacaoTexto}>
+          <p className={styles.marcador}>Biblioteca de soluções</p>
+          <h2 className={styles.tituloPagina} id="solucoes-titulo">
+            Implemente uma solução, passo a passo.
+          </h2>
+          <p className={styles.descricaoPagina}>
+            Escolha um projeto e siga um roteiro com etapas, ferramentas e prompts organizados do
+            início à entrega.
+          </p>
         </div>
-      </div>
+        <div className={styles.placar} aria-label={`${solucoes.length} soluções publicadas`}>
+          <strong>{solucoes.length}</strong>
+          <span>soluções publicadas</span>
+        </div>
+      </section>
 
-      <ChipsAtivos
-        chips={ferramentasSel.map((f) => ({
-          id: `ferramenta:${f}`,
-          rotulo: f,
-          aoRemover: () => setFerramentasSel((atual) => atual.filter((x) => x !== f)),
-        }))}
-        aoLimparTudo={() => setFerramentasSel([])}
-      />
+      <div className={styles.painelDescoberta}>
+        <div className={styles.regua}>
+          <AbasFiltro
+            abas={abas}
+            ativa={categoria}
+            aoMudar={setCategoria}
+            layoutId="solucoes-aba-ativa"
+            ariaLabel="Filtrar por categoria"
+          />
+          <div className={styles.reguaDireita}>
+            <BuscaCatalogo
+              valor={busca}
+              aoMudar={setBusca}
+              placeholder="Busque por nome, ferramenta ou área"
+            />
+            <PainelMaisFiltros
+              titulo="Ferramentas"
+              opcoes={facetasFerramentas}
+              selecionadas={ferramentasSel}
+              aoAlternar={(id) =>
+                setFerramentasSel((atual) =>
+                  atual.includes(id) ? atual.filter((f) => f !== id) : [...atual, id],
+                )
+              }
+              aoLimpar={() => setFerramentasSel([])}
+            />
+          </div>
+        </div>
 
-      <div className={styles.linhaMeta} ref={topoGradeRef}>
-        <p className={styles.contagem} aria-live="polite">
-          {filtradas.length} {filtradas.length === 1 ? 'solução' : 'soluções'}
-          {haFiltro && filtradas.length !== solucoes.length && ` de ${solucoes.length}`}
-        </p>
-        <div className={styles.ordenacao} role="group" aria-label="Ordenar">
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'recentes' ? '' : undefined}
-            onClick={() => setOrdem('recentes')}
-          >
-            Recentes
-          </button>
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'alfabetica' ? '' : undefined}
-            onClick={() => setOrdem('alfabetica')}
-          >
-            A–Z
-          </button>
+        <ChipsAtivos
+          chips={ferramentasSel.map((f) => ({
+            id: `ferramenta:${f}`,
+            rotulo: f,
+            aoRemover: () => setFerramentasSel((atual) => atual.filter((x) => x !== f)),
+          }))}
+          aoLimparTudo={() => setFerramentasSel([])}
+        />
+
+        <div className={styles.linhaMeta} ref={topoGradeRef}>
+          <p className={styles.contagem} aria-live="polite">
+            {filtradas.length} {filtradas.length === 1 ? 'solução' : 'soluções'}
+            {haFiltro && filtradas.length !== solucoes.length && ` de ${solucoes.length}`}
+          </p>
+          <div className={styles.ordenacao} role="group" aria-label="Ordenar">
+            <button
+              type="button"
+              className={styles.ordenar}
+              data-ativo={ordem === 'recentes' ? '' : undefined}
+              onClick={() => setOrdem('recentes')}
+            >
+              Recentes
+            </button>
+            <button
+              type="button"
+              className={styles.ordenar}
+              data-ativo={ordem === 'alfabetica' ? '' : undefined}
+              onClick={() => setOrdem('alfabetica')}
+            >
+              A–Z
+            </button>
+          </div>
         </div>
       </div>
 
@@ -282,10 +296,7 @@ export function CatalogoSolucoes({
                   y: { duration: 0.44, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
                 }}
               >
-                <CartaoSolucao
-                  solucao={solucao}
-                  icone={(solucao.categoria && icones[solucao.categoria]) || iconePadrao}
-                />
+                <CartaoSolucao solucao={solucao} />
               </motion.div>
             ))}
           </AnimatePresence>

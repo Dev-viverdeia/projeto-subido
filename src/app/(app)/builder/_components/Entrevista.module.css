@@ -201,11 +201,10 @@
 .acao {
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-2);
   min-height: var(--app-h-control);
   padding-inline: var(--via-space-5);
   border: 0;
-  border-radius: var(--via-radius-pill);
+  border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
   font-family: inherit;
@@ -213,18 +212,11 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-sm);
   cursor: pointer;
-  transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
+  transition: background-color var(--app-t-state);
 }
 
 .acao:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--via-shadow-md);
-}
-
-.acao:active {
-  transform: translateY(0);
+  background: var(--via-navy-deep);
 }
 
 .acao:disabled {
@@ -250,14 +242,10 @@
   .acao {
     transition: none;
   }
-
-  .acao:hover {
-    transform: none;
-  }
 }
 
-/* Por último: qualquer box-shadow de classe apaga o anel do DS (`:where()`, zero
-   de especificidade). O botão tem sombra no hover — por isso é redeclarado. */
+/* Por último: o anel é declarado explicitamente para não depender da
+   especificidade do reset global. */
 .campo:focus-visible,
 .acao:focus-visible {
   outline: none;

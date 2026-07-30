@@ -6,7 +6,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-section);
+  gap: var(--via-space-8);
 }
 
 /* Folga grande antes do histórico: ele é o segundo assunto da tela, e o
@@ -14,8 +14,8 @@
 .historico {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-block);
-  padding-top: var(--app-gap-section);
+  gap: var(--via-space-5);
+  padding-top: var(--via-space-6);
   border-top: 1px solid var(--via-border-hairline);
 }
 
@@ -24,25 +24,24 @@
   align-items: center;
   gap: var(--via-space-2);
   margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  font-size: var(--via-fs-h4);
   font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
 }
 
 .total {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: var(--via-space-1);
+  min-width: 24px;
+  height: 24px;
+  padding-inline: var(--via-space-1_5);
   border-radius: var(--via-radius-pill);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
-  font-size: 0.625rem;
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }

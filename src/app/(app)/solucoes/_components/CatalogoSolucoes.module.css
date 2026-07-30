@@ -1,12 +1,94 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--app-gap-grid);
 }
 
-/* A régua de descoberta: abas à esquerda, busca + facetas à direita, sobre uma
-   hairline única. `fill-mode: forwards` da cascata cria stacking context — o
-   z-index garante que o painel de facetas abra SOBRE a grade. */
+.apresentacao {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--via-space-8);
+  padding: var(--via-space-2) var(--via-space-1) var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.apresentacaoTexto {
+  max-width: 680px;
+}
+
+.marcador {
+  margin: 0 0 var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+}
+
+.tituloPagina {
+  margin: 0;
+  font-size: clamp(var(--via-fs-h3), 2vw, var(--via-fs-h2));
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+}
+
+.descricaoPagina {
+  max-width: 60ch;
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.6;
+  color: var(--via-text-muted);
+}
+
+.placar {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-1) var(--via-space-1) var(--via-space-5);
+  border-left: 1px solid var(--via-border-hairline);
+  color: var(--via-text-primary);
+  white-space: nowrap;
+}
+
+.placar strong {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.placar span {
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-faint);
+}
+
+.painelDescoberta {
+  --catalogo-busca-largura: 300px;
+  --catalogo-controle-altura: 40px;
+  --catalogo-controle-borda: var(--via-border-hairline);
+  --catalogo-controle-raio: var(--app-radius-control);
+  --catalogo-controle-fonte: var(--via-fs-caption);
+  --catalogo-controle-hover: var(--via-bg-2);
+  --catalogo-controle-ativo: var(--via-bg-2);
+  --catalogo-painel-raio: var(--app-radius-card);
+  --catalogo-aba-padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
+  --catalogo-aba-fonte: var(--via-fs-caption);
+  --catalogo-aba-sublinhado: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: 0 0 var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+/* A régua de descoberta: abas à esquerda, busca + facetas à direita. O z-index
+   garante que o painel de facetas abra sobre a grade. */
 .regua {
   position: relative;
   z-index: 10;
@@ -14,6 +96,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
+  min-height: 46px;
 }
 
 .reguaDireita {
@@ -25,7 +108,7 @@
 
 .linhaMeta {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
   /* Âncora do scroll da paginação: para sob o cabeçalho sticky, não atrás. */
@@ -42,23 +125,28 @@
 
 .ordenacao {
   display: flex;
-  gap: var(--via-space-3);
+  align-items: center;
+  gap: 0;
+  padding: 2px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
 }
 
 .ordenar {
   border: none;
   background: transparent;
-  padding: var(--via-space-1) 0;
+  min-height: 28px;
+  padding: var(--via-space-1) var(--via-space-2_5);
+  border-radius: calc(var(--app-radius-control) - 2px);
   font-family: inherit;
   font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
   cursor: pointer;
-  /* Borda sempre presente (transparente no repouso) — trocar borda por nada
-     causaria 1px de layout shift a cada clique. */
-  border-bottom: 1px solid transparent;
   transition:
     color var(--via-t-fast),
-    border-color var(--via-t-fast);
+    background-color var(--via-t-fast),
+    box-shadow var(--via-t-fast);
 }
 
 .ordenar:hover {
@@ -67,7 +155,12 @@
 
 .ordenar[data-ativo] {
   color: var(--via-text-primary);
-  border-bottom-color: var(--via-navy);
+  background: var(--via-bg-2);
+  box-shadow: none;
+}
+
+.ordenar:focus-visible {
+  box-shadow: var(--app-ring);
 }
 
 /* Largura maior GANHA COLUNA, não engorda card: a 1600 com 3 colunas o card iria
@@ -109,6 +202,19 @@
 }
 
 @media (max-width: 767px) {
+  .apresentacao {
+    align-items: flex-start;
+    padding: var(--via-space-1) 0 var(--via-space-4);
+  }
+
+  .placar {
+    padding: var(--via-space-1) 0 var(--via-space-1) var(--via-space-4);
+  }
+
+  .painelDescoberta {
+    padding-bottom: var(--via-space-3);
+  }
+
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -117,11 +223,29 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--via-space-2);
-    padding-bottom: var(--via-space-3);
+    padding-bottom: var(--via-space-2);
   }
 
   .reguaDireita {
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .reguaDireita > :first-child {
+    width: 100%;
+  }
+}
+
+@media (max-width: 479px) {
+  .apresentacao {
+    flex-direction: column;
+    gap: var(--via-space-3);
+  }
+
+  .placar {
+    padding: 0;
+    border-left: 0;
   }
 }
 
