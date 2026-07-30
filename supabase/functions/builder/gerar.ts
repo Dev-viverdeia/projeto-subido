@@ -3,6 +3,12 @@ import { clienteDoChamador, respostaDeErro, respostaJson } from '../_compartilha
 import { ErroDoBuilder, MODELO, gerarDocumento, traduzir } from '../_compartilhado/modelo.ts';
 import { PedidoGeracao, type RespostaClarificacao } from '../_compartilhado/schema.ts';
 
+/* Global fornecida pelo Supabase Edge Runtime. A declaração local mantém este
+   módulo verificável isoladamente pelo `deno check`; não gera código no bundle. */
+declare const EdgeRuntime: {
+  waitUntil<T>(promise: Promise<T>): Promise<T>;
+};
+
 /**
  * PASSO 2 DO BUILDER — o projeto, em TAREFA DE FUNDO.
  *
