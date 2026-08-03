@@ -77,22 +77,3 @@
     display: none;
   }
 }
-.secao {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h2);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-}
-
-@media (max-width: 899px) {
-  .secao {
-    font-size: var(--via-fs-h3);
-    letter-spacing: var(--app-ls-h3);
-  }
-}

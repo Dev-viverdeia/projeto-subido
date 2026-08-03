@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { DefinirTrilha, ProvedorDeTrilha, useTrilha } from './contexto';
+import { trilhaDaSecao } from './TrilhaDoCabecalho';
 
 /**
  * O QUE ESTE TESTE PROTEGE, e por que ele existe.
@@ -66,5 +67,35 @@ describe('trilha do cabeçalho', () => {
 
     rerender(<Tela mostrar atual="Segunda" />);
     expect(screen.getByTestId('leitor').textContent).toBe('Segunda');
+  });
+});
+
+/**
+ * A TRILHA DERIVADA DA ROTA — o que a listagem mostra.
+ *
+ * Toda tela tem a mesma FORMA de trilha; o que muda é quantos degraus. Numa
+ * listagem são dois ("‹ Início / Soluções de IA"), e em `/inicio` é um só —
+ * porque ali não existe degrau anterior. Sem esse caso de borda o cabeçalho da
+ * home diria "‹ Início / Início".
+ */
+describe('trilha derivada da rota', () => {
+  it('dá dois degraus numa listagem, com volta para o início', () => {
+    expect(trilhaDaSecao('/solucoes')).toEqual({
+      voltarPara: '/inicio',
+      voltarRotulo: 'Início',
+      atual: 'Soluções de IA',
+    });
+  });
+
+  it('dá UM degrau em /inicio — não há para onde voltar', () => {
+    expect(trilhaDaSecao('/inicio')).toEqual({ atual: 'Início' });
+  });
+
+  it('resolve por prefixo: rota de detalhe ainda pertence à seção', () => {
+    expect(trilhaDaSecao('/formacoes/algum-curso')?.atual).toBe('Formações');
+  });
+
+  it('devolve null fora das rotas do app — o cabeçalho não inventa degrau', () => {
+    expect(trilhaDaSecao('/nao-existe')).toBeNull();
   });
 });

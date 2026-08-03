@@ -72,9 +72,11 @@
 
 @media (min-width: 1024px) {
   .cabecalho {
-    /* +12px: o rótulo virou título de h3 e a barra de 68 o espremia contra as
-       duas hairlines. */
-    min-height: 80px;
+    /* De volta a 68. Os 80px foram postos quando o rótulo de seção era um título
+       de 32px e a barra o espremia contra as duas hairlines. Com o rótulo virando
+       um degrau de trilha de 14px, 80 vira calha vazia — e a barra da referência
+       é justamente baixa. */
+    min-height: 68px;
     padding-inline: var(--via-space-8);
   }
 

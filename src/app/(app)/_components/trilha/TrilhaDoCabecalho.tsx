@@ -2,26 +2,28 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { rotuloDaRota } from '@/lib/routes';
-import { useTrilha } from './contexto';
+import { ROTULOS, rotuloDaRota } from '@/lib/routes';
+import { useTrilha, type Trilha } from './contexto';
 import styles from './TrilhaDoCabecalho.module.css';
 
 /**
- * O lado esquerdo do cabeçalho: trilha quando a tela declara uma, nome da seção
- * quando não.
+ * O lado esquerdo do cabeçalho — uma TRILHA em toda tela.
  *
- * OS DOIS ESTADOS MORAM NO MESMO COMPONENTE de propósito. Separá-los em dois
- * exigiria que alguém acima soubesse qual mostrar — e esse "alguém" seria o
- * cabeçalho, que passaria a ramificar por rota. Aqui a regra é uma linha: tem
- * trilha? mostra a trilha. Não tem? mostra a seção.
+ * UMA GRAMÁTICA SÓ, e é isso que esta versão conserta. Antes a listagem mostrava
+ * o nome da seção como título de 32px e o detalhe mostrava uma trilha de 14px: a
+ * barra trocava de altura e de peso ao navegar, e lia como dois cabeçalhos
+ * diferentes. Agora a forma é sempre a mesma; o que muda é quantos degraus ela
+ * tem — dois na listagem, dois ou três no detalhe.
+ *
+ * O CAMINHO DE RENDER É ÚNICO. A trilha ou vem declarada pela tela
+ * (`DefinirTrilha`) ou é derivada da rota. Duas fontes, uma renderização — sem
+ * `if` de layout, que é o que fazia as duas versões divergirem em detalhe
+ * tipográfico.
  *
  * NÃO USA O `Breadcrumb` DO DS por dois motivos medidos: ele navega com
  * `<a href>`, o que faz recarga completa e perderia os filtros do catálogo que
- * vivem na URL; e importa `lucide` num componente que aqui é cliente, o que
- * puxaria a biblioteca para o bundle do browser. O chevron é SVG inline.
- *
- * TRÊS DEGRAUS NO MÁXIMO, e o do meio é opcional. O cabeçalho tem uma linha só;
- * trilha que cresce com a profundidade da rota vira linha que ninguém lê.
+ * vivem na URL; e importa `lucide`, que aqui é cliente e viraria bundle. O
+ * chevron é SVG inline.
  */
 function Chevron() {
   return (
@@ -37,41 +39,55 @@ function Chevron() {
   );
 }
 
+const INICIO = '/inicio';
+
+/**
+ * A trilha de uma tela de LISTAGEM, derivada só da rota.
+ *
+ * Exportada porque é lógica pura e tem teste próprio — e porque o caso de borda
+ * dela não é óbvio: em `/inicio` não existe para onde voltar, então o degrau é
+ * único. Sem isso o cabeçalho diria "‹ Início / Início".
+ */
+export function trilhaDaSecao(caminho: string): Trilha | null {
+  const secao = rotuloDaRota(caminho);
+  if (!secao) return null;
+  if (caminho === INICIO) return { atual: secao };
+  return { voltarPara: INICIO, voltarRotulo: ROTULOS[INICIO], atual: secao };
+}
+
 export function TrilhaDoCabecalho() {
-  const trilha = useTrilha();
+  const declarada = useTrilha();
   const caminho = usePathname();
 
-  if (!trilha) {
-    const secao = rotuloDaRota(caminho);
-    if (!secao) return null;
-    /* `aria-hidden`: é eco do `<h1>` da página, que existe como `sr-only`. Quem
-       ouve não precisa da seção duas vezes por rota. */
-    return (
-      <span className={styles.secao} aria-hidden="true">
-        {secao}
-      </span>
-    );
-  }
+  const trilha = declarada ?? trilhaDaSecao(caminho);
+  if (!trilha) return null;
+
+  const voltarPara = trilha.voltarPara;
+  const voltarRotulo = trilha.voltarRotulo;
 
   return (
     <nav className={styles.trilha} aria-label="Caminho de navegação">
-      <Link href={trilha.voltarPara} className={styles.voltar}>
-        <Chevron />
-        {trilha.voltarRotulo}
-      </Link>
-
-      {trilha.meio && (
+      {voltarPara && voltarRotulo && (
         <>
+          <Link href={voltarPara} className={styles.voltar}>
+            <Chevron />
+            {voltarRotulo}
+          </Link>
           <span className={styles.barra} aria-hidden="true">
             /
           </span>
-          <span className={styles.meio}>{trilha.meio}</span>
         </>
       )}
 
-      <span className={styles.barra} aria-hidden="true">
-        /
-      </span>
+      {trilha.meio && (
+        <>
+          <span className={styles.meio}>{trilha.meio}</span>
+          <span className={styles.barra} aria-hidden="true">
+            /
+          </span>
+        </>
+      )}
+
       {/* `aria-current="page"` é o que diz ao leitor de tela qual degrau é o
           atual — sem ele a trilha vira três textos soltos. */}
       <span className={styles.atual} aria-current="page">

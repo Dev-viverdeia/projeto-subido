@@ -37,8 +37,10 @@ import {
  */
 
 export type Trilha = {
-  voltarPara: string;
-  voltarRotulo: string;
+  /* Opcionais porque `/inicio` é o topo: não há degrau anterior, e a trilha lá é
+     de um degrau só. Toda tela de detalhe passa os dois. */
+  voltarPara?: string;
+  voltarRotulo?: string;
   /** Categoria, módulo — o recorte a que o item pertence. Opcional. */
   meio?: string | null;
   atual: string;
