@@ -1,10 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { mentorPorId } from '@/content/mentorias';
-import { Button, Modal } from '@/design-system/via';
-import { TRILHAS } from '@/content/mentorias/types';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
+import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
+import { iniciais } from '../../_components/iniciais';
+import { TRILHAS } from '@/lib/mentorias/tipos';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
 import { AgendaMentorias } from './AgendaMentorias';
 import { CalendarioMentorias } from './CalendarioMentorias';
@@ -34,7 +36,7 @@ export function MentoriasVista({
   agoraIso,
   vistaInicial,
 }: {
-  sessoes: MentoriaExemplo[];
+  sessoes: SessaoMentoria[];
   agoraIso: string;
   vistaInicial: IdVista;
 }) {
@@ -43,9 +45,24 @@ export function MentoriasVista({
   const agora = useMemo(() => new Date(agoraIso), [agoraIso]);
 
   const [vista, setVista] = useState<IdVista>(vistaInicial);
-  const [inscritos, setInscritos] = useState<string[]>([]);
   const [detalheId, setDetalheId] = useState<string | null>(null);
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
+
+  /**
+   * O CHECK-IN DEIXOU DE SER ESTADO DA ABA.
+   *
+   * Antes ele vivia num `useState<string[]>`: o fluxo era completo na tela e não
+   * saía dela — recarregar perdia tudo, e a vaga "ocupada" nunca existiu para
+   * mais ninguém. Agora é `INSERT` com RLS, e quem recusa é o banco: sessão
+   * lotada, encerrada ou não publicada voltam do trigger, não daqui.
+   *
+   * `useTransition` porque a Server Action revalida a rota — o React segura o
+   * pending enquanto o RSC volta com `euInscrito` e a contagem já corrigidos.
+   * Não há estado otimista: numa última vaga, mostrar "confirmado" antes de o
+   * banco decidir é exatamente a mentira que este pilar existia para não contar.
+   */
+  const [gravando, iniciarGravacao] = useTransition();
+  const [erro, setErro] = useState<string | null>(null);
 
   /* A vista entra na URL: é escolha de LEITURA, não estado do dispositivo — um
      link para o calendário reproduz o calendário no aparelho de quem recebe.
@@ -55,13 +72,14 @@ export function MentoriasVista({
     atualizarUrlFiltros({ vista: vista === 'agenda' ? null : vista });
   }, [vista]);
 
+  /* `euInscrito` vem do servidor, por linha, via RLS — não de uma lista local. */
   const estadoComInscricao = useCallback(
-    (s: MentoriaExemplo): EstadoMentoria => estadoDe(s, agora, inscritos.includes(s.id)),
-    [agora, inscritos],
+    (s: SessaoMentoria): EstadoMentoria => estadoDe(s, agora, s.euInscrito),
+    [agora],
   );
 
   const estaAoVivo = useCallback(
-    (s: MentoriaExemplo) =>
+    (s: SessaoMentoria) =>
       agora.getTime() >= new Date(s.inicioIso).getTime() &&
       agora.getTime() < new Date(s.fimIso).getTime(),
     [agora],
@@ -85,48 +103,80 @@ export function MentoriasVista({
   );
   const detalhe = porId(detalheId);
   const confirmando = porId(confirmandoId);
-  const mentorDoDetalhe = detalhe ? mentorPorId(detalhe.mentorId) : undefined;
+  const mentorDoDetalhe = detalhe?.mentor;
 
   const abrirDetalhe = useCallback((id: string) => setDetalheId(id), []);
   const pedirCheckin = useCallback((id: string) => setConfirmandoId(id), []);
-  const cancelarCheckin = useCallback(
-    (id: string) => setInscritos((atual) => atual.filter((x) => x !== id)),
-    [],
-  );
+  const executar = useCallback((acao: () => Promise<{ ok: boolean; mensagem?: string }>) => {
+    setErro(null);
+    iniciarGravacao(async () => {
+      const r = await acao();
+      if (!r.ok) setErro(r.mensagem ?? 'Não foi possível concluir agora.');
+    });
+  }, []);
+
+  const cancelar = useCallback((id: string) => executar(() => cancelarCheckin(id)), [executar]);
 
   return (
     <div className={styles.raiz}>
-      {destaque && (
-        <CartaoProxima
-          sessao={destaque}
-          estado={estadoComInscricao(destaque)}
-          agora={agora}
-          aoAbrirDetalhe={() => abrirDetalhe(destaque.id)}
-          aoFazerCheckin={() => pedirCheckin(destaque.id)}
-        />
+      {/* A recusa vem do TRIGGER, não daqui — "as vagas acabaram enquanto você
+          decidia" é uma frase que só o banco pode dizer com verdade. */}
+      {/* `role="alert"` no wrapper e não no `Alert`: o componente do DS não
+          repassa props soltas, e sem o papel o texto entra em tela sem ser
+          anunciado — quem usa leitor de tela clicaria em "Confirmar" e não
+          saberia por que nada aconteceu. */}
+      {erro && (
+        <div role="alert">
+          <Alert tone="attn">{erro}</Alert>
+        </div>
       )}
 
-      <div className={styles.chrome}>
-        <SeletorVista ativa={vista} aoMudar={setVista} />
-      </div>
-
-      {vista === 'agenda' ? (
-        <AgendaMentorias
-          sessoes={futuras}
-          agora={agora}
-          agoraIso={agoraIso}
-          estadoDaSessao={estadoComInscricao}
-          aoAbrirDetalhe={abrirDetalhe}
-          aoFazerCheckin={pedirCheckin}
-          aoCancelarCheckin={cancelarCheckin}
+      {/* CATÁLOGO VAZIO ≠ FILTRO VAZIO, e confundir os dois cria um beco: a
+          mensagem da agenda diz "veja em Todas as próximas sessões", o que só
+          faz sentido quando existe sessão em ALGUM lugar. Sem nenhuma mentoria
+          publicada, esse convite leva a outra tela vazia.
+          Este estado passou a ser o estado NORMAL da tela — a agenda deixou de
+          ser gerada em código e começa sem nada até o admin cadastrar. */}
+      {sessoes.length === 0 ? (
+        <EmptyState
+          title="Nenhuma mentoria publicada"
+          description="As sessões aparecem aqui assim que forem agendadas. Você vê o horário, faz check-in e recebe a sala pelo mesmo lugar."
         />
       ) : (
-        <CalendarioMentorias
-          sessoes={sessoes}
-          agora={agora}
-          estadoDaSessao={estadoComInscricao}
-          aoAbrirDetalhe={abrirDetalhe}
-        />
+        <>
+          {destaque && (
+            <CartaoProxima
+              sessao={destaque}
+              estado={estadoComInscricao(destaque)}
+              agora={agora}
+              aoAbrirDetalhe={() => abrirDetalhe(destaque.id)}
+              aoFazerCheckin={() => pedirCheckin(destaque.id)}
+            />
+          )}
+
+          <div className={styles.chrome}>
+            <SeletorVista ativa={vista} aoMudar={setVista} />
+          </div>
+
+          {vista === 'agenda' ? (
+            <AgendaMentorias
+              sessoes={futuras}
+              agora={agora}
+              agoraIso={agoraIso}
+              estadoDaSessao={estadoComInscricao}
+              aoAbrirDetalhe={abrirDetalhe}
+              aoFazerCheckin={pedirCheckin}
+              aoCancelarCheckin={cancelar}
+            />
+          ) : (
+            <CalendarioMentorias
+              sessoes={sessoes}
+              agora={agora}
+              estadoDaSessao={estadoComInscricao}
+              aoAbrirDetalhe={abrirDetalhe}
+            />
+          )}
+        </>
       )}
 
       {/* Ficha da sessão — a mesma dos dois lados. */}
@@ -191,7 +241,7 @@ export function MentoriasVista({
             {mentorDoDetalhe && (
               <div className={styles.mentorCartao} data-trilha={mentorDoDetalhe.trilha}>
                 <span className={styles.mentorMonograma} aria-hidden="true">
-                  {mentorDoDetalhe.iniciais}
+                  {iniciais(mentorDoDetalhe.nome)}
                 </span>
                 <span className={styles.mentorTextos}>
                   <span className={styles.mentorNome}>{mentorDoDetalhe.nome}</span>
@@ -230,12 +280,15 @@ export function MentoriasVista({
             </Button>
             <Button
               variant="primary"
+              disabled={gravando}
               onClick={() => {
-                if (confirmandoId) setInscritos((atual) => [...atual, confirmandoId]);
+                const id = confirmandoId;
+                if (!id) return;
                 setConfirmandoId(null);
+                executar(() => fazerCheckin(id));
               }}
             >
-              Confirmar
+              {gravando ? 'Confirmando…' : 'Confirmar'}
             </Button>
           </div>
         }

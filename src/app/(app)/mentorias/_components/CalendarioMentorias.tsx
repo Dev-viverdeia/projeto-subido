@@ -1,11 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { mentorPorId } from '@/content/mentorias';
-import { TRILHAS } from '@/content/mentorias/types';
-import type { Trilha } from '@/content/mentorias/types';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import { TRILHAS } from '@/lib/mentorias/tipos';
+import type { TrilhaMentor } from '@/lib/mentorias/tipos';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { chaveDoDia, horaCurta } from './estadoMentoria';
+import { iniciais } from '../../_components/iniciais';
 import styles from './CalendarioMentorias.module.css';
 
 const SEMANA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
@@ -68,16 +69,16 @@ export function CalendarioMentorias({
   aoAbrirDetalhe,
 }: {
   /** TODAS as sessões, inclusive encerradas: navegar para trás tem que mostrar o passado. */
-  sessoes: MentoriaExemplo[];
+  sessoes: SessaoMentoria[];
   agora: Date;
-  estadoDaSessao: (s: MentoriaExemplo) => EstadoMentoria;
+  estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
   aoAbrirDetalhe: (id: string) => void;
 }) {
   const [ref, setRef] = useState({ ano: agora.getFullYear(), mes: agora.getMonth() });
   const [selecionado, setSelecionado] = useState<string>(chaveDoDia(agora.toISOString()));
 
   const porDia = useMemo(() => {
-    const mapa = new Map<string, MentoriaExemplo[]>();
+    const mapa = new Map<string, SessaoMentoria[]>();
     for (const s of sessoes) {
       const chave = chaveDoDia(s.inicioIso);
       mapa.set(chave, [...(mapa.get(chave) ?? []), s]);
@@ -116,11 +117,11 @@ export function CalendarioMentorias({
      charada. E resolve, com informação de verdade, a calha morta que sobrava sob
      o painel do dia. */
   const porTrilhaNoMes = useMemo(() => {
-    const conta = new Map<Trilha, number>();
+    const conta = new Map<TrilhaMentor, number>();
     for (const s of sessoes) {
       const d = new Date(s.inicioIso);
       if (d.getFullYear() !== ref.ano || d.getMonth() !== ref.mes) continue;
-      const t = mentorPorId(s.mentorId)?.trilha;
+      const t = s.mentor?.trilha;
       if (t) conta.set(t, (conta.get(t) ?? 0) + 1);
     }
     return conta;
@@ -139,7 +140,7 @@ export function CalendarioMentorias({
   const noMesAtual = ref.ano === agora.getFullYear() && ref.mes === agora.getMonth();
   const dataObj = dataSelecionada ? new Date(dataSelecionada.iso) : null;
 
-  const irPara = (s: MentoriaExemplo) => {
+  const irPara = (s: SessaoMentoria) => {
     const d = new Date(s.inicioIso);
     setRef({ ano: d.getFullYear(), mes: d.getMonth() });
     setSelecionado(chaveDoDia(s.inicioIso));
@@ -205,11 +206,13 @@ export function CalendarioMentorias({
 
               <span className={styles.marcas}>
                 {lista.slice(0, 2).map((s) => {
-                  const mentor = mentorPorId(s.mentorId);
+                  const mentor = s.mentor;
                   return (
                     <span key={s.id} className={styles.marca} data-trilha={mentor?.trilha}>
                       <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
-                      <span className={styles.marcaTrilha}>{mentor?.iniciais}</span>
+                      <span className={styles.marcaTrilha}>
+                        {mentor ? iniciais(mentor.nome) : ''}
+                      </span>
                     </span>
                   );
                 })}
@@ -269,7 +272,7 @@ export function CalendarioMentorias({
           ) : (
             <ul className={styles.lista}>
               {doDia.map((s) => {
-                const mentor = mentorPorId(s.mentorId);
+                const mentor = s.mentor;
                 const estado = estadoDaSessao(s);
                 return (
                   <li key={s.id}>
@@ -309,7 +312,7 @@ export function CalendarioMentorias({
         <div className={styles.legenda}>
           <p className={styles.legendaTitulo}>Trilhas em {nomeMes.split(' de ')[0]}</p>
           <ul className={styles.legendaLista}>
-            {(Object.keys(TRILHAS) as Trilha[]).map((t) => (
+            {(Object.keys(TRILHAS) as TrilhaMentor[]).map((t) => (
               <li key={t} className={styles.legendaItem} data-trilha={t}>
                 <span className={styles.legendaBarra} aria-hidden="true" />
                 <span className={styles.legendaSigla}>{TRILHAS[t].sigla}</span>

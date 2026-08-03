@@ -8,11 +8,22 @@
  * escreve o JSON do erro POR CIMA deste arquivo em vez de falhar — o `>` do shell
  * trunca antes de o comando rodar. Confira o topo do arquivo antes de commitar.
  *
+ * E O `>` TAMBÉM APAGA ESTE CABEÇALHO a cada geração: ele não vem do CLI, é
+ * escrito à mão depois. Se você acabou de rodar `db:types` e este bloco sumiu,
+ * cole-o de volta — foi assim que ele quase se perdeu quando as mentorias
+ * entraram.
+ *
  * Ignorado por eslint e prettier (ver eslint.config.mjs e .prettierignore): a
  * integridade de um arquivo gerado é o comando que o gera, não o formatador.
  */
 
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -143,6 +154,121 @@ export type Database = {
           titulo?: string
         }
         Relationships: []
+      }
+      mentores: {
+        Row: {
+          ativo: boolean
+          atualizado_em: string
+          criado_em: string
+          foto_url: string | null
+          headline: string
+          id: string
+          nome: string
+          trilha: string
+          usuario_id: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          foto_url?: string | null
+          headline?: string
+          id?: string
+          nome: string
+          trilha: string
+          usuario_id?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          foto_url?: string | null
+          headline?: string
+          id?: string
+          nome?: string
+          trilha?: string
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
+      mentoria_inscricoes: {
+        Row: {
+          criado_em: string
+          mentoria_id: string
+          usuario_id: string
+        }
+        Insert: {
+          criado_em?: string
+          mentoria_id: string
+          usuario_id: string
+        }
+        Update: {
+          criado_em?: string
+          mentoria_id?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentoria_inscricoes_mentoria_id_fkey"
+            columns: ["mentoria_id"]
+            isOneToOne: false
+            referencedRelation: "mentorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentorias: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          criado_por: string | null
+          descricao: string
+          fim: string
+          id: string
+          inicio: string
+          mentor_id: string
+          sala_url: string | null
+          status: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          vagas: number
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string
+          fim: string
+          id?: string
+          inicio: string
+          mentor_id: string
+          sala_url?: string | null
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          vagas?: number
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string
+          fim?: string
+          id?: string
+          inicio?: string
+          mentor_id?: string
+          sala_url?: string | null
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo?: string
+          vagas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentorias_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       modulos: {
         Row: {
@@ -309,7 +435,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mentoria_ocupacao: {
+        Args: { _ids: string[] }
+        Returns: {
+          inscritos: number
+          mentoria_id: string
+        }[]
+      }
     }
     Enums: {
       papel_usuario: "membro" | "mentor" | "admin"

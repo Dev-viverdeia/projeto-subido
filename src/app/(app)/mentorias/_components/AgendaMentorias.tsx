@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
 import { ItemAgenda } from './ItemAgenda';
 import { chaveDoDia, rotuloDoDia } from './estadoMentoria';
@@ -29,10 +30,10 @@ export function AgendaMentorias({
   aoCancelarCheckin,
 }: {
   /** Já vem só com as futuras (e a que está ao vivo), ordenadas. */
-  sessoes: MentoriaExemplo[];
+  sessoes: SessaoMentoria[];
   agora: Date;
   agoraIso: string;
-  estadoDaSessao: (s: MentoriaExemplo) => EstadoMentoria;
+  estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
   aoAbrirDetalhe: (id: string) => void;
   aoFazerCheckin: (id: string) => void;
   aoCancelarCheckin: (id: string) => void;
@@ -60,7 +61,7 @@ export function AgendaMentorias({
   }, [sessoes, filtro, agora, agoraIso]);
 
   const porDia = useMemo(() => {
-    const grupos = new Map<string, MentoriaExemplo[]>();
+    const grupos = new Map<string, SessaoMentoria[]>();
     for (const s of filtradas) {
       const chave = chaveDoDia(s.inicioIso);
       grupos.set(chave, [...(grupos.get(chave) ?? []), s]);

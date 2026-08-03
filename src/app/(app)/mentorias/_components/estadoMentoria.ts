@@ -1,12 +1,28 @@
-import { JANELA_CHECKIN_HORAS } from '@/content/mentorias';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+
+/**
+ * A matriz de estados de UMA sessão. Mora aqui, junto da função que a deriva —
+ * antes vivia no módulo de dados de exemplo, que deixou de existir.
+ */
+export type EstadoMentoria =
+  'ao-vivo' | 'inscrito' | 'checkin-aberto' | 'lotada' | 'fora-da-janela' | 'encerrada';
+
+/**
+ * Quantas horas antes o check-in abre.
+ *
+ * É REGRA DE PRODUTO EM CÓDIGO, e está dito: o banco não guarda esta janela, e
+ * mudá-la é mudar este número. Quando ela virar coluna da mentoria (sessões
+ * diferentes podem querer janelas diferentes), o valor passa a vir da linha e
+ * esta constante some.
+ */
+export const JANELA_CHECKIN_HORAS = 48;
 
 /**
  * Derivações puras da agenda — data/estado calculados de `agora` + a sessão.
  * Espelham as regras da futura tabela; o servidor será a fonte da verdade.
  */
 export function estadoDe(
-  sessao: MentoriaExemplo,
+  sessao: SessaoMentoria,
   agora: Date,
   inscritoLocal: boolean,
 ): EstadoMentoria {
@@ -67,14 +83,14 @@ export function horaCurta(dataIso: string): string {
   return new Date(dataIso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-export function duracaoMin(sessao: MentoriaExemplo): number {
+export function duracaoMin(sessao: SessaoMentoria): number {
   return Math.round(
     (new Date(sessao.fimIso).getTime() - new Date(sessao.inicioIso).getTime()) / 60_000,
   );
 }
 
 /** "começa em 45 min" / "começa em 2h15" — some quando falta mais de um dia. */
-export function comecaEm(sessao: MentoriaExemplo, agora: Date): string | null {
+export function comecaEm(sessao: SessaoMentoria, agora: Date): string | null {
   const delta = new Date(sessao.inicioIso).getTime() - agora.getTime();
   if (delta <= 0 || delta > DIA_MS) return null;
   const minutos = Math.round(delta / 60_000);

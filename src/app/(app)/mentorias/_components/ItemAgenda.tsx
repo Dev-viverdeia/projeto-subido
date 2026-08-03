@@ -1,9 +1,10 @@
 'use client';
 
 import { Avatar, Button } from '@/design-system/via';
-import { mentorPorId } from '@/content/mentorias';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
+import { iniciais } from '../../_components/iniciais';
 import styles from './ItemAgenda.module.css';
 
 /**
@@ -27,14 +28,14 @@ export function ItemAgenda({
   aoFazerCheckin,
   aoCancelarCheckin,
 }: {
-  sessao: MentoriaExemplo;
+  sessao: SessaoMentoria;
   estado: EstadoMentoria;
   agora: Date;
   aoAbrirDetalhe: () => void;
   aoFazerCheckin: () => void;
   aoCancelarCheckin: () => void;
 }) {
-  const mentor = mentorPorId(sessao.mentorId);
+  const mentor = sessao.mentor;
   const lotada = estado === 'lotada';
 
   return (
@@ -65,7 +66,7 @@ export function ItemAgenda({
             linhas — em lista, informação idêntica em toda linha é ruído, não
             contexto. Ela vive na ficha da sessão, onde é lida uma vez. */}
         <div className={styles.mentor}>
-          <Avatar initials={mentor?.iniciais ?? '—'} size="xs" />
+          <Avatar initials={mentor ? iniciais(mentor.nome) : '—'} size="xs" />
           <span className={styles.mentorNome}>{mentor?.nome}</span>
         </div>
       </div>
