@@ -52,8 +52,10 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
       ? `/formacoes/${formacao.slug}/aula/${formacao.modulos[0].aulas[0].id}`
       : null);
 
-  /* Só entra o que EXISTE — a duração some quando nenhuma aula tem `duracao_seg`
-     cadastrada, em vez de virar "0 min". */
+  /* Módulos e aulas são a ESTRUTURA do curso: entram sempre, inclusive em zero —
+     "0 aulas" é um fato sobre um curso em montagem, não um número inventado. A
+     duração é diferente: ela some quando nenhuma aula tem `duracao_seg`, porque
+     "0 min" afirmaria que o curso não dura nada. */
   const metas = [
     `${curriculo.modulos.length} ${curriculo.modulos.length === 1 ? 'módulo' : 'módulos'}`,
     `${curriculo.total} ${curriculo.total === 1 ? 'aula' : 'aulas'}`,
@@ -115,7 +117,11 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
             feitasIds={curriculo.feitasIds}
             proximo={curriculo.proxima}
             unidade={{ singular: 'aula', plural: 'aulas' }}
-            notaFinal="O certificado entra quando a emissão for ligada."
+            /* NÃO promete certificado. O texto anterior dizia "o certificado
+               entra quando a emissão for ligada" — um resultado prometido sem
+               mecanismo e sem data, que é exatamente o que a casa não faz. O que
+               entra no lugar é a limitação REAL e verificável do progresso. */
+            notaFinal="O progresso é deste navegador — ele não acompanha você em outro dispositivo."
           />
         </aside>
       </div>

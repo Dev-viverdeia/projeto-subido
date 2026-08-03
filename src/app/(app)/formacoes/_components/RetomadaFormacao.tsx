@@ -28,6 +28,14 @@ export function RetomadaFormacao({ formacoes }: { formacoes: FormacaoResumo[] })
   if (!formacao) return null;
 
   const feitas = contarConcluidas(progresso, formacao.aulaIds);
+
+  /* A MESMA REGRA da faixa de resumo do catálogo, e ela estava divergindo: aqui
+     bastava ter TOCADO a formação, lá era preciso ter algo por terminar. O
+     resultado era o `/inicio` convidando a "continuar de onde parou" uma trilha
+     100% concluída enquanto o catálogo, na mesma sessão, não oferecia retomada
+     nenhuma. Duas telas discordando sobre o mesmo dado. */
+  if (feitas === 0 || feitas >= formacao.aulas) return null;
+
   const pct = percentual(feitas, formacao.aulas);
 
   return (

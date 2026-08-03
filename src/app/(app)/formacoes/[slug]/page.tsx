@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterFormacao } from '@/lib/conteudo/queries';
-import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import entrada from '../../_components/entrada.module.css';
 import { CursoConteudo } from '../_components/CursoConteudo';
 import { DefinirTrilha } from '../../_components/trilha/contexto';
@@ -15,7 +14,13 @@ export async function generateMetadata({
   return { title: formacao?.titulo ?? 'Formação' };
 }
 
-/** Detalhe do curso. Server: busca + 404; o resto é client (progresso local). */
+/**
+ * Detalhe do curso. Server: busca + 404; o resto é client (progresso local).
+ *
+ * SEM BOTÃO "VOLTAR": a trilha do cabeçalho já traz `‹ Formações` em toda tela de
+ * detalhe. Esta era a última das três a empilhar os dois controles de retorno a
+ * 40px um do outro.
+ */
 export default async function FormacaoPage({ params }: PageProps<'/formacoes/[slug]'>) {
   const { slug } = await params;
   const formacao = await obterFormacao(slug);
@@ -28,9 +33,6 @@ export default async function FormacaoPage({ params }: PageProps<'/formacoes/[sl
       <DefinirTrilha voltarPara="/formacoes" voltarRotulo="Formações" atual={formacao.titulo} />
 
       <div className={entrada.bloco}>
-        <BotaoVoltar fallback="/formacoes" rotulo="Formações" />
-      </div>
-      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
         <CursoConteudo formacao={formacao} />
       </div>
     </div>

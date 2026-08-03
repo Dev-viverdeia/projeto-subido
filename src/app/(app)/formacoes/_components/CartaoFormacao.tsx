@@ -154,18 +154,24 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
       </div>
 
       {/* Fecha o card, encostado na base: trilho de largura total com o
-          percentual à direita — o mesmo desenho da referência. */}
-      <div className={styles.progresso}>
-        <div className={styles.trilho} aria-hidden="true">
-          <div
-            className={styles.preenchido}
-            style={{ transform: `scaleX(${feitas > 0 ? Math.max(0.02, pct / 100) : 0})` }}
-          />
+          percentual à direita.
+          SÓ EXISTE SE HÁ AULA. Sem esta guarda, uma formação em montagem (zero
+          aulas) mostrava a barra e "0%" — afirmando um progresso possível onde
+          não há conteúdo, e contradizendo o `PillEstado`, que some no mesmo caso
+          justamente porque `sem-itens` não é um estado exibível. */}
+      {formacao.aulas > 0 && (
+        <div className={styles.progresso}>
+          <div className={styles.trilho} aria-hidden="true">
+            <div
+              className={styles.preenchido}
+              style={{ transform: `scaleX(${feitas > 0 ? Math.max(0.02, pct / 100) : 0})` }}
+            />
+          </div>
+          <span className={styles.pct} data-comecou={feitas > 0 ? '' : undefined}>
+            {pct}%
+          </span>
         </div>
-        <span className={styles.pct} data-comecou={feitas > 0 ? '' : undefined}>
-          {pct}%
-        </span>
-      </div>
+      )}
     </Link>
   );
 }

@@ -119,8 +119,14 @@ export function ResumoCatalogo({
           <span className={styles.retomarTextos}>
             <span className={styles.rotulo}>Retomar</span>
             <span className={styles.retomarTitulo}>{retomar.titulo}</span>
+            {/* CONTAGEM, não posição. Isto dizia "etapa 4 de 5", derivando o
+                índice de `feitas + 1` — número que só é verdade se a pessoa
+                marcar em ordem, e marcar etapa é uma checklist que alterna. Quem
+                marcasse a 3ª e a 5ª leria "etapa 3 de 5" apontando para uma etapa
+                já feita. "3 de 5 etapas" é verdade em qualquer ordem. */}
             <span className={styles.retomarEtapa}>
-              {itemUnidade.singular} {retomar.feitas + 1} de {retomar.total}
+              {retomar.feitas} de {retomar.total}{' '}
+              {retomar.total === 1 ? itemUnidade.singular : itemUnidade.plural}
             </span>
           </span>
           <span className={styles.seta} aria-hidden="true">

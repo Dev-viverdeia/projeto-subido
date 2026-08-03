@@ -215,23 +215,30 @@ export function CatalogoFormacoes({
       <div className={styles.ancoraGrade} ref={topoGradeRef} aria-hidden="true" />
 
       {visiveis.length === 0 ? (
+        /* A BUSCA VEM PRIMEIRO, e a ordem anterior produzia uma mentira: com
+           "Em andamento" ativo mostrando 3 no próprio controle e uma busca sem
+           resultado, a tela dizia "Nenhuma formação em andamento" — negando o
+           número que estava escrito dois palmos acima. Quem esvaziou a lista foi
+           o termo, e é isso que o estado vazio precisa dizer. */
         <EmptyState
           title={
-            situacao === 'andamento'
-              ? 'Nenhuma formação em andamento'
-              : situacao === 'concluidas'
-                ? 'Nenhuma formação concluída'
-                : buscaLenta
-                  ? 'Nada com essa busca'
+            buscaLenta
+              ? 'Nada com essa busca'
+              : situacao === 'andamento'
+                ? 'Nenhuma formação em andamento'
+                : situacao === 'concluidas'
+                  ? 'Nenhuma formação concluída'
                   : 'Nenhuma formação publicada'
           }
           description={
-            situacao === 'andamento'
-              ? 'Assim que você concluir a primeira aula de uma trilha, ela aparece aqui.'
-              : situacao === 'concluidas'
-                ? 'As trilhas que você terminar ficam guardadas aqui.'
-                : buscaLenta
-                  ? 'Nenhuma formação combina com o termo. Tente outra palavra.'
+            buscaLenta
+              ? situacao === TODAS
+                ? 'Nenhuma formação combina com o termo. Tente outra palavra.'
+                : 'Nenhuma formação combina o termo com esse recorte. Afrouxe um dos dois.'
+              : situacao === 'andamento'
+                ? 'Assim que você concluir a primeira aula de uma trilha, ela aparece aqui.'
+                : situacao === 'concluidas'
+                  ? 'As trilhas que você terminar ficam guardadas aqui.'
                   : 'As trilhas aparecem aqui assim que forem publicadas.'
           }
           action={
@@ -245,7 +252,7 @@ export function CatalogoFormacoes({
       ) : (
         /* A CHAVE POR PÁGINA separa os dois tipos de mudança. Filtrar tira alguns
            cards do conjunto: ali a saída animada comunica algo. Paginar troca os
-           dez de uma vez — todo card sai e todo card entra, e o resultado é um
+           doze de uma vez — todo card sai e todo card entra, e o resultado é um
            crossfade de duas grades inteiras, com o dobro de nós em tela durante a
            transição. Com a chave, a troca de página REMONTA a grade. */
         <div className={styles.grade} key={`pagina-${paginaVisivel}`}>
