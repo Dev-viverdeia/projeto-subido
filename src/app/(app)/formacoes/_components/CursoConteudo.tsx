@@ -45,12 +45,14 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
     : curriculo.comecou
       ? 'Continuar'
       : 'Começar curso';
-  /* Concluiu tudo → revisar leva à primeira aula. */
+  /* Concluiu tudo → revisar leva à primeira aula DO CURSO, não à primeira aula do
+     primeiro módulo. Lendo `modulos[0].aulas[0]`, um curso cujo módulo de abertura
+     ainda não tem aula cadastrada — o caso normal de um currículo em montagem —
+     ficava sem CTA nenhum, mesmo com dezenas de aulas nos módulos seguintes.
+     `curriculo.planas` já é a ordem global achatada. */
   const hrefCta =
     hrefProxima ??
-    (formacao.modulos[0]?.aulas[0]
-      ? `/formacoes/${formacao.slug}/aula/${formacao.modulos[0].aulas[0].id}`
-      : null);
+    (curriculo.planas[0] ? `/formacoes/${formacao.slug}/aula/${curriculo.planas[0].id}` : null);
 
   /* Módulos e aulas são a ESTRUTURA do curso: entram sempre, inclusive em zero —
      "0 aulas" é um fato sobre um curso em montagem, não um número inventado. A

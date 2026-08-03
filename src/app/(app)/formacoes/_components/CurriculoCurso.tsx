@@ -54,12 +54,35 @@ export function CurriculoCurso({
   modulos: ModuloDoCurriculo[];
   moduloAbertoInicial: string | null;
 }) {
-  const [abertos, setAbertos] = useState<string[]>(() =>
-    moduloAbertoInicial ? [moduloAbertoInicial] : modulos[0] ? [modulos[0].modulo.id] : [],
+  /**
+   * ABERTO DERIVADO, e o inicializador de `useState` era um BUG de hidratação.
+   *
+   * `moduloAbertoInicial` sai do progresso local, e o progresso local vem de
+   * `useSyncExternalStore`, cujo snapshot de SERVIDOR é vazio (ver `local.ts`).
+   * O inicializador roda UMA vez, no render de hidratação — exatamente o render
+   * em que o progresso ainda é vazio. Resultado: quem já concluiu os módulos 1 e
+   * 2 abria o curso com o módulo 1 expandido, porque naquele instante "a próxima
+   * aula" era a primeira de todas. O progresso chegava no ciclo seguinte e o
+   * acordeão já estava congelado.
+   *
+   * A correção é a mesma que a `PlaylistAula` já usa: o estado guarda a ESCOLHA
+   * explícita junto da assinatura sob a qual ela foi feita. Assinatura mudou →
+   * volta a valer o derivado, no MESMO render. Um `useEffect` sincronizando isso
+   * mostraria o módulo errado por um frame, e o lint de hooks reprova o setState
+   * síncrono em efeito — com razão.
+   */
+  const padrao = moduloAbertoInicial ?? modulos[0]?.modulo.id ?? null;
+  const [escolha, setEscolha] = useState<{ assinatura: string | null; abertos: string[] } | null>(
+    null,
   );
+  const abertos =
+    escolha && escolha.assinatura === padrao ? escolha.abertos : padrao ? [padrao] : [];
 
   const alternar = (id: string) =>
-    setAbertos((atual) => (atual.includes(id) ? atual.filter((m) => m !== id) : [...atual, id]));
+    setEscolha({
+      assinatura: padrao,
+      abertos: abertos.includes(id) ? abertos.filter((m) => m !== id) : [...abertos, id],
+    });
 
   return (
     <div className={styles.lista}>
