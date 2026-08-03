@@ -121,3 +121,29 @@ html {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * SUBLINHADO DE HOVER — o DS sublinha TODO link, e neste produto isso é errado.
+ *
+ * `tokens.css:598` declara `a:hover { text-decoration: underline }`. A regra faz
+ * sentido para link EM PROSA, onde o sublinhado é a única pista de que aquela
+ * palavra é clicável. Aqui a maioria dos `<a>` não é palavra: é o CARD inteiro do
+ * catálogo, o degrau da trilha, o item da navegação, a retomada. Sublinhar um
+ * card de 340px risca o título e o resumo de uma vez, e o hover passa a parecer
+ * defeito.
+ *
+ * O DS é vendorizado e não se edita — a correção mora aqui, que é a camada de
+ * comportamento de documento. Mesma especificidade da regra do DS (0,1,1) e mais
+ * tarde na cascata, então esta ganha por ordem.
+ *
+ * E o sublinhado VOLTA onde ele é certo: dentro de parágrafo, item de lista ou
+ * citação. Ali o link é mesmo uma palavra no meio do texto, e tirar a pista
+ * deixaria o clicável indistinguível do resto da frase.
+ * ------------------------------------------------------------------------- */
+a:hover {
+  text-decoration: none;
+}
+
+:is(p, li, dd, dt, blockquote, figcaption) a:hover {
+  text-decoration: underline;
+}

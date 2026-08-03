@@ -100,20 +100,6 @@
   overflow: hidden;
 }
 
-.ferramentas {
-  margin: var(--via-space-3) 0 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mais {
-  color: var(--via-text-faint);
-}
-
 .vao {
   flex: 1;
   min-height: var(--via-space-3);
@@ -133,33 +119,100 @@
 }
 
 .contagens {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-/* O ESTADO é pill de contorno, e a diferença entre os dois é de PESO, não de cor:
-   verde/vermelho de semáforo é banido, e "concluída" não precisa de verde para se
-   ler como concluída. Em andamento fica em contorno; concluída ganha o
-   preenchimento navy, que é o degrau mais alto que a casa tem. */
+/* TRÊS ESTADOS, e nenhum verde/vermelho de semáforo — que é banido. A escada é de
+   INTENSIDADE: não iniciada é o degrau mais quieto (navy translúcido), em
+   andamento acende no accent, concluída fecha no navy sólido.
+
+   OS NÚMEROS, medidos antes de escolher (texto de 10px exige 4,5:1):
+   · não iniciada — text-muted sobre navy 6%: 7,04:1
+   · em andamento — accent-ink sobre accent 8%: 4,66:1
+     (a 12% cai para 4,47 e reprova; 8% é o teto seguro, não gosto)
+   · concluída    — branco sobre navy: 18:1
+   O accent aparece aqui SOBRE CLARO, o que a regra da casa restringe — mas a
+   restrição é contra accent como TINTA de texto ou fundo de área grande. Aqui o
+   fundo é um véu de 8% numa pill de 10px e a tinta é `accent-ink`, a única
+   variante que a marca declara legível sobre claro. */
 .estado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
   flex-shrink: 0;
   margin-left: auto;
-  padding: 3px var(--via-space-2);
+  padding: 4px var(--via-space-2_5);
   border-radius: var(--via-radius-pill);
-  border: 1px solid var(--via-border);
+  background: var(--via-navy-06);
   font-family: var(--via-font-mono);
   font-size: 0.625rem;
-  letter-spacing: var(--app-ls-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-muted);
   white-space: nowrap;
+  /* O badge é o único elemento do topo que não desce com o texto: alinhado ao
+     topo, ele fica na mesma altura do glifo em todos os cards, e a coluna de
+     estado passa a ser uma linha reta na grade inteira. */
+  align-self: flex-start;
+}
+
+.estado[data-estado='em-andamento'] {
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  color: var(--via-accent-ink);
+}
+
+/* O ponto é do mesmo tom da tinta: em accent puro ele daria 2,49:1 sobre o véu e
+   sumiria — e um indicador que some é pior que nenhum. */
+.ponto {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--via-radius-pill);
+  background: currentcolor;
 }
 
 .estado[data-estado='concluida'] {
-  border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+}
+
+/* As MARCAS de ferramenta: iniciais derivadas do nome, sobrepostas com um anel da
+   cor do card para separá-las. Não são logotipos — o banco só guarda o nome —, e
+   é por isso que a contagem escrita continua ao lado: a marca dá textura, o número
+   dá o fato. */
+.marcas {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--via-radius-pill);
+  /* CLARO e quieto, não o Avatar do DS — que é navy sólido com tinta branca e,
+     repetido três vezes no rodapé, puxava o olho para longe do título. A marca é
+     textura; a contagem ao lado é o fato. */
+  background: var(--via-navy-06);
+  border: 1.5px solid var(--app-elev-1-bg);
+  font-family: var(--via-font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0;
+  color: var(--via-text-muted);
+}
+
+.marca + .marca {
+  margin-left: -6px;
 }
 
 .etapas {

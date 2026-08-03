@@ -53,34 +53,12 @@
   text-decoration: none;
 }
 
-/* O NOME DA SEÇÃO É O TÍTULO DA TELA, e recebe a TIPOGRAFIA DE TÍTULO.
-   Ele começou como eyebrow (11px mono) porque a página tinha um <h1> próprio
-   logo abaixo. Quando esse <h1> saiu, o rótulo herdou o PAPEL do título mas
-   continuou com a tipografia de rótulo — e ficou pela metade nos dois passos
-   seguintes.
-
-   Duas medidas fecharam a conta:
-   · PESO. Estava em 500 enquanto o título de um item de lista de 14px está em
-     560. O maior título da tela pesava menos que a menor linha abaixo dele, o
-     que é exatamente o que se lê como "fonte fraca". Agora 560, o mesmo dos
-     títulos de card e de item — uma voz de título, não três.
-   · CORPO. 24px numa barra de 80 deixava 56px de folga. 32px é o degrau que o
-     <h1> da página usava, restaurado onde o título passou a morar; sobram 48,
-     que é respiro e não vazio.
-
-   Geist é variável (100–900), então 560 é um peso real e não uma síntese. */
-.secao {
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h2);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-  /* Some antes de qualquer outra coisa quando falta largura. */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* O slot vive aqui. `min-width: 0` é o que permite a trilha truncar pelo título
+   em vez de empurrar o menu de perfil para fora da barra. */
+.esquerda {
   display: none;
+  align-items: center;
+  min-width: 0;
 }
 
 .direita {
@@ -104,9 +82,5 @@
      mesma tela. O lugar dela passa a ser do rótulo de seção. */
   .marca {
     display: none;
-  }
-
-  .secao {
-    display: block;
   }
 }

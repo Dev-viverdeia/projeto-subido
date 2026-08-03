@@ -26,7 +26,19 @@ import styles from './layout.module.css';
  * O QueryProvider mora aqui e só aqui. A landing nunca o carrega — é isso que
  * mantém o bundle de `(marketing)` sem React Query.
  */
-export default async function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({
+  children,
+  trilha,
+}: {
+  children: ReactNode;
+  /* Slot paralelo `@trilha`. Ele existe porque o cabeçalho vive no layout e o
+     layout não enxerga o dado da página — e passar título por contexto de cliente
+     custaria um pisca de "seção primeiro, título depois" a cada navegação. Com o
+     slot, a trilha é renderizada no servidor, com o título real, no mesmo request.
+     As consultas são `cache()` do React: o slot e a página compartilham o
+     resultado, sem segunda ida ao banco. */
+  trilha: ReactNode;
+}) {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
 
@@ -79,7 +91,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             (usa usePathname) e receber o SVG pronto do servidor evita puxar a marca
             para o bundle do browser. Só aparece no mobile — em desktop a sidebar
             já carrega a marca, e repetir seria a segunda vez na mesma tela. */}
-        <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} />
+        <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} trilha={trilha} />
 
         <main className={styles.conteudo} id="conteudo">
           {children}

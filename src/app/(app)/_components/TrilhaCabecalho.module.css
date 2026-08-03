@@ -1,0 +1,79 @@
+/* Uma linha só, e ela encolhe pelo ATUAL — nunca pelo degrau de volta, que é o
+   controle. Numa tela estreita o título trunca e o "‹ Soluções de IA" continua
+   inteiro e clicável. */
+.trilha {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+}
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  flex-shrink: 0;
+  /* O ícone encosta no texto: o `‹` é parte da palavra "voltar", não um botão
+     separado ao lado dela. */
+  margin-left: calc(var(--via-space-1) * -1);
+  padding: var(--via-space-1) var(--via-space-2);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  transition:
+    color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.voltar:hover {
+  color: var(--via-text-primary);
+  background: var(--via-navy-03);
+}
+
+.voltar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.barra {
+  flex-shrink: 0;
+  color: var(--via-border);
+}
+
+/* O degrau do meio é o RECORTE (categoria, módulo). Em mono caixa-alta porque é
+   rótulo de classificação, não nome próprio — a mesma gramática do eyebrow. */
+.meio {
+  flex-shrink: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* Só o atual cede espaço, e ele é o único com tinta cheia: é onde a pessoa está. */
+.atual {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voltar {
+    transition: none;
+  }
+}
+
+/* A 600 o degrau do meio sai: três degraus numa linha de 375px deixam ~90px para
+   o título, e um título de 90px não é título. */
+@media (max-width: 599px) {
+  .meio,
+  .meio + .barra {
+    display: none;
+  }
+}

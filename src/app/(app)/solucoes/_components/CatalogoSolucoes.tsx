@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Button, EmptyState, Pagination } from '@/design-system/via';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
-import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
+import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
 import { BuscaCatalogo } from '../../_components/filtros/BuscaCatalogo';
 import { ChipsAtivos } from '../../_components/filtros/ChipsAtivos';
 import { PainelMaisFiltros } from '../../_components/filtros/PainelMaisFiltros';
@@ -193,19 +193,33 @@ export function CatalogoSolucoes({
 
   return (
     <div className={styles.raiz}>
+      {/* CATEGORIA E ORDEM na mesma linha, as duas como controle segmentado.
+          A regra escrita no `SeletorVista` — segmentado para MODO, tipográfico
+          para FILTRO — nasceu numa tela que tinha os dois ao mesmo tempo, onde
+          dois sublinhados leriam como dois estados ativos concorrentes. Aqui não
+          há modo: há um filtro e uma ordem, ambos "escolha um de N". A mesma forma
+          para a mesma natureza de escolha é o que mantém a linha calma; o que os
+          distingue é a posição e o rótulo "Ordenar". */}
       <div className={styles.regua}>
-        <AbasFiltro
-          abas={abas}
+        <ControleSegmentado
+          opcoes={abas}
           ativa={categoria}
           aoMudar={setCategoria}
-          layoutId="solucoes-aba-ativa"
+          layoutId="solucoes-categoria"
           ariaLabel="Filtrar por categoria"
         />
+
         <div className={styles.reguaDireita}>
-          <BuscaCatalogo
-            valor={busca}
-            aoMudar={setBusca}
-            placeholder="Buscar solução ou ferramenta"
+          <span className={styles.ordenarRotulo}>Ordenar</span>
+          <ControleSegmentado
+            opcoes={[
+              { id: 'recentes', rotulo: 'Recentes' },
+              { id: 'alfabetica', rotulo: 'A–Z' },
+            ]}
+            ativa={ordem}
+            aoMudar={(id) => setOrdem(id as 'recentes' | 'alfabetica')}
+            layoutId="solucoes-ordem"
+            ariaLabel="Ordenar"
           />
           <PainelMaisFiltros
             titulo="Ferramentas"
@@ -221,6 +235,14 @@ export function CatalogoSolucoes({
         </div>
       </div>
 
+      <div className={styles.linhaBusca}>
+        <BuscaCatalogo
+          valor={busca}
+          aoMudar={setBusca}
+          placeholder="Buscar solução ou ferramenta"
+        />
+      </div>
+
       <ChipsAtivos
         chips={ferramentasSel.map((f) => ({
           id: `ferramenta:${f}`,
@@ -230,32 +252,10 @@ export function CatalogoSolucoes({
         aoLimparTudo={() => setFerramentasSel([])}
       />
 
-      {/* A ORDENAÇÃO sobe para a linha das abas e a CONTAGEM desce para o rodapé.
-          Elas estavam juntas numa faixa entre a régua e a grade, e a faixa
-          empurrava a primeira fileira de cards para baixo sem informar nada que
-          não coubesse nos dois lugares naturais: o controle junto dos outros
-          controles, a contagem junto da paginação que ela descreve. */}
-      <div className={styles.linhaMeta} ref={topoGradeRef}>
-        <span className={styles.ordenarRotulo}>Ordenar</span>
-        <div className={styles.ordenacao} role="group" aria-label="Ordenar">
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'recentes' ? '' : undefined}
-            onClick={() => setOrdem('recentes')}
-          >
-            Recentes
-          </button>
-          <button
-            type="button"
-            className={styles.ordenar}
-            data-ativo={ordem === 'alfabetica' ? '' : undefined}
-            onClick={() => setOrdem('alfabetica')}
-          >
-            A–Z
-          </button>
-        </div>
-      </div>
+      {/* Âncora do scroll da paginação — a faixa que existia aqui (rótulo de
+          ordenação + contagem) foi desmontada: o controle subiu para a régua e a
+          contagem desceu para o rodapé, junto da paginação que ela descreve. */}
+      <div className={styles.ancoraGrade} ref={topoGradeRef} aria-hidden="true" />
 
       {visiveis.length === 0 ? (
         <EmptyState

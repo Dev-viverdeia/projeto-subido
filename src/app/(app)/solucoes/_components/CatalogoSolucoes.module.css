@@ -27,15 +27,18 @@
   flex: none;
 }
 
-/* A linha da ordenação agora fica à DIREITA e sozinha — a contagem que dividia
-   esta faixa com ela desceu para o rodapé. */
-.linhaMeta {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--via-space-3);
-  /* Âncora do scroll da paginação: para sob o cabeçalho sticky, não atrás. */
+/* Âncora invisível: o scroll da paginação precisa parar no topo da grade, e a
+   faixa que servia de referência deixou de existir. Altura zero, sem conteúdo. */
+.ancoraGrade {
   scroll-margin-top: 84px;
+}
+
+/* A busca ganhou linha própria. Na régua ela dividia espaço com dois trilhos
+   segmentados e as três coisas encolhiam: o trilho de categorias tem largura de
+   conteúdo e não cede, então quem cedia era o campo — 240px e placeholder
+   cortado. */
+.linhaBusca {
+  display: flex;
 }
 
 .ordenarRotulo {
@@ -44,36 +47,6 @@
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
-}
-
-.ordenacao {
-  display: flex;
-  gap: var(--via-space-3);
-}
-
-.ordenar {
-  border: none;
-  background: transparent;
-  padding: var(--via-space-1) 0;
-  font-family: inherit;
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  cursor: pointer;
-  /* Borda sempre presente (transparente no repouso) — trocar borda por nada
-     causaria 1px de layout shift a cada clique. */
-  border-bottom: 1px solid transparent;
-  transition:
-    color var(--via-t-fast),
-    border-color var(--via-t-fast);
-}
-
-.ordenar:hover {
-  color: var(--via-text-body);
-}
-
-.ordenar[data-ativo] {
-  color: var(--via-text-primary);
-  border-bottom-color: var(--via-navy);
 }
 
 /* Largura maior GANHA COLUNA, não engorda card: a 1600 com 3 colunas o card iria

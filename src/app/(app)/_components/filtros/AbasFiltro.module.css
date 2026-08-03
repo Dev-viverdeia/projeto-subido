@@ -56,18 +56,3 @@
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
 }
-
-/* Contagem da aba — mono, um degrau abaixo do rótulo. Na aba ativa ela sobe junto
-   com o texto, senão pareceria desligada dentro de um item ligado. */
-.total {
-  margin-left: var(--via-space-1_5);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-micro);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.aba[data-ativa] .total {
-  color: var(--via-text-muted);
-}
