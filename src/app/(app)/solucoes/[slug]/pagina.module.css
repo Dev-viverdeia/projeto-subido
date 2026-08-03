@@ -1,105 +1,17 @@
-/* A PÁGINA usa o canvas inteiro; quem NÃO cresce é a coluna do vídeo.
-   Esta tela tinha um acoplamento ruim: página larga → coluna principal larga →
-   vídeo alto (16:9 numa coluna de 1188 dá 668px de ALTURA, e o primeiro passo
-   sai da dobra). Conter a página inteira resolvia o vídeo e desperdiçava 336px
-   de calha a 1920. A correção é quebrar o acoplamento — ver `.grade`. */
+/* MEDIDA DE LEITURA, não o canvas de 1600.
+   A regra da casa separa os dois casos que parecem um: GRADE ganha coluna e
+   acompanha `--app-canvas`; LISTA e PROSA têm medida. Esta tela é vídeo + passo a
+   passo + coluna de apoio — leitura.
+
+   O número que decide: com a página em 1600 e a coluna de apoio em 360, a coluna
+   principal vai a ~1200px e o vídeo 16:9 a 675 de ALTURA — a primeira etapa nasce
+   fora da dobra em qualquer notebook. Em 1280 a principal fica em ~916 e o vídeo
+   em ~515, que é a medida em que esta tela foi desenhada.
+
+   A versão anterior resolvia isso com teto na coluna (`minmax(0, 900px)`) e a
+   página no canvas; o efeito colateral era uma coluna de apoio de 668px a 1600.
+   Conter a PÁGINA é a mesma correção sem o efeito colateral. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: var(--via-container);
   margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-5);
-}
-
-.topo {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-}
-
-.eyebrow {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: 0.688rem;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.cabecalho {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-}
-
-.titulo {
-  margin: 0;
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h2);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-  text-wrap: balance;
-  max-width: 26ch;
-}
-
-.resumo {
-  margin: 0;
-  font-size: var(--via-fs-body);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 62ch;
-}
-
-/* A ficha em uma linha — o mesmo dado do rodapé do card no catálogo, para quem
-   chegou aqui saber o tamanho da empreitada antes de rolar. */
-.meta {
-  margin: var(--via-space-1) 0 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-/* O ACOPLAMENTO QUEBRADO: a coluna principal tem TETO de 900px, e a largura que
-   sobra vai toda para o kit.
-   `minmax(0, 900px)` mantém o vídeo em ~506 de altura — a medida que funcionava —
-   por mais larga que a página fique. O `1fr` da segunda coluna faz o kit deixar
-   de ser um trilho de 360 e virar painel: a 1600 ele fica com 668 e as
-   ferramentas passam a caber em duas colunas. Em telas menores a ordem se
-   inverte sozinha — o mínimo de 280 do kit protege ele, e a principal encolhe. */
-.grade {
-  display: grid;
-  grid-template-columns: minmax(0, 900px) minmax(280px, 1fr);
-  gap: var(--via-space-8);
-  align-items: start;
-}
-
-.principal {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-7);
-  min-width: 0;
-}
-
-/* Sticky sob o cabeçalho do shell (68px + folga). A coluna rola junto quando é
-   mais alta que a viewport — `align-items: start` no pai é o que permite. */
-.lateral {
-  position: sticky;
-  top: calc(68px + var(--via-space-5));
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-6);
-}
-
-@media (max-width: 1099px) {
-  .grade {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .lateral {
-    position: static;
-  }
 }

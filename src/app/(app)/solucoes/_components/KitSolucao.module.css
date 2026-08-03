@@ -1,7 +1,7 @@
 .secao {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-3);
+  gap: var(--app-gap-stack);
 }
 
 .eyebrow {
@@ -10,7 +10,7 @@
   gap: var(--via-space-2);
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
@@ -23,137 +23,154 @@
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding-inline: var(--via-space-1);
+  padding-inline: 5px;
   border-radius: var(--via-radius-pill);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
+  background: var(--via-navy-06);
   font-size: 0.625rem;
   letter-spacing: 0;
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.vazio {
-  margin: 0;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px dashed var(--via-border);
-  border-radius: var(--via-radius-md);
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-faint);
-}
-
-/* ── Ferramentas ───────────────────────────────────────────────────────────── */
-/* Grade que ACOMPANHA a largura do painel: com o kit em 668px as ferramentas
-   caem em duas colunas; num trilho de 280 voltam a uma. Cada ferramenta é um
-   card fechado em vez de linha com divisor — divisor só funciona em coluna
-   única, e a mesma regra do catálogo vale aqui: largura a mais vira COLUNA, não
-   linha esticada. */
+/* GRADE SEM MEDIA QUERY, e a diferença é real: `.lista` vive dentro da coluna
+   principal da ficha, não da viewport. Preso a `@media (min-width: 1280px)`, o
+   item esticava para os ~635px da coluna a 1279 e virava faixa; com `auto-fill`
+   quem decide é a LARGURA DISPONÍVEL — uma coluna quando é estreita, três quando
+   a ficha está larga, sem número mágico em lugar nenhum. */
 .listaFerramentas {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--via-space-2_5);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--via-space-2);
 }
 
+/* Prompt NÃO vira grade: o bloco de código quer linha longa, e dois deles lado a
+   lado dariam duas colunas de texto monoespaçado estreito. */
+.listaPrompts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+/* Raio livre: nada aqui dentro é full-bleed. A sigla é um chip de 32px flutuando
+   no meio do card, e a regra de cantos concêntricos só vale para filho cujas
+   bordas correm paralelas às do pai, recuadas pelo padding. */
 .ferramenta {
   display: flex;
   align-items: flex-start;
   gap: var(--via-space-3);
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-surface);
+  padding: var(--app-pad-card-tight);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
 }
 
-.tile {
+.sigla {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  flex: none;
-  border-radius: var(--via-radius-sm);
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--app-radius-chip);
   background: var(--via-navy-06);
-  color: var(--via-navy);
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: 0;
+  color: var(--via-text-muted);
 }
 
-.ferramentaTextos {
+.textos {
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.ferramentaNome {
+.nome {
   margin: 0;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
 }
 
-.ferramentaPara {
+.papel {
   margin: 0;
   font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
+  /* 40ch ≈ 52 caracteres no Geist (o `ch` mede ~30% a menos que o caractere
+     médio) — linha curta é o certo numa coluna de apoio. */
+  max-width: 40ch;
+  text-wrap: pretty;
 }
 
-/* ── Prompts ───────────────────────────────────────────────────────────────── */
-/* Mesma lógica das ferramentas, com mínimo maior (prompt é bloco de texto e não
-   sobrevive a coluna estreita) e `auto-FIT` em vez de fill: com um prompt só, o
-   fill deixaria a trilha vazia ao lado e o card ocuparia meia largura; o fit
-   colapsa a trilha e ele preenche o painel. */
-.listaPrompts {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--via-space-3);
-  align-items: start;
-}
-
+/* Raio 20 e não 12, e a conta é o motivo: o `<pre>` É full-bleed dentro deste
+   card (recuado pelos 16 do padding em todos os lados), então vale a regra dos
+   cantos concêntricos — raio interno = raio externo − padding. Com 12 de fora a
+   conta dava NEGATIVO e nenhum raio interno seria correto; com 20, o bloco de
+   código fecha em 4 (`--app-radius-track`) e os cantos ficam mesmo concêntricos. */
 .prompt {
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-surface);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card-tight);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
 }
 
-.promptCabecalho {
+.promptTopo {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-3);
-  padding: var(--via-space-2_5) var(--via-space-3);
 }
 
-.promptNome {
-  margin: 0;
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* O texto do prompt é DADO, não prosa: mono, fundo rebaixado, rolagem própria
-   depois de ~9 linhas para um prompt longo não engolir a coluna. */
-.promptTexto {
+/* O bloco de código: escuro porque é código. Tinta `--via-gray-300` (12,2:1
+   sobre navy-deep) — `--via-text-soft` cairia para 3,45:1 e reprovaria AA.
+   Raio 4 = 20 do card − 16 de padding: cantos concêntricos de verdade. */
+.codigo {
   margin: 0;
   padding: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
-  background: var(--via-navy-03);
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-deep);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  line-height: 1.6;
-  color: var(--via-text-body);
+  font-size: 0.688rem;
+  line-height: var(--via-lh-loose);
+  color: var(--via-gray-300);
   white-space: pre-wrap;
-  overflow-wrap: break-word;
-  max-height: 176px;
+  word-break: break-word;
+  /* Prompt longo rola dentro do próprio bloco em vez de esticar a coluna. */
+  max-height: 260px;
   overflow-y: auto;
-  scrollbar-width: thin;
+}
+
+/* O bloco é focável (`tabIndex=0`) para poder ser rolado por teclado — então
+   precisa de anel, senão o cursor de tabulação some dentro da tela. Anel claro:
+   ele é escuro, mas está SOBRE superfície clara, e o anel desenha para fora. */
+.codigo:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.vazio {
+  margin: 0;
+  padding: var(--via-space-3) var(--app-pad-card-tight);
+  border: 1px dashed var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-faint);
+  text-wrap: pretty;
 }

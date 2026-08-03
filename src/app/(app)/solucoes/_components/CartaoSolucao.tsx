@@ -9,44 +9,9 @@ import {
   percentual,
   useProgresso,
 } from '@/lib/progresso/local';
+import { iniciais } from './iniciais';
+import { PillEstado } from './PillEstado';
 import styles from './CartaoSolucao.module.css';
-
-const ROTULO_ESTADO: Record<'nao-iniciada' | 'em-andamento' | 'concluida', string> = {
-  'nao-iniciada': 'não iniciada',
-  'em-andamento': 'em andamento',
-  concluida: 'concluída',
-};
-
-/** Check inline — este arquivo é client e importar `lucide` puxaria a biblioteca. */
-function Visto() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path
-        d="M2.5 6.2 4.8 8.5 9.5 3.8"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/**
- * Iniciais da ferramenta a partir do NOME — derivação, não invenção.
- *
- * O banco guarda só o título do item (`solucao_itens.titulo`): não há logo, url
- * nem sigla. Reduzir "WhatsApp Business API" a "WA" não afirma nada que o dado já
- * não diga; é o mesmo fallback que o `Avatar` do DS faz com um nome de pessoa. O
- * que seria invenção é desenhar o LOGOTIPO da ferramenta, e por isso o nome
- * completo continua no `title` e a contagem escrita fica ao lado.
- */
-function iniciais(nome: string): string {
-  const palavras = nome.split(/[\s.-]+/).filter(Boolean);
-  if (palavras.length === 0) return '?';
-  if (palavras.length === 1) return palavras[0]!.slice(0, 2).toUpperCase();
-  return (palavras[0]![0]! + palavras[1]![0]!).toUpperCase();
-}
 
 /**
  * Card do catálogo de soluções — SEM capa, de propósito. O texto carrega o card
@@ -76,14 +41,13 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
   const total = solucao.etapaIds.length;
   const feitas = contarEtapasFeitas(progresso, solucao.etapaIds);
   const estado = estadoDaSolucao(feitas, total);
-  /* `sem-etapas` é o único que não vira pill: solução sem passo a passo cadastrado
-     não está "não iniciada", ela não tem o que iniciar.
-     `nao-iniciada` PASSOU A APARECER. Antes ficava escondida com o argumento de
+  /* `nao-iniciada` PASSOU A APARECER. Antes ficava escondida com o argumento de
      que uma pill igual em todo card seria ruído — mas escondê-la deixava o card
      sem coluna de estado até a primeira marcação, e a grade lia como duas
      famílias de card diferentes. Com as três variantes visíveis, o estado é uma
-     posição fixa que o olho aprende uma vez. */
-  const temEstado = estado !== 'sem-etapas';
+     posição fixa que o olho aprende uma vez. Quem decide o que é exibível é o
+     `PillEstado`, o MESMO selo que a ficha usa — antes havia uma cópia aqui, e
+     duas cópias divergem justamente na transição catálogo → detalhe. */
   const emProgresso = estado === 'em-andamento' || estado === 'concluida';
 
   return (
@@ -98,13 +62,7 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
         </span>
         {solucao.categoria && <p className={styles.eyebrow}>{solucao.categoria}</p>}
 
-        {temEstado && (
-          <span className={styles.estado} data-estado={estado}>
-            {estado === 'em-andamento' && <span className={styles.ponto} aria-hidden="true" />}
-            {estado === 'concluida' && <Visto />}
-            {ROTULO_ESTADO[estado]}
-          </span>
-        )}
+        <PillEstado estado={estado} className={styles.selo} />
       </div>
 
       <h3 className={styles.titulo}>{solucao.titulo}</h3>
@@ -124,7 +82,7 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
               ))}
               {/* As marcas são decorativas — quem carrega o significado para o
                   leitor de tela é a contagem escrita logo ao lado, mais os nomes
-                  completos na ficha. Repetir "WA, N8, CL" em voz alta não
+                  completos na ficha. Repetir "WB, N8, CL" em voz alta não
                   informaria nada. */}
             </span>
           )}
@@ -133,8 +91,12 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
         </span>
         <span className={styles.etapas}>
           {/* Com progresso, o número é a POSIÇÃO da pessoa (2/5). Sem, é o
-              tamanho da empreitada (5 etapas) — dado do catálogo, não dela. */}
-          {total > 0 && (emProgresso ? `${feitas}/${total} etapas` : `${total} etapas`)}
+              tamanho da empreitada (5 etapas) — dado do catálogo, não dela.
+              O singular importa: uma solução de uma etapa dizia "1 etapas". */}
+          {total > 0 &&
+            (emProgresso
+              ? `${feitas}/${total} etapas`
+              : `${total} ${total === 1 ? 'etapa' : 'etapas'}`)}
         </span>
       </footer>
 

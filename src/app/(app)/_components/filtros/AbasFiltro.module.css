@@ -22,7 +22,10 @@
   font-family: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-regular);
-  letter-spacing: var(--app-ls-h4);
+  /* O tracking é função do TAMANHO: 14px é o degrau `sm`. Estava em `--app-ls-h4`,
+     o degrau de 18px — negativo demais para este corpo, e a aba lia apertada ao
+     lado do resto da régua. */
+  letter-spacing: var(--app-ls-sm);
   color: var(--via-text-muted);
   white-space: nowrap;
   cursor: pointer;

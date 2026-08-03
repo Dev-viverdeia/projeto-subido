@@ -1,179 +1,386 @@
 .secao {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--app-gap-block);
 }
 
 .cabecalho {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--via-space-4);
   flex-wrap: wrap;
 }
 
-.progresso {
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+.controles {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-4);
+}
+
+/* Caixa-alta por CONTEÚDO ("3 DE 5 CONCLUÍDAS"): sem `text-transform`, e mesmo
+   assim precisa do tracking de eyebrow — a necessidade vem da forma das letras,
+   não da propriedade CSS. */
+.contagem {
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
 .feitas {
   color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
 }
 
-.eyebrow {
+.expandir {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  border-radius: var(--app-radius-chip);
+  transition: color var(--app-t-state);
+}
+
+.expandir:hover {
+  color: var(--via-text-primary);
+}
+
+.expandir:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+/* `stretch` (padrão do grid) e não `start`: é o que faz a coluna do trilho ter a
+   ALTURA da linha, e é dessa altura que o fio vertical depende para alcançar o
+   próximo círculo quando a etapa está expandida. */
+.passo {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: var(--via-space-4);
+}
+
+.trilho {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* O FIO que liga uma etapa à seguinte. Começa abaixo do círculo e termina dentro
+   da calha da lista (`-16px` = o `gap` do `.lista`), de modo que o traço encosta
+   no círculo de baixo em vez de morrer no ar. O último passo não tem fio. */
+.passo:not(:last-child) .trilho::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  bottom: calc(-1 * var(--via-space-4));
+  left: 50%;
+  width: 1.5px;
+  margin-left: -0.75px;
+  background: var(--via-border-hairline);
+}
+
+.passo[data-feita] .trilho::after {
+  background: var(--via-navy-22);
+}
+
+/* O checkbox real, escondido do olho e não do teclado nem do leitor de tela.
+   Sobrepô-lo ao círculo mantém o alvo nativo exatamente onde o dedo já está. */
+.marca {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.circulo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-border-hairline);
+  background: var(--app-elev-1-bg);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.check {
+  display: none;
+  color: var(--via-white);
+}
+
+.passo[data-feita] .circulo {
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+}
+
+.passo[data-feita] .numero {
+  display: none;
+}
+
+.passo[data-feita] .check {
+  display: inline-flex;
+}
+
+/* A etapa atual: anel accent no círculo. Accent sobre CLARO só como tinta de
+   traço (`--via-accent-ink`), nunca como preenchimento de área. */
+.passo[data-atual] .circulo {
+  border-color: var(--via-accent-ink);
+  border-width: 2px;
+}
+
+.passo[data-atual] .numero {
+  color: var(--via-accent-ink);
+}
+
+/* O anel de foco mora no CÍRCULO porque o input está invisível por cima dele.
+   Sem esta regra o passo inteiro fica sem foco visível — e o `:where()` do
+   globals.css tem especificidade zero, então nada avisaria. */
+.marca:focus-visible + .circulo {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.corpo {
+  min-width: 0;
+  border-radius: var(--app-radius-card);
+  border: 1px solid transparent;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.passo[data-atual] .corpo {
+  border-color: color-mix(in srgb, var(--via-accent-ink) 34%, transparent);
+  background: color-mix(in srgb, var(--via-accent) 4%, transparent);
+}
+
+.linha {
   display: flex;
   align-items: center;
-  gap: var(--via-space-2);
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  gap: var(--via-space-3);
+  width: 100%;
+  padding: var(--via-space-3) var(--via-space-4);
+  min-height: 44px;
+  border: 0;
+  background: none;
+  border-radius: var(--app-radius-card);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--app-t-state);
+}
+
+.linha:hover {
+  background: var(--via-navy-04);
+}
+
+.linha:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.tituloPasso {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--via-fs-body);
   font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  /* `pretty` e não `balance`: o título de etapa pode ter duas linhas, e o que
+     incomoda ali é a órfã, não o desequilíbrio. */
+  text-wrap: pretty;
+}
+
+.passo[data-feita] .tituloPasso {
+  color: var(--via-text-muted);
+}
+
+/* VÉU A 8%, não 10%, e o tamanho subiu de 9px para 10.
+   `--via-accent-ink` sobre accent a 10% dá 4,31:1 — reprova AA para texto normal
+   (4,5:1), e a 9px não há isenção de "texto grande" que salve. 8% é o teto que
+   este repo já mediu para o véu de accent, e é o mesmo par que o `PillEstado`
+   usa em "em andamento": um selo, uma receita. */
+.aqui {
+  flex-shrink: 0;
+  padding: 3px var(--via-space-2);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+  white-space: nowrap;
+}
+
+.feitaRotulo {
+  flex-shrink: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
 
-.total {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: var(--via-space-1);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
-  font-size: 0.625rem;
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-/* O passo a passo ganha SUPERFÍCIE — é o produto desta tela e estava flutuando
-   direto no fundo da página, enquanto o currículo do curso mora num card. O
-   contorno dá corpo à coluna e alinha as duas telas na mesma gramática. */
-.lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-surface);
-  overflow: hidden;
-}
-
-.passo {
-  position: relative;
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: var(--via-space-4);
-  padding: var(--via-space-4) var(--via-space-5);
-  transition: background-color var(--via-t-fast);
-}
-
-/* O checkbox REAL fica na árvore (é ele que o teclado e o leitor de tela usam) e
-   sai da vista: quem desenha o estado é a coluna do número. `sr-only` e não
-   `display: none` — display tira do foco. */
-.marca {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* A coluna do número é o alvo de clique. Em repouso, o número; feita, o número
-   some e entra o traço de conferido — hierarquia por tinta, sem ícone novo. */
-.numero {
-  cursor: pointer;
-  border-radius: var(--app-radius-chip);
-}
-
-.passo[data-feita] .numero {
-  color: var(--via-navy);
-}
-
-.passo[data-feita] .numero span[aria-hidden]::after {
-  content: '';
-  display: block;
-  height: 1.5px;
-  margin-top: -0.55em;
-  border-radius: var(--app-radius-track);
-  background: currentcolor;
-}
-
-/* Feita fica MAIS QUIETA, não riscada: o texto continua sendo referência de
-   execução e precisa ser legível depois de marcado. */
-.passo[data-feita] .tituloPasso,
-.passo[data-feita] .texto {
-  color: var(--via-text-muted);
-}
-
-.passo[data-feita] {
-  background: var(--via-navy-03);
-}
-
-/* O anel vive no PASSO, não no checkbox invisível — um anel numa caixa de 1px
-   seria invisível. `focus-within` porque o focável está dentro. */
-.passo:focus-within {
-  outline: none;
-  box-shadow: var(--app-ring);
-  /* Sobre o vizinho, para o anel não ser cortado pelo `overflow` da lista. */
-  z-index: 1;
-}
-
-/* Realce ao passar o mouse: numa lista de execução, saber em que linha você está
-   vale mais que em uma lista de leitura. */
-.passo:hover {
-  background: var(--via-navy-03);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .passo {
-    transition: none;
-  }
-}
-
-.passo + .passo {
-  border-top: 1px solid var(--via-border-hairline);
-}
-
-.numero {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-sm);
+.chevron {
+  flex-shrink: 0;
   color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--via-lh-snug);
-  padding-top: 2px;
+  transition: transform var(--app-t-touch);
 }
 
-.corpo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-1);
+.linha[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
 }
 
-.tituloPasso {
-  margin: 0;
-  font-size: var(--via-fs-body);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-body);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
+/* `0fr → 1fr` anima a abertura sem conhecer a altura do conteúdo e sem animar
+   `height`. É a exceção sancionada à regra "só transform e opacity": a
+   alternativa (medir e escrever px por JS) custa layout a cada frame E um
+   efeito de medição. O filho precisa de `min-height: 0` senão o conteúdo se
+   recusa a encolher abaixo do tamanho natural.
+   token-ok: `grid-template-rows` não é transform, e a duração é a de revelação. */
+.painel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--app-t-reveal);
+}
+
+.painel[data-aberta] {
+  grid-template-rows: 1fr;
+}
+
+.painelInterno {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .texto {
-  margin: 0;
+  margin: 0 var(--via-space-4) var(--via-space-4);
+  /* O `ch` do Geist mede ~30% a menos que o caractere médio: o alvo real é
+     caracteres ÷ 1,3. 52ch ≈ 68 caracteres, dentro da faixa de 45–75. */
+  max-width: 52ch;
   font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-loose);
   color: var(--via-text-muted);
-  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.acao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  margin: 0 var(--via-space-4) var(--via-space-4);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-white);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.acao:hover {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
+}
+
+.acao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* Desfazer é ação QUIETA: sólida navy nas duas direções faria "desmarcar" pesar
+   tanto quanto "concluir", e a etapa feita voltaria a puxar o olho. */
+.acao[data-feita] {
+  background: none;
+  border-color: var(--via-border);
+  color: var(--via-text-muted);
+}
+
+.acao[data-feita]:hover {
+  background: var(--via-navy-04);
+  border-color: var(--via-navy-22);
+  color: var(--via-text-primary);
+}
+
+@media (max-width: 599px) {
+  .passo {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: var(--via-space-3);
+  }
+
+  .circulo,
+  .marca {
+    width: 24px;
+    height: 24px;
+  }
+
+  .passo:not(:last-child) .trilho::after {
+    top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circulo,
+  .linha,
+  .corpo,
+  .chevron,
+  .painel,
+  .acao,
+  .expandir {
+    transition: none;
+  }
 }

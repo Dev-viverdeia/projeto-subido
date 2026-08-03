@@ -69,10 +69,14 @@ JS do DS. Consequências:
 
 - Um `<Button>` server-rendered **não aceita `onClick`**. CTA é `<Link>`/`<a href>`.
 - Se uma seção precisa de interação, é a **seção** que ganha `'use client'`, não o DS.
-- Ícones `lucide-react` em Server Component custam zero JS. **Ícone mora em Server Component.**
+- **Ícone mora em Server Component** — mas NÃO custa zero JS, e a linha que dizia isso estava
+  errada. Medido em `lucide-react@1.27.0`: `dist/esm/Icon.mjs` abre com `"use client"`. Renderizar
+  `<Boxes />` no servidor não produz SVG inline no payload; produz uma **referência de cliente**
+  para `Icon` (1,8 KB de fonte) com os traços do ícone viajando como prop. O piso é fixo e pequeno.
 - Módulo que exporta ícone exporta **elemento já renderizado** (`icone: <Boxes />`), nunca a
-  referência ao componente (`icone: Boxes`). Com a referência, todo consumidor cliente passa a
-  importar a biblioteca para poder chamá-la. Ver `(app)/_components/navegacao.tsx`.
+  referência ao componente (`icone: Boxes`). É isto que continua valendo, e o ganho é o RESTO: com
+  a referência, todo consumidor cliente importa a fábrica e os demais ícones do módulo para poder
+  chamá-la. Ver `(app)/_components/navegacao.tsx`.
 - Consulte `src/design-system/via/DS_CLIENT.json` para a classificação de cada componente.
 
 ### Marca e paleta

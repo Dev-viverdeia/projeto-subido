@@ -1,0 +1,141 @@
+/* Elevação é um TRIPLO — superfície, hairline e sombra do mesmo degrau. Este é o
+   card de repouso da coluna. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* Número é protagonista: mono, tabular, tinta sólida. `min-width` reservado em
+   `ch` para 100% não empurrar o rótulo quando a última etapa é marcada. */
+.pct {
+  margin: 0;
+  min-width: 4ch;
+  text-align: right;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h3);
+  line-height: 1;
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.simbolo {
+  font-size: var(--via-fs-body);
+  color: var(--via-text-faint);
+  margin-left: 1px;
+}
+
+.segmentos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 3px;
+}
+
+/* `--app-t-state` (120ms) e não `-reveal`: a casa só troca de COR, nada se
+   desloca. Estado e entrada nunca compartilham duração — é o que impede a
+   interface de ler chapada. */
+.segmento {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-08);
+  transition: background var(--app-t-state);
+}
+
+.segmento[data-feito] {
+  background: var(--via-accent-ink);
+}
+
+.continuo {
+  height: 6px;
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-08);
+  overflow: hidden;
+}
+
+.preenchido {
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--via-accent-ink);
+  transition: transform var(--app-t-reveal);
+}
+
+.frase {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+/* Ênfase é `<em>` itálico — nunca peso 700. */
+.proxima {
+  color: var(--via-text-primary);
+}
+
+.continuar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  margin-top: var(--via-space-1);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-white);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.continuar:hover {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
+}
+
+.continuar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segmento,
+  .preenchido,
+  .continuar {
+    transition: none;
+  }
+}

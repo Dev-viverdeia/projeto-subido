@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { obterSolucao } from '@/lib/conteudo/queries';
-import { ROTULOS } from '@/lib/routes';
-import { BotaoVoltar } from '../../_components/BotaoVoltar';
+import { obterProximaSolucao, obterSolucao } from '@/lib/conteudo/queries';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import entrada from '../../_components/entrada.module.css';
-import { Ferramentas, Prompts } from '../_components/KitSolucao';
-import { PassoAPasso } from '../_components/PassoAPasso';
+import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../../_components/iconesCategorias';
 import { DefinirTrilha } from '../../_components/trilha/contexto';
+import { FichaSolucao } from '../_components/FichaSolucao';
+import { ProximaSolucao } from '../_components/ProximaSolucao';
 import styles from './pagina.module.css';
 
 /* `obterSolucao` é `cache()`-ada: esta chamada e a da página são UMA ida ao banco. */
@@ -20,38 +19,35 @@ export async function generateMetadata({
 }
 
 /**
- * Detalhe da solução — a ficha de implementação.
+ * Detalhe da solução — a ficha de implantação.
  *
- * COMPOSIÇÃO: cabeçalho claro, vídeo abrindo a coluna principal, passo a passo
- * abaixo dele e o kit (ferramentas + prompts) fixo à direita.
+ * ESTE ARQUIVO É SÓ DADO E MOLDURA. Toda a composição vive na `FichaSolucao`,
+ * que é cliente porque três partes da tela derivam do progresso local. O que fica
+ * aqui é o que só o servidor sabe fazer de graça: as duas leituras, os ícones
+ * `lucide` já RENDERIZADOS (elemento, não referência — com a referência, o
+ * consumidor cliente importaria a biblioteca para poder chamá-la) e a moldura do
+ * vídeo.
  *
- * A LARGURA É QUE FAZ ESTA TELA FUNCIONAR, não a estrutura. Ela nasceu em 1280
- * (vídeo com 488px de altura) e quebrou quando o canvas da área logada subiu para
- * 1600: o vídeo foi para 668px e empurrou o primeiro passo para fora da dobra.
- * A correção é a medida — esta é uma tela de LEITURA (vídeo + passos + kit), não
- * uma grade, e pela regra do CLAUDE.md não acompanha o canvas.
+ * NÃO HÁ BOTÃO "VOLTAR" AQUI. A trilha do cabeçalho já traz `‹ Soluções de IA` em
+ * toda tela de detalhe; um segundo controle de retorno a 40px de distância é o
+ * tipo de duplicata que aparece quando duas telas evoluem separadas.
  */
 export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug]'>) {
   const { slug } = await params;
   const solucao = await obterSolucao(slug);
   if (!solucao) notFound();
 
+  /* Depois do `notFound()` porque a vizinha só faz sentido se esta existe. */
+  const proxima = await obterProximaSolucao(slug);
+
   const etapas = solucao.itens.filter((i) => i.tipo === 'etapa');
   const ferramentas = solucao.itens.filter((i) => i.tipo === 'ferramenta');
   const prompts = solucao.itens.filter((i) => i.tipo === 'prompt');
 
-  /* Só entra o que EXISTE — contagem zero não vira "0 ferramentas". */
-  const meta = [
-    etapas.length > 0 && `${etapas.length} ${etapas.length === 1 ? 'etapa' : 'etapas'}`,
-    ferramentas.length > 0 &&
-      `${ferramentas.length} ${ferramentas.length === 1 ? 'ferramenta' : 'ferramentas'}`,
-    prompts.length > 0 && `${prompts.length} ${prompts.length === 1 ? 'prompt' : 'prompts'}`,
-  ].filter((v): v is string => Boolean(v));
-
   return (
-    <div className={styles.pagina}>
-      {/* Alimenta a trilha do cabeçalho. Renderiza null; some ao sair da
-          tela, e é o desmonte que devolve o cabeçalho ao nome da seção. */}
+    <div className={`${styles.pagina} ${entrada.bloco}`}>
+      {/* Alimenta a trilha do cabeçalho. Renderiza null; some ao sair da tela, e
+          é o desmonte que devolve o cabeçalho ao nome da seção. */}
       <DefinirTrilha
         voltarPara="/solucoes"
         voltarRotulo="Soluções de IA"
@@ -59,30 +55,20 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
         atual={solucao.titulo}
       />
 
-      <div className={`${styles.topo} ${entrada.bloco}`}>
-        <BotaoVoltar fallback="/solucoes" rotulo={ROTULOS['/solucoes']} />
-        {solucao.categoria && <p className={styles.eyebrow}>{solucao.categoria}</p>}
-      </div>
-
-      <header className={`${styles.cabecalho} ${entrada.bloco} ${entrada.atraso1}`}>
-        <h1 className={styles.titulo}>{solucao.titulo}</h1>
-        {solucao.resumo && <p className={styles.resumo}>{solucao.resumo}</p>}
-        {meta.length > 0 && <p className={styles.meta}>{meta.join(' · ')}</p>}
-      </header>
-
-      <div className={`${styles.grade} ${entrada.bloco} ${entrada.atraso2}`}>
-        <div className={styles.principal}>
-          <VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />
-          {/* O `slug` vai junto para o progresso saber a QUAL solução a etapa
-              marcada pertence — é ele que alimenta a retomada do catálogo. */}
-          <PassoAPasso etapas={etapas} slug={solucao.slug} />
-        </div>
-
-        <aside className={styles.lateral}>
-          <Ferramentas itens={ferramentas} />
-          <Prompts itens={prompts} />
-        </aside>
-      </div>
+      <FichaSolucao
+        slug={solucao.slug}
+        titulo={solucao.titulo}
+        resumo={solucao.resumo}
+        categoria={solucao.categoria}
+        etapas={etapas}
+        ferramentas={ferramentas}
+        prompts={prompts}
+        icone={
+          (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) || ICONE_CATEGORIA_PADRAO
+        }
+        video={<VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />}
+        proxima={proxima ? <ProximaSolucao proxima={proxima} /> : null}
+      />
     </div>
   );
 }

@@ -1,0 +1,88 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  /* O MESH VEM DAQUI, não da classe `via-mesh-navy`, e a razão é determinismo:
+     `.via-mesh-navy` e esta classe têm a MESMA especificidade (uma classe cada),
+     então quem ganha depende da ordem de injeção do CSS — que muda entre dev e
+     build. Declarando aqui, não há disputa. A base do mesh é um
+     `linear-gradient(#0B162D → #040B1A)` opaco, então os contrastes calculados
+     sobre navy valem (e melhoram no canto escuro). O `via-noise` continua na
+     classe: ele é `::after`, não disputa nada. */
+  background: var(--via-mesh-navy);
+  border: 1px solid var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+  text-decoration: none;
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--app-t-touch);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* O anel sobre banda escura é o `onnavy` — o anel claro sumiria no navy. E ele
+   COMPÕE com a sombra de repouso para o card não achatar ao receber foco. */
+.card:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy), var(--app-elev-2-shadow);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* 6,99:1 sobre navy. `--via-text-faint` daria 2,5:1 e sumiria. */
+  color: var(--via-gray-400);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: pretty;
+}
+
+.rodape {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  /* Accent é legível sobre navy (6,52:1) — é justamente aqui que ele pertence. */
+  color: var(--via-accent);
+}
+
+.seta {
+  transition: transform var(--app-t-touch);
+}
+
+.card:hover .seta {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .seta {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card:hover .seta {
+    transform: none;
+  }
+}

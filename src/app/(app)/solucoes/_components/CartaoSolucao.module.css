@@ -30,10 +30,13 @@
   box-shadow: var(--via-shadow-lg);
 }
 
+/* O anel COMPÕE com a sombra de repouso, e a vírgula é a correção. Sozinho, ele
+   substituía o `box-shadow` inteiro: o card perdia a elevação e ACHATAVA no
+   instante em que recebia foco de teclado — só quem navega por Tab via o defeito.
+   É literalmente a receita do CLAUDE.md (`var(--app-ring), var(--app-elev-1-shadow)`),
+   que existe por causa deste caso. */
 .cartao:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--via-white),
-    0 0 0 4px var(--via-navy-60);
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 /* O topo é uma linha só: glifo, categoria e — quando há — o estado à direita.
@@ -142,45 +145,13 @@
    restrição é contra accent como TINTA de texto ou fundo de área grande. Aqui o
    fundo é um véu de 8% numa pill de 10px e a tinta é `accent-ink`, a única
    variante que a marca declara legível sobre claro. */
-.estado {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-1_5);
-  flex-shrink: 0;
+/* O SELO vem do `PillEstado` — a aparência mora lá, e o que sobra aqui é só a
+   POSIÇÃO dele neste card. É o único elemento do topo que não desce com o texto:
+   alinhado ao topo, fica na mesma altura do glifo em todos os cards, e a coluna
+   de estado passa a ser uma linha reta na grade inteira. */
+.selo {
   margin-left: auto;
-  padding: 4px var(--via-space-2_5);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy-06);
-  font-family: var(--via-font-mono);
-  font-size: 0.625rem;
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-  white-space: nowrap;
-  /* O badge é o único elemento do topo que não desce com o texto: alinhado ao
-     topo, ele fica na mesma altura do glifo em todos os cards, e a coluna de
-     estado passa a ser uma linha reta na grade inteira. */
   align-self: flex-start;
-}
-
-.estado[data-estado='em-andamento'] {
-  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
-  color: var(--via-accent-ink);
-}
-
-/* O ponto é do mesmo tom da tinta: em accent puro ele daria 2,49:1 sobre o véu e
-   sumiria — e um indicador que some é pior que nenhum. */
-.ponto {
-  width: 5px;
-  height: 5px;
-  border-radius: var(--via-radius-pill);
-  background: currentcolor;
-}
-
-.estado[data-estado='concluida'] {
-  background: var(--via-navy);
-  color: var(--via-white);
 }
 
 /* As MARCAS de ferramenta: iniciais derivadas do nome, sobrepostas com um anel da
