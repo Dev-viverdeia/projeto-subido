@@ -159,6 +159,7 @@ export function MentoriasVista({
               sessao={destaque}
               estado={estadoComInscricao(destaque)}
               agora={agora}
+              gravando={gravando}
               aoAbrirDetalhe={() => abrirDetalhe(destaque.id)}
               aoFazerCheckin={() => pedirCheckin(destaque.id)}
             />

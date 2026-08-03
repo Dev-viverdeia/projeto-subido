@@ -86,15 +86,6 @@
   color: var(--via-gray-400);
 }
 
-.meta {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-gray-300);
-  font-variant-numeric: tabular-nums;
-}
-
 .acoes {
   display: flex;
   align-items: center;
@@ -103,7 +94,92 @@
   margin-top: var(--via-space-1);
 }
 
+/* A MESMA `<dl>` do modal da sessão, na temperatura da banda escura.
+   FLEX e não `auto-fit`: `minmax(max-content, 1fr)` não dá ao auto-fit um mínimo
+   definido para calcular a contagem, e a tira colapsa para uma coluna — foi
+   exatamente o que aconteceu no modal. Flex com wrap encaixa quantos couberem. */
+.ficha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-gap-stack) var(--app-gap-block);
+  margin: 0;
+}
+
+.fichaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fichaRotulo {
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* 6,99:1 sobre a navy. `--via-text-faint` daria 2,5:1 e sumiria — sobre banda
+     escura a escala de cinza INVERTE. */
+  color: var(--via-gray-400);
+}
+
+.fichaValor {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* O PULSO DE "AO VIVO" — accent puro, que é legível justamente sobre a navy
+   (6,52:1). Substitui a `Pill variant="live"` do DS, que é navy sobre navy aqui.
+
+   `animation` e não `transition`: isto é AMBIENTE, não resposta a interação, e a
+   regra da casa é explícita — o gate cobre `transition` e não toca em `animation`
+   porque as duas famílias obedecem a lógicas opostas. */
+.pulso {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+  animation: pulso-ao-vivo 2s ease-in-out infinite;
+}
+
+@keyframes pulso-ao-vivo {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Estado FINAL, não animação rápida: o ponto continua lá, sólido. */
+  .pulso {
+    animation: none;
+  }
+}
+
+/* Lotada e fora-da-janela: texto que explica, no lugar de um botão desabilitado
+   que não explica. Quieto de propósito — não é ação, é motivo. */
+.impedido {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-gray-400);
+  font-variant-numeric: tabular-nums;
+}
+
 .confirmado {
+  gap: var(--via-space-2);
   display: inline-flex;
   align-items: center;
   min-height: 40px;
