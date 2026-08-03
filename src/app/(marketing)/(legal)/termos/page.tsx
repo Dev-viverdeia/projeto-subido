@@ -34,7 +34,7 @@ export default function Page() {
       <h2>4. Cancelamento e arrependimento</h2>
       <p>
         Direito de arrependimento em 7 dias (CDC art. 49) e cancelamento a qualquer tempo com efeito
-        ao fim do ciclo. Ver a <a href="/reembolso">política de reembolso</a>.
+        ao fim do ciclo. Ver a <Link href="/reembolso">política de reembolso</Link>.
       </p>
 
       <h2>5. Propriedade intelectual</h2>

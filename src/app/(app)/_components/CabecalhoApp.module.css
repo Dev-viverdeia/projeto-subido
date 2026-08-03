@@ -79,8 +79,17 @@
   }
 
   /* A marca vive na sidebar em desktop; repeti-la aqui seria a segunda vez na
-     mesma tela. O lugar dela passa a ser do rótulo de seção. */
+     mesma tela. O lugar dela passa a ser do slot. */
   .marca {
     display: none;
+  }
+
+  /* O PAR DA REGRA ACIMA — e ele já sumiu uma vez. `.esquerda` nasce
+     `display: none` porque abaixo de 1024 o lugar é da marca; sem esta linha o
+     cabeçalho fica sem lado esquerdo em TODA largura. Nenhum gate pega isso:
+     tsc, eslint, build e o check de identidade passam verdes com um cabeçalho
+     vazio. As duas regras são um par — mexeu numa, confira a outra. */
+  .esquerda {
+    display: flex;
   }
 }
