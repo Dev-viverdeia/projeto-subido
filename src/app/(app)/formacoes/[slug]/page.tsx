@@ -4,6 +4,7 @@ import { obterFormacao } from '@/lib/conteudo/queries';
 import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import entrada from '../../_components/entrada.module.css';
 import { CursoConteudo } from '../_components/CursoConteudo';
+import { DefinirTrilha } from '../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 export async function generateMetadata({
@@ -22,6 +23,10 @@ export default async function FormacaoPage({ params }: PageProps<'/formacoes/[sl
 
   return (
     <div className={styles.pagina}>
+      {/* Alimenta a trilha do cabeçalho. Renderiza null; some ao sair da
+          tela, e é o desmonte que devolve o cabeçalho ao nome da seção. */}
+      <DefinirTrilha voltarPara="/formacoes" voltarRotulo="Formações" atual={formacao.titulo} />
+
       <div className={entrada.bloco}>
         <BotaoVoltar fallback="/formacoes" rotulo="Formações" />
       </div>

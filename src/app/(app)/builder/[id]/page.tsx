@@ -12,6 +12,7 @@ import { Entrevista } from '../_components/Entrevista';
 import { EstadoGeracao } from '../_components/EstadoGeracao';
 import { FichaProjeto } from '../_components/FichaProjeto';
 import { ROTULO_STATUS, VARIANTE_STATUS } from '../_components/statusBuilder';
+import { DefinirTrilha } from '../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 /**
@@ -47,6 +48,15 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
 
   return (
     <div className={styles.pagina} data-coluna={emColuna ? '' : undefined}>
+      {/* Enquanto a entrevista não terminou não existe título — o modelo só o
+          escreve junto com o documento. A ideia original é o que a pessoa
+          reconhece, e é ela que vai para o degrau atual até lá. */}
+      <DefinirTrilha
+        voltarPara="/builder"
+        voltarRotulo="Builder"
+        atual={solucao.titulo || solucao.ideiaOriginal}
+      />
+
       <div className={styles.topo}>
         <BotaoVoltar fallback="/builder" rotulo="Builder" />
 

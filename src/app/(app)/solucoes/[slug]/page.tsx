@@ -7,6 +7,7 @@ import { VideoConteudo } from '../../_components/VideoConteudo';
 import entrada from '../../_components/entrada.module.css';
 import { Ferramentas, Prompts } from '../_components/KitSolucao';
 import { PassoAPasso } from '../_components/PassoAPasso';
+import { DefinirTrilha } from '../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 /* `obterSolucao` é `cache()`-ada: esta chamada e a da página são UMA ida ao banco. */
@@ -49,6 +50,15 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
 
   return (
     <div className={styles.pagina}>
+      {/* Alimenta a trilha do cabeçalho. Renderiza null; some ao sair da
+          tela, e é o desmonte que devolve o cabeçalho ao nome da seção. */}
+      <DefinirTrilha
+        voltarPara="/solucoes"
+        voltarRotulo="Soluções de IA"
+        meio={solucao.categoria}
+        atual={solucao.titulo}
+      />
+
       <div className={`${styles.topo} ${entrada.bloco}`}>
         <BotaoVoltar fallback="/solucoes" rotulo={ROTULOS['/solucoes']} />
         {solucao.categoria && <p className={styles.eyebrow}>{solucao.categoria}</p>}

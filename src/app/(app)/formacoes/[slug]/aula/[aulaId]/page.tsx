@@ -7,6 +7,7 @@ import { formatarDuracao } from '../../../../_components/tempo';
 import entrada from '../../../../_components/entrada.module.css';
 import { NavAula } from '../../../_components/NavAula';
 import { PlaylistAula } from '../../../_components/PlaylistAula';
+import { DefinirTrilha } from '../../../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 export async function generateMetadata({
@@ -32,6 +33,16 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
 
   return (
     <div className={styles.pagina}>
+      {/* Três degraus: a volta é para o CURSO, não para o catálogo — é de onde a
+          pessoa veio e para onde ela continua depois desta aula. O módulo entra
+          como recorte. */}
+      <DefinirTrilha
+        voltarPara={`/formacoes/${slug}`}
+        voltarRotulo={formacao.titulo}
+        meio={modulo.titulo}
+        atual={aula.titulo}
+      />
+
       <header className={`${styles.cabecalho} ${entrada.bloco}`}>
         <BotaoVoltar fallback={`/formacoes/${slug}`} rotulo={formacao.titulo} />
         <div className={styles.textos}>

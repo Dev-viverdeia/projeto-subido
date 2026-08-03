@@ -1,22 +1,21 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { MenuPerfil } from './MenuPerfil';
+import { TrilhaDoCabecalho } from './trilha/TrilhaDoCabecalho';
 import styles from './CabecalhoApp.module.css';
 
 /**
  * Cabeçalho da área logada.
  *
- * ELE VOLTOU A SER SERVER COMPONENT. Era cliente só por causa do `usePathname`,
- * que servia para descobrir o nome da seção. Esse pedaço mudou de casa: quem
- * decide o que aparece à esquerda agora é o slot paralelo `@trilha`, e o
- * cabeçalho só o renderiza. Sobrou zero JS de cabeçalho no browser além do
- * `MenuPerfil`, que é cliente por natureza.
+ * ELE É SERVER COMPONENT. O pedaço que precisa do cliente — decidir entre trilha
+ * e nome de seção — está isolado no `TrilhaDoCabecalho`, que é a única coisa que
+ * hidrata aqui além do `MenuPerfil`.
  *
  * O QUE A ESQUERDA CARREGA
- * Numa listagem, o nome da seção — a única coisa que diz onde a pessoa está,
- * já que o `<h1>` das telas de índice é `sr-only`. Numa tela de DETALHE, a
- * trilha: volta, recorte e título do item. As duas formas vêm do slot; o
- * cabeçalho não ramifica.
+ * Numa listagem, o nome da seção — a única coisa que diz onde a pessoa está, já
+ * que o `<h1>` das telas de índice é `sr-only`. Numa tela de DETALHE, a trilha:
+ * volta, recorte e título do item. Quem escolhe entre as duas é o próprio
+ * `TrilhaDoCabecalho`; este arquivo não ramifica por rota.
  *
  * ABAIXO DE 1024 o lugar da esquerda é do LOGOTIPO, porque não há sidebar para
  * carregá-lo — e por isso a trilha e o rótulo de seção só aparecem em desktop.
@@ -30,13 +29,10 @@ export function CabecalhoApp({
   nome,
   email,
   logo,
-  trilha,
 }: {
   nome: string;
   email: string;
   logo: ReactNode;
-  /** Slot `@trilha`: rótulo de seção por padrão, trilha nas telas de detalhe. */
-  trilha: ReactNode;
 }) {
   return (
     <header className={styles.cabecalho}>
@@ -44,7 +40,9 @@ export function CabecalhoApp({
         {logo}
       </Link>
 
-      <div className={styles.esquerda}>{trilha}</div>
+      <div className={styles.esquerda}>
+        <TrilhaDoCabecalho />
+      </div>
 
       <div className={styles.direita}>
         <MenuPerfil nome={nome} email={email} />
