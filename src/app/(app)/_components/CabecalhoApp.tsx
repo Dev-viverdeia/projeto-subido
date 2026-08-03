@@ -19,7 +19,9 @@ import styles from './CabecalhoApp.module.css';
  *
  * ABAIXO DE 1024 o lugar da esquerda é do LOGOTIPO, porque não há sidebar para
  * carregá-lo — e por isso a trilha e o rótulo de seção só aparecem em desktop.
- * A volta no mobile é o `BotaoVoltar` que as fichas já renderizam no corpo.
+ * A volta no mobile é o primeiro degrau da própria trilha (`‹ Soluções de IA`),
+ * que é link em qualquer largura. As fichas já não renderizam botão de voltar no
+ * corpo — ele duplicava esse degrau.
  *
  * `logo` chega como PROP já renderizada. Hoje o motivo mudou de "evitar bundle"
  * para "manter a montagem num lugar só": é o layout que decide o tamanho da

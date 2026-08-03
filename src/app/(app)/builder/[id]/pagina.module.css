@@ -15,10 +15,13 @@
   max-width: var(--via-content);
 }
 
+/* `flex-end` e não `space-between`: com o "voltar" removido do lado esquerdo,
+   sobrou UM filho, e `space-between` empurra um filho solitário para a esquerda —
+   as ações caíam sob o título em vez de fechar a linha à direita. */
 .topo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--via-space-4);
   flex-wrap: wrap;
 }

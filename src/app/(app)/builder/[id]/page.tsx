@@ -5,7 +5,6 @@ import { apagarSolucao } from '@/lib/builder/actions';
 import { paraMarkdown } from '@/lib/builder/markdown';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
-import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import entrada from '../../_components/entrada.module.css';
 import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
 import { Entrevista } from '../_components/Entrevista';
@@ -57,9 +56,10 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
         atual={solucao.titulo || solucao.ideiaOriginal}
       />
 
+      {/* Sem botão "voltar": a trilha do cabeçalho já traz `‹ Builder`. Esta era
+          a última tela de detalhe com os dois controles de retorno a 40px um do
+          outro — soluções, curso e aula já tinham perdido o seu. */}
       <div className={styles.topo}>
-        <BotaoVoltar fallback="/builder" rotulo="Builder" />
-
         <div className={styles.acoes}>
           <Pill variant={VARIANTE_STATUS[solucao.status]} size="sm">
             {ROTULO_STATUS[solucao.status]}
