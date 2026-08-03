@@ -1,5 +1,18 @@
+/* MEDIDA DE LEITURA, não o canvas de 1600.
+   A regra da casa separa GRADE (ganha coluna, acompanha `--app-canvas`) de LISTA
+   e PROSA (têm medida). Esta tela é cartão + lista + coluna de apoio — leitura.
+
+   O número que decide: com a página em 1600 e a coluna de apoio em 360, a agenda
+   fica com 1200px de largura para uma linha de hora + título + mentor + CTA, e o
+   miolo vira vão morto — o olho atravessa meio metro de nada entre o título e o
+   botão. Cortar a página em 1280 põe a agenda em ~908 e a coluna de apoio em
+   ~332, sem sobrar calha à direita.
+
+   A alternativa era manter o canvas e limitar só a coluna da agenda, mas aí
+   sobravam 120px de calha morta na borda direita a 1600 — exatamente o defeito
+   que a ficha da solução já tinha e que foi corrigido do mesmo jeito. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: var(--via-container);
   margin-inline: auto;
   display: flex;
   flex-direction: column;

@@ -11,6 +11,7 @@ import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
 import { AgendaMentorias } from './AgendaMentorias';
 import { CalendarioMentorias } from './CalendarioMentorias';
 import { CartaoProxima } from './CartaoProxima';
+import { TrilhoInscricoes } from './TrilhoInscricoes';
 import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
 import { ICONE_AGENDA, ICONE_CALENDARIO, type IdVista } from './vistas';
 import { duracaoMin, estadoDe, horaCurta, rotuloDoDia } from './estadoMentoria';
@@ -28,9 +29,17 @@ import styles from './MentoriasVista.module.css';
  * sessão ao vivo ou a próxima —, e trocar o modo de leitura não pode esconder a
  * única coisa da tela que é urgente.
  *
- * O check-in vive em estado local da navegação: demonstra o fluxo completo
- * (confirmar, cancelar, vaga contada) sem fingir persistência. O aviso de
- * demonstração fica na página, acima daqui.
+ * A LARGURA SEPARA OS DOIS MIOLOS, e é a regra da casa aplicada ao pé da letra:
+ * "grade ganha coluna, lista tem MEDIDA". A agenda é uma pilha de linhas de um
+ * dado só (hora + título + mentor + CTA) — esticada no canvas de 1600, o miolo
+ * vira vão morto entre o título e o botão. O calendário é grade: ele PRECISA da
+ * área, e por isso ocupa a largura inteira. O cartão da próxima acompanha o
+ * canvas nos dois casos, porque card com mesh gosta de largura.
+ *
+ * Este comentário já descreveu um check-in que vivia em estado de tela e "não
+ * fingia persistência". Isso deixou de ser verdade quando o pilar ganhou banco —
+ * comentário que descreve o que não existe ensina o próximo a mentir sobre o
+ * repo, e é verificável com grep.
  */
 export function MentoriasVista({
   sessoes,
@@ -155,43 +164,52 @@ export function MentoriasVista({
             />
           )}
 
-          <div className={styles.chrome}>
-            {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
+          <div className={styles.corpo} data-vista={vista}>
+            <div className={styles.principal}>
+              <div className={styles.chrome}>
+                {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
                 comentário do próprio `ControleSegmentado` já dizia que ele fora
                 extraído para substituir esta cópia e as abas de catálogo. A
                 cópia ficou para trás e, com ela, as setas do teclado: o
                 `role="tablist"` prometia navegação por seta e não entregava. */}
-            <ControleSegmentado
-              opcoes={[
-                { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
-                { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
-              ]}
-              ativa={vista}
-              aoMudar={(id) => setVista(id as IdVista)}
-              layoutId="mentorias-vista"
-              ariaLabel="Modo de visualização"
-            />
-          </div>
+                <ControleSegmentado
+                  opcoes={[
+                    { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
+                    { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
+                  ]}
+                  ativa={vista}
+                  aoMudar={(id) => setVista(id as IdVista)}
+                  layoutId="mentorias-vista"
+                  ariaLabel="Modo de visualização"
+                />
+              </div>
 
-          {vista === 'agenda' ? (
-            <AgendaMentorias
-              sessoes={futuras}
-              agora={agora}
-              agoraIso={agoraIso}
-              estadoDaSessao={estadoComInscricao}
-              gravando={gravando}
-              aoAbrirDetalhe={abrirDetalhe}
-              aoFazerCheckin={pedirCheckin}
-              aoCancelarCheckin={cancelar}
-            />
-          ) : (
-            <CalendarioMentorias
-              sessoes={sessoes}
-              agora={agora}
-              estadoDaSessao={estadoComInscricao}
-              aoAbrirDetalhe={abrirDetalhe}
-            />
-          )}
+              {vista === 'agenda' ? (
+                <AgendaMentorias
+                  sessoes={futuras}
+                  agora={agora}
+                  agoraIso={agoraIso}
+                  estadoDaSessao={estadoComInscricao}
+                  gravando={gravando}
+                  aoAbrirDetalhe={abrirDetalhe}
+                  aoFazerCheckin={pedirCheckin}
+                  aoCancelarCheckin={cancelar}
+                />
+              ) : (
+                <CalendarioMentorias
+                  sessoes={sessoes}
+                  agora={agora}
+                  estadoDaSessao={estadoComInscricao}
+                  aoAbrirDetalhe={abrirDetalhe}
+                />
+              )}
+            </div>
+
+            {/* Some sozinho quando não há check-in — ver o componente. */}
+            <aside className={styles.apoio}>
+              <TrilhoInscricoes sessoes={futuras} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
+            </aside>
+          </div>
         </>
       )}
 
