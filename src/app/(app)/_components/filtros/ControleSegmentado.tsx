@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { useNavegacaoPorSetas } from './useNavegacaoPorSetas';
 import styles from './ControleSegmentado.module.css';
 
 export type OpcaoSegmentada = {
@@ -33,6 +34,11 @@ export type OpcaoSegmentada = {
  *
  * `layoutId` É OBRIGATÓRIO E ÚNICO POR TELA. Dois controles com o mesmo id
  * compartilhariam o polegar, e ele voaria de um trilho para o outro a cada clique.
+ *
+ * SETAS DO TECLADO em `useNavegacaoPorSetas`. Ele declara `role="tablist"` desde
+ * sempre e não cumpria o contrato: quem usa leitor de tela ouve "guia 2 de 3" e
+ * tenta as setas. O `AbasFiltro` — que vive na MESMA régua — já as tinha, então os
+ * dois controles lado a lado respondiam diferente ao mesmo teclado.
  */
 export function ControleSegmentado({
   opcoes,
@@ -51,13 +57,16 @@ export function ControleSegmentado({
   largura?: 'auto' | 'full';
 }) {
   const reduzir = useReducedMotion();
+  const { trilho, aoTeclar, tabIndexDe } = useNavegacaoPorSetas({ itens: opcoes, ativa, aoMudar });
 
   return (
     <div
+      ref={trilho}
       role="tablist"
       aria-label={ariaLabel}
       className={styles.trilho}
       data-largura={largura === 'full' ? '' : undefined}
+      onKeyDown={aoTeclar}
     >
       {opcoes.map((opcao) => {
         const ativo = opcao.id === ativa;
@@ -66,7 +75,11 @@ export function ControleSegmentado({
             key={opcao.id}
             role="tab"
             type="button"
+            data-id={opcao.id}
             aria-selected={ativo}
+            /* Tabindex rotativo: o trilho inteiro é UMA parada de Tab, e as setas
+               movem dentro dele. É o par obrigatório do `onKeyDown` acima. */
+            tabIndex={tabIndexDe(opcao.id)}
             className={styles.opcao}
             data-ativa={ativo ? '' : undefined}
             onClick={() => aoMudar(opcao.id)}

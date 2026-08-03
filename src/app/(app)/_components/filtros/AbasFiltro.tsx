@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'motion/react';
-import { useRef, type KeyboardEvent } from 'react';
+import { useNavegacaoPorSetas } from './useNavegacaoPorSetas';
 import styles from './AbasFiltro.module.css';
 
 export type Aba = { id: string; rotulo: string };
@@ -15,11 +15,9 @@ export type Aba = { id: string; rotulo: string };
  * Regra herdada: só a aba ativa tem sublinhado. Nenhum outro controle da régua
  * ganha um — dois sublinhados concorrentes leem como dois estados ativos.
  *
- * SETAS DO TECLADO, e isso não é enfeite de acessibilidade: `role="tablist"` é uma
- * PROMESSA. Quem usa leitor de tela ouve "guia 2 de 4" e tenta as setas, porque é
- * assim que toda tablist funciona no padrão ARIA. Sem elas o componente anuncia um
- * contrato que não cumpre — pior que não ter papel nenhum. Junto vem o tabindex
- * rotativo: a tira inteira ocupa UMA parada de Tab, não quatro.
+ * SETAS DO TECLADO em `useNavegacaoPorSetas`, dividido com o `ControleSegmentado`:
+ * os dois declaram `role="tablist"`, e essa é uma PROMESSA que precisa ser cumprida
+ * igual nos dois — o motivo completo está lá.
  *
  * `prefixoId` é opcional porque há dois usos diferentes. Na régua de filtros as
  * abas não controlam painel nenhum (elas filtram uma grade que continua no lugar),
@@ -44,38 +42,7 @@ export function AbasFiltro({
   prefixoId?: string;
 }) {
   const reduzir = useReducedMotion();
-  const trilho = useRef<HTMLDivElement>(null);
-
-  const aoTeclar = (e: KeyboardEvent<HTMLDivElement>) => {
-    const indice = abas.findIndex((a) => a.id === ativa);
-    let destino: number;
-
-    switch (e.key) {
-      /* Circular: da última volta para a primeira, como manda o padrão ARIA. */
-      case 'ArrowRight':
-        destino = (indice + 1 + abas.length) % abas.length;
-        break;
-      case 'ArrowLeft':
-        destino = (indice - 1 + abas.length) % abas.length;
-        break;
-      case 'Home':
-        destino = 0;
-        break;
-      case 'End':
-        destino = abas.length - 1;
-        break;
-      default:
-        return;
-    }
-
-    e.preventDefault();
-    const alvo = abas[destino];
-    if (!alvo) return;
-    aoMudar(alvo.id);
-    /* O foco acompanha a seleção — sem isso a próxima seta partiria da aba
-       antiga e a navegação andaria de lado. */
-    trilho.current?.querySelector<HTMLButtonElement>(`[data-id="${alvo.id}"]`)?.focus();
-  };
+  const { trilho, aoTeclar, tabIndexDe } = useNavegacaoPorSetas({ itens: abas, ativa, aoMudar });
 
   return (
     <div
@@ -98,7 +65,7 @@ export function AbasFiltro({
             aria-selected={ativo}
             /* Tabindex rotativo: só a aba ativa recebe Tab; as outras se alcançam
                pelas setas. É o par obrigatório do `onKeyDown` acima. */
-            tabIndex={ativo ? 0 : -1}
+            tabIndex={tabIndexDe(aba.id)}
             className={styles.aba}
             data-ativa={ativo ? '' : undefined}
             onClick={() => aoMudar(aba.id)}
