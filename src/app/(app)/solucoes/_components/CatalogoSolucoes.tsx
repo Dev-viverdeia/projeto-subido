@@ -78,12 +78,18 @@ export function CatalogoSolucoes({
     });
   }, [busca, buscaLenta, categoria, ferramentasSel, ordem]);
 
+  /* A contagem por aba responde "vale a pena clicar?" ANTES do clique — e é
+     contada sobre o catálogo inteiro, não sobre o resultado da busca: uma aba que
+     mudasse de número a cada tecla deixaria de ser referência. */
   const abas = useMemo(() => {
-    const vistas: string[] = [];
+    const porCategoria = new Map<string, number>();
     for (const s of solucoes) {
-      if (s.categoria && !vistas.includes(s.categoria)) vistas.push(s.categoria);
+      if (s.categoria) porCategoria.set(s.categoria, (porCategoria.get(s.categoria) ?? 0) + 1);
     }
-    return [{ id: TODAS, rotulo: 'Todas' }, ...vistas.map((c) => ({ id: c, rotulo: c }))];
+    return [
+      { id: TODAS, rotulo: 'Todas', total: solucoes.length },
+      ...[...porCategoria.entries()].map(([c, total]) => ({ id: c, rotulo: c, total })),
+    ];
   }, [solucoes]);
 
   const facetasFerramentas = useMemo(() => {
@@ -199,7 +205,7 @@ export function CatalogoSolucoes({
           <BuscaCatalogo
             valor={busca}
             aoMudar={setBusca}
-            placeholder="Busque por nome, ferramenta ou área"
+            placeholder="Buscar solução ou ferramenta"
           />
           <PainelMaisFiltros
             titulo="Ferramentas"
@@ -224,11 +230,13 @@ export function CatalogoSolucoes({
         aoLimparTudo={() => setFerramentasSel([])}
       />
 
+      {/* A ORDENAÇÃO sobe para a linha das abas e a CONTAGEM desce para o rodapé.
+          Elas estavam juntas numa faixa entre a régua e a grade, e a faixa
+          empurrava a primeira fileira de cards para baixo sem informar nada que
+          não coubesse nos dois lugares naturais: o controle junto dos outros
+          controles, a contagem junto da paginação que ela descreve. */}
       <div className={styles.linhaMeta} ref={topoGradeRef}>
-        <p className={styles.contagem} aria-live="polite">
-          {filtradas.length} {filtradas.length === 1 ? 'solução' : 'soluções'}
-          {haFiltro && filtradas.length !== solucoes.length && ` de ${solucoes.length}`}
-        </p>
+        <span className={styles.ordenarRotulo}>Ordenar</span>
         <div className={styles.ordenacao} role="group" aria-label="Ordenar">
           <button
             type="button"
@@ -266,7 +274,15 @@ export function CatalogoSolucoes({
           }
         />
       ) : (
-        <div className={styles.grade}>
+        /* A CHAVE POR PÁGINA separa os dois tipos de mudança. Filtrar tira alguns
+           cards do conjunto: ali a saída animada comunica algo, e o
+           `AnimatePresence` faz sentido. Paginar troca os doze de uma vez — todo
+           card sai e todo card entra, e o resultado é um crossfade de duas grades
+           inteiras, com o dobro de nós em tela durante a transição: não informa
+           nada e ainda faz o layout tremer. Com a chave, a troca de página
+           REMONTA a grade — sem saídas, entrada limpa, e a fileira nova já nasce
+           pronta. */
+        <div className={styles.grade} key={`pagina-${paginaVisivel}`}>
           <AnimatePresence mode="popLayout">
             {visiveis.map((solucao, i) => (
               <motion.div
@@ -292,16 +308,31 @@ export function CatalogoSolucoes({
         </div>
       )}
 
-      {/* O rodapé aparece sempre que há resultado: a CONTAGEM é informação em
-          qualquer tamanho de catálogo ("estou vendo tudo?"). Só o controle de
-          páginas é condicional — com uma página, setas desabilitadas seriam
-          cromo morto. */}
+      {/* O RODAPÉ É O CENTRO DE GRAVIDADE DA NAVEGAÇÃO: contagem, atalho para o
+          catálogo inteiro e páginas, os três centrados no mesmo eixo da grade.
+          A contagem aparece sempre que há resultado — ela responde "estou vendo
+          tudo?" em qualquer tamanho de catálogo. Só as páginas são condicionais:
+          com uma página só, setas desabilitadas seriam cromo morto. */}
       {filtradas.length > 0 && (
         <div className={styles.rodapePaginas}>
-          <p className={styles.mostrando}>
+          <p className={styles.mostrando} aria-live="polite">
             Mostrando {(paginaVisivel - 1) * POR_PAGINA + 1}–
             {Math.min(paginaVisivel * POR_PAGINA, filtradas.length)} de {filtradas.length}
+            {/* "Ver todas" só existe quando há filtro ESCONDENDO algo. Sem filtro
+                ele seria um botão que não muda nada — e um controle que não faz
+                nada ensina a ignorar os que fazem. */}
+            {haFiltro && filtradas.length !== solucoes.length && (
+              <>
+                <span className={styles.separador} aria-hidden="true">
+                  ·
+                </span>
+                <button type="button" className={styles.verTodas} onClick={limparTudo}>
+                  ver todas as {solucoes.length}
+                </button>
+              </>
+            )}
           </p>
+
           {totalPaginas > 1 && (
             <Pagination
               page={paginaVisivel}

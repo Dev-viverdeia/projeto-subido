@@ -27,7 +27,9 @@ export type SolucaoResumo = Pick<
   Tables<'solucoes'>,
   'id' | 'slug' | 'titulo' | 'resumo' | 'categoria' | 'publicado_em' | 'criado_em'
 > & {
-  etapas: number;
+  /** IDs das etapas, não a contagem: é com eles que o card cruza o progresso
+      local para saber quantas ESTA pessoa já marcou. `.length` dá o total. */
+  etapaIds: string[];
   /** Nomes, não contagem: alimentam o painel de facetas e o rodapé do card. */
   ferramentas: string[];
 };
@@ -75,7 +77,7 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
   const { data, error } = await supabase
     .from('solucoes')
     .select(
-      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(tipo, titulo, ordem)',
+      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(id, tipo, titulo, ordem)',
     )
     .eq('status', 'publicado')
     .order('ordem', { ascending: true })
@@ -85,7 +87,10 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
 
   return (data ?? []).map(({ solucao_itens, ...solucao }) => ({
     ...solucao,
-    etapas: solucao_itens.filter((i) => i.tipo === 'etapa').length,
+    etapaIds: solucao_itens
+      .filter((i) => i.tipo === 'etapa')
+      .sort((a, b) => a.ordem - b.ordem)
+      .map((i) => i.id),
     ferramentas: solucao_itens
       .filter((i) => i.tipo === 'ferramenta')
       .sort((a, b) => a.ordem - b.ordem)

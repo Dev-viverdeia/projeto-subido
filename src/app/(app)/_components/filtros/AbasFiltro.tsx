@@ -3,7 +3,12 @@
 import { motion, useReducedMotion } from 'motion/react';
 import styles from './AbasFiltro.module.css';
 
-export type Aba = { id: string; rotulo: string };
+export type Aba = {
+  id: string;
+  rotulo: string;
+  /** Quantos itens a aba filtra. Opcional: sem ele a aba é só o rótulo. */
+  total?: number;
+};
 
 /**
  * Tabs de categoria puramente TIPOGRÁFICAS — sem caixa, sem pill, sem ring.
@@ -45,6 +50,10 @@ export function AbasFiltro({
             onClick={() => aoMudar(aba.id)}
           >
             {aba.rotulo}
+            {/* A contagem é DADO, não enfeite: ela responde "vale a pena clicar?"
+                antes do clique. Fica em mono e mais quieta que o rótulo, para a
+                aba continuar lendo como uma palavra e não como duas. */}
+            {aba.total !== undefined && <span className={styles.total}>{aba.total}</span>}
             {ativo && (
               <motion.span
                 layoutId={layoutId}

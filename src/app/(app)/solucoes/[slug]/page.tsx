@@ -63,7 +63,9 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
       <div className={`${styles.grade} ${entrada.bloco} ${entrada.atraso2}`}>
         <div className={styles.principal}>
           <VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />
-          <PassoAPasso etapas={etapas} />
+          {/* O `slug` vai junto para o progresso saber a QUAL solução a etapa
+              marcada pertence — é ele que alimenta a retomada do catálogo. */}
+          <PassoAPasso etapas={etapas} slug={solucao.slug} />
         </div>
 
         <aside className={styles.lateral}>

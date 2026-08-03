@@ -27,9 +27,13 @@ type Estado = {
   aulas: Record<string, string>;
   /** slug da formação → ISO do último toque (alimenta o "continue de onde parou"). */
   formacoes: Record<string, string>;
+  /** id do `solucao_itens` tipo `etapa` → ISO da conclusão. */
+  etapas: Record<string, string>;
+  /** slug da solução → ISO do último toque (alimenta a retomada do catálogo). */
+  solucoes: Record<string, string>;
 };
 
-const VAZIO: Estado = { aulas: {}, formacoes: {} };
+const VAZIO: Estado = { aulas: {}, formacoes: {}, etapas: {}, solucoes: {} };
 
 /* Cache do snapshot: `useSyncExternalStore` exige que `getSnapshot` devolva a
    MESMA referência enquanto nada mudou — parsear o JSON a cada chamada criaria um
@@ -37,11 +41,22 @@ const VAZIO: Estado = { aulas: {}, formacoes: {} };
 let cache: Estado | null = null;
 const ouvintes = new Set<() => void>();
 
+/**
+ * NORMALIZA AO LER, e isso não é paranoia.
+ *
+ * A chave `subido_progresso_v1` já está gravada em navegadores com a forma
+ * ANTIGA — só `aulas` e `formacoes`. Quando `etapas` e `solucoes` entraram, todo
+ * `Object.keys(estado.etapas)` num desses navegadores viraria
+ * `Cannot convert undefined or null to object`, em runtime, para quem já usava o
+ * produto — e nunca para quem testa com storage limpo. Preencher o que falta na
+ * leitura custa uma linha e dispensa uma versão nova de chave.
+ */
 function ler(): Estado {
   if (cache) return cache;
   try {
     const cru = localStorage.getItem(CHAVE);
-    cache = cru ? (JSON.parse(cru) as Estado) : VAZIO;
+    const bruto = cru ? (JSON.parse(cru) as Partial<Estado>) : null;
+    cache = bruto ? { ...VAZIO, ...bruto } : VAZIO;
   } catch {
     cache = VAZIO;
   }
@@ -86,6 +101,7 @@ export function concluirAula(aulaId: string, formacaoSlug: string) {
   if (atual.aulas[aulaId]) return;
   const agora = new Date().toISOString();
   gravar({
+    ...atual,
     aulas: { ...atual.aulas, [aulaId]: agora },
     formacoes: { ...atual.formacoes, [formacaoSlug]: agora },
   });
@@ -95,8 +111,31 @@ export function concluirAula(aulaId: string, formacaoSlug: string) {
 export function tocarFormacao(formacaoSlug: string) {
   const atual = ler();
   gravar({
-    aulas: atual.aulas,
+    ...atual,
     formacoes: { ...atual.formacoes, [formacaoSlug]: new Date().toISOString() },
+  });
+}
+
+/**
+ * ETAPA DE SOLUÇÃO — alterna, ao contrário de aula, que só conclui.
+ *
+ * A diferença é do objeto, não de gosto: aula assistida não "desassiste", mas
+ * etapa de implementação é uma checklist de trabalho, e quem marca por engano
+ * precisa desmarcar. Sem o desfazer, o único conserto seria limpar o storage.
+ */
+export function alternarEtapa(etapaId: string, solucaoSlug: string) {
+  const atual = ler();
+  const etapas = { ...atual.etapas };
+
+  if (etapas[etapaId]) delete etapas[etapaId];
+  else etapas[etapaId] = new Date().toISOString();
+
+  gravar({
+    ...atual,
+    etapas,
+    /* O toque é registrado nos DOIS sentidos: desmarcar também é atividade, e a
+       retomada deve apontar para onde a pessoa esteve por último. */
+    solucoes: { ...atual.solucoes, [solucaoSlug]: new Date().toISOString() },
   });
 }
 
@@ -113,13 +152,45 @@ export function percentual(feitas: number, total: number): number {
 
 /** O slug da formação tocada mais recentemente — ou null se nunca houve toque. */
 export function formacaoMaisRecente(estado: Estado): string | null {
+  return maisRecente(estado.formacoes);
+}
+
+/** O slug da solução tocada mais recentemente — ou null se nunca houve toque. */
+export function solucaoMaisRecente(estado: Estado): string | null {
+  return maisRecente(estado.solucoes);
+}
+
+/* ISO 8601 ordena lexicograficamente na mesma ordem que cronologicamente — daí a
+   comparação com `>` em vez de `new Date()` por item. */
+function maisRecente(registro: Record<string, string>): string | null {
   let melhor: string | null = null;
   let quando = '';
-  for (const [slug, iso] of Object.entries(estado.formacoes)) {
+  for (const [chave, iso] of Object.entries(registro)) {
     if (iso > quando) {
       quando = iso;
-      melhor = slug;
+      melhor = chave;
     }
   }
   return melhor;
+}
+
+/** Quantas das etapas dadas já foram marcadas. */
+export function contarEtapasFeitas(estado: Estado, etapaIds: string[]): number {
+  return etapaIds.reduce((n, id) => (estado.etapas[id] ? n + 1 : n), 0);
+}
+
+/**
+ * O estado de uma solução, derivado do progresso.
+ *
+ * `sem-etapas` é um caso à parte de `nao-iniciada`: uma solução que ainda não tem
+ * passo a passo cadastrado não está "não iniciada", ela não tem o que iniciar. Sem
+ * essa distinção o catálogo mostraria "0/0 etapas" e uma barra vazia para
+ * conteúdo que nem prevê progresso.
+ */
+export type EstadoSolucao = 'sem-etapas' | 'nao-iniciada' | 'em-andamento' | 'concluida';
+
+export function estadoDaSolucao(feitas: number, total: number): EstadoSolucao {
+  if (total === 0) return 'sem-etapas';
+  if (feitas === 0) return 'nao-iniciada';
+  return feitas >= total ? 'concluida' : 'em-andamento';
 }

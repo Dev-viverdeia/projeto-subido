@@ -1,4 +1,8 @@
 .cartao {
+  position: relative;
+  /* `overflow: hidden` porque a barra de progresso encosta na borda inferior e
+     precisa acompanhar o raio do card. */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 196px;
@@ -32,16 +36,26 @@
     0 0 0 4px var(--via-navy-60);
 }
 
+/* O topo é uma linha só: glifo, categoria e — quando há — o estado à direita.
+   Antes o glifo era bloco e a categoria vinha embaixo; com a pill entrando, três
+   elementos empilhados comiam 40px da altura útil do card. */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+  margin-bottom: var(--via-space-3);
+}
+
 .glifo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--via-radius-md);
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--app-radius-chip);
   background: var(--via-navy-08);
   color: var(--via-navy);
-  margin-bottom: var(--via-space-3);
   transition: transform var(--app-t-touch);
 }
 
@@ -50,7 +64,11 @@
 }
 
 .eyebrow {
-  margin: 0 0 var(--via-space-1);
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--via-font-mono);
   font-size: 0.656rem;
   letter-spacing: var(--app-ls-eyebrow);
@@ -121,35 +139,65 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* "Abrir →" só aparece no hover — convite, não botão. Some via opacidade + slide,
-   nunca via display (que não transiciona). */
-.abrir {
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-  opacity: 0;
-  transform: translateX(-6px);
-  transition:
-    opacity var(--app-t-touch),
-    transform var(--app-t-touch);
+/* O ESTADO é pill de contorno, e a diferença entre os dois é de PESO, não de cor:
+   verde/vermelho de semáforo é banido, e "concluída" não precisa de verde para se
+   ler como concluída. Em andamento fica em contorno; concluída ganha o
+   preenchimento navy, que é o degrau mais alto que a casa tem. */
+.estado {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 3px var(--via-space-2);
+  border-radius: var(--via-radius-pill);
+  border: 1px solid var(--via-border);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-muted);
+  white-space: nowrap;
 }
 
-.cartao:hover .abrir,
-.cartao:focus-visible .abrir {
-  opacity: 1;
-  transform: none;
+.estado[data-estado='concluida'] {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.etapas {
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Barra na BORDA do card. 3px: fina o bastante para ler como estado do objeto e
+   não como seção dele. */
+.trilho {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--via-navy-08);
+}
+
+.barra {
+  display: block;
+  height: 100%;
+  /* `scaleX` a partir da esquerda, nunca `width`: width dispara layout a cada
+     frame; transform fica no compositor. */
+  transform-origin: left center;
+  background: var(--via-accent-ink);
+  transition: transform var(--app-t-reveal);
+}
+
+.cartao[data-estado='concluida'] .barra {
+  background: var(--via-navy);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
   .glifo,
-  .abrir {
+  .barra {
     transition: none;
-  }
-
-  /* Sem motion, o convite fica sempre visível — sumir sem transição é pisca. */
-  .abrir {
-    opacity: 1;
-    transform: none;
   }
 }

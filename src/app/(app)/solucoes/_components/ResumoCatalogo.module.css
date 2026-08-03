@@ -1,0 +1,186 @@
+/* A faixa é UMA superfície com divisórias internas, não quatro cards.
+   Quatro cards separados leriam como quatro objetos de mesmo peso; aqui são três
+   medidas do mesmo catálogo mais um atalho — um objeto só, dividido. */
+.faixa {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(240px, 1.4fr);
+  align-items: stretch;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  overflow: hidden;
+}
+
+/* Sem a retomada sobram três colunas — e elas se distribuem em vez de deixar um
+   quarto vazio à direita. `:has` é o que permite o layout reagir ao conteúdo sem
+   uma prop de variante atravessando o componente. */
+.faixa:not(:has(.retomar)) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.medida {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  min-width: 0;
+}
+
+.medida + .medida,
+.retomar {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.rotulo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.valor {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+}
+
+/* Número é protagonista: mono, tabular, tinta sólida. */
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  letter-spacing: var(--app-ls-h3);
+  line-height: 1;
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Zero é informação, não erro — fica mais quieto sem sumir. */
+.numero[data-zero] {
+  color: var(--via-text-faint);
+}
+
+.unidade {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+/* ---- Retomada --------------------------------------------------------------- */
+
+.retomar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card);
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--app-t-state);
+}
+
+.retomar:hover {
+  background: var(--via-navy-03);
+}
+
+.retomarTextos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.retomarTitulo {
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  /* Duas linhas: o título de solução é longo e uma linha só com reticências
+     esconde justamente o que distingue uma solução da outra. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.retomarEtapa {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  transition: transform var(--app-t-touch);
+}
+
+.retomar:hover .seta {
+  transform: translateX(2px);
+}
+
+.retomar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* A 900 a faixa vira 2×2: quatro colunas num tablet dão ~180px cada, e o título
+   da retomada não sobrevive a isso. */
+@media (max-width: 899px) {
+  .faixa,
+  .faixa:not(:has(.retomar)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .medida:nth-child(odd),
+  .retomar:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .medida:nth-child(n + 3),
+  .retomar:nth-child(n + 3) {
+    border-top: 1px solid var(--via-border-hairline);
+  }
+}
+
+@media (max-width: 599px) {
+  .faixa,
+  .faixa:not(:has(.retomar)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .medida,
+  .retomar {
+    border-left: 0;
+  }
+
+  .medida + .medida,
+  .retomar {
+    border-top: 1px solid var(--via-border-hairline);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retomar,
+  .seta {
+    transition: none;
+  }
+
+  .retomar:hover .seta {
+    transform: none;
+  }
+}
