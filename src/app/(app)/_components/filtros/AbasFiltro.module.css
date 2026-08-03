@@ -59,3 +59,20 @@
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
 }
+
+/* A contagem da aba. Mesmo desenho da do `ControleSegmentado` — os dois
+   controles vivem na mesma régua e a pastilha precisa ser a mesma peça. */
+.total {
+  margin-left: var(--via-space-1_5);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Na aba ATIVA a contagem sobe um degrau: ela descreve o que está na tela agora,
+   e no tom quieto competia com o próprio rótulo por atenção. */
+.aba[data-ativa] .total {
+  color: var(--via-text-muted);
+}

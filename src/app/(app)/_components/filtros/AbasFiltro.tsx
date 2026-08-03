@@ -4,7 +4,19 @@ import { motion, useReducedMotion } from 'motion/react';
 import { useNavegacaoPorSetas } from './useNavegacaoPorSetas';
 import styles from './AbasFiltro.module.css';
 
-export type Aba = { id: string; rotulo: string };
+export type Aba = {
+  id: string;
+  rotulo: string;
+  /**
+   * Contagem à direita do rótulo. Opcional — sem ela a aba é só a palavra.
+   *
+   * O ARGUMENTO É O MESMO do `ControleSegmentado`, que já a tinha: a contagem
+   * responde "vale a pena clicar?" ANTES do clique. Sem ela, descobrir que
+   * "Amanhã" está vazio custa uma navegação e um estado vazio — e o estado vazio
+   * é indistinguível de tela quebrada para quem chegou agora.
+   */
+  total?: number;
+};
 
 /**
  * Tabs de categoria puramente TIPOGRÁFICAS — sem caixa, sem pill, sem ring.
@@ -66,11 +78,26 @@ export function AbasFiltro({
             /* Tabindex rotativo: só a aba ativa recebe Tab; as outras se alcançam
                pelas setas. É o par obrigatório do `onKeyDown` acima. */
             tabIndex={tabIndexDe(aba.id)}
+            /* O NOME ACESSÍVEL É COMPOSTO À MÃO quando há contagem. Deixando o
+               leitor de tela juntar o rótulo com o `<span>` da contagem, o nome
+               calculado sai "Hoje2" — a concatenação de nós inline não garante
+               espaço, e é uma armadilha conhecida do accname. Com `aria-label`
+               explícito ele ouve "Hoje, 2", que é o que a pessoa vidente lê. */
+            aria-label={aba.total === undefined ? undefined : `${aba.rotulo}, ${aba.total}`}
             className={styles.aba}
             data-ativa={ativo ? '' : undefined}
             onClick={() => aoMudar(aba.id)}
           >
             {aba.rotulo}
+            {/* Um degrau mais quieta que o rótulo, para a aba continuar lendo
+                como uma palavra e não como duas. `aria-hidden` porque o
+                `aria-label` acima já a inclui — sem isso ela seria anunciada
+                duas vezes. */}
+            {aba.total !== undefined && (
+              <span className={styles.total} aria-hidden="true">
+                {aba.total}
+              </span>
+            )}
             {ativo && (
               <motion.span
                 layoutId={layoutId}

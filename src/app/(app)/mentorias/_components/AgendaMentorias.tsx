@@ -49,19 +49,49 @@ export function AgendaMentorias({
   );
   const [filtro, setFiltro] = useState<FiltroDia>(haHoje ? 'hoje' : 'todas');
 
-  const filtradas = useMemo(() => {
+  /**
+   * UMA REGRA SÓ, consultada duas vezes: para filtrar a lista e para contar cada
+   * aba. Escrever a contagem como um segundo `filter` — o caminho curto — daria
+   * dois lugares para a mesma pergunta, e eles divergiriam no primeiro ajuste de
+   * borda (o que conta como "esta semana"?). A aba diria 3 e a lista mostraria 2.
+   */
+  const pertence = useMemo(() => {
     const hoje = chaveDoDia(agoraIso);
     const amanha = chaveDoDia(new Date(agora.getTime() + DIA_MS).toISOString());
     const fimSemana = agora.getTime() + 7 * DIA_MS;
 
-    return sessoes.filter((s) => {
-      if (filtro === 'todas') return true;
+    return (alvo: FiltroDia, s: SessaoMentoria) => {
+      if (alvo === 'todas') return true;
       const dia = chaveDoDia(s.inicioIso);
-      if (filtro === 'hoje') return dia === hoje;
-      if (filtro === 'amanha') return dia === amanha;
+      if (alvo === 'hoje') return dia === hoje;
+      if (alvo === 'amanha') return dia === amanha;
       return new Date(s.inicioIso).getTime() <= fimSemana;
-    });
-  }, [sessoes, filtro, agora, agoraIso]);
+    };
+  }, [agora, agoraIso]);
+
+  const filtradas = useMemo(
+    () => sessoes.filter((s) => pertence(filtro, s)),
+    [sessoes, filtro, pertence],
+  );
+
+  /* A contagem responde "vale a pena clicar?" ANTES do clique — o mesmo
+     argumento que o `ControleSegmentado` já carregava e que estas abas não
+     tinham. Sem ela, descobrir que "Amanhã" está vazio custa uma navegação. */
+  const abas = useMemo(
+    () =>
+      (
+        [
+          { id: 'hoje', rotulo: 'Hoje' },
+          { id: 'amanha', rotulo: 'Amanhã' },
+          { id: 'semana', rotulo: 'Esta semana' },
+          { id: 'todas', rotulo: 'Todas' },
+        ] as const
+      ).map((a) => ({
+        ...a,
+        total: sessoes.reduce((n, s) => (pertence(a.id, s) ? n + 1 : n), 0),
+      })),
+    [sessoes, pertence],
+  );
 
   const porDia = useMemo(() => {
     const grupos = new Map<string, SessaoMentoria[]>();
@@ -76,20 +106,12 @@ export function AgendaMentorias({
     <div className={styles.raiz}>
       <div className={styles.filtro}>
         <AbasFiltro
-          abas={[
-            { id: 'hoje', rotulo: 'Hoje' },
-            { id: 'amanha', rotulo: 'Amanhã' },
-            { id: 'semana', rotulo: 'Esta semana' },
-            { id: 'todas', rotulo: 'Todas' },
-          ]}
+          abas={abas}
           ativa={filtro}
           aoMudar={(id) => setFiltro(id as FiltroDia)}
           layoutId="mentorias-filtro-dia"
           ariaLabel="Filtrar por dia"
         />
-        <p className={styles.contagem} aria-live="polite">
-          {filtradas.length} {filtradas.length === 1 ? 'agendada' : 'agendadas'}
-        </p>
       </div>
 
       {porDia.length === 0 ? (
