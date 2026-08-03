@@ -67,40 +67,6 @@
   white-space: nowrap;
 }
 
-/* Ocupação como barra: 22/30 é um número que só significa alguma coisa depois de
-   uma divisão — a barra faz a divisão pelo leitor. `scaleX`, nunca `width`. */
-.ocupacao {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-}
-
-.ocupacaoTrilho {
-  flex: 1;
-  height: 4px;
-  border-radius: var(--app-radius-track);
-  background: var(--via-navy-10);
-  overflow: hidden;
-}
-
-.ocupacaoCheia {
-  width: 100%;
-  height: 100%;
-  background: var(--via-navy);
-  transform-origin: left;
-  transition: transform var(--app-t-scene);
-}
-
-.ocupacaoTexto {
-  flex: none;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .detalheTexto {
   margin: 0;
   font-size: var(--via-fs-sm);

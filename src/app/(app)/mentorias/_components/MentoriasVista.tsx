@@ -11,7 +11,8 @@ import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
 import { AgendaMentorias } from './AgendaMentorias';
 import { CalendarioMentorias } from './CalendarioMentorias';
 import { CartaoProxima } from './CartaoProxima';
-import { SeletorVista, type IdVista } from './SeletorVista';
+import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
+import { ICONE_AGENDA, ICONE_CALENDARIO, type IdVista } from './vistas';
 import { duracaoMin, estadoDe, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './MentoriasVista.module.css';
 
@@ -155,7 +156,21 @@ export function MentoriasVista({
           )}
 
           <div className={styles.chrome}>
-            <SeletorVista ativa={vista} aoMudar={setVista} />
+            {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
+                comentário do próprio `ControleSegmentado` já dizia que ele fora
+                extraído para substituir esta cópia e as abas de catálogo. A
+                cópia ficou para trás e, com ela, as setas do teclado: o
+                `role="tablist"` prometia navegação por seta e não entregava. */}
+            <ControleSegmentado
+              opcoes={[
+                { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
+                { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
+              ]}
+              ativa={vista}
+              aoMudar={(id) => setVista(id as IdVista)}
+              layoutId="mentorias-vista"
+              ariaLabel="Modo de visualização"
+            />
           </div>
 
           {vista === 'agenda' ? (
@@ -164,6 +179,7 @@ export function MentoriasVista({
               agora={agora}
               agoraIso={agoraIso}
               estadoDaSessao={estadoComInscricao}
+              gravando={gravando}
               aoAbrirDetalhe={abrirDetalhe}
               aoFazerCheckin={pedirCheckin}
               aoCancelarCheckin={cancelar}
@@ -215,23 +231,15 @@ export function MentoriasVista({
               </div>
             </dl>
 
-            {/* Ocupação como BARRA: 22/30 é um número que só significa alguma
-                coisa depois de uma divisão. A barra faz a divisão pelo leitor. */}
-            <div className={styles.ocupacao}>
-              <div className={styles.ocupacaoTrilho} aria-hidden="true">
-                <div
-                  className={styles.ocupacaoCheia}
-                  style={{
-                    transform: `scaleX(${Math.min(1, detalhe.inscritos / detalhe.vagas)})`,
-                  }}
-                />
-              </div>
-              <span className={styles.ocupacaoTexto}>
-                {detalhe.vagas - detalhe.inscritos > 0
-                  ? `${detalhe.vagas - detalhe.inscritos} vagas livres`
-                  : 'sem vagas'}
-              </span>
-            </div>
+            {/* SEM BARRA DE LOTAÇÃO — a regra da casa é literal: "zero contador,
+                zero vagas restantes, zero barra de lotação". Uma barra que enche
+                é medidor de escassez, e medidor de escassez converte no clique e
+                diverge no reembolso.
+
+                O NÚMERO fica, porque ele não é a mesma coisa: "22/30" é fato
+                verificável e operacionalmente necessário — sem ele não dá para
+                saber se ainda cabe. O que sai é o gesto que transforma o fato em
+                pressão. Ele já está na tira de fichas acima, com rótulo. */}
 
             <p className={styles.detalheTexto}>{detalhe.descricao}</p>
 

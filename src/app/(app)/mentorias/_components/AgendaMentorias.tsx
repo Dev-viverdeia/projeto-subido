@@ -25,6 +25,7 @@ export function AgendaMentorias({
   agora,
   agoraIso,
   estadoDaSessao,
+  gravando,
   aoAbrirDetalhe,
   aoFazerCheckin,
   aoCancelarCheckin,
@@ -34,6 +35,8 @@ export function AgendaMentorias({
   agora: Date;
   agoraIso: string;
   estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
+  /** Uma gravação em voo — trava os CTAs de todas as linhas. */
+  gravando: boolean;
   aoAbrirDetalhe: (id: string) => void;
   aoFazerCheckin: (id: string) => void;
   aoCancelarCheckin: (id: string) => void;
@@ -113,6 +116,7 @@ export function AgendaMentorias({
                       key={s.id}
                       sessao={s}
                       estado={estadoDaSessao(s)}
+                      gravando={gravando}
                       agora={agora}
                       aoAbrirDetalhe={() => aoAbrirDetalhe(s.id)}
                       aoFazerCheckin={() => aoFazerCheckin(s.id)}
