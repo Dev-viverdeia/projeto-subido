@@ -180,17 +180,23 @@ export function contarEtapasFeitas(estado: Estado, etapaIds: string[]): number {
 }
 
 /**
- * O estado de uma solução, derivado do progresso.
+ * O estado de um conteúdo com progresso — solução por etapas, formação por aulas.
  *
- * `sem-etapas` é um caso à parte de `nao-iniciada`: uma solução que ainda não tem
- * passo a passo cadastrado não está "não iniciada", ela não tem o que iniciar. Sem
- * essa distinção o catálogo mostraria "0/0 etapas" e uma barra vazia para
- * conteúdo que nem prevê progresso.
+ * O NOME DEIXOU DE DIZER "SOLUÇÃO" porque a conta nunca soube o que estava
+ * contando: são dois números. Enquanto o helper se chamava `estadoDaSolucao`, o
+ * catálogo de formações escreveu a MESMA regra de novo, com outros nomes e um
+ * estado a menos — e as duas versões já discordavam sobre o que fazer com
+ * conteúdo vazio.
+ *
+ * `sem-itens` é um caso à parte de `nao-iniciada`: uma solução sem passo a passo
+ * cadastrado, ou uma formação sem aula nenhuma, não está "não iniciada" — ela não
+ * tem o que iniciar. Sem essa distinção a tela mostraria "0/0" e uma barra vazia
+ * para conteúdo que nem prevê progresso.
  */
-export type EstadoSolucao = 'sem-etapas' | 'nao-iniciada' | 'em-andamento' | 'concluida';
+export type EstadoProgresso = 'sem-itens' | 'nao-iniciada' | 'em-andamento' | 'concluida';
 
-export function estadoDaSolucao(feitas: number, total: number): EstadoSolucao {
-  if (total === 0) return 'sem-etapas';
+export function estadoDoProgresso(feitas: number, total: number): EstadoProgresso {
+  if (total === 0) return 'sem-itens';
   if (feitas === 0) return 'nao-iniciada';
   return feitas >= total ? 'concluida' : 'em-andamento';
 }

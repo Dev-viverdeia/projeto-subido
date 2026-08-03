@@ -240,24 +240,6 @@
   color: var(--via-text-muted);
 }
 
-/* VÉU A 8%, não 10%, e o tamanho subiu de 9px para 10.
-   `--via-accent-ink` sobre accent a 10% dá 4,31:1 — reprova AA para texto normal
-   (4,5:1), e a 9px não há isenção de "texto grande" que salve. 8% é o teto que
-   este repo já mediu para o véu de accent, e é o mesmo par que o `PillEstado`
-   usa em "em andamento": um selo, uma receita. */
-.aqui {
-  flex-shrink: 0;
-  padding: 3px var(--via-space-2);
-  border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
-  font-family: var(--via-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-accent-ink);
-  white-space: nowrap;
-}
-
 .feitaRotulo {
   flex-shrink: 0;
   font-family: var(--via-font-mono);

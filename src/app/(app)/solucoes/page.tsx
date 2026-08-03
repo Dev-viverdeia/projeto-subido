@@ -5,7 +5,7 @@ import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/icones
 import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoSolucoes } from './_components/CatalogoSolucoes';
-import { ResumoCatalogo } from './_components/ResumoCatalogo';
+import { ResumoSolucoes } from './_components/ResumoSolucoes';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Soluções de IA' };
@@ -21,7 +21,7 @@ export default async function SolucoesPage({ searchParams }: PageProps<'/solucoe
           estou" e o filtro responde "o que eu procuro". Invertido, a pessoa
           escolheria um recorte antes de saber que tem algo pela metade. */}
       <div className={entrada.bloco}>
-        <ResumoCatalogo solucoes={solucoes} />
+        <ResumoSolucoes solucoes={solucoes} />
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>

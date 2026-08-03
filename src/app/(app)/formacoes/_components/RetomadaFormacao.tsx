@@ -14,6 +14,12 @@ import styles from './RetomadaFormacao.module.css';
  * "Continue de onde parou" — a pill que devolve o aluno à formação tocada mais
  * recentemente. Só renderiza quando EXISTE progresso local; para quem nunca
  * começou, nada aparece (um convite vazio seria dado inventado).
+ *
+ * VIVE SÓ NO `/inicio` AGORA. O catálogo de formações usava esta pill como
+ * abertura e não respondia "quanto existe" nem "quanto eu já fiz" — passou a usar
+ * a `ResumoCatalogo`, a mesma faixa de três medidas do catálogo de soluções. Aqui
+ * no início a faixa não cabe: a tela compõe TRÊS pilares, e cada um tem direito a
+ * uma linha, não a um painel de métricas.
  */
 export function RetomadaFormacao({ formacoes }: { formacoes: FormacaoResumo[] }) {
   const progresso = useProgresso();

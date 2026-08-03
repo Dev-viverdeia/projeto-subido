@@ -1,6 +1,6 @@
 import type { ItemSolucao } from '@/lib/conteudo/queries';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
-import { iniciais } from './iniciais';
+import { iniciais } from '../../_components/iniciais';
 import styles from './KitSolucao.module.css';
 
 /**

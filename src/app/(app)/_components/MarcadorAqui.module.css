@@ -1,0 +1,14 @@
+/* VÉU A 8%, e o número é medido: `--via-accent-ink` sobre accent a 10% dá 4,31:1
+   e reprova AA — não há isenção de "texto grande" a 10px que salve. */
+.aqui {
+  flex-shrink: 0;
+  padding: 3px var(--via-space-2);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+  white-space: nowrap;
+}

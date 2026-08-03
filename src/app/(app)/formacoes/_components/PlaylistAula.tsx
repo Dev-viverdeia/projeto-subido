@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Drawer, Progress } from '@/design-system/via';
+import { Button, Drawer } from '@/design-system/via';
 import type { FormacaoCompleta } from '@/lib/conteudo/queries';
+import { MarcadorAqui } from '../../_components/MarcadorAqui';
+import { TrilhoProgresso } from '../../_components/TrilhoProgresso';
 import { formatarDuracao } from '../../_components/tempo';
 import { useCurriculo } from './useCurriculo';
 import styles from './PlaylistAula.module.css';
@@ -43,18 +45,19 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
 
   return (
     <div className={styles.painel}>
-      <header className={styles.topo}>
-        <p className={styles.eyebrow}>Progresso do curso</p>
-        <Progress
-          value={curriculo.pct}
-          tone="navy"
-          size="sm"
-          ariaLabel={`${curriculo.feitas} de ${curriculo.total} aulas concluídas`}
+      {/* O MESMO trilho do curso, na variante densa. Aqui existiam um `Progress`
+          do DS, um eyebrow com outro nome ("Progresso do curso") e uma contagem
+          própria — uma TERCEIRA maneira de desenhar o número que o curso e o
+          catálogo já desenhavam de dois jeitos. */}
+      <div className={styles.topo}>
+        <TrilhoProgresso
+          itens={curriculo.planas}
+          feitasIds={curriculo.feitasIds}
+          proximo={curriculo.proxima}
+          unidade={{ singular: 'aula', plural: 'aulas' }}
+          denso
         />
-        <p className={styles.contagem}>
-          {curriculo.feitas} de {curriculo.total} aulas
-        </p>
-      </header>
+      </div>
 
       <div className={styles.modulos}>
         {curriculo.modulos.map(({ modulo, aulas }, indice) => {
@@ -108,6 +111,7 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
                           aria-hidden="true"
                         />
                         <span className={styles.tituloAula}>{aula.titulo}</span>
+                        {atual && <MarcadorAqui />}
                         {duracao && <span className={styles.duracao}>{duracao}</span>}
                       </Link>
                     );

@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useReducedMotion } from 'motion/react';
 import type { ItemSolucao } from '@/lib/conteudo/queries';
-import { estadoDaSolucao, useProgresso } from '@/lib/progresso/local';
+import { estadoDoProgresso, useProgresso } from '@/lib/progresso/local';
 import { AbasFiltro, type Aba } from '../../_components/filtros/AbasFiltro';
 import { Ferramentas, Prompts } from './KitSolucao';
 import { PassoAPasso, idDaEtapa } from './PassoAPasso';
-import { PillEstado } from './PillEstado';
-import { TrilhoProgresso } from './TrilhoProgresso';
+import { PillEstado } from '../../_components/PillEstado';
+import { TrilhoProgresso } from '../../_components/TrilhoProgresso';
 import styles from './FichaSolucao.module.css';
 
 /**
@@ -85,7 +85,7 @@ export function FichaSolucao({
      porque marcar etapa alterna e pode acontecer fora de ordem. */
   const feitasIds = new Set(etapas.filter((e) => progresso.etapas[e.id]).map((e) => e.id));
   const etapaAtual = etapas.find((e) => !feitasIds.has(e.id)) ?? null;
-  const estado = estadoDaSolucao(feitasIds.size, etapas.length);
+  const estado = estadoDoProgresso(feitasIds.size, etapas.length);
 
   /**
    * "Continuar" rola até a etapa atual — e o caminho depende de a aba já ser a
@@ -227,10 +227,12 @@ export function FichaSolucao({
 
       <aside className={styles.apoio}>
         <TrilhoProgresso
-          etapas={etapas}
+          itens={etapas}
           feitasIds={feitasIds}
-          etapaAtual={etapaAtual}
+          proximo={etapaAtual}
+          unidade={{ singular: 'etapa', plural: 'etapas' }}
           aoContinuar={continuar}
+          notaFinal="O progresso é deste navegador — ele não acompanha você em outro dispositivo."
         />
         {proxima}
       </aside>

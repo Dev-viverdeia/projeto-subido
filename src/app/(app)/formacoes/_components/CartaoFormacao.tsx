@@ -2,7 +2,13 @@
 
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
-import { useProgresso, contarConcluidas, percentual } from '@/lib/progresso/local';
+import {
+  useProgresso,
+  contarConcluidas,
+  estadoDoProgresso,
+  percentual,
+} from '@/lib/progresso/local';
+import { PillEstado } from '../../_components/PillEstado';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoFormacao.module.css';
 
@@ -98,7 +104,7 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
   const progresso = useProgresso();
   const feitas = contarConcluidas(progresso, formacao.aulaIds);
   const pct = percentual(feitas, formacao.aulas);
-  const concluida = formacao.aulas > 0 && feitas === formacao.aulas;
+  const estado = estadoDoProgresso(feitas, formacao.aulas);
 
   return (
     <Link href={`/formacoes/${formacao.slug}`} className={styles.cartao}>
@@ -113,7 +119,12 @@ export function CartaoFormacao({ formacao }: { formacao: FormacaoResumo }) {
 
           <span className={styles.scrim} aria-hidden="true" />
 
-          {concluida && <span className={styles.selo}>Concluída</span>}
+          {/* O MESMO selo do card de solução e do hero do curso — antes aqui só
+              existia "Concluída", então o card não tinha coluna de estado até a
+              trilha terminar, e a grade lia como duas famílias de card.
+              Tom `midia` porque ele pousa sobre a CAPA que o admin sobe: véu
+              translúcido ali daria contraste provável, não garantido. */}
+          <PillEstado estado={estado} tom="midia" className={styles.selo} />
 
           {/* Ancorado na base do pôster: eyebrow + título, dois tons SÓLIDOS
               (gray-400 e branco). Sobre banda escura a escala de cinza inverte —

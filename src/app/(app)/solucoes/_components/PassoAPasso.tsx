@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import type { ItemSolucao } from '@/lib/conteudo/queries';
 import { alternarEtapa, useProgresso } from '@/lib/progresso/local';
-import { Visto } from './PillEstado';
+import { MarcadorAqui } from '../../_components/MarcadorAqui';
+import { Visto } from '../../_components/PillEstado';
 import styles from './PassoAPasso.module.css';
 
 /** Id do elemento de uma etapa — a ficha usa o mesmo cálculo para rolar até ela. */
@@ -152,7 +153,7 @@ export function PassoAPasso({
                 >
                   <span className={styles.tituloPasso}>{etapa.titulo}</span>
 
-                  {atual && <span className={styles.aqui}>você está aqui</span>}
+                  {atual && <MarcadorAqui />}
                   {feita && !atual && <span className={styles.feitaRotulo}>feita</span>}
 
                   <Chevron />

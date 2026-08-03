@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { ModuloDoCurriculo, StatusAula } from './useCurriculo';
+import { MarcadorAqui } from '../../_components/MarcadorAqui';
 import { formatarDuracao } from '../../_components/tempo';
 import styles from './CurriculoCurso.module.css';
 
@@ -137,6 +138,9 @@ export function CurriculoCurso({
                     >
                       <IconeStatus status={status} />
                       <span className={styles.aulaTitulo}>{aula.titulo}</span>
+                      {/* O MESMO marcador da timeline de etapas: as duas listas
+                          respondem "onde eu parei?", e a resposta é uma só. */}
+                      {status === 'atual' && <MarcadorAqui />}
                       {duracao && <span className={styles.duracao}>{duracao}</span>}
                     </Link>
                   );

@@ -114,20 +114,15 @@
   pointer-events: none;
 }
 
+/* Só a POSIÇÃO mora aqui: a aparência é do `PillEstado`, o mesmo selo do card de
+   solução e do hero do curso. O que sobrou desta regra é onde ele pousa no
+   pôster — e o `z-index`, porque o scrim é um irmão posicionado logo acima na
+   ordem do documento e cobriria a pill sem ele. */
 .selo {
   position: absolute;
   top: var(--via-space-3);
   right: var(--via-space-3);
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding-inline: var(--via-space-3);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-white);
-  color: var(--via-navy);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  box-shadow: var(--via-shadow-sm);
+  z-index: 1;
 }
 
 /* Legenda do pôster: ancorada na base, dois tons SÓLIDOS. Sobre banda escura a

@@ -4,7 +4,7 @@ import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoFormacoes } from './_components/CatalogoFormacoes';
-import { RetomadaFormacao } from './_components/RetomadaFormacao';
+import { ResumoFormacoes } from './_components/ResumoFormacoes';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Formações' };
@@ -16,8 +16,11 @@ export default async function FormacoesPage({ searchParams }: PageProps<'/formac
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Formações" oculto />
 
+      {/* A faixa de resumo vem ANTES da régua: ela responde "onde eu estou" e o
+          filtro responde "o que eu procuro". Invertido, a pessoa escolheria um
+          recorte antes de saber que tem algo pela metade. */}
       <div className={entrada.bloco}>
-        <RetomadaFormacao formacoes={formacoes} />
+        <ResumoFormacoes formacoes={formacoes} />
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>

@@ -5,12 +5,12 @@ import type { ReactNode } from 'react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
 import {
   contarEtapasFeitas,
-  estadoDaSolucao,
+  estadoDoProgresso,
   percentual,
   useProgresso,
 } from '@/lib/progresso/local';
-import { iniciais } from './iniciais';
-import { PillEstado } from './PillEstado';
+import { iniciais } from '../../_components/iniciais';
+import { PillEstado } from '../../_components/PillEstado';
 import styles from './CartaoSolucao.module.css';
 
 /**
@@ -40,7 +40,7 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
 
   const total = solucao.etapaIds.length;
   const feitas = contarEtapasFeitas(progresso, solucao.etapaIds);
-  const estado = estadoDaSolucao(feitas, total);
+  const estado = estadoDoProgresso(feitas, total);
   /* `nao-iniciada` PASSOU A APARECER. Antes ficava escondida com o argumento de
      que uma pill igual em todo card seria ruído — mas escondê-la deixava o card
      sem coluna de estado até a primeira marcação, e a grade lia como duas
