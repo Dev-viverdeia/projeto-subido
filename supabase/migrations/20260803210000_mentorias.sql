@@ -120,7 +120,7 @@ create view public.mentoria_ocupacao as
   group by mentoria_id;
 
 comment on view public.mentoria_ocupacao is
-  'Agregado SEM identidade. Roda como definidor de propósito: a RLS de mentoria_inscricoes esconde as linhas dos outros, e sem isto ninguém saberia se a sessão está lotada. Nunca acrescente uma coluna que identifique quem se inscreveu.';
+  'Agregado SEM identidade. Roda como definidor de proposito: a RLS de mentoria_inscricoes esconde as linhas dos outros, e sem isto ninguem saberia se a sessao esta lotada. Nunca acrescente uma coluna que identifique quem se inscreveu.';
 
 grant select on public.mentoria_ocupacao to authenticated;
 
@@ -154,7 +154,7 @@ begin
   end if;
 
   if _status <> 'publicado' then
-    raise exception 'mentoria não publicada' using errcode = '23514';
+    raise exception 'mentoria nao publicada' using errcode = '23514';
   end if;
 
   /* Check-in depois do fim é sempre erro — inclusive para admin. O passado não
@@ -176,7 +176,7 @@ end;
 $$;
 
 comment on function private.validar_inscricao is
-  'SECURITY DEFINER: precisa contar TODAS as inscrições da sessão, e a RLS da tabela mostra só a do próprio usuário. O `for update` na linha da mentoria é o que impede duas pessoas de levarem a mesma última vaga.';
+  'SECURITY DEFINER: precisa contar TODAS as inscricoes da sessao, e a RLS da tabela mostra so a do proprio usuario. O for update na linha da mentoria impede duas pessoas de levarem a mesma ultima vaga.';
 
 create trigger mentoria_inscricoes_validar
   before insert on public.mentoria_inscricoes
@@ -184,6 +184,18 @@ create trigger mentoria_inscricoes_validar
 
 -- -----------------------------------------------------------------------------
 -- RLS
+--
+-- OS NOMES DAS POLICIES NÃO TÊM ACENTO, e isso não é descuido de digitação: é o
+-- que está gravado no banco. Nome de policy é IDENTIFICADOR — "mentores são
+-- visíveis" e "mentores sao visiveis" são duas policies diferentes. Este arquivo
+-- divergiu do aplicado por um instante (o SQL foi passado por um canal que comeu
+-- os acentos), e rodá-lo assim contra o banco existente criaria ONZE policies
+-- duplicadas em vez de falhar: a superfície de permissão dobraria em silêncio,
+-- porque `create policy` não reclama de policy parecida, só de policy igual.
+--
+-- Os comentários `--` podem ter acento à vontade; eles não chegam ao Postgres. O
+-- que precisa bater byte a byte é tudo que vira identificador ou string de
+-- `raise` — a tradução de erro em `lib/mentorias/actions.ts` casa por texto.
 -- -----------------------------------------------------------------------------
 alter table public.mentores enable row level security;
 alter table public.mentorias enable row level security;
@@ -192,27 +204,27 @@ alter table public.mentoria_inscricoes enable row level security;
 /* Mentor é dado público da plataforma — quem aparece na agenda aparece para
    todos os autenticados. Inativo continua visível porque as sessões passadas
    dele ainda mostram o nome; quem some da lista de escolha é decisão do admin. */
-create policy "mentores são visíveis"
+create policy "mentores sao visiveis"
   on public.mentores for select to authenticated using (true);
 
-create policy "mentores são escritos por admin"
+create policy "mentores sao escritos por admin"
   on public.mentores for insert to authenticated with check (private.eh_admin());
-create policy "mentores são alterados por admin"
+create policy "mentores sao alterados por admin"
   on public.mentores for update to authenticated
   using (private.eh_admin()) with check (private.eh_admin());
-create policy "mentores são removidos por admin"
+create policy "mentores sao removidos por admin"
   on public.mentores for delete to authenticated using (private.eh_admin());
 
-create policy "mentorias publicadas são visíveis"
+create policy "mentorias publicadas sao visiveis"
   on public.mentorias for select to authenticated
   using (status = 'publicado' or private.eh_admin());
 
-create policy "mentorias são escritas por admin"
+create policy "mentorias sao escritas por admin"
   on public.mentorias for insert to authenticated with check (private.eh_admin());
-create policy "mentorias são alteradas por admin"
+create policy "mentorias sao alteradas por admin"
   on public.mentorias for update to authenticated
   using (private.eh_admin()) with check (private.eh_admin());
-create policy "mentorias são removidas por admin"
+create policy "mentorias sao removidas por admin"
   on public.mentorias for delete to authenticated using (private.eh_admin());
 
 /* CADA UM VÊ A PRÓPRIA INSCRIÇÃO, e só. Nem admin: a lista de quem se inscreveu
@@ -222,7 +234,7 @@ create policy "mentorias são removidas por admin"
 
    `(select auth.uid())` dentro de subquery: o Postgres promove a InitPlan e
    avalia uma vez por query em vez de uma por linha. */
-create policy "inscrição é de quem se inscreveu"
+create policy "inscricao e de quem se inscreveu"
   on public.mentoria_inscricoes for select to authenticated
   using (usuario_id = (select auth.uid()));
 
@@ -232,6 +244,6 @@ create policy "cada um se inscreve por si"
 
 /* Cancelar é apagar a própria linha. Não há `update`: uma inscrição não muda de
    estado, ela existe ou não. */
-create policy "cada um cancela a própria inscrição"
+create policy "cada um cancela a propria inscricao"
   on public.mentoria_inscricoes for delete to authenticated
   using (usuario_id = (select auth.uid()));

@@ -32,6 +32,6 @@ as $$
 $$;
 
 comment on function public.mentoria_ocupacao is
-  'SECURITY DEFINER com escopo mínimo: devolve só (mentoria_id, inscritos). Quem consulta a agenda precisa saber se ainda cabe e NÃO pode saber quem está inscrito — a policy de mentoria_inscricoes mostra à pessoa apenas a linha dela, então um count() feito pelo cliente daria sempre 0 ou 1. NUNCA acrescente aqui uma coluna que identifique participante.';
+  'SECURITY DEFINER com escopo minimo: devolve so (mentoria_id, inscritos). Quem consulta a agenda precisa saber se ainda cabe e NAO pode saber quem esta inscrito. NUNCA acrescente aqui uma coluna que identifique participante.';
 
 grant execute on function public.mentoria_ocupacao(uuid[]) to authenticated;
