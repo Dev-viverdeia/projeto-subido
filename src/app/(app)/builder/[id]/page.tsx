@@ -8,8 +8,8 @@ import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import entrada from '../../_components/entrada.module.css';
 import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
 import { Entrevista } from '../_components/Entrevista';
-import { EstadoGeracao } from '../_components/EstadoGeracao';
 import { FichaProjeto } from '../_components/FichaProjeto';
+import { EtapaCriacao } from '../_components/sala/EtapaCriacao';
 import { EtapaKit } from '../_components/sala/EtapaKit';
 import { Kanban } from '../_components/sala/Kanban';
 import { SalaDoProjeto } from '../_components/sala/SalaDoProjeto';
@@ -84,10 +84,6 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
       </div>
 
       <div className={entrada.bloco}>
-        {solucao.status === 'gerando' ? (
-          <EstadoGeracao id={solucao.id} ideia={solucao.ideiaOriginal} />
-        ) : null}
-
         {solucao.status === 'falhou' && solucao.erro ? (
           <p className={styles.falha} role="alert">
             <span className={styles.falhaRotulo}>A geração anterior falhou</span>
@@ -103,24 +99,39 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
             momentos — cada um respondendo uma pergunta diferente. Os painéis são
             montados AQUI, no servidor, e entram na ilha como `ReactNode`: assim o
             documento inteiro não atravessa a fronteira como prop serializada. */}
-        {solucao.status === 'pronta' && solucao.documento ? (
+        {/* A SALA ABRE JÁ NA GERAÇÃO, como no print: etapa 1 ativa e as outras com
+            cadeado. Antes a espera era um card flutuante que sumia e dava lugar à
+            sala — duas telas para um momento só, com um salto no meio. Agora o
+            percurso é o mesmo desde o início; o que muda é quanto dele está
+            aberto. */}
+        {solucao.status === 'gerando' || (solucao.status === 'pronta' && solucao.documento) ? (
           <SalaDoProjeto
             solucao={solucao}
-            criacao={
-              <p className={styles.criacaoPronta}>
-                O plano está pronto. Siga para “Entenda o projeto”.
-              </p>
-            }
+            criacao={<EtapaCriacao id={solucao.id} documento={solucao.documento} />}
+            /* Travados enquanto não há documento — ver `motivoDoCadeado`. O `null`
+               aqui nunca chega à tela: o cadeado substitui o painel. */
             entender={
-              <FichaProjeto
-                documento={solucao.documento}
-                criadoEm={solucao.criadoEm}
-                modelo={solucao.modelo}
-              />
+              solucao.documento ? (
+                <FichaProjeto
+                  documento={solucao.documento}
+                  criadoEm={solucao.criadoEm}
+                  modelo={solucao.modelo}
+                />
+              ) : null
             }
-            kit={<EtapaKit id={solucao.id} documento={solucao.documento} stack={solucao.stack} />}
+            kit={
+              solucao.documento ? (
+                <EtapaKit id={solucao.id} documento={solucao.documento} stack={solucao.stack} />
+              ) : null
+            }
             construir={
-              <Kanban id={solucao.id} etapas={solucao.documento.etapas} tarefas={solucao.tarefas} />
+              solucao.documento ? (
+                <Kanban
+                  id={solucao.id}
+                  etapas={solucao.documento.etapas}
+                  tarefas={solucao.tarefas}
+                />
+              ) : null
             }
           />
         ) : null}
