@@ -6,6 +6,7 @@ import type { EstadoStack } from '@/lib/builder/queries';
 import { escolherStack } from '@/lib/builder/actions';
 import { BotaoCopiar } from '../../../_components/BotaoCopiar';
 import { Visto } from '../../../_components/PillEstado';
+import { montarKit } from '@/lib/builder/kit';
 import { STACKS, acharStack, promptDePartida } from './STACKS';
 import styles from './EtapaKit.module.css';
 
@@ -18,11 +19,17 @@ import styles from './EtapaKit.module.css';
  * a etapa mostra as três saídas e nada mais — e a etapa "Construir" fica travada,
  * dizendo exatamente isso.
  *
- * O QUE NÃO EXISTE AQUI, e é dito em vez de fingido: não há "Baixar projeto
- * (.zip)" nem "Versão em PDF". O kit em arquivo é a próxima fase; um botão de
- * download que não baixa nada é pior que a ausência dele. O que a pessoa tem
- * agora — ferramentas, prompts e o texto de partida — está tudo em tela e
- * copiável.
+ * O ZIP EXISTE E DIZ O QUE TEM DENTRO. São cinco arquivos derivados do documento
+ * — não onze. A referência gera onze porque roda três agentes que escrevem coisas
+ * diferentes; aqui há uma geração e um documento, e recortá-lo em fatias menores
+ * só para chegar a onze seria inflar número.
+ *
+ * A LISTA DOS ARQUIVOS FICA VISÍVEL ANTES DO DOWNLOAD, e não num accordion de
+ * "curiosidade opcional": é ela que diz por que baixar em vez de copiar da tela.
+ * Baixar às cegas é o que faz um botão de download parecer opcional.
+ *
+ * Continua sem "Versão em PDF": o PDF exigiria renderizar layout no servidor, e
+ * o kit é feito para uma IA ler — Markdown é o formato certo para isso.
  */
 export function EtapaKit({
   id,
@@ -45,8 +52,36 @@ export function EtapaKit({
     });
   };
 
+  const arquivos = montarKit(documento);
+
   return (
     <div className={styles.kit}>
+      <section aria-labelledby="kit-baixar">
+        <h3 id="kit-baixar" className={styles.secaoTitulo}>
+          Baixe o kit do projeto
+        </h3>
+
+        <div className={styles.baixar}>
+          {/* `<a download>` e não botão: o download é uma navegação com resposta
+              de arquivo, e o elemento certo dá clique do meio, "salvar como" e
+              funciona sem JS. */}
+          <a className={styles.botaoBaixar} href={`/api/builder/${id}/kit`} download>
+            Baixar projeto (.zip)
+          </a>
+          <p className={styles.baixarNota}>
+            {arquivos.length} arquivos em Markdown, prontos para anexar na IA.
+          </p>
+        </div>
+
+        <ul className={styles.arquivos}>
+          {arquivos.map((a) => (
+            <li key={a.nome} className={styles.arquivo}>
+              {a.nome}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="kit-onde">
         <h3 id="kit-onde" className={styles.secaoTitulo}>
           Escolha onde construir

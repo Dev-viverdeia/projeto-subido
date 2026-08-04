@@ -221,3 +221,72 @@
     transition: none;
   }
 }
+
+.baixar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-4);
+}
+
+.botaoBaixar {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-5);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-white);
+  text-decoration: none;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.botaoBaixar:hover {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
+}
+
+.botaoBaixar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.baixarNota {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+/* Os nomes dos arquivos, visíveis ANTES do download: é a lista que responde
+   "por que baixar em vez de copiar da tela". Mono porque são nomes de arquivo. */
+.arquivos {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin: var(--app-gap-stack) 0 0;
+  padding: 0;
+}
+
+.arquivo {
+  padding: 3px var(--via-space-2_5);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-06);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botaoBaixar {
+    transition: none;
+  }
+}
