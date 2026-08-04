@@ -152,6 +152,13 @@ O que faz este documento valer:
 · As ETAPAS são executáveis por quem nunca viu o projeto. "Configurar o webhook"
   não é etapa; "criar o webhook no n8n apontando para o endpoint X e testar com um
   payload de exemplo" é.
+· Cada etapa declara sua FASE, e a ordem das fases é a ordem de execução:
+    1 · fundação — o que precisa existir antes de qualquer coisa funcionar
+        (contas, banco, credenciais, esqueleto)
+    2 · construção — o que faz a solução funcionar de verdade
+    3 · polimento e lançamento — o que a deixa confiável e no ar
+  Toda fase declarada precisa ter pelo menos uma etapa: não pule a 2 nem entregue
+  um projeto inteiro na 1.
 · Os PROMPTS vêm prontos para colar, escritos para a tarefa específica — não
   modelos genéricos com colchetes para preencher.
 · A ARQUITETURA descreve o caminho do dado da entrada até a saída, dizendo onde

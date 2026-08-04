@@ -46,6 +46,17 @@ const Etapa = z.object({
   descricao: z.string().min(1).max(1200),
   /** Ferramentas usadas NESTA etapa, pelo nome. Vazio quando é trabalho manual. */
   ferramentas: z.array(z.string().max(60)).max(8),
+  /**
+   * A fase do projeto: 1 fundação, 2 construção, 3 polimento e lançamento.
+   *
+   * OPCIONAL, E ISSO NÃO É INDECISÃO — é compatibilidade. Todo documento gerado
+   * antes desta mudança não tem o campo, e torná-lo obrigatório faria cada um
+   * deles falhar o `safeParse` e cair em `documentoIlegivel`: a pessoa abriria o
+   * projeto e veria "formato antigo" no lugar do plano que já tinha. O campo é
+   * pedido no prompt e usado quando vem; quando não vem, o quadro simplesmente
+   * não agrupa.
+   */
+  fase: z.number().int().min(1).max(3).optional(),
 });
 
 const Ferramenta = z.object({
