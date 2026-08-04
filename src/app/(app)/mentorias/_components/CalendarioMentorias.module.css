@@ -119,9 +119,13 @@
 .celulas {
   grid-column: 1;
   grid-row: 3;
+  /* A GRADE PERDEU A LINHA FORTE. Era `gap: 1px` sobre `--via-border-hairline`
+     mais uma borda externa da MESMA tinta: 42 células desenhando 71 traços do
+     mesmo peso, e o mês lia como planilha. Agora o fio é um véu de navy a 5%,
+     que separa sem riscar, e a moldura externa some — o raio e a sombra já
+     dizem onde a grade termina. */
   gap: 1px;
-  background: var(--via-border-hairline);
-  border: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-05);
   border-radius: var(--app-radius-card);
   overflow: hidden;
   box-shadow: var(--app-elev-1-shadow);
@@ -225,9 +229,8 @@
   /* `min-width: 0` no container E no título: sem os dois, o texto empurra a
      pastilha para fora da célula em vez de truncar. */
   min-width: 0;
-  padding: 2px var(--via-space-1_5) 2px var(--via-space-2);
-  border-left: 2px solid var(--via-navy-40);
-  border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
+  padding: 3px var(--via-space-2);
+  border-radius: var(--app-radius-chip);
   background: var(--via-navy-05);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -239,20 +242,20 @@
 
 /* Trilha por INTENSIDADE de navy, nunca por cor nova — categoria que vira cor é
    como uma paleta ganha seis tons que ninguém aprovou. */
-.marca[data-trilha='implementacao'] {
-  border-left-color: var(--via-navy);
+.marca[data-trilha='implementacao']::before {
+  background: var(--via-navy);
 }
 
-.marca[data-trilha='trafego'] {
-  border-left-color: var(--via-blue-soft);
+.marca[data-trilha='trafego']::before {
+  background: var(--via-blue-soft);
 }
 
-.marca[data-trilha='comercial'] {
-  border-left-color: var(--via-navy-40);
+.marca[data-trilha='comercial']::before {
+  background: var(--via-navy-40);
 }
 
-.marca[data-trilha='produto'] {
-  border-left-color: var(--via-navy-25);
+.marca[data-trilha='produto']::before {
+  background: var(--via-navy-25);
 }
 
 .marcaHora {
@@ -275,7 +278,6 @@
 
 .celula[data-fora] .marca {
   background: transparent;
-  border-left-color: var(--via-navy-20);
 }
 
 .celula[data-fora] .marcaHora {
@@ -352,8 +354,13 @@
   gap: var(--via-space-2_5);
 }
 
+/* Ponto, não barra: a legenda EXPLICA a pastilha, então tem que usar a mesma
+   forma que a pastilha usa. Com barra aqui e ponto lá, a legenda deixaria de
+   mapear o que está na grade. */
 .legendaBarra {
-  height: 14px;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
   border-radius: var(--via-radius-pill);
   background: var(--via-navy-40);
 }
@@ -470,15 +477,29 @@
 
 /* O item repete a gramática da marca na célula: barra de trilha à esquerda,
    horário em mono. Quem viu a célula reconhece o item sem aprender nada novo. */
+/* O PONTO substitui a barra à esquerda, igual à pastilha do mês — as regras de
+   trilha logo abaixo colorem este `::before`. Alinhado ao topo do bloco de horas
+   para acompanhar a primeira linha de texto. */
+.item::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--via-space-2_5) + 6px);
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-40);
+}
+
 .item {
   display: flex;
   align-items: flex-start;
   gap: var(--via-space-3);
   width: 100%;
   padding: var(--via-space-2_5) var(--via-space-3);
+  padding-left: var(--via-space-4);
   border: none;
-  border-left: 2px solid var(--via-navy-40);
-  border-radius: 0 var(--app-radius-chip) var(--app-radius-chip) 0;
+  border-radius: var(--app-radius-control);
   background: transparent;
   font-family: inherit;
   text-align: left;
@@ -490,20 +511,20 @@
   background: var(--via-bg-2);
 }
 
-.item[data-trilha='implementacao'] {
-  border-left-color: var(--via-navy);
+.item[data-trilha='implementacao']::before {
+  background: var(--via-navy);
 }
 
-.item[data-trilha='trafego'] {
-  border-left-color: var(--via-blue-soft);
+.item[data-trilha='trafego']::before {
+  background: var(--via-blue-soft);
 }
 
-.item[data-trilha='comercial'] {
-  border-left-color: var(--via-navy-40);
+.item[data-trilha='comercial']::before {
+  background: var(--via-navy-40);
 }
 
-.item[data-trilha='produto'] {
-  border-left-color: var(--via-navy-25);
+.item[data-trilha='produto']::before {
+  background: var(--via-navy-25);
 }
 
 /* Encerrada continua legível, só perde ênfase — some seria esconder histórico. */
@@ -653,7 +674,7 @@
   .marca {
     height: 4px;
     padding: 0;
-    border-left-width: 0;
+
     border-radius: var(--via-radius-pill);
     background: var(--via-navy-40);
   }
@@ -725,23 +746,40 @@
 
 /* Os chips sobem ACIMA da sobreposição. Sem isto o `::after` do número os
    cobriria e todo clique voltaria a selecionar o dia. */
+/* SEM BARRA À ESQUERDA. Ela marcava a trilha por cor, mas um fio vertical em
+   cada pastilha, em cada item do painel e em cada linha da legenda enchia a tela
+   de riscos — e num chip de 90px o traço competia com o próprio texto. A trilha
+   passa a ser um PONTO antes da hora: mesma informação, um sexto da tinta. */
 .marca {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
   width: 100%;
   border: 0;
-  border-left: 2px solid var(--via-navy-40);
   cursor: pointer;
   text-align: left;
   transition:
     background-color var(--app-t-state),
-    border-color var(--app-t-state);
+    box-shadow var(--app-t-state);
+}
+
+.marca::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-40);
 }
 
 /* PREMIUM É RESPOSTA, não ornamento: o chip precisa reagir ao dedo para ler como
    coisa clicável. Sem hover ele parecia etiqueta impressa na célula. */
+/* O realce de hover é a SUPERFÍCIE, não mais uma borda: um anel de 1px por
+   dentro ergue a pastilha sem acrescentar traço à tela. */
 .marca:hover {
   background: var(--via-navy-08);
-  border-left-color: var(--via-accent-ink);
+  box-shadow: inset 0 0 0 1px var(--via-navy-16);
 }
 
 .marca:focus-visible {
@@ -753,8 +791,11 @@
    passa a responder "onde eu já estou" num relance, que é o que a coluna de
    inscrições responde por escrito. */
 .marca[data-estado='inscrito'] {
-  border-left-color: var(--via-accent-ink);
-  background: color-mix(in srgb, var(--via-accent) 6%, transparent);
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+}
+
+.marca[data-estado='inscrito']::before {
+  background: var(--via-accent-ink);
 }
 
 .marca[data-estado='encerrada'] .marcaHora,

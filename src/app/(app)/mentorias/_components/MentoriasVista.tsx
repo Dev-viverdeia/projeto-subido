@@ -155,7 +155,33 @@ export function MentoriasVista({
         />
       ) : (
         <>
-          {destaque && (
+          {/* AS TABS ABREM A TELA, acima do cartão. Elas escolhem o MODO DE
+              LEITURA da agenda inteira — estavam abaixo do cartão, o que as
+              rebaixava a controle de uma seção quando na verdade governam tudo
+              que vem depois. */}
+          <div className={styles.chrome}>
+            {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
+            comentário do próprio `ControleSegmentado` já dizia que ele fora
+            extraído para substituir esta cópia e as abas de catálogo. A
+            cópia ficou para trás e, com ela, as setas do teclado: o
+            `role="tablist"` prometia navegação por seta e não entregava. */}
+            <ControleSegmentado
+              opcoes={[
+                { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
+                { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
+              ]}
+              ativa={vista}
+              aoMudar={(id) => setVista(id as IdVista)}
+              layoutId="mentorias-vista"
+              ariaLabel="Modo de visualização"
+            />
+          </div>
+
+          {/* O CARTÃO GRANDE É DA AGENDA, não da tela. No calendário ele repetia
+              em 400px de altura a mesma sessão que a grade já mostra na célula do
+              dia — e empurrava o mês inteiro para fora da dobra. A vista de
+              calendário É a visão geral; um destaque acima dela compete com ela. */}
+          {vista === 'agenda' && destaque && (
             <CartaoProxima
               sessao={destaque}
               estado={estadoComInscricao(destaque)}
@@ -168,24 +194,6 @@ export function MentoriasVista({
 
           <div className={styles.corpo} data-vista={vista}>
             <div className={styles.principal}>
-              <div className={styles.chrome}>
-                {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
-                comentário do próprio `ControleSegmentado` já dizia que ele fora
-                extraído para substituir esta cópia e as abas de catálogo. A
-                cópia ficou para trás e, com ela, as setas do teclado: o
-                `role="tablist"` prometia navegação por seta e não entregava. */}
-                <ControleSegmentado
-                  opcoes={[
-                    { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
-                    { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
-                  ]}
-                  ativa={vista}
-                  aoMudar={(id) => setVista(id as IdVista)}
-                  layoutId="mentorias-vista"
-                  ariaLabel="Modo de visualização"
-                />
-              </div>
-
               {vista === 'agenda' ? (
                 <AgendaMentorias
                   sessoes={futuras}

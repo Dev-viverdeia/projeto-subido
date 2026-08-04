@@ -169,14 +169,19 @@ a:hover {
  * O scrim ganha o mesmo tratamento: mais escuro, para o conteúdo de trás recuar
  * de verdade em vez de competir.
  * ------------------------------------------------------------------------- */
-.via-modal {
+/* CLASSE DOBRADA de propósito. `.via-modal` sozinha empata com a regra do DS
+   (0,1,0) e quem ganha passa a depender da ORDEM DE INJEÇÃO do CSS — que muda
+   entre dev e build, porque o CSS do componente é importado pelo próprio módulo.
+   Empate resolvido por ordem é aposta; `.via-modal.via-modal` (0,2,0) ganha
+   sempre, e o seletor continua sendo o mesmo elemento. */
+.via-modal.via-modal {
   background: var(--via-surface-elev, var(--via-surface));
   /* Elevação 3 = sobreposto. A hairline sobe junto com a superfície: sombra de um
      nível com linha de outro é o desvio que o CLAUDE.md nomeia. */
   border-color: var(--via-border);
 }
 
-.via-modal-scrim {
+.via-modal-scrim.via-modal-scrim {
   background: radial-gradient(
     circle at 50% 30%,
     color-mix(in srgb, var(--via-navy-deep) 62%, transparent),
