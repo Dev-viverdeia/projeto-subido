@@ -89,4 +89,15 @@ describe('etapas da sala', () => {
   it('sem documento não há denominador', () => {
     expect(contarTarefas(projeto())).toEqual({ feitas: 0, total: 0 });
   });
+
+  /* O AVANÇO só pode existir quando a próxima está destravada — um "continuar"
+     que esbarra num cadeado é a promessa que a etapa acabou de negar. A regra é
+     a mesma do travamento, consultada com o degrau SEGUINTE. */
+  it('o avanço respeita o mesmo cadeado da etapa de destino', () => {
+    const semStack = projeto({ documento: DOC, status: 'pronta' });
+    expect(motivoDoCadeado('construir', semStack)).not.toBeNull();
+
+    const comStack = projeto({ documento: DOC, status: 'pronta', stack: 'lovable_supabase' });
+    expect(motivoDoCadeado('construir', comStack)).toBeNull();
+  });
 });

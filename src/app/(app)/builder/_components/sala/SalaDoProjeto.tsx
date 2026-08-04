@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import type { SolucaoBuilder } from '@/lib/builder/queries';
 import { Visto } from '../../../_components/PillEstado';
 import { ETAPAS, contarTarefas, etapaInicial, motivoDoCadeado, type IdEtapa } from './etapas';
+import entrada from '../../../_components/entrada.module.css';
 import styles from './SalaDoProjeto.module.css';
 
 /**
@@ -43,8 +44,16 @@ export function SalaDoProjeto({
   const { feitas, total } = contarTarefas(solucao);
 
   const paineis: Record<IdEtapa, ReactNode> = { criacao, entender, kit, construir };
-  const atual = ETAPAS.find((e) => e.id === etapa) ?? ETAPAS[0]!;
+  const indice = ETAPAS.findIndex((e) => e.id === etapa);
+  const atual = ETAPAS[indice] ?? ETAPAS[0]!;
   const cadeadoAtual = motivoDoCadeado(etapa, solucao);
+
+  /* O AVANÇO EXPLÍCITO, que o stepper sozinho não dá. Clicar num degrau é
+     navegação; terminar uma etapa e seguir é conclusão, e são gestos diferentes.
+     Só existe quando a próxima está DESTRAVADA — um "continuar" que esbarra num
+     cadeado é a promessa que a etapa acabou de negar. */
+  const proxima = ETAPAS[indice + 1];
+  const podeAvancar = proxima && motivoDoCadeado(proxima.id, solucao) === null;
 
   return (
     <div className={styles.sala}>
@@ -106,7 +115,9 @@ export function SalaDoProjeto({
         })}
       </div>
 
-      <section className={styles.painel} aria-live="polite">
+      {/* `key` na etapa: mudar de degrau remonta o painel, e o remonte é o que
+          dispara a entrada — ver `entrada.troca`. */}
+      <section key={etapa} className={`${styles.painel} ${entrada.troca}`} aria-live="polite">
         <p className={styles.painelEyebrow}>
           <span className={styles.painelNumero} aria-hidden="true">
             {atual.numero}
@@ -121,6 +132,23 @@ export function SalaDoProjeto({
           </p>
         ) : (
           paineis[etapa]
+        )}
+
+        {!cadeadoAtual && podeAvancar && proxima && (
+          <div className={styles.avancoLinha}>
+            <button type="button" className={styles.avanco} onClick={() => setEtapa(proxima.id)}>
+              {proxima.id === 'construir' ? 'Começar a construir' : `Ir para ${proxima.rotulo}`}
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
         )}
       </section>
     </div>

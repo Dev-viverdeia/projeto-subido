@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { pedirGeracao } from '@/lib/builder/invocar';
 import type { RespostaClarificacao } from '@/lib/builder/schema';
+import entrada from '../../_components/entrada.module.css';
 import styles from './Entrevista.module.css';
 
 const LIMITE = 2000;
@@ -123,7 +124,11 @@ export function Entrevista({
         />
       </div>
 
-      <div className={styles.corpo}>
+      {/* `key` no índice: trocar de pergunta REMONTA o bloco, e é o remonte que
+          dispara a entrada. Sem ele o React só trocaria o texto e a animação
+          nunca rodaria — é o mesmo motivo pelo qual a grade paginada do catálogo
+          recebe chave por página. */}
+      <div key={atual} className={`${styles.corpo} ${entrada.troca}`}>
         <label className={styles.pergunta} htmlFor="resposta">
           {item.pergunta}
         </label>

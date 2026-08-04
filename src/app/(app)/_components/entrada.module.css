@@ -57,3 +57,39 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * TROCA — a entrada de um conteúdo que SUBSTITUI outro no mesmo lugar.
+ *
+ * A `.bloco` acima é para a chegada de uma TELA: 440ms com atrasos em cascata,
+ * pensada para quatro batidas que se sucedem. Usá-la numa troca em curso — passar
+ * de pergunta, mudar de etapa na sala — faria cada clique custar meio segundo de
+ * espera, e o que é boas-vindas na abertura vira lentidão no meio do caminho.
+ *
+ * Daí a segunda: 180ms, deslocamento de 6px e nenhum atraso. É o degrau de
+ * `--app-t-touch` porque é resposta a um toque — a pessoa clicou e o conteúdo
+ * chega. Estado e entrada nunca compartilham duração; aqui a entrada É a
+ * resposta, e a duração é a do gesto.
+ *
+ * `backwards` pelo mesmo motivo da `.bloco`, e ele importa mais aqui: `forwards`
+ * retém o valor animado, e um transform residual cria containing block para
+ * `position: fixed` de qualquer descendente. Num painel que hospeda modal, isso
+ * ancoraria o modal na seção em vez da viewport.
+ * ------------------------------------------------------------------------- */
+.troca {
+  opacity: 1;
+  animation: entrada-troca 180ms var(--via-ease-out) backwards;
+}
+
+@keyframes entrada-troca {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .troca {
+    animation: none;
+  }
+}
