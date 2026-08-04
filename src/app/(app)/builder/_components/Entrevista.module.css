@@ -1,265 +1,267 @@
-/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
-   arquivo já estão corrigidas.
-   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
-   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
-   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
-   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
-   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
-   medir de novo. */
-
-/* `text-wrap: pretty` nos textos secundários: a medida certa não impede a ÓRFÃ.
-   Medido nesta tela — "…compensa a API oficial / paga.", "…não tem onde /
-   encaixar." Uma palavra sozinha na última linha lê como erro de composição, e
-   `pretty` a puxa para cima sem mexer na largura. Só o último punhado de linhas é
-   reflowado, então não custa layout. */
-
-/* A entrevista é LEITURA E ESCRITA em coluna — largura de conteúdo, não de
-   canvas. Uma pergunta de 90 caracteres numa linha de 1600px força o olho a
-   varrer a tela inteira para achar o campo que fica embaixo dela. */
+/* A entrevista ocupa uma COLUNA DE LEITURA, não a página. É uma pergunta e um
+   campo: esticar isso na largura da tela faria o enunciado virar uma linha de
+   1200px e o campo, uma faixa. Quem fecha a medida é o bloco, porque aqui tudo
+   dentro dele precisa compartilhar a mesma borda. */
 .entrevista {
-  max-width: var(--via-content);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
 }
 
-/* A ideia original fica visível durante toda a entrevista: são as respostas DELA
-   que estão sendo dadas, e rolar de volta para reler é atrito puro. */
-.contexto {
-  padding: var(--app-pad-card-tight) var(--app-pad-card);
-  border-radius: var(--app-radius-card);
-  border: 1px solid var(--via-border-hairline);
-  /* Fundo levemente rebaixado: é citação, não campo. */
-  background: var(--via-navy-03);
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap-block);
 }
 
-.contextoRotulo {
-  margin: 0 0 var(--via-space-1);
+.ideia {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  /* Uma linha só: a ideia aqui é CONTEXTO, não leitura. Ela existe inteira na
+     etapa anterior e no cabeçalho do projeto. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ideiaRotulo {
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.topoDireita {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-shrink: 0;
+}
+
+/* Caixa-alta por CONTEÚDO ("PERGUNTA 1 DE 5"): precisa do tracking de eyebrow
+   mesmo sem `text-transform` — a necessidade vem da forma das letras. */
+.contador {
+  margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
-}
-
-.contextoTexto {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-}
-
-.cabecalho {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-}
-
-.titulo {
-  margin: 0;
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h3);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-}
-
-.subtitulo {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 52ch;
-  text-wrap: pretty;
-}
-
-.lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-4);
-}
-
-.item {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  gap: var(--via-space-4);
-  padding: var(--app-pad-card);
-  border-radius: var(--app-radius-card);
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-elev-1-bg);
-  transition: border-color var(--app-t-state);
-}
-
-/* `focus-within` e não `hover`: numa lista de campos, o que importa é onde o
-   cursor de texto está, não onde o mouse passou. */
-.item:focus-within {
-  border-color: var(--app-elev-2-line);
-}
-
-/* Respondida: o número sai do cinza e vira tinta. É a mesma regra do resto da
-   casa — hierarquia por cor SÓLIDA, nunca por opacidade. */
-.item[data-respondida] .numero {
-  color: var(--via-text-primary);
-}
-
-.numero {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
-  line-height: var(--via-lh-snug);
-  padding-top: 2px;
+  white-space: nowrap;
+}
+
+.sair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  background: none;
+  color: var(--via-text-muted);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.sair:hover {
+  background: var(--via-navy-04);
+  color: var(--via-text-primary);
+}
+
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.trilho {
+  height: 2px;
+  background: var(--via-navy-08);
+  overflow: hidden;
+}
+
+.preenchido {
+  display: block;
+  height: 100%;
+  /* `scaleX` e nunca `width`: width dispara layout a cada frame. */
+  transform-origin: left center;
+  background: var(--via-navy);
+  transition: transform var(--app-t-reveal);
 }
 
 .corpo {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1);
-  min-width: 0;
+  gap: var(--app-gap-stack);
+  margin-top: var(--via-space-4);
 }
 
+/* O ENUNCIADO É O PROTAGONISTA da tela. Corpo de display porque ele é a única
+   coisa que a pessoa precisa ler antes de escrever — e porque com uma pergunta
+   por vez sobra espaço para dar a ela o peso que ela tem. */
 .pergunta {
-  font-size: var(--via-fs-body);
+  font-family: var(--via-font-display);
+  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
   font-weight: 560;
-  letter-spacing: var(--app-ls-body);
+  letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
-  cursor: pointer;
-}
-
-.porque {
-  margin: 0 0 var(--via-space-2);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 50ch;
   text-wrap: pretty;
 }
 
-/* Raio concêntrico: item 20, padding 20 → o campo fica no degrau de controle. */
-.campo {
-  width: 100%;
-  resize: vertical;
-  min-height: 60px;
-  padding: var(--via-space-3);
-  border-radius: var(--app-radius-control);
-  border: 1px solid var(--via-border);
-  background: var(--via-bg);
-  color: var(--via-text-primary);
-  font-family: inherit;
+/* Subordinado ao enunciado: diz o que a resposta muda no projeto, sem competir
+   com a pergunta pela primeira leitura. */
+.porque {
+  margin: 0;
   font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
   line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  /* 52ch ≈ 68 caracteres no Geist (o `ch` desta fonte mede ~30% a menos que o
+     caractere médio; o alvo real é caracteres ÷ 1,3). */
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+/* O CONTADOR MORA DENTRO DA CAIXA, e é por isso que a caixa é que tem a borda:
+   um `0 / 2000` solto abaixo do campo lê como legenda de outra coisa. */
+.campoCaixa {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
   transition: border-color var(--app-t-state);
+}
+
+.campoCaixa:focus-within {
+  border-color: var(--via-navy-40);
+  box-shadow: var(--app-ring);
+}
+
+.campo {
+  min-height: 140px;
+  padding: var(--app-pad-card) var(--app-pad-card) var(--via-space-2);
+  border: 0;
+  background: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: var(--via-fs-body);
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+}
+
+/* O anel vive na CAIXA (regra acima); aqui ele é suprimido para não desenhar
+   duas vezes, uma na moldura e outra rente ao texto. */
+.campo:focus-visible {
+  outline: none;
 }
 
 .campo::placeholder {
   color: var(--via-text-faint);
 }
 
-.campo:hover {
-  border-color: var(--via-navy-16);
+.limite {
+  margin: 0;
+  padding: 0 var(--app-pad-card) var(--via-space-3);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
+/* `space-between` com um `<span />` vazio quando não há "Voltar": mantém o
+   avançar na direita em todas as perguntas, em vez de ele saltar para a esquerda
+   na primeira. */
 .rodape {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  flex-wrap: wrap;
-  padding-top: var(--via-space-4);
-  border-top: 1px solid var(--via-border-hairline);
+  margin-top: var(--via-space-2);
 }
 
-.progresso {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
+.voltar {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  border-radius: var(--app-radius-chip);
+  transition: color var(--app-t-state);
 }
 
-.contagem {
+.voltar:hover {
   color: var(--via-text-primary);
 }
 
-.aviso {
-  color: var(--via-text-faint);
-  text-transform: none;
-  letter-spacing: var(--app-ls-micro);
+.voltar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
-/* Sobre CLARO o preenchimento é navy — accent sobre branco dá 2,70:1 e reprova
-   AA até para texto grande. Não há banda escura em nenhuma tela do Builder, então
-   o accent simplesmente não aparece neste pilar. */
-.acao {
+.avancar {
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-2);
-  min-height: var(--app-h-control);
-  padding-inline: var(--via-space-5);
-  border: 0;
+  height: 44px;
+  padding-inline: var(--via-space-6);
+  border: 1px solid var(--via-navy);
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
-  color: var(--via-white);
   font-family: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-sm);
+  color: var(--via-white);
   cursor: pointer;
   transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
+    background var(--app-t-state),
+    border-color var(--app-t-state);
 }
 
-.acao:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--via-shadow-md);
+.avancar:hover:not(:disabled) {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
 }
 
-.acao:active {
-  transform: translateY(0);
+.avancar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
-.acao:disabled {
-  cursor: not-allowed;
-  background: var(--via-navy-16);
-  color: var(--via-text-faint);
+.avancar:disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 .erro {
   margin: 0;
-  padding: var(--via-space-3) var(--via-space-4);
-  border-radius: var(--app-radius-control);
+  padding: var(--app-pad-card-tight);
   border: 1px solid var(--via-border);
-  background: var(--via-surface);
+  border-radius: var(--app-radius-control);
   font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-primary);
+  color: var(--via-text-body);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .item,
-  .campo,
-  .acao {
+  .preenchido,
+  .campoCaixa,
+  .sair,
+  .voltar,
+  .avancar {
     transition: none;
   }
-
-  .acao:hover {
-    transform: none;
-  }
-}
-
-/* Por último: qualquer box-shadow de classe apaga o anel do DS (`:where()`, zero
-   de especificidade). O botão tem sombra no hover — por isso é redeclarado. */
-.campo:focus-visible,
-.acao:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
 }

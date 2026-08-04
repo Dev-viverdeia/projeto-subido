@@ -1,30 +1,37 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { pedirGeracao } from '@/lib/builder/invocar';
 import type { RespostaClarificacao } from '@/lib/builder/schema';
 import styles from './Entrevista.module.css';
 
+const LIMITE = 2000;
+
 /**
- * A entrevista — passo 2 de 2.
+ * A entrevista — UMA PERGUNTA POR VEZ.
  *
- * As perguntas vêm do banco (foram gravadas junto do rascunho), não de um estado
- * que sobreviveu à navegação. É o que torna o rascunho retomável: recarregar,
- * fechar a aba, abrir no outro computador — as mesmas perguntas.
+ * O QUE MUDOU E POR QUÊ. Antes as cinco perguntas vinham numa lista só, com um
+ * `textarea` de duas linhas cada. A lista é honesta e é o formato errado para
+ * este momento: cinco campos abertos ao mesmo tempo leem como formulário de
+ * cadastro, e a pessoa varre tudo procurando o mais fácil em vez de responder. Um
+ * campo por tela devolve o peso de cada pergunta — e o campo grande convida a
+ * escrever, que é exatamente o que a geração precisa.
  *
- * NENHUMA RESPOSTA É OBRIGATÓRIA, E ISSO É DELIBERADO.
- * Travar o botão até tudo estar preenchido é a forma mais rápida de fazer alguém
- * escrever "não sei" cinco vezes — resposta pior que campo vazio, porque entra no
- * prompt como se fosse informação. O que falta é DITO, com número, e a decisão
- * fica com quem conhece o cliente.
+ * NENHUMA RESPOSTA É OBRIGATÓRIA, e isso sobrevive à mudança. Travar o avanço até
+ * o campo ter texto é a forma mais rápida de fazer alguém escrever "não sei" cinco
+ * vezes — resposta pior que campo vazio, porque entra no prompt como se fosse
+ * informação. "Próxima pergunta" está sempre habilitada.
  *
- * ESTE COMPONENTE NÃO TEM MAIS TELA DE ESPERA, e a razão é arquitetural. A Edge
- * Function aceita o pedido e responde em milissegundos: quem gera é uma tarefa de
- * fundo, e quem conta a espera é o `EstadoGeracao`, que lê o status do banco.
- * Manter aqui um segundo cronômetro seria duas telas de espera para a mesma
- * espera — e elas divergiriam no primeiro reload.
+ * "VOLTAR" SÓ APARECE A PARTIR DA SEGUNDA. Na primeira ele não teria destino
+ * dentro da entrevista, e um botão que não faz nada ensina a ignorar os que
+ * fazem. Para sair existe o X, que é outra intenção.
+ *
+ * AS RESPOSTAS VIVEM NA MEMÓRIA ATÉ A GERAÇÃO — igual à versão anterior. As
+ * PERGUNTAS vêm do banco, então o rascunho é retomável; as respostas ainda não
+ * são. Com uma pergunta por vez isso pesa mais que antes (a pessoa pode estar na
+ * quinta), e é dívida assumida, não esquecida: gravar a cada avanço precisa de uma
+ * Server Action própria, que não entra junto com a mudança de layout.
  */
 export function Entrevista({
   id,
@@ -37,22 +44,30 @@ export function Entrevista({
 }) {
   const router = useRouter();
   const [respostas, setRespostas] = useState(perguntas);
+  const [atual, setAtual] = useState(0);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const campoRef = useRef<HTMLTextAreaElement>(null);
 
-  const respondidas = respostas.filter((r) => r.resposta.trim().length > 0).length;
-  const vazias = respostas.length - respondidas;
+  const item = respostas[atual];
+  const ultima = atual === respostas.length - 1;
 
-  function responder(indice: number, valor: string) {
-    setRespostas((atual) =>
-      atual.map((r, i) => (i === indice ? { ...r, resposta: valor.slice(0, 2000) } : r)),
+  /* O foco acompanha a pergunta. Sem isto, avançar deixaria o foco no botão e
+     quem usa teclado teria de tabular de volta ao campo a cada pergunta. */
+  useEffect(() => {
+    campoRef.current?.focus();
+  }, [atual]);
+
+  if (!item) return null;
+
+  function responder(valor: string) {
+    setRespostas((lista) =>
+      lista.map((r, i) => (i === atual ? { ...r, resposta: valor.slice(0, LIMITE) } : r)),
     );
   }
 
-  async function gerar(evento: React.FormEvent) {
-    evento.preventDefault();
+  async function gerar() {
     if (enviando) return;
-
     setEnviando(true);
     setErro(null);
 
@@ -64,83 +79,101 @@ export function Entrevista({
       return;
     }
 
-    /* `refresh()` e não `push()`: a URL já é a certa. O servidor re-renderiza a
-       mesma rota, agora com status `gerando`, e o `EstadoGeracao` assume a espera.
-       `enviando` não é zerado — este formulário está de saída. */
+    /* `refresh()` e não `push()`: a URL já é a certa. O servidor re-renderiza com
+       status `gerando` e o `EstadoGeracao` assume a espera. `enviando` não é
+       zerado — este formulário está de saída. */
     router.refresh();
   }
 
   return (
-    <form
-      className={styles.entrevista}
-      onSubmit={(evento) => {
-        void gerar(evento);
-      }}
-    >
-      <div className={styles.contexto}>
-        <p className={styles.contextoRotulo}>A ideia</p>
-        <p className={styles.contextoTexto}>{ideia}</p>
-      </div>
-
-      <div className={styles.cabecalho}>
-        <h2 className={styles.titulo}>O que falta para projetar</h2>
-        <p className={styles.subtitulo}>
-          Cada resposta muda a arquitetura. Deixe em branco o que não souber: lacuna atrapalha menos
-          que chute.
+    <div className={styles.entrevista}>
+      <header className={styles.topo}>
+        <p className={styles.ideia}>
+          <span className={styles.ideiaRotulo}>Sua ideia:</span> {ideia}
         </p>
-      </div>
 
-      {/* `data-respondida` é a única pista de PROGRESSO dentro da lista. Sem ela o
-          rodapé dizia "1 de 3 respondidas" e o olho não achava QUAL — três cards
-          idênticos. A distinção é por cor sólida no número, não por ícone: a lista
-          é de texto, e um check seria o único glifo da tela. */}
-      <ol className={styles.lista}>
-        {respostas.map((item, indice) => (
-          <li
-            key={item.pergunta}
-            className={styles.item}
-            data-respondida={item.resposta.trim().length > 0 ? '' : undefined}
+        <div className={styles.topoDireita}>
+          {/* Caixa-alta por CONTEÚDO: precisa do tracking de eyebrow mesmo sem
+              `text-transform`, porque a necessidade vem da forma das letras. */}
+          <p className={styles.contador} aria-live="polite">
+            Pergunta {atual + 1} de {respostas.length}
+          </p>
+          <button
+            type="button"
+            className={styles.sair}
+            onClick={() => router.push('/builder')}
+            aria-label="Sair da entrevista e voltar aos projetos"
           >
-            <span className={styles.numero}>{String(indice + 1).padStart(2, '0')}</span>
-
-            <div className={styles.corpo}>
-              <label className={styles.pergunta} htmlFor={`pergunta-${indice}`}>
-                {item.pergunta}
-              </label>
-              <p className={styles.porque}>{item.porque}</p>
-              <textarea
-                id={`pergunta-${indice}`}
-                className={styles.campo}
-                rows={2}
-                value={item.resposta}
-                onChange={(evento) => responder(indice, evento.target.value)}
-                placeholder="Sua resposta"
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="m4 4 8 8M12 4l-8 8"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
               />
-            </div>
-          </li>
-        ))}
-      </ol>
+            </svg>
+          </button>
+        </div>
+      </header>
 
-      <div className={styles.rodape}>
-        <p className={styles.progresso}>
-          <span className={styles.contagem}>{respondidas}</span> de{' '}
-          <span className={styles.contagem}>{respostas.length}</span> respondidas
-          {vazias > 0 ? (
-            <span className={styles.aviso}> · o projeto sai com menos precisão</span>
-          ) : null}
-        </p>
-
-        <button type="submit" className={styles.acao} disabled={enviando}>
-          {enviando ? 'Iniciando…' : 'Gerar o projeto'}
-          <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
-        </button>
+      <div className={styles.trilho} aria-hidden="true">
+        <span
+          className={styles.preenchido}
+          style={{ transform: `scaleX(${(atual + 1) / respostas.length})` }}
+        />
       </div>
 
-      {erro ? (
+      <div className={styles.corpo}>
+        <label className={styles.pergunta} htmlFor="resposta">
+          {item.pergunta}
+        </label>
+
+        {/* O `porque` não está na referência, e fica: é dado que o modelo produziu
+            explicando o que aquela pergunta muda no projeto. Subordinado ao
+            enunciado, nunca competindo com ele. */}
+        {item.porque && <p className={styles.porque}>{item.porque}</p>}
+
+        <div className={styles.campoCaixa}>
+          <textarea
+            id="resposta"
+            ref={campoRef}
+            className={styles.campo}
+            value={item.resposta}
+            maxLength={LIMITE}
+            onChange={(e) => responder(e.target.value)}
+            placeholder="Escreva o que souber. Pode deixar em branco."
+          />
+          <p className={styles.limite}>
+            {item.resposta.length} / {LIMITE}
+          </p>
+        </div>
+      </div>
+
+      <footer className={styles.rodape}>
+        {/* Só a partir da segunda — na primeira não há destino. */}
+        {atual > 0 ? (
+          <button type="button" className={styles.voltar} onClick={() => setAtual(atual - 1)}>
+            Voltar
+          </button>
+        ) : (
+          <span />
+        )}
+
+        <button
+          type="button"
+          className={styles.avancar}
+          disabled={enviando}
+          onClick={() => (ultima ? void gerar() : setAtual(atual + 1))}
+        >
+          {ultima ? (enviando ? 'Iniciando…' : 'Gerar o projeto') : 'Próxima pergunta'}
+        </button>
+      </footer>
+
+      {erro && (
         <p className={styles.erro} role="alert">
           {erro}
         </p>
-      ) : null}
-    </form>
+      )}
+    </div>
   );
 }
