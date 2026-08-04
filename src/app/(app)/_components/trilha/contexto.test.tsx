@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { DefinirTrilha, ProvedorDeTrilha, useTrilha } from './contexto';
-import { trilhaDaSecao } from './TrilhaDoCabecalho';
+import { encurtar, trilhaDaSecao } from './TrilhaDoCabecalho';
 
 /**
  * O QUE ESTE TESTE PROTEGE, e por que ele existe.
@@ -97,5 +97,55 @@ describe('trilha derivada da rota', () => {
 
   it('devolve null fora das rotas do app — o cabeçalho não inventa degrau', () => {
     expect(trilhaDaSecao('/nao-existe')).toBeNull();
+  });
+});
+
+/**
+ * O ENCURTAMENTO NASCEU DE UM LAYOUT QUEBRADO, e o defeito não era do texto: a
+ * faixa do shell era `1fr`, que tem mínimo automático `auto` e não encolhe abaixo
+ * do min-content. Com a trilha em `white-space: nowrap`, um rótulo de 300
+ * caracteres (o Builder usa a ideia inteira enquanto não há título gerado) fazia a
+ * faixa crescer, a página ganhar rolagem horizontal, e todo bloco centralizado por
+ * `margin-inline: auto` centralizar dentro da largura ESTOURADA — indo parar fora
+ * da tela.
+ *
+ * A faixa virou `minmax(0, 1fr)` e o cabeçalho ganhou `min-width: 0`. Este teste
+ * cobre a outra metade: o corte no componente, que protege o leitor de tela — o
+ * elemento com `aria-current="page"` carregaria a string inteira mesmo com o CSS
+ * truncando o pixel.
+ */
+describe('encurtar do degrau atual', () => {
+  it('deixa passar o que já é curto, sem reticências', () => {
+    expect(encurtar('Qualificação de leads')).toBe('Qualificação de leads');
+  });
+
+  it('corta na palavra, não no caractere', () => {
+    const longo =
+      'Meu cliente tem uma clínica com 4 recepcionistas e recebe muitas mensagens por mês';
+    const curto = encurtar(longo);
+
+    expect(curto.length).toBeLessThanOrEqual(73);
+    expect(curto.endsWith('…')).toBe(true);
+    /* Corte na palavra: nada de "recepcionist…" no meio de uma sílaba. */
+    expect(curto.slice(0, -1).trim()).toBe(
+      curto
+        .slice(0, -1)
+        .trim()
+        .replace(/\S$/, (c) => c),
+    );
+    expect(longo.startsWith(curto.slice(0, -1))).toBe(true);
+    expect(curto.slice(0, -1).endsWith(' ')).toBe(false);
+  });
+
+  /* Uma palavra só, gigante — um slug colado, uma URL. Não há espaço onde cortar,
+     e o corte seco é o único possível. */
+  it('sem espaço onde cortar, corta seco em vez de estourar', () => {
+    const curto = encurtar('a'.repeat(200));
+    expect(curto.length).toBeLessThanOrEqual(73);
+    expect(curto.endsWith('…')).toBe(true);
+  });
+
+  it('normaliza espaço em branco antes de medir', () => {
+    expect(encurtar('  Qualificação   de \n leads  ')).toBe('Qualificação de leads');
   });
 });

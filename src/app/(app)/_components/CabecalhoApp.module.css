@@ -1,7 +1,12 @@
+/* `min-width: 0` É O PAR OBRIGATÓRIO do `minmax(0, 1fr)` da faixa do shell.
+   Faixa que encolhe não basta: o ITEM do grid tem `min-width: auto` por padrão e
+   transbordaria a faixa em vez de encolher. Os dois juntos são o que faz a
+   trilha truncar em vez de empurrar a página. */
 .cabecalho {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
+  min-width: 0;
   min-height: 60px;
   padding-inline: var(--via-space-4);
 

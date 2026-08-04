@@ -42,6 +42,36 @@ function Chevron() {
 const INICIO = '/inicio';
 
 /**
+ * O rótulo do degrau atual, encurtado NA PALAVRA.
+ *
+ * POR QUE NO COMPONENTE E NÃO EM CADA CHAMADOR. O truncamento por CSS resolve o
+ * pixel e não resolve o resto: o elemento com `aria-current="page"` continua
+ * carregando a string inteira, e o leitor de tela lê os 300 caracteres da ideia
+ * do Builder de ponta a ponta. Cortar aqui protege TODA tela de uma vez, inclusive
+ * as que ainda não existem — e um chamador não precisa saber que o cabeçalho tem
+ * limite.
+ *
+ * 72 caracteres é o teto: acima disso o degrau já não cabe em nenhuma largura sem
+ * reticências, e o que sobra deixou de ser identificação para virar leitura.
+ *
+ * CORTE NA PALAVRA e não no caractere. "Meu cliente tem uma clíni…" lê como texto
+ * quebrado; "Meu cliente tem uma clínica com 4…" lê como resumo. A diferença é um
+ * `lastIndexOf(' ')`.
+ */
+const TETO = 72;
+
+export function encurtar(texto: string): string {
+  const limpo = texto.replace(/\s+/g, ' ').trim();
+  if (limpo.length <= TETO) return limpo;
+
+  const corte = limpo.slice(0, TETO);
+  const espaco = corte.lastIndexOf(' ');
+  /* Sem espaço no trecho (uma palavra gigante, um slug colado) o corte seco é o
+     único possível — e aí as reticências são a única pista mesmo. */
+  return `${espaco > TETO * 0.6 ? corte.slice(0, espaco) : corte}…`;
+}
+
+/**
  * A trilha de uma tela de LISTAGEM, derivada só da rota.
  *
  * Exportada porque é lógica pura e tem teste próprio — e porque o caso de borda
@@ -90,8 +120,10 @@ export function TrilhaDoCabecalho() {
 
       {/* `aria-current="page"` é o que diz ao leitor de tela qual degrau é o
           atual — sem ele a trilha vira três textos soltos. */}
-      <span className={styles.atual} aria-current="page">
-        {trilha.atual}
+      {/* `title` com o texto INTEIRO: encurtar não pode custar a informação para
+          quem quer conferir onde está. */}
+      <span className={styles.atual} aria-current="page" title={trilha.atual}>
+        {encurtar(trilha.atual)}
       </span>
     </nav>
   );

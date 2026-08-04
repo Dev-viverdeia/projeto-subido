@@ -30,7 +30,16 @@
      e o resto cai por auto-placement, na ordem do DOM: cabeçalho na linha 1 da
      coluna 2, conteúdo na linha 2. Menos acoplamento, mesmo resultado. */
   .shell {
-    grid-template-columns: 240px 1fr;
+    /* `minmax(0, 1fr)` E NUNCA `1fr`. Uma faixa `1fr` tem mínimo automático
+       `auto`, o que a impede de encolher abaixo do min-content dos seus itens —
+       e o cabeçalho tem a trilha com `white-space: nowrap`. Bastou um título
+       longo (o Builder usa a ideia inteira como rótulo enquanto não há título
+       gerado) para a faixa crescer até caber a frase, levar a página junto e
+       aparecer barra de rolagem horizontal. Todo bloco centralizado por
+       `margin-inline: auto` passava a centralizar dentro da largura ESTOURADA,
+       indo parar fora da tela.
+       Nada em tsc, eslint, build ou nos gates percebe: é layout. */
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 
   .sidebar {
