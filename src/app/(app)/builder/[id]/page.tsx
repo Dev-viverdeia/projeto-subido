@@ -84,7 +84,9 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
       </div>
 
       <div className={entrada.bloco}>
-        {solucao.status === 'gerando' ? <EstadoGeracao id={solucao.id} /> : null}
+        {solucao.status === 'gerando' ? (
+          <EstadoGeracao id={solucao.id} ideia={solucao.ideiaOriginal} />
+        ) : null}
 
         {solucao.status === 'falhou' && solucao.erro ? (
           <p className={styles.falha} role="alert">

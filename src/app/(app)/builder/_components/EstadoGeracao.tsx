@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { voltarParaEntrevista } from '@/lib/builder/actions';
+import { PainelEspera } from './PainelEspera';
 import styles from './EstadoGeracao.module.css';
 
 /** ~4 minutos de tentativas. Além disso a geração não voltou mais — e insistir
@@ -30,7 +31,18 @@ const INTERVALO = 6000;
  * `rascunho` ou `falhou`, e não havia nada que mudasse o status de volta. A
  * instrução existia, o caminho não. Agora o botão é a Server Action que destrava.
  */
-export function EstadoGeracao({ id }: { id: string }) {
+/**
+ * Os passos da GERAÇÃO, na ordem em que o documento é escrito. Não são chamadas
+ * separadas — são as fases de uma só, narradas. O último fica ativo até o status
+ * virar `pronta` no banco, que é o sinal REAL de término.
+ */
+const PASSOS = [
+  'Lendo a sua ideia e as respostas',
+  'Desenhando a arquitetura da solução',
+  'Escrevendo o passo a passo e os prompts',
+];
+
+export function EstadoGeracao({ id, ideia }: { id: string; ideia: string }) {
   const router = useRouter();
   const [tentativas, setTentativas] = useState(0);
   const desistiu = tentativas >= TENTATIVAS;
@@ -45,54 +57,38 @@ export function EstadoGeracao({ id }: { id: string }) {
   }, [tentativas, desistiu, router]);
 
   return (
-    <div className={styles.estado} role="status" aria-live="polite">
-      {/* O ponto ganha RÓTULO. Sozinho acima do título ele lia como sujeira de
-          renderização; na linha do eyebrow ele vira o mesmo padrão de rótulo
-          que o resto do produto usa, e o estado fica escrito além de pulsar. */}
-      <p className={styles.estagio}>
-        <span className={styles.pulso} data-parado={desistiu ? '' : undefined} aria-hidden="true" />
-        {desistiu ? 'Sem resposta' : 'Gerando'}
-      </p>
-
-      <h2 className={styles.titulo}>
-        {desistiu ? 'A geração não respondeu' : 'Este projeto está sendo escrito'}
-      </h2>
-
-      <p className={styles.texto}>
-        {desistiu
-          ? 'Ela ficou marcada como em andamento por tempo demais, o que normalmente significa que a chamada morreu no meio. Suas respostas continuam salvas — volte à entrevista e gere de novo.'
-          : 'Arquitetura, ferramentas, passo a passo, prompts, riscos e a conta da economia. Leva de um a três minutos, e continua rodando mesmo se você fechar a aba — o projeto vai estar aqui quando você voltar.'}
-      </p>
-
-      {/* Número protagonista: o tempo decorrido é o que diz se a espera está
-          andando ou travada. Um pulso sozinho não distingue as duas coisas. */}
-      {!desistiu ? (
-        <p className={styles.cronometro}>
-          {/* Um nó de texto só. Com o "s" num irmão do `<span>`, a fronteira do
-              inline-block abria um vão visível entre o número e a unidade —
-              "168 s". `padStart(3)` + `tabular-nums` já travam a largura, então
-              o `min-width` que existia para isso era redundante. */}
-          {`${String(tentativas * (INTERVALO / 1000)).padStart(3, '0')}s`}
-        </p>
-      ) : null}
-
-      {desistiu ? (
-        <form action={voltarParaEntrevista} className={styles.acoes}>
-          <input type="hidden" name="id" value={id} />
-          <Destravar />
-          <button
-            type="button"
-            className={styles.secundaria}
-            onClick={() => {
-              setTentativas(0);
-              router.refresh();
-            }}
-          >
-            Verificar de novo
-          </button>
-        </form>
-      ) : null}
-    </div>
+    <PainelEspera
+      rotulo="Geração"
+      ideia={ideia}
+      passos={PASSOS}
+      /* ~50s por fase: a geração leva de 1 a 3 minutos, então os dois primeiros
+         passos cobrem a primeira metade e o terceiro segura o resto da espera. */
+      intervalo={50_000}
+      falha={
+        desistiu ? (
+          <div className={styles.falha}>
+            <p className={styles.falhaTexto}>
+              A geração ficou marcada como em andamento por tempo demais, o que normalmente
+              significa que a chamada morreu no meio. Suas respostas continuam salvas.
+            </p>
+            <form action={voltarParaEntrevista} className={styles.acoes}>
+              <input type="hidden" name="id" value={id} />
+              <Destravar />
+              <button
+                type="button"
+                className={styles.secundaria}
+                onClick={() => {
+                  setTentativas(0);
+                  router.refresh();
+                }}
+              >
+                Verificar de novo
+              </button>
+            </form>
+          </div>
+        ) : undefined
+      }
+    />
   );
 }
 

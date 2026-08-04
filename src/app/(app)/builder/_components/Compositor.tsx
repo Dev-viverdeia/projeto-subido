@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { pedirPerguntas } from '@/lib/builder/invocar';
+import { PainelEspera } from './PainelEspera';
 import { EXEMPLOS } from './exemplos';
 import styles from './Compositor.module.css';
 
@@ -104,6 +105,25 @@ export function Compositor() {
       campo.focus();
       requestAnimationFrame(() => campo.setSelectionRange(texto.length, texto.length));
     }
+  }
+
+  /* Os passos da ANÁLISE — as fases da chamada que escreve as perguntas. Elas
+     acontecem de verdade; o que a lista faz é narrar o que está em curso em vez
+     de deixar a pessoa olhando para um botão desabilitado. Ver `PainelEspera`. */
+  if (ocupado) {
+    return (
+      <PainelEspera
+        rotulo="Análise"
+        ideia={ideia}
+        passos={[
+          'Lendo a sua ideia',
+          'Mapeando o que você já definiu',
+          'Escrevendo perguntas sobre o seu projeto',
+        ]}
+        /* A análise leva ~10–25s: fases mais curtas que as da geração. */
+        intervalo={6000}
+      />
+    );
   }
 
   return (
