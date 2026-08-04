@@ -133,8 +133,11 @@
   flex-direction: column;
   gap: var(--via-space-2);
   /* Altura FIXA e seis semanas sempre: a grade não pode mudar de altura ao
-     navegar entre meses. */
-  min-height: 112px;
+     navegar entre meses.
+     96 e não 112: com no máximo duas pastilhas mais o "+N mais", o conteúdo
+     ocupa ~62px. Os 112 deixavam metade da célula vazia em SEIS fileiras, o que
+     esticava o mês por 672px de altura só de calha. */
+  min-height: 96px;
   padding: var(--via-space-2_5) var(--via-space-2);
   border: none;
   background: var(--via-surface);
@@ -222,6 +225,9 @@
   display: flex;
   align-items: baseline;
   gap: var(--via-space-1_5);
+  /* `min-width: 0` no container E no título: sem os dois, o texto empurra a
+     pastilha para fora da célula em vez de truncar. */
+  min-width: 0;
   padding: 2px var(--via-space-1_5) 2px var(--via-space-2);
   border-left: 2px solid var(--via-navy-40);
   border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
@@ -256,11 +262,18 @@
   color: var(--via-text-primary);
 }
 
-.marcaTrilha {
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-text-faint);
+/* O TÍTULO, não as iniciais do mentor. Fonte de TEXTO e não mono: a mono é para
+   número (a hora ao lado), e um título em mono numa caixa de 90px lê como código.
+   Uma linha só, com reticências — a célula do mês é resumo, não leitura. */
+.marcaTitulo {
+  min-width: 0;
+  font-family: inherit;
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .celula[data-fora] .marca {

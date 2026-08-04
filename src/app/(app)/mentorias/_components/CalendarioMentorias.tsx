@@ -6,7 +6,6 @@ import type { TrilhaMentor } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { chaveDoDia, horaCurta } from './estadoMentoria';
-import { iniciais } from '../../_components/iniciais';
 import styles from './CalendarioMentorias.module.css';
 
 const SEMANA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
@@ -113,9 +112,11 @@ export function CalendarioMentorias({
   }, [doDia, dataSelecionada, sessoes]);
 
   /* Quantas sessões cada trilha tem no mês VISÍVEL. Alimenta a legenda, que
-     existe porque a célula mostra siglas (IMP/TRF/COM/PRD) e sigla sem legenda é
-     charada. E resolve, com informação de verdade, a calha morta que sobrava sob
-     o painel do dia. */
+     existe porque a célula codifica a trilha em COR — e cor sem legenda é
+     charada. (O comentário antigo dizia que a célula mostrava siglas; ela nunca
+     mostrou. Mostrava as iniciais do MENTOR, que é outra coisa e não informava
+     nada.) E resolve, com informação de verdade, a calha morta que sobrava sob o
+     painel do dia. */
   const porTrilhaNoMes = useMemo(() => {
     const conta = new Map<TrilhaMentor, number>();
     for (const s of sessoes) {
@@ -205,17 +206,17 @@ export function CalendarioMentorias({
               </span>
 
               <span className={styles.marcas}>
-                {lista.slice(0, 2).map((s) => {
-                  const mentor = s.mentor;
-                  return (
-                    <span key={s.id} className={styles.marca} data-trilha={mentor?.trilha}>
-                      <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
-                      <span className={styles.marcaTrilha}>
-                        {mentor ? iniciais(mentor.nome) : ''}
-                      </span>
-                    </span>
-                  );
-                })}
+                {lista.slice(0, 2).map((s) => (
+                  /* HORA + TÍTULO. Antes eram hora + iniciais do mentor, e as
+                     iniciais não dizem nada aqui: numa agenda com um time só,
+                     toda célula do mês virava "ES". O que a pessoa procura ao
+                     bater o olho no mês é DO QUE é a sessão — a trilha já está
+                     dita pela cor da barra à esquerda, que a legenda mapeia. */
+                  <span key={s.id} className={styles.marca} data-trilha={s.mentor?.trilha}>
+                    <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
+                    <span className={styles.marcaTitulo}>{s.titulo}</span>
+                  </span>
+                ))}
                 {lista.length > 2 && <span className={styles.mais}>+{lista.length - 2} mais</span>}
               </span>
             </button>

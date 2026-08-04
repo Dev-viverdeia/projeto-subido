@@ -52,8 +52,16 @@
   top: calc(68px + var(--via-space-5));
 }
 
+/* Na vista de calendário o trilho desce para baixo da grade, e sem teto ele
+   esticava por toda a largura da página — um card de conteúdo curto com 1200px
+   de linha, que é a mesma "faixa" que a regra da casa proíbe nos cards de
+   solução. Ancorado à direita, com a MESMA medida da coluna lateral do
+   calendário (`clamp(300px, 23vw, 360px)`), ele lê como continuação daquela
+   coluna em vez de um bloco solto. */
 .corpo[data-vista='calendario'] .apoio {
   position: static;
+  width: clamp(300px, 23vw, 360px);
+  margin-left: auto;
 }
 
 /* A régua de vista fica sozinha na linha, alinhada à esquerda: é o controle mais

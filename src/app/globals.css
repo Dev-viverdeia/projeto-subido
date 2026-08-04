@@ -147,3 +147,39 @@ a:hover {
 :is(p, li, dd, dt, blockquote, figcaption) a:hover {
   text-decoration: underline;
 }
+
+/* ---------------------------------------------------------------------------
+ * MODAL — superfície SÓLIDA, porque o vidro do DS nunca chegou a acontecer.
+ *
+ * O `Modal.css` do DS declara `-webkit-backdrop-filter` AO LADO da versão sem
+ * prefixo, tanto no painel quanto no scrim. É exatamente a armadilha registrada
+ * no CLAUDE.md: o Lightning CSS já prefixa pelo browserslist e, ao encontrar a
+ * duplicata manual, DESCARTA AS DUAS. Resultado medido em tela: o painel fica com
+ * `--via-glass-card` (translúcido) e ZERO desfoque — dá para ler o calendário
+ * inteiro através do modal, e o texto do modal disputa espaço com o texto de
+ * trás. Não era estilo, era um bug de build.
+ *
+ * O DS é vendorizado e não se edita, então a correção mora aqui. E ela não tenta
+ * consertar o blur: troca a translucidez por SUPERFÍCIE SÓLIDA. Vidro que depende
+ * de `backdrop-filter` é uma aposta — some em qualquer navegador que não suporte,
+ * e o `@supports` que a casa exige para todo `backdrop-filter` cairia justamente
+ * no fundo sólido. Num painel que carrega decisão (fazer check-in, cancelar), a
+ * legibilidade não pode depender de um recurso opcional.
+ *
+ * O scrim ganha o mesmo tratamento: mais escuro, para o conteúdo de trás recuar
+ * de verdade em vez de competir.
+ * ------------------------------------------------------------------------- */
+.via-modal {
+  background: var(--via-surface-elev, var(--via-surface));
+  /* Elevação 3 = sobreposto. A hairline sobe junto com a superfície: sombra de um
+     nível com linha de outro é o desvio que o CLAUDE.md nomeia. */
+  border-color: var(--via-border);
+}
+
+.via-modal-scrim {
+  background: radial-gradient(
+    circle at 50% 30%,
+    color-mix(in srgb, var(--via-navy-deep) 62%, transparent),
+    color-mix(in srgb, var(--via-navy-deep) 78%, transparent)
+  );
+}
