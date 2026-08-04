@@ -1,14 +1,17 @@
-/* A PÁGINA VAI AO CANVAS; quem tem teto é o VÍDEO.
-   O limite anterior era da página inteira, e o motivo era real: 16:9 é uma
-   restrição dura, e a coluna do player a 1200px produz 675 de ALTURA — a
-   navegação da aula nasce fora da dobra em qualquer notebook.
+/* A LARGURA DA PÁGINA É A SOMA DAS DUAS COLUNAS, e isso conserta um desalinhamento
+   que eu mesmo criei.
 
-   Mas travar a página para proteger o vídeo cobrava o preço do resto da tela. O
-   teto migrou para a COLUNA do player (1000px → ~562 de altura, que cabe), e a
-   playlist ganhou a folga. A grade se centraliza no canvas em vez de encostar à
-   esquerda: sobra menos de 80px de cada lado a 1600, e nada fica esticado. */
+   16:9 é restrição dura: a coluna do player a 1200px produz 675 de ALTURA e joga a
+   navegação da aula para fora da dobra. Por isso o player tem teto de 1000. Minha
+   primeira tentativa foi pôr a página no canvas e CENTRALIZAR a grade — e o
+   cabeçalho, que vive FORA da grade, ficou no canto esquerdo da página enquanto o
+   vídeo ia para o meio. Dois eixos verticais diferentes na mesma tela.
+
+   Derivando o teto da soma (1000 do player + 420 da playlist + a calha), a página
+   inteira passa a ter UM eixo: cabeçalho, vídeo, navegação e playlist compartilham
+   as mesmas bordas, e o bloco todo se centraliza como uma peça só. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: calc(1000px + 420px + var(--via-space-6));
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -66,12 +69,11 @@
 
 .grade {
   display: grid;
-  /* 1000 é o teto do 16:9 que ainda cabe na dobra; a playlist fica com o resto,
-     limitada para não virar um trilho largo de linhas curtas. */
-  grid-template-columns: minmax(0, 1000px) clamp(300px, 26%, 420px);
+  /* Os mesmos 1000 e 420 que a página soma acima — mexer num sem o outro volta a
+     desalinhar o cabeçalho do vídeo. */
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 26%, 420px);
   gap: var(--via-space-6);
   align-items: start;
-  justify-content: center;
 }
 
 .principal {
