@@ -9,6 +9,7 @@ import {
   percentual,
 } from '@/lib/progresso/local';
 import { PillEstado } from '../../_components/PillEstado';
+import { fatia, hashDeterminista } from '../../_components/hashDeterminista';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoFormacao.module.css';
 
@@ -62,40 +63,24 @@ function IconeAulas() {
 /**
  * Campo de luz do pôster sintético, derivado do SLUG — não do índice na grade.
  * Assim a mesma formação tem sempre o mesmo pôster, esteja ela em primeiro ou em
- * último depois de um filtro, e quatro cards lado a lado param de ler como
- * quatro cópias do mesmo retângulo escuro.
+ * último depois de um filtro.
  *
- * VALORES CONTÍNUOS, não uma lista de variantes. Com 4 variantes sorteadas por
- * hash, a chance de os 4 primeiros cards saírem todos diferentes é 4!/4⁴ ≈ 9% —
- * medido na tela, deram 2 campos distintos em 4, e a variação não acontecia.
- * Interpolando as posições não existe colisão: cada slug tem o seu campo.
- *
- * FNV-1a com a avalanche do murmur3 no fim. Sem ela os bits baixos ficam presos
- * às últimas letras do slug, e slugs de uma mesma família saem quase iguais.
+ * O HASH MORA EM `hashDeterminista`, dividido com o retrato dos mentores. Estava
+ * embutido aqui; duas cópias de uma função de hash é pior que duas cópias de um
+ * componente, porque elas divergem num bit sem ninguém notar — as duas continuam
+ * "gerando algo bonito", só que a mesma entrada passa a dar saídas diferentes em
+ * telas diferentes. O porquê da avalanche e das fatias contínuas está lá.
  *
  * A luz fica na METADE DE CIMA de propósito: embaixo mora a legenda, e luz atrás
  * de texto é contraste perdido. Luz vindo de cima também é a leitura natural.
  */
 function campoDoSlug(slug: string): CSSProperties {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < slug.length; i += 1) {
-    h ^= slug.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  h ^= h >>> 16;
-  h = Math.imul(h, 0x7feb352d);
-  h ^= h >>> 15;
-  h = Math.imul(h, 0x846ca68b);
-  h ^= h >>> 16;
-
-  const u = h >>> 0;
-  const fatia = (bits: number) => ((u >>> bits) & 0xff) / 255;
-
+  const u = hashDeterminista(slug);
   return {
-    '--luz-x': `${(6 + fatia(0) * 86).toFixed(1)}%`,
-    '--luz-y': `${(-8 + fatia(8) * 52).toFixed(1)}%`,
-    '--eco-x': `${(4 + fatia(16) * 92).toFixed(1)}%`,
-    '--eco-y': `${(fatia(24) * 62).toFixed(1)}%`,
+    '--luz-x': `${(6 + fatia(u, 0) * 86).toFixed(1)}%`,
+    '--luz-y': `${(-8 + fatia(u, 8) * 52).toFixed(1)}%`,
+    '--eco-x': `${(4 + fatia(u, 16) * 92).toFixed(1)}%`,
+    '--eco-y': `${(fatia(u, 24) * 62).toFixed(1)}%`,
     '--base-ang': `${112 + (u % 117)}deg`,
   } as CSSProperties;
 }

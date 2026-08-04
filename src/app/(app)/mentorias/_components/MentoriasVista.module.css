@@ -153,24 +153,6 @@
   border-left-color: var(--via-navy-25);
 }
 
-/* Monograma, não silhueta: silhueta genérica lê como pessoa real cuja foto não
-   carregou, e não há pessoa aqui — há um papel. */
-.mentorMonograma {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-indent: var(--app-ls-eyebrow);
-}
-
 .mentorTextos {
   display: flex;
   flex-direction: column;

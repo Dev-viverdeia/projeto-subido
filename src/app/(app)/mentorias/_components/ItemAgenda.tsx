@@ -1,10 +1,10 @@
 'use client';
 
-import { Avatar, Button } from '@/design-system/via';
+import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
-import { iniciais } from '../../_components/iniciais';
+import { RetratoMentor } from '../../_components/RetratoMentor';
 import { Visto } from '../../_components/PillEstado';
 import styles from './ItemAgenda.module.css';
 
@@ -76,7 +76,7 @@ export function ItemAgenda({
             linha — em lista, informação idêntica em toda linha é ruído, não
             contexto. Ela vive na ficha da sessão, onde é lida uma vez. */}
         <div className={styles.mentor}>
-          <Avatar initials={iniciais(mentor.nome)} size="xs" />
+          <RetratoMentor nome={mentor.nome} fotoUrl={mentor.foto_url} tamanho="xs" />
           <span className={styles.mentorNome}>{mentor.nome}</span>
         </div>
       </div>

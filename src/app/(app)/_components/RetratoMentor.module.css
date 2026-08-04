@@ -1,0 +1,80 @@
+/* Círculo com HAIRLINE INTERNA, não borda externa: `inset` de 1px por dentro
+   fecha o contorno sem somar ao diâmetro, então quatro retratos em linha ficam na
+   mesma medida esteja a foto presente ou não. Uma borda de 1px mudaria o tamanho
+   só no caso com foto — o tipo de meio-pixel que faz a fileira dançar. */
+.retrato {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-06);
+  box-shadow: inset 0 0 0 1px var(--via-navy-16);
+}
+
+.retrato[data-tamanho='xs'] {
+  width: 24px;
+  height: 24px;
+}
+.retrato[data-tamanho='sm'] {
+  width: 36px;
+  height: 36px;
+}
+.retrato[data-tamanho='md'] {
+  width: 48px;
+  height: 48px;
+}
+.retrato[data-tamanho='lg'] {
+  width: 64px;
+  height: 64px;
+}
+
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* O CAMPO GERADO. O hash varia POSIÇÃO, FORÇA e ÂNGULO; a cor sai dos tokens e
+   não se abre — um gerador que sorteasse matiz seria a porta de entrada do roxo
+   "IA" que a marca bane.
+
+   Duas camadas: a luz (radial, deslocada pelo hash) sobre a base (linear, com o
+   ângulo do hash). Uma camada só daria círculos concêntricos iguais em todos. */
+.retrato[data-gerado] {
+  background:
+    radial-gradient(
+      circle at var(--retrato-x) var(--retrato-y),
+      color-mix(in srgb, var(--via-accent) var(--retrato-forca), transparent),
+      transparent 62%
+    ),
+    linear-gradient(var(--retrato-ang), var(--via-navy), var(--via-navy-deep));
+  box-shadow: inset 0 0 0 1px var(--via-navy-22);
+}
+
+/* Iniciais sobre o campo escuro: branco puro. `--via-gray-300` (12,2:1) seria o
+   token de texto corrido sobre navy, mas aqui são duas letras em corpo pequeno
+   sobre um gradiente que varia de peça para peça — o branco é o único valor que
+   não depende de onde a luz do hash caiu. */
+.iniciais {
+  font-family: var(--via-font-mono);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: 0;
+  color: var(--via-white);
+}
+
+.retrato[data-tamanho='xs'] .iniciais {
+  font-size: 0.5rem;
+}
+.retrato[data-tamanho='sm'] .iniciais {
+  font-size: 0.688rem;
+}
+.retrato[data-tamanho='md'] .iniciais {
+  font-size: 0.813rem;
+}
+.retrato[data-tamanho='lg'] .iniciais {
+  font-size: 1rem;
+}

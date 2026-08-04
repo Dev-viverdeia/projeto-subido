@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
-import { iniciais } from '../../_components/iniciais';
+import { RetratoMentor } from '../../_components/RetratoMentor';
 import { TRILHAS } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -267,9 +267,11 @@ export function MentoriasVista({
                 cada linha; aqui é lida uma vez, no momento em que importa. */}
             {mentorDoDetalhe && (
               <div className={styles.mentorCartao} data-trilha={mentorDoDetalhe.trilha}>
-                <span className={styles.mentorMonograma} aria-hidden="true">
-                  {iniciais(mentorDoDetalhe.nome)}
-                </span>
+                <RetratoMentor
+                  nome={mentorDoDetalhe.nome}
+                  fotoUrl={mentorDoDetalhe.foto_url}
+                  tamanho="md"
+                />
                 <span className={styles.mentorTextos}>
                   <span className={styles.mentorNome}>{mentorDoDetalhe.nome}</span>
                   <span className={styles.mentorHeadline}>{mentorDoDetalhe.headline}</span>

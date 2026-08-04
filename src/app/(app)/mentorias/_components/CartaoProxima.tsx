@@ -1,10 +1,11 @@
 'use client';
 
-import { Avatar, Button } from '@/design-system/via';
+import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { comecaEm, duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
-import { iniciais } from '../../_components/iniciais';
+import { RetratoMentor } from '../../_components/RetratoMentor';
+import { TRILHAS } from '@/lib/mentorias/tipos';
 import { Visto } from '../../_components/PillEstado';
 import styles from './CartaoProxima.module.css';
 
@@ -82,13 +83,18 @@ export function CartaoProxima({
 
         <h2 className={styles.titulo}>{sessao.titulo}</h2>
 
-        <div className={styles.mentor}>
-          <Avatar initials={mentor ? iniciais(mentor.nome) : '—'} size="sm" />
-          <div className={styles.mentorTextos}>
-            <p className={styles.mentorNome}>{mentor?.nome}</p>
-            <p className={styles.mentorHeadline}>{mentor?.headline}</p>
+        {mentor && (
+          <div className={styles.mentor}>
+            {/* Retrato GERADO enquanto não há foto real — abstrato, derivado do
+                nome, nunca uma silhueta que finge ser gente. Ver o componente. */}
+            <RetratoMentor nome={mentor.nome} fotoUrl={mentor.foto_url} tamanho="lg" />
+            <div className={styles.mentorTextos}>
+              <p className={styles.mentorTrilha}>{TRILHAS[mentor.trilha].rotulo}</p>
+              <p className={styles.mentorNome}>{mentor.nome}</p>
+              {mentor.headline && <p className={styles.mentorHeadline}>{mentor.headline}</p>}
+            </div>
           </div>
-        </div>
+        )}
 
         <dl className={styles.ficha}>
           {dados.map((d) => (

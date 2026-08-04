@@ -68,6 +68,18 @@
   gap: var(--via-space-2_5);
 }
 
+/* A trilha vira o eyebrow do bloco de mentor: diz DE QUE o mentor é mentor
+   antes do nome, que é a pergunta que a pessoa faz primeiro numa agenda com
+   trilhas diferentes. 6,99:1 sobre a navy. */
+.mentorTrilha {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
 .mentorTextos {
   display: flex;
   flex-direction: column;
