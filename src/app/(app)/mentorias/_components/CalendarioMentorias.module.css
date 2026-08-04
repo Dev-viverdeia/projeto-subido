@@ -139,11 +139,8 @@
      esticava o mês por 672px de altura só de calha. */
   min-height: 96px;
   padding: var(--via-space-2_5) var(--via-space-2);
-  border: none;
   background: var(--via-surface);
-  font-family: inherit;
   text-align: left;
-  cursor: pointer;
   transition: background-color var(--app-t-state);
 }
 
@@ -685,5 +682,108 @@
 
   .carimboDia {
     font-size: var(--via-fs-h2);
+  }
+}
+
+/* ── Sobreposição: o número seleciona o dia, os chips abrem a sessão ─────────
+   A célula era um `<button>` com os chips dentro. Além de ser controle aninhado
+   (que o HTML não permite), clicar na sessão não abria a sessão: selecionava o
+   dia. O botão do número agora carrega o `::after` que cobre a célula inteira,
+   então o clique em qualquer vazio continua selecionando o dia. */
+.numero {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--app-radius-chip);
+}
+
+.numero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Cobre a célula inteira a partir do número, descontando o padding dela. */
+  inset-block: calc(-1 * var(--via-space-2_5));
+  inset-inline: calc(-1 * var(--via-space-2));
+  height: auto;
+  width: auto;
+}
+
+/* O anel desenha na SOBREPOSIÇÃO, que já tem a geometria da célula — assim o
+   foco marca o dia inteiro e não duas letras soltas no canto. */
+.numero:focus-visible {
+  outline: none;
+}
+
+.numero:focus-visible::after {
+  box-shadow: var(--app-ring);
+  border-radius: var(--app-radius-chip);
+}
+
+/* Os chips sobem ACIMA da sobreposição. Sem isto o `::after` do número os
+   cobriria e todo clique voltaria a selecionar o dia. */
+.marca {
+  position: relative;
+  width: 100%;
+  border: 0;
+  border-left: 2px solid var(--via-navy-40);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+/* PREMIUM É RESPOSTA, não ornamento: o chip precisa reagir ao dedo para ler como
+   coisa clicável. Sem hover ele parecia etiqueta impressa na célula. */
+.marca:hover {
+  background: var(--via-navy-08);
+  border-left-color: var(--via-accent-ink);
+}
+
+.marca:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* Quem já tem check-in ganha a barra em accent-ink permanente — o mês inteiro
+   passa a responder "onde eu já estou" num relance, que é o que a coluna de
+   inscrições responde por escrito. */
+.marca[data-estado='inscrito'] {
+  border-left-color: var(--via-accent-ink);
+  background: color-mix(in srgb, var(--via-accent) 6%, transparent);
+}
+
+.marca[data-estado='encerrada'] .marcaHora,
+.marca[data-estado='encerrada'] .marcaTitulo {
+  color: var(--via-text-faint);
+}
+
+.mais {
+  position: relative;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--app-radius-chip);
+  transition: color var(--app-t-state);
+}
+
+.mais:hover {
+  color: var(--via-text-primary);
+}
+
+.mais:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celula,
+  .marca,
+  .mais {
+    transition: none;
   }
 }

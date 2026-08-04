@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import { RetratoMentor } from '../../_components/RetratoMentor';
+import { Visto } from '../../_components/PillEstado';
 import { TRILHAS } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -281,17 +282,76 @@ export function MentoriasVista({
                 </span>
               </div>
             )}
-            {estadoComInscricao(detalhe) === 'checkin-aberto' && (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setDetalheId(null);
-                  setConfirmandoId(detalhe.id);
-                }}
-              >
-                Fazer check-in
-              </Button>
-            )}
+            {/* A MATRIZ COMPLETA, e antes era um caso só. O modal é a vista mais
+                detalhada da sessão e oferecia ação apenas em `checkin-aberto`:
+                nos outros quatro estados ele abria, mostrava a ficha e não dizia
+                nem o que dava para fazer nem por que não dava. Quem estava
+                inscrito precisava fechar o modal e achar a linha na agenda para
+                cancelar. */}
+            <div className={styles.acoesFicha}>
+              {(() => {
+                const estadoAtual = estadoComInscricao(detalhe);
+
+                if (estadoAtual === 'checkin-aberto') {
+                  return (
+                    <Button
+                      variant="primary"
+                      disabled={gravando}
+                      onClick={() => {
+                        setDetalheId(null);
+                        setConfirmandoId(detalhe.id);
+                      }}
+                    >
+                      Fazer check-in
+                    </Button>
+                  );
+                }
+
+                if (estadoAtual === 'inscrito') {
+                  return (
+                    <>
+                      <span className={styles.fichaConfirmado}>
+                        <Visto tamanho={12} />
+                        Check-in confirmado
+                      </span>
+                      {/* Direto, sem confirmação, igual à linha da agenda —
+                          cancelar libera a vaga e dá para refazer enquanto
+                          houver lugar. Confirmar aqui e não lá seria a mesma
+                          ação com dois pesos. */}
+                      <Button
+                        variant="ghost"
+                        disabled={gravando}
+                        onClick={() => cancelar(detalhe.id)}
+                      >
+                        Cancelar check-in
+                      </Button>
+                    </>
+                  );
+                }
+
+                if (estadoAtual === 'ao-vivo') {
+                  return (
+                    <>
+                      <Button variant="primary" disabled>
+                        Entrar na sala
+                      </Button>
+                      <span className={styles.fichaNota}>
+                        A sala de vídeo entra na próxima fase da plataforma.
+                      </span>
+                    </>
+                  );
+                }
+
+                /* Lotada e fora-da-janela: motivo, não botão morto. */
+                return (
+                  <span className={styles.fichaNota}>
+                    {estadoAtual === 'lotada'
+                      ? `Sessão lotada — ${detalhe.inscritos} de ${detalhe.vagas} vagas.`
+                      : `O check-in abre ${rotuloDoDia(detalhe.inicioIso, agora).mono}.`}
+                  </span>
+                );
+              })()}
+            </div>
           </div>
         )}
       </Modal>

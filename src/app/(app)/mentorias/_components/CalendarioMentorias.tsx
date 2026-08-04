@@ -189,19 +189,38 @@ export function CalendarioMentorias({
           const lista = porDia.get(c.chave) ?? [];
           const aoVivo = lista.some((s) => estadoDaSessao(s) === 'ao-vivo');
           return (
-            <button
+            <div
               key={c.chave}
-              type="button"
               role="gridcell"
               className={styles.celula}
               data-fora={!c.doMes ? '' : undefined}
               data-hoje={c.hoje ? '' : undefined}
               data-sel={c.chave === selecionado ? '' : undefined}
               aria-selected={c.chave === selecionado}
-              onClick={() => setSelecionado(c.chave)}
             >
+              {/* A CÉLULA DEIXOU DE SER BOTÃO. Ela era `<button>` com os chips das
+                  sessões DENTRO — controle interativo aninhado, o mesmo defeito
+                  que a linha da agenda tinha: clicar na sessão não abria a
+                  sessão, selecionava o dia, e por teclado nem isso.
+
+                  Padrão de sobreposição, igual ao da agenda: quem seleciona o dia
+                  é o botão do NÚMERO, cujo `::after` cobre a célula inteira. Os
+                  chips sobem com `position: relative` e ficam ACIMA dessa
+                  sobreposição — cada um recebe o próprio clique e abre a ficha,
+                  sem `stopPropagation` e sem aninhamento. */}
               <span className={styles.topo}>
-                <span className={styles.numero}>{c.dia}</span>
+                <button
+                  type="button"
+                  className={styles.numero}
+                  onClick={() => setSelecionado(c.chave)}
+                  aria-label={`${c.dia} — ${
+                    lista.length === 0
+                      ? 'sem mentoria'
+                      : `${lista.length} ${lista.length === 1 ? 'mentoria' : 'mentorias'}`
+                  }`}
+                >
+                  {c.dia}
+                </button>
                 {aoVivo && <span className={styles.pontoVivo} aria-hidden="true" />}
               </span>
 
@@ -212,14 +231,29 @@ export function CalendarioMentorias({
                      toda célula do mês virava "ES". O que a pessoa procura ao
                      bater o olho no mês é DO QUE é a sessão — a trilha já está
                      dita pela cor da barra à esquerda, que a legenda mapeia. */
-                  <span key={s.id} className={styles.marca} data-trilha={s.mentor?.trilha}>
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={styles.marca}
+                    data-trilha={s.mentor?.trilha}
+                    data-estado={estadoDaSessao(s)}
+                    onClick={() => aoAbrirDetalhe(s.id)}
+                  >
                     <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
                     <span className={styles.marcaTitulo}>{s.titulo}</span>
-                  </span>
+                  </button>
                 ))}
-                {lista.length > 2 && <span className={styles.mais}>+{lista.length - 2} mais</span>}
+                {lista.length > 2 && (
+                  <button
+                    type="button"
+                    className={styles.mais}
+                    onClick={() => setSelecionado(c.chave)}
+                  >
+                    +{lista.length - 2} mais
+                  </button>
+                )}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>

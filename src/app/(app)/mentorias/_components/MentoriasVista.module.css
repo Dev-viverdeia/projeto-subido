@@ -229,3 +229,40 @@
     position: static;
   }
 }
+
+/* As ações da ficha da sessão. `wrap` porque "Check-in confirmado" mais
+   "Cancelar check-in" passam de 380px, e o modal `md` não garante isso. */
+.acoesFicha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-1);
+}
+
+.fichaConfirmado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-accent-ink);
+}
+
+/* Motivo, não botão desabilitado: botão travado sem explicação é pior que texto
+   que explica. */
+.fichaNota {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--app-h-control);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
+}
