@@ -85,3 +85,62 @@ export async function apagarSolucao(formData: FormData): Promise<void> {
      por isso esta função não tem um. */
   redirect('/builder');
 }
+
+/* ── Sala do Projeto ────────────────────────────────────────────────────────── */
+
+const EstadoTarefa = z.enum(['a_fazer', 'fazendo', 'feito']);
+const Stack = z.enum(['lovable_supabase', 'lovable_cloud', 'claude_code_supabase']);
+
+/**
+ * Move uma tarefa do kanban.
+ *
+ * `upsert` E NÃO `update`: a tarefa nasce implícita. Índice sem linha na tabela é
+ * `a_fazer`, o que evita ter de inserir N linhas no instante em que o documento
+ * fica pronto — e evita a pergunta "o que acontece com as linhas quando o
+ * documento é regerado com menos etapas?". Quem não tem linha simplesmente não
+ * aparece; quem tem, e cujo índice saiu do documento, é ignorado na leitura.
+ *
+ * A RLS é a barreira: a policy exige que o projeto seja do chamador, então um
+ * `solucao_id` alheio afeta zero linhas em vez de vazar existência.
+ */
+export async function moverTarefa(formData: FormData): Promise<void> {
+  const id = Id.safeParse(formData.get('id'));
+  const indice = z.coerce.number().int().min(0).safeParse(formData.get('indice'));
+  const estado = EstadoTarefa.safeParse(formData.get('estado'));
+  if (!id.success || !indice.success || !estado.success) return;
+
+  const supabase = await clienteAutenticado();
+  /* Sem sessão não há o que fazer — e o retorno silencioso é o mesmo desfecho que
+     a RLS produziria com um id alheio: nada acontece, nada é revelado. */
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from('builder_tarefas')
+    .upsert(
+      { solucao_id: id.data, etapa_indice: indice.data, estado: estado.data },
+      { onConflict: 'solucao_id,etapa_indice' },
+    );
+
+  if (error) throw handleError(error, 'builder:mover-tarefa');
+  revalidatePath(`/builder/${id.data}`);
+}
+
+/** Onde construir. Um valor por projeto — por isso coluna, não tabela. */
+export async function escolherStack(formData: FormData): Promise<void> {
+  const id = Id.safeParse(formData.get('id'));
+  const stack = Stack.safeParse(formData.get('stack'));
+  if (!id.success || !stack.success) return;
+
+  const supabase = await clienteAutenticado();
+  /* Sem sessão não há o que fazer — e o retorno silencioso é o mesmo desfecho que
+     a RLS produziria com um id alheio: nada acontece, nada é revelado. */
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from('builder_solucoes')
+    .update({ stack: stack.data })
+    .eq('id', id.data);
+
+  if (error) throw handleError(error, 'builder:escolher-stack');
+  revalidatePath(`/builder/${id.data}`);
+}

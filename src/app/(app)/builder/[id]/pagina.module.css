@@ -59,3 +59,15 @@
   text-transform: uppercase;
   color: var(--via-text-primary);
 }
+
+/* A etapa "Criação" depois de a geração terminar. Ela existe para o degrau não
+   ficar vazio quando a pessoa volta a ele — o trabalho dessa etapa já aconteceu,
+   e dizer isso é melhor que abrir um painel em branco. */
+.criacaoPronta {
+  margin: 0;
+  padding: var(--app-pad-card);
+  border: 1px dashed var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}

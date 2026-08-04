@@ -1,22 +1,3 @@
-/**
- * GERADO — não editar à mão.
- *
- * Fonte: projeto Supabase fopljjqxituhajzwjrjt (plataforma-subido-viverdeia).
- * Regerar com `npm run db:types`.
- *
- * ATENÇÃO: o CLI exige `supabase login` ou SUPABASE_ACCESS_TOKEN. Sem isso ele
- * escreve o JSON do erro POR CIMA deste arquivo em vez de falhar — o `>` do shell
- * trunca antes de o comando rodar. Confira o topo do arquivo antes de commitar.
- *
- * E O `>` TAMBÉM APAGA ESTE CABEÇALHO a cada geração: ele não vem do CLI, é
- * escrito à mão depois. Se você acabou de rodar `db:types` e este bloco sumiu,
- * cole-o de volta — foi assim que ele quase se perdeu quando as mentorias
- * entraram.
- *
- * Ignorado por eslint e prettier (ver eslint.config.mjs e .prettierignore): a
- * integridade de um arquivo gerado é o comando que o gera, não o formatador.
- */
-
 export type Json =
   | string
   | number
@@ -82,6 +63,7 @@ export type Database = {
           ideia_original: string
           modelo: string | null
           respostas: Json
+          stack: string | null
           status: Database["public"]["Enums"]["status_builder"]
           titulo: string
         }
@@ -95,6 +77,7 @@ export type Database = {
           ideia_original: string
           modelo?: string | null
           respostas?: Json
+          stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
           titulo?: string
         }
@@ -108,10 +91,40 @@ export type Database = {
           ideia_original?: string
           modelo?: string | null
           respostas?: Json
+          stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
           titulo?: string
         }
         Relationships: []
+      }
+      builder_tarefas: {
+        Row: {
+          atualizado_em: string
+          estado: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice: number
+          solucao_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          estado?: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice: number
+          solucao_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          estado?: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice?: number
+          solucao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "builder_tarefas_solucao_id_fkey"
+            columns: ["solucao_id"]
+            isOneToOne: false
+            referencedRelation: "builder_solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       formacoes: {
         Row: {
@@ -444,6 +457,7 @@ export type Database = {
       }
     }
     Enums: {
+      estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
       status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
       status_publicacao: "rascunho" | "publicado" | "arquivado"
@@ -574,6 +588,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
       status_builder: ["rascunho", "gerando", "pronta", "falhou"],
       status_publicacao: ["rascunho", "publicado", "arquivado"],

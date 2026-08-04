@@ -1,0 +1,223 @@
+.kit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+.secaoTitulo {
+  margin: 0 0 var(--app-gap-stack);
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+.opcoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+.opcao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+  box-shadow: var(--app-elev-1-shadow);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    background var(--app-t-state);
+}
+
+.opcao:hover:not(:disabled) {
+  border-color: var(--via-navy-22);
+}
+
+.opcao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+/* A escolhida usa accent-ink na BORDA — accent sobre claro só como tinta de
+   traço, nunca como preenchimento de área. */
+.opcao[data-ativa] {
+  border-color: var(--via-accent-ink);
+  background: color-mix(in srgb, var(--via-accent) 5%, var(--via-surface));
+}
+
+.opcaoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+}
+
+.opcaoEyebrow {
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.opcao[data-ativa] .opcaoEyebrow {
+  color: var(--via-accent-ink);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-border);
+  color: var(--via-white);
+}
+
+.opcao[data-ativa] .marca {
+  background: var(--via-accent-ink);
+  border-color: var(--via-accent-ink);
+}
+
+.opcaoTitulo {
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-body);
+  color: var(--via-text-primary);
+}
+
+.opcaoTexto {
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.comece {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+}
+
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.passo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-3);
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+  /* 52ch ≈ 68 caracteres, dentro da faixa confortável de 45–75. */
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.passoNumero {
+  flex-shrink: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-faint);
+}
+
+.prompt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card-tight);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+}
+
+/* Escuro porque é CÓDIGO. `--via-gray-300` dá 12,2:1 sobre navy-deep;
+   `--via-text-soft` cairia para 3,45:1 e reprovaria AA. */
+.promptTexto {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: var(--via-space-3);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-deep);
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  line-height: var(--via-lh-loose);
+  color: var(--via-gray-300);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.ferramentas,
+.listaPrompts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--via-space-2);
+}
+
+.listaPrompts {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ferramenta,
+.itemPrompt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--app-pad-card-tight);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+}
+
+.itemPromptTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.ferramentaNome {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+.ferramentaPapel {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opcao {
+    transition: none;
+  }
+}

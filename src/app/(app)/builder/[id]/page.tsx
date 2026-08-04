@@ -10,6 +10,9 @@ import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
 import { Entrevista } from '../_components/Entrevista';
 import { EstadoGeracao } from '../_components/EstadoGeracao';
 import { FichaProjeto } from '../_components/FichaProjeto';
+import { EtapaKit } from '../_components/sala/EtapaKit';
+import { Kanban } from '../_components/sala/Kanban';
+import { SalaDoProjeto } from '../_components/sala/SalaDoProjeto';
 import { ROTULO_STATUS, VARIANTE_STATUS } from '../_components/statusBuilder';
 import { DefinirTrilha } from '../../_components/trilha/contexto';
 import styles from './pagina.module.css';
@@ -94,11 +97,29 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
           <Entrevista id={solucao.id} ideia={solucao.ideiaOriginal} perguntas={solucao.respostas} />
         ) : null}
 
+        {/* A SALA substitui a ficha corrida. O mesmo material, quebrado em quatro
+            momentos — cada um respondendo uma pergunta diferente. Os painéis são
+            montados AQUI, no servidor, e entram na ilha como `ReactNode`: assim o
+            documento inteiro não atravessa a fronteira como prop serializada. */}
         {solucao.status === 'pronta' && solucao.documento ? (
-          <FichaProjeto
-            documento={solucao.documento}
-            criadoEm={solucao.criadoEm}
-            modelo={solucao.modelo}
+          <SalaDoProjeto
+            solucao={solucao}
+            criacao={
+              <p className={styles.criacaoPronta}>
+                O plano está pronto. Siga para “Entenda o projeto”.
+              </p>
+            }
+            entender={
+              <FichaProjeto
+                documento={solucao.documento}
+                criadoEm={solucao.criadoEm}
+                modelo={solucao.modelo}
+              />
+            }
+            kit={<EtapaKit id={solucao.id} documento={solucao.documento} stack={solucao.stack} />}
+            construir={
+              <Kanban id={solucao.id} etapas={solucao.documento.etapas} tarefas={solucao.tarefas} />
+            }
           />
         ) : null}
 
