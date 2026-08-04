@@ -238,7 +238,7 @@
   gap: var(--via-space-2);
 }
 
-@media (max-width: 1099px) {
+@media (max-width: 1079px) {
   /* Empilhado, o trilho fica DEPOIS da agenda, na ordem do documento e sem
      `order`: mover o pixel sem mover o DOM faz a ordem visual divergir da ordem
      de foco (WCAG 1.3.2). Quem abre no telefone já tem o cartão da próxima

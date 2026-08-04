@@ -135,7 +135,7 @@
   gap: var(--app-gap-block);
 }
 
-@media (max-width: 1099px) {
+@media (max-width: 1079px) {
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }
