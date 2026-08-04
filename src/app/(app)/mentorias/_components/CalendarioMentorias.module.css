@@ -163,9 +163,14 @@
 /* Selecionado é SUPERFÍCIE, hoje é TINTA — dois sinais de naturezas diferentes
    que coexistem sem competir, que é o caso do dia de hoje quando selecionado.
    O anel é INSET para não ser recortado pelo overflow da grade. */
+/* SELEÇÃO SEM CONTORNO. Era um anel navy de 1,5px por dentro da célula — a coisa
+   mais escura da grade inteira, gritando mais que o próprio conteúdo e brigando
+   com a hairline das células vizinhas. Agora quem marca o dia é a SUPERFÍCIE
+   (véu de accent) mais o disco do número, que já é sólido: dois sinais quietos
+   no lugar de um contorno duro. É a mesma lógica do "hierarquia por peso e cor
+   sólida, nunca por borda" que o resto do produto segue. */
 .celula[data-sel] {
-  background: var(--via-navy-05);
-  box-shadow: inset 0 0 0 1.5px var(--via-navy);
+  background: color-mix(in srgb, var(--via-accent) 7%, var(--via-surface));
 }
 
 .celula:focus-visible {
@@ -188,7 +193,12 @@
   color: var(--via-text-body);
 }
 
-.celula[data-hoje] .numero {
+/* O DISCO É UMA GEOMETRIA SÓ, com dois donos: HOJE e o dia SELECIONADO. Antes
+   só "hoje" o tinha, e a seleção se anunciava por contorno — duas gramáticas
+   para a mesma pergunta ("que dia é este?"). Agora é a mesma peça; o que muda é
+   a tinta. */
+.celula[data-hoje] .numero,
+.celula[data-sel] .numero {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -197,9 +207,25 @@
   margin: -3px 0 -3px -5px;
   padding-inline: 5px;
   border-radius: var(--via-radius-pill);
+  font-weight: var(--via-fw-medium);
+}
+
+/* HOJE é navy sólido — é fato, não escolha. */
+.celula[data-hoje] .numero {
   background: var(--via-navy);
   color: var(--via-white);
-  font-weight: var(--via-fw-medium);
+}
+
+/* SELECIONADO é accent — é a escolha da pessoa, e o accent existe no produto
+   justamente para marcar "aqui". Quando o dia selecionado É hoje, a regra de
+   hoje vem depois e ganha: o fato prevalece sobre a escolha. */
+.celula[data-sel] .numero {
+  background: var(--via-accent-ink);
+  color: var(--via-white);
+}
+
+.celula[data-hoje][data-sel] .numero {
+  background: var(--via-navy);
 }
 
 /* Dot de "ao vivo": o accent sobre claro reprova para TEXTO, mas isto não é
@@ -491,7 +517,12 @@
   background: var(--via-navy-40);
 }
 
+/* `position: relative` É O PAR OBRIGATÓRIO do `::before` acima, e faltava: sem
+   ele o ponto absoluto sobe até o primeiro ancestral posicionado — o card do dia
+   inteiro — e aparecia solto no canto superior esquerdo do painel. Visível no
+   print, invisível para tsc, eslint e build. */
 .item {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--via-space-3);
@@ -827,4 +858,11 @@
   .mais {
     transition: none;
   }
+}
+
+/* O retrato no item do dia. Não encolhe: num flex com texto ao lado, sem
+   `flex-shrink: 0` ele viraria uma elipse quando o título tem duas linhas. */
+.itemRetrato {
+  flex-shrink: 0;
+  margin-top: 1px;
 }

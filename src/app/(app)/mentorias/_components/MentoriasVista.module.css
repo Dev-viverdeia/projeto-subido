@@ -1,10 +1,31 @@
 /* O shell: cartão da próxima, chrome de vista, miolo. O respiro entre eles é o
    ritmo de BLOCO — o de grade seria apertado demais para separar três coisas de
    naturezas diferentes. */
+/* O TETO É POR VISTA. A agenda é lista e para em `--via-container` (1280): acima
+   disso o miolo da linha vira vão morto entre o título e o botão. O calendário é
+   grade e vai até o canvas (1600) — em tela grande cada célula ganha ~46px, que é
+   a diferença entre a pastilha mostrar "Plantã…" e mostrar o título.
+
+   `margin-inline: auto` nos dois para a tira de abas, que fica acima, continuar
+   alinhada com o conteúdo em qualquer vista. */
 .raiz {
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
+  width: 100%;
+  max-width: var(--via-container);
+  margin-inline: auto;
+  transition: max-width var(--app-t-reveal);
+}
+
+.raiz[data-vista='calendario'] {
+  max-width: var(--app-canvas);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raiz {
+    transition: none;
+  }
 }
 
 /* ── O CORPO, e é aqui que a tela deixa de ser uma pilha ────────────────────
@@ -29,6 +50,16 @@
   grid-template-columns: minmax(0, 1fr) clamp(280px, 26%, 360px);
   gap: var(--app-gap-section);
   align-items: start;
+}
+
+/* SEM INSCRIÇÃO, SEM COLUNA. O trilho some sozinho quando não há check-in, mas a
+   grade continuava reservando o lugar dele — e a lista, que já tem medida, ficava
+   encostada à esquerda com um vão de 360px ao lado. Aqui a grade vira uma coluna
+   e o bloco inteiro assume a medida de leitura: a agenda passa a ler como coluna
+   editorial sob o cartão, em vez de conteúdo espremido numa tela larga. */
+.corpo[data-vista='agenda']:not([data-apoio]) {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 920px;
 }
 
 /* Calendário: uma coluna só, largura inteira. O trilho de inscrições desce para

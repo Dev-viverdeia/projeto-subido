@@ -1,18 +1,14 @@
-/* MEDIDA DE LEITURA, não o canvas de 1600.
-   A regra da casa separa GRADE (ganha coluna, acompanha `--app-canvas`) de LISTA
-   e PROSA (têm medida). Esta tela é cartão + lista + coluna de apoio — leitura.
+/* A PÁGINA acompanha o canvas; quem tem MEDIDA é cada vista, e a regra da casa
+   separa as duas naturezas: GRADE ganha área, LISTA e PROSA têm medida.
 
-   O número que decide: com a página em 1600 e a coluna de apoio em 360, a agenda
-   fica com 1200px de largura para uma linha de hora + título + mentor + CTA, e o
-   miolo vira vão morto — o olho atravessa meio metro de nada entre o título e o
-   botão. Cortar a página em 1280 põe a agenda em ~908 e a coluna de apoio em
-   ~332, sem sobrar calha à direita.
+   A agenda é lista — uma pilha de linhas de um dado só (hora | título + mentor |
+   CTA). Esticada, o miolo vira vão morto entre o título e o botão. O calendário é
+   GRADE: sete colunas de dia que só melhoram com espaço, e em tela grande cada
+   célula passa a caber o título da sessão em vez de cortá-lo em cinco letras.
 
-   A alternativa era manter o canvas e limitar só a coluna da agenda, mas aí
-   sobravam 120px de calha morta na borda direita a 1600 — exatamente o defeito
-   que a ficha da solução já tinha e que foi corrigido do mesmo jeito. */
+   Por isso o teto mora no `.raiz` da ilha, por vista — ver `MentoriasVista`. */
 .pagina {
-  max-width: var(--via-container);
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;

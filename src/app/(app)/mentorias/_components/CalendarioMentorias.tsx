@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { TRILHAS } from '@/lib/mentorias/tipos';
+import { RetratoMentor } from '../../_components/RetratoMentor';
 import type { TrilhaMentor } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -322,6 +323,19 @@ export function CalendarioMentorias({
                         <span className={styles.itemInicio}>{horaCurta(s.inicioIso)}</span>
                         <span className={styles.itemFim}>{horaCurta(s.fimIso)}</span>
                       </span>
+                      {/* O RETRATO entra aqui: o painel do dia é a única vista do
+                          calendário com espaço para dizer QUEM dá a sessão, e
+                          quem dá é metade da decisão de comparecer. Nas células
+                          do mês não cabe — lá a trilha é o ponto. */}
+                      {mentor && (
+                        <RetratoMentor
+                          nome={mentor.nome}
+                          fotoUrl={mentor.foto_url}
+                          tamanho="sm"
+                          className={styles.itemRetrato}
+                        />
+                      )}
+
                       <span className={styles.itemTextos}>
                         <span className={styles.itemTitulo}>{s.titulo}</span>
                         <span className={styles.itemRodape}>

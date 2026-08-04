@@ -108,6 +108,13 @@ export function MentoriasVista({
 
   const destaque = futuras.find((s) => estaAoVivo(s)) ?? futuras[0] ?? null;
 
+  /* O TRILHO SOME QUANDO NÃO HÁ CHECK-IN — e a GRADE precisa saber disso.
+     `TrilhoInscricoes` já devolvia `null` sozinho, mas a coluna continuava
+     reservada: quem nunca se inscreveu via ~360px de nada à direita da lista, e
+     as linhas ficavam espremidas num canto de uma tela larga. CSS não consegue
+     perguntar "meu filho renderizou?", então quem responde é este booleano. */
+  const temInscricoes = futuras.some((s) => s.euInscrito);
+
   const porId = useCallback(
     (id: string | null) => (id ? (sessoes.find((s) => s.id === id) ?? null) : null),
     [sessoes],
@@ -129,7 +136,7 @@ export function MentoriasVista({
   const cancelar = useCallback((id: string) => executar(() => cancelarCheckin(id)), [executar]);
 
   return (
-    <div className={styles.raiz}>
+    <div className={styles.raiz} data-vista={vista}>
       {/* A recusa vem do TRIGGER, não daqui — "as vagas acabaram enquanto você
           decidia" é uma frase que só o banco pode dizer com verdade. */}
       {/* `role="alert"` no wrapper e não no `Alert`: o componente do DS não
@@ -192,7 +199,11 @@ export function MentoriasVista({
             />
           )}
 
-          <div className={styles.corpo} data-vista={vista}>
+          <div
+            className={styles.corpo}
+            data-vista={vista}
+            data-apoio={temInscricoes ? '' : undefined}
+          >
             <div className={styles.principal}>
               {vista === 'agenda' ? (
                 <AgendaMentorias
