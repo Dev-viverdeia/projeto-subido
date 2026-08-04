@@ -41,9 +41,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* A MEDIDA MORA AQUI, não no container da página. É o que permite o curso usar a
+   tela inteira sem o título do módulo correr até a contagem do outro lado.
+   O `ch` do Geist mede ~30% a menos que o caractere médio, então o alvo real é
+   caracteres ÷ 1,3 — 62ch ≈ 80 caracteres, folgado para nome de módulo. */
 .nome {
   flex: 1;
   min-width: 0;
+  max-width: 62ch;
   font-size: var(--via-fs-sm);
   font-weight: 560;
   letter-spacing: var(--app-ls-sm);
@@ -121,9 +126,11 @@
   background: var(--via-navy);
 }
 
+/* Mesma lógica do nome do módulo: teto no texto, não no container. */
 .aulaTitulo {
   flex: 1;
   min-width: 0;
+  max-width: 62ch;
   font-size: var(--via-fs-caption);
   color: var(--via-text-body);
   overflow: hidden;

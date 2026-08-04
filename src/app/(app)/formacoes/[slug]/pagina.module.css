@@ -1,11 +1,15 @@
-/* NÃO usa o canvas cheio, e isso é a regra, não descuido: a coluna principal
-   desta tela é o CURRÍCULO — uma lista de linhas de uma linha só. A 1600 ela
-   ficaria com 1292px para um título de módulo de ~300px de texto; o resto seria
-   vão entre o título e a contagem. 1308 põe o currículo em 1000px, que é a
-   medida de varredura da linha. O hero acima ocupa a largura inteira da página,
-   porque banda com mesh gosta de área. */
+/* A PÁGINA USA O CANVAS. O teto anterior era `1308px` — um número mágico, sem
+   token e sem origem escrita —, posto para o currículo não esticar: a 1600 a
+   linha do módulo ficava com 1292px para um título de ~300px de texto, e o resto
+   era vão entre o título e a contagem.
+
+   O diagnóstico estava certo e a correção estava no lugar errado. Quem tem que
+   ter medida é o TEXTO, não a página: o título do módulo e o da aula ganharam
+   teto próprio (ver `CurriculoCurso.module.css`), então a largura que sobra vira
+   respiro entre as duas pontas da linha em vez de texto esticado — e o hero com
+   mesh, que gosta de área, deixa de pagar por um limite que não era dele. */
 .pagina {
-  max-width: 1308px;
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;

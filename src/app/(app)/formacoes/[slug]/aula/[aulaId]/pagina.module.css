@@ -1,9 +1,14 @@
-/* MEDIDA DE LEITURA, não o canvas de 1600 — a mesma correção que a ficha de
-   solução recebeu, pelo mesmo motivo. Com a página em 1600 e a playlist em 360, a
-   coluna do player vai a ~1200px e o vídeo 16:9 a 675 de ALTURA: a navegação de
-   aula nasce fora da dobra em qualquer notebook. */
+/* A PÁGINA VAI AO CANVAS; quem tem teto é o VÍDEO.
+   O limite anterior era da página inteira, e o motivo era real: 16:9 é uma
+   restrição dura, e a coluna do player a 1200px produz 675 de ALTURA — a
+   navegação da aula nasce fora da dobra em qualquer notebook.
+
+   Mas travar a página para proteger o vídeo cobrava o preço do resto da tela. O
+   teto migrou para a COLUNA do player (1000px → ~562 de altura, que cabe), e a
+   playlist ganhou a folga. A grade se centraliza no canvas em vez de encostar à
+   esquerda: sobra menos de 80px de cada lado a 1600, e nada fica esticado. */
 .pagina {
-  max-width: var(--via-container);
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -61,9 +66,12 @@
 
 .grade {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 360px);
+  /* 1000 é o teto do 16:9 que ainda cabe na dobra; a playlist fica com o resto,
+     limitada para não virar um trilho largo de linhas curtas. */
+  grid-template-columns: minmax(0, 1000px) clamp(300px, 26%, 420px);
   gap: var(--via-space-6);
   align-items: start;
+  justify-content: center;
 }
 
 .principal {
