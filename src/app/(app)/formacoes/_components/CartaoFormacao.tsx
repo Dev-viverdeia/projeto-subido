@@ -14,10 +14,16 @@ import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import styles from './CartaoFormacao.module.css';
 
 /**
- * Card de formação em PÔSTER VERTICAL 3:4, na anatomia da plataforma de
- * referência: o pôster é ENCAIXADO dentro do card, com margem e raio próprios —
- * um pôster montado sobre uma superfície, não uma foto colada no topo. É essa
- * moldura de 8px que dá o acabamento; sem ela o card é um retângulo com imagem.
+ * Card de formação em PÔSTER VERTICAL 3:4, agora SANGRADO até a borda.
+ *
+ * A versão anterior encaixava o pôster com 8px de folga dentro de um card com
+ * hairline — "um pôster montado sobre uma superfície", era o argumento, e ele
+ * lia bem numa peça isolada. Na grade não: cada card somava TRÊS contornos
+ * concêntricos (a borda do card, a folga, o raio do pôster), e uma fileira
+ * inteira virava uma fileira de molduras.
+ *
+ * Sem borda e sem folga, quem separa o card do fundo é a SOMBRA sozinha, e o
+ * raio é um só, aplicado na peça inteira por `overflow: hidden`.
  *
  * O TÍTULO VIVE NO PÔSTER, sobre um scrim que desce até a base. Foi o que
  * resolveu o retrato: um 3:4 com o texto todo embaixo tem um vazio alto no meio
