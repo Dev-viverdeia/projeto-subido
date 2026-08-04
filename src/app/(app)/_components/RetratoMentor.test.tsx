@@ -72,6 +72,21 @@ describe('retrato do mentor', () => {
     }
   });
 
+  /**
+   * As duas luzes saem de BANDAS SEPARADAS (12–38 e 62–88), não de um espelho em
+   * torno do centro. Este teste já reprovou a primeira versão, que usava
+   * `100 − x` e cujo comentário afirmava garantir 22 pontos: com x ≈ 50 as duas
+   * caíam no mesmo lugar, e a medição deu 18,4. O piso real agora é 24.
+   */
+  it('as duas luzes nunca caem do mesmo lado', () => {
+    for (const nome of ['Equipe Subido · Tráfego', 'Ana', 'Z', 'Um Nome Bem Mais Longo Aqui']) {
+      const estilo = campo(nome);
+      const x = Number(/--retrato-x:\s*([\d.]+)%/.exec(estilo)?.[1]);
+      const x2 = Number(/--retrato-x2:\s*([\d.]+)%/.exec(estilo)?.[1]);
+      expect(Math.abs(x - x2)).toBeGreaterThanOrEqual(24);
+    }
+  });
+
   /* A paleta não se abre: o hash varia posição, força e ângulo — nunca matiz. Um
      gerador que sorteasse hue seria a porta de entrada do roxo "IA" que a marca
      bane, e o gate de identidade não pega valor vindo de JS. */

@@ -40,14 +40,41 @@ export function RetratoMentor({
 }) {
   const h = hashDeterminista(nome);
 
-  /* Posições contínuas, não uma lista de variantes — ver `fatia`. A luz fica na
-     metade de cima porque é de onde a luz vem, e porque embaixo moram as
-     iniciais. */
+  /**
+   * TRÊS FONTES DE LUZ, não uma. A versão anterior tinha um radial só sobre um
+   * linear, e o resultado era chapado: variava de peça para peça, mas cada peça
+   * isolada era uma mancha sem forma.
+   *
+   * A composição agora é a de um retrato de estúdio, que é de onde a ideia vem:
+   * uma PRINCIPAL forte no alto (a key light), uma SECUNDÁRIA fria e larga do
+   * lado oposto (a fill, que impede a metade escura de virar um buraco preto) e
+   * uma base linear inclinada.
+   *
+   * AS DUAS LUZES SAEM DE BANDAS SEPARADAS, e a primeira tentativa disto estava
+   * errada: eu espelhei a secundária com `100 − x` e escrevi no comentário que
+   * isso garantia 22 pontos de distância. Não garante nada — com x ≈ 50 as duas
+   * caem no mesmo lugar e a distância é ZERO. O teste mediu 18,4 num dos nomes e
+   * reprovou antes de o commit sair. Agora cada luz é sorteada dentro da sua
+   * própria banda (12–38 e 62–88) e um bit do hash decide qual delas fica à
+   * esquerda: a separação mínima passa a ser 24 pontos POR CONSTRUÇÃO.
+   *
+   * A luz principal fica na metade de CIMA porque é de onde a luz vem, e porque
+   * embaixo moram as iniciais: luz atrás de texto é contraste perdido.
+   *
+   * Posições contínuas, nunca uma lista de variantes — ver `fatia`.
+   */
+  const banda = { esquerda: 12 + fatia(h, 0) * 26, direita: 62 + fatia(h, 16) * 26 };
+  /* Um bit decide de que lado nasce a principal — sem ele todo retrato teria a
+     key light do mesmo lado e a fileira leria como um padrão repetido. */
+  const espelhar = (h & 1) === 1;
+
   const campo = {
-    '--retrato-x': `${(14 + fatia(h, 0) * 72).toFixed(1)}%`,
-    '--retrato-y': `${(2 + fatia(h, 8) * 44).toFixed(1)}%`,
+    '--retrato-x': `${(espelhar ? banda.direita : banda.esquerda).toFixed(1)}%`,
+    '--retrato-y': `${(4 + fatia(h, 8) * 34).toFixed(1)}%`,
+    '--retrato-x2': `${(espelhar ? banda.esquerda : banda.direita).toFixed(1)}%`,
+    '--retrato-y2': `${(58 + fatia(h, 24) * 34).toFixed(1)}%`,
     '--retrato-ang': `${104 + (h % 132)}deg`,
-    '--retrato-forca': `${(16 + fatia(h, 16) * 16).toFixed(0)}%`,
+    '--retrato-forca': `${(26 + fatia(h, 8) * 20).toFixed(0)}%`,
   } as CSSProperties;
 
   return (

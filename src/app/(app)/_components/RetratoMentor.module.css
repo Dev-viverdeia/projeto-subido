@@ -38,21 +38,41 @@
   display: block;
 }
 
-/* O CAMPO GERADO. O hash varia POSIÇÃO, FORÇA e ÂNGULO; a cor sai dos tokens e
-   não se abre — um gerador que sorteasse matiz seria a porta de entrada do roxo
-   "IA" que a marca bane.
+/* O CAMPO GERADO — composição de retrato de estúdio, não uma mancha.
+   O hash varia POSIÇÃO, FORÇA e ÂNGULO; a cor sai dos tokens e não se abre: um
+   gerador que sorteasse matiz seria a porta de entrada do roxo "IA" que a marca
+   bane, e o gate de identidade não enxerga valor vindo de JS.
 
-   Duas camadas: a luz (radial, deslocada pelo hash) sobre a base (linear, com o
-   ângulo do hash). Uma camada só daria círculos concêntricos iguais em todos. */
+   TRÊS CAMADAS, na ordem em que se iluminaria uma pessoa:
+
+   1 · KEY LIGHT — a principal, quente de accent, no alto. Corte em 58% para ela
+       ter BORDA: sem o corte a luz sangra até o outro lado e o retrato volta a
+       ser um degradê chapado.
+   2 · FILL — a secundária, do lado oposto por construção, em accent-deep e mais
+       fraca. Ela existe para a metade escura não virar um buraco preto, que é o
+       que acontecia com uma luz só.
+   3 · BASE — o linear inclinado pelo hash, que dá a direção do conjunto.
+
+   A ordem importa: em CSS a PRIMEIRA camada pinta por cima. */
 .retrato[data-gerado] {
   background:
     radial-gradient(
       circle at var(--retrato-x) var(--retrato-y),
       color-mix(in srgb, var(--via-accent) var(--retrato-forca), transparent),
-      transparent 62%
+      transparent 58%
+    ),
+    radial-gradient(
+      circle at var(--retrato-x2) var(--retrato-y2),
+      color-mix(in srgb, var(--via-accent-deep) 30%, transparent),
+      transparent 64%
     ),
     linear-gradient(var(--retrato-ang), var(--via-navy), var(--via-navy-deep));
-  box-shadow: inset 0 0 0 1px var(--via-navy-22);
+  /* Aro interno duplo: a hairline navy fecha o círculo contra o fundo claro, e o
+     fio branco a 1px por dentro é o brilho de borda que separa o retrato da
+     superfície. É a assinatura de vidro da casa em 2px. */
+  box-shadow:
+    inset 0 0 0 1px var(--via-navy-22),
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 16%, transparent);
 }
 
 /* Iniciais sobre o campo escuro: branco puro. `--via-gray-300` (12,2:1) seria o
