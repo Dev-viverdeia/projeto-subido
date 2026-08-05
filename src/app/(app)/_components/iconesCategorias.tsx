@@ -1,5 +1,13 @@
 import type { ReactNode } from 'react';
-import { Blocks, ChartNoAxesCombined, Megaphone, MessageSquareMore, Waypoints } from 'lucide-react';
+import {
+  Blocks,
+  ChartNoAxesCombined,
+  IdCard,
+  Landmark,
+  Megaphone,
+  MessageSquareMore,
+  Waypoints,
+} from 'lucide-react';
 
 /**
  * Categoria de solução → glifo, como ELEMENTOS já renderizados (Server Component
@@ -17,6 +25,9 @@ export const ICONES_CATEGORIAS: Record<string, ReactNode> = {
   Vendas: <ChartNoAxesCombined size={TAMANHO} strokeWidth={TRACO} />,
   Marketing: <Megaphone size={TAMANHO} strokeWidth={TRACO} />,
   Operações: <Waypoints size={TAMANHO} strokeWidth={TRACO} />,
+  /* Chegaram com a importação das soluções da comunidade (top-10 por uso). */
+  Financeiro: <Landmark size={TAMANHO} strokeWidth={TRACO} />,
+  RH: <IdCard size={TAMANHO} strokeWidth={TRACO} />,
 };
 
 export const ICONE_CATEGORIA_PADRAO: ReactNode = <Blocks size={TAMANHO} strokeWidth={TRACO} />;
