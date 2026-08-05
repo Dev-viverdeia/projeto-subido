@@ -1,6 +1,6 @@
 .caixa {
   position: relative;
-  width: min(320px, 100%);
+  width: min(var(--catalogo-busca-largura, 320px), 100%);
 }
 
 .lupa {
@@ -15,13 +15,13 @@
 
 .campo {
   width: 100%;
-  height: 38px;
+  height: var(--catalogo-controle-altura, 38px);
   padding: 0 34px;
-  border: 1px solid var(--via-border);
-  border-radius: var(--via-radius-pill);
+  border: 1px solid var(--catalogo-controle-borda, var(--via-border));
+  border-radius: var(--catalogo-controle-raio, var(--via-radius-pill));
   background: var(--via-surface);
   font-family: inherit;
-  font-size: var(--via-fs-sm);
+  font-size: var(--catalogo-controle-fonte, var(--via-fs-sm));
   color: var(--via-text-primary);
   transition:
     border-color var(--via-t-fast),
@@ -35,7 +35,7 @@
 .campo:focus {
   outline: none;
   border-color: var(--via-navy);
-  box-shadow: 0 0 0 3px var(--via-navy-08);
+  box-shadow: var(--app-ring);
 }
 
 /* O `type="search"` do WebKit desenha um × próprio; escondido para não duplicar. */

@@ -53,9 +53,7 @@ export function RetomadaFormacao({ formacoes }: { formacoes: FormacaoResumo[] })
           style={{ transform: `scaleX(${Math.max(0.02, pct / 100)})` }}
         />
       </span>
-      <span className={styles.seta} aria-hidden="true">
-        →
-      </span>
+      <span className={styles.acao}>Continuar</span>
     </Link>
   );
 }

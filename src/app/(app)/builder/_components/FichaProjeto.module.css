@@ -115,9 +115,17 @@
    vazio à direita.
    O que sobra vai para o painel, que sai de 280 e passa a ter corpo para as
    descrições de ferramenta respirarem. */
+/* O painel é 380 FIXO, e não `minmax(280px, 1fr)`. Medido com documento real:
+   com `1fr` ele comia toda a sobra e ia a 788px a 1920, jogando a descrição de
+   ferramenta para 127 caracteres por linha e a premissa para 124 — no corpo de
+   12px, o menor da ficha. A 380: 62 e 51.
+   Hoje a `.pagina` já para na largura derivada (780 + 32 + 380), o que sozinho
+   segura o `1fr` em 380 — mas deixar `1fr` aqui é guardar a bomba: some o teto da
+   página e o painel volta a inchar. O número explícito é o que torna verdadeiro o
+   comentário de `[id]/pagina.module.css`, que soma estes três termos. */
 .grade {
   display: grid;
-  grid-template-columns: minmax(0, 780px) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 780px) 380px;
   gap: var(--via-space-8);
   align-items: start;
 }
@@ -137,7 +145,12 @@
   gap: var(--app-gap-block);
 }
 
-@media (max-width: 1079px) {
+/* 1279 e não 1079: com o painel em 380 fixos, a prosa fica com o que sobra, e o
+   trilho de 240 come a largura antes de o conteúdo começar. Medido: a 1280 as
+   trilhas ficam 549 + 380 (prosa ainda mais larga que o painel); a 1100 ficariam
+   369 + 380 — painel secundário mais largo que a prosa, com o texto de etapa
+   caindo a 39 caracteres. 1279 é o degrau canônico que nunca inverte. */
+@media (max-width: 1279px) {
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -381,11 +394,20 @@
   color: var(--via-navy);
 }
 
+/* A MEDIDA MORA AQUI, no elemento de texto, e não no painel — é o que a faz valer
+   nos DOIS modos de layout. Com a grade colapsada (abaixo de 1280) o painel passa
+   a ter a largura inteira da página: medido a 1279 ele vai a 960px, e sem esta
+   linha a descrição voltaria a ~150 caracteres por linha mesmo com a trilha de 380
+   resolvida acima.
+   44ch e não 46: a 12px, 1ch = 7,95px aqui, e o `ch` do Geist infla ~1,46× neste
+   corpo (46ch = 366px = 67 caracteres). 44ch entrega 62 — e é o mesmo 44ch que a
+   faixa de fechamento já usa neste arquivo. */
 .ferramentaPapel {
   margin: var(--via-space-1) 0 0;
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
+  max-width: 44ch;
   text-wrap: pretty;
 }
 
@@ -433,6 +455,14 @@
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
+}
+
+/* No `li`, não na `ul`: a medida é do texto, e a `ul` ainda carrega o recuo do
+   marcador. Premissa é a prova da estimativa — o número ao lado não vale nada se a
+   conta que o produziu vier em linha de 124 caracteres, que é o que o painel de
+   788px entregava. Medido com 44ch: 51. */
+.premissas li {
+  max-width: 44ch;
 }
 
 /* ---- Fechamento ------------------------------------------------------------ */
