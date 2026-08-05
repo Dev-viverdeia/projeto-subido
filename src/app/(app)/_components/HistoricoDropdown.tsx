@@ -4,6 +4,9 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import styles from './HistoricoDropdown.module.css';
 
 /**
+ * Promovido de builder/_components na segunda ocorrência (Consultor) — a
+ * regra de dois da casa.
+ *
  * O histórico no CANTO SUPERIOR da tela: gatilho compacto à direita, painel
  * SOBREPOSTO que abre embaixo dele. A tela de criação fica inteira para a
  * pergunta, e os projetos ficam a um clique de qualquer ponto da página.

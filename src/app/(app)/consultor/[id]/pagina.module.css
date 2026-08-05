@@ -1,0 +1,15 @@
+/* Conversa é COLUNA DE LEITURA, não canvas: balões de 52ch pedem eixo estreito. */
+.pagina {
+  width: 100%;
+  max-width: var(--via-content);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+/* O campo cola no fim da conversa; o respiro de baixo é da página. */
+.rodape {
+  position: sticky;
+  bottom: var(--via-space-4);
+}

@@ -4,7 +4,7 @@ import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { Compositor } from './_components/Compositor';
 import { HistoricoBuilder } from './_components/HistoricoBuilder';
-import { HistoricoDropdown } from './_components/HistoricoDropdown';
+import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Builder' };

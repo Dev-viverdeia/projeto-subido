@@ -126,6 +126,62 @@ export type Database = {
           },
         ]
       }
+      consultor_mensagens: {
+        Row: {
+          conteudo: string
+          criado_em: string
+          id: string
+          papel: string
+          thread_id: string
+        }
+        Insert: {
+          conteudo: string
+          criado_em?: string
+          id?: string
+          papel: string
+          thread_id: string
+        }
+        Update: {
+          conteudo?: string
+          criado_em?: string
+          id?: string
+          papel?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_mensagens_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultor_threads: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          dono: string
+          id: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          dono: string
+          id?: string
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          dono?: string
+          id?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       formacoes: {
         Row: {
           atualizado_em: string

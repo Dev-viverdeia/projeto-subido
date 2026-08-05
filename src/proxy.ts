@@ -41,6 +41,7 @@ export const config = {
     '/solucoes/:path*',
     '/formacoes/:path*',
     '/builder/:path*',
+    '/consultor/:path*',
     '/mentorias/:path*',
     '/conta/:path*',
     '/admin/:path*',

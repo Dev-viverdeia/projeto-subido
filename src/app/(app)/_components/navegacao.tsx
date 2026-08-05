@@ -1,4 +1,4 @@
-import { Blocks, Boxes, GraduationCap, House, ShieldCheck, Users } from 'lucide-react';
+import { Blocks, Boxes, Compass, GraduationCap, House, ShieldCheck, Users } from 'lucide-react';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
@@ -49,6 +49,14 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/builder'],
     icone: <Blocks size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+  },
+  {
+    href: '/consultor',
+    rotulo: ROTULOS['/consultor'],
+    icone: <Compass size={TAMANHO} strokeWidth={TRACO} />,
+    /* O dock do mobile cabe cinco itens e já tem cinco — o Consultor entra só
+       no trilho lateral até alguém ceder o lugar. */
+    noDock: false,
   },
   {
     href: '/mentorias',

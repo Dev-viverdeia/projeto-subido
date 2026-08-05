@@ -1,0 +1,103 @@
+/* Mesma decisão do Builder: a página no wide, o conteúdo com coluna própria. */
+.pagina {
+  max-width: var(--via-container);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-8);
+}
+
+/* O canto do histórico — anatomia idêntica ao /builder (ver os porquês lá). */
+.topoDireito {
+  position: relative;
+  z-index: 20;
+  height: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.threads {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+.thread {
+  display: block;
+  padding: var(--via-space-3) var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: background-color var(--app-t-state);
+}
+
+.thread:hover {
+  background: var(--via-navy-04);
+  text-decoration: none;
+}
+
+.thread:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* A coluna da pergunta — 720 como o compositor do Builder. */
+.tela {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+  padding-top: clamp(32px, 8vh, 96px);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h1);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.apoio {
+  margin: 0 auto;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thread {
+    transition: none;
+  }
+}

@@ -11,6 +11,7 @@ export const ROTAS_APP = [
   '/solucoes',
   '/formacoes',
   '/builder',
+  '/consultor',
   '/mentorias',
   '/conta',
   /* Área administrativa. Entra aqui — e não numa lista separada — porque para o
@@ -39,6 +40,7 @@ export const ROTULOS: Record<RotaApp, string> = {
   '/solucoes': 'Soluções de IA',
   '/formacoes': 'Formações',
   '/builder': 'Builder',
+  '/consultor': 'Consultor',
   '/mentorias': 'Mentorias',
   '/conta': 'Conta',
   '/admin': 'Administração',
