@@ -174,7 +174,10 @@
   margin: var(--via-space-16) 0 0;
   padding-top: var(--via-space-5);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  max-width: 70ch;
+  /* 53ch e não 70: com o fator da Outfit (1,369) os 70ch rendiam 96 caracteres por
+     linha, muito acima da faixa de 45–75 — e este é o parágrafo que a seção existe
+     para que seja lido, o de não-promessa. Medido no navegador depois: 75. */
+  max-width: 53ch;
   font-size: var(--via-fs-caption);
   line-height: var(--via-lh-loose);
   color: var(--via-gray-400);

@@ -88,7 +88,9 @@
 
 .answer {
   padding: 0 0 var(--via-space-6) calc(var(--via-space-4) + 2ch);
-  max-width: 62ch;
+  /* 53ch e não 62: os 62ch rendiam 85 caracteres com a Outfit. Resposta de FAQ é
+     prosa, então vale a faixa de 45–75. Medido no navegador depois: 70. */
+  max-width: 53ch;
 }
 
 .answer p {

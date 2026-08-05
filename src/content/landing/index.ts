@@ -156,10 +156,17 @@ export const PILLARS: Pillar[] = [
     teaser: 'Descreva a ideia. Receba o projeto montado.',
     title: 'Descreva a ideia. Receba o projeto.',
     sub: 'O Builder avalia se a ideia se sustenta e, quando sim, monta a base de conhecimento, o framework, a arquitetura, o stack de ferramentas, o plano de ação e a estimativa de economia.',
+    /* CINCO fatos, contra três dos outros pilares — e não é para preencher a fileira:
+       são os entregáveis que o `sub` desta mesma seção já enumera um a um. Ter três
+       aqui obrigava a agrupar "arquitetura e stack" e "plano e economia" em pares que
+       o produto entrega separados. Contagem igual em todos os pilares é o que a
+       doutrina chama de molde denunciado pela própria regularidade. */
     facts: [
       'Análise de viabilidade antes de qualquer linha',
+      'Base de conhecimento e framework montados',
       'Arquitetura e stack de ferramentas sugeridos',
-      'Plano de ação e estimativa de economia',
+      'Plano de ação por etapa',
+      'Estimativa de economia',
     ],
   },
   {
@@ -239,13 +246,27 @@ export const COMPARISON = {
   eyebrow: 'Comparação',
   title: 'Por que não só fazer um curso.',
   columns: ['Curso avulso', 'Consultoria', 'Aprender sozinho', 'Esta assinatura'],
+  /* PLACAR NÃO PERFEITO, de propósito e por honestidade. Antes esta coluna acertava
+     6 de 6 e "Aprender sozinho" errava 6 de 6 — dois placares perfeitos em direções
+     opostas, que é o que denuncia tabela escrita para a conclusão em vez de medida.
+     Três correções, e nenhuma é cosmética:
+
+     · "Vitrine para ser contratado" SAIU. Era `true` para esta coluna enquanto a
+       seção do HUB, na mesma página, diz "em construção" e "previsto para mar/2027".
+       A tabela contradizia o disclaimer — e o disclaimer é o ativo, não a tabela.
+       O argumento da vitrine continua na seção do HUB, onde cabe a data e a ressalva.
+     · "Alguém implementa por você" ENTROU, e é o `false` honesto desta coluna. É a
+       diferença real para consultoria: lá alguém entrega por você, aqui você aprende
+       a entregar. Ceder este ponto é mais crível que vencer os seis.
+     · "Conteúdo atualizado" virou `true` para quem aprende sozinho. Conteúdo atual
+       existe de graça; o que não existe é o resto da linha. */
   rows: [
-    { label: 'Conteúdo atualizado', values: [false, true, false, true] },
+    { label: 'Conteúdo atualizado', values: [false, true, true, true] },
     { label: 'Passo a passo de implementação', values: [false, true, false, true] },
     { label: 'Ferramentas incluídas', values: [false, false, false, true] },
     { label: 'Mentoria com humano', values: [false, true, false, true] },
     { label: 'Certificado', values: [true, false, false, true] },
-    { label: 'Vitrine para ser contratado', values: [false, false, false, true] },
+    { label: 'Alguém implementa por você', values: [false, true, false, false] },
   ],
 } as const;
 

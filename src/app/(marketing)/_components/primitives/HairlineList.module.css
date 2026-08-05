@@ -40,3 +40,39 @@
 .dark .item strong {
   color: var(--via-white);
 }
+
+/* ---- Fileira -------------------------------------------------------------------
+   A régua gira junto com o empilhamento. Em fileira, manter a `border-top` de cada
+   item produziria um traço solto por cima da primeira palavra de cada coluna, em vez
+   de um separador entre elas — a régua fina só lê como separador quando é
+   perpendicular ao sentido da leitura.
+
+   Só a partir de 1024px: abaixo disso a fileira vira coluna de novo (o `auto-fit`
+   colapsa), e aí a régua horizontal volta a ser a certa, que é o que o seletor
+   dentro do media query preserva. */
+@media (min-width: 1024px) {
+  .fileira {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--via-space-6);
+  }
+
+  .fileira .item {
+    padding-block: 0;
+    padding-inline-start: var(--via-space-4);
+    border-top: none;
+    border-inline-start: 1px solid transparent;
+  }
+
+  .fileira .item:first-child {
+    padding-inline-start: 0;
+    border-inline-start: none;
+  }
+
+  .light.fileira .item {
+    border-inline-start-color: var(--via-border-hairline);
+  }
+
+  .dark.fileira .item {
+    border-inline-start-color: rgba(255, 255, 255, 0.12);
+  }
+}

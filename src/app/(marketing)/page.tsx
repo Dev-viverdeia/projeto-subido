@@ -46,14 +46,17 @@ export default function LandingPage() {
       <CredibilityStrip />
       <PillarsIndex />
 
-      {PILLARS.map((pillar, i) => (
-        <PillarSection
-          key={pillar.slug}
-          pillar={pillar}
-          flip={i % 2 === 1}
-          tone={i % 2 === 1 ? 'tint' : 'light'}
-        />
-      ))}
+      {/* COMPOSIÇÃO EXPLÍCITA, e não `i % 2`. O módulo dava a cada pilar o mesmo peso
+          por construção — e o resultado era medível: 614 / 601 / 601 / 601px de
+          altura, três idênticas ao pixel. Escrito à mão, a exceção do Builder fica
+          visível no código em vez de escondida numa aritmética de índice, e mudar a
+          ordem dos pilares deixa de reatribuir silenciosamente tom e lado.
+          O Builder é o único que a concorrência não tem: biblioteca de soluções e
+          trilha em vídeo são commodity, gerador de projeto não é. */}
+      <PillarSection pillar={PILLARS[0]!} tone="light" />
+      <PillarSection pillar={PILLARS[1]!} flip tone="tint" />
+      <PillarSection pillar={PILLARS[2]!} variante="destaque" tone="light" />
+      <PillarSection pillar={PILLARS[3]!} flip tone="tint" />
 
       <TwoPathsSection />
       <HubSection />
