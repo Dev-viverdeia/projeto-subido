@@ -4,6 +4,7 @@ import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { Compositor } from './_components/Compositor';
 import { HistoricoBuilder } from './_components/HistoricoBuilder';
+import { HistoricoDropdown } from './_components/HistoricoDropdown';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Builder' };
@@ -35,14 +36,14 @@ export default async function BuilderPage() {
         <Compositor />
       </div>
 
+      {/* O histórico é um DISCLOSURE fechado: a tela inicial volta a ser só a
+          pergunta. A grade continua server-rendered e atravessa como children —
+          o dropdown só abre e fecha. */}
       {itens.length > 0 ? (
         <section className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}>
-          <h2 className={styles.eyebrow}>
-            Seus projetos
-            <span className={styles.total}>{itens.length}</span>
-          </h2>
-
-          <HistoricoBuilder itens={itens} />
+          <HistoricoDropdown total={itens.length}>
+            <HistoricoBuilder itens={itens} />
+          </HistoricoDropdown>
         </section>
       ) : null}
     </div>

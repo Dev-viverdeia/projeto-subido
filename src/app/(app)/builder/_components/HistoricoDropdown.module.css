@@ -1,0 +1,107 @@
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.titulo {
+  margin: 0;
+}
+
+/* O gatilho é a linha inteira do título — alvo generoso, sem virar botão-caixa:
+   a superfície só aparece no hover, como resposta, não como moldura. */
+.gatilho {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  width: 100%;
+  margin: 0;
+  padding: var(--via-space-2) var(--via-space-3);
+  margin-inline: calc(-1 * var(--via-space-3));
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background-color var(--app-t-state);
+}
+
+.gatilho:hover {
+  background: var(--via-navy-03);
+}
+
+/* O anel compõe com sombra nenhuma: o gatilho não tem elevação de repouso. */
+.gatilho:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.rotulo {
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding-inline: var(--via-space-1_5);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A seta fecha a linha à direita: rótulo e contagem à esquerda, estado no fim.
+   Rotação a `--app-t-touch` — é resposta ao dedo, não revelação. */
+.seta {
+  margin-left: auto;
+  color: var(--via-text-faint);
+  transition: transform var(--app-t-touch);
+}
+
+.seta[data-aberto] {
+  transform: rotate(180deg);
+}
+
+.gatilho:hover .seta {
+  color: var(--via-text-muted);
+}
+
+/* A CASCATA DOS CARDS. O painel em si não anima altura (regra da casa: só
+   transform e opacity) — quem entra são os ITENS, cada um no seu tempo, lendo o
+   `--i` que a grade server-rendered carimba. O atraso trava em 6 batidas: numa
+   grade de 12+ projetos, esperar 12 × 45ms é desfile, não entrada. */
+.painel :where(li) {
+  opacity: 1;
+  animation: historico-entrar var(--app-motion-reveal) var(--via-ease-out) backwards;
+  animation-delay: calc(min(var(--i, 0), 6) * 45ms);
+}
+
+/* Sem `to`, e `backwards` — ver entrada.module.css: `forwards` reteria um
+   transform residual que cria containing block para `position: fixed`. */
+@keyframes historico-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel :where(li) {
+    animation: none;
+  }
+
+  .seta,
+  .gatilho {
+    transition: none;
+  }
+}

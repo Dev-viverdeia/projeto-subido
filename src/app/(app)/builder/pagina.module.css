@@ -6,7 +6,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-section);
+  gap: var(--via-space-8);
 }
 
 /* Folga grande antes do histórico: ele é o segundo assunto da tela, e o
@@ -14,35 +14,9 @@
 .historico {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-block);
-  padding-top: var(--app-gap-section);
+  gap: var(--via-space-5);
+  padding-top: var(--via-space-6);
   border-top: 1px solid var(--via-border-hairline);
 }
 
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: 0.688rem;
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.total {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: var(--via-space-1);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
-  font-size: 0.625rem;
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
-}
+/* Título e contagem migraram para o gatilho do HistoricoDropdown. */
