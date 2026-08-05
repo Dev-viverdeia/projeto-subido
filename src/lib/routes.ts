@@ -13,6 +13,7 @@ export const ROTAS_APP = [
   '/builder',
   '/consultor',
   '/mentorias',
+  '/certificados',
   '/conta',
   /* Área administrativa. Entra aqui — e não numa lista separada — porque para o
      proxy ela é igual às outras: exige sessão. Quem tem sessão mas não é admin é
@@ -42,6 +43,7 @@ export const ROTULOS: Record<RotaApp, string> = {
   '/builder': 'Builder',
   '/consultor': 'Consultor',
   '/mentorias': 'Mentorias',
+  '/certificados': 'Certificados',
   '/conta': 'Conta',
   '/admin': 'Administração',
 };
