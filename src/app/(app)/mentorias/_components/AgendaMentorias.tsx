@@ -41,13 +41,12 @@ export function AgendaMentorias({
   aoFazerCheckin: (id: string) => void;
   aoCancelarCheckin: (id: string) => void;
 }) {
-  /* "Hoje" só é o padrão se HOUVER hoje — abrir num filtro vazio é a forma mais
-     rápida de a tela parecer quebrada. */
-  const haHoje = useMemo(
-    () => sessoes.some((s) => chaveDoDia(s.inicioIso) === chaveDoDia(agoraIso)),
-    [sessoes, agoraIso],
-  );
-  const [filtro, setFiltro] = useState<FiltroDia>(haHoje ? 'hoje' : 'todas');
+  /* O padrão é TODAS, e já foi "hoje se houver hoje". Medido a 1920 com uma
+     sessão no dia: o cartão da próxima acima JÁ mostra essa sessão — a lista
+     abria repetindo o cartão numa linha de 66px e o resto da tela era vazio,
+     com "Todas 7" escondida atrás de um clique. O cartão é o agora; a lista
+     abre como panorama. "Hoje" continua a um clique, com contagem visível. */
+  const [filtro, setFiltro] = useState<FiltroDia>('todas');
 
   /**
    * UMA REGRA SÓ, consultada duas vezes: para filtrar a lista e para contar cada

@@ -84,6 +84,17 @@
   color: var(--via-text-body);
 }
 
+/* Um degrau mais quieto que o nome: é qualificador, não protagonista. O
+   separador entra por pseudo-elemento para não virar texto selecionável. */
+.trilha {
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+}
+
+.trilha::before {
+  content: '· ';
+}
+
 /* `position: relative` sobe os CTAs ACIMA da sobreposição do título. Sem isto o
    `::after` de `.abrir` cobriria "Fazer check-in" e todo clique abriria a ficha. */
 .direita {

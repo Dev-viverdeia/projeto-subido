@@ -5,6 +5,7 @@ import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
 import { RetratoMentor } from '../../_components/RetratoMentor';
+import { TRILHAS } from '@/lib/mentorias/tipos';
 import { Visto } from '../../_components/PillEstado';
 import styles from './ItemAgenda.module.css';
 
@@ -78,6 +79,11 @@ export function ItemAgenda({
         <div className={styles.mentor}>
           <RetratoMentor nome={mentor.nome} fotoUrl={mentor.foto_url} tamanho="xs" />
           <span className={styles.mentorNome}>{mentor.nome}</span>
+          {/* A trilha organiza o calendário inteiro (legenda por cor), mas a
+              agenda a escondia — quem varre a lista não sabia qual sessão é da
+              sua área sem abrir a ficha. Texto quieto, não dot: dot decorativo
+              antes de texto é padrão banido; aqui a informação É o texto. */}
+          <span className={styles.trilha}>{TRILHAS[mentor.trilha].rotulo}</span>
         </div>
       </div>
 
