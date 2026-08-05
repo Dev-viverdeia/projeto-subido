@@ -80,9 +80,17 @@
   gap: var(--via-space-4);
 }
 
+/* `minmax(0, 1fr)` E NUNCA `1fr` nas duas larguras. Faixa `1fr` tem mínimo
+   automático `auto` e não encolhe abaixo do min-content dos seus itens; dentro do
+   card mora o `.badge`, que é `white-space: nowrap`. Medido a 1280 trocando o
+   badge por um rótulo de 240px: as faixas iam de 233,6 · 233,6 · 233,6 para
+   185,7 · 329,4 · 185,7 — os três planos deixavam de ter a MESMA largura, com o
+   do meio 1,77× maior que os vizinhos. Numa tabela de preço isso não é só layout:
+   card maior lê como plano recomendado, e essa ênfase ninguém escolheu.
+   Com o badge real a mudança é NO-OP: 233,6 nas três, antes e depois. */
 @media (min-width: 640px) and (max-width: 1079px) {
   .plans {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   /* Enterprise ocupa a linha inteira quando sobra sozinho. */
   .plans > :last-child {
@@ -92,7 +100,7 @@
 
 @media (min-width: 1080px) {
   .plans {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
