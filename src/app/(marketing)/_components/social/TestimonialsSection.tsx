@@ -1,5 +1,6 @@
+import { Avatar } from '@/design-system/via';
 import { TESTIMONIALS, TESTIMONIALS_META } from '@/content/landing';
-import { Section, SectionHeader, Reveal, AssetPlaceholder } from '../primitives';
+import { Section, SectionHeader, Reveal } from '../primitives';
 import styles from './TestimonialsSection.module.css';
 
 /**
@@ -35,8 +36,13 @@ export function TestimonialsSection() {
             </div>
 
             <footer className={styles.person}>
+              {/* MONOGRAMA, não foto de banco. A regra da casa pede foto no card, e
+                  ela continua valendo — mas foto de pessoa que não é o depoente é
+                  pior que nenhuma: transforma um depoimento sem rosto num depoimento
+                  com rosto errado. O monograma preenche a composição sem afirmar
+                  ninguém. `Avatar` é Server Component, então custa zero JS. */}
               <span className={styles.avatar}>
-                <AssetPlaceholder label="foto" />
+                <Avatar alt={item.name} size="md" />
               </span>
               <span className={styles.identity}>
                 <span className={styles.name}>{item.name}</span>

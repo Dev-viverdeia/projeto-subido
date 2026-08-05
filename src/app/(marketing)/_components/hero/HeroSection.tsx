@@ -3,7 +3,6 @@ import { HERO, NAV, HEADER_LOGIN } from '@/content/landing';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { MaskReveal } from '../primitives/MaskReveal';
 import { TrackedCta } from '../primitives/TrackedCta';
-import { HeroVideoFacade } from './HeroVideoFacade';
 import { HeroPortrait } from './HeroPortrait';
 import styles from './HeroSection.module.css';
 
@@ -94,33 +93,21 @@ export function HeroSection() {
             </p>
           </div>
 
-          {/* A ENTRADA NÃO MORA AQUI, e isso não é organização: mora nos dois FILHOS.
-              Este contêiner é ancestral comum do retrato e do card de vídeo, e o card
-              é vidro (`backdrop-filter` no `.frame` do HeroVideoFacade). Opacidade < 1
-              num ancestral cria grupo composto e o vidro deixa de existir — medido no
-              navegador: com `opacity: 0.99` aqui, a foto atrás do card sai NÍTIDA em
-              vez de borrada. Enquanto o `rise` viveu nesta div, o card passou os
-              ~1,02s da cascata (320ms de atraso + 700ms) sem vidro nenhum. É a mesma
-              cirurgia que o SiteHeader já tinha recebido. */}
+          {/* A ENTRADA MORA NO RETRATO, não neste contêiner, e a regra vale para quem
+              vier depois: nada com `backdrop-filter` pode ter um ancestral que anime
+              opacidade. Opacidade < 1 cria grupo composto, o filho passa a amostrar o
+              grupo em vez da página, e o vidro não acontece — medido aqui no
+              navegador, e é o mesmo motivo que faz a barra do SiteHeader entrar só por
+              transform. Enquanto o `rise` viveu nesta div, o vidro que existia dentro
+              dela ficava chapado durante ~1,02s (320ms de atraso + 700ms). */}
           <div className={styles.figure}>
-            {/* Contêiner próprio da figura: o card do vídeo se posiciona em relação
-                AO RETRATO, não à coluna. Sem isso, mover o retrato para a direita
-                deixaria o card para trás, no meio da coluna de texto. */}
             <div className={styles.figureInner}>
-              {/* O retrato é IRMÃO do card, não ancestral: aqui a opacidade é livre. */}
               <HeroPortrait
                 alt={HERO.portraitAlt}
                 prioritario
                 className="rise rise--now"
                 style={{ ['--rise-i' as string]: 4 }}
               />
-
-              {/* O vídeo não disputa a coluna com o retrato: se apoia nele, sobreposto
-                  ao canto inferior esquerdo. A camada é o que dá profundidade à
-                  composição sem precisar de 3D. */}
-              <div className={`${styles.videoCard} ${styles.videoCardEntra}`}>
-                <HeroVideoFacade caption={HERO.videoCaption} />
-              </div>
             </div>
           </div>
         </div>

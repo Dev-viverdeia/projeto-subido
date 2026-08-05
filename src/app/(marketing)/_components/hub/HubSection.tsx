@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
+import { Skeleton } from '@/design-system/via';
 import { HUB } from '@/content/landing';
-import { Section, SectionHeader, Reveal, AssetPlaceholder } from '../primitives';
+import { Section, SectionHeader, Reveal } from '../primitives';
 import styles from './HubSection.module.css';
 
 /**
@@ -63,9 +64,15 @@ export function HubSection() {
             <div className={styles.previewGrid}>
               {Array.from({ length: 6 }, (_, i) => (
                 <div key={i} className={styles.profile}>
-                  {/* Avatar silhueta apresentado como membro real seria uma mentira
-                      pequena que custaria a postura de credibilidade da página. */}
-                  <AssetPlaceholder label="perfil" tone="dark" />
+                  {/* SKELETON, e não avatar: o HUB abre em 2027 e não tem um membro
+                      sequer. Uma silhueta aqui seria apresentada como membro real —
+                      "uma mentira pequena que custaria a postura de credibilidade da
+                      página", e a seção inteira é sobre não prometer o que não existe.
+                      O esqueleto diz a verdade (é a FORMA da interface, não o
+                      conteúdo dela) e ainda assim lê como peça acabada. */}
+                  <Skeleton variant="circle" width={36} height={36} />
+                  <Skeleton width="70%" height={8} />
+                  <Skeleton width="45%" height={8} />
                 </div>
               ))}
             </div>

@@ -1,13 +1,33 @@
 import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
 
 /**
- * TODO(conteúdo) — o que ainda precisa vir de vocês antes do tráfego pago ligar:
- *   · números reais da plataforma (marcados como [N] abaixo)
+ * ⚠ CONTEÚDO DE DEMONSTRAÇÃO — NADA NESTE ARQUIVO É VERIFICADO.
+ *
+ * Os `[N]`, `R$ [X]` e `[Nome do aluno]` que moravam aqui foram preenchidos com
+ * valores INVENTADOS para a página poder ser apresentada cheia. Isso inclui os três
+ * depoimentos (pessoas, cidades, prazos e resultados), os preços dos planos, os
+ * números da plataforma, a data do HUB, as respostas de pagamento e do papel do
+ * Pedro, e os contatos do rodapé.
+ *
+ * POR QUE ISTO É PERIGOSO, e é o próprio CLAUDE.md quem diz: depoimento fabricado
+ * numa página de conversão é exposição de CDC/CONAR, não preferência estética —
+ * "a única coisa capaz de derrubar a credibilidade desta página, justamente porque
+ * todo o resto dela é construído sobre atribuição". Preço inventado é pior: é oferta.
+ *
+ * POR ISSO A FLAG ABAIXO EXISTE E O CI REPROVA ENQUANTO ELA ESTIVER LIGADA.
+ * Não basta apagar a flag: desligá-la sem substituir o conteúdo faz a página ir ao ar
+ * com os mesmos dados inventados, agora sem aviso nenhum. O caminho é trocar o
+ * conteúdo por real e ENTÃO desligar.
+ *
+ * O que precisa vir de vocês para desligar:
+ *   · números reais da plataforma e a data de apuração
  *   · preços dos três planos
  *   · data prevista do HUB
  *   · depoimentos reais OU autorização para usar os da Comunidade Subido, rotulados
- *   · VSL, retratos e screenshots dos pilares
+ *   · retratos, e as respostas reais das quatro perguntas de FAQ
+ *   · WhatsApp e e-mail de suporte
  */
+export const CONTEUDO_DEMO = true;
 
 export const HERO = {
   eyebrow: 'Comunidade Subido de Tráfego',
@@ -53,15 +73,15 @@ export const PROOF: StatGroup[] = [
   {
     source: 'A plataforma',
     stats: [
-      { value: '[N]', label: 'empresas com implementação entregue' },
+      { value: '64', label: 'empresas com implementação entregue' },
       { value: '103', label: 'soluções publicadas' },
-      { value: '[N]', label: 'implementações rodando em produção' },
+      { value: '180', label: 'implementações rodando em produção' },
     ],
   },
 ];
 
 export const PROOF_NOTE =
-  'Números informados pela Comunidade Subido de Tráfego · atualizados em [mês/ano].';
+  'Números informados pela Comunidade Subido de Tráfego · atualizados em jul/2026.';
 
 /**
  * Navegação do header.
@@ -124,7 +144,7 @@ export const PILLARS: Pillar[] = [
     title: 'Do primeiro conceito à entrega para cliente.',
     sub: 'Trilhas completas em vídeo: curso, módulos, aulas, progresso e certificado. Feitas para quem vai implementar, não para quem vai comentar.',
     facts: [
-      '<strong>[N]</strong> formações · <strong>[N]</strong> aulas',
+      '<strong>12</strong> formações · <strong>287</strong> aulas',
       'Progresso salvo e retomada de onde parou',
       'Certificado por formação',
     ],
@@ -150,7 +170,7 @@ export const PILLARS: Pillar[] = [
     title: 'Quando travar, tem gente do outro lado.',
     sub: 'Encontros em grupo toda semana e sessões individuais por crédito, em sala de vídeo dentro da plataforma. Você chega com o problema real e sai com o próximo passo.',
     facts: [
-      '<strong>[N]</strong> encontros em grupo por mês',
+      '<strong>4</strong> encontros em grupo por mês',
       'Sessão individual por crédito',
       'Gravações disponíveis depois',
     ],
@@ -184,9 +204,9 @@ export const HUB = {
   timeline: [
     { label: 'Formação', status: 'Disponível hoje', done: true },
     { label: 'Certificação', status: 'Disponível hoje', done: true },
-    { label: 'HUB', status: 'Previsto para [mês/ano]', done: false },
+    { label: 'HUB', status: 'Previsto para mar/2027', done: false },
   ],
-  criteria: 'Entram no HUB os assinantes com [N] soluções implementadas e certificado ativo.',
+  criteria: 'Entram no HUB os assinantes com 5 soluções implementadas e certificado ativo.',
   /** Fica NA seção, não em rodapé nem tooltip. Num mercado saturado de "ganhe R$10k/mês
    *  em 30 dias", recusar-se a prometer renda é ativo de conversão. */
   disclaimer:
@@ -222,13 +242,13 @@ export const PRICING_META = {
   title: 'Quanto custa.',
   stackLead: 'Somando o que existe hoje no mercado separadamente:',
   stack: [
-    { label: 'Formação em implementação de IA', value: 'R$ [X]' },
-    { label: 'Biblioteca de soluções prontas', value: 'R$ [X]' },
-    { label: 'Ferramenta de geração de projeto', value: 'R$ [X]/ano' },
-    { label: 'Mentoria mensal', value: 'R$ [X]/ano' },
+    { label: 'Formação em implementação de IA', value: 'R$ 4.800' },
+    { label: 'Biblioteca de soluções prontas', value: 'R$ 3.600' },
+    { label: 'Ferramenta de geração de projeto', value: 'R$ 2.280/ano' },
+    { label: 'Mentoria mensal', value: 'R$ 7.200/ano' },
   ],
-  stackTotal: 'R$ [X] por ano',
-  reveal: 'Na assinatura, a partir de R$ [Y] por mês.',
+  stackTotal: 'R$ 17.880 por ano',
+  reveal: 'Na assinatura, a partir de R$ 197 por mês.',
 } as const;
 
 export const AUTHORITY = {
@@ -244,10 +264,11 @@ export const AUTHORITY = {
         'Eu passei oito anos ensinando gente a vender tráfego. O próximo serviço que as empresas vão comprar é implementação de IA — e quase ninguém tá pronto pra entregar.',
     },
     {
-      name: '[Nome do responsável técnico]',
+      name: 'Mateus Milagre',
       role: 'Direção da plataforma',
-      credentials: ['[N] implementações entregues', '103 soluções publicadas', '[N] empresas'],
-      quote: '[TODO: citação sobre por que a plataforma existe e o que ela entrega.]',
+      credentials: ['180 implementações entregues', '103 soluções publicadas', '64 empresas'],
+      quote:
+        'Curso ensina a ferramenta e a ferramenta muda em seis meses. O que não muda é o método de implementar: entender o processo, escolher onde a IA entra e entregar funcionando. A plataforma existe para ser esse método, com as ferramentas dentro.',
     },
   ],
 } as const;
@@ -264,29 +285,31 @@ export const FAQ_META = {
  *  justamente porque todo o resto dela é construído sobre atribuição. */
 export const TESTIMONIALS: Testimonial[] = [
   {
-    name: '[Nome do aluno]',
+    name: 'Rafael Nunes',
     role: 'Implementador de IA',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] semanas',
+    city: 'Curitiba/PR',
+    timeframe: 'em 7 semanas',
     quote:
-      '[Depoimento verbatim, no português do aluno — gíria e tudo. Nunca reescrever para a voz da marca.]',
-    outcome: '[Resultado concreto com número]',
+      'Eu já mexia com tráfego, mas na hora que o cliente pedia automação eu travava e passava pra outro. Peguei a solução de atendimento pronta, adaptei pro nicho dele e entreguei em duas semanas. O que mudou não foi eu saber mais IA, foi ter o passo a passo de implementação na mão.',
+    outcome: '3 clientes de retainer',
   },
   {
-    name: '[Nome do aluno]',
-    role: 'Sócio em agência',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] meses',
-    quote: '[Depoimento verbatim]',
-    outcome: '[Resultado concreto com número]',
+    name: 'Marina Bueno',
+    role: 'Sócia em agência',
+    city: 'Belo Horizonte/MG',
+    timeframe: 'em 4 meses',
+    quote:
+      'A gente vendia gestão de tráfego e ponto. Coloquei implementação de IA como segundo serviço pros clientes que já tinha e não precisei prospectar nada novo. O Builder me poupou a parte que eu mais odiava, que era montar escopo do zero toda vez.',
+    outcome: 'ticket médio de R$ 2.400 para R$ 6.100',
   },
   {
-    name: '[Nome do aluno]',
+    name: 'Diego Farias',
     role: 'Dono de negócio local',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] dias',
-    quote: '[Depoimento verbatim]',
-    outcome: '[Resultado concreto com número]',
+    city: 'Fortaleza/CE',
+    timeframe: 'em 19 dias',
+    quote:
+      'Não sou técnico, tenho três lojas de material de construção. Fiz a formação achando que ia ser código e não era. Montei o atendimento no WhatsApp seguindo a solução e hoje ele responde orçamento fora do horário, que era quando eu perdia venda.',
+    outcome: '41% dos orçamentos fora do horário comercial',
   },
 ];
 
@@ -309,7 +332,7 @@ export const PLANS: Plan[] = [
     id: 'starter',
     name: 'Starter',
     pitch: 'Para começar a implementar e provar que funciona.',
-    priceMonthly: null,
+    priceMonthly: 197,
     features: [
       'Soluções com passo a passo',
       'Formações completas',
@@ -323,7 +346,7 @@ export const PLANS: Plan[] = [
     id: 'pro',
     name: 'Pro',
     pitch: 'Para quem vai implementar para o mercado.',
-    priceMonthly: null,
+    priceMonthly: 397,
     features: [
       'Tudo do Starter',
       'Builder sem limite',
@@ -377,7 +400,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'O HUB já está no ar?',
-    a: 'Ainda não. Formação e certificação estão disponíveis hoje; o HUB está previsto para [mês/ano]. Ele conecta empresas a implementadores certificados — não vendemos vaga nem garantimos contrato.',
+    a: 'Ainda não. Formação e certificação estão disponíveis hoje; o HUB está previsto para março de 2027. Ele conecta empresas a implementadores certificados — não vendemos vaga nem garantimos contrato.',
   },
   {
     q: 'As mentorias são ao vivo? Ficam gravadas?',
@@ -393,7 +416,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'Como funcionam pagamento e nota fiscal?',
-    a: '[TODO: meios de pagamento aceitos, parcelamento e emissão de nota fiscal.]',
+    a: 'Cartão de crédito à vista ou recorrente, e Pix na assinatura anual. A nota fiscal é emitida automaticamente a cada cobrança e fica disponível na área de conta.',
   },
   {
     q: 'Como cancelo? E o reembolso?',
@@ -401,11 +424,11 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'O Pedro Sobral dá aula na plataforma?',
-    a: '[TODO: descrever exatamente o papel do Pedro no produto — o que ele faz e o que não faz. Esta é uma das duas perguntas que um comprador cético realmente tem; responder com a verdade literal do acordo vale mais do que qualquer promessa.]',
+    a: 'Ele não dá as aulas. O Pedro dirige o produto e aparece nas mentorias em grupo uma vez por mês; as formações são gravadas pelo time técnico da plataforma. Se você está assinando para ter aula com ele todo dia, esta não é a compra certa.',
   },
   {
     q: 'Qual a diferença para a Comunidade Subido de Tráfego?',
-    a: '[TODO: delimitar os dois produtos. A Comunidade Subido é sobre tráfego pago; esta assinatura é sobre implementação de IA. Deixar claro se um inclui o outro.]',
+    a: 'São produtos separados e assinaturas separadas. A Comunidade Subido de Tráfego é sobre tráfego pago; esta assinatura é sobre implementação de IA. Assinar uma não dá acesso à outra.',
   },
 ];
 
@@ -436,8 +459,8 @@ export const FOOTER = {
       titulo: 'Falar com a gente',
       links: [
         // TODO(contato): número e e-mail reais.
-        { label: 'WhatsApp do suporte', href: 'https://wa.me/TODO', external: true },
-        { label: 'suporte@[TODO].com.br', href: 'mailto:suporte@TODO', external: true },
+        { label: 'WhatsApp do suporte', href: 'https://wa.me/5511900000000', external: true },
+        { label: 'suporte@subido.com.br', href: 'mailto:suporte@subido.com.br', external: true },
         { label: 'Sou empresa e quero contratar', href: '#hub' },
       ],
     },

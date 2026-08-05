@@ -1,5 +1,6 @@
+import { Avatar } from '@/design-system/via';
 import { AUTHORITY } from '@/content/landing';
-import { Section, SectionHeader, Reveal, AssetPlaceholder } from '../primitives';
+import { Section, SectionHeader, Reveal } from '../primitives';
 import styles from './AuthoritySection.module.css';
 
 /**
@@ -24,8 +25,12 @@ export function AuthoritySection() {
       <div className={styles.grid}>
         {AUTHORITY.people.map((person, i) => (
           <Reveal key={person.name} index={i} as="article" className={styles.person}>
+            {/* MONOGRAMA enquanto o retrato duotone não chega. Foto de banco aqui
+                seria pior que vazio: são as duas pessoas que RESPONDEM pelo produto,
+                e um rosto que não é o delas mina exatamente a credibilidade que a
+                seção existe para construir. */}
             <div className={styles.portrait}>
-              <AssetPlaceholder label={`Retrato · ${person.name}`} spec="duotone assado · 3:4" />
+              <Avatar alt={person.name} size="xl" />
             </div>
 
             <div className={styles.body}>
