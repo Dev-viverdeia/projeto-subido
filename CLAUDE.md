@@ -204,6 +204,21 @@ tocá-la** — trocar 23 breakpoints de uma vez muda o layout de toda a platafor
 verificação visual que a área logada ainda não permite sem sessão. Não está gateado de propósito:
 gate com 23 exceções não é gate.
 
+**A LANDING já migrou, e sobrou uma exceção sancionada: 1024/1023 FICA.** Nos arquivos da
+landing restam quatro fora da escala (419, 420, 560, 1120), todos em telas que ninguém
+tocou ainda — SiteHeader e SiteFooter. O resto virou 599/600/768/900/1080.
+
+Mas 1024 não é número arbitrário: é iPad em paisagem, e é onde as duas colunas do hero,
+dos pilares e do HUB começam. Medido a 1024 com elas ativas — 466 + 431px de coluna, o
+lead do hero em 52 caracteres por linha, o hero fechando em 820. Empurrar para 1080
+mandaria toda a faixa 1024–1079 para o layout empilhado, o que é regressão e não migração.
+Quem tocar nesses arquivos: mantenha 1024/1023 e não "corrija" para 1080.
+
+E ao migrar, o mapeamento não é para o canônico MAIS PRÓXIMO — é para o que preserva a
+composição. Os depoimentos foram de 720 para 768 e os dois caminhos de 860 para 900,
+ambos SUBINDO, porque o card carrega citação e a 600 ficaria estreito; o índice de pilares
+e a timeline do HUB desceram de 640 para 600, porque cabem.
+
 ### Como compor uma seção
 
 Esta é a parte construtiva: o que fazer, não só o que evitar.

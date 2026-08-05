@@ -80,7 +80,7 @@
   gap: var(--via-space-4);
 }
 
-@media (min-width: 640px) and (max-width: 1079px) {
+@media (min-width: 600px) and (max-width: 1079px) {
   .plans {
     grid-template-columns: repeat(2, 1fr);
   }

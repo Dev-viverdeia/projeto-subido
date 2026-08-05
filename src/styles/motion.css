@@ -24,6 +24,24 @@
 
 .mask-line > span {
   display: block;
+}
+
+/* PROMOÇÃO SÓ ONDE ELA PAGA: as linhas que animam NO MOUNT.
+   Estava em `.mask-line > span`, sem escopo — e medido na landing isso eram 18 spans
+   promovidas permanentemente, em todas as 14 seções, porque todo SectionHeader usa
+   MaskReveal. É exatamente a "dezenas de camadas" que reveal.css adverte, e o custo
+   é para a vida inteira da página: camada composta não se recolhe sozinha.
+
+   Quatro delas justificam a promoção — as do hero, que disparam na primeira pintura,
+   onde o hitch do primeiro quadro apareceria. As outras quatorze entram por
+   IntersectionObserver, que avisa ANTES de o elemento chegar na viewport: o navegador
+   tem tempo de sobra para montar a camada quando a transição começa.
+
+   Por que não `[data-animating]` como o Reveal faz: o atributo é escrito pelo Reveal,
+   e o MaskReveal não passa por ele — é Server Component, sem JS. Dar a ele um listener
+   de transitionend só para liberar camada custaria hidratação no elemento de LCP da
+   página, que é o oposto da troca que se quer aqui. */
+.mask-reveal--now .mask-line > span {
   will-change: transform;
 }
 

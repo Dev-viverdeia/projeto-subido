@@ -25,7 +25,7 @@
   align-content: start;
 }
 
-@media (min-width: 560px) {
+@media (min-width: 600px) {
   .person {
     grid-template-columns: 140px minmax(0, 1fr);
     gap: var(--via-space-6);
@@ -40,7 +40,7 @@
   box-shadow: var(--via-shadow-md);
 }
 
-@media (max-width: 559px) {
+@media (max-width: 599px) {
   .portrait {
     max-width: 160px;
   }

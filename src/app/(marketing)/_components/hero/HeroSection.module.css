@@ -286,7 +286,7 @@
 /* No mobile os dois botões empilhavam com larguras diferentes, o que lê como
    desalinho e não como hierarquia. Largura total iguala os dois e ainda aumenta a
    área de toque. */
-@media (max-width: 559px) {
+@media (max-width: 599px) {
   .actions {
     display: grid;
     gap: var(--via-space-2);
