@@ -19,4 +19,8 @@
   height: 0;
   display: flex;
   justify-content: flex-end;
+  /* `flex-start`, senão o stretch padrão estica o filho para os 0px do contêiner
+     e o painel — ancorado em `top: 100%` do filho — nasce COBRINDO o gatilho.
+     Medido: 30px de sobreposição antes desta linha. */
+  align-items: flex-start;
 }
