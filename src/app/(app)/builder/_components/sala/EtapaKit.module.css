@@ -137,10 +137,15 @@
   color: var(--via-text-faint);
 }
 
+/* MEDIDA DE CÓDIGO: sem o teto, o bloco abria os 1600 do canvas e a linha
+   passava de 200 caracteres — `pre-wrap` quebra, mas quebra tarde demais. Em
+   mono o `ch` é honesto (o `0` É a largura de tudo), então 96ch ≈ 96 colunas,
+   na vizinhança das 80–100 de qualquer editor. */
 .prompt {
   display: flex;
   align-items: flex-start;
   gap: var(--via-space-3);
+  max-width: 96ch;
   padding: var(--app-pad-card-tight);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
@@ -166,13 +171,16 @@
   overflow-y: auto;
 }
 
+/* `minmax(340px, …)`: com 260 o canvas de 1600 abria SEIS colunas de ~215px e
+   o papel da ferramenta virava coluna de jornal. 340 é o piso da faixa de card
+   da casa (340–420): a 1600 dão 4 colunas de ~385. */
 .ferramentas,
 .listaPrompts {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--via-space-2);
 }
 
