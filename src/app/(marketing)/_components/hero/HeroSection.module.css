@@ -234,6 +234,38 @@
   justify-content: flex-end;
 }
 
+/* NO MOBILE ESTE CONTÊINER TAMBÉM VIRA COLUNA, e sem isto a regra do `.videoCard`
+   abaixo nunca teve efeito. Ela tira o card do fluxo absoluto e manda ele para
+   largura total (`position: static; width: 100%; margin-inline: auto`), mas o pai
+   continuava em linha: os dois viravam itens flex lado a lado e o `width: 100%` do
+   card era encolhido pelo flex. Medido a 375: retrato e card com 168px cada dentro
+   de 335 — a foto renderizava 168 de largura numa caixa de 420 de altura, com
+   `object-fit: contain` deixando 168px de vazio acima dela. Empilhados, o retrato
+   recupera a largura da coluna. O `.figure` já virava coluna; faltava este. */
+@media (max-width: 1023px) {
+  .figureInner {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+/* TETO DE ALTURA — o retrato não pode DITAR a altura do hero.
+   Com a foto real (1024×1536, razão 0,667) e a coluna em 460px, a proporção puxava a
+   figura para 690px de altura. A linha da grade seguia junto e o hero ia de 720 para
+   874 — e a dica "Role para ver", que é `position: absolute; bottom` do hero, caía
+   118px ABAIXO da dobra. Um aviso para rolar que só aparece depois de rolar.
+   Os 184px são medidos, não estimados: é tudo que o hero gasta acima e abaixo da
+   figura (header estático + os dois paddings de bloco) — 874 medido menos 690 da
+   figura. Com o teto, a figura volta a caber e o hero fecha em 100svh.
+   `contain` no `.photo` cuida do resto: a foto encolhe mantendo a proporção em vez
+   de deformar. TODO(medir): reconferir os 184px se o padding do hero mudar. */
+@media (min-width: 1024px) {
+  .figureInner {
+    max-height: calc(100svh - 184px);
+  }
+}
+
 @media (min-width: 1280px) {
   .figure {
     /* Sangra em direção à borda da viewport: a figura ganha ar e o olho corre do
@@ -250,6 +282,37 @@
   bottom: var(--via-space-10);
   width: min(258px, 62%);
   z-index: 2;
+}
+
+/* ENTRA SÓ POR TRANSFORM — e não é preferência de estilo. Este elemento é o pai do
+   `.frame` do HeroVideoFacade, que é vidro (`backdrop-filter`). Se ele mesmo esmaecer,
+   apaga o próprio vidro pelo mecanismo do grupo composto. Por isso não usa `.rise`,
+   que anima opacidade junto: sobe deslocado e chega inteiro.
+
+   `animation` e não `transition`: transição não dispara na primeira pintura, e este
+   elemento não muda de estado depois — ele CHEGA. É também a categoria certa pela
+   doutrina (transition é vocabulário de resposta; animation é coreografia autoral).
+
+   `backwards` e nunca `forwards`: com forwards o elemento retém o transform ANIMADO,
+   e `transform: none` interpolado resolve para a matriz identidade — que continua
+   criando containing block para `position: fixed` de qualquer descendente. Com
+   backwards o `from` só vale durante o atraso, e o estado final é o do próprio
+   elemento.
+
+   Os 32px são maiores que os 20px do `.rise` porque este é o único elemento da cena
+   sem fade: sem a opacidade marcando a chegada, quem precisa ser legível é o percurso.
+   Curva e duração são as mesmas da cascata, para não virar um terceiro dialeto. */
+:global(.js-reveal) .videoCardEntra {
+  /* token-ok: coreografia de entrada da landing, não interação — a mesma justificativa
+     que motion.css dá para os 700ms do `.rise`. O atraso põe o card DEPOIS do retrato
+     (índice 4 = 320ms): o sujeito assenta, e só então o card se apoia nele. */
+  animation: cardApoia 700ms cubic-bezier(0.16, 1, 0.3, 1) 480ms backwards;
+}
+
+@keyframes cardApoia {
+  from {
+    transform: translate3d(0, 32px, 0);
+  }
 }
 
 @media (max-width: 1023px) {

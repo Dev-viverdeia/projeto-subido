@@ -94,17 +94,31 @@ export function HeroSection() {
             </p>
           </div>
 
-          <div className={`${styles.figure} rise rise--now`} style={{ ['--rise-i' as string]: 4 }}>
+          {/* A ENTRADA NÃO MORA AQUI, e isso não é organização: mora nos dois FILHOS.
+              Este contêiner é ancestral comum do retrato e do card de vídeo, e o card
+              é vidro (`backdrop-filter` no `.frame` do HeroVideoFacade). Opacidade < 1
+              num ancestral cria grupo composto e o vidro deixa de existir — medido no
+              navegador: com `opacity: 0.99` aqui, a foto atrás do card sai NÍTIDA em
+              vez de borrada. Enquanto o `rise` viveu nesta div, o card passou os
+              ~1,02s da cascata (320ms de atraso + 700ms) sem vidro nenhum. É a mesma
+              cirurgia que o SiteHeader já tinha recebido. */}
+          <div className={styles.figure}>
             {/* Contêiner próprio da figura: o card do vídeo se posiciona em relação
                 AO RETRATO, não à coluna. Sem isso, mover o retrato para a direita
                 deixaria o card para trás, no meio da coluna de texto. */}
             <div className={styles.figureInner}>
-              <HeroPortrait />
+              {/* O retrato é IRMÃO do card, não ancestral: aqui a opacidade é livre. */}
+              <HeroPortrait
+                alt={HERO.portraitAlt}
+                prioritario
+                className="rise rise--now"
+                style={{ ['--rise-i' as string]: 4 }}
+              />
 
               {/* O vídeo não disputa a coluna com o retrato: se apoia nele, sobreposto
                   ao canto inferior esquerdo. A camada é o que dá profundidade à
                   composição sem precisar de 3D. */}
-              <div className={styles.videoCard}>
+              <div className={`${styles.videoCard} ${styles.videoCardEntra}`}>
                 <HeroVideoFacade caption={HERO.videoCaption} />
               </div>
             </div>

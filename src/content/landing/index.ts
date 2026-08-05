@@ -14,8 +14,10 @@ export const HERO = {
   scrollHint: 'Role para ver',
   /** Linhas AUTORAIS: a quebra é decisão de composição, não acaso de largura — e é o
    *  que torna o mask reveal determinístico. Dois tons sólidos fazem a hierarquia.
-   *  Sem <em> aqui de propósito: itálico no elemento de LCP arrastaria a face
-   *  itálica (+72 kB) para o caminho crítico por causa de uma palavra. */
+   *  Sem <em> aqui, e o motivo mudou: era para não arrastar a face itálica para o
+   *  caminho crítico do LCP; hoje a Outfit não TEM face itálica, e a ênfase da casa
+   *  virou tom. Continua sem <em> porque o tom já é o que separa as duas duplas de
+   *  linhas — um terceiro tom no mesmo bloco viraria ruído. */
   titleLines: [
     { text: 'As empresas já', tone: 'strong' as const },
     { text: 'decidiram usar IA.', tone: 'strong' as const },
@@ -27,6 +29,11 @@ export const HERO = {
   ctaSecondary: { label: 'Ver como funciona', href: '#pilares' },
   trust: ['Pagamento seguro', '7 dias de garantia', 'Acesso imediato'],
   videoCaption: 'Como funciona · 4 min',
+  /** O `alt` do retrato mora aqui, com o resto da copy, e não no componente: é texto
+   *  que uma pessoa lê (com leitor de tela), então segue a mesma regra de todo o
+   *  resto da página. Nome seco, sem cargo — a figura não afirma papel nenhum, e
+   *  quem faz essa afirmação é a seção de autoridade, com fonte. */
+  portraitAlt: 'Pedro Sobral',
 } as const;
 
 /**
