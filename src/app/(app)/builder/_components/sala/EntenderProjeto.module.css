@@ -69,6 +69,14 @@
   }
 }
 
+/* A coluna de leitura inteira: lead, viabilidade e o fluxo, no mesmo eixo. */
+.leitura {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+  min-width: 0;
+}
+
 .principal {
   display: flex;
   flex-direction: column;
@@ -121,6 +129,10 @@
 }
 
 .lateral {
+  /* Trilho: acompanha a leitura em vez de ficar para trás no scroll — mesmo
+     offset da lateral da ficha (68px de cabeçalho + folga). */
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
   display: flex;
   flex-direction: column;
   gap: var(--via-space-3);
@@ -129,6 +141,12 @@
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
+}
+
+@media (max-width: 1079px) {
+  .lateral {
+    position: static;
+  }
 }
 
 .economia {

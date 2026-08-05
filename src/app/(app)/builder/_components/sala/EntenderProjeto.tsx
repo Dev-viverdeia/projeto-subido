@@ -22,50 +22,57 @@ export function EntenderProjeto({ documento }: { documento: DocumentoSolucao }) 
 
   return (
     <div className={styles.entender}>
-      {/* O resumo abre como lead — o título NÃO se repete: ele está no hero,
-          a 200px daqui. */}
-      <p className={styles.lead}>{documento.resumo}</p>
-
-      <div className={styles.viabilidade}>
-        <div className={styles.viabilidadeTopo}>
-          <span className={styles.rotuloMono}>Viabilidade</span>
-          <Pill variant={viabilidade.nivel === 'direta' ? 'default' : 'attn'} size="sm">
-            {viabilidade.nivel}
-          </Pill>
-        </div>
-        <p className={styles.viabilidadeTexto}>{viabilidade.justificativa}</p>
-      </div>
-
+      {/* A GRADE COMEÇA NO TOPO: leitura à esquerda, economia como trilho à
+          direita. Na primeira versão o lead e a viabilidade ficavam sozinhos
+          numa coluna de ~34% e os outros 66% da tela eram vazio até o "Como
+          funciona" — o trilho presente desde a primeira dobra é o que preenche
+          a largura sem inventar conteúdo. */}
       <div className={styles.grade}>
-        <section className={styles.principal} aria-labelledby="entender-como">
-          <h3 id="entender-como" className={styles.rotuloMono}>
-            Como funciona
-          </h3>
-          {/* A arquitetura chega como prosa em parágrafos — cada um é um trecho
+        <div className={styles.leitura}>
+          {/* O resumo abre como lead — o título NÃO se repete: ele está no
+              hero, a 200px daqui. */}
+          <p className={styles.lead}>{documento.resumo}</p>
+
+          <div className={styles.viabilidade}>
+            <div className={styles.viabilidadeTopo}>
+              <span className={styles.rotuloMono}>Viabilidade</span>
+              <Pill variant={viabilidade.nivel === 'direta' ? 'default' : 'attn'} size="sm">
+                {viabilidade.nivel}
+              </Pill>
+            </div>
+            <p className={styles.viabilidadeTexto}>{viabilidade.justificativa}</p>
+          </div>
+
+          <section className={styles.principal} aria-labelledby="entender-como">
+            <h3 id="entender-como" className={styles.rotuloMono}>
+              Como funciona
+            </h3>
+            {/* A arquitetura chega como prosa em parágrafos — cada um é um trecho
               do caminho do dado. Numerá-los dá âncora de leitura ao paredão SEM
               tocar numa palavra: o texto é o mesmo, o olho ganha degraus. Com um
               parágrafo só, prosa simples — numerar um item é cerimônia. */}
-          {(() => {
-            const trechos = documento.arquitetura
-              .split(/\n\s*\n/)
-              .map((t) => t.trim())
-              .filter(Boolean);
-            return trechos.length > 1 ? (
-              <ol className={styles.fluxo}>
-                {trechos.map((trecho, i) => (
-                  <li key={trecho.slice(0, 40)} className={styles.trecho}>
-                    <span className={styles.trechoNumero} aria-hidden="true">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className={styles.trechoTexto}>{trecho}</p>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className={styles.prosa}>{documento.arquitetura}</p>
-            );
-          })()}
-        </section>
+            {(() => {
+              const trechos = documento.arquitetura
+                .split(/\n\s*\n/)
+                .map((t) => t.trim())
+                .filter(Boolean);
+              return trechos.length > 1 ? (
+                <ol className={styles.fluxo}>
+                  {trechos.map((trecho, i) => (
+                    <li key={trecho.slice(0, 40)} className={styles.trecho}>
+                      <span className={styles.trechoNumero} aria-hidden="true">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <p className={styles.trechoTexto}>{trecho}</p>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className={styles.prosa}>{documento.arquitetura}</p>
+              );
+            })()}
+          </section>
+        </div>
 
         {/* A economia mora AQUI e só aqui — é argumento de entendimento, não de
             execução. Número protagonista, premissas como corpo do bloco: a conta
