@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { pedirPerguntas } from '@/lib/builder/invocar';
 import { PainelEspera } from './PainelEspera';
 import { EXEMPLOS } from './exemplos';
@@ -20,9 +21,13 @@ const MAXIMO = 4000;
 /**
  * O compositor — a tela inicial do Builder.
  *
- * COMPOSIÇÃO EDITORIAL E OPERACIONAL. O cabeçalho apresenta o resultado, o campo
- * recebe o contexto e os exemplos ensinam a qualidade esperada sem competir com
- * a ação principal.
+ * COMPOSIÇÃO CENTRADA E CLARA, e a versão anterior errava justamente nisso.
+ * Ela era uma banda navy de largura total com o texto encostado à esquerda: peso
+ * de seção de landing numa tela cuja única função é receber uma frase. Aqui a
+ * página inteira É o campo, então a hierarquia certa é editorial e centrada —
+ * pergunta, campo, exemplos — com a superfície clara que o resto da plataforma
+ * usa. Sem banda escura nenhuma: o accent não é legível sobre claro, e nesta
+ * tela ele não tem o que destacar.
  *
  * OS EXEMPLOS NÃO SÃO DECORAÇÃO. Campo em branco com limite de 4000 caracteres
  * não diz o que é uma boa descrição. Cada chip preenche o campo com um briefing
@@ -123,126 +128,98 @@ export function Compositor() {
 
   return (
     <div className={styles.tela}>
-      <section className={styles.introducao} aria-labelledby="builder-titulo">
-        <header className={styles.cabecalho}>
-          <p className={styles.eyebrow}>Builder de projetos</p>
-          <h2 className={styles.titulo} id="builder-titulo">
-            Do problema ao plano de implementação.
-          </h2>
-          <p className={styles.apoio}>
-            Descreva o cenário como o cliente contou. O Builder identifica as lacunas e estrutura um
-            projeto pronto para executar.
-          </p>
-        </header>
+      <header className={styles.cabecalho}>
+        <p className={styles.eyebrow}>Builder</p>
+        <h2 className={styles.titulo}>
+          O que o seu cliente precisa <em>resolver</em>?
+        </h2>
+        {/* As duas frases têm comprimento parecido de propósito: com `balance` e a
+            medida em 46ch, a quebra cai no ponto final em vez de deixar uma
+            palavra órfã abrindo a segunda linha. */}
+        <p className={styles.apoio}>
+          Descreva o problema como o cliente te contou.{' '}
+          <em>O projeto de implementação é o que volta.</em>
+        </p>
+      </header>
 
-        <ol className={styles.etapas}>
-          <li className={styles.etapaFluxo}>
-            <span className={styles.numero}>01</span>
-            <div>
-              <h3>Descreva o contexto</h3>
-              <p>Explique o problema, quem opera e o que já existe.</p>
-            </div>
-          </li>
-          <li className={styles.etapaFluxo}>
-            <span className={styles.numero}>02</span>
-            <div>
-              <h3>Complete as lacunas</h3>
-              <p>Responda apenas o que souber na entrevista seguinte.</p>
-            </div>
-          </li>
-          <li className={styles.etapaFluxo}>
-            <span className={styles.numero}>03</span>
-            <div>
-              <h3>Receba o projeto</h3>
-              <p>Arquitetura, ferramentas, etapas, prompts, riscos e economia.</p>
-            </div>
-          </li>
-        </ol>
-      </section>
-
-      <div className={styles.estacao}>
-        <form
-          className={styles.caixa}
-          onSubmit={(evento) => {
-            evento.preventDefault();
-            void enviar();
+      <form
+        className={styles.caixa}
+        onSubmit={(evento) => {
+          evento.preventDefault();
+          void enviar();
+        }}
+      >
+        <label className="sr-only" htmlFor="ideia-do-cliente">
+          O problema do cliente, com o contexto que você já tem
+        </label>
+        <textarea
+          id="ideia-do-cliente"
+          ref={campoRef}
+          className={styles.campo}
+          value={ideia}
+          onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
+          onKeyDown={(evento) => {
+            /* ⌘/Ctrl + Enter envia; Enter sozinho continua quebrando linha. Num
+               campo de briefing, Enter-para-enviar corta a frase no meio. */
+            if (evento.key === 'Enter' && (evento.metaKey || evento.ctrlKey)) {
+              evento.preventDefault();
+              void enviar();
+            }
           }}
-        >
-          <div className={styles.campoCabecalho}>
-            <label className={styles.rotuloCampo} htmlFor="ideia-do-cliente">
-              Contexto do cliente
-            </label>
-            <span className={styles.indiceEtapa}>Etapa 1 de 2</span>
-          </div>
+          disabled={ocupado}
+          rows={6}
+          placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
+        />
 
-          <textarea
-            id="ideia-do-cliente"
-            ref={campoRef}
-            className={styles.campo}
-            value={ideia}
-            onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
-            onKeyDown={(evento) => {
-              /* ⌘/Ctrl + Enter envia; Enter sozinho continua quebrando linha. Num
-                 campo de briefing, Enter-para-enviar corta a frase no meio. */
-              if (evento.key === 'Enter' && (evento.metaKey || evento.ctrlKey)) {
-                evento.preventDefault();
-                void enviar();
-              }
-            }}
-            disabled={ocupado}
-            rows={7}
-            placeholder="Ex.: uma clínica perde agendamentos porque ninguém responde o WhatsApp fora do horário. A recepção usa um sistema próprio, recebe cerca de 80 contatos por dia e precisa manter o atendimento humano nos casos mais complexos…"
-          />
-
-          <div className={styles.rodape}>
-            <p className={styles.contador} aria-hidden="true">
-              <span className={styles.escrito}>{ideia.trim().length}</span>
-              <span className={styles.barra}>/</span>
-              {MAXIMO}
-              <span className={styles.minimo}>mín. {MINIMO}</span>
-            </p>
-
-            <div className={styles.acoes}>
-              <span className={styles.atalho} aria-hidden="true">
-                {atalho} Enter
-              </span>
-              <button
-                type="submit"
-                className={styles.enviar}
-                disabled={bloqueado}
-                aria-label={ocupado ? 'Analisando o contexto' : 'Analisar o contexto'}
-              >
-                {ocupado ? 'Analisando…' : 'Analisar contexto'}
-              </button>
-            </div>
-          </div>
-        </form>
-
-        {erro ? (
-          <p className={styles.aviso} role="alert">
-            {erro}
+        <div className={styles.rodape}>
+          <p className={styles.contador} aria-hidden="true">
+            <span className={styles.escrito}>{ideia.trim().length}</span>
+            <span className={styles.barra}>/</span>
+            {MAXIMO}
           </p>
-        ) : null}
 
-        <section className={styles.exemplos}>
-          <h3 className={styles.divisor}>Comece por um exemplo</h3>
+          <div className={styles.acoes}>
+            <span className={styles.atalho} aria-hidden="true">
+              {atalho} Enter
+            </span>
+            <button
+              type="submit"
+              className={styles.enviar}
+              disabled={bloqueado}
+              aria-label={ocupado ? 'Lendo a ideia' : 'Formular o projeto'}
+            >
+              <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </form>
 
-          <ul className={styles.chips}>
-            {EXEMPLOS.map((exemplo) => (
-              <li key={exemplo.rotulo}>
-                <button
-                  type="button"
-                  className={styles.chip}
-                  onClick={() => usarExemplo(exemplo.texto)}
-                  disabled={ocupado}
-                >
-                  {exemplo.rotulo}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+      {erro ? (
+        <p className={styles.aviso} role="alert">
+          {erro}
+        </p>
+      ) : null}
+
+      <section className={styles.exemplos}>
+        <h3 className={styles.divisor}>
+          <span>ou comece por um exemplo</span>
+        </h3>
+
+        <ul className={styles.chips}>
+          {EXEMPLOS.map((exemplo) => (
+            <li key={exemplo.rotulo}>
+              <button
+                type="button"
+                className={styles.chip}
+                onClick={() => usarExemplo(exemplo.texto)}
+                disabled={ocupado}
+              >
+                {exemplo.rotulo}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
