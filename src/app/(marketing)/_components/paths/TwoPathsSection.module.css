@@ -45,9 +45,13 @@
 
 /* Mais quieto que os cards e numa medida estreita: lê como nota do autor, não como
    terceira opção. */
+/* MEDIDA EM `ch`, NÃO EM PX. Estava em `--via-narrow` (560px), que é largura de
+   CONTÊINER — e a doutrina diz que medida de leitura mora no elemento de texto, em
+   `ch`, justamente porque px ignora o corpo da fonte. Medido: os 560px rendiam 85
+   caracteres por linha. 50ch devolve 75. */
 .disqualifier {
   margin: var(--via-space-12) 0 0;
-  max-width: var(--via-narrow);
+  max-width: 50ch;
   padding-left: var(--via-space-5);
   border-left: 1px solid var(--via-border-hairline);
   font-size: var(--via-fs-sm);

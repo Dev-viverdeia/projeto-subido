@@ -109,8 +109,10 @@
   color: var(--via-text-muted);
 }
 
+/* 53ch: sem teto a nota atravessava a grade de três cards inteira. */
 .note {
   margin: var(--via-space-8) 0 0;
+  max-width: 53ch;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);

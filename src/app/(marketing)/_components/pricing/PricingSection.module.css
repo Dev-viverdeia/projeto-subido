@@ -284,9 +284,11 @@
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-loose);
   color: var(--via-text-body);
-  /* 53ch, não 56ch: o fator do `ch` mudou com a Outfit (1,369 contra os 1,30 da
-     Geist — medido no navegador, ver CLAUDE.md). Os 56ch rendiam 73 caracteres e
-     passariam a render 77, acima da faixa confortável. 53 × 1,369 ≈ 73 — o
-     comprimento de linha desenhado fica igual ao de antes da troca de fonte. */
-  max-width: 53ch;
+  /* 50ch, e o número veio de MEDIR ESTA FRASE, não de aplicar o fator médio.
+     O 1,369 do CLAUDE.md é constante entre TAMANHOS de fonte, não entre TEXTOS: ele
+     sai de prosa média, e esta frase — "Assine, use tudo e, se não fizer sentido…" —
+     é quase toda de letras estreitas, então o fator dela é 1,50. Com 53ch rendia 80
+     caracteres, acima da faixa de 45–75; a 50ch fica em 75.
+     Quando a copy desta garantia mudar, remeça: o teto depende do texto. */
+  max-width: 50ch;
 }

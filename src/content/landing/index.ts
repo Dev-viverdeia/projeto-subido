@@ -236,10 +236,23 @@ export const HUB = {
 export const TESTIMONIALS_META = {
   eyebrow: 'Resultados',
   title: 'O que os alunos entregaram.',
-  /** Enquanto for prova emprestada, a origem fica DITA. Prova emprestada rotulada é
-   *  honesta e converte; sem rótulo é a única coisa capaz de derrubar a credibilidade
-   *  desta página, justamente porque todo o resto dela é construído sobre atribuição. */
-  note: 'TODO(prova-social): substituir por depoimentos reais desta plataforma, ou renomear para "Depoimentos da Comunidade Subido de Tráfego" e rotular a origem.',
+  /**
+   * ESTA LINHA É RENDERIZADA NA PÁGINA PÚBLICA, então não pode ser um TODO — e era:
+   * até aqui o campo carregava "TODO(prova-social): substituir por depoimentos
+   * reais...", e o texto aparecia inteiro para quem visitava, com 167 caracteres por
+   * linha. Nota para a equipe mora em comentário; o que vai ao ar é copy.
+   *
+   * O que está no ar agora é a única coisa VERDADEIRA que cabe aqui hoje: resultado
+   * varia. Ela não afirma origem nem autoriza os depoimentos — continua valendo o
+   * que o cabeçalho deste arquivo diz sobre CONTEUDO_DEMO.
+   *
+   * TODO(prova-social): quando os depoimentos forem reais, esta linha vira a nota de
+   * ATRIBUIÇÃO — de onde a prova vem. Se vierem da Comunidade Subido e não desta
+   * plataforma, a origem fica dita aqui e o título da seção muda junto: prova
+   * emprestada rotulada é honesta e converte; sem rótulo é a única coisa capaz de
+   * derrubar a credibilidade desta página, porque todo o resto dela é atribuição.
+   */
+  note: 'Resultados variam conforme o negócio, o tempo dedicado e o mercado.',
 } as const;
 
 export const COMPARISON = {

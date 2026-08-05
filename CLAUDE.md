@@ -270,6 +270,20 @@ O alvo real é **caracteres ÷ 1,369**: **~50ch para 68 caracteres**, ~53ch para
 confortável continua **45–75** e nenhum lint pega isso. Ao escrever uma medida nova, **meça** —
 não copie o número de outro arquivo achando que 65ch dá 65 caracteres.
 
+**E o fator varia por TEXTO, não só por fonte — a frase acima diz "constante" e é preciso
+ler o que ela constata: constante entre TAMANHOS de corpo, para o mesmo texto.** Medido na
+landing: a prosa média dá 1,369, mas a linha da garantia ("Assine, use tudo e, se não
+fizer sentido…"), quase toda de letras estreitas, dá **1,50** — os mesmos 53ch rendiam 73
+caracteres num parágrafo e 80 nela. Não existe número de `ch` que sirva para toda copy;
+existe medir a copy que está lá.
+
+**E meça a CAIXA DE LINHA, não a largura do elemento.** `largura do elemento ÷ glifo médio`
+responde "quantos caracteres CABERIAM", que é diferente de "quantos há na linha mais longa".
+As duas divergem sempre que o texto não preenche a caixa — e aí a auditoria acusa defeito
+onde não há. Medido: a linha de confiança do hero acusava 83 e tem 21 (são oito spans, cada
+um sua própria caixa); o rodapé legal acusava 151 e tem 52 (um `<br>` no meio). O certo é
+`Range.selectNodeContents(el)` e o maior `getClientRects()`.
+
 > A troca Geist→Outfit subiu o fator ~5%, então toda medida em `ch` do repo passou a render
 > mais caracteres. Duas cruzaram o teto de 75 por causa disso e foram recalibradas de 56ch para
 > 53ch (`PricingSection`, `CursoConteudo`) — preservando o comprimento de linha, não o número
