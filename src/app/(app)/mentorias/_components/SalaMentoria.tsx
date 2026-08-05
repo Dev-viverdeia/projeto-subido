@@ -9,8 +9,8 @@ import { comecaEm, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './SalaMentoria.module.css';
 
 /**
- * O corpo da sala: CHAT à esquerda, PALCO à direita. O contexto (mentor,
- * participação) subiu para o header da página — o corpo é só o que acontece
+ * O corpo da sala: PALCO à esquerda, CHAT à direita. O contexto (mentor,
+ * participação) mora no header da página — o corpo é só o que acontece
  * DURANTE a sessão.
  *
  * PALCO E CHAT SÃO A PENDÊNCIA DECLARADA. A transmissão e o chat entram com a
@@ -39,34 +39,6 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
 
   return (
     <div className={styles.corpo}>
-      {/* O CHAT da sessão — a coluna de conversa de toda sala ao vivo. */}
-      <section className={styles.chat} aria-label="Chat da sessão">
-        <div className={styles.chatTopo}>
-          <h2 className={styles.chatEyebrow}>Chat da sessão</h2>
-        </div>
-
-        <div className={styles.chatMiolo}>
-          <p className={styles.chatVazio}>
-            {encerrada
-              ? 'A sessão encerrou — o chat fica fechado.'
-              : 'As mensagens da sala aparecem aqui. O chat abre com a transmissão.'}
-          </p>
-        </div>
-
-        <div className={styles.chatCompositor}>
-          <input
-            type="text"
-            className={styles.chatCampo}
-            placeholder="Escreva para a sala…"
-            disabled
-            aria-label="Mensagem para a sala"
-          />
-          <button type="button" className={styles.chatEnviar} disabled aria-label="Enviar mensagem">
-            <ArrowUp size={15} strokeWidth={2} />
-          </button>
-        </div>
-      </section>
-
       <section className={styles.palcoColuna} aria-label="Transmissão">
         <div
           className={`${styles.palco} via-mesh-navy via-noise`}
@@ -150,6 +122,33 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
 
         {/* O motivo de tudo que está apagado, dito uma vez, fora do palco. */}
         <p className={styles.controlesNota}>Áudio, vídeo e chat ligam com a transmissão.</p>
+      </section>
+      {/* O CHAT da sessão — a coluna de conversa de toda sala ao vivo. */}
+      <section className={styles.chat} aria-label="Chat da sessão">
+        <div className={styles.chatTopo}>
+          <h2 className={styles.chatEyebrow}>Chat da sessão</h2>
+        </div>
+
+        <div className={styles.chatMiolo}>
+          <p className={styles.chatVazio}>
+            {encerrada
+              ? 'A sessão encerrou — o chat fica fechado.'
+              : 'As mensagens da sala aparecem aqui. O chat abre com a transmissão.'}
+          </p>
+        </div>
+
+        <div className={styles.chatCompositor}>
+          <input
+            type="text"
+            className={styles.chatCampo}
+            placeholder="Escreva para a sala…"
+            disabled
+            aria-label="Mensagem para a sala"
+          />
+          <button type="button" className={styles.chatEnviar} disabled aria-label="Enviar mensagem">
+            <ArrowUp size={15} strokeWidth={2} />
+          </button>
+        </div>
       </section>
     </div>
   );

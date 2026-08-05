@@ -5,9 +5,8 @@
 
 .corpo {
   display: grid;
-  /* Chat à ESQUERDA, palco no resto — o contexto subiu para o header, então o
-     corpo divide entre a conversa e a transmissão, como toda sala ao vivo. */
-  grid-template-columns: 340px minmax(0, 1fr);
+  /* Palco à esquerda, chat à DIREITA — o lugar do chat em toda sala ao vivo. */
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: var(--app-gap-grid);
   align-items: stretch;
 }
@@ -17,10 +16,9 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* O palco é o protagonista — no empilhado o chat desce para baixo dele, e
-     ganha altura própria em vez da esticada do grid. */
+  /* No empilhado o chat já vem depois do palco na ordem do DOM; só ganha
+     altura própria em vez da esticada do grid. */
   .chat {
-    order: 2;
     min-height: 320px;
   }
 }
