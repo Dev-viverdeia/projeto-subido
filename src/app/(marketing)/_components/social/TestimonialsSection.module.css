@@ -83,12 +83,15 @@
   gap: var(--via-space-3);
 }
 
+/* QUEM DEFINE O TAMANHO É O RETRATO, não esta caixa. Ela tinha 40×40 fixos com
+   `overflow: hidden` enquanto o RetratoFicticio entrava com 44 — os 4px sobrando
+   eram aparados à direita e embaixo, e um círculo cortado assimetricamente lê como
+   desalinhado, não como cortado. Duas fontes de verdade para a mesma medida sempre
+   terminam assim; agora só existe uma. */
 .avatar {
   flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--via-radius-pill);
-  overflow: hidden;
+  display: grid;
+  place-items: center;
 }
 
 .identity {

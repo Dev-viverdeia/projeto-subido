@@ -4,10 +4,17 @@
   gap: var(--via-space-12);
 }
 
-/* Colunas de largura IGUAL — é a gramática visual que comunica a paridade. */
+/* UMA COLUNA ENQUANTO HÁ UMA PESSOA. O desenho eram duas colunas de largura igual,
+   e a igualdade era a mensagem: o rosto conhecido e a direção técnica pesando o mesmo.
+   Com `repeat(2, 1fr)` e um único card, metade da linha ficava vazia — o que não lê
+   como composição assimétrica, lê como card que não carregou.
+   `auto-fit` em vez de contagem fixa: quando a segunda pessoa voltar, a paridade volta
+   junto sem ninguém precisar lembrar de mexer aqui. O teto de 520px impede a coluna
+   solitária de esticar até 1280 e transformar a citação numa linha de 150 caracteres. */
 @media (min-width: 900px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, min(520px, 100%)));
+    justify-content: start;
     gap: var(--via-space-12);
   }
 }
@@ -22,16 +29,6 @@
   .person {
     grid-template-columns: 140px minmax(0, 1fr);
     gap: var(--via-space-6);
-  }
-
-  /* Quem não tem foto não paga a calha da foto. Sem isto o corpo do texto caía na
-     segunda coluna e sobravam 140px de vazio à esquerda — que lê como imagem que não
-     carregou, exatamente o que a remoção do retrato desenhado queria evitar.
-     `:has()` em vez de classe modificadora porque a condição é ESTRUTURAL: se um dia
-     a segunda pessoa ganhar retrato, o layout se corrige sozinho, sem ninguém lembrar
-     de tirar a classe. */
-  .person:not(:has(.portrait)) {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

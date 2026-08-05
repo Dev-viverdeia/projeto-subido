@@ -276,13 +276,6 @@ export const AUTHORITY = {
       quote:
         'Eu passei oito anos ensinando gente a vender tráfego. O próximo serviço que as empresas vão comprar é implementação de IA — e quase ninguém tá pronto pra entregar.',
     },
-    {
-      name: 'Helena Vasques',
-      role: 'Direção da plataforma',
-      credentials: ['180 implementações entregues', '103 soluções publicadas', '64 empresas'],
-      quote:
-        'Curso ensina a ferramenta e a ferramenta muda em seis meses. O que não muda é o método de implementar: entender o processo, escolher onde a IA entra e entregar funcionando. A plataforma existe para ser esse método, com as ferramentas dentro.',
-    },
   ],
 } as const;
 
