@@ -53,7 +53,10 @@
   line-height: var(--via-lh-normal);
   /* Cinza da banda escura — nunca --via-text-muted aqui (3,45:1, reprova). */
   color: var(--via-gray-300);
-  max-width: 56ch;
+  /* 53ch, não 56ch: ver a nota em PricingSection.module.css — o fator do `ch` subiu
+     de 1,30 (Geist) para 1,369 (Outfit), então 56ch passaria de 73 para 77
+     caracteres. 53ch devolve exatamente os 73 de antes. */
+  max-width: 53ch;
 }
 
 .stats {

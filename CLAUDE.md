@@ -79,7 +79,11 @@ JS do DS. Consequências:
 
 **A marca do produto é Subido, e só.** O DS vendorizado (prefixo `--via-*`) vem de outra origem e
 fornece a ARQUITETURA visual: superfície clara, hierarquia editorial, vidro + atmosfera + sombra
-navy, escalas, Geist. A camada de marca sobrescreve a CROMÁTICA.
+navy, escalas. A camada de marca sobrescreve a CROMÁTICA e a FAMÍLIA TIPOGRÁFICA.
+
+> O `tokens.css` do vendor declara `--via-font: 'Geist'`, mas o vendor não se edita. A família
+> real é escolhida uma única vez, na ponte `next/font` → token em `globals.css`, e hoje é a
+> **Outfit**. Trocar de fonte é editar essa ponte e `src/app/fonts.ts` — mais nada.
 
 > `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do DS. Não são marca e não
 > podem aparecer em copy, `alt`, `aria-label`, metadata ou asset.
@@ -249,12 +253,29 @@ destrói as quebras autorais.
 font-size de quem declara: `20ch` num container que herda 16px vale ~180px e esmaga o título em
 sete linhas; no `<h2>`, vale a medida pretendida.
 
-**E o `ch` do Geist MENTE por ~30% — a unidade é a largura do glifo `0`, que nesta fonte é bem
-mais estreito que a média das minúsculas.** Medido no navegador (largura da caixa ÷ glifo médio),
-na ficha do Builder: `72ch` entregava **94 caracteres** por linha, `68ch` dava 89, `62ch` dava 81 —
-todos acima da faixa confortável de **45–75**, e nenhum lint pega isso. O fator é constante, então
-o alvo real é **caracteres ÷ 1,3**: ~52ch para 68 caracteres. Ao escrever uma medida nova, meça;
+**E o `ch` MENTE, porque a unidade é a largura do glifo `0` — que é bem mais LARGO que a média
+das minúsculas.** Por isso `52ch` não dá 52 caracteres, dá mais. (Versões antigas deste
+documento diziam "mais estreito"; a explicação estava invertida, os números não — se o `0`
+fosse estreito, caberiam MENOS caracteres, não mais.)
+
+**O fator é PROPRIEDADE DA FONTE, então mudou junto com ela.** Medido no navegador com
+`canvas.measureText` a 450/17px, com prosa real em pt-BR (largura do `0` ÷ largura do glifo médio):
+
+| Fonte               | fator     | controle                                                                   |
+| ------------------- | --------- | -------------------------------------------------------------------------- |
+| Geist (até 08/2026) | 1,30      | —                                                                          |
+| **Outfit (atual)**  | **1,369** | Arial dá 1,141 — é assim que se prova que a face carregou e não é fallback |
+
+O alvo real é **caracteres ÷ 1,369**: **~50ch para 68 caracteres**, ~53ch para 73. A faixa
+confortável continua **45–75** e nenhum lint pega isso. Ao escrever uma medida nova, **meça** —
 não copie o número de outro arquivo achando que 65ch dá 65 caracteres.
+
+> A troca Geist→Outfit subiu o fator ~5%, então toda medida em `ch` do repo passou a render
+> mais caracteres. Duas cruzaram o teto de 75 por causa disso e foram recalibradas de 56ch para
+> 53ch (`PricingSection`, `CursoConteudo`) — preservando o comprimento de linha, não o número
+> do token. **Dez outras medidas já estouravam 75 antes da troca** e continuam estourando:
+> 70ch no `HubSection`, 68ch em `CartaoProxima` e `CabecalhoPagina`, 62ch em quatro arquivos,
+> 60ch em três. São dívida pré-existente, não regressão da fonte.
 
 **Órfã não é problema de medida, é de quebra.** Com a medida certa ainda sobrava "…compensa a API
 oficial / paga." — uma palavra sozinha na última linha lê como erro de composição. `text-wrap:
@@ -395,11 +416,19 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
   texto, verde/vermelho de semáforo. Cyan segue banido como _decoração_.
 - **Cores só por token.** Hex literal reprova em `check:identidade` (não é regra de
   eslint — era o que o texto dizia antes de o gate existir).
-- **Nunca Lexend**, **nunca headline caixa-alta condensada** — a tipografia é Geist, sempre.
+- **Nunca Lexend**, **nunca headline caixa-alta condensada** — a tipografia é **Outfit**, sempre
+  (texto e display). Geist Mono sobrevive só para número, rótulo e eyebrow: a Outfit não é
+  monoespaçada e a régua de "número é prova" depende de `tabular-nums`.
 - A assinatura é **glass + atmosférico + sombra navy** — **não glow**.
-- **Ênfase é `<em>` itálico. Nunca `font-weight: 700`.** Exceção única: o `<h1>` do hero, elemento
-  de LCP — ali a ênfase é por tom sólido. Itálico arrastaria a face itálica (+72 KB) para o caminho
-  crítico por causa de uma palavra.
+- **Ênfase é TOM, nunca `font-weight: 700` e nunca itálico.** A Outfit não tem face itálica —
+  nenhuma — então `font-style: italic` só produz o oblíquo SINTETIZADO do browser: inclinação
+  calculada por matriz, não desenho. O que era exceção do `<h1>` do hero virou a regra da casa,
+  e o tom da ênfase é o mais QUIETO (`--app-em-ink`: `--via-text-muted` no claro,
+  `--via-gray-onnavy` sobre banda escura — a escala inverte, ver acima). `SectionHeader` já
+  fazia tom + itálico junto; era o tom que carregava a leitura.
+- **Citação não é ênfase, e perdeu o itálico junto.** Quem marca voz de outra pessoa agora é o
+  enquadramento: `<blockquote>` + atribuição no card de depoimento, barra navy de 2px na
+  citação dentro de prosa (`AuthoritySection`). Nada de aspas decorativas gigantes.
 - Preferido: número específico + fonte atribuída + verbo concreto.
 - **Nenhuma estatística de mercado sem fonte inline.** Um "87% das empresas…" órfão anula o
   investimento da nota de atribuição, que gasta uma linha dizendo de onde vêm os números.

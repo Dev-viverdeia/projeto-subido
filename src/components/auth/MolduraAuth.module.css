@@ -38,9 +38,13 @@
   text-wrap: balance;
 }
 
-/* Ênfase é itálico, nunca peso 700 — ver as leis estéticas no CLAUDE.md. */
+/* Ênfase é TOM, nunca peso 700 e nunca itálico — ver as leis estéticas no CLAUDE.md.
+   Esta frase vive sobre a banda navy, onde a escala de cinza inverte: `--via-text-muted`
+   (o padrão claro) daria contraste de banda escura reprovado. Daí o `--via-gray-onnavy`,
+   a mesma tinta que SectionHeader usa no seu modo `.dark`. */
 .frase em {
-  font-style: italic;
+  font-style: normal;
+  color: var(--via-gray-onnavy);
 }
 
 /* ⚠ TEXTO SOBRE BANDA ESCURA USA A ESCALA `--via-gray-*`, NUNCA `--via-text-*`.

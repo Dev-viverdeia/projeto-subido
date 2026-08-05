@@ -160,10 +160,10 @@
   }
 }
 
-/* MONO no nav, Geist no CTA.
+/* MONO no nav, Outfit no CTA.
    A página inteira usa Geist Mono para rótulo (eyebrows, números, carimbos), e a
    navegação pertence a essa família de elementos: ela nomeia seções, não conversa.
-   O contraste com o CTA em Geist é o que faz o botão ler como ação e o menu como
+   O contraste com o CTA em Outfit é o que faz o botão ler como ação e o menu como
    índice — em vez de tudo virar a mesma voz tipográfica em tamanhos diferentes. */
 .link {
   position: relative;

@@ -9,10 +9,11 @@
    Duas camadas complementares, não concorrentes:
 
      · O DS VENDORIZADO traz a ARQUITETURA — superfície clara, hierarquia editorial,
-       vidro + atmosfera + sombra navy, escalas de espaço/raio/motion, Geist.
+       vidro + atmosfera + sombra navy, escalas de espaço/raio/motion.
      · A MARCA SUBIDO traz a CROMÁTICA — o navy institucional, o branco frio e,
        principalmente, um ACCENT que o DS não tinha (lá o "accent" era o próprio
-       navy).
+       navy) — e a FAMÍLIA: a Outfit, ligada na ponte next/font de globals.css.
+       O `--via-font: 'Geist'` do vendor continua lá, e continua sendo sobrescrito.
 
    O prefixo `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do
    design system. Não são marca: não aparecem em copy, alt, aria-label, metadata
@@ -192,7 +193,7 @@
   /* ---- TIPOGRAFIA · tracking ótico ------------------------------------------
      O tracking é função do TAMANHO. Corpo grande precisa de negativo (as letras
      parecem soltas quando crescem) e corpo pequeno precisa de positivo (elas se
-     apertam quando encolhem). Uma face bem desenhada como a Geist já compensa
+     apertam quando encolhem). Uma face bem desenhada como a Outfit já compensa
      parte disso, mas não toda — e a diferença entre "texto digitado" e "texto
      composto" é justamente esta curva.
 

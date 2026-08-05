@@ -83,10 +83,12 @@
   border-left: 2px solid var(--via-navy);
 }
 
+/* Aqui a citação vive DENTRO de prosa, então precisa de um marcador próprio — e ele
+   já existe: a barra navy de 2px do `.quote` acima. O itálico era o segundo marcador,
+   e a Outfit não tem face itálica; a barra continua fazendo o trabalho sozinha. */
 .quote p {
   margin: 0;
   font-size: var(--via-fs-body);
-  font-style: italic;
   line-height: var(--via-lh-loose);
   color: var(--via-text-body);
   text-wrap: pretty;

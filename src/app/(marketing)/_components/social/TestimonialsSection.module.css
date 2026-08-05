@@ -41,12 +41,13 @@
   margin: 0;
 }
 
-/* Itálico editorial: marca que a voz é de outra pessoa, sem precisar de aspas
-   decorativas gigantes. */
+/* O que marca que a voz é de outra pessoa: o card inteiro. `<blockquote>` no HTML,
+   a atribuição (nome · foto · cidade) logo abaixo e a régua do resultado fechando.
+   Era isso que carregava a leitura — o itálico apenas reforçava, e a Outfit não tem
+   face itálica para reforçar com. Sem aspas decorativas gigantes, como antes. */
 .quoteText {
   margin: 0;
   font-size: var(--via-fs-body);
-  font-style: italic;
   line-height: var(--via-lh-loose);
   color: var(--via-text-body);
   text-wrap: pretty;

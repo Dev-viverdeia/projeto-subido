@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import { concluirAula, tocarFormacao, useProgresso } from '@/lib/progresso/local';
 import styles from './NavAula.module.css';
@@ -48,7 +49,8 @@ export function NavAula({
         disabled={!anteriorId}
         onClick={() => anteriorId && irPara(anteriorId)}
       >
-        ← Anterior
+        <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
+        Anterior
       </Button>
 
       {concluida ? (
@@ -72,7 +74,8 @@ export function NavAula({
       )}
 
       <Button variant="ghost" disabled={!proximaId} onClick={() => proximaId && irPara(proximaId)}>
-        Próxima →
+        Próxima
+        <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
       </Button>
     </nav>
   );

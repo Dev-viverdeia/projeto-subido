@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { THEME_COLOR } from '@/lib/brand';
-import { geist, geistMono } from './fonts';
+import { outfit, geistMono } from './fonts';
 import './globals.css';
 
 /**
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="pt-BR"
       data-theme="light"
       data-scroll-behavior="smooth"
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`${outfit.variable} ${geistMono.variable}`}
       /* O script inline de motion (ver (marketing)/layout.tsx) adiciona `js-reveal`
          ao <html> antes da hidratação, então o className do cliente diverge do que o
          servidor renderizou. Este é o mesmo padrão que bibliotecas de tema usam, e

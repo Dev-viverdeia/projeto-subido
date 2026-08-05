@@ -20,11 +20,19 @@
 @import '../styles/type.css';
 
 /* 4 · Ponte next/font → tokens do design system.
-   Precisa vir depois de tokens.css, que declara --via-font com a família literal. */
+   Precisa vir depois de tokens.css, que declara --via-font com a família literal
+   ('Geist'), herdada da origem do DS. Esta ponte é o único lugar onde a família real
+   é escolhida — o vendor não se edita, então a troca de fonte mora aqui. */
 :root {
-  --via-font: var(--font-geist), 'Inter', system-ui, -apple-system, sans-serif;
-  --via-font-display: var(--font-geist), 'Inter', system-ui, -apple-system, sans-serif;
+  --via-font: var(--font-outfit), 'Inter', system-ui, -apple-system, sans-serif;
+  --via-font-display: var(--font-outfit), 'Inter', system-ui, -apple-system, sans-serif;
   --via-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Tinta da ênfase. A Outfit não tem face itálica, então `<em>` é marcado por TOM,
+     não por inclinação — e o tom da ênfase é o mais QUIETO, recuo editorial.
+     A escala de cinza inverte entre bandas (ver CLAUDE.md), então banda escura
+     precisa redeclarar: `--app-em-ink: var(--via-gray-onnavy)`. */
+  --app-em-ink: var(--via-text-muted);
 
   /* Escala de empilhamento — o DS não define z-index, e sem uma escala única
      cada componente inventa a sua. */

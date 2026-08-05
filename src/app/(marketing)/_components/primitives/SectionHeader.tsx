@@ -5,7 +5,7 @@ import styles from './SectionHeader.module.css';
 export interface SectionHeaderProps {
   /** Rótulo curto em mono. Nunca uma frase — os parênteses vêm do CSS. */
   eyebrow?: string;
-  /** Aceita <em>: a ênfase é itálico editorial, nunca peso 700. */
+  /** Aceita <em>: a ênfase é TOM editorial (o mais quieto), nunca peso 700 nem itálico. */
   title: ReactNode;
   sub?: ReactNode;
   /** Precisa bater com o `labelledBy` da Section para o marco de leitura funcionar. */

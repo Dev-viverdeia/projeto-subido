@@ -36,7 +36,7 @@ export interface SubidoLogoProps {
  * `mono` põe o conjunto inteiro em `currentColor`. Obrigatório sobre preenchimento
  * colorido e onde o azul brigaria com a banda em vez de ancorá-la.
  *
- * TODO(asset): o wordmark é composto em Geist bold como stand-in. O original tem
+ * TODO(asset): o wordmark é composto em Outfit bold como stand-in. O original tem
  * desenho próprio (não é fonte comercial); quando o SVG oficial chegar, ele entra no
  * lugar do `<span>` sem mudar a API.
  */
