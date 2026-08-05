@@ -15,9 +15,10 @@
   box-shadow: var(--via-glow-navy-strong);
 }
 
-/* Ao vivo, a moldura acende — borda viva no tom do Pill live do DS. */
+/* Ao vivo, a moldura acende em ACCENT — o verde do Pill live do DS é
+   vocabulário de semáforo, que a casa bane; o sinal de vivo aqui é o azul. */
 .cartao[data-ao-vivo] {
-  border-color: rgba(31, 138, 91, 0.42);
+  border-color: var(--via-accent-hairline);
 }
 
 .sheen {
@@ -43,7 +44,11 @@
 .principal {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-3);
+  /* Cabeça no topo, mentor ancorado na BASE: o vão morto sob o título era o
+     que fazia o cartão ler vazio — agora os dois cantos da coluna trabalham. */
+  justify-content: space-between;
+  align-self: stretch;
+  gap: var(--app-gap-block);
   min-width: 0;
   /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
      caracteres ÷ 1,369. 46ch ≈ 63 caracteres (eram 60 com a Geist) — dentro da
@@ -59,6 +64,12 @@
   flex-direction: column;
   gap: var(--app-gap-block);
   min-width: 0;
+}
+
+.cabeca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
 }
 
 .eyebrow {
@@ -144,17 +155,19 @@
    vertical, que é como se lê ficha de evento. */
 .ficha {
   display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--via-space-2) var(--app-gap-block);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4) var(--app-gap-block);
   margin: 0;
-  align-items: baseline;
 }
 
-/* `display: contents` desmonta o wrapper para os pares caírem direto na grade —
-   sem ele cada `<div>` viraria uma célula e o alinhamento entre rótulo e valor
-   se perderia de linha para linha. A semântica da `<dl>` fica intacta. */
+/* Bloco de estatística: rótulo EM CIMA do valor. O par rótulo-à-esquerda /
+   valor-à-direita fazia o olho viajar o vão da coluna para ligar os dois —
+   medido no print: ~500px entre "HORÁRIO" e o horário. */
 .fichaItem {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .fichaRotulo {
@@ -169,10 +182,10 @@
 
 .fichaValor {
   margin: 0;
-  text-align: right;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-sm);
-  letter-spacing: var(--app-ls-sm);
+  /* Um degrau acima do corpo: número é prova, e aqui é o que decide. */
+  font-size: var(--via-fs-h4);
+  letter-spacing: var(--via-ls-tight);
   color: var(--via-white);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -270,19 +283,9 @@
     max-width: none;
   }
 
+  /* Quatro blocos em linha, onde há largura para isso. */
   .ficha {
     grid-template-columns: repeat(auto-fit, minmax(96px, max-content));
-    gap: var(--via-space-2) var(--app-gap-block);
-  }
-
-  .fichaItem {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .fichaValor {
-    text-align: left;
   }
 
   /* Com largura sobrando, as ações voltam a ser uma linha e param de ocupar a

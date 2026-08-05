@@ -54,12 +54,20 @@ export function CartaoProxima({
   const dia = rotuloDoDia(sessao.inicioIso, agora);
   const contagem = comecaEm(sessao, agora);
 
-  const dados = [
-    { rotulo: 'Quando', valor: dia.principal === 'Hoje' ? 'Hoje' : dia.mono },
-    { rotulo: 'Horário', valor: `${horaCurta(sessao.inicioIso)}–${horaCurta(sessao.fimIso)}` },
-    { rotulo: 'Duração', valor: `${duracaoMin(sessao)} min` },
-    { rotulo: 'Vagas', valor: `${sessao.inscritos}/${sessao.vagas}` },
-  ];
+  /* AO VIVO, "Quando: Hoje" é informação velha — a sessão está acontecendo.
+     O que decide é quando TERMINA e se ainda cabe. */
+  const dados = aoVivo
+    ? [
+        { rotulo: 'Termina', valor: horaCurta(sessao.fimIso) },
+        { rotulo: 'Duração', valor: `${duracaoMin(sessao)} min` },
+        { rotulo: 'Vagas', valor: `${sessao.inscritos}/${sessao.vagas}` },
+      ]
+    : [
+        { rotulo: 'Quando', valor: dia.principal === 'Hoje' ? 'Hoje' : dia.mono },
+        { rotulo: 'Horário', valor: `${horaCurta(sessao.inicioIso)}–${horaCurta(sessao.fimIso)}` },
+        { rotulo: 'Duração', valor: `${duracaoMin(sessao)} min` },
+        { rotulo: 'Vagas', valor: `${sessao.inscritos}/${sessao.vagas}` },
+      ];
 
   return (
     <article
@@ -69,21 +77,23 @@ export function CartaoProxima({
       <span className={styles.sheen} aria-hidden="true" />
       <div className={styles.conteudo}>
         <div className={styles.principal}>
-          <p className={styles.eyebrow}>
-            {aoVivo ? (
-              <>
-                <span className={styles.pulso} aria-hidden="true" />
-                ao vivo agora
-              </>
-            ) : (
-              <>
-                Próxima mentoria
-                {contagem && <span className={styles.contagem}> · {contagem}</span>}
-              </>
-            )}
-          </p>
+          <div className={styles.cabeca}>
+            <p className={styles.eyebrow}>
+              {aoVivo ? (
+                <>
+                  <span className={styles.pulso} aria-hidden="true" />
+                  ao vivo agora
+                </>
+              ) : (
+                <>
+                  Próxima mentoria
+                  {contagem && <span className={styles.contagem}> · {contagem}</span>}
+                </>
+              )}
+            </p>
 
-          <h2 className={styles.titulo}>{sessao.titulo}</h2>
+            <h2 className={styles.titulo}>{sessao.titulo}</h2>
+          </div>
 
           {mentor && (
             <div className={styles.mentor}>
