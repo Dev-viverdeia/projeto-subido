@@ -3,15 +3,10 @@ import styles from './RetratoFicticio.module.css';
 export interface RetratoFicticioProps {
   /** Nome de quem o retrato representa. Decide o monograma E a variante de cor. */
   nome: string;
-  /** Lado do círculo em px. Ignorado em `forma="retrato"`, que preenche o pai. */
+  /** Lado do círculo em px. */
   tamanho?: number;
   /** `dark` inverte a superfície para banda escura. */
   tone?: 'light' | 'dark';
-  /**
-   * `circulo` — avatar ao lado de um nome (depoimento, lista, chip).
-   * `retrato` — a moldura 3:4 de uma seção de autoridade, que preenche o contêiner.
-   */
-  forma?: 'circulo' | 'retrato';
   className?: string;
 }
 
@@ -61,12 +56,10 @@ export function RetratoFicticio({
   nome,
   tamanho = 56,
   tone = 'light',
-  forma = 'circulo',
   className,
 }: RetratoFicticioProps) {
   const v = variantePara(nome);
   const mono = iniciais(nome);
-  const retrato = forma === 'retrato';
   /* O id do gradiente precisa ser único por instância: dois `<defs>` com o mesmo id na
      mesma página fazem todos os círculos usarem o primeiro. Derivado do nome, não de
      contador, para não depender de ordem de render. */
@@ -74,24 +67,12 @@ export function RetratoFicticio({
 
   return (
     <span
-      className={[
-        styles.moldura,
-        retrato && styles.retrato,
-        tone === 'dark' && styles.escuro,
-        className,
-      ]
+      className={[styles.moldura, tone === 'dark' && styles.escuro, className]
         .filter(Boolean)
         .join(' ')}
-      style={retrato ? undefined : { ['--retrato-lado' as string]: `${tamanho}px` }}
+      style={{ ['--retrato-lado' as string]: `${tamanho}px` }}
     >
-      {/* `preserveAspectRatio="none"` na forma retrato: a luz é um campo, não um
-          desenho — esticar não deforma nada reconhecível, e evita ter que manter dois
-          viewBox. No círculo o padrão (uniforme) é o certo. */}
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio={retrato ? 'none' : undefined}
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 100 100" aria-hidden="true">
         <defs>
           {/* Duas fontes de luz, como o halo do hero: uma quente no alto à esquerda
               (a mesma direção da luz do retrato real) e a superfície por baixo. */}

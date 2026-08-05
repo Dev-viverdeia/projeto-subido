@@ -22,17 +22,6 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
-/* Forma retrato: preenche o contêiner (que já define o 3:4 e o raio) em vez de
-   carregar medida própria. O raio e a borda ficam com o pai — dois raios concêntricos
-   discordando é o defeito que a doutrina chama de canto não-concêntrico. */
-.retrato {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  box-shadow: none;
-  --retrato-lado: 96px;
-}
-
 .moldura svg {
   position: absolute;
   inset: 0;

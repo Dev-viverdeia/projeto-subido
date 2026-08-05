@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import retratoPedro from '@/assets/img/pedro-sobral-recorte.png';
 import { AUTHORITY } from '@/content/landing';
-import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
+import { Section, SectionHeader, Reveal } from '../primitives';
 import styles from './AuthoritySection.module.css';
 
 /**
@@ -26,24 +26,25 @@ export function AuthoritySection() {
       <div className={styles.grid}>
         {AUTHORITY.people.map((person, i) => (
           <Reveal key={person.name} index={i} as="article" className={styles.person}>
-            {/* O PEDRO TEM FOTO DE VERDADE — a mesma do hero — e ela entra aqui.
-                A outra pessoa não tem, e ganha retrato desenhado: rosto de banco na
-                seção de autoridade seria pior que vazio, porque são justamente as
-                pessoas que RESPONDEM pelo produto. `cover` e não `contain`: aqui a
-                moldura 3:4 é o enquadramento, e sobra de fundo transparente dentro
-                dela leria como recorte flutuando. */}
-            <div className={styles.portrait}>
-              {person.name === 'Pedro Sobral' ? (
+            {/* MOLDURA SÓ PARA QUEM TEM FOTO DE VERDADE. O retrato desenhado saiu
+                daqui: numa moldura 3:4 de 140×187 ele virava um campo de cor com duas
+                letras, que preenche espaço sem informar nada — e numa seção cujo
+                trabalho é dizer QUEM responde pelo produto, um símbolo abstrato do
+                tamanho de um rosto lê como foto que não carregou.
+                Sem moldura, o card fica tipográfico e a credencial assume o peso, que
+                é o mesmo caminho que o CartaoSolucao já usa na área logada.
+                `cover` e não `contain` no Pedro: aqui a moldura É o enquadramento, e
+                fundo transparente sobrando dentro dela leria como adesivo. */}
+            {person.name === 'Pedro Sobral' && (
+              <div className={styles.portrait}>
                 <Image
                   src={retratoPedro}
                   alt={person.name}
                   className={styles.photo}
                   sizes="(min-width: 900px) 320px, 45vw"
                 />
-              ) : (
-                <RetratoFicticio nome={person.name} forma="retrato" />
-              )}
-            </div>
+              </div>
+            )}
 
             <div className={styles.body}>
               <h3 className={`t-subtitle ${styles.name}`}>{person.name}</h3>

@@ -23,6 +23,16 @@
     grid-template-columns: 140px minmax(0, 1fr);
     gap: var(--via-space-6);
   }
+
+  /* Quem não tem foto não paga a calha da foto. Sem isto o corpo do texto caía na
+     segunda coluna e sobravam 140px de vazio à esquerda — que lê como imagem que não
+     carregou, exatamente o que a remoção do retrato desenhado queria evitar.
+     `:has()` em vez de classe modificadora porque a condição é ESTRUTURAL: se um dia
+     a segunda pessoa ganhar retrato, o layout se corrige sozinho, sem ninguém lembrar
+     de tirar a classe. */
+  .person:not(:has(.portrait)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .portrait {
