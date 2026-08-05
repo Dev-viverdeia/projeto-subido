@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -128,9 +129,15 @@ export function CartaoProxima({
             )}
 
             {aoVivo && (
-              <Button variant="primary" disabled>
+              /* LINK vestindo as classes do DS: navegação é <a>, e `brand.css`
+                 já troca o primary para accent sobre `.via-mesh-navy`. O
+                 Button.css chega pelo import do Button neste mesmo arquivo. */
+              <Link
+                href={`/mentorias/${sessao.id}`}
+                className="via-btn via-btn--primary via-btn--md"
+              >
                 Entrar na sala
-              </Button>
+              </Link>
             )}
 
             {/* Os dois estados que o hero não cobria. Sem CTA de propósito: não há
@@ -150,10 +157,6 @@ export function CartaoProxima({
               Ver detalhes
             </Button>
           </div>
-
-          {aoVivo && (
-            <p className={styles.aviso}>A sala de vídeo entra na próxima fase da plataforma.</p>
-          )}
         </div>
       </div>
     </article>

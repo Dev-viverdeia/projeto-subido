@@ -1,0 +1,343 @@
+/* A sala: palco + trilho. O palco é a única superfície escura da página —
+   mesma regra do CartaoProxima na agenda: o escuro marca o que é O MOMENTO. */
+
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--app-gap-grid);
+  align-items: start;
+}
+
+@media (max-width: 1079px) {
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.palcoColuna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  min-width: 0;
+}
+
+/* 16:9 é a proporção da transmissão que vai morar aqui; o teto de altura
+   segura o palco dentro da primeira dobra em monitores baixos (o LiveKit
+   preenche o contêiner que existir, qualquer que seja o corte). */
+.palco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(62vh, 640px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  overflow: hidden;
+}
+
+.palcoMiolo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-6);
+  text-align: center;
+}
+
+.palcoEyebrow {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* Sobre a navy a escala inverte: gray-400 (6,99:1), nunca text-muted. */
+  color: var(--via-gray-400);
+}
+
+[data-ao-vivo] .palcoEyebrow {
+  color: var(--via-accent);
+}
+
+/* O pulso de "ao vivo" — animation é AMBIENTE, fora do gate de transition. */
+.pulso {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+  animation: sala-pulso 2s var(--via-ease-out) infinite;
+}
+
+@keyframes sala-pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.palcoTitulo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+}
+
+.palcoNota {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  /* gray-300 (12,2:1) — hierarquia por dois tons SÓLIDOS, nunca opacidade. */
+  color: var(--via-gray-300);
+  max-width: 38ch;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- controles */
+
+.controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.controlesMidia {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.controle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.controle:hover:not(:disabled) {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  color: var(--via-text-primary);
+}
+
+.controle:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.controle:disabled {
+  cursor: default;
+  color: var(--via-text-faint);
+  box-shadow: none;
+}
+
+.controlesNota {
+  margin-left: var(--via-space-2);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+.sair {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  text-decoration: none;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.sair:hover {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+/* ------------------------------------------------------------------- trilho */
+
+.trilho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  min-width: 0;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.cartaoEyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.pauta {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-primary);
+  /* 40ch ÷ fator 1,369 da Outfit ≈ 55 caracteres — trilho de 360 − padding. */
+  max-width: 40ch;
+  text-wrap: pretty;
+  white-space: pre-line;
+}
+
+.mentor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.mentorTextos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mentorNome {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.mentorHeadline {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.mentorTrilha {
+  margin: 0;
+  align-self: flex-start;
+  padding: 2px var(--via-space-2);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+}
+
+.vagas {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+}
+
+.vagasNumero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.vagasRotulo {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.meuEstado {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.meuEstadoNota {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.fazerCheckin {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    box-shadow var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.fazerCheckin:hover {
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.fazerCheckin:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso {
+    animation: none;
+  }
+
+  .controle,
+  .sair,
+  .fazerCheckin {
+    transition: none;
+  }
+}

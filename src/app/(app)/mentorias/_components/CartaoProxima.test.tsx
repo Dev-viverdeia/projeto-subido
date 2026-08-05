@@ -73,9 +73,9 @@ describe('cartão da próxima sessão', () => {
     expect(screen.queryByRole('button', { name: 'Fazer check-in' })).toBeNull();
   });
 
-  it('ao vivo oferece a sala travada e diz por quê', () => {
+  it('ao vivo leva à sala da sessão', () => {
     montar('ao-vivo');
-    expect(screen.getByRole('button', { name: 'Entrar na sala' })).toHaveProperty('disabled', true);
-    expect(screen.getByText(/sala de vídeo entra na próxima fase/)).toBeDefined();
+    const entrar = screen.getByRole('link', { name: 'Entrar na sala' });
+    expect(entrar.getAttribute('href')).toContain('/mentorias/');
   });
 });

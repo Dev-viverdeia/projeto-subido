@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
@@ -364,14 +365,12 @@ export function MentoriasVista({
 
                 if (estadoAtual === 'ao-vivo') {
                   return (
-                    <>
-                      <Button variant="primary" disabled>
-                        Entrar na sala
-                      </Button>
-                      <span className={styles.fichaNota}>
-                        A sala de vídeo entra na próxima fase da plataforma.
-                      </span>
-                    </>
+                    <Link
+                      href={`/mentorias/${detalhe.id}`}
+                      className="via-btn via-btn--primary via-btn--md"
+                    >
+                      Entrar na sala
+                    </Link>
                   );
                 }
 

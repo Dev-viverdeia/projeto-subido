@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -94,9 +95,14 @@ export function ItemAgenda({
               <span className={styles.dot} aria-hidden="true" />
               ao vivo
             </span>
-            <Button variant="primary" size="sm" disabled>
+            {/* Link com as classes do DS — a linha usa o padrão de sobreposição,
+                e o link sobe com o mesmo z-index dos CTAs. */}
+            <Link
+              href={`/mentorias/${sessao.id}`}
+              className={`via-btn via-btn--primary via-btn--sm ${styles.entrarSala}`}
+            >
               Entrar na sala
-            </Button>
+            </Link>
           </>
         )}
 

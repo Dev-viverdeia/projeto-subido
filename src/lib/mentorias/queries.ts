@@ -99,6 +99,55 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
   });
 }
 
+/**
+ * UMA sessão pela id — a leitura da SALA. Mesmas três idas da agenda, no
+ * singular, pelo mesmo motivo (ver `listarAgenda`): a RLS filtra `publicado`,
+ * a ocupação vem por rpc sem identidade, e `euInscrito` é a linha que a RLS
+ * deixa a pessoa ver.
+ */
+export async function obterSessao(id: string): Promise<SessaoMentoria | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('mentorias')
+    .select(
+      'id, titulo, descricao, inicio, fim, vagas, sala_url, mentores(id, nome, headline, foto_url, trilha)',
+    )
+    .eq('id', id)
+    .maybeSingle<LinhaComMentor>();
+
+  if (error) throw handleError(error, 'mentorias:sessao');
+  if (!data || !data.mentores) return null;
+
+  const [ocupacao, minha] = await Promise.all([
+    supabase.rpc('mentoria_ocupacao', { _ids: [data.id] }),
+    supabase.from('mentoria_inscricoes').select('mentoria_id').eq('mentoria_id', data.id),
+  ]);
+
+  if (ocupacao.error) throw handleError(ocupacao.error, 'mentorias:ocupacao');
+  if (minha.error) throw handleError(minha.error, 'mentorias:inscricoes');
+
+  const m = data.mentores;
+  return {
+    id: data.id,
+    titulo: data.titulo,
+    descricao: data.descricao,
+    inicioIso: data.inicio,
+    fimIso: data.fim,
+    vagas: data.vagas,
+    salaUrl: data.sala_url,
+    mentor: {
+      id: m.id,
+      nome: m.nome,
+      headline: m.headline,
+      foto_url: m.foto_url,
+      trilha: ehTrilha(m.trilha) ? m.trilha : 'implementacao',
+    },
+    inscritos: ocupacao.data?.[0]?.inscritos ?? 0,
+    euInscrito: (minha.data ?? []).length > 0,
+  };
+}
+
 /** Mentores ativos — alimenta o seletor do admin. */
 export async function listarMentores(): Promise<Tables<'mentores'>[]> {
   const supabase = await createClient();

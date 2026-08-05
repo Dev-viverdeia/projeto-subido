@@ -253,3 +253,11 @@
     transform: none;
   }
 }
+
+/* O CTA-link da sala sobe acima da sobreposição do título, como os botões, e
+   não herda sublinhado. */
+.entrarSala {
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
+}
