@@ -79,6 +79,9 @@ export default async function InicioPage() {
             </Link>
           </div>
           <div className={styles.grade}>
+            {/* Mesma resolução do catálogo: categoria sem entrada no mapa cai no
+                padrão. O ícone chega como ELEMENTO já renderizado do Server
+                Component — passar a referência arrastaria o lucide para o cliente. */}
             {recentes.map((solucao) => (
               <CartaoSolucao
                 key={solucao.id}

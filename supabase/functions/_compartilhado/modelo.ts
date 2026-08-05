@@ -144,9 +144,31 @@ export async function gerarDocumento(
          clock de 400s, e teto alto demais é convite para a geração ser cortada
          pelo relógio em vez de terminar. */
       max_tokens: 32000,
+      /* MEDIDO: a `medium` a geração deste briefing levou 165s e 166s em duas
+         corridas, contra os 400s de wall clock do isolate — folga de ~2,4×. O
+         nível é escolha de orçamento de relógio, não de qualidade: a doc do
+         modelo trata `low`/`medium` como níveis fortes, e `high` (o default)
+         gastaria pensamento que aqui compete com o teto de tempo. */
+      output_config: { effort: 'medium', format: zodOutputFormat(DocumentoSolucao) },
       system: `${VOZ}
 
 Sua tarefa é escrever o projeto COMPLETO de implementação.
+
+ORÇAMENTO DE CADA CAMPO — é contrato, não sugestão. O documento é recusado
+inteiro se qualquer um destes for excedido, e você não vê esses limites no
+schema:
+· titulo até 120 caracteres · resumo até 400 · viabilidade.justificativa até 800
+· arquitetura até 2500 caracteres, em prosa
+· ferramentas: de 1 a 10, nome até 60, papel até 400
+· etapas: de 3 a 12, titulo até 120, descricao até 1200, até 8 ferramentas por etapa
+· prompts: até 6, titulo até 120, conteudo até 4000
+· riscos: de 1 a 6, risco até 300, mitigacao até 400
+· economia.horas_por_mes: inteiro de 0 a 720 · economia.premissas: de 1 a 6, cada uma até 300
+· fora_do_escopo: de 1 a 6, cada item até 300
+
+Caber no orçamento é parte da tarefa. Corte o item mais fraco em vez de encurtar
+todos até virarem tópico solto — seis riscos escolhidos valem mais que nove
+genéricos.
 
 O que faz este documento valer:
 · As ETAPAS são executáveis por quem nunca viu o projeto. "Configurar o webhook"
@@ -174,10 +196,38 @@ O que faz este documento valer:
             : `Ideia do cliente:\n\n${ideia}`,
         },
       ],
-      output_config: { format: zodOutputFormat(DocumentoSolucao) },
     });
 
-    const mensagem = await stream.finalMessage();
+    /* Duas coisas são lidas DO STREAM porque depois de `finalMessage()` não dá
+       mais: com saída estruturada, um documento que não passa no schema faz o
+       próprio SDK lançar na montagem da mensagem final — e aí nem o `stop_reason`
+       nem o JSON bruto estão ao alcance.
+
+       `cortadoPorTokens` é guarda para o teto de `max_tokens`, e não é a falha que
+       aconteceu nas duas corridas medidas: `stop_reason` veio diferente de
+       `max_tokens` nas duas. Fica porque o modo existe e a mensagem dele é outra.
+
+       `bruto` é o que resolve a falha REAL — ver `comDetalheDeSchema`. */
+    let cortadoPorTokens = false;
+    let bruto = '';
+    for await (const evento of stream) {
+      if (evento.type === 'message_delta' && evento.delta.stop_reason === 'max_tokens') {
+        cortadoPorTokens = true;
+      }
+      if (evento.type === 'content_block_delta' && evento.delta.type === 'text_delta') {
+        bruto += evento.delta.text;
+      }
+    }
+
+    const mensagem = await stream.finalMessage().catch((erro: unknown) => {
+      if (cortadoPorTokens) {
+        throw new ErroDoBuilder(
+          'O documento estourou o limite de tokens da geração e voltou cortado. Tente de novo; se repetir, encurte a ideia ou as respostas.',
+          'falha',
+        );
+      }
+      throw comDetalheDeSchema(erro, bruto);
+    });
 
     if (mensagem.stop_reason === 'refusal') {
       throw new ErroDoBuilder(
@@ -192,6 +242,48 @@ O que faz este documento valer:
   } catch (erro) {
     throw traduzir(erro);
   }
+}
+
+/**
+ * DIZ QUAL CAMPO ESTOUROU. É a diferença entre uma falha acionável e um beco.
+ *
+ * A saída estruturada garante a FORMA — tipos, campos obrigatórios, enums — e não
+ * garante os `min`/`max`: o SDK os remove do JSON Schema enviado e só os aplica no
+ * `safeParse` da resposta. Consequência medida em duas corridas: o modelo devolve
+ * JSON íntegro, com todos os campos, e o documento é recusado por um teto que ele
+ * nunca viu. A mensagem genérica ("voltou incompleto e não passou na validação")
+ * mandava tentar de novo contra um limite invisível, e a segunda tentativa falhava
+ * igual — o `erro` no banco não distinguia isso de JSON truncado.
+ *
+ * Por isso o JSON bruto é acumulado do stream e reconferido aqui: os `issues` do
+ * Zod trazem o CAMINHO do campo, que é justamente o que faltava. São nomes do nosso
+ * próprio schema (`arquitetura`, `etapas.4.descricao`) — não é `error.message` cru
+ * de PostgREST, é vocabulário desta casa.
+ */
+function comDetalheDeSchema(erro: unknown, bruto: string): unknown {
+  if (!bruto) return erro;
+
+  let json: unknown;
+  try {
+    json = JSON.parse(bruto);
+  } catch {
+    /* JSON quebrado de verdade — o genérico está certo neste caso. */
+    return erro;
+  }
+
+  const conferido = DocumentoSolucao.safeParse(json);
+  if (conferido.success) return erro;
+
+  /* `Set` porque um array fora do tamanho gera um issue por item, e a mensagem não
+     precisa repetir o mesmo campo seis vezes. */
+  const campos = [...new Set(conferido.error.issues.map((i) => i.path.join('.') || '(raiz)'))];
+  const mostrados = campos.slice(0, 4).join(', ');
+  const resto = campos.length > 4 ? ` e mais ${campos.length - 4}` : '';
+
+  return new ErroDoBuilder(
+    `O documento passou do tamanho permitido em: ${mostrados}${resto}. Tente gerar de novo.`,
+    'falha',
+  );
 }
 
 /** Erro da API vira mensagem que o implementador entende — nunca stack cru. */

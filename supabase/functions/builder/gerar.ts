@@ -3,6 +3,12 @@ import { clienteDoChamador, respostaDeErro, respostaJson } from '../_compartilha
 import { ErroDoBuilder, MODELO, gerarDocumento, traduzir } from '../_compartilhado/modelo.ts';
 import { PedidoGeracao, type RespostaClarificacao } from '../_compartilhado/schema.ts';
 
+/* Global fornecida pelo Supabase Edge Runtime. A declaração local mantém este
+   módulo verificável isoladamente pelo `deno check`; não gera código no bundle. */
+declare const EdgeRuntime: {
+  waitUntil<T>(promise: Promise<T>): Promise<T>;
+};
+
 /**
  * PASSO 2 DO BUILDER — o projeto, em TAREFA DE FUNDO.
  *
@@ -118,6 +124,11 @@ async function gerarEGravar(
   } catch (erro) {
     const traduzido = traduzir(erro);
     console.error(`[builder:gerar] ${id}: ${traduzido.tipo} — ${traduzido.message}`);
+    /* O erro CRU também, senão o log só guarda a tradução — e a primeira falha
+       real provou que a tradução não distingue corte de token de schema violado. */
+    if (!(erro instanceof ErroDoBuilder)) {
+      console.error(`[builder:gerar] ${id}: erro original —`, erro);
+    }
 
     const { error } = await supabase
       .from('builder_solucoes')

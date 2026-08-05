@@ -37,7 +37,7 @@ export function HistoricoBuilder({ itens }: { itens: ItemHistorico[] }) {
               {pronta ? <p className={styles.ideia}>{item.ideiaOriginal}</p> : null}
 
               <span className={styles.abrir} aria-hidden="true">
-                {pronta ? 'Abrir projeto' : 'Retomar'} →
+                {pronta ? 'Abrir projeto' : 'Retomar projeto'}
               </span>
             </Link>
           </li>

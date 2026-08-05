@@ -26,22 +26,22 @@
   flex-direction: column;
   gap: var(--via-space-3);
   height: 100%;
+  min-height: 188px;
   padding: var(--app-pad-card);
   border-radius: var(--app-radius-card);
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  box-shadow: var(--via-shadow-xs);
   text-decoration: none;
   transition:
-    transform var(--app-t-touch),
-    border-color var(--app-t-touch),
-    box-shadow var(--app-t-touch);
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .cartao:hover {
-  transform: translateY(-3px);
   border-color: var(--app-elev-2-line);
-  box-shadow: var(--app-elev-2-shadow);
+  box-shadow: var(--via-shadow-sm);
+  text-decoration: none;
 }
 
 .topo {
@@ -61,9 +61,9 @@
 
 .titulo {
   margin: 0;
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-h4);
   font-weight: 560;
-  letter-spacing: var(--app-ls-body);
+  letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
   /* Duas linhas: com três, um card fica muito mais alto que o vizinho e a
@@ -89,31 +89,15 @@
    texto — é o que mantém a fileira alinhada sem altura fixa. */
 .abrir {
   margin-top: auto;
-  padding-top: var(--via-space-2);
-  font-family: var(--via-font-mono);
+  padding-top: var(--via-space-3);
   font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  font-weight: var(--via-fw-medium);
   color: var(--via-accent-ink);
-  transition: transform var(--app-t-touch);
-}
-
-.cartao:hover .abrir {
-  transform: translateX(3px);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cartao,
-  .abrir {
+  .cartao {
     transition: none;
-  }
-
-  .cartao:hover {
-    transform: none;
-  }
-
-  .cartao:hover .abrir {
-    transform: none;
   }
 }
 
