@@ -84,8 +84,12 @@ export function PainelEspera({
               data-feito={i < ativo ? '' : undefined}
               data-ativo={i === ativo ? '' : undefined}
             >
+              {/* A marca conta a história do passo: vazia no futuro, PONTO
+                  PULSANDO no ativo, check no feito — o mesmo lugar, três
+                  estados, sem o texto saltar. */}
               <span className={styles.marca} aria-hidden="true">
                 {i < ativo ? <Visto tamanho={12} /> : null}
+                {i === ativo && !falha ? <span className={styles.ponto} /> : null}
               </span>
               {passo}
               {/* O cursor do print. Só no passo ativo, e só enquanto ele é o

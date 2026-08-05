@@ -51,6 +51,7 @@
 }
 
 .trilho {
+  position: relative;
   height: 2px;
   margin: var(--app-gap-block) 0;
   background: var(--via-navy-08);
@@ -64,6 +65,28 @@
   transform-origin: left center;
   background: var(--via-navy);
   transition: transform var(--app-t-scene);
+}
+
+/* A VARREDURA: uma faixa clara que percorre o trilho em loop enquanto a espera
+   dura. É ela que diz "trabalhando" no intervalo em que o preenchido está
+   parado — a barra determinada conta as fases, a varredura conta o pulso.
+   Só `transform`; o gradiente é navy sobre navy, não glow. */
+.trilho::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, var(--via-navy-25), transparent);
+  animation: varrer 1.8s var(--via-ease) infinite;
+}
+
+@keyframes varrer {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(420%);
+  }
 }
 
 .passos {
@@ -114,6 +137,54 @@
   background: var(--via-navy);
 }
 
+/* O check ENTRA, não aparece: pop curto de escala no instante em que a fase
+   fica para trás. `backwards` — ver entrada.module.css. */
+.passo[data-feito] .marca svg {
+  animation: chegar-visto var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+@keyframes chegar-visto {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* O PONTO do passo ativo: núcleo sólido + anel que respira por transform e
+   opacity. É o vocabulário do dot de "ao vivo", em navy — accent só sobre
+   escuro, e esta superfície é clara. */
+.ponto {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+}
+
+.ponto::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1.5px solid var(--via-navy-40);
+  animation: respirar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes respirar {
+  0% {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
 /* O cursor do print: um traço que pisca ao lado do passo em curso. `animation` e
    não `transition` — é AMBIENTE, não resposta a interação, e é por isso que o
    gate de identidade cobre uma e não a outra. */
@@ -135,9 +206,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Estado FINAL, não animação rápida: o traço fica sólido no lugar. */
-  .cursor {
+  /* Estado FINAL, não animação rápida: o traço fica sólido no lugar, o anel do
+     ponto some (o núcleo sólido já marca o passo), a varredura para e o check
+     simplesmente está lá. */
+  .cursor,
+  .trilho::after,
+  .ponto::after,
+  .passo[data-feito] .marca svg {
     animation: none;
+  }
+
+  .trilho::after {
+    content: none;
   }
 
   .preenchido,
