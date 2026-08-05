@@ -94,3 +94,23 @@
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
+
+/* O canto do histórico — anatomia idêntica ao /builder (ver os porquês lá). */
+.topoDireito {
+  position: relative;
+  z-index: 20;
+  height: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.semConversas {
+  margin: 0;
+  padding: var(--via-space-3);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 32ch;
+  text-wrap: pretty;
+}

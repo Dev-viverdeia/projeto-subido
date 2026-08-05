@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { listarThreads } from '@/lib/consultor/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import entrada from '../_components/entrada.module.css';
 import { Conversa, type ExemploDoConsultor } from './_components/Conversa';
 import { ListaConversas } from './_components/ListaConversas';
@@ -39,6 +40,21 @@ export default async function ConsultorPage() {
   return (
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Consultor" oculto />
+
+      {/* O canto vive SEMPRE, mesmo sem conversa — o controle sumir lia como
+          "a tela não tem memória". Vazio, o painel diz o estado em uma linha
+          em vez de fingir que a seção não existe. */}
+      <div className={`${entrada.bloco} ${styles.topoDireito}`}>
+        <HistoricoDropdown total={threads.length} rotulo="Suas conversas">
+          {threads.length > 0 ? (
+            <ListaConversas threads={threads} />
+          ) : (
+            <p className={styles.semConversas}>
+              Nenhuma conversa ainda — a primeira nasce quando você enviar uma pergunta.
+            </p>
+          )}
+        </HistoricoDropdown>
+      </div>
 
       <div className={`${entrada.bloco} ${styles.tela}`}>
         <header className={styles.cabecalho}>
