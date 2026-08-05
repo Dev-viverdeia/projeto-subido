@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import type { StaticImageData } from 'next/image';
 import { HUB } from '@/content/landing';
 import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './HubSection.module.css';
@@ -18,6 +19,14 @@ import styles from './HubSection.module.css';
  * "ganhe R$10k/mês em 30 dias", recusar-se a prometer renda é ativo de conversão:
  * é a frase que o comprador queimado printa.
  */
+/**
+ * ONDE AS FOTOS DOS PERFIS ENTRAM. Chave = `nome` em HUB.perfis.
+ *
+ * Mesmo contrato do mapa de depoimentos: enquanto a chave não existe, o cartão cai
+ * no retrato ilustrado. Ver src/assets/img/RETRATOS.md para nomes e especificação.
+ */
+const FOTOS: Record<string, StaticImageData> = {};
+
 export function HubSection() {
   return (
     <Section id="hub" tone="navy" labelledBy="hub-title" space="loose">
@@ -68,7 +77,12 @@ export function HubSection() {
                   prometer o que ainda não existe. */}
               {HUB.perfis.map((perfil) => (
                 <div key={perfil.nome} className={styles.profile}>
-                  <RetratoFicticio nome={perfil.nome} tamanho={48} tone="dark" />
+                  <RetratoFicticio
+                    nome={perfil.nome}
+                    foto={FOTOS[perfil.nome]}
+                    tamanho={48}
+                    tone="dark"
+                  />
                   <span className={styles.profileNome}>{perfil.nome}</span>
                   <span className={styles.profileMeta}>
                     {perfil.foco} · {perfil.local}
