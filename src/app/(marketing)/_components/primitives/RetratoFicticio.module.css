@@ -1,6 +1,22 @@
-/* O SVG pinta a superfície e o monograma flutua por cima em DOM normal, então a
-   moldura precisa ser o contexto de posicionamento dos dois. */
+/* O SVG é posicionado em absoluto dentro da moldura, então ela precisa ser o contexto
+   de posicionamento e a dona da medida — o `viewBox` do desenho é sempre 100×100 e
+   quem decide o tamanho real é `--retrato-lado`. */
 .moldura {
+  /* token-ok: PELE, CABELO e TINTA DA FEIÇÃO são carga da ilustração, não paleta da
+     marca. Não existem como token `--via-*` de propósito: a marca não tem tom de pele,
+     e criar um faria dele uma cor de sistema que mais cedo ou mais tarde aparece num
+     botão. Ficam confinadas ao único arquivo que desenha gente, e vivem aqui em vez de
+     no TSX porque cor é camada de estilo — o componente escolhe QUAL, não INVENTA. */
+  --rf-pele-0: #f2d0b4;
+  --rf-pele-1: #ddae87;
+  --rf-pele-2: #b9805a;
+  --rf-pele-3: #8d5a3b;
+  --rf-cabelo-0: #2b2118;
+  --rf-cabelo-1: #4a3524;
+  --rf-cabelo-2: #6e4b2e;
+  --rf-cabelo-3: #1b1b1f;
+  --rf-feicao: #1b1b1f;
+
   position: relative;
   display: inline-grid;
   place-items: center;
@@ -30,17 +46,12 @@
   display: block;
 }
 
-/* O monograma escala com o círculo em vez de ter corpo fixo: a 40px o valor fixo
-   estourava a moldura e a 96px sumia dentro dela. */
-.mono {
-  position: relative;
-  font-family: var(--via-font-display);
-  font-size: calc(var(--retrato-lado) * 0.36);
-  font-weight: var(--via-fw-semibold);
-  letter-spacing: var(--app-ls-caption);
-  line-height: 1;
-  /* `tabular-nums` não serve aqui, mas o mesmo princípio vale: duas letras precisam
-     ocupar largura previsível para o monograma não dançar entre um card e outro. */
-  font-variant-ligatures: none;
-  user-select: none;
+/* A foto preenche a moldura redonda. `cover` e não `contain`: dentro de um círculo,
+   `contain` deixa barras nas laterais e o retrato lê como selo, não como foto. */
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }

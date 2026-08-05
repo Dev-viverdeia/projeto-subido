@@ -68,7 +68,7 @@ export function HubSection() {
                   prometer o que ainda não existe. */}
               {HUB.perfis.map((perfil) => (
                 <div key={perfil.nome} className={styles.profile}>
-                  <RetratoFicticio nome={perfil.nome} tamanho={40} tone="dark" />
+                  <RetratoFicticio nome={perfil.nome} tamanho={48} tone="dark" />
                   <span className={styles.profileNome}>{perfil.nome}</span>
                   <span className={styles.profileMeta}>
                     {perfil.foco} · {perfil.local}
