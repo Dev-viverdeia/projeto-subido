@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-
+import { ArrowRight } from 'lucide-react';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -59,7 +59,7 @@ export default async function InicioPage() {
               </span>
             </span>
             <span className={styles.mentoriaSeta} aria-hidden="true">
-              →
+              <ArrowRight size={16} strokeWidth={2} />
             </span>
           </Link>
         )}
@@ -75,7 +75,8 @@ export default async function InicioPage() {
               Últimas soluções
             </h2>
             <Link href="/solucoes" className={styles.verTodas}>
-              Ver todas →
+              Ver todas
+              <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
             </Link>
           </div>
           <div className={styles.grade}>

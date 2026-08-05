@@ -63,8 +63,10 @@
   color: var(--via-white);
 }
 
+/* A ênfase sempre foi tom + itálico aqui. A Outfit não tem face itálica, então
+   sobrou o tom — que era quem fazia o trabalho. Ver `.t-* em` em styles/type.css. */
 .title em {
-  font-style: italic;
+  font-style: normal;
   font-weight: inherit;
 }
 

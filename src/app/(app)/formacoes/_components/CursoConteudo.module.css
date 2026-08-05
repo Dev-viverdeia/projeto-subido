@@ -76,7 +76,11 @@
   line-height: var(--via-lh-normal);
   /* Cinza da banda escura — nunca `--via-text-muted` aqui (3,45:1, reprova). */
   color: var(--via-gray-300);
-  max-width: 56ch;
+  /* 53ch, não 56ch: o fator do `ch` subiu de 1,30 (Geist) para 1,369 (Outfit) —
+     medido no navegador, ver CLAUDE.md. Os 56ch rendiam 73 caracteres e passariam
+     a render 77, acima da faixa confortável de 45–75. 53 × 1,369 ≈ 73 devolve
+     exatamente o comprimento de linha de antes da troca de fonte. */
+  max-width: 53ch;
   text-wrap: pretty;
 }
 

@@ -284,5 +284,9 @@
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-loose);
   color: var(--via-text-body);
-  max-width: 56ch;
+  /* 53ch, não 56ch: o fator do `ch` mudou com a Outfit (1,369 contra os 1,30 da
+     Geist — medido no navegador, ver CLAUDE.md). Os 56ch rendiam 73 caracteres e
+     passariam a render 77, acima da faixa confortável. 53 × 1,369 ≈ 73 — o
+     comprimento de linha desenhado fica igual ao de antes da troca de fonte. */
+  max-width: 53ch;
 }

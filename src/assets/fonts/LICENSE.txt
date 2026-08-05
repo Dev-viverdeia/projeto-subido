@@ -1,4 +1,12 @@
-Copyright (c) 2023 Vercel, in collaboration with basement.studio
+Duas famílias vivem nesta pasta, ambas sob a MESMA licença (SIL OFL 1.1), com
+detentores de copyright diferentes:
+
+  Outfit-Variable.woff2   (texto e display — a fonte do produto)
+  Copyright (c) 2020 The Outfit Project Authors
+  https://github.com/Outfitio/Outfit-Fonts
+
+  GeistMono-Variable.woff2   (números, rótulos e eyebrows)
+  Copyright (c) 2023 Vercel, in collaboration with basement.studio
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

@@ -20,7 +20,7 @@ export type ItemNav = {
  * NavLateral — que é cliente por causa do `usePathname` — teria que importar a
  * biblioteca inteira para poder chamá-la.
  *
- * `strokeWidth` 1.8 acompanha o peso da Geist; o default 2 pesa demais ao lado dela.
+ * `strokeWidth` 1.8 acompanha o peso da Outfit; o default 2 pesa demais ao lado dela.
  */
 const TAMANHO = 18;
 const TRACO = 1.8;

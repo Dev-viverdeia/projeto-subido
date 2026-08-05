@@ -88,13 +88,18 @@
   letter-spacing: -0.022em;
 }
 
-/* Ênfase é itálico editorial, nunca peso. */
+/* Ênfase é TOM, nunca peso — e nunca itálico, porque a Outfit não tem face itálica
+   e o oblíquo sintetizado do browser é inclinação calculada, não desenho.
+   O tom da ênfase é o mais QUIETO, não o mais forte: recuo editorial, o mesmo
+   mecanismo que SectionHeader já usava por baixo do itálico.
+   Sobre banda escura, redeclare `--app-em-ink` (a escala de cinza inverte). */
 .t-hero em,
 .t-display em,
 .t-title em,
 .t-subtitle em {
-  font-style: italic;
+  font-style: normal;
   font-weight: inherit;
+  color: var(--app-em-ink);
 }
 
 /* --- Label em mono ------------------------------------------------------------

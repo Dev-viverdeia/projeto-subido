@@ -78,7 +78,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* `display: flex` porque o filho é um SVG inline: sem isso o glifo-caixa herda o
+   espaço de descida da linha e a seta assenta 3px abaixo do centro do card. */
 .mentoriaSeta {
+  display: flex;
   flex: none;
   color: var(--via-text-muted);
   transition: transform var(--via-t-fast);
@@ -110,6 +113,9 @@
 }
 
 .verTodas {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
   color: var(--via-text-muted);

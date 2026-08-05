@@ -15,8 +15,8 @@ export const contentType = 'image/png';
  * gerar a cada request — numa landing estática, gerar OG sob demanda seria pagar
  * função por cada preview no WhatsApp.
  *
- * `next/og` lida mal com fonte variável: o Geist é variável, então aqui a família
- * cai no fallback do Satori de propósito. Trocar por uma instância estática do Geist
+ * `next/og` lida mal com fonte variável: a Outfit é variável, então aqui a família
+ * cai no fallback do Satori de propósito. Trocar por uma instância estática da Outfit
  * quando houver o arquivo — a diferença aparece no peso do título.
  */
 export default function Image() {
