@@ -1,4 +1,4 @@
-# Retratos da landing — o que falta e como entregar
+# Retratos da landing
 
 Nove pessoas na landing ainda não têm foto e caem no retrato ilustrado
 (`RetratoFicticio`). O Pedro já tem e é o único que não precisa de nada.

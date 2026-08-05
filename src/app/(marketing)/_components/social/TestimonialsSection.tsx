@@ -1,4 +1,7 @@
 import type { StaticImageData } from 'next/image';
+import rafaelNunes from '@/assets/img/depoimento-rafael-nunes.jpg';
+import marinaBueno from '@/assets/img/depoimento-marina-bueno.jpg';
+import deniseFarias from '@/assets/img/depoimento-denise-farias.jpg';
 import { TESTIMONIALS, TESTIMONIALS_META } from '@/content/landing';
 import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './TestimonialsSection.module.css';
@@ -35,7 +38,11 @@ import styles from './TestimonialsSection.module.css';
  * "ter dito" o depoimento. Se as fotos forem entrar, o caminho honesto é que venham
  * junto dos depoimentos REAIS, das mesmas pessoas.
  */
-const FOTOS: Record<string, StaticImageData> = {};
+const FOTOS: Record<string, StaticImageData> = {
+  'Rafael Nunes': rafaelNunes,
+  'Marina Bueno': marinaBueno,
+  'Denise Farias': deniseFarias,
+};
 
 export function TestimonialsSection() {
   return (

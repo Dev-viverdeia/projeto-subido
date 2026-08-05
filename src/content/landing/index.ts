@@ -309,12 +309,12 @@ export const TESTIMONIALS: Testimonial[] = [
     outcome: 'ticket médio de R$ 2.400 para R$ 6.100',
   },
   {
-    name: 'Diego Farias',
-    role: 'Dono de negócio local',
+    name: 'Denise Farias',
+    role: 'Dona de negócio local',
     city: 'Fortaleza/CE',
     timeframe: 'em 19 dias',
     quote:
-      'Não sou técnico, tenho três lojas de material de construção. Fiz a formação achando que ia ser código e não era. Montei o atendimento no WhatsApp seguindo a solução e hoje ele responde orçamento fora do horário, que era quando eu perdia venda.',
+      'Não sou técnica, tenho três lojas de material de construção. Fiz a formação achando que ia ser código e não era. Montei o atendimento no WhatsApp seguindo a solução e hoje ele responde orçamento fora do horário, que era quando eu perdia venda.',
     outcome: '41% dos orçamentos fora do horário comercial',
   },
 ];

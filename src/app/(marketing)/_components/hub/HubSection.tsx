@@ -1,5 +1,11 @@
 import { Check } from 'lucide-react';
 import type { StaticImageData } from 'next/image';
+import camilaDeodato from '@/assets/img/hub-camila-deodato.jpg';
+import igorSalgado from '@/assets/img/hub-igor-salgado.jpg';
+import biancaRocha from '@/assets/img/hub-bianca-rocha.jpg';
+import tarsoMenezes from '@/assets/img/hub-tarso-menezes.jpg';
+import leilaAoki from '@/assets/img/hub-leila-aoki.jpg';
+import wesleyPrado from '@/assets/img/hub-wesley-prado.jpg';
 import { HUB } from '@/content/landing';
 import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './HubSection.module.css';
@@ -25,7 +31,14 @@ import styles from './HubSection.module.css';
  * Mesmo contrato do mapa de depoimentos: enquanto a chave não existe, o cartão cai
  * no retrato ilustrado. Ver src/assets/img/RETRATOS.md para nomes e especificação.
  */
-const FOTOS: Record<string, StaticImageData> = {};
+const FOTOS: Record<string, StaticImageData> = {
+  'Camila Deodato': camilaDeodato,
+  'Igor Salgado': igorSalgado,
+  'Bianca Rocha': biancaRocha,
+  'Tarso Menezes': tarsoMenezes,
+  'Leila Aoki': leilaAoki,
+  'Wesley Prado': wesleyPrado,
+};
 
 export function HubSection() {
   return (
