@@ -7,16 +7,6 @@
   gap: var(--via-space-8);
 }
 
-/* O canto do histórico — anatomia idêntica ao /builder (ver os porquês lá). */
-.topoDireito {
-  position: relative;
-  z-index: 20;
-  height: 0;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-}
-
 /* A coluna da pergunta — 720 como o compositor do Builder. */
 .tela {
   width: 100%;
@@ -25,7 +15,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-6);
-  padding-top: clamp(32px, 8vh, 96px);
+  padding-top: clamp(24px, 5vh, 64px);
 }
 
 .cabecalho {
@@ -62,4 +52,45 @@
   color: var(--via-text-muted);
   max-width: 46ch;
   text-wrap: pretty;
+}
+
+/* ── Histórico como SEÇÃO — folga grande antes: é o segundo assunto da tela,
+   mesma regra do catálogo do Builder. A lista alinha com a coluna da pergunta
+   para a página ter um eixo só. */
+.historico {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.historicoTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding-inline: var(--via-space-1_5);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }

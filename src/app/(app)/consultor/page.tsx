@@ -1,36 +1,44 @@
 import type { Metadata } from 'next';
 import { listarThreads } from '@/lib/consultor/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
-import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import entrada from '../_components/entrada.module.css';
-import { Conversa } from './_components/Conversa';
+import { Conversa, type ExemploDoConsultor } from './_components/Conversa';
 import { ListaConversas } from './_components/ListaConversas';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Consultor' };
 
 /**
- * O CONSULTOR — a tela inicial é a pergunta, como no Builder.
- *
- * A conversa mora em /consultor/[id]: a primeira mensagem cria a thread na Edge
- * Function e a navegação leva para a URL dela — fechar a aba não perde nada.
- * As conversas anteriores ficam no dropdown do canto, o mesmo componente do
- * histórico do Builder.
+ * O CONSULTOR — a tela inicial é a pergunta, e o histórico é uma SEÇÃO da
+ * página, não um canto: quem volta ao consultor volta quase sempre para
+ * retomar uma conversa, e escondê-las num dropdown fazia a tela parecer sem
+ * memória. Sem conversa nenhuma, a seção some — a pergunta fica sozinha, que
+ * é o estado certo de uma tela de criação (mesma regra do Builder).
  */
+const EXEMPLOS: ExemploDoConsultor[] = [
+  {
+    rotulo: 'Atendimento fora do horário',
+    texto:
+      'Meu cliente perde atendimento fora do horário comercial no WhatsApp. Qual solução do catálogo resolve isso e por onde eu começo?',
+  },
+  {
+    rotulo: 'Primeiro projeto',
+    texto:
+      'Quero fechar meu primeiro projeto de IA como implementador. Qual solução do catálogo é a porta de entrada mais simples de vender e implantar?',
+  },
+  {
+    rotulo: 'Não está no catálogo',
+    texto:
+      'Meu cliente pediu um sistema que não vejo no catálogo. Como uso o Builder para transformar essa ideia num projeto completo?',
+  },
+];
+
 export default async function ConsultorPage() {
   const threads = await listarThreads();
 
   return (
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Consultor" oculto />
-
-      {threads.length > 0 ? (
-        <div className={`${entrada.bloco} ${styles.topoDireito}`}>
-          <HistoricoDropdown total={threads.length} rotulo="Suas conversas">
-            <ListaConversas threads={threads} />
-          </HistoricoDropdown>
-        </div>
-      ) : null}
 
       <div className={`${entrada.bloco} ${styles.tela}`}>
         <header className={styles.cabecalho}>
@@ -44,8 +52,21 @@ export default async function ConsultorPage() {
           </p>
         </header>
 
-        <Conversa />
+        <Conversa exemplos={EXEMPLOS} />
       </div>
+
+      {threads.length > 0 ? (
+        <section
+          className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}
+          aria-labelledby="consultor-conversas"
+        >
+          <h3 id="consultor-conversas" className={styles.historicoTitulo}>
+            Conversas recentes
+            <span className={styles.total}>{threads.length}</span>
+          </h3>
+          <ListaConversas threads={threads} />
+        </section>
+      ) : null}
     </div>
   );
 }

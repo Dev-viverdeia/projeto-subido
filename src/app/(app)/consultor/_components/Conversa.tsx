@@ -20,7 +20,20 @@ const MAXIMO = 8000;
  * Numa conversa NOVA (sem thread), a resposta traz o id e a navegação leva para
  * /consultor/[id] — a URL vira o estado, como no Builder.
  */
-export function Conversa({ threadId }: { threadId?: string }) {
+export type ExemploDoConsultor = {
+  /** O que aparece no chip — rótulo curto. */
+  rotulo: string;
+  /** O que entra no campo — a pergunta completa, pronta para editar. */
+  texto: string;
+};
+
+export function Conversa({
+  threadId,
+  exemplos,
+}: {
+  threadId?: string;
+  exemplos?: ExemploDoConsultor[];
+}) {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
   const fimRef = useRef<HTMLDivElement>(null);
@@ -140,6 +153,39 @@ export function Conversa({ threadId }: { threadId?: string }) {
           <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
         </button>
       </form>
+
+      {/* Os exemplos ensinam o que é uma boa pergunta — mesmo papel dos chips
+          do Builder: ponto de partida para editar, não formulário pronto. */}
+      {exemplos && exemplos.length > 0 && (
+        <section className={styles.exemplos}>
+          <h3 className={styles.divisor}>
+            <span>ou comece por um exemplo</span>
+          </h3>
+          <ul className={styles.chips}>
+            {exemplos.map((e) => (
+              <li key={e.rotulo}>
+                <button
+                  type="button"
+                  className={styles.chip}
+                  disabled={ocupado}
+                  onClick={() => {
+                    setTexto(e.texto);
+                    const campo = campoRef.current;
+                    if (campo) {
+                      campo.focus();
+                      requestAnimationFrame(() =>
+                        campo.setSelectionRange(e.texto.length, e.texto.length),
+                      );
+                    }
+                  }}
+                >
+                  {e.rotulo}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
