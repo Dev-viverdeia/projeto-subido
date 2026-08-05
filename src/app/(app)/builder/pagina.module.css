@@ -9,14 +9,14 @@
   gap: var(--via-space-8);
 }
 
-/* Folga grande antes do histórico: ele é o segundo assunto da tela, e o
-   compositor precisa terminar antes de o olho encontrar o próximo. */
-.historico {
+/* O CANTO do histórico. Altura ZERO de propósito: o gatilho flutua no canto sem
+   empurrar o compositor um pixel para baixo — a tela de criação continua com a
+   mesma dobra de quando não há projeto nenhum. O painel que abre é
+   position:absolute dentro do dropdown, então também não entra no fluxo. */
+.topoDireito {
+  position: relative;
+  z-index: 20;
+  height: 0;
   display: flex;
-  flex-direction: column;
-  gap: var(--via-space-5);
-  padding-top: var(--via-space-6);
-  border-top: 1px solid var(--via-border-hairline);
+  justify-content: flex-end;
 }
-
-/* Título e contagem migraram para o gatilho do HistoricoDropdown. */

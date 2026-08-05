@@ -32,20 +32,21 @@ export default async function BuilderPage() {
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Builder" oculto />
 
-      <div className={entrada.bloco}>
-        <Compositor />
-      </div>
-
-      {/* O histórico é um DISCLOSURE fechado: a tela inicial volta a ser só a
-          pergunta. A grade continua server-rendered e atravessa como children —
-          o dropdown só abre e fecha. */}
+      {/* O histórico mora no CANTO SUPERIOR direito, sobreposto: um gatilho
+          compacto que abre o painel por cima da tela. A grade continua
+          server-rendered e atravessa como children — o dropdown só abre e
+          fecha. Sem projetos, nem o gatilho aparece. */}
       {itens.length > 0 ? (
-        <section className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}>
+        <div className={`${entrada.bloco} ${styles.topoDireito}`}>
           <HistoricoDropdown total={itens.length}>
             <HistoricoBuilder itens={itens} />
           </HistoricoDropdown>
-        </section>
+        </div>
       ) : null}
+
+      <div className={entrada.bloco}>
+        <Compositor />
+      </div>
     </div>
   );
 }
