@@ -90,9 +90,12 @@
 /* A régua de vista fica sozinha na linha, alinhada à esquerda: é o controle mais
    alto da hierarquia da tela, e dividir a linha com outro controle o rebaixaria
    ao mesmo nível do filtro que vive DENTRO da agenda. */
+/* Abas à esquerda, o histórico de check-ins no canto direito da MESMA linha —
+   os dois governam a leitura da tela inteira, então moram no mesmo andar. */
 .chrome {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--app-gap-stack);
 }
 

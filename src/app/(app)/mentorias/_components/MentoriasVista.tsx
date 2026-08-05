@@ -14,6 +14,8 @@ import { CalendarioMentorias } from './CalendarioMentorias';
 import { CartaoProxima } from './CartaoProxima';
 import { TrilhoInscricoes } from './TrilhoInscricoes';
 import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
+import { HistoricoDropdown } from '../../_components/HistoricoDropdown';
+import { MeusCheckins } from './MeusCheckins';
 import { ICONE_AGENDA, ICONE_CALENDARIO, type IdVista } from './vistas';
 import { duracaoMin, estadoDe, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './MentoriasVista.module.css';
@@ -182,6 +184,18 @@ export function MentoriasVista({
               layoutId="mentorias-vista"
               ariaLabel="Modo de visualização"
             />
+
+            {/* O canto direito da mesma linha: histórico completo de check-ins,
+                encerradas incluídas — o trilho lateral só enxerga as futuras, e
+                sessão que termina sumia da tela sem deixar rastro. Presente
+                mesmo com zero: o painel vazio diz isso com uma linha honesta,
+                como no Consultor. */}
+            <HistoricoDropdown
+              total={sessoes.filter((s) => s.euInscrito).length}
+              rotulo="Meus check-ins"
+            >
+              <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
+            </HistoricoDropdown>
           </div>
 
           {/* O CARTÃO GRANDE É DA AGENDA, não da tela. No calendário ele repetia
@@ -361,12 +375,16 @@ export function MentoriasVista({
                   );
                 }
 
-                /* Lotada e fora-da-janela: motivo, não botão morto. */
+                /* Lotada, fora-da-janela e encerrada: motivo, não botão morto.
+                   Encerrada passou a ser alcançável daqui — o histórico do
+                   dropdown abre a ficha de sessões que já foram. */
                 return (
                   <span className={styles.fichaNota}>
                     {estadoAtual === 'lotada'
                       ? `Sessão lotada — ${detalhe.inscritos} de ${detalhe.vagas} vagas.`
-                      : `O check-in abre ${rotuloDoDia(detalhe.inicioIso, agora).mono}.`}
+                      : estadoAtual === 'encerrada'
+                        ? 'Sessão encerrada.'
+                        : `O check-in abre ${rotuloDoDia(detalhe.inicioIso, agora).mono}.`}
                   </span>
                 );
               })()}
