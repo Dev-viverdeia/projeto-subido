@@ -206,9 +206,10 @@
   /* A MEDIDA MORA AQUI, não no container da lista. É o que permite a agenda usar
      a tela inteira sem o título correr mil pixels até o botão: ele para onde a
      leitura pede e o resto da largura vira respiro entre as duas pontas da linha.
-     O `ch` do Geist mede ~30% a menos que o caractere médio, então o alvo real é
-     caracteres ÷ 1,3 — 68ch ≈ 88 caracteres, generoso para um título de sessão e
-     ainda dentro do que se lê numa linha só. */
+     O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio, então o alvo
+     real é caracteres ÷ 1,369 — 68ch ≈ 93 caracteres (eram 88 com a Geist),
+     generoso para um título de sessão e ainda dentro do que se lê numa linha só.
+     Acima de 75 de propósito: é linha única, não prosa. */
   max-width: 68ch;
 }
 

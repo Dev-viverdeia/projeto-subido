@@ -108,8 +108,8 @@
   letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  /* 40ch ≈ 52 caracteres no Geist (o `ch` mede ~30% a menos que o caractere
-     médio) — linha curta é o certo numa coluna de apoio. */
+  /* 40ch ≈ 55 caracteres na Outfit (o glifo `0` é ~37% mais LARGO que o caractere
+     médio; eram 52 com a Geist) — linha curta é o certo numa coluna de apoio. */
   max-width: 40ch;
   text-wrap: pretty;
 }

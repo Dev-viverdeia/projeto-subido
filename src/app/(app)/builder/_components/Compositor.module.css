@@ -1,11 +1,13 @@
-/* MEDIDA DE LEITURA — o `ch` do Geist mente por ~30%, e todas as medidas deste
-   arquivo já estão corrigidas.
-   `ch` é a largura do glifo `0`, que nesta fonte é bem mais estreito que a média
-   das minúsculas. Medido no navegador (largura da caixa ÷ glifo médio): `72ch`
-   entregava 94 caracteres por linha, `68ch` dava 89, `62ch` dava 81 — todos acima
-   da faixa confortável de 45–75. O fator é constante (~1,30), então o alvo real é
-   `caracteres ÷ 1,3`: ~52ch para 68 caracteres. Não "arredonde de volta" sem
-   medir de novo. */
+/* MEDIDA DE LEITURA — o `ch` MENTE por ~37%, e todas as medidas deste arquivo já
+   estão corrigidas.
+   `ch` é a largura do glifo `0`, que é bem mais LARGO que a média das minúsculas —
+   por isso `52ch` não entrega 52 caracteres, entrega mais. Medido no navegador
+   (largura do `0` ÷ largura do glifo médio, com prosa real em pt-BR): a Outfit dá
+   fator 1,369, CONSTANTE de 12px a 64px e de peso 400 a 450 — não é preciso
+   remedir por corpo. O alvo real é `caracteres ÷ 1,369`: ~50ch para 68 caracteres,
+   ~53ch para 73, e a faixa confortável é 45–75.
+   Não "arredonde de volta" sem medir: o fator é propriedade da FONTE e muda com
+   ela (a Geist, até 08/2026, dava 1,30). */
 
 /* UM EIXO PARA O ARCO DE CRIAÇÃO INTEIRO.
    Compor, responder a entrevista e esperar são três momentos de um percurso só, e
@@ -60,10 +62,12 @@
   max-width: 15ch;
 }
 
-/* Ênfase é itálico editorial, nunca peso 700. A face itálica do Geist já está
-   carregada e esta tela não está no caminho crítico de LCP. */
+/* Ênfase é TOM editorial, nunca peso 700 e nunca itálico: a Outfit não tem face
+   itálica, e a da Geist saiu do repo junto com a troca de fonte. `font-style:
+   italic` aqui produziria só o oblíquo sintetizado do browser. */
 .titulo em {
-  font-style: italic;
+  font-style: normal;
+  color: var(--app-em-ink);
 }
 
 .apoio {
@@ -75,8 +79,11 @@
   text-wrap: balance;
 }
 
+/* Aqui o tom já fazia o trabalho junto com o itálico: o apoio é `--via-text-muted`
+   e a ênfase sobe para a tinta primária. Sem a face itálica, o contraste de tom
+   carrega sozinho. */
 .apoio em {
-  font-style: italic;
+  font-style: normal;
   color: var(--via-text-primary);
 }
 

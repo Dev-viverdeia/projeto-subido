@@ -82,8 +82,8 @@
   line-height: var(--via-lh-tight);
   color: var(--via-text-primary);
   text-wrap: balance;
-  /* O `ch` do Geist mede ~30% a menos que o caractere médio (o glifo `0` é
-     estreito nesta fonte): o alvo real é caracteres ÷ 1,3. 34ch ≈ 44 caracteres
+  /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
+     caracteres ÷ 1,369. 34ch ≈ 47 caracteres (eram 44 com a Geist)
      por linha — um título de duas linhas no máximo, que é o que a composição
      comporta antes de o resumo ser empurrado para fora da dobra. */
   max-width: 34ch;

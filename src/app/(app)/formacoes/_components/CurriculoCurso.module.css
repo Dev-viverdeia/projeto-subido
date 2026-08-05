@@ -43,8 +43,9 @@
 
 /* A MEDIDA MORA AQUI, não no container da página. É o que permite o curso usar a
    tela inteira sem o título do módulo correr até a contagem do outro lado.
-   O `ch` do Geist mede ~30% a menos que o caractere médio, então o alvo real é
-   caracteres ÷ 1,3 — 62ch ≈ 80 caracteres, folgado para nome de módulo. */
+   O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio, então o alvo real
+   é caracteres ÷ 1,369 — 62ch ≈ 85 caracteres (eram 80 com a Geist), folgado para
+   nome de módulo. Acima de 75 de propósito: é linha única, não prosa. */
 .nome {
   flex: 1;
   min-width: 0;

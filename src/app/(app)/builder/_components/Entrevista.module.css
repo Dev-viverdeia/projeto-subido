@@ -125,8 +125,8 @@
   letter-spacing: var(--app-ls-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  /* 52ch ≈ 68 caracteres no Geist (o `ch` desta fonte mede ~30% a menos que o
-     caractere médio; o alvo real é caracteres ÷ 1,3). */
+  /* 52ch ≈ 71 caracteres na Outfit — o glifo `0` é ~37% mais LARGO que o caractere
+     médio, então o alvo real é caracteres ÷ 1,369 (eram 68 com a Geist). */
   max-width: 52ch;
   text-wrap: pretty;
 }

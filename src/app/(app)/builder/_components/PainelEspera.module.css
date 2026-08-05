@@ -33,13 +33,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* CITAÇÃO, não texto de interface: é o que a pessoa escreveu. Itálico e aspas
-   dizem isso sem precisar de rótulo. Duas linhas — aqui a ideia é lembrete, e
-   ela existe inteira no cabeçalho do projeto. */
+/* CITAÇÃO, não texto de interface: é o que a pessoa escreveu. Quem diz isso são as
+   ASPAS, sem precisar de rótulo — o itálico que as acompanhava saiu porque a Outfit
+   não tem face itálica e a da Geist deixou o repo na troca de fonte. Duas linhas —
+   aqui a ideia é lembrete, e ela existe inteira no cabeçalho do projeto. */
 .ideia {
   margin: var(--app-gap-block) 0 0;
   font-size: var(--via-fs-h4);
-  font-style: italic;
   letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);

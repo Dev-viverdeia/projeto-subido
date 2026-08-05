@@ -45,9 +45,9 @@
   flex-direction: column;
   gap: var(--via-space-3);
   min-width: 0;
-  /* O `ch` do Geist mede ~30% a menos que o caractere médio: o alvo real é
-     caracteres ÷ 1,3. 46ch ≈ 60 caracteres — dentro da faixa de 45–75 mesmo com
-     o título em corpo de display. */
+  /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
+     caracteres ÷ 1,369. 46ch ≈ 63 caracteres (eram 60 com a Geist) — dentro da
+     faixa de 45–75 mesmo com o título em corpo de display. */
   max-width: 46ch;
 }
 
