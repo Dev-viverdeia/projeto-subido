@@ -8,7 +8,7 @@ import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import entrada from '../../_components/entrada.module.css';
 import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
 import { Entrevista } from '../_components/Entrevista';
-import { FichaProjeto } from '../_components/FichaProjeto';
+import { EntenderProjeto } from '../_components/sala/EntenderProjeto';
 import { EtapaCriacao } from '../_components/sala/EtapaCriacao';
 import { EtapaKit } from '../_components/sala/EtapaKit';
 import { Kanban } from '../_components/sala/Kanban';
@@ -115,13 +115,10 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
             /* Travados enquanto não há documento — ver `motivoDoCadeado`. O `null`
                aqui nunca chega à tela: o cadeado substitui o painel. */
             entender={
-              solucao.documento ? (
-                <FichaProjeto
-                  documento={solucao.documento}
-                  criadoEm={solucao.criadoEm}
-                  modelo={solucao.modelo}
-                />
-              ) : null
+              /* Painel FOCADO, não a ficha inteira: a ficha repetia o título do
+                 hero e duplicava etapas (Construir), prompts e ferramentas (Kit).
+                 Aqui fica só o que responde "o que é isto e por quê". */
+              solucao.documento ? <EntenderProjeto documento={solucao.documento} /> : null
             }
             kit={
               solucao.documento ? (
