@@ -1,24 +1,24 @@
 'use client';
 
 import Link from 'next/link';
-import { Mic, MonitorUp, Video } from 'lucide-react';
+import { ArrowUp, Mic, MonitorUp, Video } from 'lucide-react';
 import { useMemo } from 'react';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
-import { TRILHAS } from '@/lib/mentorias/tipos';
 import { RetratoMentor } from '../../_components/RetratoMentor';
-import { Visto } from '../../_components/PillEstado';
-import { comecaEm, estadoDe, horaCurta, rotuloDoDia } from './estadoMentoria';
+import { comecaEm, horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './SalaMentoria.module.css';
 
 /**
- * O corpo da sala: PALCO à esquerda, trilho de contexto à direita.
+ * O corpo da sala: CHAT à esquerda, PALCO à direita. O contexto (mentor,
+ * participação) subiu para o header da página — o corpo é só o que acontece
+ * DURANTE a sessão.
  *
- * O PALCO É A PENDÊNCIA DECLARADA. A transmissão (LiveKit) entra numa fase
- * seguinte — até lá o palco mostra o estado da sessão com todas as letras, e
- * NUNCA um player falso: controles de mídia ficam desabilitados com o motivo
- * escrito do lado, porque botão morto sem explicação é pior que texto que
- * explica. Quando a integração chegar, o miolo do palco e os controles são os
- * únicos pontos que mudam — o resto da sala já é real (RLS, estados, pauta).
+ * PALCO E CHAT SÃO A PENDÊNCIA DECLARADA. A transmissão e o chat entram com a
+ * integração (LiveKit) — até lá cada um mostra o próprio estado com todas as
+ * letras. Nunca um player falso, nunca mensagens de figurantes: o chat vazio
+ * diz que abre com a transmissão, e o compositor fica desabilitado com o
+ * motivo à vista. Quando a integração chegar, o miolo do palco, a lista de
+ * mensagens e o compositor são os únicos pontos que mudam.
  *
  * `agora` é o instante do SERVIDOR, fixo — o mesmo dos dois lados da
  * hidratação. O relógio não anda na tela; anda no refresh, como em toda a
@@ -28,7 +28,6 @@ import styles from './SalaMentoria.module.css';
  */
 export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; agoraIso: string }) {
   const agora = useMemo(() => new Date(agoraIso), [agoraIso]);
-  const estado = estadoDe(sessao, agora, sessao.euInscrito);
 
   const aoVivo =
     agora.getTime() >= new Date(sessao.inicioIso).getTime() &&
@@ -40,14 +39,42 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
 
   return (
     <div className={styles.corpo}>
+      {/* O CHAT da sessão — a coluna de conversa de toda sala ao vivo. */}
+      <section className={styles.chat} aria-label="Chat da sessão">
+        <div className={styles.chatTopo}>
+          <h2 className={styles.chatEyebrow}>Chat da sessão</h2>
+        </div>
+
+        <div className={styles.chatMiolo}>
+          <p className={styles.chatVazio}>
+            {encerrada
+              ? 'A sessão encerrou — o chat fica fechado.'
+              : 'As mensagens da sala aparecem aqui. O chat abre com a transmissão.'}
+          </p>
+        </div>
+
+        <div className={styles.chatCompositor}>
+          <input
+            type="text"
+            className={styles.chatCampo}
+            placeholder="Escreva para a sala…"
+            disabled
+            aria-label="Mensagem para a sala"
+          />
+          <button type="button" className={styles.chatEnviar} disabled aria-label="Enviar mensagem">
+            <ArrowUp size={15} strokeWidth={2} />
+          </button>
+        </div>
+      </section>
+
       <section className={styles.palcoColuna} aria-label="Transmissão">
         <div
           className={`${styles.palco} via-mesh-navy via-noise`}
           data-ao-vivo={aoVivo ? '' : undefined}
         >
-          {/* CHIPS SOBREPOSTOS, como numa sala de verdade: estado no canto
-              esquerdo, o número real de confirmados no direito. Vidro sobre a
-              navy — com fallback sólido onde não há backdrop-filter. */}
+          {/* O CHIP de estado sobreposto no canto, em vidro sobre a navy (com
+              fallback sólido). Só ele: os confirmados moram no header agora —
+              o chip duplicado ficava a 20px do mesmo número. */}
           <p className={styles.chipEstado}>
             {aoVivo ? (
               <>
@@ -60,10 +87,6 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
               (contagem ?? `programada · ${dia.mono}`)
             )}
           </p>
-          <p className={styles.chipVagas}>
-            {sessao.inscritos}/{sessao.vagas} confirmados
-          </p>
-
           {aoVivo ? (
             /* O TILE do momento: quem mentora, como o vídeo vai mostrar. Dado
                real — retrato derivado do nome, nunca figurante. */
@@ -86,7 +109,7 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
               </p>
               <p className={styles.palcoData}>{dia.mono}</p>
               <p className={styles.palcoNota}>
-                Esta sala fica como registro da sessão — tema, pauta e quem mentorou.
+                Esta sala fica como registro da sessão — tema, horário e quem mentorou.
               </p>
             </div>
           ) : (
@@ -125,67 +148,9 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
           </div>
         </div>
 
-        {/* O motivo dos controles apagados, dito uma vez, fora do palco. */}
-        <p className={styles.controlesNota}>Áudio e vídeo ligam com a transmissão.</p>
+        {/* O motivo de tudo que está apagado, dito uma vez, fora do palco. */}
+        <p className={styles.controlesNota}>Áudio, vídeo e chat ligam com a transmissão.</p>
       </section>
-
-      <aside className={styles.trilho}>
-        {sessao.descricao && (
-          <section className={styles.cartao} aria-labelledby="sala-pauta">
-            <h2 id="sala-pauta" className={styles.cartaoEyebrow}>
-              Pauta
-            </h2>
-            <p className={styles.pauta}>{sessao.descricao}</p>
-          </section>
-        )}
-
-        <section className={styles.cartao} aria-labelledby="sala-mentor">
-          <h2 id="sala-mentor" className={styles.cartaoEyebrow}>
-            Quem mentora
-          </h2>
-          <div className={styles.mentor}>
-            <RetratoMentor
-              nome={sessao.mentor.nome}
-              fotoUrl={sessao.mentor.foto_url}
-              tamanho="md"
-            />
-            <div className={styles.mentorTextos}>
-              <p className={styles.mentorNome}>{sessao.mentor.nome}</p>
-              {sessao.mentor.headline && (
-                <p className={styles.mentorHeadline}>{sessao.mentor.headline}</p>
-              )}
-            </div>
-          </div>
-          <p className={styles.mentorTrilha}>{TRILHAS[sessao.mentor.trilha].rotulo}</p>
-        </section>
-
-        <section className={styles.cartao} aria-labelledby="sala-participacao">
-          <h2 id="sala-participacao" className={styles.cartaoEyebrow}>
-            Participação
-          </h2>
-          <p className={styles.vagas}>
-            <span className={styles.vagasNumero}>
-              {sessao.inscritos}/{sessao.vagas}
-            </span>
-            <span className={styles.vagasRotulo}>confirmados</span>
-          </p>
-
-          {sessao.euInscrito ? (
-            <p className={styles.meuEstado}>
-              <Visto tamanho={11} />
-              Seu check-in está confirmado.
-            </p>
-          ) : encerrada ? null : estado === 'lotada' ? (
-            <p className={styles.meuEstadoNota}>Sessão lotada — sem vagas no momento.</p>
-          ) : (
-            /* O check-in mora na AGENDA (modal de confirmação, recusa do
-               trigger) — a sala aponta para lá em vez de duplicar o fluxo. */
-            <Link href="/mentorias" className={styles.fazerCheckin}>
-              Fazer check-in na agenda
-            </Link>
-          )}
-        </section>
-      </aside>
     </div>
   );
 }

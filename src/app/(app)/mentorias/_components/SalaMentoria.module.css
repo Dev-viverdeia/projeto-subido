@@ -5,14 +5,23 @@
 
 .corpo {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  /* Chat à ESQUERDA, palco no resto — o contexto subiu para o header, então o
+     corpo divide entre a conversa e a transmissão, como toda sala ao vivo. */
+  grid-template-columns: 340px minmax(0, 1fr);
   gap: var(--app-gap-grid);
-  align-items: start;
+  align-items: stretch;
 }
 
 @media (max-width: 1079px) {
   .corpo {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* O palco é o protagonista — no empilhado o chat desce para baixo dele, e
+     ganha altura própria em vez da esticada do grid. */
+  .chat {
+    order: 2;
+    min-height: 320px;
   }
 }
 
@@ -43,8 +52,7 @@
 
 /* Vidro sobre a navy. SÓ `backdrop-filter` (o Lightning prefixa sozinho; a
    dupla manual descarta as duas), e fallback sólido onde não há suporte. */
-.chipEstado,
-.chipVagas {
+.chipEstado {
   position: absolute;
   top: var(--via-space-4);
   z-index: 1;
@@ -67,8 +75,7 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .chipEstado,
-  .chipVagas {
+  .chipEstado {
     background: var(--via-navy-deep);
   }
 }
@@ -81,11 +88,6 @@
 [data-ao-vivo] .chipEstado {
   color: var(--via-accent);
   border-color: var(--via-accent-hairline);
-}
-
-.chipVagas {
-  right: var(--via-space-4);
-  color: var(--via-gray-400);
 }
 
 /* O pulso de "ao vivo" — animation é AMBIENTE, fora do gate de transition. */
@@ -262,27 +264,27 @@
   color: var(--via-text-muted);
 }
 
-/* ------------------------------------------------------------------- trilho */
+/* --------------------------------------------------------------------- chat */
 
-.trilho {
+/* A coluna estica junto com o palco (`align-items: stretch` no grid): o
+   compositor assenta na mesma base da barra de controles. */
+.chat {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-3);
   min-width: 0;
-}
-
-.cartao {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-  padding: var(--app-pad-card);
+  min-height: 0;
   border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-surface);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
 }
 
-.cartaoEyebrow {
+.chatTopo {
+  padding: var(--app-pad-card) var(--app-pad-card) var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.chatEyebrow {
   margin: 0;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -292,117 +294,79 @@
   color: var(--via-text-faint);
 }
 
-.pauta {
+/* O miolo cresce e centra o estado vazio — quando as mensagens chegarem, ele
+   vira a lista com rolagem própria (min-height: 0 já deixa isso pronto). */
+.chatMiolo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--app-pad-card);
+}
+
+.chatVazio {
   margin: 0;
   font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-loose);
-  color: var(--via-text-primary);
-  /* 40ch ÷ fator 1,369 da Outfit ≈ 55 caracteres — trilho de 360 − padding. */
-  max-width: 40ch;
-  text-wrap: pretty;
-  white-space: pre-line;
-}
-
-.mentor {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-}
-
-.mentorTextos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.mentorNome {
-  margin: 0;
-  font-size: var(--via-fs-body);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-}
-
-.mentorHeadline {
-  margin: 0;
-  font-size: var(--via-fs-caption);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
+  text-align: center;
+  max-width: 24ch;
   text-wrap: pretty;
 }
 
-.mentorTrilha {
-  margin: 0;
-  align-self: flex-start;
-  padding: 2px var(--via-space-2);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-chip);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-}
-
-.vagas {
-  margin: 0;
+.chatCompositor {
   display: flex;
-  align-items: baseline;
-  gap: var(--via-space-2);
-}
-
-.vagasNumero {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-h2);
-  letter-spacing: var(--via-ls-tight);
-  color: var(--via-text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.vagasRotulo {
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-muted);
-}
-
-.meuEstado {
-  margin: 0;
-  display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
+  padding: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
-.meuEstadoNota {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-muted);
-}
-
-.fazerCheckin {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
+.chatCampo {
+  flex: 1;
+  min-width: 0;
   height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+}
+
+.chatCampo::placeholder {
+  color: var(--via-text-faint);
+}
+
+.chatCampo:disabled {
+  cursor: default;
+}
+
+.chatEnviar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  flex-shrink: 0;
+  border: 0;
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  text-decoration: none;
-  box-shadow: var(--app-elev-1-shadow);
-  transition:
-    box-shadow var(--app-t-state),
-    background-color var(--app-t-state);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
 }
 
-.fazerCheckin:hover {
-  background: var(--via-navy-deep);
-  box-shadow: var(--app-elev-2-shadow);
+.chatEnviar:disabled {
+  cursor: default;
+  background: var(--via-navy-16);
+  color: var(--via-text-faint);
 }
 
-.fazerCheckin:focus-visible {
+.chatEnviar:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+  box-shadow: var(--app-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -412,15 +376,14 @@
 
   .controle,
   .sair,
-  .fazerCheckin {
+  .chatEnviar {
     transition: none;
   }
 }
 
 /* NO MOBILE o 16:9 estrangula: medido a 375, o miolo do tile (244px) estourava
    um palco de 193 e a nota sumia sob a barra. Abaixo de 600 o palco dimensiona
-   pelo conteúdo, com folga vertical para os sobrepostos; o chip de vagas sai —
-   o mesmo número está no card de participação logo abaixo. */
+   pelo conteúdo, com folga vertical para os sobrepostos. */
 @media (max-width: 599px) {
   .palco {
     aspect-ratio: auto;
@@ -428,9 +391,5 @@
 
   .palcoMiolo {
     padding-block: calc(28px + 2 * var(--via-space-4)) calc(56px + 2 * var(--via-space-4));
-  }
-
-  .chipVagas {
-    display: none;
   }
 }
