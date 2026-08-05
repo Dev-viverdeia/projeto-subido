@@ -1,6 +1,7 @@
-import { Avatar } from '@/design-system/via';
+import Image from 'next/image';
+import retratoPedro from '@/assets/img/pedro-sobral-recorte.png';
 import { AUTHORITY } from '@/content/landing';
-import { Section, SectionHeader, Reveal } from '../primitives';
+import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './AuthoritySection.module.css';
 
 /**
@@ -25,12 +26,23 @@ export function AuthoritySection() {
       <div className={styles.grid}>
         {AUTHORITY.people.map((person, i) => (
           <Reveal key={person.name} index={i} as="article" className={styles.person}>
-            {/* MONOGRAMA enquanto o retrato duotone não chega. Foto de banco aqui
-                seria pior que vazio: são as duas pessoas que RESPONDEM pelo produto,
-                e um rosto que não é o delas mina exatamente a credibilidade que a
-                seção existe para construir. */}
+            {/* O PEDRO TEM FOTO DE VERDADE — a mesma do hero — e ela entra aqui.
+                A outra pessoa não tem, e ganha retrato desenhado: rosto de banco na
+                seção de autoridade seria pior que vazio, porque são justamente as
+                pessoas que RESPONDEM pelo produto. `cover` e não `contain`: aqui a
+                moldura 3:4 é o enquadramento, e sobra de fundo transparente dentro
+                dela leria como recorte flutuando. */}
             <div className={styles.portrait}>
-              <Avatar alt={person.name} size="xl" />
+              {person.name === 'Pedro Sobral' ? (
+                <Image
+                  src={retratoPedro}
+                  alt={person.name}
+                  className={styles.photo}
+                  sizes="(min-width: 900px) 320px, 45vw"
+                />
+              ) : (
+                <RetratoFicticio nome={person.name} forma="retrato" />
+              )}
             </div>
 
             <div className={styles.body}>

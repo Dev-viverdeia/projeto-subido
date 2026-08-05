@@ -1,7 +1,6 @@
 import { Check } from 'lucide-react';
-import { Skeleton } from '@/design-system/via';
 import { HUB } from '@/content/landing';
-import { Section, SectionHeader, Reveal } from '../primitives';
+import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './HubSection.module.css';
 
 /**
@@ -62,17 +61,18 @@ export function HubSection() {
           <div className={styles.previewFrame}>
             <span className={styles.previewLabel}>Prévia da interface</span>
             <div className={styles.previewGrid}>
-              {Array.from({ length: 6 }, (_, i) => (
-                <div key={i} className={styles.profile}>
-                  {/* SKELETON, e não avatar: o HUB abre em 2027 e não tem um membro
-                      sequer. Uma silhueta aqui seria apresentada como membro real —
-                      "uma mentira pequena que custaria a postura de credibilidade da
-                      página", e a seção inteira é sobre não prometer o que não existe.
-                      O esqueleto diz a verdade (é a FORMA da interface, não o
-                      conteúdo dela) e ainda assim lê como peça acabada. */}
-                  <Skeleton variant="circle" width={36} height={36} />
-                  <Skeleton width="70%" height={8} />
-                  <Skeleton width="45%" height={8} />
+              {/* Perfis INVENTADOS (ver CONTEUDO_DEMO). O rótulo "Prévia da interface"
+                  acima e a pílula "em construção" no cabeçalho da seção são o que
+                  impede isto de ler como diretório já povoado — sem eles, seis pessoas
+                  numa grade afirmam que o HUB existe, e a seção inteira é sobre não
+                  prometer o que ainda não existe. */}
+              {HUB.perfis.map((perfil) => (
+                <div key={perfil.nome} className={styles.profile}>
+                  <RetratoFicticio nome={perfil.nome} tamanho={40} tone="dark" />
+                  <span className={styles.profileNome}>{perfil.nome}</span>
+                  <span className={styles.profileMeta}>
+                    {perfil.foco} · {perfil.local}
+                  </span>
                 </div>
               ))}
             </div>

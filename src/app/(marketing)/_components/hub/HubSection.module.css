@@ -138,10 +138,36 @@
   }
 }
 
+/* O cartão de perfil deixou de ser uma caixa vazia e passou a ter conteúdo, então
+   perde o `aspect-ratio`: com ele travado em 3:4 o nome e a linha de meta eram
+   cortados pelo `overflow: hidden` nas colunas estreitas. Agora a altura vem do
+   conteúdo e a grade continua regular porque todos os cartões têm as mesmas 3 linhas. */
 .profile {
-  aspect-ratio: 3 / 4;
+  display: grid;
+  justify-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4) var(--via-space-2);
   border-radius: var(--via-radius-sm);
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.profileNome {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  /* Sobre a banda navy o cinza INVERTE: --via-text-soft daria 3,45:1 e reprova AA. */
+  color: var(--via-gray-300);
+  line-height: var(--via-lh-snug);
+}
+
+.profileMeta {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-gray-400);
+  line-height: var(--via-lh-snug);
 }
 
 .disclaimer {

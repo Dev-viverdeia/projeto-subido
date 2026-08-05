@@ -1,6 +1,5 @@
-import { Avatar } from '@/design-system/via';
 import { TESTIMONIALS, TESTIMONIALS_META } from '@/content/landing';
-import { Section, SectionHeader, Reveal } from '../primitives';
+import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './TestimonialsSection.module.css';
 
 /**
@@ -36,13 +35,10 @@ export function TestimonialsSection() {
             </div>
 
             <footer className={styles.person}>
-              {/* MONOGRAMA, não foto de banco. A regra da casa pede foto no card, e
-                  ela continua valendo — mas foto de pessoa que não é o depoente é
-                  pior que nenhuma: transforma um depoimento sem rosto num depoimento
-                  com rosto errado. O monograma preenche a composição sem afirmar
-                  ninguém. `Avatar` é Server Component, então custa zero JS. */}
+              {/* RETRATO DESENHADO, não foto de banco: um rosto que não é o do
+                  depoente afirma que aquela pessoa disse aquilo. Ver RetratoFicticio. */}
               <span className={styles.avatar}>
-                <Avatar alt={item.name} size="md" />
+                <RetratoFicticio nome={item.name} tamanho={44} />
               </span>
               <span className={styles.identity}>
                 <span className={styles.name}>{item.name}</span>

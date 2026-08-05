@@ -93,3 +93,15 @@
   color: var(--via-text-body);
   text-wrap: pretty;
 }
+
+/* O recorte tem fundo transparente e a moldura é o enquadramento: `cover` preenche a
+   caixa 3:4 e `object-position: top` mantém o rosto no terço superior, que é onde ele
+   está no arquivo. Com `contain` sobrava vazio nas laterais e o recorte lia como
+   adesivo dentro do card, em vez de retrato emoldurado. */
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}

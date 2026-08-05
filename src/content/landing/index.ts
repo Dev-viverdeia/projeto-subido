@@ -207,6 +207,19 @@ export const HUB = {
     { label: 'HUB', status: 'Previsto para mar/2027', done: false },
   ],
   criteria: 'Entram no HUB os assinantes com 5 soluções implementadas e certificado ativo.',
+  /** Perfis da prévia da interface. INVENTADOS, como todo o resto sob CONTEUDO_DEMO —
+   *  e aqui o risco é o mais direto da página: a seção diz que o HUB abre em 2027 e
+   *  não tem um membro sequer, então estes nomes não podem sobreviver ao desligamento
+   *  da flag. Cidade e especialidade existem porque um diretório sem elas não é um
+   *  diretório, é uma grade de bolinhas. */
+  perfis: [
+    { nome: 'Camila Deodato', local: 'São Paulo/SP', foco: 'Atendimento' },
+    { nome: 'Igor Salgado', local: 'Recife/PE', foco: 'Operações' },
+    { nome: 'Bianca Rocha', local: 'Porto Alegre/RS', foco: 'Comercial' },
+    { nome: 'Tarso Menezes', local: 'Goiânia/GO', foco: 'Financeiro' },
+    { nome: 'Leila Aoki', local: 'Curitiba/PR', foco: 'Logística' },
+    { nome: 'Wesley Prado', local: 'Salvador/BA', foco: 'Marketing' },
+  ],
   /** Fica NA seção, não em rodapé nem tooltip. Num mercado saturado de "ganhe R$10k/mês
    *  em 30 dias", recusar-se a prometer renda é ativo de conversão. */
   disclaimer:
@@ -264,7 +277,7 @@ export const AUTHORITY = {
         'Eu passei oito anos ensinando gente a vender tráfego. O próximo serviço que as empresas vão comprar é implementação de IA — e quase ninguém tá pronto pra entregar.',
     },
     {
-      name: 'Mateus Milagre',
+      name: 'Helena Vasques',
       role: 'Direção da plataforma',
       credentials: ['180 implementações entregues', '103 soluções publicadas', '64 empresas'],
       quote:
