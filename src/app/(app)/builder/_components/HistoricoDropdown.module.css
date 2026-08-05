@@ -109,6 +109,15 @@
   }
 }
 
+/* UMA COLUNA SEMPRE, e o porquê é traiçoeiro: os breakpoints da grade dos cards
+   são de VIEWPORT, não de contêiner — a 1440+ ela pede 4 colunas, e dentro de um
+   painel de 400px isso dá trilhas de ~100px com o card espremido. Medido no
+   navegador: era exatamente o que acontecia. `.painel ul` (0,1,1) ganha das
+   regras de media query da grade (0,1,0) por especificidade, sem !important. */
+.painel ul {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* A cascata dos itens, lida do `--i` que a grade server-rendered carimba.
    Trava em 6 batidas: fila comprida é desfile, não entrada. */
 .painel :where(li) {
