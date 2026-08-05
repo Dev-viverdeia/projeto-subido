@@ -52,12 +52,14 @@
   color: var(--via-text-primary);
 }
 
-/* Prosa + economia lado a lado: a arquitetura tem medida de leitura, a conta
-   fica à direita como prova. `minmax(0, 1fr)` na prosa — a regra do repo. */
+/* Trilhas DEFINIDAS, não `1fr` + medida no texto: com `1fr` a coluna de prosa
+   abria ~1100px, o texto parava nos 54ch (~640px) e sobrava um RIO de vazio até
+   o card de economia lá na borda. Com 660 + 340 o card senta ao lado da leitura;
+   o que sobra fica na borda direita do painel, que é onde vazio é editorial. */
 .grade {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: var(--app-gap-section);
+  grid-template-columns: minmax(0, 660px) 340px;
+  gap: clamp(48px, 5vw, 88px);
   align-items: start;
 }
 
@@ -80,6 +82,42 @@
   color: var(--via-text-primary);
   max-width: 54ch;
   white-space: pre-line;
+}
+
+/* O caminho do dado, em degraus: numeral mono quieto à esquerda, texto com a
+   mesma medida da prosa. O numeral é âncora de varredura, não hierarquia — por
+   isso `text-faint`, não navy. */
+.fluxo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.trecho {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--via-space-3);
+}
+
+.trechoNumero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--via-lh-loose);
+  padding-top: 1px;
+}
+
+.trechoTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-primary);
+  max-width: 54ch;
+  text-wrap: pretty;
 }
 
 .lateral {
@@ -170,6 +208,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-1);
+}
+
+/* Hairline entre itens: o paredão vira lista com respiração. Separador, não
+   card — mais uma superfície aqui seria moldura demais dentro da banda. */
+.risco + .risco,
+.fora li + li {
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .riscoTexto {

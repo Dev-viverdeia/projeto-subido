@@ -41,7 +41,30 @@ export function EntenderProjeto({ documento }: { documento: DocumentoSolucao }) 
           <h3 id="entender-como" className={styles.rotuloMono}>
             Como funciona
           </h3>
-          <p className={styles.prosa}>{documento.arquitetura}</p>
+          {/* A arquitetura chega como prosa em parágrafos — cada um é um trecho
+              do caminho do dado. Numerá-los dá âncora de leitura ao paredão SEM
+              tocar numa palavra: o texto é o mesmo, o olho ganha degraus. Com um
+              parágrafo só, prosa simples — numerar um item é cerimônia. */}
+          {(() => {
+            const trechos = documento.arquitetura
+              .split(/\n\s*\n/)
+              .map((t) => t.trim())
+              .filter(Boolean);
+            return trechos.length > 1 ? (
+              <ol className={styles.fluxo}>
+                {trechos.map((trecho, i) => (
+                  <li key={trecho.slice(0, 40)} className={styles.trecho}>
+                    <span className={styles.trechoNumero} aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <p className={styles.trechoTexto}>{trecho}</p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className={styles.prosa}>{documento.arquitetura}</p>
+            );
+          })()}
         </section>
 
         {/* A economia mora AQUI e só aqui — é argumento de entendimento, não de
