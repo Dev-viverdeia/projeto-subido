@@ -83,6 +83,46 @@
   border-color: var(--via-navy);
 }
 
+/* O check ENTRA com pop — mesma chegada do PainelEspera. `backwards` para não
+   sobrar transform residual (ver entrada.module.css). */
+.parte[data-estado='feito'] .marca svg {
+  animation: criacao-chegar var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+@keyframes criacao-chegar {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* A marca da parte EM CURSO ganha o ponto que respira — mesmo lugar onde o
+   check vai pousar. Navy, não accent: esta superfície é clara. */
+.parte[data-estado='fazendo'] .marca {
+  border-color: var(--via-navy-22);
+}
+
+.parte[data-estado='fazendo'] .marca::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  animation: criacao-pulsar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes criacao-pulsar {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.72);
+  }
+}
+
 .parteEstado {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -228,6 +268,14 @@
   /* Estado FINAL, não animação rápida: a luz para parada à esquerda, e a barra
      continua dizendo "esta é a parte em curso" pela cor. */
   .barraLuz {
+    animation: none;
+  }
+
+  .parte[data-estado='fazendo'] .marca::before {
+    animation: none;
+  }
+
+  .parte[data-estado='feito'] .marca svg {
     animation: none;
   }
 

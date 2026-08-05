@@ -60,13 +60,29 @@ export function SalaDoProjeto({
       <header className={`${styles.hero} via-noise`}>
         <div className={styles.heroTexto}>
           <p className={styles.eyebrow}>Builder · Sala do projeto</p>
-          <h1 className={styles.titulo}>{solucao.titulo || solucao.ideiaOriginal}</h1>
+          {/* Enquanto não há título, a ideia entra como CITAÇÃO compacta — aspas
+              e clamp de 3 linhas — e não como display: 318 caracteres em corpo de
+              h1 eram uma torre navy que empurrava a criação para fora da dobra. */}
+          {solucao.titulo ? (
+            <h1 className={styles.titulo}>{solucao.titulo}</h1>
+          ) : (
+            <h1 className={styles.tituloCitacao}>“{solucao.ideiaOriginal}”</h1>
+          )}
           <p className={styles.resumo}>
             {solucao.documento
               ? 'Você é o gerente deste projeto — siga as etapas.'
               : 'Assim que a criação terminar, o plano completo abre aqui.'}
           </p>
         </div>
+
+        {/* O contrapeso do hero enquanto não há medida: o estado AO VIVO, com o
+            dot pulsando em accent — que só é legível justamente sobre a navy. */}
+        {!solucao.documento && solucao.status === 'gerando' && (
+          <p className={styles.aoVivo}>
+            <span className={styles.aoVivoDot} aria-hidden="true" />
+            escrevendo agora
+          </p>
+        )}
 
         {/* Só existe medida quando existe documento. Sem ele, `0 / 0` seria um
             medidor fingindo medir. */}

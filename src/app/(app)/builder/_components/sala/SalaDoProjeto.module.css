@@ -51,6 +51,72 @@
   line-height: var(--via-lh-snug);
   color: var(--via-white);
   text-wrap: balance;
+  /* Guarda para título longo do modelo (o teto do schema é 120): duas linhas
+     no hero; ele existe inteiro na trilha e no documento. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* A CITAÇÃO — o hero enquanto não há título. Corpo de h4, não display: é a
+   ideia da pessoa servindo de lembrete, não o nome do projeto. Três linhas. */
+.tituloCitacao {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--app-ls-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-white);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+/* AO VIVO — dot em accent, que sobre a navy rende 6,52:1. O anel respira por
+   transform e opacity; `animation` porque é ambiente, não resposta. */
+.aoVivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-300);
+  white-space: nowrap;
+}
+
+.aoVivoDot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+}
+
+.aoVivoDot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1.5px solid var(--via-accent);
+  animation: sala-respirar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes sala-respirar {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
 }
 
 .resumo {
@@ -228,6 +294,12 @@
   .degrau,
   .marcador {
     transition: none;
+  }
+
+  /* O núcleo sólido já marca o estado; o anel some. */
+  .aoVivoDot::after {
+    animation: none;
+    content: none;
   }
 }
 

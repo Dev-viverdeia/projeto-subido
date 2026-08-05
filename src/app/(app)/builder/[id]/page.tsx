@@ -45,8 +45,12 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
 
   if (!solucao) notFound();
 
-  /* Ficha usa o canvas; entrevista, espera e falha usam a coluna — ver o CSS. */
-  const emColuna = solucao.status !== 'pronta';
+  /* A SALA usa a largura larga; entrevista, espera e falha usam a coluna.
+     `gerando` entrou no lado largo porque a sala JÁ abre na geração — medido a
+     1920: com a coluna de 760 o hero virava uma torre e os três cards da criação
+     ficavam abaixo da dobra. A condição segue o que RENDERIZA (a sala), não um
+     status solto. */
+  const emColuna = !(solucao.status === 'gerando' || solucao.status === 'pronta');
 
   return (
     <div className={styles.pagina} data-coluna={emColuna ? '' : undefined}>
