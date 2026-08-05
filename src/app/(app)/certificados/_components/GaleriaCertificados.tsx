@@ -219,26 +219,16 @@ export function GaleriaCertificados({
         </section>
       )}
 
+      {/* O que não começou NÃO vira lista aqui — os catálogos já são essa
+          lista. Fica só a contagem honesta, com o caminho. */}
       {porComecar.length > 0 && (
-        <section aria-labelledby="certificados-por-comecar" className={styles.secao}>
-          <div className={styles.secaoTopo}>
-            <h2 id="certificados-por-comecar" className={styles.secaoRotulo}>
-              Ainda por começar
-            </h2>
-            <span className={styles.secaoTotal}>{porComecar.length}</span>
-          </div>
-
-          <ul className={styles.pendentes}>
-            {porComecar.map((c) => (
-              <li key={`${c.origem}-${c.slug}`}>
-                <Link href={c.href} className={styles.pendente}>
-                  <span className={styles.pendenteOrigem}>{ROTULO_ORIGEM[c.origem]}</span>
-                  {c.titulo}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <p className={styles.rodape}>
+          {porComecar.length === 1
+            ? 'Mais 1 conteúdo ainda sem progresso'
+            : `Mais ${porComecar.length} conteúdos ainda sem progresso`}{' '}
+          — comece por <Link href="/formacoes">Formações</Link> ou{' '}
+          <Link href="/solucoes">Soluções</Link>.
+        </p>
       )}
     </div>
   );
