@@ -71,6 +71,14 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom center;
+  /* ANCORADO À DIREITA, não centrado. Com `contain` a foto raramente preenche a
+     caixa nos dois eixos, e o resto vira letterbox: centrada, sobravam ~4,5px de cada
+     lado. Esses poucos pixels importam porque o recorte VEM CORTADO no arquivo (folga
+     zero à direita, medido no PNG) — qualquer folga entre o corte e a borda da tela
+     expõe uma linha vertical reta no meio do navy. Ancorado à direita, o corte encosta
+     na sangria e some.
+     `bottom` continua porque o recorte precisa de chão: ele termina na borda inferior
+     da seção, não flutuando acima dela. */
+  object-position: bottom right;
   display: block;
 }

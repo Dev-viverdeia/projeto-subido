@@ -251,11 +251,25 @@
   }
 }
 
+/* A SANGRIA PRECISA ALCANÇAR A BORDA DA VIEWPORT, não a do container — e o motivo é
+   o arquivo, não a estética. O recorte do Pedro chega cortado: medido no PNG, a
+   última coluna (x=1023) tem 501 linhas de corpo e a folga à direita é ZERO. O braço
+   dele termina na moldura da foto.
+   Enquanto a sangria era um -40px fixo, esse corte reto parava DENTRO da tela — a
+   1512 ele ficava a 105px da borda, uma linha vertical no meio do navy, e lê como
+   imagem quebrada. Colado na borda, o mesmo corte lê como sangria.
+   A conta: metade da folga entre o container (1280) e a viewport, mais o
+   `padding-inline` que o `.inner` aplica a partir de 768. `min(0px, …)` impede que
+   vire margem POSITIVA numa viewport menor que o container, o que puxaria a figura
+   para dentro em vez de sangrar.
+   TODO(asset): com um recorte que tenha folga à direita, esta regra pode voltar ao
+   -40px — a sangria vira escolha de composição de novo, em vez de conserto. */
 @media (min-width: 1280px) {
   .figure {
-    /* Sangra em direção à borda da viewport: a figura ganha ar e o olho corre do
-       texto para ela sem esbarrar numa margem simétrica. */
-    margin-right: calc(var(--via-space-10) * -1);
+    margin-right: min(
+      calc(var(--via-space-10) * -1),
+      calc((var(--via-container) - 100vw) / 2 - var(--via-space-8))
+    );
   }
 }
 
