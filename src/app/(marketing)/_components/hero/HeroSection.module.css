@@ -251,27 +251,15 @@
   }
 }
 
-/* A SANGRIA PRECISA ALCANÇAR A BORDA DA VIEWPORT, não a do container — e o motivo é
-   o arquivo, não a estética. O recorte do Pedro chega cortado: medido no PNG, a
-   última coluna (x=1023) tem 501 linhas de corpo e a folga à direita é ZERO. O braço
-   dele termina na moldura da foto.
-   Enquanto a sangria era um -40px fixo, esse corte reto parava DENTRO da tela — a
-   1512 ele ficava a 105px da borda, uma linha vertical no meio do navy, e lê como
-   imagem quebrada. Colado na borda, o mesmo corte lê como sangria.
-   A conta: metade da folga entre o container (1280) e a viewport, mais o
-   `padding-inline` que o `.inner` aplica a partir de 768. `min(0px, …)` impede que
-   vire margem POSITIVA numa viewport menor que o container, o que puxaria a figura
-   para dentro em vez de sangrar.
-   TODO(asset): com um recorte que tenha folga à direita, esta regra pode voltar ao
-   -40px — a sangria vira escolha de composição de novo, em vez de conserto. */
-@media (min-width: 1280px) {
-  .figure {
-    margin-right: min(
-      calc(var(--via-space-10) * -1),
-      calc((var(--via-container) - 100vw) / 2 - var(--via-space-8))
-    );
-  }
-}
+/* SEM SANGRIA LATERAL. A figura fecha na coluna, alinhada à direita do container.
+   Houve um -40px aqui, e depois uma sangria que alcançava a borda da viewport — as
+   duas empurravam o recorte para fora da tela para esconder um corte do ARQUIVO.
+   Medido no PNG: o corpo encosta na moldura (x=1023) só a partir de y=1024, ou seja
+   no terço inferior — é a perna. Acima disso há folga real, o corpo termina entre
+   x=678 e x=1002. Como o corte fica embaixo, e a base da figura já sangra para fora
+   da seção pelo `margin-bottom` negativo, ele sai de cena sozinho: não é preciso
+   jogar um terço do sujeito para fora da viewport para escondê-lo.
+   O que se ganha: o recorte inteiro fica visível dentro da composição. */
 
 @media (max-width: 1023px) {
   .figure {
