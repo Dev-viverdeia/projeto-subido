@@ -45,43 +45,65 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
           className={`${styles.palco} via-mesh-navy via-noise`}
           data-ao-vivo={aoVivo ? '' : undefined}
         >
-          {aoVivo ? (
-            <div className={styles.palcoMiolo}>
-              <p className={styles.palcoEyebrow}>
+          {/* CHIPS SOBREPOSTOS, como numa sala de verdade: estado no canto
+              esquerdo, o número real de confirmados no direito. Vidro sobre a
+              navy — com fallback sólido onde não há backdrop-filter. */}
+          <p className={styles.chipEstado}>
+            {aoVivo ? (
+              <>
                 <span className={styles.pulso} aria-hidden="true" />
-                ao vivo agora
-              </p>
-              <p className={styles.palcoTitulo}>A transmissão entra aqui</p>
+                ao vivo
+              </>
+            ) : encerrada ? (
+              'encerrada'
+            ) : (
+              (contagem ?? `programada · ${dia.mono}`)
+            )}
+          </p>
+          <p className={styles.chipVagas}>
+            {sessao.inscritos}/{sessao.vagas} confirmados
+          </p>
+
+          {aoVivo ? (
+            /* O TILE do momento: quem mentora, como o vídeo vai mostrar. Dado
+               real — retrato derivado do nome, nunca figurante. */
+            <div className={styles.palcoMiolo}>
+              <RetratoMentor
+                nome={sessao.mentor.nome}
+                fotoUrl={sessao.mentor.foto_url}
+                tamanho="lg"
+              />
+              <p className={styles.palcoNome}>{sessao.mentor.nome}</p>
+              <p className={styles.palcoPapel}>mentora esta sessão</p>
               <p className={styles.palcoNota}>
-                A integração de vídeo é a próxima fase da sala — este palco já é o lugar dela.
+                A transmissão entra aqui — o vídeo é a próxima fase da sala.
               </p>
             </div>
           ) : encerrada ? (
             <div className={styles.palcoMiolo}>
-              <p className={styles.palcoEyebrow}>sessão encerrada</p>
-              <p className={styles.palcoTitulo}>
-                {dia.mono} · {horaCurta(sessao.inicioIso)}–{horaCurta(sessao.fimIso)}
+              <p className={styles.palcoHora}>
+                {horaCurta(sessao.inicioIso)}–{horaCurta(sessao.fimIso)}
               </p>
+              <p className={styles.palcoData}>{dia.mono}</p>
               <p className={styles.palcoNota}>
                 Esta sala fica como registro da sessão — tema, pauta e quem mentorou.
               </p>
             </div>
           ) : (
             <div className={styles.palcoMiolo}>
-              <p className={styles.palcoEyebrow}>{contagem ?? `programada · ${dia.mono}`}</p>
-              <p className={styles.palcoTitulo}>{horaCurta(sessao.inicioIso)}</p>
+              <p className={styles.palcoHora}>{horaCurta(sessao.inicioIso)}</p>
+              <p className={styles.palcoData}>{dia.mono}</p>
               <p className={styles.palcoNota}>
                 A transmissão abre aqui na hora da sessão. Deixe o check-in feito para garantir a
                 vaga.
               </p>
             </div>
           )}
-        </div>
 
-        <div className={styles.controles}>
-          <div className={styles.controlesMidia}>
-            {/* Desabilitados COM motivo — a barra existe para a sala já ter a
-                anatomia final; quem liga os três é a integração. */}
+          {/* A BARRA DE CONTROLES flutua DENTRO do palco, como em qualquer sala
+              de vídeo — é a anatomia final; a integração só liga os três
+              primeiros. Raios concêntricos: barra 20, controles 12, folga 8. */}
+          <div className={styles.barra}>
             <button type="button" className={styles.controle} disabled aria-label="Microfone">
               <Mic size={17} strokeWidth={1.8} />
             </button>
@@ -96,13 +118,15 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
             >
               <MonitorUp size={17} strokeWidth={1.8} />
             </button>
-            <span className={styles.controlesNota}>Áudio e vídeo ligam com a transmissão.</span>
+            <span className={styles.barraDivisor} aria-hidden="true" />
+            <Link href="/mentorias" className={styles.sair}>
+              Sair da sala
+            </Link>
           </div>
-
-          <Link href="/mentorias" className={styles.sair}>
-            Sair da sala
-          </Link>
         </div>
+
+        {/* O motivo dos controles apagados, dito uma vez, fora do palco. */}
+        <p className={styles.controlesNota}>Áudio e vídeo ligam com a transmissão.</p>
       </section>
 
       <aside className={styles.trilho}>
