@@ -104,6 +104,13 @@
    um card. Compõe com a sombra de repouso para a caixa não achatar ao focar. */
 .caixa:focus-within {
   border-color: var(--via-navy-16);
+}
+
+/* `:has(:focus-visible)` e não `:focus-within` para o anel e a subida de
+   elevação: são a resposta ao foco de TECLADO. Com `:focus-within`, um clique de
+   mouse já acendia o anel e a caixa lia como emoldurada duas vezes. A borda
+   acima continua respondendo a qualquer foco. */
+.caixa:has(:focus-visible) {
   box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
@@ -130,9 +137,12 @@
   color: var(--via-text-faint);
 }
 
-/* O anel é da caixa; repetir aqui dentro daria dois anéis concêntricos. */
+/* O anel é da caixa; repetir aqui dentro daria dois anéis concêntricos — e era
+   exatamente o que acontecia, porque zerar o `outline` não apaga o anel do DS:
+   ele é `box-shadow` (`via-base.css:54`, todo `textarea:focus-visible`). */
 .campo:focus-visible {
   outline: none;
+  box-shadow: none;
 }
 
 .campo:disabled {

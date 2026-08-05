@@ -142,8 +142,17 @@
   transition: border-color var(--app-t-state);
 }
 
+/* A BORDA responde a qualquer foco — ela só diz onde o cursor está. */
 .campoCaixa:focus-within {
   border-color: var(--via-navy-40);
+}
+
+/* O ANEL responde só a `:focus-visible`, e é por isso que existe o `:has()`.
+   O campo recebe FOCO AUTOMÁTICO ao montar (ver o efeito em Entrevista.tsx):
+   com o anel no `:focus-within`, ele nascia aceso em toda pergunta e lia como
+   uma segunda borda permanente, não como foco. Medido no navegador: foco
+   automático dá `:focus-visible === false`; um Tab real dá `true`. */
+.campoCaixa:has(:focus-visible) {
   box-shadow: var(--app-ring);
 }
 
@@ -161,9 +170,15 @@
 }
 
 /* O anel vive na CAIXA (regra acima); aqui ele é suprimido para não desenhar
-   duas vezes, uma na moldura e outra rente ao texto. */
+   duas vezes, uma na moldura e outra rente ao texto.
+   `box-shadow: none` JUNTO com o `outline`, e é a linha que faltava: o anel do
+   DS não é outline, é BOX-SHADOW — `via-base.css:54` dá o anel a todo
+   `textarea:focus-visible`, com `border-radius: inherit`. Só zerar o outline
+   deixava o anel do DS no campo E o meu na caixa: dois anéis concêntricos com
+   20px de raio, que é a "borda dupla" que aparecia no print. */
 .campo:focus-visible {
   outline: none;
+  box-shadow: none;
 }
 
 .campo::placeholder {
