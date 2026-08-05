@@ -128,6 +128,7 @@ export type Database = {
       }
       consultor_mensagens: {
         Row: {
+          cartoes: Json | null
           conteudo: string
           criado_em: string
           id: string
@@ -135,6 +136,7 @@ export type Database = {
           thread_id: string
         }
         Insert: {
+          cartoes?: Json | null
           conteudo: string
           criado_em?: string
           id?: string
@@ -142,6 +144,7 @@ export type Database = {
           thread_id: string
         }
         Update: {
+          cartoes?: Json | null
           conteudo?: string
           criado_em?: string
           id?: string
@@ -179,6 +182,27 @@ export type Database = {
           dono?: string
           id?: string
           titulo?: string
+        }
+        Relationships: []
+      }
+      consultor_uso: {
+        Row: {
+          atualizado_em: string
+          dono: string
+          mes: string
+          tokens: number
+        }
+        Insert: {
+          atualizado_em?: string
+          dono: string
+          mes: string
+          tokens?: number
+        }
+        Update: {
+          atualizado_em?: string
+          dono?: string
+          mes?: string
+          tokens?: number
         }
         Relationships: []
       }

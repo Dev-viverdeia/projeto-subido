@@ -17,38 +17,6 @@
   align-items: flex-start;
 }
 
-.threads {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-1);
-}
-
-.thread {
-  display: block;
-  padding: var(--via-space-3) var(--via-space-3);
-  border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-primary);
-  text-decoration: none;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  transition: background-color var(--app-t-state);
-}
-
-.thread:hover {
-  background: var(--via-navy-04);
-  text-decoration: none;
-}
-
-.thread:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
 /* A coluna da pergunta — 720 como o compositor do Builder. */
 .tela {
   width: 100%;
@@ -94,10 +62,4 @@
   color: var(--via-text-muted);
   max-width: 46ch;
   text-wrap: pretty;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .thread {
-    transition: none;
-  }
 }

@@ -22,6 +22,12 @@ import { ErroDoBuilder, traduzir } from '../_compartilhado/modelo.ts';
 
 const MODELO_CHAT = 'claude-sonnet-5';
 
+/* TETO MENSAL por pessoa, em tokens (entrada + saída), como a plataforma de
+   origem. 500k ≈ 250 rodadas de ~2k tokens — premissa: rodada típica desta
+   função tem system de ~1,2k + histórico + resposta de até 1,2k. É número de
+   PRODUTO para calibrar com uso real; o mecanismo é o que importa aqui. */
+const TETO_TOKENS_MES = 500_000;
+
 const Pedido = z.object({
   thread_id: z.uuid().optional(),
   mensagem: z.string().trim().min(1).max(8000),
@@ -61,6 +67,24 @@ export async function responder(req: Request): Promise<Response> {
 
     const { mensagem } = corpo.data;
     let threadId = corpo.data.thread_id ?? null;
+
+    /* O LIMITE VEM ANTES de qualquer gravação: estourou, nada é criado — nem
+       thread, nem mensagem pendurada sem resposta. */
+    const mesAtual = new Date().toISOString().slice(0, 8) + '01';
+    const { data: uso } = await supabase
+      .from('consultor_uso')
+      .select('tokens')
+      .eq('mes', mesAtual)
+      .maybeSingle();
+    if ((uso?.tokens ?? 0) >= TETO_TOKENS_MES) {
+      return respostaJson(
+        {
+          erro: 'Você atingiu o limite mensal do Consultor. Ele zera no primeiro dia do próximo mês.',
+          tipo: 'limite',
+        },
+        429,
+      );
+    }
 
     /* Sem thread: a primeira mensagem CRIA a conversa, e o título nasce dela —
        corte na palavra, como a trilha do cabeçalho faz. */
@@ -149,9 +173,21 @@ export async function responder(req: Request): Promise<Response> {
 
     if (!texto) throw new ErroDoBuilder('O consultor não devolveu resposta.', 'falha');
 
-    const { error: erroResposta } = await supabase
-      .from('consultor_mensagens')
-      .insert({ thread_id: threadId, papel: 'consultor', conteudo: texto.slice(0, 8000) });
+    /* CARTÕES INLINE, detectados no texto FINAL — determinístico, sem depender
+       de o modelo formatar nada: solução do catálogo citada pelo nome vira
+       ponteiro {slug, titulo, categoria}. Até 3; mais que isso é lista, e lista
+       já é o catálogo. */
+    const cartoes = (solucoes ?? [])
+      .filter((s) => texto.toLowerCase().includes(s.titulo.toLowerCase()))
+      .slice(0, 3)
+      .map((s) => ({ slug: s.slug, titulo: s.titulo, categoria: s.categoria }));
+
+    const { error: erroResposta } = await supabase.from('consultor_mensagens').insert({
+      thread_id: threadId,
+      papel: 'consultor',
+      conteudo: texto.slice(0, 8000),
+      cartoes: cartoes.length > 0 ? cartoes : null,
+    });
     if (erroResposta) {
       console.error('[consultor] gravar resposta:', erroResposta);
       return respostaJson({ erro: 'A resposta veio mas não pôde ser salva.', tipo: 'falha' }, 500);
@@ -162,7 +198,22 @@ export async function responder(req: Request): Promise<Response> {
       .update({ atualizado_em: new Date().toISOString() })
       .eq('id', threadId);
 
-    return respostaJson({ thread_id: threadId, resposta: texto });
+    /* Uso REAL da rodada, não estimativa: o SDK devolve a contagem. Upsert por
+       (dono, mês); se a gravação do uso falhar, a resposta já foi entregue — o
+       log fica como rastro e a rodada não é cobrada duas vezes. */
+    const gastos = (resposta.usage?.input_tokens ?? 0) + (resposta.usage?.output_tokens ?? 0);
+    const { error: erroUso } = await supabase.from('consultor_uso').upsert(
+      {
+        dono: user.id,
+        mes: mesAtual,
+        tokens: (uso?.tokens ?? 0) + gastos,
+        atualizado_em: new Date().toISOString(),
+      },
+      { onConflict: 'dono,mes' },
+    );
+    if (erroUso) console.error('[consultor] uso:', erroUso);
+
+    return respostaJson({ thread_id: threadId, resposta: texto, cartoes });
   } catch (erro) {
     try {
       throw traduzir(erro);

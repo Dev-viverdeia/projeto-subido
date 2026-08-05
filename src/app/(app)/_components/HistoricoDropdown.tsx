@@ -20,7 +20,16 @@ import styles from './HistoricoDropdown.module.css';
  * painel nunca anima altura: entra por transform + opacity (regra da casa), e
  * os itens cascateiam lendo o `--i` que a grade carimba.
  */
-export function HistoricoDropdown({ total, children }: { total: number; children: ReactNode }) {
+export function HistoricoDropdown({
+  total,
+  rotulo = 'Seus projetos',
+  children,
+}: {
+  total: number;
+  /** "Seus projetos" no Builder, "Suas conversas" no Consultor. */
+  rotulo?: string;
+  children: ReactNode;
+}) {
   const [aberto, setAberto] = useState(false);
   const idPainel = useId();
   const raiz = useRef<HTMLDivElement>(null);
@@ -59,7 +68,7 @@ export function HistoricoDropdown({ total, children }: { total: number; children
         aria-controls={idPainel}
         onClick={() => setAberto((v) => !v)}
       >
-        <span className={styles.rotulo}>Seus projetos</span>
+        <span className={styles.rotulo}>{rotulo}</span>
         <span className={styles.total}>{total}</span>
 
         {/* Chevron inline, como na trilha: lucide aqui seria bundle de cliente

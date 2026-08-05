@@ -1,0 +1,57 @@
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+.conversa {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+.conversa:hover {
+  background: var(--via-navy-04);
+  text-decoration: none;
+}
+
+.conversa:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.conversa[aria-current='page'] {
+  background: var(--via-navy-08);
+}
+
+.titulo {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.data {
+  flex-shrink: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conversa {
+    transition: none;
+  }
+}

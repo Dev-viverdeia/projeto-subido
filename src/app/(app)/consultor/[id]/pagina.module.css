@@ -13,3 +13,53 @@
   position: sticky;
   bottom: var(--via-space-4);
 }
+
+/* Os controles da conversa: nova à esquerda, histórico + excluir à direita. */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+}
+
+.nova {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  text-decoration: none;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.nova:hover {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-1-shadow);
+  text-decoration: none;
+}
+
+.nova:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nova {
+    transition: none;
+  }
+}

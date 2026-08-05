@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 
@@ -15,12 +16,24 @@ export type ThreadDoConsultor = {
   atualizadoEm: string;
 };
 
+/** Ponteiro para uma solução do catálogo citada na resposta. */
+export type CartaoDeSolucao = {
+  slug: string;
+  titulo: string;
+  categoria: string | null;
+};
+
 export type MensagemDoConsultor = {
   id: string;
   papel: 'usuario' | 'consultor';
   conteudo: string;
+  cartoes: CartaoDeSolucao[];
   criadoEm: string;
 };
+
+const Cartoes = z.array(
+  z.object({ slug: z.string(), titulo: z.string(), categoria: z.string().nullable() }),
+);
 
 export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
   const supabase = await createClient();
@@ -50,7 +63,7 @@ export const obterConversa = cache(
 
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
-      .select('id, papel, conteudo, criado_em')
+      .select('id, papel, conteudo, cartoes, criado_em')
       .eq('thread_id', id)
       .order('criado_em')
       .limit(200);
@@ -58,12 +71,18 @@ export const obterConversa = cache(
 
     return {
       thread: { id: thread.id, titulo: thread.titulo, atualizadoEm: thread.atualizado_em },
-      mensagens: (mensagens ?? []).map((m) => ({
-        id: m.id,
-        papel: m.papel as 'usuario' | 'consultor',
-        conteudo: m.conteudo,
-        criadoEm: m.criado_em,
-      })),
+      mensagens: (mensagens ?? []).map((m) => {
+        /* `safeParse` no JSONB, como o Builder faz com o documento: cartão em
+           formato inesperado vira lista vazia, nunca estouro em `.map`. */
+        const cartoes = Cartoes.safeParse(m.cartoes);
+        return {
+          id: m.id,
+          papel: m.papel as 'usuario' | 'consultor',
+          conteudo: m.conteudo,
+          cartoes: cartoes.success ? cartoes.data : [],
+          criadoEm: m.criado_em,
+        };
+      }),
     };
   },
 );

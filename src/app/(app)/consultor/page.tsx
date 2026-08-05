@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { listarThreads } from '@/lib/consultor/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import entrada from '../_components/entrada.module.css';
 import { Conversa } from './_components/Conversa';
+import { ListaConversas } from './_components/ListaConversas';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Consultor' };
@@ -26,16 +26,8 @@ export default async function ConsultorPage() {
 
       {threads.length > 0 ? (
         <div className={`${entrada.bloco} ${styles.topoDireito}`}>
-          <HistoricoDropdown total={threads.length}>
-            <ul className={styles.threads}>
-              {threads.map((t, indice) => (
-                <li key={t.id} style={{ '--i': indice } as React.CSSProperties}>
-                  <Link href={`/consultor/${t.id}`} className={styles.thread}>
-                    {t.titulo}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <HistoricoDropdown total={threads.length} rotulo="Suas conversas">
+            <ListaConversas threads={threads} />
           </HistoricoDropdown>
         </div>
       ) : null}

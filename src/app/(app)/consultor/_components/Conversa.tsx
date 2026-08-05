@@ -28,6 +28,7 @@ export function Conversa({ threadId }: { threadId?: string }) {
   const [emVoo, setEmVoo] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [navegando, iniciarNavegacao] = useTransition();
+  const fimAncora = useRef<HTMLDivElement>(null);
 
   const ocupado = emVoo !== null || navegando;
 
@@ -35,6 +36,22 @@ export function Conversa({ threadId }: { threadId?: string }) {
   useEffect(() => {
     if (emVoo) fimRef.current?.scrollIntoView({ block: 'end' });
   }, [emVoo]);
+
+  /* CONVERSA ABRE NO FIM — chat lê de baixo. `instant`: é posição inicial,
+     não movimento; animar a chegada seria teatro. Roda a cada remonte, e a
+     página remonta quando o refresh traz mensagens novas. */
+  useEffect(() => {
+    if (threadId) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
+  }, [threadId]);
+
+  /* O campo CRESCE com o texto, como o compositor do Builder — `auto` antes de
+     ler o scrollHeight, senão a altura anterior vira piso e ele nunca encolhe. */
+  useEffect(() => {
+    const campo = campoRef.current;
+    if (!campo) return;
+    campo.style.height = 'auto';
+    campo.style.height = `${Math.min(campo.scrollHeight, 220)}px`;
+  }, [texto]);
 
   async function enviar() {
     const mensagem = texto.trim();
@@ -68,6 +85,7 @@ export function Conversa({ threadId }: { threadId?: string }) {
 
   return (
     <div className={styles.conversa}>
+      <div ref={fimAncora} aria-hidden="true" />
       {emVoo !== null && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
           <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>
@@ -101,7 +119,10 @@ export function Conversa({ threadId }: { threadId?: string }) {
           value={texto}
           onChange={(e) => setTexto(e.target.value.slice(0, MAXIMO))}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+            /* Chat: Enter ENVIA, Shift+Enter quebra linha — a convenção que a
+               mão já conhece. O Compositor do Builder faz o inverso porque lá
+               o texto é um briefing longo; aqui é conversa. */
+            if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               void enviar();
             }
