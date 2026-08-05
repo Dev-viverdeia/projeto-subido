@@ -53,13 +53,16 @@
 }
 
 /* Trilhas DEFINIDAS, não `1fr` + medida no texto: com `1fr` a coluna de prosa
-   abria ~1100px, o texto parava nos 54ch (~640px) e sobrava um RIO de vazio até
-   o card de economia lá na borda. Com 660 + 340 o card senta ao lado da leitura;
-   o que sobra fica na borda direita do painel, que é onde vazio é editorial. */
+   abria além da medida e sobrava um RIO de vazio até o card de economia. Com a
+   página agora em wide (1280), as trilhas preenchem o eixo: 700 de leitura
+   (numeral 44 + texto de 54ch ≈ 684) + 380 de trilho, e o `space-between`
+   distribui a sobra (~200 no máximo) como UMA calha central — não um rio na
+   borda. Abaixo de 1080, coluna única. */
 .grade {
   display: grid;
-  grid-template-columns: minmax(0, 660px) 340px;
-  gap: clamp(48px, 5vw, 88px);
+  grid-template-columns: minmax(0, 700px) 380px;
+  justify-content: space-between;
+  gap: var(--via-space-8);
   align-items: start;
 }
 

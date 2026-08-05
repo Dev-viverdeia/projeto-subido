@@ -2,8 +2,15 @@
    ações) precisa dividir o eixo com o conteúdo. Com a barra em 1200 e a entrevista
    em 760 centrada, o "Voltar" ficava 240px à esquerda do primeiro card e a tela
    lia como dois documentos empilhados. */
+/* WIDE (1280), não o canvas de 1600 — decisão pelo TIPO de conteúdo, como manda
+   a tabela do CLAUDE.md: a sala é editorial + painéis, não catálogo. Medido nas
+   duas pontas que motivaram a troca: a 1512 de viewport o canvas encostava o
+   conteúdo à esquerda (trilho 240 + 1600 não cabem, e o excesso saía todo do
+   lado direito); a 1900+ o hero esticava 1600 enquanto a leitura parava em
+   ~1100 — dois eixos na mesma tela. Com 1280 os dois casos centram: 240 + 1280
+   = 1520 preenche a tela normal exata, e sobra margem simétrica na grande. */
 .pagina {
-  max-width: var(--app-canvas);
+  max-width: var(--via-container);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
