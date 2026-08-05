@@ -1,7 +1,10 @@
-/* Conversa é COLUNA DE LEITURA, não canvas: balões de 52ch pedem eixo estreito. */
+/* 900 — o mesmo degrau da coluna de vídeo das formações. A conversa é UMA
+   coluna centrada, mas 760 numa viewport de 1900 deixava metade da tela vazia;
+   a 900 o chat respira e os balões (que guardam a própria medida de 52ch)
+   ganham separação lateral de verdade entre usuário e consultor. */
 .pagina {
   width: 100%;
-  max-width: var(--via-content);
+  max-width: 900px;
   margin-inline: auto;
   display: flex;
   flex-direction: column;

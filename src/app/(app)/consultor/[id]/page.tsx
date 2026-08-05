@@ -5,6 +5,7 @@ import { MessageSquarePlus } from 'lucide-react';
 import { apagarConversa } from '@/lib/consultor/actions';
 import { listarThreads, obterConversa } from '@/lib/consultor/queries';
 import { BotaoExcluir } from '../../admin/_components/BotaoExcluir';
+import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import { DefinirTrilha } from '../../_components/trilha/contexto';
 import { HistoricoDropdown } from '../../_components/HistoricoDropdown';
 import { dataCurta } from '../../builder/_components/statusBuilder';
@@ -53,6 +54,7 @@ export default async function ConversaDoConsultorPage({ params }: PageProps<'/co
 
       <header className={styles.cabecalho}>
         <div className={styles.identidade}>
+          <BotaoVoltar fallback="/consultor" rotulo="Consultor" />
           <p className={styles.eyebrow}>Consultor · conversa</p>
           <h1 className={styles.tituloConversa}>{conversa.thread.titulo}</h1>
           <p className={styles.meta}>Iniciada em {dataCurta(conversa.thread.criadoEm)}</p>
