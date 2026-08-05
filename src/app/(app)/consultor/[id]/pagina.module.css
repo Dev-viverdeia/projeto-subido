@@ -1,10 +1,9 @@
-/* 900 — o mesmo degrau da coluna de vídeo das formações. A conversa é UMA
-   coluna centrada, mas 760 numa viewport de 1900 deixava metade da tela vazia;
-   a 900 o chat respira e os balões (que guardam a própria medida de 52ch)
-   ganham separação lateral de verdade entre usuário e consultor. */
+/* 1080 — degrau canônico. A conversa é UMA coluna centrada; os balões guardam
+   a própria medida (52ch), e a largura da página é o que dá SEPARAÇÃO entre o
+   lado do usuário e o do consultor — a 760 os dois quase se tocavam. */
 .pagina {
   width: 100%;
-  max-width: 900px;
+  max-width: 1080px;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -50,6 +49,7 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
+  flex-shrink: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -63,17 +63,31 @@
    com endereço. */
 .cabecalho {
   display: flex;
-  align-items: flex-end;
+  /* Centrado, não flex-end: com o voltar ao lado do título o bloco esquerdo tem
+     três linhas de altura, e as ações penduradas na base liam desalinhadas. */
+  align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  flex-wrap: wrap;
   padding-bottom: var(--via-space-4);
   border-bottom: 1px solid var(--via-border-hairline);
+}
+
+/* Voltar + identidade lado a lado, o chip centrado na altura do bloco.
+   `flex: 1` + `min-width: 0` é o que deixa o título TRUNCAR em vez de empurrar
+   as ações para uma segunda linha — medido: 678 + 422 = 1100 > 1080 e o
+   wrap jogava os três botões para baixo do título, alinhados à esquerda. */
+.esquerda {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  flex: 1;
+  min-width: 0;
 }
 
 .identidade {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--via-space-1);
   min-width: 0;
 }
@@ -98,7 +112,10 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 40ch;
+  /* `min(40ch, 100%)`: com `nowrap` a largura mínima do h1 é a linha INTEIRA,
+     e num flex de coluna com `flex-start` ele vazava do bloco — medido: o
+     título terminava em 1251px com as ações começando em 1230. */
+  max-width: min(40ch, 100%);
 }
 
 .meta {

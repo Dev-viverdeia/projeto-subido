@@ -53,11 +53,15 @@ export default async function ConversaDoConsultorPage({ params }: PageProps<'/co
       />
 
       <header className={styles.cabecalho}>
-        <div className={styles.identidade}>
+        <div className={styles.esquerda}>
+          {/* O voltar mora AO LADO do título, centrado no bloco — é o gesto de
+              sair da conversa, não um item do conteúdo dela. */}
           <BotaoVoltar fallback="/consultor" rotulo="Consultor" />
-          <p className={styles.eyebrow}>Consultor · conversa</p>
-          <h1 className={styles.tituloConversa}>{conversa.thread.titulo}</h1>
-          <p className={styles.meta}>Iniciada em {dataCurta(conversa.thread.criadoEm)}</p>
+          <div className={styles.identidade}>
+            <p className={styles.eyebrow}>Conversa</p>
+            <h1 className={styles.tituloConversa}>{conversa.thread.titulo}</h1>
+            <p className={styles.meta}>Iniciada em {dataCurta(conversa.thread.criadoEm)}</p>
+          </div>
         </div>
 
         <div className={styles.acoes}>
