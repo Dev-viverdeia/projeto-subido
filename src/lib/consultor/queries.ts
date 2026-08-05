@@ -13,6 +13,7 @@ import { handleError } from '@/lib/errors';
 export type ThreadDoConsultor = {
   id: string;
   titulo: string;
+  criadoEm: string;
   atualizadoEm: string;
 };
 
@@ -39,11 +40,16 @@ export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('consultor_threads')
-    .select('id, titulo, atualizado_em')
+    .select('id, titulo, criado_em, atualizado_em')
     .order('atualizado_em', { ascending: false })
     .limit(40);
   if (error) throw handleError(error, 'consultor:listar');
-  return (data ?? []).map((t) => ({ id: t.id, titulo: t.titulo, atualizadoEm: t.atualizado_em }));
+  return (data ?? []).map((t) => ({
+    id: t.id,
+    titulo: t.titulo,
+    criadoEm: t.criado_em,
+    atualizadoEm: t.atualizado_em,
+  }));
 });
 
 /** `null` quando o id não existe OU é de outra pessoa — a RLS não distingue. */
@@ -55,7 +61,7 @@ export const obterConversa = cache(
 
     const { data: thread, error } = await supabase
       .from('consultor_threads')
-      .select('id, titulo, atualizado_em')
+      .select('id, titulo, criado_em, atualizado_em')
       .eq('id', id)
       .maybeSingle();
     if (error) throw handleError(error, 'consultor:obter');
@@ -70,7 +76,12 @@ export const obterConversa = cache(
     if (erroMsgs) throw handleError(erroMsgs, 'consultor:mensagens');
 
     return {
-      thread: { id: thread.id, titulo: thread.titulo, atualizadoEm: thread.atualizado_em },
+      thread: {
+        id: thread.id,
+        titulo: thread.titulo,
+        criadoEm: thread.criado_em,
+        atualizadoEm: thread.atualizado_em,
+      },
       mensagens: (mensagens ?? []).map((m) => {
         /* `safeParse` no JSONB, como o Builder faz com o documento: cartão em
            formato inesperado vira lista vazia, nunca estouro em `.map`. */

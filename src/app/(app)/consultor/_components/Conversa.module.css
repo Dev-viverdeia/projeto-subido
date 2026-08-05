@@ -29,45 +29,43 @@
   color: var(--via-white);
 }
 
-/* O "escrevendo": ponto que respira, vocabulário do painel de espera do Builder. */
-.escrevendo {
+/* A BOLHA DE DIGITAÇÃO — anatomia de mensagem do consultor, três pontos em
+   compasso defasado. Só opacity; o compasso vem do delay, não de deslocamento. */
+.digitando {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-2);
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  gap: 5px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
 }
 
-.ponto {
-  position: relative;
-  width: 8px;
-  height: 8px;
+.pontinho {
+  width: 7px;
+  height: 7px;
   border-radius: var(--via-radius-pill);
-  background: var(--via-navy);
+  background: var(--via-text-faint);
+  animation: consultor-digitar 1.2s var(--via-ease) infinite;
 }
 
-.ponto::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: inherit;
-  border: 1.5px solid var(--via-navy-40);
-  animation: consultor-respirar 1.6s var(--via-ease) infinite;
+.pontinho:nth-child(2) {
+  animation-delay: 0.15s;
 }
 
-@keyframes consultor-respirar {
-  0% {
-    opacity: 1;
-    transform: scale(0.6);
-  }
-  70%,
+.pontinho:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes consultor-digitar {
+  0%,
+  60%,
   100% {
-    opacity: 0;
-    transform: scale(1.35);
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
   }
 }
 
@@ -157,18 +155,6 @@
   box-shadow: var(--app-ring);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ponto::after {
-    animation: none;
-    content: none;
-  }
-
-  .caixa,
-  .enviar {
-    transition: none;
-  }
-}
-
 /* ── Exemplos — a mesma gramática dos chips do Compositor ─────────────────── */
 .exemplos {
   display: flex;
@@ -240,6 +226,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pontinho {
+    animation: none;
+  }
+
+  .caixa,
+  .enviar,
   .chip {
     transition: none;
   }

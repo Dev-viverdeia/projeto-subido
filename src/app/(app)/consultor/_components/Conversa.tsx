@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { enviarMensagem } from '@/lib/consultor/invocar';
+import { enviarMensagem, responderPendente } from '@/lib/consultor/invocar';
+import { criarConversa } from '@/lib/consultor/criar';
 import styles from './Conversa.module.css';
 
 const MAXIMO = 8000;
@@ -29,9 +30,13 @@ export type ExemploDoConsultor = {
 
 export function Conversa({
   threadId,
+  pendente = false,
   exemplos,
 }: {
   threadId?: string;
+  /** A última mensagem gravada é do usuário e ainda não tem resposta — a
+      conversa acabou de nascer no browser e o consultor deve responder JÁ. */
+  pendente?: boolean;
   exemplos?: ExemploDoConsultor[];
 }) {
   const router = useRouter();
@@ -39,16 +44,44 @@ export function Conversa({
   const fimRef = useRef<HTMLDivElement>(null);
   const [texto, setTexto] = useState('');
   const [emVoo, setEmVoo] = useState<string | null>(null);
+  const [digitando, setDigitando] = useState(pendente);
   const [erro, setErro] = useState<string | null>(null);
   const [navegando, iniciarNavegacao] = useTransition();
   const fimAncora = useRef<HTMLDivElement>(null);
 
-  const ocupado = emVoo !== null || navegando;
+  const ocupado = emVoo !== null || digitando || navegando;
 
   /* A rodada em voo entra no fim da lista; rolar até ela é o que diz "foi". */
   useEffect(() => {
     if (emVoo) fimRef.current?.scrollIntoView({ block: 'end' });
   }, [emVoo]);
+
+  /* A PENDÊNCIA DISPARA NA CHEGADA: a página navegou para cá com a pergunta
+     já gravada; esta é a metade lenta, rodando dentro do chat — que é onde a
+     espera pertence. Idempotente do lado da função: aba duplicada não paga
+     duas rodadas. */
+  useEffect(() => {
+    if (!pendente || !threadId) return;
+    let ativo = true;
+    void (async () => {
+      const { falha } = await responderPendente(threadId);
+      if (!ativo) return;
+      if (falha) {
+        setErro(falha.mensagem);
+        setDigitando(false);
+        return;
+      }
+      iniciarNavegacao(() => {
+        router.refresh();
+        setDigitando(false);
+      });
+    })();
+    return () => {
+      ativo = false;
+    };
+    /* Roda uma vez por montagem da conversa pendente. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* CONVERSA ABRE NO FIM — chat lê de baixo. `instant`: é posição inicial,
      não movimento; animar a chegada seria teatro. Roda a cada remonte, e a
@@ -70,21 +103,31 @@ export function Conversa({
     const mensagem = texto.trim();
     if (!mensagem || ocupado) return;
 
-    setEmVoo(mensagem);
     setErro(null);
+
+    /* CONVERSA NOVA: grava pergunta + thread pelo browser (milissegundos) e
+       NAVEGA — a resposta acontece dentro do chat, onde a espera pertence. */
+    if (!threadId) {
+      setEmVoo(mensagem);
+      const { threadId: novo, falha } = await criarConversa(mensagem);
+      if (falha) {
+        setErro(falha);
+        setEmVoo(null);
+        return;
+      }
+      iniciarNavegacao(() => router.push(`/consultor/${novo}`));
+      return;
+    }
+
+    setEmVoo(mensagem);
     setTexto('');
 
-    const { dados, falha } = await enviarMensagem(mensagem, threadId);
+    const { falha } = await enviarMensagem(mensagem, threadId);
 
     if (falha) {
       setErro(falha.mensagem);
       setEmVoo(null);
       setTexto(mensagem);
-      return;
-    }
-
-    if (!threadId) {
-      iniciarNavegacao(() => router.push(`/consultor/${dados.thread_id}`));
       return;
     }
 
@@ -99,13 +142,16 @@ export function Conversa({
   return (
     <div className={styles.conversa}>
       <div ref={fimAncora} aria-hidden="true" />
-      {emVoo !== null && (
+      {(emVoo !== null || digitando) && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
-          <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>
-          <p className={styles.escrevendo} role="status">
-            <span className={styles.ponto} aria-hidden="true" />
-            consultor escrevendo
-          </p>
+          {emVoo !== null && <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>}
+          {/* A bolha de digitação — o idioma universal de chat, com os três
+              pontos em compasso. `role=status` + rótulo para leitor de tela. */}
+          <div className={styles.digitando} role="status" aria-label="Consultor escrevendo">
+            <span className={styles.pontinho} aria-hidden="true" />
+            <span className={styles.pontinho} aria-hidden="true" />
+            <span className={styles.pontinho} aria-hidden="true" />
+          </div>
         </div>
       )}
 

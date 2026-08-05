@@ -23,10 +23,23 @@ export async function enviarMensagem(
   mensagem: string,
   threadId?: string,
 ): Promise<{ dados: RespostaDoConsultor; falha: null } | { dados: null; falha: FalhaDoConsultor }> {
+  return invocar(threadId ? { thread_id: threadId, mensagem } : { mensagem });
+}
+
+/** Responde a pergunta JÁ GRAVADA pelo browser — o caminho da conversa nova. */
+export async function responderPendente(
+  threadId: string,
+): Promise<{ dados: RespostaDoConsultor; falha: null } | { dados: null; falha: FalhaDoConsultor }> {
+  return invocar({ thread_id: threadId, pendente: true });
+}
+
+async function invocar(
+  body: Record<string, unknown>,
+): Promise<{ dados: RespostaDoConsultor; falha: null } | { dados: null; falha: FalhaDoConsultor }> {
   const supabase = createClient();
 
   const resposta = await supabase.functions.invoke<RespostaDoConsultor>('consultor/responder', {
-    body: threadId ? { thread_id: threadId, mensagem } : { mensagem },
+    body,
   });
 
   if (resposta.error) {

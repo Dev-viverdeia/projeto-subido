@@ -30,7 +30,11 @@ const TETO_TOKENS_MES = 500_000;
 
 const Pedido = z.object({
   thread_id: z.uuid().optional(),
-  mensagem: z.string().trim().min(1).max(8000),
+  mensagem: z.string().trim().min(1).max(8000).optional(),
+  /* MODO PENDENTE: a thread e a mensagem do usuário já foram gravadas pelo
+     browser (via RLS) para o chat abrir na hora; esta chamada só produz a
+     resposta. Exige thread_id e ignora `mensagem`. */
+  pendente: z.boolean().optional(),
 });
 
 const VOZ_CONSULTOR = `Você é o Consultor de IA da Comunidade Subido — orienta
@@ -65,8 +69,13 @@ export async function responder(req: Request): Promise<Response> {
     const corpo = Pedido.safeParse(await req.json());
     if (!corpo.success) return respostaJson({ erro: 'Pedido inválido.', tipo: 'falha' }, 400);
 
-    const { mensagem } = corpo.data;
+    const pendente = corpo.data.pendente === true;
+    const mensagem = corpo.data.mensagem ?? null;
     let threadId = corpo.data.thread_id ?? null;
+
+    if ((pendente && !threadId) || (!pendente && !mensagem)) {
+      return respostaJson({ erro: 'Pedido inválido.', tipo: 'falha' }, 400);
+    }
 
     /* O LIMITE VEM ANTES de qualquer gravação: estourou, nada é criado — nem
        thread, nem mensagem pendurada sem resposta. */
@@ -88,7 +97,7 @@ export async function responder(req: Request): Promise<Response> {
 
     /* Sem thread: a primeira mensagem CRIA a conversa, e o título nasce dela —
        corte na palavra, como a trilha do cabeçalho faz. */
-    if (!threadId) {
+    if (!threadId && mensagem) {
       const bruto = mensagem.replace(/\s+/g, ' ').trim();
       const corte = bruto.slice(0, 80);
       const espaco = corte.lastIndexOf(' ');
@@ -115,12 +124,14 @@ export async function responder(req: Request): Promise<Response> {
       if (!data) return respostaJson({ erro: 'Conversa não encontrada.', tipo: 'falha' }, 404);
     }
 
-    const { error: erroMsg } = await supabase
-      .from('consultor_mensagens')
-      .insert({ thread_id: threadId, papel: 'usuario', conteudo: mensagem });
-    if (erroMsg) {
-      console.error('[consultor] gravar pergunta:', erroMsg);
-      return respostaJson({ erro: 'Não foi possível enviar a mensagem.', tipo: 'falha' }, 500);
+    if (!pendente && mensagem) {
+      const { error: erroMsg } = await supabase
+        .from('consultor_mensagens')
+        .insert({ thread_id: threadId, papel: 'usuario', conteudo: mensagem });
+      if (erroMsg) {
+        console.error('[consultor] gravar pergunta:', erroMsg);
+        return respostaJson({ erro: 'Não foi possível enviar a mensagem.', tipo: 'falha' }, 500);
+      }
     }
 
     /* Histórico: as últimas 20 mensagens bastam para uma conversa de orientação
@@ -131,6 +142,16 @@ export async function responder(req: Request): Promise<Response> {
       .eq('thread_id', threadId)
       .order('criado_em', { ascending: false })
       .limit(20);
+
+    /* PENDENTE é idempotente: se a última mensagem já é do consultor (dupla
+       chamada, aba duplicada), devolve o que existe sem pagar outra rodada. */
+    const ultimaGravada = (historico ?? [])[0];
+    if (pendente && ultimaGravada?.papel === 'consultor') {
+      return respostaJson({ thread_id: threadId, resposta: ultimaGravada.conteudo, cartoes: [] });
+    }
+    if (pendente && !ultimaGravada) {
+      return respostaJson({ erro: 'A conversa está vazia.', tipo: 'falha' }, 400);
+    }
 
     const mensagens = (historico ?? []).reverse().map((m) => ({
       role: m.papel === 'usuario' ? ('user' as const) : ('assistant' as const),

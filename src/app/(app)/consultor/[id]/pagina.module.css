@@ -14,15 +14,6 @@
   bottom: var(--via-space-4);
 }
 
-/* Os controles da conversa: nova à esquerda, histórico + excluir à direita. */
-.topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  flex-wrap: wrap;
-}
-
 .nova {
   display: inline-flex;
   align-items: center;
@@ -62,4 +53,56 @@
   .nova {
     transition: none;
   }
+}
+
+/* ── O cabeçalho da conversa: identidade à esquerda, controles à direita,
+   hairline fechando — é o que separa "uma tela com balões" de uma conversa
+   com endereço. */
+.cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.identidade {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.tituloConversa {
+  margin: 0;
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  /* Uma linha: o título é endereço aqui; inteiro ele vive na trilha e no title. */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 40ch;
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
 }
