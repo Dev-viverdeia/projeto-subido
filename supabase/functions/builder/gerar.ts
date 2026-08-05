@@ -118,6 +118,11 @@ async function gerarEGravar(
   } catch (erro) {
     const traduzido = traduzir(erro);
     console.error(`[builder:gerar] ${id}: ${traduzido.tipo} — ${traduzido.message}`);
+    /* O erro CRU também, senão o log só guarda a tradução — e a primeira falha
+       real provou que a tradução não distingue corte de token de schema violado. */
+    if (!(erro instanceof ErroDoBuilder)) {
+      console.error(`[builder:gerar] ${id}: erro original —`, erro);
+    }
 
     const { error } = await supabase
       .from('builder_solucoes')
