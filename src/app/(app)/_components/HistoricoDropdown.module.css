@@ -1,0 +1,148 @@
+/* O CANTO é a âncora: o gatilho fica no topo direito da página e o painel abre
+   embaixo dele, alinhado à direita. Quem posiciona o conjunto é a página
+   (.topoDireito em pagina.module.css); aqui dentro só existe a relação
+   gatilho → painel. */
+.canto {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Gatilho COMPACTO — mora no canto, não pode pesar como seção. Altura de
+   controle, superfície de repouso e a contagem como o dado que convida. */
+.gatilho {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.gatilho:hover {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+/* Compõe com a sombra de repouso para o controle não achatar ao focar. */
+.gatilho:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.rotulo {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: var(--via-space-1);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rotação a `--app-t-touch`: resposta ao dedo, não revelação. */
+.seta {
+  color: var(--via-text-faint);
+  transition: transform var(--app-t-touch);
+}
+
+.seta[data-aberto] {
+  transform: rotate(180deg);
+}
+
+.gatilho:hover .seta {
+  color: var(--via-text-muted);
+}
+
+/* O PAINEL flutua — elevação 3, o triplo completo do nível sobreposto. Largura
+   própria de ~400px: nela a grade `minmax(300px, 1fr)` dos cards colapsa para
+   uma coluna sozinha. `max-height` com rolagem interna: 60 projetos não podem
+   virar uma torre até o rodapé; rolar dentro do painel é esperado, animar
+   altura não. Entrada por transform + opacity, nunca height. */
+.painel {
+  position: absolute;
+  top: calc(100% + var(--via-space-2));
+  right: 0;
+  z-index: 30;
+  width: min(400px, calc(100vw - 2 * var(--via-space-5)));
+  max-height: min(560px, 70vh);
+  overflow-y: auto;
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-3-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-3-bg);
+  box-shadow: var(--app-elev-3-shadow);
+  opacity: 1;
+  animation: painel-chegar var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+/* Raio aninhado = raio externo − padding: 28 − 12 = 16… o card do histórico tem
+   raio 20 (token de card). token-ok: o painel usa `--app-radius-surface` (28) e
+   o padding de 12px deixa o card de 20 DENTRO da regra com folga de 8 — cantos
+   concêntricos na prática, sem raio novo inventado. */
+
+@keyframes painel-chegar {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* UMA COLUNA SEMPRE, e o porquê é traiçoeiro: os breakpoints da grade dos cards
+   são de VIEWPORT, não de contêiner — a 1440+ ela pede 4 colunas, e dentro de um
+   painel de 400px isso dá trilhas de ~100px com o card espremido. Medido no
+   navegador: era exatamente o que acontecia. `.painel ul` (0,1,1) ganha das
+   regras de media query da grade (0,1,0) por especificidade, sem !important. */
+.painel ul {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A cascata dos itens, lida do `--i` que a grade server-rendered carimba.
+   Trava em 6 batidas: fila comprida é desfile, não entrada. */
+.painel :where(li) {
+  opacity: 1;
+  animation: historico-entrar var(--app-motion-reveal) var(--via-ease-out) backwards;
+  animation-delay: calc(min(var(--i, 0), 6) * 40ms);
+}
+
+/* Sem `to`, e `backwards` — ver entrada.module.css: `forwards` reteria um
+   transform residual que cria containing block para `position: fixed`. */
+@keyframes historico-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel,
+  .painel :where(li) {
+    animation: none;
+  }
+
+  .seta,
+  .gatilho {
+    transition: none;
+  }
+}

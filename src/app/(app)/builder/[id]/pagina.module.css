@@ -2,14 +2,15 @@
    ações) precisa dividir o eixo com o conteúdo. Com a barra em 1200 e a entrevista
    em 760 centrada, o "Voltar" ficava 240px à esquerda do primeiro card e a tela
    lia como dois documentos empilhados. */
-/* LARGURA DERIVADA, não o canvas de 1600. A ficha é um documento de contagem FIXA
-   de colunas (prosa + painel), então ela não ganha coluna ao sobrar espaço — para
-   numa largura que sai da soma das trilhas de `.grade`: 780 da prosa + 32 de gap +
-   380 do painel. Com o canvas inteiro sobravam 408px de calha morta à direita a
-   1920, porque nenhuma das duas trilhas cresce para preenchê-la.
-   Os três termos vivem em `FichaProjeto.module.css`; mexer lá pede mexer aqui. */
+/* WIDE (1280), não o canvas de 1600 — decisão pelo TIPO de conteúdo, como manda
+   a tabela do CLAUDE.md: a sala é editorial + painéis, não catálogo. Medido nas
+   duas pontas que motivaram a troca: a 1512 de viewport o canvas encostava o
+   conteúdo à esquerda (trilho 240 + 1600 não cabem, e o excesso saía todo do
+   lado direito); a 1900+ o hero esticava 1600 enquanto a leitura parava em
+   ~1100 — dois eixos na mesma tela. Com 1280 os dois casos centram: 240 + 1280
+   = 1520 preenche a tela normal exata, e sobra margem simétrica na grande. */
 .pagina {
-  max-width: calc(780px + var(--via-space-8) + 380px);
+  max-width: var(--via-container);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -21,10 +22,13 @@
   max-width: var(--via-content);
 }
 
+/* `flex-end` e não `space-between`: com o "voltar" removido do lado esquerdo,
+   sobrou UM filho, e `space-between` empurra um filho solitário para a esquerda —
+   as ações caíam sob o título em vez de fechar a linha à direita. */
 .topo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--via-space-4);
   flex-wrap: wrap;
 }

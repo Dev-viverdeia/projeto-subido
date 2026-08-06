@@ -1,0 +1,238 @@
+.conversa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+}
+
+/* A rodada em voo repete a anatomia das mensagens do servidor (Mensagens.module)
+   para a troca RSC não causar salto visual. */
+.rodadaEmVoo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+}
+
+.balao {
+  margin: 0;
+  max-width: 52ch;
+  padding: var(--via-space-3) var(--via-space-4);
+  border-radius: var(--app-radius-card);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+.doUsuario {
+  align-self: flex-end;
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+/* A BOLHA DE DIGITAÇÃO — anatomia de mensagem do consultor, três pontos em
+   compasso defasado. Só opacity; o compasso vem do delay, não de deslocamento. */
+.digitando {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+}
+
+.pontinho {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-text-faint);
+  animation: consultor-digitar 1.2s var(--via-ease) infinite;
+}
+
+.pontinho:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pontinho:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes consultor-digitar {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+.erro {
+  margin: 0;
+  padding: var(--app-pad-card-tight);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--via-border);
+  background: var(--app-elev-1-bg);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+/* A caixa de envio — mesma gramática do Compositor: superfície com borda que
+   acorda no foco, botão circular de enviar. */
+.caixa {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  transition: border-color var(--app-t-state);
+}
+
+.caixa:focus-within {
+  border-color: var(--via-navy-16);
+}
+
+.caixa:has(:focus-visible) {
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+.campo {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  resize: none;
+  background: transparent;
+  font: inherit;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+}
+
+/* O anel é da caixa; o do DS é box-shadow e precisa ser apagado aqui dentro. */
+.campo:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.campo::placeholder {
+  color: var(--via-text-faint);
+}
+
+.enviar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    opacity var(--app-t-state);
+}
+
+.enviar:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.enviar:not(:disabled):hover {
+  background: var(--via-navy-deep);
+}
+
+.enviar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+/* ── Exemplos — a mesma gramática dos chips do Compositor ─────────────────── */
+.exemplos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.divisor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.divisor::before,
+.divisor::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--via-border-hairline);
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--via-space-3);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--via-radius-pill);
+  background: var(--app-elev-1-bg);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pontinho {
+    animation: none;
+  }
+
+  .caixa,
+  .enviar,
+  .chip {
+    transition: none;
+  }
+}

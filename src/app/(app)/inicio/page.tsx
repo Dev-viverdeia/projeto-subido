@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Pill } from '@/design-system/via';
-import { gerarAgendaExemplo } from '@/content/mentorias';
+import { listarAgenda } from '@/lib/mentorias/queries';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
 import entrada from '../_components/entrada.module.css';
 import { RetomadaFormacao } from '../formacoes/_components/RetomadaFormacao';
 import { horaCurta, rotuloDoDia } from '../mentorias/_components/estadoMentoria';
@@ -17,14 +17,15 @@ export const metadata: Metadata = { title: 'Início' };
 /**
  * O painel de entrada compõe os três pilares SEM inventar número: a retomada só
  * aparece com progresso local real, as soluções são as últimas publicadas do
- * banco, e a mentoria de demonstração carrega o próprio rótulo.
+ * banco, e a mentoria vem da agenda — que deixou de ser gerada em código.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
-  const [{ data }, solucoes, formacoes] = await Promise.all([
+  const [{ data }, solucoes, formacoes, agenda] = await Promise.all([
     supabase.auth.getClaims(),
     listarSolucoes(),
     listarFormacoes(),
+    listarAgenda(),
   ]);
 
   const claims = data?.claims;
@@ -32,9 +33,9 @@ export default async function InicioPage() {
   const nome = meta.nome?.split(' ')[0] ?? null;
 
   const agora = new Date();
-  const proximaMentoria = gerarAgendaExemplo(agora)
-    .filter((s) => new Date(s.fimIso).getTime() > agora.getTime())
-    .sort((a, b) => a.inicioIso.localeCompare(b.inicioIso))[0];
+  /* A agenda já vem ordenada por início; aqui só sobra descartar o que terminou.
+     Sem mentoria cadastrada, o bloco inteiro some — nada de convite vazio. */
+  const proximaMentoria = agenda.find((s) => new Date(s.fimIso).getTime() > agora.getTime());
 
   const recentes = solucoes.slice(0, 3);
 
@@ -48,10 +49,9 @@ export default async function InicioPage() {
         {proximaMentoria && (
           <Link href="/mentorias" className={styles.mentoria}>
             <span className={styles.mentoriaTextos}>
-              <span className={styles.mentoriaRotulo}>
-                Próxima mentoria
-                <Pill size="sm">demonstração</Pill>
-              </span>
+              {/* A pill "demonstração" saiu junto com os dados de exemplo: a
+                  sessão que aparece aqui está cadastrada e publicada. */}
+              <span className={styles.mentoriaRotulo}>Próxima mentoria</span>
               <span className={styles.mentoriaTitulo}>{proximaMentoria.titulo}</span>
               <span className={styles.mentoriaMeta}>
                 {rotuloDoDia(proximaMentoria.inicioIso, agora).principal} ·{' '}
@@ -80,8 +80,18 @@ export default async function InicioPage() {
             </Link>
           </div>
           <div className={styles.grade}>
+            {/* Mesma resolução do catálogo: categoria sem entrada no mapa cai no
+                padrão. O ícone chega como ELEMENTO já renderizado do Server
+                Component — passar a referência arrastaria o lucide para o cliente. */}
             {recentes.map((solucao) => (
-              <CartaoSolucao key={solucao.id} solucao={solucao} />
+              <CartaoSolucao
+                key={solucao.id}
+                solucao={solucao}
+                icone={
+                  (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) ||
+                  ICONE_CATEGORIA_PADRAO
+                }
+              />
             ))}
           </div>
         </section>

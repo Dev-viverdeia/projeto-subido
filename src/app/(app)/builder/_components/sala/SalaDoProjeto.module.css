@@ -1,0 +1,363 @@
+.sala {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+/* A ÚNICA SUPERFÍCIE ESCURA da sala. O mesh vem daqui e não da classe global:
+   as duas têm a mesma especificidade e quem ganha dependeria da ordem de
+   injeção do CSS, que muda entre dev e build. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--app-gap-section);
+  flex-wrap: wrap;
+  padding: clamp(24px, 3.4vw, 36px);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-mesh-navy);
+  color: var(--via-white);
+  box-shadow: var(--via-glow-navy);
+}
+
+.heroTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  min-width: 0;
+  /* 46ch ≈ 63 caracteres na Outfit (o glifo `0` é ~37% mais LARGO que o caractere
+     médio; o alvo real é caracteres ÷ 1,369, e eram 60 com a Geist). */
+  max-width: 46ch;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* Accent puro é legível justamente aqui: 6,52:1 sobre a navy. */
+  color: var(--via-accent);
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(1.375rem, 2.8vw, 2rem);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: balance;
+  /* Guarda para título longo do modelo (o teto do schema é 120): duas linhas
+     no hero; ele existe inteiro na trilha e no documento. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* A CITAÇÃO — o hero enquanto não há título. Corpo de h4, não display: é a
+   ideia da pessoa servindo de lembrete, não o nome do projeto. Três linhas. */
+.tituloCitacao {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--app-ls-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-white);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+/* AO VIVO — dot em accent, que sobre a navy rende 6,52:1. O anel respira por
+   transform e opacity; `animation` porque é ambiente, não resposta. */
+.aoVivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-300);
+  white-space: nowrap;
+}
+
+.aoVivoDot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+}
+
+.aoVivoDot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1.5px solid var(--via-accent);
+  animation: sala-respirar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes sala-respirar {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  /* Sobre banda escura a escala de cinza INVERTE: `--via-text-muted` daria
+     3,45:1 e reprovaria AA. */
+  color: var(--via-gray-300);
+}
+
+.medida {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  min-width: 180px;
+}
+
+.contagem {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.trilho {
+  height: 3px;
+  border-radius: var(--app-radius-track);
+  background: color-mix(in srgb, var(--via-white) 18%, transparent);
+  overflow: hidden;
+}
+
+.preenchido {
+  display: block;
+  height: 100%;
+  /* `scaleX` e nunca `width`: width dispara layout a cada frame. */
+  transform-origin: left center;
+  background: var(--via-accent);
+  transition: transform var(--app-t-reveal);
+}
+
+/* ── Stepper ───────────────────────────────────────────────────────────────── */
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--via-space-2);
+}
+
+.degrau {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) var(--via-space-2);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--app-t-state);
+}
+
+.degrau[data-travada] {
+  cursor: not-allowed;
+}
+
+.degrau:not([data-travada]):hover {
+  background: var(--via-navy-04);
+}
+
+.degrau:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.marcador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-border-hairline);
+  background: var(--app-elev-1-bg);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.degrau[data-ativa] .marcador {
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+  color: var(--via-white);
+}
+
+.degrau[data-travada] .marcador {
+  color: var(--via-text-faint);
+}
+
+.degrauRotulo {
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.degrau[data-ativa] .degrauRotulo {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+.degrau[data-travada] .degrauRotulo {
+  color: var(--via-text-faint);
+}
+
+/* ── Painel da etapa ───────────────────────────────────────────────────────── */
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+.painelEyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* O numeral fantasma da referência: grande, quieto, atrás do rótulo. É
+   ornamento com função — dá âncora vertical à seção sem pedir mais uma linha. */
+.painelNumero {
+  font-size: 2.5rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
+  line-height: 1;
+  color: var(--via-navy-08);
+}
+
+.travado {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: 0;
+  padding: var(--app-pad-card);
+  border: 1px dashed var(--via-border);
+  border-radius: var(--app-radius-card);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+@media (max-width: 599px) {
+  .stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preenchido,
+  .degrau,
+  .marcador {
+    transition: none;
+  }
+
+  /* O núcleo sólido já marca o estado; o anel some. */
+  .aoVivoDot::after {
+    animation: none;
+    content: none;
+  }
+}
+
+/* O avanço fica ANCORADO À DIREITA e separado por uma hairline: ele fecha a
+   etapa, não faz parte do conteúdo dela. Sem a linha ele lia como mais um botão
+   do painel. */
+.avancoLinha {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--app-gap-block);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.avanco {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: 44px;
+  padding-inline: var(--via-space-6);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-white);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.avanco:hover {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
+}
+
+.avanco:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.avanco svg {
+  transition: transform var(--app-t-touch);
+}
+
+.avanco:hover svg {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avanco,
+  .avanco svg {
+    transition: none;
+  }
+
+  .avanco:hover svg {
+    transform: none;
+  }
+}

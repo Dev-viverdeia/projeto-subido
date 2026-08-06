@@ -1,0 +1,79 @@
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  flex-shrink: 0;
+  padding: 4px var(--via-space-2_5);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-06);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+  white-space: nowrap;
+}
+
+.estado[data-estado='em-andamento'] {
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  color: var(--via-accent-ink);
+}
+
+/* O ponto é do mesmo tom da tinta: em accent puro ele daria 2,49:1 sobre o véu e
+   sumiria — e um indicador que some é pior que nenhum. */
+.ponto {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--via-radius-pill);
+  background: currentcolor;
+}
+
+.estado[data-estado='concluida'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+/* ── SOBRE BANDA ESCURA ───────────────────────────────────────────────────────
+   A escala de cinza INVERTE aqui, e é a armadilha de contraste mais cara do
+   repo: sobre claro "mais quieto" é mais escuro; sobre `#0B162D`,
+   `--via-text-muted` cai para 3,45:1 e reprova AA a 10px.
+
+   `--via-gray-300` dá 12,2:1. E o accent PURO, banido sobre claro (2,70:1),
+   é justamente aqui que funciona: 6,52:1 sobre a navy. A pill "concluída"
+   inverte de vez — preenchimento claro, tinta navy —, senão navy sobre navy
+   desapareceria. */
+.estado[data-tom='onnavy'] {
+  background: color-mix(in srgb, var(--via-white) 10%, transparent);
+  color: var(--via-gray-300);
+}
+
+.estado[data-tom='onnavy'][data-estado='em-andamento'] {
+  background: color-mix(in srgb, var(--via-accent) 16%, transparent);
+  color: var(--via-accent);
+}
+
+.estado[data-tom='onnavy'][data-estado='concluida'] {
+  background: var(--via-gray-300);
+  color: var(--via-navy-deep);
+}
+
+/* ── SOBRE MÍDIA QUE NINGUÉM CONTROLA ────────────────────────────────────────
+   A capa da formação é upload do admin: pode ser clara, escura, lisa ou um
+   mosaico. Véu translúcido ali não tem contraste GARANTIDO, tem contraste
+   PROVÁVEL — e a diferença aparece justamente na capa que ninguém testou.
+   Fundo opaco + a sombra pequena que separa o selo da foto. */
+.estado[data-tom='midia'] {
+  background: var(--via-white);
+  color: var(--via-navy);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.estado[data-tom='midia'][data-estado='em-andamento'] {
+  color: var(--via-accent-ink);
+}
+
+.estado[data-tom='midia'][data-estado='concluida'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+}

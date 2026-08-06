@@ -4,6 +4,7 @@ import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { Compositor } from './_components/Compositor';
 import { HistoricoBuilder } from './_components/HistoricoBuilder';
+import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Builder' };
@@ -31,23 +32,21 @@ export default async function BuilderPage() {
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Builder" oculto />
 
+      {/* O histórico mora no CANTO SUPERIOR direito, sobreposto: um gatilho
+          compacto que abre o painel por cima da tela. A grade continua
+          server-rendered e atravessa como children — o dropdown só abre e
+          fecha. Sem projetos, nem o gatilho aparece. */}
+      {itens.length > 0 ? (
+        <div className={`${entrada.bloco} ${styles.topoDireito}`}>
+          <HistoricoDropdown total={itens.length}>
+            <HistoricoBuilder itens={itens} />
+          </HistoricoDropdown>
+        </div>
+      ) : null}
+
       <div className={entrada.bloco}>
         <Compositor />
       </div>
-
-      {itens.length > 0 ? (
-        <section
-          className={`${entrada.bloco} ${entrada.atraso1} ${styles.historico}`}
-          aria-labelledby="builder-projetos"
-        >
-          <h2 className={styles.eyebrow} id="builder-projetos">
-            Projetos recentes
-            <span className={styles.total}>{itens.length}</span>
-          </h2>
-
-          <HistoricoBuilder itens={itens} />
-        </section>
-      ) : null}
     </div>
   );
 }

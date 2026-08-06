@@ -1,0 +1,44 @@
+/* Certificados: canvas da área logada — a galeria é grade, gosta de área. */
+.pagina {
+  width: 100%;
+  max-width: var(--app-canvas);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+.cabeca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.titulo {
+  margin: 0;
+  font-size: var(--via-fs-h2);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+}
+
+.apoio {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  /* 50ch ÷ 1,369 da Outfit ≈ 68 caracteres — dentro da faixa de 45–75. */
+  max-width: 50ch;
+  text-wrap: pretty;
+}

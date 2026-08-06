@@ -1,0 +1,288 @@
+.criacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+.chamada {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  /* 52ch ≈ 71 caracteres na Outfit — o glifo `0` é ~37% mais LARGO que o caractere
+     médio, então o alvo real é caracteres ÷ 1,369 (eram 68 com a Geist). */
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.partes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+.parte {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  border: 1px solid var(--app-elev-1-line);
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    border-color var(--app-t-reveal),
+    background var(--app-t-reveal);
+}
+
+/* A parte EM CURSO é a única erguida — é onde o olho deve pousar. As demais
+   ficam no repouso, e a que ainda não começou perde a sombra: ela não é assunto
+   ainda, e a hierarquia é por elevação, não por borda colorida. */
+.parte[data-estado='fazendo'] {
+  border-color: var(--via-navy-22);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.parte[data-estado='espera'] {
+  background: var(--via-bg-2);
+  box-shadow: none;
+}
+
+.parteTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+}
+
+/* A marca ocupa o lugar mesmo vazia — sem isso o conteúdo salta no instante em
+   que o check aparece. */
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-border-hairline);
+  color: var(--via-white);
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.parte[data-estado='feito'] .marca {
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+}
+
+/* O check ENTRA com pop — mesma chegada do PainelEspera. `backwards` para não
+   sobrar transform residual (ver entrada.module.css). */
+.parte[data-estado='feito'] .marca svg {
+  animation: criacao-chegar var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+@keyframes criacao-chegar {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* A marca da parte EM CURSO ganha o ponto que respira — mesmo lugar onde o
+   check vai pousar. Navy, não accent: esta superfície é clara. */
+.parte[data-estado='fazendo'] .marca {
+  border-color: var(--via-navy-22);
+}
+
+.parte[data-estado='fazendo'] .marca::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  animation: criacao-pulsar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes criacao-pulsar {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.72);
+  }
+}
+
+.parteEstado {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.parte[data-estado='fazendo'] .parteEstado {
+  color: var(--via-accent-ink);
+}
+
+.parteTitulo {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-body);
+  color: var(--via-text-primary);
+}
+
+.parte[data-estado='espera'] .parteTitulo {
+  color: var(--via-text-muted);
+}
+
+.parteTexto {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+/* A LUZ QUE ATRAVESSA a barra da parte em curso. Ela NÃO mede progresso — não há
+   o que medir dentro de uma chamada —, ela diz "isto está em movimento". É por
+   isso que é um pulso que atravessa e volta, e não uma barra que enche: barra
+   enchendo prometeria uma porcentagem que ninguém calculou.
+
+   `animation` e não `transition`: é ambiente, não resposta a interação, e é essa
+   a divisão que o gate de identidade respeita. */
+.barra {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--via-navy-08);
+  overflow: hidden;
+}
+
+.barraLuz {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: var(--app-radius-track);
+  background: var(--via-accent-ink);
+  animation: atravessar 1.8s var(--via-ease) infinite;
+}
+
+@keyframes atravessar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* ── Falha ─────────────────────────────────────────────────────────────────── */
+.falha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+.falhaTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+}
+
+.acao,
+.secundaria {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-5);
+  border-radius: var(--app-radius-control);
+  font-family: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.acao {
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.acao:hover:not(:disabled) {
+  background: var(--via-navy-deep);
+  border-color: var(--via-navy-deep);
+}
+
+.secundaria {
+  border: 1px solid var(--via-border);
+  background: none;
+  color: var(--via-text-muted);
+}
+
+.secundaria:hover {
+  background: var(--via-navy-04);
+  color: var(--via-text-primary);
+}
+
+.acao:focus-visible,
+.secundaria:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.acao:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Estado FINAL, não animação rápida: a luz para parada à esquerda, e a barra
+     continua dizendo "esta é a parte em curso" pela cor. */
+  .barraLuz {
+    animation: none;
+  }
+
+  .parte[data-estado='fazendo'] .marca::before {
+    animation: none;
+  }
+
+  .parte[data-estado='feito'] .marca svg {
+    animation: none;
+  }
+
+  .parte,
+  .marca,
+  .acao,
+  .secundaria {
+    transition: none;
+  }
+}

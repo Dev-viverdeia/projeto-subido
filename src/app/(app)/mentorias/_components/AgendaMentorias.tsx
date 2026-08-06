@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
 import { ItemAgenda } from './ItemAgenda';
 import { chaveDoDia, rotuloDoDia } from './estadoMentoria';
@@ -24,43 +25,75 @@ export function AgendaMentorias({
   agora,
   agoraIso,
   estadoDaSessao,
+  gravando,
   aoAbrirDetalhe,
   aoFazerCheckin,
   aoCancelarCheckin,
 }: {
   /** Já vem só com as futuras (e a que está ao vivo), ordenadas. */
-  sessoes: MentoriaExemplo[];
+  sessoes: SessaoMentoria[];
   agora: Date;
   agoraIso: string;
-  estadoDaSessao: (s: MentoriaExemplo) => EstadoMentoria;
+  estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
+  /** Uma gravação em voo — trava os CTAs de todas as linhas. */
+  gravando: boolean;
   aoAbrirDetalhe: (id: string) => void;
   aoFazerCheckin: (id: string) => void;
   aoCancelarCheckin: (id: string) => void;
 }) {
-  /* "Hoje" só é o padrão se HOUVER hoje — abrir num filtro vazio é a forma mais
-     rápida de a tela parecer quebrada. */
-  const haHoje = useMemo(
-    () => sessoes.some((s) => chaveDoDia(s.inicioIso) === chaveDoDia(agoraIso)),
-    [sessoes, agoraIso],
-  );
-  const [filtro, setFiltro] = useState<FiltroDia>(haHoje ? 'hoje' : 'todas');
+  /* O padrão é TODAS, e já foi "hoje se houver hoje". Medido a 1920 com uma
+     sessão no dia: o cartão da próxima acima JÁ mostra essa sessão — a lista
+     abria repetindo o cartão numa linha de 66px e o resto da tela era vazio,
+     com "Todas 7" escondida atrás de um clique. O cartão é o agora; a lista
+     abre como panorama. "Hoje" continua a um clique, com contagem visível. */
+  const [filtro, setFiltro] = useState<FiltroDia>('todas');
 
-  const filtradas = useMemo(() => {
+  /**
+   * UMA REGRA SÓ, consultada duas vezes: para filtrar a lista e para contar cada
+   * aba. Escrever a contagem como um segundo `filter` — o caminho curto — daria
+   * dois lugares para a mesma pergunta, e eles divergiriam no primeiro ajuste de
+   * borda (o que conta como "esta semana"?). A aba diria 3 e a lista mostraria 2.
+   */
+  const pertence = useMemo(() => {
     const hoje = chaveDoDia(agoraIso);
     const amanha = chaveDoDia(new Date(agora.getTime() + DIA_MS).toISOString());
     const fimSemana = agora.getTime() + 7 * DIA_MS;
 
-    return sessoes.filter((s) => {
-      if (filtro === 'todas') return true;
+    return (alvo: FiltroDia, s: SessaoMentoria) => {
+      if (alvo === 'todas') return true;
       const dia = chaveDoDia(s.inicioIso);
-      if (filtro === 'hoje') return dia === hoje;
-      if (filtro === 'amanha') return dia === amanha;
+      if (alvo === 'hoje') return dia === hoje;
+      if (alvo === 'amanha') return dia === amanha;
       return new Date(s.inicioIso).getTime() <= fimSemana;
-    });
-  }, [sessoes, filtro, agora, agoraIso]);
+    };
+  }, [agora, agoraIso]);
+
+  const filtradas = useMemo(
+    () => sessoes.filter((s) => pertence(filtro, s)),
+    [sessoes, filtro, pertence],
+  );
+
+  /* A contagem responde "vale a pena clicar?" ANTES do clique — o mesmo
+     argumento que o `ControleSegmentado` já carregava e que estas abas não
+     tinham. Sem ela, descobrir que "Amanhã" está vazio custa uma navegação. */
+  const abas = useMemo(
+    () =>
+      (
+        [
+          { id: 'hoje', rotulo: 'Hoje' },
+          { id: 'amanha', rotulo: 'Amanhã' },
+          { id: 'semana', rotulo: 'Esta semana' },
+          { id: 'todas', rotulo: 'Todas' },
+        ] as const
+      ).map((a) => ({
+        ...a,
+        total: sessoes.reduce((n, s) => (pertence(a.id, s) ? n + 1 : n), 0),
+      })),
+    [sessoes, pertence],
+  );
 
   const porDia = useMemo(() => {
-    const grupos = new Map<string, MentoriaExemplo[]>();
+    const grupos = new Map<string, SessaoMentoria[]>();
     for (const s of filtradas) {
       const chave = chaveDoDia(s.inicioIso);
       grupos.set(chave, [...(grupos.get(chave) ?? []), s]);
@@ -72,20 +105,12 @@ export function AgendaMentorias({
     <div className={styles.raiz}>
       <div className={styles.filtro}>
         <AbasFiltro
-          abas={[
-            { id: 'hoje', rotulo: 'Hoje' },
-            { id: 'amanha', rotulo: 'Amanhã' },
-            { id: 'semana', rotulo: 'Esta semana' },
-            { id: 'todas', rotulo: 'Todas' },
-          ]}
+          abas={abas}
           ativa={filtro}
           aoMudar={(id) => setFiltro(id as FiltroDia)}
           layoutId="mentorias-filtro-dia"
           ariaLabel="Filtrar por dia"
         />
-        <p className={styles.contagem} aria-live="polite">
-          {filtradas.length} {filtradas.length === 1 ? 'agendada' : 'agendadas'}
-        </p>
       </div>
 
       {porDia.length === 0 ? (
@@ -112,6 +137,7 @@ export function AgendaMentorias({
                       key={s.id}
                       sessao={s}
                       estado={estadoDaSessao(s)}
+                      gravando={gravando}
                       agora={agora}
                       aoAbrirDetalhe={() => aoAbrirDetalhe(s.id)}
                       aoFazerCheckin={() => aoFazerCheckin(s.id)}

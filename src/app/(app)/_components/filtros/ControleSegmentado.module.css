@@ -1,6 +1,6 @@
-/* Controle segmentado: o trilho é a superfície recuada, o polegar é a superfície
-   ERGUIDA. É o triplo de elevação fazendo o trabalho — fundo, hairline e sombra
-   andando juntos —, e não uma sombra escolhida sozinha. */
+/* O trilho é a superfície RECUADA; o polegar é a ERGUIDA. É o triplo de elevação
+   fazendo o trabalho — fundo, hairline e sombra andando juntos —, e não uma sombra
+   escolhida sozinha. */
 .trilho {
   display: inline-flex;
   align-items: center;
@@ -9,6 +9,26 @@
   border-radius: var(--via-radius-pill);
   background: var(--via-bg-2);
   border: 1px solid var(--via-border-hairline);
+  /* Numa linha com busca ao lado, sem isto o trilho encolhe e os rótulos
+     quebram. Ele tem largura de conteúdo e não cede. */
+  flex-shrink: 0;
+  /* Muitas categorias numa tela estreita: rola em vez de quebrar a linha. */
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.trilho[data-largura] {
+  display: flex;
+  width: 100%;
+}
+
+.trilho[data-largura] .opcao {
+  flex: 1;
 }
 
 .opcao {
@@ -71,12 +91,27 @@
   color: var(--via-navy);
 }
 
-@media (max-width: 599px) {
-  .trilho {
-    width: 100%;
-  }
+.total {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
 
+.opcao[data-ativa] .total {
+  color: var(--via-text-muted);
+}
+
+/* O anel do DS é box-shadow com especificidade zero e o polegar já usa box-shadow
+   — sem esta redeclaração, focar uma opção não mostra nada. */
+.opcao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
   .opcao {
-    flex: 1;
+    transition: none;
   }
 }

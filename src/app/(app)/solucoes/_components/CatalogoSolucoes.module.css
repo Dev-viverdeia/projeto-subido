@@ -1,94 +1,12 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-grid);
+  gap: var(--via-space-4);
 }
 
-.apresentacao {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--via-space-8);
-  padding: var(--via-space-2) var(--via-space-1) var(--via-space-5);
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
-.apresentacaoTexto {
-  max-width: 680px;
-}
-
-.marcador {
-  margin: 0 0 var(--via-space-2);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-accent-ink);
-}
-
-.tituloPagina {
-  margin: 0;
-  font-size: clamp(var(--via-fs-h3), 2vw, var(--via-fs-h2));
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-}
-
-.descricaoPagina {
-  max-width: 60ch;
-  margin: var(--via-space-2) 0 0;
-  font-size: var(--via-fs-caption);
-  line-height: 1.6;
-  color: var(--via-text-muted);
-}
-
-.placar {
-  display: flex;
-  flex: none;
-  align-items: baseline;
-  gap: var(--via-space-2);
-  padding: 0 var(--via-space-1) var(--via-space-1) var(--via-space-5);
-  border-left: 1px solid var(--via-border-hairline);
-  color: var(--via-text-primary);
-  white-space: nowrap;
-}
-
-.placar strong {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-h4);
-  font-weight: var(--via-fw-medium);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.placar span {
-  font-size: var(--via-fs-micro);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-faint);
-}
-
-.painelDescoberta {
-  --catalogo-busca-largura: 300px;
-  --catalogo-controle-altura: 40px;
-  --catalogo-controle-borda: var(--via-border-hairline);
-  --catalogo-controle-raio: var(--app-radius-control);
-  --catalogo-controle-fonte: var(--via-fs-caption);
-  --catalogo-controle-hover: var(--via-bg-2);
-  --catalogo-controle-ativo: var(--via-bg-2);
-  --catalogo-painel-raio: var(--app-radius-card);
-  --catalogo-aba-padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
-  --catalogo-aba-fonte: var(--via-fs-caption);
-  --catalogo-aba-sublinhado: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-  padding: 0 0 var(--via-space-3);
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
-/* A régua de descoberta: abas à esquerda, busca + facetas à direita. O z-index
-   garante que o painel de facetas abra sobre a grade. */
+/* A régua de descoberta: abas à esquerda, busca + facetas à direita, sobre uma
+   hairline única. `fill-mode: forwards` da cascata cria stacking context — o
+   z-index garante que o painel de facetas abra SOBRE a grade. */
 .regua {
   position: relative;
   z-index: 10;
@@ -96,71 +14,39 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 46px;
 }
 
+/* A busca declara `min(320px, 100%)`, mas como item de flex ela encolhia até
+   240 e cortava o placeholder. `flex-shrink: 0` no grupo devolve a largura que o
+   componente pediu — há folga de sobra nesta linha. */
 .reguaDireita {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: var(--via-space-2);
   flex: none;
 }
 
-.linhaMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  /* Âncora do scroll da paginação: para sob o cabeçalho sticky, não atrás. */
+/* Âncora invisível: o scroll da paginação precisa parar no topo da grade, e a
+   faixa que servia de referência deixou de existir. Altura zero, sem conteúdo. */
+.ancoraGrade {
   scroll-margin-top: 84px;
 }
 
-.contagem {
-  margin: 0;
+/* A busca ganhou linha própria. Na régua ela dividia espaço com dois trilhos
+   segmentados e as três coisas encolhiam: o trilho de categorias tem largura de
+   conteúdo e não cede, então quem cedia era o campo — 240px e placeholder
+   cortado. */
+.linhaBusca {
+  display: flex;
+}
+
+.ordenarRotulo {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.ordenacao {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 2px;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
-}
-
-.ordenar {
-  border: none;
-  background: transparent;
-  min-height: 28px;
-  padding: var(--via-space-1) var(--via-space-2_5);
-  border-radius: calc(var(--app-radius-control) - 2px);
-  font-family: inherit;
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  cursor: pointer;
-  transition:
-    color var(--via-t-fast),
-    background-color var(--via-t-fast),
-    box-shadow var(--via-t-fast);
-}
-
-.ordenar:hover {
-  color: var(--via-text-body);
-}
-
-.ordenar[data-ativo] {
-  color: var(--via-text-primary);
-  background: var(--via-bg-2);
-  box-shadow: none;
-}
-
-.ordenar:focus-visible {
-  box-shadow: var(--app-ring);
 }
 
 /* Largura maior GANHA COLUNA, não engorda card: a 1600 com 3 colunas o card iria
@@ -202,19 +88,6 @@
 }
 
 @media (max-width: 767px) {
-  .apresentacao {
-    align-items: flex-start;
-    padding: var(--via-space-1) 0 var(--via-space-4);
-  }
-
-  .placar {
-    padding: var(--via-space-1) 0 var(--via-space-1) var(--via-space-4);
-  }
-
-  .painelDescoberta {
-    padding-bottom: var(--via-space-3);
-  }
-
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -223,44 +96,79 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--via-space-2);
-    padding-bottom: var(--via-space-2);
+    padding-bottom: var(--via-space-3);
   }
 
+  /* A busca declara `min(320px, 100%)`, mas como item de flex ela encolhia até
+   240 e cortava o placeholder. `flex-shrink: 0` no grupo devolve a largura que o
+   componente pediu — há folga de sobra nesta linha. */
   .reguaDireita {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    width: 100%;
-  }
-
-  .reguaDireita > :first-child {
-    width: 100%;
+    flex-shrink: 0;
+    justify-content: space-between;
   }
 }
 
-@media (max-width: 479px) {
-  .apresentacao {
-    flex-direction: column;
-    gap: var(--via-space-3);
-  }
-
-  .placar {
-    padding: 0;
-    border-left: 0;
-  }
-}
-
+/* CENTRADO e empilhado: contagem em cima, páginas embaixo, ambas no eixo da
+   grade. Antes era `space-between`, com a contagem colada à esquerda e as páginas
+   à direita — dois cantos opostos para duas informações que descrevem a MESMA
+   coisa, e o olho tinha de atravessar a tela para juntar as duas. */
 .rodapePaginas {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  flex-wrap: wrap;
+  gap: var(--app-gap-block);
+  padding-top: var(--app-gap-block);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .mostrando {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  justify-content: center;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
+}
+
+.separador {
+  color: var(--via-border);
+}
+
+/* Link tipográfico, não botão: a ação é de navegação dentro da própria lista, e
+   um preenchimento aqui competiria com a paginação logo abaixo. */
+.verTodas {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--via-accent-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--app-t-state);
+}
+
+.verTodas:hover {
+  text-decoration-color: currentcolor;
+}
+
+.verTodas:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-track);
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verTodas {
+    transition: none;
+  }
 }

@@ -1,44 +1,89 @@
 .cartao {
+  position: relative;
+  /* `overflow: hidden` porque a barra de progresso encosta na borda inferior e
+     precisa acompanhar o raio do card. */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 286px;
+  min-height: 196px;
   padding: var(--via-space-5);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--via-shadow-xs);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-lg);
+  background: var(--via-glass-card);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--via-shadow-sm);
   color: inherit;
   text-decoration: none;
   transition:
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-state);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
+  }
 }
 
 .cartao:hover {
-  border-color: var(--app-elev-2-line);
-  box-shadow: var(--via-shadow-sm);
-  text-decoration: none;
+  transform: translateY(-3px);
+  box-shadow: var(--via-shadow-lg);
 }
 
+/* O anel COMPÕE com a sombra de repouso, e a vírgula é a correção. Sozinho, ele
+   substituía o `box-shadow` inteiro: o card perdia a elevação e ACHATAVA no
+   instante em que recebia foco de teclado — só quem navega por Tab via o defeito.
+   É literalmente a receita do CLAUDE.md (`var(--app-ring), var(--app-elev-1-shadow)`),
+   que existe por causa deste caso. */
 .cartao:focus-visible {
-  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
-  text-decoration: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
-.categoria {
-  margin: 0 0 var(--via-space-3);
+/* O topo é uma linha só: glifo, categoria e — quando há — o estado à direita.
+   Antes o glifo era bloco e a categoria vinha embaixo; com a pill entrando, três
+   elementos empilhados comiam 40px da altura útil do card. */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+  margin-bottom: var(--via-space-3);
+}
+
+.glifo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  transition: transform var(--app-t-touch);
+}
+
+.cartao:hover .glifo {
+  transform: scale(1.08);
+}
+
+.eyebrow {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-accent-ink);
+  font-size: 0.656rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
 }
 
 .titulo {
-  max-width: 22ch;
-  margin: 0 0 var(--via-space-2);
-  font-size: var(--via-fs-h4);
+  margin: 0 0 var(--via-space-1_5);
+  font-size: var(--via-fs-body);
   font-weight: 560;
-  letter-spacing: var(--app-ls-h4);
+  letter-spacing: var(--app-ls-body);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
   display: -webkit-box;
@@ -50,7 +95,7 @@
 .resumo {
   margin: 0;
   font-size: var(--via-fs-caption);
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--via-text-muted);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -58,93 +103,125 @@
   overflow: hidden;
 }
 
-.ferramentas {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--via-space-1_5);
-  margin-top: var(--via-space-4);
-}
-
-.ferramenta,
-.mais {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding-inline: var(--via-space-2);
-  border-radius: var(--app-radius-chip);
-  background: var(--via-bg-2);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-}
-
-.mais {
-  min-width: 24px;
-  justify-content: center;
-  padding-inline: var(--via-space-1_5);
-  font-family: var(--via-font-mono);
-  color: var(--via-text-faint);
-}
-
 .vao {
   flex: 1;
-  min-height: var(--via-space-5);
+  min-height: var(--via-space-3);
+}
+
+.fio {
+  margin: 0 0 var(--via-space-3);
+  border: none;
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .rodape {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--via-space-4);
+  gap: var(--via-space-3);
 }
 
-.metricas {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  min-width: 0;
-}
-
-.metrica {
+.contagens {
   display: inline-flex;
   align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: 0.625rem;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* TRÊS ESTADOS, e nenhum verde/vermelho de semáforo — que é banido. A escada é de
+   INTENSIDADE: não iniciada é o degrau mais quieto (navy translúcido), em
+   andamento acende no accent, concluída fecha no navy sólido.
+
+   OS NÚMEROS, medidos antes de escolher (texto de 10px exige 4,5:1):
+   · não iniciada — text-muted sobre navy 6%: 7,04:1
+   · em andamento — accent-ink sobre accent 8%: 4,66:1
+     (a 12% cai para 4,47 e reprova; 8% é o teto seguro, não gosto)
+   · concluída    — branco sobre navy: 18:1
+   O accent aparece aqui SOBRE CLARO, o que a regra da casa restringe — mas a
+   restrição é contra accent como TINTA de texto ou fundo de área grande. Aqui o
+   fundo é um véu de 8% numa pill de 10px e a tinta é `accent-ink`, a única
+   variante que a marca declara legível sobre claro. */
+/* O SELO vem do `PillEstado` — a aparência mora lá, e o que sobra aqui é só a
+   POSIÇÃO dele neste card. É o único elemento do topo que não desce com o texto:
+   alinhado ao topo, fica na mesma altura do glifo em todos os cards, e a coluna
+   de estado passa a ser uma linha reta na grade inteira. */
+.selo {
+  margin-left: auto;
+  align-self: flex-start;
+}
+
+/* As MARCAS de ferramenta: iniciais derivadas do nome, sobrepostas com um anel da
+   cor do card para separá-las. Não são logotipos — o banco só guarda o nome —, e
+   é por isso que a contagem escrita continua ao lado: a marca dá textura, o número
+   dá o fato. */
+.marcas {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--via-radius-pill);
+  /* CLARO e quieto, não o Avatar do DS — que é navy sólido com tinta branca e,
+     repetido três vezes no rodapé, puxava o olho para longe do título. A marca é
+     textura; a contagem ao lado é o fato. */
+  background: var(--via-navy-06);
+  border: 1.5px solid var(--app-elev-1-bg);
+  font-family: var(--via-font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0;
   color: var(--via-text-muted);
+}
+
+.marca + .marca {
+  margin-left: -6px;
+}
+
+.etapas {
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.metrica + .metrica::before {
-  content: '/';
-  margin-right: var(--via-space-3);
-  color: var(--via-border-strong);
+/* Barra na BORDA do card. 3px: fina o bastante para ler como estado do objeto e
+   não como seção dele. */
+.trilho {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--via-navy-08);
 }
 
-.abrir {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  flex: none;
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-  transition: color var(--app-t-state);
+.barra {
+  display: block;
+  height: 100%;
+  /* `scaleX` a partir da esquerda, nunca `width`: width dispara layout a cada
+     frame; transform fica no compositor. */
+  transform-origin: left center;
+  background: var(--via-accent-ink);
+  transition: transform var(--app-t-reveal);
 }
 
-.cartao:hover .abrir {
-  color: var(--via-accent-ink);
+.cartao[data-estado='concluida'] .barra {
+  background: var(--via-navy);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
-  .abrir {
+  .glifo,
+  .barra {
     transition: none;
-  }
-}
-
-@media (max-width: 479px) {
-  .cartao {
-    min-height: 270px;
   }
 }

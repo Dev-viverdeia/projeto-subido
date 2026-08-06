@@ -9,39 +9,18 @@
   gap: var(--via-space-8);
 }
 
-/* Folga grande antes do histórico: ele é o segundo assunto da tela, e o
-   compositor precisa terminar antes de o olho encontrar o próximo. */
-.historico {
+/* O CANTO do histórico. Altura ZERO de propósito: o gatilho flutua no canto sem
+   empurrar o compositor um pixel para baixo — a tela de criação continua com a
+   mesma dobra de quando não há projeto nenhum. O painel que abre é
+   position:absolute dentro do dropdown, então também não entra no fluxo. */
+.topoDireito {
+  position: relative;
+  z-index: 20;
+  height: 0;
   display: flex;
-  flex-direction: column;
-  gap: var(--via-space-5);
-  padding-top: var(--via-space-6);
-  border-top: 1px solid var(--via-border-hairline);
-}
-
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  margin: 0;
-  font-size: var(--via-fs-h4);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-h4);
-  color: var(--via-text-primary);
-}
-
-.total {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding-inline: var(--via-space-1_5);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-bg-2);
-  color: var(--via-text-muted);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
+  justify-content: flex-end;
+  /* `flex-start`, senão o stretch padrão estica o filho para os 0px do contêiner
+     e o painel — ancorado em `top: 100%` do filho — nasce COBRINDO o gatilho.
+     Medido: 30px de sobreposição antes desta linha. */
+  align-items: flex-start;
 }

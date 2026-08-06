@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Drawer, Progress } from '@/design-system/via';
+import { Button, Drawer } from '@/design-system/via';
 import type { FormacaoCompleta } from '@/lib/conteudo/queries';
+import { TrilhoProgresso } from '../../_components/TrilhoProgresso';
 import { formatarDuracao } from '../../_components/tempo';
 import { useCurriculo } from './useCurriculo';
 import styles from './PlaylistAula.module.css';
@@ -15,6 +16,13 @@ import styles from './PlaylistAula.module.css';
  *
  * O módulo da aula ATUAL abre sozinho quando a rota muda, e a linha atual entra
  * na área visível — respeitando reduced-motion no scroll.
+ *
+ * SEM "VOCÊ ESTÁ AQUI" AQUI, e a razão é de significado, não de espaço. No
+ * currículo do curso esse marcador quer dizer "a próxima aula não assistida"; na
+ * playlist, a aula em foco é a que está ABERTA, que pode ser qualquer uma —
+ * inclusive uma revisão. O mesmo selo com dois sentidos, nas duas listas do mesmo
+ * curso, ensina a pessoa a desconfiar dele. A aula aberta já é marcada por
+ * `aria-current="page"` e por `data-atual`, que é o que ela significa.
  */
 function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtualId: string }) {
   const curriculo = useCurriculo(formacao);
@@ -43,18 +51,19 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
 
   return (
     <div className={styles.painel}>
-      <header className={styles.topo}>
-        <p className={styles.eyebrow}>Progresso do curso</p>
-        <Progress
-          value={curriculo.pct}
-          tone="navy"
-          size="sm"
-          ariaLabel={`${curriculo.feitas} de ${curriculo.total} aulas concluídas`}
+      {/* O MESMO trilho do curso, na variante densa. Aqui existiam um `Progress`
+          do DS, um eyebrow com outro nome ("Progresso do curso") e uma contagem
+          própria — uma TERCEIRA maneira de desenhar o número que o curso e o
+          catálogo já desenhavam de dois jeitos. */}
+      <div className={styles.topo}>
+        <TrilhoProgresso
+          itens={curriculo.planas}
+          feitasIds={curriculo.feitasIds}
+          proximo={curriculo.proxima}
+          unidade={{ singular: 'aula', plural: 'aulas' }}
+          denso
         />
-        <p className={styles.contagem}>
-          {curriculo.feitas} de {curriculo.total} aulas
-        </p>
-      </header>
+      </div>
 
       <div className={styles.modulos}>
         {curriculo.modulos.map(({ modulo, aulas }, indice) => {

@@ -160,7 +160,7 @@ schema:
 · titulo até 120 caracteres · resumo até 400 · viabilidade.justificativa até 800
 · arquitetura até 2500 caracteres, em prosa
 · ferramentas: de 1 a 10, nome até 60, papel até 400
-· etapas: de 3 a 12, titulo até 120, descricao até 1200, até 8 ferramentas por etapa
+· etapas: de 3 a 12, titulo até 120, descricao até 1200, até 8 ferramentas por etapa, fase de 1 a 3
 · prompts: até 6, titulo até 120, conteudo até 4000
 · riscos: de 1 a 6, risco até 300, mitigacao até 400
 · economia.horas_por_mes: inteiro de 0 a 720 · economia.premissas: de 1 a 6, cada uma até 300
@@ -174,6 +174,13 @@ O que faz este documento valer:
 · As ETAPAS são executáveis por quem nunca viu o projeto. "Configurar o webhook"
   não é etapa; "criar o webhook no n8n apontando para o endpoint X e testar com um
   payload de exemplo" é.
+· Cada etapa declara sua FASE, e a ordem das fases é a ordem de execução:
+    1 · fundação — o que precisa existir antes de qualquer coisa funcionar
+        (contas, banco, credenciais, esqueleto)
+    2 · construção — o que faz a solução funcionar de verdade
+    3 · polimento e lançamento — o que a deixa confiável e no ar
+  Toda fase declarada precisa ter pelo menos uma etapa: não pule a 2 nem entregue
+  um projeto inteiro na 1.
 · Os PROMPTS vêm prontos para colar, escritos para a tarefa específica — não
   modelos genéricos com colchetes para preencher.
 · A ARQUITETURA descreve o caminho do dado da entrada até a saída, dizendo onde
@@ -195,11 +202,6 @@ O que faz este documento valer:
        mais: com saída estruturada, um documento que não passa no schema faz o
        próprio SDK lançar na montagem da mensagem final — e aí nem o `stop_reason`
        nem o JSON bruto estão ao alcance.
-
-       `cortadoPorTokens` é guarda para o teto de `max_tokens`, e não é a falha que
-       aconteceu nas duas corridas medidas: `stop_reason` veio diferente de
-       `max_tokens` nas duas. Fica porque o modo existe e a mensagem dele é outra.
-
        `bruto` é o que resolve a falha REAL — ver `comDetalheDeSchema`. */
     let cortadoPorTokens = false;
     let bruto = '';
@@ -246,12 +248,7 @@ O que faz este documento valer:
  * JSON íntegro, com todos os campos, e o documento é recusado por um teto que ele
  * nunca viu. A mensagem genérica ("voltou incompleto e não passou na validação")
  * mandava tentar de novo contra um limite invisível, e a segunda tentativa falhava
- * igual — o `erro` no banco não distinguia isso de JSON truncado.
- *
- * Por isso o JSON bruto é acumulado do stream e reconferido aqui: os `issues` do
- * Zod trazem o CAMINHO do campo, que é justamente o que faltava. São nomes do nosso
- * próprio schema (`arquitetura`, `etapas.4.descricao`) — não é `error.message` cru
- * de PostgREST, é vocabulário desta casa.
+ * igual. Os `issues` do Zod trazem o CAMINHO do campo, que é o que faltava.
  */
 function comDetalheDeSchema(erro: unknown, bruto: string): unknown {
   if (!bruto) return erro;
@@ -267,8 +264,7 @@ function comDetalheDeSchema(erro: unknown, bruto: string): unknown {
   const conferido = DocumentoSolucao.safeParse(json);
   if (conferido.success) return erro;
 
-  /* `Set` porque um array fora do tamanho gera um issue por item, e a mensagem não
-     precisa repetir o mesmo campo seis vezes. */
+  /* `Set` porque um array fora do tamanho gera um issue por item. */
   const campos = [...new Set(conferido.error.issues.map((i) => i.path.join('.') || '(raiz)'))];
   const mostrados = campos.slice(0, 4).join(', ');
   const resto = campos.length > 4 ? ` e mais ${campos.length - 4}` : '';

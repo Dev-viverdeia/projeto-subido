@@ -19,11 +19,13 @@ import styles from './HistoricoBuilder.module.css';
 export function HistoricoBuilder({ itens }: { itens: ItemHistorico[] }) {
   return (
     <ul className={styles.grade}>
-      {itens.map((item) => {
+      {itens.map((item, indice) => {
         const pronta = item.status === 'pronta';
 
         return (
-          <li key={item.id}>
+          /* `--i` é só dado de ordem: quem decide se (e como) ele vira atraso de
+             cascata é o wrapper — hoje, o HistoricoDropdown. */
+          <li key={item.id} style={{ '--i': indice } as React.CSSProperties}>
             <Link href={`/builder/${item.id}`} className={styles.cartao}>
               <div className={styles.topo}>
                 <span className={styles.data}>{dataCurta(item.criadoEm)}</span>

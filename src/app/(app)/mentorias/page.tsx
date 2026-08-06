@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { gerarAgendaExemplo } from '@/content/mentorias';
+import { listarAgenda } from '@/lib/mentorias/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { lerVistaInicial } from '../_components/filtros/urlFiltros';
@@ -9,26 +9,28 @@ import styles from './pagina.module.css';
 export const metadata: Metadata = { title: 'Mentorias' };
 
 /**
- * Agenda de mentorias.
+ * Agenda de mentorias — do BANCO.
  *
- * A rota é dinâmica, então `new Date()` aqui é o instante real de cada visita; a
- * agenda de exemplo se posiciona em volta dele para todos os estados da matriz
- * ficarem visíveis.
+ * O BLOQUEIO QUE ESTA PÁGINA CARREGAVA CAIU. Até aqui a agenda vinha de
+ * `gerarAgendaExemplo(new Date())`, que posicionava sessões em volta do instante
+ * da visita: horário, vagas e lotação inventados a cada request. O comentário
+ * que morava aqui dizia, com todas as letras, que a tela não podia ir ao ar para
+ * assinante nesse estado. Agora ela lê `mentorias`/`mentores`/`mentoria_inscricoes`
+ * e o que aparece é o que existe.
  *
- * TODO(backend) — A AGENDA AINDA É DE DEMONSTRAÇÃO. O aviso visível que dizia
- * isso foi removido a pedido, e com ele a única indicação, para quem usa, de que
- * estas sessões são exemplo. Enquanto `gerarAgendaExemplo` for a fonte, esta tela
- * NÃO pode ir ao ar para assinante: ou a tabela real entra antes, ou o aviso
- * volta. Horário, vagas e lotação aqui são inventados, e a tela inteira se apoia
- * em atribuição.
+ * A rota é dinâmica, então `new Date()` é o instante real de cada visita — é ele
+ * que decide o que está ao vivo, o que já encerrou e onde a janela de check-in
+ * abriu. Nada disso é flag gravada.
+ *
+ * NASCE VAZIA, e isso é o certo: não há mentoria cadastrada ainda. O estado
+ * vazio é a tela honesta até a primeira sessão entrar pelo admin.
  *
  * O cabeçalho fica FORA do `entrada.bloco`: oculto ele não tem o que animar, e um
  * wrapper de altura zero continua sendo item flex e comeria o `gap` da página.
  */
 export default async function MentoriasPage({ searchParams }: PageProps<'/mentorias'>) {
   const agora = new Date();
-  const vista = lerVistaInicial(await searchParams);
-  const sessoes = gerarAgendaExemplo(agora);
+  const [vista, sessoes] = await Promise.all([searchParams.then(lerVistaInicial), listarAgenda()]);
 
   return (
     <div className={styles.pagina}>

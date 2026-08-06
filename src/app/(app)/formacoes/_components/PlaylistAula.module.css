@@ -23,29 +23,12 @@
   scrollbar-width: thin;
 }
 
+/* Só a moldura do topo do painel: o conteúdo é o `TrilhoProgresso` denso, que
+   traz o próprio espaçamento. As regras de eyebrow e contagem que moravam aqui
+   saíram junto com a versão local do progresso. */
 .topo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
   padding: var(--via-space-4);
   border-bottom: 1px solid var(--via-border-hairline);
-}
-
-.eyebrow {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.contagem {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  font-variant-numeric: tabular-nums;
 }
 
 .modulos {

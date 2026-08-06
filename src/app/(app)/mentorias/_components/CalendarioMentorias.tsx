@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { mentorPorId } from '@/content/mentorias';
-import { TRILHAS } from '@/content/mentorias/types';
-import type { Trilha } from '@/content/mentorias/types';
-import type { EstadoMentoria, MentoriaExemplo } from '@/content/mentorias/types';
+import { TRILHAS } from '@/lib/mentorias/tipos';
+import { RetratoMentor } from '../../_components/RetratoMentor';
+import type { TrilhaMentor } from '@/lib/mentorias/tipos';
+import type { SessaoMentoria } from '@/lib/mentorias/tipos';
+import type { EstadoMentoria } from './estadoMentoria';
 import { chaveDoDia, horaCurta } from './estadoMentoria';
 import styles from './CalendarioMentorias.module.css';
 
@@ -68,16 +69,16 @@ export function CalendarioMentorias({
   aoAbrirDetalhe,
 }: {
   /** TODAS as sessões, inclusive encerradas: navegar para trás tem que mostrar o passado. */
-  sessoes: MentoriaExemplo[];
+  sessoes: SessaoMentoria[];
   agora: Date;
-  estadoDaSessao: (s: MentoriaExemplo) => EstadoMentoria;
+  estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
   aoAbrirDetalhe: (id: string) => void;
 }) {
   const [ref, setRef] = useState({ ano: agora.getFullYear(), mes: agora.getMonth() });
   const [selecionado, setSelecionado] = useState<string>(chaveDoDia(agora.toISOString()));
 
   const porDia = useMemo(() => {
-    const mapa = new Map<string, MentoriaExemplo[]>();
+    const mapa = new Map<string, SessaoMentoria[]>();
     for (const s of sessoes) {
       const chave = chaveDoDia(s.inicioIso);
       mapa.set(chave, [...(mapa.get(chave) ?? []), s]);
@@ -112,15 +113,17 @@ export function CalendarioMentorias({
   }, [doDia, dataSelecionada, sessoes]);
 
   /* Quantas sessões cada trilha tem no mês VISÍVEL. Alimenta a legenda, que
-     existe porque a célula mostra siglas (IMP/TRF/COM/PRD) e sigla sem legenda é
-     charada. E resolve, com informação de verdade, a calha morta que sobrava sob
-     o painel do dia. */
+     existe porque a célula codifica a trilha em COR — e cor sem legenda é
+     charada. (O comentário antigo dizia que a célula mostrava siglas; ela nunca
+     mostrou. Mostrava as iniciais do MENTOR, que é outra coisa e não informava
+     nada.) E resolve, com informação de verdade, a calha morta que sobrava sob o
+     painel do dia. */
   const porTrilhaNoMes = useMemo(() => {
-    const conta = new Map<Trilha, number>();
+    const conta = new Map<TrilhaMentor, number>();
     for (const s of sessoes) {
       const d = new Date(s.inicioIso);
       if (d.getFullYear() !== ref.ano || d.getMonth() !== ref.mes) continue;
-      const t = mentorPorId(s.mentorId)?.trilha;
+      const t = s.mentor?.trilha;
       if (t) conta.set(t, (conta.get(t) ?? 0) + 1);
     }
     return conta;
@@ -139,7 +142,7 @@ export function CalendarioMentorias({
   const noMesAtual = ref.ano === agora.getFullYear() && ref.mes === agora.getMonth();
   const dataObj = dataSelecionada ? new Date(dataSelecionada.iso) : null;
 
-  const irPara = (s: MentoriaExemplo) => {
+  const irPara = (s: SessaoMentoria) => {
     const d = new Date(s.inicioIso);
     setRef({ ano: d.getFullYear(), mes: d.getMonth() });
     setSelecionado(chaveDoDia(s.inicioIso));
@@ -187,35 +190,71 @@ export function CalendarioMentorias({
           const lista = porDia.get(c.chave) ?? [];
           const aoVivo = lista.some((s) => estadoDaSessao(s) === 'ao-vivo');
           return (
-            <button
+            <div
               key={c.chave}
-              type="button"
               role="gridcell"
               className={styles.celula}
               data-fora={!c.doMes ? '' : undefined}
               data-hoje={c.hoje ? '' : undefined}
               data-sel={c.chave === selecionado ? '' : undefined}
               aria-selected={c.chave === selecionado}
-              onClick={() => setSelecionado(c.chave)}
             >
+              {/* A CÉLULA DEIXOU DE SER BOTÃO. Ela era `<button>` com os chips das
+                  sessões DENTRO — controle interativo aninhado, o mesmo defeito
+                  que a linha da agenda tinha: clicar na sessão não abria a
+                  sessão, selecionava o dia, e por teclado nem isso.
+
+                  Padrão de sobreposição, igual ao da agenda: quem seleciona o dia
+                  é o botão do NÚMERO, cujo `::after` cobre a célula inteira. Os
+                  chips sobem com `position: relative` e ficam ACIMA dessa
+                  sobreposição — cada um recebe o próprio clique e abre a ficha,
+                  sem `stopPropagation` e sem aninhamento. */}
               <span className={styles.topo}>
-                <span className={styles.numero}>{c.dia}</span>
+                <button
+                  type="button"
+                  className={styles.numero}
+                  onClick={() => setSelecionado(c.chave)}
+                  aria-label={`${c.dia} — ${
+                    lista.length === 0
+                      ? 'sem mentoria'
+                      : `${lista.length} ${lista.length === 1 ? 'mentoria' : 'mentorias'}`
+                  }`}
+                >
+                  {c.dia}
+                </button>
                 {aoVivo && <span className={styles.pontoVivo} aria-hidden="true" />}
               </span>
 
               <span className={styles.marcas}>
-                {lista.slice(0, 2).map((s) => {
-                  const mentor = mentorPorId(s.mentorId);
-                  return (
-                    <span key={s.id} className={styles.marca} data-trilha={mentor?.trilha}>
-                      <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
-                      <span className={styles.marcaTrilha}>{mentor?.iniciais}</span>
-                    </span>
-                  );
-                })}
-                {lista.length > 2 && <span className={styles.mais}>+{lista.length - 2} mais</span>}
+                {lista.slice(0, 2).map((s) => (
+                  /* HORA + TÍTULO. Antes eram hora + iniciais do mentor, e as
+                     iniciais não dizem nada aqui: numa agenda com um time só,
+                     toda célula do mês virava "ES". O que a pessoa procura ao
+                     bater o olho no mês é DO QUE é a sessão — a trilha já está
+                     dita pela cor da barra à esquerda, que a legenda mapeia. */
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={styles.marca}
+                    data-trilha={s.mentor?.trilha}
+                    data-estado={estadoDaSessao(s)}
+                    onClick={() => aoAbrirDetalhe(s.id)}
+                  >
+                    <span className={styles.marcaHora}>{horaCurta(s.inicioIso)}</span>
+                    <span className={styles.marcaTitulo}>{s.titulo}</span>
+                  </button>
+                ))}
+                {lista.length > 2 && (
+                  <button
+                    type="button"
+                    className={styles.mais}
+                    onClick={() => setSelecionado(c.chave)}
+                  >
+                    +{lista.length - 2} mais
+                  </button>
+                )}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -269,7 +308,7 @@ export function CalendarioMentorias({
           ) : (
             <ul className={styles.lista}>
               {doDia.map((s) => {
-                const mentor = mentorPorId(s.mentorId);
+                const mentor = s.mentor;
                 const estado = estadoDaSessao(s);
                 return (
                   <li key={s.id}>
@@ -284,6 +323,19 @@ export function CalendarioMentorias({
                         <span className={styles.itemInicio}>{horaCurta(s.inicioIso)}</span>
                         <span className={styles.itemFim}>{horaCurta(s.fimIso)}</span>
                       </span>
+                      {/* O RETRATO entra aqui: o painel do dia é a única vista do
+                          calendário com espaço para dizer QUEM dá a sessão, e
+                          quem dá é metade da decisão de comparecer. Nas células
+                          do mês não cabe — lá a trilha é o ponto. */}
+                      {mentor && (
+                        <RetratoMentor
+                          nome={mentor.nome}
+                          fotoUrl={mentor.foto_url}
+                          tamanho="sm"
+                          className={styles.itemRetrato}
+                        />
+                      )}
+
                       <span className={styles.itemTextos}>
                         <span className={styles.itemTitulo}>{s.titulo}</span>
                         <span className={styles.itemRodape}>
@@ -309,7 +361,7 @@ export function CalendarioMentorias({
         <div className={styles.legenda}>
           <p className={styles.legendaTitulo}>Trilhas em {nomeMes.split(' de ')[0]}</p>
           <ul className={styles.legendaLista}>
-            {(Object.keys(TRILHAS) as Trilha[]).map((t) => (
+            {(Object.keys(TRILHAS) as TrilhaMentor[]).map((t) => (
               <li key={t} className={styles.legendaItem} data-trilha={t}>
                 <span className={styles.legendaBarra} aria-hidden="true" />
                 <span className={styles.legendaSigla}>{TRILHAS[t].sigla}</span>

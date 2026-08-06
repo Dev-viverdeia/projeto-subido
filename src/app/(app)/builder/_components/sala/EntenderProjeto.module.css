@@ -1,0 +1,278 @@
+/* Medidas herdadas da FichaProjeto, já corrigidas para a Outfit (o `ch` dela
+   infla ~1,369× — ver o cabeçalho daquele arquivo). Não arredonde de volta. */
+
+.entender {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+/* O rótulo mono é UM só para todo o painel — eyebrow de card (0.14em), porque
+   todos vivem dentro da superfície da etapa. */
+.rotuloMono {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.688rem;
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* O lead é o resumo do documento — um degrau acima do corpo, como na ficha. */
+.lead {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+  max-width: 48ch;
+  text-wrap: pretty;
+}
+
+/* Filete à esquerda, não card: o diagnóstico é anotação sobre o projeto. */
+.viabilidade {
+  padding-left: var(--via-space-5);
+  border-left: 2px solid var(--via-navy-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  max-width: 52ch;
+}
+
+.viabilidadeTopo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.viabilidadeTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+}
+
+/* Trilhas DEFINIDAS, não `1fr` + medida no texto: com `1fr` a coluna de prosa
+   abria além da medida e sobrava um RIO de vazio até o card de economia. Com a
+   página agora em wide (1280), as trilhas preenchem o eixo: 700 de leitura
+   (numeral 44 + texto de 54ch ≈ 684) + 380 de trilho, e o `space-between`
+   distribui a sobra (~200 no máximo) como UMA calha central — não um rio na
+   borda. Abaixo de 1080, coluna única. */
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 700px) 380px;
+  justify-content: space-between;
+  gap: var(--via-space-8);
+  align-items: start;
+}
+
+@media (max-width: 1079px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A coluna de leitura inteira: lead, viabilidade e o fluxo, no mesmo eixo. */
+.leitura {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+  min-width: 0;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.prosa {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-primary);
+  max-width: 54ch;
+  white-space: pre-line;
+}
+
+/* O caminho do dado, em degraus: numeral mono quieto à esquerda, texto com a
+   mesma medida da prosa. O numeral é âncora de varredura, não hierarquia — por
+   isso `text-faint`, não navy. */
+.fluxo {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.trecho {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--via-space-3);
+}
+
+.trechoNumero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--via-lh-loose);
+  padding-top: 1px;
+}
+
+.trechoTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  color: var(--via-text-primary);
+  max-width: 54ch;
+  text-wrap: pretty;
+}
+
+.lateral {
+  /* Trilho: acompanha a leitura em vez de ficar para trás no scroll — mesmo
+     offset da lateral da ficha (68px de cabeçalho + folga). */
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+@media (max-width: 1079px) {
+  .lateral {
+    position: static;
+  }
+}
+
+.economia {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  margin: 0;
+}
+
+.economiaNumero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h1);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.economiaUnidade {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.economiaRotulo {
+  margin: var(--via-space-2) 0 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.premissas {
+  margin: 0;
+  padding-left: var(--via-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.premissas li {
+  max-width: 44ch;
+}
+
+/* A fronteira fecha o painel em superfície própria — mesmo peso do resto,
+   porque é a parte que torna o documento crível. */
+.fechamento {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--via-space-8);
+  padding: clamp(24px, 3.2vw, 40px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-03);
+}
+
+.fechamentoColuna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  min-width: 0;
+}
+
+.riscos,
+.fora {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.risco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+/* Hairline entre itens: o paredão vira lista com respiração. Separador, não
+   card — mais uma superfície aqui seria moldura demais dentro da banda. */
+.risco + .risco,
+.fora li + li {
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.riscoTexto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.mitigacao {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.fora li {
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-primary);
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+.nota {
+  margin: 0;
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 44ch;
+  text-wrap: pretty;
+}

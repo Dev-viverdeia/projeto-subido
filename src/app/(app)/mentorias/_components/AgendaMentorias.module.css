@@ -4,19 +4,13 @@
   gap: var(--via-space-5);
 }
 
+/* A contagem solta à direita saiu: cada aba passou a trazer a sua, e um total
+   repetido ao lado de quatro totais é a mesma informação uma quinta vez. Sem ela
+   o `space-between` não tem o que separar. */
 .filtro {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--via-space-4);
-}
-
-.contagem {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
 }
 
 .vazio {

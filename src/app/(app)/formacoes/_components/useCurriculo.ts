@@ -16,6 +16,16 @@ export type ModuloDoCurriculo = {
 
 export type Curriculo = {
   modulos: ModuloDoCurriculo[];
+  /** Todas as aulas na ordem global — é o que o trilho de progresso consome. */
+  planas: AulaResumo[];
+  /**
+   * Os ids das aulas concluídas, não só a contagem.
+   *
+   * A barra segmentada do `TrilhoProgresso` precisa saber QUAIS: com um número,
+   * a única coisa possível é pintar as N primeiras casas, e aula concluída fora
+   * de ordem faria a barra contradizer a lista logo ao lado.
+   */
+  feitasIds: ReadonlySet<string>;
   feitas: number;
   total: number;
   pct: number;
@@ -62,11 +72,16 @@ export function useCurriculo(formacao: FormacaoCompleta): Curriculo {
     });
 
     const total = planas.length;
-    const feitas = planas.filter(({ aula }) => progresso.aulas[aula.id]).length;
+    const feitasIds = new Set(
+      planas.filter(({ aula }) => progresso.aulas[aula.id]).map(({ aula }) => aula.id),
+    );
+    const feitas = feitasIds.size;
     const atual = indiceAtual === -1 ? null : (planas[indiceAtual] ?? null);
 
     return {
       modulos,
+      planas: planas.map(({ aula }) => aula),
+      feitasIds,
       feitas,
       total,
       pct: total === 0 ? 0 : Math.round((feitas / total) * 100),

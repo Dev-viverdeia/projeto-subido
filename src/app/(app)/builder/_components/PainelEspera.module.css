@@ -1,0 +1,228 @@
+/* O CARD FLUTUA CENTRADO NA TELA, como no print. Ele é o único elemento do
+   momento: enquanto a espera dura não há mais nada para fazer, e ancorá-lo no
+   topo deixaria a página com um bloco pequeno e um vazio grande embaixo. */
+.painel {
+  width: 100%;
+  max-width: 620px;
+  margin: clamp(48px, 12vh, 140px) auto;
+  padding: var(--via-space-7);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-3-bg);
+  border: 1px solid var(--app-elev-3-line);
+  box-shadow: var(--app-elev-3-shadow);
+}
+
+.topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.rotulo,
+.contador {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.contador {
+  font-variant-numeric: tabular-nums;
+}
+
+/* CITAÇÃO, não texto de interface: é o que a pessoa escreveu. Quem diz isso são as
+   ASPAS, sem precisar de rótulo — o itálico que as acompanhava saiu porque a Outfit
+   não tem face itálica e a da Geist deixou o repo na troca de fonte. Duas linhas —
+   aqui a ideia é lembrete, e ela existe inteira no cabeçalho do projeto. */
+.ideia {
+  margin: var(--app-gap-block) 0 0;
+  font-size: var(--via-fs-h4);
+  letter-spacing: var(--app-ls-h4);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+.trilho {
+  position: relative;
+  height: 2px;
+  margin: var(--app-gap-block) 0;
+  background: var(--via-navy-08);
+  overflow: hidden;
+}
+
+.preenchido {
+  display: block;
+  height: 100%;
+  /* `scaleX` e nunca `width`: width dispara layout a cada frame. */
+  transform-origin: left center;
+  background: var(--via-navy);
+  transition: transform var(--app-t-scene);
+}
+
+/* A VARREDURA: uma faixa clara que percorre o trilho em loop enquanto a espera
+   dura. É ela que diz "trabalhando" no intervalo em que o preenchido está
+   parado — a barra determinada conta as fases, a varredura conta o pulso.
+   Só `transform`; o gradiente é navy sobre navy, não glow. */
+.trilho::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, var(--via-navy-25), transparent);
+  animation: varrer 1.8s var(--via-ease) infinite;
+}
+
+@keyframes varrer {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(420%);
+  }
+}
+
+.passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-stack);
+}
+
+.passo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  font-size: var(--via-fs-body);
+  letter-spacing: var(--app-ls-body);
+  line-height: var(--via-lh-snug);
+  /* O passo FUTURO é o mais quieto: ele ainda não é assunto. */
+  color: var(--via-text-faint);
+  transition: color var(--app-t-reveal);
+}
+
+.passo[data-feito] {
+  color: var(--via-text-muted);
+}
+
+.passo[data-ativo] {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+/* A marca ocupa o lugar mesmo vazia — sem isso o texto salta 24px para a
+   esquerda no instante em que o check aparece. */
+.marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  color: var(--via-white);
+  transition: background var(--app-t-state);
+}
+
+.passo[data-feito] .marca {
+  background: var(--via-navy);
+}
+
+/* O check ENTRA, não aparece: pop curto de escala no instante em que a fase
+   fica para trás. `backwards` — ver entrada.module.css. */
+.passo[data-feito] .marca svg {
+  animation: chegar-visto var(--app-motion-touch) var(--via-ease-out) backwards;
+}
+
+@keyframes chegar-visto {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* O PONTO do passo ativo: núcleo sólido + anel que respira por transform e
+   opacity. É o vocabulário do dot de "ao vivo", em navy — accent só sobre
+   escuro, e esta superfície é clara. */
+.ponto {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+}
+
+.ponto::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1.5px solid var(--via-navy-40);
+  animation: respirar 1.6s var(--via-ease) infinite;
+}
+
+@keyframes respirar {
+  0% {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+/* O cursor do print: um traço que pisca ao lado do passo em curso. `animation` e
+   não `transition` — é AMBIENTE, não resposta a interação, e é por isso que o
+   gate de identidade cobre uma e não a outra. */
+.cursor {
+  width: 2px;
+  height: 1.05em;
+  flex-shrink: 0;
+  background: var(--via-navy-40);
+  animation: piscar 1.1s steps(2, start) infinite;
+}
+
+@keyframes piscar {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Estado FINAL, não animação rápida: o traço fica sólido no lugar, o anel do
+     ponto some (o núcleo sólido já marca o passo), a varredura para e o check
+     simplesmente está lá. */
+  .cursor,
+  .trilho::after,
+  .ponto::after,
+  .passo[data-feito] .marca svg {
+    animation: none;
+  }
+
+  .trilho::after {
+    content: none;
+  }
+
+  .preenchido,
+  .passo,
+  .marca {
+    transition: none;
+  }
+}

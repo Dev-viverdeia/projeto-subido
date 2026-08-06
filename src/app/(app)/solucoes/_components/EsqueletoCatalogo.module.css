@@ -47,3 +47,10 @@
   padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
 }
+
+/* Espelha o `.topo` do card real: glifo e categoria na mesma linha. */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2_5);
+}

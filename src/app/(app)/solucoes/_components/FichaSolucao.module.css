@@ -1,0 +1,162 @@
+/* DUAS COLUNAS, e a de apoio é ESTREITA de propósito.
+   A versão anterior desta tela dava à coluna direita `minmax(280px, 1fr)` porque
+   ela carregava ferramentas E prompts — a 1600 isso a deixava com 668px, mais
+   larga que muitos cards da plataforma. Agora o kit vive nas abas e a coluna de
+   apoio guarda só orientação (onde estou, para onde vou), que cabe em ~330. */
+.grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 26%, 360px);
+  gap: var(--app-gap-section);
+  align-items: start;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+  min-width: 0;
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+/* Sticky sob o cabeçalho do shell (68px + folga). `align-items: start` no pai é
+   o que permite a coluna rolar junto quando é mais alta que a viewport. */
+.apoio {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-grid);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.identidade {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+/* O glifo da categoria: mesma peça do card do catálogo, para quem chegou de lá
+   reconhecer o objeto. Raio 12 num quadrado de 42 — controle, não card. */
+.glifo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.selo {
+  margin-left: auto;
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h1);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+  /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
+     caracteres ÷ 1,369. 34ch ≈ 47 caracteres (eram 44 com a Geist)
+     por linha — um título de duas linhas no máximo, que é o que a composição
+     comporta antes de o resumo ser empurrado para fora da dobra. */
+  max-width: 34ch;
+}
+
+.resumo {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-muted);
+  /* 52ch ≈ 68 caracteres — dentro da faixa confortável de 45–75. */
+  max-width: 52ch;
+  text-wrap: pretty;
+}
+
+.metas {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin: var(--via-space-2) 0 0;
+  padding: 0;
+}
+
+/* Cada meta é uma pill de FATO: contagem real de `solucao_itens`, nunca
+   estimativa. É por isso que não há "~3h de implantação" aqui — o banco não
+   guarda duração de solução, e um tempo inventado é o tipo de número que a
+   página inteira existe para não dar. */
+.meta {
+  padding: 5px var(--via-space-3);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-06);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A hairline sob as abas é o que faz o sublinhado deslizante ler como aba e não
+   como marcador solto. */
+.tira {
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+@media (max-width: 1079px) {
+  .grade {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+  }
+
+  /* SEM `order: -1`, e a versão anterior tinha. O argumento era bom ("no telefone,
+     orientação primeiro") e o efeito era um defeito de sequência: `order` move o
+     PIXEL e não o DOM, então o card "Seu progresso"/"Continuar" aparecia no topo
+     da tela e continuava por último na ordem de tabulação. Quem usa teclado ou
+     leitor de tela recebia a tela numa ordem, e quem enxerga, noutra — WCAG 1.3.2.
+     Ordem visual = ordem do documento, nas duas larguras. */
+  .apoio {
+    position: static;
+  }
+}
+
+@media (max-width: 599px) {
+  .titulo {
+    font-size: var(--via-fs-h2);
+    letter-spacing: var(--app-ls-h2);
+  }
+
+  .resumo {
+    font-size: var(--via-fs-body);
+    letter-spacing: var(--app-ls-body);
+  }
+}

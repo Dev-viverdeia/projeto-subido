@@ -1,0 +1,128 @@
+/* 1080 — degrau canônico. A conversa é UMA coluna centrada; os balões guardam
+   a própria medida (52ch), e a largura da página é o que dá SEPARAÇÃO entre o
+   lado do usuário e o do consultor — a 760 os dois quase se tocavam. */
+.pagina {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+}
+
+/* O campo cola no fim da conversa; o respiro de baixo é da página. */
+.rodape {
+  position: sticky;
+  bottom: var(--via-space-4);
+}
+
+.nova {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  text-decoration: none;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.nova:hover {
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-1-shadow);
+  text-decoration: none;
+}
+
+.nova:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nova {
+    transition: none;
+  }
+}
+
+/* ── O cabeçalho da conversa: identidade à esquerda, controles à direita,
+   hairline fechando — é o que separa "uma tela com balões" de uma conversa
+   com endereço. */
+.cabecalho {
+  display: flex;
+  /* Centrado, não flex-end: com o voltar ao lado do título o bloco esquerdo tem
+     três linhas de altura, e as ações penduradas na base liam desalinhadas. */
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+/* Voltar + identidade lado a lado, o chip centrado na altura do bloco.
+   `flex: 1` + `min-width: 0` é o que deixa o título TRUNCAR em vez de empurrar
+   as ações para uma segunda linha — medido: 678 + 422 = 1100 > 1080 e o
+   wrap jogava os três botões para baixo do título, alinhados à esquerda. */
+.esquerda {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  flex: 1;
+  min-width: 0;
+}
+
+.identidade {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.tituloConversa {
+  margin: 0;
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  /* Uma linha: o título é endereço aqui; inteiro ele vive na trilha e no title. */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* `min(40ch, 100%)`: com `nowrap` a largura mínima do h1 é a linha INTEIRA,
+     e num flex de coluna com `flex-start` ele vazava do bloco — medido: o
+     título terminava em 1251px com as ações começando em 1230. */
+  max-width: min(40ch, 100%);
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}

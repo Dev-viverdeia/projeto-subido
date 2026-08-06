@@ -1,3 +1,13 @@
+/* A PÁGINA acompanha o canvas; quem tem MEDIDA é cada vista, e a regra da casa
+   separa as duas naturezas: GRADE ganha área, LISTA e PROSA têm medida.
+
+   A agenda é lista — uma pilha de linhas de um dado só (hora | título + mentor |
+   CTA). Esticada, o miolo vira vão morto entre o título e o botão. O calendário é
+   GRADE: sete colunas de dia que só melhoram com espaço, e em tela grande cada
+   célula passa a caber o título da sessão em vez de cortá-lo em cinco letras.
+
+   As duas vistas usam o canvas: o que segura a leitura é a MEDIDA no elemento de
+   texto (o título da linha), não um teto no container — ver `ItemAgenda`. */
 .pagina {
   max-width: var(--app-canvas);
   margin-inline: auto;

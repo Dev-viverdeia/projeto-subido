@@ -26,7 +26,14 @@ import { globSync } from 'node:fs';
 import path from 'node:path';
 
 const RAIZ = path.resolve(import.meta.dirname, '..');
-const arquivos = globSync('src/**/*.{ts,tsx}', { cwd: RAIZ });
+/* ARQUIVO DE TESTE NÃO É SERVER COMPONENT.
+   Ele roda no vitest, em jsdom, fora do grafo de RSC — importar um hook de um
+   módulo `'use client'` ali é o uso correto, não a violação que este gate
+   procura. Sem a exclusão, escrever teste para um componente de cliente reprova
+   o CI, o que ensina a não escrever o teste. */
+const arquivos = globSync('src/**/*.{ts,tsx}', { cwd: RAIZ }).filter(
+  (f) => !/\.(test|spec)\.tsx?$/.test(f),
+);
 
 const ehClient = (rel) => {
   const conteudo = readFileSync(path.join(RAIZ, rel), 'utf8');

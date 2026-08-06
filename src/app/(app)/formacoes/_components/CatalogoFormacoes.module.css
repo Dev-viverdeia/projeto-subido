@@ -1,25 +1,12 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-grid);
+  gap: var(--via-space-4);
 }
 
-.painelDescoberta {
-  --catalogo-busca-largura: 300px;
-  --catalogo-controle-altura: 40px;
-  --catalogo-controle-borda: var(--via-border-hairline);
-  --catalogo-controle-raio: var(--app-radius-control);
-  --catalogo-controle-fonte: var(--via-fs-caption);
-  --catalogo-aba-padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
-  --catalogo-aba-fonte: var(--via-fs-caption);
-  --catalogo-aba-sublinhado: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-  padding-bottom: var(--via-space-3);
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
+/* A régua de descoberta: situação à esquerda, ordem à direita, sobre a mesma
+   linha. `fill-mode` da cascata cria stacking context — o z-index garante que
+   qualquer sobreposição abra SOBRE a grade. */
 .regua {
   position: relative;
   z-index: 10;
@@ -27,76 +14,56 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 46px;
 }
 
 .reguaDireita {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
+  gap: var(--via-space-2);
   flex: none;
 }
 
-.linhaMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-}
-
-.contagem {
-  margin: 0;
+.ordenarRotulo {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
 }
 
-.ordenacao {
+/* A busca ganhou linha própria: dividindo a régua com dois trilhos segmentados,
+   quem cedia largura era sempre ela — trilho tem largura de conteúdo e não
+   encolhe. O campo caía para 240px e cortava o placeholder. */
+.linhaBusca {
   display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 2px;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
 }
 
-.ordenar {
-  min-height: 28px;
-  padding: var(--via-space-1) var(--via-space-2_5);
-  border: none;
-  border-radius: calc(var(--app-radius-control) - 2px);
-  background: transparent;
-  font-family: inherit;
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    color var(--via-t-fast),
-    background-color var(--via-t-fast);
+/* Âncora invisível: o scroll da paginação para no topo da grade. */
+.ancoraGrade {
+  scroll-margin-top: 84px;
 }
 
-.ordenar:hover {
-  color: var(--via-text-body);
-}
+/* Sem o "piso atmosférico" que existia atrás da grade: ele fazia sentido com o
+   catálogo cheio, mas com duas formações a caixa colorida se estendia por toda a
+   largura e lia como container VAZIO — o defeito ficava maior que o efeito.
+   Card com contorno próprio já se sustenta no fundo da página.
 
-.ordenar[data-ativo] {
-  color: var(--via-text-primary);
-  background: var(--via-bg-2);
-}
-
-.ordenar:focus-visible {
-  box-shadow: var(--app-ring);
-}
-
+   PÔSTER 3:4 ENGORDA EM DUAS DIMENSÕES, então ganha coluna antes de tudo — é a
+   regra da casa e é o que a referência faz (4 colunas em xl, 5 em 2xl). A 1600
+   com 4 colunas o card fica 385 de largura e ~630 de altura: retrato de verdade.
+   Com 3 colunas o pôster iria a 504 de largura e 672 de altura, e a fileira
+   sozinha passaria da viewport — catálogo em que não cabe uma segunda fileira é
+   um catálogo pior. */
 .grade {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--via-space-5);
+  /* Altura idêntica: resumos de 1 ou 2 linhas produziriam fileiras desiguais. */
   grid-auto-rows: 1fr;
 }
 
+/* Filho direto = wrapper de motion (sem classe). Ver a nota em CatalogoSolucoes. */
 .grade > * {
   display: flex;
 }
@@ -118,6 +85,8 @@
   }
 }
 
+/* Continua em DUAS colunas no telefone, como a referência: pôster é conteúdo de
+   varredura, e uma coluna só faria um card ocupar a tela inteira. */
 @media (max-width: 599px) {
   .grade {
     gap: var(--via-space-3);
@@ -127,11 +96,69 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--via-space-2);
-    padding-bottom: var(--via-space-2);
   }
+}
 
-  .reguaDireita,
-  .reguaDireita > * {
-    width: 100%;
+/* CENTRADO e empilhado: contagem em cima, páginas embaixo, ambas no eixo da
+   grade — duas informações que descrevem a MESMA coisa não moram em cantos
+   opostos. Idêntico ao rodapé de soluções, de propósito. */
+.rodapePaginas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-gap-block);
+  padding-top: var(--app-gap-block);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.mostrando {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.separador {
+  color: var(--via-border);
+}
+
+/* Link tipográfico, não botão: a ação é de navegação dentro da própria lista, e
+   um preenchimento aqui competiria com a paginação logo abaixo. */
+.verTodas {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--via-accent-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--app-t-state);
+}
+
+.verTodas:hover {
+  text-decoration-color: currentcolor;
+}
+
+.verTodas:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-track);
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verTodas {
+    transition: none;
   }
 }

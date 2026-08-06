@@ -1,0 +1,108 @@
+/* O miolo do dropdown de check-ins. O PAINEL (elevação, largura, rolagem) é do
+   HistoricoDropdown; aqui só existem os grupos e as linhas. */
+
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+/* Eyebrow de card (0.14em): rótulo DENTRO de superfície, não seção isolada. */
+.eyebrow {
+  margin: 0;
+  padding-inline: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+}
+
+/* A linha inteira é o botão — mesma anatomia do TrilhoInscricoes: quando em
+   mono quieto, título em corpo. O estado fecha a linha à direita. */
+.linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--via-space-3);
+  row-gap: 2px;
+  width: 100%;
+  padding: var(--via-space-2);
+  border: 0;
+  border-radius: var(--app-radius-chip);
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background-color var(--app-t-state);
+}
+
+.linha:hover {
+  background: var(--via-navy-03);
+}
+
+.linha:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.quando {
+  grid-column: 1;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.titulo {
+  grid-column: 1;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.estado {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  white-space: nowrap;
+}
+
+/* Encerrada assenta: tinta um degrau abaixo em tudo, sem riscado — o registro
+   não é erro, é passado. */
+.linha[data-encerrada] .titulo {
+  color: var(--via-text-soft);
+  font-weight: var(--via-fw-regular);
+}
+
+.vazio {
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}

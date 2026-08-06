@@ -1,18 +1,101 @@
 /* O shell: cartão da próxima, chrome de vista, miolo. O respiro entre eles é o
    ritmo de BLOCO — o de grade seria apertado demais para separar três coisas de
    naturezas diferentes. */
+/* AS DUAS VISTAS USAM O CANVAS.
+   Eu tinha travado a agenda em 1280 pelo argumento de que lista esticada cria vão
+   morto entre o título e o botão. O argumento não é falso, mas a conclusão era:
+   ele vale para linha que não tem NADA na direita. Esta tem — vagas e o CTA de
+   check-in —, e linha com dado nas duas pontas é padrão de lista larga que
+   funciona (o olho percorre as bordas, não o meio).
+
+   O que faz a largura funcionar não é o teto do container: é a MEDIDA no elemento
+   de texto. O título da linha ganha teto próprio (ver `ItemAgenda`), então ele
+   para de crescer onde a leitura pede e o resto da largura vira respiro entre as
+   duas pontas, não texto esticado. */
 .raiz {
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
+  width: 100%;
+  max-width: var(--app-canvas);
+  margin-inline: auto;
+}
+
+/* ── O CORPO, e é aqui que a tela deixa de ser uma pilha ────────────────────
+   A regra da casa separa dois casos que parecem um: GRADE ganha coluna e
+   acompanha o canvas; LISTA tem MEDIDA, igual a prosa.
+
+   A AGENDA é lista — cada item é uma linha de um dado só (hora | título + mentor
+   | CTA). Esticada, o miolo vira vão morto: o título fica grudado à esquerda, o
+   botão à direita, e o olho atravessa meio metro de nada entre os dois. Quem
+   fecha a medida é a PÁGINA (ver `pagina.module.css`); aqui a agenda só divide o
+   que sobra com a coluna de apoio.
+
+   O CALENDÁRIO é grade — sete colunas de dia que precisam de área. Ele NÃO cabe
+   na medida da lista, então na vista de calendário a grade vira uma coluna só e
+   o miolo recebe a largura inteira. É a mesma decisão do catálogo de soluções,
+   aplicada dentro de uma tela em vez de entre duas.
+
+   O cartão da próxima fica FORA daqui, acompanhando o canvas nas duas vistas:
+   card com mesh gosta de largura. */
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 26%, 360px);
+  gap: var(--app-gap-section);
+  align-items: start;
+}
+
+/* SEM INSCRIÇÃO, SEM COLUNA. O trilho some sozinho quando não há check-in, mas a
+   grade continuava reservando o lugar dele — quem nunca se inscreveu via ~360px
+   de nada à direita da lista. Sem trilho a grade vira uma coluna e a lista ocupa
+   a largura inteira; quem segura a leitura é a medida do título, não um teto no
+   bloco. */
+.corpo[data-vista='agenda']:not([data-apoio]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Calendário: uma coluna só, largura inteira. O trilho de inscrições desce para
+   baixo da grade em vez de comer 300px da área que ela precisa. */
+.corpo[data-vista='calendario'] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--app-gap-block);
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+  min-width: 0;
+}
+
+/* Sticky sob o cabeçalho do shell (68px + folga). `align-items: start` no pai é
+   o que permite a coluna rolar junto quando é mais alta que a viewport. */
+.apoio {
+  position: sticky;
+  top: calc(68px + var(--via-space-5));
+}
+
+/* Na vista de calendário o trilho desce para baixo da grade, e sem teto ele
+   esticava por toda a largura da página — um card de conteúdo curto com 1200px
+   de linha, que é a mesma "faixa" que a regra da casa proíbe nos cards de
+   solução. Ancorado à direita, com a MESMA medida da coluna lateral do
+   calendário (`clamp(300px, 23vw, 360px)`), ele lê como continuação daquela
+   coluna em vez de um bloco solto. */
+.corpo[data-vista='calendario'] .apoio {
+  position: static;
+  width: clamp(300px, 23vw, 360px);
+  margin-left: auto;
 }
 
 /* A régua de vista fica sozinha na linha, alinhada à esquerda: é o controle mais
    alto da hierarquia da tela, e dividir a linha com outro controle o rebaixaria
    ao mesmo nível do filtro que vive DENTRO da agenda. */
+/* Abas à esquerda, o histórico de check-ins no canto direito da MESMA linha —
+   os dois governam a leitura da tela inteira, então moram no mesmo andar. */
 .chrome {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--app-gap-stack);
 }
 
@@ -67,40 +150,6 @@
   white-space: nowrap;
 }
 
-/* Ocupação como barra: 22/30 é um número que só significa alguma coisa depois de
-   uma divisão — a barra faz a divisão pelo leitor. `scaleX`, nunca `width`. */
-.ocupacao {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-}
-
-.ocupacaoTrilho {
-  flex: 1;
-  height: 4px;
-  border-radius: var(--app-radius-track);
-  background: var(--via-navy-10);
-  overflow: hidden;
-}
-
-.ocupacaoCheia {
-  width: 100%;
-  height: 100%;
-  background: var(--via-navy);
-  transform-origin: left;
-  transition: transform var(--app-t-scene);
-}
-
-.ocupacaoTexto {
-  flex: none;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .detalheTexto {
   margin: 0;
   font-size: var(--via-fs-sm);
@@ -136,24 +185,6 @@
 
 .mentorCartao[data-trilha='produto'] {
   border-left-color: var(--via-navy-25);
-}
-
-/* Monograma, não silhueta: silhueta genérica lê como pessoa real cuja foto não
-   carregou, e não há pessoa aqui — há um papel. */
-.mentorMonograma {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-indent: var(--app-ls-eyebrow);
 }
 
 .mentorTextos {
@@ -208,4 +239,56 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--via-space-2);
+}
+
+@media (max-width: 1079px) {
+  /* Empilhado, o trilho fica DEPOIS da agenda, na ordem do documento e sem
+     `order`: mover o pixel sem mover o DOM faz a ordem visual divergir da ordem
+     de foco (WCAG 1.3.2). Quem abre no telefone já tem o cartão da próxima
+     sessão acima da dobra, que é a informação urgente. */
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+  }
+
+  .apoio {
+    position: static;
+  }
+}
+
+/* As ações da ficha da sessão. `wrap` porque "Check-in confirmado" mais
+   "Cancelar check-in" passam de 380px, e o modal `md` não garante isso. */
+.acoesFicha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-1);
+}
+
+.fichaConfirmado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-accent) 8%, transparent);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-accent-ink);
+}
+
+/* Motivo, não botão desabilitado: botão travado sem explicação é pior que texto
+   que explica. */
+.fichaNota {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--app-h-control);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
 }

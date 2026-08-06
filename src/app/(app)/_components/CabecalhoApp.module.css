@@ -1,7 +1,12 @@
+/* `min-width: 0` É O PAR OBRIGATÓRIO do `minmax(0, 1fr)` da faixa do shell.
+   Faixa que encolhe não basta: o ITEM do grid tem `min-width: auto` por padrão e
+   transbordaria a faixa em vez de encolher. Os dois juntos são o que faz a
+   trilha truncar em vez de empurrar a página. */
 .cabecalho {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
+  min-width: 0;
   min-height: 60px;
   padding-inline: var(--via-space-4);
 
@@ -53,34 +58,12 @@
   text-decoration: none;
 }
 
-/* O NOME DA SEÇÃO É O TÍTULO DA TELA, e recebe a TIPOGRAFIA DE TÍTULO.
-   Ele começou como eyebrow (11px mono) porque a página tinha um <h1> próprio
-   logo abaixo. Quando esse <h1> saiu, o rótulo herdou o PAPEL do título mas
-   continuou com a tipografia de rótulo — e ficou pela metade nos dois passos
-   seguintes.
-
-   Duas medidas fecharam a conta:
-   · PESO. Estava em 500 enquanto o título de um item de lista de 14px está em
-     560. O maior título da tela pesava menos que a menor linha abaixo dele, o
-     que é exatamente o que se lê como "fonte fraca". Agora 560, o mesmo dos
-     títulos de card e de item — uma voz de título, não três.
-   · CORPO. 24px numa barra de 80 deixava 56px de folga. 32px é o degrau que o
-     <h1> da página usava, restaurado onde o título passou a morar; sobram 48,
-     que é respiro e não vazio.
-
-   A Outfit é variável (100–900), então 560 é um peso real e não uma síntese. */
-.secao {
-  font-family: var(--via-font-display);
-  font-size: var(--via-fs-h2);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-  /* Some antes de qualquer outra coisa quando falta largura. */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* O slot vive aqui. `min-width: 0` é o que permite a trilha truncar pelo título
+   em vez de empurrar o menu de perfil para fora da barra. */
+.esquerda {
   display: none;
+  align-items: center;
+  min-width: 0;
 }
 
 .direita {
@@ -94,19 +77,26 @@
 
 @media (min-width: 1024px) {
   .cabecalho {
-    /* +12px: o rótulo virou título de h3 e a barra de 68 o espremia contra as
-       duas hairlines. */
-    min-height: 80px;
+    /* De volta a 68. Os 80px foram postos quando o rótulo de seção era um título
+       de 32px e a barra o espremia contra as duas hairlines. Com o rótulo virando
+       um degrau de trilha de 14px, 80 vira calha vazia — e a barra da referência
+       é justamente baixa. */
+    min-height: 68px;
     padding-inline: var(--via-space-8);
   }
 
   /* A marca vive na sidebar em desktop; repeti-la aqui seria a segunda vez na
-     mesma tela. O lugar dela passa a ser do rótulo de seção. */
+     mesma tela. O lugar dela passa a ser do slot. */
   .marca {
     display: none;
   }
 
-  .secao {
-    display: block;
+  /* O PAR DA REGRA ACIMA — e ele já sumiu uma vez. `.esquerda` nasce
+     `display: none` porque abaixo de 1024 o lugar é da marca; sem esta linha o
+     cabeçalho fica sem lado esquerdo em TODA largura. Nenhum gate pega isso:
+     tsc, eslint, build e o check de identidade passam verdes com um cabeçalho
+     vazio. As duas regras são um par — mexeu numa, confira a outra. */
+  .esquerda {
+    display: flex;
   }
 }

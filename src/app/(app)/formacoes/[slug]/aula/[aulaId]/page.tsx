@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterAula } from '@/lib/conteudo/queries';
-import { BotaoVoltar } from '../../../../_components/BotaoVoltar';
 import { VideoConteudo } from '../../../../_components/VideoConteudo';
 import { formatarDuracao } from '../../../../_components/tempo';
 import entrada from '../../../../_components/entrada.module.css';
 import { NavAula } from '../../../_components/NavAula';
 import { PlaylistAula } from '../../../_components/PlaylistAula';
+import { DefinirTrilha } from '../../../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 export async function generateMetadata({
@@ -21,6 +21,11 @@ export async function generateMetadata({
  * A tela da aula. O header vive FORA do grid de propósito: assim o topo do card
  * da playlist alinha com o topo do vídeo — detalhe herdado da referência que
  * separa "montado" de "composto".
+ *
+ * O TOPO DIZIA A MESMA COISA TRÊS VEZES. A trilha do cabeçalho já mostra
+ * `‹ Nome do curso / Módulo / Aula` em toda tela de detalhe; abaixo dela havia um
+ * botão "voltar" para o mesmo curso e um eyebrow repetindo "curso · módulo".
+ * Sobrou o que é só desta tela: o título da aula e a posição dela no curso.
  */
 export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/aula/[aulaId]'>) {
   const { slug, aulaId } = await params;
@@ -32,23 +37,28 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
 
   return (
     <div className={styles.pagina}>
-      <header className={`${styles.cabecalho} ${entrada.bloco}`}>
-        <div className={styles.navegacao}>
-          <BotaoVoltar fallback={`/formacoes/${slug}`} rotulo="Voltar à formação" />
-        </div>
+      {/* Três degraus: a volta é para o CURSO, não para o catálogo — é de onde a
+          pessoa veio e para onde ela continua depois desta aula. O módulo entra
+          como recorte. */}
+      <DefinirTrilha
+        voltarPara={`/formacoes/${slug}`}
+        voltarRotulo={formacao.titulo}
+        meio={modulo.titulo}
+        atual={aula.titulo}
+      />
 
+      <header className={`${styles.cabecalho} ${entrada.bloco}`}>
         <div className={styles.textos}>
-          <p className={styles.eyebrow}>
-            {formacao.titulo} · {modulo.titulo}
-          </p>
           <h1 className={styles.titulo}>{aula.titulo}</h1>
-          <p className={styles.meta}>
-            {duracao && <span>{duracao}</span>}
-            {duracao && <span aria-hidden="true">·</span>}
-            <span>
+          {/* Pills, como na ficha de solução e no hero do curso — e só o que
+              EXISTE: a duração some quando a aula não tem `duracao_seg`, em vez
+              de virar "0 min". */}
+          <ul className={styles.metas}>
+            {duracao && <li className={styles.meta}>{duracao}</li>}
+            <li className={styles.meta}>
               Aula {posicao} de {total}
-            </span>
-          </p>
+            </li>
+          </ul>
         </div>
       </header>
 

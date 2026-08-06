@@ -1,4 +1,15 @@
+/* `position: relative` é o que ancora a sobreposição do título — sem ele o
+   `::after` de `.abrir` se espalha até o primeiro ancestral posicionado, que
+   seria a página inteira. O `cursor: pointer` saiu daqui: a linha não é mais um
+   controle, quem é controle é o botão de dentro (e ele traz o próprio cursor).
+
+   token-ok: esta regra tem `box-shadow` e `:hover` sem `:focus-visible`, e o
+   gate reprova isso com razão em 99% dos casos. Aqui a linha NÃO É FOCÁVEL — ela
+   deixou de ser `role="button"` justamente porque continha botões. Quem recebe o
+   foco é `.abrir`, e o anel dele desenha no `::after`, que tem exatamente a
+   geometria desta linha. `.item:focus-visible` nunca casaria nada. */
 .item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--via-space-4);
@@ -8,7 +19,6 @@
   border-radius: var(--via-radius-md);
   background: var(--via-surface);
   box-shadow: var(--via-shadow-xs);
-  cursor: pointer;
   transition:
     transform var(--app-t-touch),
     box-shadow var(--app-t-touch);
@@ -17,12 +27,6 @@
 .item:hover {
   transform: translateY(-1px);
   box-shadow: var(--via-shadow-sm);
-}
-
-.item:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--via-white),
-    0 0 0 4px var(--via-navy-60);
 }
 
 .item[data-ao-vivo] {
@@ -68,17 +72,6 @@
   gap: 3px;
 }
 
-.titulo {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-sm);
-  color: var(--via-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .mentor {
   display: flex;
   align-items: center;
@@ -91,15 +84,21 @@
   color: var(--via-text-body);
 }
 
-.mentorHeadline {
+/* Um degrau mais quieto que o nome: é qualificador, não protagonista. O
+   separador entra por pseudo-elemento para não virar texto selecionável. */
+.trilha {
   font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--via-text-muted);
 }
 
+.trilha::before {
+  content: '· ';
+}
+
+/* `position: relative` sobe os CTAs ACIMA da sobreposição do título. Sem isto o
+   `::after` de `.abrir` cobriria "Fazer check-in" e todo clique abriria a ficha. */
 .direita {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
@@ -188,4 +187,77 @@
   .dot {
     animation: none;
   }
+}
+
+/* ── A sobreposição ──────────────────────────────────────────────────────────
+   O botão do título é a área de clique da LINHA inteira. Ele fica transparente e
+   herda a tipografia do título; o `::after` é que estica.
+
+   `z-index` NÃO entra aqui de propósito: o `::after` é conteúdo de um elemento
+   não posicionado no fluxo, então ele pinta ABAIXO de qualquer irmão que tenha
+   `position: relative`. É exatamente isso que faz os CTAs da direita receberem
+   os próprios cliques sem `stopPropagation` — eles só precisam se posicionar. */
+.abrir {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* A MEDIDA MORA AQUI, não no container da lista. É o que permite a agenda usar
+     a tela inteira sem o título correr mil pixels até o botão: ele para onde a
+     leitura pede e o resto da largura vira respiro entre as duas pontas da linha.
+     O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio, então o alvo
+     real é caracteres ÷ 1,369 — 68ch ≈ 93 caracteres (eram 88 com a Geist),
+     generoso para um título de sessão e ainda dentro do que se lê numa linha só.
+     Acima de 75 de propósito: é linha única, não prosa. */
+  max-width: 68ch;
+}
+
+.abrir::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* O ANEL DESENHA NA SOBREPOSIÇÃO, e é isso que o deixa com a forma da LINHA sem
+   depender de `:has()` no ancestral: o `::after` já tem a geometria do artigo
+   inteiro, então basta pintá-lo. O foco fica onde o navegador o pôs — no botão —
+   e o desenho aparece onde a affordance está.
+   Compõe com a sombra de repouso, senão a linha achata ao receber Tab. */
+.abrir:focus-visible {
+  outline: none;
+}
+
+.abrir:focus-visible::after {
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
+
+  .item:hover {
+    transform: none;
+  }
+}
+
+/* O CTA-link da sala sobe acima da sobreposição do título, como os botões, e
+   não herda sublinhado. */
+.entrarSala {
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
 }

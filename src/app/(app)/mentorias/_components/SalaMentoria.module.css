@@ -1,0 +1,393 @@
+/* A sala: palco + trilho. O palco é a única superfície escura da página —
+   mesma regra do CartaoProxima na agenda: o escuro marca o que é O MOMENTO.
+   A anatomia é a de uma sala de vídeo de verdade: chips de estado sobrepostos
+   no topo, o momento no centro, a barra de controles flutuando na base. */
+
+.corpo {
+  display: grid;
+  /* Palco à esquerda, chat à DIREITA — o lugar do chat em toda sala ao vivo. */
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--app-gap-grid);
+  align-items: stretch;
+}
+
+@media (max-width: 1079px) {
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* No empilhado o chat já vem depois do palco na ordem do DOM; só ganha
+     altura própria em vez da esticada do grid. */
+  .chat {
+    min-height: 320px;
+  }
+}
+
+.palcoColuna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  min-width: 0;
+}
+
+/* 16:9 é a proporção da transmissão que vai morar aqui; o teto de altura
+   segura o palco dentro da primeira dobra em monitores baixos (o LiveKit
+   preenche o contêiner que existir, qualquer que seja o corte). */
+.palco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(62vh, 640px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------- chips */
+
+/* Vidro sobre a navy. SÓ `backdrop-filter` (o Lightning prefixa sozinho; a
+   dupla manual descarta as duas), e fallback sólido onde não há suporte. */
+.chipEstado {
+  position: absolute;
+  top: var(--via-space-4);
+  z-index: 1;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: 28px;
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 22, 45, 0.55);
+  backdrop-filter: blur(10px);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .chipEstado {
+    background: var(--via-navy-deep);
+  }
+}
+
+.chipEstado {
+  left: var(--via-space-4);
+  color: var(--via-gray-300);
+}
+
+[data-ao-vivo] .chipEstado {
+  color: var(--via-accent);
+  border-color: var(--via-accent-hairline);
+}
+
+/* O pulso de "ao vivo" — animation é AMBIENTE, fora do gate de transition. */
+.pulso {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+  animation: sala-pulso 2s var(--via-ease-out) infinite;
+}
+
+@keyframes sala-pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* -------------------------------------------------------------------- miolo */
+
+.palcoMiolo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-6);
+  text-align: center;
+}
+
+/* A hora é o protagonista do palco em espera — número é prova, mono tabular. */
+.palcoHora {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-display);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.palcoData {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* Sobre a navy a escala inverte: gray-400 (6,99:1), nunca text-muted. */
+  color: var(--via-gray-400);
+}
+
+.palcoNome {
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+}
+
+.palcoPapel {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
+.palcoNota {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  /* gray-300 (12,2:1) — hierarquia por dois tons SÓLIDOS, nunca opacidade. */
+  color: var(--via-gray-300);
+  max-width: 38ch;
+  text-wrap: pretty;
+}
+
+/* -------------------------------------------------------------------- barra */
+
+/* Flutua na base do palco. Raio aninhado: barra 20 (card) − padding 8 =
+   controles 12 (control) — cantos concêntricos. Sem animação de opacity em
+   ancestral de backdrop-filter: a barra não anima. */
+.barra {
+  position: absolute;
+  bottom: var(--via-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2);
+  border-radius: var(--app-radius-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 22, 45, 0.55);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--app-elev-3-shadow);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .barra {
+    background: var(--via-navy-deep);
+  }
+}
+
+.controle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--via-gray-300);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.controle:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--via-white);
+}
+
+.controle:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.controle:disabled {
+  cursor: default;
+  color: var(--via-gray-500);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.barraDivisor {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.sair {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+.sair:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.controlesNota {
+  margin: 0;
+  align-self: center;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+/* --------------------------------------------------------------------- chat */
+
+/* A coluna estica junto com o palco (`align-items: stretch` no grid): o
+   compositor assenta na mesma base da barra de controles. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.chatTopo {
+  padding: var(--app-pad-card) var(--app-pad-card) var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.chatEyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+/* O miolo cresce e centra o estado vazio — quando as mensagens chegarem, ele
+   vira a lista com rolagem própria (min-height: 0 já deixa isso pronto). */
+.chatMiolo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--app-pad-card);
+}
+
+.chatVazio {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-align: center;
+  max-width: 24ch;
+  text-wrap: pretty;
+}
+
+.chatCompositor {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.chatCampo {
+  flex: 1;
+  min-width: 0;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+}
+
+.chatCampo::placeholder {
+  color: var(--via-text-faint);
+}
+
+.chatCampo:disabled {
+  cursor: default;
+}
+
+.chatEnviar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-h-control);
+  height: var(--app-h-control);
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.chatEnviar:disabled {
+  cursor: default;
+  background: var(--via-navy-16);
+  color: var(--via-text-faint);
+}
+
+.chatEnviar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso {
+    animation: none;
+  }
+
+  .controle,
+  .sair,
+  .chatEnviar {
+    transition: none;
+  }
+}
+
+/* NO MOBILE o 16:9 estrangula: medido a 375, o miolo do tile (244px) estourava
+   um palco de 193 e a nota sumia sob a barra. Abaixo de 600 o palco dimensiona
+   pelo conteúdo, com folga vertical para os sobrepostos. */
+@media (max-width: 599px) {
+  .palco {
+    aspect-ratio: auto;
+  }
+
+  .palcoMiolo {
+    padding-block: calc(28px + 2 * var(--via-space-4)) calc(56px + 2 * var(--via-space-4));
+  }
+}

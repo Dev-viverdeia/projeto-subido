@@ -15,9 +15,10 @@
   box-shadow: var(--via-glow-navy-strong);
 }
 
-/* Ao vivo, a moldura acende — borda viva no tom do Pill live do DS. */
+/* Ao vivo, a moldura acende em ACCENT — o verde do Pill live do DS é
+   vocabulário de semáforo, que a casa bane; o sinal de vivo aqui é o azul. */
 .cartao[data-ao-vivo] {
-  border-color: rgba(31, 138, 91, 0.42);
+  border-color: var(--via-accent-hairline);
 }
 
 .sheen {
@@ -27,11 +28,48 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
+/* DUAS COLUNAS: o que É à esquerda, o que DECIDE à direita.
+   Era uma coluna só com teto de 68ch (~578px) dentro de um cartão que passa de
+   1500 — sobravam mais de mil pixels de vazio no elemento mais proeminente da
+   tela. O teto agora é POR COLUNA, e o cartão se preenche por composição em vez
+   de esticar o texto até a borda. */
 .conteudo {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: var(--app-gap-block) var(--app-gap-section);
+  align-items: start;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  /* Cabeça no topo, mentor ancorado na BASE: o vão morto sob o título era o
+     que fazia o cartão ler vazio — agora os dois cantos da coluna trabalham. */
+  justify-content: space-between;
+  align-self: stretch;
+  gap: var(--app-gap-block);
+  min-width: 0;
+  /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
+     caracteres ÷ 1,369. 46ch ≈ 63 caracteres (eram 60 com a Geist) — dentro da
+     faixa de 45–75 mesmo com o título em corpo de display. */
+  max-width: 46ch;
+}
+
+/* A coluna da decisão: ficha e ação juntas, encostadas na borda direita do
+   cartão. `align-self: stretch` para a ação poder descer até a base quando o
+   texto da esquerda for alto. */
+.lado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-block);
+  min-width: 0;
+}
+
+.cabeca {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-3);
-  max-width: 68ch;
 }
 
 .eyebrow {
@@ -68,6 +106,18 @@
   gap: var(--via-space-2_5);
 }
 
+/* A trilha vira o eyebrow do bloco de mentor: diz DE QUE o mentor é mentor
+   antes do nome, que é a pergunta que a pessoa faz primeiro numa agenda com
+   trilhas diferentes. 6,99:1 sobre a navy. */
+.mentorTrilha {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
 .mentorTextos {
   display: flex;
   flex-direction: column;
@@ -86,24 +136,110 @@
   color: var(--via-gray-400);
 }
 
-.meta {
+/* EMPILHADAS na coluna da direita: "Fazer check-in" e "Ver detalhes" lado a lado
+   pedem ~330px e a coluna tem 300. `stretch` para as duas terem a mesma largura —
+   dois botões de larguras diferentes numa pilha leem como hierarquia acidental. */
+.acoes {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--via-space-2_5);
+}
+
+/* A MESMA `<dl>` do modal da sessão, na temperatura da banda escura.
+   FLEX e não `auto-fit`: `minmax(max-content, 1fr)` não dá ao auto-fit um mínimo
+   definido para calcular a contagem, e a tira colapsa para uma coluna — foi
+   exatamente o que aconteceu no modal. Flex com wrap encaixa quantos couberem. */
+/* VERTICAL na coluna da direita: quatro pares lado a lado precisam de ~460px e a
+   coluna tem 300. Empilhados, o rótulo e o valor formam uma tabela de leitura
+   vertical, que é como se lê ficha de evento. */
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4) var(--app-gap-block);
   margin: 0;
+}
+
+/* Bloco de estatística: rótulo EM CIMA do valor. O par rótulo-à-esquerda /
+   valor-à-direita fazia o olho viajar o vão da coluna para ligar os dois —
+   medido no print: ~500px entre "HORÁRIO" e o horário. */
+.fichaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fichaRotulo {
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  /* 6,99:1 sobre a navy. `--via-text-faint` daria 2,5:1 e sumiria — sobre banda
+     escura a escala de cinza INVERTE. */
+  color: var(--via-gray-400);
+}
+
+.fichaValor {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  /* Um degrau acima do corpo: número é prova, e aqui é o que decide. */
+  font-size: var(--via-fs-h4);
+  letter-spacing: var(--via-ls-tight);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* O PULSO DE "AO VIVO" — accent puro, que é legível justamente sobre a navy
+   (6,52:1). Substitui a `Pill variant="live"` do DS, que é navy sobre navy aqui.
+
+   `animation` e não `transition`: isto é AMBIENTE, não resposta a interação, e a
+   regra da casa é explícita — o gate cobre `transition` e não toca em `animation`
+   porque as duas famílias obedecem a lógicas opostas. */
+.pulso {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+  animation: pulso-ao-vivo 2s ease-in-out infinite;
+}
+
+@keyframes pulso-ao-vivo {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Estado FINAL, não animação rápida: o ponto continua lá, sólido. */
+  .pulso {
+    animation: none;
+  }
+}
+
+/* Lotada e fora-da-janela: texto que explica, no lugar de um botão desabilitado
+   que não explica. Quieto de propósito — não é ação, é motivo. */
+.impedido {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-gray-300);
+  color: var(--via-gray-400);
   font-variant-numeric: tabular-nums;
 }
 
-.acoes {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  flex-wrap: wrap;
-  margin-top: var(--via-space-1);
-}
-
 .confirmado {
+  gap: var(--via-space-2);
   display: inline-flex;
   align-items: center;
   min-height: 40px;
@@ -133,4 +269,31 @@
    Compõe com a sombra de repouso para o elemento não achatar ao focar. */
 .cartao:focus-visible {
   box-shadow: var(--app-ring);
+}
+
+/* Uma coluna abaixo de 900: a ficha volta a ser horizontal, onde há largura para
+   isso, e a ação encosta no texto de novo. */
+@media (max-width: 899px) {
+  .conteudo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+  }
+
+  .principal {
+    max-width: none;
+  }
+
+  /* Quatro blocos em linha, onde há largura para isso. */
+  .ficha {
+    grid-template-columns: repeat(auto-fit, minmax(96px, max-content));
+  }
+
+  /* Com largura sobrando, as ações voltam a ser uma linha e param de ocupar a
+     tela inteira no telefone. */
+  .acoes {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--via-space-3);
+  }
 }

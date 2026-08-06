@@ -1,18 +1,10 @@
-/**
- * GERADO — não editar à mão.
- *
- * Fonte: projeto Supabase fopljjqxituhajzwjrjt (plataforma-subido-viverdeia).
- * Regerar com `npm run db:types`.
- *
- * ATENÇÃO: o CLI exige `supabase login` ou SUPABASE_ACCESS_TOKEN. Sem isso ele
- * escreve o JSON do erro POR CIMA deste arquivo em vez de falhar — o `>` do shell
- * trunca antes de o comando rodar. Confira o topo do arquivo antes de commitar.
- *
- * Ignorado por eslint e prettier (ver eslint.config.mjs e .prettierignore): a
- * integridade de um arquivo gerado é o comando que o gera, não o formatador.
- */
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -71,6 +63,7 @@ export type Database = {
           ideia_original: string
           modelo: string | null
           respostas: Json
+          stack: string | null
           status: Database["public"]["Enums"]["status_builder"]
           titulo: string
         }
@@ -84,6 +77,7 @@ export type Database = {
           ideia_original: string
           modelo?: string | null
           respostas?: Json
+          stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
           titulo?: string
         }
@@ -97,8 +91,118 @@ export type Database = {
           ideia_original?: string
           modelo?: string | null
           respostas?: Json
+          stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
           titulo?: string
+        }
+        Relationships: []
+      }
+      builder_tarefas: {
+        Row: {
+          atualizado_em: string
+          estado: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice: number
+          solucao_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          estado?: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice: number
+          solucao_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          estado?: Database["public"]["Enums"]["estado_tarefa"]
+          etapa_indice?: number
+          solucao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "builder_tarefas_solucao_id_fkey"
+            columns: ["solucao_id"]
+            isOneToOne: false
+            referencedRelation: "builder_solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultor_mensagens: {
+        Row: {
+          cartoes: Json | null
+          conteudo: string
+          criado_em: string
+          id: string
+          papel: string
+          thread_id: string
+        }
+        Insert: {
+          cartoes?: Json | null
+          conteudo: string
+          criado_em?: string
+          id?: string
+          papel: string
+          thread_id: string
+        }
+        Update: {
+          cartoes?: Json | null
+          conteudo?: string
+          criado_em?: string
+          id?: string
+          papel?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_mensagens_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultor_threads: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          dono: string
+          id: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          dono: string
+          id?: string
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          dono?: string
+          id?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      consultor_uso: {
+        Row: {
+          atualizado_em: string
+          dono: string
+          mes: string
+          tokens: number
+        }
+        Insert: {
+          atualizado_em?: string
+          dono: string
+          mes: string
+          tokens?: number
+        }
+        Update: {
+          atualizado_em?: string
+          dono?: string
+          mes?: string
+          tokens?: number
         }
         Relationships: []
       }
@@ -143,6 +247,121 @@ export type Database = {
           titulo?: string
         }
         Relationships: []
+      }
+      mentores: {
+        Row: {
+          ativo: boolean
+          atualizado_em: string
+          criado_em: string
+          foto_url: string | null
+          headline: string
+          id: string
+          nome: string
+          trilha: string
+          usuario_id: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          foto_url?: string | null
+          headline?: string
+          id?: string
+          nome: string
+          trilha: string
+          usuario_id?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          foto_url?: string | null
+          headline?: string
+          id?: string
+          nome?: string
+          trilha?: string
+          usuario_id?: string | null
+        }
+        Relationships: []
+      }
+      mentoria_inscricoes: {
+        Row: {
+          criado_em: string
+          mentoria_id: string
+          usuario_id: string
+        }
+        Insert: {
+          criado_em?: string
+          mentoria_id: string
+          usuario_id: string
+        }
+        Update: {
+          criado_em?: string
+          mentoria_id?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentoria_inscricoes_mentoria_id_fkey"
+            columns: ["mentoria_id"]
+            isOneToOne: false
+            referencedRelation: "mentorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentorias: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          criado_por: string | null
+          descricao: string
+          fim: string
+          id: string
+          inicio: string
+          mentor_id: string
+          sala_url: string | null
+          status: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          vagas: number
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string
+          fim: string
+          id?: string
+          inicio: string
+          mentor_id: string
+          sala_url?: string | null
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo: string
+          vagas?: number
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string
+          fim?: string
+          id?: string
+          inicio?: string
+          mentor_id?: string
+          sala_url?: string | null
+          status?: Database["public"]["Enums"]["status_publicacao"]
+          titulo?: string
+          vagas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentorias_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       modulos: {
         Row: {
@@ -309,9 +528,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mentoria_ocupacao: {
+        Args: { _ids: string[] }
+        Returns: {
+          inscritos: number
+          mentoria_id: string
+        }[]
+      }
     }
     Enums: {
+      estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
       status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
       status_publicacao: "rascunho" | "publicado" | "arquivado"
@@ -442,6 +668,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
       status_builder: ["rascunho", "gerando", "pronta", "falhou"],
       status_publicacao: ["rascunho", "publicado", "arquivado"],

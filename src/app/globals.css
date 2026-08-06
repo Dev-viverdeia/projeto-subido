@@ -129,3 +129,70 @@ html {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * SUBLINHADO DE HOVER — o DS sublinha TODO link, e neste produto isso é errado.
+ *
+ * `tokens.css:598` declara `a:hover { text-decoration: underline }`. A regra faz
+ * sentido para link EM PROSA, onde o sublinhado é a única pista de que aquela
+ * palavra é clicável. Aqui a maioria dos `<a>` não é palavra: é o CARD inteiro do
+ * catálogo, o degrau da trilha, o item da navegação, a retomada. Sublinhar um
+ * card de 340px risca o título e o resumo de uma vez, e o hover passa a parecer
+ * defeito.
+ *
+ * O DS é vendorizado e não se edita — a correção mora aqui, que é a camada de
+ * comportamento de documento. Mesma especificidade da regra do DS (0,1,1) e mais
+ * tarde na cascata, então esta ganha por ordem.
+ *
+ * E o sublinhado VOLTA onde ele é certo: dentro de parágrafo, item de lista ou
+ * citação. Ali o link é mesmo uma palavra no meio do texto, e tirar a pista
+ * deixaria o clicável indistinguível do resto da frase.
+ * ------------------------------------------------------------------------- */
+a:hover {
+  text-decoration: none;
+}
+
+:is(p, li, dd, dt, blockquote, figcaption) a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+ * MODAL — superfície SÓLIDA, porque o vidro do DS nunca chegou a acontecer.
+ *
+ * O `Modal.css` do DS declara `-webkit-backdrop-filter` AO LADO da versão sem
+ * prefixo, tanto no painel quanto no scrim. É exatamente a armadilha registrada
+ * no CLAUDE.md: o Lightning CSS já prefixa pelo browserslist e, ao encontrar a
+ * duplicata manual, DESCARTA AS DUAS. Resultado medido em tela: o painel fica com
+ * `--via-glass-card` (translúcido) e ZERO desfoque — dá para ler o calendário
+ * inteiro através do modal, e o texto do modal disputa espaço com o texto de
+ * trás. Não era estilo, era um bug de build.
+ *
+ * O DS é vendorizado e não se edita, então a correção mora aqui. E ela não tenta
+ * consertar o blur: troca a translucidez por SUPERFÍCIE SÓLIDA. Vidro que depende
+ * de `backdrop-filter` é uma aposta — some em qualquer navegador que não suporte,
+ * e o `@supports` que a casa exige para todo `backdrop-filter` cairia justamente
+ * no fundo sólido. Num painel que carrega decisão (fazer check-in, cancelar), a
+ * legibilidade não pode depender de um recurso opcional.
+ *
+ * O scrim ganha o mesmo tratamento: mais escuro, para o conteúdo de trás recuar
+ * de verdade em vez de competir.
+ * ------------------------------------------------------------------------- */
+/* CLASSE DOBRADA de propósito. `.via-modal` sozinha empata com a regra do DS
+   (0,1,0) e quem ganha passa a depender da ORDEM DE INJEÇÃO do CSS — que muda
+   entre dev e build, porque o CSS do componente é importado pelo próprio módulo.
+   Empate resolvido por ordem é aposta; `.via-modal.via-modal` (0,2,0) ganha
+   sempre, e o seletor continua sendo o mesmo elemento. */
+.via-modal.via-modal {
+  background: var(--via-surface-elev, var(--via-surface));
+  /* Elevação 3 = sobreposto. A hairline sobe junto com a superfície: sombra de um
+     nível com linha de outro é o desvio que o CLAUDE.md nomeia. */
+  border-color: var(--via-border);
+}
+
+.via-modal-scrim.via-modal-scrim {
+  background: radial-gradient(
+    circle at 50% 30%,
+    color-mix(in srgb, var(--via-navy-deep) 62%, transparent),
+    color-mix(in srgb, var(--via-navy-deep) 78%, transparent)
+  );
+}

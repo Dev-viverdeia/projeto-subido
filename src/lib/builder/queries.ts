@@ -3,7 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
-import type { Tables } from '@/lib/supabase/types.generated';
+import type { Enums, Tables } from '@/lib/supabase/types.generated';
 import { DocumentoSolucao, RespostaClarificacao } from './schema';
 
 /**
@@ -37,11 +37,27 @@ export type SolucaoBuilder = {
   erro: string | null;
   modelo: string | null;
   criadoEm: string;
+  /** Onde a pessoa escolheu construir. `null` = ainda não escolheu. */
+  stack: EstadoStack;
+  /**
+   * Estado kanban por ÍNDICE de etapa, não por texto.
+   *
+   * A tabela guarda `(projeto, índice)` e nada mais: se o documento for regerado,
+   * o texto da etapa muda e uma cópia mentiria. O índice é o único elo que
+   * sobrevive à regeração — e é por isso que a chave é composta.
+   *
+   * Índice sem linha na tabela é `a_fazer`: a tarefa nasce pendente sem precisar
+   * de um INSERT por etapa no momento em que o documento fica pronto.
+   */
+  tarefas: Record<number, EstadoTarefa>;
 };
+
+export type EstadoTarefa = Enums<'estado_tarefa'>;
+export type EstadoStack = LinhaBuilder['stack'];
 
 const ListaDeRespostas = RespostaClarificacao.array();
 
-function montar(linha: LinhaBuilder): SolucaoBuilder {
+function montar(linha: LinhaBuilder, tarefas: Record<number, EstadoTarefa> = {}): SolucaoBuilder {
   const respostas = ListaDeRespostas.safeParse(linha.respostas);
   const documento = linha.documento ? DocumentoSolucao.safeParse(linha.documento) : null;
 
@@ -56,6 +72,8 @@ function montar(linha: LinhaBuilder): SolucaoBuilder {
     erro: linha.erro,
     modelo: linha.modelo,
     criadoEm: linha.criado_em,
+    stack: linha.stack,
+    tarefas,
   };
 }
 
@@ -96,12 +114,21 @@ export const listarSolucoesDoBuilder = cache(async (): Promise<ItemHistorico[]> 
 export const obterSolucaoDoBuilder = cache(async (id: string): Promise<SolucaoBuilder | null> => {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('builder_solucoes')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  /* DUAS LEITURAS EM PARALELO, não um join aninhado: o kanban é do PROJETO, e
+     um `builder_tarefas(*)` embutido faria o payload do documento carregar a
+     lista de tarefas em toda leitura — inclusive nas que só querem saber o
+     status. Aqui as duas viajam juntas mas cada uma tem o seu erro. */
+  const [projeto, tarefas] = await Promise.all([
+    supabase.from('builder_solucoes').select('*').eq('id', id).maybeSingle(),
+    supabase.from('builder_tarefas').select('etapa_indice, estado').eq('solucao_id', id),
+  ]);
 
-  if (error) throw handleError(error, 'builder:obter');
-  return data ? montar(data) : null;
+  if (projeto.error) throw handleError(projeto.error, 'builder:obter');
+  if (tarefas.error) throw handleError(tarefas.error, 'builder:tarefas');
+  if (!projeto.data) return null;
+
+  const porIndice: Record<number, EstadoTarefa> = {};
+  for (const t of tarefas.data ?? []) porIndice[t.etapa_indice] = t.estado;
+
+  return montar(projeto.data, porIndice);
 });

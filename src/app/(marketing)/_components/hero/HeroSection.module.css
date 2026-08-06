@@ -71,13 +71,23 @@
     gap: var(--via-space-2);
   }
 
-  /* Grade de três colunas com as laterais IGUAIS (1fr · auto · 1fr) em vez de
-     `space-between`. Com space-between a posição do nav depende da largura do que
-     está à direita, então trocar o que mora ali desloca o nav — o eixo da página
-     não pode ficar refém do rótulo de um link. */
+  /* Grade de três colunas com as laterais IGUAIS em vez de `space-between`. Com
+     space-between a posição do nav depende da largura do que está à direita,
+     então trocar o que mora ali desloca o nav — o eixo da página não pode ficar
+     refém do rótulo de um link.
+
+     `minmax(0, 1fr)` E NUNCA `1fr`, que era o que deixava o eixo refém apesar do
+     parágrafo acima: faixa `1fr` tem mínimo automático `auto` e não encolhe abaixo
+     do min-content dos seus itens, e `.login` é `white-space: nowrap`. Medido a
+     1280 com um rótulo de 524px no lugar de "Entrar" (64px): as faixas iam de
+     281,8 · 597,4 · 281,8 para 99,1 · 537,9 · 524,1 — o lockup central deixava de
+     ser central (99 de um lado, 524 do outro) e o `auto` do meio era espremido.
+     Com `minmax(0, …)` as três ficam onde estavam. É a mesma armadilha que quebrou
+     o shell da área logada; aqui ainda não estourou só porque o rótulo é autoral.
+     Com o rótulo real a mudança é NO-OP: 281,8 · 597,4 · 281,8 antes e depois. */
   .top {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   }
 
   .login {

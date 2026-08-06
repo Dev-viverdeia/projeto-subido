@@ -4,6 +4,9 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 import type { Tables } from '@/lib/supabase/types.generated';
+import { escolherProxima, type VizinhaSolucao } from './proxima';
+
+export type { VizinhaSolucao };
 
 /**
  * Leituras de conteúdo do lado do ALUNO. Toda página RSC chama daqui — nunca
@@ -27,7 +30,9 @@ export type SolucaoResumo = Pick<
   Tables<'solucoes'>,
   'id' | 'slug' | 'titulo' | 'resumo' | 'categoria' | 'publicado_em' | 'criado_em'
 > & {
-  etapas: number;
+  /** IDs das etapas, não a contagem: é com eles que o card cruza o progresso
+      local para saber quantas ESTA pessoa já marcou. `.length` dá o total. */
+  etapaIds: string[];
   /** Nomes, não contagem: alimentam o painel de facetas e o rodapé do card. */
   ferramentas: string[];
 };
@@ -75,7 +80,7 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
   const { data, error } = await supabase
     .from('solucoes')
     .select(
-      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(tipo, titulo, ordem)',
+      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(id, tipo, titulo, ordem)',
     )
     .eq('status', 'publicado')
     .order('ordem', { ascending: true })
@@ -85,7 +90,10 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
 
   return (data ?? []).map(({ solucao_itens, ...solucao }) => ({
     ...solucao,
-    etapas: solucao_itens.filter((i) => i.tipo === 'etapa').length,
+    etapaIds: solucao_itens
+      .filter((i) => i.tipo === 'etapa')
+      .sort((a, b) => a.ordem - b.ordem)
+      .map((i) => i.id),
     ferramentas: solucao_itens
       .filter((i) => i.tipo === 'ferramenta')
       .sort((a, b) => a.ordem - b.ordem)
@@ -110,6 +118,32 @@ export const obterSolucao = cache(async (slug: string): Promise<SolucaoCompleta 
   const { solucao_itens, ...solucao } = data;
   return { ...solucao, itens: estreitarItens(solucao_itens) };
 });
+
+/** A vizinha desta solução na trilha. A REGRA vive em `proxima.ts`, que é puro
+ *  e testado; aqui fica só a leitura. */
+export async function obterProximaSolucao(atual: string): Promise<VizinhaSolucao | null> {
+  const supabase = await createClient();
+  /* A lista inteira, e não um `.gt('ordem', …)`: o catálogo está na casa das
+     dezenas, a linha tem quatro colunas curtas, e a alternativa exigiria uma
+     PRIMEIRA query só para descobrir a ordem da atual — duas idas ao banco para
+     economizar bytes que cabem num pacote. Se o catálogo virar centenas, o lugar
+     de resolver isso é um índice em (status, ordem) e um `range`, não aqui. */
+  const { data, error } = await supabase
+    .from('solucoes')
+    .select('slug, titulo, categoria, ordem')
+    .eq('status', 'publicado')
+    /* O DESEMPATE TEM QUE SER O MESMO DO CATÁLOGO. `listarSolucoes` ordena por
+       `ordem ASC, criado_em DESC`, e `ordem` tem default 0 — ou seja, empate é o
+       caso NORMAL, não a exceção. Só com `ordem`, o Postgres pode devolver as
+       empatadas em qualquer sequência, e "próxima solução" apontaria para um
+       lugar diferente do que a grade mostra logo antes. */
+    .order('ordem', { ascending: true })
+    .order('criado_em', { ascending: false });
+
+  if (error) throw handleError(error, 'solucoes:proxima');
+
+  return escolherProxima(data ?? [], atual);
+}
 
 export async function listarFormacoes(): Promise<FormacaoResumo[]> {
   const supabase = await createClient();

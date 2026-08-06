@@ -1,43 +1,53 @@
+/* SEM BORDA E SEM MOLDURA. A versão anterior encaixava o pôster com 8px de
+   respiro por dentro de um card com hairline — "um pôster montado sobre uma
+   superfície", era o argumento. Na grade real isso somava TRÊS contornos
+   concêntricos em cada card (a borda, a folga, o raio do pôster), e catorze
+   cards viravam catorze molduras.
+
+   Agora o pôster sangra até a borda e quem separa o card do fundo é a SOMBRA,
+   sozinha. `overflow: hidden` no card é o que faz o pôster respeitar o raio sem
+   precisar repeti-lo — um raio só, na peça inteira. */
 .cartao {
   display: flex;
   flex-direction: column;
-  border-radius: var(--app-radius-card);
+  border-radius: var(--via-radius-xl);
   background: var(--via-surface);
-  border: 1px solid var(--via-border-hairline);
-  box-shadow: var(--via-shadow-xs);
+  overflow: hidden;
+  box-shadow: var(--via-shadow-sm);
   color: inherit;
   text-decoration: none;
   transition:
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-state);
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
 }
 
 .cartao:hover {
-  border-color: var(--app-elev-2-line);
-  box-shadow: var(--via-shadow-sm);
-  text-decoration: none;
+  transform: translateY(-4px);
+  box-shadow: var(--via-shadow-lg);
 }
 
+/* O anel COMPÕE com a sombra de repouso — sozinho ele substituiria o
+   `box-shadow` e o card achataria ao receber Tab. */
 .cartao:focus-visible {
+  outline: none;
   box-shadow: var(--app-ring), var(--via-shadow-sm);
-  text-decoration: none;
 }
 
-/* A moldura é o acabamento: o pôster fica ENCAIXADO, com folga e raio próprios
-   (xl por fora, lg por dentro — o raio interno é sempre menor, senão os cantos
-   não ficam concêntricos). Sem esta folga o card vira um retângulo com foto
-   colada no topo, que é exatamente a diferença entre o nosso e o da referência. */
+/* O pôster sangra até a borda; o raio é o do card. */
+/* Sem padding: o pôster encosta nas bordas do card. A regra fica porque o
+   componente ainda a usa como wrapper de layout. */
 .moldura {
-  padding: var(--via-space-2);
+  display: contents;
 }
 
-/* Retrato mais contido: preserva a leitura de capa sem transformar cada formação
-   em uma coluna excessivamente alta. */
+/* 3:4 — retrato, como a referência. A 1600 com 4 colunas o pôster fica 369×492:
+   a proporção que faz o card ler como pôster e não como banner. */
+/* O raio saiu daqui: quem arredonda é o card, via `overflow: hidden`. Repetir o
+   raio no pôster criaria o segundo contorno que este ajuste veio remover. */
 .poster {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: var(--app-radius-control);
   background: var(--via-navy-deep);
   isolation: isolate;
 }
@@ -47,6 +57,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform var(--app-t-scene);
+}
+
+.cartao:hover .imagem {
+  transform: scale(1.06);
 }
 
 /* Capa sintética: campo navy com luz e grão. Não desenha marca nem repete texto
@@ -109,20 +124,15 @@
   pointer-events: none;
 }
 
+/* Só a POSIÇÃO mora aqui: a aparência é do `PillEstado`, o mesmo selo do card de
+   solução e do hero do curso. O que sobrou desta regra é onde ele pousa no
+   pôster — e o `z-index`, porque o scrim é um irmão posicionado logo acima na
+   ordem do documento e cobriria a pill sem ele. */
 .selo {
   position: absolute;
   top: var(--via-space-3);
   right: var(--via-space-3);
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding-inline: var(--via-space-3);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-white);
-  color: var(--via-navy);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  box-shadow: var(--via-shadow-sm);
+  z-index: 1;
 }
 
 /* Legenda do pôster: ancorada na base, dois tons SÓLIDOS. Sobre banda escura a
@@ -153,7 +163,7 @@
   color: var(--via-white);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   overflow: hidden;
 }
 
@@ -161,7 +171,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-4) 0;
+  padding: var(--via-space-4) var(--via-space-4) 0;
   /* Empurra a tira de meta para a base quando `grid-auto-rows: 1fr` iguala os
      cards — resumos de tamanhos diferentes não desalinham a tira entre cards. */
   flex: 1;
@@ -182,13 +192,14 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0;
+  gap: var(--via-space-4);
   margin-top: auto;
 }
 
 .item {
   display: inline-flex;
   align-items: center;
+  gap: var(--via-space-1_5);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
@@ -196,10 +207,9 @@
   white-space: nowrap;
 }
 
-.item + .item::before {
-  content: '/';
-  margin-inline: var(--via-space-2);
-  color: var(--via-border-strong);
+.item svg {
+  color: var(--via-text-faint);
+  flex: none;
 }
 
 /* Fecha o card encostado na base — trilho de largura total, percentual à direita. */
@@ -244,8 +254,10 @@
   font-weight: var(--via-fw-medium);
 }
 
-/* Duas colunas no telefone preservam a varredura do catálogo. Nessa largura o
-   resumo vira ruído, e o título já está na capa; some o resumo, não a informação. */
+/* Duas colunas no telefone (como a referência): pôster é conteúdo de varredura,
+   e uma coluna só faria UM card ocupar a tela inteira. Nessa largura o resumo
+   caberia em ~28 caracteres por linha — vira ruído, e o título já está no
+   pôster. Some o resumo, não a informação. */
 @media (max-width: 599px) {
   .resumo {
     display: none;
@@ -262,6 +274,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
+  .imagem,
   .preenchido {
     transition: none;
   }

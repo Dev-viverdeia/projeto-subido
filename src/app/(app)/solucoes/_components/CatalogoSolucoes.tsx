@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Button, EmptyState, Pagination } from '@/design-system/via';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
-import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
+import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
 import { BuscaCatalogo } from '../../_components/filtros/BuscaCatalogo';
 import { ChipsAtivos } from '../../_components/filtros/ChipsAtivos';
 import { PainelMaisFiltros } from '../../_components/filtros/PainelMaisFiltros';
@@ -33,9 +34,13 @@ function normalizar(texto: string): string {
  */
 export function CatalogoSolucoes({
   solucoes,
+  icones,
+  iconePadrao,
   filtrosIniciais,
 }: {
   solucoes: SolucaoResumo[];
+  icones: Record<string, ReactNode>;
+  iconePadrao: ReactNode;
   filtrosIniciais: FiltrosIniciais;
 }) {
   const [busca, setBusca] = useState(filtrosIniciais.q);
@@ -73,12 +78,18 @@ export function CatalogoSolucoes({
     });
   }, [busca, buscaLenta, categoria, ferramentasSel, ordem]);
 
+  /* A contagem por aba responde "vale a pena clicar?" ANTES do clique — e é
+     contada sobre o catálogo inteiro, não sobre o resultado da busca: uma aba que
+     mudasse de número a cada tecla deixaria de ser referência. */
   const abas = useMemo(() => {
-    const vistas: string[] = [];
+    const porCategoria = new Map<string, number>();
     for (const s of solucoes) {
-      if (s.categoria && !vistas.includes(s.categoria)) vistas.push(s.categoria);
+      if (s.categoria) porCategoria.set(s.categoria, (porCategoria.get(s.categoria) ?? 0) + 1);
     }
-    return [{ id: TODAS, rotulo: 'Todas' }, ...vistas.map((c) => ({ id: c, rotulo: c }))];
+    return [
+      { id: TODAS, rotulo: 'Todas', total: solucoes.length },
+      ...[...porCategoria.entries()].map(([c, total]) => ({ id: c, rotulo: c, total })),
+    ];
   }, [solucoes]);
 
   const facetasFerramentas = useMemo(() => {
@@ -182,86 +193,69 @@ export function CatalogoSolucoes({
 
   return (
     <div className={styles.raiz}>
-      <section className={styles.apresentacao} aria-labelledby="solucoes-titulo">
-        <div className={styles.apresentacaoTexto}>
-          <p className={styles.marcador}>Biblioteca de soluções</p>
-          <h2 className={styles.tituloPagina} id="solucoes-titulo">
-            Implemente uma solução, passo a passo.
-          </h2>
-          <p className={styles.descricaoPagina}>
-            Escolha um projeto e siga um roteiro com etapas, ferramentas e prompts organizados do
-            início à entrega.
-          </p>
-        </div>
-        <div className={styles.placar} aria-label={`${solucoes.length} soluções publicadas`}>
-          <strong>{solucoes.length}</strong>
-          <span>soluções publicadas</span>
-        </div>
-      </section>
-
-      <div className={styles.painelDescoberta}>
-        <div className={styles.regua}>
-          <AbasFiltro
-            abas={abas}
-            ativa={categoria}
-            aoMudar={setCategoria}
-            layoutId="solucoes-aba-ativa"
-            ariaLabel="Filtrar por categoria"
-          />
-          <div className={styles.reguaDireita}>
-            <BuscaCatalogo
-              valor={busca}
-              aoMudar={setBusca}
-              placeholder="Busque por nome, ferramenta ou área"
-            />
-            <PainelMaisFiltros
-              titulo="Ferramentas"
-              opcoes={facetasFerramentas}
-              selecionadas={ferramentasSel}
-              aoAlternar={(id) =>
-                setFerramentasSel((atual) =>
-                  atual.includes(id) ? atual.filter((f) => f !== id) : [...atual, id],
-                )
-              }
-              aoLimpar={() => setFerramentasSel([])}
-            />
-          </div>
-        </div>
-
-        <ChipsAtivos
-          chips={ferramentasSel.map((f) => ({
-            id: `ferramenta:${f}`,
-            rotulo: f,
-            aoRemover: () => setFerramentasSel((atual) => atual.filter((x) => x !== f)),
-          }))}
-          aoLimparTudo={() => setFerramentasSel([])}
+      {/* CATEGORIA E ORDEM na mesma linha, as duas como controle segmentado.
+          A regra escrita no `SeletorVista` — segmentado para MODO, tipográfico
+          para FILTRO — nasceu numa tela que tinha os dois ao mesmo tempo, onde
+          dois sublinhados leriam como dois estados ativos concorrentes. Aqui não
+          há modo: há um filtro e uma ordem, ambos "escolha um de N". A mesma forma
+          para a mesma natureza de escolha é o que mantém a linha calma; o que os
+          distingue é a posição e o rótulo "Ordenar". */}
+      <div className={styles.regua}>
+        <ControleSegmentado
+          opcoes={abas}
+          ativa={categoria}
+          aoMudar={setCategoria}
+          layoutId="solucoes-categoria"
+          ariaLabel="Filtrar por categoria"
         />
 
-        <div className={styles.linhaMeta} ref={topoGradeRef}>
-          <p className={styles.contagem} aria-live="polite">
-            {filtradas.length} {filtradas.length === 1 ? 'solução' : 'soluções'}
-            {haFiltro && filtradas.length !== solucoes.length && ` de ${solucoes.length}`}
-          </p>
-          <div className={styles.ordenacao} role="group" aria-label="Ordenar">
-            <button
-              type="button"
-              className={styles.ordenar}
-              data-ativo={ordem === 'recentes' ? '' : undefined}
-              onClick={() => setOrdem('recentes')}
-            >
-              Recentes
-            </button>
-            <button
-              type="button"
-              className={styles.ordenar}
-              data-ativo={ordem === 'alfabetica' ? '' : undefined}
-              onClick={() => setOrdem('alfabetica')}
-            >
-              A–Z
-            </button>
-          </div>
+        <div className={styles.reguaDireita}>
+          <span className={styles.ordenarRotulo}>Ordenar</span>
+          <ControleSegmentado
+            opcoes={[
+              { id: 'recentes', rotulo: 'Recentes' },
+              { id: 'alfabetica', rotulo: 'A–Z' },
+            ]}
+            ativa={ordem}
+            aoMudar={(id) => setOrdem(id as 'recentes' | 'alfabetica')}
+            layoutId="solucoes-ordem"
+            ariaLabel="Ordenar"
+          />
+          <PainelMaisFiltros
+            titulo="Ferramentas"
+            opcoes={facetasFerramentas}
+            selecionadas={ferramentasSel}
+            aoAlternar={(id) =>
+              setFerramentasSel((atual) =>
+                atual.includes(id) ? atual.filter((f) => f !== id) : [...atual, id],
+              )
+            }
+            aoLimpar={() => setFerramentasSel([])}
+          />
         </div>
       </div>
+
+      <div className={styles.linhaBusca}>
+        <BuscaCatalogo
+          valor={busca}
+          aoMudar={setBusca}
+          placeholder="Buscar solução ou ferramenta"
+        />
+      </div>
+
+      <ChipsAtivos
+        chips={ferramentasSel.map((f) => ({
+          id: `ferramenta:${f}`,
+          rotulo: f,
+          aoRemover: () => setFerramentasSel((atual) => atual.filter((x) => x !== f)),
+        }))}
+        aoLimparTudo={() => setFerramentasSel([])}
+      />
+
+      {/* Âncora do scroll da paginação — a faixa que existia aqui (rótulo de
+          ordenação + contagem) foi desmontada: o controle subiu para a régua e a
+          contagem desceu para o rodapé, junto da paginação que ela descreve. */}
+      <div className={styles.ancoraGrade} ref={topoGradeRef} aria-hidden="true" />
 
       {visiveis.length === 0 ? (
         <EmptyState
@@ -280,7 +274,15 @@ export function CatalogoSolucoes({
           }
         />
       ) : (
-        <div className={styles.grade}>
+        /* A CHAVE POR PÁGINA separa os dois tipos de mudança. Filtrar tira alguns
+           cards do conjunto: ali a saída animada comunica algo, e o
+           `AnimatePresence` faz sentido. Paginar troca os doze de uma vez — todo
+           card sai e todo card entra, e o resultado é um crossfade de duas grades
+           inteiras, com o dobro de nós em tela durante a transição: não informa
+           nada e ainda faz o layout tremer. Com a chave, a troca de página
+           REMONTA a grade — sem saídas, entrada limpa, e a fileira nova já nasce
+           pronta. */
+        <div className={styles.grade} key={`pagina-${paginaVisivel}`}>
           <AnimatePresence mode="popLayout">
             {visiveis.map((solucao, i) => (
               <motion.div
@@ -296,23 +298,41 @@ export function CatalogoSolucoes({
                   y: { duration: 0.44, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
                 }}
               >
-                <CartaoSolucao solucao={solucao} />
+                <CartaoSolucao
+                  solucao={solucao}
+                  icone={(solucao.categoria && icones[solucao.categoria]) || iconePadrao}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
       )}
 
-      {/* O rodapé aparece sempre que há resultado: a CONTAGEM é informação em
-          qualquer tamanho de catálogo ("estou vendo tudo?"). Só o controle de
-          páginas é condicional — com uma página, setas desabilitadas seriam
-          cromo morto. */}
+      {/* O RODAPÉ É O CENTRO DE GRAVIDADE DA NAVEGAÇÃO: contagem, atalho para o
+          catálogo inteiro e páginas, os três centrados no mesmo eixo da grade.
+          A contagem aparece sempre que há resultado — ela responde "estou vendo
+          tudo?" em qualquer tamanho de catálogo. Só as páginas são condicionais:
+          com uma página só, setas desabilitadas seriam cromo morto. */}
       {filtradas.length > 0 && (
         <div className={styles.rodapePaginas}>
-          <p className={styles.mostrando}>
+          <p className={styles.mostrando} aria-live="polite">
             Mostrando {(paginaVisivel - 1) * POR_PAGINA + 1}–
             {Math.min(paginaVisivel * POR_PAGINA, filtradas.length)} de {filtradas.length}
+            {/* "Ver todas" só existe quando há filtro ESCONDENDO algo. Sem filtro
+                ele seria um botão que não muda nada — e um controle que não faz
+                nada ensina a ignorar os que fazem. */}
+            {haFiltro && filtradas.length !== solucoes.length && (
+              <>
+                <span className={styles.separador} aria-hidden="true">
+                  ·
+                </span>
+                <button type="button" className={styles.verTodas} onClick={limparTudo}>
+                  ver todas as {solucoes.length}
+                </button>
+              </>
+            )}
           </p>
+
           {totalPaginas > 1 && (
             <Pagination
               page={paginaVisivel}
