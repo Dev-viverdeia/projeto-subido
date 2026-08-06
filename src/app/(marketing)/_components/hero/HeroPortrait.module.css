@@ -1,6 +1,14 @@
 .wrap {
   position: relative;
   margin: 0;
+  /* `width: 100%` não é decoração: o pai (.figureInner) é flex, então sem largura
+     declarada esta figure vira item flexível e ENCOLHE para a largura intrínseca do
+     conteúdo. Medido com o placeholder no lugar: a caixa fechava em 262px dentro de
+     um contêiner de 470, e a foto (razão 0,667) renderizava 262×393 em `contain`,
+     deixando 98px de vazio vertical — exatamente o que o comentário de `.subject`
+     abaixo diz ter querido evitar. Com os 460px liberados, o recorte passa a ser
+     limitado pela ALTURA (328×492) e preenche a coluna. */
+  width: 100%;
   height: 100%;
   min-height: 420px;
   display: flex;
@@ -56,18 +64,21 @@
   justify-content: center;
 }
 
+/* O `next/image` escreve `width`/`height` a partir do import estático (1024×1536).
+   Estas duas linhas são o que impede o recorte de sair no tamanho intrínseco e
+   estourar a coluna; `object-fit` continua fazendo o enquadramento. */
 .photo {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom center;
+  /* ANCORADO À DIREITA, não centrado. Com `contain` a foto raramente preenche a
+     caixa nos dois eixos, e o resto vira letterbox: centrada, sobravam ~4,5px de cada
+     lado. Esses poucos pixels importam porque o recorte VEM CORTADO no arquivo (folga
+     zero à direita, medido no PNG) — qualquer folga entre o corte e a borda da tela
+     expõe uma linha vertical reta no meio do navy. Ancorado à direita, o corte encosta
+     na sangria e some.
+     `bottom` continua porque o recorte precisa de chão: ele termina na borda inferior
+     da seção, não flutuando acima dela. */
+  object-position: bottom right;
   display: block;
-}
-
-/* Enquanto é placeholder, a moldura precisa de forma própria — um recorte real não
-   tem borda, então o marcador ganha uma. */
-.subject > div {
-  border-radius: var(--via-radius-lg) var(--via-radius-lg) 0 0;
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-bottom: none;
 }

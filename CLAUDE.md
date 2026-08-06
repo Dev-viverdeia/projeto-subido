@@ -196,6 +196,14 @@ o apaga, e nada reprova — nem tsc, nem eslint, nem build. Medido no navegador 
 incluindo os quatro cards de pilar e o CTA primário do hero — o botão que recebe o clique pago.
 `check:identidade` agora reprova `box-shadow` + `:hover` sem `:focus-visible`.
 
+> **E ao varrer o CSSOM atrás dessas regras, um terceiro: `rule.cssRules` de uma folha é
+> uma lista VAZIA, não `undefined`, em toda regra — e lista vazia é _truthy_. O padrão
+> `if (r.cssRules) { recursa; return; }` pula TODAS as folhas da árvore e devolve zero
+> achados com ar de página limpa. Aconteceu aqui: a varredura acusou "48 focáveis sem
+> anel" quando existem 18 regras pintando foco e nenhum elemento em risco. Cheque
+> `r.cssRules && r.cssRules.length`. Auditoria que devolve zero merece a mesma
+> desconfiança que auditoria que devolve muito.
+
 > Ao medir foco, dois erros custam caro e os dois aconteceram aqui: `el.focus()` **não** dispara
 > `:focus-visible` (o navegador exige modalidade de teclado), e ler o computed no meio da
 > transição devolve o valor interpolado. Meça com `transition: none`, ou logo após um Tab real.
@@ -207,6 +215,21 @@ Isso não é sistema responsivo, são 23 decisões independentes. A escala canô
 tocá-la** — trocar 23 breakpoints de uma vez muda o layout de toda a plataforma e exige
 verificação visual que a área logada ainda não permite sem sessão. Não está gateado de propósito:
 gate com 23 exceções não é gate.
+
+**A LANDING já migrou, e sobrou uma exceção sancionada: 1024/1023 FICA.** Nos arquivos da
+landing restam quatro fora da escala (419, 420, 560, 1120), todos em telas que ninguém
+tocou ainda — SiteHeader e SiteFooter. O resto virou 599/600/768/900/1080.
+
+Mas 1024 não é número arbitrário: é iPad em paisagem, e é onde as duas colunas do hero,
+dos pilares e do HUB começam. Medido a 1024 com elas ativas — 466 + 431px de coluna, o
+lead do hero em 52 caracteres por linha, o hero fechando em 820. Empurrar para 1080
+mandaria toda a faixa 1024–1079 para o layout empilhado, o que é regressão e não migração.
+Quem tocar nesses arquivos: mantenha 1024/1023 e não "corrija" para 1080.
+
+E ao migrar, o mapeamento não é para o canônico MAIS PRÓXIMO — é para o que preserva a
+composição. Os depoimentos foram de 720 para 768 e os dois caminhos de 860 para 900,
+ambos SUBINDO, porque o card carrega citação e a 600 ficaria estreito; o índice de pilares
+e a timeline do HUB desceram de 640 para 600, porque cabem.
 
 ### Como compor uma seção
 
@@ -273,6 +296,20 @@ fosse estreito, caberiam MENOS caracteres, não mais.)
 O alvo real é **caracteres ÷ 1,369**: **~50ch para 68 caracteres**, ~53ch para 73. A faixa
 confortável continua **45–75** e nenhum lint pega isso. Ao escrever uma medida nova, **meça** —
 não copie o número de outro arquivo achando que 65ch dá 65 caracteres.
+
+**E o fator varia por TEXTO, não só por fonte.** A tabela acima o trata como propriedade da
+fonte, e ele é — mas só entre TAMANHOS de corpo, para o mesmo texto. Medido na
+landing: a prosa média dá 1,369, mas a linha da garantia ("Assine, use tudo e, se não
+fizer sentido…"), quase toda de letras estreitas, dá **1,50** — os mesmos 53ch rendiam 73
+caracteres num parágrafo e 80 nela. Não existe número de `ch` que sirva para toda copy;
+existe medir a copy que está lá.
+
+**E meça a CAIXA DE LINHA, não a largura do elemento.** `largura do elemento ÷ glifo médio`
+responde "quantos caracteres CABERIAM", que é diferente de "quantos há na linha mais longa".
+As duas divergem sempre que o texto não preenche a caixa — e aí a auditoria acusa defeito
+onde não há. Medido: a linha de confiança do hero acusava 83 e tem 21 (são oito spans, cada
+um sua própria caixa); o rodapé legal acusava 151 e tem 52 (um `<br>` no meio). O certo é
+`Range.selectNodeContents(el)` e o maior `getClientRects()`.
 
 > A troca Geist→Outfit subiu o fator ~5%, então toda medida em `ch` do repo passou a render
 > mais caracteres. Duas cruzaram o teto de 75 por causa disso e foram recalibradas de 56ch para

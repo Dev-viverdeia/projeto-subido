@@ -5,6 +5,7 @@ export { MonoNumber, type MonoNumberProps } from './MonoNumber';
 export { HairlineList, type HairlineListProps } from './HairlineList';
 export { DeviceFrame, type DeviceFrameProps } from './DeviceFrame';
 export { AssetPlaceholder, type AssetPlaceholderProps } from './AssetPlaceholder';
+export { RetratoFicticio, type RetratoFicticioProps } from './RetratoFicticio';
 export { MaskReveal, type MaskRevealProps } from './MaskReveal';
 export { Parallax, type ParallaxProps } from './Parallax';
 export { TrackedCta, type TrackedCtaProps } from './TrackedCta';

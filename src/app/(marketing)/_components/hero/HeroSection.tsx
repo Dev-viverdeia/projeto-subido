@@ -3,7 +3,6 @@ import { HERO, NAV, HEADER_LOGIN } from '@/content/landing';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { MaskReveal } from '../primitives/MaskReveal';
 import { TrackedCta } from '../primitives/TrackedCta';
-import { HeroVideoFacade } from './HeroVideoFacade';
 import { HeroPortrait } from './HeroPortrait';
 import styles from './HeroSection.module.css';
 
@@ -94,19 +93,21 @@ export function HeroSection() {
             </p>
           </div>
 
-          <div className={`${styles.figure} rise rise--now`} style={{ ['--rise-i' as string]: 4 }}>
-            {/* Contêiner próprio da figura: o card do vídeo se posiciona em relação
-                AO RETRATO, não à coluna. Sem isso, mover o retrato para a direita
-                deixaria o card para trás, no meio da coluna de texto. */}
+          {/* A ENTRADA MORA NO RETRATO, não neste contêiner, e a regra vale para quem
+              vier depois: nada com `backdrop-filter` pode ter um ancestral que anime
+              opacidade. Opacidade < 1 cria grupo composto, o filho passa a amostrar o
+              grupo em vez da página, e o vidro não acontece — medido aqui no
+              navegador, e é o mesmo motivo que faz a barra do SiteHeader entrar só por
+              transform. Enquanto o `rise` viveu nesta div, o vidro que existia dentro
+              dela ficava chapado durante ~1,02s (320ms de atraso + 700ms). */}
+          <div className={styles.figure}>
             <div className={styles.figureInner}>
-              <HeroPortrait />
-
-              {/* O vídeo não disputa a coluna com o retrato: se apoia nele, sobreposto
-                  ao canto inferior esquerdo. A camada é o que dá profundidade à
-                  composição sem precisar de 3D. */}
-              <div className={styles.videoCard}>
-                <HeroVideoFacade caption={HERO.videoCaption} />
-              </div>
+              <HeroPortrait
+                alt={HERO.portraitAlt}
+                prioritario
+                className="rise rise--now"
+                style={{ ['--rise-i' as string]: 4 }}
+              />
             </div>
           </div>
         </div>

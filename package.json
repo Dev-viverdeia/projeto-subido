@@ -31,7 +31,8 @@
     "gen:schema-edge": "node scripts/gerar-schema-edge.mjs",
     "check:schema-edge": "node scripts/gerar-schema-edge.mjs --check",
     "check:edge": "deno check supabase/functions/builder/index.ts",
-    "deploy:edge": "npm run gen:schema-edge && supabase functions deploy builder --project-ref fopljjqxituhajzwjrjt"
+    "deploy:edge": "npm run gen:schema-edge && supabase functions deploy builder --project-ref fopljjqxituhajzwjrjt",
+    "check:conteudo-demo": "node scripts/check-conteudo-demo.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs}": [

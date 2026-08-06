@@ -210,7 +210,7 @@
   min-width: 0;
 }
 
-/* --- Figura: retrato + card de vídeo sobreposto -------------------------------- */
+/* --- Figura: o retrato recortado ------------------------------------------------ */
 .figure {
   position: relative;
   min-width: 0;
@@ -233,8 +233,9 @@
   }
 }
 
-/* O contêiner da figura tem a largura do retrato, então o card do vídeo se ancora
-   nele e acompanha qualquer deslocamento lateral. */
+/* Fecha a largura do retrato em 470px e serve de contexto de posicionamento para
+   qualquer camada que venha a se apoiar nele — é o que faz uma sobreposição
+   acompanhar o deslocamento lateral da figura em vez de ficar para trás na coluna. */
 .figureInner {
   position: relative;
   width: min(100%, 470px);
@@ -244,33 +245,31 @@
   justify-content: flex-end;
 }
 
-@media (min-width: 1280px) {
-  .figure {
-    /* Sangra em direção à borda da viewport: a figura ganha ar e o olho corre do
-       texto para ela sem esbarrar numa margem simétrica. */
-    margin-right: calc(var(--via-space-10) * -1);
+/* TETO DE ALTURA — o retrato não pode DITAR a altura do hero.
+   Com a foto real (1024×1536, razão 0,667) e a coluna em 460px, a proporção puxava a
+   figura para 690px de altura. A linha da grade seguia junto e o hero ia de 720 para
+   874 — e a dica "Role para ver", que é `position: absolute; bottom` do hero, caía
+   118px ABAIXO da dobra. Um aviso para rolar que só aparece depois de rolar.
+   Os 184px são medidos, não estimados: é tudo que o hero gasta acima e abaixo da
+   figura (header estático + os dois paddings de bloco) — 874 medido menos 690 da
+   figura. Com o teto, a figura volta a caber e o hero fecha em 100svh.
+   `contain` no `.photo` cuida do resto: a foto encolhe mantendo a proporção em vez
+   de deformar. TODO(medir): reconferir os 184px se o padding do hero mudar. */
+@media (min-width: 1024px) {
+  .figureInner {
+    max-height: calc(100svh - 184px);
   }
 }
 
-/* Card do vídeo apoiado no retrato, não ao lado dele. A sobreposição é o que dá
-   profundidade à cena sem 3D nem vídeo de fundo. */
-.videoCard {
-  position: absolute;
-  left: -22%;
-  bottom: var(--via-space-10);
-  width: min(258px, 62%);
-  z-index: 2;
-}
-
-@media (max-width: 1023px) {
-  .videoCard {
-    position: static;
-    width: 100%;
-    max-width: 420px;
-    margin-inline: auto;
-    margin-top: var(--via-space-6);
-  }
-}
+/* SEM SANGRIA LATERAL. A figura fecha na coluna, alinhada à direita do container.
+   Houve um -40px aqui, e depois uma sangria que alcançava a borda da viewport — as
+   duas empurravam o recorte para fora da tela para esconder um corte do ARQUIVO.
+   Medido no PNG: o corpo encosta na moldura (x=1023) só a partir de y=1024, ou seja
+   no terço inferior — é a perna. Acima disso há folga real, o corpo termina entre
+   x=678 e x=1002. Como o corte fica embaixo, e a base da figura já sangra para fora
+   da seção pelo `margin-bottom` negativo, ele sai de cena sozinho: não é preciso
+   jogar um terço do sujeito para fora da viewport para escondê-lo.
+   O que se ganha: o recorte inteiro fica visível dentro da composição. */
 
 @media (max-width: 1023px) {
   .figure {
@@ -297,7 +296,7 @@
 /* No mobile os dois botões empilhavam com larguras diferentes, o que lê como
    desalinho e não como hierarquia. Largura total iguala os dois e ainda aumenta a
    área de toque. */
-@media (max-width: 559px) {
+@media (max-width: 599px) {
   .actions {
     display: grid;
     gap: var(--via-space-2);

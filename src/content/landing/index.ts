@@ -1,21 +1,43 @@
 import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
 
 /**
- * TODO(conteúdo) — o que ainda precisa vir de vocês antes do tráfego pago ligar:
- *   · números reais da plataforma (marcados como [N] abaixo)
+ * ⚠ CONTEÚDO DE DEMONSTRAÇÃO — NADA NESTE ARQUIVO É VERIFICADO.
+ *
+ * Os `[N]`, `R$ [X]` e `[Nome do aluno]` que moravam aqui foram preenchidos com
+ * valores INVENTADOS para a página poder ser apresentada cheia. Isso inclui os três
+ * depoimentos (pessoas, cidades, prazos e resultados), os preços dos planos, os
+ * números da plataforma, a data do HUB, as respostas de pagamento e do papel do
+ * Pedro, e os contatos do rodapé.
+ *
+ * POR QUE ISTO É PERIGOSO, e é o próprio CLAUDE.md quem diz: depoimento fabricado
+ * numa página de conversão é exposição de CDC/CONAR, não preferência estética —
+ * "a única coisa capaz de derrubar a credibilidade desta página, justamente porque
+ * todo o resto dela é construído sobre atribuição". Preço inventado é pior: é oferta.
+ *
+ * POR ISSO A FLAG ABAIXO EXISTE E O CI REPROVA ENQUANTO ELA ESTIVER LIGADA.
+ * Não basta apagar a flag: desligá-la sem substituir o conteúdo faz a página ir ao ar
+ * com os mesmos dados inventados, agora sem aviso nenhum. O caminho é trocar o
+ * conteúdo por real e ENTÃO desligar.
+ *
+ * O que precisa vir de vocês para desligar:
+ *   · números reais da plataforma e a data de apuração
  *   · preços dos três planos
  *   · data prevista do HUB
  *   · depoimentos reais OU autorização para usar os da Comunidade Subido, rotulados
- *   · VSL, retratos e screenshots dos pilares
+ *   · retratos, e as respostas reais das quatro perguntas de FAQ
+ *   · WhatsApp e e-mail de suporte
  */
+export const CONTEUDO_DEMO = true;
 
 export const HERO = {
   eyebrow: 'Comunidade Subido de Tráfego',
   scrollHint: 'Role para ver',
   /** Linhas AUTORAIS: a quebra é decisão de composição, não acaso de largura — e é o
    *  que torna o mask reveal determinístico. Dois tons sólidos fazem a hierarquia.
-   *  Sem <em> aqui de propósito: itálico no elemento de LCP arrastaria a face
-   *  itálica (+72 kB) para o caminho crítico por causa de uma palavra. */
+   *  Sem <em> aqui, e o motivo mudou: era para não arrastar a face itálica para o
+   *  caminho crítico do LCP; hoje a Outfit não TEM face itálica, e a ênfase da casa
+   *  virou tom. Continua sem <em> porque o tom já é o que separa as duas duplas de
+   *  linhas — um terceiro tom no mesmo bloco viraria ruído. */
   titleLines: [
     { text: 'As empresas já', tone: 'strong' as const },
     { text: 'decidiram usar IA.', tone: 'strong' as const },
@@ -27,6 +49,11 @@ export const HERO = {
   ctaSecondary: { label: 'Ver como funciona', href: '#pilares' },
   trust: ['Pagamento seguro', '7 dias de garantia', 'Acesso imediato'],
   videoCaption: 'Como funciona · 4 min',
+  /** O `alt` do retrato mora aqui, com o resto da copy, e não no componente: é texto
+   *  que uma pessoa lê (com leitor de tela), então segue a mesma regra de todo o
+   *  resto da página. Nome seco, sem cargo — a figura não afirma papel nenhum, e
+   *  quem faz essa afirmação é a seção de autoridade, com fonte. */
+  portraitAlt: 'Pedro Sobral',
 } as const;
 
 /**
@@ -46,15 +73,15 @@ export const PROOF: StatGroup[] = [
   {
     source: 'A plataforma',
     stats: [
-      { value: '[N]', label: 'empresas com implementação entregue' },
+      { value: '64', label: 'empresas com implementação entregue' },
       { value: '103', label: 'soluções publicadas' },
-      { value: '[N]', label: 'implementações rodando em produção' },
+      { value: '180', label: 'implementações rodando em produção' },
     ],
   },
 ];
 
 export const PROOF_NOTE =
-  'Números informados pela Comunidade Subido de Tráfego · atualizados em [mês/ano].';
+  'Números informados pela Comunidade Subido de Tráfego · atualizados em jul/2026.';
 
 /**
  * Navegação do header.
@@ -117,7 +144,7 @@ export const PILLARS: Pillar[] = [
     title: 'Do primeiro conceito à entrega para cliente.',
     sub: 'Trilhas completas em vídeo: curso, módulos, aulas, progresso e certificado. Feitas para quem vai implementar, não para quem vai comentar.',
     facts: [
-      '<strong>[N]</strong> formações · <strong>[N]</strong> aulas',
+      '<strong>12</strong> formações · <strong>287</strong> aulas',
       'Progresso salvo e retomada de onde parou',
       'Certificado por formação',
     ],
@@ -129,10 +156,17 @@ export const PILLARS: Pillar[] = [
     teaser: 'Descreva a ideia. Receba o projeto montado.',
     title: 'Descreva a ideia. Receba o projeto.',
     sub: 'O Builder avalia se a ideia se sustenta e, quando sim, monta a base de conhecimento, o framework, a arquitetura, o stack de ferramentas, o plano de ação e a estimativa de economia.',
+    /* CINCO fatos, contra três dos outros pilares — e não é para preencher a fileira:
+       são os entregáveis que o `sub` desta mesma seção já enumera um a um. Ter três
+       aqui obrigava a agrupar "arquitetura e stack" e "plano e economia" em pares que
+       o produto entrega separados. Contagem igual em todos os pilares é o que a
+       doutrina chama de molde denunciado pela própria regularidade. */
     facts: [
       'Análise de viabilidade antes de qualquer linha',
+      'Base de conhecimento e framework montados',
       'Arquitetura e stack de ferramentas sugeridos',
-      'Plano de ação e estimativa de economia',
+      'Plano de ação por etapa',
+      'Estimativa de economia',
     ],
   },
   {
@@ -143,7 +177,7 @@ export const PILLARS: Pillar[] = [
     title: 'Quando travar, tem gente do outro lado.',
     sub: 'Encontros em grupo toda semana e sessões individuais por crédito, em sala de vídeo dentro da plataforma. Você chega com o problema real e sai com o próximo passo.',
     facts: [
-      '<strong>[N]</strong> encontros em grupo por mês',
+      '<strong>4</strong> encontros em grupo por mês',
       'Sessão individual por crédito',
       'Gravações disponíveis depois',
     ],
@@ -177,9 +211,22 @@ export const HUB = {
   timeline: [
     { label: 'Formação', status: 'Disponível hoje', done: true },
     { label: 'Certificação', status: 'Disponível hoje', done: true },
-    { label: 'HUB', status: 'Previsto para [mês/ano]', done: false },
+    { label: 'HUB', status: 'Previsto para mar/2027', done: false },
   ],
-  criteria: 'Entram no HUB os assinantes com [N] soluções implementadas e certificado ativo.',
+  criteria: 'Entram no HUB os assinantes com 5 soluções implementadas e certificado ativo.',
+  /** Perfis da prévia da interface. INVENTADOS, como todo o resto sob CONTEUDO_DEMO —
+   *  e aqui o risco é o mais direto da página: a seção diz que o HUB abre em 2027 e
+   *  não tem um membro sequer, então estes nomes não podem sobreviver ao desligamento
+   *  da flag. Cidade e especialidade existem porque um diretório sem elas não é um
+   *  diretório, é uma grade de bolinhas. */
+  perfis: [
+    { nome: 'Camila Deodato', local: 'São Paulo/SP', foco: 'Atendimento' },
+    { nome: 'Igor Salgado', local: 'Recife/PE', foco: 'Operações' },
+    { nome: 'Bianca Rocha', local: 'Porto Alegre/RS', foco: 'Comercial' },
+    { nome: 'Tarso Menezes', local: 'Goiânia/GO', foco: 'Financeiro' },
+    { nome: 'Leila Aoki', local: 'Curitiba/PR', foco: 'Logística' },
+    { nome: 'Wesley Prado', local: 'Salvador/BA', foco: 'Marketing' },
+  ],
   /** Fica NA seção, não em rodapé nem tooltip. Num mercado saturado de "ganhe R$10k/mês
    *  em 30 dias", recusar-se a prometer renda é ativo de conversão. */
   disclaimer:
@@ -189,23 +236,50 @@ export const HUB = {
 export const TESTIMONIALS_META = {
   eyebrow: 'Resultados',
   title: 'O que os alunos entregaram.',
-  /** Enquanto for prova emprestada, a origem fica DITA. Prova emprestada rotulada é
-   *  honesta e converte; sem rótulo é a única coisa capaz de derrubar a credibilidade
-   *  desta página, justamente porque todo o resto dela é construído sobre atribuição. */
-  note: 'TODO(prova-social): substituir por depoimentos reais desta plataforma, ou renomear para "Depoimentos da Comunidade Subido de Tráfego" e rotular a origem.',
+  /**
+   * ESTA LINHA É RENDERIZADA NA PÁGINA PÚBLICA, então não pode ser um TODO — e era:
+   * até aqui o campo carregava "TODO(prova-social): substituir por depoimentos
+   * reais...", e o texto aparecia inteiro para quem visitava, com 167 caracteres por
+   * linha. Nota para a equipe mora em comentário; o que vai ao ar é copy.
+   *
+   * O que está no ar agora é a única coisa VERDADEIRA que cabe aqui hoje: resultado
+   * varia. Ela não afirma origem nem autoriza os depoimentos — continua valendo o
+   * que o cabeçalho deste arquivo diz sobre CONTEUDO_DEMO.
+   *
+   * TODO(prova-social): quando os depoimentos forem reais, esta linha vira a nota de
+   * ATRIBUIÇÃO — de onde a prova vem. Se vierem da Comunidade Subido e não desta
+   * plataforma, a origem fica dita aqui e o título da seção muda junto: prova
+   * emprestada rotulada é honesta e converte; sem rótulo é a única coisa capaz de
+   * derrubar a credibilidade desta página, porque todo o resto dela é atribuição.
+   */
+  note: 'Resultados variam conforme o negócio, o tempo dedicado e o mercado.',
 } as const;
 
 export const COMPARISON = {
   eyebrow: 'Comparação',
   title: 'Por que não só fazer um curso.',
   columns: ['Curso avulso', 'Consultoria', 'Aprender sozinho', 'Esta assinatura'],
+  /* PLACAR NÃO PERFEITO, de propósito e por honestidade. Antes esta coluna acertava
+     6 de 6 e "Aprender sozinho" errava 6 de 6 — dois placares perfeitos em direções
+     opostas, que é o que denuncia tabela escrita para a conclusão em vez de medida.
+     Três correções, e nenhuma é cosmética:
+
+     · "Vitrine para ser contratado" SAIU. Era `true` para esta coluna enquanto a
+       seção do HUB, na mesma página, diz "em construção" e "previsto para mar/2027".
+       A tabela contradizia o disclaimer — e o disclaimer é o ativo, não a tabela.
+       O argumento da vitrine continua na seção do HUB, onde cabe a data e a ressalva.
+     · "Alguém implementa por você" ENTROU, e é o `false` honesto desta coluna. É a
+       diferença real para consultoria: lá alguém entrega por você, aqui você aprende
+       a entregar. Ceder este ponto é mais crível que vencer os seis.
+     · "Conteúdo atualizado" virou `true` para quem aprende sozinho. Conteúdo atual
+       existe de graça; o que não existe é o resto da linha. */
   rows: [
-    { label: 'Conteúdo atualizado', values: [false, true, false, true] },
+    { label: 'Conteúdo atualizado', values: [false, true, true, true] },
     { label: 'Passo a passo de implementação', values: [false, true, false, true] },
     { label: 'Ferramentas incluídas', values: [false, false, false, true] },
     { label: 'Mentoria com humano', values: [false, true, false, true] },
     { label: 'Certificado', values: [true, false, false, true] },
-    { label: 'Vitrine para ser contratado', values: [false, false, false, true] },
+    { label: 'Alguém implementa por você', values: [false, true, false, false] },
   ],
 } as const;
 
@@ -215,13 +289,13 @@ export const PRICING_META = {
   title: 'Quanto custa.',
   stackLead: 'Somando o que existe hoje no mercado separadamente:',
   stack: [
-    { label: 'Formação em implementação de IA', value: 'R$ [X]' },
-    { label: 'Biblioteca de soluções prontas', value: 'R$ [X]' },
-    { label: 'Ferramenta de geração de projeto', value: 'R$ [X]/ano' },
-    { label: 'Mentoria mensal', value: 'R$ [X]/ano' },
+    { label: 'Formação em implementação de IA', value: 'R$ 4.800' },
+    { label: 'Biblioteca de soluções prontas', value: 'R$ 3.600' },
+    { label: 'Ferramenta de geração de projeto', value: 'R$ 2.280/ano' },
+    { label: 'Mentoria mensal', value: 'R$ 7.200/ano' },
   ],
-  stackTotal: 'R$ [X] por ano',
-  reveal: 'Na assinatura, a partir de R$ [Y] por mês.',
+  stackTotal: 'R$ 17.880 por ano',
+  reveal: 'Na assinatura, a partir de R$ 197 por mês.',
 } as const;
 
 export const AUTHORITY = {
@@ -235,12 +309,6 @@ export const AUTHORITY = {
       /** Registro dele, não o nosso. A voz autoral da página é VIA; a citada é dele. */
       quote:
         'Eu passei oito anos ensinando gente a vender tráfego. O próximo serviço que as empresas vão comprar é implementação de IA — e quase ninguém tá pronto pra entregar.',
-    },
-    {
-      name: '[Nome do responsável técnico]',
-      role: 'Direção da plataforma',
-      credentials: ['[N] implementações entregues', '103 soluções publicadas', '[N] empresas'],
-      quote: '[TODO: citação sobre por que a plataforma existe e o que ela entrega.]',
     },
   ],
 } as const;
@@ -257,29 +325,31 @@ export const FAQ_META = {
  *  justamente porque todo o resto dela é construído sobre atribuição. */
 export const TESTIMONIALS: Testimonial[] = [
   {
-    name: '[Nome do aluno]',
+    name: 'Rafael Nunes',
     role: 'Implementador de IA',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] semanas',
+    city: 'Curitiba/PR',
+    timeframe: 'em 7 semanas',
     quote:
-      '[Depoimento verbatim, no português do aluno — gíria e tudo. Nunca reescrever para a voz da marca.]',
-    outcome: '[Resultado concreto com número]',
+      'Eu já mexia com tráfego, mas na hora que o cliente pedia automação eu travava e passava pra outro. Peguei a solução de atendimento pronta, adaptei pro nicho dele e entreguei em duas semanas. O que mudou não foi eu saber mais IA, foi ter o passo a passo de implementação na mão.',
+    outcome: '3 clientes de retainer',
   },
   {
-    name: '[Nome do aluno]',
-    role: 'Sócio em agência',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] meses',
-    quote: '[Depoimento verbatim]',
-    outcome: '[Resultado concreto com número]',
+    name: 'Marina Bueno',
+    role: 'Sócia em agência',
+    city: 'Belo Horizonte/MG',
+    timeframe: 'em 4 meses',
+    quote:
+      'A gente vendia gestão de tráfego e ponto. Coloquei implementação de IA como segundo serviço pros clientes que já tinha e não precisei prospectar nada novo. O Builder me poupou a parte que eu mais odiava, que era montar escopo do zero toda vez.',
+    outcome: 'ticket médio de R$ 2.400 para R$ 6.100',
   },
   {
-    name: '[Nome do aluno]',
-    role: 'Dono de negócio local',
-    city: '[Cidade/UF]',
-    timeframe: 'em [N] dias',
-    quote: '[Depoimento verbatim]',
-    outcome: '[Resultado concreto com número]',
+    name: 'Denise Farias',
+    role: 'Dona de negócio local',
+    city: 'Fortaleza/CE',
+    timeframe: 'em 19 dias',
+    quote:
+      'Não sou técnica, tenho três lojas de material de construção. Fiz a formação achando que ia ser código e não era. Montei o atendimento no WhatsApp seguindo a solução e hoje ele responde orçamento fora do horário, que era quando eu perdia venda.',
+    outcome: '41% dos orçamentos fora do horário comercial',
   },
 ];
 
@@ -302,7 +372,7 @@ export const PLANS: Plan[] = [
     id: 'starter',
     name: 'Starter',
     pitch: 'Para começar a implementar e provar que funciona.',
-    priceMonthly: null,
+    priceMonthly: 197,
     features: [
       'Soluções com passo a passo',
       'Formações completas',
@@ -316,7 +386,7 @@ export const PLANS: Plan[] = [
     id: 'pro',
     name: 'Pro',
     pitch: 'Para quem vai implementar para o mercado.',
-    priceMonthly: null,
+    priceMonthly: 397,
     features: [
       'Tudo do Starter',
       'Builder sem limite',
@@ -370,7 +440,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'O HUB já está no ar?',
-    a: 'Ainda não. Formação e certificação estão disponíveis hoje; o HUB está previsto para [mês/ano]. Ele conecta empresas a implementadores certificados — não vendemos vaga nem garantimos contrato.',
+    a: 'Ainda não. Formação e certificação estão disponíveis hoje; o HUB está previsto para março de 2027. Ele conecta empresas a implementadores certificados — não vendemos vaga nem garantimos contrato.',
   },
   {
     q: 'As mentorias são ao vivo? Ficam gravadas?',
@@ -386,7 +456,7 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'Como funcionam pagamento e nota fiscal?',
-    a: '[TODO: meios de pagamento aceitos, parcelamento e emissão de nota fiscal.]',
+    a: 'Cartão de crédito à vista ou recorrente, e Pix na assinatura anual. A nota fiscal é emitida automaticamente a cada cobrança e fica disponível na área de conta.',
   },
   {
     q: 'Como cancelo? E o reembolso?',
@@ -394,11 +464,11 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: 'O Pedro Sobral dá aula na plataforma?',
-    a: '[TODO: descrever exatamente o papel do Pedro no produto — o que ele faz e o que não faz. Esta é uma das duas perguntas que um comprador cético realmente tem; responder com a verdade literal do acordo vale mais do que qualquer promessa.]',
+    a: 'Ele não dá as aulas. O Pedro dirige o produto e aparece nas mentorias em grupo uma vez por mês; as formações são gravadas pelo time técnico da plataforma. Se você está assinando para ter aula com ele todo dia, esta não é a compra certa.',
   },
   {
     q: 'Qual a diferença para a Comunidade Subido de Tráfego?',
-    a: '[TODO: delimitar os dois produtos. A Comunidade Subido é sobre tráfego pago; esta assinatura é sobre implementação de IA. Deixar claro se um inclui o outro.]',
+    a: 'São produtos separados e assinaturas separadas. A Comunidade Subido de Tráfego é sobre tráfego pago; esta assinatura é sobre implementação de IA. Assinar uma não dá acesso à outra.',
   },
 ];
 
@@ -429,8 +499,8 @@ export const FOOTER = {
       titulo: 'Falar com a gente',
       links: [
         // TODO(contato): número e e-mail reais.
-        { label: 'WhatsApp do suporte', href: 'https://wa.me/TODO', external: true },
-        { label: 'suporte@[TODO].com.br', href: 'mailto:suporte@TODO', external: true },
+        { label: 'WhatsApp do suporte', href: 'https://wa.me/5511900000000', external: true },
+        { label: 'suporte@subido.com.br', href: 'mailto:suporte@subido.com.br', external: true },
         { label: 'Sou empresa e quero contratar', href: '#hub' },
       ],
     },

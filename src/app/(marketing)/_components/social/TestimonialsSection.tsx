@@ -1,5 +1,9 @@
+import type { StaticImageData } from 'next/image';
+import rafaelNunes from '@/assets/img/depoimento-rafael-nunes.jpg';
+import marinaBueno from '@/assets/img/depoimento-marina-bueno.jpg';
+import deniseFarias from '@/assets/img/depoimento-denise-farias.jpg';
 import { TESTIMONIALS, TESTIMONIALS_META } from '@/content/landing';
-import { Section, SectionHeader, Reveal, AssetPlaceholder } from '../primitives';
+import { Section, SectionHeader, Reveal, RetratoFicticio } from '../primitives';
 import styles from './TestimonialsSection.module.css';
 
 /**
@@ -13,6 +17,33 @@ import styles from './TestimonialsSection.module.css';
  * citada é do aluno. Uniformizar as duas mata os dois registros — a energia que a
  * audiência do Sobral reconhece só existe como evidência, não como postura autoral.
  */
+/**
+ * ONDE AS FOTOS REAIS ENTRAM. Chave = `name` do depoimento em content/landing.
+ *
+ * Está vazio de propósito, e o vazio é o estado correto até que existam fotos com
+ * direito de uso das pessoas que de fato deram o depoimento. Enquanto uma chave não
+ * existe aqui, o card cai na ilustração — que preenche a composição sem afirmar que
+ * aquela pessoa existe.
+ *
+ * Para ligar uma foto, são duas linhas:
+ *   import rafael from '@/assets/img/depoimento-rafael-nunes.jpg';
+ *   const FOTOS = { 'Rafael Nunes': rafael };
+ *
+ * ESPECIFICAÇÃO DO ARQUIVO: quadrado (1:1), mínimo 224×224 para cobrir os 56px em
+ * telas 2×, rosto centrado no terço superior (o `object-position` é `center top`),
+ * JPG ou WebP — aqui não precisa de alfa, porque a moldura é que recorta.
+ *
+ * E O AVISO QUE IMPORTA: foto de banco de imagens ao lado de um nome, uma cidade e um
+ * resultado inventados não é ilustração, é atribuição falsa — a pessoa da foto passa a
+ * "ter dito" o depoimento. Se as fotos forem entrar, o caminho honesto é que venham
+ * junto dos depoimentos REAIS, das mesmas pessoas.
+ */
+const FOTOS: Record<string, StaticImageData> = {
+  'Rafael Nunes': rafaelNunes,
+  'Marina Bueno': marinaBueno,
+  'Denise Farias': deniseFarias,
+};
+
 export function TestimonialsSection() {
   return (
     <Section id="resultados" tone="tint" labelledBy="resultados-title">
@@ -35,8 +66,12 @@ export function TestimonialsSection() {
             </div>
 
             <footer className={styles.person}>
+              {/* RETRATO ILUSTRADO, não foto de banco: um rosto real que não é o do
+                  depoente afirma que aquela pessoa disse aquilo. Ver RetratoFicticio.
+                  56px e não 44: abaixo disso as feições viram três manchas e o desenho
+                  lê como imagem corrompida em vez de ilustração. */}
               <span className={styles.avatar}>
-                <AssetPlaceholder label="foto" />
+                <RetratoFicticio nome={item.name} foto={FOTOS[item.name]} tamanho={56} />
               </span>
               <span className={styles.identity}>
                 <span className={styles.name}>{item.name}</span>

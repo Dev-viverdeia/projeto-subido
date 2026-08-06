@@ -1,0 +1,57 @@
+/* O SVG é posicionado em absoluto dentro da moldura, então ela precisa ser o contexto
+   de posicionamento e a dona da medida — o `viewBox` do desenho é sempre 100×100 e
+   quem decide o tamanho real é `--retrato-lado`. */
+.moldura {
+  /* token-ok: PELE, CABELO e TINTA DA FEIÇÃO são carga da ilustração, não paleta da
+     marca. Não existem como token `--via-*` de propósito: a marca não tem tom de pele,
+     e criar um faria dele uma cor de sistema que mais cedo ou mais tarde aparece num
+     botão. Ficam confinadas ao único arquivo que desenha gente, e vivem aqui em vez de
+     no TSX porque cor é camada de estilo — o componente escolhe QUAL, não INVENTA. */
+  --rf-pele-0: #f2d0b4;
+  --rf-pele-1: #ddae87;
+  --rf-pele-2: #b9805a;
+  --rf-pele-3: #8d5a3b;
+  --rf-cabelo-0: #2b2118;
+  --rf-cabelo-1: #4a3524;
+  --rf-cabelo-2: #6e4b2e;
+  --rf-cabelo-3: #1b1b1f;
+  --rf-feicao: #1b1b1f;
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--retrato-lado);
+  height: var(--retrato-lado);
+  flex: none;
+  border-radius: var(--via-radius-pill);
+  /* Hairline de contato: sem ela o círculo escuro encosta na superfície clara sem
+     transição e lê como recorte, não como objeto. Sobre banda escura ela inverte
+     (ver `.escuro`), porque a escala de cinza inverte junto com a banda. */
+  box-shadow: 0 0 0 1px var(--app-elev-1-line);
+  overflow: hidden;
+}
+
+/* Mesmo valor que HairlineList, SiteFooter e DeviceFrame usam para hairline sobre a
+   banda navy. Não virou token porque o DS não tem um branco-alfa e a camada de marca
+   sobrescreve cor, não cria escala nova — o alinhamento aqui é com os vizinhos. */
+.escuro {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.moldura svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* A foto preenche a moldura redonda. `cover` e não `contain`: dentro de um círculo,
+   `contain` deixa barras nas laterais e o retrato lê como selo, não como foto. */
+.foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}

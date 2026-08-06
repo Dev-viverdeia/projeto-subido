@@ -48,7 +48,7 @@
   gap: var(--via-space-6);
 }
 
-@media (min-width: 560px) {
+@media (min-width: 600px) {
   .stats {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--via-space-5);
@@ -83,10 +83,16 @@
   max-width: 24ch;
 }
 
+/* MEDIDA, e aqui ela pesa mais que o normal: esta é a nota de fonte, que a doutrina
+   chama de elemento mais credível da página — quem diz de onde vem o número. Sem teto
+   ela ocupava a largura inteira do contêiner e rendia 197 CARACTERES por linha,
+   medidos no navegador. Nota que ninguém consegue ler não credencia nada.
+   53ch rende ~73 no corpo de caption. */
 .note {
   margin: var(--via-space-10) 0 0;
   padding-top: var(--via-space-5);
   border-top: 1px solid var(--via-border-hairline);
+  max-width: 53ch;
   font-size: var(--via-fs-caption);
   color: var(--via-text-faint);
 }

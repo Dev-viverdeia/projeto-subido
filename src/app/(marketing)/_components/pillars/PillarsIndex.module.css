@@ -6,7 +6,7 @@
   gap: var(--via-space-4);
 }
 
-@media (min-width: 640px) {
+@media (min-width: 600px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -27,7 +27,7 @@
   display: grid;
   gap: var(--via-space-2);
   align-content: start;
-  padding: var(--via-space-6) var(--via-space-5) var(--via-space-10);
+  padding: var(--via-space-6) var(--via-space-5);
   border-radius: var(--via-radius-md);
   border: 1px solid var(--via-border-hairline);
   background: var(--via-surface);
@@ -40,10 +40,23 @@
     border-color var(--via-t-fast);
 }
 
+/* `text-decoration: none` PRECISA SER REPETIDO NO HOVER. O DS declara
+   `a:hover { text-decoration: underline }` (tokens.css:598) com seletor de elemento
+   mais pseudo-classe, que ganha do `.card` na especificidade. Sem esta linha o card
+   inteiro — nome, teaser e índice — nasce sublinhado ao passar o mouse, que é como
+   ele estava. O DS não se edita, então a correção mora aqui. */
 .card:hover {
   transform: translate3d(0, -3px, 0);
   box-shadow: var(--via-shadow-md);
   border-color: var(--via-border);
+  text-decoration: none;
+}
+
+/* O índice acende no lugar do ícone que saiu: é o único elemento do card que não
+   carrega conteúdo de leitura, então mudá-lo não compete com o texto. Cor só —
+   `--app-t-state` é a duração de quem não desloca nada. */
+.card:hover .index {
+  color: var(--via-accent-ink);
 }
 
 .index {
@@ -52,6 +65,7 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--via-ls-wide);
   color: var(--via-text-faint);
+  transition: color var(--app-t-state);
 }
 
 .name {
@@ -66,29 +80,6 @@
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
   text-wrap: pretty;
-}
-
-.jump {
-  position: absolute;
-  left: var(--via-space-5);
-  bottom: var(--via-space-5);
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: var(--via-radius-pill);
-  color: var(--via-text-faint);
-  background: var(--via-bg-2);
-  transition:
-    transform var(--via-t-fast),
-    color var(--via-t-fast),
-    background-color var(--via-t-fast);
-}
-
-.card:hover .jump {
-  transform: translate3d(0, 2px, 0);
-  color: var(--via-accent-ink);
-  background: var(--via-accent-soft);
 }
 
 /* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade

@@ -40,7 +40,7 @@
   gap: var(--via-space-4);
 }
 
-@media (min-width: 640px) {
+@media (min-width: 600px) {
   .timeline {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--via-space-5);
@@ -132,23 +132,52 @@
   gap: var(--via-space-3);
 }
 
-@media (min-width: 480px) {
+@media (min-width: 600px) {
   .previewGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* O cartão de perfil deixou de ser uma caixa vazia e passou a ter conteúdo, então
+   perde o `aspect-ratio`: com ele travado em 3:4 o nome e a linha de meta eram
+   cortados pelo `overflow: hidden` nas colunas estreitas. Agora a altura vem do
+   conteúdo e a grade continua regular porque todos os cartões têm as mesmas 3 linhas. */
 .profile {
-  aspect-ratio: 3 / 4;
+  display: grid;
+  justify-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4) var(--via-space-2);
   border-radius: var(--via-radius-sm);
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.profileNome {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  /* Sobre a banda navy o cinza INVERTE: --via-text-soft daria 3,45:1 e reprova AA. */
+  color: var(--via-gray-300);
+  line-height: var(--via-lh-snug);
+}
+
+.profileMeta {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-gray-400);
+  line-height: var(--via-lh-snug);
 }
 
 .disclaimer {
   margin: var(--via-space-16) 0 0;
   padding-top: var(--via-space-5);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  max-width: 70ch;
+  /* 53ch e não 70: com o fator da Outfit (1,369) os 70ch rendiam 96 caracteres por
+     linha, muito acima da faixa de 45–75 — e este é o parágrafo que a seção existe
+     para que seja lido, o de não-promessa. Medido no navegador depois: 75. */
+  max-width: 53ch;
   font-size: var(--via-fs-caption);
   line-height: var(--via-lh-loose);
   color: var(--via-gray-400);

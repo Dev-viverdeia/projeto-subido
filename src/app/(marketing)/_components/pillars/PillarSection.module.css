@@ -35,3 +35,42 @@
 .media {
   min-width: 0;
 }
+
+/* ---- Variante DESTAQUE ---------------------------------------------------------
+   Uma coluna, não duas: a declaração vive numa medida de leitura e a tela ocupa a
+   largura inteira embaixo. É a quebra deliberada do molde 50/50 dos outros três — ver
+   o comentário do componente para o porquê e para os números que motivaram.
+
+   Em coluna única o `align-items: center` do `.split` não serve: com a mídia mais alta
+   que o texto ele centralizaria a copy verticalmente contra a moldura. */
+.destaque {
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .destaque {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-12);
+  }
+
+  /* A copy para na medida de leitura mesmo com o contêiner em 1280: título de largura
+     total viraria uma linha de 120 caracteres, e a régua da casa é 45–75. */
+  .destaque .copy {
+    max-width: var(--via-content);
+  }
+
+  /* Os fatos passam a fileira — quem faz o layout é o próprio HairlineList, via
+     `direcao="fileira"`, porque a régua precisa girar junto e ela mora lá. Aqui só
+     cai o teto de medida: em coluna única, 46ch deixaria uma calha morta de ~500px
+     à direita da lista. */
+  .destaque .facts {
+    max-width: none;
+  }
+
+  /* `flip` não se aplica a uma coluna só; anular explicitamente evita que um `flip`
+     esquecido no consumidor reordene copy e mídia sem motivo. */
+  .destaque.flip .copy,
+  .destaque.flip .media {
+    order: initial;
+  }
+}

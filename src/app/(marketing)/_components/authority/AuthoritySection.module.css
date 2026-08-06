@@ -4,10 +4,17 @@
   gap: var(--via-space-12);
 }
 
-/* Colunas de largura IGUAL — é a gramática visual que comunica a paridade. */
+/* UMA COLUNA ENQUANTO HÁ UMA PESSOA. O desenho eram duas colunas de largura igual,
+   e a igualdade era a mensagem: o rosto conhecido e a direção técnica pesando o mesmo.
+   Com `repeat(2, 1fr)` e um único card, metade da linha ficava vazia — o que não lê
+   como composição assimétrica, lê como card que não carregou.
+   `auto-fit` em vez de contagem fixa: quando a segunda pessoa voltar, a paridade volta
+   junto sem ninguém precisar lembrar de mexer aqui. O teto de 520px impede a coluna
+   solitária de esticar até 1280 e transformar a citação numa linha de 150 caracteres. */
 @media (min-width: 900px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, min(520px, 100%)));
+    justify-content: start;
     gap: var(--via-space-12);
   }
 }
@@ -18,7 +25,7 @@
   align-content: start;
 }
 
-@media (min-width: 560px) {
+@media (min-width: 600px) {
   .person {
     grid-template-columns: 140px minmax(0, 1fr);
     gap: var(--via-space-6);
@@ -33,7 +40,7 @@
   box-shadow: var(--via-shadow-md);
 }
 
-@media (max-width: 559px) {
+@media (max-width: 599px) {
   .portrait {
     max-width: 160px;
   }
@@ -92,4 +99,16 @@
   line-height: var(--via-lh-loose);
   color: var(--via-text-body);
   text-wrap: pretty;
+}
+
+/* O recorte tem fundo transparente e a moldura é o enquadramento: `cover` preenche a
+   caixa 3:4 e `object-position: top` mantém o rosto no terço superior, que é onde ele
+   está no arquivo. Com `contain` sobrava vazio nas laterais e o recorte lia como
+   adesivo dentro do card, em vez de retrato emoldurado. */
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
 }

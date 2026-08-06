@@ -1,4 +1,3 @@
-import { ArrowDown } from 'lucide-react';
 import { PILLARS } from '@/content/landing';
 import { Section, SectionHeader, Reveal } from '../primitives';
 import styles from './PillarsIndex.module.css';
@@ -38,13 +37,15 @@ export function PillarsIndex() {
       <ol className={styles.grid}>
         {PILLARS.map((pillar, i) => (
           <Reveal key={pillar.slug} as="li" index={i} className={styles.item}>
+            {/* SEM ÍCONE. A seta em círculo saiu por dois motivos que se somam: é o
+                "card com ícone em círculo" que a doutrina lista como assinatura de
+                design genérico, e ela repetia quatro vezes a mesma informação que o
+                cursor e a elevação no hover já dão. O que sinaliza que o card é
+                clicável agora é o conjunto — levanta, ganha sombra, e o índice acende. */}
             <a href={`#${pillar.slug}`} className={styles.card}>
               <span className={styles.index}>{pillar.index}</span>
               <span className={styles.name}>{pillar.name}</span>
               <span className={styles.teaser}>{pillar.teaser}</span>
-              <span className={styles.jump} aria-hidden="true">
-                <ArrowDown size={14} />
-              </span>
             </a>
           </Reveal>
         ))}
