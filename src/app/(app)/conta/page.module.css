@@ -39,9 +39,38 @@
   max-width: var(--via-content);
 }
 
+/* O RÓTULO OCUPA O QUE O RÓTULO PRECISA. Estava em `160px` fixos — largura de chute
+   com aparência de decisão, que é como o CLAUDE.md classifica o caso. Medido aqui:
+   o `<dt>` "Nome" recebia 160px para um texto de 27px, ou seja 133px de vazio entre
+   o rótulo e o valor, em toda linha da lista.
+
+   `fit-content(12ch)` e NÃO `minmax(max-content, 12ch)`: as duas parecem dizer a
+   mesma coisa e não dizem. Em `minmax`, o 12ch é o teto que a faixa PODE alcançar, e
+   com espaço livre disponível ela alcança — medido, o rótulo foi de 160px para 126,
+   que é exatamente 12ch, e sobraram 99px de vazio. `fit-content` dimensiona pelo
+   CONTEÚDO e só usa o valor como limite.
+
+   O teto de 12ch existe para um rótulo novo e comprido não empurrar a coluna de
+   valores para fora: acima disso ele quebra em duas linhas, que é preferível a
+   espremer o dado ao lado.
+
+   E QUEM DEFINE AS FAIXAS É O `<dl>`, NÃO CADA LINHA — via `subgrid`. Com cada linha
+   dimensionando sozinha, "Nome" fechava em 27px e "E-mail" em 29, e os valores
+   deixavam de alinhar entre si: 2px de degrau, pequeno mas visível como coluna torta.
+   Era esse alinhamento o único trabalho que os 160px fixos faziam de útil, e ele
+   precisava ser preservado. Com `subgrid`, as linhas herdam as MESMAS faixas do
+   contêiner: a coluna é a do maior rótulo do conjunto, e os valores nascem alinhados.
+
+   O breakpoint 640 fica: a migração para a escala canônica é por tela, ao tocá-la, e
+   esta tela não foi medida em outras larguras nesta passagem. */
 @media (min-width: 640px) {
+  .lista {
+    grid-template-columns: fit-content(12ch) 1fr;
+  }
+
   .linha {
-    grid-template-columns: 160px 1fr;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     gap: var(--via-space-4);
     align-items: baseline;
   }
