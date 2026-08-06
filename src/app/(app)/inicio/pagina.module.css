@@ -128,27 +128,104 @@
   }
 }
 
-/* ------------------------------------------------------------------- o meio */
+/* ----------------------------------------------------------------- destinos */
 
-/* Gráficos à esquerda (a área), o trilho do agora à direita (a medida). */
-.meio {
+/* Seis cards, 3×2 — fileiras sempre cheias (contagem fixa não usa auto-fit). */
+.destinos {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--app-gap-grid);
-  align-items: start;
 }
 
 @media (max-width: 1079px) {
-  .meio {
+  .destinos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .destinos {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.trilho {
+.destino {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-3);
-  min-width: 0;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  text-decoration: none;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-touch),
+    transform var(--app-t-touch);
+}
+
+.destino:hover {
+  transform: translateY(-2px);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.destino:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.destinoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--via-space-2);
+}
+
+/* Ícone NU, sem círculo — círculo decorativo em grade de cards é a assinatura
+   de template que a casa bane. O mesmo desenho do trilho de navegação. */
+.destinoIcone {
+  display: flex;
+  color: var(--via-navy);
+}
+
+.destinoSeta {
+  display: flex;
+  color: var(--via-text-faint);
+  transition:
+    color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.destino:hover .destinoSeta {
+  color: var(--via-text-primary);
+  transform: translateX(2px);
+}
+
+.destinoTitulo {
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.destinoDescricao {
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+/* O dado real fecha o card, em mono — número é prova, não decoração. */
+.destinoDado {
+  margin-top: var(--via-space-2);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .secao {
@@ -216,7 +293,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .heroMentoria,
-  .heroMentoriaSeta {
+  .heroMentoriaSeta,
+  .destino,
+  .destinoSeta {
     transition: none;
   }
 }
