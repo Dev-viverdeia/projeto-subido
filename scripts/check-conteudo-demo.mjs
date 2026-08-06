@@ -8,10 +8,19 @@
  * CDC/CONAR e preço fabricado é oferta — os dois precisam de uma porta de saída, e
  * esta é ela.
  *
- * POR QUE UM GATE E NÃO UM COMENTÁRIO: comentário não reprova merge. O CLAUDE.md é
- * explícito — "se não é aplicado no CI, é sugestão, e sugestão não sobrevive". O
- * conteúdo de demonstração é exatamente o tipo de coisa que passa com tsc, eslint,
- * prettier e build todos verdes.
+ * ESTE SCRIPT NÃO ESTÁ NO CI, E ISSO É DELIBERADO — mas foi um erro de descrição
+ * antes: a versão anterior deste comentário citava o CLAUDE.md ("se não é aplicado no
+ * CI, é sugestão") como se ele já estivesse no validate-pr.yml. Não está, e nunca
+ * esteve. Enquanto a plataforma for MVP com conteúdo mockado, pô-lo no CI deixaria
+ * toda PR vermelha por uma condição conhecida e aceita — alarme que toca sempre é
+ * alarme que ninguém escuta.
+ *
+ * O ponto de ligação certo é o DEPLOY DE PRODUÇÃO, não o merge: mock no repositório é
+ * normal, mock no ar é oferta falsa. Quem montar o pipeline de produção: chame
+ * `npm run check:conteudo-demo` lá, e aí ele vira o gate que o nome promete.
+ *
+ * Até então, rode antes de qualquer publicação. O conteúdo de demonstração é
+ * exatamente o tipo de coisa que passa com tsc, eslint, prettier e build verdes.
  *
  * Como desligar: troque o conteúdo por real e ponha `CONTEUDO_DEMO = false`. Desligar
  * a flag sem trocar o conteúdo publica os mesmos dados inventados, agora sem aviso.
