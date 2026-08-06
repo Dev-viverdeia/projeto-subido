@@ -178,20 +178,32 @@
   color: var(--via-white);
 }
 
-/* Pendência declarada (o motivo mora no cabeçalho da página). */
+/* O caminho para a folha — vivo, sobre a navy. */
 .baixar {
   display: inline-flex;
   align-items: center;
   height: 28px;
   padding-inline: var(--via-space-3);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: var(--app-radius-control);
-  background: none;
-  color: var(--via-gray-400);
-  font: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--via-white);
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
-  cursor: default;
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.baixar:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.baixar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
 }
 
 /* ---------------------------------------------------------------- andamento */
@@ -430,6 +442,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .linha,
+  .baixar,
   .vazioCta,
   .vazioCtaGhost {
     transition: none;

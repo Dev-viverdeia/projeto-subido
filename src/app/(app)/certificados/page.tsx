@@ -32,8 +32,9 @@ export default async function CertificadosPage() {
         <p className={styles.eyebrow}>Reconhecimento</p>
         <h1 className={styles.titulo}>Certificados.</h1>
         <p className={styles.apoio}>
-          Cada formação ou solução concluída vira um certificado aqui. A emissão em PDF chega com o
-          backend de certificados — a conclusão já fica registrada.
+          Cada formação ou solução concluída vira um certificado aqui — abra a folha para imprimir
+          ou salvar em PDF. A conclusão vale neste navegador; o registro na conta chega com o
+          backend de certificados.
         </p>
       </header>
 

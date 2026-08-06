@@ -163,11 +163,10 @@ export function GaleriaCertificados({
 
                   <div className={styles.diplomaBase}>
                     <span className={styles.marca}>subido</span>
-                    {/* Pendência declarada: a emissão depende do backend — o
-                        motivo está no cabeçalho da página. */}
-                    <button type="button" className={styles.baixar} disabled>
-                      Baixar PDF
-                    </button>
+                    {/* A folha existe: imprimir/salvar em PDF acontece lá. */}
+                    <Link href={`/certificados/${c.origem}/${c.slug}`} className={styles.baixar}>
+                      Ver certificado
+                    </Link>
                   </div>
                 </article>
               </li>

@@ -1,0 +1,296 @@
+/* O certificado: a folha clara em A4 paisagem, e as ações fora dela. */
+
+.pagina {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.imprimir {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.imprimir:hover {
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.imprimir:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+/* -------------------------------------------------------------------- folha */
+
+/* PAPEL: claro, A4 paisagem (297/210). O navy vira TINTA — fundo escuro em
+   impressora é desperdício, e navegadores descartam fundos por padrão. */
+.folha {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 297 / 210;
+  background: var(--via-bg);
+  border: 1px solid var(--via-navy-16);
+  border-radius: var(--app-radius-card);
+  box-shadow: var(--via-glow-navy);
+  overflow: hidden;
+}
+
+/* Moldura dupla — a gramática de diploma, em dois pesos de hairline navy. */
+.molduraExterna {
+  position: absolute;
+  inset: 16px;
+  border: 1.5px solid var(--via-navy);
+  border-radius: 8px; /* token-ok: raio aninhado do documento, 20 − 12 de folga visual */
+  pointer-events: none;
+}
+
+.molduraInterna {
+  position: absolute;
+  inset: 22px;
+  border: 1px solid var(--via-navy-16);
+  border-radius: 5px; /* token-ok: acompanha a externa − folga de 6 */
+  pointer-events: none;
+}
+
+.folhaMiolo {
+  position: absolute;
+  inset: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(20px, 4vw, 48px);
+}
+
+.folhaTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.marca {
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: -0.01em; /* token-ok: assinatura segue o desenho do logotipo, não a escala de texto */
+  color: var(--via-navy);
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--via-radius-pill);
+  border: 1.5px solid var(--via-navy);
+  color: var(--via-navy);
+}
+
+.folhaCentro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--via-space-2);
+}
+
+.eyebrow {
+  margin: 0 0 var(--via-space-3);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+}
+
+.certificamos {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+/* O NOME é o protagonista do documento. */
+.nome {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.6vw, 2.5rem);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.concluiu {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+
+.tituloConteudo {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.375rem);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  max-width: 40ch;
+  text-wrap: balance;
+}
+
+.folhaBase {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--app-gap-section);
+}
+
+.dado {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dadoRotulo {
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.dadoValor {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A procedência, dita na folha: este registro é local. Sem código inventado. */
+.origem {
+  margin: 0 0 0 auto;
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-faint);
+  text-align: right;
+  max-width: 30ch;
+}
+
+/* ---------------------------------------------------------------- pendência */
+
+.pendencia {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-8) var(--app-pad-card);
+  border: 1px dashed var(--via-navy-16);
+  border-radius: var(--app-radius-surface);
+}
+
+.pendenciaTitulo {
+  margin: 0;
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  color: var(--via-text-primary);
+}
+
+.pendenciaTexto {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.pendenciaCta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.pendenciaCta:hover {
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.pendenciaCta:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Isola a FOLHA: tudo invisível menos ela, que assume a página em paisagem.
+   `visibility` e não `display` — esconder o shell por display quebraria o
+   fluxo e levaria a folha junto. */
+@media print {
+  :global(body) * {
+    visibility: hidden;
+  }
+
+  .folha,
+  .folha * {
+    visibility: visible;
+  }
+
+  .folha {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    aspect-ratio: auto;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .imprimir,
+  .pendenciaCta {
+    transition: none;
+  }
+}
