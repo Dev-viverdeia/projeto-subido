@@ -7,7 +7,22 @@ e não em `src/assets/img/`, ao contrário de todas as outras imagens do projeto
 (A regra de `src/assets/` vale para imagem que o código importa: o Next fingerprinta e
 serve com cache imutável. Aqui o dono do caminho é o banco, que não sabe de hash.)
 
-## Os quatro que faltam
+## ⚠ OS QUATRO ATUAIS SÃO REUSO — substituir
+
+As fotos que estão aqui hoje são **cópias de retratos do HUB da landing**. Foi uma
+escolha de conveniência para a tela não ficar com iniciais, e ela tem um custo que
+precisa ser pago antes de mostrar isto a alguém de fora: **a mesma cara aparece em duas
+telas do produto com nomes diferentes** — o rosto de `hub-bianca-rocha` é a mentora
+Camila Duarte, o de `hub-leila-aoki` é a Renata Alves, e assim por diante.
+
+Escolhi os do HUB e não os dos depoimentos porque no HUB eles são miniaturas de 48px
+numa "prévia da interface", e portanto os menos memoráveis dos nove. Continua sendo
+duplicação.
+
+Para resolver: gere quatro rostos NOVOS com os prompts abaixo e sobrescreva os
+arquivos. Nada mais muda — o banco já aponta para estes caminhos.
+
+## Os quatro arquivos
 
 | arquivo             | mentor        | trilha        |
 | ------------------- | ------------- | ------------- |
