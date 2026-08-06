@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { listarAgenda } from '@/lib/mentorias/queries';
+import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
+import { listarThreads } from '@/lib/consultor/queries';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
+import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
@@ -10,22 +12,30 @@ import entrada from '../_components/entrada.module.css';
 import { RetomadaFormacao } from '../formacoes/_components/RetomadaFormacao';
 import { horaCurta, rotuloDoDia } from '../mentorias/_components/estadoMentoria';
 import { CartaoSolucao } from '../solucoes/_components/CartaoSolucao';
+import { MapaPlataforma } from './_components/MapaPlataforma';
+import { PainelProgresso } from './_components/PainelProgresso';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Início' };
 
 /**
- * O painel de entrada compõe os três pilares SEM inventar número: a retomada só
- * aparece com progresso local real, as soluções são as últimas publicadas do
- * banco, e a mentoria vem da agenda — que deixou de ser gerada em código.
+ * O INÍCIO: saudação, o mapa da plataforma com o número real de cada pilar,
+ * os dois gráficos de progresso e o trilho do agora (retomada + mentoria).
+ *
+ * SEM NÚMERO INVENTADO — a regra que este painel sempre carregou, agora com
+ * mais números: aulas/etapas/certificados derivam do progresso local deste
+ * navegador (cliente); projetos, conversas e a agenda vêm do banco via RLS.
+ * Todo tile leva para a tela dona do número.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
-  const [{ data }, solucoes, formacoes, agenda] = await Promise.all([
+  const [{ data }, solucoes, formacoes, agenda, projetos, conversas] = await Promise.all([
     supabase.auth.getClaims(),
     listarSolucoes(),
     listarFormacoes(),
     listarAgenda(),
+    listarSolucoesDoBuilder(),
+    listarThreads(),
   ]);
 
   const claims = data?.claims;
@@ -33,41 +43,75 @@ export default async function InicioPage() {
   const nome = meta.nome?.split(' ')[0] ?? null;
 
   const agora = new Date();
-  /* A agenda já vem ordenada por início; aqui só sobra descartar o que terminou.
-     Sem mentoria cadastrada, o bloco inteiro some — nada de convite vazio. */
+  const dataLonga = agora.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+
+  /* A agenda já vem ordenada por início; sobra descartar o que terminou. */
   const proximaMentoria = agenda.find((s) => new Date(s.fimIso).getTime() > agora.getTime());
+  const mentoriaCurta = proximaMentoria
+    ? `${rotuloDoDia(proximaMentoria.inicioIso, agora).principal === 'Hoje' ? 'HOJE' : rotuloDoDia(proximaMentoria.inicioIso, agora).mono} · ${horaCurta(proximaMentoria.inicioIso)}`
+    : null;
 
   const recentes = solucoes.slice(0, 3);
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo={nome ? `Bem-vindo, ${nome}` : 'Início'} oculto />
+      <CabecalhoPagina titulo="Início" oculto />
 
-      <div className={`${entrada.bloco} ${styles.linhaTopo}`}>
-        <RetomadaFormacao formacoes={formacoes} />
+      {/* SAUDAÇÃO: a data como eyebrow (caixa-alta por conteúdo → tracking de
+          eyebrow) e o nome como display. Sem frase de efeito embaixo — o
+          conteúdo da página é a frase. */}
+      <header className={`${entrada.bloco} ${styles.saudacao}`}>
+        <p className={styles.data}>{dataLonga}</p>
+        <h1 className={styles.ola}>{nome ? `Olá, ${nome}.` : 'Olá.'}</h1>
+      </header>
 
-        {proximaMentoria && (
-          <Link href="/mentorias" className={styles.mentoria}>
-            <span className={styles.mentoriaTextos}>
-              {/* A pill "demonstração" saiu junto com os dados de exemplo: a
-                  sessão que aparece aqui está cadastrada e publicada. */}
-              <span className={styles.mentoriaRotulo}>Próxima mentoria</span>
-              <span className={styles.mentoriaTitulo}>{proximaMentoria.titulo}</span>
-              <span className={styles.mentoriaMeta}>
-                {rotuloDoDia(proximaMentoria.inicioIso, agora).principal} ·{' '}
-                {horaCurta(proximaMentoria.inicioIso)}
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
+        <MapaPlataforma
+          totalSolucoes={solucoes.length}
+          totalFormacoes={formacoes.length}
+          aulaIdsPorFormacao={formacoes.map((f) => f.aulaIds)}
+          etapaIdsPorSolucao={solucoes.map((s) => s.etapaIds)}
+          projetosBuilder={projetos.length}
+          conversasConsultor={conversas.length}
+          proximaMentoria={mentoriaCurta}
+        />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso2} ${styles.meio}`}>
+        <PainelProgresso
+          formacoes={formacoes.map((f) => ({ slug: f.slug, titulo: f.titulo, aulaIds: f.aulaIds }))}
+          agoraIso={agora.toISOString()}
+        />
+
+        {/* O trilho do AGORA: retomar de onde parou e a próxima sessão. */}
+        <aside className={styles.trilho}>
+          <RetomadaFormacao formacoes={formacoes} />
+
+          {proximaMentoria && (
+            <Link href="/mentorias" className={styles.mentoria}>
+              <span className={styles.mentoriaTextos}>
+                <span className={styles.mentoriaRotulo}>Próxima mentoria</span>
+                <span className={styles.mentoriaTitulo}>{proximaMentoria.titulo}</span>
+                <span className={styles.mentoriaMeta}>
+                  {rotuloDoDia(proximaMentoria.inicioIso, agora).principal} ·{' '}
+                  {horaCurta(proximaMentoria.inicioIso)}
+                </span>
               </span>
-            </span>
-            <span className={styles.mentoriaSeta} aria-hidden="true">
-              <ArrowRight size={16} strokeWidth={2} />
-            </span>
-          </Link>
-        )}
+              <span className={styles.mentoriaSeta} aria-hidden="true">
+                <ArrowRight size={16} strokeWidth={2} />
+              </span>
+            </Link>
+          )}
+        </aside>
       </div>
 
       {recentes.length > 0 && (
         <section
-          className={`${entrada.bloco} ${entrada.atraso1} ${styles.secao}`}
+          className={`${entrada.bloco} ${entrada.atraso3} ${styles.secao}`}
           aria-labelledby="inicio-solucoes"
         >
           <div className={styles.secaoTopo}>

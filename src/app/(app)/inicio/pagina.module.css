@@ -6,11 +6,56 @@
   gap: var(--via-space-6);
 }
 
-.linhaTopo {
+/* ---------------------------------------------------------------- saudação */
+
+.saudacao {
   display: flex;
-  align-items: stretch;
-  gap: var(--via-space-4);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+/* Caixa-alta por conteúdo (a data) → tracking de eyebrow mesmo sem
+   text-transform no conteúdo original; aqui o transform explicita. */
+.data {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.ola {
+  margin: 0;
+  font-size: var(--via-fs-h1);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+}
+
+/* ------------------------------------------------------------------- o meio */
+
+/* Gráficos à esquerda (a área), o trilho do agora à direita (a medida). */
+.meio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: var(--app-gap-grid);
+  align-items: start;
+}
+
+@media (max-width: 1079px) {
+  .meio {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.trilho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  min-width: 0;
 }
 
 /* Teaser da mentoria — mesma família da retomada: pill de vidro, uma linha. */
@@ -18,7 +63,6 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-4);
-  max-width: 420px;
   padding: var(--via-space-3) var(--via-space-4);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-md);
