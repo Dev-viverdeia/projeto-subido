@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { listarSolucoes } from '@/lib/conteudo/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
-import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
 import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoSolucoes } from './_components/CatalogoSolucoes';
@@ -25,12 +24,7 @@ export default async function SolucoesPage({ searchParams }: PageProps<'/solucoe
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>
-        <CatalogoSolucoes
-          solucoes={solucoes}
-          icones={ICONES_CATEGORIAS}
-          iconePadrao={ICONE_CATEGORIA_PADRAO}
-          filtrosIniciais={lerFiltrosIniciais(params)}
-        />
+        <CatalogoSolucoes solucoes={solucoes} filtrosIniciais={lerFiltrosIniciais(params)} />
       </div>
     </div>
   );

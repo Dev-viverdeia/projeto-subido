@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { Button, EmptyState, Pagination } from '@/design-system/via';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
@@ -34,13 +33,9 @@ function normalizar(texto: string): string {
  */
 export function CatalogoSolucoes({
   solucoes,
-  icones,
-  iconePadrao,
   filtrosIniciais,
 }: {
   solucoes: SolucaoResumo[];
-  icones: Record<string, ReactNode>;
-  iconePadrao: ReactNode;
   filtrosIniciais: FiltrosIniciais;
 }) {
   const [busca, setBusca] = useState(filtrosIniciais.q);
@@ -298,10 +293,7 @@ export function CatalogoSolucoes({
                   y: { duration: 0.44, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
                 }}
               >
-                <CartaoSolucao
-                  solucao={solucao}
-                  icone={(solucao.categoria && icones[solucao.categoria]) || iconePadrao}
-                />
+                <CartaoSolucao solucao={solucao} />
               </motion.div>
             ))}
           </AnimatePresence>

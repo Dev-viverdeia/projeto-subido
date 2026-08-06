@@ -39,31 +39,14 @@
   box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
-/* O topo é uma linha só: glifo, categoria e — quando há — o estado à direita.
-   Antes o glifo era bloco e a categoria vinha embaixo; com a pill entrando, três
-   elementos empilhados comiam 40px da altura útil do card. */
+/* O topo é uma linha só: categoria à esquerda, estado à direita. Havia um glifo de
+   categoria antes delas — saiu, porque repetia em desenho o que o rótulo ao lado já
+   dizia em palavra (ver o comentário do componente). */
 .topo {
   display: flex;
   align-items: center;
   gap: var(--via-space-2_5);
   margin-bottom: var(--via-space-3);
-}
-
-.glifo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--app-radius-chip);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
-  transition: transform var(--app-t-touch);
-}
-
-.cartao:hover .glifo {
-  transform: scale(1.08);
 }
 
 .eyebrow {
@@ -147,7 +130,7 @@
    variante que a marca declara legível sobre claro. */
 /* O SELO vem do `PillEstado` — a aparência mora lá, e o que sobra aqui é só a
    POSIÇÃO dele neste card. É o único elemento do topo que não desce com o texto:
-   alinhado ao topo, fica na mesma altura do glifo em todos os cards, e a coluna
+   alinhado ao topo, fica na mesma altura da categoria em todos os cards, e a coluna
    de estado passa a ser uma linha reta na grade inteira. */
 .selo {
   margin-left: auto;
@@ -220,7 +203,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
-  .glifo,
   .barra {
     transition: none;
   }

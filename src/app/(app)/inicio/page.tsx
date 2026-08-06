@@ -7,7 +7,6 @@ import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
-import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../_components/iconesCategorias';
 import entrada from '../_components/entrada.module.css';
 import { ITENS_NAV } from '../_components/navegacao';
 import { horaCurta, rotuloDoDia } from '../mentorias/_components/estadoMentoria';
@@ -181,14 +180,7 @@ export default async function InicioPage() {
                 padrão. O ícone chega como ELEMENTO já renderizado do Server
                 Component — passar a referência arrastaria o lucide para o cliente. */}
             {recentes.map((solucao) => (
-              <CartaoSolucao
-                key={solucao.id}
-                solucao={solucao}
-                icone={
-                  (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) ||
-                  ICONE_CATEGORIA_PADRAO
-                }
-              />
+              <CartaoSolucao key={solucao.id} solucao={solucao} />
             ))}
           </div>
         </section>

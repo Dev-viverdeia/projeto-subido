@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
 import {
   contarEtapasFeitas,
@@ -14,13 +13,18 @@ import { PillEstado } from '../../_components/PillEstado';
 import styles from './CartaoSolucao.module.css';
 
 /**
- * Card do catálogo de soluções — SEM capa, de propósito. O texto carrega o card
- * (decisão herdada da plataforma de referência), e a categoria entra como
- * intensidade de navy no chip-glifo, nunca como cor nova.
+ * Card do catálogo de soluções — SEM capa, de propósito: o texto carrega o card.
  *
- * O `icone` chega JÁ RENDERIZADO do servidor (padrão navegacao.tsx): este arquivo
- * é client por viver dentro da grade animada, e importar lucide aqui arrastaria a
- * biblioteca para o bundle.
+ * SEM ÍCONE DE CATEGORIA. O card tinha um glifo de 34px em moldura arredondada ao
+ * lado do rótulo — o mesmo "card com ícone em círculo" que a doutrina lista como
+ * assinatura de design genérico, e que já saiu dos cards de pilar da landing pelo
+ * mesmo motivo. Ele repetia em desenho o que o rótulo ao lado já dizia em palavra
+ * ("VENDAS", "FINANCEIRO"), e numa grade de dez cards viravam dez selos disputando
+ * atenção com os títulos. A categoria continua, em texto.
+ *
+ * De quebra o card deixou de depender do lucide: era por causa do glifo que o ícone
+ * precisava chegar JÁ RENDERIZADO do servidor, para a biblioteca não entrar no bundle
+ * deste componente cliente.
  *
  * Raiz é `<Link>`, não `<div onClick>` — ctrl+clique, botão do meio e "abrir em
  * nova aba" são de graça.
@@ -30,7 +34,7 @@ import styles from './CartaoSolucao.module.css';
  * rodapé volta a ser só a contagem do catálogo. Uma pill "não iniciada" em todos
  * os cards de quem acabou de entrar seria ruído com aparência de informação.
  */
-export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icone: ReactNode }) {
+export function CartaoSolucao({ solucao }: { solucao: SolucaoResumo }) {
   const progresso = useProgresso();
 
   const ferramentas = solucao.ferramentas;
@@ -57,9 +61,6 @@ export function CartaoSolucao({ solucao, icone }: { solucao: SolucaoResumo; icon
       data-estado={emProgresso ? estado : undefined}
     >
       <div className={styles.topo}>
-        <span className={styles.glifo} aria-hidden="true">
-          {icone}
-        </span>
         {solucao.categoria && <p className={styles.eyebrow}>{solucao.categoria}</p>}
 
         <PillEstado estado={estado} className={styles.selo} />
