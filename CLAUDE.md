@@ -192,6 +192,14 @@ o apaga, e nada reprova — nem tsc, nem eslint, nem build. Medido no navegador 
 incluindo os quatro cards de pilar e o CTA primário do hero — o botão que recebe o clique pago.
 `check:identidade` agora reprova `box-shadow` + `:hover` sem `:focus-visible`.
 
+> **E ao varrer o CSSOM atrás dessas regras, um terceiro: `rule.cssRules` de uma folha é
+> uma lista VAZIA, não `undefined`, em toda regra — e lista vazia é _truthy_. O padrão
+> `if (r.cssRules) { recursa; return; }` pula TODAS as folhas da árvore e devolve zero
+> achados com ar de página limpa. Aconteceu aqui: a varredura acusou "48 focáveis sem
+> anel" quando existem 18 regras pintando foco e nenhum elemento em risco. Cheque
+> `r.cssRules && r.cssRules.length`. Auditoria que devolve zero merece a mesma
+> desconfiança que auditoria que devolve muito.
+
 > Ao medir foco, dois erros custam caro e os dois aconteceram aqui: `el.focus()` **não** dispara
 > `:focus-visible` (o navegador exige modalidade de teclado), e ler o computed no meio da
 > transição devolve o valor interpolado. Meça com `transition: none`, ou logo após um Tab real.
