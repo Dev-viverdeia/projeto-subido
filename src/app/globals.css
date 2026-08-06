@@ -111,6 +111,34 @@ html {
   outline-offset: 2px;
 }
 
+/* O ANEL DO CAMPO VIVE NA MOLDURA, NÃO NO <input> DE DENTRO.
+   O `Input` do DS é uma casca (`.via-input`, 400×42 com raio 12) em volta de um
+   `<input>` cru (370×20, raio 0) — a casca é que desenha borda, fundo e vidro. Sem
+   esta regra o anel de foco cai no elemento interno, e o resultado é um anel pequeno
+   flutuando DENTRO da moldura, com raio diferente do dela. Medido em produção com Tab
+   real: `box-shadow: 0 0 0 2px branco, 0 0 0 4px navy` numa caixa de 370×20, dentro de
+   uma moldura de 400×42 — duas formas concêntricas que não se acompanham.
+
+   `outline` E `box-shadow` zerados nos dois: o anel do DS é box-shadow, então zerar só
+   o outline não apaga nada. É a mesma cirurgia que Compositor.module.css já fazia no
+   textarea do Builder, pelo mesmo motivo.
+
+   E a moldura ganha o anel de verdade, composto com a sombra de repouso para o campo
+   não achatar ao receber foco — `:focus-within` e não `:focus-visible` porque quem
+   recebe o foco é o filho, não ela. */
+.via-input :where(input, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.via-input:has(:focus-visible) {
+  border-color: var(--via-navy-40);
+  box-shadow:
+    var(--app-ring),
+    0 1px 0 var(--via-edge-hi) inset,
+    0 1px 2px var(--via-navy-04);
+}
+
 /* Sobre banda escura o anel navy some — aqui o accent CST é a cor legível. */
 .via-mesh-navy :where(a, button, input, [tabindex]):focus-visible,
 .via-glass-dark :where(a, button, input, [tabindex]):focus-visible {
