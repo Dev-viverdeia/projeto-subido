@@ -53,8 +53,8 @@ export function PainelProgresso({
   const totalJanela = dias.reduce((n, d) => n + d.total, 0);
 
   return (
-    <div className={styles.paineis}>
-      <section className={styles.painel} aria-labelledby="inicio-progresso">
+    <section className={styles.painel} aria-labelledby="inicio-progresso">
+      <div className={styles.bloco}>
         <h2 id="inicio-progresso" className={styles.eyebrow}>
           Progresso nas formações
         </h2>
@@ -87,9 +87,12 @@ export function PainelProgresso({
         {!haProgresso && barras.length > 0 && (
           <p className={styles.semDados}>As barras enchem conforme você conclui aulas.</p>
         )}
-      </section>
+      </div>
 
-      <section className={styles.painel} aria-labelledby="inicio-atividade">
+      <div
+        className={`${styles.bloco} ${styles.blocoAtividade}`}
+        aria-labelledby="inicio-atividade"
+      >
         <div className={styles.atividadeTopo}>
           <h2 id="inicio-atividade" className={styles.eyebrow}>
             Atividade · 14 dias
@@ -117,7 +120,7 @@ export function PainelProgresso({
             ))}
           </div>
         )}
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }

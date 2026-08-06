@@ -11,13 +11,14 @@ import {
 import styles from './MapaPlataforma.module.css';
 
 /**
- * O MAPA da plataforma: um tile por destino, cada um com o SEU número real —
- * é o "levar para as telas" com um motivo para ir, não uma grade de ícones.
+ * O MAPA da plataforma como LISTA, não grade: seis linhas com hairline entre
+ * elas, rótulo à esquerda e o número real em mono à direita. A grade de seis
+ * tiles iguais era a assinatura de template que a casa manda evitar — lista
+ * com medida lê como índice, e índice é o que isto é.
  *
- * Número é protagonista (mono, tabular): aulas e etapas vêm do progresso
- * local deste navegador; projetos, conversas e a próxima mentoria vêm do
- * servidor via RLS. Nenhum número decorativo — quando não há nada, o tile
- * diz zero ou um traço, e continua levando para a tela.
+ * Aulas, etapas e certificados derivam do progresso local; projetos,
+ * conversas e a próxima mentoria chegam do servidor via RLS. Nenhum número
+ * decorativo.
  */
 export function MapaPlataforma({
   totalSolucoes,
@@ -53,67 +54,73 @@ export function MapaPlataforma({
       (ids) => estadoDoProgresso(contarEtapasFeitas(progresso, ids), ids.length) === 'concluida',
     ).length;
 
-  const tiles = [
+  const linhas = [
     {
       href: '/formacoes' as const,
       rotulo: 'Formações',
-      numero: String(aulasFeitas),
-      de: `/${todasAulas.length}`,
-      sub: `aulas concluídas · ${totalFormacoes} trilhas`,
+      detalhe: `${totalFormacoes} trilhas`,
+      valor: `${aulasFeitas}/${todasAulas.length}`,
+      unidade: 'aulas',
     },
     {
       href: '/solucoes' as const,
       rotulo: 'Soluções de IA',
-      numero: String(etapasFeitas),
-      de: `/${todasEtapas.length}`,
-      sub: `etapas implementadas · ${totalSolucoes} soluções`,
+      detalhe: `${totalSolucoes} soluções`,
+      valor: `${etapasFeitas}/${todasEtapas.length}`,
+      unidade: 'etapas',
     },
     {
       href: '/builder' as const,
       rotulo: 'Builder',
-      numero: String(projetosBuilder),
-      de: null,
-      sub: projetosBuilder === 1 ? 'projeto formulado' : 'projetos formulados',
+      detalhe: 'do problema ao plano',
+      valor: String(projetosBuilder),
+      unidade: projetosBuilder === 1 ? 'projeto' : 'projetos',
     },
     {
       href: '/consultor' as const,
       rotulo: 'Consultor',
-      numero: String(conversasConsultor),
-      de: null,
-      sub: conversasConsultor === 1 ? 'conversa aberta' : 'conversas abertas',
+      detalhe: 'indica a solução certa',
+      valor: String(conversasConsultor),
+      unidade: conversasConsultor === 1 ? 'conversa' : 'conversas',
     },
     {
       href: '/mentorias' as const,
       rotulo: 'Mentorias',
-      numero: proximaMentoria ?? '—',
-      de: null,
-      sub: proximaMentoria ? 'próxima sessão' : 'sem sessão marcada',
-      compacto: true,
+      detalhe: proximaMentoria ? 'próxima sessão' : 'sem sessão marcada',
+      valor: proximaMentoria ?? '—',
+      unidade: null,
     },
     {
       href: '/certificados' as const,
       rotulo: 'Certificados',
-      numero: String(certificados),
-      de: null,
-      sub: certificados === 1 ? 'conquistado' : 'conquistados',
+      detalhe: 'formações e soluções',
+      valor: String(certificados),
+      unidade: certificados === 1 ? 'conquistado' : 'conquistados',
     },
   ];
 
   return (
     <nav className={styles.mapa} aria-label="Mapa da plataforma">
-      {tiles.map((t) => (
-        <Link key={t.href} href={t.href} className={styles.tile}>
-          <span className={styles.tileRotulo}>{t.rotulo}</span>
-          <span className={styles.tileNumero} data-compacto={t.compacto ? '' : undefined}>
-            {t.numero}
-            {t.de && <span className={styles.tileDe}>{t.de}</span>}
-          </span>
-          <span className={styles.tileSub}>{t.sub}</span>
-          <span className={styles.tileSeta} aria-hidden="true">
-            <ArrowRight size={14} strokeWidth={2} />
-          </span>
-        </Link>
-      ))}
+      <h2 className={styles.eyebrow}>A plataforma</h2>
+      <ul className={styles.lista}>
+        {linhas.map((l) => (
+          <li key={l.href}>
+            <Link href={l.href} className={styles.linha}>
+              <span className={styles.textos}>
+                <span className={styles.rotulo}>{l.rotulo}</span>
+                <span className={styles.detalhe}>{l.detalhe}</span>
+              </span>
+              <span className={styles.valorBloco}>
+                <span className={styles.valor}>{l.valor}</span>
+                {l.unidade && <span className={styles.unidade}>{l.unidade}</span>}
+              </span>
+              <span className={styles.seta} aria-hidden="true">
+                <ArrowRight size={14} strokeWidth={2} />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

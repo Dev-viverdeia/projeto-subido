@@ -1,0 +1,31 @@
+/* A linha de fatos sobre a navy: número em branco, palavra em gray-300 —
+   hierarquia por dois tons SÓLIDOS, nunca opacidade. */
+
+.fatos {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--via-space-2);
+  row-gap: var(--via-space-1);
+  font-size: var(--via-fs-sm);
+  color: var(--via-gray-300);
+}
+
+.fato {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  white-space: nowrap;
+}
+
+.numero {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-body);
+  color: var(--via-white);
+  font-variant-numeric: tabular-nums;
+}
+
+.divisor {
+  color: var(--via-gray-400);
+}

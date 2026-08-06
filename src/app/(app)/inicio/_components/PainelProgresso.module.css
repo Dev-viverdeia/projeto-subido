@@ -1,21 +1,26 @@
-/* Os dois painéis de gráfico — CSS puro: trilho + preenchimento, colunas. */
-
-.paineis {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-grid);
-  min-width: 0;
-}
+/* UM card composto — barras em cima, atividade embaixo, hairline entre os
+   dois. Dois cards brancos soltos liam como caixas; um documento composto lê
+   como painel. CSS puro: trilho + preenchimento, colunas. */
 
 .painel {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
-  padding: var(--app-pad-card);
+  min-width: 0;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
+}
+
+.bloco {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card);
+}
+
+.blocoAtividade {
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .eyebrow {

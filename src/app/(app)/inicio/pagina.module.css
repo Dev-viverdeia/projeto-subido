@@ -6,16 +6,30 @@
   gap: var(--via-space-6);
 }
 
-/* ---------------------------------------------------------------- saudação */
+/* -------------------------------------------------------------------- hero */
 
-.saudacao {
+/* A única banda escura da tela — mesma regra do CartaoProxima na agenda: o
+   escuro marca o momento. Saudação à esquerda, o agora à direita. */
+.hero {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--app-gap-section);
+  padding: clamp(28px, 3.4vw, 44px);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--via-navy-16);
+  box-shadow: var(--via-glow-navy);
 }
 
-/* Caixa-alta por conteúdo (a data) → tracking de eyebrow mesmo sem
-   text-transform no conteúdo original; aqui o transform explicita. */
+.heroEsquerda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  min-width: 0;
+}
+
 .data {
   margin: 0;
   font-family: var(--via-font-mono);
@@ -23,16 +37,95 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--via-ls-label);
   text-transform: uppercase;
-  color: var(--via-text-faint);
+  /* Sobre a navy a escala inverte: gray-400 (6,99:1), nunca text-faint. */
+  color: var(--via-gray-400);
 }
 
 .ola {
   margin: 0;
-  font-size: var(--via-fs-h1);
+  font-family: var(--via-font-display);
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-h1);
   line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
+  color: var(--via-white);
+}
+
+/* O AGORA no hero: superfície de tinta branca rala sobre a navy (não vidro —
+   opacity animada no ancestral de backdrop-filter quebraria o vidro durante a
+   cascata de entrada). */
+.heroMentoria {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  flex-shrink: 0;
+  max-width: 380px;
+  padding: var(--app-pad-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--app-radius-card);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.heroMentoria:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.heroMentoria:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.heroMentoriaRotulo {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent);
+}
+
+.heroMentoriaTitulo {
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+.heroMentoriaMentor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  font-size: var(--via-fs-caption);
+  color: var(--via-gray-300);
+}
+
+.heroMentoriaSeta {
+  display: flex;
+  color: var(--via-gray-400);
+  transition: transform var(--app-t-touch);
+}
+
+.heroMentoria:hover .heroMentoriaSeta {
+  transform: translateX(2px);
+  color: var(--via-white);
+}
+
+@media (max-width: 899px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroMentoria {
+    max-width: none;
+  }
 }
 
 /* ------------------------------------------------------------------- o meio */
@@ -56,83 +149,6 @@
   flex-direction: column;
   gap: var(--via-space-3);
   min-width: 0;
-}
-
-/* Teaser da mentoria — mesma família da retomada: pill de vidro, uma linha. */
-.mentoria {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-md);
-  background: var(--via-glass-card);
-  backdrop-filter: blur(14px) saturate(1.3);
-  box-shadow: var(--via-shadow-xs);
-  color: inherit;
-  text-decoration: none;
-  transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .mentoria {
-    background: var(--via-surface);
-  }
-}
-
-.mentoria:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--via-shadow-md);
-}
-
-.mentoriaTextos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.mentoriaRotulo {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  font-family: var(--via-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.mentoriaTitulo {
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mentoriaMeta {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-/* `display: flex` porque o filho é um SVG inline: sem isso o glifo-caixa herda o
-   espaço de descida da linha e a seta assenta 3px abaixo do centro do card. */
-.mentoriaSeta {
-  display: flex;
-  flex: none;
-  color: var(--via-text-muted);
-  transition: transform var(--via-t-fast);
-}
-
-.mentoria:hover .mentoriaSeta {
-  transform: translateX(2px);
 }
 
 .secao {
@@ -199,8 +215,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mentoria,
-  .mentoriaSeta {
+  .heroMentoria,
+  .heroMentoriaSeta {
     transition: none;
   }
 }
@@ -208,6 +224,3 @@
 /* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
    zero): a box-shadow desta classe o apagava. Medido: foco sem NADA visível.
    Compõe com a sombra de repouso para o elemento não achatar ao focar. */
-.mentoria:focus-visible {
-  box-shadow: var(--app-ring);
-}
