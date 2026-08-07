@@ -74,8 +74,8 @@ const ETAPAS: Etapa[] = [
     titulo: 'Prospectar',
     resumo: 'Atrair e qualificar oportunidades',
     marco: 'realizar a chamada de descoberta',
-    destino: '/consultor',
-    acao: 'Preparar chamada de descoberta',
+    destino: '/crm',
+    acao: 'Abrir CRM e preparar o lead',
     contexto:
       'Organize as informações do lead, identifique sinais de oportunidade e chegue à conversa sabendo o que precisa descobrir.',
     guia: 'Roteiro da primeira conversa comercial',
@@ -171,6 +171,8 @@ type Props = {
   cliente: string;
   lead: string;
   contato: string;
+  proximaAcao?: string | null;
+  etapaInicial?: IdEtapa;
   proximaMentoria?: string | null;
 };
 
@@ -180,10 +182,12 @@ export function MapaJornada({
   cliente,
   lead,
   contato,
+  proximaAcao,
+  etapaInicial = 'prospectar',
   proximaMentoria,
 }: Props) {
-  const [etapaAtiva, setEtapaAtiva] = useState<IdEtapa>('vender');
-  const etapa = ETAPAS.find((item) => item.id === etapaAtiva) ?? ETAPAS[2]!;
+  const [etapaAtiva, setEtapaAtiva] = useState<IdEtapa>(etapaInicial);
+  const etapa = ETAPAS.find((item) => item.id === etapaAtiva) ?? ETAPAS[1]!;
   const hoje = new Date();
   const dataLonga = hoje.toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -298,7 +302,7 @@ export function MapaJornada({
               <dt>
                 <CalendarDays size={14} aria-hidden="true" /> Prazo desejado
               </dt>
-              <dd>Concluir este ciclo na próxima semana</dd>
+              <dd>{proximaAcao ? 'Definido na próxima ação do CRM' : 'Ainda não definido'}</dd>
             </div>
           </dl>
 
@@ -337,16 +341,16 @@ export function MapaJornada({
         </article>
 
         <aside className={styles.hoje}>
-          <h2>Em andamento hoje</h2>
+          <h2>Próximas ações</h2>
           <div className={styles.agenda}>
             <Link href={etapa.destino} className={styles.agendaItem}>
               <span className={styles.agendaIcone} aria-hidden="true">
                 <CalendarDays size={18} strokeWidth={1.8} />
               </span>
               <span>
-                <small>09:30</small>
+                <small>Oportunidade em foco</small>
                 <strong>{cliente}</strong>
-                <em>{etapa.checklist[0]?.titulo}</em>
+                <em>{proximaAcao ?? etapa.checklist[0]?.titulo}</em>
               </span>
               <ArrowRight size={14} strokeWidth={1.8} aria-hidden="true" />
             </Link>
@@ -368,7 +372,7 @@ export function MapaJornada({
                 <FileText size={18} strokeWidth={1.8} />
               </span>
               <span>
-                <small>14:00</small>
+                <small>Recomendação</small>
                 <strong>Revisar escopo da proposta</strong>
                 <em>Organize entregáveis e próximos passos</em>
               </span>
@@ -376,8 +380,8 @@ export function MapaJornada({
             </Link>
           </div>
 
-          <Link href="/mentorias" className={styles.linkAgenda}>
-            Ver agenda completa
+          <Link href="/crm" className={styles.linkAgenda}>
+            Abrir operação comercial
             <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
           </Link>
         </aside>

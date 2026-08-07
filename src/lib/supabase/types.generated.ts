@@ -206,6 +206,246 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_contatos: {
+        Row: {
+          atualizado_em: string
+          cargo: string | null
+          criado_em: string
+          dono: string
+          email: string | null
+          empresa_id: string
+          id: string
+          linkedin_url: string | null
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          cargo?: string | null
+          criado_em?: string
+          dono: string
+          email?: string | null
+          empresa_id: string
+          id?: string
+          linkedin_url?: string | null
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          cargo?: string | null
+          criado_em?: string
+          dono?: string
+          email?: string | null
+          empresa_id?: string
+          id?: string
+          linkedin_url?: string | null
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_contatos_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      crm_empresas: {
+        Row: {
+          atualizado_em: string
+          cidade: string | null
+          criado_em: string
+          dominio: string | null
+          dono: string
+          enriquecido_em: string | null
+          enriquecimento: Json
+          estado: string | null
+          id: string
+          nome: string
+          porte: string | null
+          resumo: string | null
+          setor: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          cidade?: string | null
+          criado_em?: string
+          dominio?: string | null
+          dono: string
+          enriquecido_em?: string | null
+          enriquecimento?: Json
+          estado?: string | null
+          id?: string
+          nome: string
+          porte?: string | null
+          resumo?: string | null
+          setor?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          cidade?: string | null
+          criado_em?: string
+          dominio?: string | null
+          dono?: string
+          enriquecido_em?: string | null
+          enriquecimento?: Json
+          estado?: string | null
+          id?: string
+          nome?: string
+          porte?: string | null
+          resumo?: string | null
+          setor?: string | null
+        }
+        Relationships: []
+      }
+      crm_eventos: {
+        Row: {
+          contato_id: string | null
+          criado_em: string
+          dados: Json
+          descricao: string | null
+          dono: string
+          empresa_id: string
+          fonte: string
+          fonte_id: string | null
+          id: string
+          ocorrido_em: string
+          oportunidade_id: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          contato_id?: string | null
+          criado_em?: string
+          dados?: Json
+          descricao?: string | null
+          dono: string
+          empresa_id: string
+          fonte?: string
+          fonte_id?: string | null
+          id?: string
+          ocorrido_em?: string
+          oportunidade_id: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          contato_id?: string | null
+          criado_em?: string
+          dados?: Json
+          descricao?: string | null
+          dono?: string
+          empresa_id?: string
+          fonte?: string
+          fonte_id?: string | null
+          id?: string
+          ocorrido_em?: string
+          oportunidade_id?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_eventos_contato_fk"
+            columns: ["dono", "empresa_id", "contato_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contatos"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "crm_eventos_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "crm_eventos_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+        ]
+      }
+      crm_oportunidades: {
+        Row: {
+          atualizado_em: string
+          contato_principal_id: string | null
+          criado_em: string
+          dono: string
+          empresa_id: string
+          etapa: Database["public"]["Enums"]["crm_etapa"]
+          ganha_em: string | null
+          id: string
+          motivo_perda: string | null
+          ordem: number
+          origem: string
+          perdida_em: string | null
+          probabilidade: number | null
+          proxima_acao: string | null
+          proxima_acao_em: string | null
+          titulo: string
+          valor_centavos: number | null
+        }
+        Insert: {
+          atualizado_em?: string
+          contato_principal_id?: string | null
+          criado_em?: string
+          dono: string
+          empresa_id: string
+          etapa?: Database["public"]["Enums"]["crm_etapa"]
+          ganha_em?: string | null
+          id?: string
+          motivo_perda?: string | null
+          ordem?: number
+          origem?: string
+          perdida_em?: string | null
+          probabilidade?: number | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          titulo: string
+          valor_centavos?: number | null
+        }
+        Update: {
+          atualizado_em?: string
+          contato_principal_id?: string | null
+          criado_em?: string
+          dono?: string
+          empresa_id?: string
+          etapa?: Database["public"]["Enums"]["crm_etapa"]
+          ganha_em?: string | null
+          id?: string
+          motivo_perda?: string | null
+          ordem?: number
+          origem?: string
+          perdida_em?: string | null
+          probabilidade?: number | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          titulo?: string
+          valor_centavos?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_oportunidades_contato_fk"
+            columns: ["dono", "empresa_id", "contato_principal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contatos"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "crm_oportunidades_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       formacoes: {
         Row: {
           atualizado_em: string
@@ -528,6 +768,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      crm_criar_lead: {
+        Args: {
+          p_contato_email?: string
+          p_contato_nome: string
+          p_empresa_nome: string
+          p_oportunidade_titulo?: string
+        }
+        Returns: string
+      }
+      crm_mover_oportunidade: {
+        Args: {
+          p_etapa: Database["public"]["Enums"]["crm_etapa"]
+          p_oportunidade: string
+        }
+        Returns: boolean
+      }
       mentoria_ocupacao: {
         Args: { _ids: string[] }
         Returns: {
@@ -537,6 +793,14 @@ export type Database = {
       }
     }
     Enums: {
+      crm_etapa:
+        | "novo_lead"
+        | "qualificacao"
+        | "descoberta"
+        | "proposta"
+        | "negociacao"
+        | "ganho"
+        | "perdido"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
       status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
@@ -668,6 +932,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      crm_etapa: [
+        "novo_lead",
+        "qualificacao",
+        "descoberta",
+        "proposta",
+        "negociacao",
+        "ganho",
+        "perdido",
+      ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
       status_builder: ["rascunho", "gerando", "pronta", "falhou"],

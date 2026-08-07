@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
+import { obterFocoDoCrm } from '@/lib/crm/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { MapaJornada } from './_components/MapaJornada';
@@ -9,16 +10,17 @@ export const metadata: Metadata = { title: 'Início' };
 /**
  * O início agora é o sistema de orientação do profissional.
  *
- * Dados que já existem (nome, projetos do Estúdio e mentorias) entram de verdade.
- * Cliente e contato ainda não têm entidade própria no banco atual; até o CRM
- * nascer, a interface fala isso com clareza em vez de inventar atividade.
+ * Nome, CRM, projetos do Estúdio e mentorias entram de verdade. O marco inicial
+ * acompanha a etapa da oportunidade em foco — o mapa agora orienta pelo estado
+ * operacional, não por uma demonstração fixa.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
-  const [{ data }, projetos, agenda] = await Promise.all([
+  const [{ data }, projetos, agenda, focoCrm] = await Promise.all([
     supabase.auth.getClaims(),
     listarSolucoesDoBuilder(),
     listarAgenda(),
+    obterFocoDoCrm(),
   ]);
 
   const claims = data?.claims;
@@ -30,14 +32,23 @@ export default async function InicioPage() {
   const proximaMentoria = agenda.find(
     (sessao) => new Date(sessao.fimIso).getTime() > agora.getTime(),
   );
+  const etapaInicial = focoCrm
+    ? focoCrm.etapa === 'novo_lead' || focoCrm.etapa === 'qualificacao'
+      ? 'prospectar'
+      : focoCrm.etapa === 'ganho'
+        ? 'entregar'
+        : 'vender'
+    : 'prospectar';
 
   return (
     <MapaJornada
       nome={primeiroNome}
       espacoDeTrabalho={`${nomeCompleto} — Consultoria`}
-      cliente={projetoAtual?.titulo ?? 'Seu primeiro projeto'}
-      lead={projetoAtual?.titulo ?? 'Nenhum lead selecionado'}
-      contato="Adicione um contato no CRM"
+      cliente={focoCrm?.empresa ?? projetoAtual?.titulo ?? 'Sua operação'}
+      lead={focoCrm?.titulo ?? 'Nenhum lead selecionado'}
+      contato={focoCrm?.contato ?? 'Adicione seu primeiro contato no CRM'}
+      proximaAcao={focoCrm?.proximaAcao ?? null}
+      etapaInicial={etapaInicial}
       proximaMentoria={proximaMentoria?.titulo ?? null}
     />
   );

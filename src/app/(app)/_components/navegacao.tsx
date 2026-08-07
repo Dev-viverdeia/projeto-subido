@@ -2,6 +2,7 @@ import {
   Award,
   Bot,
   BriefcaseBusiness,
+  ContactRound,
   DraftingCompass,
   GraduationCap,
   House,
@@ -42,6 +43,12 @@ export const ITENS_NAV: ItemNav[] = [
     noDock: true,
   },
   {
+    href: '/crm',
+    rotulo: ROTULOS['/crm'],
+    icone: <ContactRound size={TAMANHO} strokeWidth={TRACO} />,
+    noDock: true,
+  },
+  {
     href: '/solucoes',
     rotulo: ROTULOS['/solucoes'],
     icone: <BriefcaseBusiness size={TAMANHO} strokeWidth={TRACO} />,
@@ -71,7 +78,9 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/mentorias',
     rotulo: ROTULOS['/mentorias'],
     icone: <Users size={TAMANHO} strokeWidth={TRACO} />,
-    noDock: true,
+    /* O CRM ocupa o quinto destino operacional do dock. Mentorias continua na
+       navegação lateral e nas chamadas contextuais do Mapa da Jornada. */
+    noDock: false,
   },
   {
     href: '/certificados',

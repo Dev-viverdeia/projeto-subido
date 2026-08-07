@@ -1,0 +1,106 @@
+.gatilho {
+  gap: var(--via-space-2);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-4);
+  background: color-mix(in srgb, var(--via-navy-deep) 72%, transparent);
+}
+
+.dialogo {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface-elev, var(--via-surface));
+  color: var(--via-text-primary);
+  box-shadow: var(--via-shadow-xl);
+}
+
+.painel {
+  padding: var(--via-space-6);
+}
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding-bottom: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.topo h2,
+.topo p {
+  margin: 0;
+}
+
+.topo h2 {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-h2);
+  line-height: var(--via-lh-tight);
+}
+
+.topo p:not(.sobretitulo) {
+  max-width: 42ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.sobretitulo {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.fechar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg);
+  color: var(--via-text-muted);
+  cursor: pointer;
+}
+
+.fechar:hover {
+  color: var(--via-text-primary);
+  border-color: var(--via-border);
+}
+
+.formulario {
+  display: grid;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-5);
+}
+
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-2);
+}
+
+@media (max-width: 520px) {
+  .painel {
+    padding: var(--via-space-5) var(--via-space-4);
+  }
+
+  .acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
