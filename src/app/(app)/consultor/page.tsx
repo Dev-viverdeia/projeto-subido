@@ -7,7 +7,7 @@ import { Conversa, type ExemploDoConsultor } from './_components/Conversa';
 import { ListaConversas } from './_components/ListaConversas';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Consultor' };
+export const metadata: Metadata = { title: 'Sobral AI' };
 
 /**
  * O CONSULTOR — a tela inicial é a pergunta, e o histórico é uma SEÇÃO da
@@ -30,7 +30,7 @@ const EXEMPLOS: ExemploDoConsultor[] = [
   {
     rotulo: 'Não está no catálogo',
     texto:
-      'Meu cliente pediu um sistema que não vejo no catálogo. Como uso o Builder para transformar essa ideia num projeto completo?',
+      'Meu cliente pediu um sistema que não vejo no catálogo. Como uso o Estúdio para transformar essa ideia num projeto completo?',
   },
 ];
 
@@ -39,7 +39,7 @@ export default async function ConsultorPage() {
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Consultor" oculto />
+      <CabecalhoPagina titulo="Sobral AI" oculto />
 
       {/* O canto vive SEMPRE, mesmo sem conversa — o controle sumir lia como
           "a tela não tem memória". Vazio, o painel diz o estado em uma linha
@@ -58,7 +58,7 @@ export default async function ConsultorPage() {
 
       <div className={`${entrada.bloco} ${styles.tela}`}>
         <header className={styles.cabecalho}>
-          <p className={styles.eyebrow}>Consultor</p>
+          <p className={styles.eyebrow}>Sobral AI</p>
           <h2 className={styles.titulo}>
             Qual é a <em>dúvida</em> do momento?
           </h2>

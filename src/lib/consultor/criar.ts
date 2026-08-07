@@ -29,7 +29,7 @@ export async function criarConversa(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { threadId: null, falha: 'Faça login para usar o Consultor.' };
+  if (!user) return { threadId: null, falha: 'Faça login para usar o Sobral AI.' };
 
   const { data: thread, error } = await supabase
     .from('consultor_threads')

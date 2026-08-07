@@ -16,7 +16,7 @@ import { Mensagens } from '../_components/Mensagens';
 import styles from './pagina.module.css';
 
 /**
- * Uma conversa do Consultor. A URL é o estado: recarregar ou trocar de
+ * Uma conversa do Sobral AI. A URL é o estado: recarregar ou trocar de
  * aparelho cai exatamente onde a conversa parou, porque tudo mora no banco.
  *
  * O HEADER é da conversa, não da tela: eyebrow do domínio, o título que
@@ -48,7 +48,7 @@ export default async function ConversaDoConsultorPage({ params }: PageProps<'/co
     <div className={`${styles.pagina} ${entrada.bloco}`}>
       <DefinirTrilha
         voltarPara="/consultor"
-        voltarRotulo="Consultor"
+        voltarRotulo="Sobral AI"
         atual={conversa.thread.titulo}
       />
 
@@ -56,7 +56,7 @@ export default async function ConversaDoConsultorPage({ params }: PageProps<'/co
         <div className={styles.esquerda}>
           {/* O voltar mora AO LADO do título, centrado no bloco — é o gesto de
               sair da conversa, não um item do conteúdo dela. */}
-          <BotaoVoltar fallback="/consultor" rotulo="Consultor" />
+          <BotaoVoltar fallback="/consultor" rotulo="Sobral AI" />
           <div className={styles.identidade}>
             <p className={styles.eyebrow}>Conversa</p>
             <h1 className={styles.tituloConversa}>{conversa.thread.titulo}</h1>

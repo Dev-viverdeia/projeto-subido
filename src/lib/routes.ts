@@ -38,10 +38,10 @@ export type RotaApp = (typeof ROTAS_APP)[number];
  */
 export const ROTULOS: Record<RotaApp, string> = {
   '/inicio': 'Início',
-  '/solucoes': 'Soluções de IA',
+  '/solucoes': 'Projetos',
   '/formacoes': 'Formações',
-  '/builder': 'Builder',
-  '/consultor': 'Consultor',
+  '/builder': 'Estúdio',
+  '/consultor': 'Sobral AI',
   '/mentorias': 'Mentorias',
   '/certificados': 'Certificados',
   '/conta': 'Conta',
@@ -52,7 +52,7 @@ export const ROTULOS: Record<RotaApp, string> = {
  * Rótulo da seção a que um caminho pertence.
  *
  * Por prefixo, para que `/solucoes/automacao-de-atendimento` continue dizendo
- * "Soluções" — a mesma regra que acende o item na navegação. A barra no fim evita
+ * "Projetos" — a mesma regra que acende o item na navegação. A barra no fim evita
  * que `/conta` case com um futuro `/contas`.
  */
 export function rotuloDaRota(caminho: string): string | null {

@@ -57,7 +57,7 @@ export function PainelEspera({
   return (
     <div className={styles.painel} role="status" aria-live="polite">
       <div className={styles.topo}>
-        <p className={styles.rotulo}>Builder · {rotulo}</p>
+        <p className={styles.rotulo}>Estúdio · {rotulo}</p>
         <p className={styles.contador}>
           {String(posicao).padStart(2, '0')} / {String(passos.length).padStart(2, '0')}
         </p>

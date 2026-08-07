@@ -7,7 +7,7 @@ import { HistoricoBuilder } from './_components/HistoricoBuilder';
 import { HistoricoDropdown } from '../_components/HistoricoDropdown';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Builder' };
+export const metadata: Metadata = { title: 'Estúdio' };
 
 /**
  * Pilar 03 — o implementador descreve o problema do cliente e recebe o projeto.
@@ -30,7 +30,7 @@ export default async function BuilderPage() {
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Builder" oculto />
+      <CabecalhoPagina titulo="Estúdio" oculto />
 
       {/* O histórico mora no CANTO SUPERIOR direito, sobreposto: um gatilho
           compacto que abre o painel por cima da tela. A grade continua

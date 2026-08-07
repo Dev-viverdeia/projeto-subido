@@ -15,7 +15,7 @@ export async function generateMetadata({
 }: PageProps<'/solucoes/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const solucao = await obterSolucao(slug);
-  return { title: solucao?.titulo ?? 'Solução' };
+  return { title: solucao?.titulo ?? 'Projeto' };
 }
 
 /**
@@ -28,7 +28,7 @@ export async function generateMetadata({
  * consumidor cliente importaria a biblioteca para poder chamá-la) e a moldura do
  * vídeo.
  *
- * NÃO HÁ BOTÃO "VOLTAR" AQUI. A trilha do cabeçalho já traz `‹ Soluções de IA` em
+ * NÃO HÁ BOTÃO "VOLTAR" AQUI. A trilha do cabeçalho já traz `‹ Projetos` em
  * toda tela de detalhe; um segundo controle de retorno a 40px de distância é o
  * tipo de duplicata que aparece quando duas telas evoluem separadas.
  */
@@ -50,7 +50,7 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
           é o desmonte que devolve o cabeçalho ao nome da seção. */}
       <DefinirTrilha
         voltarPara="/solucoes"
-        voltarRotulo="Soluções de IA"
+        voltarRotulo="Projetos"
         meio={solucao.categoria}
         atual={solucao.titulo}
       />

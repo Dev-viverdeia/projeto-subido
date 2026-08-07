@@ -15,7 +15,7 @@ export default function NaoEncontrado() {
       description="O conteúdo pode ter sido despublicado ou o endereço mudou. O catálogo continua no lugar."
       action={
         <Link href="/solucoes">
-          <Button variant="primary">Ver soluções</Button>
+          <Button variant="primary">Ver projetos</Button>
         </Link>
       }
       secondary={

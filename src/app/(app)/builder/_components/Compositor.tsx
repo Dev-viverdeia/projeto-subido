@@ -129,7 +129,7 @@ export function Compositor() {
   return (
     <div className={styles.tela}>
       <header className={styles.cabecalho}>
-        <p className={styles.eyebrow}>Builder</p>
+        <p className={styles.eyebrow}>Estúdio</p>
         <h2 className={styles.titulo}>
           O que o seu cliente precisa <em>resolver</em>?
         </h2>

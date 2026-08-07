@@ -18,7 +18,7 @@ import { DefinirTrilha } from '../../_components/trilha/contexto';
 import styles from './pagina.module.css';
 
 /**
- * Um projeto do Builder — e os quatro estados em que ele pode estar.
+ * Um projeto do Estúdio — e os quatro estados em que ele pode estar.
  *
  * A URL É O ESTADO. O rascunho existe no banco desde que as perguntas voltaram,
  * então recarregar, fechar a aba ou abrir em outro dispositivo cai exatamente no
@@ -59,11 +59,11 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
           reconhece, e é ela que vai para o degrau atual até lá. */}
       <DefinirTrilha
         voltarPara="/builder"
-        voltarRotulo="Builder"
+        voltarRotulo="Estúdio"
         atual={solucao.titulo || solucao.ideiaOriginal}
       />
 
-      {/* Sem botão "voltar": a trilha do cabeçalho já traz `‹ Builder`. Esta era
+      {/* Sem botão "voltar": a trilha do cabeçalho já traz `‹ Estúdio`. Esta era
           a última tela de detalhe com os dois controles de retorno a 40px um do
           outro — soluções, curso e aula já tinham perdido o seu. */}
       <div className={styles.topo}>

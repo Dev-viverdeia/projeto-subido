@@ -9,7 +9,7 @@ import styles from './pagina.module.css';
 export default function CarregandoSolucoes() {
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Soluções de IA" oculto />
+      <CabecalhoPagina titulo="Projetos" oculto />
       <EsqueletoCatalogo />
     </div>
   );

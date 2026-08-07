@@ -1,8 +1,8 @@
 import {
   Award,
-  Blocks,
-  Boxes,
-  Compass,
+  Bot,
+  BriefcaseBusiness,
+  DraftingCompass,
   GraduationCap,
   House,
   ShieldCheck,
@@ -44,7 +44,7 @@ export const ITENS_NAV: ItemNav[] = [
   {
     href: '/solucoes',
     rotulo: ROTULOS['/solucoes'],
-    icone: <Boxes size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <BriefcaseBusiness size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
@@ -56,14 +56,14 @@ export const ITENS_NAV: ItemNav[] = [
   {
     href: '/builder',
     rotulo: ROTULOS['/builder'],
-    icone: <Blocks size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <DraftingCompass size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
   },
   {
     href: '/consultor',
     rotulo: ROTULOS['/consultor'],
-    icone: <Compass size={TAMANHO} strokeWidth={TRACO} />,
-    /* O dock do mobile cabe cinco itens e já tem cinco — o Consultor entra só
+    icone: <Bot size={TAMANHO} strokeWidth={TRACO} />,
+    /* O dock do mobile cabe cinco itens e já tem cinco — o Sobral AI entra só
        no trilho lateral até alguém ceder o lugar. */
     noDock: false,
   },

@@ -15,7 +15,7 @@ import styles from './pagina.module.css';
 export default function CarregandoBuilder() {
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Builder" oculto />
+      <CabecalhoPagina titulo="Estúdio" oculto />
       <Compositor />
     </div>
   );

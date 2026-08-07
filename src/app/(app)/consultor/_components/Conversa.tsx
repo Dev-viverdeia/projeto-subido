@@ -147,7 +147,7 @@ export function Conversa({
           {emVoo !== null && <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>}
           {/* A bolha de digitação — o idioma universal de chat, com os três
               pontos em compasso. `role=status` + rótulo para leitor de tela. */}
-          <div className={styles.digitando} role="status" aria-label="Consultor escrevendo">
+          <div className={styles.digitando} role="status" aria-label="Sobral AI escrevendo">
             <span className={styles.pontinho} aria-hidden="true" />
             <span className={styles.pontinho} aria-hidden="true" />
             <span className={styles.pontinho} aria-hidden="true" />

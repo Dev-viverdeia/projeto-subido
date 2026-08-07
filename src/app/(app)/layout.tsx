@@ -40,6 +40,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* Antes do primeiro cadastro completo o nome pode não existir. O trecho antes do
      @ é um fallback previsível — melhor que "Usuário" e melhor que vazio. */
   const nome = nomeBruto || email.split('@')[0] || 'Sua conta';
+  const iniciais = nome
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0]?.toUpperCase())
+    .join('');
 
   /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
      o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
@@ -67,16 +73,26 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
             <NavLateral itens={ITENS_NAV} variante="lateral" rotuloGrupo="Plataforma" />
 
-            {admin && (
-              <div className={styles.rodapeSidebar}>
+            <div className={styles.rodapeSidebar}>
+              {admin && (
                 <NavLateral
                   itens={[ITEM_ADMIN]}
                   variante="lateral"
                   grupo="admin"
                   rotuloGrupo="Gestão"
                 />
-              </div>
-            )}
+              )}
+
+              <Link href="/conta" className={styles.perfilSidebar}>
+                <span className={styles.avatarSidebar} aria-hidden="true">
+                  {iniciais || 'SI'}
+                </span>
+                <span className={styles.identidadeSidebar}>
+                  <strong>{nome}</strong>
+                  <small>Profissional de IA</small>
+                </span>
+              </Link>
+            </div>
           </aside>
 
           {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component

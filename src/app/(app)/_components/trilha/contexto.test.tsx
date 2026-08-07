@@ -74,7 +74,7 @@ describe('trilha do cabeçalho', () => {
  * A TRILHA DERIVADA DA ROTA — o que a listagem mostra.
  *
  * Toda tela tem a mesma FORMA de trilha; o que muda é quantos degraus. Numa
- * listagem são dois ("‹ Início / Soluções de IA"), e em `/inicio` é um só —
+ * listagem são dois ("‹ Início / Projetos"), e em `/inicio` é um só —
  * porque ali não existe degrau anterior. Sem esse caso de borda o cabeçalho da
  * home diria "‹ Início / Início".
  */
@@ -83,7 +83,7 @@ describe('trilha derivada da rota', () => {
     expect(trilhaDaSecao('/solucoes')).toEqual({
       voltarPara: '/inicio',
       voltarRotulo: 'Início',
-      atual: 'Soluções de IA',
+      atual: 'Projetos',
     });
   });
 

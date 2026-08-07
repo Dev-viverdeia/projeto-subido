@@ -111,7 +111,7 @@ export function GaleriaCertificados({
             Ver formações
           </Link>
           <Link href="/solucoes" className={styles.vazioCtaGhost}>
-            Ver soluções
+            Ver projetos
           </Link>
         </div>
       </div>

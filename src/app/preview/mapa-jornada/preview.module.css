@@ -1,0 +1,108 @@
+.shell {
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--via-bg);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: var(--via-space-6) var(--via-space-4);
+  background: var(--app-mesh-trilho);
+  color: var(--via-white);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-2);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1_5);
+  margin-top: var(--via-space-4);
+}
+
+.sidebar nav a,
+.sidebar nav span {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+}
+
+.sidebar nav .ativo {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--via-white);
+  font-weight: var(--via-fw-medium);
+}
+
+.sidebar nav a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  margin-top: auto;
+  padding: var(--via-space-4) var(--via-space-2) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.perfil > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  font-size: var(--via-fs-micro);
+}
+
+.perfil strong,
+.perfil small {
+  display: block;
+}
+
+.perfil strong {
+  font-size: var(--via-fs-caption);
+}
+
+.perfil small {
+  margin-top: var(--via-space-1);
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-micro);
+}
+
+.conteudo {
+  min-width: 0;
+  padding: var(--via-space-7) var(--via-space-8) var(--via-space-10);
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .conteudo {
+    padding: var(--via-space-5) var(--via-space-4) var(--via-space-10);
+  }
+}

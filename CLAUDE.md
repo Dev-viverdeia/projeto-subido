@@ -27,14 +27,22 @@ o typecheck pesado é gate de merge.
 
 ## O produto
 
-Plataforma B2C de assinatura da **Comunidade Subido de Tráfego** que forma **implementadores
-de IA**. Quatro pilares — Soluções, Formações, Builder, Mentorias — e um HUB onde empresas
-contratam os formados. A porta de entrada é uma **landing page pública de conversão**
-alimentada por tráfego pago.
+**Viver de IA Subido** é o sistema operacional do profissional que vende e implementa IA em
+empresas. A jornada central é contínua: **aprender → prospectar → vender → entregar → evoluir**.
+Formação e execução vivem juntas; cada ação comercial e cada entrega alimentam o mesmo contexto.
 
-**A marca do produto é Subido, e só.** O design system que serve de base tem outra origem
-(ver abaixo), mas isso é infraestrutura interna: nenhuma outra marca é nomeada, assinada ou
-exibida no produto.
+Os módulos do produto são: Mapa da Jornada, CRM factual, Calls com transcrição e Live Coach,
+enriquecimento de leads, Projetos guiados, Estúdio de projetos personalizados e propostas,
+Sobral AI, Mentorias, Formações, Certificados e, depois da base, Diagnóstico de Atendimento.
+
+**Nomes públicos atuais:** `Soluções` virou **Projetos**, `Builder` virou **Estúdio** e
+`Consultor` virou **Sobral AI**. Nomes técnicos herdados podem continuar em rotas, tabelas e
+arquivos até uma migração segura; não podem reaparecer na interface nova.
+
+A identidade é própria do **Viver de IA Subido**: usa a arquitetura do design system Viver de IA
+e a cromática/energia da Subido, mas a composição, a navegação e a jornada precisam ser
+reconhecíveis como outro produto. Não copiar telas inteiras nem criar confusão visual com a
+plataforma Viver de IA.
 
 ## Stack
 
@@ -81,16 +89,17 @@ JS do DS. Consequências:
 
 ### Marca e paleta
 
-**A marca do produto é Subido, e só.** O DS vendorizado (prefixo `--via-*`) vem de outra origem e
-fornece a ARQUITETURA visual: superfície clara, hierarquia editorial, vidro + atmosfera + sombra
-navy, escalas. A camada de marca sobrescreve a CROMÁTICA e a FAMÍLIA TIPOGRÁFICA.
+**A marca do produto é Viver de IA Subido.** O DS vendorizado (prefixo `--via-*`) fornece a
+ARQUITETURA visual: superfície clara, hierarquia editorial, vidro + atmosfera + sombra navy,
+escalas. A camada de marca aplica a CROMÁTICA e a FAMÍLIA TIPOGRÁFICA da Subido; a composição do
+produto é própria e organizada pelo Mapa da Jornada.
 
 > O `tokens.css` do vendor declara `--via-font: 'Geist'`, mas o vendor não se edita. A família
 > real é escolhida uma única vez, na ponte `next/font` → token em `globals.css`, e hoje é a
 > **Outfit**. Trocar de fonte é editar essa ponte e `src/app/fonts.ts` — mais nada.
 
-> `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do DS. Não são marca e não
-> podem aparecer em copy, `alt`, `aria-label`, metadata ou asset.
+> `--via-*` e o nome da pasta são NOMES INTERNOS do DS. Não são copy de produto e não podem
+> aparecer em `alt`, `aria-label`, metadata ou asset.
 
 | Token              | Valor     | Uso                                |
 | ------------------ | --------- | ---------------------------------- |

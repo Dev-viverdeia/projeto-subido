@@ -59,7 +59,7 @@ export function SalaDoProjeto({
     <div className={styles.sala}>
       <header className={`${styles.hero} via-noise`}>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Builder · Sala do projeto</p>
+          <p className={styles.eyebrow}>Estúdio · Sala do projeto</p>
           {/* Enquanto não há título, a ideia entra como CITAÇÃO compacta — aspas
               e clamp de 3 linhas — e não como display: 318 caracteres em corpo de
               h1 eram uma torre navy que empurrava a criação para fora da dobra. */}

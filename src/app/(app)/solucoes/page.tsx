@@ -7,14 +7,14 @@ import { CatalogoSolucoes } from './_components/CatalogoSolucoes';
 import { ResumoSolucoes } from './_components/ResumoSolucoes';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Soluções de IA' };
+export const metadata: Metadata = { title: 'Projetos' };
 
 export default async function SolucoesPage({ searchParams }: PageProps<'/solucoes'>) {
   const [solucoes, params] = await Promise.all([listarSolucoes(), searchParams]);
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Soluções de IA" oculto />
+      <CabecalhoPagina titulo="Projetos" oculto />
 
       {/* A faixa de resumo vem ANTES da régua de filtros: ela responde "onde eu
           estou" e o filtro responde "o que eu procuro". Invertido, a pessoa

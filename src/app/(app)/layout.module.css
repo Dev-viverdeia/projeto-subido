@@ -19,6 +19,13 @@
   padding-bottom: calc(var(--via-space-20) + env(safe-area-inset-bottom, 0px));
 }
 
+/* Quando /inicio renderiza o mapa, o CabecalhoApp sai da árvore e o conteúdo
+   ocupa a única linha do shell. A classe global é só um marcador estrutural da
+   página; toda a aparência continua encapsulada no CSS Module dela. */
+.shell:has(.conteudo > :global(.pagina-mapa-jornada)) {
+  grid-template-rows: 1fr;
+}
+
 @media (min-width: 1024px) {
   /* 240px, não 264. A sidebar carrega seis rótulos curtos e um logotipo pequeno —
      a largura extra não estava sendo usada por nada, e cada pixel dela sai do
@@ -87,6 +94,11 @@
   .conteudo {
     padding: var(--via-space-8) var(--via-space-8) var(--via-space-16);
   }
+
+  .shell:has(.conteudo > :global(.pagina-mapa-jornada)) .conteudo {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 .marcaSidebar {
@@ -103,4 +115,61 @@
   /* 12 para casar com o padding-inline da sidebar: marca e ícones de nav passam a
      nascer no mesmo x=24. */
   padding-inline: var(--via-space-3);
+}
+
+.perfilSidebar {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 56px;
+  margin-top: var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  color: var(--via-white);
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+.perfilSidebar:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.perfilSidebar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.avatarSidebar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.identidadeSidebar {
+  min-width: 0;
+}
+
+.identidadeSidebar strong,
+.identidadeSidebar small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identidadeSidebar strong {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+}
+
+.identidadeSidebar small {
+  margin-top: var(--via-space-1);
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-micro);
 }
