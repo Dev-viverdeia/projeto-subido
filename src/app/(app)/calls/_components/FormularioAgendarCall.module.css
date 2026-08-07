@@ -1,0 +1,201 @@
+.gatilho {
+  gap: var(--via-space-2);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-4);
+  background: color-mix(in srgb, var(--via-navy-deep) 74%, transparent);
+}
+
+.dialogo {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface-elev, var(--via-surface));
+  color: var(--via-text-primary);
+  box-shadow: var(--via-shadow-xl);
+}
+
+.painel {
+  padding: var(--via-space-6);
+}
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding-bottom: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.topo h2,
+.topo p {
+  margin: 0;
+}
+
+.topo h2 {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-h2);
+  line-height: var(--via-lh-tight);
+}
+
+.topo p:not(.sobretitulo) {
+  max-width: 46ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.sobretitulo {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.fechar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg);
+  color: var(--via-text-muted);
+  cursor: pointer;
+}
+
+.fechar:hover {
+  color: var(--via-text-primary);
+  border-color: var(--via-border);
+}
+
+.formulario {
+  display: grid;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-5);
+}
+
+.duasColunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
+  gap: var(--via-space-4);
+}
+
+.campo {
+  display: grid;
+  gap: var(--via-space-2);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+}
+
+.campo select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+
+.campo select:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.erro {
+  color: var(--via-danger);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-regular);
+}
+
+.coach {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-accent) 24%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-accent) 6%, var(--via-surface));
+  cursor: pointer;
+}
+
+.coach input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--via-accent);
+}
+
+.coachIcone {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--via-accent);
+  color: var(--via-white);
+}
+
+.coach strong,
+.coach small {
+  display: block;
+}
+
+.coach strong {
+  font-size: var(--via-fs-sm);
+}
+
+.coach small {
+  margin-top: 2px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-2);
+}
+
+.semLead {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-6);
+}
+
+.semLead p {
+  margin: 0;
+  color: var(--via-text-muted);
+}
+
+@media (max-width: 560px) {
+  .painel {
+    padding: var(--via-space-5) var(--via-space-4);
+  }
+
+  .duasColunas {
+    grid-template-columns: 1fr;
+  }
+
+  .acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

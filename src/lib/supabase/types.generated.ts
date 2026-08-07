@@ -126,6 +126,371 @@ export type Database = {
           },
         ]
       }
+      calls_analises: {
+        Row: {
+          atualizada_em: string
+          compromissos: Json
+          criada_em: string
+          dados: Json
+          dono: string
+          dores: Json
+          erro: string | null
+          id: string
+          nota_comercial: number | null
+          objecoes: Json
+          oportunidades_projeto: Json
+          proximos_passos: Json
+          resumo: string | null
+          reuniao_id: string
+          sentimento: string | null
+          status: string
+        }
+        Insert: {
+          atualizada_em?: string
+          compromissos?: Json
+          criada_em?: string
+          dados?: Json
+          dono: string
+          dores?: Json
+          erro?: string | null
+          id?: string
+          nota_comercial?: number | null
+          objecoes?: Json
+          oportunidades_projeto?: Json
+          proximos_passos?: Json
+          resumo?: string | null
+          reuniao_id: string
+          sentimento?: string | null
+          status?: string
+        }
+        Update: {
+          atualizada_em?: string
+          compromissos?: Json
+          criada_em?: string
+          dados?: Json
+          dono?: string
+          dores?: Json
+          erro?: string | null
+          id?: string
+          nota_comercial?: number | null
+          objecoes?: Json
+          oportunidades_projeto?: Json
+          proximos_passos?: Json
+          resumo?: string | null
+          reuniao_id?: string
+          sentimento?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_analises_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      calls_coach_sugestoes: {
+        Row: {
+          categoria: string
+          confianca: number | null
+          criada_em: string
+          dono: string
+          id: string
+          metodologia: string | null
+          reuniao_id: string
+          segundo_reuniao: number | null
+          status: string
+          sugestao: string
+          titulo: string
+          trecho_gatilho: string | null
+        }
+        Insert: {
+          categoria: string
+          confianca?: number | null
+          criada_em?: string
+          dono: string
+          id?: string
+          metodologia?: string | null
+          reuniao_id: string
+          segundo_reuniao?: number | null
+          status?: string
+          sugestao: string
+          titulo: string
+          trecho_gatilho?: string | null
+        }
+        Update: {
+          categoria?: string
+          confianca?: number | null
+          criada_em?: string
+          dono?: string
+          id?: string
+          metodologia?: string | null
+          reuniao_id?: string
+          segundo_reuniao?: number | null
+          status?: string
+          sugestao?: string
+          titulo?: string
+          trecho_gatilho?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_coach_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      calls_gravacoes: {
+        Row: {
+          atualizada_em: string
+          caminho_arquivo: string | null
+          criado_em: string
+          dono: string
+          duracao_segundos: number | null
+          encerrada_em: string | null
+          erro: string | null
+          id: string
+          id_provedor: string | null
+          iniciada_em: string | null
+          reuniao_id: string
+          status: string
+        }
+        Insert: {
+          atualizada_em?: string
+          caminho_arquivo?: string | null
+          criado_em?: string
+          dono: string
+          duracao_segundos?: number | null
+          encerrada_em?: string | null
+          erro?: string | null
+          id?: string
+          id_provedor?: string | null
+          iniciada_em?: string | null
+          reuniao_id: string
+          status?: string
+        }
+        Update: {
+          atualizada_em?: string
+          caminho_arquivo?: string | null
+          criado_em?: string
+          dono?: string
+          duracao_segundos?: number | null
+          encerrada_em?: string | null
+          erro?: string | null
+          id?: string
+          id_provedor?: string | null
+          iniciada_em?: string | null
+          reuniao_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_gravacoes_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      calls_participantes: {
+        Row: {
+          consentiu_gravacao_em: string | null
+          criado_em: string
+          dono: string
+          email: string | null
+          entrou_em: string | null
+          id: string
+          identidade_provedor: string | null
+          nome: string
+          papel: string
+          reuniao_id: string
+          saiu_em: string | null
+          total_segundos: number | null
+        }
+        Insert: {
+          consentiu_gravacao_em?: string | null
+          criado_em?: string
+          dono: string
+          email?: string | null
+          entrou_em?: string | null
+          id?: string
+          identidade_provedor?: string | null
+          nome: string
+          papel: string
+          reuniao_id: string
+          saiu_em?: string | null
+          total_segundos?: number | null
+        }
+        Update: {
+          consentiu_gravacao_em?: string | null
+          criado_em?: string
+          dono?: string
+          email?: string | null
+          entrou_em?: string | null
+          id?: string
+          identidade_provedor?: string | null
+          nome?: string
+          papel?: string
+          reuniao_id?: string
+          saiu_em?: string | null
+          total_segundos?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_participantes_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      calls_reunioes: {
+        Row: {
+          agendada_para: string
+          atualizada_em: string
+          codigo_publico: string
+          contato_id: string | null
+          criada_em: string
+          dono: string
+          duracao_minutos: number
+          empresa_id: string
+          encerrada_em: string | null
+          id: string
+          iniciada_em: string | null
+          live_coach_ativo: boolean
+          oportunidade_id: string
+          provedor: string
+          sala_provedor: string
+          status: Database["public"]["Enums"]["calls_status"]
+          tipo: Database["public"]["Enums"]["calls_tipo"]
+          titulo: string
+        }
+        Insert: {
+          agendada_para: string
+          atualizada_em?: string
+          codigo_publico?: string
+          contato_id?: string | null
+          criada_em?: string
+          dono: string
+          duracao_minutos?: number
+          empresa_id: string
+          encerrada_em?: string | null
+          id?: string
+          iniciada_em?: string | null
+          live_coach_ativo?: boolean
+          oportunidade_id: string
+          provedor?: string
+          sala_provedor?: string
+          status?: Database["public"]["Enums"]["calls_status"]
+          tipo?: Database["public"]["Enums"]["calls_tipo"]
+          titulo: string
+        }
+        Update: {
+          agendada_para?: string
+          atualizada_em?: string
+          codigo_publico?: string
+          contato_id?: string | null
+          criada_em?: string
+          dono?: string
+          duracao_minutos?: number
+          empresa_id?: string
+          encerrada_em?: string | null
+          id?: string
+          iniciada_em?: string | null
+          live_coach_ativo?: boolean
+          oportunidade_id?: string
+          provedor?: string
+          sala_provedor?: string
+          status?: Database["public"]["Enums"]["calls_status"]
+          tipo?: Database["public"]["Enums"]["calls_tipo"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_reunioes_contato_fk"
+            columns: ["dono", "empresa_id", "contato_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contatos"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "calls_reunioes_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "calls_reunioes_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+        ]
+      }
+      calls_transcricoes: {
+        Row: {
+          atualizada_em: string
+          criada_em: string
+          dono: string
+          duracao_segundos: number | null
+          erro: string | null
+          id: string
+          idioma: string
+          modelo: string | null
+          provedor: string | null
+          reuniao_id: string
+          segmentos: Json
+          status: string
+          texto_completo: string | null
+        }
+        Insert: {
+          atualizada_em?: string
+          criada_em?: string
+          dono: string
+          duracao_segundos?: number | null
+          erro?: string | null
+          id?: string
+          idioma?: string
+          modelo?: string | null
+          provedor?: string | null
+          reuniao_id: string
+          segmentos?: Json
+          status?: string
+          texto_completo?: string | null
+        }
+        Update: {
+          atualizada_em?: string
+          criada_em?: string
+          dono?: string
+          duracao_segundos?: number | null
+          erro?: string | null
+          id?: string
+          idioma?: string
+          modelo?: string | null
+          provedor?: string | null
+          reuniao_id?: string
+          segmentos?: Json
+          status?: string
+          texto_completo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_transcricoes_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       consultor_mensagens: {
         Row: {
           cartoes: Json | null
@@ -768,6 +1133,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calls_agendar_reuniao: {
+        Args: {
+          p_agendada_para: string
+          p_duracao_minutos?: number
+          p_live_coach_ativo?: boolean
+          p_oportunidade: string
+          p_tipo: Database["public"]["Enums"]["calls_tipo"]
+          p_titulo?: string
+        }
+        Returns: {
+          codigo_publico: string
+          reuniao_id: string
+        }[]
+      }
       crm_criar_lead: {
         Args: {
           p_contato_email?: string
@@ -793,6 +1172,20 @@ export type Database = {
       }
     }
     Enums: {
+      calls_status:
+        | "agendada"
+        | "aguardando"
+        | "ao_vivo"
+        | "processando"
+        | "concluida"
+        | "cancelada"
+      calls_tipo:
+        | "descoberta"
+        | "follow_up"
+        | "proposta"
+        | "kickoff"
+        | "entrega"
+        | "outro"
       crm_etapa:
         | "novo_lead"
         | "qualificacao"
@@ -932,6 +1325,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      calls_status: [
+        "agendada",
+        "aguardando",
+        "ao_vivo",
+        "processando",
+        "concluida",
+        "cancelada",
+      ],
+      calls_tipo: [
+        "descoberta",
+        "follow_up",
+        "proposta",
+        "kickoff",
+        "entrega",
+        "outro",
+      ],
       crm_etapa: [
         "novo_lead",
         "qualificacao",

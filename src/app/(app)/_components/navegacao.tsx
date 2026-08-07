@@ -8,6 +8,7 @@ import {
   House,
   ShieldCheck,
   Users,
+  Video,
 } from 'lucide-react';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
@@ -49,6 +50,12 @@ export const ITENS_NAV: ItemNav[] = [
     noDock: true,
   },
   {
+    href: '/calls',
+    rotulo: ROTULOS['/calls'],
+    icone: <Video size={TAMANHO} strokeWidth={TRACO} />,
+    noDock: true,
+  },
+  {
     href: '/solucoes',
     rotulo: ROTULOS['/solucoes'],
     icone: <BriefcaseBusiness size={TAMANHO} strokeWidth={TRACO} />,
@@ -58,7 +65,9 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/formacoes',
     rotulo: ROTULOS['/formacoes'],
     icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
-    noDock: true,
+    /* No mobile, Calls passa a ocupar este destino operacional. A formação
+       continua disponível no trilho lateral e pelo Mapa da Jornada. */
+    noDock: false,
   },
   {
     href: '/builder',

@@ -74,6 +74,30 @@ export function serverEnv() {
 }
 
 /**
+ * Credenciais opcionais da infraestrutura de Calls.
+ *
+ * A agenda e o CRM continuam funcionando sem LiveKit. A sala só tenta emitir um
+ * token quando esta função encontra o trio completo no servidor. Isso permite
+ * publicar a fundação do produto agora sem aceitar configuração parcial ou fazer
+ * qualquer segredo atravessar para o bundle do navegador.
+ */
+export function livekitEnv() {
+  const parsed = z
+    .object({
+      LIVEKIT_URL: z.url(),
+      LIVEKIT_API_KEY: z.string().min(1),
+      LIVEKIT_API_SECRET: z.string().min(1),
+    })
+    .safeParse({
+      LIVEKIT_URL: process.env.LIVEKIT_URL,
+      LIVEKIT_API_KEY: process.env.LIVEKIT_API_KEY,
+      LIVEKIT_API_SECRET: process.env.LIVEKIT_API_SECRET,
+    });
+
+  return parsed.success ? parsed.data : null;
+}
+
+/**
  * NÃO PROCURE A CHAVE DA ANTHROPIC AQUI.
  *
  * Ela vive nos SECRETS DO SUPABASE e é lida por `Deno.env.get` dentro das Edge
