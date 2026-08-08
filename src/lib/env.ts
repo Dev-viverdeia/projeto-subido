@@ -82,10 +82,12 @@ export function openAIEnv() {
     .object({
       OPENAI_API_KEY: z.string().min(20, { error: 'OPENAI_API_KEY está vazia.' }),
       SOBRAL_AI_MODEL: z.string().min(2).default('gpt-5.6-terra'),
+      LIVE_COACH_MODEL: z.string().min(2).default('gpt-5.6-luna'),
     })
     .safeParse({
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       SOBRAL_AI_MODEL: process.env.SOBRAL_AI_MODEL,
+      LIVE_COACH_MODEL: process.env.LIVE_COACH_MODEL,
     });
 
   if (!parsed.success) {

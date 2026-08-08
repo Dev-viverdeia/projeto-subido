@@ -1,0 +1,145 @@
+.pagina {
+  min-height: 100dvh;
+  padding: 22px;
+  background: #020713;
+}
+
+.sala {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 350px);
+  width: min(1440px, 100%);
+  height: calc(100dvh - 44px);
+  min-height: 650px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: #040b1a;
+  box-shadow: 0 36px 110px rgba(0, 0, 0, 0.45);
+}
+
+.palco {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 42%, rgba(25, 54, 100, 0.24), transparent 44%), #040b1a;
+}
+
+.topo {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  right: 22px;
+  left: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fafdff;
+  font-size: 13px;
+}
+
+.topo small {
+  color: #7d8aa0;
+  font-family: var(--via-font-mono);
+}
+
+.pessoas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.28fr);
+  gap: 10px;
+  height: 100%;
+  padding: 58px 12px 76px;
+}
+
+.pessoas article {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.cliente {
+  background: #101b30;
+}
+
+.anfitriao {
+  align-self: end;
+  height: 190px;
+  background: #0a1427;
+}
+
+.pessoas article div {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border-radius: 50%;
+  background: #1a2a44;
+  color: #aebbd0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.pessoas article span {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: rgba(2, 7, 19, 0.72);
+  color: #dce7f5;
+  font-size: 11px;
+}
+
+.controles {
+  position: absolute;
+  z-index: 2;
+  bottom: 17px;
+  left: 50%;
+  display: flex;
+  gap: 8px;
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(7, 17, 38, 0.84);
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+}
+
+.controles button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e9f3ff;
+}
+
+.controles button.encerrar {
+  border-color: rgba(255, 88, 88, 0.3);
+  background: rgba(255, 67, 67, 0.16);
+  color: #ff8787;
+}
+
+@media (max-width: 920px) {
+  .pagina {
+    padding: 0;
+  }
+
+  .sala {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: 100dvh;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .pessoas {
+    padding-bottom: 66px;
+  }
+}

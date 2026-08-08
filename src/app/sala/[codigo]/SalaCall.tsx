@@ -6,6 +6,7 @@ import { CalendarClock, CheckCircle2, LockKeyhole, Mic2, Sparkles, Video } from 
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
+import { LiveCoach } from './LiveCoach';
 import styles from './sala.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -78,7 +79,16 @@ export function SalaCall({
           video
           onDisconnected={() => setCredenciais(null)}
         >
-          <VideoConference />
+          {anfitriao ? (
+            <div className={styles.experienciaAnfitriao}>
+              <div className={styles.palcoVideo}>
+                <VideoConference />
+              </div>
+              <LiveCoach reuniaoId={convite.reuniaoId} ativo={convite.liveCoachAtivo} />
+            </div>
+          ) : (
+            <VideoConference />
+          )}
           <RoomAudioRenderer />
         </LiveKitRoom>
       </div>

@@ -206,7 +206,7 @@ export function PainelCalls({
             <li>Confirmar impacto antes de apresentar solução</li>
             <li>Tratar objeção com contexto da própria conversa</li>
           </ul>
-          <span className={styles.estadoCoach}>Estrutura preparada · integração em ativação</span>
+          <span className={styles.estadoCoach}>Operacional · privado para o anfitrião</span>
         </aside>
       </div>
 

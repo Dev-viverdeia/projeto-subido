@@ -196,9 +196,12 @@ export type Database = {
           categoria: string
           confianca: number | null
           criada_em: string
+          dados: Json
           dono: string
           id: string
           metodologia: string | null
+          origem_item_id: string | null
+          prioridade: number
           reuniao_id: string
           segundo_reuniao: number | null
           status: string
@@ -210,9 +213,12 @@ export type Database = {
           categoria: string
           confianca?: number | null
           criada_em?: string
+          dados?: Json
           dono: string
           id?: string
           metodologia?: string | null
+          origem_item_id?: string | null
+          prioridade?: number
           reuniao_id: string
           segundo_reuniao?: number | null
           status?: string
@@ -224,9 +230,12 @@ export type Database = {
           categoria?: string
           confianca?: number | null
           criada_em?: string
+          dados?: Json
           dono?: string
           id?: string
           metodologia?: string | null
+          origem_item_id?: string | null
+          prioridade?: number
           reuniao_id?: string
           segundo_reuniao?: number | null
           status?: string
