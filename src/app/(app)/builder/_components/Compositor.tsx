@@ -41,10 +41,21 @@ const MAXIMO = 4000;
  * chamada, como erro com o nome do secret. É o preço direto de mover a geração
  * para a Edge Function.
  */
-export function Compositor() {
+export type OrigemProjeto = {
+  slug: string;
+  titulo: string;
+  resumo: string;
+  resultado: string;
+};
+
+export function Compositor({ origem = null }: { origem?: OrigemProjeto | null }) {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
-  const [ideia, setIdeia] = useState('');
+  const [ideia, setIdeia] = useState(() =>
+    origem
+      ? `Quero adaptar o projeto “${origem.titulo}” para este cliente.\n\nO que já sei sobre a empresa, o problema e a operação: `
+      : '',
+  );
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [navegando, iniciarNavegacao] = useTransition();
@@ -129,18 +140,44 @@ export function Compositor() {
   return (
     <div className={styles.tela}>
       <header className={styles.cabecalho}>
-        <p className={styles.eyebrow}>Estúdio</p>
+        <p className={styles.eyebrow}>{origem ? 'Estúdio · Projeto personalizado' : 'Estúdio'}</p>
         <h2 className={styles.titulo}>
-          O que o seu cliente precisa <em>resolver</em>?
+          {origem ? (
+            <>
+              O que muda <em>neste cliente</em>?
+            </>
+          ) : (
+            <>
+              O que o seu cliente precisa <em>resolver</em>?
+            </>
+          )}
         </h2>
         {/* As duas frases têm comprimento parecido de propósito: com `balance` e a
             medida em 46ch, a quebra cai no ponto final em vez de deixar uma
             palavra órfã abrindo a segunda linha. */}
         <p className={styles.apoio}>
-          Descreva o problema como o cliente te contou.{' '}
-          <em>O projeto de implementação é o que volta.</em>
+          {origem ? (
+            <>
+              Parta da entrega padrão e conte o contexto real. <em>O Estúdio adapta o projeto.</em>
+            </>
+          ) : (
+            <>
+              Descreva o problema como o cliente te contou.{' '}
+              <em>O projeto de implementação é o que volta.</em>
+            </>
+          )}
         </p>
       </header>
+
+      {origem ? (
+        <aside className={styles.origem} aria-label="Projeto usado como base">
+          <div>
+            <span>Projeto-base</span>
+            <strong>{origem.titulo}</strong>
+          </div>
+          <p>{origem.resultado}</p>
+        </aside>
+      ) : null}
 
       <form
         className={styles.caixa}
@@ -200,26 +237,28 @@ export function Compositor() {
         </p>
       ) : null}
 
-      <section className={styles.exemplos}>
-        <h3 className={styles.divisor}>
-          <span>ou comece por um exemplo</span>
-        </h3>
+      {!origem ? (
+        <section className={styles.exemplos}>
+          <h3 className={styles.divisor}>
+            <span>ou comece por um exemplo</span>
+          </h3>
 
-        <ul className={styles.chips}>
-          {EXEMPLOS.map((exemplo) => (
-            <li key={exemplo.rotulo}>
-              <button
-                type="button"
-                className={styles.chip}
-                onClick={() => usarExemplo(exemplo.texto)}
-                disabled={ocupado}
-              >
-                {exemplo.rotulo}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+          <ul className={styles.chips}>
+            {EXEMPLOS.map((exemplo) => (
+              <li key={exemplo.rotulo}>
+                <button
+                  type="button"
+                  className={styles.chip}
+                  onClick={() => usarExemplo(exemplo.texto)}
+                  disabled={ocupado}
+                >
+                  {exemplo.rotulo}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

@@ -20,7 +20,7 @@ import styles from './ProximaSolucao.module.css';
 export function ProximaSolucao({ proxima }: { proxima: VizinhaSolucao }) {
   return (
     <Link href={`/solucoes/${proxima.slug}`} className={`${styles.card} via-noise`}>
-      <p className={styles.eyebrow}>Próxima solução</p>
+      <p className={styles.eyebrow}>Próximo projeto</p>
       <p className={styles.titulo}>{proxima.titulo}</p>
 
       <span className={styles.rodape}>

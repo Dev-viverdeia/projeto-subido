@@ -41,7 +41,7 @@ export function Ferramentas({ itens }: { itens: ItemSolucao[] }) {
       </div>
 
       {itens.length === 0 ? (
-        <VazioCompacto texto="Esta solução não depende de ferramenta externa." />
+        <VazioCompacto texto="Este projeto não depende de ferramenta externa." />
       ) : (
         <ul className={styles.listaFerramentas}>
           {itens.map((item) => (
@@ -71,7 +71,7 @@ export function Prompts({ itens }: { itens: ItemSolucao[] }) {
       </div>
 
       {itens.length === 0 ? (
-        <VazioCompacto texto="Esta solução não usa prompt pronto." />
+        <VazioCompacto texto="Este projeto não usa prompt pronto." />
       ) : (
         <ul className={styles.listaPrompts}>
           {itens.map((item) => (

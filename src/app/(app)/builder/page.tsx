@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
+import { obterSolucao } from '@/lib/conteudo/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { Compositor } from './_components/Compositor';
@@ -25,8 +26,21 @@ export const metadata: Metadata = { title: 'Estúdio' };
  * lida dentro da Edge Function; o processo do Next não enxerga aquele cofre. A
  * ausência aparece na primeira chamada, com o nome do secret na mensagem.
  */
-export default async function BuilderPage() {
-  const itens = await listarSolucoesDoBuilder();
+export default async function BuilderPage({ searchParams }: PageProps<'/builder'>) {
+  const params = await searchParams;
+  const projetoParam = Array.isArray(params.projeto) ? params.projeto[0] : params.projeto;
+  const [itens, projeto] = await Promise.all([
+    listarSolucoesDoBuilder(),
+    projetoParam ? obterSolucao(projetoParam) : Promise.resolve(null),
+  ]);
+  const origem = projeto?.projeto
+    ? {
+        slug: projeto.slug,
+        titulo: projeto.titulo,
+        resumo: projeto.resumo,
+        resultado: projeto.projeto.resultado,
+      }
+    : null;
 
   return (
     <div className={styles.pagina}>
@@ -45,7 +59,7 @@ export default async function BuilderPage() {
       ) : null}
 
       <div className={entrada.bloco}>
-        <Compositor />
+        <Compositor origem={origem} />
       </div>
     </div>
   );

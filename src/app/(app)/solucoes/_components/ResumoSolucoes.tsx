@@ -26,8 +26,8 @@ export function ResumoSolucoes({ solucoes }: { solucoes: SolucaoResumo[] }) {
     <ResumoCatalogo
       linhas={linhas}
       base="/solucoes"
-      unidade={{ singular: 'solução', plural: 'soluções' }}
-      itemUnidade={{ singular: 'etapa', plural: 'etapas' }}
+      unidade={{ singular: 'projeto', plural: 'projetos' }}
+      itemUnidade={{ singular: 'passo', plural: 'passos' }}
       slugRecente={solucaoMaisRecente(progresso)}
     />
   );

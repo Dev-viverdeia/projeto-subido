@@ -6,6 +6,7 @@ import entrada from '../../_components/entrada.module.css';
 import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../../_components/iconesCategorias';
 import { DefinirTrilha } from '../../_components/trilha/contexto';
 import { FichaSolucao } from '../_components/FichaSolucao';
+import { ProjetoGuiado } from '../_components/ProjetoGuiado';
 import { ProximaSolucao } from '../_components/ProximaSolucao';
 import styles from './pagina.module.css';
 
@@ -55,20 +56,38 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
         atual={solucao.titulo}
       />
 
-      <FichaSolucao
-        slug={solucao.slug}
-        titulo={solucao.titulo}
-        resumo={solucao.resumo}
-        categoria={solucao.categoria}
-        etapas={etapas}
-        ferramentas={ferramentas}
-        prompts={prompts}
-        icone={
-          (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) || ICONE_CATEGORIA_PADRAO
-        }
-        video={<VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />}
-        proxima={proxima ? <ProximaSolucao proxima={proxima} /> : null}
-      />
+      {solucao.projeto ? (
+        <ProjetoGuiado
+          slug={solucao.slug}
+          titulo={solucao.titulo}
+          resumo={solucao.resumo}
+          categoria={solucao.categoria}
+          projeto={solucao.projeto}
+          ferramentas={ferramentas}
+          prompts={prompts}
+          video={
+            solucao.video_url ? (
+              <VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />
+            ) : null
+          }
+          proxima={proxima ? <ProximaSolucao proxima={proxima} /> : null}
+        />
+      ) : (
+        <FichaSolucao
+          slug={solucao.slug}
+          titulo={solucao.titulo}
+          resumo={solucao.resumo}
+          categoria={solucao.categoria}
+          etapas={etapas}
+          ferramentas={ferramentas}
+          prompts={prompts}
+          icone={
+            (solucao.categoria && ICONES_CATEGORIAS[solucao.categoria]) || ICONE_CATEGORIA_PADRAO
+          }
+          video={<VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />}
+          proxima={proxima ? <ProximaSolucao proxima={proxima} /> : null}
+        />
+      )}
     </div>
   );
 }

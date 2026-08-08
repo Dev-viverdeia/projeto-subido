@@ -201,7 +201,7 @@ export function FichaSolucao({
               ativa={aba}
               aoMudar={(id) => setAba(id as Chave)}
               layoutId="ficha-solucao"
-              ariaLabel="Seções da solução"
+              ariaLabel="Seções do projeto"
               prefixoId="ficha"
             />
           </div>

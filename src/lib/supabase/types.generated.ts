@@ -1106,6 +1106,47 @@ export type Database = {
         }
         Relationships: []
       }
+      projeto_roteiros: {
+        Row: {
+          atualizado_em: string
+          cliente_ideal: string
+          criado_em: string
+          entregavel_final: string
+          projeto_id: string
+          resultado: string
+          roteiro: Json
+          versao: number
+        }
+        Insert: {
+          atualizado_em?: string
+          cliente_ideal: string
+          criado_em?: string
+          entregavel_final: string
+          projeto_id: string
+          resultado: string
+          roteiro: Json
+          versao?: number
+        }
+        Update: {
+          atualizado_em?: string
+          cliente_ideal?: string
+          criado_em?: string
+          entregavel_final?: string
+          projeto_id?: string
+          resultado?: string
+          roteiro?: Json
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_roteiros_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: true
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solucao_itens: {
         Row: {
           conteudo: string

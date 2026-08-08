@@ -1,0 +1,97 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
+import type { ProjetoGuiado } from './ProjetoGuiado';
+
+const fases = ['entender', 'preparar', 'construir', 'validar', 'entregar'] as const;
+
+const projeto: DadosRoteiroProjeto = {
+  resultado: 'Uma operação completa e validada nas mãos do cliente.',
+  clienteIdeal: 'Uma empresa com processo recorrente e um responsável disponível para validar.',
+  entregavelFinal: 'Operação ativa, testes, treinamento e manual de acompanhamento.',
+  versao: 1,
+  roteiro: {
+    fases: fases.map((id, indice) => ({
+      id,
+      titulo: id[0]!.toUpperCase() + id.slice(1),
+      objetivo: `Objetivo detalhado e verificável da fase de ${id}.`,
+      passos: [
+        {
+          id: `passo-${id}`,
+          titulo: indice === 0 ? 'Mapear o cenário atual' : `Executar ${id}`,
+          acao: `Execute uma ação suficientemente detalhada na fase ${id}.`,
+          concluidoQuando: 'A evidência foi registrada e revisada pelo responsável.',
+          entregavel: `Entrega da fase ${id}`,
+        },
+      ],
+    })),
+  },
+};
+
+function item(id: string, tipo: 'ferramenta' | 'prompt'): ItemSolucao {
+  return {
+    id,
+    solucao_id: 's1',
+    tipo,
+    ordem: 1,
+    titulo: tipo === 'ferramenta' ? 'Supabase' : 'Revisar implantação',
+    conteudo: 'Conteúdo pronto para usar na implantação.',
+  };
+}
+
+type Props = Parameters<typeof ProjetoGuiado>[0];
+let Tela: (props: Props) => React.ReactNode;
+
+beforeEach(async () => {
+  localStorage.clear();
+  vi.resetModules();
+  Reflect.defineProperty(Element.prototype, 'scrollIntoView', {
+    value: vi.fn(),
+    writable: true,
+  });
+  Tela = (await import('./ProjetoGuiado')).ProjetoGuiado;
+});
+
+function montar() {
+  return render(
+    <Tela
+      slug="crm-comercial"
+      titulo="CRM Comercial com IA"
+      resumo="Um CRM factual para conduzir a venda."
+      categoria="Vendas"
+      projeto={projeto}
+      ferramentas={[item('f1', 'ferramenta')]}
+      prompts={[item('p1', 'prompt')]}
+      video={null}
+      proxima={null}
+    />,
+  );
+}
+
+describe('Projeto guiado', () => {
+  it('mostra as cinco fases, a entrega e o próximo passo', () => {
+    montar();
+    for (const nome of ['Entender', 'Preparar', 'Construir', 'Validar', 'Entregar']) {
+      expect(screen.getByRole('heading', { level: 2, name: nome })).toBeDefined();
+    }
+    expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
+    expect(screen.getByText('Próximo passo')).toBeDefined();
+  });
+
+  it('marca o passo e move a retomada para o seguinte', async () => {
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByRole('button', { name: 'Concluir: Mapear o cenário atual' }));
+    expect(screen.getByRole('button', { name: 'Reabrir: Mapear o cenário atual' })).toBeDefined();
+    expect(screen.getByText('1 de 5 passos')).toBeDefined();
+  });
+
+  it('leva a identidade do projeto ao Estúdio', () => {
+    montar();
+    expect(screen.getByRole('link', { name: /Personalizar no Estúdio/ })).toHaveAttribute(
+      'href',
+      '/builder?projeto=crm-comercial',
+    );
+  });
+});

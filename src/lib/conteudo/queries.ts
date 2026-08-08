@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 import type { Tables } from '@/lib/supabase/types.generated';
+import { idsPassosProjeto, lerRoteiroProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { escolherProxima, type VizinhaSolucao } from './proxima';
 
 export type { VizinhaSolucao };
@@ -25,6 +26,14 @@ export type TipoItem = 'etapa' | 'ferramenta' | 'prompt';
 
 export type ItemSolucao = Omit<Tables<'solucao_itens'>, 'tipo'> & { tipo: TipoItem };
 
+export type DadosRoteiroProjeto = {
+  resultado: string;
+  clienteIdeal: string;
+  entregavelFinal: string;
+  roteiro: RoteiroProjeto;
+  versao: number;
+};
+
 /** Card do catálogo: a solução + contagens reais dos itens (nada de número inventado). */
 export type SolucaoResumo = Pick<
   Tables<'solucoes'>,
@@ -35,9 +44,13 @@ export type SolucaoResumo = Pick<
   etapaIds: string[];
   /** Nomes, não contagem: alimentam o painel de facetas e o rodapé do card. */
   ferramentas: string[];
+  projeto: DadosRoteiroProjeto | null;
 };
 
-export type SolucaoCompleta = Tables<'solucoes'> & { itens: ItemSolucao[] };
+export type SolucaoCompleta = Tables<'solucoes'> & {
+  itens: ItemSolucao[];
+  projeto: DadosRoteiroProjeto | null;
+};
 
 export type AulaResumo = Pick<Tables<'aulas'>, 'id' | 'titulo' | 'ordem' | 'duracao_seg'>;
 
@@ -75,12 +88,27 @@ function estreitarItens(itens: Tables<'solucao_itens'>[]): ItemSolucao[] {
     .sort((a, b) => a.ordem - b.ordem);
 }
 
+function montarDadosProjeto(
+  registro: Tables<'projeto_roteiros'> | null,
+): DadosRoteiroProjeto | null {
+  if (!registro) return null;
+  const roteiro = lerRoteiroProjeto(registro.roteiro);
+  if (!roteiro) return null;
+  return {
+    resultado: registro.resultado,
+    clienteIdeal: registro.cliente_ideal,
+    entregavelFinal: registro.entregavel_final,
+    roteiro,
+    versao: registro.versao,
+  };
+}
+
 export async function listarSolucoes(): Promise<SolucaoResumo[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('solucoes')
     .select(
-      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(id, tipo, titulo, ordem)',
+      'id, slug, titulo, resumo, categoria, publicado_em, criado_em, solucao_itens(id, tipo, titulo, ordem), projeto_roteiros(*)',
     )
     .eq('status', 'publicado')
     .order('ordem', { ascending: true })
@@ -88,17 +116,23 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
 
   if (error) throw handleError(error, 'solucoes:listar');
 
-  return (data ?? []).map(({ solucao_itens, ...solucao }) => ({
-    ...solucao,
-    etapaIds: solucao_itens
-      .filter((i) => i.tipo === 'etapa')
-      .sort((a, b) => a.ordem - b.ordem)
-      .map((i) => i.id),
-    ferramentas: solucao_itens
-      .filter((i) => i.tipo === 'ferramenta')
-      .sort((a, b) => a.ordem - b.ordem)
-      .map((i) => i.titulo),
-  }));
+  return (data ?? []).map(({ solucao_itens, projeto_roteiros, ...solucao }) => {
+    const projeto = montarDadosProjeto(projeto_roteiros);
+    return {
+      ...solucao,
+      etapaIds: projeto
+        ? idsPassosProjeto(solucao.slug, projeto.roteiro)
+        : solucao_itens
+            .filter((i) => i.tipo === 'etapa')
+            .sort((a, b) => a.ordem - b.ordem)
+            .map((i) => i.id),
+      ferramentas: solucao_itens
+        .filter((i) => i.tipo === 'ferramenta')
+        .sort((a, b) => a.ordem - b.ordem)
+        .map((i) => i.titulo),
+      projeto,
+    };
+  });
 }
 
 /* `cache()`: `generateMetadata` e a página pedem o mesmo registro no mesmo render —
@@ -107,7 +141,7 @@ export const obterSolucao = cache(async (slug: string): Promise<SolucaoCompleta 
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('solucoes')
-    .select('*, solucao_itens(*)')
+    .select('*, solucao_itens(*), projeto_roteiros(*)')
     .eq('slug', slug)
     .eq('status', 'publicado')
     .maybeSingle();
@@ -115,8 +149,12 @@ export const obterSolucao = cache(async (slug: string): Promise<SolucaoCompleta 
   if (error) throw handleError(error, 'solucoes:detalhe');
   if (!data) return null;
 
-  const { solucao_itens, ...solucao } = data;
-  return { ...solucao, itens: estreitarItens(solucao_itens) };
+  const { solucao_itens, projeto_roteiros, ...solucao } = data;
+  return {
+    ...solucao,
+    itens: estreitarItens(solucao_itens),
+    projeto: montarDadosProjeto(projeto_roteiros),
+  };
 });
 
 /** A vizinha desta solução na trilha. A REGRA vive em `proxima.ts`, que é puro
