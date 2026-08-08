@@ -9,9 +9,8 @@ import {
 import styles from './FatosLocais.module.css';
 
 /**
- * A linha de fatos do hero: três números reais do progresso local, em mono
- * sobre a navy. Client porque o dado é do navegador; o SSR chega com zeros e
- * o cliente corrige na hidratação — o custo honesto do progresso local.
+ * A linha de fatos do hero: três números reais do progresso da conta, em mono
+ * sobre a navy. Client porque reage imediatamente às marcações otimistas.
  */
 export function FatosLocais({
   aulaIdsPorFormacao,

@@ -163,12 +163,13 @@ describe('conteúdo do curso', () => {
   });
 
   /* Não promete certificado: o produto não tem emissão nem tabela. */
-  it('concluído, a nota final fala do progresso local — não de certificado', () => {
+  it('concluído, a nota final confirma a conta — não inventa certificado', () => {
     comProgresso(['a1', 'a2', 'a3']);
     render(<Curso formacao={TRES_MODULOS} />);
 
     const trilho = screen.getByRole('region', { name: 'Seu progresso' });
     expect(trilho.textContent).toContain('As 3 aulas estão marcadas');
+    expect(trilho.textContent).toContain('Salvo na sua conta');
     expect(trilho.textContent).not.toMatch(/certificado/i);
   });
 });

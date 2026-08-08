@@ -35,7 +35,7 @@ import styles from './CartaoFormacao.module.css';
  * O scrim não é decoração: é o que garante contraste de branco sobre uma imagem
  * que o admin sobe e que ninguém controla.
  *
- * Ícones em SVG inline: este componente é client (usa progresso local), e
+ * Ícones em SVG inline: este componente é client (reage ao progresso), e
  * importar lucide aqui arrastaria a biblioteca para o bundle do browser.
  */
 function IconeModulos() {

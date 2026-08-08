@@ -51,6 +51,12 @@ const PROJETOS = [
 
 const PLANO = montarPlanoJornada({
   perfil: null,
+  aprendizado: {
+    aulasConcluidas: 8,
+    formacoesConcluidas: 1,
+    etapasConcluidas: 4,
+    projetosConcluidos: 0,
+  },
   oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
   calls: { descobertasConcluidas: 1, kickoffsConcluidos: 0, entregasConcluidas: 0 },
   diagnosticosConcluidos: 1,

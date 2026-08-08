@@ -15,7 +15,7 @@ export async function generateMetadata({
 }
 
 /**
- * Detalhe do curso. Server: busca + 404; o resto é client (progresso local).
+ * Detalhe do curso. Server: busca + 404; o resto reage ao progresso da conta.
  *
  * SEM BOTÃO "VOLTAR": a trilha do cabeçalho já traz `‹ Formações` em toda tela de
  * detalhe. Esta era a última das três a empilhar os dois controles de retorno a

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { ItemSolucao } from '@/lib/conteudo/queries';
-import { alternarEtapa, useProgresso } from '@/lib/progresso/local';
+import { useAcoesProgresso, useProgresso } from '@/lib/progresso/local';
 import { MarcadorAqui } from '../../_components/MarcadorAqui';
 import { Visto } from '../../_components/PillEstado';
 import styles from './PassoAPasso.module.css';
@@ -57,7 +57,7 @@ function Chevron() {
  * botão dentro do painel é um segundo caminho para a mesma ação — não um segundo
  * estado.
  *
- * PROGRESSO DESTE NAVEGADOR — a limitação está dita no `local.ts`.
+ * A marcação é otimista: responde na hora e o provider confirma na conta.
  */
 export function PassoAPasso({
   etapas,
@@ -70,6 +70,7 @@ export function PassoAPasso({
   etapaAtualId: string | null;
 }) {
   const progresso = useProgresso();
+  const { alternarEtapa } = useAcoesProgresso();
   const [override, setOverride] = useState<Record<string, boolean>>({});
   const [todas, setTodas] = useState(false);
 

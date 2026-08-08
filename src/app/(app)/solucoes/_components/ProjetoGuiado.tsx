@@ -12,7 +12,12 @@ import {
 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
 import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
-import { alternarEtapa, contarEtapasFeitas, percentual, useProgresso } from '@/lib/progresso/local';
+import {
+  contarEtapasFeitas,
+  percentual,
+  useAcoesProgresso,
+  useProgresso,
+} from '@/lib/progresso/local';
 import { Ferramentas, Prompts } from './KitSolucao';
 import styles from './ProjetoGuiado.module.css';
 
@@ -38,6 +43,7 @@ export function ProjetoGuiado({
   proxima: ReactNode;
 }) {
   const progresso = useProgresso();
+  const { alternarEtapa } = useAcoesProgresso();
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
@@ -242,7 +248,7 @@ export function ProjetoGuiado({
           </Link>
 
           <p className={styles.notaLocal}>
-            O progresso fica salvo neste navegador. Você pode marcar e reabrir qualquer passo.
+            Salvo na sua conta. Você pode marcar, reabrir e continuar em qualquer dispositivo.
           </p>
         </aside>
       </div>

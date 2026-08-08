@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterFormacao, obterSolucao } from '@/lib/conteudo/queries';
+import { idsPassosProjeto } from '@/lib/projetos/roteiro';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../../../_components/CabecalhoPagina';
 import { CertificadoVista } from '../../_components/CertificadoVista';
@@ -12,12 +13,11 @@ import { CertificadoVista } from '../../_components/CertificadoVista';
  * impressão — "salvar como PDF" no diálogo de imprimir produz o arquivo, sem
  * backend. O que um backend acrescentaria (código de verificação público,
  * registro auditável) continua sendo outra fase; o que NÃO dá para fingir é
- * dito na folha: a conclusão vem do progresso deste navegador.
+ * dito na folha: a conclusão vem do progresso desta conta.
  *
- * QUEM DECIDE SE HÁ CERTIFICADO É O CLIENTE: a conclusão mora no progresso
- * local (localStorage), então o servidor entrega o conteúdo e os claims, e a
- * `CertificadoVista` só desenha a folha se a conclusão for real. URL adivinhada
- * de conteúdo não concluído mostra o estado honesto com a barra de progresso.
+ * QUEM DECIDE SE HÁ CERTIFICADO É O CLIENTE: o layout já hidratou o progresso
+ * da conta, e a `CertificadoVista` só desenha a folha se a conclusão for real.
+ * URL adivinhada de conteúdo não concluído mostra o estado honesto.
  *
  * O nome vem do JWT (user_metadata.nome, como em /conta) — sem ida ao banco.
  */
@@ -43,7 +43,9 @@ async function carregar(origem: Origem, slug: string) {
   if (!solucao) return null;
   return {
     titulo: solucao.titulo,
-    itemIds: solucao.itens.filter((i) => i.tipo === 'etapa').map((i) => i.id),
+    itemIds: solucao.projeto
+      ? idsPassosProjeto(solucao.slug, solucao.projeto.roteiro)
+      : solucao.itens.filter((i) => i.tipo === 'etapa').map((i) => i.id),
     href: `/solucoes/${slug}`,
   };
 }

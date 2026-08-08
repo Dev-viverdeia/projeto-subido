@@ -190,7 +190,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A procedência, dita na folha: este registro é local. Sem código inventado. */
+/* A procedência, dita na folha: este registro vem da conta. Sem código inventado. */
 .origem {
   margin: 0 0 0 auto;
   font-family: var(--via-font-mono);

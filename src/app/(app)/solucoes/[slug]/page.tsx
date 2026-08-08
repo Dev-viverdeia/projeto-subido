@@ -23,7 +23,7 @@ export async function generateMetadata({
  * Detalhe da solução — a ficha de implantação.
  *
  * ESTE ARQUIVO É SÓ DADO E MOLDURA. Toda a composição vive na `FichaSolucao`,
- * que é cliente porque três partes da tela derivam do progresso local. O que fica
+ * que é cliente porque três partes da tela derivam do progresso da conta. O que fica
  * aqui é o que só o servidor sabe fazer de graça: as duas leituras, os ícones
  * `lucide` já RENDERIZADOS (elemento, não referência — com a referência, o
  * consumidor cliente importaria a biblioteca para poder chamá-la) e a moldura do

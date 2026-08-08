@@ -119,11 +119,7 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
             feitasIds={curriculo.feitasIds}
             proximo={curriculo.proxima}
             unidade={{ singular: 'aula', plural: 'aulas' }}
-            /* NÃO promete certificado. O texto anterior dizia "o certificado
-               entra quando a emissão for ligada" — um resultado prometido sem
-               mecanismo e sem data, que é exatamente o que a casa não faz. O que
-               entra no lugar é a limitação REAL e verificável do progresso. */
-            notaFinal="O progresso é deste navegador — ele não acompanha você em outro dispositivo."
+            notaFinal="Salvo na sua conta para continuar em qualquer dispositivo."
           />
         </aside>
       </div>

@@ -12,7 +12,7 @@ import styles from './RetomadaFormacao.module.css';
 
 /**
  * "Continue de onde parou" — a pill que devolve o aluno à formação tocada mais
- * recentemente. Só renderiza quando EXISTE progresso local; para quem nunca
+ * recentemente. Só renderiza quando EXISTE progresso na conta; para quem nunca
  * começou, nada aparece (um convite vazio seria dado inventado).
  *
  * VIVE SÓ NO `/inicio` AGORA. O catálogo de formações usava esta pill como

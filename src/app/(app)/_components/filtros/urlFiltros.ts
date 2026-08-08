@@ -44,7 +44,7 @@ export function lerFiltrosIniciais(params: {
 /**
  * Vista inicial da tela de mentorias, lida da URL no servidor.
  *
- * A vista ENTRA na URL (ao contrário do progresso local das formações) porque é
+ * A vista ENTRA na URL (ao contrário do progresso da conta) porque é
  * uma escolha de leitura, não um estado do dispositivo: um link para o calendário
  * do mês reproduz o calendário do mês no aparelho de quem recebe.
  */

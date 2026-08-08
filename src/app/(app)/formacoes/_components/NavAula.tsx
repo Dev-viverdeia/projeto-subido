@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/design-system/via';
-import { concluirAula, tocarFormacao, useProgresso } from '@/lib/progresso/local';
+import { useAcoesProgresso, useProgresso } from '@/lib/progresso/local';
 import styles from './NavAula.module.css';
 
 /**
  * A barra de navegação da aula: ← Anterior · [Marcar como concluída] · Próxima →.
  * O botão do meio é o ÚNICO sólido da tela — é a ação que importa. Concluir grava
- * no progresso local e AVANÇA para a próxima; na última aula, apenas conclui.
+ * na conta e AVANÇA para a próxima; na última aula, apenas conclui.
  *
  * No mobile a barra gruda no rodapé com vidro — o aluno conclui sem rolar de
  * volta. Montar esta barra também "toca" a formação: é o que alimenta o
@@ -29,11 +29,12 @@ export function NavAula({
 }) {
   const router = useRouter();
   const progresso = useProgresso();
+  const { concluirAula, tocarFormacao } = useAcoesProgresso();
   const concluida = Boolean(progresso.aulas[aulaId]);
 
   useEffect(() => {
     tocarFormacao(formacaoSlug);
-  }, [formacaoSlug]);
+  }, [formacaoSlug, tocarFormacao]);
 
   const irPara = (id: string) => router.push(`/formacoes/${formacaoSlug}/aula/${id}`);
 

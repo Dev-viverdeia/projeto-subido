@@ -1,0 +1,63 @@
+.aviso {
+  position: fixed;
+  right: var(--via-space-4);
+  bottom: calc(var(--via-space-20) + env(safe-area-inset-bottom, 0px));
+  z-index: var(--via-z-toast);
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  width: min(380px, calc(100vw - 2 * var(--via-space-4)));
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface-elev, var(--via-surface));
+  box-shadow: var(--app-elev-3-shadow);
+  color: var(--via-text);
+}
+
+.marcador {
+  grid-row: 1 / span 2;
+  width: 3px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent);
+}
+
+.aviso strong {
+  display: block;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+}
+
+.aviso p {
+  max-width: 34ch;
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  line-height: 1.45;
+}
+
+.aviso button {
+  grid-column: 2;
+  justify-self: start;
+  min-height: 36px;
+  padding: 0 var(--via-space-3);
+  border: 1px solid var(--via-border-strong);
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-navy);
+  font: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+}
+
+.aviso button:hover {
+  background: var(--via-navy-04);
+}
+
+@media (min-width: 1024px) {
+  .aviso {
+    bottom: var(--via-space-6);
+    right: var(--via-space-6);
+  }
+}

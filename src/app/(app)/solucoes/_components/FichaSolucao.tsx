@@ -232,7 +232,7 @@ export function FichaSolucao({
           proximo={etapaAtual}
           unidade={{ singular: 'etapa', plural: 'etapas' }}
           aoContinuar={continuar}
-          notaFinal="O progresso é deste navegador — ele não acompanha você em outro dispositivo."
+          notaFinal="Salvo na sua conta para continuar em qualquer dispositivo."
         />
         {proxima}
       </aside>

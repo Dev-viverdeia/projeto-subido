@@ -11,6 +11,12 @@ export type PerfilJornada = {
 
 export type SinaisJornada = {
   perfil: PerfilJornada;
+  aprendizado: {
+    aulasConcluidas: number;
+    formacoesConcluidas: number;
+    etapasConcluidas: number;
+    projetosConcluidos: number;
+  };
   oportunidades: {
     total: number;
     comProximaAcao: number;
@@ -78,6 +84,10 @@ function passo(
   return { id, titulo, detalhe, evidencia, concluido, destino, acao };
 }
 
+function quantidade(valor: number, singular: string, plural: string): string {
+  return `${valor} ${valor === 1 ? singular : plural}`;
+}
+
 function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
   const projetoEscolhido = Boolean(sinais.perfil?.projetoInicialId);
   const posicionamentoDefinido = Boolean(sinais.perfil?.posicionamento.trim());
@@ -95,6 +105,19 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         'A base não termina em conteúdo assistido. Ela termina quando você consegue nomear o cliente, o problema e a primeira entrega que vai vender.',
       guia: 'Como transformar aprendizado em serviço',
       passos: [
+        passo(
+          'formacao-base',
+          'Concluir uma formação essencial',
+          'Complete uma trilha de base para dominar linguagem, processo e critério antes de prometer uma entrega.',
+          sinais.aprendizado.formacoesConcluidas > 0
+            ? `${quantidade(sinais.aprendizado.formacoesConcluidas, 'formação concluída', 'formações concluídas')} na conta.`
+            : sinais.aprendizado.aulasConcluidas > 0
+              ? `${quantidade(sinais.aprendizado.aulasConcluidas, 'aula concluída', 'aulas concluídas')}; a formação ainda está em andamento.`
+              : 'Nenhuma aula concluída ainda.',
+          sinais.aprendizado.formacoesConcluidas > 0,
+          '/formacoes',
+          'Continuar formação',
+        ),
         passo(
           'projeto-inicial',
           'Escolher o primeiro projeto',
@@ -238,6 +261,21 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
           sinais.calls.kickoffsConcluidos > 0,
           '/calls',
           'Agendar kickoff',
+        ),
+        passo(
+          'projeto-guiado',
+          'Executar o projeto guiado',
+          'Siga todas as fases da implementação e marque cada evidência somente quando estiver pronta.',
+          sinais.aprendizado.projetosConcluidos > 0
+            ? `${quantidade(sinais.aprendizado.projetosConcluidos, 'projeto guiado concluído', 'projetos guiados concluídos')}.`
+            : sinais.aprendizado.etapasConcluidas > 0
+              ? `${quantidade(sinais.aprendizado.etapasConcluidas, 'etapa executada', 'etapas executadas')}; nenhum projeto completo ainda.`
+              : 'Nenhuma etapa de projeto concluída.',
+          sinais.aprendizado.projetosConcluidos > 0,
+          sinais.perfil?.projetoInicialSlug
+            ? `/solucoes/${sinais.perfil.projetoInicialSlug}`
+            : '/solucoes',
+          'Executar projeto',
         ),
         passo(
           'validacao-entrega',

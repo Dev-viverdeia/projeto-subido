@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { ProgressoProvider } from '@/lib/progresso/provider';
+import { obterProgressoConta } from '@/lib/progresso/queries';
 import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
@@ -50,65 +52,69 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
      o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
      todo mundo. */
-  const admin = await ehAdmin();
+  const [admin, progressoInicial] = await Promise.all([ehAdmin(), obterProgressoConta()]);
 
   return (
     <QueryProvider>
-      {/* O provedor abraça o shell porque quem ESCREVE a trilha é a página, lá
-          dentro, e quem LÊ é o cabeçalho, aqui em cima. */}
-      <ProvedorDeTrilha>
-        <div className={styles.shell}>
-          <a href="#conteudo" className="via-skip-link">
-            Pular para o conteúdo
-          </a>
+      {/* Só a área autenticada recebe o progresso da conta. A landing continua
+          estática e não carrega nem sessão nem sincronização. */}
+      <ProgressoProvider inicial={progressoInicial}>
+        {/* O provedor abraça o shell porque quem ESCREVE a trilha é a página, lá
+            dentro, e quem LÊ é o cabeçalho, aqui em cima. */}
+        <ProvedorDeTrilha>
+          <div className={styles.shell}>
+            <a href="#conteudo" className="via-skip-link">
+              Pular para o conteúdo
+            </a>
 
-          {/* O trilho navy: a banda escura da landing e das telas de sessão, em pé.
+            {/* O trilho navy: a banda escura da landing e das telas de sessão, em pé.
             A marca azul sobre a navy é o mesmo quadro de /entrar — o produto
             inteiro abre e fecha na mesma assinatura. O item de admin é UTILITÁRIO,
             não pilar: mora ancorado no pé do trilho, separado por hairline. */}
-          <aside className={`${styles.sidebar} via-noise`}>
-            <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-              <SubidoLogo size={18} />
-            </Link>
-
-            <NavLateral itens={ITENS_NAV} variante="lateral" rotuloGrupo="Plataforma" />
-
-            <div className={styles.rodapeSidebar}>
-              {admin && (
-                <NavLateral
-                  itens={[ITEM_ADMIN]}
-                  variante="lateral"
-                  grupo="admin"
-                  rotuloGrupo="Gestão"
-                />
-              )}
-
-              <Link href="/conta" className={styles.perfilSidebar}>
-                <span className={styles.avatarSidebar} aria-hidden="true">
-                  {iniciais || 'SI'}
-                </span>
-                <span className={styles.identidadeSidebar}>
-                  <strong>{nome}</strong>
-                  <small>Profissional de IA</small>
-                </span>
+            <aside className={`${styles.sidebar} via-noise`}>
+              <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
+                <SubidoLogo size={18} />
               </Link>
-            </div>
-          </aside>
 
-          {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
+              <NavLateral itens={ITENS_NAV} variante="lateral" rotuloGrupo="Plataforma" />
+
+              <div className={styles.rodapeSidebar}>
+                {admin && (
+                  <NavLateral
+                    itens={[ITEM_ADMIN]}
+                    variante="lateral"
+                    grupo="admin"
+                    rotuloGrupo="Gestão"
+                  />
+                )}
+
+                <Link href="/conta" className={styles.perfilSidebar}>
+                  <span className={styles.avatarSidebar} aria-hidden="true">
+                    {iniciais || 'SI'}
+                  </span>
+                  <span className={styles.identidadeSidebar}>
+                    <strong>{nome}</strong>
+                    <small>Profissional de IA</small>
+                  </span>
+                </Link>
+              </div>
+            </aside>
+
+            {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
             (usa usePathname) e receber o SVG pronto do servidor evita puxar a marca
             para o bundle do browser. Só aparece no mobile — em desktop a sidebar
             já carrega a marca, e repetir seria a segunda vez na mesma tela. */}
-          <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} />
+            <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} />
 
-          <main className={styles.conteudo} id="conteudo">
-            {children}
-          </main>
+            <main className={styles.conteudo} id="conteudo">
+              {children}
+            </main>
 
-          {/* O dock nunca carrega o admin (noDock) — a lista base basta. */}
-          <NavLateral itens={ITENS_NAV} variante="dock" />
-        </div>
-      </ProvedorDeTrilha>
+            {/* O dock nunca carrega o admin (noDock) — a lista base basta. */}
+            <NavLateral itens={ITENS_NAV} variante="dock" />
+          </div>
+        </ProvedorDeTrilha>
+      </ProgressoProvider>
     </QueryProvider>
   );
 }

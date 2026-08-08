@@ -1250,6 +1250,113 @@ export type Database = {
         }
         Relationships: []
       }
+      progresso_aulas: {
+        Row: {
+          aula_id: string
+          concluida_em: string
+          dono: string
+        }
+        Insert: {
+          aula_id: string
+          concluida_em?: string
+          dono: string
+        }
+        Update: {
+          aula_id?: string
+          concluida_em?: string
+          dono?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progresso_aulas_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      progresso_etapas: {
+        Row: {
+          concluida_em: string
+          dono: string
+          etapa_chave: string
+          projeto_id: string
+        }
+        Insert: {
+          concluida_em?: string
+          dono: string
+          etapa_chave: string
+          projeto_id: string
+        }
+        Update: {
+          concluida_em?: string
+          dono?: string
+          etapa_chave?: string
+          projeto_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progresso_etapas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      progresso_formacoes: {
+        Row: {
+          dono: string
+          formacao_id: string
+          ultimo_acesso_em: string
+        }
+        Insert: {
+          dono: string
+          formacao_id: string
+          ultimo_acesso_em?: string
+        }
+        Update: {
+          dono?: string
+          formacao_id?: string
+          ultimo_acesso_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progresso_formacoes_formacao_id_fkey"
+            columns: ["formacao_id"]
+            isOneToOne: false
+            referencedRelation: "formacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      progresso_projetos: {
+        Row: {
+          dono: string
+          projeto_id: string
+          ultimo_acesso_em: string
+        }
+        Insert: {
+          dono: string
+          projeto_id: string
+          ultimo_acesso_em?: string
+        }
+        Update: {
+          dono?: string
+          projeto_id?: string
+          ultimo_acesso_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progresso_projetos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projeto_roteiros: {
         Row: {
           atualizado_em: string

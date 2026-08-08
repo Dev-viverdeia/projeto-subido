@@ -17,7 +17,7 @@ import styles from './GaleriaCertificados.module.css';
  * A galeria: certificados CONQUISTADOS como diplomas navy, o que está EM
  * ANDAMENTO como linhas de progresso, e o restante como convite quieto.
  *
- * TUDO DERIVA DO PROGRESSO REAL deste navegador — inclusive a DATA de
+ * TUDO DERIVA DO PROGRESSO REAL da conta — inclusive a DATA de
  * conclusão, que é a marcação mais recente entre as aulas/etapas do conteúdo
  * (a conclusão acontece quando a última cai). Nenhum certificado nasce de
  * dado inventado: com o storage limpo, a tela mostra o estado vazio honesto.

@@ -2,6 +2,7 @@ import 'server-only';
 
 import { cache } from 'react';
 import { handleError } from '@/lib/errors';
+import { obterMetricasProgressoConta } from '@/lib/progresso/queries';
 import { createClient } from '@/lib/supabase/server';
 import { montarPlanoJornada, type PerfilJornada, type PlanoJornada } from './motor';
 
@@ -21,23 +22,25 @@ export type JornadaOperacional = {
 
 export const obterJornadaOperacional = cache(async (): Promise<JornadaOperacional> => {
   const supabase = await createClient();
-  const [perfil, projetos, oportunidades, calls, diagnosticos, propostas] = await Promise.all([
-    supabase
-      .from('jornada_perfis')
-      .select('nicho, projeto_inicial_id, posicionamento, atualizado_em')
-      .maybeSingle(),
-    supabase
-      .from('solucoes')
-      .select('id, slug, titulo, resumo, categoria')
-      .eq('status', 'publicado')
-      .order('ordem')
-      .order('criado_em', { ascending: false })
-      .limit(20),
-    supabase.from('crm_oportunidades').select('id, etapa, proxima_acao').limit(500),
-    supabase.from('calls_reunioes').select('id, tipo, status').limit(500),
-    supabase.from('diagnosticos_atendimento').select('id, status').limit(500),
-    supabase.from('propostas').select('id, status').limit(500),
-  ]);
+  const [perfil, projetos, oportunidades, calls, diagnosticos, propostas, progresso] =
+    await Promise.all([
+      supabase
+        .from('jornada_perfis')
+        .select('nicho, projeto_inicial_id, posicionamento, atualizado_em')
+        .maybeSingle(),
+      supabase
+        .from('solucoes')
+        .select('id, slug, titulo, resumo, categoria')
+        .eq('status', 'publicado')
+        .order('ordem')
+        .order('criado_em', { ascending: false })
+        .limit(20),
+      supabase.from('crm_oportunidades').select('id, etapa, proxima_acao').limit(500),
+      supabase.from('calls_reunioes').select('id, tipo, status').limit(500),
+      supabase.from('diagnosticos_atendimento').select('id, status').limit(500),
+      supabase.from('propostas').select('id, status').limit(500),
+      obterMetricasProgressoConta(),
+    ]);
 
   if (perfil.error) throw handleError(perfil.error, 'jornada:perfil');
   if (projetos.error) throw handleError(projetos.error, 'jornada:projetos');
@@ -68,6 +71,7 @@ export const obterJornadaOperacional = cache(async (): Promise<JornadaOperaciona
 
   const plano = montarPlanoJornada({
     perfil: perfilMontado,
+    aprendizado: progresso,
     oportunidades: {
       total: linhasOportunidade.length,
       comProximaAcao: linhasOportunidade.filter((item) => Boolean(item.proxima_acao)).length,

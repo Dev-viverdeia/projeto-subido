@@ -57,13 +57,10 @@ export function CurriculoCurso({
   /**
    * ABERTO DERIVADO, e o inicializador de `useState` era um BUG de hidratação.
    *
-   * `moduloAbertoInicial` sai do progresso local, e o progresso local vem de
-   * `useSyncExternalStore`, cujo snapshot de SERVIDOR é vazio (ver `local.ts`).
-   * O inicializador roda UMA vez, no render de hidratação — exatamente o render
-   * em que o progresso ainda é vazio. Resultado: quem já concluiu os módulos 1 e
-   * 2 abria o curso com o módulo 1 expandido, porque naquele instante "a próxima
-   * aula" era a primeira de todas. O progresso chegava no ciclo seguinte e o
-   * acordeão já estava congelado.
+   * `moduloAbertoInicial` sai do progresso da conta e muda assim que uma aula é
+   * marcada. Um inicializador de `useState` roda UMA vez e congelaria o módulo
+   * anterior depois dessa mudança — a pessoa concluiria a aula, mas o currículo
+   * continuaria aberto no lugar errado.
    *
    * A correção é a mesma que a `PlaylistAula` já usa: o estado guarda a ESCOLHA
    * explícita junto da assinatura sob a qual ela foi feita. Assinatura mudou →

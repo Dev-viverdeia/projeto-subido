@@ -24,8 +24,8 @@ import styles from './CertificadoVista.module.css';
  *
  * "Salvar em PDF" é o diálogo de impressão do navegador (`window.print()`), e
  * o CSS de impressão isola a folha: tudo fica invisível menos ela, que assume
- * a página inteira em paisagem. Emissão sem backend — o que só um backend
- * daria (código de verificação público) não é fingido aqui.
+ * a página inteira em paisagem. A conclusão vem da conta; código público de
+ * verificação continua fora do escopo e não é fingido aqui.
  *
  * CONCLUSÃO É DO CLIENTE: quem chega por URL a um conteúdo não concluído vê o
  * estado honesto com o progresso real e o caminho de volta.
@@ -129,7 +129,7 @@ export function CertificadoVista({
             </div>
             {/* Sem código de verificação: registro público auditável é fase de
                 backend, e número inventado aqui seria pior que a ausência. */}
-            <p className={styles.origem}>Registro local de conclusão · plataforma Subido</p>
+            <p className={styles.origem}>Registro da conta · plataforma Subido</p>
           </footer>
         </div>
       </article>

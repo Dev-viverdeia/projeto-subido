@@ -15,7 +15,7 @@ import styles from './ResumoCatalogo.module.css';
  *
  * TODO NÚMERO AQUI É DERIVADO, nenhum é literal. "Disponíveis" vem da lista que o
  * servidor entregou; "em andamento" e "concluídas" saem de cruzar o que está
- * marcado NESTE navegador com os itens de cada conteúdo. Quem nunca marcou nada
+ * marcado nesta conta com os itens de cada conteúdo. Quem nunca marcou nada
  * vê 8 · 0 · 0, que é a verdade — e a retomada simplesmente não aparece.
  *
  * A RETOMADA É O ÚNICO ELEMENTO COM CTA da faixa, e some quando não há o que
@@ -26,14 +26,13 @@ import styles from './ResumoCatalogo.module.css';
  * estava aqui arrastava a biblioteca para o bundle do navegador por causa de uma
  * flecha de 16px.
  *
- * `useSyncExternalStore` devolve o estado VAZIO no servidor (ver `local.ts`),
- * então o HTML sai com os zeros e o cliente corrige após a hidratação. É o custo
- * assumido de progresso local, e some no dia em que ele virar tabela.
+ * O layout autenticado entrega o estado inicial do banco; novas marcações entram
+ * otimistas no cliente e são confirmadas na mesma conta.
  */
 export type LinhaResumo = {
   slug: string;
   titulo: string;
-  /** Quantos itens deste conteúdo estão marcados neste navegador. */
+  /** Quantos itens deste conteúdo estão marcados nesta conta. */
   feitas: number;
   /** Quantos itens ele tem no total. */
   total: number;

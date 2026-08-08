@@ -40,7 +40,7 @@ export type SolucaoResumo = Pick<
   'id' | 'slug' | 'titulo' | 'resumo' | 'categoria' | 'publicado_em' | 'criado_em'
 > & {
   /** IDs das etapas, não a contagem: é com eles que o card cruza o progresso
-      local para saber quantas ESTA pessoa já marcou. `.length` dá o total. */
+      da conta para saber quantas ESTA pessoa já marcou. `.length` dá o total. */
   etapaIds: string[];
   /** Nomes, não contagem: alimentam o painel de facetas e o rodapé do card. */
   ferramentas: string[];
@@ -58,7 +58,7 @@ export type ModuloComAulas = Pick<Tables<'modulos'>, 'id' | 'titulo' | 'ordem'> 
   aulas: AulaResumo[];
 };
 
-/** Card do catálogo de formações. `aulaIds` alimenta o progresso local no cliente. */
+/** Card do catálogo de formações. `aulaIds` cruza o progresso da conta no cliente. */
 export type FormacaoResumo = Pick<
   Tables<'formacoes'>,
   'id' | 'slug' | 'titulo' | 'resumo' | 'capa_url' | 'publicado_em' | 'criado_em'

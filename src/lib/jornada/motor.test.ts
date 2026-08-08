@@ -4,6 +4,12 @@ import { montarPlanoJornada, type SinaisJornada } from './motor';
 function sinais(v: Partial<SinaisJornada> = {}): SinaisJornada {
   return {
     perfil: null,
+    aprendizado: {
+      aulasConcluidas: 0,
+      formacoesConcluidas: 0,
+      etapasConcluidas: 0,
+      projetosConcluidos: 0,
+    },
     oportunidades: { total: 0, comProximaAcao: 0, ganhas: 0 },
     calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
     diagnosticosConcluidos: 0,
@@ -26,13 +32,23 @@ describe('motor da jornada', () => {
     const plano = montarPlanoJornada(sinais());
 
     expect(plano.etapaAtual).toBe('aprender');
-    expect(plano.proximoPasso.id).toBe('projeto-inicial');
+    expect(plano.proximoPasso.id).toBe('formacao-base');
     expect(plano.percentual).toBe(0);
     expect(plano.perfilCompleto).toBe(false);
   });
 
   it('avança para prospecção somente depois de oferta e posicionamento', () => {
-    const plano = montarPlanoJornada(sinais({ perfil }));
+    const plano = montarPlanoJornada(
+      sinais({
+        perfil,
+        aprendizado: {
+          aulasConcluidas: 12,
+          formacoesConcluidas: 1,
+          etapasConcluidas: 0,
+          projetosConcluidos: 0,
+        },
+      }),
+    );
 
     expect(plano.etapaAtual).toBe('prospectar');
     expect(plano.proximoPasso.id).toBe('primeiro-lead');
@@ -43,6 +59,12 @@ describe('motor da jornada', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
+        aprendizado: {
+          aulasConcluidas: 12,
+          formacoesConcluidas: 1,
+          etapasConcluidas: 0,
+          projetosConcluidos: 0,
+        },
         oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
         calls: { descobertasConcluidas: 1, kickoffsConcluidos: 0, entregasConcluidas: 0 },
         diagnosticosConcluidos: 1,
@@ -58,6 +80,12 @@ describe('motor da jornada', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
+        aprendizado: {
+          aulasConcluidas: 12,
+          formacoesConcluidas: 1,
+          etapasConcluidas: 15,
+          projetosConcluidos: 1,
+        },
         oportunidades: { total: 2, comProximaAcao: 1, ganhas: 1 },
         calls: { descobertasConcluidas: 1, kickoffsConcluidos: 1, entregasConcluidas: 1 },
         diagnosticosConcluidos: 1,

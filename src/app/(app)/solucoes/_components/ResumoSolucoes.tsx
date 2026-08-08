@@ -9,7 +9,7 @@ import { contarEtapasFeitas, solucaoMaisRecente, useProgresso } from '@/lib/prog
  *
  * A FAIXA NÃO SABE O QUE ESTÁ CONTANDO, e é isso que a deixa servir os dois
  * pilares: ela recebe `{slug, titulo, feitas, total}` e não pergunta se aquilo é
- * etapa ou aula. Quem lê o progresso local — que é conhecimento deste pilar — é
+ * etapa ou aula. Quem lê o progresso da conta — conhecimento deste pilar — é
  * este arquivo de vinte linhas.
  */
 export function ResumoSolucoes({ solucoes }: { solucoes: SolucaoResumo[] }) {
