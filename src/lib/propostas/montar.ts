@@ -27,6 +27,12 @@ export type ContextoPosCallProposta = {
   compromissos: string[];
 };
 
+export type ContextoDiagnosticoProposta = {
+  resumo: string;
+  falhas: string[];
+  plano: string[];
+};
+
 const TITULOS_FASE: Record<number, string> = {
   1: 'Fundação',
   2: 'Construção',
@@ -148,6 +154,7 @@ export function montarDocumentoInicial(
   lead: DossieLead,
   origem: OrigemProposta,
   posCall?: ContextoPosCallProposta | null,
+  diagnostico?: ContextoDiagnosticoProposta | null,
 ): DocumentoProposta {
   const leitura = ultimaLeitura(lead);
   const base =
@@ -168,12 +175,34 @@ export function montarDocumentoInicial(
         .filter(Boolean)
         .join('\n\n')
     : null;
+  const contextoDoDiagnostico = diagnostico
+    ? [
+        diagnostico.resumo,
+        diagnostico.falhas.length
+          ? `Falhas observadas no diagnóstico: ${diagnostico.falhas.slice(0, 4).join('; ')}.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join('\n\n')
+    : null;
   const desafio =
     contextoDaCall ??
+    contextoDoDiagnostico ??
     leitura?.resumo ??
     `A ${lead.empresa.nome} busca avançar em ${lead.oportunidade.titulo.toLowerCase()}, com um processo claro, mensurável e seguro.`;
   const objetivo = oportunidade?.impacto ?? base.objetivo;
   const confirmacoes = posCall ? unicos([...posCall.decisoes, ...posCall.compromissos], 5) : [];
+  const planoDiagnostico = diagnostico ? unicos(diagnostico.plano, 4) : [];
+  const observacoes = [
+    confirmacoes.length
+      ? `Pontos confirmados na reunião:\n${confirmacoes.map((item) => `• ${item}`).join('\n')}`
+      : null,
+    planoDiagnostico.length
+      ? `Ações indicadas pelo diagnóstico para validação:\n${planoDiagnostico.map((item) => `• ${item}`).join('\n')}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join('\n\n');
 
   return DocumentoPropostaSchema.parse({
     cliente: {
@@ -201,11 +230,6 @@ export function montarDocumentoInicial(
       'Aprovar esta proposta comercial.',
       'Realizar a reunião de início do projeto.',
     ],
-    observacoes: confirmacoes.length
-      ? limitar(
-          `Pontos confirmados na reunião:\n${confirmacoes.map((item) => `• ${item}`).join('\n')}`,
-          3000,
-        )
-      : null,
+    observacoes: observacoes ? limitar(observacoes, 3000) : null,
   });
 }

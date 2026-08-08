@@ -7,6 +7,7 @@ import {
   FileSignature,
   GraduationCap,
   House,
+  ScanSearch,
   ShieldCheck,
   Users,
   Video,
@@ -62,6 +63,14 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/calls'],
     icone: <Video size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+  },
+  {
+    href: '/diagnosticos',
+    rotulo: ROTULOS['/diagnosticos'],
+    icone: <ScanSearch size={TAMANHO} strokeWidth={TRACO} />,
+    /* O diagnóstico é uma ferramenta de pré-venda e fica no trilho completo.
+       O dock móvel preserva os cinco destinos centrais da operação diária. */
+    noDock: false,
   },
   {
     href: '/solucoes',

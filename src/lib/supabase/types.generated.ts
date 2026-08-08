@@ -908,6 +908,100 @@ export type Database = {
           },
         ]
       }
+      diagnosticos_atendimento: {
+        Row: {
+          atualizado_em: string
+          canal: Database["public"]["Enums"]["diagnostico_atendimento_canal"]
+          cenario: string
+          concluido_em: string | null
+          confirmou_autorizacao: boolean
+          contato_id: string | null
+          dono: string
+          empresa_id: string
+          erro: string | null
+          evidencia_informada: string | null
+          fontes: Json
+          id: string
+          iniciado_em: string | null
+          modelo: string | null
+          nota_geral: number | null
+          oportunidade_id: string
+          resposta_id: string | null
+          resultado: Json | null
+          site_url: string | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["diagnostico_atendimento_status"]
+        }
+        Insert: {
+          atualizado_em?: string
+          canal: Database["public"]["Enums"]["diagnostico_atendimento_canal"]
+          cenario: string
+          concluido_em?: string | null
+          confirmou_autorizacao?: boolean
+          contato_id?: string | null
+          dono: string
+          empresa_id: string
+          erro?: string | null
+          evidencia_informada?: string | null
+          fontes?: Json
+          id?: string
+          iniciado_em?: string | null
+          modelo?: string | null
+          nota_geral?: number | null
+          oportunidade_id: string
+          resposta_id?: string | null
+          resultado?: Json | null
+          site_url?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["diagnostico_atendimento_status"]
+        }
+        Update: {
+          atualizado_em?: string
+          canal?: Database["public"]["Enums"]["diagnostico_atendimento_canal"]
+          cenario?: string
+          concluido_em?: string | null
+          confirmou_autorizacao?: boolean
+          contato_id?: string | null
+          dono?: string
+          empresa_id?: string
+          erro?: string | null
+          evidencia_informada?: string | null
+          fontes?: Json
+          id?: string
+          iniciado_em?: string | null
+          modelo?: string | null
+          nota_geral?: number | null
+          oportunidade_id?: string
+          resposta_id?: string | null
+          resultado?: Json | null
+          site_url?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["diagnostico_atendimento_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosticos_atendimento_contato_fk"
+            columns: ["dono", "empresa_id", "contato_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contatos"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_atendimento_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "diagnosticos_atendimento_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+        ]
+      }
       formacoes: {
         Row: {
           atualizado_em: string
@@ -1436,6 +1530,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      diagnostico_aplicar_proxima_acao: {
+        Args: { p_diagnostico: string }
+        Returns: boolean
+      }
+      diagnostico_iniciar: {
+        Args: {
+          p_canal: Database["public"]["Enums"]["diagnostico_atendimento_canal"]
+          p_cenario: string
+          p_confirmou_autorizacao?: boolean
+          p_evidencia?: string
+          p_oportunidade: string
+          p_site_url: string
+        }
+        Returns: string
+      }
       mentoria_ocupacao: {
         Args: { _ids: string[] }
         Returns: {
@@ -1476,6 +1585,19 @@ export type Database = {
         | "negociacao"
         | "ganho"
         | "perdido"
+      diagnostico_atendimento_canal:
+        | "site"
+        | "whatsapp"
+        | "instagram"
+        | "chat"
+        | "email"
+        | "telefone"
+        | "outro"
+      diagnostico_atendimento_status:
+        | "na_fila"
+        | "processando"
+        | "concluido"
+        | "falhou"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
       proposta_status:
@@ -1649,6 +1771,21 @@ export const Constants = {
         "negociacao",
         "ganho",
         "perdido",
+      ],
+      diagnostico_atendimento_canal: [
+        "site",
+        "whatsapp",
+        "instagram",
+        "chat",
+        "email",
+        "telefone",
+        "outro",
+      ],
+      diagnostico_atendimento_status: [
+        "na_fila",
+        "processando",
+        "concluido",
+        "falhou",
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],

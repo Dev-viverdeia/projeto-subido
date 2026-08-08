@@ -153,4 +153,21 @@ describe('montagem inicial da proposta', () => {
     expect(documento.observacoes).toContain('O piloto ficará restrito');
     expect(documento.objetivo).not.toContain('promessa');
   });
+
+  it('usa somente falhas observadas e ações do diagnóstico no rascunho', () => {
+    const documento = montarDocumentoInicial(
+      LEAD,
+      { tipo: 'sem_base', titulo: 'Projeto personalizado de IA' },
+      null,
+      {
+        resumo: 'O acesso ao atendimento é claro, mas a conversa termina sem próximo passo.',
+        falhas: ['A conversa não registra responsável nem prazo de retorno.'],
+        plano: ['Definir responsável e prazo para cada categoria de solicitação.'],
+      },
+    );
+
+    expect(documento.desafio).toContain('termina sem próximo passo');
+    expect(documento.desafio).toContain('não registra responsável');
+    expect(documento.observacoes).toContain('Definir responsável');
+  });
 });

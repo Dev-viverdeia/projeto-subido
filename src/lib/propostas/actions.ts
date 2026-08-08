@@ -7,6 +7,7 @@ import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
 import { obterPosCall } from '@/lib/calls/queries';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
+import { obterDiagnostico } from '@/lib/diagnosticos/queries';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { montarDocumentoInicial, type OrigemProposta } from './montar';
@@ -17,6 +18,7 @@ const NovaPropostaSchema = z.object({
   oportunidade: z.uuid(),
   origem: z.string().min(1).max(200),
   reuniao: z.preprocess((valor) => (valor === '' ? undefined : valor), z.uuid().optional()),
+  diagnostico: z.preprocess((valor) => (valor === '' ? undefined : valor), z.uuid().optional()),
 });
 
 const SalvarSchema = z.object({
@@ -83,14 +85,18 @@ export async function criarProposta(formData: FormData): Promise<void> {
     oportunidade: formData.get('oportunidade'),
     origem: formData.get('origem'),
     reuniao: formData.get('reuniao'),
+    diagnostico: formData.get('diagnostico'),
   });
   if (!validacao.success) redirect('/propostas/nova?erro=campos');
 
-  const [{ supabase, user }, lead, origem, posCall] = await Promise.all([
+  const [{ supabase, user }, lead, origem, posCall, diagnostico] = await Promise.all([
     usuarioAtual(),
     obterDossieLead(validacao.data.oportunidade),
     resolverOrigem(validacao.data.origem),
     validacao.data.reuniao ? obterPosCall(validacao.data.reuniao) : Promise.resolve(null),
+    validacao.data.diagnostico
+      ? obterDiagnostico(validacao.data.diagnostico)
+      : Promise.resolve(null),
   ]);
   if (!user) redirect('/entrar');
   if (!lead || !origem) redirect('/propostas/nova?erro=indisponivel');
@@ -106,7 +112,17 @@ export async function criarProposta(formData: FormData): Promise<void> {
           compromissos: posCall.analise.compromissos,
         }
       : null;
-  const documento = montarDocumentoInicial(lead, origem, contextoPosCall);
+  const contextoDiagnostico =
+    diagnostico?.oportunidadeId === validacao.data.oportunidade &&
+    diagnostico.status === 'concluido' &&
+    diagnostico.relatorio
+      ? {
+          resumo: diagnostico.relatorio.resumo,
+          falhas: diagnostico.relatorio.falhas.map((falha) => falha.titulo),
+          plano: diagnostico.relatorio.plano_correcao.map((passo) => passo.acao),
+        }
+      : null;
+  const documento = montarDocumentoInicial(lead, origem, contextoPosCall, contextoDiagnostico);
   const origemProjeto = origem.tipo === 'catalogo';
   const origemEstudio = origem.tipo === 'estudio';
   const projetoId = origemProjeto

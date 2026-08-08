@@ -41,6 +41,7 @@ export const config = {
     '/crm/:path*',
     '/propostas/:path*',
     '/calls/:path*',
+    '/diagnosticos/:path*',
     '/solucoes/:path*',
     '/formacoes/:path*',
     '/builder/:path*',

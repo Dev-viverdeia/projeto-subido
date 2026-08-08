@@ -130,6 +130,33 @@
   text-decoration: none;
 }
 
+.criarDiagnostico {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-white) 22%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.criarDiagnostico:hover {
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+  transform: translateY(-2px);
+}
+
+.criarDiagnostico:focus-visible {
+  box-shadow: var(--app-ring-onnavy);
+}
+
 .etapa {
   display: inline-flex;
   align-items: center;

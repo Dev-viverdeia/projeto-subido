@@ -1,0 +1,15 @@
+.pagina {
+  width: min(100%, var(--app-canvas));
+  margin-inline: auto;
+}
+
+.voltar {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin-bottom: var(--via-space-5);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+}

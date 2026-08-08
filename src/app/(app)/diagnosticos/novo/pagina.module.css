@@ -1,0 +1,332 @@
+.pagina {
+  width: min(100%, 1040px);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
+}
+
+.voltar {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+}
+
+.hero {
+  padding-block: clamp(12px, 3vw, 30px);
+}
+
+.sobretitulo,
+.etapaTitulo p,
+.rodape span {
+  margin: 0;
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 15ch;
+  margin: var(--via-space-3) 0 var(--via-space-5);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: var(--app-ls-hero);
+  text-wrap: balance;
+}
+
+.hero > p:last-child {
+  max-width: 53ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-loose);
+}
+
+.limite {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5);
+  border-left: 2px solid var(--via-navy);
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.limite div,
+.limite strong,
+.limite span {
+  display: block;
+}
+
+.limite span {
+  margin-top: 2px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.formulario {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.erro {
+  margin: 0;
+  padding: var(--via-space-4) clamp(24px, 6vw, 64px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.etapa {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+}
+
+.etapa + .etapa {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.numero {
+  padding-top: 42px;
+  border-right: 1px solid var(--via-border-hairline);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  text-align: center;
+}
+
+.etapaCorpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+  padding: clamp(28px, 5vw, 50px);
+}
+
+.etapaTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.etapaTitulo > span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.etapaTitulo h2 {
+  margin: var(--via-space-1) 0 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  letter-spacing: var(--app-ls-h3);
+}
+
+.gradeCampos {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr);
+  gap: var(--app-gap-grid);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.campo > span {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+  font: inherit;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.campo input,
+.campo select {
+  min-height: 48px;
+  padding-inline: var(--via-space-4);
+}
+
+.campo select {
+  padding-right: 44px;
+}
+
+.campo textarea {
+  min-height: 132px;
+  padding: var(--via-space-4);
+  line-height: var(--via-lh-loose);
+  resize: vertical;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  outline: none;
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--app-ring);
+}
+
+.campo small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.autorizacao {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--via-space-3);
+  align-items: start;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  cursor: pointer;
+}
+
+.autorizacao input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--via-navy);
+}
+
+.semLead {
+  padding: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.semLead p {
+  margin: 0 0 var(--via-space-2);
+  color: var(--via-text-muted);
+}
+
+.semLead a {
+  color: var(--via-accent-ink);
+  font-weight: var(--via-fw-semibold);
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-5) clamp(24px, 5vw, 48px);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.rodape div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rodape strong {
+  font-size: var(--via-fs-sm);
+}
+
+.rodape button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-5);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: inherit;
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+  transition:
+    transform var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.rodape button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--via-navy-deep);
+}
+
+.rodape button:focus-visible {
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.rodape button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  .etapa {
+    grid-template-columns: 46px 1fr;
+  }
+
+  .numero {
+    padding-top: 34px;
+  }
+
+  .etapaCorpo {
+    padding: var(--via-space-6) var(--via-space-4);
+  }
+
+  .etapaTitulo {
+    align-items: flex-start;
+  }
+
+  .gradeCampos {
+    grid-template-columns: 1fr;
+  }
+
+  .rodape {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rodape button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campo input,
+  .campo select,
+  .campo textarea,
+  .rodape button {
+    transition: none;
+  }
+
+  .rodape button:hover:not(:disabled) {
+    transform: none;
+  }
+}
