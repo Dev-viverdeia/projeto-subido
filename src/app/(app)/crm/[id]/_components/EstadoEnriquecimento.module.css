@@ -1,0 +1,171 @@
+.estado {
+  overflow: hidden;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-6);
+}
+
+.cabecalho h2,
+.cabecalho p {
+  margin: 0;
+}
+
+.cabecalho h2 {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-h3);
+}
+
+.cabecalho p:last-child {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.sobretitulo {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.pulso {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-top: var(--via-space-2);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-accent-ink);
+  box-shadow: 0 0 0 0 var(--via-navy-14);
+  animation: pulsar 1.8s var(--via-ease) infinite;
+}
+
+@keyframes pulsar {
+  70% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+
+.mapa {
+  display: grid;
+  grid-template-columns: auto minmax(24px, 1fr) auto minmax(24px, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-deep);
+}
+
+.no {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: color-mix(in srgb, var(--via-white) 68%, transparent);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  text-transform: uppercase;
+}
+
+.noAtivo {
+  color: var(--via-white);
+}
+
+.noAtivo svg {
+  color: var(--via-accent);
+}
+
+.traco {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+}
+
+.traco::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 35%;
+  background: var(--via-accent);
+  animation: atravessar 1.8s var(--via-ease) infinite;
+}
+
+@keyframes atravessar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.falha {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5);
+  border: 1px solid color-mix(in srgb, var(--via-danger) 22%, transparent);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-danger) 5%, var(--via-surface));
+  color: var(--via-danger);
+}
+
+.falha strong,
+.falha p {
+  margin: 0;
+}
+
+.falha p {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+@media (max-width: 560px) {
+  .cabecalho {
+    padding: var(--via-space-5) var(--via-space-4);
+  }
+
+  .mapa {
+    grid-template-columns: 1fr;
+    padding: var(--via-space-4);
+  }
+
+  .traco {
+    width: 1px;
+    height: 20px;
+    margin-left: 8px;
+  }
+
+  .traco::after {
+    width: 100%;
+    height: 35%;
+    animation-name: descer;
+  }
+}
+
+@keyframes descer {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso,
+  .traco::after {
+    animation: none;
+  }
+}

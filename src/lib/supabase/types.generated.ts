@@ -666,6 +666,88 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_enriquecimentos: {
+        Row: {
+          atualizado_em: string
+          concluido_em: string | null
+          contato_id: string | null
+          contexto: string | null
+          dominio: string | null
+          dono: string
+          empresa_id: string
+          erro: string | null
+          fontes: Json
+          id: string
+          iniciado_em: string | null
+          linkedin_url: string | null
+          modelo: string | null
+          oportunidade_id: string
+          resultado: Json | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["crm_enriquecimento_status"]
+        }
+        Insert: {
+          atualizado_em?: string
+          concluido_em?: string | null
+          contato_id?: string | null
+          contexto?: string | null
+          dominio?: string | null
+          dono: string
+          empresa_id: string
+          erro?: string | null
+          fontes?: Json
+          id?: string
+          iniciado_em?: string | null
+          linkedin_url?: string | null
+          modelo?: string | null
+          oportunidade_id: string
+          resultado?: Json | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["crm_enriquecimento_status"]
+        }
+        Update: {
+          atualizado_em?: string
+          concluido_em?: string | null
+          contato_id?: string | null
+          contexto?: string | null
+          dominio?: string | null
+          dono?: string
+          empresa_id?: string
+          erro?: string | null
+          fontes?: Json
+          id?: string
+          iniciado_em?: string | null
+          linkedin_url?: string | null
+          modelo?: string | null
+          oportunidade_id?: string
+          resultado?: Json | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["crm_enriquecimento_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_enriquecimentos_contato_fk"
+            columns: ["dono", "empresa_id", "contato_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contatos"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "crm_enriquecimentos_empresa_fk"
+            columns: ["dono", "empresa_id"]
+            isOneToOne: false
+            referencedRelation: "crm_empresas"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "crm_enriquecimentos_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+        ]
+      }
       crm_eventos: {
         Row: {
           contato_id: string | null
@@ -1147,12 +1229,25 @@ export type Database = {
           reuniao_id: string
         }[]
       }
+      crm_aplicar_proxima_acao: {
+        Args: { p_enriquecimento: string; p_oportunidade: string }
+        Returns: boolean
+      }
       crm_criar_lead: {
         Args: {
           p_contato_email?: string
           p_contato_nome: string
           p_empresa_nome: string
           p_oportunidade_titulo?: string
+        }
+        Returns: string
+      }
+      crm_iniciar_enriquecimento: {
+        Args: {
+          p_contexto?: string
+          p_dominio?: string
+          p_linkedin_url?: string
+          p_oportunidade: string
         }
         Returns: string
       }
@@ -1186,6 +1281,11 @@ export type Database = {
         | "kickoff"
         | "entrega"
         | "outro"
+      crm_enriquecimento_status:
+        | "na_fila"
+        | "processando"
+        | "concluido"
+        | "falhou"
       crm_etapa:
         | "novo_lead"
         | "qualificacao"
@@ -1340,6 +1440,12 @@ export const Constants = {
         "kickoff",
         "entrega",
         "outro",
+      ],
+      crm_enriquecimento_status: [
+        "na_fila",
+        "processando",
+        "concluido",
+        "falhou",
       ],
       crm_etapa: [
         "novo_lead",

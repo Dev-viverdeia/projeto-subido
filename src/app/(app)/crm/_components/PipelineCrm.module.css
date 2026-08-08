@@ -153,11 +153,58 @@
   font-size: var(--via-fs-micro);
 }
 
+.acoesCartao {
+  display: grid;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-3);
+}
+
+.dossie {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 34px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.dossie:hover {
+  border-color: var(--via-navy-22);
+  background: var(--via-navy-08);
+}
+
+.dossie[data-estado='pronto'] {
+  border-color: color-mix(in srgb, var(--via-success) 24%, transparent);
+  background: color-mix(in srgb, var(--via-success) 7%, var(--via-surface));
+  color: var(--via-success);
+}
+
+.dossie[data-estado='analisando'] svg {
+  animation: dossie-pulsar 1.5s var(--via-ease) infinite;
+}
+
+@keyframes dossie-pulsar {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
 .mover {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 34px;
   gap: var(--via-space-2);
-  margin-top: var(--via-space-3);
 }
 
 .mover select,
@@ -209,5 +256,9 @@
 
   .cartao:hover {
     transform: none;
+  }
+
+  .dossie[data-estado='analisando'] svg {
+    animation: none;
   }
 }

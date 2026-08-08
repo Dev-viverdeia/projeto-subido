@@ -22,6 +22,11 @@ const moverSchema = z.object({
   etapa: z.enum(ETAPAS_CRM.map((etapa) => etapa.id) as [string, ...string[]]),
 });
 
+const aplicarAcaoSchema = z.object({
+  oportunidade: z.uuid(),
+  enriquecimento: z.uuid(),
+});
+
 export type EstadoNovoLead = {
   erro?: string;
   porCampo?: Partial<Record<'empresa' | 'contato' | 'email' | 'titulo', string>>;
@@ -107,5 +112,27 @@ export async function moverOportunidade(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/crm');
+  revalidatePath('/inicio');
+}
+
+export async function aplicarProximaAcao(formData: FormData): Promise<void> {
+  const validacao = aplicarAcaoSchema.safeParse({
+    oportunidade: formData.get('oportunidade'),
+    enriquecimento: formData.get('enriquecimento'),
+  });
+  if (!validacao.success) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('crm_aplicar_proxima_acao', {
+    p_oportunidade: validacao.data.oportunidade,
+    p_enriquecimento: validacao.data.enriquecimento,
+  });
+  if (error) {
+    console.error(`[crm:aplicar-acao] ${error.code}: ${error.message}`);
+    return;
+  }
+
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/inicio');
 }

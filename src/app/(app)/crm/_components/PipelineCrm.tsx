@@ -1,4 +1,5 @@
-import { ArrowRight, Building2, CircleUserRound, Clock3, Inbox } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Building2, CircleUserRound, Clock3, Inbox, Sparkles } from 'lucide-react';
 import { moverOportunidade } from '@/lib/crm/actions';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
@@ -9,6 +10,11 @@ function dataCurta(iso: string): string {
 }
 
 function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm }) {
+  const analisando =
+    oportunidade.enriquecimentoStatus === 'na_fila' ||
+    oportunidade.enriquecimentoStatus === 'processando';
+  const pronto = oportunidade.enriquecimentoStatus === 'concluido';
+
   return (
     <article className={styles.cartao}>
       <div className={styles.empresa}>
@@ -33,22 +39,33 @@ function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm })
         </time>
       </div>
 
-      <form action={moverOportunidade} className={styles.mover}>
-        <input type="hidden" name="id" value={oportunidade.id} />
-        <label htmlFor={`etapa-${oportunidade.id}`} className="sr-only">
-          Mover {oportunidade.titulo} para
-        </label>
-        <select id={`etapa-${oportunidade.id}`} name="etapa" defaultValue={oportunidade.etapa}>
-          {ETAPAS_CRM.map((etapa) => (
-            <option key={etapa.id} value={etapa.id}>
-              {etapa.rotulo}
-            </option>
-          ))}
-        </select>
-        <button type="submit" aria-label={`Confirmar nova etapa de ${oportunidade.titulo}`}>
-          <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
-        </button>
-      </form>
+      <div className={styles.acoesCartao}>
+        <Link
+          href={`/crm/${oportunidade.id}`}
+          className={styles.dossie}
+          data-estado={analisando ? 'analisando' : pronto ? 'pronto' : 'novo'}
+        >
+          <Sparkles size={14} strokeWidth={1.8} aria-hidden="true" />
+          <span>{analisando ? 'Analisando lead' : pronto ? 'Dossiê pronto' : 'Abrir dossiê'}</span>
+        </Link>
+
+        <form action={moverOportunidade} className={styles.mover}>
+          <input type="hidden" name="id" value={oportunidade.id} />
+          <label htmlFor={`etapa-${oportunidade.id}`} className="sr-only">
+            Mover {oportunidade.titulo} para
+          </label>
+          <select id={`etapa-${oportunidade.id}`} name="etapa" defaultValue={oportunidade.etapa}>
+            {ETAPAS_CRM.map((etapa) => (
+              <option key={etapa.id} value={etapa.id}>
+                {etapa.rotulo}
+              </option>
+            ))}
+          </select>
+          <button type="submit" aria-label={`Confirmar nova etapa de ${oportunidade.titulo}`}>
+            <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+          </button>
+        </form>
+      </div>
     </article>
   );
 }
