@@ -1044,6 +1044,41 @@ export type Database = {
         }
         Relationships: []
       }
+      jornada_perfis: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          dono: string
+          nicho: string
+          posicionamento: string
+          projeto_inicial_id: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          dono: string
+          nicho: string
+          posicionamento: string
+          projeto_inicial_id?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          dono?: string
+          nicho?: string
+          posicionamento?: string
+          projeto_inicial_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jornada_perfis_projeto_inicial_id_fkey"
+            columns: ["projeto_inicial_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentores: {
         Row: {
           ativo: boolean

@@ -10,11 +10,52 @@ import {
   House,
   UsersRound,
 } from 'lucide-react';
+import { ConfiguracaoJornada } from '@/app/(app)/inicio/_components/ConfiguracaoJornada';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { montarPlanoJornada } from '@/lib/jornada/motor';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Mapa da jornada' };
+
+const PROJETOS = [
+  {
+    id: '00000000-0000-4000-8000-000000000001',
+    slug: 'atendimento-com-ia',
+    titulo: 'Atendimento com IA',
+    resumo: 'Estruture triagem, respostas e passagem para a equipe com contexto.',
+    categoria: 'Atendimento',
+  },
+  {
+    id: '00000000-0000-4000-8000-000000000002',
+    slug: 'maquina-de-leads',
+    titulo: 'Máquina de leads',
+    resumo: 'Organize captura, qualificação e priorização comercial.',
+    categoria: 'Leads',
+  },
+  {
+    id: '00000000-0000-4000-8000-000000000003',
+    slug: 'copiloto-de-vendas',
+    titulo: 'Copiloto de vendas',
+    resumo: 'Apoie descoberta, follow-up e preparo de propostas.',
+    categoria: 'Vendas',
+  },
+  {
+    id: '00000000-0000-4000-8000-000000000004',
+    slug: 'conteudo-operacional',
+    titulo: 'Conteúdo operacional',
+    resumo: 'Transforme repertório da empresa em produção assistida.',
+    categoria: 'Marketing',
+  },
+];
+
+const PLANO = montarPlanoJornada({
+  perfil: null,
+  oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
+  calls: { descobertasConcluidas: 1, kickoffsConcluidos: 0, entregasConcluidas: 0 },
+  diagnosticosConcluidos: 1,
+  propostas: { total: 1, apresentadas: 0, aceitas: 0 },
+});
 
 /**
  * Bancada visual local para comparar a implementação com a direção aprovada.
@@ -66,12 +107,18 @@ export default function PreviewMapaJornadaPage() {
       </aside>
       <main id="conteudo" className={styles.conteudo}>
         <MapaJornada
+          configuracao={<ConfiguracaoJornada perfil={null} projetos={PROJETOS} />}
           nome="Mateus"
           espacoDeTrabalho="Mateus Milagre — Consultoria"
           cliente="Clínica Aurora"
-          lead="Clínica Aurora"
           contato="Dra. Camila Rios"
+          proximaAcao="Apresentar proposta na quinta-feira"
           proximaMentoria="Chamada de alinhamento"
+          oferta={null}
+          nicho={null}
+          diagnosticoSobral="A operação já tem uma descoberta e um diagnóstico registrados, mas ainda não declarou qual oferta será o ponto de partida."
+          focoSobral="Definir a primeira oferta"
+          plano={PLANO}
         />
       </main>
     </div>

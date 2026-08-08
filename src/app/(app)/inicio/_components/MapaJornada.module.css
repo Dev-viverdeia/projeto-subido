@@ -1,9 +1,31 @@
 .pagina {
-  width: min(100%, 1420px);
+  width: min(100%, var(--app-canvas));
   margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--via-space-6);
+  color: var(--via-text-primary);
+}
+
+.espaco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--via-space-1);
+  max-width: 360px;
+  text-align: right;
+}
+
+.espaco span {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+.espaco strong {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
   color: var(--via-text-primary);
 }
 
@@ -81,9 +103,61 @@
   background-size: 100% auto;
 }
 
+.mapaTopo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-6);
+}
+
 .mapaCabecalho h1,
 .mapaCabecalho p {
   margin: 0;
+}
+
+.progressoGeral {
+  width: min(300px, 100%);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.progressoGeral > span,
+.progressoGeral > small {
+  display: block;
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.progressoGeral > span strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+}
+
+.progressoGeral > small {
+  margin-top: var(--via-space-2);
+}
+
+.progressoTrilho {
+  height: 4px;
+  margin-top: var(--via-space-3);
+  overflow: hidden;
+  border-radius: var(--app-radius-track);
+  background: var(--via-border-soft);
+}
+
+.progressoTrilho span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--via-navy);
 }
 
 .mapaCabecalho h1 {
@@ -151,6 +225,14 @@
   line-height: var(--via-lh-snug);
 }
 
+.etapaContagem {
+  margin-top: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .etapaIcone {
   display: grid;
   place-items: center;
@@ -185,17 +267,30 @@
 
 .etapaBotao[aria-pressed='true'] .etapaNumero,
 .etapaBotao[aria-pressed='true'] .etapaTitulo,
-.etapaBotao[aria-pressed='true'] .etapaResumo {
+.etapaBotao[aria-pressed='true'] .etapaResumo,
+.etapaBotao[aria-pressed='true'] .etapaContagem {
   color: var(--via-accent-ink);
 }
 
 .etapaBotao[aria-pressed='true'] .etapaIcone {
   border-color: var(--via-accent);
   background: var(--via-accent);
-  color: var(--via-white);
+  color: var(--via-navy);
   box-shadow:
     0 0 0 6px var(--via-accent-soft),
     var(--via-shadow-md);
+}
+
+.etapaItem[data-status='concluida'] .etapaIcone {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.etapaItem[data-status='futura'] .etapaIcone {
+  border-color: var(--via-border);
+  color: var(--via-text-faint);
+  box-shadow: none;
 }
 
 .marcoAtual {
@@ -354,9 +449,31 @@
 }
 
 .assistenteAcao p {
-  margin: 0 0 var(--via-space-4);
-  font-size: var(--via-fs-caption);
+  margin: 0;
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
+}
+
+.assistenteAcao > strong,
+.assistenteAcao > span {
+  display: block;
+}
+
+.assistenteAcao > strong {
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
+  color: var(--via-text-primary);
+}
+
+.assistenteAcao > span {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
 }
 
 .botaoPrimario {
@@ -372,6 +489,7 @@
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
+  margin-top: var(--via-space-4);
   box-shadow: var(--via-shadow-sm);
   transition:
     background-color var(--app-t-state),
@@ -402,9 +520,28 @@
   padding: var(--via-space-5) var(--via-space-5) var(--via-space-3);
 }
 
+.cartaoCabecalho > div > p {
+  margin: 0 0 var(--via-space-1);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
 .cartaoCabecalho h2,
 .cartaoCabecalho span {
   margin: 0;
+}
+
+.contextoEtapa {
+  margin: 0 var(--via-space-5) var(--via-space-3);
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
 }
 
 .cartaoCabecalho span {
@@ -436,6 +573,16 @@
 .listaChecklist strong,
 .listaChecklist small {
   display: block;
+}
+
+.listaChecklist em {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+  line-height: var(--via-lh-snug);
 }
 
 .listaChecklist strong {
@@ -555,6 +702,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
+  min-height: 44px;
   margin-top: var(--via-space-4);
   color: var(--via-accent-ink);
   font-size: var(--via-fs-caption);
@@ -586,6 +734,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-1);
+  min-height: 32px;
   color: var(--via-accent-ink);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
@@ -596,7 +745,7 @@
   text-underline-offset: 3px;
 }
 
-@media (max-width: 1240px) {
+@media (max-width: 1279px) {
   .paineis {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -617,9 +766,15 @@
   }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 767px) {
   .topo {
     flex-direction: column;
+  }
+
+  .espaco {
+    align-items: flex-start;
+    max-width: none;
+    text-align: left;
   }
 
   .seletorLabel {
@@ -636,6 +791,14 @@
 
   .mapaCabecalho {
     padding-inline: var(--via-space-1);
+  }
+
+  .mapaTopo {
+    flex-direction: column;
+  }
+
+  .progressoGeral {
+    width: 100%;
   }
 
   .etapas {
@@ -677,6 +840,11 @@
   .etapaResumo {
     grid-column: 3;
     align-self: end;
+  }
+
+  .etapaContagem {
+    grid-column: 3;
+    margin-top: var(--via-space-1);
   }
 
   .etapaTitulo {

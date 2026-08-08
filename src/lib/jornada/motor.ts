@@ -1,0 +1,322 @@
+export type IdEtapaJornada = 'aprender' | 'prospectar' | 'vender' | 'entregar' | 'evoluir';
+
+export type PerfilJornada = {
+  nicho: string;
+  projetoInicialId: string | null;
+  projetoInicialTitulo: string | null;
+  projetoInicialSlug: string | null;
+  posicionamento: string;
+  atualizadoEm: string;
+} | null;
+
+export type SinaisJornada = {
+  perfil: PerfilJornada;
+  oportunidades: {
+    total: number;
+    comProximaAcao: number;
+    ganhas: number;
+  };
+  calls: {
+    descobertasConcluidas: number;
+    kickoffsConcluidos: number;
+    entregasConcluidas: number;
+  };
+  diagnosticosConcluidos: number;
+  propostas: {
+    total: number;
+    apresentadas: number;
+    aceitas: number;
+  };
+};
+
+export type PassoJornada = {
+  id: string;
+  titulo: string;
+  detalhe: string;
+  evidencia: string;
+  concluido: boolean;
+  destino: string;
+  acao: string;
+};
+
+export type EtapaJornada = {
+  id: IdEtapaJornada;
+  numero: string;
+  titulo: string;
+  resumo: string;
+  marco: string;
+  contexto: string;
+  guia: string;
+  passos: PassoJornada[];
+  concluidos: number;
+  status: 'concluida' | 'atual' | 'futura';
+};
+
+export type PlanoJornada = {
+  etapaAtual: IdEtapaJornada;
+  etapas: EtapaJornada[];
+  proximoPasso: PassoJornada;
+  evidenciasConcluidas: number;
+  totalEvidencias: number;
+  percentual: number;
+  perfilCompleto: boolean;
+};
+
+type DefinicaoEtapa = Omit<EtapaJornada, 'passos' | 'concluidos' | 'status'> & {
+  passos: PassoJornada[];
+};
+
+function passo(
+  id: string,
+  titulo: string,
+  detalhe: string,
+  evidencia: string,
+  concluido: boolean,
+  destino: string,
+  acao: string,
+): PassoJornada {
+  return { id, titulo, detalhe, evidencia, concluido, destino, acao };
+}
+
+function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
+  const projetoEscolhido = Boolean(sinais.perfil?.projetoInicialId);
+  const posicionamentoDefinido = Boolean(sinais.perfil?.posicionamento.trim());
+  const vendaConfirmada = sinais.propostas.aceitas > 0 || sinais.oportunidades.ganhas > 0;
+  const segundaVenda = Math.max(sinais.propostas.aceitas, sinais.oportunidades.ganhas) >= 2;
+
+  return [
+    {
+      id: 'aprender',
+      numero: '01',
+      titulo: 'Aprender',
+      resumo: 'Escolha o que dominar e vender',
+      marco: 'Oferta inicial definida',
+      contexto:
+        'A base não termina em conteúdo assistido. Ela termina quando você consegue nomear o cliente, o problema e a primeira entrega que vai vender.',
+      guia: 'Como transformar aprendizado em serviço',
+      passos: [
+        passo(
+          'projeto-inicial',
+          'Escolher o primeiro projeto',
+          'Selecione uma entrega padrão para estudar, explicar e implementar antes de ampliar o portfólio.',
+          projetoEscolhido
+            ? `${sinais.perfil?.projetoInicialTitulo ?? 'Projeto inicial'} registrado como oferta.`
+            : 'Projeto inicial ainda não escolhido.',
+          projetoEscolhido,
+          '/inicio#configuracao-jornada',
+          'Escolher projeto inicial',
+        ),
+        passo(
+          'posicionamento',
+          'Explicar o serviço em uma frase',
+          'Registre para quem é o projeto, qual problema ele resolve e qual mudança observável entrega.',
+          posicionamentoDefinido
+            ? 'Frase de posicionamento registrada na jornada.'
+            : 'Posicionamento ainda não registrado.',
+          posicionamentoDefinido,
+          '/inicio#configuracao-jornada',
+          'Definir posicionamento',
+        ),
+      ],
+    },
+    {
+      id: 'prospectar',
+      numero: '02',
+      titulo: 'Prospectar',
+      resumo: 'Transforme uma empresa em conversa',
+      marco: 'Descoberta registrada',
+      contexto:
+        'Prospectar aqui não é acumular contatos. É criar uma oportunidade com contexto, assumir uma próxima ação e conduzir uma descoberta que vire registro.',
+      guia: 'Roteiro da primeira conversa comercial',
+      passos: [
+        passo(
+          'primeiro-lead',
+          'Criar a primeira oportunidade',
+          'Cadastre uma empresa e um contato reais no CRM para concentrar toda a próxima movimentação.',
+          sinais.oportunidades.total > 0
+            ? `${sinais.oportunidades.total} oportunidade(s) registrada(s) no CRM.`
+            : 'Nenhuma oportunidade registrada.',
+          sinais.oportunidades.total > 0,
+          '/crm',
+          'Adicionar primeiro lead',
+        ),
+        passo(
+          'proxima-acao',
+          'Assumir uma próxima ação',
+          'Defina no CRM um verbo concreto e uma data. O lead não pode depender da memória.',
+          sinais.oportunidades.comProximaAcao > 0
+            ? `${sinais.oportunidades.comProximaAcao} oportunidade(s) com próxima ação.`
+            : 'Nenhuma próxima ação registrada.',
+          sinais.oportunidades.comProximaAcao > 0,
+          '/crm',
+          'Definir próxima ação',
+        ),
+        passo(
+          'descoberta',
+          'Concluir a descoberta',
+          'Use a call vinculada ao CRM para confirmar processo, impacto, restrições e decisão.',
+          sinais.calls.descobertasConcluidas > 0
+            ? `${sinais.calls.descobertasConcluidas} call(s) de descoberta concluída(s).`
+            : 'Nenhuma call de descoberta concluída.',
+          sinais.calls.descobertasConcluidas > 0,
+          '/calls',
+          'Agendar descoberta',
+        ),
+      ],
+    },
+    {
+      id: 'vender',
+      numero: '03',
+      titulo: 'Vender',
+      resumo: 'Converta fatos em uma decisão',
+      marco: 'Primeiro projeto vendido',
+      contexto:
+        'A venda avança quando o diagnóstico sustenta um escopo, a proposta é apresentada e a decisão fica registrada. Documento criado sozinho não é venda.',
+      guia: 'Como conduzir proposta e decisão',
+      passos: [
+        passo(
+          'diagnostico',
+          'Concluir um diagnóstico',
+          'Meça o cenário do cliente e separe o que foi observado do que ainda precisa ser validado.',
+          sinais.diagnosticosConcluidos > 0
+            ? `${sinais.diagnosticosConcluidos} diagnóstico(s) concluído(s).`
+            : 'Nenhum diagnóstico concluído.',
+          sinais.diagnosticosConcluidos > 0,
+          '/diagnosticos/novo',
+          'Criar diagnóstico',
+        ),
+        passo(
+          'proposta-criada',
+          'Construir a proposta',
+          'Transforme fatos, fronteiras, entregáveis, prazo e investimento em uma proposta vinculada ao lead.',
+          sinais.propostas.total > 0
+            ? `${sinais.propostas.total} proposta(s) criada(s).`
+            : 'Nenhuma proposta criada.',
+          sinais.propostas.total > 0,
+          '/propostas/nova',
+          'Criar proposta',
+        ),
+        passo(
+          'proposta-apresentada',
+          'Apresentar a proposta',
+          'Conduza a decisão em conversa e registre a apresentação antes do acompanhamento.',
+          sinais.propostas.apresentadas > 0
+            ? `${sinais.propostas.apresentadas} proposta(s) apresentada(s).`
+            : 'Nenhuma proposta marcada como apresentada.',
+          sinais.propostas.apresentadas > 0,
+          '/propostas',
+          'Apresentar proposta',
+        ),
+        passo(
+          'venda-confirmada',
+          'Registrar a decisão',
+          'Marque a proposta como aceita ou a oportunidade como ganha somente depois da confirmação do cliente.',
+          vendaConfirmada ? 'Primeira venda confirmada na operação.' : 'Nenhuma venda confirmada.',
+          vendaConfirmada,
+          '/propostas',
+          'Registrar decisão',
+        ),
+      ],
+    },
+    {
+      id: 'entregar',
+      numero: '04',
+      titulo: 'Entregar',
+      resumo: 'Execute com acordo e evidência',
+      marco: 'Primeira entrega encerrada',
+      contexto:
+        'A entrega começa com um kickoff claro e termina com uma conversa de validação registrada. O projeto guiado mostra o como; as calls provam o combinado.',
+      guia: 'Como conduzir uma implementação guiada',
+      passos: [
+        passo(
+          'kickoff',
+          'Concluir o kickoff',
+          'Confirme objetivo, responsáveis, acessos, fronteiras e critério de sucesso com o cliente.',
+          sinais.calls.kickoffsConcluidos > 0
+            ? `${sinais.calls.kickoffsConcluidos} kickoff(s) concluído(s).`
+            : 'Nenhum kickoff concluído.',
+          sinais.calls.kickoffsConcluidos > 0,
+          '/calls',
+          'Agendar kickoff',
+        ),
+        passo(
+          'validacao-entrega',
+          'Registrar a validação da entrega',
+          'Faça a revisão final com o cliente, registre evidências e deixe próximos passos explícitos.',
+          sinais.calls.entregasConcluidas > 0
+            ? `${sinais.calls.entregasConcluidas} call(s) de entrega concluída(s).`
+            : 'Nenhuma call de entrega concluída.',
+          sinais.calls.entregasConcluidas > 0,
+          '/calls',
+          'Agendar validação',
+        ),
+      ],
+    },
+    {
+      id: 'evoluir',
+      numero: '05',
+      titulo: 'Evoluir',
+      resumo: 'Repita o método com mais precisão',
+      marco: 'Segundo ciclo comprovado',
+      contexto:
+        'Escala começa quando a primeira experiência vira repertório e o método consegue produzir uma segunda venda sem apagar as evidências da anterior.',
+      guia: 'Como transformar experiência em método',
+      passos: [
+        passo(
+          'segunda-venda',
+          'Confirmar o segundo projeto',
+          'Use o aprendizado da primeira entrega para qualificar, vender e registrar um novo projeto com menos improviso.',
+          segundaVenda
+            ? 'Segundo projeto confirmado na operação.'
+            : 'Segundo projeto ainda não confirmado.',
+          segundaVenda,
+          '/crm',
+          'Iniciar próximo ciclo',
+        ),
+      ],
+    },
+  ];
+}
+
+export function montarPlanoJornada(sinais: SinaisJornada): PlanoJornada {
+  const definicoes = criarEtapas(sinais);
+  const indiceAtual = definicoes.findIndex((etapa) => etapa.passos.some((item) => !item.concluido));
+  const indiceResolvido = indiceAtual === -1 ? definicoes.length - 1 : indiceAtual;
+  const etapaAtual = definicoes[indiceResolvido]!.id;
+  const etapas = definicoes.map((etapa, indice): EtapaJornada => ({
+    ...etapa,
+    concluidos: etapa.passos.filter((item) => item.concluido).length,
+    status: etapa.passos.every((item) => item.concluido)
+      ? 'concluida'
+      : indice === indiceResolvido
+        ? 'atual'
+        : 'futura',
+  }));
+  const todos = etapas.flatMap((etapa) => etapa.passos);
+  const evidenciasConcluidas = todos.filter((item) => item.concluido).length;
+  const proximoPasso =
+    etapas[indiceResolvido]?.passos.find((item) => !item.concluido) ??
+    passo(
+      'revisar-operacao',
+      'Revisar o próximo ciclo',
+      'Leve os fatos acumulados para o Sobral AI e escolha onde aumentar qualidade ou previsibilidade.',
+      'Primeiro ciclo operacional completo.',
+      false,
+      '/consultor',
+      'Revisar com Sobral AI',
+    );
+
+  return {
+    etapaAtual,
+    etapas,
+    proximoPasso,
+    evidenciasConcluidas,
+    totalEvidencias: todos.length,
+    percentual: todos.length ? Math.round((evidenciasConcluidas / todos.length) * 100) : 0,
+    perfilCompleto: Boolean(
+      sinais.perfil?.nicho.trim() &&
+      sinais.perfil.projetoInicialId &&
+      sinais.perfil.posicionamento.trim(),
+    ),
+  };
+}
