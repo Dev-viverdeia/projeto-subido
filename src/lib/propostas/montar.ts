@@ -20,6 +20,13 @@ type OrigemSemBase = { tipo: 'sem_base'; titulo: string };
 
 export type OrigemProposta = OrigemCatalogo | OrigemEstudio | OrigemSemBase;
 
+export type ContextoPosCallProposta = {
+  resumo: string;
+  dores: string[];
+  decisoes: string[];
+  compromissos: string[];
+};
+
 const TITULOS_FASE: Record<number, string> = {
   1: 'Fundação',
   2: 'Construção',
@@ -140,6 +147,7 @@ function baseSemProjeto(origem: OrigemSemBase) {
 export function montarDocumentoInicial(
   lead: DossieLead,
   origem: OrigemProposta,
+  posCall?: ContextoPosCallProposta | null,
 ): DocumentoProposta {
   const leitura = ultimaLeitura(lead);
   const base =
@@ -150,10 +158,22 @@ export function montarDocumentoInicial(
         : baseSemProjeto(origem);
 
   const oportunidade = leitura?.oportunidades[0];
+  const contextoDaCall = posCall
+    ? [
+        posCall.resumo,
+        posCall.dores.length
+          ? `Dores explicitadas: ${posCall.dores.slice(0, 4).join('; ')}.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join('\n\n')
+    : null;
   const desafio =
+    contextoDaCall ??
     leitura?.resumo ??
     `A ${lead.empresa.nome} busca avançar em ${lead.oportunidade.titulo.toLowerCase()}, com um processo claro, mensurável e seguro.`;
   const objetivo = oportunidade?.impacto ?? base.objetivo;
+  const confirmacoes = posCall ? unicos([...posCall.decisoes, ...posCall.compromissos], 5) : [];
 
   return DocumentoPropostaSchema.parse({
     cliente: {
@@ -181,6 +201,11 @@ export function montarDocumentoInicial(
       'Aprovar esta proposta comercial.',
       'Realizar a reunião de início do projeto.',
     ],
-    observacoes: null,
+    observacoes: confirmacoes.length
+      ? limitar(
+          `Pontos confirmados na reunião:\n${confirmacoes.map((item) => `• ${item}`).join('\n')}`,
+          3000,
+        )
+      : null,
   });
 }

@@ -18,6 +18,13 @@ const agendarSchema = z.object({
   liveCoach: z.boolean(),
 });
 
+const proximaAcaoSchema = z.object({
+  reuniao: z.uuid(),
+  oportunidade: z.uuid(),
+  acao: z.string().trim().min(3).max(500),
+  quando: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
+});
+
 type CampoAgendamento = 'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao';
 
 export type EstadoAgendamento = {
@@ -101,4 +108,38 @@ export async function agendarReuniao(
   revalidatePath('/crm');
   revalidatePath('/inicio');
   redirect('/calls?agendada=ok');
+}
+
+export async function confirmarProximaAcao(formData: FormData): Promise<void> {
+  const validacao = proximaAcaoSchema.safeParse({
+    reuniao: formData.get('reuniao'),
+    oportunidade: formData.get('oportunidade'),
+    acao: formData.get('acao'),
+    quando: formData.get('quando'),
+  });
+  const reuniao = texto(formData, 'reuniao');
+  if (!validacao.success) redirect(`/calls/${reuniao}?acao=erro`);
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) redirect('/entrar');
+
+  const quando = validacao.data.quando ? `${validacao.data.quando}T12:00:00-03:00` : undefined;
+  const { data, error } = await supabase.rpc('calls_aplicar_proxima_acao', {
+    p_reuniao: validacao.data.reuniao,
+    p_acao: validacao.data.acao,
+    p_quando: quando,
+  });
+
+  if (error) {
+    console.error(`[calls:proxima-acao] ${error.code}: ${error.message}`);
+    redirect(`/calls/${validacao.data.reuniao}?acao=erro`);
+  }
+
+  revalidatePath('/calls');
+  revalidatePath(`/calls/${validacao.data.reuniao}`);
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath('/inicio');
+  redirect(`/calls/${validacao.data.reuniao}?acao=${data ? 'ok' : 'sem-alteracao'}`);
 }

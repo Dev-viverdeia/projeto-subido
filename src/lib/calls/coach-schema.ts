@@ -43,9 +43,12 @@ export const AnaliseCallSchema = z.object({
   resumo: z.string().trim().min(20).max(2_000),
   dores: z.array(z.string().trim().min(2).max(300)).max(10),
   objecoes: z.array(z.string().trim().min(2).max(300)).max(10),
+  decisoes: z.array(z.string().trim().min(2).max(300)).max(10),
   compromissos: z.array(z.string().trim().min(2).max(300)).max(10),
   proximos_passos: z.array(z.string().trim().min(2).max(300)).max(10),
   oportunidades_projeto: z.array(z.string().trim().min(2).max(300)).max(8),
+  lacunas: z.array(z.string().trim().min(2).max(300)).max(10),
+  sinais_compra: z.array(z.string().trim().min(2).max(300)).max(8),
   sentimento: z.enum(['positivo', 'neutro', 'cauteloso', 'negativo', 'indefinido']),
   nota_comercial: z.number().int().min(0).max(100),
 });

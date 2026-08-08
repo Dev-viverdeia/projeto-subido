@@ -1,0 +1,5 @@
+.preview {
+  min-height: 100vh;
+  padding: clamp(16px, 3vw, 44px);
+  background: var(--via-bg);
+}

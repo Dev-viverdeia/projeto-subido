@@ -135,4 +135,22 @@ describe('montagem inicial da proposta', () => {
     );
     expect(documento.investimento.valorCentavos).toBeNull();
   });
+
+  it('prioriza fatos confirmados na call sem transformar hipótese em promessa', () => {
+    const documento = montarDocumentoInicial(
+      LEAD,
+      { tipo: 'sem_base', titulo: 'Projeto personalizado de IA' },
+      {
+        resumo: 'A recepção confirmou perda de contexto e demora na primeira resposta.',
+        dores: ['Mensagens ficam sem responsável durante a troca de turno.'],
+        decisoes: ['O piloto ficará restrito a uma unidade.'],
+        compromissos: ['Marina enviará uma amostra anonimizada das conversas.'],
+      },
+    );
+
+    expect(documento.desafio).toContain('perda de contexto');
+    expect(documento.desafio).toContain('Mensagens ficam sem responsável');
+    expect(documento.observacoes).toContain('O piloto ficará restrito');
+    expect(documento.objetivo).not.toContain('promessa');
+  });
 });

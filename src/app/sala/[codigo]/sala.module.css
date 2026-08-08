@@ -325,7 +325,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: #040b1a;
+  background: var(--via-navy-deep);
 }
 
 .palcoVideo > :global(.lk-video-conference) {

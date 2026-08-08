@@ -222,12 +222,17 @@ export function PainelCalls({
             {historico.map((reuniao) => (
               <article key={reuniao.id}>
                 <span>{ROTULO_STATUS_CALL[reuniao.status]}</span>
-                <div>
-                  <strong>{reuniao.titulo}</strong>
-                  <small>
-                    {reuniao.empresa} · {DATA_LONGA.format(new Date(reuniao.agendadaPara))}
-                  </small>
-                </div>
+                <Link href={`/calls/${reuniao.id}`} className={styles.historicoLink}>
+                  <div>
+                    <strong>{reuniao.titulo}</strong>
+                    <small>
+                      {reuniao.empresa} · {DATA_LONGA.format(new Date(reuniao.agendadaPara))}
+                    </small>
+                  </div>
+                  <span>
+                    Abrir pós-call <ArrowRight size={14} aria-hidden="true" />
+                  </span>
+                </Link>
               </article>
             ))}
           </div>

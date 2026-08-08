@@ -23,6 +23,7 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
       : typeof parametros.builder === 'string'
         ? `estudio:${parametros.builder}`
         : '';
+  const reuniaoInicial = typeof parametros.reuniao === 'string' ? parametros.reuniao : '';
   const erro = typeof parametros.erro === 'string' ? parametros.erro : null;
 
   return (
@@ -42,6 +43,7 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
       </header>
 
       <form action={criarProposta} className={styles.formulario}>
+        <input type="hidden" name="reuniao" value={reuniaoInicial} />
         {erro && (
           <p className={styles.erro} role="alert">
             Não foi possível criar com essa combinação. Revise as escolhas e tente novamente.
@@ -75,6 +77,11 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
                   ))}
                 </select>
                 <small>Empresa, contato, fatos e valor negociado entram no rascunho.</small>
+                {reuniaoInicial && (
+                  <span className={styles.contextoCall}>
+                    A análise da call selecionada também será usada no desafio e nas confirmações.
+                  </span>
+                )}
               </label>
             ) : (
               <div className={styles.semOpcao}>

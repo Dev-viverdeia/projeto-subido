@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AnaliseCallSchema,
   LoteSegmentosSchema,
   mesclarSegmentos,
   textoDaTranscricao,
@@ -46,5 +47,23 @@ describe('memória do Live Coach', () => {
     });
 
     expect(resultado.success).toBe(false);
+  });
+
+  it('obriga a análise a separar decisões, lacunas e sinais de avanço', () => {
+    const resultado = AnaliseCallSchema.safeParse({
+      resumo: 'A empresa confirmou o problema, mas ainda precisa validar o responsável interno.',
+      dores: ['As mensagens se perdem durante a troca de turno.'],
+      objecoes: [],
+      decisoes: ['O primeiro escopo ficará restrito ao WhatsApp.'],
+      compromissos: ['Marina enviará o fluxo atual até sexta-feira.'],
+      proximos_passos: ['Revisar o fluxo enviado e marcar a apresentação do diagnóstico.'],
+      oportunidades_projeto: ['Hipótese: projeto de triagem e registro do atendimento.'],
+      lacunas: ['Quem aprova o orçamento final?'],
+      sinais_compra: ['A diretora pediu uma proposta com cronograma.'],
+      sentimento: 'cauteloso',
+      nota_comercial: 72,
+    });
+
+    expect(resultado.success).toBe(true);
   });
 });

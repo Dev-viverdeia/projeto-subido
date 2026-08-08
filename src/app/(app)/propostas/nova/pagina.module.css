@@ -137,6 +137,18 @@
   font-size: var(--via-fs-xs);
 }
 
+.campo .contextoCall {
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: var(--app-radius-chip);
+  background: color-mix(in srgb, var(--via-accent) 8%, var(--via-surface));
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
 .origens {
   display: flex;
   gap: var(--via-space-3);

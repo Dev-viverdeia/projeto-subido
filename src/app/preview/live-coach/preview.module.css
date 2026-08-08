@@ -1,7 +1,7 @@
 .pagina {
   min-height: 100dvh;
   padding: 22px;
-  background: #020713;
+  background: var(--via-navy-darker);
 }
 
 .sala {
@@ -14,7 +14,7 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
-  background: #040b1a;
+  background: var(--via-navy-deep);
   box-shadow: 0 36px 110px rgba(0, 0, 0, 0.45);
 }
 
@@ -22,7 +22,9 @@
   position: relative;
   min-width: 0;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 42%, rgba(25, 54, 100, 0.24), transparent 44%), #040b1a;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(25, 54, 100, 0.24), transparent 44%),
+    var(--via-navy-deep);
 }
 
 .topo {
@@ -34,12 +36,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #fafdff;
+  color: var(--via-white);
   font-size: 13px;
 }
 
 .topo small {
-  color: #7d8aa0;
+  color: var(--via-gray-400);
   font-family: var(--via-font-mono);
 }
 
@@ -61,13 +63,13 @@
 }
 
 .cliente {
-  background: #101b30;
+  background: color-mix(in srgb, var(--via-navy) 82%, var(--via-navy-deep));
 }
 
 .anfitriao {
   align-self: end;
   height: 190px;
-  background: #0a1427;
+  background: color-mix(in srgb, var(--via-navy) 48%, var(--via-navy-deep));
 }
 
 .pessoas article div {
@@ -76,8 +78,8 @@
   height: 64px;
   place-items: center;
   border-radius: 50%;
-  background: #1a2a44;
-  color: #aebbd0;
+  background: var(--via-blue);
+  color: var(--via-gray-300);
   font-size: 18px;
   font-weight: 600;
 }
@@ -89,7 +91,7 @@
   padding: 5px 8px;
   border-radius: 7px;
   background: rgba(2, 7, 19, 0.72);
-  color: #dce7f5;
+  color: var(--via-gray-200);
   font-size: 11px;
 }
 
@@ -116,13 +118,13 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  color: #e9f3ff;
+  color: var(--via-gray-100);
 }
 
 .controles button.encerrar {
   border-color: rgba(255, 88, 88, 0.3);
   background: rgba(255, 67, 67, 0.16);
-  color: #ff8787;
+  color: var(--via-danger);
 }
 
 @media (max-width: 920px) {

@@ -1403,6 +1403,10 @@ export type Database = {
           reuniao_id: string
         }[]
       }
+      calls_aplicar_proxima_acao: {
+        Args: { p_acao: string; p_quando?: string; p_reuniao: string }
+        Returns: boolean
+      }
       crm_aplicar_proxima_acao: {
         Args: { p_enriquecimento: string; p_oportunidade: string }
         Returns: boolean

@@ -479,6 +479,26 @@
   display: block;
 }
 
+.historicoLink {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.historicoLink > span {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+  font-weight: 700;
+}
+
 .historicoLista strong {
   font-size: var(--via-fs-sm);
 }
@@ -554,5 +574,10 @@
   .historicoLista article {
     grid-template-columns: 1fr;
     gap: var(--via-space-2);
+  }
+
+  .historicoLink {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

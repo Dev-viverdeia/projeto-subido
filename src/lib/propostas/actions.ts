@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
+import { obterPosCall } from '@/lib/calls/queries';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -15,6 +16,7 @@ import type { StatusProposta } from './queries';
 const NovaPropostaSchema = z.object({
   oportunidade: z.uuid(),
   origem: z.string().min(1).max(200),
+  reuniao: z.preprocess((valor) => (valor === '' ? undefined : valor), z.uuid().optional()),
 });
 
 const SalvarSchema = z.object({
@@ -80,18 +82,31 @@ export async function criarProposta(formData: FormData): Promise<void> {
   const validacao = NovaPropostaSchema.safeParse({
     oportunidade: formData.get('oportunidade'),
     origem: formData.get('origem'),
+    reuniao: formData.get('reuniao'),
   });
   if (!validacao.success) redirect('/propostas/nova?erro=campos');
 
-  const [{ supabase, user }, lead, origem] = await Promise.all([
+  const [{ supabase, user }, lead, origem, posCall] = await Promise.all([
     usuarioAtual(),
     obterDossieLead(validacao.data.oportunidade),
     resolverOrigem(validacao.data.origem),
+    validacao.data.reuniao ? obterPosCall(validacao.data.reuniao) : Promise.resolve(null),
   ]);
   if (!user) redirect('/entrar');
   if (!lead || !origem) redirect('/propostas/nova?erro=indisponivel');
 
-  const documento = montarDocumentoInicial(lead, origem);
+  const contextoPosCall =
+    posCall?.oportunidade.id === validacao.data.oportunidade &&
+    posCall.analise?.status === 'concluida' &&
+    posCall.analise.resumo
+      ? {
+          resumo: posCall.analise.resumo,
+          dores: posCall.analise.dores,
+          decisoes: posCall.analise.decisoes,
+          compromissos: posCall.analise.compromissos,
+        }
+      : null;
+  const documento = montarDocumentoInicial(lead, origem, contextoPosCall);
   const origemProjeto = origem.tipo === 'catalogo';
   const origemEstudio = origem.tipo === 'estudio';
   const projetoId = origemProjeto

@@ -1,0 +1,416 @@
+import Link from 'next/link';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  BrainCircuit,
+  CalendarClock,
+  Check,
+  ChevronRight,
+  CircleAlert,
+  CircleHelp,
+  Clock3,
+  ContactRound,
+  FileSignature,
+  Lightbulb,
+  MessageSquareQuote,
+  Radar,
+  Sparkles,
+  Target,
+} from 'lucide-react';
+import { confirmarProximaAcao } from '@/lib/calls/actions';
+import type { PosCall } from '@/lib/calls/queries';
+import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
+import { ROTULO_ETAPA } from '@/lib/crm/etapas';
+import { ListaFactual, MapaFactual } from './MapaFactual';
+import { TranscricaoCall } from './TranscricaoCall';
+import styles from '../pagina.module.css';
+
+const DATA = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'America/Sao_Paulo',
+});
+const HORA = new Intl.DateTimeFormat('pt-BR', {
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'America/Sao_Paulo',
+});
+
+const ROTULO_SENTIMENTO: Record<string, string> = {
+  positivo: 'abertura positiva',
+  neutro: 'posição neutra',
+  cauteloso: 'avanço com cautela',
+  negativo: 'resistência percebida',
+  indefinido: 'sinal ainda indefinido',
+};
+
+function duracao(posCall: PosCall): string {
+  const segundosTranscricao = posCall.transcricao?.duracaoSegundos;
+  if (segundosTranscricao && segundosTranscricao > 0) {
+    return `${Math.max(1, Math.round(segundosTranscricao / 60))} min`;
+  }
+  const inicio = posCall.reuniao.iniciadaEm;
+  const fim = posCall.reuniao.encerradaEm;
+  if (inicio && fim) {
+    const minutos = Math.round((new Date(fim).getTime() - new Date(inicio).getTime()) / 60_000);
+    if (minutos > 0) return `${minutos} min`;
+  }
+  return `${posCall.reuniao.duracaoMinutos} min previstos`;
+}
+
+function minuto(segundo: number | null): string {
+  if (segundo === null) return 'durante a call';
+  const minutos = Math.floor(segundo / 60);
+  const segundos = segundo % 60;
+  return `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+}
+
+function dataInput(iso: string | null): string {
+  if (!iso) return '';
+  const formatador = new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  });
+  const data = formatador.format(new Date(iso));
+  return data >= formatador.format(new Date()) ? data : '';
+}
+
+function estadoDaAnalise(posCall: PosCall) {
+  if (posCall.analise?.status === 'concluida' && posCall.analise.resumo) {
+    return { rotulo: 'Leitura pronta', tipo: 'pronta' } as const;
+  }
+  if (posCall.analise?.status === 'falhou') {
+    return { rotulo: 'Revisão manual', tipo: 'falhou' } as const;
+  }
+  if (posCall.reuniao.status === 'cancelada') {
+    return { rotulo: 'Call cancelada', tipo: 'indisponivel' } as const;
+  }
+  return { rotulo: 'Processando', tipo: 'processando' } as const;
+}
+
+export function DossiePosCall({
+  posCall,
+  estadoAcao,
+}: {
+  posCall: PosCall;
+  estadoAcao: string | null;
+}) {
+  const analise = posCall.analise;
+  const estado = estadoDaAnalise(posCall);
+  const fatosConfirmados = (analise?.decisoes.length ?? 0) + (analise?.compromissos.length ?? 0);
+  const pontosAbertos = analise?.lacunas.length ?? 0;
+  const acaoSugerida = analise?.proximosPassos[0] ?? posCall.oportunidade.proximaAcao ?? '';
+  const nota = analise?.notaComercial;
+  const sentimento = analise?.sentimento
+    ? (ROTULO_SENTIMENTO[analise.sentimento] ?? analise.sentimento)
+    : 'sem leitura suficiente';
+  const temAnalise = estado.tipo === 'pronta';
+  const linkProposta = `/propostas/nova?oportunidade=${posCall.oportunidade.id}&reuniao=${posCall.reuniao.id}`;
+
+  return (
+    <div className={styles.pagina}>
+      <nav className={styles.navegacao} aria-label="Navegação do pós-call">
+        <Link href="/calls">
+          <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
+          Voltar às calls
+        </Link>
+        <span>
+          {DATA.format(new Date(posCall.reuniao.agendadaPara))} ·{' '}
+          {HORA.format(new Date(posCall.reuniao.agendadaPara))}
+        </span>
+      </nav>
+
+      <header className={styles.hero}>
+        <div className={styles.heroGrade} aria-hidden="true" />
+        <div className={styles.heroTopo}>
+          <div className={styles.heroTitulo}>
+            <div className={styles.sobretituloHero}>
+              <span data-estado={estado.tipo} />
+              Pós-call inteligente · {estado.rotulo}
+            </div>
+            <h1>{posCall.reuniao.titulo}</h1>
+            <p>
+              {posCall.empresa.nome}
+              {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
+            </p>
+          </div>
+          <div className={styles.heroSelos}>
+            <span>{ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</span>
+            <span>{ROTULO_STATUS_CALL[posCall.reuniao.status]}</span>
+          </div>
+        </div>
+
+        <div className={styles.pulsoDecisao}>
+          <div className={styles.pulsoRotulo}>
+            <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+            <span>Mapa da conversa</span>
+          </div>
+          <div className={styles.pulsoItem}>
+            <small>Confirmado</small>
+            <strong>{fatosConfirmados}</strong>
+            <span>decisões e compromissos</span>
+          </div>
+          <i aria-hidden="true" />
+          <div className={styles.pulsoItem}>
+            <small>Em aberto</small>
+            <strong>{pontosAbertos}</strong>
+            <span>lacunas para validar</span>
+          </div>
+          <i aria-hidden="true" />
+          <div className={`${styles.pulsoItem} ${styles.pulsoAcao}`}>
+            <small>Próximo movimento</small>
+            <strong>{acaoSugerida || 'Definir com revisão humana'}</strong>
+          </div>
+        </div>
+
+        <div className={styles.heroMeta}>
+          <span>
+            <Clock3 size={14} aria-hidden="true" /> {duracao(posCall)}
+          </span>
+          <span>
+            <ContactRound size={14} aria-hidden="true" />{' '}
+            {posCall.contato?.cargo ?? 'Contato sem cargo informado'}
+          </span>
+          <span>
+            <Target size={14} aria-hidden="true" />{' '}
+            {ROTULO_ETAPA[posCall.oportunidade.etapa as keyof typeof ROTULO_ETAPA] ??
+              posCall.oportunidade.etapa}
+          </span>
+        </div>
+      </header>
+
+      {estadoAcao === 'ok' && (
+        <div className={styles.retorno} data-tipo="sucesso" role="status">
+          <Check size={17} aria-hidden="true" />
+          Próxima ação confirmada. O CRM e a linha do tempo já foram atualizados.
+        </div>
+      )}
+      {estadoAcao === 'sem-alteracao' && (
+        <div className={styles.retorno} role="status">
+          <BadgeCheck size={17} aria-hidden="true" />
+          Essa ação já estava salva no CRM; nada foi duplicado.
+        </div>
+      )}
+      {estadoAcao === 'erro' && (
+        <div className={styles.retorno} data-tipo="erro" role="alert">
+          <CircleAlert size={17} aria-hidden="true" />
+          Não foi possível salvar agora. Revise o texto e a data antes de tentar novamente.
+        </div>
+      )}
+
+      <div className={styles.gradeOperacional}>
+        <div className={styles.principal}>
+          <section className={styles.leitura} aria-labelledby="leitura-titulo">
+            <div className={styles.leituraMarca}>
+              <BrainCircuit size={20} strokeWidth={1.65} aria-hidden="true" />
+              <span>Leitura central</span>
+            </div>
+            <div className={styles.leituraCorpo}>
+              <div className={styles.leituraTopo}>
+                <h2 id="leitura-titulo">O que esta conversa realmente mudou</h2>
+                {nota !== null && nota !== undefined && (
+                  <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
+                    <strong>{nota}</strong>
+                    <span>/100</span>
+                  </div>
+                )}
+              </div>
+              {temAnalise ? (
+                <p className={styles.resumo}>{analise?.resumo}</p>
+              ) : estado.tipo === 'falhou' ? (
+                <div className={styles.estadoLeitura}>
+                  <CircleAlert size={19} aria-hidden="true" />
+                  <div>
+                    <strong>
+                      A conversa foi preservada, mas a leitura automática não ficou pronta.
+                    </strong>
+                    <p>
+                      {analise?.erro ??
+                        'Use a transcrição abaixo para revisar os fatos manualmente.'}
+                    </p>
+                  </div>
+                </div>
+              ) : estado.tipo === 'indisponivel' ? (
+                <div className={styles.estadoLeitura}>
+                  <CircleAlert size={19} aria-hidden="true" />
+                  <div>
+                    <strong>Esta call foi cancelada antes de gerar conteúdo.</strong>
+                    <p>O vínculo com o lead permanece no histórico, sem conclusões artificiais.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.estadoLeitura}>
+                  <Radar size={19} aria-hidden="true" />
+                  <div>
+                    <strong>A reunião ainda está sendo organizada.</strong>
+                    <p>Assim que a análise terminar, decisões e próximos passos aparecerão aqui.</p>
+                  </div>
+                </div>
+              )}
+              <div className={styles.leituraRodape}>
+                <span data-sentimento={analise?.sentimento ?? 'indefinido'}>{sentimento}</span>
+                <small>Leitura assistida por IA · valide antes de agir</small>
+              </div>
+            </div>
+          </section>
+
+          <MapaFactual analise={analise} temAnalise={temAnalise} />
+
+          <section className={styles.oportunidades} aria-labelledby="oportunidades-titulo">
+            <header className={styles.secaoTopo}>
+              <div>
+                <p>Hipóteses, não promessas</p>
+                <h2 id="oportunidades-titulo">Oportunidades de Projeto</h2>
+              </div>
+              <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
+            </header>
+            {analise?.oportunidadesProjeto.length ? (
+              <div className={styles.listaOportunidades}>
+                {analise.oportunidadesProjeto.map((oportunidade, indice) => (
+                  <article key={`${oportunidade}-${indice}`}>
+                    <span>{String(indice + 1).padStart(2, '0')}</span>
+                    <p>{oportunidade}</p>
+                    <CircleHelp size={17} aria-label="Hipótese a validar" />
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.vazioSecao}>
+                A conversa ainda não sustenta uma hipótese clara de Projeto. Isso é uma lacuna, não
+                um sinal negativo.
+              </p>
+            )}
+            <footer className={styles.oportunidadesRodape}>
+              <p>Leve apenas hipóteses validadas para o escopo comercial.</p>
+              <Link href={linkProposta}>
+                Preparar proposta <ArrowRight size={15} aria-hidden="true" />
+              </Link>
+            </footer>
+          </section>
+
+          {posCall.coach.length > 0 && (
+            <section className={styles.coachRevisao} aria-labelledby="coach-revisao-titulo">
+              <header className={styles.secaoTopo}>
+                <div>
+                  <p>Aprendizado da condução</p>
+                  <h2 id="coach-revisao-titulo">Momentos do Live Coach</h2>
+                </div>
+                <span>{posCall.coach.length} intervenções</span>
+              </header>
+              <div className={styles.coachLinha}>
+                {posCall.coach.map((sugestao) => (
+                  <article key={sugestao.id} data-prioridade={sugestao.prioridade}>
+                    <div className={styles.coachTempo}>{minuto(sugestao.segundoReuniao)}</div>
+                    <div className={styles.coachPonto} aria-hidden="true" />
+                    <div className={styles.coachConteudo}>
+                      <div>
+                        <span>{sugestao.categoria}</span>
+                        {sugestao.metodologia && <small>{sugestao.metodologia}</small>}
+                      </div>
+                      <h3>{sugestao.titulo}</h3>
+                      <p>{sugestao.sugestao}</p>
+                      {sugestao.trechoGatilho && (
+                        <blockquote>“{sugestao.trechoGatilho}”</blockquote>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
+        </div>
+
+        <aside className={styles.lateral}>
+          <section className={styles.proximaAcao} aria-labelledby="proxima-acao-titulo">
+            <div className={styles.acaoMarca}>
+              <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+            </div>
+            <p className={styles.sobretitulo}>Agora</p>
+            <h2 id="proxima-acao-titulo">Transforme leitura em movimento</h2>
+            <p>Confirme ou ajuste a recomendação. Só depois disso ela passa a orientar o CRM.</p>
+
+            <form action={confirmarProximaAcao}>
+              <input type="hidden" name="reuniao" value={posCall.reuniao.id} />
+              <input type="hidden" name="oportunidade" value={posCall.oportunidade.id} />
+              <label>
+                <span>Próxima ação</span>
+                <textarea
+                  name="acao"
+                  rows={4}
+                  maxLength={500}
+                  defaultValue={acaoSugerida}
+                  placeholder="Ex.: enviar diagnóstico revisado para o contato"
+                  required
+                />
+              </label>
+              <label>
+                <span>Data combinada</span>
+                <input
+                  type="date"
+                  name="quando"
+                  defaultValue={dataInput(posCall.oportunidade.proximaAcaoEm)}
+                />
+              </label>
+              <button type="submit">
+                Confirmar no CRM <Check size={16} aria-hidden="true" />
+              </button>
+            </form>
+            <small className={styles.acaoNota}>
+              A atualização fica registrada como fato na jornada do lead.
+            </small>
+          </section>
+
+          <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
+            <div className={styles.lacunasTopo}>
+              <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
+              <span>{pontosAbertos}</span>
+            </div>
+            <p className={styles.sobretitulo}>Antes de prometer</p>
+            <h2 id="lacunas-titulo">O que ainda falta saber</h2>
+            <ListaFactual
+              itens={analise?.lacunas ?? []}
+              vazio="Nenhuma lacuna foi registrada. Ainda assim, revise escopo e responsáveis antes da proposta."
+              variante="alerta"
+            />
+          </section>
+
+          {analise?.sinaisCompra.length ? (
+            <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
+              <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
+              <p className={styles.sobretitulo}>Com evidência</p>
+              <h2 id="sinais-compra-titulo">Sinais de avanço</h2>
+              <ListaFactual
+                itens={analise.sinaisCompra}
+                vazio="Nenhum sinal explícito foi encontrado."
+                variante="decisao"
+              />
+            </section>
+          ) : null}
+
+          <section className={styles.atalhos} aria-label="Próximos destinos">
+            <Link href={`/crm/${posCall.oportunidade.id}`}>
+              <span>
+                <Target size={17} aria-hidden="true" />
+                Abrir dossiê do lead
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+            <Link href={linkProposta}>
+              <span>
+                <FileSignature size={17} aria-hidden="true" />
+                Criar proposta com esta call
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+          </section>
+        </aside>
+      </div>
+    </div>
+  );
+}
