@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
+import { obterPainelSobral } from '@/lib/consultor/queries';
 import { obterFocoDoCrm } from '@/lib/crm/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -16,11 +17,12 @@ export const metadata: Metadata = { title: 'Início' };
  */
 export default async function InicioPage() {
   const supabase = await createClient();
-  const [{ data }, projetos, agenda, focoCrm] = await Promise.all([
+  const [{ data }, projetos, agenda, focoCrm, painelSobral] = await Promise.all([
     supabase.auth.getClaims(),
     listarSolucoesDoBuilder(),
     listarAgenda(),
     obterFocoDoCrm(),
+    obterPainelSobral(),
   ]);
 
   const claims = data?.claims;
@@ -32,13 +34,7 @@ export default async function InicioPage() {
   const proximaMentoria = agenda.find(
     (sessao) => new Date(sessao.fimIso).getTime() > agora.getTime(),
   );
-  const etapaInicial = focoCrm
-    ? focoCrm.etapa === 'novo_lead' || focoCrm.etapa === 'qualificacao'
-      ? 'prospectar'
-      : focoCrm.etapa === 'ganho'
-        ? 'entregar'
-        : 'vender'
-    : 'prospectar';
+  const etapaInicial = painelSobral.plano.etapa;
 
   return (
     <MapaJornada

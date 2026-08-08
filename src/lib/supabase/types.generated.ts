@@ -496,7 +496,9 @@ export type Database = {
           cartoes: Json | null
           conteudo: string
           criado_em: string
+          direcao: Json | null
           id: string
+          modelo: string | null
           papel: string
           thread_id: string
         }
@@ -504,7 +506,9 @@ export type Database = {
           cartoes?: Json | null
           conteudo: string
           criado_em?: string
+          direcao?: Json | null
           id?: string
+          modelo?: string | null
           papel: string
           thread_id: string
         }
@@ -512,7 +516,9 @@ export type Database = {
           cartoes?: Json | null
           conteudo?: string
           criado_em?: string
+          direcao?: Json | null
           id?: string
+          modelo?: string | null
           papel?: string
           thread_id?: string
         }
@@ -1223,6 +1229,48 @@ export type Database = {
           },
         ]
       }
+      sobral_planos: {
+        Row: {
+          acoes: Json
+          atualizado_em: string
+          contexto_hash: string
+          diagnostico: string
+          dono: string
+          etapa: Database["public"]["Enums"]["sobral_etapa"]
+          foco: string
+          gerado_em: string
+          modelo: string
+          proximo_passo: Json
+          sinais: Json
+        }
+        Insert: {
+          acoes: Json
+          atualizado_em?: string
+          contexto_hash: string
+          diagnostico: string
+          dono: string
+          etapa: Database["public"]["Enums"]["sobral_etapa"]
+          foco: string
+          gerado_em?: string
+          modelo: string
+          proximo_passo: Json
+          sinais?: Json
+        }
+        Update: {
+          acoes?: Json
+          atualizado_em?: string
+          contexto_hash?: string
+          diagnostico?: string
+          dono?: string
+          etapa?: Database["public"]["Enums"]["sobral_etapa"]
+          foco?: string
+          gerado_em?: string
+          modelo?: string
+          proximo_passo?: Json
+          sinais?: Json
+        }
+        Relationships: []
+      }
       solucao_itens: {
         Row: {
           conteudo: string
@@ -1382,6 +1430,10 @@ export type Database = {
           mentoria_id: string
         }[]
       }
+      registrar_uso_sobral: {
+        Args: { p_dono: string; p_mes: string; p_tokens: number }
+        Returns: number
+      }
     }
     Enums: {
       calls_status:
@@ -1419,6 +1471,12 @@ export type Database = {
         | "apresentada"
         | "aceita"
         | "recusada"
+      sobral_etapa:
+        | "aprender"
+        | "prospectar"
+        | "vender"
+        | "entregar"
+        | "evoluir"
       status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
       status_publicacao: "rascunho" | "publicado" | "arquivado"
     }
@@ -1588,6 +1646,7 @@ export const Constants = {
         "aceita",
         "recusada",
       ],
+      sobral_etapa: ["aprender", "prospectar", "vender", "entregar", "evoluir"],
       status_builder: ["rascunho", "gerando", "pronta", "falhou"],
       status_publicacao: ["rascunho", "publicado", "arquivado"],
     },

@@ -1,12 +1,8 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
-
 /**
- * Chamada à Edge Function do Consultor, do browser — mesmo padrão (e mesmos
- * porquês) do `lib/builder/invocar.ts`: `functions.invoke` monta URL e anexa o
- * `Authorization` da sessão; o erro legível vem do CORPO da resposta, não do
- * `error` genérico do supabase-js.
+ * Chamada ao Route Handler do Sobral AI. A sessão viaja no cookie HttpOnly e a
+ * chave da OpenAI permanece no servidor da aplicação.
  */
 
 export type FalhaDoConsultor = {
@@ -36,25 +32,32 @@ export async function responderPendente(
 async function invocar(
   body: Record<string, unknown>,
 ): Promise<{ dados: RespostaDoConsultor; falha: null } | { dados: null; falha: FalhaDoConsultor }> {
-  const supabase = createClient();
+  try {
+    const resposta = await fetch('/api/consultor/responder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      cache: 'no-store',
+    });
 
-  const resposta = await supabase.functions.invoke<RespostaDoConsultor>('consultor/responder', {
-    body,
-  });
+    if (!resposta.ok) {
+      const doCorpo = await mensagemDoCorpo(resposta);
+      return {
+        dados: null,
+        falha: doCorpo ?? { mensagem: 'Não foi possível enviar. Tente de novo.' },
+      };
+    }
 
-  if (resposta.error) {
-    const doCorpo = await mensagemDoCorpo(resposta.response);
+    return { dados: (await resposta.json()) as RespostaDoConsultor, falha: null };
+  } catch {
     return {
       dados: null,
-      falha: doCorpo ?? { mensagem: 'Não foi possível enviar. Tente de novo.' },
+      falha: { mensagem: 'A conexão falhou. Confira sua internet e tente de novo.' },
     };
   }
-
-  return { dados: resposta.data as RespostaDoConsultor, falha: null };
 }
 
-async function mensagemDoCorpo(response: Response | undefined): Promise<FalhaDoConsultor | null> {
-  if (!response) return null;
+async function mensagemDoCorpo(response: Response): Promise<FalhaDoConsultor | null> {
   try {
     const corpo: unknown = await response.json();
     if (typeof corpo === 'object' && corpo !== null && 'erro' in corpo) {

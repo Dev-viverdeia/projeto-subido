@@ -1,0 +1,85 @@
+.bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--via-space-2);
+}
+
+.botao {
+  min-height: var(--app-h-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  box-shadow: var(--via-shadow-xs);
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.botao:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--via-navy-40);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.botao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--via-shadow-xs);
+}
+
+.botao:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.erro {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--via-text-body);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  text-align: right;
+}
+
+.girando {
+  animation: sobral-girar 900ms linear infinite;
+}
+
+@keyframes sobral-girar {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (max-width: 640px) {
+  .bloco {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .erro {
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao {
+    transition: none;
+  }
+
+  .girando {
+    animation: none;
+  }
+}

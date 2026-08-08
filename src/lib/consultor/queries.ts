@@ -4,6 +4,15 @@ import { cache } from 'react';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
+import { hashDoContexto, obterSinaisSobral } from './contexto';
+import {
+  criarPlanoBase,
+  DirecaoMensagemSchema,
+  PlanoSobralSchema,
+  type DirecaoMensagem,
+  type PlanoSobral,
+  type SinaisSobral,
+} from './direcao';
 
 /**
  * Leituras do Consultor — RSC only, mesma disciplina do builder/queries.ts:
@@ -29,6 +38,8 @@ export type MensagemDoConsultor = {
   papel: 'usuario' | 'consultor';
   conteudo: string;
   cartoes: CartaoDeSolucao[];
+  direcao: DirecaoMensagem | null;
+  modelo: string | null;
   criadoEm: string;
 };
 
@@ -52,6 +63,48 @@ export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
   }));
 });
 
+export type PainelSobral = {
+  plano: PlanoSobral;
+  sinais: SinaisSobral;
+  geradoPorIA: boolean;
+  desatualizado: boolean;
+};
+
+export const obterPainelSobral = cache(async (): Promise<PainelSobral> => {
+  const supabase = await createClient();
+  const [sinais, plano] = await Promise.all([
+    obterSinaisSobral(supabase),
+    supabase
+      .from('sobral_planos')
+      .select(
+        'etapa, diagnostico, foco, proximo_passo, acoes, sinais, contexto_hash, modelo, gerado_em',
+      )
+      .maybeSingle(),
+  ]);
+
+  if (plano.error) throw handleError(plano.error, 'sobral:plano');
+
+  const base = criarPlanoBase(sinais);
+  if (!plano.data) return { plano: base, sinais, geradoPorIA: false, desatualizado: false };
+
+  const lido = PlanoSobralSchema.safeParse({
+    etapa: plano.data.etapa,
+    diagnostico: plano.data.diagnostico,
+    foco: plano.data.foco,
+    proximoPasso: plano.data.proximo_passo,
+    acoes: plano.data.acoes,
+    sinais: plano.data.sinais,
+    modelo: plano.data.modelo,
+    geradoEm: plano.data.gerado_em,
+  });
+  const desatualizado = plano.data.contexto_hash !== hashDoContexto(sinais);
+
+  if (!lido.success || desatualizado) {
+    return { plano: base, sinais, geradoPorIA: false, desatualizado };
+  }
+  return { plano: lido.data, sinais, geradoPorIA: true, desatualizado: false };
+});
+
 /** `null` quando o id não existe OU é de outra pessoa — a RLS não distingue. */
 export const obterConversa = cache(
   async (
@@ -69,7 +122,7 @@ export const obterConversa = cache(
 
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
-      .select('id, papel, conteudo, cartoes, criado_em')
+      .select('id, papel, conteudo, cartoes, direcao, modelo, criado_em')
       .eq('thread_id', id)
       .order('criado_em')
       .limit(200);
@@ -86,11 +139,14 @@ export const obterConversa = cache(
         /* `safeParse` no JSONB, como o Builder faz com o documento: cartão em
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
         const cartoes = Cartoes.safeParse(m.cartoes);
+        const direcao = DirecaoMensagemSchema.safeParse(m.direcao);
         return {
           id: m.id,
           papel: m.papel as 'usuario' | 'consultor',
           conteudo: m.conteudo,
           cartoes: cartoes.success ? cartoes.data : [],
+          direcao: direcao.success ? direcao.data : null,
+          modelo: m.modelo,
           criadoEm: m.criado_em,
         };
       }),
