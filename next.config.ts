@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  /* A rota monta o PDF no servidor e lê estas fontes por caminho absoluto. O
+     tracing precisa levá-las para a função da Vercel; sem isto funciona local e
+     cai silenciosamente para outra tipografia em produção. */
+  outputFileTracingIncludes: {
+    '/api/propostas/[id]/pdf': ['./src/assets/fonts/pdf/*.ttf'],
+  },
   images: {
     /* AVIF ANTES DE WEBP, e a ordem É a preferência de negociação: o Next serve o
        primeiro formato que o `Accept` do cliente aceitar e cai para o original no fim.

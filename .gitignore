@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Exceção: o exemplo é documentação, precisa estar no repo.
 !.env.example
+
+# Artefatos temporários de validação visual (PDFs e screenshots locais).
+/tmp/

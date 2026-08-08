@@ -1147,6 +1147,82 @@ export type Database = {
           },
         ]
       }
+      propostas: {
+        Row: {
+          aceita_em: string | null
+          apresentada_em: string | null
+          atualizado_em: string
+          builder_solucao_id: string | null
+          criado_em: string
+          documento: Json
+          dono: string
+          empresa_id: string
+          id: string
+          oportunidade_id: string
+          projeto_id: string | null
+          recusada_em: string | null
+          status: Database["public"]["Enums"]["proposta_status"]
+          titulo: string
+          versao: number
+        }
+        Insert: {
+          aceita_em?: string | null
+          apresentada_em?: string | null
+          atualizado_em?: string
+          builder_solucao_id?: string | null
+          criado_em?: string
+          documento: Json
+          dono: string
+          empresa_id: string
+          id?: string
+          oportunidade_id: string
+          projeto_id?: string | null
+          recusada_em?: string | null
+          status?: Database["public"]["Enums"]["proposta_status"]
+          titulo: string
+          versao?: number
+        }
+        Update: {
+          aceita_em?: string | null
+          apresentada_em?: string | null
+          atualizado_em?: string
+          builder_solucao_id?: string | null
+          criado_em?: string
+          documento?: Json
+          dono?: string
+          empresa_id?: string
+          id?: string
+          oportunidade_id?: string
+          projeto_id?: string | null
+          recusada_em?: string | null
+          status?: Database["public"]["Enums"]["proposta_status"]
+          titulo?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "propostas_builder_solucao_id_fkey"
+            columns: ["builder_solucao_id"]
+            isOneToOne: false
+            referencedRelation: "builder_solucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "propostas_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "propostas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solucao_itens: {
         Row: {
           conteudo: string
@@ -1337,6 +1413,12 @@ export type Database = {
         | "perdido"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
+      proposta_status:
+        | "rascunho"
+        | "pronta"
+        | "apresentada"
+        | "aceita"
+        | "recusada"
       status_builder: "rascunho" | "gerando" | "pronta" | "falhou"
       status_publicacao: "rascunho" | "publicado" | "arquivado"
     }
@@ -1499,6 +1581,13 @@ export const Constants = {
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
+      proposta_status: [
+        "rascunho",
+        "pronta",
+        "apresentada",
+        "aceita",
+        "recusada",
+      ],
       status_builder: ["rascunho", "gerando", "pronta", "falhou"],
       status_publicacao: ["rascunho", "publicado", "arquivado"],
     },

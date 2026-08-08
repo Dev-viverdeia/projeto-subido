@@ -38,6 +38,28 @@ export const BRAND = {
 } as const;
 
 /**
+ * Tintas sólidas do documento comercial.
+ *
+ * PDF não entende CSS custom properties. Estes valores espelham a escala clara
+ * de brand.css e mantêm esse consumidor estático sem cores espalhadas no template.
+ */
+export const DOCUMENT = {
+  paper: '#FCFDFF',
+  soft: '#F2F6FB',
+  line: '#E2E9F2',
+  body: '#4F596B',
+  faint: '#667085',
+  coverMuted: '#AAB4C5',
+  coverLine: '#2A3449',
+  coverFaint: '#7E899D',
+  coverDetail: '#9BA6B8',
+  coverBlue: '#65CAFF',
+  coverMid: '#677186',
+  decisionMuted: '#AEB8C8',
+  signature: '#AAB3C1',
+} as const;
+
+/**
  * Razões de contraste medidas (WCAG 2.1), para não serem re-descobertas por tentativa:
  *
  *   #00A2FF sobre #FAFDFF ....  2,70:1  ✗ reprova AA até para texto grande

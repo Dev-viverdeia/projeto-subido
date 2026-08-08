@@ -1,0 +1,234 @@
+.pagina {
+  width: min(100%, 980px);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
+}
+
+.voltar {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+}
+
+.hero {
+  padding-block: clamp(12px, 3vw, 32px);
+}
+
+.sobretitulo,
+.etapaTitulo p,
+.rodape span {
+  margin: 0;
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 15ch;
+  margin: var(--via-space-3) 0 var(--via-space-5);
+  font-size: clamp(2.5rem, 6vw, 5.3rem);
+  line-height: 0.94;
+  letter-spacing: var(--app-ls-hero);
+}
+
+.hero > p:last-child {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  line-height: 1.65;
+}
+
+.formulario {
+  overflow: hidden;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-white);
+  box-shadow: 0 20px 60px rgba(11, 22, 45, 0.07);
+}
+
+.erro {
+  margin: 0;
+  padding: var(--via-space-4) clamp(24px, 6vw, 64px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.etapa {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  min-height: 286px;
+}
+
+.etapa + .etapa {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.numero {
+  padding-top: 42px;
+  border-right: 1px solid var(--via-border-hairline);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  text-align: center;
+}
+
+.etapaCorpo {
+  padding: clamp(28px, 5vw, 48px);
+}
+
+.etapaTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  margin-bottom: var(--via-space-6);
+}
+
+.etapaTitulo > span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.etapaTitulo h2 {
+  margin: var(--via-space-1) 0 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  letter-spacing: var(--app-ls-h3);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.campo > span {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: 650;
+}
+
+.campo select {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 44px 0 var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+
+.campo small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.origens {
+  display: flex;
+  gap: var(--via-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--via-space-4);
+}
+
+.origens span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: 7px 10px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.semOpcao {
+  padding: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.semOpcao p {
+  margin: 0 0 var(--via-space-2);
+  color: var(--via-text-muted);
+}
+.semOpcao a {
+  color: var(--via-accent-ink);
+  font-weight: 700;
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-5) clamp(24px, 5vw, 48px);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.rodape div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rodape strong {
+  font-size: var(--via-fs-sm);
+}
+
+.rodape button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-5);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rodape button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 620px) {
+  .etapa {
+    grid-template-columns: 46px 1fr;
+  }
+  .numero {
+    padding-top: 34px;
+  }
+  .etapaCorpo {
+    padding: var(--via-space-6) var(--via-space-4);
+  }
+  .etapaTitulo {
+    align-items: flex-start;
+  }
+  .rodape {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .rodape button {
+    width: 100%;
+  }
+}

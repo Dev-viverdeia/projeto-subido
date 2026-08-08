@@ -116,6 +116,20 @@
   color: var(--via-white);
 }
 
+.criarProposta {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-accent);
+  color: var(--via-navy-deep);
+  font-size: var(--via-fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .etapa {
   display: inline-flex;
   align-items: center;

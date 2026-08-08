@@ -42,6 +42,21 @@
   flex-wrap: wrap;
 }
 
+.proposta {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: 650;
+  text-decoration: none;
+}
+
 /* A falha herda a superfície de card, não uma cor de alerta: verde/vermelho de
    semáforo é banido, e o texto já diz o que aconteceu. O rótulo em mono dá a
    hierarquia que a cor daria. */

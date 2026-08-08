@@ -9,6 +9,7 @@
 export const ROTAS_APP = [
   '/inicio',
   '/crm',
+  '/propostas',
   '/calls',
   '/solucoes',
   '/formacoes',
@@ -41,6 +42,7 @@ export type RotaApp = (typeof ROTAS_APP)[number];
 export const ROTULOS: Record<RotaApp, string> = {
   '/inicio': 'Início',
   '/crm': 'CRM',
+  '/propostas': 'Propostas',
   '/calls': 'Calls',
   '/solucoes': 'Projetos',
   '/formacoes': 'Formações',

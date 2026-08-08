@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { FileSignature } from 'lucide-react';
 import { Pill } from '@/design-system/via';
 import { apagarSolucao } from '@/lib/builder/actions';
 import { paraMarkdown } from '@/lib/builder/markdown';
@@ -73,10 +75,16 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
           </Pill>
 
           {solucao.documento ? (
-            <BotaoCopiar
-              texto={paraMarkdown(solucao.documento)}
-              rotuloDoQue="o projeto inteiro em Markdown"
-            />
+            <>
+              <Link href={`/propostas/nova?builder=${solucao.id}`} className={styles.proposta}>
+                <FileSignature size={15} strokeWidth={1.8} aria-hidden="true" />
+                Criar proposta
+              </Link>
+              <BotaoCopiar
+                texto={paraMarkdown(solucao.documento)}
+                rotuloDoQue="o projeto inteiro em Markdown"
+              />
+            </>
           ) : null}
 
           <BotaoExcluir

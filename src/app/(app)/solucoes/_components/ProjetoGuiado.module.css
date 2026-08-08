@@ -36,6 +36,39 @@
   font-family: var(--via-font-mono);
 }
 
+.proposta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  text-decoration: none;
+}
+
+.proposta > svg:first-child {
+  color: var(--via-accent);
+}
+
+.proposta span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--via-fs-sm);
+  font-weight: 650;
+}
+
+.proposta small {
+  color: rgba(255, 255, 255, 0.48);
+  font-family: var(--via-font-mono);
+  font-size: 0.59rem;
+  font-weight: 400;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
 .eyebrow {
   margin: 0 0 var(--via-space-4);
   font-size: var(--via-fs-micro);

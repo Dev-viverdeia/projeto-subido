@@ -28,6 +28,7 @@ import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
+import { AtalhoProposta } from './_components/AtalhoProposta';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Dossiê do lead · CRM' };
@@ -71,6 +72,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
           </div>
 
           <div className={styles.heroAcoes}>
+            <AtalhoProposta oportunidadeId={lead.oportunidade.id} />
             <span className={styles.etapa}>{ROTULO_ETAPA[lead.oportunidade.etapa]}</span>
             {!emAndamento && (
               <FormularioEnriquecimento

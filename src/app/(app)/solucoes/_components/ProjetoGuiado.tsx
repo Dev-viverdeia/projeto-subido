@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import { ArrowDown, ArrowUpRight, Check, PackageCheck, Sparkles } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Check,
+  FileSignature,
+  PackageCheck,
+  Sparkles,
+} from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
 import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import { alternarEtapa, contarEtapasFeitas, percentual, useProgresso } from '@/lib/progresso/local';
@@ -221,6 +228,18 @@ export function ProjetoGuiado({
               Personalizar no Estúdio <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </section>
+
+          <Link
+            href={`/propostas/nova?projeto=${encodeURIComponent(slug)}`}
+            className={styles.proposta}
+          >
+            <FileSignature size={17} strokeWidth={1.8} aria-hidden="true" />
+            <span>
+              <small>Levar ao cliente</small>
+              Criar proposta comercial
+            </span>
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
 
           <p className={styles.notaLocal}>
             O progresso fica salvo neste navegador. Você pode marcar e reabrir qualquer passo.

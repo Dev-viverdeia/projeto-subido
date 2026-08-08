@@ -4,6 +4,7 @@ import {
   BriefcaseBusiness,
   ContactRound,
   DraftingCompass,
+  FileSignature,
   GraduationCap,
   House,
   ShieldCheck,
@@ -48,6 +49,13 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/crm'],
     icone: <ContactRound size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+  },
+  {
+    href: '/propostas',
+    rotulo: ROTULOS['/propostas'],
+    icone: <FileSignature size={TAMANHO} strokeWidth={TRACO} />,
+    /* O dock continua com os cinco destinos operacionais já priorizados. */
+    noDock: false,
   },
   {
     href: '/calls',
