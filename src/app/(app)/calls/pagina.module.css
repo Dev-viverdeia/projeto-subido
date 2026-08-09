@@ -1,6 +1,6 @@
 .pagina {
   width: 100%;
-  max-width: 1500px;
+  max-width: var(--app-canvas);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@
 
 .topo {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--via-space-6);
 }
@@ -22,16 +22,18 @@
 .introducao h1 {
   max-width: 730px;
   margin-top: var(--via-space-2);
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 0.98;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  line-height: 1.02;
   letter-spacing: var(--app-ls-h1);
+  text-wrap: balance;
 }
 
 .introducao > p:last-child {
   max-width: 67ch;
   margin-top: var(--via-space-3);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
 }
 
 .sobretitulo {
@@ -58,7 +60,7 @@
 .fluxo {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--via-navy) 20%, var(--via-border));
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-surface);
   background: var(--app-mesh-trilho);
   color: var(--via-white);
   box-shadow: var(--via-shadow-md);
@@ -69,7 +71,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--via-space-4);
-  padding: var(--via-space-5) var(--via-space-6);
+  padding: var(--via-space-4) var(--via-space-5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
@@ -111,8 +113,8 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: var(--via-space-3);
-  min-height: 104px;
-  padding: var(--via-space-4) var(--via-space-5);
+  min-height: 92px;
+  padding: var(--via-space-4);
 }
 
 .trilha li + li {
@@ -132,8 +134,7 @@
 .trilha li > span.noAtivo {
   border-color: color-mix(in srgb, var(--via-accent) 62%, white);
   background: var(--via-accent);
-  color: var(--via-white);
-  box-shadow: 0 0 0 6px rgba(29, 91, 255, 0.12);
+  color: var(--via-navy);
 }
 
 .trilha strong,
@@ -355,7 +356,10 @@
   top: var(--via-space-6);
   overflow: hidden;
   padding: var(--via-space-6);
-  background: linear-gradient(145deg, rgba(29, 91, 255, 0.1), transparent 42%), var(--via-surface);
+  border-color: var(--via-accent-hairline);
+  background:
+    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 42%), var(--via-surface);
+  box-shadow: var(--via-shadow-md);
 }
 
 .coachSinal {

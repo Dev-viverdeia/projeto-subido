@@ -74,9 +74,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             <aside className={`${styles.sidebar} via-noise`}>
               <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
                 <SubidoLogo size={18} />
+                <span>Mesa do profissional de IA</span>
               </Link>
 
-              <NavLateral itens={ITENS_NAV} variante="lateral" rotuloGrupo="Plataforma" />
+              <NavLateral itens={ITENS_NAV} variante="lateral" />
 
               <div className={styles.rodapeSidebar}>
                 {admin && (

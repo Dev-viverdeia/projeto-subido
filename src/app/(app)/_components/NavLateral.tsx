@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
-import type { ItemNav } from './navegacao';
+import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
 
 /**
@@ -46,6 +46,7 @@ export function NavLateral({
 
   const visiveis = variante === 'dock' ? itens.filter((i) => i.noDock) : itens;
   const idMarcador = `nav-${variante}-${grupo}`;
+  const ordemGrupos: ItemNav['grupo'][] = ['operacao', 'entrega', 'evolucao', 'gestao'];
 
   /* Spring, não duração: o marcador percorre uma distância variável (dois itens
      vizinhos ou as pontas da lista), e uma duração fixa faria o percurso curto
@@ -55,21 +56,10 @@ export function NavLateral({
     ? { duration: 0 }
     : ({ type: 'spring', stiffness: 420, damping: 34, mass: 0.8 } as const);
 
-  return (
-    <nav
-      className={variante === 'dock' ? styles.dock : styles.lateral}
-      aria-label={
-        variante === 'dock' ? 'Navegação principal' : (rotuloGrupo ?? 'Seções da plataforma')
-      }
-    >
-      {variante === 'lateral' && rotuloGrupo && (
-        <p className={styles.rotuloGrupo} aria-hidden="true">
-          {rotuloGrupo}
-        </p>
-      )}
-
+  function renderizarItens(lista: ItemNav[], sufixoGrupo: string) {
+    return (
       <ul className={styles.lista}>
-        {visiveis.map((item) => {
+        {lista.map((item) => {
           /* Prefixo, não igualdade: `/solucoes/automacao` precisa manter "Soluções"
              aceso. O `/` no fim evita que `/conta` case com um futuro `/contas`. */
           const ativo = caminho === item.href || caminho.startsWith(`${item.href}/`);
@@ -83,7 +73,7 @@ export function NavLateral({
               >
                 {ativo && (
                   <motion.span
-                    layoutId={idMarcador}
+                    layoutId={`${idMarcador}-${sufixoGrupo}`}
                     className={variante === 'dock' ? styles.marcaDock : styles.pilula}
                     transition={transicao}
                   />
@@ -97,6 +87,35 @@ export function NavLateral({
           );
         })}
       </ul>
+    );
+  }
+
+  return (
+    <nav
+      className={variante === 'dock' ? styles.dock : styles.lateral}
+      aria-label={
+        variante === 'dock' ? 'Navegação principal' : (rotuloGrupo ?? 'Seções da plataforma')
+      }
+    >
+      {variante === 'lateral' ? (
+        <div className={styles.grupos}>
+          {ordemGrupos.map((idGrupo) => {
+            const itensDoGrupo = visiveis.filter((item) => item.grupo === idGrupo);
+            if (!itensDoGrupo.length) return null;
+
+            return (
+              <section className={styles.grupoLateral} key={idGrupo}>
+                <p className={styles.rotuloGrupo} aria-hidden="true">
+                  {rotuloGrupo ?? ROTULOS_GRUPO_NAV[idGrupo]}
+                </p>
+                {renderizarItens(itensDoGrupo, idGrupo)}
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        renderizarItens(visiveis, grupo)
+      )}
     </nav>
   );
 }

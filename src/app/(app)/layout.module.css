@@ -4,7 +4,9 @@
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 100dvh;
-  background: var(--via-bg);
+  background:
+    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 24%),
+    linear-gradient(180deg, var(--via-bg), var(--via-bg-2));
 }
 
 .sidebar {
@@ -46,7 +48,7 @@
        `margin-inline: auto` passava a centralizar dentro da largura ESTOURADA,
        indo parar fora da tela.
        Nada em tsc, eslint, build ou nos gates percebe: é layout. */
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 224px minmax(0, 1fr);
   }
 
   .sidebar {
@@ -55,7 +57,7 @@
 
     display: flex;
     flex-direction: column;
-    gap: var(--via-space-6);
+    gap: var(--via-space-4);
     /* `sticky` + altura de viewport em vez de `fixed`: a sidebar continua no fluxo
        do grid, então o conteúdo não precisa de margin-left mágica para não ficar
        embaixo dela. */
@@ -65,7 +67,7 @@
     /* 12 e não 16 no inline: põe o ícone do item de nav em x=24, alinhado com a
        marca, que também recua para 12. Eram os dois únicos elementos da coluna e
        estavam desalinhados em 8px. */
-    padding: var(--via-space-6) var(--via-space-3);
+    padding: var(--via-space-5) var(--via-space-3);
     /* O TRILHO — campo PRÓPRIO (`--app-mesh-trilho`), não o mesh da landing.
        Aquele desce até #040B1A, quase preto, e preto não pertence à paleta: a
        coluna virava um buraco ao lado de um canvas claro. Este começa mais claro
@@ -80,7 +82,7 @@
     box-shadow: 12px 0 32px -18px rgba(11, 22, 45, 0.45);
     /* A folga entre a marca e a lista: a marca já carrega ~10px de ar próprio
        dentro do min-height de 44px, então 24 lia como 34. */
-    gap: var(--via-space-4);
+    gap: var(--via-space-3);
   }
 
   /* O admin ancora o PÉ do trilho — utilitário, separado dos pilares por uma
@@ -92,7 +94,7 @@
   }
 
   .conteudo {
-    padding: var(--via-space-8) var(--via-space-8) var(--via-space-16);
+    padding: var(--via-space-7) var(--via-space-8) var(--via-space-16);
   }
 
   .shell:has(.conteudo > :global(.pagina-mapa-jornada)) .conteudo {
@@ -103,7 +105,9 @@
 
 .marcaSidebar {
   display: inline-flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--via-space-2);
   align-self: flex-start;
   /* Sobre a navy, o wordmark é BRANCO (via currentColor); a marca segue azul
      institucional pela variante brand — o mesmo quadro de /entrar. */
@@ -117,14 +121,25 @@
   padding-inline: var(--via-space-3);
 }
 
+.marcaSidebar span {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  line-height: 1;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
 .perfilSidebar {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
   min-height: 56px;
-  margin-top: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-3);
+  margin-top: var(--via-space-2);
+  padding: var(--via-space-2_5) var(--via-space-3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.035);
   color: var(--via-white);
   text-decoration: none;
   transition: background-color var(--app-t-state);

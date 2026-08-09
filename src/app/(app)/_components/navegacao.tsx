@@ -21,7 +21,16 @@ export type ItemNav = {
   icone: React.ReactNode;
   /** Aparece no dock do mobile. Sete itens não cabem em 375px; cinco cabem. */
   noDock: boolean;
+  /** Organiza a navegação pela jornada real, em vez de uma lista plana de ferramentas. */
+  grupo: 'operacao' | 'entrega' | 'evolucao' | 'gestao';
 };
+
+export const ROTULOS_GRUPO_NAV = {
+  operacao: 'Operação',
+  entrega: 'Construir e entregar',
+  evolucao: 'Evolução profissional',
+  gestao: 'Gestão',
+} satisfies Record<ItemNav['grupo'], string>;
 
 /**
  * Os destinos da plataforma, na ordem dos quatro pilares.
@@ -44,12 +53,21 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/inicio'],
     icone: <House size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+    grupo: 'operacao',
   },
   {
     href: '/crm',
     rotulo: ROTULOS['/crm'],
     icone: <ContactRound size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+    grupo: 'operacao',
+  },
+  {
+    href: '/calls',
+    rotulo: ROTULOS['/calls'],
+    icone: <Video size={TAMANHO} strokeWidth={TRACO} />,
+    noDock: true,
+    grupo: 'operacao',
   },
   {
     href: '/propostas',
@@ -57,12 +75,7 @@ export const ITENS_NAV: ItemNav[] = [
     icone: <FileSignature size={TAMANHO} strokeWidth={TRACO} />,
     /* O dock continua com os cinco destinos operacionais já priorizados. */
     noDock: false,
-  },
-  {
-    href: '/calls',
-    rotulo: ROTULOS['/calls'],
-    icone: <Video size={TAMANHO} strokeWidth={TRACO} />,
-    noDock: true,
+    grupo: 'operacao',
   },
   {
     href: '/diagnosticos',
@@ -71,26 +84,21 @@ export const ITENS_NAV: ItemNav[] = [
     /* O diagnóstico é uma ferramenta de pré-venda e fica no trilho completo.
        O dock móvel preserva os cinco destinos centrais da operação diária. */
     noDock: false,
+    grupo: 'operacao',
   },
   {
     href: '/solucoes',
     rotulo: ROTULOS['/solucoes'],
     icone: <BriefcaseBusiness size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
-  },
-  {
-    href: '/formacoes',
-    rotulo: ROTULOS['/formacoes'],
-    icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
-    /* No mobile, Calls passa a ocupar este destino operacional. A formação
-       continua disponível no trilho lateral e pelo Mapa da Jornada. */
-    noDock: false,
+    grupo: 'entrega',
   },
   {
     href: '/builder',
     rotulo: ROTULOS['/builder'],
     icone: <DraftingCompass size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+    grupo: 'entrega',
   },
   {
     href: '/consultor',
@@ -99,6 +107,16 @@ export const ITENS_NAV: ItemNav[] = [
     /* O dock do mobile cabe cinco itens e já tem cinco — o Sobral AI entra só
        no trilho lateral até alguém ceder o lugar. */
     noDock: false,
+    grupo: 'entrega',
+  },
+  {
+    href: '/formacoes',
+    rotulo: ROTULOS['/formacoes'],
+    icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
+    /* No mobile, Calls passa a ocupar este destino operacional. A formação
+       continua disponível no trilho lateral e pelo Mapa da Jornada. */
+    noDock: false,
+    grupo: 'evolucao',
   },
   {
     href: '/mentorias',
@@ -107,6 +125,7 @@ export const ITENS_NAV: ItemNav[] = [
     /* O CRM ocupa o quinto destino operacional do dock. Mentorias continua na
        navegação lateral e nas chamadas contextuais do Mapa da Jornada. */
     noDock: false,
+    grupo: 'evolucao',
   },
   {
     href: '/certificados',
@@ -115,6 +134,7 @@ export const ITENS_NAV: ItemNav[] = [
     /* O dock do mobile cabe cinco e já tem cinco — como o Consultor, entra só
        no trilho lateral. */
     noDock: false,
+    grupo: 'evolucao',
   },
 ];
 
@@ -134,4 +154,5 @@ export const ITEM_ADMIN: ItemNav = {
   rotulo: ROTULOS['/admin'],
   icone: <ShieldCheck size={TAMANHO} strokeWidth={TRACO} />,
   noDock: false,
+  grupo: 'gestao',
 };

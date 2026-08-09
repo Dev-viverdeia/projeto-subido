@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import { ArrowRight, Check, PencilLine, Target } from 'lucide-react';
+import { useActionState, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, PencilLine, Target } from 'lucide-react';
 import { salvarPerfilJornada } from '@/lib/jornada/actions';
 import type { PerfilJornada } from '@/lib/jornada/motor';
 import type { ProjetoInicialJornada } from '@/lib/jornada/queries';
@@ -18,8 +18,26 @@ export function ConfiguracaoJornada({
   projetos: ProjetoInicialJornada[];
 }) {
   const [editando, setEditando] = useState(false);
+  const [passo, setPasso] = useState(1);
   const [estado, acao, pendente] = useActionState(salvarPerfilJornada, ESTADO_INICIAL);
+  const formulario = useRef<HTMLFormElement>(null);
   const aberto = !perfil || editando;
+
+  function avancar() {
+    const campos = formulario.current?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+      `[data-passo="${passo}"] input, [data-passo="${passo}"] textarea`,
+    );
+
+    for (const campo of campos ?? []) {
+      if (!campo.checkValidity()) {
+        campo.reportValidity();
+        campo.focus();
+        return;
+      }
+    }
+
+    setPasso((atual) => Math.min(3, atual + 1));
+  }
 
   return (
     <section
@@ -46,7 +64,14 @@ export function ConfiguracaoJornada({
         </div>
 
         {!aberto && (
-          <button type="button" className={styles.editar} onClick={() => setEditando(true)}>
+          <button
+            type="button"
+            className={styles.editar}
+            onClick={() => {
+              setPasso(1);
+              setEditando(true);
+            }}
+          >
             <PencilLine size={15} strokeWidth={1.9} aria-hidden="true" />
             Editar direção
           </button>
@@ -54,8 +79,27 @@ export function ConfiguracaoJornada({
       </header>
 
       {aberto && (
-        <form action={acao} className={styles.formulario}>
-          <fieldset className={styles.decisao}>
+        <form ref={formulario} action={acao} className={styles.formulario}>
+          <ol className={styles.progresso} aria-label="Etapas da direção da operação">
+            {['Seu mercado', 'Projeto principal', 'Como você vende'].map((rotulo, indice) => {
+              const numero = indice + 1;
+              const concluido = numero < passo;
+              const ativo = numero === passo;
+
+              return (
+                <li
+                  key={rotulo}
+                  data-ativo={ativo || undefined}
+                  data-concluido={concluido || undefined}
+                >
+                  <span>{concluido ? <Check size={13} strokeWidth={2.7} /> : numero}</span>
+                  <strong>{rotulo}</strong>
+                </li>
+              );
+            })}
+          </ol>
+
+          <fieldset className={styles.decisao} data-passo="1" hidden={passo !== 1}>
             <legend>
               <span>01</span>
               <strong>Onde você quer começar?</strong>
@@ -77,7 +121,7 @@ export function ConfiguracaoJornada({
             </label>
           </fieldset>
 
-          <fieldset className={styles.decisao}>
+          <fieldset className={styles.decisao} data-passo="2" hidden={passo !== 2}>
             <legend>
               <span>02</span>
               <strong>Qual projeto você vai dominar primeiro?</strong>
@@ -117,7 +161,7 @@ export function ConfiguracaoJornada({
             )}
           </fieldset>
 
-          <fieldset className={styles.decisao}>
+          <fieldset className={styles.decisao} data-passo="3" hidden={passo !== 3}>
             <legend>
               <span>03</span>
               <strong>Como você explica o serviço?</strong>
@@ -142,11 +186,23 @@ export function ConfiguracaoJornada({
           </fieldset>
 
           <footer className={styles.rodape}>
-            <p aria-live="polite" className={estado.erro ? styles.erro : styles.sucesso}>
-              {estado.erro ?? estado.sucesso ?? 'Essas escolhas podem ser ajustadas depois.'}
-            </p>
+            <div className={styles.rodapeContexto}>
+              <span>Passo {passo} de 3</span>
+              <p aria-live="polite" className={estado.erro ? styles.erro : styles.sucesso}>
+                {estado.erro ?? estado.sucesso ?? 'Você poderá ajustar essa direção depois.'}
+              </p>
+            </div>
             <div className={styles.acoes}>
-              {perfil && (
+              {passo > 1 ? (
+                <button
+                  type="button"
+                  className={styles.cancelar}
+                  onClick={() => setPasso((atual) => Math.max(1, atual - 1))}
+                >
+                  <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+                  Voltar
+                </button>
+              ) : perfil ? (
                 <button
                   type="button"
                   className={styles.cancelar}
@@ -154,15 +210,23 @@ export function ConfiguracaoJornada({
                 >
                   Cancelar
                 </button>
+              ) : null}
+
+              {passo < 3 ? (
+                <button type="button" className={styles.salvar} onClick={avancar}>
+                  Continuar
+                  <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className={styles.salvar}
+                  disabled={pendente || !projetos.length}
+                >
+                  {pendente ? 'Salvando…' : 'Ativar meu mapa'}
+                  {!pendente && <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />}
+                </button>
               )}
-              <button
-                type="submit"
-                className={styles.salvar}
-                disabled={pendente || !projetos.length}
-              >
-                {pendente ? 'Salvando…' : 'Salvar direção'}
-                {!pendente && <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />}
-              </button>
             </div>
           </footer>
         </form>

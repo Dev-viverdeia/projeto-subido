@@ -74,7 +74,10 @@ export function MapaJornada({
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
       <header className={styles.topo}>
-        <div>
+        <div className={styles.topoPrincipal}>
+          <span className={styles.estadoOperacao}>
+            <i aria-hidden="true" /> Sua operação hoje
+          </span>
           <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
           <p className={styles.data}>{dataLonga}</p>
         </div>
@@ -90,8 +93,9 @@ export function MapaJornada({
       <section className={styles.mapa} aria-labelledby="titulo-mapa-jornada">
         <div className={styles.mapaTopo}>
           <div className={styles.mapaCabecalho}>
-            <h1 id="titulo-mapa-jornada">Seu mapa da jornada</h1>
-            <p>Cada avanço abaixo exige uma evidência registrada na plataforma.</p>
+            <p className={styles.mapaSobretitulo}>Ciclo profissional</p>
+            <h1 id="titulo-mapa-jornada">Jornada de operação</h1>
+            <p>O mapa avança quando o seu trabalho deixa evidências reais.</p>
           </div>
           <div className={styles.progressoGeral} aria-label={`${plano.percentual}% da jornada`}>
             <span>
@@ -100,7 +104,7 @@ export function MapaJornada({
             <div className={styles.progressoTrilho} aria-hidden="true">
               <span style={{ width: `${plano.percentual}%` }} />
             </div>
-            <small>{plano.percentual}% do primeiro ciclo</small>
+            <small>{plano.percentual}% do ciclo em andamento</small>
           </div>
         </div>
 
@@ -153,7 +157,7 @@ export function MapaJornada({
             <div>
               <div className={styles.linhaTitulo}>
                 <h2>Sobral AI</h2>
-                <span className={styles.selo}>Leitura factual</span>
+                <span className={styles.selo}>Leitura operacional</span>
               </div>
               <p>{diagnosticoSobral}</p>
             </div>
@@ -193,7 +197,7 @@ export function MapaJornada({
           </dl>
 
           <div className={styles.assistenteAcao}>
-            <p>Próximo passo da operação</p>
+            <p>Próxima ação recomendada</p>
             <strong>{plano.proximoPasso.titulo}</strong>
             <span>{plano.proximoPasso.detalhe}</span>
             <Link href={plano.proximoPasso.destino} className={styles.botaoPrimario}>
@@ -233,7 +237,7 @@ export function MapaJornada({
         </article>
 
         <aside className={styles.hoje}>
-          <h2>Agora na operação</h2>
+          <h2>Fila de hoje</h2>
           <div className={styles.agenda}>
             <Link href={plano.proximoPasso.destino} className={styles.agendaItem}>
               <span className={styles.agendaIcone} aria-hidden="true">

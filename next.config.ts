@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  /* O preview local abre pelo navegador embutido em 127.0.0.1. Sem esta origem,
+     o Next bloqueia os chunks de hidratação: a tela aparece, mas os controles
+     não respondem durante a validação visual. */
+  allowedDevOrigins: ['127.0.0.1'],
   /* A rota monta o PDF no servidor e lê estas fontes por caminho absoluto. O
      tracing precisa levá-las para a função da Vercel; sem isto funciona local e
      cai silenciosamente para outra tipografia em produção. */
