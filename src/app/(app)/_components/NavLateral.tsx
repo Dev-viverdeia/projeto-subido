@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
@@ -28,6 +28,7 @@ export function NavLateral({
 }) {
   const caminho = usePathname();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [destinoPendente, setDestinoPendente] = useState<string | null>(null);
   const tituloMenuId = useId();
   const painelMenuId = useId();
   const botaoMaisRef = useRef<HTMLButtonElement>(null);
@@ -83,11 +84,26 @@ export function NavLateral({
     if (devolverFoco) requestAnimationFrame(() => botaoMaisRef.current?.focus());
   }
 
+  function iniciarNavegacao(evento: ReactMouseEvent<HTMLAnchorElement>, item: ItemNav) {
+    if (
+      evento.button !== 0 ||
+      evento.metaKey ||
+      evento.ctrlKey ||
+      evento.shiftKey ||
+      evento.altKey ||
+      estaAtivo(item)
+    ) {
+      return;
+    }
+    setDestinoPendente(item.href);
+  }
+
   function renderizarItens(lista: ItemNav[]) {
     return (
       <ul className={styles.lista}>
         {lista.map((item) => {
           const ativo = estaAtivo(item);
+          const carregando = destinoPendente === item.href && !ativo;
 
           return (
             <li key={item.href}>
@@ -95,6 +111,9 @@ export function NavLateral({
                 href={item.href}
                 className={styles.item}
                 aria-current={ativo ? 'page' : undefined}
+                aria-busy={carregando || undefined}
+                data-loading={carregando || undefined}
+                onClick={(evento) => iniciarNavegacao(evento, item)}
               >
                 {ativo && (
                   <span className={variante === 'dock' ? styles.marcaDock : styles.pilula} />
@@ -103,6 +122,7 @@ export function NavLateral({
                   {item.icone}
                 </span>
                 <span className={styles.rotulo}>{item.rotulo}</span>
+                {carregando && <span className="sr-only">Carregando {item.rotulo}</span>}
               </Link>
             </li>
           );
@@ -160,20 +180,27 @@ export function NavLateral({
                       <div className={styles.gradeMenu}>
                         {itensDoGrupo.map((item) => {
                           const ativo = estaAtivo(item);
+                          const carregando = destinoPendente === item.href && !ativo;
 
                           return (
                             <Link
                               href={item.href}
                               className={styles.itemMenu}
                               aria-current={ativo ? 'page' : undefined}
+                              aria-busy={carregando || undefined}
+                              data-loading={carregando || undefined}
                               key={item.href}
-                              onClick={() => fecharMenu()}
+                              onClick={(evento) => {
+                                iniciarNavegacao(evento, item);
+                                fecharMenu();
+                              }}
                             >
                               <span className={styles.iconeMenu} aria-hidden="true">
                                 {item.icone}
                               </span>
                               <span>{item.rotulo}</span>
                               {ativo && <small>Você está aqui</small>}
+                              {carregando && <small>Carregando…</small>}
                             </Link>
                           );
                         })}
@@ -189,6 +216,7 @@ export function NavLateral({
         <ul className={`${styles.lista} ${styles.listaDock}`}>
           {itensPrioritarios.map((item) => {
             const ativo = estaAtivo(item);
+            const carregando = destinoPendente === item.href && !ativo;
 
             return (
               <li key={item.href}>
@@ -196,12 +224,16 @@ export function NavLateral({
                   href={item.href}
                   className={styles.item}
                   aria-current={ativo ? 'page' : undefined}
+                  aria-busy={carregando || undefined}
+                  data-loading={carregando || undefined}
+                  onClick={(evento) => iniciarNavegacao(evento, item)}
                 >
                   {ativo && <span className={styles.marcaDock} />}
                   <span className={styles.icone} aria-hidden="true">
                     {item.icone}
                   </span>
                   <span className={styles.rotulo}>{item.rotulo}</span>
+                  {carregando && <span className="sr-only">Carregando {item.rotulo}</span>}
                 </Link>
               </li>
             );

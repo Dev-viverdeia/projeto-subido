@@ -1,6 +1,6 @@
 .estado {
   width: min(100%, 900px);
-  min-height: 440px;
+  min-height: 500px;
   margin: clamp(24px, 8vh, 100px) auto;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -45,8 +45,101 @@
   text-wrap: balance;
 }
 
-.estado div > span {
+.descricao {
+  display: block;
+  max-width: 62ch;
   color: var(--via-text-muted);
+}
+
+.etapas {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  margin: var(--via-space-8) 0 0;
+  padding: var(--via-space-4) 0 0;
+  border-top: 1px solid var(--via-border-hairline);
+  list-style: none;
+}
+
+.etapas::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 34%;
+  height: 2px;
+  border-radius: var(--app-radius-track);
+  background: var(--via-accent-ink);
+  animation: progresso 1.8s var(--via-ease) infinite;
+}
+
+.etapas li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-2);
+  color: var(--via-text-faint);
+}
+
+.etapas li > span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: 50%;
+  background: var(--via-bg);
+  color: inherit;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.etapas li div {
+  display: grid;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.etapas strong {
+  color: inherit;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.etapas small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
+}
+
+.etapas li[data-situacao='atual'] {
+  color: var(--via-text-primary);
+}
+
+.etapas li[data-situacao='atual'] > span {
+  border-color: var(--via-accent-hairline);
+  background: var(--via-accent-soft);
+  color: var(--via-accent-ink);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--via-accent) 8%, transparent);
+}
+
+.etapas li[data-situacao='concluida'] {
+  color: var(--via-accent-ink);
+}
+
+@keyframes progresso {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scaleX(0.45);
+    transform-origin: left;
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 .estado button {
@@ -83,10 +176,15 @@
   .estado button {
     width: fit-content;
   }
+
+  .etapas {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .icone svg {
+  .icone svg,
+  .etapas::before {
     animation: none;
   }
 }

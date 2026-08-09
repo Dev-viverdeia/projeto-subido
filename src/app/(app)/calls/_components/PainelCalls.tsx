@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL, callPodeAbrir } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
-import type { OportunidadeCrm } from '@/lib/crm/queries';
+import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import { AcoesSala } from './AcoesSala';
 import { FormularioAgendarCall } from './FormularioAgendarCall';
 import styles from '../pagina.module.css';
@@ -40,7 +40,7 @@ export function PainelCalls({
   modalInicial = false,
 }: {
   reunioes: ReuniaoCall[];
-  oportunidades: OportunidadeCrm[];
+  oportunidades: OportunidadeSeletor[];
   agendada?: boolean;
   modalInicial?: boolean;
 }) {
@@ -195,18 +195,23 @@ export function PainelCalls({
             <i />
             <i />
           </div>
-          <p>Durante a call</p>
-          <h2 id="live-coach-titulo">Live Coach</h2>
+          <p>{ativas.length ? 'Durante a call' : 'Prévia guiada'}</p>
+          <h2 id="live-coach-titulo">{ativas.length ? 'Live Coach' : 'Como o Live Coach ajuda'}</h2>
           <p>
-            A conversa é transcrita enquanto acontece. O agente identifica sinais e recomenda a
-            melhor próxima pergunta sem tirar você da reunião.
+            {ativas.length
+              ? 'A conversa é transcrita enquanto acontece. O agente identifica sinais e recomenda a melhor próxima pergunta sem tirar você da reunião.'
+              : 'Ao abrir sua primeira sala, a conversa será transcrita e estas sugestões serão atualizadas com o contexto real da reunião.'}
           </p>
           <ul>
             <li>Investigar uma dor ainda superficial</li>
             <li>Confirmar impacto antes de apresentar solução</li>
             <li>Tratar objeção com contexto da própria conversa</li>
           </ul>
-          <span className={styles.estadoCoach}>Operacional · privado para o anfitrião</span>
+          <span className={styles.estadoCoach}>
+            {ativas.length
+              ? 'Operacional · privado para o anfitrião'
+              : 'Exemplo · nada está sendo analisado agora'}
+          </span>
         </aside>
       </div>
 

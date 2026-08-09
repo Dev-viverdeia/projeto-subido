@@ -130,7 +130,7 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
       </aside>
       <main id="conteudo" className={styles.conteudo}>
         <PainelCalls
-          reunioes={REUNIOES}
+          reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
           oportunidades={OPORTUNIDADES}
           modalInicial={parametros.modal === '1'}
         />

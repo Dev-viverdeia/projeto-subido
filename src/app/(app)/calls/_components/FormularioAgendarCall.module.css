@@ -81,6 +81,11 @@
   border-color: var(--via-border);
 }
 
+.fechar:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 .formulario {
   display: grid;
   gap: var(--via-space-4);
@@ -195,7 +200,21 @@
   }
 
   .acoes {
+    position: sticky;
+    bottom: calc(-1 * var(--via-space-5));
+    z-index: 2;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    margin: var(--via-space-1) calc(-1 * var(--via-space-4)) calc(-1 * var(--via-space-5));
+    padding: var(--via-space-4);
+    border-top: 1px solid var(--via-border-hairline);
+    background: color-mix(in srgb, var(--via-surface) 92%, transparent);
+    backdrop-filter: blur(18px);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .acoes {
+    background: var(--via-surface);
   }
 }

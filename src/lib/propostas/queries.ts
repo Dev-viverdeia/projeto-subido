@@ -2,7 +2,7 @@ import 'server-only';
 
 import { cache } from 'react';
 import { listarSolucoes, type SolucaoResumo } from '@/lib/conteudo/queries';
-import { listarPipeline, type OportunidadeCrm } from '@/lib/crm/queries';
+import { listarOportunidadesSeletor, type OportunidadeSeletor } from '@/lib/crm/queries';
 import { listarSolucoesDoBuilder, type ItemHistorico } from '@/lib/builder/queries';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
@@ -32,7 +32,7 @@ export type PropostaCompleta = ResumoProposta & {
 };
 
 export type OpcoesNovaProposta = {
-  oportunidades: OportunidadeCrm[];
+  oportunidades: OportunidadeSeletor[];
   projetos: SolucaoResumo[];
   projetosEstudio: ItemHistorico[];
 };
@@ -101,7 +101,7 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
 
 export async function listarOpcoesNovaProposta(): Promise<OpcoesNovaProposta> {
   const [oportunidades, projetos, projetosEstudio] = await Promise.all([
-    listarPipeline(),
+    listarOportunidadesSeletor(),
     listarSolucoes(),
     listarSolucoesDoBuilder(),
   ]);

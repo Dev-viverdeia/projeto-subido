@@ -8,12 +8,13 @@ import { criarLead, type EstadoNovoLead } from '@/lib/crm/actions';
 import styles from './FormularioNovoLead.module.css';
 
 const INICIAL: EstadoNovoLead = {};
+type CampoNovoLead = 'empresa' | 'contato' | 'email' | 'titulo';
 
 function BotaoAdicionar() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" variant="primary" loading={pending}>
-      Adicionar ao pipeline
+      {pending ? 'Adicionando lead…' : 'Adicionar ao pipeline'}
     </Button>
   );
 }
@@ -22,12 +23,30 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(abertoInicial);
+  const [errosOcultos, setErrosOcultos] = useState<Set<CampoNovoLead>>(new Set());
   const [estado, acao] = useActionState(criarLead, INICIAL);
 
   useEffect(() => {
     if (!aberto) return;
     painel.current?.querySelector<HTMLElement>('input')?.focus();
   }, [aberto]);
+
+  useEffect(() => {
+    if (!aberto || !estado.porCampo) return;
+    const quadro = window.requestAnimationFrame(() => {
+      painel.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+    });
+    return () => window.cancelAnimationFrame(quadro);
+  }, [aberto, estado]);
+
+  function ocultarErro(campo: CampoNovoLead) {
+    if (!estado.porCampo?.[campo]) return;
+    setErrosOcultos((atuais) => new Set(atuais).add(campo));
+  }
+
+  function erroVisivel(campo: CampoNovoLead) {
+    return errosOcultos.has(campo) ? undefined : estado.porCampo?.[campo];
+  }
 
   function fechar() {
     setAberto(false);
@@ -99,11 +118,18 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
                 </button>
               </header>
 
-              <form action={acao} className={styles.formulario} noValidate>
+              <form
+                action={acao}
+                className={styles.formulario}
+                noValidate
+                onSubmit={() => setErrosOcultos(new Set())}
+              >
                 {estado.erro && (
-                  <Alert tone="danger" size="compact">
-                    {estado.erro}
-                  </Alert>
+                  <div role="alert">
+                    <Alert tone="danger" size="compact">
+                      {estado.erro}
+                    </Alert>
+                  </div>
                 )}
 
                 <Input
@@ -113,7 +139,8 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
                   placeholder="Ex.: Clínica Aurora"
                   autoComplete="organization"
                   defaultValue={estado.campos?.empresa ?? ''}
-                  error={estado.porCampo?.empresa}
+                  error={erroVisivel('empresa')}
+                  onChange={() => ocultarErro('empresa')}
                   required
                 />
                 <Input
@@ -123,7 +150,8 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
                   placeholder="Nome da pessoa"
                   autoComplete="name"
                   defaultValue={estado.campos?.contato ?? ''}
-                  error={estado.porCampo?.contato}
+                  error={erroVisivel('contato')}
+                  onChange={() => ocultarErro('contato')}
                   required
                 />
                 <Input
@@ -134,7 +162,8 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
                   hint="Opcional por enquanto. Você pode enriquecer depois."
                   autoComplete="email"
                   defaultValue={estado.campos?.email ?? ''}
-                  error={estado.porCampo?.email}
+                  error={erroVisivel('email')}
+                  onChange={() => ocultarErro('email')}
                 />
                 <Input
                   id="crm-titulo"
@@ -143,7 +172,8 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
                   hint="Se deixar vazio, criamos um título com o nome da empresa."
                   placeholder="Ex.: Automação do atendimento"
                   defaultValue={estado.campos?.titulo ?? ''}
-                  error={estado.porCampo?.titulo}
+                  error={erroVisivel('titulo')}
+                  onChange={() => ocultarErro('titulo')}
                 />
 
                 <div className={styles.acoes}>

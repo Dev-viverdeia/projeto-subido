@@ -58,24 +58,48 @@ export function ExecutorDiagnostico({
   }, [router, status]);
 
   const ativo = status === 'na_fila' || status === 'processando' || executando;
+  const etapaAtual = status === 'processando' ? 2 : 1;
 
   return (
-    <section className={styles.estado} aria-live="polite">
+    <section className={styles.estado} aria-live="polite" aria-busy={ativo}>
       <span className={styles.icone} aria-hidden="true">
         {ativo ? <LoaderCircle size={26} /> : <ScanSearch size={26} />}
       </span>
-      <div>
+      <div className={styles.conteudo}>
         <p>{ativo ? 'Leitura em andamento' : 'A análise precisa de uma nova tentativa'}</p>
         <h1>
           {ativo
             ? 'Estamos separando evidências, lacunas e oportunidades.'
             : 'O relatório ainda não ficou pronto.'}
         </h1>
-        <span>
+        <span className={styles.descricao}>
           {ativo
             ? 'Você pode sair desta página. O diagnóstico continua e ficará salvo aqui.'
             : (erro ?? 'Revise as fontes ou tente processar novamente.')}
         </span>
+
+        {ativo && (
+          <ol className={styles.etapas} aria-label="Etapas do diagnóstico">
+            {[
+              ['Preparar fontes', 'Organizando CRM, cenário e páginas públicas'],
+              ['Ler evidências', 'Separando fatos observados de hipóteses'],
+              ['Montar laudo', 'Criando correções e a próxima ação comercial'],
+            ].map(([titulo, detalhe], indice) => {
+              const numero = indice + 1;
+              const situacao =
+                numero < etapaAtual ? 'concluida' : numero === etapaAtual ? 'atual' : 'pendente';
+              return (
+                <li data-situacao={situacao} key={titulo}>
+                  <span>{String(numero).padStart(2, '0')}</span>
+                  <div>
+                    <strong>{titulo}</strong>
+                    <small>{detalhe}</small>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </div>
       {!ativo && (
         <button type="button" onClick={() => void executar()}>

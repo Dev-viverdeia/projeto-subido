@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
-import { listarPipeline } from '@/lib/crm/queries';
+import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
@@ -117,7 +117,7 @@ export const listarReunioes = cache(async (): Promise<ReuniaoCall[]> => {
       )
       .order('agendada_para', { ascending: true })
       .limit(200),
-    listarPipeline(),
+    listarOportunidadesSeletor(),
   ]);
 
   if (reunioes.error) throw handleError(reunioes.error, 'calls:listar');

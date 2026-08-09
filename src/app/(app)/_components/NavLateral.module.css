@@ -18,6 +18,28 @@
     transform var(--app-t-touch);
 }
 
+.item[data-loading='true'] {
+  color: var(--via-text-primary);
+  background: var(--via-navy-04);
+}
+
+.item[data-loading='true']::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  right: var(--via-space-3);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--via-accent-ink);
+  box-shadow: 0 0 0 4px var(--via-accent-soft);
+  animation: destino-pendente 900ms var(--via-ease) infinite;
+}
+
+.item[data-loading='true'] .icone {
+  color: var(--via-navy);
+}
+
 .icone,
 .rotulo {
   position: relative;
@@ -167,6 +189,13 @@
   text-align: center;
 }
 
+.dock .item[data-loading='true']::after {
+  top: 8px;
+  right: calc(50% - 18px);
+  width: 5px;
+  height: 5px;
+}
+
 .botaoMais {
   width: 100%;
   border: 0;
@@ -245,6 +274,18 @@
     var(--via-surface);
   box-shadow: 0 -28px 70px -30px var(--via-navy-40);
   animation: revelarPainel 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.itemMenu[data-loading='true'] {
+  border-color: var(--via-accent-hairline);
+  background: var(--via-accent-soft);
+}
+
+@keyframes destino-pendente {
+  50% {
+    opacity: 0.38;
+    transform: scale(0.72);
+  }
 }
 
 .cabecalhoMenu {
@@ -453,7 +494,8 @@
   }
 
   .fundoMenu,
-  .painelMenu {
+  .painelMenu,
+  .item[data-loading='true']::after {
     animation: none;
   }
 }

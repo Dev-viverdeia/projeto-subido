@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
-import { listarPipeline, type OportunidadeCrm } from '@/lib/crm/queries';
+import { listarOportunidadesSeletor, type OportunidadeSeletor } from '@/lib/crm/queries';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Enums } from '@/lib/supabase/types.generated';
@@ -41,40 +41,37 @@ export type DiagnosticoCompleto = ResumoDiagnostico & {
   proximaAcaoAtual: string | null;
 };
 
-export async function listarOpcoesDiagnostico(): Promise<OportunidadeCrm[]> {
-  const pipeline = await listarPipeline();
+export async function listarOpcoesDiagnostico(): Promise<OportunidadeSeletor[]> {
+  const pipeline = await listarOportunidadesSeletor();
   return pipeline.filter((item) => item.etapa !== 'ganho' && item.etapa !== 'perdido');
 }
 
 export const listarDiagnosticos = cache(async (): Promise<ResumoDiagnostico[]> => {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('diagnosticos_atendimento')
-    .select(
-      'id, status, canal, nota_geral, solicitado_em, concluido_em, empresa_id, oportunidade_id',
-    )
-    .order('solicitado_em', { ascending: false })
-    .limit(100);
-  if (error) throw handleError(error, 'diagnosticos:listar');
-  if (!data?.length) return [];
-
-  const empresasIds = [...new Set(data.map((item) => item.empresa_id))];
-  const oportunidadesIds = [...new Set(data.map((item) => item.oportunidade_id))];
-  const [empresas, oportunidades] = await Promise.all([
-    supabase.from('crm_empresas').select('id, nome').in('id', empresasIds),
-    supabase.from('crm_oportunidades').select('id, titulo').in('id', oportunidadesIds),
+  const [diagnosticos, empresas, oportunidades] = await Promise.all([
+    supabase
+      .from('diagnosticos_atendimento')
+      .select(
+        'id, status, canal, nota_geral, solicitado_em, concluido_em, empresa_id, oportunidade_id',
+      )
+      .order('solicitado_em', { ascending: false })
+      .limit(100),
+    supabase.from('crm_empresas').select('id, nome').limit(500),
+    supabase.from('crm_oportunidades').select('id, titulo').limit(500),
   ]);
+  if (diagnosticos.error) throw handleError(diagnosticos.error, 'diagnosticos:listar');
   if (empresas.error) throw handleError(empresas.error, 'diagnosticos:listar-empresas');
   if (oportunidades.error) {
     throw handleError(oportunidades.error, 'diagnosticos:listar-oportunidades');
   }
+  if (!diagnosticos.data?.length) return [];
 
   const empresaPorId = new Map((empresas.data ?? []).map((item) => [item.id, item.nome]));
   const oportunidadePorId = new Map(
     (oportunidades.data ?? []).map((item) => [item.id, item.titulo]),
   );
 
-  return data.map((item) => ({
+  return diagnosticos.data.map((item) => ({
     id: item.id,
     status: item.status,
     canal: item.canal,

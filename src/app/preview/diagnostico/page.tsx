@@ -11,6 +11,7 @@ import {
   ScanSearch,
   Video,
 } from 'lucide-react';
+import { ExecutorDiagnostico } from '@/app/(app)/diagnosticos/_components/ExecutorDiagnostico';
 import { PainelRelatorio } from '@/app/(app)/diagnosticos/_components/PainelRelatorio';
 import type { DiagnosticoCompleto } from '@/lib/diagnosticos/queries';
 import { RelatorioDiagnosticoSchema } from '@/lib/diagnosticos/schema';
@@ -222,8 +223,12 @@ const DIAGNOSTICO: DiagnosticoCompleto = {
   erro: null,
 };
 
-export default function PreviewDiagnosticoPage() {
+export default async function PreviewDiagnosticoPage({
+  searchParams,
+}: PageProps<'/preview/diagnostico'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
+  const emAndamento = parametros.estado === 'processando';
 
   return (
     <div className={shell.shell}>
@@ -262,7 +267,11 @@ export default function PreviewDiagnosticoPage() {
         </nav>
       </aside>
       <main id="conteudo" className={`${shell.conteudo} ${styles.conteudo}`}>
-        <PainelRelatorio diagnostico={DIAGNOSTICO} />
+        {emAndamento ? (
+          <ExecutorDiagnostico id={DIAGNOSTICO.id} status="na_fila" automatico={false} />
+        ) : (
+          <PainelRelatorio diagnostico={DIAGNOSTICO} />
+        )}
       </main>
     </div>
   );

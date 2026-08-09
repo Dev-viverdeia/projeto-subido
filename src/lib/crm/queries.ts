@@ -37,6 +37,51 @@ export type OportunidadeCrm = {
 };
 
 /**
+ * Recorte leve para seletores que só precisam identificar a oportunidade.
+ *
+ * Calls, diagnósticos e propostas não precisam carregar eventos e análises de
+ * enriquecimento para abrir um formulário. Manter essa leitura separada evita
+ * duas consultas e reduz o tempo até a primeira interação nessas rotas.
+ */
+export type OportunidadeSeletor = Pick<
+  OportunidadeCrm,
+  'id' | 'titulo' | 'etapa' | 'empresa' | 'dominio' | 'contato'
+>;
+
+export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSeletor[]> => {
+  const supabase = await createClient();
+  const [oportunidades, empresas, contatos] = await Promise.all([
+    supabase
+      .from('crm_oportunidades')
+      .select('id, titulo, etapa, empresa_id, contato_principal_id, ordem')
+      .order('ordem', { ascending: false })
+      .limit(300),
+    supabase.from('crm_empresas').select('id, nome, dominio').limit(500),
+    supabase.from('crm_contatos').select('id, nome').limit(800),
+  ]);
+
+  if (oportunidades.error) {
+    throw handleError(oportunidades.error, 'crm:seletor-oportunidades');
+  }
+  if (empresas.error) throw handleError(empresas.error, 'crm:seletor-empresas');
+  if (contatos.error) throw handleError(contatos.error, 'crm:seletor-contatos');
+
+  const empresaPorId = new Map((empresas.data ?? []).map((empresa) => [empresa.id, empresa]));
+  const contatoPorId = new Map((contatos.data ?? []).map((contato) => [contato.id, contato.nome]));
+
+  return (oportunidades.data ?? []).map((oportunidade) => ({
+    id: oportunidade.id,
+    titulo: oportunidade.titulo,
+    etapa: oportunidade.etapa,
+    empresa: empresaPorId.get(oportunidade.empresa_id)?.nome ?? 'Empresa não encontrada',
+    dominio: empresaPorId.get(oportunidade.empresa_id)?.dominio ?? null,
+    contato: oportunidade.contato_principal_id
+      ? (contatoPorId.get(oportunidade.contato_principal_id) ?? null)
+      : null,
+  }));
+});
+
+/**
  * Pipeline privado do profissional.
  *
  * As quatro leituras viajam em paralelo. Elas ficam separadas em vez de um join

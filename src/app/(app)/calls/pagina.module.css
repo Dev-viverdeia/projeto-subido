@@ -311,8 +311,8 @@
   display: grid;
   justify-items: start;
   gap: var(--via-space-4);
-  min-height: 310px;
-  padding: var(--via-space-10) var(--via-space-6);
+  min-height: 260px;
+  padding: var(--via-space-7) var(--via-space-6);
 }
 
 .pulsoVazio {
