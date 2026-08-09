@@ -39,11 +39,24 @@ export function estadoDe(
 }
 
 const DIA_MS = 86_400_000;
+export const FUSO_MENTORIAS = 'America/Sao_Paulo';
 
-function inicioDoDia(d: Date): number {
-  const zerado = new Date(d);
-  zerado.setHours(0, 0, 0, 0);
-  return zerado.getTime();
+export function partesDoDia(data: Date | string): { ano: number; mes: number; dia: number } {
+  const valor = typeof data === 'string' ? new Date(data) : data;
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: FUSO_MENTORIAS,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(valor);
+  const numero = (tipo: Intl.DateTimeFormatPartTypes) =>
+    Number(partes.find((parte) => parte.type === tipo)?.value ?? 0);
+  return { ano: numero('year'), mes: numero('month'), dia: numero('day') };
+}
+
+function indiceDoDia(d: Date): number {
+  const { ano, mes, dia } = partesDoDia(d);
+  return Date.UTC(ano, mes - 1, dia);
 }
 
 export type RotuloDia = {
@@ -55,9 +68,12 @@ export type RotuloDia = {
 
 export function rotuloDoDia(dataIso: string, agora: Date): RotuloDia {
   const data = new Date(dataIso);
-  const dias = Math.round((inicioDoDia(data) - inicioDoDia(agora)) / DIA_MS);
+  const dias = Math.round((indiceDoDia(data) - indiceDoDia(agora)) / DIA_MS);
 
-  const semana = data.toLocaleDateString('pt-BR', { weekday: 'long' });
+  const semana = data.toLocaleDateString('pt-BR', {
+    timeZone: FUSO_MENTORIAS,
+    weekday: 'long',
+  });
   const principal =
     dias === 0 ? 'Hoje' : dias === 1 ? 'Amanhã' : semana.charAt(0).toUpperCase() + semana.slice(1);
 
@@ -65,7 +81,12 @@ export function rotuloDoDia(dataIso: string, agora: Date): RotuloDia {
      " · " e produzia "TER · 28 · DE · JUL" — o "de" virava um campo. Tira o "de"
      primeiro; só a vírgula vira separador. */
   const curto = data
-    .toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })
+    .toLocaleDateString('pt-BR', {
+      timeZone: FUSO_MENTORIAS,
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
     .replace(/\./g, '')
     .replace(/\s+de\s+/g, ' ')
     .toUpperCase()
@@ -75,12 +96,16 @@ export function rotuloDoDia(dataIso: string, agora: Date): RotuloDia {
 }
 
 export function chaveDoDia(dataIso: string): string {
-  const d = new Date(dataIso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const { ano, mes, dia } = partesDoDia(dataIso);
+  return `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 }
 
 export function horaCurta(dataIso: string): string {
-  return new Date(dataIso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return new Date(dataIso).toLocaleTimeString('pt-BR', {
+    timeZone: FUSO_MENTORIAS,
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export function duracaoMin(sessao: SessaoMentoria): number {

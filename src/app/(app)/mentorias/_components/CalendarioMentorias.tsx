@@ -6,7 +6,7 @@ import { RetratoMentor } from '../../_components/RetratoMentor';
 import type { TrilhaMentor } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
-import { chaveDoDia, horaCurta } from './estadoMentoria';
+import { chaveDoDia, FUSO_MENTORIAS, horaCurta, partesDoDia } from './estadoMentoria';
 import styles from './CalendarioMentorias.module.css';
 
 const SEMANA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
@@ -15,17 +15,23 @@ type Celula = { chave: string; dia: number; iso: string; doMes: boolean; hoje: b
 
 /** Seis semanas SEMPRE — cinco faria a grade mudar de altura ao trocar de mês. */
 function montarGrade(ano: number, mes: number, agora: Date): Celula[] {
-  const primeiro = new Date(ano, mes, 1);
+  const primeiro = new Date(Date.UTC(ano, mes, 1, 12));
   const inicio = new Date(primeiro);
-  inicio.setDate(1 - primeiro.getDay());
+  inicio.setUTCDate(1 - primeiro.getUTCDay());
   const chaveHoje = chaveDoDia(agora.toISOString());
 
   return Array.from({ length: 42 }, (_, i) => {
     const d = new Date(inicio);
-    d.setDate(inicio.getDate() + i);
+    d.setUTCDate(inicio.getUTCDate() + i);
     const iso = d.toISOString();
     const chave = chaveDoDia(iso);
-    return { chave, dia: d.getDate(), iso, doMes: d.getMonth() === mes, hoje: chave === chaveHoje };
+    return {
+      chave,
+      dia: d.getUTCDate(),
+      iso,
+      doMes: d.getUTCMonth() === mes,
+      hoje: chave === chaveHoje,
+    };
   });
 }
 
@@ -74,7 +80,8 @@ export function CalendarioMentorias({
   estadoDaSessao: (s: SessaoMentoria) => EstadoMentoria;
   aoAbrirDetalhe: (id: string) => void;
 }) {
-  const [ref, setRef] = useState({ ano: agora.getFullYear(), mes: agora.getMonth() });
+  const hoje = partesDoDia(agora);
+  const [ref, setRef] = useState({ ano: hoje.ano, mes: hoje.mes - 1 });
   const [selecionado, setSelecionado] = useState<string>(chaveDoDia(agora.toISOString()));
 
   const porDia = useMemo(() => {
@@ -89,7 +96,8 @@ export function CalendarioMentorias({
 
   const grade = useMemo(() => montarGrade(ref.ano, ref.mes, agora), [ref, agora]);
 
-  const nomeMes = new Date(ref.ano, ref.mes, 1).toLocaleDateString('pt-BR', {
+  const nomeMes = new Date(Date.UTC(ref.ano, ref.mes, 1, 12)).toLocaleDateString('pt-BR', {
+    timeZone: FUSO_MENTORIAS,
     month: 'long',
     year: 'numeric',
   });
@@ -103,14 +111,12 @@ export function CalendarioMentorias({
      diferença entre "não tem nada" e "não tem aqui, tem ali". */
   const proximaDepois = useMemo(() => {
     if (doDia.length > 0 || !dataSelecionada) return null;
-    const limite = new Date(dataSelecionada.iso);
-    limite.setHours(23, 59, 59, 999);
     return (
       sessoes
-        .filter((s) => new Date(s.inicioIso).getTime() > limite.getTime())
+        .filter((s) => chaveDoDia(s.inicioIso) > selecionado)
         .sort((a, b) => a.inicioIso.localeCompare(b.inicioIso))[0] ?? null
     );
-  }, [doDia, dataSelecionada, sessoes]);
+  }, [doDia, dataSelecionada, selecionado, sessoes]);
 
   /* Quantas sessões cada trilha tem no mês VISÍVEL. Alimenta a legenda, que
      existe porque a célula codifica a trilha em COR — e cor sem legenda é
@@ -121,8 +127,8 @@ export function CalendarioMentorias({
   const porTrilhaNoMes = useMemo(() => {
     const conta = new Map<TrilhaMentor, number>();
     for (const s of sessoes) {
-      const d = new Date(s.inicioIso);
-      if (d.getFullYear() !== ref.ano || d.getMonth() !== ref.mes) continue;
+      const d = partesDoDia(s.inicioIso);
+      if (d.ano !== ref.ano || d.mes - 1 !== ref.mes) continue;
       const t = s.mentor?.trilha;
       if (t) conta.set(t, (conta.get(t) ?? 0) + 1);
     }
@@ -130,21 +136,21 @@ export function CalendarioMentorias({
   }, [sessoes, ref]);
 
   const andar = (passo: number) => {
-    const d = new Date(ref.ano, ref.mes + passo, 1);
-    setRef({ ano: d.getFullYear(), mes: d.getMonth() });
+    const d = new Date(Date.UTC(ref.ano, ref.mes + passo, 1, 12));
+    setRef({ ano: d.getUTCFullYear(), mes: d.getUTCMonth() });
   };
 
   const voltarParaHoje = () => {
-    setRef({ ano: agora.getFullYear(), mes: agora.getMonth() });
+    setRef({ ano: hoje.ano, mes: hoje.mes - 1 });
     setSelecionado(chaveDoDia(agora.toISOString()));
   };
 
-  const noMesAtual = ref.ano === agora.getFullYear() && ref.mes === agora.getMonth();
+  const noMesAtual = ref.ano === hoje.ano && ref.mes === hoje.mes - 1;
   const dataObj = dataSelecionada ? new Date(dataSelecionada.iso) : null;
 
   const irPara = (s: SessaoMentoria) => {
-    const d = new Date(s.inicioIso);
-    setRef({ ano: d.getFullYear(), mes: d.getMonth() });
+    const d = partesDoDia(s.inicioIso);
+    setRef({ ano: d.ano, mes: d.mes - 1 });
     setSelecionado(chaveDoDia(s.inicioIso));
   };
 
@@ -263,13 +269,20 @@ export function CalendarioMentorias({
         <div className={styles.painel} aria-live="polite">
           {/* Carimbo de data: o número é o protagonista, como num calendário de mesa. */}
           <div className={styles.carimbo}>
-            <span className={styles.carimboDia}>{dataObj?.getDate()}</span>
+            <span className={styles.carimboDia}>{dataObj?.getUTCDate()}</span>
             <span className={styles.carimboTextos}>
               <span className={styles.carimboSemana}>
-                {dataObj?.toLocaleDateString('pt-BR', { weekday: 'long' })}
+                {dataObj?.toLocaleDateString('pt-BR', {
+                  timeZone: FUSO_MENTORIAS,
+                  weekday: 'long',
+                })}
               </span>
               <span className={styles.carimboMes}>
-                {dataObj?.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                {dataObj?.toLocaleDateString('pt-BR', {
+                  timeZone: FUSO_MENTORIAS,
+                  month: 'long',
+                  year: 'numeric',
+                })}
               </span>
             </span>
           </div>
@@ -295,6 +308,7 @@ export function CalendarioMentorias({
                   <span className={styles.proximaData}>
                     {new Date(proximaDepois.inicioIso)
                       .toLocaleDateString('pt-BR', {
+                        timeZone: FUSO_MENTORIAS,
                         weekday: 'short',
                         day: 'numeric',
                         month: 'short',
