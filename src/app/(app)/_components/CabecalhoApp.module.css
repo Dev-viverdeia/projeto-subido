@@ -6,12 +6,12 @@
   align-items: center;
   gap: var(--via-space-4);
   min-width: 0;
-  min-height: 68px;
+  min-height: 66px;
   padding-inline: var(--via-space-4);
   border-bottom: 1px solid var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
-  backdrop-filter: blur(26px) saturate(175%);
-  box-shadow: 0 8px 24px -24px var(--via-navy-30);
+  background: color-mix(in srgb, var(--via-surface) 84%, transparent);
+  backdrop-filter: blur(24px) saturate(155%);
+  box-shadow: 0 10px 26px -26px var(--via-navy-30);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -42,9 +42,9 @@
   margin-left: auto;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1080px) {
   .cabecalho {
-    min-height: 72px;
+    min-height: 68px;
     padding-inline: clamp(28px, 3vw, 52px);
   }
 

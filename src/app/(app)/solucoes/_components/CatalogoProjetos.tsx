@@ -28,21 +28,39 @@ export function CatalogoProjetos({
 }) {
   const progresso = useProgresso();
   const Titulo = tituloComo;
+  const totalPassos = solucoes.reduce((total, solucao) => total + solucao.etapaIds.length, 0);
 
   return (
     <div className={styles.raiz}>
       <section className={styles.abertura} data-on-dark aria-labelledby="titulo-projetos">
-        <div className={styles.aberturaTexto}>
-          <p className={styles.eyebrow}>Biblioteca de execução</p>
-          <Titulo id="titulo-projetos" className={styles.titulo}>
-            Cinco projetos.
-            <br />
-            <span>Um jeito de entregar.</span>
-          </Titulo>
-          <p className={styles.apoio}>
-            Você não recebe só a ideia. Cada projeto começa no diagnóstico e termina com uma
-            operação validada nas mãos do cliente.
-          </p>
+        <div className={styles.aberturaCorpo}>
+          <div className={styles.aberturaTexto}>
+            <p className={styles.eyebrow}>Biblioteca de execução</p>
+            <Titulo id="titulo-projetos" className={styles.titulo}>
+              Cinco projetos.
+              <br />
+              <span>Um jeito de entregar.</span>
+            </Titulo>
+            <p className={styles.apoio}>
+              Você não recebe só a ideia. Cada projeto começa no diagnóstico e termina com uma
+              operação validada nas mãos do cliente.
+            </p>
+          </div>
+
+          <dl className={styles.resumoBiblioteca} aria-label="Resumo da biblioteca">
+            <div>
+              <dt>Projetos prontos</dt>
+              <dd>{String(solucoes.length).padStart(2, '0')}</dd>
+            </div>
+            <div>
+              <dt>Passos guiados</dt>
+              <dd>{String(totalPassos).padStart(2, '0')}</dd>
+            </div>
+            <div>
+              <dt>Fases por entrega</dt>
+              <dd>{String(FASES.length).padStart(2, '0')}</dd>
+            </div>
+          </dl>
         </div>
 
         <ol className={styles.linhaEntrega} aria-label="Método dos projetos">
@@ -77,6 +95,7 @@ export function CatalogoProjetos({
                 href={`/solucoes/${solucao.slug}`}
                 className={styles.cartao}
                 data-estado={andamento ? estado : undefined}
+                data-indice={String(indice + 1).padStart(2, '0')}
               >
                 <div className={styles.cartaoTopo}>
                   <span className={styles.indice}>{String(indice + 1).padStart(2, '0')}</span>

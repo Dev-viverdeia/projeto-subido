@@ -40,12 +40,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* Antes do primeiro cadastro completo o nome pode não existir. O trecho antes do
      @ é um fallback previsível — melhor que "Usuário" e melhor que vazio. */
   const nome = nomeBruto || email.split('@')[0] || 'Sua conta';
-  const iniciais = nome
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase())
-    .join('');
 
   /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
      o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
@@ -66,31 +60,24 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <aside className={styles.sidebar}>
             <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
               <ViverDeIaLogo size="compact" produto={false} />
-              <span>Subido · Sistema operacional do profissional de IA</span>
+              <span>
+                <strong>Subido</strong>
+                <small>Sistema operacional do profissional de IA</small>
+              </span>
             </Link>
 
             <NavLateral itens={ITENS_NAV} variante="lateral" />
 
-            <div className={styles.rodapeSidebar}>
-              {admin && (
+            {admin && (
+              <div className={styles.rodapeSidebar}>
                 <NavLateral
                   itens={[ITEM_ADMIN]}
                   variante="lateral"
                   grupo="admin"
                   rotuloGrupo="Gestão"
                 />
-              )}
-
-              <Link href="/conta" className={styles.perfilSidebar}>
-                <span className={styles.avatarSidebar} aria-hidden="true">
-                  {iniciais || 'SI'}
-                </span>
-                <span className={styles.identidadeSidebar}>
-                  <strong>{nome}</strong>
-                  <small>Profissional de IA</small>
-                </span>
-              </Link>
-            </div>
+              </div>
+            )}
           </aside>
 
           <CabecalhoApp

@@ -1,6 +1,6 @@
 .bloco {
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: var(--via-surface);
@@ -217,7 +217,7 @@
 
 .decisao {
   min-width: 0;
-  min-height: 320px;
+  min-height: 240px;
   margin: 0;
   padding: clamp(28px, 4vw, 52px) clamp(24px, 4vw, 52px);
   border: 0;
@@ -431,13 +431,17 @@
 }
 
 .rodape {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
   padding: var(--via-space-4) clamp(24px, 4vw, 52px);
   border-top: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-bg-2) 72%, var(--via-surface));
+  background: var(--via-surface);
+  box-shadow: 0 -16px 34px -32px var(--via-navy-30);
 }
 
 .rodapeContexto {
@@ -530,6 +534,10 @@
 }
 
 @media (max-width: 599px) {
+  .formulario {
+    padding-bottom: 126px;
+  }
+
   .cabecalho {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-2);
@@ -607,9 +615,19 @@
   }
 
   .rodape {
+    position: fixed;
+    inset-inline: var(--via-space-4);
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
     align-items: stretch;
     flex-direction: column;
     padding: var(--via-space-4);
+    border: 1px solid var(--via-border-soft);
+    border-radius: var(--app-radius-card) var(--app-radius-card) 0 0;
+    box-shadow: var(--app-elev-3-shadow);
+  }
+
+  .rodapeContexto p {
+    display: none;
   }
 
   .acoes,

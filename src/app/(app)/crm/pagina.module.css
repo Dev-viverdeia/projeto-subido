@@ -4,14 +4,15 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-6);
+  gap: var(--via-space-7);
 }
 
 .topo {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: var(--via-space-6);
+  gap: var(--app-gap-section);
+  padding: var(--via-space-2) var(--via-space-1) 0;
 }
 
 .introducao h1,
@@ -21,18 +22,21 @@
 
 .introducao h1 {
   margin-top: var(--via-space-2);
-  font-size: clamp(2rem, 3vw, 2.75rem);
-  line-height: 1.02;
+  max-width: 15ch;
+  font-size: clamp(2.25rem, 3.8vw, 3.65rem);
+  font-weight: 540;
+  line-height: 0.98;
   letter-spacing: var(--app-ls-h1);
   text-wrap: balance;
 }
 
 .introducao > p:last-child {
-  max-width: 64ch;
-  margin-top: var(--via-space-3);
+  max-width: 54ch;
+  margin-top: var(--via-space-4);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
+  text-wrap: pretty;
 }
 
 .sobretitulo {
@@ -59,19 +63,20 @@
 .resumo {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--via-space-3);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .resumo article {
   display: flex;
   align-items: center;
-  gap: var(--via-space-3);
-  min-height: 92px;
-  padding: var(--via-space-4) var(--via-space-5);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-surface) 90%, transparent);
-  box-shadow: var(--via-shadow-xs);
+  gap: var(--via-space-4);
+  min-height: 104px;
+  padding: var(--via-space-5) var(--via-space-6);
 }
 
 .resumo article + article {
@@ -79,19 +84,18 @@
 }
 
 .resumo article:first-child {
-  border-color: var(--via-accent-hairline);
-  background: color-mix(in srgb, var(--via-accent) 6%, var(--via-surface));
+  background:
+    radial-gradient(ellipse 72% 100% at 0% 0%, var(--via-navy-08), transparent 72%),
+    var(--app-elev-1-bg);
 }
 
 .iconeResumo {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-bg);
+  width: 34px;
+  height: 34px;
   color: var(--via-accent-ink);
 }
 
@@ -102,8 +106,10 @@
 
 .resumo strong {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-h2);
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: var(--via-fw-medium);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .resumo article div span {
@@ -121,7 +127,8 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--via-space-4);
-  margin-bottom: var(--via-space-4);
+  margin-bottom: var(--via-space-5);
+  padding-inline: var(--via-space-1);
 }
 
 .quadroTopo h2,
@@ -130,7 +137,9 @@
 }
 
 .quadroTopo h2 {
-  font-size: var(--via-fs-h3);
+  font-size: var(--via-fs-h2);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
 }
 
 .quadroTopo p {
@@ -148,7 +157,7 @@
   letter-spacing: var(--app-ls-eyebrow);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .topo {
     align-items: flex-start;
     flex-direction: column;
@@ -159,11 +168,13 @@
   }
 
   .resumo article {
-    min-height: 72px;
+    min-height: 82px;
+    padding: var(--via-space-4) var(--via-space-5);
   }
 
   .resumo article + article {
-    border-left: 1px solid var(--via-border-hairline);
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
   }
 
   .quadroTopo {

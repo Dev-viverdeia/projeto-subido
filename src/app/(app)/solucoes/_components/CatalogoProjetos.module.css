@@ -1,28 +1,22 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: clamp(40px, 6vw, 76px);
+  gap: clamp(36px, 5vw, 64px);
 }
 
 .abertura {
   position: relative;
   overflow: hidden;
-  min-height: 430px;
+  min-height: 410px;
   display: grid;
   grid-template-rows: 1fr auto;
-  gap: var(--via-space-6);
+  gap: var(--via-space-7);
   padding: clamp(28px, 5vw, 64px);
-  border-radius: var(--app-radius-card);
+  border: 1px solid var(--via-navy-20);
+  border-radius: var(--app-radius-surface);
   color: var(--via-white);
-  background:
-    radial-gradient(circle at 82% 10%, rgba(255, 203, 5, 0.13), transparent 28%),
-    linear-gradient(
-      145deg,
-      var(--via-navy) 0%,
-      var(--via-navy-deep) 72%,
-      var(--via-navy-darker) 100%
-    );
-  box-shadow: 0 26px 80px -44px var(--via-navy-60);
+  background: var(--app-mesh-trilho);
+  box-shadow: var(--via-shadow-xl);
 }
 
 .abertura::after {
@@ -45,6 +39,15 @@
   z-index: 1;
   align-self: center;
   max-width: 760px;
+}
+
+.aberturaCorpo {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 260px);
+  align-items: end;
+  gap: var(--app-gap-section);
 }
 
 .eyebrow,
@@ -70,7 +73,7 @@
   margin: 0;
   max-width: 13ch;
   font-family: var(--via-font-display);
-  font-size: clamp(2.55rem, 2rem + 3vw, 5rem);
+  font-size: clamp(2.75rem, 2rem + 3vw, 4.75rem);
   line-height: 0.98;
   letter-spacing: var(--app-ls-h1);
   font-weight: 520;
@@ -78,7 +81,7 @@
 }
 
 .titulo span {
-  color: var(--via-accent);
+  color: var(--via-gray-300);
 }
 
 .apoio {
@@ -86,8 +89,47 @@
   max-width: 56ch;
   font-size: var(--via-fs-h4);
   line-height: var(--via-lh-normal);
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--via-gray-300);
   text-wrap: pretty;
+}
+
+.resumoBiblioteca {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-block: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.resumoBiblioteca div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  padding-block: var(--via-space-3);
+}
+
+.resumoBiblioteca div + div {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resumoBiblioteca dt,
+.resumoBiblioteca dd {
+  margin: 0;
+}
+
+.resumoBiblioteca dt {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-xs);
+}
+
+.resumoBiblioteca dd {
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
 }
 
 .linhaEntrega {
@@ -163,7 +205,7 @@
 .grade {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: var(--via-space-5);
   margin: 0;
   padding: 0;
@@ -171,9 +213,20 @@
 
 .item {
   min-width: 0;
+  grid-column: span 6;
 }
 
-.item:last-child:nth-child(odd) {
+.item:nth-child(1),
+.item:nth-child(4) {
+  grid-column: span 7;
+}
+
+.item:nth-child(2),
+.item:nth-child(3) {
+  grid-column: span 5;
+}
+
+.item:nth-child(5) {
   grid-column: 1 / -1;
 }
 
@@ -182,7 +235,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 390px;
+  min-height: 350px;
   height: 100%;
   padding: clamp(22px, 3vw, 34px);
   border: 1px solid var(--app-elev-1-line);
@@ -197,6 +250,20 @@
     box-shadow var(--app-t-touch);
 }
 
+.cartao::before {
+  content: attr(data-indice);
+  position: absolute;
+  top: var(--via-space-4);
+  right: var(--via-space-5);
+  color: var(--via-navy-05);
+  font-family: var(--via-font-mono);
+  font-size: clamp(4.5rem, 8vw, 7rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 0.8;
+  letter-spacing: var(--app-ls-display);
+  pointer-events: none;
+}
+
 .cartao:hover {
   transform: translateY(-4px);
   border-color: var(--app-elev-2-line);
@@ -209,6 +276,8 @@
 }
 
 .cartaoTopo {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
@@ -237,6 +306,8 @@
 }
 
 .cartaoCorpo {
+  position: relative;
+  z-index: 1;
   flex: 1;
   padding-block: clamp(30px, 5vw, 56px);
 }
@@ -263,6 +334,8 @@
 }
 
 .miniLinha {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   padding-block: var(--via-space-4);
@@ -322,6 +395,8 @@
 }
 
 .rodape {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -386,16 +461,38 @@
     min-height: 390px;
   }
 
-  .grade {
+  .aberturaCorpo {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .item:last-child:nth-child(odd) {
-    grid-column: auto;
+  .resumoBiblioteca {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .resumoBiblioteca div {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: var(--via-space-1);
+    padding: var(--via-space-3);
+  }
+
+  .resumoBiblioteca div + div {
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .item,
+  .item:nth-child(1),
+  .item:nth-child(2),
+  .item:nth-child(3),
+  .item:nth-child(4),
+  .item:nth-child(5) {
+    grid-column: 1 / -1;
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: 599px) {
   .abertura {
     min-height: 0;
     padding: var(--via-space-5);
@@ -417,22 +514,22 @@
   }
 
   .linhaEntrega {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    border-top: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-left: 0;
   }
 
   .linhaEntrega li {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--via-space-3);
-    padding: 0 0 var(--via-space-3) var(--via-space-4);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--via-space-1);
+    padding: var(--via-space-3) var(--via-space-1) 0 0;
+    font-size: 0.625rem;
   }
 
   .linhaEntrega li::before {
-    top: 6px;
-    left: -4px;
+    top: -4px;
+    left: 0;
   }
 
   .introducao {

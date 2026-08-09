@@ -3,8 +3,8 @@
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse 70% 42% at 15% 0%, var(--via-navy-05), transparent 62%),
-    radial-gradient(ellipse 55% 45% at 100% 100%, var(--via-navy-03), transparent 68%),
+    radial-gradient(ellipse 62% 34% at 8% 0%, var(--via-navy-05), transparent 66%),
+    radial-gradient(ellipse 44% 36% at 100% 92%, var(--via-navy-03), transparent 72%),
     var(--via-bg-2);
 }
 
@@ -14,13 +14,13 @@
 
 .conteudo {
   min-width: 0;
-  padding: var(--via-space-6) var(--via-space-4);
+  padding: var(--via-space-5) var(--via-space-4);
   padding-bottom: calc(var(--via-space-20) + env(safe-area-inset-bottom, 0px));
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1080px) {
   .shell {
-    grid-template-columns: 252px minmax(0, 1fr);
+    grid-template-columns: 232px minmax(0, 1fr);
   }
 
   .sidebar {
@@ -30,15 +30,15 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--via-space-5);
+    gap: var(--via-space-4);
     height: 100dvh;
-    padding: var(--via-space-6) var(--via-space-4) var(--via-space-4);
+    padding: var(--via-space-5) var(--via-space-3) var(--via-space-4);
     overflow: hidden;
     background:
-      radial-gradient(ellipse 110% 34% at 0% 0%, var(--via-navy-05), transparent 68%),
-      color-mix(in srgb, var(--via-surface) 94%, transparent);
+      radial-gradient(ellipse 118% 28% at 0% 0%, var(--via-navy-05), transparent 72%),
+      color-mix(in srgb, var(--via-surface) 96%, transparent);
     border-right: 1px solid var(--via-border-soft);
-    box-shadow: 12px 0 32px -28px var(--via-navy-30);
+    box-shadow: 14px 0 36px -34px var(--via-navy-30);
   }
 
   .rodapeSidebar {
@@ -48,7 +48,7 @@
   }
 
   .conteudo {
-    padding: var(--via-space-8) clamp(28px, 3vw, 52px) var(--via-space-16);
+    padding: var(--via-space-7) clamp(28px, 3vw, 52px) var(--via-space-16);
   }
 }
 
@@ -56,8 +56,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--via-space-3);
-  min-height: 66px;
+  gap: var(--via-space-2_5);
+  min-height: 72px;
   padding: 2px var(--via-space-2) var(--via-space-4);
   color: var(--via-text-primary);
   text-decoration: none;
@@ -65,74 +65,26 @@
 }
 
 .marcaSidebar > span:last-child {
-  max-width: 190px;
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-  line-height: 1.45;
-  letter-spacing: var(--app-ls-caption);
-}
-
-.perfilSidebar {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  min-height: 58px;
-  margin-top: var(--via-space-2);
-  padding: var(--via-space-2) var(--via-space-3);
-  border: 1px solid transparent;
-  border-radius: var(--app-radius-control);
-  color: var(--via-text-primary);
-  text-decoration: none;
-  transition:
-    background-color var(--app-t-state),
-    border-color var(--app-t-state),
-    transform var(--app-t-touch);
-}
-
-.perfilSidebar:hover {
-  background: var(--via-navy-04);
-  border-color: var(--via-border-soft);
-  transform: translateY(-1px);
-}
-
-.perfilSidebar:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
-.avatarSidebar {
   display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
+  gap: 2px;
+  max-width: 184px;
 }
 
-.identidadeSidebar {
-  min-width: 0;
-}
-
-.identidadeSidebar strong,
-.identidadeSidebar small {
+.marcaSidebar strong,
+.marcaSidebar small {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.identidadeSidebar strong {
-  font-size: var(--via-fs-caption);
+.marcaSidebar strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-label);
 }
 
-.identidadeSidebar small {
-  margin-top: 2px;
+.marcaSidebar small {
   color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
+  line-height: 1.4;
+  letter-spacing: var(--app-ls-caption);
 }
