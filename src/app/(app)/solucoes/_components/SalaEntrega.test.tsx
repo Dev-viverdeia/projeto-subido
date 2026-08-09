@@ -1,0 +1,105 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
+
+vi.mock('@/lib/projetos-execucao/actions', () => ({
+  atualizarTarefaProjeto: vi.fn(),
+  definirPrazoProjeto: vi.fn(),
+}));
+
+import { SalaEntrega } from './SalaEntrega';
+
+const DOCUMENTO: ProjetoExecucaoCompleto['documento'] = {
+  cliente: { empresa: 'Clínica Aurora', contato: null, cargo: null, email: null },
+  projeto: {
+    titulo: 'Atendimento com IA',
+    resumo: 'Uma operação de atendimento validada.',
+    origem: 'catalogo',
+  },
+  desafio: 'A clínica perde conversas fora do horário comercial.',
+  objetivo: 'Responder rapidamente e transferir com contexto para a recepção.',
+  escopo: [{ titulo: 'Agente', descricao: 'Construção e testes do atendimento.' }],
+  entregaveis: ['Agente configurado'],
+  cronograma: [{ fase: 'Construir', duracao: '1 semana', descricao: 'Configurar e testar.' }],
+  investimento: { valorCentavos: 1000000, condicoes: 'À vista.' },
+  validadeDias: 10,
+  proximosPassos: ['Kick-off'],
+  observacoes: null,
+};
+
+const PROJETO: ProjetoExecucaoCompleto = {
+  id: '11111111-1111-4111-8111-111111111111',
+  propostaId: '22222222-2222-4222-8222-222222222222',
+  oportunidadeId: '33333333-3333-4333-8333-333333333333',
+  titulo: 'Atendimento com IA',
+  empresa: 'Clínica Aurora',
+  status: 'em_execucao',
+  inicioEm: '2026-08-01T12:00:00.000Z',
+  prazoEm: null,
+  atualizadoEm: '2026-08-09T12:00:00.000Z',
+  feitas: 1,
+  total: 3,
+  proximaTarefa: 'Montar a base',
+  documento: DOCUMENTO,
+  tarefas: [
+    {
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      faseId: 'entender',
+      faseTitulo: 'Entender',
+      passoId: '1',
+      titulo: 'Mapear demanda',
+      acao: 'Leia as conversas reais.',
+      concluidoQuando: 'O mapa está pronto.',
+      entregavel: 'Mapa de demanda.',
+      ordem: 1,
+      status: 'concluida',
+      evidencia: 'Mapa aprovado.',
+      evidenciaEm: null,
+      concluidaEm: null,
+    },
+    {
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2',
+      faseId: 'preparar',
+      faseTitulo: 'Preparar',
+      passoId: '2',
+      titulo: 'Montar a base',
+      acao: 'Organize as respostas aprovadas.',
+      concluidoQuando: 'Dez respostas estão aprovadas.',
+      entregavel: 'Base versionada.',
+      ordem: 1001,
+      status: 'em_andamento',
+      evidencia: '',
+      evidenciaEm: null,
+      concluidaEm: null,
+    },
+    {
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
+      faseId: 'entregar',
+      faseTitulo: 'Entregar',
+      passoId: '3',
+      titulo: 'Treinar a equipe',
+      acao: 'Conduza o treinamento.',
+      concluidoQuando: 'A equipe opera sem ajuda.',
+      entregavel: 'Manual final.',
+      ordem: 2001,
+      status: 'pendente',
+      evidencia: null,
+      evidenciaEm: null,
+      concluidaEm: null,
+    },
+  ],
+};
+
+describe('SalaEntrega', () => {
+  it('abre na próxima tarefa e permite navegar entre as fases', async () => {
+    const user = userEvent.setup();
+    render(<SalaEntrega projeto={PROJETO} />);
+
+    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeInTheDocument();
+    expect(screen.getByText('33%')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Entregar/ }));
+    expect(screen.getByRole('heading', { name: 'Treinar a equipe', level: 2 })).toBeInTheDocument();
+  });
+});

@@ -1398,6 +1398,157 @@ export type Database = {
           },
         ]
       }
+      projeto_tarefas: {
+        Row: {
+          acao: string
+          atualizado_em: string
+          concluida_em: string | null
+          concluido_quando: string
+          criado_em: string
+          dono: string
+          entregavel: string
+          evidencia: string | null
+          evidencia_em: string | null
+          fase_id: string
+          fase_titulo: string
+          id: string
+          ordem: number
+          passo_id: string
+          projeto_execucao_id: string
+          status: Database["public"]["Enums"]["projeto_tarefa_status"]
+          titulo: string
+        }
+        Insert: {
+          acao: string
+          atualizado_em?: string
+          concluida_em?: string | null
+          concluido_quando: string
+          criado_em?: string
+          dono: string
+          entregavel: string
+          evidencia?: string | null
+          evidencia_em?: string | null
+          fase_id: string
+          fase_titulo: string
+          id?: string
+          ordem: number
+          passo_id: string
+          projeto_execucao_id: string
+          status?: Database["public"]["Enums"]["projeto_tarefa_status"]
+          titulo: string
+        }
+        Update: {
+          acao?: string
+          atualizado_em?: string
+          concluida_em?: string | null
+          concluido_quando?: string
+          criado_em?: string
+          dono?: string
+          entregavel?: string
+          evidencia?: string | null
+          evidencia_em?: string | null
+          fase_id?: string
+          fase_titulo?: string
+          id?: string
+          ordem?: number
+          passo_id?: string
+          projeto_execucao_id?: string
+          status?: Database["public"]["Enums"]["projeto_tarefa_status"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_tarefas_projeto_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      projetos_execucao: {
+        Row: {
+          atualizado_em: string
+          builder_solucao_id: string | null
+          concluido_em: string | null
+          criado_em: string
+          documento: Json
+          dono: string
+          empresa_id: string
+          id: string
+          inicio_em: string
+          oportunidade_id: string
+          prazo_em: string | null
+          projeto_id: string | null
+          proposta_id: string
+          status: Database["public"]["Enums"]["projeto_execucao_status"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          builder_solucao_id?: string | null
+          concluido_em?: string | null
+          criado_em?: string
+          documento: Json
+          dono: string
+          empresa_id: string
+          id?: string
+          inicio_em?: string
+          oportunidade_id: string
+          prazo_em?: string | null
+          projeto_id?: string | null
+          proposta_id: string
+          status?: Database["public"]["Enums"]["projeto_execucao_status"]
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          builder_solucao_id?: string | null
+          concluido_em?: string | null
+          criado_em?: string
+          documento?: Json
+          dono?: string
+          empresa_id?: string
+          id?: string
+          inicio_em?: string
+          oportunidade_id?: string
+          prazo_em?: string | null
+          projeto_id?: string | null
+          proposta_id?: string
+          status?: Database["public"]["Enums"]["projeto_execucao_status"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projetos_execucao_builder_solucao_id_fkey"
+            columns: ["builder_solucao_id"]
+            isOneToOne: false
+            referencedRelation: "builder_solucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projetos_execucao_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "projetos_execucao_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projetos_execucao_proposta_fk"
+            columns: ["dono", "proposta_id"]
+            isOneToOne: false
+            referencedRelation: "propostas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       propostas: {
         Row: {
           aceita_em: string | null
@@ -1694,6 +1845,7 @@ export type Database = {
           mentoria_id: string
         }[]
       }
+      projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }
         Returns: number
@@ -1742,6 +1894,17 @@ export type Database = {
         | "falhou"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
+      projeto_execucao_status:
+        | "planejamento"
+        | "em_execucao"
+        | "em_validacao"
+        | "concluido"
+        | "pausado"
+      projeto_tarefa_status:
+        | "pendente"
+        | "em_andamento"
+        | "concluida"
+        | "bloqueada"
       proposta_status:
         | "rascunho"
         | "pronta"
@@ -1931,6 +2094,19 @@ export const Constants = {
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
+      projeto_execucao_status: [
+        "planejamento",
+        "em_execucao",
+        "em_validacao",
+        "concluido",
+        "pausado",
+      ],
+      projeto_tarefa_status: [
+        "pendente",
+        "em_andamento",
+        "concluida",
+        "bloqueada",
+      ],
       proposta_status: [
         "rascunho",
         "pronta",

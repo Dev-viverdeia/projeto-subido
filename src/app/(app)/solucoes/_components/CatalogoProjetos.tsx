@@ -19,19 +19,26 @@ const FASES = ['Entender', 'Preparar', 'Construir', 'Validar', 'Entregar'];
  * entregas deliberadas, então busca, paginação e facetas só esconderiam a tese.
  * A assinatura é a linha de execução repetida em todos os projetos.
  */
-export function CatalogoProjetos({ solucoes }: { solucoes: SolucaoResumo[] }) {
+export function CatalogoProjetos({
+  solucoes,
+  tituloComo = 'h1',
+}: {
+  solucoes: SolucaoResumo[];
+  tituloComo?: 'h1' | 'h2';
+}) {
   const progresso = useProgresso();
+  const Titulo = tituloComo;
 
   return (
     <div className={styles.raiz}>
       <section className={styles.abertura} aria-labelledby="titulo-projetos">
         <div className={styles.aberturaTexto}>
           <p className={styles.eyebrow}>Biblioteca de execução</p>
-          <h1 id="titulo-projetos" className={styles.titulo}>
+          <Titulo id="titulo-projetos" className={styles.titulo}>
             Cinco projetos.
             <br />
             <span>Um jeito de entregar.</span>
-          </h1>
+          </Titulo>
           <p className={styles.apoio}>
             Você não recebe só a ideia. Cada projeto começa no diagnóstico e termina com uma
             operação validada nas mãos do cliente.

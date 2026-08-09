@@ -1,0 +1,770 @@
+.sala {
+  width: min(100%, var(--app-canvas));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  border-radius: var(--app-radius-surface);
+  background:
+    radial-gradient(circle at 88% -6%, rgba(0, 174, 239, 0.2), transparent 28%),
+    linear-gradient(145deg, var(--via-navy), var(--via-navy-deep));
+  color: var(--via-white);
+  box-shadow: var(--via-glow-navy);
+}
+
+.heroTexto {
+  min-width: 0;
+  padding: clamp(28px, 4.5vw, 54px);
+}
+
+.heroLinha {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-wrap: wrap;
+}
+
+.eyebrow,
+.heroMetadados dt,
+.statusProjeto,
+.medida small,
+.cabecalhoFase p,
+.tarefaTopo p,
+.criterios dt,
+.filaCabecalho p,
+.proximaAcao p,
+.cliente > p,
+.entregaveis > p,
+.prazo > p {
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--via-accent);
+  font-size: var(--via-fs-micro);
+}
+
+.statusProjeto {
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--app-radius-chip);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.58rem;
+}
+
+.statusProjeto[data-status='concluido'] {
+  border-color: rgba(0, 174, 239, 0.4);
+  background: rgba(0, 174, 239, 0.12);
+  color: var(--via-accent);
+}
+
+.hero h1 {
+  max-width: 16ch;
+  margin: var(--via-space-3) 0 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(2.25rem, 4vw, 4.15rem);
+  font-weight: 550;
+  line-height: 0.98;
+  letter-spacing: var(--app-ls-h1);
+  color: var(--via-white);
+  text-wrap: balance;
+}
+
+.heroTexto > p:last-of-type {
+  max-width: 60ch;
+  margin: var(--via-space-4) 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.58;
+}
+
+.heroMetadados {
+  display: flex;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
+  margin: var(--via-space-7) 0 0;
+}
+
+.heroMetadados div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroMetadados dt {
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.56rem;
+}
+
+.heroMetadados dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: var(--via-fs-sm);
+}
+
+.medida {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 4vw, 48px);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.medida > span {
+  font-family: var(--via-font-mono);
+  font-size: clamp(2.5rem, 5vw, 4.3rem);
+  line-height: 1;
+}
+
+.medida strong {
+  margin-top: var(--via-space-3);
+  font-size: var(--via-fs-sm);
+}
+
+.medida small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.56rem;
+}
+
+.medida > div {
+  overflow: hidden;
+  height: 3px;
+  margin-top: var(--via-space-5);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.medida > div span {
+  display: block;
+  height: 100%;
+  transform-origin: left;
+  background: var(--via-accent);
+}
+
+.fases {
+  grid-column: 1 / -1;
+  display: flex;
+  overflow-x: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  scrollbar-width: none;
+}
+
+.fases::-webkit-scrollbar {
+  display: none;
+}
+
+.fases button {
+  flex: 1 0 150px;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.52);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fases button[data-ativa] {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--via-white);
+}
+
+.fases button[data-completa] {
+  color: var(--via-accent);
+}
+
+.fases button:focus-visible {
+  outline: 2px solid var(--via-accent);
+  outline-offset: -3px;
+}
+
+.fases button > span,
+.fases button small {
+  font-family: var(--via-font-mono);
+  font-size: 0.58rem;
+}
+
+.fases button > span {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.fases button strong {
+  overflow: hidden;
+  font-size: var(--via-fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 340px);
+  gap: var(--via-space-6);
+  align-items: start;
+}
+
+.operacao,
+.lateral {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.cabecalhoFase {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: var(--via-space-3) 0 var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.cabecalhoFase p,
+.cabecalhoFase h2 {
+  margin: 0;
+}
+
+.cabecalhoFase p {
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-micro);
+}
+
+.cabecalhoFase h2 {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--app-ls-h2);
+}
+
+.cabecalhoFase > span {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+}
+
+.tarefa {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.tarefa[data-status='bloqueada'] {
+  border-color: color-mix(in srgb, var(--via-text-muted) 34%, var(--via-border));
+}
+
+.tarefaTopo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-4);
+  align-items: start;
+  padding: clamp(24px, 4vw, 38px);
+}
+
+.marcadorTarefa {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: 50%;
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.tarefa[data-status='concluida'] .marcadorTarefa {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.tarefaTopo p,
+.tarefaTopo h2 {
+  margin: 0;
+}
+
+.tarefaTopo p {
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-micro);
+}
+
+.tarefaTopo h2 {
+  max-width: 26ch;
+  margin-top: 5px;
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1.07;
+  letter-spacing: var(--app-ls-h2);
+  text-wrap: balance;
+}
+
+.acao {
+  margin: 0;
+  padding: 0 clamp(24px, 4vw, 38px) clamp(24px, 4vw, 36px) calc(clamp(24px, 4vw, 38px) + 58px);
+  color: var(--via-text-muted);
+  line-height: 1.65;
+}
+
+.criterios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--via-border-hairline);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.criterios > div {
+  padding: var(--via-space-5);
+}
+
+.criterios > div + div {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.criterios dt {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-accent-ink);
+  font-size: 0.58rem;
+}
+
+.criterios dd {
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.55;
+}
+
+.evidencia {
+  padding: clamp(24px, 4vw, 38px);
+}
+
+.evidencia label,
+.evidencia label > span {
+  display: flex;
+}
+
+.evidencia label {
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.evidencia label > span {
+  align-items: center;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+}
+
+.evidencia textarea {
+  width: 100%;
+  min-height: 112px;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.evidencia textarea:focus {
+  outline: none;
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--app-ring);
+}
+
+.erro,
+.sucesso {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-xs);
+}
+
+.erro {
+  color: var(--via-text-muted);
+}
+
+.sucesso {
+  color: var(--via-accent-ink);
+}
+
+.acoesTarefa {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  margin-top: var(--via-space-4);
+}
+
+.acoesTarefa button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: 650 var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+
+.acoesTarefa button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.acoesTarefa .concluir {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.acoesTarefa button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.fila {
+  margin-top: var(--via-space-5);
+}
+
+.filaCabecalho p,
+.filaCabecalho h2 {
+  margin: 0;
+}
+
+.filaCabecalho p {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.filaCabecalho h2 {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-h3);
+}
+
+.fila ol {
+  margin: var(--via-space-4) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--via-border-hairline);
+  list-style: none;
+}
+
+.fila button {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-2);
+  border: 0;
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: transparent;
+  color: var(--via-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fila button:hover,
+.fila button[data-ativa] {
+  background: var(--via-navy-04);
+}
+
+.fila button > span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: 50%;
+  font-family: var(--via-font-mono);
+  font-size: 0.6rem;
+}
+
+.fila button[data-concluida] > span {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.fila button strong {
+  overflow: hidden;
+  font-size: var(--via-fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fila button small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.proximaAcao,
+.cliente,
+.entregaveis,
+.prazo {
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.proximaAcao {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.proximaAcao p,
+.proximaAcao strong,
+.proximaAcao span,
+.cliente > p,
+.cliente h2,
+.cliente blockquote,
+.entregaveis > p,
+.prazo > p {
+  margin: 0;
+}
+
+.proximaAcao p,
+.cliente > p,
+.entregaveis > p,
+.prazo > p {
+  font-size: var(--via-fs-micro);
+}
+
+.proximaAcao p {
+  color: var(--via-accent);
+}
+
+.proximaAcao strong {
+  display: block;
+  margin-top: var(--via-space-4);
+  font-size: var(--via-fs-h4);
+  line-height: 1.18;
+}
+
+.proximaAcao span {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: rgba(255, 255, 255, 0.54);
+  font-size: var(--via-fs-xs);
+}
+
+.prazo > p {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+}
+
+.prazo form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-3);
+}
+
+.prazo input,
+.prazo button {
+  min-height: 42px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+
+.prazo input {
+  min-width: 0;
+  padding-inline: var(--via-space-3);
+}
+
+.prazo button {
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.prazo small {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+}
+
+.cliente > p,
+.entregaveis > p {
+  color: var(--via-accent-ink);
+}
+
+.cliente h2 {
+  margin-top: var(--via-space-3);
+  font-size: var(--via-fs-h3);
+}
+
+.cliente blockquote {
+  margin-top: var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.55;
+}
+
+.cliente > div {
+  display: flex;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  margin-top: var(--via-space-4);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.cliente a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.entregaveis ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  margin: var(--via-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entregaveis li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.45;
+}
+
+.entregaveis li svg {
+  margin-top: 2px;
+  color: var(--via-accent-ink);
+}
+
+.semTarefa {
+  padding: var(--via-space-8);
+  border-radius: var(--app-radius-card);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.semTarefa h2,
+.semTarefa p {
+  margin: var(--via-space-3) 0 0;
+}
+
+.semTarefa p {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+@media (max-width: 980px) {
+  .corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lateral {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroTexto,
+  .medida {
+    padding: var(--via-space-6) var(--via-space-5);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  }
+
+  .medida {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 0;
+  }
+
+  .medida > span {
+    font-size: 2.6rem;
+  }
+
+  .fases button {
+    flex-basis: 150px;
+    min-height: 64px;
+  }
+
+  .criterios,
+  .lateral {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .criterios > div + div {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+
+  .acao {
+    padding-left: var(--via-space-5);
+  }
+
+  .acoesTarefa,
+  .acoesTarefa button {
+    width: 100%;
+  }
+
+  .fila button {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .fila button small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medida > div span {
+    transition: none;
+  }
+}

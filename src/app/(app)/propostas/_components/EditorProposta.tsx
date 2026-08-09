@@ -14,6 +14,7 @@ import {
 import { PreviewProposta } from './PreviewProposta';
 import { SecoesContextoEntrega } from './SecoesContextoEntrega';
 import { SecoesPrazoDecisao } from './SecoesPrazoDecisao';
+import { AcaoEntrega } from './AcaoEntrega';
 import styles from './EditorProposta.module.css';
 
 const INICIAL: EstadoProposta = {};
@@ -25,6 +26,7 @@ export function EditorProposta({
   statusInicial,
   versaoInicial,
   oportunidadeId,
+  execucaoId,
 }: {
   id: string;
   tituloInicial: string;
@@ -32,6 +34,7 @@ export function EditorProposta({
   statusInicial: StatusProposta;
   versaoInicial: number;
   oportunidadeId: string;
+  execucaoId: string | null;
 }) {
   const [titulo, setTitulo] = useState(tituloInicial);
   const [documento, setDocumento] = useState(documentoInicial);
@@ -149,7 +152,7 @@ export function EditorProposta({
           />
 
           <section className={styles.decisao}>
-            <div>
+            <div className={styles.estadoDocumento}>
               <FileCheck2 size={21} strokeWidth={1.7} aria-hidden="true" />
               <div>
                 <p className={styles.sobretitulo}>Estado do documento</p>
@@ -164,53 +167,56 @@ export function EditorProposta({
               </div>
             </div>
 
-            <form action={acaoStatus} className={styles.acoesStatus}>
-              <input type="hidden" name="id" value={id} />
-              {proximoStatus && (
-                <button
-                  type="submit"
-                  name="status"
-                  value={proximoStatus}
-                  disabled={sujo || atualizandoStatus}
-                  className={styles.avancar}
-                >
-                  {ROTULO_ACAO_STATUS[status]}
-                </button>
-              )}
-              {status === 'apresentada' && (
-                <>
+            <div className={styles.controlesDecisao}>
+              <form action={acaoStatus} className={styles.acoesStatus}>
+                <input type="hidden" name="id" value={id} />
+                {proximoStatus && (
                   <button
                     type="submit"
                     name="status"
-                    value="aceita"
+                    value={proximoStatus}
                     disabled={sujo || atualizandoStatus}
                     className={styles.avancar}
                   >
-                    Marcar como aceita
+                    {ROTULO_ACAO_STATUS[status]}
                   </button>
+                )}
+                {status === 'apresentada' && (
+                  <>
+                    <button
+                      type="submit"
+                      name="status"
+                      value="aceita"
+                      disabled={sujo || atualizandoStatus}
+                      className={styles.avancar}
+                    >
+                      Marcar como aceita
+                    </button>
+                    <button
+                      type="submit"
+                      name="status"
+                      value="recusada"
+                      disabled={sujo || atualizandoStatus}
+                      className={styles.secundario}
+                    >
+                      Não aprovada
+                    </button>
+                  </>
+                )}
+                {(status === 'aceita' || status === 'recusada') && (
                   <button
                     type="submit"
                     name="status"
-                    value="recusada"
+                    value="rascunho"
                     disabled={sujo || atualizandoStatus}
                     className={styles.secundario}
                   >
-                    Não aprovada
+                    Criar nova versão
                   </button>
-                </>
-              )}
-              {(status === 'aceita' || status === 'recusada') && (
-                <button
-                  type="submit"
-                  name="status"
-                  value="rascunho"
-                  disabled={sujo || atualizandoStatus}
-                  className={styles.secundario}
-                >
-                  Criar nova versão
-                </button>
-              )}
-            </form>
+                )}
+              </form>
+              {status === 'aceita' && <AcaoEntrega propostaId={id} execucaoId={execucaoId} />}
+            </div>
           </section>
         </main>
 

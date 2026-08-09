@@ -96,6 +96,7 @@ export default function PreviewEditorPropostaPage() {
           statusInicial="rascunho"
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
+          execucaoId={null}
         />
       </main>
     </div>

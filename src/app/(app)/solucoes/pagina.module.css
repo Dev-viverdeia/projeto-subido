@@ -6,5 +6,5 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-6);
+  gap: clamp(48px, 7vw, 88px);
 }

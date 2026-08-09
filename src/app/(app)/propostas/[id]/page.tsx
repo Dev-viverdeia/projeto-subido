@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterProposta } from '@/lib/propostas/queries';
+import { obterExecucaoDaProposta } from '@/lib/projetos-execucao/queries';
 import { EditorProposta } from '../_components/EditorProposta';
 
 export async function generateMetadata({
@@ -13,7 +14,10 @@ export async function generateMetadata({
 
 export default async function PropostaPage({ params }: PageProps<'/propostas/[id]'>) {
   const { id } = await params;
-  const proposta = await obterProposta(id);
+  const [proposta, execucaoId] = await Promise.all([
+    obterProposta(id),
+    obterExecucaoDaProposta(id),
+  ]);
   if (!proposta) notFound();
 
   return (
@@ -24,6 +28,7 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
       statusInicial={proposta.status}
       versaoInicial={proposta.versao}
       oportunidadeId={proposta.oportunidadeId}
+      execucaoId={execucaoId}
     />
   );
 }
