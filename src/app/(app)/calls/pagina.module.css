@@ -345,6 +345,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
   color: var(--via-accent-ink);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);

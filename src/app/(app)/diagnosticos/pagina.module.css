@@ -295,8 +295,15 @@
 }
 
 .vazio a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
   color: var(--via-accent-ink);
   font-weight: var(--via-fw-semibold);
+  text-decoration: none;
 }
 
 @supports not (backdrop-filter: blur(1px)) {
