@@ -413,6 +413,150 @@
   font-size: var(--via-fs-sm);
 }
 
+.arquivos {
+  margin-top: var(--via-space-10);
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-surface);
+  background:
+    radial-gradient(circle at 100% 0, rgba(0, 174, 239, 0.1), transparent 24rem), var(--via-bg-2);
+}
+
+.arquivos > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.arquivos header p,
+.arquivos header h2 {
+  margin: 0;
+}
+
+.arquivos header p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.arquivos header h2 {
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--app-ls-h2);
+}
+
+.arquivos > header > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: 0.54rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.arquivos ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  margin: var(--via-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.arquivos li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--via-space-4);
+  align-items: center;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.iconeArquivo {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.arquivos li small,
+.arquivos li strong,
+.arquivos li p,
+.arquivos li em {
+  display: block;
+  margin: 0;
+}
+
+.arquivos li small {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: 0.53rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.arquivos li strong {
+  margin-top: 4px;
+  font-size: var(--via-fs-sm);
+}
+
+.arquivos li p {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+}
+
+.arquivos li em {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+}
+
+.arquivos li a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.vazioArquivo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-5);
+  padding: var(--via-space-5);
+  border: 1px dashed var(--via-border);
+  border-radius: var(--app-radius-card);
+  color: var(--via-text-faint);
+}
+
+.vazioArquivo p {
+  margin: 0;
+  font-size: var(--via-fs-xs);
+}
+
 .caixaAprovacoes > header h2 {
   max-width: 14ch;
   margin-top: var(--via-space-2);
@@ -703,7 +847,8 @@
   }
 
   .andamento header,
-  .biblioteca > header {
+  .biblioteca > header,
+  .arquivos > header {
     align-items: start;
     flex-direction: column;
   }
@@ -714,6 +859,19 @@
 
   .biblioteca li a {
     grid-column: 2;
+  }
+
+  .arquivos {
+    padding: var(--via-space-5);
+  }
+
+  .arquivos li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .arquivos li a {
+    grid-column: 2;
+    width: fit-content;
   }
 
   .aprovacaoAcoes {

@@ -39,7 +39,28 @@ const EntregaClienteSchema = z.object({
     .refine((valor) => !valor || /^https?:\/\/[^\s]+$/i.test(valor), 'Link inválido.'),
 });
 
+const ArquivoSchema = z.object({
+  projeto: z.uuid(),
+  tarefa: z.uuid().nullable(),
+  grupo: z.uuid().nullable(),
+  titulo: z.string().trim().min(2).max(180),
+  descricao: z.string().trim().max(2000),
+  nome: z.string().trim().min(1).max(240),
+  caminho: z.string().trim().min(10).max(1000),
+  mimeType: z.string().trim().min(1).max(180),
+  tamanho: z.number().int().positive().max(52_428_800),
+});
+
+const ArquivoOperacaoSchema = z.object({
+  projeto: z.uuid(),
+  arquivo: z.uuid(),
+});
+
+const ArquivoVisibilidadeSchema = ArquivoOperacaoSchema.extend({ visivel: z.boolean() });
+
 export type EstadoProjetoExecucao = { erro?: string; sucesso?: string };
+
+export type EntradaArquivoProjeto = z.input<typeof ArquivoSchema>;
 
 async function usuarioAtual() {
   const supabase = await createClient();
@@ -280,4 +301,123 @@ export async function prepararEntregaCliente(
         ? 'Entrega enviada para aprovação.'
         : 'Apresentação do cliente salva.',
   };
+}
+
+export async function registrarArquivoProjeto(
+  entrada: EntradaArquivoProjeto,
+): Promise<EstadoProjetoExecucao> {
+  const validacao = ArquivoSchema.safeParse(entrada);
+  if (!validacao.success) return { erro: 'Revise o nome e os dados deste arquivo.' };
+
+  const { supabase, user } = await usuarioAtual();
+  if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  const dados = validacao.data;
+  const { data, error } = await supabase.rpc('projeto_arquivo_registrar', {
+    p_projeto_id: dados.projeto,
+    p_tarefa_id: dados.tarefa as string,
+    p_grupo_id: dados.grupo as string,
+    p_titulo: dados.titulo,
+    p_descricao: dados.descricao,
+    p_nome_original: dados.nome,
+    p_caminho_storage: dados.caminho,
+    p_mime_type: dados.mimeType,
+    p_tamanho_bytes: dados.tamanho,
+  });
+
+  if (error || !data) {
+    console.error(
+      `[projetos-execucao:arquivo-registrar] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`,
+    );
+    return { erro: 'O envio terminou, mas não foi possível registrar o arquivo.' };
+  }
+
+  revalidatePath(`/solucoes/execucao/${dados.projeto}`);
+  return { sucesso: dados.grupo ? `Versão ${data.versao} adicionada.` : 'Arquivo adicionado.' };
+}
+
+export async function definirVisibilidadeArquivoProjeto(
+  entrada: z.input<typeof ArquivoVisibilidadeSchema>,
+): Promise<EstadoProjetoExecucao> {
+  const validacao = ArquivoVisibilidadeSchema.safeParse(entrada);
+  if (!validacao.success) return { erro: 'Não foi possível identificar este arquivo.' };
+
+  const { supabase, user } = await usuarioAtual();
+  if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  const { data: projeto } = await supabase
+    .from('projetos_execucao')
+    .select('portal_codigo')
+    .eq('id', validacao.data.projeto)
+    .eq('dono', user.id)
+    .maybeSingle();
+  const { data: arquivo } = await supabase
+    .from('projeto_arquivos')
+    .select('id')
+    .eq('id', validacao.data.arquivo)
+    .eq('projeto_execucao_id', validacao.data.projeto)
+    .maybeSingle();
+  if (!projeto || !arquivo) return { erro: 'Este arquivo não está disponível.' };
+
+  const { data, error } = await supabase.rpc('projeto_arquivo_definir_visibilidade', {
+    p_arquivo_id: validacao.data.arquivo,
+    p_visivel: validacao.data.visivel,
+  });
+  if (error || !data) {
+    console.error(
+      `[projetos-execucao:arquivo-visibilidade] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`,
+    );
+    return { erro: 'Não foi possível atualizar a liberação ao cliente.' };
+  }
+
+  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidatePath(`/portal/${projeto.portal_codigo}`);
+  return {
+    sucesso: validacao.data.visivel
+      ? 'Esta versão foi liberada ao cliente.'
+      : 'O arquivo voltou a ficar somente interno.',
+  };
+}
+
+export async function excluirArquivoProjeto(
+  entrada: z.input<typeof ArquivoOperacaoSchema>,
+): Promise<EstadoProjetoExecucao> {
+  const validacao = ArquivoOperacaoSchema.safeParse(entrada);
+  if (!validacao.success) return { erro: 'Não foi possível identificar este arquivo.' };
+
+  const { supabase, user } = await usuarioAtual();
+  if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  const { data: arquivo, error: erroArquivo } = await supabase
+    .from('projeto_arquivos')
+    .select('caminho_storage, visivel_cliente')
+    .eq('id', validacao.data.arquivo)
+    .eq('projeto_execucao_id', validacao.data.projeto)
+    .maybeSingle();
+  if (erroArquivo || !arquivo) return { erro: 'Este arquivo não está disponível.' };
+  if (arquivo.visivel_cliente) {
+    return { erro: 'Retire o arquivo do Portal do Cliente antes de excluí-lo.' };
+  }
+
+  const { error: erroStorage } = await supabase.storage
+    .from('projeto-entregaveis')
+    .remove([arquivo.caminho_storage]);
+  if (erroStorage) {
+    console.error(`[projetos-execucao:arquivo-storage] ${erroStorage.message}`);
+    return { erro: 'Não foi possível remover o arquivo do cofre.' };
+  }
+
+  const { error } = await supabase
+    .from('projeto_arquivos')
+    .delete()
+    .eq('id', validacao.data.arquivo)
+    .eq('projeto_execucao_id', validacao.data.projeto)
+    .eq('dono', user.id);
+  if (error) {
+    console.error(`[projetos-execucao:arquivo-excluir] ${error.code}: ${error.message}`);
+    return { erro: 'O arquivo foi removido do cofre, mas a lista não pôde ser atualizada.' };
+  }
+
+  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  return { sucesso: 'Versão excluída.' };
 }

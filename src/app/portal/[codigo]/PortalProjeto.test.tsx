@@ -19,6 +19,19 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 1,
   total: 2,
+  arquivos: [
+    {
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      titulo: 'Mapa final da demanda',
+      descricao: 'Documento consolidado após a validação.',
+      nomeOriginal: 'mapa-final.pdf',
+      mimeType: 'application/pdf',
+      tamanhoBytes: 240000,
+      versao: 2,
+      publicadoEm: '2026-08-09T13:00:00.000Z',
+    },
+  ],
   tarefas: [
     {
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
@@ -62,6 +75,10 @@ describe('PortalProjeto', () => {
     ).toBeVisible();
     expect(screen.getByText('50%')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar entrega/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Baixar/i })).toHaveAttribute(
+      'href',
+      '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    );
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
   });
 });

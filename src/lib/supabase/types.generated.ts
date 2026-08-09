@@ -1357,6 +1357,75 @@ export type Database = {
           },
         ]
       }
+      projeto_arquivos: {
+        Row: {
+          caminho_storage: string
+          criado_em: string
+          descricao: string | null
+          dono: string
+          grupo_id: string
+          id: string
+          mime_type: string
+          nome_original: string
+          projeto_execucao_id: string
+          publicado_em: string | null
+          tamanho_bytes: number
+          tarefa_id: string | null
+          titulo: string
+          versao: number
+          visivel_cliente: boolean
+        }
+        Insert: {
+          caminho_storage: string
+          criado_em?: string
+          descricao?: string | null
+          dono: string
+          grupo_id: string
+          id?: string
+          mime_type: string
+          nome_original: string
+          projeto_execucao_id: string
+          publicado_em?: string | null
+          tamanho_bytes: number
+          tarefa_id?: string | null
+          titulo: string
+          versao: number
+          visivel_cliente?: boolean
+        }
+        Update: {
+          caminho_storage?: string
+          criado_em?: string
+          descricao?: string | null
+          dono?: string
+          grupo_id?: string
+          id?: string
+          mime_type?: string
+          nome_original?: string
+          projeto_execucao_id?: string
+          publicado_em?: string | null
+          tamanho_bytes?: number
+          tarefa_id?: string | null
+          titulo?: string
+          versao?: number
+          visivel_cliente?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_arquivos_projeto_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "projeto_arquivos_tarefa_fk"
+            columns: ["tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "projeto_tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projeto_portal_eventos: {
         Row: {
           autor: string
@@ -1919,6 +1988,46 @@ export type Database = {
           inscritos: number
           mentoria_id: string
         }[]
+      }
+      projeto_arquivo_definir_visibilidade: {
+        Args: { p_arquivo_id: string; p_visivel: boolean }
+        Returns: boolean
+      }
+      projeto_arquivo_registrar: {
+        Args: {
+          p_caminho_storage: string
+          p_descricao: string
+          p_grupo_id: string
+          p_mime_type: string
+          p_nome_original: string
+          p_projeto_id: string
+          p_tamanho_bytes: number
+          p_tarefa_id: string
+          p_titulo: string
+        }
+        Returns: {
+          caminho_storage: string
+          criado_em: string
+          descricao: string | null
+          dono: string
+          grupo_id: string
+          id: string
+          mime_type: string
+          nome_original: string
+          projeto_execucao_id: string
+          publicado_em: string | null
+          tamanho_bytes: number
+          tarefa_id: string | null
+          titulo: string
+          versao: number
+          visivel_cliente: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projeto_arquivos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
       projeto_portal_decidir: {

@@ -29,6 +29,7 @@ import type {
 import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
 import { formatarReais } from '@/lib/propostas/schema';
 import { EntregaCliente } from './EntregaCliente';
+import { CentralArquivos } from './CentralArquivos';
 import { PortalClienteCard } from './PortalClienteCard';
 import styles from './SalaEntrega.module.css';
 
@@ -253,6 +254,12 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           </section>
         </aside>
       </div>
+
+      <CentralArquivos
+        projetoId={projeto.id}
+        tarefas={projeto.tarefas}
+        arquivos={projeto.arquivos}
+      />
     </div>
   );
 }

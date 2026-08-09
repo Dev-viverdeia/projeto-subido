@@ -29,6 +29,21 @@ export type TarefaProjetoExecucao = {
   clienteComentario: string | null;
 };
 
+export type ArquivoProjetoExecucao = {
+  id: string;
+  grupoId: string;
+  tarefaId: string | null;
+  versao: number;
+  titulo: string;
+  descricao: string | null;
+  nomeOriginal: string;
+  mimeType: string;
+  tamanhoBytes: number;
+  visivelCliente: boolean;
+  publicadoEm: string | null;
+  criadoEm: string;
+};
+
 export type ResumoProjetoExecucao = {
   id: string;
   titulo: string;
@@ -47,6 +62,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   inicioEm: string;
   documento: DocumentoProposta;
   tarefas: TarefaProjetoExecucao[];
+  arquivos: ArquivoProjetoExecucao[];
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -117,7 +133,7 @@ export const obterProjetoExecucao = cache(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('projetos_execucao')
-      .select('*, projeto_tarefas(*)')
+      .select('*, projeto_tarefas(*), projeto_arquivos(*)')
       .eq('id', id)
       .maybeSingle();
 
@@ -145,6 +161,22 @@ export const obterProjetoExecucao = cache(
       inicioEm: data.inicio_em,
       documento,
       tarefas,
+      arquivos: data.projeto_arquivos
+        .map((arquivo) => ({
+          id: arquivo.id,
+          grupoId: arquivo.grupo_id,
+          tarefaId: arquivo.tarefa_id,
+          versao: arquivo.versao,
+          titulo: arquivo.titulo,
+          descricao: arquivo.descricao,
+          nomeOriginal: arquivo.nome_original,
+          mimeType: arquivo.mime_type,
+          tamanhoBytes: arquivo.tamanho_bytes,
+          visivelCliente: arquivo.visivel_cliente,
+          publicadoEm: arquivo.publicado_em,
+          criadoEm: arquivo.criado_em,
+        }))
+        .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
       portalAtivo: data.portal_ativo,
       portalCodigo: data.portal_codigo,
       portalAtivadoEm: data.portal_ativado_em,

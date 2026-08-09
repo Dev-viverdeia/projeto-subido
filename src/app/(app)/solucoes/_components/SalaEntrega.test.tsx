@@ -8,7 +8,12 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
   configurarPortalCliente: vi.fn(),
   definirPrazoProjeto: vi.fn(),
   prepararEntregaCliente: vi.fn(),
+  definirVisibilidadeArquivoProjeto: vi.fn(),
+  excluirArquivoProjeto: vi.fn(),
+  registrarArquivoProjeto: vi.fn(),
 }));
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 import { SalaEntrega } from './SalaEntrega';
 
@@ -46,6 +51,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: false,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
+  arquivos: [],
   documento: DOCUMENTO,
   tarefas: [
     {

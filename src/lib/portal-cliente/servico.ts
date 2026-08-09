@@ -29,6 +29,18 @@ export type TarefaPortalCliente = {
   comentario: string | null;
 };
 
+export type ArquivoPortalCliente = {
+  id: string;
+  tarefaId: string | null;
+  titulo: string;
+  descricao: string | null;
+  nomeOriginal: string;
+  mimeType: string;
+  tamanhoBytes: number;
+  versao: number;
+  publicadoEm: string;
+};
+
 export type ProjetoPortalCliente = {
   id: string;
   titulo: string;
@@ -41,6 +53,7 @@ export type ProjetoPortalCliente = {
   feitas: number;
   total: number;
   tarefas: TarefaPortalCliente[];
+  arquivos: ArquivoPortalCliente[];
 };
 
 function codigoValido(codigo: string) {
@@ -84,6 +97,16 @@ export const obterPortalCliente = cache(
         comentario: tarefa.cliente_comentario,
       }));
 
+    const { data: arquivos, error: erroArquivos } = await admin
+      .from('projeto_arquivos')
+      .select(
+        'id, tarefa_id, titulo, descricao, nome_original, mime_type, tamanho_bytes, versao, publicado_em',
+      )
+      .eq('projeto_execucao_id', data.id)
+      .eq('visivel_cliente', true)
+      .order('publicado_em', { ascending: false });
+    if (erroArquivos) throw handleError(erroArquivos, 'portal-cliente:arquivos');
+
     return {
       id: data.id,
       titulo: data.titulo,
@@ -96,6 +119,23 @@ export const obterPortalCliente = cache(
       feitas: tarefas.filter((tarefa) => tarefa.status === 'concluida').length,
       total: tarefas.length,
       tarefas,
+      arquivos: (arquivos ?? []).flatMap((arquivo) =>
+        arquivo.publicado_em
+          ? [
+              {
+                id: arquivo.id,
+                tarefaId: arquivo.tarefa_id,
+                titulo: arquivo.titulo,
+                descricao: arquivo.descricao,
+                nomeOriginal: arquivo.nome_original,
+                mimeType: arquivo.mime_type,
+                tamanhoBytes: arquivo.tamanho_bytes,
+                versao: arquivo.versao,
+                publicadoEm: arquivo.publicado_em,
+              },
+            ]
+          : [],
+      ),
     };
   },
 );

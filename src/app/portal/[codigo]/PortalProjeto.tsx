@@ -1,4 +1,14 @@
-import { ArrowUpRight, Check, CircleDot, Clock3, FileCheck2, LockKeyhole } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Check,
+  CircleDot,
+  Clock3,
+  Download,
+  FileCheck2,
+  Files,
+  LockKeyhole,
+  ShieldCheck,
+} from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
@@ -9,6 +19,22 @@ function formatarData(valor: string): string {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     .format(new Date(valor))
     .replace('.', '');
+}
+
+function formatarTamanho(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
+}
+
+function rotuloArquivo(mime: string): string {
+  if (mime.includes('spreadsheet') || mime.includes('excel') || mime === 'text/csv') {
+    return 'Planilha';
+  }
+  if (mime.startsWith('image/')) return 'Imagem';
+  if (mime.startsWith('video/')) return 'Vídeo';
+  if (mime.startsWith('audio/')) return 'Áudio';
+  if (mime.includes('zip')) return 'Pacote';
+  return 'Documento';
 }
 
 export function PortalProjeto({
@@ -168,6 +194,52 @@ export function PortalProjeto({
                 <div className={styles.vazio}>
                   <FileCheck2 size={20} aria-hidden="true" />
                   <p>A primeira entrega aparecerá aqui assim que estiver pronta para você.</p>
+                </div>
+              )}
+            </section>
+
+            <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
+              <header>
+                <div>
+                  <p>Materiais liberados</p>
+                  <h2 id="arquivos-titulo">Arquivos do projeto</h2>
+                </div>
+                <span>
+                  <ShieldCheck size={14} /> Versões aprovadas para você
+                </span>
+              </header>
+
+              {projeto.arquivos.length ? (
+                <ol>
+                  {projeto.arquivos.map((arquivo) => {
+                    const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
+                    return (
+                      <li key={arquivo.id}>
+                        <span className={styles.iconeArquivo}>
+                          <Files size={18} aria-hidden="true" />
+                        </span>
+                        <div>
+                          <small>
+                            {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
+                          </small>
+                          <strong>{arquivo.titulo}</strong>
+                          {arquivo.descricao && <p>{arquivo.descricao}</p>}
+                          <em>
+                            {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
+                            {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
+                          </em>
+                        </div>
+                        <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
+                          <Download size={15} /> Baixar
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : (
+                <div className={styles.vazioArquivo}>
+                  <Files size={20} aria-hidden="true" />
+                  <p>Os arquivos liberados para download aparecerão aqui.</p>
                 </div>
               )}
             </section>

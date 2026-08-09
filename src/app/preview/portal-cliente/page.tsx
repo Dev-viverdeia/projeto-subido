@@ -36,6 +36,30 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 2,
   total: 7,
+  arquivos: [
+    {
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      titulo: 'Mapa de demanda do atendimento',
+      descricao: 'Consolidado final após a revisão da diretora de operações.',
+      nomeOriginal: 'mapa-demanda-aurora-v2.pdf',
+      mimeType: 'application/pdf',
+      tamanhoBytes: 1840000,
+      versao: 2,
+      publicadoEm: '2026-08-09T13:00:00.000Z',
+    },
+    {
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2',
+      titulo: 'Matriz de limites da IA',
+      descricao: 'Regras validadas para transferência segura à recepção.',
+      nomeOriginal: 'matriz-limites.pdf',
+      mimeType: 'application/pdf',
+      tamanhoBytes: 920000,
+      versao: 1,
+      publicadoEm: '2026-08-09T13:30:00.000Z',
+    },
+  ],
   tarefas: [
     tarefa({
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
