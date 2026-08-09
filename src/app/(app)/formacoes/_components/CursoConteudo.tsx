@@ -66,7 +66,7 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
 
   return (
     <div className={styles.raiz}>
-      <header className={`${styles.hero} via-noise`}>
+      <header className={`${styles.hero} via-noise`} data-on-dark>
         <span className={styles.sheen} aria-hidden="true" />
         <div className={styles.heroTexto}>
           <div className={styles.identidade}>

@@ -110,6 +110,13 @@
   box-shadow: var(--app-ring);
 }
 
+@media (max-width: 767px) {
+  .opcao {
+    height: 40px;
+    padding-inline: var(--via-space-3);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .opcao {
     transition: none;

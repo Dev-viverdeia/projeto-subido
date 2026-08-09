@@ -57,7 +57,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         Voltar ao pipeline
       </Link>
 
-      <section className={styles.hero} aria-labelledby="dossie-titulo">
+      <section className={styles.hero} data-on-dark aria-labelledby="dossie-titulo">
         <div className={styles.heroTopo}>
           <div className={styles.identidade}>
             <p className={styles.sobretitulo}>Dossiê comercial</p>

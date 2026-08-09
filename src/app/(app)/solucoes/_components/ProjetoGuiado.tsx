@@ -55,7 +55,7 @@ export function ProjetoGuiado({
 
   return (
     <div className={styles.raiz}>
-      <header className={styles.hero}>
+      <header className={styles.hero} data-on-dark>
         <div className={styles.heroPrincipal}>
           <p className={styles.eyebrow}>{categoria ? `${categoria} · ` : ''}Projeto guiado</p>
           <h1>{titulo}</h1>

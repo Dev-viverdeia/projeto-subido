@@ -667,6 +667,35 @@
     padding: var(--via-space-5);
   }
 
+  .navegacaoFases {
+    overflow: visible;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .navegacaoFases a {
+    min-width: 0;
+    min-height: 68px;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: 2px var(--via-space-1);
+    padding-inline: 2px;
+    text-align: center;
+  }
+
+  .faseNome {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 0.56rem;
+    text-overflow: ellipsis;
+  }
+
+  .faseNumero,
+  .faseEstado {
+    font-size: 0.52rem;
+  }
+
   .faseCabecalho {
     grid-template-columns: 40px minmax(0, 1fr);
     gap: var(--via-space-3);

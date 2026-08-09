@@ -124,7 +124,7 @@ export function DossiePosCall({
         </span>
       </nav>
 
-      <header className={styles.hero}>
+      <header className={styles.hero} data-on-dark>
         <div className={styles.heroGrade} aria-hidden="true" />
         <div className={styles.heroTopo}>
           <div className={styles.heroTitulo}>

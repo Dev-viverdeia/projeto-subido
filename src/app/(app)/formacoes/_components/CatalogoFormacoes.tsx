@@ -162,8 +162,10 @@ export function CatalogoFormacoes({
     const quadro = requestAnimationFrame(() => setAquecido(true));
     return () => cancelAnimationFrame(quadro);
   }, []);
-  const atraso = (i: number) =>
-    aquecido ? Math.min(i * 0.04, 0.24) : 0.24 + Math.min(i * 0.05, 0.4);
+  /* A primeira pintura nasce pronta. A cascata antiga segurava o último card por
+     quase 800ms e fazia uma página já carregada parecer lenta. Depois da
+     primeira pintura, filtros mantêm só um stagger curto para comunicar a troca. */
+  const atraso = (i: number) => (aquecido ? Math.min(i * 0.025, 0.1) : 0);
 
   const irParaPagina = (proxima: number) => {
     setPagina(proxima);
@@ -262,13 +264,13 @@ export function CatalogoFormacoes({
                 key={formacao.id}
                 /* `position`, nunca `true`: com `true` o pôster estica no FLIP. */
                 layout={reduzir ? false : 'position'}
-                initial={reduzir ? false : { opacity: 0, y: 14 }}
+                initial={reduzir || !aquecido ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, transition: { duration: 0.16, ease: 'easeOut' } }}
+                exit={{ opacity: 0, transition: { duration: 0.12, ease: 'easeOut' } }}
                 transition={{
-                  layout: { duration: 0.3, ease: [0.32, 0.08, 0.24, 1] },
-                  opacity: { duration: 0.4, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
-                  y: { duration: 0.44, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
+                  layout: { duration: 0.2, ease: [0.32, 0.08, 0.24, 1] },
+                  opacity: { duration: 0.18, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
+                  y: { duration: 0.2, ease: [0.32, 0.08, 0.24, 1], delay: atraso(i) },
                 }}
               >
                 <CartaoFormacao formacao={formacao} />

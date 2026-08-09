@@ -57,7 +57,7 @@ export function SalaDoProjeto({
 
   return (
     <div className={styles.sala}>
-      <header className={`${styles.hero} via-noise`}>
+      <header className={`${styles.hero} via-noise`} data-on-dark>
         <div className={styles.heroTexto}>
           <p className={styles.eyebrow}>Estúdio · Sala do projeto</p>
           {/* Enquanto não há título, a ideia entra como CITAÇÃO compacta — aspas

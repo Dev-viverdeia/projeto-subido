@@ -71,7 +71,7 @@ export function PainelCalls({
         </div>
       )}
 
-      <section className={styles.fluxo} aria-labelledby="fluxo-calls-titulo">
+      <section className={styles.fluxo} data-on-dark aria-labelledby="fluxo-calls-titulo">
         <div className={styles.fluxoCabecalho}>
           <div>
             <p>Uma única conversa</p>

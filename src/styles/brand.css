@@ -87,6 +87,18 @@
   --app-ring: 0 0 0 2px var(--via-bg), 0 0 0 4px var(--via-text-primary);
 }
 
+/* Superfícies navy precisam inverter também os papéis de destaque. O DS já
+   invertia títulos e foco, mas `--via-accent` continuava navy dentro de um
+   fundo navy — origem dos títulos, rótulos e CTAs que praticamente sumiam.
+   Esta adaptação é local: no restante da aplicação o accent continua navy. */
+:is(.via-mesh-navy, .via-glass-dark, .via-on-dark, [data-on-dark]) {
+  --via-accent: var(--via-white);
+  --via-accent-deep: var(--via-gray-200);
+  --via-accent-soft: color-mix(in srgb, var(--via-white) 11%, transparent);
+  --via-accent-hairline: color-mix(in srgb, var(--via-white) 18%, transparent);
+  --via-accent-ink: var(--via-white);
+}
+
 /* Primário em banda navy usa papel branco; navy sobre navy seria invisível. */
 .via-mesh-navy .via-btn--primary,
 .via-glass-dark .via-btn--primary {

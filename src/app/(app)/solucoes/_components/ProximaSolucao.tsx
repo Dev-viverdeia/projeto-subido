@@ -19,7 +19,7 @@ import styles from './ProximaSolucao.module.css';
  */
 export function ProximaSolucao({ proxima }: { proxima: VizinhaSolucao }) {
   return (
-    <Link href={`/solucoes/${proxima.slug}`} className={`${styles.card} via-noise`}>
+    <Link href={`/solucoes/${proxima.slug}`} className={`${styles.card} via-noise`} data-on-dark>
       <p className={styles.eyebrow}>Próximo projeto</p>
       <p className={styles.titulo}>{proxima.titulo}</p>
 

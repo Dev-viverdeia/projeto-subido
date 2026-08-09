@@ -31,7 +31,11 @@ export default async function DiagnosticosPage() {
 
   return (
     <div className={styles.pagina}>
-      <section className={`${styles.hero} via-noise`} aria-labelledby="diagnosticos-titulo">
+      <section
+        className={`${styles.hero} via-noise`}
+        data-on-dark
+        aria-labelledby="diagnosticos-titulo"
+      >
         <div className={styles.heroTexto}>
           <p className={styles.sobretituloClaro}>Inteligência de pré-venda</p>
           <h1 id="diagnosticos-titulo">Veja o atendimento pelo olhar do cliente.</h1>

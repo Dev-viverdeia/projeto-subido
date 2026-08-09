@@ -86,7 +86,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
 
   return (
     <div className={styles.sala}>
-      <header className={styles.hero}>
+      <header className={styles.hero} data-on-dark>
         <div className={styles.heroTexto}>
           <div className={styles.heroLinha}>
             <p className={styles.eyebrow}>Sala de Entrega · {projeto.empresa}</p>

@@ -50,11 +50,11 @@
   right: -120px;
   width: 440px;
   height: 440px;
-  border: 1px solid rgba(81, 133, 255, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 50%;
   box-shadow:
-    0 0 0 52px rgba(81, 133, 255, 0.035),
-    0 0 0 104px rgba(81, 133, 255, 0.025);
+    0 0 0 52px rgba(255, 255, 255, 0.035),
+    0 0 0 104px rgba(255, 255, 255, 0.025);
 }
 
 .heroGrade {
@@ -95,8 +95,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--via-warning);
-  box-shadow: 0 0 0 5px rgba(240, 180, 67, 0.1);
+  background: var(--via-gray-300);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.08);
 }
 
 .sobretituloHero > span[data-estado='pronta'] {

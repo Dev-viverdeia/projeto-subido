@@ -25,7 +25,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.hero}>
+      <header className={styles.hero} data-on-dark>
         <div className={styles.heroTexto}>
           <p className={styles.sobretitulo}>Propostas comerciais</p>
           <h1>Do diagnóstico à decisão.</h1>

@@ -39,7 +39,11 @@ export function PainelRelatorio({ diagnostico }: { diagnostico: DiagnosticoCompl
 
   return (
     <div className={styles.relatorio}>
-      <section className={`${styles.hero} via-noise`} aria-labelledby="relatorio-titulo">
+      <section
+        className={`${styles.hero} via-noise`}
+        data-on-dark
+        aria-labelledby="relatorio-titulo"
+      >
         <div className={styles.heroTexto}>
           <p className={styles.sobretituloClaro}>Diagnóstico de atendimento</p>
           <h1 id="relatorio-titulo">{diagnostico.empresa}</h1>

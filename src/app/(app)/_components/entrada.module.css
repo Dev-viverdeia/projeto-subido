@@ -29,17 +29,17 @@
 .bloco {
   /* Estado NORMAL, não o inicial: quem pinta o estado inicial é o `from`. */
   opacity: 1;
-  animation: entrada-subir 440ms var(--via-ease) backwards;
+  animation: entrada-subir 220ms var(--via-ease-out) backwards;
 }
 
 .atraso1 {
-  animation-delay: 80ms;
+  animation-delay: 40ms;
 }
 .atraso2 {
-  animation-delay: 160ms;
+  animation-delay: 80ms;
 }
 .atraso3 {
-  animation-delay: 240ms;
+  animation-delay: 120ms;
 }
 
 /* Sem `to`: o estado final é o do próprio elemento, e é justamente isso que
@@ -47,7 +47,7 @@
 @keyframes entrada-subir {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(6px);
   }
 }
 
@@ -61,7 +61,7 @@
 /* ---------------------------------------------------------------------------
  * TROCA — a entrada de um conteúdo que SUBSTITUI outro no mesmo lugar.
  *
- * A `.bloco` acima é para a chegada de uma TELA: 440ms com atrasos em cascata,
+ * A `.bloco` acima é para a chegada de uma TELA: 220ms com atrasos curtos,
  * pensada para quatro batidas que se sucedem. Usá-la numa troca em curso — passar
  * de pergunta, mudar de etapa na sala — faria cada clique custar meio segundo de
  * espera, e o que é boas-vindas na abertura vira lentidão no meio do caminho.

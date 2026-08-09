@@ -31,7 +31,7 @@ export function CatalogoProjetos({
 
   return (
     <div className={styles.raiz}>
-      <section className={styles.abertura} aria-labelledby="titulo-projetos">
+      <section className={styles.abertura} data-on-dark aria-labelledby="titulo-projetos">
         <div className={styles.aberturaTexto}>
           <p className={styles.eyebrow}>Biblioteca de execução</p>
           <Titulo id="titulo-projetos" className={styles.titulo}>

@@ -120,7 +120,7 @@ export default async function ConsultorPage() {
           </ol>
         </nav>
 
-        <article className={styles.direcao}>
+        <article className={styles.direcao} data-on-dark>
           <div className={styles.direcaoTopo}>
             <span className={styles.seloDirecao}>
               <Radio size={13} strokeWidth={2} aria-hidden="true" /> Direção de agora

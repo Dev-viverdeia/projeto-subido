@@ -792,6 +792,38 @@
     border-radius: var(--app-radius-card);
   }
 
+  .trilho {
+    overflow: visible;
+    padding: var(--via-space-4);
+  }
+
+  .etapas {
+    min-width: 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .etapas::before {
+    right: 10%;
+    left: 10%;
+  }
+
+  .etapa {
+    gap: var(--via-space-2);
+    padding-inline: 2px;
+  }
+
+  .etapaTexto small,
+  .etapaTexto em {
+    display: none;
+  }
+
+  .etapaTexto strong {
+    max-width: 100%;
+    font-size: 0.625rem;
+    line-height: var(--via-lh-snug);
+    text-wrap: balance;
+  }
+
   .direcao {
     min-height: 500px;
     padding: var(--via-space-5);
