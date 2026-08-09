@@ -28,6 +28,8 @@ import type {
 } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
 import { formatarReais } from '@/lib/propostas/schema';
+import { EntregaCliente } from './EntregaCliente';
+import { PortalClienteCard } from './PortalClienteCard';
 import styles from './SalaEntrega.module.css';
 
 const ESTADO_INICIAL: EstadoProjetoExecucao = {};
@@ -161,7 +163,12 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           </header>
 
           {tarefaAtual ? (
-            <TarefaEmFoco projetoId={projeto.id} tarefa={tarefaAtual} />
+            <TarefaEmFoco
+              key={tarefaAtual.id}
+              projetoId={projeto.id}
+              tarefa={tarefaAtual}
+              portalAtivo={projeto.portalAtivo}
+            />
           ) : (
             <div className={styles.semTarefa}>
               <Check size={24} aria-hidden="true" />
@@ -214,6 +221,12 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
 
           <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />
 
+          <PortalClienteCard
+            projetoId={projeto.id}
+            ativo={projeto.portalAtivo}
+            codigo={projeto.portalCodigo}
+          />
+
           <section className={styles.cliente}>
             <p>Contexto aprovado</p>
             <h2>{projeto.empresa}</h2>
@@ -244,91 +257,102 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   );
 }
 
-function TarefaEmFoco({ projetoId, tarefa }: { projetoId: string; tarefa: TarefaProjetoExecucao }) {
+function TarefaEmFoco({
+  projetoId,
+  tarefa,
+  portalAtivo,
+}: {
+  projetoId: string;
+  tarefa: TarefaProjetoExecucao;
+  portalAtivo: boolean;
+}) {
   const [estado, acao, pendente] = useActionState(atualizarTarefaProjeto, ESTADO_INICIAL);
 
   return (
-    <article className={styles.tarefa} data-status={tarefa.status}>
-      <div className={styles.tarefaTopo}>
-        <span className={styles.marcadorTarefa}>
-          {tarefa.status === 'concluida' ? <Check size={17} /> : <CircleDot size={17} />}
-        </span>
-        <div>
-          <p>{ROTULO_STATUS_TAREFA[tarefa.status]}</p>
-          <h2>{tarefa.titulo}</h2>
-        </div>
-      </div>
-
-      <p className={styles.acao}>{tarefa.acao}</p>
-
-      <dl className={styles.criterios}>
-        <div>
-          <dt>
-            <Flag size={14} aria-hidden="true" /> Pronto quando
-          </dt>
-          <dd>{tarefa.concluidoQuando}</dd>
-        </div>
-        <div>
-          <dt>
-            <FileCheck2 size={14} aria-hidden="true" /> O que você entrega
-          </dt>
-          <dd>{tarefa.entregavel}</dd>
-        </div>
-      </dl>
-
-      <form action={acao} className={styles.evidencia}>
-        <input type="hidden" name="projeto" value={projetoId} />
-        <input type="hidden" name="tarefa" value={tarefa.id} />
-        <label>
-          <span>
-            <Link2 size={14} aria-hidden="true" /> Evidência da execução
+    <>
+      <article className={styles.tarefa} data-status={tarefa.status}>
+        <div className={styles.tarefaTopo}>
+          <span className={styles.marcadorTarefa}>
+            {tarefa.status === 'concluida' ? <Check size={17} /> : <CircleDot size={17} />}
           </span>
-          <textarea
-            name="evidencia"
-            defaultValue={tarefa.evidencia ?? ''}
-            maxLength={10_000}
-            placeholder="Cole o link, registre o teste realizado ou descreva o aceite do cliente."
-          />
-        </label>
-
-        {estado.erro && (
-          <p className={styles.erro} role="alert">
-            {estado.erro}
-          </p>
-        )}
-        {estado.sucesso && (
-          <p className={styles.sucesso} role="status">
-            {estado.sucesso}
-          </p>
-        )}
-
-        <div className={styles.acoesTarefa}>
-          {tarefa.status === 'concluida' ? (
-            <button type="submit" name="status" value="em_andamento" disabled={pendente}>
-              <RotateCcw size={15} aria-hidden="true" /> Reabrir tarefa
-            </button>
-          ) : (
-            <>
-              <button type="submit" name="status" value="bloqueada" disabled={pendente}>
-                <LockKeyhole size={15} aria-hidden="true" /> Registrar bloqueio
-              </button>
-              <button type="submit" name="status" value="em_andamento" disabled={pendente}>
-                <Play size={15} aria-hidden="true" /> Salvar andamento
-              </button>
-              <button
-                type="submit"
-                name="status"
-                value="concluida"
-                className={styles.concluir}
-                disabled={pendente}
-              >
-                <Check size={16} aria-hidden="true" /> Concluir com evidência
-              </button>
-            </>
-          )}
+          <div>
+            <p>{ROTULO_STATUS_TAREFA[tarefa.status]}</p>
+            <h2>{tarefa.titulo}</h2>
+          </div>
         </div>
-      </form>
-    </article>
+
+        <p className={styles.acao}>{tarefa.acao}</p>
+
+        <dl className={styles.criterios}>
+          <div>
+            <dt>
+              <Flag size={14} aria-hidden="true" /> Pronto quando
+            </dt>
+            <dd>{tarefa.concluidoQuando}</dd>
+          </div>
+          <div>
+            <dt>
+              <FileCheck2 size={14} aria-hidden="true" /> O que você entrega
+            </dt>
+            <dd>{tarefa.entregavel}</dd>
+          </div>
+        </dl>
+
+        <form action={acao} className={styles.evidencia}>
+          <input type="hidden" name="projeto" value={projetoId} />
+          <input type="hidden" name="tarefa" value={tarefa.id} />
+          <label>
+            <span>
+              <Link2 size={14} aria-hidden="true" /> Evidência da execução
+            </span>
+            <textarea
+              name="evidencia"
+              defaultValue={tarefa.evidencia ?? ''}
+              maxLength={10_000}
+              placeholder="Cole o link, registre o teste realizado ou descreva o aceite do cliente."
+            />
+          </label>
+
+          {estado.erro && (
+            <p className={styles.erro} role="alert">
+              {estado.erro}
+            </p>
+          )}
+          {estado.sucesso && (
+            <p className={styles.sucesso} role="status">
+              {estado.sucesso}
+            </p>
+          )}
+
+          <div className={styles.acoesTarefa}>
+            {tarefa.status === 'concluida' ? (
+              <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                <RotateCcw size={15} aria-hidden="true" /> Reabrir tarefa
+              </button>
+            ) : (
+              <>
+                <button type="submit" name="status" value="bloqueada" disabled={pendente}>
+                  <LockKeyhole size={15} aria-hidden="true" /> Registrar bloqueio
+                </button>
+                <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                  <Play size={15} aria-hidden="true" /> Salvar andamento
+                </button>
+                <button
+                  type="submit"
+                  name="status"
+                  value="concluida"
+                  className={styles.concluir}
+                  disabled={pendente}
+                >
+                  <Check size={16} aria-hidden="true" /> Concluir com evidência
+                </button>
+              </>
+            )}
+          </div>
+        </form>
+      </article>
+      <EntregaCliente projetoId={projetoId} tarefa={tarefa} portalAtivo={portalAtivo} />
+    </>
   );
 }
 

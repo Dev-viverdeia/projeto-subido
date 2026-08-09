@@ -5,7 +5,7 @@ import { handleError } from '@/lib/errors';
 import { lerDocumentoProposta, type DocumentoProposta } from '@/lib/propostas/schema';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
-import type { StatusProjetoExecucao, StatusTarefaProjeto } from './status';
+import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
 
 export type TarefaProjetoExecucao = {
   id: string;
@@ -21,6 +21,12 @@ export type TarefaProjetoExecucao = {
   evidencia: string | null;
   evidenciaEm: string | null;
   concluidaEm: string | null;
+  clienteStatus: StatusClienteProjeto;
+  clienteNota: string | null;
+  entregavelUrl: string | null;
+  clienteSolicitadoEm: string | null;
+  clienteRespondidoEm: string | null;
+  clienteComentario: string | null;
 };
 
 export type ResumoProjetoExecucao = {
@@ -41,6 +47,9 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   inicioEm: string;
   documento: DocumentoProposta;
   tarefas: TarefaProjetoExecucao[];
+  portalAtivo: boolean;
+  portalCodigo: string;
+  portalAtivadoEm: string | null;
 };
 
 type LinhaTarefa = Tables<'projeto_tarefas'>;
@@ -60,6 +69,12 @@ function mapearTarefa(linha: LinhaTarefa): TarefaProjetoExecucao {
     evidencia: linha.evidencia,
     evidenciaEm: linha.evidencia_em,
     concluidaEm: linha.concluida_em,
+    clienteStatus: linha.cliente_status,
+    clienteNota: linha.cliente_nota,
+    entregavelUrl: linha.entregavel_url,
+    clienteSolicitadoEm: linha.cliente_solicitado_em,
+    clienteRespondidoEm: linha.cliente_respondido_em,
+    clienteComentario: linha.cliente_comentario,
   };
 }
 
@@ -130,6 +145,9 @@ export const obterProjetoExecucao = cache(
       inicioEm: data.inicio_em,
       documento,
       tarefas,
+      portalAtivo: data.portal_ativo,
+      portalCodigo: data.portal_codigo,
+      portalAtivadoEm: data.portal_ativado_em,
     };
   },
 );

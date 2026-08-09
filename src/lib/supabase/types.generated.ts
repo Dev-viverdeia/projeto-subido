@@ -1357,6 +1357,54 @@ export type Database = {
           },
         ]
       }
+      projeto_portal_eventos: {
+        Row: {
+          autor: string
+          comentario: string | null
+          criado_em: string
+          dono: string
+          id: string
+          projeto_execucao_id: string
+          tarefa_id: string | null
+          tipo: string
+        }
+        Insert: {
+          autor: string
+          comentario?: string | null
+          criado_em?: string
+          dono: string
+          id?: string
+          projeto_execucao_id: string
+          tarefa_id?: string | null
+          tipo: string
+        }
+        Update: {
+          autor?: string
+          comentario?: string | null
+          criado_em?: string
+          dono?: string
+          id?: string
+          projeto_execucao_id?: string
+          tarefa_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_portal_eventos_projeto_execucao_id_fkey"
+            columns: ["projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projeto_portal_eventos_tarefa_id_fkey"
+            columns: ["tarefa_id"]
+            isOneToOne: false
+            referencedRelation: "projeto_tarefas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projeto_roteiros: {
         Row: {
           atualizado_em: string
@@ -1402,11 +1450,17 @@ export type Database = {
         Row: {
           acao: string
           atualizado_em: string
+          cliente_comentario: string | null
+          cliente_nota: string | null
+          cliente_respondido_em: string | null
+          cliente_solicitado_em: string | null
+          cliente_status: Database["public"]["Enums"]["projeto_cliente_status"]
           concluida_em: string | null
           concluido_quando: string
           criado_em: string
           dono: string
           entregavel: string
+          entregavel_url: string | null
           evidencia: string | null
           evidencia_em: string | null
           fase_id: string
@@ -1421,11 +1475,17 @@ export type Database = {
         Insert: {
           acao: string
           atualizado_em?: string
+          cliente_comentario?: string | null
+          cliente_nota?: string | null
+          cliente_respondido_em?: string | null
+          cliente_solicitado_em?: string | null
+          cliente_status?: Database["public"]["Enums"]["projeto_cliente_status"]
           concluida_em?: string | null
           concluido_quando: string
           criado_em?: string
           dono: string
           entregavel: string
+          entregavel_url?: string | null
           evidencia?: string | null
           evidencia_em?: string | null
           fase_id: string
@@ -1440,11 +1500,17 @@ export type Database = {
         Update: {
           acao?: string
           atualizado_em?: string
+          cliente_comentario?: string | null
+          cliente_nota?: string | null
+          cliente_respondido_em?: string | null
+          cliente_solicitado_em?: string | null
+          cliente_status?: Database["public"]["Enums"]["projeto_cliente_status"]
           concluida_em?: string | null
           concluido_quando?: string
           criado_em?: string
           dono?: string
           entregavel?: string
+          entregavel_url?: string | null
           evidencia?: string | null
           evidencia_em?: string | null
           fase_id?: string
@@ -1478,6 +1544,9 @@ export type Database = {
           id: string
           inicio_em: string
           oportunidade_id: string
+          portal_ativado_em: string | null
+          portal_ativo: boolean
+          portal_codigo: string
           prazo_em: string | null
           projeto_id: string | null
           proposta_id: string
@@ -1495,6 +1564,9 @@ export type Database = {
           id?: string
           inicio_em?: string
           oportunidade_id: string
+          portal_ativado_em?: string | null
+          portal_ativo?: boolean
+          portal_codigo?: string
           prazo_em?: string | null
           projeto_id?: string | null
           proposta_id: string
@@ -1512,6 +1584,9 @@ export type Database = {
           id?: string
           inicio_em?: string
           oportunidade_id?: string
+          portal_ativado_em?: string | null
+          portal_ativo?: boolean
+          portal_codigo?: string
           prazo_em?: string | null
           projeto_id?: string | null
           proposta_id?: string
@@ -1846,6 +1921,15 @@ export type Database = {
         }[]
       }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
+      projeto_portal_decidir: {
+        Args: {
+          p_codigo: string
+          p_comentario?: string
+          p_decisao: Database["public"]["Enums"]["projeto_cliente_status"]
+          p_tarefa_id: string
+        }
+        Returns: boolean
+      }
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }
         Returns: number
@@ -1894,6 +1978,11 @@ export type Database = {
         | "falhou"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
+      projeto_cliente_status:
+        | "nao_solicitada"
+        | "aguardando"
+        | "aprovada"
+        | "ajustes"
       projeto_execucao_status:
         | "planejamento"
         | "em_execucao"
@@ -2094,6 +2183,12 @@ export const Constants = {
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
+      projeto_cliente_status: [
+        "nao_solicitada",
+        "aguardando",
+        "aprovada",
+        "ajustes",
+      ],
       projeto_execucao_status: [
         "planejamento",
         "em_execucao",

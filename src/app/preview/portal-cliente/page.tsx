@@ -1,0 +1,125 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { PortalProjeto } from '@/app/portal/[codigo]/PortalProjeto';
+import type { ProjetoPortalCliente, TarefaPortalCliente } from '@/lib/portal-cliente/servico';
+
+export const metadata: Metadata = { title: 'Preview · Portal do Cliente' };
+
+const CODIGO = '44444444-4444-4444-8444-444444444444';
+
+function tarefa(
+  dados: Pick<
+    TarefaPortalCliente,
+    'id' | 'faseId' | 'faseTitulo' | 'titulo' | 'entregavel' | 'ordem' | 'status' | 'clienteStatus'
+  > &
+    Partial<TarefaPortalCliente>,
+): TarefaPortalCliente {
+  return {
+    clienteNota: null,
+    entregavelUrl: null,
+    solicitadoEm: null,
+    respondidoEm: null,
+    comentario: null,
+    ...dados,
+  };
+}
+
+const PROJETO: ProjetoPortalCliente = {
+  id: '11111111-1111-4111-8111-111111111111',
+  titulo: 'Atendimento inteligente para clínicas',
+  empresa: 'Clínica Aurora',
+  resumo: 'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp da clínica.',
+  objetivo:
+    'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
+  status: 'em_execucao',
+  inicioEm: '2026-08-05T12:00:00.000Z',
+  prazoEm: '2026-08-28T12:00:00.000Z',
+  feitas: 2,
+  total: 7,
+  tarefas: [
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      faseId: 'entender',
+      faseTitulo: 'Entender',
+      titulo: 'Medir a demanda real',
+      entregavel: 'Mapa de demanda do atendimento.',
+      ordem: 1,
+      status: 'concluida',
+      clienteStatus: 'aprovada',
+      clienteNota:
+        'Mapeamos os horários de pico e os dez assuntos que concentram 82% das conversas.',
+      entregavelUrl: 'https://example.com/mapa-demanda',
+      solicitadoEm: '2026-08-07T14:00:00.000Z',
+      respondidoEm: '2026-08-08T10:00:00.000Z',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2',
+      faseId: 'entender',
+      faseTitulo: 'Entender',
+      titulo: 'Definir os limites da IA',
+      entregavel: 'Matriz de limites e escalonamento.',
+      ordem: 2,
+      status: 'concluida',
+      clienteStatus: 'aguardando',
+      clienteNota:
+        'A matriz separa o que a IA pode responder e os cenários que precisam da recepção.',
+      entregavelUrl: 'https://example.com/matriz-limites',
+      solicitadoEm: '2026-08-09T09:00:00.000Z',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
+      faseId: 'preparar',
+      faseTitulo: 'Preparar',
+      titulo: 'Montar a base aprovada',
+      entregavel: 'Base de conhecimento versionada.',
+      ordem: 1001,
+      status: 'em_andamento',
+      clienteStatus: 'nao_solicitada',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4',
+      faseId: 'preparar',
+      faseTitulo: 'Preparar',
+      titulo: 'Configurar o canal oficial',
+      entregavel: 'Canal de teste conectado.',
+      ordem: 1002,
+      status: 'pendente',
+      clienteStatus: 'nao_solicitada',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa5',
+      faseId: 'construir',
+      faseTitulo: 'Construir',
+      titulo: 'Construir o agente e o handoff',
+      entregavel: 'Agente com handoff humano.',
+      ordem: 2001,
+      status: 'pendente',
+      clienteStatus: 'nao_solicitada',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa6',
+      faseId: 'validar',
+      faseTitulo: 'Validar',
+      titulo: 'Rodar vinte cenários',
+      entregavel: 'Relatório de testes com evidências.',
+      ordem: 3001,
+      status: 'pendente',
+      clienteStatus: 'nao_solicitada',
+    }),
+    tarefa({
+      id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa7',
+      faseId: 'entregar',
+      faseTitulo: 'Entregar',
+      titulo: 'Entregar operação e indicadores',
+      entregavel: 'Manual e agenda de acompanhamento.',
+      ordem: 4001,
+      status: 'pendente',
+      clienteStatus: 'nao_solicitada',
+    }),
+  ],
+};
+
+export default function PreviewPortalClientePage() {
+  if (process.env.NODE_ENV === 'production') notFound();
+  return <PortalProjeto codigo={CODIGO} projeto={PROJETO} />;
+}

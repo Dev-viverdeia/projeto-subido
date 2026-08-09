@@ -1,0 +1,217 @@
+.entrega {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.entrega > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.icone {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: 50%;
+  color: var(--via-accent-ink);
+}
+
+.entrega header p,
+.entrega header h2 {
+  margin: 0;
+}
+
+.entrega header p,
+.selo,
+.entrega label > span {
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.entrega header p {
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-micro);
+}
+
+.entrega header h2 {
+  margin-top: 3px;
+  font-size: var(--via-fs-h4);
+}
+
+.selo {
+  padding: 5px 8px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
+  color: var(--via-text-faint);
+  font-size: 0.55rem;
+}
+
+.entrega[data-status='aprovada'] .selo {
+  background: var(--via-accent-soft);
+  color: var(--via-accent-ink);
+}
+
+.entrega form,
+.resumo {
+  padding: var(--via-space-5);
+}
+
+.entrega form,
+.entrega label {
+  display: flex;
+  flex-direction: column;
+}
+
+.entrega form {
+  gap: var(--via-space-4);
+}
+
+.entrega label {
+  gap: var(--via-space-2);
+}
+
+.entrega label > span {
+  color: var(--via-text-muted);
+  font-size: 0.58rem;
+}
+
+.entrega textarea,
+.entrega input {
+  width: 100%;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+
+.entrega textarea {
+  min-height: 96px;
+  padding: var(--via-space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.entrega input {
+  min-height: 42px;
+  padding-inline: var(--via-space-3);
+}
+
+.entrega textarea:focus,
+.entrega input:focus {
+  outline: none;
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--app-ring);
+}
+
+.privacidade,
+.entrega form > p,
+.acoes > span {
+  margin: 0;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  line-height: 1.5;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+}
+
+.acoes button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: 650 var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+
+.acoes .enviar {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.acoes button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.entrega blockquote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-3);
+  margin: 0;
+  padding: var(--via-space-4) var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-accent-soft) 54%, var(--via-surface));
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.5;
+}
+
+.entrega blockquote strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--via-text-primary);
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  color: var(--via-text-muted);
+  line-height: 1.55;
+}
+
+.resumo p {
+  margin: 0;
+}
+
+.resumo a,
+.resumo span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .entrega > header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .selo {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .acoes,
+  .acoes button {
+    width: 100%;
+  }
+}

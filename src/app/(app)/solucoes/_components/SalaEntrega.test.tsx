@@ -5,7 +5,9 @@ import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 
 vi.mock('@/lib/projetos-execucao/actions', () => ({
   atualizarTarefaProjeto: vi.fn(),
+  configurarPortalCliente: vi.fn(),
   definirPrazoProjeto: vi.fn(),
+  prepararEntregaCliente: vi.fn(),
 }));
 
 import { SalaEntrega } from './SalaEntrega';
@@ -41,6 +43,9 @@ const PROJETO: ProjetoExecucaoCompleto = {
   feitas: 1,
   total: 3,
   proximaTarefa: 'Montar a base',
+  portalAtivo: false,
+  portalCodigo: '44444444-4444-4444-8444-444444444444',
+  portalAtivadoEm: null,
   documento: DOCUMENTO,
   tarefas: [
     {
@@ -57,6 +62,12 @@ const PROJETO: ProjetoExecucaoCompleto = {
       evidencia: 'Mapa aprovado.',
       evidenciaEm: null,
       concluidaEm: null,
+      clienteStatus: 'nao_solicitada',
+      clienteNota: null,
+      entregavelUrl: null,
+      clienteSolicitadoEm: null,
+      clienteRespondidoEm: null,
+      clienteComentario: null,
     },
     {
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2',
@@ -72,6 +83,12 @@ const PROJETO: ProjetoExecucaoCompleto = {
       evidencia: '',
       evidenciaEm: null,
       concluidaEm: null,
+      clienteStatus: 'nao_solicitada',
+      clienteNota: null,
+      entregavelUrl: null,
+      clienteSolicitadoEm: null,
+      clienteRespondidoEm: null,
+      clienteComentario: null,
     },
     {
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
@@ -87,6 +104,12 @@ const PROJETO: ProjetoExecucaoCompleto = {
       evidencia: null,
       evidenciaEm: null,
       concluidaEm: null,
+      clienteStatus: 'nao_solicitada',
+      clienteNota: null,
+      entregavelUrl: null,
+      clienteSolicitadoEm: null,
+      clienteRespondidoEm: null,
+      clienteComentario: null,
     },
   ],
 };
@@ -101,5 +124,10 @@ describe('SalaEntrega', () => {
 
     await user.click(screen.getByRole('button', { name: /Entregar/ }));
     expect(screen.getByRole('heading', { name: 'Treinar a equipe', level: 2 })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Entender/ }));
+    expect(screen.getByRole('textbox', { name: /Evidência da execução/i })).toHaveValue(
+      'Mapa aprovado.',
+    );
   });
 });
