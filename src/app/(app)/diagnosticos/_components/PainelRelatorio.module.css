@@ -781,18 +781,50 @@
 @media (max-width: 767px) {
   .hero {
     grid-template-columns: 1fr;
-    padding: var(--via-space-7) var(--via-space-5);
+    gap: var(--via-space-5);
+    padding: var(--via-space-6) var(--via-space-5);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.7rem, 14vw, 3.5rem);
+  }
+
+  .veredito {
+    font-size: var(--via-fs-body);
+    line-height: var(--via-lh-normal);
+  }
+
+  .meta {
+    margin-top: var(--via-space-4);
   }
 
   .notaHero {
     min-height: 0;
-    padding: var(--via-space-5) 0 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding: var(--via-space-4) 0 0;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
     border-left: 0;
   }
 
+  .notaHero span {
+    align-self: center;
+  }
+
   .notaHero strong {
-    font-size: 4.5rem;
+    grid-column: 2;
+    grid-row: 1 / 3;
+    margin: 0;
+    font-size: 4rem;
+  }
+
+  .notaHero small {
+    align-self: start;
+  }
+
+  .mapaDimensoes {
+    padding: var(--via-space-4);
   }
 
   .linhaDimensao {
@@ -808,15 +840,24 @@
     padding: var(--via-space-5) var(--via-space-4);
   }
 
-  .gradeDimensoes,
   .listaFalhas,
   .colunaLateral,
   .plano ol {
     grid-template-columns: 1fr;
   }
 
+  .gradeDimensoes {
+    grid-auto-columns: minmax(78vw, 1fr);
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
   .dimensao {
-    min-height: 0;
+    min-height: 252px;
+    scroll-snap-align: start;
   }
 
   .cabecalhoSecao {

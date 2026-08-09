@@ -289,11 +289,14 @@
 
 @media (max-width: 767px) {
   .etapa {
-    grid-template-columns: 46px 1fr;
+    grid-template-columns: 1fr;
   }
 
   .numero {
-    padding-top: 34px;
+    padding: var(--via-space-3) var(--via-space-4);
+    border-right: 0;
+    border-bottom: 1px solid var(--via-border-hairline);
+    text-align: left;
   }
 
   .etapaCorpo {
@@ -309,12 +312,38 @@
   }
 
   .rodape {
-    align-items: stretch;
-    flex-direction: column;
+    position: fixed;
+    z-index: var(--via-z-sticky);
+    right: var(--via-space-4);
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    left: var(--via-space-4);
+    align-items: center;
+    padding: var(--via-space-3);
+    border: 1px solid var(--app-elev-3-line);
+    border-radius: var(--app-radius-card);
+    background: color-mix(in srgb, var(--via-surface) 94%, transparent);
+    box-shadow: var(--app-elev-3-shadow);
+    backdrop-filter: blur(18px);
   }
 
   .rodape button {
     width: 100%;
+  }
+
+  .rodape div {
+    display: none;
+  }
+
+  .formulario {
+    padding-bottom: 82px;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  @media (max-width: 767px) {
+    .rodape {
+      background: var(--via-surface);
+    }
   }
 }
 

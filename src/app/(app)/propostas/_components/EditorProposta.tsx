@@ -102,10 +102,12 @@ export function EditorProposta({
             <button type="submit" className={styles.salvar} disabled={salvando || !sujo}>
               {salvando ? (
                 <span className={styles.spinner} />
+              ) : !sujo ? (
+                <Check size={15} aria-hidden="true" />
               ) : (
                 <Save size={15} aria-hidden="true" />
               )}
-              {salvando ? 'Salvando' : sujo ? 'Salvar versão' : 'Salva'}
+              {salvando ? 'Salvando' : sujo ? 'Salvar versão' : 'Salvo'}
             </button>
           </form>
         </div>

@@ -377,7 +377,7 @@
   box-shadow: var(--app-ring);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-4);
@@ -405,12 +405,15 @@
   }
 
   .etapa {
-    min-height: 300px;
-    grid-template-columns: 46px minmax(0, 1fr);
+    min-height: 280px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .numero {
-    padding-top: 36px;
+    padding: var(--via-space-3) var(--via-space-4);
+    border-right: 0;
+    border-bottom: 1px solid var(--via-border-hairline);
+    text-align: left;
   }
 
   .etapaCorpo {
@@ -430,13 +433,45 @@
   }
 
   .rodape {
-    align-items: stretch;
-    flex-direction: column;
+    position: fixed;
+    z-index: var(--via-z-sticky);
+    right: var(--via-space-4);
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    left: var(--via-space-4);
+    align-items: center;
+    padding: var(--via-space-3);
+    border: 1px solid var(--app-elev-3-line);
+    border-radius: var(--app-radius-card);
+    background: color-mix(in srgb, var(--via-surface) 94%, transparent);
+    box-shadow: var(--app-elev-3-shadow);
+    backdrop-filter: blur(18px);
   }
 
-  .rodapeAcoes,
-  .continuar,
-  .voltarEtapa {
+  .rodape > div:first-child {
+    display: none;
+  }
+
+  .rodapeAcoes {
     width: 100%;
+  }
+
+  .continuar {
+    flex: 1;
+  }
+
+  .voltarEtapa {
+    flex: 0 0 auto;
+  }
+
+  .formulario {
+    padding-bottom: 84px;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  @media (max-width: 767px) {
+    .rodape {
+      background: var(--via-surface);
+    }
   }
 }

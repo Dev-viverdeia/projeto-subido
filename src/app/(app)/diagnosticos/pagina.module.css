@@ -333,16 +333,62 @@
 @media (max-width: 767px) {
   .hero {
     min-height: 0;
-    padding: var(--via-space-7) var(--via-space-5);
+    gap: var(--via-space-5);
+    padding: var(--via-space-6) var(--via-space-5);
+  }
+
+  .hero h1 {
+    margin-block: var(--via-space-3);
+    font-size: clamp(2.4rem, 11vw, 2.9rem);
+  }
+
+  .heroTexto > p:not(.sobretituloClaro) {
+    font-size: var(--via-fs-body);
+    line-height: var(--via-lh-normal);
+  }
+
+  .ctaHero {
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--via-space-5);
+  }
+
+  .leituraHero {
+    max-width: none;
+    padding: var(--via-space-3) var(--via-space-4);
+  }
+
+  .mira {
+    display: none;
+  }
+
+  .leituraHero li {
+    padding-block: var(--via-space-2_5);
   }
 
   .resumo {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .resumo article + article {
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
+    border-top: 0;
+    border-left: 1px solid var(--via-border-hairline);
+  }
+
+  .resumo article {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-1);
+    padding: var(--via-space-4) var(--via-space-3);
+  }
+
+  .resumo strong {
+    font-size: var(--via-fs-h4);
+  }
+
+  .resumo span {
+    font-size: var(--via-fs-micro);
+    line-height: var(--via-lh-normal);
   }
 
   .historico {

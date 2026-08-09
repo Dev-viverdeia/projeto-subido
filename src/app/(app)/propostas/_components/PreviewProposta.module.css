@@ -351,14 +351,14 @@
   letter-spacing: var(--app-ls-eyebrow);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1079px) {
   .moldura {
     position: relative;
     top: auto;
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 599px) {
   .capa {
     min-height: 280px;
   }

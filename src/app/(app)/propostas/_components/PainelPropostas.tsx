@@ -76,8 +76,13 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       {propostas.length ? (
         <section className={styles.lista} aria-label="Suas propostas">
           <header className={styles.listaTopo}>
-            <h2>Documentos recentes</h2>
-            <span>{propostas.length}</span>
+            <div>
+              <p className={styles.sobretitulo}>Biblioteca comercial</p>
+              <h2>Documentos recentes</h2>
+            </div>
+            <span>
+              {propostas.length} {propostas.length === 1 ? 'documento' : 'documentos'}
+            </span>
           </header>
           <div className={styles.grade}>
             {propostas.map((proposta) => (
