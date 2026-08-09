@@ -169,6 +169,25 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
         </p>
       </header>
 
+      <ol className={styles.fluxoEstudio} aria-label="Fluxo de criação do projeto">
+        <li data-ativo="true">
+          <span>01</span>
+          <strong>Contexto</strong>
+        </li>
+        <li>
+          <span>02</span>
+          <strong>Entrevista</strong>
+        </li>
+        <li>
+          <span>03</span>
+          <strong>Projeto</strong>
+        </li>
+        <li>
+          <span>04</span>
+          <strong>Proposta</strong>
+        </li>
+      </ol>
+
       {origem ? (
         <aside className={styles.origem} aria-label="Projeto usado como base">
           <div>

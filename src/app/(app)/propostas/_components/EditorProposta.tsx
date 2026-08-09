@@ -123,10 +123,11 @@ export function EditorProposta({
         <main className={styles.editor}>
           <section className={styles.abertura}>
             <p className={styles.sobretitulo}>Documento comercial</p>
-            <input
+            <textarea
               aria-label="Título interno da proposta"
               className={styles.tituloDocumento}
               value={titulo}
+              rows={2}
               maxLength={180}
               onChange={(evento) => {
                 setTitulo(evento.target.value);
