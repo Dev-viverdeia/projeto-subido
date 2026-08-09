@@ -99,6 +99,13 @@
   gap: var(--app-gap-stack);
 }
 
+@media (max-width: 599px) {
+  .chrome {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* ── Modais, compartilhados pelas duas vistas ─────────────────────────────── */
 .detalhe {
   display: flex;

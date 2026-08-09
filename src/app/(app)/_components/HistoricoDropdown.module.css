@@ -43,6 +43,7 @@
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   color: var(--via-text-primary);
+  white-space: nowrap;
 }
 
 .total {
