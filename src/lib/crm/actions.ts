@@ -134,5 +134,6 @@ export async function aplicarProximaAcao(formData: FormData): Promise<void> {
 
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath('/solucoes');
   revalidatePath('/inicio');
 }

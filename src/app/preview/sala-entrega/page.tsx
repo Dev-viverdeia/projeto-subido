@@ -32,6 +32,38 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: true,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: '2026-08-09T12:00:00.000Z',
+  acoesPlano: [
+    {
+      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+      titulo: 'Enviar os acessos do WhatsApp e da agenda da recepção',
+      prazoEm: '2026-08-11T12:00:00-03:00',
+      status: 'pendente',
+      origem: 'call',
+      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1',
+      concluidaEm: null,
+      atualizadoEm: '2026-08-09T12:00:00.000Z',
+    },
+    {
+      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd2',
+      titulo: 'Validar com Camila os horários de transferência para a equipe',
+      prazoEm: '2026-08-13T12:00:00-03:00',
+      status: 'pendente',
+      origem: 'call',
+      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2',
+      concluidaEm: null,
+      atualizadoEm: '2026-08-08T12:00:00.000Z',
+    },
+    {
+      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd3',
+      titulo: 'Compartilhar o mapa de demanda com a diretora de operações',
+      prazoEm: '2026-08-08T12:00:00-03:00',
+      status: 'concluida',
+      origem: 'call',
+      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3',
+      concluidaEm: '2026-08-08T16:00:00.000Z',
+      atualizadoEm: '2026-08-08T16:00:00.000Z',
+    },
+  ],
   documento: {
     cliente: {
       empresa: 'Clínica Aurora',

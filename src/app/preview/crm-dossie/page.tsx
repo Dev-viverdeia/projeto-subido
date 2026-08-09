@@ -111,6 +111,19 @@ const LEAD_OPERACIONAL: DossieLead = {
       codigoPublico: 'preview-follow-up',
     },
   ],
+  acoesPlano: [
+    {
+      id: '55555555-5555-4555-8555-555555555555',
+      titulo: 'Enviar o diagnóstico do piloto e marcar a apresentação com a diretoria.',
+      prazoEm: '2026-08-12T15:00:00.000Z',
+      reuniaoId: '22222222-2222-4222-8222-222222222222',
+    },
+  ],
+  projetoAtivo: {
+    id: '66666666-6666-4666-8666-666666666666',
+    titulo: 'Atendimento inteligente para clínicas',
+    status: 'em_execucao',
+  },
   enriquecimentos: [],
   totalCalls: 2,
 };
@@ -312,7 +325,7 @@ export default async function PreviewDossiePage({
                 <p className={pagina.acaoPorque}>
                   O processo atual precisa ser confirmado antes de propor automação.
                 </p>
-                <button type="button">Usar como próxima ação</button>
+                <button type="button">Adicionar ao plano</button>
               </section>
 
               <section className={pagina.painelLateral}>

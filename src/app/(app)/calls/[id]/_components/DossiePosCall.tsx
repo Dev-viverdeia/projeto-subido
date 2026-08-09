@@ -207,8 +207,8 @@ export function DossiePosCall({
           <p className={styles.sobretitulo}>Decisão assistida</p>
           <h2 id="proxima-acao-titulo">Confirme o próximo movimento</h2>
           <p>
-            A leitura sugere; você ajusta e decide. A ação só entra no CRM depois da sua
-            confirmação.
+            A leitura sugere; você ajusta e decide. Depois da confirmação, o compromisso entra no
+            plano do cliente e segue até a entrega.
           </p>
           <dl className={styles.acaoEvidencias}>
             <div>

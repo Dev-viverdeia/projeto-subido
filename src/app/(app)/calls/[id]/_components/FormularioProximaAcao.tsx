@@ -10,7 +10,7 @@ function BotaoConfirmar() {
 
   return (
     <button type="submit" disabled={pending} aria-busy={pending || undefined}>
-      {pending ? 'Atualizando CRM…' : 'Confirmar no CRM'}
+      {pending ? 'Salvando no plano…' : 'Confirmar no plano'}
       <Check size={16} aria-hidden="true" />
     </button>
   );
@@ -51,7 +51,7 @@ export function FormularioProximaAcao({
         <BotaoConfirmar />
       </div>
       <small id="proxima-acao-ajuda" className={styles.acaoNota}>
-        Sua confirmação atualiza a próxima ação e registra um novo fato na jornada do lead.
+        A confirmação atualiza o CRM agora e acompanha o cliente até a Sala de Entrega.
       </small>
     </form>
   );

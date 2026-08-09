@@ -140,6 +140,7 @@ export async function confirmarProximaAcao(formData: FormData): Promise<void> {
   revalidatePath(`/calls/${validacao.data.reuniao}`);
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath('/solucoes');
   revalidatePath('/inicio');
   redirect(`/calls/${validacao.data.reuniao}?acao=${data ? 'ok' : 'sem-alteracao'}`);
 }

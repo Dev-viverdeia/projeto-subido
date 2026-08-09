@@ -44,6 +44,17 @@ export type ArquivoProjetoExecucao = {
   criadoEm: string;
 };
 
+export type AcaoPlanoProjeto = {
+  id: string;
+  titulo: string;
+  prazoEm: string | null;
+  status: Tables<'projeto_acoes'>['status'];
+  origem: string;
+  reuniaoId: string | null;
+  concluidaEm: string | null;
+  atualizadoEm: string;
+};
+
 export type ResumoProjetoExecucao = {
   id: string;
   titulo: string;
@@ -63,6 +74,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   documento: DocumentoProposta;
   tarefas: TarefaProjetoExecucao[];
   arquivos: ArquivoProjetoExecucao[];
+  acoesPlano: AcaoPlanoProjeto[];
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -99,8 +111,9 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem), projeto_acoes(status, titulo, prazo_em, atualizado_em)',
     )
+    .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
     .limit(50);
 
@@ -112,6 +125,14 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
     const tarefas = [...linha.projeto_tarefas].sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
+    const compromisso = [...linha.projeto_acoes]
+      .filter((acao) => acao.status === 'pendente')
+      .sort((a, b) => {
+        if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
+        if (a.prazo_em) return -1;
+        if (b.prazo_em) return 1;
+        return b.atualizado_em.localeCompare(a.atualizado_em);
+      })[0];
     return [
       {
         id: linha.id,
@@ -122,7 +143,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         atualizadoEm: linha.atualizado_em,
         feitas,
         total: tarefas.length,
-        proximaTarefa: proxima?.titulo ?? null,
+        proximaTarefa: compromisso?.titulo ?? proxima?.titulo ?? null,
       },
     ];
   });
@@ -133,7 +154,7 @@ export const obterProjetoExecucao = cache(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('projetos_execucao')
-      .select('*, projeto_tarefas(*), projeto_arquivos(*)')
+      .select('*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*)')
       .eq('id', id)
       .maybeSingle();
 
@@ -180,6 +201,25 @@ export const obterProjetoExecucao = cache(
       portalAtivo: data.portal_ativo,
       portalCodigo: data.portal_codigo,
       portalAtivadoEm: data.portal_ativado_em,
+      acoesPlano: data.projeto_acoes
+        .map((acao) => ({
+          id: acao.id,
+          titulo: acao.titulo,
+          prazoEm: acao.prazo_em,
+          status: acao.status,
+          origem: acao.origem,
+          reuniaoId: acao.reuniao_id,
+          concluidaEm: acao.concluida_em,
+          atualizadoEm: acao.atualizado_em,
+        }))
+        .sort((a, b) => {
+          if (a.status === 'pendente' && b.status !== 'pendente') return -1;
+          if (a.status !== 'pendente' && b.status === 'pendente') return 1;
+          if (a.prazoEm && b.prazoEm) return a.prazoEm.localeCompare(b.prazoEm);
+          if (a.prazoEm) return -1;
+          if (b.prazoEm) return 1;
+          return b.atualizadoEm.localeCompare(a.atualizadoEm);
+        }),
     };
   },
 );

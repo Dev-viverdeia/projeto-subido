@@ -49,6 +49,10 @@
 }
 
 body {
+  /* O vendor fixa html/body em 100%. Com overflow-x oculto, isso criava um
+     contêiner de rolagem de 1 viewport e recortava conteúdo após 194px ao
+     inspecionar a Sala em 390×844. A altura precisa acompanhar o documento. */
+  height: auto;
   min-height: 100dvh;
   overflow-x: hidden;
   background: var(--via-bg);
@@ -57,6 +61,9 @@ body {
 }
 
 html {
+  height: auto;
+  min-height: 100%;
+
   /* Quadros horizontais (como o Kanban do CRM) rolam dentro do próprio
      componente; nunca devem transformar a página inteira em uma faixa lateral. */
   overflow-x: hidden;

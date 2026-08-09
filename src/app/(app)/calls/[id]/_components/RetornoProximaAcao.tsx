@@ -6,7 +6,7 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} data-tipo="sucesso" role="status">
         <Check size={17} aria-hidden="true" />
-        Próxima ação confirmada. O CRM e a linha do tempo já foram atualizados.
+        Compromisso confirmado. O CRM e o plano do cliente já foram atualizados.
       </div>
     );
   }
@@ -15,7 +15,7 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} role="status">
         <BadgeCheck size={17} aria-hidden="true" />
-        Essa ação já estava salva no CRM; nada foi duplicado.
+        Essa ação já estava no plano do cliente; nada foi duplicado.
       </div>
     );
   }

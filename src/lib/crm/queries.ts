@@ -238,6 +238,19 @@ export type CallDossieLead = {
   codigoPublico: string;
 };
 
+export type AcaoPlanoDossie = {
+  id: string;
+  titulo: string;
+  prazoEm: string | null;
+  reuniaoId: string | null;
+};
+
+export type ProjetoAtivoDossie = {
+  id: string;
+  titulo: string;
+  status: Tables<'projetos_execucao'>['status'];
+};
+
 export type DossieLead = {
   oportunidade: OportunidadeCrm;
   empresa: {
@@ -257,6 +270,8 @@ export type DossieLead = {
   } | null;
   eventos: EventoDossie[];
   calls: CallDossieLead[];
+  acoesPlano: AcaoPlanoDossie[];
+  projetoAtivo: ProjetoAtivoDossie | null;
   enriquecimentos: ExecucaoEnriquecimento[];
   totalCalls: number;
 };
@@ -278,43 +293,60 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   if (error) throw handleError(error, 'crm:dossie-oportunidade');
   if (!linha) return null;
 
-  const [empresa, contato, eventos, enriquecimentos, calls] = await Promise.all([
-    supabase
-      .from('crm_empresas')
-      .select('id, nome, dominio, setor, porte, cidade, estado, enriquecido_em')
-      .eq('id', linha.empresa_id)
-      .single(),
-    linha.contato_principal_id
-      ? supabase
-          .from('crm_contatos')
-          .select('id, nome, email, telefone, cargo, linkedin_url')
-          .eq('id', linha.contato_principal_id)
-          .maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-    supabase
-      .from('crm_eventos')
-      .select('id, titulo, descricao, tipo, ocorrido_em, fonte')
-      .eq('oportunidade_id', id)
-      .order('ocorrido_em', { ascending: false })
-      .limit(30),
-    supabase
-      .from('crm_enriquecimentos')
-      .select(
-        'id, status, dominio, linkedin_url, erro, solicitado_em, concluido_em, resultado, fontes',
-      )
-      .eq('oportunidade_id', id)
-      .order('solicitado_em', { ascending: false })
-      .limit(10),
-    supabase
-      .from('calls_reunioes')
-      .select(
-        'id, titulo, tipo, status, agendada_para, iniciada_em, encerrada_em, duracao_minutos, codigo_publico',
-        { count: 'exact' },
-      )
-      .eq('oportunidade_id', id)
-      .order('agendada_para', { ascending: false })
-      .limit(6),
-  ]);
+  const [empresa, contato, eventos, enriquecimentos, calls, acoesPlano, projetoAtivo] =
+    await Promise.all([
+      supabase
+        .from('crm_empresas')
+        .select('id, nome, dominio, setor, porte, cidade, estado, enriquecido_em')
+        .eq('id', linha.empresa_id)
+        .single(),
+      linha.contato_principal_id
+        ? supabase
+            .from('crm_contatos')
+            .select('id, nome, email, telefone, cargo, linkedin_url')
+            .eq('id', linha.contato_principal_id)
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+      supabase
+        .from('crm_eventos')
+        .select('id, titulo, descricao, tipo, ocorrido_em, fonte')
+        .eq('oportunidade_id', id)
+        .order('ocorrido_em', { ascending: false })
+        .limit(30),
+      supabase
+        .from('crm_enriquecimentos')
+        .select(
+          'id, status, dominio, linkedin_url, erro, solicitado_em, concluido_em, resultado, fontes',
+        )
+        .eq('oportunidade_id', id)
+        .order('solicitado_em', { ascending: false })
+        .limit(10),
+      supabase
+        .from('calls_reunioes')
+        .select(
+          'id, titulo, tipo, status, agendada_para, iniciada_em, encerrada_em, duracao_minutos, codigo_publico',
+          { count: 'exact' },
+        )
+        .eq('oportunidade_id', id)
+        .order('agendada_para', { ascending: false })
+        .limit(6),
+      supabase
+        .from('projeto_acoes')
+        .select('id, titulo, prazo_em, reuniao_id, atualizado_em')
+        .eq('oportunidade_id', id)
+        .eq('status', 'pendente')
+        .order('prazo_em', { ascending: true, nullsFirst: false })
+        .order('atualizado_em', { ascending: false })
+        .limit(6),
+      supabase
+        .from('projetos_execucao')
+        .select('id, titulo, status')
+        .eq('oportunidade_id', id)
+        .neq('status', 'concluido')
+        .order('atualizado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
   if (empresa.error) throw handleError(empresa.error, 'crm:dossie-empresa');
   if (contato.error) throw handleError(contato.error, 'crm:dossie-contato');
@@ -323,6 +355,8 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     throw handleError(enriquecimentos.error, 'crm:dossie-enriquecimentos');
   }
   if (calls.error) throw handleError(calls.error, 'crm:dossie-calls');
+  if (acoesPlano.error) throw handleError(acoesPlano.error, 'crm:dossie-plano');
+  if (projetoAtivo.error) throw handleError(projetoAtivo.error, 'crm:dossie-projeto');
 
   const empresaLinha = empresa.data;
   if (!empresaLinha) return null;
@@ -384,6 +418,19 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       duracaoMinutos: call.duracao_minutos,
       codigoPublico: call.codigo_publico,
     })),
+    acoesPlano: (acoesPlano.data ?? []).map((acao) => ({
+      id: acao.id,
+      titulo: acao.titulo,
+      prazoEm: acao.prazo_em,
+      reuniaoId: acao.reuniao_id,
+    })),
+    projetoAtivo: projetoAtivo.data
+      ? {
+          id: projetoAtivo.data.id,
+          titulo: projetoAtivo.data.titulo,
+          status: projetoAtivo.data.status,
+        }
+      : null,
     enriquecimentos: (enriquecimentos.data ?? []).map((execucao) => ({
       id: execucao.id,
       status: execucao.status,

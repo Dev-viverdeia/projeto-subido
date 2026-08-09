@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, CalendarPlus, Clock3, History, Video } from 'lucide-react';
+import { ArrowUpRight, CalendarPlus, History, ListChecks, Video } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import type { DossieLead } from '@/lib/crm/queries';
 import styles from '../pagina.module.css';
@@ -31,7 +31,9 @@ function rotuloDaCall(call: DossieLead['calls'][number]) {
 
 export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
   const callRecente = lead.calls[0] ?? null;
+  const compromisso = lead.acoesPlano[0] ?? null;
   const proximaAcao =
+    compromisso?.titulo ??
     lead.oportunidade.proximaAcao ??
     (callRecente?.status === 'concluida'
       ? 'Revisar a última call e confirmar o próximo movimento.'
@@ -57,20 +59,30 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
       <div className={styles.gradeOperacao}>
         <article className={styles.agora}>
           <div className={styles.agoraRotulo}>
-            <Clock3 size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>Próximo movimento</span>
+            <ListChecks size={17} strokeWidth={1.8} aria-hidden="true" />
+            <span>{compromisso ? 'Plano do cliente' : 'Próximo movimento'}</span>
           </div>
           <h3>{proximaAcao}</h3>
-          {lead.oportunidade.proximaAcaoEm && (
-            <time dateTime={lead.oportunidade.proximaAcaoEm}>
-              Combinado para {DATA_CURTA.format(new Date(lead.oportunidade.proximaAcaoEm))}
+          {(compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm) && (
+            <time dateTime={compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm ?? undefined}>
+              Combinado para{' '}
+              {DATA_CURTA.format(
+                new Date(compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm ?? ''),
+              )}
             </time>
           )}
-          {callRecente && (
-            <Link href={destinoDaCall(callRecente)}>
-              {rotuloDaCall(callRecente)}
+          {lead.projetoAtivo ? (
+            <Link href={`/solucoes/execucao/${lead.projetoAtivo.id}`}>
+              Abrir sala de entrega
               <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
+          ) : (
+            callRecente && (
+              <Link href={destinoDaCall(callRecente)}>
+                {rotuloDaCall(callRecente)}
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            )
           )}
         </article>
 

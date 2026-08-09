@@ -1357,6 +1357,76 @@ export type Database = {
           },
         ]
       }
+      projeto_acoes: {
+        Row: {
+          atualizado_em: string
+          concluida_em: string | null
+          criado_em: string
+          dono: string
+          empresa_id: string
+          id: string
+          oportunidade_id: string
+          origem: string
+          prazo_em: string | null
+          projeto_execucao_id: string | null
+          reuniao_id: string | null
+          status: Database["public"]["Enums"]["projeto_acao_status"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          concluida_em?: string | null
+          criado_em?: string
+          dono: string
+          empresa_id: string
+          id?: string
+          oportunidade_id: string
+          origem?: string
+          prazo_em?: string | null
+          projeto_execucao_id?: string | null
+          reuniao_id?: string | null
+          status?: Database["public"]["Enums"]["projeto_acao_status"]
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          concluida_em?: string | null
+          criado_em?: string
+          dono?: string
+          empresa_id?: string
+          id?: string
+          oportunidade_id?: string
+          origem?: string
+          prazo_em?: string | null
+          projeto_execucao_id?: string | null
+          reuniao_id?: string | null
+          status?: Database["public"]["Enums"]["projeto_acao_status"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_acoes_execucao_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "projeto_acoes_oportunidade_fk"
+            columns: ["dono", "empresa_id", "oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["dono", "empresa_id", "id"]
+          },
+          {
+            foreignKeyName: "projeto_acoes_reuniao_fk"
+            columns: ["dono", "reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       projeto_arquivos: {
         Row: {
           caminho_storage: string
@@ -2087,6 +2157,7 @@ export type Database = {
         | "falhou"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
       papel_usuario: "membro" | "mentor" | "admin"
+      projeto_acao_status: "pendente" | "concluida" | "cancelada"
       projeto_cliente_status:
         | "nao_solicitada"
         | "aguardando"
@@ -2292,6 +2363,7 @@ export const Constants = {
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
       papel_usuario: ["membro", "mentor", "admin"],
+      projeto_acao_status: ["pendente", "concluida", "cancelada"],
       projeto_cliente_status: [
         "nao_solicitada",
         "aguardando",

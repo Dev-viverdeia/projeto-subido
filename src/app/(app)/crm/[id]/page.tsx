@@ -287,11 +287,11 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
                   >
                     {lead.oportunidade.proximaAcao === dossie.proximaAcao.acao ? (
                       <>
-                        <Check size={15} aria-hidden="true" /> Ação adicionada ao CRM
+                        <Check size={15} aria-hidden="true" /> Ação no plano
                       </>
                     ) : (
                       <>
-                        Usar como próxima ação <ArrowUpRight size={15} aria-hidden="true" />
+                        Adicionar ao plano <ArrowUpRight size={15} aria-hidden="true" />
                       </>
                     )}
                   </button>

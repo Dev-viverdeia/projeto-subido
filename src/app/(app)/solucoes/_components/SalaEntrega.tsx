@@ -30,6 +30,7 @@ import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-exec
 import { formatarReais } from '@/lib/propostas/schema';
 import { EntregaCliente } from './EntregaCliente';
 import { CentralArquivos } from './CentralArquivos';
+import { PlanoVivo } from './PlanoVivo';
 import { PortalClienteCard } from './PortalClienteCard';
 import styles from './SalaEntrega.module.css';
 
@@ -59,6 +60,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     [projeto.tarefas],
   );
   const proxima = projeto.tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
+  const proximoCompromisso = projeto.acoesPlano.find((acao) => acao.status === 'pendente') ?? null;
   const faseInicial = fases.find((fase) => fase.id === proxima?.faseId) ?? fases[0] ?? null;
   const [faseId, setFaseId] = useState(faseInicial?.id ?? '');
   const faseAtual = fases.find((fase) => fase.id === faseId) ?? faseInicial;
@@ -148,6 +150,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </nav>
       </header>
 
+      <PlanoVivo projetoId={projeto.id} acoes={projeto.acoesPlano} />
+
       <div className={styles.corpo}>
         <main className={styles.operacao}>
           <header className={styles.cabecalhoFase}>
@@ -209,8 +213,13 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
 
         <aside className={styles.lateral}>
           <section className={styles.proximaAcao}>
-            <p>Próxima ação</p>
-            {proxima ? (
+            <p>{proximoCompromisso ? 'Próximo compromisso' : 'Próxima tarefa'}</p>
+            {proximoCompromisso ? (
+              <>
+                <strong>{proximoCompromisso.titulo}</strong>
+                <span>Plano vivo do cliente</span>
+              </>
+            ) : proxima ? (
               <>
                 <strong>{proxima.titulo}</strong>
                 <span>{proxima.faseTitulo}</span>

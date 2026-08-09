@@ -13,6 +13,8 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
   registrarArquivoProjeto: vi.fn(),
 }));
 
+vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn() }));
+
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 import { SalaEntrega } from './SalaEntrega';
@@ -52,6 +54,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
   arquivos: [],
+  acoesPlano: [],
   documento: DOCUMENTO,
   tarefas: [
     {
@@ -135,5 +138,33 @@ describe('SalaEntrega', () => {
     expect(screen.getByRole('textbox', { name: /Evidência da execução/i })).toHaveValue(
       'Mapa aprovado.',
     );
+  });
+
+  it('mantém os compromissos da call separados das tarefas do método', () => {
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          acoesPlano: [
+            {
+              id: '55555555-5555-4555-8555-555555555555',
+              titulo: 'Enviar os acessos combinados na call',
+              prazoEm: '2026-08-12T12:00:00.000Z',
+              status: 'pendente',
+              origem: 'call',
+              reuniaoId: '66666666-6666-4666-8666-666666666666',
+              concluidaEm: null,
+              atualizadoEm: '2026-08-09T12:00:00.000Z',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('region', { name: 'O combinado segue com o cliente' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Enviar os acessos combinados na call')).toHaveLength(2);
+    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeInTheDocument();
   });
 });
