@@ -25,9 +25,11 @@ function BotaoAgendar() {
 export function FormularioAgendarCall({
   oportunidades,
   abertoInicial = false,
+  oportunidadeInicial,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
+  oportunidadeInicial?: string;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -36,6 +38,9 @@ export function FormularioAgendarCall({
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
   const [estado, acao] = useActionState(agendarReuniao, INICIAL);
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
+  const oportunidadePadrao = disponiveis.some((item) => item.id === oportunidadeInicial)
+    ? oportunidadeInicial
+    : '';
 
   useEffect(() => {
     if (!aberto) return;
@@ -160,7 +165,7 @@ export function FormularioAgendarCall({
                     <select
                       id="calls-oportunidade"
                       name="oportunidade"
-                      defaultValue={estado.campos?.oportunidade ?? ''}
+                      defaultValue={estado.campos?.oportunidade ?? oportunidadePadrao}
                       aria-invalid={Boolean(erroVisivel('oportunidade'))}
                       aria-describedby={
                         erroVisivel('oportunidade') ? 'calls-oportunidade-msg' : undefined

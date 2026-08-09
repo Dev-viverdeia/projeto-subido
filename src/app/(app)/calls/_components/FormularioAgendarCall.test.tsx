@@ -40,6 +40,20 @@ describe('FormularioAgendarCall', () => {
     await waitFor(() => expect(gatilho).toHaveFocus());
   });
 
+  it('abre pelo dossiê com a oportunidade correta já selecionada', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+      />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Agendar call' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
+  });
+
   it('anuncia os erros, foca a primeira decisão e limpa o campo corrigido', async () => {
     const user = userEvent.setup();
     agendarReuniaoMock.mockResolvedValue({

@@ -30,6 +30,7 @@ import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
 import { AtalhoDiagnostico } from './_components/AtalhoDiagnostico';
 import { AtalhoProposta } from './_components/AtalhoProposta';
+import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import { dataCompleta } from './datas';
 import styles from './pagina.module.css';
 
@@ -119,6 +120,8 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         </div>
       </section>
 
+      <ResumoOperacionalLead lead={lead} />
+
       {emAndamento && <EstadoEnriquecimento status={emAndamento.status} erro={null} />}
       {falhaRecente && (
         <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
@@ -180,7 +183,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
           </section>
 
           <div className={styles.gradeConteudo}>
-            <main className={styles.colunaPrincipal}>
+            <div className={styles.colunaPrincipal}>
               <section className={styles.bloco} aria-labelledby="fatos-titulo">
                 <header className={styles.blocoTopo}>
                   <div>
@@ -267,7 +270,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
                   ))}
                 </div>
               </section>
-            </main>
+            </div>
 
             <aside className={styles.colunaLateral}>
               <section className={styles.proximaAcao} aria-labelledby="proxima-acao-titulo">

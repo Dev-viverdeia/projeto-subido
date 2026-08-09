@@ -17,11 +17,103 @@ import {
   Video,
 } from 'lucide-react';
 import { FormularioEnriquecimento } from '@/app/(app)/crm/[id]/_components/FormularioEnriquecimento';
+import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Dossiê do lead' };
+
+const LEAD_OPERACIONAL: DossieLead = {
+  oportunidade: {
+    id: '11111111-1111-4111-8111-111111111111',
+    titulo: 'Automação do atendimento',
+    etapa: 'descoberta',
+    empresaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    empresa: 'Clínica Aurora',
+    dominio: 'clinicaaurora.com.br',
+    enriquecidoEm: '2026-08-08T18:10:00.000Z',
+    enriquecimentoStatus: 'concluido',
+    contatoId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    contato: 'Camila Rios',
+    contatoEmail: 'camila@clinicaaurora.com.br',
+    valorCentavos: null,
+    proximaAcao: 'Enviar o diagnóstico do piloto e marcar a apresentação com a diretoria.',
+    proximaAcaoEm: '2026-08-12T15:00:00.000Z',
+    ultimoFato: 'Call de descoberta concluída',
+    ultimoFatoEm: '2026-08-08T17:44:00.000Z',
+    atualizadoEm: '2026-08-08T17:46:00.000Z',
+    criadoEm: '2026-08-03T13:00:00.000Z',
+  },
+  empresa: {
+    nome: 'Clínica Aurora',
+    dominio: 'clinicaaurora.com.br',
+    setor: 'Saúde',
+    porte: 'Médio',
+    cidade: 'São Paulo',
+    estado: 'SP',
+  },
+  contato: {
+    nome: 'Camila Rios',
+    email: 'camila@clinicaaurora.com.br',
+    telefone: null,
+    cargo: 'Diretora de Operações',
+    linkedinUrl: 'https://www.linkedin.com/in/camila-rios',
+  },
+  eventos: [
+    {
+      id: 'evento-2',
+      titulo: 'Dossiê comercial atualizado',
+      descricao: 'Site público e histórico do CRM foram lidos novamente.',
+      tipo: 'enriquecimento',
+      ocorridoEm: '2026-08-08T18:10:00.000Z',
+      fonte: 'Enriquecimento',
+    },
+    {
+      id: 'evento-1',
+      titulo: 'Call de descoberta concluída',
+      descricao: 'Dores, decisões e compromissos foram adicionados ao contexto do lead.',
+      tipo: 'call_concluida',
+      ocorridoEm: '2026-08-08T17:44:00.000Z',
+      fonte: 'Calls',
+    },
+    {
+      id: 'evento-3',
+      titulo: 'Lead entrou no pipeline',
+      descricao: 'Oportunidade criada por indicação de um cliente.',
+      tipo: 'lead_criado',
+      ocorridoEm: '2026-08-03T13:00:00.000Z',
+      fonte: 'CRM',
+    },
+  ],
+  calls: [
+    {
+      id: '22222222-2222-4222-8222-222222222222',
+      titulo: 'Descoberta do atendimento',
+      tipo: 'descoberta',
+      status: 'concluida',
+      agendadaPara: '2026-08-08T17:00:00.000Z',
+      iniciadaEm: '2026-08-08T17:02:00.000Z',
+      encerradaEm: '2026-08-08T17:44:00.000Z',
+      duracaoMinutos: 45,
+      codigoPublico: 'preview-descoberta',
+    },
+    {
+      id: '33333333-3333-4333-8333-333333333333',
+      titulo: 'Follow-up do diagnóstico',
+      tipo: 'follow_up',
+      status: 'agendada',
+      agendadaPara: '2026-08-12T15:00:00.000Z',
+      iniciadaEm: null,
+      encerradaEm: null,
+      duracaoMinutos: 30,
+      codigoPublico: 'preview-follow-up',
+    },
+  ],
+  enriquecimentos: [],
+  totalCalls: 2,
+};
 
 export default async function PreviewDossiePage({
   searchParams,
@@ -118,6 +210,8 @@ export default async function PreviewDossiePage({
             </div>
           </section>
 
+          <ResumoOperacionalLead lead={LEAD_OPERACIONAL} />
+
           <section className={pagina.resumo}>
             <div className={pagina.resumoMarca}>
               <Layers3 size={18} aria-hidden="true" /> Leitura do lead
@@ -132,7 +226,7 @@ export default async function PreviewDossiePage({
           </section>
 
           <div className={pagina.gradeConteudo}>
-            <main className={pagina.colunaPrincipal}>
+            <div className={pagina.colunaPrincipal}>
               <section className={pagina.bloco}>
                 <header className={pagina.blocoTopo}>
                   <div>
@@ -208,7 +302,7 @@ export default async function PreviewDossiePage({
                   </article>
                 </div>
               </section>
-            </main>
+            </div>
 
             <aside className={pagina.colunaLateral}>
               <section className={pagina.proximaAcao}>

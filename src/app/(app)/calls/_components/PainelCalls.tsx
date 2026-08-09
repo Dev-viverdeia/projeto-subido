@@ -38,11 +38,13 @@ export function PainelCalls({
   oportunidades,
   agendada = false,
   modalInicial = false,
+  oportunidadeInicial,
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
   agendada?: boolean;
   modalInicial?: boolean;
+  oportunidadeInicial?: string;
 }) {
   const ativas = reunioes.filter((item) => callPodeAbrir(item.status));
   const historico = reunioes
@@ -61,7 +63,11 @@ export function PainelCalls({
             entrega do projeto.
           </p>
         </div>
-        <FormularioAgendarCall oportunidades={oportunidades} abertoInicial={modalInicial} />
+        <FormularioAgendarCall
+          oportunidades={oportunidades}
+          abertoInicial={modalInicial}
+          oportunidadeInicial={oportunidadeInicial}
+        />
       </header>
 
       {agendada && (
@@ -148,7 +154,10 @@ export function PainelCalls({
                   Adicionar lead <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               ) : (
-                <FormularioAgendarCall oportunidades={oportunidades} />
+                <FormularioAgendarCall
+                  oportunidades={oportunidades}
+                  oportunidadeInicial={oportunidadeInicial}
+                />
               )}
             </div>
           ) : (

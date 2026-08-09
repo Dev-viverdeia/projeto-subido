@@ -17,6 +17,10 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
       reunioes={reunioes}
       oportunidades={oportunidades}
       agendada={parametros.agendada === 'ok'}
+      modalInicial={parametros.nova === '1'}
+      oportunidadeInicial={
+        typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
+      }
     />
   );
 }

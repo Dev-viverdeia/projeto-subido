@@ -133,6 +133,9 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
           reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
           oportunidades={OPORTUNIDADES}
           modalInicial={parametros.modal === '1'}
+          oportunidadeInicial={
+            typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
+          }
         />
       </main>
     </div>

@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
+import type { StatusCall, TipoCall } from '@/lib/calls/tipos';
 import {
   lerDossie,
   lerFontes,
@@ -225,6 +226,18 @@ export type ExecucaoEnriquecimento = {
   fontes: FonteEnriquecimento[];
 };
 
+export type CallDossieLead = {
+  id: string;
+  titulo: string;
+  tipo: TipoCall;
+  status: StatusCall;
+  agendadaPara: string;
+  iniciadaEm: string | null;
+  encerradaEm: string | null;
+  duracaoMinutos: number;
+  codigoPublico: string;
+};
+
 export type DossieLead = {
   oportunidade: OportunidadeCrm;
   empresa: {
@@ -243,6 +256,7 @@ export type DossieLead = {
     linkedinUrl: string | null;
   } | null;
   eventos: EventoDossie[];
+  calls: CallDossieLead[];
   enriquecimentos: ExecucaoEnriquecimento[];
   totalCalls: number;
 };
@@ -293,8 +307,13 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .limit(10),
     supabase
       .from('calls_reunioes')
-      .select('id', { count: 'exact', head: true })
-      .eq('oportunidade_id', id),
+      .select(
+        'id, titulo, tipo, status, agendada_para, iniciada_em, encerrada_em, duracao_minutos, codigo_publico',
+        { count: 'exact' },
+      )
+      .eq('oportunidade_id', id)
+      .order('agendada_para', { ascending: false })
+      .limit(6),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'crm:dossie-empresa');
@@ -353,6 +372,17 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       tipo: evento.tipo,
       ocorridoEm: evento.ocorrido_em,
       fonte: evento.fonte,
+    })),
+    calls: (calls.data ?? []).map((call) => ({
+      id: call.id,
+      titulo: call.titulo,
+      tipo: call.tipo,
+      status: call.status,
+      agendadaPara: call.agendada_para,
+      iniciadaEm: call.iniciada_em,
+      encerradaEm: call.encerrada_em,
+      duracaoMinutos: call.duracao_minutos,
+      codigoPublico: call.codigo_publico,
     })),
     enriquecimentos: (enriquecimentos.data ?? []).map((execucao) => ({
       id: execucao.id,

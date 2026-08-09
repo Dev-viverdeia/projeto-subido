@@ -5,7 +5,6 @@ import {
   BadgeCheck,
   BrainCircuit,
   CalendarClock,
-  Check,
   ChevronRight,
   CircleAlert,
   CircleHelp,
@@ -18,11 +17,12 @@ import {
   Layers3,
   Target,
 } from 'lucide-react';
-import { confirmarProximaAcao } from '@/lib/calls/actions';
 import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { ListaFactual, MapaFactual } from './MapaFactual';
+import { FormularioProximaAcao } from './FormularioProximaAcao';
+import { RetornoProximaAcao } from './RetornoProximaAcao';
 import { TranscricaoCall } from './TranscricaoCall';
 import styles from '../pagina.module.css';
 
@@ -92,6 +92,13 @@ function estadoDaAnalise(posCall: PosCall) {
   return { rotulo: 'Processando', tipo: 'processando' } as const;
 }
 
+function IconeEstado({ tipo }: { tipo: ReturnType<typeof estadoDaAnalise>['tipo'] }) {
+  if (tipo === 'pronta') return <BadgeCheck size={14} aria-hidden="true" />;
+  if (tipo === 'falhou') return <CircleAlert size={14} aria-hidden="true" />;
+  if (tipo === 'indisponivel') return <CircleHelp size={14} aria-hidden="true" />;
+  return <Radar size={14} aria-hidden="true" />;
+}
+
 export function DossiePosCall({
   posCall,
   estadoAcao,
@@ -129,7 +136,7 @@ export function DossiePosCall({
         <div className={styles.heroTopo}>
           <div className={styles.heroTitulo}>
             <div className={styles.sobretituloHero}>
-              <span data-estado={estado.tipo} />
+              <IconeEstado tipo={estado.tipo} />
               Pós-call inteligente · {estado.rotulo}
             </div>
             <h1>{posCall.reuniao.titulo}</h1>
@@ -164,6 +171,9 @@ export function DossiePosCall({
           <div className={`${styles.pulsoItem} ${styles.pulsoAcao}`}>
             <small>Próximo movimento</small>
             <strong>{acaoSugerida || 'Definir com revisão humana'}</strong>
+            <a href="#proxima-acao">
+              Revisar e confirmar <ChevronRight size={14} aria-hidden="true" />
+            </a>
           </div>
         </div>
 
@@ -183,24 +193,46 @@ export function DossiePosCall({
         </div>
       </header>
 
-      {estadoAcao === 'ok' && (
-        <div className={styles.retorno} data-tipo="sucesso" role="status">
-          <Check size={17} aria-hidden="true" />
-          Próxima ação confirmada. O CRM e a linha do tempo já foram atualizados.
+      <RetornoProximaAcao estado={estadoAcao} />
+
+      <section
+        id="proxima-acao"
+        className={styles.centralAcao}
+        aria-labelledby="proxima-acao-titulo"
+      >
+        <div className={styles.centralAcaoContexto}>
+          <div className={styles.acaoMarca}>
+            <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+          </div>
+          <p className={styles.sobretitulo}>Decisão assistida</p>
+          <h2 id="proxima-acao-titulo">Confirme o próximo movimento</h2>
+          <p>
+            A leitura sugere; você ajusta e decide. A ação só entra no CRM depois da sua
+            confirmação.
+          </p>
+          <dl className={styles.acaoEvidencias}>
+            <div>
+              <dt>Confirmados</dt>
+              <dd>{fatosConfirmados}</dd>
+            </div>
+            <div>
+              <dt>Em aberto</dt>
+              <dd>{pontosAbertos}</dd>
+            </div>
+            <div>
+              <dt>Leitura</dt>
+              <dd>{nota ?? '—'}</dd>
+            </div>
+          </dl>
         </div>
-      )}
-      {estadoAcao === 'sem-alteracao' && (
-        <div className={styles.retorno} role="status">
-          <BadgeCheck size={17} aria-hidden="true" />
-          Essa ação já estava salva no CRM; nada foi duplicado.
-        </div>
-      )}
-      {estadoAcao === 'erro' && (
-        <div className={styles.retorno} data-tipo="erro" role="alert">
-          <CircleAlert size={17} aria-hidden="true" />
-          Não foi possível salvar agora. Revise o texto e a data antes de tentar novamente.
-        </div>
-      )}
+
+        <FormularioProximaAcao
+          reuniaoId={posCall.reuniao.id}
+          oportunidadeId={posCall.oportunidade.id}
+          acaoInicial={acaoSugerida}
+          dataInicial={dataInput(posCall.oportunidade.proximaAcaoEm)}
+        />
+      </section>
 
       <div className={styles.gradeOperacional}>
         <div className={styles.principal}>
@@ -327,45 +359,6 @@ export function DossiePosCall({
         </div>
 
         <aside className={styles.lateral}>
-          <section className={styles.proximaAcao} aria-labelledby="proxima-acao-titulo">
-            <div className={styles.acaoMarca}>
-              <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
-            </div>
-            <p className={styles.sobretitulo}>Agora</p>
-            <h2 id="proxima-acao-titulo">Transforme leitura em movimento</h2>
-            <p>Confirme ou ajuste a recomendação. Só depois disso ela passa a orientar o CRM.</p>
-
-            <form action={confirmarProximaAcao}>
-              <input type="hidden" name="reuniao" value={posCall.reuniao.id} />
-              <input type="hidden" name="oportunidade" value={posCall.oportunidade.id} />
-              <label>
-                <span>Próxima ação</span>
-                <textarea
-                  name="acao"
-                  rows={4}
-                  maxLength={500}
-                  defaultValue={acaoSugerida}
-                  placeholder="Ex.: enviar diagnóstico revisado para o contato"
-                  required
-                />
-              </label>
-              <label>
-                <span>Data combinada</span>
-                <input
-                  type="date"
-                  name="quando"
-                  defaultValue={dataInput(posCall.oportunidade.proximaAcaoEm)}
-                />
-              </label>
-              <button type="submit">
-                Confirmar no CRM <Check size={16} aria-hidden="true" />
-              </button>
-            </form>
-            <small className={styles.acaoNota}>
-              A atualização fica registrada como fato na jornada do lead.
-            </small>
-          </section>
-
           <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
             <div className={styles.lacunasTopo}>
               <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
