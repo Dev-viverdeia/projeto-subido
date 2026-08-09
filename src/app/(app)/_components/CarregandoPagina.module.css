@@ -1,0 +1,151 @@
+.pagina {
+  width: min(100%, 1240px);
+  margin-inline: auto;
+}
+
+.cabecalho {
+  max-width: 720px;
+  padding-block: var(--via-space-2) var(--via-space-8);
+}
+
+.esqueleto {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-06);
+}
+
+.esqueleto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    var(--via-navy-05) 42%,
+    var(--via-navy-08) 50%,
+    var(--via-navy-05) 58%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: carregar 1.35s ease-in-out infinite;
+}
+
+.sobretitulo {
+  width: 92px;
+  height: 10px;
+  margin-bottom: var(--via-space-4);
+}
+
+.titulo {
+  width: min(72%, 430px);
+  height: 36px;
+  margin-bottom: var(--via-space-3);
+  border-radius: var(--via-radius-sm);
+}
+
+.descricao {
+  width: min(88%, 620px);
+  height: 14px;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4);
+}
+
+.cartao {
+  min-height: 154px;
+  padding: var(--via-space-5);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-surface) 94%, var(--via-navy-03));
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.cartaoPrincipal {
+  grid-row: span 2;
+  min-height: 324px;
+}
+
+.linhaCartao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.icone {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--via-radius-md);
+}
+
+.textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.textoCurto,
+.textoMedio,
+.textoLongo {
+  height: 11px;
+  margin-bottom: var(--via-space-3);
+}
+
+.textoCurto {
+  width: 38%;
+}
+
+.textoMedio {
+  width: 62%;
+}
+
+.textoLongo {
+  width: 88%;
+}
+
+.bloco {
+  height: 180px;
+  margin-top: var(--via-space-6);
+  border-radius: var(--app-radius-control);
+}
+
+@keyframes carregar {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 680px) {
+  .cabecalho {
+    padding-bottom: var(--via-space-6);
+  }
+
+  .titulo {
+    width: 78%;
+    height: 30px;
+  }
+
+  .grade {
+    grid-template-columns: 1fr;
+  }
+
+  .cartaoPrincipal {
+    grid-row: auto;
+    min-height: 250px;
+  }
+
+  .bloco {
+    height: 116px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto::after {
+    animation: none;
+  }
+}

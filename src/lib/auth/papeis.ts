@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/lib/supabase/types.generated';
 
@@ -18,7 +19,7 @@ export type Papel = Database['public']['Enums']['papel_usuario'];
  * A RLS de `user_roles` já limita a leitura ao próprio usuário — esta função não
  * consegue ler o papel de outra pessoa mesmo que tente.
  */
-export async function papeisDoUsuario(): Promise<Papel[]> {
+export const papeisDoUsuario = cache(async (): Promise<Papel[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase.from('user_roles').select('papel');
 
@@ -31,7 +32,7 @@ export async function papeisDoUsuario(): Promise<Papel[]> {
   }
 
   return data.map((linha) => linha.papel);
-}
+});
 
 /** Atalho para o guard das rotas de `/admin`. */
 export async function ehAdmin(): Promise<boolean> {

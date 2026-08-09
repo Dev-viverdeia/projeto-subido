@@ -19,7 +19,7 @@ export type ItemNav = {
   rotulo: string;
   /** Elemento já renderizado no servidor — ver o porquê abaixo. */
   icone: React.ReactNode;
-  /** Aparece no dock do mobile. Sete itens não cabem em 375px; cinco cabem. */
+  /** Concorre aos quatro atalhos do dock. O painel "Mais" sempre recebe a lista completa. */
   noDock: boolean;
   /** Organiza a navegação pela jornada real, em vez de uma lista plana de ferramentas. */
   grupo: 'operacao' | 'entrega' | 'evolucao' | 'gestao';
@@ -42,7 +42,7 @@ export const ROTULOS_GRUPO_NAV = {
  * NavLateral — que é cliente por causa do `usePathname` — teria que importar a
  * biblioteca inteira para poder chamá-la.
  *
- * `strokeWidth` 1.8 acompanha o peso da Outfit; o default 2 pesa demais ao lado dela.
+ * `strokeWidth` 1.8 acompanha o peso da Geist; o default 2 pesa demais ao lado dela.
  */
 const TAMANHO = 18;
 const TRACO = 1.8;
@@ -73,7 +73,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/propostas',
     rotulo: ROTULOS['/propostas'],
     icone: <FileSignature size={TAMANHO} strokeWidth={TRACO} />,
-    /* O dock continua com os cinco destinos operacionais já priorizados. */
+    /* Fica no painel completo; o dock prioriza quatro ações recorrentes e "Mais". */
     noDock: false,
     grupo: 'operacao',
   },
@@ -81,8 +81,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/diagnosticos',
     rotulo: ROTULOS['/diagnosticos'],
     icone: <ScanSearch size={TAMANHO} strokeWidth={TRACO} />,
-    /* O diagnóstico é uma ferramenta de pré-venda e fica no trilho completo.
-       O dock móvel preserva os cinco destinos centrais da operação diária. */
+    /* Diagnóstico é pré-venda e fica a um toque dentro do painel completo. */
     noDock: false,
     grupo: 'operacao',
   },
@@ -104,8 +103,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/consultor',
     rotulo: ROTULOS['/consultor'],
     icone: <Bot size={TAMANHO} strokeWidth={TRACO} />,
-    /* O dock do mobile cabe cinco itens e já tem cinco — o Sobral AI entra só
-       no trilho lateral até alguém ceder o lugar. */
+    /* O Sobral AI fica no painel completo para preservar os atalhos operacionais. */
     noDock: false,
     grupo: 'entrega',
   },
@@ -113,8 +111,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/formacoes',
     rotulo: ROTULOS['/formacoes'],
     icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
-    /* No mobile, Calls passa a ocupar este destino operacional. A formação
-       continua disponível no trilho lateral e pelo Mapa da Jornada. */
+    /* Formação fica no painel completo e também aparece no Mapa da Jornada. */
     noDock: false,
     grupo: 'evolucao',
   },
@@ -122,8 +119,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/mentorias',
     rotulo: ROTULOS['/mentorias'],
     icone: <Users size={TAMANHO} strokeWidth={TRACO} />,
-    /* O CRM ocupa o quinto destino operacional do dock. Mentorias continua na
-       navegação lateral e nas chamadas contextuais do Mapa da Jornada. */
+    /* Mentorias fica no painel completo e nas chamadas contextuais da jornada. */
     noDock: false,
     grupo: 'evolucao',
   },
@@ -131,8 +127,7 @@ export const ITENS_NAV: ItemNav[] = [
     href: '/certificados',
     rotulo: ROTULOS['/certificados'],
     icone: <Award size={TAMANHO} strokeWidth={TRACO} />,
-    /* O dock do mobile cabe cinco e já tem cinco — como o Consultor, entra só
-       no trilho lateral. */
+    /* Certificados fica no painel completo, junto das áreas de evolução. */
     noDock: false,
     grupo: 'evolucao',
   },
@@ -146,8 +141,7 @@ export const ITENS_NAV: ItemNav[] = [
  * vazam para quem não pode entrar. Esconder por CSS deixaria a rota descoberta no
  * HTML de todo mundo.
  *
- * Não entra no dock: em 375px cabem cinco, e nenhum deles pode ser um item que a
- * maioria dos usuários não enxerga.
+ * Não entra nos quatro atalhos; quando autorizado, aparece no painel "Mais".
  */
 export const ITEM_ADMIN: ItemNav = {
   href: '/admin',

@@ -36,14 +36,14 @@ type Props = {
   configuracao?: ReactNode;
   nome: string | null;
   espacoDeTrabalho: string;
-  cliente: string;
-  contato: string;
-  proximaAcao?: string | null;
-  proximaMentoria?: string | null;
+  cliente: ReactNode;
+  contato: ReactNode;
+  proximaAcao?: ReactNode;
+  proximaMentoria?: ReactNode;
   oferta: string | null;
   nicho: string | null;
-  diagnosticoSobral: string;
-  focoSobral: string;
+  diagnosticoSobral: ReactNode;
+  focoSobral: ReactNode;
   plano: PlanoJornada;
 };
 

@@ -2,8 +2,6 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
-import { ProgressoProvider } from '@/lib/progresso/provider';
-import { obterProgressoConta } from '@/lib/progresso/queries';
 import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
@@ -52,66 +50,64 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
      o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
      todo mundo. */
-  const [admin, progressoInicial] = await Promise.all([ehAdmin(), obterProgressoConta()]);
+  const admin = await ehAdmin();
 
   return (
     <QueryProvider>
-      {/* Só a área autenticada recebe o progresso da conta. A landing continua
-          estática e não carrega nem sessão nem sincronização. */}
-      <ProgressoProvider inicial={progressoInicial}>
-        {/* O provedor abraça o shell porque quem ESCREVE a trilha é a página, lá
-            dentro, e quem LÊ é o cabeçalho, aqui em cima. */}
-        <ProvedorDeTrilha>
-          <div className={styles.shell}>
-            <a href="#conteudo" className="via-skip-link">
-              Pular para o conteúdo
-            </a>
+      {/* O provedor abraça o shell porque quem ESCREVE a trilha é a página, lá
+          dentro, e quem LÊ é o cabeçalho, aqui em cima. O progresso, por outro
+          lado, mora apenas nas quatro áreas que realmente o consomem. */}
+      <ProvedorDeTrilha>
+        <div className={styles.shell}>
+          <a href="#conteudo" className="via-skip-link">
+            Pular para o conteúdo
+          </a>
 
-            <aside className={styles.sidebar}>
-              <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-                <ViverDeIaLogo size="compact" produto={false} />
-                <span>Subido · Sistema operacional do profissional de IA</span>
+          <aside className={styles.sidebar}>
+            <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
+              <ViverDeIaLogo size="compact" produto={false} />
+              <span>Subido · Sistema operacional do profissional de IA</span>
+            </Link>
+
+            <NavLateral itens={ITENS_NAV} variante="lateral" />
+
+            <div className={styles.rodapeSidebar}>
+              {admin && (
+                <NavLateral
+                  itens={[ITEM_ADMIN]}
+                  variante="lateral"
+                  grupo="admin"
+                  rotuloGrupo="Gestão"
+                />
+              )}
+
+              <Link href="/conta" className={styles.perfilSidebar}>
+                <span className={styles.avatarSidebar} aria-hidden="true">
+                  {iniciais || 'SI'}
+                </span>
+                <span className={styles.identidadeSidebar}>
+                  <strong>{nome}</strong>
+                  <small>Profissional de IA</small>
+                </span>
               </Link>
+            </div>
+          </aside>
 
-              <NavLateral itens={ITENS_NAV} variante="lateral" />
+          <CabecalhoApp
+            nome={nome}
+            email={email}
+            logo={<ViverDeIaLogo size="compact" produto={false} />}
+          />
 
-              <div className={styles.rodapeSidebar}>
-                {admin && (
-                  <NavLateral
-                    itens={[ITEM_ADMIN]}
-                    variante="lateral"
-                    grupo="admin"
-                    rotuloGrupo="Gestão"
-                  />
-                )}
+          <main className={styles.conteudo} id="conteudo">
+            {children}
+          </main>
 
-                <Link href="/conta" className={styles.perfilSidebar}>
-                  <span className={styles.avatarSidebar} aria-hidden="true">
-                    {iniciais || 'SI'}
-                  </span>
-                  <span className={styles.identidadeSidebar}>
-                    <strong>{nome}</strong>
-                    <small>Profissional de IA</small>
-                  </span>
-                </Link>
-              </div>
-            </aside>
-
-            <CabecalhoApp
-              nome={nome}
-              email={email}
-              logo={<ViverDeIaLogo size="compact" produto={false} />}
-            />
-
-            <main className={styles.conteudo} id="conteudo">
-              {children}
-            </main>
-
-            {/* O dock nunca carrega o admin (noDock) — a lista base basta. */}
-            <NavLateral itens={ITENS_NAV} variante="dock" />
-          </div>
-        </ProvedorDeTrilha>
-      </ProgressoProvider>
+          {/* No mobile, "Mais" dá acesso à navegação completa. O item de gestão
+              só entra no payload de quem realmente é admin. */}
+          <NavLateral itens={admin ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV} variante="dock" />
+        </div>
+      </ProvedorDeTrilha>
     </QueryProvider>
   );
 }
