@@ -9,30 +9,34 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  text-decoration: none;
   color: var(--via-text-muted);
+  text-decoration: none;
   border-radius: var(--app-radius-control);
-  /* Só transform, cor e fundo animam. `transition: all` é banido. */
   transition:
-    background-color var(--app-t-state),
     color var(--app-t-state),
+    background-color var(--app-t-state),
     transform var(--app-t-touch);
 }
 
-.icone {
-  display: inline-flex;
-  flex-shrink: 0;
-  transition: color var(--app-t-state);
-}
-
-/* O conteúdo passa POR CIMA do marcador deslizante. */
 .icone,
 .rotulo {
   position: relative;
   z-index: 1;
 }
 
-/* ---- Sidebar (desktop) ------------------------------------------------------- */
+.icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  color: var(--via-text-soft);
+  transition:
+    color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
 .lateral {
   display: none;
 }
@@ -43,109 +47,64 @@
   gap: var(--via-space-5);
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: var(--via-space-2);
+  padding-right: 2px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-color: var(--via-navy-14) transparent;
 }
 
 .grupoLateral {
   min-width: 0;
 }
 
-/* Rótulo do bloco. Dá estrutura à coluna sem inventar conteúdo — a alternativa
-   para os ~690px de vazio seria um widget de enfeite, que é pior que o vazio. */
 .rotuloGrupo {
-  margin: 0 0 var(--via-space-1_5);
+  margin: 0 0 var(--via-space-2);
   padding-inline: var(--via-space-3);
+  color: var(--via-text-soft);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  /* Sobre o trilho a escala inverte, e o degrau mais quieto que ainda PASSA é o
-     gray-400. Medido no topo do --app-mesh-trilho (#16294d): gray-500 dá 2,89:1
-     e reprova AA a 10px — era um chute com cara de decisão; gray-400 dá 5,59:1.
-     `text-faint` some aqui. */
-  color: var(--via-gray-400);
 }
 
 .lateral .lista {
   display: flex;
   flex-direction: column;
-  /* 6px e não 4: o anel de foco projeta 4px para fora da caixa. Com gap 4 ele
-     encosta no vizinho; com 6 sobram 2px de folga. */
-  gap: var(--via-space-0_5);
+  gap: 3px;
 }
 
 .lateral .item {
-  padding-block: var(--via-space-1_5);
-  padding-inline: var(--via-space-2_5);
-  /* Sem line-height declarado, o item herdava `--via-lh-loose` (1.65), que é token
-     de PROSA: 14px × 1,65 + 24 de padding dava 47px de altura para uma linha de
-     navegação. Com `snug` quem passa a governar é o min-height, que é a medida que
-     a gente quis. */
-  min-height: 40px;
-  line-height: var(--via-lh-snug);
+  min-height: 42px;
+  padding: var(--via-space-1_5) var(--via-space-2_5);
   font-size: var(--via-fs-sm);
-  letter-spacing: var(--app-ls-sm);
-  /* Explícito para que o degrau até o ativo (500) exista de verdade: os dois
-     estados vinham com peso 500 e a diferença era só um cinza pálido. */
   font-weight: var(--via-fw-regular);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--via-lh-snug);
 }
 
-/* SOBRE O TRILHO a escala de cinza INVERTE: nunca text-muted/soft aqui. O ativo
-   continua no mesmo campo navy, com uma película clara e accent pontual — é a
-   assinatura escolhida para o novo produto, sem a antiga pílula branca. */
-.lateral .item {
-  color: var(--via-gray-400);
-}
-
-/* O ícone ganha CAIXA. Solto sobre a navy ele era um traço fino perdido num
-   campo grande; num contêiner de 30px com fio próprio, cada item passa a ter
-   peso e a coluna deixa de ser uma lista de texto com enfeite.
-   É acabamento, não enchimento — a alternativa para os ~640px de vazio seria um
-   widget inventado, e widget inventado é pior que vazio. */
-.lateral .icone {
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--app-radius-chip);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--via-gray-400);
-  transition:
-    background-color var(--app-t-state),
-    border-color var(--app-t-state),
-    color var(--app-t-state);
-}
-
-/* O hover MOVE, e é isso que faltava. Só cor mudando lê como estado ligado e
-   desligado; 2px de deslocamento lê como resposta. Transform, nunca margin. */
 .lateral .item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--via-white);
+  color: var(--via-text-primary);
+  background: var(--via-navy-04);
   transform: translateX(2px);
 }
 
 .lateral .item:hover .icone {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: var(--via-accent);
+  color: var(--via-navy);
 }
 
-.lateral .item:active {
-  transform: translateX(2px) scale(0.99);
-}
-
-/* O MARCADOR. Fica ATRÁS do conteúdo e é ele que o `layoutId` desloca. */
 .pilula {
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: var(--app-radius-control);
   overflow: hidden;
-  background: linear-gradient(90deg, rgba(0, 162, 255, 0.13), rgba(255, 255, 255, 0.07));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background:
+    radial-gradient(ellipse 80% 120% at 0% 0%, var(--via-navy-08), transparent 65%),
+    var(--via-glass-card);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 8px 18px -16px var(--via-navy-30);
 }
 
 .pilula::before {
@@ -155,49 +114,38 @@
   left: 0;
   width: 2px;
   border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
-  background: var(--via-accent);
+  background: var(--via-navy);
 }
 
 .lateral .item[aria-current='page'] {
-  color: var(--via-white);
+  color: var(--via-text-primary);
   font-weight: var(--via-fw-medium);
 }
 
-/* No ativo a caixa se acende sem virar uma segunda pílula. */
 .lateral .item[aria-current='page'] .icone {
-  background: var(--via-accent);
-  border-color: var(--via-accent);
   color: var(--via-navy);
 }
 
-/* Ativo não recebe hover: a pílula já é o estado mais alto, e clarear por cima
-   dela produziria um cinza sujo. */
 .lateral .item[aria-current='page']:hover {
   background: transparent;
   transform: none;
 }
 
-/* O anel de foco do DS é um `box-shadow` (via-base.css:46), não um outline — a regra
-   do globals.css usa `:where()`, que tem especificidade zero, e perde. Consequência:
-   QUALQUER box-shadow num seletor de classe apaga o anel. Por isso o foco é
-   redeclarado aqui, POR ÚLTIMO no arquivo — e sobre a banda escura o anel é o
-   token de foco on-navy da marca (accent translúcido, legível sobre navy). */
 .lateral .item:focus-visible {
-  box-shadow: var(--via-shadow-focus-onnavy);
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
-/* ---- Dock (mobile) ----------------------------------------------------------- */
 .dock {
   position: fixed;
   inset-inline: 0;
   bottom: 0;
   z-index: var(--via-z-dock);
-  background: color-mix(in srgb, var(--via-surface) 92%, transparent);
-  backdrop-filter: blur(18px) saturate(1.5);
-  border-top: 1px solid var(--via-border-hairline);
-  /* Barra de gestos do iOS: sem isto o último item fica embaixo dela. */
   padding-bottom: env(safe-area-inset-bottom, 0);
-  box-shadow: var(--via-shadow-md);
+  border-top: 1px solid var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
+  backdrop-filter: blur(24px) saturate(165%);
+  box-shadow: 0 -12px 30px -26px var(--via-navy-30);
 }
 
 .dock .lista {
@@ -208,10 +156,9 @@
 
 .dock .item {
   flex-direction: column;
-  gap: var(--via-space-1);
-  /* 56px de altura mínima — acima dos 44px de alvo de toque recomendados. */
-  min-height: 60px;
   justify-content: center;
+  gap: 3px;
+  min-height: 62px;
   padding: var(--via-space-2) var(--via-space-1);
   border-radius: 0;
   font-size: var(--via-fs-micro);
@@ -223,19 +170,16 @@
   font-weight: var(--via-fw-medium);
 }
 
-/* Mesma ideia da pílula, na gramática do dock: uma barra de 2px no topo que
-   DESLIZA entre as colunas em vez de piscar de uma para a outra. */
 .marcaDock {
   position: absolute;
   top: 0;
   inset-inline: var(--via-space-4);
   height: 2px;
   border-radius: 0 0 var(--app-radius-track) var(--app-radius-track);
-  background: var(--via-accent-ink);
+  background: var(--via-navy);
 }
 
 .dock .rotulo {
-  /* Em 320px, "Formações" ainda cabe; garantir que nada estoure a coluna. */
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -256,10 +200,5 @@
   .item,
   .icone {
     transition: none;
-  }
-
-  .lateral .item:hover,
-  .lateral .item:active {
-    transform: none;
   }
 }

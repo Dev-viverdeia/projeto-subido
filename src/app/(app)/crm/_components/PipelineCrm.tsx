@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Building2, CircleUserRound, Clock3, Inbox, Sparkles } from 'lucide-react';
+import { ArrowRight, Building2, CircleUserRound, Clock3, Inbox, Layers3 } from 'lucide-react';
 import { moverOportunidade } from '@/lib/crm/actions';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
@@ -45,7 +45,7 @@ function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm })
           className={styles.dossie}
           data-estado={analisando ? 'analisando' : pronto ? 'pronto' : 'novo'}
         >
-          <Sparkles size={14} strokeWidth={1.8} aria-hidden="true" />
+          <Layers3 size={14} strokeWidth={1.8} aria-hidden="true" />
           <span>{analisando ? 'Analisando lead' : pronto ? 'Dossiê pronto' : 'Abrir dossiê'}</span>
         </Link>
 

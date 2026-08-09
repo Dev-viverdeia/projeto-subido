@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Building2, ContactRound, Database, Globe2, Sparkles, X } from 'lucide-react';
+import { Building2, ContactRound, Database, Globe2, Layers3, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import styles from './FormularioEnriquecimento.module.css';
@@ -80,7 +80,7 @@ export function FormularioEnriquecimento({
         onClick={() => setAberto(true)}
         aria-haspopup="dialog"
       >
-        <Sparkles size={16} strokeWidth={1.9} aria-hidden="true" />
+        <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
         {temDossie ? 'Atualizar dossiê' : 'Enriquecer lead'}
       </button>
 

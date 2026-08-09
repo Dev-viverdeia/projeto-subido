@@ -1,5 +1,8 @@
 .rolagem {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  contain: inline-size;
   overflow-x: auto;
   padding: 2px 2px var(--via-space-4);
   scrollbar-width: thin;
@@ -260,5 +263,21 @@
 
   .dossie[data-estado='analisando'] svg {
     animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .rolagem {
+    overflow-x: visible;
+    padding-inline: 0;
+  }
+
+  .pipeline {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  .coluna {
+    min-height: 0;
   }
 }

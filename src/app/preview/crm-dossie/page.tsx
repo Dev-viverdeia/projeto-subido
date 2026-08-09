@@ -12,7 +12,7 @@ import {
   House,
   MapPin,
   MessageSquareQuote,
-  Sparkles,
+  Layers3,
   UsersRound,
   Video,
 } from 'lucide-react';
@@ -99,7 +99,7 @@ export default async function PreviewDossiePage({
               </div>
               <span className={pagina.linhaSinal} />
               <div className={`${pagina.fonteSinal} ${pagina.leituraSinal}`}>
-                <Sparkles size={17} aria-hidden="true" />
+                <Layers3 size={17} aria-hidden="true" />
                 <span>Leitura IA</span>
                 <strong>dossiê pronto</strong>
               </div>
@@ -120,7 +120,7 @@ export default async function PreviewDossiePage({
 
           <section className={pagina.resumo}>
             <div className={pagina.resumoMarca}>
-              <Sparkles size={18} aria-hidden="true" /> Leitura do lead
+              <Layers3 size={18} aria-hidden="true" /> Leitura do lead
             </div>
             <div>
               <h2>

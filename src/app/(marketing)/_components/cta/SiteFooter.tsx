@@ -23,7 +23,7 @@ export function SiteFooter() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.brand}>
-          <SubidoLogo size={20} />
+          <SubidoLogo size={20} variant="mono" />
           <p className={styles.tagline}>{FOOTER.tagline}</p>
         </div>
 

@@ -8,7 +8,7 @@
   text-align: center;
   gap: var(--via-space-3_5);
   padding: 48px 32px;
-  border-radius: 16px;
+  border-radius: var(--via-radius-md);
   font-family: var(--via-font, 'Geist', system-ui, sans-serif);
 }
 
@@ -24,7 +24,7 @@
   border: 1px dashed var(--via-navy-18);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
-    0 6px 14px -10px rgba(10, 31, 59, 0.08);
+    0 6px 14px -10px var(--via-shadow-ink-06);
   isolation: isolate;
   overflow: hidden;
 }
@@ -63,12 +63,12 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: var(--via-radius-sm);
   background: linear-gradient(180deg, var(--via-navy-06), var(--via-navy-02));
   border: 1px solid var(--via-border-soft);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
-    0 4px 10px -6px var(--via-navy-12);
+    0 4px 10px -6px var(--via-shadow-ink-14);
   color: var(--via-text-primary);
   margin-bottom: 4px;
 }

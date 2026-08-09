@@ -21,22 +21,24 @@
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--via-border-soft);
-  border-radius: 10px;
+  border-radius: var(--via-radius-sm);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-10),
-    0 22px 44px -16px var(--via-navy-22),
-    0 8px 18px -10px var(--via-navy-14);
+    0 22px 44px -16px var(--via-shadow-ink-20),
+    0 8px 18px -10px var(--via-shadow-ink-14);
   animation: via-dropdown-in var(--via-dur) var(--via-ease-out);
   isolation: isolate;
 }
 
-.via-dropdown__menu--start { left: 0; }
-.via-dropdown__menu--end { right: 0; }
+/* Origem espacial (WWDC): o menu abre pra baixo — escala nasce do canto
+   ancorado no trigger, não do centro */
+.via-dropdown__menu--start { left: 0; transform-origin: top left; }
+.via-dropdown__menu--end { right: 0; transform-origin: top right; }
 
 @keyframes via-dropdown-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .via-dropdown__group {
@@ -61,7 +63,7 @@
   padding: 8px 10px;
   background: none;
   border: none;
-  border-radius: 7px;
+  border-radius: var(--via-radius-xs);
   font-family: inherit;
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
@@ -76,6 +78,10 @@
   background: var(--via-navy-05);
 }
 
+.via-dropdown__item:active:not(:disabled) {
+  background: var(--via-navy-10);
+}
+
 .via-dropdown__item:focus-visible {
   background: var(--via-navy-05);
   outline: 2px solid var(--via-navy-60);
@@ -88,6 +94,10 @@
 
 .via-dropdown__item.is-destructive:hover:not(:disabled) {
   background: rgba(184, 92, 92, 0.08);
+}
+
+.via-dropdown__item.is-destructive:active:not(:disabled) {
+  background: rgba(184, 92, 92, 0.14);
 }
 
 .via-dropdown__item.is-disabled,
@@ -121,7 +131,7 @@
   color: var(--via-ink-3, #6B7891);
   background: var(--via-navy-05);
   border: 1px solid var(--via-border-soft, rgba(10, 31, 59, 0.08));
-  border-radius: 4px;
+  border-radius: var(--via-radius-xs);
   padding: 1px 5px;
   letter-spacing: 0.04em;
 }
@@ -130,4 +140,8 @@
   height: 1px;
   background: var(--via-border-soft, rgba(10, 31, 59, 0.08));
   margin: 6px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .via-dropdown__menu { animation: none !important; }
 }

@@ -33,8 +33,8 @@
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-08),
-    0 32px 72px -16px var(--via-navy-40),
-    0 16px 32px -12px var(--via-navy-20);
+    0 32px 72px -16px var(--via-shadow-ink-40),
+    0 16px 32px -12px var(--via-shadow-ink-20);
   display: flex;
   flex-direction: column;
   pointer-events: auto;
@@ -58,7 +58,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  border-radius: 18px 0 0 18px;
+  border-radius: var(--via-radius-lg) 0 0 var(--via-radius-lg);
   animation: via-drawer-in-right .3s var(--via-ease-snap);
 }
 
@@ -72,7 +72,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  border-radius: 0 18px 18px 0;
+  border-radius: 0 var(--via-radius-lg) var(--via-radius-lg) 0;
   animation: via-drawer-in-left .3s var(--via-ease-snap);
 }
 
@@ -86,7 +86,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  border-radius: 18px 18px 0 0;
+  border-radius: var(--via-radius-lg) var(--via-radius-lg) 0 0;
   animation: via-drawer-in-bottom .3s var(--via-ease-snap);
   max-height: 85vh;
 }
@@ -137,7 +137,7 @@
 .via-drawer__close {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: var(--via-radius-sm);
   background: transparent;
   border: 1px solid transparent;
   color: var(--via-ink-3, #6B7891);

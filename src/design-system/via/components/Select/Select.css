@@ -27,7 +27,7 @@
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
   border: 1px solid var(--via-border, #D0D5DD);
-  border-radius: 9px;
+  border-radius: var(--via-radius-sm);
   color: var(--via-text-primary);
   font-family: inherit;
   font-size: var(--via-fs-caption);
@@ -37,11 +37,17 @@
   transition:
     border-color var(--via-dur) ease,
     background var(--via-dur) ease,
-    box-shadow var(--via-dur) ease;
+    box-shadow var(--via-dur) ease,
+    transform var(--via-dur) var(--via-ease-snap);
   text-align: left;
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
-    0 1px 2px var(--via-navy-04);
+    0 1px 2px var(--via-shadow-ink-03);
+}
+
+.via-select__trigger:active:not(:disabled) {
+  transform: scale(0.99);
+  transition-duration: var(--via-dur-press);
 }
 
 .via-select--md .via-select__trigger {
@@ -68,7 +74,7 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
     0 0 0 3px var(--via-navy-10),
-    0 6px 14px -8px var(--via-navy-12);
+    0 6px 14px -8px var(--via-shadow-ink-14);
 }
 
 .via-select__trigger.has-error {
@@ -127,12 +133,12 @@
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--via-border-soft);
-  border-radius: 10px;
+  border-radius: var(--via-radius-sm);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-10),
-    0 22px 44px -16px var(--via-navy-22),
-    0 8px 18px -10px var(--via-navy-14);
+    0 22px 44px -16px var(--via-shadow-ink-20),
+    0 8px 18px -10px var(--via-shadow-ink-14);
   max-height: 280px;
   overflow-y: auto;
   animation: via-select-in var(--via-dur) var(--via-ease-out);
@@ -150,7 +156,8 @@
   justify-content: space-between;
   gap: var(--via-space-3);
   padding: 8px 10px;
-  border-radius: 7px;
+  /* um degrau abaixo do .via-select__list (sm) — canto interno não vaza */
+  border-radius: var(--via-radius-xs);
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
   letter-spacing: -0.006em;
@@ -161,6 +168,10 @@
 
 .via-select__option:hover {
   background: var(--via-navy-05);
+}
+
+.via-select__option:active:not(.is-disabled) {
+  background: var(--via-navy-10);
 }
 
 /* Destaque por teclado (navegação com setas) */

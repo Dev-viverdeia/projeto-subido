@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Check,
-  FileSignature,
-  PackageCheck,
-  Sparkles,
-} from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Check, FileSignature, PackageCheck, Layers3 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
 import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import {
@@ -223,7 +216,7 @@ export function ProjetoGuiado({
           </section>
 
           <section className={styles.estudio}>
-            <Sparkles size={18} aria-hidden="true" />
+            <Layers3 size={18} aria-hidden="true" />
             <div>
               <span>O cliente tem outra realidade?</span>
               <p>

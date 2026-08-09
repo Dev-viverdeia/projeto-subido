@@ -7,7 +7,7 @@ import {
   Database,
   FileAudio,
   Radio,
-  Sparkles,
+  Layers3,
 } from 'lucide-react';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL, callPodeAbrir } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
@@ -66,7 +66,7 @@ export function PainelCalls({
 
       {agendada && (
         <div className={styles.confirmacao} role="status">
-          <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+          <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
           Call criada. O link já está disponível e o CRM recebeu o primeiro fato.
         </div>
       )}
@@ -165,7 +165,7 @@ export function PainelCalls({
                       <span>{ROTULO_TIPO_CALL[reuniao.tipo]}</span>
                       {reuniao.liveCoachAtivo && (
                         <span className={styles.coachTag}>
-                          <Sparkles size={12} aria-hidden="true" /> Live Coach
+                          <Layers3 size={12} aria-hidden="true" /> Live Coach
                         </span>
                       )}
                     </div>

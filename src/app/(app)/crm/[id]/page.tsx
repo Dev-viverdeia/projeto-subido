@@ -18,7 +18,7 @@ import {
   MessageSquareQuote,
   Phone,
   Radar,
-  Sparkles,
+  Layers3,
   Target,
   Video,
 } from 'lucide-react';
@@ -94,7 +94,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
           </div>
           <span className={styles.linhaSinal} aria-hidden="true" />
           <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
-            <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
             <span>Leitura IA</span>
             <strong>
               {emAndamento ? 'analisando' : dossie ? 'dossiê pronto' : 'não iniciada'}
@@ -165,7 +165,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         <>
           <section className={styles.resumo} aria-labelledby="leitura-titulo">
             <div className={styles.resumoMarca}>
-              <Sparkles size={18} strokeWidth={1.8} aria-hidden="true" />
+              <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
               Leitura do lead
             </div>
             <div>

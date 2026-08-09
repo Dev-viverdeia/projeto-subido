@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import { AudioLines, LockKeyhole, MessageSquareQuote, Radio, Sparkles } from 'lucide-react';
+import { AudioLines, LockKeyhole, MessageSquareQuote, Radio, Layers3 } from 'lucide-react';
 import { RoomEvent, Track } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import styles from './LiveCoach.module.css';
@@ -292,7 +292,7 @@ export function CabineLiveCoach({
 
       <section className={styles.recomendacao} aria-live="polite" aria-atomic="true">
         <div className={styles.rotuloSecao}>
-          <Sparkles size={15} strokeWidth={1.8} aria-hidden="true" />
+          <Layers3 size={15} strokeWidth={1.8} aria-hidden="true" />
           Próximo movimento
         </div>
         {sugestao ? (

@@ -43,11 +43,10 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 // ─── Pin ──────────────────────────────────────────────────────────────────────
 const UPSTREAM_REPO = 'https://github.com/rafaelmilagre7/viver-de-ia-ds';
-// v0.6.1 — the exact commit the sibling platform vendored and runs in production.
-// HEAD has drifted past it; we deliberately pin to the validated release rather than
-// integrating unreviewed upstream changes into a greenfield project.
-const UPSTREAM_COMMIT = 'eb2d76b74909599bab9de5cf483f288e72a212cc';
-const UPSTREAM_DATE = '2026-07-01'; // pinned; never new Date()
+// v0.6.1 — fonte canônica que alimenta o site vivo do Design System.
+// O SHA continua pinado: a plataforma só muda quando este diff é revisado.
+const UPSTREAM_COMMIT = 'ed6fb6b0f0a72bbf62b838fef57e2d34f7e7b066';
+const UPSTREAM_DATE = '2026-08-06'; // pinned; never new Date()
 const UPSTREAM_VERSION = '0.6.1';
 
 const OUT_DIR = process.env.VIA_OUT_DIR ?? resolve(ROOT, 'src/design-system/via');

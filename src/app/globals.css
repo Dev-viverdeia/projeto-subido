@@ -11,7 +11,7 @@
 @import '../design-system/via/base/via-base.css';
 @import '../design-system/via/styles/form-fields.css';
 
-/* 2 · Camada de marca Subido. Precisa vir DEPOIS dos tokens. */
+/* 2 · Camada de aplicação VIA. Precisa vir DEPOIS dos tokens. */
 @import '../styles/brand.css';
 
 /* 3 · Motion de entrada. Ver o comentário do arquivo: nada de opacity:0 no base. */
@@ -24,14 +24,11 @@
    ('Geist'), herdada da origem do DS. Esta ponte é o único lugar onde a família real
    é escolhida — o vendor não se edita, então a troca de fonte mora aqui. */
 :root {
-  --via-font: var(--font-outfit), 'Inter', system-ui, -apple-system, sans-serif;
-  --via-font-display: var(--font-outfit), 'Inter', system-ui, -apple-system, sans-serif;
+  --via-font: var(--font-geist), system-ui, -apple-system, sans-serif;
+  --via-font-display: var(--font-geist), system-ui, -apple-system, sans-serif;
   --via-font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
-  /* Tinta da ênfase. A Outfit não tem face itálica, então `<em>` é marcado por TOM,
-     não por inclinação — e o tom da ênfase é o mais QUIETO, recuo editorial.
-     A escala de cinza inverte entre bandas (ver CLAUDE.md), então banda escura
-     precisa redeclarar: `--app-em-ink: var(--via-gray-onnavy)`. */
+  /* Ênfase editorial VIA: tom e peso, sem oblíquo sintético. */
   --app-em-ink: var(--via-text-muted);
 
   /* Escala de empilhamento — o DS não define z-index, e sem uma escala única
@@ -53,12 +50,17 @@
 
 body {
   min-height: 100dvh;
+  overflow-x: hidden;
   background: var(--via-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 html {
+  /* Quadros horizontais (como o Kanban do CRM) rolam dentro do próprio
+     componente; nunca devem transformar a página inteira em uma faixa lateral. */
+  overflow-x: hidden;
+
   /* Âncoras de seção não podem ficar embaixo da barra fixa. */
   scroll-padding-top: 88px;
 
@@ -139,7 +141,7 @@ html {
     0 1px 2px var(--via-navy-04);
 }
 
-/* Sobre banda escura o anel navy some — aqui o accent CST é a cor legível. */
+/* Sobre banda escura o anel navy some; o contexto precisa de tinta clara. */
 .via-mesh-navy :where(a, button, input, [tabindex]):focus-visible,
 .via-glass-dark :where(a, button, input, [tabindex]):focus-visible {
   outline-color: var(--via-accent);

@@ -1,394 +1,114 @@
-/* ==============================================================================
-   SUBIDO — camada de marca
-   ------------------------------------------------------------------------------
-   Este arquivo é carregado DEPOIS de design-system/via/styles/tokens.css e
-   redefine apenas os tokens cromáticos. O design system vendorizado NUNCA é
-   editado — é isso que mantém `npm run check:ds-drift` significativo.
+/* =============================================================================
+   VIVER DE IA SUBIDO · camada de aplicação
 
-   A DIVISÃO DE TRABALHO
-   Duas camadas complementares, não concorrentes:
-
-     · O DS VENDORIZADO traz a ARQUITETURA — superfície clara, hierarquia editorial,
-       vidro + atmosfera + sombra navy, escalas de espaço/raio/motion.
-     · A MARCA SUBIDO traz a CROMÁTICA — o navy institucional, o branco frio e,
-       principalmente, um ACCENT que o DS não tinha (lá o "accent" era o próprio
-       navy) — e a FAMÍLIA: a Outfit, ligada na ponte next/font de globals.css.
-       O `--via-font: 'Geist'` do vendor continua lá, e continua sendo sobrescrito.
-
-   O prefixo `--via-*` e o nome da pasta são NOMES INTERNOS herdados da origem do
-   design system. Não são marca: não aparecem em copy, alt, aria-label, metadata
-   nem asset. A marca do produto é Subido, e só.
-
-   O manual da marca resolve sozinho o maior risco desta camada. Ele diz, textualmente:
-
-     "Utilize o azul #00A2FF de forma pontual. Não é recomendado aplicá-lo em
-      grandes áreas, especialmente em fundos. Esse tom deve ser reservado para
-      elementos de destaque."
-     "A cor preta não pertence à paleta da marca Comunidade Subido."
-
-   Essa é exatamente a disciplina do design system: hierarquia por peso editorial e
-   cor sólida, nunca por inundação de cor. A restrição não é uma concessão — é a
-   regra que faz a cromática da marca caber na arquitetura herdada.
-
-   E a física concorda com o manual (medido, não estimado):
-
-     #00A2FF sobre #FAFDFF ....  2,70:1  ✗ reprova AA até para texto grande
-     #00A2FF sobre #0B162D ....  6,52:1  ✓ passa AA com folga
-     #0B162D sobre #FAFDFF .... 17,62:1  ✓
-
-   Ou seja: o azul elétrico é, fisicamente, uma cor de destaque sobre escuro.
-   Para o caso raro de texto accent sobre claro existe --via-accent-ink (#0072BE,
-   4,95:1), e só para isso.
-
-   CONSEQUÊNCIA NO LAYOUT
-   A landing alterna três momentos escuros (hero, HUB, CTA final) num corpo claro.
-   As bandas escuras marcam os momentos de decisão — navy institucional com o azul
-   pontual; o corpo claro carrega o argumento editorial.
-   ============================================================================== */
+   A fonte cromática, tipográfica e material é o Design System oficial da Viver
+   de IA. Este arquivo não cria uma segunda marca: só traduz papéis próprios da
+   plataforma (canvas, densidade, elevação e movimento) para os tokens canônicos.
+   ============================================================================= */
 
 :root {
-  /* ---- Paleta institucional Subido (fonte: manual da marca) ----------------- */
-  --cst-blue: #00a2ff; /* accent · uso PONTUAL, nunca em grandes áreas */
-  --cst-navy: #0b162d; /* azul-marinho institucional */
-  --cst-navy-deep: #040b1a; /* azul-marinho escuro institucional */
-  --cst-white: #fafdff; /* branco institucional (levemente frio) */
+  /* Aliases de aplicação. Todos permanecem dentro da paleta navy + cinzas. */
+  --via-accent-ink: var(--via-navy);
+  --via-accent-hairline: var(--via-navy-18);
+  --via-surface-onnavy: linear-gradient(180deg, var(--via-white), var(--via-gray-50));
+  --via-gray-onnavy: var(--via-gray-300);
+  --via-shadow-focus-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-white);
 
-  /* ---- Marca → tokens do design system -------------------------------------- */
-  --via-navy: var(--cst-navy);
-  --via-navy-deep: var(--cst-navy-deep);
-  --via-navy-darker: #02060f; /* derivado · banda mais profunda */
+  /* Nomes antigos de glow viram elevação oficial, sem halo luminoso. */
+  --via-glow-navy: var(--via-shadow-lg);
+  --via-glow-navy-strong: var(--via-shadow-xl);
 
-  /* Azuis intermediários das radiais do mesh, derivados da navy institucional
-     mantendo a mesma relação de luminância do design system de origem. */
-  --via-blue: #122348;
-  --via-blue-soft: #183063;
+  /* Largura de trabalho: ampla para CRM/calls, ainda legível em telas grandes. */
+  --app-canvas: 1480px;
 
-  /* ---- Accent (a peça que o design system não tinha) ------------------------ */
-  --via-accent: var(--cst-blue);
-  --via-accent-deep: #0086d6;
-  --via-accent-ink: #0072be; /* única variante legível sobre claro · 4,95:1 */
-  --via-accent-soft: rgba(0, 162, 255, 0.14);
-  --via-accent-hairline: rgba(0, 162, 255, 0.28);
-
-  /* ---- Superfícies claras -------------------------------------------------- */
-  --via-bg: var(--cst-white);
-  --via-bg-2: #f2f6fb;
-  --via-bg-3: #e9eff7;
-  --via-surface: #ffffff; /* cartão continua branco puro: o vidro precisa do topo */
-  --via-surface-elev: #ffffff;
-  --via-surface-onnavy: linear-gradient(180deg, #ffffff 0%, var(--cst-white) 100%);
-
-  /* ---- Hairlines e sombras, re-tingidas com a navy institucional ---------------------- */
-  /* CORREÇÃO DE ACESSIBILIDADE — não é ajuste de gosto.
-     O `--via-text-faint` do design system (#98A2B3) rende 2,52:1 sobre o branco e
-     2,37:1 sobre o tint: reprova AA (4,5:1) com folga. Ele pinta índices numerados,
-     notas de fonte e preços — tudo texto pequeno, onde a régua é a mais dura.
-     #667085 passa nos dois fundos (4,87 e 4,58) e mantém a hierarquia:
-       faint 4,58  <  muted 6,51  <  body 9,64  <  primary 16,58
-     O tom "quieto" continua quieto; só deixou de ser ilegível. */
-  --via-text-faint: #667085;
-
-  --via-border: rgba(11, 22, 45, 0.16);
-  --via-border-soft: rgba(11, 22, 45, 0.05);
-  --via-border-hairline: #e2e9f2;
-
-  --via-shadow-xs: 0 1px 2px rgba(11, 22, 45, 0.04);
-  --via-shadow-sm: 0 2px 6px rgba(11, 22, 45, 0.05), 0 1px 2px rgba(11, 22, 45, 0.03);
-  --via-shadow-md: 0 6px 18px rgba(11, 22, 45, 0.07), 0 1px 3px rgba(11, 22, 45, 0.04);
-  --via-shadow-lg: 0 16px 40px rgba(11, 22, 45, 0.1), 0 2px 8px rgba(11, 22, 45, 0.05);
-  --via-shadow-xl: 0 32px 80px rgba(11, 22, 45, 0.14), 0 4px 16px rgba(11, 22, 45, 0.06);
-  --via-shadow-focus: 0 0 0 3px rgba(11, 22, 45, 0.15);
-  --via-shadow-glass-light:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.3),
-    0 12px 32px rgba(11, 22, 45, 0.08), 0 2px 8px rgba(11, 22, 45, 0.04);
-
-  /* Anel de foco visível SOBRE superfície escura — aqui o accent trabalha. */
-  --via-shadow-focus-onnavy: 0 0 0 3px rgba(0, 162, 255, 0.45);
-
-  /* ---- Atmosferas ---------------------------------------------------------- */
-  /* O mesh escuro é a assinatura da marca dentro do sistema herdado. A última radial
-     carrega um traço do accent — é a única presença dele em área grande, a ~10%,
-     onde funciona como luz e não como preenchimento. */
-  --via-mesh-navy:
-    radial-gradient(ellipse 60% 70% at 12% 0%, rgba(24, 48, 99, 0.55) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 95% 8%, rgba(18, 35, 72, 0.5) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 80% at 100% 100%, rgba(4, 11, 26, 0.85) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 65% at 4% 96%, rgba(0, 162, 255, 0.1) 0%, transparent 58%),
-    linear-gradient(135deg, #0b162d 0%, #040b1a 100%);
-
-  --via-mesh-light:
-    radial-gradient(ellipse 60% 70% at 12% 0%, rgba(18, 35, 72, 0.26) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 60% at 95% 8%, rgba(24, 48, 99, 0.2) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 80% at 100% 100%, rgba(11, 22, 45, 0.3) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 60% at 5% 100%, rgba(0, 162, 255, 0.08) 0%, transparent 55%),
-    linear-gradient(135deg, #ccd6e2 0%, #a7b4c6 100%);
-
-  --via-glow-navy:
-    0 0 0 1px rgba(11, 22, 45, 0.05), 0 8px 24px rgba(11, 22, 45, 0.2),
-    0 16px 48px rgba(11, 22, 45, 0.14);
-  --via-glow-navy-strong:
-    0 0 0 1px rgba(11, 22, 45, 0.1), 0 16px 48px rgba(11, 22, 45, 0.3),
-    0 32px 80px rgba(11, 22, 45, 0.2);
-
-  /* ----------------------------------------------------------------------------
-     LARGURA DA ÁREA LOGADA
-     O `--via-container` (1280) do design system foi dimensionado para a LANDING,
-     onde a página ocupa a viewport inteira. Na plataforma o trilho já come 240px
-     antes de o conteúdo começar, então 1280 vira teto cedo demais:
-
-       viewport 1600 → 16px desperdiçados
-       viewport 1920 → 336px
-       viewport 2560 → 976px
-
-     `--app-canvas` é a largura das telas de ÁREA (catálogos, detalhe, agenda).
-     Isto só é seguro porque a medida de leitura mora no ELEMENTO de texto — o
-     `<p>` tem seu `ch`, o container não. Ver a regra em CLAUDE.md.
-
-     O teto de 1600 não é timidez: acima disso uma fileira de cards ultrapassa o
-     percurso confortável do olho, e o h1 fica sozinho no topo de uma banda larga
-     demais. O que sobra vira calha, de propósito.
-
-     Formulário e prosa NÃO usam este token — continuam em `--via-content` (760),
-     porque ali a página INTEIRA é uma coluna de leitura. */
-  --app-canvas: 1600px;
-
-  /* ============================================================================
-     IDENTIDADE SUBIDO — as quatro famílias que a camada de marca não tocava
-     ----------------------------------------------------------------------------
-     Até aqui esta camada era CROMÁTICA e só: 32 dos 245 tokens do DS, todos de cor
-     e sombra, zero de tipografia, forma, densidade ou movimento. Era por isso que
-     o produto lia como o design system de origem com outra paleta — a identidade
-     mora exatamente nas famílias que a marca nunca teve permissão de tocar.
-
-     O diagnóstico não foi de gosto, foi contagem. O DS oferece 4 durações e 6
-     valores de tracking; os módulos do app usavam 9 durações inventadas
-     (240/260/140/480/320/460/280/200/80ms) e 5 trackings soltos. VALOR QUE VARIA
-     SEM MOTIVO é o que lê como "não preparado" — antes de qualquer ornamento.
-
-     Então o que segue não é ornamento: é a disciplina que faz o acabamento
-     existir. `npm run check:identidade` reprova quem não obedecer.
-     ============================================================================ */
-
-  /* ---- MOVIMENTO ------------------------------------------------------------
-     A duração é função do TAMANHO DO QUE MUDA, não do gosto de cada componente:
-     deslocamento maior precisa de mais tempo para ser lido como movimento e não
-     como salto.
-
-     A regra que transforma isto em linguagem: ESTADO E ENTRADA NUNCA COMPARTILHAM
-     DURAÇÃO. Quando um hover e uma revelação levam o mesmo tempo, a interface
-     lê chapada — tudo responde igual, nada tem peso diferente. */
-  --app-motion-state: 120ms; /* cor, opacidade, borda · nada se desloca      */
-  --app-motion-touch: 180ms; /* hover e press · deslocamento de 2–4px         */
-  --app-motion-reveal: 320ms; /* entrada, layout, accordion · o elemento chega */
-  --app-motion-scene: 480ms; /* overlay, drawer · o contexto inteiro troca    */
-
-  /* Pares prontos, para o easing não ser reinventado junto com a duração.
-     `snap` responde ao dedo; `out` desacelera e para — é o que faz algo que
-     CHEGA parecer que chegou, em vez de parecer que foi empurrado. */
+  /* Movimento por papel. */
+  --app-motion-state: 140ms;
+  --app-motion-touch: 200ms;
+  --app-motion-reveal: 320ms;
+  --app-motion-scene: 480ms;
   --app-t-state: var(--app-motion-state) var(--via-ease-snap);
   --app-t-touch: var(--app-motion-touch) var(--via-ease-snap);
   --app-t-reveal: var(--app-motion-reveal) var(--via-ease-out);
   --app-t-scene: var(--app-motion-scene) var(--via-ease-out);
 
-  /* ---- TIPOGRAFIA · tracking ótico ------------------------------------------
-     O tracking é função do TAMANHO. Corpo grande precisa de negativo (as letras
-     parecem soltas quando crescem) e corpo pequeno precisa de positivo (elas se
-     apertam quando encolhem). Uma face bem desenhada como a Outfit já compensa
-     parte disso, mas não toda — e a diferença entre "texto digitado" e "texto
-     composto" é justamente esta curva.
+  /* Curva ótica canônica da Geist. */
+  --app-ls-hero: -0.04em;
+  --app-ls-display: -0.035em;
+  --app-ls-h1: -0.032em;
+  --app-ls-h2: -0.028em;
+  --app-ls-h3: -0.022em;
+  --app-ls-h4: -0.018em;
+  --app-ls-body: -0.012em;
+  --app-ls-sm: -0.008em;
+  --app-ls-caption: -0.004em;
+  --app-ls-xs: -0.002em;
+  --app-ls-label: 0.02em;
+  --app-ls-micro: 0.03em;
+  --app-ls-eyebrow: 0.06em;
 
-     Um valor por degrau da escala do DS, para o tracking deixar de ser escolha
-     por componente. Antes: `0.13em` em 10 lugares, `-0.01em` em 6, mais
-     `-0.022em`, `0.12em`, `0.1em` — cinco decisões para o mesmo problema. */
-  --app-ls-hero: -0.034em; /* 80px */
-  --app-ls-display: -0.028em; /* 56px */
-  --app-ls-h1: -0.024em; /* 40px */
-  --app-ls-h2: -0.02em; /* 32px */
-  --app-ls-h3: -0.016em; /* 24px */
-  --app-ls-h4: -0.012em; /* 18px */
-  --app-ls-body: -0.006em; /* 16px */
-  --app-ls-sm: -0.002em; /* 14px */
-  --app-ls-caption: 0; /* 13px · o ponto de virada da curva */
-  --app-ls-xs: 0.004em; /* 12px */
-  --app-ls-label: 0.008em; /* 11px */
-  --app-ls-micro: 0.012em; /* 10px */
+  /* Forma, densidade e elevação por papel. */
+  --app-radius-surface: var(--via-radius-xl);
+  --app-radius-card: var(--via-radius-lg);
+  --app-radius-control: var(--via-radius-md);
+  --app-radius-chip: var(--via-radius-sm);
+  --app-radius-track: var(--via-radius-xs);
 
-  /* Mono caixa-alta (eyebrow, meta, rótulo de dado) é outro problema: a caixa
-     alta não tem ascendente nem descendente para criar ritmo, então precisa do
-     espaço lateral. UM valor, não cinco. O `--via-ls-label` do DS (0.18em) fica
-     para rótulo isolado; dentro de card, 0.18em já lê como pill decorativa —
-     que o CLAUDE.md bane. */
-  --app-ls-eyebrow: 0.14em;
+  --app-pad-card: var(--via-space-6);
+  --app-pad-card-tight: var(--via-space-4);
+  --app-gap-stack: var(--via-space-3);
+  --app-gap-block: var(--via-space-6);
+  --app-gap-grid: var(--via-space-5);
+  --app-gap-section: var(--via-space-10);
+  --app-h-control: 40px;
 
-  /* ---- FORMA · raio por PAPEL, não por gosto ---------------------------------
-     O DS oferece 7 raios e nada dizia qual pertence a quê — daí `pill` aparecer
-     38 vezes e `md` 22, sem regra. Nomear pelo PAPEL faz a forma parar de ser
-     escolha estética a cada componente.
-
-     E a regra que mais separa acabamento de descuido, porque quase ninguém a
-     enuncia: RAIO ANINHADO = RAIO EXTERNO − PADDING. Cantos concêntricos. Um
-     pôster de raio 20 dentro de um card de raio 28 com 8px de folga está certo
-     (28−8=20); o mesmo pôster com raio 28 dentro do mesmo card está errado, e o
-     olho percebe antes de a pessoa saber dizer o quê. */
-  --app-radius-surface: var(--via-radius-xl); /* 28 · superfície que contém outra */
-  --app-radius-card: var(--via-radius-lg); /* 20 · card, painel, mídia          */
-  --app-radius-control: var(--via-radius-md); /* 12 · input, select, botão        */
-  --app-radius-chip: var(--via-radius-sm); /* 8  · chip inline, tile           */
-  --app-radius-track: var(--via-radius-xs); /* 4  · trilho, marcador            */
-
-  /* ---- DENSIDADE · o ritmo ---------------------------------------------------
-     Espaço escolhido livremente dentro de uma escala de 14 degraus não é escala,
-     é 14 opções. Estes são os degraus que a área logada usa; sair deles é o
-     desvio que precisa de motivo. */
-  --app-pad-card: var(--via-space-5); /* 20 · respiro interno padrão        */
-  --app-pad-card-tight: var(--via-space-4); /* 16 · card denso, item de lista     */
-  --app-gap-stack: var(--via-space-3); /* 12 · entre linhas de um bloco      */
-  --app-gap-block: var(--via-space-6); /* 24 · entre blocos de uma tela      */
-  --app-gap-grid: var(--via-space-5); /* 20 · entre cards de uma grade      */
-  --app-gap-section: var(--via-space-10); /* 40 · entre seções                  */
-  --app-h-control: 38px; /* altura única de busca/pill/botão   */
-
-  /* ---- ELEVAÇÃO · o triplo ---------------------------------------------------
-     O que mais separa "premium" de "ok" não é a sombra: é a sombra, a hairline e
-     a superfície ANDAREM JUNTAS. Sombra escolhida sozinha produz caixas que
-     flutuam sem material; as três juntas produzem um sistema em que a distância
-     do plano é legível.
-
-     Três níveis, e só. Cada nível é um conjunto — usar a sombra de um com a
-     hairline de outro é o desvio. */
-  --app-elev-1-bg: var(--via-surface); /* repouso · card na página       */
-  --app-elev-1-line: var(--via-border-hairline);
+  --app-elev-1-bg: var(--via-glass-card);
+  --app-elev-1-line: var(--via-border-soft);
   --app-elev-1-shadow: var(--via-shadow-sm);
-
-  --app-elev-2-bg: var(--via-surface); /* erguido · hover, card ativo    */
+  --app-elev-2-bg: var(--via-surface);
   --app-elev-2-line: var(--via-border);
   --app-elev-2-shadow: var(--via-shadow-lg);
-
-  --app-elev-3-bg: var(--via-surface-elev); /* sobreposto · popover, modal    */
+  --app-elev-3-bg: var(--via-surface-elev);
   --app-elev-3-line: var(--via-border);
   --app-elev-3-shadow: var(--via-shadow-xl);
 
-  /* ---- FOCO · o estado que some sem ninguém notar ----------------------------
-     O anel do DS é um `box-shadow`, e o de `globals.css` usa `:where()` — que tem
-     especificidade ZERO. Resultado: qualquer `.classe { box-shadow: … }` num
-     elemento interativo APAGA o anel, e o build passa verde porque nada disso é
-     erro de sintaxe.
+  --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-40);
+  --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-white);
+  --app-em-ink: var(--via-text-muted);
 
-     Não é hipótese. Medido no navegador, com `:focus-visible` ativo e a transição
-     terminada, em `.card` do PillarsIndex: `outline: none` e a sombra de foco
-     resolvendo `rgba(0,0,0,0) 0px 0px 0px 0px` — quem navega por teclado nos
-     quatro cards de pilar não via absolutamente nada. Seis seletores estavam
-     assim. O CLAUDE.md já descrevia essa armadilha; faltava alguém verificar.
-
-     Por isso o anel é TOKEN: a correção é uma declaração, não seis cópias que
-     divergem na primeira vez que alguém mexer. Componha com a sombra de repouso
-     (`var(--app-ring), var(--app-elev-1-shadow)`) para o card não achatar ao
-     receber foco. `check:identidade` reprova quem reintroduzir o problema. */
-  --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-60);
-  --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-accent);
-
-  /* ---- CAMPO DO TRILHO LATERAL ----------------------------------------------
-     A sidebar usava o `--via-mesh-navy`, cuja base desce até #040B1A — quase
-     preto. E preto não pertence à paleta da marca: o manual é explícito, e metade
-     da coluna estava lá.
-
-     Este campo é próprio dela: começa mais claro NO TOPO (a luz vem de cima, e é
-     onde os itens de navegação vivem) e assenta na navy institucional embaixo.
-     Medido: #16294D contra o gray-400 dos rótulos dá 5,59:1, e contra o branco do
-     item ativo 14,40 — os dois passam AA com folga, e a coluna deixa de ser um
-     buraco preto ao lado de um canvas claro.
-
-     O accent aparece a 10% no alto — a mesma dose do mesh da landing, onde ele
-     funciona como LUZ e não como preenchimento. É a única presença dele em área
-     grande que o manual da marca admite. */
+  /* Campo escuro oficial para os poucos momentos imersivos da plataforma. */
   --app-mesh-trilho:
-    radial-gradient(ellipse 95% 40% at 18% 0%, rgba(0, 162, 255, 0.1) 0%, transparent 62%),
-    radial-gradient(ellipse 75% 38% at 100% 10%, rgba(24, 48, 99, 0.5) 0%, transparent 64%),
-    linear-gradient(180deg, #16294d 0%, #0f1c39 42%, #0b162d 100%);
-
-  /* ---- "AO VIVO" É UM SINAL SÓ ----------------------------------------------
-     Medido na tela: o mesmo estado tinha TRÊS cores. O Pill do DS pintava coral
-     (#B85C5C), o item da agenda pintava verde (--via-success) e a célula do
-     calendário pintava accent. Nada disso foi escolhido junto — cada um chutou o
-     seu, que é o mesmo defeito das nove durações, agora em cor.
-
-     A cor certa é o accent: o CLAUDE.md já lista "dot de ao vivo" entre os usos
-     legítimos dele, e verde/vermelho de semáforo é banido pela seção de Voz.
-
-     O DS lê `var(--via-coral, #B85C5C)` — ele mesmo oferece o gancho, então o
-     token resolve o dot sem override de seletor. O halo e o anel são literais
-     dentro do DS e precisam do override abaixo. */
-  --via-coral: var(--via-accent);
-
-  /* ---- Cinza sobre banda escura ---------------------------------------------
-     `#8fa0b8` aparecia literal em três seções da landing (hero, SectionHeader e
-     CTA final) porque não havia token para "cinza claro legível sobre navy".
-     Medido: 6,76:1 sobre --cst-navy e 7,39:1 sobre --cst-navy-deep. É uma cor de
-     trabalho, não um acidente, então vira token.
-
-     Sobre CLARO ele dá 2,61:1 e reprova — este token é de banda escura e só,
-     como manda a inversão da escala de cinza descrita no CLAUDE.md. */
-  --via-gray-onnavy: #8fa0b8;
+    radial-gradient(ellipse 82% 54% at 0% 0%, rgba(42, 74, 110, 0.48), transparent 58%),
+    radial-gradient(ellipse 68% 72% at 100% 100%, rgba(30, 58, 95, 0.34), transparent 62%),
+    linear-gradient(135deg, var(--via-navy) 0%, var(--via-navy-deep) 68%, var(--via-navy-darker));
 }
 
-/* ------------------------------------------------------------------------------
-   CTA primário sobre banda escura.
+:root[data-theme='dark'] {
+  --app-elev-1-bg: var(--via-glass-card);
+  --app-ring: 0 0 0 2px var(--via-bg), 0 0 0 4px var(--via-text-primary);
+}
 
-   O `.via-btn--primary` do design system é preenchido com navy — foi desenhado para
-   superfície CLARA. Sobre a banda escura ele fica navy-sobre-navy e praticamente
-   desaparece. Esta é a correção de sistema, não um ajuste pontual.
-
-   O accent é a resposta certa e é brand-legal: o manual da marca reserva o #00A2FF
-   para "elementos de destaque", e um CTA é a definição disso — área pequena, intenção
-   alta. Não é preenchimento de grande área, que é o que o manual proíbe.
-
-   O rótulo é navy escuro, não branco: medido, branco sobre #00A2FF dá 2,76:1 e
-   reprova AA. Navy escuro dá 7,13:1.
-
-   A especificidade (0,2,0) vence a regra do DS (0,1,0) sem precisar de !important,
-   e o shine sweep e o press ficam de pé porque moram em `.via-btn`.
-   ------------------------------------------------------------------------------ */
+/* Primário em banda navy usa papel branco; navy sobre navy seria invisível. */
 .via-mesh-navy .via-btn--primary,
 .via-glass-dark .via-btn--primary {
-  background: var(--via-accent);
-  border-color: var(--via-accent);
-  color: var(--cst-navy-deep);
+  background: var(--via-surface-onnavy);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--via-navy);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.28) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.12) inset,
-    0 10px 24px -8px rgba(0, 162, 255, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 10px 24px -12px rgba(0, 0, 0, 0.44);
 }
 
 .via-mesh-navy .via-btn--primary:hover:not(:disabled),
 .via-glass-dark .via-btn--primary:hover:not(:disabled) {
-  background: var(--via-accent-deep);
-  border-color: var(--via-accent-deep);
+  background: var(--via-white);
+  border-color: rgba(255, 255, 255, 0.52);
 }
 
-/* Seleção de texto — navy institucional. */
 ::selection {
-  background: rgba(11, 22, 45, 0.92);
-  color: var(--cst-white);
-}
-
-/* Sobre banda escura, a seleção usa o accent: é onde ele é legível e onde a
-   marca está em casa. */
-.via-mesh-navy ::selection,
-.via-glass-dark ::selection {
-  background: rgba(0, 162, 255, 0.85);
-  color: var(--cst-navy-deep);
-}
-
-/* O halo e o anel do pulso do Pill live são literais dentro do DS e não seguem o
-   `--via-coral`. Aqui eles passam a acompanhar o accent.
-
-   O halo saiu: a assinatura da marca é glass + atmosférico + sombra navy, NÃO
-   glow. O anel pulsante do `::after` já comunica "ao vivo" sozinho — o brilho era
-   o segundo sinal para a mesma coisa. */
-.via-pill__live-dot {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  background: var(--via-navy);
+  color: var(--via-white);
 }
 
 .via-pill__live-dot::after {
-  background: var(--via-accent-hairline);
+  background: color-mix(in srgb, var(--via-coral) 34%, transparent);
 }

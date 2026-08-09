@@ -1,8 +1,5 @@
-'use client';
-
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { MenuPerfil } from './MenuPerfil';
 import { TrilhaDoCabecalho } from './trilha/TrilhaDoCabecalho';
 import styles from './CabecalhoApp.module.css';
@@ -39,13 +36,6 @@ export function CabecalhoApp({
   email: string;
   logo: ReactNode;
 }) {
-  const caminho = usePathname();
-
-  /* O mapa da jornada já tem o próprio cabeçalho operacional (saudação + espaço
-     de trabalho). Manter a barra genérica acima dele duplicaria o topo e
-     quebraria a hierarquia da direção visual aprovada. */
-  if (caminho === '/inicio') return null;
-
   return (
     <header className={styles.cabecalho}>
       <Link href="/inicio" className={styles.marca} aria-label="Ir para o início">

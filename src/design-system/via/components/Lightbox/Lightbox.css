@@ -7,12 +7,20 @@
   z-index: 9994;
   display: flex;
   flex-direction: column;
+  font-family: var(--via-font, 'Geist', system-ui, sans-serif);
+}
+
+/* Fundo em elemento próprio: a opacidade acompanha o arrasto (scrimRef)
+   sem apagar a foto nem o chrome */
+.via-lightbox__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background:
     radial-gradient(circle at 50% 40%, rgba(10, 31, 59, 0.86), rgba(2, 22, 42, 0.96));
   backdrop-filter: blur(16px) saturate(130%);
   -webkit-backdrop-filter: blur(16px) saturate(130%);
   animation: via-lightbox-in .26s var(--via-ease-out);
-  font-family: var(--via-font, 'Geist', system-ui, sans-serif);
 }
 
 @keyframes via-lightbox-in {
@@ -28,12 +36,13 @@
   padding: 24px;
   cursor: zoom-out;
   overflow: hidden;
+  touch-action: none; /* pan vertical é o gesto de dispensar, não scroll nativo */
 }
 
 .via-lightbox__img {
   max-width: min(92vw, 1400px);
   max-height: 86vh;
-  border-radius: 12px;
+  border-radius: var(--via-radius-md);
   cursor: default;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
@@ -58,7 +67,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: var(--via-white, #FFFFFF);
   cursor: pointer;
-  border-radius: 999px;
+  border-radius: var(--via-radius-pill);
   z-index: 1;
   transition: background var(--via-dur) ease, transform var(--via-dur) var(--via-ease-spring);
   box-shadow:
@@ -129,7 +138,7 @@
   color: var(--via-white, #FFFFFF);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
+  border-radius: var(--via-radius-pill);
   text-decoration: none;
   transition: background var(--via-dur) ease, transform .15s ease;
 }
@@ -139,7 +148,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .via-lightbox, .via-lightbox__img, .via-lightbox__close, .via-lightbox__arrow, .via-lightbox__download {
+  .via-lightbox__scrim, .via-lightbox__img, .via-lightbox__close, .via-lightbox__arrow, .via-lightbox__download {
     animation: none !important;
     transition: none !important;
   }

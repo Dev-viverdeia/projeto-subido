@@ -1,48 +1,19 @@
-/* `min-width: 0` É O PAR OBRIGATÓRIO do `minmax(0, 1fr)` da faixa do shell.
-   Faixa que encolhe não basta: o ITEM do grid tem `min-width: auto` por padrão e
-   transbordaria a faixa em vez de encolher. Os dois juntos são o que faz a
-   trilha truncar em vez de empurrar a página. */
 .cabecalho {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  min-width: 0;
-  min-height: 60px;
-  padding-inline: var(--via-space-4);
-
   position: sticky;
   top: 0;
   z-index: var(--via-z-sticky);
-
-  /* VIDRO — a assinatura do sistema é glass + atmosfera + sombra navy, nunca glow.
-     `--via-glass-bar` é o token que o DS reserva para barra/chrome: translúcido de
-     verdade, pensado para o conteúdo passar DESFOCADO por baixo. O `saturate`
-     compensa a dessaturação que o blur provoca, senão o que rola sob o cabeçalho
-     parece desbotar.
-
-     ⚠ NÃO ACRESCENTE `-webkit-backdrop-filter` AQUI.
-     O Lightning CSS (minificador do Turbopack) já faz o prefixing sozinho a partir
-     do browserslist. Com a duplicata manual escrita ao lado, ele descarta AS DUAS
-     declarações: medido no CSSOM, `backdrop-filter` saía `none` e sobrava só o
-     fundo a 60% — ou seja, o texto do conteúdo passando nítido por trás do
-     cabeçalho, sem nenhum aviso em build, lint ou tipo. O ConsentNotice da landing
-     nunca teve o problema justamente por trazer só a linha sem prefixo. */
-  background: var(--via-glass-bar);
-  backdrop-filter: blur(14px) saturate(1.6);
-  /* Fio de tinta navy, igual ao da sidebar. O `--via-border-hairline` (#E2E9F2) era
-     coerente quando a sidebar também era branca; com a calha rebaixada os dois
-     únicos fios da tela precisam ser o mesmo fio, senão o chrome lê como dois
-     sistemas. */
-  border-bottom: 1px solid var(--via-border);
-  /* A assinatura do sistema é vidro + atmosfera + SOMBRA NAVY, e a sombra era a
-     única das três que faltava aqui: a barra ficava colada no conteúdo em vez de
-     pairar sobre ele. `xs` de propósito — 0 1px 2px a 4% é o degrau mais baixo que
-     existe, o suficiente para separar sem virar caixa. */
-  box-shadow: var(--via-shadow-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  min-width: 0;
+  min-height: 68px;
+  padding-inline: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  backdrop-filter: blur(26px) saturate(175%);
+  box-shadow: 0 8px 24px -24px var(--via-navy-30);
 }
 
-/* Sem suporte a backdrop-filter, um fundo translúcido deixaria o conteúdo passar
-   nítido por trás e virar sopa. Aí o branco é sólido. */
 @supports not (backdrop-filter: blur(1px)) {
   .cabecalho {
     background: var(--via-surface);
@@ -52,14 +23,12 @@
 .marca {
   display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   min-height: 44px;
-  color: var(--via-navy);
+  color: var(--via-text-primary);
   text-decoration: none;
 }
 
-/* O slot vive aqui. `min-width: 0` é o que permite a trilha truncar pelo título
-   em vez de empurrar o menu de perfil para fora da barra. */
 .esquerda {
   display: none;
   align-items: center;
@@ -70,32 +39,19 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-2);
-  /* Empurra o perfil para a direita sem precisar de space-between, que brigaria
-     com o rótulo de seção quando ele aparece. */
   margin-left: auto;
 }
 
 @media (min-width: 1024px) {
   .cabecalho {
-    /* De volta a 68. Os 80px foram postos quando o rótulo de seção era um título
-       de 32px e a barra o espremia contra as duas hairlines. Com o rótulo virando
-       um degrau de trilha de 14px, 80 vira calha vazia — e a barra da referência
-       é justamente baixa. */
-    min-height: 68px;
-    padding-inline: var(--via-space-8);
+    min-height: 72px;
+    padding-inline: clamp(28px, 3vw, 52px);
   }
 
-  /* A marca vive na sidebar em desktop; repeti-la aqui seria a segunda vez na
-     mesma tela. O lugar dela passa a ser do slot. */
   .marca {
     display: none;
   }
 
-  /* O PAR DA REGRA ACIMA — e ele já sumiu uma vez. `.esquerda` nasce
-     `display: none` porque abaixo de 1024 o lugar é da marca; sem esta linha o
-     cabeçalho fica sem lado esquerdo em TODA largura. Nenhum gate pega isso:
-     tsc, eslint, build e o check de identidade passam verdes com um cabeçalho
-     vazio. As duas regras são um par — mexeu numa, confira a outra. */
   .esquerda {
     display: flex;
   }

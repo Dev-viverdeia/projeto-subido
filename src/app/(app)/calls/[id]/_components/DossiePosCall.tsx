@@ -15,7 +15,7 @@ import {
   Lightbulb,
   MessageSquareQuote,
   Radar,
-  Sparkles,
+  Layers3,
   Target,
 } from 'lucide-react';
 import { confirmarProximaAcao } from '@/lib/calls/actions';
@@ -146,7 +146,7 @@ export function DossiePosCall({
 
         <div className={styles.pulsoDecisao}>
           <div className={styles.pulsoRotulo}>
-            <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
             <span>Mapa da conversa</span>
           </div>
           <div className={styles.pulsoItem}>

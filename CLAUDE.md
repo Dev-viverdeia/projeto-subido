@@ -42,10 +42,10 @@ Sobral AI, Mentorias, Formações, Certificados e, depois da base, Diagnóstico 
 `Consultor` virou **Sobral AI**. Nomes técnicos herdados podem continuar em rotas, tabelas e
 arquivos até uma migração segura; não podem reaparecer na interface nova.
 
-A identidade é própria do **Viver de IA Subido**: usa a arquitetura do design system Viver de IA
-e a cromática/energia da Subido, mas a composição, a navegação e a jornada precisam ser
-reconhecíveis como outro produto. Não copiar telas inteiras nem criar confusão visual com a
-plataforma Viver de IA.
+A identidade visual do **Viver de IA Subido** usa integralmente o Design System oficial da
+Viver de IA: paleta, Geist, logo, superfícies, componentes e movimento. "Subido" identifica o
+produto e a colaboração no naming, sem criar uma segunda cromática. A arquitetura de produto e a
+jornada continuam próprias deste produto; o acabamento visual tem uma única fonte de verdade.
 
 ## Stack
 
@@ -92,45 +92,37 @@ JS do DS. Consequências:
 
 ### Marca e paleta
 
-**A marca do produto é Viver de IA Subido.** O DS vendorizado (prefixo `--via-*`) fornece a
-ARQUITETURA visual: superfície clara, hierarquia editorial, vidro + atmosfera + sombra navy,
-escalas. A camada de marca aplica a CROMÁTICA e a FAMÍLIA TIPOGRÁFICA da Subido; a composição do
-produto é própria e organizada pelo Mapa da Jornada.
+**A marca do produto é Viver de IA Subido.** O DS vendorizado (prefixo `--via-*`) é a fonte única
+da linguagem visual: superfície clara, hierarquia editorial, vidro + atmosfera + sombra navy,
+paleta, tipografia e movimento. `src/styles/brand.css` apenas traduz papéis próprios do aplicativo
+para tokens canônicos; ela não pode introduzir outra marca ou outra cor.
 
 > O `tokens.css` do vendor declara `--via-font: 'Geist'`, mas o vendor não se edita. A família
-> real é escolhida uma única vez, na ponte `next/font` → token em `globals.css`, e hoje é a
-> **Outfit**. Trocar de fonte é editar essa ponte e `src/app/fonts.ts` — mais nada.
+> real é escolhida uma única vez, na ponte `next/font` → token em `globals.css`, e é a
+> **Geist**. Geist Mono fica reservada a dados, código, timestamps e metadados.
 
 > `--via-*` e o nome da pasta são NOMES INTERNOS do DS. Não são copy de produto e não podem
 > aparecer em `alt`, `aria-label`, metadata ou asset.
 
-| Token              | Valor     | Uso                                |
-| ------------------ | --------- | ---------------------------------- |
-| `--via-navy`       | `#0B162D` | banda escura, tinta primária       |
-| `--via-navy-deep`  | `#040B1A` | fundo da banda de fechamento       |
-| `--via-bg`         | `#FAFDFF` | branco institucional               |
-| `--via-accent`     | `#00A2FF` | **uso pontual, só sobre escuro**   |
-| `--via-accent-ink` | `#0072BE` | única variante legível sobre claro |
+| Token             | Valor     | Uso                            |
+| ----------------- | --------- | ------------------------------ |
+| `--via-navy`      | `#0A1F3B` | CTA, tinta primária, marca     |
+| `--via-navy-deep` | `#02162A` | momentos escuros imersivos     |
+| `--via-blue`      | `#1E3A5F` | gradientes e dados secundários |
+| `--via-bg`        | `#FFFFFF` | canvas light-first             |
+| `--via-bg-2`      | `#F7F8FA` | superfície alternativa         |
 
-**Regra do accent — do manual da marca, e a física concorda:** `#00A2FF` sobre branco dá **2,70:1**
-(reprova AA até para texto grande); sobre a navy dá **6,52:1**. O azul é fisicamente uma cor de
-destaque **sobre escuro**.
-
-- ✅ Eyebrow, CTA primário, anel de foco, dot de "ao vivo", ícone de destaque — **em banda escura**.
-- ❌ Fundo de seção, card grande, texto corrido, qualquer coisa sobre claro.
-- Texto accent sobre claro: **só** `--via-accent-ink`.
-- Rótulo sobre preenchimento accent: **navy escuro** (7,13:1). Branco reprova (2,76:1).
-- **Preto não pertence à paleta.** Nada de `#000`.
+**Regra zero: light-first.** Branco e off-white ocupam aproximadamente 85% da tela. Navy é a cor
+da marca, não o fundo padrão. Escuro aparece no máximo como um momento imersivo por tela; cyan,
+roxo, amarelo, dourado, magenta, neon e gradiente quente são banidos.
 
 **A escala de cinza inverte entre bandas, e essa é a armadilha de contraste mais cara do repo.**
 Sobre claro, "mais quieto" = mais escuro (`--via-text-soft/muted/faint`). Sobre a banda navy isso
-se inverte: `--via-text-soft` (#636D80) sobre `#0B162D` dá **3,45:1** e reprova AA a 14px.
+se inverte: tokens semânticos claros podem perder contraste sobre uma banda navy.
 
 - Sobre banda escura use **`--via-gray-300`** (12,2:1) ou **`--via-gray-400`** (6,99:1).
 - **Nunca** `--via-text-soft/muted/faint` sobre escuro.
-- `--via-text-faint` está sobrescrito para `#667085` em `brand.css`. O `#98A2B3` do DS rende
-  **2,52:1** sobre branco e pinta justamente índices, notas de fonte e preços — texto pequeno.
-  Não volte ao valor do DS.
+- Use os tokens semânticos do DS e valide contraste AA nos dois temas.
 
 ### A identidade: as quatro famílias além da cor
 
@@ -300,20 +292,16 @@ fosse estreito, caberiam MENOS caracteres, não mais.)
 **O fator é PROPRIEDADE DA FONTE, então mudou junto com ela.** Medido no navegador com
 `canvas.measureText` a 450/17px, com prosa real em pt-BR (largura do `0` ÷ largura do glifo médio):
 
-| Fonte               | fator     | controle                                                                   |
-| ------------------- | --------- | -------------------------------------------------------------------------- |
-| Geist (até 08/2026) | 1,30      | —                                                                          |
-| **Outfit (atual)**  | **1,369** | Arial dá 1,141 — é assim que se prova que a face carregou e não é fallback |
+| Fonte             | fator    | controle                        |
+| ----------------- | -------- | ------------------------------- |
+| **Geist (atual)** | **1,30** | fonte canônica do Design System |
 
-O alvo real é **caracteres ÷ 1,369**: **~50ch para 68 caracteres**, ~53ch para 73. A faixa
+O alvo real é **caracteres ÷ 1,30**. A faixa
 confortável continua **45–75** e nenhum lint pega isso. Ao escrever uma medida nova, **meça** —
 não copie o número de outro arquivo achando que 65ch dá 65 caracteres.
 
 **E o fator varia por TEXTO, não só por fonte.** A tabela acima o trata como propriedade da
-fonte, e ele é — mas só entre TAMANHOS de corpo, para o mesmo texto. Medido na
-landing: a prosa média dá 1,369, mas a linha da garantia ("Assine, use tudo e, se não
-fizer sentido…"), quase toda de letras estreitas, dá **1,50** — os mesmos 53ch rendiam 73
-caracteres num parágrafo e 80 nela. Não existe número de `ch` que sirva para toda copy;
+fonte, mas a medida real também varia conforme a composição e a copy. Não existe número de `ch` que sirva para todo texto;
 existe medir a copy que está lá.
 
 **E meça a CAIXA DE LINHA, não a largura do elemento.** `largura do elemento ÷ glifo médio`
@@ -323,10 +311,7 @@ onde não há. Medido: a linha de confiança do hero acusava 83 e tem 21 (são o
 um sua própria caixa); o rodapé legal acusava 151 e tem 52 (um `<br>` no meio). O certo é
 `Range.selectNodeContents(el)` e o maior `getClientRects()`.
 
-> A troca Geist→Outfit subiu o fator ~5%, então toda medida em `ch` do repo passou a render
-> mais caracteres. Duas cruzaram o teto de 75 por causa disso e foram recalibradas de 56ch para
-> 53ch (`PricingSection`, `CursoConteudo`) — preservando o comprimento de linha, não o número
-> do token. **Dez outras medidas já estouravam 75 antes da troca** e continuam estourando:
+> Medidas em `ch` devem ser revalidadas visualmente com Geist. **Dez medidas históricas estouram 75**:
 > 70ch no `HubSection`, 68ch em `CartaoProxima` e `CabecalhoPagina`, 62ch em quatro arquivos,
 > 60ch em três. São dívida pré-existente, não regressão da fonte.
 
@@ -469,13 +454,11 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
   texto, verde/vermelho de semáforo. Cyan segue banido como _decoração_.
 - **Cores só por token.** Hex literal reprova em `check:identidade` (não é regra de
   eslint — era o que o texto dizia antes de o gate existir).
-- **Nunca Lexend**, **nunca headline caixa-alta condensada** — a tipografia é **Outfit**, sempre
-  (texto e display). Geist Mono sobrevive só para número, rótulo e eyebrow: a Outfit não é
-  monoespaçada e a régua de "número é prova" depende de `tabular-nums`.
+- **Nunca Lexend ou Outfit**, **nunca headline caixa-alta condensada** — a tipografia é **Geist**
+  em texto e display. Geist Mono fica para número, código, timestamp, rótulo e eyebrow.
 - A assinatura é **glass + atmosférico + sombra navy** — **não glow**.
-- **Ênfase é TOM, nunca `font-weight: 700` e nunca itálico.** A Outfit não tem face itálica —
-  nenhuma — então `font-style: italic` só produz o oblíquo SINTETIZADO do browser: inclinação
-  calculada por matriz, não desenho. O que era exceção do `<h1>` do hero virou a regra da casa,
+- **Ênfase é TOM, nunca `font-weight: 700` e nunca itálico sintético.** `font-style: italic`
+  sem uma face real produz apenas uma inclinação calculada pelo navegador. A regra da casa é
   e o tom da ênfase é o mais QUIETO (`--app-em-ink`: `--via-text-muted` no claro,
   `--via-gray-onnavy` sobre banda escura — a escala inverte, ver acima). `SectionHeader` já
   fazia tom + itálico junto; era o tom que carregava a leitura.

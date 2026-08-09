@@ -132,8 +132,8 @@
 }
 
 .trilha li > span.noAtivo {
-  border-color: color-mix(in srgb, var(--via-accent) 62%, white);
-  background: var(--via-accent);
+  border-color: rgba(255, 255, 255, 0.72);
+  background: var(--via-white);
   color: var(--via-navy);
 }
 
@@ -358,7 +358,7 @@
   padding: var(--via-space-6);
   border-color: var(--via-accent-hairline);
   background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 42%), var(--via-surface);
+    radial-gradient(circle at 100% 0%, var(--via-navy-06), transparent 46%), var(--via-surface);
   box-shadow: var(--via-shadow-md);
 }
 

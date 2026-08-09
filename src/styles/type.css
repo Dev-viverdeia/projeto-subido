@@ -88,8 +88,7 @@
   letter-spacing: -0.022em;
 }
 
-/* Ênfase é TOM, nunca peso — e nunca itálico, porque a Outfit não tem face itálica
-   e o oblíquo sintetizado do browser é inclinação calculada, não desenho.
+/* Ênfase é TOM, nunca peso — e nunca oblíquo sintetizado pelo navegador.
    O tom da ênfase é o mais QUIETO, não o mais forte: recuo editorial, o mesmo
    mecanismo que SectionHeader já usava por baixo do itálico.
    Sobre banda escura, redeclare `--app-em-ink` (a escala de cinza inverte). */

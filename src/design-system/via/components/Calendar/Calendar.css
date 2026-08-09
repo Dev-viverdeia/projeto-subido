@@ -11,11 +11,11 @@
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid var(--via-border-soft);
-  border-radius: 16px;
+  border-radius: var(--via-radius-md);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-10),
-    0 12px 28px -12px var(--via-navy-14);
+    0 12px 28px -12px var(--via-shadow-ink-14);
   font-family: var(--via-font, 'Geist', system-ui, sans-serif);
   isolation: isolate;
 }
@@ -43,7 +43,7 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 7px;
+  border-radius: var(--via-radius-sm);
   background: transparent;
   border: 1px solid transparent;
   color: var(--via-ink-2, #5E6B82);
@@ -54,6 +54,10 @@
   background: var(--via-navy-06);
   color: var(--via-text-primary);
   border-color: var(--via-navy-12);
+}
+.via-cal__nav:active {
+  background: var(--via-navy-10);
+  transition-duration: var(--via-dur-press);
 }
 
 .via-cal__month {
@@ -97,7 +101,7 @@
   justify-content: center;
   gap: 3px;
   aspect-ratio: 1 / 1;
-  border-radius: 7px;
+  border-radius: var(--via-radius-sm);
   font-family: inherit;
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
@@ -122,6 +126,11 @@
 .via-cal__cell:hover:not(.is-disabled):not(.is-selected) {
   background: var(--via-navy-06);
   color: var(--via-text-primary);
+}
+
+.via-cal__cell:active:not(.is-disabled) {
+  transform: scale(0.94);
+  transition-duration: var(--via-dur-press);
 }
 
 .via-cal__cell.is-out {
@@ -152,7 +161,7 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.18) inset,
     0 -1px 0 rgba(0, 0, 0, 0.10) inset,
-    0 4px 10px -4px var(--via-navy-30);
+    0 4px 10px -4px var(--via-shadow-ink-30);
 }
 
 .via-cal__cell.is-disabled {

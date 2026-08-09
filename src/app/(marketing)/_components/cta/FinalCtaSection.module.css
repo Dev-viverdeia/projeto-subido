@@ -42,11 +42,11 @@
   padding: 17px 32px;
   border-radius: var(--via-radius-pill);
   background: var(--via-accent);
-  color: var(--cst-navy-deep);
+  color: var(--via-white);
   font-size: var(--via-fs-body);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
-  box-shadow: 0 14px 36px -12px rgba(0, 162, 255, 0.7);
+  box-shadow: 0 14px 36px -12px var(--via-navy-30);
   transition:
     transform var(--via-t-fast),
     background-color var(--via-t-fast);

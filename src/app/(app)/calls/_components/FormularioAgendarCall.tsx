@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { CalendarPlus, Sparkles, X } from 'lucide-react';
+import { CalendarPlus, Layers3, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
@@ -199,7 +199,7 @@ export function FormularioAgendarCall({
                   <label className={styles.coach}>
                     <input type="checkbox" name="liveCoach" defaultChecked />
                     <span className={styles.coachIcone}>
-                      <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+                      <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
                     </span>
                     <span>
                       <strong>Ativar Live Coach</strong>

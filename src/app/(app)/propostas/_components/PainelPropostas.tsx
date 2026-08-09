@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, FileSignature, Plus, Sparkles } from 'lucide-react';
+import { ArrowUpRight, FileSignature, Plus, Layers3 } from 'lucide-react';
 import type { ResumoProposta } from '@/lib/propostas/queries';
 import { formatarReais } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
@@ -111,7 +111,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       ) : (
         <section className={styles.vazio}>
           <span>
-            <Sparkles size={22} strokeWidth={1.7} aria-hidden="true" />
+            <Layers3 size={22} strokeWidth={1.7} aria-hidden="true" />
           </span>
           <p className={styles.sobretitulo}>Primeiro documento</p>
           <h2>Seu trabalho já está no sistema. Falta apresentá-lo.</h2>

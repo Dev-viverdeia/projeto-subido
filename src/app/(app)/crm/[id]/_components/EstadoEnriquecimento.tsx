@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Database, Globe2, ScanSearch, Sparkles } from 'lucide-react';
+import { Database, Globe2, ScanSearch, Layers3 } from 'lucide-react';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import styles from './EstadoEnriquecimento.module.css';
 
@@ -64,7 +64,7 @@ export function EstadoEnriquecimento({
         </span>
         <span className={styles.traco} />
         <span className={`${styles.no} ${styles.noAtivo}`}>
-          <Sparkles size={17} /> Dossiê
+          <Layers3 size={17} /> Dossiê
         </span>
       </div>
     </section>

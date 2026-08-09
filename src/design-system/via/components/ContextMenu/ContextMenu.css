@@ -15,13 +15,16 @@
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid var(--via-border-soft);
-  border-radius: 10px;
+  border-radius: var(--via-radius-sm);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-10),
-    0 22px 44px -16px var(--via-navy-22),
-    0 8px 18px -10px var(--via-navy-14);
+    0 22px 44px -16px var(--via-shadow-ink-20),
+    0 8px 18px -10px var(--via-shadow-ink-14);
   font-family: var(--via-font, 'Geist', system-ui, sans-serif);
+  /* Origem espacial (WWDC): o menu nasce do ponto do clique — o canto
+     superior esquerdo ancora no cursor */
+  transform-origin: top left;
   animation: via-cm-in 0.2s var(--via-ease-out);
   isolation: isolate;
 }
@@ -55,7 +58,7 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: -0.006em;
   color: var(--via-text-primary);
-  border-radius: 6px;
+  border-radius: var(--via-radius-xs);
   text-align: left;
   transition: background .15s ease, color .15s ease;
 }

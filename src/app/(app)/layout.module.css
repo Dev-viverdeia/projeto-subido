@@ -1,12 +1,11 @@
-/* Mobile primeiro: cabeçalho, conteúdo e o dock fixo (que mora no
-   NavLateral.module.css). A sidebar só existe a partir de 1024px. */
 .shell {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 24%),
-    linear-gradient(180deg, var(--via-bg), var(--via-bg-2));
+    radial-gradient(ellipse 70% 42% at 15% 0%, var(--via-navy-05), transparent 62%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, var(--via-navy-03), transparent 68%),
+    var(--via-bg-2);
 }
 
 .sidebar {
@@ -16,142 +15,89 @@
 .conteudo {
   min-width: 0;
   padding: var(--via-space-6) var(--via-space-4);
-  /* Espaço para o dock não cobrir o fim do conteúdo: 56px do dock + folga + a área
-     segura do iOS. Sem isto o último elemento da página fica inalcançável. */
   padding-bottom: calc(var(--via-space-20) + env(safe-area-inset-bottom, 0px));
 }
 
-/* Quando /inicio renderiza o mapa, o CabecalhoApp sai da árvore e o conteúdo
-   ocupa a única linha do shell. A classe global é só um marcador estrutural da
-   página; toda a aparência continua encapsulada no CSS Module dela. */
-.shell:has(.conteudo > :global(.pagina-mapa-jornada)) {
-  grid-template-rows: 1fr;
-}
-
 @media (min-width: 1024px) {
-  /* 240px, não 264. A sidebar carrega seis rótulos curtos e um logotipo pequeno —
-     a largura extra não estava sendo usada por nada, e cada pixel dela sai do
-     conteúdo, que é onde o trabalho acontece.
-
-     SEM `grid-template-areas` DE PROPÓSITO. O cabeçalho é um componente com CSS
-     Module próprio, e daqui não há como alcançar a classe dele para lhe atribuir
-     uma área. Em vez disso a sidebar é posicionada explicitamente nas duas linhas
-     e o resto cai por auto-placement, na ordem do DOM: cabeçalho na linha 1 da
-     coluna 2, conteúdo na linha 2. Menos acoplamento, mesmo resultado. */
   .shell {
-    /* `minmax(0, 1fr)` E NUNCA `1fr`. Uma faixa `1fr` tem mínimo automático
-       `auto`, o que a impede de encolher abaixo do min-content dos seus itens —
-       e o cabeçalho tem a trilha com `white-space: nowrap`. Bastou um título
-       longo (o Builder usa a ideia inteira como rótulo enquanto não há título
-       gerado) para a faixa crescer até caber a frase, levar a página junto e
-       aparecer barra de rolagem horizontal. Todo bloco centralizado por
-       `margin-inline: auto` passava a centralizar dentro da largura ESTOURADA,
-       indo parar fora da tela.
-       Nada em tsc, eslint, build ou nos gates percebe: é layout. */
-    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-columns: 252px minmax(0, 1fr);
   }
 
   .sidebar {
     grid-column: 1;
     grid-row: 1 / -1;
-
-    display: flex;
-    flex-direction: column;
-    gap: var(--via-space-4);
-    /* `sticky` + altura de viewport em vez de `fixed`: a sidebar continua no fluxo
-       do grid, então o conteúdo não precisa de margin-left mágica para não ficar
-       embaixo dela. */
     position: sticky;
     top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--via-space-5);
     height: 100dvh;
-    /* 12 e não 16 no inline: põe o ícone do item de nav em x=24, alinhado com a
-       marca, que também recua para 12. Eram os dois únicos elementos da coluna e
-       estavam desalinhados em 8px. */
-    padding: var(--via-space-5) var(--via-space-3);
-    /* O TRILHO — campo PRÓPRIO (`--app-mesh-trilho`), não o mesh da landing.
-       Aquele desce até #040B1A, quase preto, e preto não pertence à paleta: a
-       coluna virava um buraco ao lado de um canvas claro. Este começa mais claro
-       no topo, onde os itens vivem, e assenta na navy institucional embaixo.
-       O grão continua vindo da classe `via-noise` no JSX. */
-    background: var(--app-mesh-trilho);
-    /* Hairline CLARA na aresta: o fio navy de antes seria invisível sobre a
-       própria navy. */
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    /* Sombra navy direcional para dentro do canvas — vidro + atmosfera + sombra,
-       nunca glow. */
-    box-shadow: 12px 0 32px -18px rgba(11, 22, 45, 0.45);
-    /* A folga entre a marca e a lista: a marca já carrega ~10px de ar próprio
-       dentro do min-height de 44px, então 24 lia como 34. */
-    gap: var(--via-space-3);
+    padding: var(--via-space-6) var(--via-space-4) var(--via-space-4);
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 110% 34% at 0% 0%, var(--via-navy-05), transparent 68%),
+      color-mix(in srgb, var(--via-surface) 94%, transparent);
+    border-right: 1px solid var(--via-border-soft);
+    box-shadow: 12px 0 32px -28px var(--via-navy-30);
   }
 
-  /* O admin ancora o PÉ do trilho — utilitário, separado dos pilares por uma
-     hairline clara. Também resolve o vazio de ~450px que a coluna tinha. */
   .rodapeSidebar {
     margin-top: auto;
-    padding-top: var(--via-space-3);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: var(--via-space-4);
+    border-top: 1px solid var(--via-border-soft);
   }
 
   .conteudo {
-    padding: var(--via-space-7) var(--via-space-8) var(--via-space-16);
-  }
-
-  .shell:has(.conteudo > :global(.pagina-mapa-jornada)) .conteudo {
-    grid-column: 2;
-    grid-row: 1;
+    padding: var(--via-space-8) clamp(28px, 3vw, 52px) var(--via-space-16);
   }
 }
 
 .marcaSidebar {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--via-space-2);
-  align-self: flex-start;
-  /* Sobre a navy, o wordmark é BRANCO (via currentColor); a marca segue azul
-     institucional pela variante brand — o mesmo quadro de /entrar. */
-  color: var(--via-white);
+  gap: var(--via-space-3);
+  min-height: 66px;
+  padding: 2px var(--via-space-2) var(--via-space-4);
+  color: var(--via-text-primary);
   text-decoration: none;
-  /* O logotipo é baixo; como link, a caixa dele seria a área clicável inteira e
-     ficaria abaixo dos 24px que a WCAG 2.5.8 exige. A caixa cresce, o desenho não. */
-  min-height: 44px;
-  /* 12 para casar com o padding-inline da sidebar: marca e ícones de nav passam a
-     nascer no mesmo x=24. */
-  padding-inline: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-soft);
 }
 
-.marcaSidebar span {
-  font-family: var(--via-font-mono);
+.marcaSidebar > span:last-child {
+  max-width: 190px;
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
-  line-height: 1;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-gray-400);
+  line-height: 1.45;
+  letter-spacing: var(--app-ls-caption);
 }
 
 .perfilSidebar {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  min-height: 56px;
+  min-height: 58px;
   margin-top: var(--via-space-2);
-  padding: var(--via-space-2_5) var(--via-space-3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid transparent;
   border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-decoration: none;
-  transition: background-color var(--app-t-state);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    transform var(--app-t-touch);
 }
 
 .perfilSidebar:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--via-navy-04);
+  border-color: var(--via-border-soft);
+  transform: translateY(-1px);
 }
 
 .perfilSidebar:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy);
+  box-shadow: var(--app-ring);
 }
 
 .avatarSidebar {
@@ -160,10 +106,12 @@
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 50%;
+  background: var(--via-navy);
+  color: var(--via-white);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
 }
 
 .identidadeSidebar {
@@ -184,7 +132,7 @@
 }
 
 .identidadeSidebar small {
-  margin-top: var(--via-space-1);
-  color: var(--via-gray-400);
+  margin-top: 2px;
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
 }

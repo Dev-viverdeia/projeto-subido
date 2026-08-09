@@ -17,7 +17,7 @@
   padding: clamp(28px, 4vw, 46px);
   border-radius: var(--app-radius-surface);
   background:
-    radial-gradient(circle at 84% 10%, var(--via-accent-soft), transparent 26%),
+    radial-gradient(circle at 84% 10%, rgba(255, 255, 255, 0.1), transparent 30%),
     var(--app-mesh-trilho);
   color: var(--via-white);
   box-shadow: var(--app-elev-2-shadow);
@@ -55,7 +55,7 @@
 }
 
 .hero .sobretitulo {
-  color: var(--via-accent);
+  color: var(--via-gray-300);
 }
 
 .hero h1 {
@@ -85,8 +85,9 @@
   gap: var(--via-space-2);
   padding: 0 var(--via-space-5);
   border-radius: var(--app-radius-control);
-  background: var(--via-accent);
-  color: var(--via-navy-deep);
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
@@ -94,6 +95,12 @@
   transition:
     transform var(--app-t-touch),
     box-shadow var(--app-t-touch);
+}
+
+.hero .nova {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: var(--via-surface-onnavy);
+  color: var(--via-navy);
 }
 
 .nova:hover {
@@ -123,11 +130,11 @@
 
 .linhaDecisao i {
   height: 1px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), var(--via-accent));
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.42));
 }
 
 .linhaDecisao strong {
-  color: var(--via-accent);
+  color: var(--via-white);
 }
 
 .resumo {

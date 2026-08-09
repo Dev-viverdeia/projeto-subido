@@ -11,26 +11,21 @@
  * abaixo espelham aquele arquivo e não podem divergir dele.
  */
 
-/** Paleta institucional da Comunidade Subido de Tráfego (manual da marca). */
+/** Paleta canônica da Viver de IA. O nome CST fica apenas por compatibilidade. */
 export const CST = {
-  /** Accent. Uso PONTUAL — nunca em grandes áreas ou fundos. */
-  blue: '#00A2FF',
-  /** Azul-marinho institucional. */
-  navy: '#0B162D',
-  /** Azul-marinho escuro institucional. */
-  navyDeep: '#040B1A',
-  /** Branco institucional (levemente frio). */
-  white: '#FAFDFF',
+  blue: '#1E3A5F',
+  navy: '#0A1F3B',
+  navyDeep: '#02162A',
+  white: '#FFFFFF',
 } as const;
 
 /** Derivados verificados por contraste. Ver src/styles/brand.css para o racional. */
 export const BRAND = {
   /** Banda mais profunda da landing. */
-  navyDarker: '#02060F',
-  /** Única variante do accent legível sobre superfície clara — 4,95:1. */
-  accentInk: '#0072BE',
+  navyDarker: '#010B1A',
+  accentInk: '#0A1F3B',
   /** Segundo tom sólido do título sobre banda escura (não é opacidade). */
-  softInk: '#8FA0B8',
+  softInk: '#98A2B3',
   /** Texto de apoio sobre banda escura. */
   mutedInk: '#98A2B3',
   /** Branco puro — o vidro e a tinta sobre navy precisam dele, não do branco frio. */
@@ -44,16 +39,16 @@ export const BRAND = {
  * de brand.css e mantêm esse consumidor estático sem cores espalhadas no template.
  */
 export const DOCUMENT = {
-  paper: '#FCFDFF',
-  soft: '#F2F6FB',
-  line: '#E2E9F2',
-  body: '#4F596B',
+  paper: '#FFFFFF',
+  soft: '#F7F8FA',
+  line: '#E4E7EC',
+  body: '#344054',
   faint: '#667085',
   coverMuted: '#AAB4C5',
   coverLine: '#2A3449',
   coverFaint: '#7E899D',
   coverDetail: '#9BA6B8',
-  coverBlue: '#65CAFF',
+  coverBlue: '#93A8C2',
   coverMid: '#677186',
   decisionMuted: '#AEB8C8',
   signature: '#AAB3C1',
@@ -62,11 +57,7 @@ export const DOCUMENT = {
 /**
  * Razões de contraste medidas (WCAG 2.1), para não serem re-descobertas por tentativa:
  *
- *   #00A2FF sobre #FAFDFF ....  2,70:1  ✗ reprova AA até para texto grande
- *   #00A2FF sobre #0B162D ....  6,52:1  ✓ AA
- *   #0B162D sobre #FAFDFF .... 17,62:1  ✓ AAA
- *   #0072BE sobre #FAFDFF ....  4,95:1  ✓ AA
- *   #FFFFFF sobre #00A2FF ....  2,76:1  ✗ — por isso rótulo em accent é navy escuro
- *   #040B1A sobre #00A2FF ....  7,13:1  ✓ AA
+ * Cores de produto devem consumir os tokens CSS semânticos. Estes valores ficam
+ * reservados a consumidores que não entendem custom properties, como PDF e OG.
  */
 export const THEME_COLOR = CST.navy;

@@ -83,8 +83,7 @@
   opacity: 0.75;
 }
 
-/* Botão de play: círculo de vidro com o accent. É destaque pontual — exatamente o
-   uso que o manual da CST reserva para o #00A2FF. */
+/* Botão de play: círculo navy oficial com destaque pontual. */
 .play {
   position: relative;
   display: grid;
@@ -93,9 +92,9 @@
   height: 64px;
   border-radius: var(--via-radius-pill);
   background: var(--via-accent);
-  color: var(--cst-navy-deep);
+  color: var(--via-white);
   padding-left: 3px;
-  box-shadow: 0 12px 32px -8px rgba(0, 162, 255, 0.6);
+  box-shadow: 0 12px 32px -8px var(--via-navy-30);
   transition: transform var(--via-t-fast);
 }
 

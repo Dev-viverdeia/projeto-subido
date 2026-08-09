@@ -28,7 +28,7 @@ export function HeroSection() {
             e morre no nada — é o que separa uma régua de 1px de uma borda de caixa. */}
         <header className={`${styles.top} rise rise--now`} style={{ ['--rise-i' as string]: 0 }}>
           <span className={styles.logo}>
-            <SubidoLogo size={19} />
+            <SubidoLogo size={19} variant="mono" />
           </span>
 
           <nav className={styles.nav} aria-label="Seções da página">

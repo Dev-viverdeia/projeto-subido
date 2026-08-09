@@ -1,0 +1,50 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  line-height: 0;
+  color: inherit;
+}
+
+.monograma,
+.wordmark {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+
+.monograma {
+  height: var(--via-logo-mark, 24px);
+}
+
+.wordmark {
+  height: var(--via-logo-word, 18px);
+}
+
+.produto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-04);
+  color: var(--via-text-muted);
+  font-family: var(--via-font);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--app-ls-caption);
+}
+
+.white .produto {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--via-gray-300);
+}
+
+@media (max-width: 419px) {
+  .produto {
+    display: none;
+  }
+}

@@ -1,8 +1,9 @@
 .shell {
   display: grid;
-  grid-template-columns: 235px minmax(0, 1fr);
+  grid-template-columns: 252px minmax(0, 1fr);
   min-height: 100dvh;
-  background: var(--via-bg);
+  background:
+    radial-gradient(ellipse 70% 42% at 15% 0%, var(--via-navy-05), transparent 62%), var(--via-bg-2);
 }
 
 .sidebar {
@@ -11,47 +12,67 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  padding: var(--via-space-6) var(--via-space-4);
-  background: var(--app-mesh-trilho);
-  color: var(--via-white);
+  padding: var(--via-space-6) var(--via-space-4) var(--via-space-4);
+  border-right: 1px solid var(--via-border-soft);
+  background:
+    radial-gradient(ellipse 110% 34% at 0% 0%, var(--via-navy-05), transparent 68%),
+    color-mix(in srgb, var(--via-surface) 94%, transparent);
+  box-shadow: 12px 0 32px -28px var(--via-navy-30);
+  color: var(--via-text-primary);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  min-height: 44px;
-  padding-inline: var(--via-space-2);
+  min-height: 60px;
+  padding: 0 var(--via-space-2) var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-soft);
 }
 
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1_5);
-  margin-top: var(--via-space-4);
+  gap: 3px;
+  margin-top: var(--via-space-5);
 }
 
 .sidebar nav a,
 .sidebar nav span {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  min-height: 44px;
-  padding: var(--via-space-2) var(--via-space-4);
+  min-height: 42px;
+  padding: var(--via-space-2) var(--via-space-3);
   border-radius: var(--app-radius-control);
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   text-decoration: none;
 }
 
 .sidebar nav .ativo {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--via-white);
+  border: 1px solid var(--via-border-soft);
+  background:
+    radial-gradient(ellipse 80% 120% at 0% 0%, var(--via-navy-08), transparent 65%),
+    var(--via-glass-card);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  color: var(--via-text-primary);
   font-weight: var(--via-fw-medium);
+}
+
+.sidebar nav .ativo::before {
+  content: '';
+  position: absolute;
+  inset-block: 10px;
+  left: 0;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--via-navy);
 }
 
 .sidebar nav a:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy);
+  box-shadow: var(--app-ring);
 }
 
 .perfil {
@@ -60,7 +81,7 @@
   gap: var(--via-space-3);
   margin-top: auto;
   padding: var(--via-space-4) var(--via-space-2) 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--via-border-soft);
 }
 
 .perfil > span {
@@ -68,8 +89,10 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 50%;
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
 }
 
@@ -80,17 +103,18 @@
 
 .perfil strong {
   font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
 }
 
 .perfil small {
-  margin-top: var(--via-space-1);
-  color: var(--via-gray-400);
+  margin-top: 2px;
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
 }
 
 .conteudo {
   min-width: 0;
-  padding: var(--via-space-7) var(--via-space-8) var(--via-space-10);
+  padding: var(--via-space-8) clamp(28px, 3vw, 52px) var(--via-space-12);
 }
 
 @media (max-width: 900px) {

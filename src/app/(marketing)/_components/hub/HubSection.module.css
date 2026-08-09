@@ -68,7 +68,7 @@
 
 .done .marker {
   background: var(--via-accent);
-  color: var(--cst-navy-deep);
+  color: var(--via-white);
 }
 
 .pending .marker {

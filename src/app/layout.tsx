@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { THEME_COLOR } from '@/lib/brand';
-import { outfit, geistMono } from './fonts';
+import { geist, geistMono } from './fonts';
 import './globals.css';
 
 /**
@@ -14,12 +14,12 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: {
-    default: 'Subido — a assinatura para virar implementador de IA',
-    template: '%s · Subido',
+    default: 'Viver de IA Subido — operação do profissional de IA',
+    template: '%s · Viver de IA Subido',
   },
   description:
     'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou. Da Comunidade Subido de Tráfego.',
-  applicationName: 'Subido',
+  applicationName: 'Viver de IA Subido',
   robots: { index: true, follow: true },
   /**
    * Canonical na URL LIMPA — inegociável.
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    siteName: 'Subido',
+    siteName: 'Viver de IA Subido',
     url: '/',
     title: 'Subido — a assinatura para virar implementador de IA',
     description:
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="pt-BR"
       data-theme="light"
       data-scroll-behavior="smooth"
-      className={`${outfit.variable} ${geistMono.variable}`}
+      className={`${geist.variable} ${geistMono.variable}`}
       /* O script inline de motion (ver (marketing)/layout.tsx) adiciona `js-reveal`
          ao <html> antes da hidratação, então o className do cliente diverge do que o
          servidor renderizou. Este é o mesmo padrão que bibliotecas de tema usam, e

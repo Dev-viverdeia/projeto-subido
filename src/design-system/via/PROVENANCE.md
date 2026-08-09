@@ -6,9 +6,9 @@ and verified in CI by `scripts/check-ds-drift.mjs`.
 | | |
 |---|---|
 | Source | https://github.com/rafaelmilagre7/viver-de-ia-ds |
-| Commit | `eb2d76b74909599bab9de5cf483f288e72a212cc` |
+| Commit | `ed6fb6b0f0a72bbf62b838fef57e2d34f7e7b066` |
 | Version | v0.6.1 |
-| Pinned date | 2026-07-01 |
+| Pinned date | 2026-08-06 |
 | Components | 47 (33 client, 14 server) |
 
 ## Transforms applied

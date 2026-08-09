@@ -26,7 +26,7 @@
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
   border: 1px solid var(--via-border, #D0D5DD);
-  border-radius: 9px;
+  border-radius: var(--via-radius-sm);
   color: var(--via-text-primary);
   transition:
     border-color var(--via-dur) ease,
@@ -34,7 +34,7 @@
     box-shadow var(--via-dur) ease;
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
-    0 1px 2px var(--via-navy-04);
+    0 1px 2px var(--via-shadow-ink-03);
 }
 
 .via-combobox--md .via-combobox__trigger { padding: 0 12px; }
@@ -108,10 +108,10 @@
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--via-border-soft, rgba(10, 31, 59, 0.08));
-  border-radius: 10px;
+  border-radius: var(--via-radius-sm);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
-    0 16px 40px -12px rgba(10, 31, 59, 0.18);
+    0 16px 40px -12px var(--via-shadow-ink-20);
   max-height: 280px;
   overflow-y: auto;
   animation: via-combobox-in 0.18s var(--via-ease-snap);
@@ -128,7 +128,7 @@
   justify-content: space-between;
   gap: var(--via-space-3);
   padding: 8px 10px;
-  border-radius: 7px;
+  border-radius: var(--via-radius-xs);
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
   letter-spacing: -0.006em;
@@ -139,6 +139,10 @@
 
 .via-combobox__option:hover {
   background: var(--via-navy-05);
+}
+
+.via-combobox__option:active:not(.is-disabled) {
+  background: var(--via-navy-10);
 }
 
 /* Destaque por teclado (navegação com setas) */
@@ -170,5 +174,5 @@
   text-align: center;
   font-size: var(--via-fs-xs);
   color: var(--via-ink-3, #6B7891);
-  font-style: italic;
+  font-style: normal;
 }

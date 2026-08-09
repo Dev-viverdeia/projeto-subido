@@ -148,7 +148,7 @@
   border-radius: var(--via-radius-pill);
   font-size: var(--via-fs-label);
   font-weight: var(--via-fw-medium);
-  color: var(--cst-navy-deep);
+  color: var(--via-white);
   background: var(--via-accent);
   white-space: nowrap;
 }
@@ -257,7 +257,7 @@
 
 .ctaPrimary {
   background: var(--via-accent);
-  color: var(--cst-navy-deep);
+  color: var(--via-white);
 }
 
 .ctaPrimary:hover {

@@ -325,12 +325,11 @@
     border-color var(--via-t-fast);
 }
 
-/* O accent é destaque pontual — exatamente o que o manual da CST reserva para ele.
-   Rótulo em navy escuro: branco sobre #00A2FF reprova AA (2,76:1). */
+/* Ação primária navy com contraste branco, conforme a base oficial. */
 .ctaPrimary {
   background: var(--via-accent);
-  color: var(--cst-navy-deep);
-  box-shadow: 0 12px 32px -12px rgba(0, 162, 255, 0.7);
+  color: var(--via-white);
+  box-shadow: 0 12px 32px -12px var(--via-navy-30);
 }
 
 .ctaPrimary:hover {

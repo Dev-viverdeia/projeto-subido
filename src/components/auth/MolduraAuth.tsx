@@ -22,7 +22,7 @@ import styles from './MolduraAuth.module.css';
  *
  * A BANDA ESCURA é o mesmo ritmo da landing: a banda navy carrega a marca e a
  * promessa; o lado claro carrega o trabalho. O design system dá a arquitetura visual,
- * mas isso é infraestrutura interna — a única marca exibida é a do Subido.
+ * e a marca oficial VIA identifica o produto desde a entrada.
  */
 export function MolduraAuth({ children }: { children: ReactNode }) {
   return (
@@ -32,20 +32,20 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
           {/* 16 e não 18: o wordmark tem proporção ~12:1, então cada px de altura
               custa 12 de largura. A 18 o lockup ocupava 82% da tela em 375px e a
               faixa escura virava um banner de marca. */}
-          <SubidoLogo size={16} />
+          <SubidoLogo size={16} variant="mono" />
         </Link>
 
         <div className={styles.painelTexto}>
           <p className={styles.frase}>
-            A assinatura que forma <em>implementadores</em> de IA.
+            A operação que forma <em>profissionais</em> de IA.
           </p>
           <p className={styles.apoio}>
-            Soluções com passo a passo, formações completas, um gerador que monta o projeto a partir
-            da sua ideia e mentoria com quem já entregou.
+            Projetos passo a passo, ferramentas de venda e um sistema que transforma cada conversa
+            em contexto para executar melhor.
           </p>
         </div>
 
-        <p className={styles.rodape}>Comunidade Subido de Tráfego</p>
+        <p className={styles.rodape}>Viver de IA · em colaboração com Subido</p>
       </aside>
 
       <main className={styles.area} id="conteudo">

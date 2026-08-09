@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CheckCircle2, CircleDollarSign, Radar, Sparkles } from 'lucide-react';
+import { CheckCircle2, CircleDollarSign, Radar, Layers3 } from 'lucide-react';
 import { etapaAberta } from '@/lib/crm/etapas';
 import { listarPipeline } from '@/lib/crm/queries';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
@@ -58,7 +58,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
         </article>
         <article>
           <span className={styles.iconeResumo}>
-            <Sparkles size={18} strokeWidth={1.8} aria-hidden="true" />
+            <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
           </span>
           <div>
             <strong>{ganhos}</strong>

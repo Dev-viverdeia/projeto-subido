@@ -11,7 +11,7 @@
 
 .via-carousel:focus-visible {
   box-shadow: 0 0 0 3px var(--via-navy-12);
-  border-radius: 16px;
+  border-radius: var(--via-radius-lg);
 }
 
 .via-carousel__viewport {
@@ -40,7 +40,7 @@
   transform: translateY(-50%);
   width: 38px;
   height: 38px;
-  border-radius: 999px;
+  border-radius: var(--via-radius-pill);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -53,7 +53,7 @@
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     0 0 0 0.5px var(--via-navy-10),
-    0 6px 14px -4px var(--via-navy-22);
+    0 6px 14px -4px var(--via-shadow-ink-20);
   transition: transform var(--via-dur) var(--via-ease-spring), background var(--via-dur) ease, box-shadow var(--via-dur) ease;
 }
 
@@ -66,11 +66,12 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 1) inset,
     0 0 0 0.5px var(--via-navy-18),
-    0 10px 22px -6px var(--via-navy-30);
+    0 10px 22px -6px var(--via-shadow-ink-30);
 }
 
 .via-carousel__arrow:active:not(:disabled) {
   transform: translateY(-50%) scale(0.98);
+  transition-duration: var(--via-dur-press);
 }
 
 .via-carousel__arrow:disabled {
@@ -89,7 +90,7 @@
 .via-carousel__dot {
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--via-radius-pill);
   background: var(--via-navy-14);
   border: none;
   cursor: pointer;
@@ -99,6 +100,11 @@
 
 .via-carousel__dot:hover {
   background: var(--via-navy-30);
+}
+
+.via-carousel__dot:active:not(.is-active) {
+  background: var(--via-navy-40);
+  transition-duration: var(--via-dur-press);
 }
 
 .via-carousel__dot.is-active {

@@ -28,7 +28,7 @@
   width: min(42vw, 520px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--via-accent-soft), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 68%);
   pointer-events: none;
 }
 
@@ -44,7 +44,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--app-radius-control);
   background: rgba(255, 255, 255, 0.08);
-  color: var(--via-accent);
+  color: var(--via-white);
 }
 
 .introducao {
@@ -63,7 +63,7 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-accent);
+  color: var(--via-gray-300);
 }
 
 .introducao h2 {
@@ -136,7 +136,7 @@
   position: relative;
   z-index: 1;
   background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 28%), var(--via-surface);
+    radial-gradient(circle at 100% 0%, var(--via-navy-05), transparent 34%), var(--via-surface);
 }
 
 .progresso {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
-import { CalendarClock, CheckCircle2, LockKeyhole, Mic2, Sparkles, Video } from 'lucide-react';
+import { CalendarClock, CheckCircle2, LockKeyhole, Mic2, Layers3, Video } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
@@ -98,7 +98,7 @@ export function SalaCall({
   return (
     <main className={styles.pagina}>
       <div className={styles.marca}>
-        <SubidoLogo size={18} />
+        <SubidoLogo size={18} variant="mono" />
         <span>Sala inteligente</span>
       </div>
 
@@ -129,7 +129,7 @@ export function SalaCall({
             </div>
             {convite.liveCoachAtivo && (
               <div>
-                <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+                <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
                 <span>
                   <strong>Live Coach ativo</strong>
                   <small>Recomendações aparecem para o anfitrião durante a call.</small>

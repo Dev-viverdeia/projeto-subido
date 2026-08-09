@@ -5,7 +5,7 @@
  * @example
  *   import { tokens, type TokenName } from '@viverdeia/design-system/tokens';
  *   const navy = tokens['via-navy']; // => '#0A1F3B'
- *   tokens['via-radius-lg'];          // => '16px'
+ *   tokens['via-radius-lg'];          // => '20px'
  */
 
 export interface Token {
@@ -89,7 +89,7 @@ export const tokensList: readonly Token[] = [
   {
     "name": "via-border-soft",
     "css": "--via-border-soft",
-    "value": "rgba(255, 255, 255, 0.08)",
+    "value": "rgba(255, 255, 255, 0.45)",
     "category": "color"
   },
   {
@@ -159,6 +159,48 @@ export const tokensList: readonly Token[] = [
     "category": "color"
   },
   {
+    "name": "via-data-1",
+    "css": "--via-data-1",
+    "value": "#2E6FC4",
+    "category": "color"
+  },
+  {
+    "name": "via-data-1-dark",
+    "css": "--via-data-1-dark",
+    "value": "#5C9BEA",
+    "category": "color"
+  },
+  {
+    "name": "via-data-2",
+    "css": "--via-data-2",
+    "value": "#7FB0EE",
+    "category": "color"
+  },
+  {
+    "name": "via-data-2-dark",
+    "css": "--via-data-2-dark",
+    "value": "#2E6FC4",
+    "category": "color"
+  },
+  {
+    "name": "via-data-axis",
+    "css": "--via-data-axis",
+    "value": "var(--via-navy-20)",
+    "category": "color"
+  },
+  {
+    "name": "via-data-grid",
+    "css": "--via-data-grid",
+    "value": "var(--via-navy-08)",
+    "category": "color"
+  },
+  {
+    "name": "via-data-ink",
+    "css": "--via-data-ink",
+    "value": "var(--via-text-muted)",
+    "category": "color"
+  },
+  {
     "name": "via-edge-hi",
     "css": "--via-edge-hi",
     "value": "rgba(255, 255, 255, 0.08)",
@@ -173,7 +215,19 @@ export const tokensList: readonly Token[] = [
   {
     "name": "via-glass-bar",
     "css": "--via-glass-bar",
-    "value": "rgba(11, 18, 32, 0.55)",
+    "value": "var(--via-surface)",
+    "category": "color"
+  },
+  {
+    "name": "via-glass-card",
+    "css": "--via-glass-card",
+    "value": "var(--via-surface)",
+    "category": "color"
+  },
+  {
+    "name": "via-glass-card-2",
+    "css": "--via-glass-card-2",
+    "value": "var(--via-surface)",
     "category": "color"
   },
   {
@@ -591,6 +645,12 @@ export const tokensList: readonly Token[] = [
     "category": "other"
   },
   {
+    "name": "via-dur-press",
+    "css": "--via-dur-press",
+    "value": "110ms",
+    "category": "other"
+  },
+  {
     "name": "via-fs-body",
     "css": "--via-fs-body",
     "value": "1rem",
@@ -693,15 +753,21 @@ export const tokensList: readonly Token[] = [
     "category": "other"
   },
   {
-    "name": "via-glass-card",
-    "css": "--via-glass-card",
-    "value": "linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 10%, rgba(255, 255, 255, 0.022) 100%)",
+    "name": "via-glass-blur",
+    "css": "--via-glass-blur",
+    "value": "none",
     "category": "other"
   },
   {
-    "name": "via-glass-card-2",
-    "css": "--via-glass-card-2",
-    "value": "linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018))",
+    "name": "via-glass-blur-bar",
+    "css": "--via-glass-blur-bar",
+    "value": "none",
+    "category": "other"
+  },
+  {
+    "name": "via-glass-ring",
+    "css": "--via-glass-ring",
+    "value": "1px solid var(--via-border-soft)",
     "category": "other"
   },
   {
@@ -821,7 +887,7 @@ export const tokensList: readonly Token[] = [
   {
     "name": "via-radius-md",
     "css": "--via-radius-md",
-    "value": "12px",
+    "value": "14px",
     "category": "radius"
   },
   {
@@ -833,7 +899,7 @@ export const tokensList: readonly Token[] = [
   {
     "name": "via-radius-sm",
     "css": "--via-radius-sm",
-    "value": "8px",
+    "value": "10px",
     "category": "radius"
   },
   {
@@ -845,8 +911,20 @@ export const tokensList: readonly Token[] = [
   {
     "name": "via-radius-xs",
     "css": "--via-radius-xs",
-    "value": "4px",
+    "value": "6px",
     "category": "radius"
+  },
+  {
+    "name": "via-glass-shadow",
+    "css": "--via-glass-shadow",
+    "value": "inset 0 1px 0 var(--via-edge-hi),\n    0 12px 32px -14px var(--via-navy-14),\n    0 2px 8px -4px var(--via-navy-06)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-glass-shadow-lift",
+    "css": "--via-glass-shadow-lift",
+    "value": "inset 0 1px 0 var(--via-edge-hi),\n    0 24px 56px -20px var(--via-navy-20),\n    0 4px 12px -6px var(--via-navy-08)",
+    "category": "shadow"
   },
   {
     "name": "via-shadow-focus",
@@ -864,6 +942,54 @@ export const tokensList: readonly Token[] = [
     "name": "via-shadow-glass-light",
     "css": "--via-shadow-glass-light",
     "value": "inset 0 1px 0 rgba(255,255,255,0.95),\n    inset 0 -1px 0 rgba(255,255,255,0.30),\n    0 12px 32px rgba(10,31,59,0.08),\n    0 2px 8px rgba(10,31,59,0.04)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-03",
+    "css": "--via-shadow-ink-03",
+    "value": "rgba(10, 31, 59, 0.03)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-06",
+    "css": "--via-shadow-ink-06",
+    "value": "rgba(10, 31, 59, 0.06)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-10",
+    "css": "--via-shadow-ink-10",
+    "value": "rgba(10, 31, 59, 0.10)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-14",
+    "css": "--via-shadow-ink-14",
+    "value": "rgba(10, 31, 59, 0.14)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-20",
+    "css": "--via-shadow-ink-20",
+    "value": "rgba(10, 31, 59, 0.20)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-30",
+    "css": "--via-shadow-ink-30",
+    "value": "rgba(10, 31, 59, 0.30)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-40",
+    "css": "--via-shadow-ink-40",
+    "value": "rgba(10, 31, 59, 0.40)",
+    "category": "shadow"
+  },
+  {
+    "name": "via-shadow-ink-60",
+    "css": "--via-shadow-ink-60",
+    "value": "rgba(10, 31, 59, 0.60)",
     "category": "shadow"
   },
   {
@@ -1061,9 +1187,18 @@ export type TokenName =
   | 'via-coral-dark'
   | 'via-coral-deep'
   | 'via-danger'
+  | 'via-data-1'
+  | 'via-data-1-dark'
+  | 'via-data-2'
+  | 'via-data-2-dark'
+  | 'via-data-axis'
+  | 'via-data-grid'
+  | 'via-data-ink'
   | 'via-edge-hi'
   | 'via-edge-lo'
   | 'via-glass-bar'
+  | 'via-glass-card'
+  | 'via-glass-card-2'
   | 'via-gray-100'
   | 'via-gray-200'
   | 'via-gray-300'
@@ -1133,6 +1268,7 @@ export type TokenName =
   | 'via-container'
   | 'via-content'
   | 'via-dur'
+  | 'via-dur-press'
   | 'via-fs-body'
   | 'via-fs-caption'
   | 'via-fs-h1'
@@ -1150,8 +1286,9 @@ export type TokenName =
   | 'via-fw-medium'
   | 'via-fw-regular'
   | 'via-fw-semibold'
-  | 'via-glass-card'
-  | 'via-glass-card-2'
+  | 'via-glass-blur'
+  | 'via-glass-blur-bar'
+  | 'via-glass-ring'
   | 'via-glass-sheen'
   | 'via-glow-navy'
   | 'via-glow-navy-strong'
@@ -1176,9 +1313,19 @@ export type TokenName =
   | 'via-radius-sm'
   | 'via-radius-xl'
   | 'via-radius-xs'
+  | 'via-glass-shadow'
+  | 'via-glass-shadow-lift'
   | 'via-shadow-focus'
   | 'via-shadow-glass-dark'
   | 'via-shadow-glass-light'
+  | 'via-shadow-ink-03'
+  | 'via-shadow-ink-06'
+  | 'via-shadow-ink-10'
+  | 'via-shadow-ink-14'
+  | 'via-shadow-ink-20'
+  | 'via-shadow-ink-30'
+  | 'via-shadow-ink-40'
+  | 'via-shadow-ink-60'
   | 'via-shadow-lg'
   | 'via-shadow-md'
   | 'via-shadow-sm'

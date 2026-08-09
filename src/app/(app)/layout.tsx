@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
 import { ProgressoProvider } from '@/lib/progresso/provider';
 import { obterProgressoConta } from '@/lib/progresso/queries';
 import { QueryProvider } from '@/lib/query/provider';
@@ -67,14 +67,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               Pular para o conteúdo
             </a>
 
-            {/* O trilho navy: a banda escura da landing e das telas de sessão, em pé.
-            A marca azul sobre a navy é o mesmo quadro de /entrar — o produto
-            inteiro abre e fecha na mesma assinatura. O item de admin é UTILITÁRIO,
-            não pilar: mora ancorado no pé do trilho, separado por hairline. */}
-            <aside className={`${styles.sidebar} via-noise`}>
+            <aside className={styles.sidebar}>
               <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-                <SubidoLogo size={18} />
-                <span>Mesa do profissional de IA</span>
+                <ViverDeIaLogo size="compact" produto={false} />
+                <span>Subido · Sistema operacional do profissional de IA</span>
               </Link>
 
               <NavLateral itens={ITENS_NAV} variante="lateral" />
@@ -101,11 +97,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               </div>
             </aside>
 
-            {/* O logo entra por prop já renderizado: o CabecalhoApp é Client Component
-            (usa usePathname) e receber o SVG pronto do servidor evita puxar a marca
-            para o bundle do browser. Só aparece no mobile — em desktop a sidebar
-            já carrega a marca, e repetir seria a segunda vez na mesma tela. */}
-            <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={16} />} />
+            <CabecalhoApp
+              nome={nome}
+              email={email}
+              logo={<ViverDeIaLogo size="compact" produto={false} />}
+            />
 
             <main className={styles.conteudo} id="conteudo">
               {children}
