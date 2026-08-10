@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { PosCall } from '@/lib/calls/queries';
 
-vi.mock('./FormularioProximaAcao', () => ({
-  FormularioProximaAcao: () => <button type="button">Confirmar próximo passo</button>,
+vi.mock('./FormularioPlanoCall', () => ({
+  FormularioPlanoCall: () => <button type="button">Aplicar plano da call</button>,
 }));
 
 import { DossiePosCall } from './DossiePosCall';
@@ -47,13 +47,22 @@ const POS_CALL: PosCall = {
   },
   transcricao: null,
   coach: [],
+  sincronizacao: {
+    historicoCrm: true,
+    acoesPlano: [],
+    projetoAtivo: null,
+  },
 };
 
 describe('DossiePosCall', () => {
   it('prioriza decisão, lacunas e só então o mapa factual', () => {
     render(<DossiePosCall posCall={POS_CALL} estadoAcao={null} />);
 
-    expect(screen.getByRole('heading', { name: 'Defina o próximo passo' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Transforme a conversa em execução' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Fatos registrados no CRM')).toBeInTheDocument();
+    expect(screen.getByText('Descoberta → Proposta')).toBeInTheDocument();
     expect(screen.getByLabelText('Leitura comercial 76 de 100')).toBeInTheDocument();
 
     const leitura = screen.getByRole('heading', {

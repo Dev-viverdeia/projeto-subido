@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BadgeCheck,
   BrainCircuit,
-  CalendarClock,
   ChevronRight,
   CircleAlert,
   CircleHelp,
@@ -20,8 +19,8 @@ import {
 import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
+import { CentralPlanoCall } from './CentralPlanoCall';
 import { ListaFactual, MapaFactual } from './MapaFactual';
-import { FormularioProximaAcao } from './FormularioProximaAcao';
 import { RetornoProximaAcao } from './RetornoProximaAcao';
 import { TranscricaoCall } from './TranscricaoCall';
 import styles from '../pagina.module.css';
@@ -67,18 +66,6 @@ function minuto(segundo: number | null): string {
   return `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
 }
 
-function dataInput(iso: string | null): string {
-  if (!iso) return '';
-  const formatador = new Intl.DateTimeFormat('en-CA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: 'America/Sao_Paulo',
-  });
-  const data = formatador.format(new Date(iso));
-  return data >= formatador.format(new Date()) ? data : '';
-}
-
 function estadoDaAnalise(posCall: PosCall) {
   if (posCall.analise?.status === 'concluida' && posCall.analise.resumo) {
     return { rotulo: 'Leitura pronta', tipo: 'pronta' } as const;
@@ -110,14 +97,17 @@ export function DossiePosCall({
   const estado = estadoDaAnalise(posCall);
   const fatosConfirmados = (analise?.decisoes.length ?? 0) + (analise?.compromissos.length ?? 0);
   const pontosAbertos = analise?.lacunas.length ?? 0;
-  const acaoSugerida = analise?.proximosPassos[0] ?? posCall.oportunidade.proximaAcao ?? '';
+  const acaoJaSincronizada = posCall.sincronizacao.acoesPlano.find(
+    (acao) => acao.categoria === 'proxima_acao',
+  )?.titulo;
+  const acaoSugerida =
+    acaoJaSincronizada ?? analise?.proximosPassos[0] ?? posCall.oportunidade.proximaAcao ?? '';
   const nota = analise?.notaComercial;
   const sentimento = analise?.sentimento
     ? (ROTULO_SENTIMENTO[analise.sentimento] ?? analise.sentimento)
     : 'sem leitura suficiente';
   const temAnalise = estado.tipo === 'pronta';
   const linkProposta = `/propostas/nova?oportunidade=${posCall.oportunidade.id}&reuniao=${posCall.reuniao.id}`;
-
   return (
     <div className={styles.pagina}>
       <nav className={styles.navegacao} aria-label="Navegação do pós-call">
@@ -174,8 +164,8 @@ export function DossiePosCall({
           <div className={`${styles.pulsoItem} ${styles.pulsoAcao}`}>
             <small>Próximo movimento</small>
             <strong>{acaoSugerida || 'Definir com revisão humana'}</strong>
-            <a href="#proxima-acao">
-              Revisar e confirmar <ChevronRight size={14} aria-hidden="true" />
+            <a href="#plano-da-call">
+              Organizar execução <ChevronRight size={14} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -189,37 +179,14 @@ export function DossiePosCall({
             {posCall.contato?.cargo ?? 'Contato sem cargo informado'}
           </span>
           <span>
-            <Target size={14} aria-hidden="true" />{' '}
-            {ROTULO_ETAPA[posCall.oportunidade.etapa as keyof typeof ROTULO_ETAPA] ??
-              posCall.oportunidade.etapa}
+            <Target size={14} aria-hidden="true" /> {ROTULO_ETAPA[posCall.oportunidade.etapa]}
           </span>
         </div>
       </header>
 
       <RetornoProximaAcao estado={estadoAcao} />
 
-      <section
-        id="proxima-acao"
-        className={styles.centralAcao}
-        aria-labelledby="proxima-acao-titulo"
-      >
-        <div className={styles.centralAcaoContexto}>
-          <div className={styles.acaoMarca}>
-            <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
-          </div>
-          <p className={styles.sobretitulo}>Decisão assistida</p>
-          <h2 id="proxima-acao-titulo">Defina o próximo passo</h2>
-          <p>A IA sugere. Você revisa, escolhe a data e confirma o compromisso que entra no CRM.</p>
-          <span className={styles.acaoDestino}>CRM → plano do cliente → entrega</span>
-        </div>
-
-        <FormularioProximaAcao
-          reuniaoId={posCall.reuniao.id}
-          oportunidadeId={posCall.oportunidade.id}
-          acaoInicial={acaoSugerida}
-          dataInicial={dataInput(posCall.oportunidade.proximaAcaoEm)}
-        />
-      </section>
+      <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
 
       <section className={styles.leitura} aria-labelledby="leitura-titulo">
         <div className={styles.leituraMarca}>

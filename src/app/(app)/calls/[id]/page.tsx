@@ -13,7 +13,13 @@ export default async function PosCallPage({ params, searchParams }: PageProps<'/
   return (
     <DossiePosCall
       posCall={posCall}
-      estadoAcao={typeof parametros.acao === 'string' ? parametros.acao : null}
+      estadoAcao={
+        typeof parametros.plano === 'string'
+          ? parametros.plano
+          : typeof parametros.acao === 'string'
+            ? parametros.acao
+            : null
+      }
     />
   );
 }

@@ -6,7 +6,7 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} data-tipo="sucesso" role="status">
         <Check size={17} aria-hidden="true" />
-        Compromisso confirmado. O CRM e o plano do cliente já foram atualizados.
+        Plano aplicado. CRM, pipeline e compromissos já refletem o que foi confirmado.
       </div>
     );
   }
@@ -15,7 +15,7 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} role="status">
         <BadgeCheck size={17} aria-hidden="true" />
-        Essa ação já estava no plano do cliente; nada foi duplicado.
+        Este plano já estava sincronizado; nada foi duplicado.
       </div>
     );
   }
@@ -24,7 +24,7 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} data-tipo="erro" role="alert">
         <CircleAlert size={17} aria-hidden="true" />
-        Não foi possível salvar agora. Revise o texto e a data antes de tentar novamente.
+        Não foi possível aplicar o plano agora. Revise os campos antes de tentar novamente.
       </div>
     );
   }

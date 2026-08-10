@@ -127,6 +127,11 @@ const POS_CALL: PosCall = {
       segundoReuniao: 2_220,
     },
   ],
+  sincronizacao: {
+    historicoCrm: true,
+    acoesPlano: [],
+    projetoAtivo: { id: 'projeto-preview', titulo: 'Piloto de atendimento assistido' },
+  },
 };
 
 export default function PreviewPosCallPage() {

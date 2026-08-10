@@ -2,6 +2,7 @@ import 'server-only';
 
 import { cache } from 'react';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
+import type { EtapaCrm } from '@/lib/crm/etapas';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
@@ -67,7 +68,7 @@ export type PosCall = {
   oportunidade: {
     id: string;
     titulo: string;
-    etapa: string;
+    etapa: EtapaCrm;
     proximaAcao: string | null;
     proximaAcaoEm: string | null;
   };
@@ -95,6 +96,16 @@ export type PosCall = {
     atualizadaEm: string;
   } | null;
   coach: SugestaoCoachHistorico[];
+  sincronizacao: {
+    historicoCrm: boolean;
+    acoesPlano: Array<{
+      id: string;
+      titulo: string;
+      status: Tables<'projeto_acoes'>['status'];
+      categoria: string;
+    }>;
+    projetoAtivo: { id: string; titulo: string } | null;
+  };
 };
 
 function listaDeTextos(valor: unknown): string[] {
@@ -148,7 +159,17 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
   if (error) throw handleError(error, 'calls:pos-call:reuniao');
   if (!reuniao) return null;
 
-  const [empresa, contato, oportunidade, analise, transcricao, coach] = await Promise.all([
+  const [
+    empresa,
+    contato,
+    oportunidade,
+    analise,
+    transcricao,
+    coach,
+    eventoCrm,
+    acoesPlano,
+    projetoAtivo,
+  ] = await Promise.all([
     supabase
       .from('crm_empresas')
       .select('nome, setor, porte')
@@ -187,6 +208,27 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       .neq('status', 'dispensada')
       .order('criada_em', { ascending: true })
       .limit(30),
+    supabase
+      .from('crm_eventos')
+      .select('id')
+      .eq('fonte', 'calls')
+      .eq('fonte_id', reuniao.id)
+      .eq('tipo', 'call_analisada')
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('projeto_acoes')
+      .select('id, titulo, status, categoria')
+      .eq('reuniao_id', reuniao.id)
+      .order('criado_em', { ascending: true }),
+    supabase
+      .from('projetos_execucao')
+      .select('id, titulo')
+      .eq('oportunidade_id', reuniao.oportunidade_id)
+      .neq('status', 'concluido')
+      .order('atualizado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'calls:pos-call:empresa');
@@ -195,6 +237,9 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
   if (analise.error) throw handleError(analise.error, 'calls:pos-call:analise');
   if (transcricao.error) throw handleError(transcricao.error, 'calls:pos-call:transcricao');
   if (coach.error) throw handleError(coach.error, 'calls:pos-call:coach');
+  if (eventoCrm.error) throw handleError(eventoCrm.error, 'calls:pos-call:evento-crm');
+  if (acoesPlano.error) throw handleError(acoesPlano.error, 'calls:pos-call:plano');
+  if (projetoAtivo.error) throw handleError(projetoAtivo.error, 'calls:pos-call:projeto');
   if (!empresa.data || !oportunidade.data) return null;
 
   const segmentos = SegmentoLiveSchema.array().safeParse(transcricao.data?.segmentos);
@@ -258,6 +303,16 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       status: item.status,
       segundoReuniao: item.segundo_reuniao,
     })),
+    sincronizacao: {
+      historicoCrm: Boolean(eventoCrm.data),
+      acoesPlano: (acoesPlano.data ?? []).map((acao) => ({
+        id: acao.id,
+        titulo: acao.titulo,
+        status: acao.status,
+        categoria: acao.categoria,
+      })),
+      projetoAtivo: projetoAtivo.data,
+    },
   };
 });
 

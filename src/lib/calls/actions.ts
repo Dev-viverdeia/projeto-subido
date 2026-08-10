@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import { TIPOS_CALL } from './tipos';
 
 const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
@@ -23,6 +24,11 @@ const proximaAcaoSchema = z.object({
   oportunidade: z.uuid(),
   acao: z.string().trim().min(3).max(500),
   quando: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
+  etapa: z.union([
+    z.literal('manter'),
+    z.enum(ETAPAS_CRM.map((item) => item.id) as [string, ...string[]]),
+  ]),
+  compromissos: z.array(z.string().trim().min(3).max(500)).max(8),
 });
 
 type CampoAgendamento = 'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao';
@@ -110,30 +116,34 @@ export async function agendarReuniao(
   redirect('/calls?agendada=ok');
 }
 
-export async function confirmarProximaAcao(formData: FormData): Promise<void> {
+export async function aplicarPlanoCall(formData: FormData): Promise<void> {
   const validacao = proximaAcaoSchema.safeParse({
     reuniao: formData.get('reuniao'),
     oportunidade: formData.get('oportunidade'),
     acao: formData.get('acao'),
     quando: formData.get('quando'),
+    etapa: formData.get('etapa'),
+    compromissos: formData.getAll('compromissos'),
   });
   const reuniao = texto(formData, 'reuniao');
-  if (!validacao.success) redirect(`/calls/${reuniao}?acao=erro`);
+  if (!validacao.success) redirect(`/calls/${reuniao}?plano=erro`);
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) redirect('/entrar');
 
   const quando = validacao.data.quando ? `${validacao.data.quando}T12:00:00-03:00` : undefined;
-  const { data, error } = await supabase.rpc('calls_aplicar_proxima_acao', {
+  const { data, error } = await supabase.rpc('calls_aplicar_plano', {
     p_reuniao: validacao.data.reuniao,
     p_acao: validacao.data.acao,
     p_quando: quando,
+    p_etapa: validacao.data.etapa === 'manter' ? undefined : (validacao.data.etapa as EtapaCrm),
+    p_compromissos: validacao.data.compromissos,
   });
 
   if (error) {
-    console.error(`[calls:proxima-acao] ${error.code}: ${error.message}`);
-    redirect(`/calls/${validacao.data.reuniao}?acao=erro`);
+    console.error(`[calls:aplicar-plano] ${error.code}: ${error.message}`);
+    redirect(`/calls/${validacao.data.reuniao}?plano=erro`);
   }
 
   revalidatePath('/calls');
@@ -142,5 +152,8 @@ export async function confirmarProximaAcao(formData: FormData): Promise<void> {
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
   revalidatePath('/inicio');
-  redirect(`/calls/${validacao.data.reuniao}?acao=${data ? 'ok' : 'sem-alteracao'}`);
+  const aplicado = Boolean(
+    data && typeof data === 'object' && !Array.isArray(data) && data.aplicado,
+  );
+  redirect(`/calls/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}`);
 }

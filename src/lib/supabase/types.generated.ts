@@ -1360,6 +1360,8 @@ export type Database = {
       projeto_acoes: {
         Row: {
           atualizado_em: string
+          categoria: string
+          chave_origem: string
           concluida_em: string | null
           criado_em: string
           dono: string
@@ -1375,6 +1377,8 @@ export type Database = {
         }
         Insert: {
           atualizado_em?: string
+          categoria?: string
+          chave_origem?: string
           concluida_em?: string | null
           criado_em?: string
           dono: string
@@ -1390,6 +1394,8 @@ export type Database = {
         }
         Update: {
           atualizado_em?: string
+          categoria?: string
+          chave_origem?: string
           concluida_em?: string | null
           criado_em?: string
           dono?: string
@@ -2003,6 +2009,16 @@ export type Database = {
           codigo_publico: string
           reuniao_id: string
         }[]
+      }
+      calls_aplicar_plano: {
+        Args: {
+          p_acao: string
+          p_compromissos?: string[]
+          p_etapa?: Database["public"]["Enums"]["crm_etapa"]
+          p_quando?: string
+          p_reuniao: string
+        }
+        Returns: Json
       }
       calls_aplicar_proxima_acao: {
         Args: { p_acao: string; p_quando?: string; p_reuniao: string }
