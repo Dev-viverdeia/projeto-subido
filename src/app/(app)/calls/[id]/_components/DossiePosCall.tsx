@@ -157,17 +157,20 @@ export function DossiePosCall({
             <span>Mapa da conversa</span>
           </div>
           <div className={styles.pulsoItem}>
+            <small>Leitura</small>
+            <strong>{nota ?? '—'}</strong>
+            <span>{sentimento}</span>
+          </div>
+          <div className={styles.pulsoItem}>
             <small>Confirmado</small>
             <strong>{fatosConfirmados}</strong>
             <span>decisões e compromissos</span>
           </div>
-          <i aria-hidden="true" />
           <div className={styles.pulsoItem}>
             <small>Em aberto</small>
             <strong>{pontosAbertos}</strong>
             <span>lacunas para validar</span>
           </div>
-          <i aria-hidden="true" />
           <div className={`${styles.pulsoItem} ${styles.pulsoAcao}`}>
             <small>Próximo movimento</small>
             <strong>{acaoSugerida || 'Definir com revisão humana'}</strong>
@@ -205,25 +208,9 @@ export function DossiePosCall({
             <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
           </div>
           <p className={styles.sobretitulo}>Decisão assistida</p>
-          <h2 id="proxima-acao-titulo">Confirme o próximo movimento</h2>
-          <p>
-            A leitura sugere; você ajusta e decide. Depois da confirmação, o compromisso entra no
-            plano do cliente e segue até a entrega.
-          </p>
-          <dl className={styles.acaoEvidencias}>
-            <div>
-              <dt>Confirmados</dt>
-              <dd>{fatosConfirmados}</dd>
-            </div>
-            <div>
-              <dt>Em aberto</dt>
-              <dd>{pontosAbertos}</dd>
-            </div>
-            <div>
-              <dt>Leitura</dt>
-              <dd>{nota ?? '—'}</dd>
-            </div>
-          </dl>
+          <h2 id="proxima-acao-titulo">Defina o próximo passo</h2>
+          <p>A IA sugere. Você revisa, escolhe a data e confirma o compromisso que entra no CRM.</p>
+          <span className={styles.acaoDestino}>CRM → plano do cliente → entrega</span>
         </div>
 
         <FormularioProximaAcao
@@ -234,62 +221,107 @@ export function DossiePosCall({
         />
       </section>
 
+      <section className={styles.leitura} aria-labelledby="leitura-titulo">
+        <div className={styles.leituraMarca}>
+          <BrainCircuit size={20} strokeWidth={1.65} aria-hidden="true" />
+          <span>Leitura central</span>
+        </div>
+        <div className={styles.leituraCorpo}>
+          <div className={styles.leituraTopo}>
+            <h2 id="leitura-titulo">O que esta conversa realmente mudou</h2>
+            {nota !== null && nota !== undefined && (
+              <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
+                <strong>{nota}</strong>
+                <span>/100</span>
+              </div>
+            )}
+          </div>
+          {temAnalise ? (
+            <p className={styles.resumo}>{analise?.resumo}</p>
+          ) : estado.tipo === 'falhou' ? (
+            <div className={styles.estadoLeitura}>
+              <CircleAlert size={19} aria-hidden="true" />
+              <div>
+                <strong>
+                  A conversa foi preservada, mas a leitura automática não ficou pronta.
+                </strong>
+                <p>
+                  {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
+                </p>
+              </div>
+            </div>
+          ) : estado.tipo === 'indisponivel' ? (
+            <div className={styles.estadoLeitura}>
+              <CircleAlert size={19} aria-hidden="true" />
+              <div>
+                <strong>Esta call foi cancelada antes de gerar conteúdo.</strong>
+                <p>O vínculo com o lead permanece no histórico, sem conclusões artificiais.</p>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.estadoLeitura}>
+              <Radar size={19} aria-hidden="true" />
+              <div>
+                <strong>A reunião ainda está sendo organizada.</strong>
+                <p>Assim que a análise terminar, decisões e próximos passos aparecerão aqui.</p>
+              </div>
+            </div>
+          )}
+          <div className={styles.leituraRodape}>
+            <span data-sentimento={analise?.sentimento ?? 'indefinido'}>{sentimento}</span>
+            <small>Leitura assistida por IA · valide antes de agir</small>
+          </div>
+        </div>
+      </section>
+
       <div className={styles.gradeOperacional}>
-        <div className={styles.principal}>
-          <section className={styles.leitura} aria-labelledby="leitura-titulo">
-            <div className={styles.leituraMarca}>
-              <BrainCircuit size={20} strokeWidth={1.65} aria-hidden="true" />
-              <span>Leitura central</span>
+        <aside className={styles.lateral}>
+          <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
+            <div className={styles.lacunasTopo}>
+              <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
+              <span>{pontosAbertos}</span>
             </div>
-            <div className={styles.leituraCorpo}>
-              <div className={styles.leituraTopo}>
-                <h2 id="leitura-titulo">O que esta conversa realmente mudou</h2>
-                {nota !== null && nota !== undefined && (
-                  <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
-                    <strong>{nota}</strong>
-                    <span>/100</span>
-                  </div>
-                )}
-              </div>
-              {temAnalise ? (
-                <p className={styles.resumo}>{analise?.resumo}</p>
-              ) : estado.tipo === 'falhou' ? (
-                <div className={styles.estadoLeitura}>
-                  <CircleAlert size={19} aria-hidden="true" />
-                  <div>
-                    <strong>
-                      A conversa foi preservada, mas a leitura automática não ficou pronta.
-                    </strong>
-                    <p>
-                      {analise?.erro ??
-                        'Use a transcrição abaixo para revisar os fatos manualmente.'}
-                    </p>
-                  </div>
-                </div>
-              ) : estado.tipo === 'indisponivel' ? (
-                <div className={styles.estadoLeitura}>
-                  <CircleAlert size={19} aria-hidden="true" />
-                  <div>
-                    <strong>Esta call foi cancelada antes de gerar conteúdo.</strong>
-                    <p>O vínculo com o lead permanece no histórico, sem conclusões artificiais.</p>
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.estadoLeitura}>
-                  <Radar size={19} aria-hidden="true" />
-                  <div>
-                    <strong>A reunião ainda está sendo organizada.</strong>
-                    <p>Assim que a análise terminar, decisões e próximos passos aparecerão aqui.</p>
-                  </div>
-                </div>
-              )}
-              <div className={styles.leituraRodape}>
-                <span data-sentimento={analise?.sentimento ?? 'indefinido'}>{sentimento}</span>
-                <small>Leitura assistida por IA · valide antes de agir</small>
-              </div>
-            </div>
+            <p className={styles.sobretitulo}>Antes de prometer</p>
+            <h2 id="lacunas-titulo">O que ainda falta saber</h2>
+            <ListaFactual
+              itens={analise?.lacunas ?? []}
+              vazio="Nenhuma lacuna foi registrada. Ainda assim, revise escopo e responsáveis antes da proposta."
+              variante="alerta"
+            />
           </section>
 
+          {analise?.sinaisCompra.length ? (
+            <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
+              <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
+              <p className={styles.sobretitulo}>Com evidência</p>
+              <h2 id="sinais-compra-titulo">Sinais de avanço</h2>
+              <ListaFactual
+                itens={analise.sinaisCompra}
+                vazio="Nenhum sinal explícito foi encontrado."
+                variante="decisao"
+              />
+            </section>
+          ) : null}
+
+          <section className={styles.atalhos} aria-label="Próximos destinos">
+            <Link href={`/crm/${posCall.oportunidade.id}`}>
+              <span>
+                <Target size={17} aria-hidden="true" />
+                Abrir dossiê do lead
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+            <Link href={linkProposta}>
+              <span>
+                <FileSignature size={17} aria-hidden="true" />
+                Criar proposta com esta call
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+          </section>
+        </aside>
+
+        <div className={styles.principal}>
           <MapaFactual analise={analise} temAnalise={temAnalise} />
 
           <section className={styles.oportunidades} aria-labelledby="oportunidades-titulo">
@@ -357,52 +389,6 @@ export function DossiePosCall({
 
           {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
         </div>
-
-        <aside className={styles.lateral}>
-          <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
-            <div className={styles.lacunasTopo}>
-              <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>{pontosAbertos}</span>
-            </div>
-            <p className={styles.sobretitulo}>Antes de prometer</p>
-            <h2 id="lacunas-titulo">O que ainda falta saber</h2>
-            <ListaFactual
-              itens={analise?.lacunas ?? []}
-              vazio="Nenhuma lacuna foi registrada. Ainda assim, revise escopo e responsáveis antes da proposta."
-              variante="alerta"
-            />
-          </section>
-
-          {analise?.sinaisCompra.length ? (
-            <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
-              <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
-              <p className={styles.sobretitulo}>Com evidência</p>
-              <h2 id="sinais-compra-titulo">Sinais de avanço</h2>
-              <ListaFactual
-                itens={analise.sinaisCompra}
-                vazio="Nenhum sinal explícito foi encontrado."
-                variante="decisao"
-              />
-            </section>
-          ) : null}
-
-          <section className={styles.atalhos} aria-label="Próximos destinos">
-            <Link href={`/crm/${posCall.oportunidade.id}`}>
-              <span>
-                <Target size={17} aria-hidden="true" />
-                Abrir dossiê do lead
-              </span>
-              <ChevronRight size={16} aria-hidden="true" />
-            </Link>
-            <Link href={linkProposta}>
-              <span>
-                <FileSignature size={17} aria-hidden="true" />
-                Criar proposta com esta call
-              </span>
-              <ChevronRight size={16} aria-hidden="true" />
-            </Link>
-          </section>
-        </aside>
       </div>
     </div>
   );

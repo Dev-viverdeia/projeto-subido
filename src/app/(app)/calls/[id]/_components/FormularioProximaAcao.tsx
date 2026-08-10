@@ -10,7 +10,7 @@ function BotaoConfirmar() {
 
   return (
     <button type="submit" disabled={pending} aria-busy={pending || undefined}>
-      {pending ? 'Salvando no plano…' : 'Confirmar no plano'}
+      {pending ? 'Salvando no CRM…' : 'Confirmar próximo passo'}
       <Check size={16} aria-hidden="true" />
     </button>
   );
@@ -32,7 +32,7 @@ export function FormularioProximaAcao({
       <input type="hidden" name="reuniao" value={reuniaoId} />
       <input type="hidden" name="oportunidade" value={oportunidadeId} />
       <label>
-        <span>Próxima ação</span>
+        <span>Ação combinada</span>
         <textarea
           name="acao"
           rows={3}
@@ -51,7 +51,7 @@ export function FormularioProximaAcao({
         <BotaoConfirmar />
       </div>
       <small id="proxima-acao-ajuda" className={styles.acaoNota}>
-        A confirmação atualiza o CRM agora e acompanha o cliente até a Sala de Entrega.
+        Entra no CRM agora e acompanha este cliente até a entrega.
       </small>
     </form>
   );
