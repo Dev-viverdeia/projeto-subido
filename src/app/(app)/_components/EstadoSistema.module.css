@@ -1,0 +1,219 @@
+.estado {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+  width: min(100%, 1120px);
+  min-height: min(640px, calc(100dvh - 190px));
+  margin: clamp(12px, 3vh, 34px) auto 0;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: clamp(38px, 6vw, 76px);
+}
+
+.etiqueta {
+  margin: 0;
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.conteudo h1 {
+  max-width: 13ch;
+  margin: var(--via-space-4) 0 0;
+  font-size: clamp(2.3rem, 5vw, 4.8rem);
+  font-weight: 520;
+  line-height: 0.98;
+  letter-spacing: var(--app-ls-hero);
+  text-wrap: balance;
+}
+
+.descricao {
+  max-width: 54ch;
+  margin: var(--via-space-5) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-loose);
+  text-wrap: pretty;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-6);
+}
+
+.acoes > a {
+  text-decoration: none;
+}
+
+.passos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: var(--via-space-10) 0 0;
+  border-top: 1px solid var(--via-border-soft);
+}
+
+.passos > div {
+  min-width: 0;
+  padding: var(--via-space-4) var(--via-space-4) 0 0;
+}
+
+.passos > div + div {
+  padding-left: var(--via-space-4);
+  border-left: 1px solid var(--via-border-soft);
+}
+
+.passos dt,
+.passos dd {
+  margin: 0;
+}
+
+.passos dt {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.passos dt span {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.passos dd {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.sinal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: clamp(34px, 4vw, 54px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 14%, var(--via-navy-40), transparent 34%),
+    radial-gradient(circle at 16% 76%, var(--via-blue), transparent 48%), var(--via-navy-deep);
+  color: var(--via-white);
+}
+
+.icone {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border: 1px solid color-mix(in srgb, var(--via-white) 24%, transparent);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-white) 10%, transparent);
+  box-shadow: 0 20px 48px color-mix(in srgb, var(--via-navy-deep) 50%, transparent);
+  transform: translateX(-50%);
+}
+
+.linha {
+  width: 38px;
+  height: 2px;
+  margin-bottom: var(--via-space-5);
+  background: var(--via-white);
+}
+
+.sinal p,
+.sinal strong {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.sinal p {
+  color: var(--via-gray-300);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.sinal strong {
+  max-width: 15ch;
+  margin-top: var(--via-space-3);
+  color: var(--via-white);
+  font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: var(--app-ls-h2);
+}
+
+@media (max-width: 899px) {
+  .estado {
+    grid-template-columns: 1fr;
+  }
+
+  .sinal {
+    min-height: 240px;
+  }
+
+  .icone {
+    top: 50%;
+    left: auto;
+    right: 12%;
+  }
+
+  .icone {
+    transform: translate(50%, -50%);
+  }
+}
+
+@media (max-width: 599px) {
+  .estado {
+    min-height: 0;
+    margin-top: 0;
+  }
+
+  .conteudo {
+    padding: var(--via-space-8) var(--via-space-6);
+  }
+
+  .conteudo h1 {
+    font-size: clamp(2.25rem, 12vw, 3.6rem);
+  }
+
+  .passos {
+    grid-template-columns: 1fr;
+  }
+
+  .passos > div + div {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .sinal {
+    min-height: 210px;
+    padding: var(--via-space-7) var(--via-space-6);
+  }
+
+  .icone {
+    display: none;
+  }
+}

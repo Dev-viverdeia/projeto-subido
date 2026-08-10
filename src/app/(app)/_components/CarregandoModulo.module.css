@@ -1,0 +1,183 @@
+.pagina {
+  width: 100%;
+  max-width: var(--app-canvas);
+  margin-inline: auto;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-7);
+}
+
+.topo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--app-gap-section);
+  padding: var(--via-space-2) var(--via-space-1) 0;
+}
+
+.introducao {
+  display: grid;
+  width: min(100%, 680px);
+  gap: var(--via-space-3);
+}
+
+.introducao :global(.via-skeleton--rect) {
+  border-radius: var(--app-radius-control);
+}
+
+.momentoEscuro {
+  min-height: 210px;
+  padding: clamp(28px, 4vw, 46px);
+  overflow: hidden;
+  border-radius: var(--app-radius-surface);
+  background:
+    radial-gradient(ellipse 52% 120% at 100% 0%, var(--via-navy-30), transparent 68%),
+    var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.momentoEscuro :global(.via-skeleton) {
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+}
+
+.momentoEscuro :global(.via-skeleton--rect) {
+  margin-top: var(--via-space-4);
+}
+
+.linhasEscuras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: var(--via-space-8);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+}
+
+.linhasEscuras span {
+  min-height: 62px;
+  background: color-mix(in srgb, var(--via-navy-deep) 84%, transparent);
+}
+
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.pagina[data-anatomia='pipeline'] .metricas,
+.pagina[data-anatomia='relatorios'] .metricas {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metricas article {
+  display: grid;
+  min-height: 104px;
+  align-content: center;
+  gap: var(--via-space-1);
+  padding: var(--via-space-5) var(--via-space-6);
+}
+
+.metricas article + article {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.areaFinal {
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+.areaTitulo {
+  display: grid;
+  gap: var(--via-space-1);
+  padding-inline: var(--via-space-1);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas-carregamento), minmax(0, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+.grade article {
+  display: grid;
+  min-height: 156px;
+  align-content: start;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.pagina[data-anatomia='pipeline'] .grade {
+  min-width: 1240px;
+  overflow: hidden;
+}
+
+.pagina[data-anatomia='calls'] .grade article:first-child {
+  min-height: 260px;
+}
+
+@media (max-width: 1079px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pagina[data-anatomia='pipeline'] .grade {
+    grid-template-columns: repeat(5, minmax(236px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .conteudo {
+    gap: var(--via-space-6);
+  }
+
+  .topo {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .introducao :global(.via-skeleton--rect) {
+    width: 82% !important;
+    height: 72px !important;
+  }
+
+  .momentoEscuro {
+    min-height: 230px;
+    padding: var(--via-space-6);
+  }
+
+  .linhasEscuras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metricas,
+  .pagina[data-anatomia='pipeline'] .metricas,
+  .pagina[data-anatomia='relatorios'] .metricas,
+  .grade,
+  .pagina[data-anatomia='pipeline'] .grade {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .metricas article {
+    min-height: 78px;
+    padding: var(--via-space-4) var(--via-space-5);
+  }
+
+  .metricas article + article {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+}

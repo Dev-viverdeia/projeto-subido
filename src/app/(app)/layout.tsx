@@ -29,7 +29,10 @@ import styles from './layout.module.css';
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
+  /* A leitura do papel não depende do resultado de `getClaims`: as duas usam a
+     mesma sessão já validada pelo proxy. Iniciá-las juntas elimina uma viagem
+     sequencial ao banco em toda navegação da área logada. */
+  const [{ data }, admin] = await Promise.all([supabase.auth.getClaims(), ehAdmin()]);
 
   if (!data) redirect(ROTA_ENTRAR);
 
@@ -44,8 +47,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* Montado por sessão: quem não é admin não recebe o item no payload RSC — nem
      o rótulo, nem o destino. Esconder por CSS deixaria a rota exposta no HTML de
      todo mundo. */
-  const admin = await ehAdmin();
-
   return (
     <QueryProvider>
       {/* O provedor abraça o shell porque quem ESCREVE a trilha é a página, lá

@@ -2,7 +2,9 @@
 
 import { useEffect } from 'react';
 import { CloudOff } from 'lucide-react';
-import { Button, EmptyState } from '@/design-system/via';
+import Link from 'next/link';
+import { Button } from '@/design-system/via';
+import { EstadoSistema } from './_components/EstadoSistema';
 
 /**
  * Error boundary da área logada.
@@ -30,15 +32,26 @@ export default function ErroApp({
   }, [error]);
 
   return (
-    <EmptyState
-      icon={<CloudOff size={20} strokeWidth={1.8} />}
-      title="Algo falhou ao carregar esta tela"
-      description="Não foi nada que você fez. Tente de novo — se insistir, saia e entre outra vez."
-      action={
-        <Button variant="primary" onClick={reset}>
-          Tentar de novo
-        </Button>
+    <EstadoSistema
+      urgente
+      icone={<CloudOff size={30} strokeWidth={1.6} />}
+      etiqueta="Conexão interrompida"
+      titulo="Esta tela não conseguiu chegar até você."
+      descricao="Seu trabalho continua salvo. Refaça a tentativa agora ou volte ao início para seguir por outra área."
+      acoes={
+        <>
+          <Button variant="primary" onClick={reset}>
+            Tentar novamente
+          </Button>
+          <Link href="/inicio" className="via-btn via-btn--secondary via-btn--md">
+            Voltar ao início
+          </Link>
+        </>
       }
+      passos={[
+        { rotulo: 'Primeiro', valor: 'Tente carregar a tela mais uma vez.' },
+        { rotulo: 'Se persistir', valor: 'Volte ao início e retome a jornada por lá.' },
+      ]}
     />
   );
 }

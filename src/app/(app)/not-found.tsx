@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Compass } from 'lucide-react';
-import { Button, EmptyState } from '@/design-system/via';
+import { EstadoSistema } from './_components/EstadoSistema';
 
 /**
  * 404 da área logada — dispara pelo `notFound()` das rotas dinâmicas (slug de
@@ -9,20 +9,25 @@ import { Button, EmptyState } from '@/design-system/via';
  */
 export default function NaoEncontrado() {
   return (
-    <EmptyState
-      icon={<Compass size={20} strokeWidth={1.8} />}
-      title="Isso não está mais aqui"
-      description="O conteúdo pode ter sido despublicado ou o endereço mudou. O catálogo continua no lugar."
-      action={
-        <Link href="/solucoes">
-          <Button variant="primary">Ver projetos</Button>
-        </Link>
+    <EstadoSistema
+      icone={<Compass size={30} strokeWidth={1.6} />}
+      etiqueta="Caminho não encontrado"
+      titulo="Esse conteúdo mudou de lugar."
+      descricao="O endereço pode ter mudado ou o conteúdo não está mais publicado. Seus projetos e sua jornada continuam disponíveis."
+      acoes={
+        <>
+          <Link href="/solucoes" className="via-btn via-btn--primary via-btn--md">
+            Ver projetos
+          </Link>
+          <Link href="/inicio" className="via-btn via-btn--secondary via-btn--md">
+            Ir para o início
+          </Link>
+        </>
       }
-      secondary={
-        <Link href="/inicio">
-          <Button variant="ghost">Ir para o início</Button>
-        </Link>
-      }
+      passos={[
+        { rotulo: 'Quer executar', valor: 'Abra a biblioteca de Projetos.' },
+        { rotulo: 'Quer se orientar', valor: 'Retome pelo Mapa da Jornada.' },
+      ]}
     />
   );
 }

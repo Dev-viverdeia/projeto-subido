@@ -19,7 +19,13 @@ function BotaoAdicionar() {
   );
 }
 
-export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: boolean }) {
+export function FormularioNovoLead({
+  abertoInicial = false,
+  rotulo = 'Novo lead',
+}: {
+  abertoInicial?: boolean;
+  rotulo?: string;
+}) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(abertoInicial);
@@ -65,7 +71,7 @@ export function FormularioNovoLead({ abertoInicial = false }: { abertoInicial?: 
         onClick={() => setAberto(true)}
       >
         <Plus size={17} strokeWidth={2} aria-hidden="true" />
-        <span>Novo lead</span>
+        <span>{rotulo}</span>
       </button>
 
       {aberto && (

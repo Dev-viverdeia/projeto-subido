@@ -51,34 +51,32 @@ export type OportunidadeSeletor = Pick<
 
 export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSeletor[]> => {
   const supabase = await createClient();
-  const [oportunidades, empresas, contatos] = await Promise.all([
-    supabase
-      .from('crm_oportunidades')
-      .select('id, titulo, etapa, empresa_id, contato_principal_id, ordem')
-      .order('ordem', { ascending: false })
-      .limit(300),
-    supabase.from('crm_empresas').select('id, nome, dominio').limit(500),
-    supabase.from('crm_contatos').select('id, nome').limit(800),
-  ]);
+  const oportunidades = await supabase
+    .from('crm_oportunidades')
+    .select(
+      `
+        id,
+        titulo,
+        etapa,
+        ordem,
+        empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio),
+        contato:crm_contatos!crm_oportunidades_contato_fk(nome)
+      `,
+    )
+    .order('ordem', { ascending: false })
+    .limit(300);
 
   if (oportunidades.error) {
     throw handleError(oportunidades.error, 'crm:seletor-oportunidades');
   }
-  if (empresas.error) throw handleError(empresas.error, 'crm:seletor-empresas');
-  if (contatos.error) throw handleError(contatos.error, 'crm:seletor-contatos');
-
-  const empresaPorId = new Map((empresas.data ?? []).map((empresa) => [empresa.id, empresa]));
-  const contatoPorId = new Map((contatos.data ?? []).map((contato) => [contato.id, contato.nome]));
 
   return (oportunidades.data ?? []).map((oportunidade) => ({
     id: oportunidade.id,
     titulo: oportunidade.titulo,
     etapa: oportunidade.etapa,
-    empresa: empresaPorId.get(oportunidade.empresa_id)?.nome ?? 'Empresa não encontrada',
-    dominio: empresaPorId.get(oportunidade.empresa_id)?.dominio ?? null,
-    contato: oportunidade.contato_principal_id
-      ? (contatoPorId.get(oportunidade.contato_principal_id) ?? null)
-      : null,
+    empresa: oportunidade.empresa?.nome ?? 'Empresa não encontrada',
+    dominio: oportunidade.empresa?.dominio ?? null,
+    contato: oportunidade.contato?.nome ?? null,
   }));
 });
 
@@ -93,16 +91,28 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
 export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
   const supabase = await createClient();
 
-  const [oportunidades, empresas, contatos, eventos, enriquecimentos] = await Promise.all([
+  const [oportunidades, eventos, enriquecimentos] = await Promise.all([
     supabase
       .from('crm_oportunidades')
       .select(
-        'id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos, proxima_acao, proxima_acao_em, atualizado_em, criado_em, ordem',
+        `
+          id,
+          titulo,
+          etapa,
+          empresa_id,
+          contato_principal_id,
+          valor_centavos,
+          proxima_acao,
+          proxima_acao_em,
+          atualizado_em,
+          criado_em,
+          ordem,
+          empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio, enriquecido_em),
+          contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
+        `,
       )
       .order('ordem', { ascending: false })
       .limit(300),
-    supabase.from('crm_empresas').select('id, nome, dominio, enriquecido_em').limit(500),
-    supabase.from('crm_contatos').select('id, nome, email').limit(800),
     supabase
       .from('crm_eventos')
       .select('oportunidade_id, titulo, ocorrido_em')
@@ -116,15 +126,11 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
   ]);
 
   if (oportunidades.error) throw handleError(oportunidades.error, 'crm:pipeline');
-  if (empresas.error) throw handleError(empresas.error, 'crm:empresas');
-  if (contatos.error) throw handleError(contatos.error, 'crm:contatos');
   if (eventos.error) throw handleError(eventos.error, 'crm:eventos');
   if (enriquecimentos.error) {
     throw handleError(enriquecimentos.error, 'crm:enriquecimentos');
   }
 
-  const empresaPorId = new Map((empresas.data ?? []).map((empresa) => [empresa.id, empresa]));
-  const contatoPorId = new Map((contatos.data ?? []).map((contato) => [contato.id, contato]));
   const ultimoFatoPorOportunidade = new Map<string, { titulo: string; ocorrido_em: string }>();
   const enriquecimentoPorOportunidade = new Map<string, StatusEnriquecimento>();
 
@@ -141,13 +147,7 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
   }
 
   return (oportunidades.data ?? []).map((linha) =>
-    montarOportunidade(
-      linha,
-      empresaPorId,
-      contatoPorId,
-      ultimoFatoPorOportunidade,
-      enriquecimentoPorOportunidade,
-    ),
+    montarOportunidade(linha, ultimoFatoPorOportunidade, enriquecimentoPorOportunidade),
   );
 });
 
@@ -164,31 +164,27 @@ function montarOportunidade(
     | 'proxima_acao_em'
     | 'atualizado_em'
     | 'criado_em'
-  >,
-  empresas: Map<
-    string,
-    { id: string; nome: string; dominio: string | null; enriquecido_em: string | null }
-  >,
-  contatos: Map<string, { id: string; nome: string; email: string | null }>,
+  > & {
+    empresa: { nome: string; dominio: string | null; enriquecido_em: string | null } | null;
+    contato: { nome: string; email: string | null } | null;
+  },
   eventos: Map<string, { titulo: string; ocorrido_em: string }>,
   enriquecimentos: Map<string, StatusEnriquecimento>,
 ): OportunidadeCrm {
-  const contato = linha.contato_principal_id ? contatos.get(linha.contato_principal_id) : undefined;
   const evento = eventos.get(linha.id);
-  const empresa = empresas.get(linha.empresa_id);
 
   return {
     id: linha.id,
     titulo: linha.titulo,
     etapa: linha.etapa,
     empresaId: linha.empresa_id,
-    empresa: empresa?.nome ?? 'Empresa não encontrada',
-    dominio: empresa?.dominio ?? null,
-    enriquecidoEm: empresa?.enriquecido_em ?? null,
+    empresa: linha.empresa?.nome ?? 'Empresa não encontrada',
+    dominio: linha.empresa?.dominio ?? null,
+    enriquecidoEm: linha.empresa?.enriquecido_em ?? null,
     enriquecimentoStatus: enriquecimentos.get(linha.id) ?? null,
     contatoId: linha.contato_principal_id,
-    contato: contato?.nome ?? null,
-    contatoEmail: contato?.email ?? null,
+    contato: linha.contato?.nome ?? null,
+    contatoEmail: linha.contato?.email ?? null,
     valorCentavos: linha.valor_centavos,
     proximaAcao: linha.proxima_acao,
     proximaAcaoEm: linha.proxima_acao_em,
@@ -362,8 +358,6 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   if (!empresaLinha) return null;
 
   const ultimaExecucao = enriquecimentos.data?.[0];
-  const empresaPorId = new Map([[empresaLinha.id, empresaLinha]]);
-  const contatoPorId = new Map(contato.data ? [[contato.data.id, { ...contato.data }]] : []);
   const ultimoEvento = eventos.data?.[0];
   const eventoPorOportunidade = new Map(
     ultimoEvento
@@ -376,9 +370,15 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
 
   return {
     oportunidade: montarOportunidade(
-      linha,
-      empresaPorId,
-      contatoPorId,
+      {
+        ...linha,
+        empresa: {
+          nome: empresaLinha.nome,
+          dominio: empresaLinha.dominio,
+          enriquecido_em: empresaLinha.enriquecido_em,
+        },
+        contato: contato.data ? { nome: contato.data.nome, email: contato.data.email } : null,
+      },
       eventoPorOportunidade,
       statusPorOportunidade,
     ),

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CheckCircle2, CircleDollarSign, Radar, Layers3 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, CircleDollarSign, Database, Radar, Layers3 } from 'lucide-react';
 import { etapaAberta } from '@/lib/crm/etapas';
 import { listarPipeline } from '@/lib/crm/queries';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
@@ -27,7 +27,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
             entregar melhor.
           </p>
         </div>
-        <FormularioNovoLead />
+        {oportunidades.length > 0 && <FormularioNovoLead />}
       </header>
 
       {parametros.novo === 'ok' && (
@@ -75,7 +75,50 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           </div>
           <span>{oportunidades.length} no total</span>
         </div>
-        <PipelineCrm oportunidades={oportunidades} />
+        {oportunidades.length ? (
+          <PipelineCrm oportunidades={oportunidades} />
+        ) : (
+          <div className={styles.primeiroLead}>
+            <div className={styles.primeiroLeadConteudo}>
+              <span className={styles.primeiroLeadIcone}>
+                <Database size={24} strokeWidth={1.6} aria-hidden="true" />
+              </span>
+              <p className={styles.sobretitulo}>Pipeline pronto</p>
+              <h3>Comece pelo lead que já está mais perto.</h3>
+              <p>
+                Cadastre o que você sabe agora. Empresa, contato e oportunidade bastam para a
+                plataforma começar a construir o histórico comercial.
+              </p>
+              <FormularioNovoLead rotulo="Adicionar primeiro lead" />
+            </div>
+
+            <ol className={styles.proximosPassos} aria-label="O que acontece depois">
+              <li>
+                <span>01</span>
+                <div>
+                  <strong>O lead entra no radar</strong>
+                  <p>O CRM abre o dossiê e registra o primeiro fato.</p>
+                </div>
+                <ArrowRight size={17} aria-hidden="true" />
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <strong>A conversa ganha contexto</strong>
+                  <p>Calls, diagnósticos e propostas passam a alimentar a mesma jornada.</p>
+                </div>
+                <ArrowRight size={17} aria-hidden="true" />
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <strong>A próxima ação fica clara</strong>
+                  <p>Você acompanha o avanço sem depender de memória ou planilhas soltas.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        )}
       </section>
     </div>
   );

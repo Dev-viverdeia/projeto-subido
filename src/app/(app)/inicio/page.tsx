@@ -6,6 +6,7 @@ import { obterJornadaOperacional } from '@/lib/jornada/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { ConfiguracaoJornada } from './_components/ConfiguracaoJornada';
+import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
 
 export const metadata: Metadata = { title: 'Início' };
@@ -65,34 +66,34 @@ export default async function InicioPage() {
       nome={primeiroNome}
       espacoDeTrabalho={`${nomeCompleto} — Consultoria`}
       cliente={
-        <Suspense fallback={<span>Carregando lead em foco…</span>}>
+        <Suspense fallback={<CarregandoDado largura="16ch" />}>
           <ClienteEmFoco />
         </Suspense>
       }
       contato={
-        <Suspense fallback={<span>Carregando contato…</span>}>
+        <Suspense fallback={<CarregandoDado largura="12ch" />}>
           <ContatoEmFoco />
         </Suspense>
       }
       proximaAcao={
-        <Suspense fallback={<span>Carregando próxima ação…</span>}>
+        <Suspense fallback={<CarregandoDado largura="20ch" />}>
           <ProximaAcaoCrm />
         </Suspense>
       }
       proximaMentoria={
-        <Suspense fallback={<span>Carregando próximo encontro…</span>}>
+        <Suspense fallback={<CarregandoDado largura="18ch" />}>
           <ProximaMentoria />
         </Suspense>
       }
       oferta={jornada.perfil?.projetoInicialTitulo ?? null}
       nicho={jornada.perfil?.nicho ?? null}
       diagnosticoSobral={
-        <Suspense fallback={<span>Lendo os sinais da operação…</span>}>
+        <Suspense fallback={<CarregandoDado largura="24ch" />}>
           <DiagnosticoSobral />
         </Suspense>
       }
       focoSobral={
-        <Suspense fallback={<span>Definindo a prioridade…</span>}>
+        <Suspense fallback={<CarregandoDado largura="22ch" />}>
           <FocoSobral />
         </Suspense>
       }
