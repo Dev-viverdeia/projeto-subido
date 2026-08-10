@@ -125,6 +125,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--via-space-1);
+  flex: 1;
   min-width: 0;
 }
 
@@ -161,4 +162,35 @@
   letter-spacing: var(--app-ls-eyebrow);
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
+}
+
+/* Em telas estreitas o bloco da esquerda precisa ocupar a largura real do
+   cabeçalho. Sem essa restrição, o tamanho intrínseco de um título longo
+   centralizava todo o grupo fora da viewport antes de aplicar a elipse. */
+@media (max-width: 900px) {
+  .esquerda {
+    width: 100%;
+  }
+
+  .identidade {
+    width: 0;
+    max-width: 100%;
+  }
+
+  .tituloConversa {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 599px) {
+  .tituloConversa {
+    display: -webkit-box;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: var(--via-fs-h4);
+  }
 }
