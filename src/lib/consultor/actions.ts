@@ -39,6 +39,12 @@ const GerenciarAcaoCrmSchema = z
     }
   });
 
+const ConfirmarRecomendacaoCrmSchema = z.object({
+  mensagem: z.uuid(),
+  acao: z.string().trim().min(3).max(500),
+  quando: z.union([z.literal(''), z.iso.date()]),
+});
+
 export type EstadoConfirmarAcaoCrm = {
   status?: 'erro' | 'sucesso';
   mensagem?: string;
@@ -50,6 +56,13 @@ export type EstadoGerenciarAcaoCrm = {
   status?: 'erro' | 'sucesso';
   mensagem?: string;
   operacao?: 'concluir' | 'remarcar' | 'substituir';
+  acao?: string;
+  quando?: string | null;
+};
+
+export type EstadoConfirmarRecomendacaoCrm = {
+  status?: 'erro' | 'sucesso';
+  mensagem?: string;
   acao?: string;
   quando?: string | null;
 };
@@ -212,6 +225,72 @@ export async function gerenciarAcaoCrm(
           : 'Próxima ação substituída no CRM e no plano.',
     operacao: validacao.data.operacao,
     acao: validacao.data.acao || undefined,
+    quando: validacao.data.quando || null,
+  };
+}
+
+/**
+ * Confirma uma recomendação pós-conclusão. A oportunidade continua presa ao
+ * comprovante da mensagem; ação e data são as únicas escolhas do formulário.
+ * O banco recusa a escrita se outro compromisso já tiver assumido o lead.
+ */
+export async function confirmarRecomendacaoCrm(
+  _estado: EstadoConfirmarRecomendacaoCrm,
+  formData: FormData,
+): Promise<EstadoConfirmarRecomendacaoCrm> {
+  const validacao = ConfirmarRecomendacaoCrmSchema.safeParse({
+    mensagem: formData.get('mensagem'),
+    acao: formData.get('acao'),
+    quando: formData.get('quando'),
+  });
+
+  if (!validacao.success) {
+    return { status: 'erro', mensagem: 'Revise a ação e escolha uma data válida.' };
+  }
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) {
+    return { status: 'erro', mensagem: 'Sua sessão expirou. Entre novamente para continuar.' };
+  }
+
+  const quando = validacao.data.quando ? `${validacao.data.quando}T12:00:00-03:00` : undefined;
+  const { data, error } = await supabase.rpc('sobral_confirmar_recomendacao_crm', {
+    p_mensagem: validacao.data.mensagem,
+    p_acao: validacao.data.acao,
+    p_quando: quando,
+  });
+
+  if (error) {
+    console.error(`[sobral:confirmar-recomendacao] ${error.code}: ${error.message}`);
+    return {
+      status: 'erro',
+      mensagem:
+        error.code === '22023'
+          ? 'A ação e a data precisam ser válidas e futuras.'
+          : 'Não foi possível registrar o próximo passo agora. Tente novamente.',
+    };
+  }
+
+  if (data === 'desatualizada') {
+    return {
+      status: 'erro',
+      mensagem: 'O CRM já recebeu outro compromisso. Abra o lead antes de confirmar esta ação.',
+    };
+  }
+  if (data === 'indisponivel' || data === 'nao_encontrada') {
+    return { status: 'erro', mensagem: 'Esta recomendação não está mais disponível.' };
+  }
+  if (data === 'ja_confirmada') {
+    revalidarOperacao();
+    return { status: 'sucesso', mensagem: 'Este próximo passo já estava no CRM.' };
+  }
+
+  revalidarOperacao();
+  return {
+    status: 'sucesso',
+    mensagem: 'Novo próximo passo registrado no CRM e no plano.',
+    acao: validacao.data.acao,
     quando: validacao.data.quando || null,
   };
 }

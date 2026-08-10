@@ -20,6 +20,10 @@ export function Mensagens({
   mensagens: MensagemDoConsultor[];
   modoPreview?: boolean;
 }) {
+  const ultimaAcao = [...mensagens]
+    .reverse()
+    .find((mensagem) => mensagem.direcao?.contexto_acao && mensagem.acaoConfirmada)?.id;
+
   return (
     <ol className={styles.lista}>
       {mensagens.map((m) => (
@@ -59,6 +63,7 @@ export function Mensagens({
                 contexto={m.direcao.contexto_acao}
                 confirmada={m.acaoConfirmada}
                 modoPreview={modoPreview}
+                gerarProximoPasso={m.id === ultimaAcao}
               />
             ) : null}
 

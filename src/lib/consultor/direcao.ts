@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EventoAcaoCrmSchema, RecomendacaoProximaAcaoSchema } from './recomendacao';
 
 export const EtapaSobralSchema = z.enum([
   'aprender',
@@ -51,17 +52,6 @@ export const ContextoAcaoCrmSchema = z.object({
 
 export type ContextoAcaoCrm = z.infer<typeof ContextoAcaoCrmSchema>;
 
-export const EventoAcaoCrmSchema = z.object({
-  tipo: z.enum(['confirmada', 'remarcada', 'substituida', 'concluida']),
-  acao_anterior: z.string().trim().min(3).max(500).nullable(),
-  acao_nova: z.string().trim().min(3).max(500),
-  quando_anterior: z.string().nullable(),
-  quando_novo: z.string().nullable(),
-  criado_em: z.string(),
-});
-
-export type EventoAcaoCrm = z.infer<typeof EventoAcaoCrmSchema>;
-
 export const AcaoConfirmadaCrmSchema = z
   .object({
     acao: z.string().trim().min(3).max(500),
@@ -71,6 +61,7 @@ export const AcaoConfirmadaCrmSchema = z
     status: z.enum(['pendente', 'concluida']),
     concluida_em: z.string().nullable(),
     historico: z.array(EventoAcaoCrmSchema),
+    recomendacao: RecomendacaoProximaAcaoSchema.nullable().default(null),
   })
   .superRefine((acao, contexto) => {
     if (acao.status === 'concluida' && !acao.concluida_em) {

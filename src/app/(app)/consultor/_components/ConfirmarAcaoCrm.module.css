@@ -63,6 +63,9 @@
 .comprovanteCorpo small,
 .formularioTopo small,
 .painelGestao header small,
+.topoRecomendacao small,
+.recomendacaoCarregando small,
+.revisaoRecomendacao header small,
 .campoAcao > span,
 .campoData > span {
   font-family: var(--via-font-mono);
@@ -98,7 +101,8 @@
 .cancelar,
 .fechar,
 .abrirLead,
-.acoesRegistro button {
+.acoesRegistro button,
+.tentarNovamente {
   border: 0;
   font: inherit;
   cursor: pointer;
@@ -139,6 +143,11 @@
 .abrirLead:focus-visible,
 .acoesRegistro button:focus-visible,
 .historico summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.tentarNovamente:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }
@@ -364,6 +373,194 @@
   color: var(--via-text-primary);
 }
 
+.recomendacao,
+.recomendacaoCarregando,
+.revisaoRecomendacao {
+  margin: 0 var(--via-space-2) var(--via-space-2);
+  border: 1px solid var(--via-navy-12);
+  border-radius: var(--app-radius-card);
+  background: var(--via-bg);
+}
+
+.recomendacao {
+  overflow: hidden;
+}
+
+.topoRecomendacao,
+.recomendacaoCarregando {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.topoRecomendacao {
+  padding: var(--app-pad-card-tight) var(--app-pad-card-tight) var(--via-space-3);
+}
+
+.topoRecomendacao > span:last-child,
+.recomendacaoCarregando > span:nth-child(2) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.topoRecomendacao strong,
+.recomendacaoCarregando strong,
+.revisaoRecomendacao header strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  text-wrap: pretty;
+}
+
+.iconeRecomendacao,
+.iconeAnalise {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.motivoRecomendacao {
+  max-width: 58ch;
+  margin: 0;
+  padding: 0 var(--app-pad-card-tight) var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-loose);
+  text-wrap: pretty;
+}
+
+.baseFactual {
+  margin-inline: var(--via-space-2);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.rotuloFatos {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.baseFactual ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  margin: var(--via-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baseFactual li {
+  display: grid;
+  grid-template-columns: minmax(64px, max-content) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-2);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.baseFactual li small {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+}
+
+.baseFactual li span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.rodapeRecomendacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--app-pad-card-tight) var(--app-pad-card-tight);
+}
+
+.rodapeRecomendacao p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.recomendacaoCarregando {
+  padding: var(--app-pad-card-tight);
+}
+
+.recomendacaoCarregando em {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+  line-height: var(--via-lh-normal);
+}
+
+.tentarNovamente {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 34px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  transition:
+    border-color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.tentarNovamente:hover {
+  border-color: var(--via-navy-16);
+  background: var(--via-navy-04);
+}
+
+.revisaoRecomendacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card-tight);
+}
+
+.revisaoRecomendacao header,
+.revisaoRecomendacao header > span {
+  display: flex;
+}
+
+.revisaoRecomendacao header {
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.revisaoRecomendacao header > span {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .historico {
   border-top: 1px solid var(--via-border-hairline);
 }
@@ -482,6 +679,7 @@
   .fechar,
   .abrirLead,
   .acoesRegistro button,
+  .tentarNovamente,
   .campoAcao textarea,
   .campoData input,
   .chevron {
@@ -552,5 +750,33 @@
 
   .historico time {
     grid-column: 2;
+  }
+
+  .topoRecomendacao,
+  .recomendacaoCarregando {
+    align-items: start;
+  }
+
+  .recomendacaoCarregando {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .tentarNovamente {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .baseFactual li {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .rodapeRecomendacao {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rodapeRecomendacao .revisar {
+    width: 100%;
   }
 }

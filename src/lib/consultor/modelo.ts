@@ -11,6 +11,14 @@ import {
   type RespostaEstruturadaSobral,
   type SinaisSobral,
 } from './direcao';
+import { contextoProximoPassoParaModelo } from './proximo-passo';
+import {
+  prazoDaRecomendacao,
+  resolverFatosUsados,
+  SaidaRecomendacaoModeloSchema,
+  type ContextoRecomendacao,
+  type RecomendacaoGerada,
+} from './recomendacao';
 
 const TETO_HISTORICO = 20;
 
@@ -153,5 +161,78 @@ export async function gerarRodadaSobral({
 
     console.error('[sobral:modelo] falha não classificada:', erro);
     throw new ErroSobral('O Sobral AI não conseguiu responder agora. Tente novamente.', 'falha');
+  }
+}
+
+const INSTRUCOES_PROXIMO_PASSO = `Você é o núcleo de decisão do Sobral AI.
+Uma ação acabou de ser concluída e o CRM ficou sem próximo compromisso.
+
+Sua tarefa é recomendar apenas o próximo movimento deste lead.
+- Use exclusivamente os fatos numerados recebidos.
+- Se uma call registrou um próximo passo ou compromisso explícito, priorize-o.
+- Não repita como próxima ação aquilo que já aparece como concluído.
+- A ação começa com verbo e descreve um resultado observável, não uma intenção vaga.
+- O motivo explica por que esse movimento vem agora em duas frases curtas.
+- Em fatos_utilizados, devolva somente os ids que sustentam diretamente a decisão.
+- prazo_em_dias é o intervalo seguro para executar a ação, entre hoje e 60 dias.
+- Não invente decisor, objeção, reunião, proposta, valor ou compromisso ausente.
+- Português do Brasil, sem markdown, slogan, exclamação ou promessa de resultado.`;
+
+export async function gerarProximaAcaoDoLead({
+  usuarioId,
+  contexto,
+}: {
+  usuarioId: string;
+  contexto: ContextoRecomendacao;
+}): Promise<RecomendacaoGerada> {
+  const { OPENAI_API_KEY, SOBRAL_AI_MODEL } = openAIEnv();
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const resposta = await openai.responses.parse({
+      model: SOBRAL_AI_MODEL,
+      instructions: INSTRUCOES_PROXIMO_PASSO,
+      input: contextoProximoPassoParaModelo(contexto),
+      reasoning: { effort: 'low' },
+      text: {
+        format: zodTextFormat(SaidaRecomendacaoModeloSchema, 'proxima_acao_do_lead'),
+        verbosity: 'low',
+      },
+      max_output_tokens: 1200,
+      store: false,
+      safety_identifier: identificadorSeguro(usuarioId),
+    });
+
+    if (!resposta.output_parsed) {
+      throw new ErroSobral('A recomendação voltou incompleta.', 'falha');
+    }
+
+    const tokens = (resposta.usage?.input_tokens ?? 0) + (resposta.usage?.output_tokens ?? 0);
+    return {
+      acao: resposta.output_parsed.acao,
+      motivo: resposta.output_parsed.motivo,
+      fatos: resolverFatosUsados(contexto.fatos, resposta.output_parsed.fatos_utilizados),
+      quando: prazoDaRecomendacao(contexto.momento, resposta.output_parsed.prazo_em_dias),
+      modelo: SOBRAL_AI_MODEL,
+      respostaId: resposta.id,
+      tokens,
+    };
+  } catch (erro) {
+    if (erro instanceof ErroSobral) throw erro;
+    if (erro instanceof OpenAI.RateLimitError) {
+      throw new ErroSobral('O modelo atingiu o limite de uso agora.', 'limite');
+    }
+    if (erro instanceof OpenAI.AuthenticationError) {
+      throw new ErroSobral('A chave do Sobral AI foi recusada.', 'sem-chave');
+    }
+    if (erro instanceof OpenAI.APIError) {
+      console.error(
+        `[sobral:proximo-passo] OpenAI ${erro.status ?? 'sem-status'}: ${erro.message}`,
+      );
+      throw new ErroSobral('Não foi possível gerar o próximo passo agora.', 'falha');
+    }
+
+    console.error('[sobral:proximo-passo] falha não classificada:', erro);
+    throw new ErroSobral('Não foi possível gerar o próximo passo agora.', 'falha');
   }
 }

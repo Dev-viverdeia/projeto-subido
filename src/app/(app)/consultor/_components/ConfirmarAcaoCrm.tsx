@@ -30,11 +30,13 @@ export function ConfirmarAcaoCrm({
   contexto,
   confirmada = null,
   modoPreview = false,
+  gerarProximoPasso = false,
 }: {
   mensagemId: string;
   contexto: ContextoAcaoCrm;
   confirmada?: AcaoConfirmadaCrm | null;
   modoPreview?: boolean;
+  gerarProximoPasso?: boolean;
 }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
@@ -62,6 +64,7 @@ export function ConfirmarAcaoCrm({
         atualizado_em: agora,
         status: 'pendente',
         concluida_em: null,
+        recomendacao: null,
         historico: [
           {
             tipo: 'confirmada',
@@ -81,6 +84,7 @@ export function ConfirmarAcaoCrm({
         contexto={contexto}
         confirmada={recibo}
         modoPreview={modoPreview}
+        gerarProximoPasso={gerarProximoPasso}
       />
     );
   }
@@ -125,6 +129,7 @@ export function ConfirmarAcaoCrm({
           atualizado_em: agora,
           status: 'pendente',
           concluida_em: null,
+          recomendacao: null,
           historico: [
             {
               tipo: 'confirmada',

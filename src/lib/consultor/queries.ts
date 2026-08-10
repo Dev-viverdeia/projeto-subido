@@ -14,6 +14,7 @@ import {
   type PlanoSobral,
   type SinaisSobral,
 } from './direcao';
+import { RecomendacaoProximaAcaoSchema } from './recomendacao';
 
 /**
  * Leituras do Consultor — RSC only, mesma disciplina do builder/queries.ts:
@@ -125,7 +126,7 @@ export const obterConversa = cache(
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
       .select(
-        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em))',
+        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
       )
       .eq('thread_id', id)
       .order('criado_em')
@@ -144,12 +145,21 @@ export const obterConversa = cache(
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
         const cartoes = Cartoes.safeParse(m.cartoes);
         const direcao = DirecaoMensagemSchema.safeParse(m.direcao);
+        const recomendacao = m.sobral_acoes_crm
+          ? RecomendacaoProximaAcaoSchema.safeParse(m.sobral_acoes_crm.sobral_recomendacoes_crm)
+          : null;
         const recibo = m.sobral_acoes_crm
           ? {
-              ...m.sobral_acoes_crm,
+              acao: m.sobral_acoes_crm.acao,
+              quando: m.sobral_acoes_crm.quando,
+              confirmada_em: m.sobral_acoes_crm.confirmada_em,
+              atualizado_em: m.sobral_acoes_crm.atualizado_em,
+              status: m.sobral_acoes_crm.status,
+              concluida_em: m.sobral_acoes_crm.concluida_em,
               historico: [...m.sobral_acoes_crm.sobral_acoes_crm_eventos].sort((a, b) =>
                 a.criado_em.localeCompare(b.criado_em),
               ),
+              recomendacao: recomendacao?.success ? recomendacao.data : null,
             }
           : null;
         const acaoConfirmada = AcaoConfirmadaCrmSchema.safeParse(recibo);

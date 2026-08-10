@@ -15,8 +15,10 @@ import {
   X,
 } from 'lucide-react';
 import { gerenciarAcaoCrm, type EstadoGerenciarAcaoCrm } from '@/lib/consultor/actions';
-import type { AcaoConfirmadaCrm, ContextoAcaoCrm, EventoAcaoCrm } from '@/lib/consultor/direcao';
+import type { AcaoConfirmadaCrm, ContextoAcaoCrm } from '@/lib/consultor/direcao';
+import type { EventoAcaoCrm } from '@/lib/consultor/recomendacao';
 import styles from './ConfirmarAcaoCrm.module.css';
+import { RecomendacaoProximaAcao } from './RecomendacaoProximaAcao';
 
 const GESTAO_INICIAL: EstadoGerenciarAcaoCrm = {};
 type ModoGestao = 'concluir' | 'remarcar' | 'substituir' | null;
@@ -80,6 +82,9 @@ function descreverEvento(evento: EventoAcaoCrm): { titulo: string; detalhe: stri
   if (evento.tipo === 'substituida') {
     return { titulo: 'Próxima ação substituída', detalhe: evento.acao_nova };
   }
+  if (evento.tipo === 'reativada') {
+    return { titulo: 'Novo ciclo confirmado', detalhe: evento.acao_nova };
+  }
   return { titulo: 'Ação concluída', detalhe: evento.acao_nova };
 }
 
@@ -120,11 +125,13 @@ export function AcaoCrmRegistrada({
   contexto,
   confirmada,
   modoPreview,
+  gerarProximoPasso,
 }: {
   mensagemId: string;
   contexto: ContextoAcaoCrm;
   confirmada: AcaoConfirmadaCrm;
   modoPreview: boolean;
+  gerarProximoPasso: boolean;
 }) {
   const router = useRouter();
   const [modo, setModo] = useState<ModoGestao>(null);
@@ -187,6 +194,32 @@ export function AcaoCrmRegistrada({
     setModo(null);
   }
 
+  function simularConfirmacaoDaRecomendacao(acao: string, quando: string | null) {
+    const agora = new Date().toISOString();
+    setReciboPreview({
+      ...recibo,
+      acao,
+      quando,
+      status: 'pendente',
+      concluida_em: null,
+      atualizado_em: agora,
+      recomendacao: recibo.recomendacao
+        ? { ...recibo.recomendacao, acao, quando, status: 'confirmada', confirmada_em: agora }
+        : null,
+      historico: [
+        ...recibo.historico,
+        {
+          tipo: 'reativada',
+          acao_anterior: recibo.acao,
+          acao_nova: acao,
+          quando_anterior: recibo.quando,
+          quando_novo: quando,
+          criado_em: agora,
+        },
+      ],
+    });
+  }
+
   return (
     <section
       className={`${styles.registro} ${concluida ? styles.registroConcluido : ''}`}
@@ -216,6 +249,16 @@ export function AcaoCrmRegistrada({
           <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
         </Link>
       </header>
+
+      {concluida ? (
+        <RecomendacaoProximaAcao
+          mensagemId={mensagemId}
+          recomendacao={recibo.recomendacao?.status === 'pendente' ? recibo.recomendacao : null}
+          gerarAutomaticamente={gerarProximoPasso}
+          modoPreview={modoPreview}
+          aoConfirmarPreview={simularConfirmacaoDaRecomendacao}
+        />
+      ) : null}
 
       {!concluida && !modoAtivo ? (
         <nav className={styles.acoesRegistro} aria-label="Atualizar esta ação">

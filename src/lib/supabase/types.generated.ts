@@ -1982,6 +1982,72 @@ export type Database = {
         }
         Relationships: []
       }
+      sobral_recomendacoes_crm: {
+        Row: {
+          acao: string
+          atualizado_em: string
+          confirmada_em: string | null
+          contexto_hash: string
+          dono: string
+          fatos: Json
+          gerada_em: string
+          mensagem_id: string
+          modelo: string
+          motivo: string
+          oportunidade_id: string
+          quando: string | null
+          resposta_id: string | null
+          status: string
+        }
+        Insert: {
+          acao: string
+          atualizado_em?: string
+          confirmada_em?: string | null
+          contexto_hash: string
+          dono: string
+          fatos?: Json
+          gerada_em?: string
+          mensagem_id: string
+          modelo: string
+          motivo: string
+          oportunidade_id: string
+          quando?: string | null
+          resposta_id?: string | null
+          status?: string
+        }
+        Update: {
+          acao?: string
+          atualizado_em?: string
+          confirmada_em?: string | null
+          contexto_hash?: string
+          dono?: string
+          fatos?: Json
+          gerada_em?: string
+          mensagem_id?: string
+          modelo?: string
+          motivo?: string
+          oportunidade_id?: string
+          quando?: string | null
+          resposta_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sobral_recomendacoes_crm_acao_fk"
+            columns: ["dono", "mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "sobral_acoes_crm"
+            referencedColumns: ["dono", "mensagem_id"]
+          },
+          {
+            foreignKeyName: "sobral_recomendacoes_crm_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solucao_itens: {
         Row: {
           conteudo: string
@@ -2236,6 +2302,10 @@ export type Database = {
       sobral_confirmar_acao_crm: {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: boolean
+      }
+      sobral_confirmar_recomendacao_crm: {
+        Args: { p_acao: string; p_mensagem: string; p_quando?: string }
+        Returns: string
       }
       sobral_gerenciar_acao_crm: {
         Args: {

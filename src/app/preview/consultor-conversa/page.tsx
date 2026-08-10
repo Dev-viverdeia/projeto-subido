@@ -64,9 +64,24 @@ const mensagens: MensagemDoConsultor[] = [
       acao: 'Confirmar decisor e data da decisão',
       quando: '2026-08-12T12:00:00-03:00',
       confirmada_em: '2026-08-10T18:02:00.000Z',
-      atualizado_em: '2026-08-10T18:02:00.000Z',
-      status: 'pendente',
-      concluida_em: null,
+      atualizado_em: '2026-08-10T18:10:00.000Z',
+      status: 'concluida',
+      concluida_em: '2026-08-10T18:10:00.000Z',
+      recomendacao: {
+        acao: 'Agendar uma conversa de decisão sobre a proposta',
+        motivo:
+          'A proposta já foi apresentada e a ação anterior confirmou quem decide. O avanço agora é transformar esse contexto em uma conversa com data e decisão esperada.',
+        fatos: [
+          'Proposta · “Projeto de atendimento com IA” está com status apresentada.',
+          'Call · Decisão: a diretora de operações fará a validação final.',
+          'CRM · A oportunidade está em negociação e ficou sem próxima ação após a conclusão.',
+        ],
+        quando: '2026-08-13T12:00:00-03:00',
+        status: 'pendente',
+        modelo: 'gpt-5.6-terra',
+        gerada_em: '2026-08-10T18:10:04.000Z',
+        confirmada_em: null,
+      },
       historico: [
         {
           tipo: 'confirmada',
@@ -75,6 +90,14 @@ const mensagens: MensagemDoConsultor[] = [
           quando_anterior: null,
           quando_novo: '2026-08-12T12:00:00-03:00',
           criado_em: '2026-08-10T18:02:00.000Z',
+        },
+        {
+          tipo: 'concluida',
+          acao_anterior: 'Confirmar decisor e data da decisão',
+          acao_nova: 'Confirmar decisor e data da decisão',
+          quando_anterior: '2026-08-12T12:00:00-03:00',
+          quando_novo: '2026-08-12T12:00:00-03:00',
+          criado_em: '2026-08-10T18:10:00.000Z',
         },
       ],
     },
