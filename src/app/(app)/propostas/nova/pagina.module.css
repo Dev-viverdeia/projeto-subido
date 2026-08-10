@@ -378,9 +378,17 @@
 }
 
 @media (max-width: 767px) {
+  .pagina {
+    gap: var(--via-space-5);
+  }
+
   .hero {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-4);
+  }
+
+  .hero h1 {
+    font-size: 2.1rem;
   }
 
   .hero > p:last-child {
@@ -417,7 +425,7 @@
   }
 
   .etapaCorpo {
-    padding: var(--via-space-6) var(--via-space-4);
+    padding: var(--via-space-5) var(--via-space-4);
   }
 
   .etapaTitulo {
