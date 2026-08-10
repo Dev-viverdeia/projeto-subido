@@ -19,12 +19,8 @@ export default function NaoEncontradoGlobal() {
         descricao="O endereço pode estar incompleto ou ter mudado. Você pode voltar direto para a plataforma ou conhecer a experiência Subido."
         acoes={
           <>
-            <Link href="/inicio" className="via-btn via-btn--primary via-btn--md">
-              Entrar na plataforma
-            </Link>
-            <Link href="/" className="via-btn via-btn--secondary via-btn--md">
-              Ir para a página inicial
-            </Link>
+            <Link href="/inicio">Entrar na plataforma</Link>
+            <Link href="/">Ir para a página inicial</Link>
           </>
         }
         passos={[

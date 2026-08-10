@@ -43,9 +43,7 @@ export default function ErroApp({
           <Button variant="primary" onClick={reset}>
             Tentar novamente
           </Button>
-          <Link href="/inicio" className="via-btn via-btn--secondary via-btn--md">
-            Voltar ao início
-          </Link>
+          <Link href="/inicio">Voltar ao início</Link>
         </>
       }
       passos={[

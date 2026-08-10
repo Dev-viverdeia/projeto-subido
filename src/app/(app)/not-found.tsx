@@ -16,12 +16,8 @@ export default function NaoEncontrado() {
       descricao="O endereço pode ter mudado ou o conteúdo não está mais publicado. Seus projetos e sua jornada continuam disponíveis."
       acoes={
         <>
-          <Link href="/solucoes" className="via-btn via-btn--primary via-btn--md">
-            Ver projetos
-          </Link>
-          <Link href="/inicio" className="via-btn via-btn--secondary via-btn--md">
-            Ir para o início
-          </Link>
+          <Link href="/solucoes">Ver projetos</Link>
+          <Link href="/inicio">Ir para o início</Link>
         </>
       }
       passos={[
