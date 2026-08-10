@@ -6,7 +6,7 @@ import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
-import { ITEM_ADMIN, ITENS_NAV } from './_components/navegacao';
+import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
 import { ProvedorDeTrilha } from './_components/trilha/contexto';
@@ -93,7 +93,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
           {/* No mobile, "Mais" dá acesso à navegação completa. O item de gestão
               só entra no payload de quem realmente é admin. */}
-          <NavLateral itens={admin ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV} variante="dock" />
+          <NavLateral
+            itens={admin ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV}
+            itemConta={ITEM_CONTA}
+            variante="dock"
+          />
         </div>
       </ProvedorDeTrilha>
     </QueryProvider>

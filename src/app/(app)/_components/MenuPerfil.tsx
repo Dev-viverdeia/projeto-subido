@@ -112,7 +112,7 @@ export function MenuPerfil({ nome, email }: { nome: string; email: string }) {
               </span>
               <span>
                 <strong>Minha conta</strong>
-                <small>Identidade e continuidade</small>
+                <small>Perfil e segurança</small>
               </span>
               <span className={styles.indicador} aria-hidden="true" />
             </Link>

@@ -7,10 +7,13 @@ import {
   BriefcaseBusiness,
   Check,
   Cloud,
-  LockKeyhole,
+  KeyRound,
+  Mail,
+  ShieldCheck,
   UserRound,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Conta' };
@@ -43,10 +46,9 @@ const ATALHOS = [
 ] as const;
 
 /**
- * A conta é um ponto de orientação, não um painel de configurações fictício.
- * Nome e e-mail vêm dos claims já verificados e os atalhos levam a dados reais da
- * operação. Não há controles de edição enquanto não existir uma fonte persistente
- * e segura para esses campos.
+ * A conta reúne orientação e controles reais. Nome e e-mail vêm dos claims já
+ * verificados; apenas o nome é editável porque o e-mail faz parte da identidade
+ * de autenticação e precisa de um fluxo separado de confirmação.
  */
 export default async function ContaPage() {
   const supabase = await createClient();
@@ -122,54 +124,59 @@ export default async function ContaPage() {
       </section>
 
       <div className={styles.grade}>
-        <section className={styles.cartao} aria-labelledby="dados-de-acesso">
+        <section className={styles.cartao} aria-labelledby="identidade-profissional">
           <header className={styles.cabecalhoCartao}>
             <span aria-hidden="true">
               <UserRound size={18} strokeWidth={1.7} />
             </span>
             <div>
               <p>Identidade</p>
-              <h2 id="dados-de-acesso">Dados de acesso</h2>
+              <h2 id="identidade-profissional">Como a plataforma apresenta você</h2>
             </div>
           </header>
 
-          <dl className={styles.lista}>
-            <div className={styles.linha}>
-              <dt>Nome</dt>
-              <dd>{nome}</dd>
-            </div>
-            <div className={styles.linha}>
-              <dt>E-mail</dt>
-              <dd>{email}</dd>
-            </div>
-          </dl>
-
-          <p className={styles.notaSeguranca}>
-            <LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" />
-            Dados protegidos pela sua sessão de acesso.
-          </p>
+          <FormularioIdentidade key={nome} nome={nome} />
         </section>
 
-        <section className={styles.cartao} aria-labelledby="continuidade-da-conta">
+        <section className={styles.cartao} aria-labelledby="acesso-e-seguranca">
           <header className={styles.cabecalhoCartao}>
             <span aria-hidden="true">
-              <Cloud size={18} strokeWidth={1.7} />
+              <ShieldCheck size={18} strokeWidth={1.7} />
             </span>
             <div>
-              <p>Continuidade</p>
-              <h2 id="continuidade-da-conta">Uma operação que não recomeça do zero</h2>
+              <p>Proteção</p>
+              <h2 id="acesso-e-seguranca">Acesso e segurança</h2>
             </div>
           </header>
 
-          <p className={styles.textoContinuidade}>
-            Cada avanço alimenta a mesma base. Assim, projetos, reuniões, propostas e aprendizado
-            permanecem conectados à sua jornada profissional.
-          </p>
+          <div className={styles.acessos}>
+            <div className={styles.acesso}>
+              <span className={styles.iconeAcesso} aria-hidden="true">
+                <Mail size={17} strokeWidth={1.7} />
+              </span>
+              <span>
+                <small>E-mail de acesso</small>
+                <strong>{email}</strong>
+              </span>
+              <em>Verificado</em>
+            </div>
 
-          <Link href="/inicio" className={styles.linkJornada}>
-            Ver minha jornada
-            <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
-          </Link>
+            <div className={styles.acesso}>
+              <span className={styles.iconeAcesso} aria-hidden="true">
+                <KeyRound size={17} strokeWidth={1.7} />
+              </span>
+              <span>
+                <small>Senha</small>
+                <strong>Protegida pela sua conta</strong>
+              </span>
+              <Link href="/nova-senha">Trocar senha</Link>
+            </div>
+          </div>
+
+          <p className={styles.notaSeguranca}>
+            <ShieldCheck size={14} strokeWidth={1.8} aria-hidden="true" />
+            Alterações de acesso exigem confirmação para proteger seus projetos e clientes.
+          </p>
         </section>
       </div>
     </div>

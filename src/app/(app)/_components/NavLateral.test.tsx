@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ITENS_NAV } from './navegacao';
+import { ITEM_CONTA, ITENS_NAV } from './navegacao';
 import { NavLateral } from './NavLateral';
 
 let caminho = '/inicio';
@@ -19,7 +19,7 @@ afterEach(() => {
 describe('NavLateral no mobile', () => {
   it('mantém o dock enxuto e oferece todas as áreas no menu Mais', async () => {
     const usuario = userEvent.setup();
-    render(<NavLateral itens={ITENS_NAV} variante="dock" />);
+    render(<NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />);
 
     expect(screen.getByRole('link', { name: 'Início' })).toHaveAttribute('aria-current', 'page');
     expect(screen.queryByRole('link', { name: 'Propostas' })).not.toBeInTheDocument();
@@ -33,6 +33,7 @@ describe('NavLateral no mobile', () => {
     expect(screen.getByRole('link', { name: 'Formações' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Mentorias' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Certificados' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Minha conta/ })).toHaveAttribute('href', '/conta');
     expect(document.body).toHaveStyle({ overflow: 'hidden' });
 
     await usuario.click(screen.getByRole('button', { name: 'Fechar navegação' }));
@@ -42,8 +43,23 @@ describe('NavLateral no mobile', () => {
 
   it('marca Mais quando a área atual não está entre os quatro atalhos', () => {
     caminho = '/propostas/nova';
-    render(<NavLateral itens={ITENS_NAV} variante="dock" />);
+    render(<NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />);
 
     expect(screen.getByRole('button', { name: 'Mais' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('expõe a conta no menu mobile e mantém Mais ativo nessa rota', async () => {
+    caminho = '/conta';
+    const usuario = userEvent.setup();
+    render(<NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />);
+
+    expect(screen.getByRole('button', { name: 'Mais' })).toHaveAttribute('aria-current', 'page');
+    await usuario.click(screen.getByRole('button', { name: 'Mais' }));
+
+    expect(screen.getByRole('link', { name: /Minha conta/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByText('Você está aqui')).toBeInTheDocument();
   });
 });

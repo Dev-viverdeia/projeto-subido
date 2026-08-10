@@ -24,20 +24,24 @@ export const senhaSchema = z
   .string()
   .min(8, { error: 'A senha precisa de ao menos 8 caracteres.' });
 
+export const nomeSchema = z
+  .string()
+  .trim()
+  .min(2, { error: 'Digite seu nome.' })
+  .max(80, { error: 'Nome muito longo.' });
+
 export const entrarSchema = z.object({
   email: emailSchema,
   senha: z.string().min(1, { error: 'Digite sua senha.' }),
 });
 
 export const criarContaSchema = z.object({
-  nome: z
-    .string()
-    .trim()
-    .min(2, { error: 'Digite seu nome.' })
-    .max(80, { error: 'Nome muito longo.' }),
+  nome: nomeSchema,
   email: emailSchema,
   senha: senhaSchema,
 });
+
+export const atualizarIdentidadeSchema = z.object({ nome: nomeSchema });
 
 export const recuperarSenhaSchema = z.object({ email: emailSchema });
 

@@ -18,11 +18,13 @@ const ORDEM_GRUPOS: ItemNav['grupo'][] = ['operacao', 'entrega', 'evolucao', 'ge
 export function NavLateral({
   itens,
   variante,
+  itemConta,
   grupo = 'principal',
   rotuloGrupo,
 }: {
   itens: ItemNav[];
   variante: 'lateral' | 'dock';
+  itemConta?: ItemNav;
   grupo?: string;
   rotuloGrupo?: string;
 }) {
@@ -39,7 +41,9 @@ export function NavLateral({
 
   const itensPrioritarios = itens.filter((item) => item.noDock).slice(0, 4);
   const hrefsPrioritarios = new Set(itensPrioritarios.map((item) => item.href));
-  const maisAtivo = itens.some((item) => !hrefsPrioritarios.has(item.href) && estaAtivo(item));
+  const contaAtiva = Boolean(itemConta && estaAtivo(itemConta));
+  const maisAtivo =
+    contaAtiva || itens.some((item) => !hrefsPrioritarios.has(item.href) && estaAtivo(item));
 
   useEffect(() => {
     if (!menuAberto) return;
@@ -132,6 +136,10 @@ export function NavLateral({
   }
 
   if (variante === 'dock') {
+    const contaCarregando = Boolean(
+      itemConta && destinoPendente === itemConta.href && !estaAtivo(itemConta),
+    );
+
     return (
       <nav className={styles.dock} aria-label="Navegação principal">
         {menuAberto && (
@@ -168,6 +176,33 @@ export function NavLateral({
                   <span aria-hidden="true" />
                 </button>
               </header>
+
+              {itemConta && (
+                <div className={styles.contaMenuArea}>
+                  <Link
+                    href={itemConta.href}
+                    className={styles.contaMenu}
+                    aria-current={contaAtiva ? 'page' : undefined}
+                    aria-busy={contaCarregando || undefined}
+                    data-loading={contaCarregando || undefined}
+                    onClick={(evento) => {
+                      iniciarNavegacao(evento, itemConta);
+                      fecharMenu();
+                    }}
+                  >
+                    <span className={styles.iconeConta} aria-hidden="true">
+                      {itemConta.icone}
+                    </span>
+                    <span>
+                      <small>Sua identidade</small>
+                      <strong>{itemConta.rotulo}</strong>
+                    </span>
+                    <em>
+                      {contaAtiva ? 'Você está aqui' : contaCarregando ? 'Abrindo…' : 'Abrir'}
+                    </em>
+                  </Link>
+                </div>
+              )}
 
               <div className={styles.conteudoMenu}>
                 {ORDEM_GRUPOS.map((idGrupo) => {

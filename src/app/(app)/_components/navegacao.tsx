@@ -9,6 +9,7 @@ import {
   House,
   ScanSearch,
   ShieldCheck,
+  UserRound,
   Users,
   Video,
 } from 'lucide-react';
@@ -147,6 +148,19 @@ export const ITEM_ADMIN: ItemNav = {
   href: '/admin',
   rotulo: ROTULOS['/admin'],
   icone: <ShieldCheck size={TAMANHO} strokeWidth={TRACO} />,
+  noDock: false,
+  grupo: 'gestao',
+};
+
+/**
+ * A conta não compete com as áreas da jornada na sidebar. No mobile, porém, o
+ * cabeçalho compacto não exibe o menu de perfil; por isso ela entra como destino
+ * próprio no painel "Mais".
+ */
+export const ITEM_CONTA: ItemNav = {
+  href: '/conta',
+  rotulo: 'Minha conta',
+  icone: <UserRound size={TAMANHO} strokeWidth={TRACO} />,
   noDock: false,
   grupo: 'gestao',
 };

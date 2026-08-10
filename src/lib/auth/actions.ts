@@ -1,11 +1,18 @@
 'use server';
 
+import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { ZodError } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { env } from '@/lib/env';
 import { destinoSeguro, ROTA_CALLBACK, ROTA_ENTRAR, ROTA_NOVA_SENHA } from '@/lib/routes';
-import { criarContaSchema, entrarSchema, novaSenhaSchema, recuperarSenhaSchema } from './schemas';
+import {
+  atualizarIdentidadeSchema,
+  criarContaSchema,
+  entrarSchema,
+  novaSenhaSchema,
+  recuperarSenhaSchema,
+} from './schemas';
 
 /**
  * Estado devolvido a `useActionState`.
@@ -19,6 +26,14 @@ export type EstadoAuth = {
   porCampo?: Record<string, string>;
   campos?: Record<string, string>;
   sucesso?: string;
+};
+
+export type EstadoIdentidade = {
+  erro?: string;
+  porCampo?: { nome?: string };
+  campos?: { nome?: string };
+  sucesso?: string;
+  nome?: string;
 };
 
 /**
@@ -174,6 +189,82 @@ export async function definirNovaSenha(
   }
 
   redirect(destinoSeguro(null));
+}
+
+/**
+ * Atualiza o nome que identifica a pessoa em TODO o shell autenticado.
+ *
+ * A action autentica de novo porque Server Actions são endpoints POST públicos:
+ * renderizar o formulário atrás do layout não autoriza a mutação. Depois do
+ * `updateUser`, a sessão é renovada para que o JWT carregue o novo metadata — sem
+ * isso `/conta` mudaria, mas o nome do cabeçalho continuaria antigo até o token
+ * expirar.
+ */
+export async function atualizarIdentidade(
+  _anterior: EstadoIdentidade,
+  formData: FormData,
+): Promise<EstadoIdentidade> {
+  const bruto = { nome: texto(formData.get('nome')) };
+  const validacao = atualizarIdentidadeSchema.safeParse(bruto);
+
+  if (!validacao.success) {
+    return {
+      porCampo: { nome: validacao.error.issues[0]?.message ?? 'Revise seu nome.' },
+      campos: bruto,
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: sessao, error: erroSessao } = await supabase.auth.getClaims();
+
+  if (erroSessao || !sessao?.claims?.sub) {
+    if (erroSessao) console.error('[auth:atualizar-identidade:sessao]', erroSessao.message);
+    return { erro: 'Sua sessão expirou. Entre novamente para alterar o nome.', campos: bruto };
+  }
+
+  const nomeAtual =
+    typeof sessao.claims.user_metadata?.nome === 'string'
+      ? sessao.claims.user_metadata.nome.trim()
+      : '';
+
+  if (nomeAtual === validacao.data.nome) {
+    return {
+      sucesso: 'Seu nome já está atualizado em toda a plataforma.',
+      nome: validacao.data.nome,
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ data: { nome: validacao.data.nome } });
+
+  if (error) {
+    console.error('[auth:atualizar-identidade]', error.code, error.message);
+    return {
+      erro: 'Não foi possível salvar seu nome agora. Tente novamente em instantes.',
+      campos: bruto,
+    };
+  }
+
+  /* `updateUser` troca `session.user`, mas o layout lê os claims do access token.
+     Renovar a sessão reemite esse token e o `setAll` do cliente SSR grava os
+     cookies dentro da própria Server Action. */
+  const { error: erroRenovacao } = await supabase.auth.refreshSession();
+  if (erroRenovacao) {
+    console.error(
+      '[auth:atualizar-identidade:renovar-sessao]',
+      erroRenovacao.code,
+      erroRenovacao.message,
+    );
+    return {
+      erro: 'O nome foi salvo, mas a tela não conseguiu sincronizar. Atualize a página.',
+      nome: validacao.data.nome,
+    };
+  }
+
+  refresh();
+  return {
+    sucesso: 'Nome atualizado em toda a plataforma.',
+    nome: validacao.data.nome,
+  };
 }
 
 export async function sair() {
