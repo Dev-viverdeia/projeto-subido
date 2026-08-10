@@ -65,12 +65,8 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
           projeto={solucao.projeto}
           ferramentas={ferramentas}
           prompts={prompts}
-          video={
-            solucao.video_url ? (
-              <VideoConteudo videoUrl={solucao.video_url} titulo={solucao.titulo} />
-            ) : null
-          }
-          proxima={proxima ? <ProximaSolucao proxima={proxima} /> : null}
+          videoUrl={solucao.video_url}
+          proxima={proxima}
         />
       ) : (
         <FichaSolucao

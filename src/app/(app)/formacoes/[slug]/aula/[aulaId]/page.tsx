@@ -69,7 +69,9 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
             formacaoSlug={slug}
             aulaId={aula.id}
             anteriorId={anterior?.id ?? null}
+            anteriorTitulo={anterior?.titulo ?? null}
             proximaId={proxima?.id ?? null}
+            proximaTitulo={proxima?.titulo ?? null}
           />
         </div>
 

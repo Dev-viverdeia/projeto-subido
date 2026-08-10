@@ -149,8 +149,20 @@ describe('conteúdo do curso', () => {
     ]);
     render(<Curso formacao={emMontagem} />);
 
-    const cta = screen.getByRole('link', { name: /Começar curso/ });
+    const cta = screen.getByRole('link', { name: /Começar formação/ });
     expect(cta.getAttribute('href')).toBe('/formacoes/curso/aula/a9');
+    expect(screen.getAllByText('Aula nove').length).toBeGreaterThan(0);
+  });
+
+  it('retoma dizendo qual é a próxima aula, sem botão dentro do link', () => {
+    comProgresso(['a1']);
+    render(<Curso formacao={TRES_MODULOS} />);
+
+    const cta = screen.getByRole('link', { name: /Retomar aula/ });
+    expect(cta.getAttribute('href')).toBe('/formacoes/curso/aula/a2');
+    expect(screen.getByText('Continue de onde parou')).toBeDefined();
+    expect(screen.getAllByText('Aula 2').length).toBeGreaterThan(0);
+    expect(within(cta).queryByRole('button')).toBeNull();
   });
 
   it('o selo de estado e o trilho contam o mesmo — uma leitura só do progresso', () => {

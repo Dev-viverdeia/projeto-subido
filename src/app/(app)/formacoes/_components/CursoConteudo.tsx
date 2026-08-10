@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/design-system/via';
+import { ArrowRight } from 'lucide-react';
 import type { FormacaoCompleta } from '@/lib/conteudo/queries';
 import { estadoDoProgresso } from '@/lib/progresso/local';
 import { PillEstado } from '../../_components/PillEstado';
@@ -41,10 +41,10 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
     ? `/formacoes/${formacao.slug}/aula/${curriculo.proxima.id}`
     : null;
   const rotuloCta = curriculo.concluiu
-    ? 'Revisar curso'
+    ? 'Revisar formação'
     : curriculo.comecou
-      ? 'Continuar'
-      : 'Começar curso';
+      ? 'Retomar aula'
+      : 'Começar formação';
   /* Concluiu tudo → revisar leva à primeira aula DO CURSO, não à primeira aula do
      primeiro módulo. Lendo `modulos[0].aulas[0]`, um curso cujo módulo de abertura
      ainda não tem aula cadastrada — o caso normal de um currículo em montagem —
@@ -53,6 +53,12 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
   const hrefCta =
     hrefProxima ??
     (curriculo.planas[0] ? `/formacoes/${formacao.slug}/aula/${curriculo.planas[0].id}` : null);
+  const aulaDoCta = curriculo.proxima ?? curriculo.planas[0] ?? null;
+  const rotuloDestino = curriculo.concluiu
+    ? 'Revisão sugerida'
+    : curriculo.comecou
+      ? 'Continue de onde parou'
+      : 'Sua primeira aula';
 
   /* Módulos e aulas são a ESTRUTURA do curso: entram sempre, inclusive em zero —
      "0 aulas" é um fato sobre um curso em montagem, não um número inventado. A
@@ -89,10 +95,19 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
             ))}
           </ul>
 
-          {hrefCta && (
-            <div className={styles.cta}>
-              <Link href={hrefCta}>
-                <Button variant="primary">{rotuloCta}</Button>
+          {hrefCta && aulaDoCta && (
+            <div className={styles.retomada}>
+              <div className={styles.retomadaTexto}>
+                <span>{rotuloDestino}</span>
+                <strong>{aulaDoCta.titulo}</strong>
+                <small>
+                  {curriculo.feitas} de {curriculo.total}{' '}
+                  {curriculo.total === 1 ? 'aula concluída' : 'aulas concluídas'}
+                </small>
+              </div>
+              <Link href={hrefCta} className={styles.cta}>
+                {rotuloCta}
+                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
               </Link>
             </div>
           )}

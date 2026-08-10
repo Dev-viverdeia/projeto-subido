@@ -108,8 +108,79 @@
   white-space: nowrap;
 }
 
+.retomada {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-5);
+  margin-top: var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+}
+
+.retomadaTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.retomadaTexto span,
+.retomadaTexto small {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.retomadaTexto span {
+  color: var(--via-accent);
+}
+
+.retomadaTexto strong {
+  overflow: hidden;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  line-height: var(--via-lh-snug);
+  color: var(--via-white);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retomadaTexto small {
+  margin-top: 2px;
+  color: var(--via-gray-300);
+}
+
 .cta {
-  margin-top: var(--via-space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-accent);
+  color: var(--via-navy);
+  font-size: var(--via-fs-sm);
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -14px var(--via-accent);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--via-white);
+  outline-offset: 3px;
 }
 
 /* ── Corpo: currículo + trilho de progresso ───────────────────────────────── */
@@ -161,5 +232,26 @@
      Quem abre no telefone já tem o CTA do hero acima da dobra. */
   .lateral {
     position: static;
+  }
+}
+
+@media (max-width: 599px) {
+  .retomada {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-3);
+  }
+
+  .cta {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta {
+    transition: none;
+  }
+
+  .cta:hover {
+    transform: none;
   }
 }

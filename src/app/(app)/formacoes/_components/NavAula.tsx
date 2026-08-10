@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/design-system/via';
@@ -20,12 +21,16 @@ export function NavAula({
   formacaoSlug,
   aulaId,
   anteriorId,
+  anteriorTitulo,
   proximaId,
+  proximaTitulo,
 }: {
   formacaoSlug: string;
   aulaId: string;
   anteriorId: string | null;
+  anteriorTitulo: string | null;
   proximaId: string | null;
+  proximaTitulo: string | null;
 }) {
   const router = useRouter();
   const progresso = useProgresso();
@@ -36,23 +41,31 @@ export function NavAula({
     tocarFormacao(formacaoSlug);
   }, [formacaoSlug, tocarFormacao]);
 
-  const irPara = (id: string) => router.push(`/formacoes/${formacaoSlug}/aula/${id}`);
+  const hrefAula = (id: string) => `/formacoes/${formacaoSlug}/aula/${id}`;
 
   const concluir = () => {
     concluirAula(aulaId, formacaoSlug);
-    if (proximaId) irPara(proximaId);
+    if (proximaId) router.push(hrefAula(proximaId));
   };
 
   return (
     <nav className={styles.barra} aria-label="Navegação da aula">
-      <Button
-        variant="ghost"
-        disabled={!anteriorId}
-        onClick={() => anteriorId && irPara(anteriorId)}
-      >
-        <ArrowLeft size={14} strokeWidth={2} aria-hidden="true" />
-        Anterior
-      </Button>
+      {anteriorId ? (
+        <Link
+          href={hrefAula(anteriorId)}
+          className={styles.vizinha}
+          data-direcao="anterior"
+          aria-label={`Aula anterior: ${anteriorTitulo}`}
+        >
+          <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+          <span>
+            <small>Anterior</small>
+            <strong>{anteriorTitulo}</strong>
+          </span>
+        </Link>
+      ) : (
+        <span className={styles.limite} aria-hidden="true" />
+      )}
 
       {concluida ? (
         <span className={styles.feita}>
@@ -70,14 +83,26 @@ export function NavAula({
         </span>
       ) : (
         <Button variant="primary" onClick={concluir}>
-          Marcar como concluída
+          {proximaId ? 'Concluir e avançar' : 'Concluir formação'}
         </Button>
       )}
 
-      <Button variant="ghost" disabled={!proximaId} onClick={() => proximaId && irPara(proximaId)}>
-        Próxima
-        <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
-      </Button>
+      {proximaId ? (
+        <Link
+          href={hrefAula(proximaId)}
+          className={styles.vizinha}
+          data-direcao="proxima"
+          aria-label={`Próxima aula: ${proximaTitulo}`}
+        >
+          <span>
+            <small>Próxima</small>
+            <strong>{proximaTitulo}</strong>
+          </span>
+          <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+        </Link>
+      ) : (
+        <span className={styles.limite} aria-hidden="true" />
+      )}
     </nav>
   );
 }

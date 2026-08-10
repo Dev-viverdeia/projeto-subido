@@ -63,7 +63,7 @@ function montar() {
       projeto={projeto}
       ferramentas={[item('f1', 'ferramenta')]}
       prompts={[item('p1', 'prompt')]}
-      video={null}
+      videoUrl={null}
       proxima={null}
     />,
   );
@@ -76,7 +76,19 @@ describe('Projeto guiado', () => {
       expect(screen.getByRole('heading', { level: 2, name: nome })).toBeDefined();
     }
     expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
-    expect(screen.getByText('Próximo passo')).toBeDefined();
+    expect(screen.getAllByText('Próximo passo').length).toBeGreaterThan(0);
+    expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    );
+    expect(screen.getByRole('link', { name: 'Ir para a próxima fase: Preparar' })).toHaveAttribute(
+      'href',
+      '#fase-preparar',
+    );
+    expect(screen.getByRole('link', { name: /Abrir kit de implementação/ })).toHaveAttribute(
+      'href',
+      '#kit-projeto',
+    );
   });
 
   it('marca o passo e move a retomada para o seguinte', async () => {

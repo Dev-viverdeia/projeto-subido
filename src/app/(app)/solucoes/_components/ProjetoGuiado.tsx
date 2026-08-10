@@ -1,9 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import type { CSSProperties, ReactNode } from 'react';
-import { ArrowDown, ArrowUpRight, Check, FileSignature, PackageCheck, Layers3 } from 'lucide-react';
-import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  FileSignature,
+  PackageCheck,
+  Layers3,
+} from 'lucide-react';
+import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
 import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import {
   contarEtapasFeitas,
@@ -12,6 +20,8 @@ import {
   useProgresso,
 } from '@/lib/progresso/local';
 import { Ferramentas, Prompts } from './KitSolucao';
+import { ProximaSolucao } from './ProximaSolucao';
+import { VideoConteudo } from '../../_components/VideoConteudo';
 import styles from './ProjetoGuiado.module.css';
 
 export function ProjetoGuiado({
@@ -22,7 +32,7 @@ export function ProjetoGuiado({
   projeto,
   ferramentas,
   prompts,
-  video,
+  videoUrl,
   proxima,
 }: {
   slug: string;
@@ -32,8 +42,8 @@ export function ProjetoGuiado({
   projeto: DadosRoteiroProjeto;
   ferramentas: ItemSolucao[];
   prompts: ItemSolucao[];
-  video: ReactNode;
-  proxima: ReactNode;
+  videoUrl: string | null;
+  proxima: VizinhaSolucao | null;
 }) {
   const progresso = useProgresso();
   const { alternarEtapa } = useAcoesProgresso();
@@ -67,6 +77,41 @@ export function ProjetoGuiado({
           <p>{projeto.resultado}</p>
         </div>
 
+        <section className={styles.retomadaHero} aria-label="Progresso do projeto">
+          <div className={styles.retomadaMedida}>
+            <span>Seu progresso</span>
+            <strong>
+              {feitas} de {todosIds.length} passos
+            </strong>
+          </div>
+
+          <div
+            className={styles.progressoHero}
+            role="progressbar"
+            aria-label="Progresso do projeto"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={porcentagem}
+          >
+            <span style={{ transform: `scaleX(${porcentagem / 100})` }} />
+          </div>
+
+          {proximoPasso ? (
+            <button type="button" className={styles.continuarHero} onClick={irAoProximo}>
+              <span>
+                <small>Próximo passo</small>
+                {proximoPasso.passo.titulo}
+              </span>
+              <ArrowDown size={16} aria-hidden="true" />
+            </button>
+          ) : (
+            <div className={styles.concluidoHero}>
+              <PackageCheck size={18} aria-hidden="true" />
+              Projeto pronto para entregar
+            </div>
+          )}
+        </section>
+
         <nav className={styles.navegacaoFases} aria-label="Fases do projeto">
           {projeto.roteiro.fases.map((fase, indice) => {
             const ids = fase.passos.map((passo) => idPassoProjeto(slug, fase.id, passo.id));
@@ -90,13 +135,15 @@ export function ProjetoGuiado({
 
       <div className={styles.corpo}>
         <main className={styles.principal}>
-          {video}
+          {videoUrl ? <VideoConteudo videoUrl={videoUrl} titulo={titulo} /> : null}
 
           <div className={styles.fases}>
             {projeto.roteiro.fases.map((fase, faseIndice) => {
               const ids = fase.passos.map((passo) => idPassoProjeto(slug, fase.id, passo.id));
               const concluidos = contarEtapasFeitas(progresso, ids);
               const completa = concluidos === ids.length;
+              const faseAnterior = projeto.roteiro.fases[faseIndice - 1] ?? null;
+              const proximaFase = projeto.roteiro.fases[faseIndice + 1] ?? null;
 
               return (
                 <section key={fase.id} id={`fase-${fase.id}`} className={styles.fase}>
@@ -159,6 +206,42 @@ export function ProjetoGuiado({
                       );
                     })}
                   </ol>
+
+                  <nav
+                    className={styles.navegacaoSequencial}
+                    aria-label={`Navegação da fase ${fase.titulo}`}
+                  >
+                    {faseAnterior ? (
+                      <a
+                        href={`#fase-${faseAnterior.id}`}
+                        aria-label={`Ir para a fase anterior: ${faseAnterior.titulo}`}
+                      >
+                        <ArrowLeft size={15} aria-hidden="true" />
+                        <span>
+                          <small>Fase anterior</small>
+                          {faseAnterior.titulo}
+                        </span>
+                      </a>
+                    ) : (
+                      <span aria-hidden="true" />
+                    )}
+
+                    <a
+                      href={proximaFase ? `#fase-${proximaFase.id}` : '#kit-projeto'}
+                      data-proxima
+                      aria-label={
+                        proximaFase
+                          ? `Ir para a próxima fase: ${proximaFase.titulo}`
+                          : 'Abrir kit de implementação'
+                      }
+                    >
+                      <span>
+                        <small>{proximaFase ? 'Próxima fase' : 'Depois das fases'}</small>
+                        {proximaFase?.titulo ?? 'Abrir kit de implementação'}
+                      </span>
+                      <ArrowRight size={15} aria-hidden="true" />
+                    </a>
+                  </nav>
                 </section>
               );
             })}
@@ -173,38 +256,10 @@ export function ProjetoGuiado({
             <Prompts itens={prompts} />
           </section>
 
-          {proxima}
+          {proxima ? <ProximaSolucao proxima={proxima} /> : null}
         </main>
 
         <aside className={styles.lateral}>
-          <section className={styles.progressoCard} aria-label="Progresso do projeto">
-            <div
-              className={styles.anel}
-              style={{ '--progresso': `${porcentagem * 3.6}deg` } as CSSProperties}
-              aria-hidden="true"
-            >
-              <span>{porcentagem}%</span>
-            </div>
-            <div>
-              <p>Seu projeto</p>
-              <strong>
-                {feitas} de {todosIds.length} passos
-              </strong>
-            </div>
-          </section>
-
-          {proximoPasso ? (
-            <button type="button" className={styles.continuar} onClick={irAoProximo}>
-              Continuar em “{proximoPasso.passo.titulo}”
-              <ArrowDown size={16} aria-hidden="true" />
-            </button>
-          ) : (
-            <div className={styles.concluido}>
-              <PackageCheck size={20} aria-hidden="true" />
-              Projeto pronto para entregar
-            </div>
-          )}
-
           <section className={styles.lateralBloco}>
             <span>Cliente ideal</span>
             <p>{projeto.clienteIdeal}</p>

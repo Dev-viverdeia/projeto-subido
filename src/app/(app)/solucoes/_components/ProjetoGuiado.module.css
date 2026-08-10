@@ -29,7 +29,8 @@
 .passoTitulo span,
 .evidencias dt,
 .kitCabecalho p,
-.progressoCard p,
+.retomadaMedida span,
+.continuarHero small,
 .lateralBloco > span,
 .estudio span,
 .notaLocal {
@@ -120,6 +121,109 @@
   line-height: var(--via-lh-normal);
   color: rgba(255, 255, 255, 0.88);
   text-wrap: pretty;
+}
+
+.retomadaHero {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) minmax(250px, auto);
+  align-items: center;
+  gap: var(--via-space-5);
+  min-height: 76px;
+  padding: var(--via-space-3) clamp(20px, 3vw, 38px);
+  border-top: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
+  background: color-mix(in srgb, var(--via-white) 5%, transparent);
+}
+
+.retomadaMedida {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.retomadaMedida span,
+.continuarHero small {
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-300);
+}
+
+.retomadaMedida strong {
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  color: var(--via-white);
+  white-space: nowrap;
+}
+
+.progressoHero {
+  overflow: hidden;
+  height: 4px;
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-white) 14%, transparent);
+}
+
+.progressoHero > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--via-accent);
+  transform-origin: left center;
+  transition: transform var(--app-t-state);
+}
+
+.continuarHero,
+.concluidoHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  min-height: 48px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-snug);
+}
+
+.continuarHero {
+  border: 0;
+  background: var(--via-accent);
+  color: var(--via-navy);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+.continuarHero > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 650;
+}
+
+.continuarHero small {
+  color: var(--via-navy);
+  font-weight: 500;
+}
+
+.continuarHero:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -14px var(--via-accent);
+}
+
+.continuarHero:focus-visible {
+  outline: 2px solid var(--via-white);
+  outline-offset: 3px;
+}
+
+.concluidoHero {
+  justify-content: flex-start;
+  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  color: var(--via-white);
 }
 
 .navegacaoFases {
@@ -400,6 +504,61 @@
   opacity: 0.58;
 }
 
+.navegacaoSequencial {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-4);
+}
+
+.navegacaoSequencial a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
+  min-height: 48px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-muted);
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.navegacaoSequencial a[data-proxima] {
+  justify-self: end;
+  text-align: right;
+}
+
+.navegacaoSequencial a span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--via-fs-caption);
+  font-weight: 560;
+}
+
+.navegacaoSequencial a small {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: 400;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.navegacaoSequencial a:hover {
+  background: var(--via-navy-04);
+  color: var(--via-text-primary);
+}
+
+.navegacaoSequencial a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 .kit {
   display: flex;
   flex-direction: column;
@@ -440,111 +599,11 @@
   gap: var(--via-space-3);
 }
 
-.progressoCard,
 .lateralBloco,
 .estudio {
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
-}
-
-.progressoCard {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-  padding: var(--via-space-4);
-  border-radius: var(--app-radius-card) var(--app-radius-card) var(--app-radius-control)
-    var(--app-radius-control);
-}
-
-.anel {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: conic-gradient(var(--via-navy) var(--progresso), var(--via-navy-08) 0);
-}
-
-.anel::before {
-  content: '';
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--app-elev-1-bg);
-}
-
-.anel span {
-  z-index: 1;
-  font-family: var(--via-font-mono);
-  font-size: 0.65rem;
-  color: var(--via-text-primary);
-}
-
-.progressoCard p,
-.progressoCard strong {
-  margin: 0;
-}
-
-.progressoCard p {
-  margin-bottom: 4px;
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.progressoCard strong {
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-}
-
-.continuar,
-.concluido {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-3);
-  min-height: 48px;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 0;
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-family: inherit;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-snug);
-  text-align: left;
-}
-
-.continuar {
-  cursor: pointer;
-  transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
-}
-
-.continuar:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px -10px var(--via-navy-60);
-}
-
-.continuar:focus-visible {
-  outline: none;
-  box-shadow:
-    var(--app-ring),
-    0 10px 24px -10px var(--via-navy-60);
-}
-
-.concluido {
-  justify-content: flex-start;
-  background: var(--via-navy-06);
-  color: var(--via-text-primary);
 }
 
 .lateralBloco {
@@ -627,9 +686,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .progressoCard,
-  .continuar,
-  .concluido,
   .estudio,
   .notaLocal {
     grid-column: 1 / -1;
@@ -651,6 +707,15 @@
     grid-template-columns: repeat(5, minmax(132px, 1fr));
   }
 
+  .retomadaHero {
+    grid-template-columns: auto minmax(100px, 1fr);
+  }
+
+  .continuarHero,
+  .concluidoHero {
+    grid-column: 1 / -1;
+  }
+
   .evidencias {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-2);
@@ -663,8 +728,24 @@
   }
 
   .heroPrincipal,
-  .resultado {
+  .resultado,
+  .retomadaHero {
     padding: var(--via-space-5);
+  }
+
+  .retomadaHero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--via-space-3);
+  }
+
+  .progressoHero {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .continuarHero,
+  .concluidoHero {
+    grid-row: 3;
   }
 
   .navegacaoFases {
@@ -733,17 +814,23 @@
   .lateralBloco {
     grid-column: 1;
   }
+
+  .navegacaoSequencial a span {
+    font-size: var(--via-fs-micro);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .navegacaoFases a,
   .check,
-  .continuar {
+  .continuarHero,
+  .progressoHero > span,
+  .navegacaoSequencial a {
     transition: none;
   }
 
   .check:hover,
-  .continuar:hover {
+  .continuarHero:hover {
     transform: none;
   }
 }

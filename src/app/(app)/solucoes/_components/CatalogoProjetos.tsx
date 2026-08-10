@@ -176,7 +176,12 @@ export function CatalogoProjetos({
                     <span>{solucao.ferramentas.length} ferramentas</span>
                   </div>
                   <span className={styles.abrir}>
-                    Abrir projeto <ArrowUpRight size={16} aria-hidden="true" />
+                    {estado === 'concluida'
+                      ? 'Revisar projeto'
+                      : estado === 'em-andamento'
+                        ? 'Retomar projeto'
+                        : 'Abrir projeto'}{' '}
+                    <ArrowUpRight size={16} aria-hidden="true" />
                   </span>
                 </footer>
 
