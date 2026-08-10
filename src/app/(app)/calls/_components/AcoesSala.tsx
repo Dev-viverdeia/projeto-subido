@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Check, Copy, Video } from 'lucide-react';
 import styles from './AcoesSala.module.css';
 
-export function AcoesSala({ codigo }: { codigo: string }) {
+export function AcoesSala({ codigo, destaque = false }: { codigo: string; destaque?: boolean }) {
   const [copiado, setCopiado] = useState(false);
   const caminho = `/sala/${codigo}`;
 
@@ -16,7 +16,7 @@ export function AcoesSala({ codigo }: { codigo: string }) {
   }
 
   return (
-    <div className={styles.acoes}>
+    <div className={`${styles.acoes} ${destaque ? styles.destaque : ''}`}>
       <button type="button" onClick={() => void copiar()} className={styles.copiar}>
         {copiado ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
         {copiado ? 'Copiado' : 'Copiar link'}

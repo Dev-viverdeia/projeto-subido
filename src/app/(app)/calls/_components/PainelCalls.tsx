@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BrainCircuit,
   CalendarDays,
+  Clock3,
   ContactRound,
   Database,
   FileAudio,
@@ -51,17 +52,16 @@ export function PainelCalls({
     .filter((item) => !callPodeAbrir(item.status))
     .sort((a, b) => b.agendadaPara.localeCompare(a.agendadaPara));
   const comCoach = ativas.filter((item) => item.liveCoachAtivo).length;
+  const proxima = ativas[0];
+  const seguintes = ativas.slice(1);
 
   return (
     <div className={styles.pagina}>
       <header className={styles.topo}>
         <div className={styles.introducao}>
-          <p className={styles.sobretitulo}>Conversas que viram contexto</p>
-          <h1>Calls que alimentam o trabalho</h1>
-          <p>
-            Agende, conduza e transforme cada conversa em memória útil para o CRM, a venda e a
-            entrega do projeto.
-          </p>
+          <p className={styles.sobretitulo}>Central de conversas</p>
+          <h1>Calls</h1>
+          <p>Cada reunião vira contexto no CRM, direção para a venda e memória para a entrega.</p>
         </div>
         <FormularioAgendarCall
           oportunidades={oportunidades}
@@ -77,51 +77,88 @@ export function PainelCalls({
         </div>
       )}
 
-      <section className={styles.fluxo} data-on-dark aria-labelledby="fluxo-calls-titulo">
-        <div className={styles.fluxoCabecalho}>
-          <div>
-            <p>Uma única conversa</p>
-            <h2 id="fluxo-calls-titulo">Quatro camadas de inteligência</h2>
+      {proxima && (
+        <section className={styles.proximaCall} data-on-dark aria-labelledby="proxima-call-titulo">
+          <div className={styles.proximaContexto}>
+            <div className={styles.proximaLinha}>
+              <p>Sua próxima call</p>
+              <span data-status={proxima.status}>
+                <i /> {ROTULO_STATUS_CALL[proxima.status]}
+              </span>
+            </div>
+            <h2 id="proxima-call-titulo">{proxima.titulo}</h2>
+            <p className={styles.proximaPessoa}>
+              <ContactRound size={16} strokeWidth={1.8} aria-hidden="true" />
+              {proxima.empresa}
+              {proxima.contato ? ` · ${proxima.contato}` : ''}
+            </p>
+            <div className={styles.proximaRodape}>
+              <span>{ROTULO_TIPO_CALL[proxima.tipo]}</span>
+              {proxima.liveCoachAtivo && (
+                <span>
+                  <Layers3 size={13} aria-hidden="true" /> Live Coach pronto
+                </span>
+              )}
+            </div>
           </div>
-          <span>
-            {ativas.length} agendadas · {comCoach} com Live Coach
-          </span>
-        </div>
+
+          <div className={styles.proximaHorario}>
+            <div className={styles.dataPrincipal}>
+              <CalendarDays size={18} strokeWidth={1.7} aria-hidden="true" />
+              <span>
+                <small>{DATA_LONGA.format(new Date(proxima.agendadaPara))}</small>
+                <strong>{HORA.format(new Date(proxima.agendadaPara))}</strong>
+              </span>
+            </div>
+            <div className={styles.duracao}>
+              <Clock3 size={15} strokeWidth={1.8} aria-hidden="true" />
+              {proxima.duracaoMinutos} minutos
+            </div>
+            <AcoesSala codigo={proxima.codigoPublico} destaque />
+          </div>
+        </section>
+      )}
+
+      <section className={styles.automacao} aria-labelledby="fluxo-calls-titulo">
+        <header>
+          <p>Enquanto você conversa</p>
+          <h2 id="fluxo-calls-titulo">O sistema trabalha junto</h2>
+        </header>
         <ol className={styles.trilha}>
           <li>
-            <span className={styles.noAtivo}>
-              <Radio size={18} strokeWidth={1.8} aria-hidden="true" />
+            <span>
+              <Radio size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
               <strong>Call</strong>
-              <small>Áudio e vídeo no mesmo ambiente</small>
+              <small>Conversa no mesmo ambiente</small>
             </div>
           </li>
           <li>
             <span>
-              <FileAudio size={18} strokeWidth={1.8} aria-hidden="true" />
+              <FileAudio size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
               <strong>Transcrição</strong>
-              <small>Falas, decisões e contexto preservados</small>
+              <small>Falas e decisões preservadas</small>
             </div>
           </li>
           <li>
             <span>
-              <Database size={18} strokeWidth={1.8} aria-hidden="true" />
+              <Database size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <strong>CRM factual</strong>
-              <small>Dores e próximos passos na oportunidade</small>
+              <strong>CRM</strong>
+              <small>Fatos entram na oportunidade</small>
             </div>
           </li>
           <li>
             <span>
-              <BrainCircuit size={18} strokeWidth={1.8} aria-hidden="true" />
+              <BrainCircuit size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <strong>Próxima ação</strong>
-              <small>Sobral AI, proposta e entrega com memória</small>
+              <strong>Próximo passo</strong>
+              <small>A ação nasce com contexto</small>
             </div>
           </li>
         </ol>
@@ -131,13 +168,17 @@ export function PainelCalls({
         <section className={styles.agenda} aria-labelledby="agenda-titulo">
           <header className={styles.secaoTopo}>
             <div>
-              <h2 id="agenda-titulo">Agenda</h2>
-              <p>As próximas salas ligadas ao seu pipeline.</p>
+              <h2 id="agenda-titulo">{proxima ? 'Depois desta' : 'Agenda'}</h2>
+              <p>
+                {proxima
+                  ? `${seguintes.length} ${seguintes.length === 1 ? 'call na sequência' : 'calls na sequência'}.`
+                  : 'As próximas salas ligadas ao seu pipeline.'}
+              </p>
             </div>
             <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
           </header>
 
-          {ativas.length === 0 ? (
+          {!proxima ? (
             <div className={styles.vazio}>
               <span className={styles.pulsoVazio} aria-hidden="true">
                 <Radio size={22} strokeWidth={1.6} />
@@ -160,9 +201,9 @@ export function PainelCalls({
                 />
               )}
             </div>
-          ) : (
+          ) : seguintes.length > 0 ? (
             <div className={styles.lista}>
-              {ativas.map((reuniao) => (
+              {seguintes.map((reuniao) => (
                 <article className={styles.reuniao} key={reuniao.id}>
                   <div className={styles.dataBloco}>
                     <strong>{DATA.format(new Date(reuniao.agendadaPara)).replace('.', '')}</strong>
@@ -193,28 +234,52 @@ export function PainelCalls({
                 </article>
               ))}
             </div>
+          ) : (
+            <div className={styles.agendaLivre}>
+              <span>
+                <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <div>
+                <strong>Agenda livre depois desta call</strong>
+                <p>Use o espaço para registrar o próximo passo antes de abrir outra conversa.</p>
+              </div>
+            </div>
           )}
         </section>
 
         <aside className={styles.liveCoach} aria-labelledby="live-coach-titulo">
-          <div className={styles.coachSinal} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
+          <div className={styles.coachCabecalho}>
+            <span className={styles.coachSinal} aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>
+              {comCoach} {comCoach === 1 ? 'sala preparada' : 'salas preparadas'}
+            </span>
           </div>
-          <p>{ativas.length ? 'Durante a call' : 'Prévia guiada'}</p>
-          <h2 id="live-coach-titulo">{ativas.length ? 'Live Coach' : 'Como o Live Coach ajuda'}</h2>
+          <p>{ativas.length ? 'Copiloto privado' : 'Prévia guiada'}</p>
+          <h2 id="live-coach-titulo">Live Coach</h2>
           <p>
             {ativas.length
-              ? 'A conversa é transcrita enquanto acontece. O agente identifica sinais e recomenda a melhor próxima pergunta sem tirar você da reunião.'
-              : 'Ao abrir sua primeira sala, a conversa será transcrita e estas sugestões serão atualizadas com o contexto real da reunião.'}
+              ? 'Uma recomendação por vez, no momento em que ela pode mudar a conversa.'
+              : 'Ao abrir sua primeira sala, as sugestões passam a usar o contexto real da reunião.'}
           </p>
           <ul>
-            <li>Investigar uma dor ainda superficial</li>
-            <li>Confirmar impacto antes de apresentar solução</li>
-            <li>Tratar objeção com contexto da própria conversa</li>
+            <li>
+              <strong>Escuta</strong>
+              <span>Transcreve sem tirar você da call.</span>
+            </li>
+            <li>
+              <strong>Leitura</strong>
+              <span>Identifica dor, impacto e objeção.</span>
+            </li>
+            <li>
+              <strong>Direção</strong>
+              <span>Sugere a melhor próxima pergunta.</span>
+            </li>
           </ul>
           <span className={styles.estadoCoach}>
             {ativas.length
