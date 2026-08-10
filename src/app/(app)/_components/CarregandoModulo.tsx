@@ -2,7 +2,8 @@ import { Skeleton } from '@/design-system/via';
 import { CabecalhoPagina } from './CabecalhoPagina';
 import styles from './CarregandoModulo.module.css';
 
-type Anatomia = 'pipeline' | 'calls' | 'documentos' | 'relatorios' | 'mentorias' | 'certificados';
+type Anatomia =
+  'pipeline' | 'calls' | 'documentos' | 'relatorios' | 'mentorias' | 'certificados' | 'consultor';
 
 const CONFIGURACAO: Record<
   Anatomia,
@@ -14,6 +15,7 @@ const CONFIGURACAO: Record<
   relatorios: { titulo: 'Diagnósticos', metricas: 3, colunas: 1, momentoEscuro: true },
   mentorias: { titulo: 'Mentorias', metricas: 0, colunas: 3, momentoEscuro: true },
   certificados: { titulo: 'Certificados', metricas: 0, colunas: 2, momentoEscuro: true },
+  consultor: { titulo: 'Sobral AI', metricas: 0, colunas: 4, momentoEscuro: true },
 };
 
 /**

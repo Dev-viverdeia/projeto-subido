@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { handleError } from '@/lib/errors';
 import type { Database } from '@/lib/supabase/types.generated';
 import { SinaisSobralSchema, type SinaisSobral } from './direcao';
+import { contarAcoesAtrasadas, montarRadarSobral } from './radar';
 
 /**
  * Snapshot pequeno e factual da operação. Nenhuma transcrição ou dado de
@@ -12,31 +13,45 @@ import { SinaisSobralSchema, type SinaisSobral } from './direcao';
  * próximo passo profissional.
  */
 export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Promise<SinaisSobral> {
-  const [oportunidades, empresas, calls, propostas, studio, catalogo] = await Promise.all([
-    supabase
-      .from('crm_oportunidades')
-      .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
-      .order('atualizado_em', { ascending: false })
-      .limit(500),
-    supabase.from('crm_empresas').select('id, nome').limit(500),
-    supabase
-      .from('calls_reunioes')
-      .select('id, status, agendada_para, oportunidade_id')
-      .order('agendada_para', { ascending: false })
-      .limit(500),
-    supabase
-      .from('propostas')
-      .select('id, status, oportunidade_id, atualizado_em')
-      .order('atualizado_em', { ascending: false })
-      .limit(500),
-    supabase.from('builder_solucoes').select('id, status').limit(300),
-    supabase
-      .from('solucoes')
-      .select('slug, titulo, categoria')
-      .eq('status', 'publicado')
-      .order('ordem')
-      .limit(20),
-  ]);
+  const agora = new Date().toISOString();
+  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes] =
+    await Promise.all([
+      supabase
+        .from('crm_oportunidades')
+        .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
+        .order('atualizado_em', { ascending: false })
+        .limit(500),
+      supabase.from('crm_empresas').select('id, nome').limit(500),
+      supabase
+        .from('calls_reunioes')
+        .select('id, status, agendada_para, oportunidade_id, titulo, tipo')
+        .order('agendada_para', { ascending: false })
+        .limit(500),
+      supabase
+        .from('propostas')
+        .select('id, status, oportunidade_id, empresa_id, titulo, atualizado_em')
+        .order('atualizado_em', { ascending: false })
+        .limit(500),
+      supabase.from('builder_solucoes').select('id, status').limit(300),
+      supabase
+        .from('solucoes')
+        .select('slug, titulo, categoria')
+        .eq('status', 'publicado')
+        .order('ordem')
+        .limit(20),
+      supabase
+        .from('projetos_execucao')
+        .select('id, titulo, status, prazo_em, atualizado_em')
+        .order('atualizado_em', { ascending: false })
+        .limit(200),
+      supabase
+        .from('projeto_acoes')
+        .select(
+          'id, titulo, empresa_id, oportunidade_id, projeto_execucao_id, reuniao_id, prazo_em, status, atualizado_em',
+        )
+        .order('atualizado_em', { ascending: false })
+        .limit(500),
+    ]);
 
   if (oportunidades.error) throw handleError(oportunidades.error, 'sobral:oportunidades');
   if (empresas.error) throw handleError(empresas.error, 'sobral:empresas');
@@ -44,19 +59,40 @@ export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Pro
   if (propostas.error) throw handleError(propostas.error, 'sobral:propostas');
   if (studio.error) throw handleError(studio.error, 'sobral:studio');
   if (catalogo.error) throw handleError(catalogo.error, 'sobral:catalogo');
+  if (projetos.error) throw handleError(projetos.error, 'sobral:projetos');
+  if (acoes.error) throw handleError(acoes.error, 'sobral:acoes');
 
   const linhasOportunidade = oportunidades.data ?? [];
   const linhasCalls = calls.data ?? [];
   const linhasPropostas = propostas.data ?? [];
   const linhasStudio = studio.data ?? [];
+  const linhasProjetos = projetos.data ?? [];
+  const linhasAcoes = acoes.data ?? [];
   const empresasPorId = new Map((empresas.data ?? []).map((empresa) => [empresa.id, empresa.nome]));
   const abertas = linhasOportunidade.filter(
     (oportunidade) => oportunidade.etapa !== 'ganho' && oportunidade.etapa !== 'perdido',
   );
-  const foco = abertas[0] ?? null;
+  const radar = montarRadarSobral({
+    agora,
+    oportunidades: linhasOportunidade,
+    calls: linhasCalls,
+    propostas: linhasPropostas,
+    projetos: linhasProjetos,
+    acoes: linhasAcoes,
+    empresasPorId,
+  });
+  const oportunidadeDoRadar = radar
+    .find((item) => item.dominio === 'crm')
+    ?.destino.match(/^\/crm\/([^/]+)$/)?.[1];
+  const foco =
+    abertas.find((oportunidade) => oportunidade.id === oportunidadeDoRadar) ?? abertas[0] ?? null;
+  const projetosAtivos = linhasProjetos.filter(
+    (projeto) => projeto.status !== 'concluido' && projeto.status !== 'pausado',
+  );
+  const acoesPendentes = linhasAcoes.filter((acao) => acao.status === 'pendente');
 
   return SinaisSobralSchema.parse({
-    momento: new Date().toISOString(),
+    momento: agora,
     oportunidades: {
       total: linhasOportunidade.length,
       abertas: abertas.length,
@@ -86,6 +122,13 @@ export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Pro
       total: linhasStudio.length,
       prontos: linhasStudio.filter((projeto) => projeto.status === 'pronta').length,
     },
+    projetos: {
+      total: linhasProjetos.length,
+      ativos: projetosAtivos.length,
+      acoesPendentes: acoesPendentes.length,
+      acoesAtrasadas: contarAcoesAtrasadas(linhasAcoes, agora),
+    },
+    radar,
     catalogo: (catalogo.data ?? []).map((projeto) => ({
       slug: projeto.slug,
       titulo: projeto.titulo,
@@ -128,7 +171,14 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
         calls: sinais.calls,
         propostas: sinais.propostas,
         studio: sinais.studio,
+        projetos: sinais.projetos,
       },
+      radar_operacional: sinais.radar.map((item) => ({
+        dominio: item.dominio,
+        titulo: item.titulo,
+        contexto: item.contexto,
+        momento: item.momento,
+      })),
       projetos_disponiveis: sinais.catalogo,
     },
     null,

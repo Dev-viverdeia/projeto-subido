@@ -35,6 +35,8 @@ function sinais(
       ...alteracoes.propostas,
     },
     studio: { total: 0, prontos: 0 },
+    projetos: { total: 0, ativos: 0, acoesPendentes: 0, acoesAtrasadas: 0 },
+    radar: [],
     catalogo: [],
     foco: null,
   });

@@ -102,6 +102,26 @@ export const SinaisSobralSchema = z.object({
     total: z.number().int().nonnegative(),
     prontos: z.number().int().nonnegative(),
   }),
+  projetos: z.object({
+    total: z.number().int().nonnegative(),
+    ativos: z.number().int().nonnegative(),
+    acoesPendentes: z.number().int().nonnegative(),
+    acoesAtrasadas: z.number().int().nonnegative(),
+  }),
+  radar: z
+    .array(
+      z.object({
+        id: z.string().min(3),
+        dominio: z.enum(['crm', 'calls', 'propostas', 'projetos', 'plano']),
+        titulo: z.string().trim().min(3).max(180),
+        contexto: z.string().trim().min(2).max(240),
+        momento: z.string().trim().min(2).max(120),
+        estado: z.enum(['ao_vivo', 'atrasado', 'hoje', 'agendado', 'aguardando', 'sem_prazo']),
+        destino: z.string().startsWith('/'),
+        prioridade: z.number().int().nonnegative(),
+      }),
+    )
+    .max(4),
   catalogo: z.array(
     z.object({ slug: z.string(), titulo: z.string(), categoria: z.string().nullable() }),
   ),

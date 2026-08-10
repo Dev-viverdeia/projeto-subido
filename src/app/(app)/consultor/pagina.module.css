@@ -422,12 +422,15 @@
 
 .fonteFoco {
   margin-top: auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: flex-start;
   gap: var(--via-space-3);
   padding-top: var(--via-space-4);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-accent-ink);
+  text-decoration: none;
+  transition: color var(--app-t-state);
 }
 
 .fonteFoco > span {
@@ -457,6 +460,250 @@
   font-size: var(--via-fs-xs);
   font-style: normal;
   line-height: var(--via-lh-normal);
+}
+
+a.fonteFoco:hover {
+  color: var(--via-navy);
+  text-decoration: none;
+}
+
+a.fonteFoco:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-control);
+  box-shadow: var(--app-ring);
+}
+
+/* O radar é uma fila editorial, não outra grade de cards. O primeiro registro
+   ganha mais área porque é a decisão mais urgente; os demais mantêm densidade. */
+.radar {
+  padding-block: var(--via-space-7);
+  display: grid;
+  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
+  align-items: start;
+  gap: clamp(var(--via-space-8), 6vw, var(--via-space-12));
+  border-top: 1px solid var(--via-border-hairline);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.radarCabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.radarCabecalho h2 {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--via-text-primary);
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h2);
+  font-weight: 560;
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h2);
+  text-wrap: balance;
+}
+
+.radarCabecalho > p:last-child {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.radarLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.radarLista li + li {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.radarItem {
+  min-height: 118px;
+  padding: var(--app-pad-card);
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: var(--via-space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--app-t-state);
+}
+
+.radarLista li:first-child .radarItem {
+  min-height: 148px;
+  background: var(--via-bg-2);
+}
+
+.radarItem:hover {
+  background: var(--via-bg-2);
+  text-decoration: none;
+}
+
+.radarItem:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: none;
+  box-shadow: inset var(--app-ring);
+}
+
+.radarIndice {
+  align-self: start;
+  padding-top: 2px;
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.radarCorpo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.radarMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.radarMeta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.radarMeta em {
+  overflow: hidden;
+  color: var(--via-text-muted);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radarCorpo > strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h4);
+  text-wrap: balance;
+}
+
+.radarLista li:first-child .radarCorpo > strong {
+  font-size: var(--via-fs-h3);
+  letter-spacing: var(--app-ls-h3);
+}
+
+.radarCorpo > small {
+  overflow: hidden;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radarAbrir {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.radarItem:hover .radarAbrir {
+  transform: translate(2px, -2px);
+  border-color: var(--via-navy);
+  background: var(--via-surface);
+}
+
+.radarVazio {
+  min-height: 180px;
+  padding: var(--app-pad-card);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.radarVazioIcone {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.radarVazio h3,
+.radarVazio p {
+  margin: 0;
+}
+
+.radarVazio h3 {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+}
+
+.radarVazio p {
+  max-width: 50ch;
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}
+
+.radarVazio > a {
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  text-decoration: none;
+}
+
+.radarVazio > a:hover {
+  border-color: var(--via-navy);
+  text-decoration: none;
+}
+
+.radarVazio > a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .plano,
@@ -573,13 +820,17 @@
 }
 
 .acaoLink {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  white-space: nowrap;
   text-decoration: none;
   transition:
     transform var(--app-t-touch),
@@ -770,6 +1021,15 @@
     grid-template-columns: 1fr;
   }
 
+  .radar {
+    grid-template-columns: 1fr;
+    gap: var(--via-space-6);
+  }
+
+  .radarCabecalho h2 {
+    max-width: 22ch;
+  }
+
   .acaoCard {
     min-height: 0;
   }
@@ -880,6 +1140,53 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .radar {
+    padding-block: var(--via-space-6);
+  }
+
+  .radarCabecalho h2 {
+    font-size: var(--via-fs-h3);
+  }
+
+  .radarLista {
+    margin-inline: calc(var(--via-space-2) * -1);
+    border-radius: var(--app-radius-card);
+  }
+
+  .radarItem,
+  .radarLista li:first-child .radarItem {
+    min-height: 118px;
+    padding: var(--via-space-4);
+    grid-template-columns: 24px minmax(0, 1fr) 38px;
+    gap: var(--via-space-3);
+  }
+
+  .radarLista li:first-child .radarCorpo > strong {
+    font-size: var(--via-fs-h4);
+    letter-spacing: var(--app-ls-h4);
+  }
+
+  .radarMeta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-1);
+  }
+
+  .radarAbrir {
+    width: 38px;
+    height: 38px;
+  }
+
+  .radarVazio {
+    grid-template-columns: auto minmax(0, 1fr);
+    border-radius: var(--app-radius-card);
+  }
+
+  .radarVazio > a {
+    grid-column: 2;
+    justify-self: start;
+  }
+
   .secaoCabecalho h2,
   .pergunteCabecalho h2 {
     font-size: var(--via-fs-h3);
@@ -925,6 +1232,18 @@
   .acoesPlano .acaoCard:not(:first-child) .acaoLink {
     grid-column: 3;
     grid-row: 1;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  .acoesPlano .acaoCard:not(:first-child) .acaoLink span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .acoesPlano .acaoCard:not(:first-child) {
@@ -934,7 +1253,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .acaoPrincipal,
-  .acaoLink {
+  .acaoLink,
+  .radarItem,
+  .radarAbrir {
     transition: none;
   }
 }
