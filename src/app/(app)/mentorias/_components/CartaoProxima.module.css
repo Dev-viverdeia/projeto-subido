@@ -297,3 +297,38 @@
     gap: var(--via-space-3);
   }
 }
+
+@media (max-width: 599px) {
+  .cartao {
+    padding: var(--app-pad-card);
+  }
+
+  .conteudo,
+  .principal,
+  .lado {
+    gap: var(--via-space-4);
+  }
+
+  .cabeca {
+    gap: var(--via-space-2);
+  }
+
+  .titulo {
+    font-size: var(--via-fs-h3);
+  }
+
+  .mentorHeadline {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .ficha {
+    gap: var(--via-space-3) var(--via-space-4);
+  }
+
+  .fichaValor {
+    font-size: var(--via-fs-body);
+  }
+}

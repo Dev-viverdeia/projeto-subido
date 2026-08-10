@@ -41,7 +41,7 @@ type Conteudo = {
 
 const ROTULO_ORIGEM: Record<Origem, string> = {
   formacao: 'Formação',
-  solucao: 'Solução',
+  solucao: 'Projeto',
 };
 
 const UNIDADE: Record<Origem, [string, string]> = {
@@ -100,19 +100,40 @@ export function GaleriaCertificados({
 
   if (conquistados.length === 0 && andamento.length === 0) {
     return (
-      <div className={styles.vazio}>
-        <p className={styles.vazioTitulo}>Nenhum certificado ainda — e isso é só o começo.</p>
-        <p className={styles.vazioTexto}>
-          Conclua as aulas de uma formação ou as etapas de uma solução e o certificado aparece aqui,
-          com a data da conquista.
-        </p>
-        <div className={styles.vazioAcoes}>
-          <Link href="/formacoes" className={styles.vazioCta}>
-            Ver formações
-          </Link>
-          <Link href="/solucoes" className={styles.vazioCtaGhost}>
-            Ver projetos
-          </Link>
+      <div className={`${styles.vazio} via-mesh-navy via-noise`}>
+        <div className={styles.vazioConteudo}>
+          <p className={styles.vazioEyebrow}>Nenhuma conquista registrada</p>
+          <p className={styles.vazioTitulo}>Seu portfólio comprovado começa na conclusão.</p>
+          <p className={styles.vazioTexto}>
+            Termine todas as aulas de uma formação ou todas as etapas de um projeto. O certificado
+            entra aqui automaticamente com os fatos da sua conta.
+          </p>
+          <div className={styles.vazioAcoes}>
+            <Link href="/formacoes" className={styles.vazioCta}>
+              Ver formações
+            </Link>
+            <Link href="/solucoes" className={styles.vazioCtaGhost}>
+              Ver projetos
+            </Link>
+          </div>
+        </div>
+
+        <div className={styles.vazioRegistro}>
+          <p className={styles.vazioRegistroTitulo}>O que fica registrado</p>
+          <dl className={styles.vazioDados}>
+            <div>
+              <dt>Identidade</dt>
+              <dd>Seu nome</dd>
+            </div>
+            <div>
+              <dt>Escopo</dt>
+              <dd>Conteúdo concluído</dd>
+            </div>
+            <div>
+              <dt>Conquista</dt>
+              <dd>Data da conclusão</dd>
+            </div>
+          </dl>
         </div>
       </div>
     );
@@ -226,7 +247,7 @@ export function GaleriaCertificados({
             ? 'Mais 1 conteúdo ainda sem progresso'
             : `Mais ${porComecar.length} conteúdos ainda sem progresso`}{' '}
           — comece por <Link href="/formacoes">Formações</Link> ou{' '}
-          <Link href="/solucoes">Soluções</Link>.
+          <Link href="/solucoes">Projetos</Link>.
         </p>
       )}
     </div>

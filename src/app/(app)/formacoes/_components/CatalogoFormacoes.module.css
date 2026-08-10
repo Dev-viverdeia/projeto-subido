@@ -89,7 +89,23 @@
    varredura, e uma coluna só faria um card ocupar a tela inteira. */
 @media (max-width: 599px) {
   .grade {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(252px, 76vw);
     gap: var(--via-space-3);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+    padding: var(--via-space-1) var(--via-space-1) var(--via-space-3);
+  }
+
+  .grade::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grade > * {
+    scroll-snap-align: start;
   }
 
   .regua {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { listarFormacoes } from '@/lib/conteudo/queries';
-import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
 import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoFormacoes } from './_components/CatalogoFormacoes';
@@ -14,16 +14,22 @@ export default async function FormacoesPage({ searchParams }: PageProps<'/formac
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Formações" oculto />
+      <div className={entrada.bloco}>
+        <EvolucaoProfissional
+          etapa="formacoes"
+          titulo="Aprenda para entregar."
+          descricao="Formações aplicadas ao trabalho real: domine a ferramenta, leve o método para um projeto e avance com o progresso salvo na sua conta."
+        />
+      </div>
 
       {/* A faixa de resumo vem ANTES da régua: ela responde "onde eu estou" e o
           filtro responde "o que eu procuro". Invertido, a pessoa escolheria um
           recorte antes de saber que tem algo pela metade. */}
-      <div className={entrada.bloco}>
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
         <ResumoFormacoes formacoes={formacoes} />
       </div>
 
-      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
+      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
         <CatalogoFormacoes formacoes={formacoes} filtrosIniciais={lerFiltrosIniciais(params)} />
       </div>
     </div>

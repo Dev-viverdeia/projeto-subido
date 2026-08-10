@@ -58,6 +58,7 @@ export function ResumoCatalogo({
   unidade,
   itemUnidade,
   slugRecente,
+  compactoNoCelular = false,
 }: {
   linhas: LinhaResumo[];
   /** Prefixo da rota de detalhe: `/solucoes`, `/formacoes`. */
@@ -68,6 +69,8 @@ export function ResumoCatalogo({
   itemUnidade: { singular: string; plural: string };
   /** O slug tocado mais recentemente, ou null. Quem lê o progresso é o pai. */
   slugRecente: string | null;
+  /** Mantém as três medidas na mesma linha em catálogos visuais no telefone. */
+  compactoNoCelular?: boolean;
 }) {
   let emAndamento = 0;
   let concluidas = 0;
@@ -84,7 +87,11 @@ export function ResumoCatalogo({
   const retomar = recente && recente.feitas > 0 && recente.feitas < recente.total ? recente : null;
 
   return (
-    <section className={styles.faixa} aria-label="Resumo do catálogo">
+    <section
+      className={styles.faixa}
+      aria-label="Resumo do catálogo"
+      data-compacto={compactoNoCelular ? '' : undefined}
+    >
       <div className={styles.medida}>
         <p className={styles.rotulo}>Disponíveis</p>
         <p className={styles.valor}>

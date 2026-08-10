@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { listarAgenda } from '@/lib/mentorias/queries';
-import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
 import entrada from '../_components/entrada.module.css';
 import { lerVistaInicial } from '../_components/filtros/urlFiltros';
 import { MentoriasVista } from './_components/MentoriasVista';
@@ -34,9 +34,15 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Mentorias" oculto />
-
       <div className={entrada.bloco}>
+        <EvolucaoProfissional
+          etapa="mentorias"
+          titulo="Pratique com quem executa."
+          descricao="Leve um caso real, faça check-in e use a mentoria para remover o bloqueio que está entre você e a próxima entrega."
+        />
+      </div>
+
+      <div className={`${entrada.bloco} ${entrada.atraso1}`}>
         <MentoriasVista sessoes={sessoes} agoraIso={agora.toISOString()} vistaInicial={vista} />
       </div>
     </div>

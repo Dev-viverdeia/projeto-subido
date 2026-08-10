@@ -29,6 +29,7 @@ export function ResumoFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
       unidade={{ singular: 'formação', plural: 'formações' }}
       itemUnidade={{ singular: 'aula', plural: 'aulas' }}
       slugRecente={formacaoMaisRecente(progresso)}
+      compactoNoCelular
     />
   );
 }

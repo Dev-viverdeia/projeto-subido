@@ -172,6 +172,42 @@
   .retomar {
     border-top: 1px solid var(--via-border-hairline);
   }
+
+  /* Formação abre com uma grade visual logo abaixo. As três medidas ficam numa
+     faixa compacta para o catálogo aparecer na primeira dobra, sem sacrificar
+     nenhum dado. A retomada, quando existe, ocupa a linha inteira. */
+  .faixa[data-compacto],
+  .faixa[data-compacto]:not(:has(.retomar)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .faixa[data-compacto] .medida {
+    min-height: 92px;
+    padding: var(--via-space-3);
+  }
+
+  .faixa[data-compacto] .medida + .medida {
+    border-top: 0;
+    border-left: 1px solid var(--via-border-hairline);
+  }
+
+  .faixa[data-compacto] .rotulo {
+    min-height: 2.4em;
+    font-size: 0.5625rem;
+  }
+
+  .faixa[data-compacto] .numero {
+    font-size: var(--via-fs-h4);
+  }
+
+  .faixa[data-compacto] .unidade {
+    display: none;
+  }
+
+  .faixa[data-compacto] .retomar {
+    grid-column: 1 / -1;
+    border-left: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

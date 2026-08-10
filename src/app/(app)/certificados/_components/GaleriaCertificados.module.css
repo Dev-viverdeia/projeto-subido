@@ -335,27 +335,50 @@
 /* -------------------------------------------------------------------- vazio */
 
 .vazio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.58fr);
+  align-items: stretch;
+  gap: var(--app-gap-section);
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid var(--via-navy-16);
+  border-radius: var(--app-radius-surface);
+  box-shadow: var(--via-glow-navy);
+  overflow: hidden;
+}
+
+.vazioConteudo {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--via-space-3);
-  padding: var(--via-space-8) var(--app-pad-card);
-  border: 1px dashed var(--via-navy-16);
-  border-radius: var(--app-radius-surface);
+  max-width: 50ch;
+}
+
+.vazioEyebrow,
+.vazioRegistroTitulo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
 }
 
 .vazioTitulo {
   margin: 0;
-  font-size: var(--via-fs-h4);
+  font-size: clamp(var(--via-fs-h3), 2.8vw, var(--via-fs-h2));
   font-weight: 560;
-  color: var(--via-text-primary);
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
+  color: var(--via-white);
+  text-wrap: balance;
 }
 
 .vazioTexto {
   margin: 0;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
+  color: var(--via-gray-300);
   max-width: 44ch;
   text-wrap: pretty;
 }
@@ -373,8 +396,8 @@
   height: var(--app-h-control);
   padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: var(--via-white);
+  color: var(--via-navy-deep);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -385,13 +408,13 @@
 }
 
 .vazioCta:hover {
-  background: var(--via-navy-deep);
+  background: var(--via-gray-100);
   box-shadow: var(--app-elev-2-shadow);
 }
 
 .vazioCta:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+  box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
 }
 
 .vazioCtaGhost {
@@ -399,10 +422,10 @@
   align-items: center;
   height: var(--app-h-control);
   padding-inline: var(--via-space-4);
-  border: 1px solid var(--app-elev-1-line);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  color: var(--via-text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--via-white);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -412,18 +435,92 @@
 }
 
 .vazioCtaGhost:hover {
-  border-color: var(--app-elev-2-line);
-  box-shadow: var(--app-elev-2-shadow);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .vazioCtaGhost:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.vazioRegistro {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--app-gap-block);
+  padding: var(--app-pad-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--app-radius-card);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .vazioRegistro {
+    background: var(--via-navy);
+  }
+}
+
+.vazioDados {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  margin: 0;
+}
+
+.vazioDados > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vazioDados dt {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-400);
+}
+
+.vazioDados dd {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-white);
+  text-align: right;
 }
 
 /* No telefone a linha de progresso quebra em duas: título em cima, barra
    embaixo — a barra de 160 + contagem não cabem ao lado do título. */
 @media (max-width: 599px) {
+  .vazio {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+    padding: var(--app-pad-card);
+  }
+
+  .vazioTitulo {
+    font-size: var(--via-fs-h3);
+  }
+
+  .vazioAcoes {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .vazioCta,
+  .vazioCtaGhost {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .vazioRegistro {
+    padding: var(--app-pad-card-tight);
+  }
+
   .linha {
     flex-direction: column;
     align-items: stretch;

@@ -59,7 +59,7 @@ export function CertificadoVista({
     if (iso && (!ultimaIso || iso > ultimaIso)) ultimaIso = iso;
   }
 
-  const rotuloOrigem = origem === 'formacao' ? 'formação' : 'solução';
+  const rotuloOrigem = origem === 'formacao' ? 'formação' : 'projeto';
   const unidade = origem === 'formacao' ? 'aulas' : 'etapas';
 
   if (!concluido) {
@@ -111,7 +111,7 @@ export function CertificadoVista({
             <p className={styles.certificamos}>Certificamos que</p>
             <p className={styles.nome}>{nome}</p>
             <p className={styles.concluiu}>
-              concluiu {origem === 'formacao' ? 'a formação' : 'a implementação da solução'}
+              concluiu {origem === 'formacao' ? 'a formação' : 'a implementação do projeto'}
             </p>
             <h1 className={styles.tituloConteudo}>{titulo}</h1>
           </div>
