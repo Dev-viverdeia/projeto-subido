@@ -14,13 +14,79 @@
 }
 
 .vazio {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  min-height: 112px;
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.vazioIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+}
+
+.vazioTexto {
+  min-width: 0;
+}
+
+.vazioTitulo,
+.vazioDescricao {
   margin: 0;
-  padding: var(--via-space-6) var(--via-space-4);
-  border: 1px dashed var(--via-border);
-  border-radius: var(--via-radius-md);
+}
+
+.vazioTitulo {
   font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+.vazioDescricao {
+  margin-top: var(--via-space-1);
+  max-width: 54ch;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-text-muted);
-  text-align: center;
+  text-wrap: pretty;
+}
+
+.vazioAcao {
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.vazioAcao:hover {
+  border-color: var(--via-navy-25);
+  background: var(--via-navy-03);
+}
+
+.vazioAcao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 /* A LISTA não acompanha o canvas — e isso é a regra, não exceção.
@@ -76,6 +142,15 @@
 }
 
 @media (max-width: 767px) {
+  .vazio {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .vazioAcao {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
   .dia {
     display: block;
   }

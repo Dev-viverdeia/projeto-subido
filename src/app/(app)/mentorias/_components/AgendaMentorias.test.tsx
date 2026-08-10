@@ -110,4 +110,30 @@ describe('agenda por dia', () => {
       'false',
     );
   });
+
+  it('explica o filtro vazio e permite voltar para a agenda completa', async () => {
+    const user = userEvent.setup();
+    render(
+      <AgendaMentorias
+        sessoes={[sessao('x', 5)]}
+        agora={AGORA}
+        agoraIso={AGORA.toISOString()}
+        estadoDaSessao={(s) => estadoDe(s, AGORA, s.euInscrito)}
+        gravando={false}
+        aoAbrirDetalhe={vi.fn()}
+        aoFazerCheckin={vi.fn()}
+        aoCancelarCheckin={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole('tab', { name: 'Hoje, 0' }));
+
+    expect(screen.getByText('Hoje está livre na agenda.')).toBeDefined();
+    await user.click(screen.getByRole('button', { name: 'Ver agenda completa' }));
+
+    expect(screen.getByRole('tab', { name: 'Todas, 1' }).getAttribute('aria-selected')).toBe(
+      'true',
+    );
+    expect(screen.getByText('Sessão x')).toBeDefined();
+  });
 });

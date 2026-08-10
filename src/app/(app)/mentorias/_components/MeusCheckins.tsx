@@ -1,5 +1,6 @@
 'use client';
 
+import { CalendarCheck2 } from 'lucide-react';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import { Visto } from '../../_components/PillEstado';
 import { horaCurta, rotuloDoDia } from './estadoMentoria';
@@ -31,7 +32,19 @@ export function MeusCheckins({
   const minhas = sessoes.filter((s) => s.euInscrito);
 
   if (minhas.length === 0) {
-    return <p className={styles.vazio}>Você ainda não fez check-in em nenhuma sessão.</p>;
+    return (
+      <div className={styles.vazio} role="status">
+        <span className={styles.vazioIcone} aria-hidden="true">
+          <CalendarCheck2 size={20} strokeWidth={1.7} />
+        </span>
+        <div>
+          <p className={styles.vazioTitulo}>Seu histórico começa no primeiro check-in.</p>
+          <p className={styles.vazioTexto}>
+            Escolha uma sessão na agenda. Depois da confirmação, ela fica registrada aqui.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   const encerrada = (s: SessaoMentoria) => agora.getTime() >= new Date(s.fimIso).getTime();

@@ -2,7 +2,7 @@ import { Skeleton } from '@/design-system/via';
 import { CabecalhoPagina } from './CabecalhoPagina';
 import styles from './CarregandoModulo.module.css';
 
-type Anatomia = 'pipeline' | 'calls' | 'documentos' | 'relatorios';
+type Anatomia = 'pipeline' | 'calls' | 'documentos' | 'relatorios' | 'mentorias' | 'certificados';
 
 const CONFIGURACAO: Record<
   Anatomia,
@@ -12,6 +12,8 @@ const CONFIGURACAO: Record<
   calls: { titulo: 'Calls', metricas: 0, colunas: 2, momentoEscuro: true },
   documentos: { titulo: 'Propostas', metricas: 4, colunas: 3, momentoEscuro: true },
   relatorios: { titulo: 'Diagnósticos', metricas: 3, colunas: 1, momentoEscuro: true },
+  mentorias: { titulo: 'Mentorias', metricas: 0, colunas: 3, momentoEscuro: true },
+  certificados: { titulo: 'Certificados', metricas: 0, colunas: 2, momentoEscuro: true },
 };
 
 /**
@@ -83,7 +85,11 @@ export function CarregandoModulo({ anatomia }: { anatomia: Anatomia }) {
               <article key={indice}>
                 <Skeleton variant="text" width="54%" />
                 <Skeleton variant="text" width="76%" />
-                <Skeleton variant="rect" width="100%" height={anatomia === 'pipeline' ? 112 : 82} />
+                <Skeleton
+                  variant="rect"
+                  width="100%"
+                  height={anatomia === 'pipeline' ? 112 : anatomia === 'certificados' ? 132 : 82}
+                />
               </article>
             ))}
           </div>

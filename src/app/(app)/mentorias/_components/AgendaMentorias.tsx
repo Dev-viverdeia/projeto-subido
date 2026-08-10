@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { CalendarRange } from 'lucide-react';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
@@ -101,6 +102,27 @@ export function AgendaMentorias({
     return [...grupos.entries()];
   }, [filtradas]);
 
+  const vazio =
+    filtro === 'hoje'
+      ? {
+          titulo: 'Hoje está livre na agenda.',
+          texto: 'Use o tempo para preparar o caso que você quer levar à próxima sessão.',
+        }
+      : filtro === 'amanha'
+        ? {
+            titulo: 'Amanhã ainda não tem sessão.',
+            texto: 'A agenda completa mostra as próximas oportunidades de check-in.',
+          }
+        : filtro === 'semana'
+          ? {
+              titulo: 'Nenhuma sessão nos próximos sete dias.',
+              texto: 'Abra a agenda completa para escolher uma data mais adiante.',
+            }
+          : {
+              titulo: 'A agenda futura está livre.',
+              texto: 'Novas sessões entram aqui assim que forem publicadas.',
+            };
+
   return (
     <div className={styles.raiz}>
       <div className={styles.filtro}>
@@ -114,11 +136,20 @@ export function AgendaMentorias({
       </div>
 
       {porDia.length === 0 ? (
-        <p className={styles.vazio}>
-          Nada{' '}
-          {filtro === 'hoje' ? 'para hoje' : filtro === 'amanha' ? 'para amanhã' : 'no período'}.
-          Veja em “Todas” as próximas sessões.
-        </p>
+        <div className={styles.vazio} role="status">
+          <span className={styles.vazioIcone} aria-hidden="true">
+            <CalendarRange size={20} strokeWidth={1.7} />
+          </span>
+          <div className={styles.vazioTexto}>
+            <p className={styles.vazioTitulo}>{vazio.titulo}</p>
+            <p className={styles.vazioDescricao}>{vazio.texto}</p>
+          </div>
+          {filtro !== 'todas' ? (
+            <button type="button" className={styles.vazioAcao} onClick={() => setFiltro('todas')}>
+              Ver agenda completa
+            </button>
+          ) : null}
+        </div>
       ) : (
         <div className={styles.dias}>
           {porDia.map(([chave, doDia]) => {

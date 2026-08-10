@@ -162,6 +162,11 @@ export function MentoriasVista({
         <EmptyState
           title="Nenhuma mentoria publicada"
           description="As sessões aparecem aqui assim que forem agendadas. Você vê o horário, faz check-in e recebe a sala pelo mesmo lugar."
+          action={
+            <Link href="/formacoes" className={styles.vazioCta}>
+              Continuar em Formações
+            </Link>
+          }
         />
       ) : (
         <>

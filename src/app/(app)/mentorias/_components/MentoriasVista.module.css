@@ -99,6 +99,33 @@
   gap: var(--app-gap-stack);
 }
 
+.vazioCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition:
+    transform var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.vazioCta:hover {
+  transform: translateY(-2px);
+  background: var(--via-navy-deep);
+}
+
+.vazioCta:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
 @media (max-width: 599px) {
   .raiz {
     gap: var(--via-space-4);

@@ -103,7 +103,7 @@ function montarDadosProjeto(
   };
 }
 
-export async function listarSolucoes(): Promise<SolucaoResumo[]> {
+export const listarSolucoes = cache(async (): Promise<SolucaoResumo[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('solucoes')
@@ -133,7 +133,7 @@ export async function listarSolucoes(): Promise<SolucaoResumo[]> {
       projeto,
     };
   });
-}
+});
 
 /* `cache()`: `generateMetadata` e a página pedem o mesmo registro no mesmo render —
    com o cache do React, a segunda chamada reusa a primeira em vez de ir ao banco. */
@@ -183,7 +183,7 @@ export async function obterProximaSolucao(atual: string): Promise<VizinhaSolucao
   return escolherProxima(data ?? [], atual);
 }
 
-export async function listarFormacoes(): Promise<FormacaoResumo[]> {
+export const listarFormacoes = cache(async (): Promise<FormacaoResumo[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('formacoes')
@@ -198,7 +198,7 @@ export async function listarFormacoes(): Promise<FormacaoResumo[]> {
     const aulaIds = modulos.flatMap((m) => m.aulas.map((a) => a.id));
     return { ...formacao, modulos: modulos.length, aulas: aulaIds.length, aulaIds };
   });
-}
+});
 
 export const obterFormacao = cache(async (slug: string): Promise<FormacaoCompleta | null> => {
   const supabase = await createClient();

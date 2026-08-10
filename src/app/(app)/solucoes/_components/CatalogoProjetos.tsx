@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowUpRight, Check } from 'lucide-react';
+import { ArrowUpRight, Check, FolderOpen } from 'lucide-react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
 import { idPassoProjeto } from '@/lib/projetos/roteiro';
 import {
@@ -29,6 +29,37 @@ export function CatalogoProjetos({
   const progresso = useProgresso();
   const Titulo = tituloComo;
   const totalPassos = solucoes.reduce((total, solucao) => total + solucao.etapaIds.length, 0);
+
+  if (solucoes.length === 0) {
+    return (
+      <section className={styles.catalogoVazio} aria-labelledby="catalogo-vazio-titulo">
+        <span className={styles.catalogoVazioIcone} aria-hidden="true">
+          <FolderOpen size={24} strokeWidth={1.6} />
+        </span>
+        <div className={styles.catalogoVazioTexto}>
+          <p className={styles.eyebrow}>Biblioteca em preparação</p>
+          <Titulo id="catalogo-vazio-titulo" className={styles.catalogoVazioTitulo}>
+            Os projetos guiados ainda não foram publicados.
+          </Titulo>
+          <p className={styles.catalogoVazioDescricao}>
+            Assim que a primeira entrega estiver pronta, ela aparece aqui com roteiro, ferramentas e
+            critérios de validação.
+          </p>
+        </div>
+        <div className={styles.catalogoVazioRodape}>
+          <dl>
+            <div>
+              <dt>Projetos publicados</dt>
+              <dd>00</dd>
+            </div>
+          </dl>
+          <Link href="/formacoes" className={styles.catalogoVazioCta}>
+            Continuar em Formações <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className={styles.raiz}>

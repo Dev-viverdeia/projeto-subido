@@ -2059,6 +2059,15 @@ export type Database = {
           mentoria_id: string
         }[]
       }
+      progresso_conta_snapshot: {
+        Args: never
+        Returns: {
+          aulas: Json
+          etapas: Json
+          formacoes: Json
+          solucoes: Json
+        }[]
+      }
       projeto_arquivo_definir_visibilidade: {
         Args: { p_arquivo_id: string; p_visivel: boolean }
         Returns: boolean

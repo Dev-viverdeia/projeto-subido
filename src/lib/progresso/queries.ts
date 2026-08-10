@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/lib/supabase/types.generated';
 import {
   contarConcluidas,
   contarEtapasFeitas,
@@ -11,38 +12,30 @@ import {
   type EstadoProgressoConta,
 } from './estado';
 
-/** Fonte factual única do progresso. A RLS já limita todas as linhas ao dono. */
+function normalizarRegistro(valor: Json | undefined): Record<string, string> {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return {};
+  return Object.fromEntries(
+    Object.entries(valor).filter(
+      (entrada): entrada is [string, string] =>
+        typeof entrada[1] === 'string' && Number.isFinite(Date.parse(entrada[1])),
+    ),
+  );
+}
+
+/** Fonte factual única do progresso. A RPC usa security invoker e preserva a RLS. */
 export const obterProgressoConta = cache(async (): Promise<EstadoProgressoConta> => {
   const supabase = await createClient();
-  const [aulas, formacoes, etapas, projetos] = await Promise.all([
-    supabase.from('progresso_aulas').select('aula_id, concluida_em'),
-    supabase.from('progresso_formacoes').select('ultimo_acesso_em, formacoes!inner(slug)'),
-    supabase.from('progresso_etapas').select('etapa_chave, concluida_em'),
-    supabase.from('progresso_projetos').select('ultimo_acesso_em, solucoes!inner(slug)'),
-  ]);
+  const { data, error } = await supabase.rpc('progresso_conta_snapshot').maybeSingle();
 
-  if (aulas.error) throw handleError(aulas.error, 'progresso:aulas');
-  if (formacoes.error) throw handleError(formacoes.error, 'progresso:formacoes');
-  if (etapas.error) throw handleError(etapas.error, 'progresso:etapas');
-  if (projetos.error) throw handleError(projetos.error, 'progresso:projetos');
+  if (error) throw handleError(error, 'progresso:snapshot');
+  if (!data) return PROGRESSO_VAZIO;
 
-  const estado: EstadoProgressoConta = {
-    aulas: { ...PROGRESSO_VAZIO.aulas },
-    formacoes: { ...PROGRESSO_VAZIO.formacoes },
-    etapas: { ...PROGRESSO_VAZIO.etapas },
-    solucoes: { ...PROGRESSO_VAZIO.solucoes },
+  return {
+    aulas: normalizarRegistro(data.aulas),
+    formacoes: normalizarRegistro(data.formacoes),
+    etapas: normalizarRegistro(data.etapas),
+    solucoes: normalizarRegistro(data.solucoes),
   };
-
-  for (const item of aulas.data ?? []) estado.aulas[item.aula_id] = item.concluida_em;
-  for (const item of formacoes.data ?? []) {
-    estado.formacoes[item.formacoes.slug] = item.ultimo_acesso_em;
-  }
-  for (const item of etapas.data ?? []) estado.etapas[item.etapa_chave] = item.concluida_em;
-  for (const item of projetos.data ?? []) {
-    estado.solucoes[item.solucoes.slug] = item.ultimo_acesso_em;
-  }
-
-  return estado;
 });
 
 export type MetricasProgressoConta = {

@@ -295,8 +295,9 @@ export function CalendarioMentorias({
 
           {doDia.length === 0 ? (
             <div className={styles.vazio}>
+              <p className={styles.vazioTitulo}>Dia livre na agenda.</p>
               <p className={styles.vazioTexto}>
-                Nenhuma sessão neste dia. Os dias com mentoria trazem o horário na célula.
+                Os dias com mentoria mostram o horário diretamente na célula.
               </p>
               {proximaDepois && (
                 <button

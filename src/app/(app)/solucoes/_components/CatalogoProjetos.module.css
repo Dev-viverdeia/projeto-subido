@@ -4,6 +4,117 @@
   gap: clamp(36px, 5vw, 64px);
 }
 
+.catalogoVazio {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--app-gap-block);
+  min-height: 360px;
+  padding: clamp(28px, 5vw, 64px);
+  border: 1px solid var(--via-navy-20);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-mesh-trilho);
+  box-shadow: var(--via-shadow-xl);
+  color: var(--via-white);
+}
+
+.catalogoVazioIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--via-gray-300);
+}
+
+.catalogoVazioTexto {
+  align-self: center;
+  max-width: 720px;
+}
+
+.catalogoVazioTitulo,
+.catalogoVazioDescricao {
+  margin: 0;
+}
+
+.catalogoVazioTitulo {
+  max-width: 18ch;
+  font-family: var(--via-font-display);
+  font-size: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+  font-weight: 520;
+  line-height: 1.02;
+  letter-spacing: var(--app-ls-h1);
+  text-wrap: balance;
+}
+
+.catalogoVazioDescricao {
+  max-width: 56ch;
+  margin-top: var(--via-space-4);
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-normal);
+  color: var(--via-gray-300);
+  text-wrap: pretty;
+}
+
+.catalogoVazioRodape {
+  grid-column: 2;
+  align-self: end;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--app-gap-section);
+  padding-top: var(--via-space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.catalogoVazioRodape dl,
+.catalogoVazioRodape dt,
+.catalogoVazioRodape dd {
+  margin: 0;
+}
+
+.catalogoVazioRodape dt {
+  font-size: var(--via-fs-caption);
+  color: var(--via-gray-400);
+}
+
+.catalogoVazioRodape dd {
+  margin-top: var(--via-space-1);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  font-variant-numeric: tabular-nums;
+}
+
+.catalogoVazioCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-navy-deep);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition:
+    transform var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.catalogoVazioCta:hover {
+  transform: translateY(-2px);
+  background: var(--via-gray-100);
+}
+
+.catalogoVazioCta:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
 .abertura {
   position: relative;
   overflow: hidden;
@@ -457,6 +568,14 @@
 }
 
 @media (max-width: 899px) {
+  .catalogoVazio {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogoVazioRodape {
+    grid-column: 1;
+  }
+
   .abertura {
     min-height: 390px;
   }
