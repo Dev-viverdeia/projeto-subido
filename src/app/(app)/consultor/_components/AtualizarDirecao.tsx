@@ -54,7 +54,7 @@ export function AtualizarDirecao({
           className={carregando ? styles.girando : undefined}
           aria-hidden="true"
         />
-        {rotulo}
+        <span aria-live="polite">{rotulo}</span>
       </button>
       {erro ? (
         <p className={styles.erro} role="alert">

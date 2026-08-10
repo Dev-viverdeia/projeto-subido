@@ -58,6 +58,42 @@
   }
 }
 
+@media (max-width: 900px) {
+  .cabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .acoes {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .nova {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .rodape {
+    z-index: 14;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + var(--via-space-2));
+  }
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    gap: var(--via-space-5);
+  }
+
+  .esquerda {
+    gap: var(--via-space-3);
+  }
+
+  .tituloConversa {
+    font-size: var(--via-fs-h4);
+  }
+}
+
 /* ── O cabeçalho da conversa: identidade à esquerda, controles à direita,
    hairline fechando — é o que separa "uma tela com balões" de uma conversa
    com endereço. */

@@ -192,7 +192,26 @@ export default async function ConsultorPage() {
         </aside>
       </main>
 
-      <section className={`${entrada.bloco} ${entrada.atraso2} ${styles.plano}`}>
+      <section
+        id="pergunte-sobral"
+        className={`${entrada.bloco} ${entrada.atraso2} ${styles.pergunte}`}
+      >
+        <header className={styles.pergunteCabecalho}>
+          <span className={styles.iconePergunta} aria-hidden="true">
+            <Bot size={22} strokeWidth={1.8} />
+          </span>
+          <div>
+            <p className={styles.eyebrow}>Converse com sua direção</p>
+            <h2>Pergunte sem tirar os olhos do plano.</h2>
+            <span>
+              A resposta usa o mesmo contexto acima e pode atualizar sua direção automaticamente.
+            </span>
+          </div>
+        </header>
+        <Conversa exemplos={EXEMPLOS} />
+      </section>
+
+      <section className={`${entrada.bloco} ${styles.plano}`}>
         <header className={styles.secaoCabecalho}>
           <div>
             <p className={styles.eyebrow}>Plano em ordem</p>
@@ -225,22 +244,6 @@ export default async function ConsultorPage() {
             </li>
           ))}
         </ol>
-      </section>
-
-      <section className={`${entrada.bloco} ${styles.pergunte}`}>
-        <header className={styles.pergunteCabecalho}>
-          <span className={styles.iconePergunta} aria-hidden="true">
-            <Bot size={22} strokeWidth={1.8} />
-          </span>
-          <div>
-            <p className={styles.eyebrow}>Converse com sua direção</p>
-            <h2>Pergunte sem tirar os olhos do plano.</h2>
-            <span>
-              A resposta usa o mesmo contexto acima e pode atualizar sua direção automaticamente.
-            </span>
-          </div>
-        </header>
-        <Conversa exemplos={EXEMPLOS} />
       </section>
 
       {threads.length > 0 ? (

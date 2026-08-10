@@ -286,3 +286,18 @@
     transition: none;
   }
 }
+
+@media (max-width: 599px) {
+  .criacao {
+    gap: var(--via-space-5);
+  }
+
+  .partes {
+    gap: var(--via-space-3);
+  }
+
+  .parte {
+    min-height: 116px;
+    padding: var(--via-space-4);
+  }
+}

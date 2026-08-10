@@ -188,96 +188,129 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
         </li>
       </ol>
 
-      {origem ? (
-        <aside className={styles.origem} aria-label="Projeto usado como base">
-          <div>
-            <span>Projeto-base</span>
-            <strong>{origem.titulo}</strong>
-          </div>
-          <p>{origem.resultado}</p>
+      <div className={styles.mesaCriacao}>
+        <aside className={styles.retorno} aria-labelledby="retorno-estudio" data-on-dark>
+          <p className={styles.retornoEyebrow}>O que volta para você</p>
+          <h3 id="retorno-estudio">Um projeto pronto para vender e executar.</h3>
+          <ol className={styles.entregas}>
+            <li>
+              <span>01</span>
+              <div>
+                <strong>Escopo e arquitetura</strong>
+                <p>O que construir, em qual ordem e com quais limites.</p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <strong>Kit de implementação</strong>
+                <p>Ferramentas, prompts, riscos e critérios de validação.</p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <strong>Próximo passo comercial</strong>
+                <p>O projeto vira base para uma proposta apresentada ao cliente.</p>
+              </div>
+            </li>
+          </ol>
+          <p className={styles.retornoNota}>Você revisa e adapta tudo antes de apresentar.</p>
         </aside>
-      ) : null}
 
-      <form
-        className={styles.caixa}
-        onSubmit={(evento) => {
-          evento.preventDefault();
-          void enviar();
-        }}
-      >
-        <label className="sr-only" htmlFor="ideia-do-cliente">
-          O problema do cliente, com o contexto que você já tem
-        </label>
-        <textarea
-          id="ideia-do-cliente"
-          ref={campoRef}
-          className={styles.campo}
-          value={ideia}
-          onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
-          onKeyDown={(evento) => {
-            /* ⌘/Ctrl + Enter envia; Enter sozinho continua quebrando linha. Num
-               campo de briefing, Enter-para-enviar corta a frase no meio. */
-            if (evento.key === 'Enter' && (evento.metaKey || evento.ctrlKey)) {
+        <div className={styles.briefing}>
+          {origem ? (
+            <aside className={styles.origem} aria-label="Projeto usado como base">
+              <div>
+                <span>Projeto-base</span>
+                <strong>{origem.titulo}</strong>
+              </div>
+              <p>{origem.resultado}</p>
+            </aside>
+          ) : null}
+
+          <form
+            className={styles.caixa}
+            onSubmit={(evento) => {
               evento.preventDefault();
               void enviar();
-            }
-          }}
-          disabled={ocupado}
-          rows={6}
-          placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
-        />
+            }}
+          >
+            <label className="sr-only" htmlFor="ideia-do-cliente">
+              O problema do cliente, com o contexto que você já tem
+            </label>
+            <textarea
+              id="ideia-do-cliente"
+              ref={campoRef}
+              className={styles.campo}
+              value={ideia}
+              onChange={(evento) => setIdeia(evento.target.value.slice(0, MAXIMO))}
+              onKeyDown={(evento) => {
+                /* ⌘/Ctrl + Enter envia; Enter sozinho continua quebrando linha. Num
+                   campo de briefing, Enter-para-enviar corta a frase no meio. */
+                if (evento.key === 'Enter' && (evento.metaKey || evento.ctrlKey)) {
+                  evento.preventDefault();
+                  void enviar();
+                }
+              }}
+              disabled={ocupado}
+              rows={6}
+              placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
+            />
 
-        <div className={styles.rodape}>
-          <p className={styles.contador} aria-hidden="true">
-            <span className={styles.escrito}>{ideia.trim().length}</span>
-            <span className={styles.barra}>/</span>
-            {MAXIMO}
-          </p>
+            <div className={styles.rodape}>
+              <p className={styles.contador} aria-hidden="true">
+                <span className={styles.escrito}>{ideia.trim().length}</span>
+                <span className={styles.barra}>/</span>
+                {MAXIMO}
+              </p>
 
-          <div className={styles.acoes}>
-            <span className={styles.atalho} aria-hidden="true">
-              {atalho} Enter
-            </span>
-            <button
-              type="submit"
-              className={styles.enviar}
-              disabled={bloqueado}
-              aria-label={ocupado ? 'Lendo a ideia' : 'Formular o projeto'}
-            >
-              <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
-            </button>
-          </div>
-        </div>
-      </form>
-
-      {erro ? (
-        <p className={styles.aviso} role="alert">
-          {erro}
-        </p>
-      ) : null}
-
-      {!origem ? (
-        <section className={styles.exemplos}>
-          <h3 className={styles.divisor}>
-            <span>ou comece por um exemplo</span>
-          </h3>
-
-          <ul className={styles.chips}>
-            {EXEMPLOS.map((exemplo) => (
-              <li key={exemplo.rotulo}>
+              <div className={styles.acoes}>
+                <span className={styles.atalho} aria-hidden="true">
+                  {atalho} Enter
+                </span>
                 <button
-                  type="button"
-                  className={styles.chip}
-                  onClick={() => usarExemplo(exemplo.texto)}
-                  disabled={ocupado}
+                  type="submit"
+                  className={styles.enviar}
+                  disabled={bloqueado}
+                  aria-label={ocupado ? 'Lendo a ideia' : 'Formular o projeto'}
                 >
-                  {exemplo.rotulo}
+                  <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
                 </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+              </div>
+            </div>
+          </form>
+
+          {erro ? (
+            <p className={styles.aviso} role="alert">
+              {erro}
+            </p>
+          ) : null}
+
+          {!origem ? (
+            <section className={styles.exemplos}>
+              <h3 className={styles.divisor}>
+                <span>ou comece por um exemplo</span>
+              </h3>
+
+              <ul className={styles.chips}>
+                {EXEMPLOS.map((exemplo) => (
+                  <li key={exemplo.rotulo}>
+                    <button
+                      type="button"
+                      className={styles.chip}
+                      onClick={() => usarExemplo(exemplo.texto)}
+                      disabled={ocupado}
+                    >
+                      {exemplo.rotulo}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

@@ -280,3 +280,50 @@
     transition: none;
   }
 }
+
+@media (max-width: 599px) {
+  .entrevista {
+    gap: var(--via-space-5);
+    padding-bottom: var(--via-space-4);
+  }
+
+  .topo {
+    align-items: flex-start;
+    gap: var(--via-space-3);
+  }
+
+  .ideia {
+    padding-top: var(--via-space-1);
+  }
+
+  .corpo {
+    margin-top: var(--via-space-2);
+  }
+
+  .pergunta {
+    font-size: 1.5rem;
+  }
+
+  .campo {
+    min-height: 132px;
+  }
+
+  .rodape {
+    position: sticky;
+    z-index: 12;
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + var(--via-space-2));
+    min-height: 60px;
+    margin-inline: calc(var(--via-space-2) * -1);
+    margin-top: 0;
+    padding: var(--via-space-2);
+    border: 1px solid var(--via-border-soft);
+    border-radius: var(--app-radius-control);
+    background: color-mix(in srgb, var(--via-surface) 90%, transparent);
+    box-shadow: var(--app-elev-2-shadow);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  .avancar {
+    min-height: 44px;
+  }
+}

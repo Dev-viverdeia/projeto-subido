@@ -177,3 +177,13 @@
     transition: none;
   }
 }
+
+@media (max-width: 599px) {
+  .corpo {
+    max-width: calc(100% - var(--via-space-6));
+  }
+
+  .texto {
+    font-size: var(--via-fs-sm);
+  }
+}

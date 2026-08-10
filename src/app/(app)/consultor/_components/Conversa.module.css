@@ -35,11 +35,22 @@
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--via-space-3);
   padding: var(--via-space-3) var(--via-space-4);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   border: 1px solid var(--app-elev-1-line);
+}
+
+.digitandoRotulo {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.pontosDigitando {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .pontinho {
@@ -234,5 +245,33 @@
   .enviar,
   .chip {
     transition: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .caixa {
+    padding: var(--via-space-3);
+  }
+
+  .campo {
+    min-height: 76px;
+    font-size: var(--via-fs-sm);
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    margin-inline: calc(var(--via-space-3) * -1);
+    padding: 2px var(--via-space-3) var(--via-space-2);
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    flex-shrink: 0;
   }
 }

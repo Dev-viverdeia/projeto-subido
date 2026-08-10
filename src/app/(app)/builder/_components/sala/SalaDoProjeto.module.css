@@ -284,8 +284,45 @@
 }
 
 @media (max-width: 599px) {
+  .hero {
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
+  }
+
+  .tituloCitacao {
+    -webkit-line-clamp: 2;
+  }
+
+  .resumo {
+    font-size: var(--via-fs-xs);
+  }
+
   .stepper {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .degrau {
+    gap: var(--via-space-1);
+    min-width: 0;
+    padding: var(--via-space-2) 2px;
+  }
+
+  .marcador {
+    width: 27px;
+    height: 27px;
+  }
+
+  .degrauRotulo {
+    font-size: var(--via-fs-micro);
+  }
+
+  .painel {
+    gap: var(--via-space-5);
+  }
+
+  .painelNumero {
+    font-size: 2rem;
   }
 }
 

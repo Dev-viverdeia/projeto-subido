@@ -600,10 +600,13 @@
 }
 
 .pergunte {
-  max-width: 920px;
+  max-width: var(--via-container);
   width: 100%;
   margin-inline: auto;
   padding: clamp(var(--via-space-5), 5vw, var(--via-space-10));
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  align-items: center;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-surface);
   background: var(--via-surface);
@@ -770,20 +773,36 @@
   .acaoCard {
     min-height: 0;
   }
+
+  .pergunte {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
   .pagina {
-    gap: var(--via-space-8);
+    gap: var(--via-space-7);
   }
 
   .topo {
-    gap: var(--via-space-5);
+    gap: var(--via-space-4);
+    padding-bottom: var(--via-space-5);
+  }
+
+  .titulo {
+    max-width: 13ch;
+    font-size: 2.35rem;
+  }
+
+  .apoio {
+    font-size: var(--via-fs-sm);
   }
 
   .comandos {
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--via-space-2);
   }
 
   .mesa {
@@ -825,7 +844,7 @@
   }
 
   .direcao {
-    min-height: 500px;
+    min-height: 0;
     padding: var(--via-space-5);
   }
 
@@ -836,7 +855,20 @@
   }
 
   .foco {
-    padding-block: var(--via-space-6);
+    margin-block: 0;
+    padding-block: var(--via-space-5);
+  }
+
+  .foco h2 {
+    font-size: 1.875rem;
+  }
+
+  .foco > span {
+    line-height: var(--via-lh-normal);
+  }
+
+  .prova {
+    padding: var(--via-space-3);
   }
 
   .acaoPrincipal {
@@ -855,6 +887,7 @@
 
   .acaoCard {
     grid-template-columns: auto minmax(0, 1fr);
+    padding: var(--via-space-4);
   }
 
   .acaoLink {
@@ -870,7 +903,32 @@
   }
 
   .pergunteCabecalho {
-    flex-direction: column;
+    gap: var(--via-space-3);
+  }
+
+  .iconePergunta {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .acoesPlano .acaoCard:not(:first-child) {
+    min-height: 104px;
+    align-items: center;
+  }
+
+  .acoesPlano .acaoCard:not(:first-child) .acaoConteudo p,
+  .acoesPlano .acaoCard:not(:first-child) .acaoConteudo small {
+    display: none;
+  }
+
+  .acoesPlano .acaoCard:not(:first-child) .acaoLink {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .acoesPlano .acaoCard:not(:first-child) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 }
 

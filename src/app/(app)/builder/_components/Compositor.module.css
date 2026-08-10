@@ -18,7 +18,7 @@
    Só a FICHA abre para o canvas, e aí a mudança de largura passa a significar algo:
    o documento entregue é maior que o texto que o pediu. */
 .tela {
-  max-width: var(--via-content);
+  max-width: var(--via-container);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -34,16 +34,142 @@
   align-items: center;
   text-align: center;
   gap: var(--via-space-4);
-  margin-bottom: var(--via-space-6);
+  margin-bottom: var(--via-space-5);
 }
 
 .fluxoEstudio {
+  width: min(100%, var(--via-content));
+  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  margin: 0 0 var(--app-gap-section);
+  margin-top: 0;
+  margin-bottom: var(--via-space-6);
   padding: 0;
   list-style: none;
+}
+
+.mesaCriacao {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.55fr);
+  grid-template-areas: 'retorno briefing';
+  gap: var(--via-space-3);
+  padding: var(--via-space-2);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-bg-2);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.retorno {
+  grid-area: retorno;
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+  padding: clamp(var(--via-space-5), 3vw, var(--via-space-7));
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--app-radius-card);
+  background: var(--via-mesh-navy);
+  color: var(--via-white);
+}
+
+.retornoEyebrow,
+.retornoNota {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.retornoEyebrow {
+  color: var(--via-accent);
+}
+
+.retorno h3 {
+  position: relative;
+  z-index: 1;
+  max-width: 14ch;
+  margin: var(--via-space-3) 0 var(--via-space-6);
+  color: var(--via-white);
+  font-family: var(--via-font-display);
+  font-size: clamp(var(--via-fs-h3), 2.2vw, var(--via-fs-h2));
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-snug);
+  text-wrap: balance;
+}
+
+.entregas {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.entregas li {
+  display: grid;
+  grid-template-columns: 27px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: flex-start;
+}
+
+.entregas > li > span {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--via-white) 18%, transparent);
+  border-radius: var(--via-radius-pill);
+  color: var(--via-gray-300);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.entregas div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.entregas strong {
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+}
+
+.entregas p {
+  margin: 0;
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.retornoNota {
+  z-index: 1;
+  margin-top: auto;
+  padding-top: var(--via-space-6);
+  color: var(--via-gray-onnavy);
+  line-height: var(--via-lh-normal);
+}
+
+.briefing {
+  grid-area: briefing;
+  min-width: 0;
+  padding: clamp(var(--via-space-3), 2vw, var(--via-space-5));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .fluxoEstudio li {
@@ -244,7 +370,7 @@
    escreve, então os limites moram aqui e a medida do conteúdo mora lá. */
 .campo {
   width: 100%;
-  min-height: 148px;
+  min-height: 176px;
   max-height: 46vh;
   overflow-y: auto;
   resize: none;
@@ -372,7 +498,7 @@
 /* ---- Exemplos ----------------------------------------------------------------- */
 
 .exemplos {
-  margin-top: var(--app-gap-section);
+  margin-top: var(--app-gap-block);
 }
 
 /* Rótulo com filete dos dois lados. `::before`/`::after` em `flex: 1` faz a linha
@@ -455,6 +581,72 @@
 }
 
 @media (max-width: 599px) {
+  .tela {
+    padding-block-start: var(--via-space-6);
+  }
+
+  .cabecalho {
+    gap: var(--via-space-3);
+    margin-bottom: var(--via-space-5);
+  }
+
+  .titulo {
+    font-size: 2rem;
+  }
+
+  .apoio {
+    font-size: var(--via-fs-body);
+  }
+
+  .fluxoEstudio {
+    margin-bottom: var(--via-space-5);
+  }
+
+  .mesaCriacao {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'briefing'
+      'retorno';
+    gap: var(--via-space-2);
+    margin-inline: calc(var(--via-space-2) * -1);
+    padding: var(--via-space-1);
+    border-radius: var(--app-radius-card);
+  }
+
+  .briefing {
+    padding: var(--via-space-3);
+  }
+
+  .campo {
+    min-height: 170px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    margin-inline: calc(var(--via-space-3) * -1);
+    padding: 2px var(--via-space-3) var(--via-space-2);
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    white-space: nowrap;
+  }
+
+  .retorno {
+    min-height: 410px;
+    padding: var(--via-space-6) var(--via-space-5);
+  }
+
+  .retorno h3 {
+    margin-bottom: var(--via-space-5);
+  }
+
   .origem {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-3);
@@ -465,5 +657,19 @@
     padding: var(--via-space-3) 0 0;
     border-top: 1px solid var(--via-accent-hairline);
     border-left: 0;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .mesaCriacao {
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.45fr);
+  }
+
+  .retorno {
+    padding: var(--via-space-5);
+  }
+
+  .retorno h3 {
+    font-size: var(--via-fs-h3);
   }
 }
