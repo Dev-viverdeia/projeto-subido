@@ -77,6 +77,7 @@ export async function produzirLeituraSobral({
 }
 
 export function direcaoDaMensagem(leitura: LeituraSobral): Json {
+  const oportunidade = leitura.sinais.foco;
   return {
     etapa: leitura.etapa,
     diagnostico: leitura.plano.diagnostico,
@@ -84,6 +85,15 @@ export function direcaoDaMensagem(leitura: LeituraSobral): Json {
     proximo_passo: leitura.plano.proximoPasso as unknown as Json,
     acoes: leitura.plano.acoes as unknown as Json,
     gerado_em: leitura.plano.geradoEm,
+    contexto_acao: oportunidade
+      ? {
+          oportunidade_id: oportunidade.oportunidadeId,
+          empresa: oportunidade.empresa,
+          acao_sugerida: leitura.plano.proximoPasso.titulo,
+          acao_atual: oportunidade.proximaAcao,
+          prazo_atual: oportunidade.proximaAcaoEm,
+        }
+      : null,
   };
 }
 

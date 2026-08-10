@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Target } from 'lucide-react';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
+import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
 import styles from './Mensagens.module.css';
 
 /**
@@ -12,7 +13,13 @@ import styles from './Mensagens.module.css';
  * por POSIÇÃO e cor sólida, sem avatar: numa conversa de duas vozes, avatar é
  * mobília.
  */
-export function Mensagens({ mensagens }: { mensagens: MensagemDoConsultor[] }) {
+export function Mensagens({
+  mensagens,
+  modoPreview = false,
+}: {
+  mensagens: MensagemDoConsultor[];
+  modoPreview?: boolean;
+}) {
   return (
     <ol className={styles.lista}>
       {mensagens.map((m) => (
@@ -32,11 +39,27 @@ export function Mensagens({ mensagens }: { mensagens: MensagemDoConsultor[] }) {
                 </div>
                 <strong>{m.direcao.proximo_passo.titulo}</strong>
                 <p>{m.direcao.proximo_passo.evidencia}</p>
-                <Link href={m.direcao.proximo_passo.destino} className={styles.direcaoAcao}>
-                  Executar próximo passo
+                <Link
+                  href={
+                    m.direcao.contexto_acao
+                      ? `/crm/${m.direcao.contexto_acao.oportunidade_id}`
+                      : m.direcao.proximo_passo.destino
+                  }
+                  className={styles.direcaoAcao}
+                >
+                  {m.direcao.contexto_acao ? 'Ver oportunidade' : 'Executar próximo passo'}
                   <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
                 </Link>
               </aside>
+            ) : null}
+
+            {m.direcao?.contexto_acao ? (
+              <ConfirmarAcaoCrm
+                mensagemId={m.id}
+                contexto={m.direcao.contexto_acao}
+                confirmada={m.acaoConfirmada}
+                modoPreview={modoPreview}
+              />
             ) : null}
 
             {/* Projeto citado vira caminho de um clique. Detectado pelo Route

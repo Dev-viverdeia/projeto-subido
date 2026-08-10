@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 import { hashDoContexto, obterSinaisSobral } from './contexto';
 import {
+  AcaoConfirmadaCrmSchema,
   criarPlanoBase,
   DirecaoMensagemSchema,
   PlanoSobralSchema,
@@ -39,6 +40,7 @@ export type MensagemDoConsultor = {
   conteudo: string;
   cartoes: CartaoDeSolucao[];
   direcao: DirecaoMensagem | null;
+  acaoConfirmada: z.infer<typeof AcaoConfirmadaCrmSchema> | null;
   modelo: string | null;
   criadoEm: string;
 };
@@ -122,7 +124,9 @@ export const obterConversa = cache(
 
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
-      .select('id, papel, conteudo, cartoes, direcao, modelo, criado_em')
+      .select(
+        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em)',
+      )
       .eq('thread_id', id)
       .order('criado_em')
       .limit(200);
@@ -140,12 +144,14 @@ export const obterConversa = cache(
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
         const cartoes = Cartoes.safeParse(m.cartoes);
         const direcao = DirecaoMensagemSchema.safeParse(m.direcao);
+        const acaoConfirmada = AcaoConfirmadaCrmSchema.safeParse(m.sobral_acoes_crm);
         return {
           id: m.id,
           papel: m.papel as 'usuario' | 'consultor',
           conteudo: m.conteudo,
           cartoes: cartoes.success ? cartoes.data : [],
           direcao: direcao.success ? direcao.data : null,
+          acaoConfirmada: acaoConfirmada.success ? acaoConfirmada.data : null,
           modelo: m.modelo,
           criadoEm: m.criado_em,
         };

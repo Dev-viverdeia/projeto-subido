@@ -1845,6 +1845,51 @@ export type Database = {
           },
         ]
       }
+      sobral_acoes_crm: {
+        Row: {
+          acao: string
+          atualizado_em: string
+          confirmada_em: string
+          dono: string
+          mensagem_id: string
+          oportunidade_id: string
+          quando: string | null
+        }
+        Insert: {
+          acao: string
+          atualizado_em?: string
+          confirmada_em?: string
+          dono: string
+          mensagem_id: string
+          oportunidade_id: string
+          quando?: string | null
+        }
+        Update: {
+          acao?: string
+          atualizado_em?: string
+          confirmada_em?: string
+          dono?: string
+          mensagem_id?: string
+          oportunidade_id?: string
+          quando?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sobral_acoes_crm_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: true
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sobral_acoes_crm_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sobral_planos: {
         Row: {
           acoes: Json
@@ -2137,6 +2182,10 @@ export type Database = {
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }
         Returns: number
+      }
+      sobral_confirmar_acao_crm: {
+        Args: { p_acao: string; p_mensagem: string; p_quando?: string }
+        Returns: boolean
       }
     }
     Enums: {

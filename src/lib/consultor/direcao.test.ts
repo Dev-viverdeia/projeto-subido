@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   criarPlanoBase,
   detectarEtapaSobral,
+  DirecaoMensagemSchema,
   PlanoSobralSchema,
   SinaisSobralSchema,
   type SinaisSobral,
@@ -76,5 +77,64 @@ describe('criarPlanoBase', () => {
     expect(PlanoSobralSchema.safeParse(plano).success).toBe(true);
     expect(plano.acoes).toHaveLength(3);
     expect(plano.proximoPasso).toEqual(plano.acoes[0]);
+  });
+});
+
+describe('DirecaoMensagemSchema', () => {
+  const base = {
+    etapa: 'vender',
+    diagnostico: 'A proposta existe e ainda depende de uma decisão explícita do cliente.',
+    foco: 'Conduzir a decisão do cliente',
+    proximo_passo: {
+      titulo: 'Confirmar decisor e data da decisão',
+      detalhe: 'Revise o escopo com quem decide e combine quando a resposta será dada.',
+      evidencia: 'Decisor e data registrados na oportunidade.',
+      destino: '/crm',
+    },
+    acoes: [
+      {
+        titulo: 'Confirmar decisor e data da decisão',
+        detalhe: 'Revise o escopo com quem decide e combine quando a resposta será dada.',
+        evidencia: 'Decisor e data registrados na oportunidade.',
+        destino: '/crm',
+      },
+    ],
+    gerado_em: '2026-08-10T18:00:00.000Z',
+  } as const;
+
+  it('preserva conversas antigas sem contexto de confirmação', () => {
+    expect(DirecaoMensagemSchema.safeParse(base).success).toBe(true);
+  });
+
+  it('valida o lead original da ação sugerida', () => {
+    const resultado = DirecaoMensagemSchema.safeParse({
+      ...base,
+      contexto_acao: {
+        oportunidade_id: '11111111-1111-4111-8111-111111111111',
+        empresa: 'Clínica Aurora',
+        acao_sugerida: 'Confirmar decisor e data da decisão',
+        acao_atual: null,
+        prazo_atual: null,
+      },
+    });
+
+    expect(resultado.success).toBe(true);
+    if (!resultado.success) return;
+    expect(resultado.data.contexto_acao?.empresa).toBe('Clínica Aurora');
+  });
+
+  it('rejeita uma confirmação sem oportunidade válida', () => {
+    expect(
+      DirecaoMensagemSchema.safeParse({
+        ...base,
+        contexto_acao: {
+          oportunidade_id: 'lead-atual',
+          empresa: 'Clínica Aurora',
+          acao_sugerida: 'Confirmar decisor e data da decisão',
+          acao_atual: null,
+          prazo_atual: null,
+        },
+      }).success,
+    ).toBe(false);
   });
 });

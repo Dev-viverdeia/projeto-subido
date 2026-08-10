@@ -41,6 +41,24 @@ export const RespostaEstruturadaSobralSchema = z.object({
 
 export type RespostaEstruturadaSobral = z.infer<typeof RespostaEstruturadaSobralSchema>;
 
+export const ContextoAcaoCrmSchema = z.object({
+  oportunidade_id: z.uuid(),
+  empresa: z.string().trim().min(1).max(160),
+  acao_sugerida: z.string().trim().min(3).max(500),
+  acao_atual: z.string().trim().max(500).nullable(),
+  prazo_atual: z.string().nullable(),
+});
+
+export type ContextoAcaoCrm = z.infer<typeof ContextoAcaoCrmSchema>;
+
+export const AcaoConfirmadaCrmSchema = z.object({
+  acao: z.string().trim().min(3).max(500),
+  quando: z.string().nullable(),
+  confirmada_em: z.string(),
+});
+
+export type AcaoConfirmadaCrm = z.infer<typeof AcaoConfirmadaCrmSchema>;
+
 export const DirecaoMensagemSchema = z.object({
   etapa: EtapaSobralSchema,
   diagnostico: z.string().trim().min(20).max(1200),
@@ -48,6 +66,7 @@ export const DirecaoMensagemSchema = z.object({
   proximo_passo: AcaoSobralSchema,
   acoes: z.array(AcaoSobralSchema).min(1).max(3),
   gerado_em: z.string(),
+  contexto_acao: ContextoAcaoCrmSchema.nullable().optional(),
 });
 
 export type DirecaoMensagem = z.infer<typeof DirecaoMensagemSchema>;
