@@ -16,10 +16,12 @@ export function EntregaCliente({
   projetoId,
   tarefa,
   portalAtivo,
+  aceiteFinal = false,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
   portalAtivo: boolean;
+  aceiteFinal?: boolean;
 }) {
   const [estado, acao, pendente] = useActionState(prepararEntregaCliente, INICIAL);
   const concluida = tarefa.status === 'concluida';
@@ -28,14 +30,22 @@ export function EntregaCliente({
   if (!concluida && tarefa.clienteStatus === 'nao_solicitada') return null;
 
   return (
-    <section className={styles.entrega} data-status={tarefa.clienteStatus}>
+    <section
+      className={styles.entrega}
+      data-status={tarefa.clienteStatus}
+      data-final={aceiteFinal || undefined}
+    >
       <header>
         <span className={styles.icone}>
           <ShieldCheck size={17} aria-hidden="true" />
         </span>
         <div>
-          <p>Apresentação ao cliente</p>
-          <h2>{ROTULO_STATUS_CLIENTE[tarefa.clienteStatus]}</h2>
+          <p>{aceiteFinal ? 'Encerramento do projeto' : 'Apresentação ao cliente'}</p>
+          <h2>
+            {aceiteFinal && tarefa.clienteStatus === 'nao_solicitada'
+              ? 'Aceite final pronto para envio'
+              : ROTULO_STATUS_CLIENTE[tarefa.clienteStatus]}
+          </h2>
         </div>
         <span className={styles.selo}>{portalAtivo ? 'Portal ativo' : 'Portal privado'}</span>
       </header>
@@ -60,7 +70,10 @@ export function EntregaCliente({
           )}
           {decidida && (
             <span>
-              <Check size={14} aria-hidden="true" /> Confirmação registrada no histórico
+              <Check size={14} aria-hidden="true" />{' '}
+              {aceiteFinal
+                ? 'Projeto encerrado com aceite do cliente'
+                : 'Confirmação registrada no histórico'}
             </span>
           )}
         </div>
@@ -74,7 +87,11 @@ export function EntregaCliente({
               name="nota"
               defaultValue={tarefa.clienteNota ?? ''}
               maxLength={4000}
-              placeholder="Explique o que foi entregue, como validar e o que muda a partir daqui."
+              placeholder={
+                aceiteFinal
+                  ? 'Resuma o resultado entregue, os materiais finais e como a operação continua.'
+                  : 'Explique o que foi entregue, como validar e o que muda a partir daqui.'
+              }
             />
           </label>
           <label>
@@ -89,7 +106,9 @@ export function EntregaCliente({
           </label>
 
           <p className={styles.privacidade}>
-            Sua evidência interna continua privada. Só estes dois campos aparecem no portal.
+            {aceiteFinal
+              ? 'O aceite do cliente conclui formalmente o projeto. Sua evidência interna continua privada.'
+              : 'Sua evidência interna continua privada. Só estes dois campos aparecem no portal.'}
           </p>
 
           {estado.erro && <p role="alert">{estado.erro}</p>}
@@ -107,7 +126,8 @@ export function EntregaCliente({
                 disabled={pendente || !portalAtivo}
                 className={styles.enviar}
               >
-                <Send size={14} aria-hidden="true" /> Solicitar aprovação
+                <Send size={14} aria-hidden="true" />{' '}
+                {aceiteFinal ? 'Solicitar aceite final' : 'Solicitar aprovação'}
               </button>
             ) : (
               <span>Conclua os ajustes para reenviar.</span>

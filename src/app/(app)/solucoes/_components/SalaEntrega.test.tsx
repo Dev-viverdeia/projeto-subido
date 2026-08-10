@@ -170,4 +170,29 @@ describe('SalaEntrega', () => {
     expect(screen.getAllByText('Enviar os acessos combinados na call')).toHaveLength(2);
     expect(tarefaAtual).toBeInTheDocument();
   });
+
+  it('transforma a última entrega concluída em aceite final do projeto', async () => {
+    const user = userEvent.setup();
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 3,
+          total: 3,
+          status: 'em_validacao',
+          portalAtivo: true,
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            status: 'concluida' as const,
+            evidencia: tarefa.evidencia || 'Entrega comprovada.',
+          })),
+        }}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /Entregar/ }));
+
+    expect(screen.getByText('Aceite final pronto para envio')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Solicitar aceite final/i })).toBeVisible();
+  });
 });

@@ -80,5 +80,22 @@ describe('PortalProjeto', () => {
       '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
     );
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
+    const decisao = screen.getByRole('heading', { name: /1 decisão espera por você/i });
+    const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
+    expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('apresenta o último aceite como encerramento formal do projeto', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{ ...PROJETO, status: 'em_validacao', feitas: 2 }}
+      />,
+    );
+
+    expect(screen.getByText('Aceite final do projeto')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Aprovar e concluir/i })).toBeVisible();
   });
 });

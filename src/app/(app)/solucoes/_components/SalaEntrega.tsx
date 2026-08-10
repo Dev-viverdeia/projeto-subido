@@ -75,6 +75,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     faseAtual?.tarefas[0] ??
     null;
   const percentual = projeto.total ? Math.round((projeto.feitas / projeto.total) * 100) : 0;
+  const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
 
   function abrirFase(id: string) {
     const nova = fases.find((fase) => fase.id === id);
@@ -172,6 +173,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
               projetoId={projeto.id}
               tarefa={tarefaAtual}
               portalAtivo={projeto.portalAtivo}
+              aceiteFinal={tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
             />
           ) : (
             <div className={styles.semTarefa}>
@@ -278,10 +280,12 @@ function TarefaEmFoco({
   projetoId,
   tarefa,
   portalAtivo,
+  aceiteFinal,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
   portalAtivo: boolean;
+  aceiteFinal: boolean;
 }) {
   const [estado, acao, pendente] = useActionState(atualizarTarefaProjeto, ESTADO_INICIAL);
 
@@ -368,7 +372,12 @@ function TarefaEmFoco({
           </div>
         </form>
       </article>
-      <EntregaCliente projetoId={projetoId} tarefa={tarefa} portalAtivo={portalAtivo} />
+      <EntregaCliente
+        projetoId={projetoId}
+        tarefa={tarefa}
+        portalAtivo={portalAtivo}
+        aceiteFinal={aceiteFinal}
+      />
     </>
   );
 }

@@ -8,6 +8,7 @@ import {
   Files,
   LockKeyhole,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
@@ -62,11 +63,13 @@ export function PortalProjeto({
     }
     return lista;
   }, []);
+  const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const aprovacoes = projeto.tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando');
   const compartilhadas = projeto.tarefas.filter((tarefa) =>
     ['aguardando', 'aprovada', 'ajustes'].includes(tarefa.clienteStatus),
   );
   const faseAtual = fases.find((fase) => fase.feitas < fase.total) ?? fases.at(-1) ?? null;
+  const concluido = projeto.status === 'concluido';
 
   return (
     <main className={styles.pagina}>
@@ -79,7 +82,58 @@ export function PortalProjeto({
       </header>
 
       <div className={styles.canvas}>
-        <section className={styles.hero}>
+        <section className={styles.centralDecisoes} aria-labelledby="decisoes-titulo">
+          <header>
+            <div className={styles.iconeDecisao} data-pendente={aprovacoes.length > 0 || undefined}>
+              {concluido ? (
+                <Sparkles size={20} />
+              ) : aprovacoes.length ? (
+                <Clock3 size={20} />
+              ) : (
+                <Check size={20} />
+              )}
+            </div>
+            <div>
+              <p>Sua próxima ação</p>
+              <h2 id="decisoes-titulo">
+                {concluido
+                  ? 'Projeto entregue e aprovado.'
+                  : aprovacoes.length
+                    ? `${aprovacoes.length} ${aprovacoes.length === 1 ? 'decisão espera' : 'decisões esperam'} por você.`
+                    : 'Tudo em dia por aqui.'}
+              </h2>
+              <span>
+                {concluido
+                  ? 'O aceite final foi registrado. Os materiais continuam disponíveis neste portal.'
+                  : aprovacoes.length
+                    ? 'Revise o que foi entregue e confirme ou peça um ajuste em poucos minutos.'
+                    : 'Você não precisa fazer nada agora. Avisaremos quando uma validação estiver pronta.'}
+              </span>
+            </div>
+          </header>
+
+          {aprovacoes.length ? (
+            <div className={styles.listaAprovacoes}>
+              {aprovacoes.map((tarefa) => (
+                <AprovacaoCliente
+                  key={tarefa.id}
+                  codigo={codigo}
+                  tarefa={tarefa}
+                  aceiteFinal={tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.estadoDecisao}>
+              <span>
+                {concluido ? 'Aceite final registrado' : `Agora: ${faseAtual?.titulo ?? 'Entrega'}`}
+              </span>
+              <strong>{concluido ? projeto.titulo : projeto.objetivo}</strong>
+            </div>
+          )}
+        </section>
+
+        <section className={styles.hero} data-concluido={concluido || undefined}>
           <div className={styles.heroTexto}>
             <p>Projeto em parceria com {projeto.empresa}</p>
             <h1>{projeto.titulo}</h1>
@@ -103,7 +157,7 @@ export function PortalProjeto({
 
           <div className={styles.progressoHero}>
             <span>{percentual}%</span>
-            <strong>do projeto concluído</strong>
+            <strong>{concluido ? 'entregue e aprovado' : 'do projeto concluído'}</strong>
             <div aria-hidden="true">
               <i style={{ transform: `scaleX(${percentual / 100})` }} />
             </div>
@@ -113,168 +167,136 @@ export function PortalProjeto({
           </div>
         </section>
 
-        <section className={styles.momento}>
-          <div>
-            <p>Momento atual</p>
-            <h2>{faseAtual?.titulo ?? 'Entrega concluída'}</h2>
-          </div>
-          <blockquote>{projeto.objetivo}</blockquote>
+        <div className={styles.painel}>
+          <section className={styles.andamento} aria-labelledby="andamento-titulo">
+            <header>
+              <div>
+                <p>Visão do trabalho</p>
+                <h2 id="andamento-titulo">Da descoberta à entrega.</h2>
+              </div>
+              <span>Atualizado em tempo real</span>
+            </header>
+
+            <ol>
+              {fases.map((fase, indice) => {
+                const completa = fase.feitas === fase.total;
+                const ativa = !concluido && fase.id === faseAtual?.id;
+                return (
+                  <li
+                    key={fase.id}
+                    data-completa={completa || undefined}
+                    data-ativa={ativa || undefined}
+                  >
+                    <span>
+                      {completa ? <Check size={14} /> : String(indice + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <strong>{fase.titulo}</strong>
+                      <small>
+                        {fase.feitas}/{fase.total} marcos concluídos
+                      </small>
+                    </div>
+                    {ativa && <em>Agora</em>}
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+
+          <section className={styles.biblioteca} aria-labelledby="entregas-titulo">
+            <header>
+              <p>Histórico compartilhado</p>
+              <h2 id="entregas-titulo">Entregas do projeto</h2>
+            </header>
+
+            {compartilhadas.length ? (
+              <ol>
+                {compartilhadas.map((tarefa) => (
+                  <li key={tarefa.id} data-status={tarefa.clienteStatus}>
+                    <span className={styles.marcaEntrega}>
+                      {tarefa.clienteStatus === 'aprovada' ? (
+                        <Check size={15} />
+                      ) : tarefa.clienteStatus === 'aguardando' ? (
+                        <Clock3 size={15} />
+                      ) : (
+                        <CircleDot size={15} />
+                      )}
+                    </span>
+                    <div>
+                      <small>{tarefa.faseTitulo}</small>
+                      <strong>{tarefa.titulo}</strong>
+                      {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
+                    </div>
+                    {tarefa.entregavelUrl && (
+                      <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
+                        Abrir <ArrowUpRight size={14} />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <div className={styles.vazio}>
+                <FileCheck2 size={20} aria-hidden="true" />
+                <p>A primeira entrega aparecerá aqui assim que estiver pronta para você.</p>
+              </div>
+            )}
+          </section>
+        </div>
+
+        <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
+          <header>
+            <div>
+              <p>Materiais liberados</p>
+              <h2 id="arquivos-titulo">Arquivos do projeto</h2>
+            </div>
+            <span>
+              <ShieldCheck size={14} /> Versões aprovadas para você
+            </span>
+          </header>
+
+          {projeto.arquivos.length ? (
+            <ol>
+              {projeto.arquivos.map((arquivo) => {
+                const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
+                return (
+                  <li key={arquivo.id}>
+                    <span className={styles.iconeArquivo}>
+                      <Files size={18} aria-hidden="true" />
+                    </span>
+                    <div>
+                      <small>
+                        {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
+                      </small>
+                      <strong>{arquivo.titulo}</strong>
+                      {arquivo.descricao && <p>{arquivo.descricao}</p>}
+                      <em>
+                        {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
+                        {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
+                      </em>
+                    </div>
+                    <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
+                      <Download size={15} /> Baixar
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <div className={styles.vazioArquivo}>
+              <Files size={20} aria-hidden="true" />
+              <p>Os arquivos liberados para download aparecerão aqui.</p>
+            </div>
+          )}
         </section>
 
-        <div className={styles.colunas}>
-          <div className={styles.principal}>
-            <section className={styles.andamento} aria-labelledby="andamento-titulo">
-              <header>
-                <div>
-                  <p>Visão do trabalho</p>
-                  <h2 id="andamento-titulo">Da descoberta à entrega.</h2>
-                </div>
-                <span>Atualizado em tempo real</span>
-              </header>
-
-              <ol>
-                {fases.map((fase, indice) => {
-                  const completa = fase.feitas === fase.total;
-                  const ativa = fase.id === faseAtual?.id;
-                  return (
-                    <li
-                      key={fase.id}
-                      data-completa={completa || undefined}
-                      data-ativa={ativa || undefined}
-                    >
-                      <span>
-                        {completa ? <Check size={14} /> : String(indice + 1).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <strong>{fase.titulo}</strong>
-                        <small>
-                          {fase.feitas}/{fase.total} marcos concluídos
-                        </small>
-                      </div>
-                      {ativa && <em>Agora</em>}
-                    </li>
-                  );
-                })}
-              </ol>
-            </section>
-
-            <section className={styles.biblioteca} aria-labelledby="entregas-titulo">
-              <header>
-                <p>Histórico compartilhado</p>
-                <h2 id="entregas-titulo">Entregas do projeto</h2>
-              </header>
-
-              {compartilhadas.length ? (
-                <ol>
-                  {compartilhadas.map((tarefa) => (
-                    <li key={tarefa.id} data-status={tarefa.clienteStatus}>
-                      <span className={styles.marcaEntrega}>
-                        {tarefa.clienteStatus === 'aprovada' ? (
-                          <Check size={15} />
-                        ) : tarefa.clienteStatus === 'aguardando' ? (
-                          <Clock3 size={15} />
-                        ) : (
-                          <CircleDot size={15} />
-                        )}
-                      </span>
-                      <div>
-                        <small>{tarefa.faseTitulo}</small>
-                        <strong>{tarefa.titulo}</strong>
-                        {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
-                      </div>
-                      {tarefa.entregavelUrl && (
-                        <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
-                          Abrir <ArrowUpRight size={14} />
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <div className={styles.vazio}>
-                  <FileCheck2 size={20} aria-hidden="true" />
-                  <p>A primeira entrega aparecerá aqui assim que estiver pronta para você.</p>
-                </div>
-              )}
-            </section>
-
-            <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
-              <header>
-                <div>
-                  <p>Materiais liberados</p>
-                  <h2 id="arquivos-titulo">Arquivos do projeto</h2>
-                </div>
-                <span>
-                  <ShieldCheck size={14} /> Versões aprovadas para você
-                </span>
-              </header>
-
-              {projeto.arquivos.length ? (
-                <ol>
-                  {projeto.arquivos.map((arquivo) => {
-                    const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
-                    return (
-                      <li key={arquivo.id}>
-                        <span className={styles.iconeArquivo}>
-                          <Files size={18} aria-hidden="true" />
-                        </span>
-                        <div>
-                          <small>
-                            {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
-                          </small>
-                          <strong>{arquivo.titulo}</strong>
-                          {arquivo.descricao && <p>{arquivo.descricao}</p>}
-                          <em>
-                            {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
-                            {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
-                          </em>
-                        </div>
-                        <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
-                          <Download size={15} /> Baixar
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ol>
-              ) : (
-                <div className={styles.vazioArquivo}>
-                  <Files size={20} aria-hidden="true" />
-                  <p>Os arquivos liberados para download aparecerão aqui.</p>
-                </div>
-              )}
-            </section>
+        <section className={styles.seguranca}>
+          <LockKeyhole size={16} aria-hidden="true" />
+          <div>
+            <strong>Um portal, somente o necessário.</strong>
+            <p>Notas internas, CRM e evidências de trabalho não aparecem neste link.</p>
           </div>
-
-          <aside className={styles.lateral}>
-            <section className={styles.caixaAprovacoes}>
-              <header>
-                <p>Sua participação</p>
-                <h2>{aprovacoes.length ? 'Há uma decisão esperando.' : 'Tudo em dia por aqui.'}</h2>
-              </header>
-
-              {aprovacoes.length ? (
-                <div className={styles.listaAprovacoes}>
-                  {aprovacoes.map((tarefa) => (
-                    <AprovacaoCliente key={tarefa.id} codigo={codigo} tarefa={tarefa} />
-                  ))}
-                </div>
-              ) : (
-                <div className={styles.semAprovacao}>
-                  <Check size={18} aria-hidden="true" />
-                  <p>Quando uma entrega precisar do seu aceite, ela aparecerá neste espaço.</p>
-                </div>
-              )}
-            </section>
-
-            <section className={styles.seguranca}>
-              <LockKeyhole size={16} aria-hidden="true" />
-              <div>
-                <strong>Um portal, somente o necessário.</strong>
-                <p>Notas internas, CRM e evidências de trabalho não aparecem neste link.</p>
-              </div>
-            </section>
-          </aside>
-        </div>
+        </section>
       </div>
 
       <footer className={styles.rodape}>

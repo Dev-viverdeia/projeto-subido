@@ -6,6 +6,16 @@
   box-shadow: var(--app-elev-1-shadow);
 }
 
+.entrega[data-final] {
+  border-color: rgba(0, 174, 239, 0.34);
+  box-shadow: 0 16px 38px rgba(12, 27, 58, 0.09);
+}
+
+.entrega[data-final] > header {
+  background:
+    radial-gradient(circle at 100% 0, rgba(0, 174, 239, 0.1), transparent 18rem), var(--via-bg-2);
+}
+
 .entrega > header {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

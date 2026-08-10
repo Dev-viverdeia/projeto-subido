@@ -31,10 +31,10 @@ const PROJETO: ProjetoPortalCliente = {
   resumo: 'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp da clínica.',
   objetivo:
     'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
-  status: 'em_execucao',
+  status: 'em_validacao',
   inicioEm: '2026-08-05T12:00:00.000Z',
   prazoEm: '2026-08-28T12:00:00.000Z',
-  feitas: 2,
+  feitas: 7,
   total: 7,
   arquivos: [
     {
@@ -84,11 +84,12 @@ const PROJETO: ProjetoPortalCliente = {
       entregavel: 'Matriz de limites e escalonamento.',
       ordem: 2,
       status: 'concluida',
-      clienteStatus: 'aguardando',
+      clienteStatus: 'aprovada',
       clienteNota:
         'A matriz separa o que a IA pode responder e os cenários que precisam da recepção.',
       entregavelUrl: 'https://example.com/matriz-limites',
       solicitadoEm: '2026-08-09T09:00:00.000Z',
+      respondidoEm: '2026-08-09T11:00:00.000Z',
     }),
     tarefa({
       id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
@@ -97,7 +98,7 @@ const PROJETO: ProjetoPortalCliente = {
       titulo: 'Montar a base aprovada',
       entregavel: 'Base de conhecimento versionada.',
       ordem: 1001,
-      status: 'em_andamento',
+      status: 'concluida',
       clienteStatus: 'nao_solicitada',
     }),
     tarefa({
@@ -107,7 +108,7 @@ const PROJETO: ProjetoPortalCliente = {
       titulo: 'Configurar o canal oficial',
       entregavel: 'Canal de teste conectado.',
       ordem: 1002,
-      status: 'pendente',
+      status: 'concluida',
       clienteStatus: 'nao_solicitada',
     }),
     tarefa({
@@ -117,7 +118,7 @@ const PROJETO: ProjetoPortalCliente = {
       titulo: 'Construir o agente e o handoff',
       entregavel: 'Agente com handoff humano.',
       ordem: 2001,
-      status: 'pendente',
+      status: 'concluida',
       clienteStatus: 'nao_solicitada',
     }),
     tarefa({
@@ -127,7 +128,7 @@ const PROJETO: ProjetoPortalCliente = {
       titulo: 'Rodar vinte cenários',
       entregavel: 'Relatório de testes com evidências.',
       ordem: 3001,
-      status: 'pendente',
+      status: 'concluida',
       clienteStatus: 'nao_solicitada',
     }),
     tarefa({
@@ -137,8 +138,12 @@ const PROJETO: ProjetoPortalCliente = {
       titulo: 'Entregar operação e indicadores',
       entregavel: 'Manual e agenda de acompanhamento.',
       ordem: 4001,
-      status: 'pendente',
-      clienteStatus: 'nao_solicitada',
+      status: 'concluida',
+      clienteStatus: 'aguardando',
+      clienteNota:
+        'A operação está ativa, a equipe foi treinada e os indicadores de acompanhamento estão organizados neste portal.',
+      entregavelUrl: 'https://example.com/entrega-final',
+      solicitadoEm: '2026-08-10T12:00:00.000Z',
     }),
   ],
 };

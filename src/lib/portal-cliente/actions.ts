@@ -10,6 +10,7 @@ const DecisaoSchema = z
     tarefa: z.uuid(),
     decisao: z.enum(['aprovada', 'ajustes']),
     comentario: z.string().trim().max(2000),
+    final: z.enum(['sim', 'nao']).default('nao'),
   })
   .refine((valor) => valor.decisao !== 'ajustes' || valor.comentario.length >= 5, {
     path: ['comentario'],
@@ -27,6 +28,7 @@ export async function decidirEntregaCliente(
     tarefa: formData.get('tarefa'),
     decisao: formData.get('decisao'),
     comentario: formData.get('comentario') ?? '',
+    final: formData.get('final') ?? 'nao',
   });
 
   if (!validacao.success) {
@@ -51,7 +53,9 @@ export async function decidirEntregaCliente(
     return {
       sucesso:
         validacao.data.decisao === 'aprovada'
-          ? 'Entrega aprovada. Obrigado pela confirmação.'
+          ? validacao.data.final === 'sim'
+            ? 'Aceite final registrado. O projeto foi concluído.'
+            : 'Entrega aprovada. Obrigado pela confirmação.'
           : 'Pedido de ajuste enviado ao responsável pelo projeto.',
     };
   } catch (erro) {
