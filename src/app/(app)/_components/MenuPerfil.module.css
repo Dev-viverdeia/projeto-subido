@@ -3,37 +3,38 @@
   flex-shrink: 0;
 }
 
-/* --- Gatilho ------------------------------------------------------------------ */
-/* Pill com moldura desde o repouso: sobre a barra de vidro, um gatilho sem
-   borda lia como texto solto. A hairline dá a ele corpo de CONTROLE — e o hover
-   só escurece a moldura, sem inventar preenchimento novo. */
 .gatilho {
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  min-height: 40px;
   padding: var(--via-space-1) var(--via-space-2_5) var(--via-space-1) var(--via-space-1);
-  background: var(--via-surface);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-surface) 92%, transparent);
   box-shadow: var(--via-shadow-xs);
   color: var(--via-text-body);
   font-size: var(--via-fs-sm);
-  /* Nunca 700 para dar destaque — a lei estética do projeto. */
   font-weight: var(--via-fw-medium);
   transition:
     background-color var(--via-t-fast),
-    border-color var(--via-t-fast);
+    border-color var(--via-t-fast),
+    box-shadow var(--via-t-fast);
 }
 
 .gatilho:hover,
 .gatilho[aria-expanded='true'] {
-  background: var(--via-bg-2);
   border-color: var(--via-navy-25);
+  background: var(--via-surface);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.gatilho:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
 }
 
 .nomeGatilho {
-  /* Nome longo não pode empurrar o cabeçalho. */
   max-width: 15ch;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,7 +43,6 @@
 
 .seta {
   color: var(--via-text-faint);
-  /* Só transform anima. Nunca height/width, nunca `transition: all`. */
   transition: transform var(--via-t-fast);
 }
 
@@ -50,63 +50,98 @@
   transform: rotate(180deg);
 }
 
-/* --- Painel ------------------------------------------------------------------- */
 .painel {
   position: absolute;
   top: calc(100% + var(--via-space-2));
   right: 0;
   z-index: var(--via-z-overlay);
-  min-width: 248px;
-
-  background: var(--via-surface);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-lg);
-  /* Sombra navy do sistema — a assinatura é vidro + atmosfera + sombra, não glow. */
-  box-shadow: var(--via-shadow-lg);
+  width: min(326px, calc(100vw - 32px));
   overflow: hidden;
-
-  animation: entrar 140ms ease-out;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-surface);
+  box-shadow: var(--via-shadow-lg);
+  animation: entrar 150ms ease-out;
 }
 
 @keyframes entrar {
   from {
     opacity: 0;
-    /* transform e opacity apenas: as duas únicas propriedades que o compositor
-       anima sem recalcular layout a cada frame. */
-    transform: translateY(-4px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .painel {
-    animation: none;
+    transform: translateY(-5px) scale(0.985);
   }
 }
 
 .identidade {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-hairline);
-  /* Um degrau de superfície separa identidade de ações sem precisar de régua. */
-  background: var(--via-bg-2);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in srgb, var(--via-white) 10%, transparent),
+      transparent 38%
+    ),
+    var(--via-navy);
+  color: var(--via-white);
+}
+
+.textosIdentidade {
+  min-width: 0;
+}
+
+.sobretitulo,
+.nome,
+.email {
+  display: block;
+}
+
+.sobretitulo {
+  color: color-mix(in srgb, var(--via-white) 52%, transparent);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
 }
 
 .nome {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--via-white);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .email {
-  font-size: var(--via-fs-xs);
-  /* Hierarquia por cor sólida, nunca por opacidade. */
-  color: var(--via-text-muted);
-  /* O e-mail é o texto mais largo do painel e não pode alargá-lo indefinidamente. */
   overflow: hidden;
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--via-white) 60%, transparent);
+  font-size: var(--via-fs-micro);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sincronizada {
+  grid-column: 1 / -1;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-1);
+  padding: 5px 9px;
+  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: color-mix(in srgb, var(--via-white) 72%, transparent);
+  font-family: var(--via-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
 }
 
 .itens {
@@ -114,40 +149,123 @@
 }
 
 .item {
+  position: relative;
+  width: 100%;
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: none;
+  color: var(--via-text-body);
+  text-align: left;
+  text-decoration: none;
+  transition:
+    background-color var(--via-t-fast),
+    border-color var(--via-t-fast);
+}
+
+.item:hover,
+.item[aria-current='page'] {
+  border-color: var(--via-border-soft);
+  background: var(--via-bg-2);
+}
+
+.item:focus-visible,
+.sair:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.iconeItem {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+}
+
+.item strong,
+.item small {
+  display: block;
+}
+
+.item strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+.item small {
+  margin-top: 2px;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.indicador {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.item[aria-current='page'] .indicador {
+  background: var(--via-navy);
+}
+
+.rodape {
+  padding: var(--via-space-2);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.sair {
+  width: 100%;
+  min-height: 42px;
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  width: 100%;
-  min-height: 40px;
   padding: var(--via-space-2) var(--via-space-3);
-
-  background: none;
   border: none;
-  border-radius: var(--via-radius-md);
-  color: var(--via-text-body);
+  border-radius: var(--app-radius-control);
+  background: none;
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   text-align: left;
-  text-decoration: none;
-  transition: background-color var(--via-t-fast);
+  transition:
+    background-color var(--via-t-fast),
+    color var(--via-t-fast);
 }
 
-.item:hover {
-  background: var(--via-bg-2);
+.sair:hover {
+  background: var(--via-surface);
   color: var(--via-text-primary);
 }
 
-.item svg {
-  color: var(--via-text-faint);
-  flex-shrink: 0;
+@media (max-width: 460px) {
+  .nomeGatilho {
+    max-width: 11ch;
+  }
+
+  .painel {
+    width: min(326px, calc(100vw - 24px));
+  }
 }
 
-.item:hover svg {
-  color: var(--via-text-muted);
-}
+@media (prefers-reduced-motion: reduce) {
+  .painel {
+    animation: none;
+  }
 
-/* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
-   zero): a box-shadow desta classe o apagava, e o foco ficava invisível.
-   Gatilho do menu de perfil — porta de saída da conta, alcançável só por teclado em leitor de tela. */
-.gatilho:focus-visible {
-  box-shadow: var(--app-ring);
+  .gatilho,
+  .seta,
+  .item,
+  .sair {
+    transition: none;
+  }
 }
