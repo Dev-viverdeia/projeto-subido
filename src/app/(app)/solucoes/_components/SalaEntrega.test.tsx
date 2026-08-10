@@ -161,10 +161,13 @@ describe('SalaEntrega', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('region', { name: 'O combinado segue com o cliente' }),
-    ).toBeInTheDocument();
+    const tarefaAtual = screen.getByRole('heading', { name: 'Montar a base', level: 2 });
+    const planoVivo = screen.getByRole('region', { name: 'O combinado segue com o cliente' });
+    expect(planoVivo).toBeInTheDocument();
+    expect(tarefaAtual.compareDocumentPosition(planoVivo) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
     expect(screen.getAllByText('Enviar os acessos combinados na call')).toHaveLength(2);
-    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeInTheDocument();
+    expect(tarefaAtual).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
 import type { ProjetoGuiado } from './ProjetoGuiado';
@@ -70,21 +70,26 @@ function montar() {
 }
 
 describe('Projeto guiado', () => {
-  it('mostra as cinco fases, a entrega e o próximo passo', () => {
+  it('mostra uma fase por vez e permite navegar pelas cinco etapas', async () => {
+    const user = userEvent.setup();
     montar();
-    for (const nome of ['Entender', 'Preparar', 'Construir', 'Validar', 'Entregar']) {
-      expect(screen.getByRole('heading', { level: 2, name: nome })).toBeDefined();
-    }
+
+    const navegacao = screen.getByRole('navigation', { name: 'Fases do projeto' });
+    expect(within(navegacao).getAllByRole('button')).toHaveLength(5);
+    expect(screen.getByRole('heading', { level: 2, name: 'Entender' })).toBeDefined();
+    expect(screen.queryByRole('heading', { level: 2, name: 'Preparar' })).toBeNull();
     expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
     expect(screen.getAllByText('Próximo passo').length).toBeGreaterThan(0);
     expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
       'aria-valuenow',
       '0',
     );
-    expect(screen.getByRole('link', { name: 'Ir para a próxima fase: Preparar' })).toHaveAttribute(
-      'href',
-      '#fase-preparar',
-    );
+
+    await user.click(within(navegacao).getByRole('button', { name: /Preparar/ }));
+    expect(screen.getByRole('heading', { level: 2, name: 'Preparar' })).toBeDefined();
+    expect(screen.queryByRole('heading', { level: 2, name: 'Entender' })).toBeNull();
+
+    await user.click(within(navegacao).getByRole('button', { name: /Entregar/ }));
     expect(screen.getByRole('link', { name: /Abrir kit de implementação/ })).toHaveAttribute(
       'href',
       '#kit-projeto',
@@ -95,8 +100,8 @@ describe('Projeto guiado', () => {
     const user = userEvent.setup();
     montar();
     await user.click(screen.getByRole('button', { name: 'Concluir: Mapear o cenário atual' }));
-    expect(screen.getByRole('button', { name: 'Reabrir: Mapear o cenário atual' })).toBeDefined();
     expect(screen.getByText('1 de 5 passos')).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: 'Preparar' })).toBeDefined();
   });
 
   it('leva a identidade do projeto ao Estúdio', () => {

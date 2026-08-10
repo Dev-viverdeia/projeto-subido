@@ -137,6 +137,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                 key={fase.id}
                 data-ativa={ativa || undefined}
                 data-completa={completa || undefined}
+                aria-current={ativa ? 'step' : undefined}
                 onClick={() => abrirFase(fase.id)}
               >
                 <span>{completa ? <Check size={13} /> : String(indice + 1).padStart(2, '0')}</span>
@@ -149,8 +150,6 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           })}
         </nav>
       </header>
-
-      <PlanoVivo projetoId={projeto.id} acoes={projeto.acoesPlano} />
 
       <div className={styles.corpo}>
         <main className={styles.operacao}>
@@ -263,6 +262,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           </section>
         </aside>
       </div>
+
+      <PlanoVivo projetoId={projeto.id} acoes={projeto.acoesPlano} />
 
       <CentralArquivos
         projetoId={projeto.id}

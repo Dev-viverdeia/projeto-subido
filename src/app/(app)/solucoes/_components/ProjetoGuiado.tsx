@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowDown,
@@ -55,12 +56,41 @@ export function ProjetoGuiado({
     fase.passos.map((passo) => ({ fase, passo, id: idPassoProjeto(slug, fase.id, passo.id) })),
   );
   const proximoPasso = passos.find(({ id }) => !progresso.etapas[id]) ?? null;
+  const [faseEscolhidaId, setFaseEscolhidaId] = useState<string | null>(null);
+  const faseAtivaId =
+    faseEscolhidaId ?? proximoPasso?.fase.id ?? projeto.roteiro.fases[0]?.id ?? '';
+  const faseAtiva =
+    projeto.roteiro.fases.find((fase) => fase.id === faseAtivaId) ??
+    projeto.roteiro.fases[0] ??
+    null;
+  const faseAtivaIndice = faseAtiva
+    ? projeto.roteiro.fases.findIndex((fase) => fase.id === faseAtiva.id)
+    : -1;
+  const faseAnterior =
+    faseAtivaIndice > 0 ? (projeto.roteiro.fases[faseAtivaIndice - 1] ?? null) : null;
+  const proximaFase =
+    faseAtivaIndice >= 0 ? (projeto.roteiro.fases[faseAtivaIndice + 1] ?? null) : null;
+
+  const abrirFase = (id: string, mover = false) => {
+    setFaseEscolhidaId(id);
+    if (!mover) return;
+    requestAnimationFrame(() => {
+      const alvo = document.getElementById(`fase-${id}`);
+      alvo?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      alvo?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    });
+  };
 
   const irAoProximo = () => {
     if (!proximoPasso) return;
-    const alvo = document.getElementById(`passo-${proximoPasso.fase.id}-${proximoPasso.passo.id}`);
-    alvo?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    alvo?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    setFaseEscolhidaId(proximoPasso.fase.id);
+    requestAnimationFrame(() => {
+      const alvo = document.getElementById(
+        `passo-${proximoPasso.fase.id}-${proximoPasso.passo.id}`,
+      );
+      alvo?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alvo?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    });
   };
 
   return (
@@ -117,7 +147,13 @@ export function ProjetoGuiado({
             const ids = fase.passos.map((passo) => idPassoProjeto(slug, fase.id, passo.id));
             const concluidos = contarEtapasFeitas(progresso, ids);
             return (
-              <a key={fase.id} href={`#fase-${fase.id}`}>
+              <button
+                type="button"
+                key={fase.id}
+                data-ativa={fase.id === faseAtiva?.id || undefined}
+                aria-current={fase.id === faseAtiva?.id ? 'step' : undefined}
+                onClick={() => abrirFase(fase.id)}
+              >
                 <span className={styles.faseNumero}>{String(indice + 1).padStart(2, '0')}</span>
                 <span className={styles.faseNome}>{fase.titulo}</span>
                 <span className={styles.faseEstado}>
@@ -127,7 +163,7 @@ export function ProjetoGuiado({
                     `${concluidos}/${ids.length}`
                   )}
                 </span>
-              </a>
+              </button>
             );
           })}
         </nav>
@@ -135,117 +171,143 @@ export function ProjetoGuiado({
 
       <div className={styles.corpo}>
         <main className={styles.principal}>
-          {videoUrl ? <VideoConteudo videoUrl={videoUrl} titulo={titulo} /> : null}
-
           <div className={styles.fases}>
-            {projeto.roteiro.fases.map((fase, faseIndice) => {
-              const ids = fase.passos.map((passo) => idPassoProjeto(slug, fase.id, passo.id));
-              const concluidos = contarEtapasFeitas(progresso, ids);
-              const completa = concluidos === ids.length;
-              const faseAnterior = projeto.roteiro.fases[faseIndice - 1] ?? null;
-              const proximaFase = projeto.roteiro.fases[faseIndice + 1] ?? null;
+            {faseAtiva
+              ? (() => {
+                  const ids = faseAtiva.passos.map((passo) =>
+                    idPassoProjeto(slug, faseAtiva.id, passo.id),
+                  );
+                  const concluidos = contarEtapasFeitas(progresso, ids);
+                  const completa = concluidos === ids.length;
 
-              return (
-                <section key={fase.id} id={`fase-${fase.id}`} className={styles.fase}>
-                  <header className={styles.faseCabecalho}>
-                    <div className={styles.faseMarcador} data-completa={completa || undefined}>
-                      {completa ? <Check size={18} /> : String(faseIndice + 1).padStart(2, '0')}
-                    </div>
-                    <div>
-                      <p>Fase {String(faseIndice + 1).padStart(2, '0')}</p>
-                      <h2>{fase.titulo}</h2>
-                      <span>{fase.objetivo}</span>
-                    </div>
-                    <em>
-                      {concluidos}/{ids.length}
-                    </em>
-                  </header>
+                  return (
+                    <section id={`fase-${faseAtiva.id}`} className={styles.fase}>
+                      <header className={styles.faseCabecalho}>
+                        <div className={styles.faseMarcador} data-completa={completa || undefined}>
+                          {completa ? (
+                            <Check size={18} />
+                          ) : (
+                            String(faseAtivaIndice + 1).padStart(2, '0')
+                          )}
+                        </div>
+                        <div>
+                          <p>Fase {String(faseAtivaIndice + 1).padStart(2, '0')}</p>
+                          <h2>{faseAtiva.titulo}</h2>
+                          <span>{faseAtiva.objetivo}</span>
+                        </div>
+                        <em>
+                          {concluidos}/{ids.length}
+                        </em>
+                      </header>
 
-                  <ol className={styles.passos}>
-                    {fase.passos.map((passo, passoIndice) => {
-                      const id = idPassoProjeto(slug, fase.id, passo.id);
-                      const concluido = Boolean(progresso.etapas[id]);
-                      const atual = proximoPasso?.id === id;
+                      <ol className={styles.passos}>
+                        {faseAtiva.passos.map((passo, passoIndice) => {
+                          const id = idPassoProjeto(slug, faseAtiva.id, passo.id);
+                          const concluido = Boolean(progresso.etapas[id]);
+                          const atual = proximoPasso?.id === id;
 
-                      return (
-                        <li
-                          key={passo.id}
-                          id={`passo-${fase.id}-${passo.id}`}
-                          className={styles.passo}
-                          data-concluido={concluido || undefined}
-                          data-atual={atual || undefined}
-                        >
+                          return (
+                            <li
+                              key={passo.id}
+                              id={`passo-${faseAtiva.id}-${passo.id}`}
+                              className={styles.passo}
+                              data-concluido={concluido || undefined}
+                              data-atual={atual || undefined}
+                            >
+                              <button
+                                type="button"
+                                className={styles.check}
+                                aria-pressed={concluido}
+                                aria-label={`${concluido ? 'Reabrir' : 'Concluir'}: ${passo.titulo}`}
+                                onClick={() => alternarEtapa(id, slug)}
+                              >
+                                {concluido ? <Check size={15} /> : passoIndice + 1}
+                              </button>
+
+                              <div className={styles.passoConteudo}>
+                                <div className={styles.passoTitulo}>
+                                  <h3>{passo.titulo}</h3>
+                                  {atual ? <span>Próximo passo</span> : null}
+                                </div>
+                                <p className={styles.acao}>{passo.acao}</p>
+                                <dl className={styles.evidencias}>
+                                  <div>
+                                    <dt>Pronto quando</dt>
+                                    <dd>{passo.concluidoQuando}</dd>
+                                  </div>
+                                  <div>
+                                    <dt>Você entrega</dt>
+                                    <dd>{passo.entregavel}</dd>
+                                  </div>
+                                </dl>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ol>
+
+                      <nav
+                        className={styles.navegacaoSequencial}
+                        aria-label={`Navegação da fase ${faseAtiva.titulo}`}
+                      >
+                        {faseAnterior ? (
                           <button
                             type="button"
-                            className={styles.check}
-                            aria-pressed={concluido}
-                            aria-label={`${concluido ? 'Reabrir' : 'Concluir'}: ${passo.titulo}`}
-                            onClick={() => alternarEtapa(id, slug)}
+                            aria-label={`Ir para a fase anterior: ${faseAnterior.titulo}`}
+                            onClick={() => abrirFase(faseAnterior.id, true)}
                           >
-                            {concluido ? <Check size={15} /> : passoIndice + 1}
+                            <ArrowLeft size={15} aria-hidden="true" />
+                            <span>
+                              <small>Fase anterior</small>
+                              {faseAnterior.titulo}
+                            </span>
                           </button>
+                        ) : (
+                          <span aria-hidden="true" />
+                        )}
 
-                          <div className={styles.passoConteudo}>
-                            <div className={styles.passoTitulo}>
-                              <h3>{passo.titulo}</h3>
-                              {atual ? <span>Próximo passo</span> : null}
-                            </div>
-                            <p className={styles.acao}>{passo.acao}</p>
-                            <dl className={styles.evidencias}>
-                              <div>
-                                <dt>Pronto quando</dt>
-                                <dd>{passo.concluidoQuando}</dd>
-                              </div>
-                              <div>
-                                <dt>Você entrega</dt>
-                                <dd>{passo.entregavel}</dd>
-                              </div>
-                            </dl>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ol>
-
-                  <nav
-                    className={styles.navegacaoSequencial}
-                    aria-label={`Navegação da fase ${fase.titulo}`}
-                  >
-                    {faseAnterior ? (
-                      <a
-                        href={`#fase-${faseAnterior.id}`}
-                        aria-label={`Ir para a fase anterior: ${faseAnterior.titulo}`}
-                      >
-                        <ArrowLeft size={15} aria-hidden="true" />
-                        <span>
-                          <small>Fase anterior</small>
-                          {faseAnterior.titulo}
-                        </span>
-                      </a>
-                    ) : (
-                      <span aria-hidden="true" />
-                    )}
-
-                    <a
-                      href={proximaFase ? `#fase-${proximaFase.id}` : '#kit-projeto'}
-                      data-proxima
-                      aria-label={
-                        proximaFase
-                          ? `Ir para a próxima fase: ${proximaFase.titulo}`
-                          : 'Abrir kit de implementação'
-                      }
-                    >
-                      <span>
-                        <small>{proximaFase ? 'Próxima fase' : 'Depois das fases'}</small>
-                        {proximaFase?.titulo ?? 'Abrir kit de implementação'}
-                      </span>
-                      <ArrowRight size={15} aria-hidden="true" />
-                    </a>
-                  </nav>
-                </section>
-              );
-            })}
+                        {proximaFase ? (
+                          <button
+                            type="button"
+                            data-proxima
+                            aria-label={`Ir para a próxima fase: ${proximaFase.titulo}`}
+                            onClick={() => abrirFase(proximaFase.id, true)}
+                          >
+                            <span>
+                              <small>Próxima fase</small>
+                              {proximaFase.titulo}
+                            </span>
+                            <ArrowRight size={15} aria-hidden="true" />
+                          </button>
+                        ) : (
+                          <a
+                            href="#kit-projeto"
+                            data-proxima
+                            aria-label="Abrir kit de implementação"
+                          >
+                            <span>
+                              <small>Depois das fases</small>
+                              Abrir kit de implementação
+                            </span>
+                            <ArrowRight size={15} aria-hidden="true" />
+                          </a>
+                        )}
+                      </nav>
+                    </section>
+                  );
+                })()
+              : null}
           </div>
+
+          {videoUrl ? (
+            <section className={styles.aulaApoio} aria-labelledby="aula-apoio-titulo">
+              <header>
+                <p>Conteúdo de apoio</p>
+                <h2 id="aula-apoio-titulo">Entenda o método antes de adaptar</h2>
+              </header>
+              <VideoConteudo videoUrl={videoUrl} titulo={titulo} />
+            </section>
+          ) : null}
 
           <section className={styles.kit} aria-labelledby="kit-projeto">
             <div className={styles.kitCabecalho}>

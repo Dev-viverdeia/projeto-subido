@@ -233,31 +233,41 @@
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.navegacaoFases a {
+.navegacaoFases button {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-2);
   min-height: 64px;
   padding-inline: clamp(14px, 2vw, 26px);
+  border: 0;
+  background: transparent;
   color: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
   transition:
     background-color var(--app-t-state),
     color var(--app-t-state);
 }
 
-.navegacaoFases a + a {
+.navegacaoFases button + button {
   border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.navegacaoFases a:hover,
-.navegacaoFases a:focus-visible {
+.navegacaoFases button:hover,
+.navegacaoFases button:focus-visible,
+.navegacaoFases button[data-ativa] {
   color: var(--via-white);
   background: rgba(255, 255, 255, 0.06);
 }
 
-.navegacaoFases a:focus-visible {
+.navegacaoFases button[data-ativa] {
+  box-shadow: inset 0 -3px 0 var(--via-accent);
+}
+
+.navegacaoFases button:focus-visible {
   outline: 2px solid var(--via-accent);
   outline-offset: -3px;
 }
@@ -296,9 +306,7 @@
 }
 
 .fases {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(56px, 7vw, 92px);
+  display: block;
 }
 
 .fase {
@@ -511,27 +519,33 @@
   padding-top: var(--via-space-4);
 }
 
-.navegacaoSequencial a {
+.navegacaoSequencial a,
+.navegacaoSequencial button {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
   min-width: 0;
   min-height: 48px;
   padding: var(--via-space-2) var(--via-space-3);
+  border: 0;
   border-radius: var(--app-radius-control);
+  background: transparent;
   color: var(--via-text-muted);
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
   transition:
     background-color var(--app-t-state),
     color var(--app-t-state);
 }
 
-.navegacaoSequencial a[data-proxima] {
+.navegacaoSequencial :is(a, button)[data-proxima] {
   justify-self: end;
   text-align: right;
 }
 
-.navegacaoSequencial a span {
+.navegacaoSequencial :is(a, button) span {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -540,7 +554,7 @@
   font-weight: 560;
 }
 
-.navegacaoSequencial a small {
+.navegacaoSequencial :is(a, button) small {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-weight: 400;
@@ -549,14 +563,43 @@
   color: var(--via-text-faint);
 }
 
-.navegacaoSequencial a:hover {
+.navegacaoSequencial :is(a, button):hover {
   background: var(--via-navy-04);
   color: var(--via-text-primary);
 }
 
-.navegacaoSequencial a:focus-visible {
+.navegacaoSequencial :is(a, button):focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+.aulaApoio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  padding-top: var(--app-gap-section);
+  border-top: 1px solid var(--via-border);
+}
+
+.aulaApoio header p,
+.aulaApoio header h2 {
+  margin: 0;
+}
+
+.aulaApoio header p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.aulaApoio header h2 {
+  margin-top: var(--via-space-1);
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
 }
 
 .kit {
@@ -692,7 +735,7 @@
   }
 }
 
-@media (max-width: 719px) {
+@media (max-width: 767px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -703,8 +746,7 @@
   }
 
   .navegacaoFases {
-    overflow-x: auto;
-    grid-template-columns: repeat(5, minmax(132px, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .retomadaHero {
@@ -722,7 +764,7 @@
   }
 }
 
-@media (max-width: 559px) {
+@media (max-width: 599px) {
   .hero {
     border-radius: var(--via-radius-lg);
   }
@@ -731,6 +773,15 @@
   .resultado,
   .retomadaHero {
     padding: var(--via-space-5);
+  }
+
+  .heroPrincipal h1 {
+    font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .resumo {
+    margin-top: var(--via-space-4);
+    font-size: var(--via-fs-sm);
   }
 
   .retomadaHero {
@@ -753,7 +804,7 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
-  .navegacaoFases a {
+  .navegacaoFases button {
     min-width: 0;
     min-height: 68px;
     grid-template-columns: auto auto;
@@ -821,11 +872,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .navegacaoFases a,
+  .navegacaoFases button,
   .check,
   .continuarHero,
   .progressoHero > span,
-  .navegacaoSequencial a {
+  .navegacaoSequencial a,
+  .navegacaoSequencial button {
     transition: none;
   }
 
