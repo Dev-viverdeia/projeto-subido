@@ -125,7 +125,7 @@ export const obterConversa = cache(
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
       .select(
-        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em)',
+        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em))',
       )
       .eq('thread_id', id)
       .order('criado_em')
@@ -144,7 +144,15 @@ export const obterConversa = cache(
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
         const cartoes = Cartoes.safeParse(m.cartoes);
         const direcao = DirecaoMensagemSchema.safeParse(m.direcao);
-        const acaoConfirmada = AcaoConfirmadaCrmSchema.safeParse(m.sobral_acoes_crm);
+        const recibo = m.sobral_acoes_crm
+          ? {
+              ...m.sobral_acoes_crm,
+              historico: [...m.sobral_acoes_crm.sobral_acoes_crm_eventos].sort((a, b) =>
+                a.criado_em.localeCompare(b.criado_em),
+              ),
+            }
+          : null;
+        const acaoConfirmada = AcaoConfirmadaCrmSchema.safeParse(recibo);
         return {
           id: m.id,
           papel: m.papel as 'usuario' | 'consultor',

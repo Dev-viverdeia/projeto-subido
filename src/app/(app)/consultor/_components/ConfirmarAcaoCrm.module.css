@@ -1,5 +1,5 @@
 .convite,
-.comprovante,
+.registro,
 .formulario {
   width: 100%;
   border: 1px solid var(--app-elev-1-line);
@@ -9,11 +9,28 @@
 }
 
 .convite,
-.comprovante {
+.resumoRegistro {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-3);
+}
+
+.convite {
+  padding: var(--app-pad-card-tight);
+}
+
+.registro {
+  overflow: hidden;
+}
+
+.registroConcluido {
+  border-color: var(--via-navy-12);
+  background: var(--via-navy-02);
+  box-shadow: none;
+}
+
+.resumoRegistro {
   padding: var(--app-pad-card-tight);
 }
 
@@ -29,6 +46,11 @@
   color: var(--via-white);
 }
 
+.registroConcluido .iconeConfirmado {
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+}
+
 .conviteCorpo,
 .comprovanteCorpo {
   display: flex;
@@ -40,6 +62,7 @@
 .conviteCorpo small,
 .comprovanteCorpo small,
 .formularioTopo small,
+.painelGestao header small,
 .campoAcao > span,
 .campoData > span {
   font-family: var(--via-font-mono);
@@ -72,8 +95,10 @@
 
 .revisar,
 .confirmar,
+.cancelar,
 .fechar,
-.abrirLead {
+.abrirLead,
+.acoesRegistro button {
   border: 0;
   font: inherit;
   cursor: pointer;
@@ -86,6 +111,7 @@
   justify-content: center;
   gap: var(--via-space-2);
   height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
@@ -108,50 +134,17 @@
 
 .revisar:focus-visible,
 .confirmar:focus-visible,
+.cancelar:focus-visible,
 .fechar:focus-visible,
-.abrirLead:focus-visible {
+.abrirLead:focus-visible,
+.acoesRegistro button:focus-visible,
+.historico summary:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }
 
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-4);
-  padding: var(--app-pad-card);
-}
-
-.formularioTopo,
-.formularioTopo > span,
-.formularioTopo > span > span {
-  display: flex;
-  align-items: center;
-}
-
-.formularioTopo {
-  justify-content: space-between;
-  gap: var(--via-space-3);
-}
-
-.formularioTopo > span {
-  gap: var(--via-space-2);
-  color: var(--via-navy);
-}
-
-.formularioTopo > span > span {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.formularioTopo strong {
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-}
-
-.fechar,
-.abrirLead {
+.abrirLead,
+.fechar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -166,11 +159,109 @@
     color var(--app-t-state);
 }
 
-.fechar:hover,
-.abrirLead:hover {
+.abrirLead:hover,
+.fechar:hover {
   background: var(--via-navy-04);
   color: var(--via-navy);
   text-decoration: none;
+}
+
+.acoesRegistro {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: 0 var(--app-pad-card-tight) var(--app-pad-card-tight);
+}
+
+.acoesRegistro button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 34px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  transition:
+    border-color var(--app-t-state),
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.acoesRegistro button:hover {
+  border-color: var(--via-navy-16);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+}
+
+.acoesRegistro .concluir {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.acoesRegistro .concluir:hover {
+  border-color: var(--via-navy-deep);
+  background: var(--via-navy-deep);
+  color: var(--via-white);
+}
+
+.formulario,
+.painelGestao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+}
+
+.formulario {
+  padding: var(--app-pad-card);
+}
+
+.painelGestao {
+  margin-inline: var(--via-space-2);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-navy-12);
+  border-radius: var(--app-radius-card);
+  background: var(--via-navy-02);
+}
+
+.formularioTopo,
+.formularioTopo > span,
+.formularioTopo > span > span,
+.painelGestao header,
+.painelGestao header > span {
+  display: flex;
+  align-items: center;
+}
+
+.formularioTopo,
+.painelGestao header {
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.formularioTopo > span {
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+}
+
+.formularioTopo > span > span,
+.painelGestao header > span {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.formularioTopo strong,
+.painelGestao header strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
 }
 
 .campoAcao,
@@ -220,8 +311,25 @@
   gap: var(--via-space-3);
 }
 
-.confirmar {
-  padding-inline: var(--via-space-4);
+.acoesPainel {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+}
+
+.cancelar {
+  height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.cancelar:hover {
+  background: var(--via-navy-04);
+  color: var(--via-navy);
 }
 
 .confirmar:disabled {
@@ -229,16 +337,18 @@
   cursor: wait;
 }
 
-.spinner {
-  animation: confirmar-acao-girar 0.8s linear infinite;
-}
-
+.explicacaoConclusao,
 .substituicao,
 .seguranca,
 .erro {
   margin: 0;
   font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
+}
+
+.explicacaoConclusao {
+  color: var(--via-text-muted);
+  max-width: 56ch;
 }
 
 .substituicao,
@@ -254,6 +364,111 @@
   color: var(--via-text-primary);
 }
 
+.historico {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.historico summary {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 38px;
+  padding-inline: var(--app-pad-card-tight);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  cursor: pointer;
+  list-style: none;
+}
+
+.historico summary::-webkit-details-marker {
+  display: none;
+}
+
+.historico summary > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  font-weight: var(--via-fw-medium);
+}
+
+.totalEventos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 6px;
+  border-radius: 999px;
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  margin-left: auto;
+  transition: transform var(--app-t-state);
+}
+
+.historico[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.historico ol {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 var(--app-pad-card-tight) var(--app-pad-card-tight);
+  list-style: none;
+}
+
+.historico li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--via-space-3);
+  padding-block: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.pontoHistorico {
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border: 2px solid var(--via-navy-25);
+  border-radius: 50%;
+  background: var(--via-bg);
+}
+
+.historico li > span:nth-child(2) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.historico li strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.historico li em,
+.historico time {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+  line-height: var(--via-lh-normal);
+}
+
+.historico time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.spinner {
+  animation: confirmar-acao-girar 0.8s linear infinite;
+}
+
 @keyframes confirmar-acao-girar {
   to {
     transform: rotate(360deg);
@@ -263,10 +478,13 @@
 @media (prefers-reduced-motion: reduce) {
   .revisar,
   .confirmar,
+  .cancelar,
   .fechar,
   .abrirLead,
+  .acoesRegistro button,
   .campoAcao textarea,
-  .campoData input {
+  .campoData input,
+  .chevron {
     transition: none;
   }
 
@@ -277,7 +495,7 @@
 
 @media (max-width: 599px) {
   .convite,
-  .comprovante {
+  .resumoRegistro {
     align-items: start;
   }
 
@@ -297,11 +515,42 @@
     white-space: normal;
   }
 
+  .acoesRegistro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .acoesRegistro .concluir {
+    grid-column: 1 / -1;
+  }
+
+  .acoesRegistro button {
+    width: 100%;
+  }
+
+  .painelGestao {
+    padding: var(--via-space-3);
+  }
+
   .rodapeFormulario {
     grid-template-columns: 1fr;
   }
 
-  .confirmar {
+  .acoesPainel {
+    display: grid;
+    grid-template-columns: 0.65fr 1.35fr;
+  }
+
+  .confirmar,
+  .cancelar {
     width: 100%;
+  }
+
+  .historico li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .historico time {
+    grid-column: 2;
   }
 }

@@ -1849,29 +1849,35 @@ export type Database = {
         Row: {
           acao: string
           atualizado_em: string
+          concluida_em: string | null
           confirmada_em: string
           dono: string
           mensagem_id: string
           oportunidade_id: string
           quando: string | null
+          status: string
         }
         Insert: {
           acao: string
           atualizado_em?: string
+          concluida_em?: string | null
           confirmada_em?: string
           dono: string
           mensagem_id: string
           oportunidade_id: string
           quando?: string | null
+          status?: string
         }
         Update: {
           acao?: string
           atualizado_em?: string
+          concluida_em?: string | null
           confirmada_em?: string
           dono?: string
           mensagem_id?: string
           oportunidade_id?: string
           quando?: string | null
+          status?: string
         }
         Relationships: [
           {
@@ -1887,6 +1893,50 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "crm_oportunidades"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      sobral_acoes_crm_eventos: {
+        Row: {
+          acao_anterior: string | null
+          acao_nova: string
+          criado_em: string
+          dono: string
+          id: string
+          mensagem_id: string
+          quando_anterior: string | null
+          quando_novo: string | null
+          tipo: string
+        }
+        Insert: {
+          acao_anterior?: string | null
+          acao_nova: string
+          criado_em?: string
+          dono: string
+          id?: string
+          mensagem_id: string
+          quando_anterior?: string | null
+          quando_novo?: string | null
+          tipo: string
+        }
+        Update: {
+          acao_anterior?: string | null
+          acao_nova?: string
+          criado_em?: string
+          dono?: string
+          id?: string
+          mensagem_id?: string
+          quando_anterior?: string | null
+          quando_novo?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sobral_acoes_crm_eventos_acao_fk"
+            columns: ["dono", "mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "sobral_acoes_crm"
+            referencedColumns: ["dono", "mensagem_id"]
           },
         ]
       }
@@ -2186,6 +2236,15 @@ export type Database = {
       sobral_confirmar_acao_crm: {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: boolean
+      }
+      sobral_gerenciar_acao_crm: {
+        Args: {
+          p_acao?: string
+          p_mensagem: string
+          p_operacao: string
+          p_quando?: string
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  AcaoConfirmadaCrmSchema,
   criarPlanoBase,
   detectarEtapaSobral,
   DirecaoMensagemSchema,
@@ -134,6 +135,59 @@ describe('DirecaoMensagemSchema', () => {
           acao_atual: null,
           prazo_atual: null,
         },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe('AcaoConfirmadaCrmSchema', () => {
+  const confirmada = {
+    acao: 'Confirmar decisor e data da decisão',
+    quando: '2026-08-12T15:00:00.000Z',
+    confirmada_em: '2026-08-10T18:02:00.000Z',
+    atualizado_em: '2026-08-10T18:02:00.000Z',
+    status: 'pendente',
+    concluida_em: null,
+    historico: [
+      {
+        tipo: 'confirmada',
+        acao_anterior: null,
+        acao_nova: 'Confirmar decisor e data da decisão',
+        quando_anterior: null,
+        quando_novo: '2026-08-12T15:00:00.000Z',
+        criado_em: '2026-08-10T18:02:00.000Z',
+      },
+    ],
+  } as const;
+
+  it('preserva o estado atual e a trilha de movimentos', () => {
+    const resultado = AcaoConfirmadaCrmSchema.parse({
+      ...confirmada,
+      quando: '2026-08-14T15:00:00.000Z',
+      atualizado_em: '2026-08-11T12:00:00.000Z',
+      historico: [
+        ...confirmada.historico,
+        {
+          tipo: 'remarcada',
+          acao_anterior: confirmada.acao,
+          acao_nova: confirmada.acao,
+          quando_anterior: confirmada.quando,
+          quando_novo: '2026-08-14T15:00:00.000Z',
+          criado_em: '2026-08-11T12:00:00.000Z',
+        },
+      ],
+    });
+
+    expect(resultado.historico).toHaveLength(2);
+    expect(resultado.historico[1]?.tipo).toBe('remarcada');
+  });
+
+  it('exige data de encerramento para uma ação concluída', () => {
+    expect(
+      AcaoConfirmadaCrmSchema.safeParse({
+        ...confirmada,
+        status: 'concluida',
+        concluida_em: null,
       }).success,
     ).toBe(false);
   });

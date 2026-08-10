@@ -60,7 +60,24 @@ const mensagens: MensagemDoConsultor[] = [
         prazo_atual: '2026-08-09T12:00:00-03:00',
       },
     }),
-    acaoConfirmada: null,
+    acaoConfirmada: {
+      acao: 'Confirmar decisor e data da decisão',
+      quando: '2026-08-12T12:00:00-03:00',
+      confirmada_em: '2026-08-10T18:02:00.000Z',
+      atualizado_em: '2026-08-10T18:02:00.000Z',
+      status: 'pendente',
+      concluida_em: null,
+      historico: [
+        {
+          tipo: 'confirmada',
+          acao_anterior: null,
+          acao_nova: 'Confirmar decisor e data da decisão',
+          quando_anterior: null,
+          quando_novo: '2026-08-12T12:00:00-03:00',
+          criado_em: '2026-08-10T18:02:00.000Z',
+        },
+      ],
+    },
     modelo: 'gpt-5.4-mini',
     criadoEm: '2026-08-10T18:00:10.000Z',
   },
@@ -100,10 +117,12 @@ export default function PreviewConsultorConversaPage() {
       <main id="conteudo" className={shell.conteudo}>
         <div className={conversa.pagina}>
           <header className={conversa.cabecalho}>
-            <div className={conversa.identidade}>
-              <p className={conversa.eyebrow}>Conversa</p>
-              <h1 className={conversa.tituloConversa}>Próximo avanço da Clínica Aurora</h1>
-              <p className={conversa.meta}>Iniciada hoje</p>
+            <div className={conversa.esquerda}>
+              <div className={conversa.identidade}>
+                <p className={conversa.eyebrow}>Conversa</p>
+                <h1 className={conversa.tituloConversa}>Próximo avanço da Clínica Aurora</h1>
+                <p className={conversa.meta}>Iniciada hoje</p>
+              </div>
             </div>
           </header>
           <Mensagens mensagens={mensagens} modoPreview />
