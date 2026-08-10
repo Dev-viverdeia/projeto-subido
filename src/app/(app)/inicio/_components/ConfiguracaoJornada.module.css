@@ -1,10 +1,10 @@
 .bloco {
   position: relative;
   overflow: clip;
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
   background: var(--via-surface);
-  box-shadow: var(--app-elev-2-shadow);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .cabecalho {
@@ -14,10 +14,11 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-5);
-  padding: clamp(24px, 3vw, 36px);
+  padding: var(--via-space-5) clamp(20px, 3vw, 30px);
   overflow: hidden;
-  background: var(--app-mesh-trilho);
-  color: var(--via-white);
+  background:
+    radial-gradient(circle at 0 0, var(--via-navy-08), transparent 34%), var(--via-surface);
+  color: var(--via-text-primary);
 }
 
 .cabecalho::after {
@@ -28,12 +29,12 @@
   width: min(42vw, 520px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 68%);
+  background: radial-gradient(circle, var(--via-accent-soft), transparent 68%);
   pointer-events: none;
 }
 
 .resumido .cabecalho {
-  padding-block: var(--via-space-5);
+  padding-block: var(--via-space-4);
 }
 
 .marca {
@@ -41,10 +42,10 @@
   place-items: center;
   width: 46px;
   height: 46px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--via-accent-hairline);
   border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--via-white);
+  background: var(--via-accent-soft);
+  color: var(--via-accent-ink);
 }
 
 .introducao {
@@ -63,29 +64,29 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-300);
+  color: var(--via-accent-ink);
 }
 
 .introducao h2 {
   max-width: 42ch;
   margin-top: var(--via-space-2);
-  font-size: clamp(1.55rem, 2.4vw, 2.15rem);
+  font-size: clamp(1.3rem, 2vw, 1.75rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-tight);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-wrap: balance;
 }
 
 .resumido .introducao h2 {
-  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
 }
 
 .introducao span {
   display: block;
   max-width: 66ch;
   margin-top: var(--via-space-3);
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
@@ -112,8 +113,8 @@
   align-items: center;
   gap: var(--via-space-2);
   padding: var(--via-space-2) var(--via-space-3);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
   color: var(--via-white);
   transition:
     background-color var(--app-t-state),
@@ -121,8 +122,8 @@
 }
 
 .editar:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--via-accent-ink);
+  background: var(--via-accent-ink);
 }
 
 .editar:focus-visible,
@@ -534,14 +535,10 @@
 }
 
 @media (max-width: 599px) {
-  .formulario {
-    padding-bottom: 126px;
-  }
-
   .cabecalho {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-2);
-    padding: var(--via-space-5);
+    padding: var(--via-space-4);
   }
 
   .marca {
@@ -550,7 +547,7 @@
   }
 
   .introducao h2 {
-    font-size: 1.55rem;
+    font-size: 1.25rem;
   }
 
   .introducao span {
@@ -615,15 +612,16 @@
   }
 
   .rodape {
-    position: fixed;
-    inset-inline: var(--via-space-4);
-    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    position: sticky;
+    inset-inline: auto;
+    bottom: 0;
     align-items: stretch;
     flex-direction: column;
     padding: var(--via-space-4);
-    border: 1px solid var(--via-border-soft);
-    border-radius: var(--app-radius-card) var(--app-radius-card) 0 0;
-    box-shadow: var(--app-elev-3-shadow);
+    border-inline: 0;
+    border-bottom: 0;
+    border-radius: 0;
+    box-shadow: 0 -16px 34px -32px var(--via-navy-30);
   }
 
   .rodapeContexto p {

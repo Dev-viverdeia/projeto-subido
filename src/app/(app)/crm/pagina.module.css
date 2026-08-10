@@ -4,7 +4,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-7);
+  gap: var(--via-space-6);
 }
 
 .topo {
@@ -22,8 +22,8 @@
 
 .introducao h1 {
   margin-top: var(--via-space-2);
-  max-width: 15ch;
-  font-size: clamp(2.25rem, 3.8vw, 3.65rem);
+  max-width: 18ch;
+  font-size: clamp(2.15rem, 3.4vw, 3.35rem);
   font-weight: 540;
   line-height: 0.98;
   letter-spacing: var(--app-ls-h1);
@@ -75,8 +75,8 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-4);
-  min-height: 104px;
-  padding: var(--via-space-5) var(--via-space-6);
+  min-height: 88px;
+  padding: var(--via-space-4) var(--via-space-5);
 }
 
 .resumo article + article {
@@ -106,7 +106,7 @@
 
 .resumo strong {
   font-family: var(--via-font-mono);
-  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-size: clamp(1.55rem, 2.6vw, 2.1rem);
   font-weight: var(--via-fw-medium);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -272,17 +272,33 @@
   }
 
   .resumo {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .resumo article {
-    min-height: 82px;
-    padding: var(--via-space-4) var(--via-space-5);
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-2);
+    min-height: 100px;
+    padding: var(--via-space-3);
   }
 
   .resumo article + article {
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
+    border-top: 0;
+    border-left: 1px solid var(--via-border-hairline);
+  }
+
+  .iconeResumo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .resumo strong {
+    font-size: 1.55rem;
+  }
+
+  .resumo article div span {
+    line-height: var(--via-lh-snug);
   }
 
   .quadroTopo {

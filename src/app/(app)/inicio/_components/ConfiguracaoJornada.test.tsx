@@ -31,6 +31,9 @@ describe('ConfiguracaoJornada', () => {
     const user = userEvent.setup();
     render(<ConfiguracaoJornada perfil={null} projetos={PROJETOS} />);
 
+    expect(screen.queryByRole('textbox', { name: 'Nicho inicial' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Definir direção' }));
+
     const nicho = screen.getByRole('textbox', { name: 'Nicho inicial' });
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
 

@@ -21,10 +21,10 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
       <header className={styles.topo}>
         <div className={styles.introducao}>
           <p className={styles.sobretitulo}>Operação comercial</p>
-          <h1>CRM conectado aos fatos</h1>
+          <h1>Pipeline comercial</h1>
           <p>
-            Organize oportunidades e transforme cada interação em contexto útil para vender e
-            entregar melhor.
+            Quatro fases para saber quem precisa de atenção agora — com todo o histórico no mesmo
+            lugar.
           </p>
         </div>
         {oportunidades.length > 0 && <FormularioNovoLead />}
@@ -44,7 +44,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           </span>
           <div>
             <strong>{abertas}</strong>
-            <span>oportunidades abertas</span>
+            <span>abertas</span>
           </div>
         </article>
         <article>
@@ -53,7 +53,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           </span>
           <div>
             <strong>{emDecisao}</strong>
-            <span>em proposta ou negociação</span>
+            <span>em proposta</span>
           </div>
         </article>
         <article>
@@ -62,7 +62,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           </span>
           <div>
             <strong>{ganhos}</strong>
-            <span>projetos conquistados</span>
+            <span>ganhos</span>
           </div>
         </article>
       </section>
@@ -71,7 +71,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
         <div className={styles.quadroTopo}>
           <div>
             <h2 id="pipeline-titulo">Pipeline</h2>
-            <p>Use o seletor de cada card para avançar ou corrigir uma etapa.</p>
+            <p>Avance cada oportunidade quando a conversa realmente mudar de fase.</p>
           </div>
           <span>{oportunidades.length} no total</span>
         </div>

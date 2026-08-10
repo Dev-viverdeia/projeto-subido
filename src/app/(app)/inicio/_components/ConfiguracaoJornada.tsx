@@ -21,7 +21,7 @@ export function ConfiguracaoJornada({
   const [passo, setPasso] = useState(1);
   const [estado, acao, pendente] = useActionState(salvarPerfilJornada, ESTADO_INICIAL);
   const formulario = useRef<HTMLFormElement>(null);
-  const aberto = !perfil || editando;
+  const aberto = editando;
 
   function avancar() {
     const campos = formulario.current?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
@@ -72,8 +72,12 @@ export function ConfiguracaoJornada({
               setEditando(true);
             }}
           >
-            <PencilLine size={15} strokeWidth={1.9} aria-hidden="true" />
-            Editar direção
+            {perfil ? (
+              <PencilLine size={15} strokeWidth={1.9} aria-hidden="true" />
+            ) : (
+              <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+            )}
+            {perfil ? 'Editar direção' : 'Definir direção'}
           </button>
         )}
       </header>
@@ -202,7 +206,7 @@ export function ConfiguracaoJornada({
                   <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
                   Voltar
                 </button>
-              ) : perfil ? (
+              ) : (
                 <button
                   type="button"
                   className={styles.cancelar}
@@ -210,7 +214,7 @@ export function ConfiguracaoJornada({
                 >
                   Cancelar
                 </button>
-              ) : null}
+              )}
 
               {passo < 3 ? (
                 <button type="button" className={styles.salvar} onClick={avancar}>

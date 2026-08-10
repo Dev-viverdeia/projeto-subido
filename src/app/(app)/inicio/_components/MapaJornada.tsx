@@ -63,6 +63,7 @@ export function MapaJornada({
 }: Props) {
   const [etapaAtiva, setEtapaAtiva] = useState<IdEtapaJornada>(plano.etapaAtual);
   const etapa = plano.etapas.find((item) => item.id === etapaAtiva) ?? plano.etapas[0]!;
+  const etapaAtual = plano.etapas.find((item) => item.id === plano.etapaAtual) ?? plano.etapas[0]!;
   const hoje = new Date();
   const dataLonga = hoje.toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -88,23 +89,74 @@ export function MapaJornada({
         </div>
       </header>
 
+      <section className={styles.comando} aria-label="Direção de hoje">
+        <article className={styles.prioridade}>
+          <div className={styles.prioridadeTopo}>
+            <span>Sobral AI recomenda</span>
+            <em>{etapaAtual.titulo}</em>
+          </div>
+          <h1>{plano.proximoPasso.titulo}</h1>
+          <p>{plano.proximoPasso.detalhe}</p>
+          <Link href={plano.proximoPasso.destino} className={styles.botaoPrimario}>
+            {plano.proximoPasso.acao}
+            <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
+          </Link>
+          <div className={styles.evidenciaPrioridade}>
+            <CheckCircle2 size={15} strokeWidth={1.9} aria-hidden="true" />
+            <span>Avança quando houver evidência:</span>
+            <strong>{plano.proximoPasso.evidencia}</strong>
+          </div>
+        </article>
+
+        <aside className={styles.pulso} aria-label="Pulso da operação">
+          <div className={styles.pulsoTopo}>
+            <div>
+              <span>Ciclo profissional</span>
+              <strong>{etapaAtual.titulo}</strong>
+            </div>
+            <b>{plano.percentual}%</b>
+          </div>
+          <div className={styles.progressoTrilho} aria-hidden="true">
+            <span style={{ width: `${plano.percentual}%` }} />
+          </div>
+          <p className={styles.progressoTexto}>
+            {plano.evidenciasConcluidas} de {plano.totalEvidencias} evidências comprovadas
+          </p>
+
+          <dl className={styles.pulsoFatos}>
+            <div>
+              <dt>
+                <Building2 size={15} strokeWidth={1.8} aria-hidden="true" /> Lead em foco
+              </dt>
+              <dd>{cliente}</dd>
+            </div>
+            <div>
+              <dt>
+                <CalendarDays size={15} strokeWidth={1.8} aria-hidden="true" /> Próximo encontro
+              </dt>
+              <dd>{proximaMentoria ?? 'Mentoria de implementação'}</dd>
+            </div>
+          </dl>
+
+          <Link href="/consultor" className={styles.revisarPlano}>
+            Revisar plano no Sobral AI
+            <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
+          </Link>
+        </aside>
+      </section>
+
       {configuracao}
 
       <section className={styles.mapa} aria-labelledby="titulo-mapa-jornada">
         <div className={styles.mapaTopo}>
           <div className={styles.mapaCabecalho}>
-            <p className={styles.mapaSobretitulo}>Ciclo profissional</p>
-            <h1 id="titulo-mapa-jornada">Jornada de operação</h1>
-            <p>O mapa avança quando o seu trabalho deixa evidências reais.</p>
+            <p>Seu ciclo</p>
+            <h2 id="titulo-mapa-jornada">Jornada de operação</h2>
+            <span>Escolha uma etapa para ver o que já foi comprovado e o que falta.</span>
           </div>
-          <div className={styles.progressoGeral} aria-label={`${plano.percentual}% da jornada`}>
-            <span>
-              <strong>{plano.evidenciasConcluidas}</strong> de {plano.totalEvidencias} evidências
-            </span>
-            <div className={styles.progressoTrilho} aria-hidden="true">
-              <span style={{ width: `${plano.percentual}%` }} />
-            </div>
-            <small>{plano.percentual}% do ciclo em andamento</small>
+          <div className={styles.marcoAtual}>
+            <span>{etapa.id === plano.etapaAtual ? 'Você está aqui' : 'Etapa consultada'}</span>
+            <strong>{etapa.marco}</strong>
           </div>
         </div>
 
@@ -121,93 +173,30 @@ export function MapaJornada({
                   aria-pressed={ativa}
                   onClick={() => setEtapaAtiva(item.id)}
                 >
-                  <span className={styles.etapaNumero}>{item.numero}</span>
-                  <span className={styles.etapaTitulo}>{item.titulo}</span>
-                  <span className={styles.etapaResumo}>{item.resumo}</span>
+                  <span className={styles.etapaIcone} aria-hidden="true">
+                    {item.status === 'concluida' ? (
+                      <Check size={15} strokeWidth={2.6} />
+                    ) : (
+                      <Icone size={17} strokeWidth={1.7} />
+                    )}
+                  </span>
+                  <span className={styles.etapaTexto}>
+                    <small>{item.numero}</small>
+                    <strong>{item.titulo}</strong>
+                    <em>{item.resumo}</em>
+                  </span>
                   <span className={styles.etapaContagem}>
                     {item.concluidos}/{item.passos.length}
-                  </span>
-                  <span className={styles.etapaIcone}>
-                    {item.status === 'concluida' ? (
-                      <Check size={17} strokeWidth={2.6} aria-hidden="true" />
-                    ) : (
-                      <Icone size={20} strokeWidth={1.65} aria-hidden="true" />
-                    )}
                   </span>
                 </button>
               </li>
             );
           })}
         </ol>
-
-        <div className={styles.marcoAtual}>
-          <span>{etapa.id === plano.etapaAtual ? 'Você está aqui' : 'Etapa consultada'}</span>
-          <strong>
-            {etapa.titulo} · {etapa.marco}
-          </strong>
-        </div>
       </section>
 
-      <section className={styles.paineis} aria-label={`Evidências para ${etapa.titulo}`}>
-        <article className={`${styles.cartao} ${styles.assistente}`}>
-          <div className={styles.assistenteTitulo}>
-            <span className={styles.botIcone} aria-hidden="true">
-              <Bot size={22} strokeWidth={1.8} />
-            </span>
-            <div>
-              <div className={styles.linhaTitulo}>
-                <h2>Sobral AI</h2>
-                <span className={styles.selo}>Leitura operacional</span>
-              </div>
-              <p>{diagnosticoSobral}</p>
-            </div>
-          </div>
-
-          <dl className={styles.fatos}>
-            <div>
-              <dt>
-                <BriefcaseBusiness size={14} aria-hidden="true" /> Oferta
-              </dt>
-              <dd>{oferta ?? 'Ainda não definida'}</dd>
-            </div>
-            <div>
-              <dt>
-                <Target size={14} aria-hidden="true" /> Nicho
-              </dt>
-              <dd>{nicho ?? 'Ainda não definido'}</dd>
-            </div>
-            <div>
-              <dt>
-                <Building2 size={14} aria-hidden="true" /> Lead em foco
-              </dt>
-              <dd>{cliente}</dd>
-            </div>
-            <div>
-              <dt>
-                <UserRound size={14} aria-hidden="true" /> Contato
-              </dt>
-              <dd>{contato}</dd>
-            </div>
-            <div>
-              <dt>
-                <Flag size={14} aria-hidden="true" /> Foco
-              </dt>
-              <dd>{focoSobral}</dd>
-            </div>
-          </dl>
-
-          <div className={styles.assistenteAcao}>
-            <p>Próxima ação recomendada</p>
-            <strong>{plano.proximoPasso.titulo}</strong>
-            <span>{plano.proximoPasso.detalhe}</span>
-            <Link href={plano.proximoPasso.destino} className={styles.botaoPrimario}>
-              {plano.proximoPasso.acao}
-              <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-            </Link>
-          </div>
-        </article>
-
-        <article className={`${styles.cartao} ${styles.checklist}`}>
+      <section className={styles.detalhes} aria-label={`Evidências para ${etapa.titulo}`}>
+        <article className={styles.checklist}>
           <div className={styles.cartaoCabecalho}>
             <div>
               <p>Etapa consultada</p>
@@ -237,7 +226,12 @@ export function MapaJornada({
         </article>
 
         <aside className={styles.hoje}>
-          <h2>Fila de hoje</h2>
+          <div className={styles.cartaoCabecalho}>
+            <div>
+              <p>Execução</p>
+              <h2>Fila de hoje</h2>
+            </div>
+          </div>
           <div className={styles.agenda}>
             <Link href={plano.proximoPasso.destino} className={styles.agendaItem}>
               <span className={styles.agendaIcone} aria-hidden="true">
@@ -275,17 +269,60 @@ export function MapaJornada({
               <ArrowRight size={14} strokeWidth={1.8} aria-hidden="true" />
             </Link>
           </div>
+        </aside>
+      </section>
 
-          <Link href="/consultor" className={styles.linkAgenda}>
-            Revisar plano no Sobral AI
+      <section className={styles.sobral} aria-labelledby="titulo-sobral-inicio">
+        <div className={styles.sobralIntroducao}>
+          <span className={styles.botIcone} aria-hidden="true">
+            <Bot size={21} strokeWidth={1.8} />
+          </span>
+          <div>
+            <p>Sobral AI · leitura operacional</p>
+            <h2 id="titulo-sobral-inicio">{diagnosticoSobral}</h2>
+          </div>
+        </div>
+
+        <dl className={styles.fatos}>
+          <div>
+            <dt>
+              <BriefcaseBusiness size={14} aria-hidden="true" /> Oferta
+            </dt>
+            <dd>{oferta ?? 'Ainda não definida'}</dd>
+          </div>
+          <div>
+            <dt>
+              <Target size={14} aria-hidden="true" /> Nicho
+            </dt>
+            <dd>{nicho ?? 'Ainda não definido'}</dd>
+          </div>
+          <div>
+            <dt>
+              <Building2 size={14} aria-hidden="true" /> Lead
+            </dt>
+            <dd>{cliente}</dd>
+          </div>
+          <div>
+            <dt>
+              <UserRound size={14} aria-hidden="true" /> Contato
+            </dt>
+            <dd>{contato}</dd>
+          </div>
+        </dl>
+
+        <div className={styles.sobralFoco}>
+          <span>Foco agora</span>
+          <strong>{focoSobral}</strong>
+          <Link href="/consultor">
+            Abrir consultoria
             <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
           </Link>
-        </aside>
+        </div>
       </section>
 
       <footer className={styles.ajuda}>
         <HelpCircle size={16} strokeWidth={1.8} aria-hidden="true" />
-        <span>Dúvidas sobre esta etapa? Use o Sobral AI ou consulte o guia:</span>
+        <span>Dúvidas sobre esta etapa? Consulte o guia:</span>
         <Link href="/consultor">
           {etapa.guia}
           <ExternalLink size={13} strokeWidth={2} aria-hidden="true" />

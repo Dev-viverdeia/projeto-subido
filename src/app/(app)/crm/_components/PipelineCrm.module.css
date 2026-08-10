@@ -1,45 +1,35 @@
 .rolagem {
   width: 100%;
-  max-width: 100%;
   min-width: 0;
-  contain: inline-size;
-  overflow-x: auto;
-  padding: 2px 2px var(--via-space-5);
-  scrollbar-width: thin;
-  scrollbar-color: var(--via-border) transparent;
-  scroll-snap-type: x proximity;
-  overscroll-behavior-inline: contain;
-}
-
-.rolagem:focus-visible {
-  outline: 2px solid var(--via-navy);
-  outline-offset: 3px;
-  border-radius: var(--app-radius-card);
 }
 
 .pipeline {
   display: grid;
-  grid-template-columns: repeat(7, minmax(288px, 1fr));
-  gap: var(--via-space-4);
-  min-width: 2100px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--via-space-3);
 }
 
 .coluna {
-  min-height: 500px;
+  min-width: 0;
+  min-height: 420px;
   padding: var(--via-space-3);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: color-mix(in srgb, var(--via-bg-2) 72%, var(--via-surface));
   box-shadow: inset 0 1px 0 var(--via-edge-hi);
-  scroll-snap-align: start;
 }
 
-.coluna[data-etapa='ganho'] {
-  background: color-mix(in srgb, var(--via-success) 7%, var(--via-surface));
+.coluna[data-fase='conversa'] {
+  background: color-mix(in srgb, var(--via-navy) 3%, var(--via-surface));
 }
 
-.coluna[data-etapa='perdido'] {
-  background: color-mix(in srgb, var(--via-gray-100) 60%, var(--via-surface));
+.coluna[data-fase='proposta'] {
+  border-color: var(--via-navy-14);
+  background: color-mix(in srgb, var(--via-navy) 5%, var(--via-surface));
+}
+
+.coluna[data-fase='fechados'] {
+  background: color-mix(in srgb, var(--via-gray-100) 62%, var(--via-surface));
 }
 
 .colunaTopo {
@@ -47,8 +37,8 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--via-space-3);
-  min-height: 68px;
-  padding: var(--via-space-2) var(--via-space-2) var(--via-space-4);
+  min-height: 64px;
+  padding: var(--via-space-2) var(--via-space-2) var(--via-space-3);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
@@ -59,22 +49,23 @@
 
 .colunaTopo h2 {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   letter-spacing: var(--app-ls-sm);
 }
 
 .colunaTopo p {
   margin-top: var(--via-space-1);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
 }
 
 .contador {
   display: grid;
   place-items: center;
-  min-width: 24px;
-  height: 24px;
+  min-width: 25px;
+  height: 25px;
   padding-inline: var(--via-space-1);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-pill);
@@ -92,9 +83,10 @@
 }
 
 .cartao {
-  padding: var(--via-space-5);
+  min-width: 0;
+  padding: var(--via-space-4);
   border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-control);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
   transition:
@@ -114,10 +106,19 @@
   box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
+.cartaoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  min-width: 0;
+}
+
 .cartao h3 {
   margin: var(--via-space-3) 0 0;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
   line-height: var(--via-lh-snug);
 }
 
@@ -150,12 +151,40 @@
   white-space: nowrap;
 }
 
+.etapaAtual {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  flex: 0 0 auto;
+  max-width: 48%;
+  overflow: hidden;
+  padding: 4px 7px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+  font-size: 0.625rem;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.etapaAtual[data-etapa='ganho'] {
+  border-color: color-mix(in srgb, var(--via-success) 28%, transparent);
+  background: color-mix(in srgb, var(--via-success) 7%, var(--via-surface));
+  color: var(--via-success);
+}
+
+.etapaAtual[data-etapa='perdido'] {
+  color: var(--via-text-muted);
+}
+
 .contato {
   margin-top: var(--via-space-3);
 }
 
 .fato {
-  margin-top: var(--via-space-4);
+  margin-top: var(--via-space-3);
   padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-text-faint);
@@ -179,7 +208,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 34px;
+  min-height: 36px;
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-navy-14);
   border-radius: var(--app-radius-control);
@@ -218,13 +247,13 @@
 
 .mover {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 34px;
+  grid-template-columns: minmax(0, 1fr) 36px;
   gap: var(--via-space-2);
 }
 
 .mover select,
 .mover button {
-  height: 34px;
+  height: 36px;
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   background: var(--via-bg);
@@ -236,6 +265,12 @@
   padding-inline: var(--via-space-2);
   font: inherit;
   font-size: var(--via-fs-xs);
+}
+
+.mover select:focus-visible,
+.mover button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .mover button {
@@ -256,12 +291,48 @@
 .vazio {
   display: grid;
   place-items: center;
-  min-height: 108px;
-  gap: var(--via-space-2);
+  min-height: 74px;
+  gap: var(--via-space-1);
   border: 1px dashed var(--via-border);
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-control);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-micro);
+}
+
+@media (max-width: 1279px) {
+  .pipeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coluna {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 767px) {
+  .pipeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coluna {
+    min-height: 0;
+  }
+
+  .coluna[data-vazia='true'] {
+    padding-block: var(--via-space-2);
+  }
+
+  .coluna[data-vazia='true'] .colunaTopo {
+    min-height: 48px;
+    align-items: center;
+    padding-block: var(--via-space-2);
+    border-bottom: 0;
+  }
+
+  .coluna[data-vazia='true'] .colunaTopo p,
+  .coluna[data-vazia='true'] .lista {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -275,21 +346,5 @@
 
   .dossie[data-estado='analisando'] svg {
     animation: none;
-  }
-}
-
-@media (max-width: 767px) {
-  .rolagem {
-    overflow-x: visible;
-    padding-inline: 0;
-  }
-
-  .pipeline {
-    grid-template-columns: minmax(0, 1fr);
-    min-width: 0;
-  }
-
-  .coluna {
-    min-height: 0;
   }
 }

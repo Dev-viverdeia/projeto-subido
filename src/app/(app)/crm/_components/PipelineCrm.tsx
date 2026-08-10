@@ -1,7 +1,23 @@
 import Link from 'next/link';
-import { ArrowRight, Building2, CircleUserRound, Clock3, Inbox, Layers3 } from 'lucide-react';
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  CircleUserRound,
+  Clock3,
+  Inbox,
+  Layers3,
+  XCircle,
+} from 'lucide-react';
 import { moverOportunidade } from '@/lib/crm/actions';
-import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
+import {
+  ETAPAS_MOVIMENTO_CRM,
+  FASES_CRM,
+  ROTULO_ETAPA,
+  etapaVisivel,
+  faseDaEtapa,
+  type IdFaseCrm,
+} from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from './PipelineCrm.module.css';
 
@@ -17,9 +33,20 @@ function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm })
 
   return (
     <article className={styles.cartao}>
-      <div className={styles.empresa}>
-        <Building2 size={14} strokeWidth={1.8} aria-hidden="true" />
-        <span>{oportunidade.empresa}</span>
+      <div className={styles.cartaoTopo}>
+        <div className={styles.empresa}>
+          <Building2 size={14} strokeWidth={1.8} aria-hidden="true" />
+          <span>{oportunidade.empresa}</span>
+        </div>
+        <span className={styles.etapaAtual} data-etapa={oportunidade.etapa}>
+          {oportunidade.etapa === 'ganho' && (
+            <CheckCircle2 size={12} strokeWidth={2.2} aria-hidden="true" />
+          )}
+          {oportunidade.etapa === 'perdido' && (
+            <XCircle size={12} strokeWidth={2.2} aria-hidden="true" />
+          )}
+          {ROTULO_ETAPA[oportunidade.etapa]}
+        </span>
       </div>
 
       <h3>{oportunidade.titulo}</h3>
@@ -54,8 +81,12 @@ function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm })
           <label htmlFor={`etapa-${oportunidade.id}`} className="sr-only">
             Mover {oportunidade.titulo} para
           </label>
-          <select id={`etapa-${oportunidade.id}`} name="etapa" defaultValue={oportunidade.etapa}>
-            {ETAPAS_CRM.map((etapa) => (
+          <select
+            id={`etapa-${oportunidade.id}`}
+            name="etapa"
+            defaultValue={etapaVisivel(oportunidade.etapa)}
+          >
+            {ETAPAS_MOVIMENTO_CRM.map((etapa) => (
               <option key={etapa.id} value={etapa.id}>
                 {etapa.rotulo}
               </option>
@@ -71,18 +102,23 @@ function CartaoOportunidade({ oportunidade }: { oportunidade: OportunidadeCrm })
 }
 
 function Coluna({
-  etapa,
+  fase,
   oportunidades,
 }: {
-  etapa: (typeof ETAPAS_CRM)[number];
+  fase: (typeof FASES_CRM)[number];
   oportunidades: OportunidadeCrm[];
 }) {
   return (
-    <section className={styles.coluna} data-etapa={etapa.id} aria-labelledby={`coluna-${etapa.id}`}>
+    <section
+      className={styles.coluna}
+      data-fase={fase.id}
+      data-vazia={oportunidades.length === 0 || undefined}
+      aria-labelledby={`coluna-${fase.id}`}
+    >
       <header className={styles.colunaTopo}>
         <div>
-          <h2 id={`coluna-${etapa.id}`}>{etapa.rotulo}</h2>
-          <p>{etapa.descricao}</p>
+          <h2 id={`coluna-${fase.id}`}>{fase.rotulo}</h2>
+          <p>{fase.descricao}</p>
         </div>
         <span className={styles.contador} aria-label={`${oportunidades.length} oportunidades`}>
           {oportunidades.length}
@@ -106,19 +142,17 @@ function Coluna({
 }
 
 export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[] }) {
-  const porEtapa = new Map<EtapaCrm, OportunidadeCrm[]>();
-  for (const etapa of ETAPAS_CRM) porEtapa.set(etapa.id, []);
-  for (const oportunidade of oportunidades) porEtapa.get(oportunidade.etapa)?.push(oportunidade);
+  const porFase = new Map<IdFaseCrm, OportunidadeCrm[]>();
+  for (const fase of FASES_CRM) porFase.set(fase.id, []);
+  for (const oportunidade of oportunidades) {
+    porFase.get(faseDaEtapa(oportunidade.etapa))?.push(oportunidade);
+  }
 
   return (
-    <div
-      className={styles.rolagem}
-      tabIndex={0}
-      aria-label="Pipeline comercial. Role horizontalmente para ver todas as etapas."
-    >
+    <div className={styles.rolagem} aria-label="Pipeline comercial em quatro fases">
       <div className={styles.pipeline}>
-        {ETAPAS_CRM.map((etapa) => (
-          <Coluna key={etapa.id} etapa={etapa} oportunidades={porEtapa.get(etapa.id) ?? []} />
+        {FASES_CRM.map((fase) => (
+          <Coluna key={fase.id} fase={fase} oportunidades={porFase.get(fase.id) ?? []} />
         ))}
       </div>
     </div>
