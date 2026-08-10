@@ -307,6 +307,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+.linhaAcao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding-inline: var(--via-space-3);
+  border-left: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-navy);
+}
+
 /* ------------------------------------------------------------------ rodapé */
 
 /* Uma linha, não uma lista: os catálogos já listam o que não começou. */
@@ -333,6 +346,12 @@
 }
 
 /* -------------------------------------------------------------------- vazio */
+
+.vazioEstado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
 
 .vazio {
   display: grid;
@@ -465,32 +484,205 @@
 .vazioDados {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.vazioDados > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+.vazioDados > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   gap: var(--via-space-4);
   padding-top: var(--via-space-3);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.vazioDados dt {
+.vazioDados > li + li {
+  margin-top: var(--via-space-3);
+}
+
+.vazioDados span {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-gray-400);
+  font-variant-numeric: tabular-nums;
+}
+
+.vazioDados p {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-white);
+  text-wrap: pretty;
+}
+
+/* A segunda metade do estado vazio resolve a pergunta que o painel escuro
+   deixava aberta: "qual caminho eu abro primeiro?". As duas recomendações
+   vêm do catálogo real e continuam sendo links completos, com foco visível. */
+.primeiroPasso {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.58fr) minmax(0, 1fr);
+  gap: var(--app-gap-section);
+  align-items: start;
+}
+
+.primeiroPassoCabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-1);
+}
+
+.primeiroPassoEyebrow,
+.primeiroPassoCabecalho h2,
+.primeiroPassoCabecalho > p {
+  margin: 0;
+}
+
+.primeiroPassoEyebrow {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.primeiroPassoCabecalho h2 {
+  max-width: 18ch;
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.primeiroPassoCabecalho > p {
+  max-width: 40ch;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.recomendacoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-gap-grid);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recomendacao {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: var(--via-space-3) var(--via-space-4);
+  min-height: 220px;
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-touch);
+}
+
+.recomendacao:hover {
+  transform: translateY(-3px);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  text-decoration: none;
+}
+
+.recomendacao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+.recomendacaoIndice {
+  padding-top: 2px;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.recomendacaoConteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  min-width: 0;
+}
+
+.recomendacaoOrigem {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.recomendacaoConteudo strong {
+  font-size: var(--via-fs-body);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h4);
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.recomendacaoResumo {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+.recomendacaoMeta {
+  margin-top: auto;
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-400);
+  color: var(--via-text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-.vazioDados dd {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  color: var(--via-white);
-  text-align: right;
+.recomendacaoAcao {
+  grid-column: 2;
+  width: fit-content;
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-navy);
+}
+
+@media (max-width: 899px) {
+  .primeiroPasso {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+  }
+
+  .primeiroPassoCabecalho h2 {
+    max-width: 24ch;
+  }
 }
 
 /* No telefone a linha de progresso quebra em duas: título em cima, barra
@@ -529,11 +721,35 @@
 
   .linhaProgresso {
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .trilhoBarra {
     flex: 1;
     width: auto;
+  }
+
+  .linhaAcao {
+    min-height: 28px;
+    border-left: 0;
+    padding-inline: 0;
+  }
+
+  .primeiroPasso,
+  .recomendacoes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .primeiroPasso {
+    gap: var(--app-gap-block);
+  }
+
+  .primeiroPassoCabecalho {
+    padding-inline: 0;
+  }
+
+  .recomendacao {
+    min-height: 200px;
   }
 }
 
@@ -541,7 +757,12 @@
   .linha,
   .baixar,
   .vazioCta,
-  .vazioCtaGhost {
+  .vazioCtaGhost,
+  .recomendacao {
     transition: none;
+  }
+
+  .recomendacao:hover {
+    transform: none;
   }
 }

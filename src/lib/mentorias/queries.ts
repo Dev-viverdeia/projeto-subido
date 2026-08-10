@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 import type { Tables } from '@/lib/supabase/types.generated';
@@ -96,9 +97,11 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
 
 /**
  * UMA sessão pela id — a leitura da SALA. Mesmas duas idas da agenda, no
- * singular, pelo mesmo motivo (ver `listarAgenda`).
+ * singular, pelo mesmo motivo (ver `listarAgenda`). `cache()` evita repetir as
+ * duas leituras quando `generateMetadata` e a página pedem a mesma sessão no
+ * mesmo render.
  */
-export async function obterSessao(id: string): Promise<SessaoMentoria | null> {
+export const obterSessao = cache(async (id: string): Promise<SessaoMentoria | null> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -135,7 +138,7 @@ export async function obterSessao(id: string): Promise<SessaoMentoria | null> {
     inscritos: ocupacao.data?.[0]?.inscritos ?? 0,
     euInscrito: data.mentoria_inscricoes.length > 0,
   };
-}
+});
 
 /** Mentores ativos — alimenta o seletor do admin. */
 export async function listarMentores(): Promise<Tables<'mentores'>[]> {

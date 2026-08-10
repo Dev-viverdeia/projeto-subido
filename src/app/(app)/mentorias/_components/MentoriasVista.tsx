@@ -110,6 +110,8 @@ export function MentoriasVista({
   );
 
   const destaque = futuras.find((s) => estaAoVivo(s)) ?? futuras[0] ?? null;
+  const checkinsAbertos = futuras.filter((s) => estadoComInscricao(s) === 'checkin-aberto').length;
+  const totalCheckins = sessoes.filter((s) => s.euInscrito).length;
 
   /* O TRILHO SOME QUANDO NÃO HÁ CHECK-IN — e a GRADE precisa saber disso.
      `TrilhoInscricoes` já devolvia `null` sozinho, mas a coluna continuava
@@ -175,33 +177,48 @@ export function MentoriasVista({
               rebaixava a controle de uma seção quando na verdade governam tudo
               que vem depois. */}
           <div className={styles.chrome}>
-            {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
+            <div className={styles.chromeContexto}>
+              <p className={styles.chromeEyebrow}>Agenda de mentorias</p>
+              <p className={styles.chromeResumo}>
+                {futuras.length} {futuras.length === 1 ? 'próxima sessão' : 'próximas sessões'}
+                {checkinsAbertos > 0 && (
+                  <>
+                    {' · '}
+                    {checkinsAbertos}{' '}
+                    {checkinsAbertos === 1
+                      ? 'disponível para check-in'
+                      : 'disponíveis para check-in'}
+                  </>
+                )}
+              </p>
+            </div>
+
+            <div className={styles.chromeAcoes}>
+              {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
             comentário do próprio `ControleSegmentado` já dizia que ele fora
             extraído para substituir esta cópia e as abas de catálogo. A
             cópia ficou para trás e, com ela, as setas do teclado: o
             `role="tablist"` prometia navegação por seta e não entregava. */}
-            <ControleSegmentado
-              opcoes={[
-                { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
-                { id: 'calendario', rotulo: 'Calendário', icone: ICONE_CALENDARIO },
-              ]}
-              ativa={vista}
-              aoMudar={(id) => setVista(id as IdVista)}
-              layoutId="mentorias-vista"
-              ariaLabel="Modo de visualização"
-            />
+              <ControleSegmentado
+                opcoes={[
+                  { id: 'agenda', rotulo: 'Agenda', icone: ICONE_AGENDA },
+                  { id: 'calendario', rotulo: 'Mês', icone: ICONE_CALENDARIO },
+                ]}
+                ativa={vista}
+                aoMudar={(id) => setVista(id as IdVista)}
+                layoutId="mentorias-vista"
+                ariaLabel="Modo de visualização"
+              />
 
-            {/* O canto direito da mesma linha: histórico completo de check-ins,
+              {/* O canto direito da mesma linha: histórico completo de check-ins,
                 encerradas incluídas — o trilho lateral só enxerga as futuras, e
                 sessão que termina sumia da tela sem deixar rastro. Presente
                 mesmo com zero: o painel vazio diz isso com uma linha honesta,
                 como no Consultor. */}
-            <HistoricoDropdown
-              total={sessoes.filter((s) => s.euInscrito).length}
-              rotulo="Meus check-ins"
-            >
-              <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
-            </HistoricoDropdown>
+              <HistoricoDropdown total={totalCheckins} rotulo="Check-ins">
+                <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
+              </HistoricoDropdown>
+            </div>
           </div>
 
           {/* O CARTÃO GRANDE É DA AGENDA, não da tela. No calendário ele repetia

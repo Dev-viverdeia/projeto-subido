@@ -39,6 +39,16 @@ type Conteudo = {
   ultimaIso: string | null;
 };
 
+type RecomendacaoInicial = {
+  indice: string;
+  origem: string;
+  titulo: string;
+  resumo: string;
+  meta: string;
+  href: string;
+  acao: string;
+};
+
 const ROTULO_ORIGEM: Record<Origem, string> = {
   formacao: 'Formação',
   solucao: 'Projeto',
@@ -97,44 +107,106 @@ export function GaleriaCertificados({
   const porComecar = conteudos.filter(
     (c) => estadoDoProgresso(c.feitas, c.total) === 'nao-iniciada',
   );
+  const formacaoInicial = formacoes.find((f) => f.aulaIds.length > 0);
+  const solucaoInicial = solucoes.find((s) => s.etapaIds.length > 0);
+
+  const recomendacoes: RecomendacaoInicial[] = [
+    formacaoInicial
+      ? {
+          indice: '01',
+          origem: 'Formação',
+          titulo: formacaoInicial.titulo,
+          resumo: formacaoInicial.resumo,
+          meta: `${formacaoInicial.aulas} ${formacaoInicial.aulas === 1 ? 'aula' : 'aulas'} · ${formacaoInicial.modulos} ${formacaoInicial.modulos === 1 ? 'módulo' : 'módulos'}`,
+          href: `/formacoes/${formacaoInicial.slug}`,
+          acao: 'Começar formação',
+        }
+      : null,
+    solucaoInicial
+      ? {
+          indice: '02',
+          origem: 'Projeto',
+          titulo: solucaoInicial.titulo,
+          resumo: solucaoInicial.resumo,
+          meta: `${solucaoInicial.etapaIds.length} ${solucaoInicial.etapaIds.length === 1 ? 'etapa' : 'etapas'} · ${solucaoInicial.ferramentas.length > 0 ? `${solucaoInicial.ferramentas.length} ${solucaoInicial.ferramentas.length === 1 ? 'ferramenta' : 'ferramentas'}` : 'roteiro guiado'}`,
+          href: `/solucoes/${solucaoInicial.slug}`,
+          acao: 'Abrir projeto',
+        }
+      : null,
+  ].filter((item): item is RecomendacaoInicial => item !== null);
 
   if (conquistados.length === 0 && andamento.length === 0) {
     return (
-      <div className={`${styles.vazio} via-mesh-navy via-noise`}>
-        <div className={styles.vazioConteudo}>
-          <p className={styles.vazioEyebrow}>Nenhuma conquista registrada</p>
-          <p className={styles.vazioTitulo}>Seu portfólio comprovado começa na conclusão.</p>
-          <p className={styles.vazioTexto}>
-            Termine todas as aulas de uma formação ou todas as etapas de um projeto. O certificado
-            entra aqui automaticamente com os fatos da sua conta.
-          </p>
-          <div className={styles.vazioAcoes}>
-            <Link href="/formacoes" className={styles.vazioCta}>
-              Ver formações
-            </Link>
-            <Link href="/solucoes" className={styles.vazioCtaGhost}>
-              Ver projetos
-            </Link>
+      <div className={styles.vazioEstado}>
+        <div className={`${styles.vazio} via-mesh-navy via-noise`}>
+          <div className={styles.vazioConteudo}>
+            <p className={styles.vazioEyebrow}>
+              Nenhuma conquista registrada · {conteudos.length}{' '}
+              {conteudos.length === 1 ? 'caminho disponível' : 'caminhos disponíveis'}
+            </p>
+            <p className={styles.vazioTitulo}>Seu portfólio comprovado começa na conclusão.</p>
+            <p className={styles.vazioTexto}>
+              Termine todas as aulas de uma formação ou todas as etapas de um projeto. O certificado
+              entra aqui automaticamente com os fatos da sua conta.
+            </p>
+            <div className={styles.vazioAcoes}>
+              <Link href="/formacoes" className={styles.vazioCta}>
+                Ver formações
+              </Link>
+              <Link href="/solucoes" className={styles.vazioCtaGhost}>
+                Ver projetos
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.vazioRegistro}>
+            <p className={styles.vazioRegistroTitulo}>Como a conquista acontece</p>
+            <ol className={styles.vazioDados}>
+              <li>
+                <span>01</span>
+                <p>Concluir uma formação ou projeto</p>
+              </li>
+              <li>
+                <span>02</span>
+                <p>Registrar a data da última etapa</p>
+              </li>
+              <li>
+                <span>03</span>
+                <p>Imprimir ou salvar a prova em PDF</p>
+              </li>
+            </ol>
           </div>
         </div>
 
-        <div className={styles.vazioRegistro}>
-          <p className={styles.vazioRegistroTitulo}>O que fica registrado</p>
-          <dl className={styles.vazioDados}>
-            <div>
-              <dt>Identidade</dt>
-              <dd>Seu nome</dd>
+        {recomendacoes.length > 0 && (
+          <section className={styles.primeiroPasso} aria-labelledby="certificados-primeiro-passo">
+            <div className={styles.primeiroPassoCabecalho}>
+              <p className={styles.primeiroPassoEyebrow}>Próximo passo</p>
+              <h2 id="certificados-primeiro-passo">Escolha a primeira prova que quer construir.</h2>
+              <p>
+                A formação cria repertório aplicado. O projeto transforma esse repertório em uma
+                entrega para o cliente.
+              </p>
             </div>
-            <div>
-              <dt>Escopo</dt>
-              <dd>Conteúdo concluído</dd>
-            </div>
-            <div>
-              <dt>Conquista</dt>
-              <dd>Data da conclusão</dd>
-            </div>
-          </dl>
-        </div>
+
+            <ul className={styles.recomendacoes}>
+              {recomendacoes.map((item) => (
+                <li key={item.origem}>
+                  <Link href={item.href} className={styles.recomendacao}>
+                    <span className={styles.recomendacaoIndice}>{item.indice}</span>
+                    <span className={styles.recomendacaoConteudo}>
+                      <span className={styles.recomendacaoOrigem}>{item.origem}</span>
+                      <strong>{item.titulo}</strong>
+                      <span className={styles.recomendacaoResumo}>{item.resumo}</span>
+                      <span className={styles.recomendacaoMeta}>{item.meta}</span>
+                    </span>
+                    <span className={styles.recomendacaoAcao}>{item.acao}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     );
   }
@@ -230,6 +302,9 @@ export function GaleriaCertificados({
                         <span className={styles.barra} style={{ width: `${pct}%` }} />
                       </span>
                       <span className={styles.linhaPct}>{pct}%</span>
+                      <span className={styles.linhaAcao} aria-hidden="true">
+                        Continuar
+                      </span>
                     </div>
                   </Link>
                 </li>
