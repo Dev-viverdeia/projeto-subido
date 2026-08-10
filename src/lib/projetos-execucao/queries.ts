@@ -55,6 +55,25 @@ export type AcaoPlanoProjeto = {
   atualizadoEm: string;
 };
 
+export type TipoEventoProjeto =
+  | 'portal_ativado'
+  | 'portal_desativado'
+  | 'link_rotacionado'
+  | 'aprovacao_solicitada'
+  | 'entrega_aprovada'
+  | 'ajustes_solicitados'
+  | 'arquivo_liberado'
+  | 'arquivo_retirado';
+
+export type EventoProjetoExecucao = {
+  id: string;
+  tarefaId: string | null;
+  tipo: TipoEventoProjeto;
+  autor: 'prestador' | 'cliente';
+  comentario: string | null;
+  criadoEm: string;
+};
+
 export type ResumoProjetoExecucao = {
   id: string;
   titulo: string;
@@ -75,6 +94,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   tarefas: TarefaProjetoExecucao[];
   arquivos: ArquivoProjetoExecucao[];
   acoesPlano: AcaoPlanoProjeto[];
+  eventos: EventoProjetoExecucao[];
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -154,7 +174,9 @@ export const obterProjetoExecucao = cache(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('projetos_execucao')
-      .select('*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*)')
+      .select(
+        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*)',
+      )
       .eq('id', id)
       .maybeSingle();
 
@@ -201,6 +223,23 @@ export const obterProjetoExecucao = cache(
       portalAtivo: data.portal_ativo,
       portalCodigo: data.portal_codigo,
       portalAtivadoEm: data.portal_ativado_em,
+      eventos: data.projeto_portal_eventos
+        .flatMap((evento) => {
+          const tipo = evento.tipo as TipoEventoProjeto;
+          const autor = evento.autor as EventoProjetoExecucao['autor'];
+          if (!['prestador', 'cliente'].includes(autor)) return [];
+          return [
+            {
+              id: evento.id,
+              tarefaId: evento.tarefa_id,
+              tipo,
+              autor,
+              comentario: evento.comentario,
+              criadoEm: evento.criado_em,
+            },
+          ];
+        })
+        .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
       acoesPlano: data.projeto_acoes
         .map((acao) => ({
           id: acao.id,

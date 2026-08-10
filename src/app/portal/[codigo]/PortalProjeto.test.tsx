@@ -19,6 +19,16 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 1,
   total: 2,
+  eventos: [
+    {
+      id: '99999999-9999-4999-8999-999999999999',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      tipo: 'entrega_aprovada',
+      autor: 'cliente',
+      comentario: 'Documento aprovado.',
+      criadoEm: '2026-08-08T12:00:00.000Z',
+    },
+  ],
   arquivos: [
     {
       id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
@@ -80,6 +90,8 @@ describe('PortalProjeto', () => {
       '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
     );
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
+    expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
+    expect(screen.getByText('Documento aprovado.')).toBeVisible();
     const decisao = screen.getByRole('heading', { name: /1 decisão espera por você/i });
     const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
     expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(

@@ -82,12 +82,18 @@ describe('CentralArquivos', () => {
         projetoId="11111111-1111-4111-8111-111111111111"
         tarefas={[TAREFA]}
         arquivos={ARQUIVOS}
+        eventos={[]}
+        concluido={false}
       />,
     );
 
     expect(screen.getByRole('heading', { name: 'Mapa de demanda' })).toBeVisible();
     expect(screen.getByText('v1 no portal')).toBeVisible();
     expect(screen.getByText('mapa-v2.pdf')).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Guardar um arquivo' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar arquivo' }));
+    expect(screen.getByRole('heading', { name: 'Guardar um arquivo' })).toBeVisible();
 
     await user.click(screen.getAllByRole('button', { name: 'Liberar no portal' })[0]!);
     await waitFor(() =>

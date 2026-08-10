@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition, type DragEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Archive, Check, CloudUpload, FolderLock, ShieldCheck, X } from 'lucide-react';
+import { Archive, Check, CloudUpload, FolderLock, Plus, ShieldCheck, X } from 'lucide-react';
 import {
   definirVisibilidadeArquivoProjeto,
   excluirArquivoProjeto,
@@ -10,6 +10,7 @@ import {
 } from '@/lib/projetos-execucao/actions';
 import type {
   ArquivoProjetoExecucao,
+  EventoProjetoExecucao,
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
 import {
@@ -20,6 +21,7 @@ import {
   tituloDoArquivo,
 } from '@/lib/projetos-execucao/upload-client';
 import { GrupoArquivoCard, type GrupoArquivo } from './GrupoArquivoCard';
+import { HistoricoEntrega } from './HistoricoEntrega';
 import styles from './CentralArquivos.module.css';
 
 function formatarTamanho(bytes: number): string {
@@ -31,10 +33,14 @@ export function CentralArquivos({
   projetoId,
   tarefas,
   arquivos,
+  eventos,
+  concluido,
 }: {
   projetoId: string;
   tarefas: TarefaProjetoExecucao[];
   arquivos: ArquivoProjetoExecucao[];
+  eventos: EventoProjetoExecucao[];
+  concluido: boolean;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +49,7 @@ export function CentralArquivos({
   const [descricao, setDescricao] = useState('');
   const [tarefaId, setTarefaId] = useState('');
   const [grupoAlvo, setGrupoAlvo] = useState<GrupoArquivo | null>(null);
+  const [mostrarEnvio, setMostrarEnvio] = useState(arquivos.length === 0);
   const [arrastando, setArrastando] = useState(false);
   const [progresso, setProgresso] = useState(0);
   const [enviando, setEnviando] = useState(false);
@@ -106,6 +113,7 @@ export function CentralArquivos({
     setTarefaId(grupo.tarefaId ?? '');
     setArquivo(null);
     setMensagem(null);
+    setMostrarEnvio(true);
     requestAnimationFrame(() => inputRef.current?.click());
   }
 
@@ -117,6 +125,11 @@ export function CentralArquivos({
     setGrupoAlvo(null);
     setProgresso(0);
     if (inputRef.current) inputRef.current.value = '';
+  }
+
+  function fecharEnvio() {
+    limparFormulario();
+    setMostrarEnvio(false);
   }
 
   async function enviar() {
@@ -147,6 +160,7 @@ export function CentralArquivos({
 
       setMensagem({ tipo: 'sucesso', texto: resultado.sucesso ?? 'Arquivo adicionado.' });
       limparFormulario();
+      setMostrarEnvio(false);
       router.refresh();
     } catch (error) {
       if (caminho) await removerUploadOrfao(caminho);
@@ -197,12 +211,33 @@ export function CentralArquivos({
           <span className={styles.seloCofre}>
             <FolderLock size={18} aria-hidden="true" /> Cofre privado
           </span>
-          <p>Central de arquivos</p>
-          <h2 id="central-arquivos-titulo">Cada entrega, na versão certa.</h2>
-          <blockquote>
-            Organize o material por tarefa e libere ao cliente somente o que estiver pronto.
-          </blockquote>
+          <p>{concluido ? 'Pós-entrega' : 'Central de arquivos'}</p>
+          <h2 id="central-arquivos-titulo">
+            {concluido
+              ? 'O projeto terminou. O valor fica.'
+              : 'Tudo que o cliente recebe, organizado.'}
+          </h2>
+          <span className={styles.resumoCentral}>
+            {concluido
+              ? 'Versões finais, aprovações e decisões continuam acessíveis neste espaço.'
+              : 'Prepare, versione e libere cada material sem misturar rascunhos com a entrega.'}
+          </span>
         </div>
+        <div className={styles.acaoCentral}>
+          <button
+            type="button"
+            onClick={() => (mostrarEnvio ? fecharEnvio() : setMostrarEnvio(true))}
+            aria-expanded={mostrarEnvio}
+            aria-controls="painel-novo-arquivo"
+          >
+            {mostrarEnvio ? <X size={16} /> : <Plus size={16} />}
+            {mostrarEnvio ? 'Fechar envio' : 'Adicionar arquivo'}
+          </button>
+          <small>Privado até você liberar</small>
+        </div>
+      </header>
+
+      <div className={styles.faixaResumo}>
         <dl className={styles.metricas}>
           <div>
             <dt>Entregáveis</dt>
@@ -217,124 +252,134 @@ export function CentralArquivos({
             <dd>{liberados}</dd>
           </div>
         </dl>
-      </header>
+        <p>
+          <ShieldCheck size={15} aria-hidden="true" /> Uma única versão de cada entrega aparece para
+          o cliente.
+        </p>
+      </div>
 
-      <div className={styles.corpo}>
-        <section className={styles.envio} aria-labelledby="novo-arquivo-titulo">
-          <div className={styles.envioTopo}>
-            <div>
-              <p>{grupoAlvo ? 'Atualização controlada' : 'Nova entrega'}</p>
-              <h3 id="novo-arquivo-titulo">
-                {grupoAlvo ? `Adicionar versão a ${grupoAlvo.titulo}` : 'Guardar um arquivo'}
-              </h3>
+      {mensagem && (
+        <p className={styles.mensagemGlobal} data-tipo={mensagem.tipo} role="status">
+          {mensagem.texto}
+        </p>
+      )}
+
+      <div className={styles.corpo} data-envio-aberto={mostrarEnvio || undefined}>
+        {mostrarEnvio && (
+          <section
+            className={styles.envio}
+            id="painel-novo-arquivo"
+            aria-labelledby="novo-arquivo-titulo"
+          >
+            <div className={styles.envioTopo}>
+              <div>
+                <p>{grupoAlvo ? 'Atualização controlada' : 'Nova entrega'}</p>
+                <h3 id="novo-arquivo-titulo">
+                  {grupoAlvo ? `Adicionar versão a ${grupoAlvo.titulo}` : 'Guardar um arquivo'}
+                </h3>
+              </div>
+              {grupoAlvo && (
+                <button type="button" onClick={fecharEnvio} aria-label="Cancelar nova versão">
+                  <X size={16} /> Cancelar
+                </button>
+              )}
             </div>
-            {grupoAlvo && (
-              <button type="button" onClick={limparFormulario} aria-label="Cancelar nova versão">
-                <X size={16} /> Cancelar
+
+            <input
+              ref={inputRef}
+              className={styles.inputArquivo}
+              type="file"
+              onChange={(evento) => selecionarArquivo(evento.target.files?.[0] ?? null)}
+              accept=".pdf,.zip,.json,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.webp,.avif,.mp4,.mp3,.m4a"
+            />
+            <div
+              className={styles.dropzone}
+              data-arrastando={arrastando || undefined}
+              data-preenchido={arquivo ? true : undefined}
+              onDragEnter={(evento) => {
+                evento.preventDefault();
+                setArrastando(true);
+              }}
+              onDragOver={(evento) => evento.preventDefault()}
+              onDragLeave={() => setArrastando(false)}
+              onDrop={receberDrop}
+            >
+              <span className={styles.iconeUpload}>
+                {arquivo ? <Check size={22} /> : <CloudUpload size={22} />}
+              </span>
+              {arquivo ? (
+                <div>
+                  <strong>{arquivo.name}</strong>
+                  <small>{formatarTamanho(arquivo.size)} · pronto para enviar</small>
+                </div>
+              ) : (
+                <div>
+                  <strong>Solte o arquivo neste cofre</strong>
+                  <small>Até 50 MB · envio retomável em arquivos grandes</small>
+                </div>
+              )}
+              <button type="button" onClick={() => inputRef.current?.click()}>
+                {arquivo ? 'Trocar' : 'Escolher arquivo'}
               </button>
-            )}
-          </div>
-
-          <input
-            ref={inputRef}
-            className={styles.inputArquivo}
-            type="file"
-            onChange={(evento) => selecionarArquivo(evento.target.files?.[0] ?? null)}
-            accept=".pdf,.zip,.json,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.jpg,.jpeg,.png,.webp,.avif,.mp4,.mp3,.m4a"
-          />
-          <div
-            className={styles.dropzone}
-            data-arrastando={arrastando || undefined}
-            data-preenchido={arquivo ? true : undefined}
-            onDragEnter={(evento) => {
-              evento.preventDefault();
-              setArrastando(true);
-            }}
-            onDragOver={(evento) => evento.preventDefault()}
-            onDragLeave={() => setArrastando(false)}
-            onDrop={receberDrop}
-          >
-            <span className={styles.iconeUpload}>
-              {arquivo ? <Check size={22} /> : <CloudUpload size={22} />}
-            </span>
-            {arquivo ? (
-              <div>
-                <strong>{arquivo.name}</strong>
-                <small>{formatarTamanho(arquivo.size)} · pronto para enviar</small>
-              </div>
-            ) : (
-              <div>
-                <strong>Solte o arquivo neste cofre</strong>
-                <small>Até 50 MB · envio retomável em arquivos grandes</small>
-              </div>
-            )}
-            <button type="button" onClick={() => inputRef.current?.click()}>
-              {arquivo ? 'Trocar' : 'Escolher arquivo'}
-            </button>
-          </div>
-
-          <div className={styles.campos}>
-            <label>
-              <span>Nome da entrega</span>
-              <input
-                value={titulo}
-                onChange={(evento) => setTitulo(evento.target.value)}
-                maxLength={180}
-                placeholder="Ex.: Manual final do atendimento"
-              />
-            </label>
-            <label>
-              <span>Vincular à tarefa</span>
-              <select value={tarefaId} onChange={(evento) => setTarefaId(evento.target.value)}>
-                <option value="">Projeto geral</option>
-                {tarefas.map((tarefa) => (
-                  <option key={tarefa.id} value={tarefa.id}>
-                    {tarefa.faseTitulo} · {tarefa.titulo}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={styles.descricao}>
-              <span>Contexto opcional</span>
-              <textarea
-                value={descricao}
-                onChange={(evento) => setDescricao(evento.target.value)}
-                maxLength={2000}
-                placeholder="O que esta versão contém ou o que mudou?"
-              />
-            </label>
-          </div>
-
-          {enviando && (
-            <div className={styles.progresso} role="status" aria-live="polite">
-              <div>
-                <span style={{ transform: `scaleX(${progresso / 100})` }} />
-              </div>
-              <strong>{progresso}%</strong>
-              <small>{progresso < 100 ? 'Protegendo e enviando…' : 'Registrando versão…'}</small>
             </div>
-          )}
 
-          {mensagem && (
-            <p className={styles.mensagem} data-tipo={mensagem.tipo} role="status">
-              {mensagem.texto}
-            </p>
-          )}
+            <div className={styles.campos}>
+              <label>
+                <span>Nome da entrega</span>
+                <input
+                  value={titulo}
+                  onChange={(evento) => setTitulo(evento.target.value)}
+                  maxLength={180}
+                  placeholder="Ex.: Manual final do atendimento"
+                />
+              </label>
+              <label>
+                <span>Vincular à tarefa</span>
+                <select value={tarefaId} onChange={(evento) => setTarefaId(evento.target.value)}>
+                  <option value="">Projeto geral</option>
+                  {tarefas.map((tarefa) => (
+                    <option key={tarefa.id} value={tarefa.id}>
+                      {tarefa.faseTitulo} · {tarefa.titulo}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.descricao}>
+                <span>Contexto opcional</span>
+                <textarea
+                  value={descricao}
+                  onChange={(evento) => setDescricao(evento.target.value)}
+                  maxLength={2000}
+                  placeholder="O que esta versão contém ou o que mudou?"
+                />
+              </label>
+            </div>
 
-          <button
-            className={styles.enviar}
-            type="button"
-            onClick={() => void enviar()}
-            disabled={!arquivo || titulo.trim().length < 2 || enviando}
-          >
-            <CloudUpload size={17} />
-            {enviando
-              ? 'Enviando com segurança…'
-              : grupoAlvo
-                ? 'Adicionar nova versão'
-                : 'Guardar no projeto'}
-          </button>
-        </section>
+            {enviando && (
+              <div className={styles.progresso} role="status" aria-live="polite">
+                <div>
+                  <span style={{ transform: `scaleX(${progresso / 100})` }} />
+                </div>
+                <strong>{progresso}%</strong>
+                <small>{progresso < 100 ? 'Protegendo e enviando…' : 'Registrando versão…'}</small>
+              </div>
+            )}
+
+            <button
+              className={styles.enviar}
+              type="button"
+              onClick={() => void enviar()}
+              disabled={!arquivo || titulo.trim().length < 2 || enviando}
+            >
+              <CloudUpload size={17} />
+              {enviando
+                ? 'Enviando com segurança…'
+                : grupoAlvo
+                  ? 'Adicionar nova versão'
+                  : 'Guardar no projeto'}
+            </button>
+          </section>
+        )}
 
         <section className={styles.acervo} aria-labelledby="acervo-titulo">
           <div className={styles.acervoTopo}>
@@ -371,6 +416,8 @@ export function CentralArquivos({
           )}
         </section>
       </div>
+
+      <HistoricoEntrega eventos={eventos} tarefas={tarefas} />
     </section>
   );
 }

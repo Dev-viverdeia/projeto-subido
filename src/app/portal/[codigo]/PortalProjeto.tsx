@@ -1,17 +1,21 @@
 import {
   ArrowUpRight,
+  BadgeCheck,
   Check,
   CircleDot,
   Clock3,
   Download,
   FileCheck2,
+  FileUp,
   Files,
+  History,
   LockKeyhole,
+  MessageSquareText,
+  Send,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
-import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
+import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { AprovacaoCliente } from './AprovacaoCliente';
 import styles from './portal.module.css';
@@ -36,6 +40,31 @@ function rotuloArquivo(mime: string): string {
   if (mime.startsWith('audio/')) return 'Áudio';
   if (mime.includes('zip')) return 'Pacote';
   return 'Documento';
+}
+
+const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
+  aprovacao_solicitada: 'Entrega pronta para sua revisão',
+  entrega_aprovada: 'Entrega aprovada por você',
+  ajustes_solicitados: 'Ajuste solicitado',
+  arquivo_liberado: 'Novo arquivo disponível',
+};
+
+function formatarMomento(valor: string): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+    .format(new Date(valor))
+    .replace('.', '');
+}
+
+function IconeEvento({ tipo }: { tipo: EventoPortalCliente['tipo'] }) {
+  if (tipo === 'entrega_aprovada') return <BadgeCheck size={17} aria-hidden="true" />;
+  if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
+  if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;
+  return <Send size={17} aria-hidden="true" />;
 }
 
 export function PortalProjeto({
@@ -82,11 +111,15 @@ export function PortalProjeto({
       </header>
 
       <div className={styles.canvas}>
-        <section className={styles.centralDecisoes} aria-labelledby="decisoes-titulo">
+        <section
+          className={styles.centralDecisoes}
+          data-concluido={concluido || undefined}
+          aria-labelledby="decisoes-titulo"
+        >
           <header>
             <div className={styles.iconeDecisao} data-pendente={aprovacoes.length > 0 || undefined}>
               {concluido ? (
-                <Sparkles size={20} />
+                <BadgeCheck size={20} />
               ) : aprovacoes.length ? (
                 <Clock3 size={20} />
               ) : (
@@ -167,6 +200,8 @@ export function PortalProjeto({
           </div>
         </section>
 
+        <PosEntregaPortal codigo={codigo} projeto={projeto} concluido={concluido} />
+
         <div className={styles.painel}>
           <section className={styles.andamento} aria-labelledby="andamento-titulo">
             <header>
@@ -244,52 +279,6 @@ export function PortalProjeto({
           </section>
         </div>
 
-        <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
-          <header>
-            <div>
-              <p>Materiais liberados</p>
-              <h2 id="arquivos-titulo">Arquivos do projeto</h2>
-            </div>
-            <span>
-              <ShieldCheck size={14} /> Versões aprovadas para você
-            </span>
-          </header>
-
-          {projeto.arquivos.length ? (
-            <ol>
-              {projeto.arquivos.map((arquivo) => {
-                const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
-                return (
-                  <li key={arquivo.id}>
-                    <span className={styles.iconeArquivo}>
-                      <Files size={18} aria-hidden="true" />
-                    </span>
-                    <div>
-                      <small>
-                        {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
-                      </small>
-                      <strong>{arquivo.titulo}</strong>
-                      {arquivo.descricao && <p>{arquivo.descricao}</p>}
-                      <em>
-                        {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
-                        {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
-                      </em>
-                    </div>
-                    <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
-                      <Download size={15} /> Baixar
-                    </a>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : (
-            <div className={styles.vazioArquivo}>
-              <Files size={20} aria-hidden="true" />
-              <p>Os arquivos liberados para download aparecerão aqui.</p>
-            </div>
-          )}
-        </section>
-
         <section className={styles.seguranca}>
           <LockKeyhole size={16} aria-hidden="true" />
           <div>
@@ -304,5 +293,105 @@ export function PortalProjeto({
         <span>Projeto conduzido com transparência, evidência e aprovação humana.</span>
       </footer>
     </main>
+  );
+}
+
+function PosEntregaPortal({
+  codigo,
+  projeto,
+  concluido,
+}: {
+  codigo: string;
+  projeto: ProjetoPortalCliente;
+  concluido: boolean;
+}) {
+  return (
+    <div className={styles.posEntrega} data-concluido={concluido || undefined}>
+      <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
+        <header>
+          <div>
+            <p>{concluido ? 'Kit final do projeto' : 'Materiais liberados'}</p>
+            <h2 id="arquivos-titulo">
+              {concluido ? 'Tudo que fica com você.' : 'Arquivos do projeto'}
+            </h2>
+          </div>
+          <span>
+            <ShieldCheck size={14} /> Versões aprovadas para você
+          </span>
+        </header>
+
+        {projeto.arquivos.length ? (
+          <ol>
+            {projeto.arquivos.map((arquivo) => {
+              const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
+              return (
+                <li key={arquivo.id}>
+                  <span className={styles.iconeArquivo}>
+                    <Files size={18} aria-hidden="true" />
+                  </span>
+                  <div>
+                    <small>
+                      {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
+                    </small>
+                    <strong>{arquivo.titulo}</strong>
+                    {arquivo.descricao && <p>{arquivo.descricao}</p>}
+                    <em>
+                      {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
+                      {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
+                    </em>
+                  </div>
+                  <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
+                    <Download size={15} /> Baixar
+                  </a>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <div className={styles.vazioArquivo}>
+            <Files size={20} aria-hidden="true" />
+            <p>Os arquivos liberados para download aparecerão aqui.</p>
+          </div>
+        )}
+      </section>
+
+      <section className={styles.linhaTempo} aria-labelledby="linha-tempo-titulo">
+        <header>
+          <div>
+            <p>Linha do tempo</p>
+            <h2 id="linha-tempo-titulo">O que foi decidido.</h2>
+          </div>
+          <span>
+            <History size={14} /> Histórico compartilhado
+          </span>
+        </header>
+
+        {projeto.eventos.length ? (
+          <ol>
+            {projeto.eventos.slice(0, 8).map((evento) => {
+              const tarefa = projeto.tarefas.find((item) => item.id === evento.tarefaId);
+              return (
+                <li key={evento.id} data-cliente={evento.autor === 'cliente' || undefined}>
+                  <span className={styles.iconeEvento}>
+                    <IconeEvento tipo={evento.tipo} />
+                  </span>
+                  <div>
+                    <strong>{ROTULO_EVENTO[evento.tipo]}</strong>
+                    <small>{tarefa?.titulo ?? 'Projeto geral'}</small>
+                    {evento.comentario && <p>{evento.comentario}</p>}
+                  </div>
+                  <time dateTime={evento.criadoEm}>{formatarMomento(evento.criadoEm)}</time>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <div className={styles.vazioArquivo}>
+            <History size={20} aria-hidden="true" />
+            <p>Validações e aprovações aparecerão aqui automaticamente.</p>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

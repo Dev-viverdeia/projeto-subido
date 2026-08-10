@@ -31,11 +31,45 @@ const PROJETO: ProjetoPortalCliente = {
   resumo: 'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp da clínica.',
   objetivo:
     'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
-  status: 'em_validacao',
+  status: 'concluido',
   inicioEm: '2026-08-05T12:00:00.000Z',
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 7,
   total: 7,
+  eventos: [
+    {
+      id: '99999999-9999-4999-8999-999999999991',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa7',
+      tipo: 'entrega_aprovada',
+      autor: 'cliente',
+      comentario: 'Entrega final aprovada pela diretoria de operações.',
+      criadoEm: '2026-08-10T18:20:00.000Z',
+    },
+    {
+      id: '99999999-9999-4999-8999-999999999992',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa7',
+      tipo: 'aprovacao_solicitada',
+      autor: 'prestador',
+      comentario: null,
+      criadoEm: '2026-08-10T17:10:00.000Z',
+    },
+    {
+      id: '99999999-9999-4999-8999-999999999993',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa7',
+      tipo: 'arquivo_liberado',
+      autor: 'prestador',
+      comentario: 'Manual da operação · v1',
+      criadoEm: '2026-08-10T16:40:00.000Z',
+    },
+    {
+      id: '99999999-9999-4999-8999-999999999994',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1',
+      tipo: 'entrega_aprovada',
+      autor: 'cliente',
+      comentario: null,
+      criadoEm: '2026-08-08T10:00:00.000Z',
+    },
+  ],
   arquivos: [
     {
       id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3',
@@ -58,6 +92,17 @@ const PROJETO: ProjetoPortalCliente = {
       tamanhoBytes: 920000,
       versao: 1,
       publicadoEm: '2026-08-09T13:30:00.000Z',
+    },
+    {
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5',
+      tarefaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa7',
+      titulo: 'Manual da operação e indicadores',
+      descricao: 'Rotina final, responsáveis e agenda da primeira revisão.',
+      nomeOriginal: 'manual-operacao-aurora.pdf',
+      mimeType: 'application/pdf',
+      tamanhoBytes: 2240000,
+      versao: 1,
+      publicadoEm: '2026-08-10T16:40:00.000Z',
     },
   ],
   tarefas: [
@@ -139,11 +184,12 @@ const PROJETO: ProjetoPortalCliente = {
       entregavel: 'Manual e agenda de acompanhamento.',
       ordem: 4001,
       status: 'concluida',
-      clienteStatus: 'aguardando',
+      clienteStatus: 'aprovada',
       clienteNota:
         'A operação está ativa, a equipe foi treinada e os indicadores de acompanhamento estão organizados neste portal.',
       entregavelUrl: 'https://example.com/entrega-final',
       solicitadoEm: '2026-08-10T12:00:00.000Z',
+      respondidoEm: '2026-08-10T18:20:00.000Z',
     }),
   ],
 };

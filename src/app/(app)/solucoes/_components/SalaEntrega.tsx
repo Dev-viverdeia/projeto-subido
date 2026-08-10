@@ -271,6 +271,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         projetoId={projeto.id}
         tarefas={projeto.tarefas}
         arquivos={projeto.arquivos}
+        eventos={projeto.eventos}
+        concluido={projeto.status === 'concluido'}
       />
     </div>
   );

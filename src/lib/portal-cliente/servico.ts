@@ -8,6 +8,7 @@ import type {
   StatusProjetoExecucao,
   StatusTarefaProjeto,
 } from '@/lib/projetos-execucao/status';
+import type { TipoEventoProjeto } from '@/lib/projetos-execucao/queries';
 // Exceção deliberada: o link secreto é resolvido no servidor sem abrir SELECT
 // para `anon`. O retorno abaixo contém só o recorte preparado para o cliente.
 // eslint-disable-next-line no-restricted-imports
@@ -41,6 +42,18 @@ export type ArquivoPortalCliente = {
   publicadoEm: string;
 };
 
+export type EventoPortalCliente = {
+  id: string;
+  tarefaId: string | null;
+  tipo: Extract<
+    TipoEventoProjeto,
+    'aprovacao_solicitada' | 'entrega_aprovada' | 'ajustes_solicitados' | 'arquivo_liberado'
+  >;
+  autor: 'prestador' | 'cliente';
+  comentario: string | null;
+  criadoEm: string;
+};
+
 export type ProjetoPortalCliente = {
   id: string;
   titulo: string;
@@ -54,7 +67,15 @@ export type ProjetoPortalCliente = {
   total: number;
   tarefas: TarefaPortalCliente[];
   arquivos: ArquivoPortalCliente[];
+  eventos: EventoPortalCliente[];
 };
+
+const EVENTOS_VISIVEIS = [
+  'aprovacao_solicitada',
+  'entrega_aprovada',
+  'ajustes_solicitados',
+  'arquivo_liberado',
+] as const;
 
 function codigoValido(codigo: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(codigo);
@@ -107,6 +128,15 @@ export const obterPortalCliente = cache(
       .order('publicado_em', { ascending: false });
     if (erroArquivos) throw handleError(erroArquivos, 'portal-cliente:arquivos');
 
+    const { data: eventos, error: erroEventos } = await admin
+      .from('projeto_portal_eventos')
+      .select('id, tarefa_id, tipo, autor, comentario, criado_em')
+      .eq('projeto_execucao_id', data.id)
+      .in('tipo', [...EVENTOS_VISIVEIS])
+      .order('criado_em', { ascending: false })
+      .limit(40);
+    if (erroEventos) throw handleError(erroEventos, 'portal-cliente:eventos');
+
     return {
       id: data.id,
       titulo: data.titulo,
@@ -136,6 +166,24 @@ export const obterPortalCliente = cache(
             ]
           : [],
       ),
+      eventos: (eventos ?? []).flatMap((evento) => {
+        if (
+          !EVENTOS_VISIVEIS.includes(evento.tipo as (typeof EVENTOS_VISIVEIS)[number]) ||
+          !['prestador', 'cliente'].includes(evento.autor)
+        ) {
+          return [];
+        }
+        return [
+          {
+            id: evento.id,
+            tarefaId: evento.tarefa_id,
+            tipo: evento.tipo as EventoPortalCliente['tipo'],
+            autor: evento.autor as EventoPortalCliente['autor'],
+            comentario: evento.comentario,
+            criadoEm: evento.criado_em,
+          },
+        ];
+      }),
     };
   },
 );

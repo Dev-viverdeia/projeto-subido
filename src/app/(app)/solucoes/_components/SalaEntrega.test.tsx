@@ -54,6 +54,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
   arquivos: [],
+  eventos: [],
   acoesPlano: [],
   documento: DOCUMENTO,
   tarefas: [

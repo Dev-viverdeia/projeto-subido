@@ -50,9 +50,33 @@
 }
 
 .hero[data-concluido] {
+  grid-template-columns: minmax(0, 1fr) 200px;
   background:
     radial-gradient(circle at 88% 0, rgba(0, 174, 239, 0.28), transparent 36%),
     linear-gradient(145deg, var(--via-navy), var(--via-navy-deep) 76%);
+}
+
+.hero[data-concluido] .heroTexto {
+  padding-block: clamp(28px, 3.5vw, 40px);
+}
+
+.hero[data-concluido] .heroTexto h1 {
+  max-width: 24ch;
+  font-size: clamp(2.15rem, 4.2vw, 3.35rem);
+  line-height: 1;
+}
+
+.hero[data-concluido] .heroTexto blockquote {
+  margin-top: var(--via-space-3);
+  font-size: var(--via-fs-xs);
+}
+
+.hero[data-concluido] .heroTexto dl {
+  margin-top: var(--via-space-4);
+}
+
+.hero[data-concluido] .progressoHero > span {
+  font-size: clamp(2.8rem, 5vw, 3.7rem);
 }
 
 .heroTexto {
@@ -74,6 +98,7 @@
 .andamento header p,
 .biblioteca header p,
 .arquivos header p,
+.linhaTempo header p,
 .aprovacaoTopo p,
 .aprovacaoResumo > span {
   font-family: var(--via-font-mono);
@@ -177,6 +202,28 @@
   border-bottom: 1px solid var(--via-border-hairline);
   background:
     radial-gradient(circle at 100% 0, rgba(0, 174, 239, 0.07), transparent 25rem), var(--via-bg-2);
+}
+
+.centralDecisoes[data-concluido] {
+  padding-block: clamp(24px, 3vw, 34px);
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      color-mix(in srgb, var(--via-accent) 10%, transparent),
+      transparent 24rem
+    ),
+    var(--via-white);
+}
+
+.centralDecisoes[data-concluido] .iconeDecisao {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.centralDecisoes[data-concluido] .estadoDecisao {
+  margin-top: var(--via-space-4);
+  padding-top: var(--via-space-4);
 }
 
 .centralDecisoes > header {
@@ -471,7 +518,8 @@
 
 .andamento header,
 .biblioteca > header,
-.arquivos > header {
+.arquivos > header,
+.linhaTempo > header {
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -483,27 +531,32 @@
 .biblioteca header p,
 .biblioteca header h2,
 .arquivos header p,
-.arquivos header h2 {
+.arquivos header h2,
+.linhaTempo header p,
+.linhaTempo header h2 {
   margin: 0;
 }
 
 .andamento header p,
 .biblioteca header p,
-.arquivos header p {
+.arquivos header p,
+.linhaTempo header p {
   color: var(--via-accent-ink);
   font-size: var(--via-fs-micro);
 }
 
 .andamento header h2,
 .biblioteca header h2,
-.arquivos header h2 {
+.arquivos header h2,
+.linhaTempo header h2 {
   margin-top: var(--via-space-2);
   font-size: var(--via-fs-h2);
   letter-spacing: var(--app-ls-h2);
 }
 
 .andamento header > span,
-.arquivos > header > span {
+.arquivos > header > span,
+.linhaTempo > header > span {
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: 0.54rem;
@@ -511,7 +564,8 @@
   text-transform: uppercase;
 }
 
-.arquivos > header > span {
+.arquivos > header > span,
+.linhaTempo > header > span {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
@@ -519,7 +573,8 @@
 
 .andamento ol,
 .biblioteca ol,
-.arquivos ol {
+.arquivos ol,
+.linhaTempo ol {
   margin: var(--via-space-6) 0 0;
   padding: 0;
   list-style: none;
@@ -671,8 +726,27 @@
   font-size: var(--via-fs-xs);
 }
 
-.arquivos {
-  margin: 0 clamp(34px, 5vw, 62px) clamp(34px, 5vw, 62px);
+.posEntrega {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: var(--via-space-4);
+  padding: clamp(34px, 5vw, 62px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-white);
+}
+
+.posEntrega[data-concluido] {
+  background:
+    radial-gradient(
+      circle at 0 0,
+      color-mix(in srgb, var(--via-accent) 8%, transparent),
+      transparent 28rem
+    ),
+    var(--via-white);
+}
+
+.arquivos,
+.linhaTempo {
   padding: clamp(24px, 4vw, 36px);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-surface);
@@ -681,8 +755,8 @@
 }
 
 .arquivos ol {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--via-space-3);
 }
 
@@ -762,6 +836,70 @@
   text-decoration: none;
 }
 
+.linhaTempo ol {
+  padding: 0;
+  list-style: none;
+}
+
+.linhaTempo li {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--via-space-3);
+  align-items: start;
+  padding-block: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.iconeEvento {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--via-white);
+  color: var(--via-accent-ink);
+  box-shadow: inset 0 0 0 1px var(--via-border-hairline);
+}
+
+.linhaTempo li[data-cliente] .iconeEvento {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.linhaTempo li strong,
+.linhaTempo li small,
+.linhaTempo li p {
+  display: block;
+  margin: 0;
+}
+
+.linhaTempo li strong {
+  font-size: var(--via-fs-xs);
+}
+
+.linhaTempo li small,
+.linhaTempo li time {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.linhaTempo li small {
+  margin-top: 4px;
+}
+
+.linhaTempo li p {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.45;
+}
+
+.linhaTempo li time {
+  white-space: nowrap;
+}
+
 .seguranca {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -813,9 +951,11 @@
   box-shadow: var(--app-ring);
 }
 
-@media (max-width: 940px) {
+@media (max-width: 900px) {
   .hero,
+  .hero[data-concluido],
   .painel,
+  .posEntrega,
   .aprovacaoConteudo {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -829,13 +969,9 @@
     border-right: 0;
     border-bottom: 1px solid var(--via-border-hairline);
   }
-
-  .arquivos ol {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 599px) {
   .barra,
   .canvas,
   .rodape {
@@ -859,7 +995,8 @@
   .heroTexto,
   .progressoHero,
   .centralDecisoes,
-  .painel {
+  .painel,
+  .posEntrega {
     padding: var(--via-space-6) var(--via-space-5);
   }
 
@@ -906,7 +1043,8 @@
 
   .andamento header,
   .biblioteca > header,
-  .arquivos > header {
+  .arquivos > header,
+  .linhaTempo > header {
     align-items: start;
     flex-direction: column;
   }
@@ -920,7 +1058,6 @@
   }
 
   .arquivos {
-    margin: 0 var(--via-space-5) var(--via-space-6);
     padding: var(--via-space-5);
   }
 
@@ -931,6 +1068,18 @@
   .iconeArquivo,
   .arquivos li a {
     grid-column: 1;
+  }
+
+  .linhaTempo {
+    padding: var(--via-space-5);
+  }
+
+  .linhaTempo li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .linhaTempo li time {
+    grid-column: 2;
   }
 
   .seguranca {
