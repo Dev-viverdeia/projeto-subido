@@ -52,6 +52,10 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const parciaisRef = useRef(new Map<string, string>());
   const envioRef = useRef(false);
   const finalizadaRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const destinoRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const fontesRef = useRef(new Map<string, MediaStreamAudioSourceNode>());
+  const trilhasRef = useRef<MediaStreamTrack[]>([]);
 
   const trilhas = referencias
     .map((referencia) => referencia.publication?.track?.mediaStreamTrack)
@@ -60,6 +64,13 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     .map((trilha) => trilha.id)
     .sort()
     .join('|');
+  const temTrilha = Boolean(assinaturaTrilhas);
+
+  useEffect(() => {
+    trilhasRef.current = trilhas;
+    // A assinatura muda somente quando uma mídia real entra ou sai da mistura.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assinaturaTrilhas]);
 
   const enviarPendentes = useCallback(async () => {
     if (envioRef.current || pendentesRef.current.length === 0) return;
@@ -149,11 +160,11 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   }, []);
 
   useEffect(() => {
-    if (!assinaturaTrilhas) return;
+    if (!temTrilha) return;
     let cancelado = false;
     let peer: RTCPeerConnection | null = null;
     let audioContext: AudioContext | null = null;
-    const fontes: MediaStreamAudioSourceNode[] = [];
+    const fontesAtivas = fontesRef.current;
 
     async function conectar() {
       try {
@@ -169,10 +180,12 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
         audioContext = new AudioContextClass();
         await audioContext.resume();
         const destino = audioContext.createMediaStreamDestination();
-        for (const trilha of trilhas) {
+        audioContextRef.current = audioContext;
+        destinoRef.current = destino;
+        for (const trilha of trilhasRef.current) {
           const fonte = audioContext.createMediaStreamSource(new MediaStream([trilha]));
           fonte.connect(destino);
-          fontes.push(fonte);
+          fontesAtivas.set(trilha.id, fonte);
         }
         const trilhaMista = destino.stream.getAudioTracks()[0];
         if (!trilhaMista) throw new Error('O áudio da reunião ainda não está disponível.');
@@ -212,12 +225,35 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     return () => {
       cancelado = true;
       peer?.close();
-      for (const fonte of fontes) fonte.disconnect();
+      for (const fonte of fontesAtivas.values()) fonte.disconnect();
+      fontesAtivas.clear();
+      audioContextRef.current = null;
+      destinoRef.current = null;
       void audioContext?.close();
     };
+  }, [registrarEvento, reuniaoId, temTrilha]);
+
+  useEffect(() => {
+    const audioContext = audioContextRef.current;
+    const destino = destinoRef.current;
+    if (!audioContext || !destino) return;
+
+    const idsAtuais = new Set(trilhas.map((trilha) => trilha.id));
+    for (const [id, fonte] of fontesRef.current) {
+      if (idsAtuais.has(id)) continue;
+      fonte.disconnect();
+      fontesRef.current.delete(id);
+    }
+
+    for (const trilha of trilhas) {
+      if (fontesRef.current.has(trilha.id)) continue;
+      const fonte = audioContext.createMediaStreamSource(new MediaStream([trilha]));
+      fonte.connect(destino);
+      fontesRef.current.set(trilha.id, fonte);
+    }
     // A assinatura muda somente quando uma mídia real entra ou sai da mistura.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assinaturaTrilhas, registrarEvento, reuniaoId]);
+  }, [assinaturaTrilhas]);
 
   const finalizar = useCallback(() => {
     if (finalizadaRef.current) return;
