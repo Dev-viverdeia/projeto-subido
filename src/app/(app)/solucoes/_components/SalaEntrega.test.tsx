@@ -230,4 +230,32 @@ describe('SalaEntrega', () => {
     await user.click(screen.getByRole('button', { name: /Formalizar a entrega final/i }));
     expect(screen.getByText('Aceite final pronto para envio')).toBeVisible();
   });
+
+  it('troca a próxima tarefa pelo encerramento quando o cliente já aceitou a entrega', async () => {
+    const user = userEvent.setup();
+    const tarefas = PROJETO.tarefas.map((tarefa, indice, lista) => ({
+      ...tarefa,
+      status: 'concluida' as const,
+      evidencia: tarefa.evidencia || 'Entrega comprovada.',
+      clienteStatus: indice === lista.length - 1 ? ('aprovada' as const) : tarefa.clienteStatus,
+    }));
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 3,
+          total: 3,
+          status: 'concluido',
+          portalAtivo: true,
+          tarefas,
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /Projeto concluído Entrega aceita/i })).toBeVisible();
+    expect(screen.queryByText('Formalizar a entrega final')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /Projeto concluído Entrega aceita/i }));
+    expect(screen.getByText('Projeto encerrado com aceite do cliente')).toBeVisible();
+  });
 });

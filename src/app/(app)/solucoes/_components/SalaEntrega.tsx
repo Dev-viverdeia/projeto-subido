@@ -32,6 +32,7 @@ import { EntregaCliente } from './EntregaCliente';
 import { CentralArquivos } from './CentralArquivos';
 import { PlanoVivo } from './PlanoVivo';
 import { PortalClienteCard } from './PortalClienteCard';
+import { ProximaAcaoProjeto } from './ProximaAcaoProjeto';
 import styles from './SalaEntrega.module.css';
 
 const ESTADO_INICIAL: EstadoProjetoExecucao = {};
@@ -229,31 +230,12 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </main>
 
         <aside className={styles.lateral}>
-          <button type="button" className={styles.proximaAcao} onClick={abrirProximaAcao}>
-            <p>{proximoCompromisso ? 'Próximo compromisso' : 'Próxima tarefa'}</p>
-            {proximoCompromisso ? (
-              <>
-                <strong>{proximoCompromisso.titulo}</strong>
-                <span>
-                  Abrir plano vivo <ArrowRight size={15} aria-hidden="true" />
-                </span>
-              </>
-            ) : proxima ? (
-              <>
-                <strong>{proxima.titulo}</strong>
-                <span>
-                  {proxima.faseTitulo} <ArrowRight size={15} aria-hidden="true" />
-                </span>
-              </>
-            ) : (
-              <>
-                <strong>Formalizar a entrega final</strong>
-                <span>
-                  Abrir aceite final <ArrowRight size={15} aria-hidden="true" />
-                </span>
-              </>
-            )}
-          </button>
+          <ProximaAcaoProjeto
+            concluido={projeto.status === 'concluido'}
+            compromisso={proximoCompromisso?.titulo ?? null}
+            tarefa={proxima}
+            onAbrir={abrirProximaAcao}
+          />
 
           <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />
 
