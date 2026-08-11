@@ -42,39 +42,6 @@
   font-family: var(--via-font-mono);
 }
 
-.proposta {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4);
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
-  text-decoration: none;
-}
-
-.proposta > svg:first-child {
-  color: var(--via-accent);
-}
-
-.proposta span {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: var(--via-fs-sm);
-  font-weight: 650;
-}
-
-.proposta small {
-  color: rgba(255, 255, 255, 0.48);
-  font-family: var(--via-font-mono);
-  font-size: 0.59rem;
-  font-weight: 400;
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
 .eyebrow {
   margin: 0 0 var(--via-space-4);
   font-size: var(--via-fs-micro);
@@ -178,8 +145,7 @@
   transition: transform var(--app-t-state);
 }
 
-.continuarHero,
-.concluidoHero {
+.continuarHero {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -190,6 +156,7 @@
   font-family: inherit;
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-snug);
+  text-decoration: none;
 }
 
 .continuarHero {
@@ -223,12 +190,6 @@
 .continuarHero:focus-visible {
   outline: 2px solid var(--via-white);
   outline-offset: 3px;
-}
-
-.concluidoHero {
-  justify-content: flex-start;
-  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
-  color: var(--via-white);
 }
 
 .navegacaoFases {
@@ -960,6 +921,152 @@
   gap: var(--via-space-3);
 }
 
+.rotaProjeto {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.rotaProjeto header {
+  padding: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background:
+    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 48%), var(--via-surface);
+}
+
+.rotaProjeto header span,
+.rotaProjeto header h2,
+.rotaProjeto header p {
+  margin: 0;
+}
+
+.rotaProjeto header span {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.rotaProjeto header h2 {
+  margin-top: var(--via-space-2);
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+}
+
+.rotaProjeto header p {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.rotaProjeto ol {
+  margin: 0;
+  padding: var(--via-space-2) var(--via-space-4);
+  list-style: none;
+}
+
+.rotaProjeto li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  padding-block: var(--via-space-3);
+}
+
+.rotaProjeto li + li {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.rotaProjeto li b {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--via-border);
+  border-radius: 50%;
+  background: var(--via-surface);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.rotaProjeto li strong,
+.rotaProjeto li p {
+  display: block;
+  margin: 0;
+}
+
+.rotaProjeto li strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+}
+
+.rotaProjeto li p {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.rotaAcoes {
+  display: grid;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) var(--via-space-4) var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.rotaAcoes a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 42px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition:
+    border-color var(--app-t-state),
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch);
+}
+
+.rotaAcoes a:first-child {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.rotaAcoes a:first-child > svg:first-child {
+  color: var(--via-accent);
+}
+
+.rotaAcoes a:hover {
+  transform: translateY(-1px);
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.rotaAcoes a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 .lateralBloco,
 .estudio {
   border: 1px solid var(--app-elev-1-line);
@@ -1059,6 +1166,30 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .rotaProjeto {
+    grid-column: 1 / -1;
+  }
+
+  .rotaProjeto ol {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-block: var(--via-space-3);
+  }
+
+  .rotaProjeto li {
+    align-content: start;
+    padding: var(--via-space-3);
+  }
+
+  .rotaProjeto li + li {
+    border-top: 0;
+    border-left: 1px solid var(--via-border-hairline);
+  }
+
+  .rotaAcoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .estudio,
   .notaLocal {
     grid-column: 1 / -1;
@@ -1083,8 +1214,7 @@
     grid-template-columns: auto minmax(100px, 1fr);
   }
 
-  .continuarHero,
-  .concluidoHero {
+  .continuarHero {
     grid-column: 1 / -1;
   }
 
@@ -1109,6 +1239,20 @@
 
   .guiaCorpo {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rotaProjeto ol,
+  .rotaAcoes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rotaProjeto li {
+    padding-inline: 0;
+  }
+
+  .rotaProjeto li + li {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
   }
 
   .execucao {
@@ -1146,8 +1290,7 @@
     grid-row: 2;
   }
 
-  .continuarHero,
-  .concluidoHero {
+  .continuarHero {
     grid-row: 3;
   }
 
@@ -1233,6 +1376,7 @@
   .navegacaoFases button,
   .check,
   .continuarHero,
+  .rotaAcoes a,
   .guia summary > svg,
   .progressoHero > span,
   .navegacaoSequencial a,

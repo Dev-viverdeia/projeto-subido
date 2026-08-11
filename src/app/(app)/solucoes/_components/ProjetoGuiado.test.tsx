@@ -136,4 +136,38 @@ describe('Projeto guiado', () => {
       '/builder?projeto=crm-comercial',
     );
   });
+
+  it('conecta o projeto ao primeiro lead e à proposta comercial', () => {
+    montar();
+
+    expect(screen.getByRole('link', { name: /Cadastrar lead/ })).toHaveAttribute(
+      'href',
+      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA',
+    );
+    expect(screen.getByRole('link', { name: /Criar proposta/ })).toHaveAttribute(
+      'href',
+      '/propostas/nova?projeto=crm-comercial',
+    );
+    expect(
+      screen.getByText('O roteiro entra em campo depois que uma empresa aceita avançar.'),
+    ).toBeInTheDocument();
+  });
+
+  it('leva para uma nova oportunidade quando a entrega guiada termina', () => {
+    const agora = new Date().toISOString();
+    const etapas = Object.fromEntries(
+      fases.map((fase) => [`projeto:crm-comercial:${fase}:passo-${fase}`, agora]),
+    );
+    localStorage.setItem(
+      'subido_progresso_v1',
+      JSON.stringify({ aulas: {}, formacoes: {}, etapas, solucoes: {} }),
+    );
+
+    montar();
+
+    expect(screen.getByRole('link', { name: /Encontrar novo cliente/ })).toHaveAttribute(
+      'href',
+      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA',
+    );
+  });
 });

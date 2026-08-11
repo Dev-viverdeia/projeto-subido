@@ -8,8 +8,14 @@ import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'CRM' };
 
+function primeiroParametro(valor: string | string[] | undefined): string {
+  return (Array.isArray(valor) ? valor[0] : valor)?.trim().slice(0, 180) ?? '';
+}
+
 export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
   const [oportunidades, parametros] = await Promise.all([listarPipeline(), searchParams]);
+  const projetoDeOrigem = primeiroParametro(parametros.projeto);
+  const abrirDoProjeto = parametros.novo === 'projeto' && Boolean(projetoDeOrigem);
   const abertas = oportunidades.filter((item) => etapaAberta(item.etapa)).length;
   const emDecisao = oportunidades.filter(
     (item) => item.etapa === 'proposta' || item.etapa === 'negociacao',
@@ -27,7 +33,9 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
             lugar.
           </p>
         </div>
-        {oportunidades.length > 0 && <FormularioNovoLead />}
+        {oportunidades.length > 0 && (
+          <FormularioNovoLead abertoInicial={abrirDoProjeto} tituloInicial={projetoDeOrigem} />
+        )}
       </header>
 
       {parametros.novo === 'ok' && (
@@ -89,7 +97,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 Cadastre o que você sabe agora. Empresa, contato e oportunidade bastam para a
                 plataforma começar a construir o histórico comercial.
               </p>
-              <FormularioNovoLead rotulo="Adicionar primeiro lead" />
+              <FormularioNovoLead
+                rotulo="Adicionar primeiro lead"
+                abertoInicial={abrirDoProjeto}
+                tituloInicial={projetoDeOrigem}
+              />
             </div>
 
             <ol className={styles.proximosPassos} aria-label="O que acontece depois">

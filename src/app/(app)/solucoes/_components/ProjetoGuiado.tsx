@@ -9,7 +9,6 @@ import {
   ArrowUpRight,
   Check,
   Clock3,
-  FileSignature,
   PackageCheck,
   Layers3,
 } from 'lucide-react';
@@ -24,6 +23,7 @@ import {
 import { Ferramentas, Prompts } from './KitSolucao';
 import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
 import { ProximaSolucao } from './ProximaSolucao';
+import { RotaComercialProjeto } from './RotaComercialProjeto';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import styles from './ProjetoGuiado.module.css';
 
@@ -53,6 +53,8 @@ export function ProjetoGuiado({
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
+  const destinoCrm = `/crm?novo=projeto&projeto=${encodeURIComponent(titulo)}`;
+  const destinoProposta = `/propostas/nova?projeto=${encodeURIComponent(slug)}`;
 
   const passos = projeto.roteiro.fases.flatMap((fase) =>
     fase.passos.map((passo) => ({ fase, passo, id: idPassoProjeto(slug, fase.id, passo.id) })),
@@ -137,10 +139,13 @@ export function ProjetoGuiado({
               <ArrowDown size={16} aria-hidden="true" />
             </button>
           ) : (
-            <div className={styles.concluidoHero}>
+            <Link href={destinoCrm} className={styles.continuarHero}>
+              <span>
+                <small>Próximo movimento</small>
+                Encontrar novo cliente
+              </span>
               <PackageCheck size={18} aria-hidden="true" />
-              Projeto pronto para entregar
-            </div>
+            </Link>
           )}
         </section>
 
@@ -359,6 +364,8 @@ export function ProjetoGuiado({
         </main>
 
         <aside className={styles.lateral}>
+          <RotaComercialProjeto destinoCrm={destinoCrm} destinoProposta={destinoProposta} />
+
           <section className={styles.lateralBloco}>
             <span>Cliente ideal</span>
             <p>{projeto.clienteIdeal}</p>
@@ -381,18 +388,6 @@ export function ProjetoGuiado({
               Personalizar no Estúdio <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </section>
-
-          <Link
-            href={`/propostas/nova?projeto=${encodeURIComponent(slug)}`}
-            className={styles.proposta}
-          >
-            <FileSignature size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>
-              <small>Levar ao cliente</small>
-              Criar proposta comercial
-            </span>
-            <ArrowUpRight size={16} aria-hidden="true" />
-          </Link>
 
           <p className={styles.notaLocal}>
             Salvo na sua conta. Você pode marcar, reabrir e continuar em qualquer dispositivo.

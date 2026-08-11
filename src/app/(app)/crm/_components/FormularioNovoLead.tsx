@@ -22,9 +22,11 @@ function BotaoAdicionar() {
 export function FormularioNovoLead({
   abertoInicial = false,
   rotulo = 'Novo lead',
+  tituloInicial = '',
 }: {
   abertoInicial?: boolean;
   rotulo?: string;
+  tituloInicial?: string;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -177,7 +179,7 @@ export function FormularioNovoLead({
                   label="Oportunidade"
                   hint="Se deixar vazio, criamos um título com o nome da empresa."
                   placeholder="Ex.: Automação do atendimento"
-                  defaultValue={estado.campos?.titulo ?? ''}
+                  defaultValue={estado.campos?.titulo ?? tituloInicial}
                   error={erroVisivel('titulo')}
                   onChange={() => ocultarErro('titulo')}
                 />
