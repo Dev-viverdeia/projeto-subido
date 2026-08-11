@@ -68,7 +68,7 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
       },
     };
     const formulario = new FormData();
-    formulario.set('sdp', new Blob([sdp], { type: 'application/sdp' }), 'offer.sdp');
+    formulario.set('sdp', sdp);
     formulario.set('session', JSON.stringify(sessao));
 
     const respostaOpenAI = await fetch('https://api.openai.com/v1/realtime/calls', {
