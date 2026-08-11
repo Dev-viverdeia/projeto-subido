@@ -22,7 +22,7 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.52fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
   align-items: end;
   gap: var(--via-space-8);
   padding-block: var(--via-space-3);
@@ -43,7 +43,7 @@
 .hero h1 {
   max-width: 14ch;
   margin: var(--via-space-2) 0 0;
-  font-size: clamp(2.25rem, 5vw, 4.2rem);
+  font-size: clamp(2.25rem, 4.4vw, 3.7rem);
   font-weight: 560;
   line-height: 0.97;
   letter-spacing: var(--app-ls-h1);

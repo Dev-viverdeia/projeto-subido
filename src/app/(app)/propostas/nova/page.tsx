@@ -30,8 +30,10 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
       </Link>
 
       <header className={styles.hero}>
-        <p className={styles.sobretitulo}>Novo documento</p>
-        <h1>Conecte o contexto ao que você vai entregar.</h1>
+        <div>
+          <p className={styles.sobretitulo}>Novo documento</p>
+          <h1>Conecte o contexto ao que você vai entregar.</h1>
+        </div>
         <p>
           A plataforma usa os fatos do CRM e a estrutura do Projeto para preparar o primeiro
           rascunho. Você continua no controle de cada palavra.
