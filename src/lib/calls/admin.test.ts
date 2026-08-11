@@ -19,12 +19,16 @@ describe('registro de presença na sala', () => {
   beforeEach(() => createAdminClient.mockReset());
 
   it('registra a primeira entrada com horário e consentimento', async () => {
-    const insert = vi.fn().mockResolvedValue({ error: null });
+    const insert = vi.fn((_participante: Record<string, unknown>) =>
+      Promise.resolve({ error: null }),
+    );
     createAdminClient.mockReturnValue({ from: vi.fn(() => ({ insert })) });
 
     await registrarEntradaNaSala(entrada);
 
-    const participante = insert.mock.calls[0]?.[0] as Record<string, unknown>;
+    const participante = insert.mock.calls[0]?.[0];
+    expect(participante).toBeDefined();
+    if (!participante) throw new Error('A entrada não foi registrada.');
     expect(participante).toMatchObject({
       dono: entrada.dono,
       reuniao_id: entrada.reuniaoId,
@@ -36,17 +40,21 @@ describe('registro de presença na sala', () => {
   });
 
   it('renova a presença quando o anfitrião entra novamente', async () => {
-    const insert = vi.fn().mockResolvedValue({ error: { code: '23505' } });
+    const insert = vi.fn((_participante: Record<string, unknown>) =>
+      Promise.resolve({ error: { code: '23505' } }),
+    );
     const atualizacao = {
       error: null,
       eq: vi.fn().mockReturnThis(),
     };
-    const update = vi.fn(() => atualizacao);
+    const update = vi.fn((_participante: Record<string, unknown>) => atualizacao);
     createAdminClient.mockReturnValue({ from: vi.fn(() => ({ insert, update })) });
 
     await registrarEntradaNaSala(entrada);
 
-    const participante = update.mock.calls[0]?.[0] as Record<string, unknown>;
+    const participante = update.mock.calls[0]?.[0];
+    expect(participante).toBeDefined();
+    if (!participante) throw new Error('A reentrada não foi registrada.');
     expect(participante).toMatchObject({ nome: entrada.nome, saiu_em: null });
     expect(typeof participante.entrou_em).toBe('string');
     expect(typeof participante.consentiu_gravacao_em).toBe('string');
