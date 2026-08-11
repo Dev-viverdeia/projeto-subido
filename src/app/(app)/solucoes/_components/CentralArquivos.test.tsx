@@ -75,6 +75,23 @@ const ARQUIVOS: ArquivoProjetoExecucao[] = [
 ];
 
 describe('CentralArquivos', () => {
+  it('mantém o envio fechado até o profissional decidir adicionar o primeiro arquivo', async () => {
+    const user = userEvent.setup();
+    render(
+      <CentralArquivos
+        projetoId="11111111-1111-4111-8111-111111111111"
+        tarefas={[TAREFA]}
+        arquivos={[]}
+        eventos={[]}
+        concluido={false}
+      />,
+    );
+
+    expect(screen.queryByRole('heading', { name: 'Guardar um arquivo' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Adicionar primeiro arquivo' }));
+    expect(screen.getByRole('heading', { name: 'Guardar um arquivo' })).toBeVisible();
+  });
+
   it('preserva o histórico e permite trocar a versão liberada ao cliente', async () => {
     const user = userEvent.setup();
     render(

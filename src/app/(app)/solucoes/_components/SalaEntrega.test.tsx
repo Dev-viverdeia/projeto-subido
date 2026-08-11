@@ -141,6 +141,17 @@ describe('SalaEntrega', () => {
     );
   });
 
+  it('leva o profissional da tarefa revisada para a próxima ação real', async () => {
+    const user = userEvent.setup();
+    render(<SalaEntrega projeto={PROJETO} />);
+
+    await user.click(screen.getByRole('button', { name: /Entender/ }));
+    expect(screen.getByRole('heading', { name: 'Mapear demanda', level: 2 })).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: /Próxima tarefa Montar a base/i }));
+    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeVisible();
+  });
+
   it('mantém os compromissos da call separados das tarefas do método', () => {
     render(
       <SalaEntrega
@@ -195,5 +206,28 @@ describe('SalaEntrega', () => {
 
     expect(screen.getByText('Aceite final pronto para envio')).toBeVisible();
     expect(screen.getByRole('button', { name: /Solicitar aceite final/i })).toBeVisible();
+  });
+
+  it('abre o aceite final pela ação principal quando todas as tarefas terminaram', async () => {
+    const user = userEvent.setup();
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 3,
+          total: 3,
+          status: 'em_validacao',
+          portalAtivo: true,
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            status: 'concluida' as const,
+            evidencia: tarefa.evidencia || 'Entrega comprovada.',
+          })),
+        }}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /Formalizar a entrega final/i }));
+    expect(screen.getByText('Aceite final pronto para envio')).toBeVisible();
   });
 });

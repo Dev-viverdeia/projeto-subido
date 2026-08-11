@@ -87,6 +87,22 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     );
   }
 
+  function abrirProximaAcao() {
+    if (proximoCompromisso) {
+      document.getElementById('plano-vivo-titulo')?.scrollIntoView?.({ behavior: 'smooth' });
+      return;
+    }
+
+    const alvo = proxima ?? ultimaTarefa;
+    if (!alvo) return;
+
+    setFaseId(alvo.faseId);
+    setTarefaId(alvo.id);
+    requestAnimationFrame(() =>
+      document.getElementById('tarefa-em-foco')?.scrollIntoView?.({ behavior: 'smooth' }),
+    );
+  }
+
   return (
     <div className={styles.sala}>
       <header className={styles.hero} data-on-dark>
@@ -213,22 +229,31 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </main>
 
         <aside className={styles.lateral}>
-          <section className={styles.proximaAcao}>
+          <button type="button" className={styles.proximaAcao} onClick={abrirProximaAcao}>
             <p>{proximoCompromisso ? 'Próximo compromisso' : 'Próxima tarefa'}</p>
             {proximoCompromisso ? (
               <>
                 <strong>{proximoCompromisso.titulo}</strong>
-                <span>Plano vivo do cliente</span>
+                <span>
+                  Abrir plano vivo <ArrowRight size={15} aria-hidden="true" />
+                </span>
               </>
             ) : proxima ? (
               <>
                 <strong>{proxima.titulo}</strong>
-                <span>{proxima.faseTitulo}</span>
+                <span>
+                  {proxima.faseTitulo} <ArrowRight size={15} aria-hidden="true" />
+                </span>
               </>
             ) : (
-              <strong>Formalizar a entrega final</strong>
+              <>
+                <strong>Formalizar a entrega final</strong>
+                <span>
+                  Abrir aceite final <ArrowRight size={15} aria-hidden="true" />
+                </span>
+              </>
             )}
-          </section>
+          </button>
 
           <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />
 
@@ -293,7 +318,7 @@ function TarefaEmFoco({
 
   return (
     <>
-      <article className={styles.tarefa} data-status={tarefa.status}>
+      <article id="tarefa-em-foco" className={styles.tarefa} data-status={tarefa.status}>
         <div className={styles.tarefaTopo}>
           <span className={styles.marcadorTarefa}>
             {tarefa.status === 'concluida' ? <Check size={17} /> : <CircleDot size={17} />}

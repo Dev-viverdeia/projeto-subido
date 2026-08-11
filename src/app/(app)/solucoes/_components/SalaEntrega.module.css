@@ -535,9 +535,28 @@
 }
 
 .proximaAcao {
+  width: 100%;
   border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--app-t-state),
+    box-shadow var(--app-t-state),
+    background var(--app-t-state);
+}
+
+.proximaAcao:hover {
+  transform: translateY(-2px);
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.proximaAcao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .proximaAcao p,
@@ -570,7 +589,10 @@
 }
 
 .proximaAcao span {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
   margin-top: var(--via-space-2);
   color: var(--via-gray-400);
   font-size: var(--via-fs-xs);
@@ -811,6 +833,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .proximaAcao {
+    transition: none;
+  }
+
+  .proximaAcao:hover {
+    transform: none;
+  }
+
   .medida > div span {
     transition: none;
   }

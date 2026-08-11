@@ -20,14 +20,9 @@ import {
   removerUploadOrfao,
   tituloDoArquivo,
 } from '@/lib/projetos-execucao/upload-client';
-import { GrupoArquivoCard, type GrupoArquivo } from './GrupoArquivoCard';
+import { formatarTamanhoArquivo, GrupoArquivoCard, type GrupoArquivo } from './GrupoArquivoCard';
 import { HistoricoEntrega } from './HistoricoEntrega';
 import styles from './CentralArquivos.module.css';
-
-function formatarTamanho(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
-}
 
 export function CentralArquivos({
   projetoId,
@@ -49,7 +44,7 @@ export function CentralArquivos({
   const [descricao, setDescricao] = useState('');
   const [tarefaId, setTarefaId] = useState('');
   const [grupoAlvo, setGrupoAlvo] = useState<GrupoArquivo | null>(null);
-  const [mostrarEnvio, setMostrarEnvio] = useState(arquivos.length === 0);
+  const [mostrarEnvio, setMostrarEnvio] = useState(false);
   const [arrastando, setArrastando] = useState(false);
   const [progresso, setProgresso] = useState(0);
   const [enviando, setEnviando] = useState(false);
@@ -231,7 +226,11 @@ export function CentralArquivos({
             aria-controls="painel-novo-arquivo"
           >
             {mostrarEnvio ? <X size={16} /> : <Plus size={16} />}
-            {mostrarEnvio ? 'Fechar envio' : 'Adicionar arquivo'}
+            {mostrarEnvio
+              ? 'Fechar envio'
+              : arquivos.length
+                ? 'Adicionar arquivo'
+                : 'Adicionar primeiro arquivo'}
           </button>
           <small>Privado até você liberar</small>
         </div>
@@ -310,7 +309,7 @@ export function CentralArquivos({
               {arquivo ? (
                 <div>
                   <strong>{arquivo.name}</strong>
-                  <small>{formatarTamanho(arquivo.size)} · pronto para enviar</small>
+                  <small>{formatarTamanhoArquivo(arquivo.size)} · pronto para enviar</small>
                 </div>
               ) : (
                 <div>
@@ -411,7 +410,10 @@ export function CentralArquivos({
             <div className={styles.vazio}>
               <Archive size={24} aria-hidden="true" />
               <strong>O acervo começa com a primeira entrega.</strong>
-              <p>Envie o material acima. Ele ficará privado até você decidir liberá-lo.</p>
+              <p>
+                Clique em “Adicionar primeiro arquivo”. Ele ficará privado até você decidir
+                liberá-lo.
+              </p>
             </div>
           )}
         </section>

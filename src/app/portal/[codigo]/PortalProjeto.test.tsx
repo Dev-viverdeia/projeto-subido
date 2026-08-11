@@ -94,7 +94,11 @@ describe('PortalProjeto', () => {
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
     const decisao = screen.getByRole('heading', { name: /1 decisão espera por você/i });
     const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
+    const arquivos = screen.getByRole('heading', { name: /Arquivos do projeto/i });
     expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(andamento.compareDocumentPosition(arquivos) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });

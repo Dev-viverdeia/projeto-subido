@@ -200,8 +200,6 @@ export function PortalProjeto({
           </div>
         </section>
 
-        <PosEntregaPortal codigo={codigo} projeto={projeto} concluido={concluido} />
-
         <div className={styles.painel}>
           <section className={styles.andamento} aria-labelledby="andamento-titulo">
             <header>
@@ -278,6 +276,8 @@ export function PortalProjeto({
             )}
           </section>
         </div>
+
+        <PosEntregaPortal codigo={codigo} projeto={projeto} concluido={concluido} />
 
         <section className={styles.seguranca}>
           <LockKeyhole size={16} aria-hidden="true" />

@@ -26,7 +26,7 @@ export type GrupoArquivo = {
   versoes: ArquivoProjetoExecucao[];
 };
 
-function formatarTamanho(bytes: number): string {
+export function formatarTamanhoArquivo(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
 }
@@ -107,7 +107,7 @@ export function GrupoArquivoCard({
             <div>
               <strong>{item.nomeOriginal}</strong>
               <small>
-                {formatarTamanho(item.tamanhoBytes)} · {formatarData(item.criadoEm)}
+                {formatarTamanhoArquivo(item.tamanhoBytes)} · {formatarData(item.criadoEm)}
               </small>
             </div>
             {item.visivelCliente && <em>Cliente</em>}
