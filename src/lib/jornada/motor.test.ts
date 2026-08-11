@@ -32,9 +32,16 @@ describe('motor da jornada', () => {
     const plano = montarPlanoJornada(sinais());
 
     expect(plano.etapaAtual).toBe('aprender');
-    expect(plano.proximoPasso.id).toBe('formacao-base');
+    expect(plano.proximoPasso.id).toBe('projeto-inicial');
     expect(plano.percentual).toBe(0);
     expect(plano.perfilCompleto).toBe(false);
+  });
+
+  it('direciona para a formação depois que a primeira oferta foi definida', () => {
+    const plano = montarPlanoJornada(sinais({ perfil }));
+
+    expect(plano.etapaAtual).toBe('aprender');
+    expect(plano.proximoPasso.id).toBe('formacao-base');
   });
 
   it('avança para prospecção somente depois de oferta e posicionamento', () => {

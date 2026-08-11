@@ -17,7 +17,7 @@ export function ConfiguracaoJornada({
   perfil: PerfilJornada;
   projetos: ProjetoInicialJornada[];
 }) {
-  const [editando, setEditando] = useState(false);
+  const [editando, setEditando] = useState(() => !perfil);
   const [passo, setPasso] = useState(1);
   const [estado, acao, pendente] = useActionState(salvarPerfilJornada, ESTADO_INICIAL);
   const formulario = useRef<HTMLFormElement>(null);
@@ -50,16 +50,16 @@ export function ConfiguracaoJornada({
           {perfil ? <Check size={18} strokeWidth={2.4} /> : <Target size={19} strokeWidth={1.8} />}
         </div>
         <div className={styles.introducao}>
-          <p>{perfil ? 'Direção da operação' : 'Briefing de ativação'}</p>
+          <p>{perfil ? 'Direção da operação' : 'Três decisões simples'}</p>
           <h2 id="titulo-configuracao-jornada">
             {perfil
               ? `${perfil.projetoInicialTitulo ?? 'Projeto inicial'} para ${perfil.nicho}`
-              : 'Dê três coordenadas para o mapa responder.'}
+              : 'Monte sua primeira direção de trabalho.'}
           </h2>
           <span>
             {perfil
               ? perfil.posicionamento
-              : 'O restante da jornada será calculado com fatos do CRM, calls, diagnósticos e propostas.'}
+              : 'Escolha um mercado, um projeto e uma frase. Você poderá ajustar tudo depois.'}
           </span>
         </div>
 
@@ -227,7 +227,7 @@ export function ConfiguracaoJornada({
                   className={styles.salvar}
                   disabled={pendente || !projetos.length}
                 >
-                  {pendente ? 'Salvando…' : 'Ativar meu mapa'}
+                  {pendente ? 'Salvando…' : 'Salvar direção'}
                   {!pendente && <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />}
                 </button>
               )}

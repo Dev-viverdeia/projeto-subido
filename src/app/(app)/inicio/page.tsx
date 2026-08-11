@@ -59,12 +59,10 @@ export default async function InicioPage() {
   const claims = data?.claims;
   const metadata = (claims?.user_metadata ?? {}) as { nome?: string };
   const primeiroNome = metadata.nome?.trim().split(/\s+/)[0] ?? null;
-  const nomeCompleto = metadata.nome?.trim() || primeiroNome || 'Meu negócio de IA';
   return (
     <MapaJornada
       configuracao={<ConfiguracaoJornada perfil={jornada.perfil} projetos={jornada.projetos} />}
       nome={primeiroNome}
-      espacoDeTrabalho={`${nomeCompleto} — Consultoria`}
       cliente={
         <Suspense fallback={<CarregandoDado largura="16ch" />}>
           <ClienteEmFoco />
@@ -85,8 +83,6 @@ export default async function InicioPage() {
           <ProximaMentoria />
         </Suspense>
       }
-      oferta={jornada.perfil?.projetoInicialTitulo ?? null}
-      nicho={jornada.perfil?.nicho ?? null}
       diagnosticoSobral={
         <Suspense fallback={<CarregandoDado largura="24ch" />}>
           <DiagnosticoSobral />

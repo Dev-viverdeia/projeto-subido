@@ -49,18 +49,42 @@ const PROJETOS = [
   },
 ];
 
-const PLANO = montarPlanoJornada({
+const PERFIL_PREVIEW = {
+  nicho: 'Clínicas odontológicas',
+  projetoInicialId: PROJETOS[0]!.id,
+  projetoInicialTitulo: PROJETOS[0]!.titulo,
+  projetoInicialSlug: PROJETOS[0]!.slug,
+  posicionamento:
+    'Implanto atendimento com IA para clínicas reduzirem o tempo de resposta sem perder o contexto.',
+  atualizadoEm: '2026-08-11T12:00:00.000Z',
+};
+
+const PLANO_ATIVACAO = montarPlanoJornada({
   perfil: null,
   aprendizado: {
-    aulasConcluidas: 8,
+    aulasConcluidas: 0,
+    formacoesConcluidas: 0,
+    etapasConcluidas: 0,
+    projetosConcluidos: 0,
+  },
+  oportunidades: { total: 0, comProximaAcao: 0, ganhas: 0 },
+  calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
+  diagnosticosConcluidos: 0,
+  propostas: { total: 0, apresentadas: 0, aceitas: 0 },
+});
+
+const PLANO_OPERACAO = montarPlanoJornada({
+  perfil: PERFIL_PREVIEW,
+  aprendizado: {
+    aulasConcluidas: 12,
     formacoesConcluidas: 1,
     etapasConcluidas: 4,
     projetosConcluidos: 0,
   },
   oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
-  calls: { descobertasConcluidas: 1, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-  diagnosticosConcluidos: 1,
-  propostas: { total: 1, apresentadas: 0, aceitas: 0 },
+  calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
+  diagnosticosConcluidos: 0,
+  propostas: { total: 0, apresentadas: 0, aceitas: 0 },
 });
 
 /**
@@ -68,8 +92,15 @@ const PLANO = montarPlanoJornada({
  * Em produção esta URL encerra em 404; o produto real usa o mesmo componente em
  * /inicio, protegido por sessão e abastecido com os dados do usuário.
  */
-export default function PreviewMapaJornadaPage() {
+export default async function PreviewMapaJornadaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ estado?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const operacaoAtiva = (await searchParams).estado === 'operacao';
+  const perfil = operacaoAtiva ? PERFIL_PREVIEW : null;
+  const plano = operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
 
   return (
     <div className={styles.shell}>
@@ -113,18 +144,15 @@ export default function PreviewMapaJornadaPage() {
       </aside>
       <main id="conteudo" className={styles.conteudo}>
         <MapaJornada
-          configuracao={<ConfiguracaoJornada perfil={null} projetos={PROJETOS} />}
+          configuracao={<ConfiguracaoJornada perfil={perfil} projetos={PROJETOS} />}
           nome="Mateus"
-          espacoDeTrabalho="Mateus Milagre — Consultoria"
           cliente="Clínica Aurora"
           contato="Dra. Camila Rios"
           proximaAcao="Apresentar proposta na quinta-feira"
           proximaMentoria="Chamada de alinhamento"
-          oferta={null}
-          nicho={null}
-          diagnosticoSobral="A operação já tem uma descoberta e um diagnóstico registrados, mas ainda não declarou qual oferta será o ponto de partida."
-          focoSobral="Definir a primeira oferta"
-          plano={PLANO}
+          diagnosticoSobral="A operação já tem um lead com próxima ação. O gargalo agora é transformar a conversa em uma descoberta registrada."
+          focoSobral="Concluir a descoberta antes de preparar o escopo."
+          plano={plano}
         />
       </main>
     </div>

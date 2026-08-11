@@ -106,19 +106,6 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       guia: 'Como transformar aprendizado em serviço',
       passos: [
         passo(
-          'formacao-base',
-          'Concluir uma formação essencial',
-          'Complete uma trilha de base para dominar linguagem, processo e critério antes de prometer uma entrega.',
-          sinais.aprendizado.formacoesConcluidas > 0
-            ? `${quantidade(sinais.aprendizado.formacoesConcluidas, 'formação concluída', 'formações concluídas')} na conta.`
-            : sinais.aprendizado.aulasConcluidas > 0
-              ? `${quantidade(sinais.aprendizado.aulasConcluidas, 'aula concluída', 'aulas concluídas')}; a formação ainda está em andamento.`
-              : 'Nenhuma aula concluída ainda.',
-          sinais.aprendizado.formacoesConcluidas > 0,
-          '/formacoes',
-          'Continuar formação',
-        ),
-        passo(
           'projeto-inicial',
           'Escolher o primeiro projeto',
           'Selecione uma entrega padrão para estudar, explicar e implementar antes de ampliar o portfólio.',
@@ -139,6 +126,19 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
           posicionamentoDefinido,
           '/inicio#configuracao-jornada',
           'Definir posicionamento',
+        ),
+        passo(
+          'formacao-base',
+          'Concluir uma formação essencial',
+          'Complete uma trilha de base para dominar linguagem, processo e critério antes de prometer uma entrega.',
+          sinais.aprendizado.formacoesConcluidas > 0
+            ? `${quantidade(sinais.aprendizado.formacoesConcluidas, 'formação concluída', 'formações concluídas')} na conta.`
+            : sinais.aprendizado.aulasConcluidas > 0
+              ? `${quantidade(sinais.aprendizado.aulasConcluidas, 'aula concluída', 'aulas concluídas')}; a formação ainda está em andamento.`
+              : 'Nenhuma aula concluída ainda.',
+          sinais.aprendizado.formacoesConcluidas > 0,
+          '/formacoes',
+          'Continuar formação',
         ),
       ],
     },
