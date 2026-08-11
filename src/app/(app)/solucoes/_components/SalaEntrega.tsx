@@ -39,7 +39,12 @@ import styles from './SalaEntrega.module.css';
 const ESTADO_INICIAL: EstadoProjetoExecucao = {};
 
 function formatarData(valor: string): string {
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  })
     .format(new Date(valor))
     .replace('.', '');
 }

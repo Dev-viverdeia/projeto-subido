@@ -6,7 +6,11 @@ import styles from './ProjetosEmExecucao.module.css';
 
 function prazo(valor: string | null): string {
   if (!valor) return 'Sem prazo';
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    timeZone: 'America/Sao_Paulo',
+  })
     .format(new Date(valor))
     .replace('.', '');
 }
