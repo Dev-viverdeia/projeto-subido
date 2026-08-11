@@ -22,6 +22,7 @@ export function ConfiguracaoJornada({
   const [estado, acao, pendente] = useActionState(salvarPerfilJornada, ESTADO_INICIAL);
   const formulario = useRef<HTMLFormElement>(null);
   const aberto = editando;
+  const mostrarCabecalho = Boolean(perfil) || !aberto;
 
   function avancar() {
     const campos = formulario.current?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
@@ -43,44 +44,51 @@ export function ConfiguracaoJornada({
     <section
       id="configuracao-jornada"
       className={`${styles.bloco} ${aberto ? styles.aberto : styles.resumido}`}
-      aria-labelledby="titulo-configuracao-jornada"
+      aria-labelledby={mostrarCabecalho ? 'titulo-configuracao-jornada' : undefined}
+      aria-label={mostrarCabecalho ? undefined : 'Configure a direção da sua operação'}
     >
-      <header className={styles.cabecalho}>
-        <div className={styles.marca} aria-hidden="true">
-          {perfil ? <Check size={18} strokeWidth={2.4} /> : <Target size={19} strokeWidth={1.8} />}
-        </div>
-        <div className={styles.introducao}>
-          <p>{perfil ? 'Direção da operação' : 'Três decisões simples'}</p>
-          <h2 id="titulo-configuracao-jornada">
-            {perfil
-              ? `${perfil.projetoInicialTitulo ?? 'Projeto inicial'} para ${perfil.nicho}`
-              : 'Monte sua primeira direção de trabalho.'}
-          </h2>
-          <span>
-            {perfil
-              ? perfil.posicionamento
-              : 'Escolha um mercado, um projeto e uma frase. Você poderá ajustar tudo depois.'}
-          </span>
-        </div>
-
-        {!aberto && (
-          <button
-            type="button"
-            className={styles.editar}
-            onClick={() => {
-              setPasso(1);
-              setEditando(true);
-            }}
-          >
+      {mostrarCabecalho && (
+        <header className={styles.cabecalho}>
+          <div className={styles.marca} aria-hidden="true">
             {perfil ? (
-              <PencilLine size={15} strokeWidth={1.9} aria-hidden="true" />
+              <Check size={18} strokeWidth={2.4} />
             ) : (
-              <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+              <Target size={19} strokeWidth={1.8} />
             )}
-            {perfil ? 'Editar direção' : 'Definir direção'}
-          </button>
-        )}
-      </header>
+          </div>
+          <div className={styles.introducao}>
+            <p>{perfil ? 'Direção da operação' : 'Três decisões simples'}</p>
+            <h2 id="titulo-configuracao-jornada">
+              {perfil
+                ? `${perfil.projetoInicialTitulo ?? 'Projeto inicial'} para ${perfil.nicho}`
+                : 'Monte sua primeira direção de trabalho.'}
+            </h2>
+            <span>
+              {perfil
+                ? perfil.posicionamento
+                : 'Escolha um mercado, um projeto e uma frase. Você poderá ajustar tudo depois.'}
+            </span>
+          </div>
+
+          {!aberto && (
+            <button
+              type="button"
+              className={styles.editar}
+              onClick={() => {
+                setPasso(1);
+                setEditando(true);
+              }}
+            >
+              {perfil ? (
+                <PencilLine size={15} strokeWidth={1.9} aria-hidden="true" />
+              ) : (
+                <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+              )}
+              {perfil ? 'Editar direção' : 'Definir direção'}
+            </button>
+          )}
+        </header>
+      )}
 
       {aberto && (
         <form ref={formulario} action={acao} className={styles.formulario}>

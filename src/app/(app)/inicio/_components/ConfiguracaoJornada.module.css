@@ -145,7 +145,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-3);
   margin: 0;
-  padding: var(--via-space-5) clamp(24px, 3vw, 36px);
+  padding: var(--via-space-4) clamp(24px, 3vw, 36px);
   border-bottom: 1px solid var(--via-border-hairline);
   list-style: none;
 }
@@ -217,18 +217,18 @@
 }
 
 .decisao {
+  width: min(100%, 780px);
   min-width: 0;
-  min-height: 240px;
-  margin: 0;
-  padding: clamp(28px, 4vw, 52px) clamp(24px, 4vw, 52px);
+  min-height: 220px;
+  margin: 0 auto;
+  padding: clamp(28px, 3vw, 40px) clamp(24px, 4vw, 48px);
   border: 0;
 }
 
 .decisao:not([hidden]) {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
-  align-items: start;
-  gap: clamp(32px, 5vw, 72px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
 }
 
 .decisao legend {
@@ -249,7 +249,7 @@
 }
 
 .decisao legend strong {
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-size: clamp(1.2rem, 1.7vw, 1.55rem);
   font-weight: var(--via-fw-semibold);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
@@ -439,7 +439,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding: var(--via-space-4) clamp(24px, 4vw, 52px);
+  padding: var(--via-space-4) clamp(24px, 3vw, 36px);
   border-top: 1px solid var(--via-border-hairline);
   background: var(--via-surface);
   box-shadow: 0 -16px 34px -32px var(--via-navy-30);
@@ -526,11 +526,6 @@
   .editar {
     grid-column: 2;
     width: fit-content;
-  }
-
-  .decisao:not([hidden]) {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--via-space-7);
   }
 }
 

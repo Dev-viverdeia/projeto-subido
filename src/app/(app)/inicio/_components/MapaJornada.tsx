@@ -25,13 +25,9 @@ type Props = {
   plano: PlanoJornada;
 };
 
-function TrilhoJornada({ plano, invertido = false }: { plano: PlanoJornada; invertido?: boolean }) {
+function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
   return (
-    <ol
-      className={styles.trilho}
-      data-invertido={invertido || undefined}
-      aria-label="Etapas da jornada profissional"
-    >
+    <ol className={styles.trilho} aria-label="Etapas da jornada profissional">
       {plano.etapas.map((etapa) => (
         <li
           key={etapa.id}
@@ -81,18 +77,20 @@ export function MapaJornada({
               <i aria-hidden="true" /> Primeira configuração
             </span>
             <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
-            <p className={styles.data}>{dataLonga}</p>
+            <p className={styles.data}>
+              Vamos montar uma base clara para sua operação · {dataLonga}
+            </p>
           </div>
           <span className={styles.passoAtual}>Passo 1 de 3</span>
         </header>
 
         <section className={styles.ativacao} aria-labelledby="titulo-ativacao">
           <div className={styles.ativacaoIntroducao}>
-            <span className={styles.selo}>Comece por aqui</span>
-            <h1 id="titulo-ativacao">Dê uma direção para sua operação.</h1>
+            <span className={styles.selo}>Seu ponto de partida</span>
+            <h1 id="titulo-ativacao">Defina o foco da sua primeira oferta.</h1>
             <p>
-              Escolha um mercado, um projeto e uma forma simples de explicar o que você vende. A
-              plataforma usa essas decisões para organizar o próximo passo.
+              Três decisões organizam o que você vai vender, para quem e como começar sem se perder
+              na plataforma.
             </p>
             <div className={styles.tempoAtivacao}>
               <Clock3 size={16} strokeWidth={1.8} aria-hidden="true" />
@@ -105,12 +103,12 @@ export function MapaJornada({
         <section className={styles.caminho} aria-labelledby="titulo-caminho">
           <div className={styles.caminhoCabecalho}>
             <div>
-              <p>O caminho que vamos construir</p>
-              <h2 id="titulo-caminho">Da preparação à próxima venda.</h2>
+              <p>Depois da configuração</p>
+              <h2 id="titulo-caminho">Sua operação passa a ter um próximo passo claro.</h2>
             </div>
             <span>Cada avanço exige uma evidência real na plataforma.</span>
           </div>
-          <TrilhoJornada plano={plano} invertido />
+          <TrilhoJornada plano={plano} />
         </section>
       </div>
     );

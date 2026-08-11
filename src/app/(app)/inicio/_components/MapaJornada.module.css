@@ -12,7 +12,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-6);
+  width: min(100%, 1360px);
   min-height: 58px;
+  margin-inline: auto;
   padding-inline: var(--via-space-1);
 }
 
@@ -52,7 +54,7 @@
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
   font-size: var(--via-fs-caption);
-  text-transform: capitalize;
+  text-wrap: pretty;
 }
 
 .passoAtual,
@@ -87,25 +89,27 @@
 
 .ativacao {
   display: grid;
-  grid-template-columns: minmax(270px, 0.38fr) minmax(0, 1fr);
-  gap: var(--via-space-3);
+  grid-template-columns: minmax(300px, 0.34fr) minmax(0, 1fr);
   align-items: stretch;
+  width: min(100%, 1360px);
+  margin-inline: auto;
+  overflow: clip;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-2-shadow);
 }
 
 .ativacaoIntroducao {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
   overflow: hidden;
-  padding: clamp(28px, 4vw, 48px);
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-surface);
+  padding: clamp(28px, 3vw, 38px);
   background:
-    radial-gradient(circle at 100% 0%, rgba(217, 255, 96, 0.15), transparent 34%),
+    radial-gradient(circle at 100% 0%, var(--subido-blue-soft), transparent 36%),
     var(--app-mesh-trilho);
   color: var(--via-white);
-  box-shadow: var(--app-elev-2-shadow);
 }
 
 .ativacaoIntroducao::after {
@@ -145,20 +149,20 @@
 }
 
 .ativacaoIntroducao h1 {
-  max-width: 10ch;
-  margin-top: var(--via-space-6);
+  max-width: 15ch;
+  margin-top: var(--via-space-5);
   color: var(--via-white);
   font-family: var(--via-font-display);
-  font-size: clamp(2rem, 3.5vw, 3.45rem);
+  font-size: clamp(2rem, 2.8vw, 2.65rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-h1);
-  line-height: 1;
+  line-height: 1.02;
   text-wrap: balance;
 }
 
 .ativacaoIntroducao > p {
-  max-width: 42ch;
-  margin-top: var(--via-space-5);
+  max-width: 40ch;
+  margin-top: var(--via-space-4);
   color: var(--via-gray-300);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
@@ -183,6 +187,12 @@
   height: 100%;
 }
 
+.configuracaoAberta > section {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .caminho,
 .operacao {
   min-width: 0;
@@ -193,11 +203,13 @@
 }
 
 .caminho {
+  width: min(100%, 1360px);
+  margin-inline: auto;
   overflow: hidden;
   padding: clamp(22px, 3vw, 32px);
   background:
-    radial-gradient(circle at 100% 0%, rgba(217, 255, 96, 0.09), transparent 28%), var(--via-navy);
-  color: var(--via-white);
+    radial-gradient(circle at 100% 0%, var(--subido-blue-soft), transparent 28%), var(--via-surface);
+  color: var(--via-text-primary);
 }
 
 .caminhoCabecalho,
@@ -219,7 +231,7 @@
 
 .caminhoCabecalho p,
 .secaoCabecalho p {
-  color: var(--via-accent);
+  color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
@@ -236,7 +248,9 @@
 }
 
 .caminhoCabecalho h2 {
-  color: var(--via-white);
+  max-width: 28ch;
+  color: var(--via-text-primary);
+  text-wrap: balance;
 }
 
 .caminhoCabecalho > span,
@@ -249,7 +263,7 @@
 }
 
 .caminhoCabecalho > span {
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
 }
 
 .trilho {
@@ -262,7 +276,7 @@
 }
 
 .caminho .trilho {
-  margin-top: var(--via-space-7);
+  margin-top: var(--via-space-6);
 }
 
 .trilho li {
@@ -284,10 +298,6 @@
   background: var(--via-border);
 }
 
-.trilho[data-invertido] li::before {
-  background: rgba(255, 255, 255, 0.13);
-}
-
 .trilho li:last-child::before {
   display: none;
 }
@@ -307,12 +317,6 @@
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-variant-numeric: tabular-nums;
-}
-
-.trilho[data-invertido] .trilhoMarca {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--via-gray-300);
 }
 
 .trilhoTexto {
@@ -343,14 +347,6 @@
   font-size: var(--via-fs-micro);
 }
 
-.trilho[data-invertido] .trilhoTexto strong {
-  color: var(--via-gray-200);
-}
-
-.trilho[data-invertido] .trilhoTexto small {
-  color: var(--via-gray-500);
-}
-
 .trilho li[data-status='concluida'] .trilhoMarca {
   border-color: var(--via-accent-ink);
   background: var(--via-accent-soft);
@@ -366,10 +362,6 @@
 
 .trilho li[data-status='atual'] .trilhoTexto strong {
   color: var(--via-text-primary);
-}
-
-.trilho[data-invertido] li[data-status='atual'] .trilhoTexto strong {
-  color: var(--via-white);
 }
 
 .comando {
@@ -733,13 +725,13 @@
   color: var(--via-white);
 }
 
-@media (max-width: 1099px) {
+@media (max-width: 1079px) {
   .ativacao {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .ativacaoIntroducao {
-    min-height: 320px;
+    min-height: 0;
   }
 
   .ativacaoIntroducao h1 {
@@ -759,7 +751,7 @@
   }
 }
 
-@media (max-width: 799px) {
+@media (max-width: 767px) {
   .comando {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -820,11 +812,15 @@
 
   .ativacaoIntroducao h1,
   .prioridade h1 {
-    font-size: clamp(2rem, 11vw, 2.8rem);
+    font-size: clamp(1.85rem, 9.5vw, 2.4rem);
+  }
+
+  .ativacaoIntroducao > p {
+    font-size: var(--via-fs-xs);
   }
 
   .tempoAtivacao {
-    padding-top: var(--via-space-7);
+    padding-top: var(--via-space-5);
   }
 
   .caminhoCabecalho,
