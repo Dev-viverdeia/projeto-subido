@@ -31,13 +31,13 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--via-accent-ink);
-  box-shadow: 0 0 0 4px var(--via-accent-soft);
+  background: var(--subido-blue);
+  box-shadow: 0 0 0 4px var(--subido-blue-soft);
   animation: destino-pendente 900ms var(--via-ease) infinite;
 }
 
 .item[data-loading='true'] .icone {
-  color: var(--via-navy);
+  color: var(--subido-blue-ink);
 }
 
 .icone,
@@ -110,7 +110,7 @@
 }
 
 .lateral .item:hover .icone {
-  color: var(--via-navy);
+  color: var(--subido-blue-ink);
 }
 
 .pilula {
@@ -118,9 +118,9 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  border: 1px solid var(--via-border-soft);
+  border: 1px solid color-mix(in srgb, var(--subido-blue) 18%, var(--via-border-soft));
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-navy) 5%, var(--via-surface));
+  background: color-mix(in srgb, var(--subido-blue) 5%, var(--via-surface));
   box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
@@ -131,7 +131,7 @@
   left: 0;
   width: 2px;
   border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
-  background: var(--via-navy);
+  background: var(--subido-blue);
 }
 
 .lateral .item[aria-current='page'] {
@@ -217,7 +217,7 @@
   inset-inline: var(--via-space-4);
   height: 2px;
   border-radius: 0 0 var(--app-radius-track) var(--app-radius-track);
-  background: var(--via-navy);
+  background: var(--subido-blue);
 }
 
 .dock .rotulo {

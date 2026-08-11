@@ -14,12 +14,12 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: {
-    default: 'Viver de IA Subido — operação do profissional de IA',
-    template: '%s · Viver de IA Subido',
+    default: 'Subido — operação do profissional de IA',
+    template: '%s · Subido',
   },
   description:
     'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou. Da Comunidade Subido de Tráfego.',
-  applicationName: 'Viver de IA Subido',
+  applicationName: 'Subido',
   robots: { index: true, follow: true },
   /**
    * Canonical na URL LIMPA — inegociável.
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    siteName: 'Viver de IA Subido',
+    siteName: 'Subido',
     url: '/',
     title: 'Subido — a assinatura para virar implementador de IA',
     description:

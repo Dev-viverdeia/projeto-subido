@@ -202,7 +202,7 @@ export function SalaCall({
 
       <footer>
         <CheckCircle2 size={14} strokeWidth={1.8} aria-hidden="true" />
-        Viver de IA Subido
+        Subido · em colaboração com Viver de IA
       </footer>
     </main>
   );

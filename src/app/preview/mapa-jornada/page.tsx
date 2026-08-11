@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { ConfiguracaoJornada } from '@/app/(app)/inicio/_components/ConfiguracaoJornada';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
-import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { montarPlanoJornada } from '@/lib/jornada/motor';
 import styles from './preview.module.css';
 
@@ -106,7 +106,7 @@ export default async function PreviewMapaJornadaPage({
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
-          <ViverDeIaLogo size="compact" produto={false} />
+          <SubidoLogo size={18} />
         </div>
         <nav aria-label="Preview da navegação">
           <a className={styles.ativo} href="#conteudo">

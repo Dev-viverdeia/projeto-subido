@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Compass } from 'lucide-react';
-import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { EstadoSistema } from './(app)/_components/EstadoSistema';
 import styles from './estado-global.module.css';
 
@@ -8,7 +8,7 @@ export default function NaoEncontradoGlobal() {
   return (
     <main className={styles.pagina}>
       <header className={styles.marca}>
-        <ViverDeIaLogo size="compact" />
+        <SubidoLogo size={18} />
         <span>Sistema operacional do profissional de IA</span>
       </header>
 

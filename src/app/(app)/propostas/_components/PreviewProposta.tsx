@@ -1,4 +1,5 @@
 import { Check, Circle } from 'lucide-react';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { StatusProposta } from '@/lib/propostas/queries';
 import { subtituloVisivel } from '@/lib/propostas/apresentacao';
 import { formatarReais, type DocumentoProposta } from '@/lib/propostas/schema';
@@ -36,10 +37,8 @@ export function PreviewProposta({
       <article className={styles.papel}>
         <header className={styles.capa}>
           <div className={styles.marca}>
-            <i />
-            <span>SUBIDO</span>
-            <b>×</b>
-            <span>VIVER DE IA</span>
+            <SubidoLogo size={9} variant="mono" />
+            <span className={styles.parceria}>× VIVER DE IA</span>
           </div>
           <div className={styles.capaTexto}>
             <p>Proposta comercial</p>
@@ -141,7 +140,7 @@ export function PreviewProposta({
           </section>
 
           <footer className={styles.rodape}>
-            <span>VIVER DE IA × SUBIDO</span>
+            <span>SUBIDO × VIVER DE IA</span>
             <span>Proposta V{versao.toString().padStart(2, '0')}</span>
           </footer>
         </div>

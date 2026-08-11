@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { CloudOff } from 'lucide-react';
 import { Button } from '@/design-system/via';
-import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { EstadoSistema } from './(app)/_components/EstadoSistema';
 import styles from './estado-global.module.css';
 
@@ -23,7 +23,7 @@ export default function ErroGlobal({
       <body>
         <main className={styles.pagina}>
           <header className={styles.marca}>
-            <ViverDeIaLogo size="compact" />
+            <SubidoLogo size={18} />
             <span>Recuperação segura</span>
           </header>
 

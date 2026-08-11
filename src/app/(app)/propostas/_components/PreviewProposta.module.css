@@ -69,20 +69,14 @@
 .marca {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
   font-family: var(--via-font-mono);
   font-size: 0.52rem;
   font-weight: 600;
   letter-spacing: var(--app-ls-eyebrow);
 }
 
-.marca i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--via-accent);
-}
-.marca b {
+.parceria {
   color: rgba(255, 255, 255, 0.35);
 }
 

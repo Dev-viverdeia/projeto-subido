@@ -325,15 +325,17 @@
     border-color var(--via-t-fast);
 }
 
-/* Ação primária navy com contraste branco, conforme a base oficial. */
+/* Na malha navy, a própria seção redefine o accent para branco. O CTA usa a
+   superfície clara de forma explícita para preservar contraste de texto. */
 .ctaPrimary {
-  background: var(--via-accent);
-  color: var(--via-white);
+  background: var(--via-surface-onnavy);
+  color: var(--via-navy);
   box-shadow: 0 12px 32px -12px var(--via-navy-30);
 }
 
 .ctaPrimary:hover {
-  background: var(--via-accent-deep);
+  background: var(--via-white);
+  color: var(--via-navy-deep);
   transform: translate3d(0, -2px, 0);
 }
 

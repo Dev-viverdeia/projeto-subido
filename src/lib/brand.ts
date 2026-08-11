@@ -19,6 +19,11 @@ export const CST = {
   white: '#FFFFFF',
 } as const;
 
+/** Azul oficial da marca que assina o produto. */
+export const SUBIDO = {
+  blue: '#0AA9F6',
+} as const;
+
 /** Derivados verificados por contraste. Ver src/styles/brand.css para o racional. */
 export const BRAND = {
   /** Banda mais profunda da landing. */

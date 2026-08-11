@@ -22,7 +22,7 @@ import styles from './MolduraAuth.module.css';
  *
  * A BANDA ESCURA é o mesmo ritmo da landing: a banda navy carrega a marca e a
  * promessa; o lado claro carrega o trabalho. O design system dá a arquitetura visual,
- * e a marca oficial VIA identifica o produto desde a entrada.
+ * e a marca Subido identifica o produto desde a entrada.
  */
 export function MolduraAuth({ children }: { children: ReactNode }) {
   return (
@@ -45,7 +45,7 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
           </p>
         </div>
 
-        <p className={styles.rodape}>Viver de IA · em colaboração com Subido</p>
+        <p className={styles.rodape}>Subido · em colaboração com Viver de IA</p>
       </aside>
 
       <main className={styles.area} id="conteudo">

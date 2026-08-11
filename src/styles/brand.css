@@ -1,5 +1,5 @@
 /* =============================================================================
-   VIVER DE IA SUBIDO · camada de aplicação
+   SUBIDO × VIVER DE IA · camada de aplicação
 
    A fonte cromática, tipográfica e material é o Design System oficial da Viver
    de IA. Este arquivo não cria uma segunda marca: só traduz papéis próprios da
@@ -7,6 +7,12 @@
    ============================================================================= */
 
 :root {
+  /* A marca Subido assina o produto. O azul oficial aparece no símbolo e em
+     sinais de direção; as superfícies continuam na base navy do sistema. */
+  --subido-blue: #0aa9f6;
+  --subido-blue-ink: #006da8;
+  --subido-blue-soft: color-mix(in srgb, var(--subido-blue) 11%, transparent);
+
   /* Aliases de aplicação. Todos permanecem dentro da paleta navy + cinzas. */
   --via-accent-ink: var(--via-navy);
   --via-accent-hairline: var(--via-navy-18);

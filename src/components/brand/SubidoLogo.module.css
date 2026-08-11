@@ -1,0 +1,48 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--subido-logo-size, 18px) * 0.48);
+  line-height: 1;
+  color: var(--via-navy-darker);
+}
+
+.simbolo {
+  width: calc(var(--subido-logo-size, 18px) * 1.46);
+  height: calc(var(--subido-logo-size, 18px) * 1.46);
+  display: block;
+  flex: 0 0 auto;
+  overflow: visible;
+  filter: drop-shadow(0 5px 10px color-mix(in srgb, var(--subido-blue) 18%, transparent));
+}
+
+.balao {
+  fill: var(--subido-blue);
+}
+
+.seta {
+  fill: var(--via-white);
+}
+
+.wordmark {
+  display: block;
+  color: currentColor;
+  font-family: var(--via-font-display);
+  font-size: calc(var(--subido-logo-size, 18px) * 1.52);
+  font-weight: 860;
+  line-height: 0.82;
+  letter-spacing: -0.075em; /* token-ok: aproxima a geometria compacta do wordmark oficial */
+}
+
+.mono {
+  color: var(--via-white);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo:hover .simbolo {
+    transform: translateY(-1px);
+  }
+
+  .simbolo {
+    transition: transform var(--app-t-state);
+  }
+}

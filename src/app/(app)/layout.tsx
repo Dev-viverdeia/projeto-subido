@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
+import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
@@ -60,11 +60,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
           <aside className={styles.sidebar}>
             <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
-              <ViverDeIaLogo size="compact" produto={false} />
-              <span>
-                <strong>Subido</strong>
-                <small>Sistema operacional do profissional de IA</small>
-              </span>
+              <SubidoLogo size={18} />
+              <strong>Sistema operacional do profissional de IA</strong>
+              <small>Em colaboração com Viver de IA</small>
             </Link>
 
             <NavLateral itens={ITENS_NAV} variante="lateral" />
@@ -81,11 +79,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             )}
           </aside>
 
-          <CabecalhoApp
-            nome={nome}
-            email={email}
-            logo={<ViverDeIaLogo size="compact" produto={false} />}
-          />
+          <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={17} />} />
 
           <main className={styles.conteudo} id="conteudo">
             {children}

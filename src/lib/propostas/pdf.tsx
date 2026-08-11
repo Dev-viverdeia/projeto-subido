@@ -3,7 +3,7 @@ import 'server-only';
 
 import path from 'node:path';
 import { Document, Font, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer';
-import { BRAND, CST, DOCUMENT } from '@/lib/brand';
+import { BRAND, CST, DOCUMENT, SUBIDO } from '@/lib/brand';
 import { subtituloVisivel } from './apresentacao';
 import type { PropostaCompleta } from './queries';
 import { formatarReais } from './schema';
@@ -27,7 +27,7 @@ Font.registerHyphenationCallback((palavra) => [palavra]);
 const COR = {
   navy: CST.navy,
   deep: CST.navyDeep,
-  blue: CST.blue,
+  blue: SUBIDO.blue,
   blueInk: BRAND.accentInk,
   paper: DOCUMENT.paper,
   soft: DOCUMENT.soft,
@@ -363,8 +363,8 @@ function PropostaPdf({
       title={textoPdf(proposta.titulo)}
       author={profissional}
       subject={`Proposta comercial para ${textoPdf(doc.cliente.empresa)}`}
-      creator="Viver de IA Subido"
-      producer="Viver de IA Subido"
+      creator="Subido × Viver de IA"
+      producer="Subido × Viver de IA"
       language="pt-BR"
     >
       <Page size="A4" style={estilos.capa}>

@@ -20,7 +20,7 @@
 
 @media (min-width: 1080px) {
   .shell {
-    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-columns: 244px minmax(0, 1fr);
   }
 
   .sidebar {
@@ -56,35 +56,34 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--via-space-2_5);
-  min-height: 72px;
-  padding: 2px var(--via-space-2) var(--via-space-4);
+  gap: var(--via-space-2);
+  min-height: 106px;
+  padding: 2px var(--via-space-2) var(--via-space-5);
   color: var(--via-text-primary);
   text-decoration: none;
   border-bottom: 1px solid var(--via-border-soft);
 }
 
-.marcaSidebar > span:last-child {
-  display: grid;
-  gap: 2px;
-  max-width: 184px;
-}
-
 .marcaSidebar strong,
 .marcaSidebar small {
   display: block;
+  max-width: 196px;
 }
 
 .marcaSidebar strong {
+  margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-label);
+  line-height: 1.32;
+  letter-spacing: var(--app-ls-sm);
 }
 
 .marcaSidebar small {
-  color: var(--via-text-muted);
+  color: var(--via-text-soft);
+  font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  line-height: 1.4;
-  letter-spacing: var(--app-ls-caption);
+  line-height: 1.45;
+  letter-spacing: var(--app-ls-micro);
+  text-transform: uppercase;
 }
