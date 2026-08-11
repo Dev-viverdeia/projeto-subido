@@ -1,5 +1,6 @@
 import { Check, Circle } from 'lucide-react';
 import type { StatusProposta } from '@/lib/propostas/queries';
+import { subtituloVisivel } from '@/lib/propostas/apresentacao';
 import { formatarReais, type DocumentoProposta } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import styles from './PreviewProposta.module.css';
@@ -23,6 +24,8 @@ export function PreviewProposta({
   versao: number;
   status: StatusProposta;
 }) {
+  const subtitulo = subtituloVisivel(titulo, documento.projeto.titulo);
+
   return (
     <div className={styles.moldura} aria-label="Prévia visual da proposta">
       <div className={styles.molduraTopo}>
@@ -41,7 +44,7 @@ export function PreviewProposta({
           <div className={styles.capaTexto}>
             <p>Proposta comercial</p>
             <h2>{documento.projeto.titulo}</h2>
-            <span>{titulo}</span>
+            {subtitulo && <span>{subtitulo}</span>}
           </div>
           <div className={styles.capaMeta}>
             <div>
@@ -67,7 +70,10 @@ export function PreviewProposta({
             ))}
           </div>
 
-          <section className={styles.abertura}>
+          <section
+            className={styles.abertura}
+            data-contexto-longo={documento.desafio.length > 360 || undefined}
+          >
             <p className={styles.rotulo}>O ponto de partida</p>
             <h3>{documento.desafio}</h3>
             <p>{documento.objetivo}</p>

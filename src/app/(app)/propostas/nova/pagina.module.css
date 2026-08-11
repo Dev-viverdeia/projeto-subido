@@ -241,6 +241,14 @@
   font-size: var(--via-fs-xs);
 }
 
+.campo small.recomendacao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-accent-ink);
+  font-weight: var(--via-fw-medium);
+}
+
 .contextosConectados,
 .origens {
   display: flex;

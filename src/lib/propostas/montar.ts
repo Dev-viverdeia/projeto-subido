@@ -165,26 +165,11 @@ export function montarDocumentoInicial(
         : baseSemProjeto(origem);
 
   const oportunidade = leitura?.oportunidades[0];
-  const contextoDaCall = posCall
-    ? [
-        posCall.resumo,
-        posCall.dores.length
-          ? `Dores explicitadas: ${posCall.dores.slice(0, 4).join('; ')}.`
-          : null,
-      ]
-        .filter(Boolean)
-        .join('\n\n')
-    : null;
-  const contextoDoDiagnostico = diagnostico
-    ? [
-        diagnostico.resumo,
-        diagnostico.falhas.length
-          ? `Falhas observadas no diagnóstico: ${diagnostico.falhas.slice(0, 4).join('; ')}.`
-          : null,
-      ]
-        .filter(Boolean)
-        .join('\n\n')
-    : null;
+  // A proposta precisa abrir com uma leitura comercial curta. As listas detalhadas
+  // continuam no dossiê e no pós-call; despejá-las aqui repetia o resumo, criava
+  // pontuação quebrada e obrigava o profissional a limpar o documento antes de vender.
+  const contextoDaCall = posCall ? limitar(posCall.resumo, 900) : null;
+  const contextoDoDiagnostico = diagnostico ? limitar(diagnostico.resumo, 900) : null;
   const desafio =
     contextoDaCall ??
     contextoDoDiagnostico ??

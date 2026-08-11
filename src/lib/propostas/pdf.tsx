@@ -4,6 +4,7 @@ import 'server-only';
 import path from 'node:path';
 import { Document, Font, Page, StyleSheet, Text, View, renderToBuffer } from '@react-pdf/renderer';
 import { BRAND, CST, DOCUMENT } from '@/lib/brand';
+import { subtituloVisivel } from './apresentacao';
 import type { PropostaCompleta } from './queries';
 import { formatarReais } from './schema';
 
@@ -356,6 +357,7 @@ function PropostaPdf({
   geradoEm: Date;
 }) {
   const doc = proposta.documento;
+  const subtitulo = subtituloVisivel(proposta.titulo, doc.projeto.titulo);
   return (
     <Document
       title={textoPdf(proposta.titulo)}
@@ -375,7 +377,7 @@ function PropostaPdf({
         <View style={estilos.capaCentro}>
           <Text style={estilos.etiquetaAzul}>Proposta comercial</Text>
           <Text style={estilos.capaTitulo}>{textoPdf(doc.projeto.titulo)}</Text>
-          <Text style={estilos.capaSubtitulo}>{textoPdf(proposta.titulo)}</Text>
+          {subtitulo && <Text style={estilos.capaSubtitulo}>{textoPdf(subtitulo)}</Text>}
         </View>
         <View style={estilos.capaMeta}>
           <View style={estilos.metaGrupo}>

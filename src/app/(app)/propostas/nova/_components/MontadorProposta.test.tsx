@@ -52,4 +52,39 @@ describe('MontadorProposta', () => {
     expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Montar proposta/ })).toBeDisabled();
   });
+
+  it('recomenda o Projeto compatível quando a oportunidade já vem da call', () => {
+    render(
+      <MontadorProposta
+        opcoes={{
+          ...OPCOES,
+          projetos: [
+            {
+              id: '22222222-2222-4222-8222-222222222222',
+              slug: 'atendimento-com-ia-no-whatsapp',
+              titulo: 'Atendimento com IA no WhatsApp',
+              resumo: 'Atendimento conectado e rastreável.',
+              categoria: 'atendimento',
+              publicado_em: '2026-08-01T12:00:00Z',
+              criado_em: '2026-08-01T12:00:00Z',
+              etapaIds: [],
+              ferramentas: [],
+              projeto: {} as OpcoesNovaProposta['projetos'][number]['projeto'],
+            },
+          ],
+        }}
+        oportunidadeInicial="11111111-1111-4111-8111-111111111111"
+        origemInicial=""
+        reuniaoInicial="33333333-3333-4333-8333-333333333333"
+        diagnosticoInicial=""
+        erro={false}
+      />,
+    );
+
+    expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
+      'projeto:atendimento-com-ia-no-whatsapp',
+    );
+    expect(screen.getByText(/Recomendado pelo contexto do lead/)).toBeVisible();
+    expect(screen.getByRole('button', { name: /Montar proposta/ })).toBeEnabled();
+  });
 });

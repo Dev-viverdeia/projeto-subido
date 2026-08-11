@@ -152,7 +152,7 @@ describe('montagem inicial da proposta', () => {
     );
 
     expect(documento.desafio).toContain('perda de contexto');
-    expect(documento.desafio).toContain('Mensagens ficam sem responsável');
+    expect(documento.desafio).not.toContain('Dores explicitadas');
     expect(documento.observacoes).toContain('O piloto ficará restrito');
     expect(documento.objetivo).not.toContain('promessa');
   });
@@ -170,7 +170,7 @@ describe('montagem inicial da proposta', () => {
     );
 
     expect(documento.desafio).toContain('termina sem próximo passo');
-    expect(documento.desafio).toContain('não registra responsável');
+    expect(documento.desafio).not.toContain('Falhas observadas');
     expect(documento.observacoes).toContain('Definir responsável');
   });
 });

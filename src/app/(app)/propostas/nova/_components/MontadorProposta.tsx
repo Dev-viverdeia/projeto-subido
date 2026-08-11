@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { criarProposta } from '@/lib/propostas/actions';
 import type { OpcoesNovaProposta } from '@/lib/propostas/queries';
+import { sugerirProjetoBase } from '@/lib/propostas/sugestao';
 import styles from '../pagina.module.css';
 
 export function MontadorProposta({
@@ -37,6 +38,14 @@ export function MontadorProposta({
     () => opcoes.oportunidades.find((item) => item.id === oportunidade) ?? null,
     [opcoes.oportunidades, oportunidade],
   );
+  const origemSugerida = useMemo(
+    () => (leadEscolhido ? sugerirProjetoBase(leadEscolhido.titulo, opcoes.projetos) : null),
+    [leadEscolhido, opcoes.projetos],
+  );
+  const origemSelecionada = origem || origemSugerida || '';
+  const projetoSugerido = origemSugerida
+    ? opcoes.projetos.find((projeto) => `projeto:${projeto.slug}` === origemSugerida)
+    : null;
 
   return (
     <form action={criarProposta} className={styles.formulario}>
@@ -147,7 +156,7 @@ export function MontadorProposta({
             <span>Projeto-base</span>
             <select
               name="origem"
-              value={origem}
+              value={origemSelecionada}
               onChange={(evento) => setOrigem(evento.target.value)}
               required
             >
@@ -174,7 +183,14 @@ export function MontadorProposta({
               )}
               <option value="sem-base">Começar sem um projeto-base</option>
             </select>
-            <small>Escopo, entregáveis e cronograma serão preenchidos para você revisar.</small>
+            {projetoSugerido && !origem ? (
+              <small className={styles.recomendacao}>
+                <Check size={13} strokeWidth={2.2} aria-hidden="true" /> Recomendado pelo contexto
+                do lead. Você pode trocar antes de montar.
+              </small>
+            ) : (
+              <small>Escopo, entregáveis e cronograma serão preenchidos para você revisar.</small>
+            )}
           </label>
 
           <div className={styles.origens}>
@@ -213,7 +229,7 @@ export function MontadorProposta({
               Continuar <ArrowRight size={17} aria-hidden="true" />
             </button>
           ) : (
-            <button type="submit" className={styles.continuar} disabled={!origem}>
+            <button type="submit" className={styles.continuar} disabled={!origemSelecionada}>
               Montar proposta <ArrowRight size={17} aria-hidden="true" />
             </button>
           )}
