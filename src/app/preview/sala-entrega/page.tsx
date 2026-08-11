@@ -32,6 +32,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: true,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: '2026-08-09T12:00:00.000Z',
+  kickoff: null,
   acoesPlano: [
     {
       id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',

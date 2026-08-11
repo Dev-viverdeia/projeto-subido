@@ -54,6 +54,21 @@ describe('FormularioAgendarCall', () => {
     expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
   });
 
+  it('abre o kickoff do projeto com oportunidade e tipo já definidos', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+        tipoInicial="kickoff"
+      />,
+    );
+
+    expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
+    expect(screen.getByLabelText('Tipo de call')).toHaveValue('kickoff');
+  });
+
   it('anuncia os erros, foca a primeira decisão e limpa o campo corrigido', async () => {
     const user = userEvent.setup();
     agendarReuniaoMock.mockResolvedValue({

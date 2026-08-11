@@ -11,6 +11,7 @@ import {
   Layers3,
 } from 'lucide-react';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL, callPodeAbrir } from '@/lib/calls/tipos';
+import type { TipoCall } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import { AcoesSala } from './AcoesSala';
@@ -40,12 +41,14 @@ export function PainelCalls({
   agendada = false,
   modalInicial = false,
   oportunidadeInicial,
+  tipoInicial,
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
   agendada?: boolean;
   modalInicial?: boolean;
   oportunidadeInicial?: string;
+  tipoInicial?: TipoCall;
 }) {
   const ativas = reunioes.filter((item) => callPodeAbrir(item.status));
   const historico = reunioes
@@ -67,6 +70,7 @@ export function PainelCalls({
           oportunidades={oportunidades}
           abertoInicial={modalInicial}
           oportunidadeInicial={oportunidadeInicial}
+          tipoInicial={tipoInicial}
         />
       </header>
 
@@ -198,6 +202,7 @@ export function PainelCalls({
                 <FormularioAgendarCall
                   oportunidades={oportunidades}
                   oportunidadeInicial={oportunidadeInicial}
+                  tipoInicial={tipoInicial}
                 />
               )}
             </div>

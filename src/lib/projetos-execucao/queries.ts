@@ -5,6 +5,7 @@ import { handleError } from '@/lib/errors';
 import { lerDocumentoProposta, type DocumentoProposta } from '@/lib/propostas/schema';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
+import type { StatusCall } from '@/lib/calls/tipos';
 import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
 
 export type TarefaProjetoExecucao = {
@@ -98,6 +99,12 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
+  kickoff: {
+    id: string;
+    status: StatusCall;
+    agendadaPara: string;
+    codigoPublico: string;
+  } | null;
 };
 
 type LinhaTarefa = Tables<'projeto_tarefas'>;
@@ -185,6 +192,18 @@ export const obterProjetoExecucao = cache(
     const documento = lerDocumentoProposta(data.documento);
     if (!documento) return null;
 
+    const { data: kickoff, error: erroKickoff } = await supabase
+      .from('calls_reunioes')
+      .select('id, status, agendada_para, codigo_publico')
+      .eq('oportunidade_id', data.oportunidade_id)
+      .eq('tipo', 'kickoff')
+      .neq('status', 'cancelada')
+      .order('agendada_para', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (erroKickoff) throw handleError(erroKickoff, 'projetos-execucao:kickoff');
+
     const tarefas = data.projeto_tarefas.map(mapearTarefa).sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
@@ -223,6 +242,14 @@ export const obterProjetoExecucao = cache(
       portalAtivo: data.portal_ativo,
       portalCodigo: data.portal_codigo,
       portalAtivadoEm: data.portal_ativado_em,
+      kickoff: kickoff
+        ? {
+            id: kickoff.id,
+            status: kickoff.status,
+            agendadaPara: kickoff.agendada_para,
+            codigoPublico: kickoff.codigo_publico,
+          }
+        : null,
       eventos: data.projeto_portal_eventos
         .flatMap((evento) => {
           const tipo = evento.tipo as TipoEventoProjeto;

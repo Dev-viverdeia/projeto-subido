@@ -30,6 +30,7 @@ import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-exec
 import { formatarReais } from '@/lib/propostas/schema';
 import { EntregaCliente } from './EntregaCliente';
 import { CentralArquivos } from './CentralArquivos';
+import { InicioProjeto } from './InicioProjeto';
 import { PlanoVivo } from './PlanoVivo';
 import { PortalClienteCard } from './PortalClienteCard';
 import { ProximaAcaoProjeto } from './ProximaAcaoProjeto';
@@ -169,6 +170,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </nav>
       </header>
 
+      {projeto.feitas === 0 && projeto.status !== 'concluido' && (
+        <InicioProjeto
+          projeto={projeto}
+          primeiraTarefa={proxima?.titulo ?? null}
+          onComecar={abrirProximaAcao}
+        />
+      )}
+
       <div className={styles.corpo}>
         <main className={styles.operacao}>
           <header className={styles.cabecalhoFase}>
@@ -237,7 +246,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             onAbrir={abrirProximaAcao}
           />
 
-          <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />
+          {projeto.feitas > 0 && <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />}
 
           <PortalClienteCard
             projetoId={projeto.id}

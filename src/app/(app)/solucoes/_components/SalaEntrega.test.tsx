@@ -53,6 +53,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: false,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
+  kickoff: null,
   arquivos: [],
   eventos: [],
   acoesPlano: [],
@@ -125,6 +126,71 @@ const PROJETO: ProjetoExecucaoCompleto = {
 };
 
 describe('SalaEntrega', () => {
+  it('guia o início do projeto antes da primeira execução', () => {
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 0,
+          status: 'planejamento',
+          documento: {
+            ...DOCUMENTO,
+            cliente: {
+              empresa: 'Clínica Aurora',
+              contato: 'Camila Rios',
+              cargo: 'Diretora de Operações',
+              email: 'camila@clinicaaurora.com.br',
+            },
+          },
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            status: 'pendente' as const,
+            evidencia: null,
+          })),
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Prepare o início' })).toBeVisible();
+    expect(screen.getByText('Camila Rios')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Agendar kickoff/i })).toHaveAttribute(
+      'href',
+      `/calls?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
+    );
+    expect(screen.getByLabelText('Prazo da entrega')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Começar agora/i })).toBeVisible();
+    expect(screen.getByText(/Nunca salve senhas, tokens ou chaves/i)).toBeVisible();
+  });
+
+  it('mostra o kickoff já agendado sem pedir uma nova reunião', () => {
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 0,
+          kickoff: {
+            id: '55555555-5555-4555-8555-555555555555',
+            status: 'agendada',
+            agendadaPara: '2026-08-14T17:00:00.000Z',
+            codigoPublico: '66666666-6666-4666-8666-666666666666',
+          },
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            status: 'pendente' as const,
+            evidencia: null,
+          })),
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Agendada')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Abrir sala/i })).toHaveAttribute(
+      'href',
+      '/sala/66666666-6666-4666-8666-666666666666',
+    );
+    expect(screen.queryByRole('link', { name: /Agendar kickoff/i })).toBeNull();
+  });
+
   it('abre na próxima tarefa e permite navegar entre as fases', async () => {
     const user = userEvent.setup();
     render(<SalaEntrega projeto={PROJETO} />);

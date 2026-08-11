@@ -7,6 +7,7 @@ import { CalendarPlus, Layers3, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
+import type { TipoCall } from '@/lib/calls/tipos';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import styles from './FormularioAgendarCall.module.css';
 
@@ -26,10 +27,12 @@ export function FormularioAgendarCall({
   oportunidades,
   abertoInicial = false,
   oportunidadeInicial,
+  tipoInicial,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
   oportunidadeInicial?: string;
+  tipoInicial?: TipoCall;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -192,7 +195,10 @@ export function FormularioAgendarCall({
                   <div className={styles.duasColunas}>
                     <label className={styles.campo}>
                       <span>Tipo de call</span>
-                      <select name="tipo" defaultValue={estado.campos?.tipo ?? 'descoberta'}>
+                      <select
+                        name="tipo"
+                        defaultValue={estado.campos?.tipo ?? tipoInicial ?? 'descoberta'}
+                      >
                         {TIPOS_CALL.map((tipo) => (
                           <option key={tipo.id} value={tipo.id}>
                             {tipo.rotulo}

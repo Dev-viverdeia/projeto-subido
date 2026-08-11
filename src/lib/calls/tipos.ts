@@ -25,6 +25,10 @@ export const ROTULO_STATUS_CALL: Record<StatusCall, string> = {
   cancelada: 'Cancelada',
 };
 
+export function tipoCallValido(valor: unknown): valor is TipoCall {
+  return typeof valor === 'string' && TIPOS_CALL.some((tipo) => tipo.id === valor);
+}
+
 export function callPodeAbrir(status: StatusCall) {
   return status === 'agendada' || status === 'aguardando' || status === 'ao_vivo';
 }
