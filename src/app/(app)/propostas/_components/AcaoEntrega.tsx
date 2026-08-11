@@ -23,7 +23,7 @@ export function AcaoEntrega({
   if (execucaoId) {
     return (
       <Link href={`/solucoes/execucao/${execucaoId}`} className={styles.abrir}>
-        <FolderKanban size={16} aria-hidden="true" /> Abrir Sala de Entrega
+        <FolderKanban size={16} aria-hidden="true" /> Continuar projeto
         <ArrowUpRight size={15} aria-hidden="true" />
       </Link>
     );
@@ -39,7 +39,7 @@ export function AcaoEntrega({
           ) : (
             <FolderKanban size={16} aria-hidden="true" />
           )}
-          {pendente ? 'Preparando sala' : 'Iniciar Sala de Entrega'}
+          {pendente ? 'Criando projeto' : 'Abrir projeto ativo'}
         </button>
       </form>
       {estado.erro && <p role="alert">{estado.erro}</p>}

@@ -225,7 +225,7 @@ export async function mudarStatusProposta(
     .update({ status: validacao.data.status })
     .eq('id', validacao.data.id)
     .eq('status', atual.data.status)
-    .select('versao, status')
+    .select('versao, status, oportunidade_id')
     .maybeSingle();
 
   if (error || !data) {
@@ -236,6 +236,28 @@ export async function mudarStatusProposta(
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.id}`);
   revalidatePath('/crm');
+  revalidatePath(`/crm/${data.oportunidade_id}`);
+
+  if (data.status === 'aceita') {
+    const { data: projetoId, error: erroProjeto } = await supabase.rpc('projeto_iniciar', {
+      p_proposta_id: validacao.data.id,
+    });
+
+    if (erroProjeto || !projetoId) {
+      console.error(
+        `[propostas:iniciar-projeto] ${erroProjeto?.code ?? 'sem-dados'}: ${erroProjeto?.message ?? ''}`,
+      );
+      return {
+        sucesso: 'Venda confirmada. Abra o projeto ativo pelo botão abaixo.',
+        versao: data.versao,
+        status: data.status,
+      };
+    }
+
+    revalidatePath('/solucoes');
+    redirect(`/solucoes/execucao/${projetoId}`);
+  }
+
   return {
     sucesso: 'Status atualizado.',
     versao: data.versao,

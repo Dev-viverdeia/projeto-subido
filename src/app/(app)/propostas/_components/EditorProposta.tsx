@@ -61,6 +61,19 @@ export function EditorProposta({
   const versao = estadoAtual.versao ?? versaoInicial;
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const proximoStatus = PROXIMA_ACAO_STATUS[status];
+  const descricaoEstado = sujo
+    ? 'Salve as alterações antes de avançar ou baixar o PDF.'
+    : status === 'pronta'
+      ? 'Quando você apresentar ao cliente, registre aqui para alimentar o CRM.'
+      : status === 'apresentada'
+        ? 'Registre a decisão do cliente. Ao aceitar, a plataforma cria o projeto e abre a execução.'
+        : status === 'aceita'
+          ? execucaoId
+            ? 'A venda já virou um projeto ativo, ligado ao cliente, ao CRM e ao escopo aprovado.'
+            : 'A venda foi confirmada. Abra o projeto ativo para começar a entrega.'
+          : status === 'recusada'
+            ? 'A decisão ficou registrada no CRM. Crie uma nova versão somente se o contexto mudar.'
+            : 'Cada mudança de estado vira um fato na jornada deste lead.';
 
   function mudar(mutacao: (atual: DocumentoProposta) => DocumentoProposta) {
     setDocumento((atual) => mutacao(atual));
@@ -159,13 +172,7 @@ export function EditorProposta({
               <div>
                 <p className={styles.sobretitulo}>Estado do documento</p>
                 <h2>{ROTULO_STATUS_PROPOSTA[status]}</h2>
-                <p>
-                  {sujo
-                    ? 'Salve as alterações antes de avançar ou baixar o PDF.'
-                    : status === 'pronta'
-                      ? 'Quando você apresentar ao cliente, registre aqui para alimentar o CRM.'
-                      : 'Cada mudança de estado vira um fato na jornada deste lead.'}
-                </p>
+                <p>{descricaoEstado}</p>
               </div>
             </div>
 
@@ -192,7 +199,7 @@ export function EditorProposta({
                       disabled={sujo || atualizandoStatus}
                       className={styles.avancar}
                     >
-                      Marcar como aceita
+                      Aceitar e iniciar projeto
                     </button>
                     <button
                       type="submit"

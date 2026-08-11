@@ -12,13 +12,17 @@
   justify-content: center;
   gap: var(--via-space-2);
   padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-accent);
-  border-radius: 10px;
-  background: var(--via-accent);
-  color: var(--via-navy-deep);
+  border: 1px solid var(--via-white);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-navy);
   font: 650 var(--via-fs-xs) var(--via-font);
   text-decoration: none;
   cursor: pointer;
+  transition:
+    transform var(--app-t-touch),
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
 }
 
 .abrir svg:last-child {
@@ -30,10 +34,17 @@
   opacity: 0.7;
 }
 
+.iniciar:not(:disabled):hover,
+.abrir:hover {
+  transform: translateY(-2px);
+  border-color: var(--via-gray-200);
+  background: var(--via-gray-100);
+}
+
 .iniciar:focus-visible,
 .abrir:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.34);
+  box-shadow: var(--app-ring-onnavy);
 }
 
 .raiz p {
