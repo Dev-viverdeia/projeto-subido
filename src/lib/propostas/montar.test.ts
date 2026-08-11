@@ -97,6 +97,7 @@ const PROJETO: DadosRoteiroProjeto = {
   entregavelFinal: 'Operação de atendimento assistida por IA',
   versao: 1,
   roteiro: {
+    fundamentos: [],
     fases: FASES_PROJETO.map(([id, titulo], indice) => ({
       id,
       titulo,
@@ -108,6 +109,8 @@ const PROJETO: DadosRoteiroProjeto = {
           acao: 'Executar esta etapa seguindo o roteiro detalhado e registrar as evidências.',
           concluidoQuando: 'O resultado estiver validado com a pessoa responsável.',
           entregavel: `Entregável ${indice + 1}`,
+          insumos: [],
+          execucao: [],
         },
       ],
     })),

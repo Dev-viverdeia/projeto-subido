@@ -8,6 +8,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
+  Clock3,
   FileSignature,
   PackageCheck,
   Layers3,
@@ -21,6 +22,7 @@ import {
   useProgresso,
 } from '@/lib/progresso/local';
 import { Ferramentas, Prompts } from './KitSolucao';
+import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
 import { ProximaSolucao } from './ProximaSolucao';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import styles from './ProjetoGuiado.module.css';
@@ -169,6 +171,26 @@ export function ProjetoGuiado({
         </nav>
       </header>
 
+      {projeto.roteiro.fundamentos.length > 0 ? (
+        <section className={styles.fundamentos} aria-labelledby="fundamentos-projeto">
+          <header className={styles.fundamentosCabecalho}>
+            <p>Antes de executar</p>
+            <h2 id="fundamentos-projeto">Regras que protegem este projeto</h2>
+          </header>
+          <ol>
+            {projeto.roteiro.fundamentos.map((fundamento, indice) => (
+              <li key={fundamento.titulo}>
+                <span>{String(indice + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{fundamento.titulo}</h3>
+                  <p>{fundamento.descricao}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
       <div className={styles.corpo}>
         <main className={styles.principal}>
           <div className={styles.fases}>
@@ -226,10 +248,25 @@ export function ProjetoGuiado({
 
                               <div className={styles.passoConteudo}>
                                 <div className={styles.passoTitulo}>
-                                  <h3>{passo.titulo}</h3>
+                                  <div>
+                                    <h3>{passo.titulo}</h3>
+                                    {passo.duracao ? (
+                                      <small>
+                                        <Clock3 size={12} aria-hidden="true" />
+                                        {passo.duracao}
+                                      </small>
+                                    ) : null}
+                                  </div>
                                   {atual ? <span>Próximo passo</span> : null}
                                 </div>
                                 <p className={styles.acao}>{passo.acao}</p>
+
+                                <GuiaExecucaoPasso
+                                  passo={passo}
+                                  atual={atual}
+                                  concluido={concluido}
+                                />
+
                                 <dl className={styles.evidencias}>
                                   <div>
                                     <dt>Pronto quando</dt>

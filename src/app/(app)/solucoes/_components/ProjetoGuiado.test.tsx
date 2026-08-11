@@ -12,6 +12,12 @@ const projeto: DadosRoteiroProjeto = {
   entregavelFinal: 'Operação ativa, testes, treinamento e manual de acompanhamento.',
   versao: 1,
   roteiro: {
+    fundamentos: [
+      {
+        titulo: 'Venda a operação',
+        descricao: 'O cliente compra um atendimento consistente, seguro e acompanhado por pessoas.',
+      },
+    ],
     fases: fases.map((id, indice) => ({
       id,
       titulo: id[0]!.toUpperCase() + id.slice(1),
@@ -23,6 +29,20 @@ const projeto: DadosRoteiroProjeto = {
           acao: `Execute uma ação suficientemente detalhada na fase ${id}.`,
           concluidoQuando: 'A evidência foi registrada e revisada pelo responsável.',
           entregavel: `Entrega da fase ${id}`,
+          duracao: indice === 0 ? '45–60 min' : undefined,
+          insumos: indice === 0 ? ['Conversas reais do atendimento'] : [],
+          execucao: indice === 0 ? ['Exporte e organize as conversas do período escolhido.'] : [],
+          atencao:
+            indice === 0
+              ? 'Não use uma semana atípica como retrato definitivo da operação.'
+              : undefined,
+          modelo:
+            indice === 0
+              ? {
+                  titulo: 'Planilha de demanda',
+                  conteudo: 'Data | horário | assunto | tempo de primeira resposta | desfecho',
+                }
+              : undefined,
         },
       ],
     })),
@@ -79,6 +99,11 @@ describe('Projeto guiado', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Entender' })).toBeDefined();
     expect(screen.queryByRole('heading', { level: 2, name: 'Preparar' })).toBeNull();
     expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Regras que protegem este projeto' }),
+    ).toBeDefined();
+    expect(screen.getByText('Faça nesta ordem')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Copiar Planilha de demanda' })).toBeDefined();
     expect(screen.getAllByText('Próximo passo').length).toBeGreaterThan(0);
     expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
       'aria-valuenow',

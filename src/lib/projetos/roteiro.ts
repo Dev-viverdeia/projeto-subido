@@ -2,12 +2,27 @@ import { z } from 'zod';
 
 const IdFase = z.enum(['entender', 'preparar', 'construir', 'validar', 'entregar']);
 
+const Fundamento = z.object({
+  titulo: z.string().min(3).max(80),
+  descricao: z.string().min(20).max(400),
+});
+
+const ModeloPronto = z.object({
+  titulo: z.string().min(3).max(100),
+  conteudo: z.string().min(20).max(6000),
+});
+
 const Passo = z.object({
   id: z.string().min(2).max(80),
   titulo: z.string().min(3).max(140),
   acao: z.string().min(20).max(1200),
   concluidoQuando: z.string().min(12).max(600),
   entregavel: z.string().min(3).max(240),
+  duracao: z.string().min(2).max(60).optional(),
+  insumos: z.array(z.string().min(3).max(240)).max(8).default([]),
+  execucao: z.array(z.string().min(8).max(600)).max(10).default([]),
+  atencao: z.string().min(12).max(600).optional(),
+  modelo: ModeloPronto.optional(),
 });
 
 const Fase = z.object({
@@ -18,7 +33,10 @@ const Fase = z.object({
 });
 
 export const RoteiroProjetoSchema = z
-  .object({ fases: z.array(Fase).length(5) })
+  .object({
+    fundamentos: z.array(Fundamento).max(4).default([]),
+    fases: z.array(Fase).length(5),
+  })
   .superRefine(({ fases }, contexto) => {
     const ordem = IdFase.options;
     fases.forEach((fase, indice) => {

@@ -29,6 +29,11 @@
 .passoTitulo span,
 .evidencias dt,
 .kitCabecalho p,
+.fundamentosCabecalho p,
+.fundamentos li > span,
+.guia h4,
+.atencao strong,
+.modelo header span,
 .retomadaMedida span,
 .continuarHero small,
 .lateralBloco > span,
@@ -291,6 +296,85 @@
   font-variant-numeric: tabular-nums;
 }
 
+.fundamentos {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
+  gap: var(--app-gap-section);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.fundamentosCabecalho p,
+.fundamentosCabecalho h2,
+.fundamentos li h3,
+.fundamentos li p {
+  margin: 0;
+}
+
+.fundamentosCabecalho p {
+  margin-bottom: var(--via-space-2);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+}
+
+.fundamentosCabecalho h2 {
+  max-width: 17ch;
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  font-weight: 540;
+  line-height: var(--via-lh-tight);
+  letter-spacing: var(--app-ls-h2);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.fundamentos > ol {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.fundamentos li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  gap: var(--via-space-3);
+  padding-inline: var(--via-space-4);
+}
+
+.fundamentos li + li {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.fundamentos li > span {
+  padding-top: 2px;
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.fundamentos li h3 {
+  font-size: var(--via-fs-sm);
+  font-weight: 570;
+  line-height: var(--via-lh-snug);
+  color: var(--via-text-primary);
+}
+
+.fundamentos li p {
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
 .corpo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(310px, 27%, 380px);
@@ -449,6 +533,14 @@
 .passoTitulo {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.passoTitulo > div {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
   gap: var(--via-space-3);
 }
 
@@ -469,6 +561,18 @@
   white-space: nowrap;
 }
 
+.passoTitulo small {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  flex: none;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: 400;
+  color: var(--via-text-faint);
+  white-space: nowrap;
+}
+
 .acao {
   margin: var(--via-space-2) 0 0;
   max-width: 70ch;
@@ -476,6 +580,219 @@
   line-height: 1.65;
   color: var(--via-text-muted);
   text-wrap: pretty;
+}
+
+.guia {
+  overflow: hidden;
+  margin-top: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+}
+
+.guia summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  min-height: 54px;
+  padding: var(--via-space-3) var(--via-space-4);
+  list-style: none;
+  color: var(--via-text-primary);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+
+.guia summary::-webkit-details-marker {
+  display: none;
+}
+
+.guia summary:hover {
+  background: var(--via-navy-03);
+}
+
+.guia summary:focus-visible {
+  outline: none;
+  box-shadow: inset var(--app-ring);
+}
+
+.guia summary > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+}
+
+.guia summary small {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: 400;
+  color: var(--via-text-faint);
+}
+
+.guia summary > svg {
+  flex: none;
+  color: var(--via-text-faint);
+  transition: transform var(--app-t-reveal);
+}
+
+.guia[open] summary {
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-navy-03);
+}
+
+.guia[open] summary > svg {
+  transform: rotate(180deg);
+}
+
+.guiaCorpo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  gap: var(--via-space-5);
+  padding: var(--via-space-4);
+}
+
+.guia h4,
+.atencao strong,
+.modelo header span {
+  display: block;
+  margin: 0 0 var(--via-space-2);
+  font-size: var(--via-fs-micro);
+  font-weight: 500;
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.insumos ul,
+.execucao ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.insumos ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.insumos li {
+  position: relative;
+  padding-left: var(--via-space-4);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.insumos li::before {
+  content: '';
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 7px;
+  height: 1px;
+  background: var(--via-navy-40);
+}
+
+.execucao {
+  grid-row: span 2;
+}
+
+.execucao ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-3);
+}
+
+.execucao li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: start;
+}
+
+.execucao li > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-06);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+}
+
+.execucao li p,
+.atencao p {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.atencao {
+  align-self: end;
+  padding: var(--via-space-3);
+  border-left: 2px solid var(--via-navy);
+  background: var(--via-navy-03);
+}
+
+.atencao strong {
+  color: var(--via-text-primary);
+}
+
+.modelo {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-deep);
+}
+
+.modelo header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
+}
+
+.modelo header span {
+  margin: 0 0 2px;
+  color: var(--via-gray-400);
+}
+
+.modelo header h4 {
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: 560;
+  letter-spacing: var(--app-ls-sm);
+  text-transform: none;
+  color: var(--via-white);
+}
+
+.modelo pre {
+  overflow: auto;
+  max-height: 300px;
+  margin: 0;
+  padding: var(--via-space-4);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  line-height: 1.65;
+  color: var(--via-gray-300);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.modelo pre:focus-visible {
+  outline: none;
+  box-shadow: inset var(--app-ring-onnavy);
 }
 
 .evidencias {
@@ -508,6 +825,7 @@
 
 .passo[data-concluido] .passoTitulo h3,
 .passo[data-concluido] .acao,
+.passo[data-concluido] .guia,
 .passo[data-concluido] .evidencias {
   opacity: 0.58;
 }
@@ -719,6 +1037,18 @@
 }
 
 @media (max-width: 1079px) {
+  .fundamentos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fundamentosCabecalho h2 {
+    max-width: 25ch;
+  }
+
+  .fundamentos > ol {
+    border-left: 0;
+  }
+
   .corpo {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -761,6 +1091,28 @@
   .evidencias {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-2);
+  }
+
+  .fundamentos > ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fundamentos li {
+    padding-block: var(--via-space-3);
+    padding-inline: 0;
+  }
+
+  .fundamentos li + li {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+
+  .guiaCorpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .execucao {
+    grid-row: auto;
   }
 }
 
@@ -858,6 +1210,12 @@
     gap: var(--via-space-2);
   }
 
+  .passoTitulo > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-1);
+  }
+
   .lateral {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -875,6 +1233,7 @@
   .navegacaoFases button,
   .check,
   .continuarHero,
+  .guia summary > svg,
   .progressoHero > span,
   .navegacaoSequencial a,
   .navegacaoSequencial button {
