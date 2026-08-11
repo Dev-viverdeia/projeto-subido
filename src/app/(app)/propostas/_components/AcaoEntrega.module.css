@@ -18,6 +18,7 @@
   color: var(--via-navy);
   font: 650 var(--via-fs-xs) var(--via-font);
   text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     transform var(--app-t-touch),
