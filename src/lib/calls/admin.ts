@@ -87,14 +87,41 @@ export async function registrarEntradaNaSala({
   identidade: string;
 }) {
   const admin = createAdminClient();
-  const { error } = await admin.from('calls_participantes').insert({
+  const agora = new Date().toISOString();
+  const participante = {
     dono,
     reuniao_id: reuniaoId,
     papel,
     nome,
     identidade_provedor: identidade,
-    consentiu_gravacao_em: new Date().toISOString(),
-  });
+    entrou_em: agora,
+    saiu_em: null,
+    consentiu_gravacao_em: agora,
+  };
+
+  const { error } = await admin.from('calls_participantes').insert(participante);
+
+  // O anfitrião mantém a mesma identidade no provedor para não criar pessoas
+  // duplicadas no histórico. Ao atualizar a página ou entrar novamente, a
+  // restrição única encontra o registro anterior e nós apenas renovamos sua
+  // presença e seu consentimento.
+  if (error?.code === '23505') {
+    const { error: erroReentrada } = await admin
+      .from('calls_participantes')
+      .update({
+        papel,
+        nome,
+        entrou_em: agora,
+        saiu_em: null,
+        consentiu_gravacao_em: agora,
+      })
+      .eq('dono', dono)
+      .eq('reuniao_id', reuniaoId)
+      .eq('identidade_provedor', identidade);
+
+    if (erroReentrada) throw handleError(erroReentrada, 'calls:reentrada');
+    return;
+  }
 
   if (error) throw handleError(error, 'calls:entrada');
 }

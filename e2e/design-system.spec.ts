@@ -6,9 +6,9 @@ const TELAS = [
   ['/entrar', 'Entrar'],
   ['/preview/mapa-jornada', 'Dê três coordenadas'],
   ['/preview/crm', 'CRM conectado aos fatos'],
-  ['/preview/calls', 'Calls que alimentam o trabalho'],
+  ['/preview/calls', 'Cada reunião vira contexto no CRM'],
   ['/preview/crm-dossie', 'O que aconteceu e o que vem agora'],
-  ['/preview/pos-call', 'Confirme o próximo movimento'],
+  ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Do diagnóstico à decisão'],
   ['/preview/sala-entrega', 'O combinado segue com o cliente'],
 ] as const;
@@ -43,7 +43,10 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');
-    const compromissoConcluido = page.getByRole('button', { name: 'Reabrir' });
+    const compromissoConcluido = page.getByRole('button', {
+      name: 'Reabrir tarefa',
+      exact: true,
+    });
     await compromissoConcluido.scrollIntoViewIfNeeded();
     await expect(compromissoConcluido).toBeVisible();
 
