@@ -96,8 +96,8 @@
 }
 
 .lateral .item {
-  min-height: 40px;
-  padding: var(--via-space-1_5) var(--via-space-2_5);
+  min-height: 42px;
+  padding: var(--via-space-2) var(--via-space-3);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-regular);
   letter-spacing: var(--app-ls-sm);
@@ -106,53 +106,36 @@
 
 .lateral .item:hover {
   color: var(--via-text-primary);
-  background: var(--via-navy-04);
+  background: var(--via-bg-2);
 }
 
 .lateral .item:hover .icone {
-  color: var(--subido-blue-ink);
-}
-
-.pilula {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--subido-blue) 18%, var(--via-border-soft));
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--subido-blue) 5%, var(--via-surface));
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
-}
-
-.pilula::before {
-  content: '';
-  position: absolute;
-  inset-block: var(--via-space-2);
-  left: 0;
-  width: 2px;
-  border-radius: 0 var(--app-radius-track) var(--app-radius-track) 0;
-  background: var(--subido-blue);
+  color: var(--via-navy);
 }
 
 .lateral .item[aria-current='page'] {
-  color: var(--via-text-primary);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-weight: var(--via-fw-medium);
+  box-shadow: var(--via-shadow-sm);
 }
 
 .lateral .item[aria-current='page'] .icone {
-  border-radius: var(--app-radius-chip);
-  background: var(--via-navy);
   color: var(--via-white);
 }
 
 .lateral .item[aria-current='page']:hover {
-  background: transparent;
+  background: var(--via-navy-deep);
   transform: none;
 }
 
 .lateral .item:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+.lateral .item[aria-current='page']:focus-visible {
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
 }
 
 .dock {

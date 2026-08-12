@@ -73,9 +73,7 @@ export function MapaJornada({
       <div className={`${styles.pagina} pagina-mapa-jornada`}>
         <header className={styles.topo}>
           <div>
-            <span className={styles.estadoOperacao}>
-              <i aria-hidden="true" /> Primeira configuração
-            </span>
+            <span className={styles.estadoOperacao}>Primeira configuração</span>
             <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
             <p className={styles.data}>
               Vamos montar uma base clara para sua operação · {dataLonga}
@@ -118,9 +116,7 @@ export function MapaJornada({
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
       <header className={styles.topo}>
         <div>
-          <span className={styles.estadoOperacao}>
-            <i aria-hidden="true" /> Sua operação hoje
-          </span>
+          <span className={styles.estadoOperacao}>Sua operação hoje</span>
           <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
           <p className={styles.data}>{dataLonga}</p>
         </div>

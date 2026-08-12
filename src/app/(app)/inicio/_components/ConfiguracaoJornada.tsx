@@ -111,12 +111,24 @@ export function ConfiguracaoJornada({
             })}
           </ol>
 
-          <fieldset className={styles.decisao} data-passo="1" hidden={passo !== 1}>
-            <legend>
-              <span>01</span>
-              <strong>Onde você quer começar?</strong>
-              <small>Um nicho específico deixa sua primeira abordagem mais concreta.</small>
-            </legend>
+          <fieldset
+            className={styles.decisao}
+            data-passo="1"
+            hidden={passo !== 1}
+            aria-labelledby="titulo-decisao-mercado"
+            aria-describedby="descricao-decisao-mercado"
+          >
+            <div className={styles.cabecalhoDecisao}>
+              <span className={styles.numeroDecisao} aria-hidden="true">
+                01
+              </span>
+              <span className={styles.textoDecisao}>
+                <h2 id="titulo-decisao-mercado">Onde você quer começar?</h2>
+                <p id="descricao-decisao-mercado">
+                  Um nicho específico deixa sua primeira abordagem mais concreta.
+                </p>
+              </span>
+            </div>
             <label className={styles.campoTexto}>
               <span>Nicho inicial</span>
               <input
@@ -133,14 +145,24 @@ export function ConfiguracaoJornada({
             </label>
           </fieldset>
 
-          <fieldset className={styles.decisao} data-passo="2" hidden={passo !== 2}>
-            <legend>
-              <span>02</span>
-              <strong>Qual projeto você vai dominar primeiro?</strong>
-              <small>
-                Você poderá usar os outros depois. Agora precisamos de uma oferta principal.
-              </small>
-            </legend>
+          <fieldset
+            className={styles.decisao}
+            data-passo="2"
+            hidden={passo !== 2}
+            aria-labelledby="titulo-decisao-projeto"
+            aria-describedby="descricao-decisao-projeto"
+          >
+            <div className={styles.cabecalhoDecisao}>
+              <span className={styles.numeroDecisao} aria-hidden="true">
+                02
+              </span>
+              <span className={styles.textoDecisao}>
+                <h2 id="titulo-decisao-projeto">Qual projeto você vai dominar primeiro?</h2>
+                <p id="descricao-decisao-projeto">
+                  Você poderá usar os outros depois. Agora precisamos de uma oferta principal.
+                </p>
+              </span>
+            </div>
             {projetos.length ? (
               <div className={styles.projetos}>
                 {projetos.map((projeto) => (
@@ -173,12 +195,24 @@ export function ConfiguracaoJornada({
             )}
           </fieldset>
 
-          <fieldset className={styles.decisao} data-passo="3" hidden={passo !== 3}>
-            <legend>
-              <span>03</span>
-              <strong>Como você explica o serviço?</strong>
-              <small>Escreva para um cliente, sem ferramenta, sigla ou promessa abstrata.</small>
-            </legend>
+          <fieldset
+            className={styles.decisao}
+            data-passo="3"
+            hidden={passo !== 3}
+            aria-labelledby="titulo-decisao-posicionamento"
+            aria-describedby="descricao-decisao-posicionamento"
+          >
+            <div className={styles.cabecalhoDecisao}>
+              <span className={styles.numeroDecisao} aria-hidden="true">
+                03
+              </span>
+              <span className={styles.textoDecisao}>
+                <h2 id="titulo-decisao-posicionamento">Como você explica o serviço?</h2>
+                <p id="descricao-decisao-posicionamento">
+                  Escreva para um cliente, sem ferramenta, sigla ou promessa abstrata.
+                </p>
+              </span>
+            </div>
             <label className={styles.campoTexto}>
               <span>Frase de posicionamento</span>
               <textarea

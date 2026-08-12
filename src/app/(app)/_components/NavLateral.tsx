@@ -119,9 +119,7 @@ export function NavLateral({
                 data-loading={carregando || undefined}
                 onClick={(evento) => iniciarNavegacao(evento, item)}
               >
-                {ativo && (
-                  <span className={variante === 'dock' ? styles.marcaDock : styles.pilula} />
-                )}
+                {ativo && variante === 'dock' && <span className={styles.marcaDock} />}
                 <span className={styles.icone} aria-hidden="true">
                   {item.icone}
                 </span>
