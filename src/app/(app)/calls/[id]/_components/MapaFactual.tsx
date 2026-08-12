@@ -1,4 +1,4 @@
-import { BadgeCheck, CircleAlert, ListChecks, Target } from 'lucide-react';
+import { BadgeCheck, ChevronRight, CircleAlert, ListChecks, Target } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
 import styles from '../pagina.module.css';
 
@@ -31,15 +31,25 @@ export function MapaFactual({
   analise: PosCall['analise'];
   temAnalise: boolean;
 }) {
+  const totalFatos = analise
+    ? analise.dores.length +
+      analise.decisoes.length +
+      analise.compromissos.length +
+      analise.objecoes.length
+    : 0;
+
   return (
-    <section className={styles.mapaFactual} aria-labelledby="mapa-factual-titulo">
-      <header className={styles.secaoTopo}>
+    <details className={styles.mapaFactual}>
+      <summary>
         <div>
-          <p>Do discurso para o trabalho</p>
-          <h2 id="mapa-factual-titulo">Mapa factual</h2>
+          <p>Detalhes da análise</p>
+          <h2>Rever fatos da conversa</h2>
         </div>
-        <span>{temAnalise ? 'Separado por natureza' : 'Aguardando leitura'}</span>
-      </header>
+        <span>
+          {temAnalise ? `${totalFatos} fatos` : 'Aguardando leitura'}
+          <ChevronRight size={17} aria-hidden="true" />
+        </span>
+      </summary>
 
       <div className={styles.gradeFatos}>
         <article className={styles.cartaoFato}>
@@ -113,6 +123,6 @@ export function MapaFactual({
           />
         </article>
       </div>
-    </section>
+    </details>
   );
 }

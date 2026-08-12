@@ -1,13 +1,5 @@
 import Link from 'next/link';
-import {
-  ArrowRight,
-  BadgeCheck,
-  CalendarClock,
-  ClipboardCheck,
-  GitBranch,
-  ListChecks,
-  Sparkles,
-} from 'lucide-react';
+import { ArrowRight, BadgeCheck, ClipboardCheck, GitBranch, ListChecks } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
 import { etapaVisivel, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
 import { FormularioPlanoCall } from './FormularioPlanoCall';
@@ -58,12 +50,9 @@ export function CentralPlanoCall({
       aria-labelledby="plano-da-call-titulo"
     >
       <div className={styles.centralAcaoContexto}>
-        <div className={styles.acaoMarca}>
-          <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
-        </div>
-        <p className={styles.sobretitulo}>Continuidade automática</p>
-        <h2 id="plano-da-call-titulo">Transforme a conversa em execução</h2>
-        <p>A IA já organizou os fatos. Você só valida o que muda o CRM e o trabalho do projeto.</p>
+        <p className={styles.sobretitulo}>Antes de atualizar o CRM</p>
+        <h2 id="plano-da-call-titulo">Revise o que muda a partir desta call</h2>
+        <p>O histórico já foi preservado. Agora você confirma somente as mudanças operacionais.</p>
 
         <ol className={styles.fluxoSincronizacao}>
           <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
@@ -71,10 +60,10 @@ export function CentralPlanoCall({
               <BadgeCheck size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>Resumo no histórico</strong>
+              <strong>Histórico da conversa</strong>
               <small>
                 {posCall.sincronizacao.historicoCrm
-                  ? 'Fatos registrados no CRM'
+                  ? 'Já registrado no CRM'
                   : 'Registro em processamento'}
               </small>
             </div>
@@ -84,7 +73,7 @@ export function CentralPlanoCall({
               <GitBranch size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>Pipeline preparado</strong>
+              <strong>Etapa do pipeline</strong>
               <small>
                 {etapaRecomendada === etapaAtual
                   ? `Manter em ${ROTULO_ETAPA[etapaAtual]}`
@@ -97,19 +86,19 @@ export function CentralPlanoCall({
               <ListChecks size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>{planoAplicado ? 'Plano sincronizado' : 'Compromissos prontos'}</strong>
+              <strong>
+                {planoAplicado ? 'Compromissos sincronizados' : 'Compromissos da call'}
+              </strong>
               <small>
-                {posCall.sincronizacao.projetoAtivo
-                  ? posCall.sincronizacao.projetoAtivo.titulo
-                  : 'Acompanham o lead até a entrega'}
+                {planoAplicado
+                  ? 'Ações já criadas para acompanhamento'
+                  : `${compromissos.length} para revisar antes de criar ações`}
               </small>
             </div>
           </li>
         </ol>
 
-        <span className={styles.acaoDestino}>
-          <Sparkles size={13} aria-hidden="true" /> Uma revisão · três destinos
-        </span>
+        <p className={styles.garantiaRevisao}>Nada muda no pipeline sem sua confirmação.</p>
       </div>
 
       <FormularioPlanoCall

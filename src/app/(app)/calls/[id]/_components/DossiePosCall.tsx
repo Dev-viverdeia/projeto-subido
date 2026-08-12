@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  BrainCircuit,
   ChevronRight,
   CircleAlert,
   CircleHelp,
@@ -13,7 +12,6 @@ import {
   Lightbulb,
   MessageSquareQuote,
   Radar,
-  Layers3,
   Target,
 } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
@@ -99,7 +97,6 @@ export function DossiePosCall({
 }) {
   const analise = posCall.analise;
   const estado = estadoDaAnalise(posCall);
-  const fatosConfirmados = (analise?.decisoes.length ?? 0) + (analise?.compromissos.length ?? 0);
   const pontosAbertos = analise?.lacunas.length ?? 0;
   const acaoJaSincronizada = posCall.sincronizacao.acoesPlano.find(
     (acao) => acao.categoria === 'proxima_acao',
@@ -126,7 +123,6 @@ export function DossiePosCall({
       </nav>
 
       <header className={styles.hero} data-on-dark>
-        <div className={styles.heroGrade} aria-hidden="true" />
         <div className={styles.heroTopo}>
           <div className={styles.heroTitulo}>
             <div className={styles.sobretituloHero}>
@@ -139,39 +135,20 @@ export function DossiePosCall({
               {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
             </p>
           </div>
-          <div className={styles.heroSelos}>
-            <span>{ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</span>
-            <span>{ROTULO_STATUS_CALL[posCall.reuniao.status]}</span>
+          <div className={styles.heroEstado}>
+            <small>{ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</small>
+            <strong>{ROTULO_STATUS_CALL[posCall.reuniao.status]}</strong>
           </div>
         </div>
 
-        <div className={styles.pulsoDecisao}>
-          <div className={styles.pulsoRotulo}>
-            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>Mapa da conversa</span>
+        <div className={styles.heroDecisao}>
+          <div>
+            <small>Próximo passo sugerido</small>
+            <strong>{acaoSugerida || 'Definir o próximo passo com revisão humana'}</strong>
           </div>
-          <div className={styles.pulsoItem}>
-            <small>Leitura</small>
-            <strong>{nota ?? '—'}</strong>
-            <span>{sentimento}</span>
-          </div>
-          <div className={styles.pulsoItem}>
-            <small>Confirmado</small>
-            <strong>{fatosConfirmados}</strong>
-            <span>decisões e compromissos</span>
-          </div>
-          <div className={styles.pulsoItem}>
-            <small>Em aberto</small>
-            <strong>{pontosAbertos}</strong>
-            <span>lacunas para validar</span>
-          </div>
-          <div className={`${styles.pulsoItem} ${styles.pulsoAcao}`}>
-            <small>Próximo movimento</small>
-            <strong>{acaoSugerida || 'Definir com revisão humana'}</strong>
-            <a href="#plano-da-call">
-              Organizar execução <ChevronRight size={14} aria-hidden="true" />
-            </a>
-          </div>
+          <a href="#plano-da-call">
+            Revisar antes de aplicar <ChevronRight size={15} aria-hidden="true" />
+          </a>
         </div>
 
         <div className={styles.heroMeta}>
@@ -190,16 +167,13 @@ export function DossiePosCall({
 
       <RetornoProximaAcao estado={estadoAcao} />
 
-      <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
-
       <section className={styles.leitura} aria-labelledby="leitura-titulo">
-        <div className={styles.leituraMarca}>
-          <BrainCircuit size={20} strokeWidth={1.65} aria-hidden="true" />
-          <span>Leitura central</span>
-        </div>
         <div className={styles.leituraCorpo}>
           <div className={styles.leituraTopo}>
-            <h2 id="leitura-titulo">O que esta conversa realmente mudou</h2>
+            <div>
+              <p className={styles.sobretitulo}>Resumo da call</p>
+              <h2 id="leitura-titulo">O que ficou claro nesta conversa</h2>
+            </div>
             {nota !== null && nota !== undefined && (
               <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
                 <strong>{nota}</strong>
@@ -247,11 +221,13 @@ export function DossiePosCall({
             </div>
           )}
           <div className={styles.leituraRodape}>
-            <span data-sentimento={analise?.sentimento ?? 'indefinido'}>{sentimento}</span>
+            <span>Tom percebido: {sentimento}</span>
             <small>Leitura assistida por IA · valide antes de agir</small>
           </div>
         </div>
       </section>
+
+      <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
 
       <div className={styles.gradeOperacional}>
         <aside className={styles.lateral}>
@@ -336,14 +312,17 @@ export function DossiePosCall({
           </section>
 
           {posCall.coach.length > 0 && (
-            <section className={styles.coachRevisao} aria-labelledby="coach-revisao-titulo">
-              <header className={styles.secaoTopo}>
+            <details className={styles.coachRevisao}>
+              <summary>
                 <div>
                   <p>Aprendizado da condução</p>
-                  <h2 id="coach-revisao-titulo">Momentos do Live Coach</h2>
+                  <h2>Rever momentos do Live Coach</h2>
                 </div>
-                <span>{posCall.coach.length} intervenções</span>
-              </header>
+                <span>
+                  {posCall.coach.length} intervenções
+                  <ChevronRight size={17} aria-hidden="true" />
+                </span>
+              </summary>
               <div className={styles.coachLinha}>
                 {posCall.coach.map((sugestao) => (
                   <article key={sugestao.id} data-prioridade={sugestao.prioridade}>
@@ -363,7 +342,7 @@ export function DossiePosCall({
                   </article>
                 ))}
               </div>
-            </section>
+            </details>
           )}
 
           {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-import { ArrowRight, Check, ListChecks, Sparkles } from 'lucide-react';
+import { Check, CheckCircle2, ListChecks } from 'lucide-react';
 import { aplicarPlanoCall } from '@/lib/calls/actions';
 import { ETAPAS_MOVIMENTO_CRM, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
 import styles from '../pagina.module.css';
@@ -11,12 +11,8 @@ function BotaoAplicar() {
 
   return (
     <button type="submit" disabled={pending} aria-busy={pending || undefined}>
-      {pending ? 'Organizando a operação…' : 'Aplicar plano da call'}
-      {pending ? (
-        <Sparkles size={16} aria-hidden="true" />
-      ) : (
-        <ArrowRight size={16} aria-hidden="true" />
-      )}
+      {pending ? 'Atualizando CRM…' : 'Confirmar e atualizar CRM'}
+      {!pending && <CheckCircle2 size={16} aria-hidden="true" />}
     </button>
   );
 }
@@ -47,16 +43,14 @@ export function FormularioPlanoCall({
 
       <header className={styles.formularioTopo}>
         <div>
-          <span>
-            <Sparkles size={14} aria-hidden="true" /> Plano recomendado pela IA
-          </span>
-          <p>Revise o essencial. Uma confirmação atualiza toda a jornada.</p>
+          <span>Revisão operacional</span>
+          <p>A IA sugere. Você ajusta e confirma.</p>
         </div>
-        <small>Você continua no controle</small>
+        <small>Revisão humana</small>
       </header>
 
       <label className={styles.campoAcao}>
-        <span>Próximo movimento</span>
+        <span>Próxima ação no CRM</span>
         <textarea
           name="acao"
           rows={3}
@@ -110,7 +104,7 @@ export function FormularioPlanoCall({
 
       <footer className={styles.formularioRodape}>
         <small id="plano-call-ajuda">
-          O resumo já está salvo. Aqui você confirma apenas as mudanças operacionais.
+          Atualiza a próxima ação, a etapa do pipeline e os compromissos selecionados.
         </small>
         <BotaoAplicar />
       </footer>
