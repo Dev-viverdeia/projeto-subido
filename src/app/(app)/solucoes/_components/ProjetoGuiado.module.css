@@ -1233,22 +1233,27 @@
 
 .rotaEtapas li {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
+  display: grid;
+  grid-template-rows: 24px auto;
+  justify-items: center;
+  gap: var(--via-space-1);
   min-width: 0;
 }
 
 .rotaEtapas li:not(:last-child)::after {
   content: '';
-  flex: 1;
+  position: absolute;
+  z-index: 0;
+  top: 12px;
+  left: calc(50% + 16px);
+  width: calc(100% - 32px);
   height: 1px;
-  min-width: var(--via-space-2);
-  margin-inline: var(--via-space-1);
   background: var(--via-border);
 }
 
 .rotaEtapas li > span {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   flex: none;
@@ -1276,12 +1281,10 @@
 }
 
 .rotaEtapas li strong {
-  overflow: hidden;
   margin: 0;
   color: var(--via-text-primary);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
