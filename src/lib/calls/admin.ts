@@ -410,3 +410,24 @@ export async function marcarAnaliseComoFalha({
   );
   if (error) console.error('[calls:analise:falha] não foi possível registrar:', error.message);
 }
+
+export async function marcarAnaliseSemConteudo({
+  dono,
+  reuniaoId,
+}: {
+  dono: string;
+  reuniaoId: string;
+}) {
+  const admin = createAdminClient();
+  const { error } = await admin.from('calls_analises').upsert(
+    {
+      dono,
+      reuniao_id: reuniaoId,
+      status: 'sem_conteudo',
+      resumo: null,
+      erro: 'A reunião terminou sem fala suficiente para uma análise confiável.',
+    },
+    { onConflict: 'reuniao_id' },
+  );
+  if (error) throw handleError(error, 'calls:analise:sem-conteudo');
+}

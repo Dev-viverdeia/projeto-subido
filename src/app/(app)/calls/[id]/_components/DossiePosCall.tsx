@@ -73,6 +73,9 @@ function estadoDaAnalise(posCall: PosCall) {
   if (posCall.analise?.status === 'falhou') {
     return { rotulo: 'Revisão manual', tipo: 'falhou' } as const;
   }
+  if (posCall.analise?.status === 'sem_conteudo') {
+    return { rotulo: 'Sem conteúdo', tipo: 'sem_conteudo' } as const;
+  }
   if (posCall.reuniao.status === 'cancelada') {
     return { rotulo: 'Call cancelada', tipo: 'indisponivel' } as const;
   }
@@ -82,6 +85,7 @@ function estadoDaAnalise(posCall: PosCall) {
 function IconeEstado({ tipo }: { tipo: ReturnType<typeof estadoDaAnalise>['tipo'] }) {
   if (tipo === 'pronta') return <BadgeCheck size={14} aria-hidden="true" />;
   if (tipo === 'falhou') return <CircleAlert size={14} aria-hidden="true" />;
+  if (tipo === 'sem_conteudo') return <CircleHelp size={14} aria-hidden="true" />;
   if (tipo === 'indisponivel') return <CircleHelp size={14} aria-hidden="true" />;
   return <Radar size={14} aria-hidden="true" />;
 }
@@ -215,6 +219,14 @@ export function DossiePosCall({
                 <p>
                   {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
                 </p>
+              </div>
+            </div>
+          ) : estado.tipo === 'sem_conteudo' ? (
+            <div className={styles.estadoLeitura}>
+              <CircleHelp size={19} aria-hidden="true" />
+              <div>
+                <strong>A call terminou sem conversa suficiente para uma leitura.</strong>
+                <p>O histórico foi preservado sem inventar decisões, dores ou próximos passos.</p>
               </div>
             </div>
           ) : estado.tipo === 'indisponivel' ? (

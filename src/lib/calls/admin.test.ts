@@ -5,7 +5,7 @@ const { createAdminClient } = vi.hoisted(() => ({ createAdminClient: vi.fn() }))
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/admin', () => ({ createAdminClient }));
 
-import { registrarEntradaNaSala } from './admin';
+import { marcarAnaliseSemConteudo, registrarEntradaNaSala } from './admin';
 
 const entrada = {
   dono: '11111111-1111-4111-8111-111111111111',
@@ -61,5 +61,26 @@ describe('registro de presença na sala', () => {
     expect(atualizacao.eq).toHaveBeenCalledWith('dono', entrada.dono);
     expect(atualizacao.eq).toHaveBeenCalledWith('reuniao_id', entrada.reuniaoId);
     expect(atualizacao.eq).toHaveBeenCalledWith('identidade_provedor', entrada.identidade);
+  });
+});
+
+describe('encerramento sem transcrição suficiente', () => {
+  beforeEach(() => createAdminClient.mockReset());
+
+  it('preserva a call sem registrar uma falha operacional falsa', async () => {
+    const upsert = vi.fn(() => Promise.resolve({ error: null }));
+    createAdminClient.mockReturnValue({ from: vi.fn(() => ({ upsert })) });
+
+    await marcarAnaliseSemConteudo({ dono: entrada.dono, reuniaoId: entrada.reuniaoId });
+
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dono: entrada.dono,
+        reuniao_id: entrada.reuniaoId,
+        status: 'sem_conteudo',
+        resumo: null,
+      }),
+      { onConflict: 'reuniao_id' },
+    );
   });
 });

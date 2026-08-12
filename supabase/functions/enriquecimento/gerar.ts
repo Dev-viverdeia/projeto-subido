@@ -1,10 +1,44 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@0.115.0';
 import { zodOutputFormat } from 'npm:@anthropic-ai/sdk@0.115.0/helpers/zod';
+import OpenAI from 'npm:openai@7.4.0';
+import { zodTextFormat } from 'npm:openai@7.4.0/helpers/zod';
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.110.9';
-import { DossieGerado, type DossieGerado as Dossie } from './schema.ts';
+import { DossieGerado, DossieGeradoOpenAI, type DossieGerado as Dossie } from './schema.ts';
 import { lerPaginaPublica, normalizarSite, type PaginaPublica } from './site.ts';
 
-const MODELO = 'claude-sonnet-5';
+const MODELO_ANTHROPIC = 'claude-sonnet-5';
+const MODELO_OPENAI = 'gpt-5-mini';
+
+const INSTRUCOES_DOSSIE = `Você é o analista de pré-venda da plataforma Subido. Produza um dossiê
+operacional para um prestador de serviços de IA preparar a próxima conversa.
+
+REGRAS INEGOCIÁVEIS
+· Fato e hipótese são categorias diferentes. Um dado só entra em "fatos" se
+  estiver literalmente nas fontes recebidas. Toda inferência entra em "hipoteses".
+· Não invente faturamento, número de funcionários, tecnologia usada, cargo,
+  endereço, dor, intenção ou urgência.
+· Use "alta" apenas quando múltiplos sinais independentes sustentarem a hipótese;
+  o normal é "media" ou "baixa".
+· Em cada hipótese, diga exatamente como confirmá-la na call.
+· Recomende oportunidades de IA específicas para o caso, com mecanismo e impacto;
+  nunca prometa resultado e nunca escreva marketing genérico.
+· A abertura é uma frase natural que o profissional pode dizer ao lead. Não use
+  bajulação, urgência artificial ou afirmação não confirmada.
+· A próxima ação deve ser executável e caber em uma frase.
+· Se uma fonte pública falhou ou há pouco contexto, coloque isso em "alertas".
+· Escreva em português do Brasil, direto, sem caixa alta ou exclamação.
+
+ORÇAMENTO DOS CAMPOS
+· resumo: de 40 a 1.000 caracteres
+· empresa: setor até 160; porte, cidade e estado até 120; modelo de negócio até 300
+· fatos: até 12; título até 120; valor até 600
+· hipóteses: até 8; título até 140; explicação até 700; validação até 500
+· oportunidades: até 5; título até 140; impacto e motivo até 500; abertura até 700
+· perguntas de descoberta: até 8, cada uma com até 500 caracteres
+· próxima ação: ação até 500; motivo até 700
+· alertas: até 5, cada um com até 500 caracteres
+Respeitar esses limites faz parte da tarefa. Corte o item menos útil antes de
+ultrapassar qualquer teto.`;
 
 type Entrada = {
   oportunidade_id: string;
@@ -68,8 +102,8 @@ export async function gerarEGravar(
     }
 
     etapa = 'gerar_dossie';
-    const dossie = await gerarDossieComTolerancia({ contexto, entrada, pagina });
-    const seguro = limitarUrls(dossie, fontes);
+    const geracao = await gerarDossieComTolerancia({ contexto, entrada, pagina });
+    const seguro = limitarUrls(geracao.dossie, fontes);
     const concluido = new Date().toISOString();
 
     etapa = 'gravar_resultado';
@@ -79,7 +113,7 @@ export async function gerarEGravar(
         status: 'concluido',
         resultado: seguro,
         fontes,
-        modelo: MODELO,
+        modelo: geracao.modelo,
         concluido_em: concluido,
         erro: null,
       })
@@ -182,38 +216,9 @@ async function gerarDossie({
 
   const formato = zodOutputFormat(DossieGerado);
   const resposta = await anthropic.messages.create({
-    model: MODELO,
+    model: MODELO_ANTHROPIC,
     max_tokens: 3500,
-    system: `Você é o analista de pré-venda da plataforma Subido. Produza um dossiê
-operacional para um prestador de serviços de IA preparar a próxima conversa.
-
-REGRAS INEGOCIÁVEIS
-· Fato e hipótese são categorias diferentes. Um dado só entra em "fatos" se
-  estiver literalmente nas fontes recebidas. Toda inferência entra em "hipoteses".
-· Não invente faturamento, número de funcionários, tecnologia usada, cargo,
-  endereço, dor, intenção ou urgência.
-· Use "alta" apenas quando múltiplos sinais independentes sustentarem a hipótese;
-  o normal é "media" ou "baixa".
-· Em cada hipótese, diga exatamente como confirmá-la na call.
-· Recomende oportunidades de IA específicas para o caso, com mecanismo e impacto;
-  nunca prometa resultado e nunca escreva marketing genérico.
-· A abertura é uma frase natural que o profissional pode dizer ao lead. Não use
-  bajulação, urgência artificial ou afirmação não confirmada.
-· A próxima ação deve ser executável e caber em uma frase.
-· Se uma fonte pública falhou ou há pouco contexto, coloque isso em "alertas".
-· Escreva em português do Brasil, direto, sem caixa alta ou exclamação.
-
-ORÇAMENTO DOS CAMPOS
-· resumo: de 40 a 1.000 caracteres
-· empresa: setor até 160; porte, cidade e estado até 120; modelo de negócio até 300
-· fatos: até 12; título até 120; valor até 600
-· hipóteses: até 8; título até 140; explicação até 700; validação até 500
-· oportunidades: até 5; título até 140; impacto e motivo até 500; abertura até 700
-· perguntas de descoberta: até 8, cada uma com até 500 caracteres
-· próxima ação: ação até 500; motivo até 700
-· alertas: até 5, cada um com até 500 caracteres
-Respeitar esses limites faz parte da tarefa. Corte o item menos útil antes de
-ultrapassar qualquer teto.`,
+    system: INSTRUCOES_DOSSIE,
     messages: [
       {
         role: 'user',
@@ -244,24 +249,52 @@ ultrapassar qualquer teto.`,
   }
 }
 
-/** Uma saída que falha apenas na validação não deve mandar o usuário apertar o
- * botão de novo. A segunda geração é limitada a uma tentativa e não repete erros
- * de autenticação ou limite do provedor. */
+async function gerarDossieOpenAI(entrada: Parameters<typeof gerarDossie>[0]): Promise<Dossie> {
+  const apiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!apiKey) throw new Error('sem_chave_modelo');
+  const openai = new OpenAI({ apiKey, maxRetries: 3, timeout: 45_000 });
+  const { contexto, pagina, entrada: pedido } = entrada;
+
+  const resposta = await openai.responses.parse({
+    model: MODELO_OPENAI,
+    instructions: INSTRUCOES_DOSSIE,
+    input:
+      `DADOS DO CRM (privados, confirmados pelo histórico):\n${JSON.stringify(contexto)}\n\n` +
+      `CONTEXTO INFORMADO PELO PROFISSIONAL:\n${pedido.contexto || 'Não informado.'}\n\n` +
+      `LINKEDIN INDICADO (apenas referência; não foi lido):\n${pedido.linkedin_url || 'Não informado.'}\n\n` +
+      `CONTEÚDO PÚBLICO DO SITE:\n${pagina ? `URL: ${pagina.url}\n${pagina.texto}` : 'Site não informado ou indisponível.'}`,
+    reasoning: { effort: 'low' },
+    text: {
+      format: zodTextFormat(DossieGeradoOpenAI, 'dossie_lead'),
+      verbosity: 'medium',
+    },
+    max_output_tokens: 3_500,
+    store: false,
+  });
+
+  if (!resposta.output_parsed) throw new Error('modelo_sem_saida');
+  return normalizarDossie(resposta.output_parsed);
+}
+
+/** Uma saída inválida recebe uma segunda tentativa no provedor primário. Se o
+ * provedor estiver indisponível, a geração continua pela contingência OpenAI. */
 async function gerarDossieComTolerancia(
   entrada: Parameters<typeof gerarDossie>[0],
-): Promise<Dossie> {
+): Promise<{ dossie: Dossie; modelo: string }> {
   try {
-    return await gerarDossie(entrada);
+    return { dossie: await gerarDossie(entrada), modelo: MODELO_ANTHROPIC };
   } catch (erro) {
-    if (
-      erro instanceof Anthropic.AuthenticationError ||
-      erro instanceof Anthropic.PermissionDeniedError ||
-      erro instanceof Anthropic.RateLimitError
-    ) {
-      throw erro;
+    if (!(erro instanceof Anthropic.APIError)) {
+      try {
+        console.warn('[enriquecimento] primeira saída inválida; repetindo uma vez');
+        return { dossie: await gerarDossie(entrada), modelo: MODELO_ANTHROPIC };
+      } catch {
+        console.warn('[enriquecimento] Anthropic indisponível; usando contingência OpenAI');
+        return { dossie: await gerarDossieOpenAI(entrada), modelo: MODELO_OPENAI };
+      }
     }
-    console.warn('[enriquecimento] primeira saída inválida; repetindo uma vez');
-    return gerarDossie(entrada);
+    console.warn('[enriquecimento] Anthropic indisponível; usando contingência OpenAI');
+    return { dossie: await gerarDossieOpenAI(entrada), modelo: MODELO_OPENAI };
   }
 }
 
@@ -420,6 +453,9 @@ function mensagemSegura(erro: unknown): string {
     }
     if (erro instanceof Anthropic.APIError) {
       return `O provedor da análise respondeu com erro. [api_${erro.status ?? 'desconhecido'}]`;
+    }
+    if (erro instanceof OpenAI.APIError) {
+      return `A contingência da análise respondeu com erro. [api_${erro.status ?? 'desconhecido'}]`;
     }
   }
   return 'Não foi possível montar o dossiê agora. Revise as fontes e tente novamente.';

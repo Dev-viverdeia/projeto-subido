@@ -52,7 +52,7 @@ export async function gerarSugestaoCoach({
   segmentos: readonly SegmentoLive[];
 }) {
   const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 3, timeout: 45_000 });
   const transcricao = segmentos
     .map((segmento) => segmento.texto)
     .join('\n')
@@ -97,7 +97,7 @@ export async function gerarAnaliseCall({
   segmentos: readonly SegmentoLive[];
 }) {
   const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 3, timeout: 45_000 });
   const transcricao = segmentos
     .map((segmento) => segmento.texto)
     .join('\n')

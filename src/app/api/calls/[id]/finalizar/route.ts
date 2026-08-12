@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   encerrarReuniao,
   marcarAnaliseComoFalha,
+  marcarAnaliseSemConteudo,
   marcarReuniaoProcessando,
   persistirAnalise,
   persistirSegmentos,
@@ -50,10 +51,9 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     await marcarReuniaoProcessando({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
 
     if (segmentos.reduce((total, segmento) => total + segmento.texto.length, 0) < 80) {
-      await marcarAnaliseComoFalha({
+      await marcarAnaliseSemConteudo({
         dono: contexto.dono,
         reuniaoId: contexto.reuniaoId,
-        mensagem: 'Transcrição insuficiente para gerar uma análise confiável.',
       });
       await encerrarReuniao({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
       return NextResponse.json({ estado: 'concluida_sem_analise' }, { headers: semCache() });
