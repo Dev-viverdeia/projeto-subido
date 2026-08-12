@@ -32,6 +32,48 @@ const ArtefatoEntrega = z.object({
   descricao: z.string().min(12).max(300),
 });
 
+const AulaCampo = z.object({
+  titulo: z.string().min(3).max(120),
+  objetivo: z.string().min(20).max(400),
+  duracao: z.string().min(2).max(40),
+  topicos: z.array(z.string().min(8).max(240)).min(2).max(5),
+  exercicio: z.string().min(20).max(500),
+  prontoQuando: z.string().min(20).max(500),
+});
+
+const VideoReferencia = z.object({
+  titulo: z.string().min(3).max(120),
+  descricao: z.string().min(20).max(400),
+  videoUrl: z.string().url().max(1000),
+});
+
+const PassoDemonstracao = z.object({
+  etapa: z.string().min(3).max(80),
+  oQueAcontece: z.string().min(12).max(400),
+  evidencia: z.string().min(8).max(240),
+});
+
+const DemonstracaoCampo = z.object({
+  titulo: z.string().min(3).max(120),
+  contexto: z.string().min(20).max(500),
+  passos: z.array(PassoDemonstracao).min(4).max(8),
+  resultadoEsperado: z.string().min(20).max(500),
+});
+
+const MaterialCampo = z.object({
+  titulo: z.string().min(3).max(100),
+  quandoUsar: z.string().min(12).max(300),
+  conteudo: z.string().min(20).max(8000),
+});
+
+const TrilhaDidatica = z.object({
+  tempoTotal: z.string().min(2).max(80),
+  aulas: z.array(AulaCampo).min(2).max(4),
+  videosReferencia: z.array(VideoReferencia).max(3).default([]),
+  demonstracao: DemonstracaoCampo,
+  materiais: z.array(MaterialCampo).min(3).max(6),
+});
+
 const Passo = z.object({
   id: z.string().min(2).max(80),
   titulo: z.string().min(3).max(140),
@@ -58,6 +100,7 @@ export const RoteiroProjetoSchema = z
     perfil: PerfilProjeto.optional(),
     escopo: EscopoProjeto.optional(),
     artefatosEntrega: z.array(ArtefatoEntrega).min(3).max(6).optional(),
+    trilhaDidatica: TrilhaDidatica.optional(),
     fases: z.array(Fase).length(5),
   })
   .superRefine(({ fases }, contexto) => {

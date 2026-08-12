@@ -25,6 +25,7 @@ import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
 import { ArtefatosEntregaProjeto, FichaCampoProjeto } from './EscopoProjeto';
 import { ProximaSolucao } from './ProximaSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
+import { TrilhaDidaticaProjeto } from './TrilhaDidaticaProjeto';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import styles from './ProjetoGuiado.module.css';
 
@@ -59,6 +60,7 @@ export function ProjetoGuiado({
   const perfil = projeto.roteiro.perfil;
   const escopo = projeto.roteiro.escopo;
   const artefatosEntrega = projeto.roteiro.artefatosEntrega;
+  const trilhaDidatica = projeto.roteiro.trilhaDidatica;
 
   const passos = projeto.roteiro.fases.flatMap((fase) =>
     fase.passos.map((passo) => ({ fase, passo, id: idPassoProjeto(slug, fase.id, passo.id) })),
@@ -201,6 +203,8 @@ export function ProjetoGuiado({
           </ol>
         </section>
       ) : null}
+
+      {trilhaDidatica ? <TrilhaDidaticaProjeto trilha={trilhaDidatica} /> : null}
 
       <div className={styles.corpo}>
         <div className={styles.principal}>
@@ -347,7 +351,7 @@ export function ProjetoGuiado({
               : null}
           </div>
 
-          {videoUrl ? (
+          {videoUrl && !trilhaDidatica ? (
             <section className={styles.aulaApoio} aria-labelledby="aula-apoio-titulo">
               <header>
                 <p>Conteúdo de apoio</p>

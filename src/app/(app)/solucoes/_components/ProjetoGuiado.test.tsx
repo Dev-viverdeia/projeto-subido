@@ -30,6 +30,80 @@ const projeto: DadosRoteiroProjeto = {
       { titulo: 'Suíte de testes', descricao: 'Casos, resultado esperado, evidência e reteste.' },
       { titulo: 'Manual da operação', descricao: 'Rotina, contingência e revisão da entrega.' },
     ],
+    trilhaDidatica: {
+      tempoTotal: '30 minutos',
+      aulas: [
+        {
+          titulo: 'Desenhe a conversa',
+          objetivo: 'Entender a jornada real e definir onde a automação precisa de uma pessoa.',
+          duracao: '10 min',
+          topicos: ['Estados e movimentos permitidos', 'Gatilhos para passagem humana'],
+          exercicio: 'Mapeie cinco conversas reais e marque a mudança de estado em cada uma.',
+          prontoQuando: 'Cada estado tem entrada, saída, responsável e exceção documentados.',
+        },
+        {
+          titulo: 'Valide antes de ativar',
+          objetivo: 'Testar respostas e falhas sem expor uma conversa real à automação.',
+          duracao: '12 min',
+          topicos: ['Cenários comuns e críticos', 'Evidência e reteste antes da ativação'],
+          exercicio: 'Rode um cenário comum, um ambíguo e um que exija passagem humana.',
+          prontoQuando: 'Todos os cenários deixam evidência e respeitam os limites aprovados.',
+        },
+      ],
+      videosReferencia: [
+        {
+          titulo: 'Implementação de referência',
+          descricao: 'Acompanhe uma implementação equivalente antes de construir a sua entrega.',
+          videoUrl: 'https://video.example.com/embed/123',
+        },
+      ],
+      demonstracao: {
+        titulo: 'Do contato ao CRM',
+        contexto:
+          'Um novo lead chega, é qualificado e precisa ser entregue ao vendedor com contexto.',
+        passos: [
+          {
+            etapa: 'Entrada',
+            oQueAcontece: 'A mensagem entra na linha do tempo antes da primeira resposta.',
+            evidencia: 'Evento com horário',
+          },
+          {
+            etapa: 'Qualificação',
+            oQueAcontece: 'As respostas confirmadas viram fatos e as lacunas continuam abertas.',
+            evidencia: 'Fatos e campos ausentes',
+          },
+          {
+            etapa: 'Passagem',
+            oQueAcontece: 'O vendedor recebe o histórico, a dúvida e a próxima ação sugerida.',
+            evidencia: 'Dono e resumo',
+          },
+          {
+            etapa: 'CRM',
+            oQueAcontece: 'A linha do tempo mostra o responsável e o próximo passo confirmado.',
+            evidencia: 'Evento no CRM',
+          },
+        ],
+        resultadoEsperado:
+          'A conversa chega ao vendedor completa e sem informação comercial inventada.',
+      },
+      materiais: [
+        {
+          titulo: 'Briefing de atendimento',
+          quandoUsar: 'Na primeira reunião para fechar fontes e limites.',
+          conteudo: 'Objetivo:\nFontes aprovadas:\nLimites:\nResponsável pela passagem:',
+        },
+        {
+          titulo: 'Matriz de qualificação',
+          quandoUsar: 'Antes de escrever o comportamento do agente.',
+          conteudo: 'Critério | Pergunta | Evidência | Efeito na rota | Se faltar dado',
+        },
+        {
+          titulo: 'Checklist de ativação',
+          quandoUsar: 'No aceite do piloto antes de abrir o canal.',
+          conteudo: '[ ] Base aprovada\n[ ] Passagem testada\n[ ] CRM sem duplicidade',
+        },
+      ],
+    },
     fundamentos: [
       {
         titulo: 'Venda a operação',
@@ -129,6 +203,15 @@ describe('Projeto guiado', () => {
       screen.getByRole('heading', { level: 3, name: 'O kit que comprova a entrega' }),
     ).toBeDefined();
     expect(screen.getByText('Suíte de testes')).toBeDefined();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Aprenda o necessário. Depois, execute.' }),
+    ).toBeDefined();
+    expect(screen.getByText('Só o que muda a sua execução')).toBeDefined();
+    expect(screen.getByRole('heading', { level: 3, name: 'Do contato ao CRM' })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Copiar Briefing de atendimento' })).toBeDefined();
+    expect(
+      screen.getByRole('button', { name: 'Assistir: Implementação de referência' }),
+    ).toBeDefined();
     expect(screen.getByText('Faça nesta ordem')).toBeDefined();
     expect(screen.getByRole('button', { name: 'Copiar Planilha de demanda' })).toBeDefined();
     expect(screen.getAllByText('Próximo passo').length).toBeGreaterThan(0);

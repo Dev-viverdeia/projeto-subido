@@ -61,6 +61,80 @@ describe('roteiro de Projeto', () => {
         { titulo: 'Matriz', descricao: 'Temas, urgência, evidência e regras de alerta.' },
         { titulo: 'Manual', descricao: 'Rotina, contingência e revisão da operação.' },
       ],
+      trilhaDidatica: {
+        tempoTotal: '25 a 35 minutos',
+        aulas: [
+          {
+            titulo: 'Escolha o momento certo',
+            objetivo: 'Definir um único momento da jornada e a decisão que a resposta deve apoiar.',
+            duracao: '8 min',
+            topicos: ['Evento que inicia a pesquisa', 'Público elegível e exclusões'],
+            exercicio: 'Escolha um evento real e escreva qual decisão a resposta deve melhorar.',
+            prontoQuando:
+              'O momento, o público, a pergunta e o responsável foram aprovados pelo cliente.',
+          },
+          {
+            titulo: 'Feche o retorno',
+            objetivo: 'Organizar o alerta humano e registrar o desfecho da recuperação do cliente.',
+            duracao: '10 min',
+            topicos: ['Alerta com dono e prazo', 'Ação e desfecho na mesma linha do tempo'],
+            exercicio: 'Simule uma resposta crítica e acompanhe o caso até o fechamento humano.',
+            prontoQuando: 'O alerta tem fonte, responsável, prazo, contato e desfecho registrados.',
+          },
+        ],
+        videosReferencia: [
+          {
+            titulo: 'Solução de referência',
+            descricao: 'Uma demonstração real da experiência de coleta, leitura e fechamento.',
+            videoUrl: 'https://video.example.com/embed/123',
+          },
+        ],
+        demonstracao: {
+          titulo: 'Da resposta ao fechamento',
+          contexto: 'Uma cliente responde à pesquisa com nota baixa e um comentário sobre espera.',
+          passos: [
+            {
+              etapa: 'Resposta',
+              oQueAcontece: 'A nota e o comentário original são preservados antes da análise.',
+              evidencia: 'Comentário e horário',
+            },
+            {
+              etapa: 'Leitura',
+              oQueAcontece: 'O tema é classificado com um trecho de evidência do comentário.',
+              evidencia: 'Tema e trecho citado',
+            },
+            {
+              etapa: 'Alerta',
+              oQueAcontece: 'A pessoa responsável recebe o contexto e o prazo de retorno.',
+              evidencia: 'Dono e prazo',
+            },
+            {
+              etapa: 'Fechamento',
+              oQueAcontece: 'O contato e a ação ficam registrados no relatório da campanha.',
+              evidencia: 'Desfecho atualizado',
+            },
+          ],
+          resultadoEsperado:
+            'A fala original, a ação humana e o fechamento permanecem rastreáveis.',
+        },
+        materiais: [
+          {
+            titulo: 'Briefing do radar',
+            quandoUsar: 'Na primeira conversa para definir o recorte do piloto.',
+            conteudo: 'Objetivo:\nMomento da jornada:\nPergunta:\nResponsável:\nPrazo:',
+          },
+          {
+            titulo: 'Taxonomia',
+            quandoUsar: 'Antes de configurar a classificação dos comentários.',
+            conteudo: 'Tema | Definição | Exemplos | Urgência | Evidência exigida',
+          },
+          {
+            titulo: 'Checklist de aceite',
+            quandoUsar: 'No piloto para aprovar coleta, leitura, alerta e fechamento.',
+            conteudo: '[ ] Resposta preservada\n[ ] Alerta com dono\n[ ] Fechamento registrado',
+          },
+        ],
+      },
     });
     Object.assign(valor.fases[0]!.passos[0]!, {
       duracao: '45–60 min',
@@ -78,6 +152,9 @@ describe('roteiro de Projeto', () => {
     expect(roteiro?.perfil?.recomendadoParaComecar).toBe(true);
     expect(roteiro?.escopo?.naoInclui).toHaveLength(2);
     expect(roteiro?.artefatosEntrega).toHaveLength(3);
+    expect(roteiro?.trilhaDidatica?.aulas).toHaveLength(2);
+    expect(roteiro?.trilhaDidatica?.videosReferencia).toHaveLength(1);
+    expect(roteiro?.trilhaDidatica?.materiais).toHaveLength(3);
     expect(roteiro?.fases[0]?.passos[0]?.execucao).toHaveLength(1);
     expect(roteiro?.fases[1]?.passos[0]?.execucao).toEqual([]);
   });
