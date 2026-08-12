@@ -132,6 +132,9 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
         <PainelCalls
           reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
           oportunidades={OPORTUNIDADES}
+          agendadaId={
+            parametros.agendada === '1' ? '66666666-6666-4666-8666-666666666666' : undefined
+          }
           modalInicial={parametros.modal === '1'}
           oportunidadeInicial={
             typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined

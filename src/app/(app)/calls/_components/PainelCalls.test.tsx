@@ -67,4 +67,34 @@ describe('PainelCalls', () => {
       'Kickoff concluído',
     );
   });
+
+  it('confirma a sala recém-criada sem duplicá-la na agenda', () => {
+    render(
+      <PainelCalls
+        oportunidades={[]}
+        agendadaId="call-2"
+        reunioes={[
+          reuniao({ id: 'call-1', titulo: 'Descoberta Horizonte' }),
+          reuniao({
+            id: 'call-2',
+            titulo: 'Proposta Horizonte',
+            tipo: 'proposta',
+            oportunidadeId: 'oportunidade-2',
+            oportunidade: 'Agente de vendas',
+            agendadaPara: '2026-08-11T13:00:00.000Z',
+          }),
+        ]}
+      />,
+    );
+
+    const confirmacao = screen.getByRole('region', { name: 'Proposta Horizonte' });
+    expect(within(confirmacao).getByText('Call pronta')).toBeInTheDocument();
+    expect(within(confirmacao).getByText('Agente de vendas')).toBeInTheDocument();
+    expect(within(confirmacao).getByRole('link', { name: /Abrir lead/ })).toHaveAttribute(
+      'href',
+      '/crm/oportunidade-2',
+    );
+    expect(screen.getAllByText('Proposta Horizonte')).toHaveLength(1);
+    expect(screen.getByRole('region', { name: 'Descoberta Horizonte' })).toBeInTheDocument();
+  });
 });

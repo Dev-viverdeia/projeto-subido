@@ -51,7 +51,12 @@ describe('FormularioAgendarCall', () => {
     );
 
     expect(screen.getByRole('dialog', { name: 'Agendar call' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
+    expect(screen.getByText('Oportunidade vinculada')).toBeInTheDocument();
+    expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
+    expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue(
+      OPORTUNIDADE.id,
+    );
+    await waitFor(() => expect(screen.getByLabelText('Tipo de call')).toHaveFocus());
     await waitFor(() =>
       expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
         String(new Date().getTimezoneOffset()),
@@ -70,7 +75,9 @@ describe('FormularioAgendarCall', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
+    expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue(
+      OPORTUNIDADE.id,
+    );
     expect(screen.getByLabelText('Tipo de call')).toHaveValue('kickoff');
   });
 

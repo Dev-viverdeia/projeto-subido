@@ -35,17 +35,60 @@ const DATA_LONGA = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
 });
 
+function CallRecemAgendada({ reuniao }: { reuniao: ReuniaoCall }) {
+  return (
+    <section className={styles.callCriada} aria-labelledby="call-criada-titulo" aria-live="polite">
+      <div className={styles.callCriadaContexto}>
+        <p>Call pronta</p>
+        <h2 id="call-criada-titulo">{reuniao.titulo}</h2>
+        <span>
+          {reuniao.empresa}
+          {reuniao.contato ? ` · ${reuniao.contato}` : ''}
+        </span>
+      </div>
+
+      <dl className={styles.callCriadaDados}>
+        <div>
+          <dt>Quando</dt>
+          <dd>
+            {DATA_LONGA.format(new Date(reuniao.agendadaPara))} ·{' '}
+            {HORA.format(new Date(reuniao.agendadaPara))}
+          </dd>
+        </div>
+        <div>
+          <dt>Oportunidade</dt>
+          <dd>{reuniao.oportunidade}</dd>
+        </div>
+        <div>
+          <dt>Memória</dt>
+          <dd>{reuniao.liveCoachAtivo ? 'Transcrição + Live Coach' : 'Transcrição da conversa'}</dd>
+        </div>
+      </dl>
+
+      <div className={styles.callCriadaAcoes}>
+        <p>O link foi criado e o CRM já recebeu a reunião como próximo passo.</p>
+        <div>
+          <AcoesSala codigo={reuniao.codigoPublico} />
+          <Link href={`/crm/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
+            Abrir lead <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function PainelCalls({
   reunioes,
   oportunidades,
-  agendada = false,
+  agendadaId,
   modalInicial = false,
   oportunidadeInicial,
   tipoInicial,
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
-  agendada?: boolean;
+  agendadaId?: string;
   modalInicial?: boolean;
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
@@ -55,8 +98,12 @@ export function PainelCalls({
     .filter((item) => !callPodeAbrir(item.status))
     .sort((a, b) => b.agendadaPara.localeCompare(a.agendadaPara));
   const comCoach = ativas.filter((item) => item.liveCoachAtivo).length;
-  const proxima = ativas[0];
-  const seguintes = ativas.slice(1);
+  const recemAgendada = agendadaId ? ativas.find((item) => item.id === agendadaId) : undefined;
+  const ativasNaAgenda = recemAgendada
+    ? ativas.filter((item) => item.id !== recemAgendada.id)
+    : ativas;
+  const proxima = ativasNaAgenda[0];
+  const seguintes = ativasNaAgenda.slice(1);
 
   return (
     <div className={styles.pagina}>
@@ -74,12 +121,14 @@ export function PainelCalls({
         />
       </header>
 
-      {agendada && (
+      {recemAgendada ? (
+        <CallRecemAgendada reuniao={recemAgendada} />
+      ) : agendadaId ? (
         <div className={styles.confirmacao} role="status">
           <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Call criada. O link já está disponível e o CRM recebeu o primeiro fato.
+          Call criada. Atualize a página para abrir a sala preparada.
         </div>
-      )}
+      ) : null}
 
       {proxima && (
         <section className={styles.proximaCall} data-on-dark aria-labelledby="proxima-call-titulo">
@@ -172,17 +221,31 @@ export function PainelCalls({
         <section className={styles.agenda} aria-labelledby="agenda-titulo">
           <header className={styles.secaoTopo}>
             <div>
-              <h2 id="agenda-titulo">{proxima ? 'Depois desta' : 'Agenda'}</h2>
+              <h2 id="agenda-titulo">{proxima || recemAgendada ? 'Depois desta' : 'Agenda'}</h2>
               <p>
                 {proxima
-                  ? `${seguintes.length} ${seguintes.length === 1 ? 'call na sequência' : 'calls na sequência'}.`
-                  : 'As próximas salas ligadas ao seu pipeline.'}
+                  ? seguintes.length > 0
+                    ? `${seguintes.length} ${seguintes.length === 1 ? 'call na sequência' : 'calls na sequência'}.`
+                    : 'Nenhuma outra call depois desta.'
+                  : recemAgendada
+                    ? 'Nenhuma outra call aguardando.'
+                    : 'As próximas salas ligadas ao seu pipeline.'}
               </p>
             </div>
             <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
           </header>
 
-          {!proxima ? (
+          {!proxima && recemAgendada ? (
+            <div className={styles.agendaLivre}>
+              <span>
+                <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <div>
+                <strong>Sua agenda termina nesta call</strong>
+                <p>O próximo movimento será definido com os fatos registrados na conversa.</p>
+              </div>
+            </div>
+          ) : !proxima ? (
             <div className={styles.vazio}>
               <span className={styles.pulsoVazio} aria-hidden="true">
                 <Radio size={22} strokeWidth={1.6} />

@@ -8,6 +8,7 @@ import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
 import type { TipoCall } from '@/lib/calls/tipos';
+import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import styles from './FormularioAgendarCall.module.css';
 
@@ -44,6 +45,7 @@ export function FormularioAgendarCall({
   const oportunidadePadrao = disponiveis.some((item) => item.id === oportunidadeInicial)
     ? oportunidadeInicial
     : '';
+  const oportunidadeVinculada = disponiveis.find((item) => item.id === oportunidadeInicial);
 
   useEffect(() => {
     if (!aberto) return;
@@ -127,7 +129,11 @@ export function FormularioAgendarCall({
                 <div>
                   <p className={styles.sobretitulo}>CRM + sala inteligente</p>
                   <h2 id="agendar-call-titulo">Agendar call</h2>
-                  <p>Escolha a oportunidade. O link e o primeiro fato são criados juntos.</p>
+                  <p>
+                    {oportunidadeVinculada
+                      ? 'Defina o horário. A sala já nasce ligada ao contexto deste lead.'
+                      : 'Escolha o lead e defina o horário. O link e o primeiro fato nascem juntos.'}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -163,34 +169,50 @@ export function FormularioAgendarCall({
                     </div>
                   )}
 
-                  <label className={styles.campo}>
-                    <span>Oportunidade</span>
-                    <select
-                      id="calls-oportunidade"
-                      name="oportunidade"
-                      defaultValue={estado.campos?.oportunidade ?? oportunidadePadrao}
-                      aria-invalid={Boolean(erroVisivel('oportunidade'))}
-                      aria-describedby={
-                        erroVisivel('oportunidade') ? 'calls-oportunidade-msg' : undefined
-                      }
-                      onChange={() => ocultarErro('oportunidade')}
-                      required
-                    >
-                      <option value="" disabled>
-                        Escolha no CRM
-                      </option>
-                      {disponiveis.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.empresa} · {item.titulo}
-                        </option>
-                      ))}
-                    </select>
-                    {erroVisivel('oportunidade') && (
-                      <small id="calls-oportunidade-msg" className={styles.erro}>
-                        {erroVisivel('oportunidade')}
+                  {oportunidadeVinculada ? (
+                    <div className={styles.contextoLead}>
+                      <input type="hidden" name="oportunidade" value={oportunidadeVinculada.id} />
+                      <div className={styles.contextoLeadTopo}>
+                        <span>Oportunidade vinculada</span>
+                        <Link href={`/crm/${oportunidadeVinculada.id}`}>Abrir dossiê</Link>
+                      </div>
+                      <strong>{oportunidadeVinculada.empresa}</strong>
+                      <p>{oportunidadeVinculada.titulo}</p>
+                      <small>
+                        {oportunidadeVinculada.contato ? `${oportunidadeVinculada.contato} · ` : ''}
+                        {ROTULO_ETAPA[oportunidadeVinculada.etapa]}
                       </small>
-                    )}
-                  </label>
+                    </div>
+                  ) : (
+                    <label className={styles.campo}>
+                      <span>Oportunidade</span>
+                      <select
+                        id="calls-oportunidade"
+                        name="oportunidade"
+                        defaultValue={estado.campos?.oportunidade ?? oportunidadePadrao}
+                        aria-invalid={Boolean(erroVisivel('oportunidade'))}
+                        aria-describedby={
+                          erroVisivel('oportunidade') ? 'calls-oportunidade-msg' : undefined
+                        }
+                        onChange={() => ocultarErro('oportunidade')}
+                        required
+                      >
+                        <option value="" disabled>
+                          Escolha no CRM
+                        </option>
+                        {disponiveis.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.empresa} · {item.titulo}
+                          </option>
+                        ))}
+                      </select>
+                      {erroVisivel('oportunidade') && (
+                        <small id="calls-oportunidade-msg" className={styles.erro}>
+                          {erroVisivel('oportunidade')}
+                        </small>
+                      )}
+                    </label>
+                  )}
 
                   <div className={styles.duasColunas}>
                     <label className={styles.campo}>
@@ -221,27 +243,29 @@ export function FormularioAgendarCall({
                     />
                   </div>
 
-                  <Input
-                    id="calls-data"
-                    name="agendadaPara"
-                    type="datetime-local"
-                    label="Data e horário"
-                    defaultValue={estado.campos?.agendadaPara ?? ''}
-                    error={erroVisivel('agendadaPara')}
-                    onChange={() => ocultarErro('agendadaPara')}
-                    required
-                  />
+                  <div className={styles.detalhesColunas}>
+                    <Input
+                      id="calls-data"
+                      name="agendadaPara"
+                      type="datetime-local"
+                      label="Data e horário"
+                      defaultValue={estado.campos?.agendadaPara ?? ''}
+                      error={erroVisivel('agendadaPara')}
+                      onChange={() => ocultarErro('agendadaPara')}
+                      required
+                    />
 
-                  <Input
-                    id="calls-titulo"
-                    name="titulo"
-                    label="Título"
-                    hint="Opcional. Se ficar vazio, usamos o nome da oportunidade."
-                    placeholder="Ex.: Descoberta de atendimento"
-                    defaultValue={estado.campos?.titulo ?? ''}
-                    error={erroVisivel('titulo')}
-                    onChange={() => ocultarErro('titulo')}
-                  />
+                    <Input
+                      id="calls-titulo"
+                      name="titulo"
+                      label="Título"
+                      hint="Opcional. Se vazio, usamos a oportunidade."
+                      placeholder="Ex.: Descoberta de atendimento"
+                      defaultValue={estado.campos?.titulo ?? ''}
+                      error={erroVisivel('titulo')}
+                      onChange={() => ocultarErro('titulo')}
+                    />
+                  </div>
 
                   <label className={styles.coach}>
                     <input type="checkbox" name="liveCoach" defaultChecked />

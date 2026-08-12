@@ -98,6 +98,13 @@
   gap: var(--via-space-4);
 }
 
+.detalhesColunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--via-space-4);
+}
+
 .campo {
   display: grid;
   gap: var(--via-space-2);
@@ -120,6 +127,71 @@
 .campo select:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+.contextoLead {
+  display: grid;
+  gap: var(--via-space-1);
+  padding: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.contextoLeadTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin-bottom: var(--via-space-2);
+}
+
+.contextoLeadTopo span {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.contextoLeadTopo a {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+}
+
+.contextoLeadTopo a:hover {
+  color: var(--via-text-primary);
+}
+
+.contextoLeadTopo a:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-chip);
+  box-shadow: var(--app-ring);
+}
+
+.contextoLead strong,
+.contextoLead p,
+.contextoLead small {
+  margin: 0;
+}
+
+.contextoLead strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
+}
+
+.contextoLead p {
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
+}
+
+.contextoLead small {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
 }
 
 .erro {
@@ -149,11 +221,8 @@
 .coachIcone {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--via-accent);
-  color: var(--via-white);
+  width: 24px;
+  color: var(--via-accent-ink);
 }
 
 .coach strong,
@@ -190,12 +259,16 @@
   color: var(--via-text-muted);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 599px) {
   .painel {
     padding: var(--via-space-5) var(--via-space-4);
   }
 
   .duasColunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detalhesColunas {
     grid-template-columns: 1fr;
   }
 

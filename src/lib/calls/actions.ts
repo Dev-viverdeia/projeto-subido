@@ -96,7 +96,7 @@ export async function agendarReuniao(
     return { campos, porCampo: { agendadaPara: 'Escolha uma data válida.' } };
   }
 
-  const { error } = await supabase.rpc('calls_agendar_reuniao', {
+  const { data, error } = await supabase.rpc('calls_agendar_reuniao', {
     p_oportunidade: validacao.data.oportunidade,
     p_tipo: validacao.data.tipo as (typeof TIPOS_CALL)[number]['id'],
     p_agendada_para: quando.toISOString(),
@@ -110,10 +110,20 @@ export async function agendarReuniao(
     return { campos, erro: 'Não foi possível agendar a call agora. Tente novamente.' };
   }
 
+  const reuniao = z.object({ reuniao_id: z.uuid(), codigo_publico: z.uuid() }).safeParse(data?.[0]);
+  if (!reuniao.success) {
+    console.error('[calls:agendar] A call foi criada sem um identificador válido.');
+    return {
+      campos,
+      erro: 'A call foi criada, mas não conseguimos abrir a sala preparada. Atualize as Calls.',
+    };
+  }
+
   revalidatePath('/calls');
   revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/inicio');
-  redirect('/calls?agendada=ok');
+  redirect(`/calls?agendada=${reuniao.data.reuniao_id}`);
 }
 
 export async function aplicarPlanoCall(formData: FormData): Promise<void> {

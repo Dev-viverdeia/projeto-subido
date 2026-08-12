@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { z } from 'zod';
 import { listarReunioes } from '@/lib/calls/queries';
 import { tipoCallValido } from '@/lib/calls/tipos';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
@@ -12,12 +13,13 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
     listarOportunidadesSeletor(),
     searchParams,
   ]);
+  const agendada = z.uuid().safeParse(parametros.agendada);
 
   return (
     <PainelCalls
       reunioes={reunioes}
       oportunidades={oportunidades}
-      agendada={parametros.agendada === 'ok'}
+      agendadaId={agendada.success ? agendada.data : undefined}
       modalInicial={parametros.nova === '1'}
       oportunidadeInicial={
         typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
