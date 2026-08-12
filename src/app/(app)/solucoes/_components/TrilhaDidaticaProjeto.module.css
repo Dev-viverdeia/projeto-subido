@@ -463,6 +463,10 @@
   background: var(--via-surface);
 }
 
+.gradeMateriais article:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .gradeMateriais article > header {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -529,6 +533,10 @@
 
   .listaAulas summary {
     grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .gradeMateriais article:last-child:nth-child(odd) {
+    grid-column: auto;
   }
 
   .duracao {
