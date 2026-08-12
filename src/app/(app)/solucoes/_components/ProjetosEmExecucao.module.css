@@ -6,6 +6,54 @@
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
+/* Uma única entrega vira destaque editorial. Evita que o primeiro projeto
+   pareça um card perdido dentro de uma grade ainda vazia. */
+.carteira[data-layout='destaque'] {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.7fr) minmax(440px, 1.3fr);
+  align-items: stretch;
+  gap: clamp(var(--via-space-6), 4vw, var(--via-space-10));
+}
+
+.carteira[data-layout='destaque'] .cabecalho {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-block: var(--via-space-3);
+}
+
+.carteira[data-layout='destaque'] .cabecalho h1 {
+  max-width: 11ch;
+}
+
+.carteira[data-layout='destaque'] .grade {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.carteira[data-layout='destaque'] .grade a {
+  min-height: 310px;
+  padding: clamp(var(--via-space-5), 3vw, var(--via-space-7));
+}
+
+.carteira[data-layout='destaque'] .cartaoCorpo {
+  padding-block: var(--via-space-7);
+}
+
+.carteira[data-layout='destaque'] .cartaoCorpo h2 {
+  max-width: 24ch;
+  font-size: clamp(var(--via-fs-h4), 2vw, var(--via-fs-h3));
+}
+
+.carteira[data-layout='destaque'] .proxima {
+  min-height: 0;
+}
+
+.carteira[data-layout='destaque'] .proxima span {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 .cabecalho {
   display: flex;
   align-items: end;
@@ -60,7 +108,7 @@
 }
 
 .cabecalho dt {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: 0.56rem;
 }
 
@@ -189,7 +237,7 @@
 .proxima small {
   display: block;
   margin-bottom: 3px;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: 0.54rem;
 }
 
@@ -225,6 +273,24 @@
 }
 
 @media (max-width: 980px) {
+  .carteira[data-layout='destaque'] {
+    display: flex;
+  }
+
+  .carteira[data-layout='destaque'] .cabecalho {
+    align-items: end;
+    flex-direction: row;
+    padding-block: 0;
+  }
+
+  .carteira[data-layout='destaque'] .cabecalho h1 {
+    max-width: 18ch;
+  }
+
+  .carteira[data-layout='destaque'] .grade a {
+    min-height: 0;
+  }
+
   .grade {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -232,6 +298,11 @@
 
 @media (max-width: 640px) {
   .cabecalho {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .carteira[data-layout='destaque'] .cabecalho {
     align-items: stretch;
     flex-direction: column;
   }

@@ -578,7 +578,12 @@
 
   .progresso li strong {
     max-width: 12ch;
+    min-height: calc(2em * var(--via-lh-snug));
+    overflow: visible;
     font-size: var(--via-fs-micro);
+    line-height: var(--via-lh-snug);
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .decisao {

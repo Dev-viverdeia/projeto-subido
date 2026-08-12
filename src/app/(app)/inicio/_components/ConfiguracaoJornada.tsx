@@ -93,7 +93,7 @@ export function ConfiguracaoJornada({
       {aberto && (
         <form ref={formulario} action={acao} className={styles.formulario}>
           <ol className={styles.progresso} aria-label="Etapas da direção da operação">
-            {['Seu mercado', 'Projeto principal', 'Como você vende'].map((rotulo, indice) => {
+            {['Seu mercado', 'Projeto principal', 'Como vende'].map((rotulo, indice) => {
               const numero = indice + 1;
               const concluido = numero < passo;
               const ativo = numero === passo;

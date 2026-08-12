@@ -21,7 +21,11 @@ export function ProjetosEmExecucao({ projetos }: { projetos: ResumoProjetoExecuc
   const concluidos = projetos.filter((projeto) => projeto.status === 'concluido').length;
 
   return (
-    <section className={styles.carteira} aria-labelledby="titulo-carteira">
+    <section
+      className={styles.carteira}
+      data-layout={projetos.length === 1 ? 'destaque' : undefined}
+      aria-labelledby="titulo-carteira"
+    >
       <header className={styles.cabecalho}>
         <div>
           <p>Carteira de entregas</p>

@@ -29,7 +29,7 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .titulo {
@@ -73,7 +73,7 @@
    contorno. O painel navy é o único gesto forte da tela. */
 .mesa {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr) 280px;
+  grid-template-columns: 238px minmax(0, 1fr) 320px;
   gap: var(--via-space-2);
   padding: var(--via-space-2);
   border: 1px solid var(--app-elev-1-line);
@@ -103,7 +103,7 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .trilhoCabecalho strong {
@@ -382,7 +382,7 @@
 }
 
 .leituraTitulo small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
 }
@@ -441,18 +441,20 @@
 }
 
 .fonteFoco small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
 }
 
 .fonteFoco strong {
+  display: -webkit-box;
   overflow: hidden;
   color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: var(--via-lh-snug);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .fonteFoco em {
@@ -559,7 +561,7 @@ a.fonteFoco:focus-visible {
 .radarIndice {
   align-self: start;
   padding-top: 2px;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-variant-numeric: tabular-nums;
@@ -935,7 +937,7 @@ a.fonteFoco:focus-visible {
   .leitura {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: 220px 1fr 280px;
+    grid-template-columns: 220px 1fr minmax(280px, 320px);
     align-items: center;
   }
 

@@ -183,7 +183,7 @@
   font-weight: var(--via-fw-regular);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .divisor::before,
