@@ -37,7 +37,7 @@ describe('FormularioNovoLead', () => {
     render(<FormularioNovoLead />);
 
     await user.click(screen.getByRole('button', { name: 'Novo lead' }));
-    await user.click(screen.getByRole('button', { name: 'Adicionar ao pipeline' }));
+    await user.click(screen.getByRole('button', { name: 'Cadastrar e continuar' }));
 
     await waitFor(() => expect(screen.getByLabelText('Empresa')).toHaveFocus());
     expect(screen.getByText('Digite o nome da empresa.')).toBeInTheDocument();

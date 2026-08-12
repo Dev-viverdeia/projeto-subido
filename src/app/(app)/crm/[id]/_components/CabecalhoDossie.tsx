@@ -10,10 +10,12 @@ export function CabecalhoDossie({
   lead,
   enriquecimentoEmAndamento,
   temDossie,
+  modoEntrada = false,
 }: {
   lead: DossieLead;
   enriquecimentoEmAndamento: boolean;
   temDossie: boolean;
+  modoEntrada?: boolean;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
   const faseComercial =
@@ -24,23 +26,27 @@ export function CabecalhoDossie({
     <section className={styles.hero} aria-labelledby="dossie-titulo">
       <div className={styles.heroTopo}>
         <div className={styles.identidade}>
-          <p className={styles.sobretitulo}>Dossiê comercial</p>
+          <p className={styles.sobretitulo}>
+            {modoEntrada ? 'Nova oportunidade' : 'Dossiê comercial'}
+          </p>
           <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
           <p>{lead.oportunidade.titulo}</p>
         </div>
 
-        <div className={styles.heroAcoes}>
-          <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />
-          <AtalhoProposta lead={lead} />
-          {!enriquecimentoEmAndamento && (
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              dominioInicial={lead.empresa.dominio}
-              linkedinInicial={lead.contato?.linkedinUrl ?? null}
-              temDossie={temDossie}
-            />
-          )}
-        </div>
+        {!modoEntrada && (
+          <div className={styles.heroAcoes}>
+            <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />
+            <AtalhoProposta lead={lead} />
+            {!enriquecimentoEmAndamento && (
+              <FormularioEnriquecimento
+                oportunidadeId={lead.oportunidade.id}
+                dominioInicial={lead.empresa.dominio}
+                linkedinInicial={lead.contato?.linkedinUrl ?? null}
+                temDossie={temDossie}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <div className={styles.heroMeta} aria-label="Contexto principal do lead">
@@ -63,29 +69,31 @@ export function CabecalhoDossie({
         )}
       </div>
 
-      <div className={styles.sinais} aria-label="Sinais que alimentam o dossiê">
-        <div className={styles.fonteSinal}>
-          <Database size={17} strokeWidth={1.7} aria-hidden="true" />
-          <span>CRM</span>
-          <strong>{lead.eventos.length} fatos</strong>
+      {!modoEntrada && (
+        <div className={styles.sinais} aria-label="Sinais que alimentam o dossiê">
+          <div className={styles.fonteSinal}>
+            <Database size={17} strokeWidth={1.7} aria-hidden="true" />
+            <span>CRM</span>
+            <strong>{lead.eventos.length} fatos</strong>
+          </div>
+          <div className={styles.fonteSinal}>
+            <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
+            <span>Site público</span>
+            <strong>{lead.empresa.dominio ?? 'a informar'}</strong>
+          </div>
+          <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
+            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
+            <span>Leitura IA</span>
+            <strong>
+              {enriquecimentoEmAndamento
+                ? 'analisando'
+                : temDossie
+                  ? 'dossiê pronto'
+                  : 'não iniciada'}
+            </strong>
+          </div>
         </div>
-        <div className={styles.fonteSinal}>
-          <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
-          <span>Site público</span>
-          <strong>{lead.empresa.dominio ?? 'a informar'}</strong>
-        </div>
-        <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
-          <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-          <span>Leitura IA</span>
-          <strong>
-            {enriquecimentoEmAndamento
-              ? 'analisando'
-              : temDossie
-                ? 'dossiê pronto'
-                : 'não iniciada'}
-          </strong>
-        </div>
-      </div>
+      )}
     </section>
   );
 }

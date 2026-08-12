@@ -14,7 +14,7 @@ function BotaoAdicionar() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" variant="primary" loading={pending}>
-      {pending ? 'Adicionando lead…' : 'Adicionar ao pipeline'}
+      {pending ? 'Criando oportunidade…' : 'Cadastrar e continuar'}
     </Button>
   );
 }
@@ -114,7 +114,9 @@ export function FormularioNovoLead({
                 <div>
                   <p className={styles.sobretitulo}>Nova oportunidade</p>
                   <h2 id="novo-lead-titulo">Adicionar lead</h2>
-                  <p>Comece pelo que você já sabe. O contexto cresce a cada interação.</p>
+                  <p>
+                    Cadastre o básico. Depois você completa o contexto e prepara a primeira call.
+                  </p>
                 </div>
                 <button
                   type="button"

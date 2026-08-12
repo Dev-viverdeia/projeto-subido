@@ -73,7 +73,7 @@ export async function criarLead(
   } = await supabase.auth.getUser();
   if (!user) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
 
-  const { error } = await supabase.rpc('crm_criar_lead', {
+  const { data, error } = await supabase.rpc('crm_criar_lead', {
     p_empresa_nome: validacao.data.empresa,
     p_contato_nome: validacao.data.contato,
     p_contato_email: validacao.data.email || undefined,
@@ -88,9 +88,18 @@ export async function criarLead(
     };
   }
 
+  const oportunidade = z.uuid().safeParse(data);
+  if (!oportunidade.success) {
+    console.error('[crm:criar-lead] A oportunidade foi criada sem um identificador válido.');
+    return {
+      campos,
+      erro: 'O lead foi criado, mas não conseguimos abrir a próxima etapa. Atualize o CRM.',
+    };
+  }
+
   revalidatePath('/crm');
   revalidatePath('/inicio');
-  redirect('/crm?novo=ok');
+  redirect(`/crm/${oportunidade.data}?novo=1`);
 }
 
 export async function moverOportunidade(formData: FormData): Promise<void> {

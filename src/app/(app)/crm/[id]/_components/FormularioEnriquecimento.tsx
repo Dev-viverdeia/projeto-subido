@@ -12,12 +12,14 @@ export function FormularioEnriquecimento({
   dominioInicial,
   linkedinInicial,
   temDossie,
+  rotulo,
   abertoInicial = false,
 }: {
   oportunidadeId: string;
   dominioInicial: string | null;
   linkedinInicial: string | null;
   temDossie: boolean;
+  rotulo?: string;
   abertoInicial?: boolean;
 }) {
   const router = useRouter();
@@ -81,7 +83,7 @@ export function FormularioEnriquecimento({
         aria-haspopup="dialog"
       >
         <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
-        {temDossie ? 'Atualizar dossiê' : 'Enriquecer lead'}
+        {rotulo ?? (temDossie ? 'Atualizar dossiê' : 'Enriquecer lead')}
       </button>
 
       {aberto && (

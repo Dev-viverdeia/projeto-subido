@@ -25,14 +25,15 @@ import { obterDossieLead } from '@/lib/crm/queries';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
+import { JornadaEntradaLead, type EstadoContextoLead } from './_components/JornadaEntradaLead';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import { dataCompleta } from './datas';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Dossiê do lead · CRM' };
 
-export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>) {
-  const { id } = await params;
+export default async function DossieLeadPage({ params, searchParams }: PageProps<'/crm/[id]'>) {
+  const [{ id }, parametros] = await Promise.all([params, searchParams]);
   const lead = await obterDossieLead(id);
   if (!lead) notFound();
 
@@ -44,6 +45,14 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
     (execucao) => execucao.status === 'concluido' && execucao.dossie,
   );
   const dossie = execucaoPronta?.dossie ?? null;
+  const entradaRecente = parametros.novo === '1';
+  const estadoContexto: EstadoContextoLead = dossie
+    ? 'pronto'
+    : emAndamento
+      ? 'processando'
+      : falhaRecente
+        ? 'falhou'
+        : 'pendente';
 
   return (
     <div className={styles.pagina}>
@@ -56,16 +65,28 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         lead={lead}
         enriquecimentoEmAndamento={Boolean(emAndamento)}
         temDossie={Boolean(dossie)}
+        modoEntrada={entradaRecente}
       />
 
-      <ResumoOperacionalLead lead={lead} />
+      {entradaRecente ? (
+        <JornadaEntradaLead
+          oportunidadeId={lead.oportunidade.id}
+          empresaNome={lead.empresa.nome}
+          dominio={lead.empresa.dominio}
+          linkedin={lead.contato?.linkedinUrl ?? null}
+          estadoContexto={estadoContexto}
+          totalCalls={lead.totalCalls}
+        />
+      ) : (
+        <ResumoOperacionalLead lead={lead} />
+      )}
 
       {emAndamento && <EstadoEnriquecimento status={emAndamento.status} erro={null} />}
       {falhaRecente && (
         <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
       )}
 
-      {!dossie && !emAndamento && (
+      {!entradaRecente && !dossie && !emAndamento && (
         <section className={styles.primeiroDossie}>
           <div>
             <span className={styles.iconeVazio}>
@@ -102,7 +123,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         </section>
       )}
 
-      {dossie && execucaoPronta && (
+      {!entradaRecente && dossie && execucaoPronta && (
         <>
           <section className={styles.resumo} aria-labelledby="leitura-titulo">
             <div className={styles.resumoMarca}>
