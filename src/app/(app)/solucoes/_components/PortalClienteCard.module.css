@@ -82,7 +82,8 @@
 
 .acoesPrincipais button,
 .acoesPrincipais a,
-.ativar {
+.ativar,
+.preparar {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
@@ -109,6 +110,14 @@
   margin-top: var(--via-space-4);
 }
 
+.preparar {
+  width: 100%;
+  margin-top: var(--via-space-4);
+  border-color: var(--via-border);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+
 .acoesSecundarias {
   display: flex;
   gap: var(--via-space-4);
@@ -133,7 +142,8 @@
 }
 
 .portal button:focus-visible,
-.portal a:focus-visible {
+.portal a:focus-visible,
+.preparar:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }

@@ -2,7 +2,16 @@
 
 import { useActionState, useState } from 'react';
 import Link from 'next/link';
-import { Check, Copy, ExternalLink, Globe2, LockKeyhole, Pause, RefreshCw } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  ExternalLink,
+  Globe2,
+  LockKeyhole,
+  Pause,
+  RefreshCw,
+} from 'lucide-react';
 import {
   configurarPortalCliente,
   type EstadoProjetoExecucao,
@@ -15,10 +24,12 @@ export function PortalClienteCard({
   projetoId,
   ativo,
   codigo,
+  briefingConfirmado,
 }: {
   projetoId: string;
   ativo: boolean;
   codigo: string;
+  briefingConfirmado: boolean;
 }) {
   const [estado, acao, pendente] = useActionState(configurarPortalCliente, INICIAL);
   const [copiado, setCopiado] = useState(false);
@@ -38,7 +49,13 @@ export function PortalClienteCard({
         </span>
         <div>
           <p>Portal do cliente</p>
-          <strong>{ativo ? 'Acompanhamento ativo' : 'Pronto para compartilhar'}</strong>
+          <strong>
+            {ativo
+              ? 'Acompanhamento ativo'
+              : briefingConfirmado
+                ? 'Pronto para compartilhar'
+                : 'Briefing pendente'}
+          </strong>
         </div>
         <span className={styles.estado}>{ativo ? 'Ativo' : 'Privado'}</span>
       </div>
@@ -46,7 +63,9 @@ export function PortalClienteCard({
       <p className={styles.explicacao}>
         {ativo
           ? 'O cliente vê somente o progresso e as entregas preparadas para ele.'
-          : 'Ative quando quiser dar visibilidade ao projeto sem expor suas notas internas.'}
+          : briefingConfirmado
+            ? 'Ative quando quiser dar visibilidade ao projeto sem expor suas notas internas.'
+            : 'Confirme o acordo operacional antes de abrir este espaço para o cliente.'}
       </p>
 
       {ativo ? (
@@ -81,7 +100,7 @@ export function PortalClienteCard({
             </button>
           </form>
         </>
-      ) : (
+      ) : briefingConfirmado ? (
         <form action={acao}>
           <input type="hidden" name="projeto" value={projetoId} />
           <button
@@ -95,6 +114,10 @@ export function PortalClienteCard({
             {pendente ? 'Ativando…' : 'Ativar portal seguro'}
           </button>
         </form>
+      ) : (
+        <a className={styles.preparar} href="#briefing-kickoff">
+          Concluir briefing <ArrowRight size={15} aria-hidden="true" />
+        </a>
       )}
 
       {estado.erro && <small role="alert">{estado.erro}</small>}

@@ -33,6 +33,8 @@ Compromissos e próximos passos precisam indicar quem fará o quê quando isso e
 Oportunidades de projeto são hipóteses comerciais e devem ser escritas como hipóteses.
 Sinais de compra precisam citar comportamentos ou falas concretas, sem confundir cordialidade com intenção.
 Em lacunas, escreva perguntas que ainda precisam ser respondidas para vender ou entregar com segurança.
+Quando o contexto indicar Tipo: kickoff, organize em briefing_operacional somente o que foi explicitamente confirmado: objetivo, critério de sucesso, responsáveis, nomes dos sistemas ou permissões necessárias, limites e próximos passos. Fora de kickoff, briefing_operacional deve ser nulo.
+Em acessos, registre apenas o nome do sistema ou da permissão e quem deve liberar. Nunca copie nem solicite senhas, tokens, chaves ou outros segredos.
 Não invente valores, prazos, decisões ou promessas. Português do Brasil, sem markdown.`;
 
 export class ErroModeloCoach extends Error {

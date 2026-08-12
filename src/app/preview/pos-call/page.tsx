@@ -65,6 +65,7 @@ const POS_CALL: PosCall = {
       'A diretora pediu que o diagnóstico venha acompanhado de cronograma e faixa de investimento.',
       'O contato aceitou separar uma amostra de conversas para viabilizar o desenho do piloto.',
     ],
+    briefingOperacional: null,
     sentimento: 'cauteloso',
     notaComercial: 76,
     erro: null,

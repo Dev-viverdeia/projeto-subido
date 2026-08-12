@@ -7,6 +7,13 @@ import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusCall } from '@/lib/calls/tipos';
 import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
+import {
+  lerBriefingKickoff,
+  mesclarBriefingComKickoff,
+  montarBriefingInicial,
+  type BriefingKickoff,
+  type OrigemBriefingKickoff,
+} from './briefing';
 
 export type TarefaProjetoExecucao = {
   id: string;
@@ -99,6 +106,8 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
+  briefing: BriefingKickoff;
+  briefingOrigem: OrigemBriefingKickoff;
   kickoff: {
     id: string;
     status: StatusCall;
@@ -204,6 +213,39 @@ export const obterProjetoExecucao = cache(
 
     if (erroKickoff) throw handleError(erroKickoff, 'projetos-execucao:kickoff');
 
+    const { data: analiseKickoff, error: erroAnaliseKickoff } = kickoff
+      ? await supabase
+          .from('calls_analises')
+          .select('dados, resumo')
+          .eq('reuniao_id', kickoff.id)
+          .eq('status', 'concluida')
+          .maybeSingle()
+      : { data: null, error: null };
+    if (erroAnaliseKickoff) {
+      throw handleError(erroAnaliseKickoff, 'projetos-execucao:briefing-kickoff');
+    }
+
+    const briefingSalvo = lerBriefingKickoff(data.briefing_kickoff);
+    const briefingDaOrigem = montarBriefingInicial({
+      documento,
+      dadosAnalise: analiseKickoff?.dados ?? null,
+      resumoAnalise: analiseKickoff?.resumo ?? null,
+      callId: kickoff?.id ?? null,
+    });
+    const recebeuNovoKickoff =
+      briefingSalvo &&
+      briefingDaOrigem.origem === 'kickoff' &&
+      !briefingSalvo.confirmadoEm &&
+      briefingSalvo.fonteCallId !== briefingDaOrigem.briefing.fonteCallId;
+    const briefingPreparado = briefingSalvo
+      ? {
+          briefing: recebeuNovoKickoff
+            ? mesclarBriefingComKickoff(briefingSalvo, briefingDaOrigem.briefing)
+            : briefingSalvo,
+          origem: recebeuNovoKickoff ? ('kickoff' as const) : ('salvo' as const),
+        }
+      : briefingDaOrigem;
+
     const tarefas = data.projeto_tarefas.map(mapearTarefa).sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
@@ -242,6 +284,8 @@ export const obterProjetoExecucao = cache(
       portalAtivo: data.portal_ativo,
       portalCodigo: data.portal_codigo,
       portalAtivadoEm: data.portal_ativado_em,
+      briefing: briefingPreparado.briefing,
+      briefingOrigem: briefingPreparado.origem,
       kickoff: kickoff
         ? {
             id: kickoff.id,

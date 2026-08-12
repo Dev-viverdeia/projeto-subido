@@ -4,7 +4,6 @@ import { useActionState, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
-  CalendarDays,
   Check,
   CircleDot,
   FileCheck2,
@@ -15,11 +14,9 @@ import {
   LockKeyhole,
   Play,
   RotateCcw,
-  Save,
 } from 'lucide-react';
 import {
   atualizarTarefaProjeto,
-  definirPrazoProjeto,
   type EstadoProjetoExecucao,
 } from '@/lib/projetos-execucao/actions';
 import type {
@@ -30,9 +27,11 @@ import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-exec
 import { formatarReais } from '@/lib/propostas/schema';
 import { EntregaCliente } from './EntregaCliente';
 import { CentralArquivos } from './CentralArquivos';
+import { BriefingKickoff } from './BriefingKickoff';
 import { InicioProjeto } from './InicioProjeto';
 import { PlanoVivo } from './PlanoVivo';
 import { PortalClienteCard } from './PortalClienteCard';
+import { PrazoProjeto } from './PrazoProjeto';
 import { ProximaAcaoProjeto } from './ProximaAcaoProjeto';
 import styles from './SalaEntrega.module.css';
 
@@ -47,10 +46,6 @@ function formatarData(valor: string): string {
   })
     .format(new Date(valor))
     .replace('.', '');
-}
-
-function dataParaCampo(valor: string | null): string {
-  return valor ? new Date(valor).toISOString().slice(0, 10) : '';
 }
 
 export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
@@ -175,9 +170,16 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </nav>
       </header>
 
+      <BriefingKickoff
+        projetoId={projeto.id}
+        briefing={projeto.briefing}
+        origem={projeto.briefingOrigem}
+      />
+
       {projeto.feitas === 0 && projeto.status !== 'concluido' && (
         <InicioProjeto
           projeto={projeto}
+          briefingConfirmado={Boolean(projeto.briefing.confirmadoEm)}
           primeiraTarefa={proxima?.titulo ?? null}
           onComecar={abrirProximaAcao}
         />
@@ -257,6 +259,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             projetoId={projeto.id}
             ativo={projeto.portalAtivo}
             codigo={projeto.portalCodigo}
+            briefingConfirmado={Boolean(projeto.briefing.confirmadoEm)}
           />
 
           <section className={styles.cliente}>
@@ -402,25 +405,5 @@ function TarefaEmFoco({
         aceiteFinal={aceiteFinal}
       />
     </>
-  );
-}
-
-function PrazoProjeto({ projetoId, prazo }: { projetoId: string; prazo: string | null }) {
-  const [estado, acao, pendente] = useActionState(definirPrazoProjeto, ESTADO_INICIAL);
-  return (
-    <section className={styles.prazo}>
-      <p>
-        <CalendarDays size={15} aria-hidden="true" /> Prazo da entrega
-      </p>
-      <form action={acao}>
-        <input type="hidden" name="projeto" value={projetoId} />
-        <input type="date" name="prazo" defaultValue={dataParaCampo(prazo)} />
-        <button type="submit" disabled={pendente} aria-label="Salvar prazo">
-          <Save size={15} aria-hidden="true" />
-        </button>
-      </form>
-      {estado.erro && <small role="alert">{estado.erro}</small>}
-      {estado.sucesso && <small role="status">{estado.sucesso}</small>}
-    </section>
   );
 }

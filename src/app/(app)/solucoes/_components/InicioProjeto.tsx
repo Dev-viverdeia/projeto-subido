@@ -6,9 +6,8 @@ import {
   ArrowRight,
   CalendarDays,
   Check,
-  ContactRound,
+  ClipboardCheck,
   KeyRound,
-  Mail,
   Save,
   Video,
 } from 'lucide-react';
@@ -33,10 +32,12 @@ function dataParaCampo(valor: string | null): string {
 
 export function InicioProjeto({
   projeto,
+  briefingConfirmado,
   primeiraTarefa,
   onComecar,
 }: {
   projeto: ProjetoExecucaoCompleto;
+  briefingConfirmado: boolean;
   primeiraTarefa: string | null;
   onComecar: () => void;
 }) {
@@ -44,7 +45,6 @@ export function InicioProjeto({
     definirPrazoProjeto,
     ESTADO_INICIAL,
   );
-  const cliente = projeto.documento.cliente;
   const kickoff = projeto.kickoff;
   const kickoffPodeAbrir = kickoff ? callPodeAbrir(kickoff.status) : false;
   const hrefKickoff = kickoff
@@ -67,21 +67,17 @@ export function InicioProjeto({
         <li>
           <span className={styles.numero}>01</span>
           <div className={styles.icone}>
-            <ContactRound size={18} strokeWidth={1.8} aria-hidden="true" />
+            <ClipboardCheck size={18} strokeWidth={1.8} aria-hidden="true" />
           </div>
           <div className={styles.conteudo}>
-            <p>Responsável do cliente</p>
-            <strong>{cliente.contato || 'Confirmar no kickoff'}</strong>
-            <small>{cliente.cargo || 'Defina quem aprova e libera os acessos.'}</small>
-            {cliente.email && (
-              <a href={`mailto:${cliente.email}`}>
-                <Mail size={13} aria-hidden="true" /> {cliente.email}
-              </a>
-            )}
+            <p>Acordo operacional</p>
+            <strong>{briefingConfirmado ? 'Combinado confirmado' : 'Revisar o briefing'}</strong>
+            <small>Objetivo, sucesso, responsáveis, acessos e limites em um único lugar.</small>
           </div>
-          <span className={styles.estado} data-pronto={Boolean(cliente.contato) || undefined}>
-            {cliente.contato ? 'Da proposta' : 'Pendente'}
-          </span>
+          <a className={styles.acaoSecundaria} href="#briefing-kickoff">
+            {briefingConfirmado ? 'Revisar' : 'Completar'}{' '}
+            <ArrowRight size={14} aria-hidden="true" />
+          </a>
         </li>
 
         <li>
@@ -160,8 +156,8 @@ export function InicioProjeto({
       <div className={styles.aviso}>
         <KeyRound size={16} strokeWidth={1.8} aria-hidden="true" />
         <p>
-          No kickoff, registre quem autoriza cada acesso e quais permissões serão liberadas. Nunca
-          salve senhas, tokens ou chaves dentro do projeto.
+          O acordo registra quem autoriza cada acesso e quais permissões serão liberadas. Senhas,
+          tokens e chaves continuam sempre fora do projeto.
         </p>
       </div>
     </section>

@@ -6,7 +6,11 @@ import type { EtapaCrm } from '@/lib/crm/etapas';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
-import { SegmentoLiveSchema, type SegmentoLive } from './coach-schema';
+import {
+  BriefingOperacionalCallSchema,
+  SegmentoLiveSchema,
+  type SegmentoLive,
+} from './coach-schema';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
 
@@ -83,6 +87,15 @@ export type PosCall = {
     oportunidadesProjeto: string[];
     lacunas: string[];
     sinaisCompra: string[];
+    briefingOperacional: {
+      objetivo: string | null;
+      criterio_sucesso: string | null;
+      responsavel_cliente: string | null;
+      responsavel_tecnico: string | null;
+      acessos: string[];
+      limites: string[];
+      proximos_passos: string[];
+    } | null;
     sentimento: string | null;
     notaComercial: number | null;
     erro: string | null;
@@ -116,6 +129,14 @@ function listaDeTextos(valor: unknown): string[] {
 function campoDeDados(valor: unknown, campo: string): string[] {
   if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return [];
   return listaDeTextos((valor as Record<string, unknown>)[campo]);
+}
+
+function briefingDeDados(valor: unknown) {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return null;
+  const leitura = BriefingOperacionalCallSchema.safeParse(
+    (valor as Record<string, unknown>).briefing_operacional,
+  );
+  return leitura.success ? leitura.data : null;
 }
 
 export const listarReunioes = cache(async (): Promise<ReuniaoCall[]> => {
@@ -277,6 +298,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
           oportunidadesProjeto: listaDeTextos(analise.data.oportunidades_projeto),
           lacunas: campoDeDados(analise.data.dados, 'lacunas'),
           sinaisCompra: campoDeDados(analise.data.dados, 'sinais_compra'),
+          briefingOperacional: briefingDeDados(analise.data.dados),
           sentimento: analise.data.sentimento,
           notaComercial: analise.data.nota_comercial,
           erro: analise.data.erro,

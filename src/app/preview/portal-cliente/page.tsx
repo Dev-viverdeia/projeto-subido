@@ -36,6 +36,19 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 7,
   total: 7,
+  briefing: {
+    objetivo:
+      'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
+    criterioSucesso:
+      '90% dos novos contatos recebem a primeira resposta em até um minuto durante o piloto.',
+    responsavelCliente: 'Camila Rios · Diretora de operações',
+    responsavelTecnico: 'Mateus Silva · Implementador',
+    proximosPassos: [
+      'Liberar os acessos do WhatsApp Business e da agenda',
+      'Validar a matriz de transferência com a recepção',
+      'Iniciar o piloto em uma unidade',
+    ],
+  },
   eventos: [
     {
       id: '99999999-9999-4999-8999-999999999991',

@@ -856,6 +856,59 @@
   box-shadow: var(--app-elev-2-shadow);
 }
 
+.briefingPreparado {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) clamp(24px, 3vw, 36px);
+  border-top: 1px solid var(--via-border-hairline);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition: background var(--app-t-state);
+}
+
+.briefingPreparado > span:first-child {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--via-accent);
+}
+
+.briefingPreparadoAcao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.briefingPreparado strong,
+.briefingPreparado small {
+  display: block;
+}
+
+.briefingPreparado small {
+  margin-top: 2px;
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-regular);
+}
+
+.briefingPreparado:hover {
+  background: var(--via-navy-deep);
+}
+
+.briefingPreparado:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
 .centralAcaoContexto {
   padding: clamp(24px, 3vw, 36px);
   border-right: 1px solid var(--via-border-hairline);
@@ -1409,6 +1462,16 @@
 
   .hero h1 {
     font-size: clamp(2.05rem, 10.2vw, 2.75rem);
+  }
+
+  .briefingPreparado {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: var(--via-space-4);
+  }
+
+  .briefingPreparadoAcao {
+    grid-column: 2;
+    margin-top: var(--via-space-1);
   }
 
   .pulsoDecisao {

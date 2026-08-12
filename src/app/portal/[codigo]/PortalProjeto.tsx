@@ -18,6 +18,7 @@ import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { AprovacaoCliente } from './AprovacaoCliente';
+import { AcordoProjetoPortal } from './AcordoProjetoPortal';
 import styles from './portal.module.css';
 
 function formatarData(valor: string): string {
@@ -199,6 +200,8 @@ export function PortalProjeto({
             </small>
           </div>
         </section>
+
+        <AcordoProjetoPortal briefing={projeto.briefing} />
 
         <div className={styles.painel}>
           <section className={styles.andamento} aria-labelledby="andamento-titulo">

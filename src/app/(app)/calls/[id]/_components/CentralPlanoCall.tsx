@@ -1,4 +1,13 @@
-import { BadgeCheck, CalendarClock, GitBranch, ListChecks, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarClock,
+  ClipboardCheck,
+  GitBranch,
+  ListChecks,
+  Sparkles,
+} from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
 import { etapaVisivel, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
 import { FormularioPlanoCall } from './FormularioPlanoCall';
@@ -112,6 +121,28 @@ export function CentralPlanoCall({
         etapaSugerida={etapaRecomendada}
         compromissos={compromissos}
       />
+
+      {posCall.reuniao.tipo === 'kickoff' &&
+        posCall.analise?.briefingOperacional &&
+        posCall.sincronizacao.projetoAtivo && (
+          <Link
+            className={styles.briefingPreparado}
+            href={`/solucoes/execucao/${posCall.sincronizacao.projetoAtivo.id}#briefing-kickoff`}
+          >
+            <span>
+              <ClipboardCheck size={17} aria-hidden="true" />
+            </span>
+            <div>
+              <strong>Briefing do kickoff preparado</strong>
+              <small>
+                Objetivo, responsáveis, acessos e limites estão prontos para sua revisão.
+              </small>
+            </div>
+            <span className={styles.briefingPreparadoAcao}>
+              Revisar no projeto <ArrowRight size={15} aria-hidden="true" />
+            </span>
+          </Link>
+        )}
     </section>
   );
 }

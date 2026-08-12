@@ -347,10 +347,11 @@ export async function persistirAnalise({
       dados: {
         modelo,
         resposta_id: respostaId,
-        versao_analise: 2,
+        versao_analise: 3,
         decisoes: analise.decisoes,
         lacunas: analise.lacunas,
         sinais_compra: analise.sinais_compra,
+        briefing_operacional: analise.briefing_operacional,
       },
       erro: null,
     },

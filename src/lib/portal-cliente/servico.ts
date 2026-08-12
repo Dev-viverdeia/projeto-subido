@@ -9,6 +9,7 @@ import type {
   StatusTarefaProjeto,
 } from '@/lib/projetos-execucao/status';
 import type { TipoEventoProjeto } from '@/lib/projetos-execucao/queries';
+import { lerBriefingKickoff } from '@/lib/projetos-execucao/briefing';
 // Exceção deliberada: o link secreto é resolvido no servidor sem abrir SELECT
 // para `anon`. O retorno abaixo contém só o recorte preparado para o cliente.
 // eslint-disable-next-line no-restricted-imports
@@ -68,6 +69,13 @@ export type ProjetoPortalCliente = {
   tarefas: TarefaPortalCliente[];
   arquivos: ArquivoPortalCliente[];
   eventos: EventoPortalCliente[];
+  briefing: {
+    objetivo: string;
+    criterioSucesso: string;
+    responsavelCliente: string;
+    responsavelTecnico: string;
+    proximosPassos: string[];
+  } | null;
 };
 
 const EVENTOS_VISIVEIS = [
@@ -89,7 +97,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, projeto_tarefas(id, fase_id, fase_titulo, titulo, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -99,6 +107,7 @@ export const obterPortalCliente = cache(
     if (!data) return null;
     const documento = lerDocumentoProposta(data.documento);
     if (!documento) return null;
+    const briefing = lerBriefingKickoff(data.briefing_kickoff);
 
     const tarefas = [...data.projeto_tarefas]
       .sort((a, b) => a.ordem - b.ordem)
@@ -184,6 +193,15 @@ export const obterPortalCliente = cache(
           },
         ];
       }),
+      briefing: briefing?.confirmadoEm
+        ? {
+            objetivo: briefing.objetivo,
+            criterioSucesso: briefing.criterioSucesso,
+            responsavelCliente: briefing.responsavelCliente,
+            responsavelTecnico: briefing.responsavelTecnico,
+            proximosPassos: briefing.proximosPassos,
+          }
+        : null,
     };
   },
 );

@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { lerBriefingKickoff } from './briefing';
 
 const IniciarSchema = z.object({ proposta: z.uuid() });
 const TarefaSchema = z.object({
@@ -197,6 +198,19 @@ export async function configurarPortalCliente(
 
   const { supabase, user } = await usuarioAtual();
   if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  if (validacao.data.operacao === 'ativar') {
+    const { data: projeto, error: erroProjeto } = await supabase
+      .from('projetos_execucao')
+      .select('briefing_kickoff')
+      .eq('id', validacao.data.projeto)
+      .eq('dono', user.id)
+      .maybeSingle();
+    if (erroProjeto || !projeto) return { erro: 'Este projeto não está disponível.' };
+    if (!lerBriefingKickoff(projeto.briefing_kickoff)?.confirmadoEm) {
+      return { erro: 'Confirme o acordo operacional antes de ativar o portal.' };
+    }
+  }
 
   const agora = new Date().toISOString();
   const alteracao =

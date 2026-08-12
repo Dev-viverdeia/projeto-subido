@@ -60,6 +60,7 @@ describe('memória do Live Coach', () => {
       oportunidades_projeto: ['Hipótese: projeto de triagem e registro do atendimento.'],
       lacunas: ['Quem aprova o orçamento final?'],
       sinais_compra: ['A diretora pediu uma proposta com cronograma.'],
+      briefing_operacional: null,
       sentimento: 'cauteloso',
       nota_comercial: 72,
     });

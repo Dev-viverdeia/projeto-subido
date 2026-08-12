@@ -40,6 +40,7 @@ const POS_CALL: PosCall = {
     oportunidadesProjeto: ['Hipótese: implementar triagem assistida.'],
     lacunas: ['Quem aprova o orçamento final?'],
     sinaisCompra: ['A diretora pediu cronograma e investimento.'],
+    briefingOperacional: null,
     sentimento: 'cauteloso',
     notaComercial: 76,
     erro: null,

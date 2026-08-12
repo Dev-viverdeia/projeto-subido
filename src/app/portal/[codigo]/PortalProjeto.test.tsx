@@ -19,6 +19,13 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 1,
   total: 2,
+  briefing: {
+    objetivo: 'Responder rapidamente e transferir com contexto.',
+    criterioSucesso: 'A recepção recebe cada contato com histórico completo.',
+    responsavelCliente: 'Camila Rios',
+    responsavelTecnico: 'Mateus Silva',
+    proximosPassos: ['Liberar o acesso ao WhatsApp Business'],
+  },
   eventos: [
     {
       id: '99999999-9999-4999-8999-999999999999',
@@ -92,6 +99,7 @@ describe('PortalProjeto', () => {
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
     expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'O que vamos entregar juntos.' })).toBeVisible();
     const decisao = screen.getByRole('heading', { name: /1 decisão espera por você/i });
     const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
     const arquivos = screen.getByRole('heading', { name: /Arquivos do projeto/i });

@@ -14,6 +14,7 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
 }));
 
 vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn() }));
+vi.mock('@/lib/projetos-execucao/briefing-actions', () => ({ salvarBriefingKickoff: vi.fn() }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
@@ -53,6 +54,19 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: false,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
+  briefingOrigem: 'salvo',
+  briefing: {
+    objetivo: 'Responder rapidamente e transferir com contexto para a recepção.',
+    criterioSucesso: 'A recepção recebe cada contato com o contexto completo.',
+    responsavelCliente: 'Camila Rios',
+    responsavelTecnico: 'Mateus Silva',
+    acessos: ['WhatsApp Business'],
+    limites: ['Dúvidas clínicas seguem para a recepção'],
+    proximosPassos: ['Liberar os acessos combinados'],
+    observacoes: '',
+    confirmadoEm: '2026-08-01T15:00:00.000Z',
+    fonteCallId: null,
+  },
   kickoff: null,
   arquivos: [],
   eventos: [],
@@ -133,6 +147,15 @@ describe('SalaEntrega', () => {
           ...PROJETO,
           feitas: 0,
           status: 'planejamento',
+          briefingOrigem: 'proposta',
+          briefing: {
+            ...PROJETO.briefing,
+            criterioSucesso: '',
+            responsavelTecnico: '',
+            acessos: [],
+            limites: [],
+            confirmadoEm: null,
+          },
           documento: {
             ...DOCUMENTO,
             cliente: {
@@ -152,14 +175,16 @@ describe('SalaEntrega', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Prepare o início' })).toBeVisible();
-    expect(screen.getByText('Camila Rios')).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Responsável do cliente' })).toHaveValue(
+      'Camila Rios',
+    );
     expect(screen.getByRole('link', { name: /Agendar kickoff/i })).toHaveAttribute(
       'href',
       `/calls?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
     );
     expect(screen.getByLabelText('Prazo da entrega')).toBeVisible();
     expect(screen.getByRole('button', { name: /Começar agora/i })).toBeVisible();
-    expect(screen.getByText(/Nunca salve senhas, tokens ou chaves/i)).toBeVisible();
+    expect(screen.getByText(/Senhas, tokens e chaves nunca devem ser salvos/i)).toBeVisible();
   });
 
   it('mostra o kickoff já agendado sem pedir uma nova reunião', () => {

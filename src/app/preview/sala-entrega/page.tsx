@@ -1,17 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  Bot,
-  BriefcaseBusiness,
-  ContactRound,
-  FileSignature,
-  FolderKanban,
-  House,
-  Video,
-} from 'lucide-react';
 import { SalaEntrega } from '@/app/(app)/solucoes/_components/SalaEntrega';
-import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
+import { prepararProjetoNoInicio } from './estado-inicial';
+import { PreviewSidebar } from './PreviewSidebar';
 import styles from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Sala de Entrega' };
@@ -32,6 +24,24 @@ const PROJETO: ProjetoExecucaoCompleto = {
   portalAtivo: true,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: '2026-08-09T12:00:00.000Z',
+  briefingOrigem: 'salvo',
+  briefing: {
+    objetivo:
+      'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
+    criterioSucesso:
+      '90% dos novos contatos recebem a primeira resposta em até um minuto durante o piloto.',
+    responsavelCliente: 'Camila Rios · Diretora de operações',
+    responsavelTecnico: 'Mateus Silva · Implementador',
+    acessos: ['WhatsApp Business · liberação por Camila', 'Agenda da recepção · leitura'],
+    limites: [
+      'Dúvidas clínicas seguem para a recepção',
+      'Urgências não recebem resposta automática',
+    ],
+    proximosPassos: ['Iniciar o piloto em uma unidade', 'Revisar os indicadores em sete dias'],
+    observacoes: '',
+    confirmadoEm: '2026-08-05T15:00:00.000Z',
+    fonteCallId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1',
+  },
   kickoff: null,
   acoesPlano: [
     {
@@ -357,42 +367,21 @@ const PROJETO: ProjetoExecucaoCompleto = {
   ],
 };
 
-export default function PreviewSalaEntregaPage() {
+export default async function PreviewSalaEntregaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ estado?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const inicio = (await searchParams).estado === 'inicio';
+  const projeto = inicio ? prepararProjetoNoInicio(PROJETO) : PROJETO;
 
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <div className={styles.logo}>
-          <SubidoLogo size={18} />
-        </div>
-        <nav aria-label="Preview da navegação">
-          <span>
-            <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
-          </span>
-          <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
-          </span>
-          <span>
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
-          </span>
-          <span>
-            <FileSignature size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas
-          </span>
-          <a className={styles.ativo} href="#conteudo">
-            <BriefcaseBusiness size={18} strokeWidth={1.7} aria-hidden="true" /> Projetos
-          </a>
-          <span>
-            <FolderKanban size={18} strokeWidth={1.7} aria-hidden="true" /> Estúdio
-          </span>
-          <span>
-            <Bot size={18} strokeWidth={1.7} aria-hidden="true" /> Sobral AI
-          </span>
-        </nav>
-      </aside>
+      <PreviewSidebar />
 
       <main id="conteudo" className={styles.conteudo}>
-        <SalaEntrega projeto={PROJETO} />
+        <SalaEntrega projeto={projeto} />
       </main>
     </div>
   );

@@ -1680,6 +1680,7 @@ export type Database = {
       projetos_execucao: {
         Row: {
           atualizado_em: string
+          briefing_kickoff: Json | null
           builder_solucao_id: string | null
           concluido_em: string | null
           criado_em: string
@@ -1700,6 +1701,7 @@ export type Database = {
         }
         Insert: {
           atualizado_em?: string
+          briefing_kickoff?: Json | null
           builder_solucao_id?: string | null
           concluido_em?: string | null
           criado_em?: string
@@ -1720,6 +1722,7 @@ export type Database = {
         }
         Update: {
           atualizado_em?: string
+          briefing_kickoff?: Json | null
           builder_solucao_id?: string | null
           concluido_em?: string | null
           criado_em?: string
