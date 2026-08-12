@@ -11,6 +11,7 @@ export function JornadaEntradaLead({
   linkedin,
   estadoContexto,
   totalCalls,
+  projetoSlug = null,
 }: {
   oportunidadeId: string;
   empresaNome: string;
@@ -18,19 +19,26 @@ export function JornadaEntradaLead({
   linkedin: string | null;
   estadoContexto: EstadoContextoLead;
   totalCalls: number;
+  projetoSlug?: string | null;
 }) {
   const contextoPronto = estadoContexto === 'pronto';
   const contextoEmAndamento = estadoContexto === 'processando';
   const callPronta = totalCalls > 0;
   const precisaContexto = estadoContexto === 'pendente' || estadoContexto === 'falhou';
   const etapaAtual = !contextoPronto ? 2 : callPronta ? null : 3;
+  const propostaPronta = Boolean(projetoSlug && contextoPronto && callPronta);
+  const destinoProposta = projetoSlug
+    ? `/propostas/nova?oportunidade=${oportunidadeId}&projeto=${encodeURIComponent(projetoSlug)}`
+    : null;
 
   return (
     <section className={styles.jornada} aria-labelledby="entrada-lead-titulo">
       <header className={styles.topo}>
         <div>
           <p>Lead adicionado</p>
-          <h2 id="entrada-lead-titulo">Prepare a primeira conversa.</h2>
+          <h2 id="entrada-lead-titulo">
+            {projetoSlug ? 'Prepare a conversa e a proposta.' : 'Prepare a primeira conversa.'}
+          </h2>
           <span>
             A oportunidade de {empresaNome} já está no CRM. Agora complete o contexto ou crie a
             primeira call.
@@ -68,11 +76,23 @@ export function JornadaEntradaLead({
               Agendar primeira call
             </Link>
           )}
-          {contextoPronto && callPronta && (
+          {propostaPronta && destinoProposta ? (
+            <>
+              <Link
+                href={`/crm/${oportunidadeId}`}
+                className="via-btn via-btn--secondary via-btn--md"
+              >
+                Abrir dossiê
+              </Link>
+              <Link href={destinoProposta} className="via-btn via-btn--primary via-btn--md">
+                Montar proposta
+              </Link>
+            </>
+          ) : contextoPronto && callPronta ? (
             <Link href={`/crm/${oportunidadeId}`} className="via-btn via-btn--primary via-btn--md">
               Abrir dossiê
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -115,6 +135,19 @@ export function JornadaEntradaLead({
           </div>
           <small>{callPronta ? 'Concluído' : 'Pendente'}</small>
         </li>
+        {projetoSlug ? (
+          <li
+            data-estado={propostaPronta ? 'atual' : 'pendente'}
+            aria-current={propostaPronta ? 'step' : undefined}
+          >
+            <span className={styles.numero}>04</span>
+            <div>
+              <strong>Montar a proposta</strong>
+              <p>Projeto escolhido e fatos do CRM preparam o primeiro rascunho.</p>
+            </div>
+            <small>{propostaPronta ? 'Próximo' : 'Pendente'}</small>
+          </li>
+        ) : null}
       </ol>
     </section>
   );

@@ -23,10 +23,12 @@ export function FormularioNovoLead({
   abertoInicial = false,
   rotulo = 'Novo lead',
   tituloInicial = '',
+  projetoSlug = '',
 }: {
   abertoInicial?: boolean;
   rotulo?: string;
   tituloInicial?: string;
+  projetoSlug?: string;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -36,7 +38,7 @@ export function FormularioNovoLead({
 
   useEffect(() => {
     if (!aberto) return;
-    painel.current?.querySelector<HTMLElement>('input')?.focus();
+    painel.current?.querySelector<HTMLElement>('input:not([type="hidden"])')?.focus();
   }, [aberto]);
 
   useEffect(() => {
@@ -134,6 +136,7 @@ export function FormularioNovoLead({
                 noValidate
                 onSubmit={() => setErrosOcultos(new Set())}
               >
+                <input type="hidden" name="projeto" value={projetoSlug} />
                 {estado.erro && (
                   <div role="alert">
                     <Alert tone="danger" size="compact">

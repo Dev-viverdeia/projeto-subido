@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
+import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import type { ProjetoGuiado } from './ProjetoGuiado';
 
 const fases = ['entender', 'preparar', 'construir', 'validar', 'entregar'] as const;
@@ -155,6 +156,21 @@ function item(id: string, tipo: 'ferramenta' | 'prompt'): ItemSolucao {
 type Props = Parameters<typeof ProjetoGuiado>[0];
 let Tela: (props: Props) => React.ReactNode;
 
+const rotaComercial: ContextoRotaComercialProjeto = {
+  oportunidadeInicialId: '11111111-1111-4111-8111-111111111111',
+  oportunidades: [
+    {
+      id: '11111111-1111-4111-8111-111111111111',
+      empresa: 'Clínica Aurora',
+      titulo: 'Automação do atendimento',
+      contato: 'Camila',
+      etapa: 'descoberta',
+      proposta: null,
+      execucao: null,
+    },
+  ],
+};
+
 beforeEach(async () => {
   localStorage.clear();
   vi.resetModules();
@@ -165,7 +181,7 @@ beforeEach(async () => {
   Tela = (await import('./ProjetoGuiado')).ProjetoGuiado;
 });
 
-function montar() {
+function montar(rota: ContextoRotaComercialProjeto = rotaComercial) {
   return render(
     <Tela
       slug="crm-comercial"
@@ -177,6 +193,7 @@ function montar() {
       prompts={[item('p1', 'prompt')]}
       videoUrl={null}
       proxima={null}
+      rotaComercial={rota}
     />,
   );
 }
@@ -250,17 +267,47 @@ describe('Projeto guiado', () => {
   it('conecta o projeto ao primeiro lead e à proposta comercial', () => {
     montar();
 
-    expect(screen.getByRole('link', { name: /Cadastrar lead/ })).toHaveAttribute(
+    expect(screen.getByLabelText('Empresa e oportunidade')).toHaveValue(
+      '11111111-1111-4111-8111-111111111111',
+    );
+    expect(screen.getByRole('link', { name: 'Usar com outra empresa' })).toHaveAttribute(
       'href',
-      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA',
+      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
     );
     expect(screen.getByRole('link', { name: /Criar proposta/ })).toHaveAttribute(
       'href',
-      '/propostas/nova?projeto=crm-comercial',
+      '/propostas/nova?oportunidade=11111111-1111-4111-8111-111111111111&projeto=crm-comercial',
     );
     expect(
-      screen.getByText('O roteiro entra em campo depois que uma empresa aceita avançar.'),
-    ).toBeInTheDocument();
+      screen.getByText(/A plataforma mantém CRM, proposta e entrega conectados/),
+    ).toBeVisible();
+  });
+
+  it('retoma a entrega existente sem fazer o profissional criar outra proposta', () => {
+    montar({
+      oportunidadeInicialId: rotaComercial.oportunidades[0]!.id,
+      oportunidades: [
+        {
+          ...rotaComercial.oportunidades[0]!,
+          proposta: {
+            id: '22222222-2222-4222-8222-222222222222',
+            status: 'aceita',
+            atualizadoEm: '2026-08-12T12:00:00.000Z',
+          },
+          execucao: {
+            id: '33333333-3333-4333-8333-333333333333',
+            status: 'em_execucao',
+            atualizadoEm: '2026-08-12T13:00:00.000Z',
+          },
+        },
+      ],
+    });
+
+    expect(screen.getByText('Em execução')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Abrir entrega' })).toHaveAttribute(
+      'href',
+      '/solucoes/execucao/33333333-3333-4333-8333-333333333333',
+    );
   });
 
   it('leva para uma nova oportunidade quando a entrega guiada termina', () => {
@@ -277,7 +324,7 @@ describe('Projeto guiado', () => {
 
     expect(screen.getByRole('link', { name: /Encontrar novo cliente/ })).toHaveAttribute(
       'href',
-      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA',
+      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
     );
   });
 });

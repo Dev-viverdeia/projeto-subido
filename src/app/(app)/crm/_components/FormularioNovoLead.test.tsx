@@ -49,9 +49,18 @@ describe('FormularioNovoLead', () => {
 
   it('abre pelo projeto com a oportunidade já identificada', () => {
     criarLeadMock.mockResolvedValue({});
-    render(<FormularioNovoLead abertoInicial tituloInicial="Atendimento com IA no WhatsApp" />);
+    render(
+      <FormularioNovoLead
+        abertoInicial
+        tituloInicial="Atendimento com IA no WhatsApp"
+        projetoSlug="sdr-atendimento-qualificacao"
+      />,
+    );
 
     expect(screen.getByRole('dialog', { name: 'Adicionar lead' })).toBeInTheDocument();
     expect(screen.getByLabelText('Oportunidade')).toHaveValue('Atendimento com IA no WhatsApp');
+    expect(document.querySelector('input[name="projeto"]')).toHaveValue(
+      'sdr-atendimento-qualificacao',
+    );
   });
 });

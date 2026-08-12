@@ -38,4 +38,22 @@ describe('JornadaEntradaLead', () => {
       `/crm/${BASE.oportunidadeId}`,
     );
   });
+
+  it('leva o Projeto escolhido para a proposta quando a preparação termina', () => {
+    render(
+      <JornadaEntradaLead
+        {...BASE}
+        estadoContexto="pronto"
+        totalCalls={1}
+        projetoSlug="sdr-atendimento-qualificacao"
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Prepare a conversa e a proposta.' })).toBeVisible();
+    expect(screen.getByText('Montar a proposta')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Montar proposta' })).toHaveAttribute(
+      'href',
+      `/propostas/nova?oportunidade=${BASE.oportunidadeId}&projeto=sdr-atendimento-qualificacao`,
+    );
+  });
 });

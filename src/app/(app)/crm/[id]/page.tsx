@@ -46,6 +46,10 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
   );
   const dossie = execucaoPronta?.dossie ?? null;
   const entradaRecente = parametros.novo === '1';
+  const projetoDeOrigem =
+    typeof parametros.projeto === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(parametros.projeto)
+      ? parametros.projeto.slice(0, 160)
+      : null;
   const estadoContexto: EstadoContextoLead = dossie
     ? 'pronto'
     : emAndamento
@@ -76,6 +80,7 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
           linkedin={lead.contato?.linkedinUrl ?? null}
           estadoContexto={estadoContexto}
           totalCalls={lead.totalCalls}
+          projetoSlug={projetoDeOrigem}
         />
       ) : (
         <ResumoOperacionalLead lead={lead} />

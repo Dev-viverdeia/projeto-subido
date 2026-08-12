@@ -1,65 +1,157 @@
+'use client';
+
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Building2, FileSignature } from 'lucide-react';
+import { ArrowUpRight, Building2, Check, FileSignature, FolderKanban } from 'lucide-react';
+import { ROTULO_ETAPA } from '@/lib/crm/etapas';
+import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
+import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
+import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import styles from './ProjetoGuiado.module.css';
 
+function passoAtual(
+  oportunidade: ContextoRotaComercialProjeto['oportunidades'][number] | null,
+): 1 | 2 | 3 {
+  if (oportunidade?.execucao) return 3;
+  if (oportunidade?.proposta) return 2;
+  return 1;
+}
+
 export function RotaComercialProjeto({
-  destinoCrm,
-  destinoProposta,
+  slug,
+  titulo,
+  contexto,
+  destinoNovoLead,
 }: {
-  destinoCrm: string;
-  destinoProposta: string;
+  slug: string;
+  titulo: string;
+  contexto: ContextoRotaComercialProjeto;
+  destinoNovoLead: string;
 }) {
+  const [oportunidadeId, setOportunidadeId] = useState(
+    contexto.oportunidadeInicialId ?? contexto.oportunidades[0]?.id ?? '',
+  );
+  const oportunidade = useMemo(
+    () => contexto.oportunidades.find((item) => item.id === oportunidadeId) ?? null,
+    [contexto.oportunidades, oportunidadeId],
+  );
+  const atual = passoAtual(oportunidade);
+
+  const destinoPrincipal = oportunidade?.execucao
+    ? `/solucoes/execucao/${oportunidade.execucao.id}`
+    : oportunidade?.proposta && oportunidade.proposta.status !== 'recusada'
+      ? `/propostas/${oportunidade.proposta.id}`
+      : oportunidade
+        ? `/propostas/nova?oportunidade=${oportunidade.id}&projeto=${encodeURIComponent(slug)}`
+        : destinoNovoLead;
+  const rotuloPrincipal = oportunidade?.execucao
+    ? 'Abrir entrega'
+    : oportunidade?.proposta && oportunidade.proposta.status !== 'recusada'
+      ? oportunidade.proposta.status === 'aceita'
+        ? 'Iniciar entrega'
+        : 'Continuar proposta'
+      : oportunidade
+        ? 'Criar proposta'
+        : 'Cadastrar lead';
+
   return (
     <section className={styles.rotaProjeto} aria-labelledby="rota-projeto-titulo">
       <header>
-        <span>Do projeto à entrega</span>
-        <h2 id="rota-projeto-titulo">Use nesta ordem</h2>
-        <p>O roteiro entra em campo depois que uma empresa aceita avançar.</p>
+        <span>Leve ao cliente</span>
+        <h2 id="rota-projeto-titulo">Coloque este projeto em campo.</h2>
+        <p>Escolha uma oportunidade. A plataforma mantém CRM, proposta e entrega conectados.</p>
       </header>
 
-      <ol>
-        <li>
-          <b>01</b>
-          <div>
-            <strong>Conheça a oferta</strong>
-            <p>Entenda o resultado, o cliente ideal e os limites do projeto.</p>
-          </div>
-        </li>
-        <li>
-          <b>02</b>
-          <div>
-            <strong>Encontre uma empresa</strong>
-            <p>Cadastre o lead e use a descoberta para confirmar o problema.</p>
-          </div>
-        </li>
-        <li>
-          <b>03</b>
-          <div>
-            <strong>Venda o projeto</strong>
-            <p>Monte a proposta com os fatos que o cliente confirmou.</p>
-          </div>
-        </li>
-        <li>
-          <b>04</b>
-          <div>
-            <strong>Execute com o cliente</strong>
-            <p>Siga as cinco fases abaixo e registre cada evidência.</p>
-          </div>
-        </li>
+      <ol className={styles.rotaEtapas} aria-label="Fluxo comercial deste Projeto">
+        {[
+          ['CRM', 1],
+          ['Proposta', 2],
+          ['Entrega', 3],
+        ].map(([rotulo, numero]) => {
+          const indice = Number(numero);
+          const concluido = oportunidade ? indice < atual || (indice === 1 && atual === 1) : false;
+          const ativo = oportunidade ? indice === atual : indice === 1;
+          return (
+            <li
+              key={rotulo}
+              data-concluido={concluido || undefined}
+              data-ativo={ativo || undefined}
+            >
+              <span>{concluido ? <Check size={11} aria-hidden="true" /> : `0${indice}`}</span>
+              <strong>{rotulo}</strong>
+            </li>
+          );
+        })}
       </ol>
 
+      {contexto.oportunidades.length ? (
+        <div className={styles.rotaContexto}>
+          <label htmlFor={`oportunidade-${slug}`}>
+            Empresa e oportunidade
+            <select
+              id={`oportunidade-${slug}`}
+              value={oportunidadeId}
+              onChange={(evento) => setOportunidadeId(evento.target.value)}
+            >
+              {contexto.oportunidades.map((item) => (
+                <option value={item.id} key={item.id}>
+                  {item.empresa} · {item.titulo}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {oportunidade ? (
+            <div className={styles.rotaEstado}>
+              <span>
+                {oportunidade.execucao ? (
+                  <FolderKanban size={15} aria-hidden="true" />
+                ) : oportunidade.proposta ? (
+                  <FileSignature size={15} aria-hidden="true" />
+                ) : (
+                  <Building2 size={15} aria-hidden="true" />
+                )}
+              </span>
+              <div>
+                <strong>{oportunidade.empresa}</strong>
+                <small>
+                  {oportunidade.execucao
+                    ? ROTULO_STATUS_PROJETO[oportunidade.execucao.status]
+                    : oportunidade.proposta
+                      ? ROTULO_STATUS_PROPOSTA[oportunidade.proposta.status]
+                      : ROTULO_ETAPA[oportunidade.etapa]}
+                </small>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className={styles.rotaVazia}>
+          <Building2 size={19} strokeWidth={1.7} aria-hidden="true" />
+          <div>
+            <strong>Comece por uma empresa real.</strong>
+            <p>O título de {titulo} já entra na nova oportunidade.</p>
+          </div>
+        </div>
+      )}
+
       <div className={styles.rotaAcoes}>
-        <Link href={destinoCrm}>
-          <Building2 size={16} strokeWidth={1.8} aria-hidden="true" />
-          Cadastrar lead
+        <Link href={destinoPrincipal} className={styles.rotaPrincipal}>
+          {rotuloPrincipal}
           <ArrowUpRight size={15} aria-hidden="true" />
         </Link>
-        <Link href={destinoProposta}>
-          <FileSignature size={16} strokeWidth={1.8} aria-hidden="true" />
-          Criar proposta
-          <ArrowUpRight size={15} aria-hidden="true" />
-        </Link>
+        {oportunidade ? (
+          <Link href={`/crm/${oportunidade.id}`} className={styles.rotaSecundaria}>
+            Abrir CRM
+          </Link>
+        ) : null}
       </div>
+
+      {oportunidade ? (
+        <Link href={destinoNovoLead} className={styles.rotaNovoLead}>
+          Usar com outra empresa <ArrowUpRight size={13} aria-hidden="true" />
+        </Link>
+      ) : null}
     </section>
   );
 }

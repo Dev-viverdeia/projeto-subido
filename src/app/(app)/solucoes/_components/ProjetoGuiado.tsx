@@ -13,6 +13,7 @@ import {
   Layers3,
 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
+import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import {
   contarEtapasFeitas,
@@ -39,6 +40,7 @@ export function ProjetoGuiado({
   prompts,
   videoUrl,
   proxima,
+  rotaComercial,
 }: {
   slug: string;
   titulo: string;
@@ -49,14 +51,14 @@ export function ProjetoGuiado({
   prompts: ItemSolucao[];
   videoUrl: string | null;
   proxima: VizinhaSolucao | null;
+  rotaComercial: ContextoRotaComercialProjeto;
 }) {
   const progresso = useProgresso();
   const { alternarEtapa } = useAcoesProgresso();
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
-  const destinoCrm = `/crm?novo=projeto&projeto=${encodeURIComponent(titulo)}`;
-  const destinoProposta = `/propostas/nova?projeto=${encodeURIComponent(slug)}`;
+  const destinoCrm = `/crm?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const perfil = projeto.roteiro.perfil;
   const escopo = projeto.roteiro.escopo;
   const artefatosEntrega = projeto.roteiro.artefatosEntrega;
@@ -375,7 +377,12 @@ export function ProjetoGuiado({
         </div>
 
         <aside className={styles.lateral}>
-          <RotaComercialProjeto destinoCrm={destinoCrm} destinoProposta={destinoProposta} />
+          <RotaComercialProjeto
+            slug={slug}
+            titulo={titulo}
+            contexto={rotaComercial}
+            destinoNovoLead={destinoCrm}
+          />
 
           <section className={styles.lateralBloco}>
             <span>Cliente ideal</span>

@@ -15,6 +15,15 @@ const criarLeadSchema = z.object({
     .max(320, 'E-mail muito longo.')
     .refine((valor) => !valor || z.email().safeParse(valor).success, 'Digite um e-mail válido.'),
   titulo: z.string().trim().max(180, 'Título muito longo.'),
+  projeto: z.preprocess(
+    (valor) => (typeof valor === 'string' && valor.length ? valor : undefined),
+    z
+      .string()
+      .trim()
+      .max(160)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .optional(),
+  ),
 });
 
 const moverSchema = z.object({
@@ -52,7 +61,10 @@ export async function criarLead(
   formData: FormData,
 ): Promise<EstadoNovoLead> {
   const campos = camposDo(formData);
-  const validacao = criarLeadSchema.safeParse(campos);
+  const validacao = criarLeadSchema.safeParse({
+    ...campos,
+    projeto: formData.get('projeto'),
+  });
 
   if (!validacao.success) {
     const erros = z.flattenError(validacao.error).fieldErrors;
@@ -99,7 +111,10 @@ export async function criarLead(
 
   revalidatePath('/crm');
   revalidatePath('/inicio');
-  redirect(`/crm/${oportunidade.data}?novo=1`);
+  const projeto = validacao.data.projeto
+    ? `&projeto=${encodeURIComponent(validacao.data.projeto)}`
+    : '';
+  redirect(`/crm/${oportunidade.data}?novo=1${projeto}`);
 }
 
 export async function moverOportunidade(formData: FormData): Promise<void> {

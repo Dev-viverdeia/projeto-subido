@@ -47,6 +47,18 @@ describe('criarLead', () => {
     expect(redirect).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}?novo=1`);
   });
 
+  it('preserva o Projeto escolhido até a proposta', async () => {
+    rpc.mockResolvedValue({ data: OPORTUNIDADE_ID, error: null });
+    const dados = dadosValidos();
+    dados.set('projeto', 'sdr-atendimento-qualificacao');
+
+    await criarLead({}, dados);
+
+    expect(redirect).toHaveBeenCalledWith(
+      `/crm/${OPORTUNIDADE_ID}?novo=1&projeto=sdr-atendimento-qualificacao`,
+    );
+  });
+
   it('não navega quando o banco não devolve a oportunidade', async () => {
     rpc.mockResolvedValue({ data: null, error: null });
 

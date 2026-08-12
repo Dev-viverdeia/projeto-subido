@@ -15,6 +15,7 @@ function primeiroParametro(valor: string | string[] | undefined): string {
 export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
   const [oportunidades, parametros] = await Promise.all([listarPipeline(), searchParams]);
   const projetoDeOrigem = primeiroParametro(parametros.projeto);
+  const projetoSlug = primeiroParametro(parametros.projetoSlug);
   const abrirDoProjeto = parametros.novo === 'projeto' && Boolean(projetoDeOrigem);
   const abertas = oportunidades.filter((item) => etapaAberta(item.etapa)).length;
   const emDecisao = oportunidades.filter(
@@ -34,7 +35,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           </p>
         </div>
         {oportunidades.length > 0 && (
-          <FormularioNovoLead abertoInicial={abrirDoProjeto} tituloInicial={projetoDeOrigem} />
+          <FormularioNovoLead
+            abertoInicial={abrirDoProjeto}
+            tituloInicial={projetoDeOrigem}
+            projetoSlug={projetoSlug}
+          />
         )}
       </header>
 
@@ -101,6 +106,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 rotulo="Adicionar primeiro lead"
                 abertoInicial={abrirDoProjeto}
                 tituloInicial={projetoDeOrigem}
+                projetoSlug={projetoSlug}
               />
             </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterProximaSolucao, obterSolucao } from '@/lib/conteudo/queries';
+import { obterRotaComercialProjeto } from '@/lib/projetos/rota-comercial';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import entrada from '../../_components/entrada.module.css';
 import { ICONES_CATEGORIAS, ICONE_CATEGORIA_PADRAO } from '../../_components/iconesCategorias';
@@ -39,7 +40,10 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
   if (!solucao) notFound();
 
   /* Depois do `notFound()` porque a vizinha só faz sentido se esta existe. */
-  const proxima = await obterProximaSolucao(slug);
+  const [proxima, rotaComercial] = await Promise.all([
+    obterProximaSolucao(slug),
+    obterRotaComercialProjeto(solucao.id),
+  ]);
 
   const etapas = solucao.itens.filter((i) => i.tipo === 'etapa');
   const ferramentas = solucao.itens.filter((i) => i.tipo === 'ferramenta');
@@ -67,6 +71,7 @@ export default async function SolucaoPage({ params }: PageProps<'/solucoes/[slug
           prompts={prompts}
           videoUrl={solucao.video_url}
           proxima={proxima}
+          rotaComercial={rotaComercial}
         />
       ) : (
         <FichaSolucao

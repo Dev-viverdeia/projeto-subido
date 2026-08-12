@@ -1184,10 +1184,10 @@
 }
 
 .rotaProjeto header {
-  padding: var(--via-space-4);
+  padding: var(--app-pad-card);
   border-bottom: 1px solid var(--via-border-hairline);
   background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 48%), var(--via-surface);
+    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 52%), var(--via-surface);
 }
 
 .rotaProjeto header span,
@@ -1210,6 +1210,8 @@
   font-size: var(--via-fs-h4);
   font-weight: 560;
   letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-tight);
+  text-wrap: balance;
 }
 
 .rotaProjeto header p {
@@ -1220,29 +1222,38 @@
   text-wrap: pretty;
 }
 
-.rotaProjeto ol {
+.rotaEtapas {
   margin: 0;
-  padding: var(--via-space-2) var(--via-space-4);
+  padding: var(--via-space-3) var(--app-pad-card);
   list-style: none;
-}
-
-.rotaProjeto li {
-  position: relative;
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: var(--via-space-3);
-  padding-block: var(--via-space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--via-border-hairline);
 }
 
-.rotaProjeto li + li {
-  border-top: 1px solid var(--via-border-hairline);
+.rotaEtapas li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-width: 0;
 }
 
-.rotaProjeto li b {
+.rotaEtapas li:not(:last-child)::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  min-width: var(--via-space-2);
+  margin-inline: var(--via-space-1);
+  background: var(--via-border);
+}
+
+.rotaEtapas li > span {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  flex: none;
+  width: 24px;
+  height: 24px;
   border: 1px solid var(--via-border);
   border-radius: 50%;
   background: var(--via-surface);
@@ -1253,37 +1264,151 @@
   font-variant-numeric: tabular-nums;
 }
 
-.rotaProjeto li strong,
-.rotaProjeto li p {
+.rotaEtapas li[data-concluido] > span {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.rotaEtapas li[data-ativo] > span {
+  border-color: var(--via-navy);
+  box-shadow: 0 0 0 3px var(--via-navy-08);
+}
+
+.rotaEtapas li strong {
+  overflow: hidden;
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rotaContexto {
+  display: grid;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--app-pad-card);
+}
+
+.rotaContexto label {
+  display: grid;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+}
+
+.rotaContexto select {
+  width: 100%;
+  min-height: var(--app-h-control);
+  padding: var(--via-space-2) calc(var(--via-space-5) + var(--via-space-2)) var(--via-space-2)
+    var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background-color: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-caption);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.rotaContexto select:hover {
+  border-color: var(--via-navy-30);
+}
+
+.rotaContexto select:focus-visible {
+  outline: none;
+  border-color: var(--via-navy);
+  box-shadow: var(--app-ring);
+}
+
+.rotaEstado {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.rotaEstado > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.rotaEstado strong,
+.rotaEstado small {
   display: block;
   margin: 0;
 }
 
-.rotaProjeto li strong {
+.rotaEstado strong {
+  overflow: hidden;
   color: var(--via-text-primary);
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.rotaProjeto li p {
-  margin-top: var(--via-space-1);
+.rotaEstado small {
+  margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-micro);
+}
+
+.rotaVazia {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: start;
+  margin: var(--via-space-4) var(--app-pad-card) 0;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-text-muted);
+}
+
+.rotaVazia strong,
+.rotaVazia p {
+  display: block;
+  margin: 0;
+}
+
+.rotaVazia strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-caption);
+}
+
+.rotaVazia p {
+  margin-top: var(--via-space-1);
+  font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
-  text-wrap: pretty;
 }
 
 .rotaAcoes {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--via-space-2);
-  padding: var(--via-space-3) var(--via-space-4) var(--via-space-4);
-  border-top: 1px solid var(--via-border-hairline);
+  padding: 0 var(--app-pad-card) var(--via-space-3);
 }
 
 .rotaAcoes a {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--via-space-2);
   min-height: 42px;
   padding: var(--via-space-2) var(--via-space-3);
@@ -1300,14 +1425,10 @@
     box-shadow var(--app-t-touch);
 }
 
-.rotaAcoes a:first-child {
+.rotaAcoes .rotaPrincipal {
   border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
-}
-
-.rotaAcoes a:first-child > svg:first-child {
-  color: var(--via-accent);
 }
 
 .rotaAcoes a:hover {
@@ -1319,6 +1440,31 @@
 .rotaAcoes a:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+.rotaNovoLead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) var(--app-pad-card);
+  border-top: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  text-decoration: none;
+  transition:
+    color var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.rotaNovoLead:hover {
+  background: var(--via-navy-03);
+  color: var(--via-text-primary);
+}
+
+.rotaNovoLead:focus-visible {
+  outline: none;
+  box-shadow: inset var(--app-ring);
 }
 
 .lateralBloco,
@@ -1433,26 +1579,6 @@
     grid-column: 1 / -1;
   }
 
-  .rotaProjeto ol {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding-block: var(--via-space-3);
-  }
-
-  .rotaProjeto li {
-    align-content: start;
-    padding: var(--via-space-3);
-  }
-
-  .rotaProjeto li + li {
-    border-top: 0;
-    border-left: 1px solid var(--via-border-hairline);
-  }
-
-  .rotaAcoes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .estudio,
   .notaLocal {
     grid-column: 1 / -1;
@@ -1518,20 +1644,6 @@
 
   .guiaCorpo {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .rotaProjeto ol,
-  .rotaAcoes {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .rotaProjeto li {
-    padding-inline: 0;
-  }
-
-  .rotaProjeto li + li {
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
   }
 
   .execucao {
@@ -1677,6 +1789,7 @@
   .check,
   .continuarHero,
   .rotaAcoes a,
+  .rotaNovoLead,
   .guia summary > svg,
   .progressoHero > span,
   .navegacaoSequencial a,
