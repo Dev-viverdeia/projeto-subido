@@ -40,7 +40,7 @@ describe('FormularioAgendarCall', () => {
     await waitFor(() => expect(gatilho).toHaveFocus());
   });
 
-  it('abre pelo dossiê com a oportunidade correta já selecionada', () => {
+  it('abre pelo dossiê com a oportunidade e o fuso local corretos', async () => {
     agendarReuniaoMock.mockResolvedValue({});
     render(
       <FormularioAgendarCall
@@ -52,6 +52,11 @@ describe('FormularioAgendarCall', () => {
 
     expect(screen.getByRole('dialog', { name: 'Agendar call' })).toBeInTheDocument();
     expect(screen.getByLabelText('Oportunidade')).toHaveValue(OPORTUNIDADE.id);
+    await waitFor(() =>
+      expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
+        String(new Date().getTimezoneOffset()),
+      ),
+    );
   });
 
   it('abre o kickoff do projeto com oportunidade e tipo já definidos', () => {

@@ -83,6 +83,31 @@ describe('motor da jornada', () => {
     expect(plano.proximoPasso.id).toBe('venda-confirmada');
   });
 
+  it('prioriza a prospecção existente mesmo com formação pendente', () => {
+    const plano = montarPlanoJornada(
+      sinais({
+        perfil,
+        oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
+      }),
+    );
+
+    expect(plano.etapaAtual).toBe('prospectar');
+    expect(plano.proximoPasso.id).toBe('descoberta');
+  });
+
+  it('leva uma venda aceita direto para o kickoff da entrega', () => {
+    const plano = montarPlanoJornada(
+      sinais({
+        perfil,
+        oportunidades: { total: 1, comProximaAcao: 1, ganhas: 1 },
+        propostas: { total: 1, apresentadas: 1, aceitas: 1 },
+      }),
+    );
+
+    expect(plano.etapaAtual).toBe('entregar');
+    expect(plano.proximoPasso.id).toBe('kickoff');
+  });
+
   it('só entra em evolução depois de kickoff e validação da entrega', () => {
     const plano = montarPlanoJornada(
       sinais({

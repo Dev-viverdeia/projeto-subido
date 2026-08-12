@@ -68,7 +68,7 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
 
           <div className={styles.heroAcoes}>
             <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />
-            <AtalhoProposta oportunidadeId={lead.oportunidade.id} />
+            <AtalhoProposta lead={lead} />
             <span className={styles.etapa}>{ROTULO_ETAPA[lead.oportunidade.etapa]}</span>
             {!emAndamento && (
               <FormularioEnriquecimento

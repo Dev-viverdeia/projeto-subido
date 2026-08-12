@@ -23,7 +23,7 @@ async function FocoSobral() {
 
 async function ClienteEmFoco() {
   const foco = await obterFocoDoCrm();
-  return <>{foco?.empresa ?? 'Nenhum lead em foco'}</>;
+  return <>{foco?.empresa ?? 'Nenhum cliente em foco'}</>;
 }
 
 async function ContatoEmFoco() {

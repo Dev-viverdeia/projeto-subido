@@ -36,8 +36,8 @@ export function FormularioAgendarCall({
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
+  const campoOffset = useRef<HTMLInputElement>(null);
   const [aberto, setAberto] = useState(abertoInicial);
-  const [offsetMinutos, setOffsetMinutos] = useState(0);
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
   const [estado, acao] = useActionState(agendarReuniao, INICIAL);
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
@@ -47,6 +47,9 @@ export function FormularioAgendarCall({
 
   useEffect(() => {
     if (!aberto) return;
+    if (campoOffset.current) {
+      campoOffset.current.value = String(new Date().getTimezoneOffset());
+    }
     painel.current?.querySelector<HTMLElement>('select, input:not([type="hidden"])')?.focus();
   }, [aberto]);
 
@@ -81,10 +84,7 @@ export function FormularioAgendarCall({
         aria-haspopup="dialog"
         aria-expanded={aberto}
         aria-controls="agendar-call-dialogo"
-        onClick={() => {
-          setOffsetMinutos(new Date().getTimezoneOffset());
-          setAberto(true);
-        }}
+        onClick={() => setAberto(true)}
       >
         <CalendarPlus size={17} strokeWidth={2} aria-hidden="true" />
         <span>Agendar call</span>
@@ -153,7 +153,7 @@ export function FormularioAgendarCall({
                   noValidate
                   onSubmit={() => setErrosOcultos(new Set())}
                 >
-                  <input type="hidden" name="offsetMinutos" value={offsetMinutos} />
+                  <input ref={campoOffset} type="hidden" name="offsetMinutos" defaultValue="0" />
 
                   {estado.erro && (
                     <div role="alert">

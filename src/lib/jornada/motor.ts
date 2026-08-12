@@ -318,8 +318,30 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
 
 export function montarPlanoJornada(sinais: SinaisJornada): PlanoJornada {
   const definicoes = criarEtapas(sinais);
-  const indiceAtual = definicoes.findIndex((etapa) => etapa.passos.some((item) => !item.concluido));
-  const indiceResolvido = indiceAtual === -1 ? definicoes.length - 1 : indiceAtual;
+  const indiceSequencial = definicoes.findIndex((etapa) =>
+    etapa.passos.some((item) => !item.concluido),
+  );
+  const indiceProspectar = definicoes.findIndex((etapa) => etapa.id === 'prospectar');
+  const indiceVender = definicoes.findIndex((etapa) => etapa.id === 'vender');
+  const indiceEntregar = definicoes.findIndex((etapa) => etapa.id === 'entregar');
+  const indiceEvoluir = definicoes.findIndex((etapa) => etapa.id === 'evoluir');
+  const vendaConfirmada = sinais.propostas.aceitas > 0 || sinais.oportunidades.ganhas > 0;
+  const entregaConcluida = definicoes[indiceEntregar]?.passos.every((item) => item.concluido);
+
+  // A jornada é uma prioridade operacional, não uma trava de curso. Fatos mais
+  // avançados levam o profissional ao trabalho em andamento, mesmo que ainda
+  // existam evidências educacionais pendentes em etapas anteriores.
+  const indiceResolvido = vendaConfirmada
+    ? entregaConcluida
+      ? indiceEvoluir
+      : indiceEntregar
+    : sinais.propostas.total > 0 || sinais.diagnosticosConcluidos > 0
+      ? indiceVender
+      : sinais.oportunidades.total > 0 || sinais.calls.descobertasConcluidas > 0
+        ? indiceProspectar
+        : indiceSequencial === -1
+          ? definicoes.length - 1
+          : indiceSequencial;
   const etapaAtual = definicoes[indiceResolvido]!.id;
   const etapas = definicoes.map((etapa, indice): EtapaJornada => ({
     ...etapa,

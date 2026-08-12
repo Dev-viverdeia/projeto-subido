@@ -195,7 +195,7 @@ export function MapaJornada({
               <Building2 size={19} strokeWidth={1.8} />
             </span>
             <span className={styles.cartaoConteudo}>
-              <small>Lead em foco</small>
+              <small>Cliente em foco</small>
               <strong>{cliente}</strong>
               <em>
                 <UserRound size={13} strokeWidth={1.8} aria-hidden="true" /> {contato}
