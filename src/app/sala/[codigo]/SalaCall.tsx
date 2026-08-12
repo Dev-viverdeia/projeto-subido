@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
-import { CalendarClock, CheckCircle2, LockKeyhole, Mic2, Layers3, Video } from 'lucide-react';
+import { CalendarClock, CheckCircle2, FileText, LockKeyhole, Video } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
@@ -40,6 +40,8 @@ export function SalaCall({
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
   const salaAberta = callPodeAbrir(convite.status) && (anfitriao || convite.disponivel);
   const podeEntrar = salaAberta && videoConfigurado && nome.trim().length > 0 && consentiu;
+  const estadoSala =
+    salaAberta && videoConfigurado ? 'Sala disponível' : ROTULO_STATUS_CALL[convite.status];
 
   async function entrar() {
     if (!podeEntrar) return;
@@ -99,18 +101,11 @@ export function SalaCall({
     <main className={styles.pagina}>
       <div className={styles.marca}>
         <SubidoLogo size={18} variant="mono" />
-        <span>Sala inteligente</span>
+        <span className={styles.marcaApoio}>Sala inteligente</span>
       </div>
 
       <section className={styles.cartao}>
         <div className={styles.contexto}>
-          <div className={styles.sinal} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
           <p className={styles.sobretitulo}>{anfitriao ? 'Sua sala' : 'Você foi convidado'}</p>
           <h1>{convite.titulo}</h1>
           <div className={styles.horario}>
@@ -120,32 +115,42 @@ export function SalaCall({
           </div>
 
           <div className={styles.memoria}>
-            <div>
-              <Mic2 size={17} strokeWidth={1.8} aria-hidden="true" />
-              <span>
-                <strong>Transcrição conectada</strong>
-                <small>A conversa alimenta o histórico da oportunidade.</small>
-              </span>
-            </div>
-            {convite.liveCoachAtivo && (
-              <div>
-                <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-                <span>
-                  <strong>Live Coach ativo</strong>
-                  <small>Recomendações aparecem para o anfitrião durante a call.</small>
-                </span>
-              </div>
-            )}
+            <p>O que acontece com esta conversa</p>
+            <ol>
+              <li>
+                <span>01</span>
+                <div>
+                  <strong>Transcrição privada</strong>
+                  <small>As falas ficam ligadas somente ao histórico desta oportunidade.</small>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <strong>Resumo para revisão</strong>
+                  <small>Decisões e próximos passos aparecem depois da call.</small>
+                </div>
+              </li>
+              {convite.liveCoachAtivo && anfitriao && (
+                <li>
+                  <span>03</span>
+                  <div>
+                    <strong>Coach só para você</strong>
+                    <small>O convidado não vê as recomendações durante a conversa.</small>
+                  </div>
+                </li>
+              )}
+            </ol>
           </div>
         </div>
 
         <div className={styles.entrada}>
           <div className={styles.estado}>
-            <span className={salaAberta && videoConfigurado ? styles.pronto : styles.pendente} />
-            {ROTULO_STATUS_CALL[convite.status]}
+            <span>Estado da sala</span>
+            <strong>{estadoSala}</strong>
           </div>
           <h2>Preparar entrada</h2>
-          <p>Seu nome será exibido para as outras pessoas na sala.</p>
+          <p>Confirme seu nome e como esta conversa será registrada.</p>
 
           <label className={styles.campo}>
             <span>Seu nome</span>
@@ -165,10 +170,18 @@ export function SalaCall({
               onChange={(evento) => setConsentiu(evento.target.checked)}
             />
             <span>
-              Entendo que esta reunião pode ser gravada e transcrita para gerar o histórico e os
-              próximos passos da conversa.
+              Concordo com a gravação e transcrição desta reunião para gerar o histórico, o resumo e
+              os próximos passos da conversa.
             </span>
           </label>
+
+          <div className={styles.destinoDados}>
+            <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
+            <p>
+              <strong>Depois da call</strong>
+              <span>Você poderá revisar tudo antes de aplicar qualquer mudança no CRM.</span>
+            </p>
+          </div>
 
           {!videoConfigurado && (
             <div className={styles.aviso}>

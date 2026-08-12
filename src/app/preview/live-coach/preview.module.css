@@ -6,7 +6,7 @@
 
 .sala {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(310px, 350px);
+  grid-template-columns: minmax(0, 1fr) minmax(350px, 380px);
   width: min(1440px, 100%);
   height: calc(100dvh - 44px);
   min-height: 650px;
@@ -127,7 +127,7 @@
   color: var(--via-danger);
 }
 
-@media (max-width: 920px) {
+@media (max-width: 900px) {
   .pagina {
     padding: 0;
   }

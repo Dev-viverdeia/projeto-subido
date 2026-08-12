@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import { AudioLines, LockKeyhole, MessageSquareQuote, Radio, Layers3 } from 'lucide-react';
+import { AudioLines, LockKeyhole, Radio, Layers3 } from 'lucide-react';
 import { RoomEvent, Track } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import styles from './LiveCoach.module.css';
@@ -318,32 +318,26 @@ export function CabineLiveCoach({
           <p>{ativo ? 'Live Coach' : 'Memória da call'}</p>
           <span>{ROTULO_ESTADO[estado]}</span>
         </div>
-        <Radio size={18} strokeWidth={1.7} aria-hidden="true" />
+        <span className={styles.privado}>
+          <LockKeyhole size={13} strokeWidth={1.8} aria-hidden="true" /> Só você vê
+        </span>
       </header>
-
-      <div className={styles.pulso} aria-hidden="true">
-        <span />
-        <i />
-      </div>
 
       <section className={styles.recomendacao} aria-live="polite" aria-atomic="true">
         <div className={styles.rotuloSecao}>
           <Layers3 size={15} strokeWidth={1.8} aria-hidden="true" />
-          Próximo movimento
+          Uma orientação por vez
         </div>
         {sugestao ? (
           <>
             <div className={styles.metaSugestao}>
               <span>{sugestao.categoria}</span>
-              <span>{sugestao.metodologia}</span>
+              {sugestao.metodologia && <span>{sugestao.metodologia}</span>}
             </div>
             <h2>{sugestao.titulo}</h2>
             <p>{sugestao.sugestao}</p>
             {sugestao.trecho_gatilho && (
-              <blockquote>
-                <MessageSquareQuote size={14} strokeWidth={1.8} aria-hidden="true" />“
-                {sugestao.trecho_gatilho}”
-              </blockquote>
+              <p className={styles.evidencia}>Ouvido agora: “{sugestao.trecho_gatilho}”</p>
             )}
           </>
         ) : (
@@ -361,15 +355,15 @@ export function CabineLiveCoach({
       <section className={styles.transcricao}>
         <div className={styles.rotuloSecao}>
           <AudioLines size={15} strokeWidth={1.8} aria-hidden="true" />
-          Agora na conversa
+          Transcrição agora
         </div>
         <p className={parcial ? styles.falaParcial : undefined}>{fala}</p>
         {falha && <small role="status">{falha}</small>}
       </section>
 
       <footer>
-        <LockKeyhole size={13} strokeWidth={1.8} aria-hidden="true" />
-        Somente você vê esta cabine
+        <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
+        Ao encerrar: resumo, decisões e próximo passo no CRM
       </footer>
     </aside>
   );
