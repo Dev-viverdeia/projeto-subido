@@ -4,24 +4,33 @@ type ProjetoDisponivel = Pick<SolucaoResumo, 'slug' | 'titulo'>;
 
 const SINAIS_PROJETO = [
   {
-    slug: 'atendimento-com-ia-no-whatsapp',
-    sinais: ['atendimento', 'whatsapp', 'suporte', 'sac', 'chat', 'mensagem'],
+    slug: 'sdr-atendimento-qualificacao',
+    sinais: [
+      'atendimento',
+      'whatsapp',
+      'suporte',
+      'sac',
+      'chat',
+      'mensagem',
+      'sdr',
+      'qualificacao',
+    ],
   },
   {
-    slug: 'qualificacao-de-leads-com-ia',
-    sinais: ['lead', 'prospeccao', 'captacao', 'qualificacao', 'sdr'],
+    slug: 'maquina-prospeccao-b2b',
+    sinais: ['lead', 'prospeccao', 'captacao', 'lista', 'decisor', 'enriquecimento'],
   },
   {
-    slug: 'crm-comercial-com-ia',
-    sinais: ['crm', 'pipeline', 'venda', 'comercial', 'follow up', 'negociacao'],
+    slug: 'inteligencia-comercial-com-ia',
+    sinais: ['reuniao', 'call', 'crm', 'pipeline', 'venda', 'comercial', 'follow up', 'negociacao'],
   },
   {
-    slug: 'maquina-de-conteudo-com-ia',
-    sinais: ['conteudo', 'marketing', 'social', 'instagram', 'campanha', 'editorial'],
+    slug: 'operacao-conteudo-multicanal',
+    sinais: ['conteudo', 'marketing', 'social', 'instagram', 'campanha', 'editorial', 'multicanal'],
   },
   {
-    slug: 'financeiro-sem-planilhas',
-    sinais: ['financeiro', 'conta', 'orcamento', 'cobranca', 'pagamento', 'nota fiscal'],
+    slug: 'radar-satisfacao-com-ia',
+    sinais: ['satisfacao', 'nps', 'csat', 'feedback', 'detrator', 'cliente insatisfeito'],
   },
 ] as const;
 

@@ -197,7 +197,7 @@ export function ProjetoGuiado({
       ) : null}
 
       <div className={styles.corpo}>
-        <main className={styles.principal}>
+        <div className={styles.principal}>
           <div className={styles.fases}>
             {faseAtiva
               ? (() => {
@@ -361,7 +361,7 @@ export function ProjetoGuiado({
           </section>
 
           {proxima ? <ProximaSolucao proxima={proxima} /> : null}
-        </main>
+        </div>
 
         <aside className={styles.lateral}>
           <RotaComercialProjeto destinoCrm={destinoCrm} destinoProposta={destinoProposta} />

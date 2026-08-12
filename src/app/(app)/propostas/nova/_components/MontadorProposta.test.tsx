@@ -62,8 +62,8 @@ describe('MontadorProposta', () => {
           projetos: [
             {
               id: '22222222-2222-4222-8222-222222222222',
-              slug: 'atendimento-com-ia-no-whatsapp',
-              titulo: 'Atendimento com IA no WhatsApp',
+              slug: 'sdr-atendimento-qualificacao',
+              titulo: 'SDR de Atendimento e Qualificação',
               resumo: 'Atendimento conectado e rastreável.',
               categoria: 'atendimento',
               publicado_em: '2026-08-01T12:00:00Z',
@@ -91,7 +91,7 @@ describe('MontadorProposta', () => {
     );
 
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
-      'projeto:atendimento-com-ia-no-whatsapp',
+      'projeto:sdr-atendimento-qualificacao',
     );
     expect(screen.getByText(/Recomendado pelo contexto da call/)).toBeVisible();
     expect(screen.getByText(/A equipe confirmou perda de contexto/)).toBeVisible();

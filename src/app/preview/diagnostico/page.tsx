@@ -151,8 +151,8 @@ const RELATORIO = RelatorioDiagnosticoSchema.parse({
       mecanismo:
         'Um fluxo curto coleta os campos mínimos, resume o caso e preserva o histórico para a pessoa responsável.',
       evidencia_base: 'A amostra registra somente o nome antes de encaminhar.',
-      projeto_slug: 'atendimento-com-ia-no-whatsapp',
-      projeto_titulo: 'Atendimento com IA no WhatsApp',
+      projeto_slug: 'sdr-atendimento-qualificacao',
+      projeto_titulo: 'SDR de Atendimento e Qualificação',
     },
     {
       titulo: 'Acompanhamento de retorno prometido',
@@ -160,8 +160,8 @@ const RELATORIO = RelatorioDiagnosticoSchema.parse({
       mecanismo:
         'Cada encaminhamento recebe responsável, prazo e alerta enquanto permanecer aberto.',
       evidencia_base: 'O retorno foi prometido sem responsável ou prazo.',
-      projeto_slug: 'crm-comercial-com-ia',
-      projeto_titulo: 'CRM Comercial com IA',
+      projeto_slug: 'inteligencia-comercial-com-ia',
+      projeto_titulo: 'Inteligência Comercial com IA',
     },
   ],
   plano_correcao: [

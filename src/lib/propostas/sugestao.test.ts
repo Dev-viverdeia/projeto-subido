@@ -2,17 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { sugerirProjetoBase } from './sugestao';
 
 const PROJETOS = [
-  { slug: 'atendimento-com-ia-no-whatsapp', titulo: 'Atendimento com IA no WhatsApp' },
-  { slug: 'qualificacao-de-leads-com-ia', titulo: 'Qualificação de Leads com IA' },
-  { slug: 'crm-comercial-com-ia', titulo: 'CRM Comercial com IA' },
-  { slug: 'maquina-de-conteudo-com-ia', titulo: 'Máquina de Conteúdo com IA' },
-  { slug: 'financeiro-sem-planilhas', titulo: 'Financeiro sem Planilhas' },
+  { slug: 'sdr-atendimento-qualificacao', titulo: 'SDR de Atendimento e Qualificação' },
+  { slug: 'maquina-prospeccao-b2b', titulo: 'Máquina de Prospecção B2B' },
+  { slug: 'inteligencia-comercial-com-ia', titulo: 'Inteligência Comercial com IA' },
+  { slug: 'operacao-conteudo-multicanal', titulo: 'Operação de Conteúdo Multicanal' },
+  { slug: 'radar-satisfacao-com-ia', titulo: 'Radar de Satisfação com IA' },
 ];
 
 describe('sugestão de Projeto para a proposta', () => {
   it('recomenda atendimento a partir do problema explícito do lead', () => {
     expect(sugerirProjetoBase('Automação do atendimento', PROJETOS)).toBe(
-      'projeto:atendimento-com-ia-no-whatsapp',
+      'projeto:sdr-atendimento-qualificacao',
     );
   });
 
@@ -21,6 +21,12 @@ describe('sugestão de Projeto para a proposta', () => {
   });
 
   it('não recomenda um Projeto indisponível', () => {
-    expect(sugerirProjetoBase('Organizar o financeiro', PROJETOS.slice(0, 2))).toBeNull();
+    expect(sugerirProjetoBase('Implantar uma pesquisa NPS', PROJETOS.slice(0, 2))).toBeNull();
+  });
+
+  it('recomenda o Radar quando a dor explícita é satisfação do cliente', () => {
+    expect(sugerirProjetoBase('Pesquisa NPS e recuperação de detratores', PROJETOS)).toBe(
+      'projeto:radar-satisfacao-com-ia',
+    );
   });
 });

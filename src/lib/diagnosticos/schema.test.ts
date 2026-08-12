@@ -62,7 +62,7 @@ describe('relatório do diagnóstico', () => {
 
   it('remove projeto que não existe no catálogo real', () => {
     const seguro = restringirProjetosDoRelatorio(RELATORIO, [
-      { slug: 'atendimento-com-ia-no-whatsapp', titulo: 'Atendimento com IA no WhatsApp' },
+      { slug: 'sdr-atendimento-qualificacao', titulo: 'SDR de Atendimento e Qualificação' },
     ]);
     expect(seguro.oportunidades[0]?.projeto_slug).toBeNull();
     expect(seguro.oportunidades[0]?.projeto_titulo).toBeNull();
