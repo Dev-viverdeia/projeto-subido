@@ -3,9 +3,12 @@ import { notFound } from 'next/navigation';
 import {
   Bot,
   BriefcaseBusiness,
+  CircleDollarSign,
   ContactRound,
   GraduationCap,
   House,
+  Layers3,
+  Radar,
   UsersRound,
 } from 'lucide-react';
 import { FormularioNovoLead } from '@/app/(app)/crm/_components/FormularioNovoLead';
@@ -123,10 +126,10 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
           <header className={pagina.topo}>
             <div className={pagina.introducao}>
               <p className={pagina.sobretitulo}>Operação comercial</p>
-              <h1>CRM conectado aos fatos</h1>
+              <h1>Pipeline comercial</h1>
               <p>
-                Organize oportunidades e transforme cada interação em contexto útil para vender e
-                entregar melhor.
+                Quatro fases para saber quem precisa de atenção agora — com todo o histórico no
+                mesmo lugar.
               </p>
             </div>
             <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
@@ -134,21 +137,30 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
 
           <section className={pagina.resumo} aria-label="Resumo do pipeline">
             <article>
+              <span className={pagina.iconeResumo}>
+                <Radar size={18} strokeWidth={1.8} aria-hidden="true" />
+              </span>
               <div>
                 <strong>3</strong>
-                <span>oportunidades abertas</span>
+                <span>abertas</span>
               </div>
             </article>
             <article>
+              <span className={pagina.iconeResumo}>
+                <CircleDollarSign size={18} strokeWidth={1.8} aria-hidden="true" />
+              </span>
               <div>
                 <strong>1</strong>
-                <span>em proposta ou negociação</span>
+                <span>em proposta</span>
               </div>
             </article>
             <article>
+              <span className={pagina.iconeResumo}>
+                <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
+              </span>
               <div>
                 <strong>0</strong>
-                <span>projetos conquistados</span>
+                <span>ganhos</span>
               </div>
             </article>
           </section>
@@ -157,7 +169,7 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
             <div className={pagina.quadroTopo}>
               <div>
                 <h2 id="preview-pipeline-titulo">Pipeline</h2>
-                <p>Use o seletor de cada card para avançar ou corrigir uma etapa.</p>
+                <p>Avance cada oportunidade quando a conversa realmente mudar de fase.</p>
               </div>
               <span>3 no total</span>
             </div>

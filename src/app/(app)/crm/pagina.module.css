@@ -83,12 +83,6 @@
   border-left: 1px solid var(--via-border-hairline);
 }
 
-.resumo article:first-child {
-  background:
-    radial-gradient(ellipse 72% 100% at 0% 0%, var(--via-navy-08), transparent 72%),
-    var(--app-elev-1-bg);
-}
-
 .iconeResumo {
   display: flex;
   align-items: center;
