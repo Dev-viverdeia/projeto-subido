@@ -22,6 +22,7 @@ import {
 } from '@/lib/progresso/local';
 import { Ferramentas, Prompts } from './KitSolucao';
 import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
+import { ArtefatosEntregaProjeto, FichaCampoProjeto } from './EscopoProjeto';
 import { ProximaSolucao } from './ProximaSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
 import { VideoConteudo } from '../../_components/VideoConteudo';
@@ -55,6 +56,9 @@ export function ProjetoGuiado({
   const porcentagem = percentual(feitas, todosIds.length);
   const destinoCrm = `/crm?novo=projeto&projeto=${encodeURIComponent(titulo)}`;
   const destinoProposta = `/propostas/nova?projeto=${encodeURIComponent(slug)}`;
+  const perfil = projeto.roteiro.perfil;
+  const escopo = projeto.roteiro.escopo;
+  const artefatosEntrega = projeto.roteiro.artefatosEntrega;
 
   const passos = projeto.roteiro.fases.flatMap((fase) =>
     fase.passos.map((passo) => ({ fase, passo, id: idPassoProjeto(slug, fase.id, passo.id) })),
@@ -175,6 +179,8 @@ export function ProjetoGuiado({
           })}
         </nav>
       </header>
+
+      {perfil && escopo ? <FichaCampoProjeto perfil={perfil} escopo={escopo} /> : null}
 
       {projeto.roteiro.fundamentos.length > 0 ? (
         <section className={styles.fundamentos} aria-labelledby="fundamentos-projeto">
@@ -354,8 +360,9 @@ export function ProjetoGuiado({
           <section className={styles.kit} aria-labelledby="kit-projeto">
             <div className={styles.kitCabecalho}>
               <p>Kit de implementação</p>
-              <h2 id="kit-projeto">Ferramentas e instruções prontas para executar</h2>
+              <h2 id="kit-projeto">Tudo que sai da implementação</h2>
             </div>
+            {artefatosEntrega ? <ArtefatosEntregaProjeto artefatos={artefatosEntrega} /> : null}
             <Ferramentas itens={ferramentas} />
             <Prompts itens={prompts} />
           </section>

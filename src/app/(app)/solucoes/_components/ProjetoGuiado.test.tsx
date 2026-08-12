@@ -12,6 +12,24 @@ const projeto: DadosRoteiroProjeto = {
   entregavelFinal: 'Operação ativa, testes, treinamento e manual de acompanhamento.',
   versao: 1,
   roteiro: {
+    perfil: {
+      nivel: 'intermediario',
+      prazo: '2 a 4 semanas',
+      formatoPiloto: 'Um processo, uma equipe e uma fonte de dados controlada.',
+      primeiraProva: 'Dez casos processados com evidência e aceite do responsável.',
+      recomendadoParaComecar: false,
+    },
+    escopo: {
+      inclui: ['Fluxo principal validado', 'Registro das decisões', 'Treinamento do responsável'],
+      preRequisitos: ['Processo atual documentado', 'Responsável disponível para validar'],
+      naoInclui: ['Decisão autônoma de alto risco', 'Expansão para todos os canais'],
+      evolucoes: ['Adicionar novos fluxos depois do piloto'],
+    },
+    artefatosEntrega: [
+      { titulo: 'Mapa do processo', descricao: 'Jornada, estados e responsáveis aprovados.' },
+      { titulo: 'Suíte de testes', descricao: 'Casos, resultado esperado, evidência e reteste.' },
+      { titulo: 'Manual da operação', descricao: 'Rotina, contingência e revisão da entrega.' },
+    ],
     fundamentos: [
       {
         titulo: 'Venda a operação',
@@ -102,6 +120,15 @@ describe('Projeto guiado', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Regras que protegem este projeto' }),
     ).toBeDefined();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'O combinado deste projeto' }),
+    ).toBeDefined();
+    expect(screen.getByText('2 a 4 semanas')).toBeDefined();
+    expect(screen.getByText('Expansão para todos os canais')).toBeDefined();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'O kit que comprova a entrega' }),
+    ).toBeDefined();
+    expect(screen.getByText('Suíte de testes')).toBeDefined();
     expect(screen.getByText('Faça nesta ordem')).toBeDefined();
     expect(screen.getByRole('button', { name: 'Copiar Planilha de demanda' })).toBeDefined();
     expect(screen.getAllByText('Próximo passo').length).toBeGreaterThan(0);

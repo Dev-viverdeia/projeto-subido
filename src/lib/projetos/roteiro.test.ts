@@ -39,6 +39,28 @@ describe('roteiro de Projeto', () => {
             'A IA responde somente a partir da base aprovada e transfere situações de risco.',
         },
       ],
+      perfil: {
+        nivel: 'entrada',
+        prazo: '5 a 10 dias úteis',
+        formatoPiloto: 'Um gatilho, um canal e uma equipe responsável pela recuperação.',
+        primeiraProva: 'Trinta respostas processadas com alertas rastreáveis e relatório revisado.',
+        recomendadoParaComecar: true,
+      },
+      escopo: {
+        inclui: [
+          'Coleta após um evento definido',
+          'Classificação com evidência',
+          'Alerta com dono',
+        ],
+        preRequisitos: ['Base de clientes autorizada', 'Pessoa responsável pela recuperação'],
+        naoInclui: ['Disparo sem consentimento', 'Resposta autônoma ao cliente'],
+        evolucoes: ['Adicionar novos momentos da jornada'],
+      },
+      artefatosEntrega: [
+        { titulo: 'Mapa', descricao: 'Gatilhos, perguntas, canais e responsáveis aprovados.' },
+        { titulo: 'Matriz', descricao: 'Temas, urgência, evidência e regras de alerta.' },
+        { titulo: 'Manual', descricao: 'Rotina, contingência e revisão da operação.' },
+      ],
     });
     Object.assign(valor.fases[0]!.passos[0]!, {
       duracao: '45–60 min',
@@ -53,6 +75,9 @@ describe('roteiro de Projeto', () => {
 
     const roteiro = lerRoteiroProjeto(valor);
     expect(roteiro?.fundamentos).toHaveLength(1);
+    expect(roteiro?.perfil?.recomendadoParaComecar).toBe(true);
+    expect(roteiro?.escopo?.naoInclui).toHaveLength(2);
+    expect(roteiro?.artefatosEntrega).toHaveLength(3);
     expect(roteiro?.fases[0]?.passos[0]?.execucao).toHaveLength(1);
     expect(roteiro?.fases[1]?.passos[0]?.execucao).toEqual([]);
   });

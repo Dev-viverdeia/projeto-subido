@@ -13,6 +13,11 @@ import {
 import styles from './CatalogoProjetos.module.css';
 
 const FASES = ['Entender', 'Preparar', 'Construir', 'Validar', 'Entregar'];
+const ROTULO_NIVEL = {
+  entrada: 'Entrada',
+  intermediario: 'Intermediário',
+  avancado: 'Avançado',
+} as const;
 
 /**
  * A biblioteca não é mais um marketplace de dezenas de soluções. São cinco
@@ -118,6 +123,7 @@ export function CatalogoProjetos({
           const feitas = contarEtapasFeitas(progresso, solucao.etapaIds);
           const estado = estadoDoProgresso(feitas, total);
           const projeto = solucao.projeto;
+          const perfil = projeto?.roteiro.perfil;
           const andamento = estado === 'em-andamento' || estado === 'concluida';
 
           return (
@@ -126,11 +132,15 @@ export function CatalogoProjetos({
                 href={`/solucoes/${solucao.slug}`}
                 className={styles.cartao}
                 data-estado={andamento ? estado : undefined}
+                data-recomendado={perfil?.recomendadoParaComecar || undefined}
                 data-indice={String(indice + 1).padStart(2, '0')}
               >
                 <div className={styles.cartaoTopo}>
                   <span className={styles.indice}>{String(indice + 1).padStart(2, '0')}</span>
                   <span className={styles.categoria}>{solucao.categoria}</span>
+                  {perfil?.recomendadoParaComecar ? (
+                    <span className={styles.recomendado}>Comece por aqui</span>
+                  ) : null}
                   {andamento ? (
                     <span className={styles.estado}>
                       {estado === 'concluida' ? 'Concluído' : `${feitas}/${total}`}
@@ -171,9 +181,9 @@ export function CatalogoProjetos({
 
                 <footer className={styles.rodape}>
                   <div className={styles.fatos}>
-                    <span>5 fases</span>
+                    {perfil ? <span>{perfil.prazo}</span> : <span>5 fases</span>}
+                    {perfil ? <span>{ROTULO_NIVEL[perfil.nivel]}</span> : null}
                     <span>{total} passos</span>
-                    <span>{solucao.ferramentas.length} ferramentas</span>
                   </div>
                   <span className={styles.abrir}>
                     {estado === 'concluida'

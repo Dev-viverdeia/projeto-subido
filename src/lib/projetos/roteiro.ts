@@ -12,6 +12,26 @@ const ModeloPronto = z.object({
   conteudo: z.string().min(20).max(6000),
 });
 
+const PerfilProjeto = z.object({
+  nivel: z.enum(['entrada', 'intermediario', 'avancado']),
+  prazo: z.string().min(3).max(80),
+  formatoPiloto: z.string().min(12).max(240),
+  primeiraProva: z.string().min(20).max(500),
+  recomendadoParaComecar: z.boolean().default(false),
+});
+
+const EscopoProjeto = z.object({
+  inclui: z.array(z.string().min(8).max(240)).min(3).max(6),
+  preRequisitos: z.array(z.string().min(8).max(240)).min(2).max(6),
+  naoInclui: z.array(z.string().min(8).max(240)).min(2).max(6),
+  evolucoes: z.array(z.string().min(8).max(240)).min(1).max(5),
+});
+
+const ArtefatoEntrega = z.object({
+  titulo: z.string().min(3).max(100),
+  descricao: z.string().min(12).max(300),
+});
+
 const Passo = z.object({
   id: z.string().min(2).max(80),
   titulo: z.string().min(3).max(140),
@@ -35,6 +55,9 @@ const Fase = z.object({
 export const RoteiroProjetoSchema = z
   .object({
     fundamentos: z.array(Fundamento).max(4).default([]),
+    perfil: PerfilProjeto.optional(),
+    escopo: EscopoProjeto.optional(),
+    artefatosEntrega: z.array(ArtefatoEntrega).min(3).max(6).optional(),
     fases: z.array(Fase).length(5),
   })
   .superRefine(({ fases }, contexto) => {

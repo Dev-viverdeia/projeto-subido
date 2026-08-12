@@ -407,6 +407,15 @@
   color: var(--via-text-muted);
 }
 
+.recomendado {
+  margin-left: auto;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-accent-ink);
+}
+
 .estado {
   margin-left: auto;
   padding: 4px 9px;
@@ -414,6 +423,10 @@
   background: var(--via-navy-06);
   font-size: 0.625rem;
   color: var(--via-text-muted);
+}
+
+.recomendado + .estado {
+  margin-left: 0;
 }
 
 .cartaoCorpo {
