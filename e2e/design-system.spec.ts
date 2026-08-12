@@ -4,7 +4,7 @@ import { CST } from '../src/lib/brand';
 const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
-  ['/preview/mapa-jornada', 'Dê três coordenadas'],
+  ['/preview/mapa-jornada', 'Defina o foco da sua primeira oferta'],
   ['/preview/crm', 'CRM conectado aos fatos'],
   ['/preview/calls', 'Cada reunião vira contexto no CRM'],
   ['/preview/crm-dossie', 'O que aconteceu e o que vem agora'],
@@ -38,7 +38,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o lockup oficial identifica a entrada', async ({ page }) => {
     await page.goto('/entrar');
-    await expect(page.getByRole('img', { name: 'Viver de IA Subido' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Subido' })).toBeVisible();
   });
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {

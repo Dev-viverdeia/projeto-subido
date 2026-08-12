@@ -1,6 +1,9 @@
 .pagina {
   width: min(100%, var(--app-canvas));
   margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-8);
 }
 
 .voltar {
@@ -8,8 +11,13 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  margin-bottom: var(--via-space-5);
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   text-decoration: none;
+}
+
+@media (max-width: 767px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
 }

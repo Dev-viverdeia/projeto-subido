@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-7);
+  gap: var(--app-gap-section);
 }
 
 .voltar {
@@ -288,6 +288,10 @@
 }
 
 @media (max-width: 767px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
   .etapa {
     grid-template-columns: 1fr;
   }

@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-6);
+  gap: var(--app-gap-section);
 }
 
 .hero {
@@ -390,7 +390,7 @@
 
 @media (max-width: 599px) {
   .pagina {
-    gap: var(--via-space-5);
+    gap: var(--app-gap-block);
   }
 
   .hero {

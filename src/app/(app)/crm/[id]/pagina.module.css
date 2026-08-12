@@ -4,7 +4,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-6);
+  gap: var(--app-gap-section);
 }
 
 .voltar {
@@ -1156,6 +1156,10 @@
 }
 
 @media (max-width: 768px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
   .operacaoTopo {
     align-items: flex-start;
     flex-direction: column;

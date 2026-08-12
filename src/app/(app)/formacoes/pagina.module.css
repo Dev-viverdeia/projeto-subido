@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--app-gap-section);
 }
 
 .apresentacao {
@@ -71,6 +71,10 @@
 }
 
 @media (max-width: 767px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
   .apresentacao {
     align-items: flex-start;
     padding: var(--via-space-1) 0 var(--via-space-4);

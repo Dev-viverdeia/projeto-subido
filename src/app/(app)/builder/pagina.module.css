@@ -6,7 +6,13 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-8);
+  gap: var(--app-gap-section);
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
 }
 
 /* O CANTO do histórico. Altura ZERO de propósito: o gatilho flutua no canto sem

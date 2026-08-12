@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--via-space-8);
 }
 
 .navegacao {
@@ -1318,6 +1318,10 @@
 }
 
 @media (max-width: 767px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
   .navegacao {
     align-items: flex-start;
     flex-direction: column;

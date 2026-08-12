@@ -7,7 +7,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--app-gap-section);
 }
 
 /* Mesma anatomia do header da conversa do Consultor: voltar ao lado do bloco
@@ -177,6 +177,10 @@
 
 /* Abaixo de 900 o contexto desce para uma segunda linha do header. */
 @media (max-width: 899px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
   .cabecalho {
     flex-wrap: wrap;
   }

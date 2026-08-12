@@ -6,5 +6,11 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(48px, 7vw, 88px);
+  gap: clamp(var(--app-gap-section), 4vw, var(--via-space-12));
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
 }
