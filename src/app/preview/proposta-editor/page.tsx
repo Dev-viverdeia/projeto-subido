@@ -93,7 +93,7 @@ export default function PreviewEditorPropostaPage() {
           id="11111111-1111-4111-8111-111111111111"
           tituloInicial="Automação do atendimento da Clínica Aurora"
           documentoInicial={DOCUMENTO}
-          statusInicial="rascunho"
+          statusInicial="apresentada"
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
           execucaoId={null}

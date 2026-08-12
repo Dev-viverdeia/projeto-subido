@@ -7,13 +7,24 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   Check,
+  CircleAlert,
   ContactRound,
   DraftingCompass,
+  Video,
 } from 'lucide-react';
 import { criarProposta } from '@/lib/propostas/actions';
 import type { OpcoesNovaProposta } from '@/lib/propostas/queries';
 import { sugerirProjetoBase } from '@/lib/propostas/sugestao';
 import styles from '../pagina.module.css';
+
+export type ContextoCallNovaProposta = {
+  titulo: string;
+  resumo: string;
+  decisoes: number;
+  compromissos: number;
+  pontosAValidar: number;
+  oportunidadesProjeto: string[];
+};
 
 export function MontadorProposta({
   opcoes,
@@ -21,6 +32,7 @@ export function MontadorProposta({
   origemInicial,
   reuniaoInicial,
   diagnosticoInicial,
+  contextoCall,
   erro,
 }: {
   opcoes: OpcoesNovaProposta;
@@ -28,6 +40,7 @@ export function MontadorProposta({
   origemInicial: string;
   reuniaoInicial: string;
   diagnosticoInicial: string;
+  contextoCall?: ContextoCallNovaProposta | null;
   erro: boolean;
 }) {
   const [passo, setPasso] = useState(oportunidadeInicial ? 2 : 1);
@@ -38,9 +51,16 @@ export function MontadorProposta({
     () => opcoes.oportunidades.find((item) => item.id === oportunidade) ?? null,
     [opcoes.oportunidades, oportunidade],
   );
+  const contextoCallAtivo = oportunidade === oportunidadeInicial ? contextoCall : null;
   const origemSugerida = useMemo(
-    () => (leadEscolhido ? sugerirProjetoBase(leadEscolhido.titulo, opcoes.projetos) : null),
-    [leadEscolhido, opcoes.projetos],
+    () =>
+      leadEscolhido
+        ? sugerirProjetoBase(
+            [leadEscolhido.titulo, ...(contextoCallAtivo?.oportunidadesProjeto ?? [])].join(' '),
+            opcoes.projetos,
+          )
+        : null,
+    [contextoCallAtivo?.oportunidadesProjeto, leadEscolhido, opcoes.projetos],
   );
   const origemSelecionada = origem || origemSugerida || '';
   const projetoSugerido = origemSugerida
@@ -53,24 +73,22 @@ export function MontadorProposta({
       <input type="hidden" name="diagnostico" value={diagnosticoInicial} />
 
       <ol className={styles.progresso} aria-label="Etapas para montar a proposta">
-        {['Contexto comercial', 'Estrutura de entrega', 'Revisar documento'].map(
-          (rotulo, indice) => {
-            const numero = indice + 1;
-            const concluido = numero < passo;
-            const ativo = numero === passo;
+        {['Contexto comercial', 'Projeto-base'].map((rotulo, indice) => {
+          const numero = indice + 1;
+          const concluido = numero < passo;
+          const ativo = numero === passo;
 
-            return (
-              <li
-                key={rotulo}
-                data-ativo={ativo || undefined}
-                data-concluido={concluido || undefined}
-              >
-                <span>{concluido ? <Check size={13} strokeWidth={2.6} /> : numero}</span>
-                <strong>{rotulo}</strong>
-              </li>
-            );
-          },
-        )}
+          return (
+            <li
+              key={rotulo}
+              data-ativo={ativo || undefined}
+              data-concluido={concluido || undefined}
+            >
+              <span>{concluido ? <Check size={13} strokeWidth={2.6} /> : numero}</span>
+              <strong>{rotulo}</strong>
+            </li>
+          );
+        })}
       </ol>
 
       {erro && (
@@ -100,7 +118,10 @@ export function MontadorProposta({
               <select
                 name="oportunidade"
                 value={oportunidade}
-                onChange={(evento) => setOportunidade(evento.target.value)}
+                onChange={(evento) => {
+                  setOportunidade(evento.target.value);
+                  setOrigem('');
+                }}
                 required
               >
                 <option value="" disabled>
@@ -134,13 +155,48 @@ export function MontadorProposta({
           02
         </span>
         <div className={styles.etapaCorpo}>
-          {leadEscolhido && (
+          {leadEscolhido && contextoCallAtivo ? (
+            <article className={styles.contextoCall} aria-label="Contexto aproveitado da call">
+              <header>
+                <span className={styles.iconeContexto}>
+                  <Video size={18} strokeWidth={1.7} aria-hidden="true" />
+                </span>
+                <div>
+                  <p>Contexto pronto</p>
+                  <strong>{leadEscolhido.empresa}</strong>
+                  <small>{contextoCallAtivo.titulo}</small>
+                </div>
+                <span className={styles.confirmado}>
+                  <Check size={13} strokeWidth={2.4} aria-hidden="true" /> Análise concluída
+                </span>
+              </header>
+              <p className={styles.resumoCall}>{contextoCallAtivo.resumo}</p>
+              <dl>
+                <div>
+                  <dt>{contextoCallAtivo.decisoes}</dt>
+                  <dd>decisões</dd>
+                </div>
+                <div>
+                  <dt>{contextoCallAtivo.compromissos}</dt>
+                  <dd>combinados</dd>
+                </div>
+                <div>
+                  <dt>{contextoCallAtivo.pontosAValidar}</dt>
+                  <dd>pontos a validar</dd>
+                </div>
+              </dl>
+              <footer>
+                <CircleAlert size={15} strokeWidth={1.8} aria-hidden="true" />O rascunho usa somente
+                fatos confirmados e separa o que ainda precisa de validação.
+              </footer>
+            </article>
+          ) : leadEscolhido ? (
             <div className={styles.contextoEscolhido}>
               <span>Contexto selecionado</span>
               <strong>{leadEscolhido.empresa}</strong>
               <small>{leadEscolhido.titulo}</small>
             </div>
-          )}
+          ) : null}
 
           <div className={styles.etapaTitulo}>
             <span>
@@ -186,7 +242,7 @@ export function MontadorProposta({
             {projetoSugerido && !origem ? (
               <small className={styles.recomendacao}>
                 <Check size={13} strokeWidth={2.2} aria-hidden="true" /> Recomendado pelo contexto
-                do lead. Você pode trocar antes de montar.
+                {contextoCallAtivo ? ' da call' : ' do lead'}. Você pode trocar antes de criar.
               </small>
             ) : (
               <small>Escopo, entregáveis e cronograma serão preenchidos para você revisar.</small>
@@ -210,7 +266,7 @@ export function MontadorProposta({
           <strong>
             {passo === 1
               ? 'Escolha o contexto que alimentará a proposta'
-              : 'O próximo passo é revisar cada palavra'}
+              : 'O próximo passo é revisar o rascunho'}
           </strong>
         </div>
         <div className={styles.rodapeAcoes}>
@@ -230,7 +286,7 @@ export function MontadorProposta({
             </button>
           ) : (
             <button type="submit" className={styles.continuar} disabled={!origemSelecionada}>
-              Montar proposta <ArrowRight size={17} aria-hidden="true" />
+              Criar rascunho para revisar <ArrowRight size={17} aria-hidden="true" />
             </button>
           )}
         </div>

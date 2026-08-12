@@ -23,8 +23,11 @@ export type OrigemProposta = OrigemCatalogo | OrigemEstudio | OrigemSemBase;
 export type ContextoPosCallProposta = {
   resumo: string;
   dores: string[];
+  objecoes: string[];
   decisoes: string[];
   compromissos: string[];
+  proximosPassos: string[];
+  lacunas: string[];
 };
 
 export type ContextoDiagnosticoProposta = {
@@ -177,10 +180,18 @@ export function montarDocumentoInicial(
     `A ${lead.empresa.nome} busca avançar em ${lead.oportunidade.titulo.toLowerCase()}, com um processo claro, mensurável e seguro.`;
   const objetivo = oportunidade?.impacto ?? base.objetivo;
   const confirmacoes = posCall ? unicos([...posCall.decisoes, ...posCall.compromissos], 5) : [];
+  const pontosAValidar = posCall ? unicos([...posCall.objecoes, ...posCall.lacunas], 5) : [];
+  const combinadosPosCall = posCall ? unicos(posCall.proximosPassos, 4) : [];
   const planoDiagnostico = diagnostico ? unicos(diagnostico.plano, 4) : [];
   const observacoes = [
     confirmacoes.length
       ? `Pontos confirmados na reunião:\n${confirmacoes.map((item) => `• ${item}`).join('\n')}`
+      : null,
+    pontosAValidar.length
+      ? `Pontos a validar antes do início:\n${pontosAValidar.map((item) => `• ${item}`).join('\n')}`
+      : null,
+    combinadosPosCall.length
+      ? `Próximos passos acordados na reunião:\n${combinadosPosCall.map((item) => `• ${item}`).join('\n')}`
       : null,
     planoDiagnostico.length
       ? `Ações indicadas pelo diagnóstico para validação:\n${planoDiagnostico.map((item) => `• ${item}`).join('\n')}`

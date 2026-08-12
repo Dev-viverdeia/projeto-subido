@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { obterPosCall } from '@/lib/calls/queries';
 import { listarOpcoesNovaProposta } from '@/lib/propostas/queries';
 import { MontadorProposta } from './_components/MontadorProposta';
 import styles from './pagina.module.css';
@@ -8,7 +9,7 @@ import styles from './pagina.module.css';
 export const metadata: Metadata = { title: 'Nova proposta comercial' };
 
 export default async function NovaPropostaPage({ searchParams }: PageProps<'/propostas/nova'>) {
-  const [opcoes, parametros] = await Promise.all([listarOpcoesNovaProposta(), searchParams]);
+  const parametros = await searchParams;
   const oportunidadeInicial =
     typeof parametros.oportunidade === 'string' ? parametros.oportunidade : '';
   const origemInicial =
@@ -21,6 +22,28 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
   const diagnosticoInicial =
     typeof parametros.diagnostico === 'string' ? parametros.diagnostico : '';
   const erro = typeof parametros.erro === 'string' ? parametros.erro : null;
+  const [opcoes, posCall] = await Promise.all([
+    listarOpcoesNovaProposta(),
+    reuniaoInicial ? obterPosCall(reuniaoInicial) : Promise.resolve(null),
+  ]);
+  const analise =
+    posCall?.oportunidade.id === oportunidadeInicial &&
+    posCall.analise?.status === 'concluida' &&
+    posCall.analise.resumo
+      ? posCall.analise
+      : null;
+  const contextoCall =
+    posCall && analise
+      ? {
+          titulo: posCall.reuniao.titulo,
+          resumo: analise.resumo ?? '',
+          decisoes: analise.decisoes.length,
+          compromissos: analise.compromissos.length,
+          pontosAValidar: new Set([...analise.objecoes, ...analise.lacunas]).size,
+          oportunidadesProjeto: analise.oportunidadesProjeto,
+        }
+      : null;
+  const veioDaCall = Boolean(contextoCall);
 
   return (
     <div className={styles.pagina}>
@@ -31,12 +54,19 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
 
       <header className={styles.hero}>
         <div>
-          <p className={styles.sobretitulo}>Novo documento</p>
-          <h1>Conecte o contexto ao que você vai entregar.</h1>
+          <p className={styles.sobretitulo}>
+            {veioDaCall ? 'Da call para a proposta' : 'Novo documento'}
+          </p>
+          <h1>
+            {veioDaCall
+              ? 'A conversa já preparou o primeiro rascunho.'
+              : 'Conecte o contexto ao que você vai entregar.'}
+          </h1>
         </div>
         <p>
-          A plataforma usa os fatos do CRM e a estrutura do Projeto para preparar o primeiro
-          rascunho. Você continua no controle de cada palavra.
+          {veioDaCall
+            ? 'Cliente, fatos confirmados e pontos a validar já estão conectados. Escolha a estrutura da entrega e revise o documento.'
+            : 'A plataforma usa os fatos do CRM e a estrutura do Projeto para preparar o primeiro rascunho. Você continua no controle de cada palavra.'}
         </p>
       </header>
 
@@ -46,6 +76,7 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
         origemInicial={origemInicial}
         reuniaoInicial={reuniaoInicial}
         diagnosticoInicial={diagnosticoInicial}
+        contextoCall={contextoCall}
         erro={Boolean(erro)}
       />
     </div>

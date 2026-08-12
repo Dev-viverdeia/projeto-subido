@@ -108,8 +108,11 @@ export async function criarProposta(formData: FormData): Promise<void> {
       ? {
           resumo: posCall.analise.resumo,
           dores: posCall.analise.dores,
+          objecoes: posCall.analise.objecoes,
           decisoes: posCall.analise.decisoes,
           compromissos: posCall.analise.compromissos,
+          proximosPassos: posCall.analise.proximosPassos,
+          lacunas: posCall.analise.lacunas,
         }
       : null;
   const contextoDiagnostico =

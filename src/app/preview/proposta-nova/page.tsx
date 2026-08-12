@@ -80,20 +80,29 @@ export default function PreviewNovaPropostaPage() {
         <div className={pagina.pagina}>
           <header className={pagina.hero}>
             <div>
-              <p className={pagina.sobretitulo}>Novo documento</p>
-              <h1>Conecte o contexto ao que você vai entregar.</h1>
+              <p className={pagina.sobretitulo}>Da call para a proposta</p>
+              <h1>A conversa já preparou o primeiro rascunho.</h1>
             </div>
             <p>
-              A plataforma usa os fatos do CRM e a estrutura do Projeto para preparar o primeiro
-              rascunho. Você continua no controle de cada palavra.
+              Cliente, fatos confirmados e pontos a validar já estão conectados. Escolha a estrutura
+              da entrega e revise o documento.
             </p>
           </header>
           <MontadorProposta
             opcoes={OPCOES}
-            oportunidadeInicial=""
+            oportunidadeInicial="11111111-1111-4111-8111-111111111111"
             origemInicial=""
             reuniaoInicial="55555555-5555-4555-8555-555555555555"
             diagnosticoInicial=""
+            contextoCall={{
+              titulo: 'Descoberta comercial · Clínica Aurora',
+              resumo:
+                'A recepção confirmou perda de contexto nas trocas de turno e demora para responder novos contatos fora do horário comercial.',
+              decisoes: 2,
+              compromissos: 1,
+              pontosAValidar: 2,
+              oportunidadesProjeto: ['Atendimento inteligente no WhatsApp'],
+            }}
             erro={false}
           />
         </div>

@@ -150,14 +150,20 @@ describe('montagem inicial da proposta', () => {
       {
         resumo: 'A recepção confirmou perda de contexto e demora na primeira resposta.',
         dores: ['Mensagens ficam sem responsável durante a troca de turno.'],
+        objecoes: ['A equipe ainda precisa validar o uso durante o plantão.'],
         decisoes: ['O piloto ficará restrito a uma unidade.'],
         compromissos: ['Marina enviará uma amostra anonimizada das conversas.'],
+        proximosPassos: ['Validar a amostra com a supervisora da recepção.'],
+        lacunas: ['Quem aprova a entrada em produção?'],
       },
     );
 
     expect(documento.desafio).toContain('perda de contexto');
     expect(documento.desafio).not.toContain('Dores explicitadas');
     expect(documento.observacoes).toContain('O piloto ficará restrito');
+    expect(documento.observacoes).toContain('Pontos a validar antes do início');
+    expect(documento.observacoes).toContain('Quem aprova a entrada em produção');
+    expect(documento.observacoes).toContain('Próximos passos acordados');
     expect(documento.objetivo).not.toContain('promessa');
   });
 

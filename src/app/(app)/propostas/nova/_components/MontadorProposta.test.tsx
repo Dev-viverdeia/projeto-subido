@@ -34,6 +34,7 @@ describe('MontadorProposta', () => {
         origemInicial=""
         reuniaoInicial=""
         diagnosticoInicial=""
+        contextoCall={null}
         erro={false}
       />,
     );
@@ -50,7 +51,7 @@ describe('MontadorProposta', () => {
 
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toBeInTheDocument();
     expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Montar proposta/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Criar rascunho para revisar/ })).toBeDisabled();
   });
 
   it('recomenda o Projeto compatível quando a oportunidade já vem da call', () => {
@@ -77,6 +78,14 @@ describe('MontadorProposta', () => {
         origemInicial=""
         reuniaoInicial="33333333-3333-4333-8333-333333333333"
         diagnosticoInicial=""
+        contextoCall={{
+          titulo: 'Descoberta · Clínica Aurora',
+          resumo: 'A equipe confirmou perda de contexto na troca de turno.',
+          decisoes: 2,
+          compromissos: 1,
+          pontosAValidar: 2,
+          oportunidadesProjeto: ['Atendimento assistido por IA no WhatsApp'],
+        }}
         erro={false}
       />,
     );
@@ -84,7 +93,9 @@ describe('MontadorProposta', () => {
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
       'projeto:atendimento-com-ia-no-whatsapp',
     );
-    expect(screen.getByText(/Recomendado pelo contexto do lead/)).toBeVisible();
-    expect(screen.getByRole('button', { name: /Montar proposta/ })).toBeEnabled();
+    expect(screen.getByText(/Recomendado pelo contexto da call/)).toBeVisible();
+    expect(screen.getByText(/A equipe confirmou perda de contexto/)).toBeVisible();
+    expect(screen.getAllByText('2', { selector: 'dt' })).toHaveLength(2);
+    expect(screen.getByRole('button', { name: /Criar rascunho para revisar/ })).toBeEnabled();
   });
 });

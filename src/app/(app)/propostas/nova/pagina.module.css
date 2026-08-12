@@ -69,7 +69,7 @@
 
 .progresso {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--via-space-3);
   margin: 0;
   padding: var(--via-space-5) clamp(24px, 5vw, 48px);
@@ -280,8 +280,9 @@
   gap: 2px var(--via-space-3);
   margin-bottom: var(--via-space-5);
   padding: var(--via-space-3) var(--via-space-4);
-  border-left: 2px solid var(--via-accent);
-  background: var(--via-bg-2);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
 }
 
 .contextoEscolhido > span {
@@ -298,6 +299,122 @@
 
 .contextoEscolhido small {
   color: var(--via-text-muted);
+}
+
+.contextoCall {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  margin-bottom: var(--via-space-7);
+  padding: var(--via-space-5);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--via-bg-2);
+}
+
+.contextoCall header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.iconeContexto {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-navy);
+}
+
+.contextoCall header > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contextoCall header p {
+  margin: 0;
+  color: var(--via-accent-ink);
+  font: var(--via-fs-micro) var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.contextoCall header strong,
+.contextoCall header small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contextoCall header small {
+  color: var(--via-text-muted);
+}
+
+.confirmado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.resumoCall {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}
+
+.contextoCall dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--via-border-hairline);
+}
+
+.contextoCall dl > div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) 0;
+}
+
+.contextoCall dl > div + div {
+  padding-left: var(--via-space-4);
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.contextoCall dt {
+  color: var(--via-navy);
+  font: var(--via-fs-h4) var(--via-font-mono);
+}
+
+.contextoCall dd {
+  margin: 0;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.contextoCall footer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-2);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+}
+
+.contextoCall footer svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
 }
 
 .semOpcao {
@@ -446,6 +563,28 @@
 
   .contextoEscolhido > span {
     grid-row: auto;
+  }
+
+  .contextoCall {
+    padding: var(--via-space-4);
+  }
+
+  .contextoCall header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .confirmado {
+    grid-column: 2;
+  }
+
+  .contextoCall dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contextoCall dl > div + div {
+    padding-left: 0;
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
   }
 
   .rodape {

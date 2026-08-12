@@ -474,6 +474,13 @@
   gap: var(--via-space-2);
 }
 
+.automacaoEntrega {
+  margin: 0 0 var(--via-space-2);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+}
+
 .controlesDecisao {
   width: 100%;
   display: flex;
@@ -486,8 +493,8 @@
   color: white;
 }
 .acoesStatus .avancar {
-  border-color: var(--via-accent);
-  background: var(--via-accent);
+  border-color: var(--via-white);
+  background: var(--via-white);
   color: var(--via-navy-deep);
 }
 
