@@ -17,6 +17,8 @@ import {
   Video,
 } from 'lucide-react';
 import { FormularioEnriquecimento } from '@/app/(app)/crm/[id]/_components/FormularioEnriquecimento';
+import { AtalhoDiagnostico } from '@/app/(app)/crm/[id]/_components/AtalhoDiagnostico';
+import { AtalhoProposta } from '@/app/(app)/crm/[id]/_components/AtalhoProposta';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
@@ -184,7 +186,8 @@ export default async function PreviewDossiePage({
                 <p>Automação do atendimento</p>
               </div>
               <div className={pagina.heroAcoes}>
-                <span className={pagina.etapa}>Descoberta</span>
+                <AtalhoDiagnostico oportunidadeId={LEAD_OPERACIONAL.oportunidade.id} />
+                <AtalhoProposta lead={LEAD_OPERACIONAL} />
                 <FormularioEnriquecimento
                   oportunidadeId="11111111-1111-4111-8111-111111111111"
                   dominioInicial="clinicaaurora.com.br"
@@ -195,27 +198,11 @@ export default async function PreviewDossiePage({
               </div>
             </div>
 
-            <div className={pagina.sinais}>
-              <div className={pagina.fonteSinal}>
-                <Database size={17} aria-hidden="true" />
-                <span>Histórico CRM</span>
-                <strong>8 fatos</strong>
-              </div>
-              <span className={pagina.linhaSinal} />
-              <div className={pagina.fonteSinal}>
-                <Globe2 size={17} aria-hidden="true" />
-                <span>Presença pública</span>
-                <strong>clinicaaurora.com.br</strong>
-              </div>
-              <span className={pagina.linhaSinal} />
-              <div className={`${pagina.fonteSinal} ${pagina.leituraSinal}`}>
-                <Layers3 size={17} aria-hidden="true" />
-                <span>Leitura IA</span>
-                <strong>dossiê pronto</strong>
-              </div>
-            </div>
-
-            <div className={pagina.heroMeta}>
+            <div className={pagina.heroMeta} aria-label="Contexto principal do lead">
+              <span className={pagina.etapa}>
+                <small>Etapa</small>
+                <strong>Em conversa</strong>
+              </span>
               <span>
                 <ContactRound size={14} aria-hidden="true" /> Camila Rios
               </span>
@@ -225,6 +212,24 @@ export default async function PreviewDossiePage({
               <span>
                 <MapPin size={14} aria-hidden="true" /> São Paulo · SP
               </span>
+            </div>
+
+            <div className={pagina.sinais}>
+              <div className={pagina.fonteSinal}>
+                <Database size={17} aria-hidden="true" />
+                <span>CRM</span>
+                <strong>8 fatos</strong>
+              </div>
+              <div className={pagina.fonteSinal}>
+                <Globe2 size={17} aria-hidden="true" />
+                <span>Site público</span>
+                <strong>clinicaaurora.com.br</strong>
+              </div>
+              <div className={`${pagina.fonteSinal} ${pagina.leituraSinal}`}>
+                <Layers3 size={17} aria-hidden="true" />
+                <span>Leitura IA</span>
+                <strong>dossiê pronto</strong>
+              </div>
             </div>
           </section>
 

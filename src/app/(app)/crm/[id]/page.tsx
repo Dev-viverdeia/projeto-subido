@@ -8,28 +8,23 @@ import {
   Building2,
   Check,
   CircleHelp,
-  ContactRound,
   Database,
   ExternalLink,
   Globe2,
   Lightbulb,
   Mail,
-  MapPin,
   MessageSquareQuote,
   Phone,
   Radar,
   Layers3,
   Target,
-  Video,
 } from 'lucide-react';
 import { aplicarProximaAcao } from '@/lib/crm/actions';
 import { ROTULO_CONFIANCA, ROTULO_ORIGEM } from '@/lib/crm/enriquecimento';
-import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { obterDossieLead } from '@/lib/crm/queries';
+import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
-import { AtalhoDiagnostico } from './_components/AtalhoDiagnostico';
-import { AtalhoProposta } from './_components/AtalhoProposta';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import { dataCompleta } from './datas';
 import styles from './pagina.module.css';
@@ -49,7 +44,6 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
     (execucao) => execucao.status === 'concluido' && execucao.dossie,
   );
   const dossie = execucaoPronta?.dossie ?? null;
-  const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
 
   return (
     <div className={styles.pagina}>
@@ -58,67 +52,11 @@ export default async function DossieLeadPage({ params }: PageProps<'/crm/[id]'>)
         Voltar ao pipeline
       </Link>
 
-      <section className={styles.hero} data-on-dark aria-labelledby="dossie-titulo">
-        <div className={styles.heroTopo}>
-          <div className={styles.identidade}>
-            <p className={styles.sobretitulo}>Dossiê comercial</p>
-            <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
-            <p>{lead.oportunidade.titulo}</p>
-          </div>
-
-          <div className={styles.heroAcoes}>
-            <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />
-            <AtalhoProposta lead={lead} />
-            <span className={styles.etapa}>{ROTULO_ETAPA[lead.oportunidade.etapa]}</span>
-            {!emAndamento && (
-              <FormularioEnriquecimento
-                oportunidadeId={lead.oportunidade.id}
-                dominioInicial={lead.empresa.dominio}
-                linkedinInicial={lead.contato?.linkedinUrl ?? null}
-                temDossie={Boolean(dossie)}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className={styles.sinais} aria-label="Sinais que alimentam o dossiê">
-          <div className={styles.fonteSinal}>
-            <Database size={17} strokeWidth={1.7} aria-hidden="true" />
-            <span>Histórico CRM</span>
-            <strong>{lead.eventos.length} fatos</strong>
-          </div>
-          <span className={styles.linhaSinal} aria-hidden="true" />
-          <div className={styles.fonteSinal}>
-            <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
-            <span>Presença pública</span>
-            <strong>{lead.empresa.dominio ?? 'a informar'}</strong>
-          </div>
-          <span className={styles.linhaSinal} aria-hidden="true" />
-          <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
-            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>Leitura IA</span>
-            <strong>
-              {emAndamento ? 'analisando' : dossie ? 'dossiê pronto' : 'não iniciada'}
-            </strong>
-          </div>
-        </div>
-
-        <div className={styles.heroMeta}>
-          <span>
-            <ContactRound size={14} aria-hidden="true" />
-            {lead.contato?.nome ?? 'Contato não informado'}
-          </span>
-          <span>
-            <Video size={14} aria-hidden="true" />
-            {lead.totalCalls} {lead.totalCalls === 1 ? 'call' : 'calls'}
-          </span>
-          {local && (
-            <span>
-              <MapPin size={14} aria-hidden="true" /> {local}
-            </span>
-          )}
-        </div>
-      </section>
+      <CabecalhoDossie
+        lead={lead}
+        enriquecimentoEmAndamento={Boolean(emAndamento)}
+        temDossie={Boolean(dossie)}
+      />
 
       <ResumoOperacionalLead lead={lead} />
 

@@ -43,9 +43,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.operacaoTopo}>
         <div>
-          <p className={styles.sobretitulo}>Contexto vivo</p>
-          <h2 id="operacao-titulo">O que aconteceu e o que vem agora</h2>
-          <p>Fatos, calls e próxima ação no mesmo lugar — sem reconstruir a história do lead.</p>
+          <p className={styles.sobretitulo}>Decisão atual</p>
+          <h2 id="operacao-titulo">Próximo passo e histórico</h2>
+          <p>O que fazer agora, o que já aconteceu e quais conversas estão ligadas ao lead.</p>
         </div>
         <Link
           href={`/calls?nova=1&oportunidade=${lead.oportunidade.id}`}
