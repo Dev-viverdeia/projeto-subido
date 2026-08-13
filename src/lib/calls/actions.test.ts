@@ -9,6 +9,7 @@ const { getClaims, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
+vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, rpc })),
 }));
@@ -54,6 +55,9 @@ describe('agendarReuniao', () => {
       p_live_coach_ativo: true,
     });
     expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
+    expect(revalidatePath).toHaveBeenCalledWith('/inicio');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
     expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}`);
   });
 

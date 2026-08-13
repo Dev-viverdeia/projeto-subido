@@ -12,6 +12,7 @@ import { SegmentoLiveSchema } from '@/lib/calls/coach-schema';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
 import { ErroModeloCoach, gerarAnaliseCall } from '@/lib/calls/modelo-coach';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -56,6 +57,7 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
         reuniaoId: contexto.reuniaoId,
       });
       await encerrarReuniao({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
+      revalidarDirecaoOperacional();
       return NextResponse.json({ estado: 'concluida_sem_analise' }, { headers: semCache() });
     }
 
@@ -68,6 +70,7 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
       respostaId: rodada.respostaId,
     });
 
+    revalidarDirecaoOperacional();
     return NextResponse.json({ estado: 'concluida' }, { headers: semCache() });
   } catch (causa) {
     console.error('[calls:finalizar] falha:', causa);
@@ -80,6 +83,7 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
       await encerrarReuniao({ dono: contexto.dono, reuniaoId: contexto.reuniaoId }).catch(
         () => null,
       );
+      revalidarDirecaoOperacional();
     }
     return erro(
       causa instanceof ErroModeloCoach

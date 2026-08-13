@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import { lerBriefingKickoff } from './briefing';
 
@@ -100,6 +101,7 @@ export async function iniciarProjetoExecucao(
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.proposta}`);
   revalidatePath('/solucoes');
+  revalidarDirecaoOperacional();
   redirect(`/solucoes/execucao/${data}`);
 }
 
@@ -149,6 +151,7 @@ export async function atualizarTarefaProjeto(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath('/solucoes');
+  revalidarDirecaoOperacional();
   return { sucesso: 'Tarefa atualizada.' };
 }
 
@@ -183,6 +186,7 @@ export async function definirPrazoProjeto(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath('/solucoes');
+  revalidarDirecaoOperacional();
   return { sucesso: 'Prazo atualizado.' };
 }
 
@@ -237,6 +241,7 @@ export async function configurarPortalCliente(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath(`/portal/${data.portal_codigo}`);
+  revalidarDirecaoOperacional();
   return {
     sucesso:
       validacao.data.operacao === 'desativar'
@@ -309,6 +314,7 @@ export async function prepararEntregaCliente(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
+  revalidarDirecaoOperacional();
   return {
     sucesso:
       validacao.data.operacao === 'solicitar'
@@ -347,6 +353,7 @@ export async function registrarArquivoProjeto(
   }
 
   revalidatePath(`/solucoes/execucao/${dados.projeto}`);
+  revalidarDirecaoOperacional();
   return { sucesso: dados.grupo ? `Versão ${data.versao} adicionada.` : 'Arquivo adicionado.' };
 }
 
@@ -386,6 +393,7 @@ export async function definirVisibilidadeArquivoProjeto(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
+  revalidarDirecaoOperacional();
   return {
     sucesso: validacao.data.visivel
       ? 'Esta versão foi liberada ao cliente.'
@@ -433,5 +441,6 @@ export async function excluirArquivoProjeto(
   }
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidarDirecaoOperacional();
   return { sucesso: 'Versão excluída.' };
 }

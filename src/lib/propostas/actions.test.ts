@@ -70,6 +70,9 @@ describe('mudarStatusProposta', () => {
 
     expect(rpc).toHaveBeenCalledWith('projeto_iniciar', { p_proposta_id: PROPOSTA_ID });
     expect(revalidatePath).toHaveBeenCalledWith('/solucoes');
+    expect(revalidatePath).toHaveBeenCalledWith('/inicio');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
     expect(redirect).toHaveBeenCalledWith(`/solucoes/execucao/${PROJETO_ID}`);
   });
 

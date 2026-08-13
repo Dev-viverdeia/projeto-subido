@@ -9,6 +9,7 @@ const { getUser, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
+vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getUser }, rpc })),
 }));
@@ -44,6 +45,9 @@ describe('criarLead', () => {
       p_oportunidade_titulo: 'Automação do atendimento',
     });
     expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(revalidatePath).toHaveBeenCalledWith('/inicio');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor');
+    expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
     expect(redirect).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}?novo=1`);
   });
 

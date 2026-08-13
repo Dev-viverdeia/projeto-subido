@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import {
   BriefingKickoffSchema,
@@ -105,6 +106,7 @@ export async function salvarBriefingKickoff(
 
   revalidatePath(`/solucoes/execucao/${leitura.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
+  revalidarDirecaoOperacional();
   return leitura.data.operacao === 'confirmar'
     ? { sucesso: 'Acordo operacional confirmado. O portal já pode ser ativado.', confirmado: true }
     : { sucesso: 'Rascunho salvo. Confirme quando o combinado estiver completo.' };

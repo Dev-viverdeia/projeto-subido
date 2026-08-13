@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import type { EstadoProjetoExecucao } from './actions';
 
@@ -46,6 +47,7 @@ export async function atualizarAcaoPlano(
 
   revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
   revalidatePath('/solucoes');
+  revalidarDirecaoOperacional();
   return {
     sucesso:
       validacao.data.status === 'concluida' ? 'Compromisso concluído.' : 'Compromisso reaberto.',

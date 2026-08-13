@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
 import { obterPosCall } from '@/lib/calls/queries';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { obterDiagnostico } from '@/lib/diagnosticos/queries';
@@ -154,6 +155,7 @@ export async function criarProposta(formData: FormData): Promise<void> {
   revalidatePath('/propostas');
   revalidatePath('/crm');
   revalidatePath(`/crm/${lead.oportunidade.id}`);
+  revalidarDirecaoOperacional();
   redirect(`/propostas/${data.id}`);
 }
 
@@ -197,6 +199,7 @@ export async function salvarProposta(
 
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.id}`);
+  revalidarDirecaoOperacional();
   return { sucesso: 'Proposta salva.', versao: data.versao, status: data.status };
 }
 
@@ -240,6 +243,7 @@ export async function mudarStatusProposta(
   revalidatePath(`/propostas/${validacao.data.id}`);
   revalidatePath('/crm');
   revalidatePath(`/crm/${data.oportunidade_id}`);
+  revalidarDirecaoOperacional();
 
   if (data.status === 'aceita') {
     const { data: projetoId, error: erroProjeto } = await supabase.rpc('projeto_iniciar', {

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import { TIPOS_CALL } from './tipos';
 
@@ -122,7 +123,7 @@ export async function agendarReuniao(
   revalidatePath('/calls');
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
-  revalidatePath('/inicio');
+  revalidarDirecaoOperacional();
   redirect(`/calls?agendada=${reuniao.data.reuniao_id}`);
 }
 
@@ -161,7 +162,7 @@ export async function aplicarPlanoCall(formData: FormData): Promise<void> {
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
-  revalidatePath('/inicio');
+  revalidarDirecaoOperacional();
   const aplicado = Boolean(
     data && typeof data === 'object' && !Array.isArray(data) && data.aplicado,
   );

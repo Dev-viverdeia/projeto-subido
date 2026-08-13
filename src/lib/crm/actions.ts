@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import { ETAPAS_CRM } from './etapas';
 
@@ -110,7 +111,7 @@ export async function criarLead(
   }
 
   revalidatePath('/crm');
-  revalidatePath('/inicio');
+  revalidarDirecaoOperacional();
   const projeto = validacao.data.projeto
     ? `&projeto=${encodeURIComponent(validacao.data.projeto)}`
     : '';
@@ -136,7 +137,7 @@ export async function moverOportunidade(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/crm');
-  revalidatePath('/inicio');
+  revalidarDirecaoOperacional();
 }
 
 export async function aplicarProximaAcao(formData: FormData): Promise<void> {
@@ -159,5 +160,5 @@ export async function aplicarProximaAcao(formData: FormData): Promise<void> {
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
-  revalidatePath('/inicio');
+  revalidarDirecaoOperacional();
 }

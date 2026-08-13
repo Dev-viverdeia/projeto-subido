@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { criarAdminSobral } from '@/lib/consultor/admin';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { ErroSobral } from '@/lib/consultor/modelo';
@@ -136,6 +137,7 @@ export async function POST(request: Request) {
       console.error('[sobral:plano] falha ao persistir:', plano.reason);
     }
     await registrarUsoSobral(admin, user.id, leitura.rodada.tokens);
+    revalidarDirecaoOperacional();
 
     return NextResponse.json(
       {

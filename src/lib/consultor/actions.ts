@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
+import { revalidarDirecaoOperacional } from './revalidacao';
 
 /**
  * A única mutação do Consultor que não fala com o modelo: apagar uma conversa.
@@ -68,10 +69,8 @@ export type EstadoConfirmarRecomendacaoCrm = {
 };
 
 function revalidarOperacao(): void {
-  revalidatePath('/consultor');
-  revalidatePath('/consultor/[id]', 'page');
+  revalidarDirecaoOperacional();
   revalidatePath('/crm');
-  revalidatePath('/inicio');
   revalidatePath('/solucoes');
 }
 

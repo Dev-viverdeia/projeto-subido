@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { criarAdminSobral } from '@/lib/consultor/admin';
+import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import { ErroSobral } from '@/lib/consultor/modelo';
 import {
@@ -47,6 +48,7 @@ export async function POST() {
     const admin = criarAdminSobral();
     await persistirPlanoSobral(admin, user.id, leitura);
     await registrarUsoSobral(admin, user.id, leitura.rodada.tokens);
+    revalidarDirecaoOperacional();
 
     return NextResponse.json(
       { plano: leitura.plano },
