@@ -1,7 +1,9 @@
 import Link from 'next/link';
-import { ArrowUpRight, CalendarPlus, History, ListChecks, Video } from 'lucide-react';
+import { ArrowUpRight, History, ListChecks, Video } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
+import { montarCicloCliente } from '@/lib/crm/ciclo-cliente';
 import type { DossieLead } from '@/lib/crm/queries';
+import { BotaoNovoCiclo } from './BotaoNovoCiclo';
 import styles from '../pagina.module.css';
 
 const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', {
@@ -22,47 +24,61 @@ function destinoDaCall(call: DossieLead['calls'][number]) {
   return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/calls/${call.id}`;
 }
 
-function rotuloDaCall(call: DossieLead['calls'][number]) {
-  if (call.status === 'concluida') return 'Revisar pós-call';
-  if (call.status === 'processando') return 'Acompanhar leitura';
-  if (call.status === 'cancelada') return 'Ver registro';
-  return 'Abrir sala';
-}
-
 export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
-  const callRecente = lead.calls[0] ?? null;
   const compromisso = lead.acoesPlano[0] ?? null;
-  const proximaAcao =
-    compromisso?.titulo ??
-    lead.oportunidade.proximaAcao ??
-    (callRecente?.status === 'concluida'
-      ? 'Revisar a última call e confirmar o próximo movimento.'
-      : 'Preparar a próxima conversa com o contexto já registrado.');
+  const { etapas, decisao } = montarCicloCliente(lead);
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.operacaoTopo}>
         <div>
           <p className={styles.sobretitulo}>Decisão atual</p>
-          <h2 id="operacao-titulo">Próximo passo e histórico</h2>
-          <p>O que fazer agora, o que já aconteceu e quais conversas estão ligadas ao lead.</p>
+          <h2 id="operacao-titulo">Ciclo completo do cliente</h2>
+          <p>Contexto, conversas, proposta e entrega na mesma linha de trabalho.</p>
         </div>
-        <Link
-          href={`/calls?nova=1&oportunidade=${lead.oportunidade.id}`}
-          className={styles.agendarCall}
-        >
-          <CalendarPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-          Agendar call
-        </Link>
+        {decisao.novoCiclo ? (
+          <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
+        ) : (
+          decisao.href && (
+            <Link href={decisao.href} className={styles.agendarCall}>
+              {decisao.acao}
+              <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
+            </Link>
+          )
+        )}
       </header>
+
+      <ol className={styles.fluxoCliente} aria-label="Fluxo conectado deste cliente">
+        {etapas.map((etapa) => {
+          const conteudo = (
+            <>
+              <span className={styles.fluxoNumero}>{etapa.numero}</span>
+              <span className={styles.fluxoTexto}>
+                <small>{etapa.rotulo}</small>
+                <strong>{etapa.estado}</strong>
+              </span>
+            </>
+          );
+
+          return (
+            <li
+              key={etapa.id}
+              data-atual={etapa.atual || undefined}
+              data-comprovada={etapa.comprovada || undefined}
+            >
+              {etapa.href ? <Link href={etapa.href}>{conteudo}</Link> : <div>{conteudo}</div>}
+            </li>
+          );
+        })}
+      </ol>
 
       <div className={styles.gradeOperacao}>
         <article className={styles.agora}>
           <div className={styles.agoraRotulo}>
             <ListChecks size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>{compromisso ? 'Plano do cliente' : 'Próximo movimento'}</span>
+            <span>{decisao.rotulo}</span>
           </div>
-          <h3>{proximaAcao}</h3>
+          <h3>{decisao.titulo}</h3>
           {(compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm) && (
             <time dateTime={compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm ?? undefined}>
               Combinado para{' '}
@@ -71,15 +87,15 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               )}
             </time>
           )}
-          {lead.projetoAtivo ? (
-            <Link href={`/solucoes/execucao/${lead.projetoAtivo.id}`}>
-              Abrir sala de entrega
+          {decisao.apoioHref ? (
+            <Link href={decisao.apoioHref}>
+              {decisao.apoioRotulo}
               <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
           ) : (
-            callRecente && (
-              <Link href={destinoDaCall(callRecente)}>
-                {rotuloDaCall(callRecente)}
+            decisao.href && (
+              <Link href={decisao.href}>
+                {decisao.acao}
                 <ArrowUpRight size={15} aria-hidden="true" />
               </Link>
             )

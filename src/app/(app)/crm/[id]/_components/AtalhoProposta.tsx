@@ -4,7 +4,9 @@ import type { DossieLead } from '@/lib/crm/queries';
 import styles from '../pagina.module.css';
 
 export function AtalhoProposta({ lead }: { lead: DossieLead }) {
-  if (lead.projetoAtivo) {
+  const projeto = lead.projetoAtivo ?? lead.projetoRecente;
+
+  if (projeto) {
     return (
       <>
         {lead.propostaRecente && (
@@ -13,9 +15,9 @@ export function AtalhoProposta({ lead }: { lead: DossieLead }) {
             Ver proposta
           </Link>
         )}
-        <Link href={`/solucoes/execucao/${lead.projetoAtivo.id}`} className={styles.criarProposta}>
+        <Link href={`/solucoes/execucao/${projeto.id}`} className={styles.criarProposta}>
           <BriefcaseBusiness size={16} strokeWidth={1.8} aria-hidden="true" />
-          Abrir projeto
+          {projeto.status === 'concluido' ? 'Ver entrega' : 'Abrir projeto'}
         </Link>
       </>
     );

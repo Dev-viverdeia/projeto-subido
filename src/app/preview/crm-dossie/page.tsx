@@ -121,6 +121,13 @@ const LEAD_OPERACIONAL: DossieLead = {
     id: '66666666-6666-4666-8666-666666666666',
     titulo: 'Atendimento inteligente para clínicas',
     status: 'em_execucao',
+    atualizadoEm: '2026-08-08T18:10:00.000Z',
+  },
+  projetoRecente: {
+    id: '66666666-6666-4666-8666-666666666666',
+    titulo: 'Atendimento inteligente para clínicas',
+    status: 'em_execucao',
+    atualizadoEm: '2026-08-08T18:10:00.000Z',
   },
   propostaRecente: {
     id: '77777777-7777-4777-8777-777777777777',
@@ -149,6 +156,7 @@ const LEAD_NOVO: DossieLead = {
   calls: [],
   acoesPlano: [],
   projetoAtivo: null,
+  projetoRecente: null,
   propostaRecente: null,
   totalCalls: 0,
 };

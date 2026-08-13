@@ -37,6 +37,8 @@ const aplicarAcaoSchema = z.object({
   enriquecimento: z.uuid(),
 });
 
+const novoCicloSchema = z.object({ oportunidade: z.uuid() });
+
 export type EstadoNovoLead = {
   erro?: string;
   porCampo?: Partial<Record<'empresa' | 'contato' | 'email' | 'titulo', string>>;
@@ -161,4 +163,32 @@ export async function aplicarProximaAcao(formData: FormData): Promise<void> {
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
   revalidarDirecaoOperacional();
+}
+
+/** Abre uma nova negociação para a mesma empresa depois de uma venda ganha. */
+export async function iniciarNovoCicloCliente(formData: FormData): Promise<void> {
+  const validacao = novoCicloSchema.safeParse({ oportunidade: formData.get('oportunidade') });
+  if (!validacao.success) redirect('/crm');
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/entrar');
+
+  const { data, error } = await supabase.rpc('crm_iniciar_novo_ciclo', {
+    p_oportunidade: validacao.data.oportunidade,
+  });
+  const oportunidade = z.uuid().safeParse(data);
+
+  if (error || !oportunidade.success) {
+    console.error(
+      `[crm:novo-ciclo] ${error?.code ?? 'sem-dados'}: ${error?.message ?? 'oportunidade inválida'}`,
+    );
+    redirect(`/crm/${validacao.data.oportunidade}?novo-ciclo=erro`);
+  }
+
+  revalidatePath('/crm');
+  revalidarDirecaoOperacional();
+  redirect(`/crm/${oportunidade.data}?novo=1`);
 }

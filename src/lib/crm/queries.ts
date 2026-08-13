@@ -5,7 +5,7 @@ import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import { lerDossie, lerFontes, type StatusEnriquecimento } from './enriquecimento';
-import type { DossieLead } from './dossie-types';
+import type { DossieLead, ProjetoDossie } from './dossie-types';
 import type { EtapaCrm } from './etapas';
 
 export type {
@@ -15,6 +15,7 @@ export type {
   EventoDossie,
   ExecucaoEnriquecimento,
   ProjetoAtivoDossie,
+  ProjetoDossie,
   PropostaDossie,
 } from './dossie-types';
 
@@ -244,7 +245,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     enriquecimentos,
     calls,
     acoesPlano,
-    projetoAtivo,
+    projetosRecentes,
     propostaRecente,
   ] = await Promise.all([
     supabase
@@ -292,12 +293,10 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .limit(6),
     supabase
       .from('projetos_execucao')
-      .select('id, titulo, status')
+      .select('id, titulo, status, atualizado_em')
       .eq('oportunidade_id', id)
-      .neq('status', 'concluido')
       .order('atualizado_em', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .limit(10),
     supabase
       .from('propostas')
       .select('id, titulo, status')
@@ -315,7 +314,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   }
   if (calls.error) throw handleError(calls.error, 'crm:dossie-calls');
   if (acoesPlano.error) throw handleError(acoesPlano.error, 'crm:dossie-plano');
-  if (projetoAtivo.error) throw handleError(projetoAtivo.error, 'crm:dossie-projeto');
+  if (projetosRecentes.error) throw handleError(projetosRecentes.error, 'crm:dossie-projetos');
   if (propostaRecente.error) throw handleError(propostaRecente.error, 'crm:dossie-proposta');
 
   const empresaLinha = empresa.data;
@@ -331,6 +330,21 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   const statusPorOportunidade = new Map<string, StatusEnriquecimento>(
     ultimaExecucao ? [[id, ultimaExecucao.status]] : [],
   );
+
+  const mapearProjeto = (
+    projeto: NonNullable<typeof projetosRecentes.data>[number] | null,
+  ): ProjetoDossie | null =>
+    projeto
+      ? {
+          id: projeto.id,
+          titulo: projeto.titulo,
+          status: projeto.status,
+          atualizadoEm: projeto.atualizado_em,
+        }
+      : null;
+  const projetoRecente = projetosRecentes.data?.[0] ?? null;
+  const projetoAtivo =
+    projetosRecentes.data?.find((projeto) => projeto.status !== 'concluido') ?? null;
 
   return {
     oportunidade: montarOportunidade(
@@ -388,13 +402,8 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       prazoEm: acao.prazo_em,
       reuniaoId: acao.reuniao_id,
     })),
-    projetoAtivo: projetoAtivo.data
-      ? {
-          id: projetoAtivo.data.id,
-          titulo: projetoAtivo.data.titulo,
-          status: projetoAtivo.data.status,
-        }
-      : null,
+    projetoAtivo: mapearProjeto(projetoAtivo),
+    projetoRecente: mapearProjeto(projetoRecente),
     propostaRecente: propostaRecente.data
       ? {
           id: propostaRecente.data.id,

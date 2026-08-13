@@ -14,7 +14,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getUser }, rpc })),
 }));
 
-import { criarLead } from './actions';
+import { criarLead, iniciarNovoCicloCliente } from './actions';
 
 const OPORTUNIDADE_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -70,5 +70,27 @@ describe('criarLead', () => {
 
     expect(resposta.erro).toContain('não conseguimos abrir a próxima etapa');
     expect(redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe('iniciarNovoCicloCliente', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getUser.mockResolvedValue({ data: { user: { id: 'usuario-1' } } });
+  });
+
+  it('reabre a operação na nova oportunidade da mesma empresa', async () => {
+    const NOVA_OPORTUNIDADE = '77777777-7777-4777-8777-777777777777';
+    rpc.mockResolvedValue({ data: NOVA_OPORTUNIDADE, error: null });
+    const dados = new FormData();
+    dados.set('oportunidade', OPORTUNIDADE_ID);
+
+    await iniciarNovoCicloCliente(dados);
+
+    expect(rpc).toHaveBeenCalledWith('crm_iniciar_novo_ciclo', {
+      p_oportunidade: OPORTUNIDADE_ID,
+    });
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(redirect).toHaveBeenCalledWith(`/crm/${NOVA_OPORTUNIDADE}?novo=1`);
   });
 });

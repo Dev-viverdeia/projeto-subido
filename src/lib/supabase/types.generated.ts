@@ -2231,6 +2231,10 @@ export type Database = {
         }
         Returns: string
       }
+      crm_iniciar_novo_ciclo: {
+        Args: { p_oportunidade: string }
+        Returns: string
+      }
       crm_mover_oportunidade: {
         Args: {
           p_etapa: Database["public"]["Enums"]["crm_etapa"]

@@ -47,11 +47,14 @@ export type AcaoPlanoDossie = {
   reuniaoId: string | null;
 };
 
-export type ProjetoAtivoDossie = {
+export type ProjetoDossie = {
   id: string;
   titulo: string;
   status: Tables<'projetos_execucao'>['status'];
+  atualizadoEm: string;
 };
+
+export type ProjetoAtivoDossie = ProjetoDossie;
 
 export type PropostaDossie = {
   id: string;
@@ -80,6 +83,9 @@ export type DossieLead = {
   calls: CallDossieLead[];
   acoesPlano: AcaoPlanoDossie[];
   projetoAtivo: ProjetoAtivoDossie | null;
+  /** Última entrega, inclusive quando já concluída. O CRM não perde o vínculo
+      com o trabalho realizado quando o projeto deixa de estar ativo. */
+  projetoRecente: ProjetoDossie | null;
   propostaRecente: PropostaDossie | null;
   enriquecimentos: ExecucaoEnriquecimento[];
   totalCalls: number;

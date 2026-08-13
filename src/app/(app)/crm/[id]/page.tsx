@@ -46,6 +46,7 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
   );
   const dossie = execucaoPronta?.dossie ?? null;
   const entradaRecente = parametros.novo === '1';
+  const falhaNovoCiclo = parametros['novo-ciclo'] === 'erro';
   const projetoDeOrigem =
     typeof parametros.projeto === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(parametros.projeto)
       ? parametros.projeto.slice(0, 160)
@@ -72,6 +73,13 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
         modoEntrada={entradaRecente}
       />
 
+      {falhaNovoCiclo && (
+        <p className={styles.avisoOperacao} role="alert">
+          Não foi possível abrir um novo ciclo agora. A entrega continua segura e você pode tentar
+          novamente.
+        </p>
+      )}
+
       {entradaRecente ? (
         <JornadaEntradaLead
           oportunidadeId={lead.oportunidade.id}
@@ -91,42 +99,46 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
         <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
       )}
 
-      {!entradaRecente && !dossie && !emAndamento && (
-        <section className={styles.primeiroDossie}>
-          <div>
-            <span className={styles.iconeVazio}>
-              <Radar size={22} strokeWidth={1.6} aria-hidden="true" />
-            </span>
-            <p className={styles.sobretitulo}>Próximo passo</p>
-            <h2>Chegue na conversa sabendo onde olhar</h2>
-            <p>
-              O dossiê lê o histórico do CRM, o site público e o contexto que você já possui. A
-              saída separa fatos, hipóteses e perguntas para a próxima call.
-            </p>
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              dominioInicial={lead.empresa.dominio}
-              linkedinInicial={lead.contato?.linkedinUrl ?? null}
-              temDossie={false}
-            />
-          </div>
+      {!entradaRecente &&
+        !dossie &&
+        !emAndamento &&
+        !lead.propostaRecente &&
+        !lead.projetoRecente && (
+          <section className={styles.primeiroDossie}>
+            <div>
+              <span className={styles.iconeVazio}>
+                <Radar size={22} strokeWidth={1.6} aria-hidden="true" />
+              </span>
+              <p className={styles.sobretitulo}>Próximo passo</p>
+              <h2>Chegue na conversa sabendo onde olhar</h2>
+              <p>
+                O dossiê lê o histórico do CRM, o site público e o contexto que você já possui. A
+                saída separa fatos, hipóteses e perguntas para a próxima call.
+              </p>
+              <FormularioEnriquecimento
+                oportunidadeId={lead.oportunidade.id}
+                dominioInicial={lead.empresa.dominio}
+                linkedinInicial={lead.contato?.linkedinUrl ?? null}
+                temDossie={false}
+              />
+            </div>
 
-          <div className={styles.entregas} aria-label="O que o dossiê entrega">
-            <span>
-              <BadgeCheck size={17} aria-hidden="true" /> Fatos com origem visível
-            </span>
-            <span>
-              <CircleHelp size={17} aria-hidden="true" /> Hipóteses com forma de validar
-            </span>
-            <span>
-              <Target size={17} aria-hidden="true" /> Oportunidades de projeto
-            </span>
-            <span>
-              <MessageSquareQuote size={17} aria-hidden="true" /> Perguntas de descoberta
-            </span>
-          </div>
-        </section>
-      )}
+            <div className={styles.entregas} aria-label="O que o dossiê entrega">
+              <span>
+                <BadgeCheck size={17} aria-hidden="true" /> Fatos com origem visível
+              </span>
+              <span>
+                <CircleHelp size={17} aria-hidden="true" /> Hipóteses com forma de validar
+              </span>
+              <span>
+                <Target size={17} aria-hidden="true" /> Oportunidades de projeto
+              </span>
+              <span>
+                <MessageSquareQuote size={17} aria-hidden="true" /> Perguntas de descoberta
+              </span>
+            </div>
+          </section>
+        )}
 
       {!entradaRecente && dossie && execucaoPronta && (
         <>

@@ -21,6 +21,7 @@ export function CabecalhoDossie({
   const faseComercial =
     FASES_CRM.find((fase) => fase.id === faseDaEtapa(lead.oportunidade.etapa))?.rotulo ??
     ROTULO_ETAPA[lead.oportunidade.etapa];
+  const cicloEntregue = lead.projetoRecente?.status === 'concluido';
 
   return (
     <section className={styles.hero} aria-labelledby="dossie-titulo">
@@ -35,9 +36,9 @@ export function CabecalhoDossie({
 
         {!modoEntrada && (
           <div className={styles.heroAcoes}>
-            <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />
+            {!cicloEntregue && <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />}
             <AtalhoProposta lead={lead} />
-            {!enriquecimentoEmAndamento && (
+            {!cicloEntregue && !enriquecimentoEmAndamento && (
               <FormularioEnriquecimento
                 oportunidadeId={lead.oportunidade.id}
                 dominioInicial={lead.empresa.dominio}
@@ -69,7 +70,7 @@ export function CabecalhoDossie({
         )}
       </div>
 
-      {!modoEntrada && (
+      {!modoEntrada && !cicloEntregue && (
         <div className={styles.sinais} aria-label="Sinais que alimentam o dossiê">
           <div className={styles.fonteSinal}>
             <Database size={17} strokeWidth={1.7} aria-hidden="true" />

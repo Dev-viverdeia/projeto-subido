@@ -44,6 +44,7 @@ const LEAD: DossieLead = {
   calls: [],
   acoesPlano: [],
   projetoAtivo: null,
+  projetoRecente: null,
   propostaRecente: null,
   enriquecimentos: [
     {
