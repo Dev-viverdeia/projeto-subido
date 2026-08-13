@@ -166,6 +166,8 @@ export const PedidoPerguntas = z.object({
     .trim()
     .min(20, { error: 'Descreva a ideia com um pouco mais de detalhe.' })
     .max(4000),
+  oportunidade: z.uuid().optional(),
+  projetoBase: z.uuid().optional(),
 });
 
 export const PedidoGeracao = z.object({

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { listarSolucoesDoBuilder } from '@/lib/builder/queries';
-import { obterSolucao } from '@/lib/conteudo/queries';
+import { listarSolucoes } from '@/lib/conteudo/queries';
+import { etapaAberta } from '@/lib/crm/etapas';
+import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { Compositor } from './_components/Compositor';
@@ -29,18 +31,31 @@ export const metadata: Metadata = { title: 'Estúdio' };
 export default async function BuilderPage({ searchParams }: PageProps<'/builder'>) {
   const params = await searchParams;
   const projetoParam = Array.isArray(params.projeto) ? params.projeto[0] : params.projeto;
-  const [itens, projeto] = await Promise.all([
+  const oportunidadeParam = Array.isArray(params.oportunidade)
+    ? params.oportunidade[0]
+    : params.oportunidade;
+  const [itens, projetos, oportunidades] = await Promise.all([
     listarSolucoesDoBuilder(),
-    projetoParam ? obterSolucao(projetoParam) : Promise.resolve(null),
+    listarSolucoes(),
+    listarOportunidadesSeletor(),
   ]);
-  const origem = projeto?.projeto
-    ? {
-        slug: projeto.slug,
-        titulo: projeto.titulo,
-        resumo: projeto.resumo,
-        resultado: projeto.projeto.resultado,
-      }
-    : null;
+  const projetosBase = projetos.flatMap((projeto) =>
+    projeto.projeto
+      ? [
+          {
+            id: projeto.id,
+            slug: projeto.slug,
+            titulo: projeto.titulo,
+            resumo: projeto.resumo,
+            resultado: projeto.projeto.resultado,
+          },
+        ]
+      : [],
+  );
+  const oportunidadesAbertas = oportunidades.filter((item) => etapaAberta(item.etapa));
+  const projetoInicial = projetosBase.find((item) => item.slug === projetoParam) ?? null;
+  const oportunidadeInicial =
+    oportunidadesAbertas.find((item) => item.id === oportunidadeParam) ?? null;
 
   return (
     <div className={styles.pagina}>
@@ -59,7 +74,12 @@ export default async function BuilderPage({ searchParams }: PageProps<'/builder'
       ) : null}
 
       <div className={entrada.bloco}>
-        <Compositor origem={origem} />
+        <Compositor
+          projetosBase={projetosBase}
+          oportunidades={oportunidadesAbertas}
+          projetoInicialId={projetoInicial?.id ?? ''}
+          oportunidadeInicialId={oportunidadeInicial?.id ?? ''}
+        />
       </div>
     </div>
   );

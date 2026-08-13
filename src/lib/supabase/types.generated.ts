@@ -62,6 +62,8 @@ export type Database = {
           id: string
           ideia_original: string
           modelo: string | null
+          oportunidade_id: string | null
+          projeto_base_id: string | null
           respostas: Json
           stack: string | null
           status: Database["public"]["Enums"]["status_builder"]
@@ -76,6 +78,8 @@ export type Database = {
           id?: string
           ideia_original: string
           modelo?: string | null
+          oportunidade_id?: string | null
+          projeto_base_id?: string | null
           respostas?: Json
           stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
@@ -90,12 +94,29 @@ export type Database = {
           id?: string
           ideia_original?: string
           modelo?: string | null
+          oportunidade_id?: string | null
+          projeto_base_id?: string | null
           respostas?: Json
           stack?: string | null
           status?: Database["public"]["Enums"]["status_builder"]
           titulo?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "builder_solucoes_oportunidade_id_fkey"
+            columns: ["oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "builder_solucoes_projeto_base_id_fkey"
+            columns: ["projeto_base_id"]
+            isOneToOne: false
+            referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       builder_tarefas: {
         Row: {

@@ -25,6 +25,8 @@ function projeto(over: Partial<SolucaoBuilder> = {}): SolucaoBuilder {
     erro: null,
     modelo: null,
     criadoEm: '2026-08-01T00:00:00.000Z',
+    oportunidadeId: null,
+    projetoBaseId: null,
     stack: null,
     tarefas: {},
     ...over,

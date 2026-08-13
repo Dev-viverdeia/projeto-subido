@@ -143,3 +143,4 @@ where roteiro.projeto_id = projeto.id
 update public.solucoes
 set video_url = 'https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=17171fd9-22cd-4353-bf10-6a75d982c7ca'
 where slug = 'inteligencia-comercial-com-ia';
+;

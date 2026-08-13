@@ -82,8 +82,11 @@ export type RespostaPerguntas = {
   perguntas: { pergunta: string; porque: string }[];
 };
 
-export function pedirPerguntas(ideia: string) {
-  return invocar<RespostaPerguntas>('builder/perguntas', { ideia });
+export function pedirPerguntas(
+  ideia: string,
+  contexto: { oportunidade?: string; projetoBase?: string } = {},
+) {
+  return invocar<RespostaPerguntas>('builder/perguntas', { ideia, ...contexto });
 }
 
 export function pedirGeracao(id: string, respostas: unknown) {

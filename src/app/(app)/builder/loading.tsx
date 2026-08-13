@@ -5,12 +5,9 @@ import styles from './pagina.module.css';
 /**
  * Estado de carregamento do Builder — e ele não tem skeleton nenhum de propósito.
  *
- * O que a rota espera do servidor é a LISTA de projetos, que só aparece abaixo da
- * dobra e só quando existe. O compositor é estático: pergunta, campo vazio,
- * exemplos. Renderizá-lo de verdade aqui faz o campo estar pronto para receber
- * texto enquanto a consulta ainda corre — quem chegou para criar um projeto não
- * espera nada, e quem chegou para reler o histórico vê a lista entrar embaixo,
- * sem a tela inteira trocar de pele.
+ * O compositor aparece de imediato enquanto Projeto-base, clientes e histórico
+ * chegam do servidor. Os seletores continuam bloqueados até a rota real assumir,
+ * evitando uma tela vazia sem inventar opções que ainda não foram lidas.
  */
 export default function CarregandoBuilder() {
   return (

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   useCallback,
@@ -12,27 +13,17 @@ import {
 import { ArrowUp } from 'lucide-react';
 import { pedirPerguntas } from '@/lib/builder/invocar';
 import { PainelEspera } from './PainelEspera';
-import { EXEMPLOS } from './exemplos';
 import styles from './Compositor.module.css';
 
 const MINIMO = 20;
-const MAXIMO = 4000;
+const MAXIMO = 3200;
 
 /**
  * O compositor — a tela inicial do Builder.
  *
- * COMPOSIÇÃO CENTRADA E CLARA, e a versão anterior errava justamente nisso.
- * Ela era uma banda navy de largura total com o texto encostado à esquerda: peso
- * de seção de landing numa tela cuja única função é receber uma frase. Aqui a
- * página inteira É o campo, então a hierarquia certa é editorial e centrada —
- * pergunta, campo, exemplos — com a superfície clara que o resto da plataforma
- * usa. Sem banda escura nenhuma: o accent não é legível sobre claro, e nesta
- * tela ele não tem o que destacar.
- *
- * OS EXEMPLOS NÃO SÃO DECORAÇÃO. Campo em branco com limite de 4000 caracteres
- * não diz o que é uma boa descrição. Cada chip preenche o campo com um briefing
- * real — volume, quem opera, o que já existe —, que é exatamente o que a
- * entrevista do passo seguinte vai perguntar se faltar.
+ * O ponto de partida combina uma entrega que a pessoa já sabe implementar com o
+ * contexto real de um cliente. A personalização fica limitada ao que muda, e o
+ * vínculo comercial segue junto até a proposta.
  *
  * A CHAVE NÃO É MAIS CONFERIDA AQUI, e é uma perda assumida. Enquanto a geração
  * morava na Vercel, o servidor lia `process.env` e desabilitava o campo ANTES de
@@ -41,31 +32,49 @@ const MAXIMO = 4000;
  * chamada, como erro com o nome do secret. É o preço direto de mover a geração
  * para a Edge Function.
  */
-export type OrigemProjeto = {
+export type ProjetoBaseEstudio = {
+  id: string;
   slug: string;
   titulo: string;
   resumo: string;
   resultado: string;
 };
 
-export function Compositor({ origem = null }: { origem?: OrigemProjeto | null }) {
+export type OportunidadeEstudio = {
+  id: string;
+  titulo: string;
+  empresa: string;
+  contato: string | null;
+};
+
+export function Compositor({
+  projetosBase = [],
+  oportunidades = [],
+  projetoInicialId = '',
+  oportunidadeInicialId = '',
+}: {
+  projetosBase?: ProjetoBaseEstudio[];
+  oportunidades?: OportunidadeEstudio[];
+  projetoInicialId?: string;
+  oportunidadeInicialId?: string;
+}) {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
-  const [ideia, setIdeia] = useState(() =>
-    origem
-      ? `Quero adaptar o projeto “${origem.titulo}” para este cliente.\n\nO que já sei sobre a empresa, o problema e a operação: `
-      : '',
-  );
+  const [ideia, setIdeia] = useState('');
+  const [projetoBaseId, setProjetoBaseId] = useState(projetoInicialId);
+  const [oportunidadeId, setOportunidadeId] = useState(oportunidadeInicialId);
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [navegando, iniciarNavegacao] = useTransition();
 
+  const projetoBase = projetosBase.find((item) => item.id === projetoBaseId) ?? null;
+  const oportunidade = oportunidades.find((item) => item.id === oportunidadeId) ?? null;
   const curta = ideia.trim().length < MINIMO;
   /* `enviando` cobre a chamada; `navegando` cobre a transição de rota depois
      dela. Sem o segundo, o botão volta ao normal por uns instantes enquanto a
      próxima tela carrega — e o campo parece ter perdido o clique. */
   const ocupado = enviando || navegando;
-  const bloqueado = curta || ocupado;
+  const bloqueado = curta || !projetoBase || ocupado;
 
   const atalho = useTeclaDeComando();
 
@@ -88,12 +97,25 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
   }, [ideia]);
 
   async function enviar() {
-    if (bloqueado) return;
+    if (bloqueado || !projetoBase) return;
 
     setEnviando(true);
     setErro(null);
 
-    const { dados, falha } = await pedirPerguntas(ideia.trim());
+    const briefing = [
+      `Projeto-base: ${projetoBase.titulo}.`,
+      `Resultado padrão: ${projetoBase.resultado}`,
+      oportunidade
+        ? `Cliente: ${oportunidade.empresa}. Oportunidade no CRM: ${oportunidade.titulo}.`
+        : null,
+      `Contexto real e mudanças pedidas pelo cliente: ${ideia.trim()}`,
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+    const { dados, falha } = await pedirPerguntas(briefing, {
+      projetoBase: projetoBase.id,
+      oportunidade: oportunidade?.id,
+    });
 
     if (falha) {
       setErro(falha.mensagem);
@@ -105,17 +127,6 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
        aqui e o componente sai da tela. Zerar o estado antes disso devolveria o
        botão ao normal por um instante, e o clique pareceria perdido. */
     iniciarNavegacao(() => router.push(`/builder/${dados.id}`));
-  }
-
-  function usarExemplo(texto: string) {
-    setIdeia(texto);
-    /* Foca e leva o cursor para o fim: o exemplo é ponto de partida para editar,
-       não formulário para enviar como veio. */
-    const campo = campoRef.current;
-    if (campo) {
-      campo.focus();
-      requestAnimationFrame(() => campo.setSelectionRange(texto.length, texto.length));
-    }
   }
 
   /* Os passos da ANÁLISE — as fases da chamada que escreve as perguntas. Elas
@@ -140,9 +151,11 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
   return (
     <div className={styles.tela}>
       <header className={styles.cabecalho}>
-        <p className={styles.eyebrow}>{origem ? 'Estúdio · Projeto personalizado' : 'Estúdio'}</p>
+        <p className={styles.eyebrow}>
+          {projetoBase ? 'Estúdio · Projeto personalizado' : 'Estúdio'}
+        </p>
         <h2 className={styles.titulo}>
-          {origem ? (
+          {projetoBase ? (
             <>
               O que muda <em>neste cliente</em>?
             </>
@@ -156,7 +169,7 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
             medida em 46ch, a quebra cai no ponto final em vez de deixar uma
             palavra órfã abrindo a segunda linha. */}
         <p className={styles.apoio}>
-          {origem ? (
+          {projetoBase ? (
             <>
               Parta da entrega padrão e conte o contexto real. <em>O Estúdio adapta o projeto.</em>
             </>
@@ -219,15 +232,69 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
         </aside>
 
         <div className={styles.briefing}>
-          {origem ? (
-            <aside className={styles.origem} aria-label="Projeto usado como base">
-              <div>
-                <span>Projeto-base</span>
-                <strong>{origem.titulo}</strong>
-              </div>
-              <p>{origem.resultado}</p>
-            </aside>
-          ) : null}
+          <section className={styles.partida} aria-labelledby="partida-estudio">
+            <header>
+              <span>Contexto da personalização</span>
+              <strong id="partida-estudio">Defina o ponto de partida</strong>
+            </header>
+
+            <div className={styles.decisaoGrid}>
+              <label className={styles.decisao}>
+                <span>01 · Projeto-base</span>
+                <select
+                  value={projetoBaseId}
+                  onChange={(evento) => setProjetoBaseId(evento.target.value)}
+                  disabled={ocupado}
+                  required
+                >
+                  <option value="" disabled>
+                    Escolha um dos cinco Projetos
+                  </option>
+                  {projetosBase.map((projeto) => (
+                    <option value={projeto.id} key={projeto.id}>
+                      {projeto.titulo}
+                    </option>
+                  ))}
+                </select>
+                <small>
+                  {projetoBase
+                    ? projetoBase.resultado
+                    : 'A estrutura padrão vira a base segura da personalização.'}
+                </small>
+              </label>
+
+              <label className={styles.decisao}>
+                <span>02 · Cliente do CRM</span>
+                <select
+                  value={oportunidadeId}
+                  onChange={(evento) => setOportunidadeId(evento.target.value)}
+                  disabled={ocupado || oportunidades.length === 0}
+                >
+                  <option value="">
+                    {oportunidades.length ? 'Escolher depois' : 'Nenhum cliente disponível'}
+                  </option>
+                  {oportunidades.map((item) => (
+                    <option value={item.id} key={item.id}>
+                      {item.empresa} · {item.titulo}
+                    </option>
+                  ))}
+                </select>
+                <small>
+                  {oportunidade
+                    ? `O projeto e a proposta continuarão ligados a ${oportunidade.empresa}.`
+                    : oportunidades.length
+                      ? 'Opcional agora. Você poderá escolher o cliente ao criar a proposta.'
+                      : 'Nenhuma oportunidade aberta no CRM.'}
+                </small>
+              </label>
+            </div>
+
+            {oportunidades.length === 0 ? (
+              <Link href="/crm?novo=projeto" className={styles.atalhoCrm}>
+                Cadastrar cliente no CRM
+              </Link>
+            ) : null}
+          </section>
 
           <form
             className={styles.caixa}
@@ -255,7 +322,7 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
               }}
               disabled={ocupado}
               rows={6}
-              placeholder="Ex.: meu cliente tem uma clínica e perde agendamento porque ninguém responde o WhatsApp fora do horário comercial. Ele queria que isso funcionasse sozinho, sem sair do sistema que a recepção já usa…"
+              placeholder="Conte o que o cliente relatou, como a operação funciona hoje, onde o problema aparece e o que precisa continuar igual."
             />
 
             <div className={styles.rodape}>
@@ -285,29 +352,6 @@ export function Compositor({ origem = null }: { origem?: OrigemProjeto | null })
             <p className={styles.aviso} role="alert">
               {erro}
             </p>
-          ) : null}
-
-          {!origem ? (
-            <section className={styles.exemplos}>
-              <h3 className={styles.divisor}>
-                <span>ou comece por um exemplo</span>
-              </h3>
-
-              <ul className={styles.chips}>
-                {EXEMPLOS.map((exemplo) => (
-                  <li key={exemplo.rotulo}>
-                    <button
-                      type="button"
-                      className={styles.chip}
-                      onClick={() => usarExemplo(exemplo.texto)}
-                      disabled={ocupado}
-                    >
-                      {exemplo.rotulo}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
           ) : null}
         </div>
       </div>

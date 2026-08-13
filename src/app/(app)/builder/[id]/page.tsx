@@ -53,6 +53,9 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
      ficavam abaixo da dobra. A condição segue o que RENDERIZA (a sala), não um
      status solto. */
   const emColuna = !(solucao.status === 'gerando' || solucao.status === 'pronta');
+  const destinoDaProposta = solucao.oportunidadeId
+    ? `/propostas/nova?builder=${solucao.id}&oportunidade=${solucao.oportunidadeId}`
+    : `/propostas/nova?builder=${solucao.id}`;
 
   return (
     <div className={styles.pagina} data-coluna={emColuna ? '' : undefined}>
@@ -76,7 +79,7 @@ export default async function ProjetoDoBuilderPage({ params }: PageProps<'/build
 
           {solucao.documento ? (
             <>
-              <Link href={`/propostas/nova?builder=${solucao.id}`} className={styles.proposta}>
+              <Link href={destinoDaProposta} className={styles.proposta}>
                 <FileSignature size={15} strokeWidth={1.8} aria-hidden="true" />
                 Criar proposta
               </Link>

@@ -234,51 +234,109 @@
   color: var(--via-white);
 }
 
-.origem {
-  display: grid;
-  grid-template-columns: minmax(150px, 0.42fr) minmax(0, 1fr);
-  gap: var(--via-space-5);
-  align-items: center;
+.partida {
   margin-bottom: var(--via-space-3);
-  padding: var(--via-space-4) var(--via-space-5);
-  border: 1px solid var(--via-accent-hairline);
-  border-radius: var(--app-radius-control) var(--app-radius-control) var(--app-radius-track)
-    var(--app-radius-track);
-  background: linear-gradient(90deg, var(--via-accent-soft), var(--via-navy-03));
+  padding: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
-.origem div {
-  min-width: 0;
+.partida > header {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin-bottom: var(--via-space-4);
 }
 
-.origem span {
+.partida > header span,
+.decisao > span {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-accent-ink);
+  color: var(--via-text-faint);
 }
 
-.origem strong {
-  overflow: hidden;
+.partida > header strong {
   font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
+  font-weight: var(--via-fw-semibold);
   color: var(--via-text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.origem p {
-  margin: 0;
-  padding-left: var(--via-space-5);
-  border-left: 1px solid var(--via-accent-hairline);
+.decisaoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+}
+
+.decisao {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.decisao select {
+  width: 100%;
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+  font: inherit;
   font-size: var(--via-fs-caption);
-  line-height: var(--via-lh-normal);
+  cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.decisao select:hover:not(:disabled) {
+  border-color: var(--via-navy-16);
+  background: var(--via-surface);
+}
+
+.decisao select:focus-visible {
+  outline: none;
+  border-color: var(--via-navy-16);
+  background: var(--via-surface);
+  box-shadow: var(--app-ring);
+}
+
+.decisao select:disabled {
+  cursor: not-allowed;
+  color: var(--via-text-faint);
+}
+
+.decisao small {
+  display: block;
+  min-height: 2.9em;
+  font-size: var(--via-fs-caption);
+  line-height: 1.45;
   color: var(--via-text-muted);
   text-wrap: pretty;
+}
+
+.atalhoCrm {
+  display: inline-flex;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  text-decoration: underline;
+  text-decoration-color: var(--via-border);
+  text-underline-offset: 4px;
+}
+
+.atalhoCrm:focus-visible {
+  outline: none;
+  border-radius: 2px;
+  box-shadow: var(--app-ring);
 }
 
 .eyebrow {
@@ -495,87 +553,14 @@
   color: var(--via-text-primary);
 }
 
-/* ---- Exemplos ----------------------------------------------------------------- */
-
-.exemplos {
-  margin-top: var(--app-gap-block);
-}
-
-/* Rótulo com filete dos dois lados. `::before`/`::after` em `flex: 1` faz a linha
-   se ajustar ao texto sem largura mágica. */
-.divisor {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-  margin: 0 0 var(--app-gap-block);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-regular);
-  letter-spacing: var(--via-ls-label);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.divisor::before,
-.divisor::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--via-border-hairline);
-}
-
-.chips {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--app-gap-stack);
-}
-
-.chip {
-  min-height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-border);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-surface);
-  color: var(--via-text-muted);
-  font-family: inherit;
-  font-size: var(--via-fs-sm);
-  letter-spacing: var(--app-ls-sm);
-  cursor: pointer;
-  transition:
-    border-color var(--app-t-state),
-    color var(--app-t-state),
-    transform var(--app-t-touch);
-}
-
-.chip:hover:not(:disabled) {
-  border-color: var(--via-navy-16);
-  color: var(--via-text-primary);
-  transform: translateY(-1px);
-}
-
-.chip:disabled {
-  cursor: not-allowed;
-  color: var(--via-text-faint);
-}
-
-.chip:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .caixa,
   .enviar,
-  .chip {
+  .decisao select {
     transition: none;
   }
 
-  .enviar:hover:not(:disabled),
-  .chip:hover:not(:disabled) {
+  .enviar:hover:not(:disabled) {
     transform: none;
   }
 }
@@ -617,25 +602,22 @@
     padding: var(--via-space-3);
   }
 
+  .partida > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-1);
+  }
+
   .campo {
     min-height: 170px;
   }
 
-  .chips {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    margin-inline: calc(var(--via-space-3) * -1);
-    padding: 2px var(--via-space-3) var(--via-space-2);
-    scrollbar-width: none;
+  .decisaoGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .chips::-webkit-scrollbar {
-    display: none;
-  }
-
-  .chip {
-    white-space: nowrap;
+  .decisao small {
+    min-height: 0;
   }
 
   .retorno {
@@ -645,18 +627,6 @@
 
   .retorno h3 {
     margin-bottom: var(--via-space-5);
-  }
-
-  .origem {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--via-space-3);
-    padding: var(--via-space-4);
-  }
-
-  .origem p {
-    padding: var(--via-space-3) 0 0;
-    border-top: 1px solid var(--via-accent-hairline);
-    border-left: 0;
   }
 }
 

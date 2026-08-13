@@ -37,6 +37,10 @@ export type SolucaoBuilder = {
   erro: string | null;
   modelo: string | null;
   criadoEm: string;
+  /** Cliente do CRM que originou a personalização, quando já escolhido. */
+  oportunidadeId: string | null;
+  /** Projeto padrão usado como base do trabalho personalizado. */
+  projetoBaseId: string | null;
   /** Onde a pessoa escolheu construir. `null` = ainda não escolheu. */
   stack: EstadoStack;
   /**
@@ -72,6 +76,8 @@ function montar(linha: LinhaBuilder, tarefas: Record<number, EstadoTarefa> = {})
     erro: linha.erro,
     modelo: linha.modelo,
     criadoEm: linha.criado_em,
+    oportunidadeId: linha.oportunidade_id,
+    projetoBaseId: linha.projeto_base_id,
     stack: linha.stack,
     tarefas,
   };

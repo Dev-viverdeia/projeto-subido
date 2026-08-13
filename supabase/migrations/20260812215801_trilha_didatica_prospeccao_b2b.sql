@@ -138,3 +138,4 @@ where roteiro.projeto_id = projeto.id
 update public.solucoes
 set video_url = 'https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=ba62ae7e-10ee-4148-a4c6-5d049e437c43'
 where slug = 'maquina-prospeccao-b2b';
+;

@@ -138,3 +138,4 @@ where roteiro.projeto_id = projeto.id
 update public.solucoes
 set video_url = 'https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=7bbb80ed-1f25-45a9-af1d-8981189f9b6a'
 where slug = 'operacao-conteudo-multicanal';
+;

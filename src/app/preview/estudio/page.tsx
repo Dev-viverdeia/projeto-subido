@@ -39,7 +39,19 @@ export default function PreviewEstudioPage() {
       </aside>
 
       <main id="conteudo" className={styles.conteudo}>
-        <Compositor />
+        <Compositor
+          projetosBase={[
+            {
+              id: '11111111-1111-4111-8111-111111111111',
+              slug: 'sdr-atendimento-qualificacao',
+              titulo: 'SDR de Atendimento e Qualificação',
+              resumo: 'Atendimento conectado e rastreável.',
+              resultado: 'Responder, qualificar e encaminhar os contatos certos.',
+            },
+          ]}
+          oportunidades={[]}
+          projetoInicialId="11111111-1111-4111-8111-111111111111"
+        />
       </main>
     </div>
   );

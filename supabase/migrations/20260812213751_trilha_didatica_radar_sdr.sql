@@ -270,3 +270,4 @@ set video_url = case slug
   else video_url
 end
 where slug in ('sdr-atendimento-qualificacao', 'radar-satisfacao-com-ia');
+;
