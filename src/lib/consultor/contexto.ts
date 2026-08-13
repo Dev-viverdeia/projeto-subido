@@ -18,36 +18,58 @@ export async function obterSinaisSobral(
   jornadaRecebida?: JornadaOperacional,
 ): Promise<SinaisSobral> {
   const agora = new Date().toISOString();
-  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes, jornada] =
-    await Promise.all([
-      supabase
+  const fatosCompartilhados = jornadaRecebida?.fatos;
+
+  /* Na Início, a jornada acabou de ler estes cinco domínios. Reusar os fatos
+     preserva a mesma fotografia da operação e evita cinco novas viagens ao
+     PostgREST. No Sobral AI aberto diretamente, as consultas continuam sendo
+     feitas aqui porque não há jornada recebida para compartilhar. */
+  const oportunidadesConsulta = fatosCompartilhados
+    ? Promise.resolve(null)
+    : supabase
         .from('crm_oportunidades')
         .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
         .order('atualizado_em', { ascending: false })
-        .limit(500),
-      supabase.from('crm_empresas').select('id, nome').limit(500),
-      supabase
+        .limit(500);
+  const callsConsulta = fatosCompartilhados
+    ? Promise.resolve(null)
+    : supabase
         .from('calls_reunioes')
         .select('id, status, agendada_para, oportunidade_id, titulo, tipo')
         .order('agendada_para', { ascending: false })
-        .limit(500),
-      supabase
+        .limit(500);
+  const propostasConsulta = fatosCompartilhados
+    ? Promise.resolve(null)
+    : supabase
         .from('propostas')
         .select('id, status, oportunidade_id, empresa_id, titulo, atualizado_em')
         .order('atualizado_em', { ascending: false })
-        .limit(500),
-      supabase.from('builder_solucoes').select('id, status').limit(300),
-      supabase
+        .limit(500);
+  const catalogoConsulta = fatosCompartilhados
+    ? Promise.resolve(null)
+    : supabase
         .from('solucoes')
         .select('slug, titulo, categoria')
         .eq('status', 'publicado')
         .order('ordem')
-        .limit(20),
-      supabase
+        .limit(20);
+  const projetosConsulta = fatosCompartilhados
+    ? Promise.resolve(null)
+    : supabase
         .from('projetos_execucao')
         .select('id, titulo, status, prazo_em, atualizado_em')
         .order('atualizado_em', { ascending: false })
-        .limit(200),
+        .limit(200);
+
+  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes, jornada] =
+    await Promise.all([
+      oportunidadesConsulta,
+      supabase.from('crm_empresas').select('id, nome').limit(500),
+      callsConsulta,
+      propostasConsulta,
+      supabase.from('builder_solucoes').select('id, status').limit(300),
+      catalogoConsulta,
+      projetosConsulta,
       supabase
         .from('projeto_acoes')
         .select(
@@ -58,20 +80,20 @@ export async function obterSinaisSobral(
       jornadaRecebida ?? obterJornadaOperacionalComCliente(supabase),
     ]);
 
-  if (oportunidades.error) throw handleError(oportunidades.error, 'sobral:oportunidades');
+  if (oportunidades?.error) throw handleError(oportunidades.error, 'sobral:oportunidades');
   if (empresas.error) throw handleError(empresas.error, 'sobral:empresas');
-  if (calls.error) throw handleError(calls.error, 'sobral:calls');
-  if (propostas.error) throw handleError(propostas.error, 'sobral:propostas');
+  if (calls?.error) throw handleError(calls.error, 'sobral:calls');
+  if (propostas?.error) throw handleError(propostas.error, 'sobral:propostas');
   if (studio.error) throw handleError(studio.error, 'sobral:studio');
-  if (catalogo.error) throw handleError(catalogo.error, 'sobral:catalogo');
-  if (projetos.error) throw handleError(projetos.error, 'sobral:projetos');
+  if (catalogo?.error) throw handleError(catalogo.error, 'sobral:catalogo');
+  if (projetos?.error) throw handleError(projetos.error, 'sobral:projetos');
   if (acoes.error) throw handleError(acoes.error, 'sobral:acoes');
 
-  const linhasOportunidade = oportunidades.data ?? [];
-  const linhasCalls = calls.data ?? [];
-  const linhasPropostas = propostas.data ?? [];
+  const linhasOportunidade = fatosCompartilhados?.oportunidades ?? oportunidades?.data ?? [];
+  const linhasCalls = fatosCompartilhados?.calls ?? calls?.data ?? [];
+  const linhasPropostas = fatosCompartilhados?.propostas ?? propostas?.data ?? [];
   const linhasStudio = studio.data ?? [];
-  const linhasProjetos = projetos.data ?? [];
+  const linhasProjetos = fatosCompartilhados?.projetos ?? projetos?.data ?? [];
   const linhasAcoes = acoes.data ?? [];
   const empresasPorId = new Map((empresas.data ?? []).map((empresa) => [empresa.id, empresa.nome]));
   const abertas = linhasOportunidade.filter(
@@ -143,7 +165,7 @@ export async function obterSinaisSobral(
       aprendizado: jornada.aprendizado,
     },
     radar,
-    catalogo: (catalogo.data ?? []).map((projeto) => ({
+    catalogo: (fatosCompartilhados?.catalogo ?? catalogo?.data ?? []).map((projeto) => ({
       slug: projeto.slug,
       titulo: projeto.titulo,
       categoria: projeto.categoria,

@@ -31,6 +31,9 @@ export function NavLateral({
   const caminho = usePathname();
   const [menuAberto, setMenuAberto] = useState(false);
   const [destinoPendente, setDestinoPendente] = useState<string | null>(null);
+  const [destinosPreparados, setDestinosPreparados] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
   const tituloMenuId = useId();
   const painelMenuId = useId();
   const botaoMaisRef = useRef<HTMLButtonElement>(null);
@@ -102,6 +105,13 @@ export function NavLateral({
     setDestinoPendente(item.href);
   }
 
+  function prepararDestino(item: ItemNav) {
+    setDestinosPreparados((atuais) => {
+      if (atuais.has(item.href)) return atuais;
+      return new Set([...atuais, item.href]);
+    });
+  }
+
   function renderizarItens(lista: ItemNav[]) {
     return (
       <ul className={styles.lista}>
@@ -113,10 +123,16 @@ export function NavLateral({
             <li key={item.href}>
               <Link
                 href={item.href}
+                /* A sidebar inteira fica visível no desktop. O prefetch padrão
+                   acordava todas as rotas ao mesmo tempo; agora a rota completa
+                   só é preparada quando ponteiro ou teclado indicam intenção. */
+                prefetch={destinosPreparados.has(item.href)}
                 className={styles.item}
                 aria-current={ativo ? 'page' : undefined}
                 aria-busy={carregando || undefined}
                 data-loading={carregando || undefined}
+                onMouseEnter={() => prepararDestino(item)}
+                onFocus={() => prepararDestino(item)}
                 onClick={(evento) => iniciarNavegacao(evento, item)}
               >
                 {ativo && variante === 'dock' && <span className={styles.marcaDock} />}

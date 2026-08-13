@@ -51,7 +51,10 @@ export type OportunidadeCrm = {
 export type OportunidadeSeletor = Pick<
   OportunidadeCrm,
   'id' | 'titulo' | 'etapa' | 'empresa' | 'dominio' | 'contato'
->;
+> & {
+  /** Só a Início consome; os seletores existentes podem omitir nos fixtures. */
+  proximaAcao?: string | null;
+};
 
 export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSeletor[]> => {
   const supabase = await createClient();
@@ -63,6 +66,7 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
         titulo,
         etapa,
         ordem,
+        proxima_acao,
         empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio),
         contato:crm_contatos!crm_oportunidades_contato_fk(nome)
       `,
@@ -81,7 +85,24 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
     empresa: oportunidade.empresa?.nome ?? 'Empresa não encontrada',
     dominio: oportunidade.empresa?.dominio ?? null,
     contato: oportunidade.contato?.nome ?? null,
+    proximaAcao: oportunidade.proxima_acao,
   }));
+});
+
+/**
+ * Recorte da oportunidade em foco usado na Início.
+ *
+ * Antes esta área carregava o pipeline completo — oportunidades, eventos e
+ * enriquecimentos — apenas para mostrar empresa, contato e próxima ação. O
+ * seletor já traz tudo isso em uma única leitura leve e mantém a mesma ordem.
+ */
+export const obterFocoLeveDoCrm = cache(async (): Promise<OportunidadeSeletor | null> => {
+  const oportunidades = await listarOportunidadesSeletor();
+  return (
+    oportunidades.find((item) => item.etapa !== 'ganho' && item.etapa !== 'perdido') ??
+    oportunidades.find((item) => item.etapa === 'ganho') ??
+    null
+  );
 });
 
 /**
@@ -198,16 +219,6 @@ function montarOportunidade(
     criadoEm: linha.criado_em,
   };
 }
-
-/** Oportunidade mais relevante — aberta primeiro, último cliente ganho como continuidade. */
-export const obterFocoDoCrm = cache(async (): Promise<OportunidadeCrm | null> => {
-  const pipeline = await listarPipeline();
-  return (
-    pipeline.find((item) => item.etapa !== 'ganho' && item.etapa !== 'perdido') ??
-    pipeline.find((item) => item.etapa === 'ganho') ??
-    null
-  );
-});
 
 /**
  * Dossiê de uma oportunidade. Todas as leituras seguem a sessão e a RLS; um UUID

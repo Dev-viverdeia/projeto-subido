@@ -2,10 +2,11 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
+import { listarSolucoes } from '@/lib/conteudo/queries';
 import { handleError } from '@/lib/errors';
 import { obterMetricasProgressoConta, type MetricasProgressoConta } from '@/lib/progresso/queries';
 import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@/lib/supabase/types.generated';
+import type { Database, Tables } from '@/lib/supabase/types.generated';
 import { montarPlanoJornada, type PerfilJornada, type PlanoJornada } from './motor';
 
 export type ProjetoInicialJornada = {
@@ -21,6 +22,41 @@ export type JornadaOperacional = {
   projetos: ProjetoInicialJornada[];
   plano: PlanoJornada;
   aprendizado: MetricasProgressoConta;
+  /**
+   * Fatos já lidos para montar a jornada. Permanecem só entre Server Components
+   * e evitam que a Início consulte a mesma operação outra vez para o Sobral AI.
+   */
+  fatos: FatosJornadaOperacional;
+};
+
+type FatoOportunidadeJornada = Pick<
+  Tables<'crm_oportunidades'>,
+  'id' | 'empresa_id' | 'titulo' | 'etapa' | 'proxima_acao' | 'proxima_acao_em' | 'atualizado_em'
+>;
+
+type FatoCallJornada = Pick<
+  Tables<'calls_reunioes'>,
+  'id' | 'titulo' | 'tipo' | 'status' | 'agendada_para' | 'oportunidade_id'
+>;
+
+type FatoPropostaJornada = Pick<
+  Tables<'propostas'>,
+  'id' | 'titulo' | 'status' | 'oportunidade_id' | 'empresa_id' | 'atualizado_em'
+>;
+
+type FatoProjetoJornada = Pick<
+  Tables<'projetos_execucao'>,
+  'id' | 'titulo' | 'status' | 'prazo_em' | 'atualizado_em'
+> & {
+  projeto_tarefas: Pick<Tables<'projeto_tarefas'>, 'status'>[];
+};
+
+export type FatosJornadaOperacional = {
+  oportunidades: FatoOportunidadeJornada[];
+  calls: FatoCallJornada[];
+  propostas: FatoPropostaJornada[];
+  projetos: FatoProjetoJornada[];
+  catalogo: Pick<ProjetoInicialJornada, 'slug' | 'titulo' | 'categoria'>[];
 };
 
 export async function obterJornadaOperacionalComCliente(
@@ -32,42 +68,47 @@ export async function obterJornadaOperacionalComCliente(
         .from('jornada_perfis')
         .select('nicho, projeto_inicial_id, posicionamento, atualizado_em')
         .maybeSingle(),
+      listarSolucoes(),
       supabase
-        .from('solucoes')
-        .select('id, slug, titulo, resumo, categoria')
-        .eq('status', 'publicado')
-        .order('ordem')
-        .order('criado_em', { ascending: false })
-        .limit(20),
-      supabase.from('crm_oportunidades').select('id, etapa, proxima_acao').limit(500),
+        .from('crm_oportunidades')
+        .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
+        .limit(500),
       supabase
         .from('crm_enriquecimentos')
         .select('oportunidade_id, status')
         .eq('status', 'concluido')
         .limit(500),
-      supabase.from('calls_reunioes').select('id, tipo, status').limit(500),
+      supabase
+        .from('calls_reunioes')
+        .select('id, titulo, tipo, status, agendada_para, oportunidade_id')
+        .limit(500),
       supabase
         .from('propostas')
-        .select('id, status, atualizado_em')
+        .select('id, titulo, status, oportunidade_id, empresa_id, atualizado_em')
         .order('atualizado_em', { ascending: false })
         .limit(500),
       supabase
         .from('projetos_execucao')
-        .select('id, titulo, status, atualizado_em, projeto_tarefas(status)')
+        .select('id, titulo, status, prazo_em, atualizado_em, projeto_tarefas(status)')
         .order('atualizado_em', { ascending: false })
         .limit(200),
       obterMetricasProgressoConta(),
     ]);
 
   if (perfil.error) throw handleError(perfil.error, 'jornada:perfil');
-  if (projetos.error) throw handleError(projetos.error, 'jornada:projetos');
   if (oportunidades.error) throw handleError(oportunidades.error, 'jornada:oportunidades');
   if (enriquecimentos.error) throw handleError(enriquecimentos.error, 'jornada:enriquecimentos');
   if (calls.error) throw handleError(calls.error, 'jornada:calls');
   if (propostas.error) throw handleError(propostas.error, 'jornada:propostas');
   if (execucoes.error) throw handleError(execucoes.error, 'jornada:execucoes');
 
-  const catalogo = projetos.data ?? [];
+  const catalogo: ProjetoInicialJornada[] = projetos.map((projeto) => ({
+    id: projeto.id,
+    slug: projeto.slug,
+    titulo: projeto.titulo,
+    resumo: projeto.resumo,
+    categoria: projeto.categoria,
+  }));
   const linhaPerfil = perfil.data;
   const projetoEscolhido = catalogo.find(
     (projeto) => projeto.id === linhaPerfil?.projeto_inicial_id,
@@ -130,7 +171,19 @@ export async function obterJornadaOperacionalComCliente(
     },
   });
 
-  return { perfil: perfilMontado, projetos: catalogo, plano, aprendizado: progresso };
+  return {
+    perfil: perfilMontado,
+    projetos: catalogo,
+    plano,
+    aprendizado: progresso,
+    fatos: {
+      oportunidades: linhasOportunidade,
+      calls: linhasCalls,
+      propostas: linhasProposta,
+      projetos: linhasExecucao,
+      catalogo: catalogo.map(({ slug, titulo, categoria }) => ({ slug, titulo, categoria })),
+    },
+  };
 }
 
 export const obterJornadaOperacional = cache(async (): Promise<JornadaOperacional> => {

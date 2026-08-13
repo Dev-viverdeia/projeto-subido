@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { AnchorHTMLAttributes } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ITEM_CONTA, ITENS_NAV } from './navegacao';
 import { NavLateral } from './NavLateral';
@@ -8,6 +9,15 @@ let caminho = '/inicio';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => caminho,
+}));
+
+vi.mock('next/link', () => ({
+  default: ({
+    prefetch,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { prefetch?: boolean | null }) => (
+    <a data-prefetch={String(prefetch)} {...props} />
+  ),
 }));
 
 afterEach(() => {
@@ -61,5 +71,18 @@ describe('NavLateral no mobile', () => {
       'page',
     );
     expect(screen.getByText('Você está aqui')).toBeInTheDocument();
+  });
+});
+
+describe('NavLateral no desktop', () => {
+  it('só prepara a rota completa depois que a pessoa demonstra intenção', async () => {
+    const usuario = userEvent.setup();
+    render(<NavLateral itens={ITENS_NAV} variante="lateral" />);
+
+    const crm = screen.getByRole('link', { name: 'CRM' });
+    expect(crm).toHaveAttribute('data-prefetch', 'false');
+
+    await usuario.hover(crm);
+    expect(crm).toHaveAttribute('data-prefetch', 'true');
   });
 });

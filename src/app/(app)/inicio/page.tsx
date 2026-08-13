@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { obterFocoDoCrm } from '@/lib/crm/queries';
+import { obterFocoLeveDoCrm } from '@/lib/crm/queries';
 import { obterJornadaOperacional } from '@/lib/jornada/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -13,17 +13,17 @@ import { PrioridadeSobralInicio } from './_components/PrioridadeSobralInicio';
 export const metadata: Metadata = { title: 'Início' };
 
 async function ClienteEmFoco() {
-  const foco = await obterFocoDoCrm();
+  const foco = await obterFocoLeveDoCrm();
   return <>{foco?.empresa ?? 'Nenhum cliente em foco'}</>;
 }
 
 async function ContatoEmFoco() {
-  const foco = await obterFocoDoCrm();
+  const foco = await obterFocoLeveDoCrm();
   return <>{foco?.contato ?? 'Adicione seu primeiro contato no CRM'}</>;
 }
 
 async function ProximaAcaoCrm() {
-  const foco = await obterFocoDoCrm();
+  const foco = await obterFocoLeveDoCrm();
   return <>{foco?.proximaAcao ?? 'Defina a próxima ação no CRM'}</>;
 }
 
