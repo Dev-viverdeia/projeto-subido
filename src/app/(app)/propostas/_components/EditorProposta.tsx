@@ -2,7 +2,7 @@
 
 import { useActionState, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Check, Download, FileCheck2, Save } from 'lucide-react';
+import { ArrowLeft, Check, Download, FileCheck2, Save, Video } from 'lucide-react';
 import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import type { StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
@@ -26,6 +26,7 @@ export function EditorProposta({
   statusInicial,
   versaoInicial,
   oportunidadeId,
+  reuniaoId,
   execucaoId,
 }: {
   id: string;
@@ -34,6 +35,7 @@ export function EditorProposta({
   statusInicial: StatusProposta;
   versaoInicial: number;
   oportunidadeId: string;
+  reuniaoId: string | null;
   execucaoId: string | null;
 }) {
   const [titulo, setTitulo] = useState(tituloInicial);
@@ -96,6 +98,11 @@ export function EditorProposta({
         </div>
 
         <div className={styles.acoesTopo}>
+          {reuniaoId && (
+            <Link href={`/calls/${reuniaoId}`} className={styles.secundario}>
+              <Video size={15} aria-hidden="true" /> Call de origem
+            </Link>
+          )}
           <Link href={`/crm/${oportunidadeId}`} className={styles.secundario}>
             Ver lead
           </Link>

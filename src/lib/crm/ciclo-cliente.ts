@@ -36,8 +36,11 @@ export function montarCicloCliente(lead: DossieLead): {
   etapas: EtapaCicloCliente[];
   decisao: DecisaoCicloCliente;
 } {
-  const call = lead.calls[0] ?? null;
   const proposta = lead.propostaRecente;
+  const call =
+    (proposta?.reuniaoId ? lead.calls.find((item) => item.id === proposta.reuniaoId) : undefined) ??
+    lead.calls[0] ??
+    null;
   const projeto = lead.projetoRecente;
   const contextoPronto = Boolean(
     lead.oportunidade.enriquecidoEm ||
@@ -144,8 +147,8 @@ export function montarCicloCliente(lead: DossieLead): {
         href: `/propostas/${proposta.id}`,
         acao: proposta.status === 'aceita' ? 'Abrir projeto' : 'Continuar proposta',
         novoCiclo: false,
-        apoioHref: null,
-        apoioRotulo: null,
+        apoioHref: proposta.reuniaoId ? `/calls/${proposta.reuniaoId}` : null,
+        apoioRotulo: proposta.reuniaoId ? 'Revisar call de origem' : null,
       },
     };
   }

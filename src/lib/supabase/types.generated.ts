@@ -1807,6 +1807,7 @@ export type Database = {
           oportunidade_id: string
           projeto_id: string | null
           recusada_em: string | null
+          reuniao_id: string | null
           status: Database["public"]["Enums"]["proposta_status"]
           titulo: string
           versao: number
@@ -1824,6 +1825,7 @@ export type Database = {
           oportunidade_id: string
           projeto_id?: string | null
           recusada_em?: string | null
+          reuniao_id?: string | null
           status?: Database["public"]["Enums"]["proposta_status"]
           titulo: string
           versao?: number
@@ -1841,6 +1843,7 @@ export type Database = {
           oportunidade_id?: string
           projeto_id?: string | null
           recusada_em?: string | null
+          reuniao_id?: string | null
           status?: Database["public"]["Enums"]["proposta_status"]
           titulo?: string
           versao?: number
@@ -1865,6 +1868,13 @@ export type Database = {
             columns: ["projeto_id"]
             isOneToOne: false
             referencedRelation: "solucoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "propostas_reuniao_id_fkey"
+            columns: ["reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "calls_reunioes"
             referencedColumns: ["id"]
           },
         ]

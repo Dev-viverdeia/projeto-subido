@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { montarDocumentoInicial, type OrigemProposta } from './montar';
 import { DocumentoPropostaSchema } from './schema';
-import type { StatusProposta } from './queries';
+import { obterPropostaDaReuniao, type StatusProposta } from './queries';
 
 const NovaPropostaSchema = z.object({
   oportunidade: z.uuid(),
@@ -102,6 +102,13 @@ export async function criarProposta(formData: FormData): Promise<void> {
   if (!user) redirect('/entrar');
   if (!lead || !origem) redirect('/propostas/nova?erro=indisponivel');
 
+  const reuniaoId =
+    posCall?.oportunidade.id === validacao.data.oportunidade ? posCall.reuniao.id : null;
+  if (reuniaoId) {
+    const existente = await obterPropostaDaReuniao(reuniaoId);
+    if (existente) redirect(`/propostas/${existente.id}?origem=call`);
+  }
+
   const contextoPosCall =
     posCall?.oportunidade.id === validacao.data.oportunidade &&
     posCall.analise?.status === 'concluida' &&
@@ -141,6 +148,7 @@ export async function criarProposta(formData: FormData): Promise<void> {
       oportunidade_id: lead.oportunidade.id,
       projeto_id: projetoId ?? null,
       builder_solucao_id: origemEstudio ? validacao.data.origem.slice('estudio:'.length) : null,
+      reuniao_id: reuniaoId,
       titulo: `Proposta · ${documento.projeto.titulo}`,
       documento: documento as unknown as Json,
     })
@@ -148,6 +156,10 @@ export async function criarProposta(formData: FormData): Promise<void> {
     .single();
 
   if (error || !data) {
+    if (error?.code === '23505' && reuniaoId) {
+      const existente = await obterPropostaDaReuniao(reuniaoId);
+      if (existente) redirect(`/propostas/${existente.id}?origem=call`);
+    }
     console.error(`[propostas:criar] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`);
     redirect('/propostas/nova?erro=salvar');
   }

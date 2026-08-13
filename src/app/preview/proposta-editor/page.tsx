@@ -96,6 +96,7 @@ export default function PreviewEditorPropostaPage() {
           statusInicial="apresentada"
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
+          reuniaoId="33333333-3333-4333-8333-333333333333"
           execucaoId={null}
         />
       </main>

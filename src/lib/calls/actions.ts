@@ -166,5 +166,7 @@ export async function aplicarPlanoCall(formData: FormData): Promise<void> {
   const aplicado = Boolean(
     data && typeof data === 'object' && !Array.isArray(data) && data.aplicado,
   );
-  redirect(`/calls/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}`);
+  redirect(
+    `/calls/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}#proximo-passo-pos-call`,
+  );
 }

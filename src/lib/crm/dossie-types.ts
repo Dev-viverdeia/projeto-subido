@@ -60,6 +60,7 @@ export type PropostaDossie = {
   id: string;
   titulo: string;
   status: Enums<'proposta_status'>;
+  reuniaoId: string | null;
 };
 
 export type DossieLead = {

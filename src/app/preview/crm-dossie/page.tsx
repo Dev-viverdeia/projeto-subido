@@ -133,6 +133,7 @@ const LEAD_OPERACIONAL: DossieLead = {
     id: '77777777-7777-4777-8777-777777777777',
     titulo: 'Atendimento inteligente para clínicas',
     status: 'aceita',
+    reuniaoId: '22222222-2222-4222-8222-222222222222',
   },
   enriquecimentos: [],
   totalCalls: 2,

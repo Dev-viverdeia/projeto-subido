@@ -28,6 +28,7 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
       statusInicial={proposta.status}
       versaoInicial={proposta.versao}
       oportunidadeId={proposta.oportunidadeId}
+      reuniaoId={proposta.reuniaoId}
       execucaoId={execucaoId}
     />
   );

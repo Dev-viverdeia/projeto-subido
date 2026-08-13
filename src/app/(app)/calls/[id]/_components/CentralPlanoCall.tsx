@@ -1,6 +1,15 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, ClipboardCheck, GitBranch, ListChecks } from 'lucide-react';
+import {
+  ArrowRight,
+  BadgeCheck,
+  BriefcaseBusiness,
+  FileSignature,
+  GitBranch,
+  ListChecks,
+  Target,
+} from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
+import { montarSaidaPosCall } from '@/lib/calls/saida-pos-call';
 import { etapaVisivel, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
 import { FormularioPlanoCall } from './FormularioPlanoCall';
 import styles from '../pagina.module.css';
@@ -42,6 +51,13 @@ export function CentralPlanoCall({
   const etapaRecomendada = sugerirEtapa(posCall);
   const compromissos = posCall.analise?.compromissos ?? [];
   const planoAplicado = posCall.sincronizacao.acoesPlano.some((acao) => acao.status === 'pendente');
+  const saida = montarSaidaPosCall(posCall);
+  const IconeSaida =
+    saida.tipo === 'proposta'
+      ? FileSignature
+      : saida.tipo === 'projeto'
+        ? BriefcaseBusiness
+        : Target;
 
   return (
     <section
@@ -111,27 +127,24 @@ export function CentralPlanoCall({
         compromissos={compromissos}
       />
 
-      {posCall.reuniao.tipo === 'kickoff' &&
-        posCall.analise?.briefingOperacional &&
-        posCall.sincronizacao.projetoAtivo && (
-          <Link
-            className={styles.briefingPreparado}
-            href={`/solucoes/execucao/${posCall.sincronizacao.projetoAtivo.id}#briefing-kickoff`}
-          >
-            <span>
-              <ClipboardCheck size={17} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Briefing do kickoff preparado</strong>
-              <small>
-                Objetivo, responsáveis, acessos e limites estão prontos para sua revisão.
-              </small>
-            </div>
-            <span className={styles.briefingPreparadoAcao}>
-              Revisar no projeto <ArrowRight size={15} aria-hidden="true" />
-            </span>
-          </Link>
-        )}
+      <Link
+        id="proximo-passo-pos-call"
+        className={styles.proximaSaidaCall}
+        href={saida.href}
+        data-tipo={saida.tipo}
+      >
+        <span className={styles.proximaSaidaIcone}>
+          <IconeSaida size={18} strokeWidth={1.7} aria-hidden="true" />
+        </span>
+        <span className={styles.proximaSaidaTexto}>
+          <small>{saida.rotulo}</small>
+          <strong>{saida.titulo}</strong>
+          <span>{saida.descricao}</span>
+        </span>
+        <span className={styles.proximaSaidaAcao}>
+          {saida.acao} <ArrowRight size={15} aria-hidden="true" />
+        </span>
+      </Link>
     </section>
   );
 }

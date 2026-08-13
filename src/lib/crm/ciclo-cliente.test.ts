@@ -81,6 +81,41 @@ describe('ciclo factual do cliente', () => {
     });
   });
 
+  it('mantém navegável a call que originou uma proposta', () => {
+    const lead = leadBase();
+    lead.calls = [
+      {
+        id: '33333333-3333-4333-8333-333333333333',
+        titulo: 'Descoberta',
+        tipo: 'descoberta',
+        status: 'concluida',
+        agendadaPara: '2026-08-13T12:00:00.000Z',
+        iniciadaEm: '2026-08-13T12:00:00.000Z',
+        encerradaEm: '2026-08-13T13:00:00.000Z',
+        duracaoMinutos: 60,
+        codigoPublico: '44444444-4444-4444-8444-444444444444',
+      },
+    ];
+    lead.propostaRecente = {
+      id: '55555555-5555-4555-8555-555555555555',
+      titulo: 'Proposta de atendimento',
+      status: 'rascunho',
+      reuniaoId: lead.calls[0]!.id,
+    };
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[1]).toMatchObject({
+      href: `/calls/${lead.calls[0]!.id}`,
+      comprovada: true,
+    });
+    expect(ciclo.decisao).toMatchObject({
+      href: `/propostas/${lead.propostaRecente.id}`,
+      apoioHref: `/calls/${lead.calls[0]!.id}`,
+      apoioRotulo: 'Revisar call de origem',
+    });
+  });
+
   it('não perde o projeto quando a entrega termina e abre o próximo ciclo', () => {
     const lead = leadBase();
     lead.oportunidade.etapa = 'ganho';
@@ -88,6 +123,7 @@ describe('ciclo factual do cliente', () => {
       id: '55555555-5555-4555-8555-555555555555',
       titulo: 'Proposta aceita',
       status: 'aceita',
+      reuniaoId: null,
     };
     lead.projetoRecente = {
       id: '66666666-6666-4666-8666-666666666666',

@@ -1,14 +1,12 @@
 import Link from 'next/link';
 import {
   ArrowLeft,
-  ArrowRight,
   BadgeCheck,
   ChevronRight,
   CircleAlert,
   CircleHelp,
   Clock3,
   ContactRound,
-  FileSignature,
   Lightbulb,
   MessageSquareQuote,
   Radar,
@@ -108,7 +106,6 @@ export function DossiePosCall({
     ? (ROTULO_SENTIMENTO[analise.sentimento] ?? analise.sentimento)
     : 'sem leitura suficiente';
   const temAnalise = estado.tipo === 'pronta';
-  const linkProposta = `/propostas/nova?oportunidade=${posCall.oportunidade.id}&reuniao=${posCall.reuniao.id}`;
   return (
     <div className={styles.pagina}>
       <nav className={styles.navegacao} aria-label="Navegação do pós-call">
@@ -257,23 +254,6 @@ export function DossiePosCall({
               />
             </section>
           ) : null}
-
-          <section className={styles.atalhos} aria-label="Próximos destinos">
-            <Link href={`/crm/${posCall.oportunidade.id}`}>
-              <span>
-                <Target size={17} aria-hidden="true" />
-                Abrir dossiê do lead
-              </span>
-              <ChevronRight size={16} aria-hidden="true" />
-            </Link>
-            <Link href={linkProposta}>
-              <span>
-                <FileSignature size={17} aria-hidden="true" />
-                Criar proposta com esta call
-              </span>
-              <ChevronRight size={16} aria-hidden="true" />
-            </Link>
-          </section>
         </aside>
 
         <div className={styles.principal}>
@@ -304,10 +284,10 @@ export function DossiePosCall({
               </p>
             )}
             <footer className={styles.oportunidadesRodape}>
-              <p>Leve apenas hipóteses validadas para o escopo comercial.</p>
-              <Link href={linkProposta}>
-                Preparar proposta <ArrowRight size={15} aria-hidden="true" />
-              </Link>
+              <p>
+                Leve apenas hipóteses validadas para o escopo comercial. A continuidade desta call
+                está centralizada no plano acima.
+              </p>
             </footer>
           </section>
 

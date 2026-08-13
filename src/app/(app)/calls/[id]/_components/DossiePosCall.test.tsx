@@ -52,6 +52,7 @@ const POS_CALL: PosCall = {
     historicoCrm: true,
     acoesPlano: [],
     projetoAtivo: null,
+    propostaDaCall: null,
   },
 };
 
@@ -66,6 +67,10 @@ describe('DossiePosCall', () => {
     expect(screen.getByText('Descoberta → Proposta')).toBeInTheDocument();
     expect(screen.getByLabelText('Leitura comercial 76 de 100')).toBeInTheDocument();
     expect(screen.getByText('Nada muda no pipeline sem sua confirmação.')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Transformar esta conversa em uma proposta/ }),
+    ).toHaveAttribute('href', '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1');
+    expect(screen.queryByText('Criar proposta com esta call')).not.toBeInTheDocument();
 
     const leitura = screen.getByRole('heading', {
       name: 'O que ficou claro nesta conversa',

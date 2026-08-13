@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { obterPosCall } from '@/lib/calls/queries';
-import { listarOpcoesNovaProposta } from '@/lib/propostas/queries';
+import { listarOpcoesNovaProposta, obterPropostaDaReuniao } from '@/lib/propostas/queries';
 import { MontadorProposta } from './_components/MontadorProposta';
 import styles from './pagina.module.css';
 
@@ -22,10 +23,12 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
   const diagnosticoInicial =
     typeof parametros.diagnostico === 'string' ? parametros.diagnostico : '';
   const erro = typeof parametros.erro === 'string' ? parametros.erro : null;
-  const [opcoes, posCall] = await Promise.all([
+  const [opcoes, posCall, propostaExistente] = await Promise.all([
     listarOpcoesNovaProposta(),
     reuniaoInicial ? obterPosCall(reuniaoInicial) : Promise.resolve(null),
+    reuniaoInicial ? obterPropostaDaReuniao(reuniaoInicial) : Promise.resolve(null),
   ]);
+  if (propostaExistente) redirect(`/propostas/${propostaExistente.id}?origem=call`);
   const analise =
     posCall?.oportunidade.id === oportunidadeInicial &&
     posCall.analise?.status === 'concluida' &&

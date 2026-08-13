@@ -299,7 +299,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .limit(10),
     supabase
       .from('propostas')
-      .select('id, titulo, status')
+      .select('id, titulo, status, reuniao_id')
       .eq('oportunidade_id', id)
       .order('atualizado_em', { ascending: false })
       .limit(1)
@@ -409,6 +409,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
           id: propostaRecente.data.id,
           titulo: propostaRecente.data.titulo,
           status: propostaRecente.data.status,
+          reuniaoId: propostaRecente.data.reuniao_id,
         }
       : null,
     enriquecimentos: (enriquecimentos.data ?? []).map((execucao) => ({

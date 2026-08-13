@@ -21,6 +21,7 @@ const PROPOSTA: PropostaCompleta = {
   oportunidadeId: '33333333-3333-4333-8333-333333333333',
   projetoId: '44444444-4444-4444-8444-444444444444',
   builderSolucaoId: null,
+  reuniaoId: '55555555-5555-4555-8555-555555555555',
   documento: {
     cliente: {
       empresa: 'Clínica Horizonte',

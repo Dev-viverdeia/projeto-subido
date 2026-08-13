@@ -28,6 +28,7 @@ export type PropostaCompleta = ResumoProposta & {
   oportunidadeId: string;
   projetoId: string | null;
   builderSolucaoId: string | null;
+  reuniaoId: string | null;
   documento: DocumentoProposta;
 };
 
@@ -71,7 +72,7 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
   const { data, error } = await supabase
     .from('propostas')
     .select(
-      'id, titulo, status, versao, documento, empresa_id, oportunidade_id, projeto_id, builder_solucao_id, atualizado_em, criado_em',
+      'id, titulo, status, versao, documento, empresa_id, oportunidade_id, projeto_id, builder_solucao_id, reuniao_id, atualizado_em, criado_em',
     )
     .eq('id', id)
     .maybeSingle();
@@ -95,9 +96,24 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
     oportunidadeId: data.oportunidade_id,
     projetoId: data.projeto_id,
     builderSolucaoId: data.builder_solucao_id,
+    reuniaoId: data.reuniao_id,
     documento,
   };
 });
+
+export async function obterPropostaDaReuniao(
+  reuniaoId: string,
+): Promise<{ id: string; titulo: string; status: StatusProposta } | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('propostas')
+    .select('id, titulo, status')
+    .eq('reuniao_id', reuniaoId)
+    .maybeSingle();
+
+  if (error) throw handleError(error, 'propostas:origem-call');
+  return data;
+}
 
 export async function listarOpcoesNovaProposta(): Promise<OpcoesNovaProposta> {
   const [oportunidades, projetos, projetosEstudio] = await Promise.all([

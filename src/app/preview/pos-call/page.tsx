@@ -132,6 +132,7 @@ const POS_CALL: PosCall = {
     historicoCrm: true,
     acoesPlano: [],
     projetoAtivo: { id: 'projeto-preview', titulo: 'Piloto de atendimento assistido' },
+    propostaDaCall: null,
   },
 };
 
