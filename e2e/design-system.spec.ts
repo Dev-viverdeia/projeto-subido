@@ -41,6 +41,14 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('img', { name: 'Subido' })).toBeVisible();
   });
 
+  test('a Início distingue a meta futura do próximo fato a comprovar', async ({ page }) => {
+    await page.goto('/preview/mapa-jornada?estado=evolucao');
+
+    await expect(page.getByText('Meta da etapa · Segundo ciclo comprovado')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirmar o segundo projeto' })).toBeVisible();
+    await expect(page.getByText('Segundo projeto ainda não confirmado.')).toBeVisible();
+  });
+
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');
     const compromissoConcluido = page.getByRole('button', {

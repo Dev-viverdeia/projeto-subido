@@ -172,5 +172,9 @@ describe('motor da jornada', () => {
 
     expect(plano.etapaAtual).toBe('evoluir');
     expect(plano.proximoPasso.id).toBe('segunda-venda');
+    expect(plano.etapas.find((etapa) => etapa.id === 'evoluir')?.marco).toBe(
+      'Segundo ciclo comprovado',
+    );
+    expect(plano.proximoPasso.concluido).toBe(false);
   });
 });

@@ -106,6 +106,28 @@ const PLANO_OPERACAO = montarPlanoJornada({
   },
 });
 
+const PLANO_EVOLUCAO = montarPlanoJornada({
+  perfil: PERFIL_PREVIEW,
+  aprendizado: {
+    aulasConcluidas: 12,
+    formacoesConcluidas: 1,
+    etapasConcluidas: 15,
+    projetosConcluidos: 1,
+  },
+  oportunidades: { total: 2, enriquecidas: 1, comProximaAcao: 1, ganhas: 1 },
+  calls: { descobertasConcluidas: 1, kickoffsConcluidos: 1, entregasConcluidas: 1 },
+  propostas: { total: 1, apresentadas: 1, aceitas: 1 },
+  entregas: {
+    projetosIniciados: 1,
+    projetosConcluidos: 1,
+    propostaAceitaEmFocoId: '00000000-0000-4000-8000-000000000010',
+    projetoEmFocoId: '00000000-0000-4000-8000-000000000011',
+    projetoEmFocoTitulo: 'Atendimento da Clínica Aurora',
+    tarefasConcluidas: 10,
+    tarefasTotal: 10,
+  },
+});
+
 /**
  * Bancada visual local para comparar a implementação com a direção aprovada.
  * Em produção esta URL encerra em 404; o produto real usa o mesmo componente em
@@ -117,23 +139,40 @@ export default async function PreviewMapaJornadaPage({
   searchParams: Promise<{ estado?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const operacaoAtiva = (await searchParams).estado === 'operacao';
+  const estado = (await searchParams).estado;
+  const evolucaoAtiva = estado === 'evolucao';
+  const operacaoAtiva = estado === 'operacao' || evolucaoAtiva;
   const perfil = operacaoAtiva ? PERFIL_PREVIEW : null;
-  const plano = operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
+  const plano = evolucaoAtiva ? PLANO_EVOLUCAO : operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
   const sinais = SinaisSobralSchema.parse({
     momento: '2026-08-13T12:00:00.000Z',
     oportunidades: {
-      total: operacaoAtiva ? 1 : 0,
+      total: evolucaoAtiva ? 2 : operacaoAtiva ? 1 : 0,
       abertas: operacaoAtiva ? 1 : 0,
       semProximaAcao: 0,
       emDescoberta: 0,
       emPropostaOuNegociacao: 0,
-      ganhas: 0,
+      ganhas: evolucaoAtiva ? 1 : 0,
     },
-    calls: { total: 0, agendadas: 0, concluidas: 0 },
-    propostas: { total: 0, rascunhos: 0, prontas: 0, apresentadas: 0, aceitas: 0 },
+    calls: {
+      total: evolucaoAtiva ? 2 : 0,
+      agendadas: 0,
+      concluidas: evolucaoAtiva ? 2 : 0,
+    },
+    propostas: {
+      total: evolucaoAtiva ? 1 : 0,
+      rascunhos: 0,
+      prontas: 0,
+      apresentadas: evolucaoAtiva ? 1 : 0,
+      aceitas: evolucaoAtiva ? 1 : 0,
+    },
     studio: { total: 0, prontos: 0 },
-    projetos: { total: 0, ativos: 0, acoesPendentes: 0, acoesAtrasadas: 0 },
+    projetos: {
+      total: evolucaoAtiva ? 1 : 0,
+      ativos: 0,
+      acoesPendentes: 0,
+      acoesAtrasadas: 0,
+    },
     jornada: {
       perfilCompleto: plano.perfilCompleto,
       etapaAtual: plano.etapaAtual,

@@ -101,7 +101,7 @@ export function resolverPrioridadeInicio(
   return {
     modo: 'plano da jornada',
     etapa: etapa.titulo,
-    foco: etapa.marco,
+    foco: `Meta da etapa · ${etapa.marco}`,
     titulo: passo.titulo,
     detalhe: passo.detalhe,
     rotuloEvidencia: 'Evidência atual',

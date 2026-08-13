@@ -61,6 +61,7 @@ describe('prioridade oficial da Início', () => {
     const prioridade = resolverPrioridadeInicio(jornada(), sobral());
 
     expect(prioridade.modo).toBe('plano da jornada');
+    expect(prioridade.foco).toBe('Meta da etapa · Descoberta registrada');
     expect(prioridade.titulo).toBe('Criar a primeira oportunidade');
     expect(prioridade.destino).toBe('/crm');
   });

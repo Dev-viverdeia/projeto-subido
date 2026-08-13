@@ -137,7 +137,7 @@ export function MapaJornada({
             {plano.evidenciasConcluidas} de {plano.totalEvidencias} evidências reais registradas
           </p>
           <div className={styles.marco}>
-            <span>Marco desta etapa</span>
+            <span>Meta desta etapa</span>
             <strong>{etapaAtual.marco}</strong>
           </div>
         </aside>
