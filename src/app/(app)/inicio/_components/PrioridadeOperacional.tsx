@@ -8,6 +8,7 @@ export type PrioridadeOperacionalProps = {
   foco: string;
   titulo: string;
   detalhe: string;
+  rotuloEvidencia?: string;
   evidencia: string;
   destino: string;
   acao: string;
@@ -23,6 +24,7 @@ export function PrioridadeOperacional({
   foco,
   titulo,
   detalhe,
+  rotuloEvidencia = 'Você avançou quando',
   evidencia,
   destino,
   acao,
@@ -53,7 +55,7 @@ export function PrioridadeOperacional({
       <div className={styles.evidenciaPrioridade}>
         <CheckCircle2 size={16} strokeWidth={1.9} aria-hidden="true" />
         <span>
-          <small>Você avançou quando</small>
+          <small>{rotuloEvidencia}</small>
           <strong>{evidencia}</strong>
         </span>
       </div>

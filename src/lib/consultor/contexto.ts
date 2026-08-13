@@ -3,6 +3,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { handleError } from '@/lib/errors';
+import { obterJornadaOperacionalComCliente, type JornadaOperacional } from '@/lib/jornada/queries';
 import type { Database } from '@/lib/supabase/types.generated';
 import { SinaisSobralSchema, type SinaisSobral } from './direcao';
 import { contarAcoesAtrasadas, montarRadarSobral } from './radar';
@@ -12,9 +13,12 @@ import { contarAcoesAtrasadas, montarRadarSobral } from './radar';
  * contato é enviado por padrão; o modelo recebe só o necessário para decidir o
  * próximo passo profissional.
  */
-export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Promise<SinaisSobral> {
+export async function obterSinaisSobral(
+  supabase: SupabaseClient<Database>,
+  jornadaRecebida?: JornadaOperacional,
+): Promise<SinaisSobral> {
   const agora = new Date().toISOString();
-  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes] =
+  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes, jornada] =
     await Promise.all([
       supabase
         .from('crm_oportunidades')
@@ -51,6 +55,7 @@ export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Pro
         )
         .order('atualizado_em', { ascending: false })
         .limit(500),
+      jornadaRecebida ?? obterJornadaOperacionalComCliente(supabase),
     ]);
 
   if (oportunidades.error) throw handleError(oportunidades.error, 'sobral:oportunidades');
@@ -128,6 +133,15 @@ export async function obterSinaisSobral(supabase: SupabaseClient<Database>): Pro
       acoesPendentes: acoesPendentes.length,
       acoesAtrasadas: contarAcoesAtrasadas(linhasAcoes, agora),
     },
+    jornada: {
+      perfilCompleto: jornada.plano.perfilCompleto,
+      etapaAtual: jornada.plano.etapaAtual,
+      proximoPasso: jornada.plano.proximoPasso,
+      evidenciasConcluidas: jornada.plano.evidenciasConcluidas,
+      totalEvidencias: jornada.plano.totalEvidencias,
+      percentual: jornada.plano.percentual,
+      aprendizado: jornada.aprendizado,
+    },
     radar,
     catalogo: (catalogo.data ?? []).map((projeto) => ({
       slug: projeto.slug,
@@ -172,6 +186,15 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
         propostas: sinais.propostas,
         studio: sinais.studio,
         projetos: sinais.projetos,
+        aprendizado: sinais.jornada.aprendizado,
+      },
+      jornada_profissional: {
+        perfil_completo: sinais.jornada.perfilCompleto,
+        etapa_atual: sinais.jornada.etapaAtual,
+        proximo_passo: sinais.jornada.proximoPasso,
+        evidencias_concluidas: sinais.jornada.evidenciasConcluidas,
+        total_evidencias: sinais.jornada.totalEvidencias,
+        percentual: sinais.jornada.percentual,
       },
       radar_operacional: sinais.radar.map((item) => ({
         dominio: item.dominio,

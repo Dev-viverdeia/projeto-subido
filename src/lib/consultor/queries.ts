@@ -4,6 +4,7 @@ import { cache } from 'react';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
+import type { JornadaOperacional } from '@/lib/jornada/queries';
 import { hashDoContexto, obterSinaisSobral } from './contexto';
 import {
   AcaoConfirmadaCrmSchema,
@@ -73,40 +74,42 @@ export type PainelSobral = {
   desatualizado: boolean;
 };
 
-export const obterPainelSobral = cache(async (): Promise<PainelSobral> => {
-  const supabase = await createClient();
-  const [sinais, plano] = await Promise.all([
-    obterSinaisSobral(supabase),
-    supabase
-      .from('sobral_planos')
-      .select(
-        'etapa, diagnostico, foco, proximo_passo, acoes, sinais, contexto_hash, modelo, gerado_em',
-      )
-      .maybeSingle(),
-  ]);
+export const obterPainelSobral = cache(
+  async (jornada?: JornadaOperacional): Promise<PainelSobral> => {
+    const supabase = await createClient();
+    const [sinais, plano] = await Promise.all([
+      obterSinaisSobral(supabase, jornada),
+      supabase
+        .from('sobral_planos')
+        .select(
+          'etapa, diagnostico, foco, proximo_passo, acoes, sinais, contexto_hash, modelo, gerado_em',
+        )
+        .maybeSingle(),
+    ]);
 
-  if (plano.error) throw handleError(plano.error, 'sobral:plano');
+    if (plano.error) throw handleError(plano.error, 'sobral:plano');
 
-  const base = criarPlanoBase(sinais);
-  if (!plano.data) return { plano: base, sinais, geradoPorIA: false, desatualizado: false };
+    const base = criarPlanoBase(sinais);
+    if (!plano.data) return { plano: base, sinais, geradoPorIA: false, desatualizado: false };
 
-  const lido = PlanoSobralSchema.safeParse({
-    etapa: plano.data.etapa,
-    diagnostico: plano.data.diagnostico,
-    foco: plano.data.foco,
-    proximoPasso: plano.data.proximo_passo,
-    acoes: plano.data.acoes,
-    sinais: plano.data.sinais,
-    modelo: plano.data.modelo,
-    geradoEm: plano.data.gerado_em,
-  });
-  const desatualizado = plano.data.contexto_hash !== hashDoContexto(sinais);
+    const lido = PlanoSobralSchema.safeParse({
+      etapa: plano.data.etapa,
+      diagnostico: plano.data.diagnostico,
+      foco: plano.data.foco,
+      proximoPasso: plano.data.proximo_passo,
+      acoes: plano.data.acoes,
+      sinais: plano.data.sinais,
+      modelo: plano.data.modelo,
+      geradoEm: plano.data.gerado_em,
+    });
+    const desatualizado = plano.data.contexto_hash !== hashDoContexto(sinais);
 
-  if (!lido.success || desatualizado) {
-    return { plano: base, sinais, geradoPorIA: false, desatualizado };
-  }
-  return { plano: lido.data, sinais, geradoPorIA: true, desatualizado: false };
-});
+    if (!lido.success || desatualizado) {
+      return { plano: base, sinais, geradoPorIA: false, desatualizado };
+    }
+    return { plano: lido.data, sinais, geradoPorIA: true, desatualizado: false };
+  },
+);
 
 /** `null` quando o id não existe OU é de outra pessoa — a RLS não distingue. */
 export const obterConversa = cache(

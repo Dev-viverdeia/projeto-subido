@@ -15,6 +15,7 @@ function dominioDoDestino(destino: AcaoSobral['destino']): DominioRadarSobral | 
 }
 
 const ROTULO_POR_DESTINO: Record<AcaoSobral['destino'], string> = {
+  '/inicio': 'Abrir início',
   '/formacoes': 'Abrir formação',
   '/solucoes': 'Abrir Projetos',
   '/crm': 'Abrir no CRM',

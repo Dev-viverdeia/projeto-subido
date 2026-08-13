@@ -1,17 +1,14 @@
 import { z } from 'zod';
+import { EtapaSobralSchema, type EtapaSobral } from './etapas';
+import { alinharAcoesComJornada } from './jornada-plano';
 import { EventoAcaoCrmSchema, RecomendacaoProximaAcaoSchema } from './recomendacao';
+import type { SinaisSobral } from './sinais';
 
-export const EtapaSobralSchema = z.enum([
-  'aprender',
-  'prospectar',
-  'vender',
-  'entregar',
-  'evoluir',
-]);
-
-export type EtapaSobral = z.infer<typeof EtapaSobralSchema>;
+export { ETAPAS_SOBRAL, EtapaSobralSchema, indiceDaEtapa, type EtapaSobral } from './etapas';
+export { SinaisSobralSchema, type SinaisSobral } from './sinais';
 
 export const DestinoSobralSchema = z.enum([
+  '/inicio',
   '/formacoes',
   '/solucoes',
   '/crm',
@@ -107,107 +104,12 @@ export const PlanoSobralSchema = z.object({
 
 export type PlanoSobral = z.infer<typeof PlanoSobralSchema>;
 
-const FocoSchema = z
-  .object({
-    oportunidadeId: z.uuid(),
-    titulo: z.string(),
-    empresa: z.string(),
-    etapa: z.string(),
-    proximaAcao: z.string().nullable(),
-    proximaAcaoEm: z.string().nullable(),
-  })
-  .nullable();
-
-export const SinaisSobralSchema = z.object({
-  momento: z.string(),
-  oportunidades: z.object({
-    total: z.number().int().nonnegative(),
-    abertas: z.number().int().nonnegative(),
-    semProximaAcao: z.number().int().nonnegative(),
-    emDescoberta: z.number().int().nonnegative(),
-    emPropostaOuNegociacao: z.number().int().nonnegative(),
-    ganhas: z.number().int().nonnegative(),
-  }),
-  calls: z.object({
-    total: z.number().int().nonnegative(),
-    agendadas: z.number().int().nonnegative(),
-    concluidas: z.number().int().nonnegative(),
-  }),
-  propostas: z.object({
-    total: z.number().int().nonnegative(),
-    rascunhos: z.number().int().nonnegative(),
-    prontas: z.number().int().nonnegative(),
-    apresentadas: z.number().int().nonnegative(),
-    aceitas: z.number().int().nonnegative(),
-  }),
-  studio: z.object({
-    total: z.number().int().nonnegative(),
-    prontos: z.number().int().nonnegative(),
-  }),
-  projetos: z.object({
-    total: z.number().int().nonnegative(),
-    ativos: z.number().int().nonnegative(),
-    acoesPendentes: z.number().int().nonnegative(),
-    acoesAtrasadas: z.number().int().nonnegative(),
-  }),
-  radar: z
-    .array(
-      z.object({
-        id: z.string().min(3),
-        dominio: z.enum(['crm', 'calls', 'propostas', 'projetos', 'plano']),
-        titulo: z.string().trim().min(3).max(180),
-        contexto: z.string().trim().min(2).max(240),
-        momento: z.string().trim().min(2).max(120),
-        estado: z.enum(['ao_vivo', 'atrasado', 'hoje', 'agendado', 'aguardando', 'sem_prazo']),
-        destino: z.string().startsWith('/'),
-        prioridade: z.number().int().nonnegative(),
-      }),
-    )
-    .max(4),
-  catalogo: z.array(
-    z.object({ slug: z.string(), titulo: z.string(), categoria: z.string().nullable() }),
-  ),
-  foco: FocoSchema,
-});
-
-export type SinaisSobral = z.infer<typeof SinaisSobralSchema>;
-
-export const ETAPAS_SOBRAL: ReadonlyArray<{
-  id: EtapaSobral;
-  numero: string;
-  titulo: string;
-  marco: string;
-}> = [
-  { id: 'aprender', numero: '01', titulo: 'Aprender', marco: 'Escolher uma entrega inicial' },
-  {
-    id: 'prospectar',
-    numero: '02',
-    titulo: 'Prospectar',
-    marco: 'Criar e qualificar oportunidades',
-  },
-  { id: 'vender', numero: '03', titulo: 'Vender', marco: 'Apresentar uma proposta clara' },
-  { id: 'entregar', numero: '04', titulo: 'Entregar', marco: 'Executar com evidência' },
-  { id: 'evoluir', numero: '05', titulo: 'Evoluir', marco: 'Transformar experiência em método' },
-];
-
 /**
  * A etapa é consequência de registros verificáveis. O modelo recebe o resultado
  * e não tem permissão para promovê-lo por retórica.
  */
 export function detectarEtapaSobral(sinais: SinaisSobral): EtapaSobral {
-  const entregasComprovadas = Math.max(sinais.oportunidades.ganhas, sinais.propostas.aceitas);
-
-  if (entregasComprovadas >= 2) return 'evoluir';
-  if (entregasComprovadas >= 1) return 'entregar';
-  if (sinais.propostas.total > 0 || sinais.oportunidades.emPropostaOuNegociacao > 0) {
-    return 'vender';
-  }
-  if (sinais.oportunidades.total > 0 || sinais.calls.total > 0) return 'prospectar';
-  return 'aprender';
-}
-
-export function indiceDaEtapa(etapa: EtapaSobral): number {
-  return ETAPAS_SOBRAL.findIndex((item) => item.id === etapa);
+  return sinais.jornada.etapaAtual;
 }
 
 function acao(
@@ -226,7 +128,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
   const agora = sinais.momento;
 
   if (etapa === 'aprender') {
-    const acoes = [
+    const acoes = alinharAcoesComJornada(sinais, [
       acao(
         'Escolha uma entrega para dominar',
         'Abra os projetos padrão e escolha aquele cujo problema você consegue explicar com clareza para uma empresa.',
@@ -245,12 +147,12 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Uma frase de posicionamento que não depende de jargão técnico.',
         '/formacoes',
       ),
-    ];
+    ]);
     return {
       etapa,
       diagnostico:
         'Ainda não existem fatos comerciais na plataforma. O melhor avanço é sair do aprendizado amplo com uma entrega concreta em mãos.',
-      foco: 'Escolher a primeira entrega',
+      foco: sinais.jornada.proximoPasso.titulo,
       proximoPasso: acoes[0]!,
       acoes,
       sinais,
@@ -282,7 +184,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
             'Roteiro de descoberta com perguntas específicas.',
             '/crm',
           );
-    const acoes = [
+    const acoes = alinharAcoesComJornada(sinais, [
       principal,
       acao(
         'Complete o contexto do lead',
@@ -296,12 +198,12 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Call vinculada e próxima ação registrada.',
         '/calls',
       ),
-    ];
+    ]);
     return {
       etapa,
       diagnostico: `${sinais.oportunidades.abertas} oportunidade(s) aberta(s). O avanço agora depende de converter contexto em uma conversa e uma próxima ação rastreável.`,
       foco: empresa ? `Avançar ${empresa}` : 'Criar uma descoberta com contexto',
-      proximoPasso: principal,
+      proximoPasso: acoes[0]!,
       acoes,
       sinais,
       modelo: 'regra-factual-v1',
@@ -331,7 +233,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
               'Proposta com todos os blocos revisados e status pronta.',
               '/propostas',
             );
-    const acoes = [
+    const acoes = alinharAcoesComJornada(sinais, [
       principal,
       acao(
         'Valide o escopo contra os fatos',
@@ -345,12 +247,12 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Reunião ou follow-up registrado no CRM.',
         '/calls',
       ),
-    ];
+    ]);
     return {
       etapa,
       diagnostico: `${sinais.propostas.total} proposta(s) em curso. A prioridade é reduzir ambiguidade e conduzir uma decisão, não produzir mais documentos.`,
       foco: empresa ? `Conduzir a decisão de ${empresa}` : 'Conduzir a proposta até uma decisão',
-      proximoPasso: principal,
+      proximoPasso: acoes[0]!,
       acoes,
       sinais,
       modelo: 'regra-factual-v1',
@@ -359,7 +261,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
   }
 
   if (etapa === 'entregar') {
-    const acoes = [
+    const acoes = alinharAcoesComJornada(sinais, [
       acao(
         'Abra o projeto de implementação',
         'Escolha o projeto vendido e execute a primeira fase com responsáveis, acessos e critérios de aceite definidos.',
@@ -378,7 +280,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Próxima revisão de implementação agendada.',
         '/calls',
       ),
-    ];
+    ]);
     return {
       etapa,
       diagnostico:
@@ -394,7 +296,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
     };
   }
 
-  const acoes = [
+  const acoes = alinharAcoesComJornada(sinais, [
     acao(
       'Documente o método que se repetiu',
       'Compare as entregas concluídas e registre decisões, ativos e verificações que podem virar padrão.',
@@ -413,7 +315,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
       'Um único gargalo priorizado para o próximo ciclo.',
       '/mentorias',
     ),
-  ];
+  ]);
   return {
     etapa,
     diagnostico:

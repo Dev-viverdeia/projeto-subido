@@ -10,10 +10,18 @@ function sinais(v: Partial<SinaisJornada> = {}): SinaisJornada {
       etapasConcluidas: 0,
       projetosConcluidos: 0,
     },
-    oportunidades: { total: 0, comProximaAcao: 0, ganhas: 0 },
+    oportunidades: { total: 0, enriquecidas: 0, comProximaAcao: 0, ganhas: 0 },
     calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-    diagnosticosConcluidos: 0,
     propostas: { total: 0, apresentadas: 0, aceitas: 0 },
+    entregas: {
+      projetosIniciados: 0,
+      projetosConcluidos: 0,
+      propostaAceitaEmFocoId: null,
+      projetoEmFocoId: null,
+      projetoEmFocoTitulo: null,
+      tarefasConcluidas: 0,
+      tarefasTotal: 0,
+    },
     ...v,
   };
 }
@@ -72,9 +80,8 @@ describe('motor da jornada', () => {
           etapasConcluidas: 0,
           projetosConcluidos: 0,
         },
-        oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
+        oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 0 },
         calls: { descobertasConcluidas: 1, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-        diagnosticosConcluidos: 1,
         propostas: { total: 1, apresentadas: 1, aceitas: 0 },
       }),
     );
@@ -83,15 +90,26 @@ describe('motor da jornada', () => {
     expect(plano.proximoPasso.id).toBe('venda-confirmada');
   });
 
-  it('prioriza a prospecção existente mesmo com formação pendente', () => {
+  it('prioriza o enriquecimento quando o primeiro lead ainda não tem contexto', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
-        oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
+        oportunidades: { total: 1, enriquecidas: 0, comProximaAcao: 1, ganhas: 0 },
       }),
     );
 
     expect(plano.etapaAtual).toBe('prospectar');
+    expect(plano.proximoPasso.id).toBe('enriquecer-lead');
+  });
+
+  it('prioriza a descoberta depois que o lead tem contexto e próxima ação', () => {
+    const plano = montarPlanoJornada(
+      sinais({
+        perfil,
+        oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 0 },
+      }),
+    );
+
     expect(plano.proximoPasso.id).toBe('descoberta');
   });
 
@@ -99,7 +117,7 @@ describe('motor da jornada', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
-        oportunidades: { total: 1, comProximaAcao: 1, ganhas: 1 },
+        oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 1 },
         propostas: { total: 1, apresentadas: 1, aceitas: 1 },
       }),
     );
@@ -108,7 +126,7 @@ describe('motor da jornada', () => {
     expect(plano.proximoPasso.id).toBe('kickoff');
   });
 
-  it('só entra em evolução depois de kickoff e validação da entrega', () => {
+  it('não confunde conclusão do projeto de estudo com entrega para cliente', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
@@ -118,10 +136,37 @@ describe('motor da jornada', () => {
           etapasConcluidas: 15,
           projetosConcluidos: 1,
         },
-        oportunidades: { total: 2, comProximaAcao: 1, ganhas: 1 },
-        calls: { descobertasConcluidas: 1, kickoffsConcluidos: 1, entregasConcluidas: 1 },
-        diagnosticosConcluidos: 1,
+        oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 1 },
         propostas: { total: 1, apresentadas: 1, aceitas: 1 },
+      }),
+    );
+
+    expect(plano.etapaAtual).toBe('entregar');
+    expect(plano.proximoPasso.id).toBe('kickoff');
+  });
+
+  it('só entra em evolução depois do projeto real concluir com aceite', () => {
+    const plano = montarPlanoJornada(
+      sinais({
+        perfil,
+        aprendizado: {
+          aulasConcluidas: 12,
+          formacoesConcluidas: 1,
+          etapasConcluidas: 15,
+          projetosConcluidos: 1,
+        },
+        oportunidades: { total: 2, enriquecidas: 1, comProximaAcao: 1, ganhas: 1 },
+        calls: { descobertasConcluidas: 1, kickoffsConcluidos: 1, entregasConcluidas: 1 },
+        propostas: { total: 1, apresentadas: 1, aceitas: 1 },
+        entregas: {
+          projetosIniciados: 1,
+          projetosConcluidos: 1,
+          propostaAceitaEmFocoId: 'proposta-1',
+          projetoEmFocoId: 'execucao-1',
+          projetoEmFocoTitulo: 'Atendimento da Clínica Aurora',
+          tarefasConcluidas: 10,
+          tarefasTotal: 10,
+        },
       }),
     );
 

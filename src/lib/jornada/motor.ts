@@ -19,6 +19,7 @@ export type SinaisJornada = {
   };
   oportunidades: {
     total: number;
+    enriquecidas: number;
     comProximaAcao: number;
     ganhas: number;
   };
@@ -27,11 +28,19 @@ export type SinaisJornada = {
     kickoffsConcluidos: number;
     entregasConcluidas: number;
   };
-  diagnosticosConcluidos: number;
   propostas: {
     total: number;
     apresentadas: number;
     aceitas: number;
+  };
+  entregas: {
+    projetosIniciados: number;
+    projetosConcluidos: number;
+    propostaAceitaEmFocoId: string | null;
+    projetoEmFocoId: string | null;
+    projetoEmFocoTitulo: string | null;
+    tarefasConcluidas: number;
+    tarefasTotal: number;
   };
 };
 
@@ -93,6 +102,16 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
   const posicionamentoDefinido = Boolean(sinais.perfil?.posicionamento.trim());
   const vendaConfirmada = sinais.propostas.aceitas > 0 || sinais.oportunidades.ganhas > 0;
   const segundaVenda = Math.max(sinais.propostas.aceitas, sinais.oportunidades.ganhas) >= 2;
+  const entregaConcluida = sinais.entregas.projetosConcluidos > 0;
+  const tarefasDaEntregaConcluidas =
+    entregaConcluida ||
+    (sinais.entregas.tarefasTotal > 0 &&
+      sinais.entregas.tarefasConcluidas === sinais.entregas.tarefasTotal);
+  const destinoDaEntrega = sinais.entregas.projetoEmFocoId
+    ? `/solucoes/execucao/${sinais.entregas.projetoEmFocoId}`
+    : sinais.entregas.propostaAceitaEmFocoId
+      ? `/propostas/${sinais.entregas.propostaAceitaEmFocoId}`
+      : '/propostas';
 
   return [
     {
@@ -164,6 +183,17 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
           'Adicionar primeiro lead',
         ),
         passo(
+          'enriquecer-lead',
+          'Completar o contexto do lead',
+          'Enriqueça somente os dados que ajudam a decidir abordagem, diagnóstico ou entrega e preserve a fonte de cada fato.',
+          sinais.oportunidades.enriquecidas > 0
+            ? `${sinais.oportunidades.enriquecidas} oportunidade(s) enriquecida(s) com fonte registrada.`
+            : 'Nenhum enriquecimento concluído.',
+          sinais.oportunidades.enriquecidas > 0,
+          '/crm',
+          'Enriquecer primeiro lead',
+        ),
+        passo(
           'proxima-acao',
           'Assumir uma próxima ação',
           'Defina no CRM um verbo concreto e uma data. O lead não pode depender da memória.',
@@ -197,17 +227,6 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         'A venda avança quando o diagnóstico sustenta um escopo, a proposta é apresentada e a decisão fica registrada. Documento criado sozinho não é venda.',
       guia: 'Como conduzir proposta e decisão',
       passos: [
-        passo(
-          'diagnostico',
-          'Concluir um diagnóstico',
-          'Meça o cenário do cliente e separe o que foi observado do que ainda precisa ser validado.',
-          sinais.diagnosticosConcluidos > 0
-            ? `${sinais.diagnosticosConcluidos} diagnóstico(s) concluído(s).`
-            : 'Nenhum diagnóstico concluído.',
-          sinais.diagnosticosConcluidos > 0,
-          '/diagnosticos/novo',
-          'Criar diagnóstico',
-        ),
         passo(
           'proposta-criada',
           'Construir a proposta',
@@ -248,45 +267,43 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       resumo: 'Execute com acordo e evidência',
       marco: 'Primeira entrega encerrada',
       contexto:
-        'A entrega começa com um kickoff claro e termina com uma conversa de validação registrada. O projeto guiado mostra o como; as calls provam o combinado.',
+        'A entrega começa com um kickoff claro e termina com o aceite final do cliente. O projeto padrão ensina o método; o projeto vendido concentra tarefas, evidências e decisões reais.',
       guia: 'Como conduzir uma implementação guiada',
       passos: [
         passo(
           'kickoff',
           'Concluir o kickoff',
           'Confirme objetivo, responsáveis, acessos, fronteiras e critério de sucesso com o cliente.',
-          sinais.calls.kickoffsConcluidos > 0
+          sinais.calls.kickoffsConcluidos > 0 || entregaConcluida
             ? `${sinais.calls.kickoffsConcluidos} kickoff(s) concluído(s).`
             : 'Nenhum kickoff concluído.',
-          sinais.calls.kickoffsConcluidos > 0,
+          sinais.calls.kickoffsConcluidos > 0 || entregaConcluida,
           '/calls',
           'Agendar kickoff',
         ),
         passo(
-          'projeto-guiado',
-          'Executar o projeto guiado',
-          'Siga todas as fases da implementação e marque cada evidência somente quando estiver pronta.',
-          sinais.aprendizado.projetosConcluidos > 0
-            ? `${quantidade(sinais.aprendizado.projetosConcluidos, 'projeto guiado concluído', 'projetos guiados concluídos')}.`
-            : sinais.aprendizado.etapasConcluidas > 0
-              ? `${quantidade(sinais.aprendizado.etapasConcluidas, 'etapa executada', 'etapas executadas')}; nenhum projeto completo ainda.`
-              : 'Nenhuma etapa de projeto concluída.',
-          sinais.aprendizado.projetosConcluidos > 0,
-          sinais.perfil?.projetoInicialSlug
-            ? `/solucoes/${sinais.perfil.projetoInicialSlug}`
-            : '/solucoes',
-          'Executar projeto',
+          'executar-projeto-cliente',
+          'Executar o projeto vendido',
+          'Use o projeto do cliente para organizar tarefas, evidências, arquivos, decisões e validações sem separar o método da operação real.',
+          sinais.entregas.projetosIniciados === 0
+            ? 'Nenhum projeto de cliente foi iniciado.'
+            : `${sinais.entregas.projetoEmFocoTitulo ?? 'Projeto em foco'} · ${sinais.entregas.tarefasConcluidas}/${sinais.entregas.tarefasTotal} tarefas concluídas.`,
+          tarefasDaEntregaConcluidas,
+          destinoDaEntrega,
+          sinais.entregas.projetosIniciados > 0 ? 'Continuar projeto' : 'Abrir projeto vendido',
         ),
         passo(
-          'validacao-entrega',
-          'Registrar a validação da entrega',
-          'Faça a revisão final com o cliente, registre evidências e deixe próximos passos explícitos.',
-          sinais.calls.entregasConcluidas > 0
-            ? `${sinais.calls.entregasConcluidas} call(s) de entrega concluída(s).`
-            : 'Nenhuma call de entrega concluída.',
-          sinais.calls.entregasConcluidas > 0,
-          '/calls',
-          'Agendar validação',
+          'aceite-final',
+          'Obter o aceite final do cliente',
+          'Publique as evidências no portal, registre ajustes solicitados e encerre somente depois da aprovação explícita da entrega final.',
+          entregaConcluida
+            ? `${quantidade(sinais.entregas.projetosConcluidos, 'projeto concluído com aceite', 'projetos concluídos com aceite')}.`
+            : tarefasDaEntregaConcluidas
+              ? 'Todas as tarefas foram concluídas; o aceite final ainda está pendente.'
+              : 'A execução ainda não chegou à validação final.',
+          entregaConcluida,
+          destinoDaEntrega,
+          'Revisar aceite final',
         ),
       ],
     },
@@ -326,16 +343,16 @@ export function montarPlanoJornada(sinais: SinaisJornada): PlanoJornada {
   const indiceEntregar = definicoes.findIndex((etapa) => etapa.id === 'entregar');
   const indiceEvoluir = definicoes.findIndex((etapa) => etapa.id === 'evoluir');
   const vendaConfirmada = sinais.propostas.aceitas > 0 || sinais.oportunidades.ganhas > 0;
-  const entregaConcluida = definicoes[indiceEntregar]?.passos.every((item) => item.concluido);
+  const cicloEntregue = definicoes[indiceEntregar]?.passos.every((item) => item.concluido);
 
   // A jornada é uma prioridade operacional, não uma trava de curso. Fatos mais
   // avançados levam o profissional ao trabalho em andamento, mesmo que ainda
   // existam evidências educacionais pendentes em etapas anteriores.
   const indiceResolvido = vendaConfirmada
-    ? entregaConcluida
+    ? cicloEntregue
       ? indiceEvoluir
       : indiceEntregar
-    : sinais.propostas.total > 0 || sinais.diagnosticosConcluidos > 0
+    : sinais.propostas.total > 0
       ? indiceVender
       : sinais.oportunidades.total > 0 || sinais.calls.descobertasConcluidas > 0
         ? indiceProspectar

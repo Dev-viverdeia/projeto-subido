@@ -17,6 +17,19 @@ A navegação, os dados e a IA seguem uma única jornada:
 O Mapa da Jornada é a tela inicial e o orientador desse sistema. Ele não é um dashboard de
 atalhos: mostra o marco atual, os fatos que sustentam a recomendação e a próxima ação.
 
+### Contrato único de prioridade
+
+A plataforma mantém **um único roadmap operacional**. O motor da Jornada calcula etapa, marco e
+próxima evidência; o Sobral AI recebe esse resultado, explica o motivo e ajuda na execução, sem
+criar uma segunda ordem de trabalho.
+
+1. compromisso ao vivo, atrasado ou de hoje vence a fila;
+2. sem urgência factual, vence a próxima evidência da Jornada;
+3. o CTA abre o registro exato quando ele já existe e o formulário contextualizado quando precisa
+   nascer;
+4. formação concluída comprova aprendizado, mas nunca substitui entrega feita para um cliente;
+5. diagnóstico de atendimento apoia a venda, mas não bloqueia a jornada comercial.
+
 ## Arquitetura funcional
 
 | Camada      | Módulo                 | Responsabilidade                                                         |
@@ -57,25 +70,25 @@ primeiro gera fatos rastreáveis, depois aplica as mudanças permitidas.
 
 ## Os cinco projetos iniciais
 
-1. **Atendimento inteligente no WhatsApp**
-   - triagem, respostas, handoff humano, base de conhecimento e métricas;
-   - fácil de diagnosticar e demonstrar antes da venda.
+1. **SDR de Atendimento e Qualificação**
+   - atendimento no WhatsApp, qualificação, agenda, handoff humano e contexto para vendas;
+   - operação fácil de demonstrar, medir e conectar ao CRM.
 
-2. **Prospecção e qualificação de leads com IA**
+2. **Máquina de Prospecção B2B**
    - captura, enriquecimento, priorização, pesquisa e preparação de abordagem;
    - conecta diretamente CRM, enriquecimento e geração de oportunidade.
 
-3. **Operação comercial com IA**
+3. **Inteligência Comercial com IA**
    - preparação de calls, Live Coach, follow-up, proposta e atualização automática do CRM;
    - prova o valor da plataforma dentro da própria venda do profissional.
 
-4. **Máquina de conteúdo e marketing com IA**
+4. **Operação de Conteúdo Multicanal**
    - pesquisa, planejamento, produção, revisão, distribuição e reaproveitamento;
    - projeto recorrente, visual e fácil de adaptar a diferentes negócios.
 
-5. **Assistente interno de conhecimento e operações**
-   - busca segura em documentos, rotinas, suporte interno e automações controladas;
-   - projeto com maior profundidade e ponte para entregas personalizadas no Estúdio.
+5. **Radar de Satisfação com IA**
+   - coleta, classificação, síntese e encaminhamento de feedbacks de clientes;
+   - projeto menor, de entrada e fácil de validar antes das implementações mais técnicas.
 
 Cada projeto precisa conter: resultado esperado, pré-requisitos, diagnóstico, escopo, promessa
 permitida, arquitetura, ferramentas, estimativa, roteiro comercial, proposta-base, implementação

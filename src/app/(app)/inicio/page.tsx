@@ -56,7 +56,7 @@ export default async function InicioPage() {
       nome={primeiroNome}
       prioridade={
         <Suspense fallback={<PrioridadeOperacionalCarregando />}>
-          <PrioridadeSobralInicio />
+          <PrioridadeSobralInicio jornada={jornada} />
         </Suspense>
       }
       cliente={

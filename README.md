@@ -1,34 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Subido
 
-## Getting Started
+Sistema operacional do profissional que vende e implementa projetos de IA em empresas.
 
-First, run the development server:
+O produto organiza uma jornada contínua:
+
+**aprender → prospectar → vender → entregar → evoluir**
+
+CRM, Calls, Live Coach, propostas, projetos, Estúdio, formações, mentorias, certificados e Sobral
+AI compartilham o mesmo contexto. A tela Início calcula uma prioridade factual e abre o registro
+exato que precisa avançar.
+
+## Stack
+
+- Next.js 16, React 19 e TypeScript strict;
+- Supabase com RLS;
+- LiveKit para salas em tempo real;
+- OpenAI para Sobral AI, Live Coach e diagnósticos;
+- CSS Modules sobre o Design System oficial da Viver de IA;
+- npm como único gerenciador de pacotes.
+
+## Desenvolvimento local
+
+1. Use Node 24.15 ou mais recente e npm 11.
+2. Copie `.env.example` para `.env.local` e use as credenciais do ambiente autorizado.
+3. Instale e execute:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O app abre em `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Gates principais
 
-## Learn More
+```bash
+npm run typecheck
+npm run lint
+npm run check:identidade
+npm run check:fronteira
+npm run check:ds-drift
+npm run check:schema-edge
+npm run format:check
+npm test
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Fontes de verdade
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `AGENTS.md`: convenções técnicas, produto e design system;
+- `docs/PLANO_MESTRE_PRODUTO.md`: visão, arquitetura e ordem de construção;
+- `src/lib/jornada/`: motor factual de etapa e próxima ação;
+- `src/lib/consultor/`: contexto e orientação do Sobral AI;
+- `supabase/migrations/`: histórico imutável do banco.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O Design System vendorizado em `src/design-system/via/` não recebe edições manuais. Alterações de
+marca e produto ficam nas camadas próprias da aplicação.

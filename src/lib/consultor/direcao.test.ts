@@ -14,8 +14,10 @@ function sinais(
     oportunidades?: Partial<SinaisSobral['oportunidades']>;
     calls?: Partial<SinaisSobral['calls']>;
     propostas?: Partial<SinaisSobral['propostas']>;
+    etapa?: SinaisSobral['jornada']['etapaAtual'];
   } = {},
 ): SinaisSobral {
+  const etapa = alteracoes.etapa ?? 'aprender';
   return SinaisSobralSchema.parse({
     momento: '2026-08-08T12:00:00.000Z',
     oportunidades: {
@@ -38,6 +40,36 @@ function sinais(
     },
     studio: { total: 0, prontos: 0 },
     projetos: { total: 0, ativos: 0, acoesPendentes: 0, acoesAtrasadas: 0 },
+    jornada: {
+      perfilCompleto: true,
+      etapaAtual: etapa,
+      proximoPasso: {
+        id: `passo-${etapa}`,
+        titulo: `Executar a etapa ${etapa}`,
+        detalhe: 'Conclua o próximo movimento indicado pela jornada oficial da plataforma.',
+        evidencia: 'Próximo movimento concluído e registrado.',
+        destino:
+          etapa === 'aprender'
+            ? '/formacoes'
+            : etapa === 'prospectar'
+              ? '/crm'
+              : etapa === 'vender'
+                ? '/propostas'
+                : etapa === 'entregar'
+                  ? '/solucoes'
+                  : '/builder',
+        acao: 'Executar agora',
+      },
+      evidenciasConcluidas: 3,
+      totalEvidencias: 15,
+      percentual: 20,
+      aprendizado: {
+        aulasConcluidas: 2,
+        formacoesConcluidas: 0,
+        etapasConcluidas: 0,
+        projetosConcluidos: 0,
+      },
+    },
     radar: [],
     catalogo: [],
     foco: null,
@@ -47,18 +79,19 @@ function sinais(
 describe('detectarEtapaSobral', () => {
   it.each([
     ['aprender', sinais()],
-    ['prospectar', sinais({ oportunidades: { total: 1, abertas: 1 } })],
-    ['vender', sinais({ propostas: { total: 1, rascunhos: 1 } })],
-    ['entregar', sinais({ propostas: { total: 1, aceitas: 1 } })],
-    ['evoluir', sinais({ oportunidades: { total: 2, ganhas: 2 } })],
-  ] as const)('deriva %s somente dos fatos registrados', (esperada, contexto) => {
+    ['prospectar', sinais({ etapa: 'prospectar', oportunidades: { total: 1, abertas: 1 } })],
+    ['vender', sinais({ etapa: 'vender', propostas: { total: 1, rascunhos: 1 } })],
+    ['entregar', sinais({ etapa: 'entregar', propostas: { total: 1, aceitas: 1 } })],
+    ['evoluir', sinais({ etapa: 'evoluir', oportunidades: { total: 2, ganhas: 2 } })],
+  ] as const)('segue a etapa %s calculada pela jornada oficial', (esperada, contexto) => {
     expect(detectarEtapaSobral(contexto)).toBe(esperada);
   });
 
-  it('não soma a mesma venda registrada em oportunidade e proposta', () => {
+  it('não cria uma segunda etapa quando os contadores isolados divergem', () => {
     const contexto = sinais({
+      etapa: 'entregar',
       oportunidades: { total: 1, ganhas: 1 },
-      propostas: { total: 1, aceitas: 1 },
+      propostas: { total: 2, aceitas: 2 },
     });
 
     expect(detectarEtapaSobral(contexto)).toBe('entregar');
@@ -68,10 +101,10 @@ describe('detectarEtapaSobral', () => {
 describe('criarPlanoBase', () => {
   it.each([
     sinais(),
-    sinais({ oportunidades: { total: 1, abertas: 1, semProximaAcao: 1 } }),
-    sinais({ propostas: { total: 1, prontas: 1 } }),
-    sinais({ oportunidades: { total: 1, ganhas: 1 } }),
-    sinais({ propostas: { total: 2, aceitas: 2 } }),
+    sinais({ etapa: 'prospectar', oportunidades: { total: 1, abertas: 1, semProximaAcao: 1 } }),
+    sinais({ etapa: 'vender', propostas: { total: 1, prontas: 1 } }),
+    sinais({ etapa: 'entregar', oportunidades: { total: 1, ganhas: 1 } }),
+    sinais({ etapa: 'evoluir', propostas: { total: 2, aceitas: 2 } }),
   ])('sempre produz uma direção válida com três ações', (contexto) => {
     const plano = criarPlanoBase(contexto);
 

@@ -14,7 +14,9 @@ import { ConfiguracaoJornada } from '@/app/(app)/inicio/_components/Configuracao
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
 import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { SinaisSobralSchema } from '@/lib/consultor/direcao';
 import { montarPlanoJornada } from '@/lib/jornada/motor';
+import { resolverPrioridadeInicio } from '@/lib/jornada/prioridade';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Mapa da jornada' };
@@ -68,10 +70,18 @@ const PLANO_ATIVACAO = montarPlanoJornada({
     etapasConcluidas: 0,
     projetosConcluidos: 0,
   },
-  oportunidades: { total: 0, comProximaAcao: 0, ganhas: 0 },
+  oportunidades: { total: 0, enriquecidas: 0, comProximaAcao: 0, ganhas: 0 },
   calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-  diagnosticosConcluidos: 0,
   propostas: { total: 0, apresentadas: 0, aceitas: 0 },
+  entregas: {
+    projetosIniciados: 0,
+    projetosConcluidos: 0,
+    propostaAceitaEmFocoId: null,
+    projetoEmFocoId: null,
+    projetoEmFocoTitulo: null,
+    tarefasConcluidas: 0,
+    tarefasTotal: 0,
+  },
 });
 
 const PLANO_OPERACAO = montarPlanoJornada({
@@ -82,10 +92,18 @@ const PLANO_OPERACAO = montarPlanoJornada({
     etapasConcluidas: 4,
     projetosConcluidos: 0,
   },
-  oportunidades: { total: 1, comProximaAcao: 1, ganhas: 0 },
+  oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 0 },
   calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-  diagnosticosConcluidos: 0,
   propostas: { total: 0, apresentadas: 0, aceitas: 0 },
+  entregas: {
+    projetosIniciados: 0,
+    projetosConcluidos: 0,
+    propostaAceitaEmFocoId: null,
+    projetoEmFocoId: null,
+    projetoEmFocoTitulo: null,
+    tarefasConcluidas: 0,
+    tarefasTotal: 0,
+  },
 });
 
 /**
@@ -102,6 +120,59 @@ export default async function PreviewMapaJornadaPage({
   const operacaoAtiva = (await searchParams).estado === 'operacao';
   const perfil = operacaoAtiva ? PERFIL_PREVIEW : null;
   const plano = operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
+  const sinais = SinaisSobralSchema.parse({
+    momento: '2026-08-13T12:00:00.000Z',
+    oportunidades: {
+      total: operacaoAtiva ? 1 : 0,
+      abertas: operacaoAtiva ? 1 : 0,
+      semProximaAcao: 0,
+      emDescoberta: 0,
+      emPropostaOuNegociacao: 0,
+      ganhas: 0,
+    },
+    calls: { total: 0, agendadas: 0, concluidas: 0 },
+    propostas: { total: 0, rascunhos: 0, prontas: 0, apresentadas: 0, aceitas: 0 },
+    studio: { total: 0, prontos: 0 },
+    projetos: { total: 0, ativos: 0, acoesPendentes: 0, acoesAtrasadas: 0 },
+    jornada: {
+      perfilCompleto: plano.perfilCompleto,
+      etapaAtual: plano.etapaAtual,
+      proximoPasso: plano.proximoPasso,
+      evidenciasConcluidas: plano.evidenciasConcluidas,
+      totalEvidencias: plano.totalEvidencias,
+      percentual: plano.percentual,
+      aprendizado: operacaoAtiva
+        ? {
+            aulasConcluidas: 12,
+            formacoesConcluidas: 1,
+            etapasConcluidas: 4,
+            projetosConcluidos: 0,
+          }
+        : {
+            aulasConcluidas: 0,
+            formacoesConcluidas: 0,
+            etapasConcluidas: 0,
+            projetosConcluidos: 0,
+          },
+    },
+    radar: [],
+    catalogo: PROJETOS.map((projeto) => ({
+      slug: projeto.slug,
+      titulo: projeto.titulo,
+      categoria: projeto.categoria,
+    })),
+    foco: operacaoAtiva
+      ? {
+          oportunidadeId: '00000000-0000-4000-8000-000000000001',
+          titulo: 'Atendimento da Clínica Aurora',
+          empresa: 'Clínica Aurora',
+          etapa: 'qualificacao',
+          proximaAcao: 'Agendar descoberta',
+          proximaAcaoEm: null,
+        }
+      : null,
+  });
+  const prioridade = resolverPrioridadeInicio(plano, sinais);
 
   return (
     <div className={styles.shell}>
@@ -149,14 +220,15 @@ export default async function PreviewMapaJornadaPage({
           nome="Mateus"
           prioridade={
             <PrioridadeOperacional
-              modo="leitura factual"
-              etapa="Prospectar"
-              foco="Transformar a Clínica Aurora em uma descoberta registrada"
-              titulo="Conduza a primeira descoberta"
-              detalhe="O CRM já tem cliente e próxima ação. Agora confirme processo, impacto, restrições e decisão em uma call vinculada."
-              evidencia="Call de descoberta concluída e contexto salvo no CRM."
-              destino="/calls?nova=1&oportunidade=00000000-0000-4000-8000-000000000001"
-              acao="Agendar call"
+              modo={prioridade.modo}
+              etapa={prioridade.etapa}
+              foco={prioridade.foco}
+              titulo={prioridade.titulo}
+              detalhe={prioridade.detalhe}
+              rotuloEvidencia={prioridade.rotuloEvidencia}
+              evidencia={prioridade.evidencia}
+              destino={prioridade.destino}
+              acao={prioridade.acao}
             />
           }
           cliente="Clínica Aurora"
