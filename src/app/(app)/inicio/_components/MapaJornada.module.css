@@ -364,6 +364,9 @@
 }
 
 .prioridadeTopo span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
   color: var(--via-gray-300);
 }
 
@@ -383,7 +386,7 @@
 
 .prioridade h1 {
   max-width: 17ch;
-  margin-top: var(--via-space-5);
+  margin-top: var(--via-space-2);
   color: var(--via-white);
   font-family: var(--via-font-display);
   font-size: clamp(2rem, 3.7vw, 3.55rem);
@@ -393,7 +396,17 @@
   text-wrap: balance;
 }
 
-.prioridade > p {
+.prioridadeFoco {
+  margin: var(--via-space-5) 0 0;
+  color: var(--via-gray-400);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  line-height: var(--via-lh-normal);
+  text-transform: uppercase;
+}
+
+.prioridadeDescricao {
   max-width: 64ch;
   margin-top: var(--via-space-4);
   color: var(--via-gray-300);
@@ -402,13 +415,20 @@
   text-wrap: pretty;
 }
 
+.prioridadeAcoes {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  margin-top: var(--via-space-5);
+}
+
 .botaoPrimario {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
   min-height: 44px;
-  margin-top: var(--via-space-5);
+  margin-top: 0;
   padding: var(--via-space-2_5) var(--via-space-4);
   border-radius: var(--app-radius-control);
   background: var(--via-white);
@@ -420,6 +440,26 @@
   transition:
     background-color var(--app-t-state),
     transform var(--app-t-touch);
+}
+
+.abrirLeitura {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  text-underline-offset: 4px;
+}
+
+.abrirLeitura:hover {
+  color: var(--via-white);
+}
+
+.abrirLeitura:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-chip);
+  box-shadow: var(--app-ring-onnavy);
 }
 
 .botaoPrimario:hover {
@@ -446,6 +486,25 @@
 .evidenciaPrioridade small,
 .evidenciaPrioridade strong {
   display: block;
+}
+
+.prioridadeCarregando h1 {
+  margin-top: var(--via-space-8);
+}
+
+.carregandoLinha {
+  width: min(100%, 380px);
+  height: 44px;
+  margin-top: var(--via-space-5);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.1);
+  animation: prioridade-pulso 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes prioridade-pulso {
+  to {
+    opacity: 0.48;
+  }
 }
 
 .evidenciaPrioridade small {
@@ -553,7 +612,7 @@
 
 .cartoesOperacao {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.78fr) minmax(0, 1.32fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
   gap: var(--via-space-3);
   margin-top: var(--via-space-5);
 }
@@ -665,29 +724,6 @@
   transform: translateX(2px);
 }
 
-.cartaoSobral {
-  border-color: var(--via-navy);
-  background:
-    radial-gradient(circle at 100% 0%, rgba(217, 255, 96, 0.12), transparent 35%), var(--via-navy);
-  color: var(--via-white);
-}
-
-.cartaoSobral .cartaoIcone {
-  border-color: rgba(217, 255, 96, 0.22);
-  background: rgba(217, 255, 96, 0.1);
-  color: var(--via-accent);
-}
-
-.cartaoSobral .cartaoConteudo small,
-.cartaoSobral .cartaoConteudo p,
-.cartaoSobral .cartaoSeta {
-  color: var(--via-gray-400);
-}
-
-.cartaoSobral .cartaoConteudo strong {
-  color: var(--via-white);
-}
-
 @media (max-width: 1079px) {
   .ativacaoIntroducao {
     min-height: 0;
@@ -703,10 +739,6 @@
 
   .cartoesOperacao {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .cartaoSobral {
-    grid-column: 1 / -1;
   }
 }
 
@@ -752,10 +784,6 @@
 
   .cartoesOperacao {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cartaoSobral {
-    grid-column: auto;
   }
 }
 
@@ -820,6 +848,16 @@
     width: 100%;
   }
 
+  .prioridadeAcoes {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--via-space-2);
+  }
+
+  .abrirLeitura {
+    justify-content: center;
+  }
+
   .comandoTrilho,
   .caminho,
   .operacao {
@@ -849,5 +887,9 @@
   .cartaoOperacao,
   .cartaoSeta {
     transition: none;
+  }
+
+  .carregandoLinha {
+    animation: none;
   }
 }

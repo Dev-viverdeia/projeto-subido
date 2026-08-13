@@ -1,27 +1,17 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import {
-  ArrowRight,
-  Bot,
-  Building2,
-  CalendarDays,
-  Check,
-  CheckCircle2,
-  Clock3,
-  UserRound,
-} from 'lucide-react';
+import { ArrowRight, Building2, CalendarDays, Check, Clock3, UserRound } from 'lucide-react';
 import type { PlanoJornada } from '@/lib/jornada/motor';
 import styles from './MapaJornada.module.css';
 
 type Props = {
   configuracao?: ReactNode;
   nome: string | null;
+  prioridade: ReactNode;
   cliente: ReactNode;
   contato: ReactNode;
   proximaAcao?: ReactNode;
   proximaMentoria?: ReactNode;
-  diagnosticoSobral: ReactNode;
-  focoSobral: ReactNode;
   plano: PlanoJornada;
 };
 
@@ -52,12 +42,11 @@ function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
 export function MapaJornada({
   configuracao,
   nome,
+  prioridade,
   cliente,
   contato,
   proximaAcao,
   proximaMentoria,
-  diagnosticoSobral,
-  focoSobral,
   plano,
 }: Props) {
   const etapaAtual = plano.etapas.find((item) => item.id === plano.etapaAtual) ?? plano.etapas[0]!;
@@ -127,25 +116,7 @@ export function MapaJornada({
       </header>
 
       <section className={styles.comando} aria-label="Próximo movimento da operação">
-        <article className={styles.prioridade}>
-          <div className={styles.prioridadeTopo}>
-            <span>Seu próximo movimento</span>
-            <em>{etapaAtual.titulo}</em>
-          </div>
-          <h1>{plano.proximoPasso.titulo}</h1>
-          <p>{plano.proximoPasso.detalhe}</p>
-          <Link href={plano.proximoPasso.destino} className={styles.botaoPrimario}>
-            {plano.proximoPasso.acao}
-            <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
-          </Link>
-          <div className={styles.evidenciaPrioridade}>
-            <CheckCircle2 size={16} strokeWidth={1.9} aria-hidden="true" />
-            <span>
-              <small>Evidência atual</small>
-              <strong>{plano.proximoPasso.evidencia}</strong>
-            </span>
-          </div>
-        </article>
+        {prioridade}
 
         <aside className={styles.progresso} aria-label="Progresso da jornada">
           <div className={styles.progressoNumero}>
@@ -214,23 +185,6 @@ export function MapaJornada({
               <small>Próximo encontro</small>
               <strong>{proximaMentoria ?? 'Mentoria de implementação'}</strong>
               <p>Leve o bloqueio mais importante da sua entrega.</p>
-            </span>
-            <ArrowRight
-              className={styles.cartaoSeta}
-              size={16}
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-          </Link>
-
-          <Link href="/consultor" className={`${styles.cartaoOperacao} ${styles.cartaoSobral}`}>
-            <span className={styles.cartaoIcone} aria-hidden="true">
-              <Bot size={19} strokeWidth={1.8} />
-            </span>
-            <span className={styles.cartaoConteudo}>
-              <small>Leitura do Sobral AI</small>
-              <strong>{diagnosticoSobral}</strong>
-              <p>{focoSobral}</p>
             </span>
             <ArrowRight
               className={styles.cartaoSeta}

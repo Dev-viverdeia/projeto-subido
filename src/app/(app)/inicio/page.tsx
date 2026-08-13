@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { obterPainelSobral } from '@/lib/consultor/queries';
 import { obterFocoDoCrm } from '@/lib/crm/queries';
 import { obterJornadaOperacional } from '@/lib/jornada/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
@@ -8,18 +7,10 @@ import { createClient } from '@/lib/supabase/server';
 import { ConfiguracaoJornada } from './_components/ConfiguracaoJornada';
 import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
+import { PrioridadeOperacionalCarregando } from './_components/PrioridadeOperacional';
+import { PrioridadeSobralInicio } from './_components/PrioridadeSobralInicio';
 
 export const metadata: Metadata = { title: 'Início' };
-
-async function DiagnosticoSobral() {
-  const painel = await obterPainelSobral();
-  return <>{painel.plano.diagnostico}</>;
-}
-
-async function FocoSobral() {
-  const painel = await obterPainelSobral();
-  return <>{painel.plano.foco}</>;
-}
 
 async function ClienteEmFoco() {
   const foco = await obterFocoDoCrm();
@@ -63,6 +54,11 @@ export default async function InicioPage() {
     <MapaJornada
       configuracao={<ConfiguracaoJornada perfil={jornada.perfil} projetos={jornada.projetos} />}
       nome={primeiroNome}
+      prioridade={
+        <Suspense fallback={<PrioridadeOperacionalCarregando />}>
+          <PrioridadeSobralInicio />
+        </Suspense>
+      }
       cliente={
         <Suspense fallback={<CarregandoDado largura="16ch" />}>
           <ClienteEmFoco />
@@ -81,16 +77,6 @@ export default async function InicioPage() {
       proximaMentoria={
         <Suspense fallback={<CarregandoDado largura="18ch" />}>
           <ProximaMentoria />
-        </Suspense>
-      }
-      diagnosticoSobral={
-        <Suspense fallback={<CarregandoDado largura="24ch" />}>
-          <DiagnosticoSobral />
-        </Suspense>
-      }
-      focoSobral={
-        <Suspense fallback={<CarregandoDado largura="22ch" />}>
-          <FocoSobral />
         </Suspense>
       }
       plano={jornada.plano}

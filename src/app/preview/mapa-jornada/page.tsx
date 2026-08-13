@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { ConfiguracaoJornada } from '@/app/(app)/inicio/_components/ConfiguracaoJornada';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
+import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { montarPlanoJornada } from '@/lib/jornada/motor';
 import styles from './preview.module.css';
@@ -146,12 +147,22 @@ export default async function PreviewMapaJornadaPage({
         <MapaJornada
           configuracao={<ConfiguracaoJornada perfil={perfil} projetos={PROJETOS} />}
           nome="Mateus"
+          prioridade={
+            <PrioridadeOperacional
+              modo="leitura factual"
+              etapa="Prospectar"
+              foco="Transformar a Clínica Aurora em uma descoberta registrada"
+              titulo="Conduza a primeira descoberta"
+              detalhe="O CRM já tem cliente e próxima ação. Agora confirme processo, impacto, restrições e decisão em uma call vinculada."
+              evidencia="Call de descoberta concluída e contexto salvo no CRM."
+              destino="/calls?nova=1&oportunidade=00000000-0000-4000-8000-000000000001"
+              acao="Agendar call"
+            />
+          }
           cliente="Clínica Aurora"
           contato="Dra. Camila Rios"
           proximaAcao="Apresentar proposta na quinta-feira"
           proximaMentoria="Chamada de alinhamento"
-          diagnosticoSobral="A operação já tem um lead com próxima ação. O gargalo agora é transformar a conversa em uma descoberta registrada."
-          focoSobral="Concluir a descoberta antes de preparar o escopo."
           plano={plano}
         />
       </main>
