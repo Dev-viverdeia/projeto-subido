@@ -68,6 +68,12 @@
     align-items: stretch;
   }
 
+  .botao {
+    padding-inline: var(--via-space-3);
+    font-size: var(--via-fs-xs);
+    white-space: nowrap;
+  }
+
   .erro {
     max-width: none;
     text-align: left;

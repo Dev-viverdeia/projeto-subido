@@ -40,7 +40,7 @@ export function AtualizarDirecao({
   const rotulo = carregando
     ? 'Lendo sua operação…'
     : desatualizado
-      ? 'Recalcular com os fatos novos'
+      ? 'Recalcular direção'
       : geradoPorIA
         ? 'Atualizar direção'
         : 'Fazer leitura com IA';

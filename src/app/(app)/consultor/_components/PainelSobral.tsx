@@ -14,8 +14,8 @@ import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import entrada from '@/app/(app)/_components/entrada.module.css';
 import { ETAPAS_SOBRAL, indiceDaEtapa, type AcaoSobral } from '@/lib/consultor/direcao';
+import { resolverAcaoSobral } from '@/lib/consultor/destino';
 import type { PainelSobral, ThreadDoConsultor } from '@/lib/consultor/queries';
-import type { DominioRadarSobral, ItemRadarSobral } from '@/lib/consultor/radar';
 import { AtualizarDirecao } from './AtualizarDirecao';
 import { Conversa, type ExemploDoConsultor } from './Conversa';
 import { ListaConversas } from './ListaConversas';
@@ -32,28 +32,8 @@ function dataDaLeitura(iso: string): string {
   }).format(new Date(iso));
 }
 
-function dominioDoDestino(destino: AcaoSobral['destino']): DominioRadarSobral | null {
-  if (destino === '/crm') return 'crm';
-  if (destino === '/calls') return 'calls';
-  if (destino === '/propostas') return 'propostas';
-  if (destino === '/solucoes') return 'projetos';
-  return null;
-}
-
-function acaoConcreta(acao: AcaoSobral, radar: ItemRadarSobral[]) {
-  const dominio = dominioDoDestino(acao.destino);
-  const item = dominio ? radar.find((sinal) => sinal.dominio === dominio) : null;
-  const rotulo = {
-    crm: 'Abrir no CRM',
-    calls: 'Abrir call',
-    propostas: 'Abrir proposta',
-    projetos: 'Abrir projeto',
-    plano: 'Abrir compromisso',
-  }[dominio ?? 'crm'];
-  return {
-    destino: item?.destino ?? acao.destino,
-    rotulo: item ? rotulo : 'Executar próximo passo',
-  };
+function mesmaAcao(a: AcaoSobral, b: AcaoSobral): boolean {
+  return a.titulo === b.titulo && a.destino === b.destino;
 }
 
 function exemplosDoPainel(painel: PainelSobral): ExemploDoConsultor[] {
@@ -98,7 +78,10 @@ export function PainelSobralView({
     sinais.studio.total +
     sinais.projetos.total +
     sinais.projetos.acoesPendentes;
-  const acaoPrincipal = acaoConcreta(plano.proximoPasso, sinais.radar);
+  const acaoPrincipal = resolverAcaoSobral(plano.proximoPasso, sinais);
+  const acoesDepois = plano.acoes
+    .filter((acao) => !mesmaAcao(acao, plano.proximoPasso))
+    .slice(0, 2);
   const propostasEmCurso =
     sinais.propostas.rascunhos + sinais.propostas.prontas + sinais.propostas.apresentadas;
 
@@ -267,40 +250,42 @@ export function PainelSobralView({
         <Conversa exemplos={exemplosDoPainel(painel)} />
       </section>
 
-      <section className={`${entrada.bloco} ${styles.plano}`}>
-        <header className={styles.secaoCabecalho}>
-          <div>
-            <p className={styles.eyebrow}>Plano em ordem</p>
-            <h2>Três ações. Uma frente por vez.</h2>
-          </div>
-          <p>
-            A evidência encerra cada ação e impede que “trabalhar nisso” vire estado permanente.
-          </p>
-        </header>
+      {acoesDepois.length > 0 ? (
+        <section className={`${entrada.bloco} ${styles.plano}`}>
+          <header className={styles.secaoCabecalho}>
+            <div>
+              <p className={styles.eyebrow}>Depois do movimento atual</p>
+              <h2>O restante fica em espera.</h2>
+            </div>
+            <p>
+              Conclua a evidência de agora antes de abrir a próxima frente. O plano se recalcula
+              quando os fatos mudam.
+            </p>
+          </header>
 
-        <ol className={styles.acoesPlano}>
-          {plano.acoes.map((acao, indice) => {
-            const destino = acaoConcreta(acao, sinais.radar);
-            return (
-              <li key={`${acao.titulo}-${indice}`} className={styles.acaoCard}>
-                <div className={styles.acaoIndice}>
-                  <span>{String(indice + 1).padStart(2, '0')}</span>
-                  {indice === 0 ? <em>Agora</em> : null}
-                </div>
-                <div className={styles.acaoConteudo}>
-                  <h3>{acao.titulo}</h3>
-                  <p>{acao.detalhe}</p>
-                  <small>{acao.evidencia}</small>
-                </div>
-                <Link href={destino.destino} className={styles.acaoLink}>
-                  <span>{destino.rotulo}</span>
-                  <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
+          <ol className={styles.acoesPlano}>
+            {acoesDepois.map((acao, indice) => {
+              const destino = resolverAcaoSobral(acao, sinais);
+              return (
+                <li key={`${acao.titulo}-${indice}`} className={styles.acaoCard}>
+                  <div className={styles.acaoIndice}>
+                    <span>{String(indice + 2).padStart(2, '0')}</span>
+                  </div>
+                  <div className={styles.acaoConteudo}>
+                    <h3>{acao.titulo}</h3>
+                    <p>{acao.detalhe}</p>
+                    <small>{acao.evidencia}</small>
+                  </div>
+                  <Link href={destino.destino} className={styles.acaoLink}>
+                    <span>{destino.rotulo}</span>
+                    <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                  </Link>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ) : null}
 
       {threads.length > 0 ? (
         <section
