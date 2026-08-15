@@ -4,7 +4,7 @@ import { useActionState, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, Download, FileCheck2, Save, Video } from 'lucide-react';
 import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
-import type { StatusProposta } from '@/lib/propostas/queries';
+import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
 import {
   PROXIMA_ACAO_STATUS,
@@ -15,6 +15,7 @@ import { PreviewProposta } from './PreviewProposta';
 import { SecoesContextoEntrega } from './SecoesContextoEntrega';
 import { SecoesPrazoDecisao } from './SecoesPrazoDecisao';
 import { AcaoEntrega } from './AcaoEntrega';
+import { CompartilharProposta } from './CompartilharProposta';
 import styles from './EditorProposta.module.css';
 
 const INICIAL: EstadoProposta = {};
@@ -28,6 +29,8 @@ export function EditorProposta({
   oportunidadeId,
   reuniaoId,
   execucaoId,
+  compartilhamentoInicial,
+  siteUrl,
 }: {
   id: string;
   tituloInicial: string;
@@ -37,6 +40,8 @@ export function EditorProposta({
   oportunidadeId: string;
   reuniaoId: string | null;
   execucaoId: string | null;
+  compartilhamentoInicial: PropostaCompleta['compartilhamento'];
+  siteUrl: string;
 }) {
   const [titulo, setTitulo] = useState(tituloInicial);
   const [documento, setDocumento] = useState(documentoInicial);
@@ -61,6 +66,8 @@ export function EditorProposta({
     (estadoStatus.versao ?? 0) > (estadoSalvar.versao ?? 0) ? estadoStatus : estadoSalvar;
   const status = estadoAtual.status ?? statusInicial;
   const versao = estadoAtual.versao ?? versaoInicial;
+  const compartilhamentoCodigo =
+    estadoStatus.compartilhamentoCodigo ?? compartilhamentoInicial.codigo;
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const proximoStatus = PROXIMA_ACAO_STATUS[status];
   const descricaoEstado = sujo
@@ -184,6 +191,17 @@ export function EditorProposta({
             </div>
 
             <div className={styles.controlesDecisao}>
+              {compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status) && (
+                <CompartilharProposta
+                  codigo={compartilhamentoCodigo}
+                  siteUrl={siteUrl}
+                  empresa={documento.cliente.empresa}
+                  email={documento.cliente.email}
+                  projeto={documento.projeto.titulo}
+                  status={status}
+                  compartilhamento={compartilhamentoInicial}
+                />
+              )}
               <form action={acaoStatus} className={styles.acoesStatus}>
                 <input type="hidden" name="id" value={id} />
                 {proximoStatus && (

@@ -30,6 +30,18 @@ export type PropostaCompleta = ResumoProposta & {
   builderSolucaoId: string | null;
   reuniaoId: string | null;
   documento: DocumentoProposta;
+  compartilhamento: {
+    codigo: string | null;
+    ativo: boolean;
+    compartilhadaEm: string | null;
+    primeiraVisualizacaoEm: string | null;
+    ultimaVisualizacaoEm: string | null;
+    visualizacoes: number;
+    decisaoNome: string | null;
+    decisaoEmail: string | null;
+    decisaoComentario: string | null;
+    decididaEm: string | null;
+  };
 };
 
 export type OpcoesNovaProposta = {
@@ -72,7 +84,7 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
   const { data, error } = await supabase
     .from('propostas')
     .select(
-      'id, titulo, status, versao, documento, empresa_id, oportunidade_id, projeto_id, builder_solucao_id, reuniao_id, atualizado_em, criado_em',
+      'id, titulo, status, versao, documento, empresa_id, oportunidade_id, projeto_id, builder_solucao_id, reuniao_id, atualizado_em, criado_em, compartilhamento_codigo, compartilhamento_ativo, compartilhada_em, primeira_visualizacao_em, ultima_visualizacao_em, visualizacoes, decisao_nome, decisao_email, decisao_comentario, decidida_em',
     )
     .eq('id', id)
     .maybeSingle();
@@ -98,6 +110,18 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
     builderSolucaoId: data.builder_solucao_id,
     reuniaoId: data.reuniao_id,
     documento,
+    compartilhamento: {
+      codigo: data.compartilhamento_codigo,
+      ativo: data.compartilhamento_ativo,
+      compartilhadaEm: data.compartilhada_em,
+      primeiraVisualizacaoEm: data.primeira_visualizacao_em,
+      ultimaVisualizacaoEm: data.ultima_visualizacao_em,
+      visualizacoes: data.visualizacoes,
+      decisaoNome: data.decisao_nome,
+      decisaoEmail: data.decisao_email,
+      decisaoComentario: data.decisao_comentario,
+      decididaEm: data.decidida_em,
+    },
   };
 });
 

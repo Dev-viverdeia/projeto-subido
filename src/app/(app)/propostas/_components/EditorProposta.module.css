@@ -487,6 +487,161 @@
   flex-direction: column;
   gap: var(--via-space-2);
 }
+
+.compartilhamento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border-radius: var(--app-radius-card);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+}
+
+.compartilhamentoTopo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+}
+
+.compartilhamentoTopo h3 {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-navy);
+  font-size: 1.12rem;
+}
+
+.compartilhamentoTopo > div > p:last-child {
+  max-width: 52ch;
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+}
+
+.metricaVisualizacao {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px var(--via-space-2);
+  align-items: center;
+  color: var(--via-navy);
+  font: 650 1.1rem var(--via-font);
+  white-space: nowrap;
+}
+
+.metricaVisualizacao svg {
+  color: var(--via-accent-ink);
+}
+
+.metricaVisualizacao small {
+  grid-column: 1 / -1;
+  color: var(--via-text-faint);
+  font: var(--via-fs-micro) var(--via-font-mono);
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.linkPublico {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.linkPublico > span {
+  min-width: 0;
+  padding: 0 var(--via-space-4);
+  overflow: hidden;
+  color: var(--via-text-muted);
+  font: var(--via-fs-xs) var(--via-font-mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkPublico button,
+.acoesCompartilhamento a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  border: 0;
+  border-radius: 9px;
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: 650 var(--via-fs-xs) var(--via-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.linkPublico button {
+  margin: 3px;
+  padding: 0 var(--via-space-4);
+}
+
+.acoesCompartilhamento {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+}
+
+.acoesCompartilhamento a {
+  min-height: 36px;
+  padding: 0 var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  background: transparent;
+  color: var(--via-text-primary);
+}
+
+.acoesCompartilhamento > span {
+  margin-left: auto;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.retornoCliente {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.retornoCliente > svg {
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  border-radius: 50%;
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.retornoCliente strong,
+.retornoCliente span {
+  display: block;
+}
+
+.retornoCliente strong {
+  color: var(--via-navy);
+  font-size: var(--via-fs-sm);
+}
+
+.retornoCliente span {
+  margin-top: 3px;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.retornoCliente p {
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+}
 .acoesStatus .secundario {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.06);
@@ -541,6 +696,24 @@
     width: 100%;
   }
 
+  .compartilhamentoTopo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .metricaVisualizacao {
+    width: fit-content;
+  }
+
+  .metricaVisualizacao small {
+    text-align: left;
+  }
+
+  .acoesCompartilhamento > span {
+    width: 100%;
+    margin-left: 0;
+  }
+
   .editor {
     padding: var(--via-space-5) var(--via-space-4);
   }
@@ -558,6 +731,18 @@
   }
   .tituloDocumento {
     font-size: clamp(2rem, 10.5vw, 2.35rem);
+  }
+
+  .linkPublico {
+    grid-template-columns: 1fr;
+  }
+
+  .linkPublico > span {
+    padding-block: var(--via-space-3);
+  }
+
+  .linkPublico button {
+    margin-top: 0;
   }
   .itemEscopo,
   .itemCronograma {

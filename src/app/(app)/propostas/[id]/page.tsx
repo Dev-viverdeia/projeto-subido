@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterProposta } from '@/lib/propostas/queries';
 import { obterExecucaoDaProposta } from '@/lib/projetos-execucao/queries';
+import { env } from '@/lib/env';
 import { EditorProposta } from '../_components/EditorProposta';
 
 export async function generateMetadata({
@@ -30,6 +31,8 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
       oportunidadeId={proposta.oportunidadeId}
       reuniaoId={proposta.reuniaoId}
       execucaoId={execucaoId}
+      compartilhamentoInicial={proposta.compartilhamento}
+      siteUrl={env.NEXT_PUBLIC_SITE_URL}
     />
   );
 }

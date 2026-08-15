@@ -98,6 +98,19 @@ export default function PreviewEditorPropostaPage() {
           oportunidadeId="22222222-2222-4222-8222-222222222222"
           reuniaoId="33333333-3333-4333-8333-333333333333"
           execucaoId={null}
+          compartilhamentoInicial={{
+            codigo: '44444444-4444-4444-8444-444444444444',
+            ativo: true,
+            compartilhadaEm: '2026-08-14T14:00:00.000Z',
+            primeiraVisualizacaoEm: '2026-08-14T14:20:00.000Z',
+            ultimaVisualizacaoEm: '2026-08-14T16:10:00.000Z',
+            visualizacoes: 3,
+            decisaoNome: null,
+            decisaoEmail: null,
+            decisaoComentario: null,
+            decididaEm: null,
+          }}
+          siteUrl="https://projeto-subido.vercel.app"
         />
       </main>
     </div>

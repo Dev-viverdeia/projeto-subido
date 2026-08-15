@@ -22,6 +22,18 @@ const PROPOSTA: PropostaCompleta = {
   projetoId: '44444444-4444-4444-8444-444444444444',
   builderSolucaoId: null,
   reuniaoId: '55555555-5555-4555-8555-555555555555',
+  compartilhamento: {
+    codigo: null,
+    ativo: false,
+    compartilhadaEm: null,
+    primeiraVisualizacaoEm: null,
+    ultimaVisualizacaoEm: null,
+    visualizacoes: 0,
+    decisaoNome: null,
+    decisaoEmail: null,
+    decisaoComentario: null,
+    decididaEm: null,
+  },
   documento: {
     cliente: {
       empresa: 'Clínica Horizonte',

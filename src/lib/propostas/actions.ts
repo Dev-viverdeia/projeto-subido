@@ -46,6 +46,7 @@ export type EstadoProposta = {
   sucesso?: string;
   versao?: number;
   status?: StatusProposta;
+  compartilhamentoCodigo?: string | null;
 };
 
 async function usuarioAtual() {
@@ -243,7 +244,7 @@ export async function mudarStatusProposta(
     .update({ status: validacao.data.status })
     .eq('id', validacao.data.id)
     .eq('status', atual.data.status)
-    .select('versao, status, oportunidade_id')
+    .select('versao, status, oportunidade_id, compartilhamento_codigo')
     .maybeSingle();
 
   if (error || !data) {
@@ -270,6 +271,7 @@ export async function mudarStatusProposta(
         sucesso: 'Venda confirmada. Abra o projeto ativo pelo botão abaixo.',
         versao: data.versao,
         status: data.status,
+        compartilhamentoCodigo: data.compartilhamento_codigo,
       };
     }
 
@@ -281,5 +283,6 @@ export async function mudarStatusProposta(
     sucesso: 'Status atualizado.',
     versao: data.versao,
     status: data.status,
+    compartilhamentoCodigo: data.compartilhamento_codigo,
   };
 }

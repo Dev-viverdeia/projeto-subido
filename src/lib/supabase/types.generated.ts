@@ -1793,60 +1793,131 @@ export type Database = {
           },
         ]
       }
+      proposta_portal_eventos: {
+        Row: {
+          comentario: string | null
+          criado_em: string
+          dono: string
+          email: string | null
+          id: string
+          nome: string | null
+          proposta_id: string
+          tipo: string
+        }
+        Insert: {
+          comentario?: string | null
+          criado_em?: string
+          dono: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+          proposta_id: string
+          tipo: string
+        }
+        Update: {
+          comentario?: string | null
+          criado_em?: string
+          dono?: string
+          email?: string | null
+          id?: string
+          nome?: string | null
+          proposta_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposta_portal_eventos_proposta_fk"
+            columns: ["dono", "proposta_id"]
+            isOneToOne: false
+            referencedRelation: "propostas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       propostas: {
         Row: {
           aceita_em: string | null
           apresentada_em: string | null
           atualizado_em: string
           builder_solucao_id: string | null
+          compartilhada_em: string | null
+          compartilhamento_ativo: boolean
+          compartilhamento_codigo: string | null
           criado_em: string
+          decidida_em: string | null
+          decisao_comentario: string | null
+          decisao_email: string | null
+          decisao_nome: string | null
           documento: Json
           dono: string
           empresa_id: string
           id: string
           oportunidade_id: string
+          primeira_visualizacao_em: string | null
           projeto_id: string | null
           recusada_em: string | null
           reuniao_id: string | null
           status: Database["public"]["Enums"]["proposta_status"]
           titulo: string
+          ultima_visualizacao_em: string | null
           versao: number
+          visualizacoes: number
         }
         Insert: {
           aceita_em?: string | null
           apresentada_em?: string | null
           atualizado_em?: string
           builder_solucao_id?: string | null
+          compartilhada_em?: string | null
+          compartilhamento_ativo?: boolean
+          compartilhamento_codigo?: string | null
           criado_em?: string
+          decidida_em?: string | null
+          decisao_comentario?: string | null
+          decisao_email?: string | null
+          decisao_nome?: string | null
           documento: Json
           dono: string
           empresa_id: string
           id?: string
           oportunidade_id: string
+          primeira_visualizacao_em?: string | null
           projeto_id?: string | null
           recusada_em?: string | null
           reuniao_id?: string | null
           status?: Database["public"]["Enums"]["proposta_status"]
           titulo: string
+          ultima_visualizacao_em?: string | null
           versao?: number
+          visualizacoes?: number
         }
         Update: {
           aceita_em?: string | null
           apresentada_em?: string | null
           atualizado_em?: string
           builder_solucao_id?: string | null
+          compartilhada_em?: string | null
+          compartilhamento_ativo?: boolean
+          compartilhamento_codigo?: string | null
           criado_em?: string
+          decidida_em?: string | null
+          decisao_comentario?: string | null
+          decisao_email?: string | null
+          decisao_nome?: string | null
           documento?: Json
           dono?: string
           empresa_id?: string
           id?: string
           oportunidade_id?: string
+          primeira_visualizacao_em?: string | null
           projeto_id?: string | null
           recusada_em?: string | null
           reuniao_id?: string | null
           status?: Database["public"]["Enums"]["proposta_status"]
           titulo?: string
+          ultima_visualizacao_em?: string | null
           versao?: number
+          visualizacoes?: number
         }
         Relationships: [
           {
@@ -2331,6 +2402,20 @@ export type Database = {
           p_decisao: Database["public"]["Enums"]["projeto_cliente_status"]
           p_tarefa_id: string
         }
+        Returns: boolean
+      }
+      proposta_portal_decidir: {
+        Args: {
+          p_codigo: string
+          p_comentario?: string
+          p_decisao: Database["public"]["Enums"]["proposta_status"]
+          p_email: string
+          p_nome: string
+        }
+        Returns: Json
+      }
+      proposta_portal_visualizar: {
+        Args: { p_codigo: string }
         Returns: boolean
       }
       registrar_uso_sobral: {

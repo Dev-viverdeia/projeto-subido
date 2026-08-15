@@ -352,7 +352,7 @@ function PropostaPdf({
   profissional,
   geradoEm,
 }: {
-  proposta: PropostaCompleta;
+  proposta: Pick<PropostaCompleta, 'titulo' | 'versao' | 'documento'>;
   profissional: string;
   geradoEm: Date;
 }) {
@@ -531,7 +531,7 @@ export async function renderizarPropostaPdf({
   profissional,
   geradoEm = new Date(),
 }: {
-  proposta: PropostaCompleta;
+  proposta: Pick<PropostaCompleta, 'titulo' | 'versao' | 'documento'>;
   profissional: string;
   geradoEm?: Date;
 }): Promise<Buffer> {
