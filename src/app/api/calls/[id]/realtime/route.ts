@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const IdSchema = z.uuid();
 
@@ -67,19 +68,29 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
         },
       },
     };
-    const formulario = new FormData();
-    formulario.set('sdp', sdp);
-    formulario.set('session', JSON.stringify(sessao));
+    let respostaOpenAI: Response | null = null;
+    for (let tentativa = 0; tentativa < 2; tentativa += 1) {
+      const formulario = new FormData();
+      formulario.set('sdp', sdp);
+      formulario.set('session', JSON.stringify(sessao));
+      respostaOpenAI = await fetch('https://api.openai.com/v1/realtime/calls', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          'OpenAI-Safety-Identifier': identificadorSeguro(user.id),
+        },
+        body: formulario,
+        cache: 'no-store',
+      });
 
-    const respostaOpenAI = await fetch('https://api.openai.com/v1/realtime/calls', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        'OpenAI-Safety-Identifier': identificadorSeguro(user.id),
-      },
-      body: formulario,
-      cache: 'no-store',
-    });
+      // A criação WebRTC é idempotente do ponto de vista do produto até a SDP
+      // ser aceita pelo browser. Uma repetição curta absorve 502/503/504
+      // transitórios sem pedir que o profissional saia e entre novamente na call.
+      if (![502, 503, 504].includes(respostaOpenAI.status) || tentativa === 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    }
+
+    if (!respostaOpenAI) return erro('A transcrição ao vivo não pôde ser iniciada agora.', 502);
     const respostaSdp = await respostaOpenAI.text();
     if (!respostaOpenAI.ok) {
       console.error(
