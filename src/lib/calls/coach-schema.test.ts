@@ -49,6 +49,23 @@ describe('memória do Live Coach', () => {
     expect(resultado.success).toBe(false);
   });
 
+  it('preserva quem falou no texto usado pelo CRM e pela análise', () => {
+    const resultado = textoDaTranscricao([
+      segmento({ falanteNome: 'Marina Alves', falantePapel: 'convidado' }),
+      segmento({
+        itemId: 'item-2',
+        ordinal: 1,
+        texto: 'Vou preparar o diagnóstico.',
+        falanteNome: 'Rafael',
+        falantePapel: 'anfitriao',
+      }),
+    ]);
+
+    expect(resultado).toBe(
+      'Marina Alves: O atendimento demora duas horas.\nRafael: Vou preparar o diagnóstico.',
+    );
+  });
+
   it('obriga a análise a separar decisões, lacunas e sinais de avanço', () => {
     const resultado = AnaliseCallSchema.safeParse({
       resumo: 'A empresa confirmou o problema, mas ainda precisa validar o responsável interno.',

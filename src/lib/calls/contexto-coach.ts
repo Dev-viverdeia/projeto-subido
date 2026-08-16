@@ -10,6 +10,7 @@ export type ContextoCoach = {
   tipo: string;
   liveCoachAtivo: boolean;
   iniciadaEm: string | null;
+  salaProvedor: string;
   empresa: {
     nome: string;
     setor: string | null;
@@ -38,7 +39,7 @@ export async function obterContextoCoach(
   const { data: reuniao, error } = await supabase
     .from('calls_reunioes')
     .select(
-      'id, dono, titulo, tipo, live_coach_ativo, iniciada_em, empresa_id, oportunidade_id, contato_id',
+      'id, dono, titulo, tipo, live_coach_ativo, iniciada_em, sala_provedor, empresa_id, oportunidade_id, contato_id',
     )
     .eq('id', reuniaoId)
     .maybeSingle();
@@ -77,6 +78,7 @@ export async function obterContextoCoach(
     tipo: reuniao.tipo,
     liveCoachAtivo: reuniao.live_coach_ativo,
     iniciadaEm: reuniao.iniciada_em,
+    salaProvedor: reuniao.sala_provedor,
     empresa: empresa.data,
     oportunidade: {
       titulo: oportunidade.data.titulo,

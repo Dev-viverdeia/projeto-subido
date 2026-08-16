@@ -126,6 +126,37 @@ export function livekitEnv() {
 }
 
 /**
+ * Destino privado das gravações de Calls.
+ *
+ * O LiveKit envia o MP3 direto para a API S3 do Supabase. As credenciais são
+ * exclusivamente de servidor e a leitura do arquivo continua protegida por RLS.
+ * A sala não deixa de funcionar se esta integração estiver incompleta: somente a
+ * gravação fica indisponível e a transcrição ao vivo segue normalmente.
+ */
+export function callRecordingEnv() {
+  const parsed = z
+    .object({
+      SUPABASE_S3_ACCESS_KEY_ID: z.string().min(1),
+      SUPABASE_S3_SECRET_ACCESS_KEY: z.string().min(20),
+      SUPABASE_S3_SESSION_TOKEN: z.string().min(20),
+      SUPABASE_S3_REGION: z.string().min(2),
+    })
+    .safeParse({
+      SUPABASE_S3_ACCESS_KEY_ID: process.env.SUPABASE_S3_ACCESS_KEY_ID,
+      SUPABASE_S3_SECRET_ACCESS_KEY: process.env.SUPABASE_S3_SECRET_ACCESS_KEY,
+      SUPABASE_S3_SESSION_TOKEN: process.env.SUPABASE_S3_SESSION_TOKEN,
+      SUPABASE_S3_REGION: process.env.SUPABASE_S3_REGION,
+    });
+
+  return parsed.success
+    ? {
+        ...parsed.data,
+        SUPABASE_S3_ENDPOINT: `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/s3`,
+      }
+    : null;
+}
+
+/**
  * NÃO PROCURE A CHAVE DA ANTHROPIC AQUI.
  *
  * Ela vive nos SECRETS DO SUPABASE e é lida por `Deno.env.get` dentro das Edge

@@ -84,6 +84,8 @@ const POS_CALL: PosCall = {
         ordinal: 1,
         segundoReuniao: 342,
         finalizadoEm: '2026-08-08T17:08:00.000Z',
+        falanteNome: 'Marina Alves',
+        falantePapel: 'convidado',
       },
       {
         itemId: 'preview-2',
@@ -92,6 +94,8 @@ const POS_CALL: PosCall = {
         ordinal: 2,
         segundoReuniao: 1_126,
         finalizadoEm: '2026-08-08T17:21:00.000Z',
+        falanteNome: 'Rafael',
+        falantePapel: 'anfitriao',
       },
       {
         itemId: 'preview-3',
@@ -100,8 +104,18 @@ const POS_CALL: PosCall = {
         ordinal: 3,
         segundoReuniao: 2_208,
         finalizadoEm: '2026-08-08T17:39:00.000Z',
+        falanteNome: 'Marina Alves',
+        falantePapel: 'convidado',
       },
     ],
+  },
+  gravacao: {
+    status: 'concluida',
+    urlTemporaria: '/preview-call.mp3',
+    duracaoSegundos: 2_176,
+    tamanhoBytes: 18_420_000,
+    mimeType: 'audio/mpeg',
+    atualizadaEm: '2026-08-15T14:49:00.000Z',
   },
   coach: [
     {

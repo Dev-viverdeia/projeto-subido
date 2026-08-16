@@ -7,6 +7,8 @@ const TELAS = [
   ['/preview/mapa-jornada', 'Defina o foco da sua primeira oferta'],
   ['/preview/crm', 'Quatro fases para saber quem precisa de atenção agora'],
   ['/preview/calls', 'Cada reunião vira contexto no CRM'],
+  ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
+  ['/preview/live-coach', 'Dimensione o custo da espera'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Do diagnóstico à decisão'],
@@ -64,5 +66,13 @@ test.describe('fundação visual Viver de IA', () => {
       corpo: document.body.scrollHeight,
     }));
     expect(Math.abs(alturas.documento - alturas.corpo)).toBeLessThanOrEqual(2);
+  });
+
+  test('o pós-call preserva áudio e transcrição como fontes privadas', async ({ page }) => {
+    await page.goto('/preview/pos-call');
+
+    await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toBeVisible();
+    await expect(page.getByText('Somente sua conta')).toBeVisible();
+    await expect(page.getByText('Transcrição da reunião')).toBeVisible();
   });
 });

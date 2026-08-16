@@ -53,9 +53,10 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
           },
           noise_reduction: { type: 'far_field' },
           transcription: {
-            model: 'gpt-transcribe',
+            model: 'gpt-live-transcribe',
             prompt: `Reunião comercial em português do Brasil. Preserve nomes próprios e termos de IA. ${contextoTranscricaoParaTexto(contexto)}`,
             languages: ['pt'],
+            delay: 'low',
           },
           turn_detection: {
             type: 'server_vad',

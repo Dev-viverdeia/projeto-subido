@@ -286,8 +286,10 @@ export type Database = {
           id: string
           id_provedor: string | null
           iniciada_em: string | null
+          mime_type: string
           reuniao_id: string
           status: string
+          tamanho_bytes: number | null
         }
         Insert: {
           atualizada_em?: string
@@ -300,8 +302,10 @@ export type Database = {
           id?: string
           id_provedor?: string | null
           iniciada_em?: string | null
+          mime_type?: string
           reuniao_id: string
           status?: string
+          tamanho_bytes?: number | null
         }
         Update: {
           atualizada_em?: string
@@ -314,8 +318,10 @@ export type Database = {
           id?: string
           id_provedor?: string | null
           iniciada_em?: string | null
+          mime_type?: string
           reuniao_id?: string
           status?: string
+          tamanho_bytes?: number | null
         }
         Relationships: [
           {
@@ -2288,6 +2294,10 @@ export type Database = {
       }
       calls_aplicar_proxima_acao: {
         Args: { p_acao: string; p_quando?: string; p_reuniao: string }
+        Returns: boolean
+      }
+      calls_reivindicar_analise: {
+        Args: { p_dono: string; p_reuniao: string }
         Returns: boolean
       }
       crm_aplicar_proxima_acao: {

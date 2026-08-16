@@ -47,6 +47,7 @@ const POS_CALL: PosCall = {
     atualizadaEm: '2026-08-08T17:46:00.000Z',
   },
   transcricao: null,
+  gravacao: null,
   coach: [],
   sincronizacao: {
     historicoCrm: true,
@@ -82,5 +83,33 @@ describe('DossiePosCall', () => {
     expect(leitura.compareDocumentPosition(plano) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(plano.compareDocumentPosition(lacunas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(lacunas.compareDocumentPosition(mapa) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('exibe o áudio privado quando a gravação foi concluída', () => {
+    const { container } = render(
+      <DossiePosCall
+        posCall={{
+          ...POS_CALL,
+          gravacao: {
+            status: 'concluida',
+            urlTemporaria: 'https://storage.example/call.mp3?token=temporario',
+            duracaoSegundos: 2_520,
+            tamanhoBytes: 12_000_000,
+            mimeType: 'audio/mpeg',
+            atualizadaEm: '2026-08-08T17:46:00.000Z',
+          },
+        }}
+        estadoAcao={null}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Gravação privada da reunião' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Somente sua conta')).toBeInTheDocument();
+    expect(container.querySelector('audio')).toHaveAttribute(
+      'src',
+      'https://storage.example/call.mp3?token=temporario',
+    );
   });
 });

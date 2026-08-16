@@ -41,6 +41,7 @@ const BASE: PosCall = {
     atualizadaEm: '2026-08-13T15:31:00.000Z',
   },
   transcricao: null,
+  gravacao: null,
   coach: [],
   sincronizacao: {
     historicoCrm: true,

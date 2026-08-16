@@ -16,6 +16,8 @@ export const SegmentoLiveSchema = z.object({
   ordinal: z.number().int().min(0).max(100_000),
   segundoReuniao: z.number().int().min(0).max(86_400),
   finalizadoEm: z.iso.datetime(),
+  falanteNome: z.string().trim().min(1).max(160).optional(),
+  falantePapel: z.enum(['anfitriao', 'convidado']).optional(),
 });
 
 export const LoteSegmentosSchema = z
@@ -84,7 +86,9 @@ export function mesclarSegmentos(
 
 export function textoDaTranscricao(segmentos: readonly SegmentoLive[]): string {
   return segmentos
-    .map((segmento) => segmento.texto)
+    .map((segmento) =>
+      segmento.falanteNome ? `${segmento.falanteNome}: ${segmento.texto}` : segmento.texto,
+    )
     .join('\n')
     .trim();
 }

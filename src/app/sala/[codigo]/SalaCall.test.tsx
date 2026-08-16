@@ -29,7 +29,7 @@ describe('SalaCall', () => {
     );
 
     expect(screen.getByText('Sala disponível')).toBeInTheDocument();
-    expect(screen.getByText('Transcrição privada')).toBeInTheDocument();
+    expect(screen.getByText('Áudio e transcrição privados')).toBeInTheDocument();
     expect(screen.getByText('Resumo para revisão')).toBeInTheDocument();
     expect(screen.getByText('Coach só para você')).toBeInTheDocument();
 

@@ -120,8 +120,8 @@ export function SalaCall({
               <li>
                 <span>01</span>
                 <div>
-                  <strong>Transcrição privada</strong>
-                  <small>As falas ficam ligadas somente ao histórico desta oportunidade.</small>
+                  <strong>Áudio e transcrição privados</strong>
+                  <small>A conversa fica ligada somente ao histórico desta oportunidade.</small>
                 </div>
               </li>
               <li>

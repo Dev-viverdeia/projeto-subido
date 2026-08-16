@@ -16,6 +16,7 @@ import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { CentralPlanoCall } from './CentralPlanoCall';
+import { GravacaoCall } from './GravacaoCall';
 import { ListaFactual, MapaFactual } from './MapaFactual';
 import { RetornoProximaAcao } from './RetornoProximaAcao';
 import { TranscricaoCall } from './TranscricaoCall';
@@ -324,6 +325,8 @@ export function DossiePosCall({
               </div>
             </details>
           )}
+
+          {posCall.gravacao && <GravacaoCall gravacao={posCall.gravacao} />}
 
           {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
         </div>

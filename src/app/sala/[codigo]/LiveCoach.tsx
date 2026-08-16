@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import { AudioLines, LockKeyhole, Radio, Layers3 } from 'lucide-react';
-import { RoomEvent, Track } from 'livekit-client';
+import { AudioLines, Circle, Layers3, LockKeyhole, Radio } from 'lucide-react';
+import { ConnectionState, RoomEvent, Track, type Participant } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import styles from './LiveCoach.module.css';
 
 type EstadoCoach = 'conectando' | 'escutando' | 'analisando' | 'indisponivel';
+type EstadoGravacao = 'pendente' | 'gravando' | 'processando' | 'concluida' | 'falhou';
+type EstadoGravacaoUi = 'iniciando' | EstadoGravacao | 'indisponivel';
 
 export type SugestaoLive = {
   id: string;
@@ -35,6 +37,16 @@ const ROTULO_ESTADO: Record<EstadoCoach, string> = {
   indisponivel: 'Transcrição indisponível',
 };
 
+const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
+  iniciando: 'Preparando memória',
+  pendente: 'Preparando memória',
+  gravando: 'Gravação protegida',
+  processando: 'Salvando gravação',
+  concluida: 'Gravação preservada',
+  falhou: 'Somente transcrição',
+  indisponivel: 'Somente transcrição',
+};
+
 export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: boolean }) {
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
@@ -43,6 +55,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const [parcial, setParcial] = useState('');
   const [ultimaFala, setUltimaFala] = useState('Aguardando a primeira fala…');
   const [falha, setFalha] = useState('');
+  const [gravacao, setGravacao] = useState<EstadoGravacaoUi>('iniciando');
   const [versaoFila, setVersaoFila] = useState(0);
   const inicioRef = useRef<number | null>(null);
   const ordinalRef = useRef(0);
@@ -52,6 +65,8 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const parciaisRef = useRef(new Map<string, string>());
   const envioRef = useRef(false);
   const finalizadaRef = useRef(false);
+  const gravacaoIniciadaRef = useRef(false);
+  const falanteAtualRef = useRef<Pick<SegmentoLive, 'falanteNome' | 'falantePapel'> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const destinoRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const fontesRef = useRef(new Map<string, MediaStreamAudioSourceNode>());
@@ -71,6 +86,47 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     // A assinatura muda somente quando uma mídia real entra ou sai da mistura.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assinaturaTrilhas]);
+
+  useEffect(() => {
+    function acompanharFalante(falantes: Participant[]) {
+      const participante = falantes[0];
+      if (!participante) return;
+      falanteAtualRef.current = {
+        falanteNome: participante.name || 'Participante',
+        falantePapel: participante.identity.startsWith('host-') ? 'anfitriao' : 'convidado',
+      };
+    }
+
+    room.on(RoomEvent.ActiveSpeakersChanged, acompanharFalante);
+    return () => {
+      room.off(RoomEvent.ActiveSpeakersChanged, acompanharFalante);
+    };
+  }, [room]);
+
+  useEffect(() => {
+    async function iniciar() {
+      if (gravacaoIniciadaRef.current) return;
+      gravacaoIniciadaRef.current = true;
+      setGravacao('iniciando');
+      try {
+        const response = await fetch(`/api/calls/${reuniaoId}/gravacao`, { method: 'POST' });
+        const resultado = (await response.json().catch(() => null)) as {
+          status?: EstadoGravacao;
+        } | null;
+        if (!response.ok || !resultado?.status) throw new Error('Gravação indisponível.');
+        setGravacao(resultado.status);
+      } catch {
+        setGravacao('indisponivel');
+      }
+    }
+
+    const aoConectar = () => void iniciar();
+    room.on(RoomEvent.Connected, aoConectar);
+    if (room.state === ConnectionState.Connected) void iniciar();
+    return () => {
+      room.off(RoomEvent.Connected, aoConectar);
+    };
+  }, [reuniaoId, room]);
 
   const enviarPendentes = useCallback(async () => {
     if (envioRef.current || pendentesRef.current.length === 0) return;
@@ -145,6 +201,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
         ordinal: existente?.ordinal ?? ordemItensRef.current.get(itemId) ?? ordinalRef.current++,
         segundoReuniao: Math.max(0, Math.floor((Date.now() - inicio) / 1_000)),
         finalizadoEm: new Date().toISOString(),
+        ...(falanteAtualRef.current ?? {}),
       };
       segmentosRef.current.set(itemId, segmento);
       if (!existente) pendentesRef.current.push(segmento);
@@ -258,7 +315,9 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const finalizar = useCallback(() => {
     if (finalizadaRef.current) return;
     finalizadaRef.current = true;
-    const naoSalvos = pendentesRef.current.slice(-24);
+    const naoSalvos = [...segmentosRef.current.values()]
+      .sort((a, b) => a.ordinal - b.ordinal)
+      .slice(-24);
     void fetch(`/api/calls/${reuniaoId}/finalizar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -284,6 +343,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       fala={parcial || ultimaFala}
       parcial={Boolean(parcial)}
       falha={falha}
+      gravacao={gravacao}
     />
   );
 }
@@ -295,6 +355,7 @@ export function CabineLiveCoach({
   fala,
   parcial = false,
   falha = '',
+  gravacao = 'iniciando',
 }: {
   ativo: boolean;
   estado: EstadoCoach;
@@ -302,6 +363,7 @@ export function CabineLiveCoach({
   fala: string;
   parcial?: boolean;
   falha?: string;
+  gravacao?: EstadoGravacaoUi;
 }) {
   const intensidade =
     estado === 'analisando' ? styles.intenso : estado === 'escutando' ? styles.ativo : '';
@@ -362,8 +424,14 @@ export function CabineLiveCoach({
       </section>
 
       <footer>
-        <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
-        Ao encerrar: resumo, decisões e próximo passo no CRM
+        <span className={styles.gravacao} data-estado={gravacao}>
+          <Circle size={8} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+          {ROTULO_GRAVACAO[gravacao]}
+        </span>
+        <span>
+          <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
+          Ao encerrar: resumo, decisões e próximo passo no CRM
+        </span>
       </footer>
     </aside>
   );

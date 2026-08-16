@@ -207,7 +207,9 @@
 .painel footer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--via-space-2);
+  flex-wrap: wrap;
   min-height: 52px;
   margin-top: auto;
   padding: var(--via-space-3) var(--via-space-5);
@@ -215,6 +217,33 @@
   color: var(--via-gray-400);
   font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
+}
+
+.painel footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.gravacao {
+  color: var(--via-gray-300);
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-micro);
+  text-transform: uppercase;
+}
+
+.gravacao svg {
+  color: var(--via-warning);
+}
+
+.gravacao[data-estado='gravando'] svg,
+.gravacao[data-estado='concluida'] svg {
+  color: var(--via-success);
+}
+
+.gravacao[data-estado='falhou'] svg,
+.gravacao[data-estado='indisponivel'] svg {
+  color: var(--via-gray-500);
 }
 
 @keyframes audioPulse {

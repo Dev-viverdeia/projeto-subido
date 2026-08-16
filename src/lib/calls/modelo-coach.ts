@@ -4,7 +4,12 @@ import { createHash } from 'node:crypto';
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { openAIEnv } from '@/lib/env';
-import { AnaliseCallSchema, RespostaCoachSchema, type SegmentoLive } from './coach-schema';
+import {
+  AnaliseCallSchema,
+  RespostaCoachSchema,
+  textoDaTranscricao,
+  type SegmentoLive,
+} from './coach-schema';
 import { contextoCoachParaTexto, type ContextoCoach } from './contexto-coach';
 
 function identificadorSeguro(usuarioId: string): string {
@@ -55,10 +60,7 @@ export async function gerarSugestaoCoach({
 }) {
   const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 3, timeout: 45_000 });
-  const transcricao = segmentos
-    .map((segmento) => segmento.texto)
-    .join('\n')
-    .slice(-12_000);
+  const transcricao = textoDaTranscricao(segmentos).slice(-12_000);
   const contextoPrivado = contextoCoachParaTexto(contexto).slice(0, 8_000);
 
   try {
@@ -100,10 +102,7 @@ export async function gerarAnaliseCall({
 }) {
   const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 3, timeout: 45_000 });
-  const transcricao = segmentos
-    .map((segmento) => segmento.texto)
-    .join('\n')
-    .slice(-120_000);
+  const transcricao = textoDaTranscricao(segmentos).slice(-120_000);
   const contextoPrivado = contextoCoachParaTexto(contexto).slice(0, 8_000);
 
   try {

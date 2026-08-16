@@ -31,7 +31,15 @@ export function TranscricaoCall({
             {transcricao.segmentos.map((segmento) => (
               <li key={segmento.itemId}>
                 <time>{minuto(segmento.segundoReuniao)}</time>
-                <p>{segmento.texto}</p>
+                <div>
+                  {segmento.falanteNome && (
+                    <span className={styles.falanteTranscricao}>
+                      {segmento.falanteNome}
+                      {segmento.falantePapel === 'anfitriao' ? ' · você' : ''}
+                    </span>
+                  )}
+                  <p>{segmento.texto}</p>
+                </div>
               </li>
             ))}
           </ol>

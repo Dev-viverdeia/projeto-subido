@@ -11,6 +11,7 @@ import {
   SegmentoLiveSchema,
   type SegmentoLive,
 } from './coach-schema';
+import { obterGravacaoPosCall, type GravacaoPosCall } from './gravacao-query';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
 
@@ -108,6 +109,7 @@ export type PosCall = {
     duracaoSegundos: number | null;
     atualizadaEm: string;
   } | null;
+  gravacao: GravacaoPosCall | null;
   coach: SugestaoCoachHistorico[];
   sincronizacao: {
     historicoCrm: boolean;
@@ -191,6 +193,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
     oportunidade,
     analise,
     transcricao,
+    gravacao,
     coach,
     eventoCrm,
     acoesPlano,
@@ -226,6 +229,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       .select('status, texto_completo, segmentos, duracao_segundos, atualizada_em')
       .eq('reuniao_id', reuniao.id)
       .maybeSingle(),
+    obterGravacaoPosCall(supabase, reuniao.id),
     supabase
       .from('calls_coach_sugestoes')
       .select(
@@ -329,6 +333,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
           atualizadaEm: transcricao.data.atualizada_em,
         }
       : null,
+    gravacao,
     coach: (coach.data ?? []).map((item) => ({
       id: item.id,
       categoria: item.categoria,
