@@ -199,6 +199,31 @@ export async function iniciarGravacao({
   }
 }
 
+/** Solicita o fechamento imediato do MP3 quando o anfitrião encerra a call. */
+export async function encerrarGravacao(reuniaoId: string) {
+  const gravacao = await lerGravacaoDaReuniao(reuniaoId);
+  if (!gravacao?.idProvedor || !['pendente', 'gravando', 'processando'].includes(gravacao.status)) {
+    return;
+  }
+
+  const livekit = livekitEnv();
+  if (!livekit) return;
+
+  try {
+    const cliente = new EgressClient(
+      hostHttp(livekit.LIVEKIT_URL),
+      livekit.LIVEKIT_API_KEY,
+      livekit.LIVEKIT_API_SECRET,
+    );
+    const egress = await cliente.stopEgress(gravacao.idProvedor);
+    await sincronizarGravacaoDoEgress(egress);
+  } catch (causa) {
+    // O webhook continua sendo a redundância. Uma resposta "já encerrado" não
+    // deve apagar um arquivo que o provedor terminou entre a leitura e o stop.
+    console.error('[calls:gravacao:encerrar] o webhook concluirá o estado:', causa);
+  }
+}
+
 /** Consolida o estado do arquivo a partir de um evento assinado do LiveKit. */
 export async function sincronizarGravacaoDoEgress(egress: EgressInfo) {
   if (!egress.egressId) return null;

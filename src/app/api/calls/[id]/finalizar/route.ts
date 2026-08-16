@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { marcarReuniaoProcessando, persistirSegmentos } from '@/lib/calls/admin';
 import { SegmentoLiveSchema } from '@/lib/calls/coach-schema';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
+import { encerrarGravacao } from '@/lib/calls/gravacao';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
 import { processarPosCall } from '@/lib/calls/processamento';
 import { createClient } from '@/lib/supabase/server';
@@ -44,8 +45,15 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     await marcarReuniaoProcessando({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
 
     after(async () => {
-      await processarPosCall(contexto.reuniaoId).catch((causa) => {
-        console.error('[calls:finalizar:worker] falha:', causa);
+      await Promise.allSettled([
+        encerrarGravacao(contexto.reuniaoId),
+        processarPosCall(contexto.reuniaoId),
+      ]).then((resultados) => {
+        for (const resultado of resultados) {
+          if (resultado.status === 'rejected') {
+            console.error('[calls:finalizar:worker] falha:', resultado.reason);
+          }
+        }
       });
     });
 
