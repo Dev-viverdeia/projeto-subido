@@ -21,6 +21,30 @@ export const BuscaProspeccaoSchema = z.object({
 
 export type BuscaProspeccao = z.infer<typeof BuscaProspeccaoSchema>;
 
+export const CanalContatoProspeccaoSchema = z.enum([
+  'telefone',
+  'whatsapp',
+  'email',
+  'instagram',
+  'facebook',
+  'linkedin',
+  'x',
+  'tiktok',
+  'youtube',
+  'pinterest',
+]);
+
+export const StatusContatoProspeccaoSchema = z.enum([
+  'novo',
+  'tentando_contato',
+  'conversa_iniciada',
+  'sem_interesse',
+  'no_crm',
+]);
+
+export type CanalContatoProspeccao = z.infer<typeof CanalContatoProspeccaoSchema>;
+export type StatusContatoProspeccao = z.infer<typeof StatusContatoProspeccaoSchema>;
+
 export const RedeSocialProspeccaoSchema = z.object({
   rede: z.enum(['instagram', 'facebook', 'linkedin', 'x', 'tiktok', 'youtube', 'pinterest']),
   url: z.url().max(2048),

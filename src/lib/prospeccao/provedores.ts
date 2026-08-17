@@ -3,10 +3,13 @@ import 'server-only';
 import { prospeccaoEnv } from '@/lib/env';
 import { buscarDecisores } from './decisores';
 import {
+  emailsValidos,
   jsonDaResposta,
   origemApify,
   origemSerp,
   qualificar,
+  redesDeUrls,
+  telefonesUnicos,
   texto,
   unicos,
   type Registro,
@@ -150,6 +153,33 @@ function resumoDoMarkdown(markdown: string): string | null {
   return limpo ? limpo.slice(0, 900) : null;
 }
 
+function contatosDoSite(markdown: string, links: string[]) {
+  const emailsEmLinks = links
+    .filter((link) => link.toLowerCase().startsWith('mailto:'))
+    .map((link) => link.slice(7).split('?')[0] ?? '');
+  const emailsNoTexto = markdown.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi) ?? [];
+  const telefonesEmLinks = links.flatMap((link) => {
+    const normalizado = link.toLowerCase();
+    if (normalizado.startsWith('tel:')) return [link.slice(4).split('?')[0] ?? ''];
+    try {
+      const url = new URL(link);
+      if (url.hostname === 'wa.me' || url.hostname.endsWith('.wa.me')) return [url.pathname];
+      if (url.hostname.endsWith('whatsapp.com')) return [url.searchParams.get('phone')];
+    } catch {
+      return [];
+    }
+    return [];
+  });
+  const telefonesNoTexto =
+    markdown.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?(?:9?\d{4})[-.\s]?\d{4}/g) ?? [];
+  const urlsNoTexto = markdown.match(/https?:\/\/[^\s)\]}>"']+/gi) ?? [];
+  return {
+    emails: emailsValidos([...emailsEmLinks, ...emailsNoTexto]),
+    telefones: telefonesUnicos([...telefonesEmLinks, ...telefonesNoTexto]).slice(0, 12),
+    redes: redesDeUrls([...links, ...urlsNoTexto]),
+  };
+}
+
 async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
   if (!lead.site_url) return lead;
   try {
@@ -158,8 +188,8 @@ async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
       headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url: lead.site_url,
-        formats: ['markdown'],
-        onlyMainContent: true,
+        formats: ['markdown', 'links'],
+        onlyMainContent: false,
         maxAge: 172_800_000,
         timeout: 12_000,
       }),
@@ -168,12 +198,23 @@ async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
     });
     const json = (await jsonDaResposta(resposta)) as {
       success?: boolean;
-      data?: { markdown?: unknown; metadata?: Registro };
+      data?: { markdown?: unknown; links?: unknown; metadata?: Registro };
     };
     const markdown = texto(json.data?.markdown);
+    const links = Array.isArray(json.data?.links)
+      ? json.data.links.filter((item): item is string => typeof item === 'string')
+      : [];
     const resumo = markdown ? resumoDoMarkdown(markdown) : null;
-    return {
+    const contatos = contatosDoSite(markdown ?? '', links);
+    const atualizado = {
       ...lead,
+      telefone: lead.telefone ?? contatos.telefones[0] ?? null,
+      telefones: telefonesUnicos([...lead.telefones, ...contatos.telefones]).slice(0, 12),
+      emails: unicos([...lead.emails, ...contatos.emails]).slice(0, 12),
+      redes_sociais: redesDeUrls([
+        ...lead.redes_sociais.map((rede) => rede.url),
+        ...contatos.redes.map((rede) => rede.url),
+      ]),
       descricao: lead.descricao ?? resumo,
       fontes: [...new Set([...lead.fontes, 'Site oficial · conteúdo público'])],
       dados: {
@@ -181,8 +222,15 @@ async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
         site_titulo: texto(json.data?.metadata?.title),
         site_descricao: texto(json.data?.metadata?.description),
         site_resumo: resumo,
+        site_contatos: {
+          emails: contatos.emails,
+          telefones: contatos.telefones,
+          redes_sociais: contatos.redes,
+        },
       },
+      qualificacao: lead.qualificacao,
     } satisfies LeadProspeccaoEntrada;
+    return { ...atualizado, qualificacao: qualificar(atualizado) };
   } catch {
     return lead;
   }

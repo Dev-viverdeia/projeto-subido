@@ -1,16 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Dossiê da Prospecção', () => {
-  test('abre a empresa como lista qualificada sem estouro horizontal', async ({ page }) => {
+test.describe('Estação de Prospecção', () => {
+  test('abre canais qualificados sem levar um contato frio direto ao CRM', async ({ page }) => {
     await page.goto('/preview/prospeccao');
     const empresa = page.getByRole('button', { name: /Clínica Aurora/ });
 
     await empresa.click();
     const dialogo = page.getByRole('dialog', { name: 'Clínica Aurora' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText('Canais encontrados')).toBeVisible();
-    await expect(dialogo.getByRole('link', { name: 'contato@clinicaaurora.com.br' })).toBeVisible();
-    await expect(dialogo.getByRole('button', { name: 'Enviar para o CRM' })).toBeVisible();
+    await expect(dialogo.getByText('Como falar com esta empresa')).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: /Abrir WhatsApp/ }).first()).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: /Escrever e-mail/ })).toBeVisible();
+    await expect(dialogo.getByText('@clinicaaurora', { exact: true }).first()).toBeVisible();
+    await expect(dialogo.getByText('Andamento', { exact: true })).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Alguém respondeu' })).toBeDisabled();
+    await expect(dialogo.getByRole('button', { name: 'Criar oportunidade no CRM' })).toHaveCount(0);
 
     const decisores = dialogo.getByText('Possíveis decisores');
     await decisores.scrollIntoViewIfNeeded();

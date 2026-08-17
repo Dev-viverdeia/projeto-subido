@@ -23,8 +23,8 @@ export function comoRegistro(valor: unknown): Registro | null {
 }
 
 function textos(valor: unknown): string[] {
-  if (!Array.isArray(valor)) return [];
-  return valor.map(texto).filter((item): item is string => Boolean(item));
+  const valores = Array.isArray(valor) ? valor : [valor];
+  return valores.map(texto).filter((item): item is string => Boolean(item));
 }
 
 export function urlPublica(valor: unknown): string | null {
@@ -51,7 +51,7 @@ export function unicos(valores: Array<string | null | undefined>): string[] {
   return [...new Set(valores.filter((valor): valor is string => Boolean(valor)))];
 }
 
-function emailsValidos(valor: unknown): string[] {
+export function emailsValidos(valor: unknown): string[] {
   return unicos(
     textos(valor).map((email) => {
       const normalizado = email.toLocaleLowerCase('pt-BR');
@@ -60,27 +60,106 @@ function emailsValidos(valor: unknown): string[] {
   ).slice(0, 12);
 }
 
+export function telefonesUnicos(valores: Array<string | null | undefined>): string[] {
+  const vistos = new Set<string>();
+  return valores.flatMap((valor) => {
+    const recebido = texto(valor);
+    if (!recebido) return [];
+    const digitos = recebido.replace(/\D/g, '');
+    if (digitos.length < 10 || digitos.length > 13 || vistos.has(digitos)) return [];
+    vistos.add(digitos);
+    return [recebido];
+  });
+}
+
+const ORDEM_REDES: RedeSocial['rede'][] = [
+  'instagram',
+  'linkedin',
+  'facebook',
+  'tiktok',
+  'youtube',
+  'x',
+  'pinterest',
+];
+
+function redeDaUrl(url: URL): RedeSocial['rede'] | null {
+  const dominio = url.hostname.replace(/^www\./, '').toLowerCase();
+  if (dominio === 'instagram.com') return 'instagram';
+  if (dominio === 'facebook.com' || dominio === 'fb.com') return 'facebook';
+  if (dominio === 'linkedin.com') return 'linkedin';
+  if (dominio === 'x.com' || dominio === 'twitter.com') return 'x';
+  if (dominio === 'tiktok.com') return 'tiktok';
+  if (dominio === 'youtube.com' || dominio === 'youtu.be') return 'youtube';
+  if (dominio === 'pinterest.com' || dominio === 'pin.it') return 'pinterest';
+  return null;
+}
+
+function perfilSocial(valor: string, redeSugerida?: RedeSocial['rede']): RedeSocial | null {
+  const publica = urlPublica(valor);
+  if (!publica) return null;
+  const url = new URL(publica);
+  const rede = redeDaUrl(url) ?? redeSugerida ?? null;
+  if (!rede) return null;
+  const partes = url.pathname.split('/').filter(Boolean);
+  const primeira = partes[0]?.toLowerCase() ?? '';
+  const bloqueadas: Partial<Record<RedeSocial['rede'], Set<string>>> = {
+    instagram: new Set(['p', 'reel', 'reels', 'stories', 'explore']),
+    facebook: new Set(['share', 'sharer', 'dialog', 'plugins', 'watch']),
+    linkedin: new Set(['feed', 'posts', 'pulse', 'learning']),
+    x: new Set(['intent', 'share', 'search', 'i']),
+    tiktok: new Set(['video', 'discover', 'tag']),
+    youtube: new Set(['watch', 'shorts', 'playlist', 'results']),
+    pinterest: new Set(['pin', 'ideas']),
+  };
+  if (!primeira || bloqueadas[rede]?.has(primeira)) return null;
+  url.search = '';
+  url.hash = '';
+  return { rede, url: url.toString().replace(/\/$/, '') };
+}
+
+export function redesDeUrls(valores: string[]): RedeSocial[] {
+  const porRede = new Map<RedeSocial['rede'], RedeSocial>();
+  for (const valor of valores) {
+    const perfil = perfilSocial(valor);
+    if (perfil && !porRede.has(perfil.rede)) porRede.set(perfil.rede, perfil);
+  }
+  return ORDEM_REDES.flatMap((rede) => {
+    const perfil = porRede.get(rede);
+    return perfil ? [perfil] : [];
+  });
+}
+
 function redesDo(registroFonte: Registro): RedeSocial[] {
-  const campos: Array<[RedeSocial['rede'], string]> = [
-    ['instagram', 'instagrams'],
-    ['facebook', 'facebooks'],
-    ['linkedin', 'linkedIns'],
-    ['x', 'twitters'],
-    ['tiktok', 'tiktoks'],
-    ['youtube', 'youtubes'],
-    ['pinterest', 'pinterests'],
+  const campos: Array<[RedeSocial['rede'], string[]]> = [
+    ['instagram', ['instagram', 'instagrams']],
+    ['facebook', ['facebook', 'facebooks']],
+    ['linkedin', ['linkedin', 'linkedIn', 'linkedIns', 'linkedins']],
+    ['x', ['x', 'twitter', 'twitters']],
+    ['tiktok', ['tiktok', 'tiktoks']],
+    ['youtube', ['youtube', 'youtubes']],
+    ['pinterest', ['pinterest', 'pinterests']],
   ];
-  const vistas = new Set<string>();
-  return campos
-    .flatMap(([rede, campo]) =>
-      textos(registroFonte[campo]).map((valor) => ({ rede, url: urlPublica(valor) })),
-    )
-    .filter((item): item is RedeSocial => {
-      if (!item.url || vistas.has(item.url)) return false;
-      vistas.add(item.url);
-      return true;
-    })
-    .slice(0, 16);
+  const candidatos = campos.flatMap(([rede, nomes]) =>
+    nomes.flatMap((campo) =>
+      textos(registroFonte[campo]).flatMap((valor) => {
+        const perfil = perfilSocial(valor, rede);
+        return perfil ? [perfil] : [];
+      }),
+    ),
+  );
+  const grupos = ['socials', 'socialProfiles', 'socialMedia'].flatMap((campo) => {
+    const valor = registroFonte[campo];
+    if (Array.isArray(valor)) {
+      return valor.flatMap((item) => {
+        const registro = comoRegistro(item);
+        return registro ? textos(registro.url ?? registro.link) : textos(item);
+      });
+    }
+    const registro = comoRegistro(valor);
+    return registro ? Object.values(registro).flatMap((item) => textos(item)) : textos(valor);
+  });
+  const extras = redesDeUrls(grupos);
+  return redesDeUrls([...candidatos.map((item) => item.url), ...extras.map((item) => item.url)]);
 }
 
 function horariosDo(valor: unknown): LeadProspeccaoEntrada['horarios'] {
@@ -181,7 +260,7 @@ export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
     ? registro.categories.filter((item): item is string => typeof item === 'string')
     : [];
   const telefone = texto(registro.phone) ?? texto(registro.phoneUnformatted);
-  const telefones = unicos([telefone, ...textos(registro.phones)]).slice(0, 12);
+  const telefones = telefonesUnicos([telefone, ...textos(registro.phones)]).slice(0, 12);
   const base = {
     chave_externa: chaveDo(registro, nome, endereco, site),
     nome,

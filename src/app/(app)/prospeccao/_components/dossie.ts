@@ -24,9 +24,16 @@ export type Lead = Pick<
   | 'fontes'
   | 'qualificacao'
   | 'dados'
+  | 'status_prospeccao'
+  | 'ultimo_canal'
+  | 'ultimo_contato_em'
+  | 'tentativas_contato'
   | 'crm_oportunidade_id'
   | 'enviado_crm_em'
 >;
+
+export type StatusProspeccao =
+  'novo' | 'tentando_contato' | 'conversa_iniciada' | 'sem_interesse' | 'no_crm';
 
 export type RedeSocial = {
   rede: 'instagram' | 'facebook' | 'linkedin' | 'x' | 'tiktok' | 'youtube' | 'pinterest';
@@ -93,11 +100,24 @@ export function redesDo(lead: Lead): RedeSocial[] {
     'youtube',
     'pinterest',
   ]);
-  return lead.redes_sociais.flatMap((item) => {
+  const encontradas = lead.redes_sociais.flatMap((item) => {
     const registro = item && typeof item === 'object' && !Array.isArray(item) ? item : null;
     const rede = registro && typeof registro.rede === 'string' ? registro.rede : null;
     const url = registro && typeof registro.url === 'string' ? registro.url : null;
     return rede && url && permitidas.has(rede) ? [{ rede, url } as RedeSocial] : [];
+  });
+  const ordem: RedeSocial['rede'][] = [
+    'instagram',
+    'linkedin',
+    'facebook',
+    'tiktok',
+    'youtube',
+    'x',
+    'pinterest',
+  ];
+  return ordem.flatMap((rede) => {
+    const perfil = encontradas.find((item) => item.rede === rede);
+    return perfil ? [perfil] : [];
   });
 }
 
@@ -178,6 +198,72 @@ export function rotuloRede(rede: RedeSocial['rede']) {
     youtube: 'YouTube',
     pinterest: 'Pinterest',
   }[rede];
+}
+
+export function statusProspeccaoDo(lead: Lead): StatusProspeccao {
+  if (lead.crm_oportunidade_id) return 'no_crm';
+  const permitidos = new Set<StatusProspeccao>([
+    'novo',
+    'tentando_contato',
+    'conversa_iniciada',
+    'sem_interesse',
+    'no_crm',
+  ]);
+  return permitidos.has(lead.status_prospeccao as StatusProspeccao)
+    ? (lead.status_prospeccao as StatusProspeccao)
+    : 'novo';
+}
+
+export function rotuloStatusProspeccao(status: StatusProspeccao) {
+  return {
+    novo: 'Não contatado',
+    tentando_contato: 'Em contato',
+    conversa_iniciada: 'Conversa iniciada',
+    sem_interesse: 'Sem interesse',
+    no_crm: 'No CRM',
+  }[status];
+}
+
+export function urlWhatsapp(telefone: string) {
+  let digitos = telefone.replace(/\D/g, '');
+  if ((digitos.length === 10 || digitos.length === 11) && !digitos.startsWith('55')) {
+    digitos = `55${digitos}`;
+  }
+  return digitos.length >= 12 && digitos.length <= 13 ? `https://wa.me/${digitos}` : null;
+}
+
+export function identificadorRede(rede: RedeSocial) {
+  try {
+    const url = new URL(rede.url);
+    const partes = url.pathname.split('/').filter(Boolean);
+    const perfil = partes.at(-1)?.replace(/^@/, '');
+    return perfil ? `@${perfil}` : rotuloRede(rede.rede);
+  } catch {
+    return rotuloRede(rede.rede);
+  }
+}
+
+function contatosDoSite(lead: Lead) {
+  const dados = objeto(lead.dados);
+  return objeto(dados.site_contatos ?? null);
+}
+
+export function fonteDoContato(lead: Lead, tipo: 'telefone' | 'email' | 'rede', valor: string) {
+  const site = contatosDoSite(lead);
+  const campo =
+    tipo === 'telefone' ? site.telefones : tipo === 'email' ? site.emails : site.redes_sociais;
+  const encontradoNoSite = Array.isArray(campo)
+    ? campo.some((item) => {
+        if (typeof item === 'string') return item === valor;
+        const registro = item && typeof item === 'object' && !Array.isArray(item) ? item : null;
+        return registro?.url === valor;
+      })
+    : false;
+  return encontradoNoSite ? 'Site oficial' : 'Google Maps';
+}
+
+export function totalCanaisAcionaveis(lead: Lead) {
+  return telefonesDo(lead).length + emailsDo(lead).length + redesDo(lead).length;
 }
 
 export function setorProfissionalDo(lead: Lead): string | null {

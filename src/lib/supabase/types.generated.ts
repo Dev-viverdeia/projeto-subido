@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       aulas: {
@@ -2030,9 +2005,13 @@ export type Database = {
           qualificacao: Json
           redes_sociais: Json
           site_url: string | null
+          status_prospeccao: string
           telefone: string | null
           telefones: Json
+          tentativas_contato: number
           total_avaliacoes: number | null
+          ultimo_canal: string | null
+          ultimo_contato_em: string | null
         }
         Insert: {
           atualizado_em?: string
@@ -2061,9 +2040,13 @@ export type Database = {
           qualificacao?: Json
           redes_sociais?: Json
           site_url?: string | null
+          status_prospeccao?: string
           telefone?: string | null
           telefones?: Json
+          tentativas_contato?: number
           total_avaliacoes?: number | null
+          ultimo_canal?: string | null
+          ultimo_contato_em?: string | null
         }
         Update: {
           atualizado_em?: string
@@ -2092,9 +2075,13 @@ export type Database = {
           qualificacao?: Json
           redes_sociais?: Json
           site_url?: string | null
+          status_prospeccao?: string
           telefone?: string | null
           telefones?: Json
+          tentativas_contato?: number
           total_avaliacoes?: number | null
+          ultimo_canal?: string | null
+          ultimo_contato_em?: string | null
         }
         Relationships: [
           {
@@ -2745,6 +2732,15 @@ export type Database = {
         Args: { p_dono: string }
         Returns: number
       }
+      prospeccao_sistema_registrar_contato: {
+        Args: {
+          p_canal: string
+          p_dono: string
+          p_lead: string
+          p_status: string
+        }
+        Returns: Json
+      }
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }
         Returns: number
@@ -2966,9 +2962,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       calls_status: [

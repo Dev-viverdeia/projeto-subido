@@ -38,7 +38,8 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       {parametros.busca === 'concluida' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={17} aria-hidden="true" />
-          Lista qualificada. Abra os dossiês e envie para o CRM o que fizer sentido.
+          Lista pronta. Escolha um canal, registre a conversa e leve ao CRM só o que virou
+          oportunidade.
         </div>
       )}
       {parametros.busca === 'falhou' && (
@@ -128,18 +129,21 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
               <p className={styles.sobretitulo}>Da busca ao pipeline</p>
               <h2>Comece com uma busca simples.</h2>
               <p>
-                Diga o tipo de empresa e a região. Você revisa cada resultado antes de decidir o que
-                merece virar oportunidade.
+                Diga o tipo de empresa e a região. A plataforma encontra os canais para você começar
+                a abordagem antes de abrir uma oportunidade no CRM.
               </p>
               <ol>
                 <li>
                   <span>01</span> Defina mercado e região
                 </li>
                 <li>
-                  <span>02</span> Revise os resultados
+                  <span>02</span> Escolha um canal de contato
                 </li>
                 <li>
-                  <span>03</span> Envie os melhores para o CRM
+                  <span>03</span> Registre quem respondeu
+                </li>
+                <li>
+                  <span>04</span> Transforme a conversa em oportunidade
                 </li>
               </ol>
             </div>

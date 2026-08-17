@@ -5,21 +5,36 @@ import {
   ArrowRight,
   AtSign,
   Building2,
-  Check,
   Globe2,
   MapPin,
+  MessageCircle,
   Phone,
   Share2,
-  UserRoundSearch,
 } from 'lucide-react';
-import { qualificacaoDo, type Lead } from './dossie';
+import {
+  emailsDo,
+  redesDo,
+  rotuloStatusProspeccao,
+  statusProspeccaoDo,
+  telefonesDo,
+  totalCanaisAcionaveis,
+  type Lead,
+  type StatusProspeccao,
+} from './dossie';
 import { ModalDossie } from './ModalDossie';
 import styles from '../pagina.module.css';
 
 export function ListaResultados({ leads }: { leads: Lead[] }) {
-  const [selecionado, setSelecionado] = useState<Lead | null>(null);
+  const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [retornarFoco, setRetornarFoco] = useState<HTMLButtonElement | null>(null);
-  const fecharModal = useCallback(() => setSelecionado(null), []);
+  const [filtro, setFiltro] = useState<'todos' | StatusProspeccao>('todos');
+  const fecharModal = useCallback(() => setSelecionadoId(null), []);
+  const filtrados =
+    filtro === 'todos' ? leads : leads.filter((lead) => statusProspeccaoDo(lead) === filtro);
+
+  const selecionado = selecionadoId
+    ? (leads.find((lead) => lead.id === selecionadoId) ?? null)
+    : null;
 
   if (!leads.length) {
     return (
@@ -33,16 +48,43 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
 
   return (
     <>
+      <div className={styles.filtrosLeads} aria-label="Filtrar empresas por andamento">
+        {(
+          [
+            ['todos', 'Todos'],
+            ['novo', 'Não contatados'],
+            ['tentando_contato', 'Em contato'],
+            ['conversa_iniciada', 'Conversas'],
+            ['sem_interesse', 'Sem interesse'],
+            ['no_crm', 'No CRM'],
+          ] as const
+        ).map(([valor, rotulo]) => {
+          const quantidade =
+            valor === 'todos'
+              ? leads.length
+              : leads.filter((lead) => statusProspeccaoDo(lead) === valor).length;
+          return (
+            <button
+              type="button"
+              key={valor}
+              aria-pressed={filtro === valor}
+              onClick={() => setFiltro(valor)}
+            >
+              {rotulo} <span>{quantidade}</span>
+            </button>
+          );
+        })}
+      </div>
       <div className={styles.legendaLista} aria-hidden="true">
         <span>Empresa</span>
-        <span>Contatos encontrados</span>
+        <span>Canais acionáveis</span>
         <span>Região</span>
-        <span>Completude</span>
+        <span>Andamento</span>
       </div>
       <div className={styles.listaResultados} role="list">
-        {leads.map((lead, indice) => {
-          const qualificacao = qualificacaoDo(lead);
-          const totalItens = Object.values(qualificacao.itens).filter(Boolean).length;
+        {filtrados.map((lead, indice) => {
+          const status = statusProspeccaoDo(lead);
+          const totalCanais = totalCanaisAcionaveis(lead);
           return (
             <div role="listitem" key={lead.id}>
               <button
@@ -50,7 +92,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 className={styles.linhaLead}
                 onClick={(evento) => {
                   setRetornarFoco(evento.currentTarget);
-                  setSelecionado(lead);
+                  setSelecionadoId(lead.id);
                 }}
               >
                 <span className={styles.indiceLead}>{String(indice + 1).padStart(2, '0')}</span>
@@ -60,23 +102,21 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 </span>
                 <span
                   className={styles.coberturaLead}
-                  aria-label={`${totalItens} de 5 dados essenciais encontrados`}
+                  aria-label={`${totalCanais} ${totalCanais === 1 ? 'canal acionável encontrado' : 'canais acionáveis encontrados'}`}
                 >
-                  <span data-encontrado={qualificacao.itens.telefone} title="Telefone">
+                  <span data-encontrado={telefonesDo(lead).length > 0} title="Telefone ou WhatsApp">
                     <Phone size={14} />
                   </span>
-                  <span data-encontrado={qualificacao.itens.email} title="E-mail">
+                  <span data-encontrado={emailsDo(lead).length > 0} title="E-mail">
                     <AtSign size={14} />
                   </span>
-                  <span data-encontrado={qualificacao.itens.site} title="Site">
+                  <span data-encontrado={Boolean(lead.site_url)} title="Site para pesquisa">
                     <Globe2 size={14} />
                   </span>
-                  <span data-encontrado={qualificacao.itens.redes_sociais} title="Redes sociais">
+                  <span data-encontrado={redesDo(lead).length > 0} title="Redes sociais">
                     <Share2 size={14} />
                   </span>
-                  <span data-encontrado={qualificacao.itens.decisores} title="Possível decisor">
-                    <UserRoundSearch size={14} />
-                  </span>
+                  <strong>{totalCanais}</strong>
                 </span>
                 <span className={styles.localLead}>
                   <MapPin size={14} aria-hidden="true" />
@@ -84,30 +124,23 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     lead.endereco ||
                     'A confirmar'}
                 </span>
-                <span className={styles.completudeLead}>
-                  <span>
-                    <i style={{ width: `${qualificacao.completude}%` }} />
-                  </span>
-                  <strong>{qualificacao.completude}%</strong>
+                <span className={styles.statusLead} data-status={status}>
+                  <MessageCircle size={14} aria-hidden="true" />
+                  {rotuloStatusProspeccao(status)}
                 </span>
                 <span
                   className={styles.estadoLead}
                   data-enviado={Boolean(lead.crm_oportunidade_id)}
                 >
-                  {lead.crm_oportunidade_id ? (
-                    <>
-                      <Check size={14} /> No CRM
-                    </>
-                  ) : (
-                    <>
-                      Ver dossiê <ArrowRight size={14} />
-                    </>
-                  )}
+                  {lead.crm_oportunidade_id ? 'Abrir' : 'Prospectar'} <ArrowRight size={14} />
                 </span>
               </button>
             </div>
           );
         })}
+        {!filtrados.length && (
+          <div className={styles.filtroVazio}>Nenhuma empresa está nesta etapa da prospecção.</div>
+        )}
       </div>
       {selecionado && (
         <ModalDossie lead={selecionado} onClose={fecharModal} retornarFoco={retornarFoco} />

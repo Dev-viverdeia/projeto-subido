@@ -10,10 +10,15 @@ import {
   concluirListaProspeccao,
   enviarLeadProspeccaoAoCrm,
   falharListaProspeccao,
+  registrarContatoLeadProspeccao,
   reservarListaProspeccao,
 } from './admin';
 import { prospectarEmpresas } from './provedores';
-import { BuscaProspeccaoSchema } from './schema';
+import {
+  BuscaProspeccaoSchema,
+  CanalContatoProspeccaoSchema,
+  StatusContatoProspeccaoSchema,
+} from './schema';
 
 export type EstadoBuscaProspeccao = {
   erro?: string;
@@ -24,6 +29,15 @@ export type EstadoBuscaProspeccao = {
     quantidade: string;
   };
 };
+
+const RegistroContatoSchema = z.object({
+  lead: z.uuid(),
+  canal: CanalContatoProspeccaoSchema.nullable(),
+  status: StatusContatoProspeccaoSchema.exclude(['no_crm']),
+});
+
+export type ResultadoContatoProspeccao =
+  { ok: true; status: z.infer<typeof StatusContatoProspeccaoSchema> } | { ok: false; erro: string };
 
 function camposDo(formData: FormData): NonNullable<EstadoBuscaProspeccao['campos']> {
   const valor = (nome: string) => {
@@ -121,4 +135,31 @@ export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
   revalidatePath('/crm');
   revalidarDirecaoOperacional();
   redirect(`/crm/${oportunidade.data}?novo=1&origem=prospeccao`);
+}
+
+export async function registrarContatoProspeccao(
+  entrada: unknown,
+): Promise<ResultadoContatoProspeccao> {
+  const validacao = RegistroContatoSchema.safeParse(entrada);
+  if (!validacao.success) return { ok: false, erro: 'Não foi possível registrar esta ação.' };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  const { error } = await registrarContatoLeadProspeccao(
+    user.id,
+    validacao.data.lead,
+    validacao.data.canal,
+    validacao.data.status,
+  );
+  if (error) {
+    console.error(`[prospeccao:contato] ${error.code ?? 'sem-codigo'}: ${error.message ?? ''}`);
+    return { ok: false, erro: 'Não foi possível atualizar o andamento agora.' };
+  }
+
+  revalidatePath('/prospeccao');
+  return { ok: true, status: validacao.data.status };
 }

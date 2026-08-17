@@ -10,7 +10,7 @@ export function HeroProspeccao({ saldo }: { saldo: number }) {
         <h1>Crie listas que já chegam prontas para uma abordagem.</h1>
         <p>
           Você define o mercado e a região. A plataforma reúne os canais públicos, organiza
-          possíveis decisores e deixa você escolher o que merece virar oportunidade.
+          possíveis decisores e ajuda você a começar a abordagem antes de abrir o CRM.
         </p>
         <ol className={styles.heroFluxo} aria-label="Fluxo da prospecção">
           <li>
@@ -19,11 +19,11 @@ export function HeroProspeccao({ saldo }: { saldo: number }) {
           </li>
           <li>
             <span>02</span>
-            <strong>Reunir sinais</strong>
+            <strong>Acionar contatos</strong>
           </li>
           <li>
             <span>03</span>
-            <strong>Escolher oportunidades</strong>
+            <strong>Levar conversas ao CRM</strong>
           </li>
         </ol>
       </div>

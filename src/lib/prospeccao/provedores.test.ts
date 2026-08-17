@@ -38,7 +38,16 @@ describe('provedores da prospecção', () => {
             phone: '+55 31 3333-4444',
             phones: ['+55 31 3333-4444', '+55 31 98888-1111'],
             emails: ['contato@clinica-aurora.example.com'],
-            instagrams: ['https://instagram.com/clinicaaurora'],
+            instagram: 'https://instagram.com/clinicaaurora',
+            instagrams: [
+              'https://instagram.com/clinicaaurora',
+              'https://instagram.com/reel/publicacao-duplicada',
+            ],
+            linkedIns: ['https://linkedin.com/company/clinica-aurora'],
+            socialProfiles: [
+              { url: 'https://youtube.com/watch?v=nao-e-perfil' },
+              { url: 'https://youtube.com/@clinicaaurora' },
+            ],
             openingHours: [{ day: 'segunda-feira', hours: '08:00–18:00' }],
             website: 'https://clinica-aurora.example.com',
             totalScore: 4.8,
@@ -60,7 +69,11 @@ describe('provedores da prospecção', () => {
       telefone: '+55 31 3333-4444',
       telefones: ['+55 31 3333-4444', '+55 31 98888-1111'],
       emails: ['contato@clinica-aurora.example.com'],
-      redes_sociais: [{ rede: 'instagram', url: 'https://instagram.com/clinicaaurora' }],
+      redes_sociais: [
+        { rede: 'instagram', url: 'https://instagram.com/clinicaaurora' },
+        { rede: 'linkedin', url: 'https://linkedin.com/company/clinica-aurora' },
+        { rede: 'youtube', url: 'https://youtube.com/@clinicaaurora' },
+      ],
       fontes: ['Google Maps · dados públicos'],
     });
     expect(resultado.leads[0]?.qualificacao.completude).toBe(75);
@@ -83,6 +96,71 @@ describe('provedores da prospecção', () => {
       scrapeContacts: true,
       scrapePlaceDetailPage: true,
     });
+  });
+
+  it('trata contatos do site oficial e guarda a origem de cada dado', async () => {
+    vi.mocked(prospeccaoEnv).mockReturnValue({
+      pronto: true,
+      apifyToken: 'token-apify-valido',
+      apifyActor: 'compass/crawler-google-places',
+      serpApi: null,
+      firecrawl: 'token-firecrawl-valido',
+      fullEnrich: null,
+    });
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (String(url).includes('firecrawl.dev')) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              success: true,
+              data: {
+                markdown: 'Fale conosco: comercial@aurora.example.com ou (31) 98888-1111.',
+                links: [
+                  'mailto:comercial@aurora.example.com',
+                  'tel:+553133334444',
+                  'https://wa.me/5531988881111',
+                  'https://instagram.com/clinicaaurora',
+                  'https://linkedin.com/company/clinica-aurora',
+                ],
+                metadata: { title: 'Clínica Aurora' },
+              },
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          ),
+        );
+      }
+      return Promise.resolve(
+        new Response(
+          JSON.stringify([
+            {
+              title: 'Clínica Aurora',
+              website: 'https://clinica-aurora.example.com',
+              placeId: 'aurora-bh',
+            },
+          ]),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resultado = await prospectarEmpresas(busca);
+
+    expect(resultado.leads[0]).toMatchObject({
+      telefone: '+553133334444',
+      emails: ['comercial@aurora.example.com'],
+      redes_sociais: [
+        { rede: 'instagram', url: 'https://instagram.com/clinicaaurora' },
+        { rede: 'linkedin', url: 'https://linkedin.com/company/clinica-aurora' },
+      ],
+      dados: {
+        site_contatos: {
+          emails: ['comercial@aurora.example.com'],
+        },
+      },
+    });
+    expect(resultado.leads[0]?.fontes).toContain('Site oficial · conteúdo público');
+    expect(resultado.provedores.firecrawl).toBe('concluido');
   });
 
   it('associa possíveis decisores profissionais e recalcula a completude', async () => {

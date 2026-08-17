@@ -1,49 +1,74 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { useEffect, useRef, type ReactNode } from 'react';
 import {
-  ArrowRight,
   AtSign,
   BriefcaseBusiness,
-  Building2,
   Camera,
-  Check,
   Clock3,
   ExternalLink,
-  Globe2,
+  Mail,
   MapPin,
+  MessageCircle,
+  Music2,
   Phone,
   Play,
-  Share2,
-  Star,
+  Search,
+  Users,
   UserRoundSearch,
   X,
 } from 'lucide-react';
-import { enviarLeadAoCrm } from '@/lib/prospeccao/actions';
-import { BotaoEnviarCrm } from './BotaoEnviarCrm';
+import type { CanalContatoProspeccao } from '@/lib/prospeccao/schema';
+import { AndamentoProspeccao } from './AndamentoProspeccao';
+import { ContextoEmpresa } from './ContextoEmpresa';
+import { LinkContato } from './LinkContato';
 import {
   decisoresDo,
   emailsDo,
+  fonteDoContato,
   fontesDo,
   horariosDo,
-  objeto,
-  qualificacaoDo,
+  identificadorRede,
   redesDo,
-  rotuloCompletude,
   rotuloRede,
-  setorProfissionalDo,
+  rotuloStatusProspeccao,
+  statusProspeccaoDo,
   telefonesDo,
+  totalCanaisAcionaveis,
+  urlWhatsapp,
   type Lead,
   type RedeSocial,
 } from './dossie';
-import styles from '../pagina.module.css';
+import styles from './ModalProspeccao.module.css';
 
 function IconeRede({ rede }: { rede: RedeSocial['rede'] }) {
-  if (rede === 'instagram') return <Camera size={17} aria-hidden="true" />;
-  if (rede === 'linkedin') return <BriefcaseBusiness size={17} aria-hidden="true" />;
-  if (rede === 'youtube') return <Play size={17} aria-hidden="true" />;
-  return <Globe2 size={17} aria-hidden="true" />;
+  if (rede === 'instagram') return <Camera size={18} aria-hidden="true" />;
+  if (rede === 'facebook') return <Users size={18} aria-hidden="true" />;
+  if (rede === 'linkedin') return <BriefcaseBusiness size={18} aria-hidden="true" />;
+  if (rede === 'youtube') return <Play size={18} aria-hidden="true" />;
+  if (rede === 'tiktok') return <Music2 size={18} aria-hidden="true" />;
+  return <AtSign size={18} aria-hidden="true" />;
+}
+
+function AcaoContato({
+  lead,
+  canal,
+  href,
+  ariaLabel,
+  children,
+}: {
+  lead: string;
+  canal: CanalContatoProspeccao;
+  href: string;
+  ariaLabel: string;
+  children: ReactNode;
+}) {
+  return (
+    <LinkContato lead={lead} canal={canal} href={href} ariaLabel={ariaLabel}>
+      {children}
+      <ExternalLink size={13} aria-hidden="true" />
+    </LinkContato>
+  );
 }
 
 export function ModalDossie({
@@ -57,15 +82,18 @@ export function ModalDossie({
 }) {
   const fecharRef = useRef<HTMLButtonElement>(null);
   const dialogoRef = useRef<HTMLElement>(null);
-  const detalhes = {
-    telefones: telefonesDo(selecionado),
-    emails: emailsDo(selecionado),
-    redes: redesDo(selecionado),
-    decisores: decisoresDo(selecionado),
-    horarios: horariosDo(selecionado),
-    qualificacao: qualificacaoDo(selecionado),
-    dados: objeto(selecionado.dados),
-  };
+  const telefones = telefonesDo(selecionado);
+  const emails = emailsDo(selecionado);
+  const redes = redesDo(selecionado);
+  const decisores = decisoresDo(selecionado);
+  const horarios = horariosDo(selecionado);
+  const status = statusProspeccaoDo(selecionado);
+  const totalCanais = totalCanaisAcionaveis(selecionado);
+  const ausentes = [
+    !telefones.length && 'telefone',
+    !emails.length && 'e-mail',
+    !redes.length && 'redes sociais',
+  ].filter(Boolean) as string[];
 
   useEffect(() => {
     const overflow = document.body.style.overflow;
@@ -101,307 +129,282 @@ export function ModalDossie({
 
   return (
     <div
-      className={styles.fundoDetalhe}
+      className={styles.backdrop}
       onMouseDown={(evento) => {
         if (evento.target === evento.currentTarget) onClose();
       }}
     >
       <article
         ref={dialogoRef}
-        className={styles.detalheLead}
+        className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="lead-detalhe-titulo"
         onKeyDown={manterFoco}
       >
-        <header className={styles.detalheTopo}>
-          <div className={styles.tituloDossie}>
-            <p>Dossiê de prospecção</p>
+        <header className={styles.header}>
+          <div className={styles.headerIdentity}>
+            <p>Empresa encontrada</p>
             <h2 id="lead-detalhe-titulo">{selecionado.nome}</h2>
-            <div>
+            <div className={styles.headerMeta}>
               <span>{selecionado.categoria ?? 'Categoria a confirmar'}</span>
               <span>
-                <MapPin size={13} />{' '}
+                <MapPin size={13} aria-hidden="true" />
                 {[selecionado.cidade, selecionado.estado].filter(Boolean).join(', ') ||
                   'Região a confirmar'}
               </span>
             </div>
           </div>
-          <div className={styles.resumoCompletude}>
-            <strong>{detalhes.qualificacao.completude}%</strong>
-            <span>{rotuloCompletude(detalhes.qualificacao.completude)}</span>
+          <div className={styles.headerSignals}>
+            <span className={styles.channelCount}>
+              <strong>{totalCanais}</strong>
+              {totalCanais === 1 ? 'canal acionável' : 'canais acionáveis'}
+            </span>
+            <span className={styles.status} data-status={status}>
+              {rotuloStatusProspeccao(status)}
+            </span>
           </div>
           <button
             ref={fecharRef}
+            className={styles.close}
             type="button"
-            onClick={() => onClose()}
-            aria-label="Fechar detalhes"
+            onClick={onClose}
+            aria-label="Fechar detalhes da empresa"
           >
             <X size={19} aria-hidden="true" />
           </button>
         </header>
 
-        <div className={styles.detalheConteudo}>
-          <section className={styles.faixaContatos} aria-labelledby="contatos-titulo">
-            <div className={styles.tituloSecao}>
-              <p id="contatos-titulo">Canais encontrados</p>
-              <span>Dados públicos para você validar antes do contato.</span>
-            </div>
-            <div className={styles.canaisGrid}>
-              <div
-                className={styles.canalPrincipal}
-                data-disponivel={detalhes.telefones.length > 0}
-              >
-                <span>
-                  <Phone size={17} /> Telefone
-                </span>
-                {detalhes.telefones.length ? (
-                  detalhes.telefones.slice(0, 2).map((telefone) => (
-                    <a href={`tel:${telefone}`} key={telefone}>
-                      {telefone}
-                    </a>
-                  ))
-                ) : (
-                  <em>Não encontrado</em>
-                )}
+        <div className={styles.body}>
+          <main className={styles.main}>
+            <section className={styles.section} aria-labelledby="canais-titulo">
+              <div className={styles.sectionHeading}>
+                <div>
+                  <p className={styles.eyebrow}>Canais para abordagem</p>
+                  <h3 id="canais-titulo">Como falar com esta empresa</h3>
+                  <span>Abra um canal e a tentativa fica registrada automaticamente.</span>
+                </div>
+                <MessageCircle size={20} aria-hidden="true" />
               </div>
-              <div className={styles.canalPrincipal} data-disponivel={detalhes.emails.length > 0}>
-                <span>
-                  <AtSign size={17} /> E-mail
-                </span>
-                {detalhes.emails.length ? (
-                  detalhes.emails.slice(0, 2).map((email) => (
-                    <a href={`mailto:${email}`} key={email}>
-                      {email}
-                    </a>
-                  ))
-                ) : (
-                  <em>Não encontrado</em>
-                )}
-              </div>
-              <div
-                className={styles.canalPrincipal}
-                data-disponivel={Boolean(selecionado.site_url)}
-              >
-                <span>
-                  <Globe2 size={17} /> Site
-                </span>
-                {selecionado.site_url ? (
-                  <a href={selecionado.site_url} target="_blank" rel="noreferrer">
-                    {selecionado.dominio ?? 'Abrir site'} <ExternalLink size={12} />
-                  </a>
-                ) : (
-                  <em>Não encontrado</em>
-                )}
-              </div>
-              <div className={styles.canalPrincipal} data-disponivel={detalhes.redes.length > 0}>
-                <span>
-                  <Share2 size={17} /> Redes sociais
-                </span>
-                {detalhes.redes.length ? (
-                  <div className={styles.linksSociais}>
-                    {detalhes.redes.map((rede) => (
-                      <a
-                        href={rede.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        key={`${rede.rede}-${rede.url}`}
-                        aria-label={`Abrir ${rotuloRede(rede.rede)}`}
-                        title={rotuloRede(rede.rede)}
-                      >
-                        <IconeRede rede={rede.rede} />
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <em>Não encontradas</em>
-                )}
-              </div>
-            </div>
-          </section>
 
-          <div className={styles.corpoDossie}>
-            <main>
-              <section className={styles.secaoDossie} aria-labelledby="decisores-titulo">
-                <div className={styles.tituloSecao}>
+              <div className={styles.contactList}>
+                {telefones.map((telefone) => {
+                  const whatsapp = urlWhatsapp(telefone);
+                  return (
+                    <article className={styles.contactRow} key={telefone}>
+                      <span className={styles.contactIcon}>
+                        <Phone size={18} aria-hidden="true" />
+                      </span>
+                      <div className={styles.contactData}>
+                        <span>Telefone</span>
+                        <strong>{telefone}</strong>
+                        <small>{fonteDoContato(selecionado, 'telefone', telefone)}</small>
+                      </div>
+                      <div className={styles.contactActions}>
+                        {whatsapp && (
+                          <AcaoContato
+                            lead={selecionado.id}
+                            canal="whatsapp"
+                            href={whatsapp}
+                            ariaLabel={`Abrir WhatsApp para ${telefone}`}
+                          >
+                            WhatsApp
+                          </AcaoContato>
+                        )}
+                        <AcaoContato
+                          lead={selecionado.id}
+                          canal="telefone"
+                          href={`tel:${telefone}`}
+                          ariaLabel={`Ligar para ${telefone}`}
+                        >
+                          Ligar
+                        </AcaoContato>
+                      </div>
+                    </article>
+                  );
+                })}
+
+                {emails.map((email) => (
+                  <article className={styles.contactRow} key={email}>
+                    <span className={styles.contactIcon}>
+                      <Mail size={18} aria-hidden="true" />
+                    </span>
+                    <div className={styles.contactData}>
+                      <span>E-mail</span>
+                      <strong>{email}</strong>
+                      <small>{fonteDoContato(selecionado, 'email', email)}</small>
+                    </div>
+                    <div className={styles.contactActions}>
+                      <AcaoContato
+                        lead={selecionado.id}
+                        canal="email"
+                        href={`mailto:${email}`}
+                        ariaLabel={`Escrever e-mail para ${email}`}
+                      >
+                        Escrever e-mail
+                      </AcaoContato>
+                    </div>
+                  </article>
+                ))}
+
+                {redes.map((rede) => (
+                  <article className={styles.contactRow} key={`${rede.rede}-${rede.url}`}>
+                    <span className={styles.contactIcon}>
+                      <IconeRede rede={rede.rede} />
+                    </span>
+                    <div className={styles.contactData}>
+                      <span>{rotuloRede(rede.rede)}</span>
+                      <strong>{identificadorRede(rede)}</strong>
+                      <small>{fonteDoContato(selecionado, 'rede', rede.url)}</small>
+                    </div>
+                    <div className={styles.contactActions}>
+                      <AcaoContato
+                        lead={selecionado.id}
+                        canal={rede.rede}
+                        href={rede.url}
+                        ariaLabel={`Abrir perfil no ${rotuloRede(rede.rede)}`}
+                      >
+                        Abrir perfil
+                      </AcaoContato>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {!totalCanais && (
+                <div className={styles.noContacts}>
+                  <Search size={20} aria-hidden="true" />
                   <div>
-                    <p id="decisores-titulo">Possíveis decisores</p>
-                    <span>Pessoas com cargo de liderança associadas publicamente à empresa.</span>
+                    <strong>Nenhum canal acionável foi validado.</strong>
+                    <span>Use o site e o mapa abaixo para continuar a pesquisa manual.</span>
+                  </div>
+                </div>
+              )}
+              {totalCanais > 0 && ausentes.length > 0 && (
+                <p className={styles.missing}>Não encontrado nesta busca: {ausentes.join(', ')}.</p>
+              )}
+            </section>
+
+            {decisores.length > 0 && (
+              <section className={styles.section} aria-labelledby="decisores-titulo">
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <p className={styles.eyebrow}>Pessoas associadas</p>
+                    <h3 id="decisores-titulo">Possíveis decisores</h3>
+                    <span>Confirme o vínculo e o cargo antes da abordagem.</span>
                   </div>
                   <UserRoundSearch size={20} aria-hidden="true" />
                 </div>
-                {detalhes.decisores.length ? (
-                  <div className={styles.listaDecisores}>
-                    {detalhes.decisores.map((decisor) => (
-                      <div key={`${decisor.nome}-${decisor.linkedin_url ?? decisor.cargo}`}>
-                        <span className={styles.avatarDecisor}>
-                          {decisor.nome.slice(0, 1).toLocaleUpperCase('pt-BR')}
-                        </span>
-                        <div>
-                          <strong>{decisor.nome}</strong>
-                          <span>{decisor.cargo ?? decisor.senioridade ?? 'Cargo a confirmar'}</span>
-                          {decisor.localizacao && <small>{decisor.localizacao}</small>}
-                        </div>
+                <div className={styles.decisionMakers}>
+                  {decisores.map((decisor) => (
+                    <article key={`${decisor.nome}-${decisor.linkedin_url ?? decisor.cargo}`}>
+                      <span className={styles.avatar}>
+                        {decisor.nome.slice(0, 1).toLocaleUpperCase('pt-BR')}
+                      </span>
+                      <div className={styles.decisionIdentity}>
+                        <strong>{decisor.nome}</strong>
+                        <span>{decisor.cargo ?? decisor.senioridade ?? 'Cargo a confirmar'}</span>
+                        {decisor.email && <small>{decisor.email}</small>}
+                        {decisor.telefone && <small>{decisor.telefone}</small>}
+                        <small>{decisor.fonte}</small>
+                      </div>
+                      <div className={styles.decisionActions}>
                         {decisor.linkedin_url && (
-                          <a
+                          <AcaoContato
+                            lead={selecionado.id}
+                            canal="linkedin"
                             href={decisor.linkedin_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label={`Abrir LinkedIn de ${decisor.nome}`}
+                            ariaLabel={`Abrir LinkedIn de ${decisor.nome}`}
                           >
-                            <BriefcaseBusiness size={17} /> Perfil <ExternalLink size={11} />
-                          </a>
+                            LinkedIn
+                          </AcaoContato>
+                        )}
+                        {decisor.email && (
+                          <AcaoContato
+                            lead={selecionado.id}
+                            canal="email"
+                            href={`mailto:${decisor.email}`}
+                            ariaLabel={`Escrever e-mail para ${decisor.nome}`}
+                          >
+                            E-mail
+                          </AcaoContato>
+                        )}
+                        {decisor.telefone && urlWhatsapp(decisor.telefone) && (
+                          <AcaoContato
+                            lead={selecionado.id}
+                            canal="whatsapp"
+                            href={urlWhatsapp(decisor.telefone) as string}
+                            ariaLabel={`Abrir WhatsApp de ${decisor.nome}`}
+                          >
+                            WhatsApp
+                          </AcaoContato>
+                        )}
+                        {decisor.telefone && (
+                          <AcaoContato
+                            lead={selecionado.id}
+                            canal="telefone"
+                            href={`tel:${decisor.telefone}`}
+                            ariaLabel={`Ligar para ${decisor.nome}`}
+                          >
+                            Ligar
+                          </AcaoContato>
                         )}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={styles.vazioDecisores}>
-                    <UserRoundSearch size={21} aria-hidden="true" />
-                    <div>
-                      <strong>Nenhum decisor encontrado nesta busca.</strong>
-                      <span>
-                        Isso não significa que a empresa não tenha liderança pública; confirme
-                        durante a prospecção.
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <p className={styles.notaFonte}>
-                  Possíveis correspondências. Confirme vínculo e cargo antes de abordar.
-                </p>
-              </section>
-
-              <section className={styles.secaoDossie} aria-labelledby="negocio-titulo">
-                <div className={styles.tituloSecao}>
-                  <div>
-                    <p id="negocio-titulo">Sobre o negócio</p>
-                    <span>Contexto reunido de fontes públicas.</span>
-                  </div>
-                  <Building2 size={20} aria-hidden="true" />
-                </div>
-                <p className={styles.descricaoNegocio}>
-                  {selecionado.descricao ??
-                    'Não encontramos uma descrição pública confiável para este negócio.'}
-                </p>
-                <dl className={styles.fatosNegocio}>
-                  <div>
-                    <dt>Endereço</dt>
-                    <dd>{selecionado.endereco ?? 'Não encontrado'}</dd>
-                  </div>
-                  <div>
-                    <dt>Avaliação</dt>
-                    <dd>
-                      {selecionado.avaliacao !== null ? (
-                        <>
-                          <Star size={14} fill="currentColor" /> {selecionado.avaliacao} ·{' '}
-                          {selecionado.total_avaliacoes ?? 0} avaliações
-                        </>
-                      ) : (
-                        'Sem avaliação disponível'
-                      )}
-                    </dd>
-                  </div>
-                  {setorProfissionalDo(selecionado) && (
-                    <div>
-                      <dt>Setor</dt>
-                      <dd>{setorProfissionalDo(selecionado)}</dd>
-                    </div>
-                  )}
-                </dl>
-                {selecionado.maps_url && (
-                  <a
-                    className={styles.linkMapa}
-                    href={selecionado.maps_url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <MapPin size={15} /> Abrir no mapa <ExternalLink size={11} />
-                  </a>
-                )}
-              </section>
-            </main>
-
-            <aside>
-              <section className={styles.secaoLateral}>
-                <div className={styles.tituloSecao}>
-                  <div>
-                    <p>Leitura comercial</p>
-                    <span>O que os dados já permitem concluir.</span>
-                  </div>
-                </div>
-                <ul className={styles.listaSinais}>
-                  {detalhes.qualificacao.sinais.length ? (
-                    detalhes.qualificacao.sinais.map((sinal) => (
-                      <li key={sinal}>
-                        <Check size={14} /> {sinal}
-                      </li>
-                    ))
-                  ) : (
-                    <li>
-                      <Check size={14} /> Base pública inicial organizada
-                    </li>
-                  )}
-                </ul>
-              </section>
-              <section className={styles.secaoLateral}>
-                <div className={styles.tituloSecao}>
-                  <div>
-                    <p>Horários públicos</p>
-                    <span>Útil para escolher o momento do contato.</span>
-                  </div>
-                  <Clock3 size={18} />
-                </div>
-                {detalhes.horarios.length ? (
-                  <dl className={styles.listaHorarios}>
-                    {detalhes.horarios.map((horario) => (
-                      <div key={horario.dia}>
-                        <dt>{horario.dia}</dt>
-                        <dd>{horario.horarios}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                ) : (
-                  <p className={styles.dadoAusente}>Horários não encontrados.</p>
-                )}
-              </section>
-              <section className={styles.secaoLateral}>
-                <div className={styles.tituloSecao}>
-                  <div>
-                    <p>Fontes consultadas</p>
-                    <span>Rastreabilidade do dossiê.</span>
-                  </div>
-                </div>
-                <div className={styles.fontesLead}>
-                  {fontesDo(selecionado).map((fonte) => (
-                    <span key={fonte}>{fonte}</span>
+                    </article>
                   ))}
                 </div>
               </section>
-            </aside>
-          </div>
-        </div>
+            )}
 
-        <footer className={styles.detalheRodape}>
-          <div>
-            <strong>Pronto para trabalhar este lead?</strong>
-            <span>Os contatos, decisores e fontes seguem juntos para o CRM.</span>
-          </div>
-          {selecionado.crm_oportunidade_id ? (
-            <Link
-              href={`/crm/${selecionado.crm_oportunidade_id}`}
-              className="via-btn via-btn--primary via-btn--md"
-            >
-              <span className="via-btn__label">Abrir no CRM</span>
-              <ArrowRight size={16} />
-            </Link>
-          ) : (
-            <form action={enviarLeadAoCrm}>
-              <input type="hidden" name="lead" value={selecionado.id} />
-              <BotaoEnviarCrm />
-            </form>
-          )}
-        </footer>
+            <ContextoEmpresa lead={selecionado} />
+          </main>
+
+          <aside className={styles.sidebar}>
+            <AndamentoProspeccao
+              key={`${selecionado.id}-${status}-${selecionado.tentativas_contato}`}
+              lead={selecionado.id}
+              status={status}
+              ultimoCanal={selecionado.ultimo_canal}
+              tentativas={selecionado.tentativas_contato}
+              oportunidade={selecionado.crm_oportunidade_id}
+            />
+
+            {horarios.length > 0 && (
+              <section className={styles.sideCard}>
+                <div className={styles.sideTitle}>
+                  <Clock3 size={17} aria-hidden="true" />
+                  <div>
+                    <strong>Horários públicos</strong>
+                    <span>Referência para escolher o contato.</span>
+                  </div>
+                </div>
+                <dl className={styles.hours}>
+                  {horarios.map((horario) => (
+                    <div key={horario.dia}>
+                      <dt>{horario.dia}</dt>
+                      <dd>{horario.horarios}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            )}
+
+            <section className={styles.sideCard}>
+              <div className={styles.sideTitle}>
+                <Search size={17} aria-hidden="true" />
+                <div>
+                  <strong>Fontes consultadas</strong>
+                  <span>Origem dos dados reunidos.</span>
+                </div>
+              </div>
+              <div className={styles.sources}>
+                {fontesDo(selecionado).map((fonte) => (
+                  <span key={fonte}>{fonte}</span>
+                ))}
+              </div>
+            </section>
+          </aside>
+        </div>
       </article>
     </div>
   );

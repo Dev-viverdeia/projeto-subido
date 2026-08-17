@@ -5,6 +5,11 @@ import { ListaResultados } from './ListaResultados';
 
 vi.mock('@/lib/prospeccao/actions', () => ({
   enviarLeadAoCrm: vi.fn(),
+  registrarContatoProspeccao: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
 }));
 
 const LEAD = {
@@ -45,12 +50,16 @@ const LEAD = {
     sinais: ['Telefone e e-mail disponíveis para abordagem'],
   },
   dados: {},
+  status_prospeccao: 'novo',
+  ultimo_canal: null,
+  ultimo_contato_em: null,
+  tentativas_contato: 0,
   crm_oportunidade_id: null,
   enviado_crm_em: null,
 };
 
 describe('resultados da prospecção', () => {
-  it('abre os detalhes clicando em qualquer parte da linha e oferece envio ao CRM', async () => {
+  it('abre a estação de prospecção clicando em qualquer parte da linha', async () => {
     const user = userEvent.setup();
     render(<ListaResultados leads={[LEAD]} />);
 
@@ -58,10 +67,15 @@ describe('resultados da prospecção', () => {
     await user.click(linha);
 
     expect(screen.getByRole('dialog', { name: 'Clínica Aurora' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Enviar para o CRM' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Abrir WhatsApp/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Escrever e-mail/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Alguém respondeu' })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: 'Criar oportunidade no CRM' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Google Maps · dados públicos')).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Fechar detalhes' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Fechar detalhes da empresa' })).toHaveFocus();
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(linha).toHaveFocus();
