@@ -72,10 +72,11 @@
 }
 
 .resumo article {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--via-space-4);
-  min-height: 88px;
+  gap: var(--via-space-3);
+  min-height: 82px;
   padding: var(--via-space-4) var(--via-space-5);
 }
 
@@ -83,33 +84,41 @@
   border-left: 1px solid var(--via-border-hairline);
 }
 
-.iconeResumo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  color: var(--via-accent-ink);
-}
-
-.resumo strong,
-.resumo article div span {
+.resumo article > strong,
+.resumo article div span,
+.resumo article div small {
   display: block;
 }
 
-.resumo strong {
+.resumo article > strong {
+  min-width: 2ch;
+  color: var(--via-text-primary);
   font-family: var(--via-font-mono);
-  font-size: clamp(1.55rem, 2.6vw, 2.1rem);
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
   font-weight: var(--via-fw-medium);
   line-height: 1;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
+.resumo article[data-resultado='ganho'] > strong {
+  color: var(--via-navy);
+}
+
+.resumo article[data-resultado='perdido'] > strong {
+  color: var(--via-text-muted);
+}
+
 .resumo article div span {
+  color: var(--via-text-body);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.resumo article div small {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-micro);
 }
 
 .quadro {
@@ -274,11 +283,10 @@
   }
 
   .resumo article {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
     gap: var(--via-space-2);
-    min-height: 100px;
-    padding: var(--via-space-3);
+    min-height: 86px;
+    padding: var(--via-space-4);
   }
 
   .resumo article + article {
@@ -293,16 +301,11 @@
     border-top: 1px solid var(--via-border-hairline);
   }
 
-  .iconeResumo {
-    width: 24px;
-    height: 24px;
-  }
-
-  .resumo strong {
+  .resumo article > strong {
     font-size: 1.55rem;
   }
 
-  .resumo article div span {
+  .resumo article div small {
     line-height: var(--via-lh-snug);
   }
 

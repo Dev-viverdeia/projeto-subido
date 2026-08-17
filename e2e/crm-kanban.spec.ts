@@ -4,40 +4,50 @@ test.describe('CRM Kanban', () => {
   test('separa ganho e perda e preserva o motivo no card', async ({ page }) => {
     await page.goto('/preview/crm');
 
-    await expect(page.getByRole('heading', { name: 'Desfecho' })).toBeVisible();
-    await expect(page.getByText('Ganhas', { exact: true })).toBeVisible();
-    await expect(page.getByText('Perdidas', { exact: true })).toBeVisible();
+    await expect(page.getByText('Concluir oportunidade', { exact: true })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Marcar oportunidade como ganha' })).toBeVisible();
+    await expect(
+      page.getByRole('group', { name: 'Marcar oportunidade como perdida' }),
+    ).toBeVisible();
+    await page.getByText('Histórico de desfechos', { exact: true }).click();
     await expect(page.getByText('Momento inadequado', { exact: true })).toBeVisible();
     await expect(page.getByText('Fechados', { exact: true })).toHaveCount(0);
   });
 
-  test('arrastar para Perdidas exige contexto antes de encerrar', async ({ page }, testInfo) => {
-    test.skip(
-      testInfo.project.name === 'mobile',
-      'O celular usa o menu Mover como rota principal.',
-    );
-    await page.setViewportSize({ width: 1920, height: 1080 });
+  test('o card inteiro move a oportunidade e a perda exige contexto', async ({
+    page,
+  }, testInfo) => {
+    if (testInfo.project.name !== 'mobile') {
+      await page.setViewportSize({ width: 1920, height: 1080 });
+    }
     await page.goto('/preview/crm');
 
-    const alca = page.getByRole('button', { name: 'Arrastar Automação do atendimento' });
-    const destino = page.getByText('Perdidas', { exact: true });
-    const origem = await alca.boundingBox();
-    const chegada = await destino.boundingBox();
-    expect(origem).not.toBeNull();
-    expect(chegada).not.toBeNull();
-    if (!origem || !chegada) return;
+    if (testInfo.project.name === 'mobile') {
+      await page.getByRole('button', { name: 'Ações de Automação do atendimento' }).click();
+      await page.getByRole('menuitem', { name: 'Marcar como perdida' }).click();
+    } else {
+      const card = page.getByRole('group', {
+        name: /Automação do atendimento, Clínica Aurora\. Arraste/,
+      });
+      const destino = page.getByRole('group', { name: 'Marcar oportunidade como perdida' });
+      const origem = await card.boundingBox();
+      const chegada = await destino.boundingBox();
+      expect(origem).not.toBeNull();
+      expect(chegada).not.toBeNull();
+      if (!origem || !chegada) return;
 
-    await page.mouse.move(origem.x + origem.width / 2, origem.y + origem.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(origem.x + 18, origem.y + 18, { steps: 4 });
-    await page.mouse.move(chegada.x + chegada.width / 2, chegada.y + chegada.height / 2, {
-      steps: 16,
-    });
-    await page.mouse.up();
+      await page.mouse.move(origem.x + origem.width * 0.46, origem.y + origem.height * 0.46);
+      await page.mouse.down();
+      await page.mouse.move(origem.x + 18, origem.y + 18, { steps: 4 });
+      await page.mouse.move(chegada.x + chegada.width / 2, chegada.y + chegada.height / 2, {
+        steps: 16,
+      });
+      await page.mouse.up();
+    }
 
-    const dialogo = page.getByRole('dialog', { name: 'Registrar oportunidade perdida' });
+    const dialogo = page.getByRole('dialog', { name: 'Por que a oportunidade foi perdida?' });
     await expect(dialogo).toBeVisible();
-    await dialogo.getByRole('button', { name: 'Registrar perda' }).click();
+    await dialogo.getByRole('button', { name: 'Registrar como perdida' }).click();
     await expect(dialogo.getByText('Escolha o motivo para concluir o registro.')).toBeVisible();
     await dialogo.getByText('Não é prioridade agora', { exact: true }).click();
     await expect(dialogo.getByRole('radio', { name: 'Não é prioridade agora' })).toBeChecked();

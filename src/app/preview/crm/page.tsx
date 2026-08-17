@@ -3,14 +3,10 @@ import { notFound } from 'next/navigation';
 import {
   Bot,
   BriefcaseBusiness,
-  CircleDollarSign,
   ContactRound,
   GraduationCap,
   House,
-  Layers3,
-  Radar,
   UsersRound,
-  XCircle,
 } from 'lucide-react';
 import { FormularioNovoLead } from '@/app/(app)/crm/_components/FormularioNovoLead';
 import { PipelineCrm } from '@/app/(app)/crm/_components/PipelineCrm';
@@ -184,8 +180,8 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
               <p className={pagina.sobretitulo}>Operação comercial</p>
               <h1>Pipeline comercial</h1>
               <p>
-                Quatro fases para saber quem precisa de atenção agora — com todo o histórico no
-                mesmo lugar.
+                Três etapas de trabalho para saber quem precisa de atenção agora — com cada desfecho
+                registrado.
               </p>
             </div>
             <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
@@ -193,40 +189,32 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
 
           <section className={pagina.resumo} aria-label="Resumo do pipeline">
             <article>
-              <span className={pagina.iconeResumo}>
-                <Radar size={18} strokeWidth={1.8} aria-hidden="true" />
-              </span>
               <div>
-                <strong>3</strong>
-                <span>abertas</span>
+                <span>Abertas</span>
+                <small>em andamento</small>
               </div>
+              <strong>3</strong>
             </article>
             <article>
-              <span className={pagina.iconeResumo}>
-                <CircleDollarSign size={18} strokeWidth={1.8} aria-hidden="true" />
-              </span>
               <div>
-                <strong>1</strong>
-                <span>em proposta</span>
+                <span>Em proposta</span>
+                <small>aguardando decisão</small>
               </div>
+              <strong>1</strong>
             </article>
-            <article>
-              <span className={pagina.iconeResumo}>
-                <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
-              </span>
+            <article data-resultado="ganho">
               <div>
-                <strong>1</strong>
-                <span>ganhos</span>
+                <span>Ganhas</span>
+                <small>projetos aprovados</small>
               </div>
+              <strong>1</strong>
             </article>
-            <article>
-              <span className={pagina.iconeResumo}>
-                <XCircle size={18} strokeWidth={1.8} aria-hidden="true" />
-              </span>
+            <article data-resultado="perdido">
               <div>
-                <strong>1</strong>
-                <span>perdidas</span>
+                <span>Perdidas</span>
+                <small>com motivo registrado</small>
               </div>
+              <strong>1</strong>
             </article>
           </section>
 

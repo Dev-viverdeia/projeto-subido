@@ -1,13 +1,5 @@
 import type { Metadata } from 'next';
-import {
-  ArrowRight,
-  CheckCircle2,
-  CircleDollarSign,
-  Database,
-  Layers3,
-  Radar,
-  XCircle,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Database } from 'lucide-react';
 import { etapaAberta } from '@/lib/crm/etapas';
 import { listarPipeline } from '@/lib/crm/queries';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
@@ -39,8 +31,8 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           <p className={styles.sobretitulo}>Operação comercial</p>
           <h1>Pipeline comercial</h1>
           <p>
-            Quatro fases para saber quem precisa de atenção agora — com todo o histórico no mesmo
-            lugar.
+            Três etapas de trabalho para saber quem precisa de atenção agora — com cada desfecho
+            registrado.
           </p>
         </div>
         {oportunidades.length > 0 && (
@@ -61,40 +53,32 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
 
       <section className={styles.resumo} aria-label="Resumo do pipeline">
         <article>
-          <span className={styles.iconeResumo}>
-            <Radar size={18} strokeWidth={1.8} aria-hidden="true" />
-          </span>
           <div>
-            <strong>{abertas}</strong>
-            <span>abertas</span>
+            <span>Abertas</span>
+            <small>em andamento</small>
           </div>
+          <strong>{abertas}</strong>
         </article>
         <article>
-          <span className={styles.iconeResumo}>
-            <CircleDollarSign size={18} strokeWidth={1.8} aria-hidden="true" />
-          </span>
           <div>
-            <strong>{emDecisao}</strong>
-            <span>em proposta</span>
+            <span>Em proposta</span>
+            <small>aguardando decisão</small>
           </div>
+          <strong>{emDecisao}</strong>
         </article>
-        <article>
-          <span className={styles.iconeResumo}>
-            <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
-          </span>
+        <article data-resultado="ganho">
           <div>
-            <strong>{ganhos}</strong>
-            <span>ganhos</span>
+            <span>Ganhas</span>
+            <small>projetos aprovados</small>
           </div>
+          <strong>{ganhos}</strong>
         </article>
-        <article>
-          <span className={styles.iconeResumo}>
-            <XCircle size={18} strokeWidth={1.8} aria-hidden="true" />
-          </span>
+        <article data-resultado="perdido">
           <div>
-            <strong>{perdidos}</strong>
-            <span>perdidas</span>
+            <span>Perdidas</span>
+            <small>com motivo registrado</small>
           </div>
+          <strong>{perdidos}</strong>
         </article>
       </section>
 

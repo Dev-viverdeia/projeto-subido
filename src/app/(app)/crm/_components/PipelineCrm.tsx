@@ -14,7 +14,7 @@ import {
   type CollisionDetection,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import { GripVertical, RotateCcw } from 'lucide-react';
+import { Move } from 'lucide-react';
 import { Button, Modal, RadioGroup, ToastStack, type ToastItem } from '@/design-system/via';
 import { moverOportunidadeKanban } from '@/lib/crm/actions';
 import {
@@ -29,7 +29,7 @@ import {
 } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import { CartaoOverlay } from './KanbanCartao';
-import { ColunaAtiva, ColunaDesfecho } from './KanbanColunas';
+import { BandejaDesfecho, ColunaAtiva, HistoricoDesfechos } from './KanbanColunas';
 import styles from './PipelineCrm.module.css';
 
 const detectarDestino: CollisionDetection = (argumentos) => {
@@ -76,6 +76,9 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
   const ativas = FASES_CRM.filter((fase) => fase.id !== 'desfecho');
   const ganhas = itens.filter((oportunidade) => oportunidade.etapa === 'ganho');
   const perdidas = itens.filter((oportunidade) => oportunidade.etapa === 'perdido');
+  const encerradas = itens.filter(
+    (oportunidade) => oportunidade.etapa === 'ganho' || oportunidade.etapa === 'perdido',
+  );
   const ativa = itens.find((oportunidade) => oportunidade.id === ativoId) ?? null;
 
   function publicarToast(toast: Omit<ToastItem, 'id'>) {
@@ -182,13 +185,8 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
 
   return (
     <>
-      <div className={styles.orientacao}>
-        <GripVertical size={15} strokeWidth={1.8} aria-hidden="true" />
-        <span className={styles.orientacaoDesktop}>Arraste o card pela alça até a nova etapa.</span>
-        <span className={styles.orientacaoMobile}>Use “Mover” no card para trocar de etapa.</span>
-      </div>
-
       <DndContext
+        id="crm-pipeline"
         sensors={sensores}
         collisionDetection={detectarDestino}
         onDragStart={({ active }) => setAtivoId(String(active.id).replace('card:', ''))}
@@ -197,10 +195,13 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
         accessibility={{
           screenReaderInstructions: {
             draggable:
-              'Pressione espaço para começar. Use as setas para escolher a etapa e pressione espaço novamente para soltar.',
+              'Foque o card e pressione espaço para começar. Use as setas para escolher o destino e pressione espaço novamente para soltar.',
           },
           announcements: {
-            onDragStart: ({ active }) => `Movendo ${String(active.id).replace('card:', '')}.`,
+            onDragStart: ({ active }) => {
+              const oportunidade = active.data.current?.oportunidade as OportunidadeCrm | undefined;
+              return `Movendo ${oportunidade?.titulo ?? 'oportunidade'}.`;
+            },
             onDragOver: ({ over }) => (over ? `Sobre ${String(over.id)}.` : 'Fora do quadro.'),
             onDragEnd: ({ over }) =>
               over ? `Movimento concluído em ${String(over.id)}.` : 'Movimento cancelado.',
@@ -208,25 +209,41 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           },
         }}
       >
-        <div className={styles.rolagem} aria-label="Kanban comercial arrastável">
-          <div className={styles.pipeline}>
-            {ativas.map((fase, indice) => (
-              <ColunaAtiva
-                key={fase.id}
-                fase={fase}
-                numero={indice + 1}
-                oportunidades={porFase.get(fase.id) ?? []}
-                aoMover={solicitarMovimento}
-                movimentandoId={movimentandoId}
-              />
-            ))}
-            <ColunaDesfecho
-              ganhas={ganhas}
-              perdidas={perdidas}
-              aoMover={solicitarMovimento}
-              movimentandoId={movimentandoId}
+        <div className={styles.experienciaKanban} aria-label="Kanban comercial arrastável">
+          <div className={styles.quadroKanban} data-arrastando={ativoId !== null || undefined}>
+            <div className={styles.instrucaoKanban}>
+              <Move size={15} strokeWidth={1.8} aria-hidden="true" />
+              <span>Arraste por qualquer ponto do card.</span>
+              <small>No celular, use o menu de ações.</small>
+            </div>
+
+            <BandejaDesfecho
+              ganhas={ganhas.length}
+              perdidas={perdidas.length}
+              arrastando={ativoId !== null}
             />
+
+            <div className={styles.rolagem}>
+              <div className={styles.pipeline}>
+                {ativas.map((fase, indice) => (
+                  <ColunaAtiva
+                    key={fase.id}
+                    fase={fase}
+                    numero={indice + 1}
+                    oportunidades={porFase.get(fase.id) ?? []}
+                    aoMover={solicitarMovimento}
+                    movimentandoId={movimentandoId}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
+
+          <HistoricoDesfechos
+            oportunidades={encerradas}
+            aoMover={solicitarMovimento}
+            movimentandoId={movimentandoId}
+          />
         </div>
 
         <DragOverlay dropAnimation={{ duration: 180, easing: 'ease-out' }}>
@@ -237,7 +254,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
       <Modal
         open={perdaPendente !== null}
         onClose={fecharPerda}
-        title="Registrar oportunidade perdida"
+        title="Por que a oportunidade foi perdida?"
         description={
           perdaPendente ? `${perdaPendente.empresa} · ${perdaPendente.titulo}` : undefined
         }
@@ -248,21 +265,18 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
               Cancelar
             </Button>
             <Button onClick={confirmarPerda} disabled={movimentandoId !== null}>
-              Registrar perda
+              Registrar como perdida
             </Button>
           </>
         }
       >
         <div className={styles.modalPerda}>
-          <div className={styles.avisoPerda}>
-            <RotateCcw size={17} strokeWidth={1.8} aria-hidden="true" />
-            <p>
-              Nada será apagado. O motivo entra no histórico e a oportunidade poderá ser reaberta
-              quando o cenário mudar.
-            </p>
-          </div>
+          <p className={styles.contextoPerda}>
+            O motivo alimenta seu histórico comercial. A oportunidade continua salva e pode ser
+            reaberta depois.
+          </p>
           <fieldset>
-            <legend>Por que esta oportunidade não avançou?</legend>
+            <legend>Selecione o motivo principal</legend>
             <RadioGroup
               ariaLabel="Motivo da perda"
               name="motivo-perda"

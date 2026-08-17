@@ -1,10 +1,10 @@
 'use client';
 
 import { useDroppable } from '@dnd-kit/core';
-import { CheckCircle2, Inbox, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronDown, XCircle } from 'lucide-react';
 import type { FASES_CRM, EtapaCrm, IdFaseCrm } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
-import { CartaoOportunidade, type SolicitarMovimento } from './KanbanCartao';
+import { CartaoEncerrado, CartaoOportunidade, type SolicitarMovimento } from './KanbanCartao';
 import styles from './PipelineCrm.module.css';
 
 const ETAPA_DA_FASE: Record<Exclude<IdFaseCrm, 'desfecho'>, EtapaCrm> = {
@@ -13,11 +13,11 @@ const ETAPA_DA_FASE: Record<Exclude<IdFaseCrm, 'desfecho'>, EtapaCrm> = {
   proposta: 'proposta',
 };
 
-function Vazio({ texto }: { texto: string }) {
+function Vazio() {
   return (
     <div className={styles.vazio}>
-      <Inbox size={18} strokeWidth={1.5} aria-hidden="true" />
-      <span>{texto}</span>
+      <span>Nenhuma oportunidade</span>
+      <small>Solte um card nesta etapa</small>
     </div>
   );
 }
@@ -50,10 +50,8 @@ export function ColunaAtiva({
       aria-labelledby={`coluna-${fase.id}`}
     >
       <header className={styles.colunaTopo}>
-        <span className={styles.faseNumero} aria-hidden="true">
-          {String(numero).padStart(2, '0')}
-        </span>
         <div>
+          <span className={styles.faseNumero}>Etapa {numero}</span>
           <h2 id={`coluna-${fase.id}`}>{fase.rotulo}</h2>
           <p>{fase.descricao}</p>
         </div>
@@ -73,111 +71,110 @@ export function ColunaAtiva({
             />
           ))
         ) : (
-          <Vazio texto="Solte uma oportunidade aqui" />
+          <Vazio />
         )}
       </div>
     </section>
   );
 }
 
-function ZonaResultado({
-  etapa,
-  oportunidades,
-  aoMover,
-  movimentandoId,
-}: {
-  etapa: 'ganho' | 'perdido';
-  oportunidades: OportunidadeCrm[];
-  aoMover: SolicitarMovimento;
-  movimentandoId: string | null;
-}) {
+function DestinoDesfecho({ etapa, total }: { etapa: 'ganho' | 'perdido'; total: number }) {
   const { isOver, setNodeRef } = useDroppable({
     id: `resultado:${etapa}`,
     data: { etapa },
   });
-  const Icone = etapa === 'ganho' ? CheckCircle2 : XCircle;
+  const perdida = etapa === 'perdido';
+  const Icone = perdida ? XCircle : CheckCircle2;
 
   return (
     <div
       ref={setNodeRef}
-      className={styles.zonaResultado}
+      className={styles.destinoDesfecho}
       data-resultado={etapa}
       data-sobre={isOver || undefined}
+      role="group"
+      aria-label={perdida ? 'Marcar oportunidade como perdida' : 'Marcar oportunidade como ganha'}
     >
-      <header>
-        <span>
-          <Icone size={15} strokeWidth={1.9} aria-hidden="true" />
-          {etapa === 'ganho' ? 'Ganhas' : 'Perdidas'}
-        </span>
-        <strong aria-label={`${oportunidades.length} oportunidades`}>{oportunidades.length}</strong>
-      </header>
-      <div className={styles.listaResultado}>
-        {oportunidades.length ? (
-          oportunidades.map((oportunidade) => (
-            <CartaoOportunidade
-              key={oportunidade.id}
-              oportunidade={oportunidade}
-              aoMover={aoMover}
-              desabilitado={movimentandoId !== null}
-            />
-          ))
-        ) : (
-          <Vazio
-            texto={
-              etapa === 'ganho' ? 'Solte uma venda concluída' : 'Solte para encerrar com motivo'
-            }
-          />
-        )}
+      <Icone size={18} strokeWidth={1.8} aria-hidden="true" />
+      <div>
+        <strong>{perdida ? 'Perdida' : 'Ganha'}</strong>
+        <span>{perdida ? 'Registra o motivo' : 'Inicia a entrega'}</span>
       </div>
+      <small aria-label={`${total} oportunidades encerradas`}>{total}</small>
     </div>
   );
 }
 
-export function ColunaDesfecho({
+export function BandejaDesfecho({
   ganhas,
   perdidas,
+  arrastando,
+}: {
+  ganhas: number;
+  perdidas: number;
+  arrastando: boolean;
+}) {
+  return (
+    <section className={styles.bandejaDesfecho} data-arrastando={arrastando || undefined}>
+      <div className={styles.bandejaTexto}>
+        <span>Desfecho</span>
+        <strong>{arrastando ? 'Onde esta oportunidade terminou?' : 'Concluir oportunidade'}</strong>
+        <small>
+          {arrastando ? 'Solte em uma das opções.' : 'Arraste um card até o resultado.'}
+        </small>
+      </div>
+      <div className={styles.destinosDesfecho}>
+        <DestinoDesfecho etapa="ganho" total={ganhas} />
+        <DestinoDesfecho etapa="perdido" total={perdidas} />
+      </div>
+    </section>
+  );
+}
+
+export function HistoricoDesfechos({
+  oportunidades,
   aoMover,
   movimentandoId,
 }: {
-  ganhas: OportunidadeCrm[];
-  perdidas: OportunidadeCrm[];
+  oportunidades: OportunidadeCrm[];
   aoMover: SolicitarMovimento;
   movimentandoId: string | null;
 }) {
+  if (oportunidades.length === 0) return null;
+
+  const ordenadas = [...oportunidades].sort((a, b) =>
+    (b.perdidaEm ?? b.ganhaEm ?? b.atualizadoEm).localeCompare(
+      a.perdidaEm ?? a.ganhaEm ?? a.atualizadoEm,
+    ),
+  );
+  const ganhas = oportunidades.filter((item) => item.etapa === 'ganho').length;
+  const perdidas = oportunidades.length - ganhas;
+
   return (
-    <section
-      className={`${styles.coluna} ${styles.colunaDesfecho}`}
-      aria-labelledby="desfecho-titulo"
-    >
-      <header className={styles.colunaTopo}>
-        <span className={styles.faseNumero} aria-hidden="true">
-          04
-        </span>
+    <details className={styles.historico}>
+      <summary>
         <div>
-          <h2 id="desfecho-titulo">Desfecho</h2>
-          <p>Decisão registrada</p>
+          <span>Histórico de desfechos</span>
+          <small>
+            {ganhas} {ganhas === 1 ? 'ganha' : 'ganhas'} · {perdidas}{' '}
+            {perdidas === 1 ? 'perdida' : 'perdidas'}
+          </small>
         </div>
-        <span
-          className={styles.contador}
-          aria-label={`${ganhas.length + perdidas.length} oportunidades`}
-        >
-          {ganhas.length + perdidas.length}
+        <span className={styles.abrirHistorico}>
+          Ver oportunidades
+          <ChevronDown size={16} strokeWidth={1.8} aria-hidden="true" />
         </span>
-      </header>
-      <div className={styles.desfechos}>
-        <ZonaResultado
-          etapa="ganho"
-          oportunidades={ganhas}
-          aoMover={aoMover}
-          movimentandoId={movimentandoId}
-        />
-        <ZonaResultado
-          etapa="perdido"
-          oportunidades={perdidas}
-          aoMover={aoMover}
-          movimentandoId={movimentandoId}
-        />
+      </summary>
+      <div className={styles.listaHistorico}>
+        {ordenadas.map((oportunidade) => (
+          <CartaoEncerrado
+            key={oportunidade.id}
+            oportunidade={oportunidade}
+            aoMover={aoMover}
+            desabilitado={movimentandoId !== null}
+          />
+        ))}
       </div>
-    </section>
+    </details>
   );
 }

@@ -1,18 +1,16 @@
 'use client';
 
+import { useCallback, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import { useDraggable } from '@dnd-kit/core';
 import {
   ArrowRight,
-  Building2,
   CheckCircle2,
-  CircleUserRound,
-  Clock3,
   FileText,
   GripVertical,
   Inbox,
-  Layers3,
   MessageSquareMore,
+  MoreHorizontal,
   XCircle,
 } from 'lucide-react';
 import { DropdownMenu } from '@/design-system/via';
@@ -25,6 +23,12 @@ const FORMATADOR_DATA = new Intl.DateTimeFormat('pt-BR', {
   month: 'short',
 });
 
+const FORMATADOR_MOEDA = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  maximumFractionDigits: 0,
+});
+
 const ICONES_ETAPA = {
   novo_lead: Inbox,
   descoberta: MessageSquareMore,
@@ -35,6 +39,14 @@ export type SolicitarMovimento = (oportunidade: OportunidadeCrm, etapa: EtapaCrm
 
 function dataCurta(iso: string): string {
   return FORMATADOR_DATA.format(new Date(iso)).replace('.', '');
+}
+
+function valorDaOportunidade(valorCentavos: number | null): string | null {
+  return valorCentavos === null ? null : FORMATADOR_MOEDA.format(valorCentavos / 100);
+}
+
+function impedirArraste(evento: SyntheticEvent) {
+  evento.stopPropagation();
 }
 
 function MenuMovimentacao({
@@ -59,95 +71,51 @@ function MenuMovimentacao({
   });
 
   return (
-    <DropdownMenu
-      align="end"
-      ariaLabel={`Mover ${oportunidade.titulo}`}
+    <div
       className={styles.menuMovimentacao}
-      trigger={
-        <button
-          type="button"
-          className={styles.botaoMover}
-          disabled={desabilitado}
-          aria-label={`Escolher nova etapa de ${oportunidade.titulo}`}
-        >
-          <span>Mover</span>
-          <ArrowRight size={14} strokeWidth={2} aria-hidden="true" />
-        </button>
-      }
-      groups={[
-        { id: 'pipeline', label: 'Etapa de trabalho', items: itensAtivos },
-        {
-          id: 'desfecho',
-          label: 'Encerrar oportunidade',
-          items: [
-            {
-              id: 'ganho',
-              label: 'Marcar como ganha',
-              icon: <CheckCircle2 size={14} strokeWidth={1.9} />,
-              disabled: etapaAtual === 'ganho' || desabilitado,
-              onSelect: () => aoMover(oportunidade, 'ganho'),
-            },
-            {
-              id: 'perdido',
-              label: 'Marcar como perdida',
-              icon: <XCircle size={14} strokeWidth={1.9} />,
-              disabled: etapaAtual === 'perdido' || desabilitado,
-              // O menu fecha antes do modal entrar. Isso evita que o scrim do
-              // diálogo intercepte o mesmo clique que acabou de escolher a ação.
-              onSelect: () => setTimeout(() => aoMover(oportunidade, 'perdido'), 0),
-            },
-          ],
-        },
-      ]}
-    />
-  );
-}
-
-function ConteudoCartao({ oportunidade }: { oportunidade: OportunidadeCrm }) {
-  const analisando =
-    oportunidade.enriquecimentoStatus === 'na_fila' ||
-    oportunidade.enriquecimentoStatus === 'processando';
-  const pronto = oportunidade.enriquecimentoStatus === 'concluido';
-
-  return (
-    <>
-      <div className={styles.empresa}>
-        <Building2 size={14} strokeWidth={1.8} aria-hidden="true" />
-        <span>{oportunidade.empresa}</span>
-      </div>
-      <h3>{oportunidade.titulo}</h3>
-
-      {oportunidade.contato && (
-        <p className={styles.contato}>
-          <CircleUserRound size={14} strokeWidth={1.8} aria-hidden="true" />
-          <span>{oportunidade.contato}</span>
-        </p>
-      )}
-
-      {oportunidade.etapa === 'perdido' && (
-        <div className={styles.motivoPerda}>
-          <span>Motivo da perda</span>
-          <strong>{rotuloMotivoPerda(oportunidade.motivoPerda)}</strong>
-        </div>
-      )}
-
-      <div className={styles.fato}>
-        <Clock3 size={13} strokeWidth={1.8} aria-hidden="true" />
-        <span>{oportunidade.ultimoFato ?? 'Sem interação registrada'}</span>
-        <time dateTime={oportunidade.ultimoFatoEm ?? oportunidade.criadoEm}>
-          {dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}
-        </time>
-      </div>
-
-      <Link
-        href={`/crm/${oportunidade.id}`}
-        className={styles.dossie}
-        data-estado={analisando ? 'analisando' : pronto ? 'pronto' : 'novo'}
-      >
-        <Layers3 size={14} strokeWidth={1.8} aria-hidden="true" />
-        <span>{analisando ? 'Analisando lead' : pronto ? 'Dossiê pronto' : 'Abrir dossiê'}</span>
-      </Link>
-    </>
+      data-no-dnd
+      onMouseDown={impedirArraste}
+      onTouchStart={impedirArraste}
+      onKeyDown={impedirArraste}
+    >
+      <DropdownMenu
+        align="end"
+        ariaLabel={`Ações de ${oportunidade.titulo}`}
+        trigger={
+          <button
+            type="button"
+            className={styles.botaoAcoes}
+            disabled={desabilitado}
+            aria-label={`Ações de ${oportunidade.titulo}`}
+          >
+            <MoreHorizontal size={17} strokeWidth={1.9} aria-hidden="true" />
+          </button>
+        }
+        groups={[
+          { id: 'pipeline', label: 'Mover para', items: itensAtivos },
+          {
+            id: 'desfecho',
+            label: 'Registrar desfecho',
+            items: [
+              {
+                id: 'ganho',
+                label: 'Marcar como ganha',
+                icon: <CheckCircle2 size={14} strokeWidth={1.9} />,
+                disabled: etapaAtual === 'ganho' || desabilitado,
+                onSelect: () => aoMover(oportunidade, 'ganho'),
+              },
+              {
+                id: 'perdido',
+                label: 'Marcar como perdida',
+                icon: <XCircle size={14} strokeWidth={1.9} />,
+                disabled: etapaAtual === 'perdido' || desabilitado,
+                onSelect: () => aoMover(oportunidade, 'perdido'),
+              },
+            ],
+          },
+        ]}
+      />
+    </div>
   );
 }
 
@@ -160,62 +128,128 @@ export function CartaoOportunidade({
   aoMover: SolicitarMovimento;
   desabilitado: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setActivatorNodeRef, setNodeRef, isDragging } = useDraggable({
     id: `card:${oportunidade.id}`,
     data: { oportunidade },
     disabled: desabilitado,
   });
-  const estilo = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : undefined;
-  const fechada = oportunidade.etapa === 'ganho' || oportunidade.etapa === 'perdido';
+  const definirRef = useCallback(
+    (elemento: HTMLElement | null) => {
+      setNodeRef(elemento);
+      setActivatorNodeRef(elemento);
+    },
+    [setActivatorNodeRef, setNodeRef],
+  );
+  const valor = valorDaOportunidade(oportunidade.valorCentavos);
 
   return (
     <article
-      ref={setNodeRef}
-      style={estilo}
+      ref={definirRef}
       className={styles.cartao}
       data-arrastando={isDragging || undefined}
-      data-fechada={fechada || undefined}
+      {...attributes}
+      {...listeners}
       aria-busy={desabilitado || undefined}
+      aria-label={`${oportunidade.titulo}, ${oportunidade.empresa}. Arraste para mudar de etapa.`}
+      role="group"
+      tabIndex={desabilitado ? -1 : 0}
     >
-      <div className={styles.cartaoTopo}>
-        {fechada ? (
-          <span className={styles.etapaAtual} data-etapa={oportunidade.etapa}>
-            {oportunidade.etapa === 'ganho' ? (
-              <CheckCircle2 size={13} strokeWidth={2} aria-hidden="true" />
-            ) : (
-              <XCircle size={13} strokeWidth={2} aria-hidden="true" />
-            )}
-            {oportunidade.etapa === 'ganho' ? 'Ganha' : 'Perdida'}
-          </span>
-        ) : (
-          <span className={styles.etapaAtual}>Em andamento</span>
-        )}
-
-        <button
-          type="button"
-          className={styles.alca}
-          disabled={desabilitado}
-          aria-label={`Arrastar ${oportunidade.titulo}`}
-          title="Arrastar oportunidade"
-          {...listeners}
-          {...attributes}
-        >
-          <GripVertical size={17} strokeWidth={1.8} aria-hidden="true" />
-        </button>
+      <div className={styles.cartaoCabecalho}>
+        <div className={styles.empresa}>
+          <span>{oportunidade.empresa}</span>
+          {valor && <strong>{valor}</strong>}
+        </div>
+        <GripVertical
+          className={styles.sinalArraste}
+          size={17}
+          strokeWidth={1.7}
+          aria-hidden="true"
+        />
       </div>
 
-      <ConteudoCartao oportunidade={oportunidade} />
+      <h3>{oportunidade.titulo}</h3>
 
-      <div className={styles.rodapeCartao}>
-        <span>{fechada ? 'Reabra ou mova pelo menu' : 'Arraste para avançar'}</span>
+      {oportunidade.contato && <p className={styles.contato}>{oportunidade.contato}</p>}
+
+      <div className={styles.proximoPasso} data-vazio={!oportunidade.proximaAcao || undefined}>
+        <span>{oportunidade.proximaAcao ? 'Próximo passo' : 'Último registro'}</span>
+        <strong>{oportunidade.proximaAcao ?? oportunidade.ultimoFato ?? 'Sem atividade'}</strong>
+      </div>
+
+      <footer className={styles.rodapeCartao}>
+        <time dateTime={oportunidade.ultimoFatoEm ?? oportunidade.criadoEm}>
+          Atualizado {dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}
+        </time>
+        <div className={styles.acoesCartao}>
+          <Link
+            href={`/crm/${oportunidade.id}`}
+            className={styles.dossie}
+            data-no-dnd
+            onMouseDown={impedirArraste}
+            onTouchStart={impedirArraste}
+            onKeyDown={impedirArraste}
+          >
+            Abrir
+            <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
+          </Link>
+          <MenuMovimentacao
+            oportunidade={oportunidade}
+            aoMover={aoMover}
+            desabilitado={desabilitado}
+          />
+        </div>
+      </footer>
+    </article>
+  );
+}
+
+export function CartaoEncerrado({
+  oportunidade,
+  aoMover,
+  desabilitado,
+}: {
+  oportunidade: OportunidadeCrm;
+  aoMover: SolicitarMovimento;
+  desabilitado: boolean;
+}) {
+  const perdida = oportunidade.etapa === 'perdido';
+  const Icone = perdida ? XCircle : CheckCircle2;
+  const encerradaEm = oportunidade.perdidaEm ?? oportunidade.ganhaEm ?? oportunidade.atualizadoEm;
+  const valor = valorDaOportunidade(oportunidade.valorCentavos);
+
+  return (
+    <article className={styles.cartaoEncerrado} data-resultado={perdida ? 'perdido' : 'ganho'}>
+      <header>
+        <span className={styles.estadoEncerrado}>
+          <Icone size={14} strokeWidth={2} aria-hidden="true" />
+          {perdida ? 'Perdida' : 'Ganha'}
+        </span>
         <MenuMovimentacao
           oportunidade={oportunidade}
           aoMover={aoMover}
           desabilitado={desabilitado}
         />
+      </header>
+      <div className={styles.encerradoTitulo}>
+        <div>
+          <span>{oportunidade.empresa}</span>
+          <h3>{oportunidade.titulo}</h3>
+        </div>
+        {valor && <strong>{valor}</strong>}
       </div>
+      {perdida && (
+        <p className={styles.motivoPerda}>
+          <span>Motivo</span>
+          <strong>{rotuloMotivoPerda(oportunidade.motivoPerda)}</strong>
+        </p>
+      )}
+      <footer>
+        <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
+        <Link href={`/crm/${oportunidade.id}`}>
+          Abrir dossiê
+          <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
+        </Link>
+      </footer>
     </article>
   );
 }
@@ -225,7 +259,7 @@ export function CartaoOverlay({ oportunidade }: { oportunidade: OportunidadeCrm 
     <div className={styles.overlay}>
       <span>{oportunidade.empresa}</span>
       <strong>{oportunidade.titulo}</strong>
-      <small>Solte na nova etapa</small>
+      <small>Solte na etapa desejada</small>
     </div>
   );
 }
