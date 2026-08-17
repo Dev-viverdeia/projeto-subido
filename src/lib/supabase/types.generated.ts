@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       aulas: {
@@ -1987,18 +2012,26 @@ export type Database = {
           criado_em: string
           crm_oportunidade_id: string | null
           dados: Json
+          decisores: Json
           descricao: string | null
           dominio: string | null
           dono: string
+          emails: Json
           endereco: string | null
           enviado_crm_em: string | null
           estado: string | null
           fontes: Json
+          horarios: Json
           id: string
+          imagem_url: string | null
           lista_id: string
+          maps_url: string | null
           nome: string
+          qualificacao: Json
+          redes_sociais: Json
           site_url: string | null
           telefone: string | null
+          telefones: Json
           total_avaliacoes: number | null
         }
         Insert: {
@@ -2010,18 +2043,26 @@ export type Database = {
           criado_em?: string
           crm_oportunidade_id?: string | null
           dados?: Json
+          decisores?: Json
           descricao?: string | null
           dominio?: string | null
           dono: string
+          emails?: Json
           endereco?: string | null
           enviado_crm_em?: string | null
           estado?: string | null
           fontes?: Json
+          horarios?: Json
           id?: string
+          imagem_url?: string | null
           lista_id: string
+          maps_url?: string | null
           nome: string
+          qualificacao?: Json
+          redes_sociais?: Json
           site_url?: string | null
           telefone?: string | null
+          telefones?: Json
           total_avaliacoes?: number | null
         }
         Update: {
@@ -2033,18 +2074,26 @@ export type Database = {
           criado_em?: string
           crm_oportunidade_id?: string | null
           dados?: Json
+          decisores?: Json
           descricao?: string | null
           dominio?: string | null
           dono?: string
+          emails?: Json
           endereco?: string | null
           enviado_crm_em?: string | null
           estado?: string | null
           fontes?: Json
+          horarios?: Json
           id?: string
+          imagem_url?: string | null
           lista_id?: string
+          maps_url?: string | null
           nome?: string
+          qualificacao?: Json
+          redes_sociais?: Json
           site_url?: string | null
           telefone?: string | null
+          telefones?: Json
           total_avaliacoes?: number | null
         }
         Relationships: [
@@ -2917,6 +2966,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       calls_status: [

@@ -1,9 +1,17 @@
 import 'server-only';
 
 import { prospeccaoEnv } from '@/lib/env';
-import { LeadProspeccaoSchema, type BuscaProspeccao, type LeadProspeccaoEntrada } from './schema';
-
-type Registro = Record<string, unknown>;
+import { buscarDecisores } from './decisores';
+import {
+  jsonDaResposta,
+  origemApify,
+  origemSerp,
+  qualificar,
+  texto,
+  unicos,
+  type Registro,
+} from './normalizacao';
+import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
 export type ResultadoProvedores = {
   leads: LeadProspeccaoEntrada[];
@@ -11,6 +19,7 @@ export type ResultadoProvedores = {
     serpapi: 'concluido' | 'falhou' | 'nao_configurado';
     apify: 'concluido' | 'falhou' | 'nao_configurado';
     firecrawl: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
+    fullenrich: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
   };
 };
 
@@ -21,115 +30,6 @@ export class ErroConfiguracaoProspeccao extends Error {
   }
 }
 
-function texto(valor: unknown): string | null {
-  return typeof valor === 'string' && valor.trim() ? valor.trim() : null;
-}
-
-function numero(valor: unknown): number | null {
-  return typeof valor === 'number' && Number.isFinite(valor) ? valor : null;
-}
-
-function inteiro(valor: unknown): number | null {
-  const recebido = numero(valor);
-  return recebido === null ? null : Math.max(0, Math.trunc(recebido));
-}
-
-function urlPublica(valor: unknown): string | null {
-  const recebida = texto(valor);
-  if (!recebida) return null;
-  try {
-    const url = new URL(recebida.startsWith('http') ? recebida : `https://${recebida}`);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : null;
-  } catch {
-    return null;
-  }
-}
-
-function dominioDe(url: string | null): string | null {
-  if (!url) return null;
-  try {
-    return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  } catch {
-    return null;
-  }
-}
-
-function chaveDo(registro: Registro, nome: string, endereco: string | null, site: string | null) {
-  return (
-    texto(registro.place_id) ??
-    texto(registro.placeId) ??
-    texto(registro.data_id) ??
-    texto(registro.cid) ??
-    dominioDe(site) ??
-    `${nome}|${endereco ?? ''}`.toLocaleLowerCase('pt-BR')
-  );
-}
-
-function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
-  const nome = texto(registro.title);
-  if (!nome) return null;
-  const site = urlPublica(registro.website);
-  const endereco = texto(registro.address);
-  const resultado = LeadProspeccaoSchema.safeParse({
-    chave_externa: chaveDo(registro, nome, endereco, site),
-    nome,
-    categoria: texto(registro.type),
-    endereco,
-    cidade: null,
-    estado: null,
-    site_url: site,
-    dominio: dominioDe(site),
-    telefone: texto(registro.phone),
-    avaliacao: numero(registro.rating),
-    total_avaliacoes: inteiro(registro.reviews),
-    descricao: texto(registro.description),
-    fontes: ['Google Maps · dados públicos'],
-    dados: {
-      place_id: texto(registro.place_id),
-      maps_url: texto(registro.place_id_search) ?? texto(registro.directions),
-      horario: registro.operating_hours ?? null,
-    },
-  });
-  return resultado.success ? resultado.data : null;
-}
-
-function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
-  const nome = texto(registro.title) ?? texto(registro.name);
-  if (!nome) return null;
-  const site = urlPublica(registro.website) ?? urlPublica(registro.url);
-  const endereco = texto(registro.address);
-  const categorias = Array.isArray(registro.categories)
-    ? registro.categories.filter((item): item is string => typeof item === 'string')
-    : [];
-  const resultado = LeadProspeccaoSchema.safeParse({
-    chave_externa: chaveDo(registro, nome, endereco, site),
-    nome,
-    categoria: texto(registro.categoryName) ?? categorias[0] ?? null,
-    endereco,
-    cidade: texto(registro.city),
-    estado: texto(registro.state),
-    site_url: site,
-    dominio: dominioDe(site),
-    telefone: texto(registro.phone) ?? texto(registro.phoneUnformatted),
-    avaliacao: numero(registro.totalScore),
-    total_avaliacoes: inteiro(registro.reviewsCount),
-    descricao: texto(registro.description),
-    fontes: ['Google Maps · dados públicos'],
-    dados: {
-      place_id: texto(registro.placeId),
-      maps_url: texto(registro.url),
-      categoria_secundaria: categorias[1] ?? null,
-    },
-  });
-  return resultado.success ? resultado.data : null;
-}
-
-async function jsonDaResposta(resposta: Response): Promise<unknown> {
-  const json: unknown = await resposta.json().catch(() => null);
-  if (!resposta.ok) throw new Error(`provedor_http_${resposta.status}`);
-  return json;
-}
-
 async function buscarSerpApi(
   busca: BuscaProspeccao,
   chave: string,
@@ -138,12 +38,11 @@ async function buscarSerpApi(
     { length: Math.ceil(busca.quantidade / 20) },
     (_, indice) => indice * 20,
   );
-  const consulta = busca.segmento;
   const respostas = await Promise.all(
     paginas.map(async (inicio) => {
       const parametros = new URLSearchParams({
         engine: 'google_maps',
-        q: consulta,
+        q: busca.segmento,
         location: busca.localizacao,
         hl: 'pt',
         gl: 'br',
@@ -183,9 +82,13 @@ async function buscarApify(
         language: 'pt-BR',
         countryCode: 'br',
         skipClosedPlaces: true,
+        scrapeContacts: true,
+        scrapePlaceDetailPage: true,
+        maximumLeadsEnrichmentRecords: 0,
+        verifyLeadsEnrichmentEmails: false,
       }),
       cache: 'no-store',
-      signal: AbortSignal.timeout(35_000),
+      signal: AbortSignal.timeout(115_000),
     },
   );
   const json = await jsonDaResposta(resposta);
@@ -201,7 +104,7 @@ function combinar(principal: LeadProspeccaoEntrada[], complemento: LeadProspecca
       porChave.set(lead.chave_externa, lead);
       continue;
     }
-    porChave.set(lead.chave_externa, {
+    const combinado = {
       ...existente,
       categoria: existente.categoria ?? lead.categoria,
       endereco: existente.endereco ?? lead.endereco,
@@ -210,12 +113,29 @@ function combinar(principal: LeadProspeccaoEntrada[], complemento: LeadProspecca
       site_url: existente.site_url ?? lead.site_url,
       dominio: existente.dominio ?? lead.dominio,
       telefone: existente.telefone ?? lead.telefone,
+      telefones: unicos([...existente.telefones, ...lead.telefones]).slice(0, 12),
+      emails: unicos([...existente.emails, ...lead.emails]).slice(0, 12),
+      redes_sociais: [...existente.redes_sociais, ...lead.redes_sociais].filter(
+        (rede, indice, todas) => todas.findIndex((item) => item.url === rede.url) === indice,
+      ),
+      decisores: [...existente.decisores, ...lead.decisores].filter(
+        (decisor, indice, todos) =>
+          todos.findIndex(
+            (item) =>
+              item.linkedin_url === decisor.linkedin_url ||
+              item.nome.toLocaleLowerCase('pt-BR') === decisor.nome.toLocaleLowerCase('pt-BR'),
+          ) === indice,
+      ),
+      horarios: existente.horarios.length ? existente.horarios : lead.horarios,
+      maps_url: existente.maps_url ?? lead.maps_url,
+      imagem_url: existente.imagem_url ?? lead.imagem_url,
       avaliacao: existente.avaliacao ?? lead.avaliacao,
       total_avaliacoes: existente.total_avaliacoes ?? lead.total_avaliacoes,
       descricao: existente.descricao ?? lead.descricao,
       fontes: [...new Set([...existente.fontes, ...lead.fontes])],
       dados: { ...lead.dados, ...existente.dados },
-    });
+    } satisfies LeadProspeccaoEntrada;
+    porChave.set(lead.chave_externa, { ...combinado, qualificacao: qualificar(combinado) });
   }
   return [...porChave.values()];
 }
@@ -303,14 +223,10 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
   const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
   const encontradosApify = apify.status === 'fulfilled' ? apify.value : [];
   let combinados = combinar(encontradosSerp, encontradosApify);
-
   const descobertaConcluida =
     (serpConfigurada && serp.status === 'fulfilled') ||
     (apifyConfigurado && apify.status === 'fulfilled');
-  if (!descobertaConcluida) {
-    throw new Error('provedores_descoberta_indisponiveis');
-  }
-
+  if (!descobertaConcluida) throw new Error('provedores_descoberta_indisponiveis');
   combinados = combinados.slice(0, busca.quantidade);
 
   const comSite = combinados.filter((lead) => lead.site_url);
@@ -319,10 +235,20 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
     ? await mapearComLimite(comSite, 5, (lead) => lerSite(lead, firecrawl))
     : [];
   const porChave = new Map(lidos.map((lead) => [lead.chave_externa, lead]));
-  const leads = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
-  const sitesConfirmados = leads.filter((lead) =>
+  const comContexto = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
+  const sitesConfirmados = comContexto.filter((lead) =>
     lead.fontes.some((fonte) => fonte.startsWith('Site oficial')),
   ).length;
+
+  const fullEnrich = configuracao.fullEnrich;
+  const resultadosDecisores = fullEnrich
+    ? await mapearComLimite(comContexto, 3, (lead) => buscarDecisores(lead, fullEnrich))
+    : [];
+  const leads = fullEnrich
+    ? resultadosDecisores.map((resultado) => resultado.lead)
+    : comContexto.map((lead) => ({ ...lead, qualificacao: qualificar(lead) }));
+  const consultas = resultadosDecisores.filter((resultado) => resultado.consultado);
+  const concluidas = consultas.filter((resultado) => resultado.sucesso).length;
 
   return {
     leads,
@@ -346,6 +272,13 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
             : sitesConfirmados > 0
               ? 'parcial'
               : 'falhou',
+      fullenrich: !fullEnrich
+        ? 'nao_configurado'
+        : consultas.length === 0 || concluidas === consultas.length
+          ? 'concluido'
+          : concluidas > 0
+            ? 'parcial'
+            : 'falhou',
     },
   };
 }

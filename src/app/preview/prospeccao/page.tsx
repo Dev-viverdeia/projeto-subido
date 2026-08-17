@@ -10,8 +10,22 @@ import styles from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Prospecção' };
 
+const DOSSIE_VAZIO = {
+  dominio: null,
+  telefones: [],
+  emails: [],
+  redes_sociais: [],
+  decisores: [],
+  horarios: [],
+  maps_url: null,
+  imagem_url: null,
+  qualificacao: {},
+  dados: {},
+};
+
 const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
   {
+    ...DOSSIE_VAZIO,
     id: '11111111-1111-4111-8111-111111111111',
     nome: 'Clínica Aurora',
     categoria: 'Clínica odontológica',
@@ -19,16 +33,54 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     cidade: 'Belo Horizonte',
     estado: 'MG',
     site_url: 'https://example.com',
+    dominio: 'example.com',
     telefone: '+55 31 3333-4444',
+    telefones: ['+55 31 3333-4444', '+55 31 98888-1010'],
+    emails: ['contato@clinicaaurora.com.br'],
+    redes_sociais: [
+      { rede: 'instagram', url: 'https://instagram.com/clinicaaurora' },
+      { rede: 'facebook', url: 'https://facebook.com/clinicaaurora' },
+    ],
+    decisores: [
+      {
+        nome: 'Ana Aurora',
+        cargo: 'Fundadora e diretora clínica',
+        senioridade: 'Founder',
+        linkedin_url: 'https://linkedin.com/in/ana-aurora',
+        localizacao: 'Belo Horizonte, MG',
+        email: null,
+        telefone: null,
+        fonte: 'FullEnrich · perfil profissional público',
+      },
+    ],
+    horarios: [
+      { dia: 'Segunda', horarios: '08:00–18:00' },
+      { dia: 'Terça', horarios: '08:00–18:00' },
+      { dia: 'Quarta', horarios: '08:00–18:00' },
+      { dia: 'Quinta', horarios: '08:00–18:00' },
+      { dia: 'Sexta', horarios: '08:00–17:00' },
+    ],
+    maps_url: 'https://maps.google.com/?q=clinica+aurora',
     avaliacao: 4.8,
     total_avaliacoes: 127,
     descricao:
       'Clínica com atendimento multicanal, agendamento online e presença ativa no WhatsApp.',
-    fontes: ['Google Maps · dados públicos'],
+    fontes: ['Google Maps · dados públicos', 'FullEnrich · dados profissionais públicos'],
+    qualificacao: {
+      completude: 100,
+      itens: { telefone: true, email: true, site: true, redes_sociais: true, decisores: true },
+      sinais: [
+        'Telefone e e-mail disponíveis para abordagem',
+        'Site e presença social encontrados',
+        'Possível decisor profissional mapeado',
+        'Boa reputação pública e volume relevante de avaliações',
+      ],
+    },
     crm_oportunidade_id: null,
     enviado_crm_em: null,
   },
   {
+    ...DOSSIE_VAZIO,
     id: '22222222-2222-4222-8222-222222222222',
     nome: 'Odonto Savassi',
     categoria: 'Dentista',
@@ -37,6 +89,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     estado: 'MG',
     site_url: 'https://example.org',
     telefone: '+55 31 3222-7788',
+    telefones: ['+55 31 3222-7788'],
     avaliacao: 4.6,
     total_avaliacoes: 89,
     descricao: 'Atendimento odontológico com agendamento por telefone e formulário no site.',
@@ -45,6 +98,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     enviado_crm_em: new Date().toISOString(),
   },
   {
+    ...DOSSIE_VAZIO,
     id: '44444444-4444-4444-8444-444444444444',
     nome: 'Centro Oral Minas',
     categoria: 'Clínica odontológica',
@@ -53,6 +107,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     estado: 'MG',
     site_url: null,
     telefone: '+55 31 3000-1010',
+    telefones: ['+55 31 3000-1010'],
     avaliacao: 4.4,
     total_avaliacoes: 52,
     descricao: null,
@@ -97,8 +152,8 @@ export default function PreviewProspeccaoPage() {
               <p className={pagina.sobretitulo}>Prospecção</p>
               <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
               <p>
-                Busque por tipo e região, confira os dados e envie apenas os melhores leads para o
-                CRM.
+                Crie listas qualificadas com contatos, presença digital e possíveis decisores antes
+                de enviar os melhores leads para o CRM.
               </p>
             </div>
             <div className={pagina.saldo}>

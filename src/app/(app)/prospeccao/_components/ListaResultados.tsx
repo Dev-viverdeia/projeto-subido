@@ -1,85 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useCallback, useState } from 'react';
 import {
   ArrowRight,
+  AtSign,
   Building2,
   Check,
-  ExternalLink,
   Globe2,
   MapPin,
   Phone,
-  Star,
-  X,
+  Share2,
+  UserRoundSearch,
 } from 'lucide-react';
-import { Button } from '@/design-system/via';
-import { enviarLeadAoCrm } from '@/lib/prospeccao/actions';
-import type { Tables } from '@/lib/supabase/types.generated';
+import { qualificacaoDo, type Lead } from './dossie';
+import { ModalDossie } from './ModalDossie';
 import styles from '../pagina.module.css';
-
-type Lead = Pick<
-  Tables<'prospeccao_leads'>,
-  | 'id'
-  | 'nome'
-  | 'categoria'
-  | 'endereco'
-  | 'cidade'
-  | 'estado'
-  | 'site_url'
-  | 'telefone'
-  | 'avaliacao'
-  | 'total_avaliacoes'
-  | 'descricao'
-  | 'fontes'
-  | 'crm_oportunidade_id'
-  | 'enviado_crm_em'
->;
-
-function fontesDo(lead: Lead): string[] {
-  return Array.isArray(lead.fontes)
-    ? lead.fontes.filter((fonte): fonte is string => typeof fonte === 'string')
-    : [];
-}
 
 export function ListaResultados({ leads }: { leads: Lead[] }) {
   const [selecionado, setSelecionado] = useState<Lead | null>(null);
-  const fecharRef = useRef<HTMLButtonElement>(null);
-  const dialogoRef = useRef<HTMLElement>(null);
-  const gatilhoRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!selecionado) return;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    fecharRef.current?.focus();
-    const fechar = (evento: KeyboardEvent) => {
-      if (evento.key === 'Escape') setSelecionado(null);
-    };
-    window.addEventListener('keydown', fechar);
-    return () => {
-      document.body.style.overflow = overflow;
-      window.removeEventListener('keydown', fechar);
-      gatilhoRef.current?.focus();
-    };
-  }, [selecionado]);
-
-  function manterFoco(evento: React.KeyboardEvent<HTMLElement>) {
-    if (evento.key !== 'Tab' || !dialogoRef.current) return;
-    const focaveis = dialogoRef.current.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    const primeiro = focaveis.item(0);
-    const ultimo = focaveis.item(focaveis.length - 1);
-    if (!primeiro || !ultimo) return;
-    if (evento.shiftKey && document.activeElement === primeiro) {
-      evento.preventDefault();
-      ultimo.focus();
-    } else if (!evento.shiftKey && document.activeElement === ultimo) {
-      evento.preventDefault();
-      primeiro.focus();
-    }
-  }
+  const [retornarFoco, setRetornarFoco] = useState<HTMLButtonElement | null>(null);
+  const fecharModal = useCallback(() => setSelecionado(null), []);
 
   if (!leads.length) {
     return (
@@ -93,156 +33,84 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
 
   return (
     <>
-      <div className={styles.listaResultados} role="list">
-        {leads.map((lead, indice) => (
-          <div role="listitem" key={lead.id}>
-            <button
-              type="button"
-              className={styles.linhaLead}
-              onClick={(evento) => {
-                gatilhoRef.current = evento.currentTarget;
-                setSelecionado(lead);
-              }}
-            >
-              <span className={styles.indiceLead}>{String(indice + 1).padStart(2, '0')}</span>
-              <span className={styles.identidadeLead}>
-                <strong>{lead.nome}</strong>
-                <small>{lead.categoria ?? lead.endereco ?? 'Empresa local'}</small>
-              </span>
-              <span className={styles.localLead}>
-                <MapPin size={14} aria-hidden="true" />
-                {[lead.cidade, lead.estado].filter(Boolean).join(', ') ||
-                  lead.endereco ||
-                  'Local a confirmar'}
-              </span>
-              <span className={styles.sinaisLead}>
-                {lead.avaliacao !== null && (
-                  <span>
-                    <Star size={13} fill="currentColor" aria-hidden="true" /> {lead.avaliacao}
-                  </span>
-                )}
-                {lead.site_url && <span>Site</span>}
-                {lead.telefone && <span>Telefone</span>}
-              </span>
-              <span className={styles.estadoLead} data-enviado={Boolean(lead.crm_oportunidade_id)}>
-                {lead.crm_oportunidade_id ? (
-                  <>
-                    <Check size={14} aria-hidden="true" /> No CRM
-                  </>
-                ) : (
-                  <>
-                    Abrir <ArrowRight size={14} aria-hidden="true" />
-                  </>
-                )}
-              </span>
-            </button>
-          </div>
-        ))}
+      <div className={styles.legendaLista} aria-hidden="true">
+        <span>Empresa</span>
+        <span>Contatos encontrados</span>
+        <span>Região</span>
+        <span>Completude</span>
       </div>
-
-      {selecionado && (
-        <div
-          className={styles.fundoDetalhe}
-          onMouseDown={(evento) => {
-            if (evento.target === evento.currentTarget) setSelecionado(null);
-          }}
-        >
-          <aside
-            ref={dialogoRef}
-            className={styles.detalheLead}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="lead-detalhe-titulo"
-            onKeyDown={manterFoco}
-          >
-            <header className={styles.detalheTopo}>
-              <div>
-                <p>Empresa encontrada</p>
-                <h2 id="lead-detalhe-titulo">{selecionado.nome}</h2>
-                <span>{selecionado.categoria ?? 'Categoria a confirmar'}</span>
-              </div>
+      <div className={styles.listaResultados} role="list">
+        {leads.map((lead, indice) => {
+          const qualificacao = qualificacaoDo(lead);
+          const totalItens = Object.values(qualificacao.itens).filter(Boolean).length;
+          return (
+            <div role="listitem" key={lead.id}>
               <button
-                ref={fecharRef}
                 type="button"
-                onClick={() => setSelecionado(null)}
-                aria-label="Fechar detalhes"
+                className={styles.linhaLead}
+                onClick={(evento) => {
+                  setRetornarFoco(evento.currentTarget);
+                  setSelecionado(lead);
+                }}
               >
-                <X size={19} aria-hidden="true" />
-              </button>
-            </header>
-
-            <div className={styles.detalheConteudo}>
-              <dl className={styles.fatosLead}>
-                <div>
-                  <dt>Localização</dt>
-                  <dd>{selecionado.endereco ?? 'Ainda não confirmada'}</dd>
-                </div>
-                <div>
-                  <dt>Telefone</dt>
-                  <dd>{selecionado.telefone ?? 'Não encontrado'}</dd>
-                </div>
-                <div>
-                  <dt>Avaliação pública</dt>
-                  <dd>
-                    {selecionado.avaliacao !== null
-                      ? `${selecionado.avaliacao} · ${selecionado.total_avaliacoes ?? 0} avaliações`
-                      : 'Sem avaliação disponível'}
-                  </dd>
-                </div>
-              </dl>
-
-              {selecionado.descricao && (
-                <section className={styles.contextoLead}>
-                  <p>Contexto público</p>
-                  <span>{selecionado.descricao}</span>
-                </section>
-              )}
-
-              <section className={styles.fontesLead}>
-                <p>Fontes consultadas</p>
-                <div>
-                  {fontesDo(selecionado).map((fonte) => (
-                    <span key={fonte}>{fonte}</span>
-                  ))}
-                </div>
-              </section>
-
-              <div className={styles.linksLead}>
-                {selecionado.site_url && (
-                  <a href={selecionado.site_url} target="_blank" rel="noreferrer">
-                    <Globe2 size={16} aria-hidden="true" /> Abrir site{' '}
-                    <ExternalLink size={13} aria-hidden="true" />
-                  </a>
-                )}
-                {selecionado.telefone && (
-                  <a href={`tel:${selecionado.telefone}`}>
-                    <Phone size={16} aria-hidden="true" /> Ligar
-                  </a>
-                )}
-              </div>
-            </div>
-
-            <footer className={styles.detalheRodape}>
-              {selecionado.crm_oportunidade_id ? (
-                <Link
-                  href={`/crm/${selecionado.crm_oportunidade_id}`}
-                  className="via-btn via-btn--primary via-btn--md"
+                <span className={styles.indiceLead}>{String(indice + 1).padStart(2, '0')}</span>
+                <span className={styles.identidadeLead}>
+                  <strong>{lead.nome}</strong>
+                  <small>{lead.categoria ?? lead.endereco ?? 'Empresa local'}</small>
+                </span>
+                <span
+                  className={styles.coberturaLead}
+                  aria-label={`${totalItens} de 5 dados essenciais encontrados`}
                 >
-                  <span className="via-btn__label">Abrir no CRM</span>
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-              ) : (
-                <form action={enviarLeadAoCrm}>
-                  <input type="hidden" name="lead" value={selecionado.id} />
-                  <Button type="submit" variant="primary" iconRight={<ArrowRight size={16} />}>
-                    Enviar para o CRM
-                  </Button>
-                </form>
-              )}
-              <p>No CRM, você completa o contato e enriquece o lead com IA.</p>
-            </footer>
-          </aside>
-        </div>
+                  <span data-encontrado={qualificacao.itens.telefone} title="Telefone">
+                    <Phone size={14} />
+                  </span>
+                  <span data-encontrado={qualificacao.itens.email} title="E-mail">
+                    <AtSign size={14} />
+                  </span>
+                  <span data-encontrado={qualificacao.itens.site} title="Site">
+                    <Globe2 size={14} />
+                  </span>
+                  <span data-encontrado={qualificacao.itens.redes_sociais} title="Redes sociais">
+                    <Share2 size={14} />
+                  </span>
+                  <span data-encontrado={qualificacao.itens.decisores} title="Possível decisor">
+                    <UserRoundSearch size={14} />
+                  </span>
+                </span>
+                <span className={styles.localLead}>
+                  <MapPin size={14} aria-hidden="true" />
+                  {[lead.cidade, lead.estado].filter(Boolean).join(', ') ||
+                    lead.endereco ||
+                    'A confirmar'}
+                </span>
+                <span className={styles.completudeLead}>
+                  <span>
+                    <i style={{ width: `${qualificacao.completude}%` }} />
+                  </span>
+                  <strong>{qualificacao.completude}%</strong>
+                </span>
+                <span
+                  className={styles.estadoLead}
+                  data-enviado={Boolean(lead.crm_oportunidade_id)}
+                >
+                  {lead.crm_oportunidade_id ? (
+                    <>
+                      <Check size={14} /> No CRM
+                    </>
+                  ) : (
+                    <>
+                      Ver dossiê <ArrowRight size={14} />
+                    </>
+                  )}
+                </span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      {selecionado && (
+        <ModalDossie lead={selecionado} onClose={fecharModal} retornarFoco={retornarFoco} />
       )}
     </>
   );

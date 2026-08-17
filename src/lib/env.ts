@@ -139,12 +139,14 @@ export function prospeccaoEnv() {
     APIFY_PROSPECCAO_ACTOR_ID:
       process.env.APIFY_PROSPECCAO_ACTOR_ID || 'compass/crawler-google-places',
     SERPAPI_API_KEY: process.env.SERPAPI_API_KEY,
+    FULLENRICH_API_KEY: process.env.FULLENRICH_API_KEY,
   };
 
   const firecrawl = z.string().min(10).safeParse(dados.FIRECRAWL_API_KEY);
   const apifyToken = z.string().min(10).safeParse(dados.APIFY_TOKEN);
   const apifyActor = z.string().min(3).safeParse(dados.APIFY_PROSPECCAO_ACTOR_ID);
   const serpApi = z.string().min(10).safeParse(dados.SERPAPI_API_KEY);
+  const fullEnrich = z.string().min(10).safeParse(dados.FULLENRICH_API_KEY);
 
   return {
     pronto: (apifyToken.success && apifyActor.success) || serpApi.success,
@@ -152,6 +154,7 @@ export function prospeccaoEnv() {
     apifyToken: apifyToken.success ? apifyToken.data : null,
     apifyActor: apifyActor.success ? apifyActor.data : null,
     serpApi: serpApi.success ? serpApi.data : null,
+    fullEnrich: fullEnrich.success ? fullEnrich.data : null,
   };
 }
 

@@ -8,7 +8,7 @@ import { ListaResultados } from './_components/ListaResultados';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Prospecção' };
-export const maxDuration = 60;
+export const maxDuration = 180;
 
 const ROTULO_STATUS = {
   processando: 'Buscando',
@@ -37,7 +37,8 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
           <p className={styles.sobretitulo}>Prospecção</p>
           <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
           <p>
-            Busque por tipo e região, confira os dados e envie apenas os melhores leads para o CRM.
+            Crie listas qualificadas com contatos, presença digital e possíveis decisores antes de
+            enviar os melhores leads para o CRM.
           </p>
         </div>
         <div className={styles.saldo}>
@@ -53,7 +54,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       {parametros.busca === 'concluida' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={17} aria-hidden="true" />
-          Lista pronta. Revise as empresas e envie para o CRM o que fizer sentido.
+          Lista qualificada. Abra os dossiês e envie para o CRM o que fizer sentido.
         </div>
       )}
       {parametros.busca === 'falhou' && (

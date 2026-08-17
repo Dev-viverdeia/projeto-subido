@@ -21,6 +21,39 @@ export const BuscaProspeccaoSchema = z.object({
 
 export type BuscaProspeccao = z.infer<typeof BuscaProspeccaoSchema>;
 
+export const RedeSocialProspeccaoSchema = z.object({
+  rede: z.enum(['instagram', 'facebook', 'linkedin', 'x', 'tiktok', 'youtube', 'pinterest']),
+  url: z.url().max(2048),
+});
+
+export const DecisorProspeccaoSchema = z.object({
+  nome: z.string().trim().min(1).max(160),
+  cargo: z.string().trim().max(180).nullable(),
+  senioridade: z.string().trim().max(80).nullable(),
+  linkedin_url: z.url().max(2048).nullable(),
+  localizacao: z.string().trim().max(180).nullable(),
+  email: z.email().max(320).nullable(),
+  telefone: z.string().trim().max(80).nullable(),
+  fonte: z.string().trim().min(1).max(80),
+});
+
+export const HorarioProspeccaoSchema = z.object({
+  dia: z.string().trim().min(1).max(40),
+  horarios: z.string().trim().min(1).max(160),
+});
+
+export const QualificacaoProspeccaoSchema = z.object({
+  completude: z.number().int().min(0).max(100),
+  itens: z.object({
+    telefone: z.boolean(),
+    email: z.boolean(),
+    site: z.boolean(),
+    redes_sociais: z.boolean(),
+    decisores: z.boolean(),
+  }),
+  sinais: z.array(z.string().trim().min(1).max(180)).max(8),
+});
+
 export const LeadProspeccaoSchema = z.object({
   chave_externa: z.string().trim().min(1).max(500),
   nome: z.string().trim().min(1).max(160),
@@ -31,10 +64,18 @@ export const LeadProspeccaoSchema = z.object({
   site_url: z.url().max(2048).nullable(),
   dominio: z.string().trim().max(253).nullable(),
   telefone: z.string().trim().max(80).nullable(),
+  telefones: z.array(z.string().trim().min(1).max(80)).max(12),
+  emails: z.array(z.email().max(320)).max(12),
+  redes_sociais: z.array(RedeSocialProspeccaoSchema).max(16),
+  decisores: z.array(DecisorProspeccaoSchema).max(5),
+  horarios: z.array(HorarioProspeccaoSchema).max(14),
+  maps_url: z.url().max(2048).nullable(),
+  imagem_url: z.url().max(2048).nullable(),
   avaliacao: z.number().min(0).max(5).nullable(),
   total_avaliacoes: z.number().int().min(0).nullable(),
   descricao: z.string().trim().max(3000).nullable(),
   fontes: z.array(z.string().trim().min(1).max(80)).max(5),
+  qualificacao: QualificacaoProspeccaoSchema,
   dados: z.record(z.string(), z.unknown()),
 });
 

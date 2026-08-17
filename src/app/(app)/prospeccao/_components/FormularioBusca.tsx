@@ -22,7 +22,7 @@ export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: bool
         <div>
           <p className={styles.sobretituloClaro}>Nova lista</p>
           <h2>O que você quer encontrar?</h2>
-          <p>Faça uma busca simples. Você escolhe depois quais empresas entram no CRM.</p>
+          <p>A busca monta o dossiê de cada empresa antes de você decidir o que entra no CRM.</p>
         </div>
         <span className={styles.custoBusca}>
           <Coins size={15} aria-hidden="true" /> 1 empresa encontrada = 1 crédito
@@ -127,14 +127,15 @@ export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: bool
             iconLeft={<Search size={17} aria-hidden="true" />}
             iconRight={!buscando ? <ArrowRight size={17} aria-hidden="true" /> : undefined}
           >
-            {buscando ? 'Buscando empresas…' : 'Buscar empresas'}
+            {buscando ? 'Qualificando empresas…' : 'Criar lista qualificada'}
           </Button>
         </div>
       </div>
 
       {buscando && (
         <p className={styles.andamentoBusca} role="status" aria-live="polite">
-          Consultando empresas públicas e organizando a lista. Isso pode levar até um minuto.
+          Buscando contatos, presença digital e possíveis decisores. Isso pode levar até dois
+          minutos.
         </p>
       )}
     </form>
