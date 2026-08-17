@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Spinner } from '@/design-system/via';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
 
@@ -47,6 +48,9 @@ export function NavLateral({
   const contaAtiva = Boolean(itemConta && estaAtivo(itemConta));
   const maisAtivo =
     contaAtiva || itens.some((item) => !hrefsPrioritarios.has(item.href) && estaAtivo(item));
+  const itemDestino = destinoPendente
+    ? [...itens, ...(itemConta ? [itemConta] : [])].find((item) => item.href === destinoPendente)
+    : undefined;
 
   useEffect(() => {
     if (!menuAberto) return;
@@ -149,6 +153,26 @@ export function NavLateral({
     );
   }
 
+  const feedbackNavegacao = itemDestino && !estaAtivo(itemDestino) && (
+    <div
+      className={styles.feedbackNavegacao}
+      role="status"
+      aria-live="polite"
+      aria-label={`Abrindo ${itemDestino.rotulo}`}
+    >
+      <span className={styles.feedbackIcone} aria-hidden="true">
+        <Spinner size="sm" tone="navy" />
+      </span>
+      <span>
+        <small>Carregando área</small>
+        <strong>Abrindo {itemDestino.rotulo}</strong>
+      </span>
+      <span className={styles.feedbackTrilho} aria-hidden="true">
+        <span />
+      </span>
+    </div>
+  );
+
   if (variante === 'dock') {
     const contaCarregando = Boolean(
       itemConta && destinoPendente === itemConta.href && !estaAtivo(itemConta),
@@ -156,6 +180,7 @@ export function NavLateral({
 
     return (
       <nav className={styles.dock} aria-label="Navegação principal">
+        {feedbackNavegacao}
         {menuAberto && (
           <>
             <button
@@ -315,6 +340,7 @@ export function NavLateral({
 
   return (
     <nav className={styles.lateral} aria-label={rotuloGrupo ?? 'Seções da plataforma'}>
+      {feedbackNavegacao}
       <div className={styles.grupos}>
         {ORDEM_GRUPOS.map((idGrupo) => {
           const itensDoGrupo = itens.filter((item) => item.grupo === idGrupo);

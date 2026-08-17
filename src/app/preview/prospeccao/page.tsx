@@ -1,8 +1,9 @@
 import type { ComponentProps } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { BriefcaseBusiness, Coins, ContactRound, GraduationCap, House, Search } from 'lucide-react';
+import { BriefcaseBusiness, ContactRound, GraduationCap, House, Search } from 'lucide-react';
 import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBusca';
+import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
 import { ListaResultados } from '@/app/(app)/prospeccao/_components/ListaResultados';
 import pagina from '@/app/(app)/prospeccao/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
@@ -147,24 +148,7 @@ export default function PreviewProspeccaoPage() {
 
       <main id="conteudo" className={styles.conteudo}>
         <div className={pagina.pagina}>
-          <header className={pagina.cabecalho}>
-            <div>
-              <p className={pagina.sobretitulo}>Prospecção</p>
-              <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
-              <p>
-                Crie listas qualificadas com contatos, presença digital e possíveis decisores antes
-                de enviar os melhores leads para o CRM.
-              </p>
-            </div>
-            <div className={pagina.saldo}>
-              <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>
-                Saldo disponível
-                <strong>42</strong>
-              </span>
-              <small>1 empresa encontrada = 1 crédito</small>
-            </div>
-          </header>
+          <HeroProspeccao saldo={42} />
 
           <FormularioBusca saldo={42} pronto />
 

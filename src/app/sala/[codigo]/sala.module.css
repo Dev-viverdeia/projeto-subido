@@ -310,6 +310,85 @@
   transform: translateY(-1px);
 }
 
+.conectando {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-4);
+  padding: var(--via-space-4);
+  overflow: hidden;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+}
+
+.conectandoIcone {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
+  color: var(--via-navy);
+}
+
+.conectandoIcone svg,
+.girando {
+  animation: girar-conexao 850ms linear infinite;
+}
+
+.conectando strong,
+.conectando small {
+  display: block;
+}
+
+.conectando strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.conectando small {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.conectando > i {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--app-radius-track);
+  overflow: hidden;
+  background: var(--via-navy-06);
+}
+
+.conectando > i span {
+  display: block;
+  width: 36%;
+  height: 100%;
+  background: var(--subido-blue);
+  animation: percorrer-conexao 1.25s var(--via-ease) infinite;
+}
+
+@keyframes girar-conexao {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes percorrer-conexao {
+  from {
+    transform: translateX(-105%);
+  }
+
+  to {
+    transform: translateX(395%);
+  }
+}
+
 .aviso,
 .erro {
   margin-top: var(--via-space-4);
@@ -379,7 +458,7 @@
   height: 100%;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .experienciaAnfitriao {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1fr) auto;
@@ -450,7 +529,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .entrada > button {
+  .entrada > button,
+  .conectandoIcone svg,
+  .girando,
+  .conectando > i span {
     transition: none;
+    animation: none;
+  }
+
+  .conectando > i span {
+    width: 100%;
+    opacity: 0.42;
   }
 }

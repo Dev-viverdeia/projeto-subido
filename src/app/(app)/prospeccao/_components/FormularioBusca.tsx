@@ -5,6 +5,7 @@ import { ArrowRight, Building2, Coins, MapPin, Search } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { criarListaProspeccao, type EstadoBuscaProspeccao } from '@/lib/prospeccao/actions';
 import { QUANTIDADES_PROSPECCAO } from '@/lib/prospeccao/schema';
+import { ProgressoBusca } from './ProgressoBusca';
 import styles from '../pagina.module.css';
 
 const INICIAL: EstadoBuscaProspeccao = {};
@@ -44,99 +45,95 @@ export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: bool
         </div>
       )}
 
-      <div className={styles.buscaDireta}>
-        <div className={styles.campoBusca}>
-          <span className={styles.iconeCampo} aria-hidden="true">
-            <Building2 size={18} strokeWidth={1.7} />
-          </span>
-          <Input
-            id="prospeccao-segmento"
-            name="segmento"
-            label="Tipo de empresa"
-            placeholder="Ex.: clínicas odontológicas"
-            defaultValue={estado.campos?.segmento ?? ''}
-            error={estado.porCampo?.segmento}
-            autoComplete="off"
-            disabled={buscando}
-            required
-          />
-        </div>
+      {buscando ? (
+        <ProgressoBusca quantidade={quantidade} />
+      ) : (
+        <>
+          <div className={styles.buscaDireta}>
+            <div className={styles.campoBusca}>
+              <span className={styles.iconeCampo} aria-hidden="true">
+                <Building2 size={18} strokeWidth={1.7} />
+              </span>
+              <Input
+                id="prospeccao-segmento"
+                name="segmento"
+                label="Tipo de empresa"
+                placeholder="Ex.: clínicas odontológicas"
+                defaultValue={estado.campos?.segmento ?? ''}
+                error={estado.porCampo?.segmento}
+                autoComplete="off"
+                required
+              />
+            </div>
 
-        <span className={styles.conectorBusca} aria-hidden="true">
-          em
-        </span>
+            <span className={styles.conectorBusca} aria-hidden="true">
+              em
+            </span>
 
-        <div className={styles.campoBusca}>
-          <span className={styles.iconeCampo} aria-hidden="true">
-            <MapPin size={18} strokeWidth={1.7} />
-          </span>
-          <Input
-            id="prospeccao-localizacao"
-            name="localizacao"
-            label="Cidade ou região"
-            placeholder="Ex.: Belo Horizonte, MG"
-            defaultValue={estado.campos?.localizacao ?? ''}
-            error={estado.porCampo?.localizacao}
-            autoComplete="address-level2"
-            disabled={buscando}
-            required
-          />
-        </div>
-      </div>
-
-      <div className={styles.rodapeBusca}>
-        <fieldset className={styles.quantidade} disabled={buscando}>
-          <legend>Quantidade de empresas</legend>
-          <input type="hidden" name="quantidade" value={quantidade} />
-          <div>
-            {QUANTIDADES_PROSPECCAO.map((opcao) => (
-              <button
-                type="button"
-                key={opcao}
-                data-ativo={quantidade === opcao || undefined}
-                aria-pressed={quantidade === opcao}
-                disabled={saldo < opcao}
-                onClick={() => setQuantidade(opcao)}
-              >
-                {opcao}
-              </button>
-            ))}
+            <div className={styles.campoBusca}>
+              <span className={styles.iconeCampo} aria-hidden="true">
+                <MapPin size={18} strokeWidth={1.7} />
+              </span>
+              <Input
+                id="prospeccao-localizacao"
+                name="localizacao"
+                label="Cidade ou região"
+                placeholder="Ex.: Belo Horizonte, MG"
+                defaultValue={estado.campos?.localizacao ?? ''}
+                error={estado.porCampo?.localizacao}
+                autoComplete="address-level2"
+                required
+              />
+            </div>
           </div>
-          {estado.porCampo?.quantidade && <small>{estado.porCampo.quantidade}</small>}
-        </fieldset>
 
-        <div className={styles.reservaBusca}>
-          <span>
-            <strong>{quantidade}</strong> créditos reservados
-          </span>
-          <small>
-            Você paga apenas pelas empresas encontradas. O restante volta para seu saldo.
-          </small>
-        </div>
+          <div className={styles.rodapeBusca}>
+            <fieldset className={styles.quantidade}>
+              <legend>Quantidade de empresas</legend>
+              <input type="hidden" name="quantidade" value={quantidade} />
+              <div>
+                {QUANTIDADES_PROSPECCAO.map((opcao) => (
+                  <button
+                    type="button"
+                    key={opcao}
+                    data-ativo={quantidade === opcao || undefined}
+                    aria-pressed={quantidade === opcao}
+                    disabled={saldo < opcao}
+                    onClick={() => setQuantidade(opcao)}
+                  >
+                    {opcao}
+                  </button>
+                ))}
+              </div>
+              {estado.porCampo?.quantidade && <small>{estado.porCampo.quantidade}</small>}
+            </fieldset>
 
-        <div className={styles.acaoBusca}>
-          <span>
-            Saldo atual <strong>{saldo}</strong>
-          </span>
-          <Button
-            type="submit"
-            variant="accent"
-            size="lg"
-            loading={buscando}
-            disabled={!pronto || semSaldo}
-            iconLeft={<Search size={17} aria-hidden="true" />}
-            iconRight={!buscando ? <ArrowRight size={17} aria-hidden="true" /> : undefined}
-          >
-            {buscando ? 'Qualificando empresas…' : 'Criar lista qualificada'}
-          </Button>
-        </div>
-      </div>
+            <div className={styles.reservaBusca}>
+              <span>
+                <strong>{quantidade}</strong> créditos reservados
+              </span>
+              <small>
+                Você paga apenas pelas empresas encontradas. O restante volta para seu saldo.
+              </small>
+            </div>
 
-      {buscando && (
-        <p className={styles.andamentoBusca} role="status" aria-live="polite">
-          Buscando contatos, presença digital e possíveis decisores. Isso pode levar até dois
-          minutos.
-        </p>
+            <div className={styles.acaoBusca}>
+              <span>
+                Saldo atual <strong>{saldo}</strong>
+              </span>
+              <Button
+                type="submit"
+                variant="accent"
+                size="lg"
+                disabled={!pronto || semSaldo}
+                iconLeft={<Search size={17} aria-hidden="true" />}
+                iconRight={<ArrowRight size={17} aria-hidden="true" />}
+              >
+                Criar lista qualificada
+              </Button>
+            </div>
+          </div>
+        </>
       )}
     </form>
   );

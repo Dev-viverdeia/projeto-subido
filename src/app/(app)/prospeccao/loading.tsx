@@ -1,11 +1,5 @@
-import styles from './pagina.module.css';
+import { CarregandoModulo } from '../_components/CarregandoModulo';
 
 export default function LoadingProspeccao() {
-  return (
-    <div className={styles.pagina} aria-busy="true" aria-label="Carregando Prospecção">
-      <div className={styles.esqueletoCabecalho} />
-      <div className={styles.esqueletoFormulario} />
-      <div className={styles.esqueletoResultados} />
-    </div>
-  );
+  return <CarregandoModulo anatomia="prospeccao" />;
 }

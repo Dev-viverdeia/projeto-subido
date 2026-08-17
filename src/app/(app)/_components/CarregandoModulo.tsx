@@ -1,19 +1,78 @@
 import { Skeleton } from '@/design-system/via';
 import { CabecalhoPagina } from './CabecalhoPagina';
+import { EstadoCarregamento } from './EstadoCarregamento';
 import styles from './CarregandoModulo.module.css';
 
-type Anatomia = 'pipeline' | 'calls' | 'documentos' | 'mentorias' | 'certificados' | 'consultor';
+type Anatomia =
+  'pipeline' | 'calls' | 'documentos' | 'mentorias' | 'certificados' | 'consultor' | 'prospeccao';
 
 const CONFIGURACAO: Record<
   Anatomia,
-  { titulo: string; metricas: number; colunas: number; momentoEscuro: boolean }
+  {
+    modulo: string;
+    titulo: string;
+    descricao: string;
+    metricas: number;
+    colunas: number;
+    momentoEscuro: boolean;
+  }
 > = {
-  pipeline: { titulo: 'CRM', metricas: 3, colunas: 5, momentoEscuro: false },
-  calls: { titulo: 'Calls', metricas: 0, colunas: 2, momentoEscuro: true },
-  documentos: { titulo: 'Propostas', metricas: 4, colunas: 3, momentoEscuro: true },
-  mentorias: { titulo: 'Mentorias', metricas: 0, colunas: 3, momentoEscuro: true },
-  certificados: { titulo: 'Certificados', metricas: 0, colunas: 2, momentoEscuro: true },
-  consultor: { titulo: 'Sobral AI', metricas: 0, colunas: 4, momentoEscuro: true },
+  pipeline: {
+    modulo: 'CRM',
+    titulo: 'Preparando o CRM',
+    descricao: 'Organizando oportunidades, etapas e próximos movimentos.',
+    metricas: 3,
+    colunas: 5,
+    momentoEscuro: false,
+  },
+  calls: {
+    modulo: 'Calls',
+    titulo: 'Preparando suas calls',
+    descricao: 'Carregando agenda, salas e memória das conversas.',
+    metricas: 0,
+    colunas: 2,
+    momentoEscuro: true,
+  },
+  documentos: {
+    modulo: 'Propostas',
+    titulo: 'Preparando propostas',
+    descricao: 'Organizando documentos, estados e retornos dos clientes.',
+    metricas: 4,
+    colunas: 3,
+    momentoEscuro: true,
+  },
+  mentorias: {
+    modulo: 'Mentorias',
+    titulo: 'Preparando mentorias',
+    descricao: 'Carregando agenda, sessões e suas inscrições.',
+    metricas: 0,
+    colunas: 3,
+    momentoEscuro: true,
+  },
+  certificados: {
+    modulo: 'Certificados',
+    titulo: 'Preparando certificados',
+    descricao: 'Conferindo formações concluídas e documentos disponíveis.',
+    metricas: 0,
+    colunas: 2,
+    momentoEscuro: true,
+  },
+  consultor: {
+    modulo: 'Sobral AI',
+    titulo: 'Preparando o Sobral AI',
+    descricao: 'Reunindo sua operação, conversas e próximos passos.',
+    metricas: 0,
+    colunas: 4,
+    momentoEscuro: true,
+  },
+  prospeccao: {
+    modulo: 'Prospecção',
+    titulo: 'Preparando a Prospecção',
+    descricao: 'Carregando saldo, listas e dossiês já encontrados.',
+    metricas: 0,
+    colunas: 3,
+    momentoEscuro: true,
+  },
 };
 
 /**
@@ -32,11 +91,13 @@ export function CarregandoModulo({ anatomia }: { anatomia: Anatomia }) {
       role="status"
       aria-live="polite"
       aria-busy="true"
-      aria-label={`Preparando ${configuracao.titulo}`}
+      aria-label={configuracao.titulo}
       data-anatomia={anatomia}
     >
-      <CabecalhoPagina titulo={configuracao.titulo} oculto />
+      <CabecalhoPagina titulo={configuracao.modulo} oculto />
       <span className="sr-only">Carregando os dados desta área.</span>
+
+      <EstadoCarregamento titulo={configuracao.titulo} descricao={configuracao.descricao} />
 
       <div aria-hidden="true" className={styles.conteudo}>
         <header className={styles.topo}>

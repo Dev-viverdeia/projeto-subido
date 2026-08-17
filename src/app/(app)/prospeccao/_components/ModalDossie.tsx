@@ -20,8 +20,8 @@ import {
   UserRoundSearch,
   X,
 } from 'lucide-react';
-import { Button } from '@/design-system/via';
 import { enviarLeadAoCrm } from '@/lib/prospeccao/actions';
+import { BotaoEnviarCrm } from './BotaoEnviarCrm';
 import {
   decisoresDo,
   emailsDo,
@@ -398,9 +398,7 @@ export function ModalDossie({
           ) : (
             <form action={enviarLeadAoCrm}>
               <input type="hidden" name="lead" value={selecionado.id} />
-              <Button type="submit" variant="primary" iconRight={<ArrowRight size={16} />}>
-                Enviar para o CRM
-              </Button>
+              <BotaoEnviarCrm />
             </form>
           )}
         </footer>

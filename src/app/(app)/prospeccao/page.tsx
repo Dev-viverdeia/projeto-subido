@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, Coins, DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
+import { CheckCircle2, DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
 import { FormularioBusca } from './_components/FormularioBusca';
+import { HeroProspeccao } from './_components/HeroProspeccao';
 import { ListaResultados } from './_components/ListaResultados';
 import styles from './pagina.module.css';
 
@@ -32,24 +33,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.cabecalho}>
-        <div>
-          <p className={styles.sobretitulo}>Prospecção</p>
-          <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
-          <p>
-            Crie listas qualificadas com contatos, presença digital e possíveis decisores antes de
-            enviar os melhores leads para o CRM.
-          </p>
-        </div>
-        <div className={styles.saldo}>
-          <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
-          <span>
-            Saldo disponível
-            <strong>{saldo}</strong>
-          </span>
-          <small>1 empresa encontrada = 1 crédito</small>
-        </div>
-      </header>
+      <HeroProspeccao saldo={saldo} />
 
       {parametros.busca === 'concluida' && (
         <div className={styles.confirmacao} role="status">

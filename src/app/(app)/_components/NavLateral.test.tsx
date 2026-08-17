@@ -86,4 +86,13 @@ describe('NavLateral no desktop', () => {
     await usuario.hover(crm);
     expect(crm).toHaveAttribute('data-prefetch', 'true');
   });
+
+  it('mostra um feedback destacado assim que uma nova área é solicitada', async () => {
+    const usuario = userEvent.setup();
+    render(<NavLateral itens={ITENS_NAV} variante="lateral" />);
+
+    await usuario.click(screen.getByRole('link', { name: 'CRM' }));
+
+    expect(screen.getByRole('status', { name: /Abrindo CRM/ })).toBeVisible();
+  });
 });

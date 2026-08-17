@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
-import { CalendarClock, CheckCircle2, FileText, LockKeyhole, Video } from 'lucide-react';
+import {
+  CalendarClock,
+  CheckCircle2,
+  FileText,
+  LoaderCircle,
+  LockKeyhole,
+  Video,
+} from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
@@ -201,8 +208,27 @@ export function SalaCall({
             </div>
           )}
 
+          {carregando && (
+            <div className={styles.conectando} role="status" aria-live="polite">
+              <span className={styles.conectandoIcone} aria-hidden="true">
+                <LoaderCircle size={18} />
+              </span>
+              <span>
+                <strong>Preparando sua entrada</strong>
+                <small>Conectando acesso protegido, áudio e vídeo.</small>
+              </span>
+              <i aria-hidden="true">
+                <span />
+              </i>
+            </div>
+          )}
+
           <button type="button" onClick={() => void entrar()} disabled={!podeEntrar || carregando}>
-            <Video size={17} strokeWidth={1.9} aria-hidden="true" />
+            {carregando ? (
+              <LoaderCircle className={styles.girando} size={17} aria-hidden="true" />
+            ) : (
+              <Video size={17} strokeWidth={1.9} aria-hidden="true" />
+            )}
             {carregando ? 'Abrindo sala…' : 'Entrar na call'}
           </button>
 

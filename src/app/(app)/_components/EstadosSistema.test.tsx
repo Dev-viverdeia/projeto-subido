@@ -9,10 +9,13 @@ describe('estados globais da plataforma', () => {
   it('comunica o destino enquanto o módulo ainda carrega', () => {
     render(<CarregandoModulo anatomia="pipeline" />);
 
-    expect(screen.getByRole('status', { name: 'Preparando CRM' })).toHaveAttribute(
+    expect(screen.getByRole('status', { name: 'Preparando o CRM' })).toHaveAttribute(
       'aria-busy',
       'true',
     );
+    expect(
+      screen.getByText('Organizando oportunidades, etapas e próximos movimentos.'),
+    ).toBeVisible();
     expect(screen.getByRole('heading', { name: 'CRM', level: 1 })).toHaveClass('sr-only');
   });
 

@@ -1,4 +1,5 @@
 import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { EstadoCarregamento } from '../_components/EstadoCarregamento';
 import { Compositor } from './_components/Compositor';
 import styles from './pagina.module.css';
 
@@ -13,6 +14,10 @@ export default function CarregandoBuilder() {
   return (
     <div className={styles.pagina}>
       <CabecalhoPagina titulo="Estúdio" oculto />
+      <EstadoCarregamento
+        titulo="Preparando o Estúdio"
+        descricao="Carregando projetos-base, clientes e trabalhos recentes."
+      />
       <Compositor />
     </div>
   );
