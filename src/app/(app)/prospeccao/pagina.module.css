@@ -162,67 +162,77 @@
   font-size: var(--via-fs-xs);
 }
 
-.formulario > [class*='via-alert'] {
+.alertaFormulario {
   margin-inline: clamp(26px, 4vw, 52px);
 }
 
-.camposPrincipais {
+.buscaDireta {
   display: grid;
-  grid-template-columns: 0.9fr 0.9fr 1.2fr;
-  gap: 1px;
-  margin-top: var(--via-space-2);
-  border-top: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
-  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(16px, 2vw, 28px);
+  padding: var(--via-space-5) clamp(26px, 4vw, 52px) var(--via-space-7);
 }
 
-.campoNumerado {
+.campoBusca {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
   gap: var(--via-space-3);
   min-width: 0;
-  padding: var(--via-space-6) clamp(22px, 2.6vw, 36px);
-  background: var(--via-navy);
 }
 
-.campoNumerado > span {
-  margin-top: 28px;
-  color: color-mix(in srgb, var(--via-white) 36%, transparent);
+.iconeCampo {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-top: 22px;
+  border: 1px solid color-mix(in srgb, var(--via-white) 17%, transparent);
+  border-radius: 50%;
+  color: color-mix(in srgb, var(--via-white) 66%, transparent);
+}
+
+.conectorBusca {
+  padding-bottom: 14px;
+  color: color-mix(in srgb, var(--via-white) 45%, transparent);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-sm);
+  font-style: italic;
 }
 
-.campoNumerado :global(.via-input__label),
-.campoNumerado :global(.via-input__msg) {
+.campoBusca :global(.via-input__label),
+.campoBusca :global(.via-input__msg) {
   color: color-mix(in srgb, var(--via-white) 78%, transparent);
 }
 
-.campoNumerado :global(.via-input) {
+.campoBusca :global(.via-input) {
   border-color: color-mix(in srgb, var(--via-white) 18%, transparent);
   background: color-mix(in srgb, var(--via-white) 7%, transparent);
 }
 
-.campoNumerado :global(.via-input input) {
+.campoBusca :global(.via-input input) {
   color: var(--via-white);
 }
 
-.campoNumerado :global(.via-input input::placeholder) {
+.campoBusca :global(.via-input input::placeholder) {
   color: color-mix(in srgb, var(--via-white) 38%, transparent);
 }
 
-.campoNumerado :global(.via-input:focus-within) {
+.campoBusca :global(.via-input:focus-within) {
   border-color: var(--subido-blue);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--subido-blue) 18%, transparent);
 }
 
-.opcoesBusca {
+.rodapeBusca {
   display: grid;
   grid-template-columns: auto minmax(240px, 1fr) auto;
   align-items: center;
   gap: clamp(24px, 3vw, 46px);
   padding: var(--via-space-5) clamp(26px, 4vw, 52px);
+  border-top: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
+  background: color-mix(in srgb, var(--via-black) 10%, transparent);
 }
 
 .quantidade {
@@ -267,18 +277,40 @@
   outline-offset: 2px;
 }
 
+.quantidade button:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
 .quantidade small {
   display: block;
   margin-top: var(--via-space-1);
   color: var(--via-danger);
 }
 
-.opcoesBusca :global(.via-switch__label) {
-  color: var(--via-white);
+.reservaBusca {
+  display: grid;
+  gap: 4px;
+  max-width: 430px;
+  padding-left: var(--via-space-5);
+  border-left: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
 }
 
-.opcoesBusca :global(.via-switch__desc) {
-  color: color-mix(in srgb, var(--via-white) 54%, transparent);
+.reservaBusca span {
+  color: color-mix(in srgb, var(--via-white) 78%, transparent);
+  font-size: var(--via-fs-xs);
+}
+
+.reservaBusca strong {
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-sm);
+}
+
+.reservaBusca small {
+  color: color-mix(in srgb, var(--via-white) 48%, transparent);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
 }
 
 .acaoBusca {
@@ -296,6 +328,14 @@
 .acaoBusca strong {
   color: var(--via-white);
   font-family: var(--via-font-mono);
+}
+
+.andamentoBusca {
+  margin: 0;
+  padding: 0 clamp(26px, 4vw, 52px) var(--via-space-4);
+  color: color-mix(in srgb, var(--via-white) 62%, transparent);
+  font-size: var(--via-fs-xs);
+  text-align: right;
 }
 
 .areaListas {
@@ -854,13 +894,7 @@
 }
 
 @media (max-width: 1120px) {
-  .camposPrincipais {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .campoNumerado:last-child {
-    grid-column: 1 / -1;
-  }
-  .opcoesBusca {
+  .rodapeBusca {
     grid-template-columns: auto minmax(220px, 1fr);
   }
   .acaoBusca {
@@ -887,15 +921,21 @@
     align-items: flex-start;
     flex-direction: column;
   }
-  .camposPrincipais {
+  .buscaDireta {
     grid-template-columns: 1fr;
+    gap: var(--via-space-4);
   }
-  .campoNumerado:last-child {
-    grid-column: auto;
+  .conectorBusca {
+    display: none;
   }
-  .opcoesBusca {
+  .rodapeBusca {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+  .reservaBusca {
+    max-width: none;
+    padding: 0;
+    border-left: 0;
   }
   .acaoBusca {
     grid-column: auto;
@@ -921,9 +961,15 @@
     font-size: 2.4rem;
   }
   .formularioTopo,
-  .campoNumerado,
-  .opcoesBusca {
+  .buscaDireta,
+  .rodapeBusca {
     padding-inline: var(--via-space-4);
+  }
+  .campoBusca {
+    grid-template-columns: 1fr;
+  }
+  .iconeCampo {
+    display: none;
   }
   .custoBusca {
     white-space: normal;

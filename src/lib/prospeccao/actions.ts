@@ -13,17 +13,15 @@ import {
   reservarListaProspeccao,
 } from './admin';
 import { prospectarEmpresas } from './provedores';
-import { BuscaProspeccaoSchema, separarTermos } from './schema';
+import { BuscaProspeccaoSchema } from './schema';
 
 export type EstadoBuscaProspeccao = {
   erro?: string;
-  porCampo?: Partial<Record<'segmento' | 'localizacao' | 'termos' | 'quantidade', string>>;
+  porCampo?: Partial<Record<'segmento' | 'localizacao' | 'quantidade', string>>;
   campos?: {
     segmento: string;
     localizacao: string;
-    termos: string;
     quantidade: string;
-    somenteComSite: boolean;
   };
 };
 
@@ -35,9 +33,7 @@ function camposDo(formData: FormData): NonNullable<EstadoBuscaProspeccao['campos
   return {
     segmento: valor('segmento'),
     localizacao: valor('localizacao'),
-    termos: valor('termos'),
     quantidade: valor('quantidade'),
-    somenteComSite: formData.get('somenteComSite') === 'on',
   };
 }
 
@@ -54,7 +50,6 @@ export async function criarListaProspeccao(
       porCampo: {
         segmento: erros.segmento?.[0],
         localizacao: erros.localizacao?.[0],
-        termos: erros.termos?.[0],
         quantidade: erros.quantidade?.[0],
       },
     };
@@ -63,7 +58,7 @@ export async function criarListaProspeccao(
   if (!prospeccaoEnv().pronto) {
     return {
       campos,
-      erro: 'As integrações de Prospecção estão sendo configuradas. Nenhum crédito foi usado.',
+      erro: 'A busca está temporariamente indisponível. Nenhum crédito foi usado.',
     };
   }
 
@@ -74,12 +69,10 @@ export async function criarListaProspeccao(
   if (!user) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
 
   const nome = `${validacao.data.segmento} · ${validacao.data.localizacao}`;
-  const termos = separarTermos(validacao.data.termos);
   const { data: lista, error: erroLista } = await reservarListaProspeccao(
     user.id,
     nome,
     validacao.data,
-    termos,
   );
 
   if (erroLista || !lista) {

@@ -34,19 +34,19 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
     <div className={styles.pagina}>
       <header className={styles.cabecalho}>
         <div>
-          <p className={styles.sobretitulo}>Operação comercial</p>
-          <h1>Encontre empresas antes de abrir oportunidades.</h1>
+          <p className={styles.sobretitulo}>Prospecção</p>
+          <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
           <p>
-            Crie um recorte, revise o contexto público e mande apenas os melhores leads para o CRM.
+            Busque por tipo e região, confira os dados e envie apenas os melhores leads para o CRM.
           </p>
         </div>
         <div className={styles.saldo}>
           <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
           <span>
-            Créditos disponíveis
+            Saldo disponível
             <strong>{saldo}</strong>
           </span>
-          <small>1 lead salvo = 1 crédito</small>
+          <small>1 empresa encontrada = 1 crédito</small>
         </div>
       </header>
 
@@ -119,7 +119,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                 <div className={styles.metricasLista}>
                   <span>
                     <strong>{listaAtual.creditos_consumidos}</strong>
-                    leads
+                    encontradas
                   </span>
                   <span>
                     <strong>{listaAtual.quantidade_solicitada}</strong>
@@ -141,10 +141,10 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
             <div className={styles.primeiraBusca}>
               <DatabaseZap size={28} strokeWidth={1.5} aria-hidden="true" />
               <p className={styles.sobretitulo}>Da busca ao pipeline</p>
-              <h2>Uma lista limpa, pronta para sua decisão.</h2>
+              <h2>Comece com uma busca simples.</h2>
               <p>
-                Você abre cada empresa, confere os sinais disponíveis e escolhe o que merece virar
-                oportunidade. O enriquecimento acontece depois, dentro do CRM.
+                Diga o tipo de empresa e a região. Você revisa cada resultado antes de decidir o que
+                merece virar oportunidade.
               </p>
               <ol>
                 <li>

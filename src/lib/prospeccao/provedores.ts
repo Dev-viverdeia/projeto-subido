@@ -8,9 +8,9 @@ type Registro = Record<string, unknown>;
 export type ResultadoProvedores = {
   leads: LeadProspeccaoEntrada[];
   provedores: {
-    serpapi: 'concluido' | 'falhou';
-    apify: 'concluido' | 'falhou';
-    firecrawl: 'concluido' | 'parcial' | 'falhou';
+    serpapi: 'concluido' | 'falhou' | 'nao_configurado';
+    apify: 'concluido' | 'falhou' | 'nao_configurado';
+    firecrawl: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
   };
 };
 
@@ -83,7 +83,7 @@ function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
     avaliacao: numero(registro.rating),
     total_avaliacoes: inteiro(registro.reviews),
     descricao: texto(registro.description),
-    fontes: ['SerpAPI · Google Maps'],
+    fontes: ['Google Maps · dados públicos'],
     dados: {
       place_id: texto(registro.place_id),
       maps_url: texto(registro.place_id_search) ?? texto(registro.directions),
@@ -114,7 +114,7 @@ function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
     avaliacao: numero(registro.totalScore),
     total_avaliacoes: inteiro(registro.reviewsCount),
     descricao: texto(registro.description),
-    fontes: ['Apify · coleta estruturada'],
+    fontes: ['Google Maps · dados públicos'],
     dados: {
       place_id: texto(registro.placeId),
       maps_url: texto(registro.url),
@@ -138,7 +138,7 @@ async function buscarSerpApi(
     { length: Math.ceil(busca.quantidade / 20) },
     (_, indice) => indice * 20,
   );
-  const consulta = [busca.segmento, busca.termos].filter(Boolean).join(' ');
+  const consulta = busca.segmento;
   const respostas = await Promise.all(
     paginas.map(async (inicio) => {
       const parametros = new URLSearchParams({
@@ -177,7 +177,7 @@ async function buscarApify(
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        searchStringsArray: [[busca.segmento, busca.termos].filter(Boolean).join(' ')],
+        searchStringsArray: [busca.segmento],
         locationQuery: busca.localizacao,
         maxCrawledPlacesPerSearch: busca.quantidade,
         language: 'pt-BR',
@@ -255,7 +255,7 @@ async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
     return {
       ...lead,
       descricao: lead.descricao ?? resumo,
-      fontes: [...new Set([...lead.fontes, 'Firecrawl · site público'])],
+      fontes: [...new Set([...lead.fontes, 'Site oficial · conteúdo público'])],
       dados: {
         ...lead.dados,
         site_titulo: texto(json.data?.metadata?.title),
@@ -292,36 +292,54 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
   const configuracao = prospeccaoEnv();
   if (!configuracao.pronto) throw new ErroConfiguracaoProspeccao();
 
+  const serpConfigurada = Boolean(configuracao.serpApi);
+  const apifyConfigurado = Boolean(configuracao.apifyToken && configuracao.apifyActor);
   const [serp, apify] = await Promise.allSettled([
-    buscarSerpApi(busca, configuracao.serpApi!),
-    buscarApify(busca, configuracao.apifyToken!, configuracao.apifyActor!),
+    configuracao.serpApi ? buscarSerpApi(busca, configuracao.serpApi) : Promise.resolve([]),
+    configuracao.apifyToken && configuracao.apifyActor
+      ? buscarApify(busca, configuracao.apifyToken, configuracao.apifyActor)
+      : Promise.resolve([]),
   ]);
   const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
   const encontradosApify = apify.status === 'fulfilled' ? apify.value : [];
   let combinados = combinar(encontradosSerp, encontradosApify);
 
-  if (serp.status === 'rejected' && apify.status === 'rejected') {
+  const descobertaConcluida =
+    (serpConfigurada && serp.status === 'fulfilled') ||
+    (apifyConfigurado && apify.status === 'fulfilled');
+  if (!descobertaConcluida) {
     throw new Error('provedores_descoberta_indisponiveis');
   }
 
-  if (busca.somenteComSite) combinados = combinados.filter((lead) => Boolean(lead.site_url));
   combinados = combinados.slice(0, busca.quantidade);
 
   const comSite = combinados.filter((lead) => lead.site_url);
-  const lidos = await mapearComLimite(comSite, 5, (lead) => lerSite(lead, configuracao.firecrawl!));
+  const firecrawl = configuracao.firecrawl;
+  const lidos = firecrawl
+    ? await mapearComLimite(comSite, 5, (lead) => lerSite(lead, firecrawl))
+    : [];
   const porChave = new Map(lidos.map((lead) => [lead.chave_externa, lead]));
   const leads = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
   const sitesConfirmados = leads.filter((lead) =>
-    lead.fontes.some((fonte) => fonte.startsWith('Firecrawl')),
+    lead.fontes.some((fonte) => fonte.startsWith('Site oficial')),
   ).length;
 
   return {
     leads,
     provedores: {
-      serpapi: serp.status === 'fulfilled' ? 'concluido' : 'falhou',
-      apify: apify.status === 'fulfilled' ? 'concluido' : 'falhou',
-      firecrawl:
-        comSite.length === 0
+      serpapi: !serpConfigurada
+        ? 'nao_configurado'
+        : serp.status === 'fulfilled'
+          ? 'concluido'
+          : 'falhou',
+      apify: !apifyConfigurado
+        ? 'nao_configurado'
+        : apify.status === 'fulfilled'
+          ? 'concluido'
+          : 'falhou',
+      firecrawl: !firecrawl
+        ? 'nao_configurado'
+        : comSite.length === 0
           ? 'concluido'
           : sitesConfirmados === comSite.length
             ? 'concluido'

@@ -45,6 +45,8 @@ function fontesDo(lead: Lead): string[] {
 export function ListaResultados({ leads }: { leads: Lead[] }) {
   const [selecionado, setSelecionado] = useState<Lead | null>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
+  const dialogoRef = useRef<HTMLElement>(null);
+  const gatilhoRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!selecionado) return;
@@ -58,8 +60,26 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
     return () => {
       document.body.style.overflow = overflow;
       window.removeEventListener('keydown', fechar);
+      gatilhoRef.current?.focus();
     };
   }, [selecionado]);
+
+  function manterFoco(evento: React.KeyboardEvent<HTMLElement>) {
+    if (evento.key !== 'Tab' || !dialogoRef.current) return;
+    const focaveis = dialogoRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    const primeiro = focaveis.item(0);
+    const ultimo = focaveis.item(focaveis.length - 1);
+    if (!primeiro || !ultimo) return;
+    if (evento.shiftKey && document.activeElement === primeiro) {
+      evento.preventDefault();
+      ultimo.focus();
+    } else if (!evento.shiftKey && document.activeElement === ultimo) {
+      evento.preventDefault();
+      primeiro.focus();
+    }
+  }
 
   if (!leads.length) {
     return (
@@ -76,7 +96,14 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
       <div className={styles.listaResultados} role="list">
         {leads.map((lead, indice) => (
           <div role="listitem" key={lead.id}>
-            <button type="button" className={styles.linhaLead} onClick={() => setSelecionado(lead)}>
+            <button
+              type="button"
+              className={styles.linhaLead}
+              onClick={(evento) => {
+                gatilhoRef.current = evento.currentTarget;
+                setSelecionado(lead);
+              }}
+            >
               <span className={styles.indiceLead}>{String(indice + 1).padStart(2, '0')}</span>
               <span className={styles.identidadeLead}>
                 <strong>{lead.nome}</strong>
@@ -121,10 +148,12 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
           }}
         >
           <aside
+            ref={dialogoRef}
             className={styles.detalheLead}
             role="dialog"
             aria-modal="true"
             aria-labelledby="lead-detalhe-titulo"
+            onKeyDown={manterFoco}
           >
             <header className={styles.detalheTopo}>
               <div>

@@ -19,7 +19,7 @@ const LEAD = {
   avaliacao: 4.8,
   total_avaliacoes: 127,
   descricao: 'Atendimento odontológico com agendamento pelo WhatsApp.',
-  fontes: ['SerpAPI · Google Maps', 'Firecrawl · site público'],
+  fontes: ['Google Maps · dados públicos'],
   crm_oportunidade_id: null,
   enviado_crm_em: null,
 };
@@ -29,10 +29,16 @@ describe('resultados da prospecção', () => {
     const user = userEvent.setup();
     render(<ListaResultados leads={[LEAD]} />);
 
-    await user.click(screen.getByRole('button', { name: /Clínica Aurora/ }));
+    const linha = screen.getByRole('button', { name: /Clínica Aurora/ });
+    await user.click(linha);
 
     expect(screen.getByRole('dialog', { name: 'Clínica Aurora' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Enviar para o CRM' })).toBeInTheDocument();
-    expect(screen.getByText('SerpAPI · Google Maps')).toBeInTheDocument();
+    expect(screen.getByText('Google Maps · dados públicos')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: 'Fechar detalhes' })).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(linha).toHaveFocus();
   });
 });

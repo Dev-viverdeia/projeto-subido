@@ -126,11 +126,11 @@ export function livekitEnv() {
 /**
  * Provedores privados da Prospecção.
  *
- * SerpAPI descobre empresas no mapa, Apify complementa a coleta estruturada e
- * Firecrawl confirma o contexto público do site. A configuração é opcional no
- * boot para o restante da plataforma continuar disponível durante uma rotação
- * de chave; a tela de Prospecção informa com clareza quando o trio não está
- * pronto e nenhuma busca reserva créditos nesse estado.
+ * Apify é suficiente para a busca inicial por tipo de empresa e região. SerpAPI
+ * amplia a descoberta quando configurada e Firecrawl adiciona contexto do site,
+ * mas nenhum dos dois bloqueia o fluxo principal. A configuração continua
+ * opcional no boot para o restante da plataforma sobreviver a uma rotação de
+ * chave sem reservar créditos em uma busca indisponível.
  */
 export function prospeccaoEnv() {
   const dados = {
@@ -147,7 +147,7 @@ export function prospeccaoEnv() {
   const serpApi = z.string().min(10).safeParse(dados.SERPAPI_API_KEY);
 
   return {
-    pronto: firecrawl.success && apifyToken.success && apifyActor.success && serpApi.success,
+    pronto: (apifyToken.success && apifyActor.success) || serpApi.success,
     firecrawl: firecrawl.success ? firecrawl.data : null,
     apifyToken: apifyToken.success ? apifyToken.data : null,
     apifyActor: apifyActor.success ? apifyActor.data : null,

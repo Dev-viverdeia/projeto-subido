@@ -1,18 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { BuscaProspeccaoSchema, separarTermos } from './schema';
+import { BuscaProspeccaoSchema } from './schema';
 
 describe('briefing da prospecção', () => {
   it('aceita um recorte pequeno e converte os controles do formulário', () => {
     const resultado = BuscaProspeccaoSchema.parse({
       segmento: 'Clínicas odontológicas',
       localizacao: 'Belo Horizonte, MG',
-      termos: 'WhatsApp, agendamento',
       quantidade: '10',
-      somenteComSite: 'on',
     });
 
     expect(resultado.quantidade).toBe(10);
-    expect(resultado.somenteComSite).toBe(true);
+    expect(resultado).toEqual({
+      segmento: 'Clínicas odontológicas',
+      localizacao: 'Belo Horizonte, MG',
+      quantidade: 10,
+    });
   });
 
   it('rejeita quantidades fora das opções que aparecem na interface', () => {
@@ -20,18 +22,8 @@ describe('briefing da prospecção', () => {
       BuscaProspeccaoSchema.safeParse({
         segmento: 'Clínicas',
         localizacao: 'São Paulo',
-        termos: '',
         quantidade: '50',
-        somenteComSite: false,
       }).success,
     ).toBe(false);
-  });
-
-  it('normaliza termos repetidos sem criar filtros invisíveis', () => {
-    expect(separarTermos('WhatsApp, agenda, WhatsApp,  atendimento ')).toEqual([
-      'WhatsApp',
-      'agenda',
-      'atendimento',
-    ]);
   });
 });

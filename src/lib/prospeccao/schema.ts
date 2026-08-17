@@ -13,14 +13,9 @@ export const BuscaProspeccaoSchema = z.object({
     .trim()
     .min(2, 'Informe uma cidade ou região.')
     .max(180, 'Use até 180 caracteres.'),
-  termos: z.string().trim().max(300, 'Use até 300 caracteres.').default(''),
   quantidade: z.preprocess(
     (valor) => Number(valor),
     z.union(QUANTIDADES_PROSPECCAO.map((quantidade) => z.literal(quantidade))),
-  ),
-  somenteComSite: z.preprocess(
-    (valor) => valor === true || valor === 'on' || valor === 'true',
-    z.boolean(),
   ),
 });
 
@@ -44,14 +39,3 @@ export const LeadProspeccaoSchema = z.object({
 });
 
 export type LeadProspeccaoEntrada = z.infer<typeof LeadProspeccaoSchema>;
-
-export function separarTermos(valor: string): string[] {
-  return [
-    ...new Set(
-      valor
-        .split(',')
-        .map((termo) => termo.trim())
-        .filter(Boolean),
-    ),
-  ].slice(0, 8);
-}

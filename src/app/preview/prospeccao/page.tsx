@@ -24,7 +24,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     total_avaliacoes: 127,
     descricao:
       'Clínica com atendimento multicanal, agendamento online e presença ativa no WhatsApp.',
-    fontes: ['SerpAPI · Google Maps', 'Apify · coleta estruturada', 'Firecrawl · site público'],
+    fontes: ['Google Maps · dados públicos'],
     crm_oportunidade_id: null,
     enviado_crm_em: null,
   },
@@ -40,7 +40,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     avaliacao: 4.6,
     total_avaliacoes: 89,
     descricao: 'Atendimento odontológico com agendamento por telefone e formulário no site.',
-    fontes: ['SerpAPI · Google Maps', 'Firecrawl · site público'],
+    fontes: ['Google Maps · dados públicos'],
     crm_oportunidade_id: '33333333-3333-4333-8333-333333333333',
     enviado_crm_em: new Date().toISOString(),
   },
@@ -56,7 +56,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     avaliacao: 4.4,
     total_avaliacoes: 52,
     descricao: null,
-    fontes: ['Apify · coleta estruturada'],
+    fontes: ['Google Maps · dados públicos'],
     crm_oportunidade_id: null,
     enviado_crm_em: null,
   },
@@ -94,20 +94,20 @@ export default function PreviewProspeccaoPage() {
         <div className={pagina.pagina}>
           <header className={pagina.cabecalho}>
             <div>
-              <p className={pagina.sobretitulo}>Operação comercial</p>
-              <h1>Encontre empresas antes de abrir oportunidades.</h1>
+              <p className={pagina.sobretitulo}>Prospecção</p>
+              <h1>Encontre empresas. Escolha quais viram oportunidade.</h1>
               <p>
-                Crie um recorte, revise o contexto público e mande apenas os melhores leads para o
+                Busque por tipo e região, confira os dados e envie apenas os melhores leads para o
                 CRM.
               </p>
             </div>
             <div className={pagina.saldo}>
               <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
               <span>
-                Créditos disponíveis
+                Saldo disponível
                 <strong>42</strong>
               </span>
-              <small>1 lead salvo = 1 crédito</small>
+              <small>1 empresa encontrada = 1 crédito</small>
             </div>
           </header>
 
@@ -155,8 +155,8 @@ export default function PreviewProspeccaoPage() {
                 </div>
                 <div className={pagina.metricasLista}>
                   <span>
-                    <strong>10</strong>
-                    leads
+                    <strong>3</strong>
+                    encontradas
                   </span>
                   <span>
                     <strong>10</strong>
