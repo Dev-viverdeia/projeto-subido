@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
-import { ETAPAS_CRM } from './etapas';
+import { ETAPAS_CRM, MOTIVOS_PERDA_CRM, type EtapaCrm, type MotivoPerdaCrm } from './etapas';
 
 const criarLeadSchema = z.object({
   empresa: z.string().trim().min(1, 'Digite o nome da empresa.').max(160, 'Nome muito longo.'),
@@ -31,6 +31,18 @@ const moverSchema = z.object({
   id: z.uuid(),
   etapa: z.enum(ETAPAS_CRM.map((etapa) => etapa.id) as [string, ...string[]]),
 });
+
+const moverKanbanSchema = moverSchema
+  .extend({
+    motivoPerda: z
+      .enum(MOTIVOS_PERDA_CRM.map((motivo) => motivo.id) as [MotivoPerdaCrm, ...MotivoPerdaCrm[]])
+      .nullable()
+      .optional(),
+  })
+  .refine((entrada) => entrada.etapa !== 'perdido' || Boolean(entrada.motivoPerda), {
+    message: 'Escolha o motivo da perda.',
+    path: ['motivoPerda'],
+  });
 
 const aplicarAcaoSchema = z.object({
   oportunidade: z.uuid(),
@@ -140,6 +152,53 @@ export async function moverOportunidade(formData: FormData): Promise<void> {
 
   revalidatePath('/crm');
   revalidarDirecaoOperacional();
+}
+
+export type MovimentoKanban = {
+  id: string;
+  etapa: EtapaCrm;
+  motivoPerda?: MotivoPerdaCrm | null;
+};
+
+export type ResultadoMovimentoKanban = { ok: true; movida: boolean } | { ok: false; erro: string };
+
+/**
+ * Escrita interativa do Kanban. Retorna um resultado serializável para o card
+ * poder se mover imediatamente e voltar ao lugar anterior se o banco rejeitar.
+ */
+export async function moverOportunidadeKanban(
+  entrada: MovimentoKanban,
+): Promise<ResultadoMovimentoKanban> {
+  const validacao = moverKanbanSchema.safeParse(entrada);
+  if (!validacao.success) {
+    return {
+      ok: false,
+      erro: validacao.error.issues[0]?.message ?? 'Não foi possível mover a oportunidade.',
+    };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('crm_mover_oportunidade_kanban', {
+    p_oportunidade: validacao.data.id,
+    p_etapa: validacao.data.etapa as EtapaCrm,
+    p_motivo_perda: validacao.data.motivoPerda ?? undefined,
+  });
+
+  if (error) {
+    console.error(`[crm:kanban] ${error.code}: ${error.message}`);
+    return {
+      ok: false,
+      erro:
+        error.code === '42501'
+          ? 'Sua sessão expirou. Entre novamente para continuar.'
+          : 'A oportunidade não foi movida. Tente novamente.',
+    };
+  }
+
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.id}`);
+  revalidarDirecaoOperacional();
+  return { ok: true, movida: Boolean(data) };
 }
 
 export async function aplicarProximaAcao(formData: FormData): Promise<void> {

@@ -16,7 +16,7 @@ export const ETAPAS_CRM: ReadonlyArray<{
   { id: 'perdido', rotulo: 'Perdidos', descricao: 'Oportunidade encerrada' },
 ];
 
-export type IdFaseCrm = 'entrada' | 'conversa' | 'proposta' | 'fechados';
+export type IdFaseCrm = 'entrada' | 'conversa' | 'proposta' | 'desfecho';
 
 export const FASES_CRM: ReadonlyArray<{
   id: IdFaseCrm;
@@ -43,9 +43,9 @@ export const FASES_CRM: ReadonlyArray<{
     etapas: ['proposta', 'negociacao'],
   },
   {
-    id: 'fechados',
-    rotulo: 'Fechados',
-    descricao: 'Ganhos e perdidos',
+    id: 'desfecho',
+    rotulo: 'Desfecho',
+    descricao: 'Decisão registrada',
     etapas: ['ganho', 'perdido'],
   },
 ];
@@ -69,6 +69,23 @@ export const ETAPAS_MOVIMENTO_CRM: ReadonlyArray<{
 export const ROTULO_ETAPA: Record<EtapaCrm, string> = Object.fromEntries(
   ETAPAS_CRM.map((etapa) => [etapa.id, etapa.rotulo]),
 ) as Record<EtapaCrm, string>;
+
+export const MOTIVOS_PERDA_CRM = [
+  { id: 'sem_prioridade', rotulo: 'Não é prioridade agora' },
+  { id: 'sem_orcamento', rotulo: 'Sem orçamento disponível' },
+  { id: 'sem_retorno', rotulo: 'Parou de responder' },
+  { id: 'outra_solucao', rotulo: 'Escolheu outra solução' },
+  { id: 'momento_inadequado', rotulo: 'Momento inadequado' },
+  { id: 'sem_aderencia', rotulo: 'Sem aderência ao projeto' },
+  { id: 'outro', rotulo: 'Outro motivo' },
+] as const;
+
+export type MotivoPerdaCrm = (typeof MOTIVOS_PERDA_CRM)[number]['id'];
+
+export function rotuloMotivoPerda(motivo: string | null): string {
+  if (!motivo || motivo === 'nao_informado') return 'Motivo não informado';
+  return MOTIVOS_PERDA_CRM.find((item) => item.id === motivo)?.rotulo ?? motivo;
+}
 
 export function etapaAberta(etapa: EtapaCrm): boolean {
   return etapa !== 'ganho' && etapa !== 'perdido';

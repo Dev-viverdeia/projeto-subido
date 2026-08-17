@@ -14,7 +14,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getUser }, rpc })),
 }));
 
-import { criarLead, iniciarNovoCicloCliente } from './actions';
+import { criarLead, iniciarNovoCicloCliente, moverOportunidadeKanban } from './actions';
 
 const OPORTUNIDADE_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -92,5 +92,50 @@ describe('iniciarNovoCicloCliente', () => {
     });
     expect(revalidatePath).toHaveBeenCalledWith('/crm');
     expect(redirect).toHaveBeenCalledWith(`/crm/${NOVA_OPORTUNIDADE}?novo=1`);
+  });
+});
+
+describe('moverOportunidadeKanban', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('registra uma perda somente quando existe motivo', async () => {
+    rpc.mockResolvedValue({ data: true, error: null });
+
+    const resultado = await moverOportunidadeKanban({
+      id: OPORTUNIDADE_ID,
+      etapa: 'perdido',
+      motivoPerda: 'sem_prioridade',
+    });
+
+    expect(resultado).toEqual({ ok: true, movida: true });
+    expect(rpc).toHaveBeenCalledWith('crm_mover_oportunidade_kanban', {
+      p_oportunidade: OPORTUNIDADE_ID,
+      p_etapa: 'perdido',
+      p_motivo_perda: 'sem_prioridade',
+    });
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
+  });
+
+  it('recusa encerrar como perdido sem contexto', async () => {
+    const resultado = await moverOportunidadeKanban({
+      id: OPORTUNIDADE_ID,
+      etapa: 'perdido',
+    });
+
+    expect(resultado).toEqual({ ok: false, erro: 'Escolha o motivo da perda.' });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('reabre uma oportunidade sem manter o motivo da perda', async () => {
+    rpc.mockResolvedValue({ data: true, error: null });
+
+    await moverOportunidadeKanban({ id: OPORTUNIDADE_ID, etapa: 'descoberta' });
+
+    expect(rpc).toHaveBeenCalledWith('crm_mover_oportunidade_kanban', {
+      p_oportunidade: OPORTUNIDADE_ID,
+      p_etapa: 'descoberta',
+      p_motivo_perda: undefined,
+    });
   });
 });

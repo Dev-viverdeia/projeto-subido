@@ -36,6 +36,9 @@ export type OportunidadeCrm = {
   valorCentavos: number | null;
   proximaAcao: string | null;
   proximaAcaoEm: string | null;
+  ganhaEm: string | null;
+  perdidaEm: string | null;
+  motivoPerda: string | null;
   ultimoFato: string | null;
   ultimoFatoEm: string | null;
   atualizadoEm: string;
@@ -130,6 +133,9 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
           valor_centavos,
           proxima_acao,
           proxima_acao_em,
+          ganha_em,
+          perdida_em,
+          motivo_perda,
           atualizado_em,
           criado_em,
           ordem,
@@ -188,6 +194,9 @@ function montarOportunidade(
     | 'valor_centavos'
     | 'proxima_acao'
     | 'proxima_acao_em'
+    | 'ganha_em'
+    | 'perdida_em'
+    | 'motivo_perda'
     | 'atualizado_em'
     | 'criado_em'
   > & {
@@ -214,6 +223,9 @@ function montarOportunidade(
     valorCentavos: linha.valor_centavos,
     proximaAcao: linha.proxima_acao,
     proximaAcaoEm: linha.proxima_acao_em,
+    ganhaEm: linha.ganha_em,
+    perdidaEm: linha.perdida_em,
+    motivoPerda: linha.motivo_perda,
     ultimoFato: evento?.titulo ?? null,
     ultimoFatoEm: evento?.ocorrido_em ?? null,
     atualizadoEm: linha.atualizado_em,
@@ -230,7 +242,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   const { data: linha, error } = await supabase
     .from('crm_oportunidades')
     .select(
-      'id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos, proxima_acao, proxima_acao_em, atualizado_em, criado_em',
+      'id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos, proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda, atualizado_em, criado_em',
     )
     .eq('id', id)
     .maybeSingle();

@@ -2333,6 +2333,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      crm_mover_oportunidade_kanban: {
+        Args: {
+          p_etapa: Database["public"]["Enums"]["crm_etapa"]
+          p_motivo_perda?: string
+          p_oportunidade: string
+        }
+        Returns: boolean
+      }
       diagnostico_aplicar_proxima_acao: {
         Args: { p_diagnostico: string }
         Returns: boolean

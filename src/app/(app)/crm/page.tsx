@@ -1,5 +1,13 @@
 import type { Metadata } from 'next';
-import { ArrowRight, CheckCircle2, CircleDollarSign, Database, Radar, Layers3 } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  CircleDollarSign,
+  Database,
+  Layers3,
+  Radar,
+  XCircle,
+} from 'lucide-react';
 import { etapaAberta } from '@/lib/crm/etapas';
 import { listarPipeline } from '@/lib/crm/queries';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
@@ -22,6 +30,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
     (item) => item.etapa === 'proposta' || item.etapa === 'negociacao',
   ).length;
   const ganhos = oportunidades.filter((item) => item.etapa === 'ganho').length;
+  const perdidos = oportunidades.filter((item) => item.etapa === 'perdido').length;
 
   return (
     <div className={styles.pagina}>
@@ -76,6 +85,15 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           <div>
             <strong>{ganhos}</strong>
             <span>ganhos</span>
+          </div>
+        </article>
+        <article>
+          <span className={styles.iconeResumo}>
+            <XCircle size={18} strokeWidth={1.8} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>{perdidos}</strong>
+            <span>perdidas</span>
           </div>
         </article>
       </section>

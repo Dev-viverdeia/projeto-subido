@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ETAPAS_MOVIMENTO_CRM, FASES_CRM, etapaVisivel, faseDaEtapa } from './etapas';
+import {
+  ETAPAS_MOVIMENTO_CRM,
+  FASES_CRM,
+  etapaVisivel,
+  faseDaEtapa,
+  rotuloMotivoPerda,
+} from './etapas';
 
 describe('etapas do CRM', () => {
   it('resume as sete etapas persistidas em quatro fases visíveis', () => {
@@ -7,11 +13,12 @@ describe('etapas do CRM', () => {
       'entrada',
       'conversa',
       'proposta',
-      'fechados',
+      'desfecho',
     ]);
     expect(faseDaEtapa('qualificacao')).toBe('entrada');
     expect(faseDaEtapa('negociacao')).toBe('proposta');
-    expect(faseDaEtapa('ganho')).toBe('fechados');
+    expect(faseDaEtapa('ganho')).toBe('desfecho');
+    expect(faseDaEtapa('perdido')).toBe('desfecho');
   });
 
   it('oferece apenas decisões comerciais úteis ao mover um card', () => {
@@ -24,5 +31,10 @@ describe('etapas do CRM', () => {
     ]);
     expect(etapaVisivel('qualificacao')).toBe('novo_lead');
     expect(etapaVisivel('negociacao')).toBe('proposta');
+  });
+
+  it('traduz o motivo persistido para uma explicação humana', () => {
+    expect(rotuloMotivoPerda('sem_orcamento')).toBe('Sem orçamento disponível');
+    expect(rotuloMotivoPerda('nao_informado')).toBe('Motivo não informado');
   });
 });

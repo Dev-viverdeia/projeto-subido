@@ -10,6 +10,7 @@ import {
   Layers3,
   Radar,
   UsersRound,
+  XCircle,
 } from 'lucide-react';
 import { FormularioNovoLead } from '@/app/(app)/crm/_components/FormularioNovoLead';
 import { PipelineCrm } from '@/app/(app)/crm/_components/PipelineCrm';
@@ -42,6 +43,9 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     valorCentavos: null,
     proximaAcao: null,
     proximaAcaoEm: null,
+    ganhaEm: null,
+    perdidaEm: null,
+    motivoPerda: null,
     ultimoFato: 'Lead adicionado ao CRM',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
@@ -62,6 +66,9 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     valorCentavos: null,
     proximaAcao: 'Realizar chamada de descoberta',
     proximaAcaoEm: null,
+    ganhaEm: null,
+    perdidaEm: null,
+    motivoPerda: null,
     ultimoFato: 'Etapa do pipeline alterada',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
@@ -82,7 +89,56 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     valorCentavos: null,
     proximaAcao: 'Apresentar proposta',
     proximaAcaoEm: null,
+    ganhaEm: null,
+    perdidaEm: null,
+    motivoPerda: null,
     ultimoFato: 'Etapa do pipeline alterada',
+    ultimoFatoEm: AGORA,
+    atualizadoEm: AGORA,
+    criadoEm: AGORA,
+  },
+  {
+    id: '44444444-4444-4444-8444-444444444444',
+    titulo: 'Assistente de follow-up',
+    etapa: 'ganho',
+    empresaId: '11111111-aaaa-4aaa-8aaa-111111111111',
+    empresa: 'Norte Seguros',
+    dominio: 'norteseguros.com.br',
+    enriquecidoEm: AGORA,
+    enriquecimentoStatus: 'concluido',
+    contatoId: '22222222-bbbb-4bbb-8bbb-222222222222',
+    contato: 'Paulo Nunes',
+    contatoEmail: 'paulo@exemplo.com',
+    valorCentavos: 850000,
+    proximaAcao: null,
+    proximaAcaoEm: null,
+    ganhaEm: AGORA,
+    perdidaEm: null,
+    motivoPerda: null,
+    ultimoFato: 'Oportunidade marcada como ganha',
+    ultimoFatoEm: AGORA,
+    atualizadoEm: AGORA,
+    criadoEm: AGORA,
+  },
+  {
+    id: '55555555-5555-4555-8555-555555555555',
+    titulo: 'Diagnóstico de atendimento',
+    etapa: 'perdido',
+    empresaId: '33333333-aaaa-4aaa-8aaa-333333333333',
+    empresa: 'Studio Forma',
+    dominio: null,
+    enriquecidoEm: null,
+    enriquecimentoStatus: null,
+    contatoId: '44444444-bbbb-4bbb-8bbb-444444444444',
+    contato: 'Ana Costa',
+    contatoEmail: 'ana@exemplo.com',
+    valorCentavos: null,
+    proximaAcao: null,
+    proximaAcaoEm: null,
+    ganhaEm: null,
+    perdidaEm: AGORA,
+    motivoPerda: 'momento_inadequado',
+    ultimoFato: 'Oportunidade marcada como perdida',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -159,8 +215,17 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
                 <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
               </span>
               <div>
-                <strong>0</strong>
+                <strong>1</strong>
                 <span>ganhos</span>
+              </div>
+            </article>
+            <article>
+              <span className={pagina.iconeResumo}>
+                <XCircle size={18} strokeWidth={1.8} aria-hidden="true" />
+              </span>
+              <div>
+                <strong>1</strong>
+                <span>perdidas</span>
               </div>
             </article>
           </section>
@@ -171,7 +236,7 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
                 <h2 id="preview-pipeline-titulo">Pipeline</h2>
                 <p>Avance cada oportunidade quando a conversa realmente mudar de fase.</p>
               </div>
-              <span>3 no total</span>
+              <span>5 no total</span>
             </div>
             <PipelineCrm oportunidades={OPORTUNIDADES} />
           </section>
