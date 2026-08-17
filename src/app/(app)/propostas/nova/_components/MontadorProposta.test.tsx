@@ -33,7 +33,6 @@ describe('MontadorProposta', () => {
         oportunidadeInicial=""
         origemInicial=""
         reuniaoInicial=""
-        diagnosticoInicial=""
         contextoCall={null}
         erro={false}
       />,
@@ -77,7 +76,6 @@ describe('MontadorProposta', () => {
         oportunidadeInicial="11111111-1111-4111-8111-111111111111"
         origemInicial=""
         reuniaoInicial="33333333-3333-4333-8333-333333333333"
-        diagnosticoInicial=""
         contextoCall={{
           titulo: 'Descoberta · Clínica Aurora',
           resumo: 'A equipe confirmou perda de contexto na troca de turno.',

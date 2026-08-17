@@ -9,7 +9,7 @@ export const ETAPAS_CRM: ReadonlyArray<{
 }> = [
   { id: 'novo_lead', rotulo: 'Novos leads', descricao: 'Entraram no radar' },
   { id: 'qualificacao', rotulo: 'Qualificação', descricao: 'Aderência e contexto' },
-  { id: 'descoberta', rotulo: 'Descoberta', descricao: 'Diagnóstico em andamento' },
+  { id: 'descoberta', rotulo: 'Descoberta', descricao: 'Contexto em construção' },
   { id: 'proposta', rotulo: 'Proposta', descricao: 'Escopo apresentado' },
   { id: 'negociacao', rotulo: 'Negociação', descricao: 'Ajustes e decisão' },
   { id: 'ganho', rotulo: 'Ganhos', descricao: 'Projeto aprovado' },
@@ -33,7 +33,7 @@ export const FASES_CRM: ReadonlyArray<{
   {
     id: 'conversa',
     rotulo: 'Em conversa',
-    descricao: 'Descoberta e diagnóstico',
+    descricao: 'Descoberta e contexto',
     etapas: ['descoberta'],
   },
   {

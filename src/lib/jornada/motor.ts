@@ -185,7 +185,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'enriquecer-lead',
           'Completar o contexto do lead',
-          'Enriqueça somente os dados que ajudam a decidir abordagem, diagnóstico ou entrega e preserve a fonte de cada fato.',
+          'Enriqueça somente os dados que ajudam a decidir abordagem, conversa ou entrega e preserve a fonte de cada fato.',
           sinais.oportunidades.enriquecidas > 0
             ? `${sinais.oportunidades.enriquecidas} oportunidade(s) enriquecida(s) com fonte registrada.`
             : 'Nenhum enriquecimento concluído.',
@@ -224,7 +224,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       resumo: 'Converta fatos em uma decisão',
       marco: 'Primeiro projeto vendido',
       contexto:
-        'A venda avança quando o diagnóstico sustenta um escopo, a proposta é apresentada e a decisão fica registrada. Documento criado sozinho não é venda.',
+        'A venda avança quando a descoberta sustenta um escopo, a proposta é apresentada e a decisão fica registrada. Documento criado sozinho não é venda.',
       guia: 'Como conduzir proposta e decisão',
       passos: [
         passo(

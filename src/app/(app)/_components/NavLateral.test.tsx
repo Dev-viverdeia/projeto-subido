@@ -38,7 +38,8 @@ describe('NavLateral no mobile', () => {
 
     expect(screen.getByRole('dialog', { name: 'Navegação' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Propostas' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Diagnósticos' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Prospecção' })).toHaveLength(2);
+    expect(screen.queryByRole('link', { name: 'Diagnósticos' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Sobral AI' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Formações' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Mentorias' })).toBeInTheDocument();

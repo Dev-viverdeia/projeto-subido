@@ -118,7 +118,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
   },
   {
     id: '55555555-5555-4555-8555-555555555555',
-    titulo: 'Diagnóstico de atendimento',
+    titulo: 'Automação de agendamento',
     etapa: 'perdido',
     empresaId: '33333333-aaaa-4aaa-8aaa-333333333333',
     empresa: 'Studio Forma',

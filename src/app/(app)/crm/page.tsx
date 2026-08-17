@@ -125,7 +125,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 <span>02</span>
                 <div>
                   <strong>A conversa ganha contexto</strong>
-                  <p>Calls, diagnósticos e propostas passam a alimentar a mesma jornada.</p>
+                  <p>Calls e propostas passam a alimentar a mesma jornada.</p>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>

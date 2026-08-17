@@ -20,8 +20,6 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
         ? `estudio:${parametros.builder}`
         : '';
   const reuniaoInicial = typeof parametros.reuniao === 'string' ? parametros.reuniao : '';
-  const diagnosticoInicial =
-    typeof parametros.diagnostico === 'string' ? parametros.diagnostico : '';
   const erro = typeof parametros.erro === 'string' ? parametros.erro : null;
   const [opcoes, posCall, propostaExistente] = await Promise.all([
     listarOpcoesNovaProposta(),
@@ -78,7 +76,6 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
         oportunidadeInicial={oportunidadeInicial}
         origemInicial={origemInicial}
         reuniaoInicial={reuniaoInicial}
-        diagnosticoInicial={diagnosticoInicial}
         contextoCall={contextoCall}
         erro={Boolean(erro)}
       />

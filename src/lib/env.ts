@@ -83,13 +83,11 @@ export function openAIEnv() {
       OPENAI_API_KEY: z.string().min(20, { error: 'OPENAI_API_KEY está vazia.' }),
       SOBRAL_AI_MODEL: z.string().min(2).default('gpt-5.6-terra'),
       LIVE_COACH_MODEL: z.string().min(2).default('gpt-5.6-luna'),
-      DIAGNOSTICO_MODEL: z.string().min(2).default('gpt-5.6-terra'),
     })
     .safeParse({
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       SOBRAL_AI_MODEL: process.env.SOBRAL_AI_MODEL,
       LIVE_COACH_MODEL: process.env.LIVE_COACH_MODEL,
-      DIAGNOSTICO_MODEL: process.env.DIAGNOSTICO_MODEL,
     });
 
   if (!parsed.success) {
@@ -123,6 +121,38 @@ export function livekitEnv() {
     });
 
   return parsed.success ? parsed.data : null;
+}
+
+/**
+ * Provedores privados da Prospecção.
+ *
+ * SerpAPI descobre empresas no mapa, Apify complementa a coleta estruturada e
+ * Firecrawl confirma o contexto público do site. A configuração é opcional no
+ * boot para o restante da plataforma continuar disponível durante uma rotação
+ * de chave; a tela de Prospecção informa com clareza quando o trio não está
+ * pronto e nenhuma busca reserva créditos nesse estado.
+ */
+export function prospeccaoEnv() {
+  const dados = {
+    FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
+    APIFY_TOKEN: process.env.APIFY_TOKEN,
+    APIFY_PROSPECCAO_ACTOR_ID:
+      process.env.APIFY_PROSPECCAO_ACTOR_ID || 'compass/crawler-google-places',
+    SERPAPI_API_KEY: process.env.SERPAPI_API_KEY,
+  };
+
+  const firecrawl = z.string().min(10).safeParse(dados.FIRECRAWL_API_KEY);
+  const apifyToken = z.string().min(10).safeParse(dados.APIFY_TOKEN);
+  const apifyActor = z.string().min(3).safeParse(dados.APIFY_PROSPECCAO_ACTOR_ID);
+  const serpApi = z.string().min(10).safeParse(dados.SERPAPI_API_KEY);
+
+  return {
+    pronto: firecrawl.success && apifyToken.success && apifyActor.success && serpApi.success,
+    firecrawl: firecrawl.success ? firecrawl.data : null,
+    apifyToken: apifyToken.success ? apifyToken.data : null,
+    apifyActor: apifyActor.success ? apifyActor.data : null,
+    serpApi: serpApi.success ? serpApi.data : null,
+  };
 }
 
 /**

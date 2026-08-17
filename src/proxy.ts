@@ -38,10 +38,10 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/inicio/:path*',
+    '/prospeccao/:path*',
     '/crm/:path*',
     '/propostas/:path*',
     '/calls/:path*',
-    '/diagnosticos/:path*',
     '/solucoes/:path*',
     '/formacoes/:path*',
     '/builder/:path*',

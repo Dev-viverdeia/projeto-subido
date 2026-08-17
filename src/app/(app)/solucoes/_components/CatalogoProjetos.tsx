@@ -78,7 +78,7 @@ export function CatalogoProjetos({
               <span>Um jeito de entregar.</span>
             </Titulo>
             <p className={styles.apoio}>
-              Você não recebe só a ideia. Cada projeto começa no diagnóstico e termina com uma
+              Você não recebe só a ideia. Cada projeto começa na descoberta e termina com uma
               operação validada nas mãos do cliente.
             </p>
           </div>

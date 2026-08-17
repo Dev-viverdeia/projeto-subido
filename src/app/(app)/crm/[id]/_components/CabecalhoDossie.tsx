@@ -2,7 +2,6 @@ import { ContactRound, Database, Globe2, Layers3, MapPin, Video } from 'lucide-r
 import { FASES_CRM, ROTULO_ETAPA, faseDaEtapa } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import styles from '../pagina.module.css';
-import { AtalhoDiagnostico } from './AtalhoDiagnostico';
 import { AtalhoProposta } from './AtalhoProposta';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 
@@ -36,7 +35,6 @@ export function CabecalhoDossie({
 
         {!modoEntrada && (
           <div className={styles.heroAcoes}>
-            {!cicloEntregue && <AtalhoDiagnostico oportunidadeId={lead.oportunidade.id} />}
             <AtalhoProposta lead={lead} />
             {!cicloEntregue && !enriquecimentoEmAndamento && (
               <FormularioEnriquecimento

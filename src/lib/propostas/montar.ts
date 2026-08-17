@@ -30,12 +30,6 @@ export type ContextoPosCallProposta = {
   lacunas: string[];
 };
 
-export type ContextoDiagnosticoProposta = {
-  resumo: string;
-  falhas: string[];
-  plano: string[];
-};
-
 const TITULOS_FASE: Record<number, string> = {
   1: 'Fundação',
   2: 'Construção',
@@ -124,13 +118,13 @@ function baseSemProjeto(origem: OrigemSemBase) {
   return {
     projeto: {
       titulo: origem.titulo,
-      resumo: 'Projeto personalizado a partir do diagnóstico comercial do cliente.',
+      resumo: 'Projeto personalizado a partir do contexto comercial do cliente.',
       origem: 'sem_base' as const,
     },
     objetivo: 'Construir uma solução de IA alinhada ao problema e ao resultado esperado.',
     escopo: [
       {
-        titulo: 'Diagnóstico e desenho',
+        titulo: 'Descoberta e desenho',
         descricao: 'Validar o problema, definir a solução e fechar os critérios de sucesso.',
       },
       {
@@ -147,7 +141,7 @@ function baseSemProjeto(origem: OrigemSemBase) {
       {
         fase: 'Implementação',
         duracao: 'A combinar',
-        descricao: 'Diagnóstico, construção, validação e entrega.',
+        descricao: 'Descoberta, construção, validação e entrega.',
       },
     ],
   };
@@ -157,7 +151,6 @@ export function montarDocumentoInicial(
   lead: DossieLead,
   origem: OrigemProposta,
   posCall?: ContextoPosCallProposta | null,
-  diagnostico?: ContextoDiagnosticoProposta | null,
 ): DocumentoProposta {
   const leitura = ultimaLeitura(lead);
   const base =
@@ -172,17 +165,14 @@ export function montarDocumentoInicial(
   // continuam no dossiê e no pós-call; despejá-las aqui repetia o resumo, criava
   // pontuação quebrada e obrigava o profissional a limpar o documento antes de vender.
   const contextoDaCall = posCall ? limitar(posCall.resumo, 900) : null;
-  const contextoDoDiagnostico = diagnostico ? limitar(diagnostico.resumo, 900) : null;
   const desafio =
     contextoDaCall ??
-    contextoDoDiagnostico ??
     leitura?.resumo ??
     `A ${lead.empresa.nome} busca avançar em ${lead.oportunidade.titulo.toLowerCase()}, com um processo claro, mensurável e seguro.`;
   const objetivo = oportunidade?.impacto ?? base.objetivo;
   const confirmacoes = posCall ? unicos([...posCall.decisoes, ...posCall.compromissos], 5) : [];
   const pontosAValidar = posCall ? unicos([...posCall.objecoes, ...posCall.lacunas], 5) : [];
   const combinadosPosCall = posCall ? unicos(posCall.proximosPassos, 4) : [];
-  const planoDiagnostico = diagnostico ? unicos(diagnostico.plano, 4) : [];
   const observacoes = [
     confirmacoes.length
       ? `Pontos confirmados na reunião:\n${confirmacoes.map((item) => `• ${item}`).join('\n')}`
@@ -192,9 +182,6 @@ export function montarDocumentoInicial(
       : null,
     combinadosPosCall.length
       ? `Próximos passos acordados na reunião:\n${combinadosPosCall.map((item) => `• ${item}`).join('\n')}`
-      : null,
-    planoDiagnostico.length
-      ? `Ações indicadas pelo diagnóstico para validação:\n${planoDiagnostico.map((item) => `• ${item}`).join('\n')}`
       : null,
   ]
     .filter(Boolean)

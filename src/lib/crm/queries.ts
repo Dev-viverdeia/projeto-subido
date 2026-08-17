@@ -48,7 +48,7 @@ export type OportunidadeCrm = {
 /**
  * Recorte leve para seletores que só precisam identificar a oportunidade.
  *
- * Calls, diagnósticos e propostas não precisam carregar eventos e análises de
+ * Calls e propostas não precisam carregar eventos e análises de
  * enriquecimento para abrir um formulário. Manter essa leitura separada evita
  * duas consultas e reduz o tempo até a primeira interação nessas rotas.
  */

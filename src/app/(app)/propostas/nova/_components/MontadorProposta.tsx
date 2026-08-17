@@ -31,7 +31,6 @@ export function MontadorProposta({
   oportunidadeInicial,
   origemInicial,
   reuniaoInicial,
-  diagnosticoInicial,
   contextoCall,
   erro,
 }: {
@@ -39,7 +38,6 @@ export function MontadorProposta({
   oportunidadeInicial: string;
   origemInicial: string;
   reuniaoInicial: string;
-  diagnosticoInicial: string;
   contextoCall?: ContextoCallNovaProposta | null;
   erro: boolean;
 }) {
@@ -70,7 +68,6 @@ export function MontadorProposta({
   return (
     <form action={criarProposta} className={styles.formulario}>
       <input type="hidden" name="reuniao" value={reuniaoInicial} />
-      <input type="hidden" name="diagnostico" value={diagnosticoInicial} />
 
       <ol className={styles.progresso} aria-label="Etapas para montar a proposta">
         {['Contexto comercial', 'Projeto-base'].map((rotulo, indice) => {
@@ -134,10 +131,9 @@ export function MontadorProposta({
                 ))}
               </select>
               <small>Empresa, contato, fatos e valor negociado entram no rascunho.</small>
-              {(reuniaoInicial || diagnosticoInicial) && (
+              {reuniaoInicial && (
                 <div className={styles.contextosConectados}>
-                  {reuniaoInicial && <span>Call conectada ao documento</span>}
-                  {diagnosticoInicial && <span>Diagnóstico conectado ao documento</span>}
+                  <span>Call conectada ao documento</span>
                 </div>
               )}
             </label>

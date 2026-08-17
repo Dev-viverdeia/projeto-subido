@@ -188,7 +188,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
       principal,
       acao(
         'Complete o contexto do lead',
-        'Enriqueça apenas os dados que ajudam a decidir abordagem, diagnóstico ou entrega.',
+        'Enriqueça apenas os dados que ajudam a decidir abordagem, conversa ou entrega.',
         'Dossiê do lead com fontes e lacunas explícitas.',
         '/crm',
       ),

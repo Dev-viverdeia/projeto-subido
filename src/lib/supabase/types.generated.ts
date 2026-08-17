@@ -1956,6 +1956,212 @@ export type Database = {
           },
         ]
       }
+      prospeccao_carteiras: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          dono: string
+          saldo: number
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          dono: string
+          saldo?: number
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          dono?: string
+          saldo?: number
+        }
+        Relationships: []
+      }
+      prospeccao_leads: {
+        Row: {
+          atualizado_em: string
+          avaliacao: number | null
+          categoria: string | null
+          chave_externa: string
+          cidade: string | null
+          criado_em: string
+          crm_oportunidade_id: string | null
+          dados: Json
+          descricao: string | null
+          dominio: string | null
+          dono: string
+          endereco: string | null
+          enviado_crm_em: string | null
+          estado: string | null
+          fontes: Json
+          id: string
+          lista_id: string
+          nome: string
+          site_url: string | null
+          telefone: string | null
+          total_avaliacoes: number | null
+        }
+        Insert: {
+          atualizado_em?: string
+          avaliacao?: number | null
+          categoria?: string | null
+          chave_externa: string
+          cidade?: string | null
+          criado_em?: string
+          crm_oportunidade_id?: string | null
+          dados?: Json
+          descricao?: string | null
+          dominio?: string | null
+          dono: string
+          endereco?: string | null
+          enviado_crm_em?: string | null
+          estado?: string | null
+          fontes?: Json
+          id?: string
+          lista_id: string
+          nome: string
+          site_url?: string | null
+          telefone?: string | null
+          total_avaliacoes?: number | null
+        }
+        Update: {
+          atualizado_em?: string
+          avaliacao?: number | null
+          categoria?: string | null
+          chave_externa?: string
+          cidade?: string | null
+          criado_em?: string
+          crm_oportunidade_id?: string | null
+          dados?: Json
+          descricao?: string | null
+          dominio?: string | null
+          dono?: string
+          endereco?: string | null
+          enviado_crm_em?: string | null
+          estado?: string | null
+          fontes?: Json
+          id?: string
+          lista_id?: string
+          nome?: string
+          site_url?: string | null
+          telefone?: string | null
+          total_avaliacoes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospeccao_leads_crm_fk"
+            columns: ["crm_oportunidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospeccao_leads_lista_fk"
+            columns: ["dono", "lista_id"]
+            isOneToOne: false
+            referencedRelation: "prospeccao_listas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
+      prospeccao_listas: {
+        Row: {
+          atualizado_em: string
+          concluido_em: string | null
+          creditos_consumidos: number
+          creditos_reservados: number
+          criado_em: string
+          dono: string
+          erro: string | null
+          filtros: Json
+          id: string
+          localizacao: string
+          nome: string
+          provedores: Json
+          quantidade_solicitada: number
+          segmento: string
+          status: string
+          termos: string[]
+        }
+        Insert: {
+          atualizado_em?: string
+          concluido_em?: string | null
+          creditos_consumidos?: number
+          creditos_reservados: number
+          criado_em?: string
+          dono: string
+          erro?: string | null
+          filtros?: Json
+          id?: string
+          localizacao: string
+          nome: string
+          provedores?: Json
+          quantidade_solicitada: number
+          segmento: string
+          status?: string
+          termos?: string[]
+        }
+        Update: {
+          atualizado_em?: string
+          concluido_em?: string | null
+          creditos_consumidos?: number
+          creditos_reservados?: number
+          criado_em?: string
+          dono?: string
+          erro?: string | null
+          filtros?: Json
+          id?: string
+          localizacao?: string
+          nome?: string
+          provedores?: Json
+          quantidade_solicitada?: number
+          segmento?: string
+          status?: string
+          termos?: string[]
+        }
+        Relationships: []
+      }
+      prospeccao_movimentos: {
+        Row: {
+          criado_em: string
+          descricao: string
+          dono: string
+          id: string
+          lista_id: string | null
+          movimento: number
+          saldo_apos: number
+          tipo: string
+        }
+        Insert: {
+          criado_em?: string
+          descricao: string
+          dono: string
+          id?: string
+          lista_id?: string | null
+          movimento: number
+          saldo_apos: number
+          tipo: string
+        }
+        Update: {
+          criado_em?: string
+          descricao?: string
+          dono?: string
+          id?: string
+          lista_id?: string | null
+          movimento?: number
+          saldo_apos?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospeccao_movimentos_lista_fk"
+            columns: ["dono", "lista_id"]
+            isOneToOne: false
+            referencedRelation: "prospeccao_listas"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       sobral_acoes_crm: {
         Row: {
           acao: string
@@ -2435,6 +2641,60 @@ export type Database = {
       proposta_portal_visualizar: {
         Args: { p_codigo: string }
         Returns: boolean
+      }
+      prospeccao_concluir_lista: {
+        Args: { p_leads: Json; p_lista: string; p_provedores?: Json }
+        Returns: number
+      }
+      prospeccao_criar_lista: {
+        Args: {
+          p_filtros?: Json
+          p_localizacao: string
+          p_nome: string
+          p_quantidade: number
+          p_segmento: string
+          p_termos: string[]
+        }
+        Returns: string
+      }
+      prospeccao_enviar_lead_crm: { Args: { p_lead: string }; Returns: string }
+      prospeccao_falhar_lista: {
+        Args: { p_erro: string; p_lista: string }
+        Returns: boolean
+      }
+      prospeccao_obter_saldo: { Args: never; Returns: number }
+      prospeccao_sistema_concluir_lista: {
+        Args: {
+          p_dono: string
+          p_leads: Json
+          p_lista: string
+          p_provedores?: Json
+        }
+        Returns: number
+      }
+      prospeccao_sistema_criar_lista: {
+        Args: {
+          p_dono: string
+          p_filtros?: Json
+          p_localizacao: string
+          p_nome: string
+          p_quantidade: number
+          p_segmento: string
+          p_termos: string[]
+        }
+        Returns: string
+      }
+      prospeccao_sistema_enviar_lead_crm: {
+        Args: { p_dono: string; p_lead: string }
+        Returns: string
+      }
+      prospeccao_sistema_falhar_lista: {
+        Args: { p_dono: string; p_erro: string; p_lista: string }
+        Returns: boolean
+      }
+      prospeccao_sistema_obter_saldo: {
+        Args: { p_dono: string }
+        Returns: number
       }
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }

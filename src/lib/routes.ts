@@ -8,10 +8,10 @@
 /** Rotas do grupo `(app)` — exigem sessão. Toda rota daqui É coberta pelo proxy. */
 export const ROTAS_APP = [
   '/inicio',
+  '/prospeccao',
   '/crm',
   '/propostas',
   '/calls',
-  '/diagnosticos',
   '/solucoes',
   '/formacoes',
   '/builder',
@@ -42,10 +42,10 @@ export type RotaApp = (typeof ROTAS_APP)[number];
  */
 export const ROTULOS: Record<RotaApp, string> = {
   '/inicio': 'Início',
+  '/prospeccao': 'Prospecção',
   '/crm': 'CRM',
   '/propostas': 'Propostas',
   '/calls': 'Calls',
-  '/diagnosticos': 'Diagnósticos',
   '/solucoes': 'Projetos',
   '/formacoes': 'Formações',
   '/builder': 'Estúdio',

@@ -28,7 +28,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       <header className={styles.hero} data-on-dark>
         <div className={styles.heroTexto}>
           <p className={styles.sobretitulo}>Propostas comerciais</p>
-          <h1>Do diagnóstico à decisão.</h1>
+          <h1>Da descoberta à decisão.</h1>
           <p>
             Transforme o contexto real do CRM e seus Projetos em um documento claro, pronto para
             apresentar.

@@ -56,7 +56,7 @@ export function FormularioPlanoCall({
           rows={3}
           maxLength={500}
           defaultValue={acaoInicial}
-          placeholder="Ex.: enviar diagnóstico revisado para o contato"
+          placeholder="Ex.: enviar o resumo revisado para o contato"
           aria-describedby="plano-call-ajuda"
           required
         />

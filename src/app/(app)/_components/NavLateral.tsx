@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
 
-const ORDEM_GRUPOS: ItemNav['grupo'][] = ['operacao', 'entrega', 'evolucao', 'gestao'];
+const ORDEM_GRUPOS: ItemNav['grupo'][] = ['aprendizado', 'operacao', 'gestao'];
 
 /**
  * Navegação — sidebar no desktop e dock com menu completo no mobile.
