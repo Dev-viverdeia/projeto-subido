@@ -296,22 +296,6 @@
   white-space: nowrap;
 }
 
-.iconeMais {
-  display: grid;
-  grid-template-columns: repeat(2, 4px);
-  grid-template-rows: repeat(2, 4px);
-  place-content: center;
-  gap: 3px;
-}
-
-.iconeMais i {
-  display: block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
 .fundoMenu {
   position: fixed;
   inset: 0;
@@ -499,26 +483,6 @@
 .fecharMenu:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
-}
-
-.fecharMenu::before,
-.fecharMenu::after {
-  content: '';
-  position: absolute;
-  top: 19px;
-  left: 12px;
-  width: 16px;
-  height: 1.5px;
-  border-radius: var(--app-radius-track);
-  background: currentColor;
-}
-
-.fecharMenu::before {
-  transform: rotate(45deg);
-}
-
-.fecharMenu::after {
-  transform: rotate(-45deg);
 }
 
 .conteudoMenu {

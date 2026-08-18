@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {
+  AudioLines,
   ArrowRight,
   BrainCircuit,
   CalendarDays,
@@ -136,7 +137,12 @@ export function PainelCalls({
             <div className={styles.proximaLinha}>
               <p>Sua próxima call</p>
               <span data-status={proxima.status}>
-                <i /> {ROTULO_STATUS_CALL[proxima.status]}
+                {proxima.status === 'ao_vivo' ? (
+                  <Radio size={13} strokeWidth={1.9} aria-hidden="true" />
+                ) : (
+                  <CalendarDays size={13} strokeWidth={1.9} aria-hidden="true" />
+                )}
+                {ROTULO_STATUS_CALL[proxima.status]}
               </span>
             </div>
             <h2 id="proxima-call-titulo">{proxima.titulo}</h2>
@@ -318,11 +324,7 @@ export function PainelCalls({
         <aside className={styles.liveCoach} aria-labelledby="live-coach-titulo">
           <div className={styles.coachCabecalho}>
             <span className={styles.coachSinal} aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-              <i />
+              <AudioLines size={30} strokeWidth={1.6} />
             </span>
             <span>
               {comCoach} {comCoach === 1 ? 'sala preparada' : 'salas preparadas'}

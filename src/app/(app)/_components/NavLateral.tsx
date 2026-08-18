@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Grid2X2, X } from 'lucide-react';
 import { Spinner } from '@/design-system/via';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
@@ -212,7 +213,7 @@ export function NavLateral({
                   aria-label="Fechar navegação"
                   onClick={() => fecharMenu(true)}
                 >
-                  <span aria-hidden="true" />
+                  <X size={18} strokeWidth={1.8} aria-hidden="true" />
                 </button>
               </header>
 
@@ -324,11 +325,8 @@ export function NavLateral({
               onClick={() => setMenuAberto((aberto) => !aberto)}
             >
               {maisAtivo && <span className={styles.marcaDock} />}
-              <span className={`${styles.icone} ${styles.iconeMais}`} aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
+              <span className={styles.icone} aria-hidden="true">
+                <Grid2X2 size={18} strokeWidth={1.8} />
               </span>
               <span className={styles.rotulo}>Mais</span>
             </button>

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { listarSolucoes } from '@/lib/conteudo/queries';
 import { listarProjetosExecucao } from '@/lib/projetos-execucao/queries';
-import { CabecalhoPagina } from '../_components/CabecalhoPagina';
 import entrada from '../_components/entrada.module.css';
 import { CatalogoProjetos } from './_components/CatalogoProjetos';
 import { ProjetosEmExecucao } from './_components/ProjetosEmExecucao';
@@ -17,8 +16,6 @@ export default async function SolucoesPage() {
 
   return (
     <div className={styles.pagina}>
-      <CabecalhoPagina titulo="Projetos" oculto />
-
       <ProjetosEmExecucao projetos={projetosEmExecucao} />
 
       <div className={entrada.bloco}>
