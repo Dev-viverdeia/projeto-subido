@@ -56,9 +56,9 @@ describe('galeria de certificados', () => {
   it('transforma o estado vazio em uma escolha concreta de primeiro caminho', () => {
     render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
 
-    expect(screen.getByText('Como a conquista acontece')).toBeInTheDocument();
+    expect(screen.getByText('Como receber um certificado')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Escolha a primeira prova que quer construir.' }),
+      screen.getByRole('heading', { name: 'Escolha uma formação ou projeto.' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Começar formação/ })).toHaveAttribute(
       'href',
@@ -82,7 +82,7 @@ describe('galeria de certificados', () => {
 
     const retomada = screen.getByRole('link', { name: /Formação de execução/ });
     expect(within(retomada).getByText('50%')).toBeInTheDocument();
-    expect(within(retomada).getByText('Continuar')).toBeInTheDocument();
+    expect(within(retomada).getByText('Continuar formação')).toBeInTheDocument();
     expect(screen.queryByText('Próximo passo')).not.toBeInTheDocument();
   });
 

@@ -125,7 +125,7 @@ export function DossiePosCall({
           <div className={styles.heroTitulo}>
             <div className={styles.sobretituloHero}>
               <IconeEstado tipo={estado.tipo} />
-              Pós-call inteligente · {estado.rotulo}
+              Resumo da call · {estado.rotulo}
             </div>
             <h1>{posCall.reuniao.titulo}</h1>
             <p>
@@ -141,11 +141,11 @@ export function DossiePosCall({
 
         <div className={styles.heroDecisao}>
           <div>
-            <small>Próximo passo sugerido</small>
-            <strong>{acaoSugerida || 'Definir o próximo passo com revisão humana'}</strong>
+            <small>Próxima ação sugerida</small>
+            <strong>{acaoSugerida || 'Defina a próxima ação antes de atualizar o CRM'}</strong>
           </div>
           <a href="#plano-da-call">
-            Revisar antes de aplicar <ChevronRight size={15} aria-hidden="true" />
+            Revisar e atualizar CRM <ChevronRight size={15} aria-hidden="true" />
           </a>
         </div>
 
@@ -170,7 +170,7 @@ export function DossiePosCall({
           <div className={styles.leituraTopo}>
             <div>
               <p className={styles.sobretitulo}>Resumo da call</p>
-              <h2 id="leitura-titulo">O que ficou claro nesta conversa</h2>
+              <h2 id="leitura-titulo">Resumo e pontos principais</h2>
             </div>
             {nota !== null && nota !== undefined && (
               <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
@@ -185,9 +185,7 @@ export function DossiePosCall({
             <div className={styles.estadoLeitura}>
               <CircleAlert size={19} aria-hidden="true" />
               <div>
-                <strong>
-                  A conversa foi preservada, mas a leitura automática não ficou pronta.
-                </strong>
+                <strong>A transcrição foi salva, mas a análise automática falhou.</strong>
                 <p>
                   {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
                 </p>
@@ -198,7 +196,7 @@ export function DossiePosCall({
               <CircleHelp size={19} aria-hidden="true" />
               <div>
                 <strong>A call terminou sem conversa suficiente para uma leitura.</strong>
-                <p>O histórico foi preservado sem inventar decisões, dores ou próximos passos.</p>
+                <p>A transcrição foi salva, mas não há conteúdo suficiente para resumir.</p>
               </div>
             </div>
           ) : estado.tipo === 'indisponivel' ? (
@@ -206,21 +204,21 @@ export function DossiePosCall({
               <CircleAlert size={19} aria-hidden="true" />
               <div>
                 <strong>Esta call foi cancelada antes de gerar conteúdo.</strong>
-                <p>O vínculo com o lead permanece no histórico, sem conclusões artificiais.</p>
+                <p>A call continua no histórico do lead.</p>
               </div>
             </div>
           ) : (
             <div className={styles.estadoLeitura}>
               <Radar size={19} aria-hidden="true" />
               <div>
-                <strong>A reunião ainda está sendo organizada.</strong>
-                <p>Assim que a análise terminar, decisões e próximos passos aparecerão aqui.</p>
+                <strong>A análise da reunião está em andamento.</strong>
+                <p>O resumo e as próximas ações aparecerão quando o processamento terminar.</p>
               </div>
             </div>
           )}
           <div className={styles.leituraRodape}>
             <span>Tom percebido: {sentimento}</span>
-            <small>Leitura assistida por IA · valide antes de agir</small>
+            <small>Análise feita por IA · revise antes de atualizar o CRM</small>
           </div>
         </div>
       </section>
@@ -234,7 +232,7 @@ export function DossiePosCall({
               <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
               <span>{pontosAbertos}</span>
             </div>
-            <p className={styles.sobretitulo}>Antes de prometer</p>
+            <p className={styles.sobretitulo}>Pontos pendentes</p>
             <h2 id="lacunas-titulo">O que ainda falta saber</h2>
             <ListaFactual
               itens={analise?.lacunas ?? []}
@@ -246,8 +244,8 @@ export function DossiePosCall({
           {analise?.sinaisCompra.length ? (
             <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
               <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
-              <p className={styles.sobretitulo}>Com evidência</p>
-              <h2 id="sinais-compra-titulo">Sinais de avanço</h2>
+              <p className={styles.sobretitulo}>O que o cliente demonstrou</p>
+              <h2 id="sinais-compra-titulo">Sinais de interesse</h2>
               <ListaFactual
                 itens={analise.sinaisCompra}
                 vazio="Nenhum sinal explícito foi encontrado."
@@ -263,8 +261,8 @@ export function DossiePosCall({
           <section className={styles.oportunidades} aria-labelledby="oportunidades-titulo">
             <header className={styles.secaoTopo}>
               <div>
-                <p>Hipóteses, não promessas</p>
-                <h2 id="oportunidades-titulo">Oportunidades de Projeto</h2>
+                <p>Possíveis projetos</p>
+                <h2 id="oportunidades-titulo">Onde a IA pode ajudar</h2>
               </div>
               <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
             </header>
@@ -280,15 +278,11 @@ export function DossiePosCall({
               </div>
             ) : (
               <p className={styles.vazioSecao}>
-                A conversa ainda não sustenta uma hipótese clara de Projeto. Isso é uma lacuna, não
-                um sinal negativo.
+                A conversa ainda não trouxe informações suficientes para recomendar um projeto.
               </p>
             )}
             <footer className={styles.oportunidadesRodape}>
-              <p>
-                Leve apenas hipóteses validadas para o escopo comercial. A continuidade desta call
-                está centralizada no plano acima.
-              </p>
+              <p>Confirme com o cliente antes de incluir qualquer uma destas ideias na proposta.</p>
             </footer>
           </section>
 
@@ -296,8 +290,8 @@ export function DossiePosCall({
             <details className={styles.coachRevisao}>
               <summary>
                 <div>
-                  <p>Aprendizado da condução</p>
-                  <h2>Rever momentos do Live Coach</h2>
+                  <p>Live Coach</p>
+                  <h2>Rever as sugestões da call</h2>
                 </div>
                 <span>
                   {posCall.coach.length} intervenções

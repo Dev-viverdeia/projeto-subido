@@ -236,7 +236,7 @@ export function CatalogoFormacoes({
             buscaLenta
               ? situacao === TODAS
                 ? 'Nenhuma formação combina com o termo. Tente outra palavra.'
-                : 'Nenhuma formação combina o termo com esse recorte. Afrouxe um dos dois.'
+                : 'Nenhuma formação combina com o termo e o filtro. Limpe um deles e tente novamente.'
               : situacao === 'andamento'
                 ? 'Assim que você concluir a primeira aula de uma trilha, ela aparece aqui.'
                 : situacao === 'concluidas'

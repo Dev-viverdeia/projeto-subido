@@ -109,11 +109,11 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
               <span className={styles.iconeVazio}>
                 <Radar size={22} strokeWidth={1.6} aria-hidden="true" />
               </span>
-              <p className={styles.sobretitulo}>Próximo passo</p>
-              <h2>Chegue na conversa sabendo onde olhar</h2>
+              <p className={styles.sobretitulo}>Pesquisa do lead</p>
+              <h2>Pesquise a empresa antes da call</h2>
               <p>
-                O dossiê lê o histórico do CRM, o site público e o contexto que você já possui. A
-                saída separa fatos, hipóteses e perguntas para a próxima call.
+                Informe o site e o que você já sabe. A pesquisa separa informações confirmadas,
+                pontos a verificar e perguntas para a próxima call.
               </p>
               <FormularioEnriquecimento
                 oportunidadeId={lead.oportunidade.id}
@@ -123,15 +123,15 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
               />
             </div>
 
-            <div className={styles.entregas} aria-label="O que o dossiê entrega">
+            <div className={styles.entregas} aria-label="O que a pesquisa entrega">
               <span>
-                <BadgeCheck size={17} aria-hidden="true" /> Fatos com origem visível
+                <BadgeCheck size={17} aria-hidden="true" /> Informações com fonte
               </span>
               <span>
-                <CircleHelp size={17} aria-hidden="true" /> Hipóteses com forma de validar
+                <CircleHelp size={17} aria-hidden="true" /> Pontos para confirmar
               </span>
               <span>
-                <Target size={17} aria-hidden="true" /> Oportunidades de projeto
+                <Target size={17} aria-hidden="true" /> Projetos que podem ajudar
               </span>
               <span>
                 <MessageSquareQuote size={17} aria-hidden="true" /> Perguntas de descoberta
@@ -145,7 +145,7 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
           <section className={styles.resumo} aria-labelledby="leitura-titulo">
             <div className={styles.resumoMarca}>
               <Layers3 size={18} strokeWidth={1.8} aria-hidden="true" />
-              Leitura do lead
+              Pesquisa do lead
             </div>
             <div>
               <h2 id="leitura-titulo">{dossie.resumo}</h2>
@@ -153,7 +153,7 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
                 Atualizado em{' '}
                 {dataCompleta(execucaoPronta.concluidoEm ?? execucaoPronta.solicitadoEm)}
                 {' · '}
-                {dossie.fatos.length} fatos e {dossie.hipoteses.length} hipóteses separados.
+                {dossie.fatos.length} informações e {dossie.hipoteses.length} pontos para confirmar.
               </p>
             </div>
           </section>
@@ -250,7 +250,7 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
 
             <aside className={styles.colunaLateral}>
               <section className={styles.proximaAcao} aria-labelledby="proxima-acao-titulo">
-                <p className={styles.sobretituloClaro}>Recomendação operacional</p>
+                <p className={styles.sobretituloClaro}>Recomendação para este lead</p>
                 <h2 id="proxima-acao-titulo">Próxima ação</h2>
                 <p className={styles.acaoTexto}>{dossie.proximaAcao.acao}</p>
                 <p className={styles.acaoPorque}>{dossie.proximaAcao.porque}</p>
@@ -263,11 +263,11 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
                   >
                     {lead.oportunidade.proximaAcao === dossie.proximaAcao.acao ? (
                       <>
-                        <Check size={15} aria-hidden="true" /> Ação no plano
+                        <Check size={15} aria-hidden="true" /> Ação salva no CRM
                       </>
                     ) : (
                       <>
-                        Adicionar ao plano <ArrowUpRight size={15} aria-hidden="true" />
+                        Salvar no CRM <ArrowUpRight size={15} aria-hidden="true" />
                       </>
                     )}
                   </button>
@@ -353,8 +353,8 @@ export default async function DossieLeadPage({ params, searchParams }: PageProps
 
           <section className={styles.rodapeDossie} aria-labelledby="fontes-titulo">
             <div>
-              <p className={styles.sobretitulo}>Rastreabilidade</p>
-              <h2 id="fontes-titulo">Fontes desta leitura</h2>
+              <p className={styles.sobretitulo}>Fontes consultadas</p>
+              <h2 id="fontes-titulo">De onde vieram as informações</h2>
             </div>
             <div className={styles.listaFontes}>
               {execucaoPronta.fontes.map((fonte, indice) => {

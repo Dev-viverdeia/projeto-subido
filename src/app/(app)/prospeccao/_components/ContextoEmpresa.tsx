@@ -9,7 +9,7 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
     <section className={styles.research} aria-labelledby="pesquisa-titulo">
       <div className={styles.sectionHeading}>
         <div>
-          <p className={styles.eyebrow}>Contexto público</p>
+          <p className={styles.eyebrow}>Pesquisa da empresa</p>
           <h3 id="pesquisa-titulo">Pesquise antes de abordar</h3>
           <span>Esses links ajudam a preparar a mensagem, mas não contam como contato.</span>
         </div>

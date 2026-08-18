@@ -79,8 +79,8 @@ export function BriefingKickoff({
             <BadgeCheck size={20} aria-hidden="true" />
           </span>
           <div>
-            <p>Acordo operacional</p>
-            <h2 id="briefing-titulo">O projeto começa com o combinado claro.</h2>
+            <p>Briefing aprovado</p>
+            <h2 id="briefing-titulo">O combinado do projeto</h2>
           </div>
           <span className={styles.estadoConfirmado}>
             <Check size={13} aria-hidden="true" /> Confirmado
@@ -129,10 +129,11 @@ export function BriefingKickoff({
             <ClipboardCheck size={20} aria-hidden="true" />
           </span>
           <div>
-            <p>Acordo operacional</p>
-            <h2 id="briefing-titulo">Confirme o que precisa estar claro antes de construir.</h2>
+            <p>Briefing do kickoff</p>
+            <h2 id="briefing-titulo">Revise o combinado antes de começar</h2>
             <span>
-              A proposta inicia o contexto. O kickoff completa os fatos e você aprova o combinado.
+              A proposta traz o escopo inicial. Complete os dados do kickoff e confirme com o
+              cliente.
             </span>
           </div>
         </div>
@@ -153,8 +154,8 @@ export function BriefingKickoff({
           <legend>
             <span>01</span>
             <div>
-              <strong>Direção do projeto</strong>
-              <small>O que muda e como todos reconhecerão que funcionou.</small>
+              <strong>Objetivo do projeto</strong>
+              <small>O que precisa mudar e como o resultado será avaliado.</small>
             </div>
           </legend>
           <label>
@@ -247,8 +248,8 @@ export function BriefingKickoff({
           <legend>
             <span>04</span>
             <div>
-              <strong>Saída do kickoff</strong>
-              <small>Os primeiros movimentos que colocam a entrega em andamento.</small>
+              <strong>Depois do kickoff</strong>
+              <small>As primeiras tarefas para começar a implementação.</small>
             </div>
           </legend>
           <label>
@@ -274,7 +275,10 @@ export function BriefingKickoff({
             <span>
               <Sparkles size={13} aria-hidden="true" /> {ROTULO_ORIGEM[origem]}
             </span>
-            <small>A confirmação libera o portal; qualquer edição pede nova confirmação.</small>
+            <small>
+              Ao confirmar, o portal do cliente será liberado. Se editar depois, será preciso
+              confirmar novamente.
+            </small>
           </div>
           <div>
             {confirmado && (

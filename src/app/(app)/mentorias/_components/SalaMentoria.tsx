@@ -71,7 +71,7 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
               <p className={styles.palcoNome}>{sessao.mentor.nome}</p>
               <p className={styles.palcoPapel}>mentora esta sessão</p>
               <p className={styles.palcoNota}>
-                A transmissão entra aqui — o vídeo é a próxima fase da sala.
+                A transmissão aparecerá aqui quando o vídeo da sala estiver disponível.
               </p>
             </div>
           ) : encerrada ? (
@@ -81,7 +81,7 @@ export function SalaMentoria({ sessao, agoraIso }: { sessao: SessaoMentoria; ago
               </p>
               <p className={styles.palcoData}>{dia.mono}</p>
               <p className={styles.palcoNota}>
-                Esta sala fica como registro da sessão — tema, horário e quem mentorou.
+                Esta página guarda o tema, o horário e o nome de quem conduziu a sessão.
               </p>
             </div>
           ) : (

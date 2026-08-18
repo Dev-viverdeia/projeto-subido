@@ -28,10 +28,10 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       <header className={styles.hero} data-on-dark>
         <div className={styles.heroTexto}>
           <p className={styles.sobretitulo}>Propostas comerciais</p>
-          <h1>Da descoberta à decisão.</h1>
+          <h1>Crie e acompanhe propostas.</h1>
           <p>
-            Transforme o contexto real do CRM e seus Projetos em um documento claro, pronto para
-            apresentar.
+            Use os dados do CRM e um projeto como base. Revise o texto antes de apresentar ao
+            cliente.
           </p>
         </div>
         <Link href="/propostas/nova" className={styles.nova}>
@@ -40,7 +40,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
         </Link>
 
         <div className={styles.linhaDecisao} aria-label="Fluxo da proposta">
-          <span>Contexto</span>
+          <span>Lead</span>
           <i />
           <span>Projeto</span>
           <i />
@@ -64,7 +64,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
         <article>
           <span>Aceitas</span>
           <strong>{aceitas}</strong>
-          <small>projetos conquistados</small>
+          <small>projetos fechados</small>
         </article>
         <article>
           <span>Valor em jogo</span>
@@ -77,8 +77,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
         <section className={styles.lista} aria-label="Suas propostas">
           <header className={styles.listaTopo}>
             <div>
-              <p className={styles.sobretitulo}>Biblioteca comercial</p>
-              <h2>Documentos recentes</h2>
+              <p className={styles.sobretitulo}>Suas propostas</p>
+              <h2>Propostas recentes</h2>
             </div>
             <span>
               {propostas.length} {propostas.length === 1 ? 'documento' : 'documentos'}
@@ -118,11 +118,11 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
           <span>
             <Layers3 size={22} strokeWidth={1.7} aria-hidden="true" />
           </span>
-          <p className={styles.sobretitulo}>Primeiro documento</p>
-          <h2>Seu trabalho já está no sistema. Falta apresentá-lo.</h2>
+          <p className={styles.sobretitulo}>Primeira proposta</p>
+          <h2>Crie uma proposta para uma oportunidade do CRM.</h2>
           <p>
-            Escolha um lead do CRM e um Projeto. A plataforma organiza o primeiro rascunho para você
-            revisar, salvar e baixar em PDF.
+            Escolha a oportunidade e o projeto. A plataforma prepara um rascunho para você revisar,
+            salvar e baixar em PDF.
           </p>
           <Link href="/propostas/nova" className={styles.nova}>
             Criar primeira proposta <ArrowUpRight size={16} aria-hidden="true" />

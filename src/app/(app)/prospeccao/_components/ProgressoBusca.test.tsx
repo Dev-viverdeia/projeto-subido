@@ -7,7 +7,7 @@ describe('progresso da busca de prospecção', () => {
     render(<ProgressoBusca quantidade={10} />);
 
     const estado = screen.getByRole('status');
-    expect(estado).toHaveTextContent('Localizando empresas');
+    expect(estado).toHaveTextContent('Buscando empresas');
     expect(estado).toHaveTextContent('10 empresas solicitadas');
     expect(estado).toHaveTextContent('Pode levar até 2 minutos');
     expect(estado).not.toHaveTextContent('%');

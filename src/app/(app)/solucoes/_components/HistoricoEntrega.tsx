@@ -55,7 +55,7 @@ export function HistoricoEntrega({
     <section className={styles.historico} aria-labelledby="historico-entrega-titulo">
       <header>
         <div>
-          <p>Rastro verificável</p>
+          <p>Atividades do projeto</p>
           <h3 id="historico-entrega-titulo">Histórico da entrega</h3>
         </div>
         <span>

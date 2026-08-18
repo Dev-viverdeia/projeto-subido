@@ -19,9 +19,9 @@ import styles from './page.module.css';
 export const metadata: Metadata = { title: 'Conta' };
 
 const CONTINUIDADE = [
-  'Projetos e etapas concluídas',
-  'Contexto de CRM, calls e propostas',
-  'Formações, conversas e certificados',
+  'Projetos e tarefas concluídas',
+  'Leads, calls e propostas',
+  'Formações, mentorias e certificados',
 ] as const;
 
 const ATALHOS = [
@@ -40,7 +40,7 @@ const ATALHOS = [
   {
     href: '/certificados',
     rotulo: 'Certificados',
-    detalhe: 'Consultar suas provas',
+    detalhe: 'Ver o que você concluiu',
     Icone: Award,
   },
 ] as const;
@@ -70,12 +70,11 @@ export default async function ContaPage() {
     <div className={styles.pagina}>
       <header className={styles.intro}>
         <div>
-          <p className={styles.sobretitulo}>Base do profissional</p>
-          <h1>Tudo o que você constrói, ligado à sua conta.</h1>
+          <p className={styles.sobretitulo}>Sua conta</p>
+          <h1>Dados da conta e atalhos</h1>
         </div>
         <p className={styles.resumo}>
-          Sua identidade conecta projetos, clientes, aprendizado e conquistas para você sempre
-          continuar do ponto certo.
+          Altere o nome exibido na plataforma e acesse seus projetos, formações e certificados.
         </p>
       </header>
 
@@ -96,7 +95,7 @@ export default async function ContaPage() {
         </div>
 
         <div className={styles.baseSalva}>
-          <p>O que fica com você</p>
+          <p>Dados salvos nesta conta</p>
           <ul>
             {CONTINUIDADE.map((item) => (
               <li key={item}>
@@ -130,8 +129,8 @@ export default async function ContaPage() {
               <UserRound size={18} strokeWidth={1.7} />
             </span>
             <div>
-              <p>Identidade</p>
-              <h2 id="identidade-profissional">Como a plataforma apresenta você</h2>
+              <p>Perfil</p>
+              <h2 id="identidade-profissional">Nome exibido na plataforma</h2>
             </div>
           </header>
 
@@ -167,7 +166,7 @@ export default async function ContaPage() {
               </span>
               <span>
                 <small>Senha</small>
-                <strong>Protegida pela sua conta</strong>
+                <strong>Senha cadastrada</strong>
               </span>
               <Link href="/nova-senha">Trocar senha</Link>
             </div>
@@ -175,7 +174,7 @@ export default async function ContaPage() {
 
           <p className={styles.notaSeguranca}>
             <ShieldCheck size={14} strokeWidth={1.8} aria-hidden="true" />
-            Alterações de acesso exigem confirmação para proteger seus projetos e clientes.
+            Para alterar e-mail ou senha, confirme sua identidade novamente.
           </p>
         </section>
       </div>

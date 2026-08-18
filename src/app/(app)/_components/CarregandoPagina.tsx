@@ -5,12 +5,9 @@ import { EstadoCarregamento } from './EstadoCarregamento';
 export function CarregandoPagina() {
   return (
     <div className={styles.pagina} role="status" aria-live="polite" aria-label="Carregando página">
-      <span className="sr-only">Preparando esta área da plataforma.</span>
+      <span className="sr-only">Carregando os dados desta página.</span>
 
-      <EstadoCarregamento
-        titulo="Preparando sua próxima tela"
-        descricao="Mantendo a navegação disponível enquanto os dados chegam."
-      />
+      <EstadoCarregamento titulo="Carregando a página" descricao="Buscando os dados necessários." />
 
       <header className={styles.cabecalho} aria-hidden="true">
         <div className={`${styles.esqueleto} ${styles.sobretitulo}`} />

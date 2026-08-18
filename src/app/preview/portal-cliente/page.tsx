@@ -26,7 +26,7 @@ function tarefa(
 
 const PROJETO: ProjetoPortalCliente = {
   id: '11111111-1111-4111-8111-111111111111',
-  titulo: 'Atendimento inteligente para clínicas',
+  titulo: 'Atendimento com IA para clínicas',
   empresa: 'Clínica Aurora',
   resumo: 'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp da clínica.',
   objetivo:

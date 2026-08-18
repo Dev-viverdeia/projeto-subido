@@ -27,7 +27,7 @@ describe('FormularioIdentidade', () => {
 
     expect(salvar).toBeEnabled();
     expect(descartar).toBeEnabled();
-    expect(screen.getByText('Sua alteração está pronta para salvar.')).toBeInTheDocument();
+    expect(screen.getByText('Salve para aplicar a alteração.')).toBeInTheDocument();
 
     await usuario.click(descartar);
     expect(campo).toHaveValue('QA Subido');

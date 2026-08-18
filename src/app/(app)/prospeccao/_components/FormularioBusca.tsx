@@ -23,10 +23,9 @@ export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: bool
         <div className={styles.formularioTopo}>
           <div>
             <p className={styles.sobretitulo}>Nova lista</p>
-            <h2>Defina o recorte da busca.</h2>
+            <h2>O que você quer buscar?</h2>
             <p>
-              Informe o tipo de empresa e a região. O restante da qualificação fica com a
-              plataforma.
+              Informe o tipo de empresa e onde ela deve estar. A busca procura os dados de contato.
             </p>
           </div>
           <Pill

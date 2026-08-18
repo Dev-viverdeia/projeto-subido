@@ -152,7 +152,7 @@ export function criarRecomendacaoFallback(contexto: ContextoRecomendacao): Recom
   }
 
   return {
-    acao: 'Revisar o dossiê e combinar o próximo compromisso com o cliente',
+    acao: 'Revisar o histórico e combinar o próximo compromisso com o cliente',
     motivo:
       'A ação anterior terminou e ainda não há outro compromisso registrado. O próximo passo deve fechar a principal lacuna do lead antes de produzir novo escopo.',
     fatos: resolverFatosUsados(

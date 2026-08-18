@@ -33,7 +33,7 @@ const OPCOES: OpcoesNovaProposta = {
   projetosEstudio: [
     {
       id: '33333333-3333-4333-8333-333333333333',
-      titulo: 'Atendimento inteligente para clínicas',
+      titulo: 'Atendimento com IA para clínicas',
       ideiaOriginal: 'Triagem e agendamento conectados ao WhatsApp.',
       status: 'pronta',
       criadoEm: AGORA,
@@ -100,7 +100,7 @@ export default function PreviewNovaPropostaPage() {
               decisoes: 2,
               compromissos: 1,
               pontosAValidar: 2,
-              oportunidadesProjeto: ['Atendimento inteligente no WhatsApp'],
+              oportunidadesProjeto: ['Atendimento com IA no WhatsApp'],
             }}
             erro={false}
           />

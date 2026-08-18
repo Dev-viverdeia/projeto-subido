@@ -8,7 +8,7 @@ test.describe('Estação de Prospecção', () => {
     await empresa.click();
     const dialogo = page.getByRole('dialog', { name: 'Clínica Aurora' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText('Como falar com esta empresa')).toBeVisible();
+    await expect(dialogo.getByText('Como entrar em contato')).toBeVisible();
     await expect(dialogo.getByRole('link', { name: /Abrir WhatsApp/ }).first()).toBeVisible();
     await expect(dialogo.getByRole('link', { name: /Escrever e-mail/ })).toBeVisible();
     await expect(dialogo.getByText('@clinicaaurora', { exact: true }).first()).toBeVisible();

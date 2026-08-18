@@ -11,9 +11,9 @@ export default function NaoEncontrado() {
   return (
     <EstadoSistema
       icone={<Compass size={30} strokeWidth={1.6} />}
-      etiqueta="Caminho não encontrado"
-      titulo="Esse conteúdo mudou de lugar."
-      descricao="O endereço pode ter mudado ou o conteúdo não está mais publicado. Seus projetos e sua jornada continuam disponíveis."
+      etiqueta="Página não encontrada"
+      titulo="Este conteúdo não está disponível."
+      descricao="O endereço pode estar incorreto ou o conteúdo pode ter sido removido."
       acoes={
         <>
           <Link href="/solucoes">Ver projetos</Link>
@@ -21,8 +21,8 @@ export default function NaoEncontrado() {
         </>
       }
       passos={[
-        { rotulo: 'Quer executar', valor: 'Abra a biblioteca de Projetos.' },
-        { rotulo: 'Quer se orientar', valor: 'Retome pelo Mapa da Jornada.' },
+        { rotulo: 'Projetos', valor: 'Abra a lista de projetos disponíveis.' },
+        { rotulo: 'Início', valor: 'Volte para ver sua próxima ação.' },
       ]}
     />
   );

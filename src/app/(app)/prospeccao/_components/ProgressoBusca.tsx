@@ -7,20 +7,20 @@ import styles from '../pagina.module.css';
 
 const ETAPAS = [
   {
-    titulo: 'Localizando empresas',
-    descricao: 'Cruzando o tipo de negócio com a cidade ou região escolhida.',
+    titulo: 'Buscando empresas',
+    descricao: 'Procurando o tipo de negócio na cidade ou região escolhida.',
   },
   {
-    titulo: 'Validando canais públicos',
-    descricao: 'Reunindo telefone, e-mail, site e presença nas redes sociais.',
+    titulo: 'Procurando contatos',
+    descricao: 'Buscando telefone, e-mail, site e redes sociais.',
   },
   {
     titulo: 'Buscando possíveis decisores',
-    descricao: 'Procurando lideranças associadas publicamente a cada empresa.',
+    descricao: 'Procurando pessoas com cargo de decisão ligadas à empresa.',
   },
   {
-    titulo: 'Organizando os dossiês',
-    descricao: 'Consolidando as evidências para você comparar os resultados.',
+    titulo: 'Organizando os resultados',
+    descricao: 'Removendo repetições e preparando a lista para consulta.',
   },
 ] as const;
 
@@ -48,7 +48,7 @@ export function ProgressoBusca({ quantidade }: { quantidade: number }) {
           <Spinner size="lg" tone="navy" />
         </span>
         <div>
-          <p>Lista em construção</p>
+          <p>Busca em andamento</p>
           <h3>{atual.titulo}</h3>
           <span>{atual.descricao}</span>
         </div>
@@ -73,8 +73,7 @@ export function ProgressoBusca({ quantidade }: { quantidade: number }) {
       </ol>
 
       <p className={styles.notaProcessamento}>
-        Você pode continuar nesta tela. A lista aparece automaticamente assim que a qualificação
-        terminar.
+        Pode deixar esta tela aberta. A lista aparecerá automaticamente quando a busca terminar.
       </p>
     </section>
   );

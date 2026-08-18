@@ -189,7 +189,7 @@ export function CartaoOportunidade({
             onTouchStart={impedirArraste}
             onKeyDown={impedirArraste}
           >
-            Abrir
+            Abrir oportunidade
             <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
           </Link>
           <MenuMovimentacao
@@ -246,7 +246,7 @@ export function CartaoEncerrado({
       <footer>
         <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
         <Link href={`/crm/${oportunidade.id}`}>
-          Abrir dossiê
+          Abrir oportunidade
           <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
         </Link>
       </footer>

@@ -122,19 +122,19 @@ const LEAD_OPERACIONAL: DossieLead = {
   ],
   projetoAtivo: {
     id: '66666666-6666-4666-8666-666666666666',
-    titulo: 'Atendimento inteligente para clínicas',
+    titulo: 'Atendimento com IA para clínicas',
     status: 'em_execucao',
     atualizadoEm: '2026-08-08T18:10:00.000Z',
   },
   projetoRecente: {
     id: '66666666-6666-4666-8666-666666666666',
-    titulo: 'Atendimento inteligente para clínicas',
+    titulo: 'Atendimento com IA para clínicas',
     status: 'em_execucao',
     atualizadoEm: '2026-08-08T18:10:00.000Z',
   },
   propostaRecente: {
     id: '77777777-7777-4777-8777-777777777777',
-    titulo: 'Atendimento inteligente para clínicas',
+    titulo: 'Atendimento com IA para clínicas',
     status: 'aceita',
     reuniaoId: '22222222-2222-4222-8222-222222222222',
   },

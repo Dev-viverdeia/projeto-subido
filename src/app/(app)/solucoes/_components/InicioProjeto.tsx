@@ -145,7 +145,7 @@ export function InicioProjeto({
           <div className={styles.conteudo}>
             <p>Primeiro passo executável</p>
             <strong>{primeiraTarefa || 'Revise o escopo do projeto'}</strong>
-            <small>Abra o método e registre a evidência conforme executar.</small>
+            <small>Abra o passo a passo e registre o resultado de cada tarefa.</small>
           </div>
           <button type="button" className={styles.acaoPrincipal} onClick={onComecar}>
             Começar agora <ArrowRight size={15} aria-hidden="true" />

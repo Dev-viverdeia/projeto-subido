@@ -73,7 +73,7 @@ const SINAIS = SinaisSobralSchema.parse({
       id: `projetos-${PROJETO}`,
       dominio: 'projetos',
       titulo: 'Validar base de conhecimento',
-      contexto: 'Atendimento inteligente · Clínica Aurora',
+      contexto: 'Atendimento com IA · Clínica Aurora',
       momento: '12 ago · 10:00',
       estado: 'agendado',
       destino: `/solucoes/execucao/${PROJETO}`,
@@ -83,7 +83,7 @@ const SINAIS = SinaisSobralSchema.parse({
   catalogo: [
     {
       slug: 'atendimento-inteligente',
-      titulo: 'Atendimento inteligente',
+      titulo: 'Atendimento com IA',
       categoria: 'Atendimento',
     },
     { slug: 'motor-de-leads', titulo: 'Motor de leads', categoria: 'Marketing' },

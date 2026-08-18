@@ -118,18 +118,18 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'aprender',
       numero: '01',
       titulo: 'Aprender',
-      resumo: 'Escolha o que dominar e vender',
+      resumo: 'Escolha o que aprender e vender',
       marco: 'Oferta inicial definida',
       contexto:
-        'A base não termina em conteúdo assistido. Ela termina quando você consegue nomear o cliente, o problema e a primeira entrega que vai vender.',
-      guia: 'Como transformar aprendizado em serviço',
+        'Escolha um mercado, um projeto e uma forma simples de explicar o serviço antes de começar a prospectar.',
+      guia: 'Como preparar sua primeira oferta',
       passos: [
         passo(
           'projeto-inicial',
           'Escolher o primeiro projeto',
-          'Selecione uma entrega padrão para estudar, explicar e implementar antes de ampliar o portfólio.',
+          'Escolha um projeto padrão para estudar, apresentar e implementar primeiro.',
           projetoEscolhido
-            ? `${sinais.perfil?.projetoInicialTitulo ?? 'Projeto inicial'} registrado como oferta.`
+            ? `${sinais.perfil?.projetoInicialTitulo ?? 'Projeto inicial'} escolhido como primeira oferta.`
             : 'Projeto inicial ainda não escolhido.',
           projetoEscolhido,
           '/inicio#configuracao-jornada',
@@ -138,9 +138,9 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'posicionamento',
           'Explicar o serviço em uma frase',
-          'Registre para quem é o projeto, qual problema ele resolve e qual mudança observável entrega.',
+          'Escreva para quem é o projeto, qual problema ele resolve e qual resultado o cliente espera.',
           posicionamentoDefinido
-            ? 'Frase de posicionamento registrada na jornada.'
+            ? 'Apresentação do serviço salva.'
             : 'Posicionamento ainda não registrado.',
           posicionamentoDefinido,
           '/inicio#configuracao-jornada',
@@ -149,7 +149,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'formacao-base',
           'Concluir uma formação essencial',
-          'Complete uma trilha de base para dominar linguagem, processo e critério antes de prometer uma entrega.',
+          'Conclua uma formação ligada ao projeto para entender as ferramentas e o processo de implementação.',
           sinais.aprendizado.formacoesConcluidas > 0
             ? `${quantidade(sinais.aprendizado.formacoesConcluidas, 'formação concluída', 'formações concluídas')} na conta.`
             : sinais.aprendizado.aulasConcluidas > 0
@@ -165,18 +165,18 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'prospectar',
       numero: '02',
       titulo: 'Prospectar',
-      resumo: 'Transforme uma empresa em conversa',
+      resumo: 'Encontre empresas e inicie conversas',
       marco: 'Descoberta registrada',
       contexto:
-        'Prospectar aqui não é acumular contatos. É criar uma oportunidade com contexto, assumir uma próxima ação e conduzir uma descoberta que vire registro.',
-      guia: 'Roteiro da primeira conversa comercial',
+        'Encontre empresas, faça a primeira abordagem e envie ao CRM quem responder ou demonstrar interesse.',
+      guia: 'Como fazer a primeira abordagem',
       passos: [
         passo(
           'primeiro-lead',
           'Criar a primeira oportunidade',
-          'Cadastre uma empresa e um contato reais no CRM para concentrar toda a próxima movimentação.',
+          'Cadastre no CRM uma empresa com quem você quer conversar.',
           sinais.oportunidades.total > 0
-            ? `${sinais.oportunidades.total} oportunidade(s) registrada(s) no CRM.`
+            ? `${quantidade(sinais.oportunidades.total, 'oportunidade registrada', 'oportunidades registradas')} no CRM.`
             : 'Nenhuma oportunidade registrada.',
           sinais.oportunidades.total > 0,
           '/crm',
@@ -184,21 +184,21 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         ),
         passo(
           'enriquecer-lead',
-          'Completar o contexto do lead',
-          'Enriqueça somente os dados que ajudam a decidir abordagem, conversa ou entrega e preserve a fonte de cada fato.',
+          'Pesquisar o lead',
+          'Busque site, informações da empresa e dados do contato antes da primeira conversa.',
           sinais.oportunidades.enriquecidas > 0
-            ? `${sinais.oportunidades.enriquecidas} oportunidade(s) enriquecida(s) com fonte registrada.`
+            ? `${quantidade(sinais.oportunidades.enriquecidas, 'oportunidade pesquisada', 'oportunidades pesquisadas')} com fontes salvas.`
             : 'Nenhum enriquecimento concluído.',
           sinais.oportunidades.enriquecidas > 0,
           '/crm',
-          'Enriquecer primeiro lead',
+          'Pesquisar primeiro lead',
         ),
         passo(
           'proxima-acao',
-          'Assumir uma próxima ação',
-          'Defina no CRM um verbo concreto e uma data. O lead não pode depender da memória.',
+          'Definir a próxima ação',
+          'Registre o que você vai fazer e a data do próximo contato.',
           sinais.oportunidades.comProximaAcao > 0
-            ? `${sinais.oportunidades.comProximaAcao} oportunidade(s) com próxima ação.`
+            ? `${quantidade(sinais.oportunidades.comProximaAcao, 'oportunidade com próxima ação', 'oportunidades com próxima ação')}.`
             : 'Nenhuma próxima ação registrada.',
           sinais.oportunidades.comProximaAcao > 0,
           '/crm',
@@ -207,9 +207,9 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'descoberta',
           'Concluir a descoberta',
-          'Use a call vinculada ao CRM para confirmar processo, impacto, restrições e decisão.',
+          'Use uma call ligada ao CRM para entender o processo atual, o impacto do problema e quem decide.',
           sinais.calls.descobertasConcluidas > 0
-            ? `${sinais.calls.descobertasConcluidas} call(s) de descoberta concluída(s).`
+            ? `${quantidade(sinais.calls.descobertasConcluidas, 'call de descoberta concluída', 'calls de descoberta concluídas')}.`
             : 'Nenhuma call de descoberta concluída.',
           sinais.calls.descobertasConcluidas > 0,
           '/calls',
@@ -221,18 +221,18 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'vender',
       numero: '03',
       titulo: 'Vender',
-      resumo: 'Converta fatos em uma decisão',
+      resumo: 'Apresente a proposta e registre a decisão',
       marco: 'Primeiro projeto vendido',
       contexto:
-        'A venda avança quando a descoberta sustenta um escopo, a proposta é apresentada e a decisão fica registrada. Documento criado sozinho não é venda.',
-      guia: 'Como conduzir proposta e decisão',
+        'Use o que foi confirmado na call para montar a proposta, apresentá-la e acompanhar a decisão do cliente.',
+      guia: 'Como apresentar e acompanhar uma proposta',
       passos: [
         passo(
           'proposta-criada',
           'Construir a proposta',
-          'Transforme fatos, fronteiras, entregáveis, prazo e investimento em uma proposta vinculada ao lead.',
+          'Use as informações do CRM para montar escopo, entregáveis, prazo e investimento.',
           sinais.propostas.total > 0
-            ? `${sinais.propostas.total} proposta(s) criada(s).`
+            ? `${quantidade(sinais.propostas.total, 'proposta criada', 'propostas criadas')}.`
             : 'Nenhuma proposta criada.',
           sinais.propostas.total > 0,
           '/propostas/nova',
@@ -241,9 +241,9 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'proposta-apresentada',
           'Apresentar a proposta',
-          'Conduza a decisão em conversa e registre a apresentação antes do acompanhamento.',
+          'Apresente a proposta em uma call e marque a data do follow-up.',
           sinais.propostas.apresentadas > 0
-            ? `${sinais.propostas.apresentadas} proposta(s) apresentada(s).`
+            ? `${quantidade(sinais.propostas.apresentadas, 'proposta apresentada', 'propostas apresentadas')}.`
             : 'Nenhuma proposta marcada como apresentada.',
           sinais.propostas.apresentadas > 0,
           '/propostas',
@@ -264,18 +264,18 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'entregar',
       numero: '04',
       titulo: 'Entregar',
-      resumo: 'Execute com acordo e evidência',
+      resumo: 'Implemente e valide com o cliente',
       marco: 'Primeira entrega encerrada',
       contexto:
-        'A entrega começa com um kickoff claro e termina com o aceite final do cliente. O projeto padrão ensina o método; o projeto vendido concentra tarefas, evidências e decisões reais.',
-      guia: 'Como conduzir uma implementação guiada',
+        'Comece pelo kickoff, acompanhe as tarefas e peça o aceite do cliente quando a entrega estiver pronta.',
+      guia: 'Como conduzir a implementação',
       passos: [
         passo(
           'kickoff',
           'Concluir o kickoff',
           'Confirme objetivo, responsáveis, acessos, fronteiras e critério de sucesso com o cliente.',
           sinais.calls.kickoffsConcluidos > 0 || entregaConcluida
-            ? `${sinais.calls.kickoffsConcluidos} kickoff(s) concluído(s).`
+            ? `${quantidade(sinais.calls.kickoffsConcluidos, 'kickoff concluído', 'kickoffs concluídos')}.`
             : 'Nenhum kickoff concluído.',
           sinais.calls.kickoffsConcluidos > 0 || entregaConcluida,
           '/calls',
@@ -284,7 +284,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'executar-projeto-cliente',
           'Executar o projeto vendido',
-          'Use o projeto do cliente para organizar tarefas, evidências, arquivos, decisões e validações sem separar o método da operação real.',
+          'Use o projeto do cliente para acompanhar tarefas, arquivos, decisões e testes.',
           sinais.entregas.projetosIniciados === 0
             ? 'Nenhum projeto de cliente foi iniciado.'
             : `${sinais.entregas.projetoEmFocoTitulo ?? 'Projeto em foco'} · ${sinais.entregas.tarefasConcluidas}/${sinais.entregas.tarefasTotal} tarefas concluídas.`,
@@ -295,7 +295,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'aceite-final',
           'Obter o aceite final do cliente',
-          'Publique as evidências no portal, registre ajustes solicitados e encerre somente depois da aprovação explícita da entrega final.',
+          'Compartilhe a entrega no portal, registre os ajustes pedidos e encerre depois da aprovação do cliente.',
           entregaConcluida
             ? `${quantidade(sinais.entregas.projetosConcluidos, 'projeto concluído com aceite', 'projetos concluídos com aceite')}.`
             : tarefasDaEntregaConcluidas
@@ -311,11 +311,11 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'evoluir',
       numero: '05',
       titulo: 'Evoluir',
-      resumo: 'Repita o método com mais precisão',
+      resumo: 'Use o que funcionou na próxima venda',
       marco: 'Segundo ciclo comprovado',
       contexto:
-        'Escala começa quando a primeira experiência vira repertório e o método consegue produzir uma segunda venda sem apagar as evidências da anterior.',
-      guia: 'Como transformar experiência em método',
+        'Depois da primeira entrega, registre o que funcionou e use esse aprendizado para vender e implementar o próximo projeto.',
+      guia: 'Como preparar o próximo projeto',
       passos: [
         passo(
           'segunda-venda',

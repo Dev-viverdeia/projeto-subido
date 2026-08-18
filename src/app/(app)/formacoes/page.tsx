@@ -17,8 +17,8 @@ export default async function FormacoesPage({ searchParams }: PageProps<'/formac
       <div className={entrada.bloco}>
         <EvolucaoProfissional
           etapa="formacoes"
-          titulo="Aprenda para entregar."
-          descricao="Formações aplicadas ao trabalho real: domine a ferramenta, leve o método para um projeto e avance com o progresso salvo na sua conta."
+          titulo="Aprenda o que precisa para implementar."
+          descricao="Escolha uma formação, assista às aulas e acompanhe o que já concluiu. O progresso fica salvo na sua conta."
         />
       </div>
 

@@ -66,9 +66,9 @@ export function CentralPlanoCall({
       aria-labelledby="plano-da-call-titulo"
     >
       <div className={styles.centralAcaoContexto}>
-        <p className={styles.sobretitulo}>Antes de atualizar o CRM</p>
-        <h2 id="plano-da-call-titulo">Revise o que muda a partir desta call</h2>
-        <p>O histórico já foi preservado. Agora você confirma somente as mudanças operacionais.</p>
+        <p className={styles.sobretitulo}>Atualizar o CRM</p>
+        <h2 id="plano-da-call-titulo">Revise o que será salvo</h2>
+        <p>A transcrição já foi salva. Confirme a próxima ação, a etapa e os compromissos.</p>
 
         <ol className={styles.fluxoSincronizacao}>
           <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
@@ -102,13 +102,11 @@ export function CentralPlanoCall({
               <ListChecks size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>
-                {planoAplicado ? 'Compromissos sincronizados' : 'Compromissos da call'}
-              </strong>
+              <strong>{planoAplicado ? 'Compromissos salvos' : 'Compromissos da call'}</strong>
               <small>
                 {planoAplicado
-                  ? 'Ações já criadas para acompanhamento'
-                  : `${compromissos.length} para revisar antes de criar ações`}
+                  ? 'Ações já criadas no CRM'
+                  : `${compromissos.length} para revisar antes de salvar`}
               </small>
             </div>
           </li>

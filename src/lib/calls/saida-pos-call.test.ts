@@ -114,7 +114,7 @@ describe('montarSaidaPosCall', () => {
 
     expect(montarSaidaPosCall(posCall)).toMatchObject({
       tipo: 'crm',
-      acao: 'Abrir dossiê',
+      acao: 'Abrir oportunidade',
       href: '/crm/oportunidade-1',
     });
   });

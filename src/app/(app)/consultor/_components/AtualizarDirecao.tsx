@@ -38,12 +38,12 @@ export function AtualizarDirecao({
   }
 
   const rotulo = carregando
-    ? 'Lendo sua operação…'
+    ? 'Atualizando plano…'
     : desatualizado
-      ? 'Recalcular direção'
+      ? 'Atualizar plano'
       : geradoPorIA
-        ? 'Atualizar direção'
-        : 'Fazer leitura com IA';
+        ? 'Atualizar plano'
+        : 'Criar plano com IA';
 
   return (
     <div className={styles.bloco}>

@@ -39,8 +39,8 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       {parametros.busca === 'concluida' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={17} aria-hidden="true" />
-          Lista pronta. Escolha um canal, registre a conversa e leve ao CRM só o que virou
-          oportunidade.
+          Lista pronta. Abra um canal de contato e marque quando a empresa responder. Envie ao CRM
+          somente quem demonstrar interesse.
         </div>
       )}
       {parametros.busca === 'falhou' && (
@@ -135,11 +135,11 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
           ) : (
             <div className={styles.primeiraBusca}>
               <DatabaseZap size={28} strokeWidth={1.5} aria-hidden="true" />
-              <p className={styles.sobretitulo}>Da busca ao pipeline</p>
-              <h2>Comece com uma busca simples.</h2>
+              <p className={styles.sobretitulo}>Primeira busca</p>
+              <h2>Encontre as primeiras empresas.</h2>
               <p>
-                Diga o tipo de empresa e a região. A plataforma encontra os canais para você começar
-                a abordagem antes de abrir uma oportunidade no CRM.
+                Informe o tipo de empresa e a região. Depois, use os contatos encontrados para
+                abordar e envie ao CRM somente quem respondeu.
               </p>
               <ol>
                 <li>
@@ -149,10 +149,10 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                   <span>02</span> Escolha um canal de contato
                 </li>
                 <li>
-                  <span>03</span> Registre quem respondeu
+                  <span>03</span> Marque quem respondeu
                 </li>
                 <li>
-                  <span>04</span> Transforme a conversa em oportunidade
+                  <span>04</span> Envie a oportunidade ao CRM
                 </li>
               </ol>
             </div>

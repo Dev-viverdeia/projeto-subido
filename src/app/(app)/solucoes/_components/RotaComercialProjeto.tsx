@@ -58,8 +58,8 @@ export function RotaComercialProjeto({
     <section className={styles.rotaProjeto} aria-labelledby="rota-projeto-titulo">
       <header>
         <span>Leve ao cliente</span>
-        <h2 id="rota-projeto-titulo">Coloque este projeto em campo.</h2>
-        <p>Escolha uma oportunidade. A plataforma mantém CRM, proposta e entrega conectados.</p>
+        <h2 id="rota-projeto-titulo">Venda este projeto a um cliente.</h2>
+        <p>Escolha uma oportunidade para criar a proposta e acompanhar a entrega.</p>
       </header>
 
       <ol className={styles.rotaEtapas} aria-label="Fluxo comercial deste Projeto">

@@ -216,14 +216,12 @@ describe('Projeto guiado', () => {
     ).toBeDefined();
     expect(screen.getByText('2 a 4 semanas')).toBeDefined();
     expect(screen.getByText('Expansão para todos os canais')).toBeDefined();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'O kit que comprova a entrega' }),
-    ).toBeDefined();
+    expect(screen.getByRole('heading', { level: 3, name: 'Arquivos da entrega' })).toBeDefined();
     expect(screen.getByText('Suíte de testes')).toBeDefined();
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Aprenda o necessário. Depois, execute.' }),
+      screen.getByRole('heading', { level: 2, name: 'Aprenda como este projeto funciona' }),
     ).toBeDefined();
-    expect(screen.getByText('Só o que muda a sua execução')).toBeDefined();
+    expect(screen.getByText(/Uma preparação curta para você entender a lógica/)).toBeDefined();
     expect(screen.getByRole('heading', { level: 3, name: 'Do contato ao CRM' })).toBeDefined();
     expect(screen.getByRole('button', { name: 'Copiar Briefing de atendimento' })).toBeDefined();
     expect(
@@ -279,7 +277,7 @@ describe('Projeto guiado', () => {
       '/propostas/nova?oportunidade=11111111-1111-4111-8111-111111111111&projeto=crm-comercial',
     );
     expect(
-      screen.getByText(/A plataforma mantém CRM, proposta e entrega conectados/),
+      screen.getByText(/Escolha uma oportunidade para criar a proposta e acompanhar a entrega/),
     ).toBeVisible();
   });
 

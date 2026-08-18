@@ -52,7 +52,7 @@ export function FormularioEnriquecimento({
     const linkedin = texto('linkedin');
     const contexto = texto('contexto');
     if (!dominio && !contexto) {
-      setErro('Informe o site da empresa ou escreva o contexto que você já conhece.');
+      setErro('Informe o site da empresa ou escreva o que você já sabe sobre ela.');
       return;
     }
 
@@ -83,7 +83,7 @@ export function FormularioEnriquecimento({
         aria-haspopup="dialog"
       >
         <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
-        {rotulo ?? (temDossie ? 'Atualizar dossiê' : 'Enriquecer lead')}
+        {rotulo ?? (temDossie ? 'Atualizar pesquisa' : 'Pesquisar lead')}
       </button>
 
       {aberto && (
@@ -119,9 +119,12 @@ export function FormularioEnriquecimento({
           >
             <header className={styles.topo}>
               <div>
-                <p className={styles.sobretitulo}>Pesquisa assistida</p>
-                <h2 id="enriquecimento-titulo">Montar dossiê do lead</h2>
-                <p>A IA cruza as fontes sem transformar hipótese em fato.</p>
+                <p className={styles.sobretitulo}>Pesquisa do lead</p>
+                <h2 id="enriquecimento-titulo">Buscar informações sobre a empresa</h2>
+                <p>
+                  A pesquisa usa o CRM e fontes públicas. O resultado mostra o que foi confirmado e
+                  o que ainda precisa ser verificado.
+                </p>
               </div>
               <button type="button" className={styles.fechar} onClick={fechar} aria-label="Fechar">
                 <X size={19} strokeWidth={1.8} aria-hidden="true" />
@@ -136,7 +139,7 @@ export function FormularioEnriquecimento({
                 <Globe2 size={15} aria-hidden="true" /> Site público
               </span>
               <span>
-                <Building2 size={15} aria-hidden="true" /> Seu contexto
+                <Building2 size={15} aria-hidden="true" /> Suas informações
               </span>
             </div>
 
@@ -177,9 +180,7 @@ export function FormularioEnriquecimento({
                   maxLength={4000}
                   placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
                 />
-                <small>
-                  Opcional, mas melhora muito as hipóteses e as perguntas de descoberta.
-                </small>
+                <small>Este campo é opcional e ajuda a preparar perguntas mais específicas.</small>
               </label>
 
               <div className={styles.acoes}>
@@ -187,7 +188,7 @@ export function FormularioEnriquecimento({
                   Cancelar
                 </Button>
                 <Button type="submit" variant="primary" loading={enviando}>
-                  Analisar fontes
+                  Pesquisar lead
                 </Button>
               </div>
             </form>

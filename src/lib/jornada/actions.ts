@@ -49,7 +49,7 @@ export async function salvarPerfilJornada(
     console.error(
       `[jornada:preparar] ${projeto.error?.code ?? existente.error?.code ?? 'sem-codigo'}`,
     );
-    return { erro: 'Não foi possível preparar sua jornada agora. Tente novamente.' };
+    return { erro: 'Não conseguimos carregar os projetos agora. Tente novamente.' };
   }
   if (!projeto.data) return { porCampo: { projetoInicialId: 'Escolha um projeto disponível.' } };
 
@@ -64,7 +64,7 @@ export async function salvarPerfilJornada(
 
   if (gravacao.error) {
     console.error(`[jornada:salvar] ${gravacao.error.code}: ${gravacao.error.message}`);
-    return { erro: 'Não foi possível salvar sua direção. Tente novamente em instantes.' };
+    return { erro: 'Não conseguimos salvar essas informações. Tente novamente em instantes.' };
   }
 
   revalidatePath('/inicio');

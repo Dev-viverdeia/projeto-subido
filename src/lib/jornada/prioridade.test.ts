@@ -85,7 +85,7 @@ describe('prioridade oficial da Início', () => {
       ]),
     );
 
-    expect(prioridade.titulo).toBe('Completar o contexto do lead');
+    expect(prioridade.titulo).toBe('Pesquisar o lead');
     expect(prioridade.destino).toBe('/crm/oportunidade-1');
   });
 

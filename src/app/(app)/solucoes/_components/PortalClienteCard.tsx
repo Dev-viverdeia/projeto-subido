@@ -76,7 +76,7 @@ export function PortalClienteCard({
               {copiado ? 'Link copiado' : 'Copiar link'}
             </button>
             <Link href={caminho} target="_blank" rel="noreferrer">
-              <ExternalLink size={15} aria-hidden="true" /> Abrir
+              <ExternalLink size={15} aria-hidden="true" /> Abrir portal
             </Link>
           </div>
 

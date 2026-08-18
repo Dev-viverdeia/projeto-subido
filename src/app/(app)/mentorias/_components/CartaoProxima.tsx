@@ -168,7 +168,7 @@ export function CartaoProxima({
               texto que explica. */}
             {estado === 'lotada' && (
               <span className={styles.impedido}>
-                Sessão lotada — {sessao.inscritos} de {sessao.vagas} vagas
+                Sessão lotada: {sessao.inscritos} de {sessao.vagas} vagas
               </span>
             )}
 

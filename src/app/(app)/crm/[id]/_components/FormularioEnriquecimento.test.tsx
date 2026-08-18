@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
@@ -14,7 +14,7 @@ vi.mock('@/lib/crm/invocar-enriquecimento', () => ({
 }));
 
 describe('FormularioEnriquecimento', () => {
-  it('exige uma fonte, envia o site e atualiza o dossiê', async () => {
+  it('exige uma fonte, envia o site e atualiza a pesquisa', async () => {
     vi.mocked(iniciarEnriquecimento).mockResolvedValue({
       dados: { id: '11111111-1111-4111-8111-111111111111', status: 'na_fila' },
       falha: null,
@@ -29,11 +29,13 @@ describe('FormularioEnriquecimento', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer lead' }));
-    const enviar = screen.getByRole('button', { name: 'Analisar fontes' });
+    fireEvent.click(screen.getByRole('button', { name: 'Pesquisar lead' }));
+    const enviar = within(screen.getByRole('dialog')).getByRole('button', {
+      name: 'Pesquisar lead',
+    });
     fireEvent.click(enviar);
     expect(
-      screen.getByText('Informe o site da empresa ou escreva o contexto que você já conhece.'),
+      screen.getByText('Informe o site da empresa ou escreva o que você já sabe sobre ela.'),
     ).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Site da empresa'), {

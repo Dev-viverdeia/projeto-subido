@@ -12,7 +12,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   id: '11111111-1111-4111-8111-111111111111',
   propostaId: '22222222-2222-4222-8222-222222222222',
   oportunidadeId: '33333333-3333-4333-8333-333333333333',
-  titulo: 'Atendimento inteligente para clínicas',
+  titulo: 'Atendimento com IA para clínicas',
   empresa: 'Clínica Aurora',
   status: 'concluido',
   inicioEm: '2026-08-05T12:00:00.000Z',
@@ -117,7 +117,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
       email: 'camila@clinicaaurora.com.br',
     },
     projeto: {
-      titulo: 'Atendimento inteligente para clínicas',
+      titulo: 'Atendimento com IA para clínicas',
       resumo:
         'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp da clínica.',
       origem: 'catalogo',

@@ -141,13 +141,13 @@ export function GaleriaCertificados({
         <div className={`${styles.vazio} via-mesh-navy via-noise`}>
           <div className={styles.vazioConteudo}>
             <p className={styles.vazioEyebrow}>
-              Nenhuma conquista registrada · {conteudos.length}{' '}
-              {conteudos.length === 1 ? 'caminho disponível' : 'caminhos disponíveis'}
+              Nenhum certificado ainda · {conteudos.length}{' '}
+              {conteudos.length === 1 ? 'conteúdo disponível' : 'conteúdos disponíveis'}
             </p>
-            <p className={styles.vazioTitulo}>Seu portfólio comprovado começa na conclusão.</p>
+            <p className={styles.vazioTitulo}>Você ainda não concluiu uma formação ou projeto.</p>
             <p className={styles.vazioTexto}>
               Termine todas as aulas de uma formação ou todas as etapas de um projeto. O certificado
-              entra aqui automaticamente com os fatos da sua conta.
+              aparecerá aqui automaticamente.
             </p>
             <div className={styles.vazioAcoes}>
               <Link href="/formacoes" className={styles.vazioCta}>
@@ -160,7 +160,7 @@ export function GaleriaCertificados({
           </div>
 
           <div className={styles.vazioRegistro}>
-            <p className={styles.vazioRegistroTitulo}>Como a conquista acontece</p>
+            <p className={styles.vazioRegistroTitulo}>Como receber um certificado</p>
             <ol className={styles.vazioDados}>
               <li>
                 <span>01</span>
@@ -168,11 +168,11 @@ export function GaleriaCertificados({
               </li>
               <li>
                 <span>02</span>
-                <p>Registrar a data da última etapa</p>
+                <p>A plataforma registra a conclusão</p>
               </li>
               <li>
                 <span>03</span>
-                <p>Imprimir ou salvar a prova em PDF</p>
+                <p>Imprimir ou salvar o certificado em PDF</p>
               </li>
             </ol>
           </div>
@@ -181,11 +181,10 @@ export function GaleriaCertificados({
         {recomendacoes.length > 0 && (
           <section className={styles.primeiroPasso} aria-labelledby="certificados-primeiro-passo">
             <div className={styles.primeiroPassoCabecalho}>
-              <p className={styles.primeiroPassoEyebrow}>Próximo passo</p>
-              <h2 id="certificados-primeiro-passo">Escolha a primeira prova que quer construir.</h2>
+              <p className={styles.primeiroPassoEyebrow}>Por onde começar</p>
+              <h2 id="certificados-primeiro-passo">Escolha uma formação ou projeto.</h2>
               <p>
-                A formação cria repertório aplicado. O projeto transforma esse repertório em uma
-                entrega para o cliente.
+                A formação ensina as ferramentas. O projeto mostra como implementar para um cliente.
               </p>
             </div>
 
@@ -303,7 +302,7 @@ export function GaleriaCertificados({
                       </span>
                       <span className={styles.linhaPct}>{pct}%</span>
                       <span className={styles.linhaAcao} aria-hidden="true">
-                        Continuar
+                        {c.origem === 'formacao' ? 'Continuar formação' : 'Continuar projeto'}
                       </span>
                     </div>
                   </Link>
@@ -319,9 +318,9 @@ export function GaleriaCertificados({
       {porComecar.length > 0 && (
         <p className={styles.rodape}>
           {porComecar.length === 1
-            ? 'Mais 1 conteúdo ainda sem progresso'
-            : `Mais ${porComecar.length} conteúdos ainda sem progresso`}{' '}
-          — comece por <Link href="/formacoes">Formações</Link> ou{' '}
+            ? 'Mais 1 conteúdo ainda sem progresso.'
+            : `Mais ${porComecar.length} conteúdos ainda sem progresso.`}{' '}
+          Comece por <Link href="/formacoes">Formações</Link> ou{' '}
           <Link href="/solucoes">Projetos</Link>.
         </p>
       )}

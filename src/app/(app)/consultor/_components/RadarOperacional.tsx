@@ -38,12 +38,12 @@ export function RadarOperacional({ itens }: { itens: ItemRadarSobral[] }) {
     <section className={styles.radar} aria-labelledby="radar-operacional-titulo">
       <header className={styles.radarCabecalho}>
         <div>
-          <p className={styles.eyebrow}>Radar operacional</p>
-          <h2 id="radar-operacional-titulo">O que já está pedindo uma decisão.</h2>
+          <p className={styles.eyebrow}>Pendências</p>
+          <h2 id="radar-operacional-titulo">Itens que precisam de atenção</h2>
         </div>
         <p>
-          Registros reais, em ordem de urgência. Abra o item, resolva a evidência e volte para a
-          próxima frente.
+          A lista reúne prazos, calls, propostas e projetos. Os itens mais urgentes aparecem
+          primeiro.
         </p>
       </header>
 
@@ -87,7 +87,8 @@ export function RadarOperacional({ itens }: { itens: ItemRadarSobral[] }) {
           <div>
             <h3>Nenhum compromisso aberto</h3>
             <p>
-              O radar começa a trabalhar quando CRM, calls, propostas ou projetos têm movimento.
+              As pendências aparecerão quando houver atividades no CRM, em calls, propostas ou
+              projetos.
             </p>
           </div>
           <Link href="/crm">Abrir CRM</Link>

@@ -70,7 +70,7 @@ export function MontadorProposta({
       <input type="hidden" name="reuniao" value={reuniaoInicial} />
 
       <ol className={styles.progresso} aria-label="Etapas para montar a proposta">
-        {['Contexto comercial', 'Projeto-base'].map((rotulo, indice) => {
+        {['Cliente', 'Projeto'].map((rotulo, indice) => {
           const numero = indice + 1;
           const concluido = numero < passo;
           const ativo = numero === passo;
@@ -104,7 +104,7 @@ export function MontadorProposta({
               <ContactRound size={19} strokeWidth={1.7} aria-hidden="true" />
             </span>
             <div>
-              <p>Contexto comercial</p>
+              <p>Cliente</p>
               <h2 id="proposta-contexto">Para quem é a proposta?</h2>
             </div>
           </div>
@@ -130,7 +130,7 @@ export function MontadorProposta({
                   </option>
                 ))}
               </select>
-              <small>Empresa, contato, fatos e valor negociado entram no rascunho.</small>
+              <small>Empresa, contato, anotações e valor negociado entram no rascunho.</small>
               {reuniaoInicial && (
                 <div className={styles.contextosConectados}>
                   <span>Call conectada ao documento</span>
@@ -152,13 +152,13 @@ export function MontadorProposta({
         </span>
         <div className={styles.etapaCorpo}>
           {leadEscolhido && contextoCallAtivo ? (
-            <article className={styles.contextoCall} aria-label="Contexto aproveitado da call">
+            <article className={styles.contextoCall} aria-label="Dados aproveitados da call">
               <header>
                 <span className={styles.iconeContexto}>
                   <Video size={18} strokeWidth={1.7} aria-hidden="true" />
                 </span>
                 <div>
-                  <p>Contexto pronto</p>
+                  <p>Dados da call</p>
                   <strong>{leadEscolhido.empresa}</strong>
                   <small>{contextoCallAtivo.titulo}</small>
                 </div>
@@ -188,7 +188,7 @@ export function MontadorProposta({
             </article>
           ) : leadEscolhido ? (
             <div className={styles.contextoEscolhido}>
-              <span>Contexto selecionado</span>
+              <span>Cliente selecionado</span>
               <strong>{leadEscolhido.empresa}</strong>
               <small>{leadEscolhido.titulo}</small>
             </div>
@@ -199,8 +199,8 @@ export function MontadorProposta({
               <BriefcaseBusiness size={19} strokeWidth={1.7} aria-hidden="true" />
             </span>
             <div>
-              <p>Estrutura de entrega</p>
-              <h2 id="proposta-projeto">Qual Projeto será apresentado?</h2>
+              <p>Projeto</p>
+              <h2 id="proposta-projeto">Qual projeto você vai apresentar?</h2>
             </div>
           </div>
 
@@ -213,7 +213,7 @@ export function MontadorProposta({
               required
             >
               <option value="" disabled>
-                Escolha o ponto de partida
+                Escolha um projeto
               </option>
               {opcoes.projetos.length > 0 && (
                 <optgroup label="Projetos da plataforma">
@@ -237,7 +237,7 @@ export function MontadorProposta({
             </select>
             {projetoSugerido && !origem ? (
               <small className={styles.recomendacao}>
-                <Check size={13} strokeWidth={2.2} aria-hidden="true" /> Recomendado pelo contexto
+                <Check size={13} strokeWidth={2.2} aria-hidden="true" /> Recomendado pelos dados
                 {contextoCallAtivo ? ' da call' : ' do lead'}. Você pode trocar antes de criar.
               </small>
             ) : (
@@ -260,9 +260,7 @@ export function MontadorProposta({
         <div>
           <span>Decisão {passo} de 2</span>
           <strong>
-            {passo === 1
-              ? 'Escolha o contexto que alimentará a proposta'
-              : 'O próximo passo é revisar o rascunho'}
+            {passo === 1 ? 'Escolha a oportunidade do CRM' : 'Depois de criar, revise o rascunho'}
           </strong>
         </div>
         <div className={styles.rodapeAcoes}>
@@ -278,11 +276,11 @@ export function MontadorProposta({
               disabled={!oportunidade}
               onClick={() => setPasso(2)}
             >
-              Continuar <ArrowRight size={17} aria-hidden="true" />
+              Escolher projeto <ArrowRight size={17} aria-hidden="true" />
             </button>
           ) : (
             <button type="submit" className={styles.continuar} disabled={!origemSelecionada}>
-              Criar rascunho para revisar <ArrowRight size={17} aria-hidden="true" />
+              Criar rascunho <ArrowRight size={17} aria-hidden="true" />
             </button>
           )}
         </div>

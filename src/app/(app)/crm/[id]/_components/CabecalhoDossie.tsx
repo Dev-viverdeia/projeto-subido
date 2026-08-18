@@ -27,7 +27,7 @@ export function CabecalhoDossie({
       <div className={styles.heroTopo}>
         <div className={styles.identidade}>
           <p className={styles.sobretitulo}>
-            {modoEntrada ? 'Nova oportunidade' : 'Dossiê comercial'}
+            {modoEntrada ? 'Nova oportunidade' : 'Oportunidade no CRM'}
           </p>
           <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
           <p>{lead.oportunidade.titulo}</p>
@@ -48,7 +48,7 @@ export function CabecalhoDossie({
         )}
       </div>
 
-      <div className={styles.heroMeta} aria-label="Contexto principal do lead">
+      <div className={styles.heroMeta} aria-label="Dados principais do lead">
         <span className={styles.etapa}>
           <small>Etapa</small>
           <strong>{faseComercial}</strong>
@@ -69,7 +69,7 @@ export function CabecalhoDossie({
       </div>
 
       {!modoEntrada && !cicloEntregue && (
-        <div className={styles.sinais} aria-label="Sinais que alimentam o dossiê">
+        <div className={styles.sinais} aria-label="Fontes usadas na pesquisa do lead">
           <div className={styles.fonteSinal}>
             <Database size={17} strokeWidth={1.7} aria-hidden="true" />
             <span>CRM</span>
@@ -82,12 +82,12 @@ export function CabecalhoDossie({
           </div>
           <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
             <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>Leitura IA</span>
+            <span>Pesquisa com IA</span>
             <strong>
               {enriquecimentoEmAndamento
                 ? 'analisando'
                 : temDossie
-                  ? 'dossiê pronto'
+                  ? 'pesquisa concluída'
                   : 'não iniciada'}
             </strong>
           </div>

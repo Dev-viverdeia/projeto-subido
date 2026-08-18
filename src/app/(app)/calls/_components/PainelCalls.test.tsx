@@ -62,7 +62,7 @@ describe('PainelCalls', () => {
     expect(within(agenda).getByText('Proposta Horizonte')).toBeInTheDocument();
     expect(within(agenda).queryByText('Descoberta Horizonte')).not.toBeInTheDocument();
 
-    expect(screen.getByRole('region', { name: 'O sistema trabalha junto' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'O que fica salvo' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Histórico' })).toHaveTextContent(
       'Kickoff concluído',
     );

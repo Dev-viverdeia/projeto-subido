@@ -38,7 +38,7 @@ export function MeusCheckins({
           <CalendarCheck2 size={20} strokeWidth={1.7} />
         </span>
         <div>
-          <p className={styles.vazioTitulo}>Seu histórico começa no primeiro check-in.</p>
+          <p className={styles.vazioTitulo}>Você ainda não fez nenhum check-in.</p>
           <p className={styles.vazioTexto}>
             Escolha uma sessão na agenda. Depois da confirmação, ela fica registrada aqui.
           </p>

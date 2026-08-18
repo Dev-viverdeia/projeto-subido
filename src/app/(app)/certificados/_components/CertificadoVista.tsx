@@ -70,10 +70,10 @@ export function CertificadoVista({
           <BotaoVoltar fallback="/certificados" rotulo="Certificados" />
         </div>
         <div className={styles.pendencia}>
-          <p className={styles.pendenciaTitulo}>Este certificado ainda não foi conquistado.</p>
+          <p className={styles.pendenciaTitulo}>Este certificado ainda não está disponível.</p>
           <p className={styles.pendenciaTexto}>
             “{titulo}” está em {feitas}/{total} {unidade} ({pct}%). Conclua para o certificado ser
-            emitido com a data da conquista.
+            emitido com a data de conclusão.
           </p>
           <Link href={hrefConteudo} className={styles.pendenciaCta}>
             Continuar de onde parou

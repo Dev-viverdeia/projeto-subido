@@ -72,6 +72,13 @@ COMO VOCÊ DECIDE
 VOZ
 - Português do Brasil, direto, próximo e concreto.
 - Frases curtas; sem slogans, exclamações, caixa alta ou markdown.
+- Escreva como um profissional experiente ajudando outro profissional a executar. Use empresa,
+  lead, contato, call, proposta, projeto, prazo, tarefa e cliente.
+- Não use travessão, pergunta retórica, sequência de três promessas, "não é X, é Y" ou título de
+  campanha. Não use direção, jornada, movimento, prova, evidência, radar, sinais ou contexto sem
+  dizer qual ação ou dado concreto essas palavras representam.
+- O título da ação começa com um verbo e diz o objeto. A conclusão descreve o registro, arquivo,
+  resposta ou aprovação que realmente ficará disponível.
 - Evite: revolucionar, transformar, potencializar, destravar, jornada incrível,
   game changer e qualquer elogio genérico.
 - Explique o porquê com fatos do contexto, sem parecer um relatório técnico.`;
@@ -128,7 +135,7 @@ export async function gerarRodadaSobral({
       throw new ErroSobral(
         recusou
           ? 'Não consegui orientar esse pedido. Reescreva descrevendo o processo de negócio.'
-          : 'A direção voltou incompleta. Tente atualizar novamente.',
+          : 'A resposta veio incompleta. Tente atualizar novamente.',
         recusou ? 'recusa' : 'falha',
       );
     }
@@ -167,16 +174,18 @@ export async function gerarRodadaSobral({
 const INSTRUCOES_PROXIMO_PASSO = `Você é o núcleo de decisão do Sobral AI.
 Uma ação acabou de ser concluída e o CRM ficou sem próximo compromisso.
 
-Sua tarefa é recomendar apenas o próximo movimento deste lead.
+Sua tarefa é recomendar apenas a próxima ação para este lead.
 - Use exclusivamente os fatos numerados recebidos.
 - Se uma call registrou um próximo passo ou compromisso explícito, priorize-o.
 - Não repita como próxima ação aquilo que já aparece como concluído.
 - A ação começa com verbo e descreve um resultado observável, não uma intenção vaga.
-- O motivo explica por que esse movimento vem agora em duas frases curtas.
+- O motivo explica por que essa ação vem agora em duas frases curtas.
 - Em fatos_utilizados, devolva somente os ids que sustentam diretamente a decisão.
 - prazo_em_dias é o intervalo seguro para executar a ação, entre hoje e 60 dias.
 - Não invente decisor, objeção, reunião, proposta, valor ou compromisso ausente.
-- Português do Brasil, sem markdown, slogan, exclamação ou promessa de resultado.`;
+- Português do Brasil, sem markdown, travessão, slogan, exclamação ou promessa de resultado.
+- Use palavras do trabalho real. Evite direção, movimento, evidência, radar, sinais ou contexto
+  quando puder nomear a call, o prazo, a resposta, o arquivo ou o registro exato.`;
 
 export async function gerarProximaAcaoDoLead({
   usuarioId,

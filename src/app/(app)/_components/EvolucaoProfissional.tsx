@@ -15,21 +15,21 @@ const ETAPAS: Array<{
     indice: '01',
     href: '/formacoes',
     titulo: 'Formações',
-    descricao: 'Ganhar repertório aplicado',
+    descricao: 'Aprender para implementar',
   },
   {
     id: 'mentorias',
     indice: '02',
     href: '/mentorias',
     titulo: 'Mentorias',
-    descricao: 'Resolver casos reais',
+    descricao: 'Tirar dúvidas de projetos',
   },
   {
     id: 'certificados',
     indice: '03',
     href: '/certificados',
     titulo: 'Certificados',
-    descricao: 'Comprovar o que concluiu',
+    descricao: 'Ver o que concluiu',
   },
 ];
 
@@ -51,13 +51,13 @@ export function EvolucaoProfissional({
     <header className={styles.cabecalho}>
       <div className={styles.introducao}>
         <div className={styles.titulos}>
-          <p className={styles.eyebrow}>Evolução profissional</p>
+          <p className={styles.eyebrow}>Aprendizado</p>
           <h1 className={styles.titulo}>{titulo}</h1>
         </div>
         <p className={styles.descricao}>{descricao}</p>
       </div>
 
-      <nav className={styles.navegacao} aria-label="Jornada de evolução profissional">
+      <nav className={styles.navegacao} aria-label="Aprendizado e acompanhamento">
         <ol className={styles.etapas}>
           {ETAPAS.map((item) => {
             const ativa = item.id === etapa;

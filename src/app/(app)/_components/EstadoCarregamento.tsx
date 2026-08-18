@@ -16,7 +16,7 @@ export function EstadoCarregamento({ titulo, descricao }: { titulo: string; desc
         <Spinner size="md" tone="navy" />
       </span>
       <span className={styles.texto}>
-        <small>Plataforma respondendo</small>
+        <small>Carregando</small>
         <strong>{titulo}</strong>
         <span>{descricao}</span>
       </span>

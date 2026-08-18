@@ -449,6 +449,25 @@ próximo agente a mentir sobre o repo — e a mentira é verificável com um gre
 
 - Banido: revolucionar, transformar, potencializar, destravar, game-changer, `!`, CAIXA ALTA,
   urgência fabricada.
+- **A interface fala como um profissional experiente ajudando outro profissional a trabalhar.**
+  Título nomeia a tarefa ou o conteúdo da tela; descrição explica o que acontece; botão diz a
+  ação. Tela operacional não é lugar de manifesto, slogan ou frase de campanha.
+- **Prefira substantivos do trabalho real:** empresa, lead, contato, reunião, proposta, projeto,
+  cliente, prazo, tarefa e resultado. Evite abstrações como direção, jornada, movimento, prova,
+  evidência, contexto, radar e operação quando não estiver explícito qual dado ou ação elas
+  representam.
+- **Frases curtas e PT-BR falado, sem infantilizar.** Use “você” quando ele ajuda a localizar a
+  ação. Não use travessão, pergunta retórica, sequência de três promessas, “não é X, é Y” ou
+  construções que soem como texto publicitário gerado por IA.
+- **CTA descreve a consequência imediata:** `Criar proposta`, `Agendar call`, `Salvar alterações`,
+  `Enviar para o CRM`. Evite `Continuar`, `Avançar`, `Saiba mais` ou `Começar` quando o objeto da
+  ação couber no rótulo.
+- **Estado vazio responde três coisas:** o que ainda não existe, por que isso importa e qual ação
+  cria o primeiro item. Loading diz o que está sendo processado. Erro diz o que falhou e como
+  tentar de novo. Confirmação destrutiva declara a consequência antes do botão.
+- **Termos públicos consistentes:** `lead` é contato ainda em prospecção; `oportunidade` é o que
+  entrou no CRM; `call` é a reunião da plataforma; `projeto` é o serviço aprendido, vendido ou em
+  execução. Não varie o nome só para a frase parecer mais sofisticada.
 - **Banidos visuais**: dourado/âmbar/amarelo, roxo "IA", magenta, neon, gradiente quente "premium",
   `Sparkles`, emoji decorativo, caps-lock com letterspacing alto em pills, dot decorativo antes de
   texto, verde/vermelho de semáforo. Cyan segue banido como _decoração_.

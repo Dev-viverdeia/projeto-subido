@@ -158,7 +158,7 @@ export function ModalDossie({
           <div className={styles.headerSignals}>
             <span className={styles.channelCount}>
               <strong>{totalCanais}</strong>
-              {totalCanais === 1 ? 'canal acionável' : 'canais acionáveis'}
+              {totalCanais === 1 ? 'canal de contato' : 'canais de contato'}
             </span>
             <span className={styles.status} data-status={status}>
               {rotuloStatusProspeccao(status)}
@@ -180,9 +180,9 @@ export function ModalDossie({
             <section className={styles.section} aria-labelledby="canais-titulo">
               <div className={styles.sectionHeading}>
                 <div>
-                  <p className={styles.eyebrow}>Canais para abordagem</p>
-                  <h3 id="canais-titulo">Como falar com esta empresa</h3>
-                  <span>Abra um canal e a tentativa fica registrada automaticamente.</span>
+                  <p className={styles.eyebrow}>Contatos encontrados</p>
+                  <h3 id="canais-titulo">Como entrar em contato</h3>
+                  <span>Ao abrir um canal, a tentativa fica registrada nesta lista.</span>
                 </div>
                 <MessageCircle size={20} aria-hidden="true" />
               </div>
@@ -275,13 +275,13 @@ export function ModalDossie({
                 <div className={styles.noContacts}>
                   <Search size={20} aria-hidden="true" />
                   <div>
-                    <strong>Nenhum canal acionável foi validado.</strong>
-                    <span>Use o site e o mapa abaixo para continuar a pesquisa manual.</span>
+                    <strong>Nenhum contato foi encontrado.</strong>
+                    <span>Abra o site ou o Google Maps para pesquisar a empresa.</span>
                   </div>
                 </div>
               )}
               {totalCanais > 0 && ausentes.length > 0 && (
-                <p className={styles.missing}>Não encontrado nesta busca: {ausentes.join(', ')}.</p>
+                <p className={styles.missing}>Não encontramos: {ausentes.join(', ')}.</p>
               )}
             </section>
 
@@ -289,9 +289,11 @@ export function ModalDossie({
               <section className={styles.section} aria-labelledby="decisores-titulo">
                 <div className={styles.sectionHeading}>
                   <div>
-                    <p className={styles.eyebrow}>Pessoas associadas</p>
+                    <p className={styles.eyebrow}>Pessoas encontradas</p>
                     <h3 id="decisores-titulo">Possíveis decisores</h3>
-                    <span>Confirme o vínculo e o cargo antes da abordagem.</span>
+                    <span>
+                      Confirme se a pessoa ainda trabalha na empresa antes de entrar em contato.
+                    </span>
                   </div>
                   <UserRoundSearch size={20} aria-hidden="true" />
                 </div>

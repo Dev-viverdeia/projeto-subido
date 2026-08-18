@@ -42,8 +42,8 @@ export function MapaFactual({
     <details className={styles.mapaFactual}>
       <summary>
         <div>
-          <p>Detalhes da análise</p>
-          <h2>Rever fatos da conversa</h2>
+          <p>Detalhes da call</p>
+          <h2>Informações extraídas da conversa</h2>
         </div>
         <span>
           {temAnalise ? `${totalFatos} fatos` : 'Aguardando leitura'}

@@ -139,7 +139,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           <strong>
             {projeto.feitas} de {projeto.total}
           </strong>
-          <small>tarefas comprovadas</small>
+          <small>tarefas concluídas</small>
           <div aria-hidden="true">
             <span style={{ transform: `scaleX(${percentual / 100})` }} />
           </div>
@@ -189,7 +189,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         <main className={styles.operacao}>
           <header className={styles.cabecalhoFase}>
             <div>
-              <p>Agora na entrega</p>
+              <p>Etapa atual</p>
               <h2>{faseAtual?.titulo ?? 'Projeto concluído'}</h2>
             </div>
             {faseAtual && (
@@ -212,15 +212,15 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             <div className={styles.semTarefa}>
               <Check size={24} aria-hidden="true" />
               <h2>Entrega concluída</h2>
-              <p>Todos os passos têm evidência registrada.</p>
+              <p>Todas as tarefas foram concluídas.</p>
             </div>
           )}
 
           {faseAtual && faseAtual.tarefas.length > 1 && (
             <section className={styles.fila} aria-labelledby="fila-titulo">
               <div className={styles.filaCabecalho}>
-                <p>Fila desta fase</p>
-                <h2 id="fila-titulo">Tudo que precisa acontecer</h2>
+                <p>Tarefas desta fase</p>
+                <h2 id="fila-titulo">O que falta fazer</h2>
               </div>
               <ol>
                 {faseAtual.tarefas.map((tarefa, indice) => (
@@ -263,7 +263,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           />
 
           <section className={styles.cliente}>
-            <p>Contexto aprovado</p>
+            <p>Briefing aprovado</p>
             <h2>{projeto.empresa}</h2>
             <blockquote>{projeto.documento.objetivo}</blockquote>
             <div>
@@ -350,7 +350,7 @@ function TarefaEmFoco({
           <input type="hidden" name="tarefa" value={tarefa.id} />
           <label>
             <span>
-              <Link2 size={14} aria-hidden="true" /> Evidência da execução
+              <Link2 size={14} aria-hidden="true" /> Registro da execução
             </span>
             <textarea
               name="evidencia"
@@ -391,7 +391,7 @@ function TarefaEmFoco({
                   className={styles.concluir}
                   disabled={pendente}
                 >
-                  <Check size={16} aria-hidden="true" /> Concluir com evidência
+                  <Check size={16} aria-hidden="true" /> Concluir tarefa
                 </button>
               </>
             )}

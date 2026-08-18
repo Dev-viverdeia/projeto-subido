@@ -198,14 +198,14 @@ export function RecomendacaoProximaAcao({
           <ArrowRight size={17} strokeWidth={2} />
         </span>
         <span>
-          <small>Próximo movimento</small>
+          <small>Próxima ação</small>
           <strong>{recomendacao.acao}</strong>
         </span>
       </header>
       <p className={styles.motivoRecomendacao}>{recomendacao.motivo}</p>
       <div className={styles.baseFactual}>
         <span className={styles.rotuloFatos}>
-          <FileCheck2 size={14} strokeWidth={1.9} aria-hidden="true" /> Base factual
+          <FileCheck2 size={14} strokeWidth={1.9} aria-hidden="true" /> Dados usados
         </span>
         <ul>
           {recomendacao.fatos.map((fato) => {

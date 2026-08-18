@@ -45,7 +45,7 @@ export function ConfiguracaoJornada({
       id="configuracao-jornada"
       className={`${styles.bloco} ${aberto ? styles.aberto : styles.resumido}`}
       aria-labelledby={mostrarCabecalho ? 'titulo-configuracao-jornada' : undefined}
-      aria-label={mostrarCabecalho ? undefined : 'Configure a direção da sua operação'}
+      aria-label={mostrarCabecalho ? undefined : 'Configure sua primeira oferta'}
     >
       {mostrarCabecalho && (
         <header className={styles.cabecalho}>
@@ -57,16 +57,16 @@ export function ConfiguracaoJornada({
             )}
           </div>
           <div className={styles.introducao}>
-            <p>{perfil ? 'Direção da operação' : 'Três decisões simples'}</p>
+            <p>{perfil ? 'Sua primeira oferta' : 'Configuração inicial'}</p>
             <h2 id="titulo-configuracao-jornada">
               {perfil
                 ? `${perfil.projetoInicialTitulo ?? 'Projeto inicial'} para ${perfil.nicho}`
-                : 'Monte sua primeira direção de trabalho.'}
+                : 'Defina o que você quer vender primeiro.'}
             </h2>
             <span>
               {perfil
                 ? perfil.posicionamento
-                : 'Escolha um mercado, um projeto e uma frase. Você poderá ajustar tudo depois.'}
+                : 'Escolha o mercado, o projeto e como você vai apresentar esse serviço.'}
             </span>
           </div>
 
@@ -84,7 +84,7 @@ export function ConfiguracaoJornada({
               ) : (
                 <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
               )}
-              {perfil ? 'Editar direção' : 'Definir direção'}
+              {perfil ? 'Editar oferta' : 'Definir oferta'}
             </button>
           )}
         </header>
@@ -92,7 +92,7 @@ export function ConfiguracaoJornada({
 
       {aberto && (
         <form ref={formulario} action={acao} className={styles.formulario}>
-          <ol className={styles.progresso} aria-label="Etapas da direção da operação">
+          <ol className={styles.progresso} aria-label="Etapas para definir a primeira oferta">
             {['Seu mercado', 'Projeto principal', 'Como vende'].map((rotulo, indice) => {
               const numero = indice + 1;
               const concluido = numero < passo;
@@ -123,9 +123,9 @@ export function ConfiguracaoJornada({
                 01
               </span>
               <span className={styles.textoDecisao}>
-                <h2 id="titulo-decisao-mercado">Onde você quer começar?</h2>
+                <h2 id="titulo-decisao-mercado">Para qual mercado você quer vender primeiro?</h2>
                 <p id="descricao-decisao-mercado">
-                  Um nicho específico deixa sua primeira abordagem mais concreta.
+                  Escolher um nicho ajuda a encontrar empresas e escrever uma abordagem específica.
                 </p>
               </span>
             </div>
@@ -157,9 +157,9 @@ export function ConfiguracaoJornada({
                 02
               </span>
               <span className={styles.textoDecisao}>
-                <h2 id="titulo-decisao-projeto">Qual projeto você vai dominar primeiro?</h2>
+                <h2 id="titulo-decisao-projeto">Qual projeto você quer vender primeiro?</h2>
                 <p id="descricao-decisao-projeto">
-                  Você poderá usar os outros depois. Agora precisamos de uma oferta principal.
+                  Escolha uma oferta para estudar e apresentar. Você poderá adicionar outras depois.
                 </p>
               </span>
             </div>
@@ -207,9 +207,10 @@ export function ConfiguracaoJornada({
                 03
               </span>
               <span className={styles.textoDecisao}>
-                <h2 id="titulo-decisao-posicionamento">Como você explica o serviço?</h2>
+                <h2 id="titulo-decisao-posicionamento">Como você apresentaria esse serviço?</h2>
                 <p id="descricao-decisao-posicionamento">
-                  Escreva para um cliente, sem ferramenta, sigla ou promessa abstrata.
+                  Explique o problema que resolve e o resultado esperado. Evite siglas e
+                  ferramentas.
                 </p>
               </span>
             </div>
@@ -235,7 +236,7 @@ export function ConfiguracaoJornada({
             <div className={styles.rodapeContexto}>
               <span>Passo {passo} de 3</span>
               <p aria-live="polite" className={estado.erro ? styles.erro : styles.sucesso}>
-                {estado.erro ?? estado.sucesso ?? 'Você poderá ajustar essa direção depois.'}
+                {estado.erro ?? estado.sucesso ?? 'Você pode alterar estas escolhas quando quiser.'}
               </p>
             </div>
             <div className={styles.acoes}>
@@ -269,7 +270,7 @@ export function ConfiguracaoJornada({
                   className={styles.salvar}
                   disabled={pendente || !projetos.length}
                 >
-                  {pendente ? 'Salvando…' : 'Salvar direção'}
+                  {pendente ? 'Salvando oferta…' : 'Salvar oferta'}
                   {!pendente && <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />}
                 </button>
               )}

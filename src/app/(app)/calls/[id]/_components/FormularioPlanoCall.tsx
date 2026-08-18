@@ -43,10 +43,10 @@ export function FormularioPlanoCall({
 
       <header className={styles.formularioTopo}>
         <div>
-          <span>Revisão operacional</span>
+          <span>Revisão antes de salvar</span>
           <p>A IA sugere. Você ajusta e confirma.</p>
         </div>
-        <small>Revisão humana</small>
+        <small>Você confirma</small>
       </header>
 
       <label className={styles.campoAcao}>
@@ -84,7 +84,7 @@ export function FormularioPlanoCall({
         <fieldset className={styles.compromissosCall}>
           <legend>
             <span>
-              <ListChecks size={16} aria-hidden="true" /> Compromissos que entram no plano
+              <ListChecks size={16} aria-hidden="true" /> Compromissos que serão salvos
             </span>
             <small>{compromissos.length} detectados</small>
           </legend>

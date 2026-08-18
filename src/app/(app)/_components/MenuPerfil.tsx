@@ -129,7 +129,7 @@ export function MenuPerfil({ nome, email }: { nome: string; email: string }) {
               </span>
               <span>
                 <strong>Certificados</strong>
-                <small>Suas conquistas reunidas</small>
+                <small>Formações e projetos concluídos</small>
               </span>
               <span className={styles.indicador} aria-hidden="true" />
             </Link>

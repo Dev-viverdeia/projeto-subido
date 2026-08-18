@@ -108,7 +108,7 @@ export function SalaCall({
     <main className={styles.pagina}>
       <div className={styles.marca}>
         <SubidoLogo size={18} variant="mono" />
-        <span className={styles.marcaApoio}>Sala inteligente</span>
+        <span className={styles.marcaApoio}>Sala da call</span>
       </div>
 
       <section className={styles.cartao}>

@@ -39,7 +39,7 @@ export function FichaCampoProjeto({ perfil, escopo }: { perfil: Perfil; escopo: 
         </dl>
 
         <div className={styles.primeiraProva}>
-          <span>Primeira prova real</span>
+          <span>Primeiro teste</span>
           <p>{perfil.primeiraProva}</p>
         </div>
       </div>
@@ -51,7 +51,7 @@ export function FichaCampoProjeto({ perfil, escopo }: { perfil: Perfil; escopo: 
       </div>
 
       <div className={styles.evolucoesProjeto}>
-        <span>Depois de provar</span>
+        <span>Depois de validar</span>
         <p>{escopo.evolucoes.join(' · ')}</p>
       </div>
     </section>
@@ -76,7 +76,7 @@ export function ArtefatosEntregaProjeto({ artefatos }: { artefatos: Artefatos })
     <section className={styles.artefatos} aria-labelledby="artefatos-titulo">
       <header>
         <p>Documentos do cliente</p>
-        <h3 id="artefatos-titulo">O kit que comprova a entrega</h3>
+        <h3 id="artefatos-titulo">Arquivos da entrega</h3>
       </header>
       <ol>
         {artefatos.map((artefato, indice) => (

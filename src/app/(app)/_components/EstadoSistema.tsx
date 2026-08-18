@@ -47,7 +47,7 @@ export function EstadoSistema({
         <span className={styles.icone}>{icone}</span>
         <span className={styles.linha} />
         <p>Subido</p>
-        <strong>Você não fica sem próximo passo.</strong>
+        <strong>Veja o que fazer agora.</strong>
       </aside>
     </section>
   );

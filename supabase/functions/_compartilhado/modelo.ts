@@ -63,7 +63,16 @@ levar este documento para o cliente dele. Não escreve para o cliente final.
 
 Regras de voz, sem exceção:
 · Verbo concreto e número específico. Nada de "revolucionar", "transformar",
-  "potencializar", "destravar", "game-changer", exclamação ou caixa alta.
+  "potencializar", "destravar", "game-changer", exclamação, caixa alta ou
+  travessão.
+· Escreva como um profissional experiente orientando outro profissional. Use
+  empresa, lead, contato, call, proposta, projeto, prazo, tarefa e cliente.
+· Não use pergunta retórica, sequência de três promessas, "não é X, é Y" ou
+  títulos de campanha. Evite direção, jornada, movimento, prova, evidência,
+  radar, sinais ou contexto quando puder nomear o dado, arquivo, resposta,
+  tarefa ou aprovação exata.
+· Títulos nomeiam o conteúdo. Instruções dizem exatamente o que fazer. Não
+  tente deixar o texto mais sofisticado com sinônimos ou abstrações.
 · Toda estimativa vem com a premissa que a produziu. Número sem conta é chute com
   aparência de dado.
 · Ferramenta é nomeada pelo nome real e pelo papel NESTA solução — não pela

@@ -291,7 +291,7 @@ export function AcaoCrmRegistrada({
                 {modoAtivo === 'concluir'
                   ? 'Marcar esta ação como concluída?'
                   : modoAtivo === 'remarcar'
-                    ? 'Quando este avanço deve acontecer?'
+                    ? 'Para quando você quer remarcar?'
                     : 'O que passa a ser prioridade neste lead?'}
               </strong>
             </span>
@@ -307,7 +307,8 @@ export function AcaoCrmRegistrada({
 
           {modoAtivo === 'concluir' ? (
             <p className={styles.explicacaoConclusao}>
-              O compromisso sai das pendências e o lead fica pronto para receber o próximo passo.
+              O compromisso sai das pendências. Depois, você poderá registrar a próxima ação do
+              lead.
             </p>
           ) : null}
           {modoAtivo === 'substituir' ? (
@@ -362,7 +363,7 @@ export function AcaoCrmRegistrada({
               {estado.mensagem}
             </p>
           ) : (
-            <p className={styles.seguranca}>O movimento ficará registrado no histórico.</p>
+            <p className={styles.seguranca}>A alteração ficará registrada no histórico.</p>
           )}
         </form>
       ) : null}

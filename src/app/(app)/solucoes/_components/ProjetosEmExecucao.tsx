@@ -28,8 +28,8 @@ export function ProjetosEmExecucao({ projetos }: { projetos: ResumoProjetoExecuc
     >
       <header className={styles.cabecalho}>
         <div>
-          <p>Carteira de entregas</p>
-          <h1 id="titulo-carteira">O trabalho que está em campo.</h1>
+          <p>Projetos em execução</p>
+          <h1 id="titulo-carteira">Projetos dos seus clientes</h1>
         </div>
         <dl>
           <div>

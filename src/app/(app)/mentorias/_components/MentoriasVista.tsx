@@ -415,7 +415,7 @@ export function MentoriasVista({
                 return (
                   <span className={styles.fichaNota}>
                     {estadoAtual === 'lotada'
-                      ? `Sessão lotada — ${detalhe.inscritos} de ${detalhe.vagas} vagas.`
+                      ? `Sessão lotada: ${detalhe.inscritos} de ${detalhe.vagas} vagas.`
                       : estadoAtual === 'encerrada'
                         ? 'Sessão encerrada.'
                         : `O check-in abre ${rotuloDoDia(detalhe.inicioIso, agora).mono}.`}
@@ -454,7 +454,7 @@ export function MentoriasVista({
         {cancelando && (
           <p className={styles.confirmarTexto}>
             Sua vaga em “{cancelando.titulo}” volta a ficar disponível. Você poderá fazer um novo
-            check-in enquanto ainda houver vaga.
+            check-in depois, enquanto ainda houver vaga.
           </p>
         )}
       </Modal>
@@ -489,8 +489,8 @@ export function MentoriasVista({
           <p className={styles.confirmarTexto}>
             Você garante a vaga em “{confirmando.titulo}” (
             {rotuloDoDia(confirmando.inicioIso, agora).principal.toLowerCase()},{' '}
-            {horaCurta(confirmando.inicioIso)}). Dá para cancelar até o início — a vaga volta para a
-            fila.
+            {horaCurta(confirmando.inicioIso)}). Você pode cancelar até o início. Nesse caso, a vaga
+            volta a ficar disponível.
           </p>
         )}
       </Modal>

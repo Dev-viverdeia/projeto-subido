@@ -4,7 +4,7 @@ import { DossiePosCall } from '@/app/(app)/calls/[id]/_components/DossiePosCall'
 import type { PosCall } from '@/lib/calls/queries';
 import styles from './preview.module.css';
 
-export const metadata: Metadata = { title: 'Preview · Pós-call inteligente' };
+export const metadata: Metadata = { title: 'Preview · Resumo da call' };
 
 const POS_CALL: PosCall = {
   reuniao: {

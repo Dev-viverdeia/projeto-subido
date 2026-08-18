@@ -44,20 +44,20 @@ function exemplosDoPainel(painel: PainelSobral): ExemploDoConsultor[] {
     {
       rotulo: 'Prioridade de hoje',
       texto: principal
-        ? `Explique por que "${principal.titulo}" é a prioridade agora e me dê a preparação mínima para executar sem abrir outra frente.`
-        : 'Com base na minha operação, o que eu deveria executar primeiro e qual evidência mostra que terminei?',
+        ? `Por que devo fazer "${principal.titulo}" agora? Diga também o que preciso preparar antes de começar.`
+        : 'O que devo fazer primeiro com base no que já está registrado na plataforma?',
     },
     {
       rotulo: 'Lead em foco',
       texto: lead
-        ? `Analise a oportunidade de ${lead.empresa} e diga o que ainda falta confirmar antes do próximo avanço.`
-        : 'Qual é o melhor primeiro movimento para criar uma oportunidade comercial com contexto?',
+        ? `Analise a oportunidade de ${lead.empresa} e diga o que ainda preciso confirmar antes de avançar.`
+        : 'O que preciso registrar para criar minha primeira oportunidade comercial?',
     },
     {
       rotulo: projeto ? 'Projeto em foco' : 'Projeto certo',
       texto: projeto
-        ? `Revise o compromisso "${projeto.titulo}" e me diga como concluir com uma evidência clara para o cliente.`
-        : 'Qual projeto padrão combina melhor com o momento da minha operação e por quê?',
+        ? `Revise a tarefa "${projeto.titulo}" e diga o que preciso entregar para considerá-la concluída.`
+        : 'Qual projeto padrão devo estudar primeiro e por quê?',
     },
   ];
 }
@@ -91,11 +91,11 @@ export function PainelSobralView({
 
       <header className={`${entrada.bloco} ${styles.topo}`}>
         <div className={styles.introducao}>
-          <p className={styles.eyebrow}>Sobral AI · direção operacional</p>
-          <h2 className={styles.titulo}>Seu próximo movimento, com prova.</h2>
+          <p className={styles.eyebrow}>Sobral AI</p>
+          <h2 className={styles.titulo}>Veja o que fazer agora.</h2>
           <p className={styles.apoio}>
-            O Sobral AI cruza o que já aconteceu no CRM, nas calls, nos projetos e nas propostas
-            para orientar o que fazer agora.
+            O Sobral AI verifica o CRM, as calls, os projetos e as propostas para recomendar uma
+            próxima ação.
           </p>
         </div>
 
@@ -112,9 +112,9 @@ export function PainelSobralView({
       </header>
 
       <main className={`${entrada.bloco} ${entrada.atraso1} ${styles.mesa}`}>
-        <nav className={styles.trilho} aria-label="Etapa atual da operação">
+        <nav className={styles.trilho} aria-label="Etapa atual do plano">
           <div className={styles.trilhoCabecalho}>
-            <span>Linha de avanço</span>
+            <span>Seu plano</span>
             <strong>{String(indiceAtual + 1).padStart(2, '0')} / 05</strong>
           </div>
           <ol className={styles.etapas}>
@@ -150,10 +150,10 @@ export function PainelSobralView({
         <article className={styles.direcao} data-on-dark>
           <div className={styles.direcaoTopo}>
             <span className={styles.seloDirecao}>
-              <Radio size={13} strokeWidth={2} aria-hidden="true" /> Direção de agora
+              <Radio size={13} strokeWidth={2} aria-hidden="true" /> Prioridade atual
             </span>
             <span className={styles.atualizado}>
-              {painel.geradoPorIA ? 'Leitura da IA' : 'Leitura factual'} ·{' '}
+              {painel.geradoPorIA ? 'Atualizado pela IA' : 'Plano padrão'} ·{' '}
               {dataDaLeitura(plano.geradoEm)}
             </span>
           </div>
@@ -169,7 +169,7 @@ export function PainelSobralView({
               <FileCheck2 size={18} strokeWidth={1.9} />
             </span>
             <span>
-              <small>Você saberá que avançou quando</small>
+              <small>Concluído quando</small>
               <strong>{plano.proximoPasso.evidencia}</strong>
             </span>
           </div>
@@ -184,8 +184,8 @@ export function PainelSobralView({
           <div className={styles.leituraTitulo}>
             <Database size={18} strokeWidth={1.8} aria-hidden="true" />
             <span>
-              <strong>Base da decisão</strong>
-              <small>{registros} registros conectados</small>
+              <strong>Dados usados</strong>
+              <small>{registros} registros verificados</small>
             </span>
           </div>
 
@@ -242,9 +242,9 @@ export function PainelSobralView({
             <Bot size={22} strokeWidth={1.8} />
           </span>
           <div>
-            <p className={styles.eyebrow}>Converse com sua direção</p>
-            <h2>Pergunte sem tirar os olhos do plano.</h2>
-            <span>A resposta usa o radar acima e pode atualizar sua direção automaticamente.</span>
+            <p className={styles.eyebrow}>Pergunte ao Sobral AI</p>
+            <h2>Tire uma dúvida sobre o próximo passo.</h2>
+            <span>A resposta usa os dados mostrados acima e pode atualizar seu plano.</span>
           </div>
         </header>
         <Conversa exemplos={exemplosDoPainel(painel)} />
@@ -254,12 +254,11 @@ export function PainelSobralView({
         <section className={`${entrada.bloco} ${styles.plano}`}>
           <header className={styles.secaoCabecalho}>
             <div>
-              <p className={styles.eyebrow}>Depois do movimento atual</p>
-              <h2>O restante fica em espera.</h2>
+              <p className={styles.eyebrow}>Depois desta ação</p>
+              <h2>Próximas tarefas</h2>
             </div>
             <p>
-              Conclua a evidência de agora antes de abrir a próxima frente. O plano se recalcula
-              quando os fatos mudam.
+              Conclua a tarefa atual primeiro. O plano será atualizado quando houver novos dados.
             </p>
           </header>
 

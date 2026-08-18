@@ -17,7 +17,7 @@ type Props = {
 
 function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
   return (
-    <ol className={styles.trilho} aria-label="Etapas da jornada profissional">
+    <ol className={styles.trilho} aria-label="Etapas do trabalho">
       {plano.etapas.map((etapa) => (
         <li
           key={etapa.id}
@@ -30,7 +30,7 @@ function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
           <span className={styles.trilhoTexto}>
             <strong>{etapa.titulo}</strong>
             <small>
-              {etapa.concluidos}/{etapa.passos.length} evidências
+              {etapa.concluidos} de {etapa.passos.length} itens
             </small>
           </span>
         </li>
@@ -62,10 +62,10 @@ export function MapaJornada({
       <div className={`${styles.pagina} pagina-mapa-jornada`}>
         <header className={styles.topo}>
           <div>
-            <span className={styles.estadoOperacao}>Primeira configuração</span>
+            <span className={styles.estadoOperacao}>Antes de começar</span>
             <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
             <p className={styles.data}>
-              Vamos montar uma base clara para sua operação · {dataLonga}
+              Configure sua primeira oferta para usar a plataforma · {dataLonga}
             </p>
           </div>
           <span className={styles.passoAtual}>Passo 1 de 3</span>
@@ -73,12 +73,9 @@ export function MapaJornada({
 
         <section className={styles.ativacao} aria-labelledby="titulo-ativacao">
           <div className={styles.ativacaoIntroducao}>
-            <span className={styles.selo}>Seu ponto de partida</span>
-            <h1 id="titulo-ativacao">Defina o foco da sua primeira oferta.</h1>
-            <p>
-              Três decisões organizam o que você vai vender, para quem e como começar sem se perder
-              na plataforma.
-            </p>
+            <span className={styles.selo}>Configuração inicial</span>
+            <h1 id="titulo-ativacao">Escolha o que você quer vender primeiro.</h1>
+            <p>Informe o mercado, o projeto e uma frase simples para apresentar seu serviço.</p>
             <div className={styles.tempoAtivacao}>
               <Clock3 size={16} strokeWidth={1.8} aria-hidden="true" />
               <span>Leva menos de 3 minutos</span>
@@ -90,10 +87,10 @@ export function MapaJornada({
         <section className={styles.caminho} aria-labelledby="titulo-caminho">
           <div className={styles.caminhoCabecalho}>
             <div>
-              <p>Depois da configuração</p>
-              <h2 id="titulo-caminho">Sua operação passa a ter um próximo passo claro.</h2>
+              <p>Como a plataforma organiza o trabalho</p>
+              <h2 id="titulo-caminho">Cinco etapas, da preparação à próxima venda.</h2>
             </div>
-            <span>Cada avanço exige uma evidência real na plataforma.</span>
+            <span>Os itens são concluídos conforme você trabalha na plataforma.</span>
           </div>
           <TrilhoJornada plano={plano} />
         </section>
@@ -105,28 +102,28 @@ export function MapaJornada({
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
       <header className={styles.topo}>
         <div>
-          <span className={styles.estadoOperacao}>Sua operação hoje</span>
+          <span className={styles.estadoOperacao}>Hoje</span>
           <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
           <p className={styles.data}>{dataLonga}</p>
         </div>
         <div className={styles.resumoTopo}>
-          <span>Ciclo atual</span>
+          <span>Etapa atual</span>
           <strong>{etapaAtual.titulo}</strong>
         </div>
       </header>
 
-      <section className={styles.comando} aria-label="Próximo movimento da operação">
+      <section className={styles.comando} aria-label="Próxima ação recomendada">
         {prioridade}
 
-        <aside className={styles.progresso} aria-label="Progresso da jornada">
+        <aside className={styles.progresso} aria-label="Progresso geral">
           <div className={styles.progressoNumero}>
-            <span>Jornada comprovada</span>
+            <span>Progresso geral</span>
             <strong>{plano.percentual}%</strong>
           </div>
           <div
             className={styles.progressoTrilho}
             role="progressbar"
-            aria-label="Progresso da jornada"
+            aria-label="Progresso geral"
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={plano.percentual}
@@ -134,10 +131,10 @@ export function MapaJornada({
             <span style={{ width: `${plano.percentual}%` }} />
           </div>
           <p>
-            {plano.evidenciasConcluidas} de {plano.totalEvidencias} evidências reais registradas
+            {plano.evidenciasConcluidas} de {plano.totalEvidencias} itens concluídos
           </p>
           <div className={styles.marco}>
-            <span>Meta desta etapa</span>
+            <span>Objetivo desta etapa</span>
             <strong>{etapaAtual.marco}</strong>
           </div>
         </aside>
@@ -150,10 +147,10 @@ export function MapaJornada({
       <section className={styles.operacao} aria-labelledby="titulo-operacao">
         <div className={styles.secaoCabecalho}>
           <div>
-            <p>Contexto para agir</p>
-            <h2 id="titulo-operacao">Agora na operação</h2>
+            <p>Para hoje</p>
+            <h2 id="titulo-operacao">Informações para decidir o que fazer</h2>
           </div>
-          <span>Somente o que pode mudar sua próxima decisão.</span>
+          <span>Abra um item para continuar o trabalho.</span>
         </div>
 
         <div className={styles.cartoesOperacao}>
@@ -184,7 +181,7 @@ export function MapaJornada({
             <span className={styles.cartaoConteudo}>
               <small>Próximo encontro</small>
               <strong>{proximaMentoria ?? 'Mentoria de implementação'}</strong>
-              <p>Leve o bloqueio mais importante da sua entrega.</p>
+              <p>Leve uma dúvida ou um problema real da sua entrega.</p>
             </span>
             <ArrowRight
               className={styles.cartaoSeta}

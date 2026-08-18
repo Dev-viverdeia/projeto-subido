@@ -21,7 +21,7 @@ describe('PrioridadeOperacional', () => {
       'href',
       '/propostas/proposta-1',
     );
-    expect(screen.getByRole('link', { name: 'Ver leitura completa' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Ver orientação completa' })).toHaveAttribute(
       'href',
       '/consultor',
     );

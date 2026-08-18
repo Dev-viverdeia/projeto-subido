@@ -28,11 +28,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
     <div className={styles.pagina}>
       <header className={styles.topo}>
         <div className={styles.introducao}>
-          <p className={styles.sobretitulo}>Operação comercial</p>
+          <p className={styles.sobretitulo}>CRM</p>
           <h1>Pipeline comercial</h1>
           <p>
-            Três etapas de trabalho para saber quem precisa de atenção agora — com cada desfecho
-            registrado.
+            Acompanhe cada oportunidade, registre a próxima ação e mova o card quando a venda mudar
+            de etapa.
           </p>
         </div>
         {oportunidades.length > 0 && (
@@ -47,7 +47,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
       {parametros.novo === 'ok' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={18} strokeWidth={2} aria-hidden="true" />
-          Lead adicionado. O primeiro fato já entrou na linha do tempo.
+          Lead adicionado ao pipeline.
         </div>
       )}
 
@@ -86,7 +86,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
         <div className={styles.quadroTopo}>
           <div>
             <h2 id="pipeline-titulo">Pipeline</h2>
-            <p>Avance cada oportunidade quando a conversa realmente mudar de fase.</p>
+            <p>Arraste o card quando a oportunidade mudar de etapa.</p>
           </div>
           <span>{oportunidades.length} no total</span>
         </div>
@@ -98,11 +98,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
               <span className={styles.primeiroLeadIcone}>
                 <Database size={24} strokeWidth={1.6} aria-hidden="true" />
               </span>
-              <p className={styles.sobretitulo}>Pipeline pronto</p>
-              <h3>Comece pelo lead que já está mais perto.</h3>
+              <p className={styles.sobretitulo}>Primeira oportunidade</p>
+              <h3>Adicione uma empresa que você quer abordar.</h3>
               <p>
-                Cadastre o que você sabe agora. Empresa, contato e oportunidade bastam para a
-                plataforma começar a construir o histórico comercial.
+                Empresa, contato e serviço de interesse são suficientes. Você poderá completar os
+                dados depois.
               </p>
               <FormularioNovoLead
                 rotulo="Adicionar primeiro lead"
@@ -116,24 +116,24 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
               <li>
                 <span>01</span>
                 <div>
-                  <strong>O lead entra no radar</strong>
-                  <p>O CRM abre o dossiê e registra o primeiro fato.</p>
+                  <strong>Cadastre o lead</strong>
+                  <p>Informe a empresa, o contato e o serviço que pode ser vendido.</p>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>
               <li>
                 <span>02</span>
                 <div>
-                  <strong>A conversa ganha contexto</strong>
-                  <p>Calls e propostas passam a alimentar a mesma jornada.</p>
+                  <strong>Registre as conversas</strong>
+                  <p>Calls, anotações e propostas ficam ligadas à mesma oportunidade.</p>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>
               <li>
                 <span>03</span>
                 <div>
-                  <strong>A próxima ação fica clara</strong>
-                  <p>Você acompanha o avanço sem depender de memória ou planilhas soltas.</p>
+                  <strong>Defina o próximo contato</strong>
+                  <p>Salve a ação e a data para saber quem precisa de atenção.</p>
                 </div>
               </li>
             </ol>

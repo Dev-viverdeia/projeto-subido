@@ -8,10 +8,10 @@ export function HeroProspeccao({ saldo }: { saldo: number }) {
     <header className={styles.hero}>
       <div className={styles.heroPrincipal}>
         <p className={styles.sobretitulo}>Prospecção</p>
-        <h1>Encontre empresas e comece a conversa.</h1>
+        <h1>Encontre empresas para prospectar.</h1>
         <p>
-          Busque por segmento e região. A plataforma organiza telefone, e-mail, site, redes sociais
-          e possíveis decisores em uma lista pronta para você trabalhar.
+          Escolha o segmento e a região. A busca reúne telefone, e-mail, site, redes sociais e
+          possíveis decisores em uma lista.
         </p>
       </div>
 

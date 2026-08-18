@@ -24,8 +24,8 @@ export const ETAPAS_SOBRAL: ReadonlyArray<{
     marco: 'Criar e qualificar oportunidades',
   },
   { id: 'vender', numero: '03', titulo: 'Vender', marco: 'Apresentar uma proposta clara' },
-  { id: 'entregar', numero: '04', titulo: 'Entregar', marco: 'Executar com evidência' },
-  { id: 'evoluir', numero: '05', titulo: 'Evoluir', marco: 'Transformar experiência em método' },
+  { id: 'entregar', numero: '04', titulo: 'Entregar', marco: 'Implementar e obter o aceite' },
+  { id: 'evoluir', numero: '05', titulo: 'Evoluir', marco: 'Repetir o que funcionou' },
 ];
 
 export function indiceDaEtapa(etapa: EtapaSobral): number {

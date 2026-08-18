@@ -149,7 +149,7 @@ export function ProjetoGuiado({
           ) : (
             <Link href={destinoCrm} className={styles.continuarHero}>
               <span>
-                <small>Próximo movimento</small>
+                <small>Próxima ação</small>
                 Encontrar novo cliente
               </span>
               <PackageCheck size={18} aria-hidden="true" />
@@ -357,7 +357,7 @@ export function ProjetoGuiado({
             <section className={styles.aulaApoio} aria-labelledby="aula-apoio-titulo">
               <header>
                 <p>Conteúdo de apoio</p>
-                <h2 id="aula-apoio-titulo">Entenda o método antes de adaptar</h2>
+                <h2 id="aula-apoio-titulo">Entenda o projeto antes de adaptar</h2>
               </header>
               <VideoConteudo videoUrl={videoUrl} titulo={titulo} />
             </section>
@@ -366,7 +366,7 @@ export function ProjetoGuiado({
           <section className={styles.kit} aria-labelledby="kit-projeto">
             <div className={styles.kitCabecalho}>
               <p>Kit de implementação</p>
-              <h2 id="kit-projeto">Tudo que sai da implementação</h2>
+              <h2 id="kit-projeto">Arquivos e modelos do projeto</h2>
             </div>
             {artefatosEntrega ? <ArtefatosEntregaProjeto artefatos={artefatosEntrega} /> : null}
             <Ferramentas itens={ferramentas} />
@@ -398,9 +398,7 @@ export function ProjetoGuiado({
             <Layers3 size={18} aria-hidden="true" />
             <div>
               <span>O cliente tem outra realidade?</span>
-              <p>
-                Leve esta base ao Estúdio e transforme as dores dele em um projeto personalizado.
-              </p>
+              <p>Leve esta base ao Estúdio e adapte o projeto para as necessidades do cliente.</p>
             </div>
             <Link href={`/builder?projeto=${encodeURIComponent(slug)}`}>
               Personalizar no Estúdio <ArrowUpRight size={16} aria-hidden="true" />

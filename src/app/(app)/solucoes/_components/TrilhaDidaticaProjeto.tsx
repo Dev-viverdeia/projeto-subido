@@ -11,8 +11,8 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
     <section className={styles.raiz} aria-labelledby="trilha-didatica-titulo">
       <header className={styles.cabecalho}>
         <div>
-          <p>Preparação de campo</p>
-          <h2 id="trilha-didatica-titulo">Aprenda o necessário. Depois, execute.</h2>
+          <p>Antes de implementar</p>
+          <h2 id="trilha-didatica-titulo">Aprenda como este projeto funciona</h2>
           <span>
             Uma preparação curta para você entender a lógica, observar o projeto funcionando e
             entrar na implementação com os materiais certos.
@@ -48,7 +48,7 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
           <span>03</span>
           <FileText size={18} aria-hidden="true" />
           <div>
-            <strong>Leve para o campo</strong>
+            <strong>Use no projeto</strong>
             <small>{trilha.materiais.length} modelos copiáveis</small>
           </div>
         </li>
@@ -58,7 +58,7 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
         <section className={styles.aulas} aria-labelledby="aulas-campo-titulo">
           <header className={styles.blocoCabecalho}>
             <span>Aulas de campo</span>
-            <h3 id="aulas-campo-titulo">Só o que muda a sua execução</h3>
+            <h3 id="aulas-campo-titulo">Aulas deste projeto</h3>
           </header>
 
           <div className={styles.listaAulas}>
@@ -100,7 +100,7 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
 
         <section className={styles.demonstracao} aria-labelledby="demonstracao-titulo">
           <header className={styles.blocoCabecalho}>
-            <span>Demonstração de campo</span>
+            <span>Demonstração prática</span>
             <h3 id="demonstracao-titulo">{trilha.demonstracao.titulo}</h3>
             <p>{trilha.demonstracao.contexto}</p>
           </header>
@@ -112,7 +112,7 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
                 <div>
                   <strong>{passo.etapa}</strong>
                   <p>{passo.oQueAcontece}</p>
-                  <small>Evidência · {passo.evidencia}</small>
+                  <small>Ao terminar · {passo.evidencia}</small>
                 </div>
               </li>
             ))}
@@ -131,8 +131,8 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
       {trilha.videosReferencia.length > 0 ? (
         <section className={styles.videos} aria-labelledby="videos-referencia-titulo">
           <header className={styles.blocoCabecalho}>
-            <span>Solução de referência</span>
-            <h3 id="videos-referencia-titulo">Veja a entrega antes de construir a sua</h3>
+            <span>Exemplo de entrega</span>
+            <h3 id="videos-referencia-titulo">Veja como o projeto funciona antes de construir</h3>
           </header>
           <div className={styles.gradeVideos}>
             {trilha.videosReferencia.map((video, indice) => (
@@ -154,8 +154,8 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
       <section className={styles.materiais} aria-labelledby="materiais-campo-titulo">
         <header className={styles.blocoCabecalho}>
           <span>Kit de campo</span>
-          <h3 id="materiais-campo-titulo">Não comece com uma página em branco</h3>
-          <p>Copie, adapte ao cliente e guarde cada documento como evidência da entrega.</p>
+          <h3 id="materiais-campo-titulo">Modelos para usar com o cliente</h3>
+          <p>Copie, adapte e salve cada documento no projeto do cliente.</p>
         </header>
 
         <div className={styles.gradeMateriais}>

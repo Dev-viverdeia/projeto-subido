@@ -67,7 +67,7 @@ function CallRecemAgendada({ reuniao }: { reuniao: ReuniaoCall }) {
       </dl>
 
       <div className={styles.callCriadaAcoes}>
-        <p>O link foi criado e o CRM já recebeu a reunião como próximo passo.</p>
+        <p>O link foi criado e a reunião já aparece no histórico do CRM.</p>
         <div>
           <AcoesSala codigo={reuniao.codigoPublico} />
           <Link href={`/crm/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
@@ -110,9 +110,9 @@ export function PainelCalls({
     <div className={styles.pagina}>
       <header className={styles.topo}>
         <div className={styles.introducao}>
-          <p className={styles.sobretitulo}>Central de conversas</p>
+          <p className={styles.sobretitulo}>Reuniões</p>
           <h1>Calls</h1>
-          <p>Cada reunião vira contexto no CRM, direção para a venda e memória para a entrega.</p>
+          <p>Crie a sala, use o Live Coach e salve a transcrição junto ao lead no CRM.</p>
         </div>
         <FormularioAgendarCall
           oportunidades={oportunidades}
@@ -180,8 +180,8 @@ export function PainelCalls({
 
       <section className={styles.automacao} aria-labelledby="fluxo-calls-titulo">
         <header>
-          <p>Enquanto você conversa</p>
-          <h2 id="fluxo-calls-titulo">O sistema trabalha junto</h2>
+          <p>Durante e depois da call</p>
+          <h2 id="fluxo-calls-titulo">O que fica salvo</h2>
         </header>
         <ol className={styles.trilha}>
           <li>
@@ -190,7 +190,7 @@ export function PainelCalls({
             </span>
             <div>
               <strong>Call</strong>
-              <small>Conversa no mesmo ambiente</small>
+              <small>Reunião feita pela plataforma</small>
             </div>
           </li>
           <li>
@@ -199,7 +199,7 @@ export function PainelCalls({
             </span>
             <div>
               <strong>Transcrição</strong>
-              <small>Falas e decisões preservadas</small>
+              <small>Conversa registrada em texto</small>
             </div>
           </li>
           <li>
@@ -208,7 +208,7 @@ export function PainelCalls({
             </span>
             <div>
               <strong>CRM</strong>
-              <small>Fatos entram na oportunidade</small>
+              <small>Resumo salvo na oportunidade</small>
             </div>
           </li>
           <li>
@@ -216,8 +216,8 @@ export function PainelCalls({
               <BrainCircuit size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <strong>Próximo passo</strong>
-              <small>A ação nasce com contexto</small>
+              <strong>Próxima ação</strong>
+              <small>Compromisso e data registrados</small>
             </div>
           </li>
         </ol>
@@ -235,7 +235,7 @@ export function PainelCalls({
                     : 'Nenhuma outra call depois desta.'
                   : recemAgendada
                     ? 'Nenhuma outra call aguardando.'
-                    : 'As próximas salas ligadas ao seu pipeline.'}
+                    : 'Suas próximas calls aparecerão aqui.'}
               </p>
             </div>
             <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
@@ -247,8 +247,8 @@ export function PainelCalls({
                 <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
               </span>
               <div>
-                <strong>Sua agenda termina nesta call</strong>
-                <p>O próximo movimento será definido com os fatos registrados na conversa.</p>
+                <strong>Não há outra call agendada</strong>
+                <p>Ao terminar, registre a próxima ação combinada com o cliente.</p>
               </div>
             </div>
           ) : !proxima ? (
@@ -259,8 +259,8 @@ export function PainelCalls({
               <div>
                 <h3>Nenhuma call agendada</h3>
                 <p>
-                  Escolha uma oportunidade do CRM para criar a primeira sala e começar a registrar a
-                  jornada real do cliente.
+                  Escolha uma oportunidade do CRM para criar a sala e manter a reunião ligada ao
+                  histórico do cliente.
                 </p>
               </div>
               {oportunidades.length === 0 ? (
@@ -314,8 +314,8 @@ export function PainelCalls({
                 <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
               </span>
               <div>
-                <strong>Agenda livre depois desta call</strong>
-                <p>Use o espaço para registrar o próximo passo antes de abrir outra conversa.</p>
+                <strong>Não há outra call depois desta</strong>
+                <p>Registre a próxima ação antes de encerrar a reunião.</p>
               </div>
             </div>
           )}
@@ -330,25 +330,25 @@ export function PainelCalls({
               {comCoach} {comCoach === 1 ? 'sala preparada' : 'salas preparadas'}
             </span>
           </div>
-          <p>{ativas.length ? 'Copiloto privado' : 'Prévia guiada'}</p>
+          <p>{ativas.length ? 'Ajuda durante a call' : 'Como funciona'}</p>
           <h2 id="live-coach-titulo">Live Coach</h2>
           <p>
             {ativas.length
-              ? 'Uma recomendação por vez, no momento em que ela pode mudar a conversa.'
-              : 'Ao abrir sua primeira sala, as sugestões passam a usar o contexto real da reunião.'}
+              ? 'As sugestões aparecem somente para você, durante a conversa.'
+              : 'Ao abrir uma sala, o Live Coach usa a transcrição para sugerir perguntas.'}
           </p>
           <ul>
             <li>
               <strong>Escuta</strong>
-              <span>Transcreve sem tirar você da call.</span>
+              <span>Transcreve a conversa em tempo real.</span>
             </li>
             <li>
               <strong>Leitura</strong>
-              <span>Identifica dor, impacto e objeção.</span>
+              <span>Identifica dores, impacto e objeções.</span>
             </li>
             <li>
-              <strong>Direção</strong>
-              <span>Sugere a melhor próxima pergunta.</span>
+              <strong>Sugestão</strong>
+              <span>Recomenda a próxima pergunta.</span>
             </li>
           </ul>
           <span className={styles.estadoCoach}>

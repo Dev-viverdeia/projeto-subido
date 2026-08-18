@@ -16,7 +16,7 @@ const DOCUMENTO: DocumentoProposta = {
     email: 'camila@clinicaaurora.com.br',
   },
   projeto: {
-    titulo: 'Atendimento inteligente para clínicas',
+    titulo: 'Atendimento com IA para clínicas',
     resumo: 'Uma operação de atendimento contínua, organizada e mensurável no WhatsApp.',
     origem: 'catalogo',
   },

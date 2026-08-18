@@ -458,5 +458,5 @@ function mensagemSegura(erro: unknown): string {
       return `A contingência da análise respondeu com erro. [api_${erro.status ?? 'desconhecido'}]`;
     }
   }
-  return 'Não foi possível montar o dossiê agora. Revise as fontes e tente novamente.';
+  return 'Não foi possível pesquisar este lead agora. Revise os dados e tente novamente.';
 }

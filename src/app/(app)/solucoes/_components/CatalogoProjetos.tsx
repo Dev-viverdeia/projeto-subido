@@ -73,13 +73,13 @@ export function CatalogoProjetos({
           <div className={styles.aberturaTexto}>
             <p className={styles.eyebrow}>Biblioteca de execução</p>
             <Titulo id="titulo-projetos" className={styles.titulo}>
-              Cinco projetos.
+              Cinco projetos prontos.
               <br />
-              <span>Um jeito de entregar.</span>
+              <span>Passo a passo para implementar.</span>
             </Titulo>
             <p className={styles.apoio}>
-              Você não recebe só a ideia. Cada projeto começa na descoberta e termina com uma
-              operação validada nas mãos do cliente.
+              Aprenda como funciona, prepare as ferramentas, implemente com o cliente e valide o
+              resultado antes da entrega.
             </p>
           </div>
 
@@ -110,10 +110,9 @@ export function CatalogoProjetos({
       </section>
 
       <div className={styles.introducao}>
-        <p className={styles.introducaoRotulo}>Escolha a primeira entrega</p>
+        <p className={styles.introducaoRotulo}>Escolha um projeto</p>
         <p className={styles.introducaoTexto}>
-          Abra um projeto, execute os passos em ordem e use o Estúdio quando precisar adaptar a
-          entrega ao contexto de um cliente.
+          Siga os passos em ordem. Quando precisar adaptar a entrega para um cliente, use o Estúdio.
         </p>
       </div>
 

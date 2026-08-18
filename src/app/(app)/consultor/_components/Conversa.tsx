@@ -148,7 +148,7 @@ export function Conversa({
           {/* A bolha de digitação — o idioma universal de chat, com os três
               pontos em compasso. `role=status` + rótulo para leitor de tela. */}
           <div className={styles.digitando} role="status" aria-label="Sobral AI escrevendo">
-            <span className={styles.digitandoRotulo}>Sobral AI está lendo sua operação</span>
+            <span className={styles.digitandoRotulo}>Sobral AI está preparando a resposta</span>
             <span className={styles.pontosDigitando} aria-hidden="true">
               <span className={styles.pontinho} />
               <span className={styles.pontinho} />

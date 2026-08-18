@@ -344,7 +344,7 @@ export function CentralArquivos({
                 </select>
               </label>
               <label className={styles.descricao}>
-                <span>Contexto opcional</span>
+                <span>Observação opcional</span>
                 <textarea
                   value={descricao}
                   onChange={(evento) => setDescricao(evento.target.value)}

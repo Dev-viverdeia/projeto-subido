@@ -58,9 +58,9 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
     return {
       tipo: 'proposta',
       rotulo: 'Próxima decisão comercial',
-      titulo: 'Transformar esta conversa em uma proposta',
+      titulo: 'Criar uma proposta a partir desta conversa',
       descricao:
-        'Os fatos confirmados entram no rascunho. Escopo, investimento e promessas continuam sob sua revisão.',
+        'As informações confirmadas entram no rascunho. Você ainda revisa escopo, investimento e texto antes de enviar.',
       acao: 'Preparar proposta',
       href: `/propostas/nova?oportunidade=${posCall.oportunidade.id}&reuniao=${posCall.reuniao.id}`,
     };
@@ -71,12 +71,12 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
     (!posCall.analise && posCall.reuniao.status === 'concluida');
   return {
     tipo: 'crm',
-    rotulo: 'Continuidade no CRM',
-    titulo: processando ? 'Aguardar a leitura antes de propor' : 'Manter o próximo passo no dossiê',
+    rotulo: 'Próxima ação no CRM',
+    titulo: processando ? 'Aguardar a análise antes de propor' : 'Registrar o próximo contato',
     descricao: processando
-      ? 'A conversa foi preservada. Assim que a análise terminar, a plataforma libera a saída adequada.'
-      : 'Use o histórico e o plano revisado para acompanhar o lead sem criar um documento prematuro.',
-    acao: 'Abrir dossiê',
+      ? 'A conversa já foi salva. Assim que a análise terminar, você poderá decidir o próximo passo.'
+      : 'Use o histórico e o plano da call para acompanhar o lead antes de criar uma proposta.',
+    acao: 'Abrir oportunidade',
     href: `/crm/${posCall.oportunidade.id}`,
   };
 }

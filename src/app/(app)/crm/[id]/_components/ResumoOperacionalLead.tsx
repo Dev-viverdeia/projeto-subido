@@ -32,9 +32,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.operacaoTopo}>
         <div>
-          <p className={styles.sobretitulo}>Decisão atual</p>
-          <h2 id="operacao-titulo">Ciclo completo do cliente</h2>
-          <p>Contexto, conversas, proposta e entrega na mesma linha de trabalho.</p>
+          <p className={styles.sobretitulo}>Oportunidade</p>
+          <h2 id="operacao-titulo">Histórico e próxima ação</h2>
+          <p>Calls, propostas e projetos ligados a este cliente.</p>
         </div>
         {decisao.novoCiclo ? (
           <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
@@ -48,7 +48,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
         )}
       </header>
 
-      <ol className={styles.fluxoCliente} aria-label="Fluxo conectado deste cliente">
+      <ol className={styles.fluxoCliente} aria-label="Etapas desta oportunidade">
         {etapas.map((etapa) => {
           const conteudo = (
             <>
@@ -108,7 +108,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               <History size={17} strokeWidth={1.8} aria-hidden="true" />
               <h3 id="historico-titulo">Linha do tempo</h3>
             </div>
-            <span>{lead.eventos.length} fatos</span>
+            <span>{lead.eventos.length} atividades</span>
           </header>
           {lead.eventos.length ? (
             <ol>
@@ -126,7 +126,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               ))}
             </ol>
           ) : (
-            <p className={styles.semHistorico}>O primeiro fato aparecerá após uma ação no CRM.</p>
+            <p className={styles.semHistorico}>
+              As atividades aparecerão depois da primeira ação no CRM.
+            </p>
           )}
         </section>
 
@@ -156,7 +158,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               ))}
             </ul>
           ) : (
-            <p className={styles.semHistorico}>Nenhuma conversa vinculada a este lead.</p>
+            <p className={styles.semHistorico}>Nenhuma call vinculada a esta oportunidade.</p>
           )}
         </section>
       </div>

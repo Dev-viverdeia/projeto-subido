@@ -78,11 +78,11 @@ export function EditorProposta({
         ? 'Registre a decisão do cliente. Ao aceitar, a plataforma cria o projeto e abre a execução.'
         : status === 'aceita'
           ? execucaoId
-            ? 'A venda já virou um projeto ativo, ligado ao cliente, ao CRM e ao escopo aprovado.'
-            : 'A venda foi confirmada. Abra o projeto ativo para começar a entrega.'
+            ? 'O projeto do cliente já está aberto com o escopo aprovado.'
+            : 'Venda confirmada. Abra o projeto para começar a entrega.'
           : status === 'recusada'
-            ? 'A decisão ficou registrada no CRM. Crie uma nova versão somente se o contexto mudar.'
-            : 'Cada mudança de estado vira um fato na jornada deste lead.';
+            ? 'A recusa foi registrada no CRM. Crie outra versão somente se a negociação mudar.'
+            : 'Altere o status conforme a proposta avançar com o cliente.';
 
   function mudar(mutacao: (atual: DocumentoProposta) => DocumentoProposta) {
     setDocumento((atual) => mutacao(atual));

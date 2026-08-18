@@ -202,9 +202,9 @@ export function NavLateral({
             >
               <header className={styles.cabecalhoMenu}>
                 <div>
-                  <span className={styles.sobretituloMenu}>Sua plataforma</span>
+                  <span className={styles.sobretituloMenu}>Menu</span>
                   <h2 id={tituloMenuId}>Navegação</h2>
-                  <p>Acesse qualquer área sem perder o ponto em que está.</p>
+                  <p>Escolha uma área para continuar.</p>
                 </div>
                 <button
                   ref={botaoFecharRef}

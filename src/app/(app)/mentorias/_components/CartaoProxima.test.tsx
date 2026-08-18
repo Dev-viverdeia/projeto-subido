@@ -47,7 +47,7 @@ function montar(estado: Parameters<typeof CartaoProxima>[0]['estado'], sessao = 
 describe('cartão da próxima sessão', () => {
   it('lotada DIZ que está lotada, com o número', () => {
     montar('lotada', { ...BASE, inscritos: 30 });
-    expect(screen.getByText(/Sessão lotada — 30 de 30 vagas/)).toBeDefined();
+    expect(screen.getByText(/Sessão lotada: 30 de 30 vagas/)).toBeDefined();
     expect(screen.queryByRole('button', { name: /check-in/i })).toBeNull();
   });
 

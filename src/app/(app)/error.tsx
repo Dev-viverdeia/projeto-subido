@@ -35,9 +35,9 @@ export default function ErroApp({
     <EstadoSistema
       urgente
       icone={<CloudOff size={30} strokeWidth={1.6} />}
-      etiqueta="Conexão interrompida"
-      titulo="Esta tela não conseguiu chegar até você."
-      descricao="Seu trabalho continua salvo. Refaça a tentativa agora ou volte ao início para seguir por outra área."
+      etiqueta="Não foi possível carregar"
+      titulo="Esta página não abriu."
+      descricao="Tente novamente. Se o problema continuar, volte ao início e abra outra área."
       acoes={
         <>
           <Button variant="primary" onClick={reset}>
@@ -48,7 +48,7 @@ export default function ErroApp({
       }
       passos={[
         { rotulo: 'Primeiro', valor: 'Tente carregar a tela mais uma vez.' },
-        { rotulo: 'Se persistir', valor: 'Volte ao início e retome a jornada por lá.' },
+        { rotulo: 'Se persistir', valor: 'Volte ao início e abra outra área.' },
       ]}
     />
   );

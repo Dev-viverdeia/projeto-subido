@@ -137,11 +137,7 @@ export function Compositor({
       <PainelEspera
         rotulo="Análise"
         ideia={ideia}
-        passos={[
-          'Lendo a sua ideia',
-          'Mapeando o que você já definiu',
-          'Escrevendo perguntas sobre o seu projeto',
-        ]}
+        passos={['Lendo o briefing', 'Separando o que já foi definido', 'Preparando as perguntas']}
         /* A análise leva ~10–25s: fases mais curtas que as da geração. */
         intervalo={6000}
       />
@@ -152,16 +148,16 @@ export function Compositor({
     <div className={styles.tela}>
       <header className={styles.cabecalho}>
         <p className={styles.eyebrow}>
-          {projetoBase ? 'Estúdio · Projeto personalizado' : 'Estúdio'}
+          {projetoBase ? 'Estúdio · Adaptação de projeto' : 'Estúdio'}
         </p>
         <h2 className={styles.titulo}>
           {projetoBase ? (
             <>
-              O que muda <em>neste cliente</em>?
+              O que precisa mudar <em>para este cliente</em>?
             </>
           ) : (
             <>
-              O que o seu cliente precisa <em>resolver</em>?
+              Qual problema o cliente precisa <em>resolver</em>?
             </>
           )}
         </h2>
@@ -170,14 +166,9 @@ export function Compositor({
             palavra órfã abrindo a segunda linha. */}
         <p className={styles.apoio}>
           {projetoBase ? (
-            <>
-              Parta da entrega padrão e conte o contexto real. <em>O Estúdio adapta o projeto.</em>
-            </>
+            <>Use o projeto padrão como base e explique o que este cliente precisa de diferente.</>
           ) : (
-            <>
-              Descreva o problema como o cliente te contou.{' '}
-              <em>O projeto de implementação é o que volta.</em>
-            </>
+            <>Conte como o trabalho funciona hoje, onde o problema aparece e o que precisa mudar.</>
           )}
         </p>
       </header>
@@ -185,7 +176,7 @@ export function Compositor({
       <ol className={styles.fluxoEstudio} aria-label="Fluxo de criação do projeto">
         <li data-ativo="true">
           <span>01</span>
-          <strong>Contexto</strong>
+          <strong>Cliente</strong>
         </li>
         <li>
           <span>02</span>
@@ -203,28 +194,28 @@ export function Compositor({
 
       <div className={styles.mesaCriacao}>
         <aside className={styles.retorno} aria-labelledby="retorno-estudio" data-on-dark>
-          <p className={styles.retornoEyebrow}>O que volta para você</p>
-          <h3 id="retorno-estudio">Um projeto pronto para vender e executar.</h3>
+          <p className={styles.retornoEyebrow}>O que você recebe</p>
+          <h3 id="retorno-estudio">Um projeto para revisar, apresentar e implementar.</h3>
           <ol className={styles.entregas}>
             <li>
               <span>01</span>
               <div>
                 <strong>Escopo e arquitetura</strong>
-                <p>O que construir, em qual ordem e com quais limites.</p>
+                <p>O que será construído, em qual ordem e o que fica de fora.</p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
                 <strong>Kit de implementação</strong>
-                <p>Ferramentas, prompts, riscos e critérios de validação.</p>
+                <p>Ferramentas, prompts, riscos e formas de testar a entrega.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <strong>Próximo passo comercial</strong>
-                <p>O projeto vira base para uma proposta apresentada ao cliente.</p>
+                <strong>Base para a proposta</strong>
+                <p>O escopo fica pronto para entrar na proposta comercial.</p>
               </div>
             </li>
           </ol>
@@ -234,8 +225,8 @@ export function Compositor({
         <div className={styles.briefing}>
           <section className={styles.partida} aria-labelledby="partida-estudio">
             <header>
-              <span>Contexto da personalização</span>
-              <strong id="partida-estudio">Defina o ponto de partida</strong>
+              <span>Antes de gerar</span>
+              <strong id="partida-estudio">Escolha o projeto e o cliente</strong>
             </header>
 
             <div className={styles.decisaoGrid}>
@@ -259,7 +250,7 @@ export function Compositor({
                 <small>
                   {projetoBase
                     ? projetoBase.resultado
-                    : 'A estrutura padrão vira a base segura da personalização.'}
+                    : 'O Estúdio usa esse passo a passo como base.'}
                 </small>
               </label>
 
@@ -281,7 +272,7 @@ export function Compositor({
                 </select>
                 <small>
                   {oportunidade
-                    ? `O projeto e a proposta continuarão ligados a ${oportunidade.empresa}.`
+                    ? `O projeto e a proposta ficarão ligados a ${oportunidade.empresa}.`
                     : oportunidades.length
                       ? 'Opcional agora. Você poderá escolher o cliente ao criar a proposta.'
                       : 'Nenhuma oportunidade aberta no CRM.'}
@@ -304,7 +295,7 @@ export function Compositor({
             }}
           >
             <label className="sr-only" htmlFor="ideia-do-cliente">
-              O problema do cliente, com o contexto que você já tem
+              O problema do cliente e o que você já sabe
             </label>
             <textarea
               id="ideia-do-cliente"
@@ -322,7 +313,7 @@ export function Compositor({
               }}
               disabled={ocupado}
               rows={6}
-              placeholder="Conte o que o cliente relatou, como a operação funciona hoje, onde o problema aparece e o que precisa continuar igual."
+              placeholder="Conte o que o cliente relatou, como o trabalho funciona hoje, onde o problema aparece e o que precisa continuar igual."
             />
 
             <div className={styles.rodape}>

@@ -38,7 +38,7 @@ describe('MontadorProposta', () => {
       />,
     );
 
-    const continuar = screen.getByRole('button', { name: 'Continuar' });
+    const continuar = screen.getByRole('button', { name: 'Escolher projeto' });
     expect(continuar).toBeDisabled();
     expect(screen.queryByRole('combobox', { name: /Projeto-base/ })).not.toBeInTheDocument();
 
@@ -50,7 +50,7 @@ describe('MontadorProposta', () => {
 
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toBeInTheDocument();
     expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Criar rascunho para revisar/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Criar rascunho/ })).toBeDisabled();
   });
 
   it('recomenda o Projeto compatível quando a oportunidade já vem da call', () => {
@@ -91,9 +91,9 @@ describe('MontadorProposta', () => {
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
       'projeto:sdr-atendimento-qualificacao',
     );
-    expect(screen.getByText(/Recomendado pelo contexto da call/)).toBeVisible();
+    expect(screen.getByText(/Recomendado pelos dados da call/)).toBeVisible();
     expect(screen.getByText(/A equipe confirmou perda de contexto/)).toBeVisible();
     expect(screen.getAllByText('2', { selector: 'dt' })).toHaveLength(2);
-    expect(screen.getByRole('button', { name: /Criar rascunho para revisar/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Criar rascunho/ })).toBeEnabled();
   });
 });

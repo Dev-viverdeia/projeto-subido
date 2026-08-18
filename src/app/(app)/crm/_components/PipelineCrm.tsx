@@ -44,7 +44,7 @@ function etapaDoDestino(evento: DragEndEvent): EtapaCrm | null {
 
 function rotuloDaMovimentacao(etapa: EtapaCrm, anterior: EtapaCrm): string {
   if (etapa === 'ganho') return 'Oportunidade marcada como ganha.';
-  if (etapa === 'perdido') return 'Perda registrada com contexto.';
+  if (etapa === 'perdido') return 'Oportunidade marcada como perdida.';
   if (anterior === 'ganho' || anterior === 'perdido') return 'Oportunidade reaberta.';
   return `Oportunidade movida para ${ROTULO_ETAPA[etapa].toLowerCase()}.`;
 }
@@ -272,8 +272,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
       >
         <div className={styles.modalPerda}>
           <p className={styles.contextoPerda}>
-            O motivo alimenta seu histórico comercial. A oportunidade continua salva e pode ser
-            reaberta depois.
+            O motivo ficará salvo no histórico. A oportunidade poderá ser reaberta depois.
           </p>
           <fieldset>
             <legend>Selecione o motivo principal</legend>

@@ -117,7 +117,8 @@ export function FormularioNovoLead({
                   <p className={styles.sobretitulo}>Nova oportunidade</p>
                   <h2 id="novo-lead-titulo">Adicionar lead</h2>
                   <p>
-                    Cadastre o básico. Depois você completa o contexto e prepara a primeira call.
+                    Informe a empresa e o contato. Você poderá pesquisar mais dados e agendar a call
+                    depois.
                   </p>
                 </div>
                 <button
@@ -172,7 +173,7 @@ export function FormularioNovoLead({
                   name="email"
                   type="email"
                   label="E-mail"
-                  hint="Opcional por enquanto. Você pode enriquecer depois."
+                  hint="Opcional. Você poderá pesquisar outros contatos depois."
                   autoComplete="email"
                   defaultValue={estado.campos?.email ?? ''}
                   error={erroVisivel('email')}
@@ -182,7 +183,7 @@ export function FormularioNovoLead({
                   id="crm-titulo"
                   name="titulo"
                   label="Oportunidade"
-                  hint="Se deixar vazio, criamos um título com o nome da empresa."
+                  hint="Se deixar vazio, usaremos o nome da empresa."
                   placeholder="Ex.: Automação do atendimento"
                   defaultValue={estado.campos?.titulo ?? tituloInicial}
                   error={erroVisivel('titulo')}

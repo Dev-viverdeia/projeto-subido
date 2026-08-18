@@ -75,7 +75,7 @@ export function AndamentoProspeccao({
           <span>{etapa > 2 ? <Check size={13} /> : '3'}</span>
           <div>
             <strong>Crie a oportunidade</strong>
-            <small>Leve contexto e contatos qualificados ao CRM.</small>
+            <small>Envie os dados e contatos da empresa ao CRM.</small>
           </div>
         </li>
       </ol>

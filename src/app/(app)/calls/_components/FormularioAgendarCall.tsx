@@ -127,12 +127,12 @@ export function FormularioAgendarCall({
             <div className={styles.painel}>
               <header className={styles.topo}>
                 <div>
-                  <p className={styles.sobretitulo}>CRM + sala inteligente</p>
+                  <p className={styles.sobretitulo}>CRM + Live Coach</p>
                   <h2 id="agendar-call-titulo">Agendar call</h2>
                   <p>
                     {oportunidadeVinculada
-                      ? 'Defina o horário. A sala já nasce ligada ao contexto deste lead.'
-                      : 'Escolha o lead e defina o horário. O link e o primeiro fato nascem juntos.'}
+                      ? 'Defina o horário. A sala ficará ligada a esta oportunidade.'
+                      : 'Escolha o lead e defina o horário. O link ficará salvo na oportunidade.'}
                   </p>
                 </div>
                 <button
@@ -174,7 +174,7 @@ export function FormularioAgendarCall({
                       <input type="hidden" name="oportunidade" value={oportunidadeVinculada.id} />
                       <div className={styles.contextoLeadTopo}>
                         <span>Oportunidade vinculada</span>
-                        <Link href={`/crm/${oportunidadeVinculada.id}`}>Abrir dossiê</Link>
+                        <Link href={`/crm/${oportunidadeVinculada.id}`}>Abrir oportunidade</Link>
                       </div>
                       <strong>{oportunidadeVinculada.empresa}</strong>
                       <p>{oportunidadeVinculada.titulo}</p>

@@ -4,17 +4,17 @@ import { CST } from '../src/lib/brand';
 const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
-  ['/preview/mapa-jornada', 'Defina o foco da sua primeira oferta'],
+  ['/preview/mapa-jornada', 'Escolha o que você quer vender primeiro.'],
   ['/preview/crm', 'Três etapas de trabalho para saber quem precisa de atenção agora'],
-  ['/preview/prospeccao', 'Encontre empresas e comece a conversa'],
-  ['/preview/calls', 'Cada reunião vira contexto no CRM'],
+  ['/preview/prospeccao', 'Encontre empresas para prospectar.'],
+  ['/preview/calls', 'O que fica salvo'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
-  ['/preview/propostas', 'Da descoberta à decisão'],
+  ['/preview/propostas', 'Crie e acompanhe propostas.'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/sala-entrega', 'O combinado segue com o cliente'],
+  ['/preview/sala-entrega', 'Compromissos registrados com o cliente'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {

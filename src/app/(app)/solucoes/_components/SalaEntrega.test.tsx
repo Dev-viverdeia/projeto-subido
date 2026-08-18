@@ -227,7 +227,7 @@ describe('SalaEntrega', () => {
     expect(screen.getByRole('heading', { name: 'Treinar a equipe', level: 2 })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /Entender/ }));
-    expect(screen.getByRole('textbox', { name: /Evidência da execução/i })).toHaveValue(
+    expect(screen.getByRole('textbox', { name: /Registro da execução/i })).toHaveValue(
       'Mapa aprovado.',
     );
   });
@@ -265,7 +265,9 @@ describe('SalaEntrega', () => {
     );
 
     const tarefaAtual = screen.getByRole('heading', { name: 'Montar a base', level: 2 });
-    const planoVivo = screen.getByRole('region', { name: 'O combinado segue com o cliente' });
+    const planoVivo = screen.getByRole('region', {
+      name: 'Compromissos registrados com o cliente',
+    });
     expect(planoVivo).toBeInTheDocument();
     expect(tarefaAtual.compareDocumentPosition(planoVivo) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,

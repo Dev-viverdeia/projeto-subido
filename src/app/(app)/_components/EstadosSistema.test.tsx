@@ -13,9 +13,7 @@ describe('estados globais da plataforma', () => {
       'aria-busy',
       'true',
     );
-    expect(
-      screen.getByText('Organizando oportunidades, etapas e próximos movimentos.'),
-    ).toBeVisible();
+    expect(screen.getByText('Carregando oportunidades e etapas do pipeline.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'CRM', level: 1 })).toHaveClass('sr-only');
   });
 

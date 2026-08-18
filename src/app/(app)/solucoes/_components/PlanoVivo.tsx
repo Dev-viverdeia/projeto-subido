@@ -86,8 +86,8 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
             <ListChecks size={20} strokeWidth={1.7} />
           </span>
           <div>
-            <p>Plano vivo</p>
-            <h2 id="plano-vivo-titulo">O combinado segue com o cliente</h2>
+            <p>Acordos do projeto</p>
+            <h2 id="plano-vivo-titulo">Compromissos registrados com o cliente</h2>
           </div>
         </div>
         <div className={styles.medida} aria-label={`${abertas} compromissos em aberto`}>
@@ -97,8 +97,8 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
       </header>
 
       <p className={styles.explicacao}>
-        Decisões confirmadas nas calls ficam aqui. O roteiro de implementação continua abaixo, com
-        cada tarefa e sua evidência.
+        Decisões confirmadas nas calls ficam aqui. As tarefas de implementação continuam logo
+        abaixo, com o critério de conclusão de cada uma.
       </p>
 
       <ol>

@@ -37,10 +37,10 @@ export function JornadaEntradaLead({
         <div>
           <p>Lead adicionado</p>
           <h2 id="entrada-lead-titulo">
-            {projetoSlug ? 'Prepare a conversa e a proposta.' : 'Prepare a primeira conversa.'}
+            {projetoSlug ? 'Pesquise o lead e prepare a proposta.' : 'Prepare a primeira conversa.'}
           </h2>
           <span>
-            A oportunidade de {empresaNome} já está no CRM. Agora complete o contexto ou crie a
+            A oportunidade de {empresaNome} já está no CRM. Agora pesquise a empresa ou agende a
             primeira call.
           </span>
         </div>
@@ -51,12 +51,12 @@ export function JornadaEntradaLead({
         <div>
           <strong>
             {precisaContexto
-              ? 'Comece pelo contexto que você já possui.'
+              ? 'Comece pelas informações que você já possui.'
               : callPronta
                 ? 'A preparação inicial está completa.'
-                : 'Enquanto a leitura acontece, você já pode preparar a conversa.'}
+                : 'Enquanto a pesquisa acontece, você já pode preparar a conversa.'}
           </strong>
-          <p>Nada se perde: cada etapa alimenta o mesmo histórico comercial.</p>
+          <p>Todas as ações ficam salvas no histórico desta oportunidade.</p>
         </div>
         <div className={styles.acoes}>
           {precisaContexto && (
@@ -65,7 +65,7 @@ export function JornadaEntradaLead({
               dominioInicial={dominio}
               linkedinInicial={linkedin}
               temDossie={false}
-              rotulo={estadoContexto === 'falhou' ? 'Revisar contexto' : 'Completar contexto'}
+              rotulo={estadoContexto === 'falhou' ? 'Tentar pesquisa novamente' : 'Pesquisar lead'}
             />
           )}
           {!callPronta && (
@@ -82,7 +82,7 @@ export function JornadaEntradaLead({
                 href={`/crm/${oportunidadeId}`}
                 className="via-btn via-btn--secondary via-btn--md"
               >
-                Abrir dossiê
+                Abrir oportunidade
               </Link>
               <Link href={destinoProposta} className="via-btn via-btn--primary via-btn--md">
                 Montar proposta
@@ -90,7 +90,7 @@ export function JornadaEntradaLead({
             </>
           ) : contextoPronto && callPronta ? (
             <Link href={`/crm/${oportunidadeId}`} className="via-btn via-btn--primary via-btn--md">
-              Abrir dossiê
+              Abrir oportunidade
             </Link>
           ) : null}
         </div>
@@ -101,7 +101,7 @@ export function JornadaEntradaLead({
           <span className={styles.numero}>01</span>
           <div>
             <strong>Lead no pipeline</strong>
-            <p>Empresa, contato e oportunidade já estão conectados.</p>
+            <p>Empresa, contato e serviço de interesse foram salvos.</p>
           </div>
           <small>Concluído</small>
         </li>
@@ -111,14 +111,14 @@ export function JornadaEntradaLead({
         >
           <span className={styles.numero}>02</span>
           <div>
-            <strong>Completar contexto</strong>
-            <p>Site, histórico e informações que ajudam na abordagem.</p>
+            <strong>Pesquisar o lead</strong>
+            <p>Busque site e informações que ajudam na primeira abordagem.</p>
           </div>
           <small>
             {contextoPronto
               ? 'Concluído'
               : contextoEmAndamento
-                ? 'Em análise'
+                ? 'Pesquisando'
                 : estadoContexto === 'falhou'
                   ? 'Revisar fontes'
                   : 'Próximo'}
@@ -143,7 +143,7 @@ export function JornadaEntradaLead({
             <span className={styles.numero}>04</span>
             <div>
               <strong>Montar a proposta</strong>
-              <p>Projeto escolhido e fatos do CRM preparam o primeiro rascunho.</p>
+              <p>O projeto escolhido e os dados do CRM entram no primeiro rascunho.</p>
             </div>
             <small>{propostaPronta ? 'Próximo' : 'Pendente'}</small>
           </li>

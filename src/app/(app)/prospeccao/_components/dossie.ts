@@ -182,7 +182,7 @@ export function qualificacaoDo(lead: Lead): Qualificacao {
 }
 
 export function rotuloCompletude(valor: number) {
-  if (valor >= 80) return 'Dossiê muito completo';
+  if (valor >= 80) return 'Muitos dados encontrados';
   if (valor >= 55) return 'Boa base de contato';
   if (valor >= 30) return 'Dados parciais';
   return 'Base inicial';

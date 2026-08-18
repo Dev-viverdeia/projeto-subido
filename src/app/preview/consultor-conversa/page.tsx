@@ -70,7 +70,7 @@ const mensagens: MensagemDoConsultor[] = [
       recomendacao: {
         acao: 'Agendar uma conversa de decisão sobre a proposta',
         motivo:
-          'A proposta já foi apresentada e a ação anterior confirmou quem decide. O avanço agora é transformar esse contexto em uma conversa com data e decisão esperada.',
+          'A proposta já foi apresentada e você confirmou quem decide. Agora, marque a conversa e deixe claro qual decisão precisa sair dela.',
         fatos: [
           'Proposta · “Projeto de atendimento com IA” está com status apresentada.',
           'Call · Decisão: a diretora de operações fará a validação final.',

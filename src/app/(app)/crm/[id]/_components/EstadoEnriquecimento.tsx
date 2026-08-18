@@ -44,12 +44,12 @@ export function EstadoEnriquecimento({
   if (!ativo) return null;
 
   return (
-    <section className={styles.estado} aria-live="polite" aria-label="Análise em andamento">
+    <section className={styles.estado} aria-live="polite" aria-label="Pesquisa em andamento">
       <div className={styles.cabecalho}>
         <div>
-          <p className={styles.sobretitulo}>Análise em andamento</p>
-          <h2>Cruzando os sinais deste lead</h2>
-          <p>O dossiê continua sendo montado mesmo se você sair desta página.</p>
+          <p className={styles.sobretitulo}>Pesquisa em andamento</p>
+          <h2>Buscando informações sobre este lead</h2>
+          <p>Você pode sair desta página. A pesquisa continuará em segundo plano.</p>
         </div>
         <span className={styles.pulso} aria-hidden="true" />
       </div>
@@ -64,7 +64,7 @@ export function EstadoEnriquecimento({
         </span>
         <span className={styles.traco} />
         <span className={`${styles.no} ${styles.noAtivo}`}>
-          <Layers3 size={17} /> Dossiê
+          <Layers3 size={17} /> Análise
         </span>
       </div>
     </section>

@@ -26,7 +26,7 @@ export function SecoesContextoEntrega({
         <header className={styles.blocoTopo}>
           <span>01</span>
           <div>
-            <p>Contexto</p>
+            <p>Cliente</p>
             <h2>Cliente e oportunidade</h2>
           </div>
         </header>

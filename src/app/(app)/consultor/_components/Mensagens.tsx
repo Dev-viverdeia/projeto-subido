@@ -32,11 +32,11 @@ export function Mensagens({
             <p className={styles.texto}>{m.conteudo}</p>
 
             {m.direcao ? (
-              <aside className={styles.direcao} aria-label="Direção gerada nesta resposta">
+              <aside className={styles.direcao} aria-label="Plano gerado nesta resposta">
                 <div className={styles.direcaoRotulo}>
                   <Target size={14} strokeWidth={2} aria-hidden="true" />
                   <span>
-                    Direção ·{' '}
+                    Plano ·{' '}
                     {ETAPAS_SOBRAL.find((etapa) => etapa.id === m.direcao?.etapa)?.titulo ??
                       m.direcao.etapa}
                   </span>
@@ -51,7 +51,7 @@ export function Mensagens({
                   }
                   className={styles.direcaoAcao}
                 >
-                  {m.direcao.contexto_acao ? 'Ver oportunidade' : 'Executar próximo passo'}
+                  {m.direcao.contexto_acao ? 'Ver oportunidade' : 'Fazer próxima ação'}
                   <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
                 </Link>
               </aside>

@@ -24,16 +24,29 @@ export function PrioridadeOperacional({
   foco,
   titulo,
   detalhe,
-  rotuloEvidencia = 'Você avançou quando',
+  rotuloEvidencia = 'Concluído quando',
   evidencia,
   destino,
   acao,
 }: PrioridadeOperacionalProps) {
+  const modoVisivel =
+    modo === 'prioridade da operação'
+      ? 'prioridade atual'
+      : modo === 'plano da jornada'
+        ? 'plano de trabalho'
+        : modo;
+  const rotuloVisivel =
+    rotuloEvidencia === 'Evidência atual'
+      ? 'Status atual'
+      : rotuloEvidencia === 'Registro de conclusão'
+        ? 'Concluído quando'
+        : rotuloEvidencia;
+
   return (
     <article className={styles.prioridade}>
       <div className={styles.prioridadeTopo}>
         <span>
-          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · {modo}
+          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · {modoVisivel}
         </span>
         <em>{etapa}</em>
       </div>
@@ -48,14 +61,14 @@ export function PrioridadeOperacional({
           <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
         </Link>
         <Link href="/consultor" className={styles.abrirLeitura}>
-          Ver leitura completa
+          Ver orientação completa
         </Link>
       </div>
 
       <div className={styles.evidenciaPrioridade}>
         <CheckCircle2 size={16} strokeWidth={1.9} aria-hidden="true" />
         <span>
-          <small>{rotuloEvidencia}</small>
+          <small>{rotuloVisivel}</small>
           <strong>{evidencia}</strong>
         </span>
       </div>
@@ -68,12 +81,12 @@ export function PrioridadeOperacionalCarregando() {
     <article className={`${styles.prioridade} ${styles.prioridadeCarregando}`} aria-busy="true">
       <div className={styles.prioridadeTopo}>
         <span>
-          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · conectando fatos
+          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · analisando seus dados
         </span>
       </div>
-      <h1>Preparando sua próxima ação.</h1>
+      <h1>Organizando sua próxima ação.</h1>
       <p className={styles.prioridadeDescricao}>
-        Cruzando CRM, calls, propostas e projetos para abrir somente o que importa agora.
+        Estamos verificando CRM, calls, propostas e projetos.
       </p>
       <span className={styles.carregandoLinha} aria-hidden="true" />
     </article>

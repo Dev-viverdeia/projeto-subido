@@ -27,7 +27,7 @@ const ROTULO_DOMINIO: Record<DominioRadarSobral, string> = {
 const EVIDENCIA_DOMINIO: Record<DominioRadarSobral, string> = {
   crm: 'Resultado registrado e próxima ação definida no CRM.',
   calls: 'Call concluída com fatos e próximo compromisso registrados.',
-  propostas: 'Decisão do cliente e próximo movimento registrados na proposta.',
+  propostas: 'Decisão do cliente e próxima ação registradas na proposta.',
   projetos: 'Compromisso concluído ou replanejado dentro do projeto do cliente.',
   plano: 'Compromisso atualizado com resultado, responsável e próximo passo.',
 };
@@ -88,7 +88,7 @@ export function resolverPrioridadeInicio(
       etapa: etapa.titulo,
       foco: urgente.momento,
       titulo: urgente.titulo,
-      detalhe: `${urgente.contexto}. Resolva este compromisso antes de abrir outro movimento na operação.`,
+      detalhe: `${urgente.contexto}. Resolva este item antes de começar outra tarefa.`,
       rotuloEvidencia: 'Registro de conclusão',
       evidencia: EVIDENCIA_DOMINIO[urgente.dominio],
       destino: urgente.destino,

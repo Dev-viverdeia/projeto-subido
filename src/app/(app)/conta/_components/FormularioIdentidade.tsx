@@ -49,7 +49,7 @@ export function FormularioIdentidade({ nome }: { nome: string }) {
         >
           {estado.erro ??
             estado.sucesso ??
-            (alterado ? 'Sua alteração está pronta para salvar.' : 'Seu nome está sincronizado.')}
+            (alterado ? 'Salve para aplicar a alteração.' : 'Nenhuma alteração pendente.')}
         </p>
 
         <div className={styles.acoes}>
