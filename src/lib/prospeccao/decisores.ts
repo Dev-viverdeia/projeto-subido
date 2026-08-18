@@ -82,6 +82,58 @@ function prioridade(decisor: Decisor) {
   return PRIORIDADES.get(decisor.senioridade?.toLowerCase() ?? '') ?? SENIORIDADES.length;
 }
 
+function normalizarNome(valor: string | null | undefined) {
+  return (valor ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR')
+    .replace(/\b(ltda|eireli|sa|s a|me|epp)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function dominioDaEmpresa(empresa: Registro | null) {
+  const recebido =
+    texto(empresa?.domain) ??
+    texto(empresa?.company_domain) ??
+    texto(empresa?.website) ??
+    texto(empresa?.website_url);
+  if (!recebido) return null;
+  try {
+    const url = new URL(recebido.startsWith('http') ? recebido : `https://${recebido}`);
+    return url.hostname.replace(/^www\./, '').toLocaleLowerCase('pt-BR');
+  } catch {
+    return (
+      recebido
+        .replace(/^www\./, '')
+        .toLocaleLowerCase('pt-BR')
+        .split('/')[0] ?? null
+    );
+  }
+}
+
+function vinculoCompativel(encontrado: { empresa: Registro | null }, lead: LeadProspeccaoEntrada) {
+  const dominioLead = lead.dominio?.replace(/^www\./, '').toLocaleLowerCase('pt-BR') ?? null;
+  const dominioEmpresa = dominioDaEmpresa(encontrado.empresa);
+  if (
+    dominioLead &&
+    dominioEmpresa &&
+    (dominioLead === dominioEmpresa ||
+      dominioLead.endsWith(`.${dominioEmpresa}`) ||
+      dominioEmpresa.endsWith(`.${dominioLead}`))
+  ) {
+    return true;
+  }
+
+  const nomeLead = normalizarNome(lead.nome);
+  const nomeEmpresa = normalizarNome(
+    texto(encontrado.empresa?.name) ?? texto(encontrado.empresa?.company_name),
+  );
+  if (!nomeLead || !nomeEmpresa || Math.min(nomeLead.length, nomeEmpresa.length) < 4) return false;
+  return nomeLead.includes(nomeEmpresa) || nomeEmpresa.includes(nomeLead);
+}
+
 export async function buscarDecisores(
   lead: LeadProspeccaoEntrada,
   chave: string,
@@ -113,6 +165,7 @@ export async function buscarDecisores(
     const encontrados = pessoas
       .map(decisorDaPessoa)
       .filter((item): item is NonNullable<ReturnType<typeof decisorDaPessoa>> => Boolean(item))
+      .filter((item) => vinculoCompativel(item, lead))
       .sort((a, b) => prioridade(a.decisor) - prioridade(b.decisor));
     const decisores = [...encontrados.map((item) => item.decisor), ...lead.decisores]
       .filter(

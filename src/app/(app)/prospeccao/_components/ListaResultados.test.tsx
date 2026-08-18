@@ -21,7 +21,7 @@ const LEAD = {
   site_url: 'https://clinica-aurora.example.com',
   dominio: 'clinica-aurora.example.com',
   telefone: '+55 31 3333-4444',
-  telefones: ['+55 31 3333-4444'],
+  telefones: ['+55 31 3333-4444', '+553133334444'],
   emails: ['contato@clinica-aurora.example.com'],
   redes_sociais: [{ rede: 'instagram', url: 'https://instagram.com/clinicaaurora' }],
   decisores: [
@@ -69,6 +69,7 @@ describe('resultados da prospecção', () => {
     expect(screen.getByRole('dialog', { name: 'Clínica Aurora' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /WhatsApp/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Escrever/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '+553133334444' })).not.toBeInTheDocument();
     expect(screen.queryByText('Alguém respondeu')).not.toBeInTheDocument();
     expect(screen.getByText('Google Maps · dados públicos')).toBeInTheDocument();
 

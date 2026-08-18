@@ -261,6 +261,64 @@ describe('provedores da prospecção', () => {
     expect(resultado.provedores.fullenrich).toBe('concluido');
   });
 
+  it('não trata WhatsApp como site nem aceita decisores de outra empresa', async () => {
+    vi.mocked(prospeccaoEnv).mockReturnValue({
+      pronto: true,
+      apifyToken: 'token-apify-valido',
+      apifyActor: 'compass/crawler-google-places',
+      serpApi: null,
+      firecrawl: null,
+      fullEnrich: 'token-fullenrich-valido',
+      fullEnrichWebhook: null,
+    });
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (String(url).includes('fullenrich.com')) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              people: [
+                {
+                  full_name: 'Executiva da WhatsApp',
+                  employment: {
+                    current: {
+                      title: 'Diretora',
+                      seniority: 'Director',
+                      company: { name: 'WhatsApp', domain: 'whatsapp.com' },
+                    },
+                  },
+                },
+              ],
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          ),
+        );
+      }
+      return Promise.resolve(
+        new Response(
+          JSON.stringify([
+            {
+              title: 'Odontologia Especializada LG',
+              website: 'https://api.whatsapp.com/send?phone=553134348698',
+              url: 'https://www.google.com/maps/place/odontologia-lg',
+              phone: '+55 31 3434-8698',
+              placeId: 'odontologia-lg',
+            },
+          ]),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resultado = await prospectarEmpresas(busca);
+
+    expect(resultado.leads[0]).toMatchObject({
+      site_url: null,
+      dominio: null,
+      decisores: [],
+    });
+  });
+
   it('falha a lista quando o único motor disponível não responde', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('timeout')));
 

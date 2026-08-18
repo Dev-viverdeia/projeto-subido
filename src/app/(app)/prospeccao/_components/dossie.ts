@@ -71,10 +71,13 @@ export function fontesDo(lead: Lead) {
 }
 
 export function telefonesDo(lead: Lead) {
-  const telefones = stringsDo(lead.telefones);
-  return [
-    ...new Set([lead.telefone, ...telefones].filter((item): item is string => Boolean(item))),
-  ];
+  const porNumero = new Map<string, string>();
+  for (const telefone of [lead.telefone, ...stringsDo(lead.telefones)]) {
+    if (!telefone) continue;
+    const digitos = telefone.replace(/\D/g, '');
+    if (digitos.length >= 10 && !porNumero.has(digitos)) porNumero.set(digitos, telefone);
+  }
+  return [...porNumero.values()];
 }
 
 export function emailsDo(lead: Lead) {

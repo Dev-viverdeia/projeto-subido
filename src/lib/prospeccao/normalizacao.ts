@@ -38,6 +38,42 @@ export function urlPublica(valor: unknown): string | null {
   }
 }
 
+const DOMINIOS_QUE_NAO_SAO_SITE = [
+  'whatsapp.com',
+  'wa.me',
+  'instagram.com',
+  'facebook.com',
+  'fb.com',
+  'linkedin.com',
+  'x.com',
+  'twitter.com',
+  'tiktok.com',
+  'youtube.com',
+  'youtu.be',
+  'pinterest.com',
+  'pin.it',
+  'google.com',
+  'google.com.br',
+  'g.page',
+  'goo.gl',
+  'linktr.ee',
+  'beacons.ai',
+  'bio.site',
+] as const;
+
+function dominioBloqueado(dominio: string) {
+  return DOMINIOS_QUE_NAO_SAO_SITE.some(
+    (bloqueado) => dominio === bloqueado || dominio.endsWith(`.${bloqueado}`),
+  );
+}
+
+export function siteOficial(valor: unknown): string | null {
+  const publica = urlPublica(valor);
+  if (!publica) return null;
+  const dominio = new URL(publica).hostname.replace(/^www\./, '').toLocaleLowerCase('pt-BR');
+  return dominioBloqueado(dominio) ? null : publica;
+}
+
 function dominioDe(url: string | null): string | null {
   if (!url) return null;
   try {
@@ -221,7 +257,7 @@ function chaveDo(registro: Registro, nome: string, endereco: string | null, site
 export function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
   const nome = texto(registro.title);
   if (!nome) return null;
-  const site = urlPublica(registro.website);
+  const site = siteOficial(registro.website);
   const endereco = texto(registro.address);
   const telefone = texto(registro.phone);
   const base = {
@@ -254,7 +290,7 @@ export function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
 export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
   const nome = texto(registro.title) ?? texto(registro.name);
   if (!nome) return null;
-  const site = urlPublica(registro.website) ?? urlPublica(registro.url);
+  const site = siteOficial(registro.website);
   const endereco = texto(registro.address);
   const categorias = Array.isArray(registro.categories)
     ? registro.categories.filter((item): item is string => typeof item === 'string')
