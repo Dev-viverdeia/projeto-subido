@@ -39,8 +39,8 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       {parametros.busca === 'concluida' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={17} aria-hidden="true" />
-          Lista pronta. Abra um canal de contato e marque quando a empresa responder. Envie ao CRM
-          somente quem demonstrar interesse.
+          Lista pronta. As empresas repetidas foram retiradas e os melhores contatos aparecem
+          primeiro.
         </div>
       )}
       {parametros.busca === 'falhou' && (
@@ -138,21 +138,18 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
               <p className={styles.sobretitulo}>Primeira busca</p>
               <h2>Encontre as primeiras empresas.</h2>
               <p>
-                Informe o tipo de empresa e a região. Depois, use os contatos encontrados para
-                abordar e envie ao CRM somente quem respondeu.
+                Informe o tipo de empresa e a região. A plataforma procura empresas novas, reúne os
+                contatos disponíveis e organiza a lista para você começar.
               </p>
               <ol>
                 <li>
                   <span>01</span> Defina mercado e região
                 </li>
                 <li>
-                  <span>02</span> Escolha um canal de contato
+                  <span>02</span> Veja os contatos encontrados
                 </li>
                 <li>
-                  <span>03</span> Marque quem respondeu
-                </li>
-                <li>
-                  <span>04</span> Envie a oportunidade ao CRM
+                  <span>03</span> Leve os leads escolhidos ao CRM
                 </li>
               </ol>
             </div>

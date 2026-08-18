@@ -1,16 +1,21 @@
 import 'server-only';
 
 import { prospeccaoEnv } from '@/lib/env';
-import { buscarDecisores } from './decisores';
+import { buscarDecisores, iniciarEnriquecimentoDeContatos } from './decisores';
+import { enriquecerSite, mapearComLimite } from './enriquecer-site';
 import {
-  emailsValidos,
+  carregarExposicoesProspeccao,
+  carregarMemoriaProspeccao,
+  dominioNormalizado,
+  identidadeDaEmpresa,
+  type ExposicaoProspeccao,
+  type MemoriaProspeccao,
+} from './memoria';
+import {
   jsonDaResposta,
   origemApify,
   origemSerp,
   qualificar,
-  redesDeUrls,
-  telefonesUnicos,
-  texto,
   unicos,
   type Registro,
 } from './normalizacao';
@@ -26,6 +31,9 @@ export type ResultadoProvedores = {
   };
 };
 
+type ContextoProspeccao = { dono?: string; lista?: string };
+type ParametrosDescoberta = Omit<BuscaProspeccao, 'quantidade'> & { quantidade: number };
+
 export class ErroConfiguracaoProspeccao extends Error {
   constructor() {
     super('As integrações de Prospecção ainda estão sendo configuradas.');
@@ -34,7 +42,7 @@ export class ErroConfiguracaoProspeccao extends Error {
 }
 
 async function buscarSerpApi(
-  busca: BuscaProspeccao,
+  busca: ParametrosDescoberta,
   chave: string,
 ): Promise<LeadProspeccaoEntrada[]> {
   const paginas = Array.from(
@@ -67,8 +75,12 @@ async function buscarSerpApi(
     .filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
 }
 
+function quantidadeParaDescoberta(quantidade: number) {
+  return Math.min(100, Math.max(40, quantidade * 5));
+}
+
 async function buscarApify(
-  busca: BuscaProspeccao,
+  busca: ParametrosDescoberta,
   token: string,
   actorId: string,
 ): Promise<LeadProspeccaoEntrada[]> {
@@ -99,12 +111,21 @@ async function buscarApify(
   return itens.map(origemApify).filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
 }
 
+function identidadeDeCombinacao(lead: LeadProspeccaoEntrada) {
+  const dominio = dominioNormalizado(lead.dominio);
+  if (dominio) return `dominio:${dominio}`;
+  const telefone = lead.telefones[0]?.replace(/\D/g, '') ?? lead.telefone?.replace(/\D/g, '');
+  if (telefone && telefone.length >= 10) return `telefone:${telefone}`;
+  return `empresa:${identidadeDaEmpresa(lead)}`;
+}
+
 function combinar(principal: LeadProspeccaoEntrada[], complemento: LeadProspeccaoEntrada[]) {
   const porChave = new Map<string, LeadProspeccaoEntrada>();
   for (const lead of [...principal, ...complemento]) {
-    const existente = porChave.get(lead.chave_externa);
+    const identidade = identidadeDeCombinacao(lead);
+    const existente = porChave.get(identidade);
     if (!existente) {
-      porChave.set(lead.chave_externa, lead);
+      porChave.set(identidade, lead);
       continue;
     }
     const combinado = {
@@ -138,134 +159,73 @@ function combinar(principal: LeadProspeccaoEntrada[], complemento: LeadProspecca
       fontes: [...new Set([...existente.fontes, ...lead.fontes])],
       dados: { ...lead.dados, ...existente.dados },
     } satisfies LeadProspeccaoEntrada;
-    porChave.set(lead.chave_externa, { ...combinado, qualificacao: qualificar(combinado) });
+    porChave.set(identidade, { ...combinado, qualificacao: qualificar(combinado) });
   }
   return [...porChave.values()];
 }
 
-function resumoDoMarkdown(markdown: string): string | null {
-  const limpo = markdown
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/[#>*_`~-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return limpo ? limpo.slice(0, 900) : null;
-}
-
-function contatosDoSite(markdown: string, links: string[]) {
-  const emailsEmLinks = links
-    .filter((link) => link.toLowerCase().startsWith('mailto:'))
-    .map((link) => link.slice(7).split('?')[0] ?? '');
-  const emailsNoTexto = markdown.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi) ?? [];
-  const telefonesEmLinks = links.flatMap((link) => {
-    const normalizado = link.toLowerCase();
-    if (normalizado.startsWith('tel:')) return [link.slice(4).split('?')[0] ?? ''];
-    try {
-      const url = new URL(link);
-      if (url.hostname === 'wa.me' || url.hostname.endsWith('.wa.me')) return [url.pathname];
-      if (url.hostname.endsWith('whatsapp.com')) return [url.searchParams.get('phone')];
-    } catch {
-      return [];
-    }
-    return [];
-  });
-  const telefonesNoTexto =
-    markdown.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?(?:9?\d{4})[-.\s]?\d{4}/g) ?? [];
-  const urlsNoTexto = markdown.match(/https?:\/\/[^\s)\]}>"']+/gi) ?? [];
-  return {
-    emails: emailsValidos([...emailsEmLinks, ...emailsNoTexto]),
-    telefones: telefonesUnicos([...telefonesEmLinks, ...telefonesNoTexto]).slice(0, 12),
-    redes: redesDeUrls([...links, ...urlsNoTexto]),
-  };
-}
-
-async function lerSite(lead: LeadProspeccaoEntrada, chave: string) {
-  if (!lead.site_url) return lead;
-  try {
-    const resposta = await fetch('https://api.firecrawl.dev/v2/scrape', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: lead.site_url,
-        formats: ['markdown', 'links'],
-        onlyMainContent: false,
-        maxAge: 172_800_000,
-        timeout: 12_000,
-      }),
-      cache: 'no-store',
-      signal: AbortSignal.timeout(16_000),
-    });
-    const json = (await jsonDaResposta(resposta)) as {
-      success?: boolean;
-      data?: { markdown?: unknown; links?: unknown; metadata?: Registro };
-    };
-    const markdown = texto(json.data?.markdown);
-    const links = Array.isArray(json.data?.links)
-      ? json.data.links.filter((item): item is string => typeof item === 'string')
-      : [];
-    const resumo = markdown ? resumoDoMarkdown(markdown) : null;
-    const contatos = contatosDoSite(markdown ?? '', links);
-    const atualizado = {
-      ...lead,
-      telefone: lead.telefone ?? contatos.telefones[0] ?? null,
-      telefones: telefonesUnicos([...lead.telefones, ...contatos.telefones]).slice(0, 12),
-      emails: unicos([...lead.emails, ...contatos.emails]).slice(0, 12),
-      redes_sociais: redesDeUrls([
-        ...lead.redes_sociais.map((rede) => rede.url),
-        ...contatos.redes.map((rede) => rede.url),
-      ]),
-      descricao: lead.descricao ?? resumo,
-      fontes: [...new Set([...lead.fontes, 'Site oficial · conteúdo público'])],
-      dados: {
-        ...lead.dados,
-        site_titulo: texto(json.data?.metadata?.title),
-        site_descricao: texto(json.data?.metadata?.description),
-        site_resumo: resumo,
-        site_contatos: {
-          emails: contatos.emails,
-          telefones: contatos.telefones,
-          redes_sociais: contatos.redes,
-        },
-      },
-      qualificacao: lead.qualificacao,
-    } satisfies LeadProspeccaoEntrada;
-    return { ...atualizado, qualificacao: qualificar(atualizado) };
-  } catch {
-    return lead;
-  }
-}
-
-async function mapearComLimite<T, R>(
-  itens: T[],
-  limite: number,
-  executar: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const resultado: Array<{ indice: number; valor: R }> = [];
-  let proximo = 0;
-  await Promise.all(
-    Array.from({ length: Math.min(limite, itens.length) }, async () => {
-      while (proximo < itens.length) {
-        const indice = proximo++;
-        const item = itens[indice];
-        if (item === undefined) break;
-        resultado.push({ indice, valor: await executar(item) });
-      }
-    }),
+function jaConhecido(lead: LeadProspeccaoEntrada, memoria: MemoriaProspeccao | null) {
+  if (!memoria) return false;
+  const dominio = dominioNormalizado(lead.dominio);
+  return (
+    memoria.chaves.has(lead.chave_externa) ||
+    (Boolean(dominio) && memoria.dominios.has(dominio)) ||
+    memoria.identidades.has(identidadeDaEmpresa(lead))
   );
-  return resultado.sort((a, b) => a.indice - b.indice).map((item) => item.valor);
 }
 
-export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<ResultadoProvedores> {
+function variacaoDeterministica(valor: string) {
+  let acumulado = 0;
+  for (const caractere of valor) acumulado = (acumulado * 31 + caractere.charCodeAt(0)) >>> 0;
+  return (acumulado % 500) / 100;
+}
+
+function notaDeSelecao(lead: LeadProspeccaoEntrada, exposicao?: ExposicaoProspeccao, semente = '') {
+  const canais =
+    (lead.telefones.length || lead.telefone ? 28 : 0) +
+    (lead.emails.length ? 22 : 0) +
+    (lead.redes_sociais.length ? 14 : 0) +
+    (lead.site_url ? 10 : 0);
+  const reputacao =
+    Math.min(12, Math.log10((lead.total_avaliacoes ?? 0) + 1) * 6) +
+    ((lead.avaliacao ?? 0) >= 4.3 ? 6 : 0);
+  const distribuicao = Math.min(36, (exposicao?.total ?? 0) * 3 + (exposicao?.recentes ?? 0) * 7);
+  return (
+    canais + reputacao - distribuicao + variacaoDeterministica(`${semente}:${lead.chave_externa}`)
+  );
+}
+
+function temContatoDireto(lead: LeadProspeccaoEntrada) {
+  return Boolean(
+    lead.telefone ||
+    lead.telefones.length ||
+    lead.emails.length ||
+    lead.redes_sociais.length ||
+    lead.decisores.some((decisor) => decisor.email || decisor.telefone || decisor.linkedin_url),
+  );
+}
+
+export async function prospectarEmpresas(
+  busca: BuscaProspeccao,
+  contexto: ContextoProspeccao = {},
+): Promise<ResultadoProvedores> {
   const configuracao = prospeccaoEnv();
   if (!configuracao.pronto) throw new ErroConfiguracaoProspeccao();
+
+  const buscaDescoberta = {
+    ...busca,
+    quantidade: quantidadeParaDescoberta(busca.quantidade),
+  } satisfies ParametrosDescoberta;
+  const memoria = contexto.dono ? await carregarMemoriaProspeccao(contexto.dono) : null;
 
   const serpConfigurada = Boolean(configuracao.serpApi);
   const apifyConfigurado = Boolean(configuracao.apifyToken && configuracao.apifyActor);
   const [serp, apify] = await Promise.allSettled([
-    configuracao.serpApi ? buscarSerpApi(busca, configuracao.serpApi) : Promise.resolve([]),
+    configuracao.serpApi
+      ? buscarSerpApi(buscaDescoberta, configuracao.serpApi)
+      : Promise.resolve([]),
     configuracao.apifyToken && configuracao.apifyActor
-      ? buscarApify(busca, configuracao.apifyToken, configuracao.apifyActor)
+      ? buscarApify(buscaDescoberta, configuracao.apifyToken, configuracao.apifyActor)
       : Promise.resolve([]),
   ]);
   const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
@@ -275,12 +235,42 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
     (serpConfigurada && serp.status === 'fulfilled') ||
     (apifyConfigurado && apify.status === 'fulfilled');
   if (!descobertaConcluida) throw new Error('provedores_descoberta_indisponiveis');
-  combinados = combinados.slice(0, busca.quantidade);
+
+  combinados = combinados.filter((lead) => !jaConhecido(lead, memoria));
+  const exposicoes = contexto.dono
+    ? await carregarExposicoesProspeccao(combinados.map((lead) => lead.chave_externa))
+    : new Map<string, ExposicaoProspeccao>();
+  combinados = combinados
+    .sort(
+      (a, b) =>
+        notaDeSelecao(
+          b,
+          exposicoes.get(b.chave_externa),
+          `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+        ) -
+        notaDeSelecao(
+          a,
+          exposicoes.get(a.chave_externa),
+          `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+        ),
+    )
+    .slice(0, Math.min(30, Math.max(busca.quantidade * 2, 12)))
+    .map((lead) => ({
+      ...lead,
+      dados: {
+        ...lead.dados,
+        distribuicao: {
+          exposicoes_plataforma: exposicoes.get(lead.chave_externa)?.total ?? 0,
+          exposicoes_recentes: exposicoes.get(lead.chave_externa)?.recentes ?? 0,
+          repeticao_usuario_eliminada: true,
+        },
+      },
+    }));
 
   const comSite = combinados.filter((lead) => lead.site_url);
   const firecrawl = configuracao.firecrawl;
   const lidos = firecrawl
-    ? await mapearComLimite(comSite, 5, (lead) => lerSite(lead, firecrawl))
+    ? await mapearComLimite(comSite, 5, (lead) => enriquecerSite(lead, firecrawl))
     : [];
   const porChave = new Map(lidos.map((lead) => [lead.chave_externa, lead]));
   const comContexto = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
@@ -292,9 +282,42 @@ export async function prospectarEmpresas(busca: BuscaProspeccao): Promise<Result
   const resultadosDecisores = fullEnrich
     ? await mapearComLimite(comContexto, 3, (lead) => buscarDecisores(lead, fullEnrich))
     : [];
-  const leads = fullEnrich
+  const qualificados = fullEnrich
     ? resultadosDecisores.map((resultado) => resultado.lead)
     : comContexto.map((lead) => ({ ...lead, qualificacao: qualificar(lead) }));
+  let leads = qualificados
+    .filter(temContatoDireto)
+    .sort(
+      (a, b) =>
+        b.qualificacao.completude - a.qualificacao.completude ||
+        notaDeSelecao(
+          b,
+          exposicoes.get(b.chave_externa),
+          `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+        ) -
+          notaDeSelecao(
+            a,
+            exposicoes.get(a.chave_externa),
+            `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+          ),
+    )
+    .slice(0, busca.quantidade);
+  if (
+    fullEnrich &&
+    configuracao.fullEnrichWebhook &&
+    contexto.dono &&
+    contexto.lista &&
+    leads.length
+  ) {
+    const enriquecimento = await iniciarEnriquecimentoDeContatos({
+      leads,
+      chave: fullEnrich,
+      segredo: configuracao.fullEnrichWebhook,
+      dono: contexto.dono,
+      lista: contexto.lista,
+    });
+    leads = enriquecimento.leads;
+  }
   const consultas = resultadosDecisores.filter((resultado) => resultado.consultado);
   const concluidas = consultas.filter((resultado) => resultado.sucesso).length;
 

@@ -24,16 +24,8 @@ export type Lead = Pick<
   | 'fontes'
   | 'qualificacao'
   | 'dados'
-  | 'status_prospeccao'
-  | 'ultimo_canal'
-  | 'ultimo_contato_em'
-  | 'tentativas_contato'
   | 'crm_oportunidade_id'
-  | 'enviado_crm_em'
 >;
-
-export type StatusProspeccao =
-  'novo' | 'tentando_contato' | 'conversa_iniciada' | 'sem_interesse' | 'no_crm';
 
 export type RedeSocial = {
   rede: 'instagram' | 'facebook' | 'linkedin' | 'x' | 'tiktok' | 'youtube' | 'pinterest';
@@ -200,30 +192,6 @@ export function rotuloRede(rede: RedeSocial['rede']) {
   }[rede];
 }
 
-export function statusProspeccaoDo(lead: Lead): StatusProspeccao {
-  if (lead.crm_oportunidade_id) return 'no_crm';
-  const permitidos = new Set<StatusProspeccao>([
-    'novo',
-    'tentando_contato',
-    'conversa_iniciada',
-    'sem_interesse',
-    'no_crm',
-  ]);
-  return permitidos.has(lead.status_prospeccao as StatusProspeccao)
-    ? (lead.status_prospeccao as StatusProspeccao)
-    : 'novo';
-}
-
-export function rotuloStatusProspeccao(status: StatusProspeccao) {
-  return {
-    novo: 'Não contatado',
-    tentando_contato: 'Em contato',
-    conversa_iniciada: 'Conversa iniciada',
-    sem_interesse: 'Sem interesse',
-    no_crm: 'No CRM',
-  }[status];
-}
-
 export function urlWhatsapp(telefone: string) {
   let digitos = telefone.replace(/\D/g, '');
   if ((digitos.length === 10 || digitos.length === 11) && !digitos.startsWith('55')) {
@@ -269,4 +237,9 @@ export function totalCanaisAcionaveis(lead: Lead) {
 export function setorProfissionalDo(lead: Lead): string | null {
   const empresa = objeto(objeto(lead.dados).empresa_profissional ?? null);
   return typeof empresa.setor === 'string' ? empresa.setor : null;
+}
+
+export function enriquecimentoDeContatosEmAndamento(lead: Lead) {
+  const estado = objeto(objeto(lead.dados).fullenrich_contatos ?? null);
+  return estado.status === 'processando';
 }

@@ -904,6 +904,348 @@
   font-family: var(--via-font-mono);
 }
 
+/* Lista qualificada: o card mostra o que o profissional precisa para abordar.
+   Pesquisa complementar e fontes ficam nos detalhes, sem disputar atenção. */
+.enriquecendoContatos {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  margin-bottom: var(--via-space-4);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-navy-12);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+}
+
+.enriquecendoContatos > svg {
+  flex: 0 0 auto;
+  animation: contatos-girando 1.1s linear infinite;
+}
+
+.enriquecendoContatos div {
+  display: grid;
+  gap: 2px;
+}
+
+.enriquecendoContatos strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+}
+
+.enriquecendoContatos span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+@keyframes contatos-girando {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resumoResultados {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  margin-bottom: var(--via-space-4);
+  padding: var(--via-space-3) var(--via-space-2) var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-soft);
+}
+
+.resumoResultados div {
+  display: grid;
+  gap: var(--via-space-1);
+}
+
+.resumoResultados strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.resumoResultados span {
+  max-width: 50ch;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.resumoResultados > span {
+  text-align: right;
+}
+
+.gradeLeads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4);
+}
+
+.cartaoLead {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.cartaoLead:hover {
+  transform: translateY(-2px);
+  border-color: var(--via-navy-16);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.cartaoLeadTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5) 0;
+}
+
+.numeroLead {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.qualidadeLead {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.qualidadeLead[data-alta='true'] {
+  color: var(--via-success);
+}
+
+.empresaLead {
+  padding: var(--via-space-4) var(--via-space-5) var(--via-space-5);
+}
+
+.empresaLead h3,
+.empresaLead p {
+  margin: 0;
+}
+
+.empresaLead h3 {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-lg);
+  font-weight: var(--via-fw-semibold);
+  line-height: 1.2;
+  letter-spacing: var(--app-ls-h4);
+  text-wrap: balance;
+}
+
+.empresaLead p {
+  margin-top: var(--via-space-1_5);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-xs);
+}
+
+.empresaLead > span {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-1_5);
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.empresaLead > span svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.decisorLead {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  margin: 0 var(--via-space-5) var(--via-space-4);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.avatarDecisor {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.decisorLead[data-encontrado='true'] .avatarDecisor {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.decisorLead div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.decisorLead small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.decisorLead strong,
+.decisorLead span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decisorLead strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+}
+
+.decisorLead div > span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.canaisLead {
+  display: grid;
+  gap: var(--via-space-1);
+  margin-top: auto;
+  padding: 0 var(--via-space-5) var(--via-space-5);
+}
+
+.canalLead {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 48px;
+  padding: var(--via-space-2);
+  border-radius: var(--app-radius-control);
+  transition: background-color var(--app-t-state);
+}
+
+.canalLead:hover {
+  background: var(--via-navy-03);
+}
+
+.canalIcone {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+}
+
+.canalLead div {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.canalLead small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.canalLead a {
+  overflow: hidden;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canalLead a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.copiarCanal {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-chip);
+  background: transparent;
+  color: var(--via-text-faint);
+  cursor: pointer;
+}
+
+.copiarCanal:hover,
+.copiarCanal:focus-visible {
+  border-color: var(--via-border-soft);
+  background: var(--via-bg);
+  color: var(--via-text-primary);
+}
+
+.acoesLead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-5);
+  border-top: 1px solid var(--via-border-soft);
+  background: linear-gradient(180deg, var(--via-navy-02), transparent);
+}
+
+.verDetalhes {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  min-height: 36px;
+  padding: var(--via-space-2) 0;
+  border: 0;
+  background: transparent;
+  color: var(--via-text-body);
+  font: inherit;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+}
+
+.verDetalhes:hover {
+  color: var(--via-text-primary);
+}
+
+.verDetalhes:focus-visible,
+.copiarCanal:focus-visible,
+.acaoCrmLead:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.acaoCrmLead {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  color: var(--via-success);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
 @media (max-width: 1279px) {
   .rodapeBusca {
     grid-template-columns: auto minmax(200px, 1fr);
@@ -1001,6 +1343,10 @@
   .statusLead {
     display: none !important;
   }
+
+  .gradeLeads {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 599px) {
@@ -1090,6 +1436,27 @@
     flex-direction: column;
   }
 
+  .resumoResultados {
+    flex-direction: column;
+  }
+
+  .resumoResultados > span {
+    text-align: left;
+  }
+
+  .cartaoLeadTopo,
+  .empresaLead,
+  .canaisLead,
+  .acoesLead {
+    padding-right: var(--via-space-4);
+    padding-left: var(--via-space-4);
+  }
+
+  .decisorLead {
+    margin-right: var(--via-space-4);
+    margin-left: var(--via-space-4);
+  }
+
   .metricasLista {
     width: 100%;
   }
@@ -1125,6 +1492,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .etapasProcessamento li[data-estado='ativa'] > span {
+    animation: none;
+  }
+
+  .enriquecendoContatos > svg {
     animation: none;
   }
 }

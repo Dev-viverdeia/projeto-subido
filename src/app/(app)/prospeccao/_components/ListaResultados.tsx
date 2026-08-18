@@ -1,158 +1,218 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import {
-  ArrowRight,
+  ArrowUpRight,
   AtSign,
+  BriefcaseBusiness,
   Building2,
-  Globe2,
+  Camera,
   MapPin,
-  MessageCircle,
   Phone,
-  Share2,
+  RefreshCw,
+  UserRound,
 } from 'lucide-react';
-import { Pill } from '@/design-system/via';
+import { AtualizarEnriquecimentos } from './AtualizarEnriquecimentos';
+import { BotaoEnviarCrm } from './BotaoEnviarCrm';
+import { CopiarContato } from './CopiarContato';
 import {
+  decisoresDo,
   emailsDo,
+  enriquecimentoDeContatosEmAndamento,
+  identificadorRede,
+  qualificacaoDo,
   redesDo,
-  rotuloStatusProspeccao,
-  statusProspeccaoDo,
+  rotuloCompletude,
   telefonesDo,
-  totalCanaisAcionaveis,
+  urlWhatsapp,
   type Lead,
-  type StatusProspeccao,
 } from './dossie';
 import { ModalDossie } from './ModalDossie';
 import styles from '../pagina.module.css';
 
+function Canal({
+  icone,
+  rotulo,
+  valor,
+  href,
+  valorCopiar = valor,
+}: {
+  icone: ReactNode;
+  rotulo: string;
+  valor: string;
+  href: string;
+  valorCopiar?: string;
+}) {
+  return (
+    <div className={styles.canalLead}>
+      <span className={styles.canalIcone}>{icone}</span>
+      <div>
+        <small>{rotulo}</small>
+        <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+          {valor}
+        </a>
+      </div>
+      <CopiarContato valor={valorCopiar} className={styles.copiarCanal} />
+    </div>
+  );
+}
+
 export function ListaResultados({ leads }: { leads: Lead[] }) {
   const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [retornarFoco, setRetornarFoco] = useState<HTMLButtonElement | null>(null);
-  const [filtro, setFiltro] = useState<'todos' | StatusProspeccao>('todos');
   const fecharModal = useCallback(() => setSelecionadoId(null), []);
-  const filtrados =
-    filtro === 'todos' ? leads : leads.filter((lead) => statusProspeccaoDo(lead) === filtro);
-
   const selecionado = selecionadoId
     ? (leads.find((lead) => lead.id === selecionadoId) ?? null)
     : null;
+  const enriquecendo = leads.some(enriquecimentoDeContatosEmAndamento);
 
   if (!leads.length) {
     return (
       <div className={styles.semResultados}>
         <Building2 size={25} strokeWidth={1.5} aria-hidden="true" />
-        <h3>Nenhuma empresa entrou nesta lista.</h3>
-        <p>Amplie a região ou retire um filtro. Os créditos reservados já foram devolvidos.</p>
+        <h3>Não encontramos empresas novas neste recorte.</h3>
+        <p>
+          As empresas que você já recebeu foram retiradas. Tente uma região próxima ou um tipo de
+          empresa mais amplo; os créditos não usados já voltaram para o saldo.
+        </p>
       </div>
     );
   }
 
   return (
     <>
-      <div className={styles.filtrosLeads} aria-label="Filtrar empresas por andamento">
-        {(
-          [
-            ['todos', 'Todos'],
-            ['novo', 'Não contatados'],
-            ['tentando_contato', 'Em contato'],
-            ['conversa_iniciada', 'Conversas'],
-            ['sem_interesse', 'Sem interesse'],
-            ['no_crm', 'No CRM'],
-          ] as const
-        ).map(([valor, rotulo]) => {
-          const quantidade =
-            valor === 'todos'
-              ? leads.length
-              : leads.filter((lead) => statusProspeccaoDo(lead) === valor).length;
-          return (
-            <button
-              type="button"
-              key={valor}
-              aria-pressed={filtro === valor}
-              onClick={() => setFiltro(valor)}
-            >
-              {rotulo} <span>{quantidade}</span>
-            </button>
-          );
-        })}
+      <AtualizarEnriquecimentos ativo={enriquecendo} />
+      {enriquecendo && (
+        <div className={styles.enriquecendoContatos} role="status">
+          <RefreshCw size={15} aria-hidden="true" />
+          <div>
+            <strong>Procurando contatos diretos dos decisores</strong>
+            <span>
+              Você já pode usar a lista. Novos e-mails e telefones entram aqui automaticamente.
+            </span>
+          </div>
+        </div>
+      )}
+      <div className={styles.resumoResultados}>
+        <div>
+          <strong>{leads.length} empresas novas</strong>
+          <span>Ordenadas pela qualidade dos contatos encontrados.</span>
+        </div>
+        <span>Clique em “Ver detalhes” para consultar fontes, site e dados adicionais.</span>
       </div>
-      <div className={styles.legendaLista} aria-hidden="true">
-        <span>Empresa</span>
-        <span>Canais acionáveis</span>
-        <span>Região</span>
-        <span>Andamento</span>
-      </div>
-      <div className={styles.listaResultados} role="list">
-        {filtrados.map((lead, indice) => {
-          const status = statusProspeccaoDo(lead);
-          const totalCanais = totalCanaisAcionaveis(lead);
+
+      <div className={styles.gradeLeads} role="list">
+        {leads.map((lead, indice) => {
+          const telefones = telefonesDo(lead);
+          const emails = emailsDo(lead);
+          const redes = redesDo(lead);
+          const decisores = decisoresDo(lead);
+          const decisor =
+            decisores.find((pessoa) => pessoa.email || pessoa.telefone) ?? decisores[0] ?? null;
+          const telefone = decisor?.telefone ?? telefones[0] ?? null;
+          const email = decisor?.email ?? emails[0] ?? null;
+          const linkedin =
+            decisor?.linkedin_url ?? redes.find((rede) => rede.rede === 'linkedin')?.url ?? null;
+          const instagram = redes.find((rede) => rede.rede === 'instagram') ?? null;
+          const qualificacao = qualificacaoDo(lead);
+
           return (
-            <div role="listitem" key={lead.id}>
-              <button
-                type="button"
-                className={styles.linhaLead}
-                onClick={(evento) => {
-                  setRetornarFoco(evento.currentTarget);
-                  setSelecionadoId(lead.id);
-                }}
-              >
-                <span className={styles.indiceLead}>{String(indice + 1).padStart(2, '0')}</span>
-                <span className={styles.identidadeLead}>
-                  <strong>{lead.nome}</strong>
-                  <small>{lead.categoria ?? lead.endereco ?? 'Empresa local'}</small>
+            <article className={styles.cartaoLead} role="listitem" key={lead.id}>
+              <div className={styles.cartaoLeadTopo}>
+                <span className={styles.numeroLead}>{String(indice + 1).padStart(2, '0')}</span>
+                <span className={styles.qualidadeLead} data-alta={qualificacao.completude >= 80}>
+                  {rotuloCompletude(qualificacao.completude)}
                 </span>
-                <span
-                  className={styles.coberturaLead}
-                  aria-label={`${totalCanais} ${totalCanais === 1 ? 'canal acionável encontrado' : 'canais acionáveis encontrados'}`}
-                >
-                  <span data-encontrado={telefonesDo(lead).length > 0} title="Telefone ou WhatsApp">
-                    <Phone size={14} />
-                  </span>
-                  <span data-encontrado={emailsDo(lead).length > 0} title="E-mail">
-                    <AtSign size={14} />
-                  </span>
-                  <span data-encontrado={Boolean(lead.site_url)} title="Site para pesquisa">
-                    <Globe2 size={14} />
-                  </span>
-                  <span data-encontrado={redesDo(lead).length > 0} title="Redes sociais">
-                    <Share2 size={14} />
-                  </span>
-                  <strong>{totalCanais}</strong>
-                </span>
-                <span className={styles.localLead}>
-                  <MapPin size={14} aria-hidden="true" />
+              </div>
+
+              <div className={styles.empresaLead}>
+                <h3>{lead.nome}</h3>
+                <p>{lead.categoria ?? 'Empresa local'}</p>
+                <span>
+                  <MapPin size={13} aria-hidden="true" />
                   {[lead.cidade, lead.estado].filter(Boolean).join(', ') ||
                     lead.endereco ||
-                    'A confirmar'}
+                    'Região a confirmar'}
                 </span>
-                <Pill
-                  className={styles.statusLead}
-                  size="sm"
-                  variant={
-                    status === 'sem_interesse'
-                      ? 'churn'
-                      : status === 'no_crm' || status === 'conversa_iniciada'
-                        ? 'success'
-                        : 'default'
-                  }
-                  iconLeft={<MessageCircle size={13} aria-hidden="true" />}
-                >
-                  {rotuloStatusProspeccao(status)}
-                </Pill>
-                <span
-                  className={styles.estadoLead}
-                  data-enviado={Boolean(lead.crm_oportunidade_id)}
-                >
-                  {lead.crm_oportunidade_id ? 'Abrir' : 'Prospectar'} <ArrowRight size={14} />
+              </div>
+
+              <div className={styles.decisorLead} data-encontrado={Boolean(decisor)}>
+                <span className={styles.avatarDecisor}>
+                  {decisor ? (
+                    decisor.nome.slice(0, 1).toLocaleUpperCase('pt-BR')
+                  ) : (
+                    <UserRound size={16} />
+                  )}
                 </span>
-              </button>
-            </div>
+                <div>
+                  <small>{decisor ? 'Possível decisor' : 'Decisor'}</small>
+                  <strong>{decisor?.nome ?? 'Ainda não identificado'}</strong>
+                  <span>
+                    {decisor?.cargo ?? 'Use os contatos da empresa para localizar a pessoa certa.'}
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.canaisLead}>
+                {telefone && (
+                  <Canal
+                    icone={<Phone size={15} aria-hidden="true" />}
+                    rotulo={decisor?.telefone ? 'Telefone do decisor' : 'Telefone / WhatsApp'}
+                    valor={telefone}
+                    href={urlWhatsapp(telefone) ?? `tel:${telefone}`}
+                  />
+                )}
+                {email && (
+                  <Canal
+                    icone={<AtSign size={15} aria-hidden="true" />}
+                    rotulo={decisor?.email ? 'E-mail do decisor' : 'E-mail da empresa'}
+                    valor={email}
+                    href={`mailto:${email}`}
+                  />
+                )}
+                {linkedin && (
+                  <Canal
+                    icone={<BriefcaseBusiness size={15} aria-hidden="true" />}
+                    rotulo={decisor?.linkedin_url ? 'LinkedIn do decisor' : 'LinkedIn'}
+                    valor={decisor ? decisor.nome : 'Abrir perfil'}
+                    href={linkedin}
+                    valorCopiar={linkedin}
+                  />
+                )}
+                {!linkedin && instagram && (
+                  <Canal
+                    icone={<Camera size={15} aria-hidden="true" />}
+                    rotulo="Instagram"
+                    valor={identificadorRede(instagram)}
+                    href={instagram.url}
+                    valorCopiar={instagram.url}
+                  />
+                )}
+              </div>
+
+              <footer className={styles.acoesLead}>
+                <button
+                  type="button"
+                  className={styles.verDetalhes}
+                  onClick={(evento) => {
+                    setRetornarFoco(evento.currentTarget);
+                    setSelecionadoId(lead.id);
+                  }}
+                >
+                  Ver detalhes <ArrowUpRight size={14} aria-hidden="true" />
+                </button>
+                <BotaoEnviarCrm
+                  lead={lead.id}
+                  oportunidade={lead.crm_oportunidade_id}
+                  compacto
+                  className={styles.acaoCrmLead}
+                />
+              </footer>
+            </article>
           );
         })}
-        {!filtrados.length && (
-          <div className={styles.filtroVazio}>Nenhuma empresa está nesta etapa da prospecção.</div>
-        )}
       </div>
+
       {selecionado && (
         <ModalDossie lead={selecionado} onClose={fecharModal} retornarFoco={retornarFoco} />
       )}

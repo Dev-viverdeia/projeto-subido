@@ -31,7 +31,7 @@ export async function carregarProspeccao(listaPreferida?: string) {
     ? await supabase
         .from('prospeccao_leads')
         .select(
-          'id, lista_id, nome, categoria, endereco, cidade, estado, site_url, dominio, telefone, telefones, emails, redes_sociais, decisores, horarios, maps_url, imagem_url, avaliacao, total_avaliacoes, descricao, fontes, qualificacao, dados, status_prospeccao, ultimo_canal, ultimo_contato_em, tentativas_contato, crm_oportunidade_id, enviado_crm_em, criado_em',
+          'id, nome, categoria, endereco, cidade, estado, site_url, dominio, telefone, telefones, emails, redes_sociais, decisores, horarios, maps_url, imagem_url, avaliacao, total_avaliacoes, descricao, fontes, qualificacao, dados, crm_oportunidade_id',
         )
         .eq('lista_id', listaAtual.id)
         .order('criado_em')

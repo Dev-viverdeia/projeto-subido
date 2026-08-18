@@ -22,10 +22,6 @@ const DOSSIE_VAZIO = {
   imagem_url: null,
   qualificacao: {},
   dados: {},
-  status_prospeccao: 'novo',
-  ultimo_canal: null,
-  ultimo_contato_em: null,
-  tentativas_contato: 0,
 };
 
 const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
@@ -82,7 +78,6 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
       ],
     },
     crm_oportunidade_id: null,
-    enviado_crm_em: null,
   },
   {
     ...DOSSIE_VAZIO,
@@ -99,12 +94,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     total_avaliacoes: 89,
     descricao: 'Atendimento odontológico com agendamento por telefone e formulário no site.',
     fontes: ['Google Maps · dados públicos'],
-    status_prospeccao: 'no_crm',
-    ultimo_canal: 'email',
-    ultimo_contato_em: new Date().toISOString(),
-    tentativas_contato: 2,
     crm_oportunidade_id: '33333333-3333-4333-8333-333333333333',
-    enviado_crm_em: new Date().toISOString(),
   },
   {
     ...DOSSIE_VAZIO,
@@ -121,12 +111,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     total_avaliacoes: 52,
     descricao: null,
     fontes: ['Google Maps · dados públicos'],
-    status_prospeccao: 'tentando_contato',
-    ultimo_canal: 'whatsapp',
-    ultimo_contato_em: new Date().toISOString(),
-    tentativas_contato: 1,
     crm_oportunidade_id: null,
-    enviado_crm_em: null,
   },
 ];
 

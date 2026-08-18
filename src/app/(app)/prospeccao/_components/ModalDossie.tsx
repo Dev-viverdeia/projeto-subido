@@ -9,8 +9,6 @@ import {
   ExternalLink,
   Mail,
   MapPin,
-  MessageCircle,
-  Music2,
   Phone,
   Play,
   Search,
@@ -18,10 +16,9 @@ import {
   UserRoundSearch,
   X,
 } from 'lucide-react';
-import type { CanalContatoProspeccao } from '@/lib/prospeccao/schema';
-import { AndamentoProspeccao } from './AndamentoProspeccao';
+import { BotaoEnviarCrm } from './BotaoEnviarCrm';
 import { ContextoEmpresa } from './ContextoEmpresa';
-import { LinkContato } from './LinkContato';
+import { CopiarContato } from './CopiarContato';
 import {
   decisoresDo,
   emailsDo,
@@ -29,12 +26,11 @@ import {
   fontesDo,
   horariosDo,
   identificadorRede,
+  qualificacaoDo,
   redesDo,
+  rotuloCompletude,
   rotuloRede,
-  rotuloStatusProspeccao,
-  statusProspeccaoDo,
   telefonesDo,
-  totalCanaisAcionaveis,
   urlWhatsapp,
   type Lead,
   type RedeSocial,
@@ -46,28 +42,15 @@ function IconeRede({ rede }: { rede: RedeSocial['rede'] }) {
   if (rede === 'facebook') return <Users size={18} aria-hidden="true" />;
   if (rede === 'linkedin') return <BriefcaseBusiness size={18} aria-hidden="true" />;
   if (rede === 'youtube') return <Play size={18} aria-hidden="true" />;
-  if (rede === 'tiktok') return <Music2 size={18} aria-hidden="true" />;
   return <AtSign size={18} aria-hidden="true" />;
 }
 
-function AcaoContato({
-  lead,
-  canal,
-  href,
-  ariaLabel,
-  children,
-}: {
-  lead: string;
-  canal: CanalContatoProspeccao;
-  href: string;
-  ariaLabel: string;
-  children: ReactNode;
-}) {
+function AcaoContato({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <LinkContato lead={lead} canal={canal} href={href} ariaLabel={ariaLabel}>
+    <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
       {children}
       <ExternalLink size={13} aria-hidden="true" />
-    </LinkContato>
+    </a>
   );
 }
 
@@ -87,13 +70,7 @@ export function ModalDossie({
   const redes = redesDo(selecionado);
   const decisores = decisoresDo(selecionado);
   const horarios = horariosDo(selecionado);
-  const status = statusProspeccaoDo(selecionado);
-  const totalCanais = totalCanaisAcionaveis(selecionado);
-  const ausentes = [
-    !telefones.length && 'telefone',
-    !emails.length && 'e-mail',
-    !redes.length && 'redes sociais',
-  ].filter(Boolean) as string[];
+  const qualificacao = qualificacaoDo(selecionado);
 
   useEffect(() => {
     const overflow = document.body.style.overflow;
@@ -144,10 +121,10 @@ export function ModalDossie({
       >
         <header className={styles.header}>
           <div className={styles.headerIdentity}>
-            <p>Empresa encontrada</p>
+            <p>Detalhes da empresa</p>
             <h2 id="lead-detalhe-titulo">{selecionado.nome}</h2>
             <div className={styles.headerMeta}>
-              <span>{selecionado.categoria ?? 'Categoria a confirmar'}</span>
+              <span>{selecionado.categoria ?? 'Empresa local'}</span>
               <span>
                 <MapPin size={13} aria-hidden="true" />
                 {[selecionado.cidade, selecionado.estado].filter(Boolean).join(', ') ||
@@ -157,11 +134,8 @@ export function ModalDossie({
           </div>
           <div className={styles.headerSignals}>
             <span className={styles.channelCount}>
-              <strong>{totalCanais}</strong>
-              {totalCanais === 1 ? 'canal de contato' : 'canais de contato'}
-            </span>
-            <span className={styles.status} data-status={status}>
-              {rotuloStatusProspeccao(status)}
+              <strong>{qualificacao.completude}%</strong>
+              {rotuloCompletude(qualificacao.completude)}
             </span>
           </div>
           <button
@@ -180,49 +154,36 @@ export function ModalDossie({
             <section className={styles.section} aria-labelledby="canais-titulo">
               <div className={styles.sectionHeading}>
                 <div>
-                  <p className={styles.eyebrow}>Contatos encontrados</p>
-                  <h3 id="canais-titulo">Como entrar em contato</h3>
-                  <span>Ao abrir um canal, a tentativa fica registrada nesta lista.</span>
+                  <p className={styles.eyebrow}>Contatos da empresa</p>
+                  <h3 id="canais-titulo">Canais para começar a abordagem</h3>
+                  <span>
+                    Copie o dado ou abra o canal. O CRM fica para quando você quiser trabalhar a
+                    oportunidade.
+                  </span>
                 </div>
-                <MessageCircle size={20} aria-hidden="true" />
+                <AtSign size={20} aria-hidden="true" />
               </div>
 
               <div className={styles.contactList}>
-                {telefones.map((telefone) => {
-                  const whatsapp = urlWhatsapp(telefone);
-                  return (
-                    <article className={styles.contactRow} key={telefone}>
-                      <span className={styles.contactIcon}>
-                        <Phone size={18} aria-hidden="true" />
-                      </span>
-                      <div className={styles.contactData}>
-                        <span>Telefone</span>
-                        <strong>{telefone}</strong>
-                        <small>{fonteDoContato(selecionado, 'telefone', telefone)}</small>
-                      </div>
-                      <div className={styles.contactActions}>
-                        {whatsapp && (
-                          <AcaoContato
-                            lead={selecionado.id}
-                            canal="whatsapp"
-                            href={whatsapp}
-                            ariaLabel={`Abrir WhatsApp para ${telefone}`}
-                          >
-                            WhatsApp
-                          </AcaoContato>
-                        )}
-                        <AcaoContato
-                          lead={selecionado.id}
-                          canal="telefone"
-                          href={`tel:${telefone}`}
-                          ariaLabel={`Ligar para ${telefone}`}
-                        >
-                          Ligar
-                        </AcaoContato>
-                      </div>
-                    </article>
-                  );
-                })}
+                {telefones.map((telefone) => (
+                  <article className={styles.contactRow} key={telefone}>
+                    <span className={styles.contactIcon}>
+                      <Phone size={18} aria-hidden="true" />
+                    </span>
+                    <div className={styles.contactData}>
+                      <span>Telefone / WhatsApp</span>
+                      <strong>{telefone}</strong>
+                      <small>{fonteDoContato(selecionado, 'telefone', telefone)}</small>
+                    </div>
+                    <div className={styles.contactActions}>
+                      <CopiarContato valor={telefone} />
+                      {urlWhatsapp(telefone) && (
+                        <AcaoContato href={urlWhatsapp(telefone) as string}>WhatsApp</AcaoContato>
+                      )}
+                      <AcaoContato href={`tel:${telefone}`}>Ligar</AcaoContato>
+                    </div>
+                  </article>
+                ))}
 
                 {emails.map((email) => (
                   <article className={styles.contactRow} key={email}>
@@ -235,14 +196,8 @@ export function ModalDossie({
                       <small>{fonteDoContato(selecionado, 'email', email)}</small>
                     </div>
                     <div className={styles.contactActions}>
-                      <AcaoContato
-                        lead={selecionado.id}
-                        canal="email"
-                        href={`mailto:${email}`}
-                        ariaLabel={`Escrever e-mail para ${email}`}
-                      >
-                        Escrever e-mail
-                      </AcaoContato>
+                      <CopiarContato valor={email} />
+                      <AcaoContato href={`mailto:${email}`}>Escrever</AcaoContato>
                     </div>
                   </article>
                 ))}
@@ -258,45 +213,24 @@ export function ModalDossie({
                       <small>{fonteDoContato(selecionado, 'rede', rede.url)}</small>
                     </div>
                     <div className={styles.contactActions}>
-                      <AcaoContato
-                        lead={selecionado.id}
-                        canal={rede.rede}
-                        href={rede.url}
-                        ariaLabel={`Abrir perfil no ${rotuloRede(rede.rede)}`}
-                      >
-                        Abrir perfil
-                      </AcaoContato>
+                      <CopiarContato valor={rede.url} />
+                      <AcaoContato href={rede.url}>Abrir perfil</AcaoContato>
                     </div>
                   </article>
                 ))}
               </div>
-
-              {!totalCanais && (
-                <div className={styles.noContacts}>
-                  <Search size={20} aria-hidden="true" />
-                  <div>
-                    <strong>Nenhum contato foi encontrado.</strong>
-                    <span>Abra o site ou o Google Maps para pesquisar a empresa.</span>
-                  </div>
-                </div>
-              )}
-              {totalCanais > 0 && ausentes.length > 0 && (
-                <p className={styles.missing}>Não encontramos: {ausentes.join(', ')}.</p>
-              )}
             </section>
 
-            {decisores.length > 0 && (
-              <section className={styles.section} aria-labelledby="decisores-titulo">
-                <div className={styles.sectionHeading}>
-                  <div>
-                    <p className={styles.eyebrow}>Pessoas encontradas</p>
-                    <h3 id="decisores-titulo">Possíveis decisores</h3>
-                    <span>
-                      Confirme se a pessoa ainda trabalha na empresa antes de entrar em contato.
-                    </span>
-                  </div>
-                  <UserRoundSearch size={20} aria-hidden="true" />
+            <section className={styles.section} aria-labelledby="decisores-titulo">
+              <div className={styles.sectionHeading}>
+                <div>
+                  <p className={styles.eyebrow}>Quem procurar</p>
+                  <h3 id="decisores-titulo">Possíveis decisores</h3>
+                  <span>Confirme o vínculo e o cargo antes de enviar a primeira mensagem.</span>
                 </div>
+                <UserRoundSearch size={20} aria-hidden="true" />
+              </div>
+              {decisores.length ? (
                 <div className={styles.decisionMakers}>
                   {decisores.map((decisor) => (
                     <article key={`${decisor.nome}-${decisor.linkedin_url ?? decisor.cargo}`}>
@@ -308,68 +242,51 @@ export function ModalDossie({
                         <span>{decisor.cargo ?? decisor.senioridade ?? 'Cargo a confirmar'}</span>
                         {decisor.email && <small>{decisor.email}</small>}
                         {decisor.telefone && <small>{decisor.telefone}</small>}
-                        <small>{decisor.fonte}</small>
                       </div>
                       <div className={styles.decisionActions}>
                         {decisor.linkedin_url && (
-                          <AcaoContato
-                            lead={selecionado.id}
-                            canal="linkedin"
-                            href={decisor.linkedin_url}
-                            ariaLabel={`Abrir LinkedIn de ${decisor.nome}`}
-                          >
-                            LinkedIn
-                          </AcaoContato>
+                          <AcaoContato href={decisor.linkedin_url}>LinkedIn</AcaoContato>
                         )}
                         {decisor.email && (
-                          <AcaoContato
-                            lead={selecionado.id}
-                            canal="email"
-                            href={`mailto:${decisor.email}`}
-                            ariaLabel={`Escrever e-mail para ${decisor.nome}`}
-                          >
-                            E-mail
-                          </AcaoContato>
+                          <AcaoContato href={`mailto:${decisor.email}`}>E-mail</AcaoContato>
                         )}
                         {decisor.telefone && urlWhatsapp(decisor.telefone) && (
-                          <AcaoContato
-                            lead={selecionado.id}
-                            canal="whatsapp"
-                            href={urlWhatsapp(decisor.telefone) as string}
-                            ariaLabel={`Abrir WhatsApp de ${decisor.nome}`}
-                          >
+                          <AcaoContato href={urlWhatsapp(decisor.telefone) as string}>
                             WhatsApp
-                          </AcaoContato>
-                        )}
-                        {decisor.telefone && (
-                          <AcaoContato
-                            lead={selecionado.id}
-                            canal="telefone"
-                            href={`tel:${decisor.telefone}`}
-                            ariaLabel={`Ligar para ${decisor.nome}`}
-                          >
-                            Ligar
                           </AcaoContato>
                         )}
                       </div>
                     </article>
                   ))}
                 </div>
-              </section>
-            )}
+              ) : (
+                <div className={styles.noContacts}>
+                  <Search size={20} aria-hidden="true" />
+                  <div>
+                    <strong>Não encontramos um decisor com segurança.</strong>
+                    <span>
+                      Use o telefone, o e-mail ou a rede social da empresa para pedir a pessoa
+                      responsável.
+                    </span>
+                  </div>
+                </div>
+              )}
+            </section>
 
             <ContextoEmpresa lead={selecionado} />
           </main>
 
           <aside className={styles.sidebar}>
-            <AndamentoProspeccao
-              key={`${selecionado.id}-${status}-${selecionado.tentativas_contato}`}
-              lead={selecionado.id}
-              status={status}
-              ultimoCanal={selecionado.ultimo_canal}
-              tentativas={selecionado.tentativas_contato}
-              oportunidade={selecionado.crm_oportunidade_id}
-            />
+            <section className={styles.crmCard}>
+              <p className={styles.eyebrow}>Próximo passo</p>
+              <h3>Quer trabalhar este lead?</h3>
+              <p>Crie a oportunidade com a empresa, os contatos e os decisores já preenchidos.</p>
+              <BotaoEnviarCrm
+                lead={selecionado.id}
+                oportunidade={selecionado.crm_oportunidade_id}
+                className={styles.crmAction}
+              />
+            </section>
 
             {horarios.length > 0 && (
               <section className={styles.sideCard}>
@@ -377,7 +294,7 @@ export function ModalDossie({
                   <Clock3 size={17} aria-hidden="true" />
                   <div>
                     <strong>Horários públicos</strong>
-                    <span>Referência para escolher o contato.</span>
+                    <span>Uma referência para escolher quando ligar.</span>
                   </div>
                 </div>
                 <dl className={styles.hours}>
@@ -395,8 +312,8 @@ export function ModalDossie({
               <div className={styles.sideTitle}>
                 <Search size={17} aria-hidden="true" />
                 <div>
-                  <strong>Fontes consultadas</strong>
-                  <span>Origem dos dados reunidos.</span>
+                  <strong>De onde vieram os dados</strong>
+                  <span>Confira a origem antes de usar.</span>
                 </div>
               </div>
               <div className={styles.sources}>

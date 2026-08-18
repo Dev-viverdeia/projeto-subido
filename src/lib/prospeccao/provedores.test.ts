@@ -22,6 +22,7 @@ describe('provedores da prospecção', () => {
       serpApi: null,
       firecrawl: null,
       fullEnrich: null,
+      fullEnrichWebhook: null,
     });
   });
 
@@ -92,10 +93,27 @@ describe('provedores da prospecção', () => {
     expect(corpo).toMatchObject({
       searchStringsArray: ['Clínicas odontológicas'],
       locationQuery: 'Belo Horizonte, MG',
-      maxCrawledPlacesPerSearch: 5,
+      maxCrawledPlacesPerSearch: 40,
       scrapeContacts: true,
       scrapePlaceDetailPage: true,
     });
+  });
+
+  it('descobre mais opções e entrega somente empresas com contato direto', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          { title: 'Sem Contato', placeId: 'sem-contato' },
+          { title: 'Com Telefone', placeId: 'com-telefone', phone: '+55 31 3222-1111' },
+        ]),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const resultado = await prospectarEmpresas(busca);
+
+    expect(resultado.leads.map((lead) => lead.nome)).toEqual(['Com Telefone']);
   });
 
   it('trata contatos do site oficial e guarda a origem de cada dado', async () => {
@@ -106,6 +124,7 @@ describe('provedores da prospecção', () => {
       serpApi: null,
       firecrawl: 'token-firecrawl-valido',
       fullEnrich: null,
+      fullEnrichWebhook: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (String(url).includes('firecrawl.dev')) {
@@ -171,6 +190,7 @@ describe('provedores da prospecção', () => {
       serpApi: null,
       firecrawl: null,
       fullEnrich: 'token-fullenrich-valido',
+      fullEnrichWebhook: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (String(url).includes('fullenrich.com')) {

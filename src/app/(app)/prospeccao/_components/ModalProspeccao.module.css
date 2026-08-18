@@ -5,8 +5,8 @@
   display: grid;
   place-items: center;
   padding: var(--via-space-6);
-  background: color-mix(in srgb, var(--via-navy-deep) 42%, transparent);
-  backdrop-filter: blur(8px);
+  background: rgba(5, 18, 37, 0.64);
+  backdrop-filter: blur(10px);
   animation: backdropIn var(--app-t-scene);
 }
 
@@ -16,7 +16,7 @@
   overflow: hidden;
   border: 1px solid var(--app-elev-3-line);
   border-radius: var(--app-radius-surface);
-  background: var(--app-elev-3-bg);
+  background: var(--via-bg);
   box-shadow: var(--app-elev-3-shadow);
   animation: modalIn var(--app-t-scene);
 }
@@ -161,7 +161,8 @@
 .section,
 .research,
 .sideCard,
-.andamento {
+.andamento,
+.crmCard {
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
@@ -264,7 +265,8 @@
 }
 
 .contactActions a,
-.decisionActions a {
+.decisionActions a,
+.contactActions button {
   display: inline-flex;
   min-height: 36px;
   align-items: center;
@@ -285,7 +287,8 @@
 }
 
 .contactActions a:hover,
-.decisionActions a:hover {
+.decisionActions a:hover,
+.contactActions button:hover {
   transform: translateY(-2px);
   border-color: var(--via-navy-30);
   background: var(--via-navy-03);
@@ -293,8 +296,15 @@
 
 .contactActions a:focus-visible,
 .decisionActions a:focus-visible,
+.contactActions button:focus-visible,
 .researchGrid a:focus-visible {
   box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.contactActions button {
+  width: 36px;
+  padding: 0;
+  cursor: pointer;
 }
 
 .contactActions a[data-falhou],
@@ -462,6 +472,56 @@
   align-content: start;
   gap: var(--app-gap-grid);
   padding: var(--via-space-8) var(--via-space-8) var(--via-space-8) 0;
+}
+
+.crmCard {
+  padding: var(--app-pad-card);
+  border-color: var(--via-navy-16);
+  background:
+    radial-gradient(circle at 100% 0%, var(--via-navy-08), transparent 48%), var(--app-elev-1-bg);
+}
+
+.crmCard h3,
+.crmCard > p:not(.eyebrow) {
+  margin: 0;
+}
+
+.crmCard h3 {
+  max-width: 18ch;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-lg);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-tight);
+  letter-spacing: var(--app-ls-h4);
+}
+
+.crmCard > p:not(.eyebrow) {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  line-height: 1.55;
+}
+
+.crmAction {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-5);
+  color: var(--via-success);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.crmAction :global(.via-btn) {
+  width: 100%;
+}
+
+.crmAction:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .andamento,
@@ -754,7 +814,8 @@
   .section,
   .research,
   .sideCard,
-  .andamento {
+  .andamento,
+  .crmCard {
     padding: var(--app-pad-card-tight);
     border-radius: var(--app-radius-card);
   }
