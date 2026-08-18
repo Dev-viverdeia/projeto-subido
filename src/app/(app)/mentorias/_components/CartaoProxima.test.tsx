@@ -39,6 +39,7 @@ function montar(estado: Parameters<typeof CartaoProxima>[0]['estado'], sessao = 
       gravando={false}
       aoAbrirDetalhe={vi.fn()}
       aoFazerCheckin={vi.fn()}
+      aoCancelarCheckin={vi.fn()}
     />,
   );
 }
@@ -70,6 +71,7 @@ describe('cartão da próxima sessão', () => {
   it('inscrito mostra confirmação e não oferece check-in de novo', () => {
     montar('inscrito');
     expect(screen.getByText('Check-in confirmado')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Cancelar check-in' })).toBeDefined();
     expect(screen.queryByRole('button', { name: 'Fazer check-in' })).toBeNull();
   });
 

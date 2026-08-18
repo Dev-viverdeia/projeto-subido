@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CalendarX2 } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -41,6 +42,7 @@ export function CartaoProxima({
   gravando,
   aoAbrirDetalhe,
   aoFazerCheckin,
+  aoCancelarCheckin,
 }: {
   sessao: SessaoMentoria;
   estado: EstadoMentoria;
@@ -48,6 +50,7 @@ export function CartaoProxima({
   gravando: boolean;
   aoAbrirDetalhe: () => void;
   aoFazerCheckin: () => void;
+  aoCancelarCheckin: () => void;
 }) {
   const aoVivo = estado === 'ao-vivo';
   const mentor = sessao.mentor;
@@ -132,10 +135,20 @@ export function CartaoProxima({
             )}
 
             {estado === 'inscrito' && (
-              <span className={styles.confirmado}>
-                <Visto tamanho={12} />
-                Check-in confirmado
-              </span>
+              <>
+                <span className={styles.confirmado}>
+                  <Visto tamanho={12} />
+                  Check-in confirmado
+                </span>
+                <Button
+                  variant="destructive"
+                  disabled={gravando}
+                  iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+                  onClick={aoCancelarCheckin}
+                >
+                  Cancelar check-in
+                </Button>
+              </>
             )}
 
             {aoVivo && (

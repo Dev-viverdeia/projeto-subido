@@ -119,7 +119,7 @@ export function AndamentoProspeccao({
               Alguém respondeu
             </Button>
             <Button
-              variant="ghost"
+              variant="secondary"
               disabled={pendente}
               iconLeft={<X size={15} />}
               onClick={() => atualizar('sem_interesse')}

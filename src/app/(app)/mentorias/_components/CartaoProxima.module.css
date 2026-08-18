@@ -146,6 +146,20 @@
   gap: var(--via-space-2_5);
 }
 
+/* Ação destrutiva sobre navy precisa manter a semântica coral sem perder
+   contraste. O variant continua sendo o oficial; aqui só muda a temperatura da
+   superfície escura em que ele pousa. */
+.acoes :global(.via-btn--destructive) {
+  border-color: color-mix(in srgb, var(--via-coral) 62%, transparent);
+  background: color-mix(in srgb, var(--via-coral) 9%, transparent);
+  color: var(--via-gray-100);
+}
+
+.acoes :global(.via-btn--destructive:hover:not(:disabled)) {
+  border-color: var(--via-coral);
+  color: var(--via-white);
+}
+
 /* A MESMA `<dl>` do modal da sessão, na temperatura da banda escura.
    FLEX e não `auto-fit`: `minmax(max-content, 1fr)` não dá ao auto-fit um mínimo
    definido para calcular a contagem, e a tira colapsa para uma coluna — foi

@@ -146,6 +146,9 @@
 }
 
 .confirmado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
   border: 1px solid var(--via-navy-16);
   border-radius: var(--via-radius-pill);
   background: var(--via-navy-06);
@@ -155,13 +158,6 @@
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
   color: var(--via-navy);
-  cursor: pointer;
-  transition: border-color var(--via-t-fast);
-}
-
-.confirmado:hover {
-  border-color: var(--via-coral);
-  color: var(--via-coral);
 }
 
 @media (max-width: 767px) {
@@ -176,6 +172,12 @@
   .centro {
     flex-basis: 100%;
     order: -1;
+  }
+
+  .direita {
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }
 

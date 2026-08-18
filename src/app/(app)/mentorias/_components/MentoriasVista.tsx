@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { CalendarX2 } from 'lucide-react';
 import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import { RetratoMentor } from '../../_components/RetratoMentor';
@@ -61,6 +62,7 @@ export function MentoriasVista({
   const [vista, setVista] = useState<IdVista>(vistaInicial);
   const [detalheId, setDetalheId] = useState<string | null>(null);
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
+  const [cancelandoId, setCancelandoId] = useState<string | null>(null);
 
   /**
    * O CHECK-IN DEIXOU DE SER ESTADO DA ABA.
@@ -126,10 +128,12 @@ export function MentoriasVista({
   );
   const detalhe = porId(detalheId);
   const confirmando = porId(confirmandoId);
+  const cancelando = porId(cancelandoId);
   const mentorDoDetalhe = detalhe?.mentor;
 
   const abrirDetalhe = useCallback((id: string) => setDetalheId(id), []);
   const pedirCheckin = useCallback((id: string) => setConfirmandoId(id), []);
+  const pedirCancelamento = useCallback((id: string) => setCancelandoId(id), []);
   const executar = useCallback((acao: () => Promise<{ ok: boolean; mensagem?: string }>) => {
     setErro(null);
     iniciarGravacao(async () => {
@@ -138,7 +142,12 @@ export function MentoriasVista({
     });
   }, []);
 
-  const cancelar = useCallback((id: string) => executar(() => cancelarCheckin(id)), [executar]);
+  const confirmarCancelamento = useCallback(() => {
+    if (!cancelandoId) return;
+    const id = cancelandoId;
+    setCancelandoId(null);
+    executar(() => cancelarCheckin(id));
+  }, [cancelandoId, executar]);
 
   return (
     <div className={styles.raiz} data-vista={vista}>
@@ -233,6 +242,7 @@ export function MentoriasVista({
               gravando={gravando}
               aoAbrirDetalhe={() => abrirDetalhe(destaque.id)}
               aoFazerCheckin={() => pedirCheckin(destaque.id)}
+              aoCancelarCheckin={() => pedirCancelamento(destaque.id)}
             />
           )}
 
@@ -251,7 +261,7 @@ export function MentoriasVista({
                   gravando={gravando}
                   aoAbrirDetalhe={abrirDetalhe}
                   aoFazerCheckin={pedirCheckin}
-                  aoCancelarCheckin={cancelar}
+                  aoCancelarCheckin={pedirCancelamento}
                 />
               ) : (
                 <CalendarioMentorias
@@ -370,14 +380,17 @@ export function MentoriasVista({
                         <Visto tamanho={12} />
                         Check-in confirmado
                       </span>
-                      {/* Direto, sem confirmação, igual à linha da agenda —
-                          cancelar libera a vaga e dá para refazer enquanto
-                          houver lugar. Confirmar aqui e não lá seria a mesma
-                          ação com dois pesos. */}
+                      {/* Estado e ação não dividem mais o mesmo controle. O
+                          botão abre a mesma confirmação curta usada na agenda e
+                          no cartão principal. */}
                       <Button
-                        variant="ghost"
+                        variant="destructive"
                         disabled={gravando}
-                        onClick={() => cancelar(detalhe.id)}
+                        iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+                        onClick={() => {
+                          setDetalheId(null);
+                          pedirCancelamento(detalhe.id);
+                        }}
                       >
                         Cancelar check-in
                       </Button>
@@ -411,6 +424,38 @@ export function MentoriasVista({
               })()}
             </div>
           </div>
+        )}
+      </Modal>
+
+      {/* A separação entre estado e ação termina numa confirmação curta. O
+          cancelamento libera uma vaga para outra pessoa; deixá-lo em um clique
+          na linha torna a ação evidente, mas também fácil de acionar por engano. */}
+      <Modal
+        open={cancelando !== null}
+        onClose={() => setCancelandoId(null)}
+        title="Cancelar seu check-in?"
+        size="sm"
+        footer={
+          <div className={styles.confirmarAcoes}>
+            <Button variant="secondary" onClick={() => setCancelandoId(null)}>
+              Manter check-in
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={gravando}
+              iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+              onClick={confirmarCancelamento}
+            >
+              Cancelar check-in
+            </Button>
+          </div>
+        }
+      >
+        {cancelando && (
+          <p className={styles.confirmarTexto}>
+            Sua vaga em “{cancelando.titulo}” volta a ficar disponível. Você poderá fazer um novo
+            check-in enquanto ainda houver vaga.
+          </p>
         )}
       </Modal>
 

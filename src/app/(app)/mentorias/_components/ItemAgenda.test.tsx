@@ -110,11 +110,15 @@ describe('linha da agenda', () => {
     }
   });
 
-  it('o botão de cancelar anuncia a AÇÃO, não o estado', () => {
+  it('separa o estado confirmado da ação de cancelar', async () => {
+    const user = userEvent.setup();
     const espioes = montar({ estado: 'inscrito' });
     const botao = screen.getByRole('button', { name: /Cancelar check-in/ });
-    expect(botao.textContent).toContain('Check-in confirmado');
-    expect(espioes.cancelar).not.toHaveBeenCalled();
+    expect(botao.textContent).toContain('Cancelar check-in');
+    expect(screen.getByText('Check-in confirmado').closest('button')).toBeNull();
+
+    await user.click(botao);
+    expect(espioes.cancelar).toHaveBeenCalledTimes(1);
   });
 
   it('com gravação em voo os CTAs ficam travados', () => {

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CalendarX2 } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -118,19 +119,22 @@ export function ItemAgenda({
         )}
 
         {estado === 'inscrito' && (
-          <button
-            type="button"
-            className={styles.confirmado}
-            disabled={gravando}
-            onClick={aoCancelarCheckin}
-            /* O rótulo VISÍVEL diz o estado; o acessível precisa dizer a AÇÃO —
-               senão o leitor de tela anuncia um botão chamado "check-in
-               confirmado" que, ao ser acionado, cancela. */
-            aria-label={`Cancelar check-in em ${sessao.titulo}`}
-          >
-            <Visto tamanho={11} />
-            Check-in confirmado
-          </button>
+          <>
+            <span className={styles.confirmado}>
+              <Visto tamanho={11} />
+              Check-in confirmado
+            </span>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={gravando}
+              iconLeft={<CalendarX2 size={14} strokeWidth={1.8} aria-hidden="true" />}
+              onClick={aoCancelarCheckin}
+              aria-label={`Cancelar check-in em ${sessao.titulo}`}
+            >
+              Cancelar check-in
+            </Button>
+          </>
         )}
 
         {lotada && (
