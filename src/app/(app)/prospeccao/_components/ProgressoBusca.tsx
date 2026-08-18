@@ -45,7 +45,7 @@ export function ProgressoBusca({ quantidade }: { quantidade: number }) {
     <section className={styles.processamentoBusca} role="status" aria-live="polite">
       <div className={styles.processamentoTopo}>
         <span className={styles.processamentoIcone} aria-hidden="true">
-          <Spinner size="lg" tone="inverse" />
+          <Spinner size="lg" tone="navy" />
         </span>
         <div>
           <p>Lista em construção</p>

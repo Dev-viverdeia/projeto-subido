@@ -11,6 +11,7 @@ import {
   Phone,
   Share2,
 } from 'lucide-react';
+import { Pill } from '@/design-system/via';
 import {
   emailsDo,
   redesDo,
@@ -124,10 +125,20 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     lead.endereco ||
                     'A confirmar'}
                 </span>
-                <span className={styles.statusLead} data-status={status}>
-                  <MessageCircle size={14} aria-hidden="true" />
+                <Pill
+                  className={styles.statusLead}
+                  size="sm"
+                  variant={
+                    status === 'sem_interesse'
+                      ? 'churn'
+                      : status === 'no_crm' || status === 'conversa_iniciada'
+                        ? 'success'
+                        : 'default'
+                  }
+                  iconLeft={<MessageCircle size={13} aria-hidden="true" />}
+                >
                   {rotuloStatusProspeccao(status)}
-                </span>
+                </Pill>
                 <span
                   className={styles.estadoLead}
                   data-enviado={Boolean(lead.crm_oportunidade_id)}

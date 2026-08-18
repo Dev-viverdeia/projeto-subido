@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
+import { Card, Pill } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
 import { FormularioBusca } from './_components/FormularioBusca';
@@ -55,14 +56,22 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
 
       <FormularioBusca saldo={saldo} pronto={integracoes.pronto} />
 
-      <section className={styles.areaListas} aria-labelledby="listas-titulo">
+      <Card
+        as="section"
+        variant="glass"
+        noPadding
+        className={styles.areaListas}
+        aria-labelledby="listas-titulo"
+      >
         <aside className={styles.historico}>
           <div className={styles.historicoTopo}>
             <div>
               <p className={styles.sobretitulo}>Suas buscas</p>
               <h2 id="listas-titulo">Listas</h2>
             </div>
-            <span>{listas.length}</span>
+            <Pill size="sm" variant="default">
+              {listas.length} {listas.length === 1 ? 'lista' : 'listas'}
+            </Pill>
           </div>
           {listas.length ? (
             <nav aria-label="Listas de prospecção">
@@ -149,7 +158,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
             </div>
           )}
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

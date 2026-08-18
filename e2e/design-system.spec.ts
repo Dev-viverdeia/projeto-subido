@@ -6,7 +6,7 @@ const TELAS = [
   ['/entrar', 'Entrar'],
   ['/preview/mapa-jornada', 'Defina o foco da sua primeira oferta'],
   ['/preview/crm', 'Três etapas de trabalho para saber quem precisa de atenção agora'],
-  ['/preview/prospeccao', 'Crie listas que já chegam prontas para uma abordagem'],
+  ['/preview/prospeccao', 'Encontre empresas e comece a conversa'],
   ['/preview/calls', 'Cada reunião vira contexto no CRM'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
