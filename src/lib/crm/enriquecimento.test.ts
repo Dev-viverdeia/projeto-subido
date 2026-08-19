@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lerDossie, lerFontes } from './enriquecimento';
+import { lerDossie, lerFontes, obterRoteiroCall } from './enriquecimento';
 
 const DOSSIE = {
   resumo: 'A empresa concentra o atendimento em um canal e precisa validar volume e processo.',
@@ -44,6 +44,24 @@ describe('leitura do enriquecimento', () => {
     const dossie = lerDossie(DOSSIE);
     expect(dossie?.fatos[0]?.origem).toBe('site');
     expect(dossie?.hipoteses[0]?.confianca).toBe('media');
+  });
+
+  it('transforma enriquecimentos anteriores em um roteiro comercial ligado ao projeto', () => {
+    const dossie = lerDossie(DOSSIE);
+    expect(dossie).not.toBeNull();
+
+    const roteiro = obterRoteiroCall(dossie!);
+    expect(roteiro.objetivo).toContain('Triagem assistida');
+    expect(roteiro.perguntas).toHaveLength(5);
+    expect(roteiro.perguntas.map((pergunta) => pergunta.etapa)).toEqual([
+      'contexto',
+      'processo',
+      'processo',
+      'impacto',
+      'decisao',
+    ]);
+    expect(roteiro.perguntas[1]?.projetoRelacionado).toBe('Triagem assistida');
+    expect(roteiro.fechamento.proximoPasso).toBe('Agendar call de descoberta.');
   });
 
   it('recusa payload incompleto e descarta fontes fora do contrato', () => {

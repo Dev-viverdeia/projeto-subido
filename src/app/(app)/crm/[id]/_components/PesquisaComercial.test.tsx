@@ -42,6 +42,42 @@ const DOSSIE: DossieEnriquecido = {
     },
   ],
   perguntasDescoberta: ['Quantas conversas chegam por dia?'],
+  roteiroCall: {
+    objetivo: 'Confirmar se o volume no WhatsApp justifica um SDR de Atendimento e Qualificação.',
+    abertura:
+      'Vi que o WhatsApp concentra a demanda. Quero entender onde o atendimento trava antes de sugerir um piloto.',
+    perguntas: [
+      {
+        etapa: 'contexto',
+        pergunta: 'Qual resultado do atendimento é prioridade neste trimestre?',
+        intencao: 'Definir a métrica que deve orientar um possível piloto.',
+        projetoRelacionado: null,
+      },
+      {
+        etapa: 'processo',
+        pergunta: 'O que acontece desde a primeira mensagem até o agendamento?',
+        intencao: 'Mapear o fluxo e localizar o gargalo operacional.',
+        projetoRelacionado: 'SDR de Atendimento e Qualificação',
+      },
+      {
+        etapa: 'impacto',
+        pergunta: 'Quantas conversas deixam de virar agendamento em uma semana?',
+        intencao: 'Dimensionar o impacto que o piloto precisaria demonstrar.',
+        projetoRelacionado: 'SDR de Atendimento e Qualificação',
+      },
+      {
+        etapa: 'decisao',
+        pergunta: 'Quem aprova o piloto e qual resultado essa pessoa precisa ver?',
+        intencao: 'Identificar o decisor e o critério real para avançar.',
+        projetoRelacionado: 'SDR de Atendimento e Qualificação',
+      },
+    ],
+    fechamento: {
+      sinalParaAvancar: 'Volume, gargalo e critério do piloto foram confirmados.',
+      frase: 'Faz sentido mapearmos uma semana de conversas e desenharmos o piloto?',
+      proximoPasso: 'Mapear uma semana de conversas.',
+    },
+  },
   proximaAcao: {
     acao: 'Medir o volume de uma semana.',
     porque: 'O piloto depende do volume real.',
@@ -96,7 +132,20 @@ describe('PesquisaComercial', () => {
     expect(screen.queryByText('Quantas conversas chegam por dia?')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Preparar call' }));
-    expect(screen.getByText('Quantas conversas chegam por dia?')).toBeVisible();
+    expect(screen.getByText(DOSSIE.roteiroCall!.objetivo)).toBeVisible();
+    expect(screen.getByText(/Vi que o WhatsApp concentra a demanda/)).toBeVisible();
+    expect(
+      screen.getByText('Quantas conversas deixam de virar agendamento em uma semana?'),
+    ).toBeVisible();
+    expect(screen.getByText('Dimensionar')).toBeVisible();
+    expect(
+      screen.getByText('Dimensionar o impacto que o piloto precisaria demonstrar.'),
+    ).toBeVisible();
+    expect(screen.getAllByText('SDR de Atendimento e Qualificação').length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole('heading', { name: 'Saia com um próximo passo combinado' }),
+    ).toBeVisible();
+    expect(screen.getByText(/Faz sentido mapearmos uma semana/)).toBeVisible();
     expect(screen.getByText('SDR de atendimento')).toBeVisible();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Dados e fontes' }));

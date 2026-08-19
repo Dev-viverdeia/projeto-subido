@@ -44,6 +44,26 @@ const CamposDossie = {
     )
     .max(5),
   perguntasDescoberta: z.array(TextoCurto).max(8),
+  roteiroCall: z.object({
+    objetivo: z.string().trim().min(1).max(500),
+    abertura: z.string().trim().min(1).max(700),
+    perguntas: z
+      .array(
+        z.object({
+          etapa: z.enum(['contexto', 'processo', 'impacto', 'decisao']),
+          pergunta: z.string().trim().min(1).max(500),
+          intencao: z.string().trim().min(1).max(500),
+          projetoRelacionado: z.string().trim().min(1).max(140).nullable(),
+        }),
+      )
+      .min(4)
+      .max(7),
+    fechamento: z.object({
+      sinalParaAvancar: z.string().trim().min(1).max(500),
+      frase: z.string().trim().min(1).max(700),
+      proximoPasso: z.string().trim().min(1).max(500),
+    }),
+  }),
   proximaAcao: z.object({
     acao: z.string().trim().min(1).max(500),
     porque: z.string().trim().min(1).max(700),

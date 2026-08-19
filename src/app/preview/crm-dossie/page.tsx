@@ -194,6 +194,67 @@ const LEAD_OPERACIONAL: DossieLead = {
           'Em quais horários as mensagens mais se acumulam?',
           'Como vocês acompanham conversas que não viraram agendamento?',
         ],
+        roteiroCall: {
+          objetivo:
+            'Confirmar se o volume e a demora no WhatsApp justificam um SDR de Atendimento e Qualificação, com um piloto pequeno e mensurável.',
+          abertura:
+            'Vi que o WhatsApp concentra o atendimento e que as mensagens se acumulam em alguns horários. Quero entender onde esse processo trava e medir se vale testar uma primeira automação.',
+          perguntas: [
+            {
+              etapa: 'contexto',
+              pergunta:
+                'Entre reduzir o tempo de resposta e aumentar os agendamentos, qual resultado é mais importante agora?',
+              intencao: 'Definir a métrica que deve orientar a conversa e um possível piloto.',
+              projetoRelacionado: null,
+            },
+            {
+              etapa: 'processo',
+              pergunta:
+                'Quando uma nova mensagem chega pelo WhatsApp, quem responde e quais dados precisa levantar antes de oferecer um horário?',
+              intencao:
+                'Mapear a triagem atual e localizar tarefas que podem ser assumidas pelo SDR de atendimento.',
+              projetoRelacionado: 'SDR de Atendimento e Qualificação',
+            },
+            {
+              etapa: 'processo',
+              pergunta:
+                'O que acontece com a conversa quando a recepção está ocupada ou fora do horário?',
+              intencao:
+                'Confirmar a hipótese de perda de demanda e entender o fluxo de recuperação atual.',
+              projetoRelacionado: 'SDR de Atendimento e Qualificação',
+            },
+            {
+              etapa: 'impacto',
+              pergunta:
+                'Em uma semana comum, quantas conversas chegam e quantas deixam de virar agendamento?',
+              intencao:
+                'Dimensionar o volume e estimar o impacto que um piloto precisaria demonstrar.',
+              projetoRelacionado: 'SDR de Atendimento e Qualificação',
+            },
+            {
+              etapa: 'impacto',
+              pergunta:
+                'Quanto tempo a equipe gasta por dia repetindo perguntas de triagem e retomando quem não respondeu?',
+              intencao: 'Transformar o gargalo em capacidade operacional recuperável.',
+              projetoRelacionado: 'SDR de Atendimento e Qualificação',
+            },
+            {
+              etapa: 'decisao',
+              pergunta:
+                'Se o piloto reduzir o tempo de resposta sem perder qualidade, quem precisa aprovar a implantação e o que essa pessoa vai querer ver?',
+              intencao: 'Identificar o decisor e o critério concreto para a oportunidade avançar.',
+              projetoRelacionado: 'SDR de Atendimento e Qualificação',
+            },
+          ],
+          fechamento: {
+            sinalParaAvancar:
+              'Há volume recorrente, demora confirmada e uma métrica clara para avaliar o piloto.',
+            frase:
+              'Pelo que você descreveu, faz sentido mapearmos uma semana de conversas e voltarmos com um escopo de piloto focado em tempo de resposta e agendamento?',
+            proximoPasso:
+              'Mapear uma semana de conversas e apresentar o escopo do piloto ao decisor.',
+          },
+        },
         proximaAcao: {
           acao: 'Medir uma semana de conversas antes de definir o piloto.',
           porque: 'O volume e os gargalos precisam ser confirmados para dimensionar a automação.',

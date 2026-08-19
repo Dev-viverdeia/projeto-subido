@@ -25,8 +25,18 @@ test.describe('Ficha do cliente no CRM', () => {
 
     await page.getByRole('tab', { name: 'Preparar call' }).click();
     await expect(
-      page.getByText('Quantas conversas novas chegam pelo WhatsApp por dia?'),
+      page.getByText(
+        'Confirmar se o volume e a demora no WhatsApp justificam um SDR de Atendimento e Qualificação, com um piloto pequeno e mensurável.',
+      ),
     ).toBeVisible();
+    await expect(page.getByText('Perguntas na ordem da conversa')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Em uma semana comum, quantas conversas chegam e quantas deixam de virar agendamento?',
+      ),
+    ).toBeVisible();
+    await expect(page.getByText('Dimensionar', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Saia com um próximo passo combinado')).toBeVisible();
     await page.getByRole('tab', { name: 'Dados e fontes' }).click();
     await expect(page.getByText('Site da Clínica Aurora')).toBeVisible();
 

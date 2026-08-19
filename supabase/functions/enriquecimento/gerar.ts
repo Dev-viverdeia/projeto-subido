@@ -10,7 +10,17 @@ const MODELO_ANTHROPIC = 'claude-sonnet-5';
 const MODELO_OPENAI = 'gpt-5-mini';
 
 const INSTRUCOES_DOSSIE = `Você é o analista de pré-venda da plataforma Subido. Enriqueça a ficha
-do cliente para um prestador de serviços de IA preparar a próxima conversa.
+do cliente para um prestador de serviços de IA vender e implementar um projeto com aderência real.
+
+OBJETIVO DO PRODUTO
+· A plataforma conduz o profissional por prospectar, vender e entregar projetos de IA.
+· Este enriquecimento precisa preparar uma call comercial específica para esta empresa. Não
+  entregue um questionário genérico de consultoria.
+· A call deve confirmar uma dor operacional, dimensionar o impacto, conectar o problema a um
+  projeto executável e combinar um próximo passo concreto.
+· Priorize um projeto principal e, no máximo, duas alternativas entre os projetos ensinados:
+  SDR de Atendimento e Qualificação, Máquina de Prospecção B2B, Inteligência Comercial com IA,
+  Operação de Conteúdo Multicanal e Radar de Satisfação com IA.
 
 REGRAS INEGOCIÁVEIS
 · Fato e hipótese são categorias diferentes. Um dado só entra em "fatos" se
@@ -22,8 +32,17 @@ REGRAS INEGOCIÁVEIS
 · Em cada hipótese, diga exatamente como confirmá-la na call.
 · Recomende oportunidades de IA específicas para o caso, com mecanismo e impacto;
   nunca prometa resultado e nunca escreva marketing genérico.
-· A abertura é uma frase natural que o profissional pode dizer ao contato. Não use
+· Não pergunte de novo um fato já confirmado nas fontes. Use esse fato para aprofundar a conversa.
+· Cada pergunta do roteiro deve nascer de um fato, hipótese ou projeto recomendado; escreva em
+  "intencao" o que aquela resposta permite decidir.
+· Ordene o roteiro em contexto → processo → impacto → decisão. Inclua perguntas que quantifiquem
+  volume, tempo, custo, perda ou capacidade quando a fonte sustentar essa linha de investigação.
+· A etapa "decisao" deve descobrir prioridade, responsável pela decisão e condição para um piloto,
+  sem pressionar o lead nem assumir orçamento.
+· A abertura e a frase de fechamento são falas naturais que o profissional pode usar. Não use
   bajulação, urgência artificial ou afirmação não confirmada.
+· O fechamento só recomenda avançar quando houver aderência. Diga qual sinal justifica avançar e
+  proponha uma próxima reunião, diagnóstico curto ou piloto compatível com o caso.
 · A próxima ação deve ser executável e caber em uma frase.
 · Se uma fonte pública falhou ou há pouco contexto, coloque isso em "alertas".
 · Escreva em português do Brasil, direto, sem caixa alta ou exclamação.
@@ -34,7 +53,9 @@ ORÇAMENTO DOS CAMPOS
 · fatos: até 12; título até 120; valor até 600
 · hipóteses: até 8; título até 140; explicação até 700; validação até 500
 · oportunidades: até 5; título até 140; impacto e motivo até 500; abertura até 700
-· perguntas de descoberta: até 8, cada uma com até 500 caracteres
+· perguntas de descoberta: até 8; devem espelhar as perguntas centrais do roteiro
+· roteiro da call: objetivo até 500; abertura até 700; de 4 a 7 perguntas; intenção até 500;
+  fechamento com sinal, frase e próximo passo dentro dos limites do schema
 · próxima ação: ação até 500; motivo até 700
 · alertas: até 5, cada um com até 500 caracteres
 Respeitar esses limites faz parte da tarefa. Corte o item menos útil antes de
@@ -314,6 +335,91 @@ function normalizarDossie(valor: unknown): Dossie {
   const raiz = objeto(valor);
   const empresa = objeto(raiz.empresa);
   const proxima = objeto(raiz.proximaAcao);
+  const roteiro = objeto(raiz.roteiroCall);
+  const fechamento = objeto(roteiro.fechamento);
+
+  const hipoteses = lista(raiz.hipoteses, 8).map((item) => {
+    const hipotese = objeto(item);
+    return {
+      titulo: texto(hipotese.titulo, 140, 'Hipótese para validar'),
+      explicacao: texto(
+        hipotese.explicacao,
+        700,
+        'Esta leitura ainda precisa ser confirmada com o lead.',
+      ),
+      confianca: enumSeguro(hipotese.confianca, ['alta', 'media', 'baixa'] as const, 'baixa'),
+      comoValidar: texto(
+        hipotese.comoValidar,
+        500,
+        'Pergunte diretamente sobre esse ponto na próxima conversa.',
+      ),
+    };
+  });
+  const oportunidades = lista(raiz.oportunidades, 5).map((item) => {
+    const oportunidade = objeto(item);
+    return {
+      titulo: texto(oportunidade.titulo, 140, 'Oportunidade de projeto'),
+      impacto: texto(
+        oportunidade.impacto,
+        500,
+        'O impacto precisa ser dimensionado após a descoberta.',
+      ),
+      porQueAgora: texto(
+        oportunidade.porQueAgora,
+        500,
+        'Há um sinal que merece investigação na próxima conversa.',
+      ),
+      abertura: texto(
+        oportunidade.abertura,
+        700,
+        'Quero entender melhor esse processo antes de sugerir uma solução.',
+      ),
+    };
+  });
+  const perguntasDescoberta = lista(raiz.perguntasDescoberta, 8).map((item) =>
+    texto(item, 500, 'Como esse processo funciona hoje?'),
+  );
+  const proximaAcao = {
+    acao: texto(proxima.acao, 500, 'Agendar uma conversa de descoberta com o lead.'),
+    porque: texto(
+      proxima.porque,
+      700,
+      'Ainda é preciso confirmar o processo atual antes de desenhar o projeto.',
+    ),
+  };
+  const projetoPrincipal = oportunidades[0]?.titulo ?? null;
+  const perguntasRoteiroBrutas = lista(roteiro.perguntas, 7);
+  const perguntasFallback = unicas([
+    ...oportunidades.map((oportunidade) => oportunidade.abertura),
+    ...hipoteses.map((hipotese) => hipotese.comoValidar),
+    ...perguntasDescoberta,
+    'Quem participa da decisão e o que precisa estar claro para aprovar um piloto?',
+  ]).slice(0, 7);
+  const basePerguntas =
+    perguntasRoteiroBrutas.length >= 4
+      ? perguntasRoteiroBrutas
+      : perguntasFallback.map((pergunta) => ({ pergunta }));
+  const perguntasRoteiro = basePerguntas.map((item, indice) => {
+    const pergunta = objeto(item);
+    const etapa = enumSeguro(
+      pergunta.etapa,
+      ['contexto', 'processo', 'impacto', 'decisao'] as const,
+      etapaDoRoteiro(indice, basePerguntas.length),
+    );
+    return {
+      etapa,
+      pergunta: texto(
+        pergunta.pergunta,
+        500,
+        perguntasFallback[indice] ?? perguntasFallback[0] ?? 'Como esse processo funciona hoje?',
+      ),
+      intencao: texto(pergunta.intencao, 500, intencaoFallback(etapa, projetoPrincipal)),
+      projetoRelacionado:
+        pergunta.projetoRelacionado === null
+          ? null
+          : (textoOuNulo(pergunta.projetoRelacionado, 140) ?? projetoPrincipal),
+    };
+  });
 
   const normalizado = {
     resumo: textoComMinimo(
@@ -338,61 +444,71 @@ function normalizarDossie(valor: unknown): Dossie {
         urlFonte: urlOuIndefinida(fato.urlFonte),
       };
     }),
-    hipoteses: lista(raiz.hipoteses, 8).map((item) => {
-      const hipotese = objeto(item);
-      return {
-        titulo: texto(hipotese.titulo, 140, 'Hipótese para validar'),
-        explicacao: texto(
-          hipotese.explicacao,
-          700,
-          'Esta leitura ainda precisa ser confirmada com o lead.',
-        ),
-        confianca: enumSeguro(hipotese.confianca, ['alta', 'media', 'baixa'] as const, 'baixa'),
-        comoValidar: texto(
-          hipotese.comoValidar,
-          500,
-          'Pergunte diretamente sobre esse ponto na próxima conversa.',
-        ),
-      };
-    }),
-    oportunidades: lista(raiz.oportunidades, 5).map((item) => {
-      const oportunidade = objeto(item);
-      return {
-        titulo: texto(oportunidade.titulo, 140, 'Oportunidade de projeto'),
-        impacto: texto(
-          oportunidade.impacto,
-          500,
-          'O impacto precisa ser dimensionado após a descoberta.',
-        ),
-        porQueAgora: texto(
-          oportunidade.porQueAgora,
-          500,
-          'Há um sinal que merece investigação na próxima conversa.',
-        ),
-        abertura: texto(
-          oportunidade.abertura,
-          700,
-          'Quero entender melhor esse processo antes de sugerir uma solução.',
-        ),
-      };
-    }),
-    perguntasDescoberta: lista(raiz.perguntasDescoberta, 8).map((item) =>
-      texto(item, 500, 'Como esse processo funciona hoje?'),
-    ),
-    proximaAcao: {
-      acao: texto(proxima.acao, 500, 'Agendar uma conversa de descoberta com o lead.'),
-      porque: texto(
-        proxima.porque,
-        700,
-        'Ainda é preciso confirmar o processo atual antes de desenhar o projeto.',
+    hipoteses,
+    oportunidades,
+    perguntasDescoberta,
+    roteiroCall: {
+      objetivo: texto(
+        roteiro.objetivo,
+        500,
+        projetoPrincipal
+          ? `Confirmar se ${projetoPrincipal} resolve um problema prioritário e merece avançar para um escopo inicial.`
+          : 'Confirmar a dor prioritária, o impacto e a condição para avançar com um projeto de IA.',
       ),
+      abertura: texto(
+        roteiro.abertura,
+        700,
+        oportunidades[0]?.abertura ?? 'Quero entender como esse processo funciona hoje.',
+      ),
+      perguntas: perguntasRoteiro,
+      fechamento: {
+        sinalParaAvancar: texto(
+          fechamento.sinalParaAvancar,
+          500,
+          'Há uma dor confirmada, impacto relevante e alguém responsável por decidir o próximo passo.',
+        ),
+        frase: texto(
+          fechamento.frase,
+          700,
+          'Pelo que você descreveu, faz sentido organizarmos um escopo inicial e validar o projeto com quem participa da decisão?',
+        ),
+        proximoPasso: texto(fechamento.proximoPasso, 500, proximaAcao.acao),
+      },
     },
+    proximaAcao,
     alertas: lista(raiz.alertas, 5).map((item) =>
       texto(item, 500, 'Esta informação precisa ser confirmada.'),
     ),
   };
 
   return DossieGerado.parse(normalizado);
+}
+
+function unicas(valores: string[]): string[] {
+  return [...new Set(valores.map((valor) => valor.trim()).filter(Boolean))];
+}
+
+function etapaDoRoteiro(
+  indice: number,
+  total: number,
+): 'contexto' | 'processo' | 'impacto' | 'decisao' {
+  const proporcao = total > 1 ? indice / (total - 1) : 0;
+  if (proporcao < 0.2) return 'contexto';
+  if (proporcao < 0.55) return 'processo';
+  if (proporcao < 0.82) return 'impacto';
+  return 'decisao';
+}
+
+function intencaoFallback(
+  etapa: 'contexto' | 'processo' | 'impacto' | 'decisao',
+  projeto: string | null,
+): string {
+  if (etapa === 'contexto') return 'Entender o cenário antes de entrar no problema.';
+  if (etapa === 'processo') return 'Localizar o gargalo que um projeto de IA precisaria resolver.';
+  if (etapa === 'impacto') return 'Dimensionar se a dor justifica investimento e prioridade.';
+  return projeto
+    ? `Confirmar quem decide e qual condição permite avançar com ${projeto}.`
+    : 'Confirmar quem decide e qual condição permite avançar para um escopo inicial.';
 }
 
 function objeto(valor: unknown): Record<string, unknown> {
