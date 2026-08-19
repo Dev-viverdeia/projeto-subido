@@ -864,11 +864,14 @@
   }
 
   .modal {
+    display: flex;
+    flex-direction: column;
     width: min(1320px, 100%);
     max-height: calc(100dvh - 40px);
   }
 
   .header {
+    flex: 0 0 auto;
     min-height: 88px;
     padding: var(--via-space-3) var(--via-space-7);
     background:
@@ -885,9 +888,11 @@
   }
 
   .body {
+    flex: 0 1 auto;
     grid-template-columns: minmax(0, 1fr) 286px;
     align-items: start;
-    max-height: calc(100dvh - 128px);
+    min-height: 0;
+    max-height: none;
     overflow-y: auto;
     overscroll-behavior: contain;
     background:
