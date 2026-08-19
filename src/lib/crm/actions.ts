@@ -201,12 +201,19 @@ export async function moverOportunidadeKanban(
   return { ok: true, movida: Boolean(data) };
 }
 
-export async function aplicarProximaAcao(formData: FormData): Promise<void> {
+export type ResultadoAplicarAcao = { ok: true; mensagem: string } | { ok: false; erro: string };
+
+export async function aplicarProximaAcao(
+  _estado: ResultadoAplicarAcao | null,
+  formData: FormData,
+): Promise<ResultadoAplicarAcao> {
   const validacao = aplicarAcaoSchema.safeParse({
     oportunidade: formData.get('oportunidade'),
     enriquecimento: formData.get('enriquecimento'),
   });
-  if (!validacao.success) return;
+  if (!validacao.success) {
+    return { ok: false, erro: 'Não foi possível identificar a recomendação.' };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('crm_aplicar_proxima_acao', {
@@ -215,13 +222,20 @@ export async function aplicarProximaAcao(formData: FormData): Promise<void> {
   });
   if (error) {
     console.error(`[crm:aplicar-acao] ${error.code}: ${error.message}`);
-    return;
+    return {
+      ok: false,
+      erro:
+        error.code === '42501'
+          ? 'Sua sessão expirou. Entre novamente para continuar.'
+          : 'A próxima ação não foi salva. Tente novamente.',
+    };
   }
 
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
   revalidarDirecaoOperacional();
+  return { ok: true, mensagem: 'Próxima ação salva no pipeline.' };
 }
 
 /** Abre uma nova negociação para a mesma empresa depois de uma venda ganha. */

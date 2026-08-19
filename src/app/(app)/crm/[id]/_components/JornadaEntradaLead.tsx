@@ -35,9 +35,11 @@ export function JornadaEntradaLead({
     <section className={styles.jornada} aria-labelledby="entrada-lead-titulo">
       <header className={styles.topo}>
         <div>
-          <p>Lead adicionado</p>
+          <p>Oportunidade adicionada</p>
           <h2 id="entrada-lead-titulo">
-            {projetoSlug ? 'Pesquise o lead e prepare a proposta.' : 'Prepare a primeira conversa.'}
+            {projetoSlug
+              ? 'Pesquise a empresa e prepare a proposta.'
+              : 'Prepare a primeira conversa.'}
           </h2>
           <span>
             A oportunidade de {empresaNome} já está no CRM. Agora pesquise a empresa ou agende a
@@ -65,7 +67,9 @@ export function JornadaEntradaLead({
               dominioInicial={dominio}
               linkedinInicial={linkedin}
               temDossie={false}
-              rotulo={estadoContexto === 'falhou' ? 'Tentar pesquisa novamente' : 'Pesquisar lead'}
+              rotulo={
+                estadoContexto === 'falhou' ? 'Tentar pesquisa novamente' : 'Pesquisar empresa'
+              }
             />
           )}
           {!callPronta && (
@@ -100,7 +104,7 @@ export function JornadaEntradaLead({
         <li data-estado="concluido">
           <span className={styles.numero}>01</span>
           <div>
-            <strong>Lead no pipeline</strong>
+            <strong>Oportunidade no pipeline</strong>
             <p>Empresa, contato e serviço de interesse foram salvos.</p>
           </div>
           <small>Concluído</small>
@@ -111,7 +115,7 @@ export function JornadaEntradaLead({
         >
           <span className={styles.numero}>02</span>
           <div>
-            <strong>Pesquisar o lead</strong>
+            <strong>Pesquisar a empresa</strong>
             <p>Busque site e informações que ajudam na primeira abordagem.</p>
           </div>
           <small>

@@ -86,9 +86,9 @@ export function FormularioEnriquecimento({
       {enviando && (
         <EsperaOperacao
           aberto
-          rotulo="Pesquisa do lead"
-          titulo="Iniciando a análise"
-          descricao="A plataforma está preparando a pesquisa desta empresa."
+          rotulo="Pesquisa comercial"
+          titulo="Iniciando a pesquisa"
+          descricao="Estamos organizando o contexto desta oportunidade antes de consultar as fontes."
           etapas={ETAPAS_PESQUISA}
         />
       )}
@@ -100,7 +100,7 @@ export function FormularioEnriquecimento({
         aria-haspopup="dialog"
       >
         <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
-        {rotulo ?? (temDossie ? 'Atualizar pesquisa' : 'Pesquisar lead')}
+        {rotulo ?? (temDossie ? 'Atualizar pesquisa' : 'Pesquisar empresa')}
       </button>
 
       {aberto && (
@@ -136,11 +136,11 @@ export function FormularioEnriquecimento({
           >
             <header className={styles.topo}>
               <div>
-                <p className={styles.sobretitulo}>Pesquisa do lead</p>
-                <h2 id="enriquecimento-titulo">Buscar informações sobre a empresa</h2>
+                <p className={styles.sobretitulo}>Pesquisa comercial</p>
+                <h2 id="enriquecimento-titulo">Pesquisar esta empresa</h2>
                 <p>
-                  A pesquisa usa o CRM e fontes públicas. O resultado mostra o que foi confirmado e
-                  o que ainda precisa ser verificado.
+                  Juntamos o que já está no CRM com fontes públicas para preparar sua próxima
+                  conversa. Fatos e hipóteses aparecem separados.
                 </p>
               </div>
               <button type="button" className={styles.fechar} onClick={fechar} aria-label="Fechar">
@@ -173,7 +173,7 @@ export function FormularioEnriquecimento({
                 label="Site da empresa"
                 placeholder="empresa.com.br"
                 defaultValue={dominioInicial ?? ''}
-                hint="Lemos apenas conteúdo público da página."
+                hint="Usamos apenas conteúdo público do site."
                 inputMode="url"
               />
 
@@ -183,13 +183,13 @@ export function FormularioEnriquecimento({
                 label="LinkedIn do contato"
                 placeholder="https://www.linkedin.com/in/..."
                 defaultValue={linkedinInicial ?? ''}
-                hint="Opcional. O perfil é usado como referência, sem raspagem."
+                hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
                 iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
                 inputMode="url"
               />
 
               <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
-                <span>O que você já sabe</span>
+                <span>Contexto que você já tem</span>
                 <textarea
                   id="enriquecimento-contexto"
                   name="contexto"
@@ -197,7 +197,9 @@ export function FormularioEnriquecimento({
                   maxLength={4000}
                   placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
                 />
-                <small>Este campo é opcional e ajuda a preparar perguntas mais específicas.</small>
+                <small>
+                  Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
+                </small>
               </label>
 
               <div className={styles.acoes}>
@@ -205,7 +207,7 @@ export function FormularioEnriquecimento({
                   Cancelar
                 </Button>
                 <Button type="submit" variant="primary" loading={enviando}>
-                  Pesquisar lead
+                  Começar pesquisa
                 </Button>
               </div>
             </form>

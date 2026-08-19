@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Database, Globe2, ScanSearch, Layers3 } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Check, Database, Globe2, ScanSearch, Layers3 } from 'lucide-react';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import styles from './EstadoEnriquecimento.module.css';
 
@@ -12,9 +12,11 @@ const INTERVALO = 4000;
 export function EstadoEnriquecimento({
   status,
   erro,
+  acao,
 }: {
   status: StatusEnriquecimento;
   erro: string | null;
+  acao?: ReactNode;
 }) {
   const router = useRouter();
   const [tentativas, setTentativas] = useState(0);
@@ -31,13 +33,17 @@ export function EstadoEnriquecimento({
 
   if (status === 'falhou') {
     return (
-      <div className={styles.falha} role="status">
-        <ScanSearch size={21} strokeWidth={1.7} aria-hidden="true" />
+      <section className={styles.falha} role="alert" aria-labelledby="pesquisa-falhou-titulo">
+        <span className={styles.iconeFalha}>
+          <ScanSearch size={21} strokeWidth={1.7} aria-hidden="true" />
+        </span>
         <div>
-          <strong>A análise não terminou</strong>
-          <p>{erro ?? 'Revise as fontes e tente novamente.'}</p>
+          <p className={styles.sobretitulo}>Pesquisa interrompida</p>
+          <h2 id="pesquisa-falhou-titulo">Não conseguimos concluir desta vez.</h2>
+          <p>{erro ?? 'Revise o site informado e tente novamente.'}</p>
         </div>
-      </div>
+        {acao && <div className={styles.acaoFalha}>{acao}</div>}
+      </section>
     );
   }
 
@@ -47,26 +53,46 @@ export function EstadoEnriquecimento({
     <section className={styles.estado} aria-live="polite" aria-label="Pesquisa em andamento">
       <div className={styles.cabecalho}>
         <div>
-          <p className={styles.sobretitulo}>Pesquisa em andamento</p>
-          <h2>Buscando informações sobre este lead</h2>
-          <p>Você pode sair desta página. A pesquisa continuará em segundo plano.</p>
+          <p className={styles.sobretitulo}>Pesquisa comercial em andamento</p>
+          <h2>
+            {status === 'na_fila' ? 'Preparando as fontes' : 'Montando seu briefing de venda'}
+          </h2>
+          <p>
+            Você pode continuar usando a plataforma. Esta página se atualiza quando tudo estiver
+            pronto.
+          </p>
         </div>
         <span className={styles.pulso} aria-hidden="true" />
       </div>
 
-      <div className={styles.mapa} aria-hidden="true">
-        <span className={styles.no}>
-          <Database size={17} /> CRM
-        </span>
-        <span className={styles.traco} />
-        <span className={styles.no}>
-          <Globe2 size={17} /> Site
-        </span>
-        <span className={styles.traco} />
-        <span className={`${styles.no} ${styles.noAtivo}`}>
-          <Layers3 size={17} /> Análise
-        </span>
-      </div>
+      <ol className={styles.mapa} aria-label="Etapas da pesquisa">
+        <li data-estado="concluida">
+          <span>
+            <Check size={14} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>Organizar contexto</strong>
+            <small>CRM e histórico</small>
+          </div>
+          <Database size={16} aria-hidden="true" />
+        </li>
+        <li data-estado={status === 'processando' ? 'concluida' : 'atual'}>
+          <span>{status === 'processando' ? <Check size={14} aria-hidden="true" /> : '02'}</span>
+          <div>
+            <strong>Ler fontes</strong>
+            <small>Site e dados públicos</small>
+          </div>
+          <Globe2 size={16} aria-hidden="true" />
+        </li>
+        <li data-estado={status === 'processando' ? 'atual' : 'futura'}>
+          <span>03</span>
+          <div>
+            <strong>Preparar briefing</strong>
+            <small>Fatos, perguntas e ação</small>
+          </div>
+          <Layers3 size={16} aria-hidden="true" />
+        </li>
+      </ol>
     </section>
   );
 }

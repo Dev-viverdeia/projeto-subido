@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { ArrowUpRight, History, ListChecks, Video } from 'lucide-react';
+import { ArrowUpRight, CalendarClock, History, Video } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
-import { montarCicloCliente } from '@/lib/crm/ciclo-cliente';
+import { FASES_CRM, faseDaEtapa } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
-import styles from '../pagina.module.css';
+import styles from './ResumoOperacionalLead.module.css';
 
 const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -24,144 +24,220 @@ function destinoDaCall(call: DossieLead['calls'][number]) {
   return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/calls/${call.id}`;
 }
 
-export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
+function proximoMovimento(lead: DossieLead) {
   const compromisso = lead.acoesPlano[0] ?? null;
-  const { etapas, decisao } = montarCicloCliente(lead);
+  const proposta = lead.propostaRecente;
+  const call = lead.calls[0] ?? null;
+
+  if (compromisso) {
+    return {
+      rotulo: 'Compromisso marcado',
+      titulo: compromisso.titulo,
+      href: compromisso.reuniaoId ? `/calls/${compromisso.reuniaoId}` : null,
+      acao: compromisso.reuniaoId ? 'Abrir call' : null,
+      prazo: compromisso.prazoEm,
+    };
+  }
+
+  if (lead.oportunidade.etapa === 'ganho') {
+    return {
+      rotulo: 'Venda ganha',
+      titulo: 'Registre uma nova oportunidade quando houver outro projeto para vender.',
+      href: null,
+      acao: null,
+      prazo: null,
+    };
+  }
+
+  if (lead.oportunidade.etapa === 'perdido') {
+    return {
+      rotulo: 'Venda encerrada',
+      titulo: 'O motivo da perda fica salvo para orientar uma abordagem futura.',
+      href: null,
+      acao: null,
+      prazo: null,
+    };
+  }
+
+  if (proposta) {
+    return {
+      rotulo: proposta.status === 'aceita' ? 'Proposta aceita' : 'Decisão comercial',
+      titulo:
+        proposta.status === 'aceita'
+          ? 'Confirme o início do projeto com o cliente.'
+          : `Continuar ${proposta.titulo}`,
+      href: `/propostas/${proposta.id}`,
+      acao: proposta.status === 'aceita' ? 'Abrir proposta aceita' : 'Continuar proposta',
+      prazo: lead.oportunidade.proximaAcaoEm,
+    };
+  }
+
+  if (call) {
+    return {
+      rotulo: call.status === 'concluida' ? 'Depois da conversa' : 'Próxima conversa',
+      titulo:
+        call.status === 'concluida'
+          ? 'Revise a call e monte uma proposta com o que foi confirmado.'
+          : `Prepare ${call.titulo}`,
+      href:
+        call.status === 'concluida'
+          ? `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${call.id}`
+          : destinoDaCall(call),
+      acao: call.status === 'concluida' ? 'Montar proposta' : 'Abrir call',
+      prazo: lead.oportunidade.proximaAcaoEm ?? call.agendadaPara,
+    };
+  }
+
+  return {
+    rotulo: 'Primeiro movimento',
+    titulo:
+      lead.oportunidade.proximaAcao ??
+      'Agende uma conversa para entender o problema e a prioridade.',
+    href: `/calls?nova=1&oportunidade=${lead.oportunidade.id}`,
+    acao: 'Agendar call',
+    prazo: lead.oportunidade.proximaAcaoEm,
+  };
+}
+
+export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
+  const movimento = proximoMovimento(lead);
+  const faseAtual = faseDaEtapa(lead.oportunidade.etapa);
+  const indiceAtual = FASES_CRM.findIndex((fase) => fase.id === faseAtual);
+  const fasesVenda = FASES_CRM.filter((fase) => fase.id !== 'desfecho');
+  const encerrada = faseAtual === 'desfecho';
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
-      <header className={styles.operacaoTopo}>
+      <header className={styles.topo}>
         <div>
-          <p className={styles.sobretitulo}>Oportunidade</p>
-          <h2 id="operacao-titulo">Histórico e próxima ação</h2>
-          <p>Calls, propostas e projetos ligados a este cliente.</p>
+          <p className={styles.sobretitulo}>Método de venda</p>
+          <h2 id="operacao-titulo">Um passo por vez.</h2>
+          <p>A plataforma organiza a oportunidade em três decisões simples.</p>
         </div>
-        {decisao.novoCiclo ? (
-          <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
-        ) : (
-          decisao.href && (
-            <Link href={decisao.href} className={styles.agendarCall}>
-              {decisao.acao}
-              <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
-            </Link>
-          )
-        )}
+
+        <ol className={styles.metodo} aria-label="Etapas da venda">
+          {fasesVenda.map((fase, indice) => {
+            const estado =
+              encerrada || indice < indiceAtual
+                ? 'concluida'
+                : indice === indiceAtual
+                  ? 'atual'
+                  : 'futura';
+            return (
+              <li
+                key={fase.id}
+                data-estado={estado}
+                aria-current={estado === 'atual' ? 'step' : undefined}
+              >
+                <span>{String(indice + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{fase.rotulo}</strong>
+                  <small>{fase.descricao}</small>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </header>
 
-      <ol className={styles.fluxoCliente} aria-label="Etapas desta oportunidade">
-        {etapas.map((etapa) => {
-          const conteudo = (
-            <>
-              <span className={styles.fluxoNumero}>{etapa.numero}</span>
-              <span className={styles.fluxoTexto}>
-                <small>{etapa.rotulo}</small>
-                <strong>{etapa.estado}</strong>
-              </span>
-            </>
-          );
-
-          return (
-            <li
-              key={etapa.id}
-              data-atual={etapa.atual || undefined}
-              data-comprovada={etapa.comprovada || undefined}
-            >
-              {etapa.href ? <Link href={etapa.href}>{conteudo}</Link> : <div>{conteudo}</div>}
-            </li>
-          );
-        })}
-      </ol>
-
-      <div className={styles.gradeOperacao}>
-        <article className={styles.agora}>
-          <div className={styles.agoraRotulo}>
-            <ListChecks size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>{decisao.rotulo}</span>
+      <div className={styles.decisao}>
+        <div className={styles.decisaoTexto}>
+          <span className={styles.iconeDecisao}>
+            <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+          </span>
+          <div>
+            <p>{movimento.rotulo}</p>
+            <h3>{movimento.titulo}</h3>
+            {movimento.prazo && (
+              <time dateTime={movimento.prazo}>
+                Previsto para {DATA_CURTA.format(new Date(movimento.prazo))}
+              </time>
+            )}
           </div>
-          <h3>{decisao.titulo}</h3>
-          {(compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm) && (
-            <time dateTime={compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm ?? undefined}>
-              Combinado para{' '}
-              {DATA_CURTA.format(
-                new Date(compromisso?.prazoEm ?? lead.oportunidade.proximaAcaoEm ?? ''),
-              )}
-            </time>
-          )}
-          {decisao.apoioHref ? (
-            <Link href={decisao.apoioHref}>
-              {decisao.apoioRotulo}
-              <ArrowUpRight size={15} aria-hidden="true" />
+        </div>
+
+        <div className={styles.acoesDecisao}>
+          {lead.oportunidade.etapa === 'ganho' ? (
+            <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
+          ) : movimento.href && movimento.acao ? (
+            <Link href={movimento.href} className={styles.acaoPrimaria}>
+              {movimento.acao}
+              <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
             </Link>
-          ) : (
-            decisao.href && (
-              <Link href={decisao.href}>
-                {decisao.acao}
-                <ArrowUpRight size={15} aria-hidden="true" />
-              </Link>
-            )
-          )}
-        </article>
-
-        <section className={styles.historico} aria-labelledby="historico-titulo">
-          <header>
-            <div>
-              <History size={17} strokeWidth={1.8} aria-hidden="true" />
-              <h3 id="historico-titulo">Linha do tempo</h3>
-            </div>
-            <span>{lead.eventos.length} atividades</span>
-          </header>
-          {lead.eventos.length ? (
-            <ol>
-              {lead.eventos.slice(0, 5).map((evento) => (
-                <li key={evento.id}>
-                  <time dateTime={evento.ocorridoEm}>
-                    {DATA_CURTA.format(new Date(evento.ocorridoEm))}
-                  </time>
-                  <div>
-                    <strong>{evento.titulo}</strong>
-                    {evento.descricao && <p>{evento.descricao}</p>}
-                    <small>{evento.fonte}</small>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className={styles.semHistorico}>
-              As atividades aparecerão depois da primeira ação no CRM.
-            </p>
-          )}
-        </section>
-
-        <section className={styles.callsVinculadas} aria-labelledby="calls-vinculadas-titulo">
-          <header>
-            <div>
-              <Video size={17} strokeWidth={1.8} aria-hidden="true" />
-              <h3 id="calls-vinculadas-titulo">Calls vinculadas</h3>
-            </div>
-            <span>{lead.totalCalls}</span>
-          </header>
-          {lead.calls.length ? (
-            <ul>
-              {lead.calls.slice(0, 3).map((call) => (
-                <li key={call.id}>
-                  <Link href={destinoDaCall(call)}>
-                    <span>
-                      <strong>{call.titulo}</strong>
-                      <small>
-                        {ROTULO_TIPO_CALL[call.tipo]} ·{' '}
-                        {DATA_HORA.format(new Date(call.agendadaPara))}
-                      </small>
-                    </span>
-                    <span>{ROTULO_STATUS_CALL[call.status]}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles.semHistorico}>Nenhuma call vinculada a esta oportunidade.</p>
-          )}
-        </section>
+          ) : null}
+        </div>
       </div>
+
+      <details className={styles.registrosDetalhes}>
+        <summary>
+          <span>Ver histórico da oportunidade</span>
+          <small>
+            {lead.eventos.length} {lead.eventos.length === 1 ? 'atividade' : 'atividades'} ·{' '}
+            {lead.totalCalls} {lead.totalCalls === 1 ? 'call' : 'calls'}
+          </small>
+        </summary>
+
+        <div className={styles.registros}>
+          <section aria-labelledby="historico-titulo">
+            <header>
+              <div>
+                <History size={17} strokeWidth={1.8} aria-hidden="true" />
+                <h3 id="historico-titulo">Atividade recente</h3>
+              </div>
+              <span>{lead.eventos.length}</span>
+            </header>
+            {lead.eventos.length ? (
+              <ol className={styles.listaEventos}>
+                {lead.eventos.slice(0, 4).map((evento) => (
+                  <li key={evento.id}>
+                    <time dateTime={evento.ocorridoEm}>
+                      {DATA_CURTA.format(new Date(evento.ocorridoEm))}
+                    </time>
+                    <div>
+                      <strong>{evento.titulo}</strong>
+                      {evento.descricao && <p>{evento.descricao}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className={styles.semDados}>
+                A primeira atividade aparecerá depois de uma ação no CRM.
+              </p>
+            )}
+          </section>
+
+          <section aria-labelledby="calls-titulo">
+            <header>
+              <div>
+                <Video size={17} strokeWidth={1.8} aria-hidden="true" />
+                <h3 id="calls-titulo">Calls</h3>
+              </div>
+              <span>{lead.totalCalls}</span>
+            </header>
+            {lead.calls.length ? (
+              <ul className={styles.listaCalls}>
+                {lead.calls.slice(0, 4).map((call) => (
+                  <li key={call.id}>
+                    <Link href={destinoDaCall(call)}>
+                      <div>
+                        <strong>{call.titulo}</strong>
+                        <small>
+                          {ROTULO_TIPO_CALL[call.tipo]} ·{' '}
+                          {DATA_HORA.format(new Date(call.agendadaPara))}
+                        </small>
+                      </div>
+                      <span>{ROTULO_STATUS_CALL[call.status]}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles.semDados}>Nenhuma call vinculada a esta oportunidade.</p>
+            )}
+          </section>
+        </div>
+      </details>
     </section>
   );
 }

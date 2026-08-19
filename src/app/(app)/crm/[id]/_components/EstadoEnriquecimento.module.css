@@ -1,9 +1,13 @@
-.estado {
+.estado,
+.falha {
   overflow: hidden;
-  border: 1px solid var(--via-navy-14);
-  border-radius: var(--app-radius-card);
-  background: var(--via-surface);
-  box-shadow: var(--via-shadow-sm);
+  border: 1px solid color-mix(in srgb, var(--via-white) 74%, var(--app-elev-2-line));
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(24px) saturate(140%);
 }
 
 .cabecalho {
@@ -11,27 +15,35 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding: var(--via-space-6);
+  padding: clamp(24px, 3vw, 34px);
 }
 
 .cabecalho h2,
-.cabecalho p {
+.cabecalho p,
+.falha h2,
+.falha p {
   margin: 0;
 }
 
-.cabecalho h2 {
-  margin-top: var(--via-space-1);
-  font-size: var(--via-fs-h3);
+.cabecalho h2,
+.falha h2 {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h2);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
 }
 
-.cabecalho p:last-child {
+.cabecalho p:last-child,
+.falha > div > p:last-child {
+  max-width: 62ch;
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
 }
 
 .sobretitulo {
-  color: var(--via-accent-ink);
+  color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -40,11 +52,11 @@
 
 .pulso {
   flex: 0 0 auto;
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   margin-top: var(--via-space-2);
   border-radius: var(--via-radius-pill);
-  background: var(--via-accent-ink);
+  background: var(--via-navy);
   box-shadow: 0 0 0 0 var(--via-navy-14);
   animation: pulsar 1.8s var(--via-ease) infinite;
 }
@@ -57,115 +69,145 @@
 
 .mapa {
   display: grid;
-  grid-template-columns: auto minmax(24px, 1fr) auto minmax(24px, 1fr) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  padding: var(--via-space-4) clamp(24px, 3vw, 34px) clamp(24px, 3vw, 34px);
+  margin: 0;
+  list-style: none;
+}
+
+.mapa li {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-4) var(--via-space-6);
-  border-top: 1px solid var(--via-border-hairline);
-  background: var(--via-navy-deep);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-bg-2) 62%, transparent);
+  color: var(--via-text-faint);
 }
 
-.no {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  color: color-mix(in srgb, var(--via-white) 68%, transparent);
+.mapa li > span {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--via-radius-pill);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
 }
 
-.noAtivo {
+.mapa li > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.mapa strong {
+  color: var(--via-text-secondary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.mapa small {
+  overflow: hidden;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mapa li[data-estado='atual'] {
+  border-color: var(--via-navy-20);
+  background: var(--via-navy);
+  color: var(--via-accent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.mapa li[data-estado='atual'] > span {
+  border-color: color-mix(in srgb, var(--via-white) 18%, transparent);
   color: var(--via-white);
 }
 
-.noAtivo svg {
-  color: var(--via-accent);
+.mapa li[data-estado='atual'] strong {
+  color: var(--via-white);
 }
 
-.traco {
-  position: relative;
-  height: 1px;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+.mapa li[data-estado='atual'] small {
+  color: color-mix(in srgb, var(--via-white) 62%, transparent);
 }
 
-.traco::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  width: 35%;
-  background: var(--via-accent);
-  animation: atravessar 1.8s var(--via-ease) infinite;
-}
-
-@keyframes atravessar {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(300%);
-  }
+.mapa li[data-estado='concluida'] > span {
+  border-color: var(--via-navy-14);
+  background: var(--via-navy-08);
+  color: var(--via-navy);
 }
 
 .falha {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4) var(--via-space-5);
-  border: 1px solid color-mix(in srgb, var(--via-danger) 22%, transparent);
-  border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--via-danger) 5%, var(--via-surface));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-5);
+  padding: clamp(24px, 3vw, 34px);
+  border-color: color-mix(in srgb, var(--via-danger) 22%, var(--via-border-soft));
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      color-mix(in srgb, var(--via-danger) 7%, transparent),
+      transparent 38%
+    ),
+    color-mix(in srgb, var(--via-surface) 86%, transparent);
+}
+
+.iconeFalha {
+  display: inline-grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--via-danger) 18%, var(--via-border-soft));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-danger) 6%, var(--via-surface));
   color: var(--via-danger);
 }
 
-.falha strong,
-.falha p {
-  margin: 0;
+.acaoFalha {
+  flex: 0 0 auto;
 }
 
-.falha p {
-  margin-top: var(--via-space-1);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-}
-
-@media (max-width: 560px) {
-  .cabecalho {
-    padding: var(--via-space-5) var(--via-space-4);
-  }
-
+@media (max-width: 700px) {
   .mapa {
     grid-template-columns: 1fr;
-    padding: var(--via-space-4);
   }
 
-  .traco {
-    width: 1px;
-    height: 20px;
-    margin-left: 8px;
+  .mapa small {
+    white-space: normal;
   }
 
-  .traco::after {
+  .falha {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .acaoFalha {
+    grid-column: 1 / -1;
+  }
+
+  .acaoFalha > button {
     width: 100%;
-    height: 35%;
-    animation-name: descer;
   }
 }
 
-@keyframes descer {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(300%);
+@supports not (backdrop-filter: blur(1px)) {
+  .estado,
+  .falha {
+    background: var(--via-surface);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulso,
-  .traco::after {
+  .pulso {
     animation: none;
   }
 }

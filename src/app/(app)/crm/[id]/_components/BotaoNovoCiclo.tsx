@@ -3,13 +3,13 @@
 import { useFormStatus } from 'react-dom';
 import { RotateCcw } from 'lucide-react';
 import { iniciarNovoCicloCliente } from '@/lib/crm/actions';
-import styles from '../pagina.module.css';
+import styles from './ResumoOperacionalLead.module.css';
 
 function Botao() {
   const { pending } = useFormStatus();
 
   return (
-    <button type="submit" className={styles.agendarCall} disabled={pending}>
+    <button type="submit" className={styles.acaoPrimaria} disabled={pending}>
       <RotateCcw size={15} strokeWidth={1.9} aria-hidden="true" />
       {pending ? 'Abrindo ciclo' : 'Abrir novo ciclo'}
     </button>

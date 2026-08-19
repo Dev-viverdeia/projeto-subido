@@ -20,18 +20,18 @@ describe('JornadaEntradaLead', () => {
     render(<JornadaEntradaLead {...BASE} estadoContexto="pendente" totalCalls={0} />);
 
     expect(screen.getByRole('heading', { name: 'Prepare a primeira conversa.' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Pesquisar lead' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Pesquisar empresa' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Agendar primeira call' })).toHaveAttribute(
       'href',
       `/calls?nova=1&oportunidade=${BASE.oportunidadeId}`,
     );
-    expect(screen.getByText('Lead no pipeline')).toBeVisible();
+    expect(screen.getByText('Oportunidade no pipeline')).toBeVisible();
   });
 
   it('encerra a preparação quando contexto e call já existem', () => {
     render(<JornadaEntradaLead {...BASE} estadoContexto="pronto" totalCalls={1} />);
 
-    expect(screen.queryByRole('button', { name: 'Pesquisar lead' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Pesquisar empresa' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Agendar primeira call' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Abrir oportunidade' })).toHaveAttribute(
       'href',
@@ -50,7 +50,7 @@ describe('JornadaEntradaLead', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Pesquise o lead e prepare a proposta.' }),
+      screen.getByRole('heading', { name: 'Pesquise a empresa e prepare a proposta.' }),
     ).toBeVisible();
     expect(screen.getByText('Montar a proposta')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Montar proposta' })).toHaveAttribute(

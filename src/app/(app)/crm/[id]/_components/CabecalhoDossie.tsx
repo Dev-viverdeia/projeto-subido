@@ -1,9 +1,9 @@
-import { ContactRound, Database, Globe2, Layers3, MapPin, Video } from 'lucide-react';
-import { FASES_CRM, ROTULO_ETAPA, faseDaEtapa } from '@/lib/crm/etapas';
+import { ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
+import { rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
-import styles from '../pagina.module.css';
 import { AtalhoProposta } from './AtalhoProposta';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
+import styles from './CabecalhoDossie.module.css';
 
 export function CabecalhoDossie({
   lead,
@@ -17,10 +17,13 @@ export function CabecalhoDossie({
   modoEntrada?: boolean;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
-  const faseComercial =
-    FASES_CRM.find((fase) => fase.id === faseDaEtapa(lead.oportunidade.etapa))?.rotulo ??
-    ROTULO_ETAPA[lead.oportunidade.etapa];
+  const faseComercial = rotuloEtapaVisivel(lead.oportunidade.etapa);
   const cicloEntregue = lead.projetoRecente?.status === 'concluido';
+  const estadoPesquisa = enriquecimentoEmAndamento
+    ? 'Pesquisando agora'
+    : temDossie
+      ? 'Pesquisa pronta'
+      : 'Pesquisa pendente';
 
   return (
     <section className={styles.hero} aria-labelledby="dossie-titulo">
@@ -34,28 +37,35 @@ export function CabecalhoDossie({
         </div>
 
         {!modoEntrada && (
-          <div className={styles.heroAcoes}>
-            <AtalhoProposta lead={lead} />
-            {!cicloEntregue && !enriquecimentoEmAndamento && (
-              <FormularioEnriquecimento
-                oportunidadeId={lead.oportunidade.id}
-                dominioInicial={lead.empresa.dominio}
-                linkedinInicial={lead.contato?.linkedinUrl ?? null}
-                temDossie={temDossie}
-              />
-            )}
+          <div className={styles.heroLateral}>
+            <div className={styles.estadoAtual}>
+              <span>Etapa da venda</span>
+              <strong>{faseComercial}</strong>
+              {!cicloEntregue && (
+                <small>
+                  <Layers3 size={13} strokeWidth={1.8} aria-hidden="true" /> {estadoPesquisa}
+                </small>
+              )}
+            </div>
+            <div className={styles.heroAcoes}>
+              {!cicloEntregue && !enriquecimentoEmAndamento && (
+                <FormularioEnriquecimento
+                  oportunidadeId={lead.oportunidade.id}
+                  dominioInicial={lead.empresa.dominio}
+                  linkedinInicial={lead.contato?.linkedinUrl ?? null}
+                  temDossie={temDossie}
+                />
+              )}
+              <AtalhoProposta lead={lead} destaque={temDossie || cicloEntregue} />
+            </div>
           </div>
         )}
       </div>
 
-      <div className={styles.heroMeta} aria-label="Dados principais do lead">
-        <span className={styles.etapa}>
-          <small>Etapa</small>
-          <strong>{faseComercial}</strong>
-        </span>
+      <div className={styles.heroMeta} aria-label="Dados principais da oportunidade">
         <span>
           <ContactRound size={14} aria-hidden="true" />
-          {lead.contato?.nome ?? 'Contato não informado'}
+          {lead.contato?.nome ?? 'Contato a definir'}
         </span>
         <span>
           <Video size={14} aria-hidden="true" />
@@ -66,33 +76,12 @@ export function CabecalhoDossie({
             <MapPin size={14} aria-hidden="true" /> {local}
           </span>
         )}
+        {lead.empresa.dominio && (
+          <a href={`https://${lead.empresa.dominio}`} target="_blank" rel="noreferrer">
+            <Globe2 size={14} aria-hidden="true" /> {lead.empresa.dominio}
+          </a>
+        )}
       </div>
-
-      {!modoEntrada && !cicloEntregue && (
-        <div className={styles.sinais} aria-label="Fontes usadas na pesquisa do lead">
-          <div className={styles.fonteSinal}>
-            <Database size={17} strokeWidth={1.7} aria-hidden="true" />
-            <span>CRM</span>
-            <strong>{lead.eventos.length} fatos</strong>
-          </div>
-          <div className={styles.fonteSinal}>
-            <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
-            <span>Site público</span>
-            <strong>{lead.empresa.dominio ?? 'a informar'}</strong>
-          </div>
-          <div className={`${styles.fonteSinal} ${styles.leituraSinal}`}>
-            <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-            <span>Pesquisa com IA</span>
-            <strong>
-              {enriquecimentoEmAndamento
-                ? 'analisando'
-                : temDossie
-                  ? 'pesquisa concluída'
-                  : 'não iniciada'}
-            </strong>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

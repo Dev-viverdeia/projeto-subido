@@ -29,9 +29,9 @@ describe('FormularioEnriquecimento', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Pesquisar lead' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pesquisar empresa' }));
     const enviar = within(screen.getByRole('dialog')).getByRole('button', {
-      name: 'Pesquisar lead',
+      name: 'Começar pesquisa',
     });
     fireEvent.click(enviar);
     expect(

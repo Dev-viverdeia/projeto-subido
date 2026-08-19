@@ -2,26 +2,24 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import {
   ArrowLeft,
-  BadgeCheck,
   Bot,
   BriefcaseBusiness,
   ContactRound,
   GraduationCap,
   House,
-  MessageSquareQuote,
-  Layers3,
   UsersRound,
   Video,
 } from 'lucide-react';
 import { CabecalhoDossie } from '@/app/(app)/crm/[id]/_components/CabecalhoDossie';
 import { JornadaEntradaLead } from '@/app/(app)/crm/[id]/_components/JornadaEntradaLead';
+import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
 
-export const metadata: Metadata = { title: 'Preview · Dossiê do lead' };
+export const metadata: Metadata = { title: 'Preview · Oportunidade do CRM' };
 
 const LEAD_OPERACIONAL: DossieLead = {
   oportunidade: {
@@ -37,7 +35,7 @@ const LEAD_OPERACIONAL: DossieLead = {
     contato: 'Camila Rios',
     contatoEmail: 'camila@clinicaaurora.com.br',
     valorCentavos: null,
-    proximaAcao: 'Enviar o diagnóstico do piloto e marcar a apresentação com a diretoria.',
+    proximaAcao: 'Apresentar o diagnóstico do piloto para a diretoria.',
     proximaAcaoEm: '2026-08-12T15:00:00.000Z',
     ganhaEm: null,
     perdidaEm: null,
@@ -58,31 +56,31 @@ const LEAD_OPERACIONAL: DossieLead = {
   contato: {
     nome: 'Camila Rios',
     email: 'camila@clinicaaurora.com.br',
-    telefone: null,
+    telefone: '+55 11 99999-0000',
     cargo: 'Diretora de Operações',
     linkedinUrl: 'https://www.linkedin.com/in/camila-rios',
   },
   eventos: [
     {
       id: 'evento-2',
-      titulo: 'Dossiê comercial atualizado',
-      descricao: 'Site público e histórico do CRM foram lidos novamente.',
+      titulo: 'Pesquisa comercial atualizada',
+      descricao: 'Site público e histórico do CRM foram consultados novamente.',
       tipo: 'enriquecimento',
       ocorridoEm: '2026-08-08T18:10:00.000Z',
-      fonte: 'Enriquecimento',
+      fonte: 'Pesquisa comercial',
     },
     {
       id: 'evento-1',
       titulo: 'Call de descoberta concluída',
-      descricao: 'Dores, decisões e compromissos foram adicionados ao contexto do lead.',
+      descricao: 'Problemas, decisão e próximos passos entraram no contexto da oportunidade.',
       tipo: 'call_concluida',
       ocorridoEm: '2026-08-08T17:44:00.000Z',
       fonte: 'Calls',
     },
     {
       id: 'evento-3',
-      titulo: 'Lead entrou no pipeline',
-      descricao: 'Oportunidade criada por indicação de um cliente.',
+      titulo: 'Oportunidade entrou no pipeline',
+      descricao: 'Contato recebido por indicação de um cliente.',
       tipo: 'lead_criado',
       ocorridoEm: '2026-08-03T13:00:00.000Z',
       fonte: 'CRM',
@@ -102,7 +100,7 @@ const LEAD_OPERACIONAL: DossieLead = {
     },
     {
       id: '33333333-3333-4333-8333-333333333333',
-      titulo: 'Follow-up do diagnóstico',
+      titulo: 'Apresentação do diagnóstico',
       tipo: 'follow_up',
       status: 'agendada',
       agendadaPara: '2026-08-12T15:00:00.000Z',
@@ -115,30 +113,110 @@ const LEAD_OPERACIONAL: DossieLead = {
   acoesPlano: [
     {
       id: '55555555-5555-4555-8555-555555555555',
-      titulo: 'Enviar o diagnóstico do piloto e marcar a apresentação com a diretoria.',
+      titulo: 'Apresentar o diagnóstico do piloto para a diretoria.',
       prazoEm: '2026-08-12T15:00:00.000Z',
-      reuniaoId: '22222222-2222-4222-8222-222222222222',
+      reuniaoId: '33333333-3333-4333-8333-333333333333',
     },
   ],
-  projetoAtivo: {
-    id: '66666666-6666-4666-8666-666666666666',
-    titulo: 'Atendimento com IA para clínicas',
-    status: 'em_execucao',
-    atualizadoEm: '2026-08-08T18:10:00.000Z',
-  },
-  projetoRecente: {
-    id: '66666666-6666-4666-8666-666666666666',
-    titulo: 'Atendimento com IA para clínicas',
-    status: 'em_execucao',
-    atualizadoEm: '2026-08-08T18:10:00.000Z',
-  },
-  propostaRecente: {
-    id: '77777777-7777-4777-8777-777777777777',
-    titulo: 'Atendimento com IA para clínicas',
-    status: 'aceita',
-    reuniaoId: '22222222-2222-4222-8222-222222222222',
-  },
-  enriquecimentos: [],
+  projetoAtivo: null,
+  projetoRecente: null,
+  propostaRecente: null,
+  enriquecimentos: [
+    {
+      id: '88888888-8888-4888-8888-888888888888',
+      status: 'concluido',
+      dominio: 'clinicaaurora.com.br',
+      linkedinUrl: 'https://www.linkedin.com/in/camila-rios',
+      erro: null,
+      solicitadoEm: '2026-08-08T18:08:00.000Z',
+      concluidoEm: '2026-08-08T18:10:00.000Z',
+      dossie: {
+        resumo:
+          'A clínica concentra o atendimento no WhatsApp e já sente demora nos horários de pico. A próxima conversa precisa medir volume, tempo de resposta e impacto no agendamento antes de definir o piloto.',
+        empresa: {
+          setor: 'Saúde',
+          porte: 'Médio',
+          cidade: 'São Paulo',
+          estado: 'SP',
+          modeloNegocio: 'Clínica particular com atendimento e agendamento direto ao paciente.',
+        },
+        fatos: [
+          {
+            titulo: 'WhatsApp é o principal canal',
+            valor: 'O canal aparece em destaque nas páginas de atendimento e agendamento.',
+            origem: 'site',
+            urlFonte: 'https://clinicaaurora.com.br',
+          },
+          {
+            titulo: 'Demora em horários de pico',
+            valor: 'A diretora relatou mensagens acumuladas no início da manhã e no fim da tarde.',
+            origem: 'crm',
+          },
+          {
+            titulo: 'Quatro especialidades anunciadas',
+            valor: 'O site lista dermatologia, estética, nutrição e fisioterapia.',
+            origem: 'site',
+            urlFonte: 'https://clinicaaurora.com.br/especialidades',
+          },
+        ],
+        hipoteses: [
+          {
+            titulo: 'A recepção repete perguntas de triagem',
+            explicacao: 'O site não coleta o motivo da consulta antes de abrir o WhatsApp.',
+            confianca: 'media',
+            comoValidar: 'Pergunte quais dados são coletados antes de oferecer um horário.',
+          },
+          {
+            titulo: 'Há perda de demanda fora do horário',
+            explicacao: 'Não há informação pública sobre resposta automática ou prazo de retorno.',
+            confianca: 'baixa',
+            comoValidar: 'Compare volume e conversão por horário durante uma semana.',
+          },
+        ],
+        oportunidades: [
+          {
+            titulo: 'SDR de atendimento com IA',
+            impacto: 'Responder, qualificar e encaminhar pacientes com contexto.',
+            porQueAgora: 'A operação já concentra demanda em um canal e relata demora.',
+            abertura:
+              'Quanto tempo a recepção leva hoje entre a primeira mensagem e o agendamento?',
+          },
+          {
+            titulo: 'Follow-up automático',
+            impacto: 'Retomar conversas que não viraram agendamento.',
+            porQueAgora: 'O volume e o abandono ainda precisam ser medidos.',
+            abertura: 'O que acontece com quem pede horário e não responde na sequência?',
+          },
+        ],
+        perguntasDescoberta: [
+          'Quantas conversas novas chegam pelo WhatsApp por dia?',
+          'O que a recepção precisa perguntar antes de sugerir um horário?',
+          'Em quais horários as mensagens mais se acumulam?',
+          'Como vocês acompanham conversas que não viraram agendamento?',
+        ],
+        proximaAcao: {
+          acao: 'Medir uma semana de conversas antes de definir o piloto.',
+          porque: 'O volume e os gargalos precisam ser confirmados para dimensionar a automação.',
+        },
+        alertas: ['O volume de mensagens ainda não foi confirmado em fonte ou call registrada.'],
+      },
+      fontes: [
+        { tipo: 'crm', titulo: 'CRM e calls', status: 'lida' },
+        {
+          tipo: 'site',
+          titulo: 'Site da Clínica Aurora',
+          url: 'https://clinicaaurora.com.br',
+          status: 'lida',
+        },
+        {
+          tipo: 'linkedin',
+          titulo: 'LinkedIn de Camila Rios',
+          url: 'https://www.linkedin.com/in/camila-rios',
+          status: 'referencia',
+        },
+      ],
+    },
+  ],
   totalCalls: 2,
 };
 
@@ -152,16 +230,14 @@ const LEAD_NOVO: DossieLead = {
     enriquecimentoStatus: null,
     proximaAcao: null,
     proximaAcaoEm: null,
-    ultimoFato: 'Lead entrou no pipeline',
+    ultimoFato: 'Oportunidade entrou no pipeline',
     ultimoFatoEm: LEAD_OPERACIONAL.oportunidade.criadoEm,
   },
   empresa: { ...LEAD_OPERACIONAL.empresa, dominio: null },
   eventos: [LEAD_OPERACIONAL.eventos[2]!],
   calls: [],
   acoesPlano: [],
-  projetoAtivo: null,
-  projetoRecente: null,
-  propostaRecente: null,
+  enriquecimentos: [],
   totalCalls: 0,
 };
 
@@ -172,6 +248,7 @@ export default async function PreviewDossiePage({
   const parametros = await searchParams;
   const entrada = parametros.entrada === '1';
   const lead = entrada ? LEAD_NOVO : LEAD_OPERACIONAL;
+  const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
 
   return (
     <div className={shell.shell}>
@@ -209,7 +286,6 @@ export default async function PreviewDossiePage({
           <span className={pagina.voltar}>
             <ArrowLeft size={15} aria-hidden="true" /> Voltar ao pipeline
           </span>
-
           <CabecalhoDossie
             lead={lead}
             enriquecimentoEmAndamento={false}
@@ -228,137 +304,8 @@ export default async function PreviewDossiePage({
             />
           ) : (
             <>
-              <ResumoOperacionalLead lead={LEAD_OPERACIONAL} />
-
-              <section className={pagina.resumo}>
-                <div className={pagina.resumoMarca}>
-                  <Layers3 size={18} aria-hidden="true" /> Leitura do lead
-                </div>
-                <div>
-                  <h2>
-                    A clínica centraliza o atendimento no WhatsApp e oferece agendamento para quatro
-                    especialidades, mas não apresenta triagem automatizada no site.
-                  </h2>
-                  <p>Atualizado em 08 de agosto de 2026 · 4 fatos e 3 hipóteses separados.</p>
-                </div>
-              </section>
-
-              <div className={pagina.gradeConteudo}>
-                <div className={pagina.colunaPrincipal}>
-                  <section className={pagina.bloco}>
-                    <header className={pagina.blocoTopo}>
-                      <div>
-                        <p className={pagina.sobretitulo}>O que sabemos</p>
-                        <h2>Fatos encontrados</h2>
-                      </div>
-                      <span>4</span>
-                    </header>
-                    <div className={pagina.gradeFatos}>
-                      {[
-                        [
-                          'Site público',
-                          'Atendimento pelo WhatsApp',
-                          'O canal aparece em destaque em todas as páginas.',
-                        ],
-                        [
-                          'CRM',
-                          'Indicação de um cliente',
-                          'O lead entrou no pipeline por indicação.',
-                        ],
-                        [
-                          'Site público',
-                          'Quatro especialidades',
-                          'A página lista dermatologia, estética, nutrição e fisioterapia.',
-                        ],
-                        [
-                          'Informado por você',
-                          'Resposta demorada',
-                          'O contato relatou perda de mensagens em horários de pico.',
-                        ],
-                      ].map(([origem, titulo, valor]) => (
-                        <article className={pagina.fato} key={titulo}>
-                          <div>
-                            <BadgeCheck size={16} aria-hidden="true" /> <span>{origem}</span>
-                          </div>
-                          <h3>{titulo}</h3>
-                          <p>{valor}</p>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
-
-                  <section className={pagina.bloco}>
-                    <header className={pagina.blocoTopo}>
-                      <div>
-                        <p className={pagina.sobretitulo}>O que precisa ser confirmado</p>
-                        <h2>Hipóteses para a call</h2>
-                      </div>
-                      <span>2</span>
-                    </header>
-                    <div className={pagina.listaHipoteses}>
-                      <article className={pagina.hipotese} data-confianca="media">
-                        <div className={pagina.hipoteseTopo}>
-                          <h3>A recepção repete perguntas de triagem</h3>
-                          <span>Confiança média</span>
-                        </div>
-                        <p>
-                          O site não coleta motivo da consulta antes de direcionar para o WhatsApp.
-                        </p>
-                        <div className={pagina.validar}>
-                          <span>
-                            <strong>Como validar:</strong> perguntar quais informações a recepção
-                            coleta antes de oferecer um horário.
-                          </span>
-                        </div>
-                      </article>
-                      <article className={pagina.hipotese} data-confianca="baixa">
-                        <div className={pagina.hipoteseTopo}>
-                          <h3>Há perda de demanda fora do horário comercial</h3>
-                          <span>Confiança baixa</span>
-                        </div>
-                        <p>
-                          O site não informa atendimento automático ou tempo esperado de resposta.
-                        </p>
-                        <div className={pagina.validar}>
-                          <span>
-                            <strong>Como validar:</strong> comparar volume e conversão por faixa de
-                            horário.
-                          </span>
-                        </div>
-                      </article>
-                    </div>
-                  </section>
-                </div>
-
-                <aside className={pagina.colunaLateral}>
-                  <section className={pagina.proximaAcao}>
-                    <p className={pagina.sobretituloClaro}>Recomendação operacional</p>
-                    <h2>Próxima ação</h2>
-                    <p className={pagina.acaoTexto}>
-                      Agendar uma call de descoberta com a recepção.
-                    </p>
-                    <p className={pagina.acaoPorque}>
-                      O processo atual precisa ser confirmado antes de propor automação.
-                    </p>
-                    <button type="button">Adicionar ao plano</button>
-                  </section>
-
-                  <section className={pagina.painelLateral}>
-                    <header>
-                      <MessageSquareQuote size={18} aria-hidden="true" />
-                      <div>
-                        <p className={pagina.sobretitulo}>Roteiro de descoberta</p>
-                        <h2>Perguntas para a call</h2>
-                      </div>
-                    </header>
-                    <ol className={pagina.perguntas}>
-                      <li>Quantas conversas novas chegam pelo WhatsApp por dia?</li>
-                      <li>O que a recepção precisa perguntar antes de sugerir um horário?</li>
-                      <li>Em quais horários as mensagens mais se acumulam?</li>
-                    </ol>
-                  </section>
-                </aside>
-              </div>
+              <ResumoOperacionalLead lead={lead} />
+              <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
             </>
           )}
         </div>
