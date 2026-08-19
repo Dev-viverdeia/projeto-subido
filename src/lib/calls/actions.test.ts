@@ -1,18 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getClaims, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
-  getClaims: vi.fn(),
-  redirect: vi.fn(),
-  revalidatePath: vi.fn(),
-  rpc: vi.fn(),
-}));
+const { from, getClaims, redirect, revalidatePath, rpc, sincronizarCallNoGoogle } = vi.hoisted(
+  () => ({
+    from: vi.fn(),
+    getClaims: vi.fn(),
+    redirect: vi.fn(),
+    revalidatePath: vi.fn(),
+    rpc: vi.fn(),
+    sincronizarCallNoGoogle: vi.fn(),
+  }),
+);
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, rpc })),
+  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
 }));
+vi.mock('@/lib/google-calendar/eventos', () => ({ sincronizarCallNoGoogle }));
 
 import { agendarReuniao } from './actions';
 
@@ -68,5 +73,51 @@ describe('agendarReuniao', () => {
 
     expect(resposta.erro).toContain('não conseguimos abrir a sala preparada');
     expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('cria o evento no Google com a sala pública da call', async () => {
+    const dados = dadosValidos();
+    dados.set('enviarConviteGoogle', 'on');
+    dados.set('convidadoEmail', 'cliente@clinica.com.br');
+    rpc.mockResolvedValue({
+      data: [{ reuniao_id: REUNIAO_ID, codigo_publico: CODIGO_PUBLICO }],
+      error: null,
+    });
+    from.mockImplementation((tabela: string) => {
+      if (tabela === 'calls_reunioes') {
+        return {
+          update: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ error: null })) })),
+        };
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle: vi.fn(() =>
+              Promise.resolve({
+                data: {
+                  titulo: 'Automação do atendimento',
+                  empresa: { nome: 'Clínica Aurora' },
+                  contato: { nome: 'Camila Rios' },
+                },
+                error: null,
+              }),
+            ),
+          })),
+        })),
+      };
+    });
+    sincronizarCallNoGoogle.mockResolvedValue({ status: 'sincronizado', eventoUrl: null });
+
+    await agendarReuniao({}, dados);
+
+    expect(sincronizarCallNoGoogle).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        reuniaoId: REUNIAO_ID,
+        codigoPublico: CODIGO_PUBLICO,
+        convidadoEmail: 'cliente@clinica.com.br',
+      }),
+    );
+    expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
 });

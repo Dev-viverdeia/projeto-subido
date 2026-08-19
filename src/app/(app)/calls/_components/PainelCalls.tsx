@@ -4,6 +4,8 @@ import {
   ArrowRight,
   BrainCircuit,
   CalendarDays,
+  CalendarCheck2,
+  CalendarX2,
   Clock3,
   ContactRound,
   Database,
@@ -15,7 +17,9 @@ import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL, callPodeAbrir } from '@/lib/calls
 import type { TipoCall } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
+import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { AcoesSala } from './AcoesSala';
+import { CallRecemAgendada } from './CallRecemAgendada';
 import { FormularioAgendarCall } from './FormularioAgendarCall';
 import styles from '../pagina.module.css';
 
@@ -36,63 +40,24 @@ const DATA_LONGA = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
 });
 
-function CallRecemAgendada({ reuniao }: { reuniao: ReuniaoCall }) {
-  return (
-    <section className={styles.callCriada} aria-labelledby="call-criada-titulo" aria-live="polite">
-      <div className={styles.callCriadaContexto}>
-        <p>Call pronta</p>
-        <h2 id="call-criada-titulo">{reuniao.titulo}</h2>
-        <span>
-          {reuniao.empresa}
-          {reuniao.contato ? ` · ${reuniao.contato}` : ''}
-        </span>
-      </div>
-
-      <dl className={styles.callCriadaDados}>
-        <div>
-          <dt>Quando</dt>
-          <dd>
-            {DATA_LONGA.format(new Date(reuniao.agendadaPara))} ·{' '}
-            {HORA.format(new Date(reuniao.agendadaPara))}
-          </dd>
-        </div>
-        <div>
-          <dt>Oportunidade</dt>
-          <dd>{reuniao.oportunidade}</dd>
-        </div>
-        <div>
-          <dt>Memória</dt>
-          <dd>{reuniao.liveCoachAtivo ? 'Transcrição + Live Coach' : 'Transcrição da conversa'}</dd>
-        </div>
-      </dl>
-
-      <div className={styles.callCriadaAcoes}>
-        <p>O link foi criado e a reunião já aparece no histórico do CRM.</p>
-        <div>
-          <AcoesSala codigo={reuniao.codigoPublico} />
-          <Link href={`/crm/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
-            Abrir lead <ArrowRight size={14} aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function PainelCalls({
   reunioes,
   oportunidades,
+  calendar,
   agendadaId,
   modalInicial = false,
   oportunidadeInicial,
   tipoInicial,
+  calendarResultado,
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
+  calendar?: EstadoGoogleCalendar;
   agendadaId?: string;
   modalInicial?: boolean;
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
+  calendarResultado?: 'sincronizado' | 'falhou';
 }) {
   const ativas = reunioes.filter((item) => callPodeAbrir(item.status));
   const historico = reunioes
@@ -116,14 +81,28 @@ export function PainelCalls({
         </div>
         <FormularioAgendarCall
           oportunidades={oportunidades}
+          calendar={calendar}
           abertoInicial={modalInicial}
           oportunidadeInicial={oportunidadeInicial}
           tipoInicial={tipoInicial}
         />
       </header>
 
+      {calendarResultado === 'sincronizado' && (
+        <div className={styles.confirmacao} role="status">
+          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
+          Call criada e convite enviado pelo Google Calendar.
+        </div>
+      )}
+      {calendarResultado === 'falhou' && (
+        <div className={styles.confirmacao} data-tom="erro" role="alert">
+          <CalendarX2 size={17} strokeWidth={1.8} aria-hidden="true" />A sala foi criada, mas o
+          convite não saiu. Reconecte o calendário antes de tentar de novo.
+        </div>
+      )}
+
       {recemAgendada ? (
-        <CallRecemAgendada reuniao={recemAgendada} />
+        <CallRecemAgendada reuniao={recemAgendada} calendar={calendar} />
       ) : agendadaId ? (
         <div className={styles.confirmacao} role="status">
           <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -270,6 +249,7 @@ export function PainelCalls({
               ) : (
                 <FormularioAgendarCall
                   oportunidades={oportunidades}
+                  calendar={calendar}
                   oportunidadeInicial={oportunidadeInicial}
                   tipoInicial={tipoInicial}
                 />

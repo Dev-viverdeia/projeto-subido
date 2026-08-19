@@ -12,26 +12,11 @@ import {
   type SegmentoLive,
 } from './coach-schema';
 import { obterGravacaoPosCall, type GravacaoPosCall } from './gravacao-query';
+import { montarReuniao, type ReuniaoCall } from './reuniao-modelo';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
 
-type LinhaReuniao = Tables<'calls_reunioes'>;
-
-export type ReuniaoCall = {
-  id: string;
-  titulo: string;
-  tipo: TipoCall;
-  status: StatusCall;
-  agendadaPara: string;
-  duracaoMinutos: number;
-  codigoPublico: string;
-  liveCoachAtivo: boolean;
-  oportunidadeId: string;
-  oportunidade: string;
-  empresa: string;
-  contato: string | null;
-  criadaEm: string;
-};
+export type { ReuniaoCall } from './reuniao-modelo';
 
 export type ConviteCall = {
   reuniaoId: string;
@@ -152,7 +137,7 @@ export const listarReunioes = cache(async (): Promise<ReuniaoCall[]> => {
     supabase
       .from('calls_reunioes')
       .select(
-        'id, titulo, tipo, status, agendada_para, duracao_minutos, codigo_publico, live_coach_ativo, oportunidade_id, criada_em',
+        'id, titulo, tipo, status, agendada_para, duracao_minutos, codigo_publico, live_coach_ativo, oportunidade_id, convidado_email, google_sync_status, google_event_url, google_sync_erro, criada_em',
       )
       .order('agendada_para', { ascending: true })
       .limit(200),
@@ -358,39 +343,6 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
     },
   };
 });
-
-function montarReuniao(
-  linha: Pick<
-    LinhaReuniao,
-    | 'id'
-    | 'titulo'
-    | 'tipo'
-    | 'status'
-    | 'agendada_para'
-    | 'duracao_minutos'
-    | 'codigo_publico'
-    | 'live_coach_ativo'
-    | 'oportunidade_id'
-    | 'criada_em'
-  >,
-  oportunidade: { titulo: string; empresa: string; contato: string | null } | undefined,
-): ReuniaoCall {
-  return {
-    id: linha.id,
-    titulo: linha.titulo,
-    tipo: linha.tipo,
-    status: linha.status,
-    agendadaPara: linha.agendada_para,
-    duracaoMinutos: linha.duracao_minutos,
-    codigoPublico: linha.codigo_publico,
-    liveCoachAtivo: linha.live_coach_ativo,
-    oportunidadeId: linha.oportunidade_id,
-    oportunidade: oportunidade?.titulo ?? 'Oportunidade não encontrada',
-    empresa: oportunidade?.empresa ?? 'Empresa não encontrada',
-    contato: oportunidade?.contato ?? null,
-    criadaEm: linha.criada_em,
-  };
-}
 
 /**
  * Lê somente a superfície pública liberada pela RPC. Mesmo que este caminho seja

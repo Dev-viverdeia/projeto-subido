@@ -2,6 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 
+vi.mock('@/lib/calls/actions', () => ({
+  reenviarConviteGoogle: vi.fn(),
+}));
+
 vi.mock('./FormularioAgendarCall', () => ({
   FormularioAgendarCall: () => <button type="button">Agendar call</button>,
 }));
@@ -26,6 +30,10 @@ function reuniao(parcial: Partial<ReuniaoCall> & Pick<ReuniaoCall, 'id' | 'titul
     oportunidade: parcial.oportunidade ?? 'Automação do atendimento',
     empresa: parcial.empresa ?? 'Clínica Horizonte',
     contato: parcial.contato ?? 'Marina Costa',
+    convidadoEmail: parcial.convidadoEmail ?? null,
+    googleSyncStatus: parcial.googleSyncStatus ?? 'nao_solicitado',
+    googleEventUrl: parcial.googleEventUrl ?? null,
+    googleSyncErro: parcial.googleSyncErro ?? null,
     criadaEm: parcial.criadaEm ?? '2026-08-09T12:00:00.000Z',
   };
 }

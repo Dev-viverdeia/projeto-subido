@@ -6,19 +6,32 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
+import { sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
 import { TIPOS_CALL } from './tipos';
 
 const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
 
-const agendarSchema = z.object({
-  oportunidade: z.uuid('Escolha uma oportunidade do CRM.'),
-  tipo: z.enum(tipos),
-  titulo: z.string().trim().max(180, 'Título muito longo.'),
-  agendadaPara: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Escolha data e horário.'),
-  duracao: z.coerce.number().int().min(15).max(240),
-  offsetMinutos: z.coerce.number().int().min(-840).max(840),
-  liveCoach: z.boolean(),
-});
+const agendarSchema = z
+  .object({
+    oportunidade: z.uuid('Escolha uma oportunidade do CRM.'),
+    tipo: z.enum(tipos),
+    titulo: z.string().trim().max(180, 'Título muito longo.'),
+    agendadaPara: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Escolha data e horário.'),
+    duracao: z.coerce.number().int().min(15).max(240),
+    offsetMinutos: z.coerce.number().int().min(-840).max(840),
+    liveCoach: z.boolean(),
+    enviarConviteGoogle: z.boolean(),
+    convidadoEmail: z.union([z.literal(''), z.email('Informe um e-mail válido para o convite.')]),
+  })
+  .superRefine((dados, contexto) => {
+    if (dados.enviarConviteGoogle && !dados.convidadoEmail) {
+      contexto.addIssue({
+        code: 'custom',
+        path: ['convidadoEmail'],
+        message: 'Informe o e-mail do cliente para enviar o convite.',
+      });
+    }
+  });
 
 const proximaAcaoSchema = z.object({
   reuniao: z.uuid(),
@@ -32,7 +45,8 @@ const proximaAcaoSchema = z.object({
   compromissos: z.array(z.string().trim().min(3).max(500)).max(8),
 });
 
-type CampoAgendamento = 'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao';
+type CampoAgendamento =
+  'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao' | 'convidadoEmail';
 
 export type EstadoAgendamento = {
   erro?: string;
@@ -66,12 +80,14 @@ export async function agendarReuniao(
     titulo: texto(formData, 'titulo'),
     agendadaPara: texto(formData, 'agendadaPara'),
     duracao: texto(formData, 'duracao'),
+    convidadoEmail: texto(formData, 'convidadoEmail'),
   };
 
   const validacao = agendarSchema.safeParse({
     ...campos,
     offsetMinutos: texto(formData, 'offsetMinutos'),
     liveCoach: formData.get('liveCoach') === 'on',
+    enviarConviteGoogle: formData.get('enviarConviteGoogle') === 'on',
   });
 
   if (!validacao.success) {
@@ -84,6 +100,7 @@ export async function agendarReuniao(
         titulo: erros.titulo?.[0],
         agendadaPara: erros.agendadaPara?.[0],
         duracao: erros.duracao?.[0],
+        convidadoEmail: erros.convidadoEmail?.[0],
       },
     };
   }
@@ -120,11 +137,104 @@ export async function agendarReuniao(
     };
   }
 
+  let calendar: 'sincronizado' | 'falhou' | undefined;
+  if (validacao.data.enviarConviteGoogle && validacao.data.convidadoEmail) {
+    await supabase
+      .from('calls_reunioes')
+      .update({
+        convidado_email: validacao.data.convidadoEmail,
+        google_sync_status: 'sincronizando',
+        google_sync_erro: null,
+      })
+      .eq('id', reuniao.data.reuniao_id);
+
+    const { data: oportunidade, error: erroOportunidade } = await supabase
+      .from('crm_oportunidades')
+      .select(
+        `
+          titulo,
+          empresa:crm_empresas!crm_oportunidades_empresa_fk(nome),
+          contato:crm_contatos!crm_oportunidades_contato_fk(nome)
+        `,
+      )
+      .eq('id', validacao.data.oportunidade)
+      .maybeSingle();
+
+    if (erroOportunidade || !oportunidade) {
+      console.error('[google-calendar:contexto] Oportunidade não encontrada após criar a call.');
+      await supabase
+        .from('calls_reunioes')
+        .update({
+          google_sync_status: 'falhou',
+          google_sync_erro: 'Não foi possível preparar os dados do convite.',
+        })
+        .eq('id', reuniao.data.reuniao_id);
+      calendar = 'falhou';
+    } else {
+      const resultado = await sincronizarCallNoGoogle(supabase, {
+        reuniaoId: reuniao.data.reuniao_id,
+        codigoPublico: reuniao.data.codigo_publico,
+        titulo: validacao.data.titulo || oportunidade.titulo,
+        empresa: oportunidade.empresa?.nome ?? 'Cliente',
+        contato: oportunidade.contato?.nome ?? null,
+        convidadoEmail: validacao.data.convidadoEmail,
+        agendadaPara: quando.toISOString(),
+        duracaoMinutos: validacao.data.duracao,
+      });
+      calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
+    }
+  }
+
   revalidatePath('/calls');
   revalidatePath('/crm');
   revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidarDirecaoOperacional();
-  redirect(`/calls?agendada=${reuniao.data.reuniao_id}`);
+  const parametros = new URLSearchParams({ agendada: reuniao.data.reuniao_id });
+  if (calendar) parametros.set('calendar', calendar);
+  redirect(`/calls?${parametros.toString()}`);
+}
+
+export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
+  const reuniaoId = z.uuid().safeParse(formData.get('reuniao'));
+  if (!reuniaoId.success) redirect('/calls?calendar=falhou');
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) redirect('/entrar');
+
+  const { data: reuniao, error } = await supabase
+    .from('calls_reunioes')
+    .select(
+      `
+        id,
+        codigo_publico,
+        titulo,
+        agendada_para,
+        duracao_minutos,
+        convidado_email,
+        empresa:crm_empresas!calls_reunioes_empresa_fk(nome),
+        contato:crm_contatos!calls_reunioes_contato_fk(nome)
+      `,
+    )
+    .eq('id', reuniaoId.data)
+    .maybeSingle();
+
+  if (error || !reuniao?.convidado_email) redirect('/calls?calendar=falhou');
+
+  const resultado = await sincronizarCallNoGoogle(supabase, {
+    reuniaoId: reuniao.id,
+    codigoPublico: reuniao.codigo_publico,
+    titulo: reuniao.titulo,
+    empresa: reuniao.empresa?.nome ?? 'Cliente',
+    contato: reuniao.contato?.nome ?? null,
+    convidadoEmail: reuniao.convidado_email,
+    agendadaPara: reuniao.agendada_para,
+    duracaoMinutos: reuniao.duracao_minutos,
+  });
+
+  revalidatePath('/calls');
+  const calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
+  redirect(`/calls?agendada=${reuniao.id}&calendar=${calendar}`);
 }
 
 export async function aplicarPlanoCall(formData: FormData): Promise<void> {

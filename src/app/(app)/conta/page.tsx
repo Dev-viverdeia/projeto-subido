@@ -5,6 +5,7 @@ import {
   Award,
   BookOpen,
   BriefcaseBusiness,
+  CalendarCheck2,
   Check,
   Cloud,
   KeyRound,
@@ -13,6 +14,8 @@ import {
   UserRound,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
+import { IntegracaoGoogleCalendar } from './_components/IntegracaoGoogleCalendar';
 import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import styles from './page.module.css';
 
@@ -50,9 +53,13 @@ const ATALHOS = [
  * verificados; apenas o nome é editável porque o e-mail faz parte da identidade
  * de autenticação e precisa de um fluxo separado de confirmação.
  */
-export default async function ContaPage() {
+export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
+  const [{ data }, calendar, parametros] = await Promise.all([
+    supabase.auth.getClaims(),
+    obterEstadoGoogleCalendar(),
+    searchParams,
+  ]);
 
   const claims = data?.claims;
   const email = typeof claims?.email === 'string' ? claims.email : '—';
@@ -77,6 +84,18 @@ export default async function ContaPage() {
           Altere o nome exibido na plataforma e acesse seus projetos, formações e certificados.
         </p>
       </header>
+
+      {parametros.calendar === 'conectado' && (
+        <div className={styles.avisoIntegracao} data-tom="sucesso" role="status">
+          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
+          Google Calendar conectado. Agora você pode enviar o convite ao criar uma call.
+        </div>
+      )}
+      {parametros.calendar === 'erro' && (
+        <div className={styles.avisoIntegracao} data-tom="erro" role="alert">
+          Não foi possível conectar o calendário. Tente novamente.
+        </div>
+      )}
 
       <section className={styles.perfil} aria-labelledby="nome-profissional">
         <div className={styles.identidade}>
@@ -177,6 +196,8 @@ export default async function ContaPage() {
             Para alterar e-mail ou senha, confirme sua identidade novamente.
           </p>
         </section>
+
+        <IntegracaoGoogleCalendar calendar={calendar} />
       </div>
     </div>
   );

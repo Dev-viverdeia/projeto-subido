@@ -58,6 +58,12 @@
   font-size: var(--via-fs-sm);
 }
 
+.confirmacao[data-tom='erro'] {
+  border-color: color-mix(in srgb, var(--via-danger) 24%, transparent);
+  background: color-mix(in srgb, var(--via-danger) 7%, var(--via-surface));
+  color: var(--via-danger);
+}
+
 .callCriada {
   display: grid;
   grid-template-columns: minmax(230px, 0.78fr) minmax(300px, 1.15fr) minmax(260px, 0.85fr);
@@ -185,6 +191,13 @@
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.callCriadaAcoes form {
+  margin: 0;
 }
 
 .abrirLead:hover {

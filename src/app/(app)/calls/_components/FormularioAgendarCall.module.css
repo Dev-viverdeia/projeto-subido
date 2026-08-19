@@ -13,7 +13,7 @@
 }
 
 .dialogo {
-  width: min(620px, calc(100vw - 32px));
+  width: min(760px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   overflow: auto;
   border: 1px solid var(--via-border);
@@ -24,7 +24,7 @@
 }
 
 .painel {
-  padding: var(--via-space-6);
+  padding: var(--via-space-5);
 }
 
 .topo {
@@ -32,7 +32,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding-bottom: var(--via-space-5);
+  padding-bottom: var(--via-space-4);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
@@ -88,21 +88,30 @@
 
 .formulario {
   display: grid;
-  gap: var(--via-space-4);
-  padding-top: var(--via-space-5);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-4);
+}
+
+.formulario > [role='alert'],
+.detalhesColunas,
+.calendar,
+.coach,
+.acoes {
+  grid-column: 1 / -1;
 }
 
 .duasColunas {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
-  gap: var(--via-space-4);
+  gap: var(--via-space-3);
 }
 
 .detalhesColunas {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-  gap: var(--via-space-4);
+  gap: var(--via-space-3);
 }
 
 .campo {
@@ -200,12 +209,147 @@
   font-weight: var(--via-fw-regular);
 }
 
+.calendar {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-card);
+  background:
+    radial-gradient(circle at 98% 0%, var(--via-navy-08), transparent 36%), var(--via-glass-card);
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    var(--via-shadow-sm);
+  backdrop-filter: var(--via-glass-blur);
+}
+
+.calendarTopo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.calendarIcone {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+}
+
+.calendar h3,
+.calendar p {
+  margin: 0;
+}
+
+.calendar h3 {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+}
+
+.calendarTopo p,
+.calendarDesconectado p,
+.calendarIndisponivel {
+  margin-top: 2px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.calendarTopo > small {
+  max-width: 180px;
+  overflow: hidden;
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendarCorpo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(220px, 1.08fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.enviarConvite {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-glass-card-2) 86%, transparent);
+  cursor: pointer;
+}
+
+.enviarConvite input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--via-navy);
+}
+
+.enviarConvite strong,
+.enviarConvite small {
+  display: block;
+}
+
+.enviarConvite strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+}
+
+.enviarConvite small {
+  margin-top: 2px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.calendarDesconectado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.calendarDesconectado p {
+  max-width: 48ch;
+  margin: 0;
+}
+
+.calendarDesconectado a {
+  flex: 0 0 auto;
+  gap: var(--via-space-2);
+  text-decoration: none;
+}
+
+.calendarIndisponivel {
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
 .coach {
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-4);
+  padding: var(--via-space-3);
   border: 1px solid color-mix(in srgb, var(--via-accent) 24%, var(--via-border));
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-accent) 6%, var(--via-surface));
@@ -264,12 +408,37 @@
     padding: var(--via-space-5) var(--via-space-4);
   }
 
+  .formulario {
+    grid-template-columns: 1fr;
+  }
+
+  .formulario > * {
+    grid-column: 1;
+  }
+
   .duasColunas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .detalhesColunas {
     grid-template-columns: 1fr;
+  }
+
+  .calendarTopo {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .calendarTopo > small {
+    grid-column: 2;
+  }
+
+  .calendarCorpo {
+    grid-template-columns: 1fr;
+  }
+
+  .calendarDesconectado {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .acoes {

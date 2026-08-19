@@ -56,6 +56,7 @@ export type OportunidadeSeletor = Pick<
   OportunidadeCrm,
   'id' | 'titulo' | 'etapa' | 'empresa' | 'dominio' | 'contato'
 > & {
+  contatoEmail?: string | null;
   /** Só a Início consome; os seletores existentes podem omitir nos fixtures. */
   proximaAcao?: string | null;
 };
@@ -72,7 +73,7 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
         ordem,
         proxima_acao,
         empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio),
-        contato:crm_contatos!crm_oportunidades_contato_fk(nome)
+        contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
       `,
     )
     .order('ordem', { ascending: false })
@@ -89,6 +90,7 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
     empresa: oportunidade.empresa?.nome ?? 'Empresa não encontrada',
     dominio: oportunidade.empresa?.dominio ?? null,
     contato: oportunidade.contato?.nome ?? null,
+    contatoEmail: oportunidade.contato?.email ?? null,
     proximaAcao: oportunidade.proxima_acao,
   }));
 });

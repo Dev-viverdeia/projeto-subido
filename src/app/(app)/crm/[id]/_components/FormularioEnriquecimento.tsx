@@ -12,8 +12,12 @@ import styles from './FormularioEnriquecimento.module.css';
 
 const ETAPAS_CONFIRMACAO = [
   {
-    titulo: 'Abrindo o enriquecimento',
-    descricao: 'Estamos reservando os créditos e conectando a análise à ficha deste cliente.',
+    titulo: 'Reservando os créditos',
+    descricao: 'O valor fica protegido enquanto a solicitação é registrada.',
+  },
+  {
+    titulo: 'Preparando a ficha',
+    descricao: 'Estamos ligando os dados desta oportunidade ao enriquecimento.',
   },
 ] as const;
 
@@ -77,16 +81,18 @@ export function FormularioEnriquecimento({
   async function confirmar() {
     if (!saldoSuficiente || enviando) return;
     setErro(null);
+    setAberto(false);
     setEnviando(true);
     const resposta = await iniciarEnriquecimento({ oportunidade_id: oportunidadeId });
-    setEnviando(false);
     if (resposta.falha) {
+      setEnviando(false);
+      setAberto(true);
       setErro(resposta.falha);
       return;
     }
 
-    setAberto(false);
     router.refresh();
+    setEnviando(false);
   }
 
   return (
@@ -98,7 +104,8 @@ export function FormularioEnriquecimento({
           titulo="Preparando a análise"
           descricao="A plataforma está reunindo os dados já salvos nesta oportunidade."
           etapas={ETAPAS_CONFIRMACAO}
-          nota="Assim que a solicitação for registrada, você poderá continuar trabalhando."
+          intervalo={1_800}
+          nota="Esta janela fecha assim que o enriquecimento for registrado."
         />
       )}
       <button

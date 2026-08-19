@@ -2,38 +2,33 @@
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { CalendarPlus, Layers3, X } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, ExternalLink, Layers3, Mail, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
+import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
+import { BotaoAgendar } from './BotaoAgendar';
 import styles from './FormularioAgendarCall.module.css';
 
 const INICIAL: EstadoAgendamento = {};
-type CampoAgendamento = 'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao';
-
-function BotaoAgendar() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" variant="primary" loading={pending}>
-      {pending ? 'Criando sala…' : 'Criar call e link'}
-    </Button>
-  );
-}
+type CampoAgendamento =
+  'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao' | 'convidadoEmail';
 
 export function FormularioAgendarCall({
   oportunidades,
   abertoInicial = false,
   oportunidadeInicial,
   tipoInicial,
+  calendar,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
+  calendar?: EstadoGoogleCalendar;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -46,6 +41,17 @@ export function FormularioAgendarCall({
     ? oportunidadeInicial
     : '';
   const oportunidadeVinculada = disponiveis.find((item) => item.id === oportunidadeInicial);
+  const [oportunidadeSelecionadaId, setOportunidadeSelecionadaId] = useState(
+    oportunidadeInicial ?? '',
+  );
+  const oportunidadeSelecionada =
+    oportunidadeVinculada ??
+    disponiveis.find((item) => item.id === oportunidadeSelecionadaId) ??
+    null;
+  const [convidadoEmail, setConvidadoEmail] = useState(oportunidadeVinculada?.contatoEmail ?? '');
+  const [enviarConviteGoogle, setEnviarConviteGoogle] = useState(Boolean(calendar?.conectado));
+  const retornoCalendar = `/calls?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
+  const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
 
   useEffect(() => {
     if (!aberto) return;
@@ -194,7 +200,13 @@ export function FormularioAgendarCall({
                         aria-describedby={
                           erroVisivel('oportunidade') ? 'calls-oportunidade-msg' : undefined
                         }
-                        onChange={() => ocultarErro('oportunidade')}
+                        onChange={(evento) => {
+                          ocultarErro('oportunidade');
+                          const id = evento.currentTarget.value;
+                          setOportunidadeSelecionadaId(id);
+                          const selecionada = disponiveis.find((item) => item.id === id);
+                          setConvidadoEmail(selecionada?.contatoEmail ?? '');
+                        }}
                         required
                       >
                         <option value="" disabled>
@@ -267,6 +279,75 @@ export function FormularioAgendarCall({
                     />
                   </div>
 
+                  <section className={styles.calendar} aria-labelledby="convite-google-titulo">
+                    <div className={styles.calendarTopo}>
+                      <span className={styles.calendarIcone} aria-hidden="true">
+                        <CalendarCheck2 size={19} strokeWidth={1.7} />
+                      </span>
+                      <div>
+                        <h3 id="convite-google-titulo">Convite pelo Google Calendar</h3>
+                        <p>
+                          O evento chega por e-mail e leva o cliente direto para a sala da Subido.
+                        </p>
+                      </div>
+                      {calendar?.conectado && <small>{calendar.email}</small>}
+                    </div>
+
+                    {calendar?.conectado ? (
+                      <div className={styles.calendarCorpo}>
+                        <label className={styles.enviarConvite}>
+                          <input
+                            type="checkbox"
+                            name="enviarConviteGoogle"
+                            checked={enviarConviteGoogle}
+                            onChange={(evento) => setEnviarConviteGoogle(evento.target.checked)}
+                          />
+                          <span>
+                            <strong>Enviar convite ao criar a call</strong>
+                            <small>
+                              Sem Google Meet: o acesso será pela sala pública da Subido.
+                            </small>
+                          </span>
+                        </label>
+                        <Input
+                          id="calls-convidado-email"
+                          name="convidadoEmail"
+                          type="email"
+                          label="E-mail do cliente"
+                          placeholder="cliente@empresa.com.br"
+                          iconLeft={<Mail size={16} strokeWidth={1.7} aria-hidden="true" />}
+                          value={convidadoEmail}
+                          error={erroVisivel('convidadoEmail')}
+                          onChange={(evento) => {
+                            setConvidadoEmail(evento.target.value);
+                            ocultarErro('convidadoEmail');
+                          }}
+                          disabled={!enviarConviteGoogle}
+                          required={enviarConviteGoogle}
+                        />
+                      </div>
+                    ) : calendar?.configurado ? (
+                      <div className={styles.calendarDesconectado}>
+                        <p>
+                          Conecte sua conta uma vez. Depois, cada call pode enviar o convite sem
+                          sair da plataforma.
+                        </p>
+                        <Link
+                          href={conectarCalendarHref}
+                          className="via-btn via-btn--secondary via-btn--md"
+                        >
+                          Conectar Google Calendar
+                          <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <p className={styles.calendarIndisponivel}>
+                        A integração está sendo ativada. A sala da Subido pode ser criada
+                        normalmente.
+                      </p>
+                    )}
+                  </section>
+
                   <label className={styles.coach}>
                     <input type="checkbox" name="liveCoach" defaultChecked />
                     <span className={styles.coachIcone}>
@@ -282,7 +363,9 @@ export function FormularioAgendarCall({
                     <Button type="button" variant="secondary" onClick={fechar}>
                       Cancelar
                     </Button>
-                    <BotaoAgendar />
+                    <BotaoAgendar
+                      comConviteGoogle={Boolean(calendar?.conectado && enviarConviteGoogle)}
+                    />
                   </div>
                 </form>
               )}

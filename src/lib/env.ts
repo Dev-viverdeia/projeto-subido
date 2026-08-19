@@ -124,6 +124,36 @@ export function livekitEnv() {
 }
 
 /**
+ * OAuth do Google Calendar.
+ *
+ * A configuração é opcional no boot para não derrubar as Calls quando o Google
+ * estiver em manutenção ou durante a rotação de uma credencial. A UI consulta
+ * `pronto` antes de oferecer a conexão; tokens de usuários continuam cifrados
+ * com uma chave independente do client secret do OAuth.
+ */
+export function googleCalendarEnv() {
+  const parsed = z
+    .object({
+      GOOGLE_CALENDAR_CLIENT_ID: z.string().min(20),
+      GOOGLE_CALENDAR_CLIENT_SECRET: z.string().min(10),
+      GOOGLE_CALENDAR_TOKEN_KEY: z.string().refine((valor) => {
+        try {
+          return Buffer.from(valor, 'base64').byteLength === 32;
+        } catch {
+          return false;
+        }
+      }, 'GOOGLE_CALENDAR_TOKEN_KEY precisa conter 32 bytes em base64.'),
+    })
+    .safeParse({
+      GOOGLE_CALENDAR_CLIENT_ID: process.env.GOOGLE_CALENDAR_CLIENT_ID,
+      GOOGLE_CALENDAR_CLIENT_SECRET: process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+      GOOGLE_CALENDAR_TOKEN_KEY: process.env.GOOGLE_CALENDAR_TOKEN_KEY,
+    });
+
+  return parsed.success ? parsed.data : null;
+}
+
+/**
  * Provedores privados da Prospecção.
  *
  * Apify é suficiente para a busca inicial por tipo de empresa e região. SerpAPI

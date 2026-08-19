@@ -81,6 +81,10 @@ const REUNIOES: ReuniaoCall[] = [
     oportunidade: OPORTUNIDADES[0]!.titulo,
     empresa: OPORTUNIDADES[0]!.empresa,
     contato: OPORTUNIDADES[0]!.contato,
+    convidadoEmail: null,
+    googleSyncStatus: 'nao_solicitado',
+    googleEventUrl: null,
+    googleSyncErro: null,
     criadaEm: AGORA,
   },
   {
@@ -96,6 +100,10 @@ const REUNIOES: ReuniaoCall[] = [
     oportunidade: OPORTUNIDADES[1]!.titulo,
     empresa: OPORTUNIDADES[1]!.empresa,
     contato: OPORTUNIDADES[1]!.contato,
+    convidadoEmail: null,
+    googleSyncStatus: 'nao_solicitado',
+    googleEventUrl: null,
+    googleSyncErro: null,
     criadaEm: AGORA,
   },
 ];
@@ -138,6 +146,13 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
         <PainelCalls
           reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
           oportunidades={OPORTUNIDADES}
+          calendar={{
+            configurado: true,
+            conectado: parametros.calendar === '1',
+            email: parametros.calendar === '1' ? 'profissional@gmail.com' : null,
+            status: parametros.calendar === '1' ? 'ativa' : 'desconectada',
+            ultimoErro: null,
+          }}
           agendadaId={
             parametros.agendada === '1' ? '66666666-6666-4666-8666-666666666666' : undefined
           }

@@ -30,6 +30,7 @@ export function EsperaOperacao({
   descricao,
   etapas,
   intervalo = 12_000,
+  etapaInicial = 0,
   detalhe,
   nota = 'O resultado aparece aqui assim que estiver pronto.',
   mensagemDemora,
@@ -42,6 +43,7 @@ export function EsperaOperacao({
   descricao: string;
   etapas: readonly EtapaEspera[];
   intervalo?: number;
+  etapaInicial?: number;
   detalhe?: string;
   nota?: string;
   mensagemDemora?: string;
@@ -53,7 +55,9 @@ export function EsperaOperacao({
     obterMontagemCliente,
     obterMontagemServidor,
   );
-  const [etapaAtiva, setEtapaAtiva] = useState(0);
+  const [etapaAtiva, setEtapaAtiva] = useState(() =>
+    Math.min(Math.max(etapaInicial, 0), etapas.length - 1),
+  );
   const [demorando, setDemorando] = useState(false);
   const dialogo = useRef<HTMLElement>(null);
 

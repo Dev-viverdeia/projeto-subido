@@ -1,7 +1,7 @@
 .fundo {
   position: fixed;
   inset: 0;
-  z-index: var(--via-z-modal);
+  z-index: calc(var(--via-z-modal) + 2);
   display: grid;
   place-items: center;
   padding: var(--via-space-5);

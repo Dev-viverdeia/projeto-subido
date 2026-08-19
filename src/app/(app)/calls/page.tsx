@@ -3,14 +3,16 @@ import { z } from 'zod';
 import { listarReunioes } from '@/lib/calls/queries';
 import { tipoCallValido } from '@/lib/calls/tipos';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
+import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { PainelCalls } from './_components/PainelCalls';
 
 export const metadata: Metadata = { title: 'Calls' };
 
 export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
-  const [reunioes, oportunidades, parametros] = await Promise.all([
+  const [reunioes, oportunidades, calendar, parametros] = await Promise.all([
     listarReunioes(),
     listarOportunidadesSeletor(),
+    obterEstadoGoogleCalendar(),
     searchParams,
   ]);
   const agendada = z.uuid().safeParse(parametros.agendada);
@@ -19,12 +21,18 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
     <PainelCalls
       reunioes={reunioes}
       oportunidades={oportunidades}
+      calendar={calendar}
       agendadaId={agendada.success ? agendada.data : undefined}
       modalInicial={parametros.nova === '1'}
       oportunidadeInicial={
         typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
       }
       tipoInicial={tipoCallValido(parametros.tipo) ? parametros.tipo : undefined}
+      calendarResultado={
+        parametros.calendar === 'sincronizado' || parametros.calendar === 'falhou'
+          ? parametros.calendar
+          : undefined
+      }
     />
   );
 }

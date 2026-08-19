@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { CabecalhoDossie } from '@/app/(app)/crm/[id]/_components/CabecalhoDossie';
+import { EstadoEnriquecimento } from '@/app/(app)/crm/[id]/_components/EstadoEnriquecimento';
 import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
@@ -348,6 +349,8 @@ export default async function PreviewDossiePage({
   const parametros = await searchParams;
   const entrada = parametros.entrada === '1';
   const pesquisaPendente = parametros.pesquisa === 'pendente';
+  const enriquecendo = parametros.enriquecimento === 'processando';
+  const enriquecimentoFalhou = parametros.enriquecimento === 'falhou';
   const lead = entrada || pesquisaPendente ? LEAD_NOVO : LEAD_OPERACIONAL;
   const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
 
@@ -362,9 +365,17 @@ export default async function PreviewDossiePage({
           </span>
           <CabecalhoDossie
             lead={lead}
-            enriquecimentoEmAndamento={false}
+            enriquecimentoEmAndamento={enriquecendo}
             temDossie={!entrada && !pesquisaPendente}
           />
+
+          {enriquecendo && <EstadoEnriquecimento status="processando" erro={null} />}
+          {enriquecimentoFalhou && (
+            <EstadoEnriquecimento
+              status="falhou"
+              erro="Não conseguimos concluir a pesquisa nas fontes disponíveis."
+            />
+          )}
 
           {entrada && (
             <p className={pagina.avisoSucesso} role="status">

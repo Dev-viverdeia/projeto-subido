@@ -392,11 +392,17 @@ export type Database = {
           atualizada_em: string
           codigo_publico: string
           contato_id: string | null
+          convidado_email: string | null
           criada_em: string
           dono: string
           duracao_minutos: number
           empresa_id: string
           encerrada_em: string | null
+          google_calendar_id: string | null
+          google_event_id: string | null
+          google_event_url: string | null
+          google_sync_erro: string | null
+          google_sync_status: string
           id: string
           iniciada_em: string | null
           live_coach_ativo: boolean
@@ -412,11 +418,17 @@ export type Database = {
           atualizada_em?: string
           codigo_publico?: string
           contato_id?: string | null
+          convidado_email?: string | null
           criada_em?: string
           dono: string
           duracao_minutos?: number
           empresa_id: string
           encerrada_em?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          google_event_url?: string | null
+          google_sync_erro?: string | null
+          google_sync_status?: string
           id?: string
           iniciada_em?: string | null
           live_coach_ativo?: boolean
@@ -432,11 +444,17 @@ export type Database = {
           atualizada_em?: string
           codigo_publico?: string
           contato_id?: string | null
+          convidado_email?: string | null
           criada_em?: string
           dono?: string
           duracao_minutos?: number
           empresa_id?: string
           encerrada_em?: string | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          google_event_url?: string | null
+          google_sync_erro?: string | null
+          google_sync_status?: string
           id?: string
           iniciada_em?: string | null
           live_coach_ativo?: boolean
@@ -1068,6 +1086,45 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["status_publicacao"]
           titulo?: string
+        }
+        Relationships: []
+      }
+      google_calendar_conexoes: {
+        Row: {
+          atualizado_em: string
+          calendar_id: string
+          conectado_em: string
+          dono: string
+          escopos: string[]
+          google_email: string
+          google_sub: string
+          refresh_token_cifrado: string
+          status: string
+          ultimo_erro: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          calendar_id?: string
+          conectado_em?: string
+          dono: string
+          escopos?: string[]
+          google_email: string
+          google_sub: string
+          refresh_token_cifrado: string
+          status?: string
+          ultimo_erro?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          calendar_id?: string
+          conectado_em?: string
+          dono?: string
+          escopos?: string[]
+          google_email?: string
+          google_sub?: string
+          refresh_token_cifrado?: string
+          status?: string
+          ultimo_erro?: string | null
         }
         Relationships: []
       }
@@ -2606,6 +2663,29 @@ export type Database = {
           p_site_url: string
         }
         Returns: string
+      }
+      google_calendar_desconectar: { Args: never; Returns: boolean }
+      google_calendar_marcar_estado: {
+        Args: { p_erro?: string; p_status: string }
+        Returns: undefined
+      }
+      google_calendar_obter_token: {
+        Args: never
+        Returns: {
+          calendar_id: string
+          google_email: string
+          refresh_token_cifrado: string
+          status: string
+        }[]
+      }
+      google_calendar_salvar_conexao: {
+        Args: {
+          p_escopos?: string[]
+          p_google_email: string
+          p_google_sub: string
+          p_refresh_token_cifrado: string
+        }
+        Returns: undefined
       }
       mentoria_ocupacao: {
         Args: { _ids: string[] }

@@ -20,6 +20,7 @@ const OPORTUNIDADE: OportunidadeSeletor = {
   empresa: 'Clínica Aurora',
   dominio: 'clinicaaurora.com.br',
   contato: 'Camila Rios',
+  contatoEmail: 'camila@clinicaaurora.com.br',
 };
 
 describe('FormularioAgendarCall', () => {
@@ -79,6 +80,33 @@ describe('FormularioAgendarCall', () => {
       OPORTUNIDADE.id,
     );
     expect(screen.getByLabelText('Tipo de call')).toHaveValue('kickoff');
+  });
+
+  it('prepara o convite no Google com o e-mail que já está no CRM', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+        calendar={{
+          configurado: true,
+          conectado: true,
+          email: 'profissional@gmail.com',
+          status: 'ativa',
+          ultimoErro: null,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Convite pelo Google Calendar' }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('E-mail do cliente')).toHaveValue('camila@clinicaaurora.com.br');
+    expect(screen.getByRole('button', { name: 'Criar call e enviar convite' })).toBeInTheDocument();
+    expect(
+      document.querySelector<HTMLInputElement>('input[name="enviarConviteGoogle"]'),
+    ).toBeChecked();
   });
 
   it('anuncia os erros, foca a primeira decisão e limpa o campo corrigido', async () => {
