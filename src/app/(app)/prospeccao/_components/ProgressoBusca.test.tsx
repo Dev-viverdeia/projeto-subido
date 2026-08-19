@@ -9,7 +9,8 @@ describe('progresso da busca de prospecção', () => {
     const dialogo = screen.getByRole('dialog', { name: 'Montando sua lista' });
     expect(within(dialogo).getByRole('status')).toHaveTextContent('Buscando empresas');
     expect(dialogo).toHaveTextContent('10 empresas solicitadas');
-    expect(dialogo).toHaveTextContent('Mantenha esta página aberta');
+    expect(dialogo).toHaveTextContent('Você pode acompanhar aqui ou continuar usando esta página.');
+    expect(within(dialogo).getByRole('button', { name: 'Continuar na plataforma' })).toBeVisible();
     expect(dialogo).not.toHaveTextContent('%');
   });
 });

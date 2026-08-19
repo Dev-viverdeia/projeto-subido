@@ -91,7 +91,11 @@ export async function criarListaProspeccao(
     if (error) throw error;
   } catch (erro) {
     console.error('[prospeccao:buscar] falha ao montar lista:', erro);
-    await falharListaProspeccao(user.id, lista);
+    await falharListaProspeccao(
+      user.id,
+      lista,
+      erro instanceof Error ? erro.message : 'falha_desconhecida',
+    );
     revalidatePath('/prospeccao');
     redirect(`/prospeccao?lista=${lista}&busca=falhou`);
   }

@@ -41,6 +41,10 @@ export class ErroConfiguracaoProspeccao extends Error {
   }
 }
 
+function motivoDaFalha(resultado: PromiseRejectedResult) {
+  return resultado.reason instanceof Error ? resultado.reason.message : 'erro_desconhecido';
+}
+
 async function buscarSerpApi(
   busca: ParametrosDescoberta,
   chave: string,
@@ -76,7 +80,7 @@ async function buscarSerpApi(
 }
 
 function quantidadeParaDescoberta(quantidade: number) {
-  return Math.min(100, Math.max(40, quantidade * 5));
+  return Math.min(60, Math.max(15, quantidade * 3));
 }
 
 async function buscarApify(
@@ -85,29 +89,71 @@ async function buscarApify(
   actorId: string,
 ): Promise<LeadProspeccaoEntrada[]> {
   const ator = encodeURIComponent(actorId.replace('/', '~'));
-  const resposta = await fetch(
-    `https://api.apify.com/v2/acts/${ator}/run-sync-get-dataset-items?clean=true&format=json`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        searchStringsArray: [busca.segmento],
-        locationQuery: busca.localizacao,
-        maxCrawledPlacesPerSearch: busca.quantidade,
-        language: 'pt-BR',
-        countryCode: 'br',
-        skipClosedPlaces: true,
-        scrapeContacts: true,
-        scrapePlaceDetailPage: true,
-        maximumLeadsEnrichmentRecords: 0,
-        verifyLeadsEnrichmentEmails: false,
-      }),
-      cache: 'no-store',
-      signal: AbortSignal.timeout(115_000),
-    },
-  );
-  const json = await jsonDaResposta(resposta);
-  const itens = Array.isArray(json) ? (json as Registro[]) : [];
+  const autenticacao = { Authorization: `Bearer ${token}` };
+  const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?waitForFinish=42`, {
+    method: 'POST',
+    headers: { ...autenticacao, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      searchStringsArray: [busca.segmento],
+      locationQuery: busca.localizacao,
+      maxCrawledPlacesPerSearch: busca.quantidade,
+      language: 'pt-BR',
+      countryCode: 'br',
+      skipClosedPlaces: true,
+      scrapeContacts: true,
+      scrapePlaceDetailPage: true,
+      maximumLeadsEnrichmentRecords: 0,
+      verifyLeadsEnrichmentEmails: false,
+    }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(48_000),
+  });
+  const json = (await jsonDaResposta(resposta)) as { data?: Registro };
+  const execucao = json.data;
+  const id = typeof execucao?.id === 'string' ? execucao.id : null;
+  const dataset = typeof execucao?.defaultDatasetId === 'string' ? execucao.defaultDatasetId : null;
+  if (!id || !dataset) throw new Error('apify_execucao_sem_dataset');
+
+  const lerResultados = async () => {
+    const resultado = await fetch(
+      `https://api.apify.com/v2/datasets/${encodeURIComponent(dataset)}/items?clean=true&format=json&limit=${busca.quantidade}`,
+      {
+        headers: autenticacao,
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8_000),
+      },
+    );
+    const recebido = await jsonDaResposta(resultado);
+    return Array.isArray(recebido) ? (recebido as Registro[]) : [];
+  };
+
+  let itens = await lerResultados();
+  const status = typeof execucao?.status === 'string' ? execucao.status : '';
+  const aindaExecutando = ['READY', 'RUNNING'].includes(status);
+  if (!itens.length && aindaExecutando) {
+    const espera = await fetch(
+      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=8`,
+      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(12_000) },
+    );
+    await jsonDaResposta(espera);
+    itens = await lerResultados();
+  }
+
+  if (aindaExecutando) {
+    await fetch(
+      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}/abort?gracefully=false`,
+      {
+        method: 'POST',
+        headers: autenticacao,
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5_000),
+      },
+    ).catch(() => undefined);
+  }
+
+  if (!itens.length && !['SUCCEEDED', 'RUNNING', 'READY'].includes(status)) {
+    throw new Error(`apify_execucao_${status.toLowerCase() || 'falhou'}`);
+  }
   return itens.map(origemApify).filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
 }
 
@@ -230,6 +276,12 @@ export async function prospectarEmpresas(
   ]);
   const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
   const encontradosApify = apify.status === 'fulfilled' ? apify.value : [];
+  if (serp.status === 'rejected') {
+    console.error(`[prospeccao:serpapi] ${motivoDaFalha(serp)}`);
+  }
+  if (apify.status === 'rejected') {
+    console.error(`[prospeccao:apify] ${motivoDaFalha(apify)}`);
+  }
   let combinados = combinar(encontradosSerp, encontradosApify);
   const descobertaConcluida =
     (serpConfigurada && serp.status === 'fulfilled') ||
@@ -278,13 +330,30 @@ export async function prospectarEmpresas(
     lead.fontes.some((fonte) => fonte.startsWith('Site oficial')),
   ).length;
 
+  const candidatosFinais = comContexto
+    .filter(temContatoDireto)
+    .sort(
+      (a, b) =>
+        b.qualificacao.completude - a.qualificacao.completude ||
+        notaDeSelecao(
+          b,
+          exposicoes.get(b.chave_externa),
+          `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+        ) -
+          notaDeSelecao(
+            a,
+            exposicoes.get(a.chave_externa),
+            `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
+          ),
+    )
+    .slice(0, busca.quantidade);
   const fullEnrich = configuracao.fullEnrich;
   const resultadosDecisores = fullEnrich
-    ? await mapearComLimite(comContexto, 3, (lead) => buscarDecisores(lead, fullEnrich))
+    ? await mapearComLimite(candidatosFinais, 5, (lead) => buscarDecisores(lead, fullEnrich))
     : [];
   const qualificados = fullEnrich
     ? resultadosDecisores.map((resultado) => resultado.lead)
-    : comContexto.map((lead) => ({ ...lead, qualificacao: qualificar(lead) }));
+    : candidatosFinais.map((lead) => ({ ...lead, qualificacao: qualificar(lead) }));
   let leads = qualificados
     .filter(temContatoDireto)
     .sort(

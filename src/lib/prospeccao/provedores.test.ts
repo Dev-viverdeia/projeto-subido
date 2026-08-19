@@ -12,6 +12,27 @@ const busca = {
   quantidade: 5 as const,
 };
 
+function respostaJson(valor: unknown, status = 200) {
+  return new Response(JSON.stringify(valor), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+function inicioApify() {
+  return respostaJson({
+    data: { id: 'execucao-apify', defaultDatasetId: 'dataset-apify', status: 'SUCCEEDED' },
+  });
+}
+
+function urlApify(url: string | URL) {
+  return String(url).includes('api.apify.com/v2/acts/');
+}
+
+function urlDataset(url: string | URL) {
+  return String(url).includes('api.apify.com/v2/datasets/');
+}
+
 describe('provedores da prospecção', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -27,38 +48,38 @@ describe('provedores da prospecção', () => {
   });
 
   it('faz uma busca completa apenas com Apify usando tipo e região', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify([
-          {
-            title: 'Clínica Aurora',
-            categoryName: 'Clínica odontológica',
-            address: 'Av. do Contorno, 1850',
-            city: 'Belo Horizonte',
-            state: 'MG',
-            phone: '+55 31 3333-4444',
-            phones: ['+55 31 3333-4444', '+55 31 98888-1111'],
-            emails: ['contato@clinica-aurora.example.com'],
-            instagram: 'https://instagram.com/clinicaaurora',
-            instagrams: [
-              'https://instagram.com/clinicaaurora',
-              'https://instagram.com/reel/publicacao-duplicada',
-            ],
-            linkedIns: ['https://linkedin.com/company/clinica-aurora'],
-            socialProfiles: [
-              { url: 'https://youtube.com/watch?v=nao-e-perfil' },
-              { url: 'https://youtube.com/@clinicaaurora' },
-            ],
-            openingHours: [{ day: 'segunda-feira', hours: '08:00–18:00' }],
-            website: 'https://clinica-aurora.example.com',
-            totalScore: 4.8,
-            reviewsCount: 127,
-            placeId: 'aurora-bh',
-          },
-        ]),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
-      ),
-    );
+    const itens = [
+      {
+        title: 'Clínica Aurora',
+        categoryName: 'Clínica odontológica',
+        address: 'Av. do Contorno, 1850',
+        city: 'Belo Horizonte',
+        state: 'MG',
+        phone: '+55 31 3333-4444',
+        phones: ['+55 31 3333-4444', '+55 31 98888-1111'],
+        emails: ['contato@clinica-aurora.example.com'],
+        instagram: 'https://instagram.com/clinicaaurora',
+        instagrams: [
+          'https://instagram.com/clinicaaurora',
+          'https://instagram.com/reel/publicacao-duplicada',
+        ],
+        linkedIns: ['https://linkedin.com/company/clinica-aurora'],
+        socialProfiles: [
+          { url: 'https://youtube.com/watch?v=nao-e-perfil' },
+          { url: 'https://youtube.com/@clinicaaurora' },
+        ],
+        openingHours: [{ day: 'segunda-feira', hours: '08:00–18:00' }],
+        website: 'https://clinica-aurora.example.com',
+        totalScore: 4.8,
+        reviewsCount: 127,
+        placeId: 'aurora-bh',
+      },
+    ];
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (urlApify(url)) return Promise.resolve(inicioApify());
+      if (urlDataset(url)) return Promise.resolve(respostaJson(itens));
+      throw new Error(`URL inesperada: ${String(url)}`);
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const resultado = await prospectarEmpresas(busca);
@@ -93,22 +114,22 @@ describe('provedores da prospecção', () => {
     expect(corpo).toMatchObject({
       searchStringsArray: ['Clínicas odontológicas'],
       locationQuery: 'Belo Horizonte, MG',
-      maxCrawledPlacesPerSearch: 40,
+      maxCrawledPlacesPerSearch: 15,
       scrapeContacts: true,
       scrapePlaceDetailPage: true,
     });
   });
 
   it('descobre mais opções e entrega somente empresas com contato direto', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify([
-          { title: 'Sem Contato', placeId: 'sem-contato' },
-          { title: 'Com Telefone', placeId: 'com-telefone', phone: '+55 31 3222-1111' },
-        ]),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
-      ),
-    );
+    const itens = [
+      { title: 'Sem Contato', placeId: 'sem-contato' },
+      { title: 'Com Telefone', placeId: 'com-telefone', phone: '+55 31 3222-1111' },
+    ];
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (urlApify(url)) return Promise.resolve(inicioApify());
+      if (urlDataset(url)) return Promise.resolve(respostaJson(itens));
+      throw new Error(`URL inesperada: ${String(url)}`);
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const resultado = await prospectarEmpresas(busca);
@@ -127,6 +148,18 @@ describe('provedores da prospecção', () => {
       fullEnrichWebhook: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (urlApify(url)) return Promise.resolve(inicioApify());
+      if (urlDataset(url)) {
+        return Promise.resolve(
+          respostaJson([
+            {
+              title: 'Clínica Aurora',
+              website: 'https://clinica-aurora.example.com',
+              placeId: 'aurora-bh',
+            },
+          ]),
+        );
+      }
       if (String(url).includes('firecrawl.dev')) {
         return Promise.resolve(
           new Response(
@@ -148,18 +181,7 @@ describe('provedores da prospecção', () => {
           ),
         );
       }
-      return Promise.resolve(
-        new Response(
-          JSON.stringify([
-            {
-              title: 'Clínica Aurora',
-              website: 'https://clinica-aurora.example.com',
-              placeId: 'aurora-bh',
-            },
-          ]),
-          { status: 200, headers: { 'Content-Type': 'application/json' } },
-        ),
-      );
+      throw new Error(`URL inesperada: ${String(url)}`);
     });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -193,6 +215,21 @@ describe('provedores da prospecção', () => {
       fullEnrichWebhook: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (urlApify(url)) return Promise.resolve(inicioApify());
+      if (urlDataset(url)) {
+        return Promise.resolve(
+          respostaJson([
+            {
+              title: 'Clínica Aurora',
+              website: 'https://clinica-aurora.example.com',
+              phone: '+55 31 3333-4444',
+              emails: ['contato@clinica-aurora.example.com'],
+              instagrams: ['https://instagram.com/clinicaaurora'],
+              placeId: 'aurora-bh',
+            },
+          ]),
+        );
+      }
       if (String(url).includes('fullenrich.com')) {
         return Promise.resolve(
           new Response(
@@ -223,21 +260,7 @@ describe('provedores da prospecção', () => {
           ),
         );
       }
-      return Promise.resolve(
-        new Response(
-          JSON.stringify([
-            {
-              title: 'Clínica Aurora',
-              website: 'https://clinica-aurora.example.com',
-              phone: '+55 31 3333-4444',
-              emails: ['contato@clinica-aurora.example.com'],
-              instagrams: ['https://instagram.com/clinicaaurora'],
-              placeId: 'aurora-bh',
-            },
-          ]),
-          { status: 200, headers: { 'Content-Type': 'application/json' } },
-        ),
-      );
+      throw new Error(`URL inesperada: ${String(url)}`);
     });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -272,6 +295,20 @@ describe('provedores da prospecção', () => {
       fullEnrichWebhook: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      if (urlApify(url)) return Promise.resolve(inicioApify());
+      if (urlDataset(url)) {
+        return Promise.resolve(
+          respostaJson([
+            {
+              title: 'Odontologia Especializada LG',
+              website: 'https://api.whatsapp.com/send?phone=553134348698',
+              url: 'https://www.google.com/maps/place/odontologia-lg',
+              phone: '+55 31 3434-8698',
+              placeId: 'odontologia-lg',
+            },
+          ]),
+        );
+      }
       if (String(url).includes('fullenrich.com')) {
         return Promise.resolve(
           new Response(
@@ -293,20 +330,7 @@ describe('provedores da prospecção', () => {
           ),
         );
       }
-      return Promise.resolve(
-        new Response(
-          JSON.stringify([
-            {
-              title: 'Odontologia Especializada LG',
-              website: 'https://api.whatsapp.com/send?phone=553134348698',
-              url: 'https://www.google.com/maps/place/odontologia-lg',
-              phone: '+55 31 3434-8698',
-              placeId: 'odontologia-lg',
-            },
-          ]),
-          { status: 200, headers: { 'Content-Type': 'application/json' } },
-        ),
-      );
+      throw new Error(`URL inesperada: ${String(url)}`);
     });
     vi.stubGlobal('fetch', fetchMock);
 

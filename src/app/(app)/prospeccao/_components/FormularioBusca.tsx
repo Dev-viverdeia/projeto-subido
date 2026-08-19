@@ -10,8 +10,27 @@ import styles from '../pagina.module.css';
 
 const INICIAL: EstadoBuscaProspeccao = {};
 
-export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: boolean }) {
-  const [estado, acao, buscando] = useActionState(criarListaProspeccao, INICIAL);
+type ValoresIniciais = { segmento: string; localizacao: string; quantidade: number };
+
+export function FormularioBusca({
+  saldo,
+  pronto,
+  valoresIniciais,
+}: {
+  saldo: number;
+  pronto: boolean;
+  valoresIniciais?: ValoresIniciais;
+}) {
+  const inicial = valoresIniciais
+    ? {
+        campos: {
+          segmento: valoresIniciais.segmento,
+          localizacao: valoresIniciais.localizacao,
+          quantidade: String(valoresIniciais.quantidade),
+        },
+      }
+    : INICIAL;
+  const [estado, acao, buscando] = useActionState(criarListaProspeccao, inicial);
   const [quantidade, setQuantidade] = useState(
     Number(estado.campos?.quantidade) || QUANTIDADES_PROSPECCAO[0],
   );

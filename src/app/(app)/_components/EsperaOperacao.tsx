@@ -31,6 +31,10 @@ export function EsperaOperacao({
   etapas,
   intervalo = 12_000,
   detalhe,
+  nota = 'O resultado aparece aqui assim que estiver pronto.',
+  mensagemDemora,
+  demoraApos = 24_000,
+  acaoSecundaria,
 }: {
   aberto: boolean;
   rotulo: string;
@@ -39,6 +43,10 @@ export function EsperaOperacao({
   etapas: readonly EtapaEspera[];
   intervalo?: number;
   detalhe?: string;
+  nota?: string;
+  mensagemDemora?: string;
+  demoraApos?: number;
+  acaoSecundaria?: { rotulo: string; aoAcionar: () => void };
 }) {
   const montado = useSyncExternalStore(
     escutarMontagem,
@@ -46,6 +54,7 @@ export function EsperaOperacao({
     obterMontagemServidor,
   );
   const [etapaAtiva, setEtapaAtiva] = useState(0);
+  const [demorando, setDemorando] = useState(false);
   const dialogo = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -66,6 +75,12 @@ export function EsperaOperacao({
     );
     return () => window.clearTimeout(temporizador);
   }, [aberto, etapaAtiva, etapas.length, intervalo]);
+
+  useEffect(() => {
+    if (!aberto || !mensagemDemora) return;
+    const temporizador = window.setTimeout(() => setDemorando(true), demoraApos);
+    return () => window.clearTimeout(temporizador);
+  }, [aberto, demoraApos, mensagemDemora]);
 
   if (!montado || !aberto || etapas.length === 0) return null;
 
@@ -125,9 +140,16 @@ export function EsperaOperacao({
           })}
         </ol>
 
-        <p className={styles.nota}>
-          Mantenha esta página aberta. O resultado aparece assim que estiver pronto.
-        </p>
+        <footer className={styles.rodape}>
+          <p className={styles.nota} aria-live="polite">
+            {demorando && mensagemDemora ? mensagemDemora : nota}
+          </p>
+          {acaoSecundaria && (
+            <button type="button" onClick={acaoSecundaria.aoAcionar}>
+              {acaoSecundaria.rotulo}
+            </button>
+          )}
+        </footer>
       </section>
     </div>,
     document.body,

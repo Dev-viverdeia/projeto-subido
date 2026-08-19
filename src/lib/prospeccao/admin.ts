@@ -37,11 +37,11 @@ export async function concluirListaProspeccao(
   });
 }
 
-export async function falharListaProspeccao(dono: string, lista: string) {
+export async function falharListaProspeccao(dono: string, lista: string, motivo?: string) {
   return createAdminClient().rpc('prospeccao_sistema_falhar_lista', {
     p_dono: dono,
     p_lista: lista,
-    p_erro: 'Os provedores não concluíram esta busca.',
+    p_erro: motivo || 'Os provedores não concluíram esta busca.',
   });
 }
 

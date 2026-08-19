@@ -1,0 +1,99 @@
+.minimizado {
+  position: fixed;
+  right: var(--via-space-6);
+  bottom: var(--via-space-6);
+  z-index: var(--via-z-toast);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  width: min(520px, calc(100vw - var(--via-space-8)));
+  padding: var(--via-space-3);
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-control);
+  background: var(--via-glass-card);
+  box-shadow: var(--via-glass-shadow-lift);
+  backdrop-filter: var(--via-glass-blur);
+  animation: entrar var(--app-t-scene) backwards;
+}
+
+.minimizado > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-05);
+}
+
+.minimizado div {
+  min-width: 0;
+}
+
+.minimizado strong,
+.minimizado small {
+  display: block;
+}
+
+.minimizado strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.minimizado small {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.minimizado button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 34px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-glass-card-2);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+}
+
+.minimizado button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@keyframes entrar {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .minimizado {
+    right: var(--via-space-3);
+    bottom: var(--via-space-3);
+    left: var(--via-space-3);
+    width: auto;
+  }
+
+  .minimizado small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minimizado {
+    animation: none;
+  }
+}

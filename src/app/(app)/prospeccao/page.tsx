@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
+import { DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
 import { Card, Pill } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
 import { FormularioBusca } from './_components/FormularioBusca';
 import { HeroProspeccao } from './_components/HeroProspeccao';
 import { ListaResultados } from './_components/ListaResultados';
+import { ResultadoBusca } from './_components/ResultadoBusca';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Prospecção' };
@@ -36,17 +37,14 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
     <div className={styles.pagina}>
       <HeroProspeccao saldo={saldo} />
 
-      {parametros.busca === 'concluida' && (
-        <div className={styles.confirmacao} role="status">
-          <CheckCircle2 size={17} aria-hidden="true" />
-          Lista pronta. As empresas repetidas foram retiradas e os melhores contatos aparecem
-          primeiro.
-        </div>
-      )}
-      {parametros.busca === 'falhou' && (
-        <div className={styles.aviso} role="alert">
-          A busca não foi concluída. Os créditos reservados foram devolvidos automaticamente.
-        </div>
+      {(parametros.busca === 'concluida' || parametros.busca === 'falhou') && listaAtual && (
+        <ResultadoBusca
+          estado={parametros.busca}
+          segmento={listaAtual.segmento}
+          localizacao={listaAtual.localizacao}
+          solicitadas={listaAtual.quantidade_solicitada}
+          encontradas={listaAtual.creditos_consumidos}
+        />
       )}
       {parametros.crm === 'erro' && (
         <div className={styles.aviso} role="alert">
@@ -54,9 +52,23 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
         </div>
       )}
 
-      <FormularioBusca saldo={saldo} pronto={integracoes.pronto} />
+      <FormularioBusca
+        key={parametros.busca === 'falhou' ? listaAtual?.id : 'nova-busca'}
+        saldo={saldo}
+        pronto={integracoes.pronto}
+        valoresIniciais={
+          parametros.busca === 'falhou' && listaAtual
+            ? {
+                segmento: listaAtual.segmento,
+                localizacao: listaAtual.localizacao,
+                quantidade: listaAtual.quantidade_solicitada,
+              }
+            : undefined
+        }
+      />
 
       <Card
+        id="lista-resultados"
         as="section"
         variant="glass"
         noPadding
