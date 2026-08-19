@@ -5,7 +5,15 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Building2, ContactRound, Database, Globe2, Layers3, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
+import { EsperaOperacao } from '../../../_components/EsperaOperacao';
 import styles from './FormularioEnriquecimento.module.css';
+
+const ETAPAS_PESQUISA = [
+  {
+    titulo: 'Preparando a pesquisa',
+    descricao: 'Estamos validando os dados informados e iniciando a busca nas fontes públicas.',
+  },
+] as const;
 
 export function FormularioEnriquecimento({
   oportunidadeId,
@@ -75,6 +83,15 @@ export function FormularioEnriquecimento({
 
   return (
     <>
+      {enviando && (
+        <EsperaOperacao
+          aberto
+          rotulo="Pesquisa do lead"
+          titulo="Iniciando a análise"
+          descricao="A plataforma está preparando a pesquisa desta empresa."
+          etapas={ETAPAS_PESQUISA}
+        />
+      )}
       <button
         ref={gatilho}
         type="button"

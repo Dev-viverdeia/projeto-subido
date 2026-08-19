@@ -82,20 +82,17 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
   return (
     <>
       <AtualizarEnriquecimentos ativo={enriquecendo} />
-      {enriquecendo && (
-        <div className={styles.enriquecendoContatos} role="status">
-          <RefreshCw size={15} aria-hidden="true" />
-          <div>
-            <strong>Procurando contatos diretos dos decisores</strong>
-            <span>
-              Você já pode usar a lista. Novos e-mails e telefones entram aqui automaticamente.
-            </span>
-          </div>
-        </div>
-      )}
       <div className={styles.resumoResultados}>
         <div>
-          <strong>{leads.length} empresas novas</strong>
+          <span className={styles.resultadosLinha}>
+            <strong>{leads.length} empresas novas</strong>
+            {enriquecendo && (
+              <span className={styles.statusSegundoPlano} role="status">
+                <RefreshCw size={12} aria-hidden="true" />
+                Atualizando contatos
+              </span>
+            )}
+          </span>
           <span>Ordenadas pela qualidade dos contatos encontrados.</span>
         </div>
         <span>Clique em “Ver detalhes” para consultar fontes, site e dados adicionais.</span>

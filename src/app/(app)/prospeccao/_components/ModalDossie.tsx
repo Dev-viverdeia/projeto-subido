@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import {
   AtSign,
   BriefcaseBusiness,
@@ -37,6 +38,10 @@ import {
 } from './dossie';
 import styles from './ModalProspeccao.module.css';
 
+const escutarMontagem = () => () => undefined;
+const obterMontagemCliente = () => true;
+const obterMontagemServidor = () => false;
+
 function IconeRede({ rede }: { rede: RedeSocial['rede'] }) {
   if (rede === 'instagram') return <Camera size={18} aria-hidden="true" />;
   if (rede === 'facebook') return <Users size={18} aria-hidden="true" />;
@@ -65,6 +70,11 @@ export function ModalDossie({
 }) {
   const fecharRef = useRef<HTMLButtonElement>(null);
   const dialogoRef = useRef<HTMLElement>(null);
+  const montado = useSyncExternalStore(
+    escutarMontagem,
+    obterMontagemCliente,
+    obterMontagemServidor,
+  );
   const telefones = telefonesDo(selecionado);
   const emails = emailsDo(selecionado);
   const redes = redesDo(selecionado);
@@ -73,6 +83,7 @@ export function ModalDossie({
   const qualificacao = qualificacaoDo(selecionado);
 
   useEffect(() => {
+    if (!montado) return;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     fecharRef.current?.focus();
@@ -85,7 +96,7 @@ export function ModalDossie({
       window.removeEventListener('keydown', fechar);
       retornarFoco?.focus();
     };
-  }, [onClose, retornarFoco]);
+  }, [montado, onClose, retornarFoco]);
 
   function manterFoco(evento: React.KeyboardEvent<HTMLElement>) {
     if (evento.key !== 'Tab' || !dialogoRef.current) return;
@@ -104,7 +115,9 @@ export function ModalDossie({
     }
   }
 
-  return (
+  if (!montado) return null;
+
+  return createPortal(
     <div
       className={styles.backdrop}
       onMouseDown={(evento) => {
@@ -325,6 +338,7 @@ export function ModalDossie({
           </aside>
         </div>
       </article>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -51,3 +51,4 @@ next-env.d.ts
 
 # Artefatos temporários de validação visual (PDFs e screenshots locais).
 /tmp/
+.env*.local

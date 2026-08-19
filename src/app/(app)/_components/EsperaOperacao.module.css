@@ -1,0 +1,277 @@
+.fundo {
+  position: fixed;
+  inset: 0;
+  z-index: var(--via-z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-5);
+  background: color-mix(in srgb, var(--via-navy-deep) 68%, transparent);
+  backdrop-filter: var(--via-blur-sm);
+}
+
+.painel {
+  position: relative;
+  width: min(620px, 100%);
+  overflow: hidden;
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-glass-card);
+  box-shadow: var(--via-glass-shadow-lift);
+  backdrop-filter: var(--via-glass-blur);
+  animation: entrar var(--app-t-scene) backwards;
+}
+
+.atmosfera {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 92% 2%, var(--via-navy-12), transparent 32%),
+    linear-gradient(180deg, var(--via-glass-sheen), transparent 34%);
+}
+
+.cabecalho,
+.agora,
+.etapas,
+.nota {
+  position: relative;
+}
+
+.cabecalho {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  padding: var(--via-space-6);
+}
+
+.spinner {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+}
+
+.cabecalho div {
+  min-width: 0;
+}
+
+.cabecalho p,
+.cabecalho h2,
+.cabecalho span,
+.cabecalho small,
+.agora p,
+.nota {
+  margin: 0;
+}
+
+.cabecalho p {
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.cabecalho h2 {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-tight);
+}
+
+.cabecalho div > span {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.cabecalho small {
+  max-width: 12ch;
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+  text-align: right;
+}
+
+.agora {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-4);
+  margin-inline: var(--via-space-6);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-glass-card-2) 82%, transparent);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+  backdrop-filter: var(--via-blur-sm);
+}
+
+.agora > span {
+  align-self: start;
+  padding: var(--via-space-1) var(--via-space-2);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  text-transform: uppercase;
+}
+
+.agora strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+}
+
+.agora p {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.etapas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  margin: var(--via-space-5) var(--via-space-6) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etapas li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 54px;
+  padding: var(--via-space-2);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-faint);
+}
+
+.etapas li > span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: var(--app-radius-chip);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.etapas strong {
+  color: inherit;
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-normal);
+}
+
+.etapas li[data-estado='ativa'] {
+  border-color: var(--via-navy-25);
+  background: var(--via-navy-04);
+  color: var(--via-text-primary);
+}
+
+.etapas li[data-estado='ativa'] > span {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+  animation: respirar 1.6s var(--via-ease) infinite;
+}
+
+.etapas li[data-estado='concluida'] {
+  color: var(--via-text-body);
+}
+
+.etapas li[data-estado='concluida'] > span {
+  border-color: var(--via-navy-16);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+}
+
+.nota {
+  padding: var(--via-space-4) var(--via-space-6) var(--via-space-6);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+  text-align: center;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .fundo {
+    background: color-mix(in srgb, var(--via-navy-deep) 84%, var(--via-bg));
+  }
+
+  .painel,
+  .agora {
+    background: var(--via-surface-elev);
+  }
+}
+
+@keyframes entrar {
+  from {
+    transform: translateY(16px) scale(0.985);
+  }
+}
+
+@keyframes respirar {
+  50% {
+    box-shadow: 0 0 0 4px var(--via-navy-08);
+  }
+}
+
+@media (max-width: 640px) {
+  .fundo {
+    align-items: end;
+    padding: 0;
+  }
+
+  .painel {
+    border-radius: var(--app-radius-surface) var(--app-radius-surface) 0 0;
+  }
+
+  .cabecalho {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: var(--via-space-5) var(--via-space-4);
+  }
+
+  .cabecalho small {
+    grid-column: 2;
+    max-width: none;
+    text-align: left;
+  }
+
+  .agora {
+    margin-inline: var(--via-space-4);
+  }
+
+  .etapas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-inline: var(--via-space-4);
+  }
+
+  .nota {
+    padding-inline: var(--via-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel,
+  .etapas li[data-estado='ativa'] > span {
+    animation: none;
+  }
+}

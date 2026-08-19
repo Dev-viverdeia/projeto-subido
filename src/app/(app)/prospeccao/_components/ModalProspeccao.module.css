@@ -14,10 +14,11 @@
   width: min(1180px, 100%);
   max-height: min(900px, calc(100dvh - 48px));
   overflow: hidden;
-  border: 1px solid var(--app-elev-3-line);
+  border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
-  background: var(--via-bg);
-  box-shadow: var(--app-elev-3-shadow);
+  background: var(--via-glass-card);
+  box-shadow: var(--via-glass-shadow-lift);
+  backdrop-filter: var(--via-glass-blur);
   animation: modalIn var(--app-t-scene);
 }
 
@@ -165,8 +166,8 @@
 .crmCard {
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  background: var(--via-glass-card-2);
+  box-shadow: var(--via-glass-shadow);
 }
 
 .section,
@@ -478,7 +479,7 @@
   padding: var(--app-pad-card);
   border-color: var(--via-navy-16);
   background:
-    radial-gradient(circle at 100% 0%, var(--via-navy-08), transparent 48%), var(--app-elev-1-bg);
+    radial-gradient(circle at 100% 0%, var(--via-navy-12), transparent 48%), var(--via-glass-card-2);
 }
 
 .crmCard h3,
@@ -851,5 +852,240 @@
   .modal,
   .girando {
     animation: none;
+  }
+}
+
+/* Dossiê compacto: a informação prioritária cabe na viewport comum. Só conjuntos
+   excepcionalmente grandes (muitos telefones ou decisores) rolam dentro da própria
+   seção, sem transformar o modal inteiro numa página comprida. */
+@media (min-width: 901px) {
+  .backdrop {
+    padding: var(--via-space-5);
+  }
+
+  .modal {
+    width: min(1320px, 100%);
+    height: min(780px, calc(100dvh - 40px));
+    max-height: none;
+  }
+
+  .header {
+    min-height: 102px;
+    padding: var(--via-space-5) var(--via-space-7);
+    background:
+      radial-gradient(circle at 88% 0%, var(--via-navy-10), transparent 34%),
+      var(--via-glass-card-2);
+  }
+
+  .headerIdentity h2 {
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
+  }
+
+  .headerMeta {
+    margin-top: var(--via-space-2);
+  }
+
+  .body {
+    grid-template-columns: minmax(0, 1fr) 286px;
+    height: calc(min(780px, 100dvh - 40px) - 124px);
+    max-height: none;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 8% 0%, var(--via-navy-06), transparent 30%),
+      radial-gradient(circle at 100% 100%, var(--via-navy-08), transparent 32%),
+      color-mix(in srgb, var(--via-bg-2) 82%, transparent);
+  }
+
+  .main {
+    min-width: 0;
+    min-height: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
+    overflow: hidden;
+  }
+
+  .main > .section:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .main > .section:nth-child(2),
+  .main > .research {
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .main > .research .sectionHeading div > span {
+    display: none;
+  }
+
+  .section,
+  .research {
+    padding: var(--via-space-4);
+  }
+
+  .sectionHeading {
+    margin-bottom: var(--via-space-3);
+  }
+
+  .sectionHeading h3 {
+    font-size: var(--via-fs-sm);
+  }
+
+  .sectionHeading div > span {
+    margin-top: var(--via-space-1);
+    font-size: var(--via-fs-micro);
+  }
+
+  .contactList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--via-space-2);
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .contactRow {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: var(--via-space-2);
+    min-height: 64px;
+    padding: var(--via-space-2) var(--via-space-3);
+    background: color-mix(in srgb, var(--via-glass-card) 78%, transparent);
+  }
+
+  .contactIcon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .contactData small {
+    display: none;
+  }
+
+  .contactActions,
+  .decisionActions {
+    flex-wrap: nowrap;
+    gap: var(--via-space-1);
+  }
+
+  .contactActions a,
+  .decisionActions a,
+  .contactActions button {
+    min-height: 32px;
+    padding: var(--via-space-1_5) var(--via-space-2);
+  }
+
+  .contactActions button {
+    width: 32px;
+  }
+
+  .decisionMakers {
+    gap: var(--via-space-2);
+  }
+
+  .decisionMakers article {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: var(--via-space-2);
+    padding: var(--via-space-2) var(--via-space-3);
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .decisionActions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-left: 42px;
+  }
+
+  .researchGrid {
+    gap: var(--via-space-2);
+  }
+
+  .researchGrid a {
+    padding: var(--via-space-3);
+  }
+
+  .companyFacts {
+    gap: var(--via-space-2);
+    margin-top: var(--via-space-3);
+  }
+
+  .companyFacts > div {
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: var(--via-space-3);
+    padding-top: var(--via-space-2);
+  }
+
+  .companyFacts > div:first-child {
+    display: none;
+  }
+
+  .companyFacts dd {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .sidebar {
+    min-height: 0;
+    gap: var(--via-space-3);
+    padding: var(--via-space-5) var(--via-space-5) var(--via-space-5) 0;
+    overflow: hidden;
+  }
+
+  .crmCard,
+  .sideCard {
+    padding: var(--via-space-4);
+  }
+
+  .crmCard h3 {
+    font-size: var(--via-fs-sm);
+  }
+
+  .crmCard > p:not(.eyebrow) {
+    font-size: var(--via-fs-micro);
+  }
+
+  .crmAction {
+    margin-top: var(--via-space-3);
+  }
+
+  .hours {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--via-space-1) var(--via-space-3);
+    margin-top: var(--via-space-3);
+  }
+
+  .hours > div {
+    display: grid;
+    gap: 0;
+  }
+
+  .hours dd {
+    text-align: left;
+  }
+
+  .sources {
+    margin-top: var(--via-space-3);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .backdrop {
+    background: color-mix(in srgb, var(--via-navy-deep) 86%, var(--via-bg));
+  }
+
+  .modal,
+  .section,
+  .research,
+  .sideCard,
+  .andamento,
+  .crmCard {
+    background: var(--via-surface-elev);
   }
 }

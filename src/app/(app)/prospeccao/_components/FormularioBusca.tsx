@@ -53,81 +53,79 @@ export function FormularioBusca({ saldo, pronto }: { saldo: number; pronto: bool
           </div>
         )}
 
-        {buscando ? (
-          <ProgressoBusca quantidade={quantidade} />
-        ) : (
-          <>
-            <div className={styles.buscaDireta}>
-              <Input
-                id="prospeccao-segmento"
-                name="segmento"
-                label="Tipo de empresa"
-                placeholder="Ex.: clínicas odontológicas"
-                iconLeft={<Building2 size={18} strokeWidth={1.7} aria-hidden="true" />}
-                size="lg"
-                defaultValue={estado.campos?.segmento ?? ''}
-                error={estado.porCampo?.segmento}
-                autoComplete="off"
-                required
-              />
-              <Input
-                id="prospeccao-localizacao"
-                name="localizacao"
-                label="Cidade ou região"
-                placeholder="Ex.: Belo Horizonte, MG"
-                iconLeft={<MapPin size={18} strokeWidth={1.7} aria-hidden="true" />}
-                size="lg"
-                defaultValue={estado.campos?.localizacao ?? ''}
-                error={estado.porCampo?.localizacao}
-                autoComplete="address-level2"
-                required
-              />
+        {buscando && <ProgressoBusca quantidade={quantidade} />}
+        <>
+          <div className={styles.buscaDireta}>
+            <Input
+              id="prospeccao-segmento"
+              name="segmento"
+              label="Tipo de empresa"
+              placeholder="Ex.: clínicas odontológicas"
+              iconLeft={<Building2 size={18} strokeWidth={1.7} aria-hidden="true" />}
+              size="lg"
+              defaultValue={estado.campos?.segmento ?? ''}
+              error={estado.porCampo?.segmento}
+              autoComplete="off"
+              required
+            />
+            <Input
+              id="prospeccao-localizacao"
+              name="localizacao"
+              label="Cidade ou região"
+              placeholder="Ex.: Belo Horizonte, MG"
+              iconLeft={<MapPin size={18} strokeWidth={1.7} aria-hidden="true" />}
+              size="lg"
+              defaultValue={estado.campos?.localizacao ?? ''}
+              error={estado.porCampo?.localizacao}
+              autoComplete="address-level2"
+              required
+            />
+          </div>
+
+          <div className={styles.rodapeBusca}>
+            <fieldset className={styles.quantidade}>
+              <legend>Quantidade</legend>
+              <input type="hidden" name="quantidade" value={quantidade} />
+              <div>
+                {QUANTIDADES_PROSPECCAO.map((opcao) => (
+                  <button
+                    type="button"
+                    key={opcao}
+                    data-ativo={quantidade === opcao || undefined}
+                    aria-pressed={quantidade === opcao}
+                    disabled={saldo < opcao}
+                    onClick={() => setQuantidade(opcao)}
+                  >
+                    {opcao}
+                  </button>
+                ))}
+              </div>
+              {estado.porCampo?.quantidade && <small>{estado.porCampo.quantidade}</small>}
+            </fieldset>
+
+            <div className={styles.reservaBusca}>
+              <strong>{quantidade} créditos reservados</strong>
+              <span>Você paga somente pelas empresas encontradas.</span>
             </div>
 
-            <div className={styles.rodapeBusca}>
-              <fieldset className={styles.quantidade}>
-                <legend>Quantidade</legend>
-                <input type="hidden" name="quantidade" value={quantidade} />
-                <div>
-                  {QUANTIDADES_PROSPECCAO.map((opcao) => (
-                    <button
-                      type="button"
-                      key={opcao}
-                      data-ativo={quantidade === opcao || undefined}
-                      aria-pressed={quantidade === opcao}
-                      disabled={saldo < opcao}
-                      onClick={() => setQuantidade(opcao)}
-                    >
-                      {opcao}
-                    </button>
-                  ))}
-                </div>
-                {estado.porCampo?.quantidade && <small>{estado.porCampo.quantidade}</small>}
-              </fieldset>
-
-              <div className={styles.reservaBusca}>
-                <strong>{quantidade} créditos reservados</strong>
-                <span>Você paga somente pelas empresas encontradas.</span>
-              </div>
-
-              <div className={styles.acaoBusca}>
-                <span>
-                  Saldo <strong>{saldo}</strong>
-                </span>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  disabled={!pronto || semSaldo}
-                  iconLeft={<Search size={17} aria-hidden="true" />}
-                  iconRight={<ArrowRight size={17} aria-hidden="true" />}
-                >
-                  Buscar empresas
-                </Button>
-              </div>
+            <div className={styles.acaoBusca}>
+              <span>
+                Saldo <strong>{saldo}</strong>
+              </span>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                disabled={!pronto || semSaldo}
+                loading={buscando}
+                iconLeft={<Search size={17} aria-hidden="true" />}
+                iconRight={<ArrowRight size={17} aria-hidden="true" />}
+              >
+                Buscar empresas
+              </Button>
             </div>
-          </>
-        )}
+          </div>
+        </>
       </form>
     </Card>
   );

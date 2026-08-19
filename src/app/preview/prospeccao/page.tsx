@@ -5,6 +5,7 @@ import { BriefcaseBusiness, ContactRound, GraduationCap, House, Search } from 'l
 import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBusca';
 import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
 import { ListaResultados } from '@/app/(app)/prospeccao/_components/ListaResultados';
+import { ProgressoBusca } from '@/app/(app)/prospeccao/_components/ProgressoBusca';
 import pagina from '@/app/(app)/prospeccao/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import styles from '../mapa-jornada/preview.module.css';
@@ -115,8 +116,13 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
   },
 ];
 
-export default function PreviewProspeccaoPage() {
+export default async function PreviewProspeccaoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ espera?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
 
   return (
     <div className={styles.shell}>
@@ -144,6 +150,7 @@ export default function PreviewProspeccaoPage() {
       </aside>
 
       <main id="conteudo" className={styles.conteudo}>
+        {parametros.espera === '1' && <ProgressoBusca quantidade={10} />}
         <div className={pagina.pagina}>
           <HeroProspeccao saldo={42} />
 

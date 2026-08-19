@@ -7,12 +7,13 @@
   min-height: 96px;
   padding: var(--via-space-5) var(--via-space-6);
   overflow: hidden;
-  border: 1px solid var(--app-elev-2-line);
+  border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
   background:
     radial-gradient(ellipse 46% 160% at 100% 0%, var(--via-navy-08), transparent 70%),
-    var(--app-elev-2-bg);
-  box-shadow: var(--app-elev-2-shadow);
+    var(--via-glass-card);
+  box-shadow: var(--via-glass-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .icone {
@@ -81,6 +82,12 @@
 
   to {
     transform: translateX(365%);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .estado {
+    background: var(--via-surface-elev);
   }
 }
 

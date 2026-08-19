@@ -1,20 +1,21 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Estação de Prospecção', () => {
-  test('abre canais qualificados sem levar um contato frio direto ao CRM', async ({ page }) => {
+  test('abre os canais e mantém o envio ao CRM como uma ação explícita', async ({
+    page,
+  }, testInfo) => {
     await page.goto('/preview/prospeccao');
-    const empresa = page.getByRole('button', { name: /Clínica Aurora/ });
+    const empresa = page.getByRole('button', { name: 'Ver detalhes' }).first();
 
     await empresa.click();
     const dialogo = page.getByRole('dialog', { name: 'Clínica Aurora' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText('Como entrar em contato')).toBeVisible();
-    await expect(dialogo.getByRole('link', { name: /Abrir WhatsApp/ }).first()).toBeVisible();
-    await expect(dialogo.getByRole('link', { name: /Escrever e-mail/ })).toBeVisible();
+    await expect(dialogo.getByText('Canais para começar a abordagem')).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'WhatsApp' }).first()).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'Escrever' })).toBeVisible();
     await expect(dialogo.getByText('@clinicaaurora', { exact: true }).first()).toBeVisible();
-    await expect(dialogo.getByText('Andamento', { exact: true })).toBeVisible();
-    await expect(dialogo.getByRole('button', { name: 'Alguém respondeu' })).toBeDisabled();
-    await expect(dialogo.getByRole('button', { name: 'Criar oportunidade no CRM' })).toHaveCount(0);
+    await expect(dialogo.getByText('Quer trabalhar este lead?')).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Adicionar ao CRM' })).toBeVisible();
 
     const decisores = dialogo.getByText('Possíveis decisores');
     await decisores.scrollIntoViewIfNeeded();
@@ -23,6 +24,19 @@ test.describe('Estação de Prospecção', () => {
 
     const estourou = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     expect(estourou).toBe(false);
+
+    if (testInfo.project.name === 'desktop') {
+      const rolagemNoModal = await dialogo.evaluate((elemento) =>
+        [elemento, ...elemento.querySelectorAll<HTMLElement>('*')].some((item) => {
+          const overflow = getComputedStyle(item).overflowY;
+          return (
+            (overflow === 'auto' || overflow === 'scroll') &&
+            item.scrollHeight > item.clientHeight + 2
+          );
+        }),
+      );
+      expect(rolagemNoModal).toBe(false);
+    }
 
     await page.keyboard.press('Escape');
     await expect(dialogo).toBeHidden();

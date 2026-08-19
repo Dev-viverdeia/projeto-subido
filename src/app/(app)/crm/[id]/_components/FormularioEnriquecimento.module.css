@@ -17,11 +17,12 @@
   width: min(650px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   overflow: auto;
-  border: 1px solid var(--via-border);
+  border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
-  background: var(--via-surface);
+  background: var(--via-glass-card);
   color: var(--via-text-primary);
-  box-shadow: var(--via-shadow-xl);
+  box-shadow: var(--via-glass-shadow-lift);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .topo {
@@ -142,6 +143,16 @@
   justify-content: flex-end;
   gap: var(--via-space-3);
   padding-top: var(--via-space-2);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .scrim {
+    background: color-mix(in srgb, var(--via-navy-deep) 88%, var(--via-bg));
+  }
+
+  .dialogo {
+    background: var(--via-surface-elev);
+  }
 }
 
 @media (max-width: 560px) {
