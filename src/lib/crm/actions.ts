@@ -49,6 +49,19 @@ const aplicarAcaoSchema = z.object({
   enriquecimento: z.uuid(),
 });
 
+const definirProximaAcaoSchema = z.object({
+  oportunidade: z.uuid(),
+  acao: z
+    .string()
+    .trim()
+    .min(3, 'Descreva o que precisa acontecer para a venda avançar.')
+    .max(500, 'Resuma a próxima ação em até 500 caracteres.'),
+  quando: z
+    .string()
+    .trim()
+    .refine((valor) => !valor || /^\d{4}-\d{2}-\d{2}$/.test(valor), 'Escolha uma data válida.'),
+});
+
 const novoCicloSchema = z.object({ oportunidade: z.uuid() });
 
 export type EstadoNovoLead = {
@@ -202,6 +215,59 @@ export async function moverOportunidadeKanban(
 }
 
 export type ResultadoAplicarAcao = { ok: true; mensagem: string } | { ok: false; erro: string };
+
+export type EstadoProximaAcao = {
+  status?: 'sucesso' | 'erro';
+  mensagem?: string;
+  porCampo?: Partial<Record<'acao' | 'quando', string>>;
+};
+
+export async function definirProximaAcao(
+  _estado: EstadoProximaAcao,
+  formData: FormData,
+): Promise<EstadoProximaAcao> {
+  const validacao = definirProximaAcaoSchema.safeParse({
+    oportunidade: formData.get('oportunidade'),
+    acao: formData.get('acao'),
+    quando: formData.get('quando'),
+  });
+
+  if (!validacao.success) {
+    const erros = z.flattenError(validacao.error).fieldErrors;
+    return {
+      status: 'erro',
+      mensagem: 'Revise os campos indicados.',
+      porCampo: {
+        acao: erros.acao?.[0],
+        quando: erros.quando?.[0],
+      },
+    };
+  }
+
+  const quando = validacao.data.quando ? `${validacao.data.quando}T12:00:00-03:00` : undefined;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('crm_definir_proxima_acao', {
+    p_oportunidade: validacao.data.oportunidade,
+    p_acao: validacao.data.acao,
+    p_quando: quando,
+  });
+
+  if (error) {
+    console.error(`[crm:definir-proxima-acao] ${error.code}: ${error.message}`);
+    return {
+      status: 'erro',
+      mensagem:
+        error.code === '42501'
+          ? 'Sua sessão expirou. Entre novamente para continuar.'
+          : 'A próxima ação não foi salva. Tente novamente.',
+    };
+  }
+
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidarDirecaoOperacional();
+  return { status: 'sucesso', mensagem: 'Próxima ação salva na ficha e no pipeline.' };
+}
 
 export async function aplicarProximaAcao(
   _estado: ResultadoAplicarAcao | null,

@@ -16,34 +16,6 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
   const projetoDeOrigem = primeiroParametro(parametros.projeto);
   const projetoSlug = primeiroParametro(parametros.projetoSlug);
   const abrirDoProjeto = parametros.novo === 'projeto' && Boolean(projetoDeOrigem);
-  const abertas = oportunidades.filter(
-    (oportunidade) => oportunidade.etapa !== 'ganho' && oportunidade.etapa !== 'perdido',
-  );
-  const fases = [
-    {
-      numero: '01',
-      titulo: 'Preparar',
-      descricao: 'Pesquisar e abordar',
-      total: abertas.filter(
-        (oportunidade) =>
-          oportunidade.etapa === 'novo_lead' || oportunidade.etapa === 'qualificacao',
-      ).length,
-    },
-    {
-      numero: '02',
-      titulo: 'Descobrir',
-      descricao: 'Entender a dor',
-      total: abertas.filter((oportunidade) => oportunidade.etapa === 'descoberta').length,
-    },
-    {
-      numero: '03',
-      titulo: 'Propor',
-      descricao: 'Escopo e decisão',
-      total: abertas.filter(
-        (oportunidade) => oportunidade.etapa === 'proposta' || oportunidade.etapa === 'negociacao',
-      ).length,
-    },
-  ];
 
   return (
     <div className={styles.pagina}>
@@ -61,19 +33,6 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
               projetoSlug={projetoSlug}
             />
           )}
-        </div>
-
-        <div className={styles.trilhaMetodo} aria-label="Etapas do método de venda">
-          {fases.map((fase) => (
-            <div key={fase.numero}>
-              <span>{fase.numero}</span>
-              <div>
-                <strong>{fase.titulo}</strong>
-                <small>{fase.descricao}</small>
-              </div>
-              <b aria-label={`${fase.total} oportunidades`}>{fase.total}</b>
-            </div>
-          ))}
         </div>
       </header>
 

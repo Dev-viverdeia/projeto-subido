@@ -4,6 +4,7 @@ import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls
 import { FASES_CRM, faseDaEtapa } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
+import { EditarProximaAcao } from './EditarProximaAcao';
 import styles from './ResumoOperacionalLead.module.css';
 
 const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', {
@@ -193,6 +194,13 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
             </Link>
           ) : null}
+          {!encerrada && (
+            <EditarProximaAcao
+              oportunidadeId={lead.oportunidade.id}
+              acaoAtual={lead.oportunidade.proximaAcao}
+              quandoAtual={lead.oportunidade.proximaAcaoEm}
+            />
+          )}
         </div>
       </div>
 

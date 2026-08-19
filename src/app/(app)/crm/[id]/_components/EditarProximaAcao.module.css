@@ -1,0 +1,133 @@
+.gatilho {
+  display: inline-flex;
+  min-height: var(--app-h-control);
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-white) 18%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-gray-200);
+  font: inherit;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 8%, transparent);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.gatilho:hover {
+  border-color: color-mix(in srgb, var(--via-white) 28%, transparent);
+  background: color-mix(in srgb, var(--via-white) 11%, transparent);
+  transform: translateY(-1px);
+}
+
+.gatilho:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
+.formulario {
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+.portalModal :global(.via-modal) {
+  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
+}
+
+.portalModal :global(.via-modal__foot) {
+  background: color-mix(in srgb, var(--via-surface) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .portalModal :global(.via-modal),
+  .portalModal :global(.via-modal__foot) {
+    background: var(--via-surface);
+  }
+}
+
+.campoAcao,
+.campoData {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.campoAcao > span,
+.campoData > span {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.campoAcao textarea,
+.campoData input {
+  width: 100%;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  outline: none;
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  color: var(--via-text-primary);
+  font: inherit;
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    background-color var(--app-t-state);
+}
+
+.campoAcao textarea {
+  min-height: 118px;
+  resize: vertical;
+  padding: var(--via-space-4);
+  line-height: var(--via-lh-normal);
+}
+
+.campoData input {
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+}
+
+.campoAcao textarea:focus,
+.campoData input:focus {
+  border-color: var(--via-navy-20);
+  background: var(--via-surface);
+  box-shadow:
+    var(--app-ring),
+    inset 0 1px 0 var(--via-edge-hi);
+}
+
+.campoAcao textarea::placeholder {
+  color: var(--via-text-faint);
+}
+
+.campoAcao > small,
+.campoData > small {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.campoAcao > small[role='alert'] {
+  color: var(--via-accent-ink);
+}
+
+@media (max-width: 700px) {
+  .gatilho {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gatilho {
+    transition: none;
+  }
+}

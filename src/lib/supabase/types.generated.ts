@@ -2565,6 +2565,10 @@ export type Database = {
         }
         Returns: string
       }
+      crm_definir_proxima_acao: {
+        Args: { p_acao: string; p_oportunidade: string; p_quando?: string }
+        Returns: boolean
+      }
       crm_iniciar_enriquecimento: {
         Args: { p_oportunidade: string }
         Returns: string
