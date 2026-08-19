@@ -855,9 +855,9 @@
   }
 }
 
-/* Dossiê compacto: a informação prioritária cabe na viewport comum. Só conjuntos
-   excepcionalmente grandes (muitos telefones ou decisores) rolam dentro da própria
-   seção, sem transformar o modal inteiro numa página comprida. */
+/* Dossiê compacto: em uma viewport comum, a moldura termina junto com o conteúdo.
+   Quando a altura ou o volume de dados exigirem, o corpo inteiro passa a rolar sob
+   o cabeçalho — sem esticar cards vazios nem esconder uma continuação real. */
 @media (min-width: 901px) {
   .backdrop {
     padding: var(--via-space-5);
@@ -865,8 +865,7 @@
 
   .modal {
     width: min(1320px, 100%);
-    height: min(780px, calc(100dvh - 40px));
-    max-height: none;
+    max-height: calc(100dvh - 40px);
   }
 
   .header {
@@ -887,9 +886,10 @@
 
   .body {
     grid-template-columns: minmax(0, 1fr) 286px;
-    height: calc(min(780px, 100dvh - 40px) - 88px);
-    max-height: none;
-    overflow: hidden;
+    align-items: start;
+    max-height: calc(100dvh - 128px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background:
       radial-gradient(circle at 8% 0%, var(--via-navy-06), transparent 30%),
       radial-gradient(circle at 100% 100%, var(--via-navy-08), transparent 32%),
@@ -898,12 +898,10 @@
 
   .main {
     min-width: 0;
-    min-height: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
     gap: var(--via-space-4);
     padding: var(--via-space-5);
-    overflow: hidden;
   }
 
   .main > .section:first-child {
@@ -912,8 +910,7 @@
 
   .main > .section:nth-child(2),
   .main > .research {
-    min-height: 0;
-    overflow: auto;
+    align-self: start;
   }
 
   .main > .research .sectionHeading div > span {
@@ -1032,10 +1029,9 @@
   }
 
   .sidebar {
-    min-height: 0;
+    align-self: start;
     gap: var(--via-space-3);
     padding: var(--via-space-5) var(--via-space-5) var(--via-space-5) 0;
-    overflow: hidden;
   }
 
   .crmCard,
