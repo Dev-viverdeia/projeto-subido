@@ -8,8 +8,11 @@
   z-index: var(--via-z-modal);
   display: grid;
   place-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--via-space-4);
-  background: color-mix(in srgb, var(--via-navy-deep) 72%, transparent);
+  background: color-mix(in srgb, var(--via-navy-deep) 68%, transparent);
+  backdrop-filter: blur(18px) saturate(120%);
 }
 
 .dialogo {
@@ -18,9 +21,10 @@
   overflow: auto;
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-card);
-  background: var(--via-surface-elev, var(--via-surface));
+  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
   color: var(--via-text-primary);
-  box-shadow: var(--via-shadow-xl);
+  box-shadow: var(--app-elev-3-shadow);
+  backdrop-filter: blur(28px) saturate(135%);
 }
 
 .painel {
@@ -119,6 +123,11 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
+  .scrim {
+    background: color-mix(in srgb, var(--via-navy-deep) 90%, var(--via-bg));
+  }
+
+  .dialogo,
   .acoes {
     background: var(--via-surface);
   }

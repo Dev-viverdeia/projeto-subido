@@ -1,22 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const {
-  from,
-  getClaims,
-  googleCalendarConfigurado,
-  redirect,
-  revalidatePath,
-  rpc,
-  sincronizarCallNoGoogle,
-} = vi.hoisted(() => ({
-  from: vi.fn(),
-  getClaims: vi.fn(),
-  googleCalendarConfigurado: vi.fn(),
-  redirect: vi.fn(),
-  revalidatePath: vi.fn(),
-  rpc: vi.fn(),
-  sincronizarCallNoGoogle: vi.fn(),
-}));
+const { from, getClaims, redirect, revalidatePath, rpc, sincronizarCallNoGoogle } = vi.hoisted(
+  () => ({
+    from: vi.fn(),
+    getClaims: vi.fn(),
+    redirect: vi.fn(),
+    revalidatePath: vi.fn(),
+    rpc: vi.fn(),
+    sincronizarCallNoGoogle: vi.fn(),
+  }),
+);
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
@@ -25,7 +18,6 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
 }));
 vi.mock('@/lib/google-calendar/eventos', () => ({ sincronizarCallNoGoogle }));
-vi.mock('@/lib/google-calendar/oauth', () => ({ googleCalendarConfigurado }));
 
 import { agendarReuniao } from './actions';
 
@@ -42,14 +34,50 @@ function dadosValidos() {
   dados.set('duracao', '45');
   dados.set('offsetMinutos', '180');
   dados.set('liveCoach', 'on');
+  dados.set('enviarConviteGoogle', 'on');
+  dados.set('convidadoEmail', 'cliente@clinica.com.br');
   return dados;
+}
+
+function prepararBancoComCalendarAtivo() {
+  from.mockImplementation((tabela: string) => {
+    if (tabela === 'google_calendar_conexoes') {
+      return {
+        select: vi.fn(() => ({
+          maybeSingle: vi.fn(() => Promise.resolve({ data: { status: 'ativa' }, error: null })),
+        })),
+      };
+    }
+    if (tabela === 'calls_reunioes') {
+      return {
+        update: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ error: null })) })),
+      };
+    }
+    return {
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn(() =>
+            Promise.resolve({
+              data: {
+                titulo: 'Automação do atendimento',
+                empresa: { nome: 'Clínica Aurora' },
+                contato: { nome: 'Camila Rios' },
+              },
+              error: null,
+            }),
+          ),
+        })),
+      })),
+    };
+  });
 }
 
 describe('agendarReuniao', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    googleCalendarConfigurado.mockReturnValue(false);
     getClaims.mockResolvedValue({ data: { claims: { sub: 'usuario-1' } } });
+    prepararBancoComCalendarAtivo();
+    sincronizarCallNoGoogle.mockResolvedValue({ status: 'sincronizado', eventoUrl: null });
   });
 
   it('abre a confirmação da sala criada e revalida o lead', async () => {
@@ -72,7 +100,7 @@ describe('agendarReuniao', () => {
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
-    expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}`);
+    expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
 
   it('não navega quando a call volta sem identificador', async () => {
@@ -84,8 +112,15 @@ describe('agendarReuniao', () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('exige a configuração inicial do Calendar quando a integração está ativa', async () => {
-    googleCalendarConfigurado.mockReturnValue(true);
+  it('exige a conexão do Calendar antes de qualquer call', async () => {
+    from.mockImplementation((tabela: string) => {
+      if (tabela !== 'google_calendar_conexoes') return {};
+      return {
+        select: vi.fn(() => ({
+          maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
+      };
+    });
 
     const resposta = await agendarReuniao({}, dadosValidos());
 
@@ -101,31 +136,6 @@ describe('agendarReuniao', () => {
       data: [{ reuniao_id: REUNIAO_ID, codigo_publico: CODIGO_PUBLICO }],
       error: null,
     });
-    from.mockImplementation((tabela: string) => {
-      if (tabela === 'calls_reunioes') {
-        return {
-          update: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ error: null })) })),
-        };
-      }
-      return {
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            maybeSingle: vi.fn(() =>
-              Promise.resolve({
-                data: {
-                  titulo: 'Automação do atendimento',
-                  empresa: { nome: 'Clínica Aurora' },
-                  contato: { nome: 'Camila Rios' },
-                },
-                error: null,
-              }),
-            ),
-          })),
-        })),
-      };
-    });
-    sincronizarCallNoGoogle.mockResolvedValue({ status: 'sincronizado', eventoUrl: null });
-
     await agendarReuniao({}, dados);
 
     expect(sincronizarCallNoGoogle).toHaveBeenCalledWith(

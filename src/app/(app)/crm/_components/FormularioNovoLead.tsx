@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useFormStatus } from 'react-dom';
+import { createPortal } from 'react-dom';
 import { Plus, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { criarLead, type EstadoNovoLead } from '@/lib/crm/actions';
@@ -9,6 +10,9 @@ import styles from './FormularioNovoLead.module.css';
 
 const INICIAL: EstadoNovoLead = {};
 type CampoNovoLead = 'empresa' | 'contato' | 'email' | 'titulo';
+const escutarMontagem = () => () => undefined;
+const obterMontagemCliente = () => true;
+const obterMontagemServidor = () => false;
 
 function BotaoAdicionar() {
   const { pending } = useFormStatus();
@@ -32,6 +36,11 @@ export function FormularioNovoLead({
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
+  const montado = useSyncExternalStore(
+    escutarMontagem,
+    obterMontagemCliente,
+    obterMontagemServidor,
+  );
   const [aberto, setAberto] = useState(abertoInicial);
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoNovoLead>>(new Set());
   const [estado, acao] = useActionState(criarLead, INICIAL);
@@ -39,6 +48,11 @@ export function FormularioNovoLead({
   useEffect(() => {
     if (!aberto) return;
     painel.current?.querySelector<HTMLElement>('input:not([type="hidden"])')?.focus();
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+    };
   }, [aberto]);
 
   useEffect(() => {
@@ -78,129 +92,132 @@ export function FormularioNovoLead({
         <span>{rotulo}</span>
       </button>
 
-      {aberto && (
-        <div
-          className={styles.scrim}
-          onMouseDown={(evento) => {
-            if (evento.target === evento.currentTarget) fechar();
-          }}
-        >
+      {montado &&
+        aberto &&
+        createPortal(
           <div
-            id="novo-lead-dialogo"
-            ref={painel}
-            className={styles.dialogo}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="novo-lead-titulo"
-            onKeyDown={(evento) => {
-              if (evento.key === 'Escape') fechar();
-              if (evento.key !== 'Tab') return;
-
-              const focaveis = painel.current?.querySelectorAll<HTMLElement>(
-                'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]',
-              );
-              if (!focaveis?.length) return;
-              const primeiro = focaveis[0];
-              const ultimo = focaveis[focaveis.length - 1];
-              if (evento.shiftKey && document.activeElement === primeiro) {
-                evento.preventDefault();
-                ultimo?.focus();
-              } else if (!evento.shiftKey && document.activeElement === ultimo) {
-                evento.preventDefault();
-                primeiro?.focus();
-              }
+            className={styles.scrim}
+            onMouseDown={(evento) => {
+              if (evento.target === evento.currentTarget) fechar();
             }}
           >
-            <div className={styles.painel}>
-              <header className={styles.topo}>
-                <div>
-                  <p className={styles.sobretitulo}>Nova oportunidade</p>
-                  <h2 id="novo-lead-titulo">Adicionar oportunidade</h2>
-                  <p>
-                    Use este cadastro para uma empresa que você decidiu abordar. Os dados podem ser
-                    completados antes da primeira call.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className={styles.fechar}
-                  onClick={fechar}
-                  aria-label="Fechar"
-                >
-                  <X size={19} strokeWidth={1.8} aria-hidden="true" />
-                </button>
-              </header>
+            <div
+              id="novo-lead-dialogo"
+              ref={painel}
+              className={styles.dialogo}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="novo-lead-titulo"
+              onKeyDown={(evento) => {
+                if (evento.key === 'Escape') fechar();
+                if (evento.key !== 'Tab') return;
 
-              <form
-                action={acao}
-                className={styles.formulario}
-                noValidate
-                onSubmit={() => setErrosOcultos(new Set())}
-              >
-                <input type="hidden" name="projeto" value={projetoSlug} />
-                {estado.erro && (
-                  <div role="alert">
-                    <Alert tone="danger" size="compact">
-                      {estado.erro}
-                    </Alert>
+                const focaveis = painel.current?.querySelectorAll<HTMLElement>(
+                  'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]',
+                );
+                if (!focaveis?.length) return;
+                const primeiro = focaveis[0];
+                const ultimo = focaveis[focaveis.length - 1];
+                if (evento.shiftKey && document.activeElement === primeiro) {
+                  evento.preventDefault();
+                  ultimo?.focus();
+                } else if (!evento.shiftKey && document.activeElement === ultimo) {
+                  evento.preventDefault();
+                  primeiro?.focus();
+                }
+              }}
+            >
+              <div className={styles.painel}>
+                <header className={styles.topo}>
+                  <div>
+                    <p className={styles.sobretitulo}>Nova oportunidade</p>
+                    <h2 id="novo-lead-titulo">Adicionar oportunidade</h2>
+                    <p>
+                      Use este cadastro para uma empresa que você decidiu abordar. Os dados podem
+                      ser completados antes da primeira call.
+                    </p>
                   </div>
-                )}
+                  <button
+                    type="button"
+                    className={styles.fechar}
+                    onClick={fechar}
+                    aria-label="Fechar"
+                  >
+                    <X size={19} strokeWidth={1.8} aria-hidden="true" />
+                  </button>
+                </header>
 
-                <Input
-                  id="crm-empresa"
-                  name="empresa"
-                  label="Empresa"
-                  placeholder="Ex.: Clínica Aurora"
-                  autoComplete="organization"
-                  defaultValue={estado.campos?.empresa ?? ''}
-                  error={erroVisivel('empresa')}
-                  onChange={() => ocultarErro('empresa')}
-                  required
-                />
-                <Input
-                  id="crm-contato"
-                  name="contato"
-                  label="Contato principal"
-                  placeholder="Nome da pessoa"
-                  autoComplete="name"
-                  defaultValue={estado.campos?.contato ?? ''}
-                  error={erroVisivel('contato')}
-                  onChange={() => ocultarErro('contato')}
-                  required
-                />
-                <Input
-                  id="crm-email"
-                  name="email"
-                  type="email"
-                  label="E-mail"
-                  hint="Opcional. A pesquisa da empresa pode encontrar outros contatos."
-                  autoComplete="email"
-                  defaultValue={estado.campos?.email ?? ''}
-                  error={erroVisivel('email')}
-                  onChange={() => ocultarErro('email')}
-                />
-                <Input
-                  id="crm-titulo"
-                  name="titulo"
-                  label="Projeto que pode ser vendido"
-                  hint="Se ainda não souber, você poderá definir depois da pesquisa."
-                  placeholder="Ex.: SDR de atendimento e qualificação"
-                  defaultValue={estado.campos?.titulo ?? tituloInicial}
-                  error={erroVisivel('titulo')}
-                  onChange={() => ocultarErro('titulo')}
-                />
+                <form
+                  action={acao}
+                  className={styles.formulario}
+                  noValidate
+                  onSubmit={() => setErrosOcultos(new Set())}
+                >
+                  <input type="hidden" name="projeto" value={projetoSlug} />
+                  {estado.erro && (
+                    <div role="alert">
+                      <Alert tone="danger" size="compact">
+                        {estado.erro}
+                      </Alert>
+                    </div>
+                  )}
 
-                <div className={styles.acoes}>
-                  <Button type="button" variant="secondary" onClick={fechar}>
-                    Cancelar
-                  </Button>
-                  <BotaoAdicionar />
-                </div>
-              </form>
+                  <Input
+                    id="crm-empresa"
+                    name="empresa"
+                    label="Empresa"
+                    placeholder="Ex.: Clínica Aurora"
+                    autoComplete="organization"
+                    defaultValue={estado.campos?.empresa ?? ''}
+                    error={erroVisivel('empresa')}
+                    onChange={() => ocultarErro('empresa')}
+                    required
+                  />
+                  <Input
+                    id="crm-contato"
+                    name="contato"
+                    label="Contato principal"
+                    placeholder="Nome da pessoa"
+                    autoComplete="name"
+                    defaultValue={estado.campos?.contato ?? ''}
+                    error={erroVisivel('contato')}
+                    onChange={() => ocultarErro('contato')}
+                    required
+                  />
+                  <Input
+                    id="crm-email"
+                    name="email"
+                    type="email"
+                    label="E-mail"
+                    hint="Opcional. A pesquisa da empresa pode encontrar outros contatos."
+                    autoComplete="email"
+                    defaultValue={estado.campos?.email ?? ''}
+                    error={erroVisivel('email')}
+                    onChange={() => ocultarErro('email')}
+                  />
+                  <Input
+                    id="crm-titulo"
+                    name="titulo"
+                    label="Projeto que pode ser vendido"
+                    hint="Se ainda não souber, você poderá definir depois da pesquisa."
+                    placeholder="Ex.: SDR de atendimento e qualificação"
+                    defaultValue={estado.campos?.titulo ?? tituloInicial}
+                    error={erroVisivel('titulo')}
+                    onChange={() => ocultarErro('titulo')}
+                  />
+
+                  <div className={styles.acoes}>
+                    <Button type="button" variant="secondary" onClick={fechar}>
+                      Cancelar
+                    </Button>
+                    <BotaoAdicionar />
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

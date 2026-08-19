@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import { sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
-import { googleCalendarConfigurado } from '@/lib/google-calendar/oauth';
 import { TIPOS_CALL } from './tipos';
 
 const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
@@ -110,24 +109,21 @@ export async function agendarReuniao(
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
 
-  if (googleCalendarConfigurado()) {
-    if (!validacao.data.enviarConviteGoogle || !validacao.data.convidadoEmail) {
-      return {
-        campos,
-        erro: 'Conecte seu Google Calendar e informe o e-mail do cliente antes de agendar.',
-      };
-    }
-
-    const { data: calendar, error: erroCalendar } = await supabase
-      .from('google_calendar_conexoes')
-      .select('status')
-      .maybeSingle();
-    if (erroCalendar || calendar?.status !== 'ativa') {
-      return {
-        campos,
-        erro: 'Conecte seu Google Calendar antes de criar o primeiro agendamento.',
-      };
-    }
+  const { data: conexaoCalendar, error: erroCalendar } = await supabase
+    .from('google_calendar_conexoes')
+    .select('status')
+    .maybeSingle();
+  if (erroCalendar || conexaoCalendar?.status !== 'ativa') {
+    return {
+      campos,
+      erro: 'Conecte seu Google Calendar antes de criar o primeiro agendamento.',
+    };
+  }
+  if (!validacao.data.enviarConviteGoogle || !validacao.data.convidadoEmail) {
+    return {
+      campos,
+      erro: 'Informe o e-mail do cliente para criar o convite no Google Calendar.',
+    };
   }
 
   const quando = dataUtc(validacao.data.agendadaPara, validacao.data.offsetMinutos);
