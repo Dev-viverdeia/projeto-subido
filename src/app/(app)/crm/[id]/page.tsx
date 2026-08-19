@@ -5,12 +5,11 @@ import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
-import { JornadaEntradaLead, type EstadoContextoLead } from './_components/JornadaEntradaLead';
 import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Oportunidade · CRM' };
+export const metadata: Metadata = { title: 'Ficha do cliente · CRM' };
 
 export default async function OportunidadePage({ params, searchParams }: PageProps<'/crm/[id]'>) {
   const [{ id }, parametros] = await Promise.all([params, searchParams]);
@@ -31,14 +30,6 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
     typeof parametros.projeto === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(parametros.projeto)
       ? parametros.projeto.slice(0, 160)
       : null;
-  const estadoContexto: EstadoContextoLead = dossie
-    ? 'pronto'
-    : emAndamento
-      ? 'processando'
-      : falhaRecente
-        ? 'falhou'
-        : 'pendente';
-
   return (
     <div className={styles.pagina}>
       <Link href="/crm" className={styles.voltar}>
@@ -50,8 +41,14 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
         lead={lead}
         enriquecimentoEmAndamento={Boolean(emAndamento)}
         temDossie={Boolean(dossie)}
-        modoEntrada={entradaRecente}
+        projetoSlug={projetoDeOrigem}
       />
+
+      {entradaRecente && (
+        <p className={styles.avisoSucesso} role="status">
+          Oportunidade adicionada. A ficha do cliente já está pronta para você trabalhar.
+        </p>
+      )}
 
       {falhaNovoCiclo && (
         <p className={styles.avisoOperacao} role="alert">
@@ -60,29 +57,15 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
         </p>
       )}
 
-      {entradaRecente ? (
-        <JornadaEntradaLead
-          oportunidadeId={lead.oportunidade.id}
-          empresaNome={lead.empresa.nome}
-          dominio={lead.empresa.dominio}
-          linkedin={lead.contato?.linkedinUrl ?? null}
-          estadoContexto={estadoContexto}
-          totalCalls={lead.totalCalls}
-          projetoSlug={projetoDeOrigem}
-        />
-      ) : (
-        <ResumoOperacionalLead lead={lead} />
-      )}
+      <ResumoOperacionalLead lead={lead} />
 
-      {!entradaRecente && emAndamento && (
-        <EstadoEnriquecimento status={emAndamento.status} erro={null} />
-      )}
+      {emAndamento && <EstadoEnriquecimento status={emAndamento.status} erro={null} />}
 
-      {!entradaRecente && falhaRecente && (
+      {falhaRecente && (
         <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
       )}
 
-      {!entradaRecente && dossie && execucaoPronta && (
+      {dossie && execucaoPronta && (
         <PesquisaComercial lead={lead} execucao={execucaoPronta} dossie={dossie} />
       )}
     </div>

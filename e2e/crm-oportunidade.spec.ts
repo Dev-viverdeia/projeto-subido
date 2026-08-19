@@ -1,11 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Oportunidade do CRM', () => {
-  test('prioriza método, próxima ação e pesquisa sem perder o histórico', async ({ page }) => {
+test.describe('Ficha do cliente no CRM', () => {
+  test('mantém as ações disponíveis, orienta o próximo passo e preserva o histórico', async ({
+    page,
+  }) => {
     await page.goto('/preview/crm-dossie');
 
+    await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clínica Aurora' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Um passo por vez.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Venda guiada.' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Agendar call' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Atualizar enriquecimento' })).toBeVisible();
     await expect(page.getByText('Preparar', { exact: true })).toBeVisible();
     await expect(page.getByText('Descobrir', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Propor', { exact: true })).toBeVisible();
@@ -17,7 +23,7 @@ test.describe('Oportunidade do CRM', () => {
     await expect(page.getByRole('heading', { name: 'Atividade recente' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Calls' })).toBeVisible();
 
-    await page.getByRole('tab', { name: 'Preparar conversa' }).click();
+    await page.getByRole('tab', { name: 'Preparar call' }).click();
     await expect(
       page.getByText('Quantas conversas novas chegam pelo WhatsApp por dia?'),
     ).toBeVisible();
@@ -30,36 +36,35 @@ test.describe('Oportunidade do CRM', () => {
     expect(semOverflowHorizontal).toBe(true);
   });
 
-  test('a entrada de uma nova oportunidade explica a sequência e abre a pesquisa', async ({
+  test('a entrada de uma nova oportunidade abre a ficha sem bloquear as ações', async ({
     page,
   }) => {
     await page.goto('/preview/crm-dossie?entrada=1');
 
-    await expect(page.getByText('Oportunidade adicionada')).toBeVisible();
-    await expect(page.getByText('Oportunidade no pipeline')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Agendar primeira call' })).toHaveCount(0);
-    await page.getByRole('button', { name: 'Pesquisar empresa' }).click();
+    await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Oportunidade adicionada\. A ficha do cliente/)).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Agendar call' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
+    await page.getByRole('button', { name: 'Enriquecer oportunidade' }).click();
 
-    const dialogo = page.getByRole('dialog', { name: 'Pesquisar esta empresa' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer oportunidade' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText('Fatos e hipóteses aparecem separados.')).toBeVisible();
+    await expect(dialogo.getByText(/A IA combina o CRM, as calls, o site/)).toBeVisible();
     await dialogo.getByRole('button', { name: 'Cancelar' }).click();
     await expect(dialogo).toBeHidden();
   });
 
-  test('mantém a pesquisa no viewport e mostra uma única ação principal', async ({ page }) => {
+  test('mantém o enriquecimento no viewport sem esconder as outras ações', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/preview/crm-dossie?pesquisa=pendente');
 
-    await expect(
-      page.getByText('Pesquise a empresa antes de agendar a primeira conversa.'),
-    ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Agendar call' })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Criar proposta' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Agendar call' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Enriquecer oportunidade' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Pesquisar empresa' }).click();
+    await page.getByRole('button', { name: 'Enriquecer oportunidade' }).click();
     const scrim = page.getByTestId('enriquecimento-scrim');
-    const dialogo = page.getByRole('dialog', { name: 'Pesquisar esta empresa' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer oportunidade' });
     await expect(scrim).toBeVisible();
     await expect(dialogo).toBeVisible();
 
@@ -74,7 +79,7 @@ test.describe('Oportunidade do CRM', () => {
     });
     expect(geometria).toEqual({ top: 0, left: 0, width: 1280, height: 720 });
 
-    await dialogo.getByRole('button', { name: 'Começar pesquisa' }).scrollIntoViewIfNeeded();
-    await expect(dialogo.getByRole('button', { name: 'Começar pesquisa' })).toBeVisible();
+    await dialogo.getByRole('button', { name: 'Iniciar enriquecimento' }).scrollIntoViewIfNeeded();
+    await expect(dialogo.getByRole('button', { name: 'Iniciar enriquecimento' })).toBeVisible();
   });
 });

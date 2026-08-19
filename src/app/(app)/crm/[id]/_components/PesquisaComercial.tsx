@@ -23,8 +23,8 @@ import styles from './PesquisaComercial.module.css';
 type AbaPesquisa = 'leitura' | 'conversa' | 'fontes';
 
 const ABAS: ReadonlyArray<{ id: AbaPesquisa; rotulo: string }> = [
-  { id: 'leitura', rotulo: 'Leitura comercial' },
-  { id: 'conversa', rotulo: 'Preparar conversa' },
+  { id: 'leitura', rotulo: 'Visão geral' },
+  { id: 'conversa', rotulo: 'Preparar call' },
   { id: 'fontes', rotulo: 'Dados e fontes' },
 ];
 
@@ -153,7 +153,7 @@ function DadosEFontes({
       <section className={styles.painelLeitura} aria-labelledby="empresa-titulo">
         <header>
           <div>
-            <p>Ficha rápida</p>
+            <p>Dados cadastrais</p>
             <h3 id="empresa-titulo">Empresa e contato</h3>
           </div>
           <Building2 size={18} strokeWidth={1.7} aria-hidden="true" />
@@ -278,17 +278,17 @@ export function PesquisaComercial({
             <FileSearch size={20} strokeWidth={1.7} aria-hidden="true" />
           </span>
           <div>
-            <p>Pesquisa comercial</p>
+            <p>Ficha enriquecida</p>
             <h2 id="pesquisa-comercial-titulo">{dossie.resumo}</h2>
             <small>
-              Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)} · fatos e
+              Enriquecida em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)} · fatos e
               hipóteses aparecem separados.
             </small>
           </div>
         </div>
 
         <aside className={styles.proximaAcao} aria-labelledby="acao-recomendada-titulo">
-          <p>Próximo movimento recomendado</p>
+          <p>Sugestão da análise</p>
           <h3 id="acao-recomendada-titulo">{dossie.proximaAcao.acao}</h3>
           <span>{dossie.proximaAcao.porque}</span>
           <BotaoProximaAcao
@@ -300,7 +300,7 @@ export function PesquisaComercial({
       </div>
 
       <div className={styles.conteudoPesquisa}>
-        <div className={styles.abas} role="tablist" aria-label="Conteúdo da pesquisa comercial">
+        <div className={styles.abas} role="tablist" aria-label="Dados enriquecidos da ficha">
           {ABAS.map((item) => (
             <button
               type="button"

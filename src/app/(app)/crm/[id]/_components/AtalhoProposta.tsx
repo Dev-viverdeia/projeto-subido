@@ -6,9 +6,11 @@ import styles from './CabecalhoDossie.module.css';
 export function AtalhoProposta({
   lead,
   destaque = true,
+  projetoSlug = null,
 }: {
   lead: DossieLead;
   destaque?: boolean;
+  projetoSlug?: string | null;
 }) {
   const projeto = lead.projetoAtivo ?? lead.projetoRecente;
   const classeAcao = destaque ? styles.acaoPrimaria : styles.acaoSecundaria;
@@ -39,8 +41,11 @@ export function AtalhoProposta({
     );
   }
 
+  const parametros = new URLSearchParams({ oportunidade: lead.oportunidade.id });
+  if (projetoSlug) parametros.set('projeto', projetoSlug);
+
   return (
-    <Link href={`/propostas/nova?oportunidade=${lead.oportunidade.id}`} className={classeAcao}>
+    <Link href={`/propostas/nova?${parametros.toString()}`} className={classeAcao}>
       <FileSignature size={16} strokeWidth={1.8} aria-hidden="true" />
       {lead.propostaRecente ? 'Nova proposta' : 'Criar proposta'}
     </Link>

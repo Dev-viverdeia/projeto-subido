@@ -17,6 +17,40 @@
     transform var(--app-t-state);
 }
 
+.gatilho[data-tom='secundario'] {
+  border-color: var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  color: var(--via-text-body);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(12px) saturate(130%);
+}
+
+.gatilho[data-tom='secundario']:hover:not(:disabled) {
+  border-color: var(--via-navy-20);
+  box-shadow: var(--app-elev-2-shadow);
+  transform: translateY(-1px);
+}
+
+.gatilho[data-tom='secundario']:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.gatilho:disabled {
+  cursor: wait;
+  opacity: 0.66;
+}
+
+.iconeGirando {
+  animation: girar 900ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .gatilhoClaro {
   border: 1px solid color-mix(in srgb, var(--via-white) 24%, transparent);
   background: var(--via-white);
@@ -60,9 +94,11 @@
 }
 
 .dialogo {
+  display: grid;
   width: min(650px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
-  overflow: auto;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
   background: var(--via-glass-card);
@@ -147,8 +183,18 @@
 
 .formulario {
   display: grid;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.campos {
+  display: grid;
+  min-height: 0;
   gap: var(--via-space-4);
   padding: var(--via-space-6);
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .campoTexto {
@@ -181,7 +227,7 @@
 }
 
 .campoTexto small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-regular);
 }
@@ -190,7 +236,10 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--via-space-3);
-  padding-top: var(--via-space-2);
+  padding: var(--via-space-4) var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-glass-card) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(135%);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -201,11 +250,15 @@
   .dialogo {
     background: var(--via-surface-elev);
   }
+
+  .gatilho[data-tom='secundario'] {
+    background: var(--via-surface);
+  }
 }
 
 @media (max-width: 560px) {
   .topo,
-  .formulario {
+  .campos {
     padding: var(--via-space-5) var(--via-space-4);
   }
 
@@ -227,5 +280,12 @@
   .acoes {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    padding: var(--via-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconeGirando {
+    animation: none;
   }
 }

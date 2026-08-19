@@ -38,9 +38,9 @@ export function EstadoEnriquecimento({
           <ScanSearch size={21} strokeWidth={1.7} aria-hidden="true" />
         </span>
         <div>
-          <p className={styles.sobretitulo}>Pesquisa interrompida</p>
-          <h2 id="pesquisa-falhou-titulo">Não conseguimos concluir desta vez.</h2>
-          <p>{erro ?? 'Revise o site informado e tente novamente.'}</p>
+          <p className={styles.sobretitulo}>Enriquecimento interrompido</p>
+          <h2 id="pesquisa-falhou-titulo">Não foi possível atualizar a ficha.</h2>
+          <p>{erro ?? 'Revise o site informado e inicie o enriquecimento novamente.'}</p>
         </div>
         {acao && <div className={styles.acaoFalha}>{acao}</div>}
       </section>
@@ -50,36 +50,34 @@ export function EstadoEnriquecimento({
   if (!ativo) return null;
 
   return (
-    <section className={styles.estado} aria-live="polite" aria-label="Pesquisa em andamento">
+    <section className={styles.estado} aria-live="polite" aria-label="Enriquecimento em andamento">
       <div className={styles.cabecalho}>
         <div>
-          <p className={styles.sobretitulo}>Pesquisa comercial em andamento</p>
-          <h2>
-            {status === 'na_fila' ? 'Preparando as fontes' : 'Montando seu briefing de venda'}
-          </h2>
+          <p className={styles.sobretitulo}>Enriquecimento em andamento</p>
+          <h2>{status === 'na_fila' ? 'Preparando os dados' : 'Atualizando a ficha do cliente'}</h2>
           <p>
-            Você pode continuar usando a plataforma. Esta página se atualiza quando tudo estiver
-            pronto.
+            Você pode continuar trabalhando. Esta página será atualizada quando os novos dados
+            estiverem prontos.
           </p>
         </div>
         <span className={styles.pulso} aria-hidden="true" />
       </div>
 
-      <ol className={styles.mapa} aria-label="Etapas da pesquisa">
+      <ol className={styles.mapa} aria-label="Etapas do enriquecimento">
         <li data-estado="concluida">
           <span>
             <Check size={14} aria-hidden="true" />
           </span>
           <div>
-            <strong>Organizar contexto</strong>
-            <small>CRM e histórico</small>
+            <strong>Reunir histórico</strong>
+            <small>CRM, calls e atividades</small>
           </div>
           <Database size={16} aria-hidden="true" />
         </li>
         <li data-estado={status === 'processando' ? 'concluida' : 'atual'}>
           <span>{status === 'processando' ? <Check size={14} aria-hidden="true" /> : '02'}</span>
           <div>
-            <strong>Ler fontes</strong>
+            <strong>Consultar fontes</strong>
             <small>Site e dados públicos</small>
           </div>
           <Globe2 size={16} aria-hidden="true" />
@@ -87,8 +85,8 @@ export function EstadoEnriquecimento({
         <li data-estado={status === 'processando' ? 'atual' : 'futura'}>
           <span>03</span>
           <div>
-            <strong>Preparar briefing</strong>
-            <small>Fatos, perguntas e ação</small>
+            <strong>Organizar a ficha</strong>
+            <small>Fatos, hipóteses e perguntas</small>
           </div>
           <Layers3 size={16} aria-hidden="true" />
         </li>

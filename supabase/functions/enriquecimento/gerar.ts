@@ -9,8 +9,8 @@ import { lerPaginaPublica, normalizarSite, type PaginaPublica } from './site.ts'
 const MODELO_ANTHROPIC = 'claude-sonnet-5';
 const MODELO_OPENAI = 'gpt-5-mini';
 
-const INSTRUCOES_DOSSIE = `Você é o analista de pré-venda da plataforma Subido. Produza um dossiê
-operacional para um prestador de serviços de IA preparar a próxima conversa.
+const INSTRUCOES_DOSSIE = `Você é o analista de pré-venda da plataforma Subido. Enriqueça a ficha
+do cliente para um prestador de serviços de IA preparar a próxima conversa.
 
 REGRAS INEGOCIÁVEIS
 · Fato e hipótese são categorias diferentes. Um dado só entra em "fatos" se
@@ -22,7 +22,7 @@ REGRAS INEGOCIÁVEIS
 · Em cada hipótese, diga exatamente como confirmá-la na call.
 · Recomende oportunidades de IA específicas para o caso, com mecanismo e impacto;
   nunca prometa resultado e nunca escreva marketing genérico.
-· A abertura é uma frase natural que o profissional pode dizer ao lead. Não use
+· A abertura é uma frase natural que o profissional pode dizer ao contato. Não use
   bajulação, urgência artificial ou afirmação não confirmada.
 · A próxima ação deve ser executável e caber em uma frase.
 · Se uma fonte pública falhou ou há pouco contexto, coloque isso em "alertas".
@@ -310,7 +310,7 @@ function normalizarDossie(valor: unknown): Dossie {
       raiz.resumo,
       40,
       1000,
-      'Há pouco contexto confirmado sobre este lead; use a próxima conversa para completar o diagnóstico.',
+      'Há pouco contexto confirmado sobre este cliente; use a próxima conversa para completar a ficha.',
     ),
     empresa: {
       setor: textoOuNulo(empresa.setor, 160),
@@ -458,5 +458,5 @@ function mensagemSegura(erro: unknown): string {
       return `A contingência da análise respondeu com erro. [api_${erro.status ?? 'desconhecido'}]`;
     }
   }
-  return 'Não foi possível pesquisar este lead agora. Revise os dados e tente novamente.';
+  return 'Não foi possível enriquecer esta oportunidade agora. Revise os dados e tente novamente.';
 }

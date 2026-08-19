@@ -11,7 +11,6 @@ import {
   Video,
 } from 'lucide-react';
 import { CabecalhoDossie } from '@/app/(app)/crm/[id]/_components/CabecalhoDossie';
-import { JornadaEntradaLead } from '@/app/(app)/crm/[id]/_components/JornadaEntradaLead';
 import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
@@ -19,7 +18,7 @@ import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
 
-export const metadata: Metadata = { title: 'Preview · Oportunidade do CRM' };
+export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
 const LEAD_OPERACIONAL: DossieLead = {
   oportunidade: {
@@ -63,11 +62,11 @@ const LEAD_OPERACIONAL: DossieLead = {
   eventos: [
     {
       id: 'evento-2',
-      titulo: 'Pesquisa comercial atualizada',
+      titulo: 'Ficha do cliente enriquecida',
       descricao: 'Site público e histórico do CRM foram consultados novamente.',
       tipo: 'enriquecimento',
       ocorridoEm: '2026-08-08T18:10:00.000Z',
-      fonte: 'Pesquisa comercial',
+      fonte: 'Enriquecimento',
     },
     {
       id: 'evento-1',
@@ -291,25 +290,16 @@ export default async function PreviewDossiePage({
             lead={lead}
             enriquecimentoEmAndamento={false}
             temDossie={!entrada && !pesquisaPendente}
-            modoEntrada={entrada}
           />
 
-          {entrada ? (
-            <JornadaEntradaLead
-              oportunidadeId={lead.oportunidade.id}
-              empresaNome={lead.empresa.nome}
-              dominio={lead.empresa.dominio}
-              linkedin={lead.contato?.linkedinUrl ?? null}
-              estadoContexto="pendente"
-              totalCalls={0}
-            />
-          ) : (
-            <>
-              <ResumoOperacionalLead lead={lead} />
-              {!pesquisaPendente && (
-                <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
-              )}
-            </>
+          {entrada && (
+            <p className={pagina.avisoSucesso} role="status">
+              Oportunidade adicionada. A ficha do cliente já está pronta para você trabalhar.
+            </p>
+          )}
+          <ResumoOperacionalLead lead={lead} />
+          {!entrada && !pesquisaPendente && (
+            <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
           )}
         </div>
       </main>

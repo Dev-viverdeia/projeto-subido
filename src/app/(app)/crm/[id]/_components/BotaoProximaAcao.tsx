@@ -17,7 +17,7 @@ function BotaoSalvar({ salva }: { salva: boolean }) {
           <Check size={15} aria-hidden="true" /> Salva no pipeline
         </>
       ) : pending ? (
-        'Salvando próxima ação…'
+        'Salvando ação…'
       ) : (
         <>
           <ListChecks size={15} aria-hidden="true" /> Usar como próxima ação

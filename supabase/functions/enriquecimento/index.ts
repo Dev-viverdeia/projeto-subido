@@ -13,12 +13,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') return respostaJson({ erro: 'Método não suportado.' }, 405);
 
   const supabase = clienteDoChamador(req);
-  if (!supabase) return respostaJson({ erro: 'Faça login para enriquecer um lead.' }, 401);
+  if (!supabase) return respostaJson({ erro: 'Faça login para enriquecer uma oportunidade.' }, 401);
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return respostaJson({ erro: 'Faça login para enriquecer um lead.' }, 401);
+  if (!user) return respostaJson({ erro: 'Faça login para enriquecer uma oportunidade.' }, 401);
 
   let json: unknown;
   try {
@@ -70,7 +70,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (error) {
     console.error(`[enriquecimento:iniciar] ${error.code}: ${error.message}`);
     if (error.message.includes('enriquecimento_em_andamento')) {
-      return respostaJson({ erro: 'Este lead já está sendo analisado.' }, 409);
+      return respostaJson({ erro: 'Esta oportunidade já está sendo enriquecida.' }, 409);
     }
     if (error.message.includes('oportunidade_nao_encontrada')) {
       return respostaJson({ erro: 'Oportunidade não encontrada.' }, 404);

@@ -3,7 +3,15 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { Building2, ContactRound, Database, Globe2, Layers3, X } from 'lucide-react';
+import {
+  BrainCircuit,
+  ContactRound,
+  Database,
+  Globe2,
+  Layers3,
+  LoaderCircle,
+  X,
+} from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
@@ -11,8 +19,8 @@ import styles from './FormularioEnriquecimento.module.css';
 
 const ETAPAS_PESQUISA = [
   {
-    titulo: 'Preparando a pesquisa',
-    descricao: 'Estamos validando os dados informados e iniciando a busca nas fontes públicas.',
+    titulo: 'Preparando o enriquecimento',
+    descricao: 'Estamos validando os dados e conectando esta solicitação à ficha do cliente.',
   },
 ] as const;
 
@@ -28,6 +36,7 @@ export function FormularioEnriquecimento({
   rotulo,
   abertoInicial = false,
   tom = 'padrao',
+  desabilitado = false,
 }: {
   oportunidadeId: string;
   dominioInicial: string | null;
@@ -35,7 +44,8 @@ export function FormularioEnriquecimento({
   temDossie: boolean;
   rotulo?: string;
   abertoInicial?: boolean;
-  tom?: 'padrao' | 'claro' | 'transparente';
+  tom?: 'padrao' | 'claro' | 'transparente' | 'secundario';
+  desabilitado?: boolean;
 }) {
   const router = useRouter();
   const montado = useSyncExternalStore(
@@ -109,9 +119,9 @@ export function FormularioEnriquecimento({
       {enviando && (
         <EsperaOperacao
           aberto
-          rotulo="Pesquisa comercial"
-          titulo="Iniciando a pesquisa"
-          descricao="Estamos organizando o contexto desta oportunidade antes de consultar as fontes."
+          rotulo="Enriquecimento da oportunidade"
+          titulo="Preparando a ficha do cliente"
+          descricao="Estamos reunindo o CRM, as calls e os dados informados antes de consultar as fontes."
           etapas={ETAPAS_PESQUISA}
         />
       )}
@@ -121,13 +131,28 @@ export function FormularioEnriquecimento({
         className={
           tom === 'padrao'
             ? `via-btn ${temDossie ? 'via-btn--secondary' : 'via-btn--primary'} via-btn--md ${styles.gatilho}`
-            : `${styles.gatilho} ${tom === 'claro' ? styles.gatilhoClaro : styles.gatilhoTransparente}`
+            : tom === 'secundario'
+              ? `via-btn via-btn--secondary via-btn--md ${styles.gatilho}`
+              : `${styles.gatilho} ${tom === 'claro' ? styles.gatilhoClaro : styles.gatilhoTransparente}`
         }
+        data-tom={tom}
         onClick={() => setAberto(true)}
         aria-haspopup="dialog"
+        disabled={desabilitado}
       >
-        <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
-        {rotulo ?? (temDossie ? 'Atualizar pesquisa' : 'Pesquisar empresa')}
+        {desabilitado ? (
+          <LoaderCircle
+            className={styles.iconeGirando}
+            size={16}
+            strokeWidth={1.9}
+            aria-hidden="true"
+          />
+        ) : (
+          <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
+        )}
+        {desabilitado
+          ? 'Enriquecendo oportunidade'
+          : (rotulo ?? (temDossie ? 'Atualizar enriquecimento' : 'Enriquecer oportunidade'))}
       </button>
 
       {montado &&
@@ -167,11 +192,11 @@ export function FormularioEnriquecimento({
             >
               <header className={styles.topo}>
                 <div>
-                  <p className={styles.sobretitulo}>Pesquisa comercial</p>
-                  <h2 id={tituloId}>Pesquisar esta empresa</h2>
+                  <p className={styles.sobretitulo}>Enriquecimento da ficha</p>
+                  <h2 id={tituloId}>Enriquecer oportunidade</h2>
                   <p id={descricaoId}>
-                    Juntamos o que já está no CRM com fontes públicas para preparar sua próxima
-                    conversa. Fatos e hipóteses aparecem separados.
+                    A IA combina o CRM, as calls, o site e as informações que você adicionar. A
+                    ficha ganha fatos, hipóteses e perguntas para a próxima call.
                   </p>
                 </div>
                 <button
@@ -184,66 +209,68 @@ export function FormularioEnriquecimento({
                 </button>
               </header>
 
-              <div className={styles.fontes} aria-label="Fontes usadas na análise">
+              <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
                 <span>
                   <Database size={15} aria-hidden="true" /> CRM e calls
                 </span>
                 <span>
-                  <Globe2 size={15} aria-hidden="true" /> Site público
+                  <Globe2 size={15} aria-hidden="true" /> Site e fontes públicas
                 </span>
                 <span>
-                  <Building2 size={15} aria-hidden="true" /> Suas informações
+                  <BrainCircuit size={15} aria-hidden="true" /> IA organiza a ficha
                 </span>
               </div>
 
               <form className={styles.formulario} onSubmit={(evento) => void enviar(evento)}>
-                {erro && (
-                  <Alert tone="danger" size="compact">
-                    {erro}
-                  </Alert>
-                )}
+                <div className={styles.campos}>
+                  {erro && (
+                    <Alert tone="danger" size="compact">
+                      {erro}
+                    </Alert>
+                  )}
 
-                <Input
-                  id="enriquecimento-dominio"
-                  name="dominio"
-                  label="Site da empresa"
-                  placeholder="empresa.com.br"
-                  defaultValue={dominioInicial ?? ''}
-                  hint="Usamos apenas conteúdo público do site."
-                  inputMode="url"
-                />
-
-                <Input
-                  id="enriquecimento-linkedin"
-                  name="linkedin"
-                  label="LinkedIn do contato"
-                  placeholder="https://www.linkedin.com/in/..."
-                  defaultValue={linkedinInicial ?? ''}
-                  hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
-                  iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
-                  inputMode="url"
-                />
-
-                <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
-                  <span>Contexto que você já tem</span>
-                  <textarea
-                    id="enriquecimento-contexto"
-                    name="contexto"
-                    rows={5}
-                    maxLength={4000}
-                    placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
+                  <Input
+                    id="enriquecimento-dominio"
+                    name="dominio"
+                    label="Site da empresa"
+                    placeholder="empresa.com.br"
+                    defaultValue={dominioInicial ?? ''}
+                    hint="Usamos apenas conteúdo público do site."
+                    inputMode="url"
                   />
-                  <small>
-                    Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
-                  </small>
-                </label>
+
+                  <Input
+                    id="enriquecimento-linkedin"
+                    name="linkedin"
+                    label="LinkedIn do contato"
+                    placeholder="https://www.linkedin.com/in/..."
+                    defaultValue={linkedinInicial ?? ''}
+                    hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
+                    iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
+                    inputMode="url"
+                  />
+
+                  <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
+                    <span>Contexto que você já tem</span>
+                    <textarea
+                      id="enriquecimento-contexto"
+                      name="contexto"
+                      rows={5}
+                      maxLength={4000}
+                      placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
+                    />
+                    <small>
+                      Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
+                    </small>
+                  </label>
+                </div>
 
                 <div className={styles.acoes}>
                   <Button type="button" variant="secondary" onClick={fechar} disabled={enviando}>
                     Cancelar
                   </Button>
                   <Button type="submit" variant="primary" loading={enviando}>
-                    Começar pesquisa
+                    Iniciar enriquecimento
                   </Button>
                 </div>
               </form>
