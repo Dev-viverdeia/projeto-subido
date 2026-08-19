@@ -16,10 +16,12 @@ export function FormularioBusca({
   saldo,
   pronto,
   valoresIniciais,
+  autoFoco = false,
 }: {
   saldo: number;
   pronto: boolean;
   valoresIniciais?: ValoresIniciais;
+  autoFoco?: boolean;
 }) {
   const inicial = valoresIniciais
     ? {
@@ -85,6 +87,7 @@ export function FormularioBusca({
               defaultValue={estado.campos?.segmento ?? ''}
               error={estado.porCampo?.segmento}
               autoComplete="off"
+              autoFocus={autoFoco}
               required
             />
             <Input

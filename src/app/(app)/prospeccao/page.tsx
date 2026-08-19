@@ -79,6 +79,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
         }
         saldo={saldo}
         pronto={integracoes.pronto}
+        autoFoco={Boolean(valoresRetomados)}
         valoresIniciais={
           parametros.busca === 'falhou' && listaAtual
             ? {
