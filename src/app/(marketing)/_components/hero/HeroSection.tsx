@@ -46,6 +46,10 @@ export function HeroSection() {
 
         <div className={styles.grid}>
           <div className={styles.copy}>
+            <p className={`${styles.eyebrow} rise rise--now`} style={{ ['--rise-i' as string]: 1 }}>
+              {HERO.eyebrow}
+            </p>
+
             {/* Linhas autorais: nós escolhemos a quebra. Dois tons SÓLIDOS fazem a
                 hierarquia — nunca opacidade, nunca peso. */}
             <MaskReveal
@@ -53,21 +57,21 @@ export function HeroSection() {
               id="hero-title"
               className={`t-hero ${styles.title}`}
               trigger="now"
-              offset={1}
+              offset={2}
               lines={HERO.titleLines}
               toneClass={{ strong: styles.strong, soft: styles.soft }}
             />
 
             <p
               className={`t-lead ${styles.sub} rise rise--now`}
-              style={{ ['--rise-i' as string]: 5 }}
+              style={{ ['--rise-i' as string]: 6 }}
             >
               {HERO.sub}
             </p>
 
             <div
               className={`${styles.actions} rise rise--now`}
-              style={{ ['--rise-i' as string]: 6 }}
+              style={{ ['--rise-i' as string]: 7 }}
             >
               <TrackedCta href={HERO.ctaPrimary.href} local="hero" className={styles.ctaPrimary}>
                 {HERO.ctaPrimary.label}
@@ -83,7 +87,7 @@ export function HeroSection() {
 
             {/* O separador vem DEPOIS do item, não antes: quando a linha quebra, ela
                 começa com o rótulo em vez de com um "/" órfão. */}
-            <p className={`${styles.trust} rise rise--now`} style={{ ['--rise-i' as string]: 7 }}>
+            <p className={`${styles.trust} rise rise--now`} style={{ ['--rise-i' as string]: 8 }}>
               {HERO.trust.map((item, i) => (
                 <span key={item}>
                   {item}

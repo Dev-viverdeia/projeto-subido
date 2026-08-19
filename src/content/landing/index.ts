@@ -30,7 +30,7 @@ import type { FaqItem, Pillar, Plan, StatGroup, Testimonial } from './types';
 export const CONTEUDO_DEMO = true;
 
 export const HERO = {
-  eyebrow: 'Comunidade Subido de Tráfego',
+  eyebrow: 'Subido · plataforma para profissionais de IA',
   scrollHint: 'Role para ver',
   /** Linhas AUTORAIS: a quebra é decisão de composição, não acaso de largura — e é o
    *  que torna o mask reveal determinístico. Dois tons sólidos fazem a hierarquia.
@@ -44,7 +44,7 @@ export const HERO = {
     { text: 'Falta quem saiba', tone: 'soft' as const },
     { text: 'implementar.', tone: 'soft' as const },
   ],
-  sub: 'A assinatura que forma implementadores de IA: soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou.',
+  sub: 'Subido é a plataforma que ajuda profissionais a prospectar empresas, vender e entregar projetos de IA. Reúne formação, projetos guiados, CRM, calls, propostas e acompanhamento em um só lugar.',
   ctaPrimary: { label: 'Entrar na assinatura', href: '#planos' },
   ctaSecondary: { label: 'Ver como funciona', href: '#pilares' },
   trust: ['Pagamento seguro', '7 dias de garantia', 'Acesso imediato'],

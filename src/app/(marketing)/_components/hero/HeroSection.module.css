@@ -210,6 +210,16 @@
   min-width: 0;
 }
 
+.eyebrow {
+  margin: 0 0 calc(var(--via-space-4) * -1);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-caption);
+  text-transform: uppercase;
+  color: var(--via-gray-300);
+}
+
 /* --- Figura: o retrato recortado ------------------------------------------------ */
 .figure {
   position: relative;

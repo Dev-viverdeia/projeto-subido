@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s · Subido',
   },
   description:
-    'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou. Da Comunidade Subido de Tráfego.',
+    'Subido é a plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, CRM, calls e propostas em um só lugar.',
   applicationName: 'Subido',
   robots: { index: true, follow: true },
   /**
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     url: '/',
     title: 'Subido — a assinatura para virar implementador de IA',
     description:
-      'Soluções prontas com passo a passo, formações completas, um gerador que monta o projeto a partir da sua ideia e mentoria com quem já entregou.',
+      'Plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, CRM, calls e propostas.',
   },
   twitter: { card: 'summary_large_image' },
 };

@@ -15,42 +15,71 @@ export default function Page() {
       </Link>
       <h1>Termos de uso</h1>
 
-      <p className="todo">
-        TODO(legal) — este documento precisa ser redigido e revisado por advogado antes de qualquer
-        veiculação paga. O esqueleto abaixo lista os pontos que um contrato de assinatura digital no
-        Brasil precisa cobrir; o texto em si não é conteúdo jurídico e não deve ser publicado como
-        está.
+      <p>Última atualização: 19 de agosto de 2026.</p>
+
+      <p>
+        Estes termos regulam o uso da Subido, plataforma criada para ajudar profissionais a
+        prospectar empresas, vender e entregar projetos de inteligência artificial. Ao criar uma
+        conta ou usar a plataforma, você declara que leu e concordou com estes termos.
       </p>
 
       <h2>1. Objeto</h2>
-      <p>O que a assinatura dá acesso, e o que ela explicitamente não inclui.</p>
+      <p>
+        A Subido reúne formação, projetos guiados, prospecção, CRM, calls, propostas, mentoria e
+        ferramentas de apoio. A disponibilidade de cada recurso pode variar conforme o acesso da
+        conta. A plataforma não garante clientes, vendas, faturamento ou resultados específicos.
+      </p>
 
       <h2>2. Cadastro e conta</h2>
-      <p>Requisitos, veracidade dos dados, responsabilidade pelas credenciais e uso individual.</p>
-
-      <h2>3. Pagamento, renovação e reajuste</h2>
-      <p>Meios aceitos, ciclo de cobrança, renovação automática e regra de reajuste.</p>
-
-      <h2>4. Cancelamento e arrependimento</h2>
       <p>
-        Direito de arrependimento em 7 dias (CDC art. 49) e cancelamento a qualquer tempo com efeito
-        ao fim do ciclo. Ver a <Link href="/reembolso">política de reembolso</Link>.
+        Você deve fornecer informações verdadeiras, manter seus dados atualizados e proteger suas
+        credenciais. A conta é pessoal e não pode ser compartilhada. Você é responsável pelas ações
+        realizadas na sua conta e deve comunicar imediatamente qualquer acesso indevido.
+      </p>
+
+      <h2>3. Uso da plataforma e dados de terceiros</h2>
+      <p>
+        Ao cadastrar leads, contatos, gravações, transcrições ou arquivos, você declara possuir base
+        legal e autorização para esse tratamento. É proibido usar a Subido para spam, fraude,
+        discriminação, violação de privacidade, atividade ilícita ou tentativa de acesso não
+        autorizado.
+      </p>
+
+      <h2>4. Integrações externas</h2>
+      <p>
+        Integrações, como o Google Calendar, são opcionais e dependem da autorização do titular da
+        conta externa. Você pode desconectá-las quando quiser. Serviços de terceiros também possuem
+        termos próprios e podem alterar disponibilidade ou funcionamento sem controle da Subido.
       </p>
 
       <h2>5. Propriedade intelectual</h2>
-      <p>Titularidade do conteúdo, licença de uso pessoal e vedação a redistribuição.</p>
-
-      <h2>6. Conduta e suspensão</h2>
-      <p>Compartilhamento de acesso, uso indevido e hipóteses de suspensão.</p>
-
-      <h2>7. Limitação de responsabilidade</h2>
       <p>
-        Em especial: a assinatura entrega formação, ferramentas, mentoria e vitrine — não promete
-        vaga, contrato nem faturamento.
+        A marca, o software, as formações, os templates e os materiais da Subido são protegidos. O
+        acesso concede licença limitada, revogável e não transferível para uso profissional próprio.
+        Não é permitido copiar, revender, publicar ou redistribuir conteúdo sem autorização.
       </p>
 
-      <h2>8. Foro e contato</h2>
-      <p>Foro eleito e canal oficial de atendimento.</p>
+      <h2>6. Conduta e suspensão</h2>
+      <p>
+        Podemos limitar ou suspender acesso em caso de risco de segurança, violação destes termos,
+        inadimplência ou uso que prejudique terceiros ou a operação. Sempre que possível, você será
+        informado e terá oportunidade de corrigir o problema.
+      </p>
+
+      <h2>7. Conteúdo gerado por IA</h2>
+      <p>
+        Sugestões, análises, propostas e outros conteúdos gerados por inteligência artificial podem
+        conter erros. Você deve revisar informações, fontes, valores, compromissos e decisões antes
+        de apresentá-los a clientes ou colocá-los em produção.
+      </p>
+
+      <h2>8. Privacidade, cancelamento e contato</h2>
+      <p>
+        O tratamento de dados segue a <Link href="/privacidade">Política de privacidade</Link>. As
+        regras de arrependimento e reembolso estão na{' '}
+        <Link href="/reembolso">Política de reembolso</Link>. Para dúvidas ou solicitações, escreva
+        para <a href="mailto:rafaelmilagre@gmail.com">rafaelmilagre@gmail.com</a>.
+      </p>
     </>
   );
 }
