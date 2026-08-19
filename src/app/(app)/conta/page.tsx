@@ -97,6 +97,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
         </div>
       )}
 
+      <IntegracaoGoogleCalendar calendar={calendar} />
+
       <section className={styles.perfil} aria-labelledby="nome-profissional">
         <div className={styles.identidade}>
           <span className={styles.avatar} aria-hidden="true">
@@ -142,8 +144,6 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       </section>
 
       <div className={styles.grade}>
-        <IntegracaoGoogleCalendar calendar={calendar} />
-
         <section className={styles.cartao} aria-labelledby="identidade-profissional">
           <header className={styles.cabecalhoCartao}>
             <span aria-hidden="true">
