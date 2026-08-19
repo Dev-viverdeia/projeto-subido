@@ -3,13 +3,8 @@ import { z } from 'npm:zod@4.4.3';
 export const PedidoEnriquecimento = z
   .object({
     oportunidade_id: z.uuid(),
-    dominio: z.string().trim().max(253).optional(),
-    linkedin_url: z.string().trim().max(500).optional(),
-    contexto: z.string().trim().max(4000).optional(),
   })
-  .refine((valor) => Boolean(valor.dominio || valor.contexto), {
-    message: 'Informe o site da empresa ou algum contexto para a análise.',
-  });
+  .strict();
 
 const TextoCurto = z.string().trim().min(1).max(500);
 

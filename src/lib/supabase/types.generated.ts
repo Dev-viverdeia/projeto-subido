@@ -2162,6 +2162,7 @@ export type Database = {
           criado_em: string
           descricao: string
           dono: string
+          enriquecimento_id: string | null
           id: string
           lista_id: string | null
           movimento: number
@@ -2172,6 +2173,7 @@ export type Database = {
           criado_em?: string
           descricao: string
           dono: string
+          enriquecimento_id?: string | null
           id?: string
           lista_id?: string | null
           movimento: number
@@ -2182,6 +2184,7 @@ export type Database = {
           criado_em?: string
           descricao?: string
           dono?: string
+          enriquecimento_id?: string | null
           id?: string
           lista_id?: string | null
           movimento?: number
@@ -2189,6 +2192,13 @@ export type Database = {
           tipo?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "prospeccao_movimentos_enriquecimento_fk"
+            columns: ["dono", "enriquecimento_id"]
+            isOneToOne: false
+            referencedRelation: "crm_enriquecimentos"
+            referencedColumns: ["dono", "id"]
+          },
           {
             foreignKeyName: "prospeccao_movimentos_lista_fk"
             columns: ["dono", "lista_id"]
@@ -2556,12 +2566,7 @@ export type Database = {
         Returns: string
       }
       crm_iniciar_enriquecimento: {
-        Args: {
-          p_contexto?: string
-          p_dominio?: string
-          p_linkedin_url?: string
-          p_oportunidade: string
-        }
+        Args: { p_oportunidade: string }
         Returns: string
       }
       crm_iniciar_novo_ciclo: {

@@ -47,9 +47,11 @@ test.describe('Ficha do cliente no CRM', () => {
     await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
     await page.getByRole('button', { name: 'Enriquecer oportunidade' }).click();
 
-    const dialogo = page.getByRole('dialog', { name: 'Enriquecer oportunidade' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText(/A IA combina o CRM, as calls, o site/)).toBeVisible();
+    await expect(dialogo.getByText(/usa tudo que já está salvo na ficha/)).toBeVisible();
+    await expect(dialogo.getByText('3 créditos', { exact: true })).toBeVisible();
+    await expect(dialogo.getByText('17')).toBeVisible();
     await dialogo.getByRole('button', { name: 'Cancelar' }).click();
     await expect(dialogo).toBeHidden();
   });
@@ -64,7 +66,7 @@ test.describe('Ficha do cliente no CRM', () => {
 
     await page.getByRole('button', { name: 'Enriquecer oportunidade' }).click();
     const scrim = page.getByTestId('enriquecimento-scrim');
-    const dialogo = page.getByRole('dialog', { name: 'Enriquecer oportunidade' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
     await expect(scrim).toBeVisible();
     await expect(dialogo).toBeVisible();
 
@@ -79,7 +81,9 @@ test.describe('Ficha do cliente no CRM', () => {
     });
     expect(geometria).toEqual({ top: 0, left: 0, width: 1280, height: 720 });
 
-    await dialogo.getByRole('button', { name: 'Iniciar enriquecimento' }).scrollIntoViewIfNeeded();
-    await expect(dialogo.getByRole('button', { name: 'Iniciar enriquecimento' })).toBeVisible();
+    await dialogo
+      .getByRole('button', { name: 'Confirmar por 3 créditos' })
+      .scrollIntoViewIfNeeded();
+    await expect(dialogo.getByRole('button', { name: 'Confirmar por 3 créditos' })).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 
@@ -14,7 +14,12 @@ vi.mock('@/lib/crm/invocar-enriquecimento', () => ({
 }));
 
 describe('FormularioEnriquecimento', () => {
-  it('exige uma fonte, envia o site e atualiza a pesquisa', async () => {
+  beforeEach(() => {
+    atualizar.mockReset();
+    vi.mocked(iniciarEnriquecimento).mockReset();
+  });
+
+  it('confirma o custo e envia somente a oportunidade', async () => {
     vi.mocked(iniciarEnriquecimento).mockResolvedValue({
       dados: { id: '11111111-1111-4111-8111-111111111111', status: 'na_fila' },
       falha: null,
@@ -23,8 +28,7 @@ describe('FormularioEnriquecimento', () => {
     render(
       <FormularioEnriquecimento
         oportunidadeId="22222222-2222-4222-8222-222222222222"
-        dominioInicial={null}
-        linkedinInicial={null}
+        saldoCreditos={20}
         temDossie={false}
       />,
     );
@@ -32,27 +36,35 @@ describe('FormularioEnriquecimento', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Enriquecer oportunidade' }));
     expect(screen.getByTestId('enriquecimento-scrim').parentElement).toBe(document.body);
     expect(document.body).toHaveStyle({ overflow: 'hidden' });
-    const enviar = within(screen.getByRole('dialog')).getByRole('button', {
-      name: 'Iniciar enriquecimento',
-    });
-    fireEvent.click(enviar);
-    expect(
-      screen.getByText('Informe o site da empresa ou escreva o que você já sabe sobre ela.'),
-    ).toBeInTheDocument();
+    const dialogo = screen.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
+    expect(within(dialogo).getByText('3 créditos')).toBeInTheDocument();
+    expect(within(dialogo).getByText('17')).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText('Site da empresa'), {
-      target: { value: 'empresa.com.br' },
-    });
-    fireEvent.click(enviar);
+    fireEvent.click(within(dialogo).getByRole('button', { name: 'Confirmar por 3 créditos' }));
 
     await waitFor(() =>
       expect(iniciarEnriquecimento).toHaveBeenCalledWith({
         oportunidade_id: '22222222-2222-4222-8222-222222222222',
-        dominio: 'empresa.com.br',
-        linkedin_url: undefined,
-        contexto: undefined,
       }),
     );
     expect(atualizar).toHaveBeenCalled();
+  });
+
+  it('explica o saldo insuficiente e não inicia a operação', () => {
+    render(
+      <FormularioEnriquecimento
+        oportunidadeId="22222222-2222-4222-8222-222222222222"
+        saldoCreditos={2}
+        temDossie={false}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer oportunidade' }));
+    const dialogo = screen.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
+    expect(within(dialogo).getByText(/Seu saldo é de 2 créditos/)).toBeInTheDocument();
+    expect(
+      within(dialogo).getByRole('button', { name: 'Confirmar por 3 créditos' }),
+    ).toBeDisabled();
+    expect(iniciarEnriquecimento).not.toHaveBeenCalled();
   });
 });

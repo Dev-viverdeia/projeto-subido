@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Check, Database, Globe2, ScanSearch, Layers3 } from 'lucide-react';
+import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import styles from './EstadoEnriquecimento.module.css';
 
@@ -40,7 +41,10 @@ export function EstadoEnriquecimento({
         <div>
           <p className={styles.sobretitulo}>Enriquecimento interrompido</p>
           <h2 id="pesquisa-falhou-titulo">Não foi possível atualizar a ficha.</h2>
-          <p>{erro ?? 'Revise o site informado e inicie o enriquecimento novamente.'}</p>
+          <p>
+            {erro ?? 'O processamento não foi concluído.'} Os {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE}{' '}
+            créditos foram devolvidos automaticamente.
+          </p>
         </div>
         {acao && <div className={styles.acaoFalha}>{acao}</div>}
       </section>

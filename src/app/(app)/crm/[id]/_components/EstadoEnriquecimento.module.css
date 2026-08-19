@@ -123,7 +123,7 @@
 .mapa li[data-estado='atual'] {
   border-color: var(--via-navy-20);
   background: var(--via-navy);
-  color: var(--via-accent);
+  color: var(--via-gray-300);
   box-shadow: var(--app-elev-1-shadow);
 }
 
@@ -137,7 +137,7 @@
 }
 
 .mapa li[data-estado='atual'] small {
-  color: color-mix(in srgb, var(--via-white) 62%, transparent);
+  color: var(--via-gray-300);
 }
 
 .mapa li[data-estado='concluida'] > span {

@@ -259,6 +259,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     acoesPlano,
     projetosRecentes,
     propostaRecente,
+    carteira,
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
@@ -316,6 +317,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .order('atualizado_em', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    supabase.from('prospeccao_carteiras').select('saldo').maybeSingle(),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'crm:dossie-empresa');
@@ -328,6 +330,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   if (acoesPlano.error) throw handleError(acoesPlano.error, 'crm:dossie-plano');
   if (projetosRecentes.error) throw handleError(projetosRecentes.error, 'crm:dossie-projetos');
   if (propostaRecente.error) throw handleError(propostaRecente.error, 'crm:dossie-proposta');
+  if (carteira.error) throw handleError(carteira.error, 'crm:dossie-creditos');
 
   const empresaLinha = empresa.data;
   if (!empresaLinha) return null;
@@ -359,6 +362,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     projetosRecentes.data?.find((projeto) => projeto.status !== 'concluido') ?? null;
 
   return {
+    saldoCreditos: carteira.data?.saldo ?? 30,
     oportunidade: montarOportunidade(
       {
         ...linha,

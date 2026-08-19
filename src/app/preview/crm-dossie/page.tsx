@@ -21,6 +21,7 @@ import shell from '../mapa-jornada/preview.module.css';
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
 const LEAD_OPERACIONAL: DossieLead = {
+  saldoCreditos: 20,
   oportunidade: {
     id: '11111111-1111-4111-8111-111111111111',
     titulo: 'Automação do atendimento',

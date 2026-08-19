@@ -140,13 +140,13 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
   const { data: oportunidade, error } = await supabase
     .from('crm_oportunidades')
     .select(
-      'id, titulo, etapa, empresa_id, contato_principal_id, proxima_acao, proxima_acao_em, criado_em',
+      'id, titulo, etapa, origem, valor_centavos, empresa_id, contato_principal_id, proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda, criado_em, atualizado_em',
     )
     .eq('id', oportunidadeId)
     .single();
   if (error || !oportunidade) throw new Error('oportunidade_nao_encontrada');
 
-  const [empresa, contato, eventos, reunioes] = await Promise.all([
+  const [empresa, contato, eventos, reunioes, propostas] = await Promise.all([
     supabase
       .from('crm_empresas')
       .select('nome, dominio, setor, porte, cidade, estado, resumo')
@@ -171,12 +171,21 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
       .eq('oportunidade_id', oportunidadeId)
       .order('agendada_para', { ascending: false })
       .limit(12),
+    supabase
+      .from('propostas')
+      .select(
+        'titulo, status, apresentada_em, compartilhada_em, primeira_visualizacao_em, ultima_visualizacao_em, visualizacoes, aceita_em, recusada_em, decisao_comentario, atualizado_em',
+      )
+      .eq('oportunidade_id', oportunidadeId)
+      .order('atualizado_em', { ascending: false })
+      .limit(6),
   ]);
 
   if (empresa.error) throw empresa.error;
   if (contato.error) throw contato.error;
   if (eventos.error) throw eventos.error;
   if (reunioes.error) throw reunioes.error;
+  if (propostas.error) throw propostas.error;
 
   const ids = (reunioes.data ?? []).map((reuniao) => reuniao.id);
   const analises = ids.length
@@ -198,6 +207,7 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
     eventos: eventos.data ?? [],
     reunioes: reunioes.data ?? [],
     analisesDeCalls: analises.data ?? [],
+    propostas: propostas.data ?? [],
   };
 }
 

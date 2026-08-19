@@ -103,7 +103,7 @@
 
 .metodo li[data-estado='atual'] > span,
 .metodo li[data-estado='atual'] small {
-  color: color-mix(in srgb, var(--via-white) 66%, transparent);
+  color: var(--via-gray-300);
 }
 
 .metodo li[data-estado='atual'] strong {
@@ -148,11 +148,11 @@
   border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-white) 7%, transparent);
-  color: var(--via-accent);
+  color: var(--via-gray-300);
 }
 
 .decisaoTexto p {
-  color: color-mix(in srgb, var(--via-white) 55%, transparent);
+  color: var(--via-gray-400);
 }
 
 .decisao h3 {
@@ -168,7 +168,7 @@
 .decisao time {
   display: block;
   margin-top: var(--via-space-2);
-  color: color-mix(in srgb, var(--via-white) 62%, transparent);
+  color: var(--via-gray-300);
   font-size: var(--via-fs-xs);
 }
 
@@ -206,7 +206,7 @@
 
 .acaoPrimaria:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--via-accent) 30%, transparent);
+  box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
 }
 
 .novoCicloForm {

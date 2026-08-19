@@ -1,26 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  BrainCircuit,
-  ContactRound,
-  Database,
-  Globe2,
-  Layers3,
-  LoaderCircle,
-  X,
-} from 'lucide-react';
-import { Alert, Button, Input } from '@/design-system/via';
+import { BrainCircuit, Coins, Database, Globe2, Layers3, LoaderCircle, X } from 'lucide-react';
+import { Alert, Button } from '@/design-system/via';
+import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
 import styles from './FormularioEnriquecimento.module.css';
 
-const ETAPAS_PESQUISA = [
+const ETAPAS_CONFIRMACAO = [
   {
-    titulo: 'Preparando o enriquecimento',
-    descricao: 'Estamos validando os dados e conectando esta solicitação à ficha do cliente.',
+    titulo: 'Abrindo o enriquecimento',
+    descricao: 'Estamos reservando os créditos e conectando a análise à ficha deste cliente.',
   },
 ] as const;
 
@@ -30,8 +23,7 @@ const obterMontagemServidor = () => false;
 
 export function FormularioEnriquecimento({
   oportunidadeId,
-  dominioInicial,
-  linkedinInicial,
+  saldoCreditos,
   temDossie,
   rotulo,
   abertoInicial = false,
@@ -39,8 +31,7 @@ export function FormularioEnriquecimento({
   desabilitado = false,
 }: {
   oportunidadeId: string;
-  dominioInicial: string | null;
-  linkedinInicial: string | null;
+  saldoCreditos: number;
   temDossie: boolean;
   rotulo?: string;
   abertoInicial?: boolean;
@@ -60,13 +51,15 @@ export function FormularioEnriquecimento({
   const [aberto, setAberto] = useState(abertoInicial);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const saldoSuficiente = saldoCreditos >= CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
+  const saldoDepois = saldoCreditos - CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
 
   useEffect(() => {
     if (!montado || !aberto) return;
     const overflowAnterior = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const quadro = requestAnimationFrame(() =>
-      painel.current?.querySelector<HTMLElement>('input')?.focus(),
+      painel.current?.querySelector<HTMLElement>('button')?.focus(),
     );
     return () => {
       cancelAnimationFrame(quadro);
@@ -81,29 +74,11 @@ export function FormularioEnriquecimento({
     requestAnimationFrame(() => gatilho.current?.focus());
   }
 
-  async function enviar(evento: FormEvent<HTMLFormElement>) {
-    evento.preventDefault();
+  async function confirmar() {
+    if (!saldoSuficiente || enviando) return;
     setErro(null);
-    const dados = new FormData(evento.currentTarget);
-    const texto = (nome: string) => {
-      const valor = dados.get(nome);
-      return typeof valor === 'string' ? valor.trim() : '';
-    };
-    const dominio = texto('dominio');
-    const linkedin = texto('linkedin');
-    const contexto = texto('contexto');
-    if (!dominio && !contexto) {
-      setErro('Informe o site da empresa ou escreva o que você já sabe sobre ela.');
-      return;
-    }
-
     setEnviando(true);
-    const resposta = await iniciarEnriquecimento({
-      oportunidade_id: oportunidadeId,
-      dominio: dominio || undefined,
-      linkedin_url: linkedin || undefined,
-      contexto: contexto || undefined,
-    });
+    const resposta = await iniciarEnriquecimento({ oportunidade_id: oportunidadeId });
     setEnviando(false);
     if (resposta.falha) {
       setErro(resposta.falha);
@@ -119,10 +94,11 @@ export function FormularioEnriquecimento({
       {enviando && (
         <EsperaOperacao
           aberto
-          rotulo="Enriquecimento da oportunidade"
-          titulo="Preparando a ficha do cliente"
-          descricao="Estamos reunindo o CRM, as calls e os dados informados antes de consultar as fontes."
-          etapas={ETAPAS_PESQUISA}
+          rotulo="Enriquecimento da ficha"
+          titulo="Preparando a análise"
+          descricao="A plataforma está reunindo os dados já salvos nesta oportunidade."
+          etapas={ETAPAS_CONFIRMACAO}
+          nota="Assim que a solicitação for registrada, você poderá continuar trabalhando."
         />
       )}
       <button
@@ -175,9 +151,8 @@ export function FormularioEnriquecimento({
               onKeyDown={(evento) => {
                 if (evento.key === 'Escape') fechar();
                 if (evento.key !== 'Tab') return;
-                const focaveis = painel.current?.querySelectorAll<HTMLElement>(
-                  'button:not([disabled]), input:not([disabled]), textarea:not([disabled])',
-                );
+                const focaveis =
+                  painel.current?.querySelectorAll<HTMLElement>('button:not([disabled])');
                 if (!focaveis?.length) return;
                 const primeiro = focaveis[0];
                 const ultimo = focaveis[focaveis.length - 1];
@@ -191,12 +166,15 @@ export function FormularioEnriquecimento({
               }}
             >
               <header className={styles.topo}>
+                <span className={styles.iconeTopo} aria-hidden="true">
+                  <BrainCircuit size={22} strokeWidth={1.7} />
+                </span>
                 <div>
                   <p className={styles.sobretitulo}>Enriquecimento da ficha</p>
-                  <h2 id={tituloId}>Enriquecer oportunidade</h2>
+                  <h2 id={tituloId}>Enriquecer esta oportunidade?</h2>
                   <p id={descricaoId}>
-                    A IA combina o CRM, as calls, o site e as informações que você adicionar. A
-                    ficha ganha fatos, hipóteses e perguntas para a próxima call.
+                    A plataforma usa tudo que já está salvo na ficha. Você não precisa preencher
+                    nenhum dado novamente.
                   </p>
                 </div>
                 <button
@@ -209,71 +187,87 @@ export function FormularioEnriquecimento({
                 </button>
               </header>
 
-              <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
-                <span>
-                  <Database size={15} aria-hidden="true" /> CRM e calls
-                </span>
-                <span>
-                  <Globe2 size={15} aria-hidden="true" /> Site e fontes públicas
-                </span>
-                <span>
-                  <BrainCircuit size={15} aria-hidden="true" /> IA organiza a ficha
-                </span>
-              </div>
+              <div className={styles.conteudo}>
+                {erro && (
+                  <Alert tone="danger" size="compact">
+                    {erro} Nenhum crédito foi usado.
+                  </Alert>
+                )}
 
-              <form className={styles.formulario} onSubmit={(evento) => void enviar(evento)}>
-                <div className={styles.campos}>
-                  {erro && (
-                    <Alert tone="danger" size="compact">
-                      {erro}
-                    </Alert>
-                  )}
+                {!saldoSuficiente && (
+                  <Alert tone="attn" size="compact">
+                    Seu saldo é de {saldoCreditos} {saldoCreditos === 1 ? 'crédito' : 'créditos'}.
+                    São necessários {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos para enriquecer a
+                    ficha.
+                  </Alert>
+                )}
 
-                  <Input
-                    id="enriquecimento-dominio"
-                    name="dominio"
-                    label="Site da empresa"
-                    placeholder="empresa.com.br"
-                    defaultValue={dominioInicial ?? ''}
-                    hint="Usamos apenas conteúdo público do site."
-                    inputMode="url"
-                  />
-
-                  <Input
-                    id="enriquecimento-linkedin"
-                    name="linkedin"
-                    label="LinkedIn do contato"
-                    placeholder="https://www.linkedin.com/in/..."
-                    defaultValue={linkedinInicial ?? ''}
-                    hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
-                    iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
-                    inputMode="url"
-                  />
-
-                  <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
-                    <span>Contexto que você já tem</span>
-                    <textarea
-                      id="enriquecimento-contexto"
-                      name="contexto"
-                      rows={5}
-                      maxLength={4000}
-                      placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
-                    />
-                    <small>
-                      Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
-                    </small>
-                  </label>
+                <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
+                  <div>
+                    <span>
+                      <Database size={17} strokeWidth={1.7} aria-hidden="true" />
+                    </span>
+                    <p>
+                      <strong>CRM</strong>
+                      <small>Empresa, contato e histórico da oportunidade</small>
+                    </p>
+                  </div>
+                  <div>
+                    <span>
+                      <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
+                    </span>
+                    <p>
+                      <strong>Calls</strong>
+                      <small>Resumos, dores e próximos passos registrados</small>
+                    </p>
+                  </div>
+                  <div>
+                    <span>
+                      <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
+                    </span>
+                    <p>
+                      <strong>Fontes públicas</strong>
+                      <small>Site salvo na ficha e informações públicas disponíveis</small>
+                    </p>
+                  </div>
                 </div>
 
-                <div className={styles.acoes}>
+                <div className={styles.creditos} aria-label="Custo do enriquecimento">
+                  <span className={styles.iconeCreditos} aria-hidden="true">
+                    <Coins size={20} strokeWidth={1.7} />
+                  </span>
+                  <div>
+                    <small>Custo</small>
+                    <strong>{CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos</strong>
+                  </div>
+                  <div>
+                    <small>Saldo atual</small>
+                    <strong>{saldoCreditos}</strong>
+                  </div>
+                  <div>
+                    <small>Saldo depois</small>
+                    <strong>{saldoSuficiente ? saldoDepois : '—'}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <footer className={styles.acoes}>
+                <p>Se a análise falhar, os créditos voltam automaticamente.</p>
+                <div>
                   <Button type="button" variant="secondary" onClick={fechar} disabled={enviando}>
                     Cancelar
                   </Button>
-                  <Button type="submit" variant="primary" loading={enviando}>
-                    Iniciar enriquecimento
+                  <Button
+                    type="button"
+                    variant="primary"
+                    loading={enviando}
+                    disabled={!saldoSuficiente}
+                    onClick={() => void confirmar()}
+                  >
+                    Confirmar por {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
                   </Button>
                 </div>
-              </form>
+              </footer>
             </div>
           </div>,
           document.body,

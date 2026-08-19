@@ -4,9 +4,6 @@ import { createClient } from '@/lib/supabase/client';
 
 export type PedidoEnriquecimento = {
   oportunidade_id: string;
-  dominio?: string;
-  linkedin_url?: string;
-  contexto?: string;
 };
 
 export async function iniciarEnriquecimento(

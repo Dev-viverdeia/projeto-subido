@@ -86,8 +86,7 @@ export function CabecalhoDossie({
           <AtalhoProposta lead={lead} destaque={false} projetoSlug={projetoSlug} />
           <FormularioEnriquecimento
             oportunidadeId={lead.oportunidade.id}
-            dominioInicial={lead.empresa.dominio}
-            linkedinInicial={lead.contato?.linkedinUrl ?? null}
+            saldoCreditos={lead.saldoCreditos ?? 30}
             temDossie={temDossie}
             rotulo={temDossie ? 'Atualizar enriquecimento' : 'Enriquecer oportunidade'}
             tom="secundario"

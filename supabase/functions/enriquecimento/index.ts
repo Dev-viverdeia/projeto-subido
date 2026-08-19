@@ -2,7 +2,6 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { CABECALHOS_CORS, clienteDoChamador, respostaJson } from '../_compartilhado/http.ts';
 import { gerarEGravar } from './gerar.ts';
 import { PedidoEnriquecimento } from './schema.ts';
-import { normalizarSite } from './site.ts';
 
 declare const EdgeRuntime: {
   waitUntil<T>(promise: Promise<T>): Promise<T>;
@@ -35,36 +34,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     );
   }
 
-  const site = normalizarSite(pedido.data.dominio);
-  if (pedido.data.dominio && !site) {
-    return respostaJson({ erro: 'Digite um site válido, como empresa.com.br.' }, 400);
-  }
-
-  if (pedido.data.linkedin_url) {
-    try {
-      const linkedin = new URL(pedido.data.linkedin_url);
-      const host = linkedin.hostname.toLowerCase();
-      if (
-        linkedin.protocol !== 'https:' ||
-        !(host === 'linkedin.com' || host.endsWith('.linkedin.com'))
-      ) {
-        throw new Error('linkedin_invalido');
-      }
-    } catch {
-      return respostaJson({ erro: 'Digite uma URL válida do LinkedIn.' }, 400);
-    }
-  }
-
-  const entrada = {
-    ...pedido.data,
-    dominio: site?.hostname,
-  };
-
   const { data: id, error } = await supabase.rpc('crm_iniciar_enriquecimento', {
-    p_oportunidade: entrada.oportunidade_id,
-    p_dominio: entrada.dominio,
-    p_linkedin_url: entrada.linkedin_url,
-    p_contexto: entrada.contexto,
+    p_oportunidade: pedido.data.oportunidade_id,
   });
 
   if (error) {
@@ -75,9 +46,39 @@ Deno.serve(async (req: Request): Promise<Response> => {
     if (error.message.includes('oportunidade_nao_encontrada')) {
       return respostaJson({ erro: 'Oportunidade não encontrada.' }, 404);
     }
+    if (error.message.includes('creditos_insuficientes')) {
+      return respostaJson(
+        { erro: 'Você não tem créditos suficientes para este enriquecimento.' },
+        402,
+      );
+    }
     return respostaJson({ erro: 'Não foi possível iniciar a análise.' }, 500);
   }
 
-  EdgeRuntime.waitUntil(gerarEGravar(supabase, String(id), entrada));
+  const { data: execucao, error: erroExecucao } = await supabase
+    .from('crm_enriquecimentos')
+    .select('dominio, linkedin_url, contexto')
+    .eq('id', String(id))
+    .single();
+  if (erroExecucao || !execucao) {
+    await supabase
+      .from('crm_enriquecimentos')
+      .update({
+        status: 'falhou',
+        erro: 'Não foi possível carregar os dados da oportunidade.',
+        concluido_em: new Date().toISOString(),
+      })
+      .eq('id', String(id));
+    return respostaJson({ erro: 'Não foi possível carregar os dados da oportunidade.' }, 500);
+  }
+
+  EdgeRuntime.waitUntil(
+    gerarEGravar(supabase, String(id), {
+      oportunidade_id: pedido.data.oportunidade_id,
+      dominio: execucao.dominio ?? undefined,
+      linkedin_url: execucao.linkedin_url ?? undefined,
+      contexto: execucao.contexto ?? undefined,
+    }),
+  );
   return respostaJson({ id, status: 'na_fila' }, 202);
 });

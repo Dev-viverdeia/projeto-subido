@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
+import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
 import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import styles from './pagina.module.css';
@@ -62,7 +63,19 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       {emAndamento && <EstadoEnriquecimento status={emAndamento.status} erro={null} />}
 
       {falhaRecente && (
-        <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
+        <EstadoEnriquecimento
+          status={falhaRecente.status}
+          erro={falhaRecente.erro}
+          acao={
+            <FormularioEnriquecimento
+              oportunidadeId={lead.oportunidade.id}
+              saldoCreditos={lead.saldoCreditos ?? 30}
+              temDossie={Boolean(dossie)}
+              rotulo="Tentar novamente"
+              tom="secundario"
+            />
+          }
+        />
       )}
 
       {dossie && execucaoPronta && (

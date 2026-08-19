@@ -64,6 +64,8 @@ export type PropostaDossie = {
 };
 
 export type DossieLead = {
+  /** Saldo operacional carregado apenas nas telas que exibem uma operação paga. */
+  saldoCreditos?: number;
   oportunidade: OportunidadeCrm;
   empresa: {
     nome: string;
