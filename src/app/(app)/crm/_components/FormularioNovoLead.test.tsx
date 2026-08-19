@@ -17,8 +17,8 @@ describe('FormularioNovoLead', () => {
     criarLeadMock.mockResolvedValue({});
     render(<FormularioNovoLead />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Novo lead' }));
-    expect(screen.getByRole('dialog', { name: 'Adicionar lead' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Nova oportunidade' }));
+    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
     expect(screen.getByLabelText('Empresa')).toHaveFocus();
 
     fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
@@ -36,8 +36,8 @@ describe('FormularioNovoLead', () => {
     });
     render(<FormularioNovoLead />);
 
-    await user.click(screen.getByRole('button', { name: 'Novo lead' }));
-    await user.click(screen.getByRole('button', { name: 'Cadastrar e continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Nova oportunidade' }));
+    await user.click(screen.getByRole('button', { name: 'Criar oportunidade' }));
 
     await waitFor(() => expect(screen.getByLabelText('Empresa')).toHaveFocus());
     expect(screen.getByText('Digite o nome da empresa.')).toBeInTheDocument();
@@ -57,8 +57,10 @@ describe('FormularioNovoLead', () => {
       />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Adicionar lead' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Oportunidade')).toHaveValue('Atendimento com IA no WhatsApp');
+    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Projeto que pode ser vendido')).toHaveValue(
+      'Atendimento com IA no WhatsApp',
+    );
     expect(document.querySelector('input[name="projeto"]')).toHaveValue(
       'sdr-atendimento-qualificacao',
     );

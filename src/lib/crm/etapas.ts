@@ -26,20 +26,20 @@ export const FASES_CRM: ReadonlyArray<{
 }> = [
   {
     id: 'entrada',
-    rotulo: 'Entrada',
-    descricao: 'Leads para priorizar',
+    rotulo: 'Preparar',
+    descricao: 'Contato, pesquisa e abordagem',
     etapas: ['novo_lead', 'qualificacao'],
   },
   {
     id: 'conversa',
-    rotulo: 'Em conversa',
-    descricao: 'Descoberta e contexto',
+    rotulo: 'Descobrir',
+    descricao: 'Problema, prioridade e decisão',
     etapas: ['descoberta'],
   },
   {
     id: 'proposta',
-    rotulo: 'Proposta',
-    descricao: 'Apresentação e decisão',
+    rotulo: 'Propor',
+    descricao: 'Proposta, follow-up e resposta',
     etapas: ['proposta', 'negociacao'],
   },
   {
@@ -50,6 +50,8 @@ export const FASES_CRM: ReadonlyArray<{
   },
 ];
 
+export type FaseCrm = (typeof FASES_CRM)[number];
+
 /**
  * Destinos que o profissional realmente precisa decidir na interface.
  * Qualificação e negociação continuam aceitas no banco para preservar histórico,
@@ -59,12 +61,18 @@ export const ETAPAS_MOVIMENTO_CRM: ReadonlyArray<{
   id: EtapaCrm;
   rotulo: string;
 }> = [
-  { id: 'novo_lead', rotulo: 'Entrada' },
-  { id: 'descoberta', rotulo: 'Em conversa' },
-  { id: 'proposta', rotulo: 'Proposta' },
+  { id: 'novo_lead', rotulo: 'Preparar' },
+  { id: 'descoberta', rotulo: 'Descobrir' },
+  { id: 'proposta', rotulo: 'Propor' },
   { id: 'ganho', rotulo: 'Ganho' },
   { id: 'perdido', rotulo: 'Perdido' },
 ];
+
+export function rotuloEtapaVisivel(etapa: EtapaCrm): string {
+  if (etapa === 'ganho') return 'Ganha';
+  if (etapa === 'perdido') return 'Perdida';
+  return FASES_CRM.find((fase) => fase.id === faseDaEtapa(etapa))?.rotulo ?? ROTULO_ETAPA[etapa];
+}
 
 export const ROTULO_ETAPA: Record<EtapaCrm, string> = Object.fromEntries(
   ETAPAS_CRM.map((etapa) => [etapa.id, etapa.rotulo]),

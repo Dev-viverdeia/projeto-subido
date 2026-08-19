@@ -19,6 +19,12 @@ describe('etapas do CRM', () => {
     expect(faseDaEtapa('negociacao')).toBe('proposta');
     expect(faseDaEtapa('ganho')).toBe('desfecho');
     expect(faseDaEtapa('perdido')).toBe('desfecho');
+    expect(FASES_CRM.map((fase) => fase.rotulo)).toEqual([
+      'Preparar',
+      'Descobrir',
+      'Propor',
+      'Desfecho',
+    ]);
   });
 
   it('oferece apenas decisões comerciais úteis ao mover um card', () => {

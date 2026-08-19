@@ -14,14 +14,14 @@ function BotaoAdicionar() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" variant="primary" loading={pending}>
-      {pending ? 'Criando oportunidade…' : 'Cadastrar e continuar'}
+      {pending ? 'Criando oportunidade…' : 'Criar oportunidade'}
     </Button>
   );
 }
 
 export function FormularioNovoLead({
   abertoInicial = false,
-  rotulo = 'Novo lead',
+  rotulo = 'Nova oportunidade',
   tituloInicial = '',
   projetoSlug = '',
 }: {
@@ -115,10 +115,10 @@ export function FormularioNovoLead({
               <header className={styles.topo}>
                 <div>
                   <p className={styles.sobretitulo}>Nova oportunidade</p>
-                  <h2 id="novo-lead-titulo">Adicionar lead</h2>
+                  <h2 id="novo-lead-titulo">Adicionar oportunidade</h2>
                   <p>
-                    Informe a empresa e o contato. Você poderá pesquisar mais dados e agendar a call
-                    depois.
+                    Use este cadastro para uma empresa que você decidiu abordar. Os dados podem ser
+                    completados antes da primeira call.
                   </p>
                 </div>
                 <button
@@ -173,7 +173,7 @@ export function FormularioNovoLead({
                   name="email"
                   type="email"
                   label="E-mail"
-                  hint="Opcional. Você poderá pesquisar outros contatos depois."
+                  hint="Opcional. A pesquisa da empresa pode encontrar outros contatos."
                   autoComplete="email"
                   defaultValue={estado.campos?.email ?? ''}
                   error={erroVisivel('email')}
@@ -182,9 +182,9 @@ export function FormularioNovoLead({
                 <Input
                   id="crm-titulo"
                   name="titulo"
-                  label="Oportunidade"
-                  hint="Se deixar vazio, usaremos o nome da empresa."
-                  placeholder="Ex.: Automação do atendimento"
+                  label="Projeto que pode ser vendido"
+                  hint="Se ainda não souber, você poderá definir depois da pesquisa."
+                  placeholder="Ex.: SDR de atendimento e qualificação"
                   defaultValue={estado.campos?.titulo ?? tituloInicial}
                   error={erroVisivel('titulo')}
                   onChange={() => ocultarErro('titulo')}

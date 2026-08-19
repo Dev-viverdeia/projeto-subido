@@ -13,11 +13,27 @@ const ETAPA_DA_FASE: Record<Exclude<IdFaseCrm, 'desfecho'>, EtapaCrm> = {
   proposta: 'proposta',
 };
 
-function Vazio() {
+const TEXTO_VAZIO: Record<Exclude<IdFaseCrm, 'desfecho'>, { titulo: string; apoio: string }> = {
+  entrada: {
+    titulo: 'Nada para preparar',
+    apoio: 'As novas oportunidades aparecem aqui.',
+  },
+  conversa: {
+    titulo: 'Nenhuma descoberta em andamento',
+    apoio: 'Mova para cá depois do primeiro contato.',
+  },
+  proposta: {
+    titulo: 'Nenhuma proposta em andamento',
+    apoio: 'Mova para cá quando o escopo estiver pronto.',
+  },
+};
+
+function Vazio({ fase }: { fase: Exclude<IdFaseCrm, 'desfecho'> }) {
+  const texto = TEXTO_VAZIO[fase];
   return (
     <div className={styles.vazio}>
-      <span>Nenhuma oportunidade</span>
-      <small>Solte um card nesta etapa</small>
+      <span>{texto.titulo}</span>
+      <small>{texto.apoio}</small>
     </div>
   );
 }
@@ -28,14 +44,17 @@ export function ColunaAtiva({
   oportunidades,
   aoMover,
   movimentandoId,
+  ativaNoMobile,
 }: {
   fase: (typeof FASES_CRM)[number];
   numero: number;
   oportunidades: OportunidadeCrm[];
   aoMover: SolicitarMovimento;
   movimentandoId: string | null;
+  ativaNoMobile: boolean;
 }) {
-  const etapa = ETAPA_DA_FASE[fase.id as Exclude<IdFaseCrm, 'desfecho'>];
+  const faseAtiva = fase.id as Exclude<IdFaseCrm, 'desfecho'>;
+  const etapa = ETAPA_DA_FASE[faseAtiva];
   const { isOver, setNodeRef } = useDroppable({
     id: `fase:${fase.id}`,
     data: { etapa },
@@ -47,6 +66,7 @@ export function ColunaAtiva({
       className={styles.coluna}
       data-fase={fase.id}
       data-sobre={isOver || undefined}
+      data-mobile-ativa={ativaNoMobile || undefined}
       aria-labelledby={`coluna-${fase.id}`}
     >
       <header className={styles.colunaTopo}>
@@ -71,7 +91,7 @@ export function ColunaAtiva({
             />
           ))
         ) : (
-          <Vazio />
+          <Vazio fase={faseAtiva} />
         )}
       </div>
     </section>
@@ -105,23 +125,13 @@ function DestinoDesfecho({ etapa, total }: { etapa: 'ganho' | 'perdido'; total: 
   );
 }
 
-export function BandejaDesfecho({
-  ganhas,
-  perdidas,
-  arrastando,
-}: {
-  ganhas: number;
-  perdidas: number;
-  arrastando: boolean;
-}) {
+export function BandejaDesfecho({ ganhas, perdidas }: { ganhas: number; perdidas: number }) {
   return (
-    <section className={styles.bandejaDesfecho} data-arrastando={arrastando || undefined}>
+    <section className={styles.bandejaDesfecho}>
       <div className={styles.bandejaTexto}>
-        <span>Desfecho</span>
-        <strong>{arrastando ? 'Onde esta oportunidade terminou?' : 'Concluir oportunidade'}</strong>
-        <small>
-          {arrastando ? 'Solte em uma das opções.' : 'Arraste um card até o resultado.'}
-        </small>
+        <span>Concluir venda</span>
+        <strong>Solte no resultado</strong>
+        <small>O motivo da perda será registrado.</small>
       </div>
       <div className={styles.destinosDesfecho}>
         <DestinoDesfecho etapa="ganho" total={ganhas} />
@@ -154,14 +164,14 @@ export function HistoricoDesfechos({
     <details className={styles.historico}>
       <summary>
         <div>
-          <span>Histórico de desfechos</span>
+          <span>Oportunidades encerradas</span>
           <small>
             {ganhas} {ganhas === 1 ? 'ganha' : 'ganhas'} · {perdidas}{' '}
             {perdidas === 1 ? 'perdida' : 'perdidas'}
           </small>
         </div>
         <span className={styles.abrirHistorico}>
-          Ver oportunidades
+          Ver histórico
           <ChevronDown size={16} strokeWidth={1.8} aria-hidden="true" />
         </span>
       </summary>

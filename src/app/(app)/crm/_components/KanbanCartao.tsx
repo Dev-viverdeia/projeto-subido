@@ -5,16 +5,23 @@ import Link from 'next/link';
 import { useDraggable } from '@dnd-kit/core';
 import {
   ArrowRight,
+  CalendarClock,
   CheckCircle2,
   FileText,
   GripVertical,
   Inbox,
+  LoaderCircle,
   MessageSquareMore,
   MoreHorizontal,
   XCircle,
 } from 'lucide-react';
 import { DropdownMenu } from '@/design-system/via';
-import { ROTULO_ETAPA, etapaVisivel, rotuloMotivoPerda, type EtapaCrm } from '@/lib/crm/etapas';
+import {
+  etapaVisivel,
+  rotuloEtapaVisivel,
+  rotuloMotivoPerda,
+  type EtapaCrm,
+} from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from './PipelineCrm.module.css';
 
@@ -45,6 +52,35 @@ function valorDaOportunidade(valorCentavos: number | null): string | null {
   return valorCentavos === null ? null : FORMATADOR_MOEDA.format(valorCentavos / 100);
 }
 
+function prazoDaAcao(iso: string | null): { rotulo: string; vencido: boolean } | null {
+  if (!iso) return null;
+  const data = new Date(iso);
+  const vencido = data.getTime() < Date.now();
+  return {
+    rotulo: `${vencido ? 'Atrasada desde' : 'Até'} ${dataCurta(iso)}`,
+    vencido,
+  };
+}
+
+function pesquisaDaOportunidade(oportunidade: OportunidadeCrm): {
+  estado: 'pendente' | 'processando' | 'pronta' | 'falhou';
+  rotulo: string;
+} {
+  if (
+    oportunidade.enriquecimentoStatus === 'na_fila' ||
+    oportunidade.enriquecimentoStatus === 'processando'
+  ) {
+    return { estado: 'processando', rotulo: 'Pesquisa em andamento' };
+  }
+  if (oportunidade.enriquecimentoStatus === 'concluido' || oportunidade.enriquecidoEm) {
+    return { estado: 'pronta', rotulo: 'Empresa pesquisada' };
+  }
+  if (oportunidade.enriquecimentoStatus === 'falhou') {
+    return { estado: 'falhou', rotulo: 'Refazer pesquisa' };
+  }
+  return { estado: 'pendente', rotulo: 'Pesquisa pendente' };
+}
+
 function impedirArraste(evento: SyntheticEvent) {
   evento.stopPropagation();
 }
@@ -63,7 +99,7 @@ function MenuMovimentacao({
     const Icone = ICONES_ETAPA[etapa];
     return {
       id: etapa,
-      label: ROTULO_ETAPA[etapa],
+      label: rotuloEtapaVisivel(etapa),
       icon: <Icone size={14} strokeWidth={1.9} />,
       disabled: etapaAtual === etapa || desabilitado,
       onSelect: () => aoMover(oportunidade, etapa),
@@ -141,6 +177,8 @@ export function CartaoOportunidade({
     [setActivatorNodeRef, setNodeRef],
   );
   const valor = valorDaOportunidade(oportunidade.valorCentavos);
+  const prazo = prazoDaAcao(oportunidade.proximaAcaoEm);
+  const pesquisa = pesquisaDaOportunidade(oportunidade);
 
   return (
     <article
@@ -159,21 +197,48 @@ export function CartaoOportunidade({
           <span>{oportunidade.empresa}</span>
           {valor && <strong>{valor}</strong>}
         </div>
-        <GripVertical
-          className={styles.sinalArraste}
-          size={17}
-          strokeWidth={1.7}
-          aria-hidden="true"
-        />
+        {desabilitado ? (
+          <LoaderCircle
+            className={styles.salvando}
+            size={17}
+            strokeWidth={1.8}
+            aria-label="Salvando etapa"
+          />
+        ) : (
+          <GripVertical
+            className={styles.sinalArraste}
+            size={17}
+            strokeWidth={1.7}
+            aria-hidden="true"
+          />
+        )}
       </div>
 
+      <p className={styles.projetoRotulo}>Projeto em venda</p>
       <h3>{oportunidade.titulo}</h3>
 
-      {oportunidade.contato && <p className={styles.contato}>{oportunidade.contato}</p>}
+      <div className={styles.contextoCartao}>
+        <span>
+          {oportunidade.contato ? `Contato: ${oportunidade.contato}` : 'Contato a definir'}
+        </span>
+        <span className={styles.pesquisa} data-estado={pesquisa.estado}>
+          {pesquisa.rotulo}
+        </span>
+      </div>
 
       <div className={styles.proximoPasso} data-vazio={!oportunidade.proximaAcao || undefined}>
         <span>{oportunidade.proximaAcao ? 'Próximo passo' : 'Último registro'}</span>
-        <strong>{oportunidade.proximaAcao ?? oportunidade.ultimoFato ?? 'Sem atividade'}</strong>
+        <strong>
+          {oportunidade.proximaAcao ??
+            oportunidade.ultimoFato ??
+            'Defina o primeiro contato com a empresa'}
+        </strong>
+        {prazo && (
+          <small data-vencido={prazo.vencido || undefined}>
+            <CalendarClock size={13} strokeWidth={1.9} aria-hidden="true" />
+            {prazo.rotulo}
+          </small>
+        )}
       </div>
 
       <footer className={styles.rodapeCartao}>
@@ -189,7 +254,7 @@ export function CartaoOportunidade({
             onTouchStart={impedirArraste}
             onKeyDown={impedirArraste}
           >
-            Abrir oportunidade
+            Ver oportunidade
             <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
           </Link>
           <MenuMovimentacao

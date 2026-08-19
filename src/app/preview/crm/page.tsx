@@ -177,55 +177,17 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
         <div className={pagina.pagina}>
           <header className={pagina.topo}>
             <div className={pagina.introducao}>
-              <p className={pagina.sobretitulo}>Operação comercial</p>
-              <h1>Pipeline comercial</h1>
-              <p>
-                Três etapas de trabalho para saber quem precisa de atenção agora — com cada desfecho
-                registrado.
-              </p>
+              <p className={pagina.sobretitulo}>CRM de vendas</p>
+              <h1>Oportunidades</h1>
+              <p>Veja quem precisa de atenção e o próximo passo de cada venda.</p>
             </div>
             <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
           </header>
 
-          <section className={pagina.resumo} aria-label="Resumo do pipeline">
-            <article>
-              <div>
-                <span>Abertas</span>
-                <small>em andamento</small>
-              </div>
-              <strong>3</strong>
-            </article>
-            <article>
-              <div>
-                <span>Em proposta</span>
-                <small>aguardando decisão</small>
-              </div>
-              <strong>1</strong>
-            </article>
-            <article data-resultado="ganho">
-              <div>
-                <span>Ganhas</span>
-                <small>projetos aprovados</small>
-              </div>
-              <strong>1</strong>
-            </article>
-            <article data-resultado="perdido">
-              <div>
-                <span>Perdidas</span>
-                <small>com motivo registrado</small>
-              </div>
-              <strong>1</strong>
-            </article>
-          </section>
-
           <section className={pagina.quadro} aria-labelledby="preview-pipeline-titulo">
-            <div className={pagina.quadroTopo}>
-              <div>
-                <h2 id="preview-pipeline-titulo">Pipeline</h2>
-                <p>Avance cada oportunidade quando a conversa realmente mudar de fase.</p>
-              </div>
-              <span>5 no total</span>
-            </div>
+            <h2 id="preview-pipeline-titulo" className={pagina.tituloOculto}>
+              Pipeline de oportunidades
+            </h2>
             <PipelineCrm oportunidades={OPORTUNIDADES} />
           </section>
         </div>
