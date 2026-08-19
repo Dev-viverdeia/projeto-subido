@@ -36,7 +36,9 @@ describe('resultado da busca de prospecção', () => {
 
     await usuario.click(screen.getByRole('button', { name: 'Ajustar e tentar de novo' }));
 
-    expect(substituir).toHaveBeenCalledWith('/prospeccao?lista=lista-1');
+    expect(substituir).toHaveBeenCalledWith(
+      '/prospeccao?lista=lista-1&segmento=Cl%C3%ADnicas+odontol%C3%B3gicas&localizacao=Florian%C3%B3polis&quantidade=5',
+    );
   });
 
   it('mostra quantas empresas ficaram prontas antes de abrir a lista', () => {

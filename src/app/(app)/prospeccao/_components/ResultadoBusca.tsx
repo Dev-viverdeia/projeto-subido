@@ -39,6 +39,11 @@ export function ResultadoBusca({
   const fechar = (destino?: 'formulario' | 'resultados') => {
     const url = new URL(window.location.href);
     url.searchParams.delete('busca');
+    if (destino === 'formulario') {
+      url.searchParams.set('segmento', segmento);
+      url.searchParams.set('localizacao', localizacao);
+      url.searchParams.set('quantidade', String(solicitadas));
+    }
     router.replace(`${url.pathname}${url.search}`);
     window.setTimeout(() => {
       const alvo = document.getElementById(

@@ -32,6 +32,23 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
     carregarProspeccao(listaPreferida),
     Promise.resolve(prospeccaoEnv()),
   ]);
+  const segmentoRetomado =
+    typeof parametros.segmento === 'string' ? parametros.segmento : undefined;
+  const localizacaoRetomada =
+    typeof parametros.localizacao === 'string' ? parametros.localizacao : undefined;
+  const quantidadeRetomada =
+    typeof parametros.quantidade === 'string' ? Number(parametros.quantidade) : undefined;
+  const valoresRetomados =
+    segmentoRetomado &&
+    localizacaoRetomada &&
+    quantidadeRetomada &&
+    [5, 10, 20].includes(quantidadeRetomada)
+      ? {
+          segmento: segmentoRetomado,
+          localizacao: localizacaoRetomada,
+          quantidade: quantidadeRetomada,
+        }
+      : undefined;
 
   return (
     <div className={styles.pagina}>
@@ -53,7 +70,13 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       )}
 
       <FormularioBusca
-        key={parametros.busca === 'falhou' ? listaAtual?.id : 'nova-busca'}
+        key={
+          parametros.busca === 'falhou'
+            ? listaAtual?.id
+            : valoresRetomados
+              ? 'retomar-busca'
+              : 'nova-busca'
+        }
         saldo={saldo}
         pronto={integracoes.pronto}
         valoresIniciais={
@@ -63,7 +86,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                 localizacao: listaAtual.localizacao,
                 quantidade: listaAtual.quantidade_solicitada,
               }
-            : undefined
+            : valoresRetomados
         }
       />
 
