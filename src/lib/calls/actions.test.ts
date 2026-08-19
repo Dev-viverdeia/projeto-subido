@@ -1,15 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { from, getClaims, redirect, revalidatePath, rpc, sincronizarCallNoGoogle } = vi.hoisted(
-  () => ({
-    from: vi.fn(),
-    getClaims: vi.fn(),
-    redirect: vi.fn(),
-    revalidatePath: vi.fn(),
-    rpc: vi.fn(),
-    sincronizarCallNoGoogle: vi.fn(),
-  }),
-);
+const {
+  from,
+  getClaims,
+  googleCalendarConfigurado,
+  redirect,
+  revalidatePath,
+  rpc,
+  sincronizarCallNoGoogle,
+} = vi.hoisted(() => ({
+  from: vi.fn(),
+  getClaims: vi.fn(),
+  googleCalendarConfigurado: vi.fn(),
+  redirect: vi.fn(),
+  revalidatePath: vi.fn(),
+  rpc: vi.fn(),
+  sincronizarCallNoGoogle: vi.fn(),
+}));
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
@@ -18,6 +25,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
 }));
 vi.mock('@/lib/google-calendar/eventos', () => ({ sincronizarCallNoGoogle }));
+vi.mock('@/lib/google-calendar/oauth', () => ({ googleCalendarConfigurado }));
 
 import { agendarReuniao } from './actions';
 
@@ -40,6 +48,7 @@ function dadosValidos() {
 describe('agendarReuniao', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    googleCalendarConfigurado.mockReturnValue(false);
     getClaims.mockResolvedValue({ data: { claims: { sub: 'usuario-1' } } });
   });
 
@@ -73,6 +82,15 @@ describe('agendarReuniao', () => {
 
     expect(resposta.erro).toContain('não conseguimos abrir a sala preparada');
     expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('exige a configuração inicial do Calendar quando a integração está ativa', async () => {
+    googleCalendarConfigurado.mockReturnValue(true);
+
+    const resposta = await agendarReuniao({}, dadosValidos());
+
+    expect(resposta.erro).toContain('Conecte seu Google Calendar');
+    expect(rpc).not.toHaveBeenCalledWith('calls_agendar_reuniao', expect.anything());
   });
 
   it('cria o evento no Google com a sala pública da call', async () => {

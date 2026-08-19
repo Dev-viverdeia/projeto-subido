@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { CalendarCheck2, CalendarPlus, ExternalLink, Layers3, Mail, X } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, Check, ExternalLink, Layers3, Mail, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
@@ -11,6 +11,7 @@ import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { BotaoAgendar } from './BotaoAgendar';
+import { SetupGoogleCalendar } from './SetupGoogleCalendar';
 import styles from './FormularioAgendarCall.module.css';
 
 const INICIAL: EstadoAgendamento = {};
@@ -49,7 +50,7 @@ export function FormularioAgendarCall({
     disponiveis.find((item) => item.id === oportunidadeSelecionadaId) ??
     null;
   const [convidadoEmail, setConvidadoEmail] = useState(oportunidadeVinculada?.contatoEmail ?? '');
-  const [enviarConviteGoogle, setEnviarConviteGoogle] = useState(Boolean(calendar?.conectado));
+  const precisaConfigurarCalendar = Boolean(calendar?.configurado && !calendar.conectado);
   const retornoCalendar = `/calls?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
   const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
 
@@ -58,7 +59,9 @@ export function FormularioAgendarCall({
     if (campoOffset.current) {
       campoOffset.current.value = String(new Date().getTimezoneOffset());
     }
-    painel.current?.querySelector<HTMLElement>('select, input:not([type="hidden"])')?.focus();
+    painel.current
+      ?.querySelector<HTMLElement>('[data-autofocus], select, input:not([type="hidden"])')
+      ?.focus();
   }, [aberto]);
 
   useEffect(() => {
@@ -133,12 +136,18 @@ export function FormularioAgendarCall({
             <div className={styles.painel}>
               <header className={styles.topo}>
                 <div>
-                  <p className={styles.sobretitulo}>CRM + Live Coach</p>
-                  <h2 id="agendar-call-titulo">Agendar call</h2>
+                  <p className={styles.sobretitulo}>
+                    {precisaConfigurarCalendar ? 'Configuração inicial' : 'CRM + Live Coach'}
+                  </p>
+                  <h2 id="agendar-call-titulo">
+                    {precisaConfigurarCalendar ? 'Conecte sua agenda' : 'Agendar call'}
+                  </h2>
                   <p>
-                    {oportunidadeVinculada
-                      ? 'Defina o horário. A sala ficará ligada a esta oportunidade.'
-                      : 'Escolha o lead e defina o horário. O link ficará salvo na oportunidade.'}
+                    {precisaConfigurarCalendar
+                      ? 'Você faz isso uma vez. Depois, cada call já nasce com sala, convite e histórico no CRM.'
+                      : oportunidadeVinculada
+                        ? 'Defina o horário. A sala ficará ligada a esta oportunidade.'
+                        : 'Escolha o lead e defina o horário. O link ficará salvo na oportunidade.'}
                   </p>
                 </div>
                 <button
@@ -151,7 +160,13 @@ export function FormularioAgendarCall({
                 </button>
               </header>
 
-              {disponiveis.length === 0 ? (
+              {precisaConfigurarCalendar ? (
+                <SetupGoogleCalendar
+                  calendar={calendar!}
+                  conectarHref={conectarCalendarHref}
+                  aoFechar={fechar}
+                />
+              ) : disponiveis.length === 0 ? (
                 <div className={styles.semLead}>
                   <p>Uma call precisa estar ligada a uma oportunidade real.</p>
                   <Link href="/crm" className="via-btn via-btn--primary via-btn--md">
@@ -295,20 +310,18 @@ export function FormularioAgendarCall({
 
                     {calendar?.conectado ? (
                       <div className={styles.calendarCorpo}>
-                        <label className={styles.enviarConvite}>
-                          <input
-                            type="checkbox"
-                            name="enviarConviteGoogle"
-                            checked={enviarConviteGoogle}
-                            onChange={(evento) => setEnviarConviteGoogle(evento.target.checked)}
-                          />
+                        <input type="hidden" name="enviarConviteGoogle" value="on" />
+                        <div className={styles.conviteAtivo}>
+                          <span aria-hidden="true">
+                            <Check size={14} strokeWidth={2.2} />
+                          </span>
                           <span>
-                            <strong>Enviar convite ao criar a call</strong>
+                            <strong>Convite automático ativado</strong>
                             <small>
                               Sem Google Meet: o acesso será pela sala pública da Subido.
                             </small>
                           </span>
-                        </label>
+                        </div>
                         <Input
                           id="calls-convidado-email"
                           name="convidadoEmail"
@@ -322,8 +335,7 @@ export function FormularioAgendarCall({
                             setConvidadoEmail(evento.target.value);
                             ocultarErro('convidadoEmail');
                           }}
-                          disabled={!enviarConviteGoogle}
-                          required={enviarConviteGoogle}
+                          required
                         />
                       </div>
                     ) : calendar?.configurado ? (
@@ -363,9 +375,7 @@ export function FormularioAgendarCall({
                     <Button type="button" variant="secondary" onClick={fechar}>
                       Cancelar
                     </Button>
-                    <BotaoAgendar
-                      comConviteGoogle={Boolean(calendar?.conectado && enviarConviteGoogle)}
-                    />
+                    <BotaoAgendar comConviteGoogle={Boolean(calendar?.conectado)} />
                   </div>
                 </form>
               )}

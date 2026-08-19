@@ -78,10 +78,10 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       <header className={styles.intro}>
         <div>
           <p className={styles.sobretitulo}>Sua conta</p>
-          <h1>Dados da conta e atalhos</h1>
+          <h1>Conta e integrações</h1>
         </div>
         <p className={styles.resumo}>
-          Altere o nome exibido na plataforma e acesse seus projetos, formações e certificados.
+          Gerencie seu perfil, conecte sua agenda e acesse os dados salvos na plataforma.
         </p>
       </header>
 
@@ -142,6 +142,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       </section>
 
       <div className={styles.grade}>
+        <IntegracaoGoogleCalendar calendar={calendar} />
+
         <section className={styles.cartao} aria-labelledby="identidade-profissional">
           <header className={styles.cabecalhoCartao}>
             <span aria-hidden="true">
@@ -196,8 +198,6 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
             Para alterar e-mail ou senha, confirme sua identidade novamente.
           </p>
         </section>
-
-        <IntegracaoGoogleCalendar calendar={calendar} />
       </div>
     </div>
   );

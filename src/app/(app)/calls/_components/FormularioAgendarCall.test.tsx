@@ -106,7 +106,33 @@ describe('FormularioAgendarCall', () => {
     expect(screen.getByRole('button', { name: 'Criar call e enviar convite' })).toBeInTheDocument();
     expect(
       document.querySelector<HTMLInputElement>('input[name="enviarConviteGoogle"]'),
-    ).toBeChecked();
+    ).toHaveValue('on');
+  });
+
+  it('abre o setup do Calendar antes do primeiro agendamento e retorna para a call', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+        calendar={{
+          configurado: true,
+          conectado: false,
+          email: null,
+          status: 'desconectada',
+          ultimoErro: null,
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Conecte sua agenda' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Data e horário')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Criar call/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Conectar Google Calendar/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(encodeURIComponent(`/calls?nova=1&oportunidade=${OPORTUNIDADE.id}`)),
+    );
   });
 
   it('anuncia os erros, foca a primeira decisão e limpa o campo corrigido', async () => {
