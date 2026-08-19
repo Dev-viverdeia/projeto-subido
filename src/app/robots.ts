@@ -6,8 +6,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // Documentos legais e a página de obrigado não devem competir com a landing.
-      disallow: ['/termos', '/privacidade', '/reembolso'],
+      /* As páginas legais usam `noindex` no próprio metadata: assim continuam fora
+         da busca, mas podem ser lidas pelos verificadores de OAuth e confiança do
+         Google. Bloqueá-las aqui impedia o robô de confirmar privacidade e termos. */
     },
     sitemap: `${base}/sitemap.xml`,
   };
