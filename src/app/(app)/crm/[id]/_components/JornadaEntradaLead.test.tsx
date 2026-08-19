@@ -16,16 +16,23 @@ const BASE = {
 };
 
 describe('JornadaEntradaLead', () => {
-  it('orienta contexto e primeira call logo após o cadastro', () => {
+  it('leva primeiro à pesquisa logo após o cadastro', () => {
     render(<JornadaEntradaLead {...BASE} estadoContexto="pendente" totalCalls={0} />);
 
     expect(screen.getByRole('heading', { name: 'Prepare a primeira conversa.' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Pesquisar empresa' })).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Agendar primeira call' })).not.toBeInTheDocument();
+    expect(screen.getByText('Oportunidade no pipeline')).toBeVisible();
+  });
+
+  it('libera a primeira call quando a pesquisa termina', () => {
+    render(<JornadaEntradaLead {...BASE} estadoContexto="pronto" totalCalls={0} />);
+
+    expect(screen.queryByRole('button', { name: 'Pesquisar empresa' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Agendar primeira call' })).toHaveAttribute(
       'href',
       `/calls?nova=1&oportunidade=${BASE.oportunidadeId}`,
     );
-    expect(screen.getByText('Oportunidade no pipeline')).toBeVisible();
   });
 
   it('encerra a preparação quando contexto e call já existem', () => {

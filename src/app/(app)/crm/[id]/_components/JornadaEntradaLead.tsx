@@ -42,8 +42,8 @@ export function JornadaEntradaLead({
               : 'Prepare a primeira conversa.'}
           </h2>
           <span>
-            A oportunidade de {empresaNome} já está no CRM. Agora pesquise a empresa ou agende a
-            primeira call.
+            A oportunidade de {empresaNome} já está no CRM. Primeiro reunimos o contexto; depois,
+            você prepara a call e a proposta.
           </span>
         </div>
         <Link href={`/crm/${oportunidadeId}`}>Continuar depois</Link>
@@ -53,10 +53,12 @@ export function JornadaEntradaLead({
         <div>
           <strong>
             {precisaContexto
-              ? 'Comece pelas informações que você já possui.'
+              ? 'Primeiro, pesquise a empresa.'
               : callPronta
                 ? 'A preparação inicial está completa.'
-                : 'Enquanto a pesquisa acontece, você já pode preparar a conversa.'}
+                : contextoEmAndamento
+                  ? 'A pesquisa está em andamento.'
+                  : 'Agora, agende a primeira conversa.'}
           </strong>
           <p>Todas as ações ficam salvas no histórico desta oportunidade.</p>
         </div>
@@ -72,10 +74,10 @@ export function JornadaEntradaLead({
               }
             />
           )}
-          {!callPronta && (
+          {contextoPronto && !callPronta && (
             <Link
               href={`/calls?nova=1&oportunidade=${oportunidadeId}`}
-              className={`via-btn ${precisaContexto ? 'via-btn--secondary' : 'via-btn--primary'} via-btn--md`}
+              className="via-btn via-btn--primary via-btn--md"
             >
               Agendar primeira call
             </Link>

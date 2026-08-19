@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { ArrowUpRight, CalendarClock, History, Video } from 'lucide-react';
+import { ArrowUpRight, CalendarClock, FileSearch, History, Video } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { FASES_CRM, faseDaEtapa } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
+import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 import styles from './ResumoOperacionalLead.module.css';
 
 const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', {
@@ -24,13 +25,35 @@ function destinoDaCall(call: DossieLead['calls'][number]) {
   return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/calls/${call.id}`;
 }
 
-function proximoMovimento(lead: DossieLead) {
+type Movimento = {
+  tipo: 'navegacao' | 'pesquisa' | 'espera' | 'encerrado' | 'novo-ciclo';
+  rotulo: string;
+  titulo: string;
+  href: string | null;
+  acao: string | null;
+  prazo: string | null;
+};
+
+function situacaoDaPesquisa(lead: DossieLead) {
+  const ultima = lead.enriquecimentos[0] ?? null;
+  return {
+    pronta: lead.enriquecimentos.some(
+      (execucao) => execucao.status === 'concluido' && Boolean(execucao.dossie),
+    ),
+    processando: ultima?.status === 'na_fila' || ultima?.status === 'processando',
+    falhou: ultima?.status === 'falhou',
+  };
+}
+
+function proximoMovimento(lead: DossieLead): Movimento {
   const compromisso = lead.acoesPlano[0] ?? null;
   const proposta = lead.propostaRecente;
   const call = lead.calls[0] ?? null;
+  const pesquisa = situacaoDaPesquisa(lead);
 
   if (compromisso) {
     return {
+      tipo: 'navegacao',
       rotulo: 'Compromisso marcado',
       titulo: compromisso.titulo,
       href: compromisso.reuniaoId ? `/calls/${compromisso.reuniaoId}` : null,
@@ -39,10 +62,22 @@ function proximoMovimento(lead: DossieLead) {
     };
   }
 
-  if (lead.oportunidade.etapa === 'ganho') {
+  if (lead.projetoAtivo) {
     return {
-      rotulo: 'Venda ganha',
-      titulo: 'Registre uma nova oportunidade quando houver outro projeto para vender.',
+      tipo: 'navegacao',
+      rotulo: 'Entrega em andamento',
+      titulo: `Continue ${lead.projetoAtivo.titulo}.`,
+      href: `/solucoes/execucao/${lead.projetoAtivo.id}`,
+      acao: 'Abrir projeto',
+      prazo: null,
+    };
+  }
+
+  if (lead.projetoRecente?.status === 'concluido' || lead.oportunidade.etapa === 'ganho') {
+    return {
+      tipo: 'novo-ciclo',
+      rotulo: 'Ciclo concluído',
+      titulo: `Abra uma nova oportunidade quando houver outro projeto para vender a ${lead.empresa.nome}.`,
       href: null,
       acao: null,
       prazo: null,
@@ -51,6 +86,7 @@ function proximoMovimento(lead: DossieLead) {
 
   if (lead.oportunidade.etapa === 'perdido') {
     return {
+      tipo: 'encerrado',
       rotulo: 'Venda encerrada',
       titulo: 'O motivo da perda fica salvo para orientar uma abordagem futura.',
       href: null,
@@ -61,6 +97,7 @@ function proximoMovimento(lead: DossieLead) {
 
   if (proposta) {
     return {
+      tipo: 'navegacao',
       rotulo: proposta.status === 'aceita' ? 'Proposta aceita' : 'Decisão comercial',
       titulo:
         proposta.status === 'aceita'
@@ -74,6 +111,7 @@ function proximoMovimento(lead: DossieLead) {
 
   if (call) {
     return {
+      tipo: 'navegacao',
       rotulo: call.status === 'concluida' ? 'Depois da conversa' : 'Próxima conversa',
       titulo:
         call.status === 'concluida'
@@ -88,7 +126,32 @@ function proximoMovimento(lead: DossieLead) {
     };
   }
 
+  if (!pesquisa.pronta) {
+    if (pesquisa.processando) {
+      return {
+        tipo: 'espera',
+        rotulo: 'Pesquisa em andamento',
+        titulo: 'Estamos preparando o contexto para a primeira conversa.',
+        href: null,
+        acao: null,
+        prazo: null,
+      };
+    }
+
+    return {
+      tipo: 'pesquisa',
+      rotulo: pesquisa.falhou ? 'Pesquisa interrompida' : 'Primeiro movimento',
+      titulo: pesquisa.falhou
+        ? 'Revise os dados e tente pesquisar a empresa novamente.'
+        : 'Pesquise a empresa antes de agendar a primeira conversa.',
+      href: null,
+      acao: pesquisa.falhou ? 'Tentar novamente' : 'Pesquisar empresa',
+      prazo: null,
+    };
+  }
+
   return {
+    tipo: 'navegacao',
     rotulo: 'Primeiro movimento',
     titulo:
       lead.oportunidade.proximaAcao ??
@@ -101,6 +164,7 @@ function proximoMovimento(lead: DossieLead) {
 
 export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
   const movimento = proximoMovimento(lead);
+  const pesquisa = situacaoDaPesquisa(lead);
   const faseAtual = faseDaEtapa(lead.oportunidade.etapa);
   const indiceAtual = FASES_CRM.findIndex((fase) => fase.id === faseAtual);
   const fasesVenda = FASES_CRM.filter((fase) => fase.id !== 'desfecho');
@@ -143,7 +207,11 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
       <div className={styles.decisao}>
         <div className={styles.decisaoTexto}>
           <span className={styles.iconeDecisao}>
-            <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+            {movimento.tipo === 'pesquisa' || movimento.tipo === 'espera' ? (
+              <FileSearch size={19} strokeWidth={1.7} aria-hidden="true" />
+            ) : (
+              <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+            )}
           </span>
           <div>
             <p>{movimento.rotulo}</p>
@@ -157,14 +225,36 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
         </div>
 
         <div className={styles.acoesDecisao}>
-          {lead.oportunidade.etapa === 'ganho' ? (
+          {movimento.tipo === 'novo-ciclo' ? (
             <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
+          ) : movimento.tipo === 'pesquisa' ? (
+            <FormularioEnriquecimento
+              oportunidadeId={lead.oportunidade.id}
+              dominioInicial={lead.empresa.dominio}
+              linkedinInicial={lead.contato?.linkedinUrl ?? null}
+              temDossie={false}
+              rotulo={movimento.acao ?? undefined}
+              tom="claro"
+            />
           ) : movimento.href && movimento.acao ? (
             <Link href={movimento.href} className={styles.acaoPrimaria}>
               {movimento.acao}
               <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
             </Link>
           ) : null}
+          {!pesquisa.pronta &&
+            !pesquisa.processando &&
+            movimento.tipo === 'navegacao' &&
+            lead.oportunidade.etapa !== 'perdido' && (
+              <FormularioEnriquecimento
+                oportunidadeId={lead.oportunidade.id}
+                dominioInicial={lead.empresa.dominio}
+                linkedinInicial={lead.contato?.linkedinUrl ?? null}
+                temDossie={false}
+                rotulo={pesquisa.falhou ? 'Tentar pesquisa' : 'Pesquisar empresa'}
+                tom="transparente"
+              />
+            )}
         </div>
       </div>
 

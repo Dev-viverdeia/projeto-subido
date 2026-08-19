@@ -72,15 +72,21 @@
 
 .heroLateral {
   display: grid;
-  min-width: 280px;
+  min-width: 232px;
   justify-items: end;
-  gap: var(--via-space-4);
 }
 
 .estadoAtual {
   display: grid;
-  justify-items: end;
+  min-width: 220px;
+  justify-items: start;
   gap: var(--via-space-1);
+  padding: var(--via-space-4) var(--via-space-5);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 64%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(16px) saturate(135%);
 }
 
 .estadoAtual strong {
@@ -93,63 +99,9 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-1);
+  margin-top: var(--via-space-2);
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
-}
-
-.heroAcoes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--via-space-2);
-}
-
-.acaoPrimaria,
-.acaoSecundaria {
-  display: inline-flex;
-  min-height: var(--app-h-control);
-  align-items: center;
-  justify-content: center;
-  gap: var(--via-space-2);
-  padding-inline: var(--via-space-4);
-  border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-semibold);
-  text-decoration: none;
-  transition:
-    background-color var(--app-t-state),
-    border-color var(--app-t-state),
-    color var(--app-t-state),
-    box-shadow var(--app-t-state);
-}
-
-.acaoPrimaria {
-  border: 1px solid var(--via-navy);
-  background: var(--via-navy);
-  color: var(--via-white);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.acaoPrimaria:hover {
-  background: var(--via-navy-deep);
-}
-
-.acaoSecundaria {
-  border: 1px solid var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-surface) 70%, transparent);
-  color: var(--via-navy);
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
-}
-
-.acaoSecundaria:hover {
-  border-color: var(--via-navy-20);
-  background: var(--via-surface);
-}
-
-.acaoPrimaria:focus-visible,
-.acaoSecundaria:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 .heroMeta {
@@ -194,17 +146,6 @@
   .estadoAtual {
     min-width: 0;
     justify-items: start;
-  }
-
-  .heroAcoes {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
-  }
-
-  .heroAcoes > a,
-  .heroAcoes > button {
-    width: 100%;
   }
 
   .heroMeta {

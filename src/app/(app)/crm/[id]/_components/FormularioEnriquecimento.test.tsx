@@ -30,6 +30,8 @@ describe('FormularioEnriquecimento', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Pesquisar empresa' }));
+    expect(screen.getByTestId('enriquecimento-scrim').parentElement).toBe(document.body);
+    expect(document.body).toHaveStyle({ overflow: 'hidden' });
     const enviar = within(screen.getByRole('dialog')).getByRole('button', {
       name: 'Começar pesquisa',
     });

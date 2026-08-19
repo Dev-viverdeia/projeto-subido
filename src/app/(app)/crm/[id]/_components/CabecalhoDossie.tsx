@@ -1,8 +1,6 @@
 import { ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
 import { rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
-import { AtalhoProposta } from './AtalhoProposta';
-import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 import styles from './CabecalhoDossie.module.css';
 
 export function CabecalhoDossie({
@@ -24,6 +22,11 @@ export function CabecalhoDossie({
     : temDossie
       ? 'Pesquisa pronta'
       : 'Pesquisa pendente';
+  const chavePesquisa = enriquecimentoEmAndamento
+    ? 'processando'
+    : temDossie
+      ? 'pronta'
+      : 'pendente';
 
   return (
     <section className={styles.hero} aria-labelledby="dossie-titulo">
@@ -42,21 +45,10 @@ export function CabecalhoDossie({
               <span>Etapa da venda</span>
               <strong>{faseComercial}</strong>
               {!cicloEntregue && (
-                <small>
+                <small data-estado={chavePesquisa}>
                   <Layers3 size={13} strokeWidth={1.8} aria-hidden="true" /> {estadoPesquisa}
                 </small>
               )}
-            </div>
-            <div className={styles.heroAcoes}>
-              {!cicloEntregue && !enriquecimentoEmAndamento && (
-                <FormularioEnriquecimento
-                  oportunidadeId={lead.oportunidade.id}
-                  dominioInicial={lead.empresa.dominio}
-                  linkedinInicial={lead.contato?.linkedinUrl ?? null}
-                  temDossie={temDossie}
-                />
-              )}
-              <AtalhoProposta lead={lead} destaque={temDossie || cicloEntregue} />
             </div>
           </div>
         )}

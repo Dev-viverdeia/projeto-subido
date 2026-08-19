@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, BadgeCheck, CircleHelp, MessageSquareQuote, Radar, Target } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
-import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
 import { JornadaEntradaLead, type EstadoContextoLead } from './_components/JornadaEntradaLead';
 import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
@@ -80,58 +79,7 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       )}
 
       {!entradaRecente && falhaRecente && (
-        <EstadoEnriquecimento
-          status={falhaRecente.status}
-          erro={falhaRecente.erro}
-          acao={
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              dominioInicial={lead.empresa.dominio}
-              linkedinInicial={lead.contato?.linkedinUrl ?? null}
-              temDossie={Boolean(dossie)}
-              rotulo="Tentar novamente"
-            />
-          }
-        />
-      )}
-
-      {!entradaRecente && !dossie && !emAndamento && !falhaRecente && (
-        <section className={styles.primeiroDossie} aria-labelledby="primeira-pesquisa-titulo">
-          <div className={styles.convitePesquisa}>
-            <span className={styles.iconeVazio}>
-              <Radar size={22} strokeWidth={1.6} aria-hidden="true" />
-            </span>
-            <div>
-              <p className={styles.sobretitulo}>Pesquisa comercial</p>
-              <h2 id="primeira-pesquisa-titulo">Chegue à conversa sabendo onde investigar.</h2>
-              <p>
-                Informe o site e o que você já sabe. A plataforma cruza CRM, calls e fontes públicas
-                para sugerir perguntas e o próximo movimento.
-              </p>
-            </div>
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              dominioInicial={lead.empresa.dominio}
-              linkedinInicial={lead.contato?.linkedinUrl ?? null}
-              temDossie={false}
-            />
-          </div>
-
-          <div className={styles.entregas} aria-label="O que a pesquisa prepara">
-            <span>
-              <BadgeCheck size={16} aria-hidden="true" /> Fatos com fonte
-            </span>
-            <span>
-              <CircleHelp size={16} aria-hidden="true" /> Hipóteses separadas
-            </span>
-            <span>
-              <MessageSquareQuote size={16} aria-hidden="true" /> Perguntas para a call
-            </span>
-            <span>
-              <Target size={16} aria-hidden="true" /> Próximo movimento
-            </span>
-          </div>
-        </section>
+        <EstadoEnriquecimento status={falhaRecente.status} erro={falhaRecente.erro} />
       )}
 
       {!entradaRecente && dossie && execucaoPronta && (

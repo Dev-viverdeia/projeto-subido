@@ -247,7 +247,8 @@ export default async function PreviewDossiePage({
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
   const entrada = parametros.entrada === '1';
-  const lead = entrada ? LEAD_NOVO : LEAD_OPERACIONAL;
+  const pesquisaPendente = parametros.pesquisa === 'pendente';
+  const lead = entrada || pesquisaPendente ? LEAD_NOVO : LEAD_OPERACIONAL;
   const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
 
   return (
@@ -289,7 +290,7 @@ export default async function PreviewDossiePage({
           <CabecalhoDossie
             lead={lead}
             enriquecimentoEmAndamento={false}
-            temDossie={!entrada}
+            temDossie={!entrada && !pesquisaPendente}
             modoEntrada={entrada}
           />
 
@@ -305,7 +306,9 @@ export default async function PreviewDossiePage({
           ) : (
             <>
               <ResumoOperacionalLead lead={lead} />
-              <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
+              {!pesquisaPendente && (
+                <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
+              )}
             </>
           )}
         </div>

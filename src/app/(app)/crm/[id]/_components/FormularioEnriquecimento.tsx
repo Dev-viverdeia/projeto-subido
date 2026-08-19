@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { Building2, ContactRound, Database, Globe2, Layers3, X } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
@@ -15,6 +16,10 @@ const ETAPAS_PESQUISA = [
   },
 ] as const;
 
+const escutarMontagem = () => () => undefined;
+const obterMontagemCliente = () => true;
+const obterMontagemServidor = () => false;
+
 export function FormularioEnriquecimento({
   oportunidadeId,
   dominioInicial,
@@ -22,6 +27,7 @@ export function FormularioEnriquecimento({
   temDossie,
   rotulo,
   abertoInicial = false,
+  tom = 'padrao',
 }: {
   oportunidadeId: string;
   dominioInicial: string | null;
@@ -29,8 +35,16 @@ export function FormularioEnriquecimento({
   temDossie: boolean;
   rotulo?: string;
   abertoInicial?: boolean;
+  tom?: 'padrao' | 'claro' | 'transparente';
 }) {
   const router = useRouter();
+  const montado = useSyncExternalStore(
+    escutarMontagem,
+    obterMontagemCliente,
+    obterMontagemServidor,
+  );
+  const tituloId = useId();
+  const descricaoId = useId();
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(abertoInicial);
@@ -38,8 +52,17 @@ export function FormularioEnriquecimento({
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    if (aberto) painel.current?.querySelector<HTMLElement>('input')?.focus();
-  }, [aberto]);
+    if (!montado || !aberto) return;
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const quadro = requestAnimationFrame(() =>
+      painel.current?.querySelector<HTMLElement>('input')?.focus(),
+    );
+    return () => {
+      cancelAnimationFrame(quadro);
+      document.body.style.overflow = overflowAnterior;
+    };
+  }, [aberto, montado]);
 
   function fechar() {
     if (enviando) return;
@@ -95,7 +118,11 @@ export function FormularioEnriquecimento({
       <button
         ref={gatilho}
         type="button"
-        className={`via-btn ${temDossie ? 'via-btn--secondary' : 'via-btn--primary'} via-btn--md ${styles.gatilho}`}
+        className={
+          tom === 'padrao'
+            ? `via-btn ${temDossie ? 'via-btn--secondary' : 'via-btn--primary'} via-btn--md ${styles.gatilho}`
+            : `${styles.gatilho} ${tom === 'claro' ? styles.gatilhoClaro : styles.gatilhoTransparente}`
+        }
         onClick={() => setAberto(true)}
         aria-haspopup="dialog"
       >
@@ -103,117 +130,127 @@ export function FormularioEnriquecimento({
         {rotulo ?? (temDossie ? 'Atualizar pesquisa' : 'Pesquisar empresa')}
       </button>
 
-      {aberto && (
-        <div
-          className={styles.scrim}
-          onMouseDown={(evento) => {
-            if (evento.target === evento.currentTarget) fechar();
-          }}
-        >
+      {montado &&
+        aberto &&
+        createPortal(
           <div
-            ref={painel}
-            className={styles.dialogo}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="enriquecimento-titulo"
-            onKeyDown={(evento) => {
-              if (evento.key === 'Escape') fechar();
-              if (evento.key !== 'Tab') return;
-              const focaveis = painel.current?.querySelectorAll<HTMLElement>(
-                'button:not([disabled]), input:not([disabled]), textarea:not([disabled])',
-              );
-              if (!focaveis?.length) return;
-              const primeiro = focaveis[0];
-              const ultimo = focaveis[focaveis.length - 1];
-              if (evento.shiftKey && document.activeElement === primeiro) {
-                evento.preventDefault();
-                ultimo?.focus();
-              } else if (!evento.shiftKey && document.activeElement === ultimo) {
-                evento.preventDefault();
-                primeiro?.focus();
-              }
+            className={styles.scrim}
+            data-testid="enriquecimento-scrim"
+            onMouseDown={(evento) => {
+              if (evento.target === evento.currentTarget) fechar();
             }}
           >
-            <header className={styles.topo}>
-              <div>
-                <p className={styles.sobretitulo}>Pesquisa comercial</p>
-                <h2 id="enriquecimento-titulo">Pesquisar esta empresa</h2>
-                <p>
-                  Juntamos o que já está no CRM com fontes públicas para preparar sua próxima
-                  conversa. Fatos e hipóteses aparecem separados.
-                </p>
+            <div
+              ref={painel}
+              className={styles.dialogo}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={tituloId}
+              aria-describedby={descricaoId}
+              onKeyDown={(evento) => {
+                if (evento.key === 'Escape') fechar();
+                if (evento.key !== 'Tab') return;
+                const focaveis = painel.current?.querySelectorAll<HTMLElement>(
+                  'button:not([disabled]), input:not([disabled]), textarea:not([disabled])',
+                );
+                if (!focaveis?.length) return;
+                const primeiro = focaveis[0];
+                const ultimo = focaveis[focaveis.length - 1];
+                if (evento.shiftKey && document.activeElement === primeiro) {
+                  evento.preventDefault();
+                  ultimo?.focus();
+                } else if (!evento.shiftKey && document.activeElement === ultimo) {
+                  evento.preventDefault();
+                  primeiro?.focus();
+                }
+              }}
+            >
+              <header className={styles.topo}>
+                <div>
+                  <p className={styles.sobretitulo}>Pesquisa comercial</p>
+                  <h2 id={tituloId}>Pesquisar esta empresa</h2>
+                  <p id={descricaoId}>
+                    Juntamos o que já está no CRM com fontes públicas para preparar sua próxima
+                    conversa. Fatos e hipóteses aparecem separados.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.fechar}
+                  onClick={fechar}
+                  aria-label="Fechar"
+                >
+                  <X size={19} strokeWidth={1.8} aria-hidden="true" />
+                </button>
+              </header>
+
+              <div className={styles.fontes} aria-label="Fontes usadas na análise">
+                <span>
+                  <Database size={15} aria-hidden="true" /> CRM e calls
+                </span>
+                <span>
+                  <Globe2 size={15} aria-hidden="true" /> Site público
+                </span>
+                <span>
+                  <Building2 size={15} aria-hidden="true" /> Suas informações
+                </span>
               </div>
-              <button type="button" className={styles.fechar} onClick={fechar} aria-label="Fechar">
-                <X size={19} strokeWidth={1.8} aria-hidden="true" />
-              </button>
-            </header>
 
-            <div className={styles.fontes} aria-label="Fontes usadas na análise">
-              <span>
-                <Database size={15} aria-hidden="true" /> CRM e calls
-              </span>
-              <span>
-                <Globe2 size={15} aria-hidden="true" /> Site público
-              </span>
-              <span>
-                <Building2 size={15} aria-hidden="true" /> Suas informações
-              </span>
-            </div>
+              <form className={styles.formulario} onSubmit={(evento) => void enviar(evento)}>
+                {erro && (
+                  <Alert tone="danger" size="compact">
+                    {erro}
+                  </Alert>
+                )}
 
-            <form className={styles.formulario} onSubmit={(evento) => void enviar(evento)}>
-              {erro && (
-                <Alert tone="danger" size="compact">
-                  {erro}
-                </Alert>
-              )}
-
-              <Input
-                id="enriquecimento-dominio"
-                name="dominio"
-                label="Site da empresa"
-                placeholder="empresa.com.br"
-                defaultValue={dominioInicial ?? ''}
-                hint="Usamos apenas conteúdo público do site."
-                inputMode="url"
-              />
-
-              <Input
-                id="enriquecimento-linkedin"
-                name="linkedin"
-                label="LinkedIn do contato"
-                placeholder="https://www.linkedin.com/in/..."
-                defaultValue={linkedinInicial ?? ''}
-                hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
-                iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
-                inputMode="url"
-              />
-
-              <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
-                <span>Contexto que você já tem</span>
-                <textarea
-                  id="enriquecimento-contexto"
-                  name="contexto"
-                  rows={5}
-                  maxLength={4000}
-                  placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
+                <Input
+                  id="enriquecimento-dominio"
+                  name="dominio"
+                  label="Site da empresa"
+                  placeholder="empresa.com.br"
+                  defaultValue={dominioInicial ?? ''}
+                  hint="Usamos apenas conteúdo público do site."
+                  inputMode="url"
                 />
-                <small>
-                  Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
-                </small>
-              </label>
 
-              <div className={styles.acoes}>
-                <Button type="button" variant="secondary" onClick={fechar} disabled={enviando}>
-                  Cancelar
-                </Button>
-                <Button type="submit" variant="primary" loading={enviando}>
-                  Começar pesquisa
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                <Input
+                  id="enriquecimento-linkedin"
+                  name="linkedin"
+                  label="LinkedIn do contato"
+                  placeholder="https://www.linkedin.com/in/..."
+                  defaultValue={linkedinInicial ?? ''}
+                  hint="Opcional. Ajuda a identificar o papel dessa pessoa na decisão."
+                  iconLeft={<ContactRound size={16} strokeWidth={1.8} />}
+                  inputMode="url"
+                />
+
+                <label className={styles.campoTexto} htmlFor="enriquecimento-contexto">
+                  <span>Contexto que você já tem</span>
+                  <textarea
+                    id="enriquecimento-contexto"
+                    name="contexto"
+                    rows={5}
+                    maxLength={4000}
+                    placeholder="Ex.: chegou por indicação, quer reduzir o tempo de resposta e usa WhatsApp no atendimento."
+                  />
+                  <small>
+                    Opcional. Quanto mais concreto o contexto, melhores serão as perguntas.
+                  </small>
+                </label>
+
+                <div className={styles.acoes}>
+                  <Button type="button" variant="secondary" onClick={fechar} disabled={enviando}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" variant="primary" loading={enviando}>
+                    Começar pesquisa
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

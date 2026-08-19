@@ -1,5 +1,49 @@
 .gatilho {
+  display: inline-flex;
+  min-height: var(--app-h-control);
+  align-items: center;
+  justify-content: center;
   gap: var(--via-space-2);
+  padding-inline: var(--via-space-5);
+  border-radius: var(--app-radius-control);
+  cursor: pointer;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    color var(--app-t-state),
+    transform var(--app-t-state);
+}
+
+.gatilhoClaro {
+  border: 1px solid color-mix(in srgb, var(--via-white) 24%, transparent);
+  background: var(--via-white);
+  color: var(--via-navy-deep);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.gatilhoClaro:hover {
+  box-shadow: var(--app-elev-2-shadow);
+  transform: translateY(-1px);
+}
+
+.gatilhoTransparente {
+  border: 1px solid color-mix(in srgb, var(--via-white) 22%, transparent);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-white);
+}
+
+.gatilhoTransparente:hover {
+  border-color: color-mix(in srgb, var(--via-white) 38%, transparent);
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+}
+
+.gatilhoClaro:focus-visible,
+.gatilhoTransparente:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--via-accent) 30%, transparent);
 }
 
 .scrim {
@@ -9,8 +53,10 @@
   display: grid;
   place-items: center;
   padding: var(--via-space-4);
+  overflow: auto;
   background: color-mix(in srgb, var(--via-navy-deep) 76%, transparent);
   backdrop-filter: blur(8px);
+  overscroll-behavior: contain;
 }
 
 .dialogo {
@@ -23,6 +69,8 @@
   color: var(--via-text-primary);
   box-shadow: var(--via-glass-shadow-lift);
   backdrop-filter: var(--via-glass-blur);
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .topo {

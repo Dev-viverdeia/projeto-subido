@@ -90,11 +90,9 @@
 }
 
 .metodo small {
-  overflow: hidden;
   color: var(--via-text-faint);
   font-size: var(--via-fs-micro);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: var(--via-lh-normal);
 }
 
 .metodo li[data-estado='atual'] {
@@ -175,7 +173,10 @@
 }
 
 .acoesDecisao {
+  display: flex;
   flex: 0 0 auto;
+  align-items: center;
+  gap: var(--via-space-2);
 }
 
 .acaoPrimaria {
@@ -395,10 +396,6 @@
     grid-template-columns: 1fr;
   }
 
-  .metodo small {
-    white-space: normal;
-  }
-
   .decisao {
     align-items: stretch;
     flex-direction: column;
@@ -408,6 +405,15 @@
   .acaoPrimaria,
   .novoCicloForm,
   .novoCicloForm button {
+    width: 100%;
+  }
+
+  .acoesDecisao {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acoesDecisao > button {
     width: 100%;
   }
 
