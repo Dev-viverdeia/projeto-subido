@@ -176,12 +176,30 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
       <main id="conteudo" className={styles.conteudo}>
         <div className={pagina.pagina}>
           <header className={pagina.topo}>
-            <div className={pagina.introducao}>
-              <p className={pagina.sobretitulo}>CRM de vendas</p>
-              <h1>Oportunidades</h1>
-              <p>Veja quem precisa de atenção e o próximo passo de cada venda.</p>
+            <div className={pagina.linhaTopo}>
+              <div className={pagina.introducao}>
+                <p className={pagina.sobretitulo}>Sua operação comercial</p>
+                <h1>Oportunidades</h1>
+                <p>Um método simples para vender projetos de IA com a próxima ação clara.</p>
+              </div>
+              <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
             </div>
-            <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
+            <div className={pagina.trilhaMetodo} aria-label="Etapas do método de venda">
+              {[
+                ['01', 'Preparar', 'Pesquisar e abordar', 1],
+                ['02', 'Descobrir', 'Entender a dor', 1],
+                ['03', 'Propor', 'Escopo e decisão', 1],
+              ].map(([numero, titulo, descricao, total]) => (
+                <div key={numero}>
+                  <span>{numero}</span>
+                  <div>
+                    <strong>{titulo}</strong>
+                    <small>{descricao}</small>
+                  </div>
+                  <b aria-label={`${total} oportunidades`}>{total}</b>
+                </div>
+              ))}
+            </div>
           </header>
 
           <section className={pagina.quadro} aria-labelledby="preview-pipeline-titulo">

@@ -71,7 +71,9 @@ export function ColunaAtiva({
     >
       <header className={styles.colunaTopo}>
         <div>
-          <span className={styles.faseNumero}>Etapa {numero}</span>
+          <span className={styles.faseNumero}>
+            {String(numero).padStart(2, '0')} · método de venda
+          </span>
           <h2 id={`coluna-${fase.id}`}>{fase.rotulo}</h2>
           <p>{fase.descricao}</p>
         </div>

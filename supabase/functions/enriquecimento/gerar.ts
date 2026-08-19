@@ -27,6 +27,10 @@ REGRAS INEGOCIÁVEIS
   estiver literalmente nas fontes recebidas. Toda inferência entra em "hipoteses".
 · Não invente faturamento, número de funcionários, tecnologia usada, cargo,
   endereço, dor, intenção ou urgência.
+· Os dados públicos vindos da Prospecção podem confirmar canais da empresa. Uma pessoa marcada
+  como possível decisor continua sendo apenas uma hipótese até ter vínculo e papel confirmados.
+· Aproveite telefone, e-mail, site, redes e pessoas já encontradas. Não faça perguntas cuja
+  resposta já está literalmente nos dados recebidos.
 · Use "alta" apenas quando múltiplos sinais independentes sustentarem a hipótese;
   o normal é "media" ou "baixa".
 · Em cada hipótese, diga exatamente como confirmá-la na call.
@@ -75,6 +79,40 @@ type Fonte = {
   status: 'lida' | 'referencia' | 'indisponivel';
 };
 
+type CanalEncontrado = {
+  tipo:
+    | 'telefone'
+    | 'email'
+    | 'site'
+    | 'instagram'
+    | 'facebook'
+    | 'linkedin'
+    | 'x'
+    | 'tiktok'
+    | 'youtube'
+    | 'pinterest';
+  valor: string;
+  url: string | null;
+  origem: 'crm' | 'prospeccao';
+};
+
+type PessoaEncontrada = {
+  nome: string;
+  cargo: string | null;
+  email: string | null;
+  telefone: string | null;
+  linkedinUrl: string | null;
+  status: 'confirmada' | 'possivel';
+  evidencia: string;
+};
+
+type InteligenciaContato = {
+  canais: CanalEncontrado[];
+  pessoas: PessoaEncontrada[];
+};
+
+type DossieCompleto = Dossie & { inteligenciaContato: InteligenciaContato };
+
 export async function gerarEGravar(
   supabase: SupabaseClient,
   enriquecimentoId: string,
@@ -92,6 +130,10 @@ export async function gerarEGravar(
     etapa = 'ler_contexto';
     const contexto = await lerContexto(supabase, entrada.oportunidade_id);
     const fontes: Fonte[] = [{ tipo: 'crm', titulo: 'Histórico do CRM', status: 'lida' }];
+
+    if (contexto.prospeccao) {
+      fontes.push({ tipo: 'crm', titulo: 'Dados públicos da Prospecção', status: 'lida' });
+    }
 
     let pagina: PaginaPublica | null = null;
     etapa = 'ler_site';
@@ -124,7 +166,11 @@ export async function gerarEGravar(
 
     etapa = 'gerar_dossie';
     const geracao = await gerarDossieComTolerancia({ contexto, entrada, pagina });
-    const seguro = limitarUrls(geracao.dossie, fontes);
+    const completo: DossieCompleto = {
+      ...geracao.dossie,
+      inteligenciaContato: extrairInteligenciaContato(contexto),
+    };
+    const seguro = limitarUrls(completo, fontes);
     const concluido = new Date().toISOString();
 
     etapa = 'gravar_resultado';
@@ -167,10 +213,10 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
     .single();
   if (error || !oportunidade) throw new Error('oportunidade_nao_encontrada');
 
-  const [empresa, contato, eventos, reunioes, propostas] = await Promise.all([
+  const [empresa, contato, eventos, reunioes, propostas, prospeccao] = await Promise.all([
     supabase
       .from('crm_empresas')
-      .select('nome, dominio, setor, porte, cidade, estado, resumo')
+      .select('nome, dominio, setor, porte, cidade, estado, resumo, enriquecimento')
       .eq('id', oportunidade.empresa_id)
       .single(),
     oportunidade.contato_principal_id
@@ -200,6 +246,15 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
       .eq('oportunidade_id', oportunidadeId)
       .order('atualizado_em', { ascending: false })
       .limit(6),
+    supabase
+      .from('prospeccao_leads')
+      .select(
+        'nome, categoria, endereco, cidade, estado, site_url, dominio, telefone, telefones, emails, redes_sociais, decisores, avaliacao, total_avaliacoes, descricao, fontes, qualificacao',
+      )
+      .eq('crm_oportunidade_id', oportunidadeId)
+      .order('enviado_crm_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (empresa.error) throw empresa.error;
@@ -207,6 +262,7 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
   if (eventos.error) throw eventos.error;
   if (reunioes.error) throw reunioes.error;
   if (propostas.error) throw propostas.error;
+  if (prospeccao.error) throw prospeccao.error;
 
   const ids = (reunioes.data ?? []).map((reuniao) => reuniao.id);
   const analises = ids.length
@@ -221,6 +277,10 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
     : { data: [], error: null };
   if (analises.error) throw analises.error;
 
+  const enriquecimentoEmpresa = objeto(empresa.data?.enriquecimento);
+  const prospeccaoDaEmpresa =
+    enriquecimentoEmpresa.origem === 'prospeccao' ? enriquecimentoEmpresa : null;
+
   return {
     oportunidade,
     empresa: empresa.data,
@@ -229,6 +289,7 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
     reunioes: reunioes.data ?? [],
     analisesDeCalls: analises.data ?? [],
     propostas: propostas.data ?? [],
+    prospeccao: prospeccao.data ?? prospeccaoDaEmpresa,
   };
 }
 
@@ -553,7 +614,7 @@ function urlOuIndefinida(valor: unknown): string | undefined {
   }
 }
 
-function limitarUrls(dossie: Dossie, fontes: Fonte[]): Dossie {
+function limitarUrls(dossie: DossieCompleto, fontes: Fonte[]): DossieCompleto {
   const permitidas = new Set(
     fontes.flatMap((fonte) => (fonte.url && fonte.status === 'lida' ? [fonte.url] : [])),
   );
@@ -564,6 +625,148 @@ function limitarUrls(dossie: Dossie, fontes: Fonte[]): Dossie {
       urlFonte: fato.urlFonte && permitidas.has(fato.urlFonte) ? fato.urlFonte : undefined,
     })),
   };
+}
+
+function extrairInteligenciaContato(contexto: unknown): InteligenciaContato {
+  const raiz = objeto(contexto);
+  const empresa = objeto(raiz.empresa);
+  const contato = objeto(raiz.contato);
+  const prospeccao = objeto(raiz.prospeccao);
+  const canais: CanalEncontrado[] = [];
+  const pessoas: PessoaEncontrada[] = [];
+  const vistos = new Set<string>();
+
+  const adicionarCanal = (
+    tipo: CanalEncontrado['tipo'],
+    valor: unknown,
+    url: string | null,
+    origem: CanalEncontrado['origem'],
+  ) => {
+    const limpo = textoOuNulo(valor, 2048);
+    if (!limpo) return;
+    const chave = `${tipo}:${limpo.toLocaleLowerCase('pt-BR')}`;
+    if (vistos.has(chave) || canais.length >= 20) return;
+    vistos.add(chave);
+    canais.push({ tipo, valor: limpo, url, origem });
+  };
+
+  const telefoneCrm = textoOuNulo(contato.telefone, 80);
+  const emailCrm = textoOuNulo(contato.email, 320);
+  const linkedinCrm = urlOuNula(contato.linkedin_url);
+  if (telefoneCrm)
+    adicionarCanal('telefone', telefoneCrm, `tel:${somenteDigitos(telefoneCrm)}`, 'crm');
+  if (emailCrm) adicionarCanal('email', emailCrm, `mailto:${emailCrm}`, 'crm');
+  if (linkedinCrm) adicionarCanal('linkedin', linkedinCrm, linkedinCrm, 'crm');
+
+  const site = urlOuNula(prospeccao.site_url) ?? urlDoDominio(empresa.dominio);
+  if (site) adicionarCanal('site', site, site, prospeccao.site_url ? 'prospeccao' : 'crm');
+
+  const telefones = unicas([
+    ...strings(prospeccao.telefones),
+    textoOuNulo(prospeccao.telefone, 80) ?? '',
+  ]);
+  for (const telefone of telefones) {
+    adicionarCanal('telefone', telefone, `tel:${somenteDigitos(telefone)}`, 'prospeccao');
+  }
+  for (const email of strings(prospeccao.emails)) {
+    adicionarCanal('email', email, `mailto:${email}`, 'prospeccao');
+  }
+  for (const item of lista(prospeccao.redes_sociais, 16)) {
+    const rede = objeto(item);
+    const redesPermitidas: ReadonlyArray<CanalEncontrado['tipo']> = [
+      'instagram',
+      'facebook',
+      'linkedin',
+      'x',
+      'tiktok',
+      'youtube',
+      'pinterest',
+    ];
+    const tipo =
+      typeof rede.rede === 'string' &&
+      redesPermitidas.includes(rede.rede as CanalEncontrado['tipo'])
+        ? (rede.rede as CanalEncontrado['tipo'])
+        : null;
+    const url = urlOuNula(rede.url);
+    if (tipo && url) adicionarCanal(tipo, identificadorSocial(url) ?? url, url, 'prospeccao');
+  }
+
+  const nomeContato = textoOuNulo(contato.nome, 160);
+  if (nomeContato && !/contato a identificar/i.test(nomeContato)) {
+    pessoas.push({
+      nome: nomeContato,
+      cargo: textoOuNulo(contato.cargo, 180),
+      email: emailCrm,
+      telefone: telefoneCrm,
+      linkedinUrl: linkedinCrm,
+      status: 'confirmada',
+      evidencia: 'Contato cadastrado na ficha do cliente',
+    });
+  }
+
+  for (const item of lista(prospeccao.decisores, 5)) {
+    const decisor = objeto(item);
+    const nome = textoOuNulo(decisor.nome, 160);
+    if (!nome || pessoas.some((pessoa) => pessoa.nome.toLowerCase() === nome.toLowerCase()))
+      continue;
+    const email = textoOuNulo(decisor.email, 320);
+    const telefone = textoOuNulo(decisor.telefone, 80);
+    const linkedinUrl = urlOuNula(decisor.linkedin_url);
+    pessoas.push({
+      nome,
+      cargo: textoOuNulo(decisor.cargo, 180),
+      email,
+      telefone,
+      linkedinUrl,
+      status: 'possivel',
+      evidencia: texto(decisor.fonte, 120, 'Perfil profissional público'),
+    });
+    if (email) adicionarCanal('email', email, `mailto:${email}`, 'prospeccao');
+    if (telefone)
+      adicionarCanal('telefone', telefone, `tel:${somenteDigitos(telefone)}`, 'prospeccao');
+    if (linkedinUrl) adicionarCanal('linkedin', nome, linkedinUrl, 'prospeccao');
+  }
+
+  return { canais, pessoas: pessoas.slice(0, 6) };
+}
+
+function strings(valor: unknown): string[] {
+  return Array.isArray(valor)
+    ? valor.flatMap((item) => {
+        const limpo = textoOuNulo(item, 2048);
+        return limpo ? [limpo] : [];
+      })
+    : [];
+}
+
+function somenteDigitos(valor: string): string {
+  return valor.replace(/\D/g, '');
+}
+
+function urlOuNula(valor: unknown): string | null {
+  if (typeof valor !== 'string' || !valor.trim()) return null;
+  try {
+    const url = new URL(valor.trim());
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function urlDoDominio(valor: unknown): string | null {
+  const dominio = textoOuNulo(valor, 253);
+  if (!dominio) return null;
+  return urlOuNula(/^https?:\/\//i.test(dominio) ? dominio : `https://${dominio}`);
+}
+
+function identificadorSocial(valor: string): string | null {
+  try {
+    const partes = new URL(valor).pathname.split('/').filter(Boolean);
+    const perfil = partes.at(-1)?.replace(/^@/, '');
+    return perfil ? `@${perfil}` : null;
+  } catch {
+    return null;
+  }
 }
 
 function mensagemSegura(erro: unknown): string {

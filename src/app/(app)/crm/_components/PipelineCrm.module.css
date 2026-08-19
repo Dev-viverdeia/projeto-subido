@@ -219,10 +219,15 @@
 .quadroKanban {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--app-elev-2-line);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-navy-14));
   border-radius: var(--app-radius-surface);
-  background: var(--app-elev-2-bg);
-  box-shadow: var(--app-elev-2-shadow);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--via-surface) 76%, transparent), transparent),
+    color-mix(in srgb, var(--via-bg-2) 72%, transparent);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(22px) saturate(140%);
 }
 
 .cabecalhoQuadro {
@@ -230,10 +235,10 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 48px;
-  padding: var(--via-space-2) var(--app-pad-card);
+  min-height: 54px;
+  padding: var(--via-space-3) var(--app-pad-card);
   border-bottom: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-bg-2) 54%, var(--via-surface));
+  background: color-mix(in srgb, var(--via-surface) 64%, transparent);
 }
 
 .cabecalhoQuadro > div {
@@ -387,12 +392,14 @@
 .rolagem {
   width: 100%;
   min-width: 0;
+  padding: var(--via-space-3);
   container-type: inline-size;
 }
 
 .pipeline {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  gap: var(--via-space-3);
   min-width: 0;
 }
 
@@ -401,11 +408,21 @@
   z-index: 1;
   display: flex;
   min-width: 0;
-  min-height: 220px;
+  min-height: 260px;
   flex-direction: column;
   padding: var(--app-pad-card);
-  background: color-mix(in srgb, var(--via-bg-2) 35%, var(--via-surface));
-  transition: background-color var(--app-t-state);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
+  border-radius: var(--app-radius-card);
+  background:
+    radial-gradient(ellipse 72% 34% at 50% 0%, var(--via-navy-04), transparent 78%),
+    color-mix(in srgb, var(--via-surface) 68%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .coluna:has(.cartao:focus-within) {
@@ -413,11 +430,13 @@
 }
 
 .coluna + .coluna {
-  border-top: 1px solid var(--via-border-hairline);
+  border-top: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
 }
 
 .coluna[data-sobre='true'] {
-  background: color-mix(in srgb, var(--via-navy-04) 65%, var(--via-surface));
+  border-color: var(--via-navy-20);
+  background: color-mix(in srgb, var(--via-navy-04) 72%, var(--via-surface));
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
 .colunaTopo {
@@ -427,7 +446,7 @@
   justify-content: space-between;
   gap: var(--via-space-4);
   padding-bottom: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-hairline);
+  border-bottom: 1px solid color-mix(in srgb, var(--via-navy-08) 70%, var(--via-border-hairline));
 }
 
 .colunaTopo > div {
@@ -442,7 +461,7 @@
 .faseNumero {
   display: block;
   margin-bottom: var(--via-space-1);
-  color: var(--via-text-faint);
+  color: var(--via-navy);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -468,10 +487,10 @@
   min-width: 28px;
   height: 28px;
   place-items: center;
-  border: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--via-navy-14);
   border-radius: var(--app-radius-chip);
   background: var(--via-surface);
-  color: var(--via-text-body);
+  color: var(--via-navy);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
@@ -490,10 +509,14 @@
   position: relative;
   min-width: 0;
   padding: var(--via-space-4);
-  border: 1px solid var(--app-elev-1-line);
+  border: 1px solid color-mix(in srgb, var(--via-white) 78%, var(--via-border-soft));
   border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 78%, transparent), transparent),
+    color-mix(in srgb, var(--via-surface) 82%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
   cursor: grab;
   touch-action: manipulation;
   user-select: none;
@@ -613,7 +636,10 @@
 }
 
 .pesquisa {
+  display: inline-flex;
   flex: 0 0 auto;
+  align-items: center;
+  gap: var(--via-space-1);
   max-width: 48%;
   overflow: hidden;
   color: var(--via-text-faint);
@@ -635,8 +661,11 @@
   display: grid;
   gap: var(--via-space-1);
   margin-top: var(--via-space-4);
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
+  padding: var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-bg-2) 62%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .proximoPasso span {
@@ -659,8 +688,8 @@
 }
 
 .proximoPasso[data-vazio='true'] strong {
-  color: var(--via-text-muted);
-  font-weight: var(--via-fw-regular);
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
 }
 
 .proximoPasso small {
@@ -680,13 +709,14 @@
 .rodapeCartao {
   display: flex;
   min-width: 0;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: var(--via-space-3);
   margin-top: var(--via-space-4);
 }
 
 .rodapeCartao time {
+  align-self: center;
   overflow: hidden;
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
@@ -704,12 +734,14 @@
 
 .dossie {
   display: inline-flex;
-  min-height: 32px;
+  min-height: 36px;
   align-items: center;
   gap: var(--via-space-1);
-  padding-inline: var(--via-space-2);
+  padding-inline: var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
   border-radius: var(--app-radius-chip);
-  color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -719,7 +751,7 @@
 }
 
 .dossie:hover {
-  background: var(--via-navy-04);
+  background: var(--via-navy-deep);
 }
 
 .dossie:focus-visible {
@@ -1071,14 +1103,12 @@
   }
 
   .coluna + .coluna {
-    border-top: 0;
-    border-left: 1px solid var(--via-border-hairline);
+    border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
   }
 
   .coluna:last-child {
     grid-column: 1 / -1;
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
+    border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
   }
 }
 
@@ -1089,8 +1119,7 @@
 
   .coluna:last-child {
     grid-column: auto;
-    border-top: 0;
-    border-left: 1px solid var(--via-border-hairline);
+    border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
   }
 }
 
@@ -1211,8 +1240,7 @@
 
   .pipeline .coluna:last-child {
     grid-column: auto;
-    border-top: 0;
-    border-left: 0;
+    border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
   }
 
   .desfechoFlutuante {
@@ -1251,8 +1279,7 @@
   }
 
   .coluna + .coluna {
-    border-top: 0;
-    border-left: 0;
+    border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-hairline));
   }
 
   .cartao {
@@ -1262,6 +1289,20 @@
   .contextoCartao {
     display: grid;
     justify-content: stretch;
+  }
+
+  .rodapeCartao {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .acoesCartao {
+    width: 100%;
+  }
+
+  .dossie {
+    flex: 1;
+    justify-content: center;
   }
 
   .pesquisa {
@@ -1283,6 +1324,7 @@
 
 @supports not (backdrop-filter: blur(1px)) {
   .barraPrioridades,
+  .quadroKanban,
   .bandejaDesfecho,
   .abasMobile {
     background: var(--via-surface);

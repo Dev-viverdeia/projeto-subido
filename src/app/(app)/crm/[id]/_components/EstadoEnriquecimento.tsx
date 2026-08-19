@@ -74,7 +74,7 @@ export function EstadoEnriquecimento({
           </span>
           <div>
             <strong>Reunir histórico</strong>
-            <small>CRM, calls e atividades</small>
+            <small>CRM, Prospecção e calls</small>
           </div>
           <Database size={16} aria-hidden="true" />
         </li>
@@ -90,7 +90,7 @@ export function EstadoEnriquecimento({
           <span>03</span>
           <div>
             <strong>Organizar a ficha</strong>
-            <small>Fatos, hipóteses e perguntas</small>
+            <small>Canais, fatos e roteiro da call</small>
           </div>
           <Layers3 size={16} aria-hidden="true" />
         </li>

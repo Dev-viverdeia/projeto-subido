@@ -1,22 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  ArrowLeft,
-  Bot,
-  BriefcaseBusiness,
-  ContactRound,
-  GraduationCap,
-  House,
-  UsersRound,
-  Video,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { CabecalhoDossie } from '@/app/(app)/crm/[id]/_components/CabecalhoDossie';
 import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
-import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
+import { PreviewSidebar } from './PreviewSidebar';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -235,7 +226,7 @@ const LEAD_OPERACIONAL: DossieLead = {
               etapa: 'impacto',
               pergunta:
                 'Quanto tempo a equipe gasta por dia repetindo perguntas de triagem e retomando quem não respondeu?',
-              intencao: 'Transformar o gargalo em capacidade operacional recuperável.',
+              intencao: 'Resolver o gargalo e recuperar capacidade operacional.',
               projetoRelacionado: 'SDR de Atendimento e Qualificação',
             },
             {
@@ -254,6 +245,54 @@ const LEAD_OPERACIONAL: DossieLead = {
             proximoPasso:
               'Mapear uma semana de conversas e apresentar o escopo do piloto ao decisor.',
           },
+        },
+        inteligenciaContato: {
+          canais: [
+            {
+              tipo: 'telefone',
+              valor: '+55 11 99999-0000',
+              url: 'tel:5511999990000',
+              origem: 'crm',
+            },
+            {
+              tipo: 'email',
+              valor: 'camila@clinicaaurora.com.br',
+              url: 'mailto:camila@clinicaaurora.com.br',
+              origem: 'crm',
+            },
+            {
+              tipo: 'site',
+              valor: 'https://clinicaaurora.com.br',
+              url: 'https://clinicaaurora.com.br',
+              origem: 'prospeccao',
+            },
+            {
+              tipo: 'instagram',
+              valor: '@clinicaaurora',
+              url: 'https://instagram.com/clinicaaurora',
+              origem: 'prospeccao',
+            },
+          ],
+          pessoas: [
+            {
+              nome: 'Camila Rios',
+              cargo: 'Diretora de Operações',
+              email: 'camila@clinicaaurora.com.br',
+              telefone: '+55 11 99999-0000',
+              linkedinUrl: 'https://www.linkedin.com/in/camila-rios',
+              status: 'confirmada',
+              evidencia: 'Contato cadastrado na ficha do cliente',
+            },
+            {
+              nome: 'Marcos Vieira',
+              cargo: 'Sócio-diretor',
+              email: null,
+              telefone: null,
+              linkedinUrl: 'https://www.linkedin.com/in/marcos-vieira',
+              status: 'possivel',
+              evidencia: 'Perfil profissional público',
+            },
+          ],
         },
         proximaAcao: {
           acao: 'Medir uma semana de conversas antes de definir o piloto.',
@@ -314,34 +353,7 @@ export default async function PreviewDossiePage({
 
   return (
     <div className={shell.shell}>
-      <aside className={shell.sidebar}>
-        <div className={shell.logo}>
-          <SubidoLogo size={18} />
-        </div>
-        <nav aria-label="Preview da navegação">
-          <span>
-            <House size={18} aria-hidden="true" /> Início
-          </span>
-          <a className={shell.ativo} href="#conteudo">
-            <ContactRound size={18} aria-hidden="true" /> CRM
-          </a>
-          <span>
-            <Video size={18} aria-hidden="true" /> Calls
-          </span>
-          <span>
-            <BriefcaseBusiness size={18} aria-hidden="true" /> Projetos
-          </span>
-          <span>
-            <GraduationCap size={18} aria-hidden="true" /> Formações
-          </span>
-          <span>
-            <Bot size={18} aria-hidden="true" /> Sobral AI
-          </span>
-          <span>
-            <UsersRound size={18} aria-hidden="true" /> Mentorias
-          </span>
-        </nav>
-      </aside>
+      <PreviewSidebar />
 
       <main id="conteudo" className={shell.conteudo}>
         <div className={pagina.pagina}>

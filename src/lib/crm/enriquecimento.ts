@@ -54,6 +54,40 @@ const DossieSchema = z.object({
       }),
     })
     .optional(),
+  inteligenciaContato: z
+    .object({
+      canais: z.array(
+        z.object({
+          tipo: z.enum([
+            'telefone',
+            'email',
+            'site',
+            'instagram',
+            'facebook',
+            'linkedin',
+            'x',
+            'tiktok',
+            'youtube',
+            'pinterest',
+          ]),
+          valor: z.string(),
+          url: z.string().nullable(),
+          origem: z.enum(['crm', 'prospeccao']),
+        }),
+      ),
+      pessoas: z.array(
+        z.object({
+          nome: z.string(),
+          cargo: z.string().nullable(),
+          email: z.string().nullable(),
+          telefone: z.string().nullable(),
+          linkedinUrl: z.string().nullable(),
+          status: z.enum(['confirmada', 'possivel']),
+          evidencia: z.string(),
+        }),
+      ),
+    })
+    .optional(),
   proximaAcao: z.object({ acao: z.string(), porque: z.string() }),
   alertas: z.array(z.string()),
 });

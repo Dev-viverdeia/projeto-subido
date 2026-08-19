@@ -25,13 +25,17 @@ export function BarraPrioridades({
   return (
     <section className={styles.barraPrioridades} aria-labelledby="foco-crm-titulo">
       <div className={styles.leituraPrioridade}>
-        <span>Seu foco agora</span>
+        <span>O que fazer agora</span>
         <strong id="foco-crm-titulo">
           {contagens.atencao === 0
-            ? 'As próximas ações estão em dia'
+            ? 'As vendas estão com caminho definido'
             : `${contagens.atencao} ${contagens.atencao === 1 ? 'oportunidade precisa' : 'oportunidades precisam'} de ação`}
         </strong>
-        <small>A próxima ação mantém cada venda em andamento.</small>
+        <small>
+          {contagens.atencao === 0
+            ? 'Continue pela próxima ação registrada em cada ficha.'
+            : 'Comece pelo que está atrasado ou ainda não tem próximo passo.'}
+        </small>
       </div>
 
       <div className={styles.controlesPipeline}>

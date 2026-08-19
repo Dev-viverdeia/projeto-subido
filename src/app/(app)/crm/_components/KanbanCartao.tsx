@@ -10,6 +10,7 @@ import {
   FileText,
   GripVertical,
   Inbox,
+  Layers3,
   LoaderCircle,
   MessageSquareMore,
   MoreHorizontal,
@@ -18,6 +19,7 @@ import {
 import { DropdownMenu } from '@/design-system/via';
 import {
   etapaVisivel,
+  faseDaEtapa,
   rotuloEtapaVisivel,
   rotuloMotivoPerda,
   type EtapaCrm,
@@ -70,15 +72,25 @@ function pesquisaDaOportunidade(oportunidade: OportunidadeCrm): {
     oportunidade.enriquecimentoStatus === 'na_fila' ||
     oportunidade.enriquecimentoStatus === 'processando'
   ) {
-    return { estado: 'processando', rotulo: 'Pesquisa em andamento' };
+    return { estado: 'processando', rotulo: 'Enriquecendo ficha' };
   }
   if (oportunidade.enriquecimentoStatus === 'concluido' || oportunidade.enriquecidoEm) {
-    return { estado: 'pronta', rotulo: 'Empresa pesquisada' };
+    return { estado: 'pronta', rotulo: 'Ficha enriquecida' };
   }
   if (oportunidade.enriquecimentoStatus === 'falhou') {
-    return { estado: 'falhou', rotulo: 'Refazer pesquisa' };
+    return { estado: 'falhou', rotulo: 'Enriquecimento falhou' };
   }
-  return { estado: 'pendente', rotulo: 'Pesquisa pendente' };
+  return { estado: 'pendente', rotulo: 'Enriquecimento disponível' };
+}
+
+function acaoDaOportunidade(oportunidade: OportunidadeCrm): string {
+  const pesquisa = pesquisaDaOportunidade(oportunidade);
+  const fase = faseDaEtapa(oportunidade.etapa);
+  if (pesquisa.estado === 'processando') return 'Acompanhar enriquecimento';
+  if (fase === 'entrada' && pesquisa.estado !== 'pronta') return 'Enriquecer ficha';
+  if (fase === 'entrada') return 'Preparar abordagem';
+  if (fase === 'conversa') return 'Preparar call';
+  return 'Trabalhar proposta';
 }
 
 function impedirArraste(evento: SyntheticEvent) {
@@ -179,6 +191,7 @@ export function CartaoOportunidade({
   const valor = valorDaOportunidade(oportunidade.valorCentavos);
   const prazo = prazoDaAcao(oportunidade.proximaAcaoEm);
   const pesquisa = pesquisaDaOportunidade(oportunidade);
+  const acao = acaoDaOportunidade(oportunidade);
 
   return (
     <article
@@ -214,7 +227,7 @@ export function CartaoOportunidade({
         )}
       </div>
 
-      <p className={styles.projetoRotulo}>Projeto em venda</p>
+      <p className={styles.projetoRotulo}>Serviço de IA em venda</p>
       <h3>{oportunidade.titulo}</h3>
 
       <div className={styles.contextoCartao}>
@@ -222,6 +235,7 @@ export function CartaoOportunidade({
           {oportunidade.contato ? `Contato: ${oportunidade.contato}` : 'Contato a definir'}
         </span>
         <span className={styles.pesquisa} data-estado={pesquisa.estado}>
+          <Layers3 size={12} strokeWidth={1.8} aria-hidden="true" />
           {pesquisa.rotulo}
         </span>
       </div>
@@ -249,12 +263,13 @@ export function CartaoOportunidade({
           <Link
             href={`/crm/${oportunidade.id}`}
             className={styles.dossie}
+            aria-label={`${acao}: ${oportunidade.empresa}`}
             data-no-dnd
             onMouseDown={impedirArraste}
             onTouchStart={impedirArraste}
             onKeyDown={impedirArraste}
           >
-            Ver oportunidade
+            {acao}
             <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
           </Link>
           <MenuMovimentacao

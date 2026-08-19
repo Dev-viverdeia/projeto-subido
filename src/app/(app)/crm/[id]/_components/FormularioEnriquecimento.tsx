@@ -208,8 +208,8 @@ export function FormularioEnriquecimento({
                       <Database size={17} strokeWidth={1.7} aria-hidden="true" />
                     </span>
                     <p>
-                      <strong>CRM</strong>
-                      <small>Empresa, contato e histórico da oportunidade</small>
+                      <strong>Ficha do cliente</strong>
+                      <small>Empresa, contato e dados encontrados na Prospecção</small>
                     </p>
                   </div>
                   <div>
@@ -227,7 +227,7 @@ export function FormularioEnriquecimento({
                     </span>
                     <p>
                       <strong>Fontes públicas</strong>
-                      <small>Site salvo na ficha e informações públicas disponíveis</small>
+                      <small>Site salvo e informações públicas disponíveis</small>
                     </p>
                   </div>
                 </div>

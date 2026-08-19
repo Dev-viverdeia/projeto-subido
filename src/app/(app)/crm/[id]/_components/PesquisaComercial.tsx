@@ -28,6 +28,7 @@ import {
 import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
 import { BotaoProximaAcao } from './BotaoProximaAcao';
+import { InteligenciaDeContato } from './InteligenciaDeContato';
 import styles from './PesquisaComercial.module.css';
 
 type AbaPesquisa = 'leitura' | 'conversa' | 'fontes';
@@ -223,6 +224,7 @@ function DadosEFontes({
 }) {
   return (
     <div className={styles.gradeDados}>
+      <InteligenciaDeContato lead={lead} dossie={dossie} />
       <section className={styles.painelLeitura} aria-labelledby="empresa-titulo">
         <header>
           <div>

@@ -43,7 +43,7 @@ describe('ControlesPipeline', () => {
       />,
     );
 
-    expect(screen.getByText('As próximas ações estão em dia')).toBeInTheDocument();
+    expect(screen.getByText('As vendas estão com caminho definido')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Limpar busca' }));
     expect(aoBuscar).toHaveBeenCalledWith('');
   });
