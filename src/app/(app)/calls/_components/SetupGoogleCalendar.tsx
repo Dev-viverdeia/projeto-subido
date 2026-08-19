@@ -14,6 +14,7 @@ export function SetupGoogleCalendar({
   aoFechar: () => void;
 }) {
   const reconectar = calendar.status === 'reconectar';
+  const indisponivel = !calendar.configurado;
 
   return (
     <section className={styles.setupCalendar} aria-labelledby="setup-calendar-titulo">
@@ -31,11 +32,16 @@ export function SetupGoogleCalendar({
       <div className={styles.setupConteudo}>
         <p className={styles.sobretitulo}>Antes do primeiro agendamento</p>
         <h3 id="setup-calendar-titulo">
-          {reconectar ? 'Reconecte seu Google Calendar.' : 'Autorize o Google Calendar.'}
+          {indisponivel
+            ? 'A conexão com o Google está sendo ativada.'
+            : reconectar
+              ? 'Reconecte seu Google Calendar.'
+              : 'Autorize o Google Calendar.'}
         </h3>
         <p>
-          A Subido cria o evento na sua agenda, convida o cliente e coloca o link da sala da
-          plataforma no convite.
+          {indisponivel
+            ? 'O agendamento fica bloqueado até essa configuração estar disponível e você conectar sua conta.'
+            : 'A Subido cria o evento na sua agenda, convida o cliente e coloca o link da sala da plataforma no convite.'}
         </p>
 
         <ol className={styles.setupEtapas}>
@@ -69,10 +75,20 @@ export function SetupGoogleCalendar({
           <Button type="button" variant="secondary" onClick={aoFechar}>
             Agora não
           </Button>
-          <Link href={conectarHref} className="via-btn via-btn--primary via-btn--md" data-autofocus>
-            {reconectar ? 'Reconectar Google Calendar' : 'Conectar Google Calendar'}
-            <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
-          </Link>
+          {indisponivel ? (
+            <Button type="button" disabled data-autofocus>
+              Conexão indisponível
+            </Button>
+          ) : (
+            <Link
+              href={conectarHref}
+              className="via-btn via-btn--primary via-btn--md"
+              data-autofocus
+            >
+              {reconectar ? 'Reconectar Google Calendar' : 'Conectar Google Calendar'}
+              <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+          )}
         </div>
 
         <small className={styles.setupPrivacidade}>

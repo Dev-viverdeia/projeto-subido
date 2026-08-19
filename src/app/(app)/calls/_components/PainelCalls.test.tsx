@@ -16,6 +16,14 @@ vi.mock('./AcoesSala', () => ({
 
 import { PainelCalls } from './PainelCalls';
 
+const CALENDAR = {
+  configurado: true,
+  conectado: true,
+  email: 'profissional@gmail.com',
+  status: 'ativa' as const,
+  ultimoErro: null,
+};
+
 function reuniao(parcial: Partial<ReuniaoCall> & Pick<ReuniaoCall, 'id' | 'titulo'>): ReuniaoCall {
   return {
     id: parcial.id,
@@ -42,6 +50,7 @@ describe('PainelCalls', () => {
   it('coloca a próxima call em destaque sem duplicá-la na agenda', () => {
     render(
       <PainelCalls
+        calendar={CALENDAR}
         oportunidades={[]}
         reunioes={[
           reuniao({ id: 'call-1', titulo: 'Descoberta Horizonte' }),
@@ -79,6 +88,7 @@ describe('PainelCalls', () => {
   it('confirma a sala recém-criada sem duplicá-la na agenda', () => {
     render(
       <PainelCalls
+        calendar={CALENDAR}
         oportunidades={[]}
         agendadaId="call-2"
         reunioes={[

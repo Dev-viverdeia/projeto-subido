@@ -52,7 +52,7 @@ export function PainelCalls({
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
-  calendar?: EstadoGoogleCalendar;
+  calendar: EstadoGoogleCalendar;
   agendadaId?: string;
   modalInicial?: boolean;
   oportunidadeInicial?: string;

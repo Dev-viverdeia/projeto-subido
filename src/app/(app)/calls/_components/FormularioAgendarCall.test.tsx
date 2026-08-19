@@ -22,11 +22,18 @@ const OPORTUNIDADE: OportunidadeSeletor = {
   contato: 'Camila Rios',
   contatoEmail: 'camila@clinicaaurora.com.br',
 };
+const CALENDAR_CONECTADO = {
+  configurado: true,
+  conectado: true,
+  email: 'profissional@gmail.com',
+  status: 'ativa' as const,
+  ultimoErro: null,
+};
 
 describe('FormularioAgendarCall', () => {
   it('abre com oportunidade real, Live Coach ativo e devolve o foco ao fechar', async () => {
     agendarReuniaoMock.mockResolvedValue({});
-    render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} />);
+    render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);
 
     const gatilho = screen.getByRole('button', { name: 'Agendar call' });
     fireEvent.click(gatilho);
@@ -46,6 +53,7 @@ describe('FormularioAgendarCall', () => {
     render(
       <FormularioAgendarCall
         oportunidades={[OPORTUNIDADE]}
+        calendar={CALENDAR_CONECTADO}
         abertoInicial
         oportunidadeInicial={OPORTUNIDADE.id}
       />,
@@ -70,6 +78,7 @@ describe('FormularioAgendarCall', () => {
     render(
       <FormularioAgendarCall
         oportunidades={[OPORTUNIDADE]}
+        calendar={CALENDAR_CONECTADO}
         abertoInicial
         oportunidadeInicial={OPORTUNIDADE.id}
         tipoInicial="kickoff"
@@ -89,13 +98,7 @@ describe('FormularioAgendarCall', () => {
         oportunidades={[OPORTUNIDADE]}
         abertoInicial
         oportunidadeInicial={OPORTUNIDADE.id}
-        calendar={{
-          configurado: true,
-          conectado: true,
-          email: 'profissional@gmail.com',
-          status: 'ativa',
-          ultimoErro: null,
-        }}
+        calendar={CALENDAR_CONECTADO}
       />,
     );
 
@@ -135,6 +138,27 @@ describe('FormularioAgendarCall', () => {
     );
   });
 
+  it('bloqueia o formulário enquanto a integração do Calendar não estiver ativa', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        calendar={{
+          configurado: false,
+          conectado: false,
+          email: null,
+          status: 'desconectada',
+          ultimoErro: null,
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Conecte sua agenda' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Data e horário')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Conexão indisponível' })).toBeDisabled();
+  });
+
   it('anuncia os erros, foca a primeira decisão e limpa o campo corrigido', async () => {
     const user = userEvent.setup();
     agendarReuniaoMock.mockResolvedValue({
@@ -150,10 +174,10 @@ describe('FormularioAgendarCall', () => {
         agendadaPara: 'Escolha data e horário.',
       },
     });
-    render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} />);
+    render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);
 
     await user.click(screen.getByRole('button', { name: 'Agendar call' }));
-    await user.click(screen.getByRole('button', { name: 'Criar call e link' }));
+    await user.click(screen.getByRole('button', { name: 'Criar call e enviar convite' }));
 
     const oportunidade = await screen.findByLabelText(/Oportunidade/);
     await waitFor(() => expect(oportunidade).toHaveFocus());
