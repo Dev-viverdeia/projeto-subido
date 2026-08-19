@@ -92,6 +92,7 @@ export type MotivoPerdaCrm = (typeof MOTIVOS_PERDA_CRM)[number]['id'];
 
 export function rotuloMotivoPerda(motivo: string | null): string {
   if (!motivo || motivo === 'nao_informado') return 'Motivo não informado';
+  if (motivo === 'proposta_recusada') return 'Proposta recusada pelo cliente';
   return MOTIVOS_PERDA_CRM.find((item) => item.id === motivo)?.rotulo ?? motivo;
 }
 

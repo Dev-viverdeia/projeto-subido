@@ -42,5 +42,6 @@ describe('etapas do CRM', () => {
   it('traduz o motivo persistido para uma explicação humana', () => {
     expect(rotuloMotivoPerda('sem_orcamento')).toBe('Sem orçamento disponível');
     expect(rotuloMotivoPerda('nao_informado')).toBe('Motivo não informado');
+    expect(rotuloMotivoPerda('proposta_recusada')).toBe('Proposta recusada pelo cliente');
   });
 });
