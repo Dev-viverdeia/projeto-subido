@@ -28,8 +28,9 @@
 import { readFileSync } from 'node:fs';
 import { globSync } from 'node:fs';
 import { relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const RAIZ = new URL('..', import.meta.url).pathname;
+const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 
 const ALVOS = ['src/**/*.module.css', 'src/app/**/*.css', 'src/styles/*.css'];
 

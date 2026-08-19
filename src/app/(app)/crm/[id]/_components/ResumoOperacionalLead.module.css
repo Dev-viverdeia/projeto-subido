@@ -84,7 +84,7 @@
 }
 
 .metodo strong {
-  color: var(--via-text-secondary);
+  color: var(--via-text-body);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
 }
@@ -224,7 +224,7 @@
   justify-content: space-between;
   gap: var(--via-space-4);
   padding-inline: clamp(24px, 3vw, 36px);
-  color: var(--via-text-secondary);
+  color: var(--via-text-body);
   cursor: pointer;
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
@@ -333,7 +333,7 @@
 
 .listaEventos strong,
 .listaCalls strong {
-  color: var(--via-text-secondary);
+  color: var(--via-text-body);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
 }

@@ -1015,6 +1015,10 @@
   box-shadow: var(--app-elev-2-shadow);
 }
 
+.cartaoLead:focus-within {
+  box-shadow: var(--app-ring), var(--via-glass-shadow);
+}
+
 .cartaoLeadTopo {
   display: flex;
   align-items: center;
@@ -1049,7 +1053,7 @@
 
 .empresaLead h3 {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-lg);
+  font-size: var(--via-fs-h4);
   font-weight: var(--via-fw-semibold);
   line-height: 1.2;
   letter-spacing: var(--app-ls-h4);

@@ -107,7 +107,7 @@
 }
 
 .mapa strong {
-  color: var(--via-text-secondary);
+  color: var(--via-text-body);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
 }
