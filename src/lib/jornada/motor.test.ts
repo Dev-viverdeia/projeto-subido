@@ -36,23 +36,32 @@ const perfil = {
 };
 
 describe('motor da jornada', () => {
-  it('começa pela escolha declarada quando não existem fatos', () => {
+  it('começa pela primeira formação quando não existem fatos', () => {
     const plano = montarPlanoJornada(sinais());
 
     expect(plano.etapaAtual).toBe('aprender');
-    expect(plano.proximoPasso.id).toBe('projeto-inicial');
+    expect(plano.proximoPasso.id).toBe('formacao-base');
     expect(plano.percentual).toBe(0);
-    expect(plano.perfilCompleto).toBe(false);
+    expect(plano.perfilCompleto).toBe(true);
   });
 
-  it('direciona para a formação depois que a primeira oferta foi definida', () => {
-    const plano = montarPlanoJornada(sinais({ perfil }));
+  it('direciona para o projeto guiado depois da primeira formação', () => {
+    const plano = montarPlanoJornada(
+      sinais({
+        aprendizado: {
+          aulasConcluidas: 12,
+          formacoesConcluidas: 1,
+          etapasConcluidas: 4,
+          projetosConcluidos: 0,
+        },
+      }),
+    );
 
     expect(plano.etapaAtual).toBe('aprender');
-    expect(plano.proximoPasso.id).toBe('formacao-base');
+    expect(plano.proximoPasso.id).toBe('projeto-guiado');
   });
 
-  it('avança para prospecção somente depois de oferta e posicionamento', () => {
+  it('avança para prospecção depois da formação e do projeto guiado', () => {
     const plano = montarPlanoJornada(
       sinais({
         perfil,
@@ -60,7 +69,7 @@ describe('motor da jornada', () => {
           aulasConcluidas: 12,
           formacoesConcluidas: 1,
           etapasConcluidas: 0,
-          projetosConcluidos: 0,
+          projetosConcluidos: 1,
         },
       }),
     );

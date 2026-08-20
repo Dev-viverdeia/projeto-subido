@@ -98,8 +98,6 @@ function quantidade(valor: number, singular: string, plural: string): string {
 }
 
 function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
-  const projetoEscolhido = Boolean(sinais.perfil?.projetoInicialId);
-  const posicionamentoDefinido = Boolean(sinais.perfil?.posicionamento.trim());
   const vendaConfirmada = sinais.propostas.aceitas > 0 || sinais.oportunidades.ganhas > 0;
   const segundaVenda = Math.max(sinais.propostas.aceitas, sinais.oportunidades.ganhas) >= 2;
   const entregaConcluida = sinais.entregas.projetosConcluidos > 0;
@@ -118,38 +116,16 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       id: 'aprender',
       numero: '01',
       titulo: 'Aprender',
-      resumo: 'Escolha o que aprender e vender',
-      marco: 'Oferta inicial definida',
+      resumo: 'Aprenda um projeto e prepare a entrega',
+      marco: 'Primeiro projeto pronto para vender',
       contexto:
-        'Escolha um mercado, um projeto e uma forma simples de explicar o serviço antes de começar a prospectar.',
-      guia: 'Como preparar sua primeira oferta',
+        'Conclua uma formação e execute um projeto guiado antes de começar a prospectar.',
+      guia: 'Como aprender e preparar um projeto',
       passos: [
         passo(
-          'projeto-inicial',
-          'Escolher o primeiro projeto',
-          'Escolha um projeto padrão para estudar, apresentar e implementar primeiro.',
-          projetoEscolhido
-            ? `${sinais.perfil?.projetoInicialTitulo ?? 'Projeto inicial'} escolhido como primeira oferta.`
-            : 'Projeto inicial ainda não escolhido.',
-          projetoEscolhido,
-          '/inicio#configuracao-jornada',
-          'Escolher projeto inicial',
-        ),
-        passo(
-          'posicionamento',
-          'Explicar o serviço em uma frase',
-          'Escreva para quem é o projeto, qual problema ele resolve e qual resultado o cliente espera.',
-          posicionamentoDefinido
-            ? 'Apresentação do serviço salva.'
-            : 'Posicionamento ainda não registrado.',
-          posicionamentoDefinido,
-          '/inicio#configuracao-jornada',
-          'Definir posicionamento',
-        ),
-        passo(
           'formacao-base',
-          'Concluir uma formação essencial',
-          'Conclua uma formação ligada ao projeto para entender as ferramentas e o processo de implementação.',
+          'Concluir a primeira formação',
+          'Aprenda os fundamentos e entenda como um projeto de IA é vendido e implementado.',
           sinais.aprendizado.formacoesConcluidas > 0
             ? `${quantidade(sinais.aprendizado.formacoesConcluidas, 'formação concluída', 'formações concluídas')} na conta.`
             : sinais.aprendizado.aulasConcluidas > 0
@@ -157,7 +133,18 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
               : 'Nenhuma aula concluída ainda.',
           sinais.aprendizado.formacoesConcluidas > 0,
           '/formacoes',
-          'Continuar formação',
+          sinais.aprendizado.aulasConcluidas > 0 ? 'Continuar formação' : 'Ver formações',
+        ),
+        passo(
+          'projeto-guiado',
+          'Concluir o primeiro projeto guiado',
+          'Escolha um projeto e siga o passo a passo até entender a entrega que será feita no cliente.',
+          sinais.aprendizado.projetosConcluidos > 0
+            ? `${quantidade(sinais.aprendizado.projetosConcluidos, 'projeto guiado concluído', 'projetos guiados concluídos')}.`
+            : 'Nenhum projeto guiado concluído ainda.',
+          sinais.aprendizado.projetosConcluidos > 0,
+          '/solucoes',
+          'Ver projetos',
         ),
       ],
     },
@@ -390,10 +377,8 @@ export function montarPlanoJornada(sinais: SinaisJornada): PlanoJornada {
     evidenciasConcluidas,
     totalEvidencias: todos.length,
     percentual: todos.length ? Math.round((evidenciasConcluidas / todos.length) * 100) : 0,
-    perfilCompleto: Boolean(
-      sinais.perfil?.nicho.trim() &&
-      sinais.perfil.projetoInicialId &&
-      sinais.perfil.posicionamento.trim(),
-    ),
+    /* Mantido no contrato por compatibilidade com o contexto do Sobral AI. A
+       Início não exige mais briefing: aprender pelos módulos reais já é a base. */
+    perfilCompleto: true,
   };
 }

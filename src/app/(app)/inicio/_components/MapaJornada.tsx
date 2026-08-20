@@ -19,7 +19,6 @@ import type { PlanoJornada } from '@/lib/jornada/motor';
 import styles from './MapaJornada.module.css';
 
 type Props = {
-  configuracao?: ReactNode;
   nome: string | null;
   prioridade: ReactNode;
   cliente: ReactNode;
@@ -171,7 +170,6 @@ function TrilhoCompacto({ plano }: { plano: PlanoJornada }) {
 }
 
 export function MapaJornada({
-  configuracao,
   nome,
   prioridade,
   cliente,
@@ -187,44 +185,6 @@ export function MapaJornada({
     month: 'long',
   });
 
-  if (!plano.perfilCompleto) {
-    return (
-      <div className={`${styles.pagina} pagina-mapa-jornada`}>
-        <section className={styles.heroAtivacao} aria-labelledby="titulo-ativacao">
-          <div>
-            <span className={styles.eyebrow}>Comece por aqui</span>
-            <h1 id="titulo-ativacao">Defina sua primeira oferta de IA.</h1>
-            <p>
-              Três escolhas ajudam a plataforma a recomendar projetos, clientes e próximos passos.
-            </p>
-          </div>
-          <span className={styles.tempoAtivacao}>Leva menos de 3 minutos</span>
-        </section>
-
-        <section className={styles.ativacao}>
-          <div className={styles.configuracaoAberta}>{configuracao}</div>
-        </section>
-
-        <section className={styles.caminho} aria-labelledby="titulo-caminho">
-          <div className={styles.secaoCabecalho}>
-            <div>
-              <p>O caminho completo</p>
-              <h2 id="titulo-caminho">Da primeira habilidade ao cliente bem atendido.</h2>
-            </div>
-            <span>Você não precisa dominar tudo agora. A plataforma mostra uma etapa por vez.</span>
-          </div>
-          <TrilhoCompacto plano={plano} />
-        </section>
-
-        <CartoesAreas
-          titulo="Conheça o que vai ajudar você a avançar."
-          sobretitulo="Áreas da plataforma"
-          areas={AREAS_APRENDER}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
       <section className={styles.abertura} aria-label="Resumo do dia">
@@ -232,7 +192,9 @@ export function MapaJornada({
           <span className={styles.eyebrow}>{dataLonga}</span>
           <p>{nome ? `${nome},` : 'Olá,'}</p>
           <h1>bem-vindo.</h1>
-          <strong>O próximo movimento começa por aqui.</strong>
+          <strong>
+            Aprenda, encontre clientes, venda e entregue seus projetos de IA em um só lugar.
+          </strong>
         </div>
 
         <Link href="/mentorias" className={styles.mentoriaDestaque}>
@@ -283,6 +245,19 @@ export function MapaJornada({
         </div>
       </section>
 
+      <section className={styles.caminho} aria-labelledby="titulo-caminho">
+        <div className={styles.secaoCabecalho}>
+          <div>
+            <p>Como usar a plataforma</p>
+            <h2 id="titulo-caminho">Cinco etapas, um fluxo de trabalho.</h2>
+          </div>
+          <span>
+            A página mostra uma ação por vez. O progresso muda quando você conclui tarefas reais.
+          </span>
+        </div>
+        <TrilhoCompacto plano={plano} />
+      </section>
+
       <section className={styles.emAndamento} aria-labelledby="titulo-andamento">
         <div className={styles.secaoCabecalho}>
           <div>
@@ -310,7 +285,7 @@ export function MapaJornada({
       </section>
 
       <CartoesAreas
-        titulo="Aprenda, adapte e peça ajuda."
+        titulo="Aprenda e prepare o que você vai entregar."
         sobretitulo="Aprender e construir"
         areas={AREAS_APRENDER}
       />
@@ -319,7 +294,6 @@ export function MapaJornada({
         sobretitulo="Operação comercial"
         areas={AREAS_OPERAR}
       />
-      {configuracao}
     </div>
   );
 }

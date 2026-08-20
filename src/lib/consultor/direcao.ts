@@ -140,28 +140,28 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
   if (etapa === 'aprender') {
     const acoes = alinharAcoesComJornada(sinais, [
       acao(
-        'Escolha seu primeiro projeto',
-        'Abra os projetos padrão e escolha um serviço que você consiga explicar para uma empresa.',
-        'Projeto salvo como sua primeira oferta.',
+        'Conclua a primeira formação',
+        'Aprenda os fundamentos para entender como vender e implementar um projeto de IA.',
+        'Primeira formação concluída na plataforma.',
+        '/formacoes',
+      ),
+      acao(
+        'Execute um projeto guiado',
+        'Escolha um projeto e siga o passo a passo até compreender a entrega para o cliente.',
+        'Projeto guiado concluído.',
         '/solucoes',
       ),
       acao(
-        'Conclua a formação do projeto',
-        'Faça a formação ligada ao projeto escolhido e anote as dúvidas que surgirem.',
-        'Formação concluída e dúvidas anotadas.',
-        '/formacoes',
-      ),
-      acao(
-        'Escreva como você apresenta o serviço',
-        'Explique em uma frase o problema, para quem ele aparece e qual resultado o projeto entrega.',
-        'Apresentação do serviço salva sem jargão técnico.',
-        '/formacoes',
+        'Leve uma dúvida para a mentoria',
+        'Anote o que ficou incerto durante o projeto e leve um caso concreto para a próxima sessão.',
+        'Dúvida preparada para a mentoria.',
+        '/mentorias',
       ),
     ]);
     return {
       etapa,
       diagnostico:
-        'Ainda não há clientes em Vendas. Primeiro, escolha o projeto que você quer aprender e vender.',
+        'Ainda não há clientes em Vendas. Comece pela formação e por um projeto guiado antes de prospectar.',
       foco: sinais.jornada.proximoPasso.titulo,
       proximoPasso: acoes[0]!,
       acoes,

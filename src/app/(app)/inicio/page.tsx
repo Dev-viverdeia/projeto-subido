@@ -4,7 +4,6 @@ import { obterFocoLeveDoCrm } from '@/lib/crm/queries';
 import { obterJornadaOperacional } from '@/lib/jornada/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
-import { ConfiguracaoJornada } from './_components/ConfiguracaoJornada';
 import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
 import { PrioridadeOperacionalCarregando } from './_components/PrioridadeOperacional';
@@ -37,8 +36,9 @@ async function ProximaMentoria() {
 /**
  * O início agora é o sistema de orientação do profissional.
  *
- * As três escolhas declaradas entram pelo briefing. Todo o restante é derivado
- * de evidências persistidas nos módulos operacionais — nenhum check demonstrativo.
+ * A página apresenta o produto e organiza a próxima ação com base nos fatos já
+ * persistidos. Não existe briefing obrigatório na Início: o usuário aprende a
+ * plataforma usando os módulos reais.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
@@ -52,7 +52,6 @@ export default async function InicioPage() {
   const primeiroNome = metadata.nome?.trim().split(/\s+/)[0] ?? null;
   return (
     <MapaJornada
-      configuracao={<ConfiguracaoJornada perfil={jornada.perfil} projetos={jornada.projetos} />}
       nome={primeiroNome}
       prioridade={
         <Suspense fallback={<PrioridadeOperacionalCarregando />}>
