@@ -86,7 +86,7 @@ function pesquisaDaOportunidade(oportunidade: OportunidadeCrm): {
 function acaoDaOportunidade(oportunidade: OportunidadeCrm): string {
   const pesquisa = pesquisaDaOportunidade(oportunidade);
   const fase = faseDaEtapa(oportunidade.etapa);
-  if (pesquisa.estado === 'processando') return 'Acompanhar enriquecimento';
+  if (pesquisa.estado === 'processando') return 'Ver enriquecimento';
   if (fase === 'entrada' && pesquisa.estado !== 'pronta') return 'Enriquecer ficha';
   if (fase === 'entrada') return 'Preparar abordagem';
   if (fase === 'conversa') return 'Preparar call';
@@ -204,6 +204,7 @@ export function CartaoOportunidade({
       aria-label={`${oportunidade.titulo}, ${oportunidade.empresa}. Arraste para mudar de etapa.`}
       role="group"
       tabIndex={desabilitado ? -1 : 0}
+      data-atencao={!oportunidade.proximaAcao || prazo?.vencido || undefined}
     >
       <div className={styles.cartaoCabecalho}>
         <div className={styles.empresa}>
@@ -227,7 +228,7 @@ export function CartaoOportunidade({
         )}
       </div>
 
-      <p className={styles.projetoRotulo}>Serviço de IA em venda</p>
+      <p className={styles.projetoRotulo}>Projeto em negociação</p>
       <h3>{oportunidade.titulo}</h3>
 
       <div className={styles.contextoCartao}>
@@ -256,8 +257,12 @@ export function CartaoOportunidade({
       </div>
 
       <footer className={styles.rodapeCartao}>
-        <time dateTime={oportunidade.ultimoFatoEm ?? oportunidade.criadoEm}>
-          Atualizado {dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}
+        <time
+          dateTime={oportunidade.ultimoFatoEm ?? oportunidade.criadoEm}
+          aria-label={`Atualizado em ${dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}`}
+          title={`Atualizado em ${dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}`}
+        >
+          {dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}
         </time>
         <div className={styles.acoesCartao}>
           <Link

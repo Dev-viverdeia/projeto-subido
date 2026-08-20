@@ -24,7 +24,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           <div className={styles.introducao}>
             <p className={styles.sobretitulo}>Sua operação comercial</p>
             <h1>Oportunidades</h1>
-            <p>Um método simples para vender projetos de IA com a próxima ação clara.</p>
+            <p>Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.</p>
           </div>
           {oportunidades.length > 0 && (
             <FormularioNovoLead

@@ -28,7 +28,7 @@ export function BarraPrioridades({
         <span>O que fazer agora</span>
         <strong id="foco-crm-titulo">
           {contagens.atencao === 0
-            ? 'As vendas estão com caminho definido'
+            ? 'Todas têm um próximo passo'
             : `${contagens.atencao} ${contagens.atencao === 1 ? 'oportunidade precisa' : 'oportunidades precisam'} de ação`}
         </strong>
         <small>
@@ -43,7 +43,7 @@ export function BarraPrioridades({
           {(
             [
               ['todas', 'Todas'],
-              ['atencao', 'Precisam de ação'],
+              ['atencao', 'Ação pendente'],
               ['sem_acao', 'Sem próxima ação'],
               ['proposta', 'Com proposta'],
             ] as const

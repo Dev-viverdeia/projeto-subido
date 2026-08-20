@@ -180,7 +180,7 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
               <div className={pagina.introducao}>
                 <p className={pagina.sobretitulo}>Sua operação comercial</p>
                 <h1>Oportunidades</h1>
-                <p>Um método simples para vender projetos de IA com a próxima ação clara.</p>
+                <p>Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.</p>
               </div>
               <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
             </div>

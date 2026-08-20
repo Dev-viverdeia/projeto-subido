@@ -138,10 +138,8 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
       <header className={styles.topo}>
         <div>
           <p className={styles.sobretitulo}>Método de venda</p>
-          <h2 id="operacao-titulo">Venda guiada.</h2>
-          <p>
-            A plataforma sugere o próximo passo. As outras ações continuam disponíveis na ficha.
-          </p>
+          <h2 id="operacao-titulo">Próximo passo da venda</h2>
+          <p>Veja a etapa atual e execute a ação recomendada para esta oportunidade.</p>
         </div>
 
         <ol className={styles.metodo} aria-label="Etapas da venda">

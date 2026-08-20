@@ -7,7 +7,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  grid-template-columns: minmax(0, 1.38fr) minmax(290px, 0.62fr);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-2-line));
   border-radius: var(--app-radius-surface);
@@ -42,13 +42,13 @@
   align-content: center;
   gap: var(--via-space-4);
   min-width: 0;
-  padding: clamp(28px, 4vw, 46px);
+  padding: clamp(26px, 3vw, 38px);
 }
 
 .iconePesquisa {
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   border: 1px solid var(--via-navy-14);
   border-radius: var(--app-radius-control);
@@ -78,10 +78,10 @@
 }
 
 .leituraPrincipal h2 {
-  max-width: 42ch;
+  max-width: 54ch;
   margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
   font-weight: var(--via-fw-medium);
   line-height: 1.12;
   letter-spacing: var(--app-ls-h2);
@@ -98,21 +98,21 @@
   display: grid;
   align-content: center;
   min-width: 0;
-  padding: clamp(26px, 3.5vw, 40px);
-  border-left: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  padding: clamp(24px, 3vw, 34px);
+  border-left: 1px solid var(--via-border-hairline);
   background:
-    radial-gradient(ellipse 88% 75% at 100% 0%, var(--via-navy-30), transparent 72%),
-    var(--via-navy-deep);
-  color: var(--via-white);
+    radial-gradient(ellipse 88% 92% at 100% 0%, var(--via-navy-08), transparent 72%),
+    color-mix(in srgb, var(--via-bg-2) 64%, transparent);
+  color: var(--via-text-body);
 }
 
 .proximaAcao p {
-  color: var(--via-gray-300);
+  color: var(--via-text-faint);
 }
 
 .proximaAcao h3 {
   margin-top: var(--via-space-3);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   font-size: var(--via-fs-h3);
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
@@ -122,7 +122,7 @@
 
 .proximaAcao > span {
   margin-top: var(--via-space-3);
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
@@ -143,7 +143,7 @@
   align-items: center;
   gap: var(--via-space-2);
   margin: 0;
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
 
@@ -1004,14 +1004,14 @@
   font-size: var(--via-fs-sm);
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1079px) {
   .briefing,
   .gradeDados {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .proximaAcao {
-    border-top: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+    border-top: 1px solid var(--via-border-hairline);
     border-left: 0;
   }
 

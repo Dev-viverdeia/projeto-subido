@@ -11,7 +11,7 @@
   grid-template-columns: minmax(220px, 0.58fr) minmax(0, 1.42fr);
   gap: var(--app-gap-grid);
   overflow: hidden;
-  padding: var(--via-space-3);
+  padding: var(--via-space-4);
   border: 1px solid color-mix(in srgb, var(--via-white) 70%, var(--app-elev-2-line));
   border-radius: var(--app-radius-surface);
   background:
@@ -28,7 +28,7 @@
   align-content: center;
   gap: var(--via-space-1);
   min-width: 0;
-  padding: var(--via-space-1) var(--via-space-2);
+  padding-inline: var(--via-space-2);
 }
 
 .leituraPrioridade > span {
@@ -511,6 +511,14 @@
     opacity var(--app-t-state);
 }
 
+.cartao[data-atencao='true'] {
+  border-color: color-mix(in srgb, var(--via-navy) 20%, var(--via-border-soft));
+  background:
+    radial-gradient(ellipse 72% 46% at 0% 0%, var(--via-navy-06), transparent 76%),
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 78%, transparent), transparent),
+    color-mix(in srgb, var(--via-surface) 82%, transparent);
+}
+
 .cartao:hover {
   border-color: var(--app-elev-2-line);
   box-shadow: var(--app-elev-2-shadow);
@@ -701,11 +709,10 @@
 
 .rodapeCartao time {
   align-self: center;
-  overflow: hidden;
+  flex: 0 0 auto;
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -729,6 +736,7 @@
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
+  white-space: nowrap;
   transition:
     color var(--app-t-state),
     background-color var(--app-t-state);
@@ -1115,7 +1123,7 @@
   .barraPrioridades {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-3);
-    padding: var(--via-space-3);
+    padding: var(--via-space-4);
     border-radius: var(--app-radius-card);
   }
 

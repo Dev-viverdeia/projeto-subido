@@ -8,7 +8,7 @@ test.describe('Ficha do cliente no CRM', () => {
 
     await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clínica Aurora' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Venda guiada.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Próximo passo da venda' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar call' }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Atualizar enriquecimento' })).toBeVisible();

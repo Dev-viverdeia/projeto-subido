@@ -356,14 +356,14 @@ export function PesquisaComercial({
             <p>Ficha enriquecida</p>
             <h2 id="pesquisa-comercial-titulo">{dossie.resumo}</h2>
             <small>
-              Enriquecida em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)} · fatos e
-              hipóteses aparecem separados.
+              Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)}. Fatos
+              confirmados e pontos a validar ficam separados.
             </small>
           </div>
         </div>
 
         <aside className={styles.proximaAcao} aria-labelledby="acao-recomendada-titulo">
-          <p>Sugestão da análise</p>
+          <p>Próximo passo sugerido</p>
           <h3 id="acao-recomendada-titulo">{dossie.proximaAcao.acao}</h3>
           <span>{dossie.proximaAcao.porque}</span>
           <BotaoProximaAcao
