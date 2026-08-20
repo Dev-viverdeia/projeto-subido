@@ -1,5 +1,6 @@
-import { ArrowDown, BriefcaseBusiness, CircleDollarSign, Route } from 'lucide-react';
+import { BriefcaseBusiness, CircleDollarSign, Clock3, Route } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { Card } from '@/design-system/via';
 import { BotaoEntrar } from './BotaoEntrar';
 import styles from './pagina.module.css';
 
@@ -13,85 +14,104 @@ export function ExperienciaBoasVindas({
   return (
     <main className={styles.pagina}>
       <header className={styles.cabecalho}>
-        <SubidoLogo size={20} variant="mono" />
-        <span>Em colaboração com Viver de IA</span>
+        <SubidoLogo size={20} />
+        <div className={styles.contextoCabecalho}>
+          <span>Primeiro acesso</span>
+          <small>Em colaboração com Viver de IA</small>
+        </div>
       </header>
 
-      <section className={styles.apresentacao} aria-labelledby="titulo-boas-vindas">
-        <div className={styles.texto}>
-          <p className={styles.sobretitulo}>Sua jornada começa aqui</p>
-          <h1 id="titulo-boas-vindas">
-            {nome ? `${nome}, transforme` : 'Transforme'} IA em um serviço que empresas compram.
-          </h1>
-          <p className={styles.resumo}>
-            Antes de abrir a plataforma, entenda o caminho: escolher um projeto, encontrar uma
-            empresa, vender com método e entregar um resultado real.
-          </p>
-
-          <ol className={styles.aprendizados} aria-label="O que você vai aprender">
-            <li>
-              <CircleDollarSign size={19} strokeWidth={1.8} aria-hidden="true" />
-              <span>
-                <strong>Onde está o dinheiro</strong>
-                <small>Problemas empresariais que viram projetos de IA.</small>
-              </span>
-            </li>
-            <li>
-              <BriefcaseBusiness size={19} strokeWidth={1.8} aria-hidden="true" />
-              <span>
-                <strong>O que vender primeiro</strong>
-                <small>Uma oferta simples, concreta e possível de entregar.</small>
-              </span>
-            </li>
-            <li>
-              <Route size={19} strokeWidth={1.8} aria-hidden="true" />
-              <span>
-                <strong>Como usar a plataforma</strong>
-                <small>Da primeira lista de empresas à entrega do projeto.</small>
-              </span>
-            </li>
-          </ol>
-        </div>
-
-        <div className={styles.palcoVideo}>
-          <div className={styles.videoTopo}>
-            <span>Introdução obrigatória</span>
-            <small>Como ganhar dinheiro implementando IA</small>
-          </div>
-
-          <div className={styles.video}>
-            {videoUrl ? (
-              <iframe
-                src={videoUrl}
-                title="Como ganhar dinheiro implementando projetos de IA"
-                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                allowFullScreen
-              />
-            ) : (
-              <div className={styles.videoProvisorio}>
-                <span className={styles.play} aria-hidden="true">
-                  ▶
-                </span>
-                <strong>Como sair do zero ao primeiro projeto de IA</strong>
-                <small>O vídeo principal está em produção. Esta é a capa provisória.</small>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.videoRodape}>
-            <p>
-              {videoUrl
-                ? 'Assista antes de continuar.'
-                : 'Você já pode conhecer a plataforma enquanto finalizamos o vídeo.'}
+      <section className={styles.conteudo} aria-labelledby="titulo-boas-vindas">
+        <div className={styles.introducao}>
+          <div className={styles.texto}>
+            <p className={styles.sobretitulo}>Comece por aqui</p>
+            <h1 id="titulo-boas-vindas">
+              {nome ? `${nome}, conheça` : 'Conheça'} o caminho até seu primeiro projeto de IA.
+            </h1>
+            <p className={styles.resumo}>
+              Antes de entrar, veja como a plataforma ajuda você a encontrar clientes, vender com
+              método e entregar um projeto de verdade.
             </p>
-            <BotaoEntrar videoDisponivel={Boolean(videoUrl)} />
           </div>
+          <span className={styles.sinalObrigatorio}>
+            <Clock3 size={14} aria-hidden="true" /> Introdução obrigatória
+          </span>
         </div>
-      </section>
 
-      <a href="#titulo-boas-vindas" className={styles.rodape}>
-        <ArrowDown size={14} aria-hidden="true" /> Primeiro, entenda o caminho
-      </a>
+        <Card as="section" variant="featured" noPadding className={styles.painel}>
+          <div className={styles.palcoVideo}>
+            <div className={styles.videoTopo}>
+              <span>Visão geral da plataforma</span>
+              <small>Como transformar IA em um serviço que empresas compram</small>
+            </div>
+
+            <div className={styles.video}>
+              {videoUrl ? (
+                <iframe
+                  src={videoUrl}
+                  title="Como ganhar dinheiro implementando projetos de IA"
+                  allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <div className={styles.videoProvisorio}>
+                  <span className={styles.play} aria-hidden="true">
+                    ▶
+                  </span>
+                  <div>
+                    <strong>Do primeiro cliente à entrega do projeto</strong>
+                    <small>
+                      O vídeo definitivo entra aqui. Você já pode conhecer a plataforma.
+                    </small>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <aside className={styles.guia} aria-label="O que você vai aprender">
+            <div>
+              <p className={styles.guiaEyebrow}>Neste vídeo</p>
+              <h2>Você vai entender três coisas.</h2>
+            </div>
+
+            <ol className={styles.aprendizados}>
+              <li>
+                <CircleDollarSign size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>
+                  <strong>O que vender</strong>
+                  <small>Problemas reais que viram projetos de IA.</small>
+                </span>
+              </li>
+              <li>
+                <BriefcaseBusiness size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>
+                  <strong>Como encontrar clientes</strong>
+                  <small>Da prospecção à oportunidade em Vendas.</small>
+                </span>
+              </li>
+              <li>
+                <Route size={18} strokeWidth={1.8} aria-hidden="true" />
+                <span>
+                  <strong>Como usar a Subido</strong>
+                  <small>Um próximo passo claro em cada etapa.</small>
+                </span>
+              </li>
+            </ol>
+
+            <div className={styles.entrada}>
+              <p>
+                {videoUrl
+                  ? 'Depois de assistir, sua plataforma será liberada.'
+                  : 'O vídeo ainda está em produção. Seu acesso já está liberado.'}
+              </p>
+              <BotaoEntrar videoDisponivel={Boolean(videoUrl)} />
+            </div>
+          </aside>
+        </Card>
+
+        <p className={styles.notaFinal}>Esta introdução aparece somente no primeiro acesso.</p>
+      </section>
     </main>
   );
 }

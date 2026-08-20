@@ -4,7 +4,7 @@ import { CST } from '../src/lib/brand';
 const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
-  ['/preview/boas-vindas', 'Transforme IA em um serviço que empresas compram.'],
+  ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Defina sua primeira oferta de IA.'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/prospeccao', 'Encontre empresas para prospectar.'],
