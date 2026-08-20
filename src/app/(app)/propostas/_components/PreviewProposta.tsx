@@ -56,7 +56,14 @@ export function PreviewProposta({
             <div>
               <span>Preparada para</span>
               <strong>{documento.cliente.empresa}</strong>
-              {documento.cliente.contato && <small>{documento.cliente.contato}</small>}
+              {(documento.cliente.contato || documento.cliente.cargo) && (
+                <small>
+                  {[documento.cliente.contato, documento.cliente.cargo]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </small>
+              )}
+              {documento.cliente.email && <small>{documento.cliente.email}</small>}
             </div>
             <div>
               <span>Documento</span>
@@ -85,6 +92,12 @@ export function PreviewProposta({
             <p>{documento.objetivo}</p>
           </section>
 
+          <section className={styles.resumoProjeto}>
+            <p className={styles.rotulo}>A solução proposta</p>
+            <h3>{documento.projeto.titulo}</h3>
+            <p>{documento.projeto.resumo}</p>
+          </section>
+
           <section className={styles.secao}>
             <div className={styles.secaoTopo}>
               <span>01</span>
@@ -94,7 +107,7 @@ export function PreviewProposta({
               </div>
             </div>
             <div className={styles.escopo}>
-              {documento.escopo.slice(0, 5).map((item, indice) => (
+              {documento.escopo.map((item, indice) => (
                 <div key={`${item.titulo}-${indice}`}>
                   <span>{(indice + 1).toString().padStart(2, '0')}</span>
                   <div>
@@ -110,7 +123,7 @@ export function PreviewProposta({
             <div>
               <p className={styles.rotulo}>Entregáveis</p>
               <ul>
-                {documento.entregaveis.slice(0, 6).map((item, indice) => (
+                {documento.entregaveis.map((item, indice) => (
                   <li key={`${item}-${indice}`}>
                     <Check size={11} strokeWidth={2.2} aria-hidden="true" /> {item}
                   </li>
@@ -120,12 +133,13 @@ export function PreviewProposta({
             <div>
               <p className={styles.rotulo}>Cronograma</p>
               <ul>
-                {documento.cronograma.slice(0, 5).map((item, indice) => (
+                {documento.cronograma.map((item, indice) => (
                   <li key={`${item.fase}-${indice}`}>
                     <Circle size={8} fill="currentColor" aria-hidden="true" />
                     <span>
                       <strong>{item.fase}</strong>
-                      {item.duracao}
+                      <small>{item.duracao}</small>
+                      <p>{item.descricao}</p>
                     </span>
                   </li>
                 ))}
@@ -144,6 +158,30 @@ export function PreviewProposta({
               <strong>{documento.validadeDias} dias</strong>
               <small>{ROTULO_STATUS_PROPOSTA[status]}</small>
             </div>
+          </section>
+
+          <section className={styles.decisao}>
+            <div className={styles.secaoTopo}>
+              <span>02</span>
+              <div>
+                <p className={styles.rotulo}>Para começar</p>
+                <h3>Próximos passos</h3>
+              </div>
+            </div>
+            <ol>
+              {documento.proximosPassos.map((item, indice) => (
+                <li key={`${item}-${indice}`}>
+                  <span>{(indice + 1).toString().padStart(2, '0')}</span>
+                  <p>{item}</p>
+                </li>
+              ))}
+            </ol>
+            {documento.observacoes && (
+              <div className={styles.observacoes}>
+                <p className={styles.rotulo}>Observações</p>
+                <p>{documento.observacoes}</p>
+              </div>
+            )}
           </section>
 
           <footer className={styles.rodape}>

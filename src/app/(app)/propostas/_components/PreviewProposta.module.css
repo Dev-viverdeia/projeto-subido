@@ -237,6 +237,24 @@
   line-height: 1.55;
 }
 
+.resumoProjeto {
+  padding: 0 0 28px;
+}
+
+.resumoProjeto h3 {
+  margin: 8px 0 9px;
+  font-size: 1rem;
+  letter-spacing: var(--app-ls-h3);
+}
+
+.resumoProjeto > p:last-child {
+  max-width: 92%;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: 0.61rem;
+  line-height: 1.55;
+}
+
 .secao {
   padding: 27px 0;
   border-top: 1px solid var(--via-border-hairline);
@@ -325,6 +343,18 @@
   color: var(--via-navy);
 }
 
+.duasColunas li small {
+  color: var(--via-text-muted);
+  font-size: 0.52rem;
+}
+
+.duasColunas li p {
+  margin: 2px 0 0;
+  color: var(--via-text-faint);
+  font-size: 0.52rem;
+  line-height: 1.4;
+}
+
 .investimento {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -370,6 +400,57 @@
   font-size: 0.5rem;
 }
 
+.decisao {
+  padding: 28px 0 0;
+}
+
+.decisao ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--via-border-hairline);
+  border-left: 1px solid var(--via-border-hairline);
+  list-style: none;
+}
+
+.decisao li {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 8px;
+  padding: 13px;
+  border-right: 1px solid var(--via-border-hairline);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.decisao li > span {
+  color: var(--via-accent-ink);
+  font: 0.52rem var(--via-font-mono);
+}
+
+.decisao li p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: 0.58rem;
+  line-height: 1.4;
+}
+
+.observacoes {
+  margin-top: 20px;
+  padding: 17px 18px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+
+.observacoes > p:last-child {
+  margin: 7px 0 0;
+  color: var(--via-text-muted);
+  font-size: 0.57rem;
+  line-height: 1.5;
+}
+
 .rodape {
   display: flex;
   justify-content: space-between;
@@ -394,6 +475,9 @@
     padding: 20px;
   }
   .escopo {
+    grid-template-columns: 1fr;
+  }
+  .decisao ol {
     grid-template-columns: 1fr;
   }
   .duasColunas {
