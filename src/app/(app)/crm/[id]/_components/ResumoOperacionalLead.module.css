@@ -60,10 +60,11 @@
 }
 
 .metodo li {
+  position: relative;
   display: grid;
   min-width: 0;
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
   gap: var(--via-space-3);
   padding: var(--via-space-4);
   border: 1px solid var(--via-border-hairline);
@@ -71,7 +72,14 @@
   background: color-mix(in srgb, var(--via-bg-2) 60%, transparent);
 }
 
-.metodo li > span {
+.marcadorEtapa {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--via-border-soft);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--via-white) 72%, transparent);
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -80,7 +88,7 @@
 .metodo li div {
   display: grid;
   min-width: 0;
-  gap: 2px;
+  gap: 1px;
 }
 
 .metodo strong {
@@ -89,7 +97,15 @@
   font-weight: var(--via-fw-semibold);
 }
 
-.metodo small {
+.estadoEtapa {
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+}
+
+.descricaoEtapa {
+  margin-top: 2px;
   color: var(--via-text-faint);
   font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
@@ -101,8 +117,14 @@
   box-shadow: var(--app-elev-1-shadow);
 }
 
-.metodo li[data-estado='atual'] > span,
-.metodo li[data-estado='atual'] small {
+.metodo li[data-estado='atual'] .marcadorEtapa {
+  border-color: color-mix(in srgb, var(--via-white) 24%, transparent);
+  background: color-mix(in srgb, var(--via-white) 9%, transparent);
+  color: var(--via-white);
+}
+
+.metodo li[data-estado='atual'] .estadoEtapa,
+.metodo li[data-estado='atual'] .descricaoEtapa {
   color: var(--via-gray-300);
 }
 
@@ -111,7 +133,42 @@
 }
 
 .metodo li[data-estado='concluida'] {
-  background: color-mix(in srgb, var(--via-surface) 88%, transparent);
+  border-color: var(--via-navy-20);
+  background:
+    radial-gradient(ellipse 82% 120% at 0% 0%, var(--via-navy-08), transparent 70%),
+    color-mix(in srgb, var(--via-surface) 90%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.metodo li[data-estado='concluida'] .marcadorEtapa {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.metodo li[data-estado='concluida'] strong,
+.metodo li[data-estado='concluida'] .estadoEtapa {
+  color: var(--via-navy);
+}
+
+.metodo li[data-estado='encerrada'] {
+  border-color: var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-bg-2) 82%, transparent);
+}
+
+.metodo li[data-estado='encerrada'] .marcadorEtapa {
+  border-color: var(--via-text-muted);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+}
+
+.metodo li[data-estado='encerrada'] .estadoEtapa {
+  color: var(--via-text-body);
+}
+
+.metodo li[data-estado='futura'] strong,
+.metodo li[data-estado='futura'] .estadoEtapa {
+  color: var(--via-text-muted);
 }
 
 .decisao {
@@ -149,6 +206,12 @@
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-white) 7%, transparent);
   color: var(--via-gray-300);
+}
+
+.decisao[data-resultado='ganho'] .iconeDecisao {
+  border-color: var(--via-white);
+  background: var(--via-white);
+  color: var(--via-navy-deep);
 }
 
 .decisaoTexto p {
@@ -384,14 +447,14 @@
   font-size: var(--via-fs-sm);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1079px) {
   .topo {
     grid-template-columns: 1fr;
     align-items: start;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   .metodo {
     grid-template-columns: 1fr;
   }

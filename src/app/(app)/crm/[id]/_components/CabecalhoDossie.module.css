@@ -144,6 +144,16 @@
   gap: var(--via-space-2);
 }
 
+.encerradaNota {
+  max-width: 50ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  text-align: right;
+  text-wrap: pretty;
+}
+
 .acaoPrimaria,
 .acaoSecundaria {
   display: inline-flex;
@@ -200,6 +210,10 @@
 
   .acoes {
     justify-content: flex-start;
+  }
+
+  .encerradaNota {
+    text-align: left;
   }
 }
 

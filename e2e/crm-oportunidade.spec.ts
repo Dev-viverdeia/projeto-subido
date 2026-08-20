@@ -96,4 +96,28 @@ test.describe('Ficha do cliente no CRM', () => {
       .scrollIntoViewIfNeeded();
     await expect(dialogo.getByRole('button', { name: 'Confirmar por 3 créditos' })).toBeVisible();
   });
+
+  test('diferencia etapas concluídas, futuras e o ponto em que uma venda foi encerrada', async ({
+    page,
+  }) => {
+    await page.goto('/preview/crm-dossie?resultado=ganho');
+
+    await expect(page.getByRole('heading', { name: 'Venda concluída' })).toBeVisible();
+    const etapasDaVenda = page.getByRole('list', { name: 'Etapas da venda' });
+    await expect(etapasDaVenda.getByText('Concluída', { exact: true })).toHaveCount(3);
+    await expect(page.getByText('Ciclo concluído', { exact: true })).toBeVisible();
+    await expect(page.getByText('Pesquisa arquivada')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Agendar call' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Usar como próxima ação' })).toHaveCount(0);
+
+    await page.goto('/preview/crm-dossie?resultado=perdido');
+
+    await expect(page.getByRole('heading', { name: 'Venda encerrada' })).toBeVisible();
+    await expect(etapasDaVenda.getByText('Concluída', { exact: true })).toHaveCount(1);
+    await expect(page.getByText('Encerrada aqui', { exact: true })).toBeVisible();
+    await expect(page.getByText('Próxima etapa', { exact: true })).toBeVisible();
+    await expect(page.getByText('Pesquisa arquivada')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Agendar call' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Usar como próxima ação' })).toHaveCount(0);
+  });
 });

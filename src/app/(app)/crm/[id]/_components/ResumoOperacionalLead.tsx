@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, CalendarClock, History, Video } from 'lucide-react';
+import { ArrowUpRight, CalendarClock, Check, CheckCircle2, History, Video, X } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { FASES_CRM, faseDaEtapa } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
@@ -131,35 +131,72 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
   const faseAtual = faseDaEtapa(lead.oportunidade.etapa);
   const indiceAtual = FASES_CRM.findIndex((fase) => fase.id === faseAtual);
   const fasesVenda = FASES_CRM.filter((fase) => fase.id !== 'desfecho');
-  const encerrada = faseAtual === 'desfecho';
+  const ganha = lead.oportunidade.etapa === 'ganho';
+  const perdida = lead.oportunidade.etapa === 'perdido';
+  const ultimaFasePercorrida = lead.propostaRecente ? 2 : lead.calls.length > 0 ? 1 : 0;
+  const IconeDecisao = ganha ? CheckCircle2 : perdida ? X : CalendarClock;
+  const tituloSecao = ganha
+    ? 'Venda concluída'
+    : perdida
+      ? 'Venda encerrada'
+      : 'Próximo passo da venda';
+  const descricaoSecao = ganha
+    ? 'O projeto foi aprovado. O histórico comercial continua salvo nesta ficha.'
+    : perdida
+      ? 'A venda foi encerrada. As etapas realizadas e o motivo da perda continuam salvos.'
+      : 'Veja a etapa atual e execute a ação recomendada para esta oportunidade.';
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.topo}>
         <div>
           <p className={styles.sobretitulo}>Método de venda</p>
-          <h2 id="operacao-titulo">Próximo passo da venda</h2>
-          <p>Veja a etapa atual e execute a ação recomendada para esta oportunidade.</p>
+          <h2 id="operacao-titulo">{tituloSecao}</h2>
+          <p>{descricaoSecao}</p>
         </div>
 
         <ol className={styles.metodo} aria-label="Etapas da venda">
           {fasesVenda.map((fase, indice) => {
-            const estado =
-              encerrada || indice < indiceAtual
-                ? 'concluida'
-                : indice === indiceAtual
-                  ? 'atual'
-                  : 'futura';
+            const estado = ganha
+              ? 'concluida'
+              : perdida
+                ? indice < ultimaFasePercorrida
+                  ? 'concluida'
+                  : indice === ultimaFasePercorrida
+                    ? 'encerrada'
+                    : 'futura'
+                : indice < indiceAtual
+                  ? 'concluida'
+                  : indice === indiceAtual
+                    ? 'atual'
+                    : 'futura';
+            const rotuloEstado =
+              estado === 'concluida'
+                ? 'Concluída'
+                : estado === 'atual'
+                  ? 'Em andamento'
+                  : estado === 'encerrada'
+                    ? 'Encerrada aqui'
+                    : 'Próxima etapa';
             return (
               <li
                 key={fase.id}
                 data-estado={estado}
                 aria-current={estado === 'atual' ? 'step' : undefined}
               >
-                <span>{String(indice + 1).padStart(2, '0')}</span>
+                <span className={styles.marcadorEtapa} aria-hidden="true">
+                  {estado === 'concluida' ? (
+                    <Check size={14} strokeWidth={2.6} />
+                  ) : estado === 'encerrada' ? (
+                    <X size={14} strokeWidth={2.4} />
+                  ) : (
+                    String(indice + 1).padStart(2, '0')
+                  )}
+                </span>
                 <div>
                   <strong>{fase.rotulo}</strong>
-                  <small>{fase.descricao}</small>
+                  <small className={styles.estadoEtapa}>{rotuloEstado}</small>
+                  <small className={styles.descricaoEtapa}>{fase.descricao}</small>
                 </div>
               </li>
             );
@@ -167,10 +204,13 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
         </ol>
       </header>
 
-      <div className={styles.decisao}>
+      <div
+        className={styles.decisao}
+        data-resultado={ganha ? 'ganho' : perdida ? 'perdido' : undefined}
+      >
         <div className={styles.decisaoTexto}>
           <span className={styles.iconeDecisao}>
-            <CalendarClock size={19} strokeWidth={1.7} aria-hidden="true" />
+            <IconeDecisao size={19} strokeWidth={1.9} aria-hidden="true" />
           </span>
           <div>
             <p>{movimento.rotulo}</p>
@@ -192,7 +232,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
             </Link>
           ) : null}
-          {!encerrada && (
+          {!ganha && !perdida && (
             <EditarProximaAcao
               oportunidadeId={lead.oportunidade.id}
               acaoAtual={lead.oportunidade.proximaAcao}

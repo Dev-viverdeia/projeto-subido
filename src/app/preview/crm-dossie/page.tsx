@@ -9,6 +9,7 @@ import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
 import { PreviewSidebar } from './PreviewSidebar';
+import { criarLeadEncerrado } from './criarLeadEncerrado';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -342,6 +343,9 @@ const LEAD_NOVO: DossieLead = {
   totalCalls: 0,
 };
 
+const LEAD_GANHO = criarLeadEncerrado(LEAD_OPERACIONAL, 'ganho');
+const LEAD_PERDIDO = criarLeadEncerrado(LEAD_OPERACIONAL, 'perdido');
+
 export default async function PreviewDossiePage({
   searchParams,
 }: PageProps<'/preview/crm-dossie'>) {
@@ -351,7 +355,14 @@ export default async function PreviewDossiePage({
   const pesquisaPendente = parametros.pesquisa === 'pendente';
   const enriquecendo = parametros.enriquecimento === 'processando';
   const enriquecimentoFalhou = parametros.enriquecimento === 'falhou';
-  const lead = entrada || pesquisaPendente ? LEAD_NOVO : LEAD_OPERACIONAL;
+  const lead =
+    parametros.resultado === 'ganho'
+      ? LEAD_GANHO
+      : parametros.resultado === 'perdido'
+        ? LEAD_PERDIDO
+        : entrada || pesquisaPendente
+          ? LEAD_NOVO
+          : LEAD_OPERACIONAL;
   const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
 
   return (

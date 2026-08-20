@@ -924,6 +924,16 @@
   background: var(--via-surface);
 }
 
+.cartaoEncerrado[data-resultado='ganho'] {
+  background:
+    radial-gradient(ellipse 74% 110% at 0% 0%, var(--via-navy-08), transparent 72%),
+    var(--via-surface);
+}
+
+.cartaoEncerrado[data-resultado='perdido'] {
+  background: color-mix(in srgb, var(--via-bg-2) 74%, var(--via-surface));
+}
+
 .cartaoEncerrado > header,
 .cartaoEncerrado > footer,
 .encerradoTitulo {
@@ -938,12 +948,19 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  color: var(--via-text-body);
+  min-height: 28px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
 }
 
 .cartaoEncerrado[data-resultado='perdido'] .estadoEncerrado {
+  border-color: var(--via-border-soft);
+  background: var(--via-surface);
   color: var(--via-text-muted);
 }
 

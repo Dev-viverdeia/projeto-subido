@@ -27,7 +27,7 @@ import {
 } from '@/lib/crm/enriquecimento';
 import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
-import { BotaoProximaAcao } from './BotaoProximaAcao';
+import { AcaoPesquisaComercial } from './AcaoPesquisaComercial';
 import { InteligenciaDeContato } from './InteligenciaDeContato';
 import styles from './PesquisaComercial.module.css';
 
@@ -343,7 +343,6 @@ export function PesquisaComercial({
   dossie: DossieEnriquecido;
 }) {
   const [aba, setAba] = useState<AbaPesquisa>('leitura');
-  const salva = lead.oportunidade.proximaAcao === dossie.proximaAcao.acao;
 
   return (
     <section className={styles.pesquisa} aria-labelledby="pesquisa-comercial-titulo">
@@ -362,16 +361,7 @@ export function PesquisaComercial({
           </div>
         </div>
 
-        <aside className={styles.proximaAcao} aria-labelledby="acao-recomendada-titulo">
-          <p>Próximo passo sugerido</p>
-          <h3 id="acao-recomendada-titulo">{dossie.proximaAcao.acao}</h3>
-          <span>{dossie.proximaAcao.porque}</span>
-          <BotaoProximaAcao
-            oportunidadeId={lead.oportunidade.id}
-            enriquecimentoId={execucao.id}
-            salva={salva}
-          />
-        </aside>
+        <AcaoPesquisaComercial lead={lead} dossie={dossie} enriquecimentoId={execucao.id} />
       </div>
 
       <div className={styles.conteudoPesquisa}>

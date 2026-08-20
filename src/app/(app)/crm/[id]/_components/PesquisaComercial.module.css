@@ -127,6 +127,12 @@
   line-height: var(--via-lh-normal);
 }
 
+.proximaAcao[data-encerrada='true'] {
+  background:
+    radial-gradient(ellipse 88% 92% at 100% 0%, var(--via-navy-04), transparent 72%),
+    color-mix(in srgb, var(--via-bg-2) 72%, transparent);
+}
+
 .formAcao {
   display: grid;
   gap: var(--via-space-2);

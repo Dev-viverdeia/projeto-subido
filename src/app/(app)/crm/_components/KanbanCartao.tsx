@@ -307,7 +307,7 @@ export function CartaoEncerrado({
       <header>
         <span className={styles.estadoEncerrado}>
           <Icone size={14} strokeWidth={2} aria-hidden="true" />
-          {perdida ? 'Perdida' : 'Ganha'}
+          {perdida ? 'Venda perdida' : 'Venda ganha'}
         </span>
         <MenuMovimentacao
           oportunidade={oportunidade}
@@ -331,7 +331,7 @@ export function CartaoEncerrado({
       <footer>
         <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
         <Link href={`/crm/${oportunidade.id}`}>
-          Abrir oportunidade
+          Abrir ficha
           <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
         </Link>
       </footer>
