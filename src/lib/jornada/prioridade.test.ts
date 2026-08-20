@@ -17,7 +17,7 @@ function jornada(alteracoes: Partial<SinaisJornada> = {}) {
       aulasConcluidas: 12,
       formacoesConcluidas: 1,
       etapasConcluidas: 0,
-      projetosConcluidos: 0,
+      projetosConcluidos: 1,
     },
     oportunidades: { total: 0, enriquecidas: 0, comProximaAcao: 0, ganhas: 0 },
     calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },

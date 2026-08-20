@@ -67,15 +67,15 @@ export const SinaisSobralSchema = z.object({
       }),
     })
     .default({
-      perfilCompleto: false,
+      perfilCompleto: true,
       etapaAtual: 'aprender',
       proximoPasso: {
-        id: 'configurar-direcao',
-        titulo: 'Definir a primeira oferta',
-        detalhe: 'Escolha o mercado, o primeiro projeto e a frase usada para explicar o serviço.',
-        evidencia: 'Mercado, projeto e apresentação do serviço salvos.',
-        destino: '/inicio',
-        acao: 'Definir oferta',
+        id: 'formacao-base',
+        titulo: 'Concluir a primeira formação',
+        detalhe: 'Aprenda os fundamentos e entenda como um projeto de IA é vendido e implementado.',
+        evidencia: 'Primeira formação concluída na plataforma.',
+        destino: '/formacoes',
+        acao: 'Ver formações',
       },
       evidenciasConcluidas: 0,
       totalEvidencias: 0,

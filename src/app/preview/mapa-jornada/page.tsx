@@ -10,7 +10,6 @@ import {
   House,
   UsersRound,
 } from 'lucide-react';
-import { ConfiguracaoJornada } from '@/app/(app)/inicio/_components/ConfiguracaoJornada';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
 import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
@@ -142,7 +141,6 @@ export default async function PreviewMapaJornadaPage({
   const estado = (await searchParams).estado;
   const evolucaoAtiva = estado === 'evolucao';
   const operacaoAtiva = estado === 'operacao' || evolucaoAtiva;
-  const perfil = operacaoAtiva ? PERFIL_PREVIEW : null;
   const plano = evolucaoAtiva ? PLANO_EVOLUCAO : operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
   const sinais = SinaisSobralSchema.parse({
     momento: '2026-08-13T12:00:00.000Z',
@@ -255,7 +253,6 @@ export default async function PreviewMapaJornadaPage({
       </aside>
       <main id="conteudo" className={styles.conteudo}>
         <MapaJornada
-          configuracao={<ConfiguracaoJornada perfil={perfil} projetos={PROJETOS} />}
           nome="Mateus"
           prioridade={
             <PrioridadeOperacional

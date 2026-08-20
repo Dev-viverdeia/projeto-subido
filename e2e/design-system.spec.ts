@@ -5,7 +5,7 @@ const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
-  ['/preview/mapa-jornada', 'Defina sua primeira oferta de IA.'],
+  ['/preview/mapa-jornada', 'Mateus,'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/prospeccao', 'Encontre empresas para prospectar.'],
   ['/preview/calls', 'O que fica salvo'],
@@ -52,6 +52,19 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByText('Meta da etapa · Segundo ciclo comprovado')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Confirmar o segundo projeto' })).toBeVisible();
     await expect(page.getByText('Segundo projeto ainda não confirmado.')).toBeVisible();
+  });
+
+  test('a Início guia o uso sem exigir briefing e preserva contraste no hero', async ({ page }) => {
+    await page.goto('/preview/mapa-jornada');
+
+    await expect(page.getByRole('heading', { name: 'bem-vindo.' })).toHaveCSS(
+      'color',
+      'rgb(255, 255, 255)',
+    );
+    await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toBeVisible();
+    await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);
   });
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
