@@ -37,13 +37,13 @@ export function FormularioAgendarCall({
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
-  const campoOffset = useRef<HTMLInputElement>(null);
   const montado = useSyncExternalStore(
     escutarMontagem,
     obterMontagemCliente,
     obterMontagemServidor,
   );
   const [aberto, setAberto] = useState(abertoInicial);
+  const offsetMinutos = montado ? new Date().getTimezoneOffset() : 0;
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
   const [estado, acao] = useActionState(agendarReuniao, INICIAL);
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
@@ -65,9 +65,6 @@ export function FormularioAgendarCall({
 
   useEffect(() => {
     if (!aberto) return;
-    if (campoOffset.current) {
-      campoOffset.current.value = String(new Date().getTimezoneOffset());
-    }
     painel.current
       ?.querySelector<HTMLElement>('[data-autofocus], select, input:not([type="hidden"])')
       ?.focus();
@@ -200,7 +197,7 @@ export function FormularioAgendarCall({
                     noValidate
                     onSubmit={() => setErrosOcultos(new Set())}
                   >
-                    <input ref={campoOffset} type="hidden" name="offsetMinutos" defaultValue="0" />
+                    <input type="hidden" name="offsetMinutos" value={offsetMinutos} readOnly />
 
                     {estado.erro && (
                       <div role="alert">

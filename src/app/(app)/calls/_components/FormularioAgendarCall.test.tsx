@@ -73,6 +73,29 @@ describe('FormularioAgendarCall', () => {
     );
   });
 
+  it('preserva o fuso local quando a oportunidade selecionada atualiza o formulário', async () => {
+    const user = userEvent.setup();
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        calendar={CALENDAR_CONECTADO}
+        abertoInicial
+      />,
+    );
+
+    await waitFor(() =>
+      expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
+        String(new Date().getTimezoneOffset()),
+      ),
+    );
+    await user.selectOptions(screen.getByLabelText('Oportunidade'), OPORTUNIDADE.id);
+
+    expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
+      String(new Date().getTimezoneOffset()),
+    );
+  });
+
   it('abre o kickoff do projeto com oportunidade e tipo já definidos', () => {
     agendarReuniaoMock.mockResolvedValue({});
     render(
