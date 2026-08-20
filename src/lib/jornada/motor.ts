@@ -118,8 +118,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       titulo: 'Aprender',
       resumo: 'Aprenda um projeto e prepare a entrega',
       marco: 'Primeiro projeto pronto para vender',
-      contexto:
-        'Conclua uma formação e execute um projeto guiado antes de começar a prospectar.',
+      contexto: 'Conclua uma formação e execute um projeto guiado antes de começar a prospectar.',
       guia: 'Como aprender e preparar um projeto',
       passos: [
         passo(

@@ -698,8 +698,7 @@
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-surface);
   background:
-    radial-gradient(circle at 100% 0%, var(--via-navy-04), transparent 38%),
-    var(--app-elev-1-bg);
+    radial-gradient(circle at 100% 0%, var(--via-navy-04), transparent 38%), var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
   backdrop-filter: blur(18px) saturate(125%);
 }
