@@ -1,6 +1,20 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowRight, Building2, CalendarDays, Check, Clock3, UserRound } from 'lucide-react';
+import {
+  ArrowRight,
+  Bot,
+  BriefcaseBusiness,
+  CalendarDays,
+  Check,
+  ContactRound,
+  DraftingCompass,
+  FileSignature,
+  GraduationCap,
+  Search,
+  UserRound,
+  UsersRound,
+  Video,
+} from 'lucide-react';
 import type { PlanoJornada } from '@/lib/jornada/motor';
 import styles from './MapaJornada.module.css';
 
@@ -15,9 +29,126 @@ type Props = {
   plano: PlanoJornada;
 };
 
-function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
+const AREAS_APRENDER = [
+  {
+    href: '/formacoes',
+    rotulo: 'Aprendizado',
+    titulo: 'Formações',
+    descricao: 'Aprenda os fundamentos e avance no seu ritmo.',
+    acao: 'Continuar aprendendo',
+    Icone: GraduationCap,
+  },
+  {
+    href: '/solucoes',
+    rotulo: 'Implementação',
+    titulo: 'Projetos',
+    descricao: 'Escolha o que vender e siga a entrega passo a passo.',
+    acao: 'Explorar projetos',
+    Icone: BriefcaseBusiness,
+  },
+  {
+    href: '/builder',
+    rotulo: 'Personalização',
+    titulo: 'Estúdio',
+    descricao: 'Transforme uma dor real em um projeto sob medida.',
+    acao: 'Criar um projeto',
+    Icone: DraftingCompass,
+  },
+  {
+    href: '/consultor',
+    rotulo: 'Orientação',
+    titulo: 'Sobral AI',
+    descricao: 'Tire dúvidas e descubra o melhor próximo passo.',
+    acao: 'Pedir orientação',
+    Icone: Bot,
+  },
+  {
+    href: '/mentorias',
+    rotulo: 'Ao vivo',
+    titulo: 'Mentorias',
+    descricao: 'Leve um desafio real e receba ajuda para avançar.',
+    acao: 'Ver encontros',
+    Icone: UsersRound,
+  },
+] as const;
+
+const AREAS_OPERAR = [
+  {
+    href: '/prospeccao',
+    rotulo: 'Encontrar clientes',
+    titulo: 'Prospecção',
+    descricao: 'Crie listas de empresas com contatos para abordar.',
+    acao: 'Buscar empresas',
+    Icone: Search,
+  },
+  {
+    href: '/vendas',
+    rotulo: 'Conduzir a venda',
+    titulo: 'Vendas',
+    descricao: 'Trabalhe cada oportunidade com uma próxima ação clara.',
+    acao: 'Abrir oportunidades',
+    Icone: ContactRound,
+  },
+  {
+    href: '/reunioes',
+    rotulo: 'Conversar',
+    titulo: 'Reuniões',
+    descricao: 'Agende, conduza e registre as conversas com seus clientes.',
+    acao: 'Ver reuniões',
+    Icone: Video,
+  },
+  {
+    href: '/propostas',
+    rotulo: 'Fechar o projeto',
+    titulo: 'Propostas',
+    descricao: 'Monte, apresente e acompanhe suas propostas comerciais.',
+    acao: 'Abrir propostas',
+    Icone: FileSignature,
+  },
+] as const;
+
+type Area = (typeof AREAS_APRENDER)[number] | (typeof AREAS_OPERAR)[number];
+
+function CartoesAreas({
+  titulo,
+  sobretitulo,
+  areas,
+}: {
+  titulo: string;
+  sobretitulo: string;
+  areas: readonly Area[];
+}) {
+  const id = `area-${sobretitulo.toLowerCase().replaceAll(' ', '-')}`;
   return (
-    <ol className={styles.trilho} aria-label="Etapas do trabalho">
+    <section className={styles.areas} aria-labelledby={id}>
+      <div className={styles.secaoCabecalho}>
+        <div>
+          <p>{sobretitulo}</p>
+          <h2 id={id}>{titulo}</h2>
+        </div>
+      </div>
+      <div className={styles.gradeAreas}>
+        {areas.map(({ href, rotulo, titulo: nomeArea, descricao, acao, Icone }) => (
+          <Link href={href} className={styles.cartaoArea} key={href}>
+            <span className={styles.areaTopo}>
+              <small>{rotulo}</small>
+              <Icone size={18} strokeWidth={1.7} aria-hidden="true" />
+            </span>
+            <strong>{nomeArea}</strong>
+            <p>{descricao}</p>
+            <span className={styles.areaAcao}>
+              {acao} <ArrowRight size={15} strokeWidth={1.9} aria-hidden="true" />
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TrilhoCompacto({ plano }: { plano: PlanoJornada }) {
+  return (
+    <ol className={styles.trilho} aria-label="Seu caminho na plataforma">
       {plano.etapas.map((etapa) => (
         <li
           key={etapa.id}
@@ -25,12 +156,12 @@ function TrilhoJornada({ plano }: { plano: PlanoJornada }) {
           aria-current={etapa.id === plano.etapaAtual ? 'step' : undefined}
         >
           <span className={styles.trilhoMarca} aria-hidden="true">
-            {etapa.status === 'concluida' ? <Check size={13} strokeWidth={2.7} /> : etapa.numero}
+            {etapa.status === 'concluida' ? <Check size={12} strokeWidth={2.7} /> : etapa.numero}
           </span>
           <span className={styles.trilhoTexto}>
             <strong>{etapa.titulo}</strong>
             <small>
-              {etapa.concluidos} de {etapa.passos.length} itens
+              {etapa.concluidos}/{etapa.passos.length}
             </small>
           </span>
         </li>
@@ -50,8 +181,7 @@ export function MapaJornada({
   plano,
 }: Props) {
   const etapaAtual = plano.etapas.find((item) => item.id === plano.etapaAtual) ?? plano.etapas[0]!;
-  const hoje = new Date();
-  const dataLonga = hoje.toLocaleDateString('pt-BR', {
+  const dataLonga = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -60,139 +190,135 @@ export function MapaJornada({
   if (!plano.perfilCompleto) {
     return (
       <div className={`${styles.pagina} pagina-mapa-jornada`}>
-        <header className={styles.topo}>
+        <section className={styles.heroAtivacao} aria-labelledby="titulo-ativacao">
           <div>
-            <span className={styles.estadoOperacao}>Antes de começar</span>
-            <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
-            <p className={styles.data}>
-              Configure sua primeira oferta para usar a plataforma · {dataLonga}
+            <span className={styles.eyebrow}>Comece por aqui</span>
+            <h1 id="titulo-ativacao">Defina sua primeira oferta de IA.</h1>
+            <p>
+              Três escolhas ajudam a plataforma a recomendar projetos, clientes e próximos passos.
             </p>
           </div>
-          <span className={styles.passoAtual}>Passo 1 de 3</span>
-        </header>
+          <span className={styles.tempoAtivacao}>Leva menos de 3 minutos</span>
+        </section>
 
-        <section className={styles.ativacao} aria-labelledby="titulo-ativacao">
-          <div className={styles.ativacaoIntroducao}>
-            <span className={styles.selo}>Configuração inicial</span>
-            <h1 id="titulo-ativacao">Escolha o que você quer vender primeiro.</h1>
-            <p>Informe o mercado, o projeto e uma frase simples para apresentar seu serviço.</p>
-            <div className={styles.tempoAtivacao}>
-              <Clock3 size={16} strokeWidth={1.8} aria-hidden="true" />
-              <span>Leva menos de 3 minutos</span>
-            </div>
-          </div>
+        <section className={styles.ativacao}>
           <div className={styles.configuracaoAberta}>{configuracao}</div>
         </section>
 
         <section className={styles.caminho} aria-labelledby="titulo-caminho">
-          <div className={styles.caminhoCabecalho}>
+          <div className={styles.secaoCabecalho}>
             <div>
-              <p>Como a plataforma organiza o trabalho</p>
-              <h2 id="titulo-caminho">Cinco etapas, da preparação à próxima venda.</h2>
+              <p>O caminho completo</p>
+              <h2 id="titulo-caminho">Da primeira habilidade ao cliente bem atendido.</h2>
             </div>
-            <span>Os itens são concluídos conforme você trabalha na plataforma.</span>
+            <span>Você não precisa dominar tudo agora. A plataforma mostra uma etapa por vez.</span>
           </div>
-          <TrilhoJornada plano={plano} />
+          <TrilhoCompacto plano={plano} />
         </section>
+
+        <CartoesAreas
+          titulo="Conheça o que vai ajudar você a avançar."
+          sobretitulo="Áreas da plataforma"
+          areas={AREAS_APRENDER}
+        />
       </div>
     );
   }
 
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
-      <header className={styles.topo}>
-        <div>
-          <span className={styles.estadoOperacao}>Hoje</span>
-          <p className={styles.saudacao}>Bom dia{nome ? `, ${nome}` : ''}.</p>
-          <p className={styles.data}>{dataLonga}</p>
+      <section className={styles.abertura} aria-label="Resumo do dia">
+        <div className={styles.boasVindas}>
+          <span className={styles.eyebrow}>{dataLonga}</span>
+          <p>{nome ? `${nome},` : 'Olá,'}</p>
+          <h1>bem-vindo.</h1>
+          <strong>O próximo movimento começa por aqui.</strong>
         </div>
-        <div className={styles.resumoTopo}>
-          <span>Etapa atual</span>
-          <strong>{etapaAtual.titulo}</strong>
-        </div>
-      </header>
 
-      <section className={styles.comando} aria-label="Próxima ação recomendada">
-        {prioridade}
-
-        <aside className={styles.progresso} aria-label="Progresso geral">
-          <div className={styles.progressoNumero}>
-            <span>Progresso geral</span>
-            <strong>{plano.percentual}%</strong>
-          </div>
-          <div
-            className={styles.progressoTrilho}
-            role="progressbar"
-            aria-label="Progresso geral"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={plano.percentual}
-          >
-            <span style={{ width: `${plano.percentual}%` }} />
-          </div>
-          <p>
-            {plano.evidenciasConcluidas} de {plano.totalEvidencias} itens concluídos
-          </p>
-          <div className={styles.marco}>
-            <span>Objetivo desta etapa</span>
-            <strong>{etapaAtual.marco}</strong>
-          </div>
-        </aside>
-
-        <div className={styles.comandoTrilho}>
-          <TrilhoJornada plano={plano} />
-        </div>
+        <Link href="/mentorias" className={styles.mentoriaDestaque}>
+          <span className={styles.mentoriaTopo}>
+            <small>Próxima mentoria</small>
+            <em>Ver agenda</em>
+          </span>
+          <CalendarDays size={22} strokeWidth={1.65} aria-hidden="true" />
+          <strong>{proximaMentoria ?? 'Mentoria de implementação'}</strong>
+          <p>Leve uma dúvida real da sua venda ou entrega.</p>
+          <span className={styles.mentoriaAcao}>
+            Ver próxima sessão <ArrowRight size={15} aria-hidden="true" />
+          </span>
+        </Link>
       </section>
 
-      <section className={styles.operacao} aria-labelledby="titulo-operacao">
+      <section className={styles.direcao} aria-labelledby="titulo-direcao">
         <div className={styles.secaoCabecalho}>
           <div>
-            <p>Para hoje</p>
-            <h2 id="titulo-operacao">Informações para decidir o que fazer</h2>
+            <p>Seu próximo passo</p>
+            <h2 id="titulo-direcao">Continue de onde parou.</h2>
           </div>
-          <span>Abra um item para continuar o trabalho.</span>
+          <span>A plataforma usa seu progresso para mostrar o que merece atenção agora.</span>
         </div>
 
-        <div className={styles.cartoesOperacao}>
-          <Link href="/vendas" className={styles.cartaoOperacao}>
-            <span className={styles.cartaoIcone} aria-hidden="true">
-              <Building2 size={19} strokeWidth={1.8} />
-            </span>
-            <span className={styles.cartaoConteudo}>
-              <small>Cliente em foco</small>
-              <strong>{cliente}</strong>
-              <em>
-                <UserRound size={13} strokeWidth={1.8} aria-hidden="true" /> {contato}
-              </em>
-              <p>{proximaAcao ?? 'Defina a próxima ação da venda'}</p>
-            </span>
-            <ArrowRight
-              className={styles.cartaoSeta}
-              size={16}
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-          </Link>
-
-          <Link href="/mentorias" className={styles.cartaoOperacao}>
-            <span className={styles.cartaoIcone} aria-hidden="true">
-              <CalendarDays size={19} strokeWidth={1.8} />
-            </span>
-            <span className={styles.cartaoConteudo}>
-              <small>Próximo encontro</small>
-              <strong>{proximaMentoria ?? 'Mentoria de implementação'}</strong>
-              <p>Leve uma dúvida ou um problema real da sua entrega.</p>
-            </span>
-            <ArrowRight
-              className={styles.cartaoSeta}
-              size={16}
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
-          </Link>
+        <div className={styles.comando}>
+          {prioridade}
+          <aside className={styles.painelProgresso} aria-label="Seu progresso">
+            <span className={styles.painelRotulo}>Etapa atual</span>
+            <strong>{etapaAtual.titulo}</strong>
+            <p>{etapaAtual.marco}</p>
+            <div className={styles.progressoLinha}>
+              <span>Progresso geral</span>
+              <em>{plano.percentual}%</em>
+            </div>
+            <div
+              className={styles.progressoTrilho}
+              role="progressbar"
+              aria-label="Progresso geral"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={plano.percentual}
+            >
+              <span style={{ width: `${plano.percentual}%` }} />
+            </div>
+            <TrilhoCompacto plano={plano} />
+          </aside>
         </div>
       </section>
 
+      <section className={styles.emAndamento} aria-labelledby="titulo-andamento">
+        <div className={styles.secaoCabecalho}>
+          <div>
+            <p>Em andamento</p>
+            <h2 id="titulo-andamento">O que já está na sua mesa.</h2>
+          </div>
+        </div>
+        <Link href="/vendas" className={styles.clienteEmFoco}>
+          <span className={styles.clienteIcone}>
+            <BriefcaseBusiness size={19} strokeWidth={1.8} aria-hidden="true" />
+          </span>
+          <span className={styles.clienteTexto}>
+            <small>Oportunidade em foco</small>
+            <strong>{cliente}</strong>
+            <em>
+              <UserRound size={13} aria-hidden="true" /> {contato}
+            </em>
+          </span>
+          <span className={styles.clienteAcao}>
+            <small>Próxima ação</small>
+            <strong>{proximaAcao ?? 'Defina a próxima ação da venda'}</strong>
+          </span>
+          <ArrowRight size={17} aria-hidden="true" />
+        </Link>
+      </section>
+
+      <CartoesAreas
+        titulo="Aprenda, adapte e peça ajuda."
+        sobretitulo="Aprender e construir"
+        areas={AREAS_APRENDER}
+      />
+      <CartoesAreas
+        titulo="Encontre clientes e conduza cada venda."
+        sobretitulo="Operação comercial"
+        areas={AREAS_OPERAR}
+      />
       {configuracao}
     </div>
   );
