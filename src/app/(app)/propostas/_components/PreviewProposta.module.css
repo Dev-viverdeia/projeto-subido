@@ -12,13 +12,43 @@
 
 .molduraTopo {
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: var(--via-space-3);
   padding: var(--via-space-1) var(--via-space-2) var(--via-space-3);
   color: rgba(255, 255, 255, 0.48);
+}
+
+.molduraTopo > div {
+  display: grid;
+  gap: 2px;
+}
+
+.molduraTopo strong {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.molduraTopo > div > span {
+  font-size: var(--via-fs-micro);
+}
+
+.estadoPreview {
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--app-radius-chip);
+  color: rgba(255, 255, 255, 0.66);
   font-family: var(--via-font-mono);
-  font-size: 0.59rem;
-  letter-spacing: var(--app-ls-eyebrow);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
+}
+
+.estadoPreview[data-sujo='true'] {
+  border-color: color-mix(in srgb, var(--via-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--via-accent) 9%, transparent);
+  color: color-mix(in srgb, var(--via-accent) 58%, var(--via-white));
 }
 
 .papel {

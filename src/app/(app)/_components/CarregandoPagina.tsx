@@ -1,13 +1,10 @@
 import styles from './CarregandoPagina.module.css';
-import { EstadoCarregamento } from './EstadoCarregamento';
 
 /** Estado instantâneo para navegações que ainda aguardam dados do servidor. */
 export function CarregandoPagina() {
   return (
     <div className={styles.pagina} role="status" aria-live="polite" aria-label="Carregando página">
       <span className="sr-only">Carregando os dados desta página.</span>
-
-      <EstadoCarregamento titulo="Carregando a página" descricao="Buscando os dados necessários." />
 
       <header className={styles.cabecalho} aria-hidden="true">
         <div className={`${styles.esqueleto} ${styles.sobretitulo}`} />

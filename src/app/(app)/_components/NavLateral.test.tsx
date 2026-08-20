@@ -87,12 +87,14 @@ describe('NavLateral no desktop', () => {
     expect(vendas).toHaveAttribute('data-prefetch', 'true');
   });
 
-  it('mostra um feedback destacado assim que uma nova área é solicitada', async () => {
+  it('indica a navegação no próprio item sem cobrir a página', async () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} variante="lateral" />);
 
-    await usuario.click(screen.getByRole('link', { name: 'Vendas' }));
+    const vendas = screen.getByRole('link', { name: 'Vendas' });
+    await usuario.click(vendas);
 
-    expect(screen.getByRole('status', { name: /Abrindo Vendas/ })).toBeVisible();
+    expect(vendas).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

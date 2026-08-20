@@ -2,7 +2,8 @@
 
 import { useActionState, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Check, Download, FileCheck2, Save, Video } from 'lucide-react';
+import { ArrowLeft, Check, Download, Eye, FileCheck2, Pencil, Save, Video } from 'lucide-react';
+import { Spinner } from '@/design-system/via';
 import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
@@ -49,6 +50,7 @@ export function EditorProposta({
     centavosParaCampo(documentoInicial.investimento.valorCentavos),
   );
   const [sujo, setSujo] = useState(false);
+  const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
   const [estadoSalvar, acaoSalvar, salvando] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {
       const resultado = await salvarProposta(estado, dados);
@@ -107,11 +109,11 @@ export function EditorProposta({
         <div className={styles.acoesTopo}>
           {reuniaoId && (
             <Link href={`/reunioes/${reuniaoId}`} className={styles.secundario}>
-              <Video size={15} aria-hidden="true" /> Call de origem
+              <Video size={15} aria-hidden="true" /> Reunião de origem
             </Link>
           )}
           <Link href={`/vendas/${oportunidadeId}`} className={styles.secundario}>
-            Ver lead
+            Abrir ficha
           </Link>
           {sujo ? (
             <span className={styles.downloadInativo} title="Salve antes de baixar">
@@ -128,7 +130,7 @@ export function EditorProposta({
             <input type="hidden" name="documento" value={json} />
             <button type="submit" className={styles.salvar} disabled={salvando || !sujo}>
               {salvando ? (
-                <span className={styles.spinner} />
+                <Spinner size="sm" tone="inverse" />
               ) : !sujo ? (
                 <Check size={15} aria-hidden="true" />
               ) : (
@@ -151,8 +153,29 @@ export function EditorProposta({
         </p>
       )}
 
+      <div className={styles.modos} role="tablist" aria-label="Área de trabalho da proposta">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={painelAtivo === 'editar'}
+          onClick={() => setPainelAtivo('editar')}
+        >
+          <Pencil size={15} strokeWidth={1.8} aria-hidden="true" />
+          Editar
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={painelAtivo === 'preview'}
+          onClick={() => setPainelAtivo('preview')}
+        >
+          <Eye size={16} strokeWidth={1.8} aria-hidden="true" />
+          Prévia em tempo real
+        </button>
+      </div>
+
       <div className={styles.grade}>
-        <main className={styles.editor}>
+        <main className={styles.editor} data-painel-ativo={painelAtivo === 'editar' || undefined}>
           <section className={styles.abertura}>
             <p className={styles.sobretitulo}>Documento comercial</p>
             <textarea
@@ -167,8 +190,8 @@ export function EditorProposta({
               }}
             />
             <p>
-              Revise a leitura que o cliente verá. O PDF acompanha esta prévia e só usa o que foi
-              salvo.
+              A prévia muda enquanto você edita. Salve quando quiser gerar o PDF ou enviar a
+              proposta.
             </p>
           </section>
 
@@ -258,7 +281,18 @@ export function EditorProposta({
           </section>
         </main>
 
-        <PreviewProposta documento={documento} titulo={titulo} versao={versao} status={status} />
+        <aside
+          className={styles.previewArea}
+          data-painel-ativo={painelAtivo === 'preview' || undefined}
+        >
+          <PreviewProposta
+            documento={documento}
+            titulo={titulo}
+            versao={versao}
+            status={status}
+            sujo={sujo}
+          />
+        </aside>
       </div>
     </div>
   );

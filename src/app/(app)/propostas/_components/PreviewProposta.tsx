@@ -19,19 +19,26 @@ export function PreviewProposta({
   titulo,
   versao,
   status,
+  sujo,
 }: {
   documento: DocumentoProposta;
   titulo: string;
   versao: number;
   status: StatusProposta;
+  sujo: boolean;
 }) {
   const subtitulo = subtituloVisivel(titulo, documento.projeto.titulo);
 
   return (
     <div className={styles.moldura} aria-label="Prévia visual da proposta">
       <div className={styles.molduraTopo}>
-        <span>Prévia do documento</span>
-        <span>A4 · PDF</span>
+        <div>
+          <strong>Prévia em tempo real</strong>
+          <span>Atualiza enquanto você edita</span>
+        </div>
+        <span className={styles.estadoPreview} data-sujo={sujo || undefined}>
+          {sujo ? 'Alterações locais' : 'Versão salva'}
+        </span>
       </div>
 
       <article className={styles.papel}>

@@ -12,7 +12,7 @@ const TELAS = [
   ['/preview/live-coach', 'Dimensione o custo da espera'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
-  ['/preview/propostas', 'Crie e acompanhe propostas.'],
+  ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
   ['/preview/sala-entrega', 'Compromissos registrados com o cliente'],
 ] as const;
