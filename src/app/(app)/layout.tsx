@@ -6,6 +6,7 @@ import { QueryProvider } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
+import { concluiuIntroducaoSubido } from '@/lib/auth/introducao';
 import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
@@ -39,6 +40,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const claims = data.claims;
   const email = typeof claims.email === 'string' ? claims.email : '';
   const metadata = claims.user_metadata;
+  const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
+
+  /* A introdução é parte do produto, não uma página solta. O status fica no
+     token autenticado para esta barreira não acrescentar uma consulta ao banco
+     em cada navegação. */
+  if (!concluiuIntroducao) redirect('/boas-vindas');
+
   const nomeBruto = typeof metadata?.nome === 'string' ? metadata.nome : '';
   /* Antes do primeiro cadastro completo o nome pode não existir. O trecho antes do
      @ é um fallback previsível — melhor que "Usuário" e melhor que vazio. */

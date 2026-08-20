@@ -5,8 +5,9 @@
  * matcher é o caso especial — leia o aviso em `src/proxy.ts` antes de mexer nele.
  */
 
-/** Rotas do grupo `(app)` — exigem sessão. Toda rota daqui É coberta pelo proxy. */
+/** Rotas autenticadas — app e ativação. Toda rota daqui É coberta pelo proxy. */
 export const ROTAS_APP = [
+  '/boas-vindas',
   '/inicio',
   '/prospeccao',
   '/vendas',
@@ -41,6 +42,7 @@ export type RotaApp = (typeof ROTAS_APP)[number];
  * ROTAS_APP sem dar nome a ela vira erro de tipo, não um cabeçalho vazio.
  */
 export const ROTULOS: Record<RotaApp, string> = {
+  '/boas-vindas': 'Boas-vindas',
   '/inicio': 'Início',
   '/prospeccao': 'Prospecção',
   '/vendas': 'Vendas',
