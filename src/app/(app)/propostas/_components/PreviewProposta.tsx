@@ -58,9 +58,7 @@ export function PreviewProposta({
               <strong>{documento.cliente.empresa}</strong>
               {(documento.cliente.contato || documento.cliente.cargo) && (
                 <small>
-                  {[documento.cliente.contato, documento.cliente.cargo]
-                    .filter(Boolean)
-                    .join(' · ')}
+                  {[documento.cliente.contato, documento.cliente.cargo].filter(Boolean).join(' · ')}
                 </small>
               )}
               {documento.cliente.email && <small>{documento.cliente.email}</small>}
