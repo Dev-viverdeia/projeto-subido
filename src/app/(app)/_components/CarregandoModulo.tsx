@@ -18,16 +18,16 @@ const CONFIGURACAO: Record<
   }
 > = {
   pipeline: {
-    modulo: 'CRM',
-    titulo: 'Preparando o CRM',
-    descricao: 'Carregando oportunidades e etapas do pipeline.',
+    modulo: 'Vendas',
+    titulo: 'Preparando suas vendas',
+    descricao: 'Carregando clientes e etapas da venda.',
     metricas: 3,
     colunas: 5,
     momentoEscuro: false,
   },
   calls: {
-    modulo: 'Calls',
-    titulo: 'Preparando suas calls',
+    modulo: 'Reuniões',
+    titulo: 'Preparando suas reuniões',
     descricao: 'Carregando agenda, salas e transcrições.',
     metricas: 0,
     colunas: 2,
@@ -60,7 +60,7 @@ const CONFIGURACAO: Record<
   consultor: {
     modulo: 'Sobral AI',
     titulo: 'Preparando o Sobral AI',
-    descricao: 'Verificando CRM, calls, propostas e projetos.',
+    descricao: 'Verificando vendas, reuniões, propostas e projetos.',
     metricas: 0,
     colunas: 4,
     momentoEscuro: true,

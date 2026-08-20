@@ -177,7 +177,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
                     ? 'Oportunidade marcada como perdida'
                     : etapaAnterior === 'ganho' || etapaAnterior === 'perdido'
                       ? 'Oportunidade reaberta'
-                      : 'Etapa do pipeline alterada',
+                      : 'Etapa da venda alterada',
               ultimoFatoEm: instante,
               atualizadoEm: instante,
             }
@@ -259,7 +259,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           announcements: {
             onDragStart: ({ active }) => {
               const oportunidade = active.data.current?.oportunidade as OportunidadeCrm | undefined;
-              return `Movendo ${oportunidade?.titulo ?? 'oportunidade'}.`;
+              return `Movendo ${oportunidade?.titulo ?? 'venda'}.`;
             },
             onDragOver: ({ over }) => (over ? `Sobre ${String(over.id)}.` : 'Fora do quadro.'),
             onDragEnd: ({ over }) =>
@@ -268,7 +268,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           },
         }}
       >
-        <div className={styles.experienciaKanban} aria-label="Pipeline de oportunidades">
+        <div className={styles.experienciaKanban} aria-label="Quadro de vendas">
           <BarraPrioridades
             contagens={contagens}
             filtro={filtro}
@@ -288,7 +288,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
             <header className={styles.cabecalhoQuadro}>
               <div>
                 <strong>
-                  {filtradas.length} {filtradas.length === 1 ? 'oportunidade' : 'oportunidades'}
+                  {filtradas.length} {filtradas.length === 1 ? 'venda' : 'vendas'}
                 </strong>
                 <span>
                   {filtro === 'todas' && !busca
@@ -296,7 +296,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
                     : 'Resultado dos filtros aplicados.'}
                 </span>
               </div>
-              <small>No celular, mova a oportunidade pelo menu do card.</small>
+              <small>No celular, mova a venda pelo menu do card.</small>
             </header>
 
             <div className={styles.rolagem}>
@@ -337,7 +337,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
       <Modal
         open={perdaPendente !== null}
         onClose={fecharPerda}
-        title="Registrar oportunidade perdida"
+        title="Registrar venda perdida"
         description={
           perdaPendente ? `${perdaPendente.empresa} · ${perdaPendente.titulo}` : undefined
         }

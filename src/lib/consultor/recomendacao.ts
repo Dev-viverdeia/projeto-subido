@@ -27,7 +27,7 @@ export const RecomendacaoProximaAcaoSchema = z
       contexto.addIssue({
         code: 'custom',
         path: ['confirmada_em'],
-        message: 'Uma recomendação confirmada precisa registrar quando entrou no CRM.',
+        message: 'Uma recomendação confirmada precisa registrar quando entrou em Vendas.',
       });
     }
     if (recomendacao.status === 'pendente' && recomendacao.confirmada_em) {
@@ -78,6 +78,12 @@ export type RecomendacaoGerada = {
   tokens: number;
 };
 
+function rotuloFonte(fonte: FatoDaRecomendacao['fonte']): string {
+  if (fonte === 'CRM') return 'Vendas';
+  if (fonte === 'Call') return 'Reunião';
+  return fonte;
+}
+
 function meioDiaNoBrasil(data: Date): string {
   const dia = data.toISOString().slice(0, 10);
   return `${dia}T12:00:00-03:00`;
@@ -96,10 +102,10 @@ export function resolverFatosUsados(fatos: FatoDaRecomendacao[], ids: number[]):
     .map((id) => fatos.find((fato) => fato.id === id))
     .filter((fato): fato is FatoDaRecomendacao => Boolean(fato))
     .slice(0, 3)
-    .map((fato) => `${fato.fonte} · ${fato.texto}`);
+    .map((fato) => `${rotuloFonte(fato.fonte)} · ${fato.texto}`);
 
   if (escolhidos.length > 0) return escolhidos;
-  return fatos.slice(0, 3).map((fato) => `${fato.fonte} · ${fato.texto}`);
+  return fatos.slice(0, 3).map((fato) => `${rotuloFonte(fato.fonte)} · ${fato.texto}`);
 }
 
 export function criarRecomendacaoFallback(contexto: ContextoRecomendacao): RecomendacaoGerada {
@@ -107,7 +113,7 @@ export function criarRecomendacaoFallback(contexto: ContextoRecomendacao): Recom
     return {
       acao: contexto.proximoPassoDaCall,
       motivo:
-        'A call já registrou esse compromisso como próximo avanço. Confirmá-lo mantém o CRM alinhado ao que foi combinado com o cliente.',
+        'A reunião já registrou esse compromisso como próximo avanço. Confirmá-lo mantém Vendas alinhado ao que foi combinado com o cliente.',
       fatos: resolverFatosUsados(
         contexto.fatos,
         contexto.fatos.slice(0, 2).map((fato) => fato.id),
@@ -123,7 +129,7 @@ export function criarRecomendacaoFallback(contexto: ContextoRecomendacao): Recom
     return {
       acao: 'Agendar uma conversa de decisão sobre a proposta',
       motivo:
-        'A proposta já avançou e o CRM está sem próximo compromisso. O movimento mais seguro é conduzir a decisão ao vivo e registrar o resultado.',
+        'A proposta já avançou e a venda está sem próximo compromisso. O movimento mais seguro é conduzir a decisão ao vivo e registrar o resultado.',
       fatos: resolverFatosUsados(
         contexto.fatos,
         contexto.fatos.slice(0, 2).map((fato) => fato.id),
@@ -137,7 +143,7 @@ export function criarRecomendacaoFallback(contexto: ContextoRecomendacao): Recom
 
   if (contexto.callFutura) {
     return {
-      acao: 'Preparar as perguntas e critérios da próxima call',
+      acao: 'Preparar as perguntas e critérios da próxima reunião',
       motivo:
         'Já existe uma conversa marcada. Preparar as lacunas e os critérios de decisão evita abrir uma frente paralela antes desse compromisso.',
       fatos: resolverFatosUsados(

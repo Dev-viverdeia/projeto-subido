@@ -43,7 +43,7 @@ describe('MontadorProposta', () => {
     expect(screen.queryByRole('combobox', { name: /Projeto-base/ })).not.toBeInTheDocument();
 
     await user.selectOptions(
-      screen.getByRole('combobox', { name: /Lead do CRM/ }),
+      screen.getByRole('combobox', { name: /Cliente em negociação/ }),
       '11111111-1111-4111-8111-111111111111',
     );
     await user.click(continuar);
@@ -91,7 +91,7 @@ describe('MontadorProposta', () => {
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
       'projeto:sdr-atendimento-qualificacao',
     );
-    expect(screen.getByText(/Recomendado pelos dados da call/)).toBeVisible();
+    expect(screen.getByText(/Recomendado pelos dados da reunião/)).toBeVisible();
     expect(screen.getByText(/A equipe confirmou perda de contexto/)).toBeVisible();
     expect(screen.getAllByText('2', { selector: 'dt' })).toHaveLength(2);
     expect(screen.getByRole('button', { name: /Criar rascunho/ })).toBeEnabled();

@@ -43,6 +43,6 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     );
   } catch (causa) {
     console.error('[calls:gravacao] falha:', causa);
-    return erro('A call continua ativa, mas a gravação não pôde ser iniciada.', 503);
+    return erro('A reunião continua ativa, mas a gravação não pôde ser iniciada.', 503);
   }
 }

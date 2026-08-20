@@ -16,7 +16,7 @@ const ETAPA_DA_FASE: Record<Exclude<IdFaseCrm, 'desfecho'>, EtapaCrm> = {
 const TEXTO_VAZIO: Record<Exclude<IdFaseCrm, 'desfecho'>, { titulo: string; apoio: string }> = {
   entrada: {
     titulo: 'Nada para preparar',
-    apoio: 'As novas oportunidades aparecem aqui.',
+    apoio: 'As novas vendas aparecem aqui.',
   },
   conversa: {
     titulo: 'Nenhuma descoberta em andamento',
@@ -75,7 +75,7 @@ export function ColunaAtiva({
           <h2 id={`coluna-${fase.id}`}>{fase.rotulo}</h2>
           <p>{fase.descricao}</p>
         </div>
-        <span className={styles.contador} aria-label={`${oportunidades.length} oportunidades`}>
+        <span className={styles.contador} aria-label={`${oportunidades.length} vendas`}>
           {oportunidades.length}
         </span>
       </header>
@@ -113,14 +113,14 @@ function DestinoDesfecho({ etapa, total }: { etapa: 'ganho' | 'perdido'; total: 
       data-resultado={etapa}
       data-sobre={isOver || undefined}
       role="group"
-      aria-label={perdida ? 'Marcar oportunidade como perdida' : 'Marcar oportunidade como ganha'}
+      aria-label={perdida ? 'Marcar venda como perdida' : 'Marcar venda como ganha'}
     >
       <Icone size={18} strokeWidth={1.8} aria-hidden="true" />
       <div>
         <strong>{perdida ? 'Perdida' : 'Ganha'}</strong>
         <span>{perdida ? 'Registra o motivo' : 'Inicia a entrega'}</span>
       </div>
-      <small aria-label={`${total} oportunidades encerradas`}>{total}</small>
+      <small aria-label={`${total} vendas encerradas`}>{total}</small>
     </div>
   );
 }
@@ -164,7 +164,7 @@ export function HistoricoDesfechos({
     <details className={styles.historico}>
       <summary>
         <div>
-          <span>Oportunidades encerradas</span>
+          <span>Vendas encerradas</span>
           <small>
             {ganhas} {ganhas === 1 ? 'ganha' : 'ganhas'} · {perdidas}{' '}
             {perdidas === 1 ? 'perdida' : 'perdidas'}

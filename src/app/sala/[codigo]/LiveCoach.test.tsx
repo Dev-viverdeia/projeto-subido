@@ -28,6 +28,8 @@ describe('CabineLiveCoach', () => {
     expect(screen.getByRole('heading', { name: SUGESTAO.titulo })).toBeInTheDocument();
     expect(screen.getByText(/Ouvido agora/)).toHaveTextContent(SUGESTAO.trecho_gatilho!);
     expect(screen.getByText('Só você vê')).toBeInTheDocument();
-    expect(screen.getByText(/resumo, decisões e próximo passo no CRM/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/resumo, decisões e próximo passo na ficha do cliente/i),
+    ).toBeInTheDocument();
   });
 });

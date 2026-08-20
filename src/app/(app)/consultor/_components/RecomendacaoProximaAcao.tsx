@@ -106,7 +106,7 @@ export function RecomendacaoProximaAcao({
           <strong>
             {geracao === 'erro'
               ? 'Não consegui ler os fatos agora'
-              : 'Lendo CRM, calls e decisões recentes'}
+              : 'Lendo vendas, reuniões e decisões recentes'}
           </strong>
           <em>
             {geracao === 'erro'
@@ -148,7 +148,7 @@ export function RecomendacaoProximaAcao({
         <header>
           <span>
             <small>Revisão humana</small>
-            <strong>O que entra no CRM?</strong>
+            <strong>O que entra na ficha?</strong>
           </span>
           <button
             type="button"
@@ -177,7 +177,7 @@ export function RecomendacaoProximaAcao({
           </label>
           <button type="submit" className={styles.confirmar} disabled={pendente}>
             {pendente ? <LoaderCircle className={styles.spinner} size={15} /> : <Check size={15} />}
-            {pendente ? 'Registrando' : 'Confirmar no CRM'}
+            {pendente ? 'Registrando' : 'Confirmar na ficha'}
           </button>
         </div>
         {estado.status === 'erro' ? (
@@ -220,7 +220,7 @@ export function RecomendacaoProximaAcao({
         </ul>
       </div>
       <footer className={styles.rodapeRecomendacao}>
-        <p>Nada muda no CRM antes da sua revisão.</p>
+        <p>Nada muda na venda antes da sua revisão.</p>
         <button type="button" className={styles.revisar} onClick={() => setRevisando(true)}>
           Revisar ação <PencilLine size={14} strokeWidth={2} aria-hidden="true" />
         </button>

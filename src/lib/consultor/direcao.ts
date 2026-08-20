@@ -7,17 +7,23 @@ import type { SinaisSobral } from './sinais';
 export { ETAPAS_SOBRAL, EtapaSobralSchema, indiceDaEtapa, type EtapaSobral } from './etapas';
 export { SinaisSobralSchema, type SinaisSobral } from './sinais';
 
-export const DestinoSobralSchema = z.enum([
+const DestinoSobralAtualSchema = z.enum([
   '/inicio',
   '/formacoes',
   '/solucoes',
-  '/crm',
-  '/calls',
+  '/vendas',
+  '/reunioes',
   '/propostas',
   '/propostas/nova',
   '/builder',
   '/mentorias',
 ]);
+
+/** Mantém legíveis os planos já salvos antes da simplificação dos nomes. */
+export const DestinoSobralSchema = z.preprocess(
+  (valor) => (valor === '/crm' ? '/vendas' : valor === '/calls' ? '/reunioes' : valor),
+  DestinoSobralAtualSchema,
+);
 
 export const AcaoSobralSchema = z.object({
   titulo: z.string().trim().min(5).max(120),
@@ -155,7 +161,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
     return {
       etapa,
       diagnostico:
-        'Ainda não há oportunidades no CRM. Primeiro, escolha o projeto que você quer aprender e vender.',
+        'Ainda não há clientes em Vendas. Primeiro, escolha o projeto que você quer aprender e vender.',
       foco: sinais.jornada.proximoPasso.titulo,
       proximoPasso: acoes[0]!,
       acoes,
@@ -171,22 +177,22 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
     const principal = semAcao
       ? acao(
           `Defina a próxima ação${empresa ? ` de ${empresa}` : ''}`,
-          'Registre no CRM o que será feito, quem fará e em qual data.',
+          'Registre na venda o que será feito, quem fará e em qual data.',
           'Próxima ação e data visíveis na oportunidade.',
-          '/crm',
+          '/vendas',
         )
       : semCall
         ? acao(
             `Agende a descoberta${empresa ? ` com ${empresa}` : ''}`,
-            'Use a call para entender o processo atual, o volume, o impacto do problema e quem decide.',
-            'Call de descoberta vinculada à oportunidade.',
-            '/calls',
+            'Use a reunião para entender o processo atual, o volume, o impacto do problema e quem decide.',
+            'Reunião de descoberta vinculada ao cliente.',
+            '/reunioes',
           )
         : acao(
             `Prepare a próxima conversa${empresa ? ` de ${empresa}` : ''}`,
             'Revise os dados do lead e prepare perguntas sobre o que ainda pode mudar escopo, prazo ou viabilidade.',
-            'Perguntas específicas salvas para a call.',
-            '/crm',
+            'Perguntas específicas salvas para a reunião.',
+            '/vendas',
           );
     const acoes = alinharAcoesComJornada(sinais, [
       principal,
@@ -194,18 +200,18 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Pesquise o lead',
         'Busque somente os dados que ajudam na abordagem, na conversa ou na entrega.',
         'Informações e fontes salvas no lead.',
-        '/crm',
+        '/vendas',
       ),
       acao(
-        'Faça a call de descoberta',
-        'Use a sala de calls para registrar a conversa e salvar os compromissos no CRM.',
-        'Call concluída e próxima ação registrada.',
-        '/calls',
+        'Faça a reunião de descoberta',
+        'Use a sala de reuniões para registrar a conversa e salvar os compromissos na ficha.',
+        'Reunião concluída e próxima ação registrada.',
+        '/reunioes',
       ),
     ]);
     return {
       etapa,
-      diagnostico: `${quantidade(sinais.oportunidades.abertas, 'oportunidade aberta', 'oportunidades abertas')}. Agora, prepare a conversa e registre a próxima ação no CRM.`,
+      diagnostico: `${quantidade(sinais.oportunidades.abertas, 'venda aberta', 'vendas abertas')}. Agora, prepare a conversa e registre a próxima ação na ficha.`,
       foco: empresa ? `Avançar a oportunidade de ${empresa}` : 'Preparar a primeira conversa',
       proximoPasso: acoes[0]!,
       acoes,
@@ -220,14 +226,14 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
       sinais.propostas.total === 0
         ? acao(
             `Monte a proposta${empresa ? ` de ${empresa}` : ''}`,
-            'Use o que foi confirmado na call para definir escopo, entregáveis, prazo e investimento.',
+            'Use o que foi confirmado na reunião para definir escopo, entregáveis, prazo e investimento.',
             'Proposta comercial criada e vinculada à oportunidade.',
             '/propostas/nova',
           )
         : sinais.propostas.prontas > 0
           ? acao(
               'Apresente a proposta em uma conversa',
-              'Apresente em uma call, confirme os critérios do cliente e registre as objeções antes de ajustar o documento.',
+              'Apresente em uma reunião, confirme os critérios do cliente e registre as objeções antes de ajustar o documento.',
               'Proposta marcada como apresentada e follow-up agendado.',
               '/propostas',
             )
@@ -240,16 +246,16 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
     const acoes = alinharAcoesComJornada(sinais, [
       principal,
       acao(
-        'Confira o escopo com a call',
+        'Confira o escopo com a reunião',
         'Veja se cada entregável responde a um problema citado pelo cliente e marque o que ainda precisa ser confirmado.',
-        'Escopo revisado com os dados da call.',
-        '/crm',
+        'Escopo revisado com os dados da reunião.',
+        '/vendas',
       ),
       acao(
         'Agende o próximo contato',
         'Defina o que o cliente precisa decidir, quem deve participar e a data da conversa.',
-        'Reunião ou follow-up registrado no CRM.',
-        '/calls',
+        'Reunião ou próximo contato registrado na ficha.',
+        '/reunioes',
       ),
     ]);
     return {
@@ -282,7 +288,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
         'Agende as revisões do projeto',
         'Marque encontros curtos para mostrar o que foi feito e corrigir antes da entrega final.',
         'Próxima revisão agendada.',
-        '/calls',
+        '/reunioes',
       ),
     ]);
     return {
@@ -309,7 +315,7 @@ export function criarPlanoBase(sinais: SinaisSobral): PlanoSobral {
       'Documente um caso de cliente',
       'Registre o antes, o depois, as condições do projeto e um depoimento autorizado.',
       'Caso documentado com autorização de uso.',
-      '/crm',
+      '/vendas',
     ),
     acao(
       'Escolha o próximo problema',

@@ -89,7 +89,7 @@ function acaoDaOportunidade(oportunidade: OportunidadeCrm): string {
   if (pesquisa.estado === 'processando') return 'Ver enriquecimento';
   if (fase === 'entrada' && pesquisa.estado !== 'pronta') return 'Enriquecer ficha';
   if (fase === 'entrada') return 'Preparar abordagem';
-  if (fase === 'conversa') return 'Preparar call';
+  if (fase === 'conversa') return 'Preparar reunião';
   return 'Trabalhar proposta';
 }
 
@@ -266,7 +266,7 @@ export function CartaoOportunidade({
         </time>
         <div className={styles.acoesCartao}>
           <Link
-            href={`/crm/${oportunidade.id}`}
+            href={`/vendas/${oportunidade.id}`}
             className={styles.dossie}
             aria-label={`${acao}: ${oportunidade.empresa}`}
             data-no-dnd
@@ -330,7 +330,7 @@ export function CartaoEncerrado({
       )}
       <footer>
         <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
-        <Link href={`/crm/${oportunidade.id}`}>
+        <Link href={`/vendas/${oportunidade.id}`}>
           Abrir ficha
           <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
         </Link>

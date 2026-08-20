@@ -50,8 +50,8 @@ export function InicioProjeto({
   const hrefKickoff = kickoff
     ? kickoffPodeAbrir
       ? `/sala/${kickoff.codigoPublico}`
-      : `/calls/${kickoff.id}`
-    : `/calls?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`;
+      : `/reunioes/${kickoff.id}`
+    : `/reunioes?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`;
 
   return (
     <section className={styles.inicio} aria-labelledby="inicio-projeto-titulo">

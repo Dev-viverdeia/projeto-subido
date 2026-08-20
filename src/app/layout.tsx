@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: '%s · Subido',
   },
   description:
-    'Subido é a plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, CRM, calls e propostas em um só lugar.',
+    'Subido é a plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, vendas, reuniões e propostas em um só lugar.',
   applicationName: 'Subido',
   robots: { index: true, follow: true },
   /**
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     url: '/',
     title: 'Subido — a assinatura para virar implementador de IA',
     description:
-      'Plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, CRM, calls e propostas.',
+      'Plataforma para profissionais prospectarem empresas, venderem e entregarem projetos de IA com formação, vendas, reuniões e propostas.',
   },
   twitter: { card: 'summary_large_image' },
 };

@@ -11,7 +11,7 @@ function BotaoAplicar() {
 
   return (
     <button type="submit" disabled={pending} aria-busy={pending || undefined}>
-      {pending ? 'Atualizando CRM…' : 'Confirmar e atualizar CRM'}
+      {pending ? 'Atualizando a venda…' : 'Confirmar e atualizar a venda'}
       {!pending && <CheckCircle2 size={16} aria-hidden="true" />}
     </button>
   );
@@ -50,7 +50,7 @@ export function FormularioPlanoCall({
       </header>
 
       <label className={styles.campoAcao}>
-        <span>Próxima ação no CRM</span>
+        <span>Próxima ação da venda</span>
         <textarea
           name="acao"
           rows={3}
@@ -68,7 +68,7 @@ export function FormularioPlanoCall({
           <input type="date" name="quando" defaultValue={dataInicial} />
         </label>
         <label>
-          <span>Destino no pipeline</span>
+          <span>Próxima etapa da venda</span>
           <select name="etapa" defaultValue={destinoInicial}>
             <option value="manter">Manter em {ROTULO_ETAPA[etapaAtual]}</option>
             {ETAPAS_MOVIMENTO_CRM.filter((etapa) => etapa.id !== etapaAtual).map((etapa) => (
@@ -104,7 +104,7 @@ export function FormularioPlanoCall({
 
       <footer className={styles.formularioRodape}>
         <small id="plano-call-ajuda">
-          Atualiza a próxima ação, a etapa do pipeline e os compromissos selecionados.
+          Atualiza a próxima ação, a etapa da venda e os compromissos selecionados.
         </small>
         <BotaoAplicar />
       </footer>

@@ -42,7 +42,7 @@ export function MapaFactual({
     <details className={styles.mapaFactual}>
       <summary>
         <div>
-          <p>Detalhes da call</p>
+          <p>Detalhes da reunião</p>
           <h2>Informações extraídas da conversa</h2>
         </div>
         <span>

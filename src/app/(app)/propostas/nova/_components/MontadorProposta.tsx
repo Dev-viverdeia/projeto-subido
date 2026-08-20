@@ -111,7 +111,7 @@ export function MontadorProposta({
 
           {opcoes.oportunidades.length ? (
             <label className={styles.campo}>
-              <span>Lead do CRM</span>
+              <span>Cliente em negociação</span>
               <select
                 name="oportunidade"
                 value={oportunidade}
@@ -122,7 +122,7 @@ export function MontadorProposta({
                 required
               >
                 <option value="" disabled>
-                  Escolha uma oportunidade
+                  Escolha um cliente
                 </option>
                 {opcoes.oportunidades.map((item) => (
                   <option value={item.id} key={item.id}>
@@ -133,14 +133,14 @@ export function MontadorProposta({
               <small>Empresa, contato, anotações e valor negociado entram no rascunho.</small>
               {reuniaoInicial && (
                 <div className={styles.contextosConectados}>
-                  <span>Call conectada ao documento</span>
+                  <span>Reunião conectada ao documento</span>
                 </div>
               )}
             </label>
           ) : (
             <div className={styles.semOpcao}>
-              <p>Você ainda não tem oportunidades abertas no CRM.</p>
-              <Link href="/crm">Adicionar um lead</Link>
+              <p>Você ainda não tem clientes em negociação.</p>
+              <Link href="/vendas">Adicionar um cliente</Link>
             </div>
           )}
         </div>
@@ -152,13 +152,13 @@ export function MontadorProposta({
         </span>
         <div className={styles.etapaCorpo}>
           {leadEscolhido && contextoCallAtivo ? (
-            <article className={styles.contextoCall} aria-label="Dados aproveitados da call">
+            <article className={styles.contextoCall} aria-label="Dados aproveitados da reunião">
               <header>
                 <span className={styles.iconeContexto}>
                   <Video size={18} strokeWidth={1.7} aria-hidden="true" />
                 </span>
                 <div>
-                  <p>Dados da call</p>
+                  <p>Dados da reunião</p>
                   <strong>{leadEscolhido.empresa}</strong>
                   <small>{contextoCallAtivo.titulo}</small>
                 </div>
@@ -238,7 +238,8 @@ export function MontadorProposta({
             {projetoSugerido && !origem ? (
               <small className={styles.recomendacao}>
                 <Check size={13} strokeWidth={2.2} aria-hidden="true" /> Recomendado pelos dados
-                {contextoCallAtivo ? ' da call' : ' do lead'}. Você pode trocar antes de criar.
+                {contextoCallAtivo ? ' da reunião' : ' do cliente'}. Você pode trocar antes de
+                criar.
               </small>
             ) : (
               <small>Escopo, entregáveis e cronograma serão preenchidos para você revisar.</small>
@@ -260,7 +261,7 @@ export function MontadorProposta({
         <div>
           <span>Decisão {passo} de 2</span>
           <strong>
-            {passo === 1 ? 'Escolha a oportunidade do CRM' : 'Depois de criar, revise o rascunho'}
+            {passo === 1 ? 'Escolha o cliente em negociação' : 'Depois de criar, revise o rascunho'}
           </strong>
         </div>
         <div className={styles.rodapeAcoes}>

@@ -12,11 +12,11 @@ import styles from '../pagina.module.css';
 
 const DOMINIOS = {
   crm: {
-    rotulo: 'CRM',
+    rotulo: 'Vendas',
     icone: <ContactRound size={17} strokeWidth={1.8} aria-hidden="true" />,
   },
   calls: {
-    rotulo: 'Calls',
+    rotulo: 'Reuniões',
     icone: <Video size={17} strokeWidth={1.8} aria-hidden="true" />,
   },
   propostas: {
@@ -87,11 +87,11 @@ export function RadarOperacional({ itens }: { itens: ItemRadarSobral[] }) {
           <div>
             <h3>Nenhum compromisso aberto</h3>
             <p>
-              As pendências aparecerão quando houver atividades no CRM, em calls, propostas ou
+              As pendências aparecerão quando houver atividades em Vendas, reuniões, propostas ou
               projetos.
             </p>
           </div>
-          <Link href="/crm">Abrir CRM</Link>
+          <Link href="/vendas">Abrir Vendas</Link>
         </div>
       )}
     </section>

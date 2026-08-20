@@ -32,7 +32,8 @@ export async function POST(request: Request) {
   ]);
 
   if (!contexto) return resposta('Esta sala não existe ou o link não é mais válido.', 404);
-  if (!callPodeAbrir(contexto.convite.status)) return resposta('Esta call já foi encerrada.', 409);
+  if (!callPodeAbrir(contexto.convite.status))
+    return resposta('Esta reunião já foi encerrada.', 409);
   if (!contexto.anfitriao && !contexto.convite.disponivel) {
     return resposta('A sala abre 30 minutos antes do horário agendado.', 409);
   }

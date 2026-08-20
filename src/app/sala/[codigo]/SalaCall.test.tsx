@@ -33,7 +33,7 @@ describe('SalaCall', () => {
     expect(screen.getByText('Resumo para revisão')).toBeInTheDocument();
     expect(screen.getByText('Coach só para você')).toBeInTheDocument();
 
-    const entrar = screen.getByRole('button', { name: 'Entrar na call' });
+    const entrar = screen.getByRole('button', { name: 'Entrar na reunião' });
     expect(entrar).toBeDisabled();
 
     await user.click(screen.getByRole('checkbox'));

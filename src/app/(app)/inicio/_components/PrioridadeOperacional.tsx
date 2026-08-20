@@ -86,7 +86,7 @@ export function PrioridadeOperacionalCarregando() {
       </div>
       <h1>Organizando sua próxima ação.</h1>
       <p className={styles.prioridadeDescricao}>
-        Estamos verificando CRM, calls, propostas e projetos.
+        Estamos verificando vendas, reuniões, propostas e projetos.
       </p>
       <span className={styles.carregandoLinha} aria-hidden="true" />
     </article>

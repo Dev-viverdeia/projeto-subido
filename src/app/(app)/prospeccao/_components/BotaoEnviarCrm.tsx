@@ -16,7 +16,7 @@ function BotaoPendente({ compacto = false }: { compacto?: boolean }) {
       loading={pending}
       iconLeft={!pending ? <Plus size={15} aria-hidden="true" /> : undefined}
     >
-      {pending ? 'Criando oportunidade' : 'Adicionar ao CRM'}
+      {pending ? 'Adicionando a Vendas' : 'Adicionar a Vendas'}
     </Button>
   );
 }
@@ -38,8 +38,9 @@ export function BotaoEnviarCrm({
 
   if (oportunidade) {
     return (
-      <Link className={className} href={`/crm/${oportunidade}`}>
-        <Check size={15} aria-hidden="true" /> No CRM <ArrowRight size={14} aria-hidden="true" />
+      <Link className={className} href={`/vendas/${oportunidade}`}>
+        <Check size={15} aria-hidden="true" /> Abrir ficha{' '}
+        <ArrowRight size={14} aria-hidden="true" />
       </Link>
     );
   }

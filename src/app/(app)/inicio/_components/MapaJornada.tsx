@@ -154,7 +154,7 @@ export function MapaJornada({
         </div>
 
         <div className={styles.cartoesOperacao}>
-          <Link href="/crm" className={styles.cartaoOperacao}>
+          <Link href="/vendas" className={styles.cartaoOperacao}>
             <span className={styles.cartaoIcone} aria-hidden="true">
               <Building2 size={19} strokeWidth={1.8} />
             </span>
@@ -164,7 +164,7 @@ export function MapaJornada({
               <em>
                 <UserRound size={13} strokeWidth={1.8} aria-hidden="true" /> {contato}
               </em>
-              <p>{proximaAcao ?? 'Defina a próxima ação no CRM'}</p>
+              <p>{proximaAcao ?? 'Defina a próxima ação da venda'}</p>
             </span>
             <ArrowRight
               className={styles.cartaoSeta}

@@ -7,8 +7,8 @@ export type AcaoExecutavelSobral = {
 };
 
 function dominioDoDestino(destino: AcaoSobral['destino']): DominioRadarSobral | null {
-  if (destino === '/crm') return 'crm';
-  if (destino === '/calls') return 'calls';
+  if (destino === '/vendas') return 'crm';
+  if (destino === '/reunioes') return 'calls';
   if (destino === '/propostas') return 'propostas';
   if (destino === '/solucoes') return 'projetos';
   return null;
@@ -18,8 +18,8 @@ const ROTULO_POR_DESTINO: Record<AcaoSobral['destino'], string> = {
   '/inicio': 'Abrir início',
   '/formacoes': 'Abrir formação',
   '/solucoes': 'Abrir Projetos',
-  '/crm': 'Abrir no CRM',
-  '/calls': 'Agendar call',
+  '/vendas': 'Abrir Vendas',
+  '/reunioes': 'Agendar reunião',
   '/propostas': 'Abrir propostas',
   '/propostas/nova': 'Criar proposta',
   '/builder': 'Personalizar projeto',
@@ -27,8 +27,8 @@ const ROTULO_POR_DESTINO: Record<AcaoSobral['destino'], string> = {
 };
 
 const ROTULO_REGISTRO: Partial<Record<DominioRadarSobral, string>> = {
-  crm: 'Abrir no CRM',
-  calls: 'Abrir call',
+  crm: 'Abrir em Vendas',
+  calls: 'Abrir reunião',
   propostas: 'Abrir proposta',
   projetos: 'Abrir projeto',
   plano: 'Abrir compromisso',
@@ -72,17 +72,17 @@ export function resolverAcaoSobral(acao: AcaoSobral, sinais: SinaisSobral): Acao
     };
   }
 
-  if (acao.destino === '/calls' && foco) {
+  if (acao.destino === '/reunioes' && foco) {
     return {
-      destino: `/calls?nova=1&oportunidade=${encodeURIComponent(foco.oportunidadeId)}`,
-      rotulo: 'Agendar call',
+      destino: `/reunioes?nova=1&oportunidade=${encodeURIComponent(foco.oportunidadeId)}`,
+      rotulo: 'Agendar reunião',
     };
   }
 
-  if (acao.destino === '/crm' && foco) {
+  if (acao.destino === '/vendas' && foco) {
     return {
-      destino: `/crm/${encodeURIComponent(foco.oportunidadeId)}`,
-      rotulo: 'Abrir no CRM',
+      destino: `/vendas/${encodeURIComponent(foco.oportunidadeId)}`,
+      rotulo: 'Abrir em Vendas',
     };
   }
 

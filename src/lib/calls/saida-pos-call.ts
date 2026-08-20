@@ -71,12 +71,12 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
     (!posCall.analise && posCall.reuniao.status === 'concluida');
   return {
     tipo: 'crm',
-    rotulo: 'Próxima ação no CRM',
+    rotulo: 'Próxima ação da venda',
     titulo: processando ? 'Aguardar a análise antes de propor' : 'Registrar o próximo contato',
     descricao: processando
       ? 'A conversa já foi salva. Assim que a análise terminar, você poderá decidir o próximo passo.'
-      : 'Use o histórico e o plano da call para acompanhar o lead antes de criar uma proposta.',
-    acao: 'Abrir oportunidade',
-    href: `/crm/${posCall.oportunidade.id}`,
+      : 'Use o histórico e o plano da reunião para acompanhar o cliente antes de criar uma proposta.',
+    acao: 'Abrir ficha',
+    href: `/vendas/${posCall.oportunidade.id}`,
   };
 }

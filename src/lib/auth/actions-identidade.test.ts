@@ -10,6 +10,7 @@ const { createClient, getClaims, updateUser, refreshSession, refresh } = vi.hois
 
 vi.mock('@/lib/supabase/server', () => ({ createClient }));
 vi.mock('next/cache', () => ({ refresh }));
+vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
 
 import { atualizarIdentidade } from './actions';
 

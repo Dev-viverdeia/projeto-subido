@@ -153,7 +153,7 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
       contexto: `${empresa(oportunidade.empresa_id, empresasPorId)} · ${ROTULO_ETAPA[oportunidade.etapa]}`,
       momento: semAcao ? 'Sem próxima ação' : info.momento,
       estado: semAcao ? 'sem_prazo' : info.estado,
-      destino: `/crm/${oportunidade.id}`,
+      destino: `/vendas/${oportunidade.id}`,
       prioridade: 58 + prioridadeEtapa(oportunidade.etapa) + (semAcao ? 30 : info.bonus),
     });
   }
@@ -170,7 +170,7 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
       id: `calls-${call.id}`,
       dominio: 'calls',
       titulo: call.titulo,
-      contexto: `${oportunidade ? empresa(oportunidade.empresa_id, empresasPorId) : 'Call vinculada'} · ${ROTULO_TIPO_CALL[call.tipo]}`,
+      contexto: `${oportunidade ? empresa(oportunidade.empresa_id, empresasPorId) : 'Reunião vinculada'} · ${ROTULO_TIPO_CALL[call.tipo]}`,
       momento:
         call.status === 'ao_vivo'
           ? 'Ao vivo agora'
@@ -178,7 +178,7 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
             ? 'Sala aberta'
             : info.momento,
       estado: aoVivo ? 'ao_vivo' : info.estado,
-      destino: `/calls/${call.id}`,
+      destino: `/reunioes/${call.id}`,
       prioridade: aoVivo ? 142 : 66 + info.bonus,
     });
   }
@@ -222,8 +222,8 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
       destino: projeto
         ? `/solucoes/execucao/${projeto.id}`
         : acao.reuniao_id
-          ? `/calls/${acao.reuniao_id}`
-          : `/crm/${acao.oportunidade_id}`,
+          ? `/reunioes/${acao.reuniao_id}`
+          : `/vendas/${acao.oportunidade_id}`,
       prioridade: 64 + info.bonus,
     });
   }

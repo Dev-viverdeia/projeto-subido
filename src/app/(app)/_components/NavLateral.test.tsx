@@ -80,19 +80,19 @@ describe('NavLateral no desktop', () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} variante="lateral" />);
 
-    const crm = screen.getByRole('link', { name: 'CRM' });
-    expect(crm).toHaveAttribute('data-prefetch', 'false');
+    const vendas = screen.getByRole('link', { name: 'Vendas' });
+    expect(vendas).toHaveAttribute('data-prefetch', 'false');
 
-    await usuario.hover(crm);
-    expect(crm).toHaveAttribute('data-prefetch', 'true');
+    await usuario.hover(vendas);
+    expect(vendas).toHaveAttribute('data-prefetch', 'true');
   });
 
   it('mostra um feedback destacado assim que uma nova área é solicitada', async () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} variante="lateral" />);
 
-    await usuario.click(screen.getByRole('link', { name: 'CRM' }));
+    await usuario.click(screen.getByRole('link', { name: 'Vendas' }));
 
-    expect(screen.getByRole('status', { name: /Abrindo CRM/ })).toBeVisible();
+    expect(screen.getByRole('status', { name: /Abrindo Vendas/ })).toBeVisible();
   });
 });

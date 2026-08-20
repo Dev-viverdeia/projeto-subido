@@ -66,7 +66,7 @@ export function CentralPlanoCall({
       aria-labelledby="plano-da-call-titulo"
     >
       <div className={styles.centralAcaoContexto}>
-        <p className={styles.sobretitulo}>Atualizar o CRM</p>
+        <p className={styles.sobretitulo}>Atualizar a venda</p>
         <h2 id="plano-da-call-titulo">Revise o que será salvo</h2>
         <p>A transcrição já foi salva. Confirme a próxima ação, a etapa e os compromissos.</p>
 
@@ -79,7 +79,7 @@ export function CentralPlanoCall({
               <strong>Histórico da conversa</strong>
               <small>
                 {posCall.sincronizacao.historicoCrm
-                  ? 'Já registrado no CRM'
+                  ? 'Já registrado na ficha'
                   : 'Registro em processamento'}
               </small>
             </div>
@@ -89,7 +89,7 @@ export function CentralPlanoCall({
               <GitBranch size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>Etapa do pipeline</strong>
+              <strong>Etapa da venda</strong>
               <small>
                 {etapaRecomendada === etapaAtual
                   ? `Manter em ${ROTULO_ETAPA[etapaAtual]}`
@@ -102,17 +102,17 @@ export function CentralPlanoCall({
               <ListChecks size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>{planoAplicado ? 'Compromissos salvos' : 'Compromissos da call'}</strong>
+              <strong>{planoAplicado ? 'Compromissos salvos' : 'Compromissos da reunião'}</strong>
               <small>
                 {planoAplicado
-                  ? 'Ações já criadas no CRM'
+                  ? 'Ações já criadas na ficha'
                   : `${compromissos.length} para revisar antes de salvar`}
               </small>
             </div>
           </li>
         </ol>
 
-        <p className={styles.garantiaRevisao}>Nada muda no pipeline sem sua confirmação.</p>
+        <p className={styles.garantiaRevisao}>Nada muda na venda sem sua confirmação.</p>
       </div>
 
       <FormularioPlanoCall

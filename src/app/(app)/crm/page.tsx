@@ -5,7 +5,7 @@ import { FormularioNovoLead } from './_components/FormularioNovoLead';
 import { PipelineCrm } from './_components/PipelineCrm';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'CRM' };
+export const metadata: Metadata = { title: 'Vendas' };
 
 function primeiroParametro(valor: string | string[] | undefined): string {
   return (Array.isArray(valor) ? valor[0] : valor)?.trim().slice(0, 180) ?? '';
@@ -22,9 +22,9 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
       <header className={styles.topo}>
         <div className={styles.linhaTopo}>
           <div className={styles.introducao}>
-            <p className={styles.sobretitulo}>Sua operação comercial</p>
-            <h1>Oportunidades</h1>
-            <p>Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.</p>
+            <p className={styles.sobretitulo}>Seus clientes em negociação</p>
+            <h1>Vendas</h1>
+            <p>Acompanhe cada projeto em negociação e saiba o que fazer em seguida.</p>
           </div>
           {oportunidades.length > 0 && (
             <FormularioNovoLead
@@ -39,13 +39,13 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
       {parametros.novo === 'ok' && (
         <div className={styles.confirmacao} role="status">
           <CheckCircle2 size={18} strokeWidth={2} aria-hidden="true" />
-          Oportunidade adicionada ao CRM.
+          Venda adicionada ao quadro.
         </div>
       )}
 
       <section className={styles.quadro} aria-labelledby="pipeline-titulo">
         <h2 id="pipeline-titulo" className={styles.tituloOculto}>
-          Pipeline de oportunidades
+          Quadro de vendas
         </h2>
         {oportunidades.length ? (
           <PipelineCrm oportunidades={oportunidades} />
@@ -55,14 +55,14 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
               <span className={styles.primeiroLeadIcone}>
                 <Database size={24} strokeWidth={1.6} aria-hidden="true" />
               </span>
-              <p className={styles.sobretitulo}>Primeira oportunidade</p>
+              <p className={styles.sobretitulo}>Primeira venda</p>
               <h3>Adicione uma empresa que você decidiu abordar.</h3>
               <p>
                 Empresa e contato são suficientes. A plataforma ajuda a pesquisar o negócio e a
                 preparar o próximo passo.
               </p>
               <FormularioNovoLead
-                rotulo="Criar primeira oportunidade"
+                rotulo="Adicionar primeira empresa"
                 abertoInicial={abrirDoProjeto}
                 tituloInicial={projetoDeOrigem}
                 projetoSlug={projetoSlug}
@@ -82,7 +82,7 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 <span>02</span>
                 <div>
                   <strong>Faça a descoberta</strong>
-                  <p>Use a call para confirmar o problema, a prioridade e quem decide.</p>
+                  <p>Use a reunião para confirmar o problema, a prioridade e quem decide.</p>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>

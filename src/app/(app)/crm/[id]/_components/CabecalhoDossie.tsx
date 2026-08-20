@@ -62,7 +62,7 @@ export function CabecalhoDossie({
           </span>
           <span>
             <Video size={14} aria-hidden="true" />
-            {lead.totalCalls} {lead.totalCalls === 1 ? 'call' : 'calls'}
+            {lead.totalCalls} {lead.totalCalls === 1 ? 'reunião' : 'reuniões'}
           </span>
           {local && (
             <span>
@@ -79,18 +79,18 @@ export function CabecalhoDossie({
         {oportunidadeAberta ? (
           <nav className={styles.acoes} aria-label="Ações da ficha do cliente">
             <Link
-              href={`/calls?nova=1&oportunidade=${lead.oportunidade.id}`}
+              href={`/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`}
               className={styles.acaoPrimaria}
             >
               <CalendarPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Agendar call
+              Agendar reunião
             </Link>
             <AtalhoProposta lead={lead} destaque={false} projetoSlug={projetoSlug} />
             <FormularioEnriquecimento
               oportunidadeId={lead.oportunidade.id}
               saldoCreditos={lead.saldoCreditos ?? 30}
               temDossie={temDossie}
-              rotulo={temDossie ? 'Atualizar enriquecimento' : 'Enriquecer oportunidade'}
+              rotulo={temDossie ? 'Atualizar dados' : 'Enriquecer dados'}
               tom="secundario"
               desabilitado={enriquecimentoEmAndamento}
             />

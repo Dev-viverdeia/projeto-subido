@@ -19,7 +19,7 @@ describe('ControlesPipeline', () => {
       />,
     );
 
-    expect(screen.getByText('3 oportunidades precisam de ação')).toBeInTheDocument();
+    expect(screen.getByText('3 vendas precisam de ação')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Todas: 8' })).toHaveAttribute(
       'aria-pressed',
       'true',

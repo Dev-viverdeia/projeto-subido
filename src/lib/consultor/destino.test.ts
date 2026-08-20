@@ -73,9 +73,9 @@ describe('resolverAcaoSobral', () => {
   });
 
   it('abre o agendamento de call já vinculado ao cliente', () => {
-    expect(resolverAcaoSobral(acao('/calls'), sinais())).toEqual({
-      destino: `/calls?nova=1&oportunidade=${OPORTUNIDADE}`,
-      rotulo: 'Agendar call',
+    expect(resolverAcaoSobral(acao('/reunioes'), sinais())).toEqual({
+      destino: `/reunioes?nova=1&oportunidade=${OPORTUNIDADE}`,
+      rotulo: 'Agendar reunião',
     });
   });
 
@@ -99,9 +99,9 @@ describe('resolverAcaoSobral', () => {
       foco: null,
     });
 
-    expect(resolverAcaoSobral(acao('/calls'), contexto)).toEqual({
-      destino: '/calls',
-      rotulo: 'Agendar call',
+    expect(resolverAcaoSobral(acao('/reunioes'), contexto)).toEqual({
+      destino: '/reunioes',
+      rotulo: 'Agendar reunião',
     });
   });
 });

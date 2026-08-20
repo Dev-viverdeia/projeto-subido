@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Estação de Prospecção', () => {
-  test('abre os canais e mantém o envio ao CRM como uma ação explícita', async ({
+  test('abre os canais e mantém o envio a Vendas como uma ação explícita', async ({
     page,
   }, testInfo) => {
     await page.goto('/preview/prospeccao');
@@ -14,8 +14,8 @@ test.describe('Estação de Prospecção', () => {
     await expect(dialogo.getByRole('link', { name: 'WhatsApp' }).first()).toBeVisible();
     await expect(dialogo.getByRole('link', { name: 'Escrever' })).toBeVisible();
     await expect(dialogo.getByText('@clinicaaurora', { exact: true }).first()).toBeVisible();
-    await expect(dialogo.getByText('Quer trabalhar este lead?')).toBeVisible();
-    await expect(dialogo.getByRole('button', { name: 'Adicionar ao CRM' })).toBeVisible();
+    await expect(dialogo.getByText('Quer trabalhar esta empresa?')).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Adicionar a Vendas' })).toBeVisible();
 
     const decisores = dialogo.getByText('Possíveis decisores');
     await decisores.scrollIntoViewIfNeeded();

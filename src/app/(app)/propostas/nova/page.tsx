@@ -7,7 +7,7 @@ import { listarOpcoesNovaProposta, obterPropostaDaReuniao } from '@/lib/proposta
 import { MontadorProposta } from './_components/MontadorProposta';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Nova proposta comercial' };
+export const metadata: Metadata = { title: 'Nova proposta' };
 
 export default async function NovaPropostaPage({ searchParams }: PageProps<'/propostas/nova'>) {
   const parametros = await searchParams;
@@ -26,7 +26,7 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
     reuniaoInicial ? obterPosCall(reuniaoInicial) : Promise.resolve(null),
     reuniaoInicial ? obterPropostaDaReuniao(reuniaoInicial) : Promise.resolve(null),
   ]);
-  if (propostaExistente) redirect(`/propostas/${propostaExistente.id}?origem=call`);
+  if (propostaExistente) redirect(`/propostas/${propostaExistente.id}?origem=reuniao`);
   const analise =
     posCall?.oportunidade.id === oportunidadeInicial &&
     posCall.analise?.status === 'concluida' &&
@@ -56,16 +56,18 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
       <header className={styles.hero}>
         <div>
           <p className={styles.sobretitulo}>
-            {veioDaCall ? 'Proposta a partir da call' : 'Nova proposta'}
+            {veioDaCall ? 'Proposta a partir da reunião' : 'Nova proposta'}
           </p>
           <h1>
-            {veioDaCall ? 'Use a call para preparar a proposta.' : 'Escolha o cliente e o projeto.'}
+            {veioDaCall
+              ? 'Use a reunião para preparar a proposta.'
+              : 'Escolha o cliente e o projeto.'}
           </h1>
         </div>
         <p>
           {veioDaCall
             ? 'A plataforma já trouxe o cliente, o resumo da conversa e os pontos a confirmar. Escolha o projeto e revise o texto.'
-            : 'A plataforma usa os dados do CRM e o projeto escolhido para preparar um rascunho. Você revisa tudo antes de apresentar.'}
+            : 'A plataforma usa os dados da ficha do cliente e o projeto escolhido para preparar um rascunho. Você revisa tudo antes de apresentar.'}
         </p>
       </header>
 

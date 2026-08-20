@@ -50,8 +50,8 @@ function exemplosDoPainel(painel: PainelSobral): ExemploDoConsultor[] {
     {
       rotulo: 'Lead em foco',
       texto: lead
-        ? `Analise a oportunidade de ${lead.empresa} e diga o que ainda preciso confirmar antes de avançar.`
-        : 'O que preciso registrar para criar minha primeira oportunidade comercial?',
+        ? `Analise a venda para ${lead.empresa} e diga o que ainda preciso confirmar antes de avançar.`
+        : 'O que preciso registrar para acompanhar minha primeira venda?',
     },
     {
       rotulo: projeto ? 'Projeto em foco' : 'Projeto certo',
@@ -94,7 +94,7 @@ export function PainelSobralView({
           <p className={styles.eyebrow}>Sobral AI</p>
           <h2 className={styles.titulo}>Veja o que fazer agora.</h2>
           <p className={styles.apoio}>
-            O Sobral AI verifica o CRM, as calls, os projetos e as propostas para recomendar uma
+            O Sobral AI verifica suas vendas, reuniões, projetos e propostas para recomendar a
             próxima ação.
           </p>
         </div>
@@ -191,11 +191,11 @@ export function PainelSobralView({
 
           <dl className={styles.metricas}>
             <div>
-              <dt>Oportunidades abertas</dt>
+              <dt>Vendas abertas</dt>
               <dd>{sinais.oportunidades.abertas}</dd>
             </div>
             <div>
-              <dt>Calls agendadas</dt>
+              <dt>Reuniões agendadas</dt>
               <dd>{sinais.calls.agendadas}</dd>
             </div>
             <div>
@@ -209,12 +209,12 @@ export function PainelSobralView({
           </dl>
 
           {sinais.foco ? (
-            <Link href={`/crm/${sinais.foco.oportunidadeId}`} className={styles.fonteFoco}>
+            <Link href={`/vendas/${sinais.foco.oportunidadeId}`} className={styles.fonteFoco}>
               <Target size={16} strokeWidth={1.9} aria-hidden="true" />
               <span>
-                <small>Oportunidade em foco</small>
+                <small>Venda em foco</small>
                 <strong>{sinais.foco.empresa}</strong>
-                <em>{sinais.foco.proximaAcao ?? 'O CRM ainda não tem uma próxima ação.'}</em>
+                <em>{sinais.foco.proximaAcao ?? 'Esta venda ainda não tem uma próxima ação.'}</em>
               </span>
               <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
             </Link>
@@ -222,9 +222,9 @@ export function PainelSobralView({
             <div className={styles.fonteFoco}>
               <Target size={16} strokeWidth={1.9} aria-hidden="true" />
               <span>
-                <small>Oportunidade em foco</small>
-                <strong>Nenhuma oportunidade aberta</strong>
-                <em>O CRM ainda não tem uma próxima ação.</em>
+                <small>Venda em foco</small>
+                <strong>Nenhuma venda aberta</strong>
+                <em>Sua primeira venda aparecerá aqui.</em>
               </span>
             </div>
           )}

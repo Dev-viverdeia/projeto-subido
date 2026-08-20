@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { SalaCall } from '@/app/sala/[codigo]/SalaCall';
 import type { ConviteCall } from '@/lib/calls/queries';
 
-export const metadata: Metadata = { title: 'Preview · Sala da call' };
+export const metadata: Metadata = { title: 'Preview · Sala da reunião' };
 
 const CONVITE: ConviteCall = {
   reuniaoId: 'preview-sala-call',

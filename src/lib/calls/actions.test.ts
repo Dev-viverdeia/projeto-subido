@@ -100,7 +100,7 @@ describe('agendarReuniao', () => {
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
-    expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}&calendar=sincronizado`);
+    expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
 
   it('não navega quando a call volta sem identificador', async () => {
@@ -146,6 +146,6 @@ describe('agendarReuniao', () => {
         convidadoEmail: 'cliente@clinica.com.br',
       }),
     );
-    expect(redirect).toHaveBeenCalledWith(`/calls?agendada=${REUNIAO_ID}&calendar=sincronizado`);
+    expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
 });

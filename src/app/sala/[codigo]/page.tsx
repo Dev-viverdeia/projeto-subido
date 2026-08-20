@@ -5,7 +5,7 @@ import { obterContextoDaSala } from '@/lib/calls/queries';
 import { SalaCall } from './SalaCall';
 
 export const metadata: Metadata = {
-  title: 'Sala de call',
+  title: 'Sala de reunião',
   robots: { index: false, follow: false },
 };
 

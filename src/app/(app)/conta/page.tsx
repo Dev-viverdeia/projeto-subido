@@ -23,7 +23,7 @@ export const metadata: Metadata = { title: 'Conta' };
 
 const CONTINUIDADE = [
   'Projetos e tarefas concluídas',
-  'Leads, calls e propostas',
+  'Clientes, reuniões e propostas',
   'Formações, mentorias e certificados',
 ] as const;
 
@@ -88,7 +88,7 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       {parametros.calendar === 'conectado' && (
         <div className={styles.avisoIntegracao} data-tom="sucesso" role="status">
           <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Google Calendar conectado. Agora você pode enviar o convite ao criar uma call.
+          Google Calendar conectado. Agora você pode enviar o convite ao criar uma reunião.
         </div>
       )}
       {parametros.calendar === 'erro' && (

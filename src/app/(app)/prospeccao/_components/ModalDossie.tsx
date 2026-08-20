@@ -170,8 +170,8 @@ export function ModalDossie({
                   <p className={styles.eyebrow}>Contatos da empresa</p>
                   <h3 id="canais-titulo">Canais para começar a abordagem</h3>
                   <span>
-                    Copie o dado ou abra o canal. O CRM fica para quando você quiser trabalhar a
-                    oportunidade.
+                    Copie o dado ou abra o canal. Adicione a empresa a Vendas quando houver
+                    interesse em trabalhar esse contato.
                   </span>
                 </div>
                 <AtSign size={20} aria-hidden="true" />
@@ -292,8 +292,8 @@ export function ModalDossie({
           <aside className={styles.sidebar}>
             <section className={styles.crmCard}>
               <p className={styles.eyebrow}>Próximo passo</p>
-              <h3>Quer trabalhar este lead?</h3>
-              <p>Crie a oportunidade com a empresa, os contatos e os decisores já preenchidos.</p>
+              <h3>Quer trabalhar esta empresa?</h3>
+              <p>Adicione a empresa a Vendas com os contatos e decisores já preenchidos.</p>
               <BotaoEnviarCrm
                 lead={selecionado.id}
                 oportunidade={selecionado.crm_oportunidade_id}

@@ -62,10 +62,10 @@ export default function PreviewNovaPropostaPage() {
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </span>
           <span>
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
           </span>
           <a className={styles.ativo} href="#conteudo">
             <FileSignature size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas
@@ -80,7 +80,7 @@ export default function PreviewNovaPropostaPage() {
         <div className={pagina.pagina}>
           <header className={pagina.hero}>
             <div>
-              <p className={pagina.sobretitulo}>Da call para a proposta</p>
+              <p className={pagina.sobretitulo}>Da reunião para a proposta</p>
               <h1>A conversa já preparou o primeiro rascunho.</h1>
             </div>
             <p>

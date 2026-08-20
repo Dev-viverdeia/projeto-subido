@@ -33,10 +33,12 @@ describe('FormularioEnriquecimento', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer oportunidade' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer dados' }));
     expect(screen.getByTestId('enriquecimento-scrim').parentElement).toBe(document.body);
     expect(document.body).toHaveStyle({ overflow: 'hidden' });
-    const dialogo = screen.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
+    const dialogo = screen.getByRole('dialog', {
+      name: 'Enriquecer os dados deste cliente?',
+    });
     expect(within(dialogo).getByText('3 créditos')).toBeInTheDocument();
     expect(within(dialogo).getByText('17')).toBeInTheDocument();
 
@@ -59,8 +61,10 @@ describe('FormularioEnriquecimento', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer oportunidade' }));
-    const dialogo = screen.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
+    fireEvent.click(screen.getByRole('button', { name: 'Enriquecer dados' }));
+    const dialogo = screen.getByRole('dialog', {
+      name: 'Enriquecer os dados deste cliente?',
+    });
     expect(within(dialogo).getByText(/Seu saldo é de 2 créditos/)).toBeInTheDocument();
     expect(
       within(dialogo).getByRole('button', { name: 'Confirmar por 3 créditos' }),

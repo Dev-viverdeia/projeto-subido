@@ -24,13 +24,13 @@ describe('FormularioPlanoCall', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Próxima ação no CRM')).toHaveValue(
+    expect(screen.getByLabelText('Próxima ação da venda')).toHaveValue(
       'Enviar o diagnóstico do piloto.',
     );
-    expect(screen.getByLabelText('Destino no pipeline')).toHaveValue('proposta');
+    expect(screen.getByLabelText('Próxima etapa da venda')).toHaveValue('proposta');
     const compromissos = screen.getAllByRole('checkbox');
     expect(compromissos).toHaveLength(2);
     compromissos.forEach((item) => expect(item).toBeChecked());
-    expect(screen.getByRole('button', { name: 'Confirmar e atualizar CRM' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Confirmar e atualizar a venda' })).toBeEnabled();
   });
 });

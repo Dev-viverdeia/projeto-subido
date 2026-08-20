@@ -106,7 +106,7 @@ export function Compositor({
       `Projeto-base: ${projetoBase.titulo}.`,
       `Resultado padrão: ${projetoBase.resultado}`,
       oportunidade
-        ? `Cliente: ${oportunidade.empresa}. Oportunidade no CRM: ${oportunidade.titulo}.`
+        ? `Cliente: ${oportunidade.empresa}. Venda em andamento: ${oportunidade.titulo}.`
         : null,
       `Contexto real e mudanças pedidas pelo cliente: ${ideia.trim()}`,
     ]
@@ -255,7 +255,7 @@ export function Compositor({
               </label>
 
               <label className={styles.decisao}>
-                <span>02 · Cliente do CRM</span>
+                <span>02 · Cliente em negociação</span>
                 <select
                   value={oportunidadeId}
                   onChange={(evento) => setOportunidadeId(evento.target.value)}
@@ -275,14 +275,14 @@ export function Compositor({
                     ? `O projeto e a proposta ficarão ligados a ${oportunidade.empresa}.`
                     : oportunidades.length
                       ? 'Opcional agora. Você poderá escolher o cliente ao criar a proposta.'
-                      : 'Nenhuma oportunidade aberta no CRM.'}
+                      : 'Nenhum cliente em negociação.'}
                 </small>
               </label>
             </div>
 
             {oportunidades.length === 0 ? (
-              <Link href="/crm?novo=projeto" className={styles.atalhoCrm}>
-                Cadastrar cliente no CRM
+              <Link href="/vendas?novo=projeto" className={styles.atalhoCrm}>
+                Adicionar cliente em Vendas
               </Link>
             ) : null}
           </section>

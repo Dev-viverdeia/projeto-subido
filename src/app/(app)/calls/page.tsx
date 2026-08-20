@@ -6,7 +6,7 @@ import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { PainelCalls } from './_components/PainelCalls';
 
-export const metadata: Metadata = { title: 'Calls' };
+export const metadata: Metadata = { title: 'Reuniões' };
 
 export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
   const [reunioes, oportunidades, calendar, parametros] = await Promise.all([

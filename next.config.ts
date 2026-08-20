@@ -22,6 +22,26 @@ const nextConfig: NextConfig = {
        troca óbvia para um asset que não muda. */
     formats: ['image/avif', 'image/webp'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/crm/:path*',
+        destination: '/vendas/:path*',
+        permanent: true,
+      },
+      {
+        source: '/calls/:path*',
+        destination: '/reunioes/:path*',
+        permanent: true,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      { source: '/vendas/:path*', destination: '/crm/:path*' },
+      { source: '/reunioes/:path*', destination: '/calls/:path*' },
+    ];
+  },
 };
 
 export default nextConfig;

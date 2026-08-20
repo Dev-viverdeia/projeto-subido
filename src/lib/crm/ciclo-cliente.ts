@@ -24,7 +24,7 @@ export type DecisaoCicloCliente = {
 };
 
 function destinoDaCall(call: DossieLead['calls'][number]): string {
-  return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/calls/${call.id}`;
+  return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/reunioes/${call.id}`;
 }
 
 /**
@@ -54,7 +54,7 @@ export function montarCicloCliente(lead: DossieLead): {
       numero: '01',
       rotulo: 'Contexto',
       estado: contextoPronto ? 'Lead enriquecido' : 'Lead registrado',
-      href: `/crm/${lead.oportunidade.id}`,
+      href: `/vendas/${lead.oportunidade.id}`,
       comprovada: true,
       atual: etapaAtual === 'contexto',
     },
@@ -95,9 +95,9 @@ export function montarCicloCliente(lead: DossieLead): {
         rotulo: 'Compromisso confirmado',
         titulo: compromisso.titulo,
         href: compromisso.reuniaoId
-          ? `/calls/${compromisso.reuniaoId}`
-          : `/crm/${lead.oportunidade.id}`,
-        acao: compromisso.reuniaoId ? 'Abrir call' : 'Abrir no CRM',
+          ? `/reunioes/${compromisso.reuniaoId}`
+          : `/vendas/${lead.oportunidade.id}`,
+        acao: compromisso.reuniaoId ? 'Abrir reunião' : 'Abrir em Vendas',
         novoCiclo: false,
         apoioHref: projeto ? `/solucoes/execucao/${projeto.id}` : null,
         apoioRotulo: projeto ? 'Abrir entrega' : null,
@@ -147,8 +147,8 @@ export function montarCicloCliente(lead: DossieLead): {
         href: `/propostas/${proposta.id}`,
         acao: proposta.status === 'aceita' ? 'Abrir projeto' : 'Continuar proposta',
         novoCiclo: false,
-        apoioHref: proposta.reuniaoId ? `/calls/${proposta.reuniaoId}` : null,
-        apoioRotulo: proposta.reuniaoId ? 'Revisar call de origem' : null,
+        apoioHref: proposta.reuniaoId ? `/reunioes/${proposta.reuniaoId}` : null,
+        apoioRotulo: proposta.reuniaoId ? 'Revisar reunião de origem' : null,
       },
     };
   }
@@ -160,10 +160,10 @@ export function montarCicloCliente(lead: DossieLead): {
         rotulo: call.status === 'concluida' ? 'Conversa registrada' : 'Próxima conversa',
         titulo:
           call.status === 'concluida'
-            ? 'Revisar a call e preparar a proposta'
+            ? 'Revisar a reunião e preparar a proposta'
             : `Preparar ${call.titulo}`,
         href: destinoDaCall(call),
-        acao: call.status === 'concluida' ? 'Revisar pós-call' : 'Abrir call',
+        acao: call.status === 'concluida' ? 'Revisar resumo' : 'Abrir reunião',
         novoCiclo: false,
         apoioHref:
           call.status === 'concluida'
@@ -181,8 +181,8 @@ export function montarCicloCliente(lead: DossieLead): {
       titulo:
         lead.oportunidade.proximaAcao ??
         'Preparar a primeira conversa com o contexto já registrado',
-      href: `/calls?nova=1&oportunidade=${lead.oportunidade.id}`,
-      acao: 'Agendar call',
+      href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
+      acao: 'Agendar reunião',
       novoCiclo: false,
       apoioHref: null,
       apoioRotulo: null,

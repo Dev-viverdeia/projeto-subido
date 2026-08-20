@@ -46,12 +46,12 @@ export function Mensagens({
                 <Link
                   href={
                     m.direcao.contexto_acao
-                      ? `/crm/${m.direcao.contexto_acao.oportunidade_id}`
+                      ? `/vendas/${m.direcao.contexto_acao.oportunidade_id}`
                       : m.direcao.proximo_passo.destino
                   }
                   className={styles.direcaoAcao}
                 >
-                  {m.direcao.contexto_acao ? 'Ver oportunidade' : 'Fazer próxima ação'}
+                  {m.direcao.contexto_acao ? 'Abrir ficha' : 'Fazer próxima ação'}
                   <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
                 </Link>
               </aside>

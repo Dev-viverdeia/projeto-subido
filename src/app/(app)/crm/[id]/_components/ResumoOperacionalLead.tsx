@@ -22,7 +22,7 @@ const DATA_HORA = new Intl.DateTimeFormat('pt-BR', {
 });
 
 function destinoDaCall(call: DossieLead['calls'][number]) {
-  return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/calls/${call.id}`;
+  return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/reunioes/${call.id}`;
 }
 
 type Movimento = {
@@ -44,8 +44,8 @@ function proximoMovimento(lead: DossieLead): Movimento {
       tipo: 'navegacao',
       rotulo: 'Compromisso marcado',
       titulo: compromisso.titulo,
-      href: compromisso.reuniaoId ? `/calls/${compromisso.reuniaoId}` : null,
-      acao: compromisso.reuniaoId ? 'Abrir call' : null,
+      href: compromisso.reuniaoId ? `/reunioes/${compromisso.reuniaoId}` : null,
+      acao: compromisso.reuniaoId ? 'Abrir reunião' : null,
       prazo: compromisso.prazoEm,
     };
   }
@@ -65,7 +65,7 @@ function proximoMovimento(lead: DossieLead): Movimento {
     return {
       tipo: 'novo-ciclo',
       rotulo: 'Ciclo concluído',
-      titulo: `Abra uma nova oportunidade quando houver outro projeto para vender a ${lead.empresa.nome}.`,
+      titulo: `Inicie uma nova venda quando houver outro projeto para oferecer a ${lead.empresa.nome}.`,
       href: null,
       acao: null,
       prazo: null,
@@ -103,13 +103,13 @@ function proximoMovimento(lead: DossieLead): Movimento {
       rotulo: call.status === 'concluida' ? 'Depois da conversa' : 'Próxima conversa',
       titulo:
         call.status === 'concluida'
-          ? 'Revise a call e monte uma proposta com o que foi confirmado.'
+          ? 'Revise a reunião e monte uma proposta com o que foi confirmado.'
           : `Prepare ${call.titulo}`,
       href:
         call.status === 'concluida'
           ? `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${call.id}`
           : destinoDaCall(call),
-      acao: call.status === 'concluida' ? 'Montar proposta' : 'Abrir call',
+      acao: call.status === 'concluida' ? 'Montar proposta' : 'Abrir reunião',
       prazo: lead.oportunidade.proximaAcaoEm ?? call.agendadaPara,
     };
   }
@@ -120,8 +120,8 @@ function proximoMovimento(lead: DossieLead): Movimento {
     titulo:
       lead.oportunidade.proximaAcao ??
       'Agende uma conversa para entender o problema e a prioridade.',
-    href: `/calls?nova=1&oportunidade=${lead.oportunidade.id}`,
-    acao: 'Agendar call',
+    href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
+    acao: 'Agendar reunião',
     prazo: lead.oportunidade.proximaAcaoEm,
   };
 }
@@ -144,7 +144,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
     ? 'O projeto foi aprovado. O histórico comercial continua salvo nesta ficha.'
     : perdida
       ? 'A venda foi encerrada. As etapas realizadas e o motivo da perda continuam salvos.'
-      : 'Veja a etapa atual e execute a ação recomendada para esta oportunidade.';
+      : 'Veja a etapa atual e execute a ação recomendada para este cliente.';
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
@@ -244,10 +244,10 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
 
       <details className={styles.registrosDetalhes}>
         <summary>
-          <span>Ver histórico da oportunidade</span>
+          <span>Ver histórico da venda</span>
           <small>
             {lead.eventos.length} {lead.eventos.length === 1 ? 'atividade' : 'atividades'} ·{' '}
-            {lead.totalCalls} {lead.totalCalls === 1 ? 'call' : 'calls'}
+            {lead.totalCalls} {lead.totalCalls === 1 ? 'reunião' : 'reuniões'}
           </small>
         </summary>
 
@@ -276,7 +276,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               </ol>
             ) : (
               <p className={styles.semDados}>
-                A primeira atividade aparecerá depois de uma ação no CRM.
+                A primeira atividade aparecerá depois de uma ação em Vendas.
               </p>
             )}
           </section>
@@ -285,7 +285,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
             <header>
               <div>
                 <Video size={17} strokeWidth={1.8} aria-hidden="true" />
-                <h3 id="calls-titulo">Calls</h3>
+                <h3 id="calls-titulo">Reuniões</h3>
               </div>
               <span>{lead.totalCalls}</span>
             </header>
@@ -307,7 +307,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                 ))}
               </ul>
             ) : (
-              <p className={styles.semDados}>Nenhuma call vinculada a esta oportunidade.</p>
+              <p className={styles.semDados}>Nenhuma reunião foi vinculada a esta venda.</p>
             )}
           </section>
         </div>

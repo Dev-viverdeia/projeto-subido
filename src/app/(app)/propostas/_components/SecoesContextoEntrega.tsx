@@ -27,7 +27,7 @@ export function SecoesContextoEntrega({
           <span>01</span>
           <div>
             <p>Cliente</p>
-            <h2>Cliente e oportunidade</h2>
+            <h2>Dados do cliente</h2>
           </div>
         </header>
         <div className={styles.camposDois}>

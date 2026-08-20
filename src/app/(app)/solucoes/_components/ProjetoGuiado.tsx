@@ -58,7 +58,7 @@ export function ProjetoGuiado({
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
-  const destinoCrm = `/crm?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
+  const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const perfil = projeto.roteiro.perfil;
   const escopo = projeto.roteiro.escopo;
   const artefatosEntrega = projeto.roteiro.artefatosEntrega;

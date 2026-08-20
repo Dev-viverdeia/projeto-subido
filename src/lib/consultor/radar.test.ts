@@ -87,8 +87,8 @@ describe('montarRadarSobral', () => {
       'projetos',
     ]);
     expect(resultado.map((item) => item.destino)).toEqual([
-      '/calls/call-1',
-      '/crm/oportunidade-1',
+      '/reunioes/call-1',
+      '/vendas/oportunidade-1',
       '/propostas/proposta-1',
       '/solucoes/execucao/projeto-1',
     ]);
@@ -152,7 +152,7 @@ describe('montarRadarSobral', () => {
     expect(item).toMatchObject({
       dominio: 'plano',
       titulo: 'Enviar volume mensal de atendimentos',
-      destino: '/calls/call-1',
+      destino: '/reunioes/call-1',
       estado: 'atrasado',
     });
   });

@@ -286,7 +286,7 @@ export function PortalProjeto({
           <LockKeyhole size={16} aria-hidden="true" />
           <div>
             <strong>Um portal, somente o necessário.</strong>
-            <p>Notas internas, CRM e evidências de trabalho não aparecem neste link.</p>
+            <p>Notas internas, dados de venda e evidências de trabalho não aparecem neste link.</p>
           </div>
         </section>
       </div>

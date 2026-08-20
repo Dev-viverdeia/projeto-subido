@@ -29,7 +29,7 @@ export function BarraPrioridades({
         <strong id="foco-crm-titulo">
           {contagens.atencao === 0
             ? 'Todas têm um próximo passo'
-            : `${contagens.atencao} ${contagens.atencao === 1 ? 'oportunidade precisa' : 'oportunidades precisam'} de ação`}
+            : `${contagens.atencao} ${contagens.atencao === 1 ? 'venda precisa' : 'vendas precisam'} de ação`}
         </strong>
         <small>
           {contagens.atencao === 0
@@ -39,7 +39,7 @@ export function BarraPrioridades({
       </div>
 
       <div className={styles.controlesPipeline}>
-        <div className={styles.filtros} aria-label="Filtrar oportunidades">
+        <div className={styles.filtros} aria-label="Filtrar vendas">
           {(
             [
               ['todas', 'Todas'],
@@ -63,7 +63,7 @@ export function BarraPrioridades({
 
         <label className={styles.busca}>
           <Search size={16} strokeWidth={1.8} aria-hidden="true" />
-          <span className={styles.rotuloOculto}>Buscar oportunidades</span>
+          <span className={styles.rotuloOculto}>Buscar vendas</span>
           <input
             type="search"
             value={busca}

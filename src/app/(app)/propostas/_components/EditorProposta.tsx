@@ -73,7 +73,7 @@ export function EditorProposta({
   const descricaoEstado = sujo
     ? 'Salve as alterações antes de avançar ou baixar o PDF.'
     : status === 'pronta'
-      ? 'Quando você apresentar ao cliente, registre aqui para alimentar o CRM.'
+      ? 'Quando você apresentar ao cliente, registre aqui para atualizar a venda.'
       : status === 'apresentada'
         ? 'Registre a decisão do cliente. Ao aceitar, a plataforma cria o projeto e abre a execução.'
         : status === 'aceita'
@@ -81,7 +81,7 @@ export function EditorProposta({
             ? 'O projeto do cliente já está aberto com o escopo aprovado.'
             : 'Venda confirmada. Abra o projeto para começar a entrega.'
           : status === 'recusada'
-            ? 'A recusa foi registrada no CRM. Crie outra versão somente se a negociação mudar.'
+            ? 'A recusa foi registrada na venda. Crie outra versão somente se a negociação mudar.'
             : 'Altere o status conforme a proposta avançar com o cliente.';
 
   function mudar(mutacao: (atual: DocumentoProposta) => DocumentoProposta) {
@@ -106,11 +106,11 @@ export function EditorProposta({
 
         <div className={styles.acoesTopo}>
           {reuniaoId && (
-            <Link href={`/calls/${reuniaoId}`} className={styles.secundario}>
+            <Link href={`/reunioes/${reuniaoId}`} className={styles.secundario}>
               <Video size={15} aria-hidden="true" /> Call de origem
             </Link>
           )}
-          <Link href={`/crm/${oportunidadeId}`} className={styles.secundario}>
+          <Link href={`/vendas/${oportunidadeId}`} className={styles.secundario}>
             Ver lead
           </Link>
           {sujo ? (

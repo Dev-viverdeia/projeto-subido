@@ -52,19 +52,19 @@ export function RotaComercialProjeto({
         : 'Continuar proposta'
       : oportunidade
         ? 'Criar proposta'
-        : 'Cadastrar lead';
+        : 'Adicionar empresa';
 
   return (
     <section className={styles.rotaProjeto} aria-labelledby="rota-projeto-titulo">
       <header>
         <span>Leve ao cliente</span>
         <h2 id="rota-projeto-titulo">Venda este projeto a um cliente.</h2>
-        <p>Escolha uma oportunidade para criar a proposta e acompanhar a entrega.</p>
+        <p>Escolha um cliente em negociação para criar a proposta e acompanhar a entrega.</p>
       </header>
 
       <ol className={styles.rotaEtapas} aria-label="Fluxo comercial deste Projeto">
         {[
-          ['CRM', 1],
+          ['Vendas', 1],
           ['Proposta', 2],
           ['Entrega', 3],
         ].map(([rotulo, numero]) => {
@@ -87,7 +87,7 @@ export function RotaComercialProjeto({
       {contexto.oportunidades.length ? (
         <div className={styles.rotaContexto}>
           <label htmlFor={`oportunidade-${slug}`}>
-            Empresa e oportunidade
+            Cliente em negociação
             <select
               id={`oportunidade-${slug}`}
               value={oportunidadeId}
@@ -130,7 +130,7 @@ export function RotaComercialProjeto({
           <Building2 size={19} strokeWidth={1.7} aria-hidden="true" />
           <div>
             <strong>Comece por uma empresa real.</strong>
-            <p>O título de {titulo} já entra na nova oportunidade.</p>
+            <p>O título de {titulo} já entra na nova venda.</p>
           </div>
         </div>
       )}
@@ -141,8 +141,8 @@ export function RotaComercialProjeto({
           <ArrowUpRight size={15} aria-hidden="true" />
         </Link>
         {oportunidade ? (
-          <Link href={`/crm/${oportunidade.id}`} className={styles.rotaSecundaria}>
-            Abrir CRM
+          <Link href={`/vendas/${oportunidade.id}`} className={styles.rotaSecundaria}>
+            Abrir em Vendas
           </Link>
         ) : null}
       </div>

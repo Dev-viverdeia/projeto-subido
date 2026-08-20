@@ -6,7 +6,8 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} data-tipo="sucesso" role="status">
         <Check size={17} aria-hidden="true" />
-        Plano aplicado. CRM, pipeline e compromissos já refletem o que foi confirmado.
+        Plano aplicado. A ficha, a etapa da venda e os compromissos já refletem o que foi
+        confirmado.
       </div>
     );
   }

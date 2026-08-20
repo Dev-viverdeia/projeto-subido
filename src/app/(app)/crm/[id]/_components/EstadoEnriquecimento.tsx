@@ -17,7 +17,7 @@ const obterMontagemServidor = () => false;
 const ETAPAS = [
   {
     titulo: 'Reunindo o histórico',
-    descricao: 'Lendo os dados da empresa, do contato, das calls e da Prospecção.',
+    descricao: 'Lendo os dados da empresa, do contato, das reuniões e da Prospecção.',
   },
   {
     titulo: 'Pesquisando a empresa',
@@ -25,7 +25,7 @@ const ETAPAS = [
   },
   {
     titulo: 'Preparando sua próxima conversa',
-    descricao: 'Organizando fatos, projetos aderentes e perguntas personalizadas para a call.',
+    descricao: 'Organizando fatos, projetos possíveis e perguntas personalizadas para a reunião.',
   },
 ] as const;
 
@@ -136,7 +136,7 @@ export function EstadoEnriquecimento({
         aberto={mostrarModal}
         rotulo="Enriquecimento em andamento"
         titulo={status === 'na_fila' ? 'Preparando a pesquisa' : 'Atualizando a ficha do cliente'}
-        descricao="A plataforma está transformando os dados desta oportunidade em contexto para a venda do projeto de IA."
+        descricao="A plataforma está transformando os dados desta ficha em contexto para vender o projeto de IA."
         etapas={ETAPAS}
         etapaInicial={status === 'processando' ? 1 : 0}
         intervalo={18_000}
@@ -181,7 +181,7 @@ export function EstadoEnriquecimento({
             </span>
             <div>
               <strong>Reunir histórico</strong>
-              <small>CRM, Prospecção e calls</small>
+              <small>Vendas, Prospecção e reuniões</small>
             </div>
             <Database size={16} aria-hidden="true" />
           </li>

@@ -404,7 +404,7 @@ export async function marcarAnaliseComoFalha({
       reuniao_id: reuniaoId,
       status: 'falhou',
       resumo:
-        'A call foi concluída, mas a análise automática não ficou disponível. Revise a transcrição antes de atualizar o CRM.',
+        'A reunião foi concluída, mas a análise automática não ficou disponível. Revise a transcrição antes de atualizar a venda.',
       erro: mensagem.slice(0, 500),
     },
     { onConflict: 'reuniao_id' },

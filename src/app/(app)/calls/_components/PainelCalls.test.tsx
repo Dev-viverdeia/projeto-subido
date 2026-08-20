@@ -7,7 +7,7 @@ vi.mock('@/lib/calls/actions', () => ({
 }));
 
 vi.mock('./FormularioAgendarCall', () => ({
-  FormularioAgendarCall: () => <button type="button">Agendar call</button>,
+  FormularioAgendarCall: () => <button type="button">Agendar reunião</button>,
 }));
 
 vi.mock('./AcoesSala', () => ({
@@ -72,7 +72,7 @@ describe('PainelCalls', () => {
     );
 
     const destaque = screen.getByRole('region', { name: 'Descoberta Horizonte' });
-    expect(within(destaque).getByText('Sua próxima call')).toBeInTheDocument();
+    expect(within(destaque).getByText('Sua próxima reunião')).toBeInTheDocument();
     expect(screen.getAllByText('Descoberta Horizonte')).toHaveLength(1);
 
     const agenda = screen.getByRole('region', { name: 'Depois desta' });
@@ -106,11 +106,11 @@ describe('PainelCalls', () => {
     );
 
     const confirmacao = screen.getByRole('region', { name: 'Proposta Horizonte' });
-    expect(within(confirmacao).getByText('Call pronta')).toBeInTheDocument();
+    expect(within(confirmacao).getByText('Reunião pronta')).toBeInTheDocument();
     expect(within(confirmacao).getByText('Agente de vendas')).toBeInTheDocument();
-    expect(within(confirmacao).getByRole('link', { name: /Abrir lead/ })).toHaveAttribute(
+    expect(within(confirmacao).getByRole('link', { name: /Abrir ficha/ })).toHaveAttribute(
       'href',
-      '/crm/oportunidade-2',
+      '/vendas/oportunidade-2',
     );
     expect(screen.getAllByText('Proposta Horizonte')).toHaveLength(1);
     expect(screen.getByRole('region', { name: 'Descoberta Horizonte' })).toBeInTheDocument();

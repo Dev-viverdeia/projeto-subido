@@ -62,10 +62,10 @@ describe('DossiePosCall', () => {
     render(<DossiePosCall posCall={POS_CALL} estadoAcao={null} />);
 
     expect(screen.getByRole('heading', { name: 'Revise o que será salvo' })).toBeInTheDocument();
-    expect(screen.getByText('Já registrado no CRM')).toBeInTheDocument();
+    expect(screen.getByText('Já registrado na ficha')).toBeInTheDocument();
     expect(screen.getByText('Descoberta → Proposta')).toBeInTheDocument();
     expect(screen.getByLabelText('Leitura comercial 76 de 100')).toBeInTheDocument();
-    expect(screen.getByText('Nada muda no pipeline sem sua confirmação.')).toBeInTheDocument();
+    expect(screen.getByText('Nada muda na venda sem sua confirmação.')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /Criar uma proposta a partir desta conversa/ }),
     ).toHaveAttribute('href', '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1');

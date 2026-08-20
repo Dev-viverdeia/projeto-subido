@@ -60,7 +60,7 @@ export function FormularioAgendarCall({
     null;
   const [convidadoEmail, setConvidadoEmail] = useState(oportunidadeVinculada?.contatoEmail ?? '');
   const precisaConfigurarCalendar = !calendar.conectado;
-  const retornoCalendar = `/calls?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
+  const retornoCalendar = `/reunioes?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
   const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export function FormularioAgendarCall({
         ) : (
           <CalendarPlus size={17} strokeWidth={2} aria-hidden="true" />
         )}
-        <span>{precisaConfigurarCalendar ? 'Conectar agenda' : 'Agendar call'}</span>
+        <span>{precisaConfigurarCalendar ? 'Conectar agenda' : 'Agendar reunião'}</span>
       </button>
 
       {montado &&
@@ -154,17 +154,17 @@ export function FormularioAgendarCall({
                 <header className={styles.topo}>
                   <div>
                     <p className={styles.sobretitulo}>
-                      {precisaConfigurarCalendar ? 'Configuração inicial' : 'CRM + Live Coach'}
+                      {precisaConfigurarCalendar ? 'Configuração inicial' : 'Vendas + Live Coach'}
                     </p>
                     <h2 id="agendar-call-titulo">
-                      {precisaConfigurarCalendar ? 'Conecte sua agenda' : 'Agendar call'}
+                      {precisaConfigurarCalendar ? 'Conecte sua agenda' : 'Agendar reunião'}
                     </h2>
                     <p>
                       {precisaConfigurarCalendar
-                        ? 'Você faz isso uma vez. Depois, cada call já nasce com sala, convite e histórico no CRM.'
+                        ? 'Você faz isso uma vez. Depois, cada reunião já nasce com sala, convite e histórico na ficha do cliente.'
                         : oportunidadeVinculada
-                          ? 'Defina o horário. A sala ficará ligada a esta oportunidade.'
-                          : 'Escolha o lead e defina o horário. O link ficará salvo na oportunidade.'}
+                          ? 'Defina o horário. A sala ficará ligada à ficha deste cliente.'
+                          : 'Escolha o cliente e defina o horário. O link ficará salvo na ficha.'}
                     </p>
                   </div>
                   <button
@@ -185,9 +185,9 @@ export function FormularioAgendarCall({
                   />
                 ) : disponiveis.length === 0 ? (
                   <div className={styles.semLead}>
-                    <p>Uma call precisa estar ligada a uma oportunidade real.</p>
-                    <Link href="/crm" className="via-btn via-btn--primary via-btn--md">
-                      Adicionar primeiro lead
+                    <p>Uma reunião precisa estar ligada a uma venda real.</p>
+                    <Link href="/vendas" className="via-btn via-btn--primary via-btn--md">
+                      Adicionar primeiro cliente
                     </Link>
                   </div>
                 ) : (
@@ -211,8 +211,8 @@ export function FormularioAgendarCall({
                       <div className={styles.contextoLead}>
                         <input type="hidden" name="oportunidade" value={oportunidadeVinculada.id} />
                         <div className={styles.contextoLeadTopo}>
-                          <span>Oportunidade vinculada</span>
-                          <Link href={`/crm/${oportunidadeVinculada.id}`}>Abrir oportunidade</Link>
+                          <span>Venda vinculada</span>
+                          <Link href={`/vendas/${oportunidadeVinculada.id}`}>Abrir ficha</Link>
                         </div>
                         <strong>{oportunidadeVinculada.empresa}</strong>
                         <p>{oportunidadeVinculada.titulo}</p>
@@ -225,7 +225,7 @@ export function FormularioAgendarCall({
                       </div>
                     ) : (
                       <label className={styles.campo}>
-                        <span>Oportunidade</span>
+                        <span>Cliente em negociação</span>
                         <select
                           id="calls-oportunidade"
                           name="oportunidade"
@@ -244,7 +244,7 @@ export function FormularioAgendarCall({
                           required
                         >
                           <option value="" disabled>
-                            Escolha no CRM
+                            Escolha em Vendas
                           </option>
                           {disponiveis.map((item) => (
                             <option key={item.id} value={item.id}>
@@ -262,7 +262,7 @@ export function FormularioAgendarCall({
 
                     <div className={styles.duasColunas}>
                       <label className={styles.campo}>
-                        <span>Tipo de call</span>
+                        <span>Tipo de reunião</span>
                         <select
                           name="tipo"
                           defaultValue={estado.campos?.tipo ?? tipoInicial ?? 'descoberta'}
@@ -305,7 +305,7 @@ export function FormularioAgendarCall({
                         id="calls-titulo"
                         name="titulo"
                         label="Título"
-                        hint="Opcional. Se vazio, usamos a oportunidade."
+                        hint="Opcional. Se vazio, usamos o nome da venda."
                         placeholder="Ex.: Descoberta de atendimento"
                         defaultValue={estado.campos?.titulo ?? ''}
                         error={erroVisivel('titulo')}

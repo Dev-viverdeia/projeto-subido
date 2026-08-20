@@ -35,12 +35,12 @@ export default function Page() {
       <ul>
         <li>Conta: nome, e-mail, telefone, foto e informações de autenticação.</li>
         <li>
-          Operação: oportunidades do CRM, contatos, projetos, propostas, tarefas, notas e arquivos
+          Operação: clientes em negociação, contatos, projetos, propostas, tarefas, notas e arquivos
           que você decidir registrar.
         </li>
         <li>
-          Calls: data, participantes, gravação, transcrição, resumo e próximos passos quando esses
-          recursos forem usados.
+          Reuniões: data, participantes, gravação, transcrição, resumo e próximos passos quando
+          esses recursos forem usados.
         </li>
         <li>
           Navegação e segurança: endereço IP, dispositivo, registros de acesso e preferências de
@@ -64,8 +64,8 @@ export default function Page() {
       <h2>4. Integração com o Google Calendar</h2>
       <p>
         A conexão com o Google Calendar é opcional. Quando autorizada, a Subido usa o acesso apenas
-        para criar e manter os eventos de call que você agenda pela plataforma, incluir o convidado
-        e inserir o link público da sala Subido. Não vendemos dados do Google, não os usamos para
+        para criar e manter as reuniões que você agenda pela plataforma, incluir o convidado e
+        inserir o link público da sala Subido. Não vendemos dados do Google, não os usamos para
         publicidade e não lemos calendários que não sejam necessários a essa função.
       </p>
       <p>

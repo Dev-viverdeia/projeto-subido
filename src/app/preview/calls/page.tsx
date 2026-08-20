@@ -15,7 +15,7 @@ import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from '../mapa-jornada/preview.module.css';
 
-export const metadata: Metadata = { title: 'Preview · Calls' };
+export const metadata: Metadata = { title: 'Preview · Reuniões' };
 
 const AGORA = '2026-08-07T18:00:00.000Z';
 const OPORTUNIDADES: OportunidadeCrm[] = [
@@ -37,7 +37,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Call agendada',
+    ultimoFato: 'Reunião agendada',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -60,7 +60,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Etapa do pipeline alterada',
+    ultimoFato: 'Etapa da venda alterada',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -123,10 +123,10 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </span>
           <a className={styles.ativo} href="#conteudo">
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
           </a>
           <span>
             <BriefcaseBusiness size={18} strokeWidth={1.7} aria-hidden="true" /> Projetos

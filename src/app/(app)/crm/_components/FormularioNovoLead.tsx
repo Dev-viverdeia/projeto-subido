@@ -18,14 +18,14 @@ function BotaoAdicionar() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" variant="primary" loading={pending}>
-      {pending ? 'Criando oportunidade…' : 'Criar oportunidade'}
+      {pending ? 'Adicionando…' : 'Adicionar a Vendas'}
     </Button>
   );
 }
 
 export function FormularioNovoLead({
   abertoInicial = false,
-  rotulo = 'Nova oportunidade',
+  rotulo = 'Adicionar empresa',
   tituloInicial = '',
   projetoSlug = '',
 }: {
@@ -130,11 +130,11 @@ export function FormularioNovoLead({
               <div className={styles.painel}>
                 <header className={styles.topo}>
                   <div>
-                    <p className={styles.sobretitulo}>Nova oportunidade</p>
-                    <h2 id="novo-lead-titulo">Adicionar oportunidade</h2>
+                    <p className={styles.sobretitulo}>Nova venda</p>
+                    <h2 id="novo-lead-titulo">Qual empresa você quer acompanhar?</h2>
                     <p>
                       Use este cadastro para uma empresa que você decidiu abordar. Os dados podem
-                      ser completados antes da primeira call.
+                      ser completados antes da primeira reunião.
                     </p>
                   </div>
                   <button

@@ -19,12 +19,12 @@ async function ClienteEmFoco() {
 
 async function ContatoEmFoco() {
   const foco = await obterFocoLeveDoCrm();
-  return <>{foco?.contato ?? 'Adicione seu primeiro contato no CRM'}</>;
+  return <>{foco?.contato ?? 'Adicione seu primeiro contato em Vendas'}</>;
 }
 
 async function ProximaAcaoCrm() {
   const foco = await obterFocoLeveDoCrm();
-  return <>{foco?.proximaAcao ?? 'Defina a próxima ação no CRM'}</>;
+  return <>{foco?.proximaAcao ?? 'Defina a próxima ação da venda'}</>;
 }
 
 async function ProximaMentoria() {

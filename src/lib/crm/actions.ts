@@ -124,7 +124,7 @@ export async function criarLead(
     console.error(`[crm:criar-lead] ${error.code}: ${error.message}`);
     return {
       campos,
-      erro: 'Não foi possível adicionar o lead agora. Tente de novo em instantes.',
+      erro: 'Não foi possível adicionar a empresa agora. Tente de novo em instantes.',
     };
   }
 
@@ -133,16 +133,16 @@ export async function criarLead(
     console.error('[crm:criar-lead] A oportunidade foi criada sem um identificador válido.');
     return {
       campos,
-      erro: 'O lead foi criado, mas não conseguimos abrir a próxima etapa. Atualize o CRM.',
+      erro: 'A venda foi criada, mas não conseguimos abrir a ficha. Atualize Vendas.',
     };
   }
 
-  revalidatePath('/crm');
+  revalidatePath('/vendas');
   revalidarDirecaoOperacional();
   const projeto = validacao.data.projeto
     ? `&projeto=${encodeURIComponent(validacao.data.projeto)}`
     : '';
-  redirect(`/crm/${oportunidade.data}?novo=1${projeto}`);
+  redirect(`/vendas/${oportunidade.data}?novo=1${projeto}`);
 }
 
 export async function moverOportunidade(formData: FormData): Promise<void> {
@@ -163,7 +163,7 @@ export async function moverOportunidade(formData: FormData): Promise<void> {
     return;
   }
 
-  revalidatePath('/crm');
+  revalidatePath('/vendas');
   revalidarDirecaoOperacional();
 }
 
@@ -186,7 +186,7 @@ export async function moverOportunidadeKanban(
   if (!validacao.success) {
     return {
       ok: false,
-      erro: validacao.error.issues[0]?.message ?? 'Não foi possível mover a oportunidade.',
+      erro: validacao.error.issues[0]?.message ?? 'Não foi possível mover a venda.',
     };
   }
 
@@ -204,12 +204,12 @@ export async function moverOportunidadeKanban(
       erro:
         error.code === '42501'
           ? 'Sua sessão expirou. Entre novamente para continuar.'
-          : 'A oportunidade não foi movida. Tente novamente.',
+          : 'A venda não foi movida. Tente novamente.',
     };
   }
 
-  revalidatePath('/crm');
-  revalidatePath(`/crm/${validacao.data.id}`);
+  revalidatePath('/vendas');
+  revalidatePath(`/vendas/${validacao.data.id}`);
   revalidarDirecaoOperacional();
   return { ok: true, movida: Boolean(data) };
 }
@@ -263,10 +263,10 @@ export async function definirProximaAcao(
     };
   }
 
-  revalidatePath('/crm');
-  revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath('/vendas');
+  revalidatePath(`/vendas/${validacao.data.oportunidade}`);
   revalidarDirecaoOperacional();
-  return { status: 'sucesso', mensagem: 'Próxima ação salva na ficha e no pipeline.' };
+  return { status: 'sucesso', mensagem: 'Próxima ação salva na ficha e no quadro de vendas.' };
 }
 
 export async function aplicarProximaAcao(
@@ -297,17 +297,17 @@ export async function aplicarProximaAcao(
     };
   }
 
-  revalidatePath('/crm');
-  revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath('/vendas');
+  revalidatePath(`/vendas/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
   revalidarDirecaoOperacional();
-  return { ok: true, mensagem: 'Próxima ação salva no pipeline.' };
+  return { ok: true, mensagem: 'Próxima ação salva no quadro de vendas.' };
 }
 
 /** Abre uma nova negociação para a mesma empresa depois de uma venda ganha. */
 export async function iniciarNovoCicloCliente(formData: FormData): Promise<void> {
   const validacao = novoCicloSchema.safeParse({ oportunidade: formData.get('oportunidade') });
-  if (!validacao.success) redirect('/crm');
+  if (!validacao.success) redirect('/vendas');
 
   const supabase = await createClient();
   const {
@@ -324,10 +324,10 @@ export async function iniciarNovoCicloCliente(formData: FormData): Promise<void>
     console.error(
       `[crm:novo-ciclo] ${error?.code ?? 'sem-dados'}: ${error?.message ?? 'oportunidade inválida'}`,
     );
-    redirect(`/crm/${validacao.data.oportunidade}?novo-ciclo=erro`);
+    redirect(`/vendas/${validacao.data.oportunidade}?novo-ciclo=erro`);
   }
 
-  revalidatePath('/crm');
+  revalidatePath('/vendas');
   revalidarDirecaoOperacional();
-  redirect(`/crm/${oportunidade.data}?novo=1`);
+  redirect(`/vendas/${oportunidade.data}?novo=1`);
 }

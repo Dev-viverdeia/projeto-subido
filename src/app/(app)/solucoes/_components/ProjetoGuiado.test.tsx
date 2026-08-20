@@ -265,19 +265,21 @@ describe('Projeto guiado', () => {
   it('conecta o projeto ao primeiro lead e à proposta comercial', () => {
     montar();
 
-    expect(screen.getByLabelText('Empresa e oportunidade')).toHaveValue(
+    expect(screen.getByLabelText('Cliente em negociação')).toHaveValue(
       '11111111-1111-4111-8111-111111111111',
     );
     expect(screen.getByRole('link', { name: 'Usar com outra empresa' })).toHaveAttribute(
       'href',
-      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
+      '/vendas?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
     );
     expect(screen.getByRole('link', { name: /Criar proposta/ })).toHaveAttribute(
       'href',
       '/propostas/nova?oportunidade=11111111-1111-4111-8111-111111111111&projeto=crm-comercial',
     );
     expect(
-      screen.getByText(/Escolha uma oportunidade para criar a proposta e acompanhar a entrega/),
+      screen.getByText(
+        /Escolha um cliente em negociação para criar a proposta e acompanhar a entrega/,
+      ),
     ).toBeVisible();
   });
 
@@ -322,7 +324,7 @@ describe('Projeto guiado', () => {
 
     expect(screen.getByRole('link', { name: /Encontrar novo cliente/ })).toHaveAttribute(
       'href',
-      '/crm?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
+      '/vendas?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
     );
   });
 });

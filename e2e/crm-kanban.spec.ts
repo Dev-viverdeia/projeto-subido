@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('CRM Kanban', () => {
+test.describe('Quadro de vendas', () => {
   test('separa ganho e perda e preserva o motivo no card', async ({ page }, testInfo) => {
     await page.goto('/preview/crm');
 
@@ -14,14 +14,12 @@ test.describe('CRM Kanban', () => {
       await expect(page.getByRole('heading', { name: 'Descobrir' })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Propor' })).toBeVisible();
     }
-    await page.getByText('Oportunidades encerradas', { exact: true }).click();
+    await page.getByText('Vendas encerradas', { exact: true }).click();
     await expect(page.getByText('Momento inadequado', { exact: true })).toBeVisible();
     await expect(page.getByText('Fechados', { exact: true })).toHaveCount(0);
   });
 
-  test('o card inteiro move a oportunidade e a perda exige contexto', async ({
-    page,
-  }, testInfo) => {
+  test('o card inteiro move a venda e a perda exige contexto', async ({ page }, testInfo) => {
     if (testInfo.project.name !== 'mobile') {
       await page.setViewportSize({ width: 1920, height: 1080 });
     }
@@ -41,7 +39,7 @@ test.describe('CRM Kanban', () => {
       await page.mouse.move(origem.x + origem.width * 0.46, origem.y + origem.height * 0.46);
       await page.mouse.down();
       await page.mouse.move(origem.x + 18, origem.y + 18, { steps: 4 });
-      const destino = page.getByRole('group', { name: 'Marcar oportunidade como perdida' });
+      const destino = page.getByRole('group', { name: 'Marcar venda como perdida' });
       await expect(destino).toBeVisible();
       const chegada = await destino.boundingBox();
       expect(chegada).not.toBeNull();
@@ -52,7 +50,7 @@ test.describe('CRM Kanban', () => {
       await page.mouse.up();
     }
 
-    const dialogo = page.getByRole('dialog', { name: 'Registrar oportunidade perdida' });
+    const dialogo = page.getByRole('dialog', { name: 'Registrar venda perdida' });
     await expect(dialogo).toBeVisible();
     await dialogo.getByRole('button', { name: 'Registrar como perdida' }).click();
     await expect(dialogo.getByText('Escolha o motivo para concluir o registro.')).toBeVisible();

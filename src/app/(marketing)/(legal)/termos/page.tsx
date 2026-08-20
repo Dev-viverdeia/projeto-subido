@@ -25,8 +25,8 @@ export default function Page() {
 
       <h2>1. Objeto</h2>
       <p>
-        A Subido reúne formação, projetos guiados, prospecção, CRM, calls, propostas, mentoria e
-        ferramentas de apoio. A disponibilidade de cada recurso pode variar conforme o acesso da
+        A Subido reúne formação, projetos guiados, prospecção, vendas, reuniões, propostas, mentoria
+        e ferramentas de apoio. A disponibilidade de cada recurso pode variar conforme o acesso da
         conta. A plataforma não garante clientes, vendas, faturamento ou resultados específicos.
       </p>
 

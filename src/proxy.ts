@@ -39,9 +39,9 @@ export const config = {
   matcher: [
     '/inicio/:path*',
     '/prospeccao/:path*',
-    '/crm/:path*',
+    '/vendas/:path*',
     '/propostas/:path*',
-    '/calls/:path*',
+    '/reunioes/:path*',
     '/solucoes/:path*',
     '/formacoes/:path*',
     '/builder/:path*',

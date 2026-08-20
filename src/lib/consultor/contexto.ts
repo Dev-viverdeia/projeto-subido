@@ -110,7 +110,7 @@ export async function obterSinaisSobral(
   });
   const oportunidadeDoRadar = radar
     .find((item) => item.dominio === 'crm')
-    ?.destino.match(/^\/crm\/([^/]+)$/)?.[1];
+    ?.destino.match(/^\/vendas\/([^/]+)$/)?.[1];
   const foco =
     abertas.find((oportunidade) => oportunidade.id === oportunidadeDoRadar) ?? abertas[0] ?? null;
   const projetosAtivos = linhasProjetos.filter(
@@ -193,8 +193,8 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
   return JSON.stringify(
     {
       momento: sinais.momento,
-      etapa_comercial_em_foco: sinais.foco?.etapa ?? null,
-      oportunidade_em_foco: sinais.foco
+      etapa_da_venda_em_foco: sinais.foco?.etapa ?? null,
+      venda_em_foco: sinais.foco
         ? {
             titulo: sinais.foco.titulo,
             empresa: sinais.foco.empresa,
@@ -203,8 +203,8 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
           }
         : null,
       contadores: {
-        oportunidades: sinais.oportunidades,
-        calls: sinais.calls,
+        vendas: sinais.oportunidades,
+        reunioes: sinais.calls,
         propostas: sinais.propostas,
         studio: sinais.studio,
         projetos: sinais.projetos,

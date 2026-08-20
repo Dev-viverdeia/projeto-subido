@@ -76,8 +76,8 @@ export function PainelCalls({
       <header className={styles.topo}>
         <div className={styles.introducao}>
           <p className={styles.sobretitulo}>Reuniões</p>
-          <h1>Calls</h1>
-          <p>Crie a sala, use o Live Coach e salve a transcrição junto ao lead no CRM.</p>
+          <h1>Reuniões</h1>
+          <p>Crie a sala, use o Live Coach e salve a conversa na ficha do cliente.</p>
         </div>
         <FormularioAgendarCall
           oportunidades={oportunidades}
@@ -91,7 +91,7 @@ export function PainelCalls({
       {calendarResultado === 'sincronizado' && (
         <div className={styles.confirmacao} role="status">
           <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Call criada e convite enviado pelo Google Calendar.
+          Reunião criada e convite enviado pelo Google Calendar.
         </div>
       )}
       {calendarResultado === 'falhou' && (
@@ -106,7 +106,7 @@ export function PainelCalls({
       ) : agendadaId ? (
         <div className={styles.confirmacao} role="status">
           <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Call criada. Atualize a página para abrir a sala preparada.
+          Reunião criada. Atualize a página para abrir a sala preparada.
         </div>
       ) : null}
 
@@ -114,7 +114,7 @@ export function PainelCalls({
         <section className={styles.proximaCall} data-on-dark aria-labelledby="proxima-call-titulo">
           <div className={styles.proximaContexto}>
             <div className={styles.proximaLinha}>
-              <p>Sua próxima call</p>
+              <p>Sua próxima reunião</p>
               <span data-status={proxima.status}>
                 {proxima.status === 'ao_vivo' ? (
                   <Radio size={13} strokeWidth={1.9} aria-hidden="true" />
@@ -159,7 +159,7 @@ export function PainelCalls({
 
       <section className={styles.automacao} aria-labelledby="fluxo-calls-titulo">
         <header>
-          <p>Durante e depois da call</p>
+          <p>Durante e depois da reunião</p>
           <h2 id="fluxo-calls-titulo">O que fica salvo</h2>
         </header>
         <ol className={styles.trilha}>
@@ -168,7 +168,7 @@ export function PainelCalls({
               <Radio size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <strong>Call</strong>
+              <strong>Reunião</strong>
               <small>Reunião feita pela plataforma</small>
             </div>
           </li>
@@ -186,8 +186,8 @@ export function PainelCalls({
               <Database size={17} strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <strong>CRM</strong>
-              <small>Resumo salvo na oportunidade</small>
+              <strong>Ficha do cliente</strong>
+              <small>Resumo salvo na venda</small>
             </div>
           </li>
           <li>
@@ -210,11 +210,11 @@ export function PainelCalls({
               <p>
                 {proxima
                   ? seguintes.length > 0
-                    ? `${seguintes.length} ${seguintes.length === 1 ? 'call na sequência' : 'calls na sequência'}.`
-                    : 'Nenhuma outra call depois desta.'
+                    ? `${seguintes.length} ${seguintes.length === 1 ? 'reunião na sequência' : 'reuniões na sequência'}.`
+                    : 'Nenhuma outra reunião depois desta.'
                   : recemAgendada
-                    ? 'Nenhuma outra call aguardando.'
-                    : 'Suas próximas calls aparecerão aqui.'}
+                    ? 'Nenhuma outra reunião aguardando.'
+                    : 'Suas próximas reuniões aparecerão aqui.'}
               </p>
             </div>
             <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
@@ -226,7 +226,7 @@ export function PainelCalls({
                 <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
               </span>
               <div>
-                <strong>Não há outra call agendada</strong>
+                <strong>Não há outra reunião agendada</strong>
                 <p>Ao terminar, registre a próxima ação combinada com o cliente.</p>
               </div>
             </div>
@@ -236,15 +236,12 @@ export function PainelCalls({
                 <Radio size={22} strokeWidth={1.6} />
               </span>
               <div>
-                <h3>Nenhuma call agendada</h3>
-                <p>
-                  Escolha uma oportunidade do CRM para criar a sala e manter a reunião ligada ao
-                  histórico do cliente.
-                </p>
+                <h3>Nenhuma reunião agendada</h3>
+                <p>Escolha um cliente em Vendas para criar a sala e guardar a conversa na ficha.</p>
               </div>
               {oportunidades.length === 0 ? (
-                <Link href="/crm" className={styles.acaoVazio}>
-                  Adicionar lead <ArrowRight size={16} aria-hidden="true" />
+                <Link href="/vendas" className={styles.acaoVazio}>
+                  Adicionar cliente <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               ) : (
                 <FormularioAgendarCall
@@ -294,7 +291,7 @@ export function PainelCalls({
                 <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
               </span>
               <div>
-                <strong>Não há outra call depois desta</strong>
+                <strong>Não há outra reunião depois desta</strong>
                 <p>Registre a próxima ação antes de encerrar a reunião.</p>
               </div>
             </div>
@@ -310,7 +307,7 @@ export function PainelCalls({
               {comCoach} {comCoach === 1 ? 'sala preparada' : 'salas preparadas'}
             </span>
           </div>
-          <p>{ativas.length ? 'Ajuda durante a call' : 'Como funciona'}</p>
+          <p>{ativas.length ? 'Ajuda durante a reunião' : 'Como funciona'}</p>
           <h2 id="live-coach-titulo">Live Coach</h2>
           <p>
             {ativas.length
@@ -344,14 +341,14 @@ export function PainelCalls({
           <header className={styles.secaoTopo}>
             <div>
               <h2 id="historico-titulo">Histórico</h2>
-              <p>Calls encerradas, processadas ou canceladas.</p>
+              <p>Reuniões encerradas, processadas ou canceladas.</p>
             </div>
           </header>
           <div className={styles.historicoLista}>
             {historico.map((reuniao) => (
               <article key={reuniao.id}>
                 <span>{ROTULO_STATUS_CALL[reuniao.status]}</span>
-                <Link href={`/calls/${reuniao.id}`} className={styles.historicoLink}>
+                <Link href={`/reunioes/${reuniao.id}`} className={styles.historicoLink}>
                   <div>
                     <strong>{reuniao.titulo}</strong>
                     <small>
@@ -359,7 +356,7 @@ export function PainelCalls({
                     </small>
                   </div>
                   <span>
-                    Abrir pós-call <ArrowRight size={14} aria-hidden="true" />
+                    Abrir resumo <ArrowRight size={14} aria-hidden="true" />
                   </span>
                 </Link>
               </article>

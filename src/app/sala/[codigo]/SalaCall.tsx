@@ -108,7 +108,7 @@ export function SalaCall({
     <main className={styles.pagina}>
       <div className={styles.marca}>
         <SubidoLogo size={18} variant="mono" />
-        <span className={styles.marcaApoio}>Sala da call</span>
+        <span className={styles.marcaApoio}>Sala da reunião</span>
       </div>
 
       <section className={styles.cartao}>
@@ -128,14 +128,14 @@ export function SalaCall({
                 <span>01</span>
                 <div>
                   <strong>Áudio e transcrição privados</strong>
-                  <small>A conversa fica ligada somente ao histórico desta oportunidade.</small>
+                  <small>A conversa fica ligada somente ao histórico desta ficha.</small>
                 </div>
               </li>
               <li>
                 <span>02</span>
                 <div>
                   <strong>Resumo para revisão</strong>
-                  <small>Decisões e próximos passos aparecem depois da call.</small>
+                  <small>Decisões e próximos passos aparecem depois da reunião.</small>
                 </div>
               </li>
               {convite.liveCoachAtivo && anfitriao && (
@@ -185,8 +185,8 @@ export function SalaCall({
           <div className={styles.destinoDados}>
             <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
             <p>
-              <strong>Depois da call</strong>
-              <span>Você poderá revisar tudo antes de aplicar qualquer mudança no CRM.</span>
+              <strong>Depois da reunião</strong>
+              <span>Você poderá revisar tudo antes de atualizar a ficha do cliente.</span>
             </p>
           </div>
 
@@ -200,7 +200,7 @@ export function SalaCall({
             <div className={styles.aviso}>A sala abre 30 minutos antes do horário agendado.</div>
           )}
           {!callPodeAbrir(convite.status) && (
-            <div className={styles.aviso}>Esta call já foi encerrada.</div>
+            <div className={styles.aviso}>Esta reunião já foi encerrada.</div>
           )}
           {erro && (
             <div className={styles.erro} role="alert">
@@ -229,7 +229,7 @@ export function SalaCall({
             ) : (
               <Video size={17} strokeWidth={1.9} aria-hidden="true" />
             )}
-            {carregando ? 'Abrindo sala…' : 'Entrar na call'}
+            {carregando ? 'Abrindo sala…' : 'Entrar na reunião'}
           </button>
 
           <div className={styles.seguranca}>

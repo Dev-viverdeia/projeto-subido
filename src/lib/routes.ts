@@ -9,9 +9,9 @@
 export const ROTAS_APP = [
   '/inicio',
   '/prospeccao',
-  '/crm',
+  '/vendas',
   '/propostas',
-  '/calls',
+  '/reunioes',
   '/solucoes',
   '/formacoes',
   '/builder',
@@ -43,9 +43,9 @@ export type RotaApp = (typeof ROTAS_APP)[number];
 export const ROTULOS: Record<RotaApp, string> = {
   '/inicio': 'Início',
   '/prospeccao': 'Prospecção',
-  '/crm': 'CRM',
+  '/vendas': 'Vendas',
   '/propostas': 'Propostas',
-  '/calls': 'Calls',
+  '/reunioes': 'Reuniões',
   '/solucoes': 'Projetos',
   '/formacoes': 'Formações',
   '/builder': 'Estúdio',
@@ -100,7 +100,11 @@ export function destinoSeguro(valor: string | null | undefined): string {
      e escapariam de um teste que só olhasse o primeiro caractere. */
   if (valor.startsWith('//') || valor.startsWith('/\\')) return ROTA_POS_LOGIN;
 
-  const permitida = ROTAS_APP.some((rota) => valor === rota || valor.startsWith(`${rota}/`));
+  const destinoAtual = valor
+    .replace(/^\/crm(?=\/|\?|$)/, '/vendas')
+    .replace(/^\/calls(?=\/|\?|$)/, '/reunioes');
+  const caminho = destinoAtual.split('?')[0] ?? destinoAtual;
+  const permitida = ROTAS_APP.some((rota) => caminho === rota || caminho.startsWith(`${rota}/`));
 
-  return permitida ? valor : ROTA_POS_LOGIN;
+  return permitida ? destinoAtual : ROTA_POS_LOGIN;
 }

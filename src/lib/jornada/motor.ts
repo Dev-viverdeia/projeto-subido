@@ -168,51 +168,51 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       resumo: 'Encontre empresas e inicie conversas',
       marco: 'Descoberta registrada',
       contexto:
-        'Encontre empresas, faça a primeira abordagem e envie ao CRM quem responder ou demonstrar interesse.',
+        'Encontre empresas, faça a primeira abordagem e leve para Vendas quem responder ou demonstrar interesse.',
       guia: 'Como fazer a primeira abordagem',
       passos: [
         passo(
           'primeiro-lead',
-          'Criar a primeira oportunidade',
-          'Cadastre no CRM uma empresa com quem você quer conversar.',
+          'Registrar a primeira venda',
+          'Adicione em Vendas uma empresa com quem você quer conversar.',
           sinais.oportunidades.total > 0
-            ? `${quantidade(sinais.oportunidades.total, 'oportunidade registrada', 'oportunidades registradas')} no CRM.`
-            : 'Nenhuma oportunidade registrada.',
+            ? `${quantidade(sinais.oportunidades.total, 'venda registrada', 'vendas registradas')} em Vendas.`
+            : 'Nenhuma venda registrada.',
           sinais.oportunidades.total > 0,
-          '/crm',
-          'Adicionar primeiro lead',
+          '/vendas',
+          'Adicionar primeiro cliente',
         ),
         passo(
           'enriquecer-lead',
           'Pesquisar o lead',
           'Busque site, informações da empresa e dados do contato antes da primeira conversa.',
           sinais.oportunidades.enriquecidas > 0
-            ? `${quantidade(sinais.oportunidades.enriquecidas, 'oportunidade pesquisada', 'oportunidades pesquisadas')} com fontes salvas.`
+            ? `${quantidade(sinais.oportunidades.enriquecidas, 'cliente pesquisado', 'clientes pesquisados')} com fontes salvas.`
             : 'Nenhum enriquecimento concluído.',
           sinais.oportunidades.enriquecidas > 0,
-          '/crm',
-          'Pesquisar primeiro lead',
+          '/vendas',
+          'Pesquisar primeiro cliente',
         ),
         passo(
           'proxima-acao',
           'Definir a próxima ação',
           'Registre o que você vai fazer e a data do próximo contato.',
           sinais.oportunidades.comProximaAcao > 0
-            ? `${quantidade(sinais.oportunidades.comProximaAcao, 'oportunidade com próxima ação', 'oportunidades com próxima ação')}.`
+            ? `${quantidade(sinais.oportunidades.comProximaAcao, 'venda com próxima ação', 'vendas com próxima ação')}.`
             : 'Nenhuma próxima ação registrada.',
           sinais.oportunidades.comProximaAcao > 0,
-          '/crm',
+          '/vendas',
           'Definir próxima ação',
         ),
         passo(
           'descoberta',
           'Concluir a descoberta',
-          'Use uma call ligada ao CRM para entender o processo atual, o impacto do problema e quem decide.',
+          'Use uma reunião ligada à ficha do cliente para entender o processo atual, o impacto do problema e quem decide.',
           sinais.calls.descobertasConcluidas > 0
-            ? `${quantidade(sinais.calls.descobertasConcluidas, 'call de descoberta concluída', 'calls de descoberta concluídas')}.`
-            : 'Nenhuma call de descoberta concluída.',
+            ? `${quantidade(sinais.calls.descobertasConcluidas, 'reunião de descoberta concluída', 'reuniões de descoberta concluídas')}.`
+            : 'Nenhuma reunião de descoberta concluída.',
           sinais.calls.descobertasConcluidas > 0,
-          '/calls',
+          '/reunioes',
           'Agendar descoberta',
         ),
       ],
@@ -224,13 +224,13 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
       resumo: 'Apresente a proposta e registre a decisão',
       marco: 'Primeiro projeto vendido',
       contexto:
-        'Use o que foi confirmado na call para montar a proposta, apresentá-la e acompanhar a decisão do cliente.',
+        'Use o que foi confirmado na reunião para montar a proposta, apresentá-la e acompanhar a decisão do cliente.',
       guia: 'Como apresentar e acompanhar uma proposta',
       passos: [
         passo(
           'proposta-criada',
           'Construir a proposta',
-          'Use as informações do CRM para montar escopo, entregáveis, prazo e investimento.',
+          'Use a ficha do cliente para montar escopo, entregáveis, prazo e investimento.',
           sinais.propostas.total > 0
             ? `${quantidade(sinais.propostas.total, 'proposta criada', 'propostas criadas')}.`
             : 'Nenhuma proposta criada.',
@@ -241,7 +241,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'proposta-apresentada',
           'Apresentar a proposta',
-          'Apresente a proposta em uma call e marque a data do follow-up.',
+          'Apresente a proposta em uma reunião e marque a data do próximo contato.',
           sinais.propostas.apresentadas > 0
             ? `${quantidade(sinais.propostas.apresentadas, 'proposta apresentada', 'propostas apresentadas')}.`
             : 'Nenhuma proposta marcada como apresentada.',
@@ -252,7 +252,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
         passo(
           'venda-confirmada',
           'Registrar a decisão',
-          'Marque a proposta como aceita ou a oportunidade como ganha somente depois da confirmação do cliente.',
+          'Marque a proposta como aceita ou a venda como ganha somente depois da confirmação do cliente.',
           vendaConfirmada ? 'Primeira venda confirmada na operação.' : 'Nenhuma venda confirmada.',
           vendaConfirmada,
           '/propostas',
@@ -278,7 +278,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
             ? `${quantidade(sinais.calls.kickoffsConcluidos, 'kickoff concluído', 'kickoffs concluídos')}.`
             : 'Nenhum kickoff concluído.',
           sinais.calls.kickoffsConcluidos > 0 || entregaConcluida,
-          '/calls',
+          '/reunioes',
           'Agendar kickoff',
         ),
         passo(
@@ -325,7 +325,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
             ? 'Segundo projeto confirmado na operação.'
             : 'Segundo projeto ainda não confirmado.',
           segundaVenda,
-          '/crm',
+          '/vendas',
           'Iniciar próximo ciclo',
         ),
       ],

@@ -53,7 +53,7 @@ export async function decidirPropostaCliente(
       sucesso:
         resultado.status === 'aceita'
           ? 'Proposta aprovada. O projeto já foi aberto para a equipe iniciar a entrega.'
-          : 'Decisão registrada. O responsável recebeu o retorno no CRM.',
+          : 'Decisão registrada. O responsável recebeu o retorno em Vendas.',
     };
   } catch (erro) {
     console.error(

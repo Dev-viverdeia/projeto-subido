@@ -31,7 +31,7 @@ export function CallRecemAgendada({
   return (
     <section className={styles.callCriada} aria-labelledby="call-criada-titulo" aria-live="polite">
       <div className={styles.callCriadaContexto}>
-        <p>Call pronta</p>
+        <p>Reunião pronta</p>
         <h2 id="call-criada-titulo">{reuniao.titulo}</h2>
         <span>
           {reuniao.empresa}
@@ -48,7 +48,7 @@ export function CallRecemAgendada({
           </dd>
         </div>
         <div>
-          <dt>Oportunidade</dt>
+          <dt>Venda</dt>
           <dd>{reuniao.oportunidade}</dd>
         </div>
         <div>
@@ -63,12 +63,12 @@ export function CallRecemAgendada({
             ? `Convite enviado pelo Google Calendar${reuniao.convidadoEmail ? ` para ${reuniao.convidadoEmail}` : ''}.`
             : conviteFalhou
               ? 'A sala foi criada, mas o convite do Google não foi enviado.'
-              : 'O link foi criado e a reunião já aparece no histórico do CRM.'}
+              : 'O link foi criado e a reunião já aparece na ficha do cliente.'}
         </p>
         <div>
           <AcoesSala codigo={reuniao.codigoPublico} />
-          <Link href={`/crm/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
-            Abrir lead <ArrowRight size={14} aria-hidden="true" />
+          <Link href={`/vendas/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
+            Abrir ficha <ArrowRight size={14} aria-hidden="true" />
           </Link>
           {conviteSincronizado && reuniao.googleEventUrl && (
             <a
@@ -90,7 +90,7 @@ export function CallRecemAgendada({
           )}
           {conviteFalhou && !calendar?.conectado && (
             <Link
-              href={`/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(`/calls?agendada=${reuniao.id}`)}`}
+              href={`/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(`/reunioes?agendada=${reuniao.id}`)}`}
               className={styles.abrirLead}
             >
               Reconectar calendário <ExternalLink size={13} aria-hidden="true" />

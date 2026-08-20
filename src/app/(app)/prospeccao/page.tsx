@@ -65,7 +65,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       )}
       {parametros.crm === 'erro' && (
         <div className={styles.aviso} role="alert">
-          Não foi possível enviar esse lead ao CRM agora. Tente novamente.
+          Não foi possível adicionar esse lead a Vendas agora. Tente novamente.
         </div>
       )}
 
@@ -185,7 +185,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                   <span>02</span> Veja os contatos encontrados
                 </li>
                 <li>
-                  <span>03</span> Leve os leads escolhidos ao CRM
+                  <span>03</span> Leve os leads escolhidos para Vendas
                 </li>
               </ol>
             </div>

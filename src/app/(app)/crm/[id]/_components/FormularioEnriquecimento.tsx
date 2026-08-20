@@ -17,7 +17,7 @@ const ETAPAS_CONFIRMACAO = [
   },
   {
     titulo: 'Preparando a ficha',
-    descricao: 'Estamos ligando os dados desta oportunidade ao enriquecimento.',
+    descricao: 'Estamos organizando os dados desta ficha antes da pesquisa.',
   },
 ] as const;
 
@@ -102,7 +102,7 @@ export function FormularioEnriquecimento({
           aberto
           rotulo="Enriquecimento da ficha"
           titulo="Preparando a análise"
-          descricao="A plataforma está reunindo os dados já salvos nesta oportunidade."
+          descricao="A plataforma está reunindo os dados já salvos nesta ficha."
           etapas={ETAPAS_CONFIRMACAO}
           intervalo={1_800}
           nota="Esta janela fecha assim que o enriquecimento for registrado."
@@ -134,8 +134,8 @@ export function FormularioEnriquecimento({
           <Layers3 size={16} strokeWidth={1.9} aria-hidden="true" />
         )}
         {desabilitado
-          ? 'Enriquecendo oportunidade'
-          : (rotulo ?? (temDossie ? 'Atualizar enriquecimento' : 'Enriquecer oportunidade'))}
+          ? 'Enriquecendo dados'
+          : (rotulo ?? (temDossie ? 'Atualizar dados' : 'Enriquecer dados'))}
       </button>
 
       {montado &&
@@ -178,7 +178,7 @@ export function FormularioEnriquecimento({
                 </span>
                 <div>
                   <p className={styles.sobretitulo}>Enriquecimento da ficha</p>
-                  <h2 id={tituloId}>Enriquecer esta oportunidade?</h2>
+                  <h2 id={tituloId}>Enriquecer os dados deste cliente?</h2>
                   <p id={descricaoId}>
                     A plataforma usa tudo que já está salvo na ficha. Você não precisa preencher
                     nenhum dado novamente.
@@ -224,7 +224,7 @@ export function FormularioEnriquecimento({
                       <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
                     </span>
                     <p>
-                      <strong>Calls</strong>
+                      <strong>Reuniões</strong>
                       <small>Resumos, dores e próximos passos registrados</small>
                     </p>
                   </div>

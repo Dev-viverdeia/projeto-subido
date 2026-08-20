@@ -122,7 +122,7 @@ export const ROTULO_CONFIANCA: Record<DossieEnriquecido['hipoteses'][number]['co
   };
 
 export const ROTULO_ORIGEM: Record<DossieEnriquecido['fatos'][number]['origem'], string> = {
-  crm: 'CRM',
+  crm: 'Vendas',
   site: 'Site público',
   informado: 'Informado por você',
 };

@@ -267,8 +267,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             <h2>{projeto.empresa}</h2>
             <blockquote>{projeto.documento.objetivo}</blockquote>
             <div>
-              <Link href={`/crm/${projeto.oportunidadeId}`}>
-                <FolderKanban size={15} aria-hidden="true" /> Abrir no CRM
+              <Link href={`/vendas/${projeto.oportunidadeId}`}>
+                <FolderKanban size={15} aria-hidden="true" /> Abrir em Vendas
               </Link>
               <Link href={`/propostas/${projeto.propostaId}`}>
                 <FileSignature size={15} aria-hidden="true" /> Ver proposta

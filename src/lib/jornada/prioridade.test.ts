@@ -62,8 +62,8 @@ describe('prioridade oficial da Início', () => {
 
     expect(prioridade.modo).toBe('plano da jornada');
     expect(prioridade.foco).toBe('Meta da etapa · Descoberta registrada');
-    expect(prioridade.titulo).toBe('Criar a primeira oportunidade');
-    expect(prioridade.destino).toBe('/crm');
+    expect(prioridade.titulo).toBe('Registrar a primeira venda');
+    expect(prioridade.destino).toBe('/vendas');
   });
 
   it('abre o registro exato quando o próximo marco já tem contexto no radar', () => {
@@ -79,14 +79,14 @@ describe('prioridade oficial da Início', () => {
           contexto: 'Clínica Aurora · Novo lead',
           momento: 'Sem próxima ação',
           estado: 'sem_prazo',
-          destino: '/crm/oportunidade-1',
+          destino: '/vendas/oportunidade-1',
           prioridade: 92,
         },
       ]),
     );
 
     expect(prioridade.titulo).toBe('Pesquisar o lead');
-    expect(prioridade.destino).toBe('/crm/oportunidade-1');
+    expect(prioridade.destino).toBe('/vendas/oportunidade-1');
   });
 
   it('faz uma urgência factual vencer o próximo marco planejado', () => {
@@ -100,7 +100,7 @@ describe('prioridade oficial da Início', () => {
           contexto: 'Clínica Aurora · Descoberta',
           momento: 'Ao vivo agora',
           estado: 'ao_vivo',
-          destino: '/calls/call-1',
+          destino: '/reunioes/call-1',
           prioridade: 142,
         },
       ]),
@@ -108,7 +108,7 @@ describe('prioridade oficial da Início', () => {
 
     expect(prioridade.modo).toBe('prioridade da operação');
     expect(prioridade.titulo).toBe('Descoberta com Clínica Aurora');
-    expect(prioridade.destino).toBe('/calls/call-1');
+    expect(prioridade.destino).toBe('/reunioes/call-1');
   });
 
   it('abre o formulário de call já vinculado ao lead em foco', () => {
@@ -139,7 +139,7 @@ describe('prioridade oficial da Início', () => {
 
     expect(prioridade.titulo).toBe('Concluir a descoberta');
     expect(prioridade.destino).toBe(
-      '/calls?nova=1&oportunidade=11111111-1111-4111-8111-111111111111',
+      '/reunioes?nova=1&oportunidade=11111111-1111-4111-8111-111111111111',
     );
   });
 });

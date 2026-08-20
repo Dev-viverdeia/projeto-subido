@@ -35,11 +35,11 @@ describe('FormularioAgendarCall', () => {
     agendarReuniaoMock.mockResolvedValue({});
     render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);
 
-    const gatilho = screen.getByRole('button', { name: 'Agendar call' });
+    const gatilho = screen.getByRole('button', { name: 'Agendar reunião' });
     fireEvent.click(gatilho);
 
-    expect(screen.getByRole('dialog', { name: 'Agendar call' })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByLabelText('Oportunidade')).toHaveFocus());
+    expect(screen.getByRole('dialog', { name: 'Agendar reunião' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('Cliente em negociação')).toHaveFocus());
     expect(screen.getByRole('checkbox')).toBeChecked();
     expect(screen.getByRole('option', { name: /Clínica Aurora/ })).toBeInTheDocument();
 
@@ -59,13 +59,13 @@ describe('FormularioAgendarCall', () => {
       />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Agendar call' })).toBeInTheDocument();
-    expect(screen.getByText('Oportunidade vinculada')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Agendar reunião' })).toBeInTheDocument();
+    expect(screen.getByText('Venda vinculada')).toBeInTheDocument();
     expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
     expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue(
       OPORTUNIDADE.id,
     );
-    await waitFor(() => expect(screen.getByLabelText('Tipo de call')).toHaveFocus());
+    await waitFor(() => expect(screen.getByLabelText('Tipo de reunião')).toHaveFocus());
     await waitFor(() =>
       expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
         String(new Date().getTimezoneOffset()),
@@ -89,7 +89,7 @@ describe('FormularioAgendarCall', () => {
         String(new Date().getTimezoneOffset()),
       ),
     );
-    await user.selectOptions(screen.getByLabelText('Oportunidade'), OPORTUNIDADE.id);
+    await user.selectOptions(screen.getByLabelText('Cliente em negociação'), OPORTUNIDADE.id);
 
     expect(document.querySelector<HTMLInputElement>('input[name="offsetMinutos"]')).toHaveValue(
       String(new Date().getTimezoneOffset()),
@@ -111,7 +111,7 @@ describe('FormularioAgendarCall', () => {
     expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue(
       OPORTUNIDADE.id,
     );
-    expect(screen.getByLabelText('Tipo de call')).toHaveValue('kickoff');
+    expect(screen.getByLabelText('Tipo de reunião')).toHaveValue('kickoff');
   });
 
   it('prepara o convite no Google com o e-mail que já está no CRM', () => {
@@ -129,7 +129,9 @@ describe('FormularioAgendarCall', () => {
       screen.getByRole('heading', { name: 'Convite pelo Google Calendar' }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText('E-mail do cliente')).toHaveValue('camila@clinicaaurora.com.br');
-    expect(screen.getByRole('button', { name: 'Criar call e enviar convite' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Criar reunião e enviar convite' }),
+    ).toBeInTheDocument();
     expect(
       document.querySelector<HTMLInputElement>('input[name="enviarConviteGoogle"]'),
     ).toHaveValue('on');
@@ -154,10 +156,12 @@ describe('FormularioAgendarCall', () => {
 
     expect(screen.getByRole('dialog', { name: 'Conecte sua agenda' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Data e horário')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Criar call/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Criar reunião/ })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Conectar Google Calendar/ })).toHaveAttribute(
       'href',
-      expect.stringContaining(encodeURIComponent(`/calls?nova=1&oportunidade=${OPORTUNIDADE.id}`)),
+      expect.stringContaining(
+        encodeURIComponent(`/reunioes?nova=1&oportunidade=${OPORTUNIDADE.id}`),
+      ),
     );
   });
 
@@ -193,21 +197,21 @@ describe('FormularioAgendarCall', () => {
         duracao: '45',
       },
       porCampo: {
-        oportunidade: 'Escolha uma oportunidade do CRM.',
+        oportunidade: 'Escolha um cliente em Vendas.',
         agendadaPara: 'Escolha data e horário.',
       },
     });
     render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);
 
-    await user.click(screen.getByRole('button', { name: 'Agendar call' }));
-    await user.click(screen.getByRole('button', { name: 'Criar call e enviar convite' }));
+    await user.click(screen.getByRole('button', { name: 'Agendar reunião' }));
+    await user.click(screen.getByRole('button', { name: 'Criar reunião e enviar convite' }));
 
-    const oportunidade = await screen.findByLabelText(/Oportunidade/);
+    const oportunidade = await screen.findByLabelText(/Cliente em negociação/);
     await waitFor(() => expect(oportunidade).toHaveFocus());
     expect(oportunidade).toHaveAttribute('aria-describedby', 'calls-oportunidade-msg');
 
     await user.selectOptions(oportunidade, OPORTUNIDADE.id);
-    expect(screen.queryByText('Escolha uma oportunidade do CRM.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Escolha um cliente em Vendas.')).not.toBeInTheDocument();
     expect(screen.getByText('Escolha data e horário.')).toBeInTheDocument();
   });
 });

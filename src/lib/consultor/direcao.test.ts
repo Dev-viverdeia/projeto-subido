@@ -52,7 +52,7 @@ function sinais(
           etapa === 'aprender'
             ? '/formacoes'
             : etapa === 'prospectar'
-              ? '/crm'
+              ? '/vendas'
               : etapa === 'vender'
                 ? '/propostas'
                 : etapa === 'entregar'
@@ -137,7 +137,10 @@ describe('DirecaoMensagemSchema', () => {
   } as const;
 
   it('preserva conversas antigas sem contexto de confirmação', () => {
-    expect(DirecaoMensagemSchema.safeParse(base).success).toBe(true);
+    const resultado = DirecaoMensagemSchema.safeParse(base);
+    expect(resultado.success).toBe(true);
+    if (!resultado.success) return;
+    expect(resultado.data.proximo_passo.destino).toBe('/vendas');
   });
 
   it('valida o lead original da ação sugerida', () => {

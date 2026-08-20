@@ -42,13 +42,13 @@ export function idEventoGoogle(reuniaoId: string) {
 
 function descricaoEvento(dados: DadosEventoCall, salaUrl: string) {
   const linhas = [
-    `Call com ${dados.empresa}.`,
+    `Reunião com ${dados.empresa}.`,
     dados.contato ? `Contato: ${dados.contato}.` : null,
     '',
     'Acesse a sala da Subido:',
     salaUrl,
     '',
-    'A sala reúne a conversa, a transcrição e os próximos passos desta oportunidade.',
+    'A sala reúne a conversa, a transcrição e os próximos passos desta venda.',
   ];
   return linhas.filter((linha): linha is string => linha !== null).join('\n');
 }
@@ -165,7 +165,7 @@ export async function sincronizarCallNoGoogle(
     const reconectar = erro instanceof GoogleCalendarPrecisaReconectar;
     const mensagem = reconectar
       ? 'A conexão com o Google expirou. Reconecte o calendário e tente novamente.'
-      : 'A call foi criada, mas o Google não enviou o convite. Tente sincronizar novamente.';
+      : 'A reunião foi criada, mas o Google não enviou o convite. Tente sincronizar novamente.';
     await Promise.all([
       marcarCall(supabase, dados.reuniaoId, {
         google_sync_status: 'falhou',

@@ -33,7 +33,7 @@ const LEAD_OPERACIONAL: DossieLead = {
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Call de descoberta concluída',
+    ultimoFato: 'Reunião de descoberta concluída',
     ultimoFatoEm: '2026-08-08T17:44:00.000Z',
     atualizadoEm: '2026-08-08T17:46:00.000Z',
     criadoEm: '2026-08-03T13:00:00.000Z',
@@ -57,26 +57,26 @@ const LEAD_OPERACIONAL: DossieLead = {
     {
       id: 'evento-2',
       titulo: 'Ficha do cliente enriquecida',
-      descricao: 'Site público e histórico do CRM foram consultados novamente.',
+      descricao: 'Site público e histórico da venda foram consultados novamente.',
       tipo: 'enriquecimento',
       ocorridoEm: '2026-08-08T18:10:00.000Z',
       fonte: 'Enriquecimento',
     },
     {
       id: 'evento-1',
-      titulo: 'Call de descoberta concluída',
-      descricao: 'Problemas, decisão e próximos passos entraram no contexto da oportunidade.',
+      titulo: 'Reunião de descoberta concluída',
+      descricao: 'Problemas, decisão e próximos passos entraram na ficha do cliente.',
       tipo: 'call_concluida',
       ocorridoEm: '2026-08-08T17:44:00.000Z',
-      fonte: 'Calls',
+      fonte: 'Reuniões',
     },
     {
       id: 'evento-3',
-      titulo: 'Oportunidade entrou no pipeline',
+      titulo: 'Venda adicionada ao quadro',
       descricao: 'Contato recebido por indicação de um cliente.',
       tipo: 'lead_criado',
       ocorridoEm: '2026-08-03T13:00:00.000Z',
-      fonte: 'CRM',
+      fonte: 'Vendas',
     },
   ],
   calls: [
@@ -303,7 +303,7 @@ const LEAD_OPERACIONAL: DossieLead = {
         alertas: ['O volume de mensagens ainda não foi confirmado em fonte ou call registrada.'],
       },
       fontes: [
-        { tipo: 'crm', titulo: 'CRM e calls', status: 'lida' },
+        { tipo: 'crm', titulo: 'Vendas e reuniões', status: 'lida' },
         {
           tipo: 'site',
           titulo: 'Site da Clínica Aurora',
@@ -332,7 +332,7 @@ const LEAD_NOVO: DossieLead = {
     enriquecimentoStatus: null,
     proximaAcao: null,
     proximaAcaoEm: null,
-    ultimoFato: 'Oportunidade entrou no pipeline',
+    ultimoFato: 'Venda adicionada ao quadro',
     ultimoFatoEm: LEAD_OPERACIONAL.oportunidade.criadoEm,
   },
   empresa: { ...LEAD_OPERACIONAL.empresa, dominio: null },
@@ -390,7 +390,7 @@ export default async function PreviewDossiePage({
 
           {entrada && (
             <p className={pagina.avisoSucesso} role="status">
-              Oportunidade adicionada. A ficha do cliente já está pronta para você trabalhar.
+              Venda adicionada. A ficha do cliente já está pronta para você trabalhar.
             </p>
           )}
           <ResumoOperacionalLead lead={lead} />

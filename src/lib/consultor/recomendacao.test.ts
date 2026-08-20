@@ -31,7 +31,7 @@ describe('recomendação factual do Sobral AI', () => {
 
   it('só expõe fatos que realmente existem no contexto', () => {
     expect(resolverFatosUsados(contexto.fatos, [2, 99, 2])).toEqual([
-      'Call · A diretora fará a validação final.',
+      'Reunião · A diretora fará a validação final.',
     ]);
   });
 

@@ -14,7 +14,7 @@ function BotaoSalvar({ salva }: { salva: boolean }) {
     <Button type="submit" variant="primary" loading={pending} disabled={salva || pending}>
       {salva ? (
         <>
-          <Check size={15} aria-hidden="true" /> Salva no pipeline
+          <Check size={15} aria-hidden="true" /> Salva na ficha
         </>
       ) : pending ? (
         'Salvando ação…'

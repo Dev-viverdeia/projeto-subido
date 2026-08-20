@@ -96,7 +96,7 @@ export function ConfirmarAcaoCrm({
           <ClipboardCheck size={17} strokeWidth={1.9} />
         </span>
         <span className={styles.conviteCorpo}>
-          <small>Ação pronta para o CRM</small>
+          <small>Ação pronta para a ficha</small>
           <strong>{contexto.acao_sugerida}</strong>
           <em>{contexto.empresa}</em>
         </span>
@@ -148,7 +148,7 @@ export function ConfirmarAcaoCrm({
         <span>
           <ClipboardCheck size={16} strokeWidth={1.9} aria-hidden="true" />
           <span>
-            <small>Confirmar no CRM</small>
+            <small>Confirmar na ficha</small>
             <strong>{contexto.empresa}</strong>
           </span>
         </span>
@@ -180,7 +180,7 @@ export function ConfirmarAcaoCrm({
         </label>
         <button type="submit" className={styles.confirmar} disabled={pendente}>
           {pendente ? <LoaderCircle className={styles.spinner} size={15} /> : <Check size={15} />}
-          {pendente ? 'Registrando' : 'Registrar no CRM'}
+          {pendente ? 'Registrando' : 'Registrar na ficha'}
         </button>
       </div>
       {contexto.acao_atual && contexto.acao_atual !== contexto.acao_sugerida ? (

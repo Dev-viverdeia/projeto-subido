@@ -57,7 +57,7 @@ describe('ciclo factual do cliente', () => {
       'Ainda não criada',
       'Ainda não iniciada',
     ]);
-    expect(ciclo.decisao).toMatchObject({ acao: 'Agendar call', novoCiclo: false });
+    expect(ciclo.decisao).toMatchObject({ acao: 'Agendar reunião', novoCiclo: false });
   });
 
   it('preserva uma call real como contexto da proposta', () => {
@@ -79,7 +79,7 @@ describe('ciclo factual do cliente', () => {
     const ciclo = montarCicloCliente(lead);
 
     expect(ciclo.decisao).toMatchObject({
-      acao: 'Revisar pós-call',
+      acao: 'Revisar resumo',
       apoioHref: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}`,
     });
   });
@@ -109,13 +109,13 @@ describe('ciclo factual do cliente', () => {
     const ciclo = montarCicloCliente(lead);
 
     expect(ciclo.etapas[1]).toMatchObject({
-      href: `/calls/${lead.calls[0]!.id}`,
+      href: `/reunioes/${lead.calls[0]!.id}`,
       comprovada: true,
     });
     expect(ciclo.decisao).toMatchObject({
       href: `/propostas/${lead.propostaRecente.id}`,
-      apoioHref: `/calls/${lead.calls[0]!.id}`,
-      apoioRotulo: 'Revisar call de origem',
+      apoioHref: `/reunioes/${lead.calls[0]!.id}`,
+      apoioRotulo: 'Revisar reunião de origem',
     });
   });
 

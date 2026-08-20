@@ -223,14 +223,14 @@ export function AcaoCrmRegistrada({
   return (
     <section
       className={`${styles.registro} ${concluida ? styles.registroConcluido : ''}`}
-      aria-label={concluida ? 'Ação concluída' : 'Ação ativa no CRM'}
+      aria-label={concluida ? 'Ação concluída' : 'Ação ativa em Vendas'}
     >
       <header className={styles.resumoRegistro}>
         <span className={styles.iconeConfirmado} aria-hidden="true">
           {concluida ? <CheckCircle2 size={16} /> : <Check size={15} strokeWidth={2.5} />}
         </span>
         <span className={styles.comprovanteCorpo}>
-          <small>{concluida ? 'Concluída' : 'Ativa no CRM'}</small>
+          <small>{concluida ? 'Concluída' : 'Ativa em Vendas'}</small>
           <strong>{recibo.acao}</strong>
           <em>
             {contexto.empresa}
@@ -242,9 +242,9 @@ export function AcaoCrmRegistrada({
           </em>
         </span>
         <Link
-          href={`/crm/${contexto.oportunidade_id}`}
+          href={`/vendas/${contexto.oportunidade_id}`}
           className={styles.abrirLead}
-          aria-label={`Ver oportunidade de ${contexto.empresa}`}
+          aria-label={`Abrir ficha de ${contexto.empresa}`}
         >
           <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
         </Link>

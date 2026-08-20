@@ -34,9 +34,9 @@ function ItemPlano({ projetoId, acao }: { projetoId: string; acao: AcaoPlanoProj
             </time>
           )}
           {acao.reuniaoId && (
-            <Link href={`/calls/${acao.reuniaoId}`}>
+            <Link href={`/reunioes/${acao.reuniaoId}`}>
               <Video size={13} aria-hidden="true" />
-              Ver call
+              Ver reunião
               <ArrowUpRight size={12} aria-hidden="true" />
             </Link>
           )}

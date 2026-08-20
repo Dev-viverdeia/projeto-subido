@@ -131,7 +131,7 @@ export async function confirmarAcaoCrm(
 
   return {
     status: 'sucesso',
-    mensagem: 'Ação registrada no CRM e no plano do cliente.',
+    mensagem: 'Ação registrada na venda e no plano do cliente.',
     acao: validacao.data.acao,
     quando: validacao.data.quando || null,
   };
@@ -188,7 +188,8 @@ export async function gerenciarAcaoCrm(
   if (data === 'desatualizada') {
     return {
       status: 'erro',
-      mensagem: 'Outra ação já assumiu este lead. Abra o CRM antes de decidir o próximo passo.',
+      mensagem:
+        'Outra ação já atualizou este cliente. Abra a ficha antes de decidir o próximo passo.',
     };
   }
   if (data === 'indisponivel' || data === 'nao_encontrada') {
@@ -220,8 +221,8 @@ export async function gerenciarAcaoCrm(
       validacao.data.operacao === 'concluir'
         ? 'Ação concluída e removida das pendências do lead.'
         : validacao.data.operacao === 'remarcar'
-          ? 'Nova data registrada no CRM e no plano.'
-          : 'Próxima ação substituída no CRM e no plano.',
+          ? 'Nova data registrada na venda e no plano.'
+          : 'Próxima ação substituída na venda e no plano.',
     operacao: validacao.data.operacao,
     acao: validacao.data.acao || undefined,
     quando: validacao.data.quando || null,
@@ -274,7 +275,7 @@ export async function confirmarRecomendacaoCrm(
   if (data === 'desatualizada') {
     return {
       status: 'erro',
-      mensagem: 'O CRM já recebeu outro compromisso. Abra o lead antes de confirmar esta ação.',
+      mensagem: 'A venda já recebeu outro compromisso. Abra a ficha antes de confirmar esta ação.',
     };
   }
   if (data === 'indisponivel' || data === 'nao_encontrada') {
@@ -282,13 +283,13 @@ export async function confirmarRecomendacaoCrm(
   }
   if (data === 'ja_confirmada') {
     revalidarOperacao();
-    return { status: 'sucesso', mensagem: 'Este próximo passo já estava no CRM.' };
+    return { status: 'sucesso', mensagem: 'Este próximo passo já estava na venda.' };
   }
 
   revalidarOperacao();
   return {
     status: 'sucesso',
-    mensagem: 'Novo próximo passo registrado no CRM e no plano.',
+    mensagem: 'Novo próximo passo registrado na venda e no plano.',
     acao: validacao.data.acao,
     quando: validacao.data.quando || null,
   };

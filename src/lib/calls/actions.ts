@@ -13,7 +13,7 @@ const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
 
 const agendarSchema = z
   .object({
-    oportunidade: z.uuid('Escolha uma oportunidade do CRM.'),
+    oportunidade: z.uuid('Escolha um cliente em Vendas.'),
     tipo: z.enum(tipos),
     titulo: z.string().trim().max(180, 'Título muito longo.'),
     agendadaPara: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Escolha data e horário.'),
@@ -142,7 +142,7 @@ export async function agendarReuniao(
 
   if (error) {
     console.error(`[calls:agendar] ${error.code}: ${error.message}`);
-    return { campos, erro: 'Não foi possível agendar a call agora. Tente novamente.' };
+    return { campos, erro: 'Não foi possível agendar a reunião agora. Tente novamente.' };
   }
 
   const reuniao = z.object({ reuniao_id: z.uuid(), codigo_publico: z.uuid() }).safeParse(data?.[0]);
@@ -150,7 +150,7 @@ export async function agendarReuniao(
     console.error('[calls:agendar] A call foi criada sem um identificador válido.');
     return {
       campos,
-      erro: 'A call foi criada, mas não conseguimos abrir a sala preparada. Atualize as Calls.',
+      erro: 'A reunião foi criada, mas não conseguimos abrir a sala preparada. Atualize Reuniões.',
     };
   }
 
@@ -208,12 +208,12 @@ export async function agendarReuniao(
   revalidarDirecaoOperacional();
   const parametros = new URLSearchParams({ agendada: reuniao.data.reuniao_id });
   if (calendar) parametros.set('calendar', calendar);
-  redirect(`/calls?${parametros.toString()}`);
+  redirect(`/reunioes?${parametros.toString()}`);
 }
 
 export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
   const reuniaoId = z.uuid().safeParse(formData.get('reuniao'));
-  if (!reuniaoId.success) redirect('/calls?calendar=falhou');
+  if (!reuniaoId.success) redirect('/reunioes?calendar=falhou');
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
@@ -236,7 +236,7 @@ export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
     .eq('id', reuniaoId.data)
     .maybeSingle();
 
-  if (error || !reuniao?.convidado_email) redirect('/calls?calendar=falhou');
+  if (error || !reuniao?.convidado_email) redirect('/reunioes?calendar=falhou');
 
   const resultado = await sincronizarCallNoGoogle(supabase, {
     reuniaoId: reuniao.id,
@@ -251,7 +251,7 @@ export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
 
   revalidatePath('/calls');
   const calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
-  redirect(`/calls?agendada=${reuniao.id}&calendar=${calendar}`);
+  redirect(`/reunioes?agendada=${reuniao.id}&calendar=${calendar}`);
 }
 
 export async function aplicarPlanoCall(formData: FormData): Promise<void> {
@@ -264,7 +264,7 @@ export async function aplicarPlanoCall(formData: FormData): Promise<void> {
     compromissos: formData.getAll('compromissos'),
   });
   const reuniao = texto(formData, 'reuniao');
-  if (!validacao.success) redirect(`/calls/${reuniao}?plano=erro`);
+  if (!validacao.success) redirect(`/reunioes/${reuniao}?plano=erro`);
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
@@ -281,7 +281,7 @@ export async function aplicarPlanoCall(formData: FormData): Promise<void> {
 
   if (error) {
     console.error(`[calls:aplicar-plano] ${error.code}: ${error.message}`);
-    redirect(`/calls/${validacao.data.reuniao}?plano=erro`);
+    redirect(`/reunioes/${validacao.data.reuniao}?plano=erro`);
   }
 
   revalidatePath('/calls');
@@ -294,6 +294,6 @@ export async function aplicarPlanoCall(formData: FormData): Promise<void> {
     data && typeof data === 'object' && !Array.isArray(data) && data.aplicado,
   );
   redirect(
-    `/calls/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}#proximo-passo-pos-call`,
+    `/reunioes/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}#proximo-passo-pos-call`,
   );
 }

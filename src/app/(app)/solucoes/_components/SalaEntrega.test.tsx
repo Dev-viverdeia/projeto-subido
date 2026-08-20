@@ -180,7 +180,7 @@ describe('SalaEntrega', () => {
     );
     expect(screen.getByRole('link', { name: /Agendar kickoff/i })).toHaveAttribute(
       'href',
-      `/calls?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
+      `/reunioes?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
     );
     expect(screen.getByLabelText('Prazo da entrega')).toBeVisible();
     expect(screen.getByRole('button', { name: /Começar agora/i })).toBeVisible();

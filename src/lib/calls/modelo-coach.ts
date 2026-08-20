@@ -131,6 +131,6 @@ export async function gerarAnaliseCall({
     } else {
       console.error('[calls:analise:modelo] falha não classificada:', erro);
     }
-    throw new ErroModeloCoach('A análise pós-call não pôde ser concluída agora.');
+    throw new ErroModeloCoach('A análise da reunião não pôde ser concluída agora.');
   }
 }

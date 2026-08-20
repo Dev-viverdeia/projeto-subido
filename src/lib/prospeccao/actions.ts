@@ -124,5 +124,5 @@ export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
   revalidatePath('/prospeccao');
   revalidatePath('/crm');
   revalidarDirecaoOperacional();
-  redirect(`/crm/${oportunidade.data}?novo=1&origem=prospeccao`);
+  redirect(`/vendas/${oportunidade.data}?novo=1&origem=prospeccao`);
 }

@@ -61,7 +61,7 @@ describe('resultados da prospecção', () => {
     expect(
       screen.getByRole('link', { name: 'contato@clinica-aurora.example.com' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Adicionar ao CRM' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Adicionar a Vendas' })).toBeInTheDocument();
 
     const detalhes = screen.getByRole('button', { name: 'Ver detalhes' });
     await user.click(detalhes);

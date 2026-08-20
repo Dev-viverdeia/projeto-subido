@@ -148,7 +148,7 @@ export function InteligenciaDeContato({
             </div>
           ) : (
             <p className={styles.estadoContatoVazio}>
-              Nenhum canal direto foi confirmado. Use o site ou a primeira call para localizar o
+              Nenhum canal direto foi confirmado. Use o site ou a primeira reunião para localizar o
               contato certo.
             </p>
           )}

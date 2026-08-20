@@ -15,7 +15,10 @@ export function retornoGoogleCalendarSeguro(valor: string | null | undefined) {
     return '/conta';
   }
 
-  const url = new URL(valor, env.NEXT_PUBLIC_SITE_URL);
+  const legadoAtualizado = valor
+    .replace(/^\/crm(?=\/|\?|$)/, '/vendas')
+    .replace(/^\/calls(?=\/|\?|$)/, '/reunioes');
+  const url = new URL(legadoAtualizado, env.NEXT_PUBLIC_SITE_URL);
   const permitida = ROTAS_APP.some(
     (rota) => url.pathname === rota || url.pathname.startsWith(`${rota}/`),
   );

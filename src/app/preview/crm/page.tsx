@@ -15,12 +15,12 @@ import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from '../mapa-jornada/preview.module.css';
 
-export const metadata: Metadata = { title: 'Preview · CRM' };
+export const metadata: Metadata = { title: 'Preview · Vendas' };
 
 const AGORA = new Date().toISOString();
 
 /**
- * Fixture exclusivamente visual. A rota devolve 404 em produção; o CRM real
+ * Fixture exclusivamente visual. A rota devolve 404 em produção; a área de Vendas real
  * nunca recebe estes dados e continua nascendo vazio para cada profissional.
  */
 const OPORTUNIDADES: OportunidadeCrm[] = [
@@ -42,7 +42,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Lead adicionado ao CRM',
+    ultimoFato: 'Cliente adicionado a Vendas',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -65,7 +65,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Etapa do pipeline alterada',
+    ultimoFato: 'Etapa da venda alterada',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -88,7 +88,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Etapa do pipeline alterada',
+    ultimoFato: 'Etapa da venda alterada',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -111,7 +111,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: AGORA,
     perdidaEm: null,
     motivoPerda: null,
-    ultimoFato: 'Oportunidade marcada como ganha',
+    ultimoFato: 'Venda marcada como ganha',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -134,7 +134,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     ganhaEm: null,
     perdidaEm: AGORA,
     motivoPerda: 'momento_inadequado',
-    ultimoFato: 'Oportunidade marcada como perdida',
+    ultimoFato: 'Venda marcada como perdida',
     ultimoFatoEm: AGORA,
     atualizadoEm: AGORA,
     criadoEm: AGORA,
@@ -156,7 +156,7 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <a className={styles.ativo} href="#conteudo">
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </a>
           <span>
             <BriefcaseBusiness size={18} strokeWidth={1.7} aria-hidden="true" /> Projetos
@@ -178,8 +178,8 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
           <header className={pagina.topo}>
             <div className={pagina.linhaTopo}>
               <div className={pagina.introducao}>
-                <p className={pagina.sobretitulo}>Sua operação comercial</p>
-                <h1>Oportunidades</h1>
+                <p className={pagina.sobretitulo}>Suas vendas</p>
+                <h1>Clientes em negociação</h1>
                 <p>Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.</p>
               </div>
               <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
@@ -188,7 +188,7 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
 
           <section className={pagina.quadro} aria-labelledby="preview-pipeline-titulo">
             <h2 id="preview-pipeline-titulo" className={pagina.tituloOculto}>
-              Pipeline de oportunidades
+              Quadro de vendas
             </h2>
             <PipelineCrm oportunidades={OPORTUNIDADES} />
           </section>

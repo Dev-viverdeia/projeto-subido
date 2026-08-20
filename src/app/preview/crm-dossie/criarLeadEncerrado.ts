@@ -14,9 +14,7 @@ export function criarLeadEncerrado(lead: DossieLead, etapa: 'ganho' | 'perdido')
       ganhaEm: vendaGanha ? concluidoEm : null,
       perdidaEm: vendaGanha ? null : concluidoEm,
       motivoPerda: vendaGanha ? null : 'momento_inadequado',
-      ultimoFato: vendaGanha
-        ? 'Oportunidade marcada como ganha'
-        : 'Oportunidade marcada como perdida',
+      ultimoFato: vendaGanha ? 'Venda marcada como ganha' : 'Venda marcada como perdida',
       ultimoFatoEm: concluidoEm,
     },
     acoesPlano: [],

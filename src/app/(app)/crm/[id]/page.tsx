@@ -10,7 +10,7 @@ import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import styles from './pagina.module.css';
 
-export const metadata: Metadata = { title: 'Ficha do cliente · CRM' };
+export const metadata: Metadata = { title: 'Ficha do cliente · Vendas' };
 
 export default async function OportunidadePage({ params, searchParams }: PageProps<'/crm/[id]'>) {
   const [{ id }, parametros] = await Promise.all([params, searchParams]);
@@ -33,9 +33,9 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       : null;
   return (
     <div className={styles.pagina}>
-      <Link href="/crm" className={styles.voltar}>
+      <Link href="/vendas" className={styles.voltar}>
         <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
-        Voltar ao pipeline
+        Voltar para Vendas
       </Link>
 
       <CabecalhoDossie
@@ -47,14 +47,13 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
 
       {entradaRecente && (
         <p className={styles.avisoSucesso} role="status">
-          Oportunidade adicionada. A ficha do cliente já está pronta para você trabalhar.
+          Venda adicionada. A ficha do cliente já está pronta para você trabalhar.
         </p>
       )}
 
       {falhaNovoCiclo && (
         <p className={styles.avisoOperacao} role="alert">
-          Não conseguimos abrir outro ciclo agora. Esta oportunidade continua salva; tente
-          novamente.
+          Não conseguimos abrir outra venda agora. Esta ficha continua salva; tente novamente.
         </p>
       )}
 

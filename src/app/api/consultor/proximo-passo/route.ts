@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     }
 
     const leitura = await obterContextoProximoPasso(supabase, acao.oportunidade_id);
-    if (!leitura) return resposta('A oportunidade não está mais disponível.', 404);
+    if (!leitura) return resposta('Esta venda não está mais disponível.', 404);
 
     const uso = await obterUsoDoMes(supabase);
     let recomendacao = criarRecomendacaoFallback(leitura.contexto);

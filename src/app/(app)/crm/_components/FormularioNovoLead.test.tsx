@@ -17,8 +17,10 @@ describe('FormularioNovoLead', () => {
     criarLeadMock.mockResolvedValue({});
     render(<FormularioNovoLead />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Nova oportunidade' }));
-    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Adicionar empresa' }));
+    expect(
+      screen.getByRole('dialog', { name: 'Qual empresa você quer acompanhar?' }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Empresa')).toHaveFocus();
 
     fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
@@ -36,8 +38,8 @@ describe('FormularioNovoLead', () => {
     });
     render(<FormularioNovoLead />);
 
-    await user.click(screen.getByRole('button', { name: 'Nova oportunidade' }));
-    await user.click(screen.getByRole('button', { name: 'Criar oportunidade' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar empresa' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar a Vendas' }));
 
     await waitFor(() => expect(screen.getByLabelText('Empresa')).toHaveFocus());
     expect(screen.getByText('Digite o nome da empresa.')).toBeInTheDocument();
@@ -47,7 +49,7 @@ describe('FormularioNovoLead', () => {
     expect(screen.getByText('Digite o nome do contato.')).toBeInTheDocument();
   });
 
-  it('abre pelo projeto com a oportunidade já identificada', () => {
+  it('abre pelo projeto com a venda já identificada', () => {
     criarLeadMock.mockResolvedValue({});
     render(
       <FormularioNovoLead
@@ -57,7 +59,9 @@ describe('FormularioNovoLead', () => {
       />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('dialog', { name: 'Qual empresa você quer acompanhar?' }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('Projeto que pode ser vendido')).toHaveValue(
       'Atendimento com IA no WhatsApp',
     );

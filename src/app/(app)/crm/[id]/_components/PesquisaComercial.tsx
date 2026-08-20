@@ -35,7 +35,7 @@ type AbaPesquisa = 'leitura' | 'conversa' | 'fontes';
 
 const ABAS: ReadonlyArray<{ id: AbaPesquisa; rotulo: string }> = [
   { id: 'leitura', rotulo: 'Visão geral' },
-  { id: 'conversa', rotulo: 'Preparar call' },
+  { id: 'conversa', rotulo: 'Preparar reunião' },
   { id: 'fontes', rotulo: 'Dados e fontes' },
 ];
 
@@ -79,7 +79,7 @@ function ListaHipoteses({ dossie }: { dossie: DossieEnriquecido }) {
     <section className={styles.painelLeitura} aria-labelledby="hipoteses-titulo">
       <header>
         <div>
-          <p>Confirmar na call</p>
+          <p>Confirmar na reunião</p>
           <h3 id="hipoteses-titulo">O que ainda é hipótese</h3>
         </div>
         <span>{dossie.hipoteses.length}</span>
@@ -118,8 +118,8 @@ function PrepararConversa({ dossie }: { dossie: DossieEnriquecido }) {
             <Route size={19} strokeWidth={1.7} />
           </span>
           <div>
-            <p>Objetivo comercial</p>
-            <h3 id="objetivo-call-titulo">O que esta call precisa resolver</h3>
+            <p>Objetivo da reunião</p>
+            <h3 id="objetivo-call-titulo">O que esta reunião precisa esclarecer</h3>
             <span>{roteiro.objetivo}</span>
           </div>
         </div>
@@ -161,7 +161,7 @@ function PrepararConversa({ dossie }: { dossie: DossieEnriquecido }) {
         <section className={styles.painelLeitura} aria-labelledby="projetos-titulo">
           <header>
             <div>
-              <p>Aderência comercial</p>
+              <p>Possibilidades de projeto</p>
               <h3 id="projetos-titulo">Projetos para validar</h3>
             </div>
             <Target size={18} strokeWidth={1.7} aria-hidden="true" />

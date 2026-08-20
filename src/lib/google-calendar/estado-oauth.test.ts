@@ -6,7 +6,8 @@ import { retornoGoogleCalendarSeguro } from './estado-oauth';
 
 describe('retornoGoogleCalendarSeguro', () => {
   it('aceita somente rotas internas conhecidas da plataforma', () => {
-    expect(retornoGoogleCalendarSeguro('/calls?nova=1')).toBe('/calls?nova=1');
+    expect(retornoGoogleCalendarSeguro('/reunioes?nova=1')).toBe('/reunioes?nova=1');
+    expect(retornoGoogleCalendarSeguro('/calls?nova=1')).toBe('/reunioes?nova=1');
     expect(retornoGoogleCalendarSeguro('/conta')).toBe('/conta');
   });
 

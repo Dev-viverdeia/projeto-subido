@@ -131,7 +131,7 @@ describe('PesquisaComercial', () => {
     expect(screen.getByText('WhatsApp em destaque')).toBeVisible();
     expect(screen.queryByText('Quantas conversas chegam por dia?')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Preparar call' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Preparar reunião' }));
     expect(screen.getByText(DOSSIE.roteiroCall!.objetivo)).toBeVisible();
     expect(screen.getByText(/Vi que o WhatsApp concentra a demanda/)).toBeVisible();
     expect(

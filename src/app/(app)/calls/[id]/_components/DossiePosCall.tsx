@@ -57,7 +57,7 @@ function duracao(posCall: PosCall): string {
 }
 
 function minuto(segundo: number | null): string {
-  if (segundo === null) return 'durante a call';
+  if (segundo === null) return 'durante a reunião';
   const minutos = Math.floor(segundo / 60);
   const segundos = segundo % 60;
   return `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
@@ -74,7 +74,7 @@ function estadoDaAnalise(posCall: PosCall) {
     return { rotulo: 'Sem conteúdo', tipo: 'sem_conteudo' } as const;
   }
   if (posCall.reuniao.status === 'cancelada') {
-    return { rotulo: 'Call cancelada', tipo: 'indisponivel' } as const;
+    return { rotulo: 'Reunião cancelada', tipo: 'indisponivel' } as const;
   }
   return { rotulo: 'Processando', tipo: 'processando' } as const;
 }
@@ -109,10 +109,10 @@ export function DossiePosCall({
   const temAnalise = estado.tipo === 'pronta';
   return (
     <div className={styles.pagina}>
-      <nav className={styles.navegacao} aria-label="Navegação do pós-call">
-        <Link href="/calls">
+      <nav className={styles.navegacao} aria-label="Navegação após a reunião">
+        <Link href="/reunioes">
           <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
-          Voltar às calls
+          Voltar às reuniões
         </Link>
         <span>
           {DATA.format(new Date(posCall.reuniao.agendadaPara))} ·{' '}
@@ -125,7 +125,7 @@ export function DossiePosCall({
           <div className={styles.heroTitulo}>
             <div className={styles.sobretituloHero}>
               <IconeEstado tipo={estado.tipo} />
-              Resumo da call · {estado.rotulo}
+              Resumo da reunião · {estado.rotulo}
             </div>
             <h1>{posCall.reuniao.titulo}</h1>
             <p>
@@ -142,10 +142,10 @@ export function DossiePosCall({
         <div className={styles.heroDecisao}>
           <div>
             <small>Próxima ação sugerida</small>
-            <strong>{acaoSugerida || 'Defina a próxima ação antes de atualizar o CRM'}</strong>
+            <strong>{acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}</strong>
           </div>
           <a href="#plano-da-call">
-            Revisar e atualizar CRM <ChevronRight size={15} aria-hidden="true" />
+            Revisar e atualizar a venda <ChevronRight size={15} aria-hidden="true" />
           </a>
         </div>
 
@@ -169,7 +169,7 @@ export function DossiePosCall({
         <div className={styles.leituraCorpo}>
           <div className={styles.leituraTopo}>
             <div>
-              <p className={styles.sobretitulo}>Resumo da call</p>
+              <p className={styles.sobretitulo}>Resumo da reunião</p>
               <h2 id="leitura-titulo">Resumo e pontos principais</h2>
             </div>
             {nota !== null && nota !== undefined && (
@@ -195,7 +195,7 @@ export function DossiePosCall({
             <div className={styles.estadoLeitura}>
               <CircleHelp size={19} aria-hidden="true" />
               <div>
-                <strong>A call terminou sem conversa suficiente para uma leitura.</strong>
+                <strong>A reunião terminou sem conversa suficiente para uma leitura.</strong>
                 <p>A transcrição foi salva, mas não há conteúdo suficiente para resumir.</p>
               </div>
             </div>
@@ -203,8 +203,8 @@ export function DossiePosCall({
             <div className={styles.estadoLeitura}>
               <CircleAlert size={19} aria-hidden="true" />
               <div>
-                <strong>Esta call foi cancelada antes de gerar conteúdo.</strong>
-                <p>A call continua no histórico do lead.</p>
+                <strong>Esta reunião foi cancelada antes de gerar conteúdo.</strong>
+                <p>A reunião continua no histórico do cliente.</p>
               </div>
             </div>
           ) : (
@@ -218,7 +218,7 @@ export function DossiePosCall({
           )}
           <div className={styles.leituraRodape}>
             <span>Tom percebido: {sentimento}</span>
-            <small>Análise feita por IA · revise antes de atualizar o CRM</small>
+            <small>Análise feita por IA · revise antes de atualizar a venda</small>
           </div>
         </div>
       </section>
@@ -291,7 +291,7 @@ export function DossiePosCall({
               <summary>
                 <div>
                   <p>Live Coach</p>
-                  <h2>Rever as sugestões da call</h2>
+                  <h2>Rever as sugestões da reunião</h2>
                 </div>
                 <span>
                   {posCall.coach.length} intervenções

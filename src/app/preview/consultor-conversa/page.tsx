@@ -39,16 +39,16 @@ const mensagens: MensagemDoConsultor[] = [
         titulo: 'Confirmar decisor e data da decisão',
         detalhe:
           'Revise o escopo final com quem decide e registre uma data clara para a resposta do cliente.',
-        evidencia: 'Decisor e data da resposta registrados na oportunidade.',
-        destino: '/crm',
+        evidencia: 'Decisor e data da resposta registrados na ficha do cliente.',
+        destino: '/vendas',
       },
       acoes: [
         {
           titulo: 'Confirmar decisor e data da decisão',
           detalhe:
             'Revise o escopo final com quem decide e registre uma data clara para a resposta do cliente.',
-          evidencia: 'Decisor e data da resposta registrados na oportunidade.',
-          destino: '/crm',
+          evidencia: 'Decisor e data da resposta registrados na ficha do cliente.',
+          destino: '/vendas',
         },
       ],
       gerado_em: '2026-08-10T18:00:00.000Z',
@@ -73,8 +73,8 @@ const mensagens: MensagemDoConsultor[] = [
           'A proposta já foi apresentada e você confirmou quem decide. Agora, marque a conversa e deixe claro qual decisão precisa sair dela.',
         fatos: [
           'Proposta · “Projeto de atendimento com IA” está com status apresentada.',
-          'Call · Decisão: a diretora de operações fará a validação final.',
-          'CRM · A oportunidade está em negociação e ficou sem próxima ação após a conclusão.',
+          'Reunião · Decisão: a diretora de operações fará a validação final.',
+          'Vendas · O cliente está em negociação e ficou sem próxima ação após a conclusão.',
         ],
         quando: '2026-08-13T12:00:00-03:00',
         status: 'pendente',
@@ -120,10 +120,10 @@ export default function PreviewConsultorConversaPage() {
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </span>
           <span>
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
           </span>
           <span>
             <FileText size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas

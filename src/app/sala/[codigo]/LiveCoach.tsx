@@ -152,7 +152,9 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       concluido = true;
     } catch (erro) {
       pendentesRef.current = [...lote, ...pendentesRef.current];
-      setFalha(erro instanceof Error ? erro.message : 'A inteligência da call foi interrompida.');
+      setFalha(
+        erro instanceof Error ? erro.message : 'A inteligência da reunião foi interrompida.',
+      );
       setEstado('indisponivel');
     } finally {
       envioRef.current = false;
@@ -377,7 +379,7 @@ export function CabineLiveCoach({
           <i />
         </span>
         <div>
-          <p>{ativo ? 'Live Coach' : 'Memória da call'}</p>
+          <p>{ativo ? 'Live Coach' : 'Memória da reunião'}</p>
           <span>{ROTULO_ESTADO[estado]}</span>
         </div>
         <span className={styles.privado}>
@@ -408,7 +410,7 @@ export function CabineLiveCoach({
             <p>
               {ativo
                 ? 'Quando houver um sinal útil, uma única recomendação aparece aqui.'
-                : 'Os trechos serão salvos na oportunidade ao encerrar.'}
+                : 'Os trechos serão salvos na ficha ao encerrar.'}
             </p>
           </div>
         )}
@@ -430,7 +432,7 @@ export function CabineLiveCoach({
         </span>
         <span>
           <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
-          Ao encerrar: resumo, decisões e próximo passo no CRM
+          Ao encerrar: resumo, decisões e próximo passo na ficha do cliente
         </span>
       </footer>
     </aside>

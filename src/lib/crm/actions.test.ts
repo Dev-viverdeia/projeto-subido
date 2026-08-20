@@ -44,11 +44,11 @@ describe('criarLead', () => {
       p_contato_email: 'camila@clinicaaurora.com.br',
       p_oportunidade_titulo: 'Automação do atendimento',
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor');
     expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
-    expect(redirect).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}?novo=1`);
+    expect(redirect).toHaveBeenCalledWith(`/vendas/${OPORTUNIDADE_ID}?novo=1`);
   });
 
   it('preserva o Projeto escolhido até a proposta', async () => {
@@ -59,7 +59,7 @@ describe('criarLead', () => {
     await criarLead({}, dados);
 
     expect(redirect).toHaveBeenCalledWith(
-      `/crm/${OPORTUNIDADE_ID}?novo=1&projeto=sdr-atendimento-qualificacao`,
+      `/vendas/${OPORTUNIDADE_ID}?novo=1&projeto=sdr-atendimento-qualificacao`,
     );
   });
 
@@ -68,7 +68,7 @@ describe('criarLead', () => {
 
     const resposta = await criarLead({}, dadosValidos());
 
-    expect(resposta.erro).toContain('não conseguimos abrir a próxima etapa');
+    expect(resposta.erro).toContain('não conseguimos abrir a ficha');
     expect(redirect).not.toHaveBeenCalled();
   });
 });
@@ -90,8 +90,8 @@ describe('iniciarNovoCicloCliente', () => {
     expect(rpc).toHaveBeenCalledWith('crm_iniciar_novo_ciclo', {
       p_oportunidade: OPORTUNIDADE_ID,
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/crm');
-    expect(redirect).toHaveBeenCalledWith(`/crm/${NOVA_OPORTUNIDADE}?novo=1`);
+    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
+    expect(redirect).toHaveBeenCalledWith(`/vendas/${NOVA_OPORTUNIDADE}?novo=1`);
   });
 });
 
@@ -113,8 +113,8 @@ describe('moverOportunidadeKanban', () => {
       p_etapa: 'perdido',
       p_motivo_perda: 'sem_prioridade',
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/crm');
-    expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
+    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
+    expect(revalidatePath).toHaveBeenCalledWith(`/vendas/${OPORTUNIDADE_ID}`);
   });
 
   it('recusa encerrar como perdido sem contexto', async () => {

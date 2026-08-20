@@ -30,8 +30,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
           <p className={styles.sobretitulo}>Propostas comerciais</p>
           <h1>Crie e acompanhe propostas.</h1>
           <p>
-            Use os dados do CRM e um projeto como base. Revise o texto antes de apresentar ao
-            cliente.
+            Use os dados da ficha do cliente e um projeto como base. Revise o texto antes de
+            apresentar ao cliente.
           </p>
         </div>
         <Link href="/propostas/nova" className={styles.nova}>
@@ -119,9 +119,9 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
             <Layers3 size={22} strokeWidth={1.7} aria-hidden="true" />
           </span>
           <p className={styles.sobretitulo}>Primeira proposta</p>
-          <h2>Crie uma proposta para uma oportunidade do CRM.</h2>
+          <h2>Crie uma proposta para um cliente em negociação.</h2>
           <p>
-            Escolha a oportunidade e o projeto. A plataforma prepara um rascunho para você revisar,
+            Escolha o cliente e o projeto. A plataforma prepara um rascunho para você revisar,
             salvar e baixar em PDF.
           </p>
           <Link href="/propostas/nova" className={styles.nova}>

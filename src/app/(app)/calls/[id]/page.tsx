@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { obterPosCall } from '@/lib/calls/queries';
 import { DossiePosCall } from './_components/DossiePosCall';
 
-export const metadata: Metadata = { title: 'Resumo da call' };
+export const metadata: Metadata = { title: 'Resumo da reunião' };
 
 export default async function PosCallPage({ params, searchParams }: PageProps<'/calls/[id]'>) {
   const [{ id }, parametros] = await Promise.all([params, searchParams]);
