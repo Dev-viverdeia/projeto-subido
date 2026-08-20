@@ -3,10 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
-
-export type EstadoIntroducao = { erro: string | null };
-
-export const ESTADO_INICIAL_INTRODUCAO: EstadoIntroducao = { erro: null };
+import type { EstadoIntroducao } from './estado';
 
 /**
  * Registra a passagem pela introdução no usuário autenticado.
