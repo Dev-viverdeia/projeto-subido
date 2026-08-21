@@ -17,6 +17,7 @@ const mensagens: MensagemDoConsultor[] = [
   {
     id: '66666666-6666-4666-8666-666666666666',
     papel: 'usuario',
+    anexos: [],
     conteudo: 'O que eu preciso fazer agora para avançar a Clínica Aurora?',
     cartoes: [],
     direcao: null,
@@ -27,6 +28,7 @@ const mensagens: MensagemDoConsultor[] = [
   {
     id: MENSAGEM,
     papel: 'consultor',
+    anexos: [],
     conteudo:
       'A proposta já existe e o lead está em negociação. O avanço agora é conduzir uma decisão com data, não criar outro documento. Revise o escopo final e combine quando o cliente decide.',
     cartoes: [],

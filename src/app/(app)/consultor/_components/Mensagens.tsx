@@ -1,9 +1,15 @@
 import Link from 'next/link';
-import { ArrowRight, Target } from 'lucide-react';
+import { ArrowRight, FileText, Image as ImageIcon, Mic, Target } from 'lucide-react';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
 import styles from './Mensagens.module.css';
+
+function IconeAnexo({ categoria }: { categoria: 'imagem' | 'documento' | 'audio' }) {
+  if (categoria === 'imagem') return <ImageIcon size={15} strokeWidth={1.9} aria-hidden="true" />;
+  if (categoria === 'audio') return <Mic size={15} strokeWidth={1.9} aria-hidden="true" />;
+  return <FileText size={15} strokeWidth={1.9} aria-hidden="true" />;
+}
 
 const ACAO_POR_TIPO = {
   aula: 'Abrir aula',
@@ -43,6 +49,16 @@ export function Mensagens({
         return (
           <li key={m.id} className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}>
             <div className={styles.corpo}>
+              {m.anexos.length > 0 ? (
+                <ul className={styles.anexos} aria-label="Arquivos enviados">
+                  {m.anexos.map((anexo) => (
+                    <li key={anexo.id}>
+                      <IconeAnexo categoria={anexo.categoria} />
+                      <span>{anexo.nome}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <p className={styles.texto}>{m.conteudo}</p>
 
               {detalharResposta && m.direcao && !(compacto && m.direcao.contexto_acao) ? (

@@ -1,20 +1,13 @@
-.conversa {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-stack);
-}
-
-/* A rodada em voo repete a anatomia das mensagens do servidor (Mensagens.module)
-   para a troca RSC não causar salto visual. */
+.conversa,
 .rodadaEmVoo {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-stack);
+  gap: var(--via-space-3);
 }
 
 .balao {
   margin: 0;
-  max-width: 52ch;
+  max-width: 60ch;
   padding: var(--via-space-3) var(--via-space-4);
   border-radius: var(--app-radius-card);
   font-size: var(--via-fs-body);
@@ -34,105 +27,144 @@
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-elev-1-bg);
   color: var(--via-text-primary);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
-/* A BOLHA DE DIGITAÇÃO — anatomia de mensagem do consultor, três pontos em
-   compasso defasado. Só opacity; o compasso vem do delay, não de deslocamento. */
-.digitando {
-  align-self: flex-start;
+.anexosEmVoo {
+  align-self: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+}
+
+.anexosEmVoo li {
+  max-width: 280px;
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-3) var(--via-space-4);
-  border-radius: var(--app-radius-card);
+  gap: var(--via-space-2);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
   background: var(--app-elev-1-bg);
-  border: 1px solid var(--app-elev-1-line);
-}
-
-.digitandoRotulo {
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
 
-.pontosDigitando {
+.anexosEmVoo li span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.processando {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--via-space-3);
+  max-width: 440px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-accent-hairline);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  color: var(--via-accent-ink);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(16px) saturate(135%);
 }
 
-.pontinho {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--via-radius-pill);
-  background: var(--via-text-faint);
-  animation: consultor-digitar 1.2s var(--via-ease) infinite;
+.processando > span {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.pontinho:nth-child(2) {
-  animation-delay: 0.15s;
+.processando strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
 }
 
-.pontinho:nth-child(3) {
-  animation-delay: 0.3s;
+.processando small {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
 }
 
-@keyframes consultor-digitar {
-  0%,
-  60%,
-  100% {
-    opacity: 0.35;
-  }
-  30% {
-    opacity: 1;
+.girando {
+  flex: 0 0 auto;
+  animation: sobral-girar 0.85s linear infinite;
+}
+
+@keyframes sobral-girar {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 .erro {
-  margin: 0;
-  padding: var(--app-pad-card-tight);
-  border-radius: var(--app-radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
   border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
   background: var(--app-elev-1-bg);
-  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
-/* A caixa de envio — mesma gramática do Compositor: superfície com borda que
-   acorda no foco, botão circular de enviar. */
+.erro button {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  color: var(--via-accent-ink);
+  font: inherit;
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+}
+
 .caixa {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4);
+  overflow: hidden;
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-card);
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-  transition: border-color var(--app-t-state);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 92%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(20px) saturate(140%);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .caixa:focus-within {
-  border-color: var(--via-navy-16);
-}
-
-.caixa:has(:focus-visible) {
+  border-color: var(--via-accent-hairline);
   box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
+.linhaCompositor {
+  display: flex;
+  align-items: flex-end;
+  min-height: 72px;
+  padding: var(--via-space-4) var(--via-space-4) var(--via-space-2);
+}
+
 .campo {
-  flex: 1;
+  width: 100%;
   min-width: 0;
+  min-height: 48px;
+  max-height: 180px;
   border: 0;
   resize: none;
   background: transparent;
+  color: var(--via-text-primary);
   font: inherit;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  color: var(--via-text-primary);
 }
 
-/* O anel é da caixa; o do DS é box-shadow e precisa ser apagado aqui dentro. */
 .campo:focus-visible {
   outline: none;
   box-shadow: none;
@@ -142,13 +174,143 @@
   color: var(--via-text-faint);
 }
 
-.enviar {
-  display: inline-flex;
+.arquivosSelecionados {
+  list-style: none;
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-3) 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--via-space-2);
+}
+
+.arquivosSelecionados li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-04);
+}
+
+.iconeArquivo {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
+  color: var(--via-accent-ink);
+}
+
+.dadosArquivo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dadosArquivo strong,
+.dadosArquivo small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dadosArquivo strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.dadosArquivo small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.arquivosSelecionados li > button,
+.ferramentas > button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--via-text-muted);
+  cursor: pointer;
+}
+
+.arquivosSelecionados li > button {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--via-radius-pill);
+}
+
+.arquivosSelecionados li > button:hover,
+.ferramentas > button:hover:not(:disabled) {
+  background: var(--via-navy-08);
+  color: var(--via-text-primary);
+}
+
+.barraCompositor {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
+}
+
+.ferramentas {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-1);
+}
+
+.ferramentas > button {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: var(--app-radius-control);
+}
+
+.ferramentas > button:focus-visible,
+.arquivosSelecionados li > button:focus-visible,
+.erro button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.ferramentas > button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ferramentas .gravando {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.tempoGravacao,
+.dicaAtalho {
+  margin-left: var(--via-space-1);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  white-space: nowrap;
+}
+
+.tempoGravacao {
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.enviar {
   width: 38px;
   height: 38px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
   border: 0;
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
@@ -156,16 +318,13 @@
   cursor: pointer;
   transition:
     background-color var(--app-t-state),
-    opacity var(--app-t-state);
+    opacity var(--app-t-state),
+    transform var(--app-t-touch);
 }
 
-.enviar:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.enviar:not(:disabled):hover {
+.enviar:hover:not(:disabled) {
   background: var(--via-navy-deep);
+  transform: translateY(-1px);
 }
 
 .enviar:focus-visible {
@@ -173,32 +332,9 @@
   box-shadow: var(--app-ring);
 }
 
-/* ── Exemplos — a mesma gramática dos chips do Compositor ─────────────────── */
-.exemplos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-4);
-}
-
-.divisor {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-4);
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-regular);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-}
-
-.divisor::before,
-.divisor::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--via-border-hairline);
+.enviar:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .chips {
@@ -208,78 +344,94 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--via-space-3);
+  gap: var(--via-space-2);
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
-  border: 1px solid var(--app-elev-1-line);
+.chips button {
+  min-height: 38px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-pill);
-  background: var(--app-elev-1-bg);
-  font-family: inherit;
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-primary);
-  white-space: nowrap;
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  color: var(--via-text-muted);
+  font: inherit;
+  font-size: var(--via-fs-xs);
   cursor: pointer;
+  backdrop-filter: blur(10px);
   transition:
     border-color var(--app-t-state),
+    color var(--app-t-state),
     box-shadow var(--app-t-state);
 }
 
-.chip:hover:not(:disabled) {
+.chips button:hover:not(:disabled) {
   border-color: var(--app-elev-2-line);
+  color: var(--via-text-primary);
   box-shadow: var(--app-elev-1-shadow);
 }
 
-.chip:focus-visible {
+.chips button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }
 
-.chip:disabled {
-  opacity: 0.5;
-  cursor: default;
+@supports not (backdrop-filter: blur(1px)) {
+  .processando,
+  .caixa,
+  .chips button {
+    background: var(--via-surface);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pontinho {
-    animation: none;
+  .girando {
+    animation-duration: 1.8s;
   }
 
   .caixa,
   .enviar,
-  .chip {
+  .chips button {
     transition: none;
   }
 }
 
 @media (max-width: 599px) {
-  .caixa {
-    padding: var(--via-space-3);
-  }
-
-  .campo {
-    min-height: 76px;
+  .balao {
+    max-width: calc(100% - var(--via-space-5));
     font-size: var(--via-fs-sm);
   }
 
-  .chips {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    margin-inline: calc(var(--via-space-3) * -1);
-    padding: 2px var(--via-space-3) var(--via-space-2);
-    scrollbar-width: none;
+  .processando {
+    max-width: calc(100% - var(--via-space-4));
   }
 
-  .chips::-webkit-scrollbar {
+  .linhaCompositor {
+    min-height: 64px;
+    padding: var(--via-space-3) var(--via-space-3) var(--via-space-1);
+  }
+
+  .campo {
+    min-height: 42px;
+    font-size: var(--via-fs-sm);
+  }
+
+  .arquivosSelecionados {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dicaAtalho {
     display: none;
   }
 
-  .chip {
-    flex-shrink: 0;
+  .chips {
+    max-width: 350px;
+    margin-inline: auto;
+    padding-bottom: var(--via-space-1);
+    justify-content: center;
+  }
+
+  .erro {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

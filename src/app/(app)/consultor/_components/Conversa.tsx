@@ -2,32 +2,34 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { ArrowUp } from 'lucide-react';
-import { enviarMensagem, responderPendente } from '@/lib/consultor/invocar';
-import { criarConversa } from '@/lib/consultor/criar';
+import { ArrowUp, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
+import { responderPendente } from '@/lib/consultor/invocar';
+import { adicionarMensagem, criarConversa } from '@/lib/consultor/criar';
+import {
+  categoriaDoAnexo,
+  SOBRAL_ACCEPT_ANEXOS,
+  tamanhoLegivel,
+  validarAnexosSobral,
+} from '@/lib/consultor/anexos-contrato';
+import { AnexoIcone } from './AnexoIcone';
+import { useGravadorAudio } from './useGravadorAudio';
 import styles from './Conversa.module.css';
 
 const MAXIMO = 8000;
 
-/**
- * O lado interativo da conversa — campo, envio e a rodada em curso.
- *
- * O HISTÓRICO É DO SERVIDOR. As mensagens gravadas chegam por RSC (children da
- * página); este componente só cuida da RODADA em voo: mostra a pergunta recém-
- * enviada e o "escrevendo" do consultor até o `router.refresh()` trazer a
- * conversa regravada do banco — aí o estado local zera e a fonte volta a ser
- * uma só. É o mesmo desenho do Builder: o banco conta a história.
- *
- * Numa conversa nova, a thread nasce em segundo plano e continua no mesmo chat
- * da Início. A URL deixa de ser estado: o histórico mais recente é carregado
- * pelo servidor a cada atualização.
- */
 export type ExemploDoConsultor = {
-  /** O que aparece no chip — rótulo curto. */
   rotulo: string;
-  /** O que entra no campo — a pergunta completa, pronta para editar. */
   texto: string;
 };
+
+type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | null;
+
+function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
+  if (etapa === 'enviando') return 'Enviando seus arquivos com segurança';
+  if (etapa === 'lendo') return 'Lendo o material e preparando a resposta';
+  if (comArquivos) return 'Cruzando o material com seu contexto da plataforma';
+  return 'Preparando uma resposta com seu contexto';
+}
 
 export function Conversa({
   threadId,
@@ -36,49 +38,43 @@ export function Conversa({
   exemplos,
 }: {
   threadId?: string;
-  /** A última mensagem gravada é do usuário e ainda não tem resposta — a
-      conversa acabou de nascer no browser e o consultor deve responder JÁ. */
   pendente?: boolean;
-  /** Identifica a versão do histórico que chegou do servidor. */
   ultimaMensagemId?: string;
   exemplos?: ExemploDoConsultor[];
 }) {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
+  const arquivoRef = useRef<HTMLInputElement>(null);
   const fimRef = useRef<HTMLDivElement>(null);
+  const fimAncora = useRef<HTMLDivElement>(null);
+  const versaoDoHistorico = useRef(ultimaMensagemId);
+
   const [texto, setTexto] = useState('');
+  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivosEmVoo, setArquivosEmVoo] = useState<File[]>([]);
   const [threadEmUso, setThreadEmUso] = useState(threadId);
   const [threadPendente, setThreadPendente] = useState(pendente);
   const [emVoo, setEmVoo] = useState<string | null>(null);
   const [respostaEmVoo, setRespostaEmVoo] = useState<string | null>(null);
-  const [digitando, setDigitando] = useState(pendente);
+  const [etapa, setEtapa] = useState<EtapaProcessamento>(pendente ? 'pensando' : null);
   const [erro, setErro] = useState<string | null>(null);
   const [navegando, iniciarNavegacao] = useTransition();
-  const fimAncora = useRef<HTMLDivElement>(null);
-  const versaoDoHistorico = useRef(ultimaMensagemId);
 
-  const ocupado = emVoo !== null || digitando || navegando;
+  const ocupado = etapa !== null || navegando;
 
-  /* A rodada em voo entra no fim da lista; rolar até ela é o que diz "foi". */
   useEffect(() => {
-    if (emVoo || respostaEmVoo) fimRef.current?.scrollIntoView({ block: 'end' });
-  }, [emVoo, respostaEmVoo]);
+    if (emVoo || respostaEmVoo || etapa) fimRef.current?.scrollIntoView({ block: 'end' });
+  }, [emVoo, respostaEmVoo, etapa]);
 
-  /* A API já devolve a resposta completa. Ela permanece visível até o RSC
-     confirmar uma nova mensagem no histórico, evitando o clarão vazio que
-     fazia a conversa parecer travada depois do carregamento. */
   useEffect(() => {
     if (!ultimaMensagemId || ultimaMensagemId === versaoDoHistorico.current) return;
     versaoDoHistorico.current = ultimaMensagemId;
     setEmVoo(null);
+    setArquivosEmVoo([]);
     setRespostaEmVoo(null);
-    setDigitando(false);
+    setEtapa(null);
   }, [ultimaMensagemId]);
 
-  /* A PENDÊNCIA DISPARA NA CHEGADA: a página navegou para cá com a pergunta
-     já gravada; esta é a metade lenta, rodando dentro do chat — que é onde a
-     espera pertence. Idempotente do lado da função: aba duplicada não paga
-     duas rodadas. */
   useEffect(() => {
     if (!pendente || !threadId) return;
     let ativo = true;
@@ -87,12 +83,12 @@ export function Conversa({
       if (!ativo) return;
       if (falha) {
         setErro(falha.mensagem);
-        setDigitando(false);
+        setEtapa(null);
         setThreadPendente(true);
         return;
       }
       setRespostaEmVoo(dados.resposta);
-      setDigitando(false);
+      setEtapa(null);
       iniciarNavegacao(() => {
         router.refresh();
         setThreadPendente(false);
@@ -101,195 +97,287 @@ export function Conversa({
     return () => {
       ativo = false;
     };
-    /* Roda uma vez por montagem da conversa pendente. */
+    // A pendência pertence à montagem desta conversa.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* CONVERSA ABRE NO FIM — chat lê de baixo. `instant`: é posição inicial,
-     não movimento; animar a chegada seria teatro. Roda a cada remonte, e a
-     página remonta quando o refresh traz mensagens novas. */
   useEffect(() => {
     if (threadEmUso) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
   }, [threadEmUso]);
 
-  /* O campo CRESCE com o texto, como o compositor do Builder — `auto` antes de
-     ler o scrollHeight, senão a altura anterior vira piso e ele nunca encolhe. */
   useEffect(() => {
     const campo = campoRef.current;
     if (!campo) return;
     campo.style.height = 'auto';
-    campo.style.height = `${Math.min(campo.scrollHeight, 220)}px`;
+    campo.style.height = `${Math.min(campo.scrollHeight, 180)}px`;
   }, [texto]);
 
-  async function enviar() {
-    const mensagem = texto.trim();
-    if (!mensagem || ocupado) return;
-
-    setErro(null);
-    setRespostaEmVoo(null);
-
-    /* CONVERSA NOVA: grava pergunta + thread pelo browser e responde sem tirar
-       o usuário da Início. */
-    if (!threadEmUso) {
-      setEmVoo(mensagem);
-      setTexto('');
-      const { threadId: novo, falha } = await criarConversa(mensagem);
-      if (falha || !novo) {
-        setErro(falha ?? 'Não foi possível iniciar a conversa.');
-        setEmVoo(null);
-        setTexto(mensagem);
-        return;
-      }
-      setThreadEmUso(novo);
-      setThreadPendente(true);
-      setDigitando(true);
-      const { dados: dadosResposta, falha: falhaResposta } = await responderPendente(novo);
-      if (falhaResposta) {
-        setErro(falhaResposta.mensagem);
-        setEmVoo(null);
-        setDigitando(false);
-        setTexto(mensagem);
-        return;
-      }
-      setRespostaEmVoo(dadosResposta.resposta);
-      setEmVoo(null);
-      setDigitando(false);
-      iniciarNavegacao(() => {
-        router.refresh();
-        setThreadPendente(false);
-      });
+  function incluirArquivos(novos: readonly File[]) {
+    const combinados = [...arquivos];
+    for (const arquivo of novos) {
+      const repetido = combinados.some(
+        (atual) =>
+          atual.name === arquivo.name &&
+          atual.size === arquivo.size &&
+          atual.lastModified === arquivo.lastModified,
+      );
+      if (!repetido) combinados.push(arquivo);
+    }
+    const falha = validarAnexosSobral(combinados);
+    if (falha) {
+      setErro(falha);
       return;
     }
+    setErro(null);
+    setArquivos(combinados);
+  }
 
-    setEmVoo(mensagem);
-    setTexto('');
-    setDigitando(true);
+  const {
+    gravando,
+    segundos,
+    alternar: alternarGravacao,
+  } = useGravadorAudio({
+    aoConcluir: (arquivo) => incluirArquivos([arquivo]),
+    aoFalhar: setErro,
+  });
 
-    const { dados, falha } = threadPendente
-      ? await responderPendente(threadEmUso)
-      : await enviarMensagem(mensagem, threadEmUso);
-
+  async function responder(conversaId: string, temArquivos: boolean, nova: boolean) {
+    setEtapa(temArquivos ? 'lendo' : 'pensando');
+    const { dados, falha } = await responderPendente(conversaId);
     if (falha) {
       setErro(falha.mensagem);
-      setEmVoo(null);
-      setDigitando(false);
-      setTexto(mensagem);
+      setEtapa(null);
+      setThreadPendente(true);
       return;
     }
 
     setRespostaEmVoo(dados.resposta);
-    setEmVoo(null);
-    setDigitando(false);
-
-    /* O refresh trai a conversa regravada; o estado local sai DEPOIS que o
-       servidor respondeu, para a pergunta não piscar fora da tela. */
+    setEtapa(null);
+    setThreadPendente(false);
     iniciarNavegacao(() => {
-      router.refresh();
-      setThreadPendente(false);
+      if (nova) router.replace(`/consultor/${conversaId}`);
+      else router.refresh();
     });
+  }
+
+  async function enviar() {
+    const mensagem = texto.trim();
+    if ((!mensagem && arquivos.length === 0) || ocupado || gravando) return;
+
+    const anexosDaRodada = [...arquivos];
+    const textoDaRodada =
+      mensagem ||
+      (anexosDaRodada.length === 1
+        ? `Analise o arquivo ${anexosDaRodada[0]!.name}.`
+        : `Analise estes ${anexosDaRodada.length} arquivos.`);
+    setErro(null);
+    setRespostaEmVoo(null);
+    setEmVoo(textoDaRodada);
+    setArquivosEmVoo(anexosDaRodada);
+    setTexto('');
+    setArquivos([]);
+    setEtapa('enviando');
+
+    const nova = !threadEmUso;
+    const registro = nova
+      ? await criarConversa(mensagem, anexosDaRodada)
+      : await adicionarMensagem(threadEmUso, mensagem, anexosDaRodada);
+    if (registro.falha || !registro.threadId) {
+      setErro(registro.falha ?? 'Não foi possível enviar a mensagem.');
+      setEmVoo(null);
+      setArquivosEmVoo([]);
+      setTexto(mensagem);
+      setArquivos(anexosDaRodada);
+      setEtapa(null);
+      return;
+    }
+
+    setThreadEmUso(registro.threadId);
+    setThreadPendente(true);
+    await responder(registro.threadId, anexosDaRodada.length > 0, nova);
   }
 
   return (
     <div className={styles.conversa}>
       <div ref={fimAncora} aria-hidden="true" />
-      {(emVoo !== null || digitando || respostaEmVoo !== null) && (
+
+      {(emVoo !== null || etapa || respostaEmVoo !== null) && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
-          {emVoo !== null && <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>}
-          {/* A bolha de digitação — o idioma universal de chat, com os três
-              pontos em compasso. `role=status` + rótulo para leitor de tela. */}
-          {digitando && (
-            <div className={styles.digitando} role="status" aria-label="Sobral AI escrevendo">
-              <span className={styles.digitandoRotulo}>Sobral AI está preparando a resposta</span>
-              <span className={styles.pontosDigitando} aria-hidden="true">
-                <span className={styles.pontinho} />
-                <span className={styles.pontinho} />
-                <span className={styles.pontinho} />
+          {arquivosEmVoo.length > 0 ? (
+            <ul className={styles.anexosEmVoo} aria-label="Arquivos enviados">
+              {arquivosEmVoo.map((arquivo) => (
+                <li key={`${arquivo.name}-${arquivo.size}`}>
+                  <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
+                  <span>{arquivo.name}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {emVoo !== null ? <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p> : null}
+          {etapa ? (
+            <div className={styles.processando} role="status" aria-live="polite">
+              <LoaderCircle
+                className={styles.girando}
+                size={18}
+                strokeWidth={1.8}
+                aria-hidden="true"
+              />
+              <span>
+                <strong>{descricaoDaEtapa(etapa, arquivosEmVoo.length > 0)}</strong>
+                <small>Você pode aguardar nesta tela. Sua conversa está salva.</small>
               </span>
             </div>
-          )}
-          {respostaEmVoo !== null && (
+          ) : null}
+          {respostaEmVoo !== null ? (
             <p className={`${styles.balao} ${styles.doConsultor}`}>{respostaEmVoo}</p>
-          )}
+          ) : null}
         </div>
       )}
 
       {erro ? (
-        <p className={styles.erro} role="alert">
-          {erro}
-        </p>
+        <div className={styles.erro} role="alert">
+          <span>{erro}</span>
+          {threadPendente && threadEmUso ? (
+            <button
+              type="button"
+              onClick={() => {
+                setErro(null);
+                void responder(threadEmUso, arquivosEmVoo.length > 0, !threadId);
+              }}
+            >
+              Tentar novamente
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <form
         className={styles.caixa}
-        onSubmit={(e) => {
-          e.preventDefault();
+        onSubmit={(evento) => {
+          evento.preventDefault();
           void enviar();
         }}
       >
-        <label className="sr-only" htmlFor="mensagem-consultor">
-          Sua pergunta para o consultor
-        </label>
-        <textarea
-          id="mensagem-consultor"
-          ref={campoRef}
-          className={styles.campo}
-          value={texto}
-          onChange={(e) => setTexto(e.target.value.slice(0, MAXIMO))}
-          onKeyDown={(e) => {
-            /* Chat: Enter ENVIA, Shift+Enter quebra linha — a convenção que a
-               mão já conhece. O Compositor do Builder faz o inverso porque lá
-               o texto é um briefing longo; aqui é conversa. */
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              void enviar();
-            }
-          }}
-          disabled={ocupado}
-          rows={3}
-          placeholder="Ex.: meu cliente quer automatizar o pós-venda, por onde eu começo?"
-        />
-        <button
-          type="submit"
-          className={styles.enviar}
-          disabled={!texto.trim() || ocupado}
-          aria-label={ocupado ? 'Aguardando resposta' : 'Enviar mensagem'}
-        >
-          <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
-        </button>
-      </form>
-
-      {/* Os exemplos ensinam o que é uma boa pergunta — mesmo papel dos chips
-          do Builder: ponto de partida para editar, não formulário pronto. */}
-      {exemplos && exemplos.length > 0 && (
-        <section className={styles.exemplos}>
-          <h3 className={styles.divisor}>
-            <span>ou comece por um exemplo</span>
-          </h3>
-          <ul className={styles.chips}>
-            {exemplos.map((e) => (
-              <li key={e.rotulo}>
+        {arquivos.length > 0 ? (
+          <ul className={styles.arquivosSelecionados} aria-label="Arquivos prontos para enviar">
+            {arquivos.map((arquivo, indice) => (
+              <li key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}>
+                <span className={styles.iconeArquivo} aria-hidden="true">
+                  <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
+                </span>
+                <span className={styles.dadosArquivo}>
+                  <strong>{arquivo.name}</strong>
+                  <small>{tamanhoLegivel(arquivo.size)}</small>
+                </span>
                 <button
                   type="button"
-                  className={styles.chip}
-                  disabled={ocupado}
-                  onClick={() => {
-                    setTexto(e.texto);
-                    const campo = campoRef.current;
-                    if (campo) {
-                      campo.focus();
-                      requestAnimationFrame(() =>
-                        campo.setSelectionRange(e.texto.length, e.texto.length),
-                      );
-                    }
-                  }}
+                  onClick={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
+                  aria-label={`Remover ${arquivo.name}`}
                 >
-                  {e.rotulo}
+                  <X size={14} aria-hidden="true" />
                 </button>
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        ) : null}
+
+        <div className={styles.linhaCompositor}>
+          <label className="sr-only" htmlFor="mensagem-consultor">
+            Sua pergunta para o Sobral AI
+          </label>
+          <textarea
+            id="mensagem-consultor"
+            ref={campoRef}
+            className={styles.campo}
+            value={texto}
+            onChange={(evento) => setTexto(evento.target.value.slice(0, MAXIMO))}
+            onKeyDown={(evento) => {
+              if (evento.key === 'Enter' && !evento.shiftKey) {
+                evento.preventDefault();
+                void enviar();
+              }
+            }}
+            disabled={ocupado}
+            rows={2}
+            placeholder="Pergunte algo ou envie um arquivo…"
+          />
+        </div>
+
+        <div className={styles.barraCompositor}>
+          <div className={styles.ferramentas}>
+            <input
+              ref={arquivoRef}
+              className="sr-only"
+              type="file"
+              multiple
+              accept={SOBRAL_ACCEPT_ANEXOS}
+              onChange={(evento) => {
+                incluirArquivos(Array.from(evento.target.files ?? []));
+                evento.target.value = '';
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => arquivoRef.current?.click()}
+              disabled={ocupado || gravando}
+              aria-label="Anexar documento, imagem ou áudio"
+              title="Anexar arquivo"
+            >
+              <Paperclip size={17} strokeWidth={1.9} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className={gravando ? styles.gravando : undefined}
+              onClick={() => void alternarGravacao()}
+              disabled={ocupado}
+              aria-label={gravando ? 'Parar gravação' : 'Gravar áudio'}
+              title={gravando ? 'Parar gravação' : 'Gravar áudio'}
+            >
+              {gravando ? (
+                <Square size={14} fill="currentColor" aria-hidden="true" />
+              ) : (
+                <Mic size={17} strokeWidth={1.9} aria-hidden="true" />
+              )}
+            </button>
+            {gravando ? (
+              <span className={styles.tempoGravacao} role="status">
+                Gravando · {String(Math.floor(segundos / 60)).padStart(2, '0')}:
+                {String(segundos % 60).padStart(2, '0')}
+              </span>
+            ) : (
+              <span className={styles.dicaAtalho}>Enter envia · Shift + Enter quebra linha</span>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className={styles.enviar}
+            disabled={(!texto.trim() && arquivos.length === 0) || ocupado || gravando}
+            aria-label={ocupado ? 'Aguardando o Sobral AI' : 'Enviar mensagem'}
+          >
+            <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
+          </button>
+        </div>
+      </form>
+
+      {exemplos && exemplos.length > 0 && arquivos.length === 0 ? (
+        <ul className={styles.chips} aria-label="Exemplos de perguntas">
+          {exemplos.map((exemplo) => (
+            <li key={exemplo.rotulo}>
+              <button
+                type="button"
+                disabled={ocupado}
+                onClick={() => {
+                  setTexto(exemplo.texto);
+                  campoRef.current?.focus();
+                }}
+              >
+                {exemplo.rotulo}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

@@ -45,6 +45,7 @@ export type RecomendacaoConteudoSobral = z.infer<typeof RecomendacaoConteudoSobr
 /** Contrato devolvido pelo modelo. A etapa não entra: ela pertence aos fatos. */
 export const RespostaEstruturadaSobralSchema = z.object({
   resposta: z.string().trim().min(20).max(3000),
+  memoria_anexos: z.string().trim().max(4000),
   diagnostico: z.string().trim().min(20).max(1200),
   foco: z.string().trim().min(3).max(180),
   proximo_passo: AcaoSobralSchema,
