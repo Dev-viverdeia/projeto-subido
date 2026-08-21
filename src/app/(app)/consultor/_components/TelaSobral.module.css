@@ -1,0 +1,14 @@
+.pagina {
+  width: 100%;
+  max-width: var(--app-canvas);
+  margin-inline: auto;
+}
+
+.semHistorico {
+  max-width: 30ch;
+  margin: 0;
+  padding: var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}

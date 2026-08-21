@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Bot, Link2, RefreshCw } from 'lucide-react';
 import { Conversa, type ExemploDoConsultor } from '../../consultor/_components/Conversa';
 import { Mensagens } from '../../consultor/_components/Mensagens';
@@ -31,14 +32,24 @@ export function SobralChatVisual({
   threadId,
   pendente = false,
   exemplos,
+  completo = false,
+  acaoCabecalho,
 }: {
   mensagens: MensagemDoConsultor[];
   threadId?: string;
   pendente?: boolean;
   exemplos: ExemploDoConsultor[];
+  completo?: boolean;
+  acaoCabecalho?: ReactNode;
 }) {
+  const mensagensVisiveis = completo ? mensagens : mensagens.slice(-4);
+
   return (
-    <section id="sobral-ai" className={styles.secao} aria-labelledby="titulo-sobral-ai">
+    <section
+      id="sobral-ai"
+      className={`${styles.secao} ${completo ? styles.completa : ''}`}
+      aria-labelledby="titulo-sobral-ai"
+    >
       <header className={styles.cabecalho}>
         <span className={styles.glifo} aria-hidden="true">
           <Bot size={21} strokeWidth={1.75} />
@@ -51,15 +62,18 @@ export function SobralChatVisual({
             indicar a próxima ação, uma aula, um projeto ou uma ferramenta.
           </span>
         </div>
-        <small>
-          <Link2 size={14} strokeWidth={1.8} aria-hidden="true" /> Seu contexto já está conectado
-        </small>
+        <div className={styles.acoesCabecalho}>
+          <small>
+            <Link2 size={14} strokeWidth={1.8} aria-hidden="true" /> Seu contexto já está conectado
+          </small>
+          {acaoCabecalho}
+        </div>
       </header>
 
       <div className={styles.chat}>
         <HistoricoChat>
           {mensagens.length > 0 ? (
-            <Mensagens mensagens={mensagens.slice(-4)} compacto />
+            <Mensagens mensagens={mensagensVisiveis} compacto={!completo} />
           ) : (
             <div className={styles.boasVindasChat}>
               <span aria-hidden="true">

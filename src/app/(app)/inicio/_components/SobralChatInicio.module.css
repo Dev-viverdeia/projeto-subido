@@ -64,7 +64,15 @@
   text-wrap: pretty;
 }
 
-.cabecalho > small {
+.acoesCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+}
+
+.acoesCabecalho > small {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
@@ -74,6 +82,29 @@
   color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
   white-space: nowrap;
+}
+
+.completa {
+  min-height: min(820px, calc(100dvh - 150px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.completa .chat {
+  width: min(100%, 980px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.completa .historico {
+  flex: 1;
+  min-height: 360px;
+  max-height: none;
+}
+
+.completa .compositor {
+  margin-top: auto;
 }
 
 .chat {
@@ -225,9 +256,13 @@
     grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .cabecalho > small {
+  .acoesCabecalho {
     grid-column: 2;
     justify-self: start;
+    justify-content: flex-start;
+  }
+
+  .acoesCabecalho > small {
     white-space: normal;
   }
 
@@ -256,8 +291,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .cabecalho > small {
+  .acoesCabecalho {
     grid-column: 1;
+  }
+
+  .completa {
+    min-height: calc(100dvh - 132px);
+  }
+
+  .completa .historico {
+    min-height: 280px;
+    max-height: none;
   }
 
   .glifo {

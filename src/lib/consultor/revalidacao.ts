@@ -3,9 +3,10 @@ import 'server-only';
 import { revalidatePath } from 'next/cache';
 
 /**
- * Mantém o plano e o chat da Início coerentes depois de qualquer fato novo.
- * O Sobral AI agora vive nesta única superfície.
+ * Mantém as duas entradas do mesmo Sobral AI coerentes depois de qualquer fato
+ * novo. Início e Consultor compartilham conversa, contexto e recomendações.
  */
 export function revalidarDirecaoOperacional(): void {
   revalidatePath('/inicio');
+  revalidatePath('/consultor');
 }
