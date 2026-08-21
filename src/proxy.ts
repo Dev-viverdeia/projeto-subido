@@ -41,6 +41,7 @@ export const config = {
     '/inicio/:path*',
     '/prospeccao/:path*',
     '/vendas/:path*',
+    '/metricas/:path*',
     '/propostas/:path*',
     '/reunioes/:path*',
     '/solucoes/:path*',

@@ -38,6 +38,7 @@ describe('NavLateral no mobile', () => {
 
     expect(screen.getByRole('dialog', { name: 'Navegação' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Propostas' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Métricas' })).toHaveAttribute('href', '/metricas');
     expect(screen.getAllByRole('link', { name: 'Prospecção' })).toHaveLength(2);
     expect(screen.queryByRole('link', { name: 'Diagnósticos' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Sobral AI' })).toHaveAttribute('href', '/consultor');
@@ -82,6 +83,10 @@ describe('NavLateral no desktop', () => {
 
     const vendas = screen.getByRole('link', { name: 'Vendas' });
     expect(vendas).toHaveAttribute('data-prefetch', 'false');
+    expect(screen.getByRole('link', { name: 'Métricas' })).toHaveAttribute(
+      'data-prefetch',
+      'false',
+    );
     expect(screen.getByRole('link', { name: 'Sobral AI' })).toHaveAttribute('href', '/consultor');
 
     await usuario.hover(vendas);

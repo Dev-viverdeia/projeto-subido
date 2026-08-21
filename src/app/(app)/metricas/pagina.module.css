@@ -1,0 +1,944 @@
+.pagina {
+  display: grid;
+  width: min(100%, var(--app-canvas));
+  gap: var(--app-gap-section);
+  margin-inline: auto;
+}
+
+.sobretitulo,
+.sobretituloEscuro {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.sobretitulo {
+  color: var(--via-text-soft);
+}
+
+.sobretituloEscuro {
+  color: var(--via-gray-300);
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-5);
+  min-height: 184px;
+  padding: clamp(28px, 4vw, 48px);
+  overflow: hidden;
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-surface);
+  background:
+    radial-gradient(ellipse 42% 150% at 100% 0%, var(--via-navy-08), transparent 68%),
+    radial-gradient(ellipse 28% 120% at 0% 100%, var(--via-navy-05), transparent 72%),
+    var(--via-glass-card);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(24px) saturate(145%);
+}
+
+.hero::after {
+  position: absolute;
+  z-index: -1;
+  top: -122px;
+  right: 10%;
+  width: 284px;
+  aspect-ratio: 1;
+  border: 1px solid var(--via-navy-06);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 44px var(--via-navy-03),
+    0 0 0 88px var(--via-navy-02);
+  content: '';
+  pointer-events: none;
+}
+
+.heroMarca,
+.alvo {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  color: var(--via-navy);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(16px) saturate(135%);
+}
+
+.heroMarca {
+  width: 54px;
+  height: 54px;
+}
+
+.heroTexto {
+  min-width: 0;
+}
+
+.hero h1 {
+  max-width: 14ch;
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-primary);
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 0.96;
+  letter-spacing: var(--app-ls-h1);
+  text-wrap: balance;
+}
+
+.heroTexto > p:last-child {
+  max-width: 48ch;
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.periodos {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  padding: var(--via-space-1);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 64%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.periodos a {
+  display: inline-flex;
+  min-height: var(--app-h-control);
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--via-space-4);
+  border-radius: calc(var(--app-radius-control) - var(--via-space-1));
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.periodos a:hover {
+  color: var(--via-text-primary);
+  transform: translateY(-1px);
+}
+
+.periodos a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.periodos a[aria-current='page'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.resumo {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  padding: var(--via-space-2);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-1-line));
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(22px) saturate(140%);
+}
+
+.resumo article {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 148px;
+  align-content: start;
+  gap: var(--via-space-1);
+  padding: var(--app-pad-card-tight);
+  overflow: hidden;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: calc(var(--app-radius-surface) - var(--via-space-2));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-surface) 88%, transparent), transparent),
+    color-mix(in srgb, var(--via-surface) 64%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.resumo article::after {
+  position: absolute;
+  right: -24px;
+  bottom: -36px;
+  width: 96px;
+  aspect-ratio: 1;
+  border: 1px solid var(--via-navy-05);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.resumo article[data-indicador='ganhos'] {
+  background:
+    linear-gradient(145deg, var(--via-navy-05), transparent),
+    color-mix(in srgb, var(--via-surface) 72%, transparent);
+}
+
+.resumo span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+}
+
+.resumo strong {
+  margin-block: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 0.95;
+  letter-spacing: var(--app-ls-h2);
+  font-variant-numeric: tabular-nums;
+}
+
+.resumo small,
+.resumo em {
+  display: block;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+  line-height: var(--via-lh-snug);
+}
+
+.resumo em {
+  margin-top: auto;
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  color: var(--app-em-ink);
+}
+
+.funil {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: var(--via-space-6);
+  padding: clamp(28px, 4vw, 48px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--via-white) 18%, transparent);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-mesh-trilho);
+  box-shadow:
+    var(--app-elev-3-shadow),
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 18%, transparent);
+}
+
+.funil::before {
+  position: absolute;
+  z-index: -1;
+  top: -160px;
+  right: -90px;
+  width: 430px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--via-white) 8%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 62px color-mix(in srgb, var(--via-white) 3%, transparent),
+    0 0 0 124px color-mix(in srgb, var(--via-white) 2%, transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.funilTopo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-6);
+}
+
+.funilTopo > div {
+  min-width: 0;
+}
+
+.funil h2 {
+  max-width: 22ch;
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-white);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--app-ls-h2);
+  text-wrap: balance;
+}
+
+.funilTopo > div > p:last-child {
+  max-width: 56ch;
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}
+
+.funilTopo > span {
+  flex: 0 0 auto;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-white) 20%, transparent);
+  border-radius: var(--app-radius-chip);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-gray-300);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  backdrop-filter: blur(14px) saturate(125%);
+}
+
+.etapasFunil {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  margin: 0;
+  padding: var(--via-space-2);
+  border: 1px solid color-mix(in srgb, var(--via-white) 13%, transparent);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-white) 5%, transparent);
+  list-style: none;
+  backdrop-filter: blur(20px) saturate(130%);
+}
+
+.etapasFunil li {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 164px;
+  align-content: end;
+  gap: var(--via-space-1);
+  padding: var(--app-pad-card-tight);
+  border: 1px solid color-mix(in srgb, var(--via-white) 11%, transparent);
+  border-radius: calc(var(--app-radius-card) - var(--via-space-2));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 10%, transparent), transparent),
+    color-mix(in srgb, var(--via-navy-deep) 52%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 11%, transparent);
+}
+
+.etapasFunil li:not(:last-child)::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: calc(var(--via-space-2) * -1 - 3px);
+  width: calc(var(--via-space-2) + 6px);
+  height: 1px;
+  background: color-mix(in srgb, var(--via-white) 28%, transparent);
+  content: '';
+}
+
+.numeroEtapa {
+  position: absolute;
+  top: var(--app-pad-card-tight);
+  left: var(--app-pad-card-tight);
+  color: var(--via-gray-400);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+}
+
+.etapasFunil strong {
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--app-ls-h2);
+  font-variant-numeric: tabular-nums;
+}
+
+.etapasFunil h3 {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-xs);
+}
+
+.etapasFunil small {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
+}
+
+.funilRodape {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+}
+
+.funilRodape > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-1) var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 6%, transparent);
+  backdrop-filter: blur(16px) saturate(125%);
+}
+
+.funilRodape span,
+.funilRodape small {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-micro);
+}
+
+.funilRodape strong {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  min-width: 3.4ch;
+  color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.funilRodape span,
+.funilRodape small {
+  grid-column: 2;
+}
+
+.gradeDiagnostico,
+.gradeDetalhes {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: var(--app-gap-grid);
+  align-items: stretch;
+}
+
+.diagnostico,
+.saude,
+.atividade,
+.perdas {
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-1-line));
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(22px) saturate(140%);
+}
+
+.diagnostico {
+  position: relative;
+  display: flex;
+  min-height: 340px;
+  flex-direction: column;
+  padding: clamp(24px, 3.2vw, 40px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 44% 100% at 100% 0%, var(--via-navy-08), transparent 70%),
+    color-mix(in srgb, var(--via-surface) 76%, transparent);
+}
+
+.diagnostico::after {
+  position: absolute;
+  right: -82px;
+  bottom: -116px;
+  width: 260px;
+  aspect-ratio: 1;
+  border: 1px solid var(--via-navy-06);
+  border-radius: 50%;
+  box-shadow: 0 0 0 46px var(--via-navy-03);
+  content: '';
+  pointer-events: none;
+}
+
+.diagnostico > * {
+  position: relative;
+  z-index: 1;
+}
+
+.diagnosticoCabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-4);
+}
+
+.alvo {
+  width: 46px;
+  height: 46px;
+}
+
+.diagnostico h2,
+.saude h2,
+.atividade h2,
+.perdas h2 {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-primary);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h2);
+  text-wrap: balance;
+}
+
+.diagnosticoDescricao {
+  max-width: 62ch;
+  margin: var(--via-space-5) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.diagnostico ul {
+  display: grid;
+  gap: var(--via-space-2);
+  margin: var(--via-space-5) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.diagnostico li {
+  position: relative;
+  padding-left: var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.diagnostico li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 7px;
+  height: 1px;
+  background: var(--via-navy);
+  content: '';
+}
+
+.acaoDiagnostico {
+  display: inline-flex;
+  width: fit-content;
+  min-height: var(--app-h-control);
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  margin-top: auto;
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.acaoDiagnostico:hover {
+  transform: translateY(-2px);
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.acaoDiagnostico:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.saude,
+.atividade,
+.perdas {
+  padding: clamp(22px, 3vw, 32px);
+}
+
+.saude {
+  display: flex;
+  flex-direction: column;
+}
+
+.saudeGrade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-5);
+}
+
+.saudeGrade article {
+  display: grid;
+  min-width: 0;
+  min-height: 112px;
+  align-content: space-between;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card-tight);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 66%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.saudeGrade svg {
+  color: var(--via-text-soft);
+}
+
+.saudeGrade span,
+.saudeGrade strong {
+  min-width: 0;
+}
+
+.saudeGrade span,
+.saude footer span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-snug);
+}
+
+.saudeGrade strong,
+.saude footer strong {
+  overflow: hidden;
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.saude footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin-top: auto;
+  padding-top: var(--via-space-5);
+}
+
+.atividade,
+.perdas {
+  min-width: 0;
+}
+
+.atividade > header,
+.perdas > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.atividade > header > span {
+  flex: 0 0 auto;
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.barras {
+  display: grid;
+  gap: var(--via-space-4);
+  margin-top: var(--via-space-6);
+}
+
+.barra {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.barra > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.barra span,
+.perdas li span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.barra strong,
+.perdas li strong {
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.barra progress,
+.perdas progress {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--app-radius-track);
+  appearance: none;
+  background: var(--via-navy-05);
+}
+
+.barra progress::-webkit-progress-bar,
+.perdas progress::-webkit-progress-bar {
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-05);
+}
+
+.barra progress::-webkit-progress-value,
+.perdas progress::-webkit-progress-value {
+  border-radius: var(--app-radius-track);
+  background: linear-gradient(90deg, var(--via-blue), var(--via-navy));
+}
+
+.barra progress::-moz-progress-bar,
+.perdas progress::-moz-progress-bar {
+  border-radius: var(--app-radius-track);
+  background: linear-gradient(90deg, var(--via-blue), var(--via-navy));
+}
+
+.perdas {
+  display: flex;
+  flex-direction: column;
+}
+
+.perdas ol {
+  display: grid;
+  gap: var(--via-space-4);
+  margin: var(--via-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perdas li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--via-space-2) var(--via-space-3);
+}
+
+.perdas progress {
+  grid-column: 1 / -1;
+}
+
+.semPerdas {
+  display: grid;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-6);
+  padding: var(--via-space-5);
+  border: 1px dashed var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--via-navy-02);
+}
+
+.semPerdas strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+.semPerdas p,
+.notaPerdas {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+
+.notaPerdas {
+  margin-top: auto;
+  padding-top: var(--via-space-6);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .hero,
+  .resumo,
+  .diagnostico,
+  .saude,
+  .atividade,
+  .perdas {
+    background: var(--via-surface-elev);
+  }
+
+  .heroMarca,
+  .alvo,
+  .periodos {
+    background: var(--via-surface);
+  }
+
+  .etapasFunil,
+  .funilTopo > span,
+  .funilRodape > div {
+    background: var(--via-navy-deep);
+  }
+}
+
+@media (max-width: 1279px) {
+  .resumo {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gradeDiagnostico,
+  .gradeDetalhes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .saude footer {
+    margin-top: var(--via-space-5);
+  }
+}
+
+@media (max-width: 899px) {
+  .hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .periodos {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
+  .etapasFunil {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .etapasFunil li:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .etapasFunil li::after {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    gap: var(--app-gap-block);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--via-space-4);
+    min-height: 0;
+    padding: var(--via-space-5);
+  }
+
+  .heroMarca {
+    width: 46px;
+    height: 46px;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+  }
+
+  .periodos {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .periodos a {
+    min-width: 0;
+    flex: 1;
+    padding-inline: var(--via-space-2);
+  }
+
+  .resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resumo article {
+    min-height: 136px;
+    padding: var(--via-space-3);
+  }
+
+  .resumo strong {
+    font-size: 2rem;
+  }
+
+  .funil {
+    gap: var(--via-space-5);
+    padding: var(--via-space-5);
+  }
+
+  .funilTopo {
+    flex-direction: column;
+  }
+
+  .funil h2 {
+    font-size: 2.3rem;
+  }
+
+  .etapasFunil {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .etapasFunil li:last-child {
+    grid-column: auto;
+  }
+
+  .etapasFunil li {
+    min-height: 132px;
+  }
+
+  .funilRodape,
+  .saudeGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .diagnostico,
+  .saude,
+  .atividade,
+  .perdas {
+    padding: var(--via-space-5);
+  }
+
+  .diagnosticoCabecalho {
+    flex-direction: column;
+  }
+
+  .diagnostico h2,
+  .saude h2,
+  .atividade h2,
+  .perdas h2 {
+    font-size: 1.65rem;
+  }
+
+  .atividade > header,
+  .perdas > header,
+  .saude footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .periodos a,
+  .acaoDiagnostico {
+    transition: none;
+  }
+
+  .periodos a:hover,
+  .acaoDiagnostico:hover {
+    transform: none;
+  }
+}

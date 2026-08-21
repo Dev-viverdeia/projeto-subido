@@ -2,6 +2,7 @@ import {
   Award,
   Bot,
   BriefcaseBusiness,
+  ChartNoAxesCombined,
   ContactRound,
   DraftingCompass,
   FileSignature,
@@ -109,6 +110,13 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/vendas'],
     icone: <ContactRound size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+    grupo: 'operacao',
+  },
+  {
+    href: '/metricas',
+    rotulo: ROTULOS['/metricas'],
+    icone: <ChartNoAxesCombined size={TAMANHO} strokeWidth={TRACO} />,
+    noDock: false,
     grupo: 'operacao',
   },
   {

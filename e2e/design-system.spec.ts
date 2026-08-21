@@ -7,6 +7,7 @@ const TELAS = [
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Mateus,'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
+  ['/preview/metricas', 'Da lista ao cliente.'],
   ['/preview/prospeccao', 'Encontre empresas para prospectar.'],
   ['/preview/calls', 'O que fica salvo'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],

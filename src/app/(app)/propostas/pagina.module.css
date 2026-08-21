@@ -126,58 +126,6 @@
   box-shadow: var(--app-ring), var(--via-shadow-sm);
 }
 
-.resumo {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  overflow: hidden;
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.resumo article {
-  display: grid;
-  min-width: 0;
-  gap: var(--via-space-1);
-  padding: var(--via-space-4) var(--via-space-5);
-  border-left: 1px solid var(--via-border-hairline);
-}
-
-.resumo article:first-child {
-  border-left: 0;
-}
-
-.resumo article[data-destaque='true'] {
-  background: var(--via-navy-03);
-}
-
-.resumo span,
-.resumo small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.resumo span {
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-}
-
-.resumo strong {
-  margin-block: var(--via-space-1);
-  color: var(--via-text-primary);
-  font-family: var(--via-font-mono);
-  font-size: clamp(1.25rem, 2vw, 1.75rem);
-  font-weight: var(--via-fw-medium);
-  font-variant-numeric: tabular-nums;
-}
-
-.resumo small {
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
-}
-
 .colecoes {
   display: grid;
   gap: clamp(40px, 6vw, 72px);
@@ -415,18 +363,6 @@
     grid-column: 1 / -1;
     width: 100%;
   }
-
-  .resumo {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .resumo article:nth-child(3) {
-    border-left: 0;
-  }
-
-  .resumo article:nth-child(n + 3) {
-    border-top: 1px solid var(--via-border-hairline);
-  }
 }
 
 @media (max-width: 599px) {
@@ -452,15 +388,6 @@
 
   .hero .nova {
     grid-column: auto;
-  }
-
-  .resumo article {
-    min-height: 104px;
-    padding: var(--via-space-4);
-  }
-
-  .resumo small {
-    white-space: normal;
   }
 
   .colecaoTopo {
