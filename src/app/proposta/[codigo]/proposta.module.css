@@ -63,7 +63,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
   background:
-    radial-gradient(circle at 88% 2%, rgba(0, 174, 239, 0.24), transparent 27rem),
+    linear-gradient(118deg, rgba(255, 255, 255, 0.08), transparent 34%),
     linear-gradient(145deg, var(--via-navy), var(--via-navy-deep));
   color: var(--via-white);
 }
@@ -416,8 +416,7 @@
   gap: var(--via-space-8);
   align-items: end;
   padding: clamp(48px, 7vw, 80px);
-  background:
-    radial-gradient(circle at 92% 0, rgba(0, 174, 239, 0.2), transparent 24rem), var(--via-navy);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
 }
 

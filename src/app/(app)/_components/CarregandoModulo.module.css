@@ -34,9 +34,7 @@
   padding: clamp(28px, 4vw, 46px);
   overflow: hidden;
   border-radius: var(--app-radius-surface);
-  background:
-    radial-gradient(ellipse 52% 120% at 100% 0%, var(--via-navy-30), transparent 68%),
-    var(--via-navy-deep);
+  background: var(--app-mesh-trilho);
   box-shadow: var(--app-elev-2-shadow);
 }
 

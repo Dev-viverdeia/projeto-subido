@@ -130,21 +130,6 @@
   box-shadow: var(--via-shadow-xl);
 }
 
-.abertura::after {
-  content: '';
-  position: absolute;
-  right: -7%;
-  top: -24%;
-  width: min(46vw, 620px);
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 70px rgba(255, 255, 255, 0.025),
-    0 0 0 150px rgba(255, 255, 255, 0.018);
-  pointer-events: none;
-}
-
 .aberturaTexto {
   position: relative;
   z-index: 1;

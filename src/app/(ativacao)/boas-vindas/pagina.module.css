@@ -4,8 +4,8 @@
   padding: clamp(18px, 2.4vw, 30px);
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 8% 0%, var(--subido-blue-soft), transparent 28%),
-    radial-gradient(circle at 92% 100%, var(--via-navy-06), transparent 30%), var(--via-bg);
+    linear-gradient(128deg, var(--subido-blue-soft), transparent 26%),
+    linear-gradient(308deg, var(--via-navy-05), transparent 28%), var(--via-bg);
   color: var(--via-text-primary);
 }
 
@@ -206,22 +206,9 @@
   padding: clamp(24px, 3.4vw, 40px);
   overflow: hidden;
   background:
-    radial-gradient(circle at 78% 14%, rgba(10, 169, 246, 0.2), transparent 24%),
-    radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.08), transparent 34%),
-    var(--app-mesh-trilho);
+    linear-gradient(118deg, rgba(255, 255, 255, 0.09), transparent 34%),
+    linear-gradient(298deg, rgba(10, 169, 246, 0.12), transparent 32%), var(--app-mesh-trilho);
   color: var(--via-white);
-}
-
-.videoProvisorio::after {
-  content: '';
-  position: absolute;
-  right: -10%;
-  bottom: -45%;
-  width: 48%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  box-shadow: 0 0 0 44px rgba(255, 255, 255, 0.025);
 }
 
 .play {

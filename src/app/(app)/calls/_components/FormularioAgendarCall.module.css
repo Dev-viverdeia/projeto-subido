@@ -112,12 +112,12 @@
   overflow: hidden;
   border-right: 1px solid color-mix(in srgb, white 13%, transparent);
   background:
-    radial-gradient(
-      circle at 24% 18%,
-      color-mix(in srgb, var(--via-accent) 48%, transparent),
-      transparent 30%
+    linear-gradient(118deg, color-mix(in srgb, white 10%, transparent), transparent 34%),
+    linear-gradient(
+      298deg,
+      color-mix(in srgb, var(--via-accent) 18%, transparent),
+      transparent 38%
     ),
-    radial-gradient(circle at 82% 72%, color-mix(in srgb, white 12%, transparent), transparent 36%),
     linear-gradient(148deg, var(--via-navy) 0%, var(--via-navy-deep) 68%);
   color: white;
 }
@@ -135,14 +135,7 @@
 }
 
 .setupOrbita {
-  position: absolute;
-  width: 190px;
-  height: 190px;
-  border: 1px solid color-mix(in srgb, white 15%, transparent);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 32px color-mix(in srgb, white 3%, transparent),
-    0 0 0 64px color-mix(in srgb, white 2%, transparent);
+  display: none;
 }
 
 .setupIcone {
@@ -397,8 +390,7 @@
   padding: var(--via-space-2) var(--via-space-3);
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
-  background:
-    radial-gradient(circle at 98% 0%, var(--via-navy-08), transparent 36%), var(--via-glass-card);
+  background: var(--app-glass-plane-strong);
   box-shadow:
     0 1px 0 var(--via-edge-hi) inset,
     var(--via-shadow-sm);

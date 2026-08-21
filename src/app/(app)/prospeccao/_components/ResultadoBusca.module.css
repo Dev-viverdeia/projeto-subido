@@ -28,17 +28,13 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 90% 0, var(--via-navy-12), transparent 34%),
+    linear-gradient(128deg, var(--via-navy-08), transparent 34%),
     linear-gradient(180deg, var(--via-glass-sheen), transparent 38%);
 }
 
 .fundo[data-estado='falhou'] .atmosfera {
   background:
-    radial-gradient(
-      circle at 90% 0,
-      color-mix(in srgb, var(--via-coral) 13%, transparent),
-      transparent 36%
-    ),
+    linear-gradient(128deg, color-mix(in srgb, var(--via-coral) 11%, transparent), transparent 36%),
     linear-gradient(180deg, var(--via-glass-sheen), transparent 38%);
 }
 

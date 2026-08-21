@@ -2,9 +2,8 @@
   min-height: 100dvh;
   padding: var(--via-space-5);
   background:
-    radial-gradient(ellipse 56% 34% at 0% 0%, var(--via-navy-06), transparent 70%),
-    radial-gradient(ellipse 48% 38% at 100% 100%, var(--via-navy-04), transparent 72%),
-    var(--via-bg-2);
+    linear-gradient(128deg, var(--via-navy-05), transparent 28%),
+    linear-gradient(308deg, var(--via-navy-04), transparent 26%), var(--via-bg-2);
 }
 
 .marca {

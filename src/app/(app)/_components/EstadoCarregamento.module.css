@@ -9,9 +9,7 @@
   overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
-  background:
-    radial-gradient(ellipse 46% 160% at 100% 0%, var(--via-navy-08), transparent 70%),
-    var(--via-glass-card);
+  background: var(--app-glass-plane-strong);
   box-shadow: var(--via-glass-shadow);
   backdrop-filter: var(--via-glass-blur);
 }

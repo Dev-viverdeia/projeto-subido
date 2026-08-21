@@ -12,13 +12,7 @@
   align-items: center;
   gap: var(--via-space-8);
   padding: clamp(28px, 4vw, 44px);
-  background:
-    radial-gradient(
-      circle at 92% 0,
-      color-mix(in srgb, var(--via-accent) 11%, transparent),
-      transparent 24rem
-    ),
-    var(--via-white);
+  background: var(--app-glass-plane-strong);
 }
 
 .tituloCentral > p,
@@ -675,13 +669,7 @@
 .historico {
   padding: clamp(28px, 4vw, 44px);
   border-top: 1px solid var(--via-border-hairline);
-  background:
-    radial-gradient(
-      circle at 100% 0,
-      color-mix(in srgb, var(--via-accent) 9%, transparent),
-      transparent 22rem
-    ),
-    var(--via-bg-2);
+  background: var(--app-glass-plane);
 }
 
 .historico > header {

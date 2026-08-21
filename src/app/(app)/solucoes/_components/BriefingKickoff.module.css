@@ -14,8 +14,7 @@
   gap: var(--app-gap-grid);
   padding: clamp(24px, 3vw, 36px);
   border-bottom: 1px solid var(--via-border-hairline);
-  background:
-    radial-gradient(circle at 100% 0, var(--via-accent-soft), transparent 23rem), var(--via-white);
+  background: var(--app-glass-plane-strong);
 }
 
 .tituloGrupo,

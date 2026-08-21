@@ -64,11 +64,7 @@
   border: 1px solid color-mix(in srgb, var(--via-white) 12%, transparent);
   border-radius: var(--app-radius-surface);
   background:
-    radial-gradient(
-      circle at 88% 10%,
-      color-mix(in srgb, var(--via-white) 9%, transparent),
-      transparent 30%
-    ),
+    linear-gradient(118deg, color-mix(in srgb, var(--via-white) 9%, transparent), transparent 32%),
     linear-gradient(
       135deg,
       var(--via-navy) 0%,
@@ -77,18 +73,6 @@
     );
   box-shadow: var(--via-shadow-lg);
   color: var(--via-white);
-}
-
-.perfil::after {
-  position: absolute;
-  right: -120px;
-  bottom: -180px;
-  width: 430px;
-  height: 430px;
-  border: 1px solid color-mix(in srgb, var(--via-white) 8%, transparent);
-  border-radius: 50%;
-  content: '';
-  pointer-events: none;
 }
 
 .identidade,
@@ -300,8 +284,7 @@
 
 .integracaoCalendar {
   grid-column: 1 / -1;
-  background:
-    radial-gradient(circle at 96% 0%, var(--via-navy-08), transparent 34%), var(--via-glass-card);
+  background: var(--app-glass-plane-strong);
   backdrop-filter: var(--via-glass-blur);
 }
 
@@ -555,10 +538,6 @@
     gap: var(--via-space-5);
     padding: var(--via-space-5);
     border-radius: var(--app-radius-surface);
-  }
-
-  .perfil::after {
-    right: -230px;
   }
 
   .identidade {

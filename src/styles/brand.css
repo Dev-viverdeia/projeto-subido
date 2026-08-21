@@ -70,10 +70,10 @@
   --app-elev-1-bg: var(--via-glass-card);
   --app-elev-1-line: var(--via-border-soft);
   --app-elev-1-shadow: var(--via-shadow-sm);
-  --app-elev-2-bg: var(--via-surface);
+  --app-elev-2-bg: color-mix(in srgb, var(--via-surface) 84%, transparent);
   --app-elev-2-line: var(--via-border);
   --app-elev-2-shadow: var(--via-shadow-lg);
-  --app-elev-3-bg: var(--via-surface-elev);
+  --app-elev-3-bg: color-mix(in srgb, var(--via-surface-elev) 92%, transparent);
   --app-elev-3-line: var(--via-border);
   --app-elev-3-shadow: var(--via-shadow-xl);
 
@@ -81,11 +81,31 @@
   --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-white);
   --app-em-ink: var(--via-text-muted);
 
-  /* Campo escuro oficial para os poucos momentos imersivos da plataforma. */
+  /* Campo escuro oficial para os poucos momentos imersivos da plataforma.
+     A profundidade vem de planos de vidro e recortes de luz — nunca de orbes,
+     anéis ou bolhas decorativas. */
   --app-mesh-trilho:
-    radial-gradient(ellipse 82% 54% at 0% 0%, rgba(42, 74, 110, 0.48), transparent 58%),
-    radial-gradient(ellipse 68% 72% at 100% 100%, rgba(30, 58, 95, 0.34), transparent 62%),
+    linear-gradient(112deg, rgba(255, 255, 255, 0.085) 0%, transparent 28%),
+    linear-gradient(292deg, rgba(42, 74, 110, 0.3) 0%, transparent 42%),
     linear-gradient(135deg, var(--via-navy) 0%, var(--via-navy-deep) 68%, var(--via-navy-darker));
+
+  /* Planos líquidos reutilizados pelas superfícies claras. */
+  --app-glass-plane:
+    linear-gradient(
+      132deg,
+      rgba(255, 255, 255, 0.82) 0%,
+      rgba(255, 255, 255, 0.3) 36%,
+      transparent 68%
+    ),
+    color-mix(in srgb, var(--via-surface) 70%, transparent);
+  --app-glass-plane-strong:
+    linear-gradient(
+      132deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.4) 34%,
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--via-surface) 78%, transparent);
 }
 
 :root[data-theme='dark'] {

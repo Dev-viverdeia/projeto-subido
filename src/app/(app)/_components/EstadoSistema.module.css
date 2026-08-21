@@ -169,9 +169,7 @@
   min-width: 0;
   padding: clamp(34px, 4vw, 54px);
   overflow: hidden;
-  background:
-    radial-gradient(circle at 82% 14%, var(--via-navy-40), transparent 34%),
-    radial-gradient(circle at 16% 76%, var(--via-blue), transparent 48%), var(--via-navy-deep);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
 }
 

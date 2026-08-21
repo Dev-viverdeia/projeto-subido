@@ -4,27 +4,11 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-2-line));
   border-radius: var(--app-radius-surface);
-  background:
-    radial-gradient(ellipse 54% 150% at 100% -30%, var(--via-navy-12), transparent 70%),
-    color-mix(in srgb, var(--via-surface) 78%, transparent);
+  background: var(--app-glass-plane-strong);
   box-shadow:
     var(--app-elev-2-shadow),
     inset 0 1px 0 var(--via-edge-hi);
   backdrop-filter: blur(24px) saturate(145%);
-}
-
-.hero::after {
-  position: absolute;
-  z-index: -1;
-  right: -10%;
-  bottom: -190%;
-  width: 42%;
-  aspect-ratio: 1;
-  border: 1px solid var(--via-navy-08);
-  border-radius: 50%;
-  content: '';
-  box-shadow: 0 0 0 34px color-mix(in srgb, var(--via-navy-04) 36%, transparent);
-  pointer-events: none;
 }
 
 .heroTopo {

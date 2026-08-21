@@ -7,19 +7,6 @@
   margin-inline: auto;
 }
 
-.pagina::before {
-  position: fixed;
-  z-index: -1;
-  top: 80px;
-  right: 2%;
-  width: 42vw;
-  height: 42vw;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--via-navy-06), transparent 68%);
-  content: '';
-  pointer-events: none;
-}
-
 .voltar {
   display: inline-flex;
   width: fit-content;

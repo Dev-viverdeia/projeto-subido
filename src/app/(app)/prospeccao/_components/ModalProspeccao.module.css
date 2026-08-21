@@ -31,7 +31,7 @@
   min-height: 132px;
   padding: var(--app-pad-card) var(--via-space-8);
   border-bottom: 1px solid var(--via-border-soft);
-  background: radial-gradient(circle at 84% 0%, var(--via-navy-06), transparent 34%), var(--via-bg);
+  background: var(--app-glass-plane-strong);
 }
 
 .headerIdentity {
@@ -478,8 +478,7 @@
 .crmCard {
   padding: var(--app-pad-card);
   border-color: var(--via-navy-16);
-  background:
-    radial-gradient(circle at 100% 0%, var(--via-navy-12), transparent 48%), var(--via-glass-card-2);
+  background: var(--app-glass-plane-strong);
 }
 
 .crmCard h3,
@@ -874,9 +873,7 @@
     flex: 0 0 auto;
     min-height: 88px;
     padding: var(--via-space-3) var(--via-space-7);
-    background:
-      radial-gradient(circle at 88% 0%, var(--via-navy-10), transparent 34%),
-      var(--via-glass-card-2);
+    background: var(--app-glass-plane-strong);
   }
 
   .headerIdentity h2 {
@@ -896,8 +893,8 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     background:
-      radial-gradient(circle at 8% 0%, var(--via-navy-06), transparent 30%),
-      radial-gradient(circle at 100% 100%, var(--via-navy-08), transparent 32%),
+      linear-gradient(128deg, var(--via-navy-04), transparent 28%),
+      linear-gradient(308deg, var(--via-navy-05), transparent 30%),
       color-mix(in srgb, var(--via-bg-2) 82%, transparent);
   }
 
