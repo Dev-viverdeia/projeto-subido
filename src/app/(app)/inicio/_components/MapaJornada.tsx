@@ -9,7 +9,6 @@ import {
   FileSignature,
   GraduationCap,
   Search,
-  UserRound,
   UsersRound,
   Video,
 } from 'lucide-react';
@@ -17,9 +16,6 @@ import styles from './MapaJornada.module.css';
 
 type Props = {
   nome: string | null;
-  cliente: ReactNode;
-  contato: ReactNode;
-  proximaAcao?: ReactNode;
   proximaMentoria?: ReactNode;
 };
 
@@ -132,7 +128,7 @@ function CartoesAreas({
   );
 }
 
-export function MapaJornada({ nome, cliente, contato, proximaAcao, proximaMentoria }: Props) {
+export function MapaJornada({ nome, proximaMentoria }: Props) {
   const dataLonga = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -162,32 +158,6 @@ export function MapaJornada({ nome, cliente, contato, proximaAcao, proximaMentor
           <span className={styles.mentoriaAcao}>
             Ver próxima sessão <ArrowRight size={15} aria-hidden="true" />
           </span>
-        </Link>
-      </section>
-
-      <section className={styles.emAndamento} aria-labelledby="titulo-andamento">
-        <div className={styles.secaoCabecalho}>
-          <div>
-            <p>Em andamento</p>
-            <h2 id="titulo-andamento">O que já está na sua mesa.</h2>
-          </div>
-        </div>
-        <Link href="/vendas" className={styles.clienteEmFoco}>
-          <span className={styles.clienteIcone}>
-            <BriefcaseBusiness size={19} strokeWidth={1.8} aria-hidden="true" />
-          </span>
-          <span className={styles.clienteTexto}>
-            <small>Oportunidade em foco</small>
-            <strong>{cliente}</strong>
-            <em>
-              <UserRound size={13} aria-hidden="true" /> {contato}
-            </em>
-          </span>
-          <span className={styles.clienteAcao}>
-            <small>Próxima ação</small>
-            <strong>{proximaAcao ?? 'Defina a próxima ação da venda'}</strong>
-          </span>
-          <ArrowRight size={17} aria-hidden="true" />
         </Link>
       </section>
 
