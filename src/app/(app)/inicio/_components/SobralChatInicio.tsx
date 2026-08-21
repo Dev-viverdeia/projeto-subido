@@ -1,4 +1,4 @@
-import { Bot, RefreshCw, Sparkles } from 'lucide-react';
+import { Bot, Link2, RefreshCw } from 'lucide-react';
 import { Conversa, type ExemploDoConsultor } from '../../consultor/_components/Conversa';
 import { Mensagens } from '../../consultor/_components/Mensagens';
 import { obterConversaRecente, type MensagemDoConsultor } from '@/lib/consultor/queries';
@@ -52,7 +52,7 @@ export function SobralChatVisual({
           </span>
         </div>
         <small>
-          <Sparkles size={14} strokeWidth={1.8} aria-hidden="true" /> Seu contexto já está conectado
+          <Link2 size={14} strokeWidth={1.8} aria-hidden="true" /> Seu contexto já está conectado
         </small>
       </header>
 

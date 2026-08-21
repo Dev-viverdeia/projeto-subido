@@ -87,6 +87,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--via-space-1) var(--via-space-2) var(--via-space-4);
+  scrollbar-gutter: stable;
   scrollbar-color: var(--via-border) transparent;
 }
 
@@ -262,6 +263,28 @@
   .glifo {
     width: 40px;
     height: 40px;
+  }
+
+  .cabecalho h2 {
+    margin-top: var(--via-space-1);
+    font-size: 1.65rem;
+  }
+
+  .cabecalho div > span {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: var(--via-fs-xs);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .historico {
+    max-height: min(34dvh, 260px);
+    padding-bottom: var(--via-space-3);
+  }
+
+  .compositor {
+    padding-top: var(--via-space-2);
   }
 
   .estadoFalha {
