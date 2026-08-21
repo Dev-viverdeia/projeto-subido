@@ -38,7 +38,12 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      /* O curinga opcional do Next 16 pode chegar sem valor na raiz e fazer o
+         resolvedor tentar preencher um segmento inexistente. As raízes ficam
+         explícitas para que /vendas e /reunioes nunca dependam desse caso. */
+      { source: '/vendas', destination: '/crm' },
       { source: '/vendas/:path*', destination: '/crm/:path*' },
+      { source: '/reunioes', destination: '/calls' },
       { source: '/reunioes/:path*', destination: '/calls/:path*' },
     ];
   },

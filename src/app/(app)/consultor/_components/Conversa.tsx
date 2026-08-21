@@ -32,12 +32,15 @@ export type ExemploDoConsultor = {
 export function Conversa({
   threadId,
   pendente = false,
+  ultimaMensagemId,
   exemplos,
 }: {
   threadId?: string;
   /** A última mensagem gravada é do usuário e ainda não tem resposta — a
       conversa acabou de nascer no browser e o consultor deve responder JÁ. */
   pendente?: boolean;
+  /** Identifica a versão do histórico que chegou do servidor. */
+  ultimaMensagemId?: string;
   exemplos?: ExemploDoConsultor[];
 }) {
   const router = useRouter();
@@ -47,17 +50,30 @@ export function Conversa({
   const [threadEmUso, setThreadEmUso] = useState(threadId);
   const [threadPendente, setThreadPendente] = useState(pendente);
   const [emVoo, setEmVoo] = useState<string | null>(null);
+  const [respostaEmVoo, setRespostaEmVoo] = useState<string | null>(null);
   const [digitando, setDigitando] = useState(pendente);
   const [erro, setErro] = useState<string | null>(null);
   const [navegando, iniciarNavegacao] = useTransition();
   const fimAncora = useRef<HTMLDivElement>(null);
+  const versaoDoHistorico = useRef(ultimaMensagemId);
 
   const ocupado = emVoo !== null || digitando || navegando;
 
   /* A rodada em voo entra no fim da lista; rolar até ela é o que diz "foi". */
   useEffect(() => {
-    if (emVoo) fimRef.current?.scrollIntoView({ block: 'end' });
-  }, [emVoo]);
+    if (emVoo || respostaEmVoo) fimRef.current?.scrollIntoView({ block: 'end' });
+  }, [emVoo, respostaEmVoo]);
+
+  /* A API já devolve a resposta completa. Ela permanece visível até o RSC
+     confirmar uma nova mensagem no histórico, evitando o clarão vazio que
+     fazia a conversa parecer travada depois do carregamento. */
+  useEffect(() => {
+    if (!ultimaMensagemId || ultimaMensagemId === versaoDoHistorico.current) return;
+    versaoDoHistorico.current = ultimaMensagemId;
+    setEmVoo(null);
+    setRespostaEmVoo(null);
+    setDigitando(false);
+  }, [ultimaMensagemId]);
 
   /* A PENDÊNCIA DISPARA NA CHEGADA: a página navegou para cá com a pergunta
      já gravada; esta é a metade lenta, rodando dentro do chat — que é onde a
@@ -67,7 +83,7 @@ export function Conversa({
     if (!pendente || !threadId) return;
     let ativo = true;
     void (async () => {
-      const { falha } = await responderPendente(threadId);
+      const { dados, falha } = await responderPendente(threadId);
       if (!ativo) return;
       if (falha) {
         setErro(falha.mensagem);
@@ -75,9 +91,10 @@ export function Conversa({
         setThreadPendente(true);
         return;
       }
+      setRespostaEmVoo(dados.resposta);
+      setDigitando(false);
       iniciarNavegacao(() => {
         router.refresh();
-        setDigitando(false);
         setThreadPendente(false);
       });
     })();
@@ -109,6 +126,7 @@ export function Conversa({
     if (!mensagem || ocupado) return;
 
     setErro(null);
+    setRespostaEmVoo(null);
 
     /* CONVERSA NOVA: grava pergunta + thread pelo browser e responde sem tirar
        o usuário da Início. */
@@ -125,7 +143,7 @@ export function Conversa({
       setThreadEmUso(novo);
       setThreadPendente(true);
       setDigitando(true);
-      const { falha: falhaResposta } = await responderPendente(novo);
+      const { dados: dadosResposta, falha: falhaResposta } = await responderPendente(novo);
       if (falhaResposta) {
         setErro(falhaResposta.mensagem);
         setEmVoo(null);
@@ -133,10 +151,11 @@ export function Conversa({
         setTexto(mensagem);
         return;
       }
+      setRespostaEmVoo(dadosResposta.resposta);
+      setEmVoo(null);
+      setDigitando(false);
       iniciarNavegacao(() => {
         router.refresh();
-        setEmVoo(null);
-        setDigitando(false);
         setThreadPendente(false);
       });
       return;
@@ -144,23 +163,28 @@ export function Conversa({
 
     setEmVoo(mensagem);
     setTexto('');
+    setDigitando(true);
 
-    const { falha } = threadPendente
+    const { dados, falha } = threadPendente
       ? await responderPendente(threadEmUso)
       : await enviarMensagem(mensagem, threadEmUso);
 
     if (falha) {
       setErro(falha.mensagem);
       setEmVoo(null);
+      setDigitando(false);
       setTexto(mensagem);
       return;
     }
+
+    setRespostaEmVoo(dados.resposta);
+    setEmVoo(null);
+    setDigitando(false);
 
     /* O refresh trai a conversa regravada; o estado local sai DEPOIS que o
        servidor respondeu, para a pergunta não piscar fora da tela. */
     iniciarNavegacao(() => {
       router.refresh();
-      setEmVoo(null);
       setThreadPendente(false);
     });
   }
@@ -168,19 +192,24 @@ export function Conversa({
   return (
     <div className={styles.conversa}>
       <div ref={fimAncora} aria-hidden="true" />
-      {(emVoo !== null || digitando) && (
+      {(emVoo !== null || digitando || respostaEmVoo !== null) && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
           {emVoo !== null && <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p>}
           {/* A bolha de digitação — o idioma universal de chat, com os três
               pontos em compasso. `role=status` + rótulo para leitor de tela. */}
-          <div className={styles.digitando} role="status" aria-label="Sobral AI escrevendo">
-            <span className={styles.digitandoRotulo}>Sobral AI está preparando a resposta</span>
-            <span className={styles.pontosDigitando} aria-hidden="true">
-              <span className={styles.pontinho} />
-              <span className={styles.pontinho} />
-              <span className={styles.pontinho} />
-            </span>
-          </div>
+          {digitando && (
+            <div className={styles.digitando} role="status" aria-label="Sobral AI escrevendo">
+              <span className={styles.digitandoRotulo}>Sobral AI está preparando a resposta</span>
+              <span className={styles.pontosDigitando} aria-hidden="true">
+                <span className={styles.pontinho} />
+                <span className={styles.pontinho} />
+                <span className={styles.pontinho} />
+              </span>
+            </div>
+          )}
+          {respostaEmVoo !== null && (
+            <p className={`${styles.balao} ${styles.doConsultor}`}>{respostaEmVoo}</p>
+          )}
         </div>
       )}
 
