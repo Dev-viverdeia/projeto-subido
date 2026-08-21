@@ -219,34 +219,9 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--via-navy) 22%, var(--via-border));
   border-radius: var(--app-radius-surface);
-  background: var(--via-navy-deep);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
   box-shadow: var(--via-shadow-lg);
-}
-
-.proximaCall::before,
-.proximaCall::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.proximaCall::before {
-  top: -230px;
-  right: 18%;
-  width: 540px;
-  height: 540px;
-  border: 80px solid rgba(29, 91, 255, 0.1);
-}
-
-.proximaCall::after {
-  right: -180px;
-  bottom: -340px;
-  width: 560px;
-  height: 560px;
-  background: color-mix(in srgb, var(--via-accent) 12%, transparent);
 }
 
 .proximaContexto {
@@ -729,8 +704,7 @@
   overflow: hidden;
   padding: var(--via-space-5);
   border-color: var(--via-accent-hairline);
-  background:
-    radial-gradient(circle at 100% 0%, var(--via-navy-06), transparent 48%), var(--via-surface);
+  background: var(--app-glass-plane-strong);
   box-shadow: var(--app-elev-2-shadow);
 }
 
@@ -1027,11 +1001,6 @@
   .proximaCall {
     min-height: 0;
     border-radius: var(--app-radius-card);
-  }
-
-  .proximaCall::before {
-    top: -260px;
-    right: -230px;
   }
 
   .proximaContexto,

@@ -12,8 +12,7 @@
 }
 
 .entrega[data-final] > header {
-  background:
-    radial-gradient(circle at 100% 0, rgba(0, 174, 239, 0.1), transparent 18rem), var(--via-bg-2);
+  background: var(--app-glass-plane-strong);
 }
 
 .entrega > header {

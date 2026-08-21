@@ -27,26 +27,9 @@
   overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
-  background:
-    radial-gradient(ellipse 42% 130% at 100% 0%, var(--via-navy-08), transparent 72%),
-    var(--via-glass-card);
+  background: var(--app-glass-plane-strong);
   box-shadow: var(--via-glass-shadow);
   backdrop-filter: var(--via-glass-blur);
-}
-
-.hero::after {
-  position: absolute;
-  top: -120px;
-  right: -90px;
-  width: 290px;
-  aspect-ratio: 1;
-  border: 1px solid var(--via-navy-06);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 42px var(--via-navy-03),
-    0 0 0 84px color-mix(in srgb, var(--via-navy) 2%, transparent);
-  content: '';
-  pointer-events: none;
 }
 
 .hero > * {

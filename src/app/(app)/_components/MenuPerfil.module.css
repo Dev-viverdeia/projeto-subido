@@ -80,11 +80,7 @@
   gap: var(--via-space-3);
   padding: var(--via-space-5);
   background:
-    radial-gradient(
-      circle at 100% 0%,
-      color-mix(in srgb, var(--via-white) 10%, transparent),
-      transparent 38%
-    ),
+    linear-gradient(128deg, color-mix(in srgb, var(--via-white) 9%, transparent), transparent 38%),
     var(--via-navy);
   color: var(--via-white);
 }

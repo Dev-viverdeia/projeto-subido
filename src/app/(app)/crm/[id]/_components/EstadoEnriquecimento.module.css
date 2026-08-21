@@ -178,13 +178,7 @@
   gap: var(--via-space-5);
   padding: clamp(24px, 3vw, 34px);
   border-color: color-mix(in srgb, var(--via-danger) 22%, var(--via-border-soft));
-  background:
-    radial-gradient(
-      circle at 90% 0%,
-      color-mix(in srgb, var(--via-danger) 7%, transparent),
-      transparent 38%
-    ),
-    color-mix(in srgb, var(--via-surface) 86%, transparent);
+  background: color-mix(in srgb, var(--via-danger) 4%, var(--app-elev-1-bg));
 }
 
 .iconeFalha {
@@ -219,13 +213,7 @@
   padding: clamp(26px, 4vw, 38px);
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
-  background:
-    radial-gradient(
-      circle at 90% 0%,
-      color-mix(in srgb, var(--via-danger) 8%, transparent),
-      transparent 38%
-    ),
-    var(--via-glass-card);
+  background: color-mix(in srgb, var(--via-danger) 4%, var(--app-elev-2-bg));
   box-shadow: var(--via-glass-shadow-lift);
   backdrop-filter: var(--via-glass-blur);
 }

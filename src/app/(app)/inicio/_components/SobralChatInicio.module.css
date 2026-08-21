@@ -3,9 +3,7 @@
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
-  background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 32%),
-    var(--app-elev-2-bg);
+  background: var(--app-glass-plane-strong);
   box-shadow: var(--app-elev-2-shadow);
   backdrop-filter: blur(22px) saturate(135%);
 }

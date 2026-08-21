@@ -134,9 +134,7 @@
 
 .metodo li[data-estado='concluida'] {
   border-color: var(--via-navy-20);
-  background:
-    radial-gradient(ellipse 82% 120% at 0% 0%, var(--via-navy-08), transparent 70%),
-    color-mix(in srgb, var(--via-surface) 90%, transparent);
+  background: var(--app-glass-plane-strong);
   box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
@@ -179,13 +177,7 @@
   gap: var(--via-space-6);
   padding: var(--via-space-6) clamp(24px, 3vw, 36px);
   border-block: 1px solid color-mix(in srgb, var(--via-white) 9%, transparent);
-  background:
-    radial-gradient(
-      circle at 88% 0%,
-      color-mix(in srgb, var(--via-accent) 12%, transparent),
-      transparent 38%
-    ),
-    var(--via-navy-deep);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
 }
 

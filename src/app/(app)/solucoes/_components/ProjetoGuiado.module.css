@@ -10,7 +10,7 @@
   grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
   border-radius: var(--app-radius-card);
   background:
-    radial-gradient(circle at 84% 0%, var(--via-accent-soft), transparent 30%),
+    linear-gradient(118deg, color-mix(in srgb, var(--via-white) 8%, transparent), transparent 32%),
     linear-gradient(145deg, var(--via-navy), var(--via-navy-deep));
   color: var(--via-white);
   box-shadow: 0 24px 70px -40px var(--via-navy-60);
@@ -1186,8 +1186,7 @@
 .rotaProjeto header {
   padding: var(--app-pad-card);
   border-bottom: 1px solid var(--via-border-hairline);
-  background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 52%), var(--via-surface);
+  background: var(--app-glass-plane-strong);
 }
 
 .rotaProjeto header span,
@@ -1508,9 +1507,7 @@
   padding: var(--via-space-4);
   border-radius: var(--app-radius-control) var(--app-radius-control) var(--app-radius-card)
     var(--app-radius-card);
-  background:
-    radial-gradient(circle at 100% 0%, var(--via-accent-soft), transparent 46%),
-    var(--app-elev-1-bg);
+  background: var(--app-glass-plane);
 }
 
 .estudio > svg {

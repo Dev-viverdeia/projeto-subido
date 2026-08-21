@@ -1,9 +1,7 @@
 .pagina {
   min-height: 100dvh;
   padding: var(--via-space-5);
-  background:
-    radial-gradient(circle at 12% 10%, rgba(29, 91, 255, 0.16), transparent 28%),
-    var(--via-navy-deep);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
 }
 
@@ -47,18 +45,6 @@
   background:
     linear-gradient(155deg, rgba(29, 91, 255, 0.19), transparent 46%),
     color-mix(in srgb, var(--via-navy) 86%, var(--via-navy-deep));
-}
-
-.contexto::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  right: -220px;
-  bottom: -300px;
-  width: 520px;
-  height: 520px;
-  border: 74px solid rgba(255, 255, 255, 0.035);
-  border-radius: 50%;
 }
 
 .sobretitulo {
