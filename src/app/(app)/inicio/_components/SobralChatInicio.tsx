@@ -1,4 +1,4 @@
-import { Bot, Sparkles } from 'lucide-react';
+import { Bot, RefreshCw, Sparkles } from 'lucide-react';
 import { Conversa, type ExemploDoConsultor } from '../../consultor/_components/Conversa';
 import { Mensagens } from '../../consultor/_components/Mensagens';
 import { obterConversaRecente, type MensagemDoConsultor } from '@/lib/consultor/queries';
@@ -74,7 +74,12 @@ export function SobralChatVisual({
         </HistoricoChat>
 
         <div className={styles.compositor}>
-          <Conversa threadId={threadId} pendente={pendente} exemplos={exemplos} />
+          <Conversa
+            threadId={threadId}
+            pendente={pendente}
+            ultimaMensagemId={mensagens[mensagens.length - 1]?.id}
+            exemplos={exemplos}
+          />
         </div>
       </div>
     </section>
@@ -82,7 +87,10 @@ export function SobralChatVisual({
 }
 
 export async function SobralChatInicio({ jornada }: { jornada: JornadaOperacional }) {
-  const conversa = await obterConversaRecente();
+  const resultado = await carregarConversaRecente();
+  if (!resultado.ok) return <SobralChatInicioFalhou />;
+
+  const conversa = resultado.conversa;
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
 
@@ -93,6 +101,41 @@ export async function SobralChatInicio({ jornada }: { jornada: JornadaOperaciona
       pendente={ultima?.papel === 'usuario'}
       exemplos={exemplosDa(jornada)}
     />
+  );
+}
+
+async function carregarConversaRecente(): Promise<
+  { ok: true; conversa: Awaited<ReturnType<typeof obterConversaRecente>> } | { ok: false }
+> {
+  try {
+    return { ok: true, conversa: await obterConversaRecente() };
+  } catch (causa) {
+    /* O Sobral é parte da Início, mas não pode derrubar a Início. Se a leitura
+       do histórico falhar, isolamos o problema e mantemos o restante da
+       plataforma utilizável. O histórico permanece intacto no banco. */
+    console.error('[sobral:inicio] falha ao carregar a conversa:', causa);
+    return { ok: false };
+  }
+}
+
+function SobralChatInicioFalhou() {
+  return (
+    <section id="sobral-ai" className={styles.secao} aria-labelledby="titulo-sobral-ai-falha">
+      <div className={styles.estadoFalha} role="alert">
+        <span className={styles.glifo} aria-hidden="true">
+          <Bot size={21} strokeWidth={1.75} />
+        </span>
+        <div>
+          <p>Sobral AI</p>
+          <h2 id="titulo-sobral-ai-falha">O chat não carregou desta vez.</h2>
+          <span>Seu histórico continua salvo. Atualize esta área para tentar novamente.</span>
+        </div>
+        <a href="/inicio#sobral-ai" className={styles.acaoFalha}>
+          <RefreshCw size={15} strokeWidth={2} aria-hidden="true" />
+          Tentar novamente
+        </a>
+      </div>
+    </section>
   );
 }
 

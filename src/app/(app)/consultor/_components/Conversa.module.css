@@ -29,6 +29,13 @@
   color: var(--via-white);
 }
 
+.doConsultor {
+  align-self: flex-start;
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-primary);
+}
+
 /* A BOLHA DE DIGITAÇÃO — anatomia de mensagem do consultor, três pontos em
    compasso defasado. Só opacity; o compasso vem do delay, não de deslocamento. */
 .digitando {
