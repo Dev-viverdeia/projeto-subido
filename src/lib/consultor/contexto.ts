@@ -45,14 +45,18 @@ export async function obterSinaisSobral(
         .select('id, status, oportunidade_id, empresa_id, titulo, atualizado_em')
         .order('atualizado_em', { ascending: false })
         .limit(500);
-  const catalogoConsulta = fatosCompartilhados
-    ? Promise.resolve(null)
-    : supabase
-        .from('solucoes')
-        .select('slug, titulo, categoria')
-        .eq('status', 'publicado')
-        .order('ordem')
-        .limit(20);
+  const catalogoConsulta = supabase
+    .from('solucoes')
+    .select('slug, titulo, categoria, solucao_itens(tipo, titulo)')
+    .eq('status', 'publicado')
+    .order('ordem')
+    .limit(20);
+  const formacoesConsulta = supabase
+    .from('formacoes')
+    .select('slug, titulo, resumo, modulos(aulas(id, titulo))')
+    .eq('status', 'publicado')
+    .order('ordem')
+    .limit(20);
   const projetosConsulta = fatosCompartilhados
     ? Promise.resolve(null)
     : supabase
@@ -61,31 +65,43 @@ export async function obterSinaisSobral(
         .order('atualizado_em', { ascending: false })
         .limit(200);
 
-  const [oportunidades, empresas, calls, propostas, studio, catalogo, projetos, acoes, jornada] =
-    await Promise.all([
-      oportunidadesConsulta,
-      supabase.from('crm_empresas').select('id, nome').limit(500),
-      callsConsulta,
-      propostasConsulta,
-      supabase.from('builder_solucoes').select('id, status').limit(300),
-      catalogoConsulta,
-      projetosConsulta,
-      supabase
-        .from('projeto_acoes')
-        .select(
-          'id, titulo, empresa_id, oportunidade_id, projeto_execucao_id, reuniao_id, prazo_em, status, atualizado_em',
-        )
-        .order('atualizado_em', { ascending: false })
-        .limit(500),
-      jornadaRecebida ?? obterJornadaOperacionalComCliente(supabase),
-    ]);
+  const [
+    oportunidades,
+    empresas,
+    calls,
+    propostas,
+    studio,
+    catalogo,
+    formacoes,
+    projetos,
+    acoes,
+    jornada,
+  ] = await Promise.all([
+    oportunidadesConsulta,
+    supabase.from('crm_empresas').select('id, nome').limit(500),
+    callsConsulta,
+    propostasConsulta,
+    supabase.from('builder_solucoes').select('id, status').limit(300),
+    catalogoConsulta,
+    formacoesConsulta,
+    projetosConsulta,
+    supabase
+      .from('projeto_acoes')
+      .select(
+        'id, titulo, empresa_id, oportunidade_id, projeto_execucao_id, reuniao_id, prazo_em, status, atualizado_em',
+      )
+      .order('atualizado_em', { ascending: false })
+      .limit(500),
+    jornadaRecebida ?? obterJornadaOperacionalComCliente(supabase),
+  ]);
 
   if (oportunidades?.error) throw handleError(oportunidades.error, 'sobral:oportunidades');
   if (empresas.error) throw handleError(empresas.error, 'sobral:empresas');
   if (calls?.error) throw handleError(calls.error, 'sobral:calls');
   if (propostas?.error) throw handleError(propostas.error, 'sobral:propostas');
   if (studio.error) throw handleError(studio.error, 'sobral:studio');
-  if (catalogo?.error) throw handleError(catalogo.error, 'sobral:catalogo');
+  if (catalogo.error) throw handleError(catalogo.error, 'sobral:catalogo');
+  if (formacoes.error) throw handleError(formacoes.error, 'sobral:formacoes');
   if (projetos?.error) throw handleError(projetos.error, 'sobral:projetos');
   if (acoes.error) throw handleError(acoes.error, 'sobral:acoes');
 
@@ -165,11 +181,36 @@ export async function obterSinaisSobral(
       aprendizado: jornada.aprendizado,
     },
     radar,
-    catalogo: (fatosCompartilhados?.catalogo ?? catalogo?.data ?? []).map((projeto) => ({
+    catalogo: (catalogo.data ?? fatosCompartilhados?.catalogo ?? []).map((projeto) => ({
       slug: projeto.slug,
       titulo: projeto.titulo,
       categoria: projeto.categoria,
     })),
+    formacoes: (formacoes.data ?? []).map((formacao) => ({
+      slug: formacao.slug,
+      titulo: formacao.titulo,
+      resumo: formacao.resumo,
+    })),
+    aulas: (formacoes.data ?? []).flatMap((formacao) =>
+      formacao.modulos.flatMap((modulo) =>
+        modulo.aulas.map((aula) => ({
+          id: aula.id,
+          titulo: aula.titulo,
+          formacaoSlug: formacao.slug,
+          formacaoTitulo: formacao.titulo,
+        })),
+      ),
+    ),
+    ferramentas: (catalogo.data ?? []).flatMap((projeto) =>
+      projeto.solucao_itens
+        .filter((item) => item.tipo === 'ferramenta')
+        .map((item) => ({
+          chave: `${projeto.slug}:${item.titulo}`,
+          titulo: item.titulo,
+          projetoSlug: projeto.slug,
+          projetoTitulo: projeto.titulo,
+        })),
+    ),
     foco: foco
       ? {
           oportunidadeId: foco.id,
@@ -225,6 +266,9 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
         momento: item.momento,
       })),
       projetos_disponiveis: sinais.catalogo,
+      formacoes_disponiveis: sinais.formacoes,
+      aulas_disponiveis: sinais.aulas,
+      ferramentas_por_projeto: sinais.ferramentas,
     },
     null,
     2,

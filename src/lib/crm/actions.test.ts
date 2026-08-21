@@ -46,8 +46,6 @@ describe('criarLead', () => {
     });
     expect(revalidatePath).toHaveBeenCalledWith('/vendas');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
-    expect(revalidatePath).toHaveBeenCalledWith('/consultor');
-    expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
     expect(redirect).toHaveBeenCalledWith(`/vendas/${OPORTUNIDADE_ID}?novo=1`);
   });
 

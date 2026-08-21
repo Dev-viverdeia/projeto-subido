@@ -166,6 +166,12 @@
   color: var(--via-text-primary);
 }
 
+.cartaoMotivo {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
 .cartaoAcao {
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);

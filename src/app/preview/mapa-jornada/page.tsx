@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import {
-  Bot,
   BriefcaseBusiness,
   ClipboardCheck,
   DraftingCompass,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
 import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
+import { SobralChatVisual } from '@/app/(app)/inicio/_components/SobralChatInicio';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { SinaisSobralSchema } from '@/lib/consultor/direcao';
 import { montarPlanoJornada } from '@/lib/jornada/motor';
@@ -239,9 +239,6 @@ export default async function PreviewMapaJornadaPage({
           <span>
             <DraftingCompass size={18} strokeWidth={1.7} aria-hidden="true" /> Estúdio
           </span>
-          <span>
-            <Bot size={18} strokeWidth={1.7} aria-hidden="true" /> Sobral AI
-          </span>
         </nav>
         <div className={styles.perfil}>
           <span>MM</span>
@@ -254,6 +251,19 @@ export default async function PreviewMapaJornadaPage({
       <main id="conteudo" className={styles.conteudo}>
         <MapaJornada
           nome="Mateus"
+          sobral={
+            <SobralChatVisual
+              mensagens={[]}
+              exemplos={[
+                { rotulo: 'O que faço agora?', texto: 'O que devo fazer agora?' },
+                { rotulo: 'Indique uma aula', texto: 'Qual aula pode me ajudar agora?' },
+                {
+                  rotulo: 'Escolha uma ferramenta',
+                  texto: 'Qual ferramenta faz sentido para o meu próximo passo?',
+                },
+              ]}
+            />
+          }
           prioridade={
             <PrioridadeOperacional
               modo={prioridade.modo}

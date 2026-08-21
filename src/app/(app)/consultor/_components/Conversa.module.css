@@ -215,6 +215,7 @@
   font-family: inherit;
   font-size: var(--via-fs-sm);
   color: var(--via-text-primary);
+  white-space: nowrap;
   cursor: pointer;
   transition:
     border-color var(--app-t-state),

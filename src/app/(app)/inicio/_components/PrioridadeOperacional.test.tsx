@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { PrioridadeOperacional } from './PrioridadeOperacional';
 
 describe('PrioridadeOperacional', () => {
-  it('abre a ação exata e mantém a leitura completa como apoio', () => {
+  it('abre a ação exata e leva a dúvida para o chat da Início', () => {
     render(
       <PrioridadeOperacional
         modo="leitura factual"
@@ -21,9 +21,9 @@ describe('PrioridadeOperacional', () => {
       'href',
       '/propostas/proposta-1',
     );
-    expect(screen.getByRole('link', { name: 'Ver orientação completa' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Conversar sobre este passo' })).toHaveAttribute(
       'href',
-      '/consultor',
+      '#sobral-ai',
     );
     expect(screen.getByText('Proposta apresentada e próxima decisão registrada.')).toBeVisible();
   });

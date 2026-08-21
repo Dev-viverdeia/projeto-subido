@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleError } from '@/lib/errors';
 import type { JornadaOperacional } from '@/lib/jornada/queries';
@@ -16,6 +16,7 @@ import {
   type SinaisSobral,
 } from './direcao';
 import { RecomendacaoProximaAcaoSchema } from './recomendacao';
+import { CartoesProdutoPersistidosSchema, type CartaoProduto } from './conteudo';
 
 /**
  * Leituras do Consultor — RSC only, mesma disciplina do builder/queries.ts:
@@ -29,27 +30,16 @@ export type ThreadDoConsultor = {
   atualizadoEm: string;
 };
 
-/** Ponteiro para uma solução do catálogo citada na resposta. */
-export type CartaoDeSolucao = {
-  slug: string;
-  titulo: string;
-  categoria: string | null;
-};
-
 export type MensagemDoConsultor = {
   id: string;
   papel: 'usuario' | 'consultor';
   conteudo: string;
-  cartoes: CartaoDeSolucao[];
+  cartoes: CartaoProduto[];
   direcao: DirecaoMensagem | null;
   acaoConfirmada: z.infer<typeof AcaoConfirmadaCrmSchema> | null;
   modelo: string | null;
   criadoEm: string;
 };
-
-const Cartoes = z.array(
-  z.object({ slug: z.string(), titulo: z.string(), categoria: z.string().nullable() }),
-);
 
 export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
   const supabase = await createClient();
@@ -65,6 +55,16 @@ export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
     criadoEm: t.criado_em,
     atualizadoEm: t.atualizado_em,
   }));
+});
+
+/**
+ * O produto expõe uma única conversa contínua na Início. Threads antigas não
+ * são apagadas: apenas a mais recente fica visível, preservando todo dado já
+ * criado antes desta simplificação.
+ */
+export const obterConversaRecente = cache(async () => {
+  const [recente] = await listarThreads();
+  return recente ? obterConversa(recente.id) : null;
 });
 
 export type PainelSobral = {
@@ -146,7 +146,7 @@ export const obterConversa = cache(
       mensagens: (mensagens ?? []).map((m) => {
         /* `safeParse` no JSONB, como o Builder faz com o documento: cartão em
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
-        const cartoes = Cartoes.safeParse(m.cartoes);
+        const cartoes = CartoesProdutoPersistidosSchema.safeParse(m.cartoes);
         const direcao = DirecaoMensagemSchema.safeParse(m.direcao);
         const recomendacao = m.sobral_acoes_crm
           ? RecomendacaoProximaAcaoSchema.safeParse(m.sobral_acoes_crm.sobral_recomendacoes_crm)

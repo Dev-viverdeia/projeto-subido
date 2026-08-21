@@ -104,6 +104,35 @@ export const SinaisSobralSchema = z.object({
   catalogo: z.array(
     z.object({ slug: z.string(), titulo: z.string(), categoria: z.string().nullable() }),
   ),
+  formacoes: z
+    .array(
+      z.object({
+        slug: z.string(),
+        titulo: z.string(),
+        resumo: z.string(),
+      }),
+    )
+    .default([]),
+  aulas: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        titulo: z.string(),
+        formacaoSlug: z.string(),
+        formacaoTitulo: z.string(),
+      }),
+    )
+    .default([]),
+  ferramentas: z
+    .array(
+      z.object({
+        chave: z.string(),
+        titulo: z.string(),
+        projetoSlug: z.string(),
+        projetoTitulo: z.string(),
+      }),
+    )
+    .default([]),
   foco: FocoSchema,
 });
 

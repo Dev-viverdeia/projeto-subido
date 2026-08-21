@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ListChecks } from 'lucide-react';
 import styles from './MapaJornada.module.css';
 
 export type PrioridadeOperacionalProps = {
@@ -16,7 +16,7 @@ export type PrioridadeOperacionalProps = {
 
 /**
  * A única direção de trabalho da Início. A origem dos fatos fica explícita e
- * o CTA sempre aponta para o registro resolvido pelo Sobral AI.
+ * o CTA sempre aponta para o registro que resolve a tarefa.
  */
 export function PrioridadeOperacional({
   modo,
@@ -41,12 +41,16 @@ export function PrioridadeOperacional({
       : rotuloEvidencia === 'Registro de conclusão'
         ? 'Concluído quando'
         : rotuloEvidencia;
+  const origemVisivel =
+    modoVisivel === 'plano de trabalho'
+      ? 'Plano de trabalho'
+      : `Plano de trabalho · ${modoVisivel}`;
 
   return (
     <article className={styles.prioridade}>
       <div className={styles.prioridadeTopo}>
         <span>
-          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · {modoVisivel}
+          <ListChecks size={14} strokeWidth={1.9} aria-hidden="true" /> {origemVisivel}
         </span>
         <em>{etapa}</em>
       </div>
@@ -60,8 +64,8 @@ export function PrioridadeOperacional({
           {acao}
           <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
         </Link>
-        <Link href="/consultor" className={styles.abrirLeitura}>
-          Ver orientação completa
+        <Link href="#sobral-ai" className={styles.abrirLeitura}>
+          Conversar sobre este passo
         </Link>
       </div>
 
@@ -81,7 +85,7 @@ export function PrioridadeOperacionalCarregando() {
     <article className={`${styles.prioridade} ${styles.prioridadeCarregando}`} aria-busy="true">
       <div className={styles.prioridadeTopo}>
         <span>
-          <Bot size={14} strokeWidth={1.9} aria-hidden="true" /> Sobral AI · analisando seus dados
+          <ListChecks size={14} strokeWidth={1.9} aria-hidden="true" /> Preparando seu plano
         </span>
       </div>
       <h1>Organizando sua próxima ação.</h1>

@@ -92,6 +92,31 @@ describe('contexto factual do Sobral AI', () => {
       },
     };
     const dadosPorTabela: Record<string, unknown[]> = {
+      solucoes: [
+        {
+          slug: perfil.projetoInicialSlug,
+          titulo: perfil.projetoInicialTitulo,
+          categoria: 'Atendimento',
+          solucao_itens: [{ tipo: 'ferramenta', titulo: 'OpenAI' }],
+        },
+      ],
+      formacoes: [
+        {
+          slug: 'fundamentos-de-ia',
+          titulo: 'Fundamentos de IA',
+          resumo: 'Base para começar a implementar.',
+          modulos: [
+            {
+              aulas: [
+                {
+                  id: '44444444-4444-4444-8444-444444444444',
+                  titulo: 'Como escolher o primeiro projeto',
+                },
+              ],
+            },
+          ],
+        },
+      ],
       crm_empresas: [{ id: empresaId, nome: 'Clínica Aurora' }],
       builder_solucoes: [],
       projeto_acoes: [],
@@ -102,6 +127,8 @@ describe('contexto factual do Sobral AI', () => {
     const sinais = await obterSinaisSobral(supabase, jornada);
 
     expect(from.mock.calls.map(([tabela]) => tabela)).toEqual([
+      'solucoes',
+      'formacoes',
       'crm_empresas',
       'builder_solucoes',
       'projeto_acoes',
@@ -111,5 +138,7 @@ describe('contexto factual do Sobral AI', () => {
       oportunidadeId,
       empresa: 'Clínica Aurora',
     });
+    expect(sinais.aulas[0]).toMatchObject({ titulo: 'Como escolher o primeiro projeto' });
+    expect(sinais.ferramentas[0]).toMatchObject({ titulo: 'OpenAI' });
   });
 });

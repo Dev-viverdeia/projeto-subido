@@ -18,8 +18,9 @@ const MAXIMO = 8000;
  * conversa regravada do banco — aí o estado local zera e a fonte volta a ser
  * uma só. É o mesmo desenho do Builder: o banco conta a história.
  *
- * Numa conversa NOVA (sem thread), a resposta traz o id e a navegação leva para
- * /consultor/[id] — a URL vira o estado, como no Builder.
+ * Numa conversa nova, a thread nasce em segundo plano e continua no mesmo chat
+ * da Início. A URL deixa de ser estado: o histórico mais recente é carregado
+ * pelo servidor a cada atualização.
  */
 export type ExemploDoConsultor = {
   /** O que aparece no chip — rótulo curto. */
@@ -43,6 +44,8 @@ export function Conversa({
   const campoRef = useRef<HTMLTextAreaElement>(null);
   const fimRef = useRef<HTMLDivElement>(null);
   const [texto, setTexto] = useState('');
+  const [threadEmUso, setThreadEmUso] = useState(threadId);
+  const [threadPendente, setThreadPendente] = useState(pendente);
   const [emVoo, setEmVoo] = useState<string | null>(null);
   const [digitando, setDigitando] = useState(pendente);
   const [erro, setErro] = useState<string | null>(null);
@@ -69,11 +72,13 @@ export function Conversa({
       if (falha) {
         setErro(falha.mensagem);
         setDigitando(false);
+        setThreadPendente(true);
         return;
       }
       iniciarNavegacao(() => {
         router.refresh();
         setDigitando(false);
+        setThreadPendente(false);
       });
     })();
     return () => {
@@ -87,8 +92,8 @@ export function Conversa({
      não movimento; animar a chegada seria teatro. Roda a cada remonte, e a
      página remonta quando o refresh traz mensagens novas. */
   useEffect(() => {
-    if (threadId) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
-  }, [threadId]);
+    if (threadEmUso) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
+  }, [threadEmUso]);
 
   /* O campo CRESCE com o texto, como o compositor do Builder — `auto` antes de
      ler o scrollHeight, senão a altura anterior vira piso e ele nunca encolhe. */
@@ -105,24 +110,44 @@ export function Conversa({
 
     setErro(null);
 
-    /* CONVERSA NOVA: grava pergunta + thread pelo browser (milissegundos) e
-       NAVEGA — a resposta acontece dentro do chat, onde a espera pertence. */
-    if (!threadId) {
+    /* CONVERSA NOVA: grava pergunta + thread pelo browser e responde sem tirar
+       o usuário da Início. */
+    if (!threadEmUso) {
       setEmVoo(mensagem);
+      setTexto('');
       const { threadId: novo, falha } = await criarConversa(mensagem);
-      if (falha) {
-        setErro(falha);
+      if (falha || !novo) {
+        setErro(falha ?? 'Não foi possível iniciar a conversa.');
         setEmVoo(null);
+        setTexto(mensagem);
         return;
       }
-      iniciarNavegacao(() => router.push(`/consultor/${novo}`));
+      setThreadEmUso(novo);
+      setThreadPendente(true);
+      setDigitando(true);
+      const { falha: falhaResposta } = await responderPendente(novo);
+      if (falhaResposta) {
+        setErro(falhaResposta.mensagem);
+        setEmVoo(null);
+        setDigitando(false);
+        setTexto(mensagem);
+        return;
+      }
+      iniciarNavegacao(() => {
+        router.refresh();
+        setEmVoo(null);
+        setDigitando(false);
+        setThreadPendente(false);
+      });
       return;
     }
 
     setEmVoo(mensagem);
     setTexto('');
 
-    const { falha } = await enviarMensagem(mensagem, threadId);
+    const { falha } = threadPendente
+      ? await responderPendente(threadEmUso)
+      : await enviarMensagem(mensagem, threadEmUso);
 
     if (falha) {
       setErro(falha.mensagem);
@@ -136,6 +161,7 @@ export function Conversa({
     iniciarNavegacao(() => {
       router.refresh();
       setEmVoo(null);
+      setThreadPendente(false);
     });
   }
 
