@@ -365,8 +365,8 @@ export function montarPlanoJornada(sinais: SinaisJornada): PlanoJornada {
       'Leve os fatos acumulados para o Sobral AI e escolha onde aumentar qualidade ou previsibilidade.',
       'Primeiro ciclo operacional completo.',
       false,
-      '/consultor',
-      'Revisar com Sobral AI',
+      '/inicio#sobral-ai',
+      'Conversar com Sobral AI',
     );
 
   return {

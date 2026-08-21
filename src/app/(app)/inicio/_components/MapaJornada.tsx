@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import {
   ArrowRight,
-  Bot,
   BriefcaseBusiness,
   CalendarDays,
   Check,
@@ -21,6 +20,7 @@ import styles from './MapaJornada.module.css';
 type Props = {
   nome: string | null;
   prioridade: ReactNode;
+  sobral: ReactNode;
   cliente: ReactNode;
   contato: ReactNode;
   proximaAcao?: ReactNode;
@@ -52,14 +52,6 @@ const AREAS_APRENDER = [
     descricao: 'Transforme uma dor real em um projeto sob medida.',
     acao: 'Criar um projeto',
     Icone: DraftingCompass,
-  },
-  {
-    href: '/consultor',
-    rotulo: 'Orientação',
-    titulo: 'Sobral AI',
-    descricao: 'Tire dúvidas e descubra o melhor próximo passo.',
-    acao: 'Pedir orientação',
-    Icone: Bot,
   },
   {
     href: '/mentorias',
@@ -172,6 +164,7 @@ function TrilhoCompacto({ plano }: { plano: PlanoJornada }) {
 export function MapaJornada({
   nome,
   prioridade,
+  sobral,
   cliente,
   contato,
   proximaAcao,
@@ -244,6 +237,8 @@ export function MapaJornada({
           </aside>
         </div>
       </section>
+
+      {sobral}
 
       <section className={styles.caminho} aria-labelledby="titulo-caminho">
         <div className={styles.secaoCabecalho}>

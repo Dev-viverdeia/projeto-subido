@@ -8,6 +8,7 @@ import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
 import { PrioridadeOperacionalCarregando } from './_components/PrioridadeOperacional';
 import { PrioridadeSobralInicio } from './_components/PrioridadeSobralInicio';
+import { SobralChatInicio, SobralChatInicioCarregando } from './_components/SobralChatInicio';
 
 export const metadata: Metadata = { title: 'Início' };
 
@@ -56,6 +57,11 @@ export default async function InicioPage() {
       prioridade={
         <Suspense fallback={<PrioridadeOperacionalCarregando />}>
           <PrioridadeSobralInicio jornada={jornada} />
+        </Suspense>
+      }
+      sobral={
+        <Suspense fallback={<SobralChatInicioCarregando />}>
+          <SobralChatInicio jornada={jornada} />
         </Suspense>
       }
       cliente={

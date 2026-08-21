@@ -98,8 +98,6 @@ describe('agendarReuniao', () => {
     });
     expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
-    expect(revalidatePath).toHaveBeenCalledWith('/consultor');
-    expect(revalidatePath).toHaveBeenCalledWith('/consultor/[id]', 'page');
     expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
 

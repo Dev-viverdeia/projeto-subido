@@ -5,6 +5,13 @@ import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
 import styles from './Mensagens.module.css';
 
+const ACAO_POR_TIPO = {
+  aula: 'Abrir aula',
+  formacao: 'Abrir formação',
+  projeto: 'Abrir projeto',
+  ferramenta: 'Ver no projeto',
+} as const;
+
 /**
  * O histórico gravado — Server Component puro: o texto vem do banco pelo RSC e
  * nenhum byte disto entra no bundle do cliente.
@@ -67,19 +74,17 @@ export function Mensagens({
               />
             ) : null}
 
-            {/* Projeto citado vira caminho de um clique. Detectado pelo Route
-                Handler no texto final e gravado
-                com a mensagem — a tela só lê, nunca reparseia. */}
+            {/* Conteúdo recomendado é validado contra o catálogo antes de ser
+                gravado. A tela só exibe caminhos que existem no produto. */}
             {m.cartoes.length > 0 && (
               <ul className={styles.cartoes}>
                 {m.cartoes.map((c) => (
-                  <li key={c.slug}>
-                    <Link href={`/solucoes/${c.slug}`} className={styles.cartao}>
-                      <span className={styles.cartaoRotulo}>
-                        {c.categoria ?? 'Solução'} · catálogo
-                      </span>
+                  <li key={`${c.tipo}:${c.chave}`}>
+                    <Link href={c.href} className={styles.cartao}>
+                      <span className={styles.cartaoRotulo}>{c.rotulo}</span>
                       <span className={styles.cartaoTitulo}>{c.titulo}</span>
-                      <span className={styles.cartaoAcao}>Ver solução →</span>
+                      <span className={styles.cartaoMotivo}>{c.motivo}</span>
+                      <span className={styles.cartaoAcao}>{ACAO_POR_TIPO[c.tipo]} →</span>
                     </Link>
                   </li>
                 ))}

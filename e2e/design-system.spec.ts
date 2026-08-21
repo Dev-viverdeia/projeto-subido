@@ -62,6 +62,10 @@ test.describe('fundação visual Viver de IA', () => {
       'rgb(255, 255, 255)',
     );
     await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Converse sobre o que precisa fazer.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sobral AI' })).toHaveCount(0);
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);

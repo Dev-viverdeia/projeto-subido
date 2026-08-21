@@ -34,6 +34,14 @@ export const AcaoSobralSchema = z.object({
 
 export type AcaoSobral = z.infer<typeof AcaoSobralSchema>;
 
+export const RecomendacaoConteudoSobralSchema = z.object({
+  tipo: z.enum(['aula', 'formacao', 'projeto', 'ferramenta']),
+  chave: z.string().trim().min(1).max(200),
+  motivo: z.string().trim().min(10).max(240),
+});
+
+export type RecomendacaoConteudoSobral = z.infer<typeof RecomendacaoConteudoSobralSchema>;
+
 /** Contrato devolvido pelo modelo. A etapa não entra: ela pertence aos fatos. */
 export const RespostaEstruturadaSobralSchema = z.object({
   resposta: z.string().trim().min(20).max(3000),
@@ -41,6 +49,7 @@ export const RespostaEstruturadaSobralSchema = z.object({
   foco: z.string().trim().min(3).max(180),
   proximo_passo: AcaoSobralSchema,
   acoes: z.array(AcaoSobralSchema).length(3),
+  recomendacoes: z.array(RecomendacaoConteudoSobralSchema).max(3),
 });
 
 export type RespostaEstruturadaSobral = z.infer<typeof RespostaEstruturadaSobralSchema>;

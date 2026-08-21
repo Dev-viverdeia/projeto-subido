@@ -5,6 +5,7 @@ import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { ErroSobral } from '@/lib/consultor/modelo';
+import { resolverRecomendacoes } from '@/lib/consultor/conteudo';
 import {
   direcaoDaMensagem,
   obterUsoDoMes,
@@ -101,13 +102,7 @@ export async function POST(request: Request) {
       pedido: mensagem ?? ultima.conteudo,
     });
 
-    const cartoes = leitura.sinais.catalogo
-      .filter((projeto) =>
-        leitura.rodada.direcao.resposta
-          .toLocaleLowerCase('pt-BR')
-          .includes(projeto.titulo.toLocaleLowerCase('pt-BR')),
-      )
-      .slice(0, 3);
+    const cartoes = resolverRecomendacoes(leitura.rodada.direcao.recomendacoes, leitura.sinais);
 
     const admin = criarAdminSobral();
     const { error: erroResposta } = await admin.from('consultor_mensagens').insert({
