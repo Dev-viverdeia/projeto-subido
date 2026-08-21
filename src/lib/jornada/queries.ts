@@ -6,6 +6,7 @@ import { listarSolucoes } from '@/lib/conteudo/queries';
 import { handleError } from '@/lib/errors';
 import { obterMetricasProgressoConta, type MetricasProgressoConta } from '@/lib/progresso/queries';
 import { createClient } from '@/lib/supabase/server';
+import { ehJwtEmitidoNoFuturo, repetirAposSincronizarRelogio } from '@/lib/supabase/retry-auth';
 import type { Database, Tables } from '@/lib/supabase/types.generated';
 import { montarPlanoJornada, type PerfilJornada, type PlanoJornada } from './motor';
 
@@ -95,12 +96,19 @@ export async function obterJornadaOperacionalComCliente(
       obterMetricasProgressoConta(),
     ]);
 
-  if (perfil.error) throw handleError(perfil.error, 'jornada:perfil');
-  if (oportunidades.error) throw handleError(oportunidades.error, 'jornada:oportunidades');
-  if (enriquecimentos.error) throw handleError(enriquecimentos.error, 'jornada:enriquecimentos');
-  if (calls.error) throw handleError(calls.error, 'jornada:calls');
-  if (propostas.error) throw handleError(propostas.error, 'jornada:propostas');
-  if (execucoes.error) throw handleError(execucoes.error, 'jornada:execucoes');
+  const falhar = (erro: unknown, contexto: string): never => {
+    // A tentativa externa precisa receber o erro cru para reconhecer o pequeno
+    // desalinhamento de relógio. Falhas permanentes continuam traduzidas aqui.
+    if (ehJwtEmitidoNoFuturo(erro)) throw erro;
+    throw handleError(erro, contexto);
+  };
+
+  if (perfil.error) falhar(perfil.error, 'jornada:perfil');
+  if (oportunidades.error) falhar(oportunidades.error, 'jornada:oportunidades');
+  if (enriquecimentos.error) falhar(enriquecimentos.error, 'jornada:enriquecimentos');
+  if (calls.error) falhar(calls.error, 'jornada:calls');
+  if (propostas.error) falhar(propostas.error, 'jornada:propostas');
+  if (execucoes.error) falhar(execucoes.error, 'jornada:execucoes');
 
   const catalogo: ProjetoInicialJornada[] = projetos.map((projeto) => ({
     id: projeto.id,
@@ -187,6 +195,8 @@ export async function obterJornadaOperacionalComCliente(
 }
 
 export const obterJornadaOperacional = cache(async (): Promise<JornadaOperacional> => {
-  const supabase = await createClient();
-  return obterJornadaOperacionalComCliente(supabase);
+  return repetirAposSincronizarRelogio(async () => {
+    const supabase = await createClient();
+    return obterJornadaOperacionalComCliente(supabase);
+  });
 });
