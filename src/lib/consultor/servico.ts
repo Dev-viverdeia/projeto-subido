@@ -11,6 +11,7 @@ import {
   type SinaisSobral,
 } from './direcao';
 import { gerarRodadaSobral, type RodadaSobral } from './modelo';
+import type { EntradaAnexoModelo } from './processar-anexos';
 
 export const TETO_TOKENS_SOBRAL_MES = 500_000;
 
@@ -47,15 +48,17 @@ export async function produzirLeituraSobral({
   usuarioId,
   historico,
   pedido,
+  anexos,
 }: {
   supabase: SupabaseClient<Database>;
   usuarioId: string;
   historico: MensagemModelo[];
   pedido: string;
+  anexos?: readonly EntradaAnexoModelo[];
 }): Promise<LeituraSobral> {
   const sinais = await obterSinaisSobral(supabase);
   const etapa = detectarEtapaSobral(sinais);
-  const rodada = await gerarRodadaSobral({ usuarioId, etapa, sinais, historico, pedido });
+  const rodada = await gerarRodadaSobral({ usuarioId, etapa, sinais, historico, pedido, anexos });
   const geradoEm = new Date().toISOString();
 
   return {

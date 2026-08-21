@@ -12,6 +12,7 @@ import { Mensagens } from './Mensagens';
 
 const base = {
   acaoConfirmada: null,
+  anexos: [],
   modelo: null,
   criadoEm: '2026-08-20T12:00:00.000Z',
 } satisfies Partial<MensagemDoConsultor>;

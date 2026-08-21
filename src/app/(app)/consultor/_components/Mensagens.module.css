@@ -50,6 +50,38 @@
   align-items: flex-end;
 }
 
+.anexos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+}
+
+.anexos li {
+  min-width: 0;
+  max-width: min(100%, 280px);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.anexos li span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .compacta .corpo {
   max-width: min(100%, 760px);
 }

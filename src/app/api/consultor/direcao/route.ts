@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { criarAdminSobral } from '@/lib/consultor/admin';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
-import { ErroSobral } from '@/lib/consultor/modelo';
+import { ErroSobral } from '@/lib/consultor/erro';
 import {
   obterUsoDoMes,
   persistirPlanoSobral,

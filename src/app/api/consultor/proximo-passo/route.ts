@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { criarAdminSobral } from '@/lib/consultor/admin';
-import { ErroSobral, gerarProximaAcaoDoLead } from '@/lib/consultor/modelo';
+import { gerarProximaAcaoDoLead } from '@/lib/consultor/modelo';
+import { ErroSobral } from '@/lib/consultor/erro';
 import { obterContextoProximoPasso } from '@/lib/consultor/proximo-passo';
 import { criarRecomendacaoFallback } from '@/lib/consultor/recomendacao';
 import { obterUsoDoMes, registrarUsoSobral, TETO_TOKENS_SOBRAL_MES } from '@/lib/consultor/servico';

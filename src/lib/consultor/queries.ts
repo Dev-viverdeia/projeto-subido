@@ -17,6 +17,7 @@ import {
 } from './direcao';
 import { RecomendacaoProximaAcaoSchema } from './recomendacao';
 import { CartoesProdutoPersistidosSchema, type CartaoProduto } from './conteudo';
+import type { AnexoDoConsultor } from './anexos-contrato';
 
 /**
  * Leituras do Consultor — RSC only, mesma disciplina do builder/queries.ts:
@@ -34,6 +35,7 @@ export type MensagemDoConsultor = {
   id: string;
   papel: 'usuario' | 'consultor';
   conteudo: string;
+  anexos: AnexoDoConsultor[];
   cartoes: CartaoProduto[];
   direcao: DirecaoMensagem | null;
   acaoConfirmada: z.infer<typeof AcaoConfirmadaCrmSchema> | null;
@@ -129,7 +131,7 @@ export const obterConversa = cache(
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
       .select(
-        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
+        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
       )
       .eq('thread_id', id)
       .order('criado_em')
@@ -170,6 +172,13 @@ export const obterConversa = cache(
           id: m.id,
           papel: m.papel as 'usuario' | 'consultor',
           conteudo: m.conteudo,
+          anexos: (m.consultor_anexos ?? []).map((anexo) => ({
+            id: anexo.id,
+            nome: anexo.nome,
+            tipoMime: anexo.tipo_mime,
+            tamanhoBytes: Number(anexo.tamanho_bytes),
+            categoria: anexo.categoria as AnexoDoConsultor['categoria'],
+          })),
           cartoes: cartoes.success ? cartoes.data : [],
           direcao: direcao.success ? direcao.data : null,
           acaoConfirmada: acaoConfirmada.success ? acaoConfirmada.data : null,

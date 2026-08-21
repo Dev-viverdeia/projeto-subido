@@ -4,7 +4,7 @@ import { criarAdminSobral } from '@/lib/consultor/admin';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
-import { ErroSobral } from '@/lib/consultor/modelo';
+import { ErroSobral } from '@/lib/consultor/erro';
 import { resolverRecomendacoes } from '@/lib/consultor/conteudo';
 import {
   direcaoDaMensagem,
@@ -14,9 +14,11 @@ import {
   registrarUsoSobral,
   TETO_TOKENS_SOBRAL_MES,
 } from '@/lib/consultor/servico';
+import { prepararAnexosParaModelo } from '@/lib/consultor/processar-anexos';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 180;
 
 const Pedido = z.object({
   thread_id: z.uuid(),
@@ -72,7 +74,9 @@ export async function POST(request: Request) {
 
     const { data: ultimas, error: erroHistorico } = await supabase
       .from('consultor_mensagens')
-      .select('papel, conteudo, cartoes')
+      .select(
+        'id, papel, conteudo, contexto_anexos, cartoes, consultor_anexos(id, nome, tipo_mime, categoria, caminho_storage, transcricao)',
+      )
       .eq('thread_id', corpo.data.thread_id)
       .order('criado_em', { ascending: false })
       .limit(20);
@@ -93,18 +97,39 @@ export async function POST(request: Request) {
 
     const historico = [...(ultimas ?? [])].reverse().map((item) => ({
       papel: item.papel as 'usuario' | 'consultor',
-      conteudo: item.conteudo,
+      conteudo: item.contexto_anexos
+        ? `${item.conteudo}\n\nContexto preservado dos arquivos enviados:\n${item.contexto_anexos}`
+        : item.conteudo,
     }));
-    const leitura = await produzirLeituraSobral({
-      supabase,
-      usuarioId: user.id,
-      historico,
-      pedido: mensagem ?? ultima.conteudo,
-    });
+
+    const admin = criarAdminSobral();
+    const anexosAtuais =
+      ultima.papel === 'usuario'
+        ? (ultima.consultor_anexos ?? []).map((anexo) => ({
+            id: anexo.id,
+            nome: anexo.nome,
+            tipoMime: anexo.tipo_mime,
+            categoria: anexo.categoria as 'imagem' | 'documento' | 'audio',
+            caminhoStorage: anexo.caminho_storage,
+            transcricao: anexo.transcricao,
+          }))
+        : [];
+    const preparados = await prepararAnexosParaModelo(admin, anexosAtuais);
+    let leitura;
+    try {
+      leitura = await produzirLeituraSobral({
+        supabase,
+        usuarioId: user.id,
+        historico,
+        pedido: mensagem ?? ultima.conteudo,
+        anexos: preparados.entradas,
+      });
+    } finally {
+      await preparados.limpar();
+    }
 
     const cartoes = resolverRecomendacoes(leitura.rodada.direcao.recomendacoes, leitura.sinais);
 
-    const admin = criarAdminSobral();
     const { error: erroResposta } = await admin.from('consultor_mensagens').insert({
       thread_id: corpo.data.thread_id,
       papel: 'consultor',
@@ -114,6 +139,28 @@ export async function POST(request: Request) {
       modelo: leitura.rodada.modelo,
     });
     if (erroResposta) throw erroResposta;
+
+    if (anexosAtuais.length > 0) {
+      for (const { id, texto } of preparados.transcricoes) {
+        const { error: erroTranscricao } = await admin
+          .from('consultor_anexos')
+          .update({ transcricao: texto })
+          .eq('id', id)
+          .eq('dono', user.id);
+        if (erroTranscricao) {
+          console.error('[sobral:anexos] falha ao persistir transcrição:', erroTranscricao);
+        }
+      }
+      if (leitura.rodada.direcao.memoria_anexos) {
+        const { error: erroContexto } = await admin
+          .from('consultor_mensagens')
+          .update({ contexto_anexos: leitura.rodada.direcao.memoria_anexos })
+          .eq('id', ultima.id);
+        if (erroContexto) {
+          console.error('[sobral:anexos] falha ao persistir contexto:', erroContexto);
+        }
+      }
+    }
 
     const [threadAtualizada, plano] = await Promise.allSettled([
       admin

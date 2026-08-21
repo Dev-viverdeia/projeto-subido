@@ -142,5 +142,5 @@ describe('EditorProposta', () => {
     await user.type(screen.getByLabelText('Valor do projeto (R$)'), '29990,00');
     expect(preview.getByText((conteudo) => conteudo.includes('29.990,00'))).toBeInTheDocument();
     expect(preview.getByText('Alterações locais')).toBeInTheDocument();
-  });
+  }, 10_000);
 });

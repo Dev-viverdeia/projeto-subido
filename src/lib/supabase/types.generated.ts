@@ -545,10 +545,58 @@ export type Database = {
           },
         ]
       }
+      consultor_anexos: {
+        Row: {
+          caminho_storage: string
+          categoria: string
+          criado_em: string
+          dono: string
+          id: string
+          mensagem_id: string
+          nome: string
+          tamanho_bytes: number
+          tipo_mime: string
+          transcricao: string | null
+        }
+        Insert: {
+          caminho_storage: string
+          categoria: string
+          criado_em?: string
+          dono: string
+          id?: string
+          mensagem_id: string
+          nome: string
+          tamanho_bytes: number
+          tipo_mime: string
+          transcricao?: string | null
+        }
+        Update: {
+          caminho_storage?: string
+          categoria?: string
+          criado_em?: string
+          dono?: string
+          id?: string
+          mensagem_id?: string
+          nome?: string
+          tamanho_bytes?: number
+          tipo_mime?: string
+          transcricao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_anexos_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultor_mensagens: {
         Row: {
           cartoes: Json | null
           conteudo: string
+          contexto_anexos: string | null
           criado_em: string
           direcao: Json | null
           id: string
@@ -559,6 +607,7 @@ export type Database = {
         Insert: {
           cartoes?: Json | null
           conteudo: string
+          contexto_anexos?: string | null
           criado_em?: string
           direcao?: Json | null
           id?: string
@@ -569,6 +618,7 @@ export type Database = {
         Update: {
           cartoes?: Json | null
           conteudo?: string
+          contexto_anexos?: string | null
           criado_em?: string
           direcao?: Json | null
           id?: string
