@@ -131,10 +131,6 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
   const enviadas = propostas.filter(
     (proposta) => proposta.status !== 'rascunho' && proposta.status !== 'pronta',
   );
-  const aceitas = propostas.filter((proposta) => proposta.status === 'aceita').length;
-  const valorEnviado = propostas
-    .filter((proposta) => proposta.status === 'apresentada' || proposta.status === 'aceita')
-    .reduce((total, proposta) => total + (proposta.valorCentavos ?? 0), 0);
 
   return (
     <div className={styles.pagina}>
@@ -152,29 +148,6 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
           Nova proposta
         </Link>
       </header>
-
-      <section className={styles.resumo} aria-label="Resumo da biblioteca comercial">
-        <article data-destaque="true">
-          <span>Em rascunho</span>
-          <strong>{rascunhos.length}</strong>
-          <small>para revisar ou concluir</small>
-        </article>
-        <article>
-          <span>Enviadas</span>
-          <strong>{enviadas.length}</strong>
-          <small>já compartilhadas</small>
-        </article>
-        <article>
-          <span>Aprovadas</span>
-          <strong>{aceitas}</strong>
-          <small>vendas confirmadas</small>
-        </article>
-        <article>
-          <span>Valor enviado</span>
-          <strong>{formatarReais(valorEnviado)}</strong>
-          <small>em negociação ou aprovado</small>
-        </article>
-      </section>
 
       <div className={styles.colecoes}>
         <ColecaoPropostas

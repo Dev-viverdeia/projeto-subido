@@ -44,6 +44,9 @@ describe('PainelPropostas', () => {
     expect(within(enviadas).getByText('Orbe')).toBeInTheDocument();
     expect(within(enviadas).getByText('Enviada')).toBeInTheDocument();
     expect(within(enviadas).getByText('Ver proposta')).toBeInTheDocument();
+
+    expect(screen.queryByText('Valor enviado')).not.toBeInTheDocument();
+    expect(screen.queryByText('Aprovadas')).not.toBeInTheDocument();
   });
 
   it('mostra estados vazios úteis sem esconder a criação da primeira proposta', () => {

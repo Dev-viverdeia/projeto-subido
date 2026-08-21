@@ -4,7 +4,14 @@ import { EstadoCarregamento } from './EstadoCarregamento';
 import styles from './CarregandoModulo.module.css';
 
 type Anatomia =
-  'pipeline' | 'calls' | 'documentos' | 'mentorias' | 'certificados' | 'consultor' | 'prospeccao';
+  | 'pipeline'
+  | 'metricas'
+  | 'calls'
+  | 'documentos'
+  | 'mentorias'
+  | 'certificados'
+  | 'consultor'
+  | 'prospeccao';
 
 const CONFIGURACAO: Record<
   Anatomia,
@@ -24,6 +31,14 @@ const CONFIGURACAO: Record<
     metricas: 3,
     colunas: 5,
     momentoEscuro: false,
+  },
+  metricas: {
+    modulo: 'Métricas',
+    titulo: 'Calculando suas métricas',
+    descricao: 'Reunindo prospecção, vendas, propostas e resultados.',
+    metricas: 6,
+    colunas: 5,
+    momentoEscuro: true,
   },
   calls: {
     modulo: 'Reuniões',
