@@ -19,7 +19,6 @@ import styles from './MapaJornada.module.css';
 
 type Props = {
   nome: string | null;
-  prioridade: ReactNode;
   sobral: ReactNode;
   cliente: ReactNode;
   contato: ReactNode;
@@ -163,7 +162,6 @@ function TrilhoCompacto({ plano }: { plano: PlanoJornada }) {
 
 export function MapaJornada({
   nome,
-  prioridade,
   sobral,
   cliente,
   contato,
@@ -171,7 +169,6 @@ export function MapaJornada({
   proximaMentoria,
   plano,
 }: Props) {
-  const etapaAtual = plano.etapas.find((item) => item.id === plano.etapaAtual) ?? plano.etapas[0]!;
   const dataLonga = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -202,40 +199,6 @@ export function MapaJornada({
             Ver próxima sessão <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Link>
-      </section>
-
-      <section className={styles.direcao} aria-labelledby="titulo-direcao">
-        <div className={styles.secaoCabecalho}>
-          <div>
-            <p>Seu próximo passo</p>
-            <h2 id="titulo-direcao">Continue de onde parou.</h2>
-          </div>
-          <span>A plataforma usa seu progresso para mostrar o que merece atenção agora.</span>
-        </div>
-
-        <div className={styles.comando}>
-          {prioridade}
-          <aside className={styles.painelProgresso} aria-label="Seu progresso">
-            <span className={styles.painelRotulo}>Etapa atual</span>
-            <strong>{etapaAtual.titulo}</strong>
-            <p>{etapaAtual.marco}</p>
-            <div className={styles.progressoLinha}>
-              <span>Progresso geral</span>
-              <em>{plano.percentual}%</em>
-            </div>
-            <div
-              className={styles.progressoTrilho}
-              role="progressbar"
-              aria-label="Progresso geral"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={plano.percentual}
-            >
-              <span style={{ width: `${plano.percentual}%` }} />
-            </div>
-            <TrilhoCompacto plano={plano} />
-          </aside>
-        </div>
       </section>
 
       {sobral}
