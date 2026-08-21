@@ -58,9 +58,9 @@ export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
 });
 
 /**
- * O produto expõe uma única conversa contínua na Início. Threads antigas não
- * são apagadas: apenas a mais recente fica visível, preservando todo dado já
- * criado antes desta simplificação.
+ * O produto expõe uma conversa contínua na Início e na página do Sobral AI.
+ * Threads antigas não são apagadas: a mais recente é a conversa corrente e o
+ * histórico continua disponível na tela completa.
  */
 export const obterConversaRecente = cache(async () => {
   const [recente] = await listarThreads();

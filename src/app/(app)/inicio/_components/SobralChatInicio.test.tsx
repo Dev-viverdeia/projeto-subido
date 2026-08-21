@@ -12,7 +12,7 @@ vi.mock('../../consultor/_components/Mensagens', () => ({
   Mensagens: () => <div>Histórico</div>,
 }));
 
-import { SobralChatInicio } from './SobralChatInicio';
+import { SobralChatInicio, SobralChatVisual } from './SobralChatInicio';
 
 describe('SobralChatInicio', () => {
   beforeEach(() => {
@@ -30,5 +30,22 @@ describe('SobralChatInicio', () => {
       'href',
       '/inicio#sobral-ai',
     );
+  });
+
+  it('oferece uma versão completa sem criar outro chat', () => {
+    render(
+      <SobralChatVisual
+        completo
+        mensagens={[]}
+        exemplos={[]}
+        acaoCabecalho={<button type="button">Conversas</button>}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'O que você precisa resolver agora?' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Conversas' })).toBeVisible();
+    expect(screen.getByText('Seu contexto já está conectado')).toBeVisible();
   });
 });

@@ -1,5 +1,6 @@
 import {
   Award,
+  Bot,
   BriefcaseBusiness,
   ContactRound,
   DraftingCompass,
@@ -52,6 +53,13 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/inicio'],
     icone: <House size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
+    grupo: 'aprendizado',
+  },
+  {
+    href: '/consultor',
+    rotulo: ROTULOS['/consultor'],
+    icone: <Bot size={TAMANHO} strokeWidth={TRACO} />,
+    noDock: false,
     grupo: 'aprendizado',
   },
   {

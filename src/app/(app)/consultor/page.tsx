@@ -1,5 +1,11 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import { listarThreads, obterConversaRecente } from '@/lib/consultor/queries';
+import { TelaSobral } from './_components/TelaSobral';
 
-export default function ConsultorPage() {
-  redirect('/inicio#sobral-ai');
+export const metadata: Metadata = { title: 'Sobral AI' };
+
+export default async function ConsultorPage() {
+  const [threads, conversa] = await Promise.all([listarThreads(), obterConversaRecente()]);
+
+  return <TelaSobral threads={threads} conversa={conversa} />;
 }

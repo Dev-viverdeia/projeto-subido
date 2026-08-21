@@ -10,10 +10,11 @@ import { revalidarDirecaoOperacional } from './revalidacao';
 describe('revalidarDirecaoOperacional', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('sincroniza a única superfície do Sobral AI', () => {
+  it('sincroniza a Início e a tela completa do mesmo Sobral AI', () => {
     revalidarDirecaoOperacional();
 
-    expect(revalidatePath).toHaveBeenCalledOnce();
-    expect(revalidatePath).toHaveBeenCalledWith('/inicio');
+    expect(revalidatePath).toHaveBeenCalledTimes(2);
+    expect(revalidatePath).toHaveBeenNthCalledWith(1, '/inicio');
+    expect(revalidatePath).toHaveBeenNthCalledWith(2, '/consultor');
   });
 });
