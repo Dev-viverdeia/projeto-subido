@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarDays,
-  Check,
   ContactRound,
   DraftingCompass,
   FileSignature,
@@ -14,17 +13,14 @@ import {
   UsersRound,
   Video,
 } from 'lucide-react';
-import type { PlanoJornada } from '@/lib/jornada/motor';
 import styles from './MapaJornada.module.css';
 
 type Props = {
   nome: string | null;
-  sobral: ReactNode;
   cliente: ReactNode;
   contato: ReactNode;
   proximaAcao?: ReactNode;
   proximaMentoria?: ReactNode;
-  plano: PlanoJornada;
 };
 
 const AREAS_APRENDER = [
@@ -136,39 +132,7 @@ function CartoesAreas({
   );
 }
 
-function TrilhoCompacto({ plano }: { plano: PlanoJornada }) {
-  return (
-    <ol className={styles.trilho} aria-label="Seu caminho na plataforma">
-      {plano.etapas.map((etapa) => (
-        <li
-          key={etapa.id}
-          data-status={etapa.status}
-          aria-current={etapa.id === plano.etapaAtual ? 'step' : undefined}
-        >
-          <span className={styles.trilhoMarca} aria-hidden="true">
-            {etapa.status === 'concluida' ? <Check size={12} strokeWidth={2.7} /> : etapa.numero}
-          </span>
-          <span className={styles.trilhoTexto}>
-            <strong>{etapa.titulo}</strong>
-            <small>
-              {etapa.concluidos}/{etapa.passos.length}
-            </small>
-          </span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-export function MapaJornada({
-  nome,
-  sobral,
-  cliente,
-  contato,
-  proximaAcao,
-  proximaMentoria,
-  plano,
-}: Props) {
+export function MapaJornada({ nome, cliente, contato, proximaAcao, proximaMentoria }: Props) {
   const dataLonga = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -199,21 +163,6 @@ export function MapaJornada({
             Ver próxima sessão <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Link>
-      </section>
-
-      {sobral}
-
-      <section className={styles.caminho} aria-labelledby="titulo-caminho">
-        <div className={styles.secaoCabecalho}>
-          <div>
-            <p>Como usar a plataforma</p>
-            <h2 id="titulo-caminho">Cinco etapas, um fluxo de trabalho.</h2>
-          </div>
-          <span>
-            A página mostra uma ação por vez. O progresso muda quando você conclui tarefas reais.
-          </span>
-        </div>
-        <TrilhoCompacto plano={plano} />
       </section>
 
       <section className={styles.emAndamento} aria-labelledby="titulo-andamento">

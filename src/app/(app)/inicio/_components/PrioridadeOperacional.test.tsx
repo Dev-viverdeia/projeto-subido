@@ -23,7 +23,7 @@ describe('PrioridadeOperacional', () => {
     );
     expect(screen.getByRole('link', { name: 'Conversar sobre este passo' })).toHaveAttribute(
       'href',
-      '#sobral-ai',
+      '/consultor',
     );
     expect(screen.getByText('Proposta apresentada e próxima decisão registrada.')).toBeVisible();
   });
