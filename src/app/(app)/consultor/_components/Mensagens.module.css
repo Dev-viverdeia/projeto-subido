@@ -50,6 +50,28 @@
   align-items: flex-end;
 }
 
+.compacta .corpo {
+  max-width: min(100%, 760px);
+}
+
+.compacta .texto {
+  max-width: 64ch;
+  padding: var(--via-space-2_5) var(--via-space-4);
+  font-size: var(--via-fs-sm);
+}
+
+.compacta .cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.compacta .cartaoMotivo {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .direcao {
   overflow: hidden;
   position: relative;
@@ -191,5 +213,13 @@
 
   .texto {
     font-size: var(--via-fs-sm);
+  }
+
+  .compacta .corpo {
+    max-width: calc(100% - var(--via-space-4));
+  }
+
+  .compacta .cartoes {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

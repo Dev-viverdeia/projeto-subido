@@ -45,21 +45,21 @@ export function SobralChatVisual({
         </span>
         <div>
           <p>Sobral AI</p>
-          <h2 id="titulo-sobral-ai">Converse sobre o que precisa fazer.</h2>
+          <h2 id="titulo-sobral-ai">O que você precisa resolver agora?</h2>
           <span>
-            Tire uma dúvida de venda ou implementação. O chat usa seu progresso para indicar aulas,
-            projetos, ferramentas e a próxima tarefa.
+            Pergunte sobre uma venda ou implementação. Eu uso o que já aconteceu na plataforma para
+            indicar a próxima ação, uma aula, um projeto ou uma ferramenta.
           </span>
         </div>
         <small>
-          <Sparkles size={14} strokeWidth={1.8} aria-hidden="true" /> Usa seus dados da plataforma
+          <Sparkles size={14} strokeWidth={1.8} aria-hidden="true" /> Seu contexto já está conectado
         </small>
       </header>
 
       <div className={styles.chat}>
         <HistoricoChat>
           {mensagens.length > 0 ? (
-            <Mensagens mensagens={mensagens.slice(-16)} />
+            <Mensagens mensagens={mensagens.slice(-4)} compacto />
           ) : (
             <div className={styles.boasVindasChat}>
               <span aria-hidden="true">
@@ -78,7 +78,7 @@ export function SobralChatVisual({
             threadId={threadId}
             pendente={pendente}
             ultimaMensagemId={mensagens[mensagens.length - 1]?.id}
-            exemplos={exemplos}
+            exemplos={mensagens.length === 0 ? exemplos : undefined}
           />
         </div>
       </div>

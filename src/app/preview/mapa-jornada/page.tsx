@@ -10,12 +10,9 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
-import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
 import { SobralChatVisual } from '@/app/(app)/inicio/_components/SobralChatInicio';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
-import { SinaisSobralSchema } from '@/lib/consultor/direcao';
 import { montarPlanoJornada } from '@/lib/jornada/motor';
-import { resolverPrioridadeInicio } from '@/lib/jornada/prioridade';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Mapa da jornada' };
@@ -142,75 +139,6 @@ export default async function PreviewMapaJornadaPage({
   const evolucaoAtiva = estado === 'evolucao';
   const operacaoAtiva = estado === 'operacao' || evolucaoAtiva;
   const plano = evolucaoAtiva ? PLANO_EVOLUCAO : operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
-  const sinais = SinaisSobralSchema.parse({
-    momento: '2026-08-13T12:00:00.000Z',
-    oportunidades: {
-      total: evolucaoAtiva ? 2 : operacaoAtiva ? 1 : 0,
-      abertas: operacaoAtiva ? 1 : 0,
-      semProximaAcao: 0,
-      emDescoberta: 0,
-      emPropostaOuNegociacao: 0,
-      ganhas: evolucaoAtiva ? 1 : 0,
-    },
-    calls: {
-      total: evolucaoAtiva ? 2 : 0,
-      agendadas: 0,
-      concluidas: evolucaoAtiva ? 2 : 0,
-    },
-    propostas: {
-      total: evolucaoAtiva ? 1 : 0,
-      rascunhos: 0,
-      prontas: 0,
-      apresentadas: evolucaoAtiva ? 1 : 0,
-      aceitas: evolucaoAtiva ? 1 : 0,
-    },
-    studio: { total: 0, prontos: 0 },
-    projetos: {
-      total: evolucaoAtiva ? 1 : 0,
-      ativos: 0,
-      acoesPendentes: 0,
-      acoesAtrasadas: 0,
-    },
-    jornada: {
-      perfilCompleto: plano.perfilCompleto,
-      etapaAtual: plano.etapaAtual,
-      proximoPasso: plano.proximoPasso,
-      evidenciasConcluidas: plano.evidenciasConcluidas,
-      totalEvidencias: plano.totalEvidencias,
-      percentual: plano.percentual,
-      aprendizado: operacaoAtiva
-        ? {
-            aulasConcluidas: 12,
-            formacoesConcluidas: 1,
-            etapasConcluidas: 4,
-            projetosConcluidos: 0,
-          }
-        : {
-            aulasConcluidas: 0,
-            formacoesConcluidas: 0,
-            etapasConcluidas: 0,
-            projetosConcluidos: 0,
-          },
-    },
-    radar: [],
-    catalogo: PROJETOS.map((projeto) => ({
-      slug: projeto.slug,
-      titulo: projeto.titulo,
-      categoria: projeto.categoria,
-    })),
-    foco: operacaoAtiva
-      ? {
-          oportunidadeId: '00000000-0000-4000-8000-000000000001',
-          titulo: 'Atendimento da Clínica Aurora',
-          empresa: 'Clínica Aurora',
-          etapa: 'qualificacao',
-          proximaAcao: 'Agendar descoberta',
-          proximaAcaoEm: null,
-        }
-      : null,
-  });
-  const prioridade = resolverPrioridadeInicio(plano, sinais);
-
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
@@ -262,19 +190,6 @@ export default async function PreviewMapaJornadaPage({
                   texto: 'Qual ferramenta faz sentido para o meu próximo passo?',
                 },
               ]}
-            />
-          }
-          prioridade={
-            <PrioridadeOperacional
-              modo={prioridade.modo}
-              etapa={prioridade.etapa}
-              foco={prioridade.foco}
-              titulo={prioridade.titulo}
-              detalhe={prioridade.detalhe}
-              rotuloEvidencia={prioridade.rotuloEvidencia}
-              evidencia={prioridade.evidencia}
-              destino={prioridade.destino}
-              acao={prioridade.acao}
             />
           }
           cliente="Clínica Aurora"
