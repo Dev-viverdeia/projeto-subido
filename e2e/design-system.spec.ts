@@ -65,9 +65,11 @@ test.describe('fundação visual Viver de IA', () => {
       'rgb(255, 255, 255)',
     );
     const abertura = page.getByLabel('Resumo do dia');
-    const andamento = page.getByRole('heading', { name: 'O que já está na sua mesa.' });
     await expect(abertura).toBeVisible();
-    await expect(andamento).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'O que já está na sua mesa.' })).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: 'Aprenda e prepare o que você vai entregar.' }),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toHaveCount(0);
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);

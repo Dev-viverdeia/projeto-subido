@@ -1,27 +1,11 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { obterFocoLeveDoCrm } from '@/lib/crm/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
 
 export const metadata: Metadata = { title: 'Início' };
-
-async function ClienteEmFoco() {
-  const foco = await obterFocoLeveDoCrm();
-  return <>{foco?.empresa ?? 'Nenhum cliente em foco'}</>;
-}
-
-async function ContatoEmFoco() {
-  const foco = await obterFocoLeveDoCrm();
-  return <>{foco?.contato ?? 'Adicione seu primeiro contato em Vendas'}</>;
-}
-
-async function ProximaAcaoCrm() {
-  const foco = await obterFocoLeveDoCrm();
-  return <>{foco?.proximaAcao ?? 'Defina a próxima ação da venda'}</>;
-}
 
 async function ProximaMentoria() {
   const agenda = await listarAgenda();
@@ -33,9 +17,8 @@ async function ProximaMentoria() {
 /**
  * O início é um painel leve para retomar o trabalho.
  *
- * A página apresenta somente o que ajuda o usuário a continuar: mentoria,
- * oportunidade em foco e acessos às áreas. O consultor tem uma superfície
- * própria em /consultor.
+ * A página apresenta somente a próxima mentoria e os acessos às áreas. O
+ * consultor tem uma superfície própria em /consultor.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
@@ -47,21 +30,6 @@ export default async function InicioPage() {
   return (
     <MapaJornada
       nome={primeiroNome}
-      cliente={
-        <Suspense fallback={<CarregandoDado largura="16ch" />}>
-          <ClienteEmFoco />
-        </Suspense>
-      }
-      contato={
-        <Suspense fallback={<CarregandoDado largura="12ch" />}>
-          <ContatoEmFoco />
-        </Suspense>
-      }
-      proximaAcao={
-        <Suspense fallback={<CarregandoDado largura="20ch" />}>
-          <ProximaAcaoCrm />
-        </Suspense>
-      }
       proximaMentoria={
         <Suspense fallback={<CarregandoDado largura="18ch" />}>
           <ProximaMentoria />

@@ -60,13 +60,7 @@ export default function PreviewMapaJornadaPage() {
         </div>
       </aside>
       <main id="conteudo" className={styles.conteudo}>
-        <MapaJornada
-          nome="Mateus"
-          cliente="Clínica Aurora"
-          contato="Dra. Camila Rios"
-          proximaAcao="Apresentar proposta na quinta-feira"
-          proximaMentoria="Chamada de alinhamento"
-        />
+        <MapaJornada nome="Mateus" proximaMentoria="Chamada de alinhamento" />
       </main>
     </div>
   );

@@ -10,9 +10,7 @@
 .eyebrow,
 .secaoCabecalho p,
 .areaTopo small,
-.painelRotulo,
-.clienteTexto small,
-.clienteAcao small {
+.painelRotulo {
   color: var(--via-text-soft);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -166,7 +164,6 @@
 }
 
 .direcao,
-.emAndamento,
 .areas,
 .caminho {
   min-width: 0;
@@ -518,90 +515,6 @@
   margin-top: var(--via-space-5);
 }
 
-.emAndamento {
-  padding: clamp(24px, 3vw, 34px);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-surface);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.clienteEmFoco {
-  display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) minmax(240px, 0.75fr) auto;
-  align-items: center;
-  gap: var(--via-space-4);
-  padding: var(--via-space-4);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-card);
-  background: var(--via-surface);
-  color: var(--via-text-primary);
-  text-decoration: none;
-  transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
-}
-
-.clienteEmFoco:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--via-shadow-sm);
-}
-
-.clienteEmFoco:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--via-shadow-sm);
-}
-
-.clienteIcone {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--app-radius-chip);
-  background: var(--via-accent-soft);
-  color: var(--via-accent-ink);
-}
-
-.clienteTexto,
-.clienteAcao {
-  min-width: 0;
-}
-
-.clienteTexto strong,
-.clienteTexto em,
-.clienteAcao strong {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.clienteTexto strong {
-  margin-top: var(--via-space-1);
-  font-size: var(--via-fs-sm);
-}
-
-.clienteTexto em {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-1);
-  margin-top: var(--via-space-1);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-  font-style: normal;
-}
-
-.clienteAcao {
-  padding-left: var(--via-space-5);
-  border-left: 1px solid var(--via-border-hairline);
-}
-
-.clienteAcao strong {
-  margin-top: var(--via-space-1);
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-medium);
-}
-
 .gradeAreas {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -701,15 +614,6 @@
   .comando {
     grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
   }
-  .clienteEmFoco {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-  .clienteAcao {
-    grid-column: 2 / -1;
-    padding: var(--via-space-3) 0 0;
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
-  }
 }
 
 @media (max-width: 899px) {
@@ -791,7 +695,6 @@
 
   .prioridade,
   .painelProgresso,
-  .emAndamento,
   .caminho {
     padding: var(--via-space-5);
   }
@@ -835,13 +738,6 @@
   .secaoCabecalho h2 {
     font-size: 1.65rem;
   }
-
-  .clienteEmFoco {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .clienteEmFoco > svg {
-    display: none;
-  }
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -856,7 +752,6 @@
 @media (prefers-reduced-motion: reduce) {
   .cartaoArea,
   .mentoriaDestaque,
-  .clienteEmFoco,
   .botaoPrimario {
     transition: none;
   }
