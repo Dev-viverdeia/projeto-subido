@@ -1,12 +1,10 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { obterFocoLeveDoCrm } from '@/lib/crm/queries';
-import { obterJornadaOperacional } from '@/lib/jornada/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { createClient } from '@/lib/supabase/server';
 import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
-import { SobralChatInicio, SobralChatInicioCarregando } from './_components/SobralChatInicio';
 
 export const metadata: Metadata = { title: 'Início' };
 
@@ -33,18 +31,15 @@ async function ProximaMentoria() {
 }
 
 /**
- * O início agora é o sistema de orientação do profissional.
+ * O início é um painel leve para retomar o trabalho.
  *
- * A página apresenta o produto e organiza a próxima ação com base nos fatos já
- * persistidos. Não existe briefing obrigatório na Início: o usuário aprende a
- * plataforma usando os módulos reais.
+ * A página apresenta somente o que ajuda o usuário a continuar: mentoria,
+ * oportunidade em foco e acessos às áreas. O consultor tem uma superfície
+ * própria em /consultor.
  */
 export default async function InicioPage() {
   const supabase = await createClient();
-  const [{ data }, jornada] = await Promise.all([
-    supabase.auth.getClaims(),
-    obterJornadaOperacional(),
-  ]);
+  const { data } = await supabase.auth.getClaims();
 
   const claims = data?.claims;
   const metadata = (claims?.user_metadata ?? {}) as { nome?: string };
@@ -52,11 +47,6 @@ export default async function InicioPage() {
   return (
     <MapaJornada
       nome={primeiroNome}
-      sobral={
-        <Suspense fallback={<SobralChatInicioCarregando />}>
-          <SobralChatInicio jornada={jornada} />
-        </Suspense>
-      }
       cliente={
         <Suspense fallback={<CarregandoDado largura="16ch" />}>
           <ClienteEmFoco />
@@ -77,7 +67,6 @@ export default async function InicioPage() {
           <ProximaMentoria />
         </Suspense>
       }
-      plano={jornada.plano}
     />
   );
 }

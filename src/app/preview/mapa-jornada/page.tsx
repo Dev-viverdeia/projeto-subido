@@ -10,135 +10,18 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
-import { SobralChatVisual } from '@/app/(app)/inicio/_components/SobralChatInicio';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
-import { montarPlanoJornada } from '@/lib/jornada/motor';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Mapa da jornada' };
-
-const PROJETOS = [
-  {
-    id: '00000000-0000-4000-8000-000000000001',
-    slug: 'atendimento-com-ia',
-    titulo: 'Atendimento com IA',
-    resumo: 'Estruture triagem, respostas e passagem para a equipe com contexto.',
-    categoria: 'Atendimento',
-  },
-  {
-    id: '00000000-0000-4000-8000-000000000002',
-    slug: 'maquina-de-leads',
-    titulo: 'Máquina de leads',
-    resumo: 'Organize captura, qualificação e priorização comercial.',
-    categoria: 'Leads',
-  },
-  {
-    id: '00000000-0000-4000-8000-000000000003',
-    slug: 'copiloto-de-vendas',
-    titulo: 'Copiloto de vendas',
-    resumo: 'Apoie descoberta, follow-up e preparo de propostas.',
-    categoria: 'Vendas',
-  },
-  {
-    id: '00000000-0000-4000-8000-000000000004',
-    slug: 'conteudo-operacional',
-    titulo: 'Conteúdo operacional',
-    resumo: 'Transforme repertório da empresa em produção assistida.',
-    categoria: 'Marketing',
-  },
-];
-
-const PERFIL_PREVIEW = {
-  nicho: 'Clínicas odontológicas',
-  projetoInicialId: PROJETOS[0]!.id,
-  projetoInicialTitulo: PROJETOS[0]!.titulo,
-  projetoInicialSlug: PROJETOS[0]!.slug,
-  posicionamento:
-    'Implanto atendimento com IA para clínicas reduzirem o tempo de resposta sem perder o contexto.',
-  atualizadoEm: '2026-08-11T12:00:00.000Z',
-};
-
-const PLANO_ATIVACAO = montarPlanoJornada({
-  perfil: null,
-  aprendizado: {
-    aulasConcluidas: 0,
-    formacoesConcluidas: 0,
-    etapasConcluidas: 0,
-    projetosConcluidos: 0,
-  },
-  oportunidades: { total: 0, enriquecidas: 0, comProximaAcao: 0, ganhas: 0 },
-  calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-  propostas: { total: 0, apresentadas: 0, aceitas: 0 },
-  entregas: {
-    projetosIniciados: 0,
-    projetosConcluidos: 0,
-    propostaAceitaEmFocoId: null,
-    projetoEmFocoId: null,
-    projetoEmFocoTitulo: null,
-    tarefasConcluidas: 0,
-    tarefasTotal: 0,
-  },
-});
-
-const PLANO_OPERACAO = montarPlanoJornada({
-  perfil: PERFIL_PREVIEW,
-  aprendizado: {
-    aulasConcluidas: 12,
-    formacoesConcluidas: 1,
-    etapasConcluidas: 4,
-    projetosConcluidos: 0,
-  },
-  oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 1, ganhas: 0 },
-  calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
-  propostas: { total: 0, apresentadas: 0, aceitas: 0 },
-  entregas: {
-    projetosIniciados: 0,
-    projetosConcluidos: 0,
-    propostaAceitaEmFocoId: null,
-    projetoEmFocoId: null,
-    projetoEmFocoTitulo: null,
-    tarefasConcluidas: 0,
-    tarefasTotal: 0,
-  },
-});
-
-const PLANO_EVOLUCAO = montarPlanoJornada({
-  perfil: PERFIL_PREVIEW,
-  aprendizado: {
-    aulasConcluidas: 12,
-    formacoesConcluidas: 1,
-    etapasConcluidas: 15,
-    projetosConcluidos: 1,
-  },
-  oportunidades: { total: 2, enriquecidas: 1, comProximaAcao: 1, ganhas: 1 },
-  calls: { descobertasConcluidas: 1, kickoffsConcluidos: 1, entregasConcluidas: 1 },
-  propostas: { total: 1, apresentadas: 1, aceitas: 1 },
-  entregas: {
-    projetosIniciados: 1,
-    projetosConcluidos: 1,
-    propostaAceitaEmFocoId: '00000000-0000-4000-8000-000000000010',
-    projetoEmFocoId: '00000000-0000-4000-8000-000000000011',
-    projetoEmFocoTitulo: 'Atendimento da Clínica Aurora',
-    tarefasConcluidas: 10,
-    tarefasTotal: 10,
-  },
-});
 
 /**
  * Bancada visual local para comparar a implementação com a direção aprovada.
  * Em produção esta URL encerra em 404; o produto real usa o mesmo componente em
  * /inicio, protegido por sessão e abastecido com os dados do usuário.
  */
-export default async function PreviewMapaJornadaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ estado?: string }>;
-}) {
+export default function PreviewMapaJornadaPage() {
   if (process.env.NODE_ENV === 'production') notFound();
-  const estado = (await searchParams).estado;
-  const evolucaoAtiva = estado === 'evolucao';
-  const operacaoAtiva = estado === 'operacao' || evolucaoAtiva;
-  const plano = evolucaoAtiva ? PLANO_EVOLUCAO : operacaoAtiva ? PLANO_OPERACAO : PLANO_ATIVACAO;
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
@@ -179,24 +62,10 @@ export default async function PreviewMapaJornadaPage({
       <main id="conteudo" className={styles.conteudo}>
         <MapaJornada
           nome="Mateus"
-          sobral={
-            <SobralChatVisual
-              mensagens={[]}
-              exemplos={[
-                { rotulo: 'O que faço agora?', texto: 'O que devo fazer agora?' },
-                { rotulo: 'Indique uma aula', texto: 'Qual aula pode me ajudar agora?' },
-                {
-                  rotulo: 'Escolha uma ferramenta',
-                  texto: 'Qual ferramenta faz sentido para o meu próximo passo?',
-                },
-              ]}
-            />
-          }
           cliente="Clínica Aurora"
           contato="Dra. Camila Rios"
           proximaAcao="Apresentar proposta na quinta-feira"
           proximaMentoria="Chamada de alinhamento"
-          plano={plano}
         />
       </main>
     </div>

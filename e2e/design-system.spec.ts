@@ -46,33 +46,28 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('img', { name: 'Subido' })).toBeVisible();
   });
 
-  test('a Início resume a etapa atual sem repetir o próximo passo do Sobral', async ({ page }) => {
-    await page.goto('/preview/mapa-jornada?estado=evolucao');
+  test('a Início não repete o método nem o consultor', async ({ page }) => {
+    await page.goto('/preview/mapa-jornada');
 
-    const caminho = page.getByRole('list', { name: 'Seu caminho na plataforma' });
-    await expect(caminho.locator('[aria-current="step"]')).toContainText('Evoluir');
+    await expect(page.getByRole('list', { name: 'Seu caminho na plataforma' })).toHaveCount(0);
+    await expect(page.getByText('Como usar a plataforma', { exact: true })).toHaveCount(0);
+    await expect(page.locator('#sobral-ai')).toHaveCount(0);
     await expect(page.getByText('Meta da etapa · Segundo ciclo comprovado')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Confirmar o segundo projeto' })).toHaveCount(0);
   });
 
-  test('a Início guia o uso sem exigir briefing e preserva contraste no hero', async ({ page }) => {
+  test('a Início preserva contraste e leva direto às áreas de trabalho', async ({ page }) => {
     await page.goto('/preview/mapa-jornada');
 
     await expect(page.getByRole('heading', { name: 'bem-vindo.' })).toHaveCSS(
       'color',
       'rgb(255, 255, 255)',
     );
-    await expect(
-      page.getByRole('heading', { name: 'O que você precisa resolver agora?' }),
-    ).toBeVisible();
-    const sobral = page.locator('#sobral-ai');
     const abertura = page.getByLabel('Resumo do dia');
-    await expect(sobral).toHaveCount(1);
-    const caixaSobral = (await sobral.boundingBox())!;
-    const caixaAbertura = (await abertura.boundingBox())!;
-    expect(caixaSobral.y).toBeLessThanOrEqual(caixaAbertura.y + caixaAbertura.height + 60);
+    const andamento = page.getByRole('heading', { name: 'O que já está na sua mesa.' });
+    await expect(abertura).toBeVisible();
+    await expect(andamento).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Sobral AI' })).toHaveCount(0);
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);

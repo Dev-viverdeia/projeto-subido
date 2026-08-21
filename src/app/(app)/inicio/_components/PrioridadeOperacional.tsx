@@ -64,7 +64,7 @@ export function PrioridadeOperacional({
           {acao}
           <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
         </Link>
-        <Link href="#sobral-ai" className={styles.abrirLeitura}>
+        <Link href="/consultor" className={styles.abrirLeitura}>
           Conversar sobre este passo
         </Link>
       </div>
