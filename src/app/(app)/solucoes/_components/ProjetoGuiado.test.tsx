@@ -41,6 +41,20 @@ const projeto: DadosRoteiroProjeto = {
           topicos: ['Estados e movimentos permitidos', 'Gatilhos para passagem humana'],
           exercicio: 'Mapeie cinco conversas reais e marque a mudança de estado em cada uma.',
           prontoQuando: 'Cada estado tem entrada, saída, responsável e exceção documentados.',
+          recursos: [
+            {
+              tipo: 'mapa_mental',
+              titulo: 'Mapa da conversa',
+              descricao: 'Veja a sequência entre entrada, qualificação e passagem humana.',
+              conteudo: 'Entrada → atendimento → qualificação → passagem humana → CRM',
+            },
+            {
+              tipo: 'quiz',
+              titulo: 'Conversa pronta para construir?',
+              descricao: 'Revise os limites do fluxo antes de configurar as ferramentas.',
+              conteudo: 'Cada estado tem entrada, saída, responsável e limite documentados?',
+            },
+          ],
         },
         {
           titulo: 'Valide antes de ativar',
@@ -221,7 +235,9 @@ describe('Projeto guiado', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Aprenda como este projeto funciona' }),
     ).toBeDefined();
-    expect(screen.getByText(/Uma preparação curta para você entender a lógica/)).toBeDefined();
+    expect(screen.getByText(/Cada aula termina com uma tarefa objetiva e materiais/)).toBeDefined();
+    expect(screen.getByText('2 aulas · 2 recursos')).toBeDefined();
+    expect(screen.getByText('Mapa da conversa')).toBeDefined();
     expect(screen.getByRole('heading', { level: 3, name: 'Do contato ao CRM' })).toBeDefined();
     expect(screen.getByRole('button', { name: 'Copiar Briefing de atendimento' })).toBeDefined();
     expect(

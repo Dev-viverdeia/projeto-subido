@@ -72,6 +72,20 @@ describe('roteiro de Projeto', () => {
             exercicio: 'Escolha um evento real e escreva qual decisão a resposta deve melhorar.',
             prontoQuando:
               'O momento, o público, a pergunta e o responsável foram aprovados pelo cliente.',
+            recursos: [
+              {
+                tipo: 'mapa_mental',
+                titulo: 'Do evento à decisão',
+                descricao: 'Visualize como a resposta chega à pessoa responsável pela ação.',
+                conteudo: 'Evento → pergunta → resposta → alerta → ação → fechamento',
+              },
+              {
+                tipo: 'quiz',
+                titulo: 'Pesquisa pronta?',
+                descricao: 'Confirme o objetivo, o público e a ação antes do primeiro envio.',
+                conteudo: 'A empresa sabe o que fará com cada faixa de resposta recebida?',
+              },
+            ],
           },
           {
             titulo: 'Feche o retorno',
@@ -153,6 +167,7 @@ describe('roteiro de Projeto', () => {
     expect(roteiro?.escopo?.naoInclui).toHaveLength(2);
     expect(roteiro?.artefatosEntrega).toHaveLength(3);
     expect(roteiro?.trilhaDidatica?.aulas).toHaveLength(2);
+    expect(roteiro?.trilhaDidatica?.aulas[0]?.recursos).toHaveLength(2);
     expect(roteiro?.trilhaDidatica?.videosReferencia).toHaveLength(1);
     expect(roteiro?.trilhaDidatica?.materiais).toHaveLength(3);
     expect(roteiro?.fases[0]?.passos[0]?.execucao).toHaveLength(1);

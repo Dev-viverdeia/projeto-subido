@@ -34,6 +34,10 @@ export function CatalogoProjetos({
   const progresso = useProgresso();
   const Titulo = tituloComo;
   const totalPassos = solucoes.reduce((total, solucao) => total + solucao.etapaIds.length, 0);
+  const totalAulas = solucoes.reduce(
+    (total, solucao) => total + (solucao.projeto?.roteiro.trilhaDidatica?.aulas.length ?? 0),
+    0,
+  );
 
   if (solucoes.length === 0) {
     return (
@@ -73,28 +77,28 @@ export function CatalogoProjetos({
           <div className={styles.aberturaTexto}>
             <p className={styles.eyebrow}>Biblioteca de execução</p>
             <Titulo id="titulo-projetos" className={styles.titulo}>
-              Cinco projetos prontos.
+              Cinco minicursos práticos.
               <br />
-              <span>Passo a passo para implementar.</span>
+              <span>Cada um termina em uma entrega.</span>
             </Titulo>
             <p className={styles.apoio}>
-              Aprenda como funciona, prepare as ferramentas, implemente com o cliente e valide o
-              resultado antes da entrega.
+              Assista às aulas, use os modelos e siga a implementação com um cliente até o aceite
+              final.
             </p>
           </div>
 
           <dl className={styles.resumoBiblioteca} aria-label="Resumo da biblioteca">
             <div>
-              <dt>Projetos prontos</dt>
+              <dt>Minicursos</dt>
               <dd>{String(solucoes.length).padStart(2, '0')}</dd>
+            </div>
+            <div>
+              <dt>Aulas práticas</dt>
+              <dd>{String(totalAulas).padStart(2, '0')}</dd>
             </div>
             <div>
               <dt>Passos guiados</dt>
               <dd>{String(totalPassos).padStart(2, '0')}</dd>
-            </div>
-            <div>
-              <dt>Fases por entrega</dt>
-              <dd>{String(FASES.length).padStart(2, '0')}</dd>
             </div>
           </dl>
         </div>
@@ -110,9 +114,10 @@ export function CatalogoProjetos({
       </section>
 
       <div className={styles.introducao}>
-        <p className={styles.introducaoRotulo}>Escolha um projeto</p>
+        <p className={styles.introducaoRotulo}>Escolha o que entregar</p>
         <p className={styles.introducaoTexto}>
-          Siga os passos em ordem. Quando precisar adaptar a entrega para um cliente, use o Estúdio.
+          Abra um minicurso, aprenda o método e use o passo a passo para concluir a entrega com o
+          cliente.
         </p>
       </div>
 
@@ -123,6 +128,7 @@ export function CatalogoProjetos({
           const estado = estadoDoProgresso(feitas, total);
           const projeto = solucao.projeto;
           const perfil = projeto?.roteiro.perfil;
+          const aulas = projeto?.roteiro.trilhaDidatica?.aulas.length ?? 0;
           const andamento = estado === 'em-andamento' || estado === 'concluida';
 
           return (
@@ -181,15 +187,16 @@ export function CatalogoProjetos({
                 <footer className={styles.rodape}>
                   <div className={styles.fatos}>
                     {perfil ? <span>{perfil.prazo}</span> : <span>5 fases</span>}
+                    {aulas > 0 ? <span>{aulas} aulas</span> : null}
                     {perfil ? <span>{ROTULO_NIVEL[perfil.nivel]}</span> : null}
                     <span>{total} passos</span>
                   </div>
                   <span className={styles.abrir}>
                     {estado === 'concluida'
-                      ? 'Revisar projeto'
+                      ? 'Revisar minicurso'
                       : estado === 'em-andamento'
-                        ? 'Retomar projeto'
-                        : 'Abrir projeto'}{' '}
+                        ? 'Retomar minicurso'
+                        : 'Abrir minicurso'}{' '}
                     <ArrowUpRight size={16} aria-hidden="true" />
                   </span>
                 </footer>

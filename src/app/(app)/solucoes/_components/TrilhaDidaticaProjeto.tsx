@@ -33,6 +33,10 @@ export function TrilhaDidaticaProjeto({
   const videosComplementares = trilha.videosReferencia.filter(
     (video) => video.videoUrl !== videoAberturaUrl,
   );
+  const totalRecursos = trilha.aulas.reduce(
+    (total, aula) => total + (aula.recursos?.length ?? 0),
+    0,
+  );
 
   return (
     <section className={styles.raiz} aria-labelledby="trilha-didatica-titulo">
@@ -41,8 +45,7 @@ export function TrilhaDidaticaProjeto({
           <p>Antes de implementar</p>
           <h2 id="trilha-didatica-titulo">Aprenda como este projeto funciona</h2>
           <span>
-            Uma preparação curta para você entender a lógica, observar o projeto funcionando e
-            entrar na implementação com os materiais certos.
+            Cada aula termina com uma tarefa objetiva e materiais para usar na implementação.
           </span>
         </div>
         <div className={styles.tempo}>
@@ -60,7 +63,9 @@ export function TrilhaDidaticaProjeto({
           <BookOpenCheck size={18} aria-hidden="true" />
           <div>
             <strong>Aprenda</strong>
-            <small>{trilha.aulas.length} aulas objetivas</small>
+            <small>
+              {trilha.aulas.length} aulas · {totalRecursos} recursos
+            </small>
           </div>
         </li>
         <li>
@@ -75,7 +80,7 @@ export function TrilhaDidaticaProjeto({
           <span>03</span>
           <FileText size={18} aria-hidden="true" />
           <div>
-            <strong>Use no projeto</strong>
+            <strong>Implemente</strong>
             <small>{trilha.materiais.length} modelos copiáveis</small>
           </div>
         </li>
