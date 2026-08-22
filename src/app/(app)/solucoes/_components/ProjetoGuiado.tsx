@@ -27,7 +27,7 @@ import { ArtefatosEntregaProjeto, FichaCampoProjeto } from './EscopoProjeto';
 import { ProximaSolucao } from './ProximaSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
 import { TrilhaDidaticaProjeto } from './TrilhaDidaticaProjeto';
-import { VideoConteudo } from '../../_components/VideoConteudo';
+import { CabecalhoMinicurso } from './CabecalhoMinicurso';
 import styles from './ProjetoGuiado.module.css';
 
 export function ProjetoGuiado({
@@ -63,6 +63,9 @@ export function ProjetoGuiado({
   const escopo = projeto.roteiro.escopo;
   const artefatosEntrega = projeto.roteiro.artefatosEntrega;
   const trilhaDidatica = projeto.roteiro.trilhaDidatica;
+  const videoAbertura = videoUrl
+    ? { videoUrl, titulo: `Aula de abertura · ${titulo}` }
+    : (trilhaDidatica?.videosReferencia[0] ?? null);
 
   const passos = projeto.roteiro.fases.flatMap((fase) =>
     fase.passos.map((passo) => ({ fase, passo, id: idPassoProjeto(slug, fase.id, passo.id) })),
@@ -107,11 +110,25 @@ export function ProjetoGuiado({
 
   return (
     <div className={styles.raiz}>
+      <CabecalhoMinicurso
+        titulo={titulo}
+        resumo={resumo}
+        categoria={categoria}
+        totalAulas={trilhaDidatica?.aulas.length ?? 1}
+        tempoPreparacao={trilhaDidatica?.tempoTotal ?? 'Comece pelo vídeo'}
+        totalPassos={todosIds.length}
+        videoUrl={videoAbertura?.videoUrl ?? null}
+        tituloVideo={videoAbertura?.titulo ?? 'Aula de abertura'}
+      />
+
       <header className={styles.hero} data-on-dark>
         <div className={styles.heroPrincipal}>
-          <p className={styles.eyebrow}>{categoria ? `${categoria} · ` : ''}Projeto guiado</p>
-          <h1>{titulo}</h1>
-          <p className={styles.resumo}>{resumo}</p>
+          <p className={styles.eyebrow}>Método de implementação</p>
+          <h2>Do entendimento à entrega.</h2>
+          <p className={styles.resumo}>
+            Siga as cinco fases em ordem. Cada passo termina com uma entrega verificável para o
+            cliente.
+          </p>
         </div>
 
         <div className={styles.resultado}>
@@ -206,7 +223,9 @@ export function ProjetoGuiado({
         </section>
       ) : null}
 
-      {trilhaDidatica ? <TrilhaDidaticaProjeto trilha={trilhaDidatica} /> : null}
+      {trilhaDidatica ? (
+        <TrilhaDidaticaProjeto trilha={trilhaDidatica} videoAberturaUrl={videoAbertura?.videoUrl} />
+      ) : null}
 
       <div className={styles.corpo}>
         <div className={styles.principal}>
@@ -352,16 +371,6 @@ export function ProjetoGuiado({
                 })()
               : null}
           </div>
-
-          {videoUrl && !trilhaDidatica ? (
-            <section className={styles.aulaApoio} aria-labelledby="aula-apoio-titulo">
-              <header>
-                <p>Conteúdo de apoio</p>
-                <h2 id="aula-apoio-titulo">Entenda o projeto antes de adaptar</h2>
-              </header>
-              <VideoConteudo videoUrl={videoUrl} titulo={titulo} />
-            </section>
-          ) : null}
 
           <section className={styles.kit} aria-labelledby="kit-projeto">
             <div className={styles.kitCabecalho}>

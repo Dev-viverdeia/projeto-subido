@@ -17,6 +17,7 @@ const SESSAO: SessaoMentoria = {
   inicioIso: '2026-08-18T19:00:00.000Z',
   fimIso: '2026-08-18T20:00:00.000Z',
   vagas: 30,
+  custoCreditos: 1,
   salaUrl: null,
   inscritos: 8,
   euInscrito: true,

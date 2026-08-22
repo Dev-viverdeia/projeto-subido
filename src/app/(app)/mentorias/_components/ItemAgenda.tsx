@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarX2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -113,7 +113,7 @@ export function ItemAgenda({
               {sessao.inscritos}/{sessao.vagas}
             </span>
             <Button variant="primary" size="sm" disabled={gravando} onClick={aoFazerCheckin}>
-              Fazer check-in
+              Fazer check-in · {sessao.custoCreditos} cr.
             </Button>
           </>
         )}
@@ -128,7 +128,7 @@ export function ItemAgenda({
               variant="destructive"
               size="sm"
               disabled={gravando}
-              iconLeft={<CalendarX2 size={14} strokeWidth={1.8} aria-hidden="true" />}
+              iconLeft={<X size={14} strokeWidth={2} aria-hidden="true" />}
               onClick={aoCancelarCheckin}
               aria-label={`Cancelar check-in em ${sessao.titulo}`}
             >

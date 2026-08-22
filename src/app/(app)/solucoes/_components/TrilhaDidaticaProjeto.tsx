@@ -1,4 +1,14 @@
-import { BookOpenCheck, CheckCircle2, Clapperboard, Clock3, FileText } from 'lucide-react';
+import {
+  BookOpenCheck,
+  BookOpenText,
+  CheckCircle2,
+  Clapperboard,
+  Clock3,
+  ExternalLink,
+  FileText,
+  ListChecks,
+  Network,
+} from 'lucide-react';
 import type { RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { VideoConteudo } from '../../_components/VideoConteudo';
@@ -6,7 +16,24 @@ import styles from './TrilhaDidaticaProjeto.module.css';
 
 type Trilha = NonNullable<RoteiroProjeto['trilhaDidatica']>;
 
-export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
+const ROTULOS_RECURSO = {
+  mapa_mental: { rotulo: 'Mapa mental', Icone: Network },
+  quiz: { rotulo: 'Quiz', Icone: ListChecks },
+  ebook: { rotulo: 'E-book', Icone: BookOpenText },
+  modelo: { rotulo: 'Modelo', Icone: FileText },
+} as const;
+
+export function TrilhaDidaticaProjeto({
+  trilha,
+  videoAberturaUrl,
+}: {
+  trilha: Trilha;
+  videoAberturaUrl?: string | null;
+}) {
+  const videosComplementares = trilha.videosReferencia.filter(
+    (video) => video.videoUrl !== videoAberturaUrl,
+  );
+
   return (
     <section className={styles.raiz} aria-labelledby="trilha-didatica-titulo">
       <header className={styles.cabecalho}>
@@ -92,6 +119,40 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
                       <dd>{aula.prontoQuando}</dd>
                     </div>
                   </dl>
+
+                  {(aula.recursos ?? []).length > 0 ? (
+                    <section className={styles.recursosAula} aria-label="Recursos desta aula">
+                      <h4>Recursos desta aula</h4>
+                      <div>
+                        {(aula.recursos ?? []).map((recurso) => {
+                          const { rotulo, Icone } = ROTULOS_RECURSO[recurso.tipo];
+                          return (
+                            <article key={recurso.titulo}>
+                              <span className={styles.iconeRecurso} aria-hidden="true">
+                                <Icone size={17} strokeWidth={1.7} />
+                              </span>
+                              <div>
+                                <small>{rotulo}</small>
+                                <strong>{recurso.titulo}</strong>
+                                <p>{recurso.descricao}</p>
+                                {recurso.url ? (
+                                  <a href={recurso.url} target="_blank" rel="noreferrer">
+                                    Abrir recurso <ExternalLink size={13} aria-hidden="true" />
+                                  </a>
+                                ) : null}
+                                {recurso.conteudo ? (
+                                  <details>
+                                    <summary>Abrir recurso</summary>
+                                    <pre>{recurso.conteudo}</pre>
+                                  </details>
+                                ) : null}
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ) : null}
                 </div>
               </details>
             ))}
@@ -128,14 +189,14 @@ export function TrilhaDidaticaProjeto({ trilha }: { trilha: Trilha }) {
         </section>
       </div>
 
-      {trilha.videosReferencia.length > 0 ? (
+      {videosComplementares.length > 0 ? (
         <section className={styles.videos} aria-labelledby="videos-referencia-titulo">
           <header className={styles.blocoCabecalho}>
             <span>Exemplo de entrega</span>
             <h3 id="videos-referencia-titulo">Veja como o projeto funciona antes de construir</h3>
           </header>
           <div className={styles.gradeVideos}>
-            {trilha.videosReferencia.map((video, indice) => (
+            {videosComplementares.map((video, indice) => (
               <article key={video.videoUrl}>
                 <div className={styles.videoTexto}>
                   <span>{String(indice + 1).padStart(2, '0')}</span>

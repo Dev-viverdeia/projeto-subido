@@ -545,6 +545,42 @@ export type Database = {
           },
         ]
       }
+      certificados_emitidos: {
+        Row: {
+          codigo: string
+          concluido_em: string
+          dono: string
+          emitido_em: string
+          id: string
+          nome: string
+          origem: string
+          slug: string
+          titulo: string
+        }
+        Insert: {
+          codigo?: string
+          concluido_em: string
+          dono: string
+          emitido_em?: string
+          id?: string
+          nome: string
+          origem: string
+          slug: string
+          titulo: string
+        }
+        Update: {
+          codigo?: string
+          concluido_em?: string
+          dono?: string
+          emitido_em?: string
+          id?: string
+          nome?: string
+          origem?: string
+          slug?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       consultor_anexos: {
         Row: {
           caminho_storage: string
@@ -1251,17 +1287,23 @@ export type Database = {
       }
       mentoria_inscricoes: {
         Row: {
+          creditos_usados: number
           criado_em: string
+          id: string
           mentoria_id: string
           usuario_id: string
         }
         Insert: {
+          creditos_usados?: number
           criado_em?: string
+          id?: string
           mentoria_id: string
           usuario_id: string
         }
         Update: {
+          creditos_usados?: number
           criado_em?: string
+          id?: string
           mentoria_id?: string
           usuario_id?: string
         }
@@ -1280,6 +1322,7 @@ export type Database = {
           atualizado_em: string
           criado_em: string
           criado_por: string | null
+          custo_creditos: number
           descricao: string
           fim: string
           id: string
@@ -1294,6 +1337,7 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           criado_por?: string | null
+          custo_creditos?: number
           descricao?: string
           fim: string
           id?: string
@@ -1308,6 +1352,7 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           criado_por?: string | null
+          custo_creditos?: number
           descricao?: string
           fim?: string
           id?: string
@@ -2272,7 +2317,9 @@ export type Database = {
           enriquecimento_id: string | null
           id: string
           lista_id: string | null
+          mentoria_id: string | null
           movimento: number
+          referencia_externa: string | null
           saldo_apos: number
           tipo: string
         }
@@ -2283,7 +2330,9 @@ export type Database = {
           enriquecimento_id?: string | null
           id?: string
           lista_id?: string | null
+          mentoria_id?: string | null
           movimento: number
+          referencia_externa?: string | null
           saldo_apos: number
           tipo: string
         }
@@ -2294,7 +2343,9 @@ export type Database = {
           enriquecimento_id?: string | null
           id?: string
           lista_id?: string | null
+          mentoria_id?: string | null
           movimento?: number
+          referencia_externa?: string | null
           saldo_apos?: number
           tipo?: string
         }
@@ -2312,6 +2363,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "prospeccao_listas"
             referencedColumns: ["dono", "id"]
+          },
+          {
+            foreignKeyName: "prospeccao_movimentos_mentoria_id_fkey"
+            columns: ["mentoria_id"]
+            isOneToOne: false
+            referencedRelation: "mentorias"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2659,6 +2717,29 @@ export type Database = {
         Args: { p_dono: string; p_reuniao: string }
         Returns: boolean
       }
+      certificado_publico: {
+        Args: { p_codigo: string }
+        Returns: {
+          codigo: string
+          concluido_em: string
+          emitido_em: string
+          nome: string
+          origem: string
+          slug: string
+          titulo: string
+        }[]
+      }
+      creditos_obter_saldo: { Args: never; Returns: number }
+      creditos_sistema_conceder: {
+        Args: {
+          p_descricao: string
+          p_dono: string
+          p_quantidade: number
+          p_referencia: string
+          p_tipo: string
+        }
+        Returns: number
+      }
       crm_aplicar_proxima_acao: {
         Args: { p_enriquecimento: string; p_oportunidade: string }
         Returns: boolean
@@ -2736,6 +2817,20 @@ export type Database = {
           p_refresh_token_cifrado: string
         }
         Returns: undefined
+      }
+      mentoria_cancelar_checkin: {
+        Args: { p_mentoria: string }
+        Returns: {
+          estorno: number
+          saldo: number
+        }[]
+      }
+      mentoria_fazer_checkin: {
+        Args: { p_mentoria: string }
+        Returns: {
+          custo: number
+          saldo: number
+        }[]
       }
       mentoria_ocupacao: {
         Args: { _ids: string[] }

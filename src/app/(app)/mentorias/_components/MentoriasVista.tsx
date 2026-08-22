@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { CalendarX2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import { RetratoMentor } from '../../_components/RetratoMentor';
@@ -368,7 +368,7 @@ export function MentoriasVista({
                         setConfirmandoId(detalhe.id);
                       }}
                     >
-                      Fazer check-in
+                      Fazer check-in · {detalhe.custoCreditos} cr.
                     </Button>
                   );
                 }
@@ -386,7 +386,7 @@ export function MentoriasVista({
                       <Button
                         variant="destructive"
                         disabled={gravando}
-                        iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+                        iconLeft={<X size={15} strokeWidth={2} aria-hidden="true" />}
                         onClick={() => {
                           setDetalheId(null);
                           pedirCancelamento(detalhe.id);
@@ -443,7 +443,7 @@ export function MentoriasVista({
             <Button
               variant="destructive"
               disabled={gravando}
-              iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+              iconLeft={<X size={15} strokeWidth={2} aria-hidden="true" />}
               onClick={confirmarCancelamento}
             >
               Cancelar check-in
@@ -453,8 +453,9 @@ export function MentoriasVista({
       >
         {cancelando && (
           <p className={styles.confirmarTexto}>
-            Sua vaga em “{cancelando.titulo}” volta a ficar disponível. Você poderá fazer um novo
-            check-in depois, enquanto ainda houver vaga.
+            Sua vaga em “{cancelando.titulo}” volta a ficar disponível e os{' '}
+            {cancelando.custoCreditos} créditos usados retornam ao seu saldo. Você poderá fazer um
+            novo check-in depois, enquanto ainda houver vaga.
           </p>
         )}
       </Modal>
@@ -480,14 +481,16 @@ export function MentoriasVista({
                 executar(() => fazerCheckin(id));
               }}
             >
-              {gravando ? 'Confirmando…' : 'Confirmar'}
+              {gravando ? 'Confirmando…' : `Confirmar por ${confirmando?.custoCreditos ?? 0} cr.`}
             </Button>
           </div>
         }
       >
         {confirmando && (
           <p className={styles.confirmarTexto}>
-            Você garante a vaga em “{confirmando.titulo}” (
+            O check-in usa {confirmando.custoCreditos}{' '}
+            {confirmando.custoCreditos === 1 ? 'crédito' : 'créditos'} e garante sua vaga em “
+            {confirmando.titulo}” (
             {rotuloDoDia(confirmando.inicioIso, agora).principal.toLowerCase()},{' '}
             {horaCurta(confirmando.inicioIso)}). Você pode cancelar até o início. Nesse caso, a vaga
             volta a ficar disponível.

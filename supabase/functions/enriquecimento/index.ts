@@ -18,6 +18,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return respostaJson({ erro: 'Faça login para enriquecer uma oportunidade.' }, 401);
+  if (user.user_metadata?.plano_subido === 'starter') {
+    return respostaJson({ erro: 'O enriquecimento faz parte do módulo comercial.' }, 403);
+  }
 
   let json: unknown;
   try {

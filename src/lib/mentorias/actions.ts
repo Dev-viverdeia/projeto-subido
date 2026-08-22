@@ -7,7 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 /**
  * Check-in e cancelamento — as duas únicas mutações que um membro faz aqui.
  *
- * A REGRA MORA NO BANCO, e esta camada não a repete. O trigger
+ * A REGRA MORA NO BANCO, e esta camada não a repete. As RPCs debitam ou
+ * estornam a carteira universal na mesma transação da vaga. O trigger
  * `private.validar_inscricao` recusa sessão não publicada, sessão encerrada e
  * sessão lotada, com um `for update` na linha da mentoria que serializa dois
  * cliques na última vaga. Revalidar aqui em TypeScript seria uma segunda cópia da
@@ -41,6 +42,15 @@ function mensagemDaRecusa(bruto: string): string {
   if (bruto.includes('não publicada') || bruto.includes('nao publicada')) {
     return 'Esta mentoria não está aberta para check-in.';
   }
+  if (bruto.includes('creditos_insuficientes')) {
+    return 'Seu saldo não é suficiente para esta mentoria. Confira seus créditos na conta.';
+  }
+  if (bruto.includes('checkin_duplicado')) {
+    return 'Você já tinha feito check-in nesta mentoria.';
+  }
+  if (bruto.includes('cancelamento_encerrado')) {
+    return 'O cancelamento encerrou porque a mentoria já começou.';
+  }
   if (bruto.includes('duplicate key') || bruto.includes('mentoria_inscricoes_pkey')) {
     return 'Você já tinha feito check-in nesta mentoria.';
   }
@@ -58,9 +68,7 @@ export async function fazerCheckin(mentoriaId: string): Promise<ResultadoCheckin
 
   if (!user) return { ok: false, mensagem: 'Sua sessão expirou. Entre de novo para continuar.' };
 
-  const { error } = await supabase
-    .from('mentoria_inscricoes')
-    .insert({ mentoria_id: id.data, usuario_id: user.id });
+  const { error } = await supabase.rpc('mentoria_fazer_checkin', { p_mentoria: id.data });
 
   if (error)
     return { ok: false, mensagem: mensagemDaRecusa(`${error.message} ${error.code ?? ''}`) };
@@ -71,10 +79,8 @@ export async function fazerCheckin(mentoriaId: string): Promise<ResultadoCheckin
 }
 
 /**
- * Cancelar é apagar a própria linha — e a policy de delete é
- * `usuario_id = (select auth.uid())`, então um id alheio simplesmente não casa
- * nenhuma linha. O delete "funciona" afetando zero, que é o comportamento certo:
- * não revela se aquela inscrição existe.
+ * O cancelamento também vive no banco: só acontece antes do início e devolve o
+ * valor originalmente pago, mesmo que o custo da sessão mude depois.
  */
 export async function cancelarCheckin(mentoriaId: string): Promise<ResultadoCheckin> {
   const id = Id.safeParse(mentoriaId);
@@ -87,14 +93,10 @@ export async function cancelarCheckin(mentoriaId: string): Promise<ResultadoChec
 
   if (!user) return { ok: false, mensagem: 'Sua sessão expirou. Entre de novo para continuar.' };
 
-  const { error } = await supabase
-    .from('mentoria_inscricoes')
-    .delete()
-    .eq('mentoria_id', id.data)
-    .eq('usuario_id', user.id);
+  const { error } = await supabase.rpc('mentoria_cancelar_checkin', { p_mentoria: id.data });
 
   if (error) {
-    return { ok: false, mensagem: 'Não foi possível cancelar agora. Tente de novo em instantes.' };
+    return { ok: false, mensagem: mensagemDaRecusa(`${error.message} ${error.code ?? ''}`) };
   }
 
   revalidatePath('/mentorias');

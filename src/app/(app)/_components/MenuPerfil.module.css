@@ -41,6 +41,19 @@
   white-space: nowrap;
 }
 
+.saldoGatilho {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  min-height: 30px;
+  padding: 0 var(--via-space-2_5);
+  border-right: 1px solid var(--via-border-hairline);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+}
+
 .seta {
   color: var(--via-text-faint);
   transition: transform var(--via-t-fast);
@@ -138,6 +151,15 @@
   font-size: 0.625rem;
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
+}
+
+.planoSaldo {
+  grid-column: 1 / -1;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--via-white) 62%, transparent);
 }
 
 .itens {
@@ -244,6 +266,10 @@
 }
 
 @media (max-width: 460px) {
+  .saldoGatilho {
+    padding-inline: var(--via-space-2);
+  }
+
   .nomeGatilho {
     max-width: 11ch;
   }
