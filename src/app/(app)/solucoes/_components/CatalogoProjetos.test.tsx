@@ -66,8 +66,10 @@ describe('catálogo de projetos', () => {
 
     render(<CatalogoProjetos solucoes={[solucao]} />);
 
+    expect(screen.getByRole('heading', { name: /Cinco minicursos práticos/ })).toBeDefined();
     expect(screen.getByText('Comece por aqui')).toBeDefined();
     expect(screen.getByText('5 a 10 dias úteis')).toBeDefined();
     expect(screen.getByText('Entrada')).toBeDefined();
+    expect(screen.getByRole('link', { name: /Abrir minicurso/ })).toBeDefined();
   });
 });
