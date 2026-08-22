@@ -1,48 +1,134 @@
-/* Espelha CatalogoFormacoes.module.css e CartaoFormacao.module.css à risca —
-   skeleton com contagem de colunas, proporção de pôster ou moldura diferente da
-   grade real faz a tela pular no fim do load. */
-.grade {
+.hero {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--via-space-5);
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: var(--app-gap-section);
+  align-items: center;
+  min-height: 260px;
+  padding: clamp(28px, 4vw, 52px);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(24px) saturate(145%);
 }
 
-@media (max-width: 1439px) {
-  .grade {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+.heroTexto {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.sinal {
+  flex: none;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 68%, transparent);
+}
+
+.heroTexto div,
+.heroApoio,
+.cabecalho > div,
+.proxima > div,
+.cartaoCorpo {
+  display: grid;
+  gap: var(--via-space-3);
+}
+
+.heroTexto p {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
+.heroTexto strong {
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  color: var(--via-text-primary);
+}
+
+.trilha {
+  display: grid;
+  gap: var(--app-gap-block);
+}
+
+.cabecalho,
+.proxima {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+  gap: var(--app-gap-section);
+  align-items: center;
+}
+
+.cabecalho {
+  padding-inline: var(--via-space-1);
+}
+
+.proxima {
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+.cartao {
+  display: grid;
+  grid-template-columns: clamp(132px, 31%, 176px) minmax(0, 1fr);
+  min-height: 252px;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.cartaoCorpo {
+  align-content: center;
+  padding: var(--app-pad-card);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .hero,
+  .proxima,
+  .cartao {
+    background: var(--via-surface);
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1079px) {
+  .hero,
+  .cabecalho,
+  .proxima,
   .grade {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 599px) {
-  .grade {
-    gap: var(--via-space-3);
+  .hero {
+    min-height: 220px;
+    padding: var(--app-pad-card);
   }
-}
 
-.poster {
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-xl);
-  background: var(--via-surface);
-}
+  .heroApoio {
+    display: none;
+  }
 
-/* A moldura de 8px é parte da anatomia do card real: sem ela o skeleton mede
-   menos que o card e a grade encolhe no fim do load. */
-.capa {
-  margin: var(--via-space-2);
-  aspect-ratio: 3 / 4;
-  border-radius: var(--via-radius-lg);
-  overflow: hidden;
-}
-
-.corpo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-  padding: var(--via-space-2) var(--via-space-4) var(--via-space-4);
+  .cartao {
+    grid-template-columns: 108px minmax(0, 1fr);
+    min-height: 232px;
+  }
 }

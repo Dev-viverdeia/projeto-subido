@@ -108,7 +108,8 @@
   white-space: nowrap;
 }
 
-.retomada {
+.retomada,
+.conclusao {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -118,6 +119,12 @@
   border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-white) 7%, transparent);
+}
+
+.acoesConclusao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
 }
 
 .retomadaTexto {
@@ -149,12 +156,18 @@
   white-space: nowrap;
 }
 
+.conclusao .retomadaTexto strong {
+  text-overflow: clip;
+  white-space: normal;
+}
+
 .retomadaTexto small {
   margin-top: 2px;
   color: var(--via-gray-300);
 }
 
-.cta {
+.cta,
+.ctaSecundario {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -162,8 +175,6 @@
   min-height: var(--app-h-control);
   padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
-  background: var(--via-accent);
-  color: var(--via-navy);
   font-size: var(--via-fs-sm);
   font-weight: 650;
   text-decoration: none;
@@ -173,12 +184,32 @@
     box-shadow var(--app-t-touch);
 }
 
-.cta:hover {
+.cta {
+  background: var(--via-accent);
+  color: var(--via-navy);
+}
+
+.ctaSecundario {
+  border: 1px solid color-mix(in srgb, var(--via-white) 22%, transparent);
+  background: color-mix(in srgb, var(--via-white) 9%, transparent);
+  color: var(--via-white);
+}
+
+.cta:hover,
+.ctaSecundario:hover {
   transform: translateY(-1px);
+}
+
+.cta:hover {
   box-shadow: 0 10px 24px -14px var(--via-accent);
 }
 
-.cta:focus-visible {
+.ctaSecundario:hover {
+  background: color-mix(in srgb, var(--via-white) 14%, transparent);
+}
+
+.cta:focus-visible,
+.ctaSecundario:focus-visible {
   outline: 2px solid var(--via-white);
   outline-offset: 3px;
 }
@@ -236,22 +267,31 @@
 }
 
 @media (max-width: 599px) {
-  .retomada {
+  .retomada,
+  .conclusao {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-3);
   }
 
-  .cta {
+  .acoesConclusao {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cta,
+  .ctaSecundario {
     width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cta {
+  .cta,
+  .ctaSecundario {
     transition: none;
   }
 
-  .cta:hover {
+  .cta:hover,
+  .ctaSecundario:hover {
     transform: none;
   }
 }
