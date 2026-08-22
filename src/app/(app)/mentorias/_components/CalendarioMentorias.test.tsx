@@ -27,6 +27,7 @@ function sessao(id: string, offsetDias: number, titulo: string): SessaoMentoria 
     inicioIso: inicio.toISOString(),
     fimIso: new Date(inicio.getTime() + 5_400_000).toISOString(),
     vagas: 30,
+    custoCreditos: 1,
     salaUrl: null,
     mentor: {
       id: 'p1',

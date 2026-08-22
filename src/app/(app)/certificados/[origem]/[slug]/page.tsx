@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { obterFormacao, obterSolucao } from '@/lib/conteudo/queries';
-import { idsPassosProjeto } from '@/lib/projetos/roteiro';
+import { carregarCertificavel, type OrigemCertificado } from '@/lib/certificados/conteudo';
 import { createClient } from '@/lib/supabase/server';
 import { CabecalhoPagina } from '../../../_components/CabecalhoPagina';
 import { CertificadoVista } from '../../_components/CertificadoVista';
@@ -23,31 +22,10 @@ import { CertificadoVista } from '../../_components/CertificadoVista';
  */
 
 const ORIGENS = ['formacao', 'solucao'] as const;
-type Origem = (typeof ORIGENS)[number];
+type Origem = OrigemCertificado;
 
 function ehOrigem(valor: string): valor is Origem {
   return (ORIGENS as readonly string[]).includes(valor);
-}
-
-async function carregar(origem: Origem, slug: string) {
-  if (origem === 'formacao') {
-    const formacao = await obterFormacao(slug);
-    if (!formacao) return null;
-    return {
-      titulo: formacao.titulo,
-      itemIds: formacao.modulos.flatMap((m) => m.aulas.map((a) => a.id)),
-      href: `/formacoes/${slug}`,
-    };
-  }
-  const solucao = await obterSolucao(slug);
-  if (!solucao) return null;
-  return {
-    titulo: solucao.titulo,
-    itemIds: solucao.projeto
-      ? idsPassosProjeto(solucao.slug, solucao.projeto.roteiro)
-      : solucao.itens.filter((i) => i.tipo === 'etapa').map((i) => i.id),
-    href: `/solucoes/${slug}`,
-  };
 }
 
 export async function generateMetadata({
@@ -55,7 +33,7 @@ export async function generateMetadata({
 }: PageProps<'/certificados/[origem]/[slug]'>): Promise<Metadata> {
   const { origem, slug } = await params;
   if (!ehOrigem(origem)) return { title: 'Certificado' };
-  const conteudo = await carregar(origem, slug);
+  const conteudo = await carregarCertificavel(origem, slug);
   return { title: conteudo ? `Certificado · ${conteudo.titulo}` : 'Certificado' };
 }
 
@@ -65,7 +43,7 @@ export default async function CertificadoPage({
   const { origem, slug } = await params;
   if (!ehOrigem(origem)) notFound();
 
-  const [conteudo, supabase] = [await carregar(origem, slug), await createClient()];
+  const [conteudo, supabase] = [await carregarCertificavel(origem, slug), await createClient()];
   if (!conteudo || conteudo.itemIds.length === 0) notFound();
 
   const { data } = await supabase.auth.getClaims();
@@ -77,16 +55,25 @@ export default async function CertificadoPage({
       : typeof claims?.email === 'string'
         ? claims.email
         : '—';
+  const { data: emissao } = await supabase
+    .from('certificados_emitidos')
+    .select('codigo')
+    .eq('origem', origem)
+    .eq('slug', slug)
+    .maybeSingle();
 
   return (
     <>
       <CabecalhoPagina titulo="Certificado" oculto />
       <CertificadoVista
         origem={origem}
+        slug={slug}
         titulo={conteudo.titulo}
         itemIds={conteudo.itemIds}
         hrefConteudo={conteudo.href}
         nome={nome}
+        codigoInicial={emissao?.codigo ?? null}
+        siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? 'https://projeto-subido.vercel.app'}
       />
     </>
   );

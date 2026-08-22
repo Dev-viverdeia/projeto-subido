@@ -11,11 +11,9 @@ export const metadata: Metadata = { title: 'Certificados' };
  * CERTIFICADOS — o registro do que foi concluído em Formações e Projetos.
  *
  * O QUE É REAL: a conclusão. Ela deriva do progresso salvo na conta, com as
- * datas verdadeiras de cada marcação — a
- * mesma fonte que alimenta as barras dos catálogos. O QUE É PENDÊNCIA
- * DECLARADA: a EMISSÃO (PDF, código de verificação), que depende do backend de
- * certificados — o botão fica apagado com o motivo escrito, nunca um download
- * que finge.
+ * datas verdadeiras de cada marcação — a mesma fonte que alimenta as barras dos
+ * catálogos. A emissão só é liberada depois de uma nova validação no servidor e
+ * gera um código público de autenticidade.
  *
  * O servidor entrega os catálogos e o estado no layout autenticado. A galeria é
  * client porque reage às marcações otimistas sem esperar uma nova navegação.

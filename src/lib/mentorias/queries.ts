@@ -22,7 +22,7 @@ export { TRILHAS } from './tipos';
 
 type LinhaComMentor = Pick<
   Tables<'mentorias'>,
-  'id' | 'titulo' | 'descricao' | 'inicio' | 'fim' | 'vagas' | 'sala_url'
+  'id' | 'titulo' | 'descricao' | 'inicio' | 'fim' | 'vagas' | 'custo_creditos' | 'sala_url'
 > & {
   mentores: Pick<Tables<'mentores'>, 'id' | 'nome' | 'headline' | 'foto_url' | 'trilha'> | null;
   mentoria_inscricoes: Pick<Tables<'mentoria_inscricoes'>, 'mentoria_id'>[];
@@ -48,7 +48,7 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
   const { data, error } = await supabase
     .from('mentorias')
     .select(
-      'id, titulo, descricao, inicio, fim, vagas, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
+      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
     )
     .eq('status', 'publicado')
     .order('inicio', { ascending: true })
@@ -79,6 +79,7 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
       inicioIso: l.inicio,
       fimIso: l.fim,
       vagas: l.vagas,
+      custoCreditos: l.custo_creditos,
       salaUrl: l.sala_url,
       mentor: {
         id: m.id,
@@ -107,7 +108,7 @@ export const obterSessao = cache(async (id: string): Promise<SessaoMentoria | nu
   const { data, error } = await supabase
     .from('mentorias')
     .select(
-      'id, titulo, descricao, inicio, fim, vagas, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
+      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
     )
     .eq('id', id)
     .maybeSingle<LinhaComMentor>();
@@ -127,6 +128,7 @@ export const obterSessao = cache(async (id: string): Promise<SessaoMentoria | nu
     inicioIso: data.inicio,
     fimIso: data.fim,
     vagas: data.vagas,
+    custoCreditos: data.custo_creditos,
     salaUrl: data.sala_url,
     mentor: {
       id: m.id,

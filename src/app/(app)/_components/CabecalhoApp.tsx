@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { MenuPerfil } from './MenuPerfil';
 import { TrilhaDoCabecalho } from './trilha/TrilhaDoCabecalho';
 import styles from './CabecalhoApp.module.css';
+import type { PlanoSubido } from '@/lib/planos/acessos';
 
 /**
  * Cabeçalho da área logada.
@@ -30,10 +31,14 @@ import styles from './CabecalhoApp.module.css';
 export function CabecalhoApp({
   nome,
   email,
+  saldoCreditos,
+  plano,
   logo,
 }: {
   nome: string;
   email: string;
+  saldoCreditos: number | null;
+  plano: PlanoSubido;
   logo: ReactNode;
 }) {
   return (
@@ -47,7 +52,7 @@ export function CabecalhoApp({
       </div>
 
       <div className={styles.direita}>
-        <MenuPerfil nome={nome} email={email} />
+        <MenuPerfil nome={nome} email={email} saldoCreditos={saldoCreditos} plano={plano} />
       </div>
     </header>
   );

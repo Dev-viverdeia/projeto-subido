@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
 import { concluiuIntroducaoSubido } from '@/lib/auth/introducao';
+import { obterSaldoCreditos } from '@/lib/creditos/queries';
+import { planoDosMetadados, planoPodeAcessarRota } from '@/lib/planos/acessos';
 import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
@@ -33,13 +35,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* A leitura do papel não depende do resultado de `getClaims`: as duas usam a
      mesma sessão já validada pelo proxy. Iniciá-las juntas elimina uma viagem
      sequencial ao banco em toda navegação da área logada. */
-  const [{ data }, admin] = await Promise.all([supabase.auth.getClaims(), ehAdmin()]);
+  const [{ data }, admin, saldoCreditos] = await Promise.all([
+    supabase.auth.getClaims(),
+    ehAdmin(),
+    obterSaldoCreditos(),
+  ]);
 
   if (!data) redirect(ROTA_ENTRAR);
 
   const claims = data.claims;
   const email = typeof claims.email === 'string' ? claims.email : '';
   const metadata = claims.user_metadata;
+  const plano = planoDosMetadados(metadata);
+  const itensPermitidos = ITENS_NAV.filter((item) => planoPodeAcessarRota(plano, item.href));
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
 
   /* A introdução é parte do produto, não uma página solta. O status fica no
@@ -73,7 +81,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               <small>Em colaboração com Viver de IA</small>
             </Link>
 
-            <NavLateral itens={ITENS_NAV} variante="lateral" />
+            <NavLateral itens={itensPermitidos} variante="lateral" />
 
             {admin && (
               <div className={styles.rodapeSidebar}>
@@ -87,7 +95,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             )}
           </aside>
 
-          <CabecalhoApp nome={nome} email={email} logo={<SubidoLogo size={17} />} />
+          <CabecalhoApp
+            nome={nome}
+            email={email}
+            saldoCreditos={saldoCreditos}
+            plano={plano}
+            logo={<SubidoLogo size={17} />}
+          />
 
           <main className={styles.conteudo} id="conteudo">
             {children}
@@ -96,7 +110,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {/* No mobile, "Mais" dá acesso à navegação completa. O item de gestão
               só entra no payload de quem realmente é admin. */}
           <NavLateral
-            itens={admin ? [...ITENS_NAV, ITEM_ADMIN] : ITENS_NAV}
+            itens={admin ? [...itensPermitidos, ITEM_ADMIN] : itensPermitidos}
             itemConta={ITEM_CONTA}
             variante="dock"
           />

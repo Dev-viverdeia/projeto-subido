@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarX2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -130,7 +130,7 @@ export function CartaoProxima({
           <div className={styles.acoes}>
             {estado === 'checkin-aberto' && (
               <Button variant="primary" disabled={gravando} onClick={aoFazerCheckin}>
-                Fazer check-in
+                Fazer check-in · {sessao.custoCreditos} crédito
               </Button>
             )}
 
@@ -143,7 +143,7 @@ export function CartaoProxima({
                 <Button
                   variant="destructive"
                   disabled={gravando}
-                  iconLeft={<CalendarX2 size={15} strokeWidth={1.8} aria-hidden="true" />}
+                  iconLeft={<X size={15} strokeWidth={2} aria-hidden="true" />}
                   onClick={aoCancelarCheckin}
                 >
                   Cancelar check-in

@@ -282,6 +282,81 @@
   color: var(--via-danger);
 }
 
+.avisoIntegracao[data-tom='atencao'] {
+  border-color: color-mix(in srgb, var(--via-warning) 28%, var(--via-border-soft));
+  background: color-mix(in srgb, var(--via-warning) 7%, var(--via-glass-card));
+  color: var(--via-text-primary);
+}
+
+.economia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4);
+}
+
+.economia article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 90%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+.iconeEconomia {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-navy);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.economia p,
+.economia strong,
+.economia small {
+  display: block;
+  margin: 0;
+}
+
+.economia p {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.economia strong {
+  margin-top: var(--via-space-1_5);
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-h3);
+  font-weight: 560;
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+}
+
+.economia small {
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .economia article {
+    background: var(--via-surface);
+  }
+}
+
 .integracaoCalendar {
   grid-column: 1 / -1;
   background: var(--app-glass-plane-strong);
@@ -494,7 +569,8 @@
 @media (max-width: 899px) {
   .intro,
   .perfil,
-  .grade {
+  .grade,
+  .economia {
     grid-template-columns: 1fr;
   }
 

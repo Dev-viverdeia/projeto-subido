@@ -8,7 +8,9 @@ import {
   CalendarCheck2,
   Check,
   Cloud,
+  Coins,
   KeyRound,
+  Layers3,
   Mail,
   ShieldCheck,
   UserRound,
@@ -17,6 +19,8 @@ import { createClient } from '@/lib/supabase/server';
 import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { IntegracaoGoogleCalendar } from './_components/IntegracaoGoogleCalendar';
 import { FormularioIdentidade } from './_components/FormularioIdentidade';
+import { obterSaldoCreditos } from '@/lib/creditos/queries';
+import { PLANOS_SUBIDO, planoDosMetadados } from '@/lib/planos/acessos';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Conta' };
@@ -55,15 +59,17 @@ const ATALHOS = [
  */
 export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const supabase = await createClient();
-  const [{ data }, calendar, parametros] = await Promise.all([
+  const [{ data }, calendar, parametros, saldoCreditos] = await Promise.all([
     supabase.auth.getClaims(),
     obterEstadoGoogleCalendar(),
     searchParams,
+    obterSaldoCreditos(),
   ]);
 
   const claims = data?.claims;
   const email = typeof claims?.email === 'string' ? claims.email : '—';
   const metadata = claims?.user_metadata;
+  const plano = planoDosMetadados(metadata);
   const nome = typeof metadata?.nome === 'string' ? metadata.nome : '—';
   const iniciais = nome
     .split(/\s+/)
@@ -96,6 +102,35 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           Não foi possível conectar o calendário. Tente novamente.
         </div>
       )}
+      {parametros.upgrade && (
+        <div className={styles.avisoIntegracao} data-tom="atencao" role="status">
+          Este recurso faz parte do módulo comercial. Seu aprendizado e o Live Coach continuam
+          disponíveis no plano Starter.
+        </div>
+      )}
+
+      <section className={styles.economia} aria-label="Plano e créditos">
+        <article>
+          <span className={styles.iconeEconomia} aria-hidden="true">
+            <Coins size={20} strokeWidth={1.7} />
+          </span>
+          <div>
+            <p>Créditos disponíveis</p>
+            <strong>{saldoCreditos ?? '—'}</strong>
+            <small>Use em prospecção, enriquecimento e mentorias.</small>
+          </div>
+        </article>
+        <article>
+          <span className={styles.iconeEconomia} aria-hidden="true">
+            <Layers3 size={20} strokeWidth={1.7} />
+          </span>
+          <div>
+            <p>Plano atual</p>
+            <strong>{PLANOS_SUBIDO[plano].nome}</strong>
+            <small>{PLANOS_SUBIDO[plano].descricao}</small>
+          </div>
+        </article>
+      </section>
 
       <IntegracaoGoogleCalendar calendar={calendar} />
 

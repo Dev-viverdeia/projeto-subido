@@ -3,10 +3,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Award, ChevronDown, Cloud, LogOut, UserRound } from 'lucide-react';
+import { Award, ChevronDown, Cloud, Coins, LogOut, UserRound } from 'lucide-react';
 import { Avatar } from '@/design-system/via';
 import { sair } from '@/lib/auth/actions';
 import styles from './MenuPerfil.module.css';
+import { PLANOS_SUBIDO, type PlanoSubido } from '@/lib/planos/acessos';
 
 /**
  * Porta de entrada da identidade do profissional.
@@ -15,7 +16,17 @@ import styles from './MenuPerfil.module.css';
  * Escape devolve o foco ao gatilho, ArrowDown abre direto no primeiro item e clique
  * fora fecha o painel sem alterar a página atual.
  */
-export function MenuPerfil({ nome, email }: { nome: string; email: string }) {
+export function MenuPerfil({
+  nome,
+  email,
+  saldoCreditos = null,
+  plano = 'pro',
+}: {
+  nome: string;
+  email: string;
+  saldoCreditos?: number | null;
+  plano?: PlanoSubido;
+}) {
   const [aberto, setAberto] = useState(false);
   const idMenu = useId();
   const caminho = usePathname();
@@ -72,6 +83,15 @@ export function MenuPerfil({ nome, email }: { nome: string; email: string }) {
           abrirComFoco();
         }}
       >
+        {saldoCreditos !== null ? (
+          <span
+            className={styles.saldoGatilho}
+            aria-label={`${saldoCreditos} créditos disponíveis`}
+          >
+            <Coins size={14} strokeWidth={1.8} aria-hidden="true" />
+            {saldoCreditos}
+          </span>
+        ) : null}
         <Avatar alt={nome} size="sm" aria-hidden="true" />
         <span className={styles.nomeGatilho}>{nome}</span>
         <ChevronDown
@@ -95,6 +115,10 @@ export function MenuPerfil({ nome, email }: { nome: string; email: string }) {
             <span className={styles.sincronizada}>
               <Cloud size={13} strokeWidth={1.8} aria-hidden="true" />
               Sincronizada
+            </span>
+            <span className={styles.planoSaldo}>
+              {PLANOS_SUBIDO[plano].nome}
+              {saldoCreditos !== null ? ` · ${saldoCreditos} créditos` : ''}
             </span>
           </div>
 

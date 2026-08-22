@@ -16,6 +16,68 @@
   gap: var(--via-space-3);
 }
 
+.acoesCertificado {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.compartilhar,
+.linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.compartilhar:hover,
+.linkedin:hover {
+  border-color: var(--via-border-strong-color);
+  background: var(--via-navy-04);
+}
+
+.compartilhar:focus-visible,
+.linkedin:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.compartilhar:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.girando {
+  animation: girar 900ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.erroEmissao {
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-danger) 24%, var(--via-border-soft));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-danger) 6%, var(--via-surface));
+  color: var(--via-danger);
+  font-size: var(--via-fs-xs);
+}
+
 .imprimir {
   display: inline-flex;
   align-items: center;
@@ -201,6 +263,14 @@
   max-width: 30ch;
 }
 
+.codigo {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-faint);
+}
+
 /* ---------------------------------------------------------------- pendência */
 
 .pendencia {
@@ -292,5 +362,36 @@
   .imprimir,
   .pendenciaCta {
     transition: none;
+  }
+
+  .girando {
+    animation: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .acoes {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acoesCertificado {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compartilhar,
+  .linkedin,
+  .imprimir {
+    justify-content: center;
+  }
+
+  .folhaBase {
+    gap: var(--via-space-3);
+  }
+
+  .origem,
+  .codigo {
+    display: none;
   }
 }

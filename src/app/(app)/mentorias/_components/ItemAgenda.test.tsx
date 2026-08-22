@@ -23,6 +23,7 @@ const SESSAO: SessaoMentoria = {
   inicioIso: '2026-08-10T19:00:00.000Z',
   fimIso: '2026-08-10T20:30:00.000Z',
   vagas: 30,
+  custoCreditos: 1,
   salaUrl: null,
   mentor: {
     id: 'p1',
@@ -65,7 +66,7 @@ describe('linha da agenda', () => {
 
     await user.tab();
     await user.tab();
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Fazer check-in' }));
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /Fazer check-in/ }));
 
     await user.keyboard('{ }');
 
@@ -123,6 +124,6 @@ describe('linha da agenda', () => {
 
   it('com gravação em voo os CTAs ficam travados', () => {
     montar({ gravando: true });
-    expect(screen.getByRole('button', { name: 'Fazer check-in' })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button', { name: /Fazer check-in/ })).toHaveProperty('disabled', true);
   });
 });

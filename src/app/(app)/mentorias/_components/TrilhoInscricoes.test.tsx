@@ -22,6 +22,7 @@ function sessao(id: string, titulo: string, euInscrito: boolean): SessaoMentoria
     inicioIso: '2026-08-10T19:00:00.000Z',
     fimIso: '2026-08-10T20:30:00.000Z',
     vagas: 30,
+    custoCreditos: 1,
     salaUrl: null,
     mentor: {
       id: 'p1',

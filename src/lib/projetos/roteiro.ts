@@ -32,6 +32,18 @@ const ArtefatoEntrega = z.object({
   descricao: z.string().min(12).max(300),
 });
 
+const RecursoAula = z
+  .object({
+    tipo: z.enum(['mapa_mental', 'quiz', 'ebook', 'modelo']),
+    titulo: z.string().min(3).max(120),
+    descricao: z.string().min(12).max(300),
+    url: z.string().url().max(1000).optional(),
+    conteudo: z.string().min(20).max(12000).optional(),
+  })
+  .refine((recurso) => Boolean(recurso.url || recurso.conteudo), {
+    message: 'O recurso precisa ter um link ou conteúdo.',
+  });
+
 const AulaCampo = z.object({
   titulo: z.string().min(3).max(120),
   objetivo: z.string().min(20).max(400),
@@ -39,6 +51,7 @@ const AulaCampo = z.object({
   topicos: z.array(z.string().min(8).max(240)).min(2).max(5),
   exercicio: z.string().min(20).max(500),
   prontoQuando: z.string().min(20).max(500),
+  recursos: z.array(RecursoAula).max(4).optional(),
 });
 
 const VideoReferencia = z.object({

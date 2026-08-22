@@ -55,6 +55,8 @@ export type SessaoMentoria = {
   inicioIso: string;
   fimIso: string;
   vagas: number;
+  /** Valor debitado da carteira universal ao confirmar a vaga. */
+  custoCreditos: number;
   salaUrl: string | null;
   mentor: MentorDaSessao;
   /** Quantas pessoas já fizeram check-in. Vem da rpc de ocupação. */
