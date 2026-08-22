@@ -1,36 +1,53 @@
 import type { Metadata } from 'next';
 import { listarFormacoes } from '@/lib/conteudo/queries';
-import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
-import { lerFiltrosIniciais } from '../_components/filtros/urlFiltros';
 import entrada from '../_components/entrada.module.css';
-import { CatalogoFormacoes } from './_components/CatalogoFormacoes';
-import { ResumoFormacoes } from './_components/ResumoFormacoes';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { TrilhaFormacoes } from './_components/TrilhaFormacoes';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Formações' };
 
-export default async function FormacoesPage({ searchParams }: PageProps<'/formacoes'>) {
-  const [formacoes, params] = await Promise.all([listarFormacoes(), searchParams]);
+export default async function FormacoesPage() {
+  const formacoes = await listarFormacoes();
 
   return (
     <div className={styles.pagina}>
-      <div className={entrada.bloco}>
-        <EvolucaoProfissional
-          etapa="formacoes"
-          titulo="Aprenda o que precisa para implementar."
-          descricao="Escolha uma formação, assista às aulas e acompanhe o que já concluiu. O progresso fica salvo na sua conta."
-        />
-      </div>
+      <section className={`${styles.hero} ${entrada.bloco}`} aria-labelledby="formacoes-titulo">
+        <div className={styles.heroTexto}>
+          <p className={styles.eyebrow}>Desenvolvimento profissional</p>
+          <h1 id="formacoes-titulo" className={styles.titulo}>
+            Aprenda a trabalhar com IA.
+          </h1>
+          <p className={styles.descricao}>
+            Formações desenvolvem suas habilidades. Projetos mostram como transformar essas
+            habilidades em uma entrega para o cliente.
+          </p>
+          <div className={styles.acoes}>
+            <Link href="#trilha-formacoes" className={styles.acaoPrimaria}>
+              Ver trilha profissional
+              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+            <Link href="/solucoes" className={styles.acaoSecundaria}>
+              Ver projetos
+            </Link>
+          </div>
+        </div>
 
-      {/* A faixa de resumo vem ANTES da régua: ela responde "onde eu estou" e o
-          filtro responde "o que eu procuro". Invertido, a pessoa escolheria um
-          recorte antes de saber que tem algo pela metade. */}
+        <dl className={styles.diferenca} aria-label="Como usar Formações e Projetos">
+          <div>
+            <dt>Formações</dt>
+            <dd>Aprender ferramentas e desenvolver repertório profissional.</dd>
+          </div>
+          <div>
+            <dt>Projetos</dt>
+            <dd>Seguir um método e concluir uma entrega com um cliente.</dd>
+          </div>
+        </dl>
+      </section>
+
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>
-        <ResumoFormacoes formacoes={formacoes} />
-      </div>
-
-      <div className={`${entrada.bloco} ${entrada.atraso2}`}>
-        <CatalogoFormacoes formacoes={formacoes} filtrosIniciais={lerFiltrosIniciais(params)} />
+        <TrilhaFormacoes formacoes={formacoes} />
       </div>
     </div>
   );

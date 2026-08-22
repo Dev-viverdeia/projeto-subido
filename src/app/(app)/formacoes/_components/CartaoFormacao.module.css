@@ -1,235 +1,201 @@
-/* SEM BORDA E SEM MOLDURA. A versão anterior encaixava o pôster com 8px de
-   respiro por dentro de um card com hairline — "um pôster montado sobre uma
-   superfície", era o argumento. Na grade real isso somava TRÊS contornos
-   concêntricos em cada card (a borda, a folga, o raio do pôster), e catorze
-   cards viravam catorze molduras.
-
-   Agora o pôster sangra até a borda e quem separa o card do fundo é a SOMBRA,
-   sozinha. `overflow: hidden` no card é o que faz o pôster respeitar o raio sem
-   precisar repeti-lo — um raio só, na peça inteira. */
 .cartao {
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--via-radius-xl);
-  background: var(--via-surface);
+  position: relative;
+  display: grid;
+  grid-template-columns: clamp(132px, 31%, 176px) minmax(0, 1fr);
+  min-height: 252px;
   overflow: hidden;
-  box-shadow: var(--via-shadow-sm);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
   color: inherit;
   text-decoration: none;
+  backdrop-filter: blur(18px) saturate(135%);
   transition:
     transform var(--app-t-touch),
+    border-color var(--app-t-state),
     box-shadow var(--app-t-touch);
 }
 
 .cartao:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--via-shadow-lg);
+  transform: translateY(-3px);
+  border-color: var(--via-border);
+  box-shadow: var(--app-elev-3-shadow);
 }
 
-/* O anel COMPÕE com a sombra de repouso — sozinho ele substituiria o
-   `box-shadow` e o card achataria ao receber Tab. */
 .cartao:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring), var(--via-shadow-sm);
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
-/* O pôster sangra até a borda; o raio é o do card. */
-/* Sem padding: o pôster encosta nas bordas do card. A regra fica porque o
-   componente ainda a usa como wrapper de layout. */
-.moldura {
-  display: contents;
+.cartao[data-recomendada] {
+  border-color: color-mix(in srgb, var(--via-blue) 25%, var(--app-elev-1-line));
 }
 
-/* 3:4 — retrato, como a referência. A 1600 com 4 colunas o pôster fica 369×492:
-   a proporção que faz o card ler como pôster e não como banner. */
-/* O raio saiu daqui: quem arredonda é o card, via `overflow: hidden`. Repetir o
-   raio no pôster criaria o segundo contorno que este ajuste veio remover. */
-.poster {
+.capa {
   position: relative;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  background: var(--via-navy-deep);
   isolation: isolate;
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--via-navy);
 }
 
-.imagem {
+.capa img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  min-height: 252px;
   display: block;
+  object-fit: cover;
   transition: transform var(--app-t-scene);
 }
 
-.cartao:hover .imagem {
-  transform: scale(1.06);
+.cartao:hover .capa img {
+  transform: scale(1.04);
 }
 
-/* Capa sintética: campo navy com luz e grão. Não desenha marca nem repete texto
-   — quem compõe o pôster é a legenda ancorada na base.
-
-   A POSIÇÃO DA LUZ VARIA POR FORMAÇÃO: as quatro `--luz/--eco` e o ângulo vêm
-   do slug, interpolados no TSX (`campoDoSlug`). O `--via-mesh-navy` do DS tem
-   foco fixo, e pôsteres com o mesmo foco leem como cópias do mesmo retângulo
-   escuro — a assinatura de grade gerada. Como os valores vêm do slug, a mesma
-   formação tem sempre o mesmo campo: varia entre cards, nunca entre visitas.
-   Só navy e azul da paleta; nenhuma cor nova entra por aqui.
-
-   Os valores abaixo são o piso, para o caso de o pôster renderizar sem os
-   custom properties inline. */
-.sintetica {
+.capaFallback {
   position: absolute;
   inset: 0;
-  --luz-x: 16%;
-  --luz-y: 6%;
-  --eco-x: 92%;
-  --eco-y: 38%;
-  --base-ang: 150deg;
-  /* Alfa importa: em cor cheia a luz vira BLOB — um círculo azul recortado no
-     meio do campo. O DS acerta em ~55%/40%, que é onde o gradiente lê como
-     atmosfera. `color-mix` mantém a luz amarrada ao token: se a marca trocar o
-     azul, o pôster acompanha.
-
-     Sem @supports de propósito. Verificado na build: o Lightning CSS deixa o
-     `color-mix` passar intacto (não resolve, porque o argumento é `var()`) e não
-     gera fallback. Onde não houver suporte, a declaração inteira cai e sobra o
-     `background: var(--via-navy-deep)` do `.poster` — campo chapado, título
-     ainda legível. Degradação benigna, ao contrário do backdrop-filter, que sem
-     suporte vira texto sobre conteúdo. */
-  background:
-    radial-gradient(
-      ellipse 72% 62% at var(--luz-x) var(--luz-y),
-      color-mix(in srgb, var(--via-blue-soft) 52%, transparent),
-      transparent 66%
-    ),
-    radial-gradient(
-      ellipse 58% 54% at var(--eco-x) var(--eco-y),
-      color-mix(in srgb, var(--via-blue) 34%, transparent),
-      transparent 62%
-    ),
-    linear-gradient(var(--base-ang), var(--via-navy) 0%, var(--via-navy-deep) 100%);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
+  font-family: var(--via-font-mono);
+  font-size: clamp(2.75rem, 5vw, 4.5rem);
+  font-weight: 440;
+  color: color-mix(in srgb, var(--via-white) 24%, transparent);
 }
 
-/* Garante branco legível sobre QUALQUER imagem que o admin subir. Sem opacidade
-   no elemento: a transparência mora nos stops, então o gradiente não vira um
-   grupo composto capaz de matar o backdrop-filter de um vizinho. */
-.scrim {
+.capaVela {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 30%,
-    rgba(2, 22, 42, 0.55) 62%,
-    rgba(2, 22, 42, 0.94) 100%
-  );
+  z-index: 1;
+  background: linear-gradient(180deg, transparent 48%, rgba(2, 22, 42, 0.74) 100%);
   pointer-events: none;
 }
 
-/* Só a POSIÇÃO mora aqui: a aparência é do `PillEstado`, o mesmo selo do card de
-   solução e do hero do curso. O que sobrou desta regra é onde ele pousa no
-   pôster — e o `z-index`, porque o scrim é um irmão posicionado logo acima na
-   ordem do documento e cobriria a pill sem ele. */
-.selo {
+.numero {
   position: absolute;
-  top: var(--via-space-3);
-  right: var(--via-space-3);
-  z-index: 1;
+  z-index: 2;
+  left: var(--via-space-3);
+  bottom: var(--via-space-3);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  color: var(--via-white);
 }
 
-/* Legenda do pôster: ancorada na base, dois tons SÓLIDOS. Sobre banda escura a
-   escala de cinza inverte — gray-400 dá 6,99:1; text-muted reprovaria AA. */
-.legenda {
-  position: absolute;
-  inset: auto 0 0 0;
+.corpo {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1_5);
-  padding: var(--via-space-4);
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card);
 }
 
-.eyebrow {
+.topo,
+.identidade,
+.rodape,
+.progressoTexto,
+.acao {
+  display: flex;
+  align-items: center;
+}
+
+.topo {
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.identidade {
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+
+.etapa,
+.recomendada {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-400);
 }
 
-.titulo {
+.etapa {
+  color: var(--via-text-muted);
+}
+
+.recomendada {
+  padding: 4px var(--via-space-2);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.conteudo {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.conteudo h3,
+.conteudo p {
   margin: 0;
-  font-size: var(--via-fs-h4);
-  font-weight: 560;
+}
+
+.conteudo h3 {
+  font-size: clamp(var(--via-fs-h4), 2vw, 1.55rem);
+  font-weight: 570;
   letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
-  color: var(--via-white);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
+  color: var(--via-text-primary);
+  text-wrap: balance;
 }
 
-.corpo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4) var(--via-space-4) 0;
-  /* Empurra a tira de meta para a base quando `grid-auto-rows: 1fr` iguala os
-     cards — resumos de tamanhos diferentes não desalinham a tira entre cards. */
-  flex: 1;
-}
-
-.resumo {
-  margin: 0;
+.conteudo p {
+  max-width: 47ch;
   font-size: var(--via-fs-caption);
-  line-height: 1.55;
+  line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+  text-wrap: pretty;
 }
 
-.tira {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+.rodape {
+  justify-content: space-between;
   gap: var(--via-space-4);
   margin-top: auto;
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
-.item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-1_5);
+.progresso {
+  min-width: 120px;
+  flex: 1;
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.progressoTexto {
+  justify-content: space-between;
+  gap: var(--via-space-3);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
-.item svg {
-  color: var(--via-text-faint);
-  flex: none;
-}
-
-/* Fecha o card encostado na base — trilho de largura total, percentual à direita. */
-.progresso {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-3) var(--via-space-4) var(--via-space-4);
+.progressoTexto strong {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
 }
 
 .trilho {
-  flex: 1;
   height: 3px;
+  overflow: hidden;
   border-radius: var(--via-radius-xs);
   background: var(--via-navy-10);
-  overflow: hidden;
 }
 
-/* `scaleX`, nunca `width`: largura dispara layout a cada frame de transição. */
-.preenchido {
+.trilho span {
+  display: block;
   width: 100%;
   height: 100%;
   background: var(--via-navy);
@@ -237,45 +203,84 @@
   transition: transform var(--app-t-scene);
 }
 
-.pct {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  /* 0% fica na tinta mais quieta; quem já começou ganha a navy sólida. Assim o
-     trilho existe sempre (o card não muda de altura ao começar) sem que o zero
-     grite tanto quanto um progresso real. */
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-  min-width: 4ch;
-  text-align: right;
-}
-
-.pct[data-comecou] {
+.acao {
+  flex: none;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  font-weight: 600;
   color: var(--via-navy);
-  font-weight: var(--via-fw-medium);
+  white-space: nowrap;
 }
 
-/* Duas colunas no telefone (como a referência): pôster é conteúdo de varredura,
-   e uma coluna só faria UM card ocupar a tela inteira. Nessa largura o resumo
-   caberia em ~28 caracteres por linha — vira ruído, e o título já está no
-   pôster. Some o resumo, não a informação. */
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
+  }
+}
+
 @media (max-width: 599px) {
-  .resumo {
+  .cartao {
+    grid-template-columns: 108px minmax(0, 1fr);
+    min-height: 232px;
+  }
+
+  .capa img {
+    min-height: 232px;
+  }
+
+  .corpo {
+    gap: var(--via-space-3);
+    padding: var(--via-space-4);
+  }
+
+  .topo {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-2);
+  }
+
+  .recomendada {
     display: none;
   }
 
-  .titulo {
+  .conteudo h3 {
     font-size: var(--via-fs-body);
   }
 
-  .legenda {
-    padding: var(--via-space-3);
+  .conteudo p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .rodape {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-3);
+    padding-top: var(--via-space-3);
+  }
+
+  .progresso,
+  .acao {
+    width: 100%;
+  }
+
+  .acao {
+    justify-content: space-between;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
-  .imagem,
-  .preenchido {
+  .capa img,
+  .trilho span {
     transition: none;
+  }
+
+  .cartao:hover,
+  .cartao:hover .capa img {
+    transform: none;
   }
 }
