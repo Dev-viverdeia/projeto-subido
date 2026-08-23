@@ -89,7 +89,8 @@ export function MenuPerfil({
             aria-label={`${saldoCreditos} créditos disponíveis`}
           >
             <Coins size={14} strokeWidth={1.8} aria-hidden="true" />
-            {saldoCreditos}
+            <span className={styles.saldoNumero}>{saldoCreditos}</span>
+            <span className={styles.saldoRotulo}>créditos</span>
           </span>
         ) : null}
         <Avatar alt={nome} size="sm" aria-hidden="true" />

@@ -1,0 +1,81 @@
+.texto {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}
+
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+
+/* A ação que altera vaga e saldo não some durante a espera. O estado ocupa o
+   próprio diálogo e usa o vocabulário de loading do Design System. */
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-4);
+  min-height: 156px;
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  text-align: center;
+  backdrop-filter: var(--via-blur-sm);
+}
+
+.estado p {
+  max-width: 38ch;
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.estado[data-estado='sucesso'] {
+  background: color-mix(in srgb, var(--via-accent) 5%, var(--app-elev-2-bg));
+}
+
+.icone {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid color-mix(in srgb, var(--via-accent) 26%, var(--app-elev-1-line));
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-accent-ink);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .estado {
+    background: var(--via-surface);
+  }
+}
+
+@media (max-width: 599px) {
+  .acoes {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .acoes > * {
+    width: 100%;
+  }
+
+  .estado {
+    min-height: 140px;
+    padding: var(--app-pad-card-tight);
+  }
+}

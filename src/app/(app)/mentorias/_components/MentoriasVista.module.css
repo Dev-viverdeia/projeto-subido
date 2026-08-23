@@ -158,6 +158,13 @@
     background-color var(--app-t-state);
 }
 
+.vazioAcoes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+}
+
 .vazioCta:hover {
   transform: translateY(-2px);
   background: var(--via-navy-deep);
@@ -319,19 +326,6 @@
   }
 }
 
-.confirmarTexto {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-body);
-}
-
-.confirmarAcoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--via-space-2);
-}
-
 @media (max-width: 1079px) {
   /* Empilhado, o trilho fica DEPOIS da agenda, na ordem do documento e sem
      `order`: mover o pixel sem mover o DOM faz a ordem visual divergir da ordem
@@ -344,6 +338,18 @@
 
   .apoio {
     position: static;
+  }
+}
+
+@media (max-width: 599px) {
+  .vazioAcoes {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .vazioAcoes > * {
+    width: 100%;
   }
 }
 
