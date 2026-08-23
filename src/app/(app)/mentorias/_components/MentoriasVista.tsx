@@ -2,12 +2,8 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { X } from 'lucide-react';
-import { Alert, Button, EmptyState, Modal } from '@/design-system/via';
+import { EmptyState } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
-import { RetratoMentor } from '../../_components/RetratoMentor';
-import { Visto } from '../../_components/PillEstado';
-import { TRILHAS } from '@/lib/mentorias/tipos';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
 import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
@@ -19,7 +15,9 @@ import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado
 import { HistoricoDropdown } from '../../_components/HistoricoDropdown';
 import { MeusCheckins } from './MeusCheckins';
 import { ICONE_AGENDA, ICONE_CALENDARIO, type IdVista } from './vistas';
-import { duracaoMin, estadoDe, horaCurta, rotuloDoDia } from './estadoMentoria';
+import { estadoDe } from './estadoMentoria';
+import { ModalDetalheMentoria } from './ModalDetalheMentoria';
+import { ModalOperacaoMentoria, type FaseOperacaoMentoria } from './ModalOperacaoMentoria';
 import styles from './MentoriasVista.module.css';
 
 /**
@@ -63,6 +61,9 @@ export function MentoriasVista({
   const [detalheId, setDetalheId] = useState<string | null>(null);
   const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
+  const [faseCheckin, setFaseCheckin] = useState<FaseOperacaoMentoria>('confirmacao');
+  const [faseCancelamento, setFaseCancelamento] = useState<FaseOperacaoMentoria>('confirmacao');
+  const [falhaOperacao, setFalhaOperacao] = useState<string | null>(null);
 
   /**
    * O CHECK-IN DEIXOU DE SER ESTADO DA ABA.
@@ -78,7 +79,6 @@ export function MentoriasVista({
    * banco decidir é exatamente a mentira que este pilar existia para não contar.
    */
   const [gravando, iniciarGravacao] = useTransition();
-  const [erro, setErro] = useState<string | null>(null);
 
   /* A vista entra na URL: é escolha de LEITURA, não estado do dispositivo — um
      link para o calendário reproduz o calendário no aparelho de quem recebe.
@@ -129,54 +129,88 @@ export function MentoriasVista({
   const detalhe = porId(detalheId);
   const confirmando = porId(confirmandoId);
   const cancelando = porId(cancelandoId);
-  const mentorDoDetalhe = detalhe?.mentor;
 
   const abrirDetalhe = useCallback((id: string) => setDetalheId(id), []);
-  const pedirCheckin = useCallback((id: string) => setConfirmandoId(id), []);
-  const pedirCancelamento = useCallback((id: string) => setCancelandoId(id), []);
-  const executar = useCallback((acao: () => Promise<{ ok: boolean; mensagem?: string }>) => {
-    setErro(null);
-    iniciarGravacao(async () => {
-      const r = await acao();
-      if (!r.ok) setErro(r.mensagem ?? 'Não foi possível concluir agora.');
-    });
+  const pedirCheckin = useCallback((id: string) => {
+    setFalhaOperacao(null);
+    setFaseCheckin('confirmacao');
+    setConfirmandoId(id);
   }, []);
+  const pedirCancelamento = useCallback((id: string) => {
+    setFalhaOperacao(null);
+    setFaseCancelamento('confirmacao');
+    setCancelandoId(id);
+  }, []);
+
+  const fecharCheckin = useCallback(() => {
+    if (faseCheckin === 'processando') return;
+    setConfirmandoId(null);
+    setFaseCheckin('confirmacao');
+    setFalhaOperacao(null);
+  }, [faseCheckin]);
+
+  const fecharCancelamento = useCallback(() => {
+    if (faseCancelamento === 'processando') return;
+    setCancelandoId(null);
+    setFaseCancelamento('confirmacao');
+    setFalhaOperacao(null);
+  }, [faseCancelamento]);
+
+  const confirmarCheckin = useCallback(() => {
+    if (!confirmandoId) return;
+    const id = confirmandoId;
+    setFalhaOperacao(null);
+    setFaseCheckin('processando');
+    iniciarGravacao(async () => {
+      const resultado = await fazerCheckin(id);
+      if (!resultado.ok) {
+        setFalhaOperacao(resultado.mensagem ?? 'Não foi possível confirmar o check-in agora.');
+        setFaseCheckin('erro');
+        return;
+      }
+      setFaseCheckin('sucesso');
+    });
+  }, [confirmandoId]);
 
   const confirmarCancelamento = useCallback(() => {
     if (!cancelandoId) return;
     const id = cancelandoId;
-    setCancelandoId(null);
-    executar(() => cancelarCheckin(id));
-  }, [cancelandoId, executar]);
+    setFalhaOperacao(null);
+    setFaseCancelamento('processando');
+    iniciarGravacao(async () => {
+      const resultado = await cancelarCheckin(id);
+      if (!resultado.ok) {
+        setFalhaOperacao(resultado.mensagem ?? 'Não foi possível cancelar o check-in agora.');
+        setFaseCancelamento('erro');
+        return;
+      }
+      setFaseCancelamento('sucesso');
+    });
+  }, [cancelandoId]);
 
   return (
     <div className={styles.raiz} data-vista={vista}>
-      {/* A recusa vem do TRIGGER, não daqui — "as vagas acabaram enquanto você
-          decidia" é uma frase que só o banco pode dizer com verdade. */}
-      {/* `role="alert"` no wrapper e não no `Alert`: o componente do DS não
-          repassa props soltas, e sem o papel o texto entra em tela sem ser
-          anunciado — quem usa leitor de tela clicaria em "Confirmar" e não
-          saberia por que nada aconteceu. */}
-      {erro && (
-        <div role="alert">
-          <Alert tone="attn">{erro}</Alert>
-        </div>
-      )}
-
       {/* CATÁLOGO VAZIO ≠ FILTRO VAZIO, e confundir os dois cria um beco: a
           mensagem da agenda diz "veja em Todas as próximas sessões", o que só
           faz sentido quando existe sessão em ALGUM lugar. Sem nenhuma mentoria
           publicada, esse convite leva a outra tela vazia.
           Este estado passou a ser o estado NORMAL da tela — a agenda deixou de
           ser gerada em código e começa sem nada até o admin cadastrar. */}
-      {sessoes.length === 0 ? (
+      {futuras.length === 0 ? (
         <EmptyState
-          title="Nenhuma mentoria publicada"
-          description="As sessões aparecem aqui assim que forem agendadas. Você vê o horário, faz check-in e recebe a sala pelo mesmo lugar."
+          title={sessoes.length === 0 ? 'Nenhuma mentoria publicada' : 'Nenhuma mentoria agendada'}
+          description="As próximas sessões aparecem aqui com data, horário e custo em créditos. Depois do check-in, a sala fica disponível nesta página."
           action={
-            <Link href="/formacoes" className={styles.vazioCta}>
-              Continuar em Formações
-            </Link>
+            <div className={styles.vazioAcoes}>
+              <Link href="/formacoes" className={styles.vazioCta}>
+                Continuar formação
+              </Link>
+              {totalCheckins > 0 ? (
+                <HistoricoDropdown total={totalCheckins} rotulo="Check-ins anteriores">
+                  <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
+                </HistoricoDropdown>
+              ) : null}
+            </div>
           }
         />
       ) : (
@@ -281,222 +315,39 @@ export function MentoriasVista({
         </>
       )}
 
-      {/* Ficha da sessão — a mesma dos dois lados. */}
-      <Modal
-        open={detalhe !== null}
-        onClose={() => setDetalheId(null)}
-        title={detalhe?.titulo}
-        size="md"
-      >
-        {detalhe && (
-          <div className={styles.detalhe}>
-            {/* Os quatro dados viram uma TIRA com rótulo, não uma frase em mono.
-                Numa linha só, "TER 28 JUL · 19:00–20:30 · 90 MIN · 22/30 VAGAS"
-                obriga a pessoa a decodificar a posição para saber o que é cada
-                número. Com rótulo, cada um se lê sozinho. */}
-            <dl className={styles.ficha}>
-              <div className={styles.fichaItem}>
-                <dt className={styles.fichaRotulo}>Quando</dt>
-                <dd className={styles.fichaValor}>{rotuloDoDia(detalhe.inicioIso, agora).mono}</dd>
-              </div>
-              <div className={styles.fichaItem}>
-                <dt className={styles.fichaRotulo}>Horário</dt>
-                <dd className={styles.fichaValor}>
-                  {horaCurta(detalhe.inicioIso)}–{horaCurta(detalhe.fimIso)}
-                </dd>
-              </div>
-              <div className={styles.fichaItem}>
-                <dt className={styles.fichaRotulo}>Duração</dt>
-                <dd className={styles.fichaValor}>{duracaoMin(detalhe)} min</dd>
-              </div>
-              <div className={styles.fichaItem}>
-                <dt className={styles.fichaRotulo}>Vagas</dt>
-                <dd className={styles.fichaValor}>
-                  {detalhe.inscritos}/{detalhe.vagas}
-                </dd>
-              </div>
-            </dl>
-
-            {/* SEM BARRA DE LOTAÇÃO — a regra da casa é literal: "zero contador,
-                zero vagas restantes, zero barra de lotação". Uma barra que enche
-                é medidor de escassez, e medidor de escassez converte no clique e
-                diverge no reembolso.
-
-                O NÚMERO fica, porque ele não é a mesma coisa: "22/30" é fato
-                verificável e operacionalmente necessário — sem ele não dá para
-                saber se ainda cabe. O que sai é o gesto que transforma o fato em
-                pressão. Ele já está na tira de fichas acima, com rótulo. */}
-
-            <p className={styles.detalheTexto}>{detalhe.descricao}</p>
-
-            {/* Ficha do mentor: monograma, nome e credencial numa caixa própria.
-                É onde a headline mora — na lista ela repetia a mesma frase em
-                cada linha; aqui é lida uma vez, no momento em que importa. */}
-            {mentorDoDetalhe && (
-              <div className={styles.mentorCartao} data-trilha={mentorDoDetalhe.trilha}>
-                <RetratoMentor
-                  nome={mentorDoDetalhe.nome}
-                  fotoUrl={mentorDoDetalhe.foto_url}
-                  tamanho="md"
-                />
-                <span className={styles.mentorTextos}>
-                  <span className={styles.mentorNome}>{mentorDoDetalhe.nome}</span>
-                  <span className={styles.mentorHeadline}>{mentorDoDetalhe.headline}</span>
-                </span>
-                <span className={styles.mentorTrilha}>
-                  {TRILHAS[mentorDoDetalhe.trilha].rotulo}
-                </span>
-              </div>
-            )}
-            {/* A MATRIZ COMPLETA, e antes era um caso só. O modal é a vista mais
-                detalhada da sessão e oferecia ação apenas em `checkin-aberto`:
-                nos outros quatro estados ele abria, mostrava a ficha e não dizia
-                nem o que dava para fazer nem por que não dava. Quem estava
-                inscrito precisava fechar o modal e achar a linha na agenda para
-                cancelar. */}
-            <div className={styles.acoesFicha}>
-              {(() => {
-                const estadoAtual = estadoComInscricao(detalhe);
-
-                if (estadoAtual === 'checkin-aberto') {
-                  return (
-                    <Button
-                      variant="primary"
-                      disabled={gravando}
-                      onClick={() => {
-                        setDetalheId(null);
-                        setConfirmandoId(detalhe.id);
-                      }}
-                    >
-                      Fazer check-in · {detalhe.custoCreditos} cr.
-                    </Button>
-                  );
-                }
-
-                if (estadoAtual === 'inscrito') {
-                  return (
-                    <>
-                      <span className={styles.fichaConfirmado}>
-                        <Visto tamanho={12} />
-                        Check-in confirmado
-                      </span>
-                      {/* Estado e ação não dividem mais o mesmo controle. O
-                          botão abre a mesma confirmação curta usada na agenda e
-                          no cartão principal. */}
-                      <Button
-                        variant="destructive"
-                        disabled={gravando}
-                        iconLeft={<X size={15} strokeWidth={2} aria-hidden="true" />}
-                        onClick={() => {
-                          setDetalheId(null);
-                          pedirCancelamento(detalhe.id);
-                        }}
-                      >
-                        Cancelar check-in
-                      </Button>
-                    </>
-                  );
-                }
-
-                if (estadoAtual === 'ao-vivo') {
-                  return (
-                    <Link
-                      href={`/mentorias/${detalhe.id}`}
-                      className="via-btn via-btn--primary via-btn--md"
-                    >
-                      Entrar na sala
-                    </Link>
-                  );
-                }
-
-                /* Lotada, fora-da-janela e encerrada: motivo, não botão morto.
-                   Encerrada passou a ser alcançável daqui — o histórico do
-                   dropdown abre a ficha de sessões que já foram. */
-                return (
-                  <span className={styles.fichaNota}>
-                    {estadoAtual === 'lotada'
-                      ? `Sessão lotada: ${detalhe.inscritos} de ${detalhe.vagas} vagas.`
-                      : estadoAtual === 'encerrada'
-                        ? 'Sessão encerrada.'
-                        : `O check-in abre ${rotuloDoDia(detalhe.inicioIso, agora).mono}.`}
-                  </span>
-                );
-              })()}
-            </div>
-          </div>
-        )}
-      </Modal>
+      <ModalDetalheMentoria
+        sessao={detalhe}
+        estado={detalhe ? estadoComInscricao(detalhe) : null}
+        agora={agora}
+        gravando={gravando}
+        aoFechar={() => setDetalheId(null)}
+        aoFazerCheckin={pedirCheckin}
+        aoCancelarCheckin={pedirCancelamento}
+      />
 
       {/* A separação entre estado e ação termina numa confirmação curta. O
           cancelamento libera uma vaga para outra pessoa; deixá-lo em um clique
           na linha torna a ação evidente, mas também fácil de acionar por engano. */}
-      <Modal
-        open={cancelando !== null}
-        onClose={() => setCancelandoId(null)}
-        title="Cancelar seu check-in?"
-        size="sm"
-        footer={
-          <div className={styles.confirmarAcoes}>
-            <Button variant="secondary" onClick={() => setCancelandoId(null)}>
-              Manter check-in
-            </Button>
-            <Button
-              variant="destructive"
-              disabled={gravando}
-              iconLeft={<X size={15} strokeWidth={2} aria-hidden="true" />}
-              onClick={confirmarCancelamento}
-            >
-              Cancelar check-in
-            </Button>
-          </div>
-        }
-      >
-        {cancelando && (
-          <p className={styles.confirmarTexto}>
-            Sua vaga em “{cancelando.titulo}” volta a ficar disponível e os{' '}
-            {cancelando.custoCreditos} créditos usados retornam ao seu saldo. Você poderá fazer um
-            novo check-in depois, enquanto ainda houver vaga.
-          </p>
-        )}
-      </Modal>
+      <ModalOperacaoMentoria
+        tipo="cancelamento"
+        sessao={cancelando}
+        fase={faseCancelamento}
+        falha={falhaOperacao}
+        agora={agora}
+        aoFechar={fecharCancelamento}
+        aoConfirmar={confirmarCancelamento}
+      />
 
       {/* Confirmação de check-in */}
-      <Modal
-        open={confirmando !== null}
-        onClose={() => setConfirmandoId(null)}
-        title="Confirmar check-in"
-        size="sm"
-        footer={
-          <div className={styles.confirmarAcoes}>
-            <Button variant="ghost" onClick={() => setConfirmandoId(null)}>
-              Voltar
-            </Button>
-            <Button
-              variant="primary"
-              disabled={gravando}
-              onClick={() => {
-                const id = confirmandoId;
-                if (!id) return;
-                setConfirmandoId(null);
-                executar(() => fazerCheckin(id));
-              }}
-            >
-              {gravando ? 'Confirmando…' : `Confirmar por ${confirmando?.custoCreditos ?? 0} cr.`}
-            </Button>
-          </div>
-        }
-      >
-        {confirmando && (
-          <p className={styles.confirmarTexto}>
-            O check-in usa {confirmando.custoCreditos}{' '}
-            {confirmando.custoCreditos === 1 ? 'crédito' : 'créditos'} e garante sua vaga em “
-            {confirmando.titulo}” (
-            {rotuloDoDia(confirmando.inicioIso, agora).principal.toLowerCase()},{' '}
-            {horaCurta(confirmando.inicioIso)}). Você pode cancelar até o início. Nesse caso, a vaga
-            volta a ficar disponível.
-          </p>
-        )}
-      </Modal>
+      <ModalOperacaoMentoria
+        tipo="checkin"
+        sessao={confirmando}
+        fase={faseCheckin}
+        falha={falhaOperacao}
+        agora={agora}
+        aoFechar={fecharCheckin}
+        aoConfirmar={confirmarCheckin}
+      />
     </div>
   );
 }

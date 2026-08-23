@@ -11,15 +11,16 @@
   padding: var(--via-space-1) var(--via-space-2_5) var(--via-space-1) var(--via-space-1);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-surface) 92%, transparent);
-  box-shadow: var(--via-shadow-xs);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-blur-sm);
   color: var(--via-text-body);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   transition:
-    background-color var(--via-t-fast),
-    border-color var(--via-t-fast),
-    box-shadow var(--via-t-fast);
+    background-color var(--app-t-state),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state);
 }
 
 .gatilho:hover,
@@ -54,9 +55,20 @@
   color: var(--via-text-primary);
 }
 
+.saldoNumero {
+  font-variant-numeric: tabular-nums;
+}
+
+.saldoRotulo {
+  font-family: var(--via-font);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-muted);
+}
+
 .seta {
   color: var(--via-text-faint);
-  transition: transform var(--via-t-fast);
+  transition: transform var(--app-t-touch);
 }
 
 .seta[data-aberto] {
@@ -182,8 +194,8 @@
   text-align: left;
   text-decoration: none;
   transition:
-    background-color var(--via-t-fast),
-    border-color var(--via-t-fast);
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
 }
 
 .item:hover,
@@ -256,8 +268,8 @@
   font-size: var(--via-fs-sm);
   text-align: left;
   transition:
-    background-color var(--via-t-fast),
-    color var(--via-t-fast);
+    background-color var(--app-t-state),
+    color var(--app-t-state);
 }
 
 .sair:hover {
@@ -274,8 +286,18 @@
     max-width: 11ch;
   }
 
+  .saldoRotulo {
+    display: none;
+  }
+
   .painel {
     width: min(326px, calc(100vw - 24px));
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .gatilho {
+    background: var(--via-surface);
   }
 }
 

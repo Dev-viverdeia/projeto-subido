@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Link as LinkIcon, LoaderCircle, Printer, Share2 } from 'lucide-react';
+import { Check, Copy, Link as LinkIcon, LoaderCircle, Printer, Share2 } from 'lucide-react';
 import { useState } from 'react';
+import { Alert, Button, Modal, Spinner } from '@/design-system/via';
 import {
   contarConcluidas,
   contarEtapasFeitas,
@@ -55,6 +56,10 @@ export function CertificadoVista({
   const [codigo, setCodigo] = useState(codigoInicial);
   const [emitindo, setEmitindo] = useState(false);
   const [erroEmissao, setErroEmissao] = useState<string | null>(null);
+  const [estadoEmissao, setEstadoEmissao] = useState<
+    'fechado' | 'processando' | 'sucesso' | 'erro'
+  >('fechado');
+  const [linkCopiado, setLinkCopiado] = useState(false);
 
   const feitas =
     origem === 'formacao'
@@ -77,13 +82,33 @@ export function CertificadoVista({
   async function gerarLink() {
     setEmitindo(true);
     setErroEmissao(null);
+    setEstadoEmissao('processando');
+    setLinkCopiado(false);
     const resultado = await emitirCertificado(origem, slug);
     setEmitindo(false);
     if (!resultado.ok) {
       setErroEmissao(resultado.mensagem);
+      setEstadoEmissao('erro');
       return;
     }
     setCodigo(resultado.codigo);
+    setEstadoEmissao('sucesso');
+  }
+
+  async function copiarLink() {
+    if (!urlPublica) return;
+    try {
+      await navigator.clipboard.writeText(urlPublica);
+      setLinkCopiado(true);
+      setErroEmissao(null);
+    } catch {
+      setErroEmissao('Não foi possível copiar o link. Abra o LinkedIn ou tente novamente.');
+    }
+  }
+
+  function fecharEmissao() {
+    if (estadoEmissao === 'processando') return;
+    setEstadoEmissao('fechado');
   }
 
   if (!concluido) {
@@ -113,15 +138,29 @@ export function CertificadoVista({
         <BotaoVoltar fallback="/certificados" rotulo="Certificados" />
         <div className={styles.acoesCertificado}>
           {urlPublica ? (
-            <a
-              className={styles.linkedin}
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
-              Compartilhar no LinkedIn
-            </a>
+            <>
+              <button
+                type="button"
+                className={styles.compartilhar}
+                onClick={() => void copiarLink()}
+              >
+                {linkCopiado ? (
+                  <Check size={15} strokeWidth={2.2} aria-hidden="true" />
+                ) : (
+                  <Copy size={15} strokeWidth={1.8} aria-hidden="true" />
+                )}
+                {linkCopiado ? 'Link copiado' : 'Copiar link'}
+              </button>
+              <a
+                className={styles.linkedin}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
+                Compartilhar no LinkedIn
+              </a>
+            </>
           ) : (
             <button
               type="button"
@@ -189,6 +228,68 @@ export function CertificadoVista({
           </footer>
         </div>
       </article>
+
+      <Modal
+        open={estadoEmissao !== 'fechado'}
+        onClose={fecharEmissao}
+        hideClose={estadoEmissao === 'processando'}
+        title={
+          estadoEmissao === 'processando'
+            ? 'Preparando seu certificado'
+            : estadoEmissao === 'sucesso'
+              ? 'Certificado pronto para compartilhar'
+              : 'Não foi possível gerar o link'
+        }
+        size="sm"
+        footer={
+          estadoEmissao === 'processando' ? undefined : (
+            <div className={styles.modalAcoes}>
+              {estadoEmissao === 'erro' ? (
+                <>
+                  <Button variant="secondary" onClick={fecharEmissao}>
+                    Fechar
+                  </Button>
+                  <Button variant="primary" onClick={() => void gerarLink()}>
+                    Tentar novamente
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="secondary" onClick={() => void copiarLink()}>
+                    {linkCopiado ? 'Link copiado' : 'Copiar link'}
+                  </Button>
+                  {urlPublica ? (
+                    <a
+                      className={styles.linkedin}
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
+                      Compartilhar no LinkedIn
+                    </a>
+                  ) : null}
+                </>
+              )}
+            </div>
+          )
+        }
+      >
+        {estadoEmissao === 'processando' ? (
+          <div className={styles.estadoEmissao} aria-live="polite">
+            <Spinner size="lg" label="Validando sua conclusão…" />
+            <p>Estamos registrando o certificado e criando o link público de verificação.</p>
+          </div>
+        ) : estadoEmissao === 'sucesso' ? (
+          <Alert tone="success" size="compact" title="Link público criado">
+            O certificado pode ser aberto por qualquer pessoa e já está pronto para o LinkedIn.
+          </Alert>
+        ) : erroEmissao ? (
+          <Alert tone="danger" size="compact" title="O certificado não foi alterado">
+            {erroEmissao}
+          </Alert>
+        ) : null}
+      </Modal>
     </div>
   );
 }

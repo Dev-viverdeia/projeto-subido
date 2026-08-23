@@ -62,4 +62,11 @@ describe('MenuPerfil', () => {
 
     expect(screen.getByRole('menuitem', { name: /Minha conta/ })).toHaveFocus();
   });
+
+  it('mostra o saldo como créditos ao lado do perfil', () => {
+    render(<MenuPerfil nome="QA Subido" email="qa@viverdeia.ai" saldoCreditos={42} />);
+
+    const gatilho = screen.getByRole('button', { name: /42 créditos disponíveis/ });
+    expect(gatilho).toHaveTextContent('42créditos');
+  });
 });

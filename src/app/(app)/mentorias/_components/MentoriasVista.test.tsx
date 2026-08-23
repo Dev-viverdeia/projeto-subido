@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { cancelarCheckin } from '@/lib/mentorias/actions';
+import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import { MentoriasVista } from './MentoriasVista';
 
@@ -31,6 +31,11 @@ const SESSAO: SessaoMentoria = {
 };
 
 describe('ações de check-in nas mentorias', () => {
+  beforeEach(() => {
+    vi.mocked(cancelarCheckin).mockResolvedValue({ ok: true });
+    vi.mocked(fazerCheckin).mockResolvedValue({ ok: true });
+  });
+
   it('explica a consequência antes de cancelar uma vaga', async () => {
     const user = userEvent.setup();
     render(
@@ -49,5 +54,40 @@ describe('ações de check-in nas mentorias', () => {
 
     await user.click(within(dialogo).getByRole('button', { name: 'Cancelar check-in' }));
     await waitFor(() => expect(cancelarCheckin).toHaveBeenCalledWith(SESSAO.id));
+    expect(await screen.findByRole('dialog', { name: 'Check-in cancelado' })).toBeInTheDocument();
+  });
+
+  it('mantém o usuário informado enquanto reserva a vaga e conclui no mesmo diálogo', async () => {
+    const user = userEvent.setup();
+    let concluir!: (resultado: { ok: true }) => void;
+    vi.mocked(fazerCheckin).mockImplementationOnce(
+      () => new Promise((resolve) => (concluir = resolve)),
+    );
+
+    render(
+      <MentoriasVista
+        sessoes={[{ ...SESSAO, id: 'mentoria-aberta', euInscrito: false }]}
+        agoraIso="2026-08-18T10:00:00.000Z"
+        vistaInicial="agenda"
+      />,
+    );
+
+    await user.click(screen.getAllByRole('button', { name: /Fazer check-in/ })[0]!);
+    const confirmacao = screen.getByRole('dialog', { name: 'Confirmar check-in' });
+    expect(within(confirmacao).getByText(/usa 1 crédito/)).toBeInTheDocument();
+
+    await user.click(within(confirmacao).getByRole('button', { name: 'Confirmar por 1 crédito' }));
+    expect(
+      await screen.findByRole('dialog', { name: 'Confirmando seu check-in' }),
+    ).toHaveTextContent('Reservando sua vaga');
+
+    await act(async () => {
+      concluir({ ok: true });
+      await Promise.resolve();
+    });
+
+    expect(await screen.findByRole('dialog', { name: 'Check-in confirmado' })).toHaveTextContent(
+      'A sala aparece aqui quando a sessão começar',
+    );
   });
 });
