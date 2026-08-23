@@ -46,7 +46,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const claims = data.claims;
   const email = typeof claims.email === 'string' ? claims.email : '';
   const metadata = claims.user_metadata;
-  const plano = planoDosMetadados(metadata);
+  const plano = planoDosMetadados(claims.app_metadata);
   const itensPermitidos = ITENS_NAV.filter((item) => planoPodeAcessarRota(plano, item.href));
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
 

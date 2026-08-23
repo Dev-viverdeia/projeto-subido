@@ -18,7 +18,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return respostaJson({ erro: 'Faça login para enriquecer uma oportunidade.' }, 401);
-  if (user.user_metadata?.plano_subido === 'starter') {
+  // Permissão fica em app_metadata: é assinado pelo Supabase e não pode ser
+  // promovido pelo próprio usuário ao editar o perfil.
+  if (user.app_metadata?.plano_subido === 'starter') {
     return respostaJson({ erro: 'O enriquecimento faz parte do módulo comercial.' }, 403);
   }
 
