@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_acessos_eventos: {
+        Row: {
+          admin_id: string | null
+          creditos: number | null
+          criado_em: string
+          detalhes: Json
+          id: string
+          pacote_id: string | null
+          plano_anterior: string | null
+          plano_novo: string | null
+          saldo_apos: number | null
+          tipo: string
+          usuario_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          creditos?: number | null
+          criado_em?: string
+          detalhes?: Json
+          id?: string
+          pacote_id?: string | null
+          plano_anterior?: string | null
+          plano_novo?: string | null
+          saldo_apos?: number | null
+          tipo: string
+          usuario_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          creditos?: number | null
+          criado_em?: string
+          detalhes?: Json
+          id?: string
+          pacote_id?: string | null
+          plano_anterior?: string | null
+          plano_novo?: string | null
+          saldo_apos?: number | null
+          tipo?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      admin_contas: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          email: string | null
+          nome: string | null
+          plano: string
+          ultimo_acesso_em: string | null
+          usuario_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em: string
+          email?: string | null
+          nome?: string | null
+          plano?: string
+          ultimo_acesso_em?: string | null
+          usuario_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          email?: string | null
+          nome?: string | null
+          plano?: string
+          ultimo_acesso_em?: string | null
+          usuario_id?: string
+        }
+        Relationships: []
+      }
       aulas: {
         Row: {
           criado_em: string
@@ -2685,6 +2757,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_sistema_conceder_pacote: {
+        Args: {
+          p_admin: string
+          p_pacote: string
+          p_referencia: string
+          p_usuario: string
+        }
+        Returns: number
+      }
+      admin_sistema_listar_contas: {
+        Args: { p_busca?: string; p_limite?: number; p_offset?: number }
+        Returns: {
+          criado_em: string
+          email: string
+          nome: string
+          plano: string
+          saldo: number
+          total: number
+          ultimo_acesso_em: string
+          usuario_id: string
+        }[]
+      }
       calls_agendar_reuniao: {
         Args: {
           p_agendada_para: string
