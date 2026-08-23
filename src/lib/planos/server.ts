@@ -7,6 +7,6 @@ import { planoDosMetadados, planoTemRecurso, type RecursoPlano } from './acessos
 export async function exigirRecurso(recurso: RecursoPlano): Promise<void> {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
-  const plano = planoDosMetadados(data?.claims?.user_metadata);
+  const plano = planoDosMetadados(data?.claims?.app_metadata);
   if (!planoTemRecurso(plano, recurso)) redirect(`/conta?upgrade=${recurso}`);
 }

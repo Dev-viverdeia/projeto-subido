@@ -63,6 +63,20 @@ export const PLANOS_SUBIDO: Record<
   },
 };
 
+export const RECURSOS_BASE_PLANO = [
+  'Formações e projetos passo a passo',
+  'Sobral AI para orientar o próximo passo',
+  'Reuniões com Live Coach',
+  'Mentorias e certificados',
+] as const;
+
+export const RECURSOS_COMERCIAIS_PLANO = [
+  'Prospecção e listas qualificadas',
+  'Vendas e métricas comerciais',
+  'Propostas conectadas às oportunidades',
+  'Enriquecimento das fichas de clientes',
+] as const;
+
 /** Pacotes fixos: o checkout escolhe um pacote, nunca uma quantidade avulsa. */
 export const PACOTES_CREDITOS = [
   { id: 'essencial', nome: 'Essencial', creditos: 50 },
@@ -70,6 +84,14 @@ export const PACOTES_CREDITOS = [
   { id: 'escala', nome: 'Escala', creditos: 500 },
 ] as const;
 
+/**
+ * O plano vem exclusivamente de `app_metadata`, campo assinado pelo Supabase e
+ * administrado pelo produto. Nunca use `user_metadata` para permissões: a
+ * própria pessoa pode editar esse segundo objeto ao atualizar o perfil.
+ *
+ * Contas antigas sem a chave continuam como Pro. Uma migration grava essa
+ * escolha nelas e inclui Starter automaticamente em todo cadastro novo.
+ */
 export function planoDosMetadados(metadata: unknown): PlanoSubido {
   if (!metadata || typeof metadata !== 'object') return 'pro';
   const valor = (metadata as Record<string, unknown>).plano_subido;

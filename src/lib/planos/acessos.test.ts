@@ -20,10 +20,11 @@ describe('permissões dos planos', () => {
     expect(planoPodeAcessarRota('starter', '/propostas')).toBe(false);
   });
 
-  it('preserva contas existentes como Pro quando não há plano explícito', () => {
+  it('preserva contas antigas como Pro quando não há plano explícito', () => {
     expect(planoDosMetadados(undefined)).toBe('pro');
     expect(planoDosMetadados({ plano_subido: 'desconhecido' })).toBe('pro');
     expect(planoDosMetadados({ plano_subido: 'starter' })).toBe('starter');
+    expect(planoDosMetadados({ plano_subido: 'enterprise' })).toBe('enterprise');
   });
 
   it('oferece apenas pacotes fechados de créditos', () => {

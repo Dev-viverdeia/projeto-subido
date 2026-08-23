@@ -20,7 +20,8 @@ import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { IntegracaoGoogleCalendar } from './_components/IntegracaoGoogleCalendar';
 import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
-import { PLANOS_SUBIDO, planoDosMetadados } from '@/lib/planos/acessos';
+import { PLANOS_SUBIDO, planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
+import { PainelAcessoPlano } from './_components/PainelAcessoPlano';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Conta' };
@@ -69,7 +70,9 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const claims = data?.claims;
   const email = typeof claims?.email === 'string' ? claims.email : '—';
   const metadata = claims?.user_metadata;
-  const plano = planoDosMetadados(metadata);
+  const plano = planoDosMetadados(claims?.app_metadata);
+  const acessoBloqueado =
+    Boolean(parametros.upgrade) && !planoTemRecurso(plano, 'modulo_comercial');
   const nome = typeof metadata?.nome === 'string' ? metadata.nome : '—';
   const iniciais = nome
     .split(/\s+/)
@@ -102,10 +105,13 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           Não foi possível conectar o calendário. Tente novamente.
         </div>
       )}
-      {parametros.upgrade && (
-        <div className={styles.avisoIntegracao} data-tom="atencao" role="status">
-          Este recurso faz parte do módulo comercial. Seu aprendizado e o Live Coach continuam
-          disponíveis no plano Starter.
+      {acessoBloqueado && (
+        <div className={styles.avisoIntegracao} data-tom="atencao" role="alert">
+          <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
+          <span>
+            <strong>Esta área não faz parte do seu acesso atual.</strong>
+            Você continua com formações, projetos, Sobral AI, reuniões e Live Coach.
+          </span>
         </div>
       )}
 
@@ -117,7 +123,11 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           <div>
             <p>Créditos disponíveis</p>
             <strong>{saldoCreditos ?? '—'}</strong>
-            <small>Use em prospecção, enriquecimento e mentorias.</small>
+            <small>
+              {plano === 'starter'
+                ? 'Use o saldo nas mentorias disponíveis para o seu plano.'
+                : 'Use em prospecção, enriquecimento e mentorias.'}
+            </small>
           </div>
         </article>
         <article>
@@ -131,6 +141,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           </div>
         </article>
       </section>
+
+      <PainelAcessoPlano plano={plano} destaque={acessoBloqueado} />
 
       <IntegracaoGoogleCalendar calendar={calendar} />
 
