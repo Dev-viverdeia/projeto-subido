@@ -63,10 +63,9 @@
 .cabecalhoTabela,
 .linha {
   display: grid;
-  grid-template-columns: minmax(280px, 1.6fr) minmax(110px, 0.45fr) minmax(110px, 0.45fr) minmax(
-      150px,
-      0.65fr
-    ) 24px;
+  grid-template-columns:
+    minmax(280px, 1.6fr) minmax(110px, 0.45fr) minmax(110px, 0.45fr) minmax(150px, 0.65fr)
+    24px;
   align-items: center;
   gap: var(--via-space-5);
 }
