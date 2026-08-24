@@ -143,6 +143,27 @@ export function MenuPerfil({
             </Link>
 
             <Link
+              href="/conta/creditos"
+              role="menuitem"
+              aria-current={caminho === '/conta/creditos' ? 'page' : undefined}
+              className={styles.item}
+              onClick={() => setAberto(false)}
+            >
+              <span className={styles.iconeItem} aria-hidden="true">
+                <Coins size={17} strokeWidth={1.8} />
+              </span>
+              <span>
+                <strong>Créditos</strong>
+                <small>
+                  {saldoCreditos !== null
+                    ? `${saldoCreditos} disponíveis · ver extrato`
+                    : 'Saldo e extrato'}
+                </small>
+              </span>
+              <span className={styles.indicador} aria-hidden="true" />
+            </Link>
+
+            <Link
               href="/certificados"
               role="menuitem"
               aria-current={caminho === '/certificados' ? 'page' : undefined}

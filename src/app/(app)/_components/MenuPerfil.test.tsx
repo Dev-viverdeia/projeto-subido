@@ -34,6 +34,10 @@ describe('MenuPerfil', () => {
       'href',
       '/certificados',
     );
+    expect(screen.getByRole('menuitem', { name: /Créditos/ })).toHaveAttribute(
+      'href',
+      '/conta/creditos',
+    );
     expect(screen.getByRole('menuitem', { name: 'Encerrar sessão' })).toHaveAttribute(
       'type',
       'submit',
@@ -68,5 +72,18 @@ describe('MenuPerfil', () => {
 
     const gatilho = screen.getByRole('button', { name: /42 créditos disponíveis/ });
     expect(gatilho).toHaveTextContent('42créditos');
+  });
+
+  it('indica a central de créditos quando ela é a página atual', async () => {
+    caminho = '/conta/creditos';
+    const usuario = userEvent.setup();
+    render(<MenuPerfil nome="QA Subido" email="qa@viverdeia.ai" saldoCreditos={42} />);
+
+    await usuario.click(screen.getByRole('button', { name: /42 créditos disponíveis/ }));
+
+    expect(screen.getByRole('menuitem', { name: /Créditos/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 });
