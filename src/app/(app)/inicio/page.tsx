@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { listarAgenda } from '@/lib/mentorias/queries';
+import { planoDosMetadados } from '@/lib/planos/acessos';
 import { createClient } from '@/lib/supabase/server';
 import { CarregandoDado } from './_components/CarregandoDado';
 import { MapaJornada } from './_components/MapaJornada';
@@ -26,10 +27,12 @@ export default async function InicioPage() {
 
   const claims = data?.claims;
   const metadata = (claims?.user_metadata ?? {}) as { nome?: string };
+  const plano = planoDosMetadados(claims?.app_metadata);
   const primeiroNome = metadata.nome?.trim().split(/\s+/)[0] ?? null;
   return (
     <MapaJornada
       nome={primeiroNome}
+      plano={plano}
       proximaMentoria={
         <Suspense fallback={<CarregandoDado largura="18ch" />}>
           <ProximaMentoria />

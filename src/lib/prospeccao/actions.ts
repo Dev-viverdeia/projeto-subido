@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { prospeccaoEnv } from '@/lib/env';
+import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
 import {
   concluirListaProspeccao,
@@ -41,6 +42,7 @@ export async function criarListaProspeccao(
   _estado: EstadoBuscaProspeccao,
   formData: FormData,
 ): Promise<EstadoBuscaProspeccao> {
+  await exigirRecurso('modulo_comercial');
   const campos = camposDo(formData);
   const validacao = BuscaProspeccaoSchema.safeParse(campos);
   if (!validacao.success) {
@@ -105,6 +107,7 @@ export async function criarListaProspeccao(
 }
 
 export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
+  await exigirRecurso('modulo_comercial');
   const lead = z.uuid().safeParse(formData.get('lead'));
   if (!lead.success) return;
 

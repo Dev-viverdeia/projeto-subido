@@ -8,6 +8,7 @@ import { obterPosCall } from '@/lib/calls/queries';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
+import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { montarDocumentoInicial, type OrigemProposta } from './montar';
@@ -81,6 +82,7 @@ async function resolverOrigem(valor: string): Promise<OrigemProposta | null> {
 }
 
 export async function criarProposta(formData: FormData): Promise<void> {
+  await exigirRecurso('modulo_comercial');
   const validacao = NovaPropostaSchema.safeParse({
     oportunidade: formData.get('oportunidade'),
     origem: formData.get('origem'),
@@ -160,6 +162,7 @@ export async function salvarProposta(
   _estado: EstadoProposta,
   formData: FormData,
 ): Promise<EstadoProposta> {
+  await exigirRecurso('modulo_comercial');
   const validacao = SalvarSchema.safeParse({
     id: formData.get('id'),
     titulo: formData.get('titulo'),
@@ -204,6 +207,7 @@ export async function mudarStatusProposta(
   _estado: EstadoProposta,
   formData: FormData,
 ): Promise<EstadoProposta> {
+  await exigirRecurso('modulo_comercial');
   const validacao = MudarStatusSchema.safeParse({
     id: formData.get('id'),
     status: formData.get('status'),

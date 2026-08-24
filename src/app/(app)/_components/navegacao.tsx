@@ -25,6 +25,8 @@ export type ItemNav = {
   noDock: boolean;
   /** Organiza a navegação pela jornada real, em vez de uma lista plana de ferramentas. */
   grupo: 'aprendizado' | 'operacao' | 'gestao';
+  /** Sinal calculado no servidor. O cliente só o usa para explicar o acesso. */
+  bloqueado?: boolean;
 };
 
 export const ROTULOS_GRUPO_NAV = {

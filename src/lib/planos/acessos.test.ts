@@ -17,7 +17,9 @@ describe('permissões dos planos', () => {
     expect(planoTemRecurso('starter', 'modulo_comercial')).toBe(false);
     expect(planoTemRecurso('starter', 'enriquecimento')).toBe(false);
     expect(planoPodeAcessarRota('starter', '/vendas/cliente')).toBe(false);
+    expect(planoPodeAcessarRota('starter', '/crm/cliente')).toBe(false);
     expect(planoPodeAcessarRota('starter', '/propostas')).toBe(false);
+    expect(planoPodeAcessarRota('starter', '/reunioes')).toBe(true);
   });
 
   it('preserva contas antigas como Pro quando não há plano explícito', () => {

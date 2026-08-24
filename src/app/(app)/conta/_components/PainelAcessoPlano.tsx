@@ -1,4 +1,4 @@
-import { Check, LockKeyhole, Sparkles } from 'lucide-react';
+import { Check, Layers3, LockKeyhole } from 'lucide-react';
 import {
   PLANOS_SUBIDO,
   RECURSOS_BASE_PLANO,
@@ -25,7 +25,7 @@ export function PainelAcessoPlano({
     >
       <header className={styles.cabecalho}>
         <span className={styles.icone} aria-hidden="true">
-          <Sparkles size={19} strokeWidth={1.7} />
+          <Layers3 size={19} strokeWidth={1.7} />
         </span>
         <div>
           <p>Seu acesso</p>
@@ -74,8 +74,8 @@ export function PainelAcessoPlano({
           </ul>
           {!comercialLiberado && (
             <p className={styles.nota}>
-              Quando o módulo comercial for liberado para sua conta, estas áreas aparecem
-              automaticamente no menu.
+              Estas áreas continuam visíveis no menu com o selo Pro. Ao abri-las, você volta para
+              esta explicação sem perder o que já fez na plataforma.
             </p>
           )}
         </article>

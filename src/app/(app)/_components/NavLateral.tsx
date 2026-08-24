@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Grid2X2, X } from 'lucide-react';
+import { Grid2X2, LockKeyhole, X } from 'lucide-react';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
 
@@ -41,9 +41,14 @@ export function NavLateral({
   const botaoFecharRef = useRef<HTMLButtonElement>(null);
   const painelMenuRef = useRef<HTMLElement>(null);
 
-  const estaAtivo = (item: ItemNav) => caminho === item.href || caminho.startsWith(`${item.href}/`);
+  const destinoDoItem = (item: ItemNav) =>
+    item.bloqueado
+      ? `/conta?upgrade=modulo_comercial&origem=${encodeURIComponent(item.href)}`
+      : item.href;
+  const estaAtivo = (item: ItemNav) =>
+    !item.bloqueado && (caminho === item.href || caminho.startsWith(`${item.href}/`));
 
-  const itensPrioritarios = itens.filter((item) => item.noDock).slice(0, 4);
+  const itensPrioritarios = itens.filter((item) => item.noDock && !item.bloqueado).slice(0, 4);
   const hrefsPrioritarios = new Set(itensPrioritarios.map((item) => item.href));
   const contaAtiva = Boolean(itemConta && estaAtivo(itemConta));
   const maisAtivo =
@@ -102,13 +107,14 @@ export function NavLateral({
     ) {
       return;
     }
-    setDestinoPendente(item.href);
+    setDestinoPendente(destinoDoItem(item));
   }
 
   function prepararDestino(item: ItemNav) {
+    const destino = destinoDoItem(item);
     setDestinosPreparados((atuais) => {
-      if (atuais.has(item.href)) return atuais;
-      return new Set([...atuais, item.href]);
+      if (atuais.has(destino)) return atuais;
+      return new Set([...atuais, destino]);
     });
   }
 
@@ -117,19 +123,22 @@ export function NavLateral({
       <ul className={styles.lista}>
         {lista.map((item) => {
           const ativo = estaAtivo(item);
-          const carregando = destinoPendente === item.href && !ativo;
+          const destino = destinoDoItem(item);
+          const carregando = destinoPendente === destino && !ativo;
 
           return (
             <li key={item.href}>
               <Link
-                href={item.href}
+                href={destino}
                 /* A sidebar inteira fica visível no desktop. O prefetch padrão
                    acordava todas as rotas ao mesmo tempo; agora a rota completa
                    só é preparada quando ponteiro ou teclado indicam intenção. */
-                prefetch={destinosPreparados.has(item.href)}
+                prefetch={destinosPreparados.has(destino)}
                 className={styles.item}
+                aria-label={item.bloqueado ? `${item.rotulo}, disponível no Pro` : undefined}
                 aria-current={ativo ? 'page' : undefined}
                 aria-busy={carregando || undefined}
+                data-bloqueado={item.bloqueado || undefined}
                 data-loading={carregando || undefined}
                 onMouseEnter={() => prepararDestino(item)}
                 onFocus={() => prepararDestino(item)}
@@ -140,6 +149,11 @@ export function NavLateral({
                   {item.icone}
                 </span>
                 <span className={styles.rotulo}>{item.rotulo}</span>
+                {item.bloqueado && (
+                  <span className={styles.seloPlano} aria-hidden="true">
+                    <LockKeyhole size={11} strokeWidth={1.9} /> Pro
+                  </span>
+                )}
                 {carregando && <span className="sr-only">Carregando {item.rotulo}</span>}
               </Link>
             </li>
@@ -229,14 +243,19 @@ export function NavLateral({
                       <div className={styles.gradeMenu}>
                         {itensDoGrupo.map((item) => {
                           const ativo = estaAtivo(item);
-                          const carregando = destinoPendente === item.href && !ativo;
+                          const destino = destinoDoItem(item);
+                          const carregando = destinoPendente === destino && !ativo;
 
                           return (
                             <Link
-                              href={item.href}
+                              href={destino}
                               className={styles.itemMenu}
+                              aria-label={
+                                item.bloqueado ? `${item.rotulo}, disponível no Pro` : undefined
+                              }
                               aria-current={ativo ? 'page' : undefined}
                               aria-busy={carregando || undefined}
+                              data-bloqueado={item.bloqueado || undefined}
                               data-loading={carregando || undefined}
                               key={item.href}
                               onClick={(evento) => {
@@ -248,6 +267,12 @@ export function NavLateral({
                                 {item.icone}
                               </span>
                               <span>{item.rotulo}</span>
+                              {item.bloqueado && (
+                                <small>
+                                  <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
+                                  Disponível no Pro
+                                </small>
+                              )}
                               {ativo && <small>Você está aqui</small>}
                               {carregando && <small>Carregando…</small>}
                             </Link>
@@ -265,12 +290,13 @@ export function NavLateral({
         <ul className={`${styles.lista} ${styles.listaDock}`}>
           {itensPrioritarios.map((item) => {
             const ativo = estaAtivo(item);
-            const carregando = destinoPendente === item.href && !ativo;
+            const destino = destinoDoItem(item);
+            const carregando = destinoPendente === destino && !ativo;
 
             return (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={destino}
                   className={styles.item}
                   aria-current={ativo ? 'page' : undefined}
                   aria-busy={carregando || undefined}
