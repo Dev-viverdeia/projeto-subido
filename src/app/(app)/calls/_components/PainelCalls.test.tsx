@@ -4,6 +4,7 @@ import type { ReuniaoCall } from '@/lib/calls/queries';
 
 vi.mock('@/lib/calls/actions', () => ({
   reenviarConviteGoogle: vi.fn(),
+  resolverReuniaoPendente: vi.fn(),
 }));
 
 vi.mock('./FormularioAgendarCall', () => ({
@@ -68,6 +69,7 @@ describe('PainelCalls', () => {
             agendadaPara: '2026-08-08T13:00:00.000Z',
           }),
         ]}
+        agora={new Date('2026-08-09T12:00:00.000Z')}
       />,
     );
 
@@ -102,6 +104,7 @@ describe('PainelCalls', () => {
             agendadaPara: '2026-08-11T13:00:00.000Z',
           }),
         ]}
+        agora={new Date('2026-08-09T12:00:00.000Z')}
       />,
     );
 
@@ -114,5 +117,35 @@ describe('PainelCalls', () => {
     );
     expect(screen.getAllByText('Proposta Horizonte')).toHaveLength(1);
     expect(screen.getByRole('region', { name: 'Descoberta Horizonte' })).toBeInTheDocument();
+  });
+
+  it('separa horários vencidos da próxima agenda e pede uma decisão', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        agora={new Date('2026-08-24T15:00:00.000Z')}
+        reunioes={[
+          reuniao({
+            id: 'call-vencida',
+            titulo: 'Descoberta que não aconteceu',
+            agendadaPara: '2026-08-20T13:00:00.000Z',
+          }),
+          reuniao({
+            id: 'call-futura',
+            titulo: 'Proposta da próxima semana',
+            agendadaPara: '2026-08-28T13:00:00.000Z',
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('region', { name: 'Uma reunião precisa de uma decisão' }),
+    ).toHaveTextContent('Descoberta que não aconteceu');
+    expect(
+      screen.getByRole('region', { name: 'Proposta da próxima semana' }),
+    ).not.toHaveTextContent('Descoberta que não aconteceu');
+    expect(screen.getByRole('button', { name: 'Resolver pendência' })).toBeInTheDocument();
   });
 });

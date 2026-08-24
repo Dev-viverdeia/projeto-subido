@@ -1,0 +1,30 @@
+.acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+
+.acoes form {
+  margin: 0;
+}
+
+.conteudo {
+  display: grid;
+  gap: var(--via-space-3);
+  color: var(--via-text-muted);
+  line-height: var(--via-lh-normal);
+}
+
+.conteudo p {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .acoes,
+  .acoes form,
+  .acoes :global(.via-btn) {
+    width: 100%;
+  }
+}

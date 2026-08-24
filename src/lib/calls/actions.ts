@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
-import { sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
-import { TIPOS_CALL } from './tipos';
+import { removerCallDoGoogle, sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
+import { callPassouDaJanela, TIPOS_CALL } from './tipos';
 
 const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
 
@@ -43,6 +43,11 @@ const proximaAcaoSchema = z.object({
     z.enum(ETAPAS_CRM.map((item) => item.id) as [string, ...string[]]),
   ]),
   compromissos: z.array(z.string().trim().min(3).max(500)).max(8),
+});
+
+const pendenciaSchema = z.object({
+  reuniao: z.uuid(),
+  destino: z.enum(['reagendar', 'cancelar']),
 });
 
 type CampoAgendamento =
@@ -252,6 +257,70 @@ export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
   revalidatePath('/calls');
   const calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
   redirect(`/reunioes?agendada=${reuniao.id}&calendar=${calendar}`);
+}
+
+export async function resolverReuniaoPendente(formData: FormData): Promise<void> {
+  const validacao = pendenciaSchema.safeParse({
+    reuniao: formData.get('reuniao'),
+    destino: formData.get('destino'),
+  });
+  if (!validacao.success) redirect('/reunioes?pendencia=erro');
+
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) redirect('/entrar');
+
+  const { data: reuniao, error } = await supabase
+    .from('calls_reunioes')
+    .select(
+      'id, oportunidade_id, tipo, status, agendada_para, duracao_minutos, google_event_id, google_calendar_id',
+    )
+    .eq('id', validacao.data.reuniao)
+    .maybeSingle();
+
+  if (
+    error ||
+    !reuniao ||
+    !callPassouDaJanela({
+      status: reuniao.status,
+      agendadaPara: reuniao.agendada_para,
+      duracaoMinutos: reuniao.duracao_minutos,
+    })
+  ) {
+    redirect('/reunioes?pendencia=erro');
+  }
+
+  const { error: erroAtualizacao } = await supabase
+    .from('calls_reunioes')
+    .update({ status: 'cancelada', encerrada_em: new Date().toISOString() })
+    .eq('id', reuniao.id)
+    .in('status', ['agendada', 'aguardando', 'ao_vivo']);
+  if (erroAtualizacao) {
+    console.error(`[calls:resolver-pendencia] ${erroAtualizacao.code}: ${erroAtualizacao.message}`);
+    redirect('/reunioes?pendencia=erro');
+  }
+
+  await removerCallDoGoogle(supabase, {
+    reuniaoId: reuniao.id,
+    eventoId: reuniao.google_event_id,
+    calendarId: reuniao.google_calendar_id,
+  });
+
+  revalidatePath('/calls');
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${reuniao.oportunidade_id}`);
+  revalidarDirecaoOperacional();
+
+  if (validacao.data.destino === 'reagendar') {
+    const parametros = new URLSearchParams({
+      nova: '1',
+      oportunidade: reuniao.oportunidade_id,
+      tipo: reuniao.tipo,
+      pendencia: 'reagendar',
+    });
+    redirect(`/reunioes?${parametros.toString()}`);
+  }
+  redirect('/reunioes?pendencia=cancelada');
 }
 
 export async function aplicarPlanoCall(formData: FormData): Promise<void> {

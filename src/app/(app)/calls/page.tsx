@@ -33,6 +33,13 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
           ? parametros.calendar
           : undefined
       }
+      pendenciaResultado={
+        parametros.pendencia === 'reagendar' ||
+        parametros.pendencia === 'cancelada' ||
+        parametros.pendencia === 'erro'
+          ? parametros.pendencia
+          : undefined
+      }
     />
   );
 }

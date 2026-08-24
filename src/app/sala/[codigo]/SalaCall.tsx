@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
 import {
   CalendarClock,
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
-import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
+import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { LiveCoach } from './LiveCoach';
 import styles from './sala.module.css';
 
@@ -40,15 +41,41 @@ export function SalaCall({
   nomeSugerido: string;
   videoConfigurado: boolean;
 }) {
+  const router = useRouter();
   const [nome, setNome] = useState(nomeSugerido);
   const [consentiu, setConsentiu] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
-  const salaAberta = callPodeAbrir(convite.status) && (anfitriao || convite.disponivel);
+  const [saida, setSaida] = useState<'processando' | 'encerrada' | null>(null);
+  const passouDaJanela = callPassouDaJanela({
+    status: convite.status,
+    agendadaPara: convite.agendadaPara,
+    duracaoMinutos: convite.duracaoMinutos,
+  });
+  const salaAberta =
+    callPodeAbrir(convite.status) && !passouDaJanela && (anfitriao || convite.disponivel);
   const podeEntrar = salaAberta && videoConfigurado && nome.trim().length > 0 && consentiu;
   const estadoSala =
-    salaAberta && videoConfigurado ? 'Sala disponível' : ROTULO_STATUS_CALL[convite.status];
+    salaAberta && videoConfigurado
+      ? 'Sala disponível'
+      : passouDaJanela
+        ? 'Horário encerrado'
+        : ROTULO_STATUS_CALL[convite.status];
+
+  useEffect(() => {
+    if (saida !== 'processando') return;
+    const navegacao = window.setTimeout(
+      () => router.replace(`/reunioes/${convite.reuniaoId}`),
+      900,
+    );
+    return () => window.clearTimeout(navegacao);
+  }, [convite.reuniaoId, router, saida]);
+
+  function aoDesconectar() {
+    setCredenciais(null);
+    setSaida(anfitriao ? 'processando' : 'encerrada');
+  }
 
   async function entrar() {
     if (!podeEntrar) return;
@@ -86,7 +113,7 @@ export function SalaCall({
           connect
           audio
           video
-          onDisconnected={() => setCredenciais(null)}
+          onDisconnected={aoDesconectar}
         >
           {anfitriao ? (
             <div className={styles.experienciaAnfitriao}>
@@ -101,6 +128,28 @@ export function SalaCall({
           <RoomAudioRenderer />
         </LiveKitRoom>
       </div>
+    );
+  }
+
+  if (saida) {
+    return (
+      <main className={styles.saida}>
+        <section className={styles.saidaCartao} role="status" aria-live="polite">
+          <span className={styles.saidaIcone} aria-hidden="true">
+            {saida === 'processando' ? <LoaderCircle size={28} /> : <CheckCircle2 size={28} />}
+          </span>
+          <p>{saida === 'processando' ? 'Conversa salva' : 'Reunião encerrada'}</p>
+          <h1>
+            {saida === 'processando' ? 'Preparando o resumo da reunião' : 'Obrigado por participar'}
+          </h1>
+          <span>
+            {saida === 'processando'
+              ? 'Você será levado para revisar os fatos e o próximo passo desta venda.'
+              : 'Você já pode fechar esta página com segurança.'}
+          </span>
+          {saida === 'processando' && <i aria-hidden="true" />}
+        </section>
+      </main>
     );
   }
 
@@ -197,7 +246,11 @@ export function SalaCall({
             </div>
           )}
           {videoConfigurado && !salaAberta && callPodeAbrir(convite.status) && (
-            <div className={styles.aviso}>A sala abre 30 minutos antes do horário agendado.</div>
+            <div className={styles.aviso}>
+              {passouDaJanela
+                ? 'O horário terminou sem esta reunião ser concluída. Organize a pendência em Reuniões.'
+                : 'A sala abre 30 minutos antes do horário agendado.'}
+            </div>
           )}
           {!callPodeAbrir(convite.status) && (
             <div className={styles.aviso}>Esta reunião já foi encerrada.</div>

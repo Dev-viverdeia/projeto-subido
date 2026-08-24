@@ -1,13 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ConviteCall } from '@/lib/calls/queries';
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: vi.fn() }),
+}));
+
 import { SalaCall } from './SalaCall';
 
 const CONVITE: ConviteCall = {
   reuniaoId: 'reuniao-1',
   titulo: 'Descoberta do atendimento',
-  agendadaPara: '2026-08-12T18:30:00-03:00',
+  agendadaPara: '2099-08-12T18:30:00-03:00',
   duracaoMinutos: 45,
   status: 'agendada',
   liveCoachAtivo: true,
