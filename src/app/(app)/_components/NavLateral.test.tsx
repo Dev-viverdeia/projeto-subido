@@ -77,6 +77,21 @@ describe('NavLateral no mobile', () => {
 });
 
 describe('NavLateral no desktop', () => {
+  it('explica os itens do Pro sem esconder as áreas disponíveis no Starter', () => {
+    const itensStarter = ITENS_NAV.map((item) => ({
+      ...item,
+      bloqueado: ['/prospeccao', '/vendas', '/metricas', '/propostas'].includes(item.href),
+    }));
+    render(<NavLateral itens={itensStarter} variante="lateral" />);
+
+    expect(screen.getByRole('link', { name: 'Vendas, disponível no Pro' })).toHaveAttribute(
+      'href',
+      '/conta?upgrade=modulo_comercial&origem=%2Fvendas',
+    );
+    expect(screen.getByRole('link', { name: 'Reuniões' })).toHaveAttribute('href', '/reunioes');
+    expect(screen.getAllByText('Pro')).toHaveLength(4);
+  });
+
   it('só prepara a rota completa depois que a pessoa demonstra intenção', async () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} variante="lateral" />);

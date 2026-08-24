@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { obterAcessoRecurso } from '@/lib/planos/server';
 import { obterProposta } from '@/lib/propostas/queries';
 import { renderizarPropostaPdf } from '@/lib/propostas/pdf';
 import { createClient } from '@/lib/supabase/server';
@@ -19,6 +20,14 @@ function nomeSeguro(valor: string): string {
 export async function GET(_request: Request, contexto: RouteContext<'/api/propostas/[id]/pdf'>) {
   const { id } = await contexto.params;
   if (!z.uuid().safeParse(id).success) return new Response('Não encontrado.', { status: 404 });
+
+  const acesso = await obterAcessoRecurso('modulo_comercial');
+  if (!acesso.permitido) {
+    return new Response(
+      acesso.motivo === 'sessao' ? 'Não autorizado.' : 'Recurso indisponível no plano atual.',
+      { status: acesso.motivo === 'sessao' ? 401 : 403 },
+    );
+  }
 
   const supabase = await createClient();
   const {

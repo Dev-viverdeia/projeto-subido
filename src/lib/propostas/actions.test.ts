@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { createClient, revalidatePath, redirect, rpc } = vi.hoisted(() => ({
+const { createClient, exigirRecurso, revalidatePath, redirect, rpc } = vi.hoisted(() => ({
   createClient: vi.fn(),
+  exigirRecurso: vi.fn(),
   revalidatePath: vi.fn(),
   redirect: vi.fn(),
   rpc: vi.fn(),
@@ -11,6 +12,7 @@ vi.mock('@/lib/supabase/server', () => ({ createClient }));
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/planos/server', () => ({ exigirRecurso }));
 
 import { mudarStatusProposta } from './actions';
 
@@ -68,6 +70,7 @@ describe('mudarStatusProposta', () => {
       `redirect:/solucoes/execucao/${PROJETO_ID}`,
     );
 
+    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
     expect(rpc).toHaveBeenCalledWith('projeto_iniciar', { p_proposta_id: PROPOSTA_ID });
     expect(revalidatePath).toHaveBeenCalledWith('/solucoes');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');

@@ -102,7 +102,7 @@ export function planoTemRecurso(plano: PlanoSubido, recurso: RecursoPlano): bool
   return PLANOS_SUBIDO[plano].recursos.includes(recurso);
 }
 
-const ROTAS_COMERCIAIS = ['/prospeccao', '/vendas', '/metricas', '/propostas'] as const;
+const ROTAS_COMERCIAIS = ['/prospeccao', '/vendas', '/crm', '/metricas', '/propostas'] as const;
 
 export function planoPodeAcessarRota(plano: PlanoSubido, href: string): boolean {
   if (!ROTAS_COMERCIAIS.some((rota) => href === rota || href.startsWith(`${rota}/`))) return true;

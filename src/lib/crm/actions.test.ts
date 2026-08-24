@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getUser, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
+const { exigirRecurso, getUser, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
+  exigirRecurso: vi.fn(),
   getUser: vi.fn(),
   redirect: vi.fn(),
   revalidatePath: vi.fn(),
@@ -10,6 +11,7 @@ const { getUser, redirect, revalidatePath, rpc } = vi.hoisted(() => ({
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/planos/server', () => ({ exigirRecurso }));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getUser }, rpc })),
 }));
@@ -38,6 +40,7 @@ describe('criarLead', () => {
 
     await criarLead({}, dadosValidos());
 
+    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
     expect(rpc).toHaveBeenCalledWith('crm_criar_lead', {
       p_empresa_nome: 'Clínica Aurora',
       p_contato_nome: 'Camila Rios',
@@ -106,6 +109,7 @@ describe('moverOportunidadeKanban', () => {
     });
 
     expect(resultado).toEqual({ ok: true, movida: true });
+    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
     expect(rpc).toHaveBeenCalledWith('crm_mover_oportunidade_kanban', {
       p_oportunidade: OPORTUNIDADE_ID,
       p_etapa: 'perdido',

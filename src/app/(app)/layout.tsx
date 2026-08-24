@@ -47,7 +47,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const email = typeof claims.email === 'string' ? claims.email : '';
   const metadata = claims.user_metadata;
   const plano = planoDosMetadados(claims.app_metadata);
-  const itensPermitidos = ITENS_NAV.filter((item) => planoPodeAcessarRota(plano, item.href));
+  const itensComAcesso = ITENS_NAV.map((item) => ({
+    ...item,
+    bloqueado: !planoPodeAcessarRota(plano, item.href),
+  }));
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
 
   /* A introdução é parte do produto, não uma página solta. O status fica no
@@ -81,7 +84,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               <small>Em colaboração com Viver de IA</small>
             </Link>
 
-            <NavLateral itens={itensPermitidos} variante="lateral" />
+            <NavLateral itens={itensComAcesso} variante="lateral" />
 
             {admin && (
               <div className={styles.rodapeSidebar}>
@@ -110,7 +113,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {/* No mobile, "Mais" dá acesso à navegação completa. O item de gestão
               só entra no payload de quem realmente é admin. */}
           <NavLateral
-            itens={admin ? [...itensPermitidos, ITEM_ADMIN] : itensPermitidos}
+            itens={admin ? [...itensComAcesso, ITEM_ADMIN] : itensComAcesso}
             itemConta={ITEM_CONTA}
             variante="dock"
           />

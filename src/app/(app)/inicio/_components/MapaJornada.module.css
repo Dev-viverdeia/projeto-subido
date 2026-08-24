@@ -10,6 +10,7 @@
 .eyebrow,
 .secaoCabecalho p,
 .areaTopo small,
+.seloPro,
 .painelRotulo {
   color: var(--via-text-soft);
   font-family: var(--via-font-mono);
@@ -17,6 +18,17 @@
   letter-spacing: var(--app-ls-eyebrow);
   line-height: 1.2;
   text-transform: uppercase;
+}
+
+.seloPro {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--via-radius-pill);
+  background: color-mix(in srgb, var(--via-white) 62%, transparent);
+  color: var(--via-text-muted);
 }
 
 .abertura {
@@ -546,6 +558,25 @@
   box-shadow: var(--via-shadow-md);
 }
 
+.cartaoArea[data-bloqueado='true'] {
+  background: color-mix(in srgb, var(--app-elev-2-bg) 72%, transparent);
+  color: var(--via-text-muted);
+}
+
+.cartaoArea[data-bloqueado='true']:hover {
+  border-color: var(--via-border-soft);
+  box-shadow: var(--app-elev-1-shadow);
+  transform: translateY(-1px);
+}
+
+.cartaoArea[data-bloqueado='true']:focus-visible {
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+.cartaoArea[data-bloqueado='true'] .areaAcao {
+  color: var(--via-text-muted);
+}
+
 .cartaoArea:focus-visible {
   outline: none;
   box-shadow: var(--app-ring), var(--via-shadow-md);
@@ -560,6 +591,10 @@
 
 .areaTopo svg {
   color: var(--via-accent-ink);
+}
+
+.areaTopo .seloPro svg {
+  color: currentColor;
 }
 
 .cartaoArea > strong {

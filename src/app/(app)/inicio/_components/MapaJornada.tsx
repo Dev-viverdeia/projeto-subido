@@ -8,14 +8,17 @@ import {
   DraftingCompass,
   FileSignature,
   GraduationCap,
+  LockKeyhole,
   Search,
   UsersRound,
   Video,
 } from 'lucide-react';
+import { planoTemRecurso, type PlanoSubido, type RecursoPlano } from '@/lib/planos/acessos';
 import styles from './MapaJornada.module.css';
 
 type Props = {
   nome: string | null;
+  plano?: PlanoSubido;
   proximaMentoria?: ReactNode;
 };
 
@@ -62,6 +65,7 @@ const AREAS_OPERAR = [
     descricao: 'Crie listas de empresas com contatos para abordar.',
     acao: 'Buscar empresas',
     Icone: Search,
+    recurso: 'modulo_comercial',
   },
   {
     href: '/vendas',
@@ -70,6 +74,7 @@ const AREAS_OPERAR = [
     descricao: 'Trabalhe cada oportunidade com uma próxima ação clara.',
     acao: 'Abrir oportunidades',
     Icone: ContactRound,
+    recurso: 'modulo_comercial',
   },
   {
     href: '/reunioes',
@@ -86,6 +91,7 @@ const AREAS_OPERAR = [
     descricao: 'Monte, apresente e acompanhe suas propostas comerciais.',
     acao: 'Abrir propostas',
     Icone: FileSignature,
+    recurso: 'modulo_comercial',
   },
 ] as const;
 
@@ -95,10 +101,12 @@ function CartoesAreas({
   titulo,
   sobretitulo,
   areas,
+  plano,
 }: {
   titulo: string;
   sobretitulo: string;
   areas: readonly Area[];
+  plano: PlanoSubido;
 }) {
   const id = `area-${sobretitulo.toLowerCase().replaceAll(' ', '-')}`;
   return (
@@ -110,25 +118,46 @@ function CartoesAreas({
         </div>
       </div>
       <div className={styles.gradeAreas}>
-        {areas.map(({ href, rotulo, titulo: nomeArea, descricao, acao, Icone }) => (
-          <Link href={href} className={styles.cartaoArea} key={href}>
-            <span className={styles.areaTopo}>
-              <small>{rotulo}</small>
-              <Icone size={18} strokeWidth={1.7} aria-hidden="true" />
-            </span>
-            <strong>{nomeArea}</strong>
-            <p>{descricao}</p>
-            <span className={styles.areaAcao}>
-              {acao} <ArrowRight size={15} strokeWidth={1.9} aria-hidden="true" />
-            </span>
-          </Link>
-        ))}
+        {areas.map(({ href, rotulo, titulo: nomeArea, descricao, acao, Icone, ...area }) => {
+          const recurso = 'recurso' in area ? (area.recurso as RecursoPlano) : null;
+          const bloqueado = Boolean(recurso && !planoTemRecurso(plano, recurso));
+          const destino = bloqueado
+            ? `/conta?upgrade=${recurso}&origem=${encodeURIComponent(href)}`
+            : href;
+
+          return (
+            <Link
+              href={destino}
+              className={styles.cartaoArea}
+              data-bloqueado={bloqueado || undefined}
+              aria-label={bloqueado ? `${nomeArea}, disponível no Pro` : undefined}
+              key={href}
+            >
+              <span className={styles.areaTopo}>
+                <small>{rotulo}</small>
+                {bloqueado ? (
+                  <span className={styles.seloPro} aria-hidden="true">
+                    <LockKeyhole size={11} strokeWidth={1.9} /> Pro
+                  </span>
+                ) : (
+                  <Icone size={18} strokeWidth={1.7} aria-hidden="true" />
+                )}
+              </span>
+              <strong>{nomeArea}</strong>
+              <p>{descricao}</p>
+              <span className={styles.areaAcao}>
+                {bloqueado ? 'Ver acesso do plano' : acao}{' '}
+                <ArrowRight size={15} strokeWidth={1.9} aria-hidden="true" />
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-export function MapaJornada({ nome, proximaMentoria }: Props) {
+export function MapaJornada({ nome, plano = 'pro', proximaMentoria }: Props) {
   const dataLonga = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -143,7 +172,9 @@ export function MapaJornada({ nome, proximaMentoria }: Props) {
           <p>{nome ? `${nome},` : 'Olá,'}</p>
           <h1>bem-vindo.</h1>
           <strong>
-            Aprenda, encontre clientes, venda e entregue seus projetos de IA em um só lugar.
+            {planoTemRecurso(plano, 'modulo_comercial')
+              ? 'Aprenda, encontre clientes, venda e entregue seus projetos de IA em um só lugar.'
+              : 'Aprenda, prepare e entregue projetos de IA com orientação em cada etapa.'}
           </strong>
         </div>
 
@@ -165,11 +196,13 @@ export function MapaJornada({ nome, proximaMentoria }: Props) {
         titulo="Aprenda e prepare o que você vai entregar."
         sobretitulo="Aprender e construir"
         areas={AREAS_APRENDER}
+        plano={plano}
       />
       <CartoesAreas
         titulo="Encontre clientes e conduza cada venda."
         sobretitulo="Operação comercial"
         areas={AREAS_OPERAR}
+        plano={plano}
       />
     </div>
   );
