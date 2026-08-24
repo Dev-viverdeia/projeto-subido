@@ -26,7 +26,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }));
 vi.mock('@/lib/google-calendar/eventos', () => ({ removerCallDoGoogle, sincronizarCallNoGoogle }));
 
-import { agendarReuniao } from './actions';
+import { agendarReuniao, resolverReuniaoPendente } from './actions';
 
 const OPORTUNIDADE_ID = '11111111-1111-4111-8111-111111111111';
 const REUNIAO_ID = '22222222-2222-4222-8222-222222222222';
@@ -152,5 +152,77 @@ describe('agendarReuniao', () => {
       }),
     );
     expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
+  });
+});
+
+describe('resolverReuniaoPendente', () => {
+  const atualizar = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getClaims.mockResolvedValue({ data: { claims: { sub: 'usuario-1' } } });
+    atualizar.mockReturnValue({
+      eq: vi.fn(() => ({ in: vi.fn(() => Promise.resolve({ error: null })) })),
+    });
+    from.mockImplementation((tabela: string) => {
+      if (tabela !== 'calls_reunioes') return {};
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle: vi.fn(() =>
+              Promise.resolve({
+                data: {
+                  id: REUNIAO_ID,
+                  oportunidade_id: OPORTUNIDADE_ID,
+                  tipo: 'descoberta',
+                  status: 'agendada',
+                  agendada_para: '2026-08-20T15:00:00.000Z',
+                  duracao_minutos: 45,
+                  google_event_id: 'evento-google',
+                  google_calendar_id: 'primary',
+                },
+                error: null,
+              }),
+            ),
+          })),
+        })),
+        update: atualizar,
+      };
+    });
+  });
+
+  it('não encerra a reunião quando o convite do Google não pôde ser cancelado', async () => {
+    removerCallDoGoogle.mockResolvedValue({ status: 'falhou' });
+    redirect.mockImplementationOnce(() => {
+      throw new Error('NEXT_REDIRECT');
+    });
+    const dados = new FormData();
+    dados.set('reuniao', REUNIAO_ID);
+    dados.set('destino', 'cancelar');
+
+    await expect(resolverReuniaoPendente(dados)).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(redirect).toHaveBeenCalledWith('/reunioes?pendencia=erro');
+    expect(atualizar).not.toHaveBeenCalled();
+  });
+
+  it('só encerra a reunião depois de cancelar o convite antigo', async () => {
+    removerCallDoGoogle.mockResolvedValue({ status: 'removido' });
+    const dados = new FormData();
+    dados.set('reuniao', REUNIAO_ID);
+    dados.set('destino', 'cancelar');
+
+    await resolverReuniaoPendente(dados);
+
+    const dadosAtualizacao = atualizar.mock.calls[0]?.[0] as {
+      status: string;
+      encerrada_em: string;
+    };
+    expect(dadosAtualizacao.status).toBe('cancelada');
+    expect(Date.parse(dadosAtualizacao.encerrada_em)).not.toBeNaN();
+    expect(removerCallDoGoogle.mock.invocationCallOrder[0]).toBeLessThan(
+      atualizar.mock.invocationCallOrder[0]!,
+    );
+    expect(redirect).toHaveBeenCalledWith('/reunioes?pendencia=cancelada');
   });
 });

@@ -290,6 +290,15 @@ export async function resolverReuniaoPendente(formData: FormData): Promise<void>
     redirect('/reunioes?pendencia=erro');
   }
 
+  const remocaoGoogle = await removerCallDoGoogle(supabase, {
+    reuniaoId: reuniao.id,
+    eventoId: reuniao.google_event_id,
+    calendarId: reuniao.google_calendar_id,
+  });
+  if (remocaoGoogle.status === 'falhou') {
+    redirect('/reunioes?pendencia=erro');
+  }
+
   const { error: erroAtualizacao } = await supabase
     .from('calls_reunioes')
     .update({ status: 'cancelada', encerrada_em: new Date().toISOString() })
@@ -299,12 +308,6 @@ export async function resolverReuniaoPendente(formData: FormData): Promise<void>
     console.error(`[calls:resolver-pendencia] ${erroAtualizacao.code}: ${erroAtualizacao.message}`);
     redirect('/reunioes?pendencia=erro');
   }
-
-  await removerCallDoGoogle(supabase, {
-    reuniaoId: reuniao.id,
-    eventoId: reuniao.google_event_id,
-    calendarId: reuniao.google_calendar_id,
-  });
 
   revalidatePath('/calls');
   revalidatePath('/crm');
