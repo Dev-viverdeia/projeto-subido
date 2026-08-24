@@ -12,7 +12,10 @@ import styles from './PainelContas.module.css';
 
 function dataCurta(valor: string | null): string {
   if (!valor) return 'Ainda não entrou';
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(new Date(valor));
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'medium',
+    timeZone: 'America/Sao_Paulo',
+  }).format(new Date(valor));
 }
 
 function nomeConta(conta: ContaAdministrada): string {

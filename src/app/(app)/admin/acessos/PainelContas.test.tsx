@@ -37,6 +37,7 @@ describe('PainelContas', () => {
 
     expect(screen.getByRole('dialog', { name: 'Rafael QA' })).toBeInTheDocument();
     expect(screen.getByText('Adicionar um pacote de créditos')).toBeInTheDocument();
+    expect(screen.getByText('23 de ago. de 2026')).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: /Starter/ }));
 
