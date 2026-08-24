@@ -367,7 +367,8 @@
 .automacao,
 .agenda,
 .liveCoach,
-.historico {
+.historico,
+.pendencias {
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
@@ -375,6 +376,99 @@
     var(--app-elev-1-shadow),
     inset 0 1px 0 var(--via-edge-hi);
   backdrop-filter: var(--via-glass-blur);
+}
+
+.pendencias {
+  overflow: hidden;
+}
+
+.pendencias > header {
+  padding: var(--via-space-5) var(--via-space-6);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.pendencias > header h2 {
+  margin-top: var(--via-space-1);
+}
+
+.pendencias > header p:last-child {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.pendenciasLista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--via-border-hairline);
+}
+
+.pendenciasLista article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  min-width: 0;
+  padding: var(--via-space-5) var(--via-space-6);
+  background: var(--app-elev-1-bg);
+}
+
+.pendenciaData {
+  display: grid;
+  gap: var(--via-space-1);
+  min-width: 72px;
+  padding-right: var(--via-space-4);
+  border-right: 1px solid var(--via-border-hairline);
+}
+
+.pendenciaData strong,
+.pendenciaData span {
+  font-family: var(--via-font-mono);
+}
+
+.pendenciaData strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-transform: lowercase;
+}
+
+.pendenciaData span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.pendenciaConteudo {
+  min-width: 0;
+}
+
+.pendenciaConteudo > span {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  text-transform: uppercase;
+}
+
+.pendenciaConteudo h3,
+.pendenciaConteudo p {
+  margin: 0;
+}
+
+.pendenciaConteudo h3 {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-tight);
+  text-wrap: balance;
+}
+
+.pendenciaConteudo p {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
 }
 
 .automacao {
@@ -888,6 +982,10 @@
   .liveCoach {
     position: static;
   }
+
+  .pendenciasLista {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 767px) {
@@ -943,6 +1041,15 @@
 
   .reuniao > :last-child {
     grid-column: 1 / -1;
+  }
+
+  .pendenciasLista article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .pendenciasLista article > :last-child {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 }
 
@@ -1044,6 +1151,8 @@
 
   .automacao > header,
   .secaoTopo,
+  .pendencias > header,
+  .pendenciasLista article,
   .reuniao,
   .liveCoach,
   .historicoLista article {
@@ -1080,5 +1189,10 @@
   .historicoLink {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .pendenciaData {
+    min-width: 60px;
+    padding-right: var(--via-space-3);
   }
 }

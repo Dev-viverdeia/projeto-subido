@@ -207,6 +207,11 @@
   gap: var(--via-space-5);
 }
 
+.gradeOperacional[hidden],
+.leitura[hidden] {
+  display: none;
+}
+
 .principal,
 .lateral {
   min-width: 0;

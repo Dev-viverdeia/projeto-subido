@@ -1,15 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { from, getClaims, redirect, revalidatePath, rpc, sincronizarCallNoGoogle } = vi.hoisted(
-  () => ({
-    from: vi.fn(),
-    getClaims: vi.fn(),
-    redirect: vi.fn(),
-    revalidatePath: vi.fn(),
-    rpc: vi.fn(),
-    sincronizarCallNoGoogle: vi.fn(),
-  }),
-);
+const {
+  from,
+  getClaims,
+  redirect,
+  revalidatePath,
+  removerCallDoGoogle,
+  rpc,
+  sincronizarCallNoGoogle,
+} = vi.hoisted(() => ({
+  from: vi.fn(),
+  getClaims: vi.fn(),
+  redirect: vi.fn(),
+  revalidatePath: vi.fn(),
+  removerCallDoGoogle: vi.fn(),
+  rpc: vi.fn(),
+  sincronizarCallNoGoogle: vi.fn(),
+}));
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
@@ -17,7 +24,7 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
 }));
-vi.mock('@/lib/google-calendar/eventos', () => ({ sincronizarCallNoGoogle }));
+vi.mock('@/lib/google-calendar/eventos', () => ({ removerCallDoGoogle, sincronizarCallNoGoogle }));
 
 import { agendarReuniao } from './actions';
 

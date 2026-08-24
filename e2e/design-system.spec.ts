@@ -99,4 +99,33 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByText('Somente sua conta')).toBeVisible();
     await expect(page.getByText('Transcrição da reunião')).toBeVisible();
   });
+
+  test('uma reunião vencida abre uma decisão inteira dentro da tela', async ({ page }) => {
+    await page.goto('/preview/calls');
+    await page.getByRole('button', { name: 'Resolver pendência' }).first().click();
+
+    const dialogo = page.getByRole('dialog');
+    await expect(
+      dialogo.getByRole('heading', { name: 'O que aconteceu com esta reunião?' }),
+    ).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Escolher novo horário' })).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Marcar como não realizada' })).toBeVisible();
+
+    const caixa = await dialogo.boundingBox();
+    const viewport = page.viewportSize();
+    expect(caixa).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(caixa!.x).toBeGreaterThanOrEqual(0);
+    expect(caixa!.y).toBeGreaterThanOrEqual(0);
+    expect(caixa!.x + caixa!.width).toBeLessThanOrEqual(viewport!.width + 1);
+    expect(caixa!.y + caixa!.height).toBeLessThanOrEqual(viewport!.height + 1);
+  });
+
+  test('o pós-call em processamento mostra avanço sem expor um resumo vazio', async ({ page }) => {
+    await page.goto('/preview/pos-call?estado=processando');
+
+    await expect(page.getByRole('status')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Salvando a conversa' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toHaveCount(0);
+  });
 });

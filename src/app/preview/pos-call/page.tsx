@@ -150,12 +150,24 @@ const POS_CALL: PosCall = {
   },
 };
 
-export default function PreviewPosCallPage() {
+export default async function PreviewPosCallPage({ searchParams }: PageProps<'/preview/pos-call'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
+  const processando = parametros.estado === 'processando';
+  const posCall = processando
+    ? {
+        ...POS_CALL,
+        reuniao: { ...POS_CALL.reuniao, status: 'processando' as const, encerradaEm: null },
+        analise: null,
+        transcricao: POS_CALL.transcricao
+          ? { ...POS_CALL.transcricao, status: 'processando' }
+          : null,
+      }
+    : POS_CALL;
 
   return (
     <main className={styles.preview}>
-      <DossiePosCall posCall={POS_CALL} estadoAcao={null} />
+      <DossiePosCall posCall={posCall} estadoAcao={null} />
     </main>
   );
 }

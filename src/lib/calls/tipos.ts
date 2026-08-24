@@ -32,3 +32,24 @@ export function tipoCallValido(valor: unknown): valor is TipoCall {
 export function callPodeAbrir(status: StatusCall) {
   return status === 'agendada' || status === 'aguardando' || status === 'ao_vivo';
 }
+
+const MARGEM_FINAL_SALA_MINUTOS = 60;
+
+export function fimDaJanelaDaCall(agendadaPara: string, duracaoMinutos: number): number | null {
+  const inicio = Date.parse(agendadaPara);
+  if (!Number.isFinite(inicio)) return null;
+  return inicio + (duracaoMinutos + MARGEM_FINAL_SALA_MINUTOS) * 60_000;
+}
+
+export function callPassouDaJanela(
+  reuniao: Pick<
+    { status: StatusCall; agendadaPara: string; duracaoMinutos: number },
+    'status' | 'agendadaPara' | 'duracaoMinutos'
+  >,
+  agora: Date | number = Date.now(),
+) {
+  if (!callPodeAbrir(reuniao.status)) return false;
+  const fim = fimDaJanelaDaCall(reuniao.agendadaPara, reuniao.duracaoMinutos);
+  const referencia = agora instanceof Date ? agora.getTime() : agora;
+  return fim !== null && fim < referencia;
+}

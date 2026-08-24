@@ -85,7 +85,7 @@ async function marcarCall(
   supabase: ClienteSupabase,
   reuniaoId: string,
   valores: {
-    google_sync_status: 'sincronizando' | 'sincronizado' | 'falhou';
+    google_sync_status: 'nao_solicitado' | 'sincronizando' | 'sincronizado' | 'falhou';
     convidado_email?: string;
     google_event_id?: string | null;
     google_event_url?: string | null;
@@ -95,6 +95,50 @@ async function marcarCall(
 ) {
   const { error } = await supabase.from('calls_reunioes').update(valores).eq('id', reuniaoId);
   if (error) console.error(`[google-calendar:call] ${error.code}: ${error.message}`);
+}
+
+export async function removerCallDoGoogle(
+  supabase: ClienteSupabase,
+  dados: { reuniaoId: string; eventoId: string | null; calendarId: string | null },
+) {
+  if (!dados.eventoId || !dados.calendarId) return { status: 'sem_evento' } as const;
+
+  const { data, error } = await supabase.rpc('google_calendar_obter_token');
+  const leitura = CredencialSchema.safeParse(data?.[0]);
+  if (error || !leitura.success || leitura.data.status !== 'ativa') {
+    return { status: 'falhou' } as const;
+  }
+
+  try {
+    const refreshToken = decifrarTokenGoogle(leitura.data.refresh_token_cifrado);
+    const tokens = await renovarTokenGoogle(refreshToken);
+    const calendarId = encodeURIComponent(dados.calendarId);
+    const eventoId = encodeURIComponent(dados.eventoId);
+    const resposta = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventoId}?sendUpdates=all`,
+      {
+        method: 'DELETE',
+        headers: { authorization: `Bearer ${tokens.access_token}` },
+        cache: 'no-store',
+      },
+    );
+
+    if (!resposta.ok && resposta.status !== 404 && resposta.status !== 410) {
+      throw new Error(`Google Calendar respondeu ${resposta.status}.`);
+    }
+
+    await marcarCall(supabase, dados.reuniaoId, {
+      google_sync_status: 'nao_solicitado',
+      google_event_id: null,
+      google_event_url: null,
+      google_calendar_id: null,
+      google_sync_erro: null,
+    });
+    return { status: 'removido' } as const;
+  } catch (erro) {
+    console.error('[google-calendar:remover-evento]', erro);
+    return { status: 'falhou' } as const;
+  }
 }
 
 export async function sincronizarCallNoGoogle(

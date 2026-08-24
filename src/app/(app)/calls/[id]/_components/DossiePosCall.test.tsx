@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { PosCall } from '@/lib/calls/queries';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
 vi.mock('./FormularioPlanoCall', () => ({
   FormularioPlanoCall: () => <button type="button">Aplicar plano da call</button>,
 }));
@@ -107,5 +111,26 @@ describe('DossiePosCall', () => {
       'src',
       'https://storage.example/call.mp3?token=temporario',
     );
+  });
+
+  it('mostra somente o acompanhamento enquanto a análise ainda está sendo preparada', () => {
+    render(
+      <DossiePosCall
+        posCall={{
+          ...POS_CALL,
+          reuniao: { ...POS_CALL.reuniao, status: 'processando' },
+          analise: null,
+        }}
+        estadoAcao={null}
+      />,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('Salvando a conversa');
+    expect(
+      screen.queryByRole('heading', { name: 'O que ainda falta saber' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Onde a IA pode ajudar' }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -16,6 +16,7 @@ import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { CentralPlanoCall } from './CentralPlanoCall';
+import { AcompanharProcessamento } from './AcompanharProcessamento';
 import { GravacaoCall } from './GravacaoCall';
 import { ListaFactual, MapaFactual } from './MapaFactual';
 import { RetornoProximaAcao } from './RetornoProximaAcao';
@@ -141,12 +142,18 @@ export function DossiePosCall({
 
         <div className={styles.heroDecisao}>
           <div>
-            <small>Próxima ação sugerida</small>
-            <strong>{acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}</strong>
+            <small>{estado.tipo === 'processando' ? 'Agora' : 'Próxima ação sugerida'}</small>
+            <strong>
+              {estado.tipo === 'processando'
+                ? 'Aguarde o resumo antes de atualizar esta venda'
+                : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
+            </strong>
           </div>
-          <a href="#plano-da-call">
-            Revisar e atualizar a venda <ChevronRight size={15} aria-hidden="true" />
-          </a>
+          {estado.tipo !== 'processando' && (
+            <a href="#plano-da-call">
+              Revisar e atualizar a venda <ChevronRight size={15} aria-hidden="true" />
+            </a>
+          )}
         </div>
 
         <div className={styles.heroMeta}>
@@ -165,7 +172,13 @@ export function DossiePosCall({
 
       <RetornoProximaAcao estado={estadoAcao} />
 
-      <section className={styles.leitura} aria-labelledby="leitura-titulo">
+      {estado.tipo === 'processando' && <AcompanharProcessamento />}
+
+      <section
+        className={styles.leitura}
+        aria-labelledby="leitura-titulo"
+        hidden={estado.tipo === 'processando'}
+      >
         <div className={styles.leituraCorpo}>
           <div className={styles.leituraTopo}>
             <div>
@@ -223,9 +236,11 @@ export function DossiePosCall({
         </div>
       </section>
 
-      <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
+      {estado.tipo !== 'processando' && (
+        <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
+      )}
 
-      <div className={styles.gradeOperacional}>
+      <div className={styles.gradeOperacional} hidden={estado.tipo === 'processando'}>
         <aside className={styles.lateral}>
           <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
             <div className={styles.lacunasTopo}>

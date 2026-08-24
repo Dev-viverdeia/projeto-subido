@@ -13,7 +13,12 @@ import {
   Radio,
   Layers3,
 } from 'lucide-react';
-import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL, callPodeAbrir } from '@/lib/calls/tipos';
+import {
+  ROTULO_STATUS_CALL,
+  ROTULO_TIPO_CALL,
+  callPassouDaJanela,
+  callPodeAbrir,
+} from '@/lib/calls/tipos';
 import type { TipoCall } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
@@ -21,6 +26,7 @@ import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { AcoesSala } from './AcoesSala';
 import { CallRecemAgendada } from './CallRecemAgendada';
 import { FormularioAgendarCall } from './FormularioAgendarCall';
+import { PendenciasReunioes } from './PendenciasReunioes';
 import styles from '../pagina.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -49,6 +55,8 @@ export function PainelCalls({
   oportunidadeInicial,
   tipoInicial,
   calendarResultado,
+  pendenciaResultado,
+  agora = new Date(),
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
@@ -58,8 +66,15 @@ export function PainelCalls({
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
   calendarResultado?: 'sincronizado' | 'falhou';
+  pendenciaResultado?: 'reagendar' | 'cancelada' | 'erro';
+  agora?: Date;
 }) {
-  const ativas = reunioes.filter((item) => callPodeAbrir(item.status));
+  const pendentes = reunioes
+    .filter((item) => callPassouDaJanela(item, agora))
+    .sort((a, b) => b.agendadaPara.localeCompare(a.agendadaPara));
+  const ativas = reunioes.filter(
+    (item) => callPodeAbrir(item.status) && !callPassouDaJanela(item, agora),
+  );
   const historico = reunioes
     .filter((item) => !callPodeAbrir(item.status))
     .sort((a, b) => b.agendadaPara.localeCompare(a.agendadaPara));
@@ -98,6 +113,24 @@ export function PainelCalls({
         <div className={styles.confirmacao} data-tom="erro" role="alert">
           <CalendarX2 size={17} strokeWidth={1.8} aria-hidden="true" />A sala foi criada, mas o
           convite não saiu. Reconecte o calendário antes de tentar de novo.
+        </div>
+      )}
+      {pendenciaResultado === 'cancelada' && (
+        <div className={styles.confirmacao} role="status">
+          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />A reunião foi marcada
+          como não realizada e saiu da agenda.
+        </div>
+      )}
+      {pendenciaResultado === 'reagendar' && (
+        <div className={styles.confirmacao} role="status">
+          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />O horário anterior foi
+          encerrado. Escolha a nova data para o mesmo cliente.
+        </div>
+      )}
+      {pendenciaResultado === 'erro' && (
+        <div className={styles.confirmacao} data-tom="erro" role="alert">
+          <CalendarX2 size={17} strokeWidth={1.8} aria-hidden="true" />
+          Não foi possível atualizar essa reunião. Recarregue a página e tente novamente.
         </div>
       )}
 
@@ -156,6 +189,8 @@ export function PainelCalls({
           </div>
         </section>
       )}
+
+      <PendenciasReunioes reunioes={pendentes} />
 
       <section className={styles.automacao} aria-labelledby="fluxo-calls-titulo">
         <header>
