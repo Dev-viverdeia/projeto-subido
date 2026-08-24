@@ -68,6 +68,7 @@ export const ROTULOS: Record<RotaApp, string> = {
  * que `/conta` case com um futuro `/contas`.
  */
 export function rotuloDaRota(caminho: string): string | null {
+  if (caminho === '/conta/creditos') return 'Créditos';
   const rota = ROTAS_APP.find((r) => caminho === r || caminho.startsWith(`${r}/`));
   return rota ? ROTULOS[rota] : null;
 }

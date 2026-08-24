@@ -116,7 +116,7 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       )}
 
       <section className={styles.economia} aria-label="Plano e créditos">
-        <article>
+        <Link href="/conta/creditos" className={styles.cartaoEconomia}>
           <span className={styles.iconeEconomia} aria-hidden="true">
             <Coins size={20} strokeWidth={1.7} />
           </span>
@@ -129,7 +129,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
                 : 'Use em prospecção, enriquecimento e mentorias.'}
             </small>
           </div>
-        </article>
+          <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
+        </Link>
         <article>
           <span className={styles.iconeEconomia} aria-hidden="true">
             <Layers3 size={20} strokeWidth={1.7} />
