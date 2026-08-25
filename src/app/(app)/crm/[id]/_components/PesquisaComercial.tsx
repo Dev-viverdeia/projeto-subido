@@ -25,6 +25,7 @@ import {
   ROTULO_ORIGEM,
   type DossieEnriquecido,
 } from '@/lib/crm/enriquecimento';
+import { acaoParaFicha, resumoParaFicha, valorFatoParaFicha } from '@/lib/crm/apresentacao';
 import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
 import { AcaoPesquisaComercial } from './AcaoPesquisaComercial';
@@ -57,7 +58,7 @@ function ListaFatos({ dossie }: { dossie: DossieEnriquecido }) {
               <div>
                 <span>{ROTULO_ORIGEM[fato.origem]}</span>
                 <strong>{fato.titulo}</strong>
-                <p>{fato.valor}</p>
+                <p>{valorFatoParaFicha(fato.valor)}</p>
                 {fato.urlFonte && (
                   <a href={fato.urlFonte} target="_blank" rel="noreferrer">
                     Abrir fonte <ExternalLink size={12} aria-hidden="true" />
@@ -353,7 +354,8 @@ export function PesquisaComercial({
           </span>
           <div>
             <p>Ficha enriquecida</p>
-            <h2 id="pesquisa-comercial-titulo">{dossie.resumo}</h2>
+            <h2 id="pesquisa-comercial-titulo">Leitura para a próxima reunião</h2>
+            <p className={styles.resumoDossie}>{resumoParaFicha(dossie.resumo)}</p>
             <small>
               Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)}. Fatos
               confirmados e pontos a validar ficam separados.
@@ -361,7 +363,12 @@ export function PesquisaComercial({
           </div>
         </div>
 
-        <AcaoPesquisaComercial lead={lead} dossie={dossie} enriquecimentoId={execucao.id} />
+        <AcaoPesquisaComercial
+          lead={lead}
+          dossie={dossie}
+          enriquecimentoId={execucao.id}
+          acaoVisivel={acaoParaFicha(dossie.proximaAcao.acao)}
+        />
       </div>
 
       <div className={styles.conteudoPesquisa}>

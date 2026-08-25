@@ -41,6 +41,7 @@
 
 .leituraPrincipal p,
 .leituraPrincipal h2,
+.leituraPrincipal .resumoDossie,
 .leituraPrincipal small,
 .proximaAcao p,
 .proximaAcao h3,
@@ -70,6 +71,18 @@
   text-wrap: pretty;
 }
 
+.leituraPrincipal .resumoDossie {
+  max-width: 68ch;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-body);
+  font-family: var(--via-font);
+  font-size: var(--via-fs-sm);
+  letter-spacing: normal;
+  line-height: var(--via-lh-normal);
+  text-transform: none;
+  text-wrap: pretty;
+}
+
 .leituraPrincipal small {
   margin-top: var(--via-space-3);
   color: var(--via-text-muted);
@@ -93,7 +106,7 @@
 .proximaAcao h3 {
   margin-top: var(--via-space-3);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-h3);
+  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-h3);

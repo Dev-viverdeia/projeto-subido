@@ -9,13 +9,13 @@ export const PedidoEnriquecimento = z
 const TextoCurto = z.string().trim().min(1).max(500);
 
 const CamposFato = {
-  titulo: z.string().trim().min(1).max(120),
-  valor: z.string().trim().min(1).max(600),
+  titulo: z.string().trim().min(1).max(90),
+  valor: z.string().trim().min(1).max(260),
   origem: z.enum(['crm', 'site', 'informado']),
 };
 
 const CamposDossie = {
-  resumo: z.string().trim().min(40).max(1000),
+  resumo: z.string().trim().min(80).max(360),
   empresa: z.object({
     setor: z.string().trim().min(1).max(160).nullable(),
     porte: z.string().trim().min(1).max(120).nullable(),
@@ -26,23 +26,23 @@ const CamposDossie = {
   hipoteses: z
     .array(
       z.object({
-        titulo: z.string().trim().min(1).max(140),
-        explicacao: z.string().trim().min(1).max(700),
+        titulo: z.string().trim().min(1).max(110),
+        explicacao: z.string().trim().min(1).max(320),
         confianca: z.enum(['alta', 'media', 'baixa']),
-        comoValidar: z.string().trim().min(1).max(500),
-      }),
-    )
-    .max(8),
-  oportunidades: z
-    .array(
-      z.object({
-        titulo: z.string().trim().min(1).max(140),
-        impacto: z.string().trim().min(1).max(500),
-        porQueAgora: z.string().trim().min(1).max(500),
-        abertura: z.string().trim().min(1).max(700),
+        comoValidar: z.string().trim().min(1).max(240),
       }),
     )
     .max(5),
+  oportunidades: z
+    .array(
+      z.object({
+        titulo: z.string().trim().min(1).max(110),
+        impacto: z.string().trim().min(1).max(280),
+        porQueAgora: z.string().trim().min(1).max(280),
+        abertura: z.string().trim().min(1).max(240),
+      }),
+    )
+    .max(3),
   perguntasDescoberta: z.array(TextoCurto).max(8),
   roteiroCall: z.object({
     objetivo: z.string().trim().min(1).max(500),
@@ -65,10 +65,10 @@ const CamposDossie = {
     }),
   }),
   proximaAcao: z.object({
-    acao: z.string().trim().min(1).max(500),
-    porque: z.string().trim().min(1).max(700),
+    acao: z.string().trim().min(1).max(150),
+    porque: z.string().trim().min(1).max(320),
   }),
-  alertas: z.array(TextoCurto).max(5),
+  alertas: z.array(z.string().trim().min(1).max(280)).max(4),
 };
 
 export const DossieGerado = z.object({
@@ -80,7 +80,7 @@ export const DossieGerado = z.object({
         urlFonte: z.url().max(1000).optional(),
       }),
     )
-    .max(12),
+    .max(8),
 });
 
 /** A OpenAI exige todos os campos como required em Structured Outputs. URL

@@ -48,20 +48,25 @@ REGRAS INEGOCIÁVEIS
 · O fechamento só recomenda avançar quando houver aderência. Diga qual sinal justifica avançar e
   proponha uma próxima reunião, diagnóstico curto ou piloto compatível com o caso.
 · A próxima ação deve ser executável e caber em uma frase.
+· Escreva para um profissional, não para o banco de dados. Nunca exponha UUID, nome de coluna,
+  timestamp ISO, código de etapa ou termos como "novo_lead", "criado_em" e "origem manual".
+· O resumo deve ter duas ou três frases curtas: contexto confirmado, principal lacuna e objetivo
+  da próxima conversa. Não comece com "lead novo" nem repita o nome do projeto inteiro.
+· Em fatos, traduza datas e estados técnicos para português comum. Um fato deve caber em um card.
 · Se uma fonte pública falhou ou há pouco contexto, coloque isso em "alertas".
 · Escreva em português do Brasil, direto, sem caixa alta ou exclamação.
 
 ORÇAMENTO DOS CAMPOS
-· resumo: de 40 a 1.000 caracteres
+· resumo: de 80 a 360 caracteres
 · empresa: setor até 160; porte, cidade e estado até 120; modelo de negócio até 300
-· fatos: até 12; título até 120; valor até 600
-· hipóteses: até 8; título até 140; explicação até 700; validação até 500
-· oportunidades: até 5; título até 140; impacto e motivo até 500; abertura até 700
+· fatos: até 8; título até 90; valor até 260
+· hipóteses: até 5; título até 110; explicação até 320; validação até 240
+· oportunidades: até 3; título até 110; impacto e motivo até 280; abertura até 240
 · perguntas de descoberta: até 8; devem espelhar as perguntas centrais do roteiro
 · roteiro da call: objetivo até 500; abertura até 700; de 4 a 7 perguntas; intenção até 500;
   fechamento com sinal, frase e próximo passo dentro dos limites do schema
-· próxima ação: ação até 500; motivo até 700
-· alertas: até 5, cada um com até 500 caracteres
+· próxima ação: ação até 150; motivo até 320
+· alertas: até 4, cada um com até 280 caracteres
 Respeitar esses limites faz parte da tarefa. Corte o item menos útil antes de
 ultrapassar qualquer teto.`;
 
@@ -399,40 +404,40 @@ function normalizarDossie(valor: unknown): Dossie {
   const roteiro = objeto(raiz.roteiroCall);
   const fechamento = objeto(roteiro.fechamento);
 
-  const hipoteses = lista(raiz.hipoteses, 8).map((item) => {
+  const hipoteses = lista(raiz.hipoteses, 5).map((item) => {
     const hipotese = objeto(item);
     return {
-      titulo: texto(hipotese.titulo, 140, 'Hipótese para validar'),
+      titulo: texto(hipotese.titulo, 110, 'Hipótese para validar'),
       explicacao: texto(
         hipotese.explicacao,
-        700,
+        320,
         'Esta leitura ainda precisa ser confirmada com o lead.',
       ),
       confianca: enumSeguro(hipotese.confianca, ['alta', 'media', 'baixa'] as const, 'baixa'),
       comoValidar: texto(
         hipotese.comoValidar,
-        500,
+        240,
         'Pergunte diretamente sobre esse ponto na próxima conversa.',
       ),
     };
   });
-  const oportunidades = lista(raiz.oportunidades, 5).map((item) => {
+  const oportunidades = lista(raiz.oportunidades, 3).map((item) => {
     const oportunidade = objeto(item);
     return {
-      titulo: texto(oportunidade.titulo, 140, 'Oportunidade de projeto'),
+      titulo: texto(oportunidade.titulo, 110, 'Oportunidade de projeto'),
       impacto: texto(
         oportunidade.impacto,
-        500,
+        280,
         'O impacto precisa ser dimensionado após a descoberta.',
       ),
       porQueAgora: texto(
         oportunidade.porQueAgora,
-        500,
+        280,
         'Há um sinal que merece investigação na próxima conversa.',
       ),
       abertura: texto(
         oportunidade.abertura,
-        700,
+        240,
         'Quero entender melhor esse processo antes de sugerir uma solução.',
       ),
     };
@@ -441,10 +446,10 @@ function normalizarDossie(valor: unknown): Dossie {
     texto(item, 500, 'Como esse processo funciona hoje?'),
   );
   const proximaAcao = {
-    acao: texto(proxima.acao, 500, 'Agendar uma conversa de descoberta com o lead.'),
+    acao: texto(proxima.acao, 150, 'Agendar uma conversa de descoberta com o lead.'),
     porque: texto(
       proxima.porque,
-      700,
+      320,
       'Ainda é preciso confirmar o processo atual antes de desenhar o projeto.',
     ),
   };
@@ -486,7 +491,7 @@ function normalizarDossie(valor: unknown): Dossie {
     resumo: textoComMinimo(
       raiz.resumo,
       40,
-      1000,
+      360,
       'Há pouco contexto confirmado sobre este cliente; use a próxima conversa para completar a ficha.',
     ),
     empresa: {
@@ -496,11 +501,11 @@ function normalizarDossie(valor: unknown): Dossie {
       estado: textoOuNulo(empresa.estado, 120),
       modeloNegocio: textoOuNulo(empresa.modeloNegocio, 300),
     },
-    fatos: lista(raiz.fatos, 12).map((item) => {
+    fatos: lista(raiz.fatos, 8).map((item) => {
       const fato = objeto(item);
       return {
-        titulo: texto(fato.titulo, 120, 'Fato encontrado'),
-        valor: texto(fato.valor, 600, 'Informação registrada nas fontes.'),
+        titulo: texto(fato.titulo, 90, 'Fato encontrado'),
+        valor: texto(fato.valor, 260, 'Informação registrada nas fontes.'),
         origem: enumSeguro(fato.origem, ['crm', 'site', 'informado'] as const, 'crm'),
         urlFonte: urlOuIndefinida(fato.urlFonte),
       };
@@ -537,8 +542,8 @@ function normalizarDossie(valor: unknown): Dossie {
       },
     },
     proximaAcao,
-    alertas: lista(raiz.alertas, 5).map((item) =>
-      texto(item, 500, 'Esta informação precisa ser confirmada.'),
+    alertas: lista(raiz.alertas, 4).map((item) =>
+      texto(item, 280, 'Esta informação precisa ser confirmada.'),
     ),
   };
 
