@@ -3,31 +3,21 @@
 import {
   ArrowDown,
   BookOpenCheck,
-  BookOpenText,
   Check,
   CheckCircle2,
   Clapperboard,
   Clock3,
-  ExternalLink,
   FileText,
-  ListChecks,
-  Network,
 } from 'lucide-react';
 import type { RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { idAulaProjeto } from '@/lib/projetos/roteiro';
 import { useAcoesProgresso, useProgresso } from '@/lib/progresso/local';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { VideoConteudo } from '../../_components/VideoConteudo';
+import { RecursosAula } from './RecursosAula';
 import styles from './TrilhaDidaticaProjeto.module.css';
 
 type Trilha = NonNullable<RoteiroProjeto['trilhaDidatica']>;
-
-const ROTULOS_RECURSO = {
-  mapa_mental: { rotulo: 'Mapa mental', Icone: Network },
-  quiz: { rotulo: 'Quiz', Icone: ListChecks },
-  ebook: { rotulo: 'E-book', Icone: BookOpenText },
-  modelo: { rotulo: 'Modelo', Icone: FileText },
-} as const;
 
 export function TrilhaDidaticaProjeto({
   slug,
@@ -196,39 +186,7 @@ export function TrilhaDidaticaProjeto({
                     </div>
                   </dl>
 
-                  {(aula.recursos ?? []).length > 0 ? (
-                    <section className={styles.recursosAula} aria-label="Recursos desta aula">
-                      <h4>Recursos desta aula</h4>
-                      <div>
-                        {(aula.recursos ?? []).map((recurso) => {
-                          const { rotulo, Icone } = ROTULOS_RECURSO[recurso.tipo];
-                          return (
-                            <article key={recurso.titulo}>
-                              <span className={styles.iconeRecurso} aria-hidden="true">
-                                <Icone size={17} strokeWidth={1.7} />
-                              </span>
-                              <div>
-                                <small>{rotulo}</small>
-                                <strong>{recurso.titulo}</strong>
-                                <p>{recurso.descricao}</p>
-                                {recurso.url ? (
-                                  <a href={recurso.url} target="_blank" rel="noreferrer">
-                                    Abrir recurso <ExternalLink size={13} aria-hidden="true" />
-                                  </a>
-                                ) : null}
-                                {recurso.conteudo ? (
-                                  <details>
-                                    <summary>Abrir recurso</summary>
-                                    <pre>{recurso.conteudo}</pre>
-                                  </details>
-                                ) : null}
-                              </div>
-                            </article>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ) : null}
+                  <RecursosAula recursos={aula.recursos ?? []} />
 
                   <footer className={styles.conclusaoAula}>
                     <div>
