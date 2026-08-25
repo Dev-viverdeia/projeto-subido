@@ -18,8 +18,25 @@ describe('apresentação da ficha enriquecida', () => {
     ).toBe('Enviar email para Mariana propondo reunião de 30 minutos.');
   });
 
+  it('não deixa preposição solta nem pontuação duplicada ao encurtar uma ação antiga', () => {
+    const acao = acaoParaFicha(
+      'Ligar para o telefone +55 48 99619-2888 e solicitar falar com a responsável (provável Lívia) para agendar a call de descoberta com todo o time responsável pelo atendimento',
+    );
+
+    expect(acao).not.toMatch(/\s(?:de|da|do|para|com|e)…\.$/i);
+    expect(acao).not.toContain('….');
+  });
+
   it('limita resumos legados muito longos', () => {
     expect(resumoParaFicha('Contexto '.repeat(80)).length).toBeLessThanOrEqual(261);
+  });
+
+  it('preserva número decimal sem inserir espaço depois do ponto', () => {
+    expect(
+      resumoParaFicha(
+        'Estúdio LS CLÍNICA em Florianópolis com forte reputação local (99 avaliações, média 4.9). O contato público está disponível.',
+      ),
+    ).toContain('média 4,9');
   });
 
   it('remove hora técnica de fatos comerciais', () => {
