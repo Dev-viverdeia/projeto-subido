@@ -28,6 +28,29 @@ function roteiroValido() {
   };
 }
 
+function recursosAulaTeste() {
+  return [
+    {
+      tipo: 'mapa_mental' as const,
+      titulo: 'Mapa do projeto',
+      descricao: 'Organize as decisões e os limites que orientam esta parte do trabalho.',
+      conteudo: 'Entrada → decisão → execução → revisão → entrega ao cliente',
+    },
+    {
+      tipo: 'quiz' as const,
+      titulo: 'Pode avançar?',
+      descricao: 'Revise se as condições necessárias foram confirmadas antes do próximo passo.',
+      conteudo: 'Os dados, responsáveis, limites e critérios de aceite estão documentados?',
+    },
+  ];
+}
+
+const videoReferenciaTeste = {
+  titulo: 'Solução de referência',
+  descricao: 'Uma demonstração real da experiência, da execução e do resultado esperado.',
+  videoUrl: 'https://video.example.com/embed/123',
+};
+
 describe('roteiro de Projeto', () => {
   it('aceita as cinco fases na ordem do método', () => {
     const roteiro = lerRoteiroProjeto(roteiroValido());
@@ -35,7 +58,7 @@ describe('roteiro de Projeto', () => {
     expect(roteiro?.fundamentos).toEqual([]);
   });
 
-  it('aceita guia aprofundado sem tornar o novo conteúdo obrigatório nos projetos antigos', () => {
+  it('aceita um minicurso completo com aulas, recursos e implementação', () => {
     const valor = roteiroValido();
     Object.assign(valor, {
       fundamentos: [
@@ -100,15 +123,10 @@ describe('roteiro de Projeto', () => {
             topicos: ['Alerta com dono e prazo', 'Ação e desfecho na mesma linha do tempo'],
             exercicio: 'Simule uma resposta crítica e acompanhe o caso até o fechamento humano.',
             prontoQuando: 'O alerta tem fonte, responsável, prazo, contato e desfecho registrados.',
+            recursos: recursosAulaTeste(),
           },
         ],
-        videosReferencia: [
-          {
-            titulo: 'Solução de referência',
-            descricao: 'Uma demonstração real da experiência de coleta, leitura e fechamento.',
-            videoUrl: 'https://video.example.com/embed/123',
-          },
-        ],
+        videosReferencia: [videoReferenciaTeste],
         demonstracao: {
           titulo: 'Da resposta ao fechamento',
           contexto: 'Uma cliente responde à pesquisa com nota baixa e um comentário sobre espera.',
@@ -186,6 +204,80 @@ describe('roteiro de Projeto', () => {
     expect(lerRoteiroProjeto(invalido)).toBeNull();
   });
 
+  it('rejeita minicurso sem vídeo ou sem recursos práticos em cada aula', () => {
+    const valor = roteiroValido();
+    Object.assign(valor, {
+      trilhaDidatica: {
+        tempoTotal: '20 minutos',
+        aulas: [
+          {
+            titulo: 'Entenda o projeto',
+            objetivo: 'Aprender o resultado antes de configurar a entrega para o cliente.',
+            duracao: '8 min',
+            topicos: ['Resultado esperado', 'Limites da entrega'],
+            exercicio: 'Explique a entrega em uma frase objetiva e verificável.',
+            prontoQuando: 'A entrega ficou clara, limitada e verificável.',
+          },
+          {
+            titulo: 'Prepare a execução',
+            objetivo: 'Separar os insumos necessários para iniciar o piloto com segurança.',
+            duracao: '12 min',
+            topicos: ['Insumos necessários', 'Pessoas responsáveis'],
+            exercicio: 'Liste os acessos e as pessoas responsáveis pela validação.',
+            prontoQuando: 'Os insumos e responsáveis foram confirmados.',
+          },
+        ],
+        videosReferencia: [],
+        demonstracao: {
+          titulo: 'Caso de referência',
+          contexto: 'Uma empresa precisa validar o primeiro fluxo antes de colocar no ar.',
+          passos: [
+            {
+              etapa: 'Entrada',
+              oQueAcontece: 'O caso é registrado com os dados necessários.',
+              evidencia: 'Registro com horário',
+            },
+            {
+              etapa: 'Processamento',
+              oQueAcontece: 'O fluxo executa a regra aprovada pelo cliente.',
+              evidencia: 'Resultado rastreável',
+            },
+            {
+              etapa: 'Revisão',
+              oQueAcontece: 'Uma pessoa confirma o resultado antes do uso.',
+              evidencia: 'Aceite do responsável',
+            },
+            {
+              etapa: 'Fechamento',
+              oQueAcontece: 'A evidência final fica anexada à entrega.',
+              evidencia: 'Entrega registrada',
+            },
+          ],
+          resultadoEsperado: 'O piloto termina com evidência e aceite do responsável.',
+        },
+        materiais: [
+          {
+            titulo: 'Briefing do projeto',
+            quandoUsar: 'Antes da primeira conversa com o cliente.',
+            conteudo: 'Objetivo:\nProblema:\nResponsável:\nResultado esperado:',
+          },
+          {
+            titulo: 'Checklist do piloto',
+            quandoUsar: 'Antes de ativar o primeiro fluxo em ambiente controlado.',
+            conteudo: '[ ] Insumos confirmados\n[ ] Responsável definido\n[ ] Teste documentado',
+          },
+          {
+            titulo: 'Termo de aceite',
+            quandoUsar: 'Ao concluir o piloto com a pessoa responsável.',
+            conteudo: 'Entrega:\nCritérios atendidos:\nPendências:\nAceite do responsável:',
+          },
+        ],
+      },
+    });
+
+    expect(lerRoteiroProjeto(valor)).toBeNull();
+  });
+
   it('gera ids estáveis de progresso a partir da identidade editorial', () => {
     const roteiro = lerRoteiroProjeto(roteiroValido());
     expect(roteiro).not.toBeNull();
@@ -208,6 +300,7 @@ describe('roteiro de Projeto', () => {
             topicos: ['Resultado esperado', 'Limites da entrega'],
             exercicio: 'Explique a entrega em uma frase.',
             prontoQuando: 'A entrega ficou clara e verificável.',
+            recursos: recursosAulaTeste(),
           },
           {
             titulo: 'Prepare a execução',
@@ -216,9 +309,10 @@ describe('roteiro de Projeto', () => {
             topicos: ['Insumos necessários', 'Pessoas responsáveis'],
             exercicio: 'Liste os acessos e as pessoas responsáveis.',
             prontoQuando: 'Os insumos e responsáveis foram confirmados.',
+            recursos: recursosAulaTeste(),
           },
         ],
-        videosReferencia: [],
+        videosReferencia: [videoReferenciaTeste],
         demonstracao: {
           titulo: 'Caso de referência',
           contexto: 'Uma empresa precisa validar o primeiro fluxo.',

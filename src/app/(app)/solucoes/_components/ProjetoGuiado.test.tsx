@@ -63,6 +63,20 @@ const projeto: DadosRoteiroProjeto = {
           topicos: ['Cenários comuns e críticos', 'Evidência e reteste antes da ativação'],
           exercicio: 'Rode um cenário comum, um ambíguo e um que exija passagem humana.',
           prontoQuando: 'Todos os cenários deixam evidência e respeitam os limites aprovados.',
+          recursos: [
+            {
+              tipo: 'modelo',
+              titulo: 'Roteiro de validação',
+              descricao: 'Registre cenário, resultado esperado, evidência e correção necessária.',
+              conteudo: 'Cenário:\nResultado esperado:\nEvidência:\nCorreção:\nReteste:',
+            },
+            {
+              tipo: 'quiz',
+              titulo: 'Pode ativar?',
+              descricao: 'Confirme os limites, os testes e a passagem humana antes da ativação.',
+              conteudo: 'Os cenários comuns, ambíguos e críticos foram aprovados pelo responsável?',
+            },
+          ],
         },
       ],
       videosReferencia: [
@@ -238,7 +252,7 @@ describe('Projeto guiado', () => {
     expect(
       screen.getByText(/Conclua as aulas, use os modelos e entre na implementação/),
     ).toBeDefined();
-    expect(screen.getByText('2 aulas · 2 recursos')).toBeDefined();
+    expect(screen.getByText('2 aulas · 4 recursos')).toBeDefined();
     expect(screen.getByRole('progressbar', { name: 'Progresso do aprendizado' })).toHaveAttribute(
       'aria-valuenow',
       '0',
@@ -286,6 +300,26 @@ describe('Projeto guiado', () => {
       'aria-valuenow',
       '50',
     );
+    expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    );
+  });
+
+  it('mostra a conclusão do aprendizado e leva para a implementação', async () => {
+    const user = userEvent.setup();
+    montar();
+
+    await user.click(screen.getAllByRole('button', { name: 'Concluir aula' })[0]!);
+    await user.click(screen.getByRole('button', { name: 'Concluir aula' }));
+
+    const conclusao = screen.getByRole('complementary', { name: 'Aprendizado concluído' });
+    expect(within(conclusao).getByText('Aprendizado concluído')).toBeVisible();
+    expect(within(conclusao).getByRole('link', { name: /Ir para implementação/ })).toHaveAttribute(
+      'href',
+      '#implementacao-projeto',
+    );
+    expect(screen.getByText('2 aulas concluídas')).toBeVisible();
     expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
       'aria-valuenow',
       '0',
