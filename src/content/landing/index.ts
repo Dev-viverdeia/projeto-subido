@@ -374,10 +374,10 @@ export const PLANS: Plan[] = [
     pitch: 'Para começar a implementar e provar que funciona.',
     priceMonthly: 197,
     features: [
-      'Soluções com passo a passo',
-      'Formações completas',
-      'Builder com limite mensal',
-      'Mentoria em grupo',
+      'Formações e projetos passo a passo',
+      'Sobral AI para orientar o próximo passo',
+      'Reuniões com Live Coach',
+      'Mentorias e certificados',
     ],
     cta: 'Assinar agora',
     ctaHref: '/entrar',
@@ -389,9 +389,9 @@ export const PLANS: Plan[] = [
     priceMonthly: 397,
     features: [
       'Tudo do Starter',
-      'Builder sem limite',
-      'Mentoria individual por crédito',
-      'Certificação e vitrine no HUB',
+      'Prospecção e listas qualificadas',
+      'Vendas, métricas e propostas',
+      'Enriquecimento das fichas de clientes',
     ],
     cta: 'Assinar agora',
     ctaHref: '/entrar',
@@ -405,8 +405,8 @@ export const PLANS: Plan[] = [
     features: [
       'Tudo do Pro para o time inteiro',
       'Gestão de acessos e relatórios',
-      'Acesso de contratante ao HUB',
       'Onboarding e suporte dedicados',
+      'Controles avançados para equipes',
     ],
     cta: 'Falar com o time',
     ctaHref: '/entrar',
@@ -447,8 +447,8 @@ export const FAQ: FaqItem[] = [
     a: 'Os encontros em grupo são ao vivo, em sala de vídeo dentro da plataforma, e ficam gravados. As sessões individuais são agendadas por crédito.',
   },
   {
-    q: 'O Builder tem limite de uso?',
-    a: 'No Starter há um limite mensal de gerações. No Pro e no Enterprise o uso é livre.',
+    q: 'Qual é a diferença entre Starter e Pro?',
+    a: 'O Starter reúne formação, projetos, Sobral AI, mentorias e reuniões com Live Coach. O Pro acrescenta a operação comercial: prospecção, Vendas, métricas, propostas e enriquecimento de clientes.',
   },
   {
     q: 'Serve para quem ainda não tem empresa nem clientes?',

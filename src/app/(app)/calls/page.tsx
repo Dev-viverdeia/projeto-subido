@@ -4,14 +4,17 @@ import { listarReunioes } from '@/lib/calls/queries';
 import { tipoCallValido } from '@/lib/calls/tipos';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
+import { obterAcessoRecurso } from '@/lib/planos/server';
 import { PainelCalls } from './_components/PainelCalls';
 
 export const metadata: Metadata = { title: 'Reuniões' };
 
 export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
+  const acessoComercial = await obterAcessoRecurso('modulo_comercial');
+  const comercialLiberado = acessoComercial.permitido;
   const [reunioes, oportunidades, calendar, parametros] = await Promise.all([
     listarReunioes(),
-    listarOportunidadesSeletor(),
+    comercialLiberado ? listarOportunidadesSeletor() : Promise.resolve([]),
     obterEstadoGoogleCalendar(),
     searchParams,
   ]);
@@ -21,6 +24,7 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
     <PainelCalls
       reunioes={reunioes}
       oportunidades={oportunidades}
+      comercialLiberado={comercialLiberado}
       calendar={calendar}
       agendadaId={agendada.success ? agendada.data : undefined}
       modalInicial={parametros.nova === '1'}

@@ -31,6 +31,27 @@ const CALENDAR_CONECTADO = {
 };
 
 describe('FormularioAgendarCall', () => {
+  it('abre um agendamento simples no Starter sem mandar a pessoa para Vendas', () => {
+    agendarReuniaoMock.mockResolvedValue({});
+    render(
+      <FormularioAgendarCall
+        oportunidades={[]}
+        calendar={CALENDAR_CONECTADO}
+        comercialLiberado={false}
+        abertoInicial
+      />,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Agendar reunião' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Empresa')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pessoa convidada')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Cliente em negociação')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /Adicionar primeiro cliente/ }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue('');
+  });
+
   it('abre com oportunidade real, Live Coach ativo e devolve o foco ao fechar', async () => {
     agendarReuniaoMock.mockResolvedValue({});
     render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);

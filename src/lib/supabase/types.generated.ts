@@ -2793,6 +2793,23 @@ export type Database = {
           reuniao_id: string
         }[]
       }
+      calls_agendar_reuniao_starter: {
+        Args: {
+          p_agendada_para: string
+          p_contato_email: string
+          p_contato_nome: string
+          p_duracao_minutos?: number
+          p_empresa_nome: string
+          p_live_coach_ativo?: boolean
+          p_tipo: Database["public"]["Enums"]["calls_tipo"]
+          p_titulo?: string
+        }
+        Returns: {
+          codigo_publico: string
+          oportunidade_id: string
+          reuniao_id: string
+        }[]
+      }
       calls_aplicar_plano: {
         Args: {
           p_acao: string

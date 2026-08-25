@@ -7,13 +7,16 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import { removerCallDoGoogle, sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
+import { planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
 import { callPassouDaJanela, TIPOS_CALL } from './tipos';
 
 const tipos = TIPOS_CALL.map((tipo) => tipo.id) as [string, ...string[]];
 
 const agendarSchema = z
   .object({
-    oportunidade: z.uuid('Escolha um cliente em Vendas.'),
+    oportunidade: z.union([z.literal(''), z.uuid('Escolha um cliente em Vendas.')]),
+    empresa: z.string().trim().max(160, 'Nome da empresa muito longo.'),
+    contato: z.string().trim().max(160, 'Nome do contato muito longo.'),
     tipo: z.enum(tipos),
     titulo: z.string().trim().max(180, 'Título muito longo.'),
     agendadaPara: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Escolha data e horário.'),
@@ -51,7 +54,14 @@ const pendenciaSchema = z.object({
 });
 
 type CampoAgendamento =
-  'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao' | 'convidadoEmail';
+  | 'oportunidade'
+  | 'empresa'
+  | 'contato'
+  | 'tipo'
+  | 'titulo'
+  | 'agendadaPara'
+  | 'duracao'
+  | 'convidadoEmail';
 
 export type EstadoAgendamento = {
   erro?: string;
@@ -81,6 +91,8 @@ export async function agendarReuniao(
 ): Promise<EstadoAgendamento> {
   const campos = {
     oportunidade: texto(formData, 'oportunidade'),
+    empresa: texto(formData, 'empresa'),
+    contato: texto(formData, 'contato'),
     tipo: texto(formData, 'tipo'),
     titulo: texto(formData, 'titulo'),
     agendadaPara: texto(formData, 'agendadaPara'),
@@ -101,6 +113,8 @@ export async function agendarReuniao(
       campos,
       porCampo: {
         oportunidade: erros.oportunidade?.[0],
+        empresa: erros.empresa?.[0],
+        contato: erros.contato?.[0],
         tipo: erros.tipo?.[0],
         titulo: erros.titulo?.[0],
         agendadaPara: erros.agendadaPara?.[0],
@@ -113,6 +127,18 @@ export async function agendarReuniao(
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+  const plano = planoDosMetadados(claims.claims.app_metadata);
+  const comercialLiberado = planoTemRecurso(plano, 'modulo_comercial');
+
+  if (comercialLiberado && !validacao.data.oportunidade) {
+    return { campos, porCampo: { oportunidade: 'Escolha um cliente em Vendas.' } };
+  }
+  if (!comercialLiberado && !validacao.data.empresa) {
+    return { campos, porCampo: { empresa: 'Digite o nome da empresa.' } };
+  }
+  if (!comercialLiberado && !validacao.data.contato) {
+    return { campos, porCampo: { contato: 'Digite o nome da pessoa convidada.' } };
+  }
 
   const { data: conexaoCalendar, error: erroCalendar } = await supabase
     .from('google_calendar_conexoes')
@@ -136,21 +162,37 @@ export async function agendarReuniao(
     return { campos, porCampo: { agendadaPara: 'Escolha uma data válida.' } };
   }
 
-  const { data, error } = await supabase.rpc('calls_agendar_reuniao', {
-    p_oportunidade: validacao.data.oportunidade,
+  const parametrosComuns = {
     p_tipo: validacao.data.tipo as (typeof TIPOS_CALL)[number]['id'],
     p_agendada_para: quando.toISOString(),
     p_duracao_minutos: validacao.data.duracao,
     p_titulo: validacao.data.titulo || undefined,
     p_live_coach_ativo: validacao.data.liveCoach,
-  });
+  };
+  const { data, error } = comercialLiberado
+    ? await supabase.rpc('calls_agendar_reuniao', {
+        ...parametrosComuns,
+        p_oportunidade: validacao.data.oportunidade,
+      })
+    : await supabase.rpc('calls_agendar_reuniao_starter', {
+        ...parametrosComuns,
+        p_empresa_nome: validacao.data.empresa,
+        p_contato_nome: validacao.data.contato,
+        p_contato_email: validacao.data.convidadoEmail,
+      });
 
   if (error) {
     console.error(`[calls:agendar] ${error.code}: ${error.message}`);
     return { campos, erro: 'Não foi possível agendar a reunião agora. Tente novamente.' };
   }
 
-  const reuniao = z.object({ reuniao_id: z.uuid(), codigo_publico: z.uuid() }).safeParse(data?.[0]);
+  const reuniao = z
+    .object({
+      reuniao_id: z.uuid(),
+      codigo_publico: z.uuid(),
+      oportunidade_id: z.uuid().optional(),
+    })
+    .safeParse(data?.[0]);
   if (!reuniao.success) {
     console.error('[calls:agendar] A call foi criada sem um identificador válido.');
     return {
@@ -160,6 +202,16 @@ export async function agendarReuniao(
   }
 
   let calendar: 'sincronizado' | 'falhou' | undefined;
+  const oportunidadeId = comercialLiberado
+    ? validacao.data.oportunidade
+    : reuniao.data.oportunidade_id;
+  if (!oportunidadeId) {
+    console.error('[calls:agendar] A reunião foi criada sem vínculo interno válido.');
+    return {
+      campos,
+      erro: 'A reunião foi criada, mas não conseguimos preparar o histórico. Atualize Reuniões.',
+    };
+  }
   if (validacao.data.enviarConviteGoogle && validacao.data.convidadoEmail) {
     await supabase
       .from('calls_reunioes')
@@ -179,7 +231,7 @@ export async function agendarReuniao(
           contato:crm_contatos!crm_oportunidades_contato_fk(nome)
         `,
       )
-      .eq('id', validacao.data.oportunidade)
+      .eq('id', oportunidadeId)
       .maybeSingle();
 
     if (erroOportunidade || !oportunidade) {
@@ -209,7 +261,7 @@ export async function agendarReuniao(
 
   revalidatePath('/calls');
   revalidatePath('/crm');
-  revalidatePath(`/crm/${validacao.data.oportunidade}`);
+  revalidatePath(`/crm/${oportunidadeId}`);
   revalidarDirecaoOperacional();
   const parametros = new URLSearchParams({ agendada: reuniao.data.reuniao_id });
   if (calendar) parametros.set('calendar', calendar);

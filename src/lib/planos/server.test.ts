@@ -44,6 +44,9 @@ describe('autorização de recursos no servidor', () => {
     await expect(exigirRecurso('modulo_comercial')).rejects.toThrow(
       'redirect:/conta?upgrade=modulo_comercial',
     );
+    await expect(exigirRecurso('modulo_comercial', '/metricas')).rejects.toThrow(
+      'redirect:/conta?upgrade=modulo_comercial&origem=%2Fmetricas',
+    );
   });
 
   it('libera a operação comercial no Pro', async () => {

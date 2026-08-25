@@ -4,6 +4,7 @@ import {
   planoDosMetadados,
   planoPodeAcessarRota,
   planoTemRecurso,
+  nomeDaAreaComercial,
 } from './acessos';
 
 describe('permissões dos planos', () => {
@@ -31,5 +32,11 @@ describe('permissões dos planos', () => {
 
   it('oferece apenas pacotes fechados de créditos', () => {
     expect(PACOTES_CREDITOS.map((pacote) => pacote.creditos)).toEqual([50, 150, 500]);
+  });
+
+  it('explica a área bloqueada sem depender do texto da navegação', () => {
+    expect(nomeDaAreaComercial('/metricas')).toBe('Métricas');
+    expect(nomeDaAreaComercial('/vendas/cliente')).toBe('Vendas');
+    expect(nomeDaAreaComercial('/reunioes')).toBeNull();
   });
 });
