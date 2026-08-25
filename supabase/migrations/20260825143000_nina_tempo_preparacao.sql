@@ -9,6 +9,6 @@ set roteiro = jsonb_set(
   false
 )
 from public.solucoes as solucao
-where projeto.solucao_id = solucao.id
+where projeto.projeto_id = solucao.id
   and solucao.slug = 'sdr-atendimento-qualificacao'
   and projeto.roteiro #>> '{trilhaDidatica,tempoTotal}' = '35 a 45 minutos antes do primeiro diagnóstico';
