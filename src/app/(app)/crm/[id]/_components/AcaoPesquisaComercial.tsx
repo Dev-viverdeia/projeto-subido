@@ -8,10 +8,12 @@ export function AcaoPesquisaComercial({
   lead,
   dossie,
   enriquecimentoId,
+  acaoVisivel,
 }: {
   lead: DossieLead;
   dossie: DossieEnriquecido;
   enriquecimentoId: string;
+  acaoVisivel: string;
 }) {
   const oportunidadeAberta = etapaAberta(lead.oportunidade.etapa);
   const salva = lead.oportunidade.proximaAcao === dossie.proximaAcao.acao;
@@ -25,7 +27,7 @@ export function AcaoPesquisaComercial({
       {oportunidadeAberta ? (
         <>
           <p>Próximo passo sugerido</p>
-          <h3 id="acao-recomendada-titulo">{dossie.proximaAcao.acao}</h3>
+          <h3 id="acao-recomendada-titulo">{acaoVisivel}</h3>
           <span>{dossie.proximaAcao.porque}</span>
           <BotaoProximaAcao
             oportunidadeId={lead.oportunidade.id}

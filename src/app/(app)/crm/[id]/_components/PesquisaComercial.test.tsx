@@ -127,7 +127,8 @@ describe('PesquisaComercial', () => {
   it('separa a leitura, o preparo da conversa e as fontes', () => {
     render(<PesquisaComercial lead={LEAD} execucao={EXECUCAO} dossie={DOSSIE} />);
 
-    expect(screen.getByRole('heading', { name: DOSSIE.resumo })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Leitura para a próxima reunião' })).toBeVisible();
+    expect(screen.getByText(DOSSIE.resumo)).toBeVisible();
     expect(screen.getByText('WhatsApp em destaque')).toBeVisible();
     expect(screen.queryByText('Quantas conversas chegam por dia?')).not.toBeInTheDocument();
 
