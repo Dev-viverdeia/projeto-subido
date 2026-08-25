@@ -19,6 +19,16 @@ describe('apresentação da ficha enriquecida', () => {
   });
 
   it('limita resumos legados muito longos', () => {
-    expect(resumoParaFicha('Contexto '.repeat(80)).length).toBeLessThanOrEqual(361);
+    expect(resumoParaFicha('Contexto '.repeat(80)).length).toBeLessThanOrEqual(261);
+  });
+
+  it('remove hora técnica de fatos comerciais', () => {
+    expect(
+      valorFatoParaFicha(
+        "Proposta 'Nina — SDR de Atendimento e Qualificação' apresentada em 25/08/2026 20:54:59 UTC (status: apresentada)",
+      ),
+    ).toBe(
+      "Proposta 'Nina — SDR de Atendimento e Qualificação' apresentada em 25 de agosto de 2026",
+    );
   });
 });

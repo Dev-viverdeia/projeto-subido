@@ -1,6 +1,7 @@
 const UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i;
 const UUID_GLOBAL = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi;
 const DATA_ISO = /\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?\b/g;
+const DATA_BR_COM_HORA = /\b(\d{2})\/(\d{2})\/(\d{4})\s+\d{2}:\d{2}:\d{2}\s+UTC\b/g;
 
 function limitar(texto: string, maximo: number): string {
   const limpo = texto.replace(/\s+/g, ' ').trim();
@@ -57,6 +58,10 @@ export function valorFatoParaFicha(valor: string): string {
   const limpo = valor
     .replace(UUID_GLOBAL, '')
     .replace(DATA_ISO, (data) => dataHumana(data))
+    .replace(DATA_BR_COM_HORA, (_, dia, mes, ano) =>
+      dataHumana(`${ano}-${mes}-${dia}T12:00:00-03:00`),
+    )
+    .replace(/\s*\(status:\s*[^)]+\)/gi, '')
     .replace(/\b(?:id|criado_em|atualizado_em|origem|fonte)\s*[:=]?\s*/gi, '')
     .replace(/\(\s*plataforma\s*\)/gi, '')
     .replace(/\(\s*:\s*plataforma\s*\)/gi, '')
