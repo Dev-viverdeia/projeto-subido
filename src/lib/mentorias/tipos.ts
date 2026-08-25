@@ -63,4 +63,6 @@ export type SessaoMentoria = {
   inscritos: number;
   /** Se QUEM ESTÁ OLHANDO está inscrito. Vem da própria linha, via RLS. */
   euInscrito: boolean;
+  /** Valor realmente pago no check-in. Pode divergir do preço atual da sessão. */
+  creditosUsados?: number | null;
 };

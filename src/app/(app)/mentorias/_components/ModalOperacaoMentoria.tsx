@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { X } from 'lucide-react';
 import { Alert, Button, Modal, Spinner } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
@@ -14,6 +15,7 @@ export function ModalOperacaoMentoria({
   sessao,
   fase,
   falha,
+  saldoAtual,
   agora,
   aoFechar,
   aoConfirmar,
@@ -22,11 +24,20 @@ export function ModalOperacaoMentoria({
   sessao: SessaoMentoria | null;
   fase: FaseOperacaoMentoria;
   falha: string | null;
+  saldoAtual: number | null;
   agora: Date;
   aoFechar: () => void;
   aoConfirmar: () => void;
 }) {
   const cancelamento = tipo === 'cancelamento';
+  const movimento = sessao
+    ? cancelamento
+      ? (sessao.creditosUsados ?? sessao.custoCreditos)
+      : sessao.custoCreditos
+    : 0;
+  const saldoDepois =
+    saldoAtual === null ? null : saldoAtual + (cancelamento ? movimento : -movimento);
+  const saldoInsuficiente = !cancelamento && saldoDepois !== null && saldoDepois < 0;
   const titulo =
     fase === 'processando'
       ? cancelamento
@@ -47,7 +58,16 @@ export function ModalOperacaoMentoria({
   const rodape =
     fase === 'processando' ? undefined : (
       <div className={styles.acoes}>
-        {fase === 'confirmacao' ? (
+        {fase === 'confirmacao' && saldoInsuficiente ? (
+          <>
+            <Button variant="secondary" onClick={aoFechar}>
+              Fechar
+            </Button>
+            <Link href="/conta/creditos" className={styles.creditosCta}>
+              Ver meus créditos
+            </Link>
+          </>
+        ) : fase === 'confirmacao' ? (
           <>
             <Button variant="secondary" onClick={aoFechar}>
               {cancelamento ? 'Manter check-in' : 'Voltar'}
@@ -61,7 +81,7 @@ export function ModalOperacaoMentoria({
             >
               {cancelamento
                 ? 'Cancelar check-in'
-                : `Confirmar por ${sessao?.custoCreditos ?? 0} ${(sessao?.custoCreditos ?? 0) === 1 ? 'crédito' : 'créditos'}`}
+                : `Confirmar por ${movimento} ${movimento === 1 ? 'crédito' : 'créditos'}`}
             </Button>
           </>
         ) : fase === 'erro' ? (
@@ -91,23 +111,47 @@ export function ModalOperacaoMentoria({
       footer={rodape}
     >
       {sessao && fase === 'confirmacao' ? (
-        <p className={styles.texto}>
-          {cancelamento ? (
-            <>
-              Sua vaga em “{sessao.titulo}” volta a ficar disponível e os {sessao.custoCreditos}{' '}
-              créditos usados retornam ao seu saldo. Você poderá fazer um novo check-in depois,
-              enquanto ainda houver vaga.
-            </>
-          ) : (
-            <>
-              O check-in usa {sessao.custoCreditos}{' '}
-              {sessao.custoCreditos === 1 ? 'crédito' : 'créditos'} e garante sua vaga em “
-              {sessao.titulo}” ({rotuloDoDia(sessao.inicioIso, agora).principal.toLowerCase()},{' '}
-              {horaCurta(sessao.inicioIso)}). Você pode cancelar até o início. Nesse caso, a vaga
-              volta a ficar disponível.
-            </>
-          )}
-        </p>
+        <div className={styles.confirmacao}>
+          <p className={styles.texto}>
+            {cancelamento ? (
+              <>
+                Sua vaga em “{sessao.titulo}” volta a ficar disponível. Você pode fazer um novo
+                check-in depois, enquanto ainda houver vaga.
+              </>
+            ) : (
+              <>
+                A vaga fica garantida em “{sessao.titulo}” (
+                {rotuloDoDia(sessao.inicioIso, agora).principal.toLowerCase()},{' '}
+                {horaCurta(sessao.inicioIso)}). Você pode cancelar até o início.
+              </>
+            )}
+          </p>
+
+          <div className={styles.saldo} aria-label="Resumo de créditos">
+            <span>
+              <small>Saldo atual</small>
+              <strong>{saldoAtual === null ? '—' : saldoAtual}</strong>
+            </span>
+            <span>
+              <small>{cancelamento ? 'Devolução' : 'Custo'}</small>
+              <strong>
+                {cancelamento ? '+' : '−'}
+                {movimento}
+              </strong>
+            </span>
+            <span data-destaque>
+              <small>Saldo depois</small>
+              <strong>{saldoDepois === null ? '—' : Math.max(0, saldoDepois)}</strong>
+            </span>
+          </div>
+
+          {saldoInsuficiente ? (
+            <Alert tone="danger" size="compact" title="Faltam créditos para este check-in">
+              Seu saldo é {saldoAtual ?? 0} e esta sessão usa {movimento}. Confira os pacotes
+              disponíveis antes de reservar a vaga.
+            </Alert>
+          ) : null}
+        </div>
       ) : null}
 
       {sessao && fase === 'processando' ? (
@@ -132,8 +176,9 @@ export function ModalOperacaoMentoria({
           <p>
             {cancelamento ? (
               <>
-                Sua vaga foi liberada e {sessao.custoCreditos}{' '}
-                {sessao.custoCreditos === 1 ? 'crédito voltou' : 'créditos voltaram'} para o saldo.
+                Sua vaga foi liberada e {movimento}{' '}
+                {movimento === 1 ? 'crédito voltou' : 'créditos voltaram'} para o saldo. Saldo
+                atual: {saldoAtual ?? '—'}.
               </>
             ) : (
               <>

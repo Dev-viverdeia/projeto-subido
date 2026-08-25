@@ -27,7 +27,8 @@ import { createClient } from '@/lib/supabase/server';
 
 const Id = z.uuid();
 
-export type ResultadoCheckin = { ok: true } | { ok: false; mensagem: string };
+export type ResultadoCheckin =
+  { ok: true; saldo: number; creditos: number } | { ok: false; mensagem: string };
 
 /* O código vem do `raise … using errcode` do trigger; a mensagem vem do próprio
    `raise`. Casar pelo TEXTO é o que mantém isto legível — os três usam 23514, e
@@ -68,14 +69,18 @@ export async function fazerCheckin(mentoriaId: string): Promise<ResultadoCheckin
 
   if (!user) return { ok: false, mensagem: 'Sua sessão expirou. Entre de novo para continuar.' };
 
-  const { error } = await supabase.rpc('mentoria_fazer_checkin', { p_mentoria: id.data });
+  const { data, error } = await supabase.rpc('mentoria_fazer_checkin', {
+    p_mentoria: id.data,
+  });
 
   if (error)
     return { ok: false, mensagem: mensagemDaRecusa(`${error.message} ${error.code ?? ''}`) };
 
   revalidatePath('/mentorias');
   revalidatePath('/inicio');
-  return { ok: true };
+  revalidatePath('/conta');
+  revalidatePath('/conta/creditos');
+  return { ok: true, saldo: data?.[0]?.saldo ?? 0, creditos: data?.[0]?.custo ?? 0 };
 }
 
 /**
@@ -93,7 +98,9 @@ export async function cancelarCheckin(mentoriaId: string): Promise<ResultadoChec
 
   if (!user) return { ok: false, mensagem: 'Sua sessão expirou. Entre de novo para continuar.' };
 
-  const { error } = await supabase.rpc('mentoria_cancelar_checkin', { p_mentoria: id.data });
+  const { data, error } = await supabase.rpc('mentoria_cancelar_checkin', {
+    p_mentoria: id.data,
+  });
 
   if (error) {
     return { ok: false, mensagem: mensagemDaRecusa(`${error.message} ${error.code ?? ''}`) };
@@ -101,5 +108,7 @@ export async function cancelarCheckin(mentoriaId: string): Promise<ResultadoChec
 
   revalidatePath('/mentorias');
   revalidatePath('/inicio');
-  return { ok: true };
+  revalidatePath('/conta');
+  revalidatePath('/conta/creditos');
+  return { ok: true, saldo: data?.[0]?.saldo ?? 0, creditos: data?.[0]?.estorno ?? 0 };
 }

@@ -6,8 +6,8 @@ import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import { MentoriasVista } from './MentoriasVista';
 
 vi.mock('@/lib/mentorias/actions', () => ({
-  cancelarCheckin: vi.fn(() => Promise.resolve({ ok: true })),
-  fazerCheckin: vi.fn(() => Promise.resolve({ ok: true })),
+  cancelarCheckin: vi.fn(() => Promise.resolve({ ok: true, saldo: 21, creditos: 1 })),
+  fazerCheckin: vi.fn(() => Promise.resolve({ ok: true, saldo: 19, creditos: 1 })),
 }));
 
 const SESSAO: SessaoMentoria = {
@@ -32,8 +32,9 @@ const SESSAO: SessaoMentoria = {
 
 describe('ações de check-in nas mentorias', () => {
   beforeEach(() => {
-    vi.mocked(cancelarCheckin).mockResolvedValue({ ok: true });
-    vi.mocked(fazerCheckin).mockResolvedValue({ ok: true });
+    vi.clearAllMocks();
+    vi.mocked(cancelarCheckin).mockResolvedValue({ ok: true, saldo: 21, creditos: 1 });
+    vi.mocked(fazerCheckin).mockResolvedValue({ ok: true, saldo: 19, creditos: 1 });
   });
 
   it('explica a consequência antes de cancelar uma vaga', async () => {
@@ -43,6 +44,7 @@ describe('ações de check-in nas mentorias', () => {
         sessoes={[SESSAO]}
         agoraIso="2026-08-18T10:00:00.000Z"
         vistaInicial="agenda"
+        saldoInicial={20}
       />,
     );
 
@@ -59,7 +61,7 @@ describe('ações de check-in nas mentorias', () => {
 
   it('mantém o usuário informado enquanto reserva a vaga e conclui no mesmo diálogo', async () => {
     const user = userEvent.setup();
-    let concluir!: (resultado: { ok: true }) => void;
+    let concluir!: (resultado: { ok: true; saldo: number; creditos: number }) => void;
     vi.mocked(fazerCheckin).mockImplementationOnce(
       () => new Promise((resolve) => (concluir = resolve)),
     );
@@ -69,12 +71,13 @@ describe('ações de check-in nas mentorias', () => {
         sessoes={[{ ...SESSAO, id: 'mentoria-aberta', euInscrito: false }]}
         agoraIso="2026-08-18T10:00:00.000Z"
         vistaInicial="agenda"
+        saldoInicial={20}
       />,
     );
 
     await user.click(screen.getAllByRole('button', { name: /Fazer check-in/ })[0]!);
     const confirmacao = screen.getByRole('dialog', { name: 'Confirmar check-in' });
-    expect(within(confirmacao).getByText(/usa 1 crédito/)).toBeInTheDocument();
+    expect(within(confirmacao).getByText('19')).toBeInTheDocument();
 
     await user.click(within(confirmacao).getByRole('button', { name: 'Confirmar por 1 crédito' }));
     expect(
@@ -82,12 +85,37 @@ describe('ações de check-in nas mentorias', () => {
     ).toHaveTextContent('Reservando sua vaga');
 
     await act(async () => {
-      concluir({ ok: true });
+      concluir({ ok: true, saldo: 19, creditos: 1 });
       await Promise.resolve();
     });
 
     expect(await screen.findByRole('dialog', { name: 'Check-in confirmado' })).toHaveTextContent(
       'A sala aparece aqui quando a sessão começar',
     );
+  });
+
+  it('explica a falta de saldo antes de tentar reservar a vaga', async () => {
+    const user = userEvent.setup();
+    render(
+      <MentoriasVista
+        sessoes={[{ ...SESSAO, id: 'mentoria-sem-saldo', euInscrito: false }]}
+        agoraIso="2026-08-18T10:00:00.000Z"
+        vistaInicial="agenda"
+        saldoInicial={0}
+      />,
+    );
+
+    await user.click(screen.getAllByRole('button', { name: /Fazer check-in/ })[0]!);
+
+    const dialogo = screen.getByRole('dialog', { name: 'Confirmar check-in' });
+    expect(within(dialogo).getByText('Faltam créditos para este check-in')).toBeInTheDocument();
+    expect(within(dialogo).getByRole('link', { name: 'Ver meus créditos' })).toHaveAttribute(
+      'href',
+      '/conta/creditos',
+    );
+    expect(
+      within(dialogo).queryByRole('button', { name: 'Confirmar por 1 crédito' }),
+    ).not.toBeInTheDocument();
+    expect(fazerCheckin).not.toHaveBeenCalled();
   });
 });
