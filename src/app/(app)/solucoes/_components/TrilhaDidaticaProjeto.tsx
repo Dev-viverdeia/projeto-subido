@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ArrowDown,
   BookOpenCheck,
   BookOpenText,
   Check,
@@ -43,6 +44,7 @@ export function TrilhaDidaticaProjeto({
   const aulasConcluidas = idsAulas.filter((id) => Boolean(progresso.etapas[id])).length;
   const proximaAulaIndice = idsAulas.findIndex((id) => !progresso.etapas[id]);
   const porcentagem = Math.round((aulasConcluidas / trilha.aulas.length) * 100);
+  const aprendizadoConcluido = aulasConcluidas === trilha.aulas.length;
   const videosComplementares = trilha.videosReferencia.filter(
     (video) => video.videoUrl !== videoAberturaUrl,
   );
@@ -89,13 +91,19 @@ export function TrilhaDidaticaProjeto({
       </header>
 
       <ol className={styles.mapa} aria-label="Sequência da preparação">
-        <li>
+        <li data-concluida={aprendizadoConcluido || undefined}>
           <span>01</span>
-          <BookOpenCheck size={18} aria-hidden="true" />
+          {aprendizadoConcluido ? (
+            <CheckCircle2 size={18} aria-hidden="true" />
+          ) : (
+            <BookOpenCheck size={18} aria-hidden="true" />
+          )}
           <div>
-            <strong>Aprenda</strong>
+            <strong>{aprendizadoConcluido ? 'Aulas concluídas' : 'Aprenda'}</strong>
             <small>
-              {trilha.aulas.length} aulas · {totalRecursos} recursos
+              {aprendizadoConcluido
+                ? `${trilha.aulas.length} aulas concluídas`
+                : `${trilha.aulas.length} aulas · ${totalRecursos} recursos`}
             </small>
           </div>
         </li>
@@ -116,6 +124,24 @@ export function TrilhaDidaticaProjeto({
           </div>
         </li>
       </ol>
+
+      {aprendizadoConcluido ? (
+        <aside className={styles.aprendizadoConcluido} aria-label="Aprendizado concluído">
+          <span className={styles.iconeAprendizadoConcluido} aria-hidden="true">
+            <Check size={18} />
+          </span>
+          <div>
+            <strong>Aprendizado concluído</strong>
+            <p>
+              As aulas continuam disponíveis para consulta. Agora use o caso, os modelos e as cinco
+              fases para implementar com um cliente.
+            </p>
+          </div>
+          <a href="#implementacao-projeto">
+            Ir para implementação <ArrowDown size={15} aria-hidden="true" />
+          </a>
+        </aside>
+      ) : null}
 
       <div className={styles.aprendizado}>
         <section className={styles.aulas} aria-labelledby="aulas-campo-titulo">

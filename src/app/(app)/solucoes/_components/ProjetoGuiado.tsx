@@ -132,7 +132,7 @@ export function ProjetoGuiado({
         />
       ) : null}
 
-      <header className={styles.hero} data-on-dark>
+      <header id="implementacao-projeto" className={styles.hero} data-on-dark>
         <div className={styles.heroPrincipal}>
           <p className={styles.eyebrow}>Parte 2 · Operação</p>
           <h2>Implemente com um cliente.</h2>

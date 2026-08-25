@@ -51,7 +51,7 @@ const AulaCampo = z.object({
   topicos: z.array(z.string().min(8).max(240)).min(2).max(5),
   exercicio: z.string().min(20).max(500),
   prontoQuando: z.string().min(20).max(500),
-  recursos: z.array(RecursoAula).max(4).optional(),
+  recursos: z.array(RecursoAula).min(2).max(4),
 });
 
 const VideoReferencia = z.object({
@@ -82,7 +82,7 @@ const MaterialCampo = z.object({
 const TrilhaDidatica = z.object({
   tempoTotal: z.string().min(2).max(80),
   aulas: z.array(AulaCampo).min(2).max(4),
-  videosReferencia: z.array(VideoReferencia).max(3).default([]),
+  videosReferencia: z.array(VideoReferencia).min(1).max(3),
   demonstracao: DemonstracaoCampo,
   materiais: z.array(MaterialCampo).min(3).max(6),
 });
