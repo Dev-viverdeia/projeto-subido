@@ -76,6 +76,23 @@ export const QualificacaoProspeccaoSchema = z.object({
     decisores: z.boolean(),
   }),
   sinais: z.array(z.string().trim().min(1).max(180)).max(8),
+  oportunidade: z
+    .object({
+      projeto_slug: z.enum([
+        'sdr-atendimento-qualificacao',
+        'maquina-prospeccao-b2b',
+        'inteligencia-comercial-com-ia',
+        'operacao-conteudo-multicanal',
+        'radar-satisfacao-com-ia',
+      ]),
+      projeto_titulo: z.string().trim().min(1).max(120),
+      motivo: z.string().trim().min(1).max(240),
+      pergunta_abertura: z.string().trim().min(1).max(240),
+      melhor_canal: z.enum(['whatsapp', 'telefone', 'email', 'linkedin', 'instagram']),
+      confianca: z.enum(['alta', 'media', 'inicial']),
+      evidencias: z.array(z.string().trim().min(1).max(180)).max(4),
+    })
+    .optional(),
 });
 
 export const LeadProspeccaoSchema = z.object({

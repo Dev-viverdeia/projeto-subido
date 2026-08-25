@@ -2,7 +2,15 @@ import 'server-only';
 
 import { prospeccaoEnv } from '@/lib/env';
 import { buscarDecisores, iniciarEnriquecimentoDeContatos } from './decisores';
+import {
+  buscarApify,
+  buscarFullEnrichEmpresas,
+  buscarSerpApi,
+  quantidadeParaDescoberta,
+  type ParametrosDescoberta,
+} from './descoberta';
 import { enriquecerSite, mapearComLimite } from './enriquecer-site';
+import { analisarOportunidadesDeProjeto } from './inteligencia-comercial';
 import {
   carregarExposicoesProspeccao,
   carregarMemoriaProspeccao,
@@ -11,14 +19,7 @@ import {
   type ExposicaoProspeccao,
   type MemoriaProspeccao,
 } from './memoria';
-import {
-  jsonDaResposta,
-  origemApify,
-  origemSerp,
-  qualificar,
-  unicos,
-  type Registro,
-} from './normalizacao';
+import { qualificar, unicos } from './normalizacao';
 import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
 export type ResultadoProvedores = {
@@ -26,13 +27,21 @@ export type ResultadoProvedores = {
   provedores: {
     serpapi: 'concluido' | 'falhou' | 'nao_configurado';
     apify: 'concluido' | 'falhou' | 'nao_configurado';
+    fullenrich_busca: 'concluido' | 'falhou' | 'nao_configurado';
     firecrawl: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
     fullenrich: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
+    inteligencia: 'ia' | 'regras';
   };
 };
 
-type ContextoProspeccao = { dono?: string; lista?: string };
-type ParametrosDescoberta = Omit<BuscaProspeccao, 'quantidade'> & { quantidade: number };
+export type EtapaPipelineProspeccao =
+  'descoberta' | 'identidade' | 'contexto' | 'decisores' | 'qualificacao' | 'contatos';
+
+type ContextoProspeccao = {
+  dono?: string;
+  lista?: string;
+  aoProgresso?: (etapa: EtapaPipelineProspeccao, detalhe?: string) => Promise<void> | void;
+};
 
 export class ErroConfiguracaoProspeccao extends Error {
   constructor() {
@@ -43,118 +52,6 @@ export class ErroConfiguracaoProspeccao extends Error {
 
 function motivoDaFalha(resultado: PromiseRejectedResult) {
   return resultado.reason instanceof Error ? resultado.reason.message : 'erro_desconhecido';
-}
-
-async function buscarSerpApi(
-  busca: ParametrosDescoberta,
-  chave: string,
-): Promise<LeadProspeccaoEntrada[]> {
-  const paginas = Array.from(
-    { length: Math.ceil(busca.quantidade / 20) },
-    (_, indice) => indice * 20,
-  );
-  const respostas = await Promise.all(
-    paginas.map(async (inicio) => {
-      const parametros = new URLSearchParams({
-        engine: 'google_maps',
-        q: busca.segmento,
-        location: busca.localizacao,
-        hl: 'pt',
-        gl: 'br',
-        type: 'search',
-        start: String(inicio),
-        api_key: chave,
-      });
-      const resposta = await fetch(`https://serpapi.com/search.json?${parametros}`, {
-        cache: 'no-store',
-        signal: AbortSignal.timeout(18_000),
-      });
-      const json = (await jsonDaResposta(resposta)) as Registro;
-      return Array.isArray(json.local_results) ? (json.local_results as Registro[]) : [];
-    }),
-  );
-  return respostas
-    .flat()
-    .map(origemSerp)
-    .filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
-}
-
-function quantidadeParaDescoberta(quantidade: number) {
-  return Math.min(60, Math.max(15, quantidade * 3));
-}
-
-async function buscarApify(
-  busca: ParametrosDescoberta,
-  token: string,
-  actorId: string,
-): Promise<LeadProspeccaoEntrada[]> {
-  const ator = encodeURIComponent(actorId.replace('/', '~'));
-  const autenticacao = { Authorization: `Bearer ${token}` };
-  const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?waitForFinish=42`, {
-    method: 'POST',
-    headers: { ...autenticacao, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      searchStringsArray: [busca.segmento],
-      locationQuery: busca.localizacao,
-      maxCrawledPlacesPerSearch: busca.quantidade,
-      language: 'pt-BR',
-      countryCode: 'br',
-      skipClosedPlaces: true,
-      scrapeContacts: true,
-      scrapePlaceDetailPage: true,
-      maximumLeadsEnrichmentRecords: 0,
-      verifyLeadsEnrichmentEmails: false,
-    }),
-    cache: 'no-store',
-    signal: AbortSignal.timeout(48_000),
-  });
-  const json = (await jsonDaResposta(resposta)) as { data?: Registro };
-  const execucao = json.data;
-  const id = typeof execucao?.id === 'string' ? execucao.id : null;
-  const dataset = typeof execucao?.defaultDatasetId === 'string' ? execucao.defaultDatasetId : null;
-  if (!id || !dataset) throw new Error('apify_execucao_sem_dataset');
-
-  const lerResultados = async () => {
-    const resultado = await fetch(
-      `https://api.apify.com/v2/datasets/${encodeURIComponent(dataset)}/items?clean=true&format=json&limit=${busca.quantidade}`,
-      {
-        headers: autenticacao,
-        cache: 'no-store',
-        signal: AbortSignal.timeout(8_000),
-      },
-    );
-    const recebido = await jsonDaResposta(resultado);
-    return Array.isArray(recebido) ? (recebido as Registro[]) : [];
-  };
-
-  let itens = await lerResultados();
-  const status = typeof execucao?.status === 'string' ? execucao.status : '';
-  const aindaExecutando = ['READY', 'RUNNING'].includes(status);
-  if (!itens.length && aindaExecutando) {
-    const espera = await fetch(
-      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=8`,
-      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(12_000) },
-    );
-    await jsonDaResposta(espera);
-    itens = await lerResultados();
-  }
-
-  if (aindaExecutando) {
-    await fetch(
-      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}/abort?gracefully=false`,
-      {
-        method: 'POST',
-        headers: autenticacao,
-        cache: 'no-store',
-        signal: AbortSignal.timeout(5_000),
-      },
-    ).catch(() => undefined);
-  }
-
-  if (!itens.length && !['SUCCEEDED', 'RUNNING', 'READY'].includes(status)) {
-    throw new Error(`apify_execucao_${status.toLowerCase() || 'falhou'}`);
-  }
-  return itens.map(origemApify).filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
 }
 
 function identidadeDeCombinacao(lead: LeadProspeccaoEntrada) {
@@ -251,12 +148,17 @@ function temContatoDireto(lead: LeadProspeccaoEntrada) {
   );
 }
 
+function temBaseParaEnriquecer(lead: LeadProspeccaoEntrada) {
+  return temContatoDireto(lead) || Boolean(lead.dominio || lead.site_url);
+}
+
 export async function prospectarEmpresas(
   busca: BuscaProspeccao,
   contexto: ContextoProspeccao = {},
 ): Promise<ResultadoProvedores> {
   const configuracao = prospeccaoEnv();
   if (!configuracao.pronto) throw new ErroConfiguracaoProspeccao();
+  await contexto.aoProgresso?.('descoberta', 'Consultando fontes de empresas da região.');
 
   const buscaDescoberta = {
     ...busca,
@@ -266,28 +168,38 @@ export async function prospectarEmpresas(
 
   const serpConfigurada = Boolean(configuracao.serpApi);
   const apifyConfigurado = Boolean(configuracao.apifyToken && configuracao.apifyActor);
-  const [serp, apify] = await Promise.allSettled([
+  const fullEnrichBuscaConfigurado = Boolean(configuracao.fullEnrich);
+  const [serp, apify, fullEnrichBusca] = await Promise.allSettled([
     configuracao.serpApi
       ? buscarSerpApi(buscaDescoberta, configuracao.serpApi)
       : Promise.resolve([]),
     configuracao.apifyToken && configuracao.apifyActor
       ? buscarApify(buscaDescoberta, configuracao.apifyToken, configuracao.apifyActor)
       : Promise.resolve([]),
+    configuracao.fullEnrich
+      ? buscarFullEnrichEmpresas(buscaDescoberta, configuracao.fullEnrich)
+      : Promise.resolve([]),
   ]);
   const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
   const encontradosApify = apify.status === 'fulfilled' ? apify.value : [];
+  const encontradosFullEnrich = fullEnrichBusca.status === 'fulfilled' ? fullEnrichBusca.value : [];
   if (serp.status === 'rejected') {
     console.error(`[prospeccao:serpapi] ${motivoDaFalha(serp)}`);
   }
   if (apify.status === 'rejected') {
     console.error(`[prospeccao:apify] ${motivoDaFalha(apify)}`);
   }
-  let combinados = combinar(encontradosSerp, encontradosApify);
+  if (fullEnrichBusca.status === 'rejected') {
+    console.error(`[prospeccao:fullenrich-busca] ${motivoDaFalha(fullEnrichBusca)}`);
+  }
+  let combinados = combinar(combinar(encontradosSerp, encontradosApify), encontradosFullEnrich);
   const descobertaConcluida =
     (serpConfigurada && serp.status === 'fulfilled') ||
-    (apifyConfigurado && apify.status === 'fulfilled');
+    (apifyConfigurado && apify.status === 'fulfilled') ||
+    (fullEnrichBuscaConfigurado && fullEnrichBusca.status === 'fulfilled');
   if (!descobertaConcluida) throw new Error('provedores_descoberta_indisponiveis');
 
+  await contexto.aoProgresso?.('identidade', 'Retirando repetições e empresas já recebidas.');
   combinados = combinados.filter((lead) => !jaConhecido(lead, memoria));
   const exposicoes = contexto.dono
     ? await carregarExposicoesProspeccao(combinados.map((lead) => lead.chave_externa))
@@ -319,6 +231,7 @@ export async function prospectarEmpresas(
       },
     }));
 
+  await contexto.aoProgresso?.('contexto', 'Reunindo site, presença digital e fatos públicos.');
   const comSite = combinados.filter((lead) => lead.site_url);
   const firecrawl = configuracao.firecrawl;
   const lidos = firecrawl
@@ -331,7 +244,7 @@ export async function prospectarEmpresas(
   ).length;
 
   const candidatosFinais = comContexto
-    .filter(temContatoDireto)
+    .filter(temBaseParaEnriquecer)
     .sort(
       (a, b) =>
         b.qualificacao.completude - a.qualificacao.completude ||
@@ -347,6 +260,7 @@ export async function prospectarEmpresas(
           ),
     )
     .slice(0, busca.quantidade);
+  await contexto.aoProgresso?.('decisores', 'Localizando pessoas com papel de decisão.');
   const fullEnrich = configuracao.fullEnrich;
   const resultadosDecisores = fullEnrich
     ? await mapearComLimite(candidatosFinais, 5, (lead) => buscarDecisores(lead, fullEnrich))
@@ -371,6 +285,13 @@ export async function prospectarEmpresas(
           ),
     )
     .slice(0, busca.quantidade);
+  await contexto.aoProgresso?.(
+    'qualificacao',
+    'Relacionando cada empresa ao projeto de IA mais aderente.',
+  );
+  const inteligencia = await analisarOportunidadesDeProjeto(leads);
+  leads = inteligencia.leads;
+  await contexto.aoProgresso?.('contatos', 'Validando os melhores canais para iniciar a conversa.');
   if (
     fullEnrich &&
     configuracao.fullEnrichWebhook &&
@@ -403,6 +324,11 @@ export async function prospectarEmpresas(
         : apify.status === 'fulfilled'
           ? 'concluido'
           : 'falhou',
+      fullenrich_busca: !fullEnrichBuscaConfigurado
+        ? 'nao_configurado'
+        : fullEnrichBusca.status === 'fulfilled'
+          ? 'concluido'
+          : 'falhou',
       firecrawl: !firecrawl
         ? 'nao_configurado'
         : comSite.length === 0
@@ -419,6 +345,7 @@ export async function prospectarEmpresas(
           : concluidas > 0
             ? 'parcial'
             : 'falhou',
+      inteligencia: inteligencia.modo,
     },
   };
 }

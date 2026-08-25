@@ -44,6 +44,21 @@ export type Decisor = {
 };
 
 type Horario = { dia: string; horarios: string };
+export type OportunidadeProjeto = {
+  projeto_slug:
+    | 'sdr-atendimento-qualificacao'
+    | 'maquina-prospeccao-b2b'
+    | 'inteligencia-comercial-com-ia'
+    | 'operacao-conteudo-multicanal'
+    | 'radar-satisfacao-com-ia';
+  projeto_titulo: string;
+  motivo: string;
+  pergunta_abertura: string;
+  melhor_canal: 'whatsapp' | 'telefone' | 'email' | 'linkedin' | 'instagram';
+  confianca: 'alta' | 'media' | 'inicial';
+  evidencias: string[];
+};
+
 type Qualificacao = {
   completude: number;
   itens: {
@@ -54,6 +69,7 @@ type Qualificacao = {
     decisores: boolean;
   };
   sinais: string[];
+  oportunidade: OportunidadeProjeto | null;
 };
 
 export function objeto(valor: Json | null): Record<string, Json | undefined> {
@@ -166,6 +182,48 @@ export function qualificacaoDo(lead: Lead): Qualificacao {
     (itens.redes_sociais ? 15 : 0) +
     (itens.decisores ? 25 : 0);
   const bruto = objeto(lead.qualificacao);
+  const oportunidadeBruta = objeto(bruto.oportunidade ?? null);
+  const projetoSlug = oportunidadeBruta.projeto_slug;
+  const projetoTitulo = oportunidadeBruta.projeto_titulo;
+  const motivo = oportunidadeBruta.motivo;
+  const perguntaAbertura = oportunidadeBruta.pergunta_abertura;
+  const melhorCanal = oportunidadeBruta.melhor_canal;
+  const confianca = oportunidadeBruta.confianca;
+  const projetos = new Set<OportunidadeProjeto['projeto_slug']>([
+    'sdr-atendimento-qualificacao',
+    'maquina-prospeccao-b2b',
+    'inteligencia-comercial-com-ia',
+    'operacao-conteudo-multicanal',
+    'radar-satisfacao-com-ia',
+  ]);
+  const canais = new Set<OportunidadeProjeto['melhor_canal']>([
+    'whatsapp',
+    'telefone',
+    'email',
+    'linkedin',
+    'instagram',
+  ]);
+  const confiancas = new Set<OportunidadeProjeto['confianca']>(['alta', 'media', 'inicial']);
+  const oportunidade =
+    typeof projetoSlug === 'string' &&
+    projetos.has(projetoSlug as OportunidadeProjeto['projeto_slug']) &&
+    typeof projetoTitulo === 'string' &&
+    typeof motivo === 'string' &&
+    typeof perguntaAbertura === 'string' &&
+    typeof melhorCanal === 'string' &&
+    canais.has(melhorCanal as OportunidadeProjeto['melhor_canal']) &&
+    typeof confianca === 'string' &&
+    confiancas.has(confianca as OportunidadeProjeto['confianca'])
+      ? {
+          projeto_slug: projetoSlug as OportunidadeProjeto['projeto_slug'],
+          projeto_titulo: projetoTitulo,
+          motivo,
+          pergunta_abertura: perguntaAbertura,
+          melhor_canal: melhorCanal as OportunidadeProjeto['melhor_canal'],
+          confianca: confianca as OportunidadeProjeto['confianca'],
+          evidencias: stringsDo(oportunidadeBruta.evidencias ?? []),
+        }
+      : null;
   return {
     completude:
       typeof bruto.completude === 'number' && bruto.completude >= 0 && bruto.completude <= 100
@@ -173,6 +231,7 @@ export function qualificacaoDo(lead: Lead): Qualificacao {
         : padrao,
     itens,
     sinais: stringsDo(bruto.sinais ?? []),
+    oportunidade,
   };
 }
 
@@ -240,6 +299,21 @@ export function totalCanaisAcionaveis(lead: Lead) {
 export function setorProfissionalDo(lead: Lead): string | null {
   const empresa = objeto(objeto(lead.dados).empresa_profissional ?? null);
   return typeof empresa.setor === 'string' ? empresa.setor : null;
+}
+
+export function perfilEmpresaDo(lead: Lead) {
+  const empresa = objeto(objeto(lead.dados).empresa_profissional ?? null);
+  const porteRecebido = empresa.porte;
+  const porte =
+    typeof porteRecebido === 'string' || typeof porteRecebido === 'number'
+      ? String(porteRecebido)
+      : null;
+  return {
+    setor: typeof empresa.setor === 'string' ? empresa.setor : null,
+    porte,
+    anoFundacao: typeof empresa.ano_fundacao === 'number' ? empresa.ano_fundacao : null,
+    especialidades: stringsDo(empresa.especialidades ?? []),
+  };
 }
 
 export function enriquecimentoDeContatosEmAndamento(lead: Lead) {

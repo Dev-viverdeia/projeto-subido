@@ -171,6 +171,7 @@ export function prospeccaoEnv() {
     SERPAPI_API_KEY: process.env.SERPAPI_API_KEY,
     FULLENRICH_API_KEY: process.env.FULLENRICH_API_KEY,
     FULLENRICH_WEBHOOK_SECRET: process.env.FULLENRICH_WEBHOOK_SECRET,
+    HUNTER_API_KEY: process.env.HUNTER_API_KEY,
   };
 
   const firecrawl = z.string().min(10).safeParse(dados.FIRECRAWL_API_KEY);
@@ -179,15 +180,17 @@ export function prospeccaoEnv() {
   const serpApi = z.string().min(10).safeParse(dados.SERPAPI_API_KEY);
   const fullEnrich = z.string().min(10).safeParse(dados.FULLENRICH_API_KEY);
   const fullEnrichWebhook = z.string().min(32).safeParse(dados.FULLENRICH_WEBHOOK_SECRET);
+  const hunter = z.string().min(10).safeParse(dados.HUNTER_API_KEY);
 
   return {
-    pronto: (apifyToken.success && apifyActor.success) || serpApi.success,
+    pronto: (apifyToken.success && apifyActor.success) || serpApi.success || fullEnrich.success,
     firecrawl: firecrawl.success ? firecrawl.data : null,
     apifyToken: apifyToken.success ? apifyToken.data : null,
     apifyActor: apifyActor.success ? apifyActor.data : null,
     serpApi: serpApi.success ? serpApi.data : null,
     fullEnrich: fullEnrich.success ? fullEnrich.data : null,
     fullEnrichWebhook: fullEnrichWebhook.success ? fullEnrichWebhook.data : null,
+    hunter: hunter.success ? hunter.data : null,
   };
 }
 

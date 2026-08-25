@@ -77,6 +77,20 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
         'Possível decisor profissional mapeado',
         'Boa reputação pública e volume relevante de avaliações',
       ],
+      oportunidade: {
+        projeto_slug: 'sdr-atendimento-qualificacao',
+        projeto_titulo: 'SDR de Atendimento e Qualificação',
+        motivo:
+          'A clínica recebe contatos por diferentes canais e pode ganhar velocidade ao qualificar e encaminhar cada conversa.',
+        pergunta_abertura:
+          'Como vocês recebem e distribuem hoje os novos contatos que chegam pelo WhatsApp ou pelo site?',
+        melhor_canal: 'whatsapp',
+        confianca: 'media',
+        evidencias: [
+          'Atendimento multicanal informado no site',
+          '127 avaliações públicas, nota 4.8',
+        ],
+      },
     },
     crm_oportunidade_id: null,
   },

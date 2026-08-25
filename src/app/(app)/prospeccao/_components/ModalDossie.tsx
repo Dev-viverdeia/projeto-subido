@@ -13,6 +13,7 @@ import {
   Phone,
   Play,
   Search,
+  Target,
   Users,
   UserRoundSearch,
   X,
@@ -164,7 +165,38 @@ export function ModalDossie({
 
         <div className={styles.body}>
           <main className={styles.main}>
-            <section className={styles.section} aria-labelledby="canais-titulo">
+            {qualificacao.oportunidade && (
+              <section
+                className={`${styles.section} ${styles.commercialReading}`}
+                aria-labelledby="leitura-comercial-titulo"
+              >
+                <div className={styles.commercialProject}>
+                  <p className={styles.eyebrow}>Leitura comercial</p>
+                  <span className={styles.commercialProjectIcon} aria-hidden="true">
+                    <Target size={18} />
+                  </span>
+                  <div>
+                    <small>Projeto para explorar</small>
+                    <h3 id="leitura-comercial-titulo">
+                      {qualificacao.oportunidade.projeto_titulo}
+                    </h3>
+                  </div>
+                </div>
+                <div className={styles.commercialReason}>
+                  <small>Por que vale investigar</small>
+                  <p>{qualificacao.oportunidade.motivo}</p>
+                </div>
+                <div className={styles.commercialQuestion}>
+                  <small>Primeira pergunta sugerida</small>
+                  <p>“{qualificacao.oportunidade.pergunta_abertura}”</p>
+                </div>
+              </section>
+            )}
+
+            <section
+              className={`${styles.section} ${styles.contactsSection}`}
+              aria-labelledby="canais-titulo"
+            >
               <div className={styles.sectionHeading}>
                 <div>
                   <p className={styles.eyebrow}>Contatos da empresa</p>

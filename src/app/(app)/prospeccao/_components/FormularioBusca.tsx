@@ -5,7 +5,6 @@ import { ArrowRight, Building2, Coins, MapPin, Search } from 'lucide-react';
 import { Alert, Button, Card, Input, Pill } from '@/design-system/via';
 import { criarListaProspeccao, type EstadoBuscaProspeccao } from '@/lib/prospeccao/actions';
 import { QUANTIDADES_PROSPECCAO } from '@/lib/prospeccao/schema';
-import { ProgressoBusca } from './ProgressoBusca';
 import styles from '../pagina.module.css';
 
 const INICIAL: EstadoBuscaProspeccao = {};
@@ -74,7 +73,6 @@ export function FormularioBusca({
           </div>
         )}
 
-        {buscando && <ProgressoBusca quantidade={quantidade} />}
         <>
           <div className={styles.buscaDireta}>
             <Input

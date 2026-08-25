@@ -44,6 +44,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       fullEnrich: null,
       fullEnrichWebhook: null,
+      hunter: null,
     });
   });
 
@@ -102,8 +103,10 @@ describe('provedores da prospecção', () => {
     expect(resultado.provedores).toEqual({
       apify: 'concluido',
       serpapi: 'nao_configurado',
+      fullenrich_busca: 'nao_configurado',
       firecrawl: 'nao_configurado',
       fullenrich: 'nao_configurado',
+      inteligencia: 'regras',
     });
 
     const requisicao = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
@@ -146,6 +149,7 @@ describe('provedores da prospecção', () => {
       firecrawl: 'token-firecrawl-valido',
       fullEnrich: null,
       fullEnrichWebhook: null,
+      hunter: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -213,6 +217,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       fullEnrich: 'token-fullenrich-valido',
       fullEnrichWebhook: null,
+      hunter: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -293,6 +298,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       fullEnrich: 'token-fullenrich-valido',
       fullEnrichWebhook: null,
+      hunter: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());

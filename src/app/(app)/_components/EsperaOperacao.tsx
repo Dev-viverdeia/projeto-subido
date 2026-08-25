@@ -31,6 +31,7 @@ export function EsperaOperacao({
   etapas,
   intervalo = 12_000,
   etapaInicial = 0,
+  etapaAtual,
   detalhe,
   nota = 'O resultado aparece aqui assim que estiver pronto.',
   mensagemDemora,
@@ -44,6 +45,7 @@ export function EsperaOperacao({
   etapas: readonly EtapaEspera[];
   intervalo?: number;
   etapaInicial?: number;
+  etapaAtual?: number;
   detalhe?: string;
   nota?: string;
   mensagemDemora?: string;
@@ -72,13 +74,13 @@ export function EsperaOperacao({
   }, [aberto, montado]);
 
   useEffect(() => {
-    if (!aberto || etapaAtiva >= etapas.length - 1) return;
+    if (etapaAtual !== undefined || !aberto || etapaAtiva >= etapas.length - 1) return;
     const temporizador = window.setTimeout(
       () => setEtapaAtiva((atual) => Math.min(atual + 1, etapas.length - 1)),
       intervalo,
     );
     return () => window.clearTimeout(temporizador);
-  }, [aberto, etapaAtiva, etapas.length, intervalo]);
+  }, [aberto, etapaAtiva, etapaAtual, etapas.length, intervalo]);
 
   useEffect(() => {
     if (!aberto || !mensagemDemora) return;
@@ -88,7 +90,9 @@ export function EsperaOperacao({
 
   if (!montado || !aberto || etapas.length === 0) return null;
 
-  const atual = etapas[etapaAtiva] ?? etapas[0]!;
+  const etapaExibida =
+    etapaAtual === undefined ? etapaAtiva : Math.min(Math.max(etapaAtual, 0), etapas.length - 1);
+  const atual = etapas[etapaExibida] ?? etapas[0]!;
 
   return createPortal(
     <div className={styles.fundo}>
@@ -132,11 +136,15 @@ export function EsperaOperacao({
         <ol className={styles.etapas} aria-label="Etapas da operação">
           {etapas.map((etapa, indice) => {
             const estado =
-              indice < etapaAtiva ? 'concluida' : indice === etapaAtiva ? 'ativa' : 'futura';
+              indice < etapaExibida ? 'concluida' : indice === etapaExibida ? 'ativa' : 'futura';
             return (
               <li key={etapa.titulo} data-estado={estado}>
                 <span aria-hidden="true">
-                  {indice < etapaAtiva ? <Check size={13} /> : String(indice + 1).padStart(2, '0')}
+                  {indice < etapaExibida ? (
+                    <Check size={13} />
+                  ) : (
+                    String(indice + 1).padStart(2, '0')
+                  )}
                 </span>
                 <strong>{etapa.titulo}</strong>
               </li>

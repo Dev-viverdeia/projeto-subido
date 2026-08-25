@@ -6,6 +6,7 @@ import 'server-only';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/types.generated';
 import type { ResultadoProvedores } from './provedores';
+import type { EtapaPipelineProspeccao } from './provedores';
 import type { BuscaProspeccao } from './schema';
 
 export async function obterSaldoProspeccao(dono: string) {
@@ -20,8 +21,41 @@ export async function reservarListaProspeccao(dono: string, nome: string, busca:
     p_localizacao: busca.localizacao,
     p_termos: [],
     p_quantidade: busca.quantidade,
-    p_filtros: {},
+    p_filtros: { arquitetura: 'prospeccao-qualificada-v1' },
   });
+}
+
+const ORDEM_ETAPAS: Record<EtapaPipelineProspeccao, number> = {
+  descoberta: 1,
+  identidade: 2,
+  contexto: 3,
+  decisores: 4,
+  qualificacao: 5,
+  contatos: 6,
+};
+
+export async function atualizarProgressoLista(
+  dono: string,
+  lista: string,
+  etapa: EtapaPipelineProspeccao,
+  detalhe?: string,
+) {
+  return createAdminClient()
+    .from('prospeccao_listas')
+    .update({
+      provedores: {
+        pipeline: {
+          etapa,
+          ordem: ORDEM_ETAPAS[etapa],
+          total: 6,
+          detalhe: detalhe ?? null,
+          atualizado_em: new Date().toISOString(),
+        },
+      },
+    })
+    .eq('dono', dono)
+    .eq('id', lista)
+    .eq('status', 'processando');
 }
 
 export async function concluirListaProspeccao(
@@ -33,7 +67,16 @@ export async function concluirListaProspeccao(
     p_dono: dono,
     p_lista: lista,
     p_leads: resultado.leads as unknown as Json,
-    p_provedores: resultado.provedores,
+    p_provedores: {
+      ...resultado.provedores,
+      pipeline: {
+        etapa: 'concluida',
+        ordem: 6,
+        total: 6,
+        detalhe: 'Lista pronta para abordagem.',
+        atualizado_em: new Date().toISOString(),
+      },
+    },
   });
 }
 

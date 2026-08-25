@@ -106,7 +106,7 @@ export function ResultadoBusca({
           </h2>
           <span id="resultado-busca-descricao">
             {falhou
-              ? 'Uma das fontes demorou mais do que o limite seguro. Nada foi cobrado.'
+              ? 'Não recebemos dados suficientes dentro do limite seguro. Nada foi cobrado.'
               : `${encontradas} ${encontradas === 1 ? 'empresa encontrada' : 'empresas encontradas'} e organizadas para você começar.`}
           </span>
         </div>
