@@ -2,18 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { prospeccaoEnv } from '@/lib/env';
 import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
-import {
-  concluirListaProspeccao,
-  enviarLeadProspeccaoAoCrm,
-  falharListaProspeccao,
-  reservarListaProspeccao,
-} from './admin';
-import { prospectarEmpresas } from './provedores';
+import { enviarLeadProspeccaoAoCrm, reservarListaProspeccao } from './admin';
+import { processarListaProspeccao } from './processar';
 import { BuscaProspeccaoSchema } from './schema';
 
 export type EstadoBuscaProspeccao = {
@@ -87,23 +83,8 @@ export async function criarListaProspeccao(
     };
   }
 
-  try {
-    const resultado = await prospectarEmpresas(validacao.data, { dono: user.id, lista });
-    const { error } = await concluirListaProspeccao(user.id, lista, resultado);
-    if (error) throw error;
-  } catch (erro) {
-    console.error('[prospeccao:buscar] falha ao montar lista:', erro);
-    await falharListaProspeccao(
-      user.id,
-      lista,
-      erro instanceof Error ? erro.message : 'falha_desconhecida',
-    );
-    revalidatePath('/prospeccao');
-    redirect(`/prospeccao?lista=${lista}&busca=falhou`);
-  }
-
-  revalidatePath('/prospeccao');
-  redirect(`/prospeccao?lista=${lista}&busca=concluida`);
+  after(() => processarListaProspeccao({ dono: user.id, lista, busca: validacao.data }));
+  redirect(`/prospeccao?lista=${lista}&busca=processando`);
 }
 
 export async function enviarLeadAoCrm(formData: FormData): Promise<void> {

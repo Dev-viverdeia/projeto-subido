@@ -1,9 +1,9 @@
 import { Building2, ExternalLink, Globe2, MapPin, Star } from 'lucide-react';
-import { setorProfissionalDo, type Lead } from './dossie';
+import { perfilEmpresaDo, type Lead } from './dossie';
 import styles from './ModalProspeccao.module.css';
 
 export function ContextoEmpresa({ lead }: { lead: Lead }) {
-  const setor = setorProfissionalDo(lead);
+  const perfil = perfilEmpresaDo(lead);
 
   return (
     <section className={styles.research} aria-labelledby="pesquisa-titulo">
@@ -58,10 +58,22 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
             </dd>
           </div>
         )}
-        {setor && (
+        {perfil.setor && (
           <div>
             <dt>Setor</dt>
-            <dd>{setor}</dd>
+            <dd>{perfil.setor}</dd>
+          </div>
+        )}
+        {perfil.porte && (
+          <div>
+            <dt>Porte</dt>
+            <dd>{perfil.porte}</dd>
+          </div>
+        )}
+        {perfil.anoFundacao && (
+          <div>
+            <dt>Desde</dt>
+            <dd>{perfil.anoFundacao}</dd>
           </div>
         )}
       </dl>

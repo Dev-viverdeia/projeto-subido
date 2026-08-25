@@ -10,6 +10,7 @@ import {
   MapPin,
   Phone,
   RefreshCw,
+  Target,
   UserRound,
 } from 'lucide-react';
 import { AtualizarEnriquecimentos } from './AtualizarEnriquecimentos';
@@ -112,6 +113,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
             decisor?.linkedin_url ?? redes.find((rede) => rede.rede === 'linkedin')?.url ?? null;
           const instagram = redes.find((rede) => rede.rede === 'instagram') ?? null;
           const qualificacao = qualificacaoDo(lead);
+          const oportunidade = qualificacao.oportunidade;
 
           return (
             <article className={styles.cartaoLead} role="listitem" key={lead.id}>
@@ -133,19 +135,34 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 </span>
               </div>
 
-              <div className={styles.decisorLead} data-encontrado={Boolean(decisor)}>
-                <span className={styles.avatarDecisor}>
-                  {decisor ? (
-                    decisor.nome.slice(0, 1).toLocaleUpperCase('pt-BR')
-                  ) : (
-                    <UserRound size={16} />
-                  )}
+              {oportunidade && (
+                <div className={styles.oportunidadeLead}>
+                  <div className={styles.oportunidadeLeadTitulo}>
+                    <span>
+                      <Target size={14} aria-hidden="true" /> Projeto mais aderente
+                    </span>
+                    <small data-confianca={oportunidade.confianca}>
+                      {oportunidade.confianca === 'alta'
+                        ? 'Boa aderência'
+                        : oportunidade.confianca === 'media'
+                          ? 'Aderência provável'
+                          : 'Hipótese inicial'}
+                    </small>
+                  </div>
+                  <strong>{oportunidade.projeto_titulo}</strong>
+                  <p>{oportunidade.motivo}</p>
+                </div>
+              )}
+
+              <div className={styles.contatoPrincipalLead} data-encontrado={Boolean(decisor)}>
+                <span className={styles.contatoPrincipalIcone}>
+                  <UserRound size={15} aria-hidden="true" />
                 </span>
                 <div>
-                  <small>{decisor ? 'Possível decisor' : 'Decisor'}</small>
-                  <strong>{decisor?.nome ?? 'Ainda não identificado'}</strong>
+                  <small>{decisor ? 'Pessoa para procurar' : 'Pessoa para procurar'}</small>
+                  <strong>{decisor?.nome ?? 'Responsável a identificar'}</strong>
                   <span>
-                    {decisor?.cargo ?? 'Use os contatos da empresa para localizar a pessoa certa.'}
+                    {decisor?.cargo ?? 'Peça pelo responsável da área ao iniciar o contato.'}
                   </span>
                 </div>
               </div>
@@ -167,7 +184,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     href={`mailto:${email}`}
                   />
                 )}
-                {linkedin && (
+                {linkedin && (!telefone || !email) && (
                   <Canal
                     icone={<BriefcaseBusiness size={15} aria-hidden="true" />}
                     rotulo={decisor?.linkedin_url ? 'LinkedIn do decisor' : 'LinkedIn'}
@@ -176,7 +193,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     valorCopiar={linkedin}
                   />
                 )}
-                {!linkedin && instagram && (
+                {instagram && !linkedin && (!telefone || !email) && (
                   <Canal
                     icone={<Camera size={15} aria-hidden="true" />}
                     rotulo="Instagram"
@@ -184,6 +201,11 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     href={instagram.url}
                     valorCopiar={instagram.url}
                   />
+                )}
+                {!telefone && !email && !linkedin && !instagram && (
+                  <p className={styles.semCanalLead}>
+                    Abra os detalhes para consultar os demais canais encontrados.
+                  </p>
                 )}
               </div>
 

@@ -143,7 +143,7 @@
 
 .etapas {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-2);
   margin: var(--via-space-5) var(--via-space-6) 0;
   padding: 0;

@@ -175,6 +175,97 @@
   padding: var(--app-pad-card);
 }
 
+.commercialReading {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(240px, 1fr) minmax(260px, 1.15fr);
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--via-navy-14);
+  background:
+    linear-gradient(128deg, var(--via-glass-sheen), transparent 38%),
+    color-mix(in srgb, var(--via-glass-card) 88%, var(--via-navy-04));
+}
+
+.contactsSection {
+  grid-column: 1 / -1;
+}
+
+.commercialProject,
+.commercialReason,
+.commercialQuestion {
+  min-width: 0;
+  padding: var(--via-space-4);
+}
+
+.commercialReason,
+.commercialQuestion {
+  border-left: 1px solid var(--via-border-soft);
+}
+
+.commercialProject {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.commercialProject > .eyebrow {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.commercialProjectIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+}
+
+.commercialProject div,
+.commercialReason,
+.commercialQuestion {
+  display: grid;
+  align-content: center;
+  gap: var(--via-space-1);
+}
+
+.commercialProject small,
+.commercialReason small,
+.commercialQuestion small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.commercialProject h3,
+.commercialReason p,
+.commercialQuestion p {
+  margin: 0;
+  color: var(--via-text-primary);
+}
+
+.commercialProject h3 {
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-tight);
+}
+
+.commercialReason p,
+.commercialQuestion p {
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
+}
+
+.commercialQuestion p {
+  font-weight: var(--via-fw-medium);
+}
+
 .sectionHeading {
   display: flex;
   align-items: flex-start;
@@ -789,6 +880,16 @@
   .sidebar {
     padding-top: 0;
   }
+
+  .commercialReading {
+    grid-template-columns: 1fr;
+  }
+
+  .commercialReason,
+  .commercialQuestion {
+    border-top: 1px solid var(--via-border-soft);
+    border-left: 0;
+  }
 }
 
 @media (max-width: 600px) {
@@ -915,6 +1016,10 @@
     align-self: start;
   }
 
+  .main > .research {
+    grid-column: auto;
+  }
+
   .main > .research .sectionHeading div > span {
     display: none;
   }
@@ -922,6 +1027,10 @@
   .section,
   .research {
     padding: var(--via-space-4);
+  }
+
+  .commercialReading {
+    padding: 0;
   }
 
   .sectionHeading {

@@ -47,6 +47,16 @@ const LEAD = {
     completude: 100,
     itens: { telefone: true, email: true, site: true, redes_sociais: true, decisores: true },
     sinais: ['Telefone e e-mail disponíveis para abordagem'],
+    oportunidade: {
+      projeto_slug: 'sdr-atendimento-qualificacao',
+      projeto_titulo: 'SDR de Atendimento e Qualificação',
+      motivo: 'A clínica recebe contatos pelo WhatsApp e pode organizar a triagem inicial.',
+      pergunta_abertura:
+        'Como vocês recebem e distribuem hoje os novos contatos que chegam pelo WhatsApp?',
+      melhor_canal: 'whatsapp',
+      confianca: 'media',
+      evidencias: ['Atendimento odontológico com agendamento pelo WhatsApp'],
+    },
   },
   dados: {},
   crm_oportunidade_id: null,
@@ -62,6 +72,7 @@ describe('resultados da prospecção', () => {
       screen.getByRole('link', { name: 'contato@clinica-aurora.example.com' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Adicionar a Vendas' })).toBeInTheDocument();
+    expect(screen.getByText('SDR de Atendimento e Qualificação')).toBeInTheDocument();
 
     const detalhes = screen.getByRole('button', { name: 'Ver detalhes' });
     await user.click(detalhes);
@@ -72,6 +83,9 @@ describe('resultados da prospecção', () => {
     expect(screen.queryByRole('link', { name: '+553133334444' })).not.toBeInTheDocument();
     expect(screen.queryByText('Alguém respondeu')).not.toBeInTheDocument();
     expect(screen.getByText('Google Maps · dados públicos')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Como vocês recebem e distribuem hoje os novos contatos/),
+    ).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Fechar detalhes da empresa' })).toHaveFocus();
     await user.keyboard('{Escape}');

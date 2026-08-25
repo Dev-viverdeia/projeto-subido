@@ -12,25 +12,41 @@ const ETAPAS = [
     descricao: 'Procurando o tipo de negócio na cidade ou região escolhida.',
   },
   {
-    titulo: 'Procurando contatos',
-    descricao: 'Buscando telefone, e-mail, site e redes sociais.',
+    titulo: 'Tirando repetições',
+    descricao: 'Separando empresas novas das que você já recebeu.',
   },
   {
-    titulo: 'Buscando possíveis decisores',
-    descricao: 'Procurando pessoas com cargo de decisão ligadas à empresa.',
+    titulo: 'Lendo o negócio',
+    descricao: 'Reunindo site, presença digital e fatos públicos.',
   },
   {
-    titulo: 'Organizando os resultados',
-    descricao: 'Removendo repetições e preparando a lista para consulta.',
+    titulo: 'Localizando decisores',
+    descricao: 'Procurando pessoas com papel de decisão ligadas à empresa.',
+  },
+  {
+    titulo: 'Escolhendo o projeto',
+    descricao: 'Relacionando cada empresa ao projeto de IA mais aderente.',
+  },
+  {
+    titulo: 'Validando contatos',
+    descricao: 'Organizando os melhores canais para iniciar a conversa.',
   },
 ] as const;
 
 /**
- * Narração honesta da busca longa: as quatro etapas correspondem ao pipeline
+ * Narração honesta da busca longa: as etapas correspondem ao pipeline
  * real, mas não exibem percentual ou prazo inventado. A última fica ativa até
  * a resposta do servidor substituir o formulário pela lista concluída.
  */
-export function ProgressoBusca({ quantidade }: { quantidade: number }) {
+export function ProgressoBusca({
+  quantidade,
+  etapa = 1,
+  detalhe,
+}: {
+  quantidade: number;
+  etapa?: number;
+  detalhe?: string | null;
+}) {
   const [minimizado, setMinimizado] = useState(false);
 
   if (minimizado) {
@@ -41,7 +57,7 @@ export function ProgressoBusca({ quantidade }: { quantidade: number }) {
         </span>
         <div>
           <strong>Montando sua lista</strong>
-          <small>Você pode consultar outras listas enquanto a busca termina.</small>
+          <small>{detalhe ?? 'Você pode consultar outras listas enquanto a busca termina.'}</small>
         </div>
         <button type="button" onClick={() => setMinimizado(false)}>
           <Search size={14} aria-hidden="true" /> Ver andamento
@@ -58,10 +74,10 @@ export function ProgressoBusca({ quantidade }: { quantidade: number }) {
       descricao="Estamos buscando empresas e verificando os contatos públicos encontrados."
       detalhe={`${quantidade} empresas solicitadas`}
       etapas={ETAPAS}
-      intervalo={14_000}
-      nota="Você pode acompanhar aqui ou continuar usando esta página."
-      mensagemDemora="As fontes estão levando mais tempo que o normal. A busca continua ativa e, se não terminar, os créditos voltam para o saldo."
-      demoraApos={24_000}
+      etapaAtual={Math.max(0, Math.min(etapa - 1, ETAPAS.length - 1))}
+      nota={detalhe ?? 'Você pode acompanhar aqui ou continuar usando esta página.'}
+      mensagemDemora="Algumas fontes estão respondendo mais devagar. Você pode sair desta janela; a busca continua e os créditos são devolvidos se ela falhar."
+      demoraApos={35_000}
       acaoSecundaria={{
         rotulo: 'Continuar na plataforma',
         aoAcionar: () => setMinimizado(true),

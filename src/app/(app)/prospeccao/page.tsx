@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
-import { Card, Pill } from '@/design-system/via';
+import { Card, Pill, Spinner } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
+import { AcompanhamentoBusca } from './_components/AcompanhamentoBusca';
 import { FormularioBusca } from './_components/FormularioBusca';
 import { HeroProspeccao } from './_components/HeroProspeccao';
 import { ListaResultados } from './_components/ListaResultados';
@@ -11,7 +12,7 @@ import { ResultadoBusca } from './_components/ResultadoBusca';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Prospecção' };
-export const maxDuration = 180;
+export const maxDuration = 300;
 
 const ROTULO_STATUS = {
   processando: 'Buscando',
@@ -23,6 +24,23 @@ function dataCurta(valor: string) {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' }).format(
     new Date(valor),
   );
+}
+
+function progressoDaLista(valor: unknown) {
+  const provedores = valor && typeof valor === 'object' && !Array.isArray(valor) ? valor : null;
+  const pipelineRecebido = provedores && 'pipeline' in provedores ? provedores.pipeline : null;
+  const pipeline =
+    pipelineRecebido && typeof pipelineRecebido === 'object' && !Array.isArray(pipelineRecebido)
+      ? pipelineRecebido
+      : null;
+  return {
+    etapa:
+      pipeline && 'ordem' in pipeline && typeof pipeline.ordem === 'number' ? pipeline.ordem : 1,
+    detalhe:
+      pipeline && 'detalhe' in pipeline && typeof pipeline.detalhe === 'string'
+        ? pipeline.detalhe
+        : null,
+  };
 }
 
 export default async function ProspeccaoPage({ searchParams }: PageProps<'/prospeccao'>) {
@@ -49,6 +67,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
           quantidade: quantidadeRetomada,
         }
       : undefined;
+  const progresso = progressoDaLista(listaAtual?.provedores);
 
   return (
     <div className={styles.pagina}>
@@ -61,6 +80,14 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
           localizacao={listaAtual.localizacao}
           solicitadas={listaAtual.quantidade_solicitada}
           encontradas={listaAtual.creditos_consumidos}
+        />
+      )}
+      {parametros.busca === 'processando' && listaAtual && (
+        <AcompanhamentoBusca
+          status={listaAtual.status}
+          quantidade={listaAtual.quantidade_solicitada}
+          etapa={progresso.etapa}
+          detalhe={progresso.detalhe}
         />
       )}
       {parametros.crm === 'erro' && (
@@ -158,7 +185,17 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                   </span>
                 </div>
               </header>
-              {listaAtual.status === 'falhou' ? (
+              {listaAtual.status === 'processando' ? (
+                <div className={styles.listaProcessando} role="status" aria-live="polite">
+                  <span aria-hidden="true">
+                    <Spinner size="md" tone="navy" />
+                  </span>
+                  <div>
+                    <h3>Estamos montando esta lista.</h3>
+                    <p>{progresso.detalhe ?? 'Buscando empresas novas para este recorte.'}</p>
+                  </div>
+                </div>
+              ) : listaAtual.status === 'falhou' ? (
                 <div className={styles.semResultados}>
                   <SlidersHorizontal size={24} aria-hidden="true" />
                   <h3>Esta busca não foi concluída.</h3>
