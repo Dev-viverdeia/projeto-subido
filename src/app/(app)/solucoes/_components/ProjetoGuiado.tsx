@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
 import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
-import { idPassoProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
+import { idPassoProjeto, idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import {
   contarEtapasFeitas,
   percentual,
@@ -58,6 +58,7 @@ export function ProjetoGuiado({
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
+  const aulasFeitas = contarEtapasFeitas(progresso, idsAulasProjeto(slug, projeto.roteiro));
   const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const perfil = projeto.roteiro.perfil;
   const escopo = projeto.roteiro.escopo;
@@ -115,19 +116,29 @@ export function ProjetoGuiado({
         resumo={resumo}
         categoria={categoria}
         totalAulas={trilhaDidatica?.aulas.length ?? 1}
+        aulasConcluidas={aulasFeitas}
         tempoPreparacao={trilhaDidatica?.tempoTotal ?? 'Comece pelo vídeo'}
         totalPassos={todosIds.length}
+        passosConcluidos={feitas}
         videoUrl={videoAbertura?.videoUrl ?? null}
         tituloVideo={videoAbertura?.titulo ?? 'Aula de abertura'}
       />
 
+      {trilhaDidatica ? (
+        <TrilhaDidaticaProjeto
+          slug={slug}
+          trilha={trilhaDidatica}
+          videoAberturaUrl={videoAbertura?.videoUrl}
+        />
+      ) : null}
+
       <header className={styles.hero} data-on-dark>
         <div className={styles.heroPrincipal}>
-          <p className={styles.eyebrow}>Método de implementação</p>
-          <h2>Do entendimento à entrega.</h2>
+          <p className={styles.eyebrow}>Parte 2 · Operação</p>
+          <h2>Implemente com um cliente.</h2>
           <p className={styles.resumo}>
-            Siga as cinco fases em ordem. Cada passo termina com uma entrega verificável para o
-            cliente.
+            Conclua as aulas acima. Depois, siga as cinco fases e transforme cada passo em uma
+            entrega verificável.
           </p>
         </div>
 
@@ -221,10 +232,6 @@ export function ProjetoGuiado({
             ))}
           </ol>
         </section>
-      ) : null}
-
-      {trilhaDidatica ? (
-        <TrilhaDidaticaProjeto trilha={trilhaDidatica} videoAberturaUrl={videoAbertura?.videoUrl} />
       ) : null}
 
       <div className={styles.corpo}>

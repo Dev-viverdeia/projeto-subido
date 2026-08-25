@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { idPassoProjeto, idsPassosProjeto, lerRoteiroProjeto } from './roteiro';
+import {
+  idAulaProjeto,
+  idPassoProjeto,
+  idsAulasProjeto,
+  idsPassosProjeto,
+  lerRoteiroProjeto,
+} from './roteiro';
 
 const ids = ['entender', 'preparar', 'construir', 'validar', 'entregar'] as const;
 
@@ -187,5 +193,88 @@ describe('roteiro de Projeto', () => {
       'projeto:crm-comercial:entender:mapear-jornada',
     );
     expect(idsPassosProjeto('crm-comercial', roteiro!)).toHaveLength(5);
+  });
+
+  it('mantém o progresso das aulas separado dos passos de implementação', () => {
+    const valor = roteiroValido();
+    Object.assign(valor, {
+      trilhaDidatica: {
+        tempoTotal: '20 minutos',
+        aulas: [
+          {
+            titulo: 'Entenda o projeto',
+            objetivo: 'Aprender o resultado antes de configurar a entrega.',
+            duracao: '8 min',
+            topicos: ['Resultado esperado', 'Limites da entrega'],
+            exercicio: 'Explique a entrega em uma frase.',
+            prontoQuando: 'A entrega ficou clara e verificável.',
+          },
+          {
+            titulo: 'Prepare a execução',
+            objetivo: 'Separar os insumos necessários para iniciar o piloto.',
+            duracao: '12 min',
+            topicos: ['Insumos necessários', 'Pessoas responsáveis'],
+            exercicio: 'Liste os acessos e as pessoas responsáveis.',
+            prontoQuando: 'Os insumos e responsáveis foram confirmados.',
+          },
+        ],
+        videosReferencia: [],
+        demonstracao: {
+          titulo: 'Caso de referência',
+          contexto: 'Uma empresa precisa validar o primeiro fluxo.',
+          passos: [
+            {
+              etapa: 'Entrada',
+              oQueAcontece: 'O caso é registrado.',
+              evidencia: 'Registro com horário',
+            },
+            {
+              etapa: 'Processamento',
+              oQueAcontece: 'O fluxo executa a regra aprovada.',
+              evidencia: 'Resultado rastreável',
+            },
+            {
+              etapa: 'Revisão',
+              oQueAcontece: 'Uma pessoa confirma o resultado.',
+              evidencia: 'Aceite do responsável',
+            },
+            {
+              etapa: 'Fechamento',
+              oQueAcontece: 'A evidência fica anexada.',
+              evidencia: 'Entrega registrada',
+            },
+          ],
+          resultadoEsperado: 'O piloto termina com evidência e aceite.',
+        },
+        materiais: [
+          {
+            titulo: 'Briefing do projeto',
+            quandoUsar: 'Antes da primeira conversa com o cliente.',
+            conteudo: 'Objetivo:\nProblema:\nResponsável:\nResultado esperado:',
+          },
+          {
+            titulo: 'Checklist do piloto',
+            quandoUsar: 'Antes de ativar o primeiro fluxo em ambiente controlado.',
+            conteudo: '[ ] Insumos confirmados\n[ ] Responsável definido\n[ ] Teste documentado',
+          },
+          {
+            titulo: 'Termo de aceite',
+            quandoUsar: 'Na validação final da entrega com o cliente.',
+            conteudo: 'Resultado entregue:\nEvidências:\nPendências:\nResponsável pelo aceite:',
+          },
+        ],
+      },
+    });
+
+    const roteiro = lerRoteiroProjeto(valor);
+    expect(roteiro).not.toBeNull();
+    expect(idAulaProjeto('crm-comercial', 0)).toBe('projeto:crm-comercial:aprender:aula-01');
+    expect(idsAulasProjeto('crm-comercial', roteiro!)).toEqual([
+      'projeto:crm-comercial:aprender:aula-01',
+      'projeto:crm-comercial:aprender:aula-02',
+    ]);
+    expect(idsAulasProjeto('crm-comercial', roteiro!)).not.toContain(
+      'projeto:crm-comercial:entender:passo-entender',
+    );
   });
 });

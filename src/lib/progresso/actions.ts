@@ -8,6 +8,7 @@ import {
   obterFormacao,
   obterSolucao,
 } from '@/lib/conteudo/queries';
+import { idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import { createClient } from '@/lib/supabase/server';
 import { mesclarProgresso, type EstadoProgressoConta } from './estado';
 import { obterProgressoConta } from './queries';
@@ -148,9 +149,10 @@ export async function definirEtapaConta(
 
   const chavesValidas = new Set(
     projeto.projeto
-      ? projeto.projeto.roteiro.fases.flatMap((fase) =>
-          fase.passos.map((passo) => `projeto:${projeto.slug}:${fase.id}:${passo.id}`),
-        )
+      ? [
+          ...idsAulasProjeto(projeto.slug, projeto.projeto.roteiro),
+          ...idsPassosProjeto(projeto.slug, projeto.projeto.roteiro),
+        ]
       : projeto.itens.filter((item) => item.tipo === 'etapa').map((item) => item.id),
   );
   if (!chavesValidas.has(entrada.data.etapa)) return { ok: false, mensagem: FALHA };
@@ -205,7 +207,10 @@ export async function importarProgressoConta(bruto: unknown): Promise<ResultadoP
   const aulaValida = new Set(formacoes.flatMap((item) => item.aulaIds));
   const projetoPorSlug = new Map(projetos.map((item) => [item.slug, item]));
   const projetoPorEtapa = new Map(
-    projetos.flatMap((item) => item.etapaIds.map((etapa) => [etapa, item] as const)),
+    projetos.flatMap((item) => {
+      const aulas = item.projeto ? idsAulasProjeto(item.slug, item.projeto.roteiro) : [];
+      return [...item.etapaIds, ...aulas].map((etapa) => [etapa, item] as const);
+    }),
   );
   const filtrado: EstadoProgressoConta = {
     aulas: Object.fromEntries(

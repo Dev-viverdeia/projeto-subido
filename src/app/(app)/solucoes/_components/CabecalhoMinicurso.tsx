@@ -7,8 +7,10 @@ export function CabecalhoMinicurso({
   resumo,
   categoria,
   totalAulas,
+  aulasConcluidas,
   tempoPreparacao,
   totalPassos,
+  passosConcluidos,
   videoUrl,
   tituloVideo,
 }: {
@@ -16,8 +18,10 @@ export function CabecalhoMinicurso({
   resumo: string;
   categoria: string | null;
   totalAulas: number;
+  aulasConcluidas: number;
   tempoPreparacao: string;
   totalPassos: number;
+  passosConcluidos: number;
   videoUrl: string | null;
   tituloVideo: string;
 }) {
@@ -33,15 +37,19 @@ export function CabecalhoMinicurso({
         <dl className={styles.dadosCurso}>
           <div>
             <dt>Aulas</dt>
-            <dd>{totalAulas}</dd>
+            <dd>
+              {aulasConcluidas}/{totalAulas} concluídas
+            </dd>
           </div>
           <div>
             <dt>Preparação</dt>
             <dd>{tempoPreparacao}</dd>
           </div>
           <div>
-            <dt>Execução</dt>
-            <dd>{totalPassos} passos</dd>
+            <dt>Implementação</dt>
+            <dd>
+              {passosConcluidos}/{totalPassos} passos
+            </dd>
           </div>
         </dl>
       </div>
