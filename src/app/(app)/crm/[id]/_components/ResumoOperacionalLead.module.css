@@ -11,7 +11,7 @@
 
 .topo {
   display: grid;
-  grid-template-columns: minmax(220px, 0.72fr) minmax(520px, 1.45fr);
+  grid-template-columns: minmax(180px, 0.55fr) minmax(0, 1.8fr);
   align-items: end;
   gap: var(--via-space-7);
   padding: clamp(24px, 3vw, 36px);
@@ -52,7 +52,8 @@
 
 .metodo {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--via-space-2);
   padding: 0;
   margin: 0;
@@ -65,8 +66,8 @@
   min-width: 0;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4);
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-bg-2) 60%, transparent);
@@ -78,7 +79,7 @@
   height: 30px;
   place-items: center;
   border: 1px solid var(--via-border-soft);
-  border-radius: 50%;
+  border-radius: calc(var(--app-radius-control) - 6px);
   background: color-mix(in srgb, var(--via-white) 72%, transparent);
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
@@ -264,6 +265,31 @@
   box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
 }
 
+.acaoSecundaria {
+  display: inline-flex;
+  min-height: var(--app-h-control);
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-white) 24%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition: background var(--app-t-state);
+}
+
+.acaoSecundaria:hover {
+  background: color-mix(in srgb, var(--via-white) 13%, transparent);
+}
+
+.acaoSecundaria:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+
 .novoCicloForm {
   margin: 0;
 }
@@ -439,10 +465,16 @@
   font-size: var(--via-fs-sm);
 }
 
-@media (max-width: 1079px) {
+@media (max-width: 1439px) {
   .topo {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+}
+
+@media (max-width: 1079px) {
+  .metodo {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -458,6 +490,7 @@
 
   .acoesDecisao,
   .acaoPrimaria,
+  .acaoSecundaria,
   .novoCicloForm,
   .novoCicloForm button {
     width: 100%;

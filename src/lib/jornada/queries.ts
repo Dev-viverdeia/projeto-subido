@@ -30,30 +30,31 @@ export type JornadaOperacional = {
   fatos: FatosJornadaOperacional;
 };
 
-type FatoOportunidadeJornada = Pick<
+export type FatoOportunidadeJornada = Pick<
   Tables<'crm_oportunidades'>,
   'id' | 'empresa_id' | 'titulo' | 'etapa' | 'proxima_acao' | 'proxima_acao_em' | 'atualizado_em'
 >;
 
-type FatoCallJornada = Pick<
+export type FatoCallJornada = Pick<
   Tables<'calls_reunioes'>,
   'id' | 'titulo' | 'tipo' | 'status' | 'agendada_para' | 'oportunidade_id'
 >;
 
-type FatoPropostaJornada = Pick<
+export type FatoPropostaJornada = Pick<
   Tables<'propostas'>,
   'id' | 'titulo' | 'status' | 'oportunidade_id' | 'empresa_id' | 'atualizado_em'
 >;
 
-type FatoProjetoJornada = Pick<
+export type FatoProjetoJornada = Pick<
   Tables<'projetos_execucao'>,
-  'id' | 'titulo' | 'status' | 'prazo_em' | 'atualizado_em'
+  'id' | 'titulo' | 'status' | 'prazo_em' | 'atualizado_em' | 'oportunidade_id'
 > & {
   projeto_tarefas: Pick<Tables<'projeto_tarefas'>, 'status'>[];
 };
 
 export type FatosJornadaOperacional = {
   oportunidades: FatoOportunidadeJornada[];
+  enriquecimentos: Array<Pick<Tables<'crm_enriquecimentos'>, 'oportunidade_id' | 'status'>>;
   calls: FatoCallJornada[];
   propostas: FatoPropostaJornada[];
   projetos: FatoProjetoJornada[];
@@ -90,7 +91,9 @@ export async function obterJornadaOperacionalComCliente(
         .limit(500),
       supabase
         .from('projetos_execucao')
-        .select('id, titulo, status, prazo_em, atualizado_em, projeto_tarefas(status)')
+        .select(
+          'id, titulo, status, prazo_em, atualizado_em, oportunidade_id, projeto_tarefas(status)',
+        )
         .order('atualizado_em', { ascending: false })
         .limit(200),
       obterMetricasProgressoConta(),
@@ -186,6 +189,7 @@ export async function obterJornadaOperacionalComCliente(
     aprendizado: progresso,
     fatos: {
       oportunidades: linhasOportunidade,
+      enriquecimentos: enriquecimentos.data ?? [],
       calls: linhasCalls,
       propostas: linhasProposta,
       projetos: linhasExecucao,
