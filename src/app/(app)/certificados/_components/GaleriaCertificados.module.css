@@ -276,11 +276,32 @@
   flex-shrink: 0;
 }
 
-.linhaContagem {
+.linhaCriterios {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.linhaCriterios > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding-inline: var(--via-space-2);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.linhaCriterios > span[data-completo] {
+  border-color: var(--via-navy-16);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
 }
 
 .trilhoBarra {
@@ -721,6 +742,11 @@
 
   .linhaProgresso {
     justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .linhaCriterios {
+    width: 100%;
     flex-wrap: wrap;
   }
 

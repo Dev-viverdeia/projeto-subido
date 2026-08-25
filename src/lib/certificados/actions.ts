@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { obterProgressoConta } from '@/lib/progresso/queries';
+import { avaliarCertificado } from './criterios';
 import { carregarCertificavel, type OrigemCertificado } from './conteudo';
 
 const Origem = z.enum(['formacao', 'solucao']);
@@ -37,16 +38,29 @@ export async function emitirCertificado(
     carregarCertificavel(origem.data, slug.data),
     obterProgressoConta(),
   ]);
-  if (!conteudo || conteudo.itemIds.length === 0) {
+  if (!conteudo || conteudo.aprendizadoIds.length + conteudo.implementacaoIds.length === 0) {
     return { ok: false, mensagem: 'Este conteúdo não está disponível para certificação.' };
   }
 
-  const registro = origem.data === 'formacao' ? progresso.aulas : progresso.etapas;
-  const datas = conteudo.itemIds
-    .map((id) => registro[id])
-    .filter((data): data is string => Boolean(data));
-  if (datas.length < conteudo.itemIds.length) {
-    return { ok: false, mensagem: 'Conclua todas as etapas antes de emitir o certificado.' };
+  const registroAprendizado = origem.data === 'formacao' ? progresso.aulas : progresso.etapas;
+  const estado = avaliarCertificado(conteudo, {
+    aprendizado: registroAprendizado,
+    implementacao: progresso.etapas,
+  });
+  if (!estado.aprendizado.concluido) {
+    return {
+      ok: false,
+      mensagem:
+        origem.data === 'formacao'
+          ? 'Conclua todas as aulas antes de emitir o certificado.'
+          : 'Conclua as aulas do projeto antes de emitir o certificado.',
+    };
+  }
+  if (!estado.implementacao.concluido) {
+    return {
+      ok: false,
+      mensagem: 'Conclua todos os passos da implementação antes de emitir o certificado.',
+    };
   }
 
   const metadataBruta: unknown = user.user_metadata;
@@ -66,7 +80,7 @@ export async function emitirCertificado(
         slug: slug.data,
         titulo: conteudo.titulo,
         nome,
-        concluido_em: datas.sort().at(-1)!,
+        concluido_em: estado.concluidoEm!,
       },
       { onConflict: 'dono,origem,slug' },
     )

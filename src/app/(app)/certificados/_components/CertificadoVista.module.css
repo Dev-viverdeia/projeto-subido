@@ -318,26 +318,153 @@
 .pendencia {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--via-space-3);
-  padding: var(--via-space-8) var(--app-pad-card);
-  border: 1px dashed var(--via-navy-16);
+  gap: var(--app-gap-block);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-sm);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .pendencia {
+    background: var(--via-surface);
+  }
+}
+
+.pendenciaCabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--app-gap-block);
+  padding: var(--via-space-2);
+}
+
+.pendenciaCabecalho > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.pendenciaEyebrow {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
 }
 
 .pendenciaTitulo {
   margin: 0;
-  font-size: var(--via-fs-h4);
+  max-width: 28ch;
+  font-size: var(--via-fs-h3);
   font-weight: 560;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-tight);
   color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.pendenciaPercentual {
+  flex-shrink: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  letter-spacing: var(--app-ls-h3);
+  color: var(--via-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.criterios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-gap-grid);
+}
+
+.criterios article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 104px;
+  padding: var(--app-pad-card-tight);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.criterios article[data-completo] {
+  border-color: var(--via-navy-16);
+  background: color-mix(in srgb, var(--via-navy) 4%, var(--app-elev-1-bg));
+}
+
+.criterioIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-faint);
+}
+
+[data-completo] > .criterioIcone {
+  border-color: var(--via-navy-16);
+  color: var(--via-navy);
+}
+
+.criterios article > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.criterios strong {
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-primary);
+}
+
+.criterios p,
+.criterios article > span:last-child {
+  margin: 0;
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-caption);
+  color: var(--via-text-muted);
+}
+
+.criterios article > span:last-child {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.criterios article[data-completo] > span:last-child {
+  color: var(--via-navy);
+}
+
+.pendenciaBase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-gap-block);
+  padding: var(--via-space-4) var(--via-space-2) var(--via-space-2);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .pendenciaTexto {
   margin: 0;
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 46ch;
+  max-width: 54ch;
   text-wrap: pretty;
 }
 
@@ -446,5 +573,31 @@
   .origem,
   .codigo {
     display: none;
+  }
+
+  .pendenciaCabecalho,
+  .pendenciaBase {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pendenciaPercentual {
+    font-size: var(--via-fs-h4);
+  }
+
+  .criterios {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .criterios article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .criterios article > span:last-child {
+    grid-column: 2;
+  }
+
+  .pendenciaCta {
+    justify-content: center;
   }
 }

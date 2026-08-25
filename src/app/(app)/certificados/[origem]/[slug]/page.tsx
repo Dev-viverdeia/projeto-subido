@@ -8,15 +8,13 @@ import { CertificadoVista } from '../../_components/CertificadoVista';
 /**
  * O CERTIFICADO — o documento em si, um por conteúdo concluído.
  *
- * A EMISSÃO É O NAVEGADOR: a folha é HTML em proporção A4 paisagem com CSS de
- * impressão — "salvar como PDF" no diálogo de imprimir produz o arquivo, sem
- * backend. O que um backend acrescentaria (código de verificação público,
- * registro auditável) continua sendo outra fase; o que NÃO dá para fingir é
- * dito na folha: a conclusão vem do progresso desta conta.
+ * A folha é HTML em proporção A4 paisagem; "salvar como PDF" usa o diálogo de
+ * impressão do navegador. O registro público e seu código verificável são
+ * criados no backend somente depois da validação da conclusão.
  *
- * QUEM DECIDE SE HÁ CERTIFICADO É O CLIENTE: o layout já hidratou o progresso
- * da conta, e a `CertificadoVista` só desenha a folha se a conclusão for real.
- * URL adivinhada de conteúdo não concluído mostra o estado honesto.
+ * A vista usa o progresso hidratado para mostrar o estado real, mas a emissão
+ * pública é validada novamente no servidor antes de gravar o registro. Uma URL
+ * adivinhada de conteúdo não concluído mostra o estado honesto.
  *
  * O nome vem do JWT (user_metadata.nome, como em /conta) — sem ida ao banco.
  */
@@ -44,7 +42,8 @@ export default async function CertificadoPage({
   if (!ehOrigem(origem)) notFound();
 
   const [conteudo, supabase] = [await carregarCertificavel(origem, slug), await createClient()];
-  if (!conteudo || conteudo.itemIds.length === 0) notFound();
+  if (!conteudo || conteudo.aprendizadoIds.length + conteudo.implementacaoIds.length === 0)
+    notFound();
 
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
@@ -69,7 +68,8 @@ export default async function CertificadoPage({
         origem={origem}
         slug={slug}
         titulo={conteudo.titulo}
-        itemIds={conteudo.itemIds}
+        aprendizadoIds={conteudo.aprendizadoIds}
+        implementacaoIds={conteudo.implementacaoIds}
         hrefConteudo={conteudo.href}
         nome={nome}
         codigoInicial={emissao?.codigo ?? null}

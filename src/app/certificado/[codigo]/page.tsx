@@ -22,7 +22,7 @@ export async function generateMetadata({
   const certificado = await buscarCertificado(codigo);
   const titulo = certificado ? `Certificado · ${certificado.titulo}` : 'Certificado';
   const descricao = certificado
-    ? `${certificado.nome} concluiu ${certificado.titulo} na plataforma Subido. Confira o registro.`
+    ? `${certificado.nome} concluiu ${certificado.titulo} na plataforma Subido. Confira o registro público.`
     : 'Certificado emitido pela plataforma Subido.';
   return {
     title: titulo,
@@ -85,7 +85,8 @@ export default async function CertificadoPublicoPage({
       </article>
 
       <p className={styles.nota}>
-        Este registro foi emitido depois que todas as etapas foram concluídas na conta do aluno.
+        Este registro foi emitido depois que os critérios de conclusão foram validados na conta do
+        profissional.
       </p>
     </main>
   );
