@@ -62,12 +62,17 @@
   text-wrap: pretty;
 }
 
-.tempo {
+.painelProgresso {
   flex: none;
+  display: grid;
+  gap: var(--via-space-4);
+  min-width: 240px;
+}
+
+.tempo {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  min-width: 196px;
   padding: var(--via-space-3) var(--via-space-4);
   border-left: 2px solid var(--via-navy);
   color: var(--via-text-muted);
@@ -84,6 +89,39 @@
   font-size: var(--via-fs-sm);
   font-weight: 620;
   color: var(--via-text-primary);
+}
+
+.progressoAprendizado {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.progressoAprendizado > span:first-child {
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-muted);
+}
+
+.progressoAprendizado strong {
+  color: var(--via-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.barraAprendizado {
+  overflow: hidden;
+  display: block;
+  height: var(--app-radius-track);
+  border-radius: var(--app-radius-track);
+  background: var(--via-navy-08);
+}
+
+.barraAprendizado > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--via-navy);
+  transform-origin: left center;
+  transition: transform var(--app-t-state);
 }
 
 .mapa {
@@ -222,6 +260,16 @@
   border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+}
+
+.listaAulas details[data-concluida] .indice {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.listaAulas details[data-concluida] .tituloAula > strong {
+  color: var(--via-text-muted);
 }
 
 .tituloAula {
@@ -409,6 +457,68 @@
   font: 400 var(--via-fs-xs) / 1.6 var(--via-font-mono);
   color: var(--via-text-body);
   white-space: pre-wrap;
+}
+
+.conclusaoAula {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-soft);
+}
+
+.conclusaoAula strong,
+.conclusaoAula p {
+  margin: 0;
+}
+
+.conclusaoAula strong {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+}
+
+.conclusaoAula p {
+  margin-top: var(--via-space-1_5);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
+  color: var(--via-text-muted);
+}
+
+.conclusaoAula button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding: var(--via-space-2) var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: 600 var(--via-fs-xs) / 1 var(--via-font);
+  cursor: pointer;
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.conclusaoAula button[aria-pressed='true'] {
+  border-color: var(--via-border);
+  background: var(--via-surface);
+  color: var(--via-navy);
+}
+
+.conclusaoAula button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.conclusaoAula button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
 .fluxo {
@@ -619,6 +729,7 @@
     gap: var(--via-space-6);
   }
 
+  .painelProgresso,
   .tempo {
     width: 100%;
   }
@@ -656,10 +767,24 @@
   .corpoAula {
     margin-left: 0;
   }
+
+  .conclusaoAula {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .conclusaoAula button {
+    width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .raiz * {
     scroll-behavior: auto;
+  }
+
+  .barraAprendizado > span,
+  .conclusaoAula button {
+    transition: none;
   }
 }

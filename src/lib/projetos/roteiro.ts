@@ -147,6 +147,19 @@ export function idPassoProjeto(slug: string, faseId: string, passoId: string): s
   return `projeto:${slug}:${faseId}:${passoId}`;
 }
 
+/**
+ * As aulas de campo vivem no roteiro do projeto, não na tabela de aulas das
+ * formações. A posição faz parte do contrato editorial do minicurso: revisar o
+ * texto não apaga a conclusão já registrada pela pessoa.
+ */
+export function idAulaProjeto(slug: string, indice: number): string {
+  return `projeto:${slug}:aprender:aula-${String(indice + 1).padStart(2, '0')}`;
+}
+
+export function idsAulasProjeto(slug: string, roteiro: RoteiroProjeto): string[] {
+  return (roteiro.trilhaDidatica?.aulas ?? []).map((_, indice) => idAulaProjeto(slug, indice));
+}
+
 export function idsPassosProjeto(slug: string, roteiro: RoteiroProjeto): string[] {
   return roteiro.fases.flatMap((fase) =>
     fase.passos.map((passo) => idPassoProjeto(slug, fase.id, passo.id)),

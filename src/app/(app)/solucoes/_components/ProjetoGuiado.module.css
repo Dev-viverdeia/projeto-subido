@@ -7,7 +7,7 @@
 .minicurso {
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(300px, 0.78fr) minmax(440px, 1.22fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: color-mix(in srgb, var(--app-elev-2-bg) 90%, transparent);
@@ -28,9 +28,9 @@
 
 .minicurso h1 {
   margin: 0;
-  max-width: 13ch;
+  max-width: 15ch;
   font-family: var(--via-font-display);
-  font-size: clamp(2.2rem, 1.75rem + 1.8vw, 4rem);
+  font-size: clamp(2.2rem, 1.85rem + 1.35vw, 3.35rem);
   font-weight: 540;
   line-height: 1;
   letter-spacing: var(--app-ls-h1);
@@ -1675,7 +1675,12 @@
 
 @media (max-width: 1079px) {
   .minicurso {
-    grid-template-columns: minmax(0, 0.82fr) minmax(380px, 1.18fr);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aulaAbertura {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
   }
 
   .fichaCampoResumo {

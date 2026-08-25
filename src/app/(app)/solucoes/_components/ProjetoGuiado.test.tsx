@@ -235,8 +235,14 @@ describe('Projeto guiado', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Aprenda como este projeto funciona' }),
     ).toBeDefined();
-    expect(screen.getByText(/Cada aula termina com uma tarefa objetiva e materiais/)).toBeDefined();
+    expect(
+      screen.getByText(/Conclua as aulas, use os modelos e entre na implementação/),
+    ).toBeDefined();
     expect(screen.getByText('2 aulas · 2 recursos')).toBeDefined();
+    expect(screen.getByRole('progressbar', { name: 'Progresso do aprendizado' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    );
     expect(screen.getByText('Mapa da conversa')).toBeDefined();
     expect(screen.getByRole('heading', { level: 3, name: 'Do contato ao CRM' })).toBeDefined();
     expect(screen.getByRole('button', { name: 'Copiar Briefing de atendimento' })).toBeDefined();
@@ -268,6 +274,22 @@ describe('Projeto guiado', () => {
     await user.click(screen.getByRole('button', { name: 'Concluir: Mapear o cenário atual' }));
     expect(screen.getByText('1 de 5 passos')).toBeDefined();
     expect(screen.getByRole('heading', { level: 2, name: 'Preparar' })).toBeDefined();
+  });
+
+  it('salva a conclusão da aula sem misturar aprendizado com implementação', async () => {
+    const user = userEvent.setup();
+    montar();
+
+    await user.click(screen.getAllByRole('button', { name: 'Concluir aula' })[0]!);
+
+    expect(screen.getByRole('progressbar', { name: 'Progresso do aprendizado' })).toHaveAttribute(
+      'aria-valuenow',
+      '50',
+    );
+    expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    );
   });
 
   it('leva a identidade do projeto ao Estúdio', () => {

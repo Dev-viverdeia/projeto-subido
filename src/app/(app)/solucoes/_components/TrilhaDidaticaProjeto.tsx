@@ -1,6 +1,9 @@
+'use client';
+
 import {
   BookOpenCheck,
   BookOpenText,
+  Check,
   CheckCircle2,
   Clapperboard,
   Clock3,
@@ -10,6 +13,8 @@ import {
   Network,
 } from 'lucide-react';
 import type { RoteiroProjeto } from '@/lib/projetos/roteiro';
+import { idAulaProjeto } from '@/lib/projetos/roteiro';
+import { useAcoesProgresso, useProgresso } from '@/lib/progresso/local';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import styles from './TrilhaDidaticaProjeto.module.css';
@@ -24,12 +29,20 @@ const ROTULOS_RECURSO = {
 } as const;
 
 export function TrilhaDidaticaProjeto({
+  slug,
   trilha,
   videoAberturaUrl,
 }: {
+  slug: string;
   trilha: Trilha;
   videoAberturaUrl?: string | null;
 }) {
+  const progresso = useProgresso();
+  const { alternarEtapa } = useAcoesProgresso();
+  const idsAulas = trilha.aulas.map((_, indice) => idAulaProjeto(slug, indice));
+  const aulasConcluidas = idsAulas.filter((id) => Boolean(progresso.etapas[id])).length;
+  const proximaAulaIndice = idsAulas.findIndex((id) => !progresso.etapas[id]);
+  const porcentagem = Math.round((aulasConcluidas / trilha.aulas.length) * 100);
   const videosComplementares = trilha.videosReferencia.filter(
     (video) => video.videoUrl !== videoAberturaUrl,
   );
@@ -42,18 +55,36 @@ export function TrilhaDidaticaProjeto({
     <section className={styles.raiz} aria-labelledby="trilha-didatica-titulo">
       <header className={styles.cabecalho}>
         <div>
-          <p>Antes de implementar</p>
+          <p>Parte 1 · Aprendizado</p>
           <h2 id="trilha-didatica-titulo">Aprenda como este projeto funciona</h2>
           <span>
-            Cada aula termina com uma tarefa objetiva e materiais para usar na implementação.
+            Conclua as aulas, use os modelos e entre na implementação sabendo o que precisa
+            construir para o cliente.
           </span>
         </div>
-        <div className={styles.tempo}>
-          <Clock3 size={16} aria-hidden="true" />
-          <span>
-            Tempo de preparação
-            <strong>{trilha.tempoTotal}</strong>
-          </span>
+        <div className={styles.painelProgresso}>
+          <div className={styles.tempo}>
+            <Clock3 size={16} aria-hidden="true" />
+            <span>
+              Tempo de preparação
+              <strong>{trilha.tempoTotal}</strong>
+            </span>
+          </div>
+          <div className={styles.progressoAprendizado}>
+            <span>
+              <strong>{aulasConcluidas}</strong> de {trilha.aulas.length} aulas
+            </span>
+            <span
+              className={styles.barraAprendizado}
+              role="progressbar"
+              aria-label="Progresso do aprendizado"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={porcentagem}
+            >
+              <span style={{ transform: `scaleX(${porcentagem / 100})` }} />
+            </span>
+          </div>
         </div>
       </header>
 
@@ -95,9 +126,19 @@ export function TrilhaDidaticaProjeto({
 
           <div className={styles.listaAulas}>
             {trilha.aulas.map((aula, indice) => (
-              <details key={aula.titulo} open={indice === 0}>
+              <details
+                key={aula.titulo}
+                open={indice === proximaAulaIndice}
+                data-concluida={Boolean(progresso.etapas[idsAulas[indice]!]) || undefined}
+              >
                 <summary>
-                  <span className={styles.indice}>{String(indice + 1).padStart(2, '0')}</span>
+                  <span className={styles.indice}>
+                    {progresso.etapas[idsAulas[indice]!] ? (
+                      <Check size={15} aria-label="Aula concluída" />
+                    ) : (
+                      String(indice + 1).padStart(2, '0')
+                    )}
+                  </span>
                   <span className={styles.tituloAula}>
                     <strong>{aula.titulo}</strong>
                     <small>{aula.objetivo}</small>
@@ -158,6 +199,34 @@ export function TrilhaDidaticaProjeto({
                       </div>
                     </section>
                   ) : null}
+
+                  <footer className={styles.conclusaoAula}>
+                    <div>
+                      <strong>
+                        {progresso.etapas[idsAulas[indice]!]
+                          ? 'Aula concluída'
+                          : 'Terminou esta aula?'}
+                      </strong>
+                      <p>
+                        {progresso.etapas[idsAulas[indice]!]
+                          ? 'Seu avanço está salvo. Você pode reabrir a aula quando quiser.'
+                          : 'Marque a conclusão para a plataforma abrir o próximo conteúdo.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-pressed={Boolean(progresso.etapas[idsAulas[indice]!])}
+                      onClick={() => alternarEtapa(idsAulas[indice]!, slug)}
+                    >
+                      {progresso.etapas[idsAulas[indice]!] ? (
+                        <>
+                          <Check size={15} aria-hidden="true" /> Concluída
+                        </>
+                      ) : (
+                        'Concluir aula'
+                      )}
+                    </button>
+                  </footer>
                 </div>
               </details>
             ))}
