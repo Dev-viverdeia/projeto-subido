@@ -54,7 +54,11 @@ export function TrilhaDidaticaProjeto({
   );
 
   return (
-    <section className={styles.raiz} aria-labelledby="trilha-didatica-titulo">
+    <section
+      id="aprendizado-projeto"
+      className={styles.raiz}
+      aria-labelledby="trilha-didatica-titulo"
+    >
       <header className={styles.cabecalho}>
         <div>
           <p>Parte 1 · Aprendizado</p>

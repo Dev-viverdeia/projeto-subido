@@ -1,14 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { avaliarCertificado, type EstadoCertificado } from '@/lib/certificados/criterios';
 import type { FormacaoResumo, SolucaoResumo } from '@/lib/conteudo/queries';
-import {
-  contarConcluidas,
-  contarEtapasFeitas,
-  estadoDoProgresso,
-  percentual,
-  useProgresso,
-} from '@/lib/progresso/local';
+import { idsAulasProjeto } from '@/lib/projetos/roteiro';
+import { useProgresso } from '@/lib/progresso/local';
 import { dataCurta } from '../../builder/_components/statusBuilder';
 import { Visto } from '../../_components/PillEstado';
 import styles from './GaleriaCertificados.module.css';
@@ -33,10 +29,7 @@ type Conteudo = {
   slug: string;
   titulo: string;
   href: string;
-  feitas: number;
-  total: number;
-  /** ISO da marcação mais recente — a data da conclusão quando concluído. */
-  ultimaIso: string | null;
+  estado: EstadoCertificado;
 };
 
 type RecomendacaoInicial = {
@@ -54,11 +47,6 @@ const ROTULO_ORIGEM: Record<Origem, string> = {
   solucao: 'Projeto',
 };
 
-const UNIDADE: Record<Origem, [string, string]> = {
-  formacao: ['aula', 'aulas'],
-  solucao: ['etapa', 'etapas'],
-};
-
 export function GaleriaCertificados({
   formacoes,
   solucoes,
@@ -68,45 +56,39 @@ export function GaleriaCertificados({
 }) {
   const progresso = useProgresso();
 
-  const maisRecenteDe = (ids: string[], registro: Record<string, string>) => {
-    let melhor: string | null = null;
-    for (const id of ids) {
-      const iso = registro[id];
-      if (iso && (!melhor || iso > melhor)) melhor = iso;
-    }
-    return melhor;
-  };
-
   const conteudos: Conteudo[] = [
     ...formacoes.map((f) => ({
       origem: 'formacao' as const,
       slug: f.slug,
       titulo: f.titulo,
       href: `/formacoes/${f.slug}`,
-      feitas: contarConcluidas(progresso, f.aulaIds),
-      total: f.aulaIds.length,
-      ultimaIso: maisRecenteDe(f.aulaIds, progresso.aulas),
+      estado: avaliarCertificado(
+        { aprendizadoIds: f.aulaIds, implementacaoIds: [] },
+        { aprendizado: progresso.aulas, implementacao: progresso.etapas },
+      ),
     })),
-    ...solucoes.map((s) => ({
-      origem: 'solucao' as const,
-      slug: s.slug,
-      titulo: s.titulo,
-      href: `/solucoes/${s.slug}`,
-      feitas: contarEtapasFeitas(progresso, s.etapaIds),
-      total: s.etapaIds.length,
-      ultimaIso: maisRecenteDe(s.etapaIds, progresso.etapas),
-    })),
-  ].filter((c) => c.total > 0);
+    ...solucoes.map((s) => {
+      const aprendizadoIds = s.projeto ? idsAulasProjeto(s.slug, s.projeto.roteiro) : [];
+      return {
+        origem: 'solucao' as const,
+        slug: s.slug,
+        titulo: s.titulo,
+        href: `/solucoes/${s.slug}`,
+        estado: avaliarCertificado(
+          { aprendizadoIds, implementacaoIds: s.etapaIds },
+          { aprendizado: progresso.etapas, implementacao: progresso.etapas },
+        ),
+      };
+    }),
+  ].filter((c) => c.estado.total > 0);
 
   const conquistados = conteudos
-    .filter((c) => estadoDoProgresso(c.feitas, c.total) === 'concluida')
-    .sort((a, b) => (b.ultimaIso ?? '').localeCompare(a.ultimaIso ?? ''));
+    .filter((c) => c.estado.concluido)
+    .sort((a, b) => (b.estado.concluidoEm ?? '').localeCompare(a.estado.concluidoEm ?? ''));
   const andamento = conteudos
-    .filter((c) => estadoDoProgresso(c.feitas, c.total) === 'em-andamento')
-    .sort((a, b) => percentual(b.feitas, b.total) - percentual(a.feitas, a.total));
-  const porComecar = conteudos.filter(
-    (c) => estadoDoProgresso(c.feitas, c.total) === 'nao-iniciada',
-  );
+    .filter((c) => c.estado.iniciado && !c.estado.concluido)
+    .sort((a, b) => b.estado.percentual - a.estado.percentual);
+  const porComecar = conteudos.filter((c) => !c.estado.iniciado);
   const formacaoInicial = formacoes.find((f) => f.aulaIds.length > 0);
   const solucaoInicial = solucoes.find((s) => s.etapaIds.length > 0);
 
@@ -128,7 +110,7 @@ export function GaleriaCertificados({
           origem: 'Projeto',
           titulo: solucaoInicial.titulo,
           resumo: solucaoInicial.resumo,
-          meta: `${solucaoInicial.etapaIds.length} ${solucaoInicial.etapaIds.length === 1 ? 'etapa' : 'etapas'} · ${solucaoInicial.ferramentas.length > 0 ? `${solucaoInicial.ferramentas.length} ${solucaoInicial.ferramentas.length === 1 ? 'ferramenta' : 'ferramentas'}` : 'roteiro guiado'}`,
+          meta: `${solucaoInicial.projeto?.roteiro.trilhaDidatica?.aulas.length ?? 0} aulas · ${solucaoInicial.etapaIds.length} passos`,
           href: `/solucoes/${solucaoInicial.slug}`,
           acao: 'Abrir projeto',
         }
@@ -146,8 +128,8 @@ export function GaleriaCertificados({
             </p>
             <p className={styles.vazioTitulo}>Você ainda não concluiu uma formação ou projeto.</p>
             <p className={styles.vazioTexto}>
-              Termine todas as aulas de uma formação ou todas as etapas de um projeto. O certificado
-              aparecerá aqui automaticamente.
+              Conclua todas as aulas de uma formação. Nos projetos, conclua também os passos da
+              implementação. O certificado será liberado automaticamente.
             </p>
             <div className={styles.vazioAcoes}>
               <Link href="/formacoes" className={styles.vazioCta}>
@@ -164,15 +146,15 @@ export function GaleriaCertificados({
             <ol className={styles.vazioDados}>
               <li>
                 <span>01</span>
-                <p>Concluir uma formação ou projeto</p>
+                <p>Concluir o aprendizado</p>
               </li>
               <li>
                 <span>02</span>
-                <p>A plataforma registra a conclusão</p>
+                <p>Concluir a implementação do projeto</p>
               </li>
               <li>
                 <span>03</span>
-                <p>Imprimir ou salvar o certificado em PDF</p>
+                <p>Compartilhar ou salvar em PDF</p>
               </li>
             </ol>
           </div>
@@ -242,15 +224,23 @@ export function GaleriaCertificados({
                     <div className={styles.diplomaDado}>
                       <dt className={styles.diplomaRotulo}>Concluído em</dt>
                       <dd className={styles.diplomaValor}>
-                        {c.ultimaIso ? dataCurta(c.ultimaIso) : '—'}
+                        {c.estado.concluidoEm ? dataCurta(c.estado.concluidoEm) : '—'}
                       </dd>
                     </div>
                     <div className={styles.diplomaDado}>
-                      <dt className={styles.diplomaRotulo}>{UNIDADE[c.origem][1]}</dt>
+                      <dt className={styles.diplomaRotulo}>Aulas</dt>
                       <dd className={styles.diplomaValor}>
-                        {c.feitas}/{c.total}
+                        {c.estado.aprendizado.feitas}/{c.estado.aprendizado.total}
                       </dd>
                     </div>
+                    {c.estado.implementacao.total > 0 ? (
+                      <div className={styles.diplomaDado}>
+                        <dt className={styles.diplomaRotulo}>Implementação</dt>
+                        <dd className={styles.diplomaValor}>
+                          {c.estado.implementacao.feitas}/{c.estado.implementacao.total}
+                        </dd>
+                      </div>
+                    ) : null}
                   </dl>
 
                   <div className={styles.diplomaBase}>
@@ -278,7 +268,13 @@ export function GaleriaCertificados({
 
           <ul className={styles.lista}>
             {andamento.map((c) => {
-              const pct = percentual(c.feitas, c.total);
+              const pct = c.estado.percentual;
+              const proximaAcao =
+                c.origem === 'formacao'
+                  ? 'Continuar formação'
+                  : c.estado.aprendizado.concluido
+                    ? 'Continuar implementação'
+                    : 'Concluir aulas';
               return (
                 <li key={`${c.origem}-${c.slug}`}>
                   <Link href={c.href} className={styles.linha}>
@@ -287,8 +283,16 @@ export function GaleriaCertificados({
                       <p className={styles.linhaTitulo}>{c.titulo}</p>
                     </div>
                     <div className={styles.linhaProgresso}>
-                      <span className={styles.linhaContagem}>
-                        {c.feitas}/{c.total} {UNIDADE[c.origem][c.total === 1 ? 0 : 1]}
+                      <span className={styles.linhaCriterios}>
+                        <span data-completo={c.estado.aprendizado.concluido || undefined}>
+                          Aulas {c.estado.aprendizado.feitas}/{c.estado.aprendizado.total}
+                        </span>
+                        {c.estado.implementacao.total > 0 ? (
+                          <span data-completo={c.estado.implementacao.concluido || undefined}>
+                            Implementação {c.estado.implementacao.feitas}/
+                            {c.estado.implementacao.total}
+                          </span>
+                        ) : null}
                       </span>
                       <span
                         className={styles.trilhoBarra}
@@ -302,7 +306,7 @@ export function GaleriaCertificados({
                       </span>
                       <span className={styles.linhaPct}>{pct}%</span>
                       <span className={styles.linhaAcao} aria-hidden="true">
-                        {c.origem === 'formacao' ? 'Continuar formação' : 'Continuar projeto'}
+                        {proximaAcao}
                       </span>
                     </div>
                   </Link>

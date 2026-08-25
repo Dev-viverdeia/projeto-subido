@@ -44,7 +44,11 @@ const solucoes: SolucaoResumo[] = [
     criado_em: '2026-07-01T00:00:00.000Z',
     etapaIds: ['etapa-1', 'etapa-2'],
     ferramentas: ['OpenAI'],
-    projeto: null,
+    projeto: {
+      roteiro: {
+        trilhaDidatica: { aulas: [{}, {}] },
+      },
+    } as unknown as SolucaoResumo['projeto'],
   },
 ];
 
@@ -104,5 +108,47 @@ describe('galeria de certificados', () => {
       '/certificados/formacao/formacao-de-execucao',
     );
     expect(screen.getByText('Formação de execução')).toBeInTheDocument();
+  });
+
+  it('não certifica um projeto que concluiu passos sem concluir as aulas', () => {
+    progressoTeste.atual = {
+      aulas: {},
+      formacoes: {},
+      etapas: {
+        'etapa-1': '2026-08-08T10:00:00.000Z',
+        'etapa-2': '2026-08-09T10:00:00.000Z',
+      },
+      solucoes: { 'atendimento-com-ia': '2026-08-08T10:00:00.000Z' },
+    };
+
+    render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
+
+    const projeto = screen.getByRole('link', { name: /Atendimento com IA/ });
+    expect(within(projeto).getByText('Aulas 0/2')).toBeInTheDocument();
+    expect(within(projeto).getByText('Implementação 2/2')).toBeInTheDocument();
+    expect(within(projeto).getByText('Concluir aulas')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Ver certificado' })).not.toBeInTheDocument();
+  });
+
+  it('certifica o projeto depois das aulas e da implementação', () => {
+    progressoTeste.atual = {
+      aulas: {},
+      formacoes: {},
+      etapas: {
+        'projeto:atendimento-com-ia:aprender:aula-01': '2026-08-08T10:00:00.000Z',
+        'projeto:atendimento-com-ia:aprender:aula-02': '2026-08-08T11:00:00.000Z',
+        'etapa-1': '2026-08-09T10:00:00.000Z',
+        'etapa-2': '2026-08-10T10:00:00.000Z',
+      },
+      solucoes: { 'atendimento-com-ia': '2026-08-08T10:00:00.000Z' },
+    };
+
+    render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
+
+    expect(screen.getByRole('link', { name: 'Ver certificado' })).toHaveAttribute(
+      'href',
+      '/certificados/solucao/atendimento-com-ia',
+    );
+    expect(screen.getByText('Implementação', { selector: 'dt' })).toBeInTheDocument();
   });
 });

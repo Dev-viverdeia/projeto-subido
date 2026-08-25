@@ -27,7 +27,7 @@ export default async function CertificadosPage() {
         <EvolucaoProfissional
           etapa="certificados"
           titulo="Seus certificados."
-          descricao="Ao concluir uma formação ou um projeto, o certificado aparece aqui com seu nome e a data de conclusão."
+          descricao="Formações certificam o aprendizado. Projetos certificam as aulas e a implementação concluídas."
         />
       </div>
 

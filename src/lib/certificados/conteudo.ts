@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { obterFormacao, obterSolucao } from '@/lib/conteudo/queries';
-import { idsPassosProjeto } from '@/lib/projetos/roteiro';
+import { idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 
 export type OrigemCertificado = 'formacao' | 'solucao';
 
@@ -11,7 +11,8 @@ export async function carregarCertificavel(origem: OrigemCertificado, slug: stri
     if (!formacao) return null;
     return {
       titulo: formacao.titulo,
-      itemIds: formacao.modulos.flatMap((modulo) => modulo.aulas.map((aula) => aula.id)),
+      aprendizadoIds: formacao.modulos.flatMap((modulo) => modulo.aulas.map((aula) => aula.id)),
+      implementacaoIds: [],
       href: `/formacoes/${slug}`,
     };
   }
@@ -20,7 +21,8 @@ export async function carregarCertificavel(origem: OrigemCertificado, slug: stri
   if (!projeto) return null;
   return {
     titulo: projeto.titulo,
-    itemIds: projeto.projeto
+    aprendizadoIds: projeto.projeto ? idsAulasProjeto(projeto.slug, projeto.projeto.roteiro) : [],
+    implementacaoIds: projeto.projeto
       ? idsPassosProjeto(projeto.slug, projeto.projeto.roteiro)
       : projeto.itens.filter((item) => item.tipo === 'etapa').map((item) => item.id),
     href: `/solucoes/${slug}`,

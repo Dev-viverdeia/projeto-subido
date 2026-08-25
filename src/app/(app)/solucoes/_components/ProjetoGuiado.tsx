@@ -2,16 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Clock3,
-  PackageCheck,
-  Layers3,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock3, Layers3 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
 import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import { idPassoProjeto, idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
@@ -28,6 +19,7 @@ import { ProximaSolucao } from './ProximaSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
 import { TrilhaDidaticaProjeto } from './TrilhaDidaticaProjeto';
 import { CabecalhoMinicurso } from './CabecalhoMinicurso';
+import { AcaoRetomadaProjeto } from './AcaoRetomadaProjeto';
 import styles from './ProjetoGuiado.module.css';
 
 export function ProjetoGuiado({
@@ -58,7 +50,9 @@ export function ProjetoGuiado({
   const todosIds = idsPassosProjeto(slug, projeto.roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
   const porcentagem = percentual(feitas, todosIds.length);
-  const aulasFeitas = contarEtapasFeitas(progresso, idsAulasProjeto(slug, projeto.roteiro));
+  const todosIdsAulas = idsAulasProjeto(slug, projeto.roteiro);
+  const aulasFeitas = contarEtapasFeitas(progresso, todosIdsAulas);
+  const aprendizadoConcluido = todosIdsAulas.length === 0 || aulasFeitas === todosIdsAulas.length;
   const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const perfil = projeto.roteiro.perfil;
   const escopo = projeto.roteiro.escopo;
@@ -166,23 +160,12 @@ export function ProjetoGuiado({
             <span style={{ transform: `scaleX(${porcentagem / 100})` }} />
           </div>
 
-          {proximoPasso ? (
-            <button type="button" className={styles.continuarHero} onClick={irAoProximo}>
-              <span>
-                <small>Próximo passo</small>
-                {proximoPasso.passo.titulo}
-              </span>
-              <ArrowDown size={16} aria-hidden="true" />
-            </button>
-          ) : (
-            <Link href={destinoCrm} className={styles.continuarHero}>
-              <span>
-                <small>Próxima ação</small>
-                Encontrar novo cliente
-              </span>
-              <PackageCheck size={18} aria-hidden="true" />
-            </Link>
-          )}
+          <AcaoRetomadaProjeto
+            slug={slug}
+            proximoPasso={proximoPasso?.passo.titulo ?? null}
+            aprendizadoConcluido={aprendizadoConcluido}
+            aoRetomar={irAoProximo}
+          />
         </section>
 
         <nav className={styles.navegacaoFases} aria-label="Fases do projeto">

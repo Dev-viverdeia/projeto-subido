@@ -382,7 +382,29 @@ describe('Projeto guiado', () => {
     );
   });
 
-  it('leva para uma nova oportunidade quando a entrega guiada termina', () => {
+  it('leva ao certificado quando aprendizado e implementação terminam', () => {
+    const agora = new Date().toISOString();
+    const etapas = Object.fromEntries(
+      [
+        ...fases.map((fase) => `projeto:crm-comercial:${fase}:passo-${fase}`),
+        'projeto:crm-comercial:aprender:aula-01',
+        'projeto:crm-comercial:aprender:aula-02',
+      ].map((id) => [id, agora]),
+    );
+    localStorage.setItem(
+      'subido_progresso_v1',
+      JSON.stringify({ aulas: {}, formacoes: {}, etapas, solucoes: {} }),
+    );
+
+    montar();
+
+    expect(screen.getByRole('link', { name: /Ver certificado/ })).toHaveAttribute(
+      'href',
+      '/certificados/solucao/crm-comercial',
+    );
+  });
+
+  it('pede as aulas quando a implementação terminou mas o aprendizado não', () => {
     const agora = new Date().toISOString();
     const etapas = Object.fromEntries(
       fases.map((fase) => [`projeto:crm-comercial:${fase}:passo-${fase}`, agora]),
@@ -394,9 +416,10 @@ describe('Projeto guiado', () => {
 
     montar();
 
-    expect(screen.getByRole('link', { name: /Encontrar novo cliente/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Concluir aulas do projeto/ })).toHaveAttribute(
       'href',
-      '/vendas?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
+      '#aprendizado-projeto',
     );
+    expect(screen.queryByRole('link', { name: /Ver certificado/ })).not.toBeInTheDocument();
   });
 });
