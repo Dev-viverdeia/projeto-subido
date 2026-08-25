@@ -31,7 +31,7 @@ function dataHumana(valor: string): string {
 export function resumoParaFicha(valor: string): string {
   const frases = valor.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((frase) => frase.trim()) ?? [];
   const abertura = frases.slice(0, 2).join(' ');
-  return limitar(abertura.length >= 80 ? abertura : valor, 260);
+  return limitar(abertura.length >= 80 ? abertura : valor, 260).replace(/(\d)\.\s+(\d)/g, '$1,$2');
 }
 
 /** A ação precisa caber em um olhar. Detalhes depois de dois-pontos pertencem
@@ -39,8 +39,11 @@ export function resumoParaFicha(valor: string): string {
 export function acaoParaFicha(valor: string): string {
   const [semDetalhes] = valor.split(/:\s+/, 1);
   const [semAnexo] = (semDetalhes ?? valor).split(/\s+e\s+anexando\b/i, 1);
-  const curta = limitar(semAnexo ?? semDetalhes ?? valor, 120);
-  return /[.!?]$/.test(curta) ? curta : `${curta}.`;
+  const curta = limitar(semAnexo ?? semDetalhes ?? valor, 130).replace(
+    /\s+(?:de|da|do|das|dos|para|com|e)…$/i,
+    '…',
+  );
+  return /[.!?…]$/.test(curta) ? curta : `${curta}.`;
 }
 
 /** Resultados antigos podem conter UUIDs, nomes de colunas e datas ISO. Esses
