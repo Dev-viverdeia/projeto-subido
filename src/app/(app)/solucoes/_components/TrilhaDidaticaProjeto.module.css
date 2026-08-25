@@ -446,109 +446,6 @@
   color: var(--via-text-body);
 }
 
-.recursosAula {
-  padding-top: var(--via-space-5);
-  border-top: 1px solid var(--via-border-soft);
-}
-
-.recursosAula > div {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--via-space-3);
-}
-
-.recursosAula article {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--via-space-3);
-  min-width: 0;
-  padding: var(--via-space-4);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--app-elev-1-bg) 88%, transparent);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.iconeRecurso {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
-  color: var(--via-navy);
-}
-
-.recursosAula article > div {
-  min-width: 0;
-}
-
-.recursosAula small {
-  display: block;
-  margin-bottom: 2px;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.recursosAula strong {
-  display: block;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-}
-
-.recursosAula p {
-  margin: var(--via-space-2) 0 0;
-  font-size: var(--via-fs-xs);
-  line-height: 1.5;
-  color: var(--via-text-muted);
-}
-.recursosAula a,
-.recursosAula summary {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-1_5);
-  margin-top: var(--via-space-3);
-  border: 0;
-  background: transparent;
-  font-size: var(--via-fs-xs);
-  font-weight: 620;
-  color: var(--via-navy);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.recursosAula a:hover,
-.recursosAula summary:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.recursosAula a:focus-visible,
-.recursosAula summary:focus-visible {
-  outline: none;
-  border-radius: var(--app-radius-track);
-  box-shadow: var(--app-ring);
-}
-
-.recursosAula pre {
-  overflow: auto;
-  max-height: 280px;
-  margin: var(--via-space-3) 0 0;
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
-  font: 400 var(--via-fs-xs) / 1.6 var(--via-font-mono);
-  color: var(--via-text-body);
-  white-space: pre-wrap;
-}
-
 .conclusaoAula {
   display: flex;
   align-items: center;
@@ -828,10 +725,6 @@
   .gradeVideos,
   .gradeMateriais,
   .corpoAula dl,
-  .recursosAula > div {
-    grid-template-columns: 1fr;
-  }
-
   .mapa li + li {
     border-top: 1px solid var(--via-border-soft);
     border-left: 0;
