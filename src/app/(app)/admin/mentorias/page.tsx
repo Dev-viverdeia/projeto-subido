@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { CalendarPlus2, PencilLine } from 'lucide-react';
 import { Button, EmptyState, Pill } from '@/design-system/via';
 import { createClient } from '@/lib/supabase/server';
-import { CabecalhoPagina } from '../../_components/CabecalhoPagina';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Mentorias · Administração' };
@@ -43,8 +42,6 @@ export default async function AdminMentoriasPage() {
 
   return (
     <>
-      <CabecalhoPagina titulo="Mentorias" oculto />
-
       <header className={styles.cabecalho}>
         <div>
           <p className={styles.sobretitulo}>Agenda administrável</p>
