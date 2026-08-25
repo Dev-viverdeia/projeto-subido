@@ -3,6 +3,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { handleError } from '@/lib/errors';
+import { montarPlanoJornadaEmFoco } from '@/lib/jornada/foco';
 import { obterJornadaOperacionalComCliente, type JornadaOperacional } from '@/lib/jornada/queries';
 import type { Database } from '@/lib/supabase/types.generated';
 import { SinaisSobralSchema, type SinaisSobral } from './direcao';
@@ -133,6 +134,15 @@ export async function obterSinaisSobral(
     (projeto) => projeto.status !== 'concluido' && projeto.status !== 'pausado',
   );
   const acoesPendentes = linhasAcoes.filter((acao) => acao.status === 'pendente');
+  const fatosParaPlano = fatosCompartilhados ?? jornada.fatos;
+  const planoEmFoco = foco
+    ? montarPlanoJornadaEmFoco({
+        perfil: jornada.perfil,
+        aprendizado: jornada.aprendizado,
+        fatos: fatosParaPlano,
+        oportunidadeId: foco.id,
+      })
+    : jornada.plano;
 
   return SinaisSobralSchema.parse({
     momento: agora,
@@ -172,12 +182,12 @@ export async function obterSinaisSobral(
       acoesAtrasadas: contarAcoesAtrasadas(linhasAcoes, agora),
     },
     jornada: {
-      perfilCompleto: jornada.plano.perfilCompleto,
-      etapaAtual: jornada.plano.etapaAtual,
-      proximoPasso: jornada.plano.proximoPasso,
-      evidenciasConcluidas: jornada.plano.evidenciasConcluidas,
-      totalEvidencias: jornada.plano.totalEvidencias,
-      percentual: jornada.plano.percentual,
+      perfilCompleto: planoEmFoco.perfilCompleto,
+      etapaAtual: planoEmFoco.etapaAtual,
+      proximoPasso: planoEmFoco.proximoPasso,
+      evidenciasConcluidas: planoEmFoco.evidenciasConcluidas,
+      totalEvidencias: planoEmFoco.totalEvidencias,
+      percentual: planoEmFoco.percentual,
       aprendizado: jornada.aprendizado,
     },
     radar,

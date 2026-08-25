@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowUpRight, CalendarClock, Check, CheckCircle2, History, Video, X } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
-import { FASES_CRM, faseDaEtapa } from '@/lib/crm/etapas';
+import { montarCicloCliente } from '@/lib/crm/ciclo-cliente';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
 import { EditarProximaAcao } from './EditarProximaAcao';
@@ -25,151 +25,39 @@ function destinoDaCall(call: DossieLead['calls'][number]) {
   return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/reunioes/${call.id}`;
 }
 
-type Movimento = {
-  tipo: 'navegacao' | 'encerrado' | 'novo-ciclo';
-  rotulo: string;
-  titulo: string;
-  href: string | null;
-  acao: string | null;
-  prazo: string | null;
-};
-
-function proximoMovimento(lead: DossieLead): Movimento {
-  const compromisso = lead.acoesPlano[0] ?? null;
-  const proposta = lead.propostaRecente;
-  const call = lead.calls[0] ?? null;
-
-  if (compromisso) {
-    return {
-      tipo: 'navegacao',
-      rotulo: 'Compromisso marcado',
-      titulo: compromisso.titulo,
-      href: compromisso.reuniaoId ? `/reunioes/${compromisso.reuniaoId}` : null,
-      acao: compromisso.reuniaoId ? 'Abrir reunião' : null,
-      prazo: compromisso.prazoEm,
-    };
-  }
-
-  if (lead.projetoAtivo) {
-    return {
-      tipo: 'navegacao',
-      rotulo: 'Entrega em andamento',
-      titulo: `Continue ${lead.projetoAtivo.titulo}.`,
-      href: `/solucoes/execucao/${lead.projetoAtivo.id}`,
-      acao: 'Abrir projeto',
-      prazo: null,
-    };
-  }
-
-  if (lead.projetoRecente?.status === 'concluido' || lead.oportunidade.etapa === 'ganho') {
-    return {
-      tipo: 'novo-ciclo',
-      rotulo: 'Ciclo concluído',
-      titulo: `Inicie uma nova venda quando houver outro projeto para oferecer a ${lead.empresa.nome}.`,
-      href: null,
-      acao: null,
-      prazo: null,
-    };
-  }
-
-  if (lead.oportunidade.etapa === 'perdido') {
-    return {
-      tipo: 'encerrado',
-      rotulo: 'Venda encerrada',
-      titulo: 'O motivo da perda fica salvo para orientar uma abordagem futura.',
-      href: null,
-      acao: null,
-      prazo: null,
-    };
-  }
-
-  if (proposta) {
-    return {
-      tipo: 'navegacao',
-      rotulo: proposta.status === 'aceita' ? 'Proposta aceita' : 'Decisão comercial',
-      titulo:
-        proposta.status === 'aceita'
-          ? 'Confirme o início do projeto com o cliente.'
-          : `Continuar ${proposta.titulo}`,
-      href: `/propostas/${proposta.id}`,
-      acao: proposta.status === 'aceita' ? 'Abrir proposta aceita' : 'Continuar proposta',
-      prazo: lead.oportunidade.proximaAcaoEm,
-    };
-  }
-
-  if (call) {
-    return {
-      tipo: 'navegacao',
-      rotulo: call.status === 'concluida' ? 'Depois da conversa' : 'Próxima conversa',
-      titulo:
-        call.status === 'concluida'
-          ? 'Revise a reunião e monte uma proposta com o que foi confirmado.'
-          : `Prepare ${call.titulo}`,
-      href:
-        call.status === 'concluida'
-          ? `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${call.id}`
-          : destinoDaCall(call),
-      acao: call.status === 'concluida' ? 'Montar proposta' : 'Abrir reunião',
-      prazo: lead.oportunidade.proximaAcaoEm ?? call.agendadaPara,
-    };
-  }
-
-  return {
-    tipo: 'navegacao',
-    rotulo: 'Próxima ação recomendada',
-    titulo:
-      lead.oportunidade.proximaAcao ??
-      'Agende uma conversa para entender o problema e a prioridade.',
-    href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
-    acao: 'Agendar reunião',
-    prazo: lead.oportunidade.proximaAcaoEm,
-  };
-}
-
 export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
-  const movimento = proximoMovimento(lead);
-  const faseAtual = faseDaEtapa(lead.oportunidade.etapa);
-  const indiceAtual = FASES_CRM.findIndex((fase) => fase.id === faseAtual);
-  const fasesVenda = FASES_CRM.filter((fase) => fase.id !== 'desfecho');
+  const { etapas, decisao: movimento } = montarCicloCliente(lead);
   const ganha = lead.oportunidade.etapa === 'ganho';
   const perdida = lead.oportunidade.etapa === 'perdido';
-  const ultimaFasePercorrida = lead.propostaRecente ? 2 : lead.calls.length > 0 ? 1 : 0;
+  const cicloConcluido = lead.projetoRecente?.status === 'concluido';
   const IconeDecisao = ganha ? CheckCircle2 : perdida ? X : CalendarClock;
-  const tituloSecao = ganha
-    ? 'Venda concluída'
-    : perdida
-      ? 'Venda encerrada'
-      : 'Próximo passo da venda';
-  const descricaoSecao = ganha
-    ? 'O projeto foi aprovado. O histórico comercial continua salvo nesta ficha.'
-    : perdida
-      ? 'A venda foi encerrada. As etapas realizadas e o motivo da perda continuam salvos.'
-      : 'Veja a etapa atual e execute a ação recomendada para este cliente.';
+  const tituloSecao = cicloConcluido
+    ? 'Ciclo concluído'
+    : ganha
+      ? 'Cliente em entrega'
+      : perdida
+        ? 'Venda encerrada'
+        : 'Jornada do cliente';
+  const descricaoSecao = cicloConcluido
+    ? 'A venda e a entrega ficam conectadas nesta ficha para você repetir o que funcionou.'
+    : ganha
+      ? 'A venda foi aprovada. Continue o projeto até a entrega ser aceita pelo cliente.'
+      : perdida
+        ? 'A venda foi encerrada. As etapas realizadas e o motivo da perda continuam salvos.'
+        : 'Um caminho simples, sempre guiado pelos fatos registrados nesta ficha.';
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.topo}>
         <div>
-          <p className={styles.sobretitulo}>Método de venda</p>
+          <p className={styles.sobretitulo}>Método de venda e entrega</p>
           <h2 id="operacao-titulo">{tituloSecao}</h2>
           <p>{descricaoSecao}</p>
         </div>
 
-        <ol className={styles.metodo} aria-label="Etapas da venda">
-          {fasesVenda.map((fase, indice) => {
-            const estado = ganha
-              ? 'concluida'
-              : perdida
-                ? indice < ultimaFasePercorrida
-                  ? 'concluida'
-                  : indice === ultimaFasePercorrida
-                    ? 'encerrada'
-                    : 'futura'
-                : indice < indiceAtual
-                  ? 'concluida'
-                  : indice === indiceAtual
-                    ? 'atual'
-                    : 'futura';
+        <ol className={styles.metodo} aria-label="Jornada deste cliente">
+          {etapas.map((etapa) => {
+            const estado = etapa.estado;
             const rotuloEstado =
               estado === 'concluida'
                 ? 'Concluída'
@@ -180,7 +68,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                     : 'Próxima etapa';
             return (
               <li
-                key={fase.id}
+                key={etapa.id}
                 data-estado={estado}
                 aria-current={estado === 'atual' ? 'step' : undefined}
               >
@@ -190,13 +78,13 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                   ) : estado === 'encerrada' ? (
                     <X size={14} strokeWidth={2.4} />
                   ) : (
-                    String(indice + 1).padStart(2, '0')
+                    etapa.numero
                   )}
                 </span>
                 <div>
-                  <strong>{fase.rotulo}</strong>
+                  <strong>{etapa.rotulo}</strong>
                   <small className={styles.estadoEtapa}>{rotuloEstado}</small>
-                  <small className={styles.descricaoEtapa}>{fase.descricao}</small>
+                  <small className={styles.descricaoEtapa}>{etapa.evidencia}</small>
                 </div>
               </li>
             );
@@ -232,6 +120,11 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               <ArrowUpRight size={15} strokeWidth={1.9} aria-hidden="true" />
             </Link>
           ) : null}
+          {movimento.apoioHref && movimento.apoioRotulo && (
+            <Link href={movimento.apoioHref} className={styles.acaoSecundaria}>
+              {movimento.apoioRotulo}
+            </Link>
+          )}
           {!ganha && !perdida && (
             <EditarProximaAcao
               oportunidadeId={lead.oportunidade.id}

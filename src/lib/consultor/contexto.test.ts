@@ -79,6 +79,7 @@ describe('contexto factual do Sobral AI', () => {
             atualizado_em: '2026-08-13T12:00:00.000Z',
           },
         ],
+        enriquecimentos: [],
         calls: [],
         propostas: [],
         projetos: [],

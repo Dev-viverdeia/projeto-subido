@@ -47,31 +47,75 @@ function leadBase(): DossieLead {
   };
 }
 
+function descobertaConcluida(lead: DossieLead) {
+  lead.calls = [
+    {
+      id: '33333333-3333-4333-8333-333333333333',
+      titulo: 'Descoberta',
+      tipo: 'descoberta',
+      status: 'concluida',
+      agendadaPara: '2026-08-13T12:00:00.000Z',
+      iniciadaEm: '2026-08-13T12:00:00.000Z',
+      encerradaEm: '2026-08-13T13:00:00.000Z',
+      duracaoMinutos: 60,
+      codigoPublico: '44444444-4444-4444-8444-444444444444',
+    },
+  ];
+}
+
 describe('ciclo factual do cliente', () => {
-  it('começa levando o profissional para a primeira call', () => {
+  it('começa pela descoberta e mostra o ciclo completo', () => {
     const ciclo = montarCicloCliente(leadBase());
 
-    expect(ciclo.etapas.map((etapa) => etapa.estado)).toEqual([
-      'Lead registrado',
-      'Não registrada',
-      'Ainda não criada',
-      'Ainda não iniciada',
+    expect(ciclo.etapas.map((etapa) => etapa.rotulo)).toEqual([
+      'Preparar',
+      'Descobrir',
+      'Propor',
+      'Entregar',
+      'Concluir',
     ]);
-    expect(ciclo.decisao).toMatchObject({ acao: 'Agendar reunião', novoCiclo: false });
+    expect(ciclo.etapas.map((etapa) => etapa.estado)).toEqual([
+      'concluida',
+      'atual',
+      'futura',
+      'futura',
+      'futura',
+    ]);
+    expect(ciclo.decisao).toMatchObject({ acao: 'Agendar descoberta' });
   });
 
-  it('preserva uma call real como contexto da proposta', () => {
+  it('não deixa um rascunho pular a reunião de descoberta', () => {
+    const lead = leadBase();
+    lead.propostaRecente = {
+      id: '55555555-5555-4555-8555-555555555555',
+      titulo: 'Proposta de atendimento',
+      status: 'rascunho',
+      reuniaoId: null,
+    };
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Reunião pendente' });
+    expect(ciclo.etapas[2]).toMatchObject({ estado: 'futura', evidencia: 'Rascunho' });
+    expect(ciclo.decisao).toMatchObject({
+      rotulo: 'Descoberta pendente',
+      acao: 'Agendar descoberta',
+      apoioRotulo: 'Abrir rascunho',
+    });
+  });
+
+  it('abre a reunião já agendada antes de sugerir uma proposta', () => {
     const lead = leadBase();
     lead.calls = [
       {
         id: '33333333-3333-4333-8333-333333333333',
-        titulo: 'Descoberta',
+        titulo: 'Descoberta com Camila',
         tipo: 'descoberta',
-        status: 'concluida',
-        agendadaPara: '2026-08-13T12:00:00.000Z',
-        iniciadaEm: '2026-08-13T12:00:00.000Z',
-        encerradaEm: '2026-08-13T13:00:00.000Z',
-        duracaoMinutos: 60,
+        status: 'agendada',
+        agendadaPara: '2026-08-14T12:00:00.000Z',
+        iniciadaEm: null,
+        encerradaEm: null,
+        duracaoMinutos: 45,
         codigoPublico: '44444444-4444-4444-8444-444444444444',
       },
     ];
@@ -79,26 +123,30 @@ describe('ciclo factual do cliente', () => {
     const ciclo = montarCicloCliente(lead);
 
     expect(ciclo.decisao).toMatchObject({
-      acao: 'Revisar resumo',
-      apoioHref: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}`,
+      titulo: 'Prepare Descoberta com Camila',
+      href: `/sala/${lead.calls[0]!.codigoPublico}`,
+      acao: 'Abrir reunião',
     });
   });
 
-  it('mantém navegável a call que originou uma proposta', () => {
+  it('leva a descoberta concluída para uma proposta ligada à mesma reunião', () => {
     const lead = leadBase();
-    lead.calls = [
-      {
-        id: '33333333-3333-4333-8333-333333333333',
-        titulo: 'Descoberta',
-        tipo: 'descoberta',
-        status: 'concluida',
-        agendadaPara: '2026-08-13T12:00:00.000Z',
-        iniciadaEm: '2026-08-13T12:00:00.000Z',
-        encerradaEm: '2026-08-13T13:00:00.000Z',
-        duracaoMinutos: 60,
-        codigoPublico: '44444444-4444-4444-8444-444444444444',
-      },
-    ];
+    descobertaConcluida(lead);
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[1]).toMatchObject({ estado: 'concluida' });
+    expect(ciclo.etapas[2]).toMatchObject({ estado: 'atual' });
+    expect(ciclo.decisao).toMatchObject({
+      acao: 'Montar proposta',
+      href: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}`,
+      apoioRotulo: 'Revisar descoberta',
+    });
+  });
+
+  it('só recomenda continuar a proposta depois da descoberta', () => {
+    const lead = leadBase();
+    descobertaConcluida(lead);
     lead.propostaRecente = {
       id: '55555555-5555-4555-8555-555555555555',
       titulo: 'Proposta de atendimento',
@@ -108,18 +156,14 @@ describe('ciclo factual do cliente', () => {
 
     const ciclo = montarCicloCliente(lead);
 
-    expect(ciclo.etapas[1]).toMatchObject({
-      href: `/reunioes/${lead.calls[0]!.id}`,
-      comprovada: true,
-    });
     expect(ciclo.decisao).toMatchObject({
-      href: `/propostas/${lead.propostaRecente.id}`,
-      apoioHref: `/reunioes/${lead.calls[0]!.id}`,
-      apoioRotulo: 'Revisar reunião de origem',
+      rotulo: 'Proposta em andamento',
+      acao: 'Continuar proposta',
+      apoioRotulo: 'Revisar descoberta',
     });
   });
 
-  it('não perde o projeto quando a entrega termina e abre o próximo ciclo', () => {
+  it('leva uma proposta aceita para o início da entrega quando o projeto ainda não existe', () => {
     const lead = leadBase();
     lead.oportunidade.etapa = 'ganho';
     lead.propostaRecente = {
@@ -128,6 +172,35 @@ describe('ciclo factual do cliente', () => {
       status: 'aceita',
       reuniaoId: null,
     };
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[3]).toMatchObject({ estado: 'atual' });
+    expect(ciclo.decisao).toMatchObject({
+      acao: 'Iniciar entrega',
+      href: `/propostas/${lead.propostaRecente.id}`,
+    });
+  });
+
+  it('mantém a entrega ativa como próxima ação', () => {
+    const lead = leadBase();
+    lead.projetoAtivo = {
+      id: '66666666-6666-4666-8666-666666666666',
+      titulo: 'SDR de Atendimento',
+      status: 'em_execucao',
+      atualizadoEm: '2026-08-13T15:00:00.000Z',
+    };
+    lead.projetoRecente = lead.projetoAtivo;
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[3]).toMatchObject({ estado: 'atual', evidencia: 'Em execução' });
+    expect(ciclo.decisao).toMatchObject({ acao: 'Continuar entrega' });
+  });
+
+  it('preserva a entrega concluída e abre um novo ciclo', () => {
+    const lead = leadBase();
+    lead.oportunidade.etapa = 'ganho';
     lead.projetoRecente = {
       id: '66666666-6666-4666-8666-666666666666',
       titulo: 'SDR de Atendimento',
@@ -137,10 +210,9 @@ describe('ciclo factual do cliente', () => {
 
     const ciclo = montarCicloCliente(lead);
 
-    expect(ciclo.etapas[3]).toMatchObject({ estado: 'Entregue', comprovada: true, atual: true });
+    expect(ciclo.etapas[4]).toMatchObject({ estado: 'atual', evidencia: 'Entrega comprovada' });
     expect(ciclo.decisao).toMatchObject({
-      titulo: 'Abrir a próxima oportunidade com Clínica Aurora',
-      novoCiclo: true,
+      tipo: 'novo-ciclo',
       apoioHref: `/solucoes/execucao/${lead.projetoRecente.id}`,
     });
   });
