@@ -283,8 +283,8 @@
 }
 
 .avisoIntegracao[data-tom='atencao'] {
-  border-color: color-mix(in srgb, var(--via-warning) 28%, var(--via-border-soft));
-  background: color-mix(in srgb, var(--via-warning) 7%, var(--via-glass-card));
+  border-color: color-mix(in srgb, var(--via-navy) 22%, var(--via-border-soft));
+  background: color-mix(in srgb, var(--via-navy) 5%, var(--via-glass-card));
   color: var(--via-text-primary);
 }
 

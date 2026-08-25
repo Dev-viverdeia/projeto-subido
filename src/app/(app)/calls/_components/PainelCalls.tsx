@@ -24,6 +24,7 @@ import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { AcoesSala } from './AcoesSala';
+import { CabecalhoReunioes } from './CabecalhoReunioes';
 import { CallRecemAgendada } from './CallRecemAgendada';
 import { FormularioAgendarCall } from './FormularioAgendarCall';
 import { PendenciasReunioes } from './PendenciasReunioes';
@@ -49,6 +50,7 @@ const DATA_LONGA = new Intl.DateTimeFormat('pt-BR', {
 export function PainelCalls({
   reunioes,
   oportunidades,
+  comercialLiberado = true,
   calendar,
   agendadaId,
   modalInicial = false,
@@ -60,6 +62,7 @@ export function PainelCalls({
 }: {
   reunioes: ReuniaoCall[];
   oportunidades: OportunidadeSeletor[];
+  comercialLiberado?: boolean;
   calendar: EstadoGoogleCalendar;
   agendadaId?: string;
   modalInicial?: boolean;
@@ -88,20 +91,16 @@ export function PainelCalls({
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.topo}>
-        <div className={styles.introducao}>
-          <p className={styles.sobretitulo}>Reuniões</p>
-          <h1>Reuniões</h1>
-          <p>Crie a sala, use o Live Coach e salve a conversa na ficha do cliente.</p>
-        </div>
+      <CabecalhoReunioes comercialLiberado={comercialLiberado}>
         <FormularioAgendarCall
           oportunidades={oportunidades}
+          comercialLiberado={comercialLiberado}
           calendar={calendar}
           abertoInicial={modalInicial}
           oportunidadeInicial={oportunidadeInicial}
           tipoInicial={tipoInicial}
         />
-      </header>
+      </CabecalhoReunioes>
 
       {calendarResultado === 'sincronizado' && (
         <div className={styles.confirmacao} role="status">
@@ -135,7 +134,11 @@ export function PainelCalls({
       )}
 
       {recemAgendada ? (
-        <CallRecemAgendada reuniao={recemAgendada} calendar={calendar} />
+        <CallRecemAgendada
+          reuniao={recemAgendada}
+          calendar={calendar}
+          comercialLiberado={comercialLiberado}
+        />
       ) : agendadaId ? (
         <div className={styles.confirmacao} role="status">
           <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -272,15 +275,20 @@ export function PainelCalls({
               </span>
               <div>
                 <h3>Nenhuma reunião agendada</h3>
-                <p>Escolha um cliente em Vendas para criar a sala e guardar a conversa na ficha.</p>
+                <p>
+                  {comercialLiberado
+                    ? 'Escolha um cliente em Vendas para criar a sala e guardar a conversa na ficha.'
+                    : 'Informe quem será convidado. A plataforma organiza o histórico automaticamente.'}
+                </p>
               </div>
-              {oportunidades.length === 0 ? (
+              {comercialLiberado && oportunidades.length === 0 ? (
                 <Link href="/vendas" className={styles.acaoVazio}>
                   Adicionar cliente <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               ) : (
                 <FormularioAgendarCall
                   oportunidades={oportunidades}
+                  comercialLiberado={comercialLiberado}
                   calendar={calendar}
                   oportunidadeInicial={oportunidadeInicial}
                   tipoInicial={tipoInicial}

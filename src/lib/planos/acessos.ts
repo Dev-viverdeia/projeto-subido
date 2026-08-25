@@ -102,9 +102,25 @@ export function planoTemRecurso(plano: PlanoSubido, recurso: RecursoPlano): bool
   return PLANOS_SUBIDO[plano].recursos.includes(recurso);
 }
 
-const ROTAS_COMERCIAIS = ['/prospeccao', '/vendas', '/crm', '/metricas', '/propostas'] as const;
+export const AREAS_COMERCIAIS = [
+  { href: '/prospeccao', nome: 'Prospecção' },
+  { href: '/vendas', nome: 'Vendas' },
+  { href: '/crm', nome: 'Vendas' },
+  { href: '/metricas', nome: 'Métricas' },
+  { href: '/propostas', nome: 'Propostas' },
+] as const;
 
 export function planoPodeAcessarRota(plano: PlanoSubido, href: string): boolean {
-  if (!ROTAS_COMERCIAIS.some((rota) => href === rota || href.startsWith(`${rota}/`))) return true;
+  if (!AREAS_COMERCIAIS.some((area) => href === area.href || href.startsWith(`${area.href}/`))) {
+    return true;
+  }
   return planoTemRecurso(plano, 'modulo_comercial');
+}
+
+export function nomeDaAreaComercial(href: unknown): string | null {
+  if (typeof href !== 'string') return null;
+  return (
+    AREAS_COMERCIAIS.find((area) => href === area.href || href.startsWith(`${area.href}/`))?.nome ??
+    null
+  );
 }

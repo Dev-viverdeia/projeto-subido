@@ -153,6 +153,41 @@ describe('agendarReuniao', () => {
     );
     expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
   });
+
+  it('agenda no Starter sem exigir acesso ao módulo de Vendas', async () => {
+    getClaims.mockResolvedValue({
+      data: { claims: { sub: 'usuario-1', app_metadata: { plano_subido: 'starter' } } },
+    });
+    const dados = dadosValidos();
+    dados.set('oportunidade', '');
+    dados.set('empresa', 'Clínica Horizonte');
+    dados.set('contato', 'Marina Costa');
+    rpc.mockResolvedValue({
+      data: [
+        {
+          reuniao_id: REUNIAO_ID,
+          codigo_publico: CODIGO_PUBLICO,
+          oportunidade_id: OPORTUNIDADE_ID,
+        },
+      ],
+      error: null,
+    });
+
+    await agendarReuniao({}, dados);
+
+    expect(rpc).toHaveBeenCalledWith('calls_agendar_reuniao_starter', {
+      p_empresa_nome: 'Clínica Horizonte',
+      p_contato_nome: 'Marina Costa',
+      p_contato_email: 'cliente@clinica.com.br',
+      p_tipo: 'descoberta',
+      p_agendada_para: '2026-08-14T18:00:00.000Z',
+      p_duracao_minutos: 45,
+      p_titulo: 'Descoberta do atendimento',
+      p_live_coach_ativo: true,
+    });
+    expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
+    expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
+  });
 });
 
 describe('resolverReuniaoPendente', () => {

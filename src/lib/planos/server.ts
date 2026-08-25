@@ -28,9 +28,11 @@ export async function obterAcessoRecurso(recurso: RecursoPlano): Promise<AcessoR
     : { permitido: false, motivo: 'plano', plano };
 }
 
-export async function exigirRecurso(recurso: RecursoPlano): Promise<void> {
+export async function exigirRecurso(recurso: RecursoPlano, origem?: string): Promise<void> {
   const acesso = await obterAcessoRecurso(recurso);
   if (acesso.permitido) return;
   if (acesso.motivo === 'sessao') redirect(ROTA_ENTRAR);
-  redirect(`/conta?upgrade=${encodeURIComponent(recurso)}`);
+  const parametros = new URLSearchParams({ upgrade: recurso });
+  if (origem) parametros.set('origem', origem);
+  redirect(`/conta?${parametros.toString()}`);
 }

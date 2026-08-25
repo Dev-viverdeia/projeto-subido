@@ -20,7 +20,12 @@ import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { IntegracaoGoogleCalendar } from './_components/IntegracaoGoogleCalendar';
 import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
-import { PLANOS_SUBIDO, planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
+import {
+  PLANOS_SUBIDO,
+  nomeDaAreaComercial,
+  planoDosMetadados,
+  planoTemRecurso,
+} from '@/lib/planos/acessos';
 import { PainelAcessoPlano } from './_components/PainelAcessoPlano';
 import styles from './page.module.css';
 
@@ -73,6 +78,7 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const plano = planoDosMetadados(claims?.app_metadata);
   const acessoBloqueado =
     Boolean(parametros.upgrade) && !planoTemRecurso(plano, 'modulo_comercial');
+  const areaBloqueada = nomeDaAreaComercial(parametros.origem);
   const nome = typeof metadata?.nome === 'string' ? metadata.nome : '—';
   const iniciais = nome
     .split(/\s+/)
@@ -109,8 +115,13 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
         <div className={styles.avisoIntegracao} data-tom="atencao" role="alert">
           <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
           <span>
-            <strong>Esta área não faz parte do seu acesso atual.</strong>
-            Você continua com formações, projetos, Sobral AI, reuniões e Live Coach.
+            <strong>
+              {areaBloqueada
+                ? `${areaBloqueada} está disponível no Pro.`
+                : 'Esta área está disponível no Pro.'}
+            </strong>
+            No Starter, você continua com formações, projetos, Sobral AI, mentorias e reuniões com
+            Live Coach.
           </span>
         </div>
       )}

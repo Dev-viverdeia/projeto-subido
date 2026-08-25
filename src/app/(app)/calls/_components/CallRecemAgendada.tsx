@@ -21,9 +21,11 @@ const HORA = new Intl.DateTimeFormat('pt-BR', {
 export function CallRecemAgendada({
   reuniao,
   calendar,
+  comercialLiberado = true,
 }: {
   reuniao: ReuniaoCall;
   calendar?: EstadoGoogleCalendar;
+  comercialLiberado?: boolean;
 }) {
   const conviteSincronizado = reuniao.googleSyncStatus === 'sincronizado';
   const conviteFalhou = reuniao.googleSyncStatus === 'falhou';
@@ -63,13 +65,17 @@ export function CallRecemAgendada({
             ? `Convite enviado pelo Google Calendar${reuniao.convidadoEmail ? ` para ${reuniao.convidadoEmail}` : ''}.`
             : conviteFalhou
               ? 'A sala foi criada, mas o convite do Google não foi enviado.'
-              : 'O link foi criado e a reunião já aparece na ficha do cliente.'}
+              : comercialLiberado
+                ? 'O link foi criado e a reunião já aparece na ficha do cliente.'
+                : 'O link foi criado e o histórico desta conversa ficará salvo.'}
         </p>
         <div>
           <AcoesSala codigo={reuniao.codigoPublico} />
-          <Link href={`/vendas/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
-            Abrir ficha <ArrowRight size={14} aria-hidden="true" />
-          </Link>
+          {comercialLiberado && (
+            <Link href={`/vendas/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
+              Abrir ficha <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          )}
           {conviteSincronizado && reuniao.googleEventUrl && (
             <a
               href={reuniao.googleEventUrl}

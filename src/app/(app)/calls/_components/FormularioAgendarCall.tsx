@@ -12,12 +12,20 @@ import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { BotaoAgendar } from './BotaoAgendar';
+import { CamposParticipanteStarter } from './CamposParticipanteStarter';
 import { SetupGoogleCalendar } from './SetupGoogleCalendar';
 import styles from './FormularioAgendarCall.module.css';
 
 const INICIAL: EstadoAgendamento = {};
 type CampoAgendamento =
-  'oportunidade' | 'tipo' | 'titulo' | 'agendadaPara' | 'duracao' | 'convidadoEmail';
+  | 'oportunidade'
+  | 'empresa'
+  | 'contato'
+  | 'tipo'
+  | 'titulo'
+  | 'agendadaPara'
+  | 'duracao'
+  | 'convidadoEmail';
 const escutarMontagem = () => () => undefined;
 const obterMontagemCliente = () => true;
 const obterMontagemServidor = () => false;
@@ -28,12 +36,14 @@ export function FormularioAgendarCall({
   oportunidadeInicial,
   tipoInicial,
   calendar,
+  comercialLiberado = true,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
   calendar: EstadoGoogleCalendar;
+  comercialLiberado?: boolean;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
@@ -154,7 +164,11 @@ export function FormularioAgendarCall({
                 <header className={styles.topo}>
                   <div>
                     <p className={styles.sobretitulo}>
-                      {precisaConfigurarCalendar ? 'Configuração inicial' : 'Vendas + Live Coach'}
+                      {precisaConfigurarCalendar
+                        ? 'Configuração inicial'
+                        : comercialLiberado
+                          ? 'Vendas + Live Coach'
+                          : 'Reunião + Live Coach'}
                     </p>
                     <h2 id="agendar-call-titulo">
                       {precisaConfigurarCalendar ? 'Conecte sua agenda' : 'Agendar reunião'}
@@ -164,7 +178,9 @@ export function FormularioAgendarCall({
                         ? 'Você faz isso uma vez. Depois, cada reunião já nasce com sala, convite e histórico na ficha do cliente.'
                         : oportunidadeVinculada
                           ? 'Defina o horário. A sala ficará ligada à ficha deste cliente.'
-                          : 'Escolha o cliente e defina o horário. O link ficará salvo na ficha.'}
+                          : comercialLiberado
+                            ? 'Escolha o cliente e defina o horário. O link ficará salvo na ficha.'
+                            : 'Informe quem vai participar e defina o horário. O histórico fica salvo automaticamente.'}
                     </p>
                   </div>
                   <button
@@ -183,7 +199,7 @@ export function FormularioAgendarCall({
                     conectarHref={conectarCalendarHref}
                     aoFechar={fechar}
                   />
-                ) : disponiveis.length === 0 ? (
+                ) : comercialLiberado && disponiveis.length === 0 ? (
                   <div className={styles.semLead}>
                     <p>Uma reunião precisa estar ligada a uma venda real.</p>
                     <Link href="/vendas" className="via-btn via-btn--primary via-btn--md">
@@ -207,7 +223,15 @@ export function FormularioAgendarCall({
                       </div>
                     )}
 
-                    {oportunidadeVinculada ? (
+                    {!comercialLiberado ? (
+                      <CamposParticipanteStarter
+                        campos={estado.campos}
+                        erroEmpresa={erroVisivel('empresa')}
+                        erroContato={erroVisivel('contato')}
+                        aoEditarEmpresa={() => ocultarErro('empresa')}
+                        aoEditarContato={() => ocultarErro('contato')}
+                      />
+                    ) : oportunidadeVinculada ? (
                       <div className={styles.contextoLead}>
                         <input type="hidden" name="oportunidade" value={oportunidadeVinculada.id} />
                         <div className={styles.contextoLeadTopo}>
