@@ -6,11 +6,79 @@
   text-wrap: pretty;
 }
 
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+}
+
+.saldo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-blur-sm);
+}
+
+.saldo > span {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-1);
+  padding: var(--via-space-4);
+}
+
+.saldo > span + span {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.saldo small {
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.saldo strong {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  font-variant-numeric: tabular-nums;
+  color: var(--via-text-primary);
+}
+
+.saldo [data-destaque] {
+  background: color-mix(in srgb, var(--via-accent) 5%, transparent);
+}
+
 .acoes {
   display: flex;
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: var(--via-space-2);
+}
+
+.creditosCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-5);
+  border-radius: var(--via-radius-md);
+  background: var(--via-navy);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-white);
+  text-decoration: none;
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.creditosCta:hover {
+  background: var(--via-navy-deep);
+}
+
+.creditosCta:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 /* A ação que altera vaga e saldo não some durante a espera. O estado ocupa o
@@ -77,5 +145,14 @@
   .estado {
     min-height: 140px;
     padding: var(--app-pad-card-tight);
+  }
+
+  .saldo {
+    grid-template-columns: 1fr;
+  }
+
+  .saldo > span + span {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
   }
 }

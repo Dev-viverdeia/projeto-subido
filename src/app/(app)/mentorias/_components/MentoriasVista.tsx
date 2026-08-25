@@ -48,10 +48,12 @@ export function MentoriasVista({
   sessoes,
   agoraIso,
   vistaInicial,
+  saldoInicial,
 }: {
   sessoes: SessaoMentoria[];
   agoraIso: string;
   vistaInicial: IdVista;
+  saldoInicial: number | null;
 }) {
   /* O MESMO instante no servidor e na hidratação — "começa em 45 min" idêntico
      dos dois lados. O relógio não avança na tela; avança no refresh. */
@@ -64,6 +66,7 @@ export function MentoriasVista({
   const [faseCheckin, setFaseCheckin] = useState<FaseOperacaoMentoria>('confirmacao');
   const [faseCancelamento, setFaseCancelamento] = useState<FaseOperacaoMentoria>('confirmacao');
   const [falhaOperacao, setFalhaOperacao] = useState<string | null>(null);
+  const [saldo, setSaldo] = useState<number | null>(saldoInicial);
 
   /**
    * O CHECK-IN DEIXOU DE SER ESTADO DA ABA.
@@ -168,6 +171,7 @@ export function MentoriasVista({
         setFaseCheckin('erro');
         return;
       }
+      setSaldo(resultado.saldo);
       setFaseCheckin('sucesso');
     });
   }, [confirmandoId]);
@@ -184,6 +188,7 @@ export function MentoriasVista({
         setFaseCancelamento('erro');
         return;
       }
+      setSaldo(resultado.saldo);
       setFaseCancelamento('sucesso');
     });
   }, [cancelandoId]);
@@ -333,6 +338,7 @@ export function MentoriasVista({
         sessao={cancelando}
         fase={faseCancelamento}
         falha={falhaOperacao}
+        saldoAtual={saldo}
         agora={agora}
         aoFechar={fecharCancelamento}
         aoConfirmar={confirmarCancelamento}
@@ -344,6 +350,7 @@ export function MentoriasVista({
         sessao={confirmando}
         fase={faseCheckin}
         falha={falhaOperacao}
+        saldoAtual={saldo}
         agora={agora}
         aoFechar={fecharCheckin}
         aoConfirmar={confirmarCheckin}

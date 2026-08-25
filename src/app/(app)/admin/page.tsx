@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Boxes, GraduationCap, UsersRound } from 'lucide-react';
+import { Boxes, CalendarClock, GraduationCap, UsersRound } from 'lucide-react';
 import { Card } from '@/design-system/via';
 // eslint-disable-next-line no-restricted-imports -- Server Component dentro do layout administrativo
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -21,7 +21,15 @@ export default async function AdminPage() {
   const supabase = await createClient();
   const admin = createAdminClient();
 
-  const [solucoes, formacoes, solucoesPublicadas, formacoesPublicadas, contas] = await Promise.all([
+  const [
+    solucoes,
+    formacoes,
+    solucoesPublicadas,
+    formacoesPublicadas,
+    contas,
+    mentorias,
+    proximasMentorias,
+  ] = await Promise.all([
     supabase.from('solucoes').select('*', { count: 'exact', head: true }),
     supabase.from('formacoes').select('*', { count: 'exact', head: true }),
     supabase.from('solucoes').select('*', { count: 'exact', head: true }).eq('status', 'publicado'),
@@ -30,6 +38,12 @@ export default async function AdminPage() {
       .select('*', { count: 'exact', head: true })
       .eq('status', 'publicado'),
     admin.from('admin_contas').select('*', { count: 'exact', head: true }),
+    supabase.from('mentorias').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('mentorias')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'publicado')
+      .gte('fim', new Date().toISOString()),
   ]);
 
   const cartoes = [
@@ -55,6 +69,14 @@ export default async function AdminPage() {
       titulo: 'Formações',
       total: formacoes.count ?? 0,
       publicadas: formacoesPublicadas.count ?? 0,
+      detalhe: null,
+    },
+    {
+      href: '/admin/mentorias',
+      icone: <CalendarClock size={18} strokeWidth={1.8} />,
+      titulo: 'Mentorias',
+      total: mentorias.count ?? 0,
+      publicadas: proximasMentorias.count ?? 0,
       detalhe: null,
     },
   ];

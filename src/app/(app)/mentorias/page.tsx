@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { obterSaldoCreditos } from '@/lib/creditos/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
 import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
 import entrada from '../_components/entrada.module.css';
@@ -30,7 +31,11 @@ export const metadata: Metadata = { title: 'Mentorias' };
  */
 export default async function MentoriasPage({ searchParams }: PageProps<'/mentorias'>) {
   const agora = new Date();
-  const [vista, sessoes] = await Promise.all([searchParams.then(lerVistaInicial), listarAgenda()]);
+  const [vista, sessoes, saldo] = await Promise.all([
+    searchParams.then(lerVistaInicial),
+    listarAgenda(),
+    obterSaldoCreditos(),
+  ]);
 
   return (
     <div className={styles.pagina}>
@@ -43,7 +48,12 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>
-        <MentoriasVista sessoes={sessoes} agoraIso={agora.toISOString()} vistaInicial={vista} />
+        <MentoriasVista
+          sessoes={sessoes}
+          agoraIso={agora.toISOString()}
+          vistaInicial={vista}
+          saldoInicial={saldo}
+        />
       </div>
     </div>
   );

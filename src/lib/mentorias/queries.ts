@@ -25,7 +25,7 @@ type LinhaComMentor = Pick<
   'id' | 'titulo' | 'descricao' | 'inicio' | 'fim' | 'vagas' | 'custo_creditos' | 'sala_url'
 > & {
   mentores: Pick<Tables<'mentores'>, 'id' | 'nome' | 'headline' | 'foto_url' | 'trilha'> | null;
-  mentoria_inscricoes: Pick<Tables<'mentoria_inscricoes'>, 'mentoria_id'>[];
+  mentoria_inscricoes: Pick<Tables<'mentoria_inscricoes'>, 'mentoria_id' | 'creditos_usados'>[];
 };
 
 /**
@@ -48,7 +48,7 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
   const { data, error } = await supabase
     .from('mentorias')
     .select(
-      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
+      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id, creditos_usados)',
     )
     .eq('status', 'publicado')
     .order('inicio', { ascending: true })
@@ -92,6 +92,7 @@ export async function listarAgenda(): Promise<SessaoMentoria[]> {
       },
       inscritos: porId.get(l.id) ?? 0,
       euInscrito: l.mentoria_inscricoes.length > 0,
+      creditosUsados: l.mentoria_inscricoes[0]?.creditos_usados ?? null,
     };
   });
 }
@@ -108,7 +109,7 @@ export const obterSessao = cache(async (id: string): Promise<SessaoMentoria | nu
   const { data, error } = await supabase
     .from('mentorias')
     .select(
-      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id)',
+      'id, titulo, descricao, inicio, fim, vagas, custo_creditos, sala_url, mentores(id, nome, headline, foto_url, trilha), mentoria_inscricoes(mentoria_id, creditos_usados)',
     )
     .eq('id', id)
     .maybeSingle<LinhaComMentor>();
@@ -139,6 +140,7 @@ export const obterSessao = cache(async (id: string): Promise<SessaoMentoria | nu
     },
     inscritos: ocupacao.data?.[0]?.inscritos ?? 0,
     euInscrito: data.mentoria_inscricoes.length > 0,
+    creditosUsados: data.mentoria_inscricoes[0]?.creditos_usados ?? null,
   };
 });
 

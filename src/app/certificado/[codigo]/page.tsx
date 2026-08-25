@@ -20,11 +20,24 @@ export async function generateMetadata({
 }: PageProps<'/certificado/[codigo]'>): Promise<Metadata> {
   const { codigo } = await params;
   const certificado = await buscarCertificado(codigo);
+  const titulo = certificado ? `Certificado · ${certificado.titulo}` : 'Certificado';
+  const descricao = certificado
+    ? `${certificado.nome} concluiu ${certificado.titulo} na plataforma Subido. Confira o registro.`
+    : 'Certificado emitido pela plataforma Subido.';
   return {
-    title: certificado ? `Certificado · ${certificado.titulo}` : 'Certificado',
-    description: certificado
-      ? `${certificado.nome} concluiu ${certificado.titulo} na plataforma Subido.`
-      : 'Certificado emitido pela plataforma Subido.',
+    title: titulo,
+    description: descricao,
+    alternates: certificado ? { canonical: `/certificado/${codigo}` } : undefined,
+    openGraph: certificado
+      ? {
+          type: 'article',
+          url: `/certificado/${codigo}`,
+          siteName: 'Subido',
+          title: titulo,
+          description: descricao,
+        }
+      : undefined,
+    robots: certificado ? { index: true, follow: true } : { index: false, follow: false },
   };
 }
 
