@@ -8,9 +8,13 @@ import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { prospeccaoEnv } from '@/lib/env';
 import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
-import { enviarLeadProspeccaoAoCrm, reservarListaProspeccao } from './admin';
+import {
+  enviarLeadProspeccaoAoCrm,
+  registrarContatoProspeccao,
+  reservarListaProspeccao,
+} from './admin';
 import { processarListaProspeccao } from './processar';
-import { BuscaProspeccaoSchema } from './schema';
+import { BuscaProspeccaoSchema, CanalContatoProspeccaoSchema } from './schema';
 
 export type EstadoBuscaProspeccao = {
   erro?: string;
@@ -109,4 +113,44 @@ export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
   revalidatePath('/crm');
   revalidarDirecaoOperacional();
   redirect(`/vendas/${oportunidade.data}?novo=1&origem=prospeccao`);
+}
+
+const registrarTentativaSchema = z.object({
+  lead: z.uuid(),
+  canal: CanalContatoProspeccaoSchema,
+});
+
+/**
+ * Registra uma abordagem quando a pessoa abre um canal público da empresa.
+ * A ação nunca bloqueia o contato: se o registro falhar, WhatsApp, telefone ou
+ * e-mail continuam abrindo normalmente.
+ */
+export async function registrarTentativaContato(entrada: {
+  lead: string;
+  canal: string;
+}): Promise<{ ok: boolean }> {
+  await exigirRecurso('modulo_comercial');
+  const validacao = registrarTentativaSchema.safeParse(entrada);
+  if (!validacao.success) return { ok: false };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+
+  const { error } = await registrarContatoProspeccao(
+    user.id,
+    validacao.data.lead,
+    validacao.data.canal,
+  );
+  if (error) {
+    console.error(`[prospeccao:contato] ${error.code}: ${error.message}`);
+    return { ok: false };
+  }
+
+  revalidatePath('/prospeccao');
+  revalidatePath('/metricas');
+  revalidarDirecaoOperacional();
+  return { ok: true };
 }

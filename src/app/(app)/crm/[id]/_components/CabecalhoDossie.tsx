@@ -19,6 +19,7 @@ export function CabecalhoDossie({
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
   const faseComercial = rotuloEtapaVisivel(lead.oportunidade.etapa);
+  const projetoDaJornada = projetoSlug ?? lead.empresa.projetoSugeridoSlug ?? null;
   const oportunidadeAberta = etapaAberta(lead.oportunidade.etapa);
   const cicloEntregue = lead.projetoRecente?.status === 'concluido';
   const estadoPesquisa = enriquecimentoEmAndamento
@@ -85,15 +86,17 @@ export function CabecalhoDossie({
               <CalendarPlus size={16} strokeWidth={1.8} aria-hidden="true" />
               Agendar reunião
             </Link>
-            <AtalhoProposta lead={lead} destaque={false} projetoSlug={projetoSlug} />
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              saldoCreditos={lead.saldoCreditos ?? 30}
-              temDossie={temDossie}
-              rotulo={temDossie ? 'Atualizar dados' : 'Enriquecer dados'}
-              tom="secundario"
-              desabilitado={enriquecimentoEmAndamento}
-            />
+            <AtalhoProposta lead={lead} destaque={false} projetoSlug={projetoDaJornada} />
+            {temDossie && (
+              <FormularioEnriquecimento
+                oportunidadeId={lead.oportunidade.id}
+                saldoCreditos={lead.saldoCreditos ?? 30}
+                temDossie
+                rotulo="Atualizar dados"
+                tom="secundario"
+                desabilitado={enriquecimentoEmAndamento}
+              />
+            )}
           </nav>
         ) : (
           <p className={styles.encerradaNota}>

@@ -5,6 +5,7 @@ import { montarCicloCliente } from '@/lib/crm/ciclo-cliente';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
 import { EditarProximaAcao } from './EditarProximaAcao';
+import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 import styles from './ResumoOperacionalLead.module.css';
 
 const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', {
@@ -112,7 +113,19 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
         </div>
 
         <div className={styles.acoesDecisao}>
-          {movimento.tipo === 'novo-ciclo' ? (
+          {movimento.tipo === 'enriquecer' ? (
+            <FormularioEnriquecimento
+              oportunidadeId={lead.oportunidade.id}
+              saldoCreditos={lead.saldoCreditos ?? 30}
+              temDossie={false}
+              rotulo="Enriquecer dados"
+              tom="claro"
+              desabilitado={
+                lead.oportunidade.enriquecimentoStatus === 'na_fila' ||
+                lead.oportunidade.enriquecimentoStatus === 'processando'
+              }
+            />
+          ) : movimento.tipo === 'novo-ciclo' ? (
             <BotaoNovoCiclo oportunidadeId={lead.oportunidade.id} />
           ) : movimento.href && movimento.acao ? (
             <Link href={movimento.href} className={styles.acaoPrimaria}>

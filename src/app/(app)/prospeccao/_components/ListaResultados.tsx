@@ -16,6 +16,8 @@ import {
 import { AtualizarEnriquecimentos } from './AtualizarEnriquecimentos';
 import { BotaoEnviarCrm } from './BotaoEnviarCrm';
 import { CopiarContato } from './CopiarContato';
+import { LinkContatoProspeccao } from './LinkContatoProspeccao';
+import type { CanalContatoProspeccao } from '@/lib/prospeccao/schema';
 import {
   decisoresDo,
   emailsDo,
@@ -36,12 +38,16 @@ function Canal({
   rotulo,
   valor,
   href,
+  lead,
+  canal,
   valorCopiar = valor,
 }: {
   icone: ReactNode;
   rotulo: string;
   valor: string;
   href: string;
+  lead: string;
+  canal: CanalContatoProspeccao;
   valorCopiar?: string;
 }) {
   return (
@@ -49,9 +55,15 @@ function Canal({
       <span className={styles.canalIcone}>{icone}</span>
       <div>
         <small>{rotulo}</small>
-        <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+        <LinkContatoProspeccao
+          lead={lead}
+          canal={canal}
+          href={href}
+          target={href.startsWith('http') ? '_blank' : undefined}
+          rel="noreferrer"
+        >
           {valor}
-        </a>
+        </LinkContatoProspeccao>
       </div>
       <CopiarContato valor={valorCopiar} className={styles.copiarCanal} />
     </div>
@@ -170,6 +182,8 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
               <div className={styles.canaisLead}>
                 {telefone && (
                   <Canal
+                    lead={lead.id}
+                    canal={urlWhatsapp(telefone) ? 'whatsapp' : 'telefone'}
                     icone={<Phone size={15} aria-hidden="true" />}
                     rotulo={decisor?.telefone ? 'Telefone do decisor' : 'Telefone / WhatsApp'}
                     valor={telefone}
@@ -178,6 +192,8 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 )}
                 {email && (
                   <Canal
+                    lead={lead.id}
+                    canal="email"
                     icone={<AtSign size={15} aria-hidden="true" />}
                     rotulo={decisor?.email ? 'E-mail do decisor' : 'E-mail da empresa'}
                     valor={email}
@@ -186,6 +202,8 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 )}
                 {linkedin && (!telefone || !email) && (
                   <Canal
+                    lead={lead.id}
+                    canal="linkedin"
                     icone={<BriefcaseBusiness size={15} aria-hidden="true" />}
                     rotulo={decisor?.linkedin_url ? 'LinkedIn do decisor' : 'LinkedIn'}
                     valor={decisor ? decisor.nome : 'Abrir perfil'}
@@ -195,6 +213,8 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 )}
                 {instagram && !linkedin && (!telefone || !email) && (
                   <Canal
+                    lead={lead.id}
+                    canal="instagram"
                     icone={<Camera size={15} aria-hidden="true" />}
                     rotulo="Instagram"
                     valor={identificadorRede(instagram)}

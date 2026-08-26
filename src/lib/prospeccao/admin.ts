@@ -103,3 +103,12 @@ export async function enviarLeadProspeccaoAoCrm(dono: string, lead: string) {
   }
   return resultado;
 }
+
+export async function registrarContatoProspeccao(dono: string, lead: string, canal: string) {
+  return createAdminClient().rpc('prospeccao_sistema_registrar_contato', {
+    p_dono: dono,
+    p_lead: lead,
+    p_canal: canal,
+    p_status: 'tentando_contato',
+  });
+}

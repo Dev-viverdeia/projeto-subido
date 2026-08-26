@@ -64,7 +64,7 @@ function descobertaConcluida(lead: DossieLead) {
 }
 
 describe('ciclo factual do cliente', () => {
-  it('começa pela descoberta e mostra o ciclo completo', () => {
+  it('começa pelo enriquecimento e mostra o ciclo completo', () => {
     const ciclo = montarCicloCliente(leadBase());
 
     expect(ciclo.etapas.map((etapa) => etapa.rotulo)).toEqual([
@@ -75,13 +75,18 @@ describe('ciclo factual do cliente', () => {
       'Concluir',
     ]);
     expect(ciclo.etapas.map((etapa) => etapa.estado)).toEqual([
-      'concluida',
       'atual',
       'futura',
       'futura',
       'futura',
+      'futura',
     ]);
-    expect(ciclo.decisao).toMatchObject({ acao: 'Agendar descoberta' });
+    expect(ciclo.etapas[0]).toMatchObject({ evidencia: 'Enriquecimento recomendado' });
+    expect(ciclo.decisao).toMatchObject({
+      tipo: 'enriquecer',
+      acao: 'Enriquecer dados',
+      apoioRotulo: 'Agendar sem enriquecer',
+    });
   });
 
   it('não deixa um rascunho pular a reunião de descoberta', () => {
@@ -142,6 +147,18 @@ describe('ciclo factual do cliente', () => {
       href: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}`,
       apoioRotulo: 'Revisar descoberta',
     });
+  });
+
+  it('preserva na proposta o projeto recomendado pela prospecção', () => {
+    const lead = leadBase();
+    lead.empresa.projetoSugeridoSlug = 'sdr-atendimento-qualificacao';
+    descobertaConcluida(lead);
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.decisao.href).toBe(
+      `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}&projeto=sdr-atendimento-qualificacao`,
+    );
   });
 
   it('só recomenda continuar a proposta depois da descoberta', () => {

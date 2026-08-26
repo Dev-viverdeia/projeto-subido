@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import {
   AtSign,
   BriefcaseBusiness,
   Camera,
   Clock3,
-  ExternalLink,
   Mail,
   MapPin,
   Phone,
@@ -18,6 +17,7 @@ import {
   UserRoundSearch,
   X,
 } from 'lucide-react';
+import { AcaoContatoProspeccao } from './AcaoContatoProspeccao';
 import { BotaoEnviarCrm } from './BotaoEnviarCrm';
 import { ContextoEmpresa } from './ContextoEmpresa';
 import { CopiarContato } from './CopiarContato';
@@ -49,15 +49,6 @@ function IconeRede({ rede }: { rede: RedeSocial['rede'] }) {
   if (rede === 'linkedin') return <BriefcaseBusiness size={18} aria-hidden="true" />;
   if (rede === 'youtube') return <Play size={18} aria-hidden="true" />;
   return <AtSign size={18} aria-hidden="true" />;
-}
-
-function AcaoContato({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
-      {children}
-      <ExternalLink size={13} aria-hidden="true" />
-    </a>
-  );
 }
 
 export function ModalDossie({
@@ -223,9 +214,21 @@ export function ModalDossie({
                     <div className={styles.contactActions}>
                       <CopiarContato valor={telefone} />
                       {urlWhatsapp(telefone) && (
-                        <AcaoContato href={urlWhatsapp(telefone) as string}>WhatsApp</AcaoContato>
+                        <AcaoContatoProspeccao
+                          lead={selecionado.id}
+                          canal="whatsapp"
+                          href={urlWhatsapp(telefone) as string}
+                        >
+                          WhatsApp
+                        </AcaoContatoProspeccao>
                       )}
-                      <AcaoContato href={`tel:${telefone}`}>Ligar</AcaoContato>
+                      <AcaoContatoProspeccao
+                        lead={selecionado.id}
+                        canal="telefone"
+                        href={`tel:${telefone}`}
+                      >
+                        Ligar
+                      </AcaoContatoProspeccao>
                     </div>
                   </article>
                 ))}
@@ -242,7 +245,13 @@ export function ModalDossie({
                     </div>
                     <div className={styles.contactActions}>
                       <CopiarContato valor={email} />
-                      <AcaoContato href={`mailto:${email}`}>Escrever</AcaoContato>
+                      <AcaoContatoProspeccao
+                        lead={selecionado.id}
+                        canal="email"
+                        href={`mailto:${email}`}
+                      >
+                        Escrever
+                      </AcaoContatoProspeccao>
                     </div>
                   </article>
                 ))}
@@ -259,7 +268,13 @@ export function ModalDossie({
                     </div>
                     <div className={styles.contactActions}>
                       <CopiarContato valor={rede.url} />
-                      <AcaoContato href={rede.url}>Abrir perfil</AcaoContato>
+                      <AcaoContatoProspeccao
+                        lead={selecionado.id}
+                        canal={rede.rede}
+                        href={rede.url}
+                      >
+                        Abrir perfil
+                      </AcaoContatoProspeccao>
                     </div>
                   </article>
                 ))}
@@ -290,15 +305,31 @@ export function ModalDossie({
                       </div>
                       <div className={styles.decisionActions}>
                         {decisor.linkedin_url && (
-                          <AcaoContato href={decisor.linkedin_url}>LinkedIn</AcaoContato>
+                          <AcaoContatoProspeccao
+                            lead={selecionado.id}
+                            canal="linkedin"
+                            href={decisor.linkedin_url}
+                          >
+                            LinkedIn
+                          </AcaoContatoProspeccao>
                         )}
                         {decisor.email && (
-                          <AcaoContato href={`mailto:${decisor.email}`}>E-mail</AcaoContato>
+                          <AcaoContatoProspeccao
+                            lead={selecionado.id}
+                            canal="email"
+                            href={`mailto:${decisor.email}`}
+                          >
+                            E-mail
+                          </AcaoContatoProspeccao>
                         )}
                         {decisor.telefone && urlWhatsapp(decisor.telefone) && (
-                          <AcaoContato href={urlWhatsapp(decisor.telefone) as string}>
+                          <AcaoContatoProspeccao
+                            lead={selecionado.id}
+                            canal="whatsapp"
+                            href={urlWhatsapp(decisor.telefone) as string}
+                          >
                             WhatsApp
-                          </AcaoContato>
+                          </AcaoContatoProspeccao>
                         )}
                       </div>
                     </article>
