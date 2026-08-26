@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { marcarReuniaoProcessando, persistirSegmentos } from '@/lib/calls/admin';
 import { SegmentoLiveSchema } from '@/lib/calls/coach-schema';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
-import { encerrarGravacao } from '@/lib/calls/gravacao';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
-import { processarPosCall } from '@/lib/calls/processamento';
+import { enfileirarOperacao } from '@/lib/operacoes/admin';
+import { processarOperacaoPorId } from '@/lib/operacoes/processar';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -44,18 +44,18 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     });
     await marcarReuniaoProcessando({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
 
-    after(async () => {
-      await Promise.allSettled([
-        encerrarGravacao(contexto.reuniaoId),
-        processarPosCall(contexto.reuniaoId),
-      ]).then((resultados) => {
-        for (const resultado of resultados) {
-          if (resultado.status === 'rejected') {
-            console.error('[calls:finalizar:worker] falha:', resultado.reason);
-          }
-        }
-      });
+    const operacao = await enfileirarOperacao({
+      dono: contexto.dono,
+      tipo: 'pos_call',
+      chaveIdempotencia: `pos_call:${contexto.reuniaoId}`,
+      referenciaTipo: 'call_reuniao',
+      referenciaId: contexto.reuniaoId,
+      payload: { reuniaoId: contexto.reuniaoId },
+      prioridade: 20,
+      maxTentativas: 6,
     });
+
+    after(() => processarOperacaoPorId(operacao.id));
 
     return NextResponse.json(
       { estado: 'processando', mensagem: 'A conversa já foi salva no histórico.' },

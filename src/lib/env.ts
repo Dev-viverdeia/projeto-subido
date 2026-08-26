@@ -73,6 +73,14 @@ export function serverEnv() {
   return parsed.data;
 }
 
+/** Segredo que autoriza exclusivamente o worker periódico da Vercel. */
+export function cronEnv() {
+  const parsed = z
+    .object({ CRON_SECRET: z.string().min(32) })
+    .safeParse({ CRON_SECRET: process.env.CRON_SECRET });
+  return parsed.success ? parsed.data : null;
+}
+
 /**
  * Segredo do Sobral AI. A chave vive apenas no processo do Next e nunca recebe
  * prefixo público; o modelo pode ser trocado por ambiente sem recompilar código.

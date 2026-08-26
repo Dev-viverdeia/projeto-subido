@@ -1,8 +1,9 @@
 import { WebhookReceiver } from 'livekit-server-sdk';
 import { after, NextResponse } from 'next/server';
 import { sincronizarGravacaoDoEgress } from '@/lib/calls/gravacao';
-import { processarPosCall } from '@/lib/calls/processamento';
 import { livekitEnv } from '@/lib/env';
+import { enfileirarOperacao } from '@/lib/operacoes/admin';
+import { processarOperacaoPorId } from '@/lib/operacoes/processar';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,11 +26,17 @@ export async function POST(request: Request) {
     if (evento.egressInfo) {
       const gravacao = await sincronizarGravacaoDoEgress(evento.egressInfo);
       if (evento.event === 'egress_ended' && gravacao) {
-        after(async () => {
-          await processarPosCall(gravacao.reuniaoId).catch((causa) => {
-            console.error('[livekit:webhook:pos-call] falha:', causa);
-          });
+        const operacao = await enfileirarOperacao({
+          dono: gravacao.dono,
+          tipo: 'pos_call',
+          chaveIdempotencia: `pos_call:${gravacao.reuniaoId}`,
+          referenciaTipo: 'call_reuniao',
+          referenciaId: gravacao.reuniaoId,
+          payload: { reuniaoId: gravacao.reuniaoId },
+          prioridade: 20,
+          maxTentativas: 6,
         });
+        after(() => processarOperacaoPorId(operacao.id));
       }
     }
 
