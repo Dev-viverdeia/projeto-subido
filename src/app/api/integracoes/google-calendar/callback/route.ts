@@ -7,8 +7,11 @@ import {
 import {
   ESCOPOS_GOOGLE_CALENDAR,
   obterPerfilGoogle,
+  redirectUriGoogleCalendar,
   trocarCodigoPorTokens,
 } from '@/lib/google-calendar/oauth';
+import { destinoPonteGoogleCalendar } from '@/lib/google-calendar/ponte-callback';
+import { env } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
 
 function limparCookies(resposta: NextResponse) {
@@ -34,6 +37,13 @@ function destinoComEstado(request: NextRequest, estado: 'conectado' | 'erro') {
 }
 
 export async function GET(request: NextRequest) {
+  const destinoPonte = destinoPonteGoogleCalendar({
+    requestUrl: request.nextUrl,
+    siteUrl: env.NEXT_PUBLIC_SITE_URL,
+    redirectUri: redirectUriGoogleCalendar(),
+  });
+  if (destinoPonte) return NextResponse.redirect(destinoPonte);
+
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) {

@@ -42,7 +42,10 @@ export function googleCalendarConfigurado() {
 }
 
 export function redirectUriGoogleCalendar() {
-  return new URL('/api/integracoes/google-calendar/callback', env.NEXT_PUBLIC_SITE_URL).toString();
+  return (
+    googleCalendarEnv()?.GOOGLE_CALENDAR_REDIRECT_URI ??
+    new URL('/api/integracoes/google-calendar/callback', env.NEXT_PUBLIC_SITE_URL).toString()
+  );
 }
 
 export function criarSegredosOAuth() {
