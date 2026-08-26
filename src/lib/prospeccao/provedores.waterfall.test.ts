@@ -71,7 +71,12 @@ describe('descoberta híbrida da prospecção', () => {
       apify: 'concluido',
       serpapi: 'concluido',
     });
-    expect(resultado.custos.map((uso) => uso.provedor)).toEqual(['serpapi', 'apify']);
+    expect(resultado.custos.map((uso) => uso.provedor)).toEqual(['serpapi', 'apify', 'serpapi']);
+    expect(resultado.custos.at(-1)).toMatchObject({
+      provedor: 'serpapi',
+      operacao: 'pesquisa_decisores',
+      status: 'concluido',
+    });
   });
 
   it('distribui a página inicial da SerpAPI sem aumentar o número de requisições', async () => {

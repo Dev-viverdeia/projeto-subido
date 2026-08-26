@@ -7,6 +7,7 @@ export type ConfiguracaoGatewayDados = { url: string; segredo: string } | null;
 type ConfiguracaoProvedoresWeb = {
   firecrawl: string | null;
   perplexity: string | null;
+  serpApi?: string | null;
   gateway: ConfiguracaoGatewayDados;
 };
 
@@ -31,7 +32,7 @@ async function chamarGateway(
     },
     body: JSON.stringify({ acao, payload }),
     cache: 'no-store',
-    signal: AbortSignal.timeout(20_000),
+    signal: AbortSignal.timeout(14_000),
   });
   return jsonDaResposta(resposta) as Promise<{ data?: Registro }>;
 }
@@ -52,10 +53,10 @@ export async function rasparComFirecrawl(
         formats: ['markdown', 'links'],
         onlyMainContent: false,
         maxAge: 172_800_000,
-        timeout: 12_000,
+        timeout: 9_000,
       }),
       cache: 'no-store',
-      signal: AbortSignal.timeout(16_000),
+      signal: AbortSignal.timeout(12_000),
     });
     return (await jsonDaResposta(resposta)) as Registro;
   }
@@ -70,7 +71,7 @@ export async function pesquisarComPerplexity(
 ): Promise<ResultadoPesquisa[]> {
   const corpo = {
     query: consultas.slice(0, 5),
-    max_results: 5,
+    max_results: 10,
     country: 'BR',
     search_language_filter: ['pt'],
   };
@@ -93,4 +94,31 @@ export async function pesquisarComPerplexity(
     json = resposta.data ?? {};
   }
   return Array.isArray(json.results) ? (json.results as ResultadoPesquisa[]) : [];
+}
+
+export async function pesquisarDecisorComSerpApi(
+  consulta: string,
+  chave: string,
+): Promise<ResultadoPesquisa[]> {
+  const parametros = new URLSearchParams({
+    engine: 'google',
+    q: consulta,
+    hl: 'pt',
+    gl: 'br',
+    num: '10',
+    api_key: chave,
+  });
+  const resposta = await fetch(`https://serpapi.com/search.json?${parametros}`, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(7_000),
+  });
+  const json = (await jsonDaResposta(resposta)) as Registro;
+  return Array.isArray(json.organic_results)
+    ? (json.organic_results as Registro[]).map((item) => ({
+        title: item.title,
+        url: item.link,
+        snippet: item.snippet,
+        date: item.date,
+      }))
+    : [];
 }

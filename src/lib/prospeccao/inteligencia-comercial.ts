@@ -4,7 +4,11 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import { openAIEnv } from '@/lib/env';
-import type { UsoProvedorProspeccao } from './custos';
+import {
+  custoOpenAIUsdMicros,
+  OPENAI_RATE_CARD_VERSAO,
+  type UsoProvedorProspeccao,
+} from './custos';
 import { qualificar } from './normalizacao';
 import type { LeadProspeccaoEntrada } from './schema';
 
@@ -24,7 +28,7 @@ const TITULOS = {
   'radar-satisfacao-com-ia': 'Radar de Satisfação com IA',
 } as const;
 
-const AnaliseSchema = z.object({
+export const AnaliseOportunidadesSchema = z.object({
   analises: z.array(
     z.object({
       chave: z.string().min(1).max(500),
@@ -33,19 +37,22 @@ const AnaliseSchema = z.object({
       pergunta_abertura: z.string().min(1).max(240),
       melhor_canal: z.enum(['whatsapp', 'telefone', 'email', 'linkedin', 'instagram']),
       confianca: z.enum(['alta', 'media', 'inicial']),
-      evidencias: z.array(z.string().min(1).max(180)).max(4),
+      evidencias: z.array(z.string().min(1).max(180)).max(3),
       decisor: z
         .object({
           nome: z.string().min(3).max(160),
           cargo: z.string().min(2).max(180).nullable(),
-          fonte_url: z.url(),
+          // Structured Outputs aceita apenas um subconjunto de JSON Schema.
+          // A URL continua sendo conferida contra as fontes públicas recebidas
+          // antes de entrar na ficha, sem depender de `format: uri`.
+          fonte_url: z.string().min(1).max(2048),
         })
         .nullable(),
     }),
   ),
 });
 
-type Analise = z.infer<typeof AnaliseSchema>['analises'][number];
+type Analise = z.infer<typeof AnaliseOportunidadesSchema>['analises'][number];
 
 type FontePesquisa = { titulo: string; url: string; trecho: string | null; data: string | null };
 
@@ -57,9 +64,9 @@ function fontesDePesquisa(lead: LeadProspeccaoEntrada): FontePesquisa[] {
     if (typeof item.titulo !== 'string' || typeof item.url !== 'string') return [];
     return [
       {
-        titulo: item.titulo,
+        titulo: item.titulo.slice(0, 180),
         url: item.url,
-        trecho: typeof item.trecho === 'string' ? item.trecho : null,
+        trecho: typeof item.trecho === 'string' ? item.trecho.slice(0, 320) : null,
         data: typeof item.data === 'string' ? item.data : null,
       },
     ];
@@ -77,14 +84,18 @@ function normalizar(valor: string) {
 }
 
 function decisorComFonte(lead: LeadProspeccaoEntrada, analise: Analise) {
-  if (!analise.decisor || lead.decisores.length) return null;
+  const jaTemCanalDireto = lead.decisores.some(
+    (decisor) => decisor.email || decisor.telefone || decisor.linkedin_url,
+  );
+  if (!analise.decisor || jaTemCanalDireto) return null;
   const fonte = fontesDePesquisa(lead).find((item) => item.url === analise.decisor?.fonte_url);
   if (!fonte) return null;
   const partesNome = normalizar(analise.decisor.nome)
     .split(' ')
     .filter((parte) => parte.length >= 3);
   const baseFonte = normalizar(`${fonte.titulo} ${fonte.trecho ?? ''}`);
-  if (partesNome.length < 2 || !partesNome.every((parte) => baseFonte.includes(parte))) return null;
+  const partesConfirmadas = partesNome.filter((parte) => baseFonte.includes(parte));
+  if (partesNome.length < 2 || partesConfirmadas.length < 2) return null;
   const linkedin = fonte.url.includes('linkedin.com/in/') ? fonte.url : null;
   return {
     nome: analise.decisor.nome,
@@ -221,57 +232,108 @@ export async function analisarOportunidadesDeProjeto(leads: LeadProspeccaoEntrad
   try {
     const inicio = Date.now();
     const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
-    const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 1, timeout: 45_000 });
-    const entrada = leads.map((lead) => ({
-      chave: lead.chave_externa,
-      nome: lead.nome,
-      categoria: lead.categoria,
-      cidade: lead.cidade,
-      descricao_publica: lead.descricao,
-      resumo_site: typeof lead.dados.site_resumo === 'string' ? lead.dados.site_resumo : undefined,
-      avaliacao: lead.avaliacao,
-      total_avaliacoes: lead.total_avaliacoes,
-      canais: {
-        telefone: Boolean(lead.telefone || lead.telefones.length),
-        email: lead.emails.length > 0,
-        redes: lead.redes_sociais.map((item) => item.rede),
-        decisor: lead.decisores[0]
-          ? {
-              cargo: lead.decisores[0].cargo,
-              tem_contato: Boolean(lead.decisores[0].email || lead.decisores[0].telefone),
-            }
-          : null,
-      },
-      pesquisa_publica: fontesDePesquisa(lead),
-    }));
-    const resposta = await openai.responses.parse({
-      model: LIVE_COACH_MODEL,
-      input: [
-        {
-          role: 'system',
-          content:
-            'Você qualifica empresas para um prestador vender um projeto de IA. Escolha somente um dos cinco projetos permitidos. Use apenas os fatos recebidos; o motivo deve ser uma hipótese comercial prudente, nunca uma afirmação sobre processo interno. Evidências devem repetir fatos públicos objetivos. A pergunta de abertura deve descobrir o processo atual sem pressupor dor. Se pesquisa_publica sustentar claramente nome, cargo e vínculo com a empresa, preencha decisor usando exatamente uma fonte_url recebida; caso contrário use null. Nunca invente contato, pessoa ou fonte. Seja curto, humano e específico.',
-        },
-        { role: 'user', content: JSON.stringify(entrada) },
-      ],
-      text: { format: zodTextFormat(AnaliseSchema, 'qualificacao_de_projetos') },
-    });
-    const recebidas = new Map(
-      (resposta.output_parsed?.analises ?? []).map((analise) => [analise.chave, analise]),
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 1, timeout: 18_000 });
+    const lotes: LeadProspeccaoEntrada[][] = [];
+    for (let indice = 0; indice < leads.length; indice += 3) {
+      lotes.push(leads.slice(indice, indice + 3));
+    }
+    const respostas = await Promise.all(
+      lotes.map(async (lote) => {
+        const entrada = lote.map((lead) => ({
+          chave: lead.chave_externa,
+          nome: lead.nome,
+          categoria: lead.categoria,
+          cidade: lead.cidade,
+          descricao_publica: lead.descricao,
+          resumo_site:
+            typeof lead.dados.site_resumo === 'string'
+              ? lead.dados.site_resumo.slice(0, 500)
+              : undefined,
+          avaliacao: lead.avaliacao,
+          total_avaliacoes: lead.total_avaliacoes,
+          canais: {
+            telefone: Boolean(lead.telefone || lead.telefones.length),
+            email: lead.emails.length > 0,
+            redes: lead.redes_sociais.map((item) => item.rede),
+            decisor: lead.decisores[0]
+              ? {
+                  cargo: lead.decisores[0].cargo,
+                  tem_contato: Boolean(lead.decisores[0].email || lead.decisores[0].telefone),
+                }
+              : null,
+          },
+          pesquisa_publica: fontesDePesquisa(lead).slice(0, 3),
+        }));
+        try {
+          return await openai.responses.parse({
+            model: LIVE_COACH_MODEL,
+            reasoning: { effort: 'none' },
+            max_output_tokens: 1_700,
+            input: [
+              {
+                role: 'system',
+                content:
+                  'Você qualifica empresas para um prestador vender um projeto de IA. Escolha somente um dos cinco projetos permitidos. Use apenas os fatos recebidos; o motivo deve ser uma hipótese comercial prudente, nunca uma afirmação sobre processo interno. Evidências devem repetir fatos públicos objetivos. A pergunta de abertura deve descobrir o processo atual sem pressupor dor. Se pesquisa_publica sustentar claramente nome, cargo e vínculo com a empresa, preencha decisor usando exatamente uma fonte_url recebida; caso contrário use null. Nunca invente contato, pessoa ou fonte. Seja curto, humano e específico.',
+              },
+              { role: 'user', content: JSON.stringify(entrada) },
+            ],
+            text: {
+              format: zodTextFormat(AnaliseOportunidadesSchema, 'qualificacao_de_projetos'),
+              verbosity: 'low',
+            },
+          });
+        } catch (erro) {
+          console.error('[prospeccao:inteligencia] lote indisponível:', erro);
+          return null;
+        }
+      }),
     );
+    const concluidas = respostas.filter((resposta) => resposta !== null);
+    if (!concluidas.length) throw new Error('classificacao_ia_indisponivel');
+    const recebidas = new Map(
+      concluidas.flatMap((resposta) =>
+        (resposta.output_parsed?.analises ?? []).map(
+          (analise) => [analise.chave, analise] as const,
+        ),
+      ),
+    );
+    const inputTokens = concluidas.reduce(
+      (total, resposta) => total + (resposta.usage?.input_tokens ?? 0),
+      0,
+    );
+    const outputTokens = concluidas.reduce(
+      (total, resposta) => total + (resposta.usage?.output_tokens ?? 0),
+      0,
+    );
+    const cachedInputTokens = concluidas.reduce(
+      (total, resposta) => total + (resposta.usage?.input_tokens_details?.cached_tokens ?? 0),
+      0,
+    );
+    const custoUsdMicros = custoOpenAIUsdMicros({
+      modelo: LIVE_COACH_MODEL,
+      inputTokens,
+      cachedInputTokens,
+      outputTokens,
+    });
     return {
       modo: 'ia',
       uso: {
         provedor: 'openai',
         operacao: 'qualificacao_comercial',
-        status: 'concluido',
-        unidades: (resposta.usage?.input_tokens ?? 0) + (resposta.usage?.output_tokens ?? 0),
+        status: concluidas.length === lotes.length ? 'concluido' : 'parcial',
+        unidades: inputTokens + outputTokens,
         unidade: 'token',
+        custoUsdMicros,
         latenciaMs: Date.now() - inicio,
         metadados: {
-          input_tokens: resposta.usage?.input_tokens ?? 0,
-          output_tokens: resposta.usage?.output_tokens ?? 0,
+          modelo: LIVE_COACH_MODEL,
+          rate_card: custoUsdMicros === undefined ? undefined : OPENAI_RATE_CARD_VERSAO,
+          input_tokens: inputTokens,
+          cached_input_tokens: cachedInputTokens,
+          output_tokens: outputTokens,
           empresas: leads.length,
+          lotes_concluidos: concluidas.length,
+          lotes_totais: lotes.length,
         },
       },
       leads: leads.map((lead) =>
