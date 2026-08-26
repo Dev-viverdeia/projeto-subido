@@ -58,10 +58,23 @@ const teste = {
   reuniao: null,
   proposta: null,
   projeto: null,
+  empresaNome: null,
+  propostaTitulo: null,
 };
+const iniciadoEm = Date.now();
+let ultimaEtapaEm = iniciadoEm;
 
 function etapa(nome, dados = {}) {
-  console.log(JSON.stringify({ etapa: nome, ...dados }));
+  const agora = Date.now();
+  console.log(
+    JSON.stringify({
+      etapa: nome,
+      ...dados,
+      duracaoEtapaMs: agora - ultimaEtapaEm,
+      duracaoTotalMs: agora - iniciadoEm,
+    }),
+  );
+  ultimaEtapaEm = agora;
 }
 
 function erroSe(error, contexto) {
@@ -155,7 +168,7 @@ async function criarLista() {
     ler: async () => {
       const resultado = await admin
         .from('prospeccao_listas')
-        .select('status,quantidade_encontrada')
+        .select('status,creditos_consumidos')
         .eq('id', teste.lista)
         .eq('dono', teste.usuario)
         .single();
@@ -164,7 +177,7 @@ async function criarLista() {
     },
     pronto: (valor) => valor.status === 'concluida' || valor.status === 'falhou',
   });
-  if (concluida.status !== 'concluida' || concluida.quantidade_encontrada < 1) {
+  if (concluida.status !== 'concluida') {
     throw new Error('prospecção não retornou empresas');
   }
 
@@ -174,6 +187,7 @@ async function criarLista() {
     .eq('dono', teste.usuario)
     .eq('lista_id', teste.lista);
   erroSe(leads.error, 'ler leads');
+  if (!leads.data?.length) throw new Error('prospecção concluída sem empresas');
   const melhor = (leads.data || [])
     .map((lead) => ({
       ...lead,
@@ -186,7 +200,10 @@ async function criarLista() {
     .sort((a, b) => b.pontos - a.pontos)[0];
   if (!melhor) throw new Error('nenhum lead qualificável');
   teste.lead = melhor.id;
-  etapa('prospeccao_concluida', { empresas: concluida.quantidade_encontrada });
+  etapa('prospeccao_concluida', {
+    empresas: leads.data.length,
+    creditosConsumidos: concluida.creditos_consumidos,
+  });
 }
 
 async function enviarAoCrm() {
@@ -287,6 +304,7 @@ async function aceitarPropostaEIniciarProjeto(client) {
     .eq('id', oportunidade.data.empresa_id)
     .single();
   erroSe(empresa.error, 'ler empresa');
+  teste.empresaNome = empresa.data.nome;
   const solucao = await admin
     .from('solucoes')
     .select('id,titulo,resumo')
@@ -327,6 +345,7 @@ async function aceitarPropostaEIniciarProjeto(client) {
     proximosPassos: ['Confirmar escopo', 'Agendar kick-off após o aceite'],
     observacoes: 'Proposta do teste interno da Jornada de Ouro.',
   };
+  teste.propostaTitulo = `${solucao.data.titulo} · ${empresa.data.nome}`;
   const proposta = await client
     .from('propostas')
     .insert({
@@ -335,7 +354,7 @@ async function aceitarPropostaEIniciarProjeto(client) {
       oportunidade_id: teste.oportunidade,
       projeto_id: solucao.data.id,
       reuniao_id: teste.reuniao,
-      titulo: `${solucao.data.titulo} · ${empresa.data.nome}`,
+      titulo: teste.propostaTitulo,
       documento,
     })
     .select('id')
@@ -383,16 +402,38 @@ async function verificarRotas(email, password) {
   erroSe(login.error, 'autenticar SSR');
   const cookie = cookies.map(({ name, value }) => `${name}=${value}`).join('; ');
   const rotas = [
-    '/inicio',
-    '/prospeccao',
-    '/vendas',
-    `/vendas/${teste.oportunidade}`,
-    '/reunioes',
-    '/propostas',
-    '/solucoes',
-    '/metricas',
+    { rota: '/inicio', conteudo: 'bem-vindo.' },
+    {
+      rota: `/prospeccao?lista=${teste.lista}`,
+      conteudo: [segmento, localizacao],
+    },
+    { rota: '/vendas', conteudo: teste.empresaNome },
+    {
+      rota: `/vendas/${teste.oportunidade}`,
+      conteudo: ['Ficha do cliente', teste.empresaNome, 'Cliente em entrega'],
+    },
+    {
+      rota: '/reunioes',
+      conteudo: ['Reuniões', 'Descoberta · teste da Jornada de Ouro'],
+    },
+    {
+      rota: '/reunioes?nova=1',
+      conteudo: 'Conectar agenda',
+    },
+    { rota: '/propostas', conteudo: teste.propostaTitulo },
+    {
+      rota: `/propostas/${teste.proposta}`,
+      conteudo: [teste.propostaTitulo, 'Continuar projeto'],
+    },
+    {
+      rota: `/solucoes/execucao/${teste.projeto}`,
+      conteudo: ['Sala de Entrega', teste.empresaNome, 'tarefas concluídas'],
+    },
+    { rota: '/solucoes', conteudo: teste.empresaNome },
+    { rota: '/metricas', conteudo: 'Da lista ao cliente.' },
   ];
-  for (const rota of rotas) {
+  for (const verificacao of rotas) {
+    const { rota } = verificacao;
     const resposta = await fetch(`${appUrl}${rota}`, {
       headers: { cookie },
       redirect: 'manual',
@@ -404,6 +445,14 @@ async function verificarRotas(email, password) {
       /Application error|Internal Server Error|A plataforma perdeu o fio/i.test(corpo)
     ) {
       throw new Error(`rota inválida: ${rota} (HTTP ${resposta.status})`);
+    }
+    const esperados = Array.isArray(verificacao.conteudo)
+      ? verificacao.conteudo
+      : [verificacao.conteudo];
+    for (const esperado of esperados) {
+      if (!esperado || !corpo.includes(esperado)) {
+        throw new Error(`conteúdo ausente em ${rota}: ${esperado || 'valor vazio'}`);
+      }
     }
   }
   etapa('rotas_validadas', { total: rotas.length });
