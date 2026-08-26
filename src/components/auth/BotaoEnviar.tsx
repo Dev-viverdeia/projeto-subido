@@ -2,6 +2,7 @@
 
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/design-system/via';
+import type { ComponentProps } from 'react';
 import styles from './formulario.module.css';
 
 /**
@@ -15,12 +16,18 @@ import styles from './formulario.module.css';
  * `type="submit"` explícito porque o Button do DS renderiza `type="button"` por
  * padrão — sem isto, o formulário não envia.
  */
-export function BotaoEnviar({ children }: { children: string }) {
+export function BotaoEnviar({
+  children,
+  variant = 'primary',
+}: {
+  children: string;
+  variant?: ComponentProps<typeof Button>['variant'];
+}) {
   const { pending } = useFormStatus();
 
   return (
     <div className={styles.acao}>
-      <Button type="submit" variant="primary" size="lg" fullWidth loading={pending}>
+      <Button type="submit" variant={variant} size="lg" fullWidth loading={pending}>
         {children}
       </Button>
     </div>

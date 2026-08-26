@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Cabecalho } from '@/components/auth/Cabecalho';
 import { FormularioCriarConta } from '@/components/auth/FormularioCriarConta';
+import Link from 'next/link';
 import styles from '@/components/auth/formulario.module.css';
 
 export const metadata: Metadata = {
@@ -17,10 +18,9 @@ export default function CriarContaPage() {
 
       <FormularioCriarConta />
 
-      {/* TODO(legal): apontar para as páginas reais quando existirem — hoje os
-          documentos não estão publicados e um link quebrado aqui é pior que texto. */}
       <p className={styles.legal}>
-        Ao criar a conta você concorda com os termos de uso e com a política de privacidade.
+        Ao criar a conta você concorda com os <Link href="/termos">termos de uso</Link> e com a{' '}
+        <Link href="/privacidade">política de privacidade</Link>.
       </p>
     </>
   );
