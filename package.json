@@ -31,6 +31,7 @@
     "gen:schema-edge": "node scripts/gerar-schema-edge.mjs",
     "check:schema-edge": "node scripts/gerar-schema-edge.mjs --check",
     "check:edge": "deno check supabase/functions/builder/index.ts",
+    "smoke:jornada-ouro": "node scripts/smoke-jornada-ouro.mjs",
     "deploy:edge": "npm run gen:schema-edge && supabase functions deploy builder --project-ref fopljjqxituhajzwjrjt",
     "check:conteudo-demo": "node scripts/check-conteudo-demo.mjs"
   },

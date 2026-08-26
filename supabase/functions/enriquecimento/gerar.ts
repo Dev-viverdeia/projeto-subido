@@ -7,7 +7,9 @@ import { DossieGerado, DossieGeradoOpenAI, type DossieGerado as Dossie } from '.
 import { lerPaginaPublica, normalizarSite, type PaginaPublica } from './site.ts';
 
 const MODELO_ANTHROPIC = 'claude-sonnet-5';
-const MODELO_OPENAI = 'gpt-5-mini';
+const MODELO_OPENAI = 'gpt-5.6-luna';
+const TIMEOUT_OPENAI_MS = 45_000;
+const TIMEOUT_ANTHROPIC_MS = 20_000;
 
 const INSTRUCOES_DOSSIE = `Você é o analista de pré-venda da plataforma Subido. Enriqueça a ficha
 do cliente para um prestador de serviços de IA vender e implementar um projeto com aderência real.
@@ -309,7 +311,14 @@ async function gerarDossie({
 }): Promise<Dossie> {
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) throw new Error('sem_chave_modelo');
-  const anthropic = new Anthropic({ apiKey });
+  // O enriquecimento roda depois que a resposta HTTP já voltou para o browser.
+  // Sem teto explícito, uma conexão pendurada do provedor mantém a ficha em
+  // "processando" até o watchdog, mesmo quando a contingência está saudável.
+  const anthropic = new Anthropic({
+    apiKey,
+    maxRetries: 0,
+    timeout: TIMEOUT_ANTHROPIC_MS,
+  });
 
   const formato = zodOutputFormat(DossieGerado);
   const resposta = await anthropic.messages.create({
@@ -349,7 +358,7 @@ async function gerarDossie({
 async function gerarDossieOpenAI(entrada: Parameters<typeof gerarDossie>[0]): Promise<Dossie> {
   const apiKey = Deno.env.get('OPENAI_API_KEY');
   if (!apiKey) throw new Error('sem_chave_modelo');
-  const openai = new OpenAI({ apiKey, maxRetries: 3, timeout: 45_000 });
+  const openai = new OpenAI({ apiKey, maxRetries: 0, timeout: TIMEOUT_OPENAI_MS });
   const { contexto, pagina, entrada: pedido } = entrada;
 
   const resposta = await openai.responses.parse({
@@ -373,25 +382,21 @@ async function gerarDossieOpenAI(entrada: Parameters<typeof gerarDossie>[0]): Pr
   return normalizarDossie(resposta.output_parsed);
 }
 
-/** Uma saída inválida recebe uma segunda tentativa no provedor primário. Se o
- * provedor estiver indisponível, a geração continua pela contingência OpenAI. */
+/**
+ * A OpenAI é o caminho primário porque já é a infraestrutura central do produto
+ * e, principalmente, tem um tempo máximo verificável. Anthropic continua como
+ * contingência, também com teto. Uma saída inválida não recebe uma segunda
+ * tentativa no mesmo provedor: repetir o caminho lento era o que deixava a
+ * pessoa presa no loading sem acrescentar confiabilidade.
+ */
 async function gerarDossieComTolerancia(
   entrada: Parameters<typeof gerarDossie>[0],
 ): Promise<{ dossie: Dossie; modelo: string }> {
   try {
-    return { dossie: await gerarDossie(entrada), modelo: MODELO_ANTHROPIC };
-  } catch (erro) {
-    if (!(erro instanceof Anthropic.APIError)) {
-      try {
-        console.warn('[enriquecimento] primeira saída inválida; repetindo uma vez');
-        return { dossie: await gerarDossie(entrada), modelo: MODELO_ANTHROPIC };
-      } catch {
-        console.warn('[enriquecimento] Anthropic indisponível; usando contingência OpenAI');
-        return { dossie: await gerarDossieOpenAI(entrada), modelo: MODELO_OPENAI };
-      }
-    }
-    console.warn('[enriquecimento] Anthropic indisponível; usando contingência OpenAI');
     return { dossie: await gerarDossieOpenAI(entrada), modelo: MODELO_OPENAI };
+  } catch {
+    console.warn('[enriquecimento] OpenAI indisponível; usando contingência Anthropic');
+    return { dossie: await gerarDossie(entrada), modelo: MODELO_ANTHROPIC };
   }
 }
 
