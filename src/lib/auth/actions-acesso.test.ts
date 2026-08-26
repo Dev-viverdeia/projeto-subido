@@ -17,6 +17,8 @@ vi.mock('next/navigation', () => ({ redirect }));
 
 import { criarConta, entrar, entrarComGoogle, reenviarConfirmacao } from './actions';
 
+const urlDoSite = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
 function dados(campos: Record<string, string>) {
   const formData = new FormData();
   for (const [chave, valor] of Object.entries(campos)) formData.set(chave, valor);
@@ -47,7 +49,7 @@ describe('jornada de acesso', () => {
     expect(signUp).toHaveBeenCalledOnce();
     expect(signUp.mock.calls[0]?.[0]).toMatchObject({
       email: 'rafael@example.com',
-      options: { emailRedirectTo: 'http://localhost:3000/auth/callback' },
+      options: { emailRedirectTo: `${urlDoSite}/auth/callback` },
     });
     expect(resultado).toMatchObject({
       emailPendente: 'rafael@example.com',
@@ -79,7 +81,7 @@ describe('jornada de acesso', () => {
     expect(resend).toHaveBeenCalledWith({
       type: 'signup',
       email: 'pendente@example.com',
-      options: { emailRedirectTo: 'http://localhost:3000/auth/callback' },
+      options: { emailRedirectTo: `${urlDoSite}/auth/callback` },
     });
     expect(resultado.sucesso).toMatch(/se a confirmação ainda estava pendente/i);
   });
@@ -96,8 +98,7 @@ describe('jornada de acesso', () => {
     expect(signInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: {
-        redirectTo:
-          'http://localhost:3000/auth/callback?proximo=%2Fvendas%2Fcliente-1%3Faba%3Dresumo',
+        redirectTo: `${urlDoSite}/auth/callback?proximo=%2Fvendas%2Fcliente-1%3Faba%3Dresumo`,
         scopes: 'openid email profile',
       },
     });
