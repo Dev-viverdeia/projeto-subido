@@ -40,7 +40,7 @@ describe('criarLead', () => {
 
     await criarLead({}, dadosValidos());
 
-    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
+    expect(exigirRecurso).toHaveBeenCalledWith('vendas');
     expect(rpc).toHaveBeenCalledWith('crm_criar_lead', {
       p_empresa_nome: 'Clínica Aurora',
       p_contato_nome: 'Camila Rios',
@@ -109,7 +109,7 @@ describe('moverOportunidadeKanban', () => {
     });
 
     expect(resultado).toEqual({ ok: true, movida: true });
-    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
+    expect(exigirRecurso).toHaveBeenCalledWith('vendas');
     expect(rpc).toHaveBeenCalledWith('crm_mover_oportunidade_kanban', {
       p_oportunidade: OPORTUNIDADE_ID,
       p_etapa: 'perdido',

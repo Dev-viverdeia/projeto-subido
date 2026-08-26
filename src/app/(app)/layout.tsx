@@ -8,7 +8,14 @@ import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
 import { concluiuIntroducaoSubido } from '@/lib/auth/introducao';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
-import { planoDosMetadados, planoPodeAcessarRota } from '@/lib/planos/acessos';
+import {
+  PLANOS_SUBIDO,
+  RECURSOS_SUBIDO,
+  destinoDeUpgrade,
+  planoDosMetadados,
+  planoPodeAcessarRota,
+  recursoDaRota,
+} from '@/lib/planos/acessos';
 import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
@@ -47,10 +54,17 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const email = typeof claims.email === 'string' ? claims.email : '';
   const metadata = claims.user_metadata;
   const plano = planoDosMetadados(claims.app_metadata);
-  const itensComAcesso = ITENS_NAV.map((item) => ({
-    ...item,
-    bloqueado: !planoPodeAcessarRota(plano, item.href),
-  }));
+  const itensComAcesso = ITENS_NAV.map((item) => {
+    const recurso = recursoDaRota(item.href);
+    const bloqueado = !planoPodeAcessarRota(plano, item.href);
+    return {
+      ...item,
+      bloqueado,
+      destinoBloqueado: bloqueado && recurso ? destinoDeUpgrade(recurso, item.href) : undefined,
+      planoNecessario:
+        bloqueado && recurso ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recurso].planoMinimo].nome : undefined,
+    };
+  });
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
 
   /* A introdução é parte do produto, não uma página solta. O status fica no

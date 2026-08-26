@@ -28,7 +28,7 @@ export default async function AcessosAdminPage({
   const paginaPedida = paginaParametro(parametros.pagina);
   const resultado = await listarContasAdmin({ busca, pagina: paginaPedida });
   const starterNaTela = resultado.contas.filter((conta) => conta.plano === 'starter').length;
-  const proNaTela = resultado.contas.filter((conta) => conta.plano !== 'starter').length;
+  const avancadosNaTela = resultado.contas.filter((conta) => conta.plano !== 'starter').length;
 
   const urlPagina = (pagina: number) => {
     const query = new URLSearchParams();
@@ -61,8 +61,8 @@ export default async function AcessosAdminPage({
             <dd>{starterNaTela}</dd>
           </div>
           <div>
-            <dt>Pro nesta página</dt>
-            <dd>{proNaTela}</dd>
+            <dt>Pro ou Enterprise</dt>
+            <dd>{avancadosNaTela}</dd>
           </div>
         </dl>
       </section>

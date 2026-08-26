@@ -57,6 +57,107 @@
   display: block;
 }
 
+.avisoUpgrade {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(16px, 2.5vw, 28px);
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid color-mix(in srgb, var(--via-navy) 18%, var(--app-elev-2-line));
+  border-radius: var(--app-radius-card);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--via-white) 72%, transparent), transparent 48%),
+    color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-lg) saturate(140%);
+}
+
+.iconeUpgrade {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 66%, transparent);
+  color: var(--via-navy);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+}
+
+.avisoUpgrade p,
+.avisoUpgrade h2,
+.avisoUpgrade span {
+  margin: 0;
+}
+
+.avisoUpgrade p {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.avisoUpgrade h2 {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: var(--app-ls-h3);
+}
+
+.avisoUpgrade div > span {
+  display: block;
+  max-width: 66ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.acoesUpgrade {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--via-space-2);
+}
+
+.acoesUpgrade a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2) var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-state);
+}
+
+.acoesUpgrade a:last-child:not(:first-child) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--via-text-muted);
+  font-weight: var(--via-fw-medium);
+}
+
+.acoesUpgrade a:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.acoesUpgrade a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 .aviso span {
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
@@ -284,6 +385,7 @@
 }
 
 .plano {
+  scroll-margin-top: 100px;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -490,6 +592,7 @@
 
 @supports not (backdrop-filter: blur(1px)) {
   .aviso,
+  .avisoUpgrade,
   .assinatura,
   .secaoPlanos,
   .rodapeSeguro {
@@ -504,6 +607,15 @@
 }
 
 @media (max-width: 960px) {
+  .avisoUpgrade {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .acoesUpgrade {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
   .hero {
     grid-template-columns: 1fr;
   }
@@ -523,6 +635,15 @@
 }
 
 @media (max-width: 640px) {
+  .avisoUpgrade {
+    grid-template-columns: 1fr;
+  }
+
+  .acoesUpgrade {
+    grid-column: auto;
+    flex-direction: column;
+  }
+
   .assinatura,
   .cabecalhoSecao,
   .rodapeSeguro {

@@ -43,7 +43,7 @@ export async function criarListaProspeccao(
   _estado: EstadoBuscaProspeccao,
   formData: FormData,
 ): Promise<EstadoBuscaProspeccao> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('prospeccao');
   const campos = camposDo(formData);
   const validacao = BuscaProspeccaoSchema.safeParse(campos);
   if (!validacao.success) {
@@ -109,7 +109,7 @@ export async function criarListaProspeccao(
 }
 
 export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('prospeccao');
   const lead = z.uuid().safeParse(formData.get('lead'));
   if (!lead.success) return;
 
@@ -146,7 +146,7 @@ export async function registrarTentativaContato(entrada: {
   lead: string;
   canal: string;
 }): Promise<{ ok: boolean }> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('prospeccao');
   const validacao = registrarTentativaSchema.safeParse(entrada);
   if (!validacao.success) return { ok: false };
 

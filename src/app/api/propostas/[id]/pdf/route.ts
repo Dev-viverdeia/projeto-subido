@@ -21,7 +21,7 @@ export async function GET(_request: Request, contexto: RouteContext<'/api/propos
   const { id } = await contexto.params;
   if (!z.uuid().safeParse(id).success) return new Response('Não encontrado.', { status: 404 });
 
-  const acesso = await obterAcessoRecurso('modulo_comercial');
+  const acesso = await obterAcessoRecurso('propostas');
   if (!acesso.permitido) {
     return new Response(
       acesso.motivo === 'sessao' ? 'Não autorizado.' : 'Recurso indisponível no plano atual.',

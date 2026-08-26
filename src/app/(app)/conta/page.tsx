@@ -22,9 +22,11 @@ import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
 import {
   PLANOS_SUBIDO,
-  nomeDaAreaComercial,
+  RECURSOS_SUBIDO,
+  nomeDaAreaBloqueada,
   planoDosMetadados,
   planoTemRecurso,
+  recursoPlanoValido,
 } from '@/lib/planos/acessos';
 import { PainelAcessoPlano } from './_components/PainelAcessoPlano';
 import styles from './page.module.css';
@@ -76,9 +78,14 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const email = typeof claims?.email === 'string' ? claims.email : '—';
   const metadata = claims?.user_metadata;
   const plano = planoDosMetadados(claims?.app_metadata);
-  const acessoBloqueado =
-    Boolean(parametros.upgrade) && !planoTemRecurso(plano, 'modulo_comercial');
-  const areaBloqueada = nomeDaAreaComercial(parametros.origem);
+  const recursoSolicitado = recursoPlanoValido(parametros.upgrade) ? parametros.upgrade : null;
+  const acessoBloqueado = Boolean(recursoSolicitado && !planoTemRecurso(plano, recursoSolicitado));
+  const areaBloqueada =
+    nomeDaAreaBloqueada(parametros.origem) ??
+    (recursoSolicitado ? RECURSOS_SUBIDO[recursoSolicitado].nome : null);
+  const planoNecessario = recursoSolicitado
+    ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recursoSolicitado].planoMinimo].nome
+    : 'Pro';
   const nome = typeof metadata?.nome === 'string' ? metadata.nome : '—';
   const iniciais = nome
     .split(/\s+/)
@@ -117,8 +124,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           <span>
             <strong>
               {areaBloqueada
-                ? `${areaBloqueada} está disponível no Pro.`
-                : 'Esta área está disponível no Pro.'}
+                ? `${areaBloqueada} está disponível no ${planoNecessario}.`
+                : `Esta área está disponível no ${planoNecessario}.`}
             </strong>
             No Starter, você continua com formações, projetos, Sobral AI, mentorias e reuniões com
             Live Coach.

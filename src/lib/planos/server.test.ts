@@ -42,10 +42,10 @@ describe('autorização de recursos no servidor', () => {
       plano: 'starter',
     });
     await expect(exigirRecurso('modulo_comercial')).rejects.toThrow(
-      'redirect:/conta?upgrade=modulo_comercial',
+      'redirect:/conta/assinatura?upgrade=modulo_comercial',
     );
     await expect(exigirRecurso('modulo_comercial', '/metricas')).rejects.toThrow(
-      'redirect:/conta?upgrade=modulo_comercial&origem=%2Fmetricas',
+      'redirect:/conta/assinatura?upgrade=modulo_comercial&origem=%2Fmetricas',
     );
   });
 

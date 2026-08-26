@@ -297,7 +297,7 @@
 
 .opcoesPlano {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-3);
   margin-top: var(--via-space-4);
 }
@@ -584,7 +584,8 @@
   }
 
   .faixaConta,
-  .pacotes {
+  .pacotes,
+  .opcoesPlano {
     grid-template-columns: 1fr;
   }
 
@@ -598,10 +599,6 @@
   .lista > header {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .opcoesPlano {
-    grid-template-columns: 1fr;
   }
 
   .acoesConfirmacao {

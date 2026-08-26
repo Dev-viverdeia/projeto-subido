@@ -42,7 +42,7 @@ export function PainelContas({
   >({});
   const [fluxo, setFluxo] = useState<
     | { tipo: 'detalhes' }
-    | { tipo: 'plano'; plano: 'starter' | 'pro' }
+    | { tipo: 'plano'; plano: PlanoSubido }
     | { tipo: 'pacote'; pacote: (typeof PACOTES_CREDITOS)[number]['id'] }
     | { tipo: 'sucesso'; mensagem: string }
   >({ tipo: 'detalhes' });
@@ -179,7 +179,7 @@ export function PainelContas({
                 </div>
               </div>
               <div className={styles.opcoesPlano}>
-                {(['starter', 'pro'] as const).map((plano) => (
+                {(['starter', 'pro', 'enterprise'] as const).map((plano) => (
                   <button
                     key={plano}
                     type="button"
@@ -192,7 +192,9 @@ export function PainelContas({
                       <small>
                         {plano === 'starter'
                           ? 'Aprendizado, projetos e reuniões'
-                          : 'Inclui toda a operação comercial'}
+                          : plano === 'pro'
+                            ? 'Inclui toda a operação comercial'
+                            : 'Inclui operação e gestão de equipe'}
                       </small>
                     </span>
                     {conta.plano === plano ? (
