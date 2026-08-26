@@ -45,6 +45,7 @@ const anonKey =
 const serviceKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || necessario('SUPABASE_SECRET_KEY');
 const appUrl = (process.env.SUBIDO_APP_URL || 'https://subido.viverdeia.ai').replace(/\/$/, '');
+const bypassVercel = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
 const admin = createClient(supabaseUrl, serviceKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
@@ -192,7 +193,12 @@ function observarPagina(page, papel, eventos) {
 }
 
 async function entrarNaSala(page, nome) {
-  await page.goto(`${appUrl}/sala/${teste.codigo}`, { waitUntil: 'domcontentloaded' });
+  const url = new URL(`/sala/${teste.codigo}`, appUrl);
+  if (bypassVercel) {
+    url.searchParams.set('x-vercel-protection-bypass', bypassVercel);
+    url.searchParams.set('x-vercel-set-bypass-cookie', 'true');
+  }
+  await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
   await page.getByLabel('Seu nome').fill(nome);
   await page.getByRole('checkbox').check();
   const entrar = page.getByRole('button', { name: 'Entrar na reunião' });
