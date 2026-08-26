@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { Alert, Input } from '@/design-system/via';
 import { entrar, type EstadoAuth } from '@/lib/auth/actions';
 import { ROTA_CRIAR_CONTA, ROTA_RECUPERAR_SENHA } from '@/lib/routes';
+import { AcessoGoogle } from './AcessoGoogle';
 import { BotaoEnviar } from './BotaoEnviar';
+import { ReenviarConfirmacao } from './ReenviarConfirmacao';
 import styles from './formulario.module.css';
 
 const INICIAL: EstadoAuth = {};
@@ -13,14 +15,26 @@ const INICIAL: EstadoAuth = {};
 export function FormularioEntrar({
   proximo,
   linkInvalido,
+  googleErro,
 }: {
   proximo: string;
   linkInvalido: boolean;
+  googleErro: boolean;
 }) {
   const [estado, acao] = useActionState(entrar, INICIAL);
 
   return (
     <>
+      <AcessoGoogle proximo={proximo} />
+
+      {googleErro && (
+        <div className={styles.aviso}>
+          <Alert tone="danger" size="compact" title="O Google não abriu">
+            Tente novamente. Se preferir, entre com seu e-mail e senha.
+          </Alert>
+        </div>
+      )}
+
       {linkInvalido && (
         <div className={styles.aviso}>
           <Alert tone="attn" size="compact" title="Link expirado">
@@ -35,6 +49,10 @@ export function FormularioEntrar({
             {estado.erro}
           </Alert>
         </div>
+      )}
+
+      {estado.confirmacaoPendente && estado.emailPendente && (
+        <ReenviarConfirmacao email={estado.emailPendente} compacto />
       )}
 
       <form action={acao} className={styles.campos} noValidate>

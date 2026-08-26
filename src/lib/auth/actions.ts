@@ -5,7 +5,13 @@ import { redirect } from 'next/navigation';
 import type { ZodError } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { env } from '@/lib/env';
-import { destinoSeguro, ROTA_CALLBACK, ROTA_ENTRAR, ROTA_NOVA_SENHA } from '@/lib/routes';
+import {
+  destinoSeguro,
+  ROTA_BOAS_VINDAS,
+  ROTA_CALLBACK,
+  ROTA_ENTRAR,
+  ROTA_NOVA_SENHA,
+} from '@/lib/routes';
 import {
   atualizarIdentidadeSchema,
   criarContaSchema,
@@ -26,6 +32,8 @@ export type EstadoAuth = {
   porCampo?: Record<string, string>;
   campos?: Record<string, string>;
   sucesso?: string;
+  emailPendente?: string;
+  confirmacaoPendente?: boolean;
 };
 
 export type EstadoIdentidade = {
@@ -92,6 +100,8 @@ export async function entrar(_anterior: EstadoAuth, formData: FormData): Promise
           ? 'Confirme seu e-mail antes de entrar.'
           : CREDENCIAL_INVALIDA,
       campos,
+      emailPendente: error.code === 'email_not_confirmed' ? parsed.data.email : undefined,
+      confirmacaoPendente: error.code === 'email_not_confirmed' || undefined,
     };
   }
 
@@ -141,8 +151,70 @@ export async function criarConta(_anterior: EstadoAuth, formData: FormData): Pro
    * `signInWithPassword` fecha.
    */
   return {
-    sucesso: `Enviamos um link de confirmação para ${parsed.data.email}. Abra o e-mail para ativar a conta.`,
+    sucesso:
+      'Confira sua caixa de entrada. Se este e-mail ainda não tinha uma conta, enviamos o link para ativá-la.',
+    emailPendente: parsed.data.email,
+    confirmacaoPendente: true,
   };
+}
+
+/**
+ * Solicita um novo e-mail de confirmação sem revelar se o endereço está cadastrado.
+ *
+ * O Supabase diferencia internamente uma conta confirmada, inexistente ou ainda
+ * pendente. A tela não pode transformar essa diferença em enumeração de usuários;
+ * por isso, a resposta pública continua igual em todos os casos.
+ */
+export async function reenviarConfirmacao(
+  _anterior: EstadoAuth,
+  formData: FormData,
+): Promise<EstadoAuth> {
+  const bruto = { email: texto(formData.get('email')) };
+  const parsed = recuperarSenhaSchema.safeParse(bruto);
+
+  if (!parsed.success) return deZod(parsed.error, bruto);
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: parsed.data.email,
+    options: { emailRedirectTo: `${env.NEXT_PUBLIC_SITE_URL}${ROTA_CALLBACK}` },
+  });
+
+  if (error) console.error('[auth:reenviar-confirmacao]', error.code, error.message);
+
+  return {
+    sucesso:
+      'Se a confirmação ainda estava pendente, um novo link foi enviado. Ele pode levar alguns instantes para chegar.',
+    emailPendente: parsed.data.email,
+    confirmacaoPendente: true,
+  };
+}
+
+/**
+ * Inicia o OAuth social. O Google autentica apenas identidade básica aqui;
+ * Calendar continua sendo uma integração separada e opcional dentro da conta.
+ */
+export async function entrarComGoogle(formData: FormData): Promise<never> {
+  const proximo = destinoSeguro(texto(formData.get('proximo')) || ROTA_BOAS_VINDAS);
+  const callback = new URL(ROTA_CALLBACK, env.NEXT_PUBLIC_SITE_URL);
+  callback.searchParams.set('proximo', proximo);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: callback.toString(),
+      scopes: 'openid email profile',
+    },
+  });
+
+  if (error || !data.url) {
+    console.error('[auth:google]', error?.code, error?.message);
+    redirect(`${ROTA_ENTRAR}?erro=google`);
+  }
+
+  redirect(data.url);
 }
 
 export async function recuperarSenha(

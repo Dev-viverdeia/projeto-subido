@@ -79,6 +79,7 @@ export const ROTA_CRIAR_CONTA = '/criar-conta';
 export const ROTA_RECUPERAR_SENHA = '/recuperar-senha';
 export const ROTA_NOVA_SENHA = '/nova-senha';
 export const ROTA_CALLBACK = '/auth/callback';
+export const ROTA_BOAS_VINDAS: RotaApp = '/boas-vindas';
 
 /** Para onde vai quem acabou de entrar e não pediu nada específico. */
 export const ROTA_POS_LOGIN: RotaApp = '/inicio';

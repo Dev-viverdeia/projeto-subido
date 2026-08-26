@@ -28,6 +28,7 @@ export default async function EntrarPage({ searchParams }: PageProps<'/entrar'>)
       <FormularioEntrar
         proximo={destinoSeguro(typeof bruto === 'string' ? bruto : null)}
         linkInvalido={params.erro === 'link'}
+        googleErro={params.erro === 'google'}
       />
     </>
   );

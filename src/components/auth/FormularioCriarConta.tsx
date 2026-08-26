@@ -4,8 +4,10 @@ import { useActionState } from 'react';
 import Link from 'next/link';
 import { Alert, Input } from '@/design-system/via';
 import { criarConta, type EstadoAuth } from '@/lib/auth/actions';
-import { ROTA_ENTRAR } from '@/lib/routes';
+import { ROTA_BOAS_VINDAS, ROTA_ENTRAR, ROTA_RECUPERAR_SENHA } from '@/lib/routes';
+import { AcessoGoogle } from './AcessoGoogle';
 import { BotaoEnviar } from './BotaoEnviar';
+import { ReenviarConfirmacao } from './ReenviarConfirmacao';
 import styles from './formulario.module.css';
 
 const INICIAL: EstadoAuth = {};
@@ -20,14 +22,24 @@ export function FormularioCriarConta() {
    */
   if (estado.sucesso) {
     return (
-      <Alert tone="success" title="Confirme seu e-mail">
-        {estado.sucesso}
-      </Alert>
+      <div className={styles.confirmacao}>
+        <Alert tone="success" title="Confira seu e-mail">
+          {estado.sucesso}
+        </Alert>
+        <p>Se você já usou este endereço na Subido, entre com sua senha ou peça uma nova.</p>
+        {estado.emailPendente && <ReenviarConfirmacao email={estado.emailPendente} />}
+        <div className={styles.acoesConfirmacao}>
+          <Link href={ROTA_ENTRAR}>Entrar</Link>
+          <Link href={ROTA_RECUPERAR_SENHA}>Esqueci minha senha</Link>
+        </div>
+      </div>
     );
   }
 
   return (
     <>
+      <AcessoGoogle proximo={ROTA_BOAS_VINDAS} rotulo="Criar conta com Google" />
+
       {estado.erro && (
         <div className={styles.aviso}>
           <Alert tone="danger" size="compact">
