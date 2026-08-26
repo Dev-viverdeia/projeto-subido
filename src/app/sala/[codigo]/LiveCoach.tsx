@@ -2,24 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import { AudioLines, Circle, Layers3, LockKeyhole, Radio } from 'lucide-react';
 import { ConnectionState, RoomEvent, Track, type Participant } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
-import styles from './LiveCoach.module.css';
+import {
+  CabineLiveCoach,
+  type EstadoCoach,
+  type EstadoGravacao,
+  type EstadoGravacaoUi,
+  type SugestaoLive,
+} from './CabineLiveCoach';
 
-type EstadoCoach = 'conectando' | 'escutando' | 'analisando' | 'indisponivel';
-type EstadoGravacao = 'pendente' | 'gravando' | 'processando' | 'concluida' | 'falhou';
-type EstadoGravacaoUi = 'iniciando' | EstadoGravacao | 'indisponivel';
-
-export type SugestaoLive = {
-  id: string;
-  categoria: string;
-  titulo: string;
-  sugestao: string;
-  metodologia: string | null;
-  trecho_gatilho: string | null;
-  prioridade: number;
-};
+export { CabineLiveCoach, type SugestaoLive } from './CabineLiveCoach';
 
 type EventoRealtime = {
   type?: string;
@@ -28,23 +21,6 @@ type EventoRealtime = {
   delta?: string;
   transcript?: string;
   error?: { message?: string };
-};
-
-const ROTULO_ESTADO: Record<EstadoCoach, string> = {
-  conectando: 'Conectando inteligência',
-  escutando: 'Escutando a conversa',
-  analisando: 'Lendo o momento',
-  indisponivel: 'Transcrição indisponível',
-};
-
-const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
-  iniciando: 'Preparando memória',
-  pendente: 'Preparando memória',
-  gravando: 'Gravação protegida',
-  processando: 'Salvando gravação',
-  concluida: 'Gravação preservada',
-  falhou: 'Somente transcrição',
-  indisponivel: 'Somente transcrição',
 };
 
 export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: boolean }) {
@@ -71,6 +47,9 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const destinoRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const fontesRef = useRef(new Map<string, MediaStreamAudioSourceNode>());
   const trilhasRef = useRef<MediaStreamTrack[]>([]);
+  const canalRealtimeRef = useRef<RTCDataChannel | null>(null);
+  const falaEmCursoRef = useRef(false);
+  const silencioRef = useRef<number | null>(null);
 
   const trilhas = referencias
     .map((referencia) => referencia.publication?.track?.mediaStreamTrack)
@@ -87,10 +66,25 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assinaturaTrilhas]);
 
+  const confirmarTrecho = useCallback(() => {
+    const canal = canalRealtimeRef.current;
+    if (!canal || canal.readyState !== 'open') return;
+    if (!falaEmCursoRef.current && parciaisRef.current.size === 0) return;
+    canal.send(JSON.stringify({ type: 'input_audio_buffer.commit' }));
+    falaEmCursoRef.current = false;
+  }, []);
+
   useEffect(() => {
     function acompanharFalante(falantes: Participant[]) {
       const participante = falantes[0];
-      if (!participante) return;
+      if (!participante) {
+        if (!falaEmCursoRef.current) return;
+        if (silencioRef.current) window.clearTimeout(silencioRef.current);
+        silencioRef.current = window.setTimeout(confirmarTrecho, 850);
+        return;
+      }
+      falaEmCursoRef.current = true;
+      if (silencioRef.current) window.clearTimeout(silencioRef.current);
       falanteAtualRef.current = {
         falanteNome: participante.name || 'Participante',
         falantePapel: participante.identity.startsWith('host-') ? 'anfitriao' : 'convidado',
@@ -100,8 +94,9 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     room.on(RoomEvent.ActiveSpeakersChanged, acompanharFalante);
     return () => {
       room.off(RoomEvent.ActiveSpeakersChanged, acompanharFalante);
+      if (silencioRef.current) window.clearTimeout(silencioRef.current);
     };
-  }, [room]);
+  }, [confirmarTrecho, room]);
 
   useEffect(() => {
     async function iniciar() {
@@ -223,6 +218,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     let cancelado = false;
     let peer: RTCPeerConnection | null = null;
     let audioContext: AudioContext | null = null;
+    let fechamentoPeriodico: number | null = null;
     const fontesAtivas = fontesRef.current;
 
     async function conectar() {
@@ -252,6 +248,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
         peer = new RTCPeerConnection();
         peer.addTrack(trilhaMista, destino.stream);
         const canal = peer.createDataChannel('oai-events');
+        canalRealtimeRef.current = canal;
         canal.addEventListener('open', () => !cancelado && setEstado('escutando'));
         canal.addEventListener('message', (mensagem) => {
           try {
@@ -260,6 +257,11 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
             // Eventos que não são JSON não carregam transcrição e podem ser ignorados.
           }
         });
+
+        // Protege calls longas ou com ruído constante, nas quais o evento de
+        // silêncio do LiveKit pode não chegar. O texto parcial já exibido vira
+        // um segmento definitivo sem interromper a captura do áudio seguinte.
+        fechamentoPeriodico = window.setInterval(confirmarTrecho, 9_000);
 
         const oferta = await peer.createOffer();
         await peer.setLocalDescription(oferta);
@@ -283,6 +285,9 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     void conectar();
     return () => {
       cancelado = true;
+      confirmarTrecho();
+      canalRealtimeRef.current = null;
+      if (fechamentoPeriodico) window.clearInterval(fechamentoPeriodico);
       peer?.close();
       for (const fonte of fontesAtivas.values()) fonte.disconnect();
       fontesAtivas.clear();
@@ -290,7 +295,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       destinoRef.current = null;
       void audioContext?.close();
     };
-  }, [registrarEvento, reuniaoId, temTrilha]);
+  }, [confirmarTrecho, registrarEvento, reuniaoId, temTrilha]);
 
   useEffect(() => {
     const audioContext = audioContextRef.current;
@@ -347,94 +352,5 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       falha={falha}
       gravacao={gravacao}
     />
-  );
-}
-
-export function CabineLiveCoach({
-  ativo,
-  estado,
-  sugestao,
-  fala,
-  parcial = false,
-  falha = '',
-  gravacao = 'iniciando',
-}: {
-  ativo: boolean;
-  estado: EstadoCoach;
-  sugestao: SugestaoLive | null;
-  fala: string;
-  parcial?: boolean;
-  falha?: string;
-  gravacao?: EstadoGravacaoUi;
-}) {
-  const intensidade =
-    estado === 'analisando' ? styles.intenso : estado === 'escutando' ? styles.ativo : '';
-
-  return (
-    <aside className={styles.painel} aria-label="Live Coach privado">
-      <header className={styles.cabecalho}>
-        <span className={`${styles.estado} ${intensidade}`} aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
-        <div>
-          <p>{ativo ? 'Live Coach' : 'Memória da reunião'}</p>
-          <span>{ROTULO_ESTADO[estado]}</span>
-        </div>
-        <span className={styles.privado}>
-          <LockKeyhole size={13} strokeWidth={1.8} aria-hidden="true" /> Só você vê
-        </span>
-      </header>
-
-      <section className={styles.recomendacao} aria-live="polite" aria-atomic="true">
-        <div className={styles.rotuloSecao}>
-          <Layers3 size={15} strokeWidth={1.8} aria-hidden="true" />
-          Uma orientação por vez
-        </div>
-        {sugestao ? (
-          <>
-            <div className={styles.metaSugestao}>
-              <span>{sugestao.categoria}</span>
-              {sugestao.metodologia && <span>{sugestao.metodologia}</span>}
-            </div>
-            <h2>{sugestao.titulo}</h2>
-            <p>{sugestao.sugestao}</p>
-            {sugestao.trecho_gatilho && (
-              <p className={styles.evidencia}>Ouvido agora: “{sugestao.trecho_gatilho}”</p>
-            )}
-          </>
-        ) : (
-          <div className={styles.espera}>
-            <h2>{ativo ? 'Escute antes de conduzir.' : 'A conversa já está virando histórico.'}</h2>
-            <p>
-              {ativo
-                ? 'Quando houver um sinal útil, uma única recomendação aparece aqui.'
-                : 'Os trechos serão salvos na ficha ao encerrar.'}
-            </p>
-          </div>
-        )}
-      </section>
-
-      <section className={styles.transcricao}>
-        <div className={styles.rotuloSecao}>
-          <AudioLines size={15} strokeWidth={1.8} aria-hidden="true" />
-          Transcrição agora
-        </div>
-        <p className={parcial ? styles.falaParcial : undefined}>{fala}</p>
-        {falha && <small role="status">{falha}</small>}
-      </section>
-
-      <footer>
-        <span className={styles.gravacao} data-estado={gravacao}>
-          <Circle size={8} fill="currentColor" strokeWidth={0} aria-hidden="true" />
-          {ROTULO_GRAVACAO[gravacao]}
-        </span>
-        <span>
-          <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
-          Ao encerrar: resumo, decisões e próximo passo na ficha do cliente
-        </span>
-      </footer>
-    </aside>
   );
 }

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { iniciarReuniao } from '@/lib/calls/admin';
 import { contextoTranscricaoParaTexto, obterContextoCoach } from '@/lib/calls/contexto-coach';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
+import { criarSessaoTranscricao } from '@/lib/calls/realtime';
 import { openAIEnv } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
 
@@ -44,29 +45,9 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     if (sdp.length < 40 || sdp.length > 120_000) return erro('Oferta de áudio inválida.', 400);
 
     const { OPENAI_API_KEY } = openAIEnv();
-    const sessao = {
-      type: 'transcription',
-      audio: {
-        input: {
-          format: {
-            type: 'audio/pcm',
-            rate: 24_000,
-          },
-          noise_reduction: { type: 'far_field' },
-          transcription: {
-            model: 'gpt-4o-mini-transcribe',
-            prompt: `Reunião comercial em português do Brasil. Preserve nomes próprios e termos de IA. ${contextoTranscricaoParaTexto(contexto)}`,
-            language: 'pt',
-          },
-          turn_detection: {
-            type: 'server_vad',
-            threshold: 0.5,
-            prefix_padding_ms: 300,
-            silence_duration_ms: 700,
-          },
-        },
-      },
-    };
+    const sessao = criarSessaoTranscricao({
+      prompt: `Reunião comercial em português do Brasil. Preserve nomes próprios e termos de IA. ${contextoTranscricaoParaTexto(contexto)}`,
+    });
     let respostaOpenAI: Response | null = null;
     for (let tentativa = 0; tentativa < 2; tentativa += 1) {
       const formulario = new FormData();

@@ -17,6 +17,8 @@ import { handleError } from '@/lib/errors';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const BUCKET = 'call-gravacoes';
+const TENTATIVAS_FINALIZACAO = 24;
+const INTERVALO_FINALIZACAO_MS = 500;
 
 export type EstadoGravacao = 'pendente' | 'gravando' | 'processando' | 'concluida' | 'falhou';
 
@@ -42,6 +44,12 @@ function segundosDeNanos(valor: bigint) {
   return Math.max(1, Math.round(Number(valor / 1_000_000_000n)));
 }
 
+function duracaoDoEgress(egress: EgressInfo, duracaoArquivo?: bigint) {
+  if (duracaoArquivo && duracaoArquivo > 0n) return segundosDeNanos(duracaoArquivo);
+  if (egress.endedAt <= egress.startedAt) return null;
+  return segundosDeNanos(egress.endedAt - egress.startedAt);
+}
+
 function estadoDoEgress(status: EgressStatus): EstadoGravacao {
   if (status === EgressStatus.EGRESS_COMPLETE) return 'concluida';
   if (status === EgressStatus.EGRESS_ENDING) return 'processando';
@@ -53,6 +61,31 @@ function estadoDoEgress(status: EgressStatus): EstadoGravacao {
     return 'falhou';
   }
   return 'gravando';
+}
+
+function egressFinalizou(status: EgressStatus) {
+  return [
+    EgressStatus.EGRESS_COMPLETE,
+    EgressStatus.EGRESS_FAILED,
+    EgressStatus.EGRESS_ABORTED,
+    EgressStatus.EGRESS_LIMIT_REACHED,
+  ].includes(status);
+}
+
+async function aguardarFinalizacaoDoEgress(cliente: EgressClient, inicial: EgressInfo) {
+  let egress = inicial;
+
+  for (
+    let tentativa = 0;
+    tentativa < TENTATIVAS_FINALIZACAO && !egressFinalizou(egress.status);
+    tentativa += 1
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, INTERVALO_FINALIZACAO_MS));
+    const [atualizado] = await cliente.listEgress({ egressId: egress.egressId });
+    if (atualizado) egress = atualizado;
+  }
+
+  return egress;
 }
 
 function mapearGravacao(linha: {
@@ -215,7 +248,8 @@ export async function encerrarGravacao(reuniaoId: string) {
       livekit.LIVEKIT_API_KEY,
       livekit.LIVEKIT_API_SECRET,
     );
-    const egress = await cliente.stopEgress(gravacao.idProvedor);
+    const interrompido = await cliente.stopEgress(gravacao.idProvedor);
+    const egress = await aguardarFinalizacaoDoEgress(cliente, interrompido);
     await sincronizarGravacaoDoEgress(egress);
   } catch (causa) {
     // O webhook continua sendo a redundância. Uma resposta "já encerrado" não
@@ -231,13 +265,44 @@ export async function sincronizarGravacaoDoEgress(egress: EgressInfo) {
   const arquivo = egress.fileResults[0];
   const estado = estadoDoEgress(egress.status);
   const erroEgress = egress.error || egress.details || null;
+  const { data: registroAtual, error: erroRegistro } = await admin
+    .from('calls_gravacoes')
+    .select('caminho_arquivo')
+    .eq('id_provedor', egress.egressId)
+    .maybeSingle();
+  if (erroRegistro) throw handleError(erroRegistro, 'calls:gravacao:localizar');
+
+  const caminho = arquivo?.filename || registroAtual?.caminho_arquivo || null;
+  let tamanhoBytes = arquivo?.size ? Number(arquivo.size) : null;
+
+  // O LiveKit pode concluir o upload sem devolver os metadados no fileResults.
+  // Nessa situação, o Storage é a fonte final para confirmar que o MP3 existe.
+  if (estado === 'concluida' && caminho && !tamanhoBytes) {
+    const partes = caminho.split('/');
+    const nome = partes.pop();
+    const pasta = partes.join('/');
+    if (nome) {
+      const { data: objetos, error: erroStorage } = await admin.storage
+        .from(BUCKET)
+        .list(pasta, { limit: 10, search: nome });
+      if (erroStorage) {
+        console.error('[calls:gravacao:storage] metadados indisponíveis:', erroStorage);
+      } else {
+        const objeto = objetos.find((item) => item.name === nome);
+        const tamanho = objeto?.metadata?.size;
+        if (typeof tamanho === 'number' && tamanho > 0) tamanhoBytes = tamanho;
+      }
+    }
+  }
+
+  const duracaoSegundos = duracaoDoEgress(egress, arquivo?.duration);
   const { data, error } = await admin
     .from('calls_gravacoes')
     .update({
       status: estado,
-      ...(arquivo?.filename ? { caminho_arquivo: arquivo.filename } : {}),
-      ...(arquivo?.duration ? { duracao_segundos: segundosDeNanos(arquivo.duration) } : {}),
-      ...(arquivo?.size ? { tamanho_bytes: Number(arquivo.size) } : {}),
+      ...(caminho ? { caminho_arquivo: caminho } : {}),
+      ...(duracaoSegundos ? { duracao_segundos: duracaoSegundos } : {}),
+      ...(tamanhoBytes ? { tamanho_bytes: tamanhoBytes } : {}),
       ...(egress.startedAt ? { iniciada_em: dataDeNanos(egress.startedAt) } : {}),
       ...(egress.endedAt ? { encerrada_em: dataDeNanos(egress.endedAt) } : {}),
       erro: estado === 'falhou' ? (erroEgress ?? 'A gravação foi interrompida.') : null,
