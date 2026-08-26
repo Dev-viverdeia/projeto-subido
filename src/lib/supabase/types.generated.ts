@@ -1477,6 +1477,42 @@ export type Database = {
           },
         ]
       }
+      operacoes_configuracao: {
+        Row: {
+          alerta_custo_diario_usd_micros: number
+          alerta_fila_segundos: number
+          alerta_taxa_falha: number
+          atualizado_em: string
+          enriquecimentos_ativos_por_usuario: number
+          id: boolean
+          pos_calls_globais_processando: number
+          prospeccoes_ativas_por_usuario: number
+          prospeccoes_globais_processando: number
+        }
+        Insert: {
+          alerta_custo_diario_usd_micros?: number
+          alerta_fila_segundos?: number
+          alerta_taxa_falha?: number
+          atualizado_em?: string
+          enriquecimentos_ativos_por_usuario?: number
+          id?: boolean
+          pos_calls_globais_processando?: number
+          prospeccoes_ativas_por_usuario?: number
+          prospeccoes_globais_processando?: number
+        }
+        Update: {
+          alerta_custo_diario_usd_micros?: number
+          alerta_fila_segundos?: number
+          alerta_taxa_falha?: number
+          atualizado_em?: string
+          enriquecimentos_ativos_por_usuario?: number
+          id?: boolean
+          pos_calls_globais_processando?: number
+          prospeccoes_ativas_por_usuario?: number
+          prospeccoes_globais_processando?: number
+        }
+        Relationships: []
+      }
       operacoes_jobs: {
         Row: {
           atualizado_em: string
@@ -3229,6 +3265,28 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      operacoes_sistema_resumo: {
+        Args: { p_janela_horas?: number }
+        Returns: {
+          capacidade_pos_call: number
+          capacidade_prospeccao: number
+          chamadas_provedores: number
+          concluidas: number
+          custo_usd_micros: number
+          espera_maxima_segundos: number
+          falhas: number
+          falhas_provedores: number
+          latencia_p95_provedor_ms: number
+          latencia_p95_segundos: number
+          limite_custo_usd_micros: number
+          limite_fila_segundos: number
+          limite_taxa_falha: number
+          pendentes: number
+          processando: number
+          retomadas: number
+          taxa_sucesso: number
+        }[]
       }
       progresso_conta_snapshot: {
         Args: never

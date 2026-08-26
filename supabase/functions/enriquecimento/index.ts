@@ -57,6 +57,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
         402,
       );
     }
+    if (error.message.includes('limite_enriquecimentos_simultaneos')) {
+      return respostaJson(
+        {
+          erro: 'Você já tem dois enriquecimentos em andamento. Aguarde um deles terminar para iniciar outro.',
+        },
+        429,
+      );
+    }
     return respostaJson({ erro: 'Não foi possível iniciar a análise.' }, 500);
   }
 

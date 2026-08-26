@@ -7,6 +7,7 @@
 
 .hero,
 .indicadores article,
+.escala,
 .painel {
   position: relative;
   overflow: hidden;
@@ -19,6 +20,7 @@
 
 .hero::before,
 .indicadores article::before,
+.escala::before,
 .painel::before {
   content: '';
   position: absolute;
@@ -89,8 +91,16 @@
   font-size: var(--via-fs-h4);
 }
 
-.sinal[data-ok='true'] strong {
+.sinal[data-nivel='saudavel'] strong {
   color: var(--via-success);
+}
+
+.sinal[data-nivel='atencao'] strong {
+  color: var(--via-warning);
+}
+
+.sinal[data-nivel='critico'] strong {
+  color: var(--via-danger);
 }
 
 .indicadores {
@@ -128,6 +138,132 @@
 .indicadores article[data-alerta='true'] > svg,
 .indicadores article[data-alerta='true'] strong {
   color: var(--via-danger);
+}
+
+.escala {
+  border-radius: var(--app-radius-card);
+}
+
+.escala > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-5) var(--via-space-6);
+  border-bottom: 1px solid var(--via-border-soft);
+}
+
+.escala header p,
+.escala header h2 {
+  margin: 0;
+}
+
+.escala header p {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--via-ls-label);
+  text-transform: uppercase;
+}
+
+.escala header h2 {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h3);
+}
+
+.escala > header > span {
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-chip);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  white-space: nowrap;
+}
+
+.metricasEscala {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--via-border-soft);
+}
+
+.metricasEscala article {
+  display: grid;
+  gap: var(--via-space-2);
+  min-width: 0;
+  padding: var(--via-space-5) var(--via-space-6);
+  background: color-mix(in srgb, var(--via-white) 62%, transparent);
+}
+
+.metricasEscala svg,
+.metricasEscala span,
+.metricasEscala small {
+  color: var(--via-text-faint);
+}
+
+.metricasEscala span,
+.metricasEscala small {
+  font-size: var(--via-fs-xs);
+}
+
+.metricasEscala strong {
+  overflow: hidden;
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-h3);
+  font-weight: 520;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alertas {
+  display: grid;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4) var(--via-space-6);
+  border-top: 1px solid var(--via-border-soft);
+}
+
+.alertas article,
+.semAlertas {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 54px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 56%, transparent);
+}
+
+.alertas article[data-nivel='atencao'] > svg {
+  color: var(--via-warning);
+}
+
+.alertas article[data-nivel='critico'] > svg {
+  color: var(--via-danger);
+}
+
+.alertas article > div {
+  display: grid;
+  gap: 2px;
+}
+
+.alertas strong,
+.semAlertas span {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.alertas span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.semAlertas {
+  margin: var(--via-space-4) var(--via-space-6);
+  color: var(--via-success);
 }
 
 .painel {
@@ -293,6 +429,12 @@
   .indicadores {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .metricasEscala {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .escala > header {
+    align-items: start;
+  }
   .painel > header {
     display: grid;
     align-items: start;
@@ -307,10 +449,14 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 599px) {
   .indicadores,
+  .metricasEscala,
   .lista article {
     grid-template-columns: 1fr;
+  }
+  .escala > header {
+    display: grid;
   }
   .filtros {
     display: grid;

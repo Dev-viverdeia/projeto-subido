@@ -80,11 +80,14 @@ export async function criarListaProspeccao(
 
   if (erroLista || !lista) {
     const semCreditos = erroLista?.message.includes('creditos_insuficientes');
+    const limiteSimultaneo = erroLista?.message.includes('limite_prospeccoes_simultaneas');
     return {
       campos,
-      erro: semCreditos
-        ? 'Você não tem créditos suficientes para esta lista. Reduza a quantidade.'
-        : 'Não foi possível iniciar a busca agora. Tente novamente.',
+      erro: limiteSimultaneo
+        ? 'Você já tem duas listas sendo montadas. Assim que uma ficar pronta, pode iniciar outra.'
+        : semCreditos
+          ? 'Você não tem créditos suficientes para esta lista. Reduza a quantidade.'
+          : 'Não foi possível iniciar a busca agora. Tente novamente.',
     };
   }
 
