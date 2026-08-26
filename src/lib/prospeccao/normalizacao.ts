@@ -157,6 +157,26 @@ function horariosDo(valor: unknown): LeadProspeccaoEntrada['horarios'] {
     .slice(0, 14);
 }
 
+function horariosDoRegistro(valor: unknown): LeadProspeccaoEntrada['horarios'] {
+  const registro = comoRegistro(valor);
+  if (!registro) return [];
+  return Object.entries(registro)
+    .flatMap(([dia, horarios]) => {
+      const textoHorarios = texto(horarios);
+      return textoHorarios ? [{ dia, horarios: textoHorarios }] : [];
+    })
+    .slice(0, 14);
+}
+
+function urlGoogleMaps(registro: Registro, nome: string) {
+  const direta = urlPublica(registro.directions);
+  if (direta) return direta;
+  const placeId = texto(registro.place_id);
+  const parametros = new URLSearchParams({ api: '1', query: nome });
+  if (placeId) parametros.set('query_place_id', placeId);
+  return `https://www.google.com/maps/search/?${parametros}`;
+}
+
 export function qualificar(lead: Omit<LeadProspeccaoEntrada, 'qualificacao'>) {
   const itens = {
     telefone: lead.telefones.length > 0 || Boolean(lead.telefone),
@@ -220,14 +240,20 @@ export function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
     emails: [],
     redes_sociais: [],
     decisores: [],
-    horarios: [],
-    maps_url: urlPublica(registro.place_id_search) ?? urlPublica(registro.directions),
-    imagem_url: null,
+    horarios: horariosDoRegistro(registro.operating_hours),
+    maps_url: urlGoogleMaps(registro, nome),
+    imagem_url: urlPublica(registro.thumbnail) ?? urlPublica(registro.serpapi_thumbnail),
     avaliacao: numero(registro.rating),
     total_avaliacoes: inteiro(registro.reviews),
     descricao: texto(registro.description),
     fontes: ['Google Maps · dados públicos'],
-    dados: { place_id: texto(registro.place_id), horario: registro.operating_hours ?? null },
+    dados: {
+      place_id: texto(registro.place_id),
+      data_id: texto(registro.data_id),
+      horario: registro.operating_hours ?? null,
+      localizacao: comoRegistro(registro.gps_coordinates),
+      categorias: textos(registro.types),
+    },
   } satisfies Omit<LeadProspeccaoEntrada, 'qualificacao'>;
   const resultado = LeadProspeccaoSchema.safeParse(comQualificacao(base));
   return resultado.success ? resultado.data : null;

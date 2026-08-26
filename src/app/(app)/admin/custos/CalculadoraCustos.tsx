@@ -61,7 +61,7 @@ export function CalculadoraCustos({ resumo }: { resumo: Resumo }) {
   const [margem, setMargem] = useState('70');
   const [planoFirecrawl, setPlanoFirecrawl] = useState('standard');
   const [apifyPorLead, setApifyPorLead] = useState('0');
-  const [serpPorBuscaUsd, setSerpPorBuscaUsd] = useState('0');
+  const [serpPorBuscaUsd, setSerpPorBuscaUsd] = useState('0,01');
   const [openAiPorMilhaoUsd, setOpenAiPorMilhaoUsd] = useState('0');
 
   const calculo = useMemo(() => {
@@ -185,7 +185,7 @@ export function CalculadoraCustos({ resumo }: { resumo: Resumo }) {
             />
           </label>
           <label>
-            <span>SerpAPI por busca, em US$</span>
+            <span>SerpAPI por busca · plano Production</span>
             <input
               value={serpPorBuscaUsd}
               onChange={(e) => setSerpPorBuscaUsd(e.target.value)}

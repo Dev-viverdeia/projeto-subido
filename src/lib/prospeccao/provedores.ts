@@ -26,7 +26,7 @@ export type ResultadoProvedores = {
   leads: LeadProspeccaoEntrada[];
   custos: UsoProvedorProspeccao[];
   provedores: {
-    serpapi: 'concluido' | 'falhou' | 'nao_configurado' | 'nao_necessario';
+    serpapi: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado' | 'nao_necessario';
     apify: 'concluido' | 'falhou' | 'nao_configurado';
     firecrawl: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
     perplexity: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
@@ -120,6 +120,19 @@ function variacaoDeterministica(valor: string) {
   return (acumulado % 500) / 100;
 }
 
+function deslocamentoSerp(busca: BuscaProspeccao, contexto: ContextoProspeccao) {
+  if (!contexto.dono && !contexto.lista) return 0;
+  const semente = [
+    contexto.dono ?? '',
+    contexto.lista ?? '',
+    busca.segmento,
+    busca.localizacao,
+  ].join(':');
+  let acumulado = 0;
+  for (const caractere of semente) acumulado = (acumulado * 31 + caractere.charCodeAt(0)) >>> 0;
+  return (acumulado % 3) * 20;
+}
+
 function notaDeSelecao(lead: LeadProspeccaoEntrada, exposicao?: ExposicaoProspeccao, semente = '') {
   const canais =
     (lead.telefones.length || lead.telefone ? 28 : 0) +
@@ -160,6 +173,7 @@ export async function prospectarEmpresas(
   const buscaDescoberta = {
     ...busca,
     quantidade: quantidadeParaDescoberta(busca.quantidade),
+    deslocamentoInicial: deslocamentoSerp(busca, contexto),
   } satisfies ParametrosDescoberta;
   const memoria = contexto.dono ? await carregarMemoriaProspeccao(contexto.dono) : null;
   const custos: UsoProvedorProspeccao[] = [];
@@ -168,69 +182,90 @@ export async function prospectarEmpresas(
     await contexto.aoCusto?.(uso);
   };
 
-  const serpConfigurada = Boolean(configuracao.serpApi);
-  const apifyConfigurado = Boolean(configuracao.apifyToken && configuracao.apifyActor);
-  let estadoApify: 'concluido' | 'falhou' | 'nao_configurado' = apifyConfigurado
-    ? 'falhou'
-    : 'nao_configurado';
-  let estadoSerp: 'concluido' | 'falhou' | 'nao_configurado' | 'nao_necessario' = serpConfigurada
-    ? 'nao_necessario'
-    : 'nao_configurado';
-  let encontradosApify: LeadProspeccaoEntrada[] = [];
-  let encontradosSerp: LeadProspeccaoEntrada[] = [];
+  const executarSerp = async () => {
+    if (!configuracao.serpApi) {
+      return {
+        estado: 'nao_configurado' as const,
+        leads: [] as LeadProspeccaoEntrada[],
+        uso: null,
+      };
+    }
+    const inicio = Date.now();
+    try {
+      const resultado = await buscarSerpApi(buscaDescoberta, configuracao.serpApi);
+      return {
+        estado: resultado.uso.status === 'parcial' ? ('parcial' as const) : ('concluido' as const),
+        leads: resultado.leads,
+        uso: resultado.uso,
+      };
+    } catch (erro) {
+      console.error(
+        `[prospeccao:serpapi] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
+      );
+      return {
+        estado: 'falhou' as const,
+        leads: [] as LeadProspeccaoEntrada[],
+        uso: {
+          provedor: 'serpapi' as const,
+          operacao: 'google_maps_search',
+          status: 'falhou' as const,
+          unidades: 0,
+          unidade: 'requisicao' as const,
+          latenciaMs: Date.now() - inicio,
+        },
+      };
+    }
+  };
 
-  if (configuracao.apifyToken && configuracao.apifyActor) {
-    const inicioApify = Date.now();
+  const executarApify = async () => {
+    if (!configuracao.apifyToken || !configuracao.apifyActor) {
+      return {
+        estado: 'nao_configurado' as const,
+        leads: [] as LeadProspeccaoEntrada[],
+        uso: null,
+      };
+    }
+    const inicio = Date.now();
     try {
       const resultado = await buscarApify(
         buscaDescoberta,
         configuracao.apifyToken,
         configuracao.apifyActor,
       );
-      encontradosApify = resultado.leads;
-      await adicionarCusto(resultado.uso);
-      estadoApify = 'concluido';
+      return { estado: 'concluido' as const, leads: resultado.leads, uso: resultado.uso };
     } catch (erro) {
-      await adicionarCusto({
-        provedor: 'apify',
-        operacao: 'google_places',
-        status: 'falhou',
-        unidades: 0,
-        unidade: 'execucao',
-        latenciaMs: Date.now() - inicioApify,
-      });
       console.error(
         `[prospeccao:apify] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
       );
+      return {
+        estado: 'falhou' as const,
+        leads: [] as LeadProspeccaoEntrada[],
+        uso: {
+          provedor: 'apify' as const,
+          operacao: 'google_places',
+          status: 'falhou' as const,
+          unidades: 0,
+          unidade: 'execucao' as const,
+          latenciaMs: Date.now() - inicio,
+        },
+      };
     }
-  }
+  };
 
-  // SerpAPI é contingência: só consome uma busca quando o Apify não cobriu o lote.
-  if (configuracao.serpApi && encontradosApify.length < buscaDescoberta.quantidade) {
-    estadoSerp = 'falhou';
-    const inicioSerp = Date.now();
-    try {
-      const resultado = await buscarSerpApi(buscaDescoberta, configuracao.serpApi);
-      encontradosSerp = resultado.leads;
-      await adicionarCusto(resultado.uso);
-      estadoSerp = 'concluido';
-    } catch (erro) {
-      await adicionarCusto({
-        provedor: 'serpapi',
-        operacao: 'google_maps_search',
-        status: 'falhou',
-        unidades: 0,
-        unidade: 'requisicao',
-        latenciaMs: Date.now() - inicioSerp,
-      });
-      console.error(
-        `[prospeccao:serpapi] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
-      );
-    }
+  // SerpAPI dá velocidade e diversidade; Apify aprofunda contatos no mesmo intervalo.
+  // Uma falha isolada não derruba a lista quando o outro provedor trouxe empresas válidas.
+  const [resultadoSerp, resultadoApify] = await Promise.all([executarSerp(), executarApify()]);
+  for (const uso of [resultadoSerp.uso, resultadoApify.uso]) {
+    if (uso) await adicionarCusto(uso);
   }
+  const estadoSerp = resultadoSerp.estado;
+  const estadoApify = resultadoApify.estado;
+  const encontradosSerp = resultadoSerp.leads;
+  const encontradosApify = resultadoApify.leads;
 
   let combinados = combinar(encontradosApify, encontradosSerp);
-  const descobertaConcluida = estadoApify === 'concluido' || estadoSerp === 'concluido';
+  const descobertaConcluida =
+    estadoApify === 'concluido' || estadoSerp === 'concluido' || estadoSerp === 'parcial';
   if (!descobertaConcluida) throw new Error('provedores_descoberta_indisponiveis');
 
   await contexto.aoProgresso?.('identidade', 'Retirando repetições e empresas já recebidas.');
