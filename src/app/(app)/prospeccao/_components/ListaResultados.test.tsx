@@ -33,7 +33,7 @@ const LEAD = {
       localizacao: 'Belo Horizonte, MG',
       email: null,
       telefone: null,
-      fonte: 'FullEnrich · perfil profissional público',
+      fonte: 'Pesquisa pública · fonte identificada',
     },
   ],
   horarios: [{ dia: 'segunda-feira', horarios: '08:00–18:00' }],

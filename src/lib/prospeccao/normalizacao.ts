@@ -280,61 +280,6 @@ export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
   return resultado.success ? resultado.data : null;
 }
 
-export function origemFullEnrichEmpresa(registro: Registro): LeadProspeccaoEntrada | null {
-  const nome = texto(registro.name);
-  if (!nome) return null;
-  const dominio =
-    texto(registro.domain)
-      ?.replace(/^www\./, '')
-      .toLocaleLowerCase('pt-BR') ?? null;
-  const site = dominio ? siteOficial(`https://${dominio}`) : null;
-  const localizacoes = comoRegistro(registro.locations);
-  const sede = comoRegistro(localizacoes?.headquarters);
-  const industria = comoRegistro(registro.industry);
-  const perfis = comoRegistro(registro.social_profiles);
-  const profissional = comoRegistro(perfis?.professional_network);
-  const linkedin = redesDeUrls([texto(profissional?.url) ?? '']).find(
-    (item) => item.rede === 'linkedin',
-  );
-  const cidade = texto(sede?.city);
-  const estado = texto(sede?.region);
-  const endereco = [texto(sede?.line1), texto(sede?.line2)].filter(Boolean).join(', ') || null;
-  const base = {
-    chave_externa: texto(registro.id) ?? dominio ?? `${nome}|${cidade ?? ''}`.toLowerCase(),
-    nome,
-    categoria: texto(industria?.main_industry),
-    endereco,
-    cidade,
-    estado,
-    site_url: site,
-    dominio,
-    telefone: null,
-    telefones: [],
-    emails: [],
-    redes_sociais: linkedin ? [linkedin] : [],
-    decisores: [],
-    horarios: [],
-    maps_url: null,
-    imagem_url: null,
-    avaliacao: null,
-    total_avaliacoes: null,
-    descricao: texto(registro.description),
-    fontes: ['FullEnrich · dados profissionais públicos'],
-    dados: {
-      fullenrich_company_id: texto(registro.id),
-      empresa_profissional: {
-        setor: texto(industria?.main_industry),
-        porte: registro.headcount_range ?? registro.headcount ?? null,
-        ano_fundacao: inteiro(registro.year_founded),
-        tipo: texto(registro.company_type),
-        especialidades: Array.isArray(registro.specialties) ? registro.specialties : [],
-      },
-    },
-  } satisfies Omit<LeadProspeccaoEntrada, 'qualificacao'>;
-  const resultado = LeadProspeccaoSchema.safeParse(comQualificacao(base));
-  return resultado.success ? resultado.data : null;
-}
-
 export async function jsonDaResposta(resposta: Response): Promise<unknown> {
   const json: unknown = await resposta.json().catch(() => null);
   if (!resposta.ok) throw new Error(`provedor_http_${resposta.status}`);

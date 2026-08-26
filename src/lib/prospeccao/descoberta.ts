@@ -1,15 +1,14 @@
 import 'server-only';
 
-import {
-  jsonDaResposta,
-  origemApify,
-  origemFullEnrichEmpresa,
-  origemSerp,
-  type Registro,
-} from './normalizacao';
+import { jsonDaResposta, origemApify, origemSerp, type Registro } from './normalizacao';
+import type { UsoProvedorProspeccao } from './custos';
 import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
 export type ParametrosDescoberta = Omit<BuscaProspeccao, 'quantidade'> & { quantidade: number };
+export type ResultadoDescoberta = {
+  leads: LeadProspeccaoEntrada[];
+  uso: UsoProvedorProspeccao;
+};
 
 export function quantidadeParaDescoberta(quantidade: number) {
   return Math.min(60, Math.max(15, quantidade * 3));
@@ -18,7 +17,8 @@ export function quantidadeParaDescoberta(quantidade: number) {
 export async function buscarSerpApi(
   busca: ParametrosDescoberta,
   chave: string,
-): Promise<LeadProspeccaoEntrada[]> {
+): Promise<ResultadoDescoberta> {
+  const inicio = Date.now();
   const paginas = Array.from(
     { length: Math.ceil(busca.quantidade / 20) },
     (_, indice) => indice * 20,
@@ -43,20 +43,37 @@ export async function buscarSerpApi(
       return Array.isArray(json.local_results) ? (json.local_results as Registro[]) : [];
     }),
   );
-  return respostas
+  const leads = respostas
     .flat()
     .map(origemSerp)
     .filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
+  return {
+    leads,
+    uso: {
+      provedor: 'serpapi',
+      operacao: 'google_maps_search',
+      status: 'concluido',
+      unidades: paginas.length,
+      unidade: 'requisicao',
+      latenciaMs: Date.now() - inicio,
+      metadados: { resultados: leads.length },
+    },
+  };
 }
 
 export async function buscarApify(
   busca: ParametrosDescoberta,
   token: string,
   actorId: string,
-): Promise<LeadProspeccaoEntrada[]> {
+): Promise<ResultadoDescoberta> {
+  const inicio = Date.now();
   const ator = encodeURIComponent(actorId.replace('/', '~'));
   const autenticacao = { Authorization: `Bearer ${token}` };
-  const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?waitForFinish=42`, {
+  const parametrosExecucao = new URLSearchParams({
+    waitForFinish: '42',
+    maxTotalChargeUsd: '1.00',
+  });
+  const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?${parametrosExecucao}`, {
     method: 'POST',
     headers: { ...autenticacao, 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -75,7 +92,7 @@ export async function buscarApify(
     signal: AbortSignal.timeout(48_000),
   });
   const json = (await jsonDaResposta(resposta)) as { data?: Registro };
-  const execucao = json.data;
+  let execucao = json.data;
   const id = typeof execucao?.id === 'string' ? execucao.id : null;
   const dataset = typeof execucao?.defaultDatasetId === 'string' ? execucao.defaultDatasetId : null;
   if (!id || !dataset) throw new Error('apify_execucao_sem_dataset');
@@ -101,7 +118,8 @@ export async function buscarApify(
       `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=8`,
       { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(12_000) },
     );
-    await jsonDaResposta(espera);
+    const finalizada = (await jsonDaResposta(espera)) as { data?: Registro };
+    execucao = finalizada.data ?? execucao;
     itens = await lerResultados();
   }
 
@@ -120,27 +138,24 @@ export async function buscarApify(
   if (!itens.length && !['SUCCEEDED', 'RUNNING', 'READY'].includes(status)) {
     throw new Error(`apify_execucao_${status.toLowerCase() || 'falhou'}`);
   }
-  return itens.map(origemApify).filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
-}
-
-export async function buscarFullEnrichEmpresas(
-  busca: ParametrosDescoberta,
-  chave: string,
-): Promise<LeadProspeccaoEntrada[]> {
-  const resposta = await fetch('https://app.fullenrich.com/api/v2/company/search', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit: Math.min(busca.quantidade, 60),
-      keywords: [{ value: busca.segmento, exact_match: false, exclude: false }],
-      headquarters_locations: [{ value: busca.localizacao, exact_match: false, exclude: false }],
-    }),
-    cache: 'no-store',
-    signal: AbortSignal.timeout(18_000),
-  });
-  const json = (await jsonDaResposta(resposta)) as Registro;
-  const empresas = Array.isArray(json.companies) ? (json.companies as Registro[]) : [];
-  return empresas
-    .map(origemFullEnrichEmpresa)
+  const leads = itens
+    .map(origemApify)
     .filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
+  const custoUsd =
+    typeof execucao?.usageTotalUsd === 'number' && Number.isFinite(execucao.usageTotalUsd)
+      ? execucao.usageTotalUsd
+      : 0;
+  return {
+    leads,
+    uso: {
+      provedor: 'apify',
+      operacao: 'google_places',
+      status: 'concluido',
+      unidades: 1,
+      unidade: 'execucao',
+      custoUsdMicros: Math.round(custoUsd * 1_000_000),
+      latenciaMs: Date.now() - inicio,
+      metadados: { resultados: leads.length, execucao: id },
+    },
+  };
 }

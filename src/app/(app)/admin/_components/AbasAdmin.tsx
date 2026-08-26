@@ -7,6 +7,7 @@ import styles from './AbasAdmin.module.css';
 const ABAS = [
   { href: '/admin', rotulo: 'Visão geral' },
   { href: '/admin/acessos', rotulo: 'Acessos e créditos' },
+  { href: '/admin/custos', rotulo: 'Custos e margem' },
   { href: '/admin/solucoes', rotulo: 'Soluções' },
   { href: '/admin/formacoes', rotulo: 'Formações' },
   { href: '/admin/mentorias', rotulo: 'Mentorias' },

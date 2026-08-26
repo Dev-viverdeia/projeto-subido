@@ -1,14 +1,14 @@
 import 'server-only';
 
 import { prospeccaoEnv } from '@/lib/env';
-import { buscarDecisores, iniciarEnriquecimentoDeContatos } from './decisores';
+import { pesquisarPossiveisDecisores } from './decisores';
 import {
   buscarApify,
-  buscarFullEnrichEmpresas,
   buscarSerpApi,
   quantidadeParaDescoberta,
   type ParametrosDescoberta,
 } from './descoberta';
+import type { UsoProvedorProspeccao } from './custos';
 import { enriquecerSite, mapearComLimite } from './enriquecer-site';
 import { analisarOportunidadesDeProjeto } from './inteligencia-comercial';
 import {
@@ -24,12 +24,12 @@ import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
 export type ResultadoProvedores = {
   leads: LeadProspeccaoEntrada[];
+  custos: UsoProvedorProspeccao[];
   provedores: {
-    serpapi: 'concluido' | 'falhou' | 'nao_configurado';
+    serpapi: 'concluido' | 'falhou' | 'nao_configurado' | 'nao_necessario';
     apify: 'concluido' | 'falhou' | 'nao_configurado';
-    fullenrich_busca: 'concluido' | 'falhou' | 'nao_configurado';
     firecrawl: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
-    fullenrich: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
+    perplexity: 'concluido' | 'parcial' | 'falhou' | 'nao_configurado';
     inteligencia: 'ia' | 'regras';
   };
 };
@@ -41,6 +41,7 @@ type ContextoProspeccao = {
   dono?: string;
   lista?: string;
   aoProgresso?: (etapa: EtapaPipelineProspeccao, detalhe?: string) => Promise<void> | void;
+  aoCusto?: (uso: UsoProvedorProspeccao) => Promise<void> | void;
 };
 
 export class ErroConfiguracaoProspeccao extends Error {
@@ -48,10 +49,6 @@ export class ErroConfiguracaoProspeccao extends Error {
     super('As integrações de Prospecção ainda estão sendo configuradas.');
     this.name = 'ErroConfiguracaoProspeccao';
   }
-}
-
-function motivoDaFalha(resultado: PromiseRejectedResult) {
-  return resultado.reason instanceof Error ? resultado.reason.message : 'erro_desconhecido';
 }
 
 function identidadeDeCombinacao(lead: LeadProspeccaoEntrada) {
@@ -165,38 +162,75 @@ export async function prospectarEmpresas(
     quantidade: quantidadeParaDescoberta(busca.quantidade),
   } satisfies ParametrosDescoberta;
   const memoria = contexto.dono ? await carregarMemoriaProspeccao(contexto.dono) : null;
+  const custos: UsoProvedorProspeccao[] = [];
+  const adicionarCusto = async (uso: UsoProvedorProspeccao) => {
+    custos.push(uso);
+    await contexto.aoCusto?.(uso);
+  };
 
   const serpConfigurada = Boolean(configuracao.serpApi);
   const apifyConfigurado = Boolean(configuracao.apifyToken && configuracao.apifyActor);
-  const fullEnrichBuscaConfigurado = Boolean(configuracao.fullEnrich);
-  const [serp, apify, fullEnrichBusca] = await Promise.allSettled([
-    configuracao.serpApi
-      ? buscarSerpApi(buscaDescoberta, configuracao.serpApi)
-      : Promise.resolve([]),
-    configuracao.apifyToken && configuracao.apifyActor
-      ? buscarApify(buscaDescoberta, configuracao.apifyToken, configuracao.apifyActor)
-      : Promise.resolve([]),
-    configuracao.fullEnrich
-      ? buscarFullEnrichEmpresas(buscaDescoberta, configuracao.fullEnrich)
-      : Promise.resolve([]),
-  ]);
-  const encontradosSerp = serp.status === 'fulfilled' ? serp.value : [];
-  const encontradosApify = apify.status === 'fulfilled' ? apify.value : [];
-  const encontradosFullEnrich = fullEnrichBusca.status === 'fulfilled' ? fullEnrichBusca.value : [];
-  if (serp.status === 'rejected') {
-    console.error(`[prospeccao:serpapi] ${motivoDaFalha(serp)}`);
+  let estadoApify: 'concluido' | 'falhou' | 'nao_configurado' = apifyConfigurado
+    ? 'falhou'
+    : 'nao_configurado';
+  let estadoSerp: 'concluido' | 'falhou' | 'nao_configurado' | 'nao_necessario' = serpConfigurada
+    ? 'nao_necessario'
+    : 'nao_configurado';
+  let encontradosApify: LeadProspeccaoEntrada[] = [];
+  let encontradosSerp: LeadProspeccaoEntrada[] = [];
+
+  if (configuracao.apifyToken && configuracao.apifyActor) {
+    const inicioApify = Date.now();
+    try {
+      const resultado = await buscarApify(
+        buscaDescoberta,
+        configuracao.apifyToken,
+        configuracao.apifyActor,
+      );
+      encontradosApify = resultado.leads;
+      await adicionarCusto(resultado.uso);
+      estadoApify = 'concluido';
+    } catch (erro) {
+      await adicionarCusto({
+        provedor: 'apify',
+        operacao: 'google_places',
+        status: 'falhou',
+        unidades: 0,
+        unidade: 'execucao',
+        latenciaMs: Date.now() - inicioApify,
+      });
+      console.error(
+        `[prospeccao:apify] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
+      );
+    }
   }
-  if (apify.status === 'rejected') {
-    console.error(`[prospeccao:apify] ${motivoDaFalha(apify)}`);
+
+  // SerpAPI é contingência: só consome uma busca quando o Apify não cobriu o lote.
+  if (configuracao.serpApi && encontradosApify.length < buscaDescoberta.quantidade) {
+    estadoSerp = 'falhou';
+    const inicioSerp = Date.now();
+    try {
+      const resultado = await buscarSerpApi(buscaDescoberta, configuracao.serpApi);
+      encontradosSerp = resultado.leads;
+      await adicionarCusto(resultado.uso);
+      estadoSerp = 'concluido';
+    } catch (erro) {
+      await adicionarCusto({
+        provedor: 'serpapi',
+        operacao: 'google_maps_search',
+        status: 'falhou',
+        unidades: 0,
+        unidade: 'requisicao',
+        latenciaMs: Date.now() - inicioSerp,
+      });
+      console.error(
+        `[prospeccao:serpapi] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
+      );
+    }
   }
-  if (fullEnrichBusca.status === 'rejected') {
-    console.error(`[prospeccao:fullenrich-busca] ${motivoDaFalha(fullEnrichBusca)}`);
-  }
-  let combinados = combinar(combinar(encontradosSerp, encontradosApify), encontradosFullEnrich);
-  const descobertaConcluida =
-    (serpConfigurada && serp.status === 'fulfilled') ||
-    (apifyConfigurado && apify.status === 'fulfilled') ||
-    (fullEnrichBuscaConfigurado && fullEnrichBusca.status === 'fulfilled');
+
+  let combinados = combinar(encontradosApify, encontradosSerp);
+  const descobertaConcluida = estadoApify === 'concluido' || estadoSerp === 'concluido';
   if (!descobertaConcluida) throw new Error('provedores_descoberta_indisponiveis');
 
   await contexto.aoProgresso?.('identidade', 'Retirando repetições e empresas já recebidas.');
@@ -233,11 +267,19 @@ export async function prospectarEmpresas(
 
   await contexto.aoProgresso?.('contexto', 'Reunindo site, presença digital e fatos públicos.');
   const comSite = combinados.filter((lead) => lead.site_url);
-  const firecrawl = configuracao.firecrawl;
-  const lidos = firecrawl
-    ? await mapearComLimite(comSite, 5, (lead) => enriquecerSite(lead, firecrawl))
+  const webConfigurada = Boolean(configuracao.firecrawl || configuracao.gateway);
+  const configuracaoWeb = {
+    firecrawl: configuracao.firecrawl,
+    perplexity: configuracao.perplexity,
+    gateway: configuracao.gateway,
+  };
+  const lidos = webConfigurada
+    ? await mapearComLimite(comSite, 5, (lead) => enriquecerSite(lead, configuracaoWeb))
     : [];
-  const porChave = new Map(lidos.map((lead) => [lead.chave_externa, lead]));
+  for (const resultado of lidos) await adicionarCusto(resultado.uso);
+  const porChave = new Map(
+    lidos.map((resultado) => [resultado.lead.chave_externa, resultado.lead]),
+  );
   const comContexto = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
   const sitesConfirmados = comContexto.filter((lead) =>
     lead.fontes.some((fonte) => fonte.startsWith('Site oficial')),
@@ -261,14 +303,13 @@ export async function prospectarEmpresas(
     )
     .slice(0, busca.quantidade);
   await contexto.aoProgresso?.('decisores', 'Localizando pessoas com papel de decisão.');
-  const fullEnrich = configuracao.fullEnrich;
-  const resultadosDecisores = fullEnrich
-    ? await mapearComLimite(candidatosFinais, 5, (lead) => buscarDecisores(lead, fullEnrich))
-    : [];
-  const qualificados = fullEnrich
-    ? resultadosDecisores.map((resultado) => resultado.lead)
-    : candidatosFinais.map((lead) => ({ ...lead, qualificacao: qualificar(lead) }));
-  let leads = qualificados
+  const pesquisaConfigurada = Boolean(configuracao.perplexity || configuracao.gateway);
+  const pesquisa = pesquisaConfigurada
+    ? await pesquisarPossiveisDecisores(candidatosFinais, configuracaoWeb)
+    : { leads: candidatosFinais, usos: [] };
+  for (const uso of pesquisa.usos) await adicionarCusto(uso);
+  let leads = pesquisa.leads
+    .map((lead) => ({ ...lead, qualificacao: qualificar(lead) }))
     .filter(temContatoDireto)
     .sort(
       (a, b) =>
@@ -291,45 +332,18 @@ export async function prospectarEmpresas(
   );
   const inteligencia = await analisarOportunidadesDeProjeto(leads);
   leads = inteligencia.leads;
+  if (inteligencia.uso) await adicionarCusto(inteligencia.uso);
   await contexto.aoProgresso?.('contatos', 'Validando os melhores canais para iniciar a conversa.');
-  if (
-    fullEnrich &&
-    configuracao.fullEnrichWebhook &&
-    contexto.dono &&
-    contexto.lista &&
-    leads.length
-  ) {
-    const enriquecimento = await iniciarEnriquecimentoDeContatos({
-      leads,
-      chave: fullEnrich,
-      segredo: configuracao.fullEnrichWebhook,
-      dono: contexto.dono,
-      lista: contexto.lista,
-    });
-    leads = enriquecimento.leads;
-  }
-  const consultas = resultadosDecisores.filter((resultado) => resultado.consultado);
-  const concluidas = consultas.filter((resultado) => resultado.sucesso).length;
+  const consultasPerplexity = pesquisa.usos.length;
+  const concluidasPerplexity = pesquisa.usos.filter((uso) => uso.status === 'concluido').length;
 
   return {
     leads,
+    custos,
     provedores: {
-      serpapi: !serpConfigurada
-        ? 'nao_configurado'
-        : serp.status === 'fulfilled'
-          ? 'concluido'
-          : 'falhou',
-      apify: !apifyConfigurado
-        ? 'nao_configurado'
-        : apify.status === 'fulfilled'
-          ? 'concluido'
-          : 'falhou',
-      fullenrich_busca: !fullEnrichBuscaConfigurado
-        ? 'nao_configurado'
-        : fullEnrichBusca.status === 'fulfilled'
-          ? 'concluido'
-          : 'falhou',
-      firecrawl: !firecrawl
+      serpapi: estadoSerp,
+      apify: estadoApify,
+      firecrawl: !webConfigurada
         ? 'nao_configurado'
         : comSite.length === 0
           ? 'concluido'
@@ -338,11 +352,11 @@ export async function prospectarEmpresas(
             : sitesConfirmados > 0
               ? 'parcial'
               : 'falhou',
-      fullenrich: !fullEnrich
+      perplexity: !pesquisaConfigurada
         ? 'nao_configurado'
-        : consultas.length === 0 || concluidas === consultas.length
+        : consultasPerplexity === 0 || concluidasPerplexity === consultasPerplexity
           ? 'concluido'
-          : concluidas > 0
+          : concluidasPerplexity > 0
             ? 'parcial'
             : 'falhou',
       inteligencia: inteligencia.modo,

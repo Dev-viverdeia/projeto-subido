@@ -4,6 +4,8 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import { openAIEnv } from '@/lib/env';
+import type { UsoProvedorProspeccao } from './custos';
+import { qualificar } from './normalizacao';
 import type { LeadProspeccaoEntrada } from './schema';
 
 const ProjetoSchema = z.enum([
@@ -32,11 +34,69 @@ const AnaliseSchema = z.object({
       melhor_canal: z.enum(['whatsapp', 'telefone', 'email', 'linkedin', 'instagram']),
       confianca: z.enum(['alta', 'media', 'inicial']),
       evidencias: z.array(z.string().min(1).max(180)).max(4),
+      decisor: z
+        .object({
+          nome: z.string().min(3).max(160),
+          cargo: z.string().min(2).max(180).nullable(),
+          fonte_url: z.url(),
+        })
+        .nullable(),
     }),
   ),
 });
 
 type Analise = z.infer<typeof AnaliseSchema>['analises'][number];
+
+type FontePesquisa = { titulo: string; url: string; trecho: string | null; data: string | null };
+
+function fontesDePesquisa(lead: LeadProspeccaoEntrada): FontePesquisa[] {
+  if (!Array.isArray(lead.dados.pesquisa_decisores)) return [];
+  return lead.dados.pesquisa_decisores.flatMap((valor) => {
+    if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return [];
+    const item = valor as Record<string, unknown>;
+    if (typeof item.titulo !== 'string' || typeof item.url !== 'string') return [];
+    return [
+      {
+        titulo: item.titulo,
+        url: item.url,
+        trecho: typeof item.trecho === 'string' ? item.trecho : null,
+        data: typeof item.data === 'string' ? item.data : null,
+      },
+    ];
+  });
+}
+
+function normalizar(valor: string) {
+  return valor
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function decisorComFonte(lead: LeadProspeccaoEntrada, analise: Analise) {
+  if (!analise.decisor || lead.decisores.length) return null;
+  const fonte = fontesDePesquisa(lead).find((item) => item.url === analise.decisor?.fonte_url);
+  if (!fonte) return null;
+  const partesNome = normalizar(analise.decisor.nome)
+    .split(' ')
+    .filter((parte) => parte.length >= 3);
+  const baseFonte = normalizar(`${fonte.titulo} ${fonte.trecho ?? ''}`);
+  if (partesNome.length < 2 || !partesNome.every((parte) => baseFonte.includes(parte))) return null;
+  const linkedin = fonte.url.includes('linkedin.com/in/') ? fonte.url : null;
+  return {
+    nome: analise.decisor.nome,
+    cargo: analise.decisor.cargo,
+    senioridade: null,
+    linkedin_url: linkedin,
+    localizacao: [lead.cidade, lead.estado].filter(Boolean).join(', ') || null,
+    email: null,
+    telefone: null,
+    fonte: 'Pesquisa pública · fonte identificada',
+  } satisfies LeadProspeccaoEntrada['decisores'][number];
+}
 
 function textoBase(lead: LeadProspeccaoEntrada) {
   return [lead.categoria, lead.descricao, lead.dados.site_resumo]
@@ -111,14 +171,32 @@ function analiseDeterministica(lead: LeadProspeccaoEntrada): Analise {
     melhor_canal: melhorCanal(lead),
     confianca: evidenciaBase(lead).length >= 3 ? 'media' : 'inicial',
     evidencias: evidenciaBase(lead),
+    decisor: null,
   };
 }
 
 function aplicarAnalise(lead: LeadProspeccaoEntrada, analise: Analise): LeadProspeccaoEntrada {
-  return {
+  const decisor = decisorComFonte(lead, analise);
+  const enriquecido = {
     ...lead,
+    decisores: decisor ? [decisor, ...lead.decisores].slice(0, 5) : lead.decisores,
+    fontes: decisor
+      ? [...new Set([...lead.fontes, 'Pesquisa pública · Perplexity'])].slice(0, 5)
+      : lead.fontes,
+    dados: decisor
+      ? {
+          ...lead.dados,
+          decisor_evidencia: {
+            fonte_url: analise.decisor?.fonte_url,
+            conferido_em: new Date().toISOString(),
+          },
+        }
+      : lead.dados,
+  } satisfies LeadProspeccaoEntrada;
+  return {
+    ...enriquecido,
     qualificacao: {
-      ...lead.qualificacao,
+      ...qualificar(enriquecido),
       oportunidade: {
         projeto_slug: analise.projeto_slug,
         projeto_titulo: TITULOS[analise.projeto_slug],
@@ -132,13 +210,16 @@ function aplicarAnalise(lead: LeadProspeccaoEntrada, analise: Analise): LeadPros
   };
 }
 
-export async function analisarOportunidadesDeProjeto(
-  leads: LeadProspeccaoEntrada[],
-): Promise<{ leads: LeadProspeccaoEntrada[]; modo: 'ia' | 'regras' }> {
+export async function analisarOportunidadesDeProjeto(leads: LeadProspeccaoEntrada[]): Promise<{
+  leads: LeadProspeccaoEntrada[];
+  modo: 'ia' | 'regras';
+  uso: UsoProvedorProspeccao | null;
+}> {
   const fallback = new Map(leads.map((lead) => [lead.chave_externa, analiseDeterministica(lead)]));
-  if (!leads.length) return { leads, modo: 'regras' };
+  if (!leads.length) return { leads, modo: 'regras', uso: null };
 
   try {
+    const inicio = Date.now();
     const { OPENAI_API_KEY, LIVE_COACH_MODEL } = openAIEnv();
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 1, timeout: 45_000 });
     const entrada = leads.map((lead) => ({
@@ -161,6 +242,7 @@ export async function analisarOportunidadesDeProjeto(
             }
           : null,
       },
+      pesquisa_publica: fontesDePesquisa(lead),
     }));
     const resposta = await openai.responses.parse({
       model: LIVE_COACH_MODEL,
@@ -168,7 +250,7 @@ export async function analisarOportunidadesDeProjeto(
         {
           role: 'system',
           content:
-            'Você qualifica empresas para um prestador vender um projeto de IA. Escolha somente um dos cinco projetos permitidos. Use apenas os fatos recebidos; o motivo deve ser uma hipótese comercial prudente, nunca uma afirmação sobre processo interno. Evidências devem repetir fatos públicos objetivos. A pergunta de abertura deve descobrir o processo atual sem pressupor dor. Seja curto, humano e específico.',
+            'Você qualifica empresas para um prestador vender um projeto de IA. Escolha somente um dos cinco projetos permitidos. Use apenas os fatos recebidos; o motivo deve ser uma hipótese comercial prudente, nunca uma afirmação sobre processo interno. Evidências devem repetir fatos públicos objetivos. A pergunta de abertura deve descobrir o processo atual sem pressupor dor. Se pesquisa_publica sustentar claramente nome, cargo e vínculo com a empresa, preencha decisor usando exatamente uma fonte_url recebida; caso contrário use null. Nunca invente contato, pessoa ou fonte. Seja curto, humano e específico.',
         },
         { role: 'user', content: JSON.stringify(entrada) },
       ],
@@ -179,6 +261,19 @@ export async function analisarOportunidadesDeProjeto(
     );
     return {
       modo: 'ia',
+      uso: {
+        provedor: 'openai',
+        operacao: 'qualificacao_comercial',
+        status: 'concluido',
+        unidades: (resposta.usage?.input_tokens ?? 0) + (resposta.usage?.output_tokens ?? 0),
+        unidade: 'token',
+        latenciaMs: Date.now() - inicio,
+        metadados: {
+          input_tokens: resposta.usage?.input_tokens ?? 0,
+          output_tokens: resposta.usage?.output_tokens ?? 0,
+          empresas: leads.length,
+        },
+      },
       leads: leads.map((lead) =>
         aplicarAnalise(
           lead,
@@ -190,6 +285,7 @@ export async function analisarOportunidadesDeProjeto(
     console.error('[prospeccao:inteligencia] classificação por IA indisponível:', erro);
     return {
       modo: 'regras',
+      uso: null,
       leads: leads.map((lead) => aplicarAnalise(lead, fallback.get(lead.chave_externa)!)),
     };
   }

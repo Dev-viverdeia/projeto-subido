@@ -2,6 +2,7 @@ import 'server-only';
 
 import { revalidatePath } from 'next/cache';
 import { atualizarProgressoLista, concluirListaProspeccao, falharListaProspeccao } from './admin';
+import { registrarCustosProspeccao, type UsoProvedorProspeccao } from './custos';
 import { prospectarEmpresas } from './provedores';
 import type { BuscaProspeccao } from './schema';
 
@@ -14,6 +15,7 @@ export async function processarListaProspeccao({
   lista: string;
   busca: BuscaProspeccao;
 }) {
+  const custos: UsoProvedorProspeccao[] = [];
   try {
     const resultado = await prospectarEmpresas(busca, {
       dono,
@@ -21,6 +23,9 @@ export async function processarListaProspeccao({
       aoProgresso: async (etapa, detalhe) => {
         const { error } = await atualizarProgressoLista(dono, lista, etapa, detalhe);
         if (error) console.error(`[prospeccao:progresso] ${error.code}: ${error.message}`);
+      },
+      aoCusto: (uso) => {
+        custos.push(uso);
       },
     });
     const { error } = await concluirListaProspeccao(dono, lista, resultado);
@@ -33,6 +38,7 @@ export async function processarListaProspeccao({
       erro instanceof Error ? erro.message : 'falha_desconhecida',
     );
   } finally {
+    await registrarCustosProspeccao({ dono, lista, usos: custos });
     revalidatePath('/prospeccao');
   }
 }

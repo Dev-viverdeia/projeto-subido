@@ -2,7 +2,6 @@ import 'server-only';
 
 import {
   emailsValidos,
-  jsonDaResposta,
   qualificar,
   redesDeUrls,
   telefonesUnicos,
@@ -10,7 +9,15 @@ import {
   unicos,
   type Registro,
 } from './normalizacao';
+import type { UsoProvedorProspeccao } from './custos';
+import { rasparComFirecrawl, type ConfiguracaoGatewayDados } from './gateway';
 import type { LeadProspeccaoEntrada } from './schema';
+
+type ConfiguracaoFirecrawl = {
+  firecrawl: string | null;
+  perplexity: string | null;
+  gateway: ConfiguracaoGatewayDados;
+};
 
 function resumoDoMarkdown(markdown: string): string | null {
   const limpo = markdown
@@ -49,21 +56,8 @@ function contatosDoSite(markdown: string, links: string[]) {
   };
 }
 
-async function rasparPagina(url: string, chave: string) {
-  const resposta = await fetch('https://api.firecrawl.dev/v2/scrape', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url,
-      formats: ['markdown', 'links'],
-      onlyMainContent: false,
-      maxAge: 172_800_000,
-      timeout: 12_000,
-    }),
-    cache: 'no-store',
-    signal: AbortSignal.timeout(16_000),
-  });
-  const json = (await jsonDaResposta(resposta)) as {
+async function rasparPagina(url: string, configuracao: ConfiguracaoFirecrawl) {
+  const json = (await rasparComFirecrawl(url, configuracao)) as {
     success?: boolean;
     data?: { markdown?: unknown; links?: unknown; metadata?: Registro };
   };
@@ -113,14 +107,28 @@ export async function mapearComLimite<T, R>(
   return resultado.sort((a, b) => a.indice - b.indice).map((item) => item.valor);
 }
 
-export async function enriquecerSite(lead: LeadProspeccaoEntrada, chave: string) {
-  if (!lead.site_url) return lead;
+export async function enriquecerSite(
+  lead: LeadProspeccaoEntrada,
+  configuracao: ConfiguracaoFirecrawl,
+): Promise<{ lead: LeadProspeccaoEntrada; uso: UsoProvedorProspeccao }> {
+  const inicio = Date.now();
+  const usoBase = {
+    provedor: 'firecrawl' as const,
+    operacao: 'scrape_site',
+    unidade: 'pagina' as const,
+  };
+  if (!lead.site_url) {
+    return {
+      lead,
+      uso: { ...usoBase, status: 'concluido', unidades: 0, creditosProvedor: 0 },
+    };
+  }
   try {
-    const inicial = await rasparPagina(lead.site_url, chave);
+    const inicial = await rasparPagina(lead.site_url, configuracao);
     const complementares = await mapearComLimite(
       paginasDeContato(lead.site_url, inicial.links),
       2,
-      (url) => rasparPagina(url, chave),
+      (url) => rasparPagina(url, configuracao),
     );
     const paginas = [inicial, ...complementares];
     const markdown = paginas.map((pagina) => pagina.markdown).join('\n');
@@ -152,8 +160,28 @@ export async function enriquecerSite(lead: LeadProspeccaoEntrada, chave: string)
       },
       qualificacao: lead.qualificacao,
     } satisfies LeadProspeccaoEntrada;
-    return { ...atualizado, qualificacao: qualificar(atualizado) };
+    return {
+      lead: { ...atualizado, qualificacao: qualificar(atualizado) },
+      uso: {
+        ...usoBase,
+        status: 'concluido',
+        unidades: paginas.length,
+        creditosProvedor: paginas.length,
+        latenciaMs: Date.now() - inicio,
+        metadados: { empresa: lead.chave_externa },
+      },
+    };
   } catch {
-    return lead;
+    return {
+      lead,
+      uso: {
+        ...usoBase,
+        status: 'falhou',
+        unidades: 0,
+        creditosProvedor: 0,
+        latenciaMs: Date.now() - inicio,
+        metadados: { empresa: lead.chave_externa },
+      },
+    };
   }
 }
