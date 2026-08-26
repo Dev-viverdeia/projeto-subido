@@ -25,6 +25,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        /* O domínio oficial abre diretamente a plataforma durante a beta pública.
+           A landing comercial ainda está em revisão e continua disponível apenas
+           no endereço técnico da Vercel, sem transformar conteúdo de demonstração
+           em oferta pública no domínio da marca. */
+        source: '/',
+        destination: '/entrar',
+        permanent: false,
+        has: [{ type: 'host', value: 'subido.viverdeia.ai' }],
+      },
+      {
         source: '/crm/:path*',
         destination: '/vendas/:path*',
         permanent: true,
