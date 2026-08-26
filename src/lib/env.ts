@@ -156,11 +156,11 @@ export function googleCalendarEnv() {
 /**
  * Provedores privados da Prospecção.
  *
- * Apify é suficiente para a busca inicial por tipo de empresa e região. SerpAPI
- * amplia a descoberta quando configurada e Firecrawl adiciona contexto do site,
- * mas nenhum dos dois bloqueia o fluxo principal. A configuração continua
- * opcional no boot para o restante da plataforma sobreviver a uma rotação de
- * chave sem reservar créditos em uma busca indisponível.
+ * SerpAPI é o radar rápido e principal da busca por tipo de empresa e região.
+ * Apify trabalha em paralelo para aprofundar contatos e ampliar a cobertura;
+ * Firecrawl adiciona contexto do site oficial. A configuração continua opcional
+ * no boot para o restante da plataforma sobreviver a uma rotação de chave sem
+ * reservar créditos em uma busca indisponível.
  */
 export function prospeccaoEnv() {
   const dados = {

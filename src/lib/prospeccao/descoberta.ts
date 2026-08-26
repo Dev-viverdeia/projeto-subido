@@ -4,7 +4,10 @@ import { jsonDaResposta, origemApify, origemSerp, type Registro } from './normal
 import type { UsoProvedorProspeccao } from './custos';
 import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
-export type ParametrosDescoberta = Omit<BuscaProspeccao, 'quantidade'> & { quantidade: number };
+export type ParametrosDescoberta = Omit<BuscaProspeccao, 'quantidade'> & {
+  quantidade: number;
+  deslocamentoInicial?: number;
+};
 export type ResultadoDescoberta = {
   leads: LeadProspeccaoEntrada[];
   uso: UsoProvedorProspeccao;
@@ -19,32 +22,43 @@ export async function buscarSerpApi(
   chave: string,
 ): Promise<ResultadoDescoberta> {
   const inicio = Date.now();
+  const paginaInicial = Math.max(0, Math.trunc((busca.deslocamentoInicial ?? 0) / 20)) % 3;
+  const totalPaginas = Math.min(3, Math.ceil(busca.quantidade / 20));
   const paginas = Array.from(
-    { length: Math.ceil(busca.quantidade / 20) },
-    (_, indice) => indice * 20,
+    { length: totalPaginas },
+    (_, indice) => ((paginaInicial + indice) % 3) * 20,
   );
   const respostas = await Promise.all(
     paginas.map(async (inicio) => {
-      const parametros = new URLSearchParams({
-        engine: 'google_maps',
-        q: busca.segmento,
-        location: busca.localizacao,
-        hl: 'pt',
-        gl: 'br',
-        type: 'search',
-        start: String(inicio),
-        api_key: chave,
-      });
-      const resposta = await fetch(`https://serpapi.com/search.json?${parametros}`, {
-        cache: 'no-store',
-        signal: AbortSignal.timeout(18_000),
-      });
-      const json = (await jsonDaResposta(resposta)) as Registro;
-      return Array.isArray(json.local_results) ? (json.local_results as Registro[]) : [];
+      try {
+        const parametros = new URLSearchParams({
+          engine: 'google_maps',
+          q: `${busca.segmento} em ${busca.localizacao}`,
+          hl: 'pt',
+          gl: 'br',
+          type: 'search',
+          start: String(inicio),
+          api_key: chave,
+        });
+        const resposta = await fetch(`https://serpapi.com/search.json?${parametros}`, {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(18_000),
+        });
+        const json = (await jsonDaResposta(resposta)) as Registro;
+        return {
+          pagina: inicio,
+          itens: Array.isArray(json.local_results) ? (json.local_results as Registro[]) : [],
+          concluiu: true,
+        };
+      } catch {
+        return { pagina: inicio, itens: [] as Registro[], concluiu: false };
+      }
     }),
   );
+  const concluidas = respostas.filter((resposta) => resposta.concluiu);
+  if (!concluidas.length) throw new Error('serpapi_indisponivel');
   const leads = respostas
-    .flat()
+    .flatMap((resposta) => resposta.itens)
     .map(origemSerp)
     .filter((lead): lead is LeadProspeccaoEntrada => Boolean(lead));
   return {
@@ -52,11 +66,17 @@ export async function buscarSerpApi(
     uso: {
       provedor: 'serpapi',
       operacao: 'google_maps_search',
-      status: 'concluido',
-      unidades: paginas.length,
+      status: concluidas.length === paginas.length ? 'concluido' : 'parcial',
+      unidades: concluidas.length,
       unidade: 'requisicao',
       latenciaMs: Date.now() - inicio,
-      metadados: { resultados: leads.length },
+      metadados: {
+        resultados: leads.length,
+        paginas: concluidas.map((resposta) => resposta.pagina),
+        paginas_com_falha: respostas
+          .filter((resposta) => !resposta.concluiu)
+          .map((resposta) => resposta.pagina),
+      },
     },
   };
 }
@@ -70,7 +90,7 @@ export async function buscarApify(
   const ator = encodeURIComponent(actorId.replace('/', '~'));
   const autenticacao = { Authorization: `Bearer ${token}` };
   const parametrosExecucao = new URLSearchParams({
-    waitForFinish: '42',
+    waitForFinish: '18',
     maxTotalChargeUsd: '1.00',
   });
   const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?${parametrosExecucao}`, {
@@ -89,7 +109,7 @@ export async function buscarApify(
       verifyLeadsEnrichmentEmails: false,
     }),
     cache: 'no-store',
-    signal: AbortSignal.timeout(48_000),
+    signal: AbortSignal.timeout(24_000),
   });
   const json = (await jsonDaResposta(resposta)) as { data?: Registro };
   let execucao = json.data;
@@ -111,20 +131,22 @@ export async function buscarApify(
   };
 
   let itens = await lerResultados();
-  const status = typeof execucao?.status === 'string' ? execucao.status : '';
-  const aindaExecutando = ['READY', 'RUNNING'].includes(status);
+  let status = typeof execucao?.status === 'string' ? execucao.status : '';
+  let aindaExecutando = ['READY', 'RUNNING'].includes(status);
   if (!itens.length && aindaExecutando) {
     const espera = await fetch(
-      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=8`,
-      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(12_000) },
+      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=5`,
+      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(8_000) },
     );
     const finalizada = (await jsonDaResposta(espera)) as { data?: Registro };
     execucao = finalizada.data ?? execucao;
+    status = typeof execucao?.status === 'string' ? execucao.status : status;
+    aindaExecutando = ['READY', 'RUNNING'].includes(status);
     itens = await lerResultados();
   }
 
   if (aindaExecutando) {
-    await fetch(
+    const respostaAbortar = await fetch(
       `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}/abort?gracefully=false`,
       {
         method: 'POST',
@@ -132,7 +154,11 @@ export async function buscarApify(
         cache: 'no-store',
         signal: AbortSignal.timeout(5_000),
       },
-    ).catch(() => undefined);
+    ).catch(() => null);
+    if (respostaAbortar?.ok) {
+      const abortada = (await jsonDaResposta(respostaAbortar)) as { data?: Registro };
+      execucao = abortada.data ?? execucao;
+    }
   }
 
   if (!itens.length && !['SUCCEEDED', 'RUNNING', 'READY'].includes(status)) {
