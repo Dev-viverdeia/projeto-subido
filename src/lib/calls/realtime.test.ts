@@ -16,7 +16,7 @@ describe('sessão de transcrição em tempo real', () => {
             languages: ['pt'],
             delay: 'low',
           },
-          turn_detection: { type: 'server_vad' },
+          turn_detection: null,
         },
       },
     });

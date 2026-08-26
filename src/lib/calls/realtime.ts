@@ -25,12 +25,9 @@ export function criarSessaoTranscricao({ prompt }: ContextoTranscricao) {
           languages: ['pt'],
           delay: 'low' as const,
         },
-        turn_detection: {
-          type: 'server_vad' as const,
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 700,
-        },
+        // O modelo de legenda contínua recebe o fechamento de cada trecho pelo
+        // data channel. Hoje ele rejeita o VAD do servidor nesta modalidade.
+        turn_detection: null,
       },
     },
   };

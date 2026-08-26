@@ -199,10 +199,33 @@ async function entrarNaSala(page, nome) {
     url.searchParams.set('x-vercel-set-bypass-cookie', 'true');
   }
   await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
-  await page.getByLabel('Seu nome').fill(nome);
+  await page.waitForLoadState('load');
+  const campoNome = page.getByLabel('Seu nome');
+  try {
+    await campoNome.waitFor({ state: 'visible', timeout: 30_000 });
+  } catch {
+    await page.screenshot({
+      path: `/private/tmp/subido-call-entrada-ausente-${nome}.png`,
+      fullPage: true,
+    });
+    throw new Error(
+      `A entrada da sala não carregou para ${nome}. URL: ${page.url()}. Tela: ${(await page.locator('body').innerText()).slice(0, 2_000)}`,
+    );
+  }
+  // O smoke é mais rápido que uma pessoa e pode alcançar o formulário antes
+  // de o React assumir os eventos do HTML entregue pelo servidor.
+  await page.waitForTimeout(600);
+  await campoNome.fill(nome);
   await page.getByRole('checkbox').check();
   const entrar = page.getByRole('button', { name: 'Entrar na reunião' });
   await page.waitForTimeout(250);
+  if (await entrar.isDisabled()) {
+    await campoNome.fill('');
+    await campoNome.fill(nome);
+    await page.getByRole('checkbox').uncheck();
+    await page.getByRole('checkbox').check();
+    await page.waitForTimeout(250);
+  }
   if (await entrar.isDisabled()) {
     await page.screenshot({
       path: `/private/tmp/subido-call-bloqueada-${nome}.png`,
