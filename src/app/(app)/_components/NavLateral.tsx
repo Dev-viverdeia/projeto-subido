@@ -42,9 +42,9 @@ export function NavLateral({
   const painelMenuRef = useRef<HTMLElement>(null);
 
   const destinoDoItem = (item: ItemNav) =>
-    item.bloqueado
-      ? `/conta?upgrade=modulo_comercial&origem=${encodeURIComponent(item.href)}`
-      : item.href;
+    item.bloqueado && item.destinoBloqueado ? item.destinoBloqueado : item.href;
+  const explicacaoDoBloqueio = (item: ItemNav) =>
+    `${item.rotulo}, disponível no ${item.planoNecessario ?? 'plano superior'}`;
   const estaAtivo = (item: ItemNav) =>
     !item.bloqueado && (caminho === item.href || caminho.startsWith(`${item.href}/`));
 
@@ -135,7 +135,7 @@ export function NavLateral({
                    só é preparada quando ponteiro ou teclado indicam intenção. */
                 prefetch={destinosPreparados.has(destino)}
                 className={styles.item}
-                aria-label={item.bloqueado ? `${item.rotulo}, disponível no Pro` : undefined}
+                aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
                 aria-current={ativo ? 'page' : undefined}
                 aria-busy={carregando || undefined}
                 data-bloqueado={item.bloqueado || undefined}
@@ -151,7 +151,8 @@ export function NavLateral({
                 <span className={styles.rotulo}>{item.rotulo}</span>
                 {item.bloqueado && (
                   <span className={styles.seloPlano} aria-hidden="true">
-                    <LockKeyhole size={11} strokeWidth={1.9} /> Pro
+                    <LockKeyhole size={11} strokeWidth={1.9} />
+                    {item.planoNecessario ?? 'Upgrade'}
                   </span>
                 )}
                 {carregando && <span className="sr-only">Carregando {item.rotulo}</span>}
@@ -250,9 +251,7 @@ export function NavLateral({
                             <Link
                               href={destino}
                               className={styles.itemMenu}
-                              aria-label={
-                                item.bloqueado ? `${item.rotulo}, disponível no Pro` : undefined
-                              }
+                              aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
                               aria-current={ativo ? 'page' : undefined}
                               aria-busy={carregando || undefined}
                               data-bloqueado={item.bloqueado || undefined}
@@ -270,7 +269,7 @@ export function NavLateral({
                               {item.bloqueado && (
                                 <small>
                                   <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
-                                  Disponível no Pro
+                                  Disponível no {item.planoNecessario ?? 'plano superior'}
                                 </small>
                               )}
                               {ativo && <small>Você está aqui</small>}

@@ -82,7 +82,7 @@ describe('mudarStatusProposta', () => {
       `redirect:/solucoes/execucao/${PROJETO_ID}`,
     );
 
-    expect(exigirRecurso).toHaveBeenCalledWith('modulo_comercial');
+    expect(exigirRecurso).toHaveBeenCalledWith('propostas');
     expect(rpc).toHaveBeenCalledWith('projeto_iniciar', { p_proposta_id: PROPOSTA_ID });
     expect(revalidatePath).toHaveBeenCalledWith('/solucoes');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');

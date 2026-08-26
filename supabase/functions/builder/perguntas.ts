@@ -26,6 +26,9 @@ export async function perguntas(req: Request): Promise<Response> {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return respostaJson({ erro: 'Faça login para usar o Builder.' }, 401);
+    if (!['pro', 'enterprise'].includes(String(user.app_metadata?.plano_subido))) {
+      return respostaJson({ erro: 'O Estúdio está disponível a partir do plano Pro.' }, 403);
+    }
 
     const corpo = PedidoPerguntas.safeParse(await req.json());
     if (!corpo.success) {

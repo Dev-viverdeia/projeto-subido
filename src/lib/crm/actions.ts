@@ -89,7 +89,7 @@ export async function criarLead(
   _estado: EstadoNovoLead,
   formData: FormData,
 ): Promise<EstadoNovoLead> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const campos = camposDo(formData);
   const validacao = criarLeadSchema.safeParse({
     ...campos,
@@ -148,7 +148,7 @@ export async function criarLead(
 }
 
 export async function moverOportunidade(formData: FormData): Promise<void> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const validacao = moverSchema.safeParse({
     id: formData.get('id'),
     etapa: formData.get('etapa'),
@@ -185,7 +185,7 @@ export type ResultadoMovimentoKanban = { ok: true; movida: boolean } | { ok: fal
 export async function moverOportunidadeKanban(
   entrada: MovimentoKanban,
 ): Promise<ResultadoMovimentoKanban> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const validacao = moverKanbanSchema.safeParse(entrada);
   if (!validacao.success) {
     return {
@@ -230,7 +230,7 @@ export async function definirProximaAcao(
   _estado: EstadoProximaAcao,
   formData: FormData,
 ): Promise<EstadoProximaAcao> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const validacao = definirProximaAcaoSchema.safeParse({
     oportunidade: formData.get('oportunidade'),
     acao: formData.get('acao'),
@@ -278,7 +278,7 @@ export async function aplicarProximaAcao(
   _estado: ResultadoAplicarAcao | null,
   formData: FormData,
 ): Promise<ResultadoAplicarAcao> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const validacao = aplicarAcaoSchema.safeParse({
     oportunidade: formData.get('oportunidade'),
     enriquecimento: formData.get('enriquecimento'),
@@ -312,7 +312,7 @@ export async function aplicarProximaAcao(
 
 /** Abre uma nova negociação para a mesma empresa depois de uma venda ganha. */
 export async function iniciarNovoCicloCliente(formData: FormData): Promise<void> {
-  await exigirRecurso('modulo_comercial');
+  await exigirRecurso('vendas');
   const validacao = novoCicloSchema.safeParse({ oportunidade: formData.get('oportunidade') });
   if (!validacao.success) redirect('/vendas');
 

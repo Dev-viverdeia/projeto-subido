@@ -81,12 +81,14 @@ describe('NavLateral no desktop', () => {
     const itensStarter = ITENS_NAV.map((item) => ({
       ...item,
       bloqueado: ['/prospeccao', '/vendas', '/metricas', '/propostas'].includes(item.href),
+      destinoBloqueado: `/conta/assinatura?upgrade=vendas&origem=${encodeURIComponent(item.href)}`,
+      planoNecessario: 'Pro',
     }));
     render(<NavLateral itens={itensStarter} variante="lateral" />);
 
     expect(screen.getByRole('link', { name: 'Vendas, disponível no Pro' })).toHaveAttribute(
       'href',
-      '/conta?upgrade=modulo_comercial&origem=%2Fvendas',
+      '/conta/assinatura?upgrade=vendas&origem=%2Fvendas',
     );
     expect(screen.getByRole('link', { name: 'Reuniões' })).toHaveAttribute('href', '/reunioes');
     expect(screen.getAllByText('Pro')).toHaveLength(4);

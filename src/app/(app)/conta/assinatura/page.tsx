@@ -8,6 +8,7 @@ import {
   Coins,
   CreditCard,
   Layers3,
+  LockKeyhole,
   ShieldCheck,
 } from 'lucide-react';
 import { abrirPortalCobranca, iniciarAssinatura } from '@/lib/billing/actions';
@@ -19,7 +20,10 @@ import {
   PLANOS_SUBIDO,
   RECURSOS_BASE_PLANO,
   RECURSOS_COMERCIAIS_PLANO,
+  RECURSOS_SUBIDO,
   planoDosMetadados,
+  planoTemRecurso,
+  recursoPlanoValido,
 } from '@/lib/planos/acessos';
 import { createClient } from '@/lib/supabase/server';
 import { BotaoBilling } from './BotaoBilling';
@@ -56,6 +60,18 @@ export default async function AssinaturaPage({ searchParams }: PageProps<'/conta
   ]);
   const plano = planoDosMetadados(data?.claims?.app_metadata);
   const configuracao = obterConfiguracaoBilling();
+  const recursoSolicitado = recursoPlanoValido(parametros.upgrade) ? parametros.upgrade : null;
+  const recursoBloqueado =
+    recursoSolicitado && !planoTemRecurso(plano, recursoSolicitado)
+      ? RECURSOS_SUBIDO[recursoSolicitado]
+      : null;
+  const planoNecessario = recursoBloqueado ? PLANOS_SUBIDO[recursoBloqueado.planoMinimo] : null;
+  const origem =
+    typeof parametros.origem === 'string' &&
+    parametros.origem.startsWith('/') &&
+    !parametros.origem.startsWith('//')
+      ? parametros.origem
+      : null;
   const possuiAssinaturaGerenciavel = Boolean(
     assinatura && ['active', 'trialing', 'past_due'].includes(assinatura.status),
   );
@@ -105,6 +121,28 @@ export default async function AssinaturaPage({ searchParams }: PageProps<'/conta
             {aviso.texto}
           </span>
         </div>
+      ) : null}
+
+      {recursoBloqueado && planoNecessario ? (
+        <section className={styles.avisoUpgrade} aria-labelledby="titulo-upgrade-contextual">
+          <span className={styles.iconeUpgrade} aria-hidden="true">
+            <LockKeyhole size={21} strokeWidth={1.7} />
+          </span>
+          <div>
+            <p>Recurso do {planoNecessario.nome}</p>
+            <h2 id="titulo-upgrade-contextual">
+              {recursoBloqueado.nome} não está no seu plano atual.
+            </h2>
+            <span>{recursoBloqueado.descricao}</span>
+          </div>
+          <div className={styles.acoesUpgrade}>
+            <a href={`#plano-${recursoBloqueado.planoMinimo}`}>
+              Ver {planoNecessario.nome}
+              <ArrowRight size={15} strokeWidth={1.9} aria-hidden="true" />
+            </a>
+            {origem ? <Link href={origem}>Voltar para {recursoBloqueado.nome}</Link> : null}
+          </div>
+        </section>
       ) : null}
 
       <header className={styles.hero}>
@@ -180,6 +218,7 @@ export default async function AssinaturaPage({ searchParams }: PageProps<'/conta
             const creditos = configuracao?.planos[item].creditos ?? (item === 'pro' ? 100 : 30);
             return (
               <article
+                id={`plano-${item}`}
                 className={styles.plano}
                 data-destaque={item === 'pro' || undefined}
                 key={item}
@@ -236,7 +275,7 @@ export default async function AssinaturaPage({ searchParams }: PageProps<'/conta
             );
           })}
 
-          <article className={styles.plano}>
+          <article id="plano-enterprise" className={styles.plano}>
             <div className={styles.topoPlano}>
               <span>Para equipes</span>
               <h3>Enterprise</h3>

@@ -27,6 +27,10 @@ export type ItemNav = {
   grupo: 'aprendizado' | 'operacao' | 'gestao';
   /** Sinal calculado no servidor. O cliente só o usa para explicar o acesso. */
   bloqueado?: boolean;
+  /** Destino calculado no servidor com o recurso e a origem corretos. */
+  destinoBloqueado?: string;
+  /** Nome humano do plano necessário para explicar o bloqueio. */
+  planoNecessario?: string;
 };
 
 export const ROTULOS_GRUPO_NAV = {

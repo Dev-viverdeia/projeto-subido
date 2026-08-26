@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { ehAdmin } from '@/lib/auth/papeis';
-import { PACOTES_CREDITOS, planoDosMetadados } from '@/lib/planos/acessos';
+import {
+  PACOTES_CREDITOS,
+  PLANOS_SUBIDO,
+  planoDosMetadados,
+  type PlanoSubido,
+} from '@/lib/planos/acessos';
 // eslint-disable-next-line no-restricted-imports -- Server Action protegida por ehAdmin
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -11,7 +16,7 @@ import { createClient } from '@/lib/supabase/server';
 export type EstadoAdminAcesso = {
   status: 'inicial' | 'sucesso' | 'erro';
   mensagem?: string;
-  plano?: 'starter' | 'pro';
+  plano?: PlanoSubido;
   saldo?: number;
 };
 
@@ -19,7 +24,7 @@ export const ESTADO_ADMIN_ACESSO: EstadoAdminAcesso = { status: 'inicial' };
 
 const planoSchema = z.object({
   usuario: z.uuid(),
-  plano: z.enum(['starter', 'pro']),
+  plano: z.enum(['starter', 'pro', 'enterprise']),
 });
 
 const pacoteSchema = z.object({
@@ -81,7 +86,7 @@ export async function alterarPlanoAdmin(
     return {
       status: 'sucesso',
       plano: parsed.data.plano,
-      mensagem: `A conta já está no plano ${parsed.data.plano === 'pro' ? 'Pro' : 'Starter'}.`,
+      mensagem: `A conta já está no plano ${PLANOS_SUBIDO[parsed.data.plano].nome}.`,
     };
   }
 
@@ -120,7 +125,7 @@ export async function alterarPlanoAdmin(
   return {
     status: 'sucesso',
     plano: parsed.data.plano,
-    mensagem: `Plano ${parsed.data.plano === 'pro' ? 'Pro' : 'Starter'} aplicado à conta.`,
+    mensagem: `Plano ${PLANOS_SUBIDO[parsed.data.plano].nome} aplicado à conta.`,
   };
 }
 

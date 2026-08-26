@@ -18,7 +18,12 @@ import { createClient } from '@/lib/supabase/server';
 import { obterCarteiraCreditos } from '@/lib/creditos/queries';
 import { apresentarMovimentoCredito, formatarMovimentoCredito } from '@/lib/creditos/modelo';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
-import { PACOTES_CREDITOS, planoDosMetadados } from '@/lib/planos/acessos';
+import {
+  PACOTES_CREDITOS,
+  destinoDeUpgrade,
+  planoDosMetadados,
+  planoTemRecurso,
+} from '@/lib/planos/acessos';
 import { BotaoBilling } from '../assinatura/BotaoBilling';
 import styles from './page.module.css';
 
@@ -41,7 +46,8 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
     searchParams,
   ]);
   const plano = planoDosMetadados(data?.claims?.app_metadata);
-  const comercialLiberado = plano !== 'starter';
+  const prospeccaoLiberada = planoTemRecurso(plano, 'prospeccao');
+  const enriquecimentoLiberado = planoTemRecurso(plano, 'enriquecimento');
 
   const usos = [
     {
@@ -49,8 +55,8 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
       detalhe: '1 crédito por empresa encontrada. O que não for usado volta para o saldo.',
       custo: '1',
       unidade: 'por empresa',
-      href: comercialLiberado ? '/prospeccao' : '/conta?upgrade=prospeccao',
-      bloqueado: !comercialLiberado,
+      href: prospeccaoLiberada ? '/prospeccao' : destinoDeUpgrade('prospeccao', '/prospeccao'),
+      bloqueado: !prospeccaoLiberada,
       Icone: Search,
     },
     {
@@ -58,8 +64,8 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
       detalhe: 'Reúne dados públicos e prepara perguntas para a conversa comercial.',
       custo: String(CUSTO_ENRIQUECIMENTO_OPORTUNIDADE),
       unidade: 'por análise',
-      href: comercialLiberado ? '/vendas' : '/conta?upgrade=enriquecimento',
-      bloqueado: !comercialLiberado,
+      href: enriquecimentoLiberado ? '/vendas' : destinoDeUpgrade('enriquecimento', '/vendas'),
+      bloqueado: !enriquecimentoLiberado,
       Icone: ContactRound,
     },
     {

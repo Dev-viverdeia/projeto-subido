@@ -8,9 +8,108 @@ export type RecursoPlano =
   | 'certificados'
   | 'reunioes'
   | 'live_coach'
+  | 'estudio'
+  | 'prospeccao'
+  | 'vendas'
+  | 'metricas'
+  | 'propostas'
   | 'modulo_comercial'
   | 'enriquecimento'
-  | 'recursos_avancados';
+  | 'recursos_avancados'
+  | 'gestao_equipe';
+
+export type DefinicaoRecurso = {
+  nome: string;
+  descricao: string;
+  planoMinimo: PlanoSubido;
+};
+
+/**
+ * Catálogo único de permissões. Interface, rotas e mutações usam esta mesma
+ * fonte para que uma área nunca apareça liberada e falhe apenas depois.
+ */
+export const RECURSOS_SUBIDO: Record<RecursoPlano, DefinicaoRecurso> = {
+  aprendizado: {
+    nome: 'Formações',
+    descricao: 'Aulas e trilhas para aprender a vender e entregar projetos de IA.',
+    planoMinimo: 'starter',
+  },
+  projetos: {
+    nome: 'Projetos',
+    descricao: 'Projetos de IA prontos para estudar, vender e implementar.',
+    planoMinimo: 'starter',
+  },
+  sobral_ai: {
+    nome: 'Sobral AI',
+    descricao: 'Orientação conectada às aulas, projetos e próximos passos da plataforma.',
+    planoMinimo: 'starter',
+  },
+  mentorias: {
+    nome: 'Mentorias',
+    descricao: 'Sessões ao vivo para destravar vendas e entregas.',
+    planoMinimo: 'starter',
+  },
+  certificados: {
+    nome: 'Certificados',
+    descricao: 'Certificados das formações e projetos concluídos.',
+    planoMinimo: 'starter',
+  },
+  reunioes: {
+    nome: 'Reuniões',
+    descricao: 'Agenda, sala pública, gravação e histórico das reuniões.',
+    planoMinimo: 'starter',
+  },
+  live_coach: {
+    nome: 'Live Coach',
+    descricao: 'Orientação em tempo real durante as reuniões comerciais.',
+    planoMinimo: 'starter',
+  },
+  estudio: {
+    nome: 'Estúdio',
+    descricao: 'Projetos personalizados a partir do contexto real do cliente.',
+    planoMinimo: 'pro',
+  },
+  prospeccao: {
+    nome: 'Prospecção',
+    descricao: 'Listas qualificadas com empresas e contatos para abordar.',
+    planoMinimo: 'pro',
+  },
+  vendas: {
+    nome: 'Vendas',
+    descricao: 'Pipeline guiado para transformar oportunidades em clientes.',
+    planoMinimo: 'pro',
+  },
+  metricas: {
+    nome: 'Métricas',
+    descricao: 'Diagnóstico da produtividade e das conversões comerciais.',
+    planoMinimo: 'pro',
+  },
+  propostas: {
+    nome: 'Propostas',
+    descricao: 'Propostas comerciais conectadas às oportunidades.',
+    planoMinimo: 'pro',
+  },
+  modulo_comercial: {
+    nome: 'Operação comercial',
+    descricao: 'Prospecção, vendas, métricas e propostas em uma única operação.',
+    planoMinimo: 'pro',
+  },
+  enriquecimento: {
+    nome: 'Enriquecimento de oportunidade',
+    descricao: 'Pesquisa de empresa, decisores e contexto para preparar a venda.',
+    planoMinimo: 'pro',
+  },
+  recursos_avancados: {
+    nome: 'Recursos avançados',
+    descricao: 'Ferramentas avançadas para personalizar e escalar a operação.',
+    planoMinimo: 'pro',
+  },
+  gestao_equipe: {
+    nome: 'Gestão de equipe',
+    descricao: 'Controles e visão compartilhada para operações com equipe.',
+    planoMinimo: 'enterprise',
+  },
+};
 
 export const PLANOS_SUBIDO: Record<
   PlanoSubido,
@@ -40,6 +139,11 @@ export const PLANOS_SUBIDO: Record<
       'certificados',
       'reunioes',
       'live_coach',
+      'estudio',
+      'prospeccao',
+      'vendas',
+      'metricas',
+      'propostas',
       'modulo_comercial',
       'enriquecimento',
       'recursos_avancados',
@@ -56,9 +160,15 @@ export const PLANOS_SUBIDO: Record<
       'certificados',
       'reunioes',
       'live_coach',
+      'estudio',
+      'prospeccao',
+      'vendas',
+      'metricas',
+      'propostas',
       'modulo_comercial',
       'enriquecimento',
       'recursos_avancados',
+      'gestao_equipe',
     ],
   },
 };
@@ -107,6 +217,22 @@ export function planoTemRecurso(plano: PlanoSubido, recurso: RecursoPlano): bool
   return PLANOS_SUBIDO[plano].recursos.includes(recurso);
 }
 
+export const ROTAS_COM_RECURSO = [
+  { href: '/prospeccao', recurso: 'prospeccao' },
+  { href: '/propostas', recurso: 'propostas' },
+  { href: '/metricas', recurso: 'metricas' },
+  { href: '/builder', recurso: 'estudio' },
+  { href: '/vendas', recurso: 'vendas' },
+  { href: '/crm', recurso: 'vendas' },
+  { href: '/reunioes', recurso: 'reunioes' },
+  { href: '/calls', recurso: 'reunioes' },
+  { href: '/consultor', recurso: 'sobral_ai' },
+  { href: '/formacoes', recurso: 'aprendizado' },
+  { href: '/solucoes', recurso: 'projetos' },
+  { href: '/mentorias', recurso: 'mentorias' },
+  { href: '/certificados', recurso: 'certificados' },
+] as const satisfies readonly { href: string; recurso: RecursoPlano }[];
+
 export const AREAS_COMERCIAIS = [
   { href: '/prospeccao', nome: 'Prospecção' },
   { href: '/vendas', nome: 'Vendas' },
@@ -116,10 +242,35 @@ export const AREAS_COMERCIAIS = [
 ] as const;
 
 export function planoPodeAcessarRota(plano: PlanoSubido, href: string): boolean {
-  if (!AREAS_COMERCIAIS.some((area) => href === area.href || href.startsWith(`${area.href}/`))) {
-    return true;
-  }
-  return planoTemRecurso(plano, 'modulo_comercial');
+  const recurso = recursoDaRota(href);
+  return recurso ? planoTemRecurso(plano, recurso) : true;
+}
+
+export function recursoDaRota(href: unknown): RecursoPlano | null {
+  if (typeof href !== 'string') return null;
+  return (
+    ROTAS_COM_RECURSO.find((rota) => href === rota.href || href.startsWith(`${rota.href}/`))
+      ?.recurso ?? null
+  );
+}
+
+export function definicaoDoRecurso(recurso: RecursoPlano): DefinicaoRecurso {
+  return RECURSOS_SUBIDO[recurso];
+}
+
+export function nomeDaAreaBloqueada(href: unknown): string | null {
+  const recurso = recursoDaRota(href);
+  return recurso ? RECURSOS_SUBIDO[recurso].nome : null;
+}
+
+export function destinoDeUpgrade(recurso: RecursoPlano, origem?: string): string {
+  const parametros = new URLSearchParams({ upgrade: recurso });
+  if (origem) parametros.set('origem', origem);
+  return `/conta/assinatura?${parametros.toString()}`;
+}
+
+export function recursoPlanoValido(valor: unknown): valor is RecursoPlano {
+  return typeof valor === 'string' && Object.hasOwn(RECURSOS_SUBIDO, valor);
 }
 
 export function nomeDaAreaComercial(href: unknown): string | null {

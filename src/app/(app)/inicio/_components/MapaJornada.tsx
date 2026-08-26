@@ -13,7 +13,14 @@ import {
   UsersRound,
   Video,
 } from 'lucide-react';
-import { planoTemRecurso, type PlanoSubido, type RecursoPlano } from '@/lib/planos/acessos';
+import {
+  PLANOS_SUBIDO,
+  RECURSOS_SUBIDO,
+  destinoDeUpgrade,
+  planoTemRecurso,
+  type PlanoSubido,
+  type RecursoPlano,
+} from '@/lib/planos/acessos';
 import styles from './MapaJornada.module.css';
 
 type Props = {
@@ -46,6 +53,7 @@ const AREAS_APRENDER = [
     descricao: 'Transforme uma dor real em um projeto sob medida.',
     acao: 'Criar um projeto',
     Icone: DraftingCompass,
+    recurso: 'estudio',
   },
   {
     href: '/mentorias',
@@ -65,7 +73,7 @@ const AREAS_OPERAR = [
     descricao: 'Crie listas de empresas com contatos para abordar.',
     acao: 'Buscar empresas',
     Icone: Search,
-    recurso: 'modulo_comercial',
+    recurso: 'prospeccao',
   },
   {
     href: '/vendas',
@@ -74,7 +82,7 @@ const AREAS_OPERAR = [
     descricao: 'Trabalhe cada oportunidade com uma próxima ação clara.',
     acao: 'Abrir oportunidades',
     Icone: ContactRound,
-    recurso: 'modulo_comercial',
+    recurso: 'vendas',
   },
   {
     href: '/reunioes',
@@ -91,7 +99,7 @@ const AREAS_OPERAR = [
     descricao: 'Monte, apresente e acompanhe suas propostas comerciais.',
     acao: 'Abrir propostas',
     Icone: FileSignature,
-    recurso: 'modulo_comercial',
+    recurso: 'propostas',
   },
 ] as const;
 
@@ -121,23 +129,24 @@ function CartoesAreas({
         {areas.map(({ href, rotulo, titulo: nomeArea, descricao, acao, Icone, ...area }) => {
           const recurso = 'recurso' in area ? (area.recurso as RecursoPlano) : null;
           const bloqueado = Boolean(recurso && !planoTemRecurso(plano, recurso));
-          const destino = bloqueado
-            ? `/conta?upgrade=${recurso}&origem=${encodeURIComponent(href)}`
-            : href;
+          const destino = bloqueado && recurso ? destinoDeUpgrade(recurso, href) : href;
+          const planoNecessario = recurso
+            ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recurso].planoMinimo].nome
+            : null;
 
           return (
             <Link
               href={destino}
               className={styles.cartaoArea}
               data-bloqueado={bloqueado || undefined}
-              aria-label={bloqueado ? `${nomeArea}, disponível no Pro` : undefined}
+              aria-label={bloqueado ? `${nomeArea}, disponível no ${planoNecessario}` : undefined}
               key={href}
             >
               <span className={styles.areaTopo}>
                 <small>{rotulo}</small>
                 {bloqueado ? (
                   <span className={styles.seloPro} aria-hidden="true">
-                    <LockKeyhole size={11} strokeWidth={1.9} /> Pro
+                    <LockKeyhole size={11} strokeWidth={1.9} /> {planoNecessario}
                   </span>
                 ) : (
                   <Icone size={18} strokeWidth={1.7} aria-hidden="true" />

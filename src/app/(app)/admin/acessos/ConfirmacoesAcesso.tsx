@@ -10,7 +10,7 @@ import {
   type EstadoAdminAcesso,
 } from '@/lib/admin/actions';
 import type { ContaAdministrada } from '@/lib/admin/acessos';
-import { PACOTES_CREDITOS, PLANOS_SUBIDO } from '@/lib/planos/acessos';
+import { PACOTES_CREDITOS, PLANOS_SUBIDO, type PlanoSubido } from '@/lib/planos/acessos';
 import styles from './PainelContas.module.css';
 
 function nomeConta(conta: ContaAdministrada): string {
@@ -36,7 +36,7 @@ export function ConfirmarPlano({
   onConcluir,
 }: {
   conta: ContaAdministrada;
-  plano: 'starter' | 'pro';
+  plano: PlanoSubido;
   onCancelar: () => void;
   onConcluir: (estado: EstadoAdminAcesso) => void;
 }) {
@@ -68,9 +68,11 @@ export function ConfirmarPlano({
           Mudar {nomeConta(conta)} para o plano {PLANOS_SUBIDO[plano].nome}?
         </h3>
         <span>
-          {plano === 'pro'
-            ? 'A operação comercial será liberada na próxima atualização da sessão dessa conta.'
-            : 'A operação comercial será removida na próxima atualização da sessão dessa conta.'}
+          {plano === 'starter'
+            ? 'A operação comercial será removida na próxima atualização da sessão dessa conta.'
+            : plano === 'enterprise'
+              ? 'A operação comercial e os controles de equipe serão liberados na próxima atualização da sessão.'
+              : 'A operação comercial será liberada na próxima atualização da sessão dessa conta.'}
         </span>
       </div>
       {estado.status === 'erro' && (

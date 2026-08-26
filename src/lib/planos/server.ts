@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ROTA_ENTRAR } from '@/lib/routes';
 import { createClient } from '@/lib/supabase/server';
 import { planoDosMetadados, planoTemRecurso, type PlanoSubido, type RecursoPlano } from './acessos';
+import { destinoDeUpgrade } from './acessos';
 
 export type AcessoRecurso =
   | { permitido: true; plano: PlanoSubido }
@@ -32,7 +33,5 @@ export async function exigirRecurso(recurso: RecursoPlano, origem?: string): Pro
   const acesso = await obterAcessoRecurso(recurso);
   if (acesso.permitido) return;
   if (acesso.motivo === 'sessao') redirect(ROTA_ENTRAR);
-  const parametros = new URLSearchParams({ upgrade: recurso });
-  if (origem) parametros.set('origem', origem);
-  redirect(`/conta?${parametros.toString()}`);
+  redirect(destinoDeUpgrade(recurso, origem));
 }

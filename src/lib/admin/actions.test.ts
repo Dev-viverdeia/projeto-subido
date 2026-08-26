@@ -83,6 +83,19 @@ describe('administração de acessos', () => {
     expect(mocks.updateUserById).not.toHaveBeenCalled();
   });
 
+  it('permite atribuir o plano Enterprise sem apagar metadados da conta', async () => {
+    const formulario = new FormData();
+    formulario.set('usuario', USUARIO_ID);
+    formulario.set('plano', 'enterprise');
+
+    const resultado = await alterarPlanoAdmin(ESTADO_ADMIN_ACESSO, formulario);
+
+    expect(resultado).toMatchObject({ status: 'sucesso', plano: 'enterprise' });
+    expect(mocks.updateUserById).toHaveBeenCalledWith(USUARIO_ID, {
+      app_metadata: { provider: 'email', providers: ['email'], plano_subido: 'enterprise' },
+    });
+  });
+
   it('concede somente um pacote conhecido e devolve o novo saldo', async () => {
     const formulario = new FormData();
     formulario.set('usuario', USUARIO_ID);
