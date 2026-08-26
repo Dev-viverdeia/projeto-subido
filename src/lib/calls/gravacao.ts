@@ -17,6 +17,8 @@ import { handleError } from '@/lib/errors';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const BUCKET = 'call-gravacoes';
+const TENTATIVAS_FINALIZACAO = 24;
+const INTERVALO_FINALIZACAO_MS = 500;
 
 export type EstadoGravacao = 'pendente' | 'gravando' | 'processando' | 'concluida' | 'falhou';
 
@@ -53,6 +55,31 @@ function estadoDoEgress(status: EgressStatus): EstadoGravacao {
     return 'falhou';
   }
   return 'gravando';
+}
+
+function egressFinalizou(status: EgressStatus) {
+  return [
+    EgressStatus.EGRESS_COMPLETE,
+    EgressStatus.EGRESS_FAILED,
+    EgressStatus.EGRESS_ABORTED,
+    EgressStatus.EGRESS_LIMIT_REACHED,
+  ].includes(status);
+}
+
+async function aguardarFinalizacaoDoEgress(cliente: EgressClient, inicial: EgressInfo) {
+  let egress = inicial;
+
+  for (
+    let tentativa = 0;
+    tentativa < TENTATIVAS_FINALIZACAO && !egressFinalizou(egress.status);
+    tentativa += 1
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, INTERVALO_FINALIZACAO_MS));
+    const [atualizado] = await cliente.listEgress({ egressId: egress.egressId });
+    if (atualizado) egress = atualizado;
+  }
+
+  return egress;
 }
 
 function mapearGravacao(linha: {
@@ -215,7 +242,8 @@ export async function encerrarGravacao(reuniaoId: string) {
       livekit.LIVEKIT_API_KEY,
       livekit.LIVEKIT_API_SECRET,
     );
-    const egress = await cliente.stopEgress(gravacao.idProvedor);
+    const interrompido = await cliente.stopEgress(gravacao.idProvedor);
+    const egress = await aguardarFinalizacaoDoEgress(cliente, interrompido);
     await sincronizarGravacaoDoEgress(egress);
   } catch (causa) {
     // O webhook continua sendo a redundância. Uma resposta "já encerrado" não
