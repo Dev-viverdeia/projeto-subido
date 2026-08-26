@@ -27,6 +27,39 @@
   box-shadow: var(--app-ring);
 }
 
+.avisoCheckout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 90%, transparent);
+  color: var(--via-text-muted);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-blur-md) saturate(135%);
+}
+
+.avisoCheckout[data-tom='sucesso'] svg {
+  color: var(--via-success);
+}
+
+.avisoCheckout span,
+.avisoCheckout strong {
+  display: block;
+}
+
+.avisoCheckout span {
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.avisoCheckout strong {
+  margin-bottom: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-semibold);
+}
+
 .intro {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
@@ -214,6 +247,128 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: var(--via-space-3);
   gap: var(--via-space-3);
+}
+
+.pacotes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+}
+
+.pacote {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: var(--via-space-5);
+  padding: clamp(20px, 2.6vw, 28px);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-card);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 74%, transparent), transparent 50%),
+    color-mix(in srgb, var(--via-glass-card) 92%, transparent);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+}
+
+.pacote[data-destaque] {
+  border-color: color-mix(in srgb, var(--via-navy) 24%, var(--via-border-soft));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 80%, transparent), transparent 52%),
+    color-mix(in srgb, var(--via-navy) 5%, var(--via-glass-card));
+  box-shadow:
+    0 1px 0 var(--via-edge-hi) inset,
+    0 16px 40px color-mix(in srgb, var(--via-navy) 8%, transparent);
+}
+
+.numeroPacote {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+}
+
+.numeroPacote svg {
+  align-self: center;
+}
+
+.numeroPacote strong {
+  color: var(--via-text-primary);
+  font-family: var(--via-font-mono);
+  font-size: clamp(2.7rem, 4.8vw, 4.5rem);
+  font-weight: var(--via-fw-regular);
+  letter-spacing: var(--app-ls-hero);
+  line-height: 0.9;
+}
+
+.numeroPacote span {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.textoPacote p,
+.textoPacote h3,
+.textoPacote span,
+.precoPacote strong,
+.precoPacote small {
+  margin: 0;
+}
+
+.textoPacote p {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.textoPacote h3 {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+}
+
+.textoPacote span {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.precoPacote {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-soft);
+}
+
+.precoPacote strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: 560;
+}
+
+.precoPacote small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.acaoPacote form {
+  width: 100%;
+}
+
+.acaoPacote > span {
+  min-height: 46px;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  text-align: center;
 }
 
 .uso {
@@ -489,7 +644,8 @@
 @media (max-width: 899px) {
   .intro,
   .saldo,
-  .usos {
+  .usos,
+  .pacotes {
     grid-template-columns: 1fr;
   }
 
@@ -570,7 +726,9 @@
 
 @supports not (backdrop-filter: blur(1px)) {
   .secao,
-  .uso {
+  .uso,
+  .pacote,
+  .avisoCheckout {
     background: var(--via-surface);
   }
 }

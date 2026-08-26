@@ -79,9 +79,14 @@ export const RECURSOS_COMERCIAIS_PLANO = [
 
 /** Pacotes fixos: o checkout escolhe um pacote, nunca uma quantidade avulsa. */
 export const PACOTES_CREDITOS = [
-  { id: 'essencial', nome: 'Essencial', creditos: 50 },
-  { id: 'crescimento', nome: 'Crescimento', creditos: 150 },
-  { id: 'escala', nome: 'Escala', creditos: 500 },
+  { id: 'essencial', nome: 'Essencial', creditos: 50, descricao: 'Para novas listas e análises.' },
+  {
+    id: 'crescimento',
+    nome: 'Crescimento',
+    creditos: 150,
+    descricao: 'Para uma rotina comercial recorrente.',
+  },
+  { id: 'escala', nome: 'Escala', creditos: 500, descricao: 'Para maior volume de clientes.' },
 ] as const;
 
 /**

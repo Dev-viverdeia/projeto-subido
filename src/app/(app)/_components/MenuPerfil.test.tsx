@@ -38,6 +38,10 @@ describe('MenuPerfil', () => {
       'href',
       '/conta/creditos',
     );
+    expect(screen.getByRole('menuitem', { name: /Plano e cobrança/ })).toHaveAttribute(
+      'href',
+      '/conta/assinatura',
+    );
     expect(screen.getByRole('menuitem', { name: 'Encerrar sessão' })).toHaveAttribute(
       'type',
       'submit',

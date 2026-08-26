@@ -124,6 +124,150 @@ export type Database = {
           },
         ]
       }
+      billing_assinaturas: {
+        Row: {
+          atualizado_em: string
+          cancela_ao_fim_do_periodo: boolean
+          creditos_por_ciclo: number
+          criado_em: string
+          periodo_atual_termina_em: string | null
+          plano: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string | null
+          stripe_subscription_id: string
+          ultima_fatura_id: string | null
+          usuario_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          cancela_ao_fim_do_periodo?: boolean
+          creditos_por_ciclo?: number
+          criado_em?: string
+          periodo_atual_termina_em?: string | null
+          plano: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id?: string | null
+          stripe_subscription_id: string
+          ultima_fatura_id?: string | null
+          usuario_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          cancela_ao_fim_do_periodo?: boolean
+          creditos_por_ciclo?: number
+          criado_em?: string
+          periodo_atual_termina_em?: string | null
+          plano?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string
+          ultima_fatura_id?: string | null
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      billing_clientes: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          stripe_customer_id: string
+          usuario_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          stripe_customer_id: string
+          usuario_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          stripe_customer_id?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      billing_pedidos_creditos: {
+        Row: {
+          atualizado_em: string
+          creditos: number
+          criado_em: string
+          id: string
+          moeda: string | null
+          pacote_id: string
+          pago_em: string | null
+          status: string
+          stripe_checkout_session_id: string
+          stripe_payment_intent_id: string | null
+          usuario_id: string
+          valor_total: number | null
+        }
+        Insert: {
+          atualizado_em?: string
+          creditos: number
+          criado_em?: string
+          id?: string
+          moeda?: string | null
+          pacote_id: string
+          pago_em?: string | null
+          status?: string
+          stripe_checkout_session_id: string
+          stripe_payment_intent_id?: string | null
+          usuario_id: string
+          valor_total?: number | null
+        }
+        Update: {
+          atualizado_em?: string
+          creditos?: number
+          criado_em?: string
+          id?: string
+          moeda?: string | null
+          pacote_id?: string
+          pago_em?: string | null
+          status?: string
+          stripe_checkout_session_id?: string
+          stripe_payment_intent_id?: string | null
+          usuario_id?: string
+          valor_total?: number | null
+        }
+        Relationships: []
+      }
+      billing_webhook_eventos: {
+        Row: {
+          atualizado_em: string
+          erro: string | null
+          processado_em: string | null
+          recebido_em: string
+          status: string
+          stripe_evento_id: string
+          tentativas: number
+          tipo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          erro?: string | null
+          processado_em?: string | null
+          recebido_em?: string
+          status?: string
+          stripe_evento_id: string
+          tentativas?: number
+          tipo: string
+        }
+        Update: {
+          atualizado_em?: string
+          erro?: string | null
+          processado_em?: string | null
+          recebido_em?: string
+          status?: string
+          stripe_evento_id?: string
+          tentativas?: number
+          tipo?: string
+        }
+        Relationships: []
+      }
       builder_solucoes: {
         Row: {
           atualizado_em: string
@@ -2947,6 +3091,62 @@ export type Database = {
           total: number
           ultimo_acesso_em: string
           usuario_id: string
+        }[]
+      }
+      billing_sistema_concluir_evento: {
+        Args: { p_evento: string }
+        Returns: undefined
+      }
+      billing_sistema_criar_pedido: {
+        Args: {
+          p_creditos: number
+          p_pacote: string
+          p_session: string
+          p_usuario: string
+        }
+        Returns: string
+      }
+      billing_sistema_falhar_evento: {
+        Args: { p_erro: string; p_evento: string }
+        Returns: undefined
+      }
+      billing_sistema_marcar_pedido: {
+        Args: { p_session: string; p_status: string }
+        Returns: undefined
+      }
+      billing_sistema_pagar_pacote: {
+        Args: {
+          p_creditos: number
+          p_moeda: string
+          p_pacote: string
+          p_payment_intent: string
+          p_session: string
+          p_usuario: string
+          p_valor_total: number
+        }
+        Returns: number
+      }
+      billing_sistema_reservar_evento: {
+        Args: { p_evento: string; p_tipo: string }
+        Returns: boolean
+      }
+      billing_sistema_sincronizar_assinatura: {
+        Args: {
+          p_cancela_ao_fim?: boolean
+          p_creditar_fatura?: boolean
+          p_creditos?: number
+          p_customer: string
+          p_fatura?: string
+          p_periodo_termina_em?: string
+          p_plano: string
+          p_price?: string
+          p_status: string
+          p_subscription: string
+          p_usuario: string
+        }
+        Returns: {
+          plano_efetivo: string
+          saldo: number
         }[]
       }
       calls_agendar_reuniao: {

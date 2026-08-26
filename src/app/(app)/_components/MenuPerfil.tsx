@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Award, ChevronDown, Cloud, Coins, LogOut, UserRound } from 'lucide-react';
+import { Award, ChevronDown, Cloud, Coins, CreditCard, LogOut, UserRound } from 'lucide-react';
 import { Avatar } from '@/design-system/via';
 import { sair } from '@/lib/auth/actions';
 import styles from './MenuPerfil.module.css';
@@ -159,6 +159,23 @@ export function MenuPerfil({
                     ? `${saldoCreditos} disponíveis · ver extrato`
                     : 'Saldo e extrato'}
                 </small>
+              </span>
+              <span className={styles.indicador} aria-hidden="true" />
+            </Link>
+
+            <Link
+              href="/conta/assinatura"
+              role="menuitem"
+              aria-current={caminho === '/conta/assinatura' ? 'page' : undefined}
+              className={styles.item}
+              onClick={() => setAberto(false)}
+            >
+              <span className={styles.iconeItem} aria-hidden="true">
+                <CreditCard size={17} strokeWidth={1.8} />
+              </span>
+              <span>
+                <strong>Plano e cobrança</strong>
+                <small>{PLANOS_SUBIDO[plano].nome} · gerenciar acesso</small>
               </span>
               <span className={styles.indicador} aria-hidden="true" />
             </Link>

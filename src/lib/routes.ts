@@ -69,6 +69,7 @@ export const ROTULOS: Record<RotaApp, string> = {
  */
 export function rotuloDaRota(caminho: string): string | null {
   if (caminho === '/conta/creditos') return 'Créditos';
+  if (caminho === '/conta/assinatura') return 'Plano e cobrança';
   const rota = ROTAS_APP.find((r) => caminho === r || caminho.startsWith(`${r}/`));
   return rota ? ROTULOS[rota] : null;
 }
