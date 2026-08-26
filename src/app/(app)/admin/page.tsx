@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Boxes, Calculator, CalendarClock, GraduationCap, UsersRound } from 'lucide-react';
+import {
+  Activity,
+  Boxes,
+  Calculator,
+  CalendarClock,
+  GraduationCap,
+  UsersRound,
+} from 'lucide-react';
 import { Card } from '@/design-system/via';
 // eslint-disable-next-line no-restricted-imports -- Server Component dentro do layout administrativo
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -29,6 +36,7 @@ export default async function AdminPage() {
     contas,
     mentorias,
     proximasMentorias,
+    operacoesAtivas,
   ] = await Promise.all([
     supabase.from('solucoes').select('*', { count: 'exact', head: true }),
     supabase.from('formacoes').select('*', { count: 'exact', head: true }),
@@ -44,6 +52,10 @@ export default async function AdminPage() {
       .select('*', { count: 'exact', head: true })
       .eq('status', 'publicado')
       .gte('fim', new Date().toISOString()),
+    admin
+      .from('operacoes_jobs')
+      .select('*', { count: 'exact', head: true })
+      .in('status', ['pendente', 'processando']),
   ]);
 
   const cartoes = [
@@ -62,6 +74,14 @@ export default async function AdminPage() {
       total: null,
       publicadas: null,
       detalhe: 'calculadora da operação',
+    },
+    {
+      href: '/admin/operacoes',
+      icone: <Activity size={18} strokeWidth={1.8} />,
+      titulo: 'Operações',
+      total: operacoesAtivas.count ?? 0,
+      publicadas: null,
+      detalhe: 'em andamento agora',
     },
     {
       href: '/admin/solucoes',

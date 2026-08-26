@@ -6,6 +6,8 @@ import { after } from 'next/server';
 import { z } from 'zod';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { prospeccaoEnv } from '@/lib/env';
+import { enfileirarOperacao } from '@/lib/operacoes/admin';
+import { processarOperacaoPorId } from '@/lib/operacoes/processar';
 import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -13,7 +15,6 @@ import {
   registrarContatoProspeccao,
   reservarListaProspeccao,
 } from './admin';
-import { processarListaProspeccao } from './processar';
 import { BuscaProspeccaoSchema, CanalContatoProspeccaoSchema } from './schema';
 
 export type EstadoBuscaProspeccao = {
@@ -87,7 +88,20 @@ export async function criarListaProspeccao(
     };
   }
 
-  after(() => processarListaProspeccao({ dono: user.id, lista, busca: validacao.data }));
+  const operacao = await enfileirarOperacao({
+    dono: user.id,
+    tipo: 'prospeccao',
+    chaveIdempotencia: `prospeccao:${lista}`,
+    referenciaTipo: 'prospeccao_lista',
+    referenciaId: lista,
+    payload: { dono: user.id, lista, busca: validacao.data },
+    prioridade: 10,
+    maxTentativas: 3,
+  });
+
+  // A primeira tentativa começa imediatamente para preservar a experiência.
+  // Se a Function for interrompida, o cron encontra o mesmo job e o retoma.
+  after(() => processarOperacaoPorId(operacao.id));
   redirect(`/prospeccao?lista=${lista}&busca=processando`);
 }
 

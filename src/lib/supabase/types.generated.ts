@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -1477,6 +1477,81 @@ export type Database = {
           },
         ]
       }
+      operacoes_jobs: {
+        Row: {
+          atualizado_em: string
+          bloqueado_ate: string | null
+          bloqueado_por: string | null
+          bloqueio_id: string | null
+          chave_idempotencia: string
+          concluido_em: string | null
+          criado_em: string
+          disponivel_em: string
+          dono: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          max_tentativas: number
+          payload: Json
+          prioridade: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado: Json | null
+          status: Database["public"]["Enums"]["operacao_status"]
+          tentativas: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        Insert: {
+          atualizado_em?: string
+          bloqueado_ate?: string | null
+          bloqueado_por?: string | null
+          bloqueio_id?: string | null
+          chave_idempotencia: string
+          concluido_em?: string | null
+          criado_em?: string
+          disponivel_em?: string
+          dono: string
+          erro_codigo?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          iniciado_em?: string | null
+          max_tentativas?: number
+          payload?: Json
+          prioridade?: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado?: Json | null
+          status?: Database["public"]["Enums"]["operacao_status"]
+          tentativas?: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        Update: {
+          atualizado_em?: string
+          bloqueado_ate?: string | null
+          bloqueado_por?: string | null
+          bloqueio_id?: string | null
+          chave_idempotencia?: string
+          concluido_em?: string | null
+          criado_em?: string
+          disponivel_em?: string
+          dono?: string
+          erro_codigo?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          iniciado_em?: string | null
+          max_tentativas?: number
+          payload?: Json
+          prioridade?: number
+          referencia_id?: string
+          referencia_tipo?: string
+          resultado?: Json | null
+          status?: Database["public"]["Enums"]["operacao_status"]
+          tentativas?: number
+          tipo?: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           atualizado_em: string
@@ -2201,6 +2276,65 @@ export type Database = {
         }
         Relationships: []
       }
+      prospeccao_custos_provedores: {
+        Row: {
+          cache_hit: boolean
+          creditos_provedor: number
+          criado_em: string
+          custo_usd_micros: number
+          dono: string | null
+          id: string
+          latencia_ms: number | null
+          lista_id: string | null
+          metadados: Json
+          operacao: string
+          provedor: string
+          status: string
+          unidade: string
+          unidades: number
+        }
+        Insert: {
+          cache_hit?: boolean
+          creditos_provedor?: number
+          criado_em?: string
+          custo_usd_micros?: number
+          dono?: string | null
+          id?: string
+          latencia_ms?: number | null
+          lista_id?: string | null
+          metadados?: Json
+          operacao: string
+          provedor: string
+          status?: string
+          unidade: string
+          unidades?: number
+        }
+        Update: {
+          cache_hit?: boolean
+          creditos_provedor?: number
+          criado_em?: string
+          custo_usd_micros?: number
+          dono?: string | null
+          id?: string
+          latencia_ms?: number | null
+          lista_id?: string | null
+          metadados?: Json
+          operacao?: string
+          provedor?: string
+          status?: string
+          unidade?: string
+          unidades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospeccao_custos_provedores_lista_id_fkey"
+            columns: ["lista_id"]
+            isOneToOne: false
+            referencedRelation: "prospeccao_listas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prospeccao_leads: {
         Row: {
           atualizado_em: string
@@ -2321,65 +2455,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "prospeccao_listas"
             referencedColumns: ["dono", "id"]
-          },
-        ]
-      }
-      prospeccao_custos_provedores: {
-        Row: {
-          cache_hit: boolean
-          criado_em: string
-          creditos_provedor: number
-          custo_usd_micros: number
-          dono: string | null
-          id: string
-          latencia_ms: number | null
-          lista_id: string | null
-          metadados: Json
-          operacao: string
-          provedor: string
-          status: string
-          unidade: string
-          unidades: number
-        }
-        Insert: {
-          cache_hit?: boolean
-          criado_em?: string
-          creditos_provedor?: number
-          custo_usd_micros?: number
-          dono?: string | null
-          id?: string
-          latencia_ms?: number | null
-          lista_id?: string | null
-          metadados?: Json
-          operacao: string
-          provedor: string
-          status?: string
-          unidade: string
-          unidades?: number
-        }
-        Update: {
-          cache_hit?: boolean
-          criado_em?: string
-          creditos_provedor?: number
-          custo_usd_micros?: number
-          dono?: string | null
-          id?: string
-          latencia_ms?: number | null
-          lista_id?: string | null
-          metadados?: Json
-          operacao?: string
-          provedor?: string
-          status?: string
-          unidade?: string
-          unidades?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prospeccao_custos_provedores_lista_id_fkey"
-            columns: ["lista_id"]
-            isOneToOne: false
-            referencedRelation: "prospeccao_listas"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -3009,6 +3084,152 @@ export type Database = {
           mentoria_id: string
         }[]
       }
+      operacoes_sistema_concluir: {
+        Args: { p_bloqueio: string; p_job: string; p_resultado?: Json }
+        Returns: {
+          atualizado_em: string
+          bloqueado_ate: string | null
+          bloqueado_por: string | null
+          bloqueio_id: string | null
+          chave_idempotencia: string
+          concluido_em: string | null
+          criado_em: string
+          disponivel_em: string
+          dono: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          max_tentativas: number
+          payload: Json
+          prioridade: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado: Json | null
+          status: Database["public"]["Enums"]["operacao_status"]
+          tentativas: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operacoes_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      operacoes_sistema_falhar: {
+        Args: {
+          p_bloqueio: string
+          p_codigo: string
+          p_job: string
+          p_mensagem: string
+        }
+        Returns: {
+          atualizado_em: string
+          bloqueado_ate: string | null
+          bloqueado_por: string | null
+          bloqueio_id: string | null
+          chave_idempotencia: string
+          concluido_em: string | null
+          criado_em: string
+          disponivel_em: string
+          dono: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          max_tentativas: number
+          payload: Json
+          prioridade: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado: Json | null
+          status: Database["public"]["Enums"]["operacao_status"]
+          tentativas: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operacoes_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      operacoes_sistema_reagendar: {
+        Args: { p_job: string }
+        Returns: {
+          atualizado_em: string
+          bloqueado_ate: string | null
+          bloqueado_por: string | null
+          bloqueio_id: string | null
+          chave_idempotencia: string
+          concluido_em: string | null
+          criado_em: string
+          disponivel_em: string
+          dono: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          max_tentativas: number
+          payload: Json
+          prioridade: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado: Json | null
+          status: Database["public"]["Enums"]["operacao_status"]
+          tentativas: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operacoes_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      operacoes_sistema_recuperar_enriquecimentos: {
+        Args: never
+        Returns: number
+      }
+      operacoes_sistema_reivindicar: {
+        Args: {
+          p_job_id?: string
+          p_limite?: number
+          p_tipos?: Database["public"]["Enums"]["operacao_tipo"][]
+          p_worker?: string
+        }
+        Returns: {
+          atualizado_em: string
+          bloqueado_ate: string | null
+          bloqueado_por: string | null
+          bloqueio_id: string | null
+          chave_idempotencia: string
+          concluido_em: string | null
+          criado_em: string
+          disponivel_em: string
+          dono: string
+          erro_codigo: string | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          max_tentativas: number
+          payload: Json
+          prioridade: number
+          referencia_id: string
+          referencia_tipo: string
+          resultado: Json | null
+          status: Database["public"]["Enums"]["operacao_status"]
+          tentativas: number
+          tipo: Database["public"]["Enums"]["operacao_tipo"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "operacoes_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       progresso_conta_snapshot: {
         Args: never
         Returns: {
@@ -3209,6 +3430,13 @@ export type Database = {
         | "concluido"
         | "falhou"
       estado_tarefa: "a_fazer" | "fazendo" | "feito"
+      operacao_status:
+        | "pendente"
+        | "processando"
+        | "concluida"
+        | "falhou"
+        | "cancelada"
+      operacao_tipo: "prospeccao" | "enriquecimento" | "pos_call"
       papel_usuario: "membro" | "mentor" | "admin"
       projeto_acao_status: "pendente" | "concluida" | "cancelada"
       projeto_cliente_status:
@@ -3415,6 +3643,14 @@ export const Constants = {
         "falhou",
       ],
       estado_tarefa: ["a_fazer", "fazendo", "feito"],
+      operacao_status: [
+        "pendente",
+        "processando",
+        "concluida",
+        "falhou",
+        "cancelada",
+      ],
+      operacao_tipo: ["prospeccao", "enriquecimento", "pos_call"],
       papel_usuario: ["membro", "mentor", "admin"],
       projeto_acao_status: ["pendente", "concluida", "cancelada"],
       projeto_cliente_status: [
