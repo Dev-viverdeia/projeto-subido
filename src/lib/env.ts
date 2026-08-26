@@ -136,6 +136,7 @@ export function googleCalendarEnv() {
     .object({
       GOOGLE_CALENDAR_CLIENT_ID: z.string().min(20),
       GOOGLE_CALENDAR_CLIENT_SECRET: z.string().min(10),
+      GOOGLE_CALENDAR_REDIRECT_URI: z.url().optional(),
       GOOGLE_CALENDAR_TOKEN_KEY: z.string().refine((valor) => {
         try {
           return Buffer.from(valor, 'base64').byteLength === 32;
@@ -147,6 +148,7 @@ export function googleCalendarEnv() {
     .safeParse({
       GOOGLE_CALENDAR_CLIENT_ID: process.env.GOOGLE_CALENDAR_CLIENT_ID,
       GOOGLE_CALENDAR_CLIENT_SECRET: process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+      GOOGLE_CALENDAR_REDIRECT_URI: process.env.GOOGLE_CALENDAR_REDIRECT_URI,
       GOOGLE_CALENDAR_TOKEN_KEY: process.env.GOOGLE_CALENDAR_TOKEN_KEY,
     });
 
