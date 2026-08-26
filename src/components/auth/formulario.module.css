@@ -41,8 +41,8 @@
   place-items: center;
   width: 20px;
   height: 20px;
-  border: 1px solid var(--via-border-default);
-  border-radius: var(--via-radius-full);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-pill);
   font-family: var(--via-font-display);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
@@ -91,8 +91,8 @@
   justify-content: center;
   min-height: 44px;
   padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-border-default);
-  border-radius: var(--via-radius-full);
+  border: 1px solid var(--via-border);
+  border-radius: var(--via-radius-pill);
   color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
