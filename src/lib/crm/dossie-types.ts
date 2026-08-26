@@ -85,6 +85,9 @@ export type DossieLead = {
   } | null;
   eventos: EventoDossie[];
   calls: CallDossieLead[];
+  /** A lista acima é curta para manter a ficha rápida. Este marcador consulta
+      todo o histórico e impede que uma descoberta antiga seja ignorada. */
+  temDescobertaConcluida?: boolean;
   acoesPlano: AcaoPlanoDossie[];
   projetoAtivo: ProjetoAtivoDossie | null;
   /** Última entrega, inclusive quando já concluída. O CRM não perde o vínculo

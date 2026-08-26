@@ -77,7 +77,7 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
         origemInicial={origemInicial}
         reuniaoInicial={reuniaoInicial}
         contextoCall={contextoCall}
-        erro={Boolean(erro)}
+        erro={erro}
       />
     </div>
   );

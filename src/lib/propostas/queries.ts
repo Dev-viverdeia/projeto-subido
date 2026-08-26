@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { listarOportunidadesComDescobertaConcluida } from '@/lib/calls/descoberta';
 import { listarSolucoes, type SolucaoResumo } from '@/lib/conteudo/queries';
 import { listarOportunidadesSeletor, type OportunidadeSeletor } from '@/lib/crm/queries';
 import { listarSolucoesDoBuilder, type ItemHistorico } from '@/lib/builder/queries';
@@ -140,15 +141,16 @@ export async function obterPropostaDaReuniao(
 }
 
 export async function listarOpcoesNovaProposta(): Promise<OpcoesNovaProposta> {
-  const [oportunidades, projetos, projetosEstudio] = await Promise.all([
+  const [oportunidades, projetos, projetosEstudio, descobertas] = await Promise.all([
     listarOportunidadesSeletor(),
     listarSolucoes(),
     listarSolucoesDoBuilder(),
+    listarOportunidadesComDescobertaConcluida(),
   ]);
 
   return {
     oportunidades: oportunidades.filter(
-      (item) => item.etapa !== 'ganho' && item.etapa !== 'perdido',
+      (item) => item.etapa !== 'ganho' && item.etapa !== 'perdido' && descobertas.has(item.id),
     ),
     projetos: projetos.filter((item) => item.projeto !== null),
     projetosEstudio: projetosEstudio.filter((item) => item.status === 'pronta'),

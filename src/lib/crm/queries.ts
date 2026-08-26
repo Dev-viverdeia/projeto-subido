@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { oportunidadeTemDescobertaConcluida } from '@/lib/calls/descoberta';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
@@ -259,6 +260,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     eventos,
     enriquecimentos,
     calls,
+    descobertaConcluida,
     acoesPlano,
     projetosRecentes,
     propostaRecente,
@@ -299,6 +301,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .eq('oportunidade_id', id)
       .order('agendada_para', { ascending: false })
       .limit(6),
+    oportunidadeTemDescobertaConcluida(id),
     supabase
       .from('projeto_acoes')
       .select('id, titulo, prazo_em, reuniao_id, atualizado_em')
@@ -416,6 +419,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       duracaoMinutos: call.duracao_minutos,
       codigoPublico: call.codigo_publico,
     })),
+    temDescobertaConcluida: descobertaConcluida,
     acoesPlano: (acoesPlano.data ?? []).map((acao) => ({
       id: acao.id,
       titulo: acao.titulo,

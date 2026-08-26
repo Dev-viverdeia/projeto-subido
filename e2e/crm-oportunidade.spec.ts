@@ -46,13 +46,16 @@ test.describe('Ficha do cliente em Vendas', () => {
     expect(semOverflowHorizontal).toBe(true);
   });
 
-  test('a entrada de uma nova venda abre a ficha sem bloquear as ações', async ({ page }) => {
+  test('a entrada de uma nova venda abre a ficha e mostra a ordem das ações', async ({ page }) => {
     await page.goto('/preview/crm-dossie?entrada=1');
 
     await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByText(/Venda adicionada\. A ficha do cliente/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
+    await expect(page.getByText('Proposta após descoberta', { exact: true })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();
 
     const dialogo = page.getByRole('dialog', { name: 'Enriquecer os dados deste cliente?' });
@@ -69,7 +72,10 @@ test.describe('Ficha do cliente em Vendas', () => {
     await page.goto('/preview/crm-dossie?pesquisa=pendente');
 
     await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
+    await expect(page.getByText('Proposta após descoberta', { exact: true })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     await expect(page.getByRole('button', { name: 'Enriquecer dados' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();

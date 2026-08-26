@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BriefcaseBusiness, FileSignature } from 'lucide-react';
+import { BriefcaseBusiness, FileClock, FileSignature } from 'lucide-react';
 import type { DossieLead } from '@/lib/crm/queries';
 import styles from './CabecalhoDossie.module.css';
 
@@ -38,6 +38,23 @@ export function AtalhoProposta({
         <FileSignature size={16} strokeWidth={1.8} aria-hidden="true" />
         Ver proposta
       </Link>
+    );
+  }
+
+  const temDescobertaConcluida =
+    lead.temDescobertaConcluida ??
+    lead.calls.some((call) => call.tipo === 'descoberta' && call.status === 'concluida');
+
+  if (!temDescobertaConcluida) {
+    return (
+      <span
+        className={styles.acaoIndisponivel}
+        aria-disabled="true"
+        title="Conclua a reunião de descoberta para criar a proposta."
+      >
+        <FileClock size={16} strokeWidth={1.8} aria-hidden="true" />
+        Proposta após descoberta
+      </span>
     );
   }
 
