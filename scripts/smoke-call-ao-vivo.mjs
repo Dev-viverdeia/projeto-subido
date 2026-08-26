@@ -395,8 +395,10 @@ async function validarPosCall(paginaHost) {
   if (!resultado.gravacao?.tamanho_bytes) throw new Error('A gravação terminou sem arquivo.');
 
   await paginaHost.reload({ waitUntil: 'domcontentloaded' });
-  await paginaHost.getByText('Resumo da conversa').waitFor({ timeout: 30_000 });
-  await paginaHost.getByText('Transcrição').waitFor({ timeout: 30_000 });
+  await paginaHost
+    .getByRole('heading', { name: 'Resumo e pontos principais' })
+    .waitFor({ timeout: 30_000 });
+  await paginaHost.getByText('Transcrição da reunião').waitFor({ timeout: 30_000 });
   await paginaHost.screenshot({
     path: '/private/tmp/subido-call-smoke-pos-call.png',
     fullPage: true,
