@@ -1,6 +1,9 @@
 import 'server-only';
 
 import { LeadProspeccaoSchema, type LeadProspeccaoEntrada } from './schema';
+import { redesDeUrls } from './redes-sociais';
+
+export { redesDeUrls } from './redes-sociais';
 
 export type Registro = Record<string, unknown>;
 type RedeSocial = LeadProspeccaoEntrada['redes_sociais'][number];
@@ -108,63 +111,6 @@ export function telefonesUnicos(valores: Array<string | null | undefined>): stri
   });
 }
 
-const ORDEM_REDES: RedeSocial['rede'][] = [
-  'instagram',
-  'linkedin',
-  'facebook',
-  'tiktok',
-  'youtube',
-  'x',
-  'pinterest',
-];
-
-function redeDaUrl(url: URL): RedeSocial['rede'] | null {
-  const dominio = url.hostname.replace(/^www\./, '').toLowerCase();
-  if (dominio === 'instagram.com') return 'instagram';
-  if (dominio === 'facebook.com' || dominio === 'fb.com') return 'facebook';
-  if (dominio === 'linkedin.com') return 'linkedin';
-  if (dominio === 'x.com' || dominio === 'twitter.com') return 'x';
-  if (dominio === 'tiktok.com') return 'tiktok';
-  if (dominio === 'youtube.com' || dominio === 'youtu.be') return 'youtube';
-  if (dominio === 'pinterest.com' || dominio === 'pin.it') return 'pinterest';
-  return null;
-}
-
-function perfilSocial(valor: string, redeSugerida?: RedeSocial['rede']): RedeSocial | null {
-  const publica = urlPublica(valor);
-  if (!publica) return null;
-  const url = new URL(publica);
-  const rede = redeDaUrl(url) ?? redeSugerida ?? null;
-  if (!rede) return null;
-  const partes = url.pathname.split('/').filter(Boolean);
-  const primeira = partes[0]?.toLowerCase() ?? '';
-  const bloqueadas: Partial<Record<RedeSocial['rede'], Set<string>>> = {
-    instagram: new Set(['p', 'reel', 'reels', 'stories', 'explore']),
-    facebook: new Set(['share', 'sharer', 'dialog', 'plugins', 'watch']),
-    linkedin: new Set(['feed', 'posts', 'pulse', 'learning']),
-    x: new Set(['intent', 'share', 'search', 'i']),
-    tiktok: new Set(['video', 'discover', 'tag']),
-    youtube: new Set(['watch', 'shorts', 'playlist', 'results']),
-    pinterest: new Set(['pin', 'ideas']),
-  };
-  if (!primeira || bloqueadas[rede]?.has(primeira)) return null;
-  url.search = '';
-  url.hash = '';
-  return { rede, url: url.toString().replace(/\/$/, '') };
-}
-
-export function redesDeUrls(valores: string[]): RedeSocial[] {
-  const porRede = new Map<RedeSocial['rede'], RedeSocial>();
-  for (const valor of valores) {
-    const perfil = perfilSocial(valor);
-    if (perfil && !porRede.has(perfil.rede)) porRede.set(perfil.rede, perfil);
-  }
-  return ORDEM_REDES.flatMap((rede) => {
-    const perfil = porRede.get(rede);
-    return perfil ? [perfil] : [];
-  });
-}
-
 function redesDo(registroFonte: Registro): RedeSocial[] {
   const campos: Array<[RedeSocial['rede'], string[]]> = [
     ['instagram', ['instagram', 'instagrams']],
@@ -178,7 +124,7 @@ function redesDo(registroFonte: Registro): RedeSocial[] {
   const candidatos = campos.flatMap(([rede, nomes]) =>
     nomes.flatMap((campo) =>
       textos(registroFonte[campo]).flatMap((valor) => {
-        const perfil = perfilSocial(valor, rede);
+        const perfil = redesDeUrls([valor]).find((item) => item.rede === rede);
         return perfil ? [perfil] : [];
       }),
     ),
@@ -347,7 +293,9 @@ export function origemFullEnrichEmpresa(registro: Registro): LeadProspeccaoEntra
   const industria = comoRegistro(registro.industry);
   const perfis = comoRegistro(registro.social_profiles);
   const profissional = comoRegistro(perfis?.professional_network);
-  const linkedin = perfilSocial(texto(profissional?.url) ?? '', 'linkedin');
+  const linkedin = redesDeUrls([texto(profissional?.url) ?? '']).find(
+    (item) => item.rede === 'linkedin',
+  );
   const cidade = texto(sede?.city);
   const estado = texto(sede?.region);
   const endereco = [texto(sede?.line1), texto(sede?.line2)].filter(Boolean).join(', ') || null;
