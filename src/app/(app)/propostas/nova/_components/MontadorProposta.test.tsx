@@ -34,7 +34,7 @@ describe('MontadorProposta', () => {
         origemInicial=""
         reuniaoInicial=""
         contextoCall={null}
-        erro={false}
+        erro={null}
       />,
     );
 
@@ -84,7 +84,7 @@ describe('MontadorProposta', () => {
           pontosAValidar: 2,
           oportunidadesProjeto: ['Atendimento assistido por IA no WhatsApp'],
         }}
-        erro={false}
+        erro={null}
       />,
     );
 
@@ -95,5 +95,24 @@ describe('MontadorProposta', () => {
     expect(screen.getByText(/A equipe confirmou perda de contexto/)).toBeVisible();
     expect(screen.getAllByText('2', { selector: 'dt' })).toHaveLength(2);
     expect(screen.getByRole('button', { name: /Criar rascunho/ })).toBeEnabled();
+  });
+
+  it('explica a descoberta obrigatória e devolve o usuário para a próxima ação', () => {
+    render(
+      <MontadorProposta
+        opcoes={{ ...OPCOES, oportunidades: [] }}
+        oportunidadeInicial="11111111-1111-4111-8111-111111111111"
+        origemInicial=""
+        reuniaoInicial=""
+        contextoCall={null}
+        erro="descoberta"
+      />,
+    );
+
+    expect(screen.getByText('Conclua a descoberta antes de criar a proposta.')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Agendar descoberta/ })).toHaveAttribute(
+      'href',
+      '/reunioes?nova=1&oportunidade=11111111-1111-4111-8111-111111111111',
+    );
   });
 });

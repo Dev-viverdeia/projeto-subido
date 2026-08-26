@@ -139,7 +139,8 @@
 }
 
 .acaoPrimaria,
-.acaoSecundaria {
+.acaoSecundaria,
+.acaoIndisponivel {
   display: inline-flex;
   min-height: var(--app-h-control);
   align-items: center;
@@ -158,6 +159,19 @@
     box-shadow var(--app-t-touch),
     color var(--app-t-state),
     transform var(--app-t-touch);
+}
+
+.acaoIndisponivel {
+  border-color: color-mix(in srgb, var(--via-border) 78%, transparent);
+  background: color-mix(in srgb, var(--via-bg-2) 74%, transparent);
+  color: var(--via-text-faint);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 58%, transparent);
+  cursor: not-allowed;
+  backdrop-filter: blur(12px) saturate(118%);
+}
+
+.acaoIndisponivel svg {
+  color: var(--via-text-muted);
 }
 
 .acaoPrimaria {
@@ -238,6 +252,7 @@
 
   .acaoPrimaria,
   .acaoSecundaria,
+  .acaoIndisponivel,
   .acoes > button {
     width: 100%;
   }

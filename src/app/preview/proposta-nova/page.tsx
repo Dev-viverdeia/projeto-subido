@@ -102,7 +102,7 @@ export default function PreviewNovaPropostaPage() {
               pontosAValidar: 2,
               oportunidadesProjeto: ['Atendimento com IA no WhatsApp'],
             }}
-            erro={false}
+            erro={null}
           />
         </div>
       </main>

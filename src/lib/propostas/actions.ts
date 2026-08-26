@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
+import { oportunidadeTemDescobertaConcluida } from '@/lib/calls/descoberta';
 import { obterPosCall } from '@/lib/calls/queries';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
@@ -89,6 +90,18 @@ export async function criarProposta(formData: FormData): Promise<void> {
     reuniao: formData.get('reuniao'),
   });
   if (!validacao.success) redirect('/propostas/nova?erro=campos');
+
+  const descobertaConcluida = await oportunidadeTemDescobertaConcluida(validacao.data.oportunidade);
+  if (!descobertaConcluida) {
+    const parametros = new URLSearchParams({
+      oportunidade: validacao.data.oportunidade,
+      erro: 'descoberta',
+    });
+    const [tipoOrigem, idOrigem] = validacao.data.origem.split(':', 2);
+    if (tipoOrigem === 'projeto' && idOrigem) parametros.set('projeto', idOrigem);
+    if (tipoOrigem === 'estudio' && idOrigem) parametros.set('builder', idOrigem);
+    redirect(`/propostas/nova?${parametros.toString()}`);
+  }
 
   const [{ supabase, user }, lead, origem, posCall] = await Promise.all([
     usuarioAtual(),

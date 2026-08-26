@@ -1,8 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { createClient, exigirRecurso, revalidatePath, redirect, rpc } = vi.hoisted(() => ({
+const {
+  createClient,
+  exigirRecurso,
+  oportunidadeTemDescobertaConcluida,
+  revalidatePath,
+  redirect,
+  rpc,
+} = vi.hoisted(() => ({
   createClient: vi.fn(),
   exigirRecurso: vi.fn(),
+  oportunidadeTemDescobertaConcluida: vi.fn(),
   revalidatePath: vi.fn(),
   redirect: vi.fn(),
   rpc: vi.fn(),
@@ -13,8 +21,12 @@ vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/planos/server', () => ({ exigirRecurso }));
+vi.mock('@/lib/calls/descoberta', () => ({ oportunidadeTemDescobertaConcluida }));
+vi.mock('./queries', () => ({
+  obterPropostaDaReuniao: vi.fn(),
+}));
 
-import { mudarStatusProposta } from './actions';
+import { criarProposta, mudarStatusProposta } from './actions';
 
 const PROPOSTA_ID = '11111111-1111-4111-8111-111111111111';
 const OPORTUNIDADE_ID = '22222222-2222-4222-8222-222222222222';
@@ -112,5 +124,29 @@ describe('mudarStatusProposta', () => {
     expect(resultado.status).toBe('pronta');
     expect(rpc).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe('criarProposta', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    redirect.mockImplementation((destino: string) => {
+      throw new Error(`redirect:${destino}`);
+    });
+  });
+
+  it('não deixa um link direto pular a descoberta', async () => {
+    oportunidadeTemDescobertaConcluida.mockResolvedValue(false);
+    const dados = new FormData();
+    dados.set('oportunidade', OPORTUNIDADE_ID);
+    dados.set('origem', 'projeto:sdr-atendimento-qualificacao');
+    dados.set('reuniao', '');
+
+    await expect(criarProposta(dados)).rejects.toThrow(
+      `redirect:/propostas/nova?oportunidade=${OPORTUNIDADE_ID}&erro=descoberta&projeto=sdr-atendimento-qualificacao`,
+    );
+
+    expect(oportunidadeTemDescobertaConcluida).toHaveBeenCalledWith(OPORTUNIDADE_ID);
+    expect(createClient).not.toHaveBeenCalled();
   });
 });

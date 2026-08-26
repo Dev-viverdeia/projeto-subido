@@ -39,7 +39,7 @@ export function MontadorProposta({
   origemInicial: string;
   reuniaoInicial: string;
   contextoCall?: ContextoCallNovaProposta | null;
-  erro: boolean;
+  erro: string | null;
 }) {
   const [passo, setPasso] = useState(oportunidadeInicial ? 2 : 1);
   const [oportunidade, setOportunidade] = useState(oportunidadeInicial);
@@ -88,11 +88,32 @@ export function MontadorProposta({
         })}
       </ol>
 
-      {erro && (
+      {erro === 'descoberta' ? (
+        <div className={styles.erroGuia} role="alert">
+          <span className={styles.erroIcone} aria-hidden="true">
+            <Video size={19} strokeWidth={1.8} />
+          </span>
+          <div>
+            <strong>Conclua a descoberta antes de criar a proposta.</strong>
+            <p>
+              A conversa confirma o problema, o impacto e quem decide. Assim o rascunho nasce com
+              fatos do cliente, não com suposições.
+            </p>
+          </div>
+          {oportunidadeInicial && (
+            <Link
+              href={`/reunioes?nova=1&oportunidade=${oportunidadeInicial}`}
+              className={styles.erroAcao}
+            >
+              Agendar descoberta <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+      ) : erro ? (
         <p className={styles.erro} role="alert">
           Não foi possível criar com essa combinação. Revise as escolhas e tente novamente.
         </p>
-      )}
+      ) : null}
 
       <section className={styles.etapa} hidden={passo !== 1} aria-labelledby="proposta-contexto">
         <span className={styles.numero} aria-hidden="true">
@@ -139,8 +160,8 @@ export function MontadorProposta({
             </label>
           ) : (
             <div className={styles.semOpcao}>
-              <p>Você ainda não tem clientes em negociação.</p>
-              <Link href="/vendas">Adicionar um cliente</Link>
+              <p>Você ainda não tem uma descoberta concluída para transformar em proposta.</p>
+              <Link href="/reunioes">Ver reuniões</Link>
             </div>
           )}
         </div>
