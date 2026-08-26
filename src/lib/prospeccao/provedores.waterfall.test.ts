@@ -10,6 +10,7 @@ vi.mock('@/lib/env', () => ({
     firecrawl: null,
     perplexity: null,
     gateway: null,
+    gatewayPerplexityAtiva: false,
   }),
 }));
 

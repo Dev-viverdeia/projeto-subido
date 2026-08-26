@@ -172,6 +172,7 @@ export function prospeccaoEnv() {
     SERPAPI_API_KEY: process.env.SERPAPI_API_KEY,
     VIA_DATA_GATEWAY_URL: process.env.VIA_DATA_GATEWAY_URL,
     VIA_DATA_GATEWAY_SECRET: process.env.VIA_DATA_GATEWAY_SECRET,
+    VIA_DATA_GATEWAY_PERPLEXITY_ENABLED: process.env.VIA_DATA_GATEWAY_PERPLEXITY_ENABLED,
   };
 
   const firecrawl = z.string().min(10).safeParse(dados.FIRECRAWL_API_KEY);
@@ -192,6 +193,7 @@ export function prospeccaoEnv() {
     apifyActor: apifyActor.success ? apifyActor.data : null,
     serpApi: serpApi.success ? serpApi.data : null,
     gateway: gateway.success ? gateway.data : null,
+    gatewayPerplexityAtiva: dados.VIA_DATA_GATEWAY_PERPLEXITY_ENABLED === 'true',
   };
 }
 

@@ -303,7 +303,9 @@ export async function prospectarEmpresas(
     )
     .slice(0, busca.quantidade);
   await contexto.aoProgresso?.('decisores', 'Localizando pessoas com papel de decisão.');
-  const pesquisaConfigurada = Boolean(configuracao.perplexity || configuracao.gateway);
+  const pesquisaConfigurada = Boolean(
+    configuracao.perplexity || (configuracao.gateway && configuracao.gatewayPerplexityAtiva),
+  );
   const pesquisa = pesquisaConfigurada
     ? await pesquisarPossiveisDecisores(candidatosFinais, configuracaoWeb)
     : { leads: candidatosFinais, usos: [] };

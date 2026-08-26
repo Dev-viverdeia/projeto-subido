@@ -44,6 +44,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       perplexity: null,
       gateway: null,
+      gatewayPerplexityAtiva: false,
     });
   });
 
@@ -147,6 +148,7 @@ describe('provedores da prospecção', () => {
       firecrawl: 'token-firecrawl-valido',
       perplexity: null,
       gateway: null,
+      gatewayPerplexityAtiva: false,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -214,6 +216,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       perplexity: 'token-perplexity-valido',
       gateway: null,
+      gatewayPerplexityAtiva: false,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -274,6 +277,7 @@ describe('provedores da prospecção', () => {
       firecrawl: null,
       perplexity: 'token-perplexity-valido',
       gateway: null,
+      gatewayPerplexityAtiva: false,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
