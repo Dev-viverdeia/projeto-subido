@@ -77,9 +77,9 @@ Deno.serve(async (requisicao) => {
         formats: ['markdown', 'links'],
         onlyMainContent: false,
         maxAge: 172_800_000,
-        timeout: 12_000,
+        timeout: 9_000,
       }),
-      signal: AbortSignal.timeout(16_000),
+      signal: AbortSignal.timeout(12_000),
     });
     return jsonDoProvedor(retorno);
   }
@@ -95,7 +95,7 @@ Deno.serve(async (requisicao) => {
       headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: consultas,
-        max_results: 5,
+        max_results: 10,
         country: 'BR',
         search_language_filter: ['pt'],
       }),

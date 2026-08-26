@@ -20,6 +20,28 @@ export type UsoProvedorProspeccao = {
 };
 
 export const PERPLEXITY_SEARCH_USD_MICROS_POR_REQUISICAO = 5_000;
+export const SERPAPI_SEARCH_USD_MICROS_POR_REQUISICAO = 10_000;
+export const OPENAI_RATE_CARD_VERSAO = '2026-08-25';
+
+export function custoOpenAIUsdMicros({
+  modelo,
+  inputTokens,
+  cachedInputTokens,
+  outputTokens,
+}: {
+  modelo: string;
+  inputTokens: number;
+  cachedInputTokens: number;
+  outputTokens: number;
+}) {
+  // Rate card público da API em 25/08/2026. Em USD por 1M tokens:
+  // Luna = 0,20 input, 0,02 cached input e 1,20 output.
+  // Em USD micros, multiplicar tokens pela tarifa por milhão mantém a unidade.
+  if (!modelo.startsWith('gpt-5.6-luna')) return undefined;
+  const cached = Math.min(Math.max(0, cachedInputTokens), Math.max(0, inputTokens));
+  const inputSemCache = Math.max(0, inputTokens - cached);
+  return Math.round(inputSemCache * 0.2 + cached * 0.02 + Math.max(0, outputTokens) * 1.2);
+}
 
 export async function registrarCustosProspeccao({
   dono,

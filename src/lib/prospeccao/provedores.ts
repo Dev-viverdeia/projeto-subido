@@ -287,7 +287,8 @@ export async function prospectarEmpresas(
           `${contexto.dono ?? ''}:${contexto.lista ?? ''}`,
         ),
     )
-    .slice(0, Math.min(30, Math.max(busca.quantidade * 2, 12)))
+    .filter(temBaseParaEnriquecer)
+    .slice(0, busca.quantidade)
     .map((lead) => ({
       ...lead,
       dados: {
@@ -300,22 +301,44 @@ export async function prospectarEmpresas(
       },
     }));
 
+  const candidatosBase = combinados;
   await contexto.aoProgresso?.('contexto', 'Reunindo site, presença digital e fatos públicos.');
-  const comSite = combinados.filter((lead) => lead.site_url);
+  const comSite = candidatosBase.filter((lead) => lead.site_url);
   const webConfigurada = Boolean(configuracao.firecrawl || configuracao.gateway);
   const configuracaoWeb = {
     firecrawl: configuracao.firecrawl,
     perplexity: configuracao.perplexity,
+    serpApi: configuracao.serpApi,
+    usarPerplexity: Boolean(
+      configuracao.perplexity || (configuracao.gateway && configuracao.gatewayPerplexityAtiva),
+    ),
     gateway: configuracao.gateway,
   };
-  const lidos = webConfigurada
-    ? await mapearComLimite(comSite, 5, (lead) => enriquecerSite(lead, configuracaoWeb))
-    : [];
+  const pesquisaConfigurada = Boolean(
+    configuracao.serpApi ||
+    configuracao.perplexity ||
+    (configuracao.gateway && configuracao.gatewayPerplexityAtiva),
+  );
+  await contexto.aoProgresso?.('decisores', 'Localizando pessoas com papel de decisão.');
+  const [lidos, pesquisa] = await Promise.all([
+    webConfigurada
+      ? mapearComLimite(comSite, 5, (lead) => enriquecerSite(lead, configuracaoWeb))
+      : Promise.resolve([]),
+    pesquisaConfigurada
+      ? pesquisarPossiveisDecisores(candidatosBase, configuracaoWeb)
+      : Promise.resolve({ leads: candidatosBase, usos: [] }),
+  ]);
   for (const resultado of lidos) await adicionarCusto(resultado.uso);
-  const porChave = new Map(
+  for (const uso of pesquisa.usos) await adicionarCusto(uso);
+  const sitePorChave = new Map(
     lidos.map((resultado) => [resultado.lead.chave_externa, resultado.lead]),
   );
-  const comContexto = combinados.map((lead) => porChave.get(lead.chave_externa) ?? lead);
+  const pesquisaPorChave = new Map(pesquisa.leads.map((lead) => [lead.chave_externa, lead]));
+  const comContexto = candidatosBase.map((lead) => {
+    const site = sitePorChave.get(lead.chave_externa) ?? lead;
+    const decisores = pesquisaPorChave.get(lead.chave_externa) ?? lead;
+    return combinar([site], [decisores])[0] ?? site;
+  });
   const sitesConfirmados = comContexto.filter((lead) =>
     lead.fontes.some((fonte) => fonte.startsWith('Site oficial')),
   ).length;
@@ -337,15 +360,7 @@ export async function prospectarEmpresas(
           ),
     )
     .slice(0, busca.quantidade);
-  await contexto.aoProgresso?.('decisores', 'Localizando pessoas com papel de decisão.');
-  const pesquisaConfigurada = Boolean(
-    configuracao.perplexity || (configuracao.gateway && configuracao.gatewayPerplexityAtiva),
-  );
-  const pesquisa = pesquisaConfigurada
-    ? await pesquisarPossiveisDecisores(candidatosFinais, configuracaoWeb)
-    : { leads: candidatosFinais, usos: [] };
-  for (const uso of pesquisa.usos) await adicionarCusto(uso);
-  let leads = pesquisa.leads
+  let leads = candidatosFinais
     .map((lead) => ({ ...lead, qualificacao: qualificar(lead) }))
     .filter(temContatoDireto)
     .sort(
@@ -371,8 +386,12 @@ export async function prospectarEmpresas(
   leads = inteligencia.leads;
   if (inteligencia.uso) await adicionarCusto(inteligencia.uso);
   await contexto.aoProgresso?.('contatos', 'Validando os melhores canais para iniciar a conversa.');
-  const consultasPerplexity = pesquisa.usos.length;
-  const concluidasPerplexity = pesquisa.usos.filter((uso) => uso.status === 'concluido').length;
+  const usosPerplexity = pesquisa.usos.filter((uso) => uso.provedor === 'perplexity');
+  const consultasPerplexity = usosPerplexity.length;
+  const concluidasPerplexity = usosPerplexity.filter((uso) => uso.status === 'concluido').length;
+  const perplexityConfigurada = Boolean(
+    configuracao.perplexity || (configuracao.gateway && configuracao.gatewayPerplexityAtiva),
+  );
 
   return {
     leads,
@@ -389,7 +408,7 @@ export async function prospectarEmpresas(
             : sitesConfirmados > 0
               ? 'parcial'
               : 'falhou',
-      perplexity: !pesquisaConfigurada
+      perplexity: !perplexityConfigurada
         ? 'nao_configurado'
         : consultasPerplexity === 0 || concluidasPerplexity === consultasPerplexity
           ? 'concluido'

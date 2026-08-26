@@ -90,7 +90,7 @@ export async function buscarApify(
   const ator = encodeURIComponent(actorId.replace('/', '~'));
   const autenticacao = { Authorization: `Bearer ${token}` };
   const parametrosExecucao = new URLSearchParams({
-    waitForFinish: '18',
+    waitForFinish: '8',
     maxTotalChargeUsd: '1.00',
   });
   const resposta = await fetch(`https://api.apify.com/v2/acts/${ator}/runs?${parametrosExecucao}`, {
@@ -109,7 +109,7 @@ export async function buscarApify(
       verifyLeadsEnrichmentEmails: false,
     }),
     cache: 'no-store',
-    signal: AbortSignal.timeout(24_000),
+    signal: AbortSignal.timeout(14_000),
   });
   const json = (await jsonDaResposta(resposta)) as { data?: Registro };
   let execucao = json.data;
@@ -135,8 +135,8 @@ export async function buscarApify(
   let aindaExecutando = ['READY', 'RUNNING'].includes(status);
   if (!itens.length && aindaExecutando) {
     const espera = await fetch(
-      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=5`,
-      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(8_000) },
+      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(id)}?waitForFinish=2`,
+      { headers: autenticacao, cache: 'no-store', signal: AbortSignal.timeout(4_000) },
     );
     const finalizada = (await jsonDaResposta(espera)) as { data?: Registro };
     execucao = finalizada.data ?? execucao;

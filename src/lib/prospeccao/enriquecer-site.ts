@@ -125,9 +125,12 @@ export async function enriquecerSite(
   }
   try {
     const inicial = await rasparPagina(lead.site_url, configuracao);
+    const contatosIniciais = contatosDoSite(inicial.markdown, inicial.links);
+    const precisaAprofundar =
+      contatosIniciais.emails.length === 0 || contatosIniciais.redes.length === 0;
     const complementares = await mapearComLimite(
-      paginasDeContato(lead.site_url, inicial.links),
-      2,
+      precisaAprofundar ? paginasDeContato(lead.site_url, inicial.links).slice(0, 1) : [],
+      1,
       (url) => rasparPagina(url, configuracao),
     );
     const paginas = [inicial, ...complementares];

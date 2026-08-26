@@ -207,7 +207,7 @@ describe('provedores da prospecção', () => {
     expect(resultado.provedores.firecrawl).toBe('concluido');
   });
 
-  it('pesquisa possíveis decisores sem inventar contato', async () => {
+  it('identifica possível decisor com fonte sem inventar e-mail ou telefone', async () => {
     vi.mocked(prospeccaoEnv).mockReturnValue({
       pronto: true,
       apifyToken: 'token-apify-valido',
@@ -256,7 +256,18 @@ describe('provedores da prospecção', () => {
 
     const resultado = await prospectarEmpresas(busca);
 
-    expect(resultado.leads[0]?.decisores).toEqual([]);
+    expect(resultado.leads[0]?.decisores).toEqual([
+      {
+        nome: 'Ana Aurora',
+        cargo: 'Fundadora',
+        senioridade: null,
+        linkedin_url: 'https://linkedin.com/in/ana-aurora',
+        localizacao: null,
+        email: null,
+        telefone: null,
+        fonte: 'Pesquisa pública · LinkedIn',
+      },
+    ]);
     expect(resultado.leads[0]?.dados.pesquisa_decisores).toEqual([
       {
         titulo: 'Ana Aurora - Fundadora da Clínica Aurora',
