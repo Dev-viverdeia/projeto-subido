@@ -16,7 +16,7 @@ export type EtapaCicloCliente = {
 };
 
 export type DecisaoCicloCliente = {
-  tipo: 'navegacao' | 'encerrado' | 'novo-ciclo';
+  tipo: 'navegacao' | 'enriquecer' | 'encerrado' | 'novo-ciclo';
   rotulo: string;
   titulo: string;
   href: string | null;
@@ -62,8 +62,10 @@ export function montarCicloCliente(lead: DossieLead): {
   const entregaIniciada = Boolean(lead.projetoAtivo || proposta?.status === 'aceita');
   const propostaAprovada = proposta?.status === 'aceita';
   const encerrada = lead.oportunidade.etapa === 'perdido' || proposta?.status === 'recusada';
+  const preparacaoPendente =
+    !contextoEnriquecido && !proximaCall && !descobertaConcluida && !proposta && !encerrada;
 
-  let indiceAtual = 1;
+  let indiceAtual = preparacaoPendente ? 0 : 1;
   if (concluido) indiceAtual = 4;
   else if (entregaIniciada || lead.oportunidade.etapa === 'ganho') indiceAtual = 3;
   else if (descobertaConcluida) indiceAtual = 2;
@@ -81,7 +83,11 @@ export function montarCicloCliente(lead: DossieLead): {
       rotulo: 'Preparar',
       descricao: 'Empresa, contato e contexto',
       estado: estadoDaEtapa(0, indiceAtual, encerrada),
-      evidencia: contextoEnriquecido ? 'Dados enriquecidos' : 'Ficha criada',
+      evidencia: contextoEnriquecido
+        ? 'Dados enriquecidos'
+        : preparacaoPendente
+          ? 'Enriquecimento recomendado'
+          : 'Ficha criada',
       href: `/vendas/${lead.oportunidade.id}`,
     },
     {
@@ -254,17 +260,42 @@ export function montarCicloCliente(lead: DossieLead): {
       };
     }
 
+    const parametrosProposta = new URLSearchParams({
+      oportunidade: lead.oportunidade.id,
+      reuniao: descobertaConcluida.id,
+    });
+    if (lead.empresa.projetoSugeridoSlug) {
+      parametrosProposta.set('projeto', lead.empresa.projetoSugeridoSlug);
+    }
+
     return {
       etapas,
       decisao: {
         tipo: 'navegacao',
         rotulo: 'Descoberta concluída',
         titulo: 'Use o que foi confirmado na reunião para montar a proposta.',
-        href: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${descobertaConcluida.id}`,
+        href: `/propostas/nova?${parametrosProposta.toString()}`,
         acao: 'Montar proposta',
         prazo: lead.oportunidade.proximaAcaoEm,
         apoioHref: destinoDaCall(descobertaConcluida),
         apoioRotulo: 'Revisar descoberta',
+      },
+    };
+  }
+
+  if (!contextoEnriquecido && !proposta) {
+    return {
+      etapas,
+      decisao: {
+        tipo: 'enriquecer',
+        rotulo: 'Antes da primeira conversa',
+        titulo:
+          'Enriqueça a ficha para receber contexto, perguntas de descoberta e projetos para explorar.',
+        href: null,
+        acao: 'Enriquecer dados',
+        prazo: null,
+        apoioHref: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
+        apoioRotulo: 'Agendar sem enriquecer',
       },
     };
   }

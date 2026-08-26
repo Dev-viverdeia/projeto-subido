@@ -7,6 +7,7 @@ import type { Tables } from '@/lib/supabase/types.generated';
 import { lerDossie, lerFontes, type StatusEnriquecimento } from './enriquecimento';
 import type { DossieLead, ProjetoDossie } from './dossie-types';
 import type { EtapaCrm } from './etapas';
+import { projetoSugeridoDaProspeccao } from './projeto-sugerido';
 
 export type {
   AcaoPlanoDossie,
@@ -265,7 +266,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
-      .select('id, nome, dominio, setor, porte, cidade, estado, enriquecido_em')
+      .select('id, nome, dominio, setor, porte, cidade, estado, enriquecido_em, enriquecimento')
       .eq('id', linha.empresa_id)
       .single(),
     linha.contato_principal_id
@@ -385,6 +386,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       porte: empresaLinha.porte,
       cidade: empresaLinha.cidade,
       estado: empresaLinha.estado,
+      projetoSugeridoSlug: projetoSugeridoDaProspeccao(empresaLinha.enriquecimento),
     },
     contato: contato.data
       ? {

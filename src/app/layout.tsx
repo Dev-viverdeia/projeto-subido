@@ -12,7 +12,7 @@ import './globals.css';
  * atributo em vez de um re-vendor. ThemeProvider/useTheme continuam proibidos.
  */
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     default: 'Subido — operação do profissional de IA',
     template: '%s · Subido',

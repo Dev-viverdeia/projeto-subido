@@ -74,6 +74,7 @@ export type DossieLead = {
     porte: string | null;
     cidade: string | null;
     estado: string | null;
+    projetoSugeridoSlug?: string | null;
   };
   contato: {
     nome: string;
