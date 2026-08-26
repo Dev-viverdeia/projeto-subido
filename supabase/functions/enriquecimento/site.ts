@@ -68,7 +68,11 @@ export async function lerPaginaPublica(urlInicial: URL): Promise<PaginaPublica> 
 
     const html = (await resposta.text()).slice(0, LIMITE_BYTES);
     const titulo = extrairTitulo(html) ?? atual.hostname;
-    const texto = limparHtml(html).slice(0, 45_000);
+    // O dossiê precisa de posicionamento, serviços e sinais operacionais — não
+    // de uma cópia integral da página. O teto antigo de 45 kB tornava o prompt
+    // três vezes maior sem melhorar a decisão e fazia o modelo exceder o tempo
+    // do processamento em segundo plano.
+    const texto = limparHtml(html).slice(0, 14_000);
     if (texto.length < 80) throw new Error('site_sem_conteudo');
 
     return { titulo, url: atual.toString(), texto };
