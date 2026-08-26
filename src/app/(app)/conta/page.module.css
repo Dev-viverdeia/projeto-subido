@@ -305,7 +305,6 @@
   gap: var(--via-space-4);
 }
 
-.economia article,
 .economia > a {
   min-width: 0;
   display: grid;
@@ -317,10 +316,6 @@
   background: color-mix(in srgb, var(--app-elev-2-bg) 90%, transparent);
   box-shadow: var(--app-elev-2-shadow);
   backdrop-filter: blur(18px) saturate(130%);
-}
-
-.economia article {
-  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .economia > a {
@@ -400,7 +395,6 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .economia article,
   .economia > a {
     background: var(--via-surface);
   }

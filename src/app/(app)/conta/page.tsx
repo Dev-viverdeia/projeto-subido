@@ -142,7 +142,7 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
           </div>
           <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
         </Link>
-        <article>
+        <Link href="/conta/assinatura" className={styles.cartaoEconomia}>
           <span className={styles.iconeEconomia} aria-hidden="true">
             <Layers3 size={20} strokeWidth={1.7} />
           </span>
@@ -151,7 +151,8 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
             <strong>{PLANOS_SUBIDO[plano].nome}</strong>
             <small>{PLANOS_SUBIDO[plano].descricao}</small>
           </div>
-        </article>
+          <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
+        </Link>
       </section>
 
       <PainelAcessoPlano plano={plano} destaque={acessoBloqueado} />

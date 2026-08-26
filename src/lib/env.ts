@@ -164,6 +164,82 @@ export function googleCalendarEnv() {
 }
 
 /**
+ * Stripe Billing e Checkout.
+ *
+ * A integração só aceita pagamentos quando chave e assinatura do webhook formam
+ * um conjunto válido; cada operação ainda exige seu Price ID. Isso evita o pior
+ * estado parcial: cobrar sem receber o webhook que libera acesso e saldo.
+ */
+export function billingEnv() {
+  const base = z
+    .object({
+      STRIPE_SECRET_KEY: z.string().regex(/^(?:rk|sk)_(?:test|live)_[A-Za-z0-9]+$/),
+      STRIPE_WEBHOOK_SECRET: z.string().regex(/^whsec_[A-Za-z0-9]+$/),
+      STRIPE_PORTAL_CONFIGURATION_ID: z
+        .string()
+        .regex(/^bpc_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_PRICE_STARTER_MONTHLY: z
+        .string()
+        .regex(/^price_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_PRICE_PRO_MONTHLY: z
+        .string()
+        .regex(/^price_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_PRICE_CREDITS_ESSENCIAL: z
+        .string()
+        .regex(/^price_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_PRICE_CREDITS_CRESCIMENTO: z
+        .string()
+        .regex(/^price_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_PRICE_CREDITS_ESCALA: z
+        .string()
+        .regex(/^price_[A-Za-z0-9]+$/)
+        .optional(),
+      STRIPE_CREDITOS_STARTER: z.coerce.number().int().min(0).max(100000).default(30),
+      STRIPE_CREDITOS_PRO: z.coerce.number().int().min(0).max(100000).default(100),
+    })
+    .safeParse({
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+      STRIPE_PORTAL_CONFIGURATION_ID: process.env.STRIPE_PORTAL_CONFIGURATION_ID,
+      STRIPE_PRICE_STARTER_MONTHLY: process.env.STRIPE_PRICE_STARTER_MONTHLY,
+      STRIPE_PRICE_PRO_MONTHLY: process.env.STRIPE_PRICE_PRO_MONTHLY,
+      STRIPE_PRICE_CREDITS_ESSENCIAL: process.env.STRIPE_PRICE_CREDITS_ESSENCIAL,
+      STRIPE_PRICE_CREDITS_CRESCIMENTO: process.env.STRIPE_PRICE_CREDITS_CRESCIMENTO,
+      STRIPE_PRICE_CREDITS_ESCALA: process.env.STRIPE_PRICE_CREDITS_ESCALA,
+      STRIPE_CREDITOS_STARTER: process.env.STRIPE_CREDITOS_STARTER,
+      STRIPE_CREDITOS_PRO: process.env.STRIPE_CREDITOS_PRO,
+    });
+
+  if (!base.success) return null;
+
+  return {
+    chave: base.data.STRIPE_SECRET_KEY,
+    webhook: base.data.STRIPE_WEBHOOK_SECRET,
+    portal: base.data.STRIPE_PORTAL_CONFIGURATION_ID ?? null,
+    planos: {
+      starter: {
+        priceId: base.data.STRIPE_PRICE_STARTER_MONTHLY ?? null,
+        creditos: base.data.STRIPE_CREDITOS_STARTER,
+      },
+      pro: {
+        priceId: base.data.STRIPE_PRICE_PRO_MONTHLY ?? null,
+        creditos: base.data.STRIPE_CREDITOS_PRO,
+      },
+    },
+    pacotes: {
+      essencial: base.data.STRIPE_PRICE_CREDITS_ESSENCIAL ?? null,
+      crescimento: base.data.STRIPE_PRICE_CREDITS_CRESCIMENTO ?? null,
+      escala: base.data.STRIPE_PRICE_CREDITS_ESCALA ?? null,
+    },
+  } as const;
+}
+
+/**
  * Provedores privados da Prospecção.
  *
  * SerpAPI é o radar rápido e principal da busca por tipo de empresa e região.
