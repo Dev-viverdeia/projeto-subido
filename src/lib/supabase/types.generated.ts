@@ -2324,6 +2324,65 @@ export type Database = {
           },
         ]
       }
+      prospeccao_custos_provedores: {
+        Row: {
+          cache_hit: boolean
+          criado_em: string
+          creditos_provedor: number
+          custo_usd_micros: number
+          dono: string | null
+          id: string
+          latencia_ms: number | null
+          lista_id: string | null
+          metadados: Json
+          operacao: string
+          provedor: string
+          status: string
+          unidade: string
+          unidades: number
+        }
+        Insert: {
+          cache_hit?: boolean
+          criado_em?: string
+          creditos_provedor?: number
+          custo_usd_micros?: number
+          dono?: string | null
+          id?: string
+          latencia_ms?: number | null
+          lista_id?: string | null
+          metadados?: Json
+          operacao: string
+          provedor: string
+          status?: string
+          unidade: string
+          unidades?: number
+        }
+        Update: {
+          cache_hit?: boolean
+          criado_em?: string
+          creditos_provedor?: number
+          custo_usd_micros?: number
+          dono?: string | null
+          id?: string
+          latencia_ms?: number | null
+          lista_id?: string | null
+          metadados?: Json
+          operacao?: string
+          provedor?: string
+          status?: string
+          unidade?: string
+          unidades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospeccao_custos_provedores_lista_id_fkey"
+            columns: ["lista_id"]
+            isOneToOne: false
+            referencedRelation: "prospeccao_listas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prospeccao_listas: {
         Row: {
           atualizado_em: string

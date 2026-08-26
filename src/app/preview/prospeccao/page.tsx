@@ -52,7 +52,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
         localizacao: 'Belo Horizonte, MG',
         email: null,
         telefone: null,
-        fonte: 'FullEnrich · perfil profissional público',
+        fonte: 'Pesquisa pública · fonte identificada',
       },
     ],
     horarios: [
@@ -67,7 +67,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
     total_avaliacoes: 127,
     descricao:
       'Clínica com atendimento multicanal, agendamento online e presença ativa no WhatsApp.',
-    fontes: ['Google Maps · dados públicos', 'FullEnrich · dados profissionais públicos'],
+    fontes: ['Google Maps · dados públicos', 'Pesquisa pública · Perplexity'],
     qualificacao: {
       completude: 100,
       itens: { telefone: true, email: true, site: true, redes_sociais: true, decisores: true },

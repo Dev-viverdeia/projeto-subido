@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Boxes, CalendarClock, GraduationCap, UsersRound } from 'lucide-react';
+import { Boxes, Calculator, CalendarClock, GraduationCap, UsersRound } from 'lucide-react';
 import { Card } from '@/design-system/via';
 // eslint-disable-next-line no-restricted-imports -- Server Component dentro do layout administrativo
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -56,6 +56,14 @@ export default async function AdminPage() {
       detalhe: 'contas cadastradas',
     },
     {
+      href: '/admin/custos',
+      icone: <Calculator size={18} strokeWidth={1.8} />,
+      titulo: 'Custos e margem',
+      total: null,
+      publicadas: null,
+      detalhe: 'calculadora da operação',
+    },
+    {
       href: '/admin/solucoes',
       icone: <Boxes size={18} strokeWidth={1.8} />,
       titulo: 'Soluções',
@@ -93,7 +101,7 @@ export default async function AdminPage() {
                 {c.icone}
               </span>
               <span className={styles.titulo}>{c.titulo}</span>
-              <span className={styles.numero}>{c.total}</span>
+              {c.total !== null ? <span className={styles.numero}>{c.total}</span> : null}
               <span className={styles.detalhe}>
                 {c.detalhe ?? `${c.publicadas} ${c.publicadas === 1 ? 'publicada' : 'publicadas'}`}
               </span>

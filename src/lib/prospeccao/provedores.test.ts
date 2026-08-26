@@ -42,9 +42,8 @@ describe('provedores da prospecção', () => {
       apifyActor: 'compass/crawler-google-places',
       serpApi: null,
       firecrawl: null,
-      fullEnrich: null,
-      fullEnrichWebhook: null,
-      hunter: null,
+      perplexity: null,
+      gateway: null,
     });
   });
 
@@ -103,9 +102,8 @@ describe('provedores da prospecção', () => {
     expect(resultado.provedores).toEqual({
       apify: 'concluido',
       serpapi: 'nao_configurado',
-      fullenrich_busca: 'nao_configurado',
       firecrawl: 'nao_configurado',
-      fullenrich: 'nao_configurado',
+      perplexity: 'nao_configurado',
       inteligencia: 'regras',
     });
 
@@ -147,9 +145,8 @@ describe('provedores da prospecção', () => {
       apifyActor: 'compass/crawler-google-places',
       serpApi: null,
       firecrawl: 'token-firecrawl-valido',
-      fullEnrich: null,
-      fullEnrichWebhook: null,
-      hunter: null,
+      perplexity: null,
+      gateway: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -208,16 +205,15 @@ describe('provedores da prospecção', () => {
     expect(resultado.provedores.firecrawl).toBe('concluido');
   });
 
-  it('associa possíveis decisores profissionais e recalcula a completude', async () => {
+  it('pesquisa possíveis decisores sem inventar contato', async () => {
     vi.mocked(prospeccaoEnv).mockReturnValue({
       pronto: true,
       apifyToken: 'token-apify-valido',
       apifyActor: 'compass/crawler-google-places',
       serpApi: null,
       firecrawl: null,
-      fullEnrich: 'token-fullenrich-valido',
-      fullEnrichWebhook: null,
-      hunter: null,
+      perplexity: 'token-perplexity-valido',
+      gateway: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -235,29 +231,15 @@ describe('provedores da prospecção', () => {
           ]),
         );
       }
-      if (String(url).includes('fullenrich.com')) {
+      if (String(url).includes('perplexity.ai/search')) {
         return Promise.resolve(
           new Response(
             JSON.stringify({
-              people: [
+              results: [
                 {
-                  full_name: 'Ana Aurora',
-                  headline: 'Fundadora',
-                  location: { city: 'Belo Horizonte', region: 'MG', country: 'Brasil' },
-                  social_profiles: {
-                    professional_network: { url: 'https://linkedin.com/in/ana-aurora' },
-                  },
-                  employment: {
-                    current: {
-                      title: 'Fundadora e diretora',
-                      seniority: 'Founder',
-                      company: {
-                        name: 'Clínica Aurora',
-                        domain: 'clinica-aurora.example.com',
-                        industry: 'Hospitais e saúde',
-                      },
-                    },
-                  },
+                  title: 'Ana Aurora - Fundadora da Clínica Aurora',
+                  url: 'https://linkedin.com/in/ana-aurora',
+                  snippet: 'Ana Aurora é fundadora e diretora da Clínica Aurora em Belo Horizonte.',
                 },
               ],
             }),
@@ -271,22 +253,16 @@ describe('provedores da prospecção', () => {
 
     const resultado = await prospectarEmpresas(busca);
 
-    expect(resultado.leads[0]).toMatchObject({
-      decisores: [
-        {
-          nome: 'Ana Aurora',
-          cargo: 'Fundadora e diretora',
-          senioridade: 'Founder',
-          linkedin_url: 'https://linkedin.com/in/ana-aurora',
-          localizacao: 'Belo Horizonte, MG, Brasil',
-          email: null,
-          telefone: null,
-          fonte: 'FullEnrich · perfil profissional público',
-        },
-      ],
-    });
-    expect(resultado.leads[0]?.qualificacao.completude).toBe(100);
-    expect(resultado.provedores.fullenrich).toBe('concluido');
+    expect(resultado.leads[0]?.decisores).toEqual([]);
+    expect(resultado.leads[0]?.dados.pesquisa_decisores).toEqual([
+      {
+        titulo: 'Ana Aurora - Fundadora da Clínica Aurora',
+        url: 'https://linkedin.com/in/ana-aurora',
+        trecho: 'Ana Aurora é fundadora e diretora da Clínica Aurora em Belo Horizonte.',
+        data: null,
+      },
+    ]);
+    expect(resultado.provedores.perplexity).toBe('concluido');
   });
 
   it('não trata WhatsApp como site nem aceita decisores de outra empresa', async () => {
@@ -296,9 +272,8 @@ describe('provedores da prospecção', () => {
       apifyActor: 'compass/crawler-google-places',
       serpApi: null,
       firecrawl: null,
-      fullEnrich: 'token-fullenrich-valido',
-      fullEnrichWebhook: null,
-      hunter: null,
+      perplexity: 'token-perplexity-valido',
+      gateway: null,
     });
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       if (urlApify(url)) return Promise.resolve(inicioApify());
@@ -315,20 +290,15 @@ describe('provedores da prospecção', () => {
           ]),
         );
       }
-      if (String(url).includes('fullenrich.com')) {
+      if (String(url).includes('perplexity.ai/search')) {
         return Promise.resolve(
           new Response(
             JSON.stringify({
-              people: [
+              results: [
                 {
-                  full_name: 'Executiva da WhatsApp',
-                  employment: {
-                    current: {
-                      title: 'Diretora',
-                      seniority: 'Director',
-                      company: { name: 'WhatsApp', domain: 'whatsapp.com' },
-                    },
-                  },
+                  title: 'Executiva da WhatsApp',
+                  url: 'https://linkedin.com/in/executiva-whatsapp',
+                  snippet: 'Diretora da WhatsApp.',
                 },
               ],
             }),

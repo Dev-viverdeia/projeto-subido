@@ -1,88 +1,24 @@
 import 'server-only';
 
-import { env } from '@/lib/env';
+import { PERPLEXITY_SEARCH_USD_MICROS_POR_REQUISICAO, type UsoProvedorProspeccao } from './custos';
+import { pesquisarComPerplexity, type ConfiguracaoGatewayDados } from './gateway';
+import { texto, urlPublica } from './normalizacao';
 import type { LeadProspeccaoEntrada } from './schema';
-import {
-  comoRegistro,
-  inteiro,
-  jsonDaResposta,
-  qualificar,
-  texto,
-  urlPublica,
-  type Registro,
-} from './normalizacao';
 
-type Decisor = LeadProspeccaoEntrada['decisores'][number];
-const SENIORIDADES = ['Owner', 'Founder', 'C-level', 'Partner', 'VP', 'Head', 'Director'];
-const PRIORIDADES = new Map(SENIORIDADES.map((item, indice) => [item.toLowerCase(), indice]));
-const DOMINIOS_SOCIAIS = new Set([
-  'facebook.com',
-  'instagram.com',
-  'linkedin.com',
-  'linktr.ee',
-  'tiktok.com',
-  'youtube.com',
-]);
+type ConfiguracaoPesquisa = {
+  firecrawl: string | null;
+  perplexity: string | null;
+  gateway: ConfiguracaoGatewayDados;
+};
 
-function primeiroTexto(...valores: unknown[]) {
-  for (const valor of valores) {
-    const direto = texto(valor);
-    if (direto) return direto;
-    if (Array.isArray(valor)) {
-      for (const item of valor) {
-        const registro = comoRegistro(item);
-        const encontrado = texto(registro?.email) ?? texto(registro?.number) ?? texto(item);
-        if (encontrado) return encontrado;
-      }
-    }
-  }
-  return null;
-}
+type FontePesquisa = {
+  titulo: string;
+  url: string;
+  trecho: string | null;
+  data: string | null;
+};
 
-function decisorDaPessoa(valor: unknown): { decisor: Decisor; empresa: Registro | null } | null {
-  const pessoa = comoRegistro(valor);
-  const emprego = comoRegistro(comoRegistro(pessoa?.employment)?.current);
-  const empresa = comoRegistro(emprego?.company);
-  const perfil = comoRegistro(comoRegistro(pessoa?.social_profiles)?.professional_network);
-  const contato = comoRegistro(pessoa?.contact_info);
-  const emailProvavel = comoRegistro(contato?.most_probable_work_email);
-  const telefoneProvavel = comoRegistro(contato?.most_probable_phone);
-  const localizacao = comoRegistro(pessoa?.location);
-  const nome = texto(pessoa?.full_name);
-  if (!nome) return null;
-  return {
-    decisor: {
-      nome,
-      cargo: texto(emprego?.title) ?? texto(pessoa?.headline),
-      senioridade: texto(emprego?.seniority),
-      linkedin_url: urlPublica(perfil?.url),
-      localizacao:
-        [texto(localizacao?.city), texto(localizacao?.region), texto(localizacao?.country)]
-          .filter(Boolean)
-          .join(', ') || null,
-      email: primeiroTexto(
-        emailProvavel?.email,
-        pessoa?.work_email,
-        pessoa?.email,
-        contato?.work_emails,
-      ),
-      telefone: primeiroTexto(
-        telefoneProvavel?.number,
-        pessoa?.phone,
-        pessoa?.mobile_phone,
-        contato?.phones,
-      ),
-      fonte: 'FullEnrich · perfil profissional público',
-    },
-    empresa,
-  };
-}
-
-function prioridade(decisor: Decisor) {
-  return PRIORIDADES.get(decisor.senioridade?.toLowerCase() ?? '') ?? SENIORIDADES.length;
-}
-
-function normalizarNome(valor: string | null | undefined) {
+function normalizar(valor: string | null | undefined) {
   return (valor ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -93,195 +29,93 @@ function normalizarNome(valor: string | null | undefined) {
     .trim();
 }
 
-function dominioDaEmpresa(empresa: Registro | null) {
-  const recebido =
-    texto(empresa?.domain) ??
-    texto(empresa?.company_domain) ??
-    texto(empresa?.website) ??
-    texto(empresa?.website_url);
-  if (!recebido) return null;
-  try {
-    const url = new URL(recebido.startsWith('http') ? recebido : `https://${recebido}`);
-    return url.hostname.replace(/^www\./, '').toLocaleLowerCase('pt-BR');
-  } catch {
-    return (
-      recebido
-        .replace(/^www\./, '')
-        .toLocaleLowerCase('pt-BR')
-        .split('/')[0] ?? null
-    );
-  }
+function termosDaEmpresa(nome: string) {
+  return normalizar(nome)
+    .split(' ')
+    .filter((termo) => termo.length >= 4)
+    .slice(0, 4);
 }
 
-function vinculoCompativel(encontrado: { empresa: Registro | null }, lead: LeadProspeccaoEntrada) {
-  const dominioLead = lead.dominio?.replace(/^www\./, '').toLocaleLowerCase('pt-BR') ?? null;
-  const dominioEmpresa = dominioDaEmpresa(encontrado.empresa);
-  if (
-    dominioLead &&
-    dominioEmpresa &&
-    (dominioLead === dominioEmpresa ||
-      dominioLead.endsWith(`.${dominioEmpresa}`) ||
-      dominioEmpresa.endsWith(`.${dominioLead}`))
-  ) {
-    return true;
-  }
-
-  const nomeLead = normalizarNome(lead.nome);
-  const nomeEmpresa = normalizarNome(
-    texto(encontrado.empresa?.name) ?? texto(encontrado.empresa?.company_name),
-  );
-  if (!nomeLead || !nomeEmpresa || Math.min(nomeLead.length, nomeEmpresa.length) < 4) return false;
-  return nomeLead.includes(nomeEmpresa) || nomeEmpresa.includes(nomeLead);
+function fonteRelacionada(fonte: FontePesquisa, lead: LeadProspeccaoEntrada) {
+  const base = normalizar(`${fonte.titulo} ${fonte.trecho ?? ''}`);
+  const termos = termosDaEmpresa(lead.nome);
+  return termos.length > 0 && termos.some((termo) => base.includes(termo));
 }
 
-export async function buscarDecisores(
-  lead: LeadProspeccaoEntrada,
-  chave: string,
-): Promise<{ lead: LeadProspeccaoEntrada; sucesso: boolean; consultado: boolean }> {
-  const dominio = lead.dominio?.replace(/^www\./, '').toLowerCase() ?? null;
-  const filtroEmpresa =
-    dominio && !DOMINIOS_SOCIAIS.has(dominio)
-      ? { current_company_domains: [{ value: dominio, exact_match: true, exclude: false }] }
-      : { current_company_names: [{ value: lead.nome, exact_match: true, exclude: false }] };
+function consultaPara(lead: LeadProspeccaoEntrada) {
+  const localizacao = [lead.cidade, lead.estado].filter(Boolean).join(', ');
+  return `"${lead.nome}" ${localizacao} fundador sócio proprietário diretor gerente responsável LinkedIn equipe`;
+}
 
-  try {
-    const resposta = await fetch('https://app.fullenrich.com/api/v2/people/search', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: 5,
-        ...filtroEmpresa,
-        current_position_seniority_level: SENIORIDADES.map((value) => ({
-          value,
-          exact_match: true,
-          exclude: false,
-        })),
-      }),
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15_000),
-    });
-    const json = (await jsonDaResposta(resposta)) as Registro;
-    const pessoas = Array.isArray(json.people) ? json.people : [];
-    const encontrados = pessoas
-      .map(decisorDaPessoa)
-      .filter((item): item is NonNullable<ReturnType<typeof decisorDaPessoa>> => Boolean(item))
-      .filter((item) => vinculoCompativel(item, lead))
-      .sort((a, b) => prioridade(a.decisor) - prioridade(b.decisor));
-    const decisores = [...encontrados.map((item) => item.decisor), ...lead.decisores]
-      .filter(
-        (decisor, indice, todos) =>
-          todos.findIndex(
-            (item) =>
-              item.linkedin_url === decisor.linkedin_url ||
-              item.nome.toLocaleLowerCase('pt-BR') === decisor.nome.toLocaleLowerCase('pt-BR'),
-          ) === indice,
-      )
-      .slice(0, 5);
-    const empresa = encontrados[0]?.empresa;
-    const atualizado: LeadProspeccaoEntrada = {
+function lotesDeCinco<T>(itens: T[]) {
+  const lotes: T[][] = [];
+  for (let indice = 0; indice < itens.length; indice += 5) {
+    lotes.push(itens.slice(indice, indice + 5));
+  }
+  return lotes;
+}
+
+export async function pesquisarPossiveisDecisores(
+  leads: LeadProspeccaoEntrada[],
+  configuracao: ConfiguracaoPesquisa,
+): Promise<{ leads: LeadProspeccaoEntrada[]; usos: UsoProvedorProspeccao[] }> {
+  const fontesPorLead = new Map<string, FontePesquisa[]>();
+  const usos: UsoProvedorProspeccao[] = [];
+
+  for (const lote of lotesDeCinco(leads)) {
+    const inicio = Date.now();
+    try {
+      const resultados = await pesquisarComPerplexity(lote.map(consultaPara), configuracao);
+      const fontes = resultados.flatMap((resultado) => {
+        const titulo = texto(resultado.title);
+        const url = urlPublica(resultado.url);
+        if (!titulo || !url) return [];
+        return [
+          {
+            titulo,
+            url,
+            trecho: texto(resultado.snippet),
+            data: texto(resultado.last_updated) ?? texto(resultado.date),
+          } satisfies FontePesquisa,
+        ];
+      });
+      for (const lead of lote) {
+        fontesPorLead.set(
+          lead.chave_externa,
+          fontes.filter((fonte) => fonteRelacionada(fonte, lead)).slice(0, 5),
+        );
+      }
+      usos.push({
+        provedor: 'perplexity',
+        operacao: 'pesquisa_decisores',
+        status: 'concluido',
+        unidades: 1,
+        unidade: 'requisicao',
+        custoUsdMicros: PERPLEXITY_SEARCH_USD_MICROS_POR_REQUISICAO,
+        latenciaMs: Date.now() - inicio,
+        metadados: { empresas: lote.length, resultados: fontes.length },
+      });
+    } catch {
+      usos.push({
+        provedor: 'perplexity',
+        operacao: 'pesquisa_decisores',
+        status: 'falhou',
+        unidades: 0,
+        unidade: 'requisicao',
+        latenciaMs: Date.now() - inicio,
+        metadados: { empresas: lote.length },
+      });
+    }
+  }
+
+  return {
+    usos,
+    leads: leads.map((lead) => ({
       ...lead,
-      decisores,
-      fontes: decisores.length
-        ? [...new Set([...lead.fontes, 'FullEnrich · dados profissionais públicos'])]
-        : lead.fontes,
       dados: {
         ...lead.dados,
-        empresa_profissional: empresa
-          ? {
-              setor: texto(empresa.industry),
-              porte: empresa.headcount_range ?? empresa.headcount ?? null,
-              ano_fundacao: inteiro(empresa.year_founded),
-              descricao: texto(empresa.description),
-            }
-          : null,
+        pesquisa_decisores: fontesPorLead.get(lead.chave_externa) ?? [],
       },
-      qualificacao: lead.qualificacao,
-    };
-    return {
-      lead: { ...atualizado, qualificacao: qualificar(atualizado) },
-      sucesso: true,
-      consultado: true,
-    };
-  } catch {
-    return { lead, sucesso: false, consultado: true };
-  }
-}
-
-function nomeSeparado(nome: string) {
-  const partes = nome.trim().split(/\s+/);
-  return {
-    primeiro: partes[0] ?? nome,
-    ultimo: partes.slice(1).join(' ') || partes[0] || nome,
+    })),
   };
-}
-
-export async function iniciarEnriquecimentoDeContatos({
-  leads,
-  chave,
-  segredo,
-  dono,
-  lista,
-}: {
-  leads: LeadProspeccaoEntrada[];
-  chave: string;
-  segredo: string;
-  dono: string;
-  lista: string;
-}): Promise<{ leads: LeadProspeccaoEntrada[]; iniciado: boolean }> {
-  const dados = leads.flatMap((lead) => {
-    const decisor = lead.decisores[0];
-    if (!decisor || (!decisor.linkedin_url && !lead.dominio)) return [];
-    const nome = nomeSeparado(decisor.nome);
-    return [
-      {
-        first_name: nome.primeiro,
-        last_name: nome.ultimo,
-        domain: lead.dominio ?? undefined,
-        company_name: lead.nome,
-        linkedin_url: decisor.linkedin_url ?? undefined,
-        enrich_fields: ['contact.work_emails', 'contact.phones'],
-        custom: {
-          dono,
-          lista,
-          chave: lead.chave_externa,
-        },
-      },
-    ];
-  });
-  if (!dados.length) return { leads, iniciado: false };
-
-  try {
-    const webhook = new URL('/functions/v1/prospeccao-fullenrich', env.NEXT_PUBLIC_SUPABASE_URL);
-    webhook.searchParams.set('segredo', segredo);
-    const resposta = await fetch(
-      'https://app.fullenrich.com/api/v2/contact/enrich/bulk?silentFail=true',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `Subido · ${lista}`,
-          webhook_url: webhook.toString(),
-          data: dados,
-        }),
-        cache: 'no-store',
-        signal: AbortSignal.timeout(15_000),
-      },
-    );
-    const json = (await jsonDaResposta(resposta)) as Registro;
-    const id = texto(json.enrichment_id);
-    if (!id) return { leads, iniciado: false };
-
-    return {
-      iniciado: true,
-      leads: leads.map((lead) => ({
-        ...lead,
-        dados: {
-          ...lead.dados,
-          fullenrich_contatos: { status: 'processando', id },
-        },
-      })),
-    };
-  } catch {
-    return { leads, iniciado: false };
-  }
 }

@@ -165,32 +165,33 @@ export function googleCalendarEnv() {
 export function prospeccaoEnv() {
   const dados = {
     FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
+    PERPLEXITY_API_KEY: process.env.PERPLEXITY_API_KEY,
     APIFY_TOKEN: process.env.APIFY_TOKEN,
     APIFY_PROSPECCAO_ACTOR_ID:
       process.env.APIFY_PROSPECCAO_ACTOR_ID || 'compass/crawler-google-places',
     SERPAPI_API_KEY: process.env.SERPAPI_API_KEY,
-    FULLENRICH_API_KEY: process.env.FULLENRICH_API_KEY,
-    FULLENRICH_WEBHOOK_SECRET: process.env.FULLENRICH_WEBHOOK_SECRET,
-    HUNTER_API_KEY: process.env.HUNTER_API_KEY,
+    VIA_DATA_GATEWAY_URL: process.env.VIA_DATA_GATEWAY_URL,
+    VIA_DATA_GATEWAY_SECRET: process.env.VIA_DATA_GATEWAY_SECRET,
   };
 
   const firecrawl = z.string().min(10).safeParse(dados.FIRECRAWL_API_KEY);
+  const perplexity = z.string().min(10).safeParse(dados.PERPLEXITY_API_KEY);
   const apifyToken = z.string().min(10).safeParse(dados.APIFY_TOKEN);
   const apifyActor = z.string().min(3).safeParse(dados.APIFY_PROSPECCAO_ACTOR_ID);
   const serpApi = z.string().min(10).safeParse(dados.SERPAPI_API_KEY);
-  const fullEnrich = z.string().min(10).safeParse(dados.FULLENRICH_API_KEY);
-  const fullEnrichWebhook = z.string().min(32).safeParse(dados.FULLENRICH_WEBHOOK_SECRET);
-  const hunter = z.string().min(10).safeParse(dados.HUNTER_API_KEY);
+  const gateway = z.object({ url: z.url(), segredo: z.string().min(32) }).safeParse({
+    url: dados.VIA_DATA_GATEWAY_URL,
+    segredo: dados.VIA_DATA_GATEWAY_SECRET,
+  });
 
   return {
-    pronto: (apifyToken.success && apifyActor.success) || serpApi.success || fullEnrich.success,
+    pronto: (apifyToken.success && apifyActor.success) || serpApi.success,
     firecrawl: firecrawl.success ? firecrawl.data : null,
+    perplexity: perplexity.success ? perplexity.data : null,
     apifyToken: apifyToken.success ? apifyToken.data : null,
     apifyActor: apifyActor.success ? apifyActor.data : null,
     serpApi: serpApi.success ? serpApi.data : null,
-    fullEnrich: fullEnrich.success ? fullEnrich.data : null,
-    fullEnrichWebhook: fullEnrichWebhook.success ? fullEnrichWebhook.data : null,
-    hunter: hunter.success ? hunter.data : null,
+    gateway: gateway.success ? gateway.data : null,
   };
 }
 
