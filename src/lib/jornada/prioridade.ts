@@ -36,7 +36,7 @@ function dominioDoPasso(passo: PassoJornada): DominioRadarSobral | null {
   if (passo.destino === '/vendas') return 'crm';
   if (passo.destino === '/reunioes') return 'calls';
   if (passo.destino === '/propostas') return 'propostas';
-  if (passo.destino === '/solucoes' || passo.destino.startsWith('/solucoes/execucao/')) {
+  if (passo.destino === '/solucoes' || passo.destino.startsWith('/entregas/')) {
     return 'projetos';
   }
   return null;

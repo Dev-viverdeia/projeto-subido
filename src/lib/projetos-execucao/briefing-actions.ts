@@ -104,7 +104,7 @@ export async function salvarBriefingKickoff(
     return { erro: 'Não foi possível salvar o acordo operacional agora.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${leitura.data.projeto}`);
+  revalidatePath(`/entregas/${leitura.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
   revalidarDirecaoOperacional();
   return leitura.data.operacao === 'confirmar'

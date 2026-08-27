@@ -47,7 +47,7 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
         ? 'Objetivo, responsáveis, acessos e limites estão prontos para sua revisão no projeto.'
         : 'A conversa continua na execução, junto do escopo, das ações e das evidências do cliente.',
       acao: 'Abrir projeto',
-      href: `/solucoes/execucao/${projeto.id}${temBriefing ? '#briefing-kickoff' : ''}`,
+      href: `/entregas/${projeto.id}${temBriefing ? '#briefing-kickoff' : ''}`,
     };
   }
 

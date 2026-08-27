@@ -38,7 +38,7 @@ export function RotaComercialProjeto({
   const atual = passoAtual(oportunidade);
 
   const destinoPrincipal = oportunidade?.execucao
-    ? `/solucoes/execucao/${oportunidade.execucao.id}`
+    ? `/entregas/${oportunidade.execucao.id}`
     : oportunidade?.proposta && oportunidade.proposta.status !== 'recusada'
       ? `/propostas/${oportunidade.proposta.id}`
       : oportunidade

@@ -269,15 +269,15 @@ export async function mudarStatusProposta(
         `[propostas:iniciar-projeto] ${erroProjeto?.code ?? 'sem-dados'}: ${erroProjeto?.message ?? ''}`,
       );
       return {
-        sucesso: 'Venda confirmada. Abra o projeto ativo pelo botão abaixo.',
+        sucesso: 'Venda confirmada. Abra a entrega pelo botão abaixo.',
         versao: data.versao,
         status: data.status,
         compartilhamentoCodigo: data.compartilhamento_codigo,
       };
     }
 
-    revalidatePath('/solucoes');
-    redirect(`/solucoes/execucao/${projetoId}`);
+    revalidatePath('/entregas');
+    redirect(`/entregas/${projetoId}`);
   }
 
   return {

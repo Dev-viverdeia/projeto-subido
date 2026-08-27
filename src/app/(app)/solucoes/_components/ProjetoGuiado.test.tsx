@@ -378,7 +378,7 @@ describe('Projeto guiado', () => {
     expect(screen.getByText('Em execução')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Abrir entrega' })).toHaveAttribute(
       'href',
-      '/solucoes/execucao/33333333-3333-4333-8333-333333333333',
+      '/entregas/33333333-3333-4333-8333-333333333333',
     );
   });
 

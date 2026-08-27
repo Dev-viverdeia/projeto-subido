@@ -220,7 +220,7 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
       momento: info.momento,
       estado: info.estado,
       destino: projeto
-        ? `/solucoes/execucao/${projeto.id}`
+        ? `/entregas/${projeto.id}`
         : acao.reuniao_id
           ? `/reunioes/${acao.reuniao_id}`
           : `/vendas/${acao.oportunidade_id}`,
@@ -239,7 +239,7 @@ export function montarRadarSobral(entrada: EntradaRadarSobral): ItemRadarSobral[
         contexto: `${projeto.titulo} · ${ROTULO_STATUS_PROJETO[projeto.status]}`,
         momento: 'Plano sem próxima ação',
         estado: 'sem_prazo',
-        destino: `/solucoes/execucao/${projeto.id}`,
+        destino: `/entregas/${projeto.id}`,
         prioridade: 74,
       });
     }

@@ -106,7 +106,7 @@ function criarEtapas(sinais: SinaisJornada): DefinicaoEtapa[] {
     (sinais.entregas.tarefasTotal > 0 &&
       sinais.entregas.tarefasConcluidas === sinais.entregas.tarefasTotal);
   const destinoDaEntrega = sinais.entregas.projetoEmFocoId
-    ? `/solucoes/execucao/${sinais.entregas.projetoEmFocoId}`
+    ? `/entregas/${sinais.entregas.projetoEmFocoId}`
     : sinais.entregas.propostaAceitaEmFocoId
       ? `/propostas/${sinais.entregas.propostaAceitaEmFocoId}`
       : '/propostas';

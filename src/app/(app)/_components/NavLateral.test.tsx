@@ -38,6 +38,7 @@ describe('NavLateral no mobile', () => {
 
     expect(screen.getByRole('dialog', { name: 'Navegação' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Propostas' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entregas' })).toHaveAttribute('href', '/entregas');
     expect(screen.getByRole('link', { name: 'Métricas' })).toHaveAttribute('href', '/metricas');
     expect(screen.getAllByRole('link', { name: 'Prospecção' })).toHaveLength(2);
     expect(screen.queryByRole('link', { name: 'Diagnósticos' })).not.toBeInTheDocument();
@@ -91,6 +92,7 @@ describe('NavLateral no desktop', () => {
       '/conta/assinatura?upgrade=vendas&origem=%2Fvendas',
     );
     expect(screen.getByRole('link', { name: 'Reuniões' })).toHaveAttribute('href', '/reunioes');
+    expect(screen.getByRole('link', { name: 'Entregas' })).toHaveAttribute('href', '/entregas');
     expect(screen.getAllByText('Pro')).toHaveLength(4);
   });
 

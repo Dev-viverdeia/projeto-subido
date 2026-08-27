@@ -28,12 +28,14 @@ describe('permissões dos planos', () => {
     expect(planoPodeAcessarRota('starter', '/propostas')).toBe(false);
     expect(planoPodeAcessarRota('starter', '/builder')).toBe(false);
     expect(planoPodeAcessarRota('starter', '/reunioes')).toBe(true);
+    expect(planoPodeAcessarRota('starter', '/entregas/cliente')).toBe(true);
   });
 
   it('mapeia cada rota para a permissão específica', () => {
     expect(recursoDaRota('/prospeccao/lista')).toBe('prospeccao');
     expect(recursoDaRota('/crm/cliente')).toBe('vendas');
     expect(recursoDaRota('/builder')).toBe('estudio');
+    expect(recursoDaRota('/entregas/cliente')).toBe('projetos');
     expect(recursoDaRota('/inicio')).toBeNull();
     expect(nomeDaAreaBloqueada('/builder')).toBe('Estúdio');
     expect(destinoDeUpgrade('estudio', '/builder')).toBe(

@@ -44,6 +44,7 @@ export const config = {
     '/metricas/:path*',
     '/propostas/:path*',
     '/reunioes/:path*',
+    '/entregas/:path*',
     '/solucoes/:path*',
     '/formacoes/:path*',
     '/builder/:path*',

@@ -22,7 +22,7 @@ export function AcaoEntrega({
 
   if (execucaoId) {
     return (
-      <Link href={`/solucoes/execucao/${execucaoId}`} className={styles.abrir}>
+      <Link href={`/entregas/${execucaoId}`} className={styles.abrir}>
         <FolderKanban size={16} aria-hidden="true" /> Continuar projeto
         <ArrowUpRight size={15} aria-hidden="true" />
       </Link>

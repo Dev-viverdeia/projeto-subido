@@ -45,8 +45,8 @@ export async function atualizarAcaoPlano(
     return { erro: 'Não foi possível atualizar o plano agora.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
-  revalidatePath('/solucoes');
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
+  revalidatePath('/entregas');
   revalidarDirecaoOperacional();
   return {
     sucesso:

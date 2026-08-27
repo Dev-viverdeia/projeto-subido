@@ -128,7 +128,7 @@ export function montarCicloCliente(lead: DossieLead): {
           ? 'Projeto pronto para iniciar'
           : 'Aguardando a venda',
       href: projeto
-        ? `/solucoes/execucao/${projeto.id}`
+        ? `/entregas/${projeto.id}`
         : propostaAprovada && proposta
           ? `/propostas/${proposta.id}`
           : null,
@@ -140,7 +140,7 @@ export function montarCicloCliente(lead: DossieLead): {
       descricao: 'Aceite, resultado e próximo ciclo',
       estado: estadoDaEtapa(4, indiceAtual, encerrada),
       evidencia: concluido ? 'Entrega comprovada' : 'Ainda não concluída',
-      href: concluido && projeto ? `/solucoes/execucao/${projeto.id}` : null,
+      href: concluido && projeto ? `/entregas/${projeto.id}` : null,
     },
   ];
 
@@ -186,7 +186,7 @@ export function montarCicloCliente(lead: DossieLead): {
         tipo: 'navegacao',
         rotulo: 'Entrega em andamento',
         titulo: `Continuar ${lead.projetoAtivo.titulo}`,
-        href: `/solucoes/execucao/${lead.projetoAtivo.id}`,
+        href: `/entregas/${lead.projetoAtivo.id}`,
         acao: 'Continuar entrega',
         prazo: null,
         apoioHref: proposta ? `/propostas/${proposta.id}` : null,
@@ -205,7 +205,7 @@ export function montarCicloCliente(lead: DossieLead): {
         href: null,
         acao: null,
         prazo: null,
-        apoioHref: `/solucoes/execucao/${projeto.id}`,
+        apoioHref: `/entregas/${projeto.id}`,
         apoioRotulo: 'Revisar entrega',
       },
     };

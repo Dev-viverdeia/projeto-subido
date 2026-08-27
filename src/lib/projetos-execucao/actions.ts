@@ -94,15 +94,15 @@ export async function iniciarProjetoExecucao(
       erro:
         error?.message === 'proposta_precisa_estar_aceita'
           ? 'A proposta precisa estar aceita antes de iniciar a entrega.'
-          : 'Não foi possível abrir a Sala de Entrega agora.',
+          : 'Não foi possível abrir a entrega agora.',
     };
   }
 
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.proposta}`);
-  revalidatePath('/solucoes');
+  revalidatePath('/entregas');
   revalidarDirecaoOperacional();
-  redirect(`/solucoes/execucao/${data}`);
+  redirect(`/entregas/${data}`);
 }
 
 export async function atualizarTarefaProjeto(
@@ -149,8 +149,8 @@ export async function atualizarTarefaProjeto(
     return { erro: 'Não foi possível atualizar esta tarefa agora.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
-  revalidatePath('/solucoes');
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
+  revalidatePath('/entregas');
   revalidarDirecaoOperacional();
   return { sucesso: 'Tarefa atualizada.' };
 }
@@ -184,8 +184,8 @@ export async function definirPrazoProjeto(
     return { erro: 'Não foi possível salvar o prazo.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
-  revalidatePath('/solucoes');
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
+  revalidatePath('/entregas');
   revalidarDirecaoOperacional();
   return { sucesso: 'Prazo atualizado.' };
 }
@@ -239,7 +239,7 @@ export async function configurarPortalCliente(
     return { erro: 'Não foi possível configurar o portal agora.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
   revalidatePath(`/portal/${data.portal_codigo}`);
   revalidarDirecaoOperacional();
   return {
@@ -312,7 +312,7 @@ export async function prepararEntregaCliente(
     };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
   revalidarDirecaoOperacional();
   return {
@@ -352,7 +352,7 @@ export async function registrarArquivoProjeto(
     return { erro: 'O envio terminou, mas não foi possível registrar o arquivo.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${dados.projeto}`);
+  revalidatePath(`/entregas/${dados.projeto}`);
   revalidarDirecaoOperacional();
   return { sucesso: dados.grupo ? `Versão ${data.versao} adicionada.` : 'Arquivo adicionado.' };
 }
@@ -391,7 +391,7 @@ export async function definirVisibilidadeArquivoProjeto(
     return { erro: 'Não foi possível atualizar a liberação ao cliente.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
   revalidatePath(`/portal/${projeto.portal_codigo}`);
   revalidarDirecaoOperacional();
   return {
@@ -440,7 +440,7 @@ export async function excluirArquivoProjeto(
     return { erro: 'O arquivo foi removido do cofre, mas a lista não pôde ser atualizada.' };
   }
 
-  revalidatePath(`/solucoes/execucao/${validacao.data.projeto}`);
+  revalidatePath(`/entregas/${validacao.data.projeto}`);
   revalidarDirecaoOperacional();
   return { sucesso: 'Versão excluída.' };
 }
