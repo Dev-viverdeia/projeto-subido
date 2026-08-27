@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { lerDossie } from '@/lib/crm/enriquecimento';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import type { EtapaCrm } from '@/lib/crm/etapas';
 import { handleError } from '@/lib/errors';
@@ -12,6 +13,7 @@ import {
   type SegmentoLive,
 } from './coach-schema';
 import { obterGravacaoPosCall, type GravacaoPosCall } from './gravacao-query';
+import { montarPlanoCall, type PlanoCall } from './plano';
 import { montarReuniao, type ReuniaoCall } from './reuniao-modelo';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
@@ -52,6 +54,7 @@ export type PosCall = {
     encerradaEm: string | null;
     duracaoMinutos: number;
     liveCoachAtivo: boolean;
+    codigoPublico: string;
   };
   empresa: { nome: string; setor: string | null; porte: string | null };
   contato: { nome: string; cargo: string | null } | null;
@@ -96,6 +99,10 @@ export type PosCall = {
   } | null;
   gravacao: GravacaoPosCall | null;
   coach: SugestaoCoachHistorico[];
+  preparacao: {
+    plano: PlanoCall;
+    temEnriquecimento: boolean;
+  };
   sincronizacao: {
     historicoCrm: boolean;
     acoesPlano: Array<{
@@ -164,7 +171,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
   const { data: reuniao, error } = await supabase
     .from('calls_reunioes')
     .select(
-      'id, titulo, tipo, status, agendada_para, iniciada_em, encerrada_em, duracao_minutos, live_coach_ativo, empresa_id, contato_id, oportunidade_id',
+      'id, titulo, tipo, status, agendada_para, iniciada_em, encerrada_em, duracao_minutos, live_coach_ativo, codigo_publico, empresa_id, contato_id, oportunidade_id',
     )
     .eq('id', id)
     .maybeSingle();
@@ -184,6 +191,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
     acoesPlano,
     projetoAtivo,
     propostaDaCall,
+    enriquecimento,
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
@@ -251,6 +259,14 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       .eq('reuniao_id', reuniao.id)
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from('crm_enriquecimentos')
+      .select('resultado')
+      .eq('oportunidade_id', reuniao.oportunidade_id)
+      .eq('status', 'concluido')
+      .order('concluido_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'calls:pos-call:empresa');
@@ -265,9 +281,13 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
   if (propostaDaCall.error) {
     throw handleError(propostaDaCall.error, 'calls:pos-call:proposta');
   }
+  if (enriquecimento.error) {
+    throw handleError(enriquecimento.error, 'calls:pos-call:enriquecimento');
+  }
   if (!empresa.data || !oportunidade.data) return null;
 
   const segmentos = SegmentoLiveSchema.array().safeParse(transcricao.data?.segmentos);
+  const dossie = lerDossie(enriquecimento.data?.resultado ?? null);
 
   return {
     reuniao: {
@@ -280,6 +300,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       encerradaEm: reuniao.encerrada_em,
       duracaoMinutos: reuniao.duracao_minutos,
       liveCoachAtivo: reuniao.live_coach_ativo,
+      codigoPublico: reuniao.codigo_publico,
     },
     empresa: empresa.data,
     contato: contato.data,
@@ -330,6 +351,16 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       status: item.status,
       segundoReuniao: item.segundo_reuniao,
     })),
+    preparacao: {
+      plano: montarPlanoCall({
+        tipo: reuniao.tipo,
+        empresa: empresa.data.nome,
+        oportunidade: oportunidade.data.titulo,
+        proximaAcao: oportunidade.data.proxima_acao,
+        dossie,
+      }),
+      temEnriquecimento: Boolean(dossie),
+    },
     sincronizacao: {
       historicoCrm: Boolean(eventoCrm.data),
       acoesPlano: (acoesPlano.data ?? []).map((acao) => ({

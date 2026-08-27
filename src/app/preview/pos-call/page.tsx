@@ -17,6 +17,7 @@ const POS_CALL: PosCall = {
     encerradaEm: '2026-08-08T17:44:00.000Z',
     duracaoMinutos: 45,
     liveCoachAtivo: true,
+    codigoPublico: 'preview-clinica-horizonte',
   },
   empresa: { nome: 'Clínica Horizonte', setor: 'Saúde', porte: 'Médio' },
   contato: { nome: 'Marina Alves', cargo: 'Diretora de Operações' },
@@ -142,6 +143,23 @@ const POS_CALL: PosCall = {
       segundoReuniao: 2_220,
     },
   ],
+  preparacao: {
+    temEnriquecimento: true,
+    plano: {
+      origem: 'enriquecimento',
+      objetivo: 'Confirmar a prioridade da automação do atendimento.',
+      abertura: 'Quero entender o processo atual antes de sugerir a solução.',
+      perguntas: [],
+      fechamento: {
+        sinalParaAvancar: 'Dor, impacto e decisor confirmados.',
+        frase: 'Faz sentido desenhar um piloto?',
+        proximoPasso: 'Enviar o diagnóstico do piloto.',
+      },
+      fatos: [],
+      hipoteses: [],
+      projetos: [],
+    },
+  },
   sincronizacao: {
     historicoCrm: true,
     acoesPlano: [],

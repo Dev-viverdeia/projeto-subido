@@ -170,7 +170,7 @@ export function DossiePosCall({
         </div>
       </header>
 
-      <RetornoProximaAcao estado={estadoAcao} />
+      <RetornoProximaAcao estado={estadoAcao} oportunidadeId={posCall.oportunidade.id} />
 
       {estado.tipo === 'processando' && <AcompanharProcessamento />}
 

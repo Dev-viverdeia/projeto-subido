@@ -5,6 +5,7 @@
 }
 
 .copiar,
+.preparar,
 .entrar {
   display: inline-flex;
   align-items: center;
@@ -25,13 +26,20 @@
   color: var(--via-text-body);
 }
 
+.preparar {
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+}
+
 .entrar {
   border: 1px solid var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
 }
 
-.copiar:hover {
+.copiar:hover,
+.preparar:hover {
   border-color: var(--via-text-faint);
   color: var(--via-text-primary);
 }
@@ -41,12 +49,14 @@
 }
 
 .destaque .copiar,
+.destaque .preparar,
 .destaque .entrar {
   min-height: 42px;
   padding-inline: var(--via-space-4);
 }
 
-.destaque .copiar {
+.destaque .copiar,
+.destaque .preparar {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.07);
   color: var(--via-white);
@@ -58,7 +68,8 @@
   color: var(--via-navy-deep);
 }
 
-.destaque .copiar:hover {
+.destaque .copiar:hover,
+.destaque .preparar:hover {
   border-color: rgba(255, 255, 255, 0.42);
   background: rgba(255, 255, 255, 0.12);
   color: var(--via-white);
@@ -69,6 +80,7 @@
 }
 
 .copiar:focus-visible,
+.preparar:focus-visible,
 .entrar:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
@@ -80,6 +92,7 @@
   }
 
   .copiar,
+  .preparar,
   .entrar {
     flex: 1;
   }

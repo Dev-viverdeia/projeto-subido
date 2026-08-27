@@ -68,7 +68,9 @@ export function CentralPlanoCall({
       <div className={styles.centralAcaoContexto}>
         <p className={styles.sobretitulo}>Atualizar a venda</p>
         <h2 id="plano-da-call-titulo">Revise o que será salvo</h2>
-        <p>A transcrição já foi salva. Confirme a próxima ação, a etapa e os compromissos.</p>
+        <p>
+          O resumo já entrou na ficha. Confirme apenas a próxima ação, a etapa e os compromissos.
+        </p>
 
         <ol className={styles.fluxoSincronizacao}>
           <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
@@ -76,7 +78,7 @@ export function CentralPlanoCall({
               <BadgeCheck size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>Histórico da conversa</strong>
+              <strong>Resumo na ficha</strong>
               <small>
                 {posCall.sincronizacao.historicoCrm
                   ? 'Já registrado na ficha'

@@ -188,7 +188,7 @@ export function PainelCalls({
               <Clock3 size={15} strokeWidth={1.8} aria-hidden="true" />
               {proxima.duracaoMinutos} minutos
             </div>
-            <AcoesSala codigo={proxima.codigoPublico} destaque />
+            <AcoesSala id={proxima.id} codigo={proxima.codigoPublico} destaque />
           </div>
         </section>
       )}
@@ -324,7 +324,7 @@ export function PainelCalls({
                       minutos
                     </small>
                   </div>
-                  <AcoesSala codigo={reuniao.codigoPublico} />
+                  <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} />
                 </article>
               ))}
             </div>

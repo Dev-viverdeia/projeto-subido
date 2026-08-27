@@ -70,7 +70,7 @@ export function CallRecemAgendada({
                 : 'O link foi criado e o histórico desta conversa ficará salvo.'}
         </p>
         <div>
-          <AcoesSala codigo={reuniao.codigoPublico} />
+          <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} />
           {comercialLiberado && (
             <Link href={`/vendas/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
               Abrir ficha <ArrowRight size={14} aria-hidden="true" />
