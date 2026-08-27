@@ -79,14 +79,14 @@ describe('mudarStatusProposta', () => {
     });
 
     await expect(mudarStatusProposta({}, formulario('aceita'))).rejects.toThrow(
-      `redirect:/solucoes/execucao/${PROJETO_ID}`,
+      `redirect:/entregas/${PROJETO_ID}`,
     );
 
     expect(exigirRecurso).toHaveBeenCalledWith('propostas');
     expect(rpc).toHaveBeenCalledWith('projeto_iniciar', { p_proposta_id: PROPOSTA_ID });
-    expect(revalidatePath).toHaveBeenCalledWith('/solucoes');
+    expect(revalidatePath).toHaveBeenCalledWith('/entregas');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
-    expect(redirect).toHaveBeenCalledWith(`/solucoes/execucao/${PROJETO_ID}`);
+    expect(redirect).toHaveBeenCalledWith(`/entregas/${PROJETO_ID}`);
   });
 
   it('mantém uma recuperação visível se a sala não puder ser criada', async () => {
@@ -103,7 +103,7 @@ describe('mudarStatusProposta', () => {
     const resultado = await mudarStatusProposta({}, formulario('aceita'));
 
     expect(resultado).toMatchObject({
-      sucesso: 'Venda confirmada. Abra o projeto ativo pelo botão abaixo.',
+      sucesso: 'Venda confirmada. Abra a entrega pelo botão abaixo.',
       status: 'aceita',
     });
     expect(redirect).not.toHaveBeenCalled();

@@ -11,7 +11,8 @@ type Anatomia =
   | 'mentorias'
   | 'certificados'
   | 'consultor'
-  | 'prospeccao';
+  | 'prospeccao'
+  | 'entregas';
 
 const CONFIGURACAO: Record<
   Anatomia,
@@ -87,6 +88,14 @@ const CONFIGURACAO: Record<
     metricas: 0,
     colunas: 3,
     momentoEscuro: true,
+  },
+  entregas: {
+    modulo: 'Entregas',
+    titulo: 'Organizando suas entregas',
+    descricao: 'Carregando clientes, próximas tarefas e aprovações.',
+    metricas: 3,
+    colunas: 3,
+    momentoEscuro: false,
   },
 };
 

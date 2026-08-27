@@ -24,7 +24,7 @@ export function AtalhoProposta({
             Ver proposta
           </Link>
         )}
-        <Link href={`/solucoes/execucao/${projeto.id}`} className={styles.acaoPrimaria}>
+        <Link href={`/entregas/${projeto.id}`} className={styles.acaoPrimaria}>
           <BriefcaseBusiness size={16} strokeWidth={1.8} aria-hidden="true" />
           {projeto.status === 'concluido' ? 'Ver entrega' : 'Abrir projeto'}
         </Link>

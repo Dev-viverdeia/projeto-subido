@@ -230,7 +230,7 @@ describe('ciclo factual do cliente', () => {
     expect(ciclo.etapas[4]).toMatchObject({ estado: 'atual', evidencia: 'Entrega comprovada' });
     expect(ciclo.decisao).toMatchObject({
       tipo: 'novo-ciclo',
-      apoioHref: `/solucoes/execucao/${lead.projetoRecente.id}`,
+      apoioHref: `/entregas/${lead.projetoRecente.id}`,
     });
   });
 });

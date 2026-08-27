@@ -119,7 +119,7 @@ describe('montarSaidaPosCall', () => {
     expect(montarSaidaPosCall(posCall)).toMatchObject({
       tipo: 'projeto',
       acao: 'Abrir projeto',
-      href: '/solucoes/execucao/projeto-1#briefing-kickoff',
+      href: '/entregas/projeto-1#briefing-kickoff',
     });
   });
 

@@ -90,7 +90,7 @@ describe('montarRadarSobral', () => {
       '/reunioes/call-1',
       '/vendas/oportunidade-1',
       '/propostas/proposta-1',
-      '/solucoes/execucao/projeto-1',
+      '/entregas/projeto-1',
     ]);
   });
 

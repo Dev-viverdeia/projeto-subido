@@ -16,7 +16,7 @@ describe('AcaoEntrega', () => {
 
     expect(screen.getByRole('link', { name: /Continuar projeto/i })).toHaveAttribute(
       'href',
-      `/solucoes/execucao/${PROJETO_ID}`,
+      `/entregas/${PROJETO_ID}`,
     );
   });
 

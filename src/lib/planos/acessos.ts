@@ -229,6 +229,7 @@ export const ROTAS_COM_RECURSO = [
   { href: '/consultor', recurso: 'sobral_ai' },
   { href: '/formacoes', recurso: 'aprendizado' },
   { href: '/solucoes', recurso: 'projetos' },
+  { href: '/entregas', recurso: 'projetos' },
   { href: '/mentorias', recurso: 'mentorias' },
   { href: '/certificados', recurso: 'certificados' },
 ] as const satisfies readonly { href: string; recurso: RecursoPlano }[];

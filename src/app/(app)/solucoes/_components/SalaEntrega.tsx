@@ -110,7 +110,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
       <header className={styles.hero} data-on-dark>
         <div className={styles.heroTexto}>
           <div className={styles.heroLinha}>
-            <p className={styles.eyebrow}>Sala de Entrega · {projeto.empresa}</p>
+            <p className={styles.eyebrow}>Entrega do cliente · {projeto.empresa}</p>
             <span className={styles.statusProjeto} data-status={projeto.status}>
               {ROTULO_STATUS_PROJETO[projeto.status]}
             </span>
@@ -134,7 +134,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           </dl>
         </div>
 
-        <div className={styles.medida} aria-label={`${percentual}% do projeto concluído`}>
+        <div className={styles.medida} aria-label={`${percentual}% da entrega concluída`}>
           <span>{percentual}%</span>
           <strong>
             {projeto.feitas} de {projeto.total}
@@ -190,7 +190,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           <header className={styles.cabecalhoFase}>
             <div>
               <p>Etapa atual</p>
-              <h2>{faseAtual?.titulo ?? 'Projeto concluído'}</h2>
+              <h2>{faseAtual?.titulo ?? 'Entrega concluída'}</h2>
             </div>
             {faseAtual && (
               <span>
