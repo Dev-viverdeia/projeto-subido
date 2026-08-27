@@ -1,8 +1,9 @@
-import { randomUUID } from 'node:crypto';
 import { AccessToken } from 'livekit-server-sdk';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { registrarEntradaNaSala } from '@/lib/calls/admin';
+import { resolverIdConvidado } from '@/lib/calls/identidade';
 import { obterContextoDaSala } from '@/lib/calls/queries';
 import { callPodeAbrir } from '@/lib/calls/tipos';
 import { livekitEnv } from '@/lib/env';
@@ -22,7 +23,7 @@ function resposta(erro: string, status: number) {
  * e todos os campos com poder (sala, identidade e permissões) são decididos aqui,
  * a partir do código validado no banco — não a partir do corpo enviado pelo browser.
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const corpo = requisicaoSchema.safeParse(await request.json().catch(() => null));
   if (!corpo.success) return resposta('Confira seu nome e o consentimento para continuar.', 400);
 
@@ -41,10 +42,12 @@ export async function POST(request: Request) {
     return resposta('A infraestrutura de vídeo ainda está em ativação.', 503);
   }
 
+  const cookieConvidado = `subido_call_${corpo.data.codigo.replaceAll('-', '')}`;
+  const idConvidado = resolverIdConvidado(request.cookies.get(cookieConvidado)?.value);
   const identidade =
     contexto.anfitriao && contexto.usuarioId
       ? `host-${contexto.usuarioId}`
-      : `guest-${randomUUID()}`;
+      : `guest-${idConvidado}`;
 
   const token = new AccessToken(configuracao.LIVEKIT_API_KEY, configuracao.LIVEKIT_API_SECRET, {
     identity: identidade,
@@ -77,11 +80,21 @@ export async function POST(request: Request) {
     return resposta('Não foi possível confirmar o acesso à sala.', 409);
   }
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       server_url: configuracao.LIVEKIT_URL,
       participant_token: await token.toJwt(),
     },
     { status: 201, headers: { 'Cache-Control': 'private, no-store' } },
   );
+  if (!contexto.anfitriao) {
+    response.cookies.set(cookieConvidado, idConvidado, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/api/calls/token',
+      maxAge: 60 * 60 * 2,
+    });
+  }
+  return response;
 }
