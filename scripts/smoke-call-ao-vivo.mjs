@@ -12,18 +12,26 @@
 import { randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import process from 'node:process';
-import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
+import { validarResilienciaAoVivo } from './lib/smoke-call-resiliencia.mjs';
+import { cookiesDaSessao, observarPagina } from './lib/smoke-call-sessao.mjs';
 
 const CONFIRMACAO = '--confirmar-producao';
 const executar = process.argv.includes(CONFIRMACAO);
 const manterConta = process.argv.includes('--manter-conta');
+const simularReconexao = process.argv.includes('--simular-reconexao');
+const convidadoWebkit = process.argv.includes('--convidado-webkit');
 const audioArgumento = process.argv.find((argumento) => argumento.startsWith('--audio='));
 const audio = audioArgumento?.slice('--audio='.length) || process.env.SUBIDO_SMOKE_CALL_AUDIO;
+const duracaoArgumento = process.argv.find((argumento) =>
+  argumento.startsWith('--duracao-segundos='),
+);
+const duracaoSegundos = Number(duracaoArgumento?.slice('--duracao-segundos='.length) || 0);
 
 if (!executar) {
   console.log(`Uso: npm run smoke:call-ao-vivo -- ${CONFIRMACAO} --audio=/caminho/fala.wav`);
+  console.log('Opcionais: --simular-reconexao --duracao-segundos=90 --convidado-webkit');
   console.log('O teste abre uma sala real, usa LiveKit/OpenAI e apaga a conta criada ao terminar.');
   process.exit(0);
 }
@@ -60,6 +68,7 @@ const teste = {
 const iniciadoEm = Date.now();
 let ultimaEtapaEm = iniciadoEm;
 let browser = null;
+let browserConvidado = null;
 let host = null;
 let convidado = null;
 
@@ -164,34 +173,6 @@ async function criarCenario() {
   return { email, password };
 }
 
-async function cookiesDaSessao(email, password) {
-  const cookies = [];
-  const supabase = createServerClient(supabaseUrl, anonKey, {
-    cookies: {
-      getAll: () => cookies,
-      setAll: (novos) => {
-        for (const novo of novos) {
-          const indice = cookies.findIndex((item) => item.name === novo.name);
-          if (indice >= 0) cookies[indice] = novo;
-          else cookies.push(novo);
-        }
-      },
-    },
-  });
-  const login = await supabase.auth.signInWithPassword({ email, password });
-  erroSe(login.error, 'autenticar navegador');
-  return cookies.map(({ name, value }) => ({ name, value, url: appUrl }));
-}
-
-function observarPagina(page, papel, eventos) {
-  page.on('pageerror', (erro) => eventos.push(`${papel}:pageerror:${erro.message}`));
-  page.on('response', (response) => {
-    const url = new URL(response.url());
-    if (!url.pathname.startsWith('/api/calls/')) return;
-    eventos.push(`${papel}:${response.request().method()}:${url.pathname}:${response.status()}`);
-  });
-}
-
 async function entrarNaSala(page, nome) {
   const url = new URL(`/sala/${teste.codigo}`, appUrl);
   if (bypassVercel) {
@@ -263,11 +244,14 @@ async function exercitarSala({ email, password }) {
     viewport: { width: 1440, height: 900 },
     permissions: ['camera', 'microphone'],
   });
-  convidado = await browser.newContext({
+  browserConvidado = convidadoWebkit ? await webkit.launch({ headless: true }) : null;
+  convidado = await (browserConvidado ?? browser).newContext({
     viewport: { width: 1180, height: 780 },
     permissions: ['camera', 'microphone'],
   });
-  await host.addCookies(await cookiesDaSessao(email, password));
+  await host.addCookies(
+    await cookiesDaSessao({ supabaseUrl, anonKey, appUrl, email, password, erroSe }),
+  );
 
   const paginaHost = await host.newPage();
   const paginaConvidado = await convidado.newPage();
@@ -280,7 +264,10 @@ async function exercitarSala({ email, password }) {
     state: 'visible',
     timeout: 30_000,
   });
-  etapa('dois_participantes_conectados', { participantesVisiveis: 2 });
+  etapa('dois_participantes_conectados', {
+    participantesVisiveis: 2,
+    navegadorConvidado: convidadoWebkit ? 'webkit' : 'chromium',
+  });
 
   try {
     await paginaHost.waitForFunction(
@@ -316,6 +303,16 @@ async function exercitarSala({ email, password }) {
     pronto: (valor) => valor.length > 0,
   });
   etapa('live_coach_respondeu');
+
+  await validarResilienciaAoVivo({
+    simularReconexao,
+    duracaoSegundos,
+    contextoHost: host,
+    paginaHost,
+    eventos,
+    esperar,
+    etapa,
+  });
 
   const sairConvidado = paginaConvidado.locator('.lk-disconnect-button');
   await sairConvidado.click();
@@ -419,6 +416,7 @@ async function validarPosCall(paginaHost) {
 async function limpar() {
   await convidado?.close().catch(() => null);
   await host?.close().catch(() => null);
+  await browserConvidado?.close().catch(() => null);
   await browser?.close().catch(() => null);
   if (teste.usuario && !manterConta) {
     const exclusao = await admin.auth.admin.deleteUser(teste.usuario);

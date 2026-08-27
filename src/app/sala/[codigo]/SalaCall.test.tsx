@@ -3,6 +3,27 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { ConviteCall } from '@/lib/calls/queries';
 
+vi.mock('@livekit/components-react', () => ({
+  LiveKitRoom: ({
+    children,
+    onDisconnected,
+  }: {
+    children: React.ReactNode;
+    onDisconnected?: (reason?: number) => void;
+  }) => (
+    <div data-testid="sala-livekit">
+      {children}
+      <button type="button" onClick={() => onDisconnected?.(9)}>
+        Simular queda de conexão
+      </button>
+    </div>
+  ),
+  RoomAudioRenderer: () => null,
+  VideoConference: () => <div>Palco da reunião</div>,
+}));
+
+vi.mock('./LiveCoach', () => ({ LiveCoach: () => <aside>Live Coach</aside> }));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
@@ -43,5 +64,38 @@ describe('SalaCall', () => {
 
     await user.click(screen.getByRole('checkbox'));
     expect(entrar).toBeEnabled();
+  });
+
+  it('preserva a reunião e orienta o usuário quando a conexão cai', async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          server_url: 'wss://livekit.example.test',
+          participant_token: 'token-de-teste',
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={CONVITE}
+        anfitriao
+        nomeSugerido="Rafael"
+        videoConfigurado
+      />,
+    );
+
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+    await user.click(await screen.findByRole('button', { name: 'Simular queda de conexão' }));
+
+    expect(screen.getByRole('heading', { name: 'Reconectando à reunião' })).toBeInTheDocument();
+    expect(screen.getByText('Tentativa 1 de 3')).toBeInTheDocument();
+    expect(screen.queryByText('Preparando o resumo da reunião')).not.toBeInTheDocument();
+
+    fetchMock.mockRestore();
   });
 });

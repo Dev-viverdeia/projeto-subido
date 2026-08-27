@@ -9,10 +9,14 @@ import {
   FileText,
   LoaderCircle,
   LockKeyhole,
+  RotateCcw,
   Video,
+  WifiOff,
 } from 'lucide-react';
+import type { DisconnectReason } from 'livekit-client';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
+import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { LiveCoach } from './LiveCoach';
 import styles from './sala.module.css';
@@ -27,6 +31,9 @@ const DATA = new Intl.DateTimeFormat('pt-BR', {
 });
 
 type Credenciais = { serverUrl: string; token: string };
+type Recuperacao = { estado: 'tentando' | 'falhou'; tentativa: number; mensagem?: string };
+
+const MAX_TENTATIVAS_RECONEXAO = 3;
 
 export function SalaCall({
   codigo,
@@ -48,6 +55,7 @@ export function SalaCall({
   const [erro, setErro] = useState('');
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
   const [saida, setSaida] = useState<'processando' | 'encerrada' | null>(null);
+  const [recuperacao, setRecuperacao] = useState<Recuperacao | null>(null);
   const passouDaJanela = callPassouDaJanela({
     status: convite.status,
     agendadaPara: convite.agendadaPara,
@@ -72,8 +80,74 @@ export function SalaCall({
     return () => window.clearTimeout(navegacao);
   }, [convite.reuniaoId, router, saida]);
 
-  function aoDesconectar() {
+  async function obterCredenciais() {
+    const response = await fetch('/api/calls/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo, nome: nome.trim(), consentiu }),
+    });
+    const resultado = (await response.json()) as {
+      erro?: string;
+      server_url?: string;
+      participant_token?: string;
+    };
+    if (!response.ok || !resultado.server_url || !resultado.participant_token) {
+      throw new Error(resultado.erro || 'Não foi possível abrir a sala.');
+    }
+    return { serverUrl: resultado.server_url, token: resultado.participant_token };
+  }
+
+  useEffect(() => {
+    if (recuperacao?.estado !== 'tentando') return;
+    let cancelado = false;
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const novasCredenciais = await obterCredenciais();
+          if (cancelado) return;
+          setCredenciais(novasCredenciais);
+          setRecuperacao(null);
+        } catch (falha) {
+          if (cancelado) return;
+          if (recuperacao.tentativa < MAX_TENTATIVAS_RECONEXAO) {
+            setRecuperacao({ estado: 'tentando', tentativa: recuperacao.tentativa + 1 });
+            return;
+          }
+          setRecuperacao({
+            estado: 'falhou',
+            tentativa: recuperacao.tentativa,
+            mensagem: falha instanceof Error ? falha.message : 'Não foi possível retomar a sala.',
+          });
+        }
+      })();
+    }, atrasoDaReconexao(recuperacao.tentativa));
+    return () => {
+      cancelado = true;
+      window.clearTimeout(timer);
+    };
+    // Nome e consentimento não mudam enquanto a pessoa está dentro da reunião.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recuperacao]);
+
+  function aoDesconectar(reason?: DisconnectReason) {
     setCredenciais(null);
+    if (desconexaoPermiteRetomar(reason)) {
+      setRecuperacao({ estado: 'tentando', tentativa: 1 });
+      return;
+    }
+    setSaida(anfitriao ? 'processando' : 'encerrada');
+  }
+
+  async function encerrarDepoisDaFalha() {
+    if (anfitriao) {
+      await fetch(`/api/calls/${convite.reuniaoId}/finalizar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ segmentos: [] }),
+        keepalive: true,
+      }).catch(() => null);
+    }
+    setRecuperacao(null);
     setSaida(anfitriao ? 'processando' : 'encerrada');
   }
 
@@ -83,25 +157,60 @@ export function SalaCall({
     setErro('');
 
     try {
-      const response = await fetch('/api/calls/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo, nome: nome.trim(), consentiu }),
-      });
-      const resultado = (await response.json()) as {
-        erro?: string;
-        server_url?: string;
-        participant_token?: string;
-      };
-      if (!response.ok || !resultado.server_url || !resultado.participant_token) {
-        throw new Error(resultado.erro || 'Não foi possível abrir a sala.');
-      }
-      setCredenciais({ serverUrl: resultado.server_url, token: resultado.participant_token });
+      setCredenciais(await obterCredenciais());
     } catch (falha) {
       setErro(falha instanceof Error ? falha.message : 'Não foi possível abrir a sala.');
     } finally {
       setCarregando(false);
     }
+  }
+
+  if (recuperacao) {
+    const tentando = recuperacao.estado === 'tentando';
+    return (
+      <main className={styles.saida}>
+        <section className={styles.saidaCartao} role="status" aria-live="assertive">
+          <span className={styles.saidaIcone} aria-hidden="true">
+            {tentando ? (
+              <LoaderCircle className="lucide-loader-circle" size={28} />
+            ) : (
+              <WifiOff size={28} />
+            )}
+          </span>
+          <p>
+            {tentando
+              ? `Tentativa ${recuperacao.tentativa} de ${MAX_TENTATIVAS_RECONEXAO}`
+              : 'Conexão interrompida'}
+          </p>
+          <h1>{tentando ? 'Reconectando à reunião' : 'A reunião continua protegida'}</h1>
+          <span>
+            {tentando
+              ? 'Aguarde um instante. Você volta para a mesma conversa automaticamente.'
+              : recuperacao.mensagem || 'Confira sua internet e tente entrar novamente.'}
+          </span>
+          {tentando ? (
+            <i aria-hidden="true" />
+          ) : (
+            <div className={styles.recuperacaoAcoes}>
+              <button
+                type="button"
+                className={styles.botaoRetomar}
+                onClick={() => setRecuperacao({ estado: 'tentando', tentativa: 1 })}
+              >
+                <RotateCcw size={16} aria-hidden="true" /> Tentar novamente
+              </button>
+              <button
+                type="button"
+                className={styles.botaoEncerrar}
+                onClick={() => void encerrarDepoisDaFalha()}
+              >
+                {anfitriao ? 'Encerrar e salvar' : 'Sair da reunião'}
+              </button>
+            </div>
+          )}
+        </section>
+      </main>
+    );
   }
 
   if (credenciais) {

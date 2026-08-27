@@ -2,8 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import { ConnectionState, RoomEvent, Track, type Participant } from 'livekit-client';
+import {
+  ConnectionState,
+  RoomEvent,
+  Track,
+  type DisconnectReason,
+  type Participant,
+} from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
+import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import {
   CabineLiveCoach,
   type EstadoCoach,
@@ -33,6 +40,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   const [falha, setFalha] = useState('');
   const [gravacao, setGravacao] = useState<EstadoGravacaoUi>('iniciando');
   const [versaoFila, setVersaoFila] = useState(0);
+  const [versaoRealtime, setVersaoRealtime] = useState(0);
   const inicioRef = useRef<number | null>(null);
   const ordinalRef = useRef(0);
   const ordemItensRef = useRef(new Map<string, number>());
@@ -219,7 +227,26 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
     let peer: RTCPeerConnection | null = null;
     let audioContext: AudioContext | null = null;
     let fechamentoPeriodico: number | null = null;
+    let retomadaRealtime: number | null = null;
     const fontesAtivas = fontesRef.current;
+
+    function agendarRetomada(atraso = 1_500) {
+      if (cancelado || retomadaRealtime) return;
+      setEstado('conectando');
+      setFalha('Reconectando a inteligência da reunião…');
+      retomadaRealtime = window.setTimeout(() => {
+        retomadaRealtime = null;
+        if (!cancelado) setVersaoRealtime((versao) => versao + 1);
+      }, atraso);
+    }
+
+    function acompanharRede() {
+      if (navigator.onLine) agendarRetomada(250);
+      else {
+        setEstado('conectando');
+        setFalha('Sua internet caiu. A conversa continua assim que a conexão voltar.');
+      }
+    }
 
     async function conectar() {
       try {
@@ -249,7 +276,14 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
         peer.addTrack(trilhaMista, destino.stream);
         const canal = peer.createDataChannel('oai-events');
         canalRealtimeRef.current = canal;
-        canal.addEventListener('open', () => !cancelado && setEstado('escutando'));
+        canal.addEventListener('open', () => {
+          if (cancelado) return;
+          setFalha('');
+          setEstado('escutando');
+        });
+        canal.addEventListener('close', () => {
+          if (!cancelado && navigator.onLine) agendarRetomada();
+        });
         canal.addEventListener('message', (mensagem) => {
           try {
             registrarEvento(JSON.parse(String(mensagem.data)) as EventoRealtime);
@@ -275,19 +309,30 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
           throw new Error(resultado?.erro || 'A transcrição ao vivo não pôde ser iniciada.');
         }
         await peer.setRemoteDescription({ type: 'answer', sdp: await response.text() });
+        peer.addEventListener('connectionstatechange', () => {
+          if (cancelado || !peer) return;
+          if (peer.connectionState === 'failed') agendarRetomada(250);
+          if (peer.connectionState === 'disconnected') agendarRetomada(2_500);
+        });
       } catch (erro) {
         if (cancelado) return;
         setFalha(erro instanceof Error ? erro.message : 'A transcrição não pôde ser iniciada.');
         setEstado('indisponivel');
+        if (navigator.onLine) agendarRetomada(4_000);
       }
     }
 
+    window.addEventListener('online', acompanharRede);
+    window.addEventListener('offline', acompanharRede);
     void conectar();
     return () => {
       cancelado = true;
       confirmarTrecho();
       canalRealtimeRef.current = null;
+      window.removeEventListener('online', acompanharRede);
+      window.removeEventListener('offline', acompanharRede);
       if (fechamentoPeriodico) window.clearInterval(fechamentoPeriodico);
+      if (retomadaRealtime) window.clearTimeout(retomadaRealtime);
       peer?.close();
       for (const fonte of fontesAtivas.values()) fonte.disconnect();
       fontesAtivas.clear();
@@ -295,7 +340,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       destinoRef.current = null;
       void audioContext?.close();
     };
-  }, [confirmarTrecho, registrarEvento, reuniaoId, temTrilha]);
+  }, [confirmarTrecho, registrarEvento, reuniaoId, temTrilha, versaoRealtime]);
 
   useEffect(() => {
     const audioContext = audioContextRef.current;
@@ -334,10 +379,13 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
   }, [reuniaoId]);
 
   useEffect(() => {
-    room.on(RoomEvent.Disconnected, finalizar);
+    const aoDesconectar = (reason?: DisconnectReason) => {
+      if (!desconexaoPermiteRetomar(reason)) finalizar();
+    };
+    room.on(RoomEvent.Disconnected, aoDesconectar);
     window.addEventListener('pagehide', finalizar);
     return () => {
-      room.off(RoomEvent.Disconnected, finalizar);
+      room.off(RoomEvent.Disconnected, aoDesconectar);
       window.removeEventListener('pagehide', finalizar);
     };
   }, [finalizar, room]);
