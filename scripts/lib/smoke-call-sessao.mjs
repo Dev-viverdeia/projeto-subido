@@ -18,3 +18,12 @@ export async function cookiesDaSessao({ supabaseUrl, anonKey, appUrl, email, pas
   erroSe(login.error, 'autenticar navegador');
   return cookies.map(({ name, value }) => ({ name, value, url: appUrl }));
 }
+
+export function observarPagina(page, papel, eventos) {
+  page.on('pageerror', (erro) => eventos.push(`${papel}:pageerror:${erro.message}`));
+  page.on('response', (response) => {
+    const url = new URL(response.url());
+    if (!url.pathname.startsWith('/api/calls/')) return;
+    eventos.push(`${papel}:${response.request().method()}:${url.pathname}:${response.status()}`);
+  });
+}
