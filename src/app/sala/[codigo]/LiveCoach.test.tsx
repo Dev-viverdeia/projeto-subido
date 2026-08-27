@@ -32,4 +32,42 @@ describe('CabineLiveCoach', () => {
       screen.getByText(/resumo, decisões e próximo passo na ficha do cliente/i),
     ).toBeInTheDocument();
   });
+
+  it('mostra o objetivo e a primeira pergunta antes da conversa começar', () => {
+    render(
+      <CabineLiveCoach
+        ativo
+        estado="escutando"
+        sugestao={null}
+        fala="Aguardando a primeira fala…"
+        plano={{
+          origem: 'enriquecimento',
+          objetivo: 'Confirmar o impacto da demora no atendimento.',
+          abertura: 'Quero entender o processo atual.',
+          perguntas: [
+            {
+              etapa: 'impacto',
+              pergunta: 'Quantas oportunidades são perdidas por mês?',
+              intencao: 'Dimensionar o impacto.',
+              projetoRelacionado: 'SDR de atendimento',
+            },
+          ],
+          fechamento: {
+            sinalParaAvancar: 'Impacto confirmado.',
+            frase: 'Faz sentido desenhar um piloto?',
+            proximoPasso: 'Marcar reunião técnica.',
+          },
+          fatos: [],
+          hipoteses: [],
+          projetos: ['SDR de atendimento'],
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Comece com o plano preparado')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Confirmar o impacto da demora no atendimento.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Quantas oportunidades são perdidas por mês/)).toBeInTheDocument();
+  });
 });

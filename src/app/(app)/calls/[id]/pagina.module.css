@@ -189,6 +189,28 @@
   font-size: var(--via-fs-sm);
 }
 
+.retorno > span {
+  min-width: 0;
+}
+
+.retorno > a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  margin-left: auto;
+  color: currentColor;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.retorno > a:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-chip);
+  box-shadow: var(--app-ring);
+}
+
 .retorno[data-tipo='sucesso'] {
   border-color: color-mix(in srgb, var(--via-success) 28%, var(--via-border));
   color: var(--via-success);

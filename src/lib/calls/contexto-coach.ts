@@ -1,7 +1,9 @@
 import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { lerDossie } from '@/lib/crm/enriquecimento';
 import type { Database } from '@/lib/supabase/types.generated';
+import { montarPlanoCall, type PlanoCall } from './plano';
 
 export type ContextoCoach = {
   reuniaoId: string;
@@ -26,6 +28,7 @@ export type ContextoCoach = {
     nome: string;
     cargo: string | null;
   } | null;
+  plano: PlanoCall;
 };
 
 /**
@@ -46,7 +49,7 @@ export async function obterContextoCoach(
   if (error) throw error;
   if (!reuniao) return null;
 
-  const [empresa, oportunidade, contato] = await Promise.all([
+  const [empresa, oportunidade, contato, enriquecimento] = await Promise.all([
     supabase
       .from('crm_empresas')
       .select('nome, setor, porte, resumo')
@@ -64,12 +67,23 @@ export async function obterContextoCoach(
           .eq('id', reuniao.contato_id)
           .maybeSingle()
       : Promise.resolve({ data: null, error: null }),
+    supabase
+      .from('crm_enriquecimentos')
+      .select('resultado')
+      .eq('oportunidade_id', reuniao.oportunidade_id)
+      .eq('status', 'concluido')
+      .order('concluido_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (empresa.error) throw empresa.error;
   if (oportunidade.error) throw oportunidade.error;
   if (contato.error) throw contato.error;
+  if (enriquecimento.error) throw enriquecimento.error;
   if (!empresa.data || !oportunidade.data) return null;
+
+  const dossie = lerDossie(enriquecimento.data?.resultado ?? null);
 
   return {
     reuniaoId: reuniao.id,
@@ -86,6 +100,13 @@ export async function obterContextoCoach(
       proximaAcao: oportunidade.data.proxima_acao,
     },
     contato: contato.data,
+    plano: montarPlanoCall({
+      tipo: reuniao.tipo,
+      empresa: empresa.data.nome,
+      oportunidade: oportunidade.data.titulo,
+      proximaAcao: oportunidade.data.proxima_acao,
+      dossie,
+    }),
   };
 }
 
@@ -105,6 +126,19 @@ export function contextoCoachParaTexto(contexto: ContextoCoach): string {
     contexto.contato
       ? `Contato: ${contexto.contato.nome}${contexto.contato.cargo ? `, ${contexto.contato.cargo}` : ''}`
       : null,
+    '',
+    'Plano preparado para esta conversa:',
+    `Objetivo: ${contexto.plano.objetivo}`,
+    `Abertura sugerida: ${contexto.plano.abertura}`,
+    ...contexto.plano.perguntas.map(
+      (pergunta, indice) =>
+        `Pergunta ${indice + 1} (${pergunta.etapa}): ${pergunta.pergunta} | intenção: ${pergunta.intencao}`,
+    ),
+    contexto.plano.projetos.length > 0
+      ? `Projetos para validar, não presumir: ${contexto.plano.projetos.join('; ')}`
+      : null,
+    `Sinal para avançar: ${contexto.plano.fechamento.sinalParaAvancar}`,
+    `Fechamento sugerido: ${contexto.plano.fechamento.frase}`,
   ];
 
   return linhas.filter(Boolean).join('\n');

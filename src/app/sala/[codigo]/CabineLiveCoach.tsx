@@ -1,6 +1,7 @@
 'use client';
 
 import { AudioLines, Circle, Layers3, LockKeyhole, Radio } from 'lucide-react';
+import type { PlanoCall } from '@/lib/calls/plano';
 import styles from './LiveCoach.module.css';
 
 export type EstadoCoach = 'conectando' | 'escutando' | 'analisando' | 'indisponivel';
@@ -42,6 +43,7 @@ export function CabineLiveCoach({
   parcial = false,
   falha = '',
   gravacao = 'iniciando',
+  plano = null,
 }: {
   ativo: boolean;
   estado: EstadoCoach;
@@ -50,6 +52,7 @@ export function CabineLiveCoach({
   parcial?: boolean;
   falha?: string;
   gravacao?: EstadoGravacaoUi;
+  plano?: PlanoCall | null;
 }) {
   const intensidade =
     estado === 'analisando' ? styles.intenso : estado === 'escutando' ? styles.ativo : '';
@@ -90,12 +93,26 @@ export function CabineLiveCoach({
           </>
         ) : (
           <div className={styles.espera}>
-            <h2>{ativo ? 'Escute antes de conduzir.' : 'A conversa já está virando histórico.'}</h2>
-            <p>
-              {ativo
-                ? 'Quando houver um sinal útil, uma única recomendação aparece aqui.'
-                : 'Os trechos serão salvos na ficha ao encerrar.'}
-            </p>
+            {ativo && plano ? (
+              <>
+                <span className={styles.planoRotulo}>Comece com o plano preparado</span>
+                <h2>{plano.objetivo}</h2>
+                <p className={styles.primeiraPergunta}>
+                  Primeira pergunta: “{plano.perguntas[0]?.pergunta}”
+                </p>
+              </>
+            ) : (
+              <>
+                <h2>
+                  {ativo ? 'Escute antes de conduzir.' : 'A conversa já está virando histórico.'}
+                </h2>
+                <p>
+                  {ativo
+                    ? 'Quando houver um sinal útil, uma única recomendação aparece aqui.'
+                    : 'Os trechos serão salvos na ficha ao encerrar.'}
+                </p>
+              </>
+            )}
           </div>
         )}
       </section>

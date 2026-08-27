@@ -10,6 +10,7 @@ import {
   type Participant,
 } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
+import type { PlanoCall } from '@/lib/calls/plano';
 import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import {
   CabineLiveCoach,
@@ -30,7 +31,15 @@ type EventoRealtime = {
   error?: { message?: string };
 };
 
-export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: boolean }) {
+export function LiveCoach({
+  reuniaoId,
+  ativo,
+  plano = null,
+}: {
+  reuniaoId: string;
+  ativo: boolean;
+  plano?: PlanoCall | null;
+}) {
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
   const [estado, setEstado] = useState<EstadoCoach>('conectando');
@@ -399,6 +408,7 @@ export function LiveCoach({ reuniaoId, ativo }: { reuniaoId: string; ativo: bool
       parcial={Boolean(parcial)}
       falha={falha}
       gravacao={gravacao}
+      plano={plano}
     />
   );
 }

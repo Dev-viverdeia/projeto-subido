@@ -13,6 +13,7 @@ const BASE: PosCall = {
     encerradaEm: '2026-08-13T15:30:00.000Z',
     duracaoMinutos: 30,
     liveCoachAtivo: true,
+    codigoPublico: 'sala-1',
   },
   empresa: { nome: 'Clínica Horizonte', setor: 'Saúde', porte: 'Médio' },
   contato: { nome: 'Marina', cargo: 'Diretora' },
@@ -43,6 +44,23 @@ const BASE: PosCall = {
   transcricao: null,
   gravacao: null,
   coach: [],
+  preparacao: {
+    temEnriquecimento: false,
+    plano: {
+      origem: 'base',
+      objetivo: 'Entender a prioridade do cliente.',
+      abertura: 'Quero entender o processo atual.',
+      perguntas: [],
+      fechamento: {
+        sinalParaAvancar: 'Dor e próximo passo confirmados.',
+        frase: 'Faz sentido avançar?',
+        proximoPasso: 'Definir a próxima ação.',
+      },
+      fatos: [],
+      hipoteses: [],
+      projetos: [],
+    },
+  },
   sincronizacao: {
     historicoCrm: true,
     acoesPlano: [],

@@ -1,13 +1,25 @@
-import { BadgeCheck, Check, CircleAlert } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, BadgeCheck, Check, CircleAlert } from 'lucide-react';
 import styles from '../pagina.module.css';
 
-export function RetornoProximaAcao({ estado }: { estado: string | null }) {
+export function RetornoProximaAcao({
+  estado,
+  oportunidadeId,
+}: {
+  estado: string | null;
+  oportunidadeId: string;
+}) {
   if (estado === 'ok') {
     return (
       <div className={styles.retorno} data-tipo="sucesso" role="status">
         <Check size={17} aria-hidden="true" />
-        Plano aplicado. A ficha, a etapa da venda e os compromissos já refletem o que foi
-        confirmado.
+        <span>
+          Plano aplicado. A ficha, a etapa da venda e os compromissos já refletem o que foi
+          confirmado.
+        </span>
+        <Link href={`/vendas/${oportunidadeId}`}>
+          Abrir ficha <ArrowRight size={14} aria-hidden="true" />
+        </Link>
       </div>
     );
   }
@@ -16,7 +28,10 @@ export function RetornoProximaAcao({ estado }: { estado: string | null }) {
     return (
       <div className={styles.retorno} role="status">
         <BadgeCheck size={17} aria-hidden="true" />
-        Este plano já estava sincronizado; nada foi duplicado.
+        <span>Este plano já estava sincronizado; nada foi duplicado.</span>
+        <Link href={`/vendas/${oportunidadeId}`}>
+          Abrir ficha <ArrowRight size={14} aria-hidden="true" />
+        </Link>
       </div>
     );
   }

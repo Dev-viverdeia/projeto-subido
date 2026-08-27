@@ -2,10 +2,18 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Check, Copy, Video } from 'lucide-react';
+import { Check, Copy, ListChecks, Video } from 'lucide-react';
 import styles from './AcoesSala.module.css';
 
-export function AcoesSala({ codigo, destaque = false }: { codigo: string; destaque?: boolean }) {
+export function AcoesSala({
+  id,
+  codigo,
+  destaque = false,
+}: {
+  id: string;
+  codigo: string;
+  destaque?: boolean;
+}) {
   const [copiado, setCopiado] = useState(false);
   const caminho = `/sala/${codigo}`;
 
@@ -17,6 +25,9 @@ export function AcoesSala({ codigo, destaque = false }: { codigo: string; destaq
 
   return (
     <div className={`${styles.acoes} ${destaque ? styles.destaque : ''}`}>
+      <Link href={`/reunioes/${id}`} className={styles.preparar}>
+        <ListChecks size={15} aria-hidden="true" /> Preparar call
+      </Link>
       <button type="button" onClick={() => void copiar()} className={styles.copiar}>
         {copiado ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
         {copiado ? 'Copiado' : 'Copiar link'}

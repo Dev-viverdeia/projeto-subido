@@ -16,6 +16,7 @@ import {
 import type { DisconnectReason } from 'livekit-client';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
+import type { PlanoCall } from '@/lib/calls/plano';
 import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { LiveCoach } from './LiveCoach';
@@ -41,12 +42,14 @@ export function SalaCall({
   anfitriao,
   nomeSugerido,
   videoConfigurado,
+  planoAnfitriao = null,
 }: {
   codigo: string;
   convite: ConviteCall;
   anfitriao: boolean;
   nomeSugerido: string;
   videoConfigurado: boolean;
+  planoAnfitriao?: PlanoCall | null;
 }) {
   const router = useRouter();
   const [nome, setNome] = useState(nomeSugerido);
@@ -229,7 +232,11 @@ export function SalaCall({
               <div className={styles.palcoVideo}>
                 <VideoConference />
               </div>
-              <LiveCoach reuniaoId={convite.reuniaoId} ativo={convite.liveCoachAtivo} />
+              <LiveCoach
+                reuniaoId={convite.reuniaoId}
+                ativo={convite.liveCoachAtivo}
+                plano={planoAnfitriao}
+              />
             </div>
           ) : (
             <VideoConference />
