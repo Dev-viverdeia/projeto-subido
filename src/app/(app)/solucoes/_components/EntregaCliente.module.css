@@ -194,6 +194,31 @@
   line-height: 1.55;
 }
 
+.resumo[data-aguardando] {
+  background: var(--app-glass-plane-strong);
+}
+
+.aguardando {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-3);
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.aguardando svg {
+  margin-top: 2px;
+  color: var(--via-accent-ink);
+}
+
+.aguardando strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--via-text-primary);
+}
+
 .resumo p {
   margin: 0;
 }
@@ -206,6 +231,27 @@
   color: var(--via-accent-ink);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.portalPendente {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-accent-ink) 28%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-accent-soft) 48%, var(--via-surface));
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.portalPendente:hover {
+  border-color: var(--via-accent-ink);
   text-decoration: none;
 }
 

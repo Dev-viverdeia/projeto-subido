@@ -42,7 +42,7 @@ export function PortalClienteCard({
   }
 
   return (
-    <section className={styles.portal} data-ativo={ativo || undefined}>
+    <section id="portal-cliente" className={styles.portal} data-ativo={ativo || undefined}>
       <div className={styles.topo}>
         <span className={styles.icone}>
           <Globe2 size={16} aria-hidden="true" />

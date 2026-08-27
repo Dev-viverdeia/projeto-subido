@@ -5,11 +5,13 @@ import styles from './SalaEntrega.module.css';
 
 export function ProximaAcaoProjeto({
   concluido,
+  validacao,
   compromisso,
   tarefa,
   onAbrir,
 }: {
   concluido: boolean;
+  validacao: 'nao_solicitada' | 'aguardando' | 'aprovada' | 'ajustes' | null;
   compromisso: string | null;
   tarefa: { titulo: string; faseTitulo: string } | null;
   onAbrir: () => void;
@@ -17,13 +19,26 @@ export function ProximaAcaoProjeto({
   return (
     <button type="button" className={styles.proximaAcao} onClick={onAbrir}>
       <p>
-        {concluido ? 'Projeto concluído' : compromisso ? 'Próximo compromisso' : 'Próxima tarefa'}
+        {concluido
+          ? 'Projeto concluído'
+          : validacao === 'aguardando'
+            ? 'Aceite final pendente'
+            : compromisso
+              ? 'Próximo compromisso'
+              : 'Próxima tarefa'}
       </p>
       {concluido ? (
         <>
           <strong>Entrega aceita pelo cliente</strong>
           <span>
             Revisar encerramento <ArrowRight size={15} aria-hidden="true" />
+          </span>
+        </>
+      ) : validacao === 'aguardando' ? (
+        <>
+          <strong>Aguardando o cliente</strong>
+          <span>
+            Abrir entrega final <ArrowRight size={15} aria-hidden="true" />
           </span>
         </>
       ) : compromisso ? (

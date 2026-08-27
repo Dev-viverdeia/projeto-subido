@@ -77,6 +77,7 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
   if (!acoes.length) return null;
 
   const abertas = acoes.filter((acao) => acao.status === 'pendente').length;
+  if (!abertas) return null;
 
   return (
     <section className={styles.plano} aria-labelledby="plano-vivo-titulo">
@@ -102,9 +103,12 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
       </p>
 
       <ol>
-        {acoes.slice(0, 5).map((acao) => (
-          <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
-        ))}
+        {acoes
+          .filter((acao) => acao.status === 'pendente')
+          .slice(0, 5)
+          .map((acao) => (
+            <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
+          ))}
       </ol>
     </section>
   );
