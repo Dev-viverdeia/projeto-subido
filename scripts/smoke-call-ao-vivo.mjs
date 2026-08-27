@@ -12,18 +12,25 @@
 import { randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import process from 'node:process';
-import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { chromium } from 'playwright';
+import { validarResilienciaAoVivo } from './lib/smoke-call-resiliencia.mjs';
+import { cookiesDaSessao } from './lib/smoke-call-sessao.mjs';
 
 const CONFIRMACAO = '--confirmar-producao';
 const executar = process.argv.includes(CONFIRMACAO);
 const manterConta = process.argv.includes('--manter-conta');
+const simularReconexao = process.argv.includes('--simular-reconexao');
 const audioArgumento = process.argv.find((argumento) => argumento.startsWith('--audio='));
 const audio = audioArgumento?.slice('--audio='.length) || process.env.SUBIDO_SMOKE_CALL_AUDIO;
+const duracaoArgumento = process.argv.find((argumento) =>
+  argumento.startsWith('--duracao-segundos='),
+);
+const duracaoSegundos = Number(duracaoArgumento?.slice('--duracao-segundos='.length) || 0);
 
 if (!executar) {
   console.log(`Uso: npm run smoke:call-ao-vivo -- ${CONFIRMACAO} --audio=/caminho/fala.wav`);
+  console.log('Opcionais: --simular-reconexao --duracao-segundos=90');
   console.log('O teste abre uma sala real, usa LiveKit/OpenAI e apaga a conta criada ao terminar.');
   process.exit(0);
 }
@@ -164,25 +171,6 @@ async function criarCenario() {
   return { email, password };
 }
 
-async function cookiesDaSessao(email, password) {
-  const cookies = [];
-  const supabase = createServerClient(supabaseUrl, anonKey, {
-    cookies: {
-      getAll: () => cookies,
-      setAll: (novos) => {
-        for (const novo of novos) {
-          const indice = cookies.findIndex((item) => item.name === novo.name);
-          if (indice >= 0) cookies[indice] = novo;
-          else cookies.push(novo);
-        }
-      },
-    },
-  });
-  const login = await supabase.auth.signInWithPassword({ email, password });
-  erroSe(login.error, 'autenticar navegador');
-  return cookies.map(({ name, value }) => ({ name, value, url: appUrl }));
-}
-
 function observarPagina(page, papel, eventos) {
   page.on('pageerror', (erro) => eventos.push(`${papel}:pageerror:${erro.message}`));
   page.on('response', (response) => {
@@ -267,7 +255,9 @@ async function exercitarSala({ email, password }) {
     viewport: { width: 1180, height: 780 },
     permissions: ['camera', 'microphone'],
   });
-  await host.addCookies(await cookiesDaSessao(email, password));
+  await host.addCookies(
+    await cookiesDaSessao({ supabaseUrl, anonKey, appUrl, email, password, erroSe }),
+  );
 
   const paginaHost = await host.newPage();
   const paginaConvidado = await convidado.newPage();
@@ -316,6 +306,16 @@ async function exercitarSala({ email, password }) {
     pronto: (valor) => valor.length > 0,
   });
   etapa('live_coach_respondeu');
+
+  await validarResilienciaAoVivo({
+    simularReconexao,
+    duracaoSegundos,
+    contextoHost: host,
+    paginaHost,
+    eventos,
+    esperar,
+    etapa,
+  });
 
   const sairConvidado = paginaConvidado.locator('.lk-disconnect-button');
   await sairConvidado.click();

@@ -91,6 +91,41 @@
   animation: saida-progresso 0.9s ease-in-out infinite;
 }
 
+.recuperacaoAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-6);
+}
+
+.botaoRetomar,
+.botaoEncerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: 0 var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  font: inherit;
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+}
+
+.botaoRetomar {
+  border: 1px solid var(--via-white);
+  background: var(--via-white);
+  color: var(--via-navy);
+}
+
+.botaoEncerrar {
+  border: 1px solid color-mix(in srgb, var(--via-white) 24%, transparent);
+  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  color: var(--via-white);
+}
+
 .saidaCartao[data-estado='processando'] .saidaIcone svg,
 .saidaCartao .saidaIcone:has(svg.lucide-loader-circle) svg {
   animation: saida-girar 1.1s linear infinite;
