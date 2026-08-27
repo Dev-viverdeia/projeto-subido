@@ -1,7 +1,15 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Check, ExternalLink, MessageSquareMore, Send, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  Clock3,
+  ExternalLink,
+  MessageSquareMore,
+  Send,
+  ShieldCheck,
+} from 'lucide-react';
 import {
   prepararEntregaCliente,
   type EstadoProjetoExecucao,
@@ -40,7 +48,7 @@ export function EntregaCliente({
           <ShieldCheck size={17} aria-hidden="true" />
         </span>
         <div>
-          <p>{aceiteFinal ? 'Encerramento do projeto' : 'Apresentação ao cliente'}</p>
+          <p>{aceiteFinal ? 'Encerramento do projeto' : 'Validação do cliente'}</p>
           <h2>
             {aceiteFinal && tarefa.clienteStatus === 'nao_solicitada'
               ? 'Aceite final pronto para envio'
@@ -61,7 +69,19 @@ export function EntregaCliente({
       )}
 
       {decidida || tarefa.clienteStatus === 'aguardando' ? (
-        <div className={styles.resumo}>
+        <div
+          className={styles.resumo}
+          data-aguardando={tarefa.clienteStatus === 'aguardando' || undefined}
+        >
+          {tarefa.clienteStatus === 'aguardando' && (
+            <div className={styles.aguardando}>
+              <Clock3 size={17} aria-hidden="true" />
+              <span>
+                <strong>Agora é com o cliente.</strong>A entrega já está no portal para aprovação ou
+                pedido de ajuste.
+              </span>
+            </div>
+          )}
           {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
           {tarefa.entregavelUrl && (
             <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
@@ -90,7 +110,7 @@ export function EntregaCliente({
               placeholder={
                 aceiteFinal
                   ? 'Resuma o resultado entregue, os materiais finais e como a operação continua.'
-                  : 'Explique o que foi entregue, como validar e o que muda a partir daqui.'
+                  : 'Diga o que foi concluído e qual resultado o cliente deve conferir.'
               }
             />
           </label>
@@ -108,15 +128,22 @@ export function EntregaCliente({
           <p className={styles.privacidade}>
             {aceiteFinal
               ? 'O aceite do cliente conclui formalmente o projeto. Sua evidência interna continua privada.'
-              : 'Sua evidência interna continua privada. Só estes dois campos aparecem no portal.'}
+              : 'A evidência interna continua privada. O cliente vê somente a mensagem e o material compartilhado.'}
           </p>
+
+          {!portalAtivo && concluida && (
+            <a className={styles.portalPendente} href="#portal-cliente">
+              Ative o portal para enviar esta validação
+              <ArrowRight size={14} aria-hidden="true" />
+            </a>
+          )}
 
           {estado.erro && <p role="alert">{estado.erro}</p>}
           {estado.sucesso && <p role="status">{estado.sucesso}</p>}
 
           <div className={styles.acoes}>
             <button type="submit" name="operacao" value="salvar" disabled={pendente}>
-              Salvar apresentação
+              {pendente ? 'Salvando…' : 'Salvar mensagem'}
             </button>
             {concluida ? (
               <button
@@ -127,7 +154,11 @@ export function EntregaCliente({
                 className={styles.enviar}
               >
                 <Send size={14} aria-hidden="true" />{' '}
-                {aceiteFinal ? 'Solicitar aceite final' : 'Solicitar aprovação'}
+                {pendente
+                  ? 'Enviando…'
+                  : aceiteFinal
+                    ? 'Solicitar aceite final'
+                    : 'Enviar para validação'}
               </button>
             ) : (
               <span>Conclua os ajustes para reenviar.</span>

@@ -47,3 +47,71 @@ export function prepararProjetoNoInicio(projeto: ProjetoExecucaoCompleto): Proje
     })),
   };
 }
+
+export function prepararProjetoEmExecucao(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  const feitas = 2;
+  return {
+    ...projeto,
+    status: 'em_execucao',
+    feitas,
+    proximaTarefa: projeto.tarefas[feitas]?.titulo ?? null,
+    tarefas: projeto.tarefas.map((tarefa, indice) => ({
+      ...tarefa,
+      status: indice < feitas ? 'concluida' : indice === feitas ? 'em_andamento' : 'pendente',
+      evidencia:
+        indice < feitas
+          ? tarefa.evidencia || 'Execução registrada e revisada.'
+          : indice === feitas
+            ? 'Base inicial preparada com as fontes aprovadas pelo cliente.'
+            : null,
+      clienteStatus: indice < feitas ? tarefa.clienteStatus : 'nao_solicitada',
+      clienteNota: indice < feitas ? tarefa.clienteNota : null,
+      entregavelUrl: indice < feitas ? tarefa.entregavelUrl : null,
+      clienteComentario: null,
+    })),
+  };
+}
+
+export function prepararProjetoEmValidacao(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  return {
+    ...projeto,
+    status: 'em_validacao',
+    feitas: projeto.total,
+    proximaTarefa: null,
+    tarefas: projeto.tarefas.map((tarefa, indice, lista) => ({
+      ...tarefa,
+      status: 'concluida',
+      evidencia: tarefa.evidencia || 'Execução registrada e revisada.',
+      clienteStatus: indice === lista.length - 1 ? 'aguardando' : tarefa.clienteStatus,
+      clienteNota:
+        indice === lista.length - 1
+          ? 'A operação foi entregue, testada e documentada para a equipe.'
+          : tarefa.clienteNota,
+    })),
+  };
+}
+
+export function prepararProjetoComAjustes(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  const alvo = 2;
+  return {
+    ...prepararProjetoEmExecucao(projeto),
+    feitas: 2,
+    proximaTarefa: projeto.tarefas[alvo]?.titulo ?? null,
+    tarefas: projeto.tarefas.map((tarefa, indice) => ({
+      ...tarefa,
+      status: indice < alvo ? 'concluida' : indice === alvo ? 'em_andamento' : 'pendente',
+      evidencia: indice <= alvo ? tarefa.evidencia || 'Execução registrada e revisada.' : null,
+      clienteStatus: indice === alvo ? 'ajustes' : tarefa.clienteStatus,
+      clienteComentario:
+        indice === alvo
+          ? 'Inclua também os horários de feriado e deixe a transferência para a recepção mais evidente.'
+          : tarefa.clienteComentario,
+    })),
+  };
+}

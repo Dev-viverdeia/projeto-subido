@@ -6,6 +6,131 @@
   gap: var(--via-space-6);
 }
 
+.paineis {
+  position: sticky;
+  z-index: 8;
+  top: calc(var(--app-topbar-height, 72px) + var(--via-space-3));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  padding: 5px;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: var(--via-glass-bar);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(22px) saturate(145%);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+
+.paineis button {
+  min-width: 0;
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: 10px var(--via-space-4);
+  border: 0;
+  border-radius: calc(var(--app-radius-card) - 5px);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.paineis button:hover {
+  background: color-mix(in srgb, var(--via-surface) 58%, transparent);
+  color: var(--via-text-primary);
+}
+
+.paineis button[data-ativo] {
+  background: var(--app-glass-plane-strong);
+  color: var(--via-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    var(--app-elev-1-shadow);
+}
+
+.paineis button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.paineis button > svg {
+  color: var(--via-accent-ink);
+}
+
+.paineis button > span,
+.paineis strong,
+.paineis small {
+  min-width: 0;
+  display: block;
+}
+
+.paineis strong {
+  font-size: var(--via-fs-xs);
+}
+
+.paineis small {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-regular);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avisoBriefing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-5);
+  border: 1px solid color-mix(in srgb, var(--via-accent-ink) 26%, var(--via-border));
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.avisoBriefing strong,
+.avisoBriefing span {
+  display: block;
+}
+
+.avisoBriefing strong {
+  font-size: var(--via-fs-body);
+}
+
+.avisoBriefing span {
+  margin-top: 3px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.avisoBriefing button,
+.resumoOperacional button {
+  min-height: 40px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+
 .hero {
   position: relative;
   overflow: hidden;
@@ -266,6 +391,39 @@
   box-shadow: var(--app-elev-2-shadow);
 }
 
+.fluxoTarefa {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-border-hairline);
+}
+
+.fluxoTarefa > span {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  background: color-mix(in srgb, var(--via-surface) 88%, transparent);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  font-weight: var(--via-fw-semibold);
+}
+
+.fluxoTarefa > span[data-ativo] {
+  background: color-mix(in srgb, var(--via-accent-soft) 44%, var(--via-surface));
+  color: var(--via-text-primary);
+}
+
+.fluxoTarefa > span[data-pronto] {
+  color: var(--via-accent-ink);
+}
+
+.fluxoTarefa i {
+  font: normal var(--via-fs-micro) var(--via-font-mono);
+}
+
 .tarefa[data-status='bloqueada'] {
   border-color: color-mix(in srgb, var(--via-text-muted) 34%, var(--via-border));
 }
@@ -355,6 +513,53 @@
 
 .evidencia {
   padding: clamp(24px, 4vw, 38px);
+}
+
+.evidenciaRegistrada {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: clamp(22px, 3vw, 30px) clamp(24px, 4vw, 38px);
+  background: var(--app-glass-plane);
+}
+
+.evidenciaRegistrada > div {
+  min-width: 0;
+}
+
+.evidenciaRegistrada span {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.evidenciaRegistrada p {
+  max-width: 72ch;
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.evidenciaRegistrada button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  color: var(--via-text-primary);
+  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
 }
 
 .evidencia label,
@@ -526,12 +731,105 @@
 .proximaAcao,
 .cliente,
 .entregaveis,
-.prazo {
+.prazo,
+.resumoOperacional {
   padding: var(--via-space-5);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
+}
+
+.alertaAjustes {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid color-mix(in srgb, var(--via-coral-dark) 28%, var(--via-border));
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-coral) 7%, var(--via-surface));
+  color: var(--via-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.alertaAjustes > svg:first-child {
+  color: var(--via-coral-dark);
+}
+
+.alertaAjustes strong,
+.alertaAjustes small {
+  display: block;
+}
+
+.alertaAjustes strong {
+  font-size: var(--via-fs-xs);
+}
+
+.alertaAjustes small {
+  margin-top: 3px;
+  color: var(--via-text-muted);
+}
+
+.resumoOperacional > p {
+  margin: 0;
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.resumoOperacional dl {
+  margin: var(--via-space-4) 0 0;
+}
+
+.resumoOperacional dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding-block: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.resumoOperacional dt {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.resumoOperacional dd {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-align: right;
+}
+
+.resumoOperacional button {
+  width: 100%;
+  margin-top: var(--via-space-4);
+  border-color: var(--via-border);
+  background: transparent;
+  color: var(--via-text-primary);
+}
+
+.painelCliente,
+.contextoColuna {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+}
+
+.contextoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-6);
+  align-items: start;
 }
 
 .proximaAcao {
@@ -726,6 +1024,34 @@
 }
 
 @media (max-width: 767px) {
+  .paineis {
+    position: static;
+  }
+
+  .paineis button {
+    min-height: 54px;
+    padding-inline: var(--via-space-3);
+  }
+
+  .paineis button > svg {
+    display: none;
+  }
+
+  .paineis small {
+    display: none;
+  }
+
+  .avisoBriefing,
+  .evidenciaRegistrada {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .avisoBriefing button,
+  .evidenciaRegistrada button {
+    width: 100%;
+  }
+
   .hero {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -764,7 +1090,8 @@
   }
 
   .criterios,
-  .lateral {
+  .lateral,
+  .contextoGrid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -826,9 +1153,27 @@
     display: none;
   }
 
+  .fluxoTarefa > span {
+    min-height: 42px;
+    justify-content: center;
+    padding-inline: 4px;
+    font-size: 0.56rem;
+    text-align: center;
+  }
+
+  .fluxoTarefa i {
+    display: none;
+  }
+
   .tarefaTopo,
   .evidencia {
     padding: var(--via-space-5);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .paineis {
+    background: var(--via-surface);
   }
 }
 

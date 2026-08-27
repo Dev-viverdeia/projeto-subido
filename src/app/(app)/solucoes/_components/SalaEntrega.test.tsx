@@ -227,9 +227,26 @@ describe('SalaEntrega', () => {
     expect(screen.getByRole('heading', { name: 'Treinar a equipe', level: 2 })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /Entender/ }));
-    expect(screen.getByRole('textbox', { name: /Registro da execução/i })).toHaveValue(
-      'Mapa aprovado.',
-    );
+    expect(screen.getByText('Mapa aprovado.')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Reabrir para ajustar/i })).toBeVisible();
+  });
+
+  it('separa execução, arquivos e contexto sem alongar a mesma tela', async () => {
+    const user = userEvent.setup();
+    render(<SalaEntrega projeto={PROJETO} />);
+
+    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: /Arquivos/ }));
+    expect(screen.getByRole('heading', { name: /Tudo que o cliente recebe/i })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Montar a base', level: 2 })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /Cliente e escopo/ }));
+    expect(screen.getByRole('heading', { name: 'O combinado do projeto' })).toBeVisible();
+    expect(screen.getByText('Portal do cliente')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: /Executar/ }));
+    expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeVisible();
   });
 
   it('leva o profissional da tarefa revisada para a próxima ação real', async () => {

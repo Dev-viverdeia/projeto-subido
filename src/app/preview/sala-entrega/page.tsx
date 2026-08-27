@@ -2,7 +2,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SalaEntrega } from '@/app/(app)/solucoes/_components/SalaEntrega';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
-import { prepararProjetoNoInicio } from './estado-inicial';
+import {
+  prepararProjetoComAjustes,
+  prepararProjetoEmExecucao,
+  prepararProjetoEmValidacao,
+  prepararProjetoNoInicio,
+} from './estado-inicial';
 import { PreviewSidebar } from './PreviewSidebar';
 import styles from '../mapa-jornada/preview.module.css';
 
@@ -373,8 +378,17 @@ export default async function PreviewSalaEntregaPage({
   searchParams: Promise<{ estado?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const inicio = (await searchParams).estado === 'inicio';
-  const projeto = inicio ? prepararProjetoNoInicio(PROJETO) : PROJETO;
+  const estado = (await searchParams).estado;
+  const projeto =
+    estado === 'inicio'
+      ? prepararProjetoNoInicio(PROJETO)
+      : estado === 'execucao'
+        ? prepararProjetoEmExecucao(PROJETO)
+        : estado === 'validacao'
+          ? prepararProjetoEmValidacao(PROJETO)
+          : estado === 'ajustes'
+            ? prepararProjetoComAjustes(PROJETO)
+            : PROJETO;
 
   return (
     <div className={styles.shell}>

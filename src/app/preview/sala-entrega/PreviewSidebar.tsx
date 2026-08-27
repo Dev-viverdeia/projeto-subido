@@ -21,16 +21,16 @@ export function PreviewSidebar() {
           <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
         </span>
         <span>
-          <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+          <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
         </span>
         <span>
-          <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+          <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
         </span>
         <span>
           <FileSignature size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas
         </span>
         <a className={styles.ativo} href="#conteudo">
-          <BriefcaseBusiness size={18} strokeWidth={1.7} aria-hidden="true" /> Projetos
+          <BriefcaseBusiness size={18} strokeWidth={1.7} aria-hidden="true" /> Entregas
         </a>
         <span>
           <FolderKanban size={18} strokeWidth={1.7} aria-hidden="true" /> Estúdio
