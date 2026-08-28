@@ -92,6 +92,10 @@ export type ResumoProjetoExecucao = {
   feitas: number;
   total: number;
   proximaTarefa: string | null;
+  proximaAcaoPrazoEm: string | null;
+  tarefasBloqueadas: number;
+  validacoesAguardando: number;
+  ajustesSolicitados: number;
 };
 
 export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
@@ -147,7 +151,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem), projeto_acoes(status, titulo, prazo_em, atualizado_em)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(status, titulo, prazo_em, atualizado_em)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -180,6 +184,11 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         feitas,
         total: tarefas.length,
         proximaTarefa: compromisso?.titulo ?? proxima?.titulo ?? null,
+        proximaAcaoPrazoEm: compromisso?.prazo_em ?? null,
+        tarefasBloqueadas: tarefas.filter((tarefa) => tarefa.status === 'bloqueada').length,
+        validacoesAguardando: tarefas.filter((tarefa) => tarefa.cliente_status === 'aguardando')
+          .length,
+        ajustesSolicitados: tarefas.filter((tarefa) => tarefa.cliente_status === 'ajustes').length,
       },
     ];
   });
@@ -249,6 +258,14 @@ export const obterProjetoExecucao = cache(
     const tarefas = data.projeto_tarefas.map(mapearTarefa).sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
+    const proximoCompromisso = data.projeto_acoes
+      .filter((acao) => acao.status === 'pendente')
+      .sort((a, b) => {
+        if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
+        if (a.prazo_em) return -1;
+        if (b.prazo_em) return 1;
+        return b.atualizado_em.localeCompare(a.atualizado_em);
+      })[0];
 
     return {
       id: data.id,
@@ -259,7 +276,12 @@ export const obterProjetoExecucao = cache(
       atualizadoEm: data.atualizado_em,
       feitas,
       total: tarefas.length,
-      proximaTarefa: proxima?.titulo ?? null,
+      proximaTarefa: proximoCompromisso?.titulo ?? proxima?.titulo ?? null,
+      proximaAcaoPrazoEm: proximoCompromisso?.prazo_em ?? null,
+      tarefasBloqueadas: tarefas.filter((tarefa) => tarefa.status === 'bloqueada').length,
+      validacoesAguardando: tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando')
+        .length,
+      ajustesSolicitados: tarefas.filter((tarefa) => tarefa.clienteStatus === 'ajustes').length,
       propostaId: data.proposta_id,
       oportunidadeId: data.oportunidade_id,
       inicioEm: data.inicio_em,
