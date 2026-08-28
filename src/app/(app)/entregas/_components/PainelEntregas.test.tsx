@@ -13,6 +13,10 @@ const EM_EXECUCAO: ResumoProjetoExecucao = {
   feitas: 4,
   total: 10,
   proximaTarefa: 'Validar o roteiro de atendimento com o cliente',
+  proximaAcaoPrazoEm: null,
+  tarefasBloqueadas: 0,
+  validacoesAguardando: 0,
+  ajustesSolicitados: 0,
 };
 
 const CONCLUIDO: ResumoProjetoExecucao = {
@@ -30,7 +34,12 @@ afterEach(cleanup);
 
 describe('PainelEntregas', () => {
   it('leva o profissional à próxima ação da entrega real', () => {
-    render(<PainelEntregas projetos={[EM_EXECUCAO, CONCLUIDO]} />);
+    render(
+      <PainelEntregas
+        projetos={[EM_EXECUCAO, CONCLUIDO]}
+        agora={new Date('2026-08-28T12:00:00Z')}
+      />,
+    );
 
     expect(screen.getByRole('heading', { name: 'Entregas dos clientes' })).toBeInTheDocument();
     expect(screen.getByText('Validar o roteiro de atendimento com o cliente')).toBeInTheDocument();
@@ -39,6 +48,30 @@ describe('PainelEntregas', () => {
       screen.getByRole('link', { name: 'Abrir entrega de Clínica Horizonte' }),
     ).toHaveAttribute('href', `/entregas/${EM_EXECUCAO.id}`);
     expect(screen.getByRole('heading', { name: 'Entregas concluídas' })).toBeInTheDocument();
+  });
+
+  it('destaca a urgência real antes da atualização mais recente', () => {
+    const atrasada: ResumoProjetoExecucao = {
+      ...EM_EXECUCAO,
+      id: '33333333-3333-4333-8333-333333333333',
+      empresa: 'Clínica Prioritária',
+      atualizadoEm: '2026-08-20T12:00:00.000Z',
+      proximaAcaoPrazoEm: '2026-08-27T12:00:00.000Z',
+    };
+    const recente: ResumoProjetoExecucao = {
+      ...EM_EXECUCAO,
+      id: '44444444-4444-4444-8444-444444444444',
+      empresa: 'Clínica Recente',
+      atualizadoEm: '2026-08-28T11:00:00.000Z',
+    };
+
+    render(
+      <PainelEntregas projetos={[recente, atrasada]} agora={new Date('2026-08-28T12:00:00Z')} />,
+    );
+
+    const links = screen.getAllByRole('link', { name: /Abrir entrega de/ });
+    expect(links[0]).toHaveAttribute('aria-label', 'Abrir entrega de Clínica Prioritária');
+    expect(screen.getByText('Próxima ação atrasada')).toBeInTheDocument();
   });
 
   it('explica quando a operação ainda não tem uma entrega aberta', () => {

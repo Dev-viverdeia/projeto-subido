@@ -2,12 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SalaEntrega } from '@/app/(app)/solucoes/_components/SalaEntrega';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
-import {
-  prepararProjetoComAjustes,
-  prepararProjetoEmExecucao,
-  prepararProjetoEmValidacao,
-  prepararProjetoNoInicio,
-} from './estado-inicial';
+import * as estados from './estado-inicial';
 import { PreviewSidebar } from './PreviewSidebar';
 import styles from '../mapa-jornada/preview.module.css';
 
@@ -26,6 +21,10 @@ const PROJETO: ProjetoExecucaoCompleto = {
   feitas: 7,
   total: 7,
   proximaTarefa: null,
+  proximaAcaoPrazoEm: null,
+  tarefasBloqueadas: 0,
+  validacoesAguardando: 0,
+  ajustesSolicitados: 0,
   portalAtivo: true,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: '2026-08-09T12:00:00.000Z',
@@ -381,13 +380,13 @@ export default async function PreviewSalaEntregaPage({
   const estado = (await searchParams).estado;
   const projeto =
     estado === 'inicio'
-      ? prepararProjetoNoInicio(PROJETO)
+      ? estados.prepararProjetoNoInicio(PROJETO)
       : estado === 'execucao'
-        ? prepararProjetoEmExecucao(PROJETO)
+        ? estados.prepararProjetoEmExecucao(PROJETO)
         : estado === 'validacao'
-          ? prepararProjetoEmValidacao(PROJETO)
+          ? estados.prepararProjetoEmValidacao(PROJETO)
           : estado === 'ajustes'
-            ? prepararProjetoComAjustes(PROJETO)
+            ? estados.prepararProjetoComAjustes(PROJETO)
             : PROJETO;
 
   return (

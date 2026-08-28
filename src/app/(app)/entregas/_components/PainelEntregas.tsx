@@ -4,11 +4,19 @@ import {
   ArrowUpRight,
   CalendarDays,
   Check,
-  CircleDot,
+  CircleAlert,
   ClipboardCheck,
+  Clock3,
   FolderKanban,
+  MessageSquareMore,
+  ShieldCheck,
 } from 'lucide-react';
 import type { ResumoProjetoExecucao } from '@/lib/projetos-execucao/queries';
+import {
+  classificarPrioridadeEntrega,
+  ordenarEntregasPorPrioridade,
+  type PrioridadeEntrega,
+} from '@/lib/projetos-execucao/prioridade';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import styles from './PainelEntregas.module.css';
 
@@ -28,17 +36,30 @@ function progresso(projeto: ResumoProjetoExecucao): number {
   return projeto.total ? Math.round((projeto.feitas / projeto.total) * 100) : 0;
 }
 
+function IconePrioridade({ prioridade }: { prioridade: PrioridadeEntrega }) {
+  if (prioridade.grupo === 'acao') return <CircleAlert size={16} strokeWidth={1.7} />;
+  if (prioridade.grupo === 'cliente') return <MessageSquareMore size={16} strokeWidth={1.7} />;
+  return <ShieldCheck size={16} strokeWidth={1.7} />;
+}
+
 function CartaoEntrega({
   projeto,
+  prioridade,
   destaque = false,
 }: {
   projeto: ResumoProjetoExecucao;
+  prioridade: PrioridadeEntrega;
   destaque?: boolean;
 }) {
   const percentual = progresso(projeto);
+  const prazoOperacional = projeto.proximaAcaoPrazoEm ?? projeto.prazoEm;
 
   return (
-    <article className={styles.cartao} data-destaque={destaque || undefined}>
+    <article
+      className={styles.cartao}
+      data-destaque={destaque || undefined}
+      data-prioridade={prioridade.grupo}
+    >
       <Link href={`/entregas/${projeto.id}`} aria-label={`Abrir entrega de ${projeto.empresa}`}>
         <header className={styles.cartaoTopo}>
           <span className={styles.iconeEntrega} aria-hidden="true">
@@ -47,7 +68,10 @@ function CartaoEntrega({
           <span className={styles.estado} data-status={projeto.status}>
             {ROTULO_STATUS_PROJETO[projeto.status]}
           </span>
-          <ArrowUpRight size={17} strokeWidth={1.7} aria-hidden="true" />
+          <span className={styles.sinal} data-grupo={prioridade.grupo}>
+            <IconePrioridade prioridade={prioridade} />
+            {prioridade.rotulo}
+          </span>
         </header>
 
         <div className={styles.identidade}>
@@ -56,10 +80,11 @@ function CartaoEntrega({
         </div>
 
         <div className={styles.proximaAcao}>
-          <CircleDot size={16} strokeWidth={1.7} aria-hidden="true" />
+          <Clock3 size={16} strokeWidth={1.7} aria-hidden="true" />
           <div>
-            <span>Faça agora</span>
+            <span>{destaque ? 'Comece por aqui' : 'Próxima ação'}</span>
             <strong>{projeto.proximaTarefa ?? 'Formalize a entrega final com o cliente'}</strong>
+            <small>{prioridade.detalhe}</small>
           </div>
         </div>
 
@@ -70,10 +95,17 @@ function CartaoEntrega({
             </div>
             <strong>{percentual}%</strong>
           </div>
-          <span className={styles.prazo}>
-            <CalendarDays size={14} strokeWidth={1.7} aria-hidden="true" />
-            {formatarPrazo(projeto.prazoEm)}
-          </span>
+          <div className={styles.cartaoMeta}>
+            <span className={styles.prazo}>
+              <CalendarDays size={14} strokeWidth={1.7} aria-hidden="true" />
+              {projeto.proximaAcaoPrazoEm ? 'Próxima ação' : 'Entrega'} ·{' '}
+              {formatarPrazo(prazoOperacional)}
+            </span>
+            <span className={styles.abrirEntrega}>
+              {destaque ? 'Abrir próxima tarefa' : 'Abrir entrega'}
+              <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
+            </span>
+          </div>
         </footer>
       </Link>
     </article>
@@ -101,35 +133,55 @@ function EstadoVazio() {
   );
 }
 
-export function PainelEntregas({ projetos }: { projetos: ResumoProjetoExecucao[] }) {
-  const ativos = projetos.filter((projeto) => projeto.status !== 'concluido');
+export function PainelEntregas({
+  projetos,
+  agora = new Date(),
+}: {
+  projetos: ResumoProjetoExecucao[];
+  agora?: Date;
+}) {
+  const ativos = ordenarEntregasPorPrioridade(
+    projetos.filter((projeto) => projeto.status !== 'concluido'),
+    agora,
+  );
   const concluidos = projetos.filter((projeto) => projeto.status === 'concluido');
-  const emValidacao = ativos.filter((projeto) => projeto.status === 'em_validacao').length;
+  const prioridades = new Map(
+    ativos.map((projeto) => [projeto.id, classificarPrioridadeEntrega(projeto, agora)]),
+  );
+  const precisamAcao = ativos.filter(
+    (projeto) => prioridades.get(projeto.id)?.grupo === 'acao',
+  ).length;
+  const aguardandoCliente = ativos.filter(
+    (projeto) => prioridades.get(projeto.id)?.grupo === 'cliente',
+  ).length;
+  const noRitmo = ativos.filter((projeto) => prioridades.get(projeto.id)?.grupo === 'ritmo').length;
   const principal = ativos[0] ?? null;
+  const prioridadePrincipal = principal ? prioridades.get(principal.id) : null;
   const demaisAtivos = ativos.slice(1);
 
   return (
     <div className={styles.pagina}>
       <header className={styles.hero}>
-        <span className={styles.heroIcone} aria-hidden="true">
-          <ClipboardCheck size={24} strokeWidth={1.6} />
-        </span>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Serviços vendidos</p>
+          <p className={styles.eyebrow}>Projetos em execução</p>
           <h1>Entregas dos clientes</h1>
           <p>
-            Veja o que foi combinado, execute a próxima tarefa e registre as evidências até o aceite
-            final.
+            Comece pelo que exige ação, acompanhe as validações e mantenha cada cliente dentro do
+            prazo combinado.
           </p>
         </div>
         <dl className={styles.resumo} aria-label="Resumo das entregas">
           <div>
-            <dt>Em andamento</dt>
-            <dd>{ativos.length}</dd>
+            <dt>Pedem ação</dt>
+            <dd>{precisamAcao}</dd>
           </div>
           <div>
-            <dt>Em validação</dt>
-            <dd>{emValidacao}</dd>
+            <dt>Com o cliente</dt>
+            <dd>{aguardandoCliente}</dd>
+          </div>
+          <div>
+            <dt>No ritmo</dt>
+            <dd>{noRitmo}</dd>
           </div>
           <div>
             <dt>Entregues</dt>
@@ -143,12 +195,22 @@ export function PainelEntregas({ projetos }: { projetos: ResumoProjetoExecucao[]
           <header className={styles.cabecalhoSecao}>
             <div>
               <p className={styles.eyebrow}>Prioridade agora</p>
-              <h2 id="titulo-em-andamento">Continue pela próxima tarefa.</h2>
+              <h2 id="titulo-em-andamento">
+                {prioridadePrincipal?.grupo === 'acao'
+                  ? 'Comece por esta entrega.'
+                  : prioridadePrincipal?.grupo === 'cliente'
+                    ? 'Acompanhe esta validação.'
+                    : 'Continue pela próxima tarefa.'}
+              </h2>
             </div>
-            <p>A entrega em destaque é a atualizada mais recentemente.</p>
+            <p>
+              {prioridadePrincipal?.rotulo}. {prioridadePrincipal?.detalhe}.
+            </p>
           </header>
 
-          <CartaoEntrega projeto={principal} destaque />
+          {prioridadePrincipal && (
+            <CartaoEntrega projeto={principal} prioridade={prioridadePrincipal} destaque />
+          )}
 
           {demaisAtivos.length > 0 && (
             <div className={styles.demais}>
@@ -159,7 +221,12 @@ export function PainelEntregas({ projetos }: { projetos: ResumoProjetoExecucao[]
               <ol className={styles.grade}>
                 {demaisAtivos.map((projeto) => (
                   <li key={projeto.id}>
-                    <CartaoEntrega projeto={projeto} />
+                    <CartaoEntrega
+                      projeto={projeto}
+                      prioridade={
+                        prioridades.get(projeto.id) ?? classificarPrioridadeEntrega(projeto, agora)
+                      }
+                    />
                   </li>
                 ))}
               </ol>

@@ -30,6 +30,10 @@ const PROJETOS: ResumoProjetoExecucao[] = [
     feitas: 7,
     total: 12,
     proximaTarefa: 'Validar o fluxo de triagem com a gerente da recepção',
+    proximaAcaoPrazoEm: '2026-08-27T12:00:00.000Z',
+    tarefasBloqueadas: 0,
+    validacoesAguardando: 0,
+    ajustesSolicitados: 0,
   },
   {
     id: '22222222-2222-4222-8222-222222222222',
@@ -41,6 +45,10 @@ const PROJETOS: ResumoProjetoExecucao[] = [
     feitas: 10,
     total: 12,
     proximaTarefa: 'Enviar o relatório do piloto para aprovação do cliente',
+    proximaAcaoPrazoEm: null,
+    tarefasBloqueadas: 0,
+    validacoesAguardando: 1,
+    ajustesSolicitados: 0,
   },
   {
     id: '33333333-3333-4333-8333-333333333333',
@@ -52,6 +60,10 @@ const PROJETOS: ResumoProjetoExecucao[] = [
     feitas: 1,
     total: 9,
     proximaTarefa: 'Confirmar escopo e acessos no kickoff',
+    proximaAcaoPrazoEm: null,
+    tarefasBloqueadas: 0,
+    validacoesAguardando: 0,
+    ajustesSolicitados: 0,
   },
   {
     id: '44444444-4444-4444-8444-444444444444',
@@ -63,6 +75,10 @@ const PROJETOS: ResumoProjetoExecucao[] = [
     feitas: 8,
     total: 8,
     proximaTarefa: null,
+    proximaAcaoPrazoEm: null,
+    tarefasBloqueadas: 0,
+    validacoesAguardando: 0,
+    ajustesSolicitados: 0,
   },
 ];
 
@@ -110,7 +126,7 @@ export default function PreviewEntregasPage() {
       </aside>
 
       <main id="conteudo" className={styles.conteudo}>
-        <PainelEntregas projetos={PROJETOS} />
+        <PainelEntregas projetos={PROJETOS} agora={new Date('2026-08-28T12:00:00.000Z')} />
       </main>
     </div>
   );
