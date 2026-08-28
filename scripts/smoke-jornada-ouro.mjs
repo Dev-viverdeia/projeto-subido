@@ -6,7 +6,8 @@
  * Smoke test opt-in da Jornada de Ouro em um ambiente publicado.
  *
  * O teste cria uma conta descartável, percorre Prospecção -> Vendas ->
- * Enriquecimento -> Reunião -> Proposta -> Projeto e apaga a conta no final.
+ * Enriquecimento -> Reunião -> Proposta -> Projeto -> Briefing -> Portal ->
+ * Ajuste -> Reenvio -> Aceite final e apaga a conta no final.
  * Ele usa provedores reais e, por isso, nunca roda automaticamente no CI.
  */
 
@@ -58,6 +59,8 @@ const teste = {
   reuniao: null,
   proposta: null,
   projeto: null,
+  portalCodigo: null,
+  tarefas: [],
   empresaNome: null,
   propostaTitulo: null,
 };
@@ -79,6 +82,10 @@ function etapa(nome, dados = {}) {
 
 function erroSe(error, contexto) {
   if (error) throw new Error(`${contexto}: ${error.code || 'erro'} ${error.message}`);
+}
+
+function exigir(condicao, contexto) {
+  if (!condicao) throw new Error(contexto);
 }
 
 async function esperar({ ler, pronto, limiteMs, intervaloMs = 2_500, contexto }) {
@@ -384,6 +391,217 @@ async function aceitarPropostaEIniciarProjeto(client) {
   etapa('projeto_iniciado', { tarefas: tarefas.count });
 }
 
+async function lerProjeto() {
+  const resultado = await admin
+    .from('projetos_execucao')
+    .select('id,status,portal_ativo,portal_codigo,briefing_kickoff,concluido_em')
+    .eq('id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .single();
+  erroSe(resultado.error, 'ler projeto');
+  return resultado.data;
+}
+
+async function lerTarefas() {
+  const resultado = await admin
+    .from('projeto_tarefas')
+    .select(
+      'id,titulo,ordem,status,evidencia,cliente_status,cliente_nota,entregavel_url,cliente_comentario,cliente_solicitado_em,cliente_respondido_em',
+    )
+    .eq('projeto_execucao_id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .order('ordem', { ascending: true });
+  erroSe(resultado.error, 'ler tarefas do projeto');
+  return resultado.data || [];
+}
+
+async function confirmarBriefingEAtivarPortal(client) {
+  const confirmadoEm = new Date().toISOString();
+  const briefing = {
+    objetivo: 'Colocar o atendimento com IA em operação sem perder contexto comercial.',
+    criterioSucesso:
+      'Responder o primeiro contato em até cinco minutos e registrar a próxima ação.',
+    responsavelCliente: 'Responsável de operações do cliente',
+    responsavelTecnico: 'Teste Jornada de Ouro',
+    acessos: ['Canal de atendimento de homologação', 'Base de perguntas frequentes'],
+    limites: ['Nenhuma mensagem será enviada sem aprovação durante a validação'],
+    proximosPassos: ['Configurar o fluxo', 'Validar com o cliente', 'Publicar a versão aprovada'],
+    observacoes: 'Acordo operacional descartável criado pelo teste da Jornada de Ouro.',
+    confirmadoEm,
+    fonteCallId: null,
+  };
+  const briefingSalvo = await client
+    .from('projetos_execucao')
+    .update({ briefing_kickoff: briefing })
+    .eq('id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .select('id')
+    .single();
+  erroSe(briefingSalvo.error, 'confirmar briefing');
+
+  const portalAtivado = await client
+    .from('projetos_execucao')
+    .update({ portal_ativo: true, portal_ativado_em: new Date().toISOString() })
+    .eq('id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .select('portal_codigo')
+    .single();
+  erroSe(portalAtivado.error, 'ativar portal do cliente');
+  teste.portalCodigo = portalAtivado.data.portal_codigo;
+  exigir(teste.portalCodigo, 'ativar portal do cliente: código não retornado');
+
+  teste.tarefas = await lerTarefas();
+  exigir(teste.tarefas.length >= 2, 'o roteiro precisa ter ao menos duas tarefas');
+  const projeto = await lerProjeto();
+  exigir(projeto.portal_ativo, 'portal não ficou ativo');
+  exigir(projeto.briefing_kickoff?.confirmadoEm === confirmadoEm, 'briefing não ficou confirmado');
+  etapa('briefing_confirmado_e_portal_ativo', { tarefas: teste.tarefas.length });
+}
+
+async function concluirTarefa(client, tarefa, evidencia) {
+  const atualizacao = await client
+    .from('projeto_tarefas')
+    .update({ status: 'concluida', evidencia })
+    .eq('id', tarefa.id)
+    .eq('projeto_execucao_id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .select('id,status,evidencia')
+    .single();
+  erroSe(atualizacao.error, `concluir tarefa ${tarefa.titulo}`);
+  exigir(atualizacao.data.status === 'concluida', `tarefa não concluída: ${tarefa.titulo}`);
+}
+
+async function solicitarValidacao(client, tarefa, versao) {
+  const atualizacao = await client
+    .from('projeto_tarefas')
+    .update({
+      cliente_nota: `Confira a ${versao} desta entrega e registre sua decisão.`,
+      entregavel_url: `https://subido.viverdeia.ai/qa/jornada-ouro/${tarefa.id}/${encodeURIComponent(versao)}`,
+      cliente_status: 'aguardando',
+    })
+    .eq('id', tarefa.id)
+    .eq('projeto_execucao_id', teste.projeto)
+    .eq('dono', teste.usuario)
+    .eq('status', 'concluida')
+    .select('id,cliente_status,cliente_solicitado_em')
+    .single();
+  erroSe(atualizacao.error, `solicitar validação de ${tarefa.titulo}`);
+  exigir(atualizacao.data.cliente_status === 'aguardando', 'validação não ficou aguardando');
+  exigir(atualizacao.data.cliente_solicitado_em, 'momento da solicitação não foi registrado');
+}
+
+async function exigirDecisaoReservadaAoPortal(client, tarefa) {
+  const tentativa = await client.rpc('projeto_portal_decidir', {
+    p_codigo: teste.portalCodigo,
+    p_tarefa_id: tarefa.id,
+    p_decisao: 'aprovada',
+    p_comentario: null,
+  });
+  exigir(tentativa.error, 'usuário autenticado conseguiu decidir no lugar do cliente');
+  const atual = (await lerTarefas()).find((item) => item.id === tarefa.id);
+  exigir(atual?.cliente_status === 'aguardando', 'tentativa indevida alterou a entrega');
+  etapa('fronteira_portal_validada', { acessoInternoBloqueado: true });
+}
+
+async function decidirComoCliente(tarefa, decisao, comentario = null) {
+  const resultado = await admin.rpc('projeto_portal_decidir', {
+    p_codigo: teste.portalCodigo,
+    p_tarefa_id: tarefa.id,
+    p_decisao: decisao,
+    p_comentario: comentario,
+  });
+  erroSe(resultado.error, `registrar decisão ${decisao}`);
+  exigir(resultado.data === true, `decisão ${decisao} não foi aplicada`);
+}
+
+async function executarEntregaCompleta(client) {
+  const primeira = teste.tarefas[0];
+  const ultima = teste.tarefas.at(-1);
+  exigir(primeira && ultima, 'roteiro de execução vazio');
+
+  await concluirTarefa(client, primeira, 'Primeira versão configurada e validada internamente.');
+  await solicitarValidacao(client, primeira, 'primeira versão');
+  await exigirDecisaoReservadaAoPortal(client, primeira);
+  await decidirComoCliente(
+    primeira,
+    'ajustes',
+    'Ajuste o texto de abertura para deixar o próximo passo mais claro.',
+  );
+
+  let atual = (await lerTarefas()).find((tarefa) => tarefa.id === primeira.id);
+  let projeto = await lerProjeto();
+  exigir(atual?.status === 'em_andamento', 'pedido de ajuste não reabriu a tarefa');
+  exigir(atual?.cliente_status === 'ajustes', 'pedido de ajuste não ficou visível');
+  exigir(projeto.status === 'em_execucao', 'projeto não voltou para execução após o ajuste');
+  etapa('ajuste_solicitado_pelo_cliente');
+
+  await concluirTarefa(
+    client,
+    primeira,
+    'Texto ajustado, retestado e registrado na segunda versão.',
+  );
+  await solicitarValidacao(client, primeira, 'segunda versão');
+  await decidirComoCliente(primeira, 'aprovada');
+  atual = (await lerTarefas()).find((tarefa) => tarefa.id === primeira.id);
+  exigir(atual?.cliente_status === 'aprovada', 'reenvio ajustado não foi aprovado');
+  etapa('ajuste_reenviado_e_aprovado');
+
+  for (const tarefa of teste.tarefas.slice(1)) {
+    await concluirTarefa(
+      client,
+      tarefa,
+      `Evidência automática da Jornada de Ouro para ${tarefa.titulo}.`,
+    );
+  }
+
+  projeto = await lerProjeto();
+  exigir(projeto.status === 'em_validacao', 'projeto não aguardou o aceite final');
+  exigir(!projeto.concluido_em, 'projeto foi encerrado antes do aceite final');
+  await solicitarValidacao(client, ultima, 'entrega final');
+
+  const portalAberto = await fetch(`${appUrl}/portal/${teste.portalCodigo}`, {
+    redirect: 'manual',
+    cache: 'no-store',
+  });
+  const portalAntesDoAceite = await portalAberto.text();
+  exigir(portalAberto.status === 200, `portal público indisponível: HTTP ${portalAberto.status}`);
+  exigir(portalAntesDoAceite.includes(teste.empresaNome), 'portal não mostrou o cliente correto');
+  exigir(/Aguardando você/i.test(portalAntesDoAceite), 'portal não destacou a decisão pendente');
+
+  await decidirComoCliente(ultima, 'aprovada');
+  projeto = await lerProjeto();
+  exigir(projeto.status === 'concluido', 'aceite final não encerrou o projeto');
+  exigir(projeto.concluido_em, 'encerramento não registrou a data de conclusão');
+
+  const evento = await admin
+    .from('crm_eventos')
+    .select('id,tipo')
+    .eq('dono', teste.usuario)
+    .eq('oportunidade_id', teste.oportunidade)
+    .eq('tipo', 'projeto_concluido')
+    .maybeSingle();
+  erroSe(evento.error, 'ler evento de projeto concluído');
+  exigir(evento.data, 'conclusão não foi registrada no histórico do cliente');
+
+  const eventosPortal = await admin
+    .from('projeto_portal_eventos')
+    .select('tipo')
+    .eq('dono', teste.usuario)
+    .eq('projeto_execucao_id', teste.projeto);
+  erroSe(eventosPortal.error, 'ler eventos do portal');
+  const tipos = (eventosPortal.data || []).map((item) => item.tipo);
+  exigir(tipos.includes('ajustes_solicitados'), 'histórico do portal não registrou o ajuste');
+  exigir(tipos.includes('entrega_aprovada'), 'histórico do portal não registrou a aprovação');
+  exigir(
+    tipos.filter((tipo) => tipo === 'aprovacao_solicitada').length >= 3,
+    'histórico do portal perdeu uma solicitação de aprovação',
+  );
+  etapa('entrega_aprovada_e_encerrada', {
+    tarefas: teste.tarefas.length,
+    ajusteReprocessado: true,
+  });
+}
+
 async function verificarRotas(email, password) {
   const cookies = [];
   const supabase = createServerClient(supabaseUrl, anonKey, {
@@ -410,7 +628,12 @@ async function verificarRotas(email, password) {
     { rota: '/vendas', conteudo: teste.empresaNome },
     {
       rota: `/vendas/${teste.oportunidade}`,
-      conteudo: ['Ficha do cliente', teste.empresaNome, 'Cliente em entrega'],
+      conteudo: [
+        'Ficha do cliente',
+        teste.empresaNome,
+        'Ciclo concluído',
+        'Primeiro ciclo concluído',
+      ],
     },
     {
       rota: '/reunioes',
@@ -426,12 +649,13 @@ async function verificarRotas(email, password) {
       conteudo: [teste.propostaTitulo, 'Continuar projeto'],
     },
     {
-      rota: `/solucoes/execucao/${teste.projeto}`,
-      conteudo: ['Sala de Entrega', teste.empresaNome, 'tarefas concluídas'],
+      rota: `/entregas/${teste.projeto}`,
+      conteudo: [teste.empresaNome, 'Entrega aprovada e encerrada.'],
     },
-    { rota: '/solucoes', conteudo: teste.empresaNome },
+    { rota: '/solucoes', conteudo: 'Escolha o que entregar' },
     { rota: '/metricas', conteudo: 'Da lista ao cliente.' },
   ];
+  const falhas = [];
   for (const verificacao of rotas) {
     const { rota } = verificacao;
     const resposta = await fetch(`${appUrl}${rota}`, {
@@ -444,18 +668,39 @@ async function verificarRotas(email, password) {
       resposta.status !== 200 ||
       /Application error|Internal Server Error|A plataforma perdeu o fio/i.test(corpo)
     ) {
-      throw new Error(`rota inválida: ${rota} (HTTP ${resposta.status})`);
+      falhas.push(`rota inválida: ${rota} (HTTP ${resposta.status})`);
+      continue;
     }
     const esperados = Array.isArray(verificacao.conteudo)
       ? verificacao.conteudo
       : [verificacao.conteudo];
     for (const esperado of esperados) {
       if (!esperado || !corpo.includes(esperado)) {
-        throw new Error(`conteúdo ausente em ${rota}: ${esperado || 'valor vazio'}`);
+        falhas.push(`conteúdo ausente em ${rota}: ${esperado || 'valor vazio'}`);
       }
     }
   }
+  exigir(falhas.length === 0, `rotas reprovadas: ${falhas.join(' | ')}`);
   etapa('rotas_validadas', { total: rotas.length });
+}
+
+async function verificarLimpeza() {
+  const tabelas = [
+    'prospeccao_listas',
+    'crm_oportunidades',
+    'calls_reunioes',
+    'propostas',
+    'projetos_execucao',
+  ];
+  for (const tabela of tabelas) {
+    const resultado = await admin
+      .from(tabela)
+      .select('id', { count: 'exact', head: true })
+      .eq('dono', teste.usuario);
+    erroSe(resultado.error, `verificar limpeza em ${tabela}`);
+    exigir(resultado.count === 0, `limpeza incompleta em ${tabela}: ${resultado.count}`);
+  }
+  etapa('limpeza_validada', { tabelas: tabelas.length });
 }
 
 let credenciais;
@@ -467,10 +712,13 @@ try {
   await enriquecer(credenciais.client);
   await concluirReuniao(credenciais.client);
   await aceitarPropostaEIniciarProjeto(credenciais.client);
+  await confirmarBriefingEAtivarPortal(credenciais.client);
+  await executarEntregaCompleta(credenciais.client);
   await verificarRotas(credenciais.email, credenciais.password);
   etapa('jornada_ouro_aprovada', {
     contaDescartavel: true,
     conviteExternoEnviado: false,
+    entregaAprovadaPeloCliente: true,
   });
 } catch (error) {
   console.error(
@@ -485,6 +733,7 @@ try {
       process.exitCode = 1;
     } else {
       etapa('conta_descartavel_removida');
+      await verificarLimpeza();
     }
   } else if (teste.usuario) {
     etapa('conta_mantida_para_inspecao', { usuario: teste.usuario });
