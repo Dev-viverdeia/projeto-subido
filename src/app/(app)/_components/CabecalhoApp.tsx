@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { MenuPerfil } from './MenuPerfil';
+import { MenuPendencias } from './MenuPendencias';
 import { TrilhaDoCabecalho } from './trilha/TrilhaDoCabecalho';
 import styles from './CabecalhoApp.module.css';
 import type { PlanoSubido } from '@/lib/planos/acessos';
+import type { PendenciaEntrega } from '@/lib/projetos-execucao/alertas';
 
 /**
  * Cabeçalho da área logada.
@@ -33,12 +35,14 @@ export function CabecalhoApp({
   email,
   saldoCreditos,
   plano,
+  pendencias,
   logo,
 }: {
   nome: string;
   email: string;
   saldoCreditos: number | null;
   plano: PlanoSubido;
+  pendencias: PendenciaEntrega[];
   logo: ReactNode;
 }) {
   return (
@@ -52,6 +56,7 @@ export function CabecalhoApp({
       </div>
 
       <div className={styles.direita}>
+        <MenuPendencias pendencias={pendencias} />
         <MenuPerfil nome={nome} email={email} saldoCreditos={saldoCreditos} plano={plano} />
       </div>
     </header>
