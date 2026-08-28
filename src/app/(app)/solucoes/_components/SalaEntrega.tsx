@@ -1,19 +1,23 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowRight, Check, FolderOpen, MessageSquareMore, Play, UsersRound } from 'lucide-react';
+import { ArrowRight, Check, FolderOpen, Play, UsersRound } from 'lucide-react';
 import type {
   ProjetoExecucaoCompleto,
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
+import {
+  obterEstadoJornadaEntrega,
+  type DestinoJornadaEntrega,
+} from '@/lib/projetos-execucao/jornada-entrega';
 import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
 import { BriefingKickoff } from './BriefingKickoff';
 import { ContextoEntrega } from './ContextoEntrega';
 import { InicioProjeto } from './InicioProjeto';
+import { JornadaEntrega } from './JornadaEntrega';
 import { PlanoVivo } from './PlanoVivo';
-import { ProximaAcaoProjeto } from './ProximaAcaoProjeto';
 import { TarefaEntrega } from './TarefaEntrega';
 import styles from './SalaEntrega.module.css';
 
@@ -73,6 +77,12 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const ajustesSolicitados = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
+  const estadoJornada = obterEstadoJornadaEntrega({
+    status: projeto.status,
+    briefingConfirmado,
+    tarefas: projeto.tarefas,
+    compromisso: proximoCompromisso?.titulo ?? null,
+  });
 
   function abrirFase(id: string) {
     const nova = fases.find((fase) => fase.id === id);
@@ -92,6 +102,36 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     }
 
     const alvo = proxima ?? ultimaTarefa;
+    if (!alvo) return;
+
+    setPainel('execucao');
+    setFaseId(alvo.faseId);
+    setTarefaId(alvo.id);
+    requestAnimationFrame(() =>
+      document.getElementById('tarefa-em-foco')?.scrollIntoView?.({ behavior: 'smooth' }),
+    );
+  }
+
+  function abrirAcaoJornada(destino: DestinoJornadaEntrega, tarefaAlvo: string | null) {
+    if (destino === 'briefing') {
+      setPainel('cliente');
+      requestAnimationFrame(() =>
+        document.getElementById('briefing-kickoff')?.scrollIntoView?.({ behavior: 'smooth' }),
+      );
+      return;
+    }
+
+    if (destino === 'arquivos') {
+      setPainel('arquivos');
+      return;
+    }
+
+    if (destino === 'compromisso') {
+      document.getElementById('plano-vivo-titulo')?.scrollIntoView?.({ behavior: 'smooth' });
+      return;
+    }
+
+    const alvo = projeto.tarefas.find((tarefa) => tarefa.id === tarefaAlvo) ?? ultimaTarefa;
     if (!alvo) return;
 
     setPainel('execucao');
@@ -299,38 +339,10 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             </main>
 
             <aside className={styles.lateral}>
-              {(projeto.status === 'concluido' ||
-                proximoCompromisso ||
-                !proxima ||
-                tarefaAtual?.id !== proxima.id) && (
-                <ProximaAcaoProjeto
-                  concluido={projeto.status === 'concluido'}
-                  validacao={ultimaTarefa?.clienteStatus ?? null}
-                  compromisso={proximoCompromisso?.titulo ?? null}
-                  tarefa={proxima}
-                  onAbrir={abrirProximaAcao}
-                />
-              )}
-
-              {ajustesSolicitados > 0 && (
-                <button
-                  type="button"
-                  className={styles.alertaAjustes}
-                  onClick={() => {
-                    const tarefa = projeto.tarefas.find((item) => item.clienteStatus === 'ajustes');
-                    if (!tarefa) return;
-                    setFaseId(tarefa.faseId);
-                    setTarefaId(tarefa.id);
-                  }}
-                >
-                  <MessageSquareMore size={17} aria-hidden="true" />
-                  <span>
-                    <strong>O cliente pediu ajustes</strong>
-                    <small>Abrir o retorno e corrigir</small>
-                  </span>
-                  <ArrowRight size={15} aria-hidden="true" />
-                </button>
-              )}
+              <JornadaEntrega
+                estado={estadoJornada}
+                onAbrir={() => abrirAcaoJornada(estadoJornada.destino, estadoJornada.tarefaId)}
+              />
 
               <section className={styles.resumoOperacional}>
                 <p>Resumo da entrega</p>
