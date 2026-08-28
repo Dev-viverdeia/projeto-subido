@@ -8,6 +8,8 @@ import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
 import { concluiuIntroducaoSubido } from '@/lib/auth/introducao';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
+import { listarProjetosExecucao } from '@/lib/projetos-execucao/queries';
+import { montarPendenciasEntrega } from '@/lib/projetos-execucao/alertas';
 import {
   PLANOS_SUBIDO,
   RECURSOS_SUBIDO,
@@ -42,10 +44,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* A leitura do papel não depende do resultado de `getClaims`: as duas usam a
      mesma sessão já validada pelo proxy. Iniciá-las juntas elimina uma viagem
      sequencial ao banco em toda navegação da área logada. */
-  const [{ data }, admin, saldoCreditos] = await Promise.all([
+  const [{ data }, admin, saldoCreditos, projetosExecucao] = await Promise.all([
     supabase.auth.getClaims(),
     ehAdmin(),
     obterSaldoCreditos(),
+    listarProjetosExecucao().catch((erro: unknown) => {
+      console.error('[app-layout:pendencias-entrega]', erro);
+      return [];
+    }),
   ]);
 
   if (!data) redirect(ROTA_ENTRAR);
@@ -66,6 +72,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     };
   });
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
+  const pendenciasEntrega = montarPendenciasEntrega(projetosExecucao);
 
   /* A introdução é parte do produto, não uma página solta. O status fica no
      token autenticado para esta barreira não acrescentar uma consulta ao banco
@@ -117,6 +124,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             email={email}
             saldoCreditos={saldoCreditos}
             plano={plano}
+            pendencias={pendenciasEntrega}
             logo={<SubidoLogo size={17} />}
           />
 
