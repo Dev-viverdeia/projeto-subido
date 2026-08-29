@@ -36,6 +36,10 @@ export function AprovacaoCliente({
         <div className={styles.aprovacaoResumo}>
           <span>O que está sendo validado</span>
           <p className={styles.entregavel}>{tarefa.entregavel}</p>
+          <div className={styles.criterioAceite}>
+            <span>Confira antes de aprovar</span>
+            <p>{tarefa.concluidoQuando}</p>
+          </div>
           {tarefa.clienteNota && <blockquote>{tarefa.clienteNota}</blockquote>}
           {tarefa.entregavelUrl && (
             <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">

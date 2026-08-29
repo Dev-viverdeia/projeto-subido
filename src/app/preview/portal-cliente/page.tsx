@@ -15,6 +15,7 @@ function tarefa(
     Partial<TarefaPortalCliente>,
 ): TarefaPortalCliente {
   return {
+    concluidoQuando: 'O material foi revisado com o responsável e atende ao escopo combinado.',
     clienteNota: null,
     entregavelUrl: null,
     solicitadoEm: null,

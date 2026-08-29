@@ -86,6 +86,42 @@
   gap: var(--via-space-4);
 }
 
+.criterioCliente {
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane-strong);
+}
+
+.criterioCliente span,
+.criterioCliente strong,
+.criterioCliente small {
+  display: block;
+}
+
+.criterioCliente span {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.criterioCliente strong {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  line-height: 1.5;
+}
+
+.criterioCliente small {
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.45;
+}
+
 .entrega label {
   gap: var(--via-space-2);
 }

@@ -273,6 +273,10 @@ describe('SalaEntrega', () => {
     expect(
       screen.getByRole('heading', { name: 'O que importa para Clínica Aurora' }),
     ).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Confira o resultado desta tarefa' })).toBeVisible();
+    expect(
+      screen.getByRole('checkbox', { name: /Revisei o resultado usando o critério acima/i }),
+    ).toBeVisible();
     expect(
       screen.getByText('A recepção recebe cada contato com o contexto completo.'),
     ).toBeVisible();

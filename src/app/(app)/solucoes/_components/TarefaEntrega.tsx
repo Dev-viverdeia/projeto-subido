@@ -7,8 +7,6 @@ import {
   Bot,
   Check,
   CircleDot,
-  FileCheck2,
-  Flag,
   Link2,
   LockKeyhole,
   Play,
@@ -22,6 +20,7 @@ import type {
   ArquivoProjetoExecucao,
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
+import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
 import { EntregaCliente } from './EntregaCliente';
 import { KitOperacionalTarefa } from './KitOperacionalTarefa';
 import styles from './SalaEntrega.module.css';
@@ -58,6 +57,7 @@ export function TarefaEntrega({
   const arquivosDaTarefa = contexto.arquivos.filter(
     (arquivo) => arquivo.tarefaId === tarefa.id,
   ).length;
+  const guiaValidacao = montarGuiaValidacaoTarefa(tarefa);
   const rotuloMomento = aprovada
     ? 'Aprovada pelo cliente'
     : aguardandoCliente
@@ -80,7 +80,7 @@ export function TarefaEntrega({
             <i>01</i> Executar
           </span>
           <span data-pronto={Boolean(tarefa.evidencia) || undefined}>
-            <i>02</i> Registrar
+            <i>02</i> Registrar resultado
           </span>
           <span
             data-ativo={(concluida && !aguardandoCliente && !aprovada) || undefined}
@@ -146,102 +146,116 @@ export function TarefaEntrega({
           />
         ) : null}
 
-        <dl className={styles.criterios}>
-          <div>
-            <dt>
-              <Flag size={14} aria-hidden="true" /> Pronto quando
-            </dt>
-            <dd>{tarefa.concluidoQuando}</dd>
-          </div>
-          <div>
-            <dt>
-              <FileCheck2 size={14} aria-hidden="true" /> O que você entrega
-            </dt>
-            <dd>{tarefa.entregavel}</dd>
-          </div>
-        </dl>
-
-        {concluida ? (
-          <div className={styles.evidenciaRegistrada}>
+        <section className={styles.validacaoTarefa} aria-labelledby="validacao-tarefa-titulo">
+          <header>
             <div>
-              <span>
-                <Check size={15} aria-hidden="true" /> Evidência registrada
-              </span>
-              <p>{tarefa.evidencia}</p>
+              <p>Antes de concluir</p>
+              <h3 id="validacao-tarefa-titulo">Confira o resultado desta tarefa</h3>
             </div>
-            {!aguardandoCliente && !aprovada && (
-              <form action={acao}>
-                <input type="hidden" name="projeto" value={projetoId} />
-                <input type="hidden" name="tarefa" value={tarefa.id} />
-                <input type="hidden" name="evidencia" value={tarefa.evidencia ?? ''} />
-                <button type="submit" name="status" value="em_andamento" disabled={pendente}>
-                  <RotateCcw size={15} aria-hidden="true" />
-                  {pendente ? 'Reabrindo…' : 'Reabrir para ajustar'}
+            <span>{concluida ? 'Resultado registrado' : '2 pontos para revisar'}</span>
+          </header>
+
+          <dl className={styles.criterios}>
+            <div>
+              <dt>Critério de qualidade</dt>
+              <dd>{guiaValidacao.criterio}</dd>
+            </div>
+            <div>
+              <dt>Material para revisão</dt>
+              <dd>{guiaValidacao.material}</dd>
+            </div>
+          </dl>
+
+          {concluida ? (
+            <div className={styles.evidenciaRegistrada}>
+              <div>
+                <span>
+                  <Check size={15} aria-hidden="true" /> Teste e resultado registrados
+                </span>
+                <p>{tarefa.evidencia}</p>
+              </div>
+              {!aguardandoCliente && !aprovada && (
+                <form action={acao}>
+                  <input type="hidden" name="projeto" value={projetoId} />
+                  <input type="hidden" name="tarefa" value={tarefa.id} />
+                  <input type="hidden" name="evidencia" value={tarefa.evidencia ?? ''} />
+                  <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                    <RotateCcw size={15} aria-hidden="true" />
+                    {pendente ? 'Reabrindo…' : 'Reabrir para ajustar'}
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : (
+            <form action={acao} className={styles.evidencia}>
+              <input type="hidden" name="projeto" value={projetoId} />
+              <input type="hidden" name="tarefa" value={tarefa.id} />
+              <label>
+                <span>
+                  <Link2 size={14} aria-hidden="true" />
+                  {tarefa.status === 'bloqueada'
+                    ? 'O que está impedindo o avanço?'
+                    : comAjustes
+                      ? 'Como você testou o ajuste?'
+                      : 'Teste realizado e resultado'}
+                </span>
+                <textarea
+                  name="evidencia"
+                  defaultValue={tarefa.evidencia ?? ''}
+                  maxLength={10_000}
+                  placeholder={
+                    comAjustes
+                      ? 'Descreva a correção, o novo teste e o resultado antes de reenviar.'
+                      : guiaValidacao.orientacaoRegistro
+                  }
+                />
+              </label>
+
+              <label className={styles.confirmacaoCriterio}>
+                <input type="checkbox" name="criterioConfirmado" value="sim" />
+                <span>
+                  <strong>Revisei o resultado usando o critério acima.</strong>
+                  <small>Esta confirmação será exigida somente ao concluir a tarefa.</small>
+                </span>
+              </label>
+
+              {estado.erro && (
+                <p className={styles.erro} role="alert">
+                  {estado.erro}
+                </p>
+              )}
+              {estado.sucesso && (
+                <p className={styles.sucesso} role="status">
+                  {estado.sucesso}
+                </p>
+              )}
+
+              <div className={styles.acoesTarefa}>
+                <button type="submit" name="status" value="bloqueada" disabled={pendente}>
+                  <LockKeyhole size={15} aria-hidden="true" /> Registrar bloqueio
                 </button>
-              </form>
-            )}
-          </div>
-        ) : (
-          <form action={acao} className={styles.evidencia}>
-            <input type="hidden" name="projeto" value={projetoId} />
-            <input type="hidden" name="tarefa" value={tarefa.id} />
-            <label>
-              <span>
-                <Link2 size={14} aria-hidden="true" />
-                {tarefa.status === 'bloqueada'
-                  ? 'O que está impedindo o avanço?'
-                  : comAjustes
-                    ? 'Como você resolveu o ajuste?'
-                    : 'Evidência do que você fez'}
-              </span>
-              <textarea
-                name="evidencia"
-                defaultValue={tarefa.evidencia ?? ''}
-                maxLength={10_000}
-                placeholder={
-                  comAjustes
-                    ? 'Descreva a correção e registre o novo teste antes de reenviar.'
-                    : 'Registre o teste, o resultado observado e, se houver, cole o link do material.'
-                }
-              />
-            </label>
-
-            {estado.erro && (
-              <p className={styles.erro} role="alert">
-                {estado.erro}
-              </p>
-            )}
-            {estado.sucesso && (
-              <p className={styles.sucesso} role="status">
-                {estado.sucesso}
-              </p>
-            )}
-
-            <div className={styles.acoesTarefa}>
-              <button type="submit" name="status" value="bloqueada" disabled={pendente}>
-                <LockKeyhole size={15} aria-hidden="true" /> Registrar bloqueio
-              </button>
-              <button type="submit" name="status" value="em_andamento" disabled={pendente}>
-                <Play size={15} aria-hidden="true" />
-                {pendente
-                  ? 'Salvando…'
-                  : tarefa.status === 'pendente'
-                    ? 'Começar tarefa'
-                    : 'Salvar andamento'}
-              </button>
-              <button
-                type="submit"
-                name="status"
-                value="concluida"
-                className={styles.concluir}
-                disabled={pendente}
-              >
-                <Check size={16} aria-hidden="true" />
-                {pendente ? 'Concluindo…' : comAjustes ? 'Concluir ajuste' : 'Concluir execução'}
-              </button>
-            </div>
-          </form>
-        )}
+                <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                  <Play size={15} aria-hidden="true" />
+                  {pendente
+                    ? 'Salvando…'
+                    : tarefa.status === 'pendente'
+                      ? 'Começar tarefa'
+                      : 'Salvar andamento'}
+                </button>
+                <button
+                  type="submit"
+                  name="status"
+                  value="concluida"
+                  className={styles.concluir}
+                  disabled={pendente}
+                >
+                  <Check size={16} aria-hidden="true" />
+                  {pendente ? 'Concluindo…' : comAjustes ? 'Concluir ajuste' : 'Concluir execução'}
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
       </article>
 
       <EntregaCliente

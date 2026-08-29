@@ -55,6 +55,7 @@ const PROJETO: ProjetoPortalCliente = {
       faseId: 'entender',
       faseTitulo: 'Entender',
       titulo: 'Mapa de demanda',
+      concluidoQuando: 'Os horários de pico e os principais assuntos estão documentados.',
       entregavel: 'Mapa validado.',
       ordem: 1,
       status: 'concluida',
@@ -70,6 +71,7 @@ const PROJETO: ProjetoPortalCliente = {
       faseId: 'preparar',
       faseTitulo: 'Preparar',
       titulo: 'Base aprovada',
+      concluidoQuando: 'As respostas principais têm fonte e aprovação da responsável.',
       entregavel: 'Base versionada.',
       ordem: 1001,
       status: 'concluida',
@@ -92,6 +94,10 @@ describe('PortalProjeto', () => {
     ).toBeVisible();
     expect(screen.getByText('50%')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar entrega/i })).toBeVisible();
+    expect(screen.getByText('Confira antes de aprovar')).toBeVisible();
+    expect(
+      screen.getByText('As respostas principais têm fonte e aprovação da responsável.'),
+    ).toBeVisible();
     expect(screen.getByRole('link', { name: /Baixar/i })).toHaveAttribute(
       'href',
       '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',

@@ -16,6 +16,7 @@ import {
 } from '@/lib/projetos-execucao/actions';
 import type { TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_CLIENTE } from '@/lib/projetos-execucao/status';
+import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
 import styles from './EntregaCliente.module.css';
 
 const INICIAL: EstadoProjetoExecucao = {};
@@ -34,6 +35,7 @@ export function EntregaCliente({
   const [estado, acao, pendente] = useActionState(prepararEntregaCliente, INICIAL);
   const concluida = tarefa.status === 'concluida';
   const decidida = tarefa.clienteStatus === 'aprovada';
+  const guiaValidacao = montarGuiaValidacaoTarefa(tarefa);
 
   if (!concluida && tarefa.clienteStatus === 'nao_solicitada') return null;
 
@@ -101,11 +103,16 @@ export function EntregaCliente({
         <form action={acao}>
           <input type="hidden" name="projeto" value={projetoId} />
           <input type="hidden" name="tarefa" value={tarefa.id} />
+          <section className={styles.criterioCliente} aria-label="Critério enviado ao cliente">
+            <span>O cliente vai conferir</span>
+            <strong>{guiaValidacao.criterio}</strong>
+            <small>Material: {guiaValidacao.material}</small>
+          </section>
           <label>
             <span>Mensagem para o cliente</span>
             <textarea
               name="nota"
-              defaultValue={tarefa.clienteNota ?? ''}
+              defaultValue={tarefa.clienteNota ?? guiaValidacao.mensagemCliente}
               maxLength={4000}
               placeholder={
                 aceiteFinal
