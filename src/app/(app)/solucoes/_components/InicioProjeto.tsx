@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useActionState } from 'react';
 import {
   ArrowRight,
+  BadgeCheck,
   CalendarDays,
   Check,
   ClipboardCheck,
+  FileSignature,
   KeyRound,
   Save,
   Video,
@@ -14,6 +16,7 @@ import {
 import { definirPrazoProjeto, type EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_CALL, callPodeAbrir } from '@/lib/calls/tipos';
+import { formatarReais } from '@/lib/propostas/schema';
 import styles from './InicioProjeto.module.css';
 
 const ESTADO_INICIAL: EstadoProjetoExecucao = {};
@@ -23,6 +26,13 @@ const DATA_HORA = new Intl.DateTimeFormat('pt-BR', {
   month: 'short',
   hour: '2-digit',
   minute: '2-digit',
+  timeZone: 'America/Sao_Paulo',
+});
+
+const DATA_ACEITE = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
   timeZone: 'America/Sao_Paulo',
 });
 
@@ -52,26 +62,82 @@ export function InicioProjeto({
       ? `/sala/${kickoff.codigoPublico}`
       : `/reunioes/${kickoff.id}`
     : `/reunioes?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`;
+  const prazoDefinido = Boolean(projeto.prazoEm);
+  const preparacaoCompleta = briefingConfirmado && Boolean(kickoff) && prazoDefinido;
+  const decisoesProntas = [briefingConfirmado, Boolean(kickoff), prazoDefinido].filter(
+    Boolean,
+  ).length;
+  const pendencias = 3 - decisoesProntas;
+  const etapaAtual = !briefingConfirmado
+    ? 'briefing'
+    : !kickoff
+      ? 'kickoff'
+      : !prazoDefinido
+        ? 'prazo'
+        : 'execucao';
 
   return (
     <section className={styles.inicio} aria-labelledby="inicio-projeto-titulo">
       <header className={styles.cabecalho}>
         <div>
-          <p>Antes de construir</p>
-          <h2 id="inicio-projeto-titulo">Prepare o início</h2>
+          <p>Passagem da venda</p>
+          <h2 id="inicio-projeto-titulo">Da proposta aprovada à primeira tarefa</h2>
         </div>
-        <span>4 decisões para sair do papel</span>
+        <span>{decisoesProntas}/3 decisões prontas</span>
       </header>
 
+      <div className={styles.vendaConfirmada}>
+        <span className={styles.iconeVenda} aria-hidden="true">
+          <BadgeCheck size={22} strokeWidth={1.7} />
+        </span>
+        <div className={styles.vendaTexto}>
+          <p>Venda confirmada</p>
+          <strong>Proposta V{projeto.aceiteVenda.versao.toString().padStart(2, '0')} aceita</strong>
+          <small>
+            {projeto.aceiteVenda.aceitoPor
+              ? `${projeto.aceiteVenda.aceitoPor} aprovou em `
+              : 'Aprovação registrada em '}
+            {DATA_ACEITE.format(new Date(projeto.aceiteVenda.aceitoEm))}.
+          </small>
+        </div>
+        <dl className={styles.vendaResumo}>
+          <div>
+            <dt>Cliente</dt>
+            <dd>{projeto.empresa}</dd>
+          </div>
+          <div>
+            <dt>Investimento</dt>
+            <dd>{formatarReais(projeto.documento.investimento.valorCentavos)}</dd>
+          </div>
+          <div>
+            <dt>Entrega</dt>
+            <dd>{projeto.documento.entregaveis.length} itens combinados</dd>
+          </div>
+        </dl>
+        <Link href={`/propostas/${projeto.propostaId}`} className={styles.verProposta}>
+          <FileSignature size={15} aria-hidden="true" /> Ver versão aceita
+        </Link>
+      </div>
+
+      <p className={styles.explicacao}>
+        A sala trouxe o escopo que o cliente aprovou. Agora confirme como o trabalho vai acontecer;
+        a implementação continua sendo feita por você.
+      </p>
+
       <ol className={styles.passos}>
-        <li>
-          <span className={styles.numero}>01</span>
+        <li
+          data-pronto={briefingConfirmado || undefined}
+          data-atual={etapaAtual === 'briefing' || undefined}
+        >
+          <span className={styles.numero}>
+            {briefingConfirmado ? <Check size={13} aria-label="Concluído" /> : '01'}
+          </span>
           <div className={styles.icone}>
             <ClipboardCheck size={18} strokeWidth={1.8} aria-hidden="true" />
           </div>
           <div className={styles.conteudo}>
             <p>Acordo operacional</p>
-            <strong>{briefingConfirmado ? 'Combinado confirmado' : 'Revisar o briefing'}</strong>
+            <strong>{briefingConfirmado ? 'Combinado confirmado' : 'Complete o briefing'}</strong>
             <small>Objetivo, sucesso, responsáveis, acessos e limites em um único lugar.</small>
           </div>
           <a className={styles.acaoSecundaria} href="#briefing-kickoff">
@@ -80,8 +146,13 @@ export function InicioProjeto({
           </a>
         </li>
 
-        <li>
-          <span className={styles.numero}>02</span>
+        <li
+          data-pronto={Boolean(kickoff) || undefined}
+          data-atual={etapaAtual === 'kickoff' || undefined}
+        >
+          <span className={styles.numero}>
+            {kickoff ? <Check size={13} aria-label="Concluído" /> : '02'}
+          </span>
           <div className={styles.icone}>
             <Video size={18} strokeWidth={1.8} aria-hidden="true" />
           </div>
@@ -100,8 +171,13 @@ export function InicioProjeto({
           </Link>
         </li>
 
-        <li>
-          <span className={styles.numero}>03</span>
+        <li
+          data-pronto={prazoDefinido || undefined}
+          data-atual={etapaAtual === 'prazo' || undefined}
+        >
+          <span className={styles.numero}>
+            {prazoDefinido ? <Check size={13} aria-label="Concluído" /> : '03'}
+          </span>
           <div className={styles.icone}>
             <CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
           </div>
@@ -133,11 +209,15 @@ export function InicioProjeto({
             )}
           </div>
           <span className={styles.estado} data-pronto={Boolean(projeto.prazoEm) || undefined}>
-            {projeto.prazoEm ? <Check size={14} aria-label="Definido" /> : 'Pendente'}
+            {prazoDefinido ? <Check size={14} aria-label="Definido" /> : 'Pendente'}
           </span>
         </li>
 
-        <li className={styles.primeiroPasso}>
+        <li
+          className={styles.primeiroPasso}
+          data-pronto={preparacaoCompleta || undefined}
+          data-atual={etapaAtual === 'execucao' || undefined}
+        >
           <span className={styles.numero}>04</span>
           <div className={styles.icone}>
             <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
@@ -145,10 +225,20 @@ export function InicioProjeto({
           <div className={styles.conteudo}>
             <p>Primeiro passo executável</p>
             <strong>{primeiraTarefa || 'Revise o escopo do projeto'}</strong>
-            <small>Abra o passo a passo e registre o resultado de cada tarefa.</small>
+            <small>
+              {preparacaoCompleta
+                ? 'Abra o passo a passo e registre o resultado de cada tarefa.'
+                : `${pendencias} ${pendencias === 1 ? 'pendência precisa' : 'pendências precisam'} ser resolvida${pendencias === 1 ? '' : 's'} antes de executar.`}
+            </small>
           </div>
-          <button type="button" className={styles.acaoPrincipal} onClick={onComecar}>
-            Começar agora <ArrowRight size={15} aria-hidden="true" />
+          <button
+            type="button"
+            className={styles.acaoPrincipal}
+            onClick={onComecar}
+            disabled={!preparacaoCompleta}
+          >
+            {preparacaoCompleta ? 'Começar execução' : 'Prepare o projeto'}
+            <ArrowRight size={15} aria-hidden="true" />
           </button>
         </li>
       </ol>

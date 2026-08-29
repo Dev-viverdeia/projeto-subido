@@ -46,6 +46,11 @@ const PROJETO: ProjetoExecucaoCompleto = {
   empresa: 'Clínica Aurora',
   status: 'em_execucao',
   inicioEm: '2026-08-01T12:00:00.000Z',
+  aceiteVenda: {
+    versao: 2,
+    aceitoEm: '2026-08-01T11:30:00.000Z',
+    aceitoPor: 'Camila Rios',
+  },
   prazoEm: null,
   atualizadoEm: '2026-08-09T12:00:00.000Z',
   feitas: 1,
@@ -144,7 +149,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
 };
 
 describe('SalaEntrega', () => {
-  it('guia o início do projeto antes da primeira execução', () => {
+  it('explica a venda aceita e bloqueia a execução enquanto a preparação está incompleta', () => {
     render(
       <SalaEntrega
         projeto={{
@@ -178,7 +183,15 @@ describe('SalaEntrega', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Prepare o início' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Da proposta aprovada à primeira tarefa' }),
+    ).toBeVisible();
+    expect(screen.getByText('Venda confirmada')).toBeVisible();
+    expect(screen.getByText('Proposta V02 aceita')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Ver versão aceita/i })).toHaveAttribute(
+      'href',
+      `/propostas/${PROJETO.propostaId}`,
+    );
     expect(screen.getByRole('textbox', { name: 'Responsável do cliente' })).toHaveValue(
       'Camila Rios',
     );
@@ -187,8 +200,39 @@ describe('SalaEntrega', () => {
       `/reunioes?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
     );
     expect(screen.getByLabelText('Prazo da entrega')).toBeVisible();
-    expect(screen.getByRole('button', { name: /Começar agora/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Prepare o projeto/i })).toBeDisabled();
     expect(screen.getByText(/Senhas, tokens e chaves nunca devem ser salvos/i)).toBeVisible();
+  });
+
+  it('libera a primeira tarefa quando briefing, kickoff e prazo estão prontos', async () => {
+    const user = userEvent.setup();
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          feitas: 0,
+          prazoEm: '2026-08-30T12:00:00.000Z',
+          kickoff: {
+            id: '55555555-5555-4555-8555-555555555555',
+            status: 'agendada',
+            agendadaPara: '2026-08-14T17:00:00.000Z',
+            codigoPublico: '66666666-6666-4666-8666-666666666666',
+          },
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            status: 'pendente' as const,
+            evidencia: null,
+          })),
+        }}
+      />,
+    );
+
+    expect(screen.getByText('3/3 decisões prontas')).toBeVisible();
+    const comecar = screen.getByRole('button', { name: /Começar execução/i });
+    expect(comecar).toBeEnabled();
+
+    await user.click(comecar);
+    expect(screen.getByRole('heading', { name: 'Mapear demanda', level: 2 })).toBeVisible();
   });
 
   it('mostra o kickoff já agendado sem pedir uma nova reunião', () => {

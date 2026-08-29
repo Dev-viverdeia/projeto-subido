@@ -16,7 +16,7 @@ const TELAS = [
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/sala-entrega', 'Compromissos registrados com o cliente'],
+  ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {
@@ -78,12 +78,9 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');
-    const compromissoConcluido = page.getByRole('button', {
-      name: 'Reabrir tarefa',
-      exact: true,
-    });
-    await compromissoConcluido.scrollIntoViewIfNeeded();
-    await expect(compromissoConcluido).toBeVisible();
+    const fimDaSala = page.getByRole('button', { name: 'Ver acordo e portal' });
+    await fimDaSala.scrollIntoViewIfNeeded();
+    await expect(fimDaSala).toBeVisible();
 
     const alturas = await page.evaluate(() => ({
       documento: document.documentElement.scrollHeight,
