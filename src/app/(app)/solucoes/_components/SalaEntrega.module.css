@@ -80,7 +80,7 @@
 .paineis small {
   overflow: hidden;
   margin-top: 3px;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-regular);
   text-overflow: ellipsis;
@@ -406,7 +406,7 @@
   gap: var(--via-space-2);
   padding-inline: var(--via-space-4);
   background: color-mix(in srgb, var(--via-surface) 88%, transparent);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-semibold);
 }

@@ -23,6 +23,7 @@ import type {
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
 import { EntregaCliente } from './EntregaCliente';
+import { KitOperacionalTarefa } from './KitOperacionalTarefa';
 import styles from './SalaEntrega.module.css';
 
 const ESTADO_INICIAL: EstadoProjetoExecucao = {};
@@ -33,6 +34,7 @@ export function TarefaEntrega({
   portalAtivo,
   aceiteFinal,
   contexto,
+  onAbrirArquivos,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
@@ -46,12 +48,16 @@ export function TarefaEntrega({
     limites: string[];
     arquivos: ArquivoProjetoExecucao[];
   };
+  onAbrirArquivos: (tarefaId: string) => void;
 }) {
   const [estado, acao, pendente] = useActionState(atualizarTarefaProjeto, ESTADO_INICIAL);
   const concluida = tarefa.status === 'concluida';
   const aguardandoCliente = tarefa.clienteStatus === 'aguardando';
   const aprovada = tarefa.clienteStatus === 'aprovada';
   const comAjustes = tarefa.clienteStatus === 'ajustes';
+  const arquivosDaTarefa = contexto.arquivos.filter(
+    (arquivo) => arquivo.tarefaId === tarefa.id,
+  ).length;
   const rotuloMomento = aprovada
     ? 'Aprovada pelo cliente'
     : aguardandoCliente
@@ -131,6 +137,14 @@ export function TarefaEntrega({
             </div>
           </dl>
         </section>
+
+        {tarefa.kitOperacional ? (
+          <KitOperacionalTarefa
+            kit={tarefa.kitOperacional}
+            arquivosDaTarefa={arquivosDaTarefa}
+            onAbrirArquivos={() => onAbrirArquivos(tarefa.id)}
+          />
+        ) : null}
 
         <dl className={styles.criterios}>
           <div>

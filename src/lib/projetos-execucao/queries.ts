@@ -3,6 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { handleError } from '@/lib/errors';
 import { lerDocumentoProposta, type DocumentoProposta } from '@/lib/propostas/schema';
+import { lerRoteiroProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusCall } from '@/lib/calls/tipos';
@@ -14,6 +15,7 @@ import {
   type BriefingKickoff,
   type OrigemBriefingKickoff,
 } from './briefing';
+import { montarKitOperacionalTarefa, type KitOperacionalTarefa } from './kit-operacional';
 
 export type TarefaProjetoExecucao = {
   id: string;
@@ -35,6 +37,7 @@ export type TarefaProjetoExecucao = {
   clienteSolicitadoEm: string | null;
   clienteRespondidoEm: string | null;
   clienteComentario: string | null;
+  kitOperacional?: KitOperacionalTarefa | null;
 };
 
 export type ArquivoProjetoExecucao = {
@@ -127,7 +130,10 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
 
 type LinhaTarefa = Tables<'projeto_tarefas'>;
 
-function mapearTarefa(linha: LinhaTarefa): TarefaProjetoExecucao {
+function mapearTarefa(
+  linha: LinhaTarefa,
+  guia: { projetoSlug: string; roteiro: RoteiroProjeto } | null = null,
+): TarefaProjetoExecucao {
   return {
     id: linha.id,
     faseId: linha.fase_id,
@@ -148,6 +154,14 @@ function mapearTarefa(linha: LinhaTarefa): TarefaProjetoExecucao {
     clienteSolicitadoEm: linha.cliente_solicitado_em,
     clienteRespondidoEm: linha.cliente_respondido_em,
     clienteComentario: linha.cliente_comentario,
+    kitOperacional: guia
+      ? montarKitOperacionalTarefa({
+          projetoSlug: guia.projetoSlug,
+          roteiro: guia.roteiro,
+          faseId: linha.fase_id,
+          passoId: linha.passo_id,
+        })
+      : null,
   };
 }
 
@@ -215,7 +229,16 @@ export const obterProjetoExecucao = cache(
     const documento = lerDocumentoProposta(data.documento);
     if (!documento) return null;
 
-    const [resultadoKickoff, resultadoAceite] = await Promise.all([
+    const consultarGuia = async () => {
+      if (!data.projeto_id) return { data: null, error: null };
+      return await supabase
+        .from('solucoes')
+        .select('slug, projeto_roteiros(roteiro)')
+        .eq('id', data.projeto_id)
+        .maybeSingle();
+    };
+
+    const [resultadoKickoff, resultadoAceite, resultadoGuia] = await Promise.all([
       supabase
         .from('calls_reunioes')
         .select('id, status, agendada_para, codigo_publico')
@@ -230,12 +253,15 @@ export const obterProjetoExecucao = cache(
         .select('versao, aceita_em, decisao_nome')
         .eq('id', data.proposta_id)
         .maybeSingle(),
+      consultarGuia(),
     ]);
     const { data: kickoff, error: erroKickoff } = resultadoKickoff;
     const { data: aceite, error: erroAceite } = resultadoAceite;
+    const { data: conteudoProjeto, error: erroGuia } = resultadoGuia;
 
     if (erroKickoff) throw handleError(erroKickoff, 'projetos-execucao:kickoff');
     if (erroAceite) throw handleError(erroAceite, 'projetos-execucao:aceite-venda');
+    if (erroGuia) throw handleError(erroGuia, 'projetos-execucao:guia-operacional');
 
     const { data: analiseKickoff, error: erroAnaliseKickoff } = kickoff
       ? await supabase
@@ -270,7 +296,14 @@ export const obterProjetoExecucao = cache(
         }
       : briefingDaOrigem;
 
-    const tarefas = data.projeto_tarefas.map(mapearTarefa).sort((a, b) => a.ordem - b.ordem);
+    const roteiro = conteudoProjeto?.projeto_roteiros
+      ? lerRoteiroProjeto(conteudoProjeto.projeto_roteiros.roteiro)
+      : null;
+    const guia =
+      conteudoProjeto?.slug && roteiro ? { projetoSlug: conteudoProjeto.slug, roteiro } : null;
+    const tarefas = data.projeto_tarefas
+      .map((tarefa) => mapearTarefa(tarefa, guia))
+      .sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
     const proximoCompromisso = data.projeto_acoes
