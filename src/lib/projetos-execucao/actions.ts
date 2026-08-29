@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { createClient } from '@/lib/supabase/server';
 import { lerBriefingKickoff } from './briefing';
+import { validarAtualizacaoTarefa } from './validacao-tarefa';
 
 const IniciarSchema = z.object({ proposta: z.uuid() });
 const TarefaSchema = z.object({
@@ -14,6 +15,7 @@ const TarefaSchema = z.object({
   tarefa: z.uuid(),
   status: z.enum(['pendente', 'em_andamento', 'concluida', 'bloqueada']),
   evidencia: z.string().trim().max(10_000),
+  criterioConfirmado: z.preprocess((valor) => valor === 'sim', z.boolean()),
 });
 
 const PrazoSchema = z.object({
@@ -114,19 +116,15 @@ export async function atualizarTarefaProjeto(
     tarefa: formData.get('tarefa'),
     status: formData.get('status'),
     evidencia: formData.get('evidencia') ?? '',
+    criterioConfirmado: formData.get('criterioConfirmado'),
   });
   if (!validacao.success) return { erro: 'Revise a atualização desta tarefa.' };
-  if (
-    (validacao.data.status === 'concluida' || validacao.data.status === 'bloqueada') &&
-    !validacao.data.evidencia
-  ) {
-    return {
-      erro:
-        validacao.data.status === 'concluida'
-          ? 'Registre uma evidência antes de concluir.'
-          : 'Descreva o bloqueio para saber como retomar.',
-    };
-  }
+  const erroValidacao = validarAtualizacaoTarefa({
+    status: validacao.data.status,
+    registro: validacao.data.evidencia,
+    criterioConfirmado: validacao.data.criterioConfirmado,
+  });
+  if (erroValidacao) return { erro: erroValidacao };
 
   const { supabase, user } = await usuarioAtual();
   if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };

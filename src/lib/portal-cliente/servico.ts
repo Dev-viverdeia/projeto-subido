@@ -20,6 +20,7 @@ export type TarefaPortalCliente = {
   faseId: string;
   faseTitulo: string;
   titulo: string;
+  concluidoQuando: string;
   entregavel: string;
   ordem: number;
   status: StatusTarefaProjeto;
@@ -97,7 +98,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -116,6 +117,7 @@ export const obterPortalCliente = cache(
         faseId: tarefa.fase_id,
         faseTitulo: tarefa.fase_titulo,
         titulo: tarefa.titulo,
+        concluidoQuando: tarefa.concluido_quando,
         entregavel: tarefa.entregavel,
         ordem: tarefa.ordem,
         status: tarefa.status,
