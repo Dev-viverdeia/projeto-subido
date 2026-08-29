@@ -472,11 +472,117 @@
   text-wrap: balance;
 }
 
-.acao {
-  margin: 0;
+.comoExecutar {
   padding: 0 clamp(24px, 4vw, 38px) clamp(24px, 4vw, 36px) calc(clamp(24px, 4vw, 38px) + 58px);
+}
+
+.comoExecutar p,
+.comoExecutar strong {
+  margin: 0;
+}
+
+.comoExecutar p {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.comoExecutar strong {
+  display: block;
+  max-width: 68ch;
+  margin-top: var(--via-space-2);
   color: var(--via-text-muted);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
   line-height: 1.65;
+}
+
+.contextoTarefa {
+  margin: 0 clamp(24px, 4vw, 38px) clamp(24px, 4vw, 36px);
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-glass-blur);
+}
+
+.contextoTarefa > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: var(--via-space-4) var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.contextoTarefa header p,
+.contextoTarefa header h3 {
+  margin: 0;
+}
+
+.contextoTarefa header p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.contextoTarefa header h3 {
+  margin-top: 3px;
+  font-size: var(--via-fs-body);
+}
+
+.contextoTarefa header a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  flex: 0 0 auto;
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.contextoTarefa header a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.contextoTarefa dl {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 0.72fr;
+  margin: 0;
+}
+
+.contextoTarefa dl > div {
+  min-width: 0;
+  padding: var(--via-space-4) var(--via-space-5);
+}
+
+.contextoTarefa dl > div + div {
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.contextoTarefa dt {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.contextoTarefa dd {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.5;
 }
 
 .criterios {
@@ -1090,6 +1196,7 @@
   }
 
   .criterios,
+  .contextoTarefa dl,
   .lateral,
   .contextoGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -1100,7 +1207,21 @@
     border-left: 0;
   }
 
-  .acao {
+  .contextoTarefa dl > div + div {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+
+  .contextoTarefa > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .contextoTarefa header a {
+    width: 100%;
+  }
+
+  .comoExecutar {
     padding-left: var(--via-space-5);
   }
 
@@ -1166,8 +1287,13 @@
   }
 
   .tarefaTopo,
-  .evidencia {
+  .evidencia,
+  .comoExecutar {
     padding: var(--via-space-5);
+  }
+
+  .contextoTarefa {
+    margin: 0 var(--via-space-5) var(--via-space-5);
   }
 }
 

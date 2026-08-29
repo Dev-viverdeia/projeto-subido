@@ -297,6 +297,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                   projetoId={projeto.id}
                   tarefa={tarefaAtual}
                   portalAtivo={projeto.portalAtivo}
+                  contexto={{
+                    empresa: projeto.empresa,
+                    objetivo: projeto.briefing.objetivo || projeto.documento.objetivo,
+                    criterioSucesso: projeto.briefing.criterioSucesso,
+                    acessos: projeto.briefing.acessos,
+                    limites: projeto.briefing.limites,
+                    arquivos: projeto.arquivos,
+                  }}
                   aceiteFinal={
                     tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
                   }

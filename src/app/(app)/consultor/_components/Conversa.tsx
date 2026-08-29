@@ -36,11 +36,13 @@ export function Conversa({
   pendente = false,
   ultimaMensagemId,
   exemplos,
+  textoInicial = '',
 }: {
   threadId?: string;
   pendente?: boolean;
   ultimaMensagemId?: string;
   exemplos?: ExemploDoConsultor[];
+  textoInicial?: string;
 }) {
   const router = useRouter();
   const campoRef = useRef<HTMLTextAreaElement>(null);
@@ -49,7 +51,7 @@ export function Conversa({
   const fimAncora = useRef<HTMLDivElement>(null);
   const versaoDoHistorico = useRef(ultimaMensagemId);
 
-  const [texto, setTexto] = useState('');
+  const [texto, setTexto] = useState(textoInicial.slice(0, MAXIMO));
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [arquivosEmVoo, setArquivosEmVoo] = useState<File[]>([]);
   const [threadEmUso, setThreadEmUso] = useState(threadId);
