@@ -71,6 +71,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const [painel, setPainel] = useState<PainelSala>(
     briefingConfirmado && projeto.feitas > 0 ? 'execucao' : 'cliente',
   );
+  const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
   const entregasAguardando = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'aguardando',
   ).length;
@@ -122,6 +123,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     }
 
     if (destino === 'arquivos') {
+      setArquivoTarefaId(null);
       setPainel('arquivos');
       return;
     }
@@ -140,6 +142,11 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     requestAnimationFrame(() =>
       document.getElementById('tarefa-em-foco')?.scrollIntoView?.({ behavior: 'smooth' }),
     );
+  }
+
+  function abrirArquivosDaTarefa(tarefaAlvo: string) {
+    setArquivoTarefaId(tarefaAlvo);
+    setPainel('arquivos');
   }
 
   return (
@@ -228,7 +235,10 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           type="button"
           data-ativo={painel === 'arquivos' || undefined}
           aria-current={painel === 'arquivos' ? 'page' : undefined}
-          onClick={() => setPainel('arquivos')}
+          onClick={() => {
+            setArquivoTarefaId(null);
+            setPainel('arquivos');
+          }}
         >
           <FolderOpen size={17} aria-hidden="true" />
           <span>
@@ -305,6 +315,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                     limites: projeto.briefing.limites,
                     arquivos: projeto.arquivos,
                   }}
+                  onAbrirArquivos={abrirArquivosDaTarefa}
                   aceiteFinal={
                     tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
                   }
@@ -386,6 +397,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           arquivos={projeto.arquivos}
           eventos={projeto.eventos}
           concluido={projeto.status === 'concluido'}
+          tarefaInicialId={arquivoTarefaId}
         />
       )}
 

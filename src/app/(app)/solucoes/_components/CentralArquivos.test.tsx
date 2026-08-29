@@ -92,6 +92,22 @@ describe('CentralArquivos', () => {
     expect(screen.getByRole('heading', { name: 'Guardar um arquivo' })).toBeVisible();
   });
 
+  it('abre o envio com a tarefa certa quando a pessoa vem do kit operacional', () => {
+    render(
+      <CentralArquivos
+        projetoId="11111111-1111-4111-8111-111111111111"
+        tarefas={[TAREFA]}
+        arquivos={[]}
+        eventos={[]}
+        concluido={false}
+        tarefaInicialId={TAREFA.id}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Guardar um arquivo' })).toBeVisible();
+    expect(screen.getByLabelText('Vincular à tarefa')).toHaveValue(TAREFA.id);
+  });
+
   it('preserva o histórico e permite trocar a versão liberada ao cliente', async () => {
     const user = userEvent.setup();
     render(

@@ -20,9 +20,23 @@ import {
   removerUploadOrfao,
   tituloDoArquivo,
 } from '@/lib/projetos-execucao/upload-client';
-import { formatarTamanhoArquivo, GrupoArquivoCard, type GrupoArquivo } from './GrupoArquivoCard';
+import {
+  agruparArquivos,
+  formatarTamanhoArquivo,
+  GrupoArquivoCard,
+  type GrupoArquivo,
+} from './GrupoArquivoCard';
 import { HistoricoEntrega } from './HistoricoEntrega';
 import styles from './CentralArquivos.module.css';
+
+type CentralArquivosProps = {
+  projetoId: string;
+  tarefas: TarefaProjetoExecucao[];
+  arquivos: ArquivoProjetoExecucao[];
+  eventos: EventoProjetoExecucao[];
+  concluido: boolean;
+  tarefaInicialId?: string | null;
+};
 
 export function CentralArquivos({
   projetoId,
@@ -30,21 +44,19 @@ export function CentralArquivos({
   arquivos,
   eventos,
   concluido,
-}: {
-  projetoId: string;
-  tarefas: TarefaProjetoExecucao[];
-  arquivos: ArquivoProjetoExecucao[];
-  eventos: EventoProjetoExecucao[];
-  concluido: boolean;
-}) {
+  tarefaInicialId = null,
+}: CentralArquivosProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [tarefaId, setTarefaId] = useState('');
+  const tarefaInicialValida = tarefas.some((tarefa) => tarefa.id === tarefaInicialId)
+    ? tarefaInicialId
+    : null;
+  const [tarefaId, setTarefaId] = useState(tarefaInicialValida ?? '');
   const [grupoAlvo, setGrupoAlvo] = useState<GrupoArquivo | null>(null);
-  const [mostrarEnvio, setMostrarEnvio] = useState(false);
+  const [mostrarEnvio, setMostrarEnvio] = useState(Boolean(tarefaInicialValida));
   const [arrastando, setArrastando] = useState(false);
   const [progresso, setProgresso] = useState(0);
   const [enviando, setEnviando] = useState(false);
@@ -53,21 +65,7 @@ export function CentralArquivos({
   );
   const [operando, iniciarOperacao] = useTransition();
 
-  const grupos = useMemo<GrupoArquivo[]>(() => {
-    const mapa = new Map<string, ArquivoProjetoExecucao[]>();
-    for (const item of arquivos) {
-      const grupo = mapa.get(item.grupoId) ?? [];
-      grupo.push(item);
-      mapa.set(item.grupoId, grupo);
-    }
-    return [...mapa.entries()]
-      .map(([id, versoes]) => {
-        versoes.sort((a, b) => b.versao - a.versao);
-        const atual = versoes[0]!;
-        return { id, titulo: atual.titulo, tarefaId: atual.tarefaId, versoes };
-      })
-      .sort((a, b) => b.versoes[0]!.criadoEm.localeCompare(a.versoes[0]!.criadoEm));
-  }, [arquivos]);
+  const grupos = useMemo(() => agruparArquivos(arquivos), [arquivos]);
 
   const liberados = grupos.filter((grupo) =>
     grupo.versoes.some((versao) => versao.visivelCliente),

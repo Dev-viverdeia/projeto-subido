@@ -26,6 +26,22 @@ export type GrupoArquivo = {
   versoes: ArquivoProjetoExecucao[];
 };
 
+export function agruparArquivos(arquivos: ArquivoProjetoExecucao[]): GrupoArquivo[] {
+  const mapa = new Map<string, ArquivoProjetoExecucao[]>();
+  for (const arquivo of arquivos) {
+    const grupo = mapa.get(arquivo.grupoId) ?? [];
+    grupo.push(arquivo);
+    mapa.set(arquivo.grupoId, grupo);
+  }
+  return [...mapa.entries()]
+    .map(([id, versoes]) => {
+      versoes.sort((a, b) => b.versao - a.versao);
+      const atual = versoes[0]!;
+      return { id, titulo: atual.titulo, tarefaId: atual.tarefaId, versoes };
+    })
+    .sort((a, b) => b.versoes[0]!.criadoEm.localeCompare(a.versoes[0]!.criadoEm));
+}
+
 export function formatarTamanhoArquivo(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
