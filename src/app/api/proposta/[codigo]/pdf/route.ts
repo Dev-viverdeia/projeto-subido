@@ -22,7 +22,11 @@ export async function GET(_request: Request, contexto: RouteContext<'/api/propos
   const proposta = await obterPropostaPublica(codigo);
   if (!proposta) return new Response('Não encontrado.', { status: 404 });
 
-  const pdf = await renderizarPropostaPdf({ proposta, profissional: 'Subido' });
+  const profissional =
+    proposta.documento.fornecedor?.nomeNegocio ??
+    proposta.documento.fornecedor?.nomeResponsavel ??
+    'Profissional de IA';
+  const pdf = await renderizarPropostaPdf({ proposta, profissional });
   const arquivo = `proposta-${nomeSeguro(proposta.documento.cliente.empresa) || proposta.id}.pdf`;
 
   return new Response(new Uint8Array(pdf), {

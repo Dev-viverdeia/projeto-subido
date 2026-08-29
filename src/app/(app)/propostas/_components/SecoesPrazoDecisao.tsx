@@ -164,6 +164,27 @@ export function SecoesPrazoDecisao({
             }
           />
         </label>
+        <label className={styles.campo}>
+          <span>
+            Link de pagamento desta proposta <small>opcional</small>
+          </span>
+          <input
+            type="url"
+            value={documento.investimento.linkPagamento ?? ''}
+            maxLength={1000}
+            placeholder="https://seu-checkout.com/..."
+            onChange={(evento) =>
+              mudar((atual) => ({
+                ...atual,
+                investimento: {
+                  ...atual.investimento,
+                  linkPagamento: evento.target.value || null,
+                },
+              }))
+            }
+          />
+          <small>Depois da aprovação, o cliente verá um botão para abrir o seu checkout.</small>
+        </label>
       </section>
 
       <section className={styles.bloco}>

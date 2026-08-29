@@ -10,6 +10,7 @@ import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { exigirRecurso } from '@/lib/planos/server';
+import { obterPerfilComercial } from '@/lib/perfil-comercial/queries';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 import { montarDocumentoInicial, type OrigemProposta } from './montar';
@@ -103,11 +104,12 @@ export async function criarProposta(formData: FormData): Promise<void> {
     redirect(`/propostas/nova?${parametros.toString()}`);
   }
 
-  const [{ supabase, user }, lead, origem, posCall] = await Promise.all([
+  const [{ supabase, user }, lead, origem, posCall, perfilComercial] = await Promise.all([
     usuarioAtual(),
     obterDossieLead(validacao.data.oportunidade),
     resolverOrigem(validacao.data.origem),
     validacao.data.reuniao ? obterPosCall(validacao.data.reuniao) : Promise.resolve(null),
+    obterPerfilComercial(),
   ]);
   if (!user) redirect('/entrar');
   if (!lead || !origem) redirect('/propostas/nova?erro=indisponivel');
@@ -133,7 +135,7 @@ export async function criarProposta(formData: FormData): Promise<void> {
           lacunas: posCall.analise.lacunas,
         }
       : null;
-  const documento = montarDocumentoInicial(lead, origem, contextoPosCall);
+  const documento = montarDocumentoInicial(lead, origem, contextoPosCall, perfilComercial);
   const origemProjeto = origem.tipo === 'catalogo';
   const origemEstudio = origem.tipo === 'estudio';
   const projetoId = origemProjeto

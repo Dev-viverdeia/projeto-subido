@@ -13,6 +13,7 @@ import {
   Layers3,
   Mail,
   ShieldCheck,
+  Store,
   UserRound,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
@@ -20,6 +21,7 @@ import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { IntegracaoGoogleCalendar } from './_components/IntegracaoGoogleCalendar';
 import { FormularioIdentidade } from './_components/FormularioIdentidade';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
+import { obterPerfilComercial, perfilComercialInicial } from '@/lib/perfil-comercial/queries';
 import {
   PLANOS_SUBIDO,
   RECURSOS_SUBIDO,
@@ -29,6 +31,7 @@ import {
   recursoPlanoValido,
 } from '@/lib/planos/acessos';
 import { PainelAcessoPlano } from './_components/PainelAcessoPlano';
+import { FormularioPerfilComercial } from './_components/FormularioPerfilComercial';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Conta' };
@@ -67,11 +70,12 @@ const ATALHOS = [
  */
 export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
   const supabase = await createClient();
-  const [{ data }, calendar, parametros, saldoCreditos] = await Promise.all([
+  const [{ data }, calendar, parametros, saldoCreditos, perfilComercialSalvo] = await Promise.all([
     supabase.auth.getClaims(),
     obterEstadoGoogleCalendar(),
     searchParams,
     obterSaldoCreditos(),
+    obterPerfilComercial(),
   ]);
 
   const claims = data?.claims;
@@ -87,6 +91,11 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
     ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recursoSolicitado].planoMinimo].nome
     : 'Pro';
   const nome = typeof metadata?.nome === 'string' ? metadata.nome : '—';
+  const perfilComercial = perfilComercialInicial({
+    perfil: perfilComercialSalvo,
+    nome,
+    email,
+  });
   const iniciais = nome
     .split(/\s+/)
     .filter(Boolean)
@@ -165,6 +174,26 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       <PainelAcessoPlano plano={plano} destaque={acessoBloqueado} />
 
       <IntegracaoGoogleCalendar calendar={calendar} />
+
+      <section
+        className={`${styles.cartao} ${styles.perfilComercial}`}
+        aria-labelledby="perfil-comercial"
+      >
+        <header className={styles.cabecalhoCartao}>
+          <span aria-hidden="true">
+            <Store size={18} strokeWidth={1.7} />
+          </span>
+          <div>
+            <p>Propostas e cobrança</p>
+            <h2 id="perfil-comercial">Sua identidade comercial</h2>
+          </div>
+        </header>
+        <p className={styles.descricaoComercial}>
+          Estes dados identificam você para o cliente e já entram nas novas propostas. O link de
+          pagamento continua sendo do serviço que você escolheu usar.
+        </p>
+        <FormularioPerfilComercial perfil={perfilComercial} />
+      </section>
 
       <section className={styles.perfil} aria-labelledby="nome-profissional">
         <div className={styles.identidade}>

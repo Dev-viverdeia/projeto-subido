@@ -1,4 +1,5 @@
 import { Check, Circle } from 'lucide-react';
+import Image from 'next/image';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { StatusProposta } from '@/lib/propostas/queries';
 import { subtituloVisivel } from '@/lib/propostas/apresentacao';
@@ -44,8 +45,23 @@ export function PreviewProposta({
       <article className={styles.papel}>
         <header className={styles.capa}>
           <div className={styles.marca}>
-            <SubidoLogo size={9} variant="mono" />
-            <span className={styles.parceria}>× VIVER DE IA</span>
+            {documento.fornecedor?.logoUrl ? (
+              <Image
+                src={documento.fornecedor.logoUrl}
+                alt={documento.fornecedor.nomeNegocio ?? documento.fornecedor.nomeResponsavel}
+                width={112}
+                height={36}
+                unoptimized
+                className={styles.logoFornecedor}
+              />
+            ) : documento.fornecedor ? (
+              <strong className={styles.nomeFornecedor}>
+                {documento.fornecedor.nomeNegocio ?? documento.fornecedor.nomeResponsavel}
+              </strong>
+            ) : (
+              <SubidoLogo size={9} variant="mono" />
+            )}
+            <span className={styles.parceria}>CRIADO COM SUBIDO</span>
           </div>
           <div className={styles.capaTexto}>
             <p>Proposta comercial</p>
@@ -150,6 +166,7 @@ export function PreviewProposta({
               <p className={styles.rotulo}>Investimento do projeto</p>
               <strong>{formatarReais(documento.investimento.valorCentavos)}</strong>
               <span>{documento.investimento.condicoes}</span>
+              {documento.investimento.linkPagamento && <small>Checkout configurado</small>}
             </div>
             <div>
               <span>Validade</span>
@@ -183,7 +200,12 @@ export function PreviewProposta({
           </section>
 
           <footer className={styles.rodape}>
-            <span>SUBIDO × VIVER DE IA</span>
+            <span>
+              {documento.fornecedor?.nomeNegocio ??
+                documento.fornecedor?.nomeResponsavel ??
+                'Profissional de IA'}
+            </span>
+            <span>CRIADO COM SUBIDO</span>
             <span>Proposta V{versao.toString().padStart(2, '0')}</span>
           </footer>
         </div>

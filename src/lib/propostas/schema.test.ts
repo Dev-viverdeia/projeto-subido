@@ -41,4 +41,25 @@ describe('contrato da proposta', () => {
     expect(centavosParaCampo(null)).toBe('');
     expect(formatarReais(null)).toBe('A definir');
   });
+
+  it('aceita identidade comercial e checkout externo válidos', () => {
+    const documento = DocumentoPropostaSchema.parse({
+      ...VALIDO,
+      fornecedor: {
+        nomeResponsavel: 'Ana Lima',
+        nomeNegocio: 'Ana Lima IA',
+        email: 'ana@empresa.com.br',
+        telefone: '(11) 99999-9999',
+        site: 'https://empresa.com.br',
+        logoUrl: 'https://arquivos.empresa.com.br/logo.png',
+      },
+      investimento: {
+        ...VALIDO.investimento,
+        linkPagamento: 'https://checkout.empresa.com.br/projeto',
+      },
+    });
+
+    expect(documento.fornecedor?.nomeNegocio).toBe('Ana Lima IA');
+    expect(documento.investimento.linkPagamento).toContain('checkout');
+  });
 });
