@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import {
+  ArrowRight,
+  Bot,
   Check,
   CircleDot,
   FileCheck2,
@@ -15,7 +18,10 @@ import {
   atualizarTarefaProjeto,
   type EstadoProjetoExecucao,
 } from '@/lib/projetos-execucao/actions';
-import type { TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
+import type {
+  ArquivoProjetoExecucao,
+  TarefaProjetoExecucao,
+} from '@/lib/projetos-execucao/queries';
 import { EntregaCliente } from './EntregaCliente';
 import styles from './SalaEntrega.module.css';
 
@@ -26,11 +32,20 @@ export function TarefaEntrega({
   tarefa,
   portalAtivo,
   aceiteFinal,
+  contexto,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
   portalAtivo: boolean;
   aceiteFinal: boolean;
+  contexto: {
+    empresa: string;
+    objetivo: string;
+    criterioSucesso: string;
+    acessos: string[];
+    limites: string[];
+    arquivos: ArquivoProjetoExecucao[];
+  };
 }) {
   const [estado, acao, pendente] = useActionState(atualizarTarefaProjeto, ESTADO_INICIAL);
   const concluida = tarefa.status === 'concluida';
@@ -79,7 +94,43 @@ export function TarefaEntrega({
           </div>
         </div>
 
-        <p className={styles.acao}>{tarefa.acao}</p>
+        <div className={styles.comoExecutar}>
+          <p>Como executar</p>
+          <strong>{tarefa.acao}</strong>
+        </div>
+
+        <section className={styles.contextoTarefa} aria-labelledby="contexto-tarefa-titulo">
+          <header>
+            <div>
+              <p>Antes de começar</p>
+              <h3 id="contexto-tarefa-titulo">O que importa para {contexto.empresa}</h3>
+            </div>
+            <Link href={`/consultor?projeto=${projetoId}&tarefa=${tarefa.id}`}>
+              <Bot size={16} strokeWidth={1.8} aria-hidden="true" />
+              Pedir ajuda nesta tarefa
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          </header>
+
+          <dl>
+            <div>
+              <dt>Resultado esperado</dt>
+              <dd>{contexto.criterioSucesso || contexto.objetivo}</dd>
+            </div>
+            <div>
+              <dt>Cuidado combinado</dt>
+              <dd>{contexto.limites[0] ?? 'Nenhum limite foi registrado no briefing.'}</dd>
+            </div>
+            <div>
+              <dt>Base disponível</dt>
+              <dd>
+                {contexto.acessos.length} {contexto.acessos.length === 1 ? 'acesso' : 'acessos'} ·{' '}
+                {contexto.arquivos.length} {contexto.arquivos.length === 1 ? 'arquivo' : 'arquivos'}{' '}
+                no projeto
+              </dd>
+            </div>
+          </dl>
+        </section>
 
         <dl className={styles.criterios}>
           <div>

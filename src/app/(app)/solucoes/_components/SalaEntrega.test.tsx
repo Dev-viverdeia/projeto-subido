@@ -270,6 +270,18 @@ describe('SalaEntrega', () => {
 
     expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeInTheDocument();
     expect(screen.getByText('33%')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'O que importa para Clínica Aurora' }),
+    ).toBeVisible();
+    expect(
+      screen.getByText('A recepção recebe cada contato com o contexto completo.'),
+    ).toBeVisible();
+    expect(screen.getByText('Dúvidas clínicas seguem para a recepção')).toBeVisible();
+    expect(screen.getByText('1 acesso · 0 arquivos no projeto')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Pedir ajuda nesta tarefa/i })).toHaveAttribute(
+      'href',
+      `/consultor?projeto=${PROJETO.id}&tarefa=${PROJETO.tarefas[1]!.id}`,
+    );
 
     await user.click(screen.getByRole('button', { name: /Entregar/ }));
     expect(screen.getByRole('heading', { name: 'Treinar a equipe', level: 2 })).toBeInTheDocument();

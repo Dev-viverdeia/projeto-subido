@@ -66,6 +66,13 @@ describe('Conversa integrada à Início', () => {
     expect(dependencias.replace).toHaveBeenCalledWith('/consultor/thread-1');
   });
 
+  it('abre uma conversa nova com o pedido da tarefa pronto para revisão', () => {
+    render(<Conversa textoInicial="Ajude a conferir a base da Clínica Aurora." />);
+
+    expect(screen.getByRole('textbox')).toHaveValue('Ajude a conferir a base da Clínica Aurora.');
+    expect(dependencias.criarConversa).not.toHaveBeenCalled();
+  });
+
   it('troca a resposta local pelo histórico confirmado pelo servidor', async () => {
     const { rerender } = render(<Conversa threadId="thread-1" ultimaMensagemId="mensagem-1" />);
 

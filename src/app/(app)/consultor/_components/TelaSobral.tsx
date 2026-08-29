@@ -8,6 +8,7 @@ import { Conversa } from './Conversa';
 import { ListaConversas } from './ListaConversas';
 import { Mensagens } from './Mensagens';
 import styles from './TelaSobral.module.css';
+import type { ContextoSobralTarefa } from '@/lib/projetos-execucao/contexto-sobral';
 
 const EXEMPLOS: ExemploDoConsultor[] = [
   {
@@ -34,9 +35,11 @@ type ConversaCarregada = {
 export function TelaSobral({
   threads,
   conversa,
+  contextoInicial,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
+  contextoInicial?: ContextoSobralTarefa | null;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -77,11 +80,16 @@ export function TelaSobral({
         <div className={`${styles.areaChat} ${vazio ? styles.areaVazia : ''}`}>
           {vazio ? (
             <div className={styles.boasVindas}>
-              <p className={styles.eyebrow}>Conversa nova</p>
-              <h2>Como posso ajudar?</h2>
+              <p className={styles.eyebrow}>
+                {contextoInicial
+                  ? `Tarefa conectada · ${contextoInicial.empresa}`
+                  : 'Conversa nova'}
+              </p>
+              <h2>{contextoInicial ? contextoInicial.tarefa : 'Como posso ajudar?'}</h2>
               <p className={styles.apoio}>
-                Pergunte sobre uma venda, um cliente ou uma implementação. Você também pode enviar
-                um arquivo para eu analisar.
+                {contextoInicial
+                  ? 'O pedido abaixo já reúne o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie quando estiver pronto.'
+                  : 'Pergunte sobre uma venda, um cliente ou uma implementação. Você também pode enviar um arquivo para eu analisar.'}
               </p>
               <ul className={styles.capacidades} aria-label="Formatos aceitos">
                 <li>
@@ -106,7 +114,8 @@ export function TelaSobral({
               threadId={conversa?.thread.id}
               pendente={ultima?.papel === 'usuario'}
               ultimaMensagemId={ultima?.id}
-              exemplos={vazio ? EXEMPLOS : undefined}
+              exemplos={vazio && !contextoInicial ? EXEMPLOS : undefined}
+              textoInicial={contextoInicial?.mensagem}
             />
             <p className={styles.contextoConectado}>
               <Link2 size={13} strokeWidth={1.8} aria-hidden="true" />O Sobral AI usa seus registros
