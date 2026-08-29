@@ -102,6 +102,11 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   propostaId: string;
   oportunidadeId: string;
   inicioEm: string;
+  aceiteVenda: {
+    versao: number;
+    aceitoEm: string;
+    aceitoPor: string | null;
+  };
   documento: DocumentoProposta;
   tarefas: TarefaProjetoExecucao[];
   arquivos: ArquivoProjetoExecucao[];
@@ -210,17 +215,27 @@ export const obterProjetoExecucao = cache(
     const documento = lerDocumentoProposta(data.documento);
     if (!documento) return null;
 
-    const { data: kickoff, error: erroKickoff } = await supabase
-      .from('calls_reunioes')
-      .select('id, status, agendada_para, codigo_publico')
-      .eq('oportunidade_id', data.oportunidade_id)
-      .eq('tipo', 'kickoff')
-      .neq('status', 'cancelada')
-      .order('agendada_para', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const [resultadoKickoff, resultadoAceite] = await Promise.all([
+      supabase
+        .from('calls_reunioes')
+        .select('id, status, agendada_para, codigo_publico')
+        .eq('oportunidade_id', data.oportunidade_id)
+        .eq('tipo', 'kickoff')
+        .neq('status', 'cancelada')
+        .order('agendada_para', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('propostas')
+        .select('versao, aceita_em, decisao_nome')
+        .eq('id', data.proposta_id)
+        .maybeSingle(),
+    ]);
+    const { data: kickoff, error: erroKickoff } = resultadoKickoff;
+    const { data: aceite, error: erroAceite } = resultadoAceite;
 
     if (erroKickoff) throw handleError(erroKickoff, 'projetos-execucao:kickoff');
+    if (erroAceite) throw handleError(erroAceite, 'projetos-execucao:aceite-venda');
 
     const { data: analiseKickoff, error: erroAnaliseKickoff } = kickoff
       ? await supabase
@@ -285,6 +300,11 @@ export const obterProjetoExecucao = cache(
       propostaId: data.proposta_id,
       oportunidadeId: data.oportunidade_id,
       inicioEm: data.inicio_em,
+      aceiteVenda: {
+        versao: aceite?.versao ?? 1,
+        aceitoEm: aceite?.aceita_em ?? data.inicio_em,
+        aceitoPor: aceite?.decisao_nome ?? documento.cliente.contato,
+      },
       documento,
       tarefas,
       arquivos: data.projeto_arquivos

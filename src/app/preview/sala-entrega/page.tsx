@@ -16,6 +16,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   empresa: 'Clínica Aurora',
   status: 'concluido',
   inicioEm: '2026-08-05T12:00:00.000Z',
+  aceiteVenda: { versao: 3, aceitoEm: '2026-08-05T11:42:00.000Z', aceitoPor: 'Camila Rios' },
   prazoEm: '2026-08-28T12:00:00.000Z',
   atualizadoEm: '2026-08-09T12:00:00.000Z',
   feitas: 7,
@@ -388,11 +389,9 @@ export default async function PreviewSalaEntregaPage({
           : estado === 'ajustes'
             ? estados.prepararProjetoComAjustes(PROJETO)
             : PROJETO;
-
   return (
     <div className={styles.shell}>
       <PreviewSidebar />
-
       <main id="conteudo" className={styles.conteudo}>
         <SalaEntrega projeto={projeto} />
       </main>
