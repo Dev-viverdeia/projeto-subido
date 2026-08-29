@@ -23,6 +23,30 @@ const MarcoCronograma = z.object({
   descricao: z.string().trim().min(5).max(600),
 });
 
+const UrlHttpOpcional = z
+  .string()
+  .trim()
+  .max(1000)
+  .nullable()
+  .refine((valor) => {
+    if (!valor) return true;
+    try {
+      const url = new URL(valor);
+      return url.protocol === 'https:' || url.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  }, 'Link inválido.');
+
+const FornecedorProposta = z.object({
+  nomeResponsavel: z.string().trim().min(2).max(120),
+  nomeNegocio: z.string().trim().min(2).max(160).nullable(),
+  email: z.union([z.email().max(254), z.null()]),
+  telefone: z.string().trim().max(40).nullable(),
+  site: UrlHttpOpcional,
+  logoUrl: UrlHttpOpcional,
+});
+
 /**
  * Fonte da verdade do documento comercial.
  *
@@ -30,6 +54,7 @@ const MarcoCronograma = z.object({
  * primeira versão; depois disso, a proposta pode evoluir sem reescrever a fonte.
  */
 export const DocumentoPropostaSchema = z.object({
+  fornecedor: FornecedorProposta.nullable().optional(),
   cliente: ClienteProposta,
   projeto: z.object({
     titulo: z.string().trim().min(3).max(180),
@@ -44,6 +69,7 @@ export const DocumentoPropostaSchema = z.object({
   investimento: z.object({
     valorCentavos: z.number().int().min(0).max(1_000_000_000_00).nullable(),
     condicoes: z.string().trim().min(3).max(1200),
+    linkPagamento: UrlHttpOpcional.optional(),
   }),
   validadeDias: z.number().int().min(1).max(90),
   proximosPassos: z.array(z.string().trim().min(2).max(300)).min(1).max(6),

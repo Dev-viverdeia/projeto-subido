@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Check, X } from 'lucide-react';
+import { ArrowUpRight, Check, X } from 'lucide-react';
 import { decidirPropostaCliente, type EstadoDecisaoProposta } from '@/lib/propostas/portal-actions';
 import styles from './proposta.module.css';
 
@@ -11,10 +11,12 @@ export function DecisaoCliente({
   codigo,
   nomeInicial,
   emailInicial,
+  linkPagamento,
 }: {
   codigo: string;
   nomeInicial: string;
   emailInicial: string;
+  linkPagamento: string | null;
 }) {
   const [estado, acao, enviando] = useActionState(decidirPropostaCliente, INICIAL);
 
@@ -28,6 +30,16 @@ export function DecisaoCliente({
           <p>Decisão registrada</p>
           <h2>{estado.status === 'aceita' ? 'Projeto aprovado.' : 'Retorno enviado.'}</h2>
           <span>{estado.sucesso}</span>
+          {estado.status === 'aceita' && linkPagamento && (
+            <div className={styles.proximoPagamento}>
+              <a href={linkPagamento} target="_blank" rel="noopener noreferrer">
+                Abrir pagamento <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+              <span>
+                Você será levado ao checkout do prestador. A Subido não processa este pagamento.
+              </span>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -81,6 +93,14 @@ export function DecisaoCliente({
         </label>
       </div>
 
+      <label className={styles.aceiteTermos}>
+        <input type="checkbox" name="aceiteTermos" value="sim" />
+        <span>
+          Li esta versão da proposta e concordo com o escopo, o investimento, as condições e os
+          próximos passos apresentados. <small>Obrigatório para aprovar.</small>
+        </span>
+      </label>
+
       {estado.erro && (
         <p className={styles.erroDecisao} role="alert">
           {estado.erro}
@@ -103,7 +123,8 @@ export function DecisaoCliente({
         </button>
       </div>
       <small className={styles.segurancaDecisao}>
-        Sua decisão fica vinculada a esta versão da proposta, com data, nome e e-mail.
+        Sua decisão fica vinculada a esta versão da proposta, com data, nome, e-mail e registro do
+        aceite.
       </small>
     </form>
   );

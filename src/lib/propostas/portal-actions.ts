@@ -4,13 +4,19 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { registrarDecisaoProposta } from './portal';
 
-const DecisaoPropostaSchema = z.object({
-  codigo: z.uuid(),
-  decisao: z.enum(['aceita', 'recusada']),
-  nome: z.string().trim().min(2).max(120),
-  email: z.email().max(254),
-  comentario: z.string().trim().max(2000),
-});
+const DecisaoPropostaSchema = z
+  .object({
+    codigo: z.uuid(),
+    decisao: z.enum(['aceita', 'recusada']),
+    nome: z.string().trim().min(2).max(120),
+    email: z.email().max(254),
+    comentario: z.string().trim().max(2000),
+    aceiteTermos: z.boolean(),
+  })
+  .refine((dados) => dados.decisao !== 'aceita' || dados.aceiteTermos, {
+    path: ['aceiteTermos'],
+    message: 'Confirme o aceite antes de aprovar.',
+  });
 
 export type EstadoDecisaoProposta = {
   erro?: string;
@@ -28,10 +34,16 @@ export async function decidirPropostaCliente(
     nome: formData.get('nome'),
     email: formData.get('email'),
     comentario: formData.get('comentario') ?? '',
+    aceiteTermos: formData.get('aceiteTermos') === 'sim',
   });
 
   if (!validacao.success) {
-    return { erro: 'Preencha seu nome e um e-mail válido antes de confirmar.' };
+    const erroAceite = validacao.error.issues.some((item) => item.path[0] === 'aceiteTermos');
+    return {
+      erro: erroAceite
+        ? 'Confirme que leu e concorda com esta versão antes de aprovar.'
+        : 'Preencha seu nome e um e-mail válido antes de confirmar.',
+    };
   }
 
   try {
@@ -41,6 +53,7 @@ export async function decidirPropostaCliente(
       nome: validacao.data.nome,
       email: validacao.data.email,
       comentario: validacao.data.comentario || null,
+      aceiteTermos: validacao.data.aceiteTermos,
     });
 
     if (!resultado) {
@@ -52,7 +65,7 @@ export async function decidirPropostaCliente(
       status: resultado.status,
       sucesso:
         resultado.status === 'aceita'
-          ? 'Proposta aprovada. O projeto já foi aberto para a equipe iniciar a entrega.'
+          ? 'Proposta aprovada. O espaço do projeto já está pronto para o responsável organizar a entrega.'
           : 'Decisão registrada. O responsável recebeu o retorno em Vendas.',
     };
   } catch (erro) {

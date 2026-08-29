@@ -26,6 +26,24 @@
   gap: var(--via-space-4);
 }
 
+.logoFornecedor {
+  width: auto;
+  max-width: 136px;
+  height: 40px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.nomeFornecedor {
+  max-width: 240px;
+  overflow: hidden;
+  color: var(--via-navy);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .marca > span {
   padding-left: var(--via-space-4);
   border-left: 1px solid var(--via-border-hairline);
@@ -627,6 +645,34 @@
   font-size: var(--via-fs-xs);
 }
 
+.aceiteTermos {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: start;
+  margin-top: var(--via-space-5);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 78%, transparent);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.55;
+  cursor: pointer;
+}
+
+.aceiteTermos input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--via-navy);
+}
+
+.aceiteTermos small {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-semibold);
+}
+
 .acoesDecisao {
   display: flex;
   align-items: center;
@@ -716,6 +762,47 @@
   border-left: 2px solid var(--via-accent);
   color: var(--via-text-muted);
   line-height: 1.6;
+}
+
+.proximoPagamento {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-5);
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.proximoPagamento a {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-5);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  box-shadow: var(--via-shadow-sm);
+}
+
+.proximoPagamento a:hover {
+  background: var(--via-navy-deep);
+}
+
+.proximoPagamento a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
+}
+
+.proximoPagamento > span {
+  max-width: 62ch;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+  line-height: 1.5;
 }
 
 .rodape {

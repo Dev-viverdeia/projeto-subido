@@ -1732,6 +1732,45 @@ export type Database = {
         }
         Relationships: []
       }
+      perfis_comerciais: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          dono: string
+          email: string | null
+          link_pagamento_padrao: string | null
+          logo_path: string | null
+          nome_negocio: string | null
+          nome_responsavel: string
+          site: string | null
+          telefone: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          dono: string
+          email?: string | null
+          link_pagamento_padrao?: string | null
+          logo_path?: string | null
+          nome_negocio?: string | null
+          nome_responsavel: string
+          site?: string | null
+          telefone?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          dono?: string
+          email?: string | null
+          link_pagamento_padrao?: string | null
+          logo_path?: string | null
+          nome_negocio?: string | null
+          nome_responsavel?: string
+          site?: string | null
+          telefone?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           atualizado_em: string
@@ -2322,6 +2361,9 @@ export type Database = {
       propostas: {
         Row: {
           aceita_em: string | null
+          aceite_termos_em: string | null
+          aceite_termos_identificador: string | null
+          aceite_termos_versao: number | null
           apresentada_em: string | null
           atualizado_em: string
           builder_solucao_id: string | null
@@ -2350,6 +2392,9 @@ export type Database = {
         }
         Insert: {
           aceita_em?: string | null
+          aceite_termos_em?: string | null
+          aceite_termos_identificador?: string | null
+          aceite_termos_versao?: number | null
           apresentada_em?: string | null
           atualizado_em?: string
           builder_solucao_id?: string | null
@@ -2378,6 +2423,9 @@ export type Database = {
         }
         Update: {
           aceita_em?: string | null
+          aceite_termos_em?: string | null
+          aceite_termos_identificador?: string | null
+          aceite_termos_versao?: number | null
           apresentada_em?: string | null
           atualizado_em?: string
           builder_solucao_id?: string | null
@@ -3549,6 +3597,7 @@ export type Database = {
       }
       proposta_portal_decidir: {
         Args: {
+          p_aceite_termos?: boolean
           p_codigo: string
           p_comentario?: string
           p_decisao: Database["public"]["Enums"]["proposta_status"]

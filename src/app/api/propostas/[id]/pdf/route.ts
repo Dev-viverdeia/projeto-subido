@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { obterAcessoRecurso } from '@/lib/planos/server';
 import { obterProposta } from '@/lib/propostas/queries';
 import { renderizarPropostaPdf } from '@/lib/propostas/pdf';
+import { obterPerfilComercial } from '@/lib/perfil-comercial/queries';
+import { completarDocumentoComPerfil } from '@/lib/propostas/perfil';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -35,14 +37,24 @@ export async function GET(_request: Request, contexto: RouteContext<'/api/propos
   } = await supabase.auth.getUser();
   if (!user) return new Response('Não autorizado.', { status: 401 });
 
-  const proposta = await obterProposta(id);
+  const [proposta, perfilComercial] = await Promise.all([
+    obterProposta(id),
+    obterPerfilComercial(),
+  ]);
   if (!proposta) return new Response('Não encontrado.', { status: 404 });
 
+  const documento = completarDocumentoComPerfil(proposta.documento, perfilComercial);
+
   const nome =
-    typeof user.user_metadata?.full_name === 'string'
+    documento.fornecedor?.nomeNegocio ??
+    documento.fornecedor?.nomeResponsavel ??
+    (typeof user.user_metadata?.full_name === 'string'
       ? user.user_metadata.full_name
-      : (user.email ?? 'Profissional de IA');
-  const pdf = await renderizarPropostaPdf({ proposta, profissional: nome });
+      : (user.email ?? 'Profissional de IA'));
+  const pdf = await renderizarPropostaPdf({
+    proposta: { ...proposta, documento },
+    profissional: nome,
+  });
   const arquivo = `proposta-${nomeSeguro(proposta.empresa) || proposta.id}.pdf`;
 
   return new Response(new Uint8Array(pdf), {

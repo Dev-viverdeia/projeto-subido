@@ -87,12 +87,14 @@ export async function registrarDecisaoProposta({
   nome,
   email,
   comentario,
+  aceiteTermos,
 }: {
   codigo: string;
   decisao: 'aceita' | 'recusada';
   nome: string;
   email: string;
   comentario: string | null;
+  aceiteTermos: boolean;
 }): Promise<ResultadoDecisaoProposta | null> {
   const admin = createAdminClient();
   const { data, error } = await admin.rpc('proposta_portal_decidir', {
@@ -101,6 +103,7 @@ export async function registrarDecisaoProposta({
     p_nome: nome,
     p_email: email,
     p_comentario: comentario ?? undefined,
+    p_aceite_termos: aceiteTermos,
   });
 
   if (error) throw handleError(error, 'proposta-portal:decidir');

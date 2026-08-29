@@ -9,6 +9,14 @@ import styles from '../mapa-jornada/preview.module.css';
 export const metadata: Metadata = { title: 'Preview · Editor de proposta' };
 
 const DOCUMENTO: DocumentoProposta = {
+  fornecedor: {
+    nomeResponsavel: 'Rafael Milagre',
+    nomeNegocio: 'Milagre Automações',
+    email: 'rafael@milagre.ai',
+    telefone: '(11) 99999-9999',
+    site: 'https://milagre.ai',
+    logoUrl: null,
+  },
   cliente: {
     empresa: 'Clínica Aurora',
     contato: 'Camila Rios',
@@ -54,6 +62,7 @@ const DOCUMENTO: DocumentoProposta = {
   investimento: {
     valorCentavos: 1850000,
     condicoes: '50% no início e 50% após a validação da operação.',
+    linkPagamento: 'https://checkout.exemplo.com/projeto-clinica-aurora',
   },
   validadeDias: 10,
   proximosPassos: ['Aprovação da proposta', 'Call de kick-off', 'Liberação dos acessos'],

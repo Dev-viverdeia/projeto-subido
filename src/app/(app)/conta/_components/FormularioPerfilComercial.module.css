@@ -1,0 +1,226 @@
+.formulario {
+  display: grid;
+  gap: var(--via-space-6);
+}
+
+.marcaArea {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-5);
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+.marcaPreview {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+}
+
+.marcaPreview img {
+  width: 100%;
+  height: 64px;
+  object-fit: contain;
+}
+
+.marcaPreview span {
+  color: var(--via-text-faint);
+  font: var(--via-fs-xs) var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+}
+
+.marcaArea strong,
+.marcaArea p {
+  margin: 0;
+}
+
+.marcaArea strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.marcaArea p {
+  max-width: 58ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.acoesMarca,
+.rodape > div {
+  display: flex;
+  gap: var(--via-space-2);
+  align-items: center;
+}
+
+.acoesMarca {
+  margin-top: var(--via-space-4);
+}
+
+.acoesMarca button,
+.rodape button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+
+.acoesMarca .remover {
+  color: var(--via-danger);
+}
+
+.arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.marcaArea em,
+.gradeCampos em {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-danger);
+  font-size: var(--via-fs-micro);
+  font-style: normal;
+}
+
+.gradeCampos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4);
+}
+
+.gradeCampos label {
+  min-width: 0;
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.gradeCampos label > span {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.gradeCampos label small {
+  color: var(--via-text-faint);
+  font-weight: var(--via-fw-regular);
+}
+
+.gradeCampos input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+  font: var(--via-fs-sm) var(--via-font);
+}
+
+.gradeCampos input:focus {
+  outline: none;
+  border-color: var(--via-navy-40);
+  box-shadow: var(--app-ring);
+}
+
+.campoComIcone {
+  position: relative;
+}
+
+.campoComIcone svg {
+  position: absolute;
+  left: var(--via-space-4);
+  top: 50%;
+  color: var(--via-text-faint);
+  transform: translateY(-50%);
+}
+
+.campoComIcone input {
+  padding-left: 42px;
+}
+
+.nota {
+  padding: var(--via-space-4);
+  border-left: 2px solid var(--via-accent);
+  background: color-mix(in srgb, var(--via-accent) 4%, transparent);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: var(--via-lh-normal);
+}
+
+.rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.rodape p {
+  margin: 0;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.rodape .erro {
+  color: var(--via-danger);
+}
+
+.rodape .sucesso {
+  color: var(--via-success);
+}
+
+.rodape .salvar {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.rodape button:disabled,
+.acoesMarca button:disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+
+@media (max-width: 699px) {
+  .marcaArea,
+  .gradeCampos {
+    grid-template-columns: 1fr;
+  }
+
+  .marcaPreview {
+    min-height: 92px;
+  }
+
+  .rodape {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rodape > div,
+  .rodape button {
+    width: 100%;
+  }
+}

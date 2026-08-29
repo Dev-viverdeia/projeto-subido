@@ -260,6 +260,19 @@
   gap: var(--via-space-5);
 }
 
+.perfilComercial {
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+.descricaoComercial {
+  max-width: 72ch;
+  margin: calc(var(--via-space-3) * -1) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+}
+
 .avisoIntegracao {
   display: flex;
   align-items: center;

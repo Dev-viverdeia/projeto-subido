@@ -32,6 +32,7 @@ export function EditorProposta({
   execucaoId,
   compartilhamentoInicial,
   siteUrl,
+  alteracaoInicial = false,
 }: {
   id: string;
   tituloInicial: string;
@@ -43,13 +44,14 @@ export function EditorProposta({
   execucaoId: string | null;
   compartilhamentoInicial: PropostaCompleta['compartilhamento'];
   siteUrl: string;
+  alteracaoInicial?: boolean;
 }) {
   const [titulo, setTitulo] = useState(tituloInicial);
   const [documento, setDocumento] = useState(documentoInicial);
   const [valor, setValor] = useState(
     centavosParaCampo(documentoInicial.investimento.valorCentavos),
   );
-  const [sujo, setSujo] = useState(false);
+  const [sujo, setSujo] = useState(alteracaoInicial);
   const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
   const [estadoSalvar, acaoSalvar, salvando] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {

@@ -1,6 +1,7 @@
 import type { DocumentoSolucao } from '@/lib/builder/schema';
 import type { DossieLead } from '@/lib/crm/queries';
 import type { DadosRoteiroProjeto } from '@/lib/conteudo/queries';
+import type { PerfilComercial } from '@/lib/perfil-comercial/schema';
 import { DocumentoPropostaSchema, type DocumentoProposta } from './schema';
 
 type OrigemCatalogo = {
@@ -151,6 +152,7 @@ export function montarDocumentoInicial(
   lead: DossieLead,
   origem: OrigemProposta,
   posCall?: ContextoPosCallProposta | null,
+  perfilComercial?: PerfilComercial | null,
 ): DocumentoProposta {
   const leitura = ultimaLeitura(lead);
   const base =
@@ -188,6 +190,16 @@ export function montarDocumentoInicial(
     .join('\n\n');
 
   return DocumentoPropostaSchema.parse({
+    fornecedor: perfilComercial
+      ? {
+          nomeResponsavel: perfilComercial.nomeResponsavel,
+          nomeNegocio: perfilComercial.nomeNegocio,
+          email: perfilComercial.email,
+          telefone: perfilComercial.telefone,
+          site: perfilComercial.site,
+          logoUrl: perfilComercial.logoUrl,
+        }
+      : null,
     cliente: {
       empresa: lead.empresa.nome,
       contato: lead.contato?.nome ?? null,
@@ -206,6 +218,7 @@ export function montarDocumentoInicial(
     investimento: {
       valorCentavos: lead.oportunidade.valorCentavos,
       condicoes: 'Condições de pagamento a combinar após a validação final do escopo.',
+      linkPagamento: perfilComercial?.linkPagamentoPadrao ?? null,
     },
     validadeDias: 15,
     proximosPassos: [

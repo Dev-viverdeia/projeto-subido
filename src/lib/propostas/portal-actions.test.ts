@@ -19,6 +19,7 @@ function formulario(decisao: 'aceita' | 'recusada') {
   dados.set('nome', 'Marina Alves');
   dados.set('email', 'marina@empresa.com.br');
   dados.set('comentario', 'Decisão validada com a diretoria.');
+  if (decisao === 'aceita') dados.set('aceiteTermos', 'sim');
   return dados;
 }
 
@@ -41,6 +42,7 @@ describe('decisão pública da proposta', () => {
       nome: 'Marina Alves',
       email: 'marina@empresa.com.br',
       comentario: 'Decisão validada com a diretoria.',
+      aceiteTermos: true,
     });
     expect(revalidatePath).toHaveBeenCalledWith(`/proposta/${CODIGO}`);
   });
@@ -52,6 +54,16 @@ describe('decisão pública da proposta', () => {
     const resultado = await decidirPropostaCliente({}, dados);
 
     expect(resultado.erro).toContain('e-mail válido');
+    expect(registrarDecisaoProposta).not.toHaveBeenCalled();
+  });
+
+  it('não aprova sem registrar o aceite da versão', async () => {
+    const dados = formulario('aceita');
+    dados.delete('aceiteTermos');
+
+    const resultado = await decidirPropostaCliente({}, dados);
+
+    expect(resultado.erro).toContain('leu e concorda');
     expect(registrarDecisaoProposta).not.toHaveBeenCalled();
   });
 

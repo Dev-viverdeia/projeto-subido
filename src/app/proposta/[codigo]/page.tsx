@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Check, Clock3, Download, Target } from 'lucide-react';
+import { ArrowUpRight, Check, Clock3, Download, Target } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { obterPropostaPublica } from '@/lib/propostas/portal';
 import { formatarReais } from '@/lib/propostas/schema';
@@ -29,6 +30,8 @@ export default async function PropostaClientePage({ params }: PageProps<'/propos
   if (!proposta) notFound();
 
   const documento = proposta.documento;
+  const fornecedor = documento.fornecedor;
+  const nomeFornecedor = fornecedor?.nomeNegocio ?? fornecedor?.nomeResponsavel ?? 'Subido';
   const aprovada = proposta.status === 'aceita';
   const recusada = proposta.status === 'recusada';
 
@@ -38,8 +41,21 @@ export default async function PropostaClientePage({ params }: PageProps<'/propos
 
       <header className={styles.barra}>
         <div className={styles.marca}>
-          <SubidoLogo size={11} />
-          <span>em colaboração com Viver de IA</span>
+          {fornecedor?.logoUrl ? (
+            <Image
+              src={fornecedor.logoUrl}
+              alt={nomeFornecedor}
+              width={136}
+              height={42}
+              unoptimized
+              className={styles.logoFornecedor}
+            />
+          ) : fornecedor ? (
+            <strong className={styles.nomeFornecedor}>{nomeFornecedor}</strong>
+          ) : (
+            <SubidoLogo size={11} />
+          )}
+          <span>proposta preparada com Subido</span>
         </div>
         <a href={`/api/proposta/${codigo}/pdf`}>
           <Download size={15} aria-hidden="true" /> Baixar PDF
@@ -64,6 +80,17 @@ export default async function PropostaClientePage({ params }: PageProps<'/propos
               <dd>V{proposta.versao.toString().padStart(2, '0')}</dd>
               <small>{dataLonga(proposta.compartilhadaEm)}</small>
             </div>
+            {fornecedor && (
+              <div>
+                <dt>Responsável</dt>
+                <dd>{fornecedor.nomeResponsavel}</dd>
+                {(fornecedor.email || fornecedor.telefone) && (
+                  <small>
+                    {[fornecedor.email, fornecedor.telefone].filter(Boolean).join(' · ')}
+                  </small>
+                )}
+              </div>
+            )}
           </dl>
         </section>
 
@@ -185,6 +212,7 @@ export default async function PropostaClientePage({ params }: PageProps<'/propos
             codigo={codigo}
             nomeInicial={documento.cliente.contato ?? ''}
             emailInicial={documento.cliente.email ?? ''}
+            linkPagamento={documento.investimento.linkPagamento ?? null}
           />
         ) : (
           <section className={styles.estadoFinal} data-status={proposta.status}>
@@ -200,13 +228,29 @@ export default async function PropostaClientePage({ params }: PageProps<'/propos
               {recusada && proposta.decisaoComentario && (
                 <blockquote>“{proposta.decisaoComentario}”</blockquote>
               )}
+              {aprovada && documento.investimento.linkPagamento && (
+                <div className={styles.proximoPagamento}>
+                  <a
+                    href={documento.investimento.linkPagamento}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Abrir pagamento <ArrowUpRight size={16} aria-hidden="true" />
+                  </a>
+                  <span>
+                    O pagamento acontece no checkout de {nomeFornecedor}. A Subido não recebe nem
+                    intermedeia o valor.
+                  </span>
+                </div>
+              )}
             </div>
           </section>
         )}
       </main>
 
       <footer className={styles.rodape}>
-        <span>SUBIDO × VIVER DE IA</span>
+        <span>{nomeFornecedor}</span>
+        <span>CRIADO COM SUBIDO × VIVER DE IA</span>
         <span>Link confidencial · não encaminhe sem autorização</span>
       </footer>
     </div>

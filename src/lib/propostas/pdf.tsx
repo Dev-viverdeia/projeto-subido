@@ -316,11 +316,11 @@ function dataLonga(data: Date): string {
   }).format(data);
 }
 
-function ElementosFixos({ versao }: { versao: number }) {
+function ElementosFixos({ versao, profissional }: { versao: number; profissional: string }) {
   return (
     <>
       <View style={estilos.cabecalho} fixed>
-        <Text style={estilos.cabecalhoMarca}>SUBIDO × VIVER DE IA</Text>
+        <Text style={estilos.cabecalhoMarca}>{textoPdf(profissional).toUpperCase()}</Text>
         <Text style={estilos.cabecalhoMeta}>PROPOSTA V{String(versao).padStart(2, '0')}</Text>
       </View>
       <View style={estilos.rodape} fixed>
@@ -370,9 +370,8 @@ function PropostaPdf({
       <Page size="A4" style={estilos.capa}>
         <View style={estilos.marca}>
           <View style={estilos.pontoMarca} />
-          <Text style={estilos.marcaTexto}>SUBIDO</Text>
-          <Text style={estilos.marcaX}>×</Text>
-          <Text style={estilos.marcaTexto}>VIVER DE IA</Text>
+          <Text style={estilos.marcaTexto}>{textoPdf(profissional).toUpperCase()}</Text>
+          <Text style={estilos.marcaX}>· CRIADO COM SUBIDO</Text>
         </View>
         <View style={estilos.capaCentro}>
           <Text style={estilos.etiquetaAzul}>Proposta comercial</Text>
@@ -399,7 +398,7 @@ function PropostaPdf({
       </Page>
 
       <Page size="A4" style={estilos.pagina}>
-        <ElementosFixos versao={proposta.versao} />
+        <ElementosFixos versao={proposta.versao} profissional={profissional} />
         <LinhaDecisao />
         <Text style={estilos.tituloPagina}>Contexto e objetivo</Text>
         <Text style={estilos.tituloGrande}>Uma decisão clara começa pelo problema certo.</Text>
@@ -412,7 +411,7 @@ function PropostaPdf({
       </Page>
 
       <Page size="A4" style={estilos.pagina}>
-        <ElementosFixos versao={proposta.versao} />
+        <ElementosFixos versao={proposta.versao} profissional={profissional} />
         <View style={estilos.secaoCabecalho}>
           <Text style={estilos.numeroSecao}>02</Text>
           <View>
@@ -432,7 +431,7 @@ function PropostaPdf({
       </Page>
 
       <Page size="A4" style={estilos.pagina}>
-        <ElementosFixos versao={proposta.versao} />
+        <ElementosFixos versao={proposta.versao} profissional={profissional} />
         <View style={estilos.secaoCabecalho}>
           <Text style={estilos.numeroSecao}>03</Text>
           <View>
@@ -469,7 +468,7 @@ function PropostaPdf({
       </Page>
 
       <Page size="A4" style={estilos.pagina}>
-        <ElementosFixos versao={proposta.versao} />
+        <ElementosFixos versao={proposta.versao} profissional={profissional} />
         <View style={estilos.secaoCabecalho}>
           <Text style={estilos.numeroSecao}>04</Text>
           <View>
@@ -515,7 +514,7 @@ function PropostaPdf({
 
         <View style={estilos.assinatura} wrap={false}>
           <View style={estilos.assinaturaLinha}>
-            <Text style={estilos.assinaturaRotulo}>Responsável pela proposta</Text>
+            <Text style={estilos.assinaturaRotulo}>Responsável · {textoPdf(profissional)}</Text>
           </View>
           <View style={estilos.assinaturaLinha}>
             <Text style={estilos.assinaturaRotulo}>Aprovação do cliente</Text>
