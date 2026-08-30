@@ -63,15 +63,16 @@ export function InicioProjeto({
       : `/reunioes/${kickoff.id}`
     : `/reunioes?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`;
   const prazoDefinido = Boolean(projeto.prazoEm);
+  const prazoLiberado = briefingConfirmado && Boolean(kickoff);
   const preparacaoCompleta = briefingConfirmado && Boolean(kickoff) && prazoDefinido;
-  const decisoesProntas = [briefingConfirmado, Boolean(kickoff), prazoDefinido].filter(
+  const etapasProntas = [Boolean(kickoff), briefingConfirmado, prazoDefinido].filter(
     Boolean,
   ).length;
-  const pendencias = 3 - decisoesProntas;
-  const etapaAtual = !briefingConfirmado
-    ? 'briefing'
-    : !kickoff
-      ? 'kickoff'
+  const pendencias = 3 - etapasProntas;
+  const etapaAtual = !kickoff
+    ? 'kickoff'
+    : !briefingConfirmado
+      ? 'briefing'
       : !prazoDefinido
         ? 'prazo'
         : 'execucao';
@@ -83,7 +84,7 @@ export function InicioProjeto({
           <p>Passagem da venda</p>
           <h2 id="inicio-projeto-titulo">Da proposta aprovada à primeira tarefa</h2>
         </div>
-        <span>{decisoesProntas}/3 decisões prontas</span>
+        <span>{etapasProntas}/3 etapas prontas</span>
       </header>
 
       <div className={styles.vendaConfirmada}>
@@ -120,38 +121,17 @@ export function InicioProjeto({
       </div>
 
       <p className={styles.explicacao}>
-        A sala trouxe o escopo que o cliente aprovou. Agora confirme como o trabalho vai acontecer;
-        a implementação continua sendo feita por você.
+        O escopo aprovado já está aqui. Agora alinhe o início do projeto com o cliente e transforme
+        o combinado na primeira tarefa.
       </p>
 
       <ol className={styles.passos}>
-        <li
-          data-pronto={briefingConfirmado || undefined}
-          data-atual={etapaAtual === 'briefing' || undefined}
-        >
-          <span className={styles.numero}>
-            {briefingConfirmado ? <Check size={13} aria-label="Concluído" /> : '01'}
-          </span>
-          <div className={styles.icone}>
-            <ClipboardCheck size={18} strokeWidth={1.8} aria-hidden="true" />
-          </div>
-          <div className={styles.conteudo}>
-            <p>Acordo operacional</p>
-            <strong>{briefingConfirmado ? 'Combinado confirmado' : 'Complete o briefing'}</strong>
-            <small>Objetivo, sucesso, responsáveis, acessos e limites em um único lugar.</small>
-          </div>
-          <a className={styles.acaoSecundaria} href="#briefing-kickoff">
-            {briefingConfirmado ? 'Revisar' : 'Completar'}{' '}
-            <ArrowRight size={14} aria-hidden="true" />
-          </a>
-        </li>
-
         <li
           data-pronto={Boolean(kickoff) || undefined}
           data-atual={etapaAtual === 'kickoff' || undefined}
         >
           <span className={styles.numero}>
-            {kickoff ? <Check size={13} aria-label="Concluído" /> : '02'}
+            {kickoff ? <Check size={13} aria-label="Concluído" /> : '01'}
           </span>
           <div className={styles.icone}>
             <Video size={18} strokeWidth={1.8} aria-hidden="true" />
@@ -162,13 +142,40 @@ export function InicioProjeto({
             <small>
               {kickoff
                 ? DATA_HORA.format(new Date(kickoff.agendadaPara)).replace('.', '')
-                : 'Alinhe escopo, responsáveis, prazo e acessos.'}
+                : 'Abra o projeto com o cliente e alinhe resultado, responsáveis e acessos.'}
             </small>
           </div>
           <Link className={styles.acaoSecundaria} href={hrefKickoff}>
             {kickoff ? (kickoffPodeAbrir ? 'Abrir sala' : 'Ver registro') : 'Agendar kickoff'}
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
+        </li>
+
+        <li
+          data-pronto={briefingConfirmado || undefined}
+          data-atual={etapaAtual === 'briefing' || undefined}
+        >
+          <span className={styles.numero}>
+            {briefingConfirmado ? <Check size={13} aria-label="Concluído" /> : '02'}
+          </span>
+          <div className={styles.icone}>
+            <ClipboardCheck size={18} strokeWidth={1.8} aria-hidden="true" />
+          </div>
+          <div className={styles.conteudo}>
+            <p>Acordo do projeto</p>
+            <strong>
+              {briefingConfirmado ? 'Combinado confirmado' : 'Revise o que ficou combinado'}
+            </strong>
+            <small>Resultado, responsáveis, acessos e limites organizados em quatro partes.</small>
+          </div>
+          {kickoff || briefingConfirmado ? (
+            <a className={styles.acaoSecundaria} href="#briefing-kickoff">
+              {briefingConfirmado ? 'Revisar acordo' : 'Completar acordo'}
+              <ArrowRight size={14} aria-hidden="true" />
+            </a>
+          ) : (
+            <span className={styles.estado}>Depois do kickoff</span>
+          )}
         </li>
 
         <li
@@ -183,20 +190,28 @@ export function InicioProjeto({
           </div>
           <div className={styles.conteudo}>
             <p>Prazo da entrega</p>
-            <strong>{projeto.prazoEm ? 'Prazo definido' : 'Defina uma data realista'}</strong>
-            <form action={definirPrazo} className={styles.formPrazo}>
-              <input type="hidden" name="projeto" value={projeto.id} />
-              <input
-                type="date"
-                name="prazo"
-                defaultValue={dataParaCampo(projeto.prazoEm)}
-                aria-label="Prazo da entrega"
-                required
-              />
-              <button type="submit" disabled={salvandoPrazo}>
-                <Save size={14} aria-hidden="true" /> {salvandoPrazo ? 'Salvando…' : 'Salvar'}
-              </button>
-            </form>
+            <strong>
+              {projeto.prazoEm
+                ? 'Prazo definido'
+                : prazoLiberado
+                  ? 'Defina uma data realista'
+                  : 'Disponível depois do acordo'}
+            </strong>
+            {prazoLiberado && (
+              <form action={definirPrazo} className={styles.formPrazo}>
+                <input type="hidden" name="projeto" value={projeto.id} />
+                <input
+                  type="date"
+                  name="prazo"
+                  defaultValue={dataParaCampo(projeto.prazoEm)}
+                  aria-label="Prazo da entrega"
+                  required
+                />
+                <button type="submit" disabled={salvandoPrazo}>
+                  <Save size={14} aria-hidden="true" /> {salvandoPrazo ? 'Salvando…' : 'Salvar'}
+                </button>
+              </form>
+            )}
             {estadoPrazo.erro && (
               <small className={styles.retorno} role="alert">
                 {estadoPrazo.erro}
@@ -209,7 +224,13 @@ export function InicioProjeto({
             )}
           </div>
           <span className={styles.estado} data-pronto={Boolean(projeto.prazoEm) || undefined}>
-            {prazoDefinido ? <Check size={14} aria-label="Definido" /> : 'Pendente'}
+            {prazoDefinido ? (
+              <Check size={14} aria-label="Definido" />
+            ) : prazoLiberado ? (
+              'Pendente'
+            ) : (
+              'Depois do acordo'
+            )}
           </span>
         </li>
 
@@ -237,7 +258,7 @@ export function InicioProjeto({
             onClick={onComecar}
             disabled={!preparacaoCompleta}
           >
-            {preparacaoCompleta ? 'Começar execução' : 'Prepare o projeto'}
+            {preparacaoCompleta ? 'Abrir primeira tarefa' : 'Conclua a preparação'}
             <ArrowRight size={15} aria-hidden="true" />
           </button>
         </li>

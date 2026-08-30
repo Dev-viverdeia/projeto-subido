@@ -14,10 +14,8 @@ import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-exec
 import { obterContatoNotificacao } from '@/lib/projetos-execucao/notificacao-cliente';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
-import { BriefingKickoff } from './BriefingKickoff';
-import { ContextoEntrega } from './ContextoEntrega';
-import { InicioProjeto } from './InicioProjeto';
 import { JornadaEntrega } from './JornadaEntrega';
+import { PainelClienteEntrega } from './PainelClienteEntrega';
 import { PlanoVivo } from './PlanoVivo';
 import { TarefaEntrega } from './TarefaEntrega';
 import styles from './SalaEntrega.module.css';
@@ -408,22 +406,11 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
 
       {painel === 'cliente' && (
         <div className={styles.painelCliente}>
-          {projeto.feitas === 0 && projeto.status !== 'concluido' && (
-            <InicioProjeto
-              projeto={projeto}
-              briefingConfirmado={briefingConfirmado}
-              primeiraTarefa={proxima?.titulo ?? null}
-              onComecar={abrirProximaAcao}
-            />
-          )}
-
-          <BriefingKickoff
-            projetoId={projeto.id}
-            briefing={projeto.briefing}
-            origem={projeto.briefingOrigem}
+          <PainelClienteEntrega
+            projeto={projeto}
+            primeiraTarefa={proxima?.titulo ?? null}
+            onComecar={abrirProximaAcao}
           />
-
-          <ContextoEntrega projeto={projeto} briefingConfirmado={briefingConfirmado} />
         </div>
       )}
     </div>
