@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useMemo, useState } from 'react';
+import { type FormEvent, useActionState, useRef, useState } from 'react';
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   Check,
@@ -9,7 +10,6 @@ import {
   KeyRound,
   PencilLine,
   Save,
-  Sparkles,
   UserRoundCheck,
 } from 'lucide-react';
 import {
@@ -20,15 +20,14 @@ import type {
   BriefingKickoff as DadosBriefing,
   OrigemBriefingKickoff,
 } from '@/lib/projetos-execucao/briefing';
+import {
+  ETAPAS_BRIEFING,
+  ROTULO_ORIGEM_BRIEFING,
+  type EtapaBriefingId,
+} from './briefing-kickoff-config';
 import styles from './BriefingKickoff.module.css';
 
 const INICIAL: EstadoBriefingKickoff = {};
-
-const ROTULO_ORIGEM: Record<OrigemBriefingKickoff, string> = {
-  proposta: 'Iniciado pela proposta',
-  kickoff: 'Extraído do kickoff',
-  salvo: 'Revisado por você',
-};
 
 function listaParaTexto(itens: string[]): string {
   return itens.join('\n');
@@ -45,6 +44,9 @@ export function BriefingKickoff({
 }) {
   const confirmado = Boolean(briefing.confirmadoEm);
   const [editando, setEditando] = useState(!confirmado);
+  const [etapa, setEtapa] = useState<EtapaBriefingId>('resultado');
+  const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [estado, acao, pendente] = useActionState(
     async (estadoAnterior: EstadoBriefingKickoff, formData: FormData) => {
       const resultado = await salvarBriefingKickoff(estadoAnterior, formData);
@@ -53,18 +55,51 @@ export function BriefingKickoff({
     },
     INICIAL,
   );
-  const preenchidas = useMemo(
-    () =>
-      [
-        briefing.objetivo,
-        briefing.criterioSucesso,
-        briefing.responsavelCliente && briefing.responsavelTecnico,
-        briefing.acessos.length,
-        briefing.limites.length,
-        briefing.proximosPassos.length,
-      ].filter(Boolean).length,
-    [briefing],
-  );
+  const etapaIndex = ETAPAS_BRIEFING.findIndex((item) => item.id === etapa);
+  const etapaAtual = ETAPAS_BRIEFING[etapaIndex] ?? ETAPAS_BRIEFING[0];
+
+  function abrirEtapa(proximaEtapa: EtapaBriefingId) {
+    setErroLocal(null);
+    setEtapa(proximaEtapa);
+  }
+
+  function validarEtapa(etapaParaValidar: (typeof ETAPAS_BRIEFING)[number]): boolean {
+    const formulario = formRef.current;
+    if (!formulario) return false;
+
+    for (const nome of etapaParaValidar.campos) {
+      const campo = formulario.elements.namedItem(nome);
+      if (!(campo instanceof HTMLInputElement || campo instanceof HTMLTextAreaElement)) {
+        setErroLocal('Não foi possível revisar esta parte. Atualize a página e tente novamente.');
+        return false;
+      }
+      if (!campo.value.trim()) {
+        setErroLocal('Complete os campos desta parte para continuar.');
+        requestAnimationFrame(() => campo.focus());
+        return false;
+      }
+    }
+
+    setErroLocal(null);
+    return true;
+  }
+
+  function avancar() {
+    if (!validarEtapa(etapaAtual)) return;
+    const proxima = ETAPAS_BRIEFING[etapaIndex + 1];
+    if (proxima) abrirEtapa(proxima.id);
+  }
+
+  function validarConfirmacao(event: FormEvent<HTMLFormElement>) {
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    if (submitter?.value !== 'confirmar') return;
+
+    const incompleta = ETAPAS_BRIEFING.find((item) => !validarEtapa(item));
+    if (!incompleta) return;
+
+    event.preventDefault();
+    setEtapa(incompleta.id);
+  }
 
   if (confirmado && !editando) {
     return (
@@ -79,11 +114,11 @@ export function BriefingKickoff({
             <BadgeCheck size={20} aria-hidden="true" />
           </span>
           <div>
-            <p>Briefing aprovado</p>
+            <p>Acordo confirmado</p>
             <h2 id="briefing-titulo">O combinado do projeto</h2>
           </div>
           <span className={styles.estadoConfirmado}>
-            <Check size={13} aria-hidden="true" /> Confirmado
+            <Check size={13} aria-hidden="true" /> Pronto
           </span>
         </header>
 
@@ -91,7 +126,7 @@ export function BriefingKickoff({
           <div className={styles.objetivoResumo}>
             <span>Objetivo</span>
             <strong>{briefing.objetivo}</strong>
-            <small>Sucesso: {briefing.criterioSucesso}</small>
+            <small>Como saberemos que deu certo: {briefing.criterioSucesso}</small>
           </div>
           <dl>
             <div>
@@ -112,9 +147,9 @@ export function BriefingKickoff({
         </div>
 
         <div className={styles.rodapeResumo}>
-          <span>{ROTULO_ORIGEM[origem]}</span>
+          <span>{ROTULO_ORIGEM_BRIEFING[origem]}</span>
           <button type="button" onClick={() => setEditando(true)}>
-            <PencilLine size={14} aria-hidden="true" /> Editar acordo
+            <PencilLine size={14} aria-hidden="true" /> Revisar acordo
           </button>
         </div>
       </section>
@@ -129,57 +164,102 @@ export function BriefingKickoff({
             <ClipboardCheck size={20} aria-hidden="true" />
           </span>
           <div>
-            <p>Briefing do kickoff</p>
-            <h2 id="briefing-titulo">Revise o combinado antes de começar</h2>
+            <p>Acordo do projeto</p>
+            <h2 id="briefing-titulo">Confirme como a entrega vai acontecer</h2>
             <span>
-              A proposta traz o escopo inicial. Complete os dados do kickoff e confirme com o
-              cliente.
+              Use o que foi alinhado no kickoff para deixar resultado, responsáveis e limites claros
+              antes da primeira tarefa.
             </span>
           </div>
         </div>
-        <div className={styles.progresso} aria-label={`${preenchidas} de 6 decisões preenchidas`}>
-          <strong>{preenchidas}/6</strong>
-          <span>decisões prontas</span>
+        <div
+          className={styles.progresso}
+          aria-label={`Parte ${etapaIndex + 1} de ${ETAPAS_BRIEFING.length}`}
+        >
+          <strong>{String(etapaIndex + 1).padStart(2, '0')}</strong>
+          <span>de {ETAPAS_BRIEFING.length} partes</span>
           <div aria-hidden="true">
-            <i style={{ transform: `scaleX(${preenchidas / 6})` }} />
+            <i style={{ transform: `scaleX(${(etapaIndex + 1) / ETAPAS_BRIEFING.length})` }} />
           </div>
         </div>
       </header>
 
-      <form action={acao} className={styles.formulario}>
+      <nav className={styles.etapas} role="tablist" aria-label="Partes do acordo do projeto">
+        {ETAPAS_BRIEFING.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            aria-selected={etapa === item.id}
+            aria-controls={`briefing-${item.id}`}
+            data-ativo={etapa === item.id || undefined}
+            onClick={() => abrirEtapa(item.id)}
+          >
+            <span>{item.numero}</span>
+            <strong>{item.rotulo}</strong>
+          </button>
+        ))}
+      </nav>
+
+      <form
+        ref={formRef}
+        action={acao}
+        className={styles.formulario}
+        noValidate
+        onSubmit={validarConfirmacao}
+      >
         <input type="hidden" name="projeto" value={projetoId} />
         <input type="hidden" name="fonteCallId" value={briefing.fonteCallId ?? ''} />
 
-        <fieldset className={styles.blocoPrincipal}>
+        <fieldset
+          id="briefing-resultado"
+          role="tabpanel"
+          data-visivel={etapa === 'resultado' || undefined}
+          aria-label="Resultado esperado"
+        >
           <legend>
             <span>01</span>
             <div>
-              <strong>Objetivo do projeto</strong>
-              <small>O que precisa mudar e como o resultado será avaliado.</small>
+              <strong>O resultado que o cliente comprou</strong>
+              <small>Registre a mudança esperada e a evidência que mostrará o sucesso.</small>
             </div>
           </legend>
-          <label>
-            Objetivo combinado
-            <textarea name="objetivo" rows={3} defaultValue={briefing.objetivo} required />
-          </label>
-          <label>
-            Critério de sucesso
-            <textarea
-              name="criterioSucesso"
-              rows={3}
-              defaultValue={briefing.criterioSucesso}
-              placeholder="Ex.: 90% dos contatos recebem a primeira resposta em até 1 minuto."
-              required
-            />
-          </label>
+          <div className={styles.duasColunas}>
+            <label>
+              Objetivo combinado
+              <textarea
+                name="objetivo"
+                rows={4}
+                defaultValue={briefing.objetivo}
+                aria-required="true"
+              />
+            </label>
+            <label>
+              Como saberemos que deu certo
+              <textarea
+                name="criterioSucesso"
+                rows={4}
+                defaultValue={briefing.criterioSucesso}
+                placeholder="Ex.: 90% dos contatos recebem a primeira resposta em até 1 minuto."
+                aria-required="true"
+              />
+            </label>
+          </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset
+          id="briefing-responsaveis"
+          role="tabpanel"
+          data-visivel={etapa === 'responsaveis' || undefined}
+          aria-label="Responsáveis pelo projeto"
+        >
           <legend>
             <span>02</span>
             <div>
-              <strong>Quem decide e quem executa</strong>
-              <small>Uma pessoa de cada lado, sem responsabilidade difusa.</small>
+              <strong>Quem responde por cada lado</strong>
+              <small>
+                Uma pessoa do cliente e uma pessoa da implementação, sem responsabilidade difusa.
+              </small>
             </div>
           </legend>
           <div className={styles.duasColunas}>
@@ -189,7 +269,7 @@ export function BriefingKickoff({
                 name="responsavelCliente"
                 defaultValue={briefing.responsavelCliente}
                 placeholder="Nome e função"
-                required
+                aria-required="true"
               />
             </label>
             <label>
@@ -198,17 +278,22 @@ export function BriefingKickoff({
                 name="responsavelTecnico"
                 defaultValue={briefing.responsavelTecnico}
                 placeholder="Quem conduz a entrega"
-                required
+                aria-required="true"
               />
             </label>
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset
+          id="briefing-condicoes"
+          role="tabpanel"
+          data-visivel={etapa === 'condicoes' || undefined}
+          aria-label="Acessos e limites do projeto"
+        >
           <legend>
             <span>03</span>
             <div>
-              <strong>Condições para executar</strong>
+              <strong>O que precisa estar disponível</strong>
               <small>Um item por linha. Registre permissões e limites, nunca credenciais.</small>
             </div>
           </legend>
@@ -222,7 +307,7 @@ export function BriefingKickoff({
                 placeholder={
                   'WhatsApp Business · liberar por Camila\nAgenda da recepção · acesso de leitura'
                 }
-                required
+                aria-required="true"
               />
             </label>
             <label>
@@ -234,7 +319,7 @@ export function BriefingKickoff({
                 placeholder={
                   'A IA não responde dúvidas clínicas\nCasos urgentes seguem para a recepção'
                 }
-                required
+                aria-required="true"
               />
             </label>
           </div>
@@ -244,24 +329,29 @@ export function BriefingKickoff({
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset
+          id="briefing-inicio"
+          role="tabpanel"
+          data-visivel={etapa === 'inicio' || undefined}
+          aria-label="Primeiro plano do projeto"
+        >
           <legend>
             <span>04</span>
             <div>
-              <strong>Depois do kickoff</strong>
-              <small>As primeiras tarefas para começar a implementação.</small>
+              <strong>O que acontece depois do kickoff</strong>
+              <small>Transforme o acordo nas primeiras ações do cliente e da implementação.</small>
             </div>
           </legend>
           <label>
-            Próximos passos
+            Primeiros passos
             <textarea
               name="proximosPassos"
-              rows={4}
+              rows={5}
               defaultValue={listaParaTexto(briefing.proximosPassos)}
               placeholder={
                 'Cliente libera os acessos até sexta-feira\nImplementador entrega o mapa inicial na terça-feira'
               }
-              required
+              aria-required="true"
             />
           </label>
           <label>
@@ -272,40 +362,49 @@ export function BriefingKickoff({
 
         <footer className={styles.acoes}>
           <div>
-            <span>
-              <Sparkles size={13} aria-hidden="true" /> {ROTULO_ORIGEM[origem]}
-            </span>
+            <span>{ROTULO_ORIGEM_BRIEFING[origem]}</span>
             <small>
-              Ao confirmar, o portal do cliente será liberado. Se editar depois, será preciso
-              confirmar novamente.
+              Parte {etapaIndex + 1} de {ETAPAS_BRIEFING.length}. Você pode salvar e continuar
+              depois.
             </small>
           </div>
           <div>
-            {confirmado && (
+            {confirmado && etapaIndex === 0 && (
               <button type="button" className={styles.cancelar} onClick={() => setEditando(false)}>
                 Cancelar
+              </button>
+            )}
+            {etapaIndex > 0 && (
+              <button type="button" onClick={() => abrirEtapa(ETAPAS_BRIEFING[etapaIndex - 1]!.id)}>
+                <ArrowLeft size={15} aria-hidden="true" /> Voltar
               </button>
             )}
             <button type="submit" name="operacao" value="salvar" disabled={pendente}>
               <Save size={15} aria-hidden="true" /> Salvar rascunho
             </button>
-            <button
-              type="submit"
-              name="operacao"
-              value="confirmar"
-              className={styles.confirmar}
-              disabled={pendente}
-            >
-              <UserRoundCheck size={15} aria-hidden="true" />
-              {pendente ? 'Salvando…' : 'Confirmar briefing'}
-              <ArrowRight size={15} aria-hidden="true" />
-            </button>
+            {etapaIndex < ETAPAS_BRIEFING.length - 1 ? (
+              <button type="button" className={styles.confirmar} onClick={avancar}>
+                Próxima parte <ArrowRight size={15} aria-hidden="true" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                name="operacao"
+                value="confirmar"
+                className={styles.confirmar}
+                disabled={pendente}
+              >
+                <UserRoundCheck size={15} aria-hidden="true" />
+                {pendente ? 'Confirmando…' : 'Confirmar acordo'}
+                <ArrowRight size={15} aria-hidden="true" />
+              </button>
+            )}
           </div>
         </footer>
 
-        {estado.erro && (
+        {(erroLocal || estado.erro) && (
           <p className={styles.retorno} role="alert">
-            {estado.erro}
+            {erroLocal || estado.erro}
           </p>
         )}
         {estado.sucesso && (

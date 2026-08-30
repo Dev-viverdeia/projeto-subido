@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--app-gap-grid);
-  padding: clamp(24px, 3vw, 36px);
+  padding: clamp(20px, 2.4vw, 30px);
   border-bottom: 1px solid var(--via-border-hairline);
   background: var(--app-glass-plane-strong);
 }
@@ -30,13 +30,13 @@
 }
 
 .iconePrincipal {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   display: grid;
   flex: 0 0 auto;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--via-accent) 35%, var(--via-border));
-  border-radius: 50%;
+  border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
   box-shadow: var(--app-elev-1-shadow);
@@ -83,7 +83,7 @@
   margin-top: var(--via-space-1);
   font-family: var(--via-font-display);
   font-size: clamp(1.55rem, 2.7vw, 2.25rem);
-  font-weight: 560;
+  font-weight: var(--via-fw-medium);
   line-height: 1.08;
   letter-spacing: var(--app-ls-h2);
   text-wrap: balance;
@@ -109,7 +109,7 @@
 
 .progresso strong {
   display: block;
-  font: 560 1.55rem/1 var(--via-font-display);
+  font: var(--via-fw-medium) 1.55rem/1 var(--via-font-display);
 }
 
 .progresso span {
@@ -134,25 +134,83 @@
   transition: transform var(--app-t-reveal);
 }
 
+.etapas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  padding: 6px;
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.etapas button {
+  min-width: 0;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: 9px var(--via-space-3);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    color var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+
+.etapas button:hover {
+  background: color-mix(in srgb, var(--via-white) 72%, transparent);
+  color: var(--via-text-primary);
+}
+
+.etapas button[data-ativo] {
+  background: var(--app-glass-plane-strong);
+  color: var(--via-text-primary);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.etapas button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.etapas span {
+  color: var(--via-text-faint);
+  font: var(--via-fw-medium) var(--via-fs-micro) var(--via-font-mono);
+}
+
+.etapas strong {
+  overflow: hidden;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .formulario {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .formulario fieldset {
   min-width: 0;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-stack);
   margin: 0;
-  padding: clamp(24px, 3vw, 34px);
+  padding: clamp(24px, 3vw, 32px);
   border: 0;
-  border-right: 1px solid var(--via-border-hairline);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
-.formulario fieldset:nth-of-type(even) {
-  border-right: 0;
+.formulario fieldset:not([data-visivel]) {
+  display: none;
 }
 
 .formulario legend {
@@ -236,10 +294,6 @@
   gap: var(--app-gap-grid);
 }
 
-.formulario fieldset:not(.blocoPrincipal) .duasColunas {
-  grid-template-columns: 1fr;
-}
-
 .avisoSeguranca {
   display: flex;
   align-items: start;
@@ -258,12 +312,11 @@
 }
 
 .acoes {
-  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--app-gap-grid);
-  padding: var(--app-pad-card) clamp(24px, 3vw, 34px);
+  padding: var(--via-space-4) clamp(24px, 3vw, 32px);
   background: var(--via-bg-2);
 }
 
@@ -340,8 +393,7 @@
 }
 
 .retorno {
-  grid-column: 1 / -1;
-  padding: 0 clamp(24px, 3vw, 34px) var(--app-pad-card);
+  padding: 0 clamp(24px, 3vw, 32px) var(--via-space-4);
   background: var(--via-bg-2);
   color: var(--via-accent-ink);
   font-size: var(--via-fs-xs);
@@ -442,13 +494,12 @@
     width: 100%;
   }
 
-  .formulario,
   .resumoConfirmado {
     grid-template-columns: 1fr;
   }
 
-  .formulario fieldset {
-    border-right: 0;
+  .etapas strong {
+    white-space: normal;
   }
 }
 
@@ -477,9 +528,12 @@
     font-size: 1.55rem;
   }
 
-  .duasColunas,
-  .acoes {
+  .duasColunas {
     grid-template-columns: 1fr;
+  }
+
+  .etapas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .acoes,
@@ -489,12 +543,16 @@
   }
 
   .acoes > div:last-child {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .acoes button,
   .rodapeResumo button {
     width: 100%;
+  }
+
+  .acoes button:last-child:nth-child(3) {
+    grid-column: 1 / -1;
   }
 
   .resumoConfirmado dl div {
