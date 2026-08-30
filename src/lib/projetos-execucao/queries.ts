@@ -7,6 +7,7 @@ import { lerRoteiroProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusCall } from '@/lib/calls/tipos';
+import type { StatusEmailEntrega } from '@/lib/notificacoes/entrega';
 import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
 import {
   lerBriefingKickoff,
@@ -83,6 +84,11 @@ export type EventoProjetoExecucao = {
   autor: 'prestador' | 'cliente';
   comentario: string | null;
   criadoEm: string;
+  emailDestinatario?: string | null;
+  emailStatus?: StatusEmailEntrega;
+  emailTentativas?: number;
+  emailEnviadoEm?: string | null;
+  emailEntregueEm?: string | null;
 };
 
 export type ResumoProjetoExecucao = {
@@ -382,6 +388,11 @@ export const obterProjetoExecucao = cache(
               autor,
               comentario: evento.comentario,
               criadoEm: evento.criado_em,
+              emailDestinatario: evento.email_destinatario,
+              emailStatus: evento.email_status as StatusEmailEntrega,
+              emailTentativas: evento.email_tentativas,
+              emailEnviadoEm: evento.email_enviado_em,
+              emailEntregueEm: evento.email_entregue_em,
             },
           ];
         })
@@ -408,15 +419,3 @@ export const obterProjetoExecucao = cache(
     };
   },
 );
-
-export const obterExecucaoDaProposta = cache(async (propostaId: string): Promise<string | null> => {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('projetos_execucao')
-    .select('id')
-    .eq('proposta_id', propostaId)
-    .maybeSingle();
-
-  if (error) throw handleError(error, 'projetos-execucao:por-proposta');
-  return data?.id ?? null;
-});

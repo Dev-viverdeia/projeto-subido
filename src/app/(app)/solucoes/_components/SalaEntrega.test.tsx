@@ -3,14 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 
-vi.mock('@/lib/projetos-execucao/actions', () => ({
-  atualizarTarefaProjeto: vi.fn(),
-  configurarPortalCliente: vi.fn(),
-  definirPrazoProjeto: vi.fn(),
+// prettier-ignore
+vi.mock('@/lib/projetos-execucao/actions', () => ({ atualizarTarefaProjeto: vi.fn(), configurarPortalCliente: vi.fn(), definirPrazoProjeto: vi.fn(), definirVisibilidadeArquivoProjeto: vi.fn(), excluirArquivoProjeto: vi.fn(), registrarArquivoProjeto: vi.fn() }));
+
+vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
   prepararEntregaCliente: vi.fn(),
-  definirVisibilidadeArquivoProjeto: vi.fn(),
-  excluirArquivoProjeto: vi.fn(),
-  registrarArquivoProjeto: vi.fn(),
+  reenviarNotificacaoEntregaCliente: vi.fn(),
 }));
 
 vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn() }));

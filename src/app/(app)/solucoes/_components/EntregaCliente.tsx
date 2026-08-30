@@ -6,15 +6,19 @@ import {
   Check,
   Clock3,
   ExternalLink,
+  MailCheck,
+  MailWarning,
   MessageSquareMore,
+  RefreshCw,
   Send,
   ShieldCheck,
 } from 'lucide-react';
 import {
   prepararEntregaCliente,
-  type EstadoProjetoExecucao,
-} from '@/lib/projetos-execucao/actions';
-import type { TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
+  reenviarNotificacaoEntregaCliente,
+} from '@/lib/projetos-execucao/entrega-actions';
+import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
+import type { EventoProjetoExecucao, TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_CLIENTE } from '@/lib/projetos-execucao/status';
 import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
 import styles from './EntregaCliente.module.css';
@@ -25,14 +29,22 @@ export function EntregaCliente({
   projetoId,
   tarefa,
   portalAtivo,
+  clienteEmail,
+  notificacao,
   aceiteFinal = false,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
   portalAtivo: boolean;
+  clienteEmail: string | null;
+  notificacao: EventoProjetoExecucao | null;
   aceiteFinal?: boolean;
 }) {
   const [estado, acao, pendente] = useActionState(prepararEntregaCliente, INICIAL);
+  const [estadoReenvio, reenviar, reenviando] = useActionState(
+    reenviarNotificacaoEntregaCliente,
+    INICIAL,
+  );
   const concluida = tarefa.status === 'concluida';
   const decidida = tarefa.clienteStatus === 'aprovada';
   const guiaValidacao = montarGuiaValidacaoTarefa(tarefa);
@@ -76,13 +88,23 @@ export function EntregaCliente({
           data-aguardando={tarefa.clienteStatus === 'aguardando' || undefined}
         >
           {tarefa.clienteStatus === 'aguardando' && (
-            <div className={styles.aguardando}>
-              <Clock3 size={17} aria-hidden="true" />
-              <span>
-                <strong>Agora é com o cliente.</strong>A entrega já está no portal para aprovação ou
-                pedido de ajuste.
-              </span>
-            </div>
+            <>
+              <div className={styles.aguardando}>
+                <Clock3 size={17} aria-hidden="true" />
+                <span>
+                  <strong>Agora é com o cliente.</strong>A entrega já está no portal para aprovação
+                  ou pedido de ajuste.
+                </span>
+              </div>
+              <NotificacaoCliente
+                projetoId={projetoId}
+                notificacao={notificacao}
+                email={clienteEmail}
+                estado={estadoReenvio}
+                reenviando={reenviando}
+                action={reenviar}
+              />
+            </>
           )}
           {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
           {tarefa.entregavelUrl && (
@@ -108,6 +130,18 @@ export function EntregaCliente({
             <strong>{guiaValidacao.criterio}</strong>
             <small>Material: {guiaValidacao.material}</small>
           </section>
+          <label>
+            <span>E-mail que receberá a validação</span>
+            <input
+              type="email"
+              name="email"
+              defaultValue={clienteEmail ?? ''}
+              maxLength={320}
+              autoComplete="email"
+              required={concluida}
+              placeholder="cliente@empresa.com.br"
+            />
+          </label>
           <label>
             <span>Mensagem para o cliente</span>
             <textarea
@@ -147,6 +181,11 @@ export function EntregaCliente({
 
           {estado.erro && <p role="alert">{estado.erro}</p>}
           {estado.sucesso && <p role="status">{estado.sucesso}</p>}
+          {estado.aviso && (
+            <p className={styles.aviso} role="alert">
+              {estado.aviso}
+            </p>
+          )}
 
           <div className={styles.acoes}>
             <button type="submit" name="operacao" value="salvar" disabled={pendente}>
@@ -171,6 +210,83 @@ export function EntregaCliente({
               <span>Conclua os ajustes para reenviar.</span>
             )}
           </div>
+        </form>
+      )}
+    </section>
+  );
+}
+
+function NotificacaoCliente({
+  projetoId,
+  notificacao,
+  email,
+  estado,
+  reenviando,
+  action,
+}: {
+  projetoId: string;
+  notificacao: EventoProjetoExecucao | null;
+  email: string | null;
+  estado: EstadoProjetoExecucao;
+  reenviando: boolean;
+  action: (formData: FormData) => void;
+}) {
+  const status = notificacao?.emailStatus ?? 'nao_solicitado';
+  const concluida = status === 'entregue';
+  const emTransito = ['enviando', 'enviado', 'atrasado'].includes(status);
+  const titulo = concluida
+    ? 'E-mail entregue ao cliente'
+    : status === 'enviado'
+      ? 'E-mail enviado ao cliente'
+      : status === 'enviando'
+        ? 'Enviando o aviso por e-mail'
+        : status === 'atrasado'
+          ? 'A entrega do e-mail está demorando'
+          : status === 'devolvido'
+            ? 'O endereço recusou o e-mail'
+            : 'O aviso por e-mail não foi entregue';
+  const descricao = concluida
+    ? `O provedor confirmou a entrega em ${notificacao?.emailDestinatario}.`
+    : emTransito
+      ? status === 'atrasado'
+        ? 'O provedor continuará tentando. A validação já está disponível no portal.'
+        : `A validação foi enviada para ${notificacao?.emailDestinatario ?? email}.`
+      : 'A validação continua segura no portal. Corrija o endereço, se necessário, e tente novamente.';
+
+  return (
+    <section className={styles.notificacao} data-status={status} aria-live="polite">
+      <span className={styles.notificacaoIcone}>
+        {concluida || emTransito ? (
+          <MailCheck size={17} aria-hidden="true" />
+        ) : (
+          <MailWarning size={17} aria-hidden="true" />
+        )}
+      </span>
+      <div>
+        <strong>{titulo}</strong>
+        <p>{descricao}</p>
+      </div>
+      {!concluida && !emTransito && notificacao && (
+        <form action={action} className={styles.reenvio}>
+          <input type="hidden" name="projeto" value={projetoId} />
+          <input type="hidden" name="evento" value={notificacao.id} />
+          <label>
+            <span>Novo endereço</span>
+            <input
+              type="email"
+              name="email"
+              defaultValue={notificacao.emailDestinatario ?? email ?? ''}
+              maxLength={320}
+              required
+              aria-label="E-mail para reenviar a validação"
+            />
+          </label>
+          <button type="submit" disabled={reenviando}>
+            <RefreshCw size={14} aria-hidden="true" />
+            {reenviando ? 'Tentando…' : 'Tentar novamente'}
+          </button>
+          {estado.erro && <p role="alert">{estado.erro}</p>}
+          {estado.sucesso && <p role="status">{estado.sucesso}</p>}
         </form>
       )}
     </section>

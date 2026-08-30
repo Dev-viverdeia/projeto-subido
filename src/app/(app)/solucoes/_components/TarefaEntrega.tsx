@@ -18,6 +18,7 @@ import {
 } from '@/lib/projetos-execucao/actions';
 import type {
   ArquivoProjetoExecucao,
+  EventoProjetoExecucao,
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
 import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
@@ -31,6 +32,8 @@ export function TarefaEntrega({
   projetoId,
   tarefa,
   portalAtivo,
+  clienteEmail,
+  notificacaoCliente,
   aceiteFinal,
   contexto,
   onAbrirArquivos,
@@ -38,6 +41,8 @@ export function TarefaEntrega({
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
   portalAtivo: boolean;
+  clienteEmail: string | null;
+  notificacaoCliente: EventoProjetoExecucao | null;
   aceiteFinal: boolean;
   contexto: {
     empresa: string;
@@ -262,6 +267,8 @@ export function TarefaEntrega({
         projetoId={projetoId}
         tarefa={tarefa}
         portalAtivo={portalAtivo}
+        clienteEmail={clienteEmail}
+        notificacao={notificacaoCliente}
         aceiteFinal={aceiteFinal}
       />
     </>

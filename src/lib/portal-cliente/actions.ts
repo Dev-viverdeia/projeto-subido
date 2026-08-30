@@ -17,7 +17,7 @@ const DecisaoSchema = z
     message: 'Explique o ajuste necessário.',
   });
 
-export type EstadoPortalCliente = { erro?: string; sucesso?: string };
+export type EstadoPortalCliente = { erro?: string; sucesso?: string; aviso?: string };
 
 export async function decidirEntregaCliente(
   _estado: EstadoPortalCliente,
@@ -41,13 +41,15 @@ export async function decidirEntregaCliente(
   }
 
   try {
-    const decidiu = await registrarDecisaoCliente({
+    const resultado = await registrarDecisaoCliente({
       codigo: validacao.data.codigo,
       tarefaId: validacao.data.tarefa,
       decisao: validacao.data.decisao,
       comentario: validacao.data.comentario || null,
     });
-    if (!decidiu) return { erro: 'Esta solicitação já foi respondida ou deixou de estar ativa.' };
+    if (!resultado.decidiu) {
+      return { erro: 'Esta solicitação já foi respondida ou deixou de estar ativa.' };
+    }
 
     revalidatePath(`/portal/${validacao.data.codigo}`);
     return {
@@ -57,6 +59,10 @@ export async function decidirEntregaCliente(
             ? 'Aceite final registrado. O projeto foi concluído.'
             : 'Entrega aprovada. Obrigado pela confirmação.'
           : 'Pedido de ajuste enviado ao responsável pelo projeto.',
+      aviso:
+        resultado.notificacao === 'falhou' || resultado.notificacao === 'indisponivel'
+          ? 'Sua decisão está salva. O responsável verá o retorno na plataforma mesmo que o aviso por e-mail demore.'
+          : undefined,
     };
   } catch (erro) {
     console.error(

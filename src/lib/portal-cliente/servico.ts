@@ -1,7 +1,13 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { env } from '@/lib/env';
 import { handleError } from '@/lib/errors';
+import {
+  enviarNotificacaoEntrega,
+  marcarNotificacaoSemDestinatario,
+} from '@/lib/notificacoes/entrega';
+import { emailDecisaoCliente } from '@/lib/notificacoes/entrega-email';
 import { lerDocumentoProposta } from '@/lib/propostas/schema';
 import type {
   StatusClienteProjeto,
@@ -218,8 +224,29 @@ export async function registrarDecisaoCliente({
   tarefaId: string;
   decisao: 'aprovada' | 'ajustes';
   comentario: string | null;
-}): Promise<boolean> {
+}): Promise<{
+  decidiu: boolean;
+  notificacao: 'enviada' | 'falhou' | 'indisponivel' | null;
+}> {
   const admin = createAdminClient();
+  const { data: projeto, error: erroProjeto } = await admin
+    .from('projetos_execucao')
+    .select('id, dono, titulo, documento')
+    .eq('portal_codigo', codigo)
+    .eq('portal_ativo', true)
+    .maybeSingle();
+  if (erroProjeto) throw handleError(erroProjeto, 'portal-cliente:contexto-decisao');
+  if (!projeto) return { decidiu: false, notificacao: null };
+
+  const { data: tarefa, error: erroTarefa } = await admin
+    .from('projeto_tarefas')
+    .select('titulo')
+    .eq('id', tarefaId)
+    .eq('projeto_execucao_id', projeto.id)
+    .maybeSingle();
+  if (erroTarefa) throw handleError(erroTarefa, 'portal-cliente:tarefa-decisao');
+  if (!tarefa) return { decidiu: false, notificacao: null };
+
   const { data, error } = await admin.rpc('projeto_portal_decidir', {
     p_codigo: codigo,
     p_tarefa_id: tarefaId,
@@ -228,5 +255,50 @@ export async function registrarDecisaoCliente({
   });
 
   if (error) throw handleError(error, 'portal-cliente:decidir');
-  return data;
+  if (!data) return { decidiu: false, notificacao: null };
+
+  const tipo = decisao === 'aprovada' ? 'entrega_aprovada' : 'ajustes_solicitados';
+  const { data: evento, error: erroEvento } = await admin
+    .from('projeto_portal_eventos')
+    .select('id')
+    .eq('projeto_execucao_id', projeto.id)
+    .eq('tarefa_id', tarefaId)
+    .eq('tipo', tipo)
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (erroEvento || !evento) {
+    console.error(
+      `[portal-cliente:notificacao-evento] ${erroEvento?.code ?? 'sem-evento'}: ${erroEvento?.message ?? ''}`,
+    );
+    return { decidiu: true, notificacao: 'indisponivel' };
+  }
+
+  const [{ data: dono, error: erroDono }, documento] = await Promise.all([
+    admin.auth.admin.getUserById(projeto.dono),
+    Promise.resolve(lerDocumentoProposta(projeto.documento)),
+  ]);
+  const destinatario = dono.user?.email ?? documento?.fornecedor?.email ?? null;
+  if (erroDono || !destinatario || !documento) {
+    await marcarNotificacaoSemDestinatario(evento.id);
+    return { decidiu: true, notificacao: 'indisponivel' };
+  }
+
+  const notificacao = await enviarNotificacaoEntrega({
+    eventoId: evento.id,
+    destinatario,
+    conteudo: emailDecisaoCliente({
+      empresa: documento.cliente.empresa,
+      projeto: projeto.titulo,
+      tarefa: tarefa.titulo,
+      decisao,
+      comentario,
+      link: `${env.NEXT_PUBLIC_SITE_URL}/entregas/${projeto.id}`,
+    }),
+  });
+
+  return {
+    decidiu: true,
+    notificacao: notificacao.status === 'falhou' ? 'falhou' : 'enviada',
+  };
 }

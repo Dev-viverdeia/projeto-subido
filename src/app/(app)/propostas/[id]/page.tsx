@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterProposta } from '@/lib/propostas/queries';
-import { obterExecucaoDaProposta } from '@/lib/projetos-execucao/queries';
+import { obterExecucaoDaProposta } from '@/lib/projetos-execucao/queries-proposta';
 import { env } from '@/lib/env';
 import { obterPerfilComercial } from '@/lib/perfil-comercial/queries';
 import { completarDocumentoComPerfil } from '@/lib/propostas/perfil';
