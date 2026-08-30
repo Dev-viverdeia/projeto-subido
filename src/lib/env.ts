@@ -86,7 +86,7 @@ export function resendEnv() {
       RESEND_FROM_EMAIL: z.string().min(6).default('Subido <notificacoes@subido.viverdeia.ai>'),
       RESEND_WEBHOOK_SECRET: z
         .string()
-        .regex(/^whsec_[A-Za-z0-9_+-]+$/)
+        .regex(/^whsec_[A-Za-z0-9_+/=-]+$/)
         .optional(),
     })
     .safeParse({
