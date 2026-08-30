@@ -73,6 +73,36 @@ export function serverEnv() {
   return parsed.data;
 }
 
+/**
+ * Envio transacional do Portal do Cliente.
+ *
+ * A ausência da configuração não derruba a plataforma nem desfaz uma aprovação:
+ * o evento fica salvo com falha visível e pode ser reenviado quando o serviço voltar.
+ */
+export function resendEnv() {
+  const parsed = z
+    .object({
+      RESEND_API_KEY: z.string().regex(/^re_[A-Za-z0-9_]+$/),
+      RESEND_FROM_EMAIL: z.string().min(6).default('Subido <notificacoes@subido.viverdeia.ai>'),
+      RESEND_WEBHOOK_SECRET: z
+        .string()
+        .regex(/^whsec_[A-Za-z0-9_+-]+$/)
+        .optional(),
+    })
+    .safeParse({
+      RESEND_API_KEY: process.env.RESEND_API_KEY,
+      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+      RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,
+    });
+
+  if (!parsed.success) return null;
+  return {
+    chave: parsed.data.RESEND_API_KEY,
+    remetente: parsed.data.RESEND_FROM_EMAIL,
+    webhook: parsed.data.RESEND_WEBHOOK_SECRET ?? null,
+  } as const;
+}
+
 /** Segredo que autoriza exclusivamente o worker periódico da Vercel. */
 export function cronEnv() {
   const parsed = z

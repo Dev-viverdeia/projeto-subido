@@ -68,6 +68,11 @@ export function AprovacaoCliente({
 
           {estado.erro && <p role="alert">{estado.erro}</p>}
           {estado.sucesso && <p role="status">{estado.sucesso}</p>}
+          {estado.aviso && (
+            <p className={styles.avisoAcao} role="status">
+              {estado.aviso}
+            </p>
+          )}
 
           <div className={styles.aprovacaoAcoes}>
             <button type="submit" name="decisao" value="ajustes" disabled={pendente}>

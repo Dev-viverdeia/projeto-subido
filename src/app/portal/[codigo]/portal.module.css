@@ -631,6 +631,15 @@
   font-size: var(--via-fs-xs);
 }
 
+.aprovacao form > .avisoAcao {
+  padding: var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-warning) 34%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-warning) 9%, var(--via-white));
+  color: var(--via-text-primary);
+  line-height: 1.5;
+}
+
 .aprovacaoAcoes {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);

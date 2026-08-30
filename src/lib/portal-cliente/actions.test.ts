@@ -28,7 +28,7 @@ describe('decidirEntregaCliente', () => {
   });
 
   it('registra a aprovação usando somente código e tarefa válidos', async () => {
-    registrarDecisaoCliente.mockResolvedValue(true);
+    registrarDecisaoCliente.mockResolvedValue({ decidiu: true, notificacao: 'enviada' });
 
     const resultado = await decidirEntregaCliente({}, formulario('aprovada'));
 
@@ -42,10 +42,19 @@ describe('decidirEntregaCliente', () => {
   });
 
   it('confirma o encerramento quando o aceite é o último do projeto', async () => {
-    registrarDecisaoCliente.mockResolvedValue(true);
+    registrarDecisaoCliente.mockResolvedValue({ decidiu: true, notificacao: 'enviada' });
 
     const resultado = await decidirEntregaCliente({}, formulario('aprovada', '', true));
 
     expect(resultado.sucesso).toMatch(/projeto foi concluído/i);
+  });
+
+  it('preserva a decisão quando o aviso por e-mail falha', async () => {
+    registrarDecisaoCliente.mockResolvedValue({ decidiu: true, notificacao: 'falhou' });
+
+    const resultado = await decidirEntregaCliente({}, formulario('aprovada'));
+
+    expect(resultado.sucesso).toMatch(/Entrega aprovada/i);
+    expect(resultado.aviso).toMatch(/decisão está salva/i);
   });
 });

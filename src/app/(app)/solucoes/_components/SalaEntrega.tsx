@@ -11,6 +11,7 @@ import {
   type DestinoJornadaEntrega,
 } from '@/lib/projetos-execucao/jornada-entrega';
 import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
+import { obterContatoNotificacao } from '@/lib/projetos-execucao/notificacao-cliente';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
 import { BriefingKickoff } from './BriefingKickoff';
@@ -78,6 +79,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const ajustesSolicitados = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
+  // prettier-ignore
+  const contatoCliente = obterContatoNotificacao(projeto.eventos, tarefaAtual?.id, projeto.documento.cliente.email);
   const estadoJornada = obterEstadoJornadaEntrega({
     status: projeto.status,
     briefingConfirmado,
@@ -307,6 +310,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                   projetoId={projeto.id}
                   tarefa={tarefaAtual}
                   portalAtivo={projeto.portalAtivo}
+                  clienteEmail={contatoCliente.email}
+                  notificacaoCliente={contatoCliente.evento}
                   contexto={{
                     empresa: projeto.empresa,
                     objetivo: projeto.briefing.objetivo || projeto.documento.objetivo,

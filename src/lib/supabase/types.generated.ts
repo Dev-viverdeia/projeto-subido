@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -2053,6 +2053,15 @@ export type Database = {
           comentario: string | null
           criado_em: string
           dono: string
+          email_assunto: string | null
+          email_atualizado_em: string | null
+          email_destinatario: string | null
+          email_entregue_em: string | null
+          email_enviado_em: string | null
+          email_erro: string | null
+          email_provider_id: string | null
+          email_status: string
+          email_tentativas: number
           id: string
           projeto_execucao_id: string
           tarefa_id: string | null
@@ -2063,6 +2072,15 @@ export type Database = {
           comentario?: string | null
           criado_em?: string
           dono: string
+          email_assunto?: string | null
+          email_atualizado_em?: string | null
+          email_destinatario?: string | null
+          email_entregue_em?: string | null
+          email_enviado_em?: string | null
+          email_erro?: string | null
+          email_provider_id?: string | null
+          email_status?: string
+          email_tentativas?: number
           id?: string
           projeto_execucao_id: string
           tarefa_id?: string | null
@@ -2073,6 +2091,15 @@ export type Database = {
           comentario?: string | null
           criado_em?: string
           dono?: string
+          email_assunto?: string | null
+          email_atualizado_em?: string | null
+          email_destinatario?: string | null
+          email_entregue_em?: string | null
+          email_enviado_em?: string | null
+          email_erro?: string | null
+          email_provider_id?: string | null
+          email_status?: string
+          email_tentativas?: number
           id?: string
           projeto_execucao_id?: string
           tarefa_id?: string | null
