@@ -72,6 +72,8 @@ describe('PainelEntregas', () => {
     const links = screen.getAllByRole('link', { name: /Abrir entrega de/ });
     expect(links[0]).toHaveAttribute('aria-label', 'Abrir entrega de Clínica Prioritária');
     expect(screen.getByText('Próxima ação atrasada')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Fila de trabalho' })).toBeInTheDocument();
+    expect(screen.getByText('1 na fila')).toBeInTheDocument();
   });
 
   it('explica quando a operação ainda não tem uma entrega aberta', () => {

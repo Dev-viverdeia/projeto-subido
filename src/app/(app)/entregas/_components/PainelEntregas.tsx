@@ -112,6 +112,62 @@ function CartaoEntrega({
   );
 }
 
+function LinhaEntrega({
+  projeto,
+  prioridade,
+  posicao,
+}: {
+  projeto: ResumoProjetoExecucao;
+  prioridade: PrioridadeEntrega;
+  posicao: number;
+}) {
+  const percentual = progresso(projeto);
+  const prazoOperacional = projeto.proximaAcaoPrazoEm ?? projeto.prazoEm;
+
+  return (
+    <article className={styles.linhaEntrega} data-prioridade={prioridade.grupo}>
+      <Link href={`/entregas/${projeto.id}`} aria-label={`Abrir entrega de ${projeto.empresa}`}>
+        <span className={styles.posicao} aria-hidden="true">
+          {String(posicao).padStart(2, '0')}
+        </span>
+
+        <div className={styles.linhaIdentidade}>
+          <small>{projeto.empresa}</small>
+          <strong>{projeto.titulo}</strong>
+          <span className={styles.sinal} data-grupo={prioridade.grupo}>
+            <IconePrioridade prioridade={prioridade} />
+            {prioridade.rotulo}
+          </span>
+        </div>
+
+        <div className={styles.linhaAcao}>
+          <span>Próxima ação</span>
+          <strong>{projeto.proximaTarefa ?? 'Formalizar a entrega final com o cliente'}</strong>
+          <small>{prioridade.detalhe}</small>
+        </div>
+
+        <div className={styles.linhaPrazo}>
+          <CalendarDays size={15} strokeWidth={1.7} aria-hidden="true" />
+          <span>{projeto.proximaAcaoPrazoEm ? 'Próxima ação' : 'Entrega'}</span>
+          <strong>{formatarPrazo(prazoOperacional)}</strong>
+        </div>
+
+        <div className={styles.linhaProgresso} aria-label={`${percentual}% da entrega concluída`}>
+          <strong>{percentual}%</strong>
+          <div aria-hidden="true">
+            <span style={{ transform: `scaleX(${percentual / 100})` }} />
+          </div>
+        </div>
+
+        <span className={styles.linhaAbrir}>
+          Abrir
+          <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
+        </span>
+      </Link>
+    </article>
+  );
+}
+
 function EstadoVazio() {
   return (
     <section className={styles.vazio} aria-labelledby="entregas-vazias-titulo">
@@ -195,13 +251,7 @@ export function PainelEntregas({
           <header className={styles.cabecalhoSecao}>
             <div>
               <p className={styles.eyebrow}>Prioridade agora</p>
-              <h2 id="titulo-em-andamento">
-                {prioridadePrincipal?.grupo === 'acao'
-                  ? 'Comece por esta entrega.'
-                  : prioridadePrincipal?.grupo === 'cliente'
-                    ? 'Acompanhe esta validação.'
-                    : 'Continue pela próxima tarefa.'}
-              </h2>
+              <h2 id="titulo-em-andamento">Comece por {principal.empresa}.</h2>
             </div>
             <p>
               {prioridadePrincipal?.rotulo}. {prioridadePrincipal?.detalhe}.
@@ -215,17 +265,21 @@ export function PainelEntregas({
           {demaisAtivos.length > 0 && (
             <div className={styles.demais}>
               <header>
-                <h2>Outras entregas em andamento</h2>
-                <span>{demaisAtivos.length}</span>
+                <div>
+                  <h2>Fila de trabalho</h2>
+                  <p>Ordenada pelo que exige atenção primeiro.</p>
+                </div>
+                <span>{demaisAtivos.length} na fila</span>
               </header>
-              <ol className={styles.grade}>
-                {demaisAtivos.map((projeto) => (
+              <ol className={styles.fila}>
+                {demaisAtivos.map((projeto, indice) => (
                   <li key={projeto.id}>
-                    <CartaoEntrega
+                    <LinhaEntrega
                       projeto={projeto}
                       prioridade={
                         prioridades.get(projeto.id) ?? classificarPrioridadeEntrega(projeto, agora)
                       }
+                      posicao={indice + 2}
                     />
                   </li>
                 ))}
