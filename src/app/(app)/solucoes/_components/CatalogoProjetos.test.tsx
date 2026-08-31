@@ -13,7 +13,7 @@ describe('catálogo de projetos', () => {
       }),
     ).toBeDefined();
     expect(screen.queryByText('Cinco projetos.')).toBeNull();
-    expect(screen.getByRole('link', { name: /Continuar em Formações/ }).getAttribute('href')).toBe(
+    expect(screen.getByRole('link', { name: /Ver formações/ }).getAttribute('href')).toBe(
       '/formacoes',
     );
   });
@@ -66,10 +66,12 @@ describe('catálogo de projetos', () => {
 
     render(<CatalogoProjetos solucoes={[solucao]} />);
 
-    expect(screen.getByRole('heading', { name: /Cinco minicursos práticos/ })).toBeDefined();
-    expect(screen.getByText('Comece por aqui')).toBeDefined();
+    expect(
+      screen.getByRole('heading', { name: 'Aprenda um projeto. Entregue para um cliente.' }),
+    ).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Seu próximo projeto' })).toBeDefined();
     expect(screen.getByText('5 a 10 dias úteis')).toBeDefined();
-    expect(screen.getByText('Entrada')).toBeDefined();
-    expect(screen.getByRole('link', { name: /Abrir minicurso/ })).toBeDefined();
+    expect(screen.getByText('Para começar')).toBeDefined();
+    expect(screen.getByRole('link', { name: /Ver projeto/ })).toBeDefined();
   });
 });
