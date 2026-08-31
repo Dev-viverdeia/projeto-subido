@@ -32,3 +32,14 @@ export function rotuloPrazoOperacional(valor: string, agora = new Date()): strin
   if (dias === 1) return 'Prazo amanhã';
   return `Prazo em ${dias} dias`;
 }
+
+export function formatarDataProjeto(valor: string): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: FUSO,
+  })
+    .format(new Date(valor))
+    .replace('.', '');
+}

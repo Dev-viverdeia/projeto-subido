@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { diasAtePrazo, prazoEstaAtrasado, rotuloPrazoOperacional } from './prazo';
+import {
+  diasAtePrazo,
+  formatarDataProjeto,
+  prazoEstaAtrasado,
+  rotuloPrazoOperacional,
+} from './prazo';
 
 const AGORA = new Date('2026-08-30T23:30:00.000Z');
 
@@ -13,5 +18,9 @@ describe('prazo operacional', () => {
     expect(rotuloPrazoOperacional('2026-08-30T12:00:00-03:00', AGORA)).toBe('Prazo hoje');
     expect(rotuloPrazoOperacional('2026-08-31T12:00:00-03:00', AGORA)).toBe('Prazo amanhã');
     expect(rotuloPrazoOperacional('2026-08-28T12:00:00-03:00', AGORA)).toBe('Atrasada há 2 dias');
+  });
+
+  it('formata a data do projeto no fuso operacional', () => {
+    expect(formatarDataProjeto('2026-08-31T02:00:00.000Z')).toBe('30 de ago de 2026');
   });
 });

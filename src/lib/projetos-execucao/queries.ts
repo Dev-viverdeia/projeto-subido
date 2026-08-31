@@ -17,8 +17,12 @@ import {
   type OrigemBriefingKickoff,
 } from './briefing';
 import { montarKitOperacionalTarefa, type KitOperacionalTarefa } from './kit-operacional';
-import type { AcaoPlanoProjeto } from './plano';
-import { prazoEstaAtrasado } from './prazo';
+import {
+  mapearAcoesPlano,
+  obterProximoCompromisso,
+  resumirDependencias,
+  type AcaoPlanoProjeto,
+} from './plano';
 
 export type { AcaoPlanoProjeto } from './plano';
 
@@ -174,7 +178,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(status, titulo, prazo_em, atualizado_em, categoria, responsavel_tipo)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -188,21 +192,8 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
     const tarefas = [...linha.projeto_tarefas].sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
-    const compromisso = [...linha.projeto_acoes]
-      .filter(
-        (acao) => acao.status === 'pendente' && !['acesso', 'dependencia'].includes(acao.categoria),
-      )
-      .sort((a, b) => {
-        if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
-        if (a.prazo_em) return -1;
-        if (b.prazo_em) return 1;
-        return b.atualizado_em.localeCompare(a.atualizado_em);
-      })[0];
-    const dependencias = linha.projeto_acoes.filter((acao) =>
-      ['acesso', 'dependencia'].includes(acao.categoria),
-    );
-    const doCliente = dependencias.filter((acao) => acao.responsavel_tipo === 'cliente');
-    const doPrestador = dependencias.filter((acao) => acao.responsavel_tipo === 'prestador');
+    const acoesPlano = mapearAcoesPlano(linha.projeto_acoes);
+    const compromisso = obterProximoCompromisso(acoesPlano);
     return [
       {
         id: linha.id,
@@ -214,18 +205,12 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         feitas,
         total: tarefas.length,
         proximaTarefa: compromisso?.titulo ?? proxima?.titulo ?? null,
-        proximaAcaoPrazoEm: compromisso?.prazo_em ?? null,
+        proximaAcaoPrazoEm: compromisso?.prazoEm ?? null,
         tarefasBloqueadas: tarefas.filter((tarefa) => tarefa.status === 'bloqueada').length,
         validacoesAguardando: tarefas.filter((tarefa) => tarefa.cliente_status === 'aguardando')
           .length,
         ajustesSolicitados: tarefas.filter((tarefa) => tarefa.cliente_status === 'ajustes').length,
-        dependenciasClientePendentes: doCliente.length,
-        dependenciasPrestadorPendentes: doPrestador.length,
-        dependenciasClienteAtrasadas: doCliente.filter((acao) => prazoEstaAtrasado(acao.prazo_em))
-          .length,
-        dependenciasPrestadorAtrasadas: doPrestador.filter((acao) =>
-          prazoEstaAtrasado(acao.prazo_em),
-        ).length,
+        ...resumirDependencias(acoesPlano),
       },
     ];
   });
@@ -324,25 +309,8 @@ export const obterProjetoExecucao = cache(
       .sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
-    const proximoCompromisso = data.projeto_acoes
-      .filter(
-        (acao) => acao.status === 'pendente' && !['acesso', 'dependencia'].includes(acao.categoria),
-      )
-      .sort((a, b) => {
-        if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
-        if (a.prazo_em) return -1;
-        if (b.prazo_em) return 1;
-        return b.atualizado_em.localeCompare(a.atualizado_em);
-      })[0];
-    const dependenciasPendentes = data.projeto_acoes.filter(
-      (acao) => acao.status === 'pendente' && ['acesso', 'dependencia'].includes(acao.categoria),
-    );
-    const dependenciasCliente = dependenciasPendentes.filter(
-      (acao) => acao.responsavel_tipo === 'cliente',
-    );
-    const dependenciasPrestador = dependenciasPendentes.filter(
-      (acao) => acao.responsavel_tipo === 'prestador',
-    );
+    const acoesPlano = mapearAcoesPlano(data.projeto_acoes);
+    const proximoCompromisso = obterProximoCompromisso(acoesPlano);
 
     return {
       id: data.id,
@@ -354,19 +322,12 @@ export const obterProjetoExecucao = cache(
       feitas,
       total: tarefas.length,
       proximaTarefa: proximoCompromisso?.titulo ?? proxima?.titulo ?? null,
-      proximaAcaoPrazoEm: proximoCompromisso?.prazo_em ?? null,
+      proximaAcaoPrazoEm: proximoCompromisso?.prazoEm ?? null,
       tarefasBloqueadas: tarefas.filter((tarefa) => tarefa.status === 'bloqueada').length,
       validacoesAguardando: tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando')
         .length,
       ajustesSolicitados: tarefas.filter((tarefa) => tarefa.clienteStatus === 'ajustes').length,
-      dependenciasClientePendentes: dependenciasCliente.length,
-      dependenciasPrestadorPendentes: dependenciasPrestador.length,
-      dependenciasClienteAtrasadas: dependenciasCliente.filter((acao) =>
-        prazoEstaAtrasado(acao.prazo_em),
-      ).length,
-      dependenciasPrestadorAtrasadas: dependenciasPrestador.filter((acao) =>
-        prazoEstaAtrasado(acao.prazo_em),
-      ).length,
+      ...resumirDependencias(acoesPlano),
       propostaId: data.proposta_id,
       oportunidadeId: data.oportunidade_id,
       inicioEm: data.inicio_em,
@@ -428,29 +389,7 @@ export const obterProjetoExecucao = cache(
           ];
         })
         .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
-      acoesPlano: data.projeto_acoes
-        .map((acao) => ({
-          id: acao.id,
-          titulo: acao.titulo,
-          prazoEm: acao.prazo_em,
-          status: acao.status,
-          origem: acao.origem,
-          categoria: acao.categoria as AcaoPlanoProjeto['categoria'],
-          reuniaoId: acao.reuniao_id,
-          responsavelTipo: acao.responsavel_tipo as AcaoPlanoProjeto['responsavelTipo'],
-          responsavelNome: acao.responsavel_nome,
-          visivelCliente: acao.visivel_cliente,
-          concluidaEm: acao.concluida_em,
-          atualizadoEm: acao.atualizado_em,
-        }))
-        .sort((a, b) => {
-          if (a.status === 'pendente' && b.status !== 'pendente') return -1;
-          if (a.status !== 'pendente' && b.status === 'pendente') return 1;
-          if (a.prazoEm && b.prazoEm) return a.prazoEm.localeCompare(b.prazoEm);
-          if (a.prazoEm) return -1;
-          if (b.prazoEm) return 1;
-          return b.atualizadoEm.localeCompare(a.atualizadoEm);
-        }),
+      acoesPlano,
     };
   },
 );
