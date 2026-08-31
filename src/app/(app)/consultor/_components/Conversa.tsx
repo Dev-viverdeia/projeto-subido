@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { ArrowUp, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, Bot, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
 import { responderPendente } from '@/lib/consultor/invocar';
 import { adicionarMensagem, criarConversa } from '@/lib/consultor/criar';
 import {
@@ -19,16 +19,17 @@ const MAXIMO = 8000;
 
 export type ExemploDoConsultor = {
   rotulo: string;
+  descricao?: string;
   texto: string;
 };
 
 type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | null;
 
 function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
-  if (etapa === 'enviando') return 'Enviando seus arquivos com segurança';
-  if (etapa === 'lendo') return 'Lendo o material e preparando a resposta';
-  if (comArquivos) return 'Cruzando o material com seu contexto da plataforma';
-  return 'Preparando uma resposta com seu contexto';
+  if (etapa === 'enviando') return 'Recebendo seus arquivos';
+  if (etapa === 'lendo') return 'Entendendo o material';
+  if (comArquivos) return 'Cruzando o material com sua operação';
+  return 'Analisando sua operação';
 }
 
 export function Conversa({
@@ -226,12 +227,18 @@ export function Conversa({
               />
               <span>
                 <strong>{descricaoDaEtapa(etapa, arquivosEmVoo.length > 0)}</strong>
-                <small>Você pode aguardar nesta tela. Sua conversa está salva.</small>
+                <small>Vendas, projetos e conteúdos estão entrando na resposta.</small>
               </span>
+              <i aria-hidden="true" />
             </div>
           ) : null}
           {respostaEmVoo !== null ? (
-            <p className={`${styles.balao} ${styles.doConsultor}`}>{respostaEmVoo}</p>
+            <div className={styles.respostaConsultor}>
+              <span className={styles.autorResposta}>
+                <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
+              </span>
+              <p className={`${styles.balao} ${styles.doConsultor}`}>{respostaEmVoo}</p>
+            </div>
           ) : null}
         </div>
       )}
@@ -301,7 +308,7 @@ export function Conversa({
             }}
             disabled={ocupado}
             rows={2}
-            placeholder="Pergunte algo ou envie um arquivo…"
+            placeholder="Conte o que você precisa vender, decidir ou entregar…"
           />
         </div>
 
@@ -326,6 +333,7 @@ export function Conversa({
               title="Anexar arquivo"
             >
               <Paperclip size={17} strokeWidth={1.9} aria-hidden="true" />
+              <span>Anexar</span>
             </button>
             <button
               type="button"
@@ -340,6 +348,7 @@ export function Conversa({
               ) : (
                 <Mic size={17} strokeWidth={1.9} aria-hidden="true" />
               )}
+              <span>{gravando ? 'Parar' : 'Áudio'}</span>
             </button>
             {gravando ? (
               <span className={styles.tempoGravacao} role="status">
@@ -364,7 +373,7 @@ export function Conversa({
 
       {exemplos && exemplos.length > 0 && arquivos.length === 0 ? (
         <ul className={styles.chips} aria-label="Exemplos de perguntas">
-          {exemplos.map((exemplo) => (
+          {exemplos.map((exemplo, indice) => (
             <li key={exemplo.rotulo}>
               <button
                 type="button"
@@ -374,7 +383,14 @@ export function Conversa({
                   campoRef.current?.focus();
                 }}
               >
-                {exemplo.rotulo}
+                <span className={styles.chipIndice} aria-hidden="true">
+                  {String(indice + 1).padStart(2, '0')}
+                </span>
+                <span className={styles.chipTexto}>
+                  <strong>{exemplo.rotulo}</strong>
+                  {exemplo.descricao ? <small>{exemplo.descricao}</small> : null}
+                </span>
+                <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
               </button>
             </li>
           ))}

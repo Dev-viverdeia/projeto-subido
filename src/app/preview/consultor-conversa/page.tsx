@@ -1,17 +1,23 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Bot, BriefcaseBusiness, ContactRound, FileText, House, Video } from 'lucide-react';
-import { Mensagens } from '@/app/(app)/consultor/_components/Mensagens';
-import conversa from '@/app/(app)/consultor/[id]/pagina.module.css';
+import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { DirecaoMensagemSchema } from '@/lib/consultor/direcao';
-import type { MensagemDoConsultor } from '@/lib/consultor/queries';
+import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
 import shell from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Ação do Sobral AI' };
 
 const MENSAGEM = '55555555-5555-4555-8555-555555555555';
 const OPORTUNIDADE = '11111111-1111-4111-8111-111111111111';
+
+const thread: ThreadDoConsultor = {
+  id: '44444444-4444-4444-8444-444444444444',
+  titulo: 'Próximo avanço da Clínica Aurora',
+  criadoEm: '2026-08-10T18:00:00.000Z',
+  atualizadoEm: '2026-08-10T18:10:00.000Z',
+};
 
 const mensagens: MensagemDoConsultor[] = [
   {
@@ -140,18 +146,7 @@ export default function PreviewConsultorConversaPage() {
       </aside>
 
       <main id="conteudo" className={shell.conteudo}>
-        <div className={conversa.pagina}>
-          <header className={conversa.cabecalho}>
-            <div className={conversa.esquerda}>
-              <div className={conversa.identidade}>
-                <p className={conversa.eyebrow}>Conversa</p>
-                <h1 className={conversa.tituloConversa}>Próximo avanço da Clínica Aurora</h1>
-                <p className={conversa.meta}>Iniciada hoje</p>
-              </div>
-            </div>
-          </header>
-          <Mensagens mensagens={mensagens} modoPreview />
-        </div>
+        <TelaSobral threads={[thread]} conversa={{ thread, mensagens }} />
       </main>
     </div>
   );
