@@ -2138,6 +2138,7 @@ export type Database = {
           dono: string
           evidencia_resultado_url: string | null
           id: string
+          oportunidade_continuidade_id: string | null
           projeto_execucao_id: string
           proximo_passo: string | null
           proximo_passo_em: string | null
@@ -2156,6 +2157,7 @@ export type Database = {
           dono: string
           evidencia_resultado_url?: string | null
           id?: string
+          oportunidade_continuidade_id?: string | null
           projeto_execucao_id: string
           proximo_passo?: string | null
           proximo_passo_em?: string | null
@@ -2174,6 +2176,7 @@ export type Database = {
           dono?: string
           evidencia_resultado_url?: string | null
           id?: string
+          oportunidade_continuidade_id?: string | null
           projeto_execucao_id?: string
           proximo_passo?: string | null
           proximo_passo_em?: string | null
@@ -2183,6 +2186,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["projeto_evolucao_status"]
         }
         Relationships: [
+          {
+            foreignKeyName: "projeto_evolucoes_oportunidade_continuidade_id_fkey"
+            columns: ["oportunidade_continuidade_id"]
+            isOneToOne: false
+            referencedRelation: "crm_oportunidades"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "projeto_evolucoes_projeto_fk"
             columns: ["dono", "projeto_execucao_id"]
@@ -3860,6 +3870,10 @@ export type Database = {
       }
       projeto_evolucao_agendar: {
         Args: { p_projeto_id: string; p_revisao_em: string }
+        Returns: string
+      }
+      projeto_evolucao_iniciar_continuidade: {
+        Args: { p_projeto_id: string }
         Returns: string
       }
       projeto_evolucao_registrar: {

@@ -90,6 +90,7 @@ const PROJETOS: ResumoProjetoExecucao[] = [
       proximoPassoEm: null,
       compartilharCliente: false,
       registradaEm: null,
+      oportunidadeContinuidadeId: null,
     },
   },
   {
@@ -117,6 +118,7 @@ const PROJETOS: ResumoProjetoExecucao[] = [
       proximoPassoEm: null,
       compartilharCliente: false,
       registradaEm: null,
+      oportunidadeContinuidadeId: null,
     },
   },
   {
@@ -144,6 +146,7 @@ const PROJETOS: ResumoProjetoExecucao[] = [
       proximoPassoEm: '2026-09-21',
       compartilharCliente: true,
       registradaEm: '2026-08-21T16:00:00.000Z',
+      oportunidadeContinuidadeId: null,
     },
   },
 ];

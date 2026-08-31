@@ -14,6 +14,7 @@ export type EvolucaoProjeto = {
   proximoPassoEm: string | null;
   compartilharCliente: boolean;
   registradaEm: string | null;
+  oportunidadeContinuidadeId: string | null;
 };
 
 export const ROTULO_DECISAO_EVOLUCAO: Record<DecisaoEvolucaoProjeto, string> = {
@@ -39,6 +40,7 @@ export function mapearEvolucaoProjeto(
     proximoPassoEm: linha.proximo_passo_em,
     compartilharCliente: linha.compartilhar_cliente,
     registradaEm: linha.registrada_em,
+    oportunidadeContinuidadeId: linha.oportunidade_continuidade_id,
   };
 }
 

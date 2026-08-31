@@ -10,6 +10,7 @@ const LINHA: Tables<'projeto_evolucoes'> = {
   revisao_em: '2026-09-09',
   resultado_observado: 'A equipe reduziu o tempo de primeira resposta no piloto.',
   evidencia_resultado_url: 'https://example.com/resultado',
+  oportunidade_continuidade_id: null,
   decisao: 'expandir',
   proximo_passo: 'Definir o segundo canal com a responsável.',
   proximo_passo_em: '2026-09-15',

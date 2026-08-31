@@ -1,18 +1,14 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
 import {
-  ArrowRight,
   ArrowUpRight,
   BadgeCheck,
   CalendarClock,
   ChartNoAxesCombined,
   Check,
-  RotateCcw,
   ShieldCheck,
 } from 'lucide-react';
-import { iniciarNovoCicloCliente } from '@/lib/crm/actions';
 import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
 import {
@@ -26,6 +22,7 @@ import {
   type EvolucaoProjeto,
 } from '@/lib/projetos-execucao/evolucao';
 import styles from './EvolucaoProjeto.module.css';
+import { ContinuidadeComercial } from './ContinuidadeComercial';
 
 const INICIAL: EstadoProjetoExecucao = {};
 
@@ -61,25 +58,14 @@ const DECISOES: Array<{
   },
 ];
 
-function BotaoNovoCiclo() {
-  const { pending } = useFormStatus();
-  return (
-    <button type="submit" className={styles.acaoNovoCiclo} disabled={pending}>
-      <RotateCcw size={15} aria-hidden="true" />
-      {pending ? 'Abrindo nova venda…' : 'Abrir nova venda com este cliente'}
-      {!pending && <ArrowRight size={15} aria-hidden="true" />}
-    </button>
-  );
-}
-
 export function EvolucaoProjeto({
   projetoId,
-  oportunidadeId,
+  empresa,
   encerramento,
   evolucao,
 }: {
   projetoId: string;
-  oportunidadeId: string;
+  empresa: string;
   encerramento: EncerramentoProjeto | null;
   evolucao: EvolucaoProjeto | null;
 }) {
@@ -102,7 +88,10 @@ export function EvolucaoProjeto({
   }
 
   const registrada = evolucao.status === 'registrada';
-  const podeAbrirNovoCiclo = evolucao.decisao === 'expandir' || evolucao.decisao === 'novo_projeto';
+  const decisaoComercial =
+    evolucao.decisao === 'expandir' || evolucao.decisao === 'novo_projeto'
+      ? evolucao.decisao
+      : null;
 
   return (
     <section className={styles.evolucao} data-registrada={registrada || undefined}>
@@ -177,11 +166,15 @@ export function EvolucaoProjeto({
                 ? 'O resultado e o próximo passo também estão no portal do cliente.'
                 : 'Este registro ficou somente na sua operação.'}
             </span>
-            {podeAbrirNovoCiclo && (
-              <form action={iniciarNovoCicloCliente}>
-                <input type="hidden" name="oportunidade" value={oportunidadeId} />
-                <BotaoNovoCiclo />
-              </form>
+            {decisaoComercial && (
+              <ContinuidadeComercial
+                projetoId={projetoId}
+                empresa={empresa}
+                decisao={decisaoComercial}
+                proximoPasso={evolucao.proximoPasso!}
+                proximoPassoEm={evolucao.proximoPassoEm}
+                oportunidadeId={evolucao.oportunidadeContinuidadeId}
+              />
             )}
           </footer>
         </div>
