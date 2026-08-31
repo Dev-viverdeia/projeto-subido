@@ -17,6 +17,7 @@ import {
   type OrigemBriefingKickoff,
 } from './briefing';
 import { montarKitOperacionalTarefa, type KitOperacionalTarefa } from './kit-operacional';
+import { mapearMudancasEscopo, type MudancaEscopoProjeto } from './mudancas-escopo';
 import {
   mapearAcoesPlano,
   obterProximoCompromisso,
@@ -73,11 +74,17 @@ export type TipoEventoProjeto =
   | 'ajustes_solicitados'
   | 'arquivo_liberado'
   | 'arquivo_retirado'
-  | 'pendencia_concluida';
+  | 'pendencia_concluida'
+  | 'mudanca_escopo_solicitada'
+  | 'mudanca_escopo_incluida'
+  | 'mudanca_escopo_proposta'
+  | 'mudanca_escopo_aprovada'
+  | 'mudanca_escopo_recusada';
 
 export type EventoProjetoExecucao = {
   id: string;
   tarefaId: string | null;
+  mudancaEscopoId?: string | null;
   tipo: TipoEventoProjeto;
   autor: 'prestador' | 'cliente';
   comentario: string | null;
@@ -88,6 +95,8 @@ export type EventoProjetoExecucao = {
   emailEnviadoEm?: string | null;
   emailEntregueEm?: string | null;
 };
+
+export type { MudancaEscopoProjeto, StatusMudancaEscopo } from './mudancas-escopo';
 
 export type ResumoProjetoExecucao = {
   id: string;
@@ -103,6 +112,8 @@ export type ResumoProjetoExecucao = {
   tarefasBloqueadas: number;
   validacoesAguardando: number;
   ajustesSolicitados: number;
+  mudancasEscopoParaAnalisar?: number;
+  mudancasEscopoAguardandoCliente?: number;
   dependenciasClientePendentes?: number;
   dependenciasPrestadorPendentes?: number;
   dependenciasClienteAtrasadas?: number;
@@ -123,6 +134,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   arquivos: ArquivoProjetoExecucao[];
   acoesPlano: AcaoPlanoProjeto[];
   eventos: EventoProjetoExecucao[];
+  mudancasEscopo: MudancaEscopoProjeto[];
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -178,7 +190,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -210,6 +222,12 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         validacoesAguardando: tarefas.filter((tarefa) => tarefa.cliente_status === 'aguardando')
           .length,
         ajustesSolicitados: tarefas.filter((tarefa) => tarefa.cliente_status === 'ajustes').length,
+        mudancasEscopoParaAnalisar: linha.projeto_mudancas_escopo.filter(
+          (mudanca) => mudanca.status === 'em_analise',
+        ).length,
+        mudancasEscopoAguardandoCliente: linha.projeto_mudancas_escopo.filter(
+          (mudanca) => mudanca.status === 'aguardando_cliente',
+        ).length,
         ...resumirDependencias(acoesPlano),
       },
     ];
@@ -222,7 +240,7 @@ export const obterProjetoExecucao = cache(
     const { data, error } = await supabase
       .from('projetos_execucao')
       .select(
-        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*)',
+        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*), projeto_mudancas_escopo(*)',
       )
       .eq('id', id)
       .maybeSingle();
@@ -327,6 +345,12 @@ export const obterProjetoExecucao = cache(
       validacoesAguardando: tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando')
         .length,
       ajustesSolicitados: tarefas.filter((tarefa) => tarefa.clienteStatus === 'ajustes').length,
+      mudancasEscopoParaAnalisar: data.projeto_mudancas_escopo.filter(
+        (mudanca) => mudanca.status === 'em_analise',
+      ).length,
+      mudancasEscopoAguardandoCliente: data.projeto_mudancas_escopo.filter(
+        (mudanca) => mudanca.status === 'aguardando_cliente',
+      ).length,
       ...resumirDependencias(acoesPlano),
       propostaId: data.proposta_id,
       oportunidadeId: data.oportunidade_id,
@@ -376,6 +400,7 @@ export const obterProjetoExecucao = cache(
             {
               id: evento.id,
               tarefaId: evento.tarefa_id,
+              mudancaEscopoId: evento.mudanca_escopo_id,
               tipo,
               autor,
               comentario: evento.comentario,
@@ -389,6 +414,7 @@ export const obterProjetoExecucao = cache(
           ];
         })
         .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
+      mudancasEscopo: mapearMudancasEscopo(data.projeto_mudancas_escopo),
       acoesPlano,
     };
   },

@@ -1916,9 +1916,9 @@ export type Database = {
           origem: string
           prazo_em: string | null
           projeto_execucao_id: string | null
-          reuniao_id: string | null
           responsavel_nome: string | null
           responsavel_tipo: string
+          reuniao_id: string | null
           status: Database["public"]["Enums"]["projeto_acao_status"]
           titulo: string
           visivel_cliente: boolean
@@ -1936,9 +1936,9 @@ export type Database = {
           origem?: string
           prazo_em?: string | null
           projeto_execucao_id?: string | null
-          reuniao_id?: string | null
           responsavel_nome?: string | null
           responsavel_tipo?: string
+          reuniao_id?: string | null
           status?: Database["public"]["Enums"]["projeto_acao_status"]
           titulo: string
           visivel_cliente?: boolean
@@ -1956,9 +1956,9 @@ export type Database = {
           origem?: string
           prazo_em?: string | null
           projeto_execucao_id?: string | null
-          reuniao_id?: string | null
           responsavel_nome?: string | null
           responsavel_tipo?: string
+          reuniao_id?: string | null
           status?: Database["public"]["Enums"]["projeto_acao_status"]
           titulo?: string
           visivel_cliente?: boolean
@@ -2056,6 +2056,68 @@ export type Database = {
           },
         ]
       }
+      projeto_mudancas_escopo: {
+        Row: {
+          analisado_em: string | null
+          atualizado_em: string
+          classificacao: string | null
+          criado_em: string
+          decidido_em: string | null
+          descricao: string
+          dono: string
+          id: string
+          impacto_prazo_dias: number | null
+          impacto_valor_centavos: number | null
+          projeto_execucao_id: string
+          resposta: string | null
+          solicitado_por: string
+          status: string
+          titulo: string
+        }
+        Insert: {
+          analisado_em?: string | null
+          atualizado_em?: string
+          classificacao?: string | null
+          criado_em?: string
+          decidido_em?: string | null
+          descricao: string
+          dono: string
+          id?: string
+          impacto_prazo_dias?: number | null
+          impacto_valor_centavos?: number | null
+          projeto_execucao_id: string
+          resposta?: string | null
+          solicitado_por?: string
+          status?: string
+          titulo: string
+        }
+        Update: {
+          analisado_em?: string | null
+          atualizado_em?: string
+          classificacao?: string | null
+          criado_em?: string
+          decidido_em?: string | null
+          descricao?: string
+          dono?: string
+          id?: string
+          impacto_prazo_dias?: number | null
+          impacto_valor_centavos?: number | null
+          projeto_execucao_id?: string
+          resposta?: string | null
+          solicitado_por?: string
+          status?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_mudancas_escopo_projeto_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       projeto_portal_eventos: {
         Row: {
           acao_id: string | null
@@ -2073,6 +2135,7 @@ export type Database = {
           email_status: string
           email_tentativas: number
           id: string
+          mudanca_escopo_id: string | null
           projeto_execucao_id: string
           tarefa_id: string | null
           tipo: string
@@ -2093,6 +2156,7 @@ export type Database = {
           email_status?: string
           email_tentativas?: number
           id?: string
+          mudanca_escopo_id?: string | null
           projeto_execucao_id: string
           tarefa_id?: string | null
           tipo: string
@@ -2113,6 +2177,7 @@ export type Database = {
           email_status?: string
           email_tentativas?: number
           id?: string
+          mudanca_escopo_id?: string | null
           projeto_execucao_id?: string
           tarefa_id?: string | null
           tipo?: string
@@ -2123,6 +2188,13 @@ export type Database = {
             columns: ["acao_id"]
             isOneToOne: false
             referencedRelation: "projeto_acoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projeto_portal_eventos_mudanca_escopo_id_fkey"
+            columns: ["mudanca_escopo_id"]
+            isOneToOne: false
+            referencedRelation: "projeto_mudancas_escopo"
             referencedColumns: ["id"]
           },
           {
@@ -3632,6 +3704,16 @@ export type Database = {
         }
       }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
+      projeto_mudanca_escopo_analisar: {
+        Args: {
+          p_classificacao: string
+          p_impacto_prazo_dias?: number
+          p_impacto_valor_centavos?: number
+          p_mudanca_id: string
+          p_resposta: string
+        }
+        Returns: string
+      }
       projeto_portal_concluir_pendencia: {
         Args: { p_acao: string; p_codigo: string }
         Returns: boolean
@@ -3644,6 +3726,14 @@ export type Database = {
           p_tarefa_id: string
         }
         Returns: boolean
+      }
+      projeto_portal_decidir_mudanca_escopo: {
+        Args: { p_codigo: string; p_decisao: string; p_mudanca_id: string }
+        Returns: string
+      }
+      projeto_portal_solicitar_mudanca_escopo: {
+        Args: { p_codigo: string; p_descricao: string; p_titulo: string }
+        Returns: string
       }
       proposta_portal_decidir: {
         Args: {

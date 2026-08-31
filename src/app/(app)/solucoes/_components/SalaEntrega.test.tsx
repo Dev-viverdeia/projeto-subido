@@ -1,21 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
-
-// prettier-ignore
-vi.mock('@/lib/projetos-execucao/actions', () => ({ atualizarTarefaProjeto: vi.fn(), configurarPortalCliente: vi.fn(), definirPrazoProjeto: vi.fn(), definirVisibilidadeArquivoProjeto: vi.fn(), excluirArquivoProjeto: vi.fn(), registrarArquivoProjeto: vi.fn() }));
-
-vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
-  prepararEntregaCliente: vi.fn(),
-  reenviarNotificacaoEntregaCliente: vi.fn(),
-}));
-
-// prettier-ignore
-vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn(), salvarDependenciaProjeto: vi.fn() }));
-vi.mock('@/lib/projetos-execucao/briefing-actions', () => ({ salvarBriefingKickoff: vi.fn() }));
-
-vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+import './SalaEntrega.test-mocks';
 
 import { SalaEntrega } from './SalaEntrega';
 
@@ -78,6 +65,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   kickoff: null,
   arquivos: [],
   eventos: [],
+  mudancasEscopo: [],
   acoesPlano: [],
   documento: DOCUMENTO,
   tarefas: [

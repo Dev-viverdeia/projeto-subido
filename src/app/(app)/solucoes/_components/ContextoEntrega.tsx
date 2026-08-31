@@ -3,6 +3,7 @@ import { FileCheck2, FileSignature, FolderKanban } from 'lucide-react';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { PortalClienteCard } from './PortalClienteCard';
 import { PrazoProjeto } from './PrazoProjeto';
+import { MudancasEscopoProjeto } from './MudancasEscopoProjeto';
 import styles from './SalaEntrega.module.css';
 
 export function ContextoEntrega({
@@ -14,6 +15,7 @@ export function ContextoEntrega({
 }) {
   return (
     <div className={styles.contextoGrid}>
+      <MudancasEscopoProjeto projetoId={projeto.id} mudancas={projeto.mudancasEscopo} />
       <div className={styles.contextoColuna}>
         {projeto.feitas > 0 && <PrazoProjeto projetoId={projeto.id} prazo={projeto.prazoEm} />}
         <section className={styles.cliente}>

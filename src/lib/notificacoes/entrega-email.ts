@@ -176,3 +176,118 @@ export function emailPendenciaResolvida({
     texto: `${assunto}\n\n${mensagem}\n\n${destaque}\n\nAbrir sala do projeto: ${link}\n\n${rodape}`,
   };
 }
+
+export function emailMudancaEscopoSolicitada({
+  empresa,
+  projeto,
+  tituloMudanca,
+  descricao,
+  link,
+}: {
+  empresa: string;
+  projeto: string;
+  tituloMudanca: string;
+  descricao: string;
+  link: string;
+}): ConteudoEmailEntrega {
+  const assunto = `${empresa}: há uma mudança para analisar`;
+  const mensagem = `O cliente pediu uma mudança no combinado do projeto ${projeto}. Classifique o pedido antes de alterar prazo, valor ou execução.`;
+  const destaque = `${tituloMudanca}: ${descricao}`;
+  const rodape =
+    'O pedido está registrado. Nada foi alterado no projeto enquanto você não responder.';
+
+  return {
+    assunto,
+    html: montarLayout({
+      preCabecalho: tituloMudanca,
+      titulo: 'O cliente pediu uma mudança.',
+      mensagem,
+      destaque,
+      rotuloBotao: 'Analisar mudança',
+      link,
+      rodape,
+    }),
+    texto: `${assunto}\n\n${mensagem}\n\n${destaque}\n\nAnalisar mudança: ${link}\n\n${rodape}`,
+  };
+}
+
+export function emailMudancaEscopoAnalisada({
+  empresa,
+  projeto,
+  tituloMudanca,
+  resposta,
+  dentroEscopo,
+  impacto,
+  link,
+}: {
+  empresa: string;
+  projeto: string;
+  tituloMudanca: string;
+  resposta: string;
+  dentroEscopo: boolean;
+  impacto: string | null;
+  link: string;
+}): ConteudoEmailEntrega {
+  const assunto = dentroEscopo
+    ? `${empresa}: sua mudança já está no combinado`
+    : `${empresa}: revise o impacto da mudança`;
+  const mensagem = dentroEscopo
+    ? `O pedido “${tituloMudanca}” foi analisado e já faz parte do projeto ${projeto}.`
+    : `O pedido “${tituloMudanca}” amplia o projeto ${projeto}. Confira o novo prazo e valor antes de decidir.`;
+  const destaque = impacto ? `${resposta}\n${impacto}` : resposta;
+  const rodape = dentroEscopo
+    ? 'A resposta ficou registrada no histórico do projeto.'
+    : 'O combinado original continua valendo até você aprovar a mudança.';
+
+  return {
+    assunto,
+    html: montarLayout({
+      preCabecalho: tituloMudanca,
+      titulo: dentroEscopo ? 'Pedido incluído no projeto.' : 'Uma decisão espera por você.',
+      mensagem,
+      destaque,
+      rotuloBotao: dentroEscopo ? 'Abrir portal' : 'Revisar e decidir',
+      link,
+      rodape,
+    }),
+    texto: `${assunto}\n\n${mensagem}\n\n${destaque}\n\nAbrir portal: ${link}\n\n${rodape}`,
+  };
+}
+
+export function emailDecisaoMudancaEscopo({
+  empresa,
+  projeto,
+  tituloMudanca,
+  decisao,
+  link,
+}: {
+  empresa: string;
+  projeto: string;
+  tituloMudanca: string;
+  decisao: 'aprovada' | 'recusada';
+  link: string;
+}): ConteudoEmailEntrega {
+  const aprovada = decisao === 'aprovada';
+  const assunto = aprovada
+    ? `${empresa}: mudança de escopo aprovada`
+    : `${empresa}: o combinado original foi mantido`;
+  const mensagem = aprovada
+    ? `O cliente aprovou “${tituloMudanca}” no projeto ${projeto}. O prazo e o valor adicional já aparecem na sala.`
+    : `O cliente decidiu não seguir com “${tituloMudanca}”. O projeto ${projeto} continua pelo combinado anterior.`;
+  const destaque = aprovada ? 'Mudança aprovada pelo cliente' : 'Mudança não aprovada';
+  const rodape = 'A decisão ficou registrada no histórico compartilhado.';
+
+  return {
+    assunto,
+    html: montarLayout({
+      preCabecalho: destaque,
+      titulo: aprovada ? 'A mudança foi aprovada.' : 'O escopo original foi mantido.',
+      mensagem,
+      destaque: tituloMudanca,
+      rotuloBotao: 'Abrir sala do projeto',
+      link,
+      rodape,
+    }),
+    texto: `${assunto}\n\n${mensagem}\n\n${tituloMudanca}\n\nAbrir sala do projeto: ${link}\n\n${rodape}`,
+  };
+}

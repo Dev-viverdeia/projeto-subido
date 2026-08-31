@@ -23,6 +23,7 @@ import { JornadaEntrega } from './JornadaEntrega';
 import { PainelClienteEntrega } from './PainelClienteEntrega';
 import { PlanoVivo } from './PlanoVivo';
 import { TarefaEntrega } from './TarefaEntrega';
+import { resumirEscopoSala } from './sala-entrega-resumo';
 import styles from './SalaEntrega.module.css';
 
 type PainelSala = 'execucao' | 'arquivos' | 'cliente';
@@ -72,6 +73,15 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
   const dependenciasPendentes = contarDependenciasPendentes(projeto.acoesPlano);
+  const { investimentoAtual, rotuloCliente } = resumirEscopoSala({
+    mudancas: projeto.mudancasEscopo,
+    investimentoBase: projeto.documento.investimento.valorCentavos,
+    briefingConfirmado,
+    ajustes: ajustesSolicitados,
+    dependencias: dependenciasPendentes,
+    validacoes: entregasAguardando,
+    portalAtivo: projeto.portalAtivo,
+  });
   // prettier-ignore
   const contatoCliente = obterContatoNotificacao(projeto.eventos, tarefaAtual?.id, projeto.documento.cliente.email);
   const estadoJornada = obterEstadoJornadaEntrega({
@@ -178,7 +188,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             </div>
             <div>
               <dt>Investimento</dt>
-              <dd>{formatarReais(projeto.documento.investimento.valorCentavos)}</dd>
+              <dd>{formatarReais(investimentoAtual)}</dd>
             </div>
           </dl>
         </div>
@@ -262,19 +272,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           <UsersRound size={17} aria-hidden="true" />
           <span>
             <strong>Cliente e escopo</strong>
-            <small>
-              {!briefingConfirmado
-                ? 'Briefing pendente'
-                : ajustesSolicitados
-                  ? `${ajustesSolicitados} ajuste${ajustesSolicitados > 1 ? 's' : ''}`
-                  : dependenciasPendentes
-                    ? `${dependenciasPendentes} pendência${dependenciasPendentes > 1 ? 's' : ''}`
-                    : entregasAguardando
-                      ? `${entregasAguardando} validação${entregasAguardando > 1 ? 'ões' : ''}`
-                      : projeto.portalAtivo
-                        ? 'Portal ativo'
-                        : 'Portal privado'}
-            </small>
+            <small>{rotuloCliente}</small>
           </span>
         </button>
       </nav>

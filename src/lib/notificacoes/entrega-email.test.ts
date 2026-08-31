@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  emailDecisaoMudancaEscopo,
   emailDecisaoCliente,
+  emailMudancaEscopoAnalisada,
+  emailMudancaEscopoSolicitada,
   emailPendenciaResolvida,
   emailValidacaoSolicitada,
 } from './entrega-email';
@@ -47,5 +50,41 @@ describe('e-mails da entrega', () => {
     expect(email.assunto).toContain('cliente resolveu');
     expect(email.html).toContain('Uma pendência saiu do caminho');
     expect(email.texto).toContain('Liberar acesso ao WhatsApp');
+  });
+
+  it('explica prazo e valor antes da decisão de mudança de escopo', () => {
+    const email = emailMudancaEscopoAnalisada({
+      empresa: 'Clínica Aurora',
+      projeto: 'SDR com IA',
+      tituloMudanca: 'Incluir atendimento pelo Instagram',
+      resposta: 'É uma nova frente de implementação.',
+      dentroEscopo: false,
+      impacto: '+3 dias · R$ 2.400,00',
+      link: 'https://subido.viverdeia.ai/portal/abc',
+    });
+
+    expect(email.assunto).toContain('impacto da mudança');
+    expect(email.texto).toContain('+3 dias');
+    expect(email.texto).toContain('R$ 2.400,00');
+  });
+
+  it('notifica o profissional no pedido e na decisão do cliente', () => {
+    const solicitacao = emailMudancaEscopoSolicitada({
+      empresa: 'Clínica Aurora',
+      projeto: 'SDR com IA',
+      tituloMudanca: 'Incluir atendimento pelo Instagram',
+      descricao: 'Precisamos atender também pelo Instagram.',
+      link: 'https://subido.viverdeia.ai/entregas/abc',
+    });
+    const decisao = emailDecisaoMudancaEscopo({
+      empresa: 'Clínica Aurora',
+      projeto: 'SDR com IA',
+      tituloMudanca: 'Incluir atendimento pelo Instagram',
+      decisao: 'aprovada',
+      link: 'https://subido.viverdeia.ai/entregas/abc',
+    });
+
+    expect(solicitacao.texto).toContain('Precisamos atender também pelo Instagram.');
+    expect(decisao.assunto).toContain('mudança de escopo aprovada');
   });
 });

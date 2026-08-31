@@ -38,6 +38,7 @@ const PROJETO: ProjetoPortalCliente = {
   feitas: 7,
   total: 7,
   dependencias: [],
+  mudancasEscopo: [],
   briefing: {
     objetivo:
       'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
@@ -250,7 +251,31 @@ export default async function PreviewPortalClientePage({
             entregavelUrl: indice < 2 ? tarefa.entregavelUrl : null,
           })),
         }
-      : PROJETO;
+      : estado === 'escopo'
+        ? {
+            ...PROJETO,
+            status: 'em_execucao' as const,
+            feitas: 4,
+            mudancasEscopo: [
+              {
+                id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+                titulo: 'Incluir atendimento pelo Instagram',
+                descricao:
+                  'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
+                solicitadoPor: 'cliente' as const,
+                status: 'aguardando_cliente' as const,
+                classificacao: 'fora_escopo' as const,
+                resposta:
+                  'Para incluir o Instagram, precisamos configurar um novo canal, adaptar a triagem e validar o handoff com a recepção.',
+                impactoPrazoDias: 4,
+                impactoValorCentavos: 240000,
+                criadoEm: '2026-08-30T13:40:00.000Z',
+                analisadoEm: '2026-08-30T14:20:00.000Z',
+                decididoEm: null,
+              },
+            ],
+          }
+        : PROJETO;
 
   return <PortalProjeto codigo={CODIGO} projeto={projeto} />;
 }

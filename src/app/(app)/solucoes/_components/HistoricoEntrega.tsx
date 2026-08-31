@@ -21,6 +21,11 @@ const ROTULO_EVENTO: Record<EventoProjetoExecucao['tipo'], string> = {
   arquivo_liberado: 'Arquivo liberado no portal',
   arquivo_retirado: 'Arquivo retirado do portal',
   pendencia_concluida: 'Cliente confirmou uma pendência',
+  mudanca_escopo_solicitada: 'Mudança solicitada pelo cliente',
+  mudanca_escopo_incluida: 'Mudança confirmada no combinado',
+  mudanca_escopo_proposta: 'Impacto enviado ao cliente',
+  mudanca_escopo_aprovada: 'Mudança aprovada pelo cliente',
+  mudanca_escopo_recusada: 'Combinado original mantido',
 };
 
 function IconeEvento({ tipo }: { tipo: EventoProjetoExecucao['tipo'] }) {

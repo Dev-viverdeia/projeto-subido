@@ -17,6 +17,8 @@ const BASE: ResumoProjetoExecucao = {
   tarefasBloqueadas: 0,
   validacoesAguardando: 0,
   ajustesSolicitados: 0,
+  mudancasEscopoParaAnalisar: 0,
+  mudancasEscopoAguardandoCliente: 0,
 };
 
 describe('prioridade das entregas', () => {
@@ -28,6 +30,21 @@ describe('prioridade das entregas', () => {
     expect(
       ordenarEntregasPorPrioridade([atraso, bloqueio, ajuste], AGORA).map(({ id }) => id),
     ).toEqual(['ajuste', 'bloqueio', 'atraso']);
+  });
+
+  it('coloca um pedido de mudança de escopo antes da correção de uma entrega', () => {
+    const mudanca = { ...BASE, id: 'mudanca', mudancasEscopoParaAnalisar: 1 };
+    const ajuste = { ...BASE, id: 'ajuste', ajustesSolicitados: 1 };
+
+    expect(ordenarEntregasPorPrioridade([ajuste, mudanca], AGORA).map(({ id }) => id)).toEqual([
+      'mudanca',
+      'ajuste',
+    ]);
+    expect(classificarPrioridadeEntrega(mudanca, AGORA)).toMatchObject({
+      tipo: 'mudanca_escopo',
+      grupo: 'acao',
+      rotulo: 'Mudança para analisar',
+    });
   });
 
   it('explica o fato que tornou a entrega prioritária', () => {
