@@ -174,68 +174,70 @@ export function DossiePosCall({
 
       {estado.tipo === 'processando' && <AcompanharProcessamento />}
 
-      <section
-        className={styles.leitura}
-        aria-labelledby="leitura-titulo"
-        hidden={estado.tipo === 'processando'}
-      >
-        <div className={styles.leituraCorpo}>
-          <div className={styles.leituraTopo}>
-            <div>
-              <h2 id="leitura-titulo">Resumo da reunião</h2>
+      {estado.tipo !== 'processando' && !temAnalise && (
+        <section className={styles.leitura} aria-labelledby="leitura-titulo">
+          <div className={styles.leituraCorpo}>
+            <div className={styles.leituraTopo}>
+              <div>
+                <h2 id="leitura-titulo">Resumo da reunião</h2>
+              </div>
+              {nota !== null && nota !== undefined && (
+                <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
+                  <strong>{nota}</strong>
+                  <span>/100</span>
+                </div>
+              )}
             </div>
-            {nota !== null && nota !== undefined && (
-              <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
-                <strong>{nota}</strong>
-                <span>/100</span>
+            {estado.tipo === 'falhou' ? (
+              <div className={styles.estadoLeitura}>
+                <CircleAlert size={19} aria-hidden="true" />
+                <div>
+                  <strong>A transcrição foi salva, mas a análise automática falhou.</strong>
+                  <p>
+                    {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
+                  </p>
+                </div>
+              </div>
+            ) : estado.tipo === 'sem_conteudo' ? (
+              <div className={styles.estadoLeitura}>
+                <CircleHelp size={19} aria-hidden="true" />
+                <div>
+                  <strong>A reunião terminou sem conversa suficiente para uma leitura.</strong>
+                  <p>A transcrição foi salva, mas não há conteúdo suficiente para resumir.</p>
+                </div>
+              </div>
+            ) : estado.tipo === 'indisponivel' ? (
+              <div className={styles.estadoLeitura}>
+                <CircleAlert size={19} aria-hidden="true" />
+                <div>
+                  <strong>Esta reunião foi cancelada antes de gerar conteúdo.</strong>
+                  <p>A reunião continua no histórico do cliente.</p>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.estadoLeitura}>
+                <Radar size={19} aria-hidden="true" />
+                <div>
+                  <strong>A análise da reunião está em andamento.</strong>
+                  <p>O resumo e as próximas ações aparecerão quando o processamento terminar.</p>
+                </div>
               </div>
             )}
+            <div className={styles.leituraRodape}>
+              <span>Tom percebido: {sentimento}</span>
+            </div>
           </div>
-          {temAnalise ? (
-            <p className={styles.resumo}>{analise?.resumo}</p>
-          ) : estado.tipo === 'falhou' ? (
-            <div className={styles.estadoLeitura}>
-              <CircleAlert size={19} aria-hidden="true" />
-              <div>
-                <strong>A transcrição foi salva, mas a análise automática falhou.</strong>
-                <p>
-                  {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
-                </p>
-              </div>
-            </div>
-          ) : estado.tipo === 'sem_conteudo' ? (
-            <div className={styles.estadoLeitura}>
-              <CircleHelp size={19} aria-hidden="true" />
-              <div>
-                <strong>A reunião terminou sem conversa suficiente para uma leitura.</strong>
-                <p>A transcrição foi salva, mas não há conteúdo suficiente para resumir.</p>
-              </div>
-            </div>
-          ) : estado.tipo === 'indisponivel' ? (
-            <div className={styles.estadoLeitura}>
-              <CircleAlert size={19} aria-hidden="true" />
-              <div>
-                <strong>Esta reunião foi cancelada antes de gerar conteúdo.</strong>
-                <p>A reunião continua no histórico do cliente.</p>
-              </div>
-            </div>
-          ) : (
-            <div className={styles.estadoLeitura}>
-              <Radar size={19} aria-hidden="true" />
-              <div>
-                <strong>A análise da reunião está em andamento.</strong>
-                <p>O resumo e as próximas ações aparecerão quando o processamento terminar.</p>
-              </div>
-            </div>
-          )}
-          <div className={styles.leituraRodape}>
-            <span>Tom percebido: {sentimento}</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {estado.tipo !== 'processando' && (
-        <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
+        <CentralPlanoCall
+          posCall={posCall}
+          acaoSugerida={acaoSugerida}
+          resumo={analise?.resumo ?? null}
+          nota={nota ?? null}
+          sentimento={sentimento}
+        />
       )}
 
       {estado.tipo !== 'processando' && (

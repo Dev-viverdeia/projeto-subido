@@ -37,8 +37,8 @@ export function PreviewProposta({
           <strong>Prévia em tempo real</strong>
           <span>Atualiza enquanto você edita</span>
         </div>
-        <span className={styles.estadoPreview} data-sujo={sujo || undefined}>
-          {sujo ? 'Alterações locais' : 'Versão salva'}
+        <span className={styles.estadoPreview} data-sujo={sujo || undefined} aria-live="polite">
+          {sujo ? 'Prévia atualizada' : 'Versão salva'}
         </span>
       </div>
 

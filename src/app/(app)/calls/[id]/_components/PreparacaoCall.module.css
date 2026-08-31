@@ -260,8 +260,7 @@
 }
 
 .perguntas,
-.contexto > section,
-.coachPronto {
+.contexto > section {
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-card);
   background: color-mix(in srgb, var(--via-surface) 88%, transparent);
@@ -359,8 +358,7 @@
 }
 
 .contexto {
-  display: grid;
-  gap: var(--via-space-4);
+  min-width: 0;
 }
 
 .contexto > section {
@@ -396,6 +394,12 @@
   line-height: var(--via-lh-normal);
 }
 
+.validacoes {
+  margin-top: var(--via-space-5);
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
 .estadoBase {
   margin-top: var(--via-space-4);
   padding-top: var(--via-space-4);
@@ -429,7 +433,9 @@
 }
 
 .coachPronto {
-  padding: var(--via-space-4) var(--via-space-5);
+  margin-top: var(--via-space-5);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .coachPronto strong,
@@ -462,13 +468,12 @@
   .cabecalho,
   .resumo,
   .perguntas,
-  .contexto > section,
-  .coachPronto {
+  .contexto > section {
     background: var(--via-surface);
   }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1079px) {
   .resumo {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -485,17 +490,9 @@
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .contexto {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .coachPronto {
-    grid-column: 1 / -1;
-  }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .cabecalhoLinha,
   .plano {
     grid-template-columns: minmax(0, 1fr);
@@ -521,13 +518,12 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 599px) {
   .navegacao > span {
     display: none;
   }
 
-  .resumo,
-  .contexto {
+  .resumo {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -548,9 +544,5 @@
 
   .perguntas li {
     padding-inline: var(--via-space-4);
-  }
-
-  .coachPronto {
-    grid-column: auto;
   }
 }

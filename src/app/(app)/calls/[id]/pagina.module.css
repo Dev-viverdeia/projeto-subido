@@ -1129,7 +1129,38 @@
 .centralAcaoContexto {
   padding: clamp(24px, 3vw, 36px);
   border-right: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-accent) 6%, var(--via-surface));
+  background: var(--app-glass-plane-strong);
+  backdrop-filter: blur(20px) saturate(135%);
+}
+
+.contextoTopoCall {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.notaCentral {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 7px 10px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.notaCentral strong {
+  color: var(--via-navy);
+  font-size: var(--via-fs-h4);
+}
+
+.notaCentral span {
+  font-size: var(--via-fs-micro);
 }
 
 .sobretitulo {
@@ -1150,6 +1181,24 @@
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: 1.55;
+}
+
+.centralAcaoContexto > .resumoCentral {
+  max-width: 58ch;
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  text-wrap: pretty;
+}
+
+.sentimentoCentral {
+  display: block;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-micro);
+  text-transform: uppercase;
 }
 
 .fluxoSincronizacao {
@@ -1625,16 +1674,35 @@
   }
 
   .fluxoSincronizacao {
-    grid-template-columns: 1fr;
-    gap: var(--via-space-1);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--via-space-2);
   }
 
   .fluxoSincronizacao li {
-    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    justify-items: start;
+    align-content: start;
+    gap: var(--via-space-2);
+    min-height: 84px;
   }
 
   .fluxoSincronizacao li:not(:last-child)::after {
-    display: block;
+    display: none;
+  }
+
+  .fluxoSincronizacao li > span {
+    width: 30px;
+    height: 30px;
+  }
+
+  .fluxoSincronizacao strong {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .fluxoSincronizacao small,
+  .garantiaRevisao {
+    display: none;
   }
 
   .heroMeta {
@@ -1688,6 +1756,12 @@
 
   .gravacaoAbrir {
     grid-column: 2;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .centralAcaoContexto {
+    background: var(--via-surface);
   }
 }
 

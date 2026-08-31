@@ -83,18 +83,17 @@ describe('DossiePosCall', () => {
   it('prioriza resumo, revisão humana e só então o detalhamento', () => {
     render(<DossiePosCall posCall={POS_CALL} estadoAcao={null} />);
 
-    expect(screen.getByRole('heading', { name: 'Revise o que será salvo' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'O que ficou decidido' })).toBeInTheDocument();
     expect(screen.getByText('Já registrado na ficha')).toBeInTheDocument();
     expect(screen.getByText('Descoberta → Proposta')).toBeInTheDocument();
     expect(screen.getByLabelText('Leitura comercial 76 de 100')).toBeInTheDocument();
-    expect(screen.getByText('Nada muda na venda sem sua confirmação.')).toBeInTheDocument();
+    expect(screen.getByText('Você revisa antes de salvar na ficha.')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /Criar uma proposta a partir desta conversa/ }),
     ).toHaveAttribute('href', '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1');
     expect(screen.queryByText('Criar proposta com esta call')).not.toBeInTheDocument();
 
-    const leitura = screen.getByRole('heading', { name: 'Resumo da reunião' });
-    const plano = screen.getByRole('heading', { name: 'Revise o que será salvo' });
+    const plano = screen.getByRole('heading', { name: 'O que ficou decidido' });
     expect(screen.getByText('Análise completa').closest('details')).not.toHaveAttribute('open');
     fireEvent.click(screen.getByText('Análise completa'));
     const lacunas = screen.getByRole('heading', { name: 'O que ainda falta saber' });
@@ -102,7 +101,6 @@ describe('DossiePosCall', () => {
 
     expect(lacunas).toBeVisible();
 
-    expect(leitura.compareDocumentPosition(plano) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(plano.compareDocumentPosition(lacunas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(lacunas.compareDocumentPosition(mapa) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

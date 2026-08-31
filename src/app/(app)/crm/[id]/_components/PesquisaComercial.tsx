@@ -343,7 +343,7 @@ export function PesquisaComercial({
   execucao: ExecucaoEnriquecimento;
   dossie: DossieEnriquecido;
 }) {
-  const [aba, setAba] = useState<AbaPesquisa>('leitura');
+  const [aba, setAba] = useState<AbaPesquisa>('conversa');
 
   return (
     <section className={styles.pesquisa} aria-labelledby="pesquisa-comercial-titulo">

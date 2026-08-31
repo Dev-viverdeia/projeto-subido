@@ -100,11 +100,14 @@ export function EditorProposta({
           <Link href="/propostas" aria-label="Voltar às propostas">
             <ArrowLeft size={17} strokeWidth={1.9} aria-hidden="true" />
           </Link>
-          <div>
-            <span className={styles.status} data-status={status}>
-              {ROTULO_STATUS_PROPOSTA[status]}
-            </span>
-            <small>V{versao.toString().padStart(2, '0')}</small>
+          <div className={styles.identidadeTexto}>
+            <strong>{documento.cliente.empresa}</strong>
+            <div>
+              <span className={styles.status} data-status={status}>
+                {ROTULO_STATUS_PROPOSTA[status]}
+              </span>
+              <small>V{versao.toString().padStart(2, '0')}</small>
+            </div>
           </div>
         </div>
 
@@ -179,6 +182,7 @@ export function EditorProposta({
       <div className={styles.grade}>
         <main className={styles.editor} data-painel-ativo={painelAtivo === 'editar' || undefined}>
           <section className={styles.abertura}>
+            <p className={styles.sobretitulo}>Documento de venda</p>
             <textarea
               aria-label="Título interno da proposta"
               className={styles.tituloDocumento}

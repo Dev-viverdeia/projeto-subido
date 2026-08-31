@@ -43,9 +43,15 @@ function sugerirEtapa(posCall: PosCall): EtapaCrm {
 export function CentralPlanoCall({
   posCall,
   acaoSugerida,
+  resumo,
+  nota,
+  sentimento,
 }: {
   posCall: PosCall;
   acaoSugerida: string;
+  resumo: string | null;
+  nota: number | null;
+  sentimento: string;
 }) {
   const etapaAtual = etapaVisivel(posCall.oportunidade.etapa);
   const etapaRecomendada = sugerirEtapa(posCall);
@@ -66,11 +72,20 @@ export function CentralPlanoCall({
       aria-labelledby="plano-da-call-titulo"
     >
       <div className={styles.centralAcaoContexto}>
-        <p className={styles.sobretitulo}>Atualizar a venda</p>
-        <h2 id="plano-da-call-titulo">Revise o que será salvo</h2>
-        <p>
-          O resumo já entrou na ficha. Confirme apenas a próxima ação, a etapa e os compromissos.
-        </p>
+        <div className={styles.contextoTopoCall}>
+          <div>
+            <p className={styles.sobretitulo}>Resumo e próximos passos</p>
+            <h2 id="plano-da-call-titulo">O que ficou decidido</h2>
+          </div>
+          {nota !== null && (
+            <div className={styles.notaCentral} aria-label={`Leitura comercial ${nota} de 100`}>
+              <strong>{nota}</strong>
+              <span>/100</span>
+            </div>
+          )}
+        </div>
+        {resumo && <p className={styles.resumoCentral}>{resumo}</p>}
+        <small className={styles.sentimentoCentral}>Tom percebido: {sentimento}</small>
 
         <ol className={styles.fluxoSincronizacao}>
           <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
@@ -114,7 +129,7 @@ export function CentralPlanoCall({
           </li>
         </ol>
 
-        <p className={styles.garantiaRevisao}>Nada muda na venda sem sua confirmação.</p>
+        <p className={styles.garantiaRevisao}>Você revisa antes de salvar na ficha.</p>
       </div>
 
       <FormularioPlanoCall

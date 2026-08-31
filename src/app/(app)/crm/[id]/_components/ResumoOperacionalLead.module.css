@@ -481,7 +481,40 @@
 
 @media (max-width: 767px) {
   .metodo {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .metodo li {
     grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 5px;
+    min-height: 66px;
+    padding: 8px 3px;
+    text-align: center;
+  }
+
+  .marcadorEtapa {
+    width: 26px;
+    height: 26px;
+  }
+
+  .metodo li div {
+    justify-items: center;
+  }
+
+  .metodo strong {
+    max-width: 8ch;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .estadoEtapa,
+  .descricaoEtapa {
+    display: none;
   }
 
   .decisao {
