@@ -4,15 +4,16 @@ import { cache } from 'react';
 import { oportunidadeTemDescobertaConcluida } from '@/lib/calls/descoberta';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
-import type { Tables } from '@/lib/supabase/types.generated';
+import { obterContinuidadePosEntrega } from './continuidade-pos-entrega';
 import { lerDossie, lerFontes, type StatusEnriquecimento } from './enriquecimento';
 import type { DossieLead, ProjetoDossie } from './dossie-types';
-import type { EtapaCrm } from './etapas';
+import { montarOportunidade } from './pipeline-queries';
 import { projetoSugeridoDaProspeccao } from './projeto-sugerido';
 
 export type {
   AcaoPlanoDossie,
   CallDossieLead,
+  ContinuidadePosEntregaDossie,
   DossieLead,
   EventoDossie,
   ExecucaoEnriquecimento,
@@ -20,222 +21,13 @@ export type {
   ProjetoDossie,
   PropostaDossie,
 } from './dossie-types';
-
-type LinhaOportunidade = Tables<'crm_oportunidades'>;
-
-export type OportunidadeCrm = {
-  id: string;
-  titulo: string;
-  etapa: EtapaCrm;
-  empresaId: string;
-  empresa: string;
-  dominio: string | null;
-  enriquecidoEm: string | null;
-  enriquecimentoStatus: StatusEnriquecimento | null;
-  contatoId: string | null;
-  contato: string | null;
-  contatoEmail: string | null;
-  valorCentavos: number | null;
-  proximaAcao: string | null;
-  proximaAcaoEm: string | null;
-  ganhaEm: string | null;
-  perdidaEm: string | null;
-  motivoPerda: string | null;
-  ultimoFato: string | null;
-  ultimoFatoEm: string | null;
-  atualizadoEm: string;
-  criadoEm: string;
-};
-
-/**
- * Recorte leve para seletores que só precisam identificar a oportunidade.
- *
- * Calls e propostas não precisam carregar eventos e análises de
- * enriquecimento para abrir um formulário. Manter essa leitura separada evita
- * duas consultas e reduz o tempo até a primeira interação nessas rotas.
- */
-export type OportunidadeSeletor = Pick<
-  OportunidadeCrm,
-  'id' | 'titulo' | 'etapa' | 'empresa' | 'dominio' | 'contato'
-> & {
-  contatoEmail?: string | null;
-  /** Só a Início consome; os seletores existentes podem omitir nos fixtures. */
-  proximaAcao?: string | null;
-};
-
-export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSeletor[]> => {
-  const supabase = await createClient();
-  const oportunidades = await supabase
-    .from('crm_oportunidades')
-    .select(
-      `
-        id,
-        titulo,
-        etapa,
-        ordem,
-        proxima_acao,
-        empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio),
-        contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
-      `,
-    )
-    .order('ordem', { ascending: false })
-    .limit(300);
-
-  if (oportunidades.error) {
-    throw handleError(oportunidades.error, 'crm:seletor-oportunidades');
-  }
-
-  return (oportunidades.data ?? []).map((oportunidade) => ({
-    id: oportunidade.id,
-    titulo: oportunidade.titulo,
-    etapa: oportunidade.etapa,
-    empresa: oportunidade.empresa?.nome ?? 'Empresa não encontrada',
-    dominio: oportunidade.empresa?.dominio ?? null,
-    contato: oportunidade.contato?.nome ?? null,
-    contatoEmail: oportunidade.contato?.email ?? null,
-    proximaAcao: oportunidade.proxima_acao,
-  }));
-});
-
-/**
- * Recorte da oportunidade em foco usado na Início.
- *
- * Antes esta área carregava o pipeline completo — oportunidades, eventos e
- * enriquecimentos — apenas para mostrar empresa, contato e próxima ação. O
- * seletor já traz tudo isso em uma única leitura leve e mantém a mesma ordem.
- */
-export const obterFocoLeveDoCrm = cache(async (): Promise<OportunidadeSeletor | null> => {
-  const oportunidades = await listarOportunidadesSeletor();
-  return (
-    oportunidades.find((item) => item.etapa !== 'ganho' && item.etapa !== 'perdido') ??
-    oportunidades.find((item) => item.etapa === 'ganho') ??
-    null
-  );
-});
-
-/**
- * Pipeline privado do profissional.
- *
- * As quatro leituras viajam em paralelo. Elas ficam separadas em vez de um join
- * profundo porque as FKs compostas (a barreira contra vínculo entre contas)
- * tornam o payload inferido do PostgREST desnecessariamente complexo. Aqui os
- * mapas deixam a montagem linear e o contrato devolvido à tela fica pequeno.
- */
-export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
-  const supabase = await createClient();
-
-  const [oportunidades, eventos, enriquecimentos] = await Promise.all([
-    supabase
-      .from('crm_oportunidades')
-      .select(
-        `
-          id,
-          titulo,
-          etapa,
-          empresa_id,
-          contato_principal_id,
-          valor_centavos,
-          proxima_acao,
-          proxima_acao_em,
-          ganha_em,
-          perdida_em,
-          motivo_perda,
-          atualizado_em,
-          criado_em,
-          ordem,
-          empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio, enriquecido_em),
-          contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
-        `,
-      )
-      .order('ordem', { ascending: false })
-      .limit(300),
-    supabase
-      .from('crm_eventos')
-      .select('oportunidade_id, titulo, ocorrido_em')
-      .order('ocorrido_em', { ascending: false })
-      .limit(800),
-    supabase
-      .from('crm_enriquecimentos')
-      .select('oportunidade_id, status, solicitado_em')
-      .order('solicitado_em', { ascending: false })
-      .limit(500),
-  ]);
-
-  if (oportunidades.error) throw handleError(oportunidades.error, 'crm:pipeline');
-  if (eventos.error) throw handleError(eventos.error, 'crm:eventos');
-  if (enriquecimentos.error) {
-    throw handleError(enriquecimentos.error, 'crm:enriquecimentos');
-  }
-
-  const ultimoFatoPorOportunidade = new Map<string, { titulo: string; ocorrido_em: string }>();
-  const enriquecimentoPorOportunidade = new Map<string, StatusEnriquecimento>();
-
-  /* A query já veio decrescente. O primeiro evento visto é o mais recente. */
-  for (const evento of eventos.data ?? []) {
-    if (!ultimoFatoPorOportunidade.has(evento.oportunidade_id)) {
-      ultimoFatoPorOportunidade.set(evento.oportunidade_id, evento);
-    }
-  }
-  for (const enriquecimento of enriquecimentos.data ?? []) {
-    if (!enriquecimentoPorOportunidade.has(enriquecimento.oportunidade_id)) {
-      enriquecimentoPorOportunidade.set(enriquecimento.oportunidade_id, enriquecimento.status);
-    }
-  }
-
-  return (oportunidades.data ?? []).map((linha) =>
-    montarOportunidade(linha, ultimoFatoPorOportunidade, enriquecimentoPorOportunidade),
-  );
-});
-
-function montarOportunidade(
-  linha: Pick<
-    LinhaOportunidade,
-    | 'id'
-    | 'titulo'
-    | 'etapa'
-    | 'empresa_id'
-    | 'contato_principal_id'
-    | 'valor_centavos'
-    | 'proxima_acao'
-    | 'proxima_acao_em'
-    | 'ganha_em'
-    | 'perdida_em'
-    | 'motivo_perda'
-    | 'atualizado_em'
-    | 'criado_em'
-  > & {
-    empresa: { nome: string; dominio: string | null; enriquecido_em: string | null } | null;
-    contato: { nome: string; email: string | null } | null;
-  },
-  eventos: Map<string, { titulo: string; ocorrido_em: string }>,
-  enriquecimentos: Map<string, StatusEnriquecimento>,
-): OportunidadeCrm {
-  const evento = eventos.get(linha.id);
-
-  return {
-    id: linha.id,
-    titulo: linha.titulo,
-    etapa: linha.etapa,
-    empresaId: linha.empresa_id,
-    empresa: linha.empresa?.nome ?? 'Empresa não encontrada',
-    dominio: linha.empresa?.dominio ?? null,
-    enriquecidoEm: linha.empresa?.enriquecido_em ?? null,
-    enriquecimentoStatus: enriquecimentos.get(linha.id) ?? null,
-    contatoId: linha.contato_principal_id,
-    contato: linha.contato?.nome ?? null,
-    contatoEmail: linha.contato?.email ?? null,
-    valorCentavos: linha.valor_centavos,
-    proximaAcao: linha.proxima_acao,
-    proximaAcaoEm: linha.proxima_acao_em,
-    ganhaEm: linha.ganha_em,
-    perdidaEm: linha.perdida_em,
-    motivoPerda: linha.motivo_perda,
-    ultimoFato: evento?.titulo ?? null,
-    ultimoFatoEm: evento?.ocorrido_em ?? null,
-    atualizadoEm: linha.atualizado_em,
-    criadoEm: linha.criado_em,
-  };
-}
+export {
+  listarOportunidadesSeletor,
+  listarPipeline,
+  obterFocoLeveDoCrm,
+  type OportunidadeCrm,
+  type OportunidadeSeletor,
+} from './pipeline-queries';
 
 /**
  * Dossiê de uma oportunidade. Todas as leituras seguem a sessão e a RLS; um UUID
@@ -265,6 +57,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     projetosRecentes,
     propostaRecente,
     carteira,
+    continuidadePosEntrega,
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
@@ -324,6 +117,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .limit(1)
       .maybeSingle(),
     supabase.from('prospeccao_carteiras').select('saldo').maybeSingle(),
+    obterContinuidadePosEntrega(id),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'crm:dossie-empresa');
@@ -436,6 +230,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
           reuniaoId: propostaRecente.data.reuniao_id,
         }
       : null,
+    continuidadePosEntrega,
     enriquecimentos: (enriquecimentos.data ?? []).map((execucao) => ({
       id: execucao.id,
       status: execucao.status,

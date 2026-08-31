@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { CabecalhoDossie } from '@/app/(app)/crm/[id]/_components/CabecalhoDossie';
+import { ContextoPosEntrega } from '@/app/(app)/crm/[id]/_components/ContextoPosEntrega';
 import { EstadoEnriquecimento } from '@/app/(app)/crm/[id]/_components/EstadoEnriquecimento';
 import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
@@ -9,7 +10,9 @@ import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
 import { PreviewSidebar } from './PreviewSidebar';
+import { criarLeadContinuidade } from './criarLeadContinuidade';
 import { criarLeadEncerrado } from './criarLeadEncerrado';
+import { criarLeadNovo } from './criarLeadNovo';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -322,29 +325,10 @@ const LEAD_OPERACIONAL: DossieLead = {
   totalCalls: 2,
 };
 
-const LEAD_NOVO: DossieLead = {
-  ...LEAD_OPERACIONAL,
-  oportunidade: {
-    ...LEAD_OPERACIONAL.oportunidade,
-    etapa: 'novo_lead',
-    dominio: null,
-    enriquecidoEm: null,
-    enriquecimentoStatus: null,
-    proximaAcao: null,
-    proximaAcaoEm: null,
-    ultimoFato: 'Venda adicionada ao quadro',
-    ultimoFatoEm: LEAD_OPERACIONAL.oportunidade.criadoEm,
-  },
-  empresa: { ...LEAD_OPERACIONAL.empresa, dominio: null },
-  eventos: [LEAD_OPERACIONAL.eventos[2]!],
-  calls: [],
-  acoesPlano: [],
-  enriquecimentos: [],
-  totalCalls: 0,
-};
-
+const LEAD_NOVO = criarLeadNovo(LEAD_OPERACIONAL);
 const LEAD_GANHO = criarLeadEncerrado(LEAD_OPERACIONAL, 'ganho');
 const LEAD_PERDIDO = criarLeadEncerrado(LEAD_OPERACIONAL, 'perdido');
+const LEAD_CONTINUIDADE = criarLeadContinuidade(LEAD_OPERACIONAL, LEAD_NOVO);
 
 export default async function PreviewDossiePage({
   searchParams,
@@ -355,8 +339,10 @@ export default async function PreviewDossiePage({
   const pesquisaPendente = parametros.pesquisa === 'pendente';
   const enriquecendo = parametros.enriquecimento === 'processando';
   const enriquecimentoFalhou = parametros.enriquecimento === 'falhou';
-  const lead =
-    parametros.resultado === 'ganho'
+  const posEntrega = parametros['pos-entrega'] === '1';
+  const lead = posEntrega
+    ? LEAD_CONTINUIDADE
+    : parametros.resultado === 'ganho'
       ? LEAD_GANHO
       : parametros.resultado === 'perdido'
         ? LEAD_PERDIDO
@@ -392,6 +378,9 @@ export default async function PreviewDossiePage({
             <p className={pagina.avisoSucesso} role="status">
               Venda adicionada. A ficha do cliente já está pronta para você trabalhar.
             </p>
+          )}
+          {lead.continuidadePosEntrega && (
+            <ContextoPosEntrega continuidade={lead.continuidadePosEntrega} />
           )}
           <ResumoOperacionalLead lead={lead} />
           {!entrada && !pesquisaPendente && (

@@ -1,0 +1,282 @@
+.contexto {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--via-white) 76%, var(--app-elev-2-line));
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 84%, transparent);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(24px) saturate(140%);
+}
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--via-space-6);
+  padding: clamp(24px, 3vw, 36px);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.topo h2,
+.topo p,
+.prova p,
+.abordagem h3,
+.abordagem p {
+  margin: 0;
+}
+
+.sobretitulo,
+.rotuloBloco span,
+.proximoPasso > span {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.topo h2 {
+  max-width: 23ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h2);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
+  text-wrap: balance;
+}
+
+.topo > div > p:last-child {
+  max-width: 62ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  text-wrap: pretty;
+}
+
+.estado {
+  display: inline-flex;
+  min-height: var(--app-h-control);
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy-20);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane-strong);
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+}
+
+.prova,
+.abordagem {
+  min-width: 0;
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.abordagem {
+  border-left: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-bg-2) 64%, transparent);
+}
+
+.rotuloBloco {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+}
+
+.resultado {
+  max-width: 54ch;
+  margin-top: var(--via-space-5) !important;
+  color: var(--via-text-primary);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h3);
+  text-wrap: pretty;
+}
+
+.origem {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding: var(--via-space-5) 0 0;
+  margin: var(--via-space-6) 0 0;
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.origem > div {
+  min-width: 0;
+  padding-right: var(--via-space-5);
+}
+
+.origem > div + div {
+  padding-left: var(--via-space-5);
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.origem dt {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.origem dd {
+  margin: var(--via-space-1) 0 0;
+  color: var(--via-text-body);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-normal);
+}
+
+.abordagem h3 {
+  max-width: 24ch;
+  margin-top: var(--via-space-5);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h3);
+}
+
+.abordagem > p {
+  max-width: 48ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-loose);
+  text-wrap: pretty;
+}
+
+.proximoPasso {
+  display: grid;
+  gap: var(--via-space-2);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  margin-top: var(--via-space-5);
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.proximoPasso strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-normal);
+}
+
+.proximoPasso time {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.rodape {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+  padding: var(--via-space-3) clamp(24px, 3vw, 36px);
+  border-top: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-surface) 70%, transparent);
+}
+
+.rodape > span {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.rodape nav {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.rodape a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+
+.rodape a:hover {
+  color: var(--via-blue);
+}
+
+.rodape a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .contexto,
+  .proximoPasso {
+    background: var(--via-surface);
+  }
+}
+
+@media (max-width: 899px) {
+  .corpo {
+    grid-template-columns: 1fr;
+  }
+
+  .abordagem {
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .topo {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
+  }
+
+  .estado {
+    width: fit-content;
+  }
+
+  .prova,
+  .abordagem {
+    padding: var(--via-space-5);
+  }
+
+  .origem {
+    grid-template-columns: 1fr;
+    gap: var(--via-space-3);
+  }
+
+  .origem > div,
+  .origem > div + div {
+    padding: 0;
+    border-left: 0;
+  }
+
+  .rodape {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: var(--via-space-4) var(--via-space-5);
+  }
+
+  .rodape nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-3);
+  }
+}

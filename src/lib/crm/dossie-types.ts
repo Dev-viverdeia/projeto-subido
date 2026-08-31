@@ -7,6 +7,20 @@ import type {
 } from './enriquecimento';
 import type { OportunidadeCrm } from './queries';
 
+export type ContinuidadePosEntregaDossie = {
+  projetoId: string;
+  projetoTitulo: string;
+  resumoEntrega: string;
+  resultadoPrincipal: string;
+  resultadoObservado: string;
+  evidenciaResultadoUrl: string | null;
+  decisao: 'expandir' | 'novo_projeto';
+  proximoPasso: string;
+  proximoPassoEm: string | null;
+  aceitaEm: string | null;
+  registradaEm: string;
+};
+
 export type EventoDossie = {
   id: string;
   titulo: string;
@@ -94,6 +108,8 @@ export type DossieLead = {
       com o trabalho realizado quando o projeto deixa de estar ativo. */
   projetoRecente: ProjetoDossie | null;
   propostaRecente: PropostaDossie | null;
+  /** Contexto factual da entrega que originou esta nova oportunidade. */
+  continuidadePosEntrega?: ContinuidadePosEntregaDossie | null;
   enriquecimentos: ExecucaoEnriquecimento[];
   totalCalls: number;
 };
