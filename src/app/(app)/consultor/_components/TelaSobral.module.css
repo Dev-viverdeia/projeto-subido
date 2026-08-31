@@ -1,35 +1,30 @@
 .pagina {
   width: 100%;
-  max-width: 1280px;
-  height: calc(100dvh - 132px);
+  max-width: var(--app-canvas);
+  height: calc(100dvh - 112px);
   margin-inline: auto;
 }
 
 .superficie {
   height: 100%;
   min-height: 0;
-  overflow: hidden;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: blur(28px) saturate(142%);
 }
 
 .cabecalho {
   position: relative;
   z-index: 3;
-  min-height: 72px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding: var(--via-space-3) clamp(var(--via-space-5), 3vw, var(--via-space-7));
+  padding: 0 clamp(var(--via-space-2), 2vw, var(--via-space-5)) var(--via-space-3);
   border-bottom: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
-  backdrop-filter: blur(20px) saturate(138%);
+  background: color-mix(in srgb, var(--via-bg-2) 68%, transparent);
+  backdrop-filter: blur(18px) saturate(132%);
 }
 
 .identidade,
@@ -40,21 +35,28 @@
 }
 
 .identidade {
+  flex: 1 1 auto;
   min-width: 0;
   gap: var(--via-space-3);
+  overflow: hidden;
+}
+
+.identidade > div {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .marca {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border: 1px solid var(--via-accent-hairline);
+  border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
+  background: var(--app-elev-1-bg);
   color: var(--via-accent-ink);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 88%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .identidade h1,
@@ -65,10 +67,14 @@
 }
 
 .identidade h1 {
+  max-width: 100%;
+  overflow: hidden;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   letter-spacing: var(--app-ls-h3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .identidade p {
@@ -87,12 +93,12 @@
 }
 
 .contextoAtivo {
-  height: 32px;
+  height: var(--app-h-control);
   gap: var(--via-space-2);
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-surface) 64%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 58%, transparent);
   color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
   white-space: nowrap;
@@ -104,10 +110,10 @@
   align-items: center;
   gap: var(--via-space-2);
   padding-inline: var(--via-space-3);
-  border: 1px solid var(--app-elev-1-line);
+  border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  color: var(--via-text-primary);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -118,14 +124,15 @@
 }
 
 .novaConversa:hover {
-  border-color: var(--app-elev-2-line);
+  border-color: var(--via-navy-deep);
+  background: var(--via-navy-deep);
   box-shadow: var(--app-elev-2-shadow);
   text-decoration: none;
 }
 
 .novaConversa:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+  box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
 }
 
 .semHistorico {
@@ -136,26 +143,52 @@
 }
 
 .areaChat {
-  width: min(100%, 980px);
+  width: 100%;
+  max-width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
   margin-inline: auto;
-  padding: clamp(var(--via-space-5), 3vw, var(--via-space-8));
+  padding: clamp(var(--via-space-4), 2.4vw, var(--via-space-7))
+    clamp(var(--via-space-3), 2vw, var(--via-space-6));
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
+}
+
+@media (min-width: 1081px) {
+  .areaChat {
+    max-width: 1080px;
+  }
 }
 
 .areaVazia {
   align-content: center;
   grid-template-rows: auto auto;
-  gap: var(--via-space-5);
-  padding-top: clamp(var(--via-space-5), 4vh, var(--via-space-7));
-  padding-bottom: clamp(var(--via-space-5), 4vh, var(--via-space-7));
+  gap: var(--via-space-6);
+  padding-top: clamp(var(--via-space-5), 6vh, 72px);
+  padding-bottom: clamp(var(--via-space-5), 6vh, 72px);
 }
 
 .boasVindas {
-  width: min(100%, 880px);
+  width: min(100%, 820px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.assinatura {
+  width: 52px;
+  height: 52px;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  color: var(--via-accent-ink);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(20px) saturate(138%);
 }
 
 .eyebrow {
@@ -167,20 +200,20 @@
 }
 
 .boasVindas h2 {
-  max-width: 14ch;
-  margin-top: var(--via-space-3);
+  max-width: 22ch;
+  margin: var(--via-space-4) auto 0;
   color: var(--via-text-primary);
   font-family: var(--via-font-display);
-  font-size: clamp(2.4rem, 4.5vw, 3.65rem);
+  font-size: clamp(2.35rem, 4vw, 3.5rem);
   font-weight: 520;
-  line-height: 0.96;
+  line-height: 1;
   letter-spacing: var(--app-ls-display);
   text-wrap: balance;
 }
 
 .apoio {
-  max-width: 63ch;
-  margin-top: var(--via-space-4) !important;
+  max-width: 58ch;
+  margin: var(--via-space-4) auto 0 !important;
   color: var(--via-text-muted);
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
@@ -188,10 +221,12 @@
 }
 
 .historico {
+  width: 100%;
+  min-width: 0;
   min-height: 280px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--via-space-5) var(--via-space-2) var(--via-space-7);
+  padding: var(--via-space-5) var(--via-space-3) var(--via-space-8);
   scrollbar-gutter: stable;
   scrollbar-color: var(--via-border) transparent;
 }
@@ -200,11 +235,14 @@
   position: sticky;
   bottom: 0;
   z-index: 2;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding-top: var(--via-space-2);
   background: linear-gradient(
     to bottom,
     transparent,
-    color-mix(in srgb, var(--via-surface) 90%, transparent) 28%
+    color-mix(in srgb, var(--via-bg-2) 88%, transparent) 30%
   );
 }
 
@@ -215,9 +253,9 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .superficie,
   .cabecalho,
-  .contextoAtivo {
+  .contextoAtivo,
+  .assinatura {
     background: var(--via-surface);
   }
 }
@@ -230,7 +268,7 @@
 
 @media (max-width: 767px) {
   .pagina {
-    height: calc(100dvh - 122px);
+    height: calc(100dvh - 112px);
   }
 
   .cabecalho {
@@ -243,7 +281,7 @@
   }
 
   .areaChat {
-    padding: var(--via-space-5) var(--via-space-4);
+    padding: var(--via-space-5) var(--via-space-4) var(--via-space-4);
   }
 
   .areaVazia {
@@ -254,27 +292,13 @@
 
 @media (max-width: 599px) {
   .pagina {
-    width: calc(100% + 2 * var(--via-space-4));
-    margin-inline: calc(var(--via-space-4) * -1);
-  }
-
-  .superficie {
-    border-right: 0;
-    border-left: 0;
-    border-radius: 0;
-  }
-
-  .pagina {
+    width: 100%;
+    margin-inline: 0;
     height: calc(100dvh - 104px);
   }
 
   .cabecalho {
     min-height: 64px;
-  }
-
-  .marca {
-    width: 34px;
-    height: 34px;
   }
 
   .novaConversa {
@@ -290,12 +314,12 @@
 
   .areaVazia {
     gap: var(--via-space-5);
-    padding-top: clamp(var(--via-space-6), 5vh, 40px);
+    padding-top: clamp(var(--via-space-7), 8vh, 64px);
   }
 
   .boasVindas h2 {
-    max-width: 12ch;
-    font-size: clamp(2.35rem, 12vw, 3.15rem);
+    max-width: 14ch;
+    font-size: clamp(2.15rem, 10vw, 3rem);
   }
 
   .apoio {

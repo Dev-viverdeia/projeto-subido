@@ -5,6 +5,12 @@
   flex-direction: column;
 }
 
+.conversa {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .conversa,
 .rodadaEmVoo {
   gap: var(--via-space-3);
@@ -82,14 +88,14 @@
   position: relative;
   overflow: hidden;
   align-self: flex-start;
-  width: min(100%, 480px);
+  width: min(100%, 540px);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-4);
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-card);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
   background: var(--app-glass-plane);
   color: var(--via-accent-ink);
   box-shadow: var(--app-elev-1-shadow);
@@ -175,9 +181,12 @@
 }
 
 .caixa {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-surface);
   background: color-mix(in srgb, var(--via-surface) 78%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--via-white) 90%, transparent),
@@ -196,8 +205,8 @@
 .linhaCompositor {
   display: flex;
   align-items: flex-end;
-  min-height: 76px;
-  padding: var(--via-space-4) var(--via-space-4) var(--via-space-2);
+  min-height: 82px;
+  padding: var(--via-space-4) var(--via-space-5) var(--via-space-2);
 }
 
 .campo {
@@ -307,7 +316,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-3) var(--via-space-3);
+  padding: var(--via-space-2) var(--via-space-4) var(--via-space-4);
 }
 
 .ferramentas {
@@ -393,23 +402,23 @@
 
 .chips {
   list-style: none;
-  margin: var(--via-space-3) 0 0;
+  margin: var(--via-space-4) 0 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--via-space-2);
 }
 
 .chips button {
-  width: 100%;
-  min-height: 80px;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  width: auto;
+  min-height: var(--app-h-control);
+  display: inline-flex;
   align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-3);
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-card);
+  border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-surface) 62%, transparent);
   color: var(--via-text-muted);
   font: inherit;
@@ -423,31 +432,14 @@
     transform var(--app-t-touch);
 }
 
-.chipIndice {
-  align-self: start;
-  padding-top: 2px;
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-}
-
 .chipTexto {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  display: inline-flex;
 }
 
 .chipTexto strong {
   color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
-}
-
-.chipTexto small {
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-  line-height: var(--via-lh-normal);
 }
 
 .chips button:hover:not(:disabled) {
@@ -485,11 +477,11 @@
 
 @media (max-width: 899px) {
   .chips {
-    grid-template-columns: minmax(0, 1fr);
+    justify-content: flex-start;
   }
 
   .chips button {
-    min-height: 70px;
+    min-height: var(--app-h-control);
   }
 }
 
@@ -505,7 +497,7 @@
 
   .linhaCompositor {
     min-height: 72px;
-    padding: var(--via-space-3) var(--via-space-3) var(--via-space-1);
+    padding: var(--via-space-3) var(--via-space-4) var(--via-space-1);
   }
 
   .campo {
@@ -531,12 +523,8 @@
   }
 
   .chips button {
-    min-height: 66px;
-    padding: var(--via-space-2) var(--via-space-3);
-  }
-
-  .chipTexto small {
-    display: none;
+    min-height: 36px;
+    padding-inline: var(--via-space-3);
   }
 
   .erro {

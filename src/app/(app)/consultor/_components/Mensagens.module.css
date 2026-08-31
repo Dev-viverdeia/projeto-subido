@@ -1,14 +1,17 @@
 .lista {
+  width: 100%;
+  min-width: 0;
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-stack);
+  gap: var(--via-space-7);
 }
 
 .doUsuario,
 .doConsultor {
+  min-width: 0;
   display: flex;
 }
 
@@ -18,7 +21,7 @@
 
 .texto {
   margin: 0;
-  max-width: 52ch;
+  max-width: 70ch;
   padding: var(--via-space-3) var(--via-space-4);
   border-radius: var(--app-radius-card);
   font-size: var(--via-fs-body);
@@ -28,13 +31,18 @@
 }
 
 .doUsuario .texto {
+  max-width: 52ch;
   background: var(--via-navy);
   color: var(--via-white);
 }
 
 .doConsultor .texto {
-  padding: 0;
+  padding: var(--via-space-4) var(--via-space-5);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-glass-plane);
   color: var(--via-text-primary);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(18px) saturate(132%);
 }
 
 .corpo {
@@ -42,11 +50,15 @@
   flex-direction: column;
   gap: var(--via-space-2);
   min-width: 0;
-  max-width: 52ch;
+  max-width: min(100%, 760px);
 }
 
 .doUsuario .corpo {
   align-items: flex-end;
+}
+
+.doConsultor .corpo {
+  width: min(100%, 760px);
 }
 
 .autor {
@@ -56,8 +68,7 @@
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-label);
-  text-transform: uppercase;
+  letter-spacing: var(--app-ls-micro);
 }
 
 .anexos {
@@ -119,22 +130,28 @@
   position: relative;
   display: grid;
   gap: var(--via-space-2);
-  padding: var(--via-space-3) var(--via-space-4);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--via-space-5);
+  padding: var(--via-space-4) var(--via-space-5);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: var(--app-glass-plane);
+  color: var(--via-text-primary);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(18px) saturate(132%);
 }
 
 .direcao::before {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--via-accent);
+  width: 2px;
+  background: var(--via-navy);
 }
 
 .direcaoRotulo {
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: var(--via-space-1);
@@ -142,34 +159,43 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--via-white) 68%, transparent);
+  color: var(--via-text-faint);
 }
 
 .direcao > strong {
+  grid-column: 1;
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-snug);
 }
 
 .direcao > p {
+  grid-column: 1;
   margin: 0;
   font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
-  color: color-mix(in srgb, var(--via-white) 68%, transparent);
+  color: var(--via-text-muted);
 }
 
 .direcaoAcao {
+  grid-column: 2;
+  grid-row: 1 / span 3;
   display: inline-flex;
   align-items: center;
   justify-self: start;
   gap: var(--via-space-1);
+  min-height: var(--app-h-control);
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
 }
 
 .direcaoAcao:hover {
-  color: var(--via-accent-soft);
+  background: var(--via-navy-deep);
+  color: var(--via-white);
   text-decoration: none;
 }
 
@@ -183,8 +209,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--via-space-2);
 }
 
@@ -234,6 +260,10 @@
   color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
   line-height: var(--via-lh-normal);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .cartaoAcao {
@@ -245,6 +275,13 @@
 @media (prefers-reduced-motion: reduce) {
   .cartao {
     transition: none;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .doConsultor .texto,
+  .direcao {
+    background: var(--via-surface);
   }
 }
 
@@ -262,6 +299,21 @@
   }
 
   .compacta .cartoes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .direcao {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .direcaoAcao {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: stretch;
+    justify-content: center;
+  }
+
+  .cartoes {
     grid-template-columns: minmax(0, 1fr);
   }
 }
