@@ -53,72 +53,74 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
       </nav>
 
       <header className={styles.cabecalho}>
-        <div>
-          <p>Preparar reunião · {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</p>
-          <h1>{posCall.reuniao.titulo}</h1>
-          <span>
-            {posCall.empresa.nome}
-            {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
-          </span>
+        <div className={styles.cabecalhoLinha}>
+          <div>
+            <p>Preparar reunião · {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</p>
+            <h1>{posCall.reuniao.titulo}</h1>
+            <span>
+              {posCall.empresa.nome}
+              {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
+            </span>
+          </div>
+          <div className={styles.acoesTopo}>
+            <Link href={`/vendas/${posCall.oportunidade.id}`} className={styles.secundaria}>
+              Ver ficha <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+            <Link href={`/sala/${posCall.reuniao.codigoPublico}`} className={styles.primaria}>
+              <Video size={16} aria-hidden="true" /> Entrar na sala
+            </Link>
+          </div>
         </div>
-        <div className={styles.acoesTopo}>
-          <Link href={`/vendas/${posCall.oportunidade.id}`} className={styles.secundaria}>
-            Abrir ficha <ArrowRight size={15} aria-hidden="true" />
-          </Link>
-          <Link href={`/sala/${posCall.reuniao.codigoPublico}`} className={styles.primaria}>
-            <Video size={16} aria-hidden="true" /> Abrir sala
-          </Link>
-        </div>
-      </header>
 
-      <section className={styles.resumo} aria-label="Contexto da reunião">
-        <div>
-          <CalendarDays size={16} aria-hidden="true" />
-          <span>
-            <small>Quando</small>
-            <strong>
-              {DATA.format(data)} · {HORA.format(data)}
-            </strong>
-          </span>
-        </div>
-        <div>
-          <Clock3 size={16} aria-hidden="true" />
-          <span>
-            <small>Duração prevista</small>
-            <strong>{posCall.reuniao.duracaoMinutos} minutos</strong>
-          </span>
-        </div>
-        <div>
-          <ContactRound size={16} aria-hidden="true" />
-          <span>
-            <small>Com quem</small>
-            <strong>{posCall.contato?.cargo ?? 'Contato ainda sem cargo informado'}</strong>
-          </span>
-        </div>
-        <div>
-          <Target size={16} aria-hidden="true" />
-          <span>
-            <small>Momento da venda</small>
-            <strong>{ROTULO_ETAPA[posCall.oportunidade.etapa]}</strong>
-          </span>
-        </div>
-      </section>
+        <section className={styles.resumo} aria-label="Contexto da reunião">
+          <div>
+            <CalendarDays size={16} aria-hidden="true" />
+            <span>
+              <small>Data e hora</small>
+              <strong>
+                {DATA.format(data)} · {HORA.format(data)}
+              </strong>
+            </span>
+          </div>
+          <div>
+            <Clock3 size={16} aria-hidden="true" />
+            <span>
+              <small>Duração</small>
+              <strong>{posCall.reuniao.duracaoMinutos} minutos</strong>
+            </span>
+          </div>
+          <div>
+            <ContactRound size={16} aria-hidden="true" />
+            <span>
+              <small>Contato</small>
+              <strong>{posCall.contato?.cargo ?? 'Cargo não informado'}</strong>
+            </span>
+          </div>
+          <div>
+            <Target size={16} aria-hidden="true" />
+            <span>
+              <small>Etapa da venda</small>
+              <strong>{ROTULO_ETAPA[posCall.oportunidade.etapa]}</strong>
+            </span>
+          </div>
+        </section>
+      </header>
 
       <section className={styles.plano} data-on-dark aria-labelledby="objetivo-call">
         <div className={styles.objetivo}>
-          <p>Objetivo desta conversa</p>
+          <p>Objetivo da reunião</p>
           <h2 id="objetivo-call">{plano.objetivo}</h2>
           <div className={styles.abertura}>
             <MessageSquareText size={17} aria-hidden="true" />
             <div>
-              <small>Uma abertura direta</small>
+              <small>Como abrir</small>
               <blockquote>“{plano.abertura}”</blockquote>
             </div>
           </div>
         </div>
 
         <div className={styles.fechamento}>
-          <p>Antes de encerrar</p>
+          <p>Sinal para avançar</p>
           <strong>{plano.fechamento.sinalParaAvancar}</strong>
           <span>“{plano.fechamento.frase}”</span>
         </div>
@@ -128,8 +130,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         <section className={styles.perguntas} aria-labelledby="perguntas-call">
           <header>
             <div>
-              <p>Condução sugerida</p>
-              <h2 id="perguntas-call">Perguntas que fazem esta venda avançar</h2>
+              <p>Roteiro da conversa</p>
+              <h2 id="perguntas-call">Perguntas para conduzir a descoberta</h2>
             </div>
             <span>{plano.perguntas.length} perguntas</span>
           </header>
@@ -152,8 +154,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             <header>
               <FileSearch size={17} aria-hidden="true" />
               <div>
-                <p>Antes da reunião</p>
-                <h2>O que já sabemos</h2>
+                <p>Contexto confirmado</p>
+                <h2>O que levar para a call</h2>
               </div>
             </header>
             {plano.fatos.length > 0 ? (
@@ -164,7 +166,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
               </ul>
             ) : (
               <div className={styles.estadoBase}>
-                <p>A ficha ainda não foi enriquecida.</p>
+                <p>A ficha ainda não foi pesquisada.</p>
                 <span>
                   O plano essencial continua pronto, mas uma pesquisa traz perguntas mais
                   específicas.
@@ -179,8 +181,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
               <header>
                 <CheckCheck size={17} aria-hidden="true" />
                 <div>
-                  <p>Validar, não presumir</p>
-                  <h2>Hipóteses para testar</h2>
+                  <p>Confirmar na call</p>
+                  <h2>Pontos para validar</h2>
                 </div>
               </header>
               <ul>
@@ -194,8 +196,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
           <div className={styles.coachPronto}>
             <BadgeCheck size={18} aria-hidden="true" />
             <div>
-              <strong>O Live Coach recebe este plano</strong>
-              <span>Durante a call, ele combina o contexto com o que está sendo dito.</span>
+              <strong>Live Coach preparado</strong>
+              <span>As orientações usam este roteiro e o que for dito na reunião.</span>
             </div>
           </div>
         </aside>
