@@ -1,0 +1,16 @@
+.pagina {
+  min-height: 100dvh;
+  padding: clamp(24px, 4vw, 64px);
+  background: var(--via-bg-2);
+}
+
+.conteudo {
+  width: min(100%, var(--app-canvas));
+  margin-inline: auto;
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    padding: var(--via-space-4);
+  }
+}
