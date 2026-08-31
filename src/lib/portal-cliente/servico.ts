@@ -55,11 +55,24 @@ export type EventoPortalCliente = {
   tarefaId: string | null;
   tipo: Extract<
     TipoEventoProjeto,
-    'aprovacao_solicitada' | 'entrega_aprovada' | 'ajustes_solicitados' | 'arquivo_liberado'
+    | 'aprovacao_solicitada'
+    | 'entrega_aprovada'
+    | 'ajustes_solicitados'
+    | 'arquivo_liberado'
+    | 'pendencia_concluida'
   >;
   autor: 'prestador' | 'cliente';
   comentario: string | null;
   criadoEm: string;
+};
+
+export type AcaoPortalCliente = {
+  id: string;
+  titulo: string;
+  categoria: 'acesso' | 'dependencia';
+  prazoEm: string | null;
+  status: 'pendente' | 'concluida';
+  responsavelNome: string | null;
 };
 
 export type ProjetoPortalCliente = {
@@ -76,6 +89,7 @@ export type ProjetoPortalCliente = {
   tarefas: TarefaPortalCliente[];
   arquivos: ArquivoPortalCliente[];
   eventos: EventoPortalCliente[];
+  dependencias: AcaoPortalCliente[];
   briefing: {
     objetivo: string;
     criterioSucesso: string;
@@ -90,6 +104,7 @@ const EVENTOS_VISIVEIS = [
   'entrega_aprovada',
   'ajustes_solicitados',
   'arquivo_liberado',
+  'pendencia_concluida',
 ] as const;
 
 function codigoValido(codigo: string) {
@@ -104,7 +119,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -201,6 +216,30 @@ export const obterPortalCliente = cache(
           },
         ];
       }),
+      dependencias: data.projeto_acoes
+        .filter(
+          (acao) =>
+            acao.visivel_cliente &&
+            acao.responsavel_tipo === 'cliente' &&
+            ['acesso', 'dependencia'].includes(acao.categoria) &&
+            ['pendente', 'concluida'].includes(acao.status),
+        )
+        .map((acao) => ({
+          id: acao.id,
+          titulo: acao.titulo,
+          categoria: acao.categoria as AcaoPortalCliente['categoria'],
+          prazoEm: acao.prazo_em,
+          status: acao.status as AcaoPortalCliente['status'],
+          responsavelNome: acao.responsavel_nome,
+        }))
+        .sort((a, b) => {
+          if (a.status === 'pendente' && b.status !== 'pendente') return -1;
+          if (a.status !== 'pendente' && b.status === 'pendente') return 1;
+          if (a.prazoEm && b.prazoEm) return a.prazoEm.localeCompare(b.prazoEm);
+          if (a.prazoEm) return -1;
+          if (b.prazoEm) return 1;
+          return a.titulo.localeCompare(b.titulo, 'pt-BR');
+        }),
       briefing: briefing?.confirmadoEm
         ? {
             objetivo: briefing.objetivo,
@@ -213,6 +252,22 @@ export const obterPortalCliente = cache(
     };
   },
 );
+
+export async function registrarConclusaoDependenciaCliente({
+  codigo,
+  acaoId,
+}: {
+  codigo: string;
+  acaoId: string;
+}): Promise<boolean> {
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('projeto_portal_concluir_pendencia', {
+    p_codigo: codigo,
+    p_acao: acaoId,
+  });
+  if (error) throw handleError(error, 'portal-cliente:concluir-pendencia');
+  return Boolean(data);
+}
 
 export async function registrarDecisaoCliente({
   codigo,

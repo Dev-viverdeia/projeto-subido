@@ -1917,8 +1917,11 @@ export type Database = {
           prazo_em: string | null
           projeto_execucao_id: string | null
           reuniao_id: string | null
+          responsavel_nome: string | null
+          responsavel_tipo: string
           status: Database["public"]["Enums"]["projeto_acao_status"]
           titulo: string
+          visivel_cliente: boolean
         }
         Insert: {
           atualizado_em?: string
@@ -1934,8 +1937,11 @@ export type Database = {
           prazo_em?: string | null
           projeto_execucao_id?: string | null
           reuniao_id?: string | null
+          responsavel_nome?: string | null
+          responsavel_tipo?: string
           status?: Database["public"]["Enums"]["projeto_acao_status"]
           titulo: string
+          visivel_cliente?: boolean
         }
         Update: {
           atualizado_em?: string
@@ -1951,8 +1957,11 @@ export type Database = {
           prazo_em?: string | null
           projeto_execucao_id?: string | null
           reuniao_id?: string | null
+          responsavel_nome?: string | null
+          responsavel_tipo?: string
           status?: Database["public"]["Enums"]["projeto_acao_status"]
           titulo?: string
+          visivel_cliente?: boolean
         }
         Relationships: [
           {
@@ -3613,6 +3622,10 @@ export type Database = {
         }
       }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
+      projeto_portal_concluir_pendencia: {
+        Args: { p_acao: string; p_codigo: string }
+        Returns: boolean
+      }
       projeto_portal_decidir: {
         Args: {
           p_codigo: string

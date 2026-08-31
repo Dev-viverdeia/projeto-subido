@@ -37,6 +37,7 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 7,
   total: 7,
+  dependencias: [],
   briefing: {
     objetivo:
       'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',
@@ -208,7 +209,48 @@ const PROJETO: ProjetoPortalCliente = {
   ],
 };
 
-export default function PreviewPortalClientePage() {
+const DEPENDENCIAS_PENDENTES: ProjetoPortalCliente['dependencias'] = [
+  {
+    id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+    titulo: 'Liberar os acessos do WhatsApp Business e da agenda da recepção',
+    categoria: 'acesso',
+    prazoEm: '2026-08-31T18:00:00-03:00',
+    status: 'pendente',
+    responsavelNome: 'Camila Rios · Diretora de operações',
+  },
+  {
+    id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd2',
+    titulo: 'Validar a matriz de transferência com a recepção',
+    categoria: 'dependencia',
+    prazoEm: '2026-09-01T18:00:00-03:00',
+    status: 'pendente',
+    responsavelNome: 'Camila Rios · Diretora de operações',
+  },
+];
+
+export default async function PreviewPortalClientePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ estado?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
-  return <PortalProjeto codigo={CODIGO} projeto={PROJETO} />;
+  const estado = (await searchParams).estado;
+  const projeto =
+    estado === 'pendencias'
+      ? {
+          ...PROJETO,
+          status: 'em_execucao' as const,
+          feitas: 2,
+          dependencias: DEPENDENCIAS_PENDENTES,
+          tarefas: PROJETO.tarefas.map((tarefa, indice) => ({
+            ...tarefa,
+            status: indice < 2 ? ('concluida' as const) : ('pendente' as const),
+            clienteStatus: indice < 2 ? tarefa.clienteStatus : ('nao_solicitada' as const),
+            clienteNota: indice < 2 ? tarefa.clienteNota : null,
+            entregavelUrl: indice < 2 ? tarefa.entregavelUrl : null,
+          })),
+        }
+      : PROJETO;
+
+  return <PortalProjeto codigo={CODIGO} projeto={projeto} />;
 }

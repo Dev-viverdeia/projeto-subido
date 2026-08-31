@@ -4,6 +4,7 @@ import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { BriefingKickoff } from './BriefingKickoff';
 import { ContextoEntrega } from './ContextoEntrega';
 import { InicioProjeto } from './InicioProjeto';
+import { PreparacaoProjeto } from './PreparacaoProjeto';
 
 export function PainelClienteEntrega({
   projeto,
@@ -32,6 +33,15 @@ export function PainelClienteEntrega({
           projetoId={projeto.id}
           briefing={projeto.briefing}
           origem={projeto.briefingOrigem}
+        />
+      )}
+
+      {briefingConfirmado && (
+        <PreparacaoProjeto
+          projetoId={projeto.id}
+          acoes={projeto.acoesPlano}
+          portalAtivo={projeto.portalAtivo}
+          portalCodigo={projeto.portalCodigo}
         />
       )}
 

@@ -57,6 +57,15 @@ export function prepararProjetoEmExecucao(
     status: 'em_execucao',
     feitas,
     proximaTarefa: projeto.tarefas[feitas]?.titulo ?? null,
+    acoesPlano: projeto.acoesPlano.map((acao, indice) =>
+      indice === 0
+        ? {
+            ...acao,
+            status: 'pendente',
+            concluidaEm: null,
+          }
+        : acao,
+    ),
     tarefas: projeto.tarefas.map((tarefa, indice) => ({
       ...tarefa,
       status: indice < feitas ? 'concluida' : indice === feitas ? 'em_andamento' : 'pendente',

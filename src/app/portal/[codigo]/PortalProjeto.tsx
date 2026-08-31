@@ -19,6 +19,7 @@ import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cli
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { AprovacaoCliente } from './AprovacaoCliente';
 import { AcordoProjetoPortal } from './AcordoProjetoPortal';
+import { PendenciaCliente } from './PendenciaCliente';
 import styles from './portal.module.css';
 
 function formatarData(valor: string): string {
@@ -48,6 +49,7 @@ const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
   entrega_aprovada: 'Entrega aprovada por você',
   ajustes_solicitados: 'Ajuste solicitado',
   arquivo_liberado: 'Novo arquivo disponível',
+  pendencia_concluida: 'Pendência confirmada pelo cliente',
 };
 
 function formatarMomento(valor: string): string {
@@ -65,6 +67,7 @@ function IconeEvento({ tipo }: { tipo: EventoPortalCliente['tipo'] }) {
   if (tipo === 'entrega_aprovada') return <BadgeCheck size={17} aria-hidden="true" />;
   if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
   if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;
+  if (tipo === 'pendencia_concluida') return <Check size={17} aria-hidden="true" />;
   return <Send size={17} aria-hidden="true" />;
 }
 
@@ -95,6 +98,8 @@ export function PortalProjeto({
   }, []);
   const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const aprovacoes = projeto.tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando');
+  const dependencias = projeto.dependencias.filter((acao) => acao.status === 'pendente');
+  const totalAcoes = aprovacoes.length + dependencias.length;
   const compartilhadas = projeto.tarefas.filter((tarefa) =>
     ['aguardando', 'aprovada', 'ajustes'].includes(tarefa.clienteStatus),
   );
@@ -107,7 +112,7 @@ export function PortalProjeto({
         <SubidoLogo size={19} />
         <div>
           <LockKeyhole size={13} aria-hidden="true" />
-          Link individual · ambiente protegido
+          Portal protegido
         </div>
       </header>
 
@@ -118,10 +123,10 @@ export function PortalProjeto({
           aria-labelledby="decisoes-titulo"
         >
           <header>
-            <div className={styles.iconeDecisao} data-pendente={aprovacoes.length > 0 || undefined}>
+            <div className={styles.iconeDecisao} data-pendente={totalAcoes > 0 || undefined}>
               {concluido ? (
                 <BadgeCheck size={20} />
-              ) : aprovacoes.length ? (
+              ) : totalAcoes ? (
                 <Clock3 size={20} />
               ) : (
                 <Check size={20} />
@@ -132,22 +137,25 @@ export function PortalProjeto({
               <h2 id="decisoes-titulo">
                 {concluido
                   ? 'Projeto entregue e aprovado.'
-                  : aprovacoes.length
-                    ? `${aprovacoes.length} ${aprovacoes.length === 1 ? 'decisão espera' : 'decisões esperam'} por você.`
+                  : totalAcoes
+                    ? `${totalAcoes} ${totalAcoes === 1 ? 'ação espera' : 'ações esperam'} por você.`
                     : 'Tudo em dia por aqui.'}
               </h2>
               <span>
                 {concluido
                   ? 'O aceite final foi registrado. Os materiais continuam disponíveis neste portal.'
-                  : aprovacoes.length
-                    ? 'Revise o que foi entregue e confirme ou peça um ajuste em poucos minutos.'
+                  : totalAcoes
+                    ? 'Resolva as pendências de preparação ou revise o que já foi entregue.'
                     : 'Você não precisa fazer nada agora. Avisaremos quando uma validação estiver pronta.'}
               </span>
             </div>
           </header>
 
-          {aprovacoes.length ? (
+          {totalAcoes ? (
             <div className={styles.listaAprovacoes}>
+              {dependencias.map((acao) => (
+                <PendenciaCliente key={acao.id} codigo={codigo} acao={acao} />
+              ))}
               {aprovacoes.map((tarefa) => (
                 <AprovacaoCliente
                   key={tarefa.id}

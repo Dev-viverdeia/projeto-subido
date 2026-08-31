@@ -11,7 +11,8 @@ vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
   reenviarNotificacaoEntregaCliente: vi.fn(),
 }));
 
-vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn() }));
+// prettier-ignore
+vi.mock('@/lib/projetos-execucao/plano-actions', () => ({ atualizarAcaoPlano: vi.fn(), salvarDependenciaProjeto: vi.fn() }));
 vi.mock('@/lib/projetos-execucao/briefing-actions', () => ({ salvarBriefingKickoff: vi.fn() }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
@@ -333,7 +334,11 @@ describe('SalaEntrega', () => {
               prazoEm: '2026-08-12T12:00:00.000Z',
               status: 'pendente',
               origem: 'call',
+              categoria: 'compromisso',
               reuniaoId: '66666666-6666-4666-8666-666666666666',
+              responsavelTipo: 'prestador',
+              responsavelNome: 'Mateus Silva',
+              visivelCliente: false,
               concluidaEm: null,
               atualizadoEm: '2026-08-09T12:00:00.000Z',
             },

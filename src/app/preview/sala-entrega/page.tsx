@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SalaEntrega } from '@/app/(app)/solucoes/_components/SalaEntrega';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
+import { ACOES_PLANO } from './acoes-preview';
 import * as estados from './estado-inicial';
 import { PreviewSidebar } from './PreviewSidebar';
 import styles from '../mapa-jornada/preview.module.css';
@@ -48,38 +49,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
     fonteCallId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1',
   },
   kickoff: null,
-  acoesPlano: [
-    {
-      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
-      titulo: 'Enviar os acessos do WhatsApp e da agenda da recepção',
-      prazoEm: '2026-08-11T12:00:00-03:00',
-      status: 'concluida',
-      origem: 'call',
-      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1',
-      concluidaEm: '2026-08-10T15:00:00.000Z',
-      atualizadoEm: '2026-08-09T12:00:00.000Z',
-    },
-    {
-      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd2',
-      titulo: 'Validar com Camila os horários de transferência para a equipe',
-      prazoEm: '2026-08-13T12:00:00-03:00',
-      status: 'concluida',
-      origem: 'call',
-      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2',
-      concluidaEm: '2026-08-10T15:30:00.000Z',
-      atualizadoEm: '2026-08-08T12:00:00.000Z',
-    },
-    {
-      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd3',
-      titulo: 'Compartilhar o mapa de demanda com a diretora de operações',
-      prazoEm: '2026-08-08T12:00:00-03:00',
-      status: 'concluida',
-      origem: 'call',
-      reuniaoId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3',
-      concluidaEm: '2026-08-08T16:00:00.000Z',
-      atualizadoEm: '2026-08-08T16:00:00.000Z',
-    },
-  ],
+  acoesPlano: ACOES_PLANO,
   eventos: [
     {
       id: '99999999-9999-4999-8999-999999999991',
