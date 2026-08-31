@@ -4,6 +4,7 @@ import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 
 vi.mock('@/lib/portal-cliente/actions', () => ({
   decidirEntregaCliente: vi.fn(() => Promise.resolve({})),
+  concluirPendenciaCliente: vi.fn(() => Promise.resolve({})),
 }));
 
 import { PortalProjeto } from './PortalProjeto';
@@ -19,6 +20,7 @@ const PROJETO: ProjetoPortalCliente = {
   prazoEm: '2026-08-28T12:00:00.000Z',
   feitas: 1,
   total: 2,
+  dependencias: [],
   briefing: {
     objetivo: 'Responder rapidamente e transferir com contexto.',
     criterioSucesso: 'A recepção recebe cada contato com histórico completo.',
@@ -106,7 +108,7 @@ describe('PortalProjeto', () => {
     expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'O que vamos entregar juntos.' })).toBeVisible();
-    const decisao = screen.getByRole('heading', { name: /1 decisão espera por você/i });
+    const decisao = screen.getByRole('heading', { name: /1 ação espera por você/i });
     const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
     const arquivos = screen.getByRole('heading', { name: /Arquivos do projeto/i });
     expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
@@ -127,5 +129,36 @@ describe('PortalProjeto', () => {
 
     expect(screen.getByText('Aceite final do projeto')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar e concluir/i })).toBeVisible();
+  });
+
+  it('coloca uma dependência do cliente antes do andamento do projeto', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{
+          ...PROJETO,
+          tarefas: PROJETO.tarefas.map((tarefa) => ({
+            ...tarefa,
+            clienteStatus: 'nao_solicitada',
+          })),
+          dependencias: [
+            {
+              id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+              titulo: 'Liberar o acesso ao WhatsApp Business',
+              categoria: 'acesso',
+              prazoEm: '2026-08-31T15:00:00.000Z',
+              status: 'pendente',
+              responsavelNome: 'Camila Rios',
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: '1 ação espera por você.' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Liberar o acesso ao WhatsApp Business' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: /Confirmar como resolvido/i })).toBeVisible();
   });
 });

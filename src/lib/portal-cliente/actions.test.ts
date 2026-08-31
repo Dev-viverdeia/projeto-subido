@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { registrarDecisaoCliente } = vi.hoisted(() => ({ registrarDecisaoCliente: vi.fn() }));
+const { registrarDecisaoCliente, registrarConclusaoDependenciaCliente } = vi.hoisted(() => ({
+  registrarDecisaoCliente: vi.fn(),
+  registrarConclusaoDependenciaCliente: vi.fn(),
+}));
 
-vi.mock('./servico', () => ({ registrarDecisaoCliente }));
+vi.mock('./servico', () => ({ registrarDecisaoCliente, registrarConclusaoDependenciaCliente }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
-import { decidirEntregaCliente } from './actions';
+import { concluirPendenciaCliente, decidirEntregaCliente } from './actions';
 
 function formulario(decisao: 'aprovada' | 'ajustes', comentario = '', final = false) {
   const dados = new FormData();
@@ -18,7 +21,10 @@ function formulario(decisao: 'aprovada' | 'ajustes', comentario = '', final = fa
 }
 
 describe('decidirEntregaCliente', () => {
-  beforeEach(() => registrarDecisaoCliente.mockReset());
+  beforeEach(() => {
+    registrarDecisaoCliente.mockReset();
+    registrarConclusaoDependenciaCliente.mockReset();
+  });
 
   it('exige um comentário útil quando o cliente pede ajuste', async () => {
     const resultado = await decidirEntregaCliente({}, formulario('ajustes', 'não'));
@@ -56,5 +62,20 @@ describe('decidirEntregaCliente', () => {
 
     expect(resultado.sucesso).toMatch(/Entrega aprovada/i);
     expect(resultado.aviso).toMatch(/decisão está salva/i);
+  });
+
+  it('registra uma pendência concluída pelo portal', async () => {
+    registrarConclusaoDependenciaCliente.mockResolvedValue(true);
+    const dados = new FormData();
+    dados.set('codigo', '44444444-4444-4444-8444-444444444444');
+    dados.set('acao', 'cccccccc-cccc-4ccc-8ccc-cccccccccccc');
+
+    const resultado = await concluirPendenciaCliente({}, dados);
+
+    expect(resultado.sucesso).toMatch(/responsável pelo projeto/i);
+    expect(registrarConclusaoDependenciaCliente).toHaveBeenCalledWith({
+      codigo: '44444444-4444-4444-8444-444444444444',
+      acaoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+    });
   });
 });

@@ -17,6 +17,9 @@ import {
   type OrigemBriefingKickoff,
 } from './briefing';
 import { montarKitOperacionalTarefa, type KitOperacionalTarefa } from './kit-operacional';
+import type { AcaoPlanoProjeto } from './plano';
+
+export type { AcaoPlanoProjeto } from './plano';
 
 export type TarefaProjetoExecucao = {
   id: string;
@@ -56,17 +59,6 @@ export type ArquivoProjetoExecucao = {
   criadoEm: string;
 };
 
-export type AcaoPlanoProjeto = {
-  id: string;
-  titulo: string;
-  prazoEm: string | null;
-  status: Tables<'projeto_acoes'>['status'];
-  origem: string;
-  reuniaoId: string | null;
-  concluidaEm: string | null;
-  atualizadoEm: string;
-};
-
 export type TipoEventoProjeto =
   | 'portal_ativado'
   | 'portal_desativado'
@@ -75,7 +67,8 @@ export type TipoEventoProjeto =
   | 'entrega_aprovada'
   | 'ajustes_solicitados'
   | 'arquivo_liberado'
-  | 'arquivo_retirado';
+  | 'arquivo_retirado'
+  | 'pendencia_concluida';
 
 export type EventoProjetoExecucao = {
   id: string;
@@ -404,7 +397,11 @@ export const obterProjetoExecucao = cache(
           prazoEm: acao.prazo_em,
           status: acao.status,
           origem: acao.origem,
+          categoria: acao.categoria as AcaoPlanoProjeto['categoria'],
           reuniaoId: acao.reuniao_id,
+          responsavelTipo: acao.responsavel_tipo as AcaoPlanoProjeto['responsavelTipo'],
+          responsavelNome: acao.responsavel_nome,
+          visivelCliente: acao.visivel_cliente,
           concluidaEm: acao.concluida_em,
           atualizadoEm: acao.atualizado_em,
         }))

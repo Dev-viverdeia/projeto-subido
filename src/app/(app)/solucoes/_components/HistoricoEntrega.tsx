@@ -20,10 +20,12 @@ const ROTULO_EVENTO: Record<EventoProjetoExecucao['tipo'], string> = {
   ajustes_solicitados: 'Cliente pediu um ajuste',
   arquivo_liberado: 'Arquivo liberado no portal',
   arquivo_retirado: 'Arquivo retirado do portal',
+  pendencia_concluida: 'Cliente confirmou uma pendência',
 };
 
 function IconeEvento({ tipo }: { tipo: EventoProjetoExecucao['tipo'] }) {
   if (tipo === 'entrega_aprovada') return <BadgeCheck size={17} aria-hidden="true" />;
+  if (tipo === 'pendencia_concluida') return <BadgeCheck size={17} aria-hidden="true" />;
   if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
   if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;
   if (tipo === 'arquivo_retirado') return <EyeOff size={17} aria-hidden="true" />;

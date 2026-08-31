@@ -383,6 +383,97 @@
   margin: 0;
 }
 
+.pendenciaCliente {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--via-space-4);
+  align-items: center;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-white) 82%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.pendenciaIcone {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-04);
+  color: var(--via-navy);
+}
+
+.pendenciaCliente p,
+.pendenciaCliente h3 {
+  margin: 0;
+}
+
+.pendenciaCliente p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.pendenciaCliente h3 {
+  margin-top: 3px;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-snug);
+}
+
+.pendenciaCliente div > span,
+.pendenciaCliente div > small {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-1);
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.pendenciaCliente div > small {
+  color: var(--via-accent-ink);
+}
+
+.pendenciaCliente button {
+  min-height: var(--app-h-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+  transition:
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.pendenciaCliente button:hover {
+  box-shadow: var(--app-elev-2-shadow);
+  transform: translateY(-1px);
+}
+
+.pendenciaCliente button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+.pendenciaCliente button:disabled {
+  cursor: wait;
+  opacity: 0.56;
+  transform: none;
+}
+
 .centralDecisoes > header p {
   color: var(--via-accent-ink);
   font-size: var(--via-fs-micro);
@@ -1143,7 +1234,6 @@
   }
 
   .barra > div {
-    max-width: 18ch;
     justify-content: flex-end;
     text-align: right;
   }
@@ -1210,6 +1300,19 @@
 
   .aprovacaoAcoes {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pendenciaCliente {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .pendenciaCliente form {
+    grid-column: 2;
+  }
+
+  .pendenciaCliente button {
+    width: 100%;
   }
 
   .andamento header,

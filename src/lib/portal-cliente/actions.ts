@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { registrarDecisaoCliente } from './servico';
+import { registrarConclusaoDependenciaCliente, registrarDecisaoCliente } from './servico';
 
 const DecisaoSchema = z
   .object({
@@ -18,6 +18,38 @@ const DecisaoSchema = z
   });
 
 export type EstadoPortalCliente = { erro?: string; sucesso?: string; aviso?: string };
+
+const PendenciaSchema = z.object({
+  codigo: z.uuid(),
+  acao: z.uuid(),
+});
+
+export async function concluirPendenciaCliente(
+  _estado: EstadoPortalCliente,
+  formData: FormData,
+): Promise<EstadoPortalCliente> {
+  const validacao = PendenciaSchema.safeParse({
+    codigo: formData.get('codigo'),
+    acao: formData.get('acao'),
+  });
+  if (!validacao.success) return { erro: 'Não foi possível identificar esta pendência.' };
+
+  try {
+    const concluiu = await registrarConclusaoDependenciaCliente({
+      codigo: validacao.data.codigo,
+      acaoId: validacao.data.acao,
+    });
+    if (!concluiu) return { erro: 'Esta pendência já foi concluída ou deixou de estar ativa.' };
+
+    revalidatePath(`/portal/${validacao.data.codigo}`);
+    return { sucesso: 'Tudo certo. O responsável pelo projeto já pode ver sua confirmação.' };
+  } catch (erro) {
+    console.error(
+      `[portal-cliente:pendencia] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,
+    );
+    return { erro: 'Não foi possível confirmar agora. Tente novamente.' };
+  }
+}
 
 export async function decidirEntregaCliente(
   _estado: EstadoPortalCliente,

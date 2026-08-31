@@ -74,9 +74,10 @@ function ItemPlano({ projetoId, acao }: { projetoId: string; acao: AcaoPlanoProj
 }
 
 export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: AcaoPlanoProjeto[] }) {
-  if (!acoes.length) return null;
+  const compromissos = acoes.filter((acao) => !['acesso', 'dependencia'].includes(acao.categoria));
+  if (!compromissos.length) return null;
 
-  const abertas = acoes.filter((acao) => acao.status === 'pendente').length;
+  const abertas = compromissos.filter((acao) => acao.status === 'pendente').length;
   if (!abertas) return null;
 
   return (
@@ -103,7 +104,7 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
       </p>
 
       <ol>
-        {acoes
+        {compromissos
           .filter((acao) => acao.status === 'pendente')
           .slice(0, 5)
           .map((acao) => (
