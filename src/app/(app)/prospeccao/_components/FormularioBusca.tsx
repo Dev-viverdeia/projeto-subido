@@ -1,8 +1,8 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { ArrowRight, Building2, Coins, MapPin, Search } from 'lucide-react';
-import { Alert, Button, Card, Input, Pill } from '@/design-system/via';
+import { ArrowRight, Building2, MapPin, Search } from 'lucide-react';
+import { Alert, Button, Card, Input } from '@/design-system/via';
 import { criarListaProspeccao, type EstadoBuscaProspeccao } from '@/lib/prospeccao/actions';
 import { QUANTIDADES_PROSPECCAO } from '@/lib/prospeccao/schema';
 import styles from '../pagina.module.css';
@@ -42,20 +42,9 @@ export function FormularioBusca({
       <form action={acao} className={styles.formulario} noValidate aria-busy={buscando}>
         <div className={styles.formularioTopo}>
           <div>
-            <p className={styles.sobretitulo}>Nova lista</p>
-            <h2>O que você quer buscar?</h2>
-            <p>
-              Informe o tipo de empresa e onde ela deve estar. A busca procura os dados de contato.
-            </p>
+            <h2>Nova lista</h2>
+            <p>1 crédito por empresa encontrada.</p>
           </div>
-          <Pill
-            className={styles.custoBusca}
-            size="sm"
-            variant="default"
-            iconLeft={<Coins size={14} aria-hidden="true" />}
-          >
-            1 crédito por empresa
-          </Pill>
         </div>
 
         {!pronto && (
@@ -124,14 +113,11 @@ export function FormularioBusca({
             </fieldset>
 
             <div className={styles.reservaBusca}>
-              <strong>{quantidade} créditos reservados</strong>
-              <span>Você paga somente pelas empresas encontradas.</span>
+              <strong>{quantidade} créditos</strong>
+              <span>reservados para esta busca</span>
             </div>
 
             <div className={styles.acaoBusca}>
-              <span>
-                Saldo <strong>{saldo}</strong>
-              </span>
               <Button
                 type="submit"
                 variant="primary"

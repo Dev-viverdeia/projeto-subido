@@ -19,11 +19,11 @@
 .hero {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-5);
-  min-height: 180px;
-  padding: clamp(28px, 4vw, 44px);
+  min-height: 128px;
+  padding: clamp(24px, 3vw, 34px);
   overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
@@ -59,9 +59,9 @@
 }
 
 .hero h1 {
-  margin: var(--via-space-2) 0 0;
+  margin: 0;
   color: var(--via-text-primary);
-  font-size: clamp(2.2rem, 4.4vw, 4rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: var(--via-fw-medium);
   line-height: 0.98;
   letter-spacing: var(--app-ls-h1);
@@ -69,7 +69,7 @@
 
 .heroTexto > p:last-child {
   max-width: 62ch;
-  margin: var(--via-space-3) 0 0;
+  margin: var(--via-space-2) 0 0;
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
@@ -111,7 +111,7 @@
 
 .colecoes {
   display: grid;
-  gap: clamp(40px, 6vw, 72px);
+  gap: clamp(30px, 4vw, 48px);
 }
 
 .colecao {
@@ -121,7 +121,7 @@
 
 .colecaoTopo {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--via-space-4);
   padding-inline: var(--via-space-1);
@@ -140,7 +140,7 @@
 .colecaoTopo h2 {
   margin: 0;
   color: var(--via-text-primary);
-  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
   letter-spacing: var(--app-ls-h2);
 }
 
@@ -152,8 +152,8 @@
 
 .contagem {
   display: grid;
-  min-width: 42px;
-  height: 42px;
+  min-width: 36px;
+  height: 36px;
   padding-inline: var(--via-space-2);
   place-items: center;
   border: 1px solid var(--via-border-hairline);
@@ -173,7 +173,7 @@
 
 .card {
   display: flex;
-  min-height: 222px;
+  min-height: 190px;
   flex-direction: column;
   padding: var(--via-space-5);
   border: 1px solid var(--via-border-hairline);
@@ -207,6 +207,10 @@
   gap: var(--via-space-3);
 }
 
+.cardTopo {
+  justify-content: flex-end;
+}
+
 .iconeDocumento {
   width: 38px;
   height: 38px;
@@ -238,7 +242,7 @@
 
 .cardCorpo {
   flex: 1;
-  padding-block: var(--via-space-5);
+  padding-block: var(--via-space-4);
 }
 
 .cardCorpo p,
@@ -339,7 +343,7 @@
 
 @media (max-width: 767px) {
   .hero {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .hero .nova {
@@ -374,7 +378,7 @@
   }
 
   .colecaoTopo {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .contagem {

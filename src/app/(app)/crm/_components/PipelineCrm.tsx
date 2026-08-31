@@ -290,13 +290,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
                 <strong>
                   {filtradas.length} {filtradas.length === 1 ? 'venda' : 'vendas'}
                 </strong>
-                <span>
-                  {filtro === 'todas' && !busca
-                    ? 'Arraste o card quando a venda mudar de etapa.'
-                    : 'Resultado dos filtros aplicados.'}
-                </span>
               </div>
-              <small>No celular, mova a venda pelo menu do card.</small>
             </header>
 
             <div className={styles.rolagem}>

@@ -131,7 +131,7 @@
 .areaVazia {
   align-content: center;
   grid-template-rows: auto auto;
-  padding-top: clamp(var(--via-space-8), 8vh, var(--via-space-14));
+  padding-top: clamp(var(--via-space-6), 6vh, var(--via-space-10));
 }
 
 .boasVindas {
@@ -152,7 +152,7 @@
   margin-top: var(--via-space-2);
   color: var(--via-text-primary);
   font-family: var(--via-font-display);
-  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 540;
   line-height: 0.98;
   letter-spacing: var(--app-ls-display);
@@ -161,9 +161,9 @@
 
 .apoio {
   max-width: 58ch;
-  margin: var(--via-space-4) auto 0 !important;
+  margin: var(--via-space-3) auto 0 !important;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }

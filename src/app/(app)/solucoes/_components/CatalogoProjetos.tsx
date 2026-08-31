@@ -83,32 +83,19 @@ export function CatalogoProjetos({
     <div className={styles.raiz}>
       <header className={styles.abertura}>
         <div>
-          <p className={styles.eyebrow}>Projetos guiados</p>
           <Titulo id="titulo-projetos" className={styles.titulo}>
-            Aprenda um projeto. Entregue para um cliente.
+            Projetos
           </Titulo>
-          <p className={styles.apoio}>
-            Escolha o que quer implementar. Cada projeto reúne aula, passo a passo e modelos em uma
-            única sequência.
-          </p>
+          <p className={styles.apoio}>Escolha uma entrega e siga o método até o cliente.</p>
         </div>
-        <p className={styles.contagem}>
-          <strong>{String(solucoes.length).padStart(2, '0')}</strong>
-          projetos disponíveis
-        </p>
+        <p className={styles.contagem}>{solucoes.length} projetos</p>
       </header>
 
       <section className={styles.secaoDestaque} aria-labelledby="projeto-destaque-titulo">
         <div className={styles.secaoCabecalho}>
-          <div>
-            <p className={styles.eyebrow}>
-              {destaque.estado === 'em-andamento'
-                ? 'Continue de onde parou'
-                : 'Melhor ponto de partida'}
-            </p>
-            <h2 id="projeto-destaque-titulo">Seu próximo projeto</h2>
-          </div>
-          <p>Abra o projeto para ver apenas a aula ou a etapa que precisa fazer agora.</p>
+          <h2 id="projeto-destaque-titulo">
+            {destaque.estado === 'em-andamento' ? 'Continue de onde parou' : 'Comece por aqui'}
+          </h2>
         </div>
 
         <Link
@@ -117,7 +104,6 @@ export function CatalogoProjetos({
           data-estado={destaque.estado}
         >
           <div className={styles.destaquePrincipal}>
-            <p className={styles.projetoTipo}>{destaque.solucao.categoria ?? 'Projeto de IA'}</p>
             <h3>{destaque.solucao.titulo}</h3>
             <p className={styles.resultado}>
               {destaque.solucao.projeto?.resultado ?? destaque.solucao.resumo}
@@ -162,11 +148,7 @@ export function CatalogoProjetos({
       {restantes.length > 0 ? (
         <section className={styles.outros} aria-labelledby="outros-projetos-titulo">
           <div className={styles.secaoCabecalho}>
-            <div>
-              <p className={styles.eyebrow}>Biblioteca</p>
-              <h2 id="outros-projetos-titulo">Outros projetos</h2>
-            </div>
-            <p>Escolha pelo resultado que faz sentido para o cliente que você quer atender.</p>
+            <h2 id="outros-projetos-titulo">Outros projetos</h2>
           </div>
 
           <ol className={styles.grade}>

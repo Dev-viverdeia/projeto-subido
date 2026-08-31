@@ -1,13 +1,5 @@
 import Link from 'next/link';
-import {
-  ArrowRight,
-  FileSignature,
-  FolderOpen,
-  Layers3,
-  PencilLine,
-  Plus,
-  Send,
-} from 'lucide-react';
+import { ArrowRight, FolderOpen, Plus } from 'lucide-react';
 import type { ResumoProposta } from '@/lib/propostas/queries';
 import { formatarReais } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
@@ -31,9 +23,6 @@ function CardProposta({
   return (
     <Link href={`/propostas/${proposta.id}`} className={styles.card}>
       <div className={styles.cardTopo}>
-        <span className={styles.iconeDocumento} aria-hidden="true">
-          <FileSignature size={19} strokeWidth={1.7} />
-        </span>
         <span className={styles.status} data-status={proposta.status}>
           {ROTULO_STATUS_PROPOSTA[proposta.status]}
         </span>
@@ -63,29 +52,18 @@ function CardProposta({
 
 function ColecaoPropostas({
   titulo,
-  descricao,
   propostas,
   tipo,
 }: {
   titulo: string;
-  descricao: string;
   propostas: ResumoProposta[];
   tipo: 'rascunho' | 'enviada';
 }) {
-  const Icone = tipo === 'rascunho' ? PencilLine : Send;
-
   return (
     <section className={styles.colecao} aria-labelledby={`titulo-${tipo}`}>
       <header className={styles.colecaoTopo}>
-        <span className={styles.iconeColecao} aria-hidden="true">
-          <Icone size={19} strokeWidth={1.7} />
-        </span>
         <div>
-          <p className={styles.sobretitulo}>
-            {tipo === 'rascunho' ? 'Em construção' : 'Com o cliente'}
-          </p>
           <h2 id={`titulo-${tipo}`}>{titulo}</h2>
-          <p>{descricao}</p>
         </div>
         <strong className={styles.contagem} aria-label={`${propostas.length} propostas`}>
           {propostas.length.toString().padStart(2, '0')}
@@ -135,13 +113,9 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
   return (
     <div className={styles.pagina}>
       <header className={styles.hero}>
-        <div className={styles.heroIcone} aria-hidden="true">
-          <Layers3 size={22} strokeWidth={1.6} />
-        </div>
         <div className={styles.heroTexto}>
-          <p className={styles.sobretitulo}>Propostas</p>
           <h1>Biblioteca comercial</h1>
-          <p>Encontre o que ainda precisa de revisão e acompanhe o que já está com o cliente.</p>
+          <p>Rascunhos e propostas enviadas.</p>
         </div>
         <Link href="/propostas/nova" className={styles.nova}>
           <Plus size={17} strokeWidth={2} aria-hidden="true" />
@@ -150,18 +124,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       </header>
 
       <div className={styles.colecoes}>
-        <ColecaoPropostas
-          titulo="Em rascunho"
-          descricao="Documentos que ainda podem ser revisados antes do envio."
-          propostas={rascunhos}
-          tipo="rascunho"
-        />
-        <ColecaoPropostas
-          titulo="Enviadas"
-          descricao="Propostas que já chegaram ao cliente e aguardam ou já receberam uma decisão."
-          propostas={enviadas}
-          tipo="enviada"
-        />
+        <ColecaoPropostas titulo="Em rascunho" propostas={rascunhos} tipo="rascunho" />
+        <ColecaoPropostas titulo="Enviadas" propostas={enviadas} tipo="enviada" />
       </div>
     </div>
   );

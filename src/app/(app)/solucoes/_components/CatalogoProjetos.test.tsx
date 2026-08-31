@@ -66,10 +66,8 @@ describe('catálogo de projetos', () => {
 
     render(<CatalogoProjetos solucoes={[solucao]} />);
 
-    expect(
-      screen.getByRole('heading', { name: 'Aprenda um projeto. Entregue para um cliente.' }),
-    ).toBeDefined();
-    expect(screen.getByRole('heading', { name: 'Seu próximo projeto' })).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Projetos' })).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Comece por aqui' })).toBeDefined();
     expect(screen.getByText('5 a 10 dias úteis')).toBeDefined();
     expect(screen.getByText('Para começar')).toBeDefined();
     expect(screen.getByRole('link', { name: /Ver projeto/ })).toBeDefined();

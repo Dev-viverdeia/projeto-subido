@@ -25,17 +25,11 @@ export function BarraPrioridades({
   return (
     <section className={styles.barraPrioridades} aria-labelledby="foco-crm-titulo">
       <div className={styles.leituraPrioridade}>
-        <span>O que fazer agora</span>
         <strong id="foco-crm-titulo">
           {contagens.atencao === 0
             ? 'Todas têm um próximo passo'
             : `${contagens.atencao} ${contagens.atencao === 1 ? 'venda precisa' : 'vendas precisam'} de ação`}
         </strong>
-        <small>
-          {contagens.atencao === 0
-            ? 'Continue pela próxima ação registrada em cada ficha.'
-            : 'Comece pelo que está atrasado ou ainda não tem próximo passo.'}
-        </small>
       </div>
 
       <div className={styles.controlesPipeline}>

@@ -8,7 +8,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(220px, 0.58fr) minmax(0, 1.42fr);
+  grid-template-columns: minmax(190px, 0.46fr) minmax(0, 1.54fr);
   gap: var(--app-gap-grid);
   overflow: hidden;
   padding: var(--via-space-4);
@@ -24,7 +24,7 @@
 .leituraPrioridade {
   display: grid;
   align-content: center;
-  gap: var(--via-space-1);
+  gap: 0;
   min-width: 0;
   padding-inline: var(--via-space-2);
 }
@@ -217,7 +217,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 54px;
+  min-height: 44px;
   padding: var(--via-space-3) var(--app-pad-card);
   border-bottom: 1px solid var(--via-border-hairline);
   background: color-mix(in srgb, var(--via-surface) 64%, transparent);

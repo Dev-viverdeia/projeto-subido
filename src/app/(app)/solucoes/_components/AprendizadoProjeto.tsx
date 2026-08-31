@@ -21,11 +21,13 @@ export function AprendizadoProjeto({
   titulo,
   trilha,
   videoUrl,
+  onIrImplementacao,
 }: {
   slug: string;
   titulo: string;
   trilha: Trilha;
   videoUrl: string | null;
+  onIrImplementacao?: () => void;
 }) {
   const progresso = useProgresso();
   const { alternarEtapa } = useAcoesProgresso();
@@ -176,9 +178,15 @@ export function AprendizadoProjeto({
           <Check size={17} aria-hidden="true" />
           <div>
             <strong>Aprendizado concluído</strong>
-            <p>{trilha.aulas.length} aulas concluídas. O passo a passo está liberado abaixo.</p>
+            <p>{trilha.aulas.length} aulas concluídas.</p>
           </div>
-          <a href="#implementacao-projeto">Ir para implementação</a>
+          {onIrImplementacao ? (
+            <button type="button" onClick={onIrImplementacao}>
+              Ir para implementação
+            </button>
+          ) : (
+            <a href="#implementacao-projeto">Ir para implementação</a>
+          )}
         </aside>
       ) : null}
 
