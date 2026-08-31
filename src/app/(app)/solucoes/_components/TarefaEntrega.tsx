@@ -21,8 +21,10 @@ import type {
   EventoProjetoExecucao,
   TarefaProjetoExecucao,
 } from '@/lib/projetos-execucao/queries';
+import type { EncerramentoProjeto as Encerramento } from '@/lib/projetos-execucao/encerramento';
 import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
 import { EntregaCliente } from './EntregaCliente';
+import { EncerramentoProjeto } from './EncerramentoProjeto';
 import { KitOperacionalTarefa } from './KitOperacionalTarefa';
 import styles from './SalaEntrega.module.css';
 
@@ -35,6 +37,7 @@ export function TarefaEntrega({
   clienteEmail,
   notificacaoCliente,
   aceiteFinal,
+  encerramento,
   contexto,
   onAbrirArquivos,
 }: {
@@ -44,6 +47,7 @@ export function TarefaEntrega({
   clienteEmail: string | null;
   notificacaoCliente: EventoProjetoExecucao | null;
   aceiteFinal: boolean;
+  encerramento: Encerramento | null;
   contexto: {
     empresa: string;
     objetivo: string;
@@ -263,6 +267,14 @@ export function TarefaEntrega({
         </section>
       </article>
 
+      {aceiteFinal && concluida && (
+        <EncerramentoProjeto
+          projetoId={projetoId}
+          encerramento={encerramento}
+          evidenciaInicial={tarefa.evidencia}
+        />
+      )}
+
       <EntregaCliente
         projetoId={projetoId}
         tarefa={tarefa}
@@ -270,6 +282,7 @@ export function TarefaEntrega({
         clienteEmail={clienteEmail}
         notificacao={notificacaoCliente}
         aceiteFinal={aceiteFinal}
+        encerramentoPronto={Boolean(encerramento)}
       />
     </>
   );

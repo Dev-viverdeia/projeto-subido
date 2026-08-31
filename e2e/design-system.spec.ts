@@ -17,6 +17,7 @@ const TELAS = [
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
+  ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {
@@ -87,6 +88,18 @@ test.describe('fundação visual Viver de IA', () => {
       corpo: document.body.scrollHeight,
     }));
     expect(Math.abs(alturas.documento - alturas.corpo)).toBeLessThanOrEqual(2);
+  });
+
+  test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {
+    await page.goto('/preview/portal-cliente');
+
+    const encerramento = page.getByRole('heading', {
+      name: 'Resultado, garantia e continuidade.',
+    });
+    await encerramento.scrollIntoViewIfNeeded();
+    await expect(encerramento).toBeVisible();
+    await expect(page.getByText('Até 09 de setembro de 2026')).toBeVisible();
+    await expect(page.getByText('suporte@mateussilva.com.br')).toBeVisible();
   });
 
   test('o pós-call preserva áudio e transcrição como fontes privadas', async ({ page }) => {

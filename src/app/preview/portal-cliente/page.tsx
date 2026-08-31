@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PortalProjeto } from '@/app/portal/[codigo]/PortalProjeto';
 import type { ProjetoPortalCliente, TarefaPortalCliente } from '@/lib/portal-cliente/servico';
+import { ENCERRAMENTO_PREVIEW } from '../encerramento-preview';
 
 export const metadata: Metadata = { title: 'Preview · Portal do Cliente' };
 
@@ -39,6 +40,7 @@ const PROJETO: ProjetoPortalCliente = {
   total: 7,
   dependencias: [],
   mudancasEscopo: [],
+  encerramento: ENCERRAMENTO_PREVIEW,
   briefing: {
     objetivo:
       'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',

@@ -4,6 +4,8 @@ import { useActionState } from 'react';
 import { ArrowUpRight, Check, FileCheck2, MessageSquareMore } from 'lucide-react';
 import { decidirEntregaCliente, type EstadoPortalCliente } from '@/lib/portal-cliente/actions';
 import type { TarefaPortalCliente } from '@/lib/portal-cliente/servico';
+import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
+import { TermoEncerramentoPortal } from './TermoEncerramentoPortal';
 import styles from './portal.module.css';
 
 const INICIAL: EstadoPortalCliente = {};
@@ -12,10 +14,12 @@ export function AprovacaoCliente({
   codigo,
   tarefa,
   aceiteFinal = false,
+  encerramento,
 }: {
   codigo: string;
   tarefa: TarefaPortalCliente;
   aceiteFinal?: boolean;
+  encerramento?: EncerramentoProjeto | null;
 }) {
   const [estado, acao, pendente] = useActionState(decidirEntregaCliente, INICIAL);
 
@@ -52,6 +56,12 @@ export function AprovacaoCliente({
             </small>
           )}
         </div>
+
+        {aceiteFinal && encerramento ? (
+          <div className={styles.termoAceite}>
+            <TermoEncerramentoPortal encerramento={encerramento} compacto />
+          </div>
+        ) : null}
 
         <form action={acao}>
           <input type="hidden" name="codigo" value={codigo} />

@@ -93,12 +93,24 @@ export async function prepararEntregaCliente(
     return { erro: 'Ative o Portal do Cliente antes de solicitar a aprovação.' };
   }
 
+  const { data: ultimaTarefa } = await supabase
+    .from('projeto_tarefas')
+    .select('id')
+    .eq('projeto_execucao_id', validacao.data.projeto)
+    .eq('dono', user.id)
+    .order('ordem', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const aceiteFinal = ultimaTarefa?.id === validacao.data.tarefa;
+
   let consulta = supabase
     .from('projeto_tarefas')
     .update({
       cliente_nota: validacao.data.nota || null,
       entregavel_url: validacao.data.url || null,
-      ...(validacao.data.operacao === 'solicitar' ? { cliente_status: 'aguardando' as const } : {}),
+      ...(validacao.data.operacao === 'solicitar' && !aceiteFinal
+        ? { cliente_status: 'aguardando' as const }
+        : {}),
     })
     .eq('id', validacao.data.tarefa)
     .eq('projeto_execucao_id', validacao.data.projeto)
@@ -116,6 +128,29 @@ export async function prepararEntregaCliente(
           ? 'Conclua a tarefa antes de pedir a aprovação.'
           : 'Não foi possível salvar esta apresentação agora.',
     };
+  }
+
+  if (validacao.data.operacao === 'solicitar' && aceiteFinal) {
+    const { data: enviado, error: erroEncerramento } = await supabase.rpc(
+      'projeto_encerramento_enviar',
+      {
+        p_projeto_id: validacao.data.projeto,
+        p_tarefa_id: validacao.data.tarefa,
+      },
+    );
+    if (erroEncerramento || !enviado) {
+      const precisaPreparar = erroEncerramento?.message.includes(
+        'encerramento_precisa_ser_preparado',
+      );
+      console.error(
+        `[projetos-execucao:enviar-encerramento] ${erroEncerramento?.code ?? 'sem-dados'}: ${erroEncerramento?.message ?? ''}`,
+      );
+      return {
+        erro: precisaPreparar
+          ? 'Prepare o encerramento, a garantia e a continuidade antes de pedir o aceite final.'
+          : 'Não foi possível enviar o encerramento agora. Revise os dados e tente novamente.',
+      };
+    }
   }
 
   let notificacao: Awaited<ReturnType<typeof enviarNotificacaoEntrega>> | null = null;
@@ -160,8 +195,8 @@ export async function prepararEntregaCliente(
     sucesso:
       validacao.data.operacao === 'solicitar'
         ? emailEnviado
-          ? `Validação enviada para ${validacao.data.email}.`
-          : 'A validação foi registrada no portal.'
+          ? `${aceiteFinal ? 'Encerramento' : 'Validação'} enviado para ${validacao.data.email}.`
+          : `${aceiteFinal ? 'O encerramento' : 'A validação'} foi registrado no portal.`
         : 'Apresentação do cliente salva.',
     aviso:
       validacao.data.operacao === 'solicitar' && !emailEnviado

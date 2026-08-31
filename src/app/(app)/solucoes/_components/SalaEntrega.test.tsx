@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
-import './SalaEntrega.test-mocks';
+import { ENCERRAMENTO_TESTE } from './SalaEntrega.test-mocks';
 
 import { SalaEntrega } from './SalaEntrega';
 
@@ -46,6 +46,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   tarefasBloqueadas: 0,
   validacoesAguardando: 0,
   ajustesSolicitados: 0,
+  encerramento: null,
   portalAtivo: false,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: null,
@@ -357,6 +358,7 @@ describe('SalaEntrega', () => {
           total: 3,
           status: 'em_validacao',
           portalAtivo: true,
+          encerramento: ENCERRAMENTO_TESTE,
           tarefas: PROJETO.tarefas.map((tarefa) => ({
             ...tarefa,
             status: 'concluida' as const,

@@ -32,6 +32,7 @@ export function EntregaCliente({
   clienteEmail,
   notificacao,
   aceiteFinal = false,
+  encerramentoPronto = true,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
@@ -39,6 +40,7 @@ export function EntregaCliente({
   clienteEmail: string | null;
   notificacao: EventoProjetoExecucao | null;
   aceiteFinal?: boolean;
+  encerramentoPronto?: boolean;
 }) {
   const [estado, acao, pendente] = useActionState(prepararEntregaCliente, INICIAL);
   const [estadoReenvio, reenviar, reenviando] = useActionState(
@@ -196,14 +198,16 @@ export function EntregaCliente({
                 type="submit"
                 name="operacao"
                 value="solicitar"
-                disabled={pendente || !portalAtivo}
+                disabled={pendente || !portalAtivo || (aceiteFinal && !encerramentoPronto)}
                 className={styles.enviar}
               >
                 <Send size={14} aria-hidden="true" />{' '}
                 {pendente
                   ? 'Enviando…'
                   : aceiteFinal
-                    ? 'Solicitar aceite final'
+                    ? encerramentoPronto
+                      ? 'Solicitar aceite final'
+                      : 'Prepare o encerramento acima'
                     : 'Enviar para validação'}
               </button>
             ) : (
