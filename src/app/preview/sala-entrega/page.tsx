@@ -50,6 +50,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   },
   kickoff: null,
   acoesPlano: ACOES_PLANO,
+  mudancasEscopo: [],
   eventos: [
     {
       id: '99999999-9999-4999-8999-999999999991',
@@ -358,7 +359,29 @@ export default async function PreviewSalaEntregaPage({
           ? estados.prepararProjetoEmValidacao(PROJETO)
           : estado === 'ajustes'
             ? estados.prepararProjetoComAjustes(PROJETO)
-            : PROJETO;
+            : estado === 'escopo'
+              ? {
+                  ...estados.prepararProjetoEmExecucao(PROJETO),
+                  mudancasEscopoParaAnalisar: 1,
+                  mudancasEscopo: [
+                    {
+                      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+                      titulo: 'Incluir atendimento pelo Instagram',
+                      descricao:
+                        'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
+                      solicitadoPor: 'cliente' as const,
+                      status: 'em_analise' as const,
+                      classificacao: null,
+                      resposta: null,
+                      impactoPrazoDias: null,
+                      impactoValorCentavos: null,
+                      criadoEm: '2026-08-30T13:40:00.000Z',
+                      analisadoEm: null,
+                      decididoEm: null,
+                    },
+                  ],
+                }
+              : PROJETO;
   return (
     <div className={styles.shell}>
       <PreviewSidebar />

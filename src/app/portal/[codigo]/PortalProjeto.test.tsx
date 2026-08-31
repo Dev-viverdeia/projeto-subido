@@ -4,7 +4,9 @@ import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 
 vi.mock('@/lib/portal-cliente/actions', () => ({
   decidirEntregaCliente: vi.fn(() => Promise.resolve({})),
+  decidirMudancaEscopoCliente: vi.fn(() => Promise.resolve({})),
   concluirPendenciaCliente: vi.fn(() => Promise.resolve({})),
+  solicitarMudancaEscopoCliente: vi.fn(() => Promise.resolve({})),
 }));
 
 import { PortalProjeto } from './PortalProjeto';
@@ -21,6 +23,7 @@ const PROJETO: ProjetoPortalCliente = {
   feitas: 1,
   total: 2,
   dependencias: [],
+  mudancasEscopo: [],
   briefing: {
     objetivo: 'Responder rapidamente e transferir com contexto.',
     criterioSucesso: 'A recepção recebe cada contato com histórico completo.',
@@ -160,5 +163,38 @@ describe('PortalProjeto', () => {
       screen.getByRole('heading', { name: 'Liberar o acesso ao WhatsApp Business' }),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: /Confirmar como resolvido/i })).toBeVisible();
+  });
+
+  it('expõe o impacto antes de pedir a aprovação de uma mudança no combinado', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{
+          ...PROJETO,
+          mudancasEscopo: [
+            {
+              id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+              titulo: 'Incluir atendimento pelo Instagram',
+              descricao: 'O cliente quer adicionar um novo canal ao agente.',
+              status: 'aguardando_cliente',
+              classificacao: 'fora_escopo',
+              resposta: 'A inclusão exige uma nova integração e testes próprios.',
+              impactoPrazoDias: 3,
+              impactoValorCentavos: 240000,
+              solicitadoPor: 'cliente',
+              criadoEm: '2026-08-10T12:00:00.000Z',
+              analisadoEm: '2026-08-10T14:00:00.000Z',
+              decididoEm: null,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Mudança no combinado')).toBeVisible();
+    expect(screen.getByText('+3 dias')).toBeVisible();
+    expect(screen.getByText('R$ 2.400,00')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manter o combinado' })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Aprovar mudança/i })).toBeVisible();
   });
 });

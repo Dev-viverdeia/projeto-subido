@@ -1,0 +1,436 @@
+.decisao {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--via-accent) 42%, var(--via-border));
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.decisao > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.decisao > header > span,
+.estadoAtivo > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.decisao header p,
+.decisao header h3,
+.decisaoCorpo p,
+.decisaoCorpo blockquote,
+.controle header p,
+.controle header h2,
+.controle header span,
+.estadoAtivo small,
+.estadoAtivo strong,
+.estadoAtivo p {
+  display: block;
+  margin: 0;
+}
+
+.decisao header p,
+.controle header p,
+.modal header p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.decisao header h3 {
+  margin-top: 3px;
+  font-size: var(--via-fs-h4);
+}
+.decisao header em {
+  padding: 6px 9px;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-accent-soft);
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: 0.52rem;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.decisaoCorpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+}
+.decisaoCorpo > div,
+.decisaoCorpo form {
+  padding: var(--via-space-5);
+}
+.decisaoCorpo > div {
+  border-right: 1px solid var(--via-border-hairline);
+}
+.decisaoCorpo p {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.55;
+}
+.decisaoCorpo blockquote {
+  margin-top: var(--via-space-4);
+  padding: var(--via-space-4);
+  border-left: 2px solid var(--via-accent);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  line-height: 1.55;
+}
+.decisaoCorpo form {
+  background: color-mix(in srgb, var(--via-bg-2) 72%, transparent);
+}
+.decisaoCorpo dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  margin: 0;
+}
+.decisaoCorpo dl div {
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+}
+.decisaoCorpo dt {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+.decisaoCorpo dd {
+  margin: 4px 0 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+.decisaoCorpo form > small {
+  display: block;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: 1.45;
+}
+
+.acoesDecisao,
+.modalAcoes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-4);
+}
+.acoesDecisao button,
+.modalAcoes button,
+.controle > header > button {
+  min-height: var(--app-h-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+.acoesDecisao .aprovar,
+.modalAcoes .aprovar {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+.acoesDecisao button:disabled,
+.modalAcoes button:disabled {
+  cursor: wait;
+  opacity: 0.56;
+}
+
+.retorno {
+  margin-top: var(--via-space-3);
+}
+.retorno p,
+.retorno small {
+  display: block;
+  margin: 0;
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+}
+.retorno p[data-erro],
+.erro {
+  color: var(--via-coral-dark);
+}
+.retorno small {
+  margin-top: 3px;
+  color: var(--via-text-muted);
+}
+
+.controle {
+  padding: clamp(28px, 4vw, 44px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--app-glass-plane);
+}
+.controle > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+}
+.controle > header > div {
+  min-width: 0;
+}
+.controle header h2 {
+  margin-top: var(--via-space-2);
+  font-size: var(--via-fs-h2);
+  letter-spacing: var(--app-ls-h2);
+}
+.controle header span {
+  max-width: 76ch;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: 1.55;
+}
+.controle > header > button {
+  flex: 0 0 auto;
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.estadoAtivo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: center;
+  margin-top: var(--via-space-5);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+.estadoAtivo small {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  text-transform: uppercase;
+}
+.estadoAtivo strong {
+  margin-top: 4px;
+  font-size: var(--via-fs-sm);
+}
+.estadoAtivo p {
+  margin-top: 4px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.45;
+}
+
+.historico {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  margin: var(--via-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.historico li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--via-space-3);
+  align-items: center;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+}
+.historico li > span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+.historico strong,
+.historico small {
+  display: block;
+}
+.historico strong {
+  font-size: var(--via-fs-xs);
+}
+.historico small {
+  margin-top: 3px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.modalFundo {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-5);
+  background: rgba(7, 28, 53, 0.58);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+.modal {
+  width: min(100%, 620px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 90%, transparent);
+  box-shadow: 0 30px 90px rgba(7, 28, 53, 0.28);
+}
+.modal > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--app-glass-plane-strong);
+}
+.modal header h2 {
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--via-fs-h2);
+}
+.modal header span {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+.modal > header > button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  cursor: pointer;
+}
+.modal form {
+  padding: var(--via-space-5);
+}
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+.modal label + label {
+  margin-top: var(--via-space-4);
+}
+.modal input,
+.modal textarea {
+  width: 100%;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-xs);
+}
+.modal input {
+  min-height: var(--app-h-control);
+}
+.modal textarea {
+  min-height: 118px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.modal input:focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--app-ring);
+}
+.erro {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-xs);
+}
+
+.acoesDecisao button:focus-visible,
+.modalAcoes button:focus-visible,
+.controle > header > button:focus-visible,
+.modal > header > button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .decisao,
+  .controle,
+  .estadoAtivo,
+  .historico li {
+    backdrop-filter: blur(22px) saturate(135%);
+  }
+}
+
+@media (max-width: 899px) {
+  .decisaoCorpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .decisaoCorpo > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--via-border-hairline);
+  }
+}
+
+@media (max-width: 599px) {
+  .decisao > header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .decisao header em {
+    grid-column: 2;
+    width: fit-content;
+  }
+  .decisaoCorpo dl,
+  .acoesDecisao,
+  .modalAcoes,
+  .historico {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .controle > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .controle > header > button {
+    width: 100%;
+  }
+  .modalFundo {
+    padding: var(--via-space-3);
+  }
+  .modal > header,
+  .modal form {
+    padding: var(--via-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modalFundo {
+    backdrop-filter: none;
+  }
+}

@@ -2,6 +2,7 @@ import type { ResumoProjetoExecucao } from './queries';
 import { diasAtePrazo } from './prazo';
 
 export type TipoPrioridadeEntrega =
+  | 'mudanca_escopo'
   | 'ajustes'
   | 'bloqueada'
   | 'preparacao'
@@ -39,20 +40,40 @@ export function classificarPrioridadeEntrega(
     };
   }
 
+  if ((projeto.mudancasEscopoParaAnalisar ?? 0) > 0) {
+    return {
+      tipo: 'mudanca_escopo',
+      ordem: 0,
+      grupo: 'acao',
+      rotulo: 'Mudança para analisar',
+      detalhe: `${plural(projeto.mudancasEscopoParaAnalisar ?? 0, 'pedido', 'pedidos')} do cliente`,
+    };
+  }
+
   if (projeto.ajustesSolicitados > 0) {
     return {
       tipo: 'ajustes',
-      ordem: 0,
+      ordem: 1,
       grupo: 'acao',
       rotulo: 'Ajustes solicitados',
       detalhe: `${plural(projeto.ajustesSolicitados, 'item', 'itens')} para revisar`,
     };
   }
 
+  if ((projeto.mudancasEscopoAguardandoCliente ?? 0) > 0) {
+    return {
+      tipo: 'mudanca_escopo',
+      ordem: 3,
+      grupo: 'cliente',
+      rotulo: 'Mudança com o cliente',
+      detalhe: `${plural(projeto.mudancasEscopoAguardandoCliente ?? 0, 'decisão', 'decisões')} aguardando aprovação`,
+    };
+  }
+
   if (projeto.tarefasBloqueadas > 0) {
     return {
       tipo: 'bloqueada',
-      ordem: 1,
+      ordem: 1.5,
       grupo: 'acao',
       rotulo: 'Entrega bloqueada',
       detalhe: `${plural(projeto.tarefasBloqueadas, 'tarefa', 'tarefas')} sem avanço`,

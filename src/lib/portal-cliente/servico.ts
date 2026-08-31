@@ -14,12 +14,17 @@ import type {
   StatusProjetoExecucao,
   StatusTarefaProjeto,
 } from '@/lib/projetos-execucao/status';
+import {
+  mapearMudancasEscopo,
+  type MudancaEscopoProjeto,
+} from '@/lib/projetos-execucao/mudancas-escopo';
 import type { TipoEventoProjeto } from '@/lib/projetos-execucao/queries';
 import { lerBriefingKickoff } from '@/lib/projetos-execucao/briefing';
 // Exceção deliberada: o link secreto é resolvido no servidor sem abrir SELECT
 // para `anon`. O retorno abaixo contém só o recorte preparado para o cliente.
 // eslint-disable-next-line no-restricted-imports
 import { createAdminClient } from '@/lib/supabase/admin';
+import { EVENTOS_VISIVEIS_PORTAL } from './eventos';
 
 export type TarefaPortalCliente = {
   id: string;
@@ -53,6 +58,7 @@ export type ArquivoPortalCliente = {
 export type EventoPortalCliente = {
   id: string;
   tarefaId: string | null;
+  mudancaEscopoId?: string | null;
   tipo: Extract<
     TipoEventoProjeto,
     | 'aprovacao_solicitada'
@@ -60,6 +66,11 @@ export type EventoPortalCliente = {
     | 'ajustes_solicitados'
     | 'arquivo_liberado'
     | 'pendencia_concluida'
+    | 'mudanca_escopo_solicitada'
+    | 'mudanca_escopo_incluida'
+    | 'mudanca_escopo_proposta'
+    | 'mudanca_escopo_aprovada'
+    | 'mudanca_escopo_recusada'
   >;
   autor: 'prestador' | 'cliente';
   comentario: string | null;
@@ -90,6 +101,7 @@ export type ProjetoPortalCliente = {
   arquivos: ArquivoPortalCliente[];
   eventos: EventoPortalCliente[];
   dependencias: AcaoPortalCliente[];
+  mudancasEscopo: MudancaEscopoProjeto[];
   briefing: {
     objetivo: string;
     criterioSucesso: string;
@@ -98,14 +110,6 @@ export type ProjetoPortalCliente = {
     proximosPassos: string[];
   } | null;
 };
-
-const EVENTOS_VISIVEIS = [
-  'aprovacao_solicitada',
-  'entrega_aprovada',
-  'ajustes_solicitados',
-  'arquivo_liberado',
-  'pendencia_concluida',
-] as const;
 
 function codigoValido(codigo: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(codigo);
@@ -119,7 +123,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente), projeto_mudancas_escopo(*)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -162,9 +166,9 @@ export const obterPortalCliente = cache(
 
     const { data: eventos, error: erroEventos } = await admin
       .from('projeto_portal_eventos')
-      .select('id, tarefa_id, tipo, autor, comentario, criado_em')
+      .select('id, tarefa_id, mudanca_escopo_id, tipo, autor, comentario, criado_em')
       .eq('projeto_execucao_id', data.id)
-      .in('tipo', [...EVENTOS_VISIVEIS])
+      .in('tipo', [...EVENTOS_VISIVEIS_PORTAL])
       .order('criado_em', { ascending: false })
       .limit(40);
     if (erroEventos) throw handleError(erroEventos, 'portal-cliente:eventos');
@@ -200,7 +204,9 @@ export const obterPortalCliente = cache(
       ),
       eventos: (eventos ?? []).flatMap((evento) => {
         if (
-          !EVENTOS_VISIVEIS.includes(evento.tipo as (typeof EVENTOS_VISIVEIS)[number]) ||
+          !EVENTOS_VISIVEIS_PORTAL.includes(
+            evento.tipo as (typeof EVENTOS_VISIVEIS_PORTAL)[number],
+          ) ||
           !['prestador', 'cliente'].includes(evento.autor)
         ) {
           return [];
@@ -209,6 +215,7 @@ export const obterPortalCliente = cache(
           {
             id: evento.id,
             tarefaId: evento.tarefa_id,
+            mudancaEscopoId: evento.mudanca_escopo_id,
             tipo: evento.tipo as EventoPortalCliente['tipo'],
             autor: evento.autor as EventoPortalCliente['autor'],
             comentario: evento.comentario,
@@ -216,6 +223,7 @@ export const obterPortalCliente = cache(
           },
         ];
       }),
+      mudancasEscopo: mapearMudancasEscopo(data.projeto_mudancas_escopo),
       dependencias: data.projeto_acoes
         .filter(
           (acao) =>

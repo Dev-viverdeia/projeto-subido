@@ -15,11 +15,13 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { descreverProximaAcaoPortal } from '@/lib/portal-cliente/eventos';
 import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { AprovacaoCliente } from './AprovacaoCliente';
 import { AcordoProjetoPortal } from './AcordoProjetoPortal';
 import { PendenciaCliente } from './PendenciaCliente';
+import { ControleEscopoPortal, DecisaoMudancaEscopo } from './MudancaEscopoPortal';
 import styles from './portal.module.css';
 
 function formatarData(valor: string): string {
@@ -50,6 +52,11 @@ const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
   ajustes_solicitados: 'Ajuste solicitado',
   arquivo_liberado: 'Novo arquivo disponível',
   pendencia_concluida: 'Pendência confirmada pelo cliente',
+  mudanca_escopo_solicitada: 'Mudança solicitada pelo cliente',
+  mudanca_escopo_incluida: 'Mudança confirmada no combinado',
+  mudanca_escopo_proposta: 'Impacto enviado para decisão',
+  mudanca_escopo_aprovada: 'Mudança aprovada pelo cliente',
+  mudanca_escopo_recusada: 'Combinado original mantido',
 };
 
 function formatarMomento(valor: string): string {
@@ -68,6 +75,7 @@ function IconeEvento({ tipo }: { tipo: EventoPortalCliente['tipo'] }) {
   if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
   if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;
   if (tipo === 'pendencia_concluida') return <Check size={17} aria-hidden="true" />;
+  if (tipo.startsWith('mudanca_escopo')) return <FileCheck2 size={17} aria-hidden="true" />;
   return <Send size={17} aria-hidden="true" />;
 }
 
@@ -99,7 +107,10 @@ export function PortalProjeto({
   const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const aprovacoes = projeto.tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando');
   const dependencias = projeto.dependencias.filter((acao) => acao.status === 'pendente');
-  const totalAcoes = aprovacoes.length + dependencias.length;
+  const mudancasAguardando = projeto.mudancasEscopo.filter(
+    (mudanca) => mudanca.status === 'aguardando_cliente',
+  );
+  const totalAcoes = aprovacoes.length + dependencias.length + mudancasAguardando.length;
   const compartilhadas = projeto.tarefas.filter((tarefa) =>
     ['aguardando', 'aprovada', 'ajustes'].includes(tarefa.clienteStatus),
   );
@@ -142,17 +153,16 @@ export function PortalProjeto({
                     : 'Tudo em dia por aqui.'}
               </h2>
               <span>
-                {concluido
-                  ? 'O aceite final foi registrado. Os materiais continuam disponíveis neste portal.'
-                  : totalAcoes
-                    ? 'Resolva as pendências de preparação ou revise o que já foi entregue.'
-                    : 'Você não precisa fazer nada agora. Avisaremos quando uma validação estiver pronta.'}
+                {descreverProximaAcaoPortal(concluido, totalAcoes, mudancasAguardando.length)}
               </span>
             </div>
           </header>
 
           {totalAcoes ? (
             <div className={styles.listaAprovacoes}>
+              {mudancasAguardando.map((mudanca) => (
+                <DecisaoMudancaEscopo key={mudanca.id} codigo={codigo} mudanca={mudanca} />
+              ))}
               {dependencias.map((acao) => (
                 <PendenciaCliente key={acao.id} codigo={codigo} acao={acao} />
               ))}
@@ -210,6 +220,8 @@ export function PortalProjeto({
         </section>
 
         <AcordoProjetoPortal briefing={projeto.briefing} />
+
+        <ControleEscopoPortal codigo={codigo} mudancas={projeto.mudancasEscopo} />
 
         <div className={styles.painel}>
           <section className={styles.andamento} aria-labelledby="andamento-titulo">
@@ -381,6 +393,9 @@ function PosEntregaPortal({
           <ol>
             {projeto.eventos.slice(0, 8).map((evento) => {
               const tarefa = projeto.tarefas.find((item) => item.id === evento.tarefaId);
+              const mudanca = projeto.mudancasEscopo.find(
+                (item) => item.id === evento.mudancaEscopoId,
+              );
               return (
                 <li key={evento.id} data-cliente={evento.autor === 'cliente' || undefined}>
                   <span className={styles.iconeEvento}>
@@ -388,7 +403,7 @@ function PosEntregaPortal({
                   </span>
                   <div>
                     <strong>{ROTULO_EVENTO[evento.tipo]}</strong>
-                    <small>{tarefa?.titulo ?? 'Projeto geral'}</small>
+                    <small>{tarefa?.titulo ?? mudanca?.titulo ?? 'Projeto geral'}</small>
                     {evento.comentario && <p>{evento.comentario}</p>}
                   </div>
                   <time dateTime={evento.criadoEm}>{formatarMomento(evento.criadoEm)}</time>
