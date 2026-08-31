@@ -96,19 +96,15 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
     <>
       <AtualizarEnriquecimentos ativo={enriquecendo} />
       <div className={styles.resumoResultados}>
-        <div>
-          <span className={styles.resultadosLinha}>
-            <strong>{leads.length} empresas novas</strong>
-            {enriquecendo && (
-              <span className={styles.statusSegundoPlano} role="status">
-                <RefreshCw size={12} aria-hidden="true" />
-                Atualizando contatos
-              </span>
-            )}
-          </span>
-          <span>Ordenadas pela qualidade dos contatos encontrados.</span>
-        </div>
-        <span>Clique em “Ver detalhes” para consultar fontes, site e dados adicionais.</span>
+        <span className={styles.resultadosLinha}>
+          <strong>{leads.length} empresas</strong>
+          {enriquecendo && (
+            <span className={styles.statusSegundoPlano} role="status">
+              <RefreshCw size={12} aria-hidden="true" />
+              Atualizando contatos
+            </span>
+          )}
+        </span>
       </div>
 
       <div className={styles.gradeLeads} role="list">

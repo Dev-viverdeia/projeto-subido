@@ -1,7 +1,7 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-section);
+  gap: clamp(28px, 4vw, 44px);
 }
 
 .eyebrow,
@@ -23,11 +23,11 @@
 }
 
 .abertura {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: end;
-  gap: var(--app-gap-section);
-  padding: clamp(28px, 4vw, 48px);
+  justify-content: space-between;
+  gap: var(--app-gap-block);
+  padding: clamp(24px, 3vw, 36px);
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
@@ -42,42 +42,32 @@
 }
 
 .titulo {
-  max-width: 18ch;
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(2.15rem, 1.65rem + 1.9vw, 3.6rem);
-  font-weight: 540;
-  line-height: 1.02;
+  font-size: clamp(2rem, 1.7rem + 1vw, 2.75rem);
+  font-weight: 560;
+  line-height: 1.08;
   letter-spacing: var(--app-ls-h1);
   color: var(--via-text-primary);
   text-wrap: balance;
 }
 
 .apoio {
-  max-width: 61ch;
-  margin: var(--via-space-4) 0 0;
-  font-size: var(--via-fs-body);
-  line-height: 1.6;
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--via-fs-sm);
+  line-height: 1.5;
   color: var(--via-text-muted);
   text-wrap: pretty;
 }
 
 .contagem {
-  display: grid;
-  gap: var(--via-space-1);
-  min-width: 156px;
   margin: 0;
-  padding-left: var(--via-space-5);
-  border-left: 1px solid var(--via-border-hairline);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
   font-size: var(--via-fs-xs);
   color: var(--via-text-muted);
-}
-
-.contagem strong {
-  font-size: var(--via-fs-h2);
-  font-weight: 520;
-  letter-spacing: var(--app-ls-h2);
-  color: var(--via-text-primary);
 }
 
 .secaoDestaque,
@@ -87,10 +77,10 @@
 }
 
 .secaoCabecalho {
-  display: grid;
-  grid-template-columns: minmax(0, 0.72fr) minmax(280px, 0.28fr);
+  display: flex;
   align-items: end;
-  gap: var(--app-gap-section);
+  justify-content: space-between;
+  gap: var(--app-gap-block);
 }
 
 .secaoCabecalho h2,
@@ -100,19 +90,11 @@
 
 .secaoCabecalho h2 {
   font-family: var(--via-font-display);
-  font-size: clamp(1.55rem, 1.35rem + 0.7vw, 2.1rem);
+  font-size: clamp(1.35rem, 1.2rem + 0.5vw, 1.75rem);
   font-weight: 560;
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-h2);
   color: var(--via-text-primary);
-}
-
-.secaoCabecalho > p {
-  max-width: 42ch;
-  font-size: var(--via-fs-sm);
-  line-height: 1.55;
-  color: var(--via-text-muted);
-  text-wrap: pretty;
 }
 
 .destaque,
@@ -143,7 +125,7 @@
 .destaque {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(270px, 0.34fr);
-  min-height: 280px;
+  min-height: 220px;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-surface);
   background: color-mix(in srgb, var(--app-elev-1-bg) 86%, transparent);
@@ -162,7 +144,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(28px, 4vw, 48px);
+  padding: clamp(26px, 3.5vw, 40px);
 }
 
 .projetoTipo {
@@ -177,7 +159,7 @@
   max-width: 20ch;
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(1.85rem, 1.5rem + 1.15vw, 2.75rem);
+  font-size: clamp(1.65rem, 1.4rem + 0.8vw, 2.25rem);
   font-weight: 550;
   line-height: 1.04;
   letter-spacing: var(--app-ls-h2);
@@ -187,9 +169,9 @@
 
 .resultado {
   max-width: 64ch;
-  margin: var(--via-space-4) 0 0;
-  font-size: var(--via-fs-body);
-  line-height: 1.6;
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-sm);
+  line-height: 1.5;
   color: var(--via-text-muted);
   text-wrap: pretty;
 }
@@ -268,7 +250,7 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  min-height: 270px;
+  min-height: 210px;
   height: 100%;
   padding: var(--app-pad-card);
   border: 1px solid var(--app-elev-1-line);
@@ -297,7 +279,7 @@
 
 .cartaoCorpo {
   flex: 1;
-  padding-block: var(--via-space-7);
+  padding-block: var(--via-space-5);
 }
 
 .cartao h3 {
@@ -315,7 +297,7 @@
 .cartaoCorpo p {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   overflow: hidden;
   max-width: 60ch;
   margin: var(--via-space-3) 0 0;
@@ -410,18 +392,12 @@
 
 @media (max-width: 899px) {
   .abertura,
-  .secaoCabecalho,
   .destaque {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .contagem {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: baseline;
-    min-width: 0;
-    padding: var(--via-space-4) 0 0;
-    border-top: 1px solid var(--via-border-hairline);
-    border-left: 0;
+    flex: none;
   }
 
   .destaqueRodape {
@@ -464,7 +440,7 @@
   }
 
   .cartao {
-    min-height: 240px;
+    min-height: 200px;
   }
 
   .catalogoVazio {

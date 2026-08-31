@@ -12,7 +12,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--app-gap-section);
-  padding: var(--via-space-2) var(--via-space-1) 0;
+  padding: 0 var(--via-space-1);
 }
 
 .introducao h1,
@@ -21,8 +21,7 @@
 }
 
 .introducao h1 {
-  margin-top: var(--via-space-1);
-  font-size: clamp(2.15rem, 3.4vw, 3.35rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 560;
   line-height: 1;
   letter-spacing: var(--app-ls-h1);
@@ -30,9 +29,9 @@
 
 .introducao > p:last-child {
   max-width: 62ch;
-  margin-top: var(--via-space-3);
+  margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }

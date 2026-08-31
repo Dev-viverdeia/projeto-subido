@@ -1,16 +1,7 @@
 import Link from 'next/link';
-import {
-  ArrowRight,
-  CalendarCheck2,
-  ChartNoAxesCombined,
-  CircleDollarSign,
-  FileClock,
-  ListTodo,
-  Target,
-} from 'lucide-react';
+import { ArrowRight, CalendarCheck2, CircleDollarSign, FileClock, ListTodo } from 'lucide-react';
 import {
   PERIODOS_METRICAS,
-  ROTULO_PERIODO,
   type ContagemComercial,
   type MetricasComerciais,
 } from '@/lib/metricas/modelo';
@@ -28,14 +19,13 @@ type ChaveContagem = keyof ContagemComercial;
 const INDICADORES: Array<{
   id: ChaveContagem;
   rotulo: string;
-  detalhe: string;
 }> = [
-  { id: 'prospeccoes', rotulo: 'Prospecções', detalhe: 'empresas encontradas' },
-  { id: 'abordagens', rotulo: 'Abordagens', detalhe: 'empresas contatadas' },
-  { id: 'oportunidades', rotulo: 'Oportunidades', detalhe: 'vendas abertas no CRM' },
-  { id: 'propostas', rotulo: 'Propostas', detalhe: 'enviadas ao cliente' },
-  { id: 'ganhos', rotulo: 'Ganhos', detalhe: 'vendas concluídas' },
-  { id: 'perdas', rotulo: 'Perdas', detalhe: 'vendas encerradas' },
+  { id: 'prospeccoes', rotulo: 'Prospecções' },
+  { id: 'abordagens', rotulo: 'Abordagens' },
+  { id: 'oportunidades', rotulo: 'Oportunidades' },
+  { id: 'propostas', rotulo: 'Propostas' },
+  { id: 'ganhos', rotulo: 'Ganhos' },
+  { id: 'perdas', rotulo: 'Perdas' },
 ];
 
 function numero(valor: number): string {
@@ -61,7 +51,6 @@ function taxa(valor: number | null, complemento: string): string {
 }
 
 export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
-  const maximoAtividade = Math.max(1, ...INDICADORES.map((item) => metricas.funil[item.id]));
   const etapasFunil = [
     {
       id: 'prospeccoes' as const,
@@ -98,13 +87,9 @@ export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
   return (
     <div className={styles.pagina}>
       <header className={styles.hero}>
-        <div className={styles.heroMarca} aria-hidden="true">
-          <ChartNoAxesCombined size={24} strokeWidth={1.6} />
-        </div>
         <div className={styles.heroTexto}>
-          <p className={styles.sobretitulo}>Diagnóstico comercial</p>
           <h1>Métricas</h1>
-          <p>Veja onde suas vendas avançam e qual etapa precisa de atenção agora.</p>
+          <p>Veja o funil e o próximo ponto de atenção.</p>
         </div>
 
         <nav className={styles.periodos} aria-label="Período das métricas">
@@ -128,64 +113,60 @@ export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
             <article key={indicador.id} data-indicador={indicador.id}>
               <span>{indicador.rotulo}</span>
               <strong>{numero(valor)}</strong>
-              <small>{indicador.detalhe}</small>
               <em>{comparacao(valor, anterior)}</em>
             </article>
           );
         })}
       </section>
 
-      <section className={styles.funil} data-on-dark aria-labelledby="funil-titulo">
-        <header className={styles.funilTopo}>
-          <div>
-            <p className={styles.sobretituloEscuro}>Funil de vendas</p>
-            <h2 id="funil-titulo">Da lista ao cliente.</h2>
-            <p>Uma leitura simples do método comercial, sem misturar rascunhos com propostas.</p>
-          </div>
-          <span>{metricas.rotuloPeriodo}</span>
-        </header>
+      <details className={styles.detalhesFunil}>
+        <summary>Ver funil de vendas</summary>
+        <section className={styles.funil} data-on-dark aria-labelledby="funil-titulo">
+          <header className={styles.funilTopo}>
+            <div>
+              <h2 id="funil-titulo">Da lista ao cliente</h2>
+            </div>
+            <span>{metricas.rotuloPeriodo}</span>
+          </header>
 
-        <ol className={styles.etapasFunil}>
-          {etapasFunil.map((etapa) => (
-            <li key={etapa.id}>
-              <span className={styles.numeroEtapa}>{etapa.numero}</span>
-              <strong>{numero(metricas.funil[etapa.id])}</strong>
-              <h3>{etapa.rotulo}</h3>
-              <small>{etapa.conversao}</small>
-            </li>
-          ))}
-        </ol>
+          <ol className={styles.etapasFunil}>
+            {etapasFunil.map((etapa) => (
+              <li key={etapa.id}>
+                <span className={styles.numeroEtapa}>{etapa.numero}</span>
+                <strong>{numero(metricas.funil[etapa.id])}</strong>
+                <h3>{etapa.rotulo}</h3>
+                <small>{etapa.conversao}</small>
+              </li>
+            ))}
+          </ol>
 
-        <footer className={styles.funilRodape}>
-          <div>
-            <span>Conversão total</span>
-            <strong>
-              {metricas.taxas.total === null ? 'Sem base' : `${metricas.taxas.total}%`}
-            </strong>
-            <small>das empresas encontradas até a venda</small>
-          </div>
-          <div>
-            <span>Vendas perdidas</span>
-            <strong>{numero(metricas.funil.perdas)}</strong>
-            <small>saídas registradas no período</small>
-          </div>
-        </footer>
-      </section>
+          <footer className={styles.funilRodape}>
+            <div>
+              <span>Conversão total</span>
+              <strong>
+                {metricas.taxas.total === null ? 'Sem base' : `${metricas.taxas.total}%`}
+              </strong>
+              <small>das empresas encontradas até a venda</small>
+            </div>
+            <div>
+              <span>Vendas perdidas</span>
+              <strong>{numero(metricas.funil.perdas)}</strong>
+              <small>saídas registradas no período</small>
+            </div>
+          </footer>
+        </section>
+      </details>
 
       <div className={styles.gradeDiagnostico}>
         <section className={styles.diagnostico} aria-labelledby="diagnostico-titulo">
           <div className={styles.diagnosticoCabecalho}>
-            <span className={styles.alvo} aria-hidden="true">
-              <Target size={21} strokeWidth={1.7} />
-            </span>
             <div>
-              <p className={styles.sobretitulo}>Leitura para consultoria</p>
               <h2 id="diagnostico-titulo">{metricas.diagnostico.titulo}</h2>
             </div>
           </div>
           <p className={styles.diagnosticoDescricao}>{metricas.diagnostico.descricao}</p>
           <ul>
-            {metricas.diagnostico.observacoes.map((observacao) => (
+            {metricas.diagnostico.observacoes.slice(0, 2).map((observacao) => (
               <li key={observacao}>{observacao}</li>
             ))}
           </ul>
@@ -233,34 +214,10 @@ export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
         </section>
       </div>
 
-      <div className={styles.gradeDetalhes}>
-        <section className={styles.atividade} aria-labelledby="atividade-titulo">
-          <header>
-            <div>
-              <p className={styles.sobretitulo}>Volume do período</p>
-              <h2 id="atividade-titulo">Atividade comercial</h2>
-            </div>
-            <span>{ROTULO_PERIODO[metricas.periodo]}</span>
-          </header>
-          <div className={styles.barras}>
-            {INDICADORES.map((indicador) => {
-              const valor = metricas.funil[indicador.id];
-              return (
-                <div className={styles.barra} key={indicador.id}>
-                  <div>
-                    <span>{indicador.rotulo}</span>
-                    <strong>{numero(valor)}</strong>
-                  </div>
-                  <progress max={maximoAtividade} value={valor} aria-label={indicador.rotulo} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
+      <details className={styles.detalhesSecundarios}>
+        <summary>Ver motivos de perda</summary>
         <section className={styles.perdas} aria-labelledby="perdas-titulo">
           <header>
-            <p className={styles.sobretitulo}>Aprendizado comercial</p>
             <h2 id="perdas-titulo">Motivos de perda</h2>
           </header>
           {metricas.perdasPorMotivo.length ? (
@@ -283,11 +240,8 @@ export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
               <p>Quando uma venda for encerrada, registre o motivo para orientar a consultoria.</p>
             </div>
           )}
-          <p className={styles.notaPerdas}>
-            Motivos bem registrados ajudam a revisar qualificação, proposta e follow-up.
-          </p>
         </section>
-      </div>
+      </details>
     </div>
   );
 }

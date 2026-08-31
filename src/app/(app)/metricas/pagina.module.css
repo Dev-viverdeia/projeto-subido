@@ -1,7 +1,7 @@
 .pagina {
   display: grid;
   width: min(100%, var(--app-canvas));
-  gap: var(--app-gap-section);
+  gap: var(--app-gap-block);
   margin-inline: auto;
 }
 
@@ -27,11 +27,11 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-5);
-  min-height: 184px;
-  padding: clamp(28px, 4vw, 48px);
+  min-height: 128px;
+  padding: clamp(24px, 3vw, 34px);
   overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
@@ -68,9 +68,9 @@
 
 .hero h1 {
   max-width: 14ch;
-  margin: var(--via-space-2) 0 0;
+  margin: 0;
   color: var(--via-text-primary);
-  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: var(--via-fw-medium);
   line-height: 0.96;
   letter-spacing: var(--app-ls-h1);
@@ -79,7 +79,7 @@
 
 .heroTexto > p:last-child {
   max-width: 48ch;
-  margin: var(--via-space-3) 0 0;
+  margin: var(--via-space-2) 0 0;
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
@@ -151,7 +151,7 @@
 .resumo article {
   display: grid;
   min-width: 0;
-  min-height: 148px;
+  min-height: 108px;
   align-content: start;
   gap: var(--via-space-1);
   padding: var(--app-pad-card-tight);
@@ -174,10 +174,10 @@
 }
 
 .resumo strong {
-  margin-block: var(--via-space-2);
+  margin-block: var(--via-space-1);
   color: var(--via-text-primary);
   font-family: var(--via-font-mono);
-  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  font-size: clamp(1.6rem, 2.5vw, 2.25rem);
   font-weight: var(--via-fw-medium);
   line-height: 0.95;
   letter-spacing: var(--app-ls-h2);
@@ -195,9 +195,49 @@
 
 .resumo em {
   margin-top: auto;
-  padding-top: var(--via-space-3);
+  padding-top: var(--via-space-2);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--app-em-ink);
+}
+
+.detalhesFunil,
+.detalhesSecundarios {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 82%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(20px) saturate(132%);
+}
+
+.detalhesFunil > summary,
+.detalhesSecundarios > summary {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  padding: 0 var(--app-pad-card);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+  list-style: none;
+}
+
+.detalhesFunil > summary::-webkit-details-marker,
+.detalhesSecundarios > summary::-webkit-details-marker {
+  display: none;
+}
+
+.detalhesFunil[open] > summary,
+.detalhesSecundarios[open] > summary {
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.detalhesFunil > .funil,
+.detalhesSecundarios > .perdas {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .funil {
@@ -401,7 +441,7 @@
 .diagnostico {
   position: relative;
   display: flex;
-  min-height: 340px;
+  min-height: 280px;
   flex-direction: column;
   padding: clamp(24px, 3.2vw, 40px);
   overflow: hidden;
@@ -439,7 +479,7 @@
 
 .diagnosticoDescricao {
   max-width: 62ch;
-  margin: var(--via-space-5) 0 0;
+  margin: var(--via-space-4) 0 0;
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
@@ -449,7 +489,7 @@
 .diagnostico ul {
   display: grid;
   gap: var(--via-space-2);
-  margin: var(--via-space-5) 0;
+  margin: var(--via-space-4) 0;
   padding: 0;
   list-style: none;
 }
@@ -756,11 +796,11 @@
 
 @media (max-width: 899px) {
   .hero {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .periodos {
-    grid-column: 1 / -1;
+    grid-column: auto;
     width: fit-content;
   }
 
@@ -795,7 +835,7 @@
   }
 
   .hero h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .periodos {
@@ -852,9 +892,17 @@
     padding: var(--via-space-3);
   }
 
-  .funilRodape,
-  .saudeGrade {
+  .funilRodape {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .saudeGrade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .saudeGrade article {
+    min-height: 104px;
+    padding: var(--via-space-3);
   }
 
   .diagnostico,

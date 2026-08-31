@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Bot, FileText, Image as ImageIcon, Link2, Mic, Plus } from 'lucide-react';
+import { Bot, Plus } from 'lucide-react';
 import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
@@ -80,28 +80,15 @@ export function TelaSobral({
         <div className={`${styles.areaChat} ${vazio ? styles.areaVazia : ''}`}>
           {vazio ? (
             <div className={styles.boasVindas}>
-              <p className={styles.eyebrow}>
-                {contextoInicial
-                  ? `Tarefa conectada · ${contextoInicial.empresa}`
-                  : 'Conversa nova'}
-              </p>
+              {contextoInicial ? (
+                <p className={styles.eyebrow}>Tarefa conectada · {contextoInicial.empresa}</p>
+              ) : null}
               <h2>{contextoInicial ? contextoInicial.tarefa : 'Como posso ajudar?'}</h2>
               <p className={styles.apoio}>
                 {contextoInicial
                   ? 'O pedido abaixo já reúne o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie quando estiver pronto.'
-                  : 'Pergunte sobre uma venda, um cliente ou uma implementação. Você também pode enviar um arquivo para eu analisar.'}
+                  : 'Pergunte ou envie um arquivo.'}
               </p>
-              <ul className={styles.capacidades} aria-label="Formatos aceitos">
-                <li>
-                  <FileText size={15} aria-hidden="true" /> Documentos
-                </li>
-                <li>
-                  <ImageIcon size={15} aria-hidden="true" /> Imagens
-                </li>
-                <li>
-                  <Mic size={15} aria-hidden="true" /> Áudios
-                </li>
-              </ul>
             </div>
           ) : (
             <div className={styles.historico}>
@@ -117,10 +104,6 @@ export function TelaSobral({
               exemplos={vazio && !contextoInicial ? EXEMPLOS : undefined}
               textoInicial={contextoInicial?.mensagem}
             />
-            <p className={styles.contextoConectado}>
-              <Link2 size={13} strokeWidth={1.8} aria-hidden="true" />O Sobral AI usa seus registros
-              da plataforma para responder com contexto.
-            </p>
           </div>
         </div>
       </section>

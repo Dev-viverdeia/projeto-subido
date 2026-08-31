@@ -38,7 +38,7 @@
 
 .cabecalho {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.36fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.3fr);
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
@@ -60,15 +60,15 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 320px;
-  padding: clamp(30px, 4.5vw, 58px);
+  min-height: 220px;
+  padding: clamp(28px, 3.5vw, 44px);
 }
 
 .cabecalho h1 {
   max-width: 18ch;
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(2.15rem, 1.7rem + 1.8vw, 3.65rem);
+  font-size: clamp(2rem, 1.7rem + 1.2vw, 3rem);
   font-weight: 540;
   line-height: 1.02;
   letter-spacing: var(--app-ls-h1);
@@ -78,19 +78,45 @@
 
 .resultado {
   max-width: 66ch;
-  margin: var(--via-space-5) 0 0;
-  font-size: var(--via-fs-body);
-  line-height: 1.62;
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-sm);
+  line-height: 1.52;
   color: var(--via-text-muted);
   text-wrap: pretty;
+}
+
+.metaProjeto,
+.progressoCabecalho {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  color: var(--via-text-faint);
+}
+
+.metaProjeto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin: var(--via-space-4) 0 0;
+}
+
+.progressoCabecalho {
+  display: flex;
+  align-items: baseline;
+  gap: var(--via-space-2);
+  margin: 0;
+}
+
+.progressoCabecalho strong {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
 }
 
 .cabecalhoAcao {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--via-space-7);
-  padding: clamp(26px, 3.5vw, 42px);
+  gap: var(--via-space-5);
+  padding: clamp(24px, 3vw, 34px);
   border-left: 1px solid var(--via-border-hairline);
   background: color-mix(in srgb, var(--via-navy) 3%, transparent);
 }
@@ -145,6 +171,69 @@
     transform var(--app-t-touch),
     background-color var(--app-t-state),
     box-shadow var(--app-t-touch);
+}
+
+.etapasProjeto {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 88%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(20px) saturate(130%);
+}
+
+.abasProjeto {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-2);
+  padding: var(--via-space-2);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+}
+
+.abasProjeto button {
+  min-height: var(--app-h-control);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  font-weight: 620;
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+
+.abasProjeto button:hover {
+  background: var(--via-navy-08);
+  color: var(--via-text-primary);
+}
+
+.abasProjeto button[data-ativa] {
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.abasProjeto button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.painelProjeto > .aprendizado,
+.painelProjeto > .implementacao,
+.painelProjeto > .kitProjeto {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.kitProjetoDireto > .kitCorpo {
+  border-top: 0;
 }
 
 .acaoPrincipal span {
@@ -579,14 +668,20 @@
   color: var(--via-text-muted);
 }
 
-.aprendizadoConcluido a {
+.aprendizadoConcluido a,
+.aprendizadoConcluido button {
+  border: 0;
+  background: transparent;
   color: var(--via-navy);
+  font: inherit;
   font-size: var(--via-fs-xs);
   font-weight: 620;
   text-decoration: none;
+  cursor: pointer;
 }
 
-.aprendizadoConcluido a:focus-visible {
+.aprendizadoConcluido a:focus-visible,
+.aprendizadoConcluido button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }
@@ -1173,7 +1268,8 @@
   .cabecalho,
   .aprendizado,
   .implementacao,
-  .kitProjeto {
+  .kitProjeto,
+  .etapasProjeto {
     border-radius: var(--app-radius-card);
   }
 
@@ -1189,6 +1285,11 @@
 
   .cabecalho h1 {
     font-size: clamp(2rem, 10vw, 2.75rem);
+  }
+
+  .abasProjeto {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: auto;
   }
 
   .aulaNavegacao,
