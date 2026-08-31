@@ -25,6 +25,7 @@ import {
   type AcaoPlanoProjeto,
 } from './plano';
 import { obterEncerramentoUnico, type EncerramentoProjeto } from './encerramento';
+import { obterEvolucaoUnica, type EvolucaoProjeto } from './evolucao';
 import type { TipoEventoProjeto } from './eventos';
 
 export type { AcaoPlanoProjeto } from './plano';
@@ -123,6 +124,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   eventos: EventoProjetoExecucao[];
   mudancasEscopo: MudancaEscopoProjeto[];
   encerramento: EncerramentoProjeto | null;
+  evolucao: EvolucaoProjeto | null;
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -228,7 +230,7 @@ export const obterProjetoExecucao = cache(
     const { data, error } = await supabase
       .from('projetos_execucao')
       .select(
-        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*), projeto_mudancas_escopo(*), projeto_encerramentos(*)',
+        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*), projeto_mudancas_escopo(*), projeto_encerramentos(*), projeto_evolucoes(*)',
       )
       .eq('id', id)
       .maybeSingle();
@@ -404,6 +406,7 @@ export const obterProjetoExecucao = cache(
         .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
       mudancasEscopo: mapearMudancasEscopo(data.projeto_mudancas_escopo),
       encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
+      evolucao: obterEvolucaoUnica(data.projeto_evolucoes),
       acoesPlano,
     };
   },

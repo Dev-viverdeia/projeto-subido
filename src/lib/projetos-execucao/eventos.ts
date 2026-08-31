@@ -14,4 +14,5 @@ export type TipoEventoProjeto =
   | 'mudanca_escopo_aprovada'
   | 'mudanca_escopo_recusada'
   | 'encerramento_enviado'
-  | 'projeto_encerrado';
+  | 'projeto_encerrado'
+  | 'revisao_resultado_registrada';

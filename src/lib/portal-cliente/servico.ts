@@ -12,6 +12,7 @@ import { lerDocumentoProposta } from '@/lib/propostas/schema';
 import { mapearMudancasEscopo } from '@/lib/projetos-execucao/mudancas-escopo';
 import { lerBriefingKickoff } from '@/lib/projetos-execucao/briefing';
 import { obterEncerramentoUnico } from '@/lib/projetos-execucao/encerramento';
+import { obterEvolucaoUnica } from '@/lib/projetos-execucao/evolucao';
 // Exceção deliberada: o link secreto é resolvido no servidor sem abrir SELECT
 // para `anon`. O retorno abaixo contém só o recorte preparado para o cliente.
 // eslint-disable-next-line no-restricted-imports
@@ -39,7 +40,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente), projeto_mudancas_escopo(*), projeto_encerramentos(*)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente), projeto_mudancas_escopo(*), projeto_encerramentos(*), projeto_evolucoes(*)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -174,6 +175,7 @@ export const obterPortalCliente = cache(
           }
         : null,
       encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
+      evolucao: obterEvolucaoUnica(data.projeto_evolucoes),
     };
   },
 );

@@ -11,6 +11,7 @@ export const EVENTOS_VISIVEIS_PORTAL = [
   'mudanca_escopo_recusada',
   'encerramento_enviado',
   'projeto_encerrado',
+  'revisao_resultado_registrada',
 ] as const;
 
 export function descreverProximaAcaoPortal(

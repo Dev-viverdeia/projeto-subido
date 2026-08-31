@@ -1,4 +1,5 @@
 import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
+import type { EvolucaoProjeto } from '@/lib/projetos-execucao/evolucao';
 import type { MudancaEscopoProjeto } from '@/lib/projetos-execucao/mudancas-escopo';
 import type { TipoEventoProjeto } from '@/lib/projetos-execucao/eventos';
 import type {
@@ -54,6 +55,7 @@ export type EventoPortalCliente = {
     | 'mudanca_escopo_recusada'
     | 'encerramento_enviado'
     | 'projeto_encerrado'
+    | 'revisao_resultado_registrada'
   >;
   autor: 'prestador' | 'cliente';
   comentario: string | null;
@@ -93,4 +95,5 @@ export type ProjetoPortalCliente = {
     proximosPassos: string[];
   } | null;
   encerramento: EncerramentoProjeto | null;
+  evolucao: EvolucaoProjeto | null;
 };

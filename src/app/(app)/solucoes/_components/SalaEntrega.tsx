@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowRight, Check, FolderOpen, Play, UsersRound } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import type {
   ProjetoExecucaoCompleto,
   TarefaProjetoExecucao,
@@ -19,14 +19,14 @@ import {
 import { formatarDataProjeto } from '@/lib/projetos-execucao/prazo';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
+import { EvolucaoProjeto } from './EvolucaoProjeto';
 import { JornadaEntrega } from './JornadaEntrega';
+import { NavegacaoSalaEntrega, type PainelSala } from './NavegacaoSalaEntrega';
 import { PainelClienteEntrega } from './PainelClienteEntrega';
 import { PlanoVivo } from './PlanoVivo';
 import { TarefaEntrega } from './TarefaEntrega';
 import { resumirEscopoSala } from './sala-entrega-resumo';
 import styles from './SalaEntrega.module.css';
-
-type PainelSala = 'execucao' | 'arquivos' | 'cliente';
 
 export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const fases = useMemo(
@@ -62,9 +62,10 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const percentual = projeto.total ? Math.round((projeto.feitas / projeto.total) * 100) : 0;
   const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const briefingConfirmado = Boolean(projeto.briefing.confirmadoEm);
-  const [painel, setPainel] = useState<PainelSala>(
-    briefingConfirmado && projeto.feitas > 0 ? 'execucao' : 'cliente',
-  );
+  const [painel, setPainel] = useState<PainelSala>(() => {
+    if (projeto.status === 'concluido') return 'evolucao';
+    return briefingConfirmado && projeto.feitas > 0 ? 'execucao' : 'cliente';
+  });
   const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
   const entregasAguardando = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'aguardando',
@@ -229,53 +230,18 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
         </nav>
       </header>
 
-      <nav className={styles.paineis} aria-label="Áreas da entrega">
-        <button
-          type="button"
-          data-ativo={painel === 'execucao' || undefined}
-          aria-current={painel === 'execucao' ? 'page' : undefined}
-          onClick={() => setPainel('execucao')}
-        >
-          <Play size={17} aria-hidden="true" />
-          <span>
-            <strong>Executar</strong>
-            <small>
-              {projeto.status === 'concluido'
-                ? 'Entrega encerrada'
-                : (proxima?.titulo ?? 'Aceite final')}
-            </small>
-          </span>
-        </button>
-        <button
-          type="button"
-          data-ativo={painel === 'arquivos' || undefined}
-          aria-current={painel === 'arquivos' ? 'page' : undefined}
-          onClick={() => {
-            setArquivoTarefaId(null);
-            setPainel('arquivos');
-          }}
-        >
-          <FolderOpen size={17} aria-hidden="true" />
-          <span>
-            <strong>Arquivos</strong>
-            <small>
-              {projeto.arquivos.length} {projeto.arquivos.length === 1 ? 'arquivo' : 'arquivos'}
-            </small>
-          </span>
-        </button>
-        <button
-          type="button"
-          data-ativo={painel === 'cliente' || undefined}
-          aria-current={painel === 'cliente' ? 'page' : undefined}
-          onClick={() => setPainel('cliente')}
-        >
-          <UsersRound size={17} aria-hidden="true" />
-          <span>
-            <strong>Cliente e escopo</strong>
-            <small>{rotuloCliente}</small>
-          </span>
-        </button>
-      </nav>
+      <NavegacaoSalaEntrega
+        painel={painel}
+        concluido={projeto.status === 'concluido'}
+        evolucaoRegistrada={projeto.evolucao?.status === 'registrada'}
+        proximaTarefa={proxima?.titulo ?? null}
+        totalArquivos={projeto.arquivos.length}
+        rotuloCliente={rotuloCliente}
+        onChange={(proximoPainel) => {
+          if (proximoPainel === 'arquivos') setArquivoTarefaId(null);
+          setPainel(proximoPainel);
+        }}
+      />
 
       {painel === 'execucao' && (
         <>
@@ -417,6 +383,15 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             onComecar={abrirProximaAcao}
           />
         </div>
+      )}
+
+      {painel === 'evolucao' && (
+        <EvolucaoProjeto
+          projetoId={projeto.id}
+          oportunidadeId={projeto.oportunidadeId}
+          encerramento={projeto.encerramento}
+          evolucao={projeto.evolucao}
+        />
       )}
     </div>
   );

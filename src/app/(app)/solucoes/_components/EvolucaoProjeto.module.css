@@ -1,0 +1,565 @@
+.evolucao,
+.indisponivel {
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(22px) saturate(132%);
+}
+
+.evolucao {
+  overflow: hidden;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+}
+
+.icone {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--via-accent) 32%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-accent-soft) 68%, var(--via-surface));
+  color: var(--via-accent-ink);
+}
+
+.titulo p,
+.titulo h2,
+.resultado p,
+.resultado h3,
+.agendamento p,
+.formulario p {
+  margin: 0;
+}
+
+.titulo p,
+.status,
+.contexto span,
+.resultadoPrincipal > p,
+.decisaoFinal > span,
+.formulario label > span,
+.decisoes legend {
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.titulo p {
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-micro);
+}
+
+.titulo h2 {
+  margin-top: 3px;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+}
+
+.status {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-inline: 10px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-chip);
+  background: rgba(255, 255, 255, 0.66);
+  color: var(--via-text-muted);
+  font-size: 0.58rem;
+}
+
+.evolucao[data-registrada] .status {
+  border-color: color-mix(in srgb, var(--via-success) 28%, var(--via-border));
+  color: var(--via-success);
+}
+
+.contexto {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.contexto > div {
+  min-width: 0;
+  padding: var(--via-space-4) var(--via-space-5);
+  border-right: 1px solid var(--via-border-hairline);
+}
+
+.contexto > div:last-child {
+  border-right: 0;
+}
+
+.contexto span,
+.resultadoPrincipal > p,
+.decisaoFinal > span,
+.formulario label > span,
+.decisoes legend {
+  display: block;
+  color: var(--via-text-faint);
+  font-size: 0.57rem;
+}
+
+.contexto strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  line-height: 1.45;
+}
+
+.pendente {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  align-items: start;
+}
+
+.agendamento {
+  display: grid;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  border-right: 1px solid var(--via-border-hairline);
+}
+
+.agendamento label,
+.formulario label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--via-space-2);
+}
+
+.agendamento label > span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.agendamento input,
+.formulario input,
+.formulario textarea {
+  width: 100%;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+
+.agendamento input,
+.formulario input {
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+}
+
+.formulario textarea {
+  min-height: 88px;
+  padding: var(--via-space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.agendamento input:focus,
+.formulario input:focus,
+.formulario textarea:focus {
+  outline: none;
+  border-color: var(--via-accent-ink);
+  box-shadow: var(--app-ring);
+}
+
+.agendamento button,
+.rodapeFormulario button,
+.acaoNovoCiclo {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  border-radius: var(--app-radius-control);
+  font: 650 var(--via-fs-xs) var(--via-font);
+  cursor: pointer;
+}
+
+.agendamento button {
+  border: 1px solid var(--via-border);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--via-text-primary);
+}
+
+.agendamento p {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: 1.4;
+}
+
+.formulario {
+  display: grid;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+}
+
+.instrucao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-success) 20%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-success) 6%, rgba(255, 255, 255, 0.72));
+  color: var(--via-success);
+}
+
+.instrucao strong,
+.instrucao span {
+  display: block;
+}
+
+.instrucao strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+}
+
+.instrucao span {
+  margin-top: 2px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+}
+
+.gradeCampos,
+.gradeProximoPasso {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
+  gap: var(--via-space-3);
+}
+
+.formulario label small {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.decisoes {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.decisoes legend {
+  margin-bottom: var(--via-space-2);
+}
+
+.decisoes > div {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--via-space-2);
+}
+
+.decisoes label {
+  min-height: 108px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.54);
+  cursor: pointer;
+}
+
+.decisoes label:has(input:checked) {
+  border-color: var(--via-navy);
+  background: color-mix(in srgb, var(--via-navy) 5%, rgba(255, 255, 255, 0.72));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--via-navy) 14%, transparent);
+}
+
+.decisoes input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.marcaRadio {
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+  border: 1px solid var(--via-border-strong);
+  border-radius: 50%;
+  background: var(--via-surface);
+}
+
+.decisoes label:has(input:checked) .marcaRadio {
+  border: 4px solid var(--via-navy);
+}
+
+.decisoes label strong,
+.decisoes label small {
+  display: block;
+}
+
+.decisoes label strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  line-height: 1.35;
+}
+
+.decisoes label small {
+  margin-top: 5px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: 1.45;
+}
+
+.compartilhar {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3) !important;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.compartilhar input {
+  width: 17px;
+  min-height: auto;
+  height: 17px;
+  accent-color: var(--via-navy);
+}
+
+.compartilhar strong,
+.compartilhar small {
+  display: block;
+}
+
+.compartilhar strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+}
+
+.compartilhar small {
+  margin-top: 2px;
+}
+
+.erro,
+.sucesso {
+  padding: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  font-size: var(--via-fs-xs);
+}
+
+.erro {
+  background: color-mix(in srgb, var(--via-danger) 9%, var(--via-surface));
+  color: var(--via-danger);
+}
+
+.sucesso {
+  background: color-mix(in srgb, var(--via-success) 9%, var(--via-surface));
+  color: var(--via-success);
+}
+
+.rodapeFormulario,
+.resultado footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+}
+
+.rodapeFormulario {
+  padding-top: var(--via-space-2);
+}
+
+.rodapeFormulario > span,
+.resultado footer > span {
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.rodapeFormulario button,
+.acaoNovoCiclo {
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.agendamento button:disabled,
+.rodapeFormulario button:disabled,
+.acaoNovoCiclo:disabled {
+  cursor: wait;
+  opacity: 0.56;
+}
+
+.resultado {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
+}
+
+.resultadoPrincipal,
+.decisaoFinal {
+  padding: var(--via-space-6);
+}
+
+.resultadoPrincipal {
+  border-right: 1px solid var(--via-border-hairline);
+}
+
+.resultadoPrincipal h3 {
+  max-width: 760px;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  line-height: 1.35;
+}
+
+.resultadoPrincipal a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-4);
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+}
+
+.decisaoFinal strong,
+.decisaoFinal p,
+.decisaoFinal time {
+  display: block;
+}
+
+.decisaoFinal strong {
+  margin-top: var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+}
+
+.decisaoFinal p {
+  margin-top: var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  line-height: 1.55;
+}
+
+.decisaoFinal time {
+  margin-top: var(--via-space-3);
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-micro);
+}
+
+.resultado footer {
+  grid-column: 1 / -1;
+  padding: var(--via-space-4) var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.indisponivel {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  color: var(--via-accent-ink);
+}
+
+.indisponivel strong,
+.indisponivel span {
+  display: block;
+}
+
+.indisponivel strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.indisponivel span {
+  margin-top: 3px;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+@media (max-width: 1080px) {
+  .pendente,
+  .resultado {
+    grid-template-columns: 1fr;
+  }
+
+  .agendamento,
+  .resultadoPrincipal {
+    border-right: 0;
+    border-bottom: 1px solid var(--via-border-hairline);
+  }
+
+  .agendamento {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .agendamento p {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 880px) {
+  .decisoes > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .cabecalho,
+  .rodapeFormulario,
+  .resultado footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+
+  .contexto,
+  .gradeCampos,
+  .gradeProximoPasso,
+  .agendamento,
+  .decisoes > div {
+    grid-template-columns: 1fr;
+  }
+
+  .contexto > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--via-border-hairline);
+  }
+
+  .contexto > div:last-child {
+    border-bottom: 0;
+  }
+
+  .agendamento p {
+    grid-column: auto;
+  }
+
+  .rodapeFormulario button,
+  .acaoNovoCiclo {
+    width: 100%;
+  }
+}

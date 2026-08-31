@@ -33,6 +33,11 @@ vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
 vi.mock('@/lib/projetos-execucao/encerramento-actions', () => ({
   salvarEncerramentoProjeto: vi.fn(),
 }));
+vi.mock('@/lib/projetos-execucao/evolucao-actions', () => ({
+  agendarRevisaoResultado: vi.fn(),
+  registrarRevisaoResultado: vi.fn(),
+}));
+vi.mock('@/lib/crm/actions', () => ({ iniciarNovoCicloCliente: vi.fn() }));
 vi.mock('@/lib/projetos-execucao/plano-actions', () => ({
   atualizarAcaoPlano: vi.fn(),
   salvarDependenciaProjeto: vi.fn(),
