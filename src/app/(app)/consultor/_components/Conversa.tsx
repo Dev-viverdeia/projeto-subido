@@ -26,10 +26,10 @@ export type ExemploDoConsultor = {
 type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | null;
 
 function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
-  if (etapa === 'enviando') return 'Recebendo seus arquivos';
-  if (etapa === 'lendo') return 'Entendendo o material';
-  if (comArquivos) return 'Cruzando o material com sua operação';
-  return 'Analisando sua operação';
+  if (etapa === 'enviando') return 'Recebendo o material';
+  if (etapa === 'lendo') return 'Lendo o que você enviou';
+  if (comArquivos) return 'Preparando a resposta com seus dados';
+  return 'Preparando uma resposta com seus dados';
 }
 
 export function Conversa({
@@ -227,7 +227,7 @@ export function Conversa({
               />
               <span>
                 <strong>{descricaoDaEtapa(etapa, arquivosEmVoo.length > 0)}</strong>
-                <small>Vendas, projetos e conteúdos estão entrando na resposta.</small>
+                <small>Você pode continuar aqui assim que eu terminar.</small>
               </span>
               <i aria-hidden="true" />
             </div>
@@ -308,7 +308,7 @@ export function Conversa({
             }}
             disabled={ocupado}
             rows={2}
-            placeholder="Conte o que você precisa vender, decidir ou entregar…"
+            placeholder="Conte o que você precisa resolver…"
           />
         </div>
 
@@ -333,7 +333,7 @@ export function Conversa({
               title="Anexar arquivo"
             >
               <Paperclip size={17} strokeWidth={1.9} aria-hidden="true" />
-              <span>Anexar</span>
+              <span>Arquivo</span>
             </button>
             <button
               type="button"
@@ -348,7 +348,7 @@ export function Conversa({
               ) : (
                 <Mic size={17} strokeWidth={1.9} aria-hidden="true" />
               )}
-              <span>{gravando ? 'Parar' : 'Áudio'}</span>
+              <span>{gravando ? 'Parar' : 'Gravar'}</span>
             </button>
             {gravando ? (
               <span className={styles.tempoGravacao} role="status">
@@ -356,7 +356,7 @@ export function Conversa({
                 {String(segundos % 60).padStart(2, '0')}
               </span>
             ) : (
-              <span className={styles.dicaAtalho}>Enter envia · Shift + Enter quebra linha</span>
+              <span className={styles.dicaAtalho}>Enter envia · Shift + Enter cria uma linha</span>
             )}
           </div>
 
@@ -373,7 +373,7 @@ export function Conversa({
 
       {exemplos && exemplos.length > 0 && arquivos.length === 0 ? (
         <ul className={styles.chips} aria-label="Exemplos de perguntas">
-          {exemplos.map((exemplo, indice) => (
+          {exemplos.map((exemplo) => (
             <li key={exemplo.rotulo}>
               <button
                 type="button"
@@ -383,12 +383,8 @@ export function Conversa({
                   campoRef.current?.focus();
                 }}
               >
-                <span className={styles.chipIndice} aria-hidden="true">
-                  {String(indice + 1).padStart(2, '0')}
-                </span>
                 <span className={styles.chipTexto}>
                   <strong>{exemplo.rotulo}</strong>
-                  {exemplo.descricao ? <small>{exemplo.descricao}</small> : null}
                 </span>
                 <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
               </button>

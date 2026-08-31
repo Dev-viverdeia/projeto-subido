@@ -12,20 +12,17 @@ import type { ContextoSobralTarefa } from '@/lib/projetos-execucao/contexto-sobr
 
 const EXEMPLOS: ExemploDoConsultor[] = [
   {
-    rotulo: 'Escolher a venda certa',
-    descricao: 'Priorize uma oportunidade e saiba o próximo passo.',
+    rotulo: 'Priorizar uma venda',
     texto:
       'Olhe minhas vendas abertas, escolha a oportunidade que merece atenção agora e me diga qual é o próximo passo.',
   },
   {
     rotulo: 'Preparar uma reunião',
-    descricao: 'Entre na conversa com perguntas e oferta alinhadas.',
     texto:
       'Me ajude a preparar minha próxima reunião para entender o problema do cliente e vender o projeto de IA certo.',
   },
   {
-    rotulo: 'Destravar um projeto',
-    descricao: 'Use o método e os materiais certos para entregar.',
+    rotulo: 'Avançar uma entrega',
     texto:
       'Analise os projetos que estou executando e me diga o que fazer para destravar a próxima entrega.',
   },
@@ -58,20 +55,18 @@ export function TelaSobral({
         <header className={styles.cabecalho}>
           <div className={styles.identidade}>
             <span className={styles.marca} aria-hidden="true">
-              <Bot size={19} strokeWidth={1.8} />
+              <Bot size={18} strokeWidth={1.8} />
             </span>
             <div>
-              <h1 id="titulo-sobral">Sobral AI</h1>
-              <p>
-                {conversa?.thread.titulo ?? 'Consultoria para vender e entregar projetos de IA'}
-              </p>
+              <h1 id="titulo-sobral">{conversa?.thread.titulo ?? 'Nova conversa'}</h1>
+              <p>Sobral AI · consultor conectado à sua conta</p>
             </div>
           </div>
 
           <div className={styles.acoes}>
-            <span className={styles.contextoAtivo} title="O Sobral usa seus dados da plataforma">
+            <span className={styles.contextoAtivo} title="O Sobral usa os dados da sua conta">
               <Database size={14} strokeWidth={1.8} aria-hidden="true" />
-              Contexto ativo
+              Dados conectados
             </span>
             {conversa ? (
               <Link href="/consultor" className={styles.novaConversa}>
@@ -93,15 +88,19 @@ export function TelaSobral({
           {vazio ? (
             <div className={styles.boasVindas}>
               {contextoInicial ? (
-                <p className={styles.eyebrow}>Tarefa conectada · {contextoInicial.empresa}</p>
+                <p className={styles.eyebrow}>Tarefa de {contextoInicial.empresa}</p>
               ) : (
-                <p className={styles.eyebrow}>Consultoria conectada à sua plataforma</p>
+                <span className={styles.assinatura} aria-hidden="true">
+                  <Bot size={24} strokeWidth={1.65} />
+                </span>
               )}
-              <h2>{contextoInicial ? contextoInicial.tarefa : 'O que precisa avançar hoje?'}</h2>
+              <h2>
+                {contextoInicial ? contextoInicial.tarefa : 'O que você quer resolver agora?'}
+              </h2>
               <p className={styles.apoio}>
                 {contextoInicial
-                  ? 'O pedido abaixo já reúne o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie quando estiver pronto.'
-                  : 'Traga uma venda, um projeto ou uma dúvida. O Sobral cruza seu pedido com o que já está na plataforma e devolve uma direção prática.'}
+                  ? 'O pedido já traz o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie.'
+                  : 'Analiso suas vendas, reuniões e projetos para indicar um próximo passo que faça sentido no seu trabalho.'}
               </p>
             </div>
           ) : (
