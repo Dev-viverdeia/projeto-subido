@@ -67,6 +67,29 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(dialogo).toBeHidden();
   });
 
+  test('usa o resultado da entrega para orientar a venda de continuidade', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/preview/crm-dossie?pos-entrega=1');
+
+    const contexto = page.getByRole('region', { name: 'Este cliente já confirmou valor.' });
+    await expect(contexto).toBeVisible();
+    await expect(contexto.getByText('Base confirmada')).toBeVisible();
+    await expect(
+      contexto.getByText(/tempo médio de primeira resposta caiu de 18 para 4 minutos/),
+    ).toBeVisible();
+    await expect(contexto.getByText('Expandir este projeto')).toBeVisible();
+    await expect(
+      contexto.getByText('Validar a expansão para os canais de Instagram e site.'),
+    ).toBeVisible();
+    await expect(contexto.getByRole('link', { name: 'Revisar entrega' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
+
+    const semOverflowHorizontal = await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+    );
+    expect(semOverflowHorizontal).toBe(true);
+  });
+
   test('mantém o enriquecimento no viewport sem esconder as outras ações', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/preview/crm-dossie?pesquisa=pendente');

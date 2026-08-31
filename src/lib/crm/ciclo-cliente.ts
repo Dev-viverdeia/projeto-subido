@@ -56,7 +56,8 @@ export function montarCicloCliente(lead: DossieLead): {
     descobertaConcluida;
   const contextoEnriquecido = Boolean(
     lead.oportunidade.enriquecidoEm ||
-    lead.enriquecimentos.some((execucao) => execucao.status === 'concluido'),
+    lead.enriquecimentos.some((execucao) => execucao.status === 'concluido') ||
+    lead.continuidadePosEntrega,
   );
   const concluido = projeto?.status === 'concluido';
   const entregaIniciada = Boolean(lead.projetoAtivo || proposta?.status === 'aceita');
@@ -279,6 +280,25 @@ export function montarCicloCliente(lead: DossieLead): {
         prazo: lead.oportunidade.proximaAcaoEm,
         apoioHref: destinoDaCall(descobertaConcluida),
         apoioRotulo: 'Revisar descoberta',
+      },
+    };
+  }
+
+  if (lead.continuidadePosEntrega) {
+    return {
+      etapas,
+      decisao: {
+        tipo: 'navegacao',
+        rotulo:
+          lead.continuidadePosEntrega.decisao === 'expandir'
+            ? 'Expansão confirmada'
+            : 'Novo projeto sinalizado',
+        titulo: lead.continuidadePosEntrega.proximoPasso,
+        href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
+        acao: 'Agendar reunião',
+        prazo: lead.oportunidade.proximaAcaoEm,
+        apoioHref: `/entregas/${lead.continuidadePosEntrega.projetoId}`,
+        apoioRotulo: 'Revisar entrega',
       },
     };
   }

@@ -233,4 +233,37 @@ describe('ciclo factual do cliente', () => {
       apoioHref: `/entregas/${lead.projetoRecente.id}`,
     });
   });
+
+  it('usa o resultado da entrega para guiar a primeira conversa do novo ciclo', () => {
+    const lead = leadBase();
+    lead.oportunidade.proximaAcao = 'Validar a expansão para os canais de Instagram e site.';
+    lead.oportunidade.proximaAcaoEm = '2026-09-09T15:00:00.000Z';
+    lead.continuidadePosEntrega = {
+      projetoId: '66666666-6666-4666-8666-666666666666',
+      projetoTitulo: 'SDR de Atendimento',
+      resumoEntrega: 'SDR implantado e validado pelo cliente.',
+      resultadoPrincipal: 'Tempo de resposta reduzido.',
+      resultadoObservado: 'O tempo médio de resposta caiu de 18 para 4 minutos.',
+      evidenciaResultadoUrl: null,
+      decisao: 'expandir',
+      proximoPasso: 'Validar a expansão para os canais de Instagram e site.',
+      proximoPassoEm: '2026-09-09',
+      aceitaEm: '2026-08-01T12:00:00.000Z',
+      registradaEm: '2026-08-31T13:00:00.000Z',
+    };
+
+    const ciclo = montarCicloCliente(lead);
+
+    expect(ciclo.etapas[0]).toMatchObject({
+      estado: 'concluida',
+      evidencia: 'Dados enriquecidos',
+    });
+    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Reunião pendente' });
+    expect(ciclo.decisao).toMatchObject({
+      rotulo: 'Expansão confirmada',
+      titulo: 'Validar a expansão para os canais de Instagram e site.',
+      acao: 'Agendar reunião',
+      apoioHref: `/entregas/${lead.continuidadePosEntrega.projetoId}`,
+    });
+  });
 });

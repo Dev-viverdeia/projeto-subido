@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
+import { ContextoPosEntrega } from './_components/ContextoPosEntrega';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
 import { PesquisaComercial } from './_components/PesquisaComercial';
@@ -61,6 +62,10 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
         <p className={styles.avisoOperacao} role="alert">
           Não conseguimos abrir outra venda agora. Esta ficha continua salva; tente novamente.
         </p>
+      )}
+
+      {lead.continuidadePosEntrega && (
+        <ContextoPosEntrega continuidade={lead.continuidadePosEntrega} />
       )}
 
       <ResumoOperacionalLead lead={lead} />
