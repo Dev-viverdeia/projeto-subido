@@ -16,7 +16,7 @@ function BotaoPendente({ compacto = false }: { compacto?: boolean }) {
       loading={pending}
       iconLeft={!pending ? <Plus size={15} aria-hidden="true" /> : undefined}
     >
-      {pending ? 'Adicionando a Vendas' : 'Adicionar a Vendas'}
+      {pending ? 'Criando oportunidade' : 'Criar oportunidade'}
     </Button>
   );
 }

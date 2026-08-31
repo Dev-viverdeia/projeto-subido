@@ -23,42 +23,44 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  /* Empurra o bloco para o terço superior em vez de colar no topo. `vh` e não
-     valor fixo: em tela baixa o campo continua acima da dobra. */
-  padding-block-start: clamp(16px, 6vh, 72px);
+  gap: var(--app-gap-block);
+  padding-block-start: clamp(var(--via-space-4), 3vh, var(--via-space-7));
 }
 
 .cabecalho {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--via-space-4);
-  margin-bottom: var(--via-space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr);
+  align-items: end;
+  gap: var(--via-space-7);
+  padding-inline: var(--via-space-1);
+}
+
+.cabecalhoTexto {
+  display: grid;
+  gap: var(--via-space-2);
 }
 
 .fluxoEstudio {
-  width: min(100%, var(--via-content));
-  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  margin-top: 0;
-  margin-bottom: var(--via-space-6);
+  align-self: end;
+  gap: var(--via-space-1);
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .mesaCriacao {
   display: grid;
-  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.55fr);
+  grid-template-columns: minmax(240px, 0.54fr) minmax(0, 1.46fr);
   grid-template-areas: 'retorno briefing';
-  gap: var(--via-space-3);
+  gap: var(--via-space-2);
   padding: var(--via-space-2);
-  border: 1px solid var(--app-elev-1-line);
+  border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
-  background: var(--via-bg-2);
-  box-shadow: var(--app-elev-1-shadow);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--via-glass-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .retorno {
@@ -66,7 +68,7 @@
   position: relative;
   overflow: hidden;
   min-height: 100%;
-  padding: clamp(var(--via-space-5), 3vw, var(--via-space-7));
+  padding: clamp(var(--via-space-5), 2.5vw, var(--via-space-6));
   display: flex;
   flex-direction: column;
   border-radius: var(--app-radius-card);
@@ -92,11 +94,11 @@
 .retorno h3 {
   position: relative;
   z-index: 1;
-  max-width: 14ch;
-  margin: var(--via-space-3) 0 var(--via-space-6);
+  max-width: 12ch;
+  margin: var(--via-space-3) 0 var(--via-space-5);
   color: var(--via-white);
   font-family: var(--via-font-display);
-  font-size: clamp(var(--via-fs-h3), 2.2vw, var(--via-fs-h2));
+  font-size: clamp(var(--via-fs-h4), 2vw, var(--via-fs-h3));
   font-weight: 560;
   letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-snug);
@@ -111,7 +113,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--via-space-3);
 }
 
 .entregas li {
@@ -158,7 +160,7 @@
 .retornoNota {
   z-index: 1;
   margin-top: auto;
-  padding-top: var(--via-space-6);
+  padding-top: var(--via-space-5);
   color: var(--via-gray-onnavy);
   line-height: var(--via-lh-normal);
 }
@@ -166,7 +168,7 @@
 .briefing {
   grid-area: briefing;
   min-width: 0;
-  padding: clamp(var(--via-space-3), 2vw, var(--via-space-5));
+  padding: clamp(var(--via-space-3), 1.8vw, var(--via-space-5));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -174,33 +176,24 @@
 
 .fluxoEstudio li {
   position: relative;
-  display: grid;
-  justify-items: center;
-  gap: var(--via-space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-1_5);
+  min-width: 0;
   color: var(--via-text-faint);
 }
 
 .fluxoEstudio li::before {
-  content: '';
-  position: absolute;
-  top: 11px;
-  left: 0;
-  right: 50%;
-  height: 1px;
-  background: var(--via-border-hairline);
+  display: none;
 }
 
 .fluxoEstudio li::after {
   content: '';
-  position: absolute;
-  top: 11px;
-  left: 50%;
-  right: 0;
+  flex: 1;
   height: 1px;
   background: var(--via-border-hairline);
 }
 
-.fluxoEstudio li:first-child::before,
 .fluxoEstudio li:last-child::after {
   display: none;
 }
@@ -208,12 +201,12 @@
 .fluxoEstudio span {
   position: relative;
   z-index: 1;
-  width: 23px;
-  height: 23px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   border: 1px solid var(--via-border);
-  border-radius: 50%;
+  border-radius: var(--app-radius-chip);
   background: var(--via-surface);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -222,6 +215,7 @@
 .fluxoEstudio strong {
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
+  white-space: nowrap;
 }
 
 .fluxoEstudio li[data-ativo='true'] {
@@ -248,7 +242,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--via-space-3);
-  margin-bottom: var(--via-space-4);
+  margin-bottom: var(--via-space-3);
 }
 
 .partida > header span,
@@ -353,7 +347,7 @@
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(2rem, 1.2rem + 2.6vw, 3.25rem);
+  font-size: clamp(2rem, 1.45rem + 1.8vw, 3rem);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h1);
   line-height: var(--via-lh-tight);
@@ -361,7 +355,7 @@
   text-wrap: balance;
   /* A medida mora no elemento de texto — `ch` é relativo ao font-size de quem
      declara, e num container que herda 16px este valor valeria outra coisa. */
-  max-width: 15ch;
+  max-width: 22ch;
 }
 
 /* Ênfase é TOM editorial, nunca peso 700 e nunca itálico: a Outfit não tem face
@@ -374,11 +368,11 @@
 
 .apoio {
   margin: 0;
-  font-size: var(--via-fs-h4);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  max-width: 46ch;
-  text-wrap: balance;
+  max-width: 54ch;
+  text-wrap: pretty;
 }
 
 /* Aqui o tom já fazia o trabalho junto com o itálico: o apoio é `--via-text-muted`
@@ -401,6 +395,28 @@
   transition:
     border-color var(--app-t-state),
     box-shadow var(--app-t-state);
+}
+
+.caixaCabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4) var(--via-space-5) 0;
+}
+
+.caixaCabecalho span {
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.caixaCabecalho strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
 }
 
 .caixa:hover {
@@ -428,11 +444,11 @@
    escreve, então os limites moram aqui e a medida do conteúdo mora lá. */
 .campo {
   width: 100%;
-  min-height: 176px;
+  min-height: 142px;
   max-height: 46vh;
   overflow-y: auto;
   resize: none;
-  padding: var(--via-space-5) var(--via-space-5) var(--via-space-2);
+  padding: var(--via-space-4) var(--via-space-5) var(--via-space-2);
   border: 0;
   background: transparent;
   color: var(--via-text-primary);
@@ -502,14 +518,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--app-h-control);
+  gap: var(--via-space-2);
+  min-width: 154px;
   height: var(--app-h-control);
+  padding-inline: var(--via-space-4);
   flex-shrink: 0;
   border: 0;
-  border-radius: var(--via-radius-pill);
+  border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
   cursor: pointer;
+  font: inherit;
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
   transition:
     transform var(--app-t-touch),
     background-color var(--app-t-state);
@@ -532,6 +553,12 @@
 .enviar:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .mesaCriacao {
+    background: var(--via-surface-elev);
+  }
 }
 
 /* ---- Avisos ------------------------------------------------------------------ */
@@ -571,8 +598,9 @@
   }
 
   .cabecalho {
-    gap: var(--via-space-3);
-    margin-bottom: var(--via-space-5);
+    grid-template-columns: 1fr;
+    gap: var(--via-space-4);
+    padding-inline: 0;
   }
 
   .titulo {
@@ -584,7 +612,11 @@
   }
 
   .fluxoEstudio {
-    margin-bottom: var(--via-space-5);
+    overflow-x: auto;
+  }
+
+  .fluxoEstudio strong {
+    display: none;
   }
 
   .mesaCriacao {
@@ -609,7 +641,7 @@
   }
 
   .campo {
-    min-height: 170px;
+    min-height: 160px;
   }
 
   .decisaoGrid {
@@ -621,16 +653,41 @@
   }
 
   .retorno {
-    min-height: 410px;
+    min-height: 330px;
     padding: var(--via-space-6) var(--via-space-5);
   }
 
   .retorno h3 {
     margin-bottom: var(--via-space-5);
   }
+
+  .caixaCabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-1);
+    padding-inline: var(--via-space-4);
+  }
+
+  .campo {
+    padding-inline: var(--via-space-4);
+  }
+
+  .rodape {
+    align-items: flex-end;
+    padding-inline: var(--via-space-4);
+  }
+
+  .atalho {
+    display: none;
+  }
 }
 
-@media (min-width: 600px) and (max-width: 899px) {
+@media (min-width: 600px) and (max-width: 1079px) {
+  .cabecalho {
+    grid-template-columns: 1fr;
+    gap: var(--via-space-5);
+  }
+
   .mesaCriacao {
     grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.45fr);
   }

@@ -22,8 +22,8 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-5);
-  min-height: 128px;
-  padding: clamp(24px, 3vw, 34px);
+  min-height: 116px;
+  padding: clamp(22px, 3vw, 32px);
   overflow: hidden;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
@@ -56,6 +56,8 @@
 
 .heroTexto {
   min-width: 0;
+  display: grid;
+  gap: var(--via-space-1_5);
 }
 
 .hero h1 {
@@ -69,7 +71,7 @@
 
 .heroTexto > p:last-child {
   max-width: 62ch;
-  margin: var(--via-space-2) 0 0;
+  margin: 0;
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
@@ -111,12 +113,20 @@
 
 .colecoes {
   display: grid;
-  gap: clamp(30px, 4vw, 48px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--app-gap-grid);
 }
 
 .colecao {
   display: grid;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane);
+  box-shadow: var(--via-glass-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .colecaoTopo {
@@ -124,7 +134,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--via-space-4);
-  padding-inline: var(--via-space-1);
+  padding-inline: 0;
 }
 
 .iconeColecao {
@@ -167,18 +177,18 @@
 
 .grade {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--app-gap-grid);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--via-space-3);
 }
 
 .card {
   display: flex;
-  min-height: 190px;
+  min-height: 154px;
   flex-direction: column;
-  padding: var(--via-space-5);
+  padding: var(--via-space-4);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--via-surface) 96%, var(--via-navy-03));
+  background: color-mix(in srgb, var(--via-surface) 90%, transparent);
   box-shadow: var(--via-shadow-xs);
   color: inherit;
   text-decoration: none;
@@ -208,7 +218,7 @@
 }
 
 .cardTopo {
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .iconeDocumento {
@@ -226,7 +236,7 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-micro);
   line-height: 1.2;
-  text-align: right;
+  text-align: left;
   text-transform: uppercase;
 }
 
@@ -242,7 +252,7 @@
 
 .cardCorpo {
   flex: 1;
-  padding-block: var(--via-space-4);
+  padding-block: var(--via-space-3);
 }
 
 .cardCorpo p,
@@ -253,9 +263,9 @@
 }
 
 .cardCorpo h3 {
-  margin: var(--via-space-2) 0;
+  margin: var(--via-space-1_5) 0;
   color: var(--via-text-primary);
-  font-size: clamp(1.15rem, 1.8vw, 1.42rem);
+  font-size: clamp(var(--via-fs-body), 1.6vw, var(--via-fs-h4));
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-h3);
 }
@@ -300,7 +310,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-4);
-  min-height: 112px;
+  min-height: 154px;
   padding: var(--via-space-5);
   border: 1px dashed var(--via-border);
   border-radius: var(--app-radius-card);
@@ -330,14 +340,15 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .hero {
+  .hero,
+  .colecao {
     background: var(--via-surface-elev);
   }
 }
 
 @media (max-width: 899px) {
-  .grade {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .colecoes {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -378,11 +389,11 @@
   }
 
   .colecaoTopo {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .contagem {
-    display: none;
+    display: grid;
   }
 
   .grade {
@@ -390,7 +401,7 @@
   }
 
   .card {
-    min-height: 210px;
+    min-height: 172px;
   }
 
   .cardRodape {

@@ -36,11 +36,11 @@ describe('PainelPropostas', () => {
 
     expect(screen.getByRole('heading', { name: 'Biblioteca comercial' })).toBeInTheDocument();
 
-    const rascunhos = screen.getByRole('region', { name: 'Em rascunho' });
+    const rascunhos = screen.getByRole('region', { name: 'Rascunhos' });
     expect(within(rascunhos).getByText('Clínica Aurora')).toBeInTheDocument();
     expect(within(rascunhos).getByText('Continuar edição')).toBeInTheDocument();
 
-    const enviadas = screen.getByRole('region', { name: 'Enviadas' });
+    const enviadas = screen.getByRole('region', { name: 'Propostas enviadas' });
     expect(within(enviadas).getByText('Orbe')).toBeInTheDocument();
     expect(within(enviadas).getByText('Enviada')).toBeInTheDocument();
     expect(within(enviadas).getByText('Ver proposta')).toBeInTheDocument();

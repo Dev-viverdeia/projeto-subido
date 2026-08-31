@@ -287,28 +287,28 @@ export function SalaCall({
           </div>
 
           <div className={styles.memoria}>
-            <p>O que acontece com esta conversa</p>
+            <p>Durante a reunião</p>
             <ol>
               <li>
                 <span>01</span>
                 <div>
-                  <strong>Áudio e transcrição privados</strong>
-                  <small>A conversa fica ligada somente ao histórico desta ficha.</small>
+                  <strong>Transcrição privada</strong>
+                  <small>Ligada à ficha do cliente.</small>
                 </div>
               </li>
               <li>
                 <span>02</span>
                 <div>
-                  <strong>Resumo para revisão</strong>
-                  <small>Decisões e próximos passos aparecem depois da reunião.</small>
+                  <strong>Resumo para revisar</strong>
+                  <small>Decisões e próximos passos.</small>
                 </div>
               </li>
               {convite.liveCoachAtivo && anfitriao && (
                 <li>
                   <span>03</span>
                   <div>
-                    <strong>Coach só para você</strong>
-                    <small>O convidado não vê as recomendações durante a conversa.</small>
+                    <strong>Coach privado</strong>
+                    <small>Sugestões visíveis só para você.</small>
                   </div>
                 </li>
               )}
@@ -322,7 +322,7 @@ export function SalaCall({
             <strong>{estadoSala}</strong>
           </div>
           <h2>Preparar entrada</h2>
-          <p>Confirme seu nome e como esta conversa será registrada.</p>
+          <p>Confirme seu nome e autorize o registro.</p>
 
           <label className={styles.campo}>
             <span>Seu nome</span>
@@ -342,8 +342,7 @@ export function SalaCall({
               onChange={(evento) => setConsentiu(evento.target.checked)}
             />
             <span>
-              Concordo com a gravação e transcrição desta reunião para gerar o histórico, o resumo e
-              os próximos passos da conversa.
+              Autorizo a gravação e a transcrição para gerar o resumo e os próximos passos.
             </span>
           </label>
 
@@ -351,7 +350,7 @@ export function SalaCall({
             <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
             <p>
               <strong>Depois da reunião</strong>
-              <span>Você poderá revisar tudo antes de atualizar a ficha do cliente.</span>
+              <span>Revise o resumo antes de atualizar a ficha do cliente.</span>
             </p>
           </div>
 
