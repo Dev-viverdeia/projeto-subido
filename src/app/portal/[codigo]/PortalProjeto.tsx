@@ -2,6 +2,7 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Check,
+  ChevronDown,
   CircleDot,
   Clock3,
   FileCheck2,
@@ -166,107 +167,129 @@ export function PortalProjeto({
           </div>
         </section>
 
-        <AcordoProjetoPortal briefing={projeto.briefing} />
+        <details className={styles.grupoDetalhes}>
+          <summary>
+            <div>
+              <strong>Escopo e combinados</strong>
+              <span>Objetivo, entregáveis e mudanças</span>
+            </div>
+            <ChevronDown size={17} aria-hidden="true" />
+          </summary>
+          <div className={styles.grupoConteudo}>
+            <AcordoProjetoPortal briefing={projeto.briefing} />
+            <ControleEscopoPortal codigo={codigo} mudancas={projeto.mudancasEscopo} />
+          </div>
+        </details>
 
-        <ControleEscopoPortal codigo={codigo} mudancas={projeto.mudancasEscopo} />
+        <details className={styles.grupoDetalhes}>
+          <summary>
+            <div>
+              <strong>Andamento e entregas</strong>
+              <span>{projeto.feitas} marcos concluídos</span>
+            </div>
+            <ChevronDown size={17} aria-hidden="true" />
+          </summary>
+          <div className={styles.painel}>
+            <section className={styles.andamento} aria-labelledby="andamento-titulo">
+              <header>
+                <div>
+                  <p>Visão do trabalho</p>
+                  <h2 id="andamento-titulo">Da descoberta à entrega.</h2>
+                </div>
+                <span>Atualizado em tempo real</span>
+              </header>
 
-        <div className={styles.painel}>
-          <section className={styles.andamento} aria-labelledby="andamento-titulo">
-            <header>
-              <div>
-                <p>Visão do trabalho</p>
-                <h2 id="andamento-titulo">Da descoberta à entrega.</h2>
-              </div>
-              <span>Atualizado em tempo real</span>
-            </header>
-
-            <ol>
-              {fases.map((fase, indice) => {
-                const completa = fase.feitas === fase.total;
-                const ativa = !concluido && fase.id === faseAtual?.id;
-                return (
-                  <li
-                    key={fase.id}
-                    data-completa={completa || undefined}
-                    data-ativa={ativa || undefined}
-                  >
-                    <span>
-                      {completa ? <Check size={14} /> : String(indice + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <strong>{fase.titulo}</strong>
-                      <small>
-                        {fase.feitas}/{fase.total} marcos concluídos
-                      </small>
-                    </div>
-                    {ativa && <em>Agora</em>}
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
-
-          <section className={styles.biblioteca} aria-labelledby="entregas-titulo">
-            <header>
-              <p>Histórico compartilhado</p>
-              <h2 id="entregas-titulo">Entregas do projeto</h2>
-            </header>
-
-            {compartilhadas.length ? (
               <ol>
-                {compartilhadas.map((tarefa) => (
-                  <li key={tarefa.id} data-status={tarefa.clienteStatus}>
-                    <span className={styles.marcaEntrega}>
-                      {tarefa.clienteStatus === 'aprovada' ? (
-                        <Check size={15} />
-                      ) : tarefa.clienteStatus === 'aguardando' ? (
-                        <Clock3 size={15} />
-                      ) : (
-                        <CircleDot size={15} />
-                      )}
-                    </span>
-                    <div>
-                      <small>{tarefa.faseTitulo}</small>
-                      <strong>{tarefa.titulo}</strong>
-                      {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
-                    </div>
-                    {tarefa.entregavelUrl && (
-                      <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
-                        Abrir <ArrowUpRight size={14} />
-                      </a>
-                    )}
-                  </li>
-                ))}
+                {fases.map((fase, indice) => {
+                  const completa = fase.feitas === fase.total;
+                  const ativa = !concluido && fase.id === faseAtual?.id;
+                  return (
+                    <li
+                      key={fase.id}
+                      data-completa={completa || undefined}
+                      data-ativa={ativa || undefined}
+                    >
+                      <span>
+                        {completa ? <Check size={14} /> : String(indice + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <strong>{fase.titulo}</strong>
+                        <small>
+                          {fase.feitas}/{fase.total} marcos concluídos
+                        </small>
+                      </div>
+                      {ativa && <em>Agora</em>}
+                    </li>
+                  );
+                })}
               </ol>
-            ) : (
-              <div className={styles.vazio}>
-                <FileCheck2 size={20} aria-hidden="true" />
-                <p>A primeira entrega aparecerá aqui assim que estiver pronta para você.</p>
+            </section>
+
+            <section className={styles.biblioteca} aria-labelledby="entregas-titulo">
+              <header>
+                <p>Histórico compartilhado</p>
+                <h2 id="entregas-titulo">Entregas do projeto</h2>
+              </header>
+
+              {compartilhadas.length ? (
+                <ol>
+                  {compartilhadas.map((tarefa) => (
+                    <li key={tarefa.id} data-status={tarefa.clienteStatus}>
+                      <span className={styles.marcaEntrega}>
+                        {tarefa.clienteStatus === 'aprovada' ? (
+                          <Check size={15} />
+                        ) : tarefa.clienteStatus === 'aguardando' ? (
+                          <Clock3 size={15} />
+                        ) : (
+                          <CircleDot size={15} />
+                        )}
+                      </span>
+                      <div>
+                        <small>{tarefa.faseTitulo}</small>
+                        <strong>{tarefa.titulo}</strong>
+                        {tarefa.clienteNota && <p>{tarefa.clienteNota}</p>}
+                      </div>
+                      {tarefa.entregavelUrl && (
+                        <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
+                          Abrir <ArrowUpRight size={14} />
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className={styles.vazio}>
+                  <FileCheck2 size={20} aria-hidden="true" />
+                  <p>A primeira entrega aparecerá aqui assim que estiver pronta para você.</p>
+                </div>
+              )}
+            </section>
+          </div>
+        </details>
+
+        <details className={styles.grupoDetalhes}>
+          <summary>
+            <div>
+              <strong>Resultado e continuidade</strong>
+              <span>{concluido ? 'Encerramento do projeto' : 'Próximos passos'}</span>
+            </div>
+            <ChevronDown size={17} aria-hidden="true" />
+          </summary>
+          <div className={styles.grupoConteudo}>
+            {concluido && projeto.encerramento ? (
+              <div className={styles.encerramentoPortal}>
+                <TermoEncerramentoPortal encerramento={projeto.encerramento} />
               </div>
-            )}
-          </section>
-        </div>
+            ) : null}
 
-        {concluido && projeto.encerramento ? (
-          <div className={styles.encerramentoPortal}>
-            <TermoEncerramentoPortal encerramento={projeto.encerramento} />
+            <PosEntregaPortal codigo={codigo} projeto={projeto} concluido={concluido} />
           </div>
-        ) : null}
-
-        <PosEntregaPortal codigo={codigo} projeto={projeto} concluido={concluido} />
-
-        <section className={styles.seguranca}>
-          <LockKeyhole size={16} aria-hidden="true" />
-          <div>
-            <strong>Um portal, somente o necessário.</strong>
-            <p>Notas internas, dados de venda e evidências de trabalho não aparecem neste link.</p>
-          </div>
-        </section>
+        </details>
       </div>
 
       <footer className={styles.rodape}>
         <SubidoLogo size={16} />
-        <span>Projeto conduzido com transparência, evidência e aprovação humana.</span>
+        <span>Portal protegido</span>
       </footer>
     </main>
   );

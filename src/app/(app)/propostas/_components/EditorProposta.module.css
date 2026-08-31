@@ -146,7 +146,17 @@
 }
 
 .previewArea {
+  position: sticky;
+  top: 88px;
   min-width: 0;
+  max-height: calc(100vh - 112px);
+  overflow: auto;
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-glass-card);
+  box-shadow: var(--via-glass-shadow);
+  scrollbar-width: thin;
+  scrollbar-color: var(--via-border) transparent;
 }
 .editor {
   min-width: 0;
@@ -196,27 +206,72 @@
 }
 
 .bloco {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-5);
-  padding: clamp(32px, 5vw, 56px) 0;
+  display: block;
+  padding: 0;
   border-bottom: 1px solid var(--via-border-hairline);
 }
 .blocoTopo {
-  display: grid;
-  grid-template-columns: 44px 1fr;
+  position: relative;
+  display: flex;
   gap: var(--via-space-4);
-  align-items: start;
+  align-items: center;
+  min-height: 84px;
+  padding: 16px 0;
+  list-style: none;
+  cursor: pointer;
+}
+.blocoTopo::-webkit-details-marker {
+  display: none;
+}
+.blocoTopo::marker {
+  content: '';
+}
+.blocoSeta {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  place-items: center;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: 50%;
+  color: var(--via-text-muted);
+  transition:
+    border-color var(--via-t),
+    color var(--via-t),
+    transform var(--via-t);
+}
+.bloco[open] .blocoSeta {
+  border-color: color-mix(in srgb, var(--via-accent) 35%, var(--via-border-hairline));
+  color: var(--via-accent-ink);
+  transform: rotate(180deg);
+}
+.blocoTopo:hover .blocoSeta {
+  border-color: var(--via-border);
+  color: var(--via-navy);
+}
+.blocoTopo:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 .blocoTopo > span {
-  padding-top: 4px;
+  flex: 0 0 44px;
   color: var(--via-accent-ink);
   font: var(--via-fs-xs) var(--via-font-mono);
 }
+.blocoTopo > div {
+  min-width: 0;
+  flex: 1;
+}
 .blocoTopo h2 {
-  margin: 4px 0 0;
-  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  margin: 3px 0 0;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
   letter-spacing: var(--app-ls-h2);
+}
+.blocoConteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-5);
+  padding: var(--via-space-2) 0 clamp(28px, 4vw, 44px) 44px;
 }
 
 .camposDois {
@@ -697,6 +752,12 @@
   .previewArea[data-painel-ativo='true'] {
     display: block;
   }
+
+  .previewArea {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 @media (max-width: 767px) {
@@ -722,6 +783,9 @@
   }
   .camposDois {
     grid-template-columns: 1fr;
+  }
+  .blocoConteudo {
+    padding-left: 0;
   }
   .camposCronograma {
     grid-template-columns: 1fr;

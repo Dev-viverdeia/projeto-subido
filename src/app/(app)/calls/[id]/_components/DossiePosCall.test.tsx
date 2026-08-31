@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { PosCall } from '@/lib/calls/queries';
 
@@ -93,10 +93,14 @@ describe('DossiePosCall', () => {
     ).toHaveAttribute('href', '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1');
     expect(screen.queryByText('Criar proposta com esta call')).not.toBeInTheDocument();
 
-    const leitura = screen.getByRole('heading', { name: 'Resumo e pontos principais' });
+    const leitura = screen.getByRole('heading', { name: 'Resumo da reunião' });
     const plano = screen.getByRole('heading', { name: 'Revise o que será salvo' });
+    expect(screen.getByText('Análise completa').closest('details')).not.toHaveAttribute('open');
+    fireEvent.click(screen.getByText('Análise completa'));
     const lacunas = screen.getByRole('heading', { name: 'O que ainda falta saber' });
     const mapa = screen.getByRole('heading', { name: 'Informações extraídas da conversa' });
+
+    expect(lacunas).toBeVisible();
 
     expect(leitura.compareDocumentPosition(plano) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(plano.compareDocumentPosition(lacunas) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

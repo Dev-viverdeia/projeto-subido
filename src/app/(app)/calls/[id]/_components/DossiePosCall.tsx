@@ -182,8 +182,7 @@ export function DossiePosCall({
         <div className={styles.leituraCorpo}>
           <div className={styles.leituraTopo}>
             <div>
-              <p className={styles.sobretitulo}>Resumo da reunião</p>
-              <h2 id="leitura-titulo">Resumo e pontos principais</h2>
+              <h2 id="leitura-titulo">Resumo da reunião</h2>
             </div>
             {nota !== null && nota !== undefined && (
               <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
@@ -231,7 +230,6 @@ export function DossiePosCall({
           )}
           <div className={styles.leituraRodape}>
             <span>Tom percebido: {sentimento}</span>
-            <small>Análise feita por IA · revise antes de atualizar a venda</small>
           </div>
         </div>
       </section>
@@ -240,106 +238,119 @@ export function DossiePosCall({
         <CentralPlanoCall posCall={posCall} acaoSugerida={acaoSugerida} />
       )}
 
-      <div className={styles.gradeOperacional} hidden={estado.tipo === 'processando'}>
-        <aside className={styles.lateral}>
-          <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
-            <div className={styles.lacunasTopo}>
-              <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>{pontosAbertos}</span>
+      {estado.tipo !== 'processando' && (
+        <details className={styles.analiseCompleta}>
+          <summary>
+            <div>
+              <strong>Análise completa</strong>
+              <span>Fatos, lacunas, oportunidades e transcrição</span>
             </div>
-            <p className={styles.sobretitulo}>Pontos pendentes</p>
-            <h2 id="lacunas-titulo">O que ainda falta saber</h2>
-            <ListaFactual
-              itens={analise?.lacunas ?? []}
-              vazio="Nenhuma lacuna foi registrada. Ainda assim, revise escopo e responsáveis antes da proposta."
-              variante="alerta"
-            />
-          </section>
-
-          {analise?.sinaisCompra.length ? (
-            <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
-              <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
-              <p className={styles.sobretitulo}>O que o cliente demonstrou</p>
-              <h2 id="sinais-compra-titulo">Sinais de interesse</h2>
-              <ListaFactual
-                itens={analise.sinaisCompra}
-                vazio="Nenhum sinal explícito foi encontrado."
-                variante="decisao"
-              />
-            </section>
-          ) : null}
-        </aside>
-
-        <div className={styles.principal}>
-          <MapaFactual analise={analise} temAnalise={temAnalise} />
-
-          <section className={styles.oportunidades} aria-labelledby="oportunidades-titulo">
-            <header className={styles.secaoTopo}>
-              <div>
-                <p>Possíveis projetos</p>
-                <h2 id="oportunidades-titulo">Onde a IA pode ajudar</h2>
-              </div>
-              <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
-            </header>
-            {analise?.oportunidadesProjeto.length ? (
-              <div className={styles.listaOportunidades}>
-                {analise.oportunidadesProjeto.map((oportunidade, indice) => (
-                  <article key={`${oportunidade}-${indice}`}>
-                    <span>{String(indice + 1).padStart(2, '0')}</span>
-                    <p>{oportunidade}</p>
-                    <CircleHelp size={17} aria-label="Hipótese a validar" />
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className={styles.vazioSecao}>
-                A conversa ainda não trouxe informações suficientes para recomendar um projeto.
-              </p>
-            )}
-            <footer className={styles.oportunidadesRodape}>
-              <p>Confirme com o cliente antes de incluir qualquer uma destas ideias na proposta.</p>
-            </footer>
-          </section>
-
-          {posCall.coach.length > 0 && (
-            <details className={styles.coachRevisao}>
-              <summary>
-                <div>
-                  <p>Live Coach</p>
-                  <h2>Rever as sugestões da reunião</h2>
+            <ChevronRight size={18} aria-hidden="true" />
+          </summary>
+          <div className={styles.gradeOperacional}>
+            <aside className={styles.lateral}>
+              <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
+                <div className={styles.lacunasTopo}>
+                  <CircleHelp size={18} strokeWidth={1.7} aria-hidden="true" />
+                  <span>{pontosAbertos}</span>
                 </div>
-                <span>
-                  {posCall.coach.length} intervenções
-                  <ChevronRight size={17} aria-hidden="true" />
-                </span>
-              </summary>
-              <div className={styles.coachLinha}>
-                {posCall.coach.map((sugestao) => (
-                  <article key={sugestao.id} data-prioridade={sugestao.prioridade}>
-                    <div className={styles.coachTempo}>{minuto(sugestao.segundoReuniao)}</div>
-                    <div className={styles.coachPonto} aria-hidden="true" />
-                    <div className={styles.coachConteudo}>
-                      <div>
-                        <span>{sugestao.categoria}</span>
-                        {sugestao.metodologia && <small>{sugestao.metodologia}</small>}
-                      </div>
-                      <h3>{sugestao.titulo}</h3>
-                      <p>{sugestao.sugestao}</p>
-                      {sugestao.trechoGatilho && (
-                        <blockquote>“{sugestao.trechoGatilho}”</blockquote>
-                      )}
+                <p className={styles.sobretitulo}>Pontos pendentes</p>
+                <h2 id="lacunas-titulo">O que ainda falta saber</h2>
+                <ListaFactual
+                  itens={analise?.lacunas ?? []}
+                  vazio="Nenhuma lacuna foi registrada. Ainda assim, revise escopo e responsáveis antes da proposta."
+                  variante="alerta"
+                />
+              </section>
+
+              {analise?.sinaisCompra.length ? (
+                <section className={styles.sinaisCompra} aria-labelledby="sinais-compra-titulo">
+                  <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
+                  <p className={styles.sobretitulo}>O que o cliente demonstrou</p>
+                  <h2 id="sinais-compra-titulo">Sinais de interesse</h2>
+                  <ListaFactual
+                    itens={analise.sinaisCompra}
+                    vazio="Nenhum sinal explícito foi encontrado."
+                    variante="decisao"
+                  />
+                </section>
+              ) : null}
+            </aside>
+
+            <div className={styles.principal}>
+              <MapaFactual analise={analise} temAnalise={temAnalise} />
+
+              <section className={styles.oportunidades} aria-labelledby="oportunidades-titulo">
+                <header className={styles.secaoTopo}>
+                  <div>
+                    <p>Possíveis projetos</p>
+                    <h2 id="oportunidades-titulo">Onde a IA pode ajudar</h2>
+                  </div>
+                  <Lightbulb size={20} strokeWidth={1.7} aria-hidden="true" />
+                </header>
+                {analise?.oportunidadesProjeto.length ? (
+                  <div className={styles.listaOportunidades}>
+                    {analise.oportunidadesProjeto.map((oportunidade, indice) => (
+                      <article key={`${oportunidade}-${indice}`}>
+                        <span>{String(indice + 1).padStart(2, '0')}</span>
+                        <p>{oportunidade}</p>
+                        <CircleHelp size={17} aria-label="Hipótese a validar" />
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.vazioSecao}>
+                    A conversa ainda não trouxe informações suficientes para recomendar um projeto.
+                  </p>
+                )}
+                <footer className={styles.oportunidadesRodape}>
+                  <p>
+                    Confirme com o cliente antes de incluir qualquer uma destas ideias na proposta.
+                  </p>
+                </footer>
+              </section>
+
+              {posCall.coach.length > 0 && (
+                <details className={styles.coachRevisao}>
+                  <summary>
+                    <div>
+                      <p>Live Coach</p>
+                      <h2>Rever as sugestões da reunião</h2>
                     </div>
-                  </article>
-                ))}
-              </div>
-            </details>
-          )}
+                    <span>
+                      {posCall.coach.length} intervenções
+                      <ChevronRight size={17} aria-hidden="true" />
+                    </span>
+                  </summary>
+                  <div className={styles.coachLinha}>
+                    {posCall.coach.map((sugestao) => (
+                      <article key={sugestao.id} data-prioridade={sugestao.prioridade}>
+                        <div className={styles.coachTempo}>{minuto(sugestao.segundoReuniao)}</div>
+                        <div className={styles.coachPonto} aria-hidden="true" />
+                        <div className={styles.coachConteudo}>
+                          <div>
+                            <span>{sugestao.categoria}</span>
+                            {sugestao.metodologia && <small>{sugestao.metodologia}</small>}
+                          </div>
+                          <h3>{sugestao.titulo}</h3>
+                          <p>{sugestao.sugestao}</p>
+                          {sugestao.trechoGatilho && (
+                            <blockquote>“{sugestao.trechoGatilho}”</blockquote>
+                          )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              )}
 
-          {posCall.gravacao && <GravacaoCall gravacao={posCall.gravacao} />}
+              {posCall.gravacao && <GravacaoCall gravacao={posCall.gravacao} />}
 
-          {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
-        </div>
-      </div>
+              {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
+            </div>
+          </div>
+        </details>
+      )}
     </div>
   );
 }

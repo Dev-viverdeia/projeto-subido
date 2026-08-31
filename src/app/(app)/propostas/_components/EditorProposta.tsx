@@ -179,7 +179,6 @@ export function EditorProposta({
       <div className={styles.grade}>
         <main className={styles.editor} data-painel-ativo={painelAtivo === 'editar' || undefined}>
           <section className={styles.abertura}>
-            <p className={styles.sobretitulo}>Documento comercial</p>
             <textarea
               aria-label="Título interno da proposta"
               className={styles.tituloDocumento}
@@ -191,10 +190,7 @@ export function EditorProposta({
                 setSujo(true);
               }}
             />
-            <p>
-              A prévia muda enquanto você edita. Salve quando quiser gerar o PDF ou enviar a
-              proposta.
-            </p>
+            <p>Edite uma seção por vez. A prévia acompanha suas mudanças.</p>
           </section>
 
           <SecoesContextoEntrega documento={documento} mudar={mudar} />

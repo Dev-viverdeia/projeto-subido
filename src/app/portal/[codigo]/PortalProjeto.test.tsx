@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 
@@ -127,6 +127,9 @@ describe('PortalProjeto', () => {
       '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
     );
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
+    fireEvent.click(screen.getByText('Escopo e combinados'));
+    fireEvent.click(screen.getByText('Andamento e entregas'));
+    fireEvent.click(screen.getByText('Resultado e continuidade'));
     expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'O que vamos entregar juntos.' })).toBeVisible();
@@ -186,6 +189,7 @@ describe('PortalProjeto', () => {
       />,
     );
 
+    fireEvent.click(screen.getByText('Resultado e continuidade'));
     expect(screen.getByRole('heading', { name: 'O resultado e o próximo passo.' })).toBeVisible();
     expect(
       screen.getByText('A recepção passou a receber cada contato com contexto.'),

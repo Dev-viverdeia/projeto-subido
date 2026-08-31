@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   CalendarDays,
   Check,
+  ChevronDown,
   CircleAlert,
   ClipboardCheck,
   Clock3,
@@ -236,12 +237,8 @@ export function PainelEntregas({
     <div className={styles.pagina}>
       <header className={styles.hero}>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Execução e continuidade</p>
           <h1>Entregas dos clientes</h1>
-          <p>
-            Execute o combinado, acompanhe o resultado e mantenha claro o próximo passo de cada
-            cliente.
-          </p>
+          <p>Execute o próximo passo de cada cliente.</p>
         </div>
         <dl className={styles.resumo} aria-label="Resumo das entregas">
           <div>
@@ -269,12 +266,8 @@ export function PainelEntregas({
         <section className={styles.emAndamento} aria-labelledby="titulo-em-andamento">
           <header className={styles.cabecalhoSecao}>
             <div>
-              <p className={styles.eyebrow}>Prioridade agora</p>
-              <h2 id="titulo-em-andamento">Comece por {principal.empresa}.</h2>
+              <h2 id="titulo-em-andamento">Agora: {principal.empresa}</h2>
             </div>
-            <p>
-              {prioridadePrincipal?.rotulo}. {prioridadePrincipal?.detalhe}.
-            </p>
           </header>
 
           {prioridadePrincipal && (
@@ -286,7 +279,6 @@ export function PainelEntregas({
               <header>
                 <div>
                   <h2>Fila de trabalho</h2>
-                  <p>Ordenada pelo que exige atenção primeiro.</p>
                 </div>
                 <span>{demaisAtivos.length} na fila</span>
               </header>
@@ -311,14 +303,16 @@ export function PainelEntregas({
       )}
 
       {concluidos.length > 0 && (
-        <section className={styles.concluidas} aria-labelledby="titulo-concluidas">
-          <header className={styles.cabecalhoSecao}>
+        <details className={styles.concluidas}>
+          <summary className={styles.cabecalhoSecao}>
             <div>
-              <p className={styles.eyebrow}>Histórico</p>
               <h2 id="titulo-concluidas">Entregas concluídas</h2>
             </div>
-            <p>Consulte evidências, arquivos e aceite final quando precisar.</p>
-          </header>
+            <span className={styles.resumoConcluidas}>
+              <span>{concluidos.length}</span>
+              <ChevronDown size={17} aria-hidden="true" />
+            </span>
+          </summary>
 
           <ol className={styles.listaConcluidas}>
             {concluidos.map((projeto) => {
@@ -348,7 +342,7 @@ export function PainelEntregas({
               );
             })}
           </ol>
-        </section>
+        </details>
       )}
     </div>
   );
