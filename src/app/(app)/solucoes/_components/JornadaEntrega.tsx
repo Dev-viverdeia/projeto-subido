@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Clock3, MessageSquareMore } from 'lucide-react';
+import { ArrowRight, Check, CircleAlert, Clock3, MessageSquareMore } from 'lucide-react';
 import type {
   EstadoJornadaEntrega,
   MomentoJornadaEntrega,
@@ -29,6 +29,8 @@ export function JornadaEntrega({
             <Check size={17} />
           ) : estado.tom === 'ajuste' ? (
             <MessageSquareMore size={17} />
+          ) : estado.tom === 'atrasado' ? (
+            <CircleAlert size={17} />
           ) : estado.tom === 'aguardando' ? (
             <Clock3 size={17} />
           ) : (

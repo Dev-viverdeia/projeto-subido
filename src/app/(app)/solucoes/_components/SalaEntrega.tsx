@@ -12,6 +12,11 @@ import {
 } from '@/lib/projetos-execucao/jornada-entrega';
 import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
 import { obterContatoNotificacao } from '@/lib/projetos-execucao/notificacao-cliente';
+import {
+  contarDependenciasPendentes,
+  obterProximoCompromisso,
+} from '@/lib/projetos-execucao/plano';
+import { formatarDataProjeto } from '@/lib/projetos-execucao/prazo';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
 import { JornadaEntrega } from './JornadaEntrega';
@@ -21,17 +26,6 @@ import { TarefaEntrega } from './TarefaEntrega';
 import styles from './SalaEntrega.module.css';
 
 type PainelSala = 'execucao' | 'arquivos' | 'cliente';
-
-function formatarData(valor: string): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'America/Sao_Paulo',
-  })
-    .format(new Date(valor))
-    .replace('.', '');
-}
 
 export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const fases = useMemo(
@@ -47,7 +41,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     [projeto.tarefas],
   );
   const proxima = projeto.tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
-  const proximoCompromisso = projeto.acoesPlano.find((acao) => acao.status === 'pendente') ?? null;
+  const proximoCompromisso = obterProximoCompromisso(projeto.acoesPlano);
   const faseInicial =
     fases.find((fase) => fase.id === proxima?.faseId) ??
     (projeto.feitas === projeto.total ? fases.at(-1) : fases[0]) ??
@@ -77,6 +71,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const ajustesSolicitados = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
+  const dependenciasPendentes = contarDependenciasPendentes(projeto.acoesPlano);
   // prettier-ignore
   const contatoCliente = obterContatoNotificacao(projeto.eventos, tarefaAtual?.id, projeto.documento.cliente.email);
   const estadoJornada = obterEstadoJornadaEntrega({
@@ -84,6 +79,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     briefingConfirmado,
     tarefas: projeto.tarefas,
     compromisso: proximoCompromisso?.titulo ?? null,
+    dependencias: projeto.acoesPlano,
   });
 
   function abrirFase(id: string) {
@@ -119,6 +115,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
       setPainel('cliente');
       requestAnimationFrame(() =>
         document.getElementById('briefing-kickoff')?.scrollIntoView?.({ behavior: 'smooth' }),
+      );
+      return;
+    }
+
+    if (destino === 'preparacao') {
+      setPainel('cliente');
+      requestAnimationFrame(() =>
+        document.getElementById('preparacao-titulo')?.scrollIntoView?.({ behavior: 'smooth' }),
       );
       return;
     }
@@ -166,11 +170,11 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           <dl className={styles.heroMetadados}>
             <div>
               <dt>Início</dt>
-              <dd>{formatarData(projeto.inicioEm)}</dd>
+              <dd>{formatarDataProjeto(projeto.inicioEm)}</dd>
             </div>
             <div>
               <dt>Prazo</dt>
-              <dd>{projeto.prazoEm ? formatarData(projeto.prazoEm) : 'A definir'}</dd>
+              <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
             </div>
             <div>
               <dt>Investimento</dt>
@@ -263,11 +267,13 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                 ? 'Briefing pendente'
                 : ajustesSolicitados
                   ? `${ajustesSolicitados} ajuste${ajustesSolicitados > 1 ? 's' : ''}`
-                  : entregasAguardando
-                    ? `${entregasAguardando} validação${entregasAguardando > 1 ? 'ões' : ''}`
-                    : projeto.portalAtivo
-                      ? 'Portal ativo'
-                      : 'Portal privado'}
+                  : dependenciasPendentes
+                    ? `${dependenciasPendentes} pendência${dependenciasPendentes > 1 ? 's' : ''}`
+                    : entregasAguardando
+                      ? `${entregasAguardando} validação${entregasAguardando > 1 ? 'ões' : ''}`
+                      : projeto.portalAtivo
+                        ? 'Portal ativo'
+                        : 'Portal privado'}
             </small>
           </span>
         </button>
@@ -371,7 +377,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                 <dl>
                   <div>
                     <dt>Prazo</dt>
-                    <dd>{projeto.prazoEm ? formatarData(projeto.prazoEm) : 'A definir'}</dd>
+                    <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
                   </div>
                   <div>
                     <dt>Arquivos</dt>

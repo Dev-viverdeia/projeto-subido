@@ -35,14 +35,21 @@ export async function concluirPendenciaCliente(
   if (!validacao.success) return { erro: 'Não foi possível identificar esta pendência.' };
 
   try {
-    const concluiu = await registrarConclusaoDependenciaCliente({
+    const resultado = await registrarConclusaoDependenciaCliente({
       codigo: validacao.data.codigo,
       acaoId: validacao.data.acao,
     });
-    if (!concluiu) return { erro: 'Esta pendência já foi concluída ou deixou de estar ativa.' };
+    if (!resultado.concluiu) {
+      return { erro: 'Esta pendência já foi concluída ou deixou de estar ativa.' };
+    }
 
     revalidatePath(`/portal/${validacao.data.codigo}`);
-    return { sucesso: 'Tudo certo. O responsável pelo projeto já pode ver sua confirmação.' };
+    return {
+      sucesso:
+        resultado.notificacao === 'falhou' || resultado.notificacao === 'indisponivel'
+          ? 'Tudo certo. A confirmação ficou salva no projeto.'
+          : 'Tudo certo. O responsável pelo projeto foi avisado.',
+    };
   } catch (erro) {
     console.error(
       `[portal-cliente:pendencia] ${erro instanceof Error ? erro.message : 'erro_desconhecido'}`,

@@ -52,4 +52,52 @@ describe('prioridade das entregas', () => {
       },
     );
   });
+
+  it('trata preparação atrasada do prestador como trabalho imediato', () => {
+    expect(
+      classificarPrioridadeEntrega({ ...BASE, dependenciasPrestadorAtrasadas: 2 }, AGORA),
+    ).toMatchObject({
+      tipo: 'atrasada',
+      grupo: 'acao',
+      rotulo: 'Preparação atrasada',
+      detalhe: '2 pendências com você',
+    });
+  });
+
+  it('mostra quando a preparação ainda depende do cliente', () => {
+    expect(
+      classificarPrioridadeEntrega({ ...BASE, dependenciasClientePendentes: 1 }, AGORA),
+    ).toMatchObject({
+      tipo: 'aguardando_cliente',
+      grupo: 'cliente',
+      detalhe: '1 pendência de preparação',
+    });
+  });
+
+  it('prioriza a causa operacional em vez do prazo geral do projeto', () => {
+    expect(
+      classificarPrioridadeEntrega(
+        {
+          ...BASE,
+          prazoEm: '2026-08-20T12:00:00.000Z',
+          dependenciasClientePendentes: 1,
+          dependenciasClienteAtrasadas: 1,
+        },
+        AGORA,
+      ),
+    ).toMatchObject({
+      tipo: 'aguardando_cliente',
+      rotulo: 'Pendência vencida com o cliente',
+    });
+  });
+
+  it('mantém a preparação do prestador visível mesmo antes do prazo', () => {
+    expect(
+      classificarPrioridadeEntrega({ ...BASE, dependenciasPrestadorPendentes: 1 }, AGORA),
+    ).toMatchObject({
+      tipo: 'preparacao',
+      grupo: 'acao',
+      rotulo: 'Preparação com você',
+    });
+  });
 });

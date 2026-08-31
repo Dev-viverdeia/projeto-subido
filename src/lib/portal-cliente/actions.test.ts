@@ -65,17 +65,34 @@ describe('decidirEntregaCliente', () => {
   });
 
   it('registra uma pendência concluída pelo portal', async () => {
-    registrarConclusaoDependenciaCliente.mockResolvedValue(true);
+    registrarConclusaoDependenciaCliente.mockResolvedValue({
+      concluiu: true,
+      notificacao: 'enviada',
+    });
     const dados = new FormData();
     dados.set('codigo', '44444444-4444-4444-8444-444444444444');
     dados.set('acao', 'cccccccc-cccc-4ccc-8ccc-cccccccccccc');
 
     const resultado = await concluirPendenciaCliente({}, dados);
 
-    expect(resultado.sucesso).toMatch(/responsável pelo projeto/i);
+    expect(resultado.sucesso).toMatch(/foi avisado/i);
     expect(registrarConclusaoDependenciaCliente).toHaveBeenCalledWith({
       codigo: '44444444-4444-4444-8444-444444444444',
       acaoId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
     });
+  });
+
+  it('preserva a confirmação quando o aviso ao responsável falha', async () => {
+    registrarConclusaoDependenciaCliente.mockResolvedValue({
+      concluiu: true,
+      notificacao: 'falhou',
+    });
+    const dados = new FormData();
+    dados.set('codigo', '44444444-4444-4444-8444-444444444444');
+    dados.set('acao', 'cccccccc-cccc-4ccc-8ccc-cccccccccccc');
+
+    const resultado = await concluirPendenciaCliente({}, dados);
+
+    expect(resultado.sucesso).toMatch(/ficou salva/i);
   });
 });

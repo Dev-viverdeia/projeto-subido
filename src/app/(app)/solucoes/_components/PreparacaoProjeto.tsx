@@ -20,6 +20,7 @@ import {
   salvarDependenciaProjeto,
 } from '@/lib/projetos-execucao/plano-actions';
 import type { AcaoPlanoProjeto } from '@/lib/projetos-execucao/queries';
+import { prazoEstaAtrasado, rotuloPrazoOperacional } from '@/lib/projetos-execucao/prazo';
 import styles from './PreparacaoProjeto.module.css';
 
 const INICIAL: EstadoProjetoExecucao = {};
@@ -110,9 +111,10 @@ function ItemDependencia({
   const [estado, atualizar, pendente] = useActionState(atualizarAcaoPlano, INICIAL);
   const concluida = acao.status === 'concluida';
   const cliente = acao.responsavelTipo === 'cliente';
+  const atrasada = !concluida && prazoEstaAtrasado(acao.prazoEm);
 
   return (
-    <li data-concluida={concluida || undefined}>
+    <li data-concluida={concluida || undefined} data-atrasada={atrasada || undefined}>
       <span className={styles.marcador} aria-hidden="true">
         {concluida ? (
           <Check size={15} />
@@ -136,7 +138,11 @@ function ItemDependencia({
           </span>
           <span>
             <CalendarDays size={13} />
-            {acao.prazoEm ? DATA.format(new Date(acao.prazoEm)) : 'Prazo a combinar'}
+            {acao.prazoEm
+              ? atrasada
+                ? rotuloPrazoOperacional(acao.prazoEm)
+                : DATA.format(new Date(acao.prazoEm))
+              : 'Prazo a combinar'}
           </span>
           {cliente &&
             !concluida &&

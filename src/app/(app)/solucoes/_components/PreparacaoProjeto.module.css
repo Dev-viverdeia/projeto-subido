@@ -108,6 +108,18 @@
   background: color-mix(in srgb, var(--via-bg-2) 70%, transparent);
 }
 
+.lista > li[data-atrasada] {
+  background:
+    linear-gradient(112deg, color-mix(in srgb, var(--via-coral) 7%, transparent), transparent 38%),
+    color-mix(in srgb, var(--via-white) 76%, transparent);
+}
+
+.lista > li[data-atrasada] .marcador,
+.lista > li[data-atrasada] .metadados span:nth-child(2) {
+  border-color: color-mix(in srgb, var(--via-coral-dark) 28%, var(--via-border));
+  color: var(--via-coral-dark);
+}
+
 .marcador {
   width: 34px;
   height: 34px;
