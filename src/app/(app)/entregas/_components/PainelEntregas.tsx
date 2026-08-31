@@ -17,18 +17,24 @@ import {
   ordenarEntregasPorPrioridade,
   type PrioridadeEntrega,
 } from '@/lib/projetos-execucao/prioridade';
+import { classificarRevisaoEvolucao } from '@/lib/projetos-execucao/radar-evolucao';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import styles from './PainelEntregas.module.css';
+import { RadarPosEntrega } from './RadarPosEntrega';
 
 function formatarPrazo(valor: string | null): string {
   if (!valor) return 'Prazo a definir';
+
+  const data = /^\d{4}-\d{2}-\d{2}$/.test(valor)
+    ? new Date(`${valor}T12:00:00-03:00`)
+    : new Date(valor);
 
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: 'short',
     timeZone: 'America/Sao_Paulo',
   })
-    .format(new Date(valor))
+    .format(data)
     .replace('.', '');
 }
 
@@ -168,18 +174,25 @@ function LinhaEntrega({
   );
 }
 
-function EstadoVazio() {
+function EstadoVazio({ temPosEntrega }: { temPosEntrega: boolean }) {
   return (
     <section className={styles.vazio} aria-labelledby="entregas-vazias-titulo">
       <span className={styles.vazioIcone} aria-hidden="true">
         <ClipboardCheck size={24} strokeWidth={1.6} />
       </span>
       <div>
-        <p className={styles.eyebrow}>Nenhuma entrega aberta</p>
-        <h2 id="entregas-vazias-titulo">A próxima começa quando uma proposta for aceita.</h2>
+        <p className={styles.eyebrow}>
+          {temPosEntrega ? 'Execução em dia' : 'Nenhuma entrega aberta'}
+        </p>
+        <h2 id="entregas-vazias-titulo">
+          {temPosEntrega
+            ? 'Nenhum projeto está em execução agora.'
+            : 'A próxima começa quando uma proposta for aceita.'}
+        </h2>
         <p>
-          O cliente, o escopo vendido e o passo a passo aparecem aqui automaticamente. A execução
-          continua sendo feita por você.
+          {temPosEntrega
+            ? 'Use as revisões acima para acompanhar o resultado dos clientes já atendidos.'
+            : 'O cliente, o escopo vendido e o passo a passo aparecem aqui automaticamente. A execução continua sendo feita por você.'}
         </p>
       </div>
       <Link href="/propostas" className={styles.acaoSecundaria}>
@@ -210,7 +223,11 @@ export function PainelEntregas({
   const aguardandoCliente = ativos.filter(
     (projeto) => prioridades.get(projeto.id)?.grupo === 'cliente',
   ).length;
-  const noRitmo = ativos.filter((projeto) => prioridades.get(projeto.id)?.grupo === 'ritmo').length;
+  const revisoesAgora = concluidos.filter((projeto) => {
+    if (!projeto.evolucao || projeto.evolucao.status === 'registrada') return false;
+    const sinal = classificarRevisaoEvolucao(projeto.evolucao, agora);
+    return sinal.status === 'vencida' || sinal.status === 'hoje' || sinal.status === 'proxima';
+  }).length;
   const principal = ativos[0] ?? null;
   const prioridadePrincipal = principal ? prioridades.get(principal.id) : null;
   const demaisAtivos = ativos.slice(1);
@@ -219,25 +236,25 @@ export function PainelEntregas({
     <div className={styles.pagina}>
       <header className={styles.hero}>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Projetos em execução</p>
+          <p className={styles.eyebrow}>Execução e continuidade</p>
           <h1>Entregas dos clientes</h1>
           <p>
-            Comece pelo que exige ação, acompanhe as validações e mantenha cada cliente dentro do
-            prazo combinado.
+            Execute o combinado, acompanhe o resultado e mantenha claro o próximo passo de cada
+            cliente.
           </p>
         </div>
         <dl className={styles.resumo} aria-label="Resumo das entregas">
           <div>
+            <dt>Em execução</dt>
+            <dd>{ativos.length}</dd>
+          </div>
+          <div>
             <dt>Pedem ação</dt>
-            <dd>{precisamAcao}</dd>
+            <dd>{precisamAcao + aguardandoCliente}</dd>
           </div>
           <div>
-            <dt>Com o cliente</dt>
-            <dd>{aguardandoCliente}</dd>
-          </div>
-          <div>
-            <dt>No ritmo</dt>
-            <dd>{noRitmo}</dd>
+            <dt>Revisões agora</dt>
+            <dd>{revisoesAgora}</dd>
           </div>
           <div>
             <dt>Entregues</dt>
@@ -245,6 +262,8 @@ export function PainelEntregas({
           </div>
         </dl>
       </header>
+
+      <RadarPosEntrega projetos={concluidos} agora={agora} />
 
       {principal ? (
         <section className={styles.emAndamento} aria-labelledby="titulo-em-andamento">
@@ -288,7 +307,7 @@ export function PainelEntregas({
           )}
         </section>
       ) : (
-        <EstadoVazio />
+        <EstadoVazio temPosEntrega={concluidos.some((projeto) => projeto.evolucao)} />
       )}
 
       {concluidos.length > 0 && (
@@ -302,23 +321,32 @@ export function PainelEntregas({
           </header>
 
           <ol className={styles.listaConcluidas}>
-            {concluidos.map((projeto) => (
-              <li key={projeto.id}>
-                <Link href={`/entregas/${projeto.id}`}>
-                  <span className={styles.checkConcluido} aria-hidden="true">
-                    <Check size={15} strokeWidth={1.8} />
-                  </span>
-                  <span>
-                    <small>{projeto.empresa}</small>
-                    <strong>{projeto.titulo}</strong>
-                  </span>
-                  <span className={styles.dataConcluida}>
-                    Atualizada {formatarPrazo(projeto.atualizadoEm)}
-                  </span>
-                  <ArrowRight size={16} strokeWidth={1.7} aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
+            {concluidos.map((projeto) => {
+              const sinal = projeto.evolucao
+                ? classificarRevisaoEvolucao(projeto.evolucao, agora)
+                : null;
+              return (
+                <li key={projeto.id}>
+                  <Link href={`/entregas/${projeto.id}`}>
+                    <span className={styles.checkConcluido} aria-hidden="true">
+                      <Check size={15} strokeWidth={1.8} />
+                    </span>
+                    <span>
+                      <small>{projeto.empresa}</small>
+                      <strong>{projeto.titulo}</strong>
+                    </span>
+                    <span className={styles.dataConcluida} data-status={sinal?.status ?? undefined}>
+                      {sinal
+                        ? sinal.status === 'registrada'
+                          ? sinal.rotulo
+                          : `${sinal.rotulo} · ${formatarPrazo(projeto.evolucao!.revisaoEm)}`
+                        : `Atualizada ${formatarPrazo(projeto.atualizadoEm)}`}
+                    </span>
+                    <ArrowRight size={16} strokeWidth={1.7} aria-hidden="true" />
+                  </Link>
+                </li>
+              );
+            })}
           </ol>
         </section>
       )}

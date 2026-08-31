@@ -106,6 +106,7 @@ export type ResumoProjetoExecucao = {
   dependenciasPrestadorPendentes?: number;
   dependenciasClienteAtrasadas?: number;
   dependenciasPrestadorAtrasadas?: number;
+  evolucao?: EvolucaoProjeto | null;
 };
 
 export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
@@ -180,7 +181,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status), projeto_evolucoes(*)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -219,6 +220,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
           (mudanca) => mudanca.status === 'aguardando_cliente',
         ).length,
         ...resumirDependencias(acoesPlano),
+        evolucao: obterEvolucaoUnica(linha.projeto_evolucoes),
       },
     ];
   });

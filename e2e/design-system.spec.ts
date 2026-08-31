@@ -16,6 +16,7 @@ const TELAS = [
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
+  ['/preview/entregas', 'Entregas dos clientes'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
 ] as const;
@@ -98,6 +99,17 @@ test.describe('fundação visual Viver de IA', () => {
       corpo: document.body.scrollHeight,
     }));
     expect(Math.abs(alturas.documento - alturas.corpo)).toBeLessThanOrEqual(2);
+  });
+
+  test('Entregas traz a revisão vencida para a frente sem criar outro módulo', async ({ page }) => {
+    await page.goto('/preview/entregas');
+
+    await expect(
+      page.getByRole('heading', { name: '1 revisão pede atenção agora.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Abrir revisão de Nexo Imóveis' })).toBeVisible();
+    await expect(page.getByText('Registrar resultado')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Entregas concluídas' })).toBeVisible();
   });
 
   test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {

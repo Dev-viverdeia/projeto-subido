@@ -30,6 +30,19 @@ const CONCLUIDO: ResumoProjetoExecucao = {
   proximaTarefa: null,
 };
 
+const EVOLUCAO_AGENDADA = {
+  id: '55555555-5555-4555-8555-555555555555',
+  status: 'agendada' as const,
+  revisaoEm: '2026-08-27',
+  resultadoObservado: null,
+  evidenciaResultadoUrl: null,
+  decisao: null,
+  proximoPasso: null,
+  proximoPassoEm: null,
+  compartilharCliente: false,
+  registradaEm: null,
+};
+
 afterEach(cleanup);
 
 describe('PainelEntregas', () => {
@@ -87,5 +100,48 @@ describe('PainelEntregas', () => {
       'href',
       '/propostas',
     );
+  });
+
+  it('traz uma revisão pós-entrega vencida para a frente da operação', () => {
+    render(
+      <PainelEntregas
+        projetos={[EM_EXECUCAO, { ...CONCLUIDO, evolucao: EVOLUCAO_AGENDADA }]}
+        agora={new Date('2026-08-28T12:00:00Z')}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: '1 revisão pede atenção agora.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Abrir revisão de Grupo Norte' })).toHaveAttribute(
+      'href',
+      `/entregas/${CONCLUIDO.id}`,
+    );
+    expect(screen.getByText('Registrar resultado')).toBeInTheDocument();
+    expect(screen.getAllByText(/Atrasada há 1 dia/)).toHaveLength(2);
+  });
+
+  it('mantém revisões já registradas apenas no histórico', () => {
+    render(
+      <PainelEntregas
+        projetos={[
+          {
+            ...CONCLUIDO,
+            evolucao: {
+              ...EVOLUCAO_AGENDADA,
+              status: 'registrada',
+              resultadoObservado: 'Tempo médio de resposta caiu para dois minutos.',
+            },
+          },
+        ]}
+        agora={new Date('2026-08-28T12:00:00Z')}
+      />,
+    );
+
+    expect(screen.queryByText('Depois da entrega')).not.toBeInTheDocument();
+    expect(screen.getByText('Resultado registrado')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nenhum projeto está em execução agora.' }),
+    ).toBeInTheDocument();
   });
 });
