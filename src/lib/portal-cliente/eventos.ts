@@ -9,6 +9,8 @@ export const EVENTOS_VISIVEIS_PORTAL = [
   'mudanca_escopo_proposta',
   'mudanca_escopo_aprovada',
   'mudanca_escopo_recusada',
+  'encerramento_enviado',
+  'projeto_encerrado',
 ] as const;
 
 export function descreverProximaAcaoPortal(
@@ -17,7 +19,7 @@ export function descreverProximaAcaoPortal(
   mudancasAguardando: number,
 ) {
   if (concluido) {
-    return 'O aceite final foi registrado. Os materiais continuam disponíveis neste portal.';
+    return 'O aceite final foi registrado. Garantia, suporte e materiais continuam disponíveis neste portal.';
   }
   if (!totalAcoes) {
     return 'Você não precisa fazer nada agora. Avisaremos quando uma validação estiver pronta.';

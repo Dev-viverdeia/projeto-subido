@@ -26,10 +26,14 @@ const ROTULO_EVENTO: Record<EventoProjetoExecucao['tipo'], string> = {
   mudanca_escopo_proposta: 'Impacto enviado ao cliente',
   mudanca_escopo_aprovada: 'Mudança aprovada pelo cliente',
   mudanca_escopo_recusada: 'Combinado original mantido',
+  encerramento_enviado: 'Encerramento enviado para aceite',
+  projeto_encerrado: 'Projeto encerrado com aceite',
 };
 
 function IconeEvento({ tipo }: { tipo: EventoProjetoExecucao['tipo'] }) {
-  if (tipo === 'entrega_aprovada') return <BadgeCheck size={17} aria-hidden="true" />;
+  if (tipo === 'entrega_aprovada' || tipo === 'projeto_encerrado') {
+    return <BadgeCheck size={17} aria-hidden="true" />;
+  }
   if (tipo === 'pendencia_concluida') return <BadgeCheck size={17} aria-hidden="true" />;
   if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
   if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;

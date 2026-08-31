@@ -603,6 +603,19 @@
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
 }
 
+.termoAceite {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.aprovacao[data-final] .aprovacaoResumo,
+.aprovacao[data-final] form {
+  grid-row: 2;
+}
+
 .aprovacaoResumo,
 .aprovacao form {
   padding: var(--via-space-5);
@@ -1001,6 +1014,12 @@
   background: var(--via-white);
 }
 
+.encerramentoPortal {
+  padding: clamp(34px, 5vw, 62px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--app-glass-plane-strong);
+}
+
 .posEntrega[data-concluido] {
   background: var(--app-glass-plane-strong);
 }
@@ -1259,7 +1278,8 @@
   .centralDecisoes,
   .acordo,
   .painel,
-  .posEntrega {
+  .posEntrega,
+  .encerramentoPortal {
     padding: var(--via-space-6) var(--via-space-5);
   }
 

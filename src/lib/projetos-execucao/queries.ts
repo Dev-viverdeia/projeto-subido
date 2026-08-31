@@ -24,8 +24,11 @@ import {
   resumirDependencias,
   type AcaoPlanoProjeto,
 } from './plano';
+import { obterEncerramentoUnico, type EncerramentoProjeto } from './encerramento';
+import type { TipoEventoProjeto } from './eventos';
 
 export type { AcaoPlanoProjeto } from './plano';
+export type { TipoEventoProjeto } from './eventos';
 
 export type TarefaProjetoExecucao = {
   id: string;
@@ -64,22 +67,6 @@ export type ArquivoProjetoExecucao = {
   publicadoEm: string | null;
   criadoEm: string;
 };
-
-export type TipoEventoProjeto =
-  | 'portal_ativado'
-  | 'portal_desativado'
-  | 'link_rotacionado'
-  | 'aprovacao_solicitada'
-  | 'entrega_aprovada'
-  | 'ajustes_solicitados'
-  | 'arquivo_liberado'
-  | 'arquivo_retirado'
-  | 'pendencia_concluida'
-  | 'mudanca_escopo_solicitada'
-  | 'mudanca_escopo_incluida'
-  | 'mudanca_escopo_proposta'
-  | 'mudanca_escopo_aprovada'
-  | 'mudanca_escopo_recusada';
 
 export type EventoProjetoExecucao = {
   id: string;
@@ -135,6 +122,7 @@ export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
   acoesPlano: AcaoPlanoProjeto[];
   eventos: EventoProjetoExecucao[];
   mudancasEscopo: MudancaEscopoProjeto[];
+  encerramento: EncerramentoProjeto | null;
   portalAtivo: boolean;
   portalCodigo: string;
   portalAtivadoEm: string | null;
@@ -240,7 +228,7 @@ export const obterProjetoExecucao = cache(
     const { data, error } = await supabase
       .from('projetos_execucao')
       .select(
-        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*), projeto_mudancas_escopo(*)',
+        '*, projeto_tarefas(*), projeto_arquivos(*), projeto_acoes(*), projeto_portal_eventos(*), projeto_mudancas_escopo(*), projeto_encerramentos(*)',
       )
       .eq('id', id)
       .maybeSingle();
@@ -415,6 +403,7 @@ export const obterProjetoExecucao = cache(
         })
         .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
       mudancasEscopo: mapearMudancasEscopo(data.projeto_mudancas_escopo),
+      encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
       acoesPlano,
     };
   },

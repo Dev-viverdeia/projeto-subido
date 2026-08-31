@@ -9,107 +9,23 @@ import {
 } from '@/lib/notificacoes/entrega';
 import { emailDecisaoCliente, emailPendenciaResolvida } from '@/lib/notificacoes/entrega-email';
 import { lerDocumentoProposta } from '@/lib/propostas/schema';
-import type {
-  StatusClienteProjeto,
-  StatusProjetoExecucao,
-  StatusTarefaProjeto,
-} from '@/lib/projetos-execucao/status';
-import {
-  mapearMudancasEscopo,
-  type MudancaEscopoProjeto,
-} from '@/lib/projetos-execucao/mudancas-escopo';
-import type { TipoEventoProjeto } from '@/lib/projetos-execucao/queries';
+import { mapearMudancasEscopo } from '@/lib/projetos-execucao/mudancas-escopo';
 import { lerBriefingKickoff } from '@/lib/projetos-execucao/briefing';
+import { obterEncerramentoUnico } from '@/lib/projetos-execucao/encerramento';
 // Exceção deliberada: o link secreto é resolvido no servidor sem abrir SELECT
 // para `anon`. O retorno abaixo contém só o recorte preparado para o cliente.
 // eslint-disable-next-line no-restricted-imports
 import { createAdminClient } from '@/lib/supabase/admin';
 import { EVENTOS_VISIVEIS_PORTAL } from './eventos';
+import type { AcaoPortalCliente, EventoPortalCliente, ProjetoPortalCliente } from './tipos';
 
-export type TarefaPortalCliente = {
-  id: string;
-  faseId: string;
-  faseTitulo: string;
-  titulo: string;
-  concluidoQuando: string;
-  entregavel: string;
-  ordem: number;
-  status: StatusTarefaProjeto;
-  clienteStatus: StatusClienteProjeto;
-  clienteNota: string | null;
-  entregavelUrl: string | null;
-  solicitadoEm: string | null;
-  respondidoEm: string | null;
-  comentario: string | null;
-};
-
-export type ArquivoPortalCliente = {
-  id: string;
-  tarefaId: string | null;
-  titulo: string;
-  descricao: string | null;
-  nomeOriginal: string;
-  mimeType: string;
-  tamanhoBytes: number;
-  versao: number;
-  publicadoEm: string;
-};
-
-export type EventoPortalCliente = {
-  id: string;
-  tarefaId: string | null;
-  mudancaEscopoId?: string | null;
-  tipo: Extract<
-    TipoEventoProjeto,
-    | 'aprovacao_solicitada'
-    | 'entrega_aprovada'
-    | 'ajustes_solicitados'
-    | 'arquivo_liberado'
-    | 'pendencia_concluida'
-    | 'mudanca_escopo_solicitada'
-    | 'mudanca_escopo_incluida'
-    | 'mudanca_escopo_proposta'
-    | 'mudanca_escopo_aprovada'
-    | 'mudanca_escopo_recusada'
-  >;
-  autor: 'prestador' | 'cliente';
-  comentario: string | null;
-  criadoEm: string;
-};
-
-export type AcaoPortalCliente = {
-  id: string;
-  titulo: string;
-  categoria: 'acesso' | 'dependencia';
-  prazoEm: string | null;
-  status: 'pendente' | 'concluida';
-  responsavelNome: string | null;
-};
-
-export type ProjetoPortalCliente = {
-  id: string;
-  titulo: string;
-  empresa: string;
-  resumo: string;
-  objetivo: string;
-  status: StatusProjetoExecucao;
-  inicioEm: string;
-  prazoEm: string | null;
-  feitas: number;
-  total: number;
-  tarefas: TarefaPortalCliente[];
-  arquivos: ArquivoPortalCliente[];
-  eventos: EventoPortalCliente[];
-  dependencias: AcaoPortalCliente[];
-  mudancasEscopo: MudancaEscopoProjeto[];
-  briefing: {
-    objetivo: string;
-    criterioSucesso: string;
-    responsavelCliente: string;
-    responsavelTecnico: string;
-    proximosPassos: string[];
-  } | null;
-};
+export type {
+  AcaoPortalCliente,
+  ArquivoPortalCliente,
+  EventoPortalCliente,
+  ProjetoPortalCliente,
+  TarefaPortalCliente,
+} from './tipos';
 
 function codigoValido(codigo: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(codigo);
@@ -123,7 +39,7 @@ export const obterPortalCliente = cache(
     const { data, error } = await admin
       .from('projetos_execucao')
       .select(
-        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente), projeto_mudancas_escopo(*)',
+        'id, titulo, status, inicio_em, prazo_em, documento, briefing_kickoff, projeto_tarefas(id, fase_id, fase_titulo, titulo, concluido_quando, entregavel, ordem, status, cliente_status, cliente_nota, entregavel_url, cliente_solicitado_em, cliente_respondido_em, cliente_comentario), projeto_acoes(id, titulo, categoria, prazo_em, status, responsavel_nome, responsavel_tipo, visivel_cliente), projeto_mudancas_escopo(*), projeto_encerramentos(*)',
       )
       .eq('portal_codigo', codigo)
       .eq('portal_ativo', true)
@@ -257,6 +173,7 @@ export const obterPortalCliente = cache(
             proximosPassos: briefing.proximosPassos,
           }
         : null,
+      encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
     };
   },
 );

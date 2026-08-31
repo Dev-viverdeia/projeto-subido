@@ -5,6 +5,7 @@ import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { ACOES_PLANO } from './acoes-preview';
 import * as estados from './estado-inicial';
 import { PreviewSidebar } from './PreviewSidebar';
+import { ENCERRAMENTO_PREVIEW } from '../encerramento-preview';
 import styles from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Sala de Entrega' };
@@ -27,6 +28,7 @@ const PROJETO: ProjetoExecucaoCompleto = {
   tarefasBloqueadas: 0,
   validacoesAguardando: 0,
   ajustesSolicitados: 0,
+  encerramento: ENCERRAMENTO_PREVIEW,
   portalAtivo: true,
   portalCodigo: '44444444-4444-4444-8444-444444444444',
   portalAtivadoEm: '2026-08-09T12:00:00.000Z',

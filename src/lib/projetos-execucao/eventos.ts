@@ -1,0 +1,17 @@
+export type TipoEventoProjeto =
+  | 'portal_ativado'
+  | 'portal_desativado'
+  | 'link_rotacionado'
+  | 'aprovacao_solicitada'
+  | 'entrega_aprovada'
+  | 'ajustes_solicitados'
+  | 'arquivo_liberado'
+  | 'arquivo_retirado'
+  | 'pendencia_concluida'
+  | 'mudanca_escopo_solicitada'
+  | 'mudanca_escopo_incluida'
+  | 'mudanca_escopo_proposta'
+  | 'mudanca_escopo_aprovada'
+  | 'mudanca_escopo_recusada'
+  | 'encerramento_enviado'
+  | 'projeto_encerrado';

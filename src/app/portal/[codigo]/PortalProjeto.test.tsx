@@ -24,6 +24,7 @@ const PROJETO: ProjetoPortalCliente = {
   total: 2,
   dependencias: [],
   mudancasEscopo: [],
+  encerramento: null,
   briefing: {
     objetivo: 'Responder rapidamente e transferir com contexto.',
     criterioSucesso: 'A recepção recebe cada contato com histórico completo.',
@@ -90,6 +91,23 @@ const PROJETO: ProjetoPortalCliente = {
   ],
 };
 
+const ENCERRAMENTO: NonNullable<ProjetoPortalCliente['encerramento']> = {
+  id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2',
+  status: 'aguardando_aceite',
+  resumoEntrega: 'Atendimento configurado, testado e entregue à recepção.',
+  resultadoPrincipal: 'A primeira resposta ocorreu em menos de um minuto nos testes aprovados.',
+  evidenciaResultadoUrl: 'https://example.com/resultado',
+  garantiaDias: 30,
+  garantiaCobre: 'Correções do fluxo entregue.',
+  garantiaNaoCobre: 'Novas funcionalidades.',
+  canalSuporte: 'suporte@exemplo.com',
+  responsavelContinuidade: 'Camila Rios',
+  orientacaoContinuidade: 'Acompanhar as transferências diariamente e registrar qualquer desvio.',
+  enviadoEm: '2026-08-10T17:10:00.000Z',
+  aceitoEm: null,
+  garantiaTerminaEm: null,
+};
+
 describe('PortalProjeto', () => {
   it('mostra progresso e decisão sem expor o campo de evidência interna', () => {
     render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);
@@ -126,11 +144,18 @@ describe('PortalProjeto', () => {
     render(
       <PortalProjeto
         codigo="44444444-4444-4444-8444-444444444444"
-        projeto={{ ...PROJETO, status: 'em_validacao', feitas: 2 }}
+        projeto={{
+          ...PROJETO,
+          status: 'em_validacao',
+          feitas: 2,
+          encerramento: ENCERRAMENTO,
+        }}
       />,
     );
 
     expect(screen.getByText('Aceite final do projeto')).toBeVisible();
+    expect(screen.getByText('Resultado, garantia e continuidade.')).toBeVisible();
+    expect(screen.getByText('30 dias a partir do aceite final')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar e concluir/i })).toBeVisible();
   });
 

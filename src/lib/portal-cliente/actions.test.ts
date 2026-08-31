@@ -107,7 +107,7 @@ describe('decidirEntregaCliente', () => {
 
     const resultado = await decidirEntregaCliente({}, formulario('aprovada', '', true));
 
-    expect(resultado.sucesso).toMatch(/projeto foi concluído/i);
+    expect(resultado.sucesso).toMatch(/projeto foi encerrado/i);
   });
 
   it('preserva a decisão quando o aviso por e-mail falha', async () => {

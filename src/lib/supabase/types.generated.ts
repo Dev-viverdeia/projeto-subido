@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       admin_acessos_eventos: {
@@ -2056,6 +2081,77 @@ export type Database = {
           },
         ]
       }
+      projeto_encerramentos: {
+        Row: {
+          aceito_em: string | null
+          atualizado_em: string
+          canal_suporte: string
+          criado_em: string
+          dono: string
+          enviado_em: string | null
+          evidencia_resultado_url: string | null
+          garantia_cobre: string
+          garantia_dias: number
+          garantia_nao_cobre: string
+          garantia_termina_em: string | null
+          id: string
+          orientacao_continuidade: string
+          projeto_execucao_id: string
+          responsavel_continuidade: string
+          resultado_principal: string
+          resumo_entrega: string
+          status: Database["public"]["Enums"]["projeto_encerramento_status"]
+        }
+        Insert: {
+          aceito_em?: string | null
+          atualizado_em?: string
+          canal_suporte: string
+          criado_em?: string
+          dono: string
+          enviado_em?: string | null
+          evidencia_resultado_url?: string | null
+          garantia_cobre: string
+          garantia_dias?: number
+          garantia_nao_cobre: string
+          garantia_termina_em?: string | null
+          id?: string
+          orientacao_continuidade: string
+          projeto_execucao_id: string
+          responsavel_continuidade: string
+          resultado_principal: string
+          resumo_entrega: string
+          status?: Database["public"]["Enums"]["projeto_encerramento_status"]
+        }
+        Update: {
+          aceito_em?: string | null
+          atualizado_em?: string
+          canal_suporte?: string
+          criado_em?: string
+          dono?: string
+          enviado_em?: string | null
+          evidencia_resultado_url?: string | null
+          garantia_cobre?: string
+          garantia_dias?: number
+          garantia_nao_cobre?: string
+          garantia_termina_em?: string | null
+          id?: string
+          orientacao_continuidade?: string
+          projeto_execucao_id?: string
+          responsavel_continuidade?: string
+          resultado_principal?: string
+          resumo_entrega?: string
+          status?: Database["public"]["Enums"]["projeto_encerramento_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_encerramentos_projeto_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       projeto_mudancas_escopo: {
         Row: {
           analisado_em: string | null
@@ -3703,6 +3799,25 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      projeto_encerramento_enviar: {
+        Args: { p_projeto_id: string; p_tarefa_id: string }
+        Returns: boolean
+      }
+      projeto_encerramento_salvar: {
+        Args: {
+          p_canal_suporte: string
+          p_evidencia_resultado_url: string
+          p_garantia_cobre: string
+          p_garantia_dias: number
+          p_garantia_nao_cobre: string
+          p_orientacao_continuidade: string
+          p_projeto_id: string
+          p_responsavel_continuidade: string
+          p_resultado_principal: string
+          p_resumo_entrega: string
+        }
+        Returns: string
+      }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
       projeto_mudanca_escopo_analisar: {
         Args: {
@@ -3891,6 +4006,10 @@ export type Database = {
         | "aguardando"
         | "aprovada"
         | "ajustes"
+      projeto_encerramento_status:
+        | "rascunho"
+        | "aguardando_aceite"
+        | "encerrado"
       projeto_execucao_status:
         | "planejamento"
         | "em_execucao"
@@ -4041,6 +4160,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       calls_status: [
@@ -4105,6 +4227,11 @@ export const Constants = {
         "aguardando",
         "aprovada",
         "ajustes",
+      ],
+      projeto_encerramento_status: [
+        "rascunho",
+        "aguardando_aceite",
+        "encerrado",
       ],
       projeto_execucao_status: [
         "planejamento",

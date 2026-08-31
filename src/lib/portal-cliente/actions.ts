@@ -108,7 +108,7 @@ export async function decidirEntregaCliente(
       sucesso:
         validacao.data.decisao === 'aprovada'
           ? validacao.data.final === 'sim'
-            ? 'Aceite final registrado. O projeto foi concluído.'
+            ? 'Aceite final registrado. O projeto foi encerrado e a garantia começou.'
             : 'Entrega aprovada. Obrigado pela confirmação.'
           : 'Pedido de ajuste enviado ao responsável pelo projeto.',
       aviso:

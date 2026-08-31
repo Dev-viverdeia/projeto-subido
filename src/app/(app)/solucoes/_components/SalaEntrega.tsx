@@ -326,6 +326,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                   aceiteFinal={
                     tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
                   }
+                  encerramento={projeto.encerramento}
                 />
               ) : (
                 <div className={styles.semTarefa}>
