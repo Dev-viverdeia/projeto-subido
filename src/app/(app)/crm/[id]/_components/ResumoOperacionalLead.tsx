@@ -38,20 +38,20 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
       ? 'Cliente em entrega'
       : perdida
         ? 'Venda encerrada'
-        : 'Jornada do cliente';
+        : 'Progresso do cliente';
   const descricaoSecao = cicloConcluido
     ? 'A venda e a entrega ficam conectadas nesta ficha para você repetir o que funcionou.'
     : ganha
       ? 'A venda foi aprovada. Continue o projeto até a entrega ser aceita pelo cliente.'
       : perdida
         ? 'A venda foi encerrada. As etapas realizadas e o motivo da perda continuam salvos.'
-        : 'Um caminho simples, sempre guiado pelos fatos registrados nesta ficha.';
+        : 'Veja a etapa atual e o próximo passo da venda.';
 
   return (
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.topo}>
         <div>
-          <p className={styles.sobretitulo}>Método de venda e entrega</p>
+          <p className={styles.sobretitulo}>Venda guiada</p>
           <h2 id="operacao-titulo">{tituloSecao}</h2>
           <p>{descricaoSecao}</p>
         </div>
@@ -85,7 +85,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                 <div>
                   <strong>{etapa.rotulo}</strong>
                   <small className={styles.estadoEtapa}>{rotuloEstado}</small>
-                  <small className={styles.descricaoEtapa}>{etapa.evidencia}</small>
+                  {(estado === 'atual' || estado === 'encerrada') && (
+                    <small className={styles.descricaoEtapa}>{etapa.evidencia}</small>
+                  )}
                 </div>
               </li>
             );

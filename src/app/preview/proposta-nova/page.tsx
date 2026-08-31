@@ -80,13 +80,10 @@ export default function PreviewNovaPropostaPage() {
         <div className={pagina.pagina}>
           <header className={pagina.hero}>
             <div>
-              <p className={pagina.sobretitulo}>Da reunião para a proposta</p>
-              <h1>A conversa já preparou o primeiro rascunho.</h1>
+              <p className={pagina.sobretitulo}>Nova proposta</p>
+              <h1>Criar proposta</h1>
             </div>
-            <p>
-              Cliente, fatos confirmados e pontos a validar já estão conectados. Escolha a estrutura
-              da entrega e revise o documento.
-            </p>
+            <p>Escolha o projeto. O rascunho já usa os fatos confirmados na reunião.</p>
           </header>
           <MontadorProposta
             opcoes={OPCOES}

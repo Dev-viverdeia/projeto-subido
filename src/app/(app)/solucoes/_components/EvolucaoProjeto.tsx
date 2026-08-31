@@ -34,27 +34,27 @@ const DECISOES: Array<{
   {
     id: 'manter',
     titulo: 'Manter a operação',
-    descricao: 'O projeto está funcionando e segue como foi entregue.',
+    descricao: 'O resultado segue estável.',
   },
   {
     id: 'ajustar_garantia',
-    titulo: 'Corrigir na garantia',
-    descricao: 'Existe um ajuste do escopo entregue que precisa ser resolvido.',
+    titulo: 'Ajustar na garantia',
+    descricao: 'Há uma correção no escopo entregue.',
   },
   {
     id: 'expandir',
     titulo: 'Expandir este projeto',
-    descricao: 'O resultado abriu espaço para uma nova etapa paga.',
+    descricao: 'O cliente quer uma nova etapa.',
   },
   {
     id: 'novo_projeto',
-    titulo: 'Começar outro projeto',
-    descricao: 'Outra oportunidade de IA ficou clara para este cliente.',
+    titulo: 'Criar outro projeto',
+    descricao: 'Surgiu uma nova necessidade.',
   },
   {
     id: 'encerrar',
-    titulo: 'Encerrar acompanhamento',
-    descricao: 'Não há outra ação combinada depois desta revisão.',
+    titulo: 'Encerrar',
+    descricao: 'Não há outra ação combinada.',
   },
 ];
 
@@ -102,17 +102,17 @@ export function EvolucaoProjeto({
           </span>
           <div>
             <p>Depois da entrega</p>
-            <h2>{registrada ? 'Resultado confirmado.' : 'Confirme o resultado com o cliente.'}</h2>
+            <h2>{registrada ? 'Resultado registrado' : 'Revisão de resultado'}</h2>
           </div>
         </div>
         <span className={styles.status}>
           {registrada ? (
             <>
-              <BadgeCheck size={14} aria-hidden="true" /> Revisão registrada
+              <BadgeCheck size={14} aria-hidden="true" /> Registrada
             </>
           ) : (
             <>
-              <CalendarClock size={14} aria-hidden="true" /> Revisão agendada
+              <CalendarClock size={14} aria-hidden="true" /> Agendada
             </>
           )}
         </span>
@@ -198,8 +198,8 @@ export function EvolucaoProjeto({
             <div className={styles.instrucao}>
               <Check size={17} aria-hidden="true" />
               <div>
-                <strong>Registre somente o que foi confirmado.</strong>
-                <span>Sem promessa, estimativa ou número que o cliente ainda não validou.</span>
+                <strong>Registre o que o cliente confirmou.</strong>
+                <span>Use fatos e resultados que já foram validados.</span>
               </div>
             </div>
 
@@ -265,8 +265,8 @@ export function EvolucaoProjeto({
             <label className={styles.compartilhar}>
               <input type="checkbox" name="compartilharCliente" defaultChecked />
               <span>
-                <strong>Mostrar esta revisão no portal do cliente</strong>
-                <small>Compartilha somente o resultado e o próximo passo registrados aqui.</small>
+                <strong>Mostrar no portal do cliente</strong>
+                <small>Compartilha o resultado e o próximo passo.</small>
               </span>
             </label>
 
@@ -285,7 +285,7 @@ export function EvolucaoProjeto({
               <span>Depois de registrar, a decisão fica vinculada a esta entrega.</span>
               <button type="submit" disabled={registrando}>
                 <BadgeCheck size={15} aria-hidden="true" />
-                {registrando ? 'Registrando revisão…' : 'Registrar revisão de resultado'}
+                {registrando ? 'Salvando revisão…' : 'Salvar revisão'}
               </button>
             </footer>
           </form>

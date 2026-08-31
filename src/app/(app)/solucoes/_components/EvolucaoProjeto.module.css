@@ -85,8 +85,8 @@
 }
 
 .evolucao[data-registrada] .status {
-  border-color: color-mix(in srgb, var(--via-success) 28%, var(--via-border));
-  color: var(--via-success);
+  border-color: var(--via-navy-20);
+  color: var(--via-navy);
 }
 
 .contexto {
@@ -217,10 +217,10 @@
   align-items: center;
   gap: var(--via-space-3);
   padding: var(--via-space-3);
-  border: 1px solid color-mix(in srgb, var(--via-success) 20%, var(--via-border));
+  border: 1px solid var(--via-navy-14);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-success) 6%, rgba(255, 255, 255, 0.72));
-  color: var(--via-success);
+  background: color-mix(in srgb, var(--via-navy) 4%, rgba(255, 255, 255, 0.72));
+  color: var(--via-navy);
 }
 
 .instrucao strong,
@@ -269,7 +269,7 @@
 }
 
 .decisoes label {
-  min-height: 108px;
+  min-height: 82px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-content: start;
@@ -317,6 +317,12 @@
   color: var(--via-text-primary);
   font-size: var(--via-fs-xs);
   line-height: 1.35;
+}
+
+.decisoes label > span:last-child {
+  font-family: var(--via-font);
+  letter-spacing: var(--app-ls-body);
+  text-transform: none;
 }
 
 .decisoes label small {

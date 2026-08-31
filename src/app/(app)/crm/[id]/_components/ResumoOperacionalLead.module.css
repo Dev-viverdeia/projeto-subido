@@ -13,8 +13,8 @@
   display: grid;
   grid-template-columns: minmax(180px, 0.55fr) minmax(0, 1.8fr);
   align-items: end;
-  gap: var(--via-space-7);
-  padding: clamp(24px, 3vw, 36px);
+  gap: var(--via-space-5);
+  padding: clamp(22px, 2.5vw, 30px);
 }
 
 .topo h2,
@@ -67,7 +67,8 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: var(--via-space-2);
-  padding: var(--via-space-3);
+  min-height: 70px;
+  padding: 10px var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-bg-2) 60%, transparent);
@@ -172,11 +173,11 @@
 
 .decisao {
   display: flex;
-  min-height: 128px;
+  min-height: 108px;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-6);
-  padding: var(--via-space-6) clamp(24px, 3vw, 36px);
+  padding: var(--via-space-5) clamp(22px, 2.5vw, 30px);
   border-block: 1px solid color-mix(in srgb, var(--via-white) 9%, transparent);
   background: var(--app-mesh-trilho);
   color: var(--via-white);

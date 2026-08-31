@@ -53,12 +53,10 @@ describe('EvolucaoProjeto', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', { name: 'Confirme o resultado com o cliente.' }),
-    ).toBeVisible();
-    expect(screen.getByText('Revisão agendada')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Revisão de resultado' })).toBeVisible();
+    expect(screen.getByText('Agendada')).toBeVisible();
     expect(screen.getByRole('group', { name: 'O que ficou combinado agora?' })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Registrar revisão de resultado/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Salvar revisão/i })).toBeVisible();
   });
 
   it('oferece uma nova venda somente quando a decisão abre outro projeto', () => {
@@ -79,7 +77,7 @@ describe('EvolucaoProjeto', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Resultado confirmado.' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Resultado registrado' })).toBeVisible();
     expect(screen.getByText('Expandir este projeto')).toBeVisible();
     expect(screen.getByRole('button', { name: /Levar para Vendas/i })).toBeVisible();
   });
