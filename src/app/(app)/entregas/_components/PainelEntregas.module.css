@@ -381,6 +381,29 @@
   font-weight: var(--via-fw-medium);
 }
 
+.dataConcluida {
+  max-width: 190px;
+  overflow: hidden;
+  padding: 6px 9px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dataConcluida[data-status='vencida'],
+.dataConcluida[data-status='hoje'] {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.dataConcluida[data-status='registrada'] {
+  background: var(--via-accent-soft);
+  color: var(--via-accent-ink);
+}
+
 .prazo {
   display: inline-flex;
   align-items: center;
@@ -932,6 +955,7 @@
   }
 
   .dataConcluida {
-    display: none;
+    grid-column: 2;
+    justify-self: start;
   }
 }
