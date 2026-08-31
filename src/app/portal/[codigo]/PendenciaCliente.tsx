@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { CalendarDays, Check, ClipboardList, KeyRound } from 'lucide-react';
 import { concluirPendenciaCliente, type EstadoPortalCliente } from '@/lib/portal-cliente/actions';
 import type { AcaoPortalCliente } from '@/lib/portal-cliente/servico';
+import { prazoEstaAtrasado, rotuloPrazoOperacional } from '@/lib/projetos-execucao/prazo';
 import styles from './portal.module.css';
 
 const INICIAL: EstadoPortalCliente = {};
@@ -15,9 +16,10 @@ const DATA = new Intl.DateTimeFormat('pt-BR', {
 
 export function PendenciaCliente({ codigo, acao }: { codigo: string; acao: AcaoPortalCliente }) {
   const [estado, concluir, pendente] = useActionState(concluirPendenciaCliente, INICIAL);
+  const atrasada = prazoEstaAtrasado(acao.prazoEm);
 
   return (
-    <article className={styles.pendenciaCliente}>
+    <article className={styles.pendenciaCliente} data-atrasada={atrasada || undefined}>
       <span className={styles.pendenciaIcone}>
         {acao.categoria === 'acesso' ? <KeyRound size={18} /> : <ClipboardList size={18} />}
       </span>
@@ -26,7 +28,11 @@ export function PendenciaCliente({ codigo, acao }: { codigo: string; acao: AcaoP
         <h3>{acao.titulo}</h3>
         <span>
           <CalendarDays size={13} />
-          {acao.prazoEm ? `Até ${DATA.format(new Date(acao.prazoEm))}` : 'Prazo a combinar'}
+          {acao.prazoEm
+            ? atrasada
+              ? rotuloPrazoOperacional(acao.prazoEm)
+              : `Até ${DATA.format(new Date(acao.prazoEm))}`
+            : 'Prazo a combinar'}
         </span>
         {estado.erro && <small role="alert">{estado.erro}</small>}
         {estado.sucesso && <small role="status">{estado.sucesso}</small>}

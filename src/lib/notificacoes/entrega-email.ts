@@ -150,3 +150,29 @@ export function emailDecisaoCliente({
     texto: `${assunto}\n\n${mensagem}${destaque ? `\n\n${destaque}` : ''}\n\nAbrir sala do projeto: ${link}\n\n${rodape}`,
   };
 }
+
+export function emailPendenciaResolvida({
+  empresa,
+  projeto,
+  tarefa,
+  link,
+}: BaseEmail): ConteudoEmailEntrega {
+  const assunto = `${empresa}: o cliente resolveu uma pendência`;
+  const mensagem = `O cliente confirmou um item de preparação do projeto ${projeto}. A sala já está atualizada para você seguir pelo próximo movimento.`;
+  const destaque = `Resolvido pelo cliente: ${tarefa}`;
+  const rodape = 'A confirmação está registrada no histórico do projeto.';
+
+  return {
+    assunto,
+    html: montarLayout({
+      preCabecalho: destaque,
+      titulo: 'Uma pendência saiu do caminho.',
+      mensagem,
+      destaque,
+      rotuloBotao: 'Abrir sala do projeto',
+      link,
+      rodape,
+    }),
+    texto: `${assunto}\n\n${mensagem}\n\n${destaque}\n\nAbrir sala do projeto: ${link}\n\n${rodape}`,
+  };
+}

@@ -2058,6 +2058,7 @@ export type Database = {
       }
       projeto_portal_eventos: {
         Row: {
+          acao_id: string | null
           autor: string
           comentario: string | null
           criado_em: string
@@ -2077,6 +2078,7 @@ export type Database = {
           tipo: string
         }
         Insert: {
+          acao_id?: string | null
           autor: string
           comentario?: string | null
           criado_em?: string
@@ -2096,6 +2098,7 @@ export type Database = {
           tipo: string
         }
         Update: {
+          acao_id?: string | null
           autor?: string
           comentario?: string | null
           criado_em?: string
@@ -2115,6 +2118,13 @@ export type Database = {
           tipo?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "projeto_portal_eventos_acao_id_fkey"
+            columns: ["acao_id"]
+            isOneToOne: false
+            referencedRelation: "projeto_acoes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "projeto_portal_eventos_projeto_execucao_id_fkey"
             columns: ["projeto_execucao_id"]

@@ -8,6 +8,21 @@ const tarefa = {
   clienteStatus: 'nao_solicitada' as const,
 };
 
+const dependencia = {
+  id: 'acao-1',
+  titulo: 'Liberar acesso ao WhatsApp',
+  prazoEm: '2026-08-27T12:00:00-03:00',
+  status: 'pendente' as const,
+  origem: 'briefing',
+  categoria: 'acesso' as const,
+  reuniaoId: null,
+  responsavelTipo: 'cliente' as const,
+  responsavelNome: 'Camila',
+  visivelCliente: true,
+  concluidaEm: null,
+  atualizadoEm: '2026-08-20T12:00:00.000Z',
+};
+
 describe('obterEstadoJornadaEntrega', () => {
   it('prioriza o ajuste pedido pelo cliente e devolve a entrega para execução', () => {
     const estado = obterEstadoJornadaEntrega({
@@ -37,6 +52,41 @@ describe('obterEstadoJornadaEntrega', () => {
       momento: 'validar',
       tom: 'aguardando',
       destino: 'validacao',
+    });
+  });
+
+  it('coloca uma dependência atrasada do profissional antes da próxima tarefa', () => {
+    const estado = obterEstadoJornadaEntrega({
+      status: 'em_execucao',
+      briefingConfirmado: true,
+      tarefas: [{ ...tarefa, status: 'em_andamento' }],
+      compromisso: null,
+      dependencias: [{ ...dependencia, responsavelTipo: 'prestador', visivelCliente: false }],
+      agora: new Date('2026-08-30T12:00:00.000Z'),
+    });
+
+    expect(estado).toMatchObject({
+      tom: 'atrasado',
+      destino: 'preparacao',
+      rotuloAcao: 'Abrir preparação',
+    });
+    expect(estado.descricao).toContain('Atrasada há 3 dias');
+  });
+
+  it('explica quando o próximo movimento depende do cliente', () => {
+    const estado = obterEstadoJornadaEntrega({
+      status: 'em_execucao',
+      briefingConfirmado: true,
+      tarefas: [{ ...tarefa, status: 'em_andamento' }],
+      compromisso: null,
+      dependencias: [{ ...dependencia, prazoEm: '2026-09-02T12:00:00-03:00' }],
+      agora: new Date('2026-08-30T12:00:00.000Z'),
+    });
+
+    expect(estado).toMatchObject({
+      tom: 'aguardando',
+      destino: 'preparacao',
+      rotuloAcao: 'Ver preparação',
     });
   });
 

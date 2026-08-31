@@ -1,11 +1,10 @@
 import type { ResumoProjetoExecucao } from './queries';
-
-const UM_DIA = 86_400_000;
-const FUSO = 'America/Sao_Paulo';
+import { diasAtePrazo } from './prazo';
 
 export type TipoPrioridadeEntrega =
   | 'ajustes'
   | 'bloqueada'
+  | 'preparacao'
   | 'atrasada'
   | 'pausada'
   | 'aguardando_cliente'
@@ -21,23 +20,6 @@ export type PrioridadeEntrega = {
   rotulo: string;
   detalhe: string;
 };
-
-function inicioDoDia(valor: Date): number {
-  const partes = new Intl.DateTimeFormat('en-CA', {
-    timeZone: FUSO,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(valor);
-  const ler = (tipo: Intl.DateTimeFormatPartTypes) =>
-    Number(partes.find((parte) => parte.type === tipo)?.value ?? 0);
-
-  return Date.UTC(ler('year'), ler('month') - 1, ler('day'));
-}
-
-function diasAte(valor: string, agora: Date): number {
-  return Math.round((inicioDoDia(new Date(valor)) - inicioDoDia(agora)) / UM_DIA);
-}
 
 function plural(valor: number, singular: string, pluralizado: string): string {
   return `${valor} ${valor === 1 ? singular : pluralizado}`;
@@ -77,6 +59,17 @@ export function classificarPrioridadeEntrega(
     };
   }
 
+  if ((projeto.dependenciasPrestadorAtrasadas ?? 0) > 0) {
+    const total = projeto.dependenciasPrestadorAtrasadas ?? 0;
+    return {
+      tipo: 'atrasada',
+      ordem: 2,
+      grupo: 'acao',
+      rotulo: 'Preparação atrasada',
+      detalhe: `${plural(total, 'pendência', 'pendências')} com você`,
+    };
+  }
+
   if (projeto.status === 'pausado') {
     return {
       tipo: 'pausada',
@@ -87,17 +80,14 @@ export function classificarPrioridadeEntrega(
     };
   }
 
-  const prazoOperacional = projeto.proximaAcaoPrazoEm ?? projeto.prazoEm;
-  const dias = prazoOperacional ? diasAte(prazoOperacional, agora) : null;
-
-  if (dias !== null && dias < 0) {
-    const atraso = Math.abs(dias);
+  if ((projeto.dependenciasClienteAtrasadas ?? 0) > 0) {
+    const total = projeto.dependenciasClienteAtrasadas ?? 0;
     return {
-      tipo: 'atrasada',
-      ordem: 2,
-      grupo: 'acao',
-      rotulo: projeto.proximaAcaoPrazoEm ? 'Próxima ação atrasada' : 'Prazo vencido',
-      detalhe: `Atraso de ${plural(atraso, 'dia', 'dias')}`,
+      tipo: 'aguardando_cliente',
+      ordem: 3,
+      grupo: 'cliente',
+      rotulo: 'Pendência vencida com o cliente',
+      detalhe: `${plural(total, 'item', 'itens')} aguardando retorno`,
     };
   }
 
@@ -109,6 +99,42 @@ export function classificarPrioridadeEntrega(
       grupo: 'cliente',
       rotulo: 'Aguardando o cliente',
       detalhe: `${plural(validacoes, 'validação', 'validações')} ${validacoes === 1 ? 'pendente' : 'pendentes'}`,
+    };
+  }
+
+  if ((projeto.dependenciasClientePendentes ?? 0) > 0) {
+    const total = projeto.dependenciasClientePendentes ?? 0;
+    return {
+      tipo: 'aguardando_cliente',
+      ordem: 3,
+      grupo: 'cliente',
+      rotulo: 'Aguardando o cliente',
+      detalhe: `${plural(total, 'pendência', 'pendências')} de preparação`,
+    };
+  }
+
+  if ((projeto.dependenciasPrestadorPendentes ?? 0) > 0) {
+    const total = projeto.dependenciasPrestadorPendentes ?? 0;
+    return {
+      tipo: 'preparacao',
+      ordem: 4,
+      grupo: 'acao',
+      rotulo: 'Preparação com você',
+      detalhe: `${plural(total, 'pendência', 'pendências')} para resolver`,
+    };
+  }
+
+  const prazoOperacional = projeto.proximaAcaoPrazoEm ?? projeto.prazoEm;
+  const dias = prazoOperacional ? diasAtePrazo(prazoOperacional, agora) : null;
+
+  if (dias !== null && dias < 0) {
+    const atraso = Math.abs(dias);
+    return {
+      tipo: 'atrasada',
+      ordem: 2,
+      grupo: 'acao',
+      rotulo: projeto.proximaAcaoPrazoEm ? 'Próxima ação atrasada' : 'Prazo vencido',
+      detalhe: `Atraso de ${plural(atraso, 'dia', 'dias')}`,
     };
   }
 

@@ -395,6 +395,18 @@
   box-shadow: var(--app-elev-1-shadow);
 }
 
+.pendenciaCliente[data-atrasada] {
+  border-color: color-mix(in srgb, var(--via-coral-dark) 34%, var(--via-border));
+  background:
+    linear-gradient(118deg, color-mix(in srgb, var(--via-coral) 7%, transparent), transparent 44%),
+    color-mix(in srgb, var(--via-white) 76%, transparent);
+}
+
+.pendenciaCliente[data-atrasada] .pendenciaIcone,
+.pendenciaCliente[data-atrasada] div > span {
+  color: var(--via-coral-dark);
+}
+
 .pendenciaIcone {
   width: 40px;
   height: 40px;

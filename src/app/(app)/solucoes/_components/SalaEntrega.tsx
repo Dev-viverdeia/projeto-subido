@@ -47,7 +47,10 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     [projeto.tarefas],
   );
   const proxima = projeto.tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
-  const proximoCompromisso = projeto.acoesPlano.find((acao) => acao.status === 'pendente') ?? null;
+  const proximoCompromisso =
+    projeto.acoesPlano.find(
+      (acao) => acao.status === 'pendente' && !['acesso', 'dependencia'].includes(acao.categoria),
+    ) ?? null;
   const faseInicial =
     fases.find((fase) => fase.id === proxima?.faseId) ??
     (projeto.feitas === projeto.total ? fases.at(-1) : fases[0]) ??
@@ -77,6 +80,9 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const ajustesSolicitados = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
+  const dependenciasPendentes = projeto.acoesPlano.filter(
+    (acao) => acao.status === 'pendente' && ['acesso', 'dependencia'].includes(acao.categoria),
+  ).length;
   // prettier-ignore
   const contatoCliente = obterContatoNotificacao(projeto.eventos, tarefaAtual?.id, projeto.documento.cliente.email);
   const estadoJornada = obterEstadoJornadaEntrega({
@@ -84,6 +90,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     briefingConfirmado,
     tarefas: projeto.tarefas,
     compromisso: proximoCompromisso?.titulo ?? null,
+    dependencias: projeto.acoesPlano,
   });
 
   function abrirFase(id: string) {
@@ -119,6 +126,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
       setPainel('cliente');
       requestAnimationFrame(() =>
         document.getElementById('briefing-kickoff')?.scrollIntoView?.({ behavior: 'smooth' }),
+      );
+      return;
+    }
+
+    if (destino === 'preparacao') {
+      setPainel('cliente');
+      requestAnimationFrame(() =>
+        document.getElementById('preparacao-titulo')?.scrollIntoView?.({ behavior: 'smooth' }),
       );
       return;
     }
@@ -263,11 +278,13 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                 ? 'Briefing pendente'
                 : ajustesSolicitados
                   ? `${ajustesSolicitados} ajuste${ajustesSolicitados > 1 ? 's' : ''}`
-                  : entregasAguardando
-                    ? `${entregasAguardando} validação${entregasAguardando > 1 ? 'ões' : ''}`
-                    : projeto.portalAtivo
-                      ? 'Portal ativo'
-                      : 'Portal privado'}
+                  : dependenciasPendentes
+                    ? `${dependenciasPendentes} pendência${dependenciasPendentes > 1 ? 's' : ''}`
+                    : entregasAguardando
+                      ? `${entregasAguardando} validação${entregasAguardando > 1 ? 'ões' : ''}`
+                      : projeto.portalAtivo
+                        ? 'Portal ativo'
+                        : 'Portal privado'}
             </small>
           </span>
         </button>

@@ -18,6 +18,7 @@ import {
 } from './briefing';
 import { montarKitOperacionalTarefa, type KitOperacionalTarefa } from './kit-operacional';
 import type { AcaoPlanoProjeto } from './plano';
+import { prazoEstaAtrasado } from './prazo';
 
 export type { AcaoPlanoProjeto } from './plano';
 
@@ -98,6 +99,10 @@ export type ResumoProjetoExecucao = {
   tarefasBloqueadas: number;
   validacoesAguardando: number;
   ajustesSolicitados: number;
+  dependenciasClientePendentes?: number;
+  dependenciasPrestadorPendentes?: number;
+  dependenciasClienteAtrasadas?: number;
+  dependenciasPrestadorAtrasadas?: number;
 };
 
 export type ProjetoExecucaoCompleto = ResumoProjetoExecucao & {
@@ -169,7 +174,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(status, titulo, prazo_em, atualizado_em)',
+      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(status, titulo, prazo_em, atualizado_em, categoria, responsavel_tipo)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -184,13 +189,20 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
     const compromisso = [...linha.projeto_acoes]
-      .filter((acao) => acao.status === 'pendente')
+      .filter(
+        (acao) => acao.status === 'pendente' && !['acesso', 'dependencia'].includes(acao.categoria),
+      )
       .sort((a, b) => {
         if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
         if (a.prazo_em) return -1;
         if (b.prazo_em) return 1;
         return b.atualizado_em.localeCompare(a.atualizado_em);
       })[0];
+    const dependencias = linha.projeto_acoes.filter((acao) =>
+      ['acesso', 'dependencia'].includes(acao.categoria),
+    );
+    const doCliente = dependencias.filter((acao) => acao.responsavel_tipo === 'cliente');
+    const doPrestador = dependencias.filter((acao) => acao.responsavel_tipo === 'prestador');
     return [
       {
         id: linha.id,
@@ -207,6 +219,13 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         validacoesAguardando: tarefas.filter((tarefa) => tarefa.cliente_status === 'aguardando')
           .length,
         ajustesSolicitados: tarefas.filter((tarefa) => tarefa.cliente_status === 'ajustes').length,
+        dependenciasClientePendentes: doCliente.length,
+        dependenciasPrestadorPendentes: doPrestador.length,
+        dependenciasClienteAtrasadas: doCliente.filter((acao) => prazoEstaAtrasado(acao.prazo_em))
+          .length,
+        dependenciasPrestadorAtrasadas: doPrestador.filter((acao) =>
+          prazoEstaAtrasado(acao.prazo_em),
+        ).length,
       },
     ];
   });
@@ -306,13 +325,24 @@ export const obterProjetoExecucao = cache(
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
     const proximoCompromisso = data.projeto_acoes
-      .filter((acao) => acao.status === 'pendente')
+      .filter(
+        (acao) => acao.status === 'pendente' && !['acesso', 'dependencia'].includes(acao.categoria),
+      )
       .sort((a, b) => {
         if (a.prazo_em && b.prazo_em) return a.prazo_em.localeCompare(b.prazo_em);
         if (a.prazo_em) return -1;
         if (b.prazo_em) return 1;
         return b.atualizado_em.localeCompare(a.atualizado_em);
       })[0];
+    const dependenciasPendentes = data.projeto_acoes.filter(
+      (acao) => acao.status === 'pendente' && ['acesso', 'dependencia'].includes(acao.categoria),
+    );
+    const dependenciasCliente = dependenciasPendentes.filter(
+      (acao) => acao.responsavel_tipo === 'cliente',
+    );
+    const dependenciasPrestador = dependenciasPendentes.filter(
+      (acao) => acao.responsavel_tipo === 'prestador',
+    );
 
     return {
       id: data.id,
@@ -329,6 +359,14 @@ export const obterProjetoExecucao = cache(
       validacoesAguardando: tarefas.filter((tarefa) => tarefa.clienteStatus === 'aguardando')
         .length,
       ajustesSolicitados: tarefas.filter((tarefa) => tarefa.clienteStatus === 'ajustes').length,
+      dependenciasClientePendentes: dependenciasCliente.length,
+      dependenciasPrestadorPendentes: dependenciasPrestador.length,
+      dependenciasClienteAtrasadas: dependenciasCliente.filter((acao) =>
+        prazoEstaAtrasado(acao.prazo_em),
+      ).length,
+      dependenciasPrestadorAtrasadas: dependenciasPrestador.filter((acao) =>
+        prazoEstaAtrasado(acao.prazo_em),
+      ).length,
       propostaId: data.proposta_id,
       oportunidadeId: data.oportunidade_id,
       inicioEm: data.inicio_em,

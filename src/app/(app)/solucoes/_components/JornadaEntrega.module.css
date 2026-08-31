@@ -16,6 +16,13 @@
   border-color: color-mix(in srgb, var(--via-coral-dark) 30%, var(--via-border));
 }
 
+.card[data-tom='atrasado'] {
+  border-color: color-mix(in srgb, var(--via-coral-dark) 38%, var(--via-border));
+  background:
+    linear-gradient(132deg, color-mix(in srgb, var(--via-coral) 7%, transparent), transparent 52%),
+    var(--app-glass-plane-strong);
+}
+
 .card[data-tom='concluido'] {
   border-color: color-mix(in srgb, var(--via-accent-ink) 28%, var(--via-border));
 }
@@ -45,7 +52,8 @@
   color: var(--via-navy);
 }
 
-.card[data-tom='ajuste'] .icone {
+.card[data-tom='ajuste'] .icone,
+.card[data-tom='atrasado'] .icone {
   color: var(--via-coral-dark);
 }
 

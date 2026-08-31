@@ -7,7 +7,7 @@ import {
   enviarNotificacaoEntrega,
   marcarNotificacaoSemDestinatario,
 } from '@/lib/notificacoes/entrega';
-import { emailDecisaoCliente } from '@/lib/notificacoes/entrega-email';
+import { emailDecisaoCliente, emailPendenciaResolvida } from '@/lib/notificacoes/entrega-email';
 import { lerDocumentoProposta } from '@/lib/propostas/schema';
 import type {
   StatusClienteProjeto,
@@ -259,14 +259,79 @@ export async function registrarConclusaoDependenciaCliente({
 }: {
   codigo: string;
   acaoId: string;
-}): Promise<boolean> {
+}): Promise<{
+  concluiu: boolean;
+  notificacao: 'enviada' | 'falhou' | 'indisponivel' | null;
+}> {
   const admin = createAdminClient();
+  const { data: projeto, error: erroProjeto } = await admin
+    .from('projetos_execucao')
+    .select('id, dono, titulo, documento')
+    .eq('portal_codigo', codigo)
+    .eq('portal_ativo', true)
+    .maybeSingle();
+  if (erroProjeto) throw handleError(erroProjeto, 'portal-cliente:contexto-pendencia');
+  if (!projeto) return { concluiu: false, notificacao: null };
+
+  const { data: acao, error: erroAcao } = await admin
+    .from('projeto_acoes')
+    .select('titulo')
+    .eq('id', acaoId)
+    .eq('projeto_execucao_id', projeto.id)
+    .eq('responsavel_tipo', 'cliente')
+    .eq('visivel_cliente', true)
+    .maybeSingle();
+  if (erroAcao) throw handleError(erroAcao, 'portal-cliente:item-pendencia');
+  if (!acao) return { concluiu: false, notificacao: null };
+
   const { data, error } = await admin.rpc('projeto_portal_concluir_pendencia', {
     p_codigo: codigo,
     p_acao: acaoId,
   });
   if (error) throw handleError(error, 'portal-cliente:concluir-pendencia');
-  return Boolean(data);
+  if (!data) return { concluiu: false, notificacao: null };
+
+  const { data: evento, error: erroEvento } = await admin
+    .from('projeto_portal_eventos')
+    .select('id')
+    .eq('projeto_execucao_id', projeto.id)
+    .eq('acao_id', acaoId)
+    .eq('tipo', 'pendencia_concluida')
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (erroEvento || !evento) {
+    console.error(
+      `[portal-cliente:notificacao-pendencia] ${erroEvento?.code ?? 'sem-evento'}: ${erroEvento?.message ?? ''}`,
+    );
+    return { concluiu: true, notificacao: 'indisponivel' };
+  }
+
+  const [{ data: dono, error: erroDono }, documento] = await Promise.all([
+    admin.auth.admin.getUserById(projeto.dono),
+    Promise.resolve(lerDocumentoProposta(projeto.documento)),
+  ]);
+  const destinatario = dono.user?.email ?? documento?.fornecedor?.email ?? null;
+  if (erroDono || !destinatario || !documento) {
+    await marcarNotificacaoSemDestinatario(evento.id);
+    return { concluiu: true, notificacao: 'indisponivel' };
+  }
+
+  const notificacao = await enviarNotificacaoEntrega({
+    eventoId: evento.id,
+    destinatario,
+    conteudo: emailPendenciaResolvida({
+      empresa: documento.cliente.empresa,
+      projeto: projeto.titulo,
+      tarefa: acao.titulo,
+      link: `${env.NEXT_PUBLIC_SITE_URL}/entregas/${projeto.id}`,
+    }),
+  });
+
+  return {
+    concluiu: true,
+    notificacao: notificacao.status === 'falhou' ? 'falhou' : 'enviada',
+  };
 }
 
 export async function registrarDecisaoCliente({
