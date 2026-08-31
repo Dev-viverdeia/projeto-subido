@@ -86,6 +86,7 @@ describe('Mensagens compactas do Sobral AI', () => {
     expect(screen.getByText('Resposta antiga')).toBeVisible();
     expect(screen.getByText('O que faço agora?')).toBeVisible();
     expect(screen.getByText('Resposta recente')).toBeVisible();
+    expect(screen.getAllByText('Sobral AI')).toHaveLength(2);
     expect(screen.queryByText('Projeto antigo')).not.toBeInTheDocument();
     expect(screen.getByText('Projeto recomendado agora')).toBeVisible();
     expect(screen.queryByText('Confirmar ação de antiga')).not.toBeInTheDocument();

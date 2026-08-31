@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Bot, Plus } from 'lucide-react';
+import { Bot, Database, Plus } from 'lucide-react';
 import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
@@ -12,16 +12,22 @@ import type { ContextoSobralTarefa } from '@/lib/projetos-execucao/contexto-sobr
 
 const EXEMPLOS: ExemploDoConsultor[] = [
   {
-    rotulo: 'Definir meu próximo passo',
-    texto: 'Olhe o que já aconteceu na minha plataforma e me diga o que eu deveria fazer agora.',
+    rotulo: 'Escolher a venda certa',
+    descricao: 'Priorize uma oportunidade e saiba o próximo passo.',
+    texto:
+      'Olhe minhas vendas abertas, escolha a oportunidade que merece atenção agora e me diga qual é o próximo passo.',
   },
   {
-    rotulo: 'Preparar uma venda',
-    texto: 'Me ajude a preparar a próxima conversa comercial para vender um projeto de IA.',
+    rotulo: 'Preparar uma reunião',
+    descricao: 'Entre na conversa com perguntas e oferta alinhadas.',
+    texto:
+      'Me ajude a preparar minha próxima reunião para entender o problema do cliente e vender o projeto de IA certo.',
   },
   {
-    rotulo: 'Escolher o que estudar',
-    texto: 'Qual aula ou projeto da plataforma pode me ajudar no problema que estou trabalhando?',
+    rotulo: 'Destravar um projeto',
+    descricao: 'Use o método e os materiais certos para entregar.',
+    texto:
+      'Analise os projetos que estou executando e me diga o que fazer para destravar a próxima entrega.',
   },
 ];
 
@@ -56,18 +62,24 @@ export function TelaSobral({
             </span>
             <div>
               <h1 id="titulo-sobral">Sobral AI</h1>
-              <p>Seu consultor para vender e entregar projetos de IA.</p>
+              <p>
+                {conversa?.thread.titulo ?? 'Consultoria para vender e entregar projetos de IA'}
+              </p>
             </div>
           </div>
 
           <div className={styles.acoes}>
+            <span className={styles.contextoAtivo} title="O Sobral usa seus dados da plataforma">
+              <Database size={14} strokeWidth={1.8} aria-hidden="true" />
+              Contexto ativo
+            </span>
             {conversa ? (
               <Link href="/consultor" className={styles.novaConversa}>
                 <Plus size={15} strokeWidth={2} aria-hidden="true" />
                 Nova conversa
               </Link>
             ) : null}
-            <HistoricoDropdown total={threads.length} rotulo="Histórico">
+            <HistoricoDropdown total={threads.length} rotulo="Conversas">
               {threads.length > 0 ? (
                 <ListaConversas threads={threads} atualId={conversa?.thread.id} />
               ) : (
@@ -82,12 +94,14 @@ export function TelaSobral({
             <div className={styles.boasVindas}>
               {contextoInicial ? (
                 <p className={styles.eyebrow}>Tarefa conectada · {contextoInicial.empresa}</p>
-              ) : null}
-              <h2>{contextoInicial ? contextoInicial.tarefa : 'Como posso ajudar?'}</h2>
+              ) : (
+                <p className={styles.eyebrow}>Consultoria conectada à sua plataforma</p>
+              )}
+              <h2>{contextoInicial ? contextoInicial.tarefa : 'O que precisa avançar hoje?'}</h2>
               <p className={styles.apoio}>
                 {contextoInicial
                   ? 'O pedido abaixo já reúne o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie quando estiver pronto.'
-                  : 'Pergunte ou envie um arquivo.'}
+                  : 'Traga uma venda, um projeto ou uma dúvida. O Sobral cruza seu pedido com o que já está na plataforma e devolve uma direção prática.'}
               </p>
             </div>
           ) : (

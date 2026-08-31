@@ -110,8 +110,9 @@ describe('Conversa integrada à Início', () => {
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
 
     await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('Analisando sua operação');
       expect(screen.getByRole('status')).toHaveTextContent(
-        'Preparando uma resposta com seu contexto',
+        'Vendas, projetos e conteúdos estão entrando na resposta.',
       );
     });
     act(() => {

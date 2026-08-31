@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, FileText, Image as ImageIcon, Mic, Target } from 'lucide-react';
+import { ArrowRight, Bot, FileText, Image as ImageIcon, Mic, Target } from 'lucide-react';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
@@ -58,6 +58,11 @@ export function Mensagens({
                     </li>
                   ))}
                 </ul>
+              ) : null}
+              {m.papel === 'consultor' ? (
+                <span className={styles.autor}>
+                  <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
+                </span>
               ) : null}
               <p className={styles.texto}>{m.conteudo}</p>
 

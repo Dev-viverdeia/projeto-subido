@@ -1,13 +1,34 @@
 .conversa,
-.rodadaEmVoo {
+.rodadaEmVoo,
+.respostaConsultor {
   display: flex;
   flex-direction: column;
+}
+
+.conversa,
+.rodadaEmVoo {
   gap: var(--via-space-3);
+}
+
+.respostaConsultor {
+  align-items: flex-start;
+  gap: var(--via-space-2);
+}
+
+.autorResposta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-label);
+  text-transform: uppercase;
 }
 
 .balao {
   margin: 0;
-  max-width: 60ch;
+  max-width: 66ch;
   padding: var(--via-space-3) var(--via-space-4);
   border-radius: var(--app-radius-card);
   font-size: var(--via-fs-body);
@@ -23,11 +44,8 @@
 }
 
 .doConsultor {
-  align-self: flex-start;
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-elev-1-bg);
+  padding: 0;
   color: var(--via-text-primary);
-  box-shadow: var(--app-elev-1-shadow);
 }
 
 .anexosEmVoo {
@@ -61,18 +79,21 @@
 }
 
 .processando {
+  position: relative;
+  overflow: hidden;
   align-self: flex-start;
-  display: inline-flex;
+  width: min(100%, 480px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: var(--via-space-3);
-  max-width: 440px;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px solid var(--via-accent-hairline);
+  padding: var(--via-space-4);
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  background: var(--app-glass-plane);
   color: var(--via-accent-ink);
   box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: blur(16px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(138%);
 }
 
 .processando > span {
@@ -93,6 +114,23 @@
   font-size: var(--via-fs-micro);
 }
 
+.processando i {
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  overflow: hidden;
+  background: var(--via-navy-08);
+}
+
+.processando i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--via-navy);
+  animation: sobral-progresso 1.5s var(--via-ease-out) infinite;
+}
+
 .girando {
   flex: 0 0 auto;
   animation: sobral-girar 0.85s linear infinite;
@@ -101,6 +139,15 @@
 @keyframes sobral-girar {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes sobral-progresso {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(360%);
   }
 }
 
@@ -131,9 +178,11 @@
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--app-elev-2-bg) 92%, transparent);
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: blur(20px) saturate(140%);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 90%, transparent),
+    var(--app-elev-2-shadow);
+  backdrop-filter: blur(24px) saturate(145%);
   transition:
     border-color var(--app-t-state),
     box-shadow var(--app-t-state);
@@ -147,14 +196,14 @@
 .linhaCompositor {
   display: flex;
   align-items: flex-end;
-  min-height: 72px;
+  min-height: 76px;
   padding: var(--via-space-4) var(--via-space-4) var(--via-space-2);
 }
 
 .campo {
   width: 100%;
   min-width: 0;
-  min-height: 48px;
+  min-height: 52px;
   max-height: 180px;
   border: 0;
   resize: none;
@@ -231,8 +280,9 @@
 
 .arquivosSelecionados li > button,
 .ferramentas > button {
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
   color: var(--via-text-muted);
@@ -252,7 +302,7 @@
 }
 
 .barraCompositor {
-  min-height: 48px;
+  min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -268,10 +318,13 @@
 }
 
 .ferramentas > button {
-  width: 36px;
+  min-width: 36px;
   height: 36px;
-  flex: 0 0 auto;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-2);
   border-radius: var(--app-radius-control);
+  font: inherit;
+  font-size: var(--via-fs-xs);
 }
 
 .ferramentas > button:focus-visible,
@@ -293,7 +346,7 @@
 
 .tempoGravacao,
 .dicaAtalho {
-  margin-left: var(--via-space-1);
+  margin-left: var(--via-space-2);
   color: var(--via-text-faint);
   font-size: var(--via-fs-micro);
   white-space: nowrap;
@@ -306,8 +359,8 @@
 }
 
 .enviar {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
@@ -315,6 +368,7 @@
   border-radius: var(--via-radius-pill);
   background: var(--via-navy);
   color: var(--via-white);
+  box-shadow: var(--via-shadow-sm);
   cursor: pointer;
   transition:
     background-color var(--app-t-state),
@@ -333,41 +387,74 @@
 }
 
 .enviar:disabled {
-  opacity: 0.35;
+  opacity: 0.28;
   cursor: default;
 }
 
 .chips {
   list-style: none;
-  margin: 0;
+  margin: var(--via-space-3) 0 0;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-2);
 }
 
 .chips button {
-  min-height: 38px;
-  padding-inline: var(--via-space-3);
+  width: 100%;
+  min-height: 80px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
-  border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
   color: var(--via-text-muted);
   font: inherit;
-  font-size: var(--via-fs-xs);
+  text-align: left;
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px) saturate(132%);
   transition:
     border-color var(--app-t-state),
     color var(--app-t-state),
-    box-shadow var(--app-t-state);
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.chipIndice {
+  align-self: start;
+  padding-top: 2px;
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+}
+
+.chipTexto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chipTexto strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+.chipTexto small {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-micro);
+  line-height: var(--via-lh-normal);
 }
 
 .chips button:hover:not(:disabled) {
   border-color: var(--app-elev-2-line);
   color: var(--via-text-primary);
   box-shadow: var(--app-elev-1-shadow);
+  transform: translateY(-1px);
 }
 
 .chips button:focus-visible {
@@ -384,14 +471,25 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .girando {
-    animation-duration: 1.8s;
+  .girando,
+  .processando i::after {
+    animation-duration: 2.4s;
   }
 
   .caixa,
   .enviar,
   .chips button {
     transition: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .chips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chips button {
+    min-height: 70px;
   }
 }
 
@@ -402,16 +500,16 @@
   }
 
   .processando {
-    max-width: calc(100% - var(--via-space-4));
+    max-width: 100%;
   }
 
   .linhaCompositor {
-    min-height: 64px;
+    min-height: 72px;
     padding: var(--via-space-3) var(--via-space-3) var(--via-space-1);
   }
 
   .campo {
-    min-height: 42px;
+    min-height: 46px;
     font-size: var(--via-fs-sm);
   }
 
@@ -419,15 +517,26 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .ferramentas > button span,
   .dicaAtalho {
     display: none;
   }
 
+  .tempoGravacao {
+    margin-left: var(--via-space-1);
+  }
+
   .chips {
-    max-width: 350px;
-    margin-inline: auto;
-    padding-bottom: var(--via-space-1);
-    justify-content: center;
+    margin-top: var(--via-space-2);
+  }
+
+  .chips button {
+    min-height: 66px;
+    padding: var(--via-space-2) var(--via-space-3);
+  }
+
+  .chipTexto small {
+    display: none;
   }
 
   .erro {

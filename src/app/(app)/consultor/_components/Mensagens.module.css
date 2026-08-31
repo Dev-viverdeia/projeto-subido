@@ -33,8 +33,7 @@
 }
 
 .doConsultor .texto {
-  background: var(--app-elev-1-bg);
-  border: 1px solid var(--app-elev-1-line);
+  padding: 0;
   color: var(--via-text-primary);
 }
 
@@ -48,6 +47,17 @@
 
 .doUsuario .corpo {
   align-items: flex-end;
+}
+
+.autor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-faint);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-micro);
+  letter-spacing: var(--app-ls-label);
+  text-transform: uppercase;
 }
 
 .anexos {
