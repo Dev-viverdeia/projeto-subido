@@ -30,8 +30,8 @@ function CardProposta({
 
       <div className={styles.cardCorpo}>
         <p>{proposta.empresa}</p>
-        <h3>{proposta.projeto}</h3>
-        <span>{proposta.titulo}</span>
+        <h3>{proposta.titulo}</h3>
+        <span>{proposta.projeto}</span>
       </div>
 
       <div className={styles.cardRodape}>
@@ -114,6 +114,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
     <div className={styles.pagina}>
       <header className={styles.hero}>
         <div className={styles.heroTexto}>
+          <span className={styles.sobretitulo}>Propostas</span>
           <h1>Biblioteca comercial</h1>
           <p>Rascunhos e propostas enviadas.</p>
         </div>
@@ -124,8 +125,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       </header>
 
       <div className={styles.colecoes}>
-        <ColecaoPropostas titulo="Em rascunho" propostas={rascunhos} tipo="rascunho" />
-        <ColecaoPropostas titulo="Enviadas" propostas={enviadas} tipo="enviada" />
+        <ColecaoPropostas titulo="Rascunhos" propostas={rascunhos} tipo="rascunho" />
+        <ColecaoPropostas titulo="Propostas enviadas" propostas={enviadas} tipo="enviada" />
       </div>
     </div>
   );

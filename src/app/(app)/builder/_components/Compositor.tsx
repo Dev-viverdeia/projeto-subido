@@ -10,7 +10,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { pedirPerguntas } from '@/lib/builder/invocar';
 import { PainelEspera } from './PainelEspera';
 import styles from './Compositor.module.css';
@@ -147,91 +147,74 @@ export function Compositor({
   return (
     <div className={styles.tela}>
       <header className={styles.cabecalho}>
-        <p className={styles.eyebrow}>
-          {projetoBase ? 'Estúdio · Adaptação de projeto' : 'Estúdio'}
-        </p>
-        <h2 className={styles.titulo}>
-          {projetoBase ? (
-            <>
-              O que precisa mudar <em>para este cliente</em>?
-            </>
-          ) : (
-            <>
-              Qual problema o cliente precisa <em>resolver</em>?
-            </>
-          )}
-        </h2>
-        {/* As duas frases têm comprimento parecido de propósito: com `balance` e a
-            medida em 46ch, a quebra cai no ponto final em vez de deixar uma
-            palavra órfã abrindo a segunda linha. */}
-        <p className={styles.apoio}>
-          {projetoBase ? (
-            <>Use o projeto padrão como base e explique o que este cliente precisa de diferente.</>
-          ) : (
-            <>Conte como o trabalho funciona hoje, onde o problema aparece e o que precisa mudar.</>
-          )}
-        </p>
-      </header>
+        <div className={styles.cabecalhoTexto}>
+          <p className={styles.eyebrow}>Estúdio · Novo projeto</p>
+          <h2 className={styles.titulo}>Adapte um projeto ao cliente.</h2>
+          <p className={styles.apoio}>
+            Escolha a base, vincule a venda e descreva apenas o que muda.
+          </p>
+        </div>
 
-      <ol className={styles.fluxoEstudio} aria-label="Fluxo de criação do projeto">
-        <li data-ativo="true">
-          <span>01</span>
-          <strong>Cliente</strong>
-        </li>
-        <li>
-          <span>02</span>
-          <strong>Entrevista</strong>
-        </li>
-        <li>
-          <span>03</span>
-          <strong>Projeto</strong>
-        </li>
-        <li>
-          <span>04</span>
-          <strong>Proposta</strong>
-        </li>
-      </ol>
+        <ol className={styles.fluxoEstudio} aria-label="Fluxo de criação do projeto">
+          <li data-ativo="true">
+            <span>01</span>
+            <strong>Contexto</strong>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>Entrevista</strong>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>Projeto</strong>
+          </li>
+          <li>
+            <span>04</span>
+            <strong>Proposta</strong>
+          </li>
+        </ol>
+      </header>
 
       <div className={styles.mesaCriacao}>
         <aside className={styles.retorno} aria-labelledby="retorno-estudio" data-on-dark>
-          <p className={styles.retornoEyebrow}>O que você recebe</p>
-          <h3 id="retorno-estudio">Um projeto para revisar, apresentar e implementar.</h3>
+          <p className={styles.retornoEyebrow}>Ao final</p>
+          <h3 id="retorno-estudio">Um projeto pronto para trabalhar.</h3>
           <ol className={styles.entregas}>
             <li>
               <span>01</span>
               <div>
-                <strong>Escopo e arquitetura</strong>
-                <p>O que será construído, em qual ordem e o que fica de fora.</p>
+                <strong>Escopo claro</strong>
+                <p>O que entra e em qual ordem.</p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
-                <strong>Kit de implementação</strong>
-                <p>Ferramentas, prompts, riscos e formas de testar a entrega.</p>
+                <strong>Plano de execução</strong>
+                <p>Ferramentas, testes e entrega.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <strong>Base para a proposta</strong>
-                <p>O escopo fica pronto para entrar na proposta comercial.</p>
+                <strong>Base comercial</strong>
+                <p>Escopo pronto para a proposta.</p>
               </div>
             </li>
           </ol>
-          <p className={styles.retornoNota}>Você revisa e adapta tudo antes de apresentar.</p>
+          <p className={styles.retornoNota}>Você revisa tudo antes de apresentar.</p>
         </aside>
 
         <div className={styles.briefing}>
           <section className={styles.partida} aria-labelledby="partida-estudio">
             <header>
-              <span>Antes de gerar</span>
-              <strong id="partida-estudio">Escolha o projeto e o cliente</strong>
+              <span>01 · Ponto de partida</span>
+              <strong id="partida-estudio">Projeto e cliente</strong>
             </header>
 
             <div className={styles.decisaoGrid}>
               <label className={styles.decisao}>
-                <span>01 · Projeto-base</span>
+                <span>Projeto-base</span>
                 <select
                   value={projetoBaseId}
                   onChange={(evento) => setProjetoBaseId(evento.target.value)}
@@ -255,7 +238,7 @@ export function Compositor({
               </label>
 
               <label className={styles.decisao}>
-                <span>02 · Cliente em negociação</span>
+                <span>Cliente em negociação</span>
                 <select
                   value={oportunidadeId}
                   onChange={(evento) => setOportunidadeId(evento.target.value)}
@@ -294,6 +277,10 @@ export function Compositor({
               void enviar();
             }}
           >
+            <div className={styles.caixaCabecalho}>
+              <span>02 · O que muda</span>
+              <strong>Contexto do cliente</strong>
+            </div>
             <label className="sr-only" htmlFor="ideia-do-cliente">
               O problema do cliente e o que você já sabe
             </label>
@@ -313,7 +300,7 @@ export function Compositor({
               }}
               disabled={ocupado}
               rows={6}
-              placeholder="Conte o que o cliente relatou, como o trabalho funciona hoje, onde o problema aparece e o que precisa continuar igual."
+              placeholder="Ex.: Hoje os pedidos chegam pelo WhatsApp, duas pessoas respondem manualmente e o cliente quer reduzir o tempo até o primeiro atendimento."
             />
 
             <div className={styles.rodape}>
@@ -331,9 +318,10 @@ export function Compositor({
                   type="submit"
                   className={styles.enviar}
                   disabled={bloqueado}
-                  aria-label={ocupado ? 'Lendo a ideia' : 'Formular o projeto'}
+                  aria-label={ocupado ? 'Preparando entrevista' : 'Gerar entrevista'}
                 >
-                  <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
+                  <span>Gerar entrevista</span>
+                  <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
               </div>
             </div>

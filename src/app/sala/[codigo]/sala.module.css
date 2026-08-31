@@ -167,7 +167,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(380px, 0.82fr);
   width: min(1120px, 100%);
-  min-height: 560px;
+  min-height: 520px;
   margin: clamp(28px, 6vh, 64px) auto 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -181,7 +181,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(36px, 6vw, 68px);
+  padding: clamp(34px, 5vw, 58px);
   overflow: hidden;
   background:
     linear-gradient(155deg, rgba(29, 91, 255, 0.19), transparent 46%),
@@ -201,7 +201,7 @@
   max-width: 680px;
   margin: var(--via-space-3) 0 0;
   color: var(--via-white);
-  font-size: clamp(2.25rem, 4.8vw, 4.4rem);
+  font-size: clamp(2.2rem, 4.2vw, 4rem);
   font-weight: 540;
   line-height: 0.98;
   letter-spacing: var(--app-ls-h1);
@@ -230,7 +230,7 @@
 
 .memoria {
   margin-top: auto;
-  padding-top: var(--via-space-8);
+  padding-top: var(--via-space-6);
 }
 
 .memoria > p {
@@ -244,7 +244,8 @@
 
 .memoria ol {
   display: grid;
-  gap: var(--via-space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -253,8 +254,8 @@
 .memoria li {
   display: flex;
   align-items: flex-start;
-  gap: var(--via-space-3);
-  padding-top: var(--via-space-3);
+  gap: var(--via-space-2);
+  padding-top: var(--via-space-2);
   border-top: 1px solid rgba(255, 255, 255, 0.11);
 }
 
@@ -289,7 +290,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(30px, 4.5vw, 52px);
+  padding: clamp(28px, 4vw, 46px);
   background: var(--via-surface);
   color: var(--via-text-primary);
 }
@@ -557,6 +558,12 @@
   font-size: var(--via-fs-xs);
 }
 
+@supports not (backdrop-filter: blur(1px)) {
+  .saidaCartao {
+    background: var(--via-navy);
+  }
+}
+
 .salaAoVivo {
   height: 100dvh;
   background: var(--via-navy-deep);
@@ -603,6 +610,10 @@
 
   .contexto {
     min-height: 410px;
+  }
+
+  .memoria ol {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

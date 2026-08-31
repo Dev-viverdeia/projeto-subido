@@ -147,7 +147,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 <div className={styles.oportunidadeLead}>
                   <div className={styles.oportunidadeLeadTitulo}>
                     <span>
-                      <Target size={14} aria-hidden="true" /> Projeto mais aderente
+                      <Target size={14} aria-hidden="true" /> Projeto indicado
                     </span>
                     <small data-confianca={oportunidade.confianca}>
                       {oportunidade.confianca === 'alta'
@@ -158,7 +158,6 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                     </small>
                   </div>
                   <strong>{oportunidade.projeto_titulo}</strong>
-                  <p>{oportunidade.motivo}</p>
                 </div>
               )}
 
@@ -167,7 +166,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                   <UserRound size={15} aria-hidden="true" />
                 </span>
                 <div>
-                  <small>{decisor ? 'Pessoa para procurar' : 'Pessoa para procurar'}</small>
+                  <small>{decisor ? 'Decisor encontrado' : 'Decisor a confirmar'}</small>
                   <strong>{decisor?.nome ?? 'Responsável a identificar'}</strong>
                   <span>
                     {decisor?.cargo ?? 'Peça pelo responsável da área ao iniciar o contato.'}
