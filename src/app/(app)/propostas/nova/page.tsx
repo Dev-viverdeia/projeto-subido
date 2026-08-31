@@ -58,16 +58,12 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
           <p className={styles.sobretitulo}>
             {veioDaCall ? 'Proposta a partir da reunião' : 'Nova proposta'}
           </p>
-          <h1>
-            {veioDaCall
-              ? 'Use a reunião para preparar a proposta.'
-              : 'Escolha o cliente e o projeto.'}
-          </h1>
+          <h1>{veioDaCall ? 'Criar proposta da reunião' : 'Criar proposta'}</h1>
         </div>
         <p>
           {veioDaCall
-            ? 'A plataforma já trouxe o cliente, o resumo da conversa e os pontos a confirmar. Escolha o projeto e revise o texto.'
-            : 'A plataforma usa os dados da ficha do cliente e o projeto escolhido para preparar um rascunho. Você revisa tudo antes de apresentar.'}
+            ? 'Escolha o projeto. O rascunho já usa os fatos confirmados na reunião.'
+            : 'Escolha o cliente e o projeto. Você revisa o rascunho antes de apresentar.'}
         </p>
       </header>
 
