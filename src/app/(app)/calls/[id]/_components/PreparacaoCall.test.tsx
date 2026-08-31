@@ -78,6 +78,6 @@ describe('PreparacaoCall', () => {
       'href',
       '/sala/sala-horizonte',
     );
-    expect(screen.getByText('Live Coach preparado')).toBeInTheDocument();
+    expect(screen.getByText('Live Coach pronto')).toBeInTheDocument();
   });
 });

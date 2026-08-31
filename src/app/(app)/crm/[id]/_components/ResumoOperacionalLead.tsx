@@ -72,6 +72,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                 key={etapa.id}
                 data-estado={estado}
                 aria-current={estado === 'atual' ? 'step' : undefined}
+                aria-label={`${etapa.rotulo}: ${rotuloEstado}`}
               >
                 <span className={styles.marcadorEtapa} aria-hidden="true">
                   {estado === 'concluida' ? (

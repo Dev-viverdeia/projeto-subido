@@ -129,10 +129,6 @@ describe('PesquisaComercial', () => {
 
     expect(screen.getByRole('heading', { name: 'Leitura para a próxima reunião' })).toBeVisible();
     expect(screen.getByText(DOSSIE.resumo)).toBeVisible();
-    expect(screen.getByText('WhatsApp em destaque')).toBeVisible();
-    expect(screen.queryByText('Quantas conversas chegam por dia?')).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('tab', { name: 'Preparar reunião' }));
     expect(screen.getByText(DOSSIE.roteiroCall!.objetivo)).toBeVisible();
     expect(screen.getByText(/Vi que o WhatsApp concentra a demanda/)).toBeVisible();
     expect(
@@ -148,6 +144,10 @@ describe('PesquisaComercial', () => {
     ).toBeVisible();
     expect(screen.getByText(/Faz sentido mapearmos uma semana/)).toBeVisible();
     expect(screen.getByText('SDR de atendimento')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Visão geral' }));
+    expect(screen.getByText('WhatsApp em destaque')).toBeVisible();
+    expect(screen.queryByText('Quantas conversas chegam por dia?')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Dados e fontes' }));
     expect(screen.getByText('Site da empresa')).toBeVisible();

@@ -150,12 +150,12 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         </section>
 
         <aside className={styles.contexto} aria-label="Informações para preparar a conversa">
-          <section>
+          <section className={styles.painelContexto}>
             <header>
               <FileSearch size={17} aria-hidden="true" />
               <div>
                 <p>Contexto confirmado</p>
-                <h2>O que levar para a call</h2>
+                <h2>O que já sabemos</h2>
               </div>
             </header>
             {plano.fatos.length > 0 ? (
@@ -174,32 +174,31 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
                 <Link href={`/vendas/${posCall.oportunidade.id}`}>Enriquecer na ficha</Link>
               </div>
             )}
-          </section>
+            {(plano.hipoteses.length > 0 || plano.projetos.length > 0) && (
+              <div className={styles.validacoes}>
+                <header>
+                  <CheckCheck size={17} aria-hidden="true" />
+                  <div>
+                    <p>Confirmar na call</p>
+                    <h2>Pontos para validar</h2>
+                  </div>
+                </header>
+                <ul>
+                  {[...plano.hipoteses, ...plano.projetos].slice(0, 5).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-          {(plano.hipoteses.length > 0 || plano.projetos.length > 0) && (
-            <section>
-              <header>
-                <CheckCheck size={17} aria-hidden="true" />
-                <div>
-                  <p>Confirmar na call</p>
-                  <h2>Pontos para validar</h2>
-                </div>
-              </header>
-              <ul>
-                {[...plano.hipoteses, ...plano.projetos].slice(0, 5).map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          <div className={styles.coachPronto}>
-            <BadgeCheck size={18} aria-hidden="true" />
-            <div>
-              <strong>Live Coach preparado</strong>
-              <span>As orientações usam este roteiro e o que for dito na reunião.</span>
+            <div className={styles.coachPronto}>
+              <BadgeCheck size={18} aria-hidden="true" />
+              <div>
+                <strong>Live Coach pronto</strong>
+                <span>Durante a reunião, ele usa este roteiro e o que o cliente disser.</span>
+              </div>
             </div>
-          </div>
+          </section>
         </aside>
       </div>
     </div>

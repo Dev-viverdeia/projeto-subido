@@ -51,6 +51,25 @@
 .identidade > div {
   gap: var(--via-space-2);
 }
+.identidadeTexto {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.identidadeTexto > strong {
+  max-width: 28ch;
+  overflow: hidden;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.identidadeTexto > div {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
 .identidade small {
   color: var(--via-text-faint);
   font: 0.65rem var(--via-font-mono);
@@ -484,12 +503,17 @@
   display: flex;
   align-items: stretch;
   flex-direction: column;
-  gap: var(--via-space-6);
+  gap: var(--via-space-5);
   margin-top: var(--via-space-8);
-  padding: clamp(24px, 4vw, 38px);
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-2-line));
   border-radius: var(--app-radius-card);
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: var(--app-glass-plane-strong);
+  color: var(--via-text-primary);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(20px) saturate(138%);
 }
 .estadoDocumento {
   display: flex;
@@ -504,12 +528,12 @@
 .estadoDocumento > div > p:last-child {
   max-width: 48ch;
   margin: 0;
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: 1.5;
 }
 .decisao .sobretitulo {
-  color: color-mix(in srgb, var(--via-accent) 58%, var(--via-white));
+  color: var(--via-text-faint);
 }
 .acoesStatus {
   flex: 0 0 auto;
@@ -520,7 +544,7 @@
 
 .automacaoEntrega {
   margin: 0 0 var(--via-space-2);
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
   line-height: 1.5;
 }
@@ -538,8 +562,10 @@
   gap: var(--via-space-4);
   padding: var(--via-space-5);
   border-radius: var(--app-radius-card);
-  background: var(--via-white);
+  border: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
   color: var(--via-text-primary);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .compartilhamentoTopo {
@@ -687,14 +713,14 @@
   line-height: 1.5;
 }
 .acoesStatus .secundario {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.06);
-  color: white;
+  border-color: var(--via-border);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+  color: var(--via-text-body);
 }
 .acoesStatus .avancar {
-  border-color: var(--via-white);
-  background: var(--via-white);
-  color: var(--via-navy-deep);
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
 }
 
 @media (max-width: 1079px) {
@@ -857,7 +883,8 @@
 
 @supports not (backdrop-filter: blur(1px)) {
   .barra,
-  .modos {
+  .modos,
+  .decisao {
     background: var(--via-surface-elev);
   }
 }

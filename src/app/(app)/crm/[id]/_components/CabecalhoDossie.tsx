@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CalendarPlus, ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
+import { callPodeAbrir } from '@/lib/calls/tipos';
 import { etapaAberta, rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import { AtalhoProposta } from './AtalhoProposta';
@@ -21,6 +22,15 @@ export function CabecalhoDossie({
   const faseComercial = rotuloEtapaVisivel(lead.oportunidade.etapa);
   const projetoDaJornada = projetoSlug ?? lead.empresa.projetoSugeridoSlug ?? null;
   const oportunidadeAberta = etapaAberta(lead.oportunidade.etapa);
+  const proximaReuniao = lead.calls
+    .filter((call) => callPodeAbrir(call.status))
+    .sort(
+      (primeira, segunda) =>
+        new Date(primeira.agendadaPara).getTime() - new Date(segunda.agendadaPara).getTime(),
+    )[0];
+  const hrefReuniao = proximaReuniao
+    ? `/sala/${proximaReuniao.codigoPublico}`
+    : `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`;
   const cicloEntregue = lead.projetoRecente?.status === 'concluido';
   const estadoPesquisa = enriquecimentoEmAndamento
     ? 'Enriquecendo agora'
@@ -79,12 +89,13 @@ export function CabecalhoDossie({
 
         {oportunidadeAberta ? (
           <nav className={styles.acoes} aria-label="Ações da ficha do cliente">
-            <Link
-              href={`/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`}
-              className={styles.acaoPrimaria}
-            >
-              <CalendarPlus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Agendar reunião
+            <Link href={hrefReuniao} className={styles.acaoPrimaria}>
+              {proximaReuniao ? (
+                <Video size={16} strokeWidth={1.8} aria-hidden="true" />
+              ) : (
+                <CalendarPlus size={16} strokeWidth={1.8} aria-hidden="true" />
+              )}
+              {proximaReuniao ? 'Abrir próxima reunião' : 'Agendar reunião'}
             </Link>
             <AtalhoProposta lead={lead} destaque={false} projetoSlug={projetoDaJornada} />
             {temDossie && (
