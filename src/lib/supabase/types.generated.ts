@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       admin_acessos_eventos: {
@@ -2152,6 +2127,71 @@ export type Database = {
           },
         ]
       }
+      projeto_evolucoes: {
+        Row: {
+          atualizado_em: string
+          compartilhar_cliente: boolean
+          criado_em: string
+          decisao:
+            | Database["public"]["Enums"]["projeto_evolucao_decisao"]
+            | null
+          dono: string
+          evidencia_resultado_url: string | null
+          id: string
+          projeto_execucao_id: string
+          proximo_passo: string | null
+          proximo_passo_em: string | null
+          registrada_em: string | null
+          resultado_observado: string | null
+          revisao_em: string
+          status: Database["public"]["Enums"]["projeto_evolucao_status"]
+        }
+        Insert: {
+          atualizado_em?: string
+          compartilhar_cliente?: boolean
+          criado_em?: string
+          decisao?:
+            | Database["public"]["Enums"]["projeto_evolucao_decisao"]
+            | null
+          dono: string
+          evidencia_resultado_url?: string | null
+          id?: string
+          projeto_execucao_id: string
+          proximo_passo?: string | null
+          proximo_passo_em?: string | null
+          registrada_em?: string | null
+          resultado_observado?: string | null
+          revisao_em: string
+          status?: Database["public"]["Enums"]["projeto_evolucao_status"]
+        }
+        Update: {
+          atualizado_em?: string
+          compartilhar_cliente?: boolean
+          criado_em?: string
+          decisao?:
+            | Database["public"]["Enums"]["projeto_evolucao_decisao"]
+            | null
+          dono?: string
+          evidencia_resultado_url?: string | null
+          id?: string
+          projeto_execucao_id?: string
+          proximo_passo?: string | null
+          proximo_passo_em?: string | null
+          registrada_em?: string | null
+          resultado_observado?: string | null
+          revisao_em?: string
+          status?: Database["public"]["Enums"]["projeto_evolucao_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_evolucoes_projeto_fk"
+            columns: ["dono", "projeto_execucao_id"]
+            isOneToOne: false
+            referencedRelation: "projetos_execucao"
+            referencedColumns: ["dono", "id"]
+          },
+        ]
+      }
       projeto_mudancas_escopo: {
         Row: {
           analisado_em: string | null
@@ -3818,6 +3858,22 @@ export type Database = {
         }
         Returns: string
       }
+      projeto_evolucao_agendar: {
+        Args: { p_projeto_id: string; p_revisao_em: string }
+        Returns: string
+      }
+      projeto_evolucao_registrar: {
+        Args: {
+          p_compartilhar_cliente: boolean
+          p_decisao: Database["public"]["Enums"]["projeto_evolucao_decisao"]
+          p_evidencia_resultado_url: string
+          p_projeto_id: string
+          p_proximo_passo: string
+          p_proximo_passo_em: string
+          p_resultado_observado: string
+        }
+        Returns: string
+      }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
       projeto_mudanca_escopo_analisar: {
         Args: {
@@ -4010,6 +4066,13 @@ export type Database = {
         | "rascunho"
         | "aguardando_aceite"
         | "encerrado"
+      projeto_evolucao_decisao:
+        | "manter"
+        | "ajustar_garantia"
+        | "expandir"
+        | "novo_projeto"
+        | "encerrar"
+      projeto_evolucao_status: "agendada" | "registrada"
       projeto_execucao_status:
         | "planejamento"
         | "em_execucao"
@@ -4160,9 +4223,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       calls_status: [
@@ -4233,6 +4293,14 @@ export const Constants = {
         "aguardando_aceite",
         "encerrado",
       ],
+      projeto_evolucao_decisao: [
+        "manter",
+        "ajustar_garantia",
+        "expandir",
+        "novo_projeto",
+        "encerrar",
+      ],
+      projeto_evolucao_status: ["agendada", "registrada"],
       projeto_execucao_status: [
         "planejamento",
         "em_execucao",

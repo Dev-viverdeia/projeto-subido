@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
+import { RevisaoResultadoPortal } from './RevisaoResultadoPortal';
 import styles from './portal.module.css';
 
 const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
@@ -26,6 +27,7 @@ const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
   mudanca_escopo_recusada: 'Combinado original mantido',
   encerramento_enviado: 'Encerramento enviado para aceite',
   projeto_encerrado: 'Projeto encerrado com aceite',
+  revisao_resultado_registrada: 'Resultado revisado com o cliente',
 };
 
 function formatarTamanho(bytes: number): string {
@@ -77,6 +79,12 @@ export function PosEntregaPortal({
 }) {
   return (
     <div className={styles.posEntrega} data-concluido={concluido || undefined}>
+      {concluido && projeto.evolucao ? (
+        <div className={styles.revisaoPortal}>
+          <RevisaoResultadoPortal evolucao={projeto.evolucao} />
+        </div>
+      ) : null}
+
       <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
         <header>
           <div>

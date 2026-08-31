@@ -28,6 +28,7 @@ const ROTULO_EVENTO: Record<EventoProjetoExecucao['tipo'], string> = {
   mudanca_escopo_recusada: 'Combinado original mantido',
   encerramento_enviado: 'Encerramento enviado para aceite',
   projeto_encerrado: 'Projeto encerrado com aceite',
+  revisao_resultado_registrada: 'Resultado pós-entrega registrado',
 };
 
 function IconeEvento({ tipo }: { tipo: EventoProjetoExecucao['tipo'] }) {

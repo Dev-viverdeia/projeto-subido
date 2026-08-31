@@ -106,7 +106,7 @@
 }
 
 .heroTexto > p {
-  color: var(--via-accent);
+  color: color-mix(in srgb, var(--via-white) 72%, var(--via-accent));
   font-size: var(--via-fs-micro);
 }
 
@@ -1022,6 +1022,10 @@
 
 .posEntrega[data-concluido] {
   background: var(--app-glass-plane-strong);
+}
+
+.revisaoPortal {
+  grid-column: 1 / -1;
 }
 
 .arquivos,

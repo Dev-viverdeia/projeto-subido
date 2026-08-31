@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { PortalProjeto } from '@/app/portal/[codigo]/PortalProjeto';
 import type { ProjetoPortalCliente, TarefaPortalCliente } from '@/lib/portal-cliente/servico';
 import { ENCERRAMENTO_PREVIEW } from '../encerramento-preview';
+import { EVOLUCAO_PREVIEW } from '../evolucao-preview';
 
 export const metadata: Metadata = { title: 'Preview · Portal do Cliente' };
 
@@ -41,6 +42,7 @@ const PROJETO: ProjetoPortalCliente = {
   dependencias: [],
   mudancasEscopo: [],
   encerramento: ENCERRAMENTO_PREVIEW,
+  evolucao: EVOLUCAO_PREVIEW,
   briefing: {
     objetivo:
       'Responder novos contatos em poucos segundos, organizar a triagem e entregar cada oportunidade pronta para a recepção.',

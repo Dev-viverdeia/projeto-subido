@@ -25,6 +25,7 @@ const PROJETO: ProjetoPortalCliente = {
   dependencias: [],
   mudancasEscopo: [],
   encerramento: null,
+  evolucao: null,
   briefing: {
     objetivo: 'Responder rapidamente e transferir com contexto.',
     criterioSucesso: 'A recepção recebe cada contato com histórico completo.',
@@ -157,6 +158,38 @@ describe('PortalProjeto', () => {
     expect(screen.getByText('Resultado, garantia e continuidade.')).toBeVisible();
     expect(screen.getByText('30 dias a partir do aceite final')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar e concluir/i })).toBeVisible();
+  });
+
+  it('mostra a revisão pós-entrega sem expor notas internas', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{
+          ...PROJETO,
+          status: 'concluido',
+          feitas: 2,
+          encerramento: { ...ENCERRAMENTO, status: 'encerrado' },
+          evolucao: {
+            id: 'ffffffff-ffff-4fff-8fff-fffffffffff1',
+            status: 'registrada',
+            revisaoEm: '2026-09-09',
+            resultadoObservado: 'A recepção passou a receber cada contato com contexto.',
+            evidenciaResultadoUrl: null,
+            decisao: 'manter',
+            proximoPasso: 'Revisar os indicadores novamente com a responsável.',
+            proximoPassoEm: '2026-10-09',
+            compartilharCliente: true,
+            registradaEm: '2026-09-09T14:00:00.000Z',
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'O resultado e o próximo passo.' })).toBeVisible();
+    expect(
+      screen.getByText('A recepção passou a receber cada contato com contexto.'),
+    ).toBeVisible();
+    expect(screen.getByText('Manter a operação como está')).toBeVisible();
   });
 
   it('coloca uma dependência do cliente antes do andamento do projeto', () => {

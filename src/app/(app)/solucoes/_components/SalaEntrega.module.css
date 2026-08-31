@@ -22,6 +22,10 @@
   backdrop-filter: blur(22px) saturate(145%);
 }
 
+.paineis[data-evolucao] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .paineis button {
   min-width: 0;
   min-height: 60px;
@@ -1228,6 +1232,10 @@
 @media (max-width: 767px) {
   .paineis {
     position: static;
+  }
+
+  .paineis[data-evolucao] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .paineis button {

@@ -79,6 +79,16 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');
+
+    await expect(page.getByRole('button', { name: /Evolução/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await expect(
+      page.getByRole('heading', { name: 'Confirme o resultado com o cliente.' }),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: /Executar/ }).click();
     const fimDaSala = page.getByRole('button', { name: 'Ver acordo e portal' });
     await fimDaSala.scrollIntoViewIfNeeded();
     await expect(fimDaSala).toBeVisible();
@@ -98,6 +108,10 @@ test.describe('fundação visual Viver de IA', () => {
     });
     await encerramento.scrollIntoViewIfNeeded();
     await expect(encerramento).toBeVisible();
+
+    const revisao = page.getByRole('heading', { name: 'Vamos revisar o resultado.' });
+    await revisao.scrollIntoViewIfNeeded();
+    await expect(revisao).toBeVisible();
     await expect(page.getByText('Até 09 de setembro de 2026')).toBeVisible();
     await expect(page.getByText('suporte@mateussilva.com.br')).toBeVisible();
   });
