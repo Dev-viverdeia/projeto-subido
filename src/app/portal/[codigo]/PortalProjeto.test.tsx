@@ -180,6 +180,7 @@ describe('PortalProjeto', () => {
             proximoPassoEm: '2026-10-09',
             compartilharCliente: true,
             registradaEm: '2026-09-09T14:00:00.000Z',
+            oportunidadeContinuidadeId: null,
           },
         }}
       />,

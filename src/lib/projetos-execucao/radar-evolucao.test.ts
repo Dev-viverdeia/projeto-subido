@@ -13,6 +13,7 @@ const BASE: EvolucaoProjeto = {
   proximoPassoEm: null,
   compartilharCliente: false,
   registradaEm: null,
+  oportunidadeContinuidadeId: null,
 };
 
 describe('radar de evolução', () => {

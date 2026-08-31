@@ -27,6 +27,7 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
   const dossie = execucaoPronta?.dossie ?? null;
   const entradaRecente = parametros.novo === '1';
   const veioDaProspeccao = entradaRecente && parametros.origem === 'prospeccao';
+  const veioDaPosEntrega = entradaRecente && parametros.origem === 'pos-entrega';
   const falhaNovoCiclo = parametros['novo-ciclo'] === 'erro';
   const projetoDeOrigem =
     typeof parametros.projeto === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(parametros.projeto)
@@ -50,7 +51,9 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
         <p className={styles.avisoSucesso} role="status">
           {veioDaProspeccao
             ? 'Empresa adicionada a Vendas. Contatos, projeto sugerido e fontes já vieram com ela.'
-            : 'Venda adicionada. A ficha do cliente já está pronta para você trabalhar.'}
+            : veioDaPosEntrega
+              ? 'Próximo ciclo criado. A decisão e o próximo passo da entrega já estão nesta ficha.'
+              : 'Venda adicionada. A ficha do cliente já está pronta para você trabalhar.'}
         </p>
       )}
 

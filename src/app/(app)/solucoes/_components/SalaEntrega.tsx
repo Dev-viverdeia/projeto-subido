@@ -388,7 +388,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
       {painel === 'evolucao' && (
         <EvolucaoProjeto
           projetoId={projeto.id}
-          oportunidadeId={projeto.oportunidadeId}
+          empresa={projeto.empresa}
           encerramento={projeto.encerramento}
           evolucao={projeto.evolucao}
         />

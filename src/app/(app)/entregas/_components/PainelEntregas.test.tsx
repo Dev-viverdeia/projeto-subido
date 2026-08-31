@@ -41,6 +41,7 @@ const EVOLUCAO_AGENDADA = {
   proximoPassoEm: null,
   compartilharCliente: false,
   registradaEm: null,
+  oportunidadeContinuidadeId: null,
 };
 
 afterEach(cleanup);

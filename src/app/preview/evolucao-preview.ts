@@ -11,4 +11,5 @@ export const EVOLUCAO_PREVIEW: EvolucaoProjeto = {
   proximoPassoEm: null,
   compartilharCliente: true,
   registradaEm: null,
+  oportunidadeContinuidadeId: null,
 };

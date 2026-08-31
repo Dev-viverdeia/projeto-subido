@@ -1,7 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { exigirRecurso } from '@/lib/planos/server';
 import { createClient } from '@/lib/supabase/server';
 import type { EstadoProjetoExecucao } from './actions';
 
@@ -28,6 +30,8 @@ const RegistroSchema = z.object({
   proximoPassoEm: DataSchema,
   compartilharCliente: z.boolean(),
 });
+
+const ContinuidadeSchema = z.object({ projeto: z.uuid() });
 
 function revalidarProjeto(projeto: string) {
   revalidatePath(`/entregas/${projeto}`);
@@ -109,4 +113,37 @@ export async function registrarRevisaoResultado(
 
   revalidarProjeto(validacao.data.projeto);
   return { sucesso: 'Resultado registrado. O próximo passo ficou claro para este cliente.' };
+}
+
+export async function iniciarContinuidadeComercial(
+  _estado: EstadoProjetoExecucao,
+  formData: FormData,
+): Promise<EstadoProjetoExecucao> {
+  await exigirRecurso('vendas', 'pos-entrega');
+  const validacao = ContinuidadeSchema.safeParse({ projeto: formData.get('projeto') });
+  if (!validacao.success) return { erro: 'Não conseguimos identificar esta entrega.' };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+
+  const { data, error } = await supabase.rpc('projeto_evolucao_iniciar_continuidade', {
+    p_projeto_id: validacao.data.projeto,
+  });
+  const oportunidade = z.uuid().safeParse(data);
+
+  if (error || !oportunidade.success) {
+    console.error(
+      `[projetos-execucao:evolucao-continuar-venda] ${error?.code ?? 'sem-dados'}: ${error?.message ?? 'oportunidade inválida'}`,
+    );
+    return {
+      erro: 'A oportunidade não foi criada. A entrega continua salva; tente novamente.',
+    };
+  }
+
+  revalidarProjeto(validacao.data.projeto);
+  revalidatePath('/vendas');
+  redirect(`/vendas/${oportunidade.data}?novo=1&origem=pos-entrega`);
 }

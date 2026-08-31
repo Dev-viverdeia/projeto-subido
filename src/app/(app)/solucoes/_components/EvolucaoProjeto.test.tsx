@@ -6,8 +6,8 @@ import type { EvolucaoProjeto as Evolucao } from '@/lib/projetos-execucao/evoluc
 vi.mock('@/lib/projetos-execucao/evolucao-actions', () => ({
   agendarRevisaoResultado: vi.fn(),
   registrarRevisaoResultado: vi.fn(),
+  iniciarContinuidadeComercial: vi.fn(),
 }));
-vi.mock('@/lib/crm/actions', () => ({ iniciarNovoCicloCliente: vi.fn() }));
 
 import { EvolucaoProjeto } from './EvolucaoProjeto';
 
@@ -39,6 +39,7 @@ const AGENDADA: Evolucao = {
   proximoPassoEm: null,
   compartilharCliente: true,
   registradaEm: null,
+  oportunidadeContinuidadeId: null,
 };
 
 describe('EvolucaoProjeto', () => {
@@ -46,7 +47,7 @@ describe('EvolucaoProjeto', () => {
     render(
       <EvolucaoProjeto
         projetoId="11111111-1111-4111-8111-111111111111"
-        oportunidadeId="22222222-2222-4222-8222-222222222222"
+        empresa="Clínica Aurora"
         encerramento={ENCERRAMENTO}
         evolucao={AGENDADA}
       />,
@@ -64,7 +65,7 @@ describe('EvolucaoProjeto', () => {
     render(
       <EvolucaoProjeto
         projetoId="11111111-1111-4111-8111-111111111111"
-        oportunidadeId="22222222-2222-4222-8222-222222222222"
+        empresa="Clínica Aurora"
         encerramento={ENCERRAMENTO}
         evolucao={{
           ...AGENDADA,
@@ -80,8 +81,6 @@ describe('EvolucaoProjeto', () => {
 
     expect(screen.getByRole('heading', { name: 'Resultado confirmado.' })).toBeVisible();
     expect(screen.getByText('Expandir este projeto')).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: /Abrir nova venda com este cliente/i }),
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: /Levar para Vendas/i })).toBeVisible();
   });
 });

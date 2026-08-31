@@ -183,8 +183,7 @@
 }
 
 .agendamento button,
-.rodapeFormulario button,
-.acaoNovoCiclo {
+.rodapeFormulario button {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
@@ -394,8 +393,7 @@
   font-size: var(--via-fs-micro);
 }
 
-.rodapeFormulario button,
-.acaoNovoCiclo {
+.rodapeFormulario button {
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   background: var(--via-navy);
@@ -403,8 +401,7 @@
 }
 
 .agendamento button:disabled,
-.rodapeFormulario button:disabled,
-.acaoNovoCiclo:disabled {
+.rodapeFormulario button:disabled {
   cursor: wait;
   opacity: 0.56;
 }
@@ -558,8 +555,7 @@
     grid-column: auto;
   }
 
-  .rodapeFormulario button,
-  .acaoNovoCiclo {
+  .rodapeFormulario button {
     width: 100%;
   }
 }
