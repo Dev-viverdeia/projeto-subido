@@ -23,6 +23,9 @@ const TELAS = [
   ['/preview/mentorias', 'Leve um caso. Saia com o próximo passo.'],
   ['/preview/certificados', 'Comprove o que você concluiu.'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
+  ['/preview/formacoes', 'Aprenda. Aplique no trabalho.'],
+  ['/preview/formacao', 'ChatGPT para o trabalho'],
+  ['/preview/aula', 'Como conversar com a IA para obter respostas úteis'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {
@@ -214,5 +217,33 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('link', { name: 'Compartilhar no LinkedIn' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Copiar link' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Salvar em PDF' })).toBeVisible();
+  });
+
+  test('Formações leva da retomada à aula sem repetir a explicação do produto', async ({
+    page,
+  }) => {
+    await page.goto('/preview/formacoes');
+
+    await expect(
+      page.getByRole('heading', { name: 'Aprenda. Aplique no trabalho.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: /Começar formação/ }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Todas as formações' })).toBeVisible();
+    await expect(page.getByText('Uma ordem clara para evoluir.')).toHaveCount(0);
+    await expect(page.getByText('Como usar Formações e Projetos')).toHaveCount(0);
+
+    await page.goto('/preview/formacao');
+    await expect(page.getByRole('region', { name: 'Seu progresso' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Começar formação' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Aulas da formação' })).toBeVisible();
+
+    await page.goto('/preview/aula');
+    await expect(page.getByText('Vídeo em produção')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Concluir e avançar' })).toBeVisible();
+    if ((page.viewportSize()?.width ?? 0) < 1080) {
+      await expect(page.getByRole('button', { name: 'Ver as aulas do curso' })).toBeVisible();
+    } else {
+      await expect(page.getByText('Conteúdo da formação', { exact: true })).toBeVisible();
+    }
   });
 });

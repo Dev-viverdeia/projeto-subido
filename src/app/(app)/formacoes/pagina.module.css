@@ -10,11 +10,11 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--app-gap-section);
   align-items: end;
   overflow: hidden;
-  padding: clamp(28px, 4vw, 52px);
+  padding: clamp(30px, 4vw, 56px);
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: var(--app-glass-plane-strong);
@@ -54,7 +54,7 @@
 
 .titulo {
   margin: 0;
-  max-width: 16ch;
+  max-width: 15ch;
   font-size: clamp(2.25rem, 4.4vw, 4rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-hero);
@@ -72,97 +72,54 @@
   text-wrap: pretty;
 }
 
-.acoes {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--via-space-3);
-  margin-top: var(--via-space-6);
-}
-
-.acaoPrimaria,
-.acaoSecundaria {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--via-space-2);
-  min-height: var(--app-h-control);
-  border-radius: var(--app-radius-control);
-  padding-inline: var(--via-space-4);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  text-decoration: none;
-  transition:
-    transform var(--app-t-touch),
-    box-shadow var(--app-t-touch),
-    background-color var(--app-t-state);
-}
-
-.acaoPrimaria {
-  background: var(--via-navy);
-  color: var(--via-white);
-  box-shadow: var(--via-shadow-sm);
-}
-
-.acaoSecundaria {
-  border: 1px solid var(--via-border);
-  background: color-mix(in srgb, var(--via-white) 66%, transparent);
-  color: var(--via-text-primary);
-}
-
-.acaoPrimaria:hover,
-.acaoSecundaria:hover {
-  transform: translateY(-2px);
-}
-
-.acaoPrimaria:hover {
-  box-shadow: var(--via-shadow-lg);
-}
-
-.acaoSecundaria:hover {
-  background: var(--via-white);
-}
-
-.acaoPrimaria:focus-visible,
-.acaoSecundaria:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
-}
-
-.diferenca {
+.atalhoProjetos {
   display: grid;
-  gap: var(--via-space-3);
-  margin: 0;
-}
-
-.diferenca > div {
-  display: grid;
-  gap: var(--via-space-2);
-  padding: var(--app-pad-card);
+  gap: var(--via-space-1_5);
+  min-width: min(100%, 250px);
+  padding: var(--via-space-4) var(--via-space-5);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
+  color: inherit;
+  text-decoration: none;
   backdrop-filter: var(--via-glass-blur);
+  transition:
+    transform var(--app-t-touch),
+    box-shadow var(--app-t-touch),
+    border-color var(--app-t-state);
 }
 
-.diferenca dt {
-  font-size: var(--via-fs-sm);
+.atalhoProjetos span {
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.atalhoProjetos strong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  font-size: var(--via-fs-body);
   font-weight: 600;
   color: var(--via-text-primary);
 }
 
-.diferenca dd {
-  margin: 0;
-  font-size: var(--via-fs-caption);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  text-wrap: pretty;
+.atalhoProjetos:hover {
+  transform: translateY(-2px);
+  border-color: var(--via-border);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.atalhoProjetos:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
   .hero,
-  .diferenca > div {
+  .atalhoProjetos {
     background: var(--via-surface);
   }
 }
@@ -172,8 +129,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .diferenca {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .atalhoProjetos {
+    width: 100%;
   }
 }
 
@@ -192,26 +149,12 @@
   }
 }
 
-@media (max-width: 599px) {
-  .diferenca {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .acoes,
-  .acaoPrimaria,
-  .acaoSecundaria {
-    width: 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .acaoPrimaria,
-  .acaoSecundaria {
+  .atalhoProjetos {
     transition: none;
   }
 
-  .acaoPrimaria:hover,
-  .acaoSecundaria:hover {
+  .atalhoProjetos:hover {
     transform: none;
   }
 }

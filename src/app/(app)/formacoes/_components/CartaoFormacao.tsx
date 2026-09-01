@@ -16,7 +16,6 @@ type Props = {
   numero: number;
   etapa: string;
   foco: string;
-  recomendada?: boolean;
 };
 
 function rotuloAcao(feitas: number, total: number) {
@@ -39,18 +38,14 @@ function Seta() {
   );
 }
 
-export function CartaoFormacao({ formacao, numero, etapa, foco, recomendada = false }: Props) {
+export function CartaoFormacao({ formacao, numero, etapa, foco }: Props) {
   const progresso = useProgresso();
   const feitas = contarConcluidas(progresso, formacao.aulaIds);
   const pct = percentual(feitas, formacao.aulas);
   const estado = estadoDoProgresso(feitas, formacao.aulas);
 
   return (
-    <Link
-      href={`/formacoes/${formacao.slug}`}
-      className={styles.cartao}
-      data-recomendada={recomendada ? '' : undefined}
-    >
+    <Link href={`/formacoes/${formacao.slug}`} className={styles.cartao}>
       <div className={styles.capa} aria-hidden="true">
         {formacao.capa_url ? (
           // eslint-disable-next-line @next/next/no-img-element -- imagem publicada no Storage, sem domínio estável para next/image
@@ -64,11 +59,8 @@ export function CartaoFormacao({ formacao, numero, etapa, foco, recomendada = fa
 
       <div className={styles.corpo}>
         <div className={styles.topo}>
-          <div className={styles.identidade}>
-            <span className={styles.etapa}>{etapa}</span>
-            {recomendada && <span className={styles.recomendada}>Recomendada agora</span>}
-          </div>
-          <PillEstado estado={estado} />
+          <span className={styles.etapa}>{etapa}</span>
+          {estado !== 'nao-iniciada' && <PillEstado estado={estado} />}
         </div>
 
         <div className={styles.conteudo}>
@@ -83,11 +75,13 @@ export function CartaoFormacao({ formacao, numero, etapa, foco, recomendada = fa
                 {formacao.modulos} {formacao.modulos === 1 ? 'módulo' : 'módulos'} ·{' '}
                 {formacao.aulas} {formacao.aulas === 1 ? 'aula' : 'aulas'}
               </span>
-              <strong>{pct}%</strong>
+              {feitas > 0 && <strong>{pct}%</strong>}
             </div>
-            <div className={styles.trilho} aria-hidden="true">
-              <span style={{ transform: `scaleX(${pct / 100})` }} />
-            </div>
+            {feitas > 0 && (
+              <div className={styles.trilho} aria-hidden="true">
+                <span style={{ transform: `scaleX(${pct / 100})` }} />
+              </div>
+            )}
           </div>
 
           <span className={styles.acao}>

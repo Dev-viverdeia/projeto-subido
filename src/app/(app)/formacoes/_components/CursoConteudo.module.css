@@ -1,43 +1,40 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-7);
+  gap: var(--app-gap-block);
 }
 
-/* ── Hero — a única superfície escura da tela ─────────────────────────────── */
-/* O MESH VEM DAQUI, não da classe `via-mesh-navy`, e a razão é determinismo:
-   `.via-mesh-navy` e esta classe têm a MESMA especificidade (uma classe cada),
-   então quem ganha depende da ordem de injeção do CSS — que pode mudar entre dev
-   e build. Declarando aqui não há disputa. O `via-noise` continua na classe: ele
-   é `::after`, não disputa nada.
-   `--via-glow-navy` tem nome infeliz e valor certo: é a pilha de sombra NAVY da
-   casa (0 8px 24px + 0 16px 48px em navy translúcido), não um glow. */
 .hero {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(250px, 28%, 340px);
+  align-items: end;
+  gap: var(--app-gap-section);
   overflow: hidden;
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
-  padding: clamp(26px, 4vw, 44px);
-  background: var(--via-mesh-navy);
-  color: var(--via-white);
-  box-shadow: var(--via-glow-navy);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(24px) saturate(145%);
 }
 
-.sheen {
+.hero::before {
+  content: '';
   position: absolute;
   inset: 0 0 auto;
   height: 1px;
-  background: color-mix(in srgb, var(--via-white) 14%, transparent);
+  background: color-mix(in srgb, var(--via-white) 86%, transparent);
+  pointer-events: none;
 }
 
 .heroTexto {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-3);
-  max-width: 62ch;
+  max-width: 760px;
 }
 
-/* Eyebrow e selo na mesma linha — a mesma anatomia de topo da ficha de solução
-   (identificador à esquerda, estado à direita). */
 .identidade {
   display: flex;
   align-items: center;
@@ -47,12 +44,10 @@
 .eyebrow {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  /* Accent PURO, e é aqui que ele pertence: 6,52:1 sobre a navy. Sobre claro
-     daria 2,70:1 e reprovaria AA até para texto grande. */
-  color: var(--via-accent);
+  color: var(--via-text-muted);
 }
 
 .selo {
@@ -61,31 +56,25 @@
 
 .titulo {
   margin: 0;
+  max-width: 22ch;
   font-family: var(--via-font-display);
-  font-size: clamp(1.625rem, 3.4vw, 2.5rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-snug);
-  color: var(--via-white);
+  letter-spacing: var(--app-ls-hero);
+  line-height: 1.02;
+  color: var(--via-text-primary);
   text-wrap: balance;
 }
 
 .resumo {
   margin: 0;
+  max-width: 54ch;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  /* Cinza da banda escura — nunca `--via-text-muted` aqui (3,45:1, reprova). */
-  color: var(--via-gray-300);
-  /* 53ch, não 56ch: o fator do `ch` subiu de 1,30 (Geist) para 1,369 (Outfit) —
-     medido no navegador, ver CLAUDE.md. Os 56ch rendiam 73 caracteres e passariam
-     a render 77, acima da faixa confortável de 45–75. 53 × 1,369 ≈ 73 devolve
-     exatamente o comprimento de linha de antes da troca de fonte. */
-  max-width: 53ch;
+  color: var(--via-text-muted);
   text-wrap: pretty;
 }
 
-/* As mesmas pills de meta da ficha de solução, na temperatura desta banda: véu
-   branco em vez de véu navy, tinta `--via-gray-300` (12,2:1 sobre o mesh). */
 .metas {
   list-style: none;
   display: flex;
@@ -96,59 +85,81 @@
 }
 
 .meta {
-  padding: 5px var(--via-space-3);
+  padding: 6px var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-chip);
-  background: color-mix(in srgb, var(--via-white) 10%, transparent);
+  background: color-mix(in srgb, var(--via-white) 64%, transparent);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-gray-300);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
+.progressoResumo {
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
 .retomada,
 .conclusao {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--via-space-5);
-  margin-top: var(--via-space-3);
-  padding: var(--via-space-4);
+  gap: var(--app-gap-section);
+  overflow: hidden;
+  min-height: 132px;
+  padding: clamp(22px, 3vw, 32px);
   border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 7%, transparent);
+  border-radius: var(--app-radius-card);
+  background: var(--via-mesh-navy);
+  box-shadow: var(--via-glow-navy);
+}
+
+.retomada::after,
+.conclusao::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: color-mix(in srgb, var(--via-white) 18%, transparent);
 }
 
 .acoesConclusao {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--via-space-2);
 }
 
 .retomadaTexto {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--via-space-1_5);
   min-width: 0;
 }
 
 .retomadaTexto span,
 .retomadaTexto small {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  font-size: var(--via-fs-caption);
 }
 
 .retomadaTexto span {
-  color: var(--via-accent);
+  font-family: var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-gray-300);
 }
 
 .retomadaTexto strong {
   overflow: hidden;
-  font-size: var(--via-fs-sm);
+  max-width: 48ch;
+  font-size: clamp(var(--via-fs-h4), 2.2vw, var(--via-fs-h3));
   font-weight: 560;
   line-height: var(--via-lh-snug);
   color: var(--via-white);
@@ -157,17 +168,16 @@
 }
 
 .conclusao .retomadaTexto strong {
-  text-overflow: clip;
   white-space: normal;
 }
 
 .retomadaTexto small {
-  margin-top: 2px;
   color: var(--via-gray-300);
 }
 
 .cta,
 .ctaSecundario {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -181,11 +191,11 @@
   white-space: nowrap;
   transition:
     transform var(--app-t-touch),
-    box-shadow var(--app-t-touch);
+    background-color var(--app-t-state);
 }
 
 .cta {
-  background: var(--via-accent);
+  background: var(--via-white);
   color: var(--via-navy);
 }
 
@@ -200,69 +210,70 @@
   transform: translateY(-1px);
 }
 
-.cta:hover {
-  box-shadow: 0 10px 24px -14px var(--via-accent);
-}
-
 .ctaSecundario:hover {
   background: color-mix(in srgb, var(--via-white) 14%, transparent);
 }
 
 .cta:focus-visible,
 .ctaSecundario:focus-visible {
-  outline: 2px solid var(--via-white);
+  outline: 3px solid var(--via-accent);
   outline-offset: 3px;
-}
-
-/* ── Corpo: currículo + trilho de progresso ───────────────────────────────── */
-.corpo {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(280px, 24%, 340px);
-  gap: var(--app-gap-section);
-  align-items: start;
 }
 
 .curriculo {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
   min-width: 0;
 }
 
-.tituloSecao {
+.cabecalhoSecao {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding-inline: var(--via-space-1);
+}
+
+.cabecalhoSecao p,
+.cabecalhoSecao h2,
+.cabecalhoSecao > span {
   margin: 0;
-  font-size: var(--via-fs-h4);
+}
+
+.cabecalhoSecao p {
+  margin-bottom: var(--via-space-2);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
+.cabecalhoSecao h2 {
+  font-size: clamp(var(--via-fs-h3), 3vw, var(--via-fs-h2));
   font-weight: 560;
-  letter-spacing: var(--app-ls-h4);
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
   color: var(--via-text-primary);
 }
 
-/* Só a moldura sticky: o card é o `TrilhoProgresso`, que traz o próprio triplo de
-   elevação. Empilhar a pele daqui com a dele daria dois contornos concêntricos a
-   1px de distância. */
-.lateral {
-  position: sticky;
-  top: calc(68px + var(--via-space-5));
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-grid);
+.cabecalhoSecao > span {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 1079px) {
-  .corpo {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--app-gap-block);
+@supports not (backdrop-filter: blur(1px)) {
+  .hero {
+    background: var(--via-surface);
   }
+}
 
-  /* O TRILHO PASSOU A APARECER NO TELEFONE. Antes ele era `display: none` aqui,
-     e fazia sentido enquanto o hero carregava a própria barra de progresso — com
-     a barra do hero removida (era a mesma, duas vezes), esconder o trilho
-     deixaria o mobile sem progresso nenhum.
-     Fica DEPOIS do currículo, na ordem do documento, e sem `order`: mover o pixel
-     sem mover o DOM faz a ordem visual divergir da ordem de foco (WCAG 1.3.2).
-     Quem abre no telefone já tem o CTA do hero acima da dobra. */
-  .lateral {
-    position: static;
+@media (max-width: 899px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
   }
 }
 
@@ -270,7 +281,11 @@
   .retomada,
   .conclusao {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--via-space-3);
+    gap: var(--via-space-4);
+  }
+
+  .retomadaTexto strong {
+    white-space: normal;
   }
 
   .acoesConclusao {
@@ -281,6 +296,12 @@
   .cta,
   .ctaSecundario {
     width: 100%;
+  }
+
+  .cabecalhoSecao {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--via-space-2);
   }
 }
 

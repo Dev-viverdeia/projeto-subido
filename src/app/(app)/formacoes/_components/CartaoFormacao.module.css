@@ -1,8 +1,7 @@
 .cartao {
-  position: relative;
   display: grid;
-  grid-template-columns: clamp(132px, 31%, 176px) minmax(0, 1fr);
-  min-height: 252px;
+  grid-template-columns: clamp(136px, 30%, 172px) minmax(0, 1fr);
+  min-height: 250px;
   overflow: hidden;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
@@ -10,7 +9,7 @@
   box-shadow: var(--app-elev-1-shadow);
   color: inherit;
   text-decoration: none;
-  backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(20px) saturate(138%);
   transition:
     transform var(--app-t-touch),
     border-color var(--app-t-state),
@@ -28,10 +27,6 @@
   box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
-.cartao[data-recomendada] {
-  border-color: color-mix(in srgb, var(--via-blue) 25%, var(--app-elev-1-line));
-}
-
 .capa {
   position: relative;
   isolation: isolate;
@@ -43,14 +38,14 @@
 .capa img {
   width: 100%;
   height: 100%;
-  min-height: 252px;
+  min-height: 250px;
   display: block;
   object-fit: cover;
   transition: transform var(--app-t-scene);
 }
 
 .cartao:hover .capa img {
-  transform: scale(1.04);
+  transform: scale(1.035);
 }
 
 .capaFallback {
@@ -58,7 +53,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  background: linear-gradient(145deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
+  background: var(--via-mesh-navy);
   font-family: var(--via-font-mono);
   font-size: clamp(2.75rem, 5vw, 4.5rem);
   font-weight: 440;
@@ -69,17 +64,17 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, transparent 48%, rgba(2, 22, 42, 0.74) 100%);
+  background: linear-gradient(180deg, transparent 52%, rgba(2, 22, 42, 0.72) 100%);
   pointer-events: none;
 }
 
 .numero {
   position: absolute;
   z-index: 2;
-  left: var(--via-space-3);
-  bottom: var(--via-space-3);
+  left: var(--via-space-4);
+  bottom: var(--via-space-4);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   color: var(--via-white);
 }
@@ -88,12 +83,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
-  padding: var(--app-pad-card);
+  gap: var(--via-space-5);
+  padding: clamp(20px, 2.5vw, 28px);
 }
 
 .topo,
-.identidade,
 .rodape,
 .progressoTexto,
 .acao {
@@ -106,29 +100,12 @@
   gap: var(--via-space-3);
 }
 
-.identidade {
-  min-width: 0;
-  flex-wrap: wrap;
-  gap: var(--via-space-2);
-}
-
-.etapa,
-.recomendada {
+.etapa {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-}
-
-.etapa {
   color: var(--via-text-muted);
-}
-
-.recomendada {
-  padding: 4px var(--via-space-2);
-  border-radius: var(--app-radius-chip);
-  background: var(--via-navy);
-  color: var(--via-white);
 }
 
 .conteudo {
@@ -152,7 +129,7 @@
 
 .conteudo p {
   max-width: 47ch;
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
   text-wrap: pretty;
@@ -167,7 +144,7 @@
 }
 
 .progresso {
-  min-width: 120px;
+  min-width: 128px;
   flex: 1;
   display: grid;
   gap: var(--via-space-2);
@@ -176,21 +153,21 @@
 .progressoTexto {
   justify-content: space-between;
   gap: var(--via-space-3);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .progressoTexto strong {
+  font-family: var(--via-font-mono);
   color: var(--via-text-primary);
   font-weight: var(--via-fw-medium);
 }
 
 .trilho {
-  height: 3px;
+  height: 4px;
   overflow: hidden;
-  border-radius: var(--via-radius-xs);
+  border-radius: var(--app-radius-track);
   background: var(--via-navy-10);
 }
 
@@ -208,7 +185,7 @@
   justify-content: flex-end;
   gap: var(--via-space-2);
   font-size: var(--via-fs-sm);
-  font-weight: 600;
+  font-weight: 650;
   color: var(--via-navy);
   white-space: nowrap;
 }
@@ -221,27 +198,17 @@
 
 @media (max-width: 599px) {
   .cartao {
-    grid-template-columns: 108px minmax(0, 1fr);
-    min-height: 232px;
+    grid-template-columns: 104px minmax(0, 1fr);
+    min-height: 236px;
   }
 
   .capa img {
-    min-height: 232px;
+    min-height: 236px;
   }
 
   .corpo {
     gap: var(--via-space-3);
     padding: var(--via-space-4);
-  }
-
-  .topo {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--via-space-2);
-  }
-
-  .recomendada {
-    display: none;
   }
 
   .conteudo h3 {

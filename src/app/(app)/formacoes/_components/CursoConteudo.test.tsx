@@ -179,8 +179,8 @@ describe('conteúdo do curso', () => {
     render(<Curso formacao={TRES_MODULOS} />);
 
     const trilho = screen.getByRole('region', { name: 'Seu progresso' });
-    expect(trilho.textContent).toContain('As 3 aulas estão marcadas');
-    expect(trilho.textContent).toContain('Seu certificado está disponível');
+    expect(trilho.textContent).toContain('3 de 3 aulas concluídas');
+    expect(screen.getByText('Aplique o que aprendeu em um projeto.')).toBeDefined();
     expect(screen.getByRole('link', { name: /Escolher projeto/ })).toHaveAttribute(
       'href',
       '/solucoes',

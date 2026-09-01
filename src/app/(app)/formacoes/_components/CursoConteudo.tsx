@@ -11,27 +11,8 @@ import { CurriculoCurso } from './CurriculoCurso';
 import { useCurriculo } from './useCurriculo';
 import styles from './CursoConteudo.module.css';
 
-/**
- * A tela do curso: hero mesh-navy + currículo + trilho de progresso.
- *
- * O HERO ESCURO FICA, e essa foi uma decisão contra a alternativa fácil. A ficha
- * de solução abre clara; alinhar as duas telas pelo mesmo cabeçalho seria a
- * consistência mais óbvia — e a errada. Formação e solução não têm o mesmo peso
- * no produto: uma é uma trilha de semanas, a outra é uma receita de uma tarde.
- * "Seções com peso comercial diferente não podem ter peso visual igual" é regra
- * escrita da casa. O que se unifica são as PEÇAS (selo de estado, pills de meta,
- * trilho de progresso), não a temperatura da banda.
- *
- * O QUE SAIU: a duplicata. Esta tela mostrava a MESMA barra de progresso duas
- * vezes — uma no hero, outra na lateral — e o MESMO CTA duas vezes. Dois lugares
- * dizendo o mesmo número é um lugar a mais para desalinhar, e foi assim que a
- * ficha de solução acabou com uma barra que contradizia a lista ao lado. Agora o
- * progresso mora só no trilho, e o CTA só no hero, onde ele é accent sobre navy
- * (6,52:1 — o único lugar da marca em que esse azul é legível).
- *
- * Um único `useCurriculo` alimenta hero, lista e trilho: por construção, o selo,
- * os checks e o número nunca discordam.
- */
+/** A tela do curso concentra título, progresso, próxima ação e currículo — uma
+ * decisão por bloco. Um único `useCurriculo` alimenta todas as peças. */
 export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
   const curriculo = useCurriculo(formacao);
   const duracao = formatarDuracao(curriculo.duracaoTotalSeg);
@@ -63,21 +44,16 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
 
   return (
     <div className={styles.raiz}>
-      <header className={`${styles.hero} via-noise`} data-on-dark>
-        <span className={styles.sheen} aria-hidden="true" />
+      <header className={styles.hero}>
         <div className={styles.heroTexto}>
           <div className={styles.identidade}>
-            <p className={styles.eyebrow}>Formação profissional</p>
-            {/* O MESMO selo do card do catálogo, na variante escura: a escala de
-                cinza inverte sobre navy, então não é a mesma pill recolorida. */}
-            <PillEstado estado={estado} tom="onnavy" className={styles.selo} />
+            <p className={styles.eyebrow}>Formação</p>
+            <PillEstado estado={estado} className={styles.selo} />
           </div>
 
           <h1 className={styles.titulo}>{formacao.titulo}</h1>
           {formacao.resumo && <p className={styles.resumo}>{formacao.resumo}</p>}
 
-          {/* Pills, não uma frase com `·`. É a mesma forma da ficha de solução —
-              o que muda é o tom, porque aqui elas vivem sobre banda escura. */}
           <ul className={styles.metas}>
             {metas.map((m) => (
               <li key={m} className={styles.meta}>
@@ -85,74 +61,70 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
               </li>
             ))}
           </ul>
-
-          {curriculo.concluiu ? (
-            <div className={styles.conclusao} role="status">
-              <div className={styles.retomadaTexto}>
-                <span>Formação concluída</span>
-                <strong>Agora transforme o aprendizado em uma entrega real.</strong>
-                <small>Escolha um projeto para aplicar o método ou emita seu certificado.</small>
-              </div>
-              <div className={styles.acoesConclusao}>
-                <Link href="/solucoes" className={styles.cta}>
-                  Escolher projeto
-                  <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
-                </Link>
-                <Link
-                  href={`/certificados/formacao/${formacao.slug}`}
-                  className={styles.ctaSecundario}
-                >
-                  Ver certificado
-                </Link>
-              </div>
-            </div>
-          ) : hrefCta && aulaDoCta ? (
-            <div className={styles.retomada}>
-              <div className={styles.retomadaTexto}>
-                <span>{rotuloDestino}</span>
-                <strong>{aulaDoCta.titulo}</strong>
-                <small>
-                  {curriculo.feitas} de {curriculo.total}{' '}
-                  {curriculo.total === 1 ? 'aula concluída' : 'aulas concluídas'}
-                </small>
-              </div>
-              <Link href={hrefCta} className={styles.cta}>
-                {rotuloCta}
-                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
-              </Link>
-            </div>
-          ) : null}
         </div>
-      </header>
 
-      <div className={styles.corpo}>
-        <section className={styles.curriculo} aria-label="Aulas da formação">
-          <h2 className={styles.tituloSecao}>Aulas da formação</h2>
-          <CurriculoCurso
-            formacaoSlug={formacao.slug}
-            modulos={curriculo.modulos}
-            moduloAbertoInicial={curriculo.moduloDaProximaId}
-          />
-        </section>
-
-        <aside className={styles.lateral}>
-          {/* SEM botão próprio: o `href`/`aoContinuar` fica de fora de propósito.
-              O CTA já está no hero, e um segundo controle com o mesmo destino a
-              uma rolagem de distância é o tipo de duplicata que esta tela tinha.
-              Quem já rolou até aqui tem a aula atual marcada na lista ao lado. */}
+        <div className={styles.progressoResumo}>
           <TrilhoProgresso
             itens={curriculo.planas}
             feitasIds={curriculo.feitasIds}
             proximo={curriculo.proxima}
             unidade={{ singular: 'aula', plural: 'aulas' }}
-            notaFinal={
-              curriculo.concluiu
-                ? 'Formação concluída. Seu certificado está disponível nesta plataforma.'
-                : 'Salvo na sua conta para continuar em qualquer dispositivo.'
-            }
+            denso
           />
-        </aside>
-      </div>
+        </div>
+      </header>
+
+      {curriculo.concluiu ? (
+        <section className={styles.conclusao} role="status" aria-label="Próximo passo">
+          <div className={styles.retomadaTexto}>
+            <span>Próximo passo</span>
+            <strong>Aplique o que aprendeu em um projeto.</strong>
+            <small>Escolha um projeto ou compartilhe seu certificado.</small>
+          </div>
+          <div className={styles.acoesConclusao}>
+            <Link href="/solucoes" className={styles.cta}>
+              Escolher projeto
+              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+            <Link href={`/certificados/formacao/${formacao.slug}`} className={styles.ctaSecundario}>
+              Ver certificado
+            </Link>
+          </div>
+        </section>
+      ) : hrefCta && aulaDoCta ? (
+        <section className={styles.retomada} aria-label="Próxima aula">
+          <div className={styles.retomadaTexto}>
+            <span>{rotuloDestino}</span>
+            <strong>{aulaDoCta.titulo}</strong>
+            <small>
+              {curriculo.feitas} de {curriculo.total}{' '}
+              {curriculo.total === 1 ? 'aula concluída' : 'aulas concluídas'}
+            </small>
+          </div>
+          <Link href={hrefCta} className={styles.cta}>
+            {rotuloCta}
+            <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+          </Link>
+        </section>
+      ) : null}
+
+      <section className={styles.curriculo} aria-labelledby="conteudo-formacao">
+        <header className={styles.cabecalhoSecao}>
+          <div>
+            <p>Conteúdo</p>
+            <h2 id="conteudo-formacao">Aulas da formação</h2>
+          </div>
+          <span>
+            {curriculo.modulos.length} {curriculo.modulos.length === 1 ? 'módulo' : 'módulos'} ·{' '}
+            {curriculo.total} {curriculo.total === 1 ? 'aula' : 'aulas'}
+          </span>
+        </header>
+        <CurriculoCurso
+          formacaoSlug={formacao.slug}
+          modulos={curriculo.modulos}
+          moduloAbertoInicial={curriculo.moduloDaProximaId}
+        />
+      </section>
     </div>
   );
 }
