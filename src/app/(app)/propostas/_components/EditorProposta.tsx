@@ -12,6 +12,7 @@ import {
   ROTULO_ACAO_STATUS,
   ROTULO_STATUS_PROPOSTA,
 } from '@/lib/propostas/status';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { PreviewProposta } from './PreviewProposta';
 import { SecoesContextoEntrega } from './SecoesContextoEntrega';
 import { SecoesPrazoDecisao } from './SecoesPrazoDecisao';
@@ -148,14 +149,17 @@ export function EditorProposta({
       </header>
 
       {(estadoSalvar.erro || estadoStatus.erro) && (
-        <p className={styles.aviso} role="alert">
-          {estadoSalvar.erro ?? estadoStatus.erro}
-        </p>
+        <RetornoOperacao
+          tom="erro"
+          titulo="A proposta não foi atualizada"
+          descricao={estadoSalvar.erro ?? estadoStatus.erro}
+        />
       )}
       {(estadoSalvar.sucesso || estadoStatus.sucesso) && !sujo && (
-        <p className={styles.confirmacao} role="status">
-          <Check size={14} aria-hidden="true" /> {estadoSalvar.sucesso ?? estadoStatus.sucesso}
-        </p>
+        <RetornoOperacao
+          tom="sucesso"
+          titulo={estadoSalvar.sucesso ?? estadoStatus.sucesso ?? 'Proposta atualizada'}
+        />
       )}
 
       <div className={styles.modos} role="tablist" aria-label="Área de trabalho da proposta">

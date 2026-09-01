@@ -8,8 +8,8 @@ test.describe('Ficha do cliente em Vendas', () => {
 
     await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clínica Aurora' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Jornada do cliente' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Progresso do cliente' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Abrir próxima reunião' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Atualizar dados' })).toBeVisible();
     await expect(page.getByText('Preparar', { exact: true })).toBeVisible();
@@ -141,7 +141,9 @@ test.describe('Ficha do cliente em Vendas', () => {
 
     await expect(page.getByRole('heading', { name: 'Venda encerrada' })).toBeVisible();
     await expect(jornadaCliente.getByText('Concluída', { exact: true })).toHaveCount(1);
-    await expect(page.getByText('Encerrada aqui', { exact: true })).toBeVisible();
+    await expect(
+      jornadaCliente.getByRole('listitem', { name: 'Descobrir: Encerrada aqui' }),
+    ).toBeVisible();
     await expect(jornadaCliente.getByText('Próxima etapa', { exact: true })).toHaveCount(3);
     await expect(page.getByText('Pesquisa arquivada')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar reunião' })).toHaveCount(0);

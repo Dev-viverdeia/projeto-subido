@@ -53,8 +53,7 @@
 .rodapeResumo span,
 .formulario legend strong,
 .formulario legend small,
-.acoes small,
-.retorno {
+.acoes small {
   margin: 0;
 }
 
@@ -390,13 +389,6 @@
 .rodapeResumo button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
-}
-
-.retorno {
-  padding: 0 clamp(24px, 3vw, 32px) var(--via-space-4);
-  background: var(--via-bg-2);
-  color: var(--via-accent-ink);
-  font-size: var(--via-fs-xs);
 }
 
 .cabecalhoResumo {

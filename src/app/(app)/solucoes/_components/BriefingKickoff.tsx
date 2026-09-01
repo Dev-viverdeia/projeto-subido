@@ -25,6 +25,7 @@ import {
   ROTULO_ORIGEM_BRIEFING,
   type EtapaBriefingId,
 } from './briefing-kickoff-config';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import styles from './BriefingKickoff.module.css';
 
 const INICIAL: EstadoBriefingKickoff = {};
@@ -403,15 +404,13 @@ export function BriefingKickoff({
         </footer>
 
         {(erroLocal || estado.erro) && (
-          <p className={styles.retorno} role="alert">
-            {erroLocal || estado.erro}
-          </p>
+          <RetornoOperacao
+            tom="erro"
+            titulo="O briefing não foi atualizado"
+            descricao={erroLocal || estado.erro}
+          />
         )}
-        {estado.sucesso && (
-          <p className={styles.retorno} role="status">
-            {estado.sucesso}
-          </p>
-        )}
+        {estado.sucesso && <RetornoOperacao tom="sucesso" titulo={estado.sucesso} />}
       </form>
     </section>
   );

@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Check, CircleAlert } from 'lucide-react';
-import styles from '../pagina.module.css';
+import { ArrowRight } from 'lucide-react';
+import { RetornoOperacao } from '../../../_components/RetornoOperacao';
 
 export function RetornoProximaAcao({
   estado,
@@ -11,37 +11,40 @@ export function RetornoProximaAcao({
 }) {
   if (estado === 'ok') {
     return (
-      <div className={styles.retorno} data-tipo="sucesso" role="status">
-        <Check size={17} aria-hidden="true" />
-        <span>
-          Plano aplicado. A ficha, a etapa da venda e os compromissos já refletem o que foi
-          confirmado.
-        </span>
-        <Link href={`/vendas/${oportunidadeId}`}>
-          Abrir ficha <ArrowRight size={14} aria-hidden="true" />
-        </Link>
-      </div>
+      <RetornoOperacao
+        tom="sucesso"
+        titulo="Plano aplicado"
+        descricao="A ficha, a etapa da venda e os compromissos já refletem o que foi confirmado."
+        acao={
+          <Link href={`/vendas/${oportunidadeId}`}>
+            Abrir ficha <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        }
+      />
     );
   }
 
   if (estado === 'sem-alteracao') {
     return (
-      <div className={styles.retorno} role="status">
-        <BadgeCheck size={17} aria-hidden="true" />
-        <span>Este plano já estava sincronizado; nada foi duplicado.</span>
-        <Link href={`/vendas/${oportunidadeId}`}>
-          Abrir ficha <ArrowRight size={14} aria-hidden="true" />
-        </Link>
-      </div>
+      <RetornoOperacao
+        titulo="Plano já sincronizado"
+        descricao="Nada foi duplicado."
+        acao={
+          <Link href={`/vendas/${oportunidadeId}`}>
+            Abrir ficha <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        }
+      />
     );
   }
 
   if (estado === 'erro') {
     return (
-      <div className={styles.retorno} data-tipo="erro" role="alert">
-        <CircleAlert size={17} aria-hidden="true" />
-        Não foi possível aplicar o plano agora. Revise os campos antes de tentar novamente.
-      </div>
+      <RetornoOperacao
+        tom="erro"
+        titulo="O plano não foi aplicado"
+        descricao="Revise os campos antes de tentar novamente."
+      />
     );
   }
 

@@ -44,25 +44,6 @@
   text-transform: uppercase;
 }
 
-.confirmacao {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  width: fit-content;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px solid color-mix(in srgb, var(--via-success) 28%, transparent);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-success) 8%, var(--via-surface));
-  color: var(--via-success);
-  font-size: var(--via-fs-sm);
-}
-
-.confirmacao[data-tom='erro'] {
-  border-color: color-mix(in srgb, var(--via-danger) 24%, transparent);
-  background: color-mix(in srgb, var(--via-danger) 7%, var(--via-surface));
-  color: var(--via-danger);
-}
-
 .callCriada {
   display: grid;
   grid-template-columns: minmax(230px, 0.78fr) minmax(300px, 1.15fr) minmax(260px, 0.85fr);

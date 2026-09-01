@@ -4,8 +4,6 @@ import {
   ArrowRight,
   BrainCircuit,
   CalendarDays,
-  CalendarCheck2,
-  CalendarX2,
   Clock3,
   ContactRound,
   Database,
@@ -23,11 +21,13 @@ import type { TipoCall } from '@/lib/calls/tipos';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { AcoesSala } from './AcoesSala';
 import { CabecalhoReunioes } from './CabecalhoReunioes';
 import { CallRecemAgendada } from './CallRecemAgendada';
 import { FormularioAgendarCall } from './FormularioAgendarCall';
 import { PendenciasReunioes } from './PendenciasReunioes';
+import { RetornosReunioes } from './RetornosReunioes';
 import styles from '../pagina.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -102,36 +102,10 @@ export function PainelCalls({
         />
       </CabecalhoReunioes>
 
-      {calendarResultado === 'sincronizado' && (
-        <div className={styles.confirmacao} role="status">
-          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Reunião criada e convite enviado pelo Google Calendar.
-        </div>
-      )}
-      {calendarResultado === 'falhou' && (
-        <div className={styles.confirmacao} data-tom="erro" role="alert">
-          <CalendarX2 size={17} strokeWidth={1.8} aria-hidden="true" />A sala foi criada, mas o
-          convite não saiu. Reconecte o calendário antes de tentar de novo.
-        </div>
-      )}
-      {pendenciaResultado === 'cancelada' && (
-        <div className={styles.confirmacao} role="status">
-          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />A reunião foi marcada
-          como não realizada e saiu da agenda.
-        </div>
-      )}
-      {pendenciaResultado === 'reagendar' && (
-        <div className={styles.confirmacao} role="status">
-          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />O horário anterior foi
-          encerrado. Escolha a nova data para o mesmo cliente.
-        </div>
-      )}
-      {pendenciaResultado === 'erro' && (
-        <div className={styles.confirmacao} data-tom="erro" role="alert">
-          <CalendarX2 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Não foi possível atualizar essa reunião. Recarregue a página e tente novamente.
-        </div>
-      )}
+      <RetornosReunioes
+        calendarResultado={calendarResultado}
+        pendenciaResultado={pendenciaResultado}
+      />
 
       {recemAgendada ? (
         <CallRecemAgendada
@@ -140,10 +114,11 @@ export function PainelCalls({
           comercialLiberado={comercialLiberado}
         />
       ) : agendadaId ? (
-        <div className={styles.confirmacao} role="status">
-          <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Reunião criada. Atualize a página para abrir a sala preparada.
-        </div>
+        <RetornoOperacao
+          tom="sucesso"
+          titulo="Reunião criada"
+          descricao="Atualize a página para abrir a sala preparada."
+        />
       ) : null}
 
       {proxima && (

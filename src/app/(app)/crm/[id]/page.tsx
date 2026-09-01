@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { ContextoPosEntrega } from './_components/ContextoPosEntrega';
 import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
@@ -49,19 +50,31 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       />
 
       {entradaRecente && (
-        <p className={styles.avisoSucesso} role="status">
-          {veioDaProspeccao
-            ? 'Empresa adicionada a Vendas. Contatos, projeto sugerido e fontes já vieram com ela.'
-            : veioDaPosEntrega
-              ? 'Próximo ciclo criado. A decisão e o próximo passo da entrega já estão nesta ficha.'
-              : 'Venda adicionada. A ficha do cliente já está pronta para você trabalhar.'}
-        </p>
+        <RetornoOperacao
+          tom="sucesso"
+          titulo={
+            veioDaProspeccao
+              ? 'Empresa adicionada a Vendas'
+              : veioDaPosEntrega
+                ? 'Próximo ciclo criado'
+                : 'Venda adicionada'
+          }
+          descricao={
+            veioDaProspeccao
+              ? 'Contatos, projeto sugerido e fontes já vieram com ela.'
+              : veioDaPosEntrega
+                ? 'A decisão e o próximo passo da entrega já estão nesta ficha.'
+                : 'A ficha do cliente já está pronta para você trabalhar.'
+          }
+        />
       )}
 
       {falhaNovoCiclo && (
-        <p className={styles.avisoOperacao} role="alert">
-          Não conseguimos abrir outra venda agora. Esta ficha continua salva; tente novamente.
-        </p>
+        <RetornoOperacao
+          tom="erro"
+          titulo="Não foi possível abrir outra venda"
+          descricao="Esta ficha continua salva. Tente novamente."
+        />
       )}
 
       {lead.continuidadePosEntrega && (
