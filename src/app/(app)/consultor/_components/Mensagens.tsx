@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, FileText, Image as ImageIcon, Mic, Target } from 'lucide-react';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
+import { BotaoCopiar } from '@/app/(app)/_components/BotaoCopiar';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
+import { blocosDaResposta } from './resposta';
 import styles from './Mensagens.module.css';
 
 function IconeAnexo({ categoria }: { categoria: 'imagem' | 'documento' | 'audio' }) {
@@ -64,7 +66,21 @@ export function Mensagens({
                   <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
                 </span>
               ) : null}
-              <p className={styles.texto}>{m.conteudo}</p>
+              {m.papel === 'consultor' ? (
+                <div className={styles.texto}>
+                  {blocosDaResposta(m.conteudo).map((bloco, indice) => (
+                    <p key={`${m.id}-bloco-${indice}`}>{bloco}</p>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.texto}>{m.conteudo}</p>
+              )}
+
+              {m.papel === 'consultor' && detalharResposta ? (
+                <div className={styles.utilidadesResposta}>
+                  <BotaoCopiar texto={m.conteudo} rotuloDoQue="a resposta do Sobral AI" />
+                </div>
+              ) : null}
 
               {detalharResposta && m.direcao && !(compacto && m.direcao.contexto_acao) ? (
                 <aside className={styles.direcao} aria-label="Plano gerado nesta resposta">
