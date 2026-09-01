@@ -69,7 +69,7 @@
 .campoAcao > span,
 .campoData > span {
   font-family: var(--via-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -452,7 +452,7 @@
   gap: var(--via-space-2);
   color: var(--via-navy);
   font-family: var(--via-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--app-fs-micro);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;

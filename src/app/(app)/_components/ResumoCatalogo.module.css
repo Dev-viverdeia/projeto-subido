@@ -193,7 +193,7 @@
 
   .faixa[data-compacto] .rotulo {
     min-height: 2.4em;
-    font-size: 0.5625rem;
+    font-size: var(--app-fs-micro);
   }
 
   .faixa[data-compacto] .numero {

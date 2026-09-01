@@ -336,7 +336,7 @@
 .eyebrow {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--via-ls-label);
   text-transform: uppercase;
   color: var(--via-text-faint);

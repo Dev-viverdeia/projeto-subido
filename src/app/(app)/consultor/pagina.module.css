@@ -1104,7 +1104,7 @@ a.fonteFoco:focus-visible {
 
   .etapaTexto strong {
     max-width: 100%;
-    font-size: 0.625rem;
+    font-size: var(--app-fs-micro);
     line-height: var(--via-lh-snug);
     text-wrap: balance;
   }

@@ -307,7 +307,7 @@
   background: rgba(255, 255, 255, 0.05);
   color: var(--via-gray-200);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -550,7 +550,7 @@
   max-width: 20ch;
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: 11px;
+  font-size: var(--app-fs-meta);
   line-height: 1.4;
 }
 
@@ -656,7 +656,7 @@
   background: var(--via-bg);
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -812,7 +812,7 @@
 .coachCabecalho > span:last-child {
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   text-transform: uppercase;
 }
 
@@ -869,7 +869,7 @@
 
 .liveCoach li span {
   color: var(--via-text-muted);
-  font-size: 11px;
+  font-size: var(--app-fs-meta);
   line-height: 1.45;
 }
 
@@ -878,7 +878,7 @@
   margin-top: var(--via-space-5);
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   line-height: 1.5;
   text-transform: uppercase;
 }
@@ -1172,7 +1172,7 @@
   }
 
   .trilha small {
-    font-size: 10px;
+    font-size: var(--app-fs-micro);
   }
 
   .agendaLivre,

@@ -506,7 +506,7 @@
   .metodo strong {
     max-width: 8ch;
     overflow: hidden;
-    font-size: 10px;
+    font-size: var(--app-fs-micro);
     line-height: 1.15;
     text-overflow: ellipsis;
     white-space: nowrap;

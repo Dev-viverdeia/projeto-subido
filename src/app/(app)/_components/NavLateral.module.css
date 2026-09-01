@@ -66,7 +66,7 @@
   background: color-mix(in srgb, var(--via-white) 58%, transparent);
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-micro);
   line-height: 1;

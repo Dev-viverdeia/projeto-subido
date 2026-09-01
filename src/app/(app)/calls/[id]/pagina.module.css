@@ -370,7 +370,7 @@
 }
 
 .nota span {
-  font-size: 10px;
+  font-size: var(--app-fs-micro);
 }
 
 .resumo {
@@ -574,7 +574,7 @@
 .cartaoFato header p {
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -610,7 +610,7 @@
   padding-top: 2px;
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
 }
 
 .listaFactual li p {
@@ -818,7 +818,7 @@
 .coachConteudo > div small {
   color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -1311,7 +1311,7 @@
   background: var(--via-bg-2);
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -1399,7 +1399,7 @@
 .compromissosCall legend small {
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 9px;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
@@ -1696,7 +1696,7 @@
   }
 
   .fluxoSincronizacao strong {
-    font-size: 11px;
+    font-size: var(--app-fs-meta);
     line-height: 1.25;
   }
 

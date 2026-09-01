@@ -68,7 +68,7 @@
 .total {
   margin-left: var(--via-space-1_5);
   font-family: var(--via-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: 0;
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;

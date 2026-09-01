@@ -506,7 +506,7 @@
   margin-top: 2px;
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--app-fs-micro);
 }
 
 .trilho li[data-status='concluida'] .trilhoMarca {

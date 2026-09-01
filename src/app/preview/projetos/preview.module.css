@@ -1,7 +1,27 @@
 .pagina {
+  --via-fs-body: var(--app-fs-reading);
+  --via-fs-sm: var(--app-fs-ui);
+  --via-fs-caption: var(--app-fs-support);
+  --via-fs-xs: var(--app-fs-meta);
+  --via-fs-label: var(--app-fs-micro);
+  --via-fs-micro: var(--app-fs-micro);
+  --via-fs-h4: var(--app-fs-section-title);
+
   min-height: 100dvh;
   padding: clamp(24px, 4vw, 64px);
   background: var(--via-bg-2);
+}
+
+.pagina :global(.via-btn--sm) {
+  font-size: var(--app-fs-support);
+}
+
+.pagina :global(.via-btn--md) {
+  font-size: var(--app-fs-ui);
+}
+
+.pagina :global(.via-btn--lg) {
+  font-size: var(--via-fs-body);
 }
 
 .conteudo {

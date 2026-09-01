@@ -187,7 +187,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--app-radius-chip);
   color: var(--via-gray-300);
-  font-size: 0.58rem;
+  font-size: var(--app-fs-micro);
 }
 
 .statusProjeto[data-status='concluido'] {
@@ -230,7 +230,7 @@
 
 .heroMetadados dt {
   color: var(--via-gray-400);
-  font-size: 0.56rem;
+  font-size: var(--app-fs-micro);
 }
 
 .heroMetadados dd {
@@ -262,7 +262,7 @@
 .medida small {
   margin-top: 3px;
   color: var(--via-gray-400);
-  font-size: 0.56rem;
+  font-size: var(--app-fs-micro);
 }
 
 .medida > div {
@@ -321,7 +321,7 @@
 .fases button > span,
 .fases button small {
   font-family: var(--via-font-mono);
-  font-size: 0.58rem;
+  font-size: var(--app-fs-micro);
 }
 
 .fases button > span {
@@ -913,7 +913,7 @@
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   font-family: var(--via-font-mono);
-  font-size: 0.6rem;
+  font-size: var(--app-fs-micro);
 }
 
 .fila button[data-concluida] > span {
@@ -1371,12 +1371,12 @@
   .fases button > span {
     width: 22px;
     height: 22px;
-    font-size: 0.52rem;
+    font-size: var(--app-fs-micro);
   }
 
   .fases button strong {
     max-width: 100%;
-    font-size: 0.55rem;
+    font-size: var(--app-fs-micro);
   }
 
   .fases button small {
@@ -1387,7 +1387,7 @@
     min-height: 42px;
     justify-content: center;
     padding-inline: 4px;
-    font-size: 0.56rem;
+    font-size: var(--app-fs-micro);
     text-align: center;
   }
 

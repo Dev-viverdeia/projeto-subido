@@ -78,7 +78,7 @@
   gap: var(--via-space-2);
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: 0.688rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-accent);
@@ -112,7 +112,7 @@
 .mentorTrilha {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: 0.5625rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-gray-400);
@@ -186,7 +186,7 @@
 
 .fichaRotulo {
   font-family: var(--via-font-mono);
-  font-size: 0.5625rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   /* 6,99:1 sobre a navy. `--via-text-faint` daria 2,5:1 e sumiria — sobre banda

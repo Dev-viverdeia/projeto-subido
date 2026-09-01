@@ -199,6 +199,29 @@ const REGRA_FANTASMA = {
   use: 'confira o nome na escala real (tokens.css / brand.css), ou dê um fallback ao var()',
 };
 
+/* Legibilidade da área autenticada. A plataforma chegou a usar 8–11px em
+   orientações, ações e dados operacionais — tamanhos próprios de miniatura. O
+   gate não proíbe a escala compacta por token, porque `--app-fs-micro` continua
+   legítimo para eyebrow e metadado; ele impede apenas que novos números abaixo
+   de 12px contornem a escala sem explicação.
+
+   Duas miniaturas são exceções estruturais: a folha A4 reduzida do editor de
+   propostas e o certificado reduzido da galeria. Nelas o texto representa uma
+   peça completa em escala, não uma interface de leitura. */
+const REGRA_FONTE_MINIMA = {
+  id: 'fonte-operacional-minuscula',
+  porque: 'texto abaixo de 12px na área autenticada — informação útil vira nota de rodapé',
+  use: '--app-fs-micro (12px) ou um papel maior da escala de leitura',
+};
+
+const ARQUIVOS_ESCALA_APP = globSync(['src/app/(app)/**/*.module.css'], {
+  cwd: RAIZ,
+  exclude: [
+    'src/app/(app)/propostas/_components/PreviewProposta.module.css',
+    'src/app/(app)/certificados/_components/CertificadoVista.module.css',
+  ],
+});
+
 const arquivos = globSync(ALVOS, { cwd: RAIZ, exclude: IGNORADOS });
 const DEFINIDOS = tokensDefinidos();
 
@@ -264,6 +287,26 @@ for (const rel of arquivos) {
       if (!reais.length || temEscape(linhas, i)) continue;
       achados.push({ arquivo: rel, linha: i + 1, regra, trecho: reais.join(', ') });
     }
+  });
+}
+
+for (const rel of ARQUIVOS_ESCALA_APP) {
+  const linhas = readFileSync(new URL(rel, new URL('..', import.meta.url)), 'utf8').split('\n');
+
+  linhas.forEach((linha, i) => {
+    const match = linha.match(/font-size:\s*(\d*\.?\d+)(px|rem)\s*;/);
+    if (!match || temEscape(linhas, i)) return;
+
+    const valor = Number(match[1]);
+    const pixels = match[2] === 'rem' ? valor * 16 : valor;
+    if (pixels >= 12) return;
+
+    achados.push({
+      arquivo: rel,
+      linha: i + 1,
+      regra: REGRA_FONTE_MINIMA,
+      trecho: `${match[1]}${match[2]} (${pixels.toFixed(2)}px)`,
+    });
   });
 }
 

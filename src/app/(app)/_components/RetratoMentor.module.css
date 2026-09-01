@@ -87,10 +87,10 @@
 }
 
 .retrato[data-tamanho='xs'] .iniciais {
-  font-size: 0.5rem;
+  font-size: var(--app-fs-micro);
 }
 .retrato[data-tamanho='sm'] .iniciais {
-  font-size: 0.688rem;
+  font-size: var(--app-fs-micro);
 }
 .retrato[data-tamanho='md'] .iniciais {
   font-size: 0.813rem;
