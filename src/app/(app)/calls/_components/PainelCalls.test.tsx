@@ -81,7 +81,9 @@ describe('PainelCalls', () => {
     expect(within(agenda).getByText('Proposta Horizonte')).toBeInTheDocument();
     expect(within(agenda).queryByText('Descoberta Horizonte')).not.toBeInTheDocument();
 
-    expect(screen.getByRole('region', { name: 'O que fica salvo' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Recursos da sala')).toHaveTextContent(
+      'Transcrição, resumo e próxima ação são salvos na ficha do cliente.',
+    );
     expect(screen.getByRole('region', { name: 'Histórico' })).toHaveTextContent(
       'Kickoff concluído',
     );

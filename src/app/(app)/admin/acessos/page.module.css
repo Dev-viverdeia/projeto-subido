@@ -1,55 +1,44 @@
-.hero,
+.topo,
 .consulta,
 .paginacao {
   width: min(100%, var(--app-canvas));
   margin-inline: auto;
 }
 
-.hero {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.62fr);
+.topo,
+.consulta {
   border: 1px solid var(--app-elev-2-line);
+  background: var(--app-elev-2-bg);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: var(--via-glass-blur);
+}
+
+.topo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-8);
+  min-height: 132px;
+  padding: clamp(24px, 3vw, 36px);
   border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: blur(26px) saturate(138%);
 }
 
-.hero::before,
-.consulta::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(112deg, rgba(255, 255, 255, 0.5), transparent 42%);
-}
-
-.heroTexto {
-  position: relative;
-  z-index: 1;
-  padding: clamp(28px, 4vw, 52px);
-}
-
-.heroTexto p,
-.heroTexto h1,
-.heroTexto > span,
-.consulta p,
-.consulta h2,
-.consulta > div > span,
+.topoTexto p,
+.topoTexto h1,
+.topoTexto span,
 .resumo,
 .resumo div,
 .resumo dt,
 .resumo dd,
+.consulta h2,
+.consulta span,
 .paginacao p {
   margin: 0;
 }
 
-.heroTexto p {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
+.topoTexto p {
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
@@ -57,102 +46,75 @@
   text-transform: uppercase;
 }
 
-.heroTexto h1 {
-  max-width: 680px;
-  margin-top: var(--via-space-5);
+.topoTexto h1 {
+  margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-family: var(--via-font-display);
-  font-size: clamp(2.2rem, 4.5vw, 4.35rem);
-  font-weight: 520;
-  letter-spacing: var(--app-ls-display);
-  line-height: 0.98;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--app-ls-h1);
 }
 
-.heroTexto > span {
+.topoTexto span {
   display: block;
-  max-width: 620px;
-  margin-top: var(--via-space-5);
+  margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-loose);
+  font-size: var(--via-fs-body);
 }
 
 .resumo {
-  position: relative;
-  z-index: 1;
   display: grid;
-  align-content: center;
-  padding: clamp(26px, 3vw, 42px);
-  border-left: 1px solid var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-white) 28%, transparent);
+  grid-template-columns: repeat(3, minmax(108px, auto));
+  overflow: hidden;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-white) 42%, transparent);
 }
 
 .resumo div {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--via-space-4);
-  padding-block: var(--via-space-5);
+  gap: var(--via-space-1);
+  min-width: 112px;
+  padding: var(--via-space-4) var(--via-space-5);
 }
 
 .resumo div + div {
-  border-top: 1px solid var(--via-border-soft);
+  border-left: 1px solid var(--via-border-soft);
 }
 
 .resumo dt {
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
+  white-space: nowrap;
 }
 
 .resumo dd {
   color: var(--via-text-primary);
   font-family: var(--via-font-mono);
-  font-size: clamp(1.45rem, 2.4vw, 2.15rem);
+  font-size: var(--via-fs-h3);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--app-ls-display);
+  line-height: 1;
 }
 
 .consulta {
-  position: relative;
-  overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(280px, 0.55fr) minmax(360px, 1fr);
-  align-items: end;
-  gap: clamp(24px, 4vw, 56px);
-  padding: clamp(24px, 3vw, 36px);
-  border: 1px solid var(--app-elev-1-line);
+  grid-template-columns: minmax(180px, auto) minmax(300px, 620px);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-6);
+  padding: var(--via-space-4) var(--via-space-5);
   border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: blur(22px) saturate(132%);
-}
-
-.consulta > div,
-.busca {
-  position: relative;
-  z-index: 1;
-}
-
-.sobretitulo {
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
 }
 
 .consulta h2 {
-  margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-size: clamp(var(--via-fs-h4), 2vw, var(--via-fs-h3));
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h4);
-  line-height: var(--via-lh-tight);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
 }
 
 .consulta > div > span {
   display: block;
-  margin-top: var(--via-space-2);
+  margin-top: var(--via-space-1);
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
@@ -161,14 +123,12 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 54px;
-  padding: 6px;
+  min-height: 48px;
+  padding: 4px;
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 70%, transparent);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    var(--via-shadow-xs);
+  background: color-mix(in srgb, var(--via-white) 68%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .busca:focus-within {
@@ -190,6 +150,7 @@
   background: transparent;
   color: var(--via-text-primary);
   font: inherit;
+  font-size: var(--via-fs-sm);
 }
 
 .busca input::placeholder {
@@ -203,6 +164,7 @@
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
+  font: inherit;
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-semibold);
   cursor: pointer;
@@ -214,6 +176,11 @@
 .busca button:hover {
   background: var(--via-navy-deep);
   transform: translateY(-1px);
+}
+
+.busca button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
 }
 
 .paginacao {
@@ -230,14 +197,14 @@
   align-items: center;
   gap: var(--via-space-2);
   width: fit-content;
-  min-height: 40px;
+  min-height: 44px;
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-white) 60%, transparent);
   color: var(--via-text-primary);
-  text-decoration: none;
   font-size: var(--via-fs-xs);
+  text-decoration: none;
 }
 
 .paginacao a:last-child,
@@ -255,39 +222,41 @@
   font-size: var(--via-fs-xs);
 }
 
+.paginacao a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 @supports not (backdrop-filter: blur(1px)) {
-  .hero,
+  .topo,
   .consulta {
     background: var(--via-surface);
   }
 }
 
-@media (max-width: 900px) {
-  .hero,
+@media (max-width: 899px) {
+  .topo,
   .consulta {
     grid-template-columns: 1fr;
   }
 
   .resumo {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid var(--via-border-soft);
-    border-left: 0;
+    width: 100%;
   }
 
-  .resumo div {
-    grid-template-columns: 1fr;
-  }
-
-  .resumo div + div {
-    border-top: 0;
-    border-left: 1px solid var(--via-border-soft);
-    padding-left: var(--via-space-5);
+  .consulta {
+    align-items: stretch;
   }
 }
 
-@media (max-width: 640px) {
-  .heroTexto h1 {
-    font-size: clamp(2rem, 12vw, 3.1rem);
+@media (max-width: 599px) {
+  .topo {
+    min-height: 0;
+    padding: var(--via-space-5);
+  }
+
+  .topoTexto h1 {
+    font-size: 2.2rem;
   }
 
   .resumo {
@@ -296,12 +265,22 @@
 
   .resumo div {
     grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: var(--via-space-3) var(--via-space-4);
   }
 
   .resumo div + div {
     border-top: 1px solid var(--via-border-soft);
     border-left: 0;
-    padding-left: 0;
+  }
+
+  .resumo dd {
+    font-size: var(--via-fs-h4);
+  }
+
+  .consulta {
+    gap: var(--via-space-4);
+    padding: var(--via-space-4);
   }
 
   .busca {
@@ -310,14 +289,25 @@
 
   .busca button {
     grid-column: 1 / -1;
+    min-height: 44px;
     margin-top: var(--via-space-2);
+  }
+
+  .paginacao {
+    grid-template-columns: 1fr 1fr;
   }
 
   .paginacao p {
     display: none;
   }
+}
 
-  .paginacao {
-    grid-template-columns: 1fr 1fr;
+@media (prefers-reduced-motion: reduce) {
+  .busca button {
+    transition: none;
+  }
+
+  .busca button:hover {
+    transform: none;
   }
 }

@@ -9,12 +9,13 @@ const TELAS = [
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
-  ['/preview/calls', 'O que fica salvo'],
+  ['/preview/calls', 'Sua próxima reunião'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Biblioteca comercial'],
+  ['/preview/admin-acessos', 'Acessos e créditos'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
   ['/preview/entregas', 'Execute o próximo passo de cada cliente.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
@@ -154,6 +155,30 @@ test.describe('fundação visual Viver de IA', () => {
     expect(caixa!.y).toBeGreaterThanOrEqual(0);
     expect(caixa!.x + caixa!.width).toBeLessThanOrEqual(viewport!.width + 1);
     expect(caixa!.y + caixa!.height).toBeLessThanOrEqual(viewport!.height + 1);
+  });
+
+  test('as reuniões mantêm as ações secundárias acessíveis sem poluir a agenda', async ({
+    page,
+  }) => {
+    await page.goto('/preview/calls');
+
+    await expect(page.getByText('Sua próxima reunião', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Outras ações' }).first().click();
+    await expect(page.getByRole('menuitem', { name: 'Copiar link da sala' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Abrir sala' })).toBeVisible();
+  });
+
+  test('a biblioteca comercial filtra propostas dentro de uma única superfície', async ({
+    page,
+  }) => {
+    await page.goto('/preview/propostas');
+
+    const arquivo = page.getByRole('region', { name: 'Suas propostas' });
+    await expect(arquivo).toBeVisible();
+    await page.getByRole('tab', { name: /Rascunhos/ }).click();
+    await expect(arquivo.getByText('Rascunho', { exact: true }).first()).toBeVisible();
+    await page.getByRole('tab', { name: /Enviadas/ }).click();
+    await expect(arquivo.getByText('Enviada', { exact: true }).first()).toBeVisible();
   });
 
   test('o pós-call em processamento mostra avanço sem expor um resumo vazio', async ({ page }) => {

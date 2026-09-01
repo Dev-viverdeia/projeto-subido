@@ -69,6 +69,25 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
 
 const REUNIOES: ReuniaoCall[] = [
   {
+    id: '88888888-8888-4888-8888-888888888888',
+    titulo: 'Primeira conversa com a Clínica Horizonte',
+    tipo: 'descoberta',
+    status: 'agendada',
+    agendadaPara: '2026-08-06T14:00:00.000Z',
+    duracaoMinutos: 30,
+    codigoPublico: '99999999-9999-4999-8999-999999999999',
+    liveCoachAtivo: false,
+    oportunidadeId: OPORTUNIDADES[0]!.id,
+    oportunidade: OPORTUNIDADES[0]!.titulo,
+    empresa: 'Clínica Horizonte',
+    contato: 'Marina Lopes',
+    convidadoEmail: 'marina@exemplo.com',
+    googleSyncStatus: 'sincronizado',
+    googleEventUrl: null,
+    googleSyncErro: null,
+    criadaEm: '2026-08-05T18:00:00.000Z',
+  },
+  {
     id: '44444444-4444-4444-8444-444444444444',
     titulo: 'Descoberta do atendimento',
     tipo: 'descoberta',
@@ -145,6 +164,7 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
       <main id="conteudo" className={styles.conteudo}>
         <PainelCalls
           reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
+          agora={new Date(AGORA)}
           oportunidades={OPORTUNIDADES}
           calendar={{
             configurado: true,

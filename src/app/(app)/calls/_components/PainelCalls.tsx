@@ -2,12 +2,9 @@ import Link from 'next/link';
 import {
   AudioLines,
   ArrowRight,
-  BrainCircuit,
   CalendarDays,
   Clock3,
   ContactRound,
-  Database,
-  FileAudio,
   Radio,
   Layers3,
 } from 'lucide-react';
@@ -170,51 +167,6 @@ export function PainelCalls({
 
       <PendenciasReunioes reunioes={pendentes} />
 
-      <section className={styles.automacao} aria-labelledby="fluxo-calls-titulo">
-        <header>
-          <p>Durante e depois da reunião</p>
-          <h2 id="fluxo-calls-titulo">O que fica salvo</h2>
-        </header>
-        <ol className={styles.trilha}>
-          <li>
-            <span>
-              <Radio size={17} strokeWidth={1.8} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Reunião</strong>
-              <small>Reunião feita pela plataforma</small>
-            </div>
-          </li>
-          <li>
-            <span>
-              <FileAudio size={17} strokeWidth={1.8} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Transcrição</strong>
-              <small>Conversa registrada em texto</small>
-            </div>
-          </li>
-          <li>
-            <span>
-              <Database size={17} strokeWidth={1.8} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Ficha do cliente</strong>
-              <small>Resumo salvo na venda</small>
-            </div>
-          </li>
-          <li>
-            <span>
-              <BrainCircuit size={17} strokeWidth={1.8} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Próxima ação</strong>
-              <small>Compromisso e data registrados</small>
-            </div>
-          </li>
-        </ol>
-      </section>
-
       <div className={styles.operacao}>
         <section className={styles.agenda} aria-labelledby="agenda-titulo">
           <header className={styles.secaoTopo}>
@@ -230,7 +182,10 @@ export function PainelCalls({
                     : 'Suas próximas reuniões aparecerão aqui.'}
               </p>
             </div>
-            <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
+            <div className={styles.resumoAgenda} aria-label="Resumo das reuniões">
+              <span>{ativasNaAgenda.length} próximas</span>
+              <span>{historico.length} no histórico</span>
+            </div>
           </header>
 
           {!proxima && recemAgendada ? (
@@ -316,41 +271,19 @@ export function PainelCalls({
           )}
         </section>
 
-        <aside className={styles.liveCoach} aria-labelledby="live-coach-titulo">
-          <div className={styles.coachCabecalho}>
-            <span className={styles.coachSinal} aria-hidden="true">
-              <AudioLines size={30} strokeWidth={1.6} />
-            </span>
+        <aside className={styles.apoioCall} aria-label="Recursos da sala">
+          <span className={styles.apoioIcone} aria-hidden="true">
+            <AudioLines size={20} strokeWidth={1.7} />
+          </span>
+          <div>
+            <strong>Live Coach</strong>
             <span>
-              {comCoach} {comCoach === 1 ? 'sala preparada' : 'salas preparadas'}
+              {comCoach > 0
+                ? `${comCoach} ${comCoach === 1 ? 'reunião preparada' : 'reuniões preparadas'}`
+                : 'Disponível ao abrir a sala'}
             </span>
           </div>
-          <p>{ativas.length ? 'Ajuda durante a reunião' : 'Como funciona'}</p>
-          <h2 id="live-coach-titulo">Live Coach</h2>
-          <p>
-            {ativas.length
-              ? 'As sugestões aparecem somente para você, durante a conversa.'
-              : 'Ao abrir uma sala, o Live Coach usa a transcrição para sugerir perguntas.'}
-          </p>
-          <ul>
-            <li>
-              <strong>Escuta</strong>
-              <span>Transcreve a conversa em tempo real.</span>
-            </li>
-            <li>
-              <strong>Leitura</strong>
-              <span>Identifica dores, impacto e objeções.</span>
-            </li>
-            <li>
-              <strong>Sugestão</strong>
-              <span>Recomenda a próxima pergunta.</span>
-            </li>
-          </ul>
-          <span className={styles.estadoCoach}>
-            {ativas.length
-              ? 'Operacional · privado para o anfitrião'
-              : 'Exemplo · nada está sendo analisado agora'}
-          </span>
+          <p>Transcrição, resumo e próxima ação são salvos na ficha do cliente.</p>
         </aside>
       </div>
 

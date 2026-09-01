@@ -6,18 +6,31 @@
 
 .copiar,
 .preparar,
-.entrar {
+.entrar,
+.mais {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 36px;
+  min-height: 44px;
   padding-inline: var(--via-space-3);
   border-radius: var(--app-radius-control);
   font-size: var(--via-fs-xs);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
   cursor: pointer;
+}
+
+.compactas {
+  justify-content: flex-end;
+}
+
+.mais {
+  width: 44px;
+  padding: 0;
+  border: 1px solid var(--via-border);
+  background: color-mix(in srgb, var(--via-white) 62%, transparent);
+  color: var(--via-text-body);
 }
 
 .copiar {
@@ -39,7 +52,8 @@
 }
 
 .copiar:hover,
-.preparar:hover {
+.preparar:hover,
+.mais:hover {
   border-color: var(--via-text-faint);
   color: var(--via-text-primary);
 }
@@ -81,7 +95,8 @@
 
 .copiar:focus-visible,
 .preparar:focus-visible,
-.entrar:focus-visible {
+.entrar:focus-visible,
+.mais:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }
@@ -94,6 +109,10 @@
   .copiar,
   .preparar,
   .entrar {
+    flex: 1;
+  }
+
+  .compactas .preparar {
     flex: 1;
   }
 }

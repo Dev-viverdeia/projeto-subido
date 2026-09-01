@@ -1,4 +1,5 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { ResumoProposta } from '@/lib/propostas/queries';
 import { PainelPropostas } from './PainelPropostas';
@@ -31,32 +32,48 @@ const PROPOSTAS: ResumoProposta[] = [
 afterEach(cleanup);
 
 describe('PainelPropostas', () => {
-  it('separa claramente rascunhos de propostas enviadas', () => {
+  it('filtra rascunhos e propostas enviadas sem duplicar a biblioteca', async () => {
+    const usuario = userEvent.setup();
     render(<PainelPropostas propostas={PROPOSTAS} />);
 
     expect(screen.getByRole('heading', { name: 'Biblioteca comercial' })).toBeInTheDocument();
+    const arquivo = screen.getByRole('region', { name: 'Suas propostas' });
+    expect(within(arquivo).getByText('Clínica Aurora')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Orbe')).toBeInTheDocument();
 
-    const rascunhos = screen.getByRole('region', { name: 'Rascunhos' });
-    expect(within(rascunhos).getByText('Clínica Aurora')).toBeInTheDocument();
-    expect(within(rascunhos).getByText('Continuar edição')).toBeInTheDocument();
+    await usuario.click(screen.getByRole('tab', { name: 'Rascunhos, 1' }));
+    expect(within(arquivo).getByText('Clínica Aurora')).toBeInTheDocument();
+    expect(within(arquivo).queryByText('Orbe')).not.toBeInTheDocument();
+    expect(within(arquivo).getByText('Editar')).toBeInTheDocument();
 
-    const enviadas = screen.getByRole('region', { name: 'Propostas enviadas' });
-    expect(within(enviadas).getByText('Orbe')).toBeInTheDocument();
-    expect(within(enviadas).getByText('Enviada')).toBeInTheDocument();
-    expect(within(enviadas).getByText('Ver proposta')).toBeInTheDocument();
+    await usuario.click(screen.getByRole('tab', { name: 'Enviadas, 1' }));
+    expect(within(arquivo).getByText('Orbe')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Enviada')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Abrir')).toBeInTheDocument();
 
     expect(screen.queryByText('Valor enviado')).not.toBeInTheDocument();
     expect(screen.queryByText('Aprovadas')).not.toBeInTheDocument();
   });
 
-  it('mostra estados vazios úteis sem esconder a criação da primeira proposta', () => {
+  it('mostra um estado vazio útil sem duplicar a criação da primeira proposta', () => {
     render(<PainelPropostas propostas={[]} />);
 
-    expect(screen.getByText('Nenhuma proposta em rascunho.')).toBeInTheDocument();
-    expect(screen.getByText('Nenhuma proposta enviada ainda.')).toBeInTheDocument();
+    expect(screen.getByText('Nenhuma proposta criada ainda')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Criar proposta/ })).toHaveAttribute(
       'href',
       '/propostas/nova',
     );
+  });
+
+  it('busca por empresa, proposta ou projeto e permite limpar o filtro', async () => {
+    const usuario = userEvent.setup();
+    render(<PainelPropostas propostas={PROPOSTAS} />);
+
+    await usuario.type(screen.getByRole('searchbox', { name: 'Buscar propostas' }), 'Orbe');
+    expect(screen.getByText('Orbe')).toBeInTheDocument();
+    expect(screen.queryByText('Clínica Aurora')).not.toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Limpar busca' }));
+    expect(screen.getByText('Clínica Aurora')).toBeInTheDocument();
   });
 });

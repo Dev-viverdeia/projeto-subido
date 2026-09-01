@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search } from 'lucide-react';
 import { listarContasAdmin } from '@/lib/admin/acessos';
 import { CabecalhoPagina } from '../../_components/CabecalhoPagina';
 import { PainelContas } from './PainelContas';
@@ -41,27 +41,24 @@ export default async function AcessosAdminPage({
     <>
       <CabecalhoPagina titulo="Acessos e créditos" oculto />
 
-      <section className={styles.hero} aria-labelledby="titulo-acessos-admin">
-        <div className={styles.heroTexto}>
-          <p>
-            <SlidersHorizontal size={14} strokeWidth={1.9} aria-hidden="true" />
-            Administração de contas
-          </p>
-          <h1 id="titulo-acessos-admin">Acesso certo, saldo claro.</h1>
-          <span>Encontre uma conta, confira o que está liberado e faça uma alteração por vez.</span>
+      <section className={styles.topo} aria-labelledby="titulo-acessos-admin">
+        <div className={styles.topoTexto}>
+          <p>Administração</p>
+          <h1 id="titulo-acessos-admin">Acessos e créditos</h1>
+          <span>Gerencie o plano e o saldo de cada conta.</span>
         </div>
 
-        <dl className={styles.resumo} aria-label="Resumo desta página">
+        <dl className={styles.resumo} aria-label="Resumo das contas">
           <div>
-            <dt>Contas encontradas</dt>
+            <dt>Contas</dt>
             <dd>{resultado.total}</dd>
           </div>
           <div>
-            <dt>Starter nesta página</dt>
+            <dt>Starter</dt>
             <dd>{starterNaTela}</dd>
           </div>
           <div>
-            <dt>Pro ou Enterprise</dt>
+            <dt>Pro e Enterprise</dt>
             <dd>{avancadosNaTela}</dd>
           </div>
         </dl>
@@ -69,9 +66,8 @@ export default async function AcessosAdminPage({
 
       <section className={styles.consulta} aria-labelledby="titulo-busca-conta">
         <div>
-          <p className={styles.sobretitulo}>Localizar conta</p>
-          <h2 id="titulo-busca-conta">Quem você quer administrar?</h2>
-          <span>Busque pelo nome ou e-mail usado para entrar na plataforma.</span>
+          <h2 id="titulo-busca-conta">Localizar conta</h2>
+          <span>Busque por nome ou e-mail.</span>
         </div>
 
         <form action="/admin/acessos" method="get" className={styles.busca} role="search">
@@ -89,7 +85,7 @@ export default async function AcessosAdminPage({
             placeholder="Nome ou e-mail"
             autoComplete="off"
           />
-          <button type="submit">Buscar conta</button>
+          <button type="submit">Buscar</button>
         </form>
       </section>
 
