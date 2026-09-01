@@ -6,7 +6,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-7);
+  gap: var(--via-space-8);
 }
 
 .doUsuario,
@@ -22,10 +22,10 @@
 .texto {
   margin: 0;
   max-width: 70ch;
-  padding: var(--via-space-3) var(--via-space-4);
+  padding: var(--via-space-4) var(--via-space-5);
   border-radius: var(--app-radius-card);
-  font-size: var(--via-fs-body);
-  line-height: var(--via-lh-normal);
+  font-size: 1.0625rem;
+  line-height: 1.62;
   white-space: pre-wrap;
   text-wrap: pretty;
 }
@@ -37,7 +37,7 @@
 }
 
 .doConsultor .texto {
-  padding: var(--via-space-4) var(--via-space-5);
+  padding: var(--via-space-5) var(--via-space-6);
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-glass-plane);
   color: var(--via-text-primary);
@@ -56,7 +56,7 @@
 }
 
 .utilidadesResposta {
-  min-height: 28px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   padding-left: var(--via-space-1);
@@ -67,7 +67,7 @@
   flex-direction: column;
   gap: var(--via-space-2);
   min-width: 0;
-  max-width: min(100%, 760px);
+  max-width: min(100%, 900px);
 }
 
 .doUsuario .corpo {
@@ -75,7 +75,7 @@
 }
 
 .doConsultor .corpo {
-  width: min(100%, 760px);
+  width: min(100%, 900px);
 }
 
 .autor {
@@ -84,7 +84,7 @@
   gap: var(--via-space-2);
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   letter-spacing: var(--app-ls-micro);
 }
 
@@ -121,13 +121,13 @@
 }
 
 .compacta .corpo {
-  max-width: min(100%, 760px);
+  max-width: min(100%, 900px);
 }
 
 .compacta .texto {
   max-width: 64ch;
-  padding: var(--via-space-2_5) var(--via-space-4);
-  font-size: var(--via-fs-sm);
+  padding: var(--via-space-3) var(--via-space-4);
+  font-size: var(--via-fs-body);
 }
 
 .compacta .cartoes {
@@ -150,7 +150,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: var(--via-space-5);
-  padding: var(--via-space-4) var(--via-space-5);
+  padding: var(--via-space-5) var(--via-space-6);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-glass-plane);
@@ -173,7 +173,7 @@
   align-items: center;
   gap: var(--via-space-1);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: 0.6875rem;
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -181,14 +181,14 @@
 
 .direcao > strong {
   grid-column: 1;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: var(--via-lh-snug);
 }
 
 .direcao > p {
   grid-column: 1;
   margin: 0;
-  font-size: var(--via-fs-micro);
+  font-size: 0.8125rem;
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
 }
@@ -200,12 +200,12 @@
   align-items: center;
   justify-self: start;
   gap: var(--via-space-1);
-  min-height: var(--app-h-control);
-  padding-inline: var(--via-space-3);
+  min-height: 42px;
+  padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
 }
@@ -228,7 +228,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--via-space-2);
+  gap: var(--via-space-3);
 }
 
 /* O cartão herda a gramática do card da casa: superfície ergue no hover, o
@@ -236,8 +236,8 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-1);
-  padding: var(--app-pad-card-tight);
+  gap: var(--via-space-2);
+  padding: var(--via-space-5);
   border-radius: var(--app-radius-card);
   border: 1px solid var(--app-elev-1-line);
   background: var(--app-elev-1-bg);
@@ -261,21 +261,21 @@
 
 .cartaoRotulo {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: 0.6875rem;
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
 }
 
 .cartaoTitulo {
-  font-size: var(--via-fs-sm);
+  font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   color: var(--via-text-primary);
 }
 
 .cartaoMotivo {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: 0.8125rem;
   line-height: var(--via-lh-normal);
   display: -webkit-box;
   overflow: hidden;
@@ -284,7 +284,8 @@
 }
 
 .cartaoAcao {
-  font-size: var(--via-fs-micro);
+  margin-top: var(--via-space-1);
+  font-size: 0.8125rem;
   font-weight: var(--via-fw-medium);
   color: var(--via-accent-ink);
 }
@@ -308,7 +309,9 @@
   }
 
   .texto {
-    font-size: var(--via-fs-sm);
+    padding: var(--via-space-4);
+    font-size: var(--via-fs-body);
+    line-height: 1.6;
   }
 
   .compacta .corpo {
