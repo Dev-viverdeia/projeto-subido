@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { CST } from '../src/lib/brand';
 
 const TELAS = [
@@ -26,6 +27,9 @@ const TELAS = [
   ['/preview/formacoes', 'Aprenda. Aplique no trabalho.'],
   ['/preview/formacao', 'ChatGPT para o trabalho'],
   ['/preview/aula', 'Como conversar com a IA para obter respostas úteis'],
+  ['/preview/estudio', 'Adapte um projeto ao cliente.'],
+  ['/preview/estudio-entrevista', 'Personalize o plano'],
+  ['/preview/estudio-sala', 'Atendimento e qualificação com IA'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {
@@ -84,6 +88,41 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);
   });
+
+  test('o Estúdio conduz do briefing ao plano sem prometer executar o serviço', async ({
+    page,
+  }) => {
+    await page.goto('/preview/estudio');
+
+    await expect(
+      page.getByRole('heading', { name: 'Adapte um projeto ao cliente.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue(
+      '11111111-1111-4111-8111-111111111111',
+    );
+    await expect(page.getByRole('combobox', { name: /Cliente em negociação/ })).toHaveValue(
+      '22222222-2222-4222-8222-222222222222',
+    );
+
+    const preparar = page.getByRole('button', { name: 'Preparar entrevista' });
+    await expect(preparar).toBeDisabled();
+    await page
+      .getByRole('textbox', { name: 'O problema do cliente e o que você já sabe' })
+      .fill('O cliente precisa reduzir o tempo de resposta e organizar a qualificação.');
+    await expect(preparar).toBeEnabled();
+    await expect(page.getByText('Um projeto pronto para trabalhar.')).toHaveCount(0);
+  });
+
+  for (const rota of ['/preview/estudio', '/preview/estudio-entrevista', '/preview/estudio-sala']) {
+    test(`${rota} não tem violações graves de acessibilidade`, async ({ page }) => {
+      await page.goto(rota);
+      const resultado = await new AxeBuilder({ page }).analyze();
+      const graves = resultado.violations.filter(
+        (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+      );
+      expect(graves).toEqual([]);
+    });
+  }
 
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');

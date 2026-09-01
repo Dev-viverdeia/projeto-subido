@@ -17,9 +17,9 @@
   flex-wrap: wrap;
   padding: clamp(24px, 3.4vw, 36px);
   border-radius: var(--app-radius-surface);
-  background: var(--via-mesh-navy);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
-  box-shadow: var(--via-glow-navy);
+  box-shadow: var(--via-shadow-lg);
 }
 
 .heroTexto {
@@ -27,8 +27,7 @@
   flex-direction: column;
   gap: var(--via-space-2);
   min-width: 0;
-  /* 46ch ≈ 63 caracteres na Outfit (o glifo `0` é ~37% mais LARGO que o caractere
-     médio; o alvo real é caracteres ÷ 1,369, e eram 60 com a Geist). */
+  /* Coluna curta para manter título e resumo legíveis no hero. */
   max-width: 46ch;
 }
 
@@ -45,7 +44,7 @@
 .titulo {
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(1.375rem, 2.8vw, 2rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.4rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-snug);
@@ -121,7 +120,7 @@
 
 .resumo {
   margin: 0;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
   /* Sobre banda escura a escala de cinza INVERTE: `--via-text-muted` daria
      3,45:1 e reprovaria AA. */
@@ -165,17 +164,24 @@
 .stepper {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--via-space-2);
+  gap: var(--via-space-1);
+  padding: var(--via-space-1);
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane);
+  box-shadow: var(--via-glass-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .degrau {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--via-space-2);
-  padding: var(--via-space-3) var(--via-space-2);
+  min-height: 52px;
+  padding: var(--via-space-2) var(--via-space-3);
   border: 0;
-  border-radius: var(--app-radius-control);
+  border-radius: calc(var(--app-radius-control) - 4px);
   background: none;
   font-family: inherit;
   cursor: pointer;
@@ -190,6 +196,11 @@
   background: var(--via-navy-04);
 }
 
+.degrau[data-ativa] {
+  background: var(--via-navy);
+  box-shadow: var(--via-shadow-sm);
+}
+
 .degrau:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
@@ -199,11 +210,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--via-radius-pill);
-  border: 1.5px solid var(--via-border-hairline);
-  background: var(--app-elev-1-bg);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--app-radius-chip);
+  border: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-caption);
   color: var(--via-text-muted);
@@ -215,8 +226,8 @@
 }
 
 .degrau[data-ativa] .marcador {
-  background: var(--via-navy);
-  border-color: var(--via-navy);
+  background: color-mix(in srgb, var(--via-white) 12%, transparent);
+  border-color: color-mix(in srgb, var(--via-white) 24%, transparent);
   color: var(--via-white);
 }
 
@@ -225,7 +236,7 @@
 }
 
 .degrauRotulo {
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-snug);
   color: var(--via-text-muted);
@@ -234,7 +245,7 @@
 }
 
 .degrau[data-ativa] .degrauRotulo {
-  color: var(--via-text-primary);
+  color: var(--via-white);
   font-weight: var(--via-fw-medium);
 }
 
@@ -247,6 +258,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--app-gap-block);
+  padding: clamp(var(--via-space-5), 3vw, var(--via-space-7));
+  border: var(--via-glass-ring);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--via-glass-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .painelEyebrow {
@@ -255,7 +272,7 @@
   gap: var(--via-space-3);
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -264,11 +281,17 @@
 /* O numeral fantasma da referência: grande, quieto, atrás do rótulo. É
    ornamento com função — dá âncora vertical à seção sem pedir mais uma linha. */
 .painelNumero {
-  font-size: 2.5rem;
+  min-width: 34px;
+  min-height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy-04);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h2);
   line-height: 1;
-  color: var(--via-navy-08);
+  color: var(--via-text-muted);
 }
 
 .travado {
@@ -294,7 +317,7 @@
   }
 
   .resumo {
-    font-size: var(--via-fs-xs);
+    font-size: var(--via-fs-sm);
   }
 
   .stepper {
@@ -309,20 +332,30 @@
   }
 
   .marcador {
-    width: 27px;
-    height: 27px;
+    width: 24px;
+    height: 24px;
   }
 
   .degrauRotulo {
-    font-size: var(--via-fs-micro);
+    font-size: var(--app-fs-meta);
   }
 
   .painel {
     gap: var(--via-space-5);
+    margin-inline: calc(var(--via-space-2) * -1);
+    padding: var(--via-space-5) var(--via-space-4);
+    border-radius: var(--app-radius-card);
   }
 
   .painelNumero {
-    font-size: 2rem;
+    font-size: var(--app-fs-meta);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .stepper,
+  .painel {
+    background: var(--via-surface-elev);
   }
 }
 

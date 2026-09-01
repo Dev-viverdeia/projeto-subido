@@ -27,10 +27,10 @@ export type EtapaSala = {
 };
 
 export const ETAPAS: EtapaSala[] = [
-  { id: 'criacao', rotulo: 'Criação', numero: '01' },
-  { id: 'entender', rotulo: 'Entenda o projeto', numero: '02' },
-  { id: 'kit', rotulo: 'Seu kit', numero: '03' },
-  { id: 'construir', rotulo: 'Construir', numero: '04' },
+  { id: 'criacao', rotulo: 'Plano', numero: '01' },
+  { id: 'entender', rotulo: 'Entender', numero: '02' },
+  { id: 'kit', rotulo: 'Preparar', numero: '03' },
+  { id: 'construir', rotulo: 'Executar', numero: '04' },
 ];
 
 /** `null` = liberada. String = o motivo do cadeado, dito à pessoa. */
@@ -39,7 +39,7 @@ export function motivoDoCadeado(etapa: IdEtapa, solucao: SolucaoBuilder): string
 
   if (etapa === 'criacao') return null;
   if (!temDocumento) return 'O projeto ainda está sendo criado.';
-  if (etapa === 'construir' && !solucao.stack) return 'Escolha onde construir, no “Seu kit”.';
+  if (etapa === 'construir' && !solucao.stack) return 'Escolha onde construir na etapa “Preparar”.';
   return null;
 }
 

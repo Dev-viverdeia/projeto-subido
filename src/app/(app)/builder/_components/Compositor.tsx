@@ -135,7 +135,7 @@ export function Compositor({
   if (ocupado) {
     return (
       <PainelEspera
-        rotulo="Análise"
+        rotulo="Preparando entrevista"
         ideia={ideia}
         passos={['Lendo o briefing', 'Separando o que já foi definido', 'Preparando as perguntas']}
         /* A análise leva ~10–25s: fases mais curtas que as da geração. */
@@ -175,41 +175,20 @@ export function Compositor({
         </ol>
       </header>
 
-      <div className={styles.mesaCriacao}>
-        <aside className={styles.retorno} aria-labelledby="retorno-estudio" data-on-dark>
-          <p className={styles.retornoEyebrow}>Ao final</p>
-          <h3 id="retorno-estudio">Um projeto pronto para trabalhar.</h3>
-          <ol className={styles.entregas}>
-            <li>
-              <span>01</span>
-              <div>
-                <strong>Escopo claro</strong>
-                <p>O que entra e em qual ordem.</p>
-              </div>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <strong>Plano de execução</strong>
-                <p>Ferramentas, testes e entrega.</p>
-              </div>
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <strong>Base comercial</strong>
-                <p>Escopo pronto para a proposta.</p>
-              </div>
-            </li>
-          </ol>
-          <p className={styles.retornoNota}>Você revisa tudo antes de apresentar.</p>
-        </aside>
-
+      <section className={styles.mesaCriacao} aria-label="Novo projeto personalizado">
         <div className={styles.briefing}>
+          <div className={styles.entregaResumo}>
+            <span aria-hidden="true">01</span>
+            <p>
+              O Estúdio prepara <strong>escopo, execução e base da proposta.</strong> Você revisa
+              antes de usar.
+            </p>
+          </div>
+
           <section className={styles.partida} aria-labelledby="partida-estudio">
             <header>
               <span>01 · Ponto de partida</span>
-              <strong id="partida-estudio">Projeto e cliente</strong>
+              <strong id="partida-estudio">Escolha a base e o cliente</strong>
             </header>
 
             <div className={styles.decisaoGrid}>
@@ -278,8 +257,8 @@ export function Compositor({
             }}
           >
             <div className={styles.caixaCabecalho}>
-              <span>02 · O que muda</span>
-              <strong>Contexto do cliente</strong>
+              <span>02 · Briefing do cliente</span>
+              <strong>O que precisa mudar</strong>
             </div>
             <label className="sr-only" htmlFor="ideia-do-cliente">
               O problema do cliente e o que você já sabe
@@ -300,7 +279,7 @@ export function Compositor({
               }}
               disabled={ocupado}
               rows={6}
-              placeholder="Ex.: Hoje os pedidos chegam pelo WhatsApp, duas pessoas respondem manualmente e o cliente quer reduzir o tempo até o primeiro atendimento."
+              placeholder="Ex.: Os pedidos chegam pelo WhatsApp, duas pessoas respondem manualmente e o cliente quer reduzir o tempo até o primeiro atendimento."
             />
 
             <div className={styles.rodape}>
@@ -318,9 +297,9 @@ export function Compositor({
                   type="submit"
                   className={styles.enviar}
                   disabled={bloqueado}
-                  aria-label={ocupado ? 'Preparando entrevista' : 'Gerar entrevista'}
+                  aria-label="Preparar entrevista"
                 >
-                  <span>Gerar entrevista</span>
+                  <span>Preparar entrevista</span>
                   <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />
                 </button>
               </div>
@@ -333,7 +312,7 @@ export function Compositor({
             </p>
           ) : null}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

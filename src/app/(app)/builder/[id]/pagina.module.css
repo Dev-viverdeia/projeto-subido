@@ -43,18 +43,31 @@
 }
 
 .proposta {
-  min-height: 36px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  padding-inline: var(--via-space-3);
+  padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-xs);
-  font-weight: 650;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
   text-decoration: none;
+  transition:
+    background var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.proposta:hover {
+  background: var(--via-navy-deep);
+  transform: translateY(-1px);
+}
+
+.proposta:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 /* A falha herda a superfície de card, não uma cor de alerta: verde/vermelho de

@@ -63,9 +63,8 @@ export function PainelEspera({
         </p>
       </div>
 
-      {/* A ideia entre aspas: é citação do que a pessoa escreveu, não texto da
-          interface. As aspas carregam sozinhas desde que a Outfit entrou — ela não
-          tem face itálica. Duas linhas no máximo — aqui ela é lembrete. */}
+      {/* A ideia entre aspas é citação do que a pessoa escreveu, não texto da
+          interface. Duas linhas no máximo: aqui ela funciona como lembrete. */}
       <p className={styles.ideia}>“{ideia}”</p>
 
       <div className={styles.trilho} aria-hidden="true">
