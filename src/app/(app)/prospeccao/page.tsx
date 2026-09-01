@@ -4,6 +4,7 @@ import { DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
 import { Card, Pill, Spinner } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
+import { RetornoOperacao } from '../_components/RetornoOperacao';
 import { AcompanhamentoBusca } from './_components/AcompanhamentoBusca';
 import { FormularioBusca } from './_components/FormularioBusca';
 import { HeroProspeccao } from './_components/HeroProspeccao';
@@ -91,9 +92,11 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
         />
       )}
       {parametros.crm === 'erro' && (
-        <div className={styles.aviso} role="alert">
-          Não foi possível adicionar esse lead a Vendas agora. Tente novamente.
-        </div>
+        <RetornoOperacao
+          tom="erro"
+          titulo="O lead não foi adicionado a Vendas"
+          descricao="Os dados continuam nesta lista. Tente novamente."
+        />
       )}
 
       <FormularioBusca

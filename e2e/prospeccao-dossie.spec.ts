@@ -15,7 +15,7 @@ test.describe('Estação de Prospecção', () => {
     await expect(dialogo.getByRole('link', { name: 'Escrever' })).toBeVisible();
     await expect(dialogo.getByText('@clinicaaurora', { exact: true }).first()).toBeVisible();
     await expect(dialogo.getByText('Quer trabalhar esta empresa?')).toBeVisible();
-    await expect(dialogo.getByRole('button', { name: 'Adicionar a Vendas' })).toBeVisible();
+    await expect(dialogo.getByRole('button', { name: 'Criar oportunidade' })).toBeVisible();
 
     const decisores = dialogo.getByText('Possíveis decisores');
     await decisores.scrollIntoViewIfNeeded();

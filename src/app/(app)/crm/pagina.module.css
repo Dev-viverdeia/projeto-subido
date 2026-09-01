@@ -61,19 +61,6 @@
   text-transform: uppercase;
 }
 
-.confirmacao {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  width: fit-content;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px solid var(--via-navy-20);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-navy-04) 72%, var(--via-surface));
-  color: var(--via-navy);
-  font-size: var(--via-fs-sm);
-}
-
 .quadro {
   min-width: 0;
 }

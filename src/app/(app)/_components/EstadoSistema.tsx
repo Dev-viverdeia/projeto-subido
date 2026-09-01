@@ -21,34 +21,35 @@ export function EstadoSistema({
   return (
     <section
       className={styles.estado}
+      data-urgente={urgente || undefined}
       role={urgente ? 'alert' : 'status'}
       aria-labelledby="estado-sistema-titulo"
     >
-      <div className={styles.conteudo}>
-        <p className={styles.etiqueta}>{etiqueta}</p>
+      <header className={styles.cabecalho}>
+        <div className={styles.meta}>
+          <span className={styles.icone} aria-hidden="true">
+            {icone}
+          </span>
+          <p className={styles.etiqueta}>{etiqueta}</p>
+          <span className={styles.marca}>Subido</span>
+        </div>
         <h1 id="estado-sistema-titulo">{titulo}</h1>
         <p className={styles.descricao}>{descricao}</p>
-        <div className={styles.acoes}>{acoes}</div>
+      </header>
 
-        <dl className={styles.passos}>
-          {passos.map((passo, indice) => (
-            <div key={passo.rotulo}>
-              <dt>
-                <span>{String(indice + 1).padStart(2, '0')}</span>
-                {passo.rotulo}
-              </dt>
-              <dd>{passo.valor}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      <div className={styles.acoes}>{acoes}</div>
 
-      <aside className={styles.sinal} data-on-dark aria-hidden="true">
-        <span className={styles.icone}>{icone}</span>
-        <span className={styles.linha} />
-        <p>Subido</p>
-        <strong>Veja o que fazer agora.</strong>
-      </aside>
+      <dl className={styles.passos}>
+        {passos.map((passo, indice) => (
+          <div key={passo.rotulo}>
+            <dt>
+              <span>{String(indice + 1).padStart(2, '0')}</span>
+              {passo.rotulo}
+            </dt>
+            <dd>{passo.valor}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

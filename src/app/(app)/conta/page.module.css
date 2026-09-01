@@ -273,45 +273,6 @@
   line-height: var(--via-lh-loose);
 }
 
-.avisoIntegracao {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  width: fit-content;
-  padding: var(--via-space-3) var(--via-space-4);
-  border: 1px solid color-mix(in srgb, var(--via-success) 24%, var(--via-border-soft));
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-success) 7%, var(--via-glass-card));
-  color: var(--via-success);
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-medium);
-  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
-  backdrop-filter: var(--via-blur-sm);
-}
-
-.avisoIntegracao[data-tom='erro'] {
-  border-color: color-mix(in srgb, var(--via-danger) 24%, var(--via-border-soft));
-  background: color-mix(in srgb, var(--via-danger) 6%, var(--via-glass-card));
-  color: var(--via-danger);
-}
-
-.avisoIntegracao[data-tom='atencao'] {
-  border-color: color-mix(in srgb, var(--via-navy) 22%, var(--via-border-soft));
-  background: color-mix(in srgb, var(--via-navy) 5%, var(--via-glass-card));
-  color: var(--via-text-primary);
-}
-
-.avisoIntegracao > span {
-  display: grid;
-  gap: 2px;
-  line-height: var(--via-lh-normal);
-}
-
-.avisoIntegracao > span strong {
-  color: var(--via-text-primary);
-  font-weight: var(--via-fw-semibold);
-}
-
 .economia {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

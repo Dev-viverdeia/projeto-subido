@@ -7,8 +7,8 @@ const TELAS = [
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Mateus,'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
-  ['/preview/metricas', 'Da lista ao cliente.'],
-  ['/preview/prospeccao', 'Encontre empresas para prospectar.'],
+  ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
+  ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
   ['/preview/calls', 'O que fica salvo'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
@@ -16,7 +16,7 @@ const TELAS = [
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/entregas', 'Entregas dos clientes'],
+  ['/preview/entregas', 'Execute o próximo passo de cada cliente.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
 ] as const;
@@ -85,9 +85,8 @@ test.describe('fundação visual Viver de IA', () => {
       'aria-current',
       'page',
     );
-    await expect(
-      page.getByRole('heading', { name: 'Confirme o resultado com o cliente.' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Revisão de resultado' })).toBeVisible();
+    await expect(page.getByText('Registre o que o cliente confirmou.')).toBeVisible();
 
     await page.getByRole('button', { name: /Executar/ }).click();
     const fimDaSala = page.getByRole('button', { name: 'Ver acordo e portal' });
@@ -114,6 +113,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {
     await page.goto('/preview/portal-cliente');
+    await page.getByText('Resultado e continuidade', { exact: true }).click();
 
     const encerramento = page.getByRole('heading', {
       name: 'Resultado, garantia e continuidade.',
@@ -130,6 +130,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o pós-call preserva áudio e transcrição como fontes privadas', async ({ page }) => {
     await page.goto('/preview/pos-call');
+    await page.getByText('Análise completa', { exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toBeVisible();
     await expect(page.getByText('Somente sua conta')).toBeVisible();

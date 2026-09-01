@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { ArrowRight, CheckCircle2, Database } from 'lucide-react';
+import { ArrowRight, Database } from 'lucide-react';
 import { listarPipeline } from '@/lib/crm/queries';
+import { RetornoOperacao } from '../_components/RetornoOperacao';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
 import { PipelineCrm } from './_components/PipelineCrm';
 import styles from './pagina.module.css';
@@ -37,10 +38,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
       </header>
 
       {parametros.novo === 'ok' && (
-        <div className={styles.confirmacao} role="status">
-          <CheckCircle2 size={18} strokeWidth={2} aria-hidden="true" />
-          Venda adicionada ao quadro.
-        </div>
+        <RetornoOperacao
+          tom="sucesso"
+          titulo="Venda adicionada"
+          descricao="A ficha já está no quadro e pronta para o próximo passo."
+        />
       )}
 
       <section className={styles.quadro} aria-labelledby="pipeline-titulo">

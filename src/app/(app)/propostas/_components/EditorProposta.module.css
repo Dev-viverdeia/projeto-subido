@@ -30,8 +30,7 @@
 
 .identidade,
 .acoesTopo,
-.identidade > div,
-.confirmacao {
+.identidade > div {
   display: flex;
   align-items: center;
 }
@@ -134,23 +133,6 @@
   background: var(--via-bg-2);
   color: var(--via-text-muted);
   opacity: 1;
-}
-
-.aviso,
-.confirmacao {
-  margin: 0 0 var(--via-space-4);
-  padding: 10px 13px;
-  border-radius: 10px;
-  background: var(--via-bg-2);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-}
-.confirmacao {
-  width: fit-content;
-  gap: 7px;
-}
-.confirmacao svg {
-  color: var(--via-accent-ink);
 }
 
 .grade {

@@ -27,34 +27,6 @@
   box-shadow: var(--app-ring);
 }
 
-.avisoOperacao {
-  padding: var(--via-space-4) var(--via-space-5);
-  border: 1px solid color-mix(in srgb, var(--via-danger) 22%, var(--via-border-soft));
-  border-radius: var(--app-radius-control);
-  margin: 0;
-  background: color-mix(in srgb, var(--via-danger) 5%, var(--via-surface));
-  color: var(--via-danger);
-  font-size: var(--via-fs-sm);
-}
-
-.avisoSucesso {
-  padding: var(--via-space-4) var(--via-space-5);
-  border: 1px solid var(--via-border-soft);
-  border-radius: var(--app-radius-control);
-  margin: 0;
-  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
-  color: var(--via-text-body);
-  font-size: var(--via-fs-sm);
-  box-shadow: inset 3px 0 0 var(--via-navy);
-  backdrop-filter: blur(16px) saturate(130%);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .avisoSucesso {
-    background: var(--via-surface);
-  }
-}
-
 @media (max-width: 560px) {
   .pagina {
     gap: var(--via-space-5);

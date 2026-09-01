@@ -5,7 +5,6 @@ import {
   Award,
   BookOpen,
   BriefcaseBusiness,
-  CalendarCheck2,
   Check,
   Cloud,
   Coins,
@@ -32,6 +31,7 @@ import {
 } from '@/lib/planos/acessos';
 import { PainelAcessoPlano } from './_components/PainelAcessoPlano';
 import { FormularioPerfilComercial } from './_components/FormularioPerfilComercial';
+import { RetornoOperacao } from '../_components/RetornoOperacao';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Conta' };
@@ -117,29 +117,33 @@ export default async function ContaPage({ searchParams }: PageProps<'/conta'>) {
       </header>
 
       {parametros.calendar === 'conectado' && (
-        <div className={styles.avisoIntegracao} data-tom="sucesso" role="status">
-          <CalendarCheck2 size={17} strokeWidth={1.8} aria-hidden="true" />
-          Google Calendar conectado. Agora você pode enviar o convite ao criar uma reunião.
-        </div>
+        <RetornoOperacao
+          tom="sucesso"
+          titulo="Google Calendar conectado"
+          descricao="Agora você pode enviar o convite ao criar uma reunião."
+        />
       )}
       {parametros.calendar === 'erro' && (
-        <div className={styles.avisoIntegracao} data-tom="erro" role="alert">
-          Não foi possível conectar o calendário. Tente novamente.
-        </div>
+        <RetornoOperacao
+          tom="erro"
+          titulo="O calendário não foi conectado"
+          descricao="Tente novamente. Sua conta continua segura e nenhuma reunião foi alterada."
+        />
       )}
       {acessoBloqueado && (
-        <div className={styles.avisoIntegracao} data-tom="atencao" role="alert">
-          <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
-          <span>
-            <strong>
-              {areaBloqueada
-                ? `${areaBloqueada} está disponível no ${planoNecessario}.`
-                : `Esta área está disponível no ${planoNecessario}.`}
-            </strong>
-            No Starter, você continua com formações, projetos, Sobral AI, mentorias e reuniões com
-            Live Coach.
-          </span>
-        </div>
+        <RetornoOperacao
+          titulo={
+            areaBloqueada
+              ? `${areaBloqueada} está disponível no ${planoNecessario}`
+              : `Esta área está disponível no ${planoNecessario}`
+          }
+          descricao="No Starter, você continua com formações, projetos, Sobral AI, mentorias e reuniões com Live Coach."
+          acao={
+            <Link href="/conta/assinatura">
+              Ver planos <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          }
+        />
       )}
 
       <section className={styles.economia} aria-label="Plano e créditos">
