@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Check, CheckCircle2, Coins, History, Layers3, SearchX } from 'lucide-react';
-import { Button, Modal } from '@/design-system/via';
+import { Button } from '@/design-system/via';
 import type { EstadoAdminAcesso } from '@/lib/admin/actions';
 import type { ContaAdministrada, EventoAcessoAdmin } from '@/lib/admin/acessos';
 import { PACOTES_CREDITOS, PLANOS_SUBIDO, type PlanoSubido } from '@/lib/planos/acessos';
+import { ModalOperacao } from '../../_components/ModalOperacao';
 import { ConfirmarPacote, ConfirmarPlano } from './ConfirmacoesAcesso';
 import styles from './PainelContas.module.css';
 
@@ -143,10 +144,10 @@ export function PainelContas({
         </div>
       </section>
 
-      <Modal
+      <ModalOperacao
         open={Boolean(conta)}
         onClose={fechar}
-        title={conta ? nomeConta(conta) : undefined}
+        title={conta ? nomeConta(conta) : 'Detalhes da conta'}
         description={conta?.email || 'Conta sem e-mail'}
         size="lg"
         hideClose={fluxo.tipo === 'plano' || fluxo.tipo === 'pacote'}
@@ -303,7 +304,7 @@ export function PainelContas({
             </Button>
           </div>
         )}
-      </Modal>
+      </ModalOperacao>
     </>
   );
 }

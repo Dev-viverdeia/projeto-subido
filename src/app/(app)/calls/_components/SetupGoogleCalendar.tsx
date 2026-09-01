@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CalendarCheck2, Check, ExternalLink, Link2, ShieldCheck } from 'lucide-react';
+import { CalendarCheck2, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Alert, Button } from '@/design-system/via';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import styles from './FormularioAgendarCall.module.css';
@@ -18,52 +18,29 @@ export function SetupGoogleCalendar({
 
   return (
     <section className={styles.setupCalendar} aria-labelledby="setup-calendar-titulo">
-      <div className={styles.setupVisual} aria-hidden="true">
-        <span className={styles.setupOrbita} />
-        <span className={styles.setupIcone}>
-          <CalendarCheck2 size={28} strokeWidth={1.5} />
-        </span>
-        <span className={styles.setupSelo}>
-          <Link2 size={13} strokeWidth={2} />
-          Uma conexão
-        </span>
-      </div>
-
+      <span className={styles.setupIcone} aria-hidden="true">
+        <CalendarCheck2 size={24} strokeWidth={1.6} />
+      </span>
       <div className={styles.setupConteudo}>
-        <p className={styles.sobretitulo}>Antes do primeiro agendamento</p>
         <h3 id="setup-calendar-titulo">
           {indisponivel
-            ? 'A conexão com o Google está sendo ativada.'
+            ? 'Conexão temporariamente indisponível'
             : reconectar
-              ? 'Reconecte seu Google Calendar.'
-              : 'Autorize o Google Calendar.'}
+              ? 'Reconecte sua agenda'
+              : 'Uma conexão para todos os próximos convites'}
         </h3>
         <p>
           {indisponivel
-            ? 'O agendamento fica bloqueado até essa configuração estar disponível e você conectar sua conta.'
-            : 'A Subido cria o evento na sua agenda, convida o cliente e coloca o link da sala da plataforma no convite.'}
+            ? 'O agendamento será liberado assim que a integração estiver ativa.'
+            : 'A Subido cria o evento, convida o cliente e inclui o link da sala da plataforma.'}
         </p>
 
-        <ol className={styles.setupEtapas}>
-          <li>
-            <span>
-              <Check size={13} strokeWidth={2.2} aria-hidden="true" />
-            </span>
-            Você escolhe a conta Google
-          </li>
-          <li>
-            <span>
-              <Check size={13} strokeWidth={2.2} aria-hidden="true" />
-            </span>
-            Autoriza a criação dos seus eventos
-          </li>
-          <li>
-            <span>
-              <Check size={13} strokeWidth={2.2} aria-hidden="true" />
-            </span>
-            Volta direto para este agendamento
-          </li>
-        </ol>
+        {!indisponivel && (
+          <div className={styles.setupResumo}>
+            <strong>Evento, convite e sala em uma única ação.</strong>
+            <span>Você escolhe a conta Google e volta direto para este agendamento.</span>
+          </div>
+        )}
 
         {calendar.ultimoErro && (
           <Alert tone="danger" size="compact">

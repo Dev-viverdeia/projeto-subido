@@ -12,10 +12,11 @@ import {
   Share2,
 } from 'lucide-react';
 import { useState } from 'react';
-import { Alert, Button, Modal, Spinner } from '@/design-system/via';
+import { Alert, Button, Spinner } from '@/design-system/via';
 import { avaliarCertificado } from '@/lib/certificados/criterios';
 import { useProgresso } from '@/lib/progresso/local';
 import { BotaoVoltar } from '../../_components/BotaoVoltar';
+import { ModalOperacao } from '../../_components/ModalOperacao';
 import { Visto } from '../../_components/PillEstado';
 import { dataCurta } from '../../builder/_components/statusBuilder';
 import styles from './CertificadoVista.module.css';
@@ -290,7 +291,7 @@ export function CertificadoVista({
         </div>
       </article>
 
-      <Modal
+      <ModalOperacao
         open={estadoEmissao !== 'fechado'}
         onClose={fecharEmissao}
         hideClose={estadoEmissao === 'processando'}
@@ -350,7 +351,7 @@ export function CertificadoVista({
             {erroEmissao}
           </Alert>
         ) : null}
-      </Modal>
+      </ModalOperacao>
     </div>
   );
 }

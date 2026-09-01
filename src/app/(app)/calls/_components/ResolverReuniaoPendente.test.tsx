@@ -13,8 +13,8 @@ describe('ResolverReuniaoPendente', () => {
 
     await user.click(screen.getByRole('button', { name: 'Resolver pendência' }));
 
-    const dialogo = screen.getByRole('dialog', { name: 'O que aconteceu com esta reunião?' });
-    expect(dialogo.parentElement?.parentElement).toBe(document.body);
+    const dialogo = screen.getByRole('dialog', { name: 'Resolver reunião pendente' });
+    expect(dialogo.parentElement?.parentElement?.parentElement).toBe(document.body);
     expect(screen.getByRole('button', { name: 'Marcar como não realizada' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Escolher novo horário' })).toBeInTheDocument();
   });

@@ -19,6 +19,7 @@ export function CamposParticipanteStarter({
     <div className={styles.duasColunas}>
       <Input
         id="calls-empresa"
+        data-autofocus
         name="empresa"
         label="Empresa"
         placeholder="Ex.: Clínica Horizonte"

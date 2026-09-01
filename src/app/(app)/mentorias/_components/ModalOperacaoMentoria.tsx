@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { Alert, Button, Modal, Spinner } from '@/design-system/via';
+import { Alert, Button, Spinner } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import { Visto } from '../../_components/PillEstado';
+import { ModalOperacao } from '../../_components/ModalOperacao';
 import { horaCurta, rotuloDoDia } from './estadoMentoria';
 import styles from './ModalOperacaoMentoria.module.css';
 
@@ -102,7 +103,7 @@ export function ModalOperacaoMentoria({
     );
 
   return (
-    <Modal
+    <ModalOperacao
       open={sessao !== null}
       onClose={aoFechar}
       title={titulo}
@@ -199,6 +200,6 @@ export function ModalOperacaoMentoria({
           {falha}
         </Alert>
       ) : null}
-    </Modal>
+    </ModalOperacao>
   );
 }

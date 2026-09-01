@@ -36,22 +36,6 @@
   gap: var(--via-space-5);
 }
 
-.portalModal :global(.via-modal) {
-  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
-}
-
-.portalModal :global(.via-modal__foot) {
-  background: color-mix(in srgb, var(--via-surface) 88%, transparent);
-  backdrop-filter: blur(18px) saturate(130%);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .portalModal :global(.via-modal),
-  .portalModal :global(.via-modal__foot) {
-    background: var(--via-surface);
-  }
-}
-
 .campoAcao,
 .campoData {
   display: grid;
