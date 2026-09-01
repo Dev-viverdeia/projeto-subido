@@ -73,7 +73,7 @@
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: var(--via-surface);
+  background: color-mix(in srgb, var(--via-surface) 84%, transparent);
   color: var(--via-text-primary);
   font: inherit;
   font-size: var(--via-fs-sm);
@@ -83,10 +83,23 @@
   box-shadow: var(--app-elev-1-shadow);
 }
 
-.compartilhar:hover,
-.linkedin:hover {
+.linkedin {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    var(--app-elev-1-shadow);
+}
+
+.compartilhar:hover {
   border-color: var(--via-border-strong-color);
   background: var(--via-navy-04);
+}
+
+.linkedin:hover {
+  border-color: var(--via-navy-deep);
+  background: var(--via-navy-deep);
 }
 
 .compartilhar:focus-visible,
@@ -98,6 +111,11 @@
 .compartilhar:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.linkedin:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 .girando {
@@ -126,10 +144,10 @@
   gap: var(--via-space-2);
   height: var(--app-h-control);
   padding-inline: var(--via-space-4);
-  border: 0;
+  border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: color-mix(in srgb, var(--via-surface) 84%, transparent);
+  color: var(--via-text-primary);
   font: inherit;
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
@@ -141,7 +159,8 @@
 }
 
 .imprimir:hover {
-  background: var(--via-navy-deep);
+  border-color: var(--via-border-strong-color);
+  background: var(--via-navy-04);
   box-shadow: var(--app-elev-2-shadow);
 }
 

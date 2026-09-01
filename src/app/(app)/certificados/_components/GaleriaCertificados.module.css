@@ -75,7 +75,10 @@
   padding: var(--app-pad-card);
   border-radius: var(--app-radius-card);
   border: 1px solid var(--via-navy-16);
-  box-shadow: var(--via-glow-navy);
+  background: linear-gradient(135deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    var(--via-glow-navy);
 }
 
 /* A moldura interna de hairline é o que faz "documento" sem nenhum ornamento:
@@ -380,9 +383,15 @@
   align-items: stretch;
   gap: var(--app-gap-section);
   padding: clamp(24px, 4vw, 40px);
-  border: 1px solid var(--via-navy-16);
+  border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-surface);
-  box-shadow: var(--via-glow-navy);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--via-surface) 96%, transparent),
+    color-mix(in srgb, var(--via-bg-2) 88%, transparent)
+  );
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-md);
   overflow: hidden;
 }
 
@@ -401,7 +410,7 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-400);
+  color: var(--via-text-faint);
 }
 
 .vazioTitulo {
@@ -410,7 +419,7 @@
   font-weight: 560;
   letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-tight);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-wrap: balance;
 }
 
@@ -418,7 +427,7 @@
   margin: 0;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
   max-width: 44ch;
   text-wrap: pretty;
 }
@@ -436,8 +445,8 @@
   height: var(--app-h-control);
   padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
-  background: var(--via-white);
-  color: var(--via-navy-deep);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -448,13 +457,13 @@
 }
 
 .vazioCta:hover {
-  background: var(--via-gray-100);
+  background: var(--via-navy-deep);
   box-shadow: var(--app-elev-2-shadow);
 }
 
 .vazioCta:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 .vazioCtaGhost {
@@ -462,10 +471,10 @@
   align-items: center;
   height: var(--app-h-control);
   padding-inline: var(--via-space-4);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--via-white);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
+  color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
@@ -475,13 +484,13 @@
 }
 
 .vazioCtaGhost:hover {
-  border-color: rgba(255, 255, 255, 0.34);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--via-navy-25);
+  background: var(--via-navy-04);
 }
 
 .vazioCtaGhost:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy);
+  box-shadow: var(--app-ring);
 }
 
 .vazioRegistro {
@@ -490,15 +499,16 @@
   justify-content: space-between;
   gap: var(--app-gap-block);
   padding: var(--app-pad-card);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-card);
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: var(--via-blur-sm);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
   .vazioRegistro {
-    background: var(--via-navy);
+    background: var(--via-surface);
   }
 }
 
@@ -517,7 +527,7 @@
   align-items: start;
   gap: var(--via-space-4);
   padding-top: var(--via-space-3);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .vazioDados > li + li {
@@ -528,14 +538,14 @@
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-gray-400);
+  color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
 .vazioDados p {
   margin: 0;
   font-size: var(--via-fs-sm);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-wrap: pretty;
 }
 
@@ -603,7 +613,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: 1fr auto;
   gap: var(--via-space-3) var(--via-space-4);
-  min-height: 220px;
+  min-height: 184px;
   padding: var(--app-pad-card);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
@@ -618,7 +628,6 @@
 }
 
 .recomendacao:hover {
-  transform: translateY(-3px);
   border-color: var(--app-elev-2-line);
   box-shadow: var(--app-elev-2-shadow);
   text-decoration: none;
@@ -775,7 +784,7 @@
   }
 
   .recomendacao {
-    min-height: 200px;
+    min-height: 168px;
   }
 }
 

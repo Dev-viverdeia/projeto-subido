@@ -113,7 +113,8 @@ export function ItemAgenda({
               {sessao.inscritos}/{sessao.vagas}
             </span>
             <Button variant="primary" size="sm" disabled={gravando} onClick={aoFazerCheckin}>
-              Fazer check-in · {sessao.custoCreditos} cr.
+              Fazer check-in · {sessao.custoCreditos}{' '}
+              {sessao.custoCreditos === 1 ? 'crédito' : 'créditos'}
             </Button>
           </>
         )}

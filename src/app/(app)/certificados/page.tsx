@@ -26,8 +26,8 @@ export default async function CertificadosPage() {
       <div className={entrada.bloco}>
         <EvolucaoProfissional
           etapa="certificados"
-          titulo="Seus certificados."
-          descricao="Formações certificam o aprendizado. Projetos certificam as aulas e a implementação concluídas."
+          titulo="Comprove o que você concluiu."
+          descricao="Cada certificado vira uma prova pública do que você aprendeu e implementou."
         />
       </div>
 

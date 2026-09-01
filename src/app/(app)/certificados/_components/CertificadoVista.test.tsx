@@ -68,10 +68,10 @@ describe('emissão de certificado', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Gerar link público' }));
+    await user.click(screen.getByRole('button', { name: 'Preparar para compartilhar' }));
 
     expect(
-      await screen.findByRole('dialog', { name: 'Preparando seu certificado' }),
+      await screen.findByRole('dialog', { name: 'Preparando para compartilhar' }),
     ).toHaveTextContent('Validando sua conclusão');
 
     await act(async () => {
@@ -82,7 +82,7 @@ describe('emissão de certificado', () => {
     const sucesso = await screen.findByRole('dialog', {
       name: 'Certificado pronto para compartilhar',
     });
-    expect(sucesso).toHaveTextContent('Link público criado');
+    expect(sucesso).toHaveTextContent('Pronto para compartilhar');
     expect(screen.getAllByRole('link', { name: 'Compartilhar no LinkedIn' })[0]).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent('/certificado/certificado-publico')),

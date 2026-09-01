@@ -60,9 +60,9 @@ describe('galeria de certificados', () => {
   it('transforma o estado vazio em uma escolha concreta de primeiro caminho', () => {
     render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
 
-    expect(screen.getByText('Como receber um certificado')).toBeInTheDocument();
+    expect(screen.getByText('Como funciona')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Escolha uma formação ou projeto.' }),
+      screen.getByRole('heading', { name: 'Escolha seu próximo caminho.' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Começar formação/ })).toHaveAttribute(
       'href',

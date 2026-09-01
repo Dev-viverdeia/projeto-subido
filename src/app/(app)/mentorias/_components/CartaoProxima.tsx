@@ -73,10 +73,7 @@ export function CartaoProxima({
       ];
 
   return (
-    <article
-      className={`${styles.cartao} via-mesh-navy via-noise`}
-      data-ao-vivo={aoVivo ? '' : undefined}
-    >
+    <article className={`${styles.cartao} via-mesh-navy`} data-ao-vivo={aoVivo ? '' : undefined}>
       <span className={styles.sheen} aria-hidden="true" />
       <div className={styles.conteudo}>
         <div className={styles.principal}>
@@ -130,7 +127,8 @@ export function CartaoProxima({
           <div className={styles.acoes}>
             {estado === 'checkin-aberto' && (
               <Button variant="primary" disabled={gravando} onClick={aoFazerCheckin}>
-                Fazer check-in · {sessao.custoCreditos} crédito
+                Fazer check-in · {sessao.custoCreditos}{' '}
+                {sessao.custoCreditos === 1 ? 'crédito' : 'créditos'}
               </Button>
             )}
 

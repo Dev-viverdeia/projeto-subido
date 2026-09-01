@@ -82,7 +82,7 @@ export function ModalOperacaoMentoria({
             >
               {cancelamento
                 ? 'Cancelar check-in'
-                : `Confirmar por ${movimento} ${movimento === 1 ? 'crédito' : 'créditos'}`}
+                : `Usar ${movimento} ${movimento === 1 ? 'crédito' : 'créditos'} e confirmar`}
             </Button>
           </>
         ) : fase === 'erro' ? (
@@ -116,14 +116,14 @@ export function ModalOperacaoMentoria({
           <p className={styles.texto}>
             {cancelamento ? (
               <>
-                Sua vaga em “{sessao.titulo}” volta a ficar disponível. Você pode fazer um novo
-                check-in depois, enquanto ainda houver vaga.
+                Sua vaga será liberada e {movimento}{' '}
+                {movimento === 1 ? 'crédito voltará' : 'créditos voltarão'} para o seu saldo.
               </>
             ) : (
               <>
-                A vaga fica garantida em “{sessao.titulo}” (
+                Confirme sua vaga em “{sessao.titulo}” (
                 {rotuloDoDia(sessao.inicioIso, agora).principal.toLowerCase()},{' '}
-                {horaCurta(sessao.inicioIso)}). Você pode cancelar até o início.
+                {horaCurta(sessao.inicioIso)}). O valor só é usado depois da confirmação.
               </>
             )}
           </p>

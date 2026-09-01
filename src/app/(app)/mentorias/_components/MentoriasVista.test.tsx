@@ -51,7 +51,8 @@ describe('ações de check-in nas mentorias', () => {
     await user.click(screen.getAllByRole('button', { name: /Cancelar check-in/ })[0]!);
 
     const dialogo = screen.getByRole('dialog', { name: 'Cancelar seu check-in?' });
-    expect(within(dialogo).getByText(/Sua vaga.+volta a ficar disponível/)).toBeDefined();
+    expect(within(dialogo).getByText(/Sua vaga será liberada/)).toBeDefined();
+    expect(within(dialogo).getByText(/1 crédito voltará/)).toBeDefined();
     expect(within(dialogo).getByRole('button', { name: 'Manter check-in' })).toBeDefined();
 
     await user.click(within(dialogo).getByRole('button', { name: 'Cancelar check-in' }));
@@ -79,7 +80,9 @@ describe('ações de check-in nas mentorias', () => {
     const confirmacao = screen.getByRole('dialog', { name: 'Confirmar check-in' });
     expect(within(confirmacao).getByText('19')).toBeInTheDocument();
 
-    await user.click(within(confirmacao).getByRole('button', { name: 'Confirmar por 1 crédito' }));
+    await user.click(
+      within(confirmacao).getByRole('button', { name: 'Usar 1 crédito e confirmar' }),
+    );
     expect(
       await screen.findByRole('dialog', { name: 'Confirmando seu check-in' }),
     ).toHaveTextContent('Reservando sua vaga');
@@ -114,7 +117,7 @@ describe('ações de check-in nas mentorias', () => {
       '/conta/creditos',
     );
     expect(
-      within(dialogo).queryByRole('button', { name: 'Confirmar por 1 crédito' }),
+      within(dialogo).queryByRole('button', { name: 'Usar 1 crédito e confirmar' }),
     ).not.toBeInTheDocument();
     expect(fazerCheckin).not.toHaveBeenCalled();
   });
