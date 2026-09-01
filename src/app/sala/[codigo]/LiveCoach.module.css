@@ -4,9 +4,11 @@
   height: 100%;
   flex-direction: column;
   overflow: hidden;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  background: color-mix(in srgb, var(--via-navy) 44%, var(--via-navy-deep));
-  color: var(--via-white);
+  border-left: 1px solid color-mix(in srgb, var(--via-white) 16%, transparent);
+  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
+  color: var(--via-text-primary);
+  box-shadow: -24px 0 70px -46px rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(28px) saturate(135%);
 }
 
 .cabecalho {
@@ -14,9 +16,9 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-3);
-  min-height: 72px;
+  min-height: 76px;
   padding: 0 var(--via-space-5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--via-border-hairline);
 }
 
 .cabecalho p,
@@ -25,8 +27,8 @@
 }
 
 .cabecalho p {
-  color: var(--via-white);
-  font-size: var(--via-fs-caption);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   letter-spacing: var(--app-ls-h4);
 }
@@ -34,11 +36,10 @@
 .cabecalho div > span {
   display: block;
   margin-top: var(--via-space-1);
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
+  font-size: var(--via-fs-xs);
+  text-transform: lowercase;
 }
 
 .estado {
@@ -46,22 +47,23 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  width: 26px;
-  height: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--app-radius-chip);
-  background: rgba(255, 255, 255, 0.04);
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 68%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .estado i {
   width: 2px;
-  height: 5px;
+  height: 6px;
   border-radius: var(--app-radius-track);
-  background: var(--via-gray-500);
+  background: var(--via-gray-400);
 }
 
 .estado i:nth-child(2) {
-  height: 9px;
+  height: 11px;
 }
 
 .estado.ativo i,
@@ -76,15 +78,15 @@
 }
 
 .estado.intenso {
-  border-color: color-mix(in srgb, var(--via-white) 36%, transparent);
+  border-color: color-mix(in srgb, var(--via-accent) 38%, var(--via-border));
 }
 
 .privado {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-1);
-  color: var(--via-gray-400);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
   white-space: nowrap;
 }
 
@@ -94,18 +96,19 @@
 }
 
 .recomendacao {
-  min-height: 318px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 320px;
+  flex: 1;
+  border-bottom: 1px solid var(--via-border-hairline);
 }
 
 .rotuloSecao {
   display: flex;
   align-items: center;
   gap: var(--via-space-2);
-  color: var(--via-gray-400);
+  color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
+  font-size: var(--via-fs-xs);
+  letter-spacing: var(--app-ls-micro);
   text-transform: uppercase;
 }
 
@@ -118,22 +121,22 @@
   align-items: center;
   gap: var(--via-space-2);
   margin-top: var(--via-space-7);
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   text-transform: uppercase;
 }
 
 .metaSugestao span + span::before {
-  content: '·';
   padding-right: var(--via-space-2);
+  content: '·';
 }
 
 .recomendacao h2 {
-  max-width: 14ch;
+  max-width: 16ch;
   margin: var(--via-space-4) 0 0;
-  color: var(--via-white);
-  font-size: clamp(1.45rem, 2.1vw, 2rem);
+  color: var(--via-text-primary);
+  font-size: clamp(1.65rem, 2.25vw, 2.15rem);
   font-weight: 560;
   line-height: var(--via-lh-tight);
   letter-spacing: var(--app-ls-h2);
@@ -141,20 +144,22 @@
 }
 
 .recomendacao h2 + p {
-  max-width: 34ch;
+  max-width: 36ch;
   margin: var(--via-space-4) 0 0;
-  color: var(--via-gray-200);
+  color: var(--via-text-body);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
   text-wrap: pretty;
 }
 
 .evidencia {
-  max-width: 36ch;
+  max-width: 38ch;
   margin: var(--via-space-5) 0 0;
-  padding-left: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
   border-left: 2px solid var(--via-accent);
-  color: var(--via-gray-400);
+  border-radius: 0 var(--app-radius-control) var(--app-radius-control) 0;
+  background: color-mix(in srgb, var(--via-accent) 6%, transparent);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
@@ -164,66 +169,66 @@
 }
 
 .espera h2 {
-  max-width: 12ch;
+  max-width: 15ch;
 }
 
 .espera p {
-  max-width: 34ch;
+  max-width: 36ch;
   margin: var(--via-space-3) 0 0;
-  color: var(--via-gray-400);
-  font-size: var(--via-fs-xs);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
 }
 
 .espera .planoRotulo {
   display: block;
-  color: var(--via-accent);
+  color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
 
 .espera .planoRotulo + h2 {
-  max-width: 17ch;
+  max-width: 19ch;
   margin-top: var(--via-space-3);
-  font-size: clamp(1.2rem, 1.8vw, 1.65rem);
+  font-size: clamp(1.35rem, 1.9vw, 1.75rem);
 }
 
 .espera p.primeiraPergunta {
-  max-width: 38ch;
-  margin-top: var(--via-space-4);
+  max-width: 40ch;
+  margin-top: var(--via-space-5);
   padding-left: var(--via-space-3);
   border-left: 2px solid var(--via-accent);
-  color: var(--via-gray-200);
+  color: var(--via-text-body);
 }
 
 .transcricao {
-  min-height: 150px;
-  flex: 1;
+  min-height: 170px;
+  background: color-mix(in srgb, var(--via-bg-2) 58%, transparent);
 }
 
 .transcricao > p {
   display: -webkit-box;
-  max-width: 36ch;
+  max-width: 38ch;
   margin: var(--via-space-4) 0 0;
   overflow: hidden;
-  color: var(--via-gray-300);
-  font-size: var(--via-fs-xs);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 4;
 }
 
 .transcricao > p.falaParcial {
-  color: var(--via-gray-100);
+  color: var(--via-text-primary);
 }
 
 .transcricao small {
   display: block;
   margin-top: var(--via-space-3);
-  color: var(--via-gray-300);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
@@ -233,12 +238,12 @@
   justify-content: space-between;
   gap: var(--via-space-2);
   flex-wrap: wrap;
-  min-height: 52px;
+  min-height: 58px;
   margin-top: auto;
   padding: var(--via-space-3) var(--via-space-5);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  color: var(--via-gray-400);
-  font-size: var(--via-fs-micro);
+  border-top: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
@@ -249,10 +254,9 @@
 }
 
 .gravacao {
-  color: var(--via-gray-300);
+  color: var(--via-text-body);
   font-family: var(--via-font-mono);
-  letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
+  text-transform: lowercase;
 }
 
 .gravacao svg {
@@ -269,6 +273,12 @@
   color: var(--via-gray-500);
 }
 
+@supports not (backdrop-filter: blur(1px)) {
+  .painel {
+    background: var(--via-surface);
+  }
+}
+
 @keyframes audioPulse {
   from {
     transform: scaleY(0.55);
@@ -280,13 +290,13 @@
 
 @media (max-width: 900px) {
   .painel {
-    height: min(40dvh, 340px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    height: min(42dvh, 360px);
+    border-top: 1px solid var(--via-border-soft);
     border-left: 0;
   }
 
   .cabecalho {
-    min-height: 60px;
+    min-height: 62px;
   }
 
   .recomendacao {
@@ -305,9 +315,8 @@
   }
 
   .recomendacao h2 + p {
-    max-width: 58ch;
+    max-width: 62ch;
     margin-top: var(--via-space-2);
-    font-size: var(--via-fs-xs);
   }
 
   .evidencia,
@@ -333,8 +342,12 @@
   }
 
   .privado svg {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .painel footer > span:last-child {
+    display: none;
   }
 }
 

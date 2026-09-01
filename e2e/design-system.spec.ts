@@ -10,7 +10,8 @@ const TELAS = [
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
-  ['/preview/calls', 'Sua próxima reunião'],
+  ['/preview/calls', 'Comece por aqui'],
+  ['/preview/call-preparo', 'Confirmar se a perda de contatos'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
@@ -124,6 +125,23 @@ test.describe('fundação visual Viver de IA', () => {
     });
   }
 
+  for (const rota of [
+    '/preview/calls',
+    '/preview/call-preparo',
+    '/preview/sala-call',
+    '/preview/live-coach',
+    '/preview/pos-call',
+  ]) {
+    test(`${rota} mantém a jornada de reunião acessível`, async ({ page }) => {
+      await page.goto(rota);
+      const resultado = await new AxeBuilder({ page }).analyze();
+      const graves = resultado.violations.filter(
+        (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+      );
+      expect(graves).toEqual([]);
+    });
+  }
+
   test('a Sala mantém todo o plano alcançável na rolagem', async ({ page }) => {
     await page.goto('/preview/sala-entrega');
 
@@ -207,10 +225,10 @@ test.describe('fundação visual Viver de IA', () => {
   }) => {
     await page.goto('/preview/calls');
 
-    await expect(page.getByText('Sua próxima reunião', { exact: true })).toBeVisible();
+    await expect(page.getByText('Comece por aqui', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Outras ações' }).first().click();
     await expect(page.getByRole('menuitem', { name: 'Copiar link da sala' })).toBeVisible();
-    await expect(page.getByRole('menuitem', { name: 'Abrir sala' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Entrar na sala' })).toBeVisible();
   });
 
   test('a biblioteca comercial filtra propostas dentro de uma única superfície', async ({

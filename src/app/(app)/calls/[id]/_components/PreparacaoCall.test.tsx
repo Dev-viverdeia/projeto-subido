@@ -70,14 +70,14 @@ describe('PreparacaoCall', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Como os contatos são distribuídos hoje?')).toBeInTheDocument();
     expect(screen.getByText('Canal principal: WhatsApp')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Ver ficha/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ficha do cliente/ })).toHaveAttribute(
       'href',
       '/vendas/oportunidade-1',
     );
-    expect(screen.getByRole('link', { name: /Entrar na sala/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Entrar na reunião/ })).toHaveAttribute(
       'href',
       '/sala/sala-horizonte',
     );
-    expect(screen.getByText('Live Coach pronto')).toBeInTheDocument();
+    expect(screen.getByText('Live Coach preparado')).toBeInTheDocument();
   });
 });

@@ -74,15 +74,15 @@ describe('PainelCalls', () => {
     );
 
     const destaque = screen.getByRole('region', { name: 'Descoberta Horizonte' });
-    expect(within(destaque).getByText('Sua próxima reunião')).toBeInTheDocument();
+    expect(within(destaque).getByText('Comece por aqui')).toBeInTheDocument();
     expect(screen.getAllByText('Descoberta Horizonte')).toHaveLength(1);
 
-    const agenda = screen.getByRole('region', { name: 'Depois desta' });
+    const agenda = screen.getByRole('region', { name: 'Próximas reuniões' });
     expect(within(agenda).getByText('Proposta Horizonte')).toBeInTheDocument();
     expect(within(agenda).queryByText('Descoberta Horizonte')).not.toBeInTheDocument();
 
-    expect(screen.getByLabelText('Recursos da sala')).toHaveTextContent(
-      'Transcrição, resumo e próxima ação são salvos na ficha do cliente.',
+    expect(screen.getByLabelText('Memória das reuniões')).toHaveTextContent(
+      'A conversa vira resumo, decisões e próximo passo na ficha do cliente.',
     );
     expect(screen.getByRole('region', { name: 'Histórico' })).toHaveTextContent(
       'Kickoff concluído',

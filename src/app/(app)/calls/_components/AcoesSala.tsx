@@ -30,7 +30,7 @@ export function AcoesSala({
     return (
       <div className={`${styles.acoes} ${styles.compactas}`}>
         <Link href={`/reunioes/${id}`} className={styles.preparar}>
-          <ListChecks size={16} aria-hidden="true" /> Preparar call
+          <ListChecks size={16} aria-hidden="true" /> Preparar reunião
         </Link>
         <DropdownMenu
           align="end"
@@ -49,7 +49,7 @@ export function AcoesSala({
             },
             {
               id: 'abrir',
-              label: 'Abrir sala',
+              label: 'Entrar na sala',
               icon: <Video size={16} />,
               onSelect: () => router.push(caminho),
             },
@@ -62,10 +62,10 @@ export function AcoesSala({
   return (
     <div className={`${styles.acoes} ${styles.destaque}`}>
       <Link href={`/reunioes/${id}`} className={styles.preparar}>
-        <ListChecks size={15} aria-hidden="true" /> Preparar call
+        <ListChecks size={15} aria-hidden="true" /> Preparar reunião
       </Link>
       <Link href={caminho} className={styles.entrar}>
-        <Video size={15} aria-hidden="true" /> Abrir sala
+        <Video size={15} aria-hidden="true" /> Entrar na sala
       </Link>
     </div>
   );
