@@ -92,5 +92,6 @@ describe('Mensagens compactas do Sobral AI', () => {
     expect(screen.queryByText('Confirmar ação de antiga')).not.toBeInTheDocument();
     expect(screen.getByText('Confirmar ação de recente')).toBeVisible();
     expect(screen.queryByText('Próximo passo recente')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copiar a resposta do Sobral AI' })).toBeVisible();
   });
 });

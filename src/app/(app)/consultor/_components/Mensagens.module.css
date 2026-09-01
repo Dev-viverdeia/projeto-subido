@@ -45,6 +45,23 @@
   backdrop-filter: blur(18px) saturate(132%);
 }
 
+.doConsultor .texto p {
+  margin: 0;
+}
+
+.doConsultor .texto p + p {
+  margin-top: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.utilidadesResposta {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  padding-left: var(--via-space-1);
+}
+
 .corpo {
   display: flex;
   flex-direction: column;

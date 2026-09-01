@@ -12,6 +12,7 @@ import {
   validarAnexosSobral,
 } from '@/lib/consultor/anexos-contrato';
 import { AnexoIcone } from './AnexoIcone';
+import { blocosDaResposta } from './resposta';
 import { useGravadorAudio } from './useGravadorAudio';
 import styles from './Conversa.module.css';
 
@@ -237,7 +238,11 @@ export function Conversa({
               <span className={styles.autorResposta}>
                 <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
               </span>
-              <p className={`${styles.balao} ${styles.doConsultor}`}>{respostaEmVoo}</p>
+              <div className={`${styles.balao} ${styles.doConsultor}`}>
+                {blocosDaResposta(respostaEmVoo).map((bloco, indice) => (
+                  <p key={`resposta-em-voo-${indice}`}>{bloco}</p>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>

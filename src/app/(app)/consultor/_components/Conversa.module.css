@@ -54,6 +54,14 @@
   color: var(--via-text-primary);
 }
 
+.doConsultor p {
+  margin: 0;
+}
+
+.doConsultor p + p {
+  margin-top: var(--via-space-3);
+}
+
 .anexosEmVoo {
   align-self: flex-end;
   list-style: none;

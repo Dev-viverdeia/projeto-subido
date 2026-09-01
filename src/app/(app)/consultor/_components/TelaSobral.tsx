@@ -1,5 +1,15 @@
 import Link from 'next/link';
-import { Bot, Database, Plus } from 'lucide-react';
+import {
+  Bot,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChevronDown,
+  ContactRound,
+  Database,
+  GraduationCap,
+  Plus,
+  ShieldCheck,
+} from 'lucide-react';
 import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
@@ -28,10 +38,51 @@ const EXEMPLOS: ExemploDoConsultor[] = [
   },
 ];
 
+const FONTES_DO_CONTEXTO = [
+  {
+    titulo: 'Vendas',
+    detalhe: 'clientes, etapas e próximos passos',
+    icone: ContactRound,
+  },
+  {
+    titulo: 'Reuniões',
+    detalhe: 'agenda, registros e decisões',
+    icone: CalendarDays,
+  },
+  {
+    titulo: 'Projetos',
+    detalhe: 'tarefas, prazos e entregas',
+    icone: BriefcaseBusiness,
+  },
+  {
+    titulo: 'Aprendizado',
+    detalhe: 'formações e projetos guiados',
+    icone: GraduationCap,
+  },
+] as const;
+
 type ConversaCarregada = {
   thread: ThreadDoConsultor;
   mensagens: MensagemDoConsultor[];
 } | null;
+
+function tituloLegivel(titulo: string): string {
+  const limpo = titulo.trim();
+  return limpo ? `${limpo.charAt(0).toLocaleUpperCase('pt-BR')}${limpo.slice(1)}` : 'Conversa';
+}
+
+function saudacao(): string {
+  const hora = Number(
+    new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      hourCycle: 'h23',
+      timeZone: 'America/Sao_Paulo',
+    }).format(new Date()),
+  );
+  if (hora < 12) return 'Bom dia';
+  if (hora < 18) return 'Boa tarde';
+  return 'Boa noite';
+}
 
 /** Superfície única do Sobral AI. `/consultor` sempre chega com `conversa=null`;
  * uma conversa anterior só é aberta quando a pessoa a escolhe no histórico. */
@@ -39,10 +90,12 @@ export function TelaSobral({
   threads,
   conversa,
   contextoInicial,
+  nome,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
   contextoInicial?: ContextoSobralTarefa | null;
+  nome?: string | null;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -58,16 +111,55 @@ export function TelaSobral({
               <Bot size={18} strokeWidth={1.8} />
             </span>
             <div>
-              <h1 id="titulo-sobral">{conversa?.thread.titulo ?? 'Nova conversa'}</h1>
-              <p>Sobral AI · consultor conectado à sua conta</p>
+              <h1 id="titulo-sobral">
+                {conversa ? tituloLegivel(conversa.thread.titulo) : 'Nova conversa'}
+              </h1>
+              <p>Sobral AI · consultor do seu trabalho</p>
             </div>
           </div>
 
           <div className={styles.acoes}>
-            <span className={styles.contextoAtivo} title="O Sobral usa os dados da sua conta">
-              <Database size={14} strokeWidth={1.8} aria-hidden="true" />
-              Dados conectados
-            </span>
+            <details className={styles.contexto}>
+              <summary aria-label="Ver o que o Sobral AI usa da sua conta">
+                <Database size={14} strokeWidth={1.8} aria-hidden="true" />
+                <span>Contexto da conta</span>
+                <ChevronDown
+                  className={styles.contextoSeta}
+                  size={14}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+              </summary>
+              <div className={styles.contextoPainel}>
+                <div className={styles.contextoCabecalho}>
+                  <span className={styles.contextoIcone} aria-hidden="true">
+                    <Database size={18} strokeWidth={1.8} />
+                  </span>
+                  <div>
+                    <strong>O que o Sobral consegue usar</strong>
+                    <p>Dados da sua conta e arquivos enviados nesta conversa.</p>
+                  </div>
+                </div>
+                <ul className={styles.contextoFontes}>
+                  {FONTES_DO_CONTEXTO.map((fonte) => {
+                    const Icone = fonte.icone;
+                    return (
+                      <li key={fonte.titulo}>
+                        <Icone size={16} strokeWidth={1.8} aria-hidden="true" />
+                        <span>
+                          <strong>{fonte.titulo}</strong>
+                          <small>{fonte.detalhe}</small>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className={styles.contextoPrivacidade}>
+                  <ShieldCheck size={15} strokeWidth={1.8} aria-hidden="true" />
+                  Dados de contato não são enviados por padrão.
+                </p>
+              </div>
+            </details>
             {conversa ? (
               <Link href="/consultor" className={styles.novaConversa}>
                 <Plus size={15} strokeWidth={2} aria-hidden="true" />
@@ -95,12 +187,19 @@ export function TelaSobral({
                 </span>
               )}
               <h2>
-                {contextoInicial ? contextoInicial.tarefa : 'O que você quer resolver agora?'}
+                {contextoInicial ? (
+                  contextoInicial.tarefa
+                ) : (
+                  <>
+                    {nome ? `${saudacao()}, ${nome}.` : 'Vamos ao que importa.'}
+                    <span>O que precisa avançar?</span>
+                  </>
+                )}
               </h2>
               <p className={styles.apoio}>
                 {contextoInicial
                   ? 'O pedido já traz o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie.'
-                  : 'Analiso suas vendas, reuniões e projetos para indicar um próximo passo que faça sentido no seu trabalho.'}
+                  : 'Cruzo o que já está na plataforma para recomendar uma ação concreta.'}
               </p>
             </div>
           ) : (
