@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
@@ -53,18 +53,19 @@ describe('FormularioAgendarCall', () => {
   });
 
   it('abre com oportunidade real, Live Coach ativo e devolve o foco ao fechar', async () => {
+    const user = userEvent.setup();
     agendarReuniaoMock.mockResolvedValue({});
     render(<FormularioAgendarCall oportunidades={[OPORTUNIDADE]} calendar={CALENDAR_CONECTADO} />);
 
     const gatilho = screen.getByRole('button', { name: 'Agendar reunião' });
-    fireEvent.click(gatilho);
+    await user.click(gatilho);
 
     expect(screen.getByRole('dialog', { name: 'Agendar reunião' })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByLabelText('Cliente em negociação')).toHaveFocus());
     expect(screen.getByRole('checkbox')).toBeChecked();
     expect(screen.getByRole('option', { name: /Clínica Aurora/ })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    await user.click(screen.getByRole('button', { name: 'Fechar diálogo' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await waitFor(() => expect(gatilho).toHaveFocus());
   });
@@ -175,7 +176,7 @@ describe('FormularioAgendarCall', () => {
       />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Conecte sua agenda' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Conectar Google Calendar' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Data e horário')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Criar reunião/ })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Conectar Google Calendar/ })).toHaveAttribute(
@@ -202,7 +203,7 @@ describe('FormularioAgendarCall', () => {
       />,
     );
 
-    expect(screen.getByRole('dialog', { name: 'Conecte sua agenda' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Conectar Google Calendar' })).toBeInTheDocument();
     expect(screen.queryByLabelText('Data e horário')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Conexão indisponível' })).toBeDisabled();
   });

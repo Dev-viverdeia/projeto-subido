@@ -2,231 +2,84 @@
   gap: var(--via-space-2);
 }
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  z-index: var(--via-z-modal);
-  display: grid;
-  place-items: center;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--via-space-4);
-  background: color-mix(in srgb, var(--via-navy-deep) 74%, transparent);
-  backdrop-filter: blur(18px) saturate(120%);
-}
-
-.dialogo {
-  width: min(760px, calc(100vw - 32px));
-  max-height: calc(100dvh - 32px);
-  overflow: auto;
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
-  color: var(--via-text-primary);
-  box-shadow: var(--app-elev-3-shadow);
-  backdrop-filter: blur(28px) saturate(135%);
-}
-
-.painel {
-  padding: var(--via-space-4);
-}
-
-.topo {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--via-space-5);
-  padding-bottom: var(--via-space-3);
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
-.topo h2,
-.topo p {
-  margin: 0;
-}
-
-.topo h2 {
-  margin-top: var(--via-space-1);
-  font-size: var(--via-fs-h2);
-  line-height: var(--via-lh-tight);
-}
-
-.topo p:not(.sobretitulo) {
-  max-width: 46ch;
-  margin-top: var(--via-space-2);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-}
-
-.sobretitulo {
-  color: var(--via-accent-ink);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
-.fechar {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-bg);
-  color: var(--via-text-muted);
-  cursor: pointer;
-}
-
-.fechar:hover {
-  color: var(--via-text-primary);
-  border-color: var(--via-border);
-}
-
-.fechar:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
 .setupCalendar {
   display: grid;
-  grid-template-columns: minmax(210px, 0.78fr) minmax(0, 1.22fr);
-  min-height: 390px;
-  margin-top: var(--via-space-4);
-  overflow: hidden;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-4);
+  padding: var(--via-space-5);
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
-  background: var(--via-glass-card);
-  box-shadow: var(--via-glass-shadow-lift);
-  backdrop-filter: var(--via-glass-blur);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 82%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(22px) saturate(132%);
 }
 
-.setupVisual {
-  position: relative;
-  isolation: isolate;
+.setupIcone,
+.calendarIcone {
   display: grid;
-  min-height: 100%;
   place-items: center;
-  overflow: hidden;
-  border-right: 1px solid color-mix(in srgb, white 13%, transparent);
-  background:
-    linear-gradient(118deg, color-mix(in srgb, white 10%, transparent), transparent 34%),
-    linear-gradient(
-      298deg,
-      color-mix(in srgb, var(--via-accent) 18%, transparent),
-      transparent 38%
-    ),
-    linear-gradient(148deg, var(--via-navy) 0%, var(--via-navy-deep) 68%);
-  color: white;
-}
-
-.setupVisual::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(color-mix(in srgb, white 4%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, white 4%, transparent) 1px, transparent 1px);
-  background-size: 38px 38px;
-  content: '';
-  mask-image: linear-gradient(to bottom right, black, transparent 76%);
-}
-
-.setupOrbita {
-  display: none;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .setupIcone {
-  position: relative;
-  display: grid;
-  width: 82px;
-  height: 82px;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, white 34%, transparent);
-  border-radius: 27px;
-  background: color-mix(in srgb, white 15%, transparent);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 36%, transparent) inset,
-    0 24px 60px color-mix(in srgb, black 28%, transparent);
-  backdrop-filter: blur(20px) saturate(135%);
-}
-
-.setupSelo {
-  position: absolute;
-  right: var(--via-space-4);
-  bottom: var(--via-space-4);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  padding: 8px 11px;
-  border: 1px solid color-mix(in srgb, white 18%, transparent);
-  border-radius: var(--app-radius-chip);
-  background: color-mix(in srgb, var(--via-navy-deep) 54%, transparent);
-  color: color-mix(in srgb, white 88%, transparent);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  backdrop-filter: blur(18px);
+  width: 48px;
+  height: 48px;
 }
 
 .setupConteudo {
-  align-self: center;
-  padding: clamp(28px, 4vw, 44px);
+  min-width: 0;
 }
 
 .setupConteudo h3,
-.setupConteudo > p {
+.setupConteudo > p,
+.setupResumo strong,
+.setupResumo span {
   margin: 0;
 }
 
 .setupConteudo h3 {
-  max-width: 16ch;
-  margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-size: var(--via-fs-h3);
   font-weight: var(--via-fw-semibold);
-  letter-spacing: var(--app-ls-h2);
+  letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-tight);
+  text-wrap: balance;
 }
 
-.setupConteudo > p:not(.sobretitulo) {
-  max-width: 48ch;
-  margin-top: var(--via-space-3);
+.setupConteudo > p {
+  max-width: 54ch;
+  margin-top: var(--via-space-2);
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
 }
 
-.setupEtapas {
+.setupResumo {
   display: grid;
-  gap: var(--via-space-2);
-  margin: var(--via-space-5) 0 0;
-  padding: 0;
-  list-style: none;
+  gap: var(--via-space-1);
+  margin-top: var(--via-space-5);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 68%, transparent);
 }
 
-.setupEtapas li {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  color: var(--via-text-body);
+.setupResumo strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.setupResumo span {
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-medium);
-}
-
-.setupEtapas li > span {
-  display: grid;
-  flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  place-items: center;
-  border: 1px solid var(--via-navy-14);
-  border-radius: 50%;
-  background: var(--via-navy-05);
-  color: var(--via-navy);
+  line-height: var(--via-lh-normal);
 }
 
 .setupAcoes {
@@ -235,8 +88,6 @@
   justify-content: flex-end;
   gap: var(--via-space-3);
   margin-top: var(--via-space-5);
-  padding-top: var(--via-space-4);
-  border-top: 1px solid var(--via-border-hairline);
 }
 
 .setupAcoes a {
@@ -250,41 +101,38 @@
   gap: var(--via-space-2);
   margin-top: var(--via-space-4);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
 .setupPrivacidade svg {
   flex: 0 0 auto;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .formulario {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
-  gap: var(--via-space-2);
-  padding-top: var(--via-space-3);
+  gap: var(--via-space-4);
 }
 
 .formulario > [role='alert'],
 .detalhesColunas,
 .calendar,
-.coach,
-.acoes {
+.coach {
   grid-column: 1 / -1;
 }
 
-.duasColunas {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
-  gap: var(--via-space-3);
-}
-
+.duasColunas,
 .detalhesColunas {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: var(--via-space-3);
+}
+
+.duasColunas {
+  grid-template-columns: minmax(0, 1.35fr) minmax(150px, 0.65fr);
 }
 
 .campo {
@@ -314,10 +162,11 @@
 .contextoLead {
   display: grid;
   gap: var(--via-space-1);
-  padding: var(--via-space-3);
+  padding: var(--via-space-4);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-control);
-  background: var(--via-bg-2);
+  background: color-mix(in srgb, var(--via-bg-2) 74%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .contextoLeadTopo {
@@ -331,7 +180,7 @@
 .contextoLeadTopo span {
   color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
@@ -383,18 +232,16 @@
 }
 
 .calendar {
-  position: relative;
-  overflow: hidden;
   display: grid;
-  gap: var(--via-space-2);
-  padding: var(--via-space-2) var(--via-space-3);
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane-strong);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 82%, transparent);
   box-shadow:
-    0 1px 0 var(--via-edge-hi) inset,
-    var(--via-shadow-sm);
-  backdrop-filter: var(--via-glass-blur);
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(20px) saturate(130%);
 }
 
 .calendarTopo {
@@ -405,15 +252,8 @@
 }
 
 .calendarIcone {
-  display: grid;
   width: 40px;
   height: 40px;
-  place-items: center;
-  border: 1px solid var(--via-navy-14);
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy-05);
-  color: var(--via-navy);
-  box-shadow: 0 1px 0 var(--via-edge-hi) inset;
 }
 
 .calendar h3,
@@ -427,10 +267,8 @@
   font-weight: var(--via-fw-semibold);
 }
 
-.calendarTopo p,
-.calendarDesconectado p,
-.calendarIndisponivel {
-  margin-top: 2px;
+.calendarTopo p {
+  margin-top: var(--via-space-1);
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
@@ -441,40 +279,40 @@
   overflow: hidden;
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .calendarCorpo {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(220px, 1.08fr);
+  grid-template-columns: minmax(0, 0.85fr) minmax(220px, 1.15fr);
   align-items: start;
-  gap: var(--via-space-2);
-  padding-top: var(--via-space-2);
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
 }
 
 .conviteAtivo {
-  min-height: 56px;
+  min-height: 58px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-3);
+  padding: var(--via-space-3);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-glass-card-2) 86%, transparent);
+  background: color-mix(in srgb, var(--via-surface) 70%, transparent);
 }
 
 .conviteAtivo > span:first-child {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   place-items: center;
-  border-radius: 50%;
+  border-radius: var(--app-radius-chip);
   background: var(--via-navy);
-  color: white;
+  color: var(--via-white);
 }
 
 .conviteAtivo strong,
@@ -490,33 +328,8 @@
 .conviteAtivo small {
   margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
-}
-
-.calendarDesconectado {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
-}
-
-.calendarDesconectado p {
-  max-width: 48ch;
-  margin: 0;
-}
-
-.calendarDesconectado a {
-  flex: 0 0 auto;
-  gap: var(--via-space-2);
-  text-decoration: none;
-}
-
-.calendarIndisponivel {
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
 }
 
 .coach {
@@ -524,24 +337,25 @@
   grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-3);
-  border: 1px solid color-mix(in srgb, var(--via-accent) 24%, var(--via-border));
+  min-height: 58px;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-accent) 6%, var(--via-surface));
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
   cursor: pointer;
 }
 
 .coach input {
-  width: 17px;
-  height: 17px;
-  accent-color: var(--via-accent);
+  width: 18px;
+  height: 18px;
+  accent-color: var(--via-navy);
 }
 
 .coachIcone {
   display: grid;
+  width: 26px;
   place-items: center;
-  width: 24px;
-  color: var(--via-accent-ink);
+  color: var(--via-navy);
 }
 
 .coach strong,
@@ -550,6 +364,7 @@
 }
 
 .coach strong {
+  color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
 }
 
@@ -559,18 +374,11 @@
   font-size: var(--via-fs-xs);
 }
 
-.acoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--via-space-3);
-  padding-top: 0;
-}
-
 .semLead {
   display: grid;
   justify-items: start;
   gap: var(--via-space-4);
-  padding-top: var(--via-space-6);
+  padding: var(--via-space-2) 0;
 }
 
 .semLead p {
@@ -578,55 +386,45 @@
   color: var(--via-text-muted);
 }
 
+@supports not (backdrop-filter: blur(1px)) {
+  .setupCalendar,
+  .calendar {
+    background: var(--via-surface-elev);
+  }
+}
+
 @media (max-width: 599px) {
-  .painel {
-    padding: var(--via-space-5) var(--via-space-4);
-  }
-
-  .formulario {
-    grid-template-columns: 1fr;
-  }
-
-  .formulario > * {
-    grid-column: 1;
-  }
-
   .setupCalendar {
     grid-template-columns: 1fr;
-  }
-
-  .setupVisual {
-    min-height: 150px;
-    border-right: 0;
-    border-bottom: 1px solid color-mix(in srgb, white 13%, transparent);
-  }
-
-  .setupOrbita {
-    width: 118px;
-    height: 118px;
+    gap: var(--via-space-3);
+    padding: var(--via-space-4);
   }
 
   .setupIcone {
-    width: 64px;
-    height: 64px;
-    border-radius: 21px;
-  }
-
-  .setupConteudo {
-    padding: var(--via-space-5) var(--via-space-4);
+    width: 44px;
+    height: 44px;
   }
 
   .setupAcoes {
     display: grid;
-    grid-template-columns: 0.7fr 1.3fr;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   }
 
-  .duasColunas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .setupAcoes :global(.via-btn) {
+    width: 100%;
   }
 
-  .detalhesColunas {
+  .formulario,
+  .duasColunas,
+  .detalhesColunas,
+  .calendarCorpo {
     grid-template-columns: 1fr;
+  }
+
+  .formulario > *,
+  .calendar,
+  .coach {
+    grid-column: 1;
   }
 
   .calendarTopo {
@@ -635,38 +433,6 @@
 
   .calendarTopo > small {
     grid-column: 2;
-  }
-
-  .calendarCorpo {
-    grid-template-columns: 1fr;
-  }
-
-  .calendarDesconectado {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .acoes {
-    position: sticky;
-    bottom: calc(-1 * var(--via-space-5));
-    z-index: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: var(--via-space-1) calc(-1 * var(--via-space-4)) calc(-1 * var(--via-space-5));
-    padding: var(--via-space-4);
-    border-top: 1px solid var(--via-border-hairline);
-    background: color-mix(in srgb, var(--via-surface) 92%, transparent);
-    backdrop-filter: blur(18px);
-  }
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .scrim {
-    background: color-mix(in srgb, var(--via-navy-deep) 90%, var(--via-bg));
-  }
-
-  .dialogo,
-  .acoes {
-    background: var(--via-surface);
+    max-width: 100%;
   }
 }

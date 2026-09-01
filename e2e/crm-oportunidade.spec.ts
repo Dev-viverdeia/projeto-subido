@@ -60,7 +60,7 @@ test.describe('Ficha do cliente em Vendas', () => {
 
     const dialogo = page.getByRole('dialog', { name: 'Enriquecer os dados deste cliente?' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText(/usa tudo que já está salvo na ficha/)).toBeVisible();
+    await expect(dialogo.getByText(/usa a ficha, as reuniões e fontes públicas/)).toBeVisible();
     await expect(dialogo.getByText('3 créditos', { exact: true })).toBeVisible();
     await expect(dialogo.getByText('17')).toBeVisible();
     await dialogo.getByRole('button', { name: 'Cancelar' }).click();
@@ -102,12 +102,12 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(page.getByRole('button', { name: 'Enriquecer dados' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();
-    const scrim = page.getByTestId('enriquecimento-scrim');
+    const camada = page.locator('.via-modal-root');
     const dialogo = page.getByRole('dialog', { name: 'Enriquecer os dados deste cliente?' });
-    await expect(scrim).toBeVisible();
+    await expect(camada).toBeVisible();
     await expect(dialogo).toBeVisible();
 
-    const geometria = await scrim.evaluate((elemento) => {
+    const geometria = await camada.evaluate((elemento) => {
       const caixa = elemento.getBoundingClientRect();
       return {
         top: Math.round(caixa.top),

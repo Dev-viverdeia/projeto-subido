@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,17 +13,16 @@ vi.mock('@/lib/crm/actions', () => ({
 import { FormularioNovoLead } from './FormularioNovoLead';
 
 describe('FormularioNovoLead', () => {
-  it('abre e fecha o formulário preservando a semântica de diálogo', () => {
+  it('abre e fecha o formulário preservando a semântica de diálogo', async () => {
+    const user = userEvent.setup();
     criarLeadMock.mockResolvedValue({});
     render(<FormularioNovoLead />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Adicionar empresa' }));
-    expect(
-      screen.getByRole('dialog', { name: 'Qual empresa você quer acompanhar?' }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText('Empresa')).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Adicionar empresa' }));
+    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('Empresa')).toHaveFocus());
 
-    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    await user.click(screen.getByRole('button', { name: 'Fechar diálogo' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
@@ -39,7 +38,7 @@ describe('FormularioNovoLead', () => {
     render(<FormularioNovoLead />);
 
     await user.click(screen.getByRole('button', { name: 'Adicionar empresa' }));
-    await user.click(screen.getByRole('button', { name: 'Adicionar a Vendas' }));
+    await user.click(screen.getByRole('button', { name: 'Criar oportunidade' }));
 
     await waitFor(() => expect(screen.getByLabelText('Empresa')).toHaveFocus());
     expect(screen.getByText('Digite o nome da empresa.')).toBeInTheDocument();
@@ -59,10 +58,8 @@ describe('FormularioNovoLead', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('dialog', { name: 'Qual empresa você quer acompanhar?' }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText('Projeto que pode ser vendido')).toHaveValue(
+    expect(screen.getByRole('dialog', { name: 'Adicionar oportunidade' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Projeto de IA (opcional)')).toHaveValue(
       'Atendimento com IA no WhatsApp',
     );
     expect(document.querySelector('input[name="projeto"]')).toHaveValue(

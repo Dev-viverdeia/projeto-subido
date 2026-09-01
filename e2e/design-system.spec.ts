@@ -142,9 +142,7 @@ test.describe('fundação visual Viver de IA', () => {
     await page.getByRole('button', { name: 'Resolver pendência' }).first().click();
 
     const dialogo = page.getByRole('dialog');
-    await expect(
-      dialogo.getByRole('heading', { name: 'O que aconteceu com esta reunião?' }),
-    ).toBeVisible();
+    await expect(dialogo.getByRole('heading', { name: 'Resolver reunião pendente' })).toBeVisible();
     await expect(dialogo.getByRole('button', { name: 'Escolher novo horário' })).toBeVisible();
     await expect(dialogo.getByRole('button', { name: 'Marcar como não realizada' })).toBeVisible();
 

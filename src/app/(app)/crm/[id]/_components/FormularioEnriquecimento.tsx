@@ -1,13 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
-import { createPortal } from 'react-dom';
-import { BrainCircuit, Coins, Database, Globe2, Layers3, LoaderCircle, X } from 'lucide-react';
+import { useState } from 'react';
+import { Database, Globe2, Layers3, LoaderCircle } from 'lucide-react';
 import { Alert, Button } from '@/design-system/via';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
+import { ModalOperacao } from '../../../_components/ModalOperacao';
 import styles from './FormularioEnriquecimento.module.css';
 
 const ETAPAS_CONFIRMACAO = [
@@ -20,10 +20,6 @@ const ETAPAS_CONFIRMACAO = [
     descricao: 'Estamos organizando os dados desta ficha antes da pesquisa.',
   },
 ] as const;
-
-const escutarMontagem = () => () => undefined;
-const obterMontagemCliente = () => true;
-const obterMontagemServidor = () => false;
 
 export function FormularioEnriquecimento({
   oportunidadeId,
@@ -43,39 +39,16 @@ export function FormularioEnriquecimento({
   desabilitado?: boolean;
 }) {
   const router = useRouter();
-  const montado = useSyncExternalStore(
-    escutarMontagem,
-    obterMontagemCliente,
-    obterMontagemServidor,
-  );
-  const tituloId = useId();
-  const descricaoId = useId();
-  const gatilho = useRef<HTMLButtonElement>(null);
-  const painel = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(abertoInicial);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const saldoSuficiente = saldoCreditos >= CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
   const saldoDepois = saldoCreditos - CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
 
-  useEffect(() => {
-    if (!montado || !aberto) return;
-    const overflowAnterior = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const quadro = requestAnimationFrame(() =>
-      painel.current?.querySelector<HTMLElement>('button')?.focus(),
-    );
-    return () => {
-      cancelAnimationFrame(quadro);
-      document.body.style.overflow = overflowAnterior;
-    };
-  }, [aberto, montado]);
-
   function fechar() {
     if (enviando) return;
     setAberto(false);
     setErro(null);
-    requestAnimationFrame(() => gatilho.current?.focus());
   }
 
   async function confirmar() {
@@ -109,7 +82,6 @@ export function FormularioEnriquecimento({
         />
       )}
       <button
-        ref={gatilho}
         type="button"
         className={
           tom === 'padrao'
@@ -138,147 +110,99 @@ export function FormularioEnriquecimento({
           : (rotulo ?? (temDossie ? 'Atualizar dados' : 'Enriquecer dados'))}
       </button>
 
-      {montado &&
-        aberto &&
-        createPortal(
-          <div
-            className={styles.scrim}
-            data-testid="enriquecimento-scrim"
-            onMouseDown={(evento) => {
-              if (evento.target === evento.currentTarget) fechar();
-            }}
-          >
-            <div
-              ref={painel}
-              className={styles.dialogo}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={tituloId}
-              aria-describedby={descricaoId}
-              onKeyDown={(evento) => {
-                if (evento.key === 'Escape') fechar();
-                if (evento.key !== 'Tab') return;
-                const focaveis =
-                  painel.current?.querySelectorAll<HTMLElement>('button:not([disabled])');
-                if (!focaveis?.length) return;
-                const primeiro = focaveis[0];
-                const ultimo = focaveis[focaveis.length - 1];
-                if (evento.shiftKey && document.activeElement === primeiro) {
-                  evento.preventDefault();
-                  ultimo?.focus();
-                } else if (!evento.shiftKey && document.activeElement === ultimo) {
-                  evento.preventDefault();
-                  primeiro?.focus();
-                }
-              }}
+      <ModalOperacao
+        open={aberto}
+        onClose={fechar}
+        title="Enriquecer os dados deste cliente?"
+        description="A plataforma usa a ficha, as reuniões e fontes públicas. Você não precisa preencher nada de novo."
+        size="md"
+        blocked={enviando}
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={fechar}
+              disabled={enviando}
+              data-autofocus
             >
-              <header className={styles.topo}>
-                <span className={styles.iconeTopo} aria-hidden="true">
-                  <BrainCircuit size={22} strokeWidth={1.7} />
-                </span>
-                <div>
-                  <p className={styles.sobretitulo}>Enriquecimento da ficha</p>
-                  <h2 id={tituloId}>Enriquecer os dados deste cliente?</h2>
-                  <p id={descricaoId}>
-                    A plataforma usa tudo que já está salvo na ficha. Você não precisa preencher
-                    nenhum dado novamente.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className={styles.fechar}
-                  onClick={fechar}
-                  aria-label="Fechar"
-                >
-                  <X size={19} strokeWidth={1.8} aria-hidden="true" />
-                </button>
-              </header>
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              loading={enviando}
+              disabled={!saldoSuficiente}
+              onClick={() => void confirmar()}
+            >
+              Confirmar por {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
+            </Button>
+          </>
+        }
+      >
+        <div className={styles.conteudo}>
+          {erro && (
+            <Alert tone="danger" size="compact">
+              {erro} Nenhum crédito foi usado.
+            </Alert>
+          )}
 
-              <div className={styles.conteudo}>
-                {erro && (
-                  <Alert tone="danger" size="compact">
-                    {erro} Nenhum crédito foi usado.
-                  </Alert>
-                )}
+          {!saldoSuficiente && (
+            <Alert tone="attn" size="compact">
+              Seu saldo é de {saldoCreditos} {saldoCreditos === 1 ? 'crédito' : 'créditos'}. São
+              necessários {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos para enriquecer a ficha.
+            </Alert>
+          )}
 
-                {!saldoSuficiente && (
-                  <Alert tone="attn" size="compact">
-                    Seu saldo é de {saldoCreditos} {saldoCreditos === 1 ? 'crédito' : 'créditos'}.
-                    São necessários {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos para enriquecer a
-                    ficha.
-                  </Alert>
-                )}
-
-                <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
-                  <div>
-                    <span>
-                      <Database size={17} strokeWidth={1.7} aria-hidden="true" />
-                    </span>
-                    <p>
-                      <strong>Ficha do cliente</strong>
-                      <small>Empresa, contato e dados encontrados na Prospecção</small>
-                    </p>
-                  </div>
-                  <div>
-                    <span>
-                      <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
-                    </span>
-                    <p>
-                      <strong>Reuniões</strong>
-                      <small>Resumos, dores e próximos passos registrados</small>
-                    </p>
-                  </div>
-                  <div>
-                    <span>
-                      <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
-                    </span>
-                    <p>
-                      <strong>Fontes públicas</strong>
-                      <small>Site salvo e informações públicas disponíveis</small>
-                    </p>
-                  </div>
-                </div>
-
-                <div className={styles.creditos} aria-label="Custo do enriquecimento">
-                  <span className={styles.iconeCreditos} aria-hidden="true">
-                    <Coins size={20} strokeWidth={1.7} />
-                  </span>
-                  <div>
-                    <small>Custo</small>
-                    <strong>{CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos</strong>
-                  </div>
-                  <div>
-                    <small>Saldo atual</small>
-                    <strong>{saldoCreditos}</strong>
-                  </div>
-                  <div>
-                    <small>Saldo depois</small>
-                    <strong>{saldoSuficiente ? saldoDepois : '—'}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <footer className={styles.acoes}>
-                <p>Se a análise falhar, os créditos voltam automaticamente.</p>
-                <div>
-                  <Button type="button" variant="secondary" onClick={fechar} disabled={enviando}>
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="primary"
-                    loading={enviando}
-                    disabled={!saldoSuficiente}
-                    onClick={() => void confirmar()}
-                  >
-                    Confirmar por {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
-                  </Button>
-                </div>
-              </footer>
+          <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
+            <div>
+              <span aria-hidden="true">
+                <Database size={17} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <p>
+                <strong>Ficha do cliente</strong>
+                <small>Empresa e contato</small>
+              </p>
             </div>
-          </div>,
-          document.body,
-        )}
+            <div>
+              <span aria-hidden="true">
+                <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <p>
+                <strong>Reuniões</strong>
+                <small>Dores e próximos passos</small>
+              </p>
+            </div>
+            <div>
+              <span aria-hidden="true">
+                <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <p>
+                <strong>Fontes públicas</strong>
+                <small>Site e dados disponíveis</small>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.creditos} aria-label="Custo do enriquecimento">
+            <div>
+              <small>Custo</small>
+              <strong>{CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos</strong>
+            </div>
+            <div>
+              <small>Saldo atual</small>
+              <strong>{saldoCreditos}</strong>
+            </div>
+            <div>
+              <small>Saldo depois</small>
+              <strong>{saldoSuficiente ? saldoDepois : '—'}</strong>
+            </div>
+          </div>
+          <p className={styles.garantia}>
+            Se a análise falhar, os créditos voltam automaticamente.
+          </p>
+        </div>
+      </ModalOperacao>
     </>
   );
 }

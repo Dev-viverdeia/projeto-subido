@@ -1,6 +1,3 @@
-'use client';
-
-import { useFormStatus } from 'react-dom';
 import { Button } from '@/design-system/via';
 import { EsperaOperacao } from '../../_components/EsperaOperacao';
 
@@ -23,8 +20,15 @@ const ETAPAS_CONVITE = [
   },
 ] as const;
 
-export function BotaoAgendar({ comConviteGoogle }: { comConviteGoogle: boolean }) {
-  const { pending } = useFormStatus();
+export function BotaoAgendar({
+  comConviteGoogle,
+  pending,
+  form,
+}: {
+  comConviteGoogle: boolean;
+  pending: boolean;
+  form: string;
+}) {
   return (
     <>
       <EsperaOperacao
@@ -39,7 +43,7 @@ export function BotaoAgendar({ comConviteGoogle }: { comConviteGoogle: boolean }
         mensagemDemora="O Google está demorando para responder. A reunião não será duplicada."
         demoraApos={12_000}
       />
-      <Button type="submit" variant="primary" loading={pending}>
+      <Button type="submit" form={form} variant="primary" loading={pending}>
         {pending
           ? comConviteGoogle
             ? 'Criando reunião e convite…'

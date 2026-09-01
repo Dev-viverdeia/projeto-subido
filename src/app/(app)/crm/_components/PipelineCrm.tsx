@@ -14,8 +14,9 @@ import {
   type CollisionDetection,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import { Button, Modal, RadioGroup, ToastStack, type ToastItem } from '@/design-system/via';
+import { Button, RadioGroup, ToastStack, type ToastItem } from '@/design-system/via';
 import { moverOportunidadeKanban } from '@/lib/crm/actions';
+import { ModalOperacao } from '../../_components/ModalOperacao';
 import {
   FASES_CRM,
   MOTIVOS_PERDA_CRM,
@@ -328,7 +329,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
         </DragOverlay>
       </DndContext>
 
-      <Modal
+      <ModalOperacao
         open={perdaPendente !== null}
         onClose={fecharPerda}
         title="Registrar venda perdida"
@@ -374,7 +375,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
             </p>
           )}
         </div>
-      </Modal>
+      </ModalOperacao>
 
       <ToastStack
         toasts={toasts}

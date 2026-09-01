@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { Button, Modal } from '@/design-system/via';
+import { Button } from '@/design-system/via';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import { TRILHAS } from '@/lib/mentorias/tipos';
 import { RetratoMentor } from '../../_components/RetratoMentor';
+import { ModalOperacao } from '../../_components/ModalOperacao';
 import { Visto } from '../../_components/PillEstado';
 import type { EstadoMentoria } from './estadoMentoria';
 import { duracaoMin, horaCurta, rotuloDoDia } from './estadoMentoria';
@@ -29,7 +30,12 @@ export function ModalDetalheMentoria({
   aoCancelarCheckin: (id: string) => void;
 }) {
   return (
-    <Modal open={sessao !== null} onClose={aoFechar} title={sessao?.titulo} size="md">
+    <ModalOperacao
+      open={sessao !== null}
+      onClose={aoFechar}
+      title={sessao?.titulo ?? 'Detalhes da mentoria'}
+      size="md"
+    >
       {sessao && estado ? (
         <div className={styles.detalhe}>
           <dl className={styles.ficha}>
@@ -127,6 +133,6 @@ export function ModalDetalheMentoria({
           </div>
         </div>
       ) : null}
-    </Modal>
+    </ModalOperacao>
   );
 }

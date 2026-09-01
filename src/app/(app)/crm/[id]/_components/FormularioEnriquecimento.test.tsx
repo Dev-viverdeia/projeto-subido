@@ -34,11 +34,11 @@ describe('FormularioEnriquecimento', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Enriquecer dados' }));
-    expect(screen.getByTestId('enriquecimento-scrim').parentElement).toBe(document.body);
-    expect(document.body).toHaveStyle({ overflow: 'hidden' });
     const dialogo = screen.getByRole('dialog', {
       name: 'Enriquecer os dados deste cliente?',
     });
+    expect(dialogo.parentElement?.parentElement?.parentElement).toBe(document.body);
+    expect(document.body).toHaveStyle({ overflow: 'hidden' });
     expect(within(dialogo).getByText('3 créditos')).toBeInTheDocument();
     expect(within(dialogo).getByText('17')).toBeInTheDocument();
 

@@ -80,198 +80,80 @@
   box-shadow: var(--app-ring-onnavy), var(--app-elev-1-shadow);
 }
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  z-index: var(--via-z-modal);
-  display: grid;
-  place-items: center;
-  padding: var(--via-space-5);
-  overflow: auto;
-  background: color-mix(in srgb, var(--via-navy-deep) 72%, transparent);
-  backdrop-filter: blur(10px) saturate(120%);
-  overscroll-behavior: contain;
-}
-
-.dialogo {
-  position: relative;
-  display: grid;
-  width: min(610px, calc(100vw - 40px));
-  max-height: calc(100dvh - 40px);
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  overflow: hidden;
-  border: var(--via-glass-ring);
-  border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  color: var(--via-text-primary);
-  box-shadow: var(--via-glass-shadow-lift);
-  backdrop-filter: var(--via-glass-blur);
-  animation: entrar var(--app-t-scene) backwards;
-}
-
-.topo {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--via-space-4);
-  padding: var(--via-space-6);
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
-.iconeTopo,
-.iconeCreditos,
-.fontes > div > span {
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--via-navy-14);
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy-05);
-  color: var(--via-navy);
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
-}
-
-.iconeTopo {
-  width: 46px;
-  height: 46px;
-}
-
-.topo h2,
-.topo p,
-.fontes p,
-.creditos small,
-.creditos strong,
-.acoes p {
-  margin: 0;
-}
-
-.topo h2 {
-  margin-top: var(--via-space-1);
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-h2);
-  font-weight: var(--via-fw-medium);
-  line-height: var(--via-lh-tight);
-  letter-spacing: var(--app-ls-h2);
-  text-wrap: balance;
-}
-
-.topo div > p:last-child {
-  max-width: 52ch;
-  margin-top: var(--via-space-2);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  text-wrap: pretty;
-}
-
-.sobretitulo {
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
-.fechar {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  padding: 0;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-bg) 74%, transparent);
-  color: var(--via-text-muted);
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
-  transition:
-    border-color var(--app-t-state),
-    color var(--app-t-state),
-    transform var(--app-t-touch);
-}
-
-.fechar:hover {
-  border-color: var(--via-navy-20);
-  color: var(--via-navy);
-  transform: translateY(-1px);
-}
-
-.fechar:focus-visible {
-  outline: none;
-  box-shadow:
-    var(--app-ring),
-    inset 0 1px 0 var(--via-edge-hi);
-}
-
 .conteudo {
   display: grid;
-  min-height: 0;
-  gap: var(--via-space-5);
-  padding: var(--via-space-6);
-  overflow: auto;
-  overscroll-behavior: contain;
+  gap: var(--via-space-4);
 }
 
 .fontes {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-2);
 }
 
 .fontes > div {
   display: grid;
-  min-width: 0;
-  align-content: start;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-4);
+  min-height: 58px;
+  padding: var(--via-space-3) var(--via-space-4);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-bg-2) 66%, transparent);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 72%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
 .fontes > div > span {
+  display: grid;
   width: 34px;
   height: 34px;
+  place-items: center;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+}
+
+.fontes p,
+.fontes strong,
+.fontes small,
+.creditos small,
+.creditos strong,
+.garantia {
+  margin: 0;
 }
 
 .fontes p {
   display: grid;
-  gap: 3px;
+  gap: 2px;
 }
 
 .fontes strong {
-  color: var(--via-text-body);
-  font-size: var(--via-fs-xs);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
 }
 
 .fontes small {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
 .creditos {
   display: grid;
-  grid-template-columns: auto minmax(0, 1.4fr) minmax(82px, 0.7fr) minmax(82px, 0.7fr);
-  align-items: center;
-  gap: var(--via-space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: var(--via-space-4);
   border: 1px solid var(--via-navy-14);
   border-radius: var(--app-radius-card);
-  background:
-    linear-gradient(135deg, var(--via-navy-05), transparent 68%),
-    color-mix(in srgb, var(--via-surface) 76%, transparent);
+  background: color-mix(in srgb, var(--via-navy-05) 72%, transparent);
   box-shadow: inset 0 1px 0 var(--via-edge-hi);
-}
-
-.iconeCreditos {
-  width: 42px;
-  height: 42px;
 }
 
 .creditos > div {
   display: grid;
-  gap: 2px;
+  gap: var(--via-space-1);
+  min-width: 0;
 }
 
 .creditos > div + div {
@@ -281,7 +163,7 @@
 
 .creditos small {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
 }
 
 .creditos strong {
@@ -292,131 +174,33 @@
   font-variant-numeric: tabular-nums;
 }
 
-.acoes {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-5);
-  padding: var(--via-space-4) var(--via-space-6);
-  border-top: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-glass-card) 88%, transparent);
-  backdrop-filter: blur(18px) saturate(135%);
-}
-
-.acoes p {
-  max-width: 32ch;
+.garantia {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
-.acoes > div {
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--via-space-2);
-}
-
-@keyframes entrar {
-  from {
-    transform: translateY(14px) scale(0.985);
-  }
-}
-
 @supports not (backdrop-filter: blur(1px)) {
-  .scrim {
-    background: color-mix(in srgb, var(--via-navy-deep) 88%, var(--via-bg));
-  }
-
-  .dialogo,
-  .acoes,
   .gatilho[data-tom='secundario'] {
     background: var(--via-surface-elev);
   }
 }
 
 @media (max-width: 599px) {
-  .scrim {
-    align-items: end;
-    padding: 0;
-  }
-
-  .dialogo {
-    width: 100%;
-    max-height: calc(100dvh - 16px);
-    border-radius: var(--app-radius-surface) var(--app-radius-surface) 0 0;
-  }
-
-  .topo {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: var(--via-space-3);
-    padding: var(--via-space-5) var(--via-space-4);
-  }
-
-  .iconeTopo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .topo h2 {
-    font-size: var(--via-fs-h3);
-  }
-
-  .conteudo {
-    gap: var(--via-space-4);
-    padding: var(--via-space-4);
-  }
-
-  .fontes {
-    grid-template-columns: 1fr;
-  }
-
   .fontes > div {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: var(--via-space-3);
     padding: var(--via-space-3);
   }
 
   .creditos {
-    grid-template-columns: auto repeat(2, minmax(0, 1fr));
     gap: var(--via-space-3);
-    border-radius: var(--app-radius-card);
-  }
-
-  .creditos > div:first-of-type {
-    grid-column: 2 / -1;
   }
 
   .creditos > div + div {
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .creditos > div:nth-of-type(2),
-  .creditos > div:nth-of-type(3) {
-    padding-top: var(--via-space-3);
-    border-top: 1px solid var(--via-border-hairline);
-  }
-
-  .acoes {
-    align-items: stretch;
-    flex-direction: column;
-    gap: var(--via-space-3);
-    padding: var(--via-space-4);
-  }
-
-  .acoes p {
-    max-width: none;
-  }
-
-  .acoes > div {
-    display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.5fr);
+    padding-left: var(--via-space-3);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dialogo,
   .iconeGirando {
     animation: none;
   }
