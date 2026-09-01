@@ -1,5 +1,4 @@
-/* Medidas herdadas da FichaProjeto, já corrigidas para a Outfit (o `ch` dela
-   infla ~1,369× — ver o cabeçalho daquele arquivo). Não arredonde de volta. */
+/* Medidas editoriais ajustadas para a fonte oficial e leitura confortável. */
 
 .entender {
   display: flex;
@@ -115,7 +114,7 @@
 
 .trechoNumero {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-meta);
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
   line-height: var(--via-lh-loose);
@@ -175,7 +174,7 @@
 .economiaRotulo {
   margin: var(--via-space-2) 0 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -187,7 +186,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--via-space-2);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
 }
@@ -270,7 +269,7 @@
   margin: 0;
   padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
   max-width: 44ch;

@@ -49,8 +49,16 @@ export default function PreviewEstudioPage() {
               resultado: 'Responder, qualificar e encaminhar os contatos certos.',
             },
           ]}
-          oportunidades={[]}
+          oportunidades={[
+            {
+              id: '22222222-2222-4222-8222-222222222222',
+              titulo: 'Automação do primeiro atendimento',
+              empresa: 'Clínica Aurora',
+              contato: 'Camila Rios',
+            },
+          ]}
           projetoInicialId="11111111-1111-4111-8111-111111111111"
+          oportunidadeInicialId="22222222-2222-4222-8222-222222222222"
         />
       </main>
     </div>

@@ -1,37 +1,18 @@
-/* MEDIDA DE LEITURA — o `ch` MENTE por ~37%, e todas as medidas deste arquivo já
-   estão corrigidas.
-   `ch` é a largura do glifo `0`, que é bem mais LARGO que a média das minúsculas —
-   por isso `52ch` não entrega 52 caracteres, entrega mais. Medido no navegador
-   (largura do `0` ÷ largura do glifo médio, com prosa real em pt-BR): a Outfit dá
-   fator 1,369, CONSTANTE de 12px a 64px e de peso 400 a 450 — não é preciso
-   remedir por corpo. O alvo real é `caracteres ÷ 1,369`: ~50ch para 68 caracteres,
-   ~53ch para 73, e a faixa confortável é 45–75.
-   Não "arredonde de volta" sem medir: o fator é propriedade da FONTE e muda com
-   ela (a Geist, até 08/2026, dava 1,30). */
-
-/* UM EIXO PARA O ARCO DE CRIAÇÃO INTEIRO.
-   Compor, responder a entrevista e esperar são três momentos de um percurso só, e
-   os três vivem nesta mesma coluna centrada (`--via-content`). Antes, o compositor
-   era centrado e a entrevista nascia encostada à esquerda com 488px de calha morta
-   à direita — medido: 273/288 contra 32/488. O olho perdia o eixo entre um passo e
-   o seguinte.
-   Só a FICHA abre para o canvas, e aí a mudança de largura passa a significar algo:
-   o documento entregue é maior que o texto que o pediu. */
 .tela {
+  width: 100%;
   max-width: var(--via-container);
   margin-inline: auto;
+  padding-block-start: clamp(var(--via-space-4), 3vh, var(--via-space-7));
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: var(--app-gap-block);
-  padding-block-start: clamp(var(--via-space-4), 3vh, var(--via-space-7));
+  gap: clamp(var(--via-space-5), 3vw, var(--via-space-8));
 }
 
 .cabecalho {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr);
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 0.78fr);
   align-items: end;
-  gap: var(--via-space-7);
+  gap: var(--via-space-8);
   padding-inline: var(--via-space-1);
 }
 
@@ -40,22 +21,87 @@
   gap: var(--via-space-2);
 }
 
+.eyebrow,
+.partida > header span,
+.decisao > span,
+.caixaCabecalho span {
+  margin: 0;
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.titulo {
+  max-width: 20ch;
+  margin: 0;
+  font-family: var(--via-font-display);
+  font-size: clamp(2.25rem, 1.75rem + 1.55vw, 3.2rem);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.apoio {
+  max-width: 54ch;
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
 .fluxoEstudio {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-self: end;
-  gap: var(--via-space-1);
+  gap: var(--via-space-2);
   margin: 0;
-  padding: 0;
+  padding: var(--via-space-1);
   list-style: none;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.fluxoEstudio li {
+  min-width: 0;
+  min-height: 48px;
+  padding: var(--via-space-2) var(--via-space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  border-radius: calc(var(--app-radius-control) - 4px);
+  color: var(--via-text-faint);
+}
+
+.fluxoEstudio li[data-ativo='true'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: var(--via-shadow-sm);
+}
+
+.fluxoEstudio span {
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.fluxoEstudio strong {
+  overflow: hidden;
+  font-size: var(--app-fs-support);
+  font-weight: var(--via-fw-medium);
+  white-space: nowrap;
 }
 
 .mesaCriacao {
-  display: grid;
-  grid-template-columns: minmax(240px, 0.54fr) minmax(0, 1.46fr);
-  grid-template-areas: 'retorno briefing';
-  gap: var(--via-space-2);
-  padding: var(--via-space-2);
+  padding: clamp(var(--via-space-2), 1.5vw, var(--via-space-3));
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
   background: var(--app-glass-plane-strong);
@@ -63,207 +109,80 @@
   backdrop-filter: var(--via-glass-blur);
 }
 
-.retorno {
-  grid-area: retorno;
-  position: relative;
-  overflow: hidden;
-  min-height: 100%;
-  padding: clamp(var(--via-space-5), 2.5vw, var(--via-space-6));
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--app-radius-card);
-  background: var(--via-mesh-navy);
-  color: var(--via-white);
-}
-
-.retornoEyebrow,
-.retornoNota {
-  position: relative;
-  z-index: 1;
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
-.retornoEyebrow {
-  color: var(--via-accent);
-}
-
-.retorno h3 {
-  position: relative;
-  z-index: 1;
-  max-width: 12ch;
-  margin: var(--via-space-3) 0 var(--via-space-5);
-  color: var(--via-white);
-  font-family: var(--via-font-display);
-  font-size: clamp(var(--via-fs-h4), 2vw, var(--via-fs-h3));
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-snug);
-  text-wrap: balance;
-}
-
-.entregas {
-  position: relative;
-  z-index: 1;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-}
-
-.entregas li {
-  display: grid;
-  grid-template-columns: 27px minmax(0, 1fr);
-  gap: var(--via-space-3);
-  align-items: flex-start;
-}
-
-.entregas > li > span {
-  width: 27px;
-  height: 27px;
-  display: grid;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--via-white) 18%, transparent);
-  border-radius: var(--via-radius-pill);
-  color: var(--via-gray-300);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-variant-numeric: tabular-nums;
-}
-
-.entregas div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.entregas strong {
-  color: var(--via-white);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  line-height: var(--via-lh-snug);
-}
-
-.entregas p {
-  margin: 0;
-  color: var(--via-gray-300);
-  font-size: var(--via-fs-xs);
-  line-height: var(--via-lh-normal);
-  text-wrap: pretty;
-}
-
-.retornoNota {
-  z-index: 1;
-  margin-top: auto;
-  padding-top: var(--via-space-5);
-  color: var(--via-gray-onnavy);
-  line-height: var(--via-lh-normal);
-}
-
 .briefing {
-  grid-area: briefing;
-  min-width: 0;
-  padding: clamp(var(--via-space-3), 1.8vw, var(--via-space-5));
+  padding: clamp(var(--via-space-4), 2.5vw, var(--via-space-7));
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: calc(var(--app-radius-surface) - 6px);
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
-.fluxoEstudio li {
-  position: relative;
+.entregaResumo {
   display: flex;
   align-items: center;
-  gap: var(--via-space-1_5);
-  min-width: 0;
-  color: var(--via-text-faint);
+  gap: var(--via-space-3);
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
 }
 
-.fluxoEstudio li::before {
-  display: none;
-}
-
-.fluxoEstudio li::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--via-border-hairline);
-}
-
-.fluxoEstudio li:last-child::after {
-  display: none;
-}
-
-.fluxoEstudio span {
-  position: relative;
-  z-index: 1;
-  width: 24px;
-  height: 24px;
+.entregaResumo > span {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
-  border: 1px solid var(--via-border);
   border-radius: var(--app-radius-chip);
-  background: var(--via-surface);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-}
-
-.fluxoEstudio strong {
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  white-space: nowrap;
-}
-
-.fluxoEstudio li[data-ativo='true'] {
-  color: var(--via-text-primary);
-}
-
-.fluxoEstudio li[data-ativo='true'] span {
-  border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-meta);
 }
 
-.partida {
-  margin-bottom: var(--via-space-3);
-  padding: var(--via-space-4);
+.entregaResumo p {
+  margin: 0;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+
+.entregaResumo strong {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+
+.partida,
+.caixa {
+  padding: clamp(var(--via-space-4), 2vw, var(--via-space-5));
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
 }
 
-.partida > header {
+.partida > header,
+.caixaCabecalho {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--via-space-3);
-  margin-bottom: var(--via-space-3);
+  margin-bottom: var(--via-space-4);
 }
 
-.partida > header span,
-.decisao > span {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.partida > header strong {
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-semibold);
+.partida > header strong,
+.caixaCabecalho strong {
   color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h4);
 }
 
 .decisaoGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--via-space-3);
+  gap: var(--via-space-4);
 }
 
 .decisao {
@@ -275,30 +194,29 @@
 
 .decisao select {
   width: 100%;
-  min-height: var(--app-h-control);
+  min-height: 48px;
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: var(--via-bg-2);
+  background: color-mix(in srgb, var(--via-surface) 88%, transparent);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   cursor: pointer;
   transition:
     border-color var(--app-t-state),
-    background-color var(--app-t-state),
+    background var(--app-t-state),
     box-shadow var(--app-t-state);
 }
 
-.decisao select:hover:not(:disabled) {
-  border-color: var(--via-navy-16);
+.decisao select:hover:not(:disabled),
+.decisao select:focus-visible {
+  border-color: var(--via-navy-25);
   background: var(--via-surface);
 }
 
 .decisao select:focus-visible {
   outline: none;
-  border-color: var(--via-navy-16);
-  background: var(--via-surface);
   box-shadow: var(--app-ring);
 }
 
@@ -309,164 +227,75 @@
 
 .decisao small {
   display: block;
-  min-height: 2.9em;
-  font-size: var(--via-fs-caption);
-  line-height: 1.45;
+  min-height: 3em;
+  font-size: var(--app-fs-support);
+  line-height: var(--app-lh-ui);
   color: var(--via-text-muted);
   text-wrap: pretty;
 }
 
 .atalhoCrm {
   display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   margin-top: var(--via-space-3);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
+  text-decoration: none;
+}
+
+.atalhoCrm:hover {
   text-decoration: underline;
-  text-decoration-color: var(--via-border);
   text-underline-offset: 4px;
 }
 
 .atalhoCrm:focus-visible {
   outline: none;
-  border-radius: 2px;
+  border-radius: var(--app-radius-chip);
   box-shadow: var(--app-ring);
 }
-
-.eyebrow {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--via-ls-label);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-/* Escala fluida com TETO: acima de ~52px a pergunta quebra em três linhas e a
-   composição centrada perde o eixo. */
-.titulo {
-  margin: 0;
-  font-family: var(--via-font-display);
-  font-size: clamp(2rem, 1.45rem + 1.8vw, 3rem);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-h1);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-  text-wrap: balance;
-  /* A medida mora no elemento de texto — `ch` é relativo ao font-size de quem
-     declara, e num container que herda 16px este valor valeria outra coisa. */
-  max-width: 22ch;
-}
-
-/* Ênfase é TOM editorial, nunca peso 700 e nunca itálico: a Outfit não tem face
-   itálica, e a da Geist saiu do repo junto com a troca de fonte. `font-style:
-   italic` aqui produziria só o oblíquo sintetizado do browser. */
-.titulo em {
-  font-style: normal;
-  color: var(--app-em-ink);
-}
-
-.apoio {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 54ch;
-  text-wrap: pretty;
-}
-
-/* Aqui o tom já fazia o trabalho junto com o itálico: o apoio é `--via-text-muted`
-   e a ênfase sobe para a tinta primária. Sem a face itálica, o contraste de tom
-   carrega sozinho. */
-.apoio em {
-  font-style: normal;
-  color: var(--via-text-primary);
-}
-
-/* ---- A caixa ---------------------------------------------------------------- */
 
 .caixa {
   display: flex;
   flex-direction: column;
-  border-radius: var(--app-radius-card);
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  padding-bottom: var(--via-space-4);
   transition:
     border-color var(--app-t-state),
     box-shadow var(--app-t-state);
 }
 
-.caixaCabecalho {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--via-space-3);
-  padding: var(--via-space-4) var(--via-space-5) 0;
-}
-
-.caixaCabecalho span {
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
-.caixaCabecalho strong {
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-semibold);
-}
-
-.caixa:hover {
-  border-color: var(--app-elev-2-line);
-}
-
-/* O ANEL VIVE NA CAIXA, não no textarea. Só existe um elemento focável dentro
-   dela, então o indicador continua inequívoco — e o campo sem moldura própria é
-   o que faz a caixa inteira ler como um objeto só, em vez de um input dentro de
-   um card. Compõe com a sombra de repouso para a caixa não achatar ao focar. */
 .caixa:focus-within {
-  border-color: var(--via-navy-16);
+  border-color: var(--via-navy-25);
 }
 
-/* `:has(:focus-visible)` e não `:focus-within` para o anel e a subida de
-   elevação: são a resposta ao foco de TECLADO. Com `:focus-within`, um clique de
-   mouse já acendia o anel e a caixa lia como emoldurada duas vezes. A borda
-   acima continua respondendo a qualquer foco. */
 .caixa:has(:focus-visible) {
   box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 
-/* `min-height` e `max-height` são o piso e o teto do campo que cresce sozinho
-   (ver o efeito em Compositor.tsx). Ambos ganham do `height` inline que o JS
-   escreve, então os limites moram aqui e a medida do conteúdo mora lá. */
 .campo {
   width: 100%;
-  min-height: 142px;
+  min-height: 150px;
   max-height: 46vh;
   overflow-y: auto;
   resize: none;
-  padding: var(--via-space-4) var(--via-space-5) var(--via-space-2);
-  border: 0;
-  background: transparent;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
   color: var(--via-text-primary);
-  font-family: inherit;
+  font: inherit;
   font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
-  letter-spacing: var(--app-ls-body);
 }
 
 .campo::placeholder {
   color: var(--via-text-faint);
 }
 
-/* O anel é da caixa; repetir aqui dentro daria dois anéis concêntricos — e era
-   exatamente o que acontecia, porque zerar o `outline` não apaga o anel do DS:
-   ele é `box-shadow` (`via-base.css:54`, todo `textarea:focus-visible`). */
 .campo:focus-visible {
   outline: none;
+  border-color: transparent;
   box-shadow: none;
 }
 
@@ -479,13 +308,14 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  padding: var(--via-space-2) var(--via-space-4) var(--via-space-4) var(--via-space-5);
+  padding-top: var(--via-space-3);
 }
 
-.contador {
+.contador,
+.atalho {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   letter-spacing: var(--app-ls-micro);
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
@@ -505,49 +335,34 @@
   gap: var(--via-space-3);
 }
 
-.atalho {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-micro);
-  color: var(--via-text-faint);
-}
-
-/* Botão circular, navy sólido. Accent está fora de questão: sobre claro ele dá
-   2,70:1 e reprova AA até para texto grande. */
 .enviar {
+  min-width: 190px;
+  min-height: 44px;
+  padding-inline: var(--via-space-5);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-width: 154px;
-  height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
-  flex-shrink: 0;
-  border: 0;
+  border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
-  cursor: pointer;
   font: inherit;
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-semibold);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
   transition:
     transform var(--app-t-touch),
-    background-color var(--app-t-state);
+    background var(--app-t-state);
 }
 
 .enviar:hover:not(:disabled) {
   transform: translateY(-1px);
+  background: var(--via-navy-deep);
 }
 
 .enviar:active:not(:disabled) {
   transform: translateY(0);
-}
-
-.enviar:disabled {
-  cursor: not-allowed;
-  background: var(--via-navy-08);
-  color: var(--via-text-faint);
 }
 
 .enviar:focus-visible {
@@ -555,35 +370,35 @@
   box-shadow: var(--app-ring);
 }
 
+.enviar:disabled {
+  cursor: not-allowed;
+  border-color: var(--via-navy-08);
+  background: var(--via-navy-08);
+  color: var(--via-text-faint);
+}
+
+.aviso {
+  margin: 0;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}
+
 @supports not (backdrop-filter: blur(1px)) {
-  .mesaCriacao {
+  .mesaCriacao,
+  .fluxoEstudio {
     background: var(--via-surface-elev);
   }
 }
 
-/* ---- Avisos ------------------------------------------------------------------ */
-
-.aviso {
-  margin: var(--app-gap-stack) 0 0;
-  padding: var(--via-space-3) var(--via-space-4);
-  border-radius: var(--app-radius-control);
-  border: 1px solid var(--via-border);
-  background: var(--via-surface);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-}
-
-.aviso code {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
-  color: var(--via-text-primary);
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .decisao select,
   .caixa,
-  .enviar,
-  .decisao select {
+  .enviar {
     transition: none;
   }
 
@@ -592,27 +407,31 @@
   }
 }
 
-@media (max-width: 599px) {
-  .tela {
-    padding-block-start: var(--via-space-6);
-  }
-
+@media (max-width: 1079px) {
   .cabecalho {
     grid-template-columns: 1fr;
-    gap: var(--via-space-4);
-    padding-inline: 0;
+    gap: var(--via-space-5);
+  }
+}
+
+@media (max-width: 767px) {
+  .tela {
+    padding-block-start: var(--via-space-5);
   }
 
   .titulo {
-    font-size: 2rem;
-  }
-
-  .apoio {
-    font-size: var(--via-fs-body);
+    font-size: 2.25rem;
   }
 
   .fluxoEstudio {
-    overflow-x: auto;
+    gap: var(--via-space-1);
+  }
+
+  .fluxoEstudio li {
+    justify-content: center;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: var(--via-space-2);
   }
 
   .fluxoEstudio strong {
@@ -620,11 +439,6 @@
   }
 
   .mesaCriacao {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'briefing'
-      'retorno';
-    gap: var(--via-space-2);
     margin-inline: calc(var(--via-space-2) * -1);
     padding: var(--via-space-1);
     border-radius: var(--app-radius-card);
@@ -632,71 +446,46 @@
 
   .briefing {
     padding: var(--via-space-3);
+    border-radius: calc(var(--app-radius-card) - 4px);
   }
 
-  .partida > header {
+  .entregaResumo {
+    align-items: flex-start;
+  }
+
+  .partida,
+  .caixa {
+    padding: var(--via-space-4);
+  }
+
+  .partida > header,
+  .caixaCabecalho {
     align-items: flex-start;
     flex-direction: column;
     gap: var(--via-space-1);
   }
 
-  .campo {
-    min-height: 160px;
-  }
-
   .decisaoGrid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .decisao small {
     min-height: 0;
   }
 
-  .retorno {
-    min-height: 330px;
-    padding: var(--via-space-6) var(--via-space-5);
-  }
-
-  .retorno h3 {
-    margin-bottom: var(--via-space-5);
-  }
-
-  .caixaCabecalho {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--via-space-1);
-    padding-inline: var(--via-space-4);
-  }
-
   .campo {
-    padding-inline: var(--via-space-4);
+    min-height: 170px;
   }
 
   .rodape {
     align-items: flex-end;
-    padding-inline: var(--via-space-4);
   }
 
   .atalho {
     display: none;
   }
-}
 
-@media (min-width: 600px) and (max-width: 1079px) {
-  .cabecalho {
-    grid-template-columns: 1fr;
-    gap: var(--via-space-5);
-  }
-
-  .mesaCriacao {
-    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.45fr);
-  }
-
-  .retorno {
-    padding: var(--via-space-5);
-  }
-
-  .retorno h3 {
-    font-size: var(--via-fs-h3);
+  .enviar {
+    min-width: 0;
   }
 }

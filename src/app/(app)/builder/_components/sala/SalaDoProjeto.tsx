@@ -70,8 +70,8 @@ export function SalaDoProjeto({
           )}
           <p className={styles.resumo}>
             {solucao.documento
-              ? 'Você é o gerente deste projeto — siga as etapas.'
-              : 'Assim que a criação terminar, o plano completo abre aqui.'}
+              ? 'Execute uma etapa por vez. O progresso fica salvo na sua conta.'
+              : 'O plano está sendo preparado. Você pode fechar esta página e voltar depois.'}
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export function SalaDoProjeto({
         {!solucao.documento && solucao.status === 'gerando' && (
           <p className={styles.aoVivo}>
             <span className={styles.aoVivoDot} aria-hidden="true" />
-            escrevendo agora
+            preparando plano
           </p>
         )}
 
@@ -153,7 +153,7 @@ export function SalaDoProjeto({
         {!cadeadoAtual && podeAvancar && proxima && (
           <div className={styles.avancoLinha}>
             <button type="button" className={styles.avanco} onClick={() => setEtapa(proxima.id)}>
-              {proxima.id === 'construir' ? 'Começar a construir' : `Ir para ${proxima.rotulo}`}
+              {proxima.id === 'construir' ? 'Começar a execução' : `Abrir ${proxima.rotulo}`}
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
                   d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5"

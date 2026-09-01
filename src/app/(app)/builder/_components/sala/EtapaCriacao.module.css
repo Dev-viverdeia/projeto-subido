@@ -10,8 +10,7 @@
   letter-spacing: var(--app-ls-sm);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-  /* 52ch ≈ 71 caracteres na Outfit — o glifo `0` é ~37% mais LARGO que o caractere
-     médio, então o alvo real é caracteres ÷ 1,369 (eram 68 com a Geist). */
+  /* A medida mantém a chamada dentro de uma linha confortável de leitura. */
   max-width: 52ch;
   text-wrap: pretty;
 }
@@ -125,7 +124,7 @@
 
 .parteEstado {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -149,7 +148,7 @@
 
 .parteTexto {
   margin: 0;
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
@@ -221,7 +220,7 @@
   padding-inline: var(--via-space-5);
   border-radius: var(--app-radius-control);
   font-family: inherit;
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-caption);
   cursor: pointer;

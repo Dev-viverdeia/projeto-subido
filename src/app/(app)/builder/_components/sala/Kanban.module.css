@@ -59,7 +59,7 @@
 }
 
 .faseRotulo {
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-snug);
@@ -73,7 +73,7 @@
 .faseContagem {
   margin-top: 2px;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   color: var(--via-text-faint);
   font-variant-numeric: tabular-nums;
 }
@@ -118,7 +118,7 @@
 .colunaRotulo {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
@@ -145,7 +145,7 @@
   padding: var(--via-space-6) var(--via-space-3);
   border: 1px dashed var(--via-border-hairline);
   border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
   color: var(--via-text-faint);
   text-align: center;
@@ -185,7 +185,7 @@
 
 .tarefaTexto {
   margin: 0;
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
   letter-spacing: var(--app-ls-caption);
   line-height: var(--via-lh-loose);
   color: var(--via-text-muted);
@@ -229,11 +229,11 @@
 .voltar {
   display: inline-flex;
   align-items: center;
-  height: 30px;
-  padding-inline: var(--via-space-3);
-  border-radius: var(--app-radius-chip);
+  min-height: 44px;
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
   font-family: inherit;
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-caption);
   cursor: pointer;

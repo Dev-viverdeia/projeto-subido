@@ -100,7 +100,7 @@ describe('entrevista', () => {
     await user.click(screen.getByRole('button', { name: 'Próxima pergunta' }));
 
     expect(screen.queryByRole('button', { name: 'Próxima pergunta' })).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Gerar o projeto' }));
+    await user.click(screen.getByRole('button', { name: 'Criar plano do projeto' }));
     expect(pedirGeracao).toHaveBeenCalledTimes(1);
   });
 
@@ -113,7 +113,7 @@ describe('entrevista', () => {
     await user.type(screen.getByRole('textbox'), 'primeira');
     await user.click(screen.getByRole('button', { name: 'Próxima pergunta' }));
     await user.click(screen.getByRole('button', { name: 'Próxima pergunta' }));
-    await user.click(screen.getByRole('button', { name: 'Gerar o projeto' }));
+    await user.click(screen.getByRole('button', { name: 'Criar plano do projeto' }));
 
     const respostas = pedirGeracao.mock.calls[0]?.[1] ?? [];
     expect(respostas).toHaveLength(3);

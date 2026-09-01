@@ -1,0 +1,27 @@
+.pagina {
+  min-height: 100vh;
+  padding: clamp(var(--via-space-5), 5vw, var(--via-space-10));
+  background: var(--via-bg);
+}
+
+.conteudo {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.conteudo h2,
+.conteudo p {
+  margin: 0;
+}
+
+.conteudo h2 {
+  font-size: var(--via-fs-h3);
+  color: var(--via-text-primary);
+}
+
+.conteudo p {
+  max-width: 60ch;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+}

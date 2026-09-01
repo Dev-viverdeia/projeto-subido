@@ -54,13 +54,13 @@ describe('Compositor', () => {
       screen.getByRole('textbox'),
       'O cliente perde conversas quando troca o atendente responsável.',
     );
-    expect(screen.getByRole('button', { name: 'Gerar entrevista' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Preparar entrevista' })).toBeDisabled();
 
     await user.selectOptions(
       screen.getByRole('combobox', { name: /Projeto-base/ }),
       PROJETOS[0]!.id,
     );
-    expect(screen.getByRole('button', { name: 'Gerar entrevista' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Preparar entrevista' })).toBeEnabled();
   });
 
   it('leva Projeto, cliente e dor real para o rascunho e preserva os vínculos', async () => {
@@ -78,7 +78,7 @@ describe('Compositor', () => {
       screen.getByRole('textbox'),
       'Hoje cinco atendentes respondem sem histórico compartilhado e duplicam perguntas.',
     );
-    await user.click(screen.getByRole('button', { name: 'Gerar entrevista' }));
+    await user.click(screen.getByRole('button', { name: 'Preparar entrevista' }));
 
     await waitFor(() => expect(pedirPerguntas).toHaveBeenCalledTimes(1));
     expect(pedirPerguntas).toHaveBeenCalledWith(

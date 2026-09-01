@@ -90,7 +90,7 @@ export function Entrevista({
     <div className={styles.entrevista}>
       <header className={styles.topo}>
         <p className={styles.ideia}>
-          <span className={styles.ideiaRotulo}>Sua ideia:</span> {ideia}
+          <span className={styles.ideiaRotulo}>Briefing:</span> {ideia}
         </p>
 
         <div className={styles.topoDireita}>
@@ -129,6 +129,7 @@ export function Entrevista({
           nunca rodaria — é o mesmo motivo pelo qual a grade paginada do catálogo
           recebe chave por página. */}
       <div key={atual} className={`${styles.corpo} ${entrada.troca}`}>
+        <p className={styles.etapaRotulo}>Personalize o plano</p>
         <label className={styles.pergunta} htmlFor="resposta">
           {item.pergunta}
         </label>
@@ -170,7 +171,7 @@ export function Entrevista({
           disabled={enviando}
           onClick={() => (ultima ? void gerar() : setAtual(atual + 1))}
         >
-          {ultima ? (enviando ? 'Iniciando…' : 'Gerar o projeto') : 'Próxima pergunta'}
+          {ultima ? (enviando ? 'Preparando…' : 'Criar plano do projeto') : 'Próxima pergunta'}
         </button>
       </footer>
 
