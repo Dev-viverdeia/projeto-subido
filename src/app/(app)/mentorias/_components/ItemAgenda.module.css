@@ -54,7 +54,7 @@
 .duracao {
   font-family: var(--via-font-mono);
   font-size: var(--app-fs-micro);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -109,7 +109,7 @@
 .janela {
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -216,13 +216,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* A MEDIDA MORA AQUI, não no container da lista. É o que permite a agenda usar
-     a tela inteira sem o título correr mil pixels até o botão: ele para onde a
-     leitura pede e o resto da largura vira respiro entre as duas pontas da linha.
-     O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio, então o alvo
-     real é caracteres ÷ 1,369 — 68ch ≈ 93 caracteres (eram 88 com a Geist),
-     generoso para um título de sessão e ainda dentro do que se lê numa linha só.
-     Acima de 75 de propósito: é linha única, não prosa. */
+  /* Limita o título e preserva o respiro antes das ações da linha. */
   max-width: 68ch;
 }
 

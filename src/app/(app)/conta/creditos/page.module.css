@@ -12,7 +12,7 @@
   align-items: center;
   gap: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   text-decoration: none;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .avisoCheckout span {
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
 }
 
@@ -94,11 +94,11 @@
 }
 
 .intro h1 {
-  max-width: 760px;
+  max-width: 16ch;
   margin-top: var(--via-space-3);
   color: var(--via-text-primary);
   font-family: var(--via-font-display);
-  font-size: clamp(2.35rem, 4.3vw, 4.35rem);
+  font-size: clamp(2.5rem, 3.7vw, 3.75rem);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h1);
   line-height: 0.98;
@@ -118,13 +118,14 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
   align-items: stretch;
-  border: 1px solid color-mix(in srgb, var(--via-white) 13%, transparent);
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background:
-    linear-gradient(118deg, color-mix(in srgb, var(--via-white) 10%, transparent), transparent 32%),
-    linear-gradient(135deg, var(--via-navy), var(--via-navy-deep) 58%, var(--via-navy-darker));
-  box-shadow: var(--via-shadow-lg);
-  color: var(--via-white);
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 78%, transparent), transparent 54%),
+    color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  color: var(--via-text-primary);
+  backdrop-filter: var(--via-blur-md) saturate(135%);
 }
 
 .saldoPrincipal {
@@ -140,15 +141,16 @@
   flex: 0 0 58px;
   display: grid;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--via-white) 22%, transparent);
+  border: 1px solid var(--via-navy-16);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 9%, transparent);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--via-white) 18%, transparent) inset;
+  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-navy);
   backdrop-filter: var(--via-blur-sm);
 }
 
 .saldoPrincipal p {
-  color: color-mix(in srgb, var(--via-white) 64%, transparent);
+  color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -158,7 +160,7 @@
 .saldoPrincipal strong {
   display: inline-block;
   margin-top: var(--via-space-2);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   font-family: var(--via-font-mono);
   font-size: clamp(3.5rem, 7vw, 6.6rem);
   font-weight: var(--via-fw-regular);
@@ -170,7 +172,7 @@
 .saldoPrincipal small {
   display: block;
   margin-top: var(--via-space-3);
-  color: color-mix(in srgb, var(--via-white) 72%, transparent);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
 }
 
@@ -180,18 +182,18 @@
   flex-direction: column;
   justify-content: center;
   padding: clamp(28px, 4.5vw, 54px);
-  border-left: 1px solid color-mix(in srgb, var(--via-white) 11%, transparent);
-  background: color-mix(in srgb, var(--via-white) 6%, transparent);
-  backdrop-filter: blur(22px) saturate(130%);
+  border-left: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-bg-2) 62%, transparent);
+  backdrop-filter: var(--via-blur-sm) saturate(130%);
 }
 
 .regraSaldo > p {
-  color: color-mix(in srgb, var(--via-white) 54%, transparent);
+  color: var(--via-text-faint);
 }
 
 .regraSaldo strong {
   margin-top: var(--via-space-3);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   font-size: clamp(var(--via-fs-h4), 2.2vw, var(--via-fs-h3));
   font-weight: 540;
   letter-spacing: var(--app-ls-h4);
@@ -201,7 +203,7 @@
 .regraSaldo span {
   max-width: 58ch;
   margin-top: var(--via-space-3);
-  color: color-mix(in srgb, var(--via-white) 68%, transparent);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
 }
@@ -237,7 +239,7 @@
 .cabecalhoSecao > span {
   max-width: 42ch;
   color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
   text-align: right;
 }
@@ -254,6 +256,46 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--via-space-3);
   padding: var(--via-space-3);
+}
+
+.pacotesAviso {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+  min-height: 104px;
+  margin: var(--via-space-3);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.pacotesAviso > div {
+  min-width: 0;
+}
+
+.pacotesAviso strong,
+.pacotesAviso p {
+  margin: 0;
+}
+
+.pacotesAviso strong {
+  display: block;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+}
+
+.pacotesAviso p {
+  max-width: 62ch;
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-sm);
+  text-wrap: pretty;
 }
 
 .pacote {
@@ -302,7 +344,7 @@
 
 .numeroPacote span {
   color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-caption);
 }
 
 .textoPacote p,
@@ -332,7 +374,7 @@
   display: block;
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
 }
 
@@ -367,7 +409,7 @@
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   text-align: center;
 }
 
@@ -441,7 +483,7 @@
 .custoUso small {
   margin-top: var(--via-space-1);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
 }
 
 .textoUso {
@@ -459,7 +501,7 @@
 .textoUso p {
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
 }
 
@@ -557,7 +599,7 @@
   display: block;
   margin-top: 3px;
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -565,7 +607,7 @@
 .extrato time {
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   white-space: nowrap;
 }
 
@@ -616,7 +658,7 @@
 .extratoVazio p {
   margin-top: var(--via-space-1);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
 }
 
 .extratoVazio a {
@@ -626,7 +668,7 @@
   gap: var(--via-space-2);
   margin-top: var(--via-space-3);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
 }
@@ -655,12 +697,19 @@
   }
 
   .regraSaldo {
-    border-top: 1px solid color-mix(in srgb, var(--via-white) 11%, transparent);
+    border-top: 1px solid var(--via-border-hairline);
     border-left: none;
   }
 
   .uso {
     min-height: 200px;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .saldo,
+  .pacotesAviso {
+    background: var(--via-surface);
   }
 }
 

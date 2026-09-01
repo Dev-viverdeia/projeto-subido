@@ -16,8 +16,115 @@
   gap: var(--app-gap-section);
 }
 
+.cabecalho {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: end;
+  gap: clamp(32px, 7vw, 112px);
+  padding: var(--via-space-2) 4px 0;
+}
+
+.intro,
+.regra {
+  min-width: 0;
+}
+
+.sobretitulo,
+.intro h1,
+.descricao,
+.regra p,
+.regra strong,
+.regra span {
+  margin: 0;
+}
+
+.sobretitulo,
+.regra p {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-faint);
+}
+
+.intro h1 {
+  max-width: 14ch;
+  margin-top: var(--via-space-3);
+  font-family: var(--via-font-display);
+  font-size: clamp(2.55rem, 4.3vw, 4rem);
+  font-weight: var(--via-fw-medium);
+  line-height: 0.98;
+  letter-spacing: var(--app-ls-h1);
+  color: var(--via-text-primary);
+  text-wrap: balance;
+}
+
+.descricao {
+  max-width: 54ch;
+  margin-top: var(--via-space-4);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-body);
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+.regra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-2);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-blur-md) saturate(130%);
+}
+
+.regra strong {
+  font-size: var(--via-fs-h4);
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h4);
+  color: var(--via-text-primary);
+}
+
+.regra span {
+  max-width: 42ch;
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-sm);
+  color: var(--via-text-muted);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .regra {
+    background: var(--via-surface);
+  }
+}
+
+@media (max-width: 899px) {
+  .cabecalho {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-gap-block);
+  }
+
+  .intro h1,
+  .descricao,
+  .regra span {
+    max-width: none;
+  }
+}
+
 @media (max-width: 767px) {
   .pagina {
     gap: var(--app-gap-block);
+  }
+
+  .cabecalho {
+    gap: var(--via-space-5);
+  }
+
+  .intro h1 {
+    font-size: clamp(2.35rem, 12vw, 3.25rem);
   }
 }

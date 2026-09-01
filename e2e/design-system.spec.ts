@@ -21,7 +21,7 @@ const TELAS = [
   ['/preview/entregas', 'Execute o próximo passo de cada cliente.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
-  ['/preview/mentorias', 'Leve um caso. Saia com o próximo passo.'],
+  ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
   ['/preview/certificados', 'Comprove o que você concluiu.'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
   ['/preview/formacoes', 'Aprenda. Aplique no trabalho.'],
@@ -245,6 +245,21 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(dialogo).toContainText('Saldo atual');
     await expect(dialogo).toContainText('Saldo depois');
     await expect(dialogo.getByRole('button', { name: 'Usar 1 crédito e confirmar' })).toBeVisible();
+  });
+
+  test('Mentorias mantém a agenda limpa e acessível', async ({ page }) => {
+    await page.goto('/preview/mentorias');
+
+    await expect(
+      page.getByRole('heading', { name: 'Leve um caso. Saia com direção.' }),
+    ).toBeVisible();
+    await expect(page.getByText('Saldo disponível', { exact: true })).toHaveCount(0);
+
+    const resultado = await new AxeBuilder({ page }).analyze();
+    const violacoesGraves = resultado.violations.filter(
+      (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+    );
+    expect(violacoesGraves).toEqual([]);
   });
 
   test('Certificados prioriza a prova pública e o compartilhamento', async ({ page }) => {
