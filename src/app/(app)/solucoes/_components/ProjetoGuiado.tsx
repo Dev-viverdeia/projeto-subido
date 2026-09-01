@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
 import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import { idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
-import { contarEtapasFeitas, useProgresso } from '@/lib/progresso/local';
+import { contarEtapasFeitas, percentual, useProgresso } from '@/lib/progresso/local';
 import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
 import { KitProjeto } from './KitProjeto';
@@ -45,6 +45,7 @@ export function ProjetoGuiado({
   const roteiro = projeto.roteiro;
   const todosIds = idsPassosProjeto(slug, roteiro);
   const feitas = contarEtapasFeitas(progresso, todosIds);
+  const progressoGeral = percentual(feitas, todosIds.length);
   const idsAulas = idsAulasProjeto(slug, roteiro);
   const aulasFeitas = contarEtapasFeitas(progresso, idsAulas);
   const aprendizadoConcluido = idsAulas.length === 0 || aulasFeitas === idsAulas.length;
@@ -86,12 +87,24 @@ export function ProjetoGuiado({
           </p>
         </div>
         <div className={styles.cabecalhoAcao}>
-          <p className={styles.progressoCabecalho}>
-            <strong>
-              {feitas} de {todosIds.length}
-            </strong>
-            passos concluídos
-          </p>
+          <div
+            className={styles.progressoCabecalho}
+            role="progressbar"
+            aria-label="Progresso geral do projeto"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressoGeral}
+          >
+            <p>
+              <strong>
+                {feitas} de {todosIds.length}
+              </strong>
+              <span>passos concluídos</span>
+            </p>
+            <span className={styles.progressoCabecalhoTrilho} aria-hidden="true">
+              <span style={{ transform: `scaleX(${progressoGeral / 100})` }} />
+            </span>
+          </div>
 
           {proximoPasso ? (
             <button

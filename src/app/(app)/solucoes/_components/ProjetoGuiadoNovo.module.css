@@ -38,7 +38,7 @@
 
 .cabecalho {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.3fr);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
@@ -60,7 +60,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 220px;
+  min-height: 196px;
   padding: clamp(28px, 3.5vw, 44px);
 }
 
@@ -100,6 +100,12 @@
 }
 
 .progressoCabecalho {
+  display: grid;
+  gap: var(--via-space-3);
+  margin: 0;
+}
+
+.progressoCabecalho p {
   display: flex;
   align-items: baseline;
   gap: var(--via-space-2);
@@ -111,14 +117,31 @@
   color: var(--via-text-primary);
 }
 
+.progressoCabecalhoTrilho {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--app-radius-track);
+  background: color-mix(in srgb, var(--via-navy) 10%, transparent);
+}
+
+.progressoCabecalhoTrilho > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left;
+  border-radius: inherit;
+  background: var(--via-navy);
+}
+
 .cabecalhoAcao {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
   padding: clamp(24px, 3vw, 34px);
   border-left: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-navy) 3%, transparent);
+  background: color-mix(in srgb, var(--via-surface) 54%, var(--via-navy-08));
 }
 
 .cabecalhoAcao dl {
@@ -156,7 +179,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 54px;
+  min-height: 68px;
   padding: var(--via-space-3) var(--via-space-4);
   border: 0;
   border-radius: var(--app-radius-control);
@@ -238,14 +261,17 @@
 
 .acaoPrincipal span {
   min-width: 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 2px;
   font-size: var(--via-fs-sm);
   font-weight: 620;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: var(--via-lh-snug);
+  white-space: normal;
+}
+
+.acaoPrincipal svg {
+  flex: 0 0 auto;
 }
 
 .acaoPrincipal small {

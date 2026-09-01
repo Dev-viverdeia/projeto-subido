@@ -28,9 +28,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: clamp(var(--via-space-7), 6vw, var(--via-space-12));
-  min-height: 164px;
-  padding: clamp(26px, 3vw, 40px);
+  gap: clamp(var(--via-space-6), 4vw, var(--via-space-9));
+  min-height: 136px;
+  padding: clamp(24px, 2.4vw, 32px);
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
   background: var(--app-glass-plane-strong);
@@ -66,12 +66,12 @@
 }
 
 .heroTexto h1 {
-  max-width: 18ch;
+  max-width: 22ch;
   margin: var(--via-space-2) 0 0;
   color: var(--via-text-primary);
-  font-size: clamp(2.4rem, 4.5vw, 4rem);
+  font-size: clamp(2.2rem, 3.4vw, 3rem);
   font-weight: var(--via-fw-medium);
-  line-height: 0.96;
+  line-height: 1;
   letter-spacing: var(--app-ls-h1);
   text-wrap: balance;
 }
@@ -87,7 +87,7 @@
 
 .resumo {
   display: grid;
-  grid-template-columns: repeat(4, minmax(76px, 1fr));
+  grid-template-columns: repeat(3, minmax(92px, 1fr));
   margin: 0;
   padding: var(--via-space-2);
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
@@ -473,7 +473,7 @@
   display: grid;
   grid-template-columns:
     auto minmax(180px, 0.78fr) minmax(270px, 1.35fr) minmax(116px, 0.42fr)
-    minmax(86px, 0.32fr) auto;
+    minmax(86px, 0.32fr) 40px;
   align-items: center;
   gap: var(--via-space-4);
   padding: var(--via-space-4);
@@ -614,17 +614,15 @@
 }
 
 .linhaAbrir {
-  display: inline-flex;
-  min-height: 34px;
+  display: grid;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
-  gap: var(--via-space-1);
-  padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   color: var(--via-navy);
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-medium);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
 }
 
 .vazio {
@@ -899,7 +897,8 @@
 
   .hero {
     grid-template-columns: minmax(0, 1fr);
-    padding: var(--via-space-6);
+    min-height: 0;
+    padding: var(--via-space-5);
   }
 
   .heroIcone {
@@ -908,29 +907,33 @@
   }
 
   .heroTexto h1 {
-    font-size: clamp(2.25rem, 13vw, 3.25rem);
+    font-size: clamp(2.1rem, 10vw, 2.7rem);
   }
 
   .resumo {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .resumo div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--via-space-3);
-    border-right: 0;
-    border-bottom: 1px solid var(--via-border-hairline);
-  }
-
-  .resumo div:last-child {
+    display: grid;
+    align-content: space-between;
+    min-height: 70px;
+    padding: var(--via-space-3) var(--via-space-2);
+    border-right: 1px solid var(--via-border-hairline);
     border-bottom: 0;
   }
 
+  .resumo div:last-child {
+    border-right: 0;
+  }
+
   .resumo dd {
-    margin: 0;
+    margin-top: var(--via-space-2);
     font-size: var(--via-fs-h4);
+  }
+
+  .resumo dt {
+    white-space: normal;
   }
 
   .cabecalhoSecao {
