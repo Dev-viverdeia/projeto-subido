@@ -51,10 +51,10 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
 
   return (
     <div className={styles.painel}>
-      {/* O MESMO trilho do curso, na variante densa. Aqui existiam um `Progress`
-          do DS, um eyebrow com outro nome ("Progresso do curso") e uma contagem
-          própria — uma TERCEIRA maneira de desenhar o número que o curso e o
-          catálogo já desenhavam de dois jeitos. */}
+      <header className={styles.cabecalhoPainel}>
+        <p>Conteúdo da formação</p>
+        <h2>{formacao.titulo}</h2>
+      </header>
       <div className={styles.topo}>
         <TrilhoProgresso
           itens={curriculo.planas}

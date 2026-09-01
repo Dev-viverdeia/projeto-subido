@@ -49,16 +49,11 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
 
       <header className={`${styles.cabecalho} ${entrada.bloco}`}>
         <div className={styles.textos}>
+          <p className={styles.eyebrow}>
+            Aula {posicao} de {total}
+          </p>
           <h1 className={styles.titulo}>{aula.titulo}</h1>
-          {/* Pills, como na ficha de solução e no hero do curso — e só o que
-              EXISTE: a duração some quando a aula não tem `duracao_seg`, em vez
-              de virar "0 min". */}
-          <ul className={styles.metas}>
-            {duracao && <li className={styles.meta}>{duracao}</li>}
-            <li className={styles.meta}>
-              Aula {posicao} de {total}
-            </li>
-          </ul>
+          {duracao && <p className={styles.duracao}>{duracao}</p>}
         </div>
       </header>
 

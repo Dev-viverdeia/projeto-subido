@@ -1,17 +1,5 @@
-/* A LARGURA DA PÁGINA É A SOMA DAS DUAS COLUNAS, e isso conserta um desalinhamento
-   que eu mesmo criei.
-
-   16:9 é restrição dura: a coluna do player a 1200px produz 675 de ALTURA e joga a
-   navegação da aula para fora da dobra. Por isso o player tem teto de 1000. Minha
-   primeira tentativa foi pôr a página no canvas e CENTRALIZAR a grade — e o
-   cabeçalho, que vive FORA da grade, ficou no canto esquerdo da página enquanto o
-   vídeo ia para o meio. Dois eixos verticais diferentes na mesma tela.
-
-   Derivando o teto da soma (1000 do player + 420 da playlist + a calha), a página
-   inteira passa a ter UM eixo: cabeçalho, vídeo, navegação e playlist compartilham
-   as mesmas bordas, e o bloco todo se centraliza como uma peça só. */
 .pagina {
-  max-width: calc(1000px + 420px + var(--via-space-6));
+  max-width: calc(1040px + 390px + var(--via-space-6));
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -22,62 +10,48 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--via-space-3);
-}
-
-.navegacao {
-  display: flex;
-  align-items: center;
 }
 
 .textos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-1_5);
-  max-width: 760px;
+  display: grid;
+  gap: var(--via-space-2);
+  max-width: 840px;
   min-width: 0;
 }
 
-.titulo {
+.eyebrow,
+.titulo,
+.duracao {
   margin: 0;
+}
+
+.eyebrow {
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--via-text-muted);
+}
+
+.titulo {
   font-family: var(--via-font-display);
-  font-size: clamp(var(--via-fs-h3), 2.4vw, var(--via-fs-h2));
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-hero);
+  line-height: 1.04;
   color: var(--via-text-primary);
   text-wrap: balance;
 }
 
-/* As mesmas pills de meta da ficha de solução e do hero do curso. Eram uma frase
-   com `·` no meio — o mesmo dado, numa quarta forma. */
-.metas {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--via-space-2);
-  margin: var(--via-space-2) 0 0;
-  padding: 0;
-}
-
-.meta {
-  padding: 5px var(--via-space-3);
-  border-radius: var(--app-radius-chip);
-  background: var(--via-navy-06);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+.duracao {
+  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }
 
 .grade {
   display: grid;
-  /* Os mesmos 1000 e 420 que a página soma acima — mexer num sem o outro volta a
-     desalinhar o cabeçalho do vídeo. */
-  grid-template-columns: minmax(0, 1fr) clamp(300px, 26%, 420px);
+  grid-template-columns: minmax(0, 1fr) clamp(330px, 27%, 390px);
   gap: var(--via-space-6);
   align-items: start;
 }
@@ -85,11 +59,11 @@
 .principal {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
   min-width: 0;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1079px) {
   .grade {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -76,22 +76,11 @@ export function TrilhaFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
 
   return (
     <section id="trilha-formacoes" className={styles.raiz} aria-labelledby="trilha-titulo">
-      <header className={styles.cabecalho}>
-        <div>
-          <p className={styles.eyebrow}>Sua trilha profissional</p>
-          <h2 id="trilha-titulo">Uma ordem clara para evoluir.</h2>
-        </div>
-        <p>
-          Comece pela base e avance conforme o tipo de trabalho que deseja executar. Seu progresso
-          fica salvo na conta.
-        </p>
-      </header>
-
       {proxima && perfilProxima ? (
         <Link href={`/formacoes/${proxima.slug}`} className={styles.proxima}>
           <div className={styles.proximaIdentidade}>
             <span className={styles.proximaRotulo}>
-              {feitas > 0 ? 'Continue de onde parou' : 'Próxima formação'}
+              {feitas > 0 ? 'Continue aprendendo' : 'Comece por aqui'}
             </span>
             <strong>{proxima.titulo}</strong>
             <span>{perfilProxima.foco}</span>
@@ -116,11 +105,19 @@ export function TrilhaFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
         </div>
       ) : null}
 
-      <div className={styles.resumo} aria-label="Progresso da trilha">
-        <span>{formacoes.length} formações</span>
-        <span>{concluidas} concluídas</span>
-        <span>{Math.max(0, formacoes.length - concluidas)} para concluir</span>
-      </div>
+      <header className={styles.cabecalho}>
+        <div>
+          <p className={styles.eyebrow}>Biblioteca</p>
+          <h2 id="trilha-titulo">Todas as formações</h2>
+        </div>
+        <p>
+          {formacoes.length}{' '}
+          {formacoes.length === 1 ? 'formação disponível' : 'formações disponíveis'}
+          {concluidas > 0
+            ? ` · ${concluidas} ${concluidas === 1 ? 'concluída' : 'concluídas'}`
+            : ''}
+        </p>
+      </header>
 
       <ol className={styles.grade} aria-label="Formações em ordem recomendada">
         {formacoes.map((formacao, indice) => {
@@ -132,7 +129,6 @@ export function TrilhaFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
                 numero={indice + 1}
                 etapa={dados.etapa}
                 foco={dados.foco}
-                recomendada={proxima?.id === formacao.id}
               />
             </li>
           );

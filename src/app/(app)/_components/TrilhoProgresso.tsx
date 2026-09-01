@@ -119,7 +119,8 @@ export function TrilhoProgresso({
         </div>
         {barra}
         <p className={styles.contagemDensa}>
-          {feitas} de {total} {total === 1 ? unidade.singular : unidade.plural}
+          {feitas} de {total} {total === 1 ? unidade.singular : unidade.plural}{' '}
+          {total === 1 ? 'concluída' : 'concluídas'}
         </p>
       </section>
     );
