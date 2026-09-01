@@ -89,9 +89,9 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
       <header className={styles.intro}>
         <div>
           <p className={styles.sobretitulo}>Créditos</p>
-          <h1>Saldo e extrato de créditos</h1>
+          <h1>Um saldo para toda a operação.</h1>
         </div>
-        <p>Confira seu saldo, o custo de cada recurso e as movimentações recentes da sua conta.</p>
+        <p>Veja quanto você tem, onde usar e o que entrou ou saiu da sua conta.</p>
       </header>
 
       {parametros.checkout ? (
@@ -140,60 +140,6 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
             Quando uma operação falha ou é cancelada dentro da regra, os créditos são devolvidos
             automaticamente e aparecem no extrato.
           </span>
-        </div>
-      </section>
-
-      <section className={styles.secao} aria-labelledby="titulo-pacotes">
-        <header className={styles.cabecalhoSecao}>
-          <div>
-            <p>Recarregar saldo</p>
-            <h2 id="titulo-pacotes">Pacotes de créditos</h2>
-          </div>
-          <span>
-            Escolha um pacote fechado. O saldo não expira enquanto sua conta estiver ativa.
-          </span>
-        </header>
-
-        <div className={styles.pacotes}>
-          {PACOTES_CREDITOS.map((pacote, indice) => {
-            const preco = catalogo.pacotes[pacote.id];
-            return (
-              <article
-                className={styles.pacote}
-                data-destaque={indice === 1 || undefined}
-                key={pacote.id}
-              >
-                <div className={styles.numeroPacote}>
-                  <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
-                  <strong>{pacote.creditos}</strong>
-                  <span>créditos</span>
-                </div>
-                <div className={styles.textoPacote}>
-                  <p>{indice === 1 ? 'Mais escolhido' : 'Pacote'}</p>
-                  <h3>{pacote.nome}</h3>
-                  <span>{pacote.descricao}</span>
-                </div>
-                <div className={styles.precoPacote}>
-                  <strong>{preco ?? 'Em breve'}</strong>
-                  {preco ? <small>pagamento único</small> : null}
-                </div>
-                <div className={styles.acaoPacote}>
-                  {catalogo.pronto && preco ? (
-                    <form action={comprarPacoteCreditos}>
-                      <input type="hidden" name="pacote" value={pacote.id} />
-                      <BotaoBilling
-                        texto={`Comprar ${pacote.nome}`}
-                        processando="Abrindo pagamento..."
-                        variante={indice === 1 ? 'primario' : 'secundario'}
-                      />
-                    </form>
-                  ) : (
-                    <span>Compra de pacotes será aberta em breve</span>
-                  )}
-                </div>
-              </article>
-            );
-          })}
         </div>
       </section>
 
@@ -305,6 +251,69 @@ export default async function CreditosPage({ searchParams }: PageProps<'/conta/c
                 Ver mentorias
                 <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
               </Link>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className={styles.secao} aria-labelledby="titulo-pacotes">
+        <header className={styles.cabecalhoSecao}>
+          <div>
+            <p>Recarregar saldo</p>
+            <h2 id="titulo-pacotes">Pacotes de créditos</h2>
+          </div>
+          <span>O saldo não expira enquanto sua conta estiver ativa.</span>
+        </header>
+
+        {catalogo.pronto ? (
+          <div className={styles.pacotes}>
+            {PACOTES_CREDITOS.map((pacote, indice) => {
+              const preco = catalogo.pacotes[pacote.id];
+              if (!preco) return null;
+              return (
+                <article
+                  className={styles.pacote}
+                  data-destaque={indice === 1 || undefined}
+                  key={pacote.id}
+                >
+                  <div className={styles.numeroPacote}>
+                    <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
+                    <strong>{pacote.creditos}</strong>
+                    <span>créditos</span>
+                  </div>
+                  <div className={styles.textoPacote}>
+                    <p>{indice === 1 ? 'Mais escolhido' : 'Pacote'}</p>
+                    <h3>{pacote.nome}</h3>
+                    <span>{pacote.descricao}</span>
+                  </div>
+                  <div className={styles.precoPacote}>
+                    <strong>{preco}</strong>
+                    <small>pagamento único</small>
+                  </div>
+                  <div className={styles.acaoPacote}>
+                    <form action={comprarPacoteCreditos}>
+                      <input type="hidden" name="pacote" value={pacote.id} />
+                      <BotaoBilling
+                        texto={`Comprar ${pacote.nome}`}
+                        processando="Abrindo pagamento..."
+                        variante={indice === 1 ? 'primario' : 'secundario'}
+                      />
+                    </form>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className={styles.pacotesAviso} role="status">
+            <span className={styles.iconeUso} aria-hidden="true">
+              <Coins size={19} strokeWidth={1.7} />
+            </span>
+            <div>
+              <strong>Pacotes adicionais ainda não estão disponíveis.</strong>
+              <p>
+                Seu saldo atual continua funcionando normalmente em todos os recursos liberados.
+              </p>
             </div>
           </div>
         )}

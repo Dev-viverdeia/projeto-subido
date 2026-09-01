@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
 import { listarAgenda } from '@/lib/mentorias/queries';
-import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
 import entrada from '../_components/entrada.module.css';
 import { lerVistaInicial } from '../_components/filtros/urlFiltros';
 import { MentoriasVista } from './_components/MentoriasVista';
@@ -26,8 +25,8 @@ export const metadata: Metadata = { title: 'Mentorias' };
  * NASCE VAZIA, e isso é o certo: não há mentoria cadastrada ainda. O estado
  * vazio é a tela honesta até a primeira sessão entrar pelo admin.
  *
- * O cabeçalho fica FORA do `entrada.bloco`: oculto ele não tem o que animar, e um
- * wrapper de altura zero continua sendo item flex e comeria o `gap` da página.
+ * Cabeçalho e agenda usam blocos de entrada independentes para preservar a
+ * hierarquia visual sem atrasar a informação principal.
  */
 export default async function MentoriasPage({ searchParams }: PageProps<'/mentorias'>) {
   const agora = new Date();
@@ -40,11 +39,21 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
   return (
     <div className={styles.pagina}>
       <div className={entrada.bloco}>
-        <EvolucaoProfissional
-          etapa="mentorias"
-          titulo="Leve um caso. Saia com o próximo passo."
-          descricao="Escolha uma sessão e leve a dúvida que está travando uma venda ou implementação."
-        />
+        <header className={styles.cabecalho}>
+          <div className={styles.intro}>
+            <p className={styles.sobretitulo}>Mentorias</p>
+            <h1>Leve um caso. Saia com direção.</h1>
+            <p className={styles.descricao}>
+              Escolha uma sessão para destravar uma venda, um projeto ou uma entrega.
+            </p>
+          </div>
+
+          <div className={styles.regra}>
+            <p>Créditos sem surpresa</p>
+            <strong>O custo aparece antes do check-in.</strong>
+            <span>Cancelou antes do início? O valor volta para o seu saldo.</span>
+          </div>
+        </header>
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>

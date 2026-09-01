@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { EvolucaoProfissional } from '@/app/(app)/_components/EvolucaoProfissional';
 import { MentoriasVista } from '@/app/(app)/mentorias/_components/MentoriasVista';
+import pagina from '@/app/(app)/mentorias/pagina.module.css';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import styles from '../aprendizado.module.css';
 
@@ -78,11 +78,20 @@ export default function PreviewMentoriasPage() {
   return (
     <main className={styles.pagina}>
       <div className={styles.conteudo}>
-        <EvolucaoProfissional
-          etapa="mentorias"
-          titulo="Leve um caso. Saia com o próximo passo."
-          descricao="Escolha uma sessão e leve a dúvida que está travando uma venda ou implementação."
-        />
+        <header className={pagina.cabecalho}>
+          <div className={pagina.intro}>
+            <p className={pagina.sobretitulo}>Mentorias</p>
+            <h1>Leve um caso. Saia com direção.</h1>
+            <p className={pagina.descricao}>
+              Escolha uma sessão para destravar uma venda, um projeto ou uma entrega.
+            </p>
+          </div>
+          <div className={pagina.regra}>
+            <p>Créditos sem surpresa</p>
+            <strong>O custo aparece antes do check-in.</strong>
+            <span>Cancelou antes do início? O valor volta para o seu saldo.</span>
+          </div>
+        </header>
         <MentoriasVista
           sessoes={SESSOES}
           agoraIso={AGORA}

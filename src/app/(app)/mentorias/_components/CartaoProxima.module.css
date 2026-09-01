@@ -1,31 +1,40 @@
 .cartao {
   position: relative;
   overflow: hidden;
-  border-radius: var(--via-radius-lg);
-  border: 1px solid var(--via-navy-16);
+  border-radius: var(--app-radius-surface);
+  border: 1px solid var(--app-elev-2-line);
   padding: clamp(22px, 3.4vw, 32px);
-  background: linear-gradient(135deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    var(--via-glow-navy);
-  transition: box-shadow var(--app-t-touch);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 76%, transparent), transparent 58%),
+    color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-md) saturate(135%);
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-touch);
 }
 
 .cartao:hover {
-  box-shadow: var(--via-glow-navy-strong);
+  transform: translateY(-2px);
+  border-color: var(--via-navy-16);
+  box-shadow: var(--app-elev-3-shadow);
 }
 
 /* Ao vivo, a moldura acende em ACCENT — o verde do Pill live do DS é
    vocabulário de semáforo, que a casa bane; o sinal de vivo aqui é o azul. */
 .cartao[data-ao-vivo] {
   border-color: var(--via-accent-hairline);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--via-white) 78%, transparent), transparent 58%),
+    color-mix(in srgb, var(--via-accent) 5%, var(--app-elev-2-bg));
 }
 
 .sheen {
   position: absolute;
   inset: 0 0 auto;
   height: 1px;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--via-edge-hi);
 }
 
 /* DUAS COLUNAS: o que É à esquerda, o que DECIDE à direita.
@@ -50,9 +59,7 @@
   align-self: stretch;
   gap: var(--app-gap-block);
   min-width: 0;
-  /* O glifo `0` da Outfit é ~37% mais LARGO que o caractere médio: o alvo real é
-     caracteres ÷ 1,369. 46ch ≈ 63 caracteres (eram 60 com a Geist) — dentro da
-     faixa de 45–75 mesmo com o título em corpo de display. */
+  /* Mantém o título dentro de uma linha confortável de leitura. */
   max-width: 46ch;
 }
 
@@ -81,11 +88,11 @@
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-accent);
+  color: var(--via-accent-ink);
 }
 
 .contagem {
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
   letter-spacing: var(--app-ls-eyebrow);
 }
 
@@ -96,7 +103,7 @@
   font-weight: 560;
   letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-snug);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   text-wrap: balance;
 }
 
@@ -115,7 +122,7 @@
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-400);
+  color: var(--via-text-faint);
 }
 
 .mentorTextos {
@@ -127,13 +134,13 @@
   margin: 0;
   font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
-  color: var(--via-white);
+  color: var(--via-text-primary);
 }
 
 .mentorHeadline {
   margin: 0;
   font-size: var(--via-fs-micro);
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
 }
 
 /* EMPILHADAS na coluna da direita: "Fazer check-in" e "Ver detalhes" lado a lado
@@ -146,27 +153,19 @@
   gap: var(--via-space-2_5);
 }
 
-/* Ação destrutiva sobre navy precisa manter a semântica coral sem perder
-   contraste. O variant continua sendo o oficial; aqui só muda a temperatura da
-   superfície escura em que ele pousa. */
+/* O variant oficial preserva a semântica destrutiva sem dominar o cartão. */
 .acoes :global(.via-btn--destructive) {
-  border-color: color-mix(in srgb, var(--via-coral) 62%, transparent);
-  background: color-mix(in srgb, var(--via-coral) 9%, transparent);
-  color: var(--via-gray-100);
+  border-color: color-mix(in srgb, var(--via-coral) 34%, var(--via-border-soft));
+  background: color-mix(in srgb, var(--via-coral) 5%, var(--via-surface));
+  color: var(--via-danger);
 }
 
 .acoes :global(.via-btn--destructive:hover:not(:disabled)) {
-  border-color: var(--via-coral);
-  color: var(--via-white);
+  border-color: color-mix(in srgb, var(--via-coral) 54%, var(--via-border-soft));
+  color: var(--via-danger);
 }
 
-/* A MESMA `<dl>` do modal da sessão, na temperatura da banda escura.
-   FLEX e não `auto-fit`: `minmax(max-content, 1fr)` não dá ao auto-fit um mínimo
-   definido para calcular a contagem, e a tira colapsa para uma coluna — foi
-   exatamente o que aconteceu no modal. Flex com wrap encaixa quantos couberem. */
-/* VERTICAL na coluna da direita: quatro pares lado a lado precisam de ~460px e a
-   coluna tem 300. Empilhados, o rótulo e o valor formam uma tabela de leitura
-   vertical, que é como se lê ficha de evento. */
+/* A mesma ficha rotulada do modal mantém a leitura consistente. */
 .ficha {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -189,9 +188,7 @@
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  /* 6,99:1 sobre a navy. `--via-text-faint` daria 2,5:1 e sumiria — sobre banda
-     escura a escala de cinza INVERTE. */
-  color: var(--via-gray-400);
+  color: var(--via-text-faint);
 }
 
 .fichaValor {
@@ -200,17 +197,12 @@
   /* Um degrau acima do corpo: número é prova, e aqui é o que decide. */
   font-size: var(--via-fs-h4);
   letter-spacing: var(--via-ls-tight);
-  color: var(--via-white);
+  color: var(--via-text-primary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* O PULSO DE "AO VIVO" — accent puro, que é legível justamente sobre a navy
-   (6,52:1). Substitui a `Pill variant="live"` do DS, que é navy sobre navy aqui.
-
-   `animation` e não `transition`: isto é AMBIENTE, não resposta a interação, e a
-   regra da casa é explícita — o gate cobre `transition` e não toca em `animation`
-   porque as duas famílias obedecem a lógicas opostas. */
+/* Pulso discreto para a sessão ao vivo, com alternativa sem movimento. */
 .pulso {
   width: 7px;
   height: 7px;
@@ -248,7 +240,7 @@
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -259,9 +251,9 @@
   min-height: 40px;
   padding-inline: var(--via-space-4);
   border-radius: var(--via-radius-pill);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: var(--via-white);
+  background: var(--via-navy-06);
+  border: 1px solid var(--via-navy-16);
+  color: var(--via-navy);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
 }
@@ -269,7 +261,7 @@
 .aviso {
   margin: 0;
   font-size: var(--via-fs-micro);
-  color: var(--via-gray-400);
+  color: var(--via-text-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -278,11 +270,14 @@
   }
 }
 
-/* O anel do DS é box-shadow e o de globals.css usa :where() (especificidade
-   zero): a box-shadow desta classe o apagava. Medido: foco sem NADA visível.
-   Compõe com a sombra de repouso para o elemento não achatar ao focar. */
 .cartao:focus-visible {
-  box-shadow: var(--app-ring);
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
+  }
 }
 
 /* Uma coluna abaixo de 900: a ficha volta a ser horizontal, onde há largura para

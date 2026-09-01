@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, Coins } from 'lucide-react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
@@ -198,23 +198,14 @@ export function MentoriasVista({
             </span>
             <div>
               <p className={styles.vazioEyebrow}>Agenda de mentorias</p>
-              <h2 id="mentorias-vazio-titulo">
-                {sessoes.length === 0 ? 'Novas sessões aparecem aqui.' : 'Sua agenda está livre.'}
-              </h2>
-              <p>Você verá mentor, horário e custo antes de confirmar o check-in.</p>
+              <h2 id="mentorias-vazio-titulo">Nenhuma sessão futura.</h2>
+              <p>Quando uma nova data for publicada, mentor, horário e custo aparecem aqui.</p>
             </div>
           </div>
 
           <div className={styles.vazioDecisao}>
-            <span className={styles.vazioSaldo}>
-              <Coins size={17} strokeWidth={1.7} aria-hidden="true" />
-              <span>
-                <small>Saldo disponível</small>
-                <strong>{saldo === null ? '—' : saldo} créditos</strong>
-              </span>
-            </span>
-            <Link href="/formacoes" className={styles.vazioCta}>
-              Continuar aprendendo
+            <Link href="/projetos" className={styles.vazioCta}>
+              Explorar projetos
               <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
             </Link>
             {totalCheckins > 0 ? (
@@ -248,11 +239,6 @@ export function MentoriasVista({
             </div>
 
             <div className={styles.chromeAcoes}>
-              <span className={styles.saldoAtual} aria-label={`${saldo ?? 0} créditos disponíveis`}>
-                <Coins size={15} strokeWidth={1.8} aria-hidden="true" />
-                <strong>{saldo === null ? '—' : saldo}</strong>
-                <span>créditos</span>
-              </span>
               {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
             comentário do próprio `ControleSegmentado` já dizia que ele fora
             extraído para substituir esta cópia e as abas de catálogo. A
