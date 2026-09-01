@@ -24,13 +24,11 @@ describe('CabineLiveCoach', () => {
     );
 
     expect(screen.getByRole('complementary', { name: 'Live Coach privado' })).toBeInTheDocument();
-    expect(screen.getByText('Uma orientação por vez')).toBeInTheDocument();
+    expect(screen.getByText('Próxima pergunta')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: SUGESTAO.titulo })).toBeInTheDocument();
-    expect(screen.getByText(/Ouvido agora/)).toHaveTextContent(SUGESTAO.trecho_gatilho!);
+    expect(screen.getByText(/Baseado no que ouvi/)).toHaveTextContent(SUGESTAO.trecho_gatilho!);
     expect(screen.getByText('Só você vê')).toBeInTheDocument();
-    expect(
-      screen.getByText(/resumo, decisões e próximo passo na ficha do cliente/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/resumo e decisões na ficha ao encerrar/i)).toBeInTheDocument();
   });
 
   it('mostra o objetivo e a primeira pergunta antes da conversa começar', () => {
@@ -64,7 +62,7 @@ describe('CabineLiveCoach', () => {
       />,
     );
 
-    expect(screen.getByText('Comece com o plano preparado')).toBeInTheDocument();
+    expect(screen.getByText('Objetivo da conversa')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'Confirmar o impacto da demora no atendimento.' }),
     ).toBeInTheDocument();

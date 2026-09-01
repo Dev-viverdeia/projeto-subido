@@ -55,7 +55,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
       <header className={styles.cabecalho}>
         <div className={styles.cabecalhoLinha}>
           <div>
-            <p>Preparar reunião · {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</p>
+            <p>Antes da reunião · {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</p>
             <h1>{posCall.reuniao.titulo}</h1>
             <span>
               {posCall.empresa.nome}
@@ -64,10 +64,10 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
           </div>
           <div className={styles.acoesTopo}>
             <Link href={`/vendas/${posCall.oportunidade.id}`} className={styles.secundaria}>
-              Ver ficha <ArrowRight size={15} aria-hidden="true" />
+              Ficha do cliente <ArrowRight size={15} aria-hidden="true" />
             </Link>
             <Link href={`/sala/${posCall.reuniao.codigoPublico}`} className={styles.primaria}>
-              <Video size={16} aria-hidden="true" /> Entrar na sala
+              <Video size={16} aria-hidden="true" /> Entrar na reunião
             </Link>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
 
       <section className={styles.plano} data-on-dark aria-labelledby="objetivo-call">
         <div className={styles.objetivo}>
-          <p>Objetivo da reunião</p>
+          <p>Decisão que você busca</p>
           <h2 id="objetivo-call">{plano.objetivo}</h2>
           <div className={styles.abertura}>
             <MessageSquareText size={17} aria-hidden="true" />
@@ -120,7 +120,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         </div>
 
         <div className={styles.fechamento}>
-          <p>Sinal para avançar</p>
+          <p>Você pode avançar quando</p>
           <strong>{plano.fechamento.sinalParaAvancar}</strong>
           <span>“{plano.fechamento.frase}”</span>
         </div>
@@ -130,8 +130,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         <section className={styles.perguntas} aria-labelledby="perguntas-call">
           <header>
             <div>
-              <p>Roteiro da conversa</p>
-              <h2 id="perguntas-call">Perguntas para conduzir a descoberta</h2>
+              <p>Condução</p>
+              <h2 id="perguntas-call">Perguntas essenciais</h2>
             </div>
             <span>{plano.perguntas.length} perguntas</span>
           </header>
@@ -154,7 +154,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             <header>
               <FileSearch size={17} aria-hidden="true" />
               <div>
-                <p>Contexto confirmado</p>
+                <p>Antes de perguntar</p>
                 <h2>O que já sabemos</h2>
               </div>
             </header>
@@ -194,8 +194,10 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             <div className={styles.coachPronto}>
               <BadgeCheck size={18} aria-hidden="true" />
               <div>
-                <strong>Live Coach pronto</strong>
-                <span>Durante a reunião, ele usa este roteiro e o que o cliente disser.</span>
+                <strong>Live Coach preparado</strong>
+                <span>
+                  Durante a reunião, ele acompanha este objetivo e sugere uma pergunta por vez.
+                </span>
               </div>
             </div>
           </section>

@@ -119,10 +119,10 @@ export function PainelCalls({
       ) : null}
 
       {proxima && (
-        <section className={styles.proximaCall} data-on-dark aria-labelledby="proxima-call-titulo">
+        <section className={styles.proximaCall} aria-labelledby="proxima-call-titulo">
           <div className={styles.proximaContexto}>
             <div className={styles.proximaLinha}>
-              <p>Sua próxima reunião</p>
+              <p>Comece por aqui</p>
               <span data-status={proxima.status}>
                 {proxima.status === 'ao_vivo' ? (
                   <Radio size={13} strokeWidth={1.9} aria-hidden="true" />
@@ -142,13 +142,14 @@ export function PainelCalls({
               <span>{ROTULO_TIPO_CALL[proxima.tipo]}</span>
               {proxima.liveCoachAtivo && (
                 <span>
-                  <Layers3 size={13} aria-hidden="true" /> Live Coach pronto
+                  <Layers3 size={13} aria-hidden="true" /> Roteiro e coach prontos
                 </span>
               )}
             </div>
           </div>
 
-          <div className={styles.proximaHorario}>
+          <div className={styles.proximaHorario} data-on-dark>
+            <p className={styles.horarioRotulo}>Próxima reunião</p>
             <div className={styles.dataPrincipal}>
               <CalendarDays size={18} strokeWidth={1.7} aria-hidden="true" />
               <span>
@@ -171,7 +172,9 @@ export function PainelCalls({
         <section className={styles.agenda} aria-labelledby="agenda-titulo">
           <header className={styles.secaoTopo}>
             <div>
-              <h2 id="agenda-titulo">{proxima || recemAgendada ? 'Depois desta' : 'Agenda'}</h2>
+              <h2 id="agenda-titulo">
+                {proxima || recemAgendada ? 'Próximas reuniões' : 'Agenda'}
+              </h2>
               <p>
                 {proxima
                   ? seguintes.length > 0
@@ -271,19 +274,14 @@ export function PainelCalls({
           )}
         </section>
 
-        <aside className={styles.apoioCall} aria-label="Recursos da sala">
+        <aside className={styles.apoioCall} aria-label="Memória das reuniões">
           <span className={styles.apoioIcone} aria-hidden="true">
             <AudioLines size={20} strokeWidth={1.7} />
           </span>
-          <div>
-            <strong>Live Coach</strong>
-            <span>
-              {comCoach > 0
-                ? `${comCoach} ${comCoach === 1 ? 'reunião preparada' : 'reuniões preparadas'}`
-                : 'Disponível ao abrir a sala'}
-            </span>
-          </div>
-          <p>Transcrição, resumo e próxima ação são salvos na ficha do cliente.</p>
+          <p>
+            <strong>{comCoach > 0 ? 'Live Coach preparado.' : 'Memória automática.'}</strong> A
+            conversa vira resumo, decisões e próximo passo na ficha do cliente.
+          </p>
         </aside>
       </div>
 

@@ -66,7 +66,7 @@ export function CabineLiveCoach({
           <i />
         </span>
         <div>
-          <p>{ativo ? 'Live Coach' : 'Memória da reunião'}</p>
+          <p>{ativo ? 'Coach da reunião' : 'Memória da reunião'}</p>
           <span>{ROTULO_ESTADO[estado]}</span>
         </div>
         <span className={styles.privado}>
@@ -77,7 +77,7 @@ export function CabineLiveCoach({
       <section className={styles.recomendacao} aria-live="polite" aria-atomic="true">
         <div className={styles.rotuloSecao}>
           <Layers3 size={15} strokeWidth={1.8} aria-hidden="true" />
-          Uma orientação por vez
+          Próxima pergunta
         </div>
         {sugestao ? (
           <>
@@ -88,17 +88,17 @@ export function CabineLiveCoach({
             <h2>{sugestao.titulo}</h2>
             <p>{sugestao.sugestao}</p>
             {sugestao.trecho_gatilho && (
-              <p className={styles.evidencia}>Ouvido agora: “{sugestao.trecho_gatilho}”</p>
+              <p className={styles.evidencia}>Baseado no que ouvi: “{sugestao.trecho_gatilho}”</p>
             )}
           </>
         ) : (
           <div className={styles.espera}>
             {ativo && plano ? (
               <>
-                <span className={styles.planoRotulo}>Comece com o plano preparado</span>
+                <span className={styles.planoRotulo}>Objetivo da conversa</span>
                 <h2>{plano.objetivo}</h2>
                 <p className={styles.primeiraPergunta}>
-                  Primeira pergunta: “{plano.perguntas[0]?.pergunta}”
+                  Comece perguntando: “{plano.perguntas[0]?.pergunta}”
                 </p>
               </>
             ) : (
@@ -120,7 +120,7 @@ export function CabineLiveCoach({
       <section className={styles.transcricao}>
         <div className={styles.rotuloSecao}>
           <AudioLines size={15} strokeWidth={1.8} aria-hidden="true" />
-          Transcrição agora
+          Última fala
         </div>
         <p className={parcial ? styles.falaParcial : undefined}>{fala}</p>
         {falha && <small role="status">{falha}</small>}
@@ -133,7 +133,7 @@ export function CabineLiveCoach({
         </span>
         <span>
           <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
-          Ao encerrar: resumo, decisões e próximo passo na ficha do cliente
+          Resumo e decisões na ficha ao encerrar
         </span>
       </footer>
     </aside>

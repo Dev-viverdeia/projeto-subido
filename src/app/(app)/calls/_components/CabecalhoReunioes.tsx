@@ -14,8 +14,8 @@ export function CabecalhoReunioes({
         <h1>Reuniões</h1>
         <p>
           {comercialLiberado
-            ? 'Agende, conduza e registre cada conversa.'
-            : 'Agende e conduza suas conversas.'}
+            ? 'Prepare a conversa, conduza a decisão e registre o próximo passo.'
+            : 'Prepare e conduza cada conversa com clareza.'}
         </p>
       </div>
       {children}
