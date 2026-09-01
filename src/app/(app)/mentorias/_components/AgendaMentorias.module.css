@@ -129,7 +129,7 @@
 .diaMono {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   color: var(--via-text-faint);
 }

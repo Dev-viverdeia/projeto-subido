@@ -90,7 +90,7 @@
   flex-direction: column;
   gap: 5px;
   color: var(--via-text-faint);
-  font-size: 0.62rem;
+  font-size: var(--app-fs-micro);
   font-weight: var(--via-fw-semibold);
 }
 
@@ -167,7 +167,7 @@
   }
 
   .passos li {
-    font-size: 0.56rem;
+    font-size: var(--app-fs-micro);
   }
 }
 

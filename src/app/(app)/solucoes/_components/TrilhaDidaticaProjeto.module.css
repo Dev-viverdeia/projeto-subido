@@ -545,7 +545,7 @@
   border: 1px solid var(--via-border);
   border-radius: var(--via-radius-pill);
   background: var(--via-surface);
-  font-size: 0.58rem;
+  font-size: var(--app-fs-micro);
   color: var(--via-text-muted);
 }
 
@@ -568,7 +568,7 @@
 
 .fluxo small {
   display: block;
-  font-size: 0.6rem;
+  font-size: var(--app-fs-micro);
   line-height: 1.45;
   color: var(--via-text-muted);
 }

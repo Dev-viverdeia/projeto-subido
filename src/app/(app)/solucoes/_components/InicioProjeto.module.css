@@ -210,7 +210,7 @@
   display: grid;
   place-items: center;
   color: var(--via-text-faint);
-  font-size: 0.58rem;
+  font-size: var(--app-fs-micro);
 }
 
 .icone {
@@ -230,7 +230,7 @@
 
 .conteudo p {
   color: var(--via-accent-ink);
-  font-size: 0.58rem;
+  font-size: var(--app-fs-micro);
 }
 
 .conteudo strong {
@@ -270,7 +270,7 @@
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-chip);
   color: var(--via-text-faint);
-  font-size: 0.55rem;
+  font-size: var(--app-fs-micro);
 }
 
 .estado[data-pronto] {

@@ -52,6 +52,20 @@
   --app-ls-micro: 0.03em;
   --app-ls-eyebrow: 0.06em;
 
+  /* Escala de leitura da área autenticada.
+     O DS original foi concebido com alta densidade (10/12/14px), adequada a
+     tabelas compactas, mas a plataforma usa esses degraus também em orientação,
+     ações e descrições. Estes papéis elevam a base sem alterar a landing nem os
+     documentos públicos: o shell logado faz o mapeamento logo abaixo dele. */
+  --app-fs-reading: 1.0625rem; /* 17px · texto que precisa ser compreendido */
+  --app-fs-ui: 0.9375rem; /* 15px · navegação e controles */
+  --app-fs-support: 0.875rem; /* 14px · ajuda e contexto curto */
+  --app-fs-meta: 0.8125rem; /* 13px · estados, datas e contagens */
+  --app-fs-micro: 0.75rem; /* 12px · eyebrow e metadado realmente auxiliar */
+  --app-fs-section-title: 1.25rem; /* 20px · título dentro de card */
+  --app-lh-reading: 1.62;
+  --app-lh-ui: 1.45;
+
   /* Forma, densidade e elevação por papel. */
   --app-radius-surface: var(--via-radius-xl);
   --app-radius-card: var(--via-radius-lg);
