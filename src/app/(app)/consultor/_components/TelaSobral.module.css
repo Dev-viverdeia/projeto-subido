@@ -16,12 +16,12 @@
 .cabecalho {
   position: relative;
   z-index: 3;
-  min-height: 60px;
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding: 0 clamp(var(--via-space-2), 2vw, var(--via-space-5)) var(--via-space-3);
+  padding: 0 clamp(var(--via-space-3), 2vw, var(--via-space-6)) var(--via-space-4);
   border-bottom: 1px solid var(--via-border-hairline);
   background: color-mix(in srgb, var(--via-bg-2) 68%, transparent);
   backdrop-filter: blur(18px) saturate(132%);
@@ -47,8 +47,8 @@
 }
 
 .marca {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
@@ -70,7 +70,7 @@
   max-width: 100%;
   overflow: hidden;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   font-weight: var(--via-fw-semibold);
   letter-spacing: var(--app-ls-h3);
   white-space: nowrap;
@@ -82,7 +82,7 @@
   margin-top: 2px;
   overflow: hidden;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -104,7 +104,7 @@
   border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-surface) 58%, transparent);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: 0.8125rem;
   white-space: nowrap;
   cursor: pointer;
   list-style: none;
@@ -144,8 +144,8 @@
   z-index: 8;
   top: calc(100% + var(--via-space-2));
   right: 0;
-  width: min(380px, calc(100vw - 40px));
-  padding: var(--via-space-4);
+  width: min(420px, calc(100vw - 40px));
+  padding: var(--via-space-5);
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: color-mix(in srgb, var(--via-surface) 97%, transparent);
@@ -169,19 +169,19 @@
 
 .contextoCabecalho strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
 }
 
 .contextoCabecalho p {
   margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   line-height: var(--via-lh-normal);
 }
 
 .contextoIcone {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
   border: 1px solid var(--app-elev-1-line);
@@ -221,13 +221,13 @@
 
 .contextoFontes strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   font-weight: var(--via-fw-semibold);
 }
 
 .contextoFontes small {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-snug);
 }
 
@@ -238,7 +238,7 @@
   padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
 }
 
 .novaConversa {
@@ -246,7 +246,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  padding-inline: var(--via-space-3);
+  padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
@@ -291,12 +291,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
 }
 
 @media (min-width: 1081px) {
   .areaChat {
-    max-width: 1080px;
+    max-width: 1240px;
   }
 }
 
@@ -365,23 +365,28 @@
 }
 
 .historico {
-  width: 100%;
+  width: min(100%, 980px);
   min-width: 0;
   min-height: 280px;
+  margin-inline: auto;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--via-space-5) var(--via-space-3) var(--via-space-8);
-  scrollbar-gutter: stable;
-  scrollbar-color: var(--via-border) transparent;
+  padding: var(--via-space-6) 0 var(--via-space-8);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.historico::-webkit-scrollbar {
+  display: none;
 }
 
 .compositor {
   position: sticky;
   bottom: 0;
   z-index: 2;
-  width: 100%;
+  width: min(100%, 980px);
   min-width: 0;
-  max-width: 100%;
+  margin-inline: auto;
   padding-top: var(--via-space-2);
   background: linear-gradient(
     to bottom,
@@ -443,6 +448,16 @@
 
   .cabecalho {
     min-height: 64px;
+    gap: var(--via-space-2);
+    padding-inline: var(--via-space-3);
+  }
+
+  .identidade {
+    flex: 0 0 auto;
+  }
+
+  .identidade > div {
+    display: none;
   }
 
   .novaConversa {
@@ -491,5 +506,9 @@
 
   .historico {
     padding-inline: 0;
+  }
+
+  .compositor {
+    bottom: calc(var(--via-space-2) + env(safe-area-inset-bottom, 0px));
   }
 }

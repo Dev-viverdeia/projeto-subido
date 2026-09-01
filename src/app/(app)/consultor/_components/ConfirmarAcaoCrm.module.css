@@ -17,7 +17,7 @@
 }
 
 .convite {
-  padding: var(--app-pad-card-tight);
+  padding: var(--via-space-5);
 }
 
 .registro {
@@ -39,8 +39,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
@@ -69,7 +69,7 @@
 .campoAcao > span,
 .campoData > span {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: 0.6875rem;
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -79,7 +79,7 @@
 .comprovanteCorpo strong {
   overflow: hidden;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
   text-overflow: ellipsis;
@@ -90,7 +90,7 @@
 .comprovanteCorpo em {
   overflow: hidden;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: 0.8125rem;
   font-style: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -119,7 +119,7 @@
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
   transition:
     background-color var(--app-t-state),
@@ -187,13 +187,13 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 34px;
+  min-height: 40px;
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   background: transparent;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   font-weight: var(--via-fw-medium);
   transition:
     border-color var(--app-t-state),
@@ -268,7 +268,7 @@
 .formularioTopo strong,
 .painelGestao header strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
 }
@@ -288,7 +288,7 @@
   background: var(--via-bg);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   transition:
     border-color var(--app-t-state),
     box-shadow var(--app-t-state);
@@ -332,7 +332,7 @@
   border-radius: var(--app-radius-control);
   background: transparent;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
 }
 
@@ -351,7 +351,7 @@
 .seguranca,
 .erro {
   margin: 0;
-  font-size: var(--via-fs-micro);
+  font-size: 0.8125rem;
   line-height: var(--via-lh-normal);
 }
 
@@ -410,7 +410,7 @@
 .recomendacaoCarregando strong,
 .revisaoRecomendacao header strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
   text-wrap: pretty;
@@ -421,8 +421,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
@@ -433,7 +433,7 @@
   margin: 0;
   padding: 0 var(--app-pad-card-tight) var(--via-space-4);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
   text-wrap: pretty;
 }
@@ -452,7 +452,7 @@
   gap: var(--via-space-2);
   color: var(--via-navy);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: 0.6875rem;
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
@@ -479,13 +479,13 @@
 .baseFactual li small {
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   letter-spacing: var(--app-ls-micro);
 }
 
 .baseFactual li span {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   line-height: var(--via-lh-normal);
 }
 
@@ -500,7 +500,7 @@
 .rodapeRecomendacao p {
   margin: 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
 }
 
 .recomendacaoCarregando {
@@ -509,7 +509,7 @@
 
 .recomendacaoCarregando em {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   font-style: normal;
   line-height: var(--via-lh-normal);
 }
@@ -519,13 +519,13 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 34px;
+  min-height: 40px;
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   background: transparent;
   color: var(--via-navy);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   font-weight: var(--via-fw-medium);
   transition:
     border-color var(--app-t-state),
@@ -569,10 +569,10 @@
   display: flex;
   align-items: center;
   gap: var(--via-space-2);
-  min-height: 38px;
+  min-height: 42px;
   padding-inline: var(--app-pad-card-tight);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   cursor: pointer;
   list-style: none;
 }
@@ -645,14 +645,14 @@
 
 .historico li strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: 0.8125rem;
   font-weight: var(--via-fw-medium);
 }
 
 .historico li em,
 .historico time {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
   font-style: normal;
   line-height: var(--via-lh-normal);
 }

@@ -65,7 +65,9 @@
   --app-gap-block: var(--via-space-6);
   --app-gap-grid: var(--via-space-5);
   --app-gap-section: var(--via-space-10);
-  --app-h-control: 40px;
+  /* 44px preserva alvo de toque e corrige a densidade excessivamente compacta
+     percebida em telas amplas sem inflar a tipografia de conteúdo. */
+  --app-h-control: 44px;
 
   --app-elev-1-bg: var(--via-glass-card);
   --app-elev-1-line: var(--via-border-soft);
