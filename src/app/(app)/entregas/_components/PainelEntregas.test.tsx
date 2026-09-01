@@ -55,7 +55,7 @@ describe('PainelEntregas', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Entregas dos clientes' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Entregas' })).toBeInTheDocument();
     expect(screen.getByText('Validar o roteiro de atendimento com o cliente')).toBeInTheDocument();
     expect(screen.getByLabelText('40% da entrega concluída')).toBeInTheDocument();
     expect(

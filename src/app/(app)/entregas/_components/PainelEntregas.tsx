@@ -166,8 +166,7 @@ function LinhaEntrega({
           </div>
         </div>
 
-        <span className={styles.linhaAbrir}>
-          Abrir
+        <span className={styles.linhaAbrir} aria-hidden="true">
           <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
         </span>
       </Link>
@@ -224,11 +223,6 @@ export function PainelEntregas({
   const aguardandoCliente = ativos.filter(
     (projeto) => prioridades.get(projeto.id)?.grupo === 'cliente',
   ).length;
-  const revisoesAgora = concluidos.filter((projeto) => {
-    if (!projeto.evolucao || projeto.evolucao.status === 'registrada') return false;
-    const sinal = classificarRevisaoEvolucao(projeto.evolucao, agora);
-    return sinal.status === 'vencida' || sinal.status === 'hoje' || sinal.status === 'proxima';
-  }).length;
   const principal = ativos[0] ?? null;
   const prioridadePrincipal = principal ? prioridades.get(principal.id) : null;
   const demaisAtivos = ativos.slice(1);
@@ -237,7 +231,7 @@ export function PainelEntregas({
     <div className={styles.pagina}>
       <header className={styles.hero}>
         <div className={styles.heroTexto}>
-          <h1>Entregas dos clientes</h1>
+          <h1>Entregas</h1>
           <p>Execute o próximo passo de cada cliente.</p>
         </div>
         <dl className={styles.resumo} aria-label="Resumo das entregas">
@@ -248,10 +242,6 @@ export function PainelEntregas({
           <div>
             <dt>Pedem ação</dt>
             <dd>{precisamAcao + aguardandoCliente}</dd>
-          </div>
-          <div>
-            <dt>Revisões agora</dt>
-            <dd>{revisoesAgora}</dd>
           </div>
           <div>
             <dt>Entregues</dt>
