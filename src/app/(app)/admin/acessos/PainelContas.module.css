@@ -65,7 +65,7 @@
   display: grid;
   grid-template-columns:
     minmax(280px, 1.6fr) minmax(110px, 0.45fr) minmax(110px, 0.45fr) minmax(150px, 0.65fr)
-    24px;
+    minmax(104px, auto);
   align-items: center;
   gap: var(--via-space-5);
 }
@@ -152,14 +152,14 @@
 
 .identidade strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-semibold);
 }
 
 .identidade small,
 .data {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-xs);
 }
 
 .plano {
@@ -192,14 +192,30 @@
   font-variant-numeric: tabular-nums;
 }
 
-.seta {
-  color: var(--via-text-faint);
-  transition: transform var(--app-t-touch);
+.acaoLinha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 40px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 52%, transparent);
+  color: var(--via-navy);
+  font-size: var(--via-fs-xs);
+  font-weight: var(--via-fw-semibold);
+  transition:
+    transform var(--app-t-touch),
+    border-color var(--app-t-state),
+    background-color var(--app-t-state);
 }
 
-.linha:hover .seta {
-  color: var(--via-navy);
-  transform: translateX(3px);
+.linha:hover .acaoLinha {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+  transform: translateX(2px);
 }
 
 .vazio {
@@ -579,8 +595,10 @@
     justify-self: end;
   }
 
-  .seta {
-    display: none;
+  .acaoLinha {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 44px;
   }
 
   .faixaConta,

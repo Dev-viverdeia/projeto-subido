@@ -1,4 +1,3 @@
-import { CalendarClock } from 'lucide-react';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import { ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ResolverReuniaoPendente } from './ResolverReuniaoPendente';
@@ -29,7 +28,6 @@ export function PendenciasReunioes({ reunioes }: { reunioes: ReuniaoCall[] }) {
           </h2>
           <p>Os horários passaram, mas essas reuniões não foram concluídas.</p>
         </div>
-        <CalendarClock size={20} strokeWidth={1.7} aria-hidden="true" />
       </header>
       <div className={styles.pendenciasLista}>
         {reunioes.map((reuniao) => (

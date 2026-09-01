@@ -100,10 +100,10 @@ export function PainelContas({
       <section className={styles.lista} aria-labelledby="titulo-lista-contas">
         <header>
           <div>
-            <p className={styles.sobretitulo}>Contas</p>
-            <h2 id="titulo-lista-contas">Plano e saldo em um só lugar</h2>
+            <p className={styles.sobretitulo}>Contas encontradas</p>
+            <h2 id="titulo-lista-contas">Contas</h2>
           </div>
-          <span>Clique em uma conta para administrar</span>
+          <span>{contasAtuais.length} nesta página</span>
         </header>
 
         <div className={styles.cabecalhoTabela} aria-hidden="true">
@@ -111,7 +111,7 @@ export function PainelContas({
           <span>Plano</span>
           <span>Créditos</span>
           <span>Último acesso</span>
-          <span />
+          <span>Ação</span>
         </div>
 
         <div className={styles.linhas}>
@@ -138,7 +138,10 @@ export function PainelContas({
                 <Coins size={15} strokeWidth={1.8} aria-hidden="true" /> {item.saldo}
               </span>
               <span className={styles.data}>{dataCurta(item.ultimoAcessoEm)}</span>
-              <ArrowRight className={styles.seta} size={17} strokeWidth={1.8} aria-hidden="true" />
+              <span className={styles.acaoLinha}>
+                Administrar
+                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+              </span>
             </button>
           ))}
         </div>
