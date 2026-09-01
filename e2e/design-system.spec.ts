@@ -20,6 +20,9 @@ const TELAS = [
   ['/preview/entregas', 'Execute o próximo passo de cada cliente.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
+  ['/preview/mentorias', 'Leve um caso. Saia com o próximo passo.'],
+  ['/preview/certificados', 'Comprove o que você concluiu.'],
+  ['/preview/certificado', 'ChatGPT para o trabalho'],
 ] as const;
 
 test.describe('fundação visual Viver de IA', () => {
@@ -187,5 +190,29 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('status')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Salvando a conversa' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toHaveCount(0);
+  });
+
+  test('Mentorias explica o custo antes de confirmar o check-in', async ({ page }) => {
+    await page.goto('/preview/mentorias');
+
+    await page
+      .getByRole('button', { name: /Fazer check-in · 1 crédito/ })
+      .first()
+      .click();
+    const dialogo = page.getByRole('dialog', { name: 'Confirmar check-in' });
+    await expect(dialogo).toContainText('Saldo atual');
+    await expect(dialogo).toContainText('Saldo depois');
+    await expect(dialogo.getByRole('button', { name: 'Usar 1 crédito e confirmar' })).toBeVisible();
+  });
+
+  test('Certificados prioriza a prova pública e o compartilhamento', async ({ page }) => {
+    await page.goto('/preview/certificados');
+    await expect(page.getByRole('heading', { name: 'Conquistados' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Ver certificado' })).toBeVisible();
+
+    await page.goto('/preview/certificado');
+    await expect(page.getByRole('link', { name: 'Compartilhar no LinkedIn' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Copiar link' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvar em PDF' })).toBeVisible();
   });
 });

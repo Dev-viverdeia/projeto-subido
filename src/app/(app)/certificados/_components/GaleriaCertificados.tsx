@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { avaliarCertificado, type EstadoCertificado } from '@/lib/certificados/criterios';
 import type { FormacaoResumo, SolucaoResumo } from '@/lib/conteudo/queries';
 import { idsAulasProjeto } from '@/lib/projetos/roteiro';
-import { useProgresso } from '@/lib/progresso/local';
+import { useProgresso, type EstadoProgressoConta } from '@/lib/progresso/local';
 import { dataCurta } from '../../builder/_components/statusBuilder';
 import { Visto } from '../../_components/PillEstado';
 import styles from './GaleriaCertificados.module.css';
@@ -50,11 +50,14 @@ const ROTULO_ORIGEM: Record<Origem, string> = {
 export function GaleriaCertificados({
   formacoes,
   solucoes,
+  progressoPreview,
 }: {
   formacoes: FormacaoResumo[];
   solucoes: SolucaoResumo[];
+  progressoPreview?: EstadoProgressoConta;
 }) {
-  const progresso = useProgresso();
+  const progressoConta = useProgresso();
+  const progresso = progressoPreview ?? progressoConta;
 
   const conteudos: Conteudo[] = [
     ...formacoes.map((f) => ({
@@ -120,16 +123,12 @@ export function GaleriaCertificados({
   if (conquistados.length === 0 && andamento.length === 0) {
     return (
       <div className={styles.vazioEstado}>
-        <div className={`${styles.vazio} via-mesh-navy via-noise`}>
+        <div className={styles.vazio}>
           <div className={styles.vazioConteudo}>
-            <p className={styles.vazioEyebrow}>
-              Nenhum certificado ainda · {conteudos.length}{' '}
-              {conteudos.length === 1 ? 'conteúdo disponível' : 'conteúdos disponíveis'}
-            </p>
-            <p className={styles.vazioTitulo}>Você ainda não concluiu uma formação ou projeto.</p>
+            <p className={styles.vazioEyebrow}>Sua primeira conquista</p>
+            <p className={styles.vazioTitulo}>Conclua. Comprove. Compartilhe.</p>
             <p className={styles.vazioTexto}>
-              Conclua todas as aulas de uma formação. Nos projetos, conclua também os passos da
-              implementação. O certificado será liberado automaticamente.
+              O certificado é liberado automaticamente quando o caminho chega a 100%.
             </p>
             <div className={styles.vazioAcoes}>
               <Link href="/formacoes" className={styles.vazioCta}>
@@ -142,19 +141,19 @@ export function GaleriaCertificados({
           </div>
 
           <div className={styles.vazioRegistro}>
-            <p className={styles.vazioRegistroTitulo}>Como receber um certificado</p>
+            <p className={styles.vazioRegistroTitulo}>Como funciona</p>
             <ol className={styles.vazioDados}>
               <li>
                 <span>01</span>
-                <p>Concluir o aprendizado</p>
+                <p>Conclua as aulas</p>
               </li>
               <li>
                 <span>02</span>
-                <p>Concluir a implementação do projeto</p>
+                <p>Implemente o projeto</p>
               </li>
               <li>
                 <span>03</span>
-                <p>Compartilhar ou salvar em PDF</p>
+                <p>Compartilhe a conquista</p>
               </li>
             </ol>
           </div>
@@ -164,10 +163,8 @@ export function GaleriaCertificados({
           <section className={styles.primeiroPasso} aria-labelledby="certificados-primeiro-passo">
             <div className={styles.primeiroPassoCabecalho}>
               <p className={styles.primeiroPassoEyebrow}>Por onde começar</p>
-              <h2 id="certificados-primeiro-passo">Escolha uma formação ou projeto.</h2>
-              <p>
-                A formação ensina as ferramentas. O projeto mostra como implementar para um cliente.
-              </p>
+              <h2 id="certificados-primeiro-passo">Escolha seu próximo caminho.</h2>
+              <p>Aprenda uma habilidade ou implemente um projeto real.</p>
             </div>
 
             <ul className={styles.recomendacoes}>
@@ -209,7 +206,7 @@ export function GaleriaCertificados({
                 {/* O DIPLOMA: navy, moldura interna de hairline, selo com o
                     visto. Tudo nele é dado real — título, contagem e a data da
                     última marcação. */}
-                <article className={`${styles.diploma} via-mesh-navy via-noise`}>
+                <article className={`${styles.diploma} via-on-dark`}>
                   <span className={styles.moldura} aria-hidden="true" />
                   <div className={styles.diplomaTopo}>
                     <p className={styles.diplomaEyebrow}>Certificado · {ROTULO_ORIGEM[c.origem]}</p>

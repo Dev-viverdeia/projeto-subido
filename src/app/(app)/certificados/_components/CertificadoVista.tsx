@@ -14,7 +14,7 @@ import {
 import { useState } from 'react';
 import { Alert, Button, Spinner } from '@/design-system/via';
 import { avaliarCertificado } from '@/lib/certificados/criterios';
-import { useProgresso } from '@/lib/progresso/local';
+import { useProgresso, type EstadoProgressoConta } from '@/lib/progresso/local';
 import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { Visto } from '../../_components/PillEstado';
@@ -48,6 +48,7 @@ export function CertificadoVista({
   nome,
   codigoInicial,
   siteUrl,
+  progressoPreview,
 }: {
   origem: 'formacao' | 'solucao';
   slug: string;
@@ -58,8 +59,10 @@ export function CertificadoVista({
   nome: string;
   codigoInicial: string | null;
   siteUrl: string;
+  progressoPreview?: EstadoProgressoConta;
 }) {
-  const progresso = useProgresso();
+  const progressoConta = useProgresso();
+  const progresso = progressoPreview ?? progressoConta;
   const [codigo, setCodigo] = useState(codigoInicial);
   const [emitindo, setEmitindo] = useState(false);
   const [erroEmissao, setErroEmissao] = useState<string | null>(null);
@@ -188,6 +191,15 @@ export function CertificadoVista({
         <div className={styles.acoesCertificado}>
           {urlPublica ? (
             <>
+              <a
+                className={styles.linkedin}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Share2 size={16} strokeWidth={1.8} aria-hidden="true" />
+                Compartilhar no LinkedIn
+              </a>
               <button
                 type="button"
                 className={styles.compartilhar}
@@ -200,20 +212,11 @@ export function CertificadoVista({
                 )}
                 {linkCopiado ? 'Link copiado' : 'Copiar link'}
               </button>
-              <a
-                className={styles.linkedin}
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
-                Compartilhar no LinkedIn
-              </a>
             </>
           ) : (
             <button
               type="button"
-              className={styles.compartilhar}
+              className={styles.linkedin}
               disabled={emitindo}
               onClick={() => void gerarLink()}
             >
@@ -222,7 +225,7 @@ export function CertificadoVista({
               ) : (
                 <LinkIcon size={15} />
               )}
-              {emitindo ? 'Gerando link…' : 'Gerar link público'}
+              {emitindo ? 'Preparando…' : 'Preparar para compartilhar'}
             </button>
           )}
           <button type="button" className={styles.imprimir} onClick={() => window.print()}>
@@ -297,7 +300,7 @@ export function CertificadoVista({
         hideClose={estadoEmissao === 'processando'}
         title={
           estadoEmissao === 'processando'
-            ? 'Preparando seu certificado'
+            ? 'Preparando para compartilhar'
             : estadoEmissao === 'sucesso'
               ? 'Certificado pronto para compartilhar'
               : 'Não foi possível gerar o link'
@@ -343,8 +346,8 @@ export function CertificadoVista({
             <p>Estamos registrando o certificado e criando o link público de verificação.</p>
           </div>
         ) : estadoEmissao === 'sucesso' ? (
-          <Alert tone="success" size="compact" title="Link público criado">
-            O certificado pode ser aberto por qualquer pessoa e já está pronto para o LinkedIn.
+          <Alert tone="success" size="compact" title="Pronto para compartilhar">
+            Seu link público foi criado e pode ser verificado por qualquer pessoa.
           </Alert>
         ) : erroEmissao ? (
           <Alert tone="danger" size="compact" title="O certificado não foi alterado">

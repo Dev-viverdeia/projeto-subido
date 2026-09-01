@@ -1,0 +1,32 @@
+.pagina {
+  --via-fs-body: var(--app-fs-reading);
+  --via-fs-sm: var(--app-fs-ui);
+  --via-fs-caption: var(--app-fs-support);
+  --via-fs-xs: var(--app-fs-meta);
+  --via-fs-label: var(--app-fs-micro);
+  --via-fs-micro: var(--app-fs-micro);
+  --via-fs-h4: var(--app-fs-section-title);
+
+  min-height: 100dvh;
+  padding: clamp(var(--via-space-5), 4vw, var(--via-space-10));
+  background: linear-gradient(180deg, var(--via-bg) 0%, var(--via-bg-2) 100%);
+}
+
+.conteudo {
+  width: 100%;
+  max-width: var(--app-canvas);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-gap-section);
+}
+
+@media (max-width: 767px) {
+  .pagina {
+    padding: var(--via-space-4);
+  }
+
+  .conteudo {
+    gap: var(--app-gap-block);
+  }
+}

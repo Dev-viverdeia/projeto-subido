@@ -42,8 +42,8 @@ export default async function MentoriasPage({ searchParams }: PageProps<'/mentor
       <div className={entrada.bloco}>
         <EvolucaoProfissional
           etapa="mentorias"
-          titulo="Tire dúvidas sobre um caso real."
-          descricao="Escolha uma sessão, faça o check-in e leve uma dúvida específica do projeto que está vendendo ou implementando."
+          titulo="Leve um caso. Saia com o próximo passo."
+          descricao="Escolha uma sessão e leve a dúvida que está travando uma venda ou implementação."
         />
       </div>
 

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { ArrowRight, CalendarDays, Coins } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { EmptyState } from '@/design-system/via';
 import { cancelarCheckin, fazerCheckin } from '@/lib/mentorias/actions';
 import type { SessaoMentoria } from '@/lib/mentorias/tipos';
 import type { EstadoMentoria } from './estadoMentoria';
@@ -10,7 +10,6 @@ import { atualizarUrlFiltros } from '../../_components/filtros/espelhoUrl';
 import { AgendaMentorias } from './AgendaMentorias';
 import { CalendarioMentorias } from './CalendarioMentorias';
 import { CartaoProxima } from './CartaoProxima';
-import { TrilhoInscricoes } from './TrilhoInscricoes';
 import { ControleSegmentado } from '../../_components/filtros/ControleSegmentado';
 import { HistoricoDropdown } from '../../_components/HistoricoDropdown';
 import { MeusCheckins } from './MeusCheckins';
@@ -32,12 +31,9 @@ import styles from './MentoriasVista.module.css';
  * sessão ao vivo ou a próxima —, e trocar o modo de leitura não pode esconder a
  * única coisa da tela que é urgente.
  *
- * A LARGURA SEPARA OS DOIS MIOLOS, e é a regra da casa aplicada ao pé da letra:
- * "grade ganha coluna, lista tem MEDIDA". A agenda é uma pilha de linhas de um
- * dado só (hora + título + mentor + CTA) — esticada no canvas de 1600, o miolo
- * vira vão morto entre o título e o botão. O calendário é grade: ele PRECISA da
- * área, e por isso ocupa a largura inteira. O cartão da próxima acompanha o
- * canvas nos dois casos, porque card com mesh gosta de largura.
+ * Agenda, calendário e histórico agora compartilham o mesmo fluxo. Isso evita
+ * uma lateral permanente sem função imediata e deixa a decisão principal ocupar
+ * o canvas com clareza.
  *
  * Este comentário já descreveu um check-in que vivia em estado de tela e "não
  * fingia persistência". Isso deixou de ser verdade quando o pilar ganhou banco —
@@ -118,13 +114,6 @@ export function MentoriasVista({
   const checkinsAbertos = futuras.filter((s) => estadoComInscricao(s) === 'checkin-aberto').length;
   const totalCheckins = sessoes.filter((s) => s.euInscrito).length;
 
-  /* O TRILHO SOME QUANDO NÃO HÁ CHECK-IN — e a GRADE precisa saber disso.
-     `TrilhoInscricoes` já devolvia `null` sozinho, mas a coluna continuava
-     reservada: quem nunca se inscreveu via ~360px de nada à direita da lista, e
-     as linhas ficavam espremidas num canto de uma tela larga. CSS não consegue
-     perguntar "meu filho renderizou?", então quem responde é este booleano. */
-  const temInscricoes = futuras.some((s) => s.euInscrito);
-
   const porId = useCallback(
     (id: string | null) => (id ? (sessoes.find((s) => s.id === id) ?? null) : null),
     [sessoes],
@@ -202,22 +191,39 @@ export function MentoriasVista({
           Este estado passou a ser o estado NORMAL da tela — a agenda deixou de
           ser gerada em código e começa sem nada até o admin cadastrar. */}
       {futuras.length === 0 ? (
-        <EmptyState
-          title={sessoes.length === 0 ? 'Nenhuma mentoria publicada' : 'Nenhuma mentoria agendada'}
-          description="As próximas sessões aparecem aqui com data, horário e custo em créditos. Depois do check-in, a sala fica disponível nesta página."
-          action={
-            <div className={styles.vazioAcoes}>
-              <Link href="/formacoes" className={styles.vazioCta}>
-                Continuar formação
-              </Link>
-              {totalCheckins > 0 ? (
-                <HistoricoDropdown total={totalCheckins} rotulo="Check-ins anteriores">
-                  <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
-                </HistoricoDropdown>
-              ) : null}
+        <section className={styles.vazio} aria-labelledby="mentorias-vazio-titulo">
+          <div className={styles.vazioPrincipal}>
+            <span className={styles.vazioIcone} aria-hidden="true">
+              <CalendarDays size={22} strokeWidth={1.7} />
+            </span>
+            <div>
+              <p className={styles.vazioEyebrow}>Agenda de mentorias</p>
+              <h2 id="mentorias-vazio-titulo">
+                {sessoes.length === 0 ? 'Novas sessões aparecem aqui.' : 'Sua agenda está livre.'}
+              </h2>
+              <p>Você verá mentor, horário e custo antes de confirmar o check-in.</p>
             </div>
-          }
-        />
+          </div>
+
+          <div className={styles.vazioDecisao}>
+            <span className={styles.vazioSaldo}>
+              <Coins size={17} strokeWidth={1.7} aria-hidden="true" />
+              <span>
+                <small>Saldo disponível</small>
+                <strong>{saldo === null ? '—' : saldo} créditos</strong>
+              </span>
+            </span>
+            <Link href="/formacoes" className={styles.vazioCta}>
+              Continuar aprendendo
+              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </Link>
+            {totalCheckins > 0 ? (
+              <HistoricoDropdown total={totalCheckins} rotulo="Ver check-ins">
+                <MeusCheckins sessoes={sessoes} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
+              </HistoricoDropdown>
+            ) : null}
+          </div>
+        </section>
       ) : (
         <>
           {/* AS TABS ABREM A TELA, acima do cartão. Elas escolhem o MODO DE
@@ -226,8 +232,8 @@ export function MentoriasVista({
               que vem depois. */}
           <div className={styles.chrome}>
             <div className={styles.chromeContexto}>
-              <p className={styles.chromeEyebrow}>Agenda de mentorias</p>
-              <p className={styles.chromeResumo}>
+              <p className={styles.chromeEyebrow}>Próximas sessões</p>
+              <p className={styles.chromeResumo} aria-live="polite">
                 {futuras.length} {futuras.length === 1 ? 'próxima sessão' : 'próximas sessões'}
                 {checkinsAbertos > 0 && (
                   <>
@@ -242,6 +248,11 @@ export function MentoriasVista({
             </div>
 
             <div className={styles.chromeAcoes}>
+              <span className={styles.saldoAtual} aria-label={`${saldo ?? 0} créditos disponíveis`}>
+                <Coins size={15} strokeWidth={1.8} aria-hidden="true" />
+                <strong>{saldo === null ? '—' : saldo}</strong>
+                <span>créditos</span>
+              </span>
               {/* O `SeletorVista` era uma CÓPIA do controle segmentado — e o
             comentário do próprio `ControleSegmentado` já dizia que ele fora
             extraído para substituir esta cópia e as abas de catálogo. A
@@ -285,11 +296,7 @@ export function MentoriasVista({
             />
           )}
 
-          <div
-            className={styles.corpo}
-            data-vista={vista}
-            data-apoio={temInscricoes ? '' : undefined}
-          >
+          <div className={styles.corpo} data-vista={vista}>
             <div className={styles.principal}>
               {vista === 'agenda' ? (
                 <AgendaMentorias
@@ -311,11 +318,6 @@ export function MentoriasVista({
                 />
               )}
             </div>
-
-            {/* Some sozinho quando não há check-in — ver o componente. */}
-            <aside className={styles.apoio}>
-              <TrilhoInscricoes sessoes={futuras} agora={agora} aoAbrirDetalhe={abrirDetalhe} />
-            </aside>
           </div>
         </>
       )}
