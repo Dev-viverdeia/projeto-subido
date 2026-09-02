@@ -20,6 +20,7 @@ import {
 } from '@/lib/projetos-execucao/prioridade';
 import { classificarRevisaoEvolucao } from '@/lib/projetos-execucao/radar-evolucao';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
+import { CabecalhoOperacional } from '../../_components/CabecalhoOperacional';
 import styles from './PainelEntregas.module.css';
 import { RadarPosEntrega } from './RadarPosEntrega';
 
@@ -229,26 +230,26 @@ export function PainelEntregas({
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.hero}>
-        <div className={styles.heroTexto}>
-          <h1>Entregas</h1>
-          <p>Veja o próximo passo e mantenha o cliente acompanhando.</p>
-        </div>
-        <dl className={styles.resumo} aria-label="Resumo das entregas">
-          <div>
-            <dt>Ativas</dt>
-            <dd>{ativos.length}</dd>
-          </div>
-          <div>
-            <dt>Com o cliente</dt>
-            <dd>{aguardandoCliente}</dd>
-          </div>
-          <div>
-            <dt>Concluídas</dt>
-            <dd>{concluidos.length}</dd>
-          </div>
-        </dl>
-      </header>
+      <CabecalhoOperacional
+        titulo="Entregas"
+        descricao="Acompanhe a próxima tarefa de cada projeto."
+        resumo={
+          <dl className={styles.resumo} aria-label="Resumo das entregas">
+            <div>
+              <dt>Ativas</dt>
+              <dd>{ativos.length}</dd>
+            </div>
+            <div>
+              <dt>Com o cliente</dt>
+              <dd>{aguardandoCliente}</dd>
+            </div>
+            <div>
+              <dt>Concluídas</dt>
+              <dd>{concluidos.length}</dd>
+            </div>
+          </dl>
+        }
+      />
 
       {principal ? (
         <section className={styles.emAndamento} aria-labelledby="titulo-em-andamento">

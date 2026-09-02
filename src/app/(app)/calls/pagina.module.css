@@ -7,35 +7,6 @@
   gap: var(--app-gap-section);
 }
 
-.topo {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--app-gap-section);
-  padding: 0 var(--via-space-1);
-}
-
-.introducao h1,
-.introducao p {
-  margin: 0;
-}
-
-.introducao h1 {
-  font-size: clamp(2rem, 3vw, 2.8rem);
-  font-weight: 560;
-  line-height: 1;
-  letter-spacing: var(--app-ls-h1);
-}
-
-.introducao > p:last-child {
-  max-width: 62ch;
-  margin-top: var(--via-space-2);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  text-wrap: pretty;
-}
-
 .sobretitulo {
   color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
@@ -528,7 +499,7 @@
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--app-radius-control);
   background: color-mix(in srgb, var(--via-accent) 8%, var(--via-surface));
   color: var(--via-accent-ink);
 }
@@ -787,21 +758,6 @@
   color: var(--via-text-muted);
 }
 
-.acaoVazio {
-  grid-column: 2;
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  min-height: 44px;
-  padding-inline: var(--via-space-3);
-  border-radius: var(--app-radius-control);
-  color: var(--via-accent-ink);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  text-decoration: none;
-}
-
 .apoioCall {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1047,11 +1003,6 @@
 }
 
 @media (max-width: 767px) {
-  .topo {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .callCriada {
     grid-template-columns: 1fr;
   }
@@ -1120,24 +1071,6 @@
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
     padding: var(--via-space-5);
-  }
-
-  .acaoVazio {
-    grid-column: 1;
-  }
-
-  .topo {
-    gap: var(--via-space-4);
-    padding-top: 0;
-  }
-
-  .introducao h1 {
-    font-size: 2.2rem;
-  }
-
-  .introducao > p:last-child {
-    margin-top: var(--via-space-2);
-    font-size: var(--via-fs-sm);
   }
 
   .callCriada {

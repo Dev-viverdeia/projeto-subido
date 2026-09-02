@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import styles from '../pagina.module.css';
+import { CabecalhoOperacional } from '../../_components/CabecalhoOperacional';
 
 export function CabecalhoReunioes({
   comercialLiberado,
@@ -9,16 +9,14 @@ export function CabecalhoReunioes({
   children: ReactNode;
 }) {
   return (
-    <header className={styles.topo}>
-      <div className={styles.introducao}>
-        <h1>Reuniões</h1>
-        <p>
-          {comercialLiberado
-            ? 'Prepare a conversa, conduza a decisão e registre o próximo passo.'
-            : 'Prepare e conduza cada conversa com clareza.'}
-        </p>
-      </div>
-      {children}
-    </header>
+    <CabecalhoOperacional
+      titulo="Reuniões"
+      descricao={
+        comercialLiberado
+          ? 'Prepare, conduza e registre cada conversa.'
+          : 'Prepare e conduza cada conversa.'
+      }
+      acao={children}
+    />
   );
 }

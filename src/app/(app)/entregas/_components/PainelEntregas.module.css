@@ -24,23 +24,6 @@
   color: var(--via-text-soft);
 }
 
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(var(--via-space-6), 4vw, var(--via-space-9));
-  min-height: 136px;
-  padding: clamp(24px, 2.4vw, 32px);
-  border: var(--via-glass-ring);
-  border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  box-shadow:
-    var(--app-elev-2-shadow),
-    inset 0 1px 0 var(--via-edge-hi);
-  backdrop-filter: blur(24px) saturate(145%);
-}
-
-.heroIcone,
 .vazioIcone,
 .iconeEntrega,
 .checkConcluido {
@@ -54,35 +37,6 @@
   box-shadow:
     var(--app-elev-1-shadow),
     inset 0 1px 0 var(--via-edge-hi);
-}
-
-.heroIcone {
-  width: 56px;
-  height: 56px;
-}
-
-.heroTexto {
-  min-width: 0;
-}
-
-.heroTexto h1 {
-  max-width: 22ch;
-  margin: var(--via-space-2) 0 0;
-  color: var(--via-text-primary);
-  font-size: clamp(2.2rem, 3.4vw, 3rem);
-  font-weight: var(--via-fw-medium);
-  line-height: 1;
-  letter-spacing: var(--app-ls-h1);
-  text-wrap: balance;
-}
-
-.heroTexto > p:last-child {
-  max-width: 59ch;
-  margin: var(--via-space-3) 0 0;
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  text-wrap: pretty;
 }
 
 .resumo {
@@ -806,7 +760,6 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .hero,
   .resumo,
   .cartao > a,
   .vazio {
@@ -815,10 +768,6 @@
 }
 
 @media (max-width: 1079px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .resumo {
     grid-column: 1 / -1;
   }
@@ -893,21 +842,6 @@
 @media (max-width: 599px) {
   .pagina {
     gap: var(--app-gap-block);
-  }
-
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
-    padding: var(--via-space-5);
-  }
-
-  .heroIcone {
-    width: 48px;
-    height: 48px;
-  }
-
-  .heroTexto h1 {
-    font-size: clamp(2.1rem, 10vw, 2.7rem);
   }
 
   .resumo {
