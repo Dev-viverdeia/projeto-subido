@@ -10,10 +10,34 @@ import {
   UsersRound,
 } from 'lucide-react';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
+import { PrioridadeOperacional } from '@/app/(app)/inicio/_components/PrioridadeOperacional';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { montarPlanoJornada } from '@/lib/jornada/motor';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Mapa da jornada' };
+
+const planoPreview = montarPlanoJornada({
+  perfil: null,
+  aprendizado: {
+    aulasConcluidas: 4,
+    formacoesConcluidas: 1,
+    etapasConcluidas: 0,
+    projetosConcluidos: 1,
+  },
+  oportunidades: { total: 1, enriquecidas: 1, comProximaAcao: 0, ganhas: 0 },
+  calls: { descobertasConcluidas: 0, kickoffsConcluidos: 0, entregasConcluidas: 0 },
+  propostas: { total: 0, apresentadas: 0, aceitas: 0 },
+  entregas: {
+    projetosIniciados: 0,
+    projetosConcluidos: 0,
+    propostaAceitaEmFocoId: null,
+    projetoEmFocoId: null,
+    projetoEmFocoTitulo: null,
+    tarefasConcluidas: 0,
+    tarefasTotal: 0,
+  },
+});
 
 /**
  * Bancada visual local para comparar a implementação com a direção aprovada.
@@ -60,7 +84,21 @@ export default function PreviewMapaJornadaPage() {
         </div>
       </aside>
       <main id="conteudo" className={styles.conteudo}>
-        <MapaJornada nome="Mateus" proximaMentoria="Chamada de alinhamento" />
+        <MapaJornada
+          nome="Mateus"
+          plano={planoPreview}
+          prioridade={
+            <PrioridadeOperacional
+              etapa="Prospectar"
+              titulo="Defina a próxima ação"
+              detalhe="Registre o que será feito e a data do próximo contato."
+              evidencia="Nenhuma próxima ação registrada."
+              destino="/vendas"
+              acao="Definir próxima ação"
+            />
+          }
+          proximaMentoria="Chamada de alinhamento"
+        />
       </main>
     </div>
   );

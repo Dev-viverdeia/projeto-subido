@@ -3,12 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { PrioridadeOperacional } from './PrioridadeOperacional';
 
 describe('PrioridadeOperacional', () => {
-  it('abre a ação exata e leva a dúvida para o chat da Início', () => {
+  it('mostra uma única ação principal com o status atual', () => {
     render(
       <PrioridadeOperacional
-        modo="leitura factual"
         etapa="Vender"
-        foco="Conduzir a decisão da Clínica Aurora"
         titulo="Apresente a proposta"
         detalhe="Use os fatos confirmados na descoberta para conduzir a decisão com clareza."
         evidencia="Proposta apresentada e próxima decisão registrada."
@@ -21,10 +19,7 @@ describe('PrioridadeOperacional', () => {
       'href',
       '/propostas/proposta-1',
     );
-    expect(screen.getByRole('link', { name: 'Conversar sobre este passo' })).toHaveAttribute(
-      'href',
-      '/consultor',
-    );
+    expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(screen.getByText('Proposta apresentada e próxima decisão registrada.')).toBeVisible();
   });
 });

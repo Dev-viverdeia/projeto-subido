@@ -6,7 +6,7 @@ const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
-  ['/preview/mapa-jornada', 'Mateus,'],
+  ['/preview/mapa-jornada', 'Defina a próxima ação'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
@@ -71,23 +71,28 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('heading', { name: 'Confirmar o segundo projeto' })).toHaveCount(0);
   });
 
-  test('a Início preserva contraste e leva direto às áreas de trabalho', async ({ page }) => {
+  test('a Início mostra uma única ação e mantém o contexto essencial acessível', async ({
+    page,
+  }) => {
     await page.goto('/preview/mapa-jornada');
 
-    await expect(page.getByRole('heading', { name: 'bem-vindo.' })).toHaveCSS(
-      'color',
-      'rgb(255, 255, 255)',
-    );
-    const abertura = page.getByLabel('Resumo do dia');
-    await expect(abertura).toBeVisible();
+    const comando = page.getByRole('region', { name: 'Próxima ação' });
+    await expect(comando).toBeVisible();
+    await expect(comando.getByRole('heading', { name: 'Defina a próxima ação' })).toBeVisible();
+    await expect(comando.getByRole('link', { name: 'Definir próxima ação' })).toBeVisible();
+    await expect(comando.getByRole('progressbar', { name: 'Progresso do trabalho' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Ver agenda/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'O que já está na sua mesa.' })).toHaveCount(0);
-    await expect(
-      page.getByRole('heading', { name: 'Aprenda e prepare o que você vai entregar.' }),
-    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toHaveCount(0);
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);
+
+    const resultado = await new AxeBuilder({ page }).analyze();
+    const graves = resultado.violations.filter(
+      (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+    );
+    expect(graves).toEqual([]);
   });
 
   test('o Estúdio conduz do briefing ao plano sem prometer executar o serviço', async ({
