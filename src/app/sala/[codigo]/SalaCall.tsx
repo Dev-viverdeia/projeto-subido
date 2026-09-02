@@ -6,6 +6,7 @@ import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/compon
 import {
   CalendarClock,
   CheckCircle2,
+  ClipboardCheck,
   FileText,
   LoaderCircle,
   LockKeyhole,
@@ -20,6 +21,7 @@ import type { PlanoCall } from '@/lib/calls/plano';
 import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { LiveCoach } from './LiveCoach';
+import { RoteiroSala } from './RoteiroSala';
 import styles from './sala.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -59,6 +61,7 @@ export function SalaCall({
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
   const [saida, setSaida] = useState<'processando' | 'encerrada' | null>(null);
   const [recuperacao, setRecuperacao] = useState<Recuperacao | null>(null);
+  const kickoff = convite.tipo === 'kickoff';
   const passouDaJanela = callPassouDaJanela({
     status: convite.status,
     agendadaPara: convite.agendadaPara,
@@ -236,6 +239,7 @@ export function SalaCall({
                 reuniaoId={convite.reuniaoId}
                 ativo={convite.liveCoachAtivo}
                 plano={planoAnfitriao}
+                tipo={convite.tipo}
               />
             </div>
           ) : (
@@ -256,11 +260,17 @@ export function SalaCall({
           </span>
           <p>{saida === 'processando' ? 'Conversa salva' : 'Reunião encerrada'}</p>
           <h1>
-            {saida === 'processando' ? 'Preparando o resumo da reunião' : 'Obrigado por participar'}
+            {saida === 'processando'
+              ? kickoff
+                ? 'Organizando o acordo do projeto'
+                : 'Preparando o resumo da reunião'
+              : 'Obrigado por participar'}
           </h1>
           <span>
             {saida === 'processando'
-              ? 'Você será levado para revisar os fatos e o próximo passo desta venda.'
+              ? kickoff
+                ? 'Você será levado para revisar resultado, responsáveis, acessos, limites e próximos passos.'
+                : 'Você será levado para revisar os fatos e o próximo passo desta venda.'
               : 'Você já pode fechar esta página com segurança.'}
           </span>
           {saida === 'processando' && <i aria-hidden="true" />}
@@ -273,12 +283,14 @@ export function SalaCall({
     <main className={styles.pagina}>
       <div className={styles.marca}>
         <SubidoLogo size={18} variant="mono" />
-        <span className={styles.marcaApoio}>Sala da reunião</span>
+        <span className={styles.marcaApoio}>{kickoff ? 'Sala do kickoff' : 'Sala da reunião'}</span>
       </div>
 
       <section className={styles.cartao}>
         <div className={styles.contexto}>
-          <p className={styles.sobretitulo}>{anfitriao ? 'Sua sala' : 'Você foi convidado'}</p>
+          <p className={styles.sobretitulo}>
+            {anfitriao ? (kickoff ? 'Seu kickoff' : 'Sua sala') : 'Você foi convidado'}
+          </p>
           <h1>{convite.titulo}</h1>
           <div className={styles.horario}>
             <CalendarClock size={18} strokeWidth={1.8} aria-hidden="true" />
@@ -287,32 +299,8 @@ export function SalaCall({
           </div>
 
           <div className={styles.memoria}>
-            <p>Durante a reunião</p>
-            <ol>
-              <li>
-                <span>01</span>
-                <div>
-                  <strong>Transcrição privada</strong>
-                  <small>Ligada à ficha do cliente.</small>
-                </div>
-              </li>
-              <li>
-                <span>02</span>
-                <div>
-                  <strong>Resumo para revisar</strong>
-                  <small>Decisões e próximos passos.</small>
-                </div>
-              </li>
-              {convite.liveCoachAtivo && anfitriao && (
-                <li>
-                  <span>03</span>
-                  <div>
-                    <strong>Coach privado</strong>
-                    <small>Sugestões visíveis só para você.</small>
-                  </div>
-                </li>
-              )}
-            </ol>
+            <p>{kickoff ? 'O que precisa sair definido' : 'Durante a reunião'}</p>
+            <RoteiroSala kickoff={kickoff} mostrarCoach={convite.liveCoachAtivo && anfitriao} />
           </div>
         </div>
 
@@ -321,8 +309,12 @@ export function SalaCall({
             <span>Estado da sala</span>
             <strong>{estadoSala}</strong>
           </div>
-          <h2>Preparar entrada</h2>
-          <p>Confirme seu nome e autorize o registro.</p>
+          <h2>{kickoff ? 'Preparar kickoff' : 'Preparar entrada'}</h2>
+          <p>
+            {kickoff
+              ? 'Confirme seu nome. O acordo só será atualizado após sua revisão.'
+              : 'Confirme seu nome e autorize o registro.'}
+          </p>
 
           <label className={styles.campo}>
             <span>Seu nome</span>
@@ -342,15 +334,25 @@ export function SalaCall({
               onChange={(evento) => setConsentiu(evento.target.checked)}
             />
             <span>
-              Autorizo a gravação e a transcrição para gerar o resumo e os próximos passos.
+              {kickoff
+                ? 'Autorizo a gravação e a transcrição para preparar o acordo do projeto.'
+                : 'Autorizo a gravação e a transcrição para gerar o resumo e os próximos passos.'}
             </span>
           </label>
 
           <div className={styles.destinoDados}>
-            <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
+            {kickoff ? (
+              <ClipboardCheck size={16} strokeWidth={1.8} aria-hidden="true" />
+            ) : (
+              <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
+            )}
             <p>
-              <strong>Depois da reunião</strong>
-              <span>Revise o resumo antes de atualizar a ficha do cliente.</span>
+              <strong>{kickoff ? 'Ao encerrar' : 'Depois da reunião'}</strong>
+              <span>
+                {kickoff
+                  ? 'Revise o acordo antes de iniciar a execução.'
+                  : 'Revise o resumo antes de atualizar a ficha do cliente.'}
+              </span>
             </p>
           </div>
 
@@ -397,7 +399,7 @@ export function SalaCall({
             ) : (
               <Video size={17} strokeWidth={1.9} aria-hidden="true" />
             )}
-            {carregando ? 'Abrindo sala…' : 'Entrar na reunião'}
+            {carregando ? 'Abrindo sala…' : kickoff ? 'Entrar no kickoff' : 'Entrar na reunião'}
           </button>
 
           <div className={styles.seguranca}>

@@ -68,4 +68,25 @@ describe('CabineLiveCoach', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Quantas oportunidades são perdidas por mês/)).toBeInTheDocument();
   });
+
+  it('orienta o kickoff pelos pontos do acordo sem marcar decisões não confirmadas', () => {
+    render(
+      <CabineLiveCoach
+        ativo
+        estado="escutando"
+        sugestao={SUGESTAO}
+        fala="A primeira validação precisa acontecer em duas semanas."
+        tipo="kickoff"
+      />,
+    );
+
+    expect(
+      screen.getByRole('complementary', { name: 'Acordo do projeto privado' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Próximo ponto a confirmar')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pontos para confirmar no kickoff')).toHaveTextContent(
+      'ResultadoResponsáveisAcessosLimites',
+    );
+    expect(screen.getByText(/acordo pronto para revisão ao encerrar/i)).toBeInTheDocument();
+  });
 });

@@ -153,4 +153,41 @@ describe('DossiePosCall', () => {
       screen.queryByRole('heading', { name: 'Onde a IA pode ajudar' }),
     ).not.toBeInTheDocument();
   });
+
+  it('transforma o pós-kickoff em revisão do acordo do projeto', () => {
+    render(
+      <DossiePosCall
+        posCall={{
+          ...POS_CALL,
+          reuniao: { ...POS_CALL.reuniao, tipo: 'kickoff', titulo: 'Kickoff do projeto' },
+          oportunidade: { ...POS_CALL.oportunidade, etapa: 'ganho' },
+          analise: POS_CALL.analise
+            ? {
+                ...POS_CALL.analise,
+                briefingOperacional: {
+                  objetivo: 'Reduzir o tempo de primeira resposta.',
+                  criterio_sucesso: 'Responder 80% das mensagens em cinco minutos.',
+                  responsavel_cliente: 'Marina Alves',
+                  responsavel_tecnico: 'Rafael Milagre',
+                  acessos: ['WhatsApp da unidade'],
+                  limites: ['Sem orientação clínica automática'],
+                  proximos_passos: ['Liberar amostra de conversas'],
+                },
+              }
+            : null,
+          sincronizacao: {
+            ...POS_CALL.sincronizacao,
+            projetoAtivo: { id: 'projeto-1', titulo: 'Atendimento assistido' },
+          },
+        }}
+        estadoAcao={null}
+      />,
+    );
+
+    expect(screen.getByText(/Acordo do projeto · Leitura pronta/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'O que ficou combinado' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Revisar o briefing em Atendimento assistido/ }),
+    ).toHaveAttribute('href', '/entregas/projeto-1#briefing-kickoff');
+  });
 });

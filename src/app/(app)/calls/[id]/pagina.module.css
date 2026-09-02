@@ -1323,6 +1323,10 @@
   gap: var(--via-space-4);
 }
 
+.formularioAcao[data-modo='kickoff'] .acaoCampos {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .compromissosCall {
   min-width: 0;
   margin: 0;

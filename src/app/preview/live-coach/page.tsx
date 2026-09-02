@@ -17,15 +17,30 @@ const SUGESTAO: SugestaoLive = {
   prioridade: 3,
 };
 
-export default function PreviewLiveCoachPage() {
+export default async function PreviewLiveCoachPage({
+  searchParams,
+}: PageProps<'/preview/live-coach'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
+  const kickoff = parametros.tipo === 'kickoff';
+  const sugestao: SugestaoLive = kickoff
+    ? {
+        ...SUGESTAO,
+        categoria: 'critério de sucesso',
+        titulo: 'Torne o resultado verificável.',
+        sugestao:
+          'Pergunte: “Qual indicador precisa mudar para vocês considerarem este projeto bem-sucedido?”',
+        metodologia: 'acordo do projeto',
+        trecho_gatilho: 'A gente quer melhorar o atendimento.',
+      }
+    : SUGESTAO;
 
   return (
     <main className={styles.pagina}>
       <section className={styles.sala} aria-label="Preview da reunião">
         <div className={styles.palco}>
           <div className={styles.topo}>
-            <span>Descoberta do atendimento</span>
+            <span>{kickoff ? 'Kickoff do projeto' : 'Descoberta do atendimento'}</span>
             <small>18:42</small>
           </div>
           <div className={styles.pessoas}>
@@ -56,8 +71,13 @@ export default function PreviewLiveCoachPage() {
         <CabineLiveCoach
           ativo
           estado="escutando"
-          sugestao={SUGESTAO}
-          fala="Hoje entram umas quarenta mensagens por dia e, quando a recepção está cheia, a resposta demora bastante."
+          sugestao={sugestao}
+          fala={
+            kickoff
+              ? 'A gente quer melhorar o atendimento e começar pela unidade principal.'
+              : 'Hoje entram umas quarenta mensagens por dia e, quando a recepção está cheia, a resposta demora bastante.'
+          }
+          tipo={kickoff ? 'kickoff' : 'descoberta'}
         />
       </section>
     </main>

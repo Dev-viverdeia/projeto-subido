@@ -15,20 +15,12 @@ import {
   type RespostaCoach,
   type SegmentoLive,
 } from './coach-schema';
+import type { ConviteCall } from './queries';
 import type { StatusCall } from './tipos';
 
 export type SalaPrivada = {
   dono: string;
-  convite: {
-    reuniaoId: string;
-    titulo: string;
-    agendadaPara: string;
-    duracaoMinutos: number;
-    status: StatusCall;
-    liveCoachAtivo: boolean;
-    salaProvedor: string;
-    disponivel: boolean;
-  };
+  convite: ConviteCall;
 };
 
 function callPodeAbrir(status: StatusCall) {
@@ -44,7 +36,7 @@ export async function lerSalaPeloCodigo(codigo: string): Promise<SalaPrivada | n
   const { data, error } = await admin
     .from('calls_reunioes')
     .select(
-      'id, dono, titulo, agendada_para, duracao_minutos, status, live_coach_ativo, sala_provedor',
+      'id, dono, titulo, tipo, agendada_para, duracao_minutos, status, live_coach_ativo, sala_provedor',
     )
     .eq('codigo_publico', codigo)
     .maybeSingle();
@@ -63,6 +55,7 @@ export async function lerSalaPeloCodigo(codigo: string): Promise<SalaPrivada | n
     convite: {
       reuniaoId: data.id,
       titulo: data.titulo,
+      tipo: data.tipo,
       agendadaPara: data.agendada_para,
       duracaoMinutos: data.duracao_minutos,
       status: data.status,
