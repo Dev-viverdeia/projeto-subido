@@ -89,11 +89,85 @@ const POS_CALL: PosCall = {
   },
 };
 
-export default function PreviewCallPreparoPage() {
+const POS_CALL_KICKOFF: PosCall = {
+  ...POS_CALL,
+  reuniao: {
+    ...POS_CALL.reuniao,
+    titulo: 'Kickoff do projeto de atendimento',
+    tipo: 'kickoff',
+    codigoPublico: 'preview-kickoff-clinica-horizonte',
+  },
+  oportunidade: {
+    ...POS_CALL.oportunidade,
+    etapa: 'ganho',
+    proximaAcao: 'Confirmar o acordo e iniciar a primeira tarefa.',
+  },
+  preparacao: {
+    temEnriquecimento: true,
+    plano: {
+      origem: 'enriquecimento',
+      objetivo:
+        'Confirmar resultado, responsáveis, acessos e limites para começar o SDR de atendimento com IA.',
+      abertura:
+        'Hoje vamos transformar o que foi aprovado em um plano de trabalho claro para os dois lados.',
+      perguntas: [
+        {
+          etapa: 'contexto',
+          pergunta:
+            'Qual resultado precisa estar visível para considerarmos o projeto bem-sucedido?',
+          intencao: 'Definir o critério de sucesso da entrega.',
+          projetoRelacionado: 'SDR de atendimento com IA',
+        },
+        {
+          etapa: 'processo',
+          pergunta: 'Quem responde pelo projeto e pelas aprovações dentro da clínica?',
+          intencao: 'Definir responsáveis dos dois lados.',
+          projetoRelacionado: 'SDR de atendimento com IA',
+        },
+        {
+          etapa: 'processo',
+          pergunta: 'Quais acessos e dados precisam ser liberados primeiro?',
+          intencao: 'Remover bloqueios antes da primeira tarefa.',
+          projetoRelacionado: 'SDR de atendimento com IA',
+        },
+        {
+          etapa: 'decisao',
+          pergunta: 'Qual limite não pode ser ultrapassado durante a implementação?',
+          intencao: 'Proteger a operação e o escopo aprovado.',
+          projetoRelacionado: 'SDR de atendimento com IA',
+        },
+      ],
+      fechamento: {
+        sinalParaAvancar: 'Resultado, responsáveis, acessos e primeira entrega têm dono e data.',
+        frase: 'Podemos recapitular o acordo para iniciar a primeira tarefa?',
+        proximoPasso: 'Confirmar o acordo e iniciar a primeira tarefa.',
+      },
+      fatos: [
+        'Escopo aprovado: SDR de atendimento com IA',
+        'Canal principal: WhatsApp',
+        'Responsável comercial: Marina Alves',
+      ],
+      hipoteses: ['Acesso à conta de WhatsApp ainda precisa ser liberado'],
+      projetos: [],
+    },
+  },
+  sincronizacao: {
+    ...POS_CALL.sincronizacao,
+    projetoAtivo: {
+      id: '33333333-3333-4333-8333-333333333333',
+      titulo: 'SDR de atendimento para Clínica Horizonte',
+    },
+  },
+};
+
+export default async function PreviewCallPreparoPage({
+  searchParams,
+}: PageProps<'/preview/call-preparo'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
   return (
     <main className={styles.preview}>
-      <PreparacaoCall posCall={POS_CALL} />
+      <PreparacaoCall posCall={parametros.tipo === 'kickoff' ? POS_CALL_KICKOFF : POS_CALL} />
     </main>
   );
 }

@@ -121,6 +121,27 @@ describe('PainelCalls', () => {
     expect(screen.getByRole('region', { name: 'Descoberta Horizonte' })).toBeInTheDocument();
   });
 
+  it('apresenta o kickoff como início do projeto', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        reunioes={[
+          reuniao({
+            id: 'kickoff-1',
+            titulo: 'Kickoff do atendimento',
+            tipo: 'kickoff',
+          }),
+        ]}
+        agora={new Date('2026-08-09T12:00:00.000Z')}
+      />,
+    );
+
+    const destaque = screen.getByRole('region', { name: 'Kickoff do atendimento' });
+    expect(within(destaque).getByText('Início do projeto')).toBeInTheDocument();
+    expect(within(destaque).getByText('Roteiro do kickoff pronto')).toBeInTheDocument();
+  });
+
   it('separa horários vencidos da próxima agenda e pede uma decisão', () => {
     render(
       <PainelCalls

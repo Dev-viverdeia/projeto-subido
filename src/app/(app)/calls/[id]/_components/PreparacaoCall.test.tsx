@@ -80,4 +80,33 @@ describe('PreparacaoCall', () => {
     );
     expect(screen.getByText('Live Coach preparado')).toBeInTheDocument();
   });
+
+  it('liga o kickoff ao acordo e ao projeto que começa depois da reunião', () => {
+    const kickoff: PosCall = {
+      ...POS_CALL,
+      reuniao: { ...POS_CALL.reuniao, tipo: 'kickoff', titulo: 'Kickoff do atendimento' },
+      oportunidade: { ...POS_CALL.oportunidade, etapa: 'ganho' },
+      sincronizacao: {
+        ...POS_CALL.sincronizacao,
+        projetoAtivo: { id: 'projeto-1', titulo: 'SDR da Clínica Horizonte' },
+      },
+    };
+
+    render(<PreparacaoCall posCall={kickoff} />);
+
+    expect(screen.getByText('Acordo que precisa sair da reunião')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Acordos essenciais' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Continuidade do kickoff')).toHaveTextContent(
+      'As decisões confirmadas viram o acordo do projeto.',
+    );
+    expect(screen.getByText('SDR da Clínica Horizonte')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Abrir projeto/ })).toHaveAttribute(
+      'href',
+      '/entregas/projeto-1',
+    );
+    expect(screen.getByRole('link', { name: /Entrar no kickoff/ })).toHaveAttribute(
+      'href',
+      '/sala/sala-horizonte',
+    );
+  });
 });

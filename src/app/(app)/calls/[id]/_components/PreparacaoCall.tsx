@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
+  BriefcaseBusiness,
   CalendarDays,
   CheckCheck,
   Clock3,
@@ -40,6 +41,8 @@ const ROTULO_MOMENTO = {
 export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
   const plano = posCall.preparacao.plano;
   const data = new Date(posCall.reuniao.agendadaPara);
+  const kickoff = posCall.reuniao.tipo === 'kickoff';
+  const projeto = posCall.sincronizacao.projetoAtivo;
 
   return (
     <div className={styles.pagina}>
@@ -55,7 +58,10 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
       <header className={styles.cabecalho}>
         <div className={styles.cabecalhoLinha}>
           <div>
-            <p>Antes da reunião · {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</p>
+            <p>
+              {kickoff ? 'Início do projeto' : 'Antes da reunião'} ·{' '}
+              {ROTULO_TIPO_CALL[posCall.reuniao.tipo]}
+            </p>
             <h1>{posCall.reuniao.titulo}</h1>
             <span>
               {posCall.empresa.nome}
@@ -67,7 +73,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
               Ficha do cliente <ArrowRight size={15} aria-hidden="true" />
             </Link>
             <Link href={`/sala/${posCall.reuniao.codigoPublico}`} className={styles.primaria}>
-              <Video size={16} aria-hidden="true" /> Entrar na reunião
+              <Video size={16} aria-hidden="true" />
+              {kickoff ? 'Entrar no kickoff' : 'Entrar na reunião'}
             </Link>
           </div>
         </div>
@@ -99,16 +106,37 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
           <div>
             <Target size={16} aria-hidden="true" />
             <span>
-              <small>Etapa da venda</small>
-              <strong>{ROTULO_ETAPA[posCall.oportunidade.etapa]}</strong>
+              <small>{kickoff ? 'Projeto' : 'Etapa da venda'}</small>
+              <strong>
+                {kickoff
+                  ? (projeto?.titulo ?? posCall.oportunidade.titulo)
+                  : ROTULO_ETAPA[posCall.oportunidade.etapa]}
+              </strong>
             </span>
           </div>
         </section>
+
+        {kickoff && (
+          <section className={styles.continuidadeKickoff} aria-label="Continuidade do kickoff">
+            <span className={styles.continuidadeIcone} aria-hidden="true">
+              <BriefcaseBusiness size={18} strokeWidth={1.7} />
+            </span>
+            <div>
+              <small>Depois do kickoff</small>
+              <strong>As decisões confirmadas viram o acordo do projeto.</strong>
+            </div>
+            {projeto && (
+              <Link href={`/entregas/${projeto.id}`}>
+                Abrir projeto <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            )}
+          </section>
+        )}
       </header>
 
       <section className={styles.plano} data-on-dark aria-labelledby="objetivo-call">
         <div className={styles.objetivo}>
-          <p>Decisão que você busca</p>
+          <p>{kickoff ? 'Acordo que precisa sair da reunião' : 'Decisão que você busca'}</p>
           <h2 id="objetivo-call">{plano.objetivo}</h2>
           <div className={styles.abertura}>
             <MessageSquareText size={17} aria-hidden="true" />
@@ -120,7 +148,7 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         </div>
 
         <div className={styles.fechamento}>
-          <p>Você pode avançar quando</p>
+          <p>{kickoff ? 'Kickoff pronto quando' : 'Você pode avançar quando'}</p>
           <strong>{plano.fechamento.sinalParaAvancar}</strong>
           <span>“{plano.fechamento.frase}”</span>
         </div>
@@ -130,8 +158,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
         <section className={styles.perguntas} aria-labelledby="perguntas-call">
           <header>
             <div>
-              <p>Condução</p>
-              <h2 id="perguntas-call">Perguntas essenciais</h2>
+              <p>{kickoff ? 'Condução do kickoff' : 'Condução'}</p>
+              <h2 id="perguntas-call">{kickoff ? 'Acordos essenciais' : 'Perguntas essenciais'}</h2>
             </div>
             <span>{plano.perguntas.length} perguntas</span>
           </header>
@@ -154,8 +182,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             <header>
               <FileSearch size={17} aria-hidden="true" />
               <div>
-                <p>Antes de perguntar</p>
-                <h2>O que já sabemos</h2>
+                <p>{kickoff ? 'Base já aprovada' : 'Antes de perguntar'}</p>
+                <h2>{kickoff ? 'O que já está definido' : 'O que já sabemos'}</h2>
               </div>
             </header>
             {plano.fatos.length > 0 ? (
@@ -179,8 +207,8 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
                 <header>
                   <CheckCheck size={17} aria-hidden="true" />
                   <div>
-                    <p>Confirmar na call</p>
-                    <h2>Pontos para validar</h2>
+                    <p>Confirmar {kickoff ? 'no kickoff' : 'na call'}</p>
+                    <h2>{kickoff ? 'O que falta acordar' : 'Pontos para validar'}</h2>
                   </div>
                 </header>
                 <ul>
@@ -194,9 +222,13 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             <div className={styles.coachPronto}>
               <BadgeCheck size={18} aria-hidden="true" />
               <div>
-                <strong>Live Coach preparado</strong>
+                <strong>
+                  {kickoff ? 'Live Coach acompanha o acordo' : 'Live Coach preparado'}
+                </strong>
                 <span>
-                  Durante a reunião, ele acompanha este objetivo e sugere uma pergunta por vez.
+                  {kickoff
+                    ? 'Durante o kickoff, ele ajuda a confirmar objetivo, responsáveis, acessos e limites.'
+                    : 'Durante a reunião, ele acompanha este objetivo e sugere uma pergunta por vez.'}
                 </span>
               </div>
             </div>
