@@ -19,7 +19,7 @@ const TELAS = [
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/admin-acessos', 'Acessos e créditos'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/entregas', 'Execute o próximo passo de cada cliente.'],
+  ['/preview/entregas', 'Veja o próximo passo e mantenha o cliente acompanhando.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
@@ -152,7 +152,7 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('heading', { name: 'Revisão de resultado' })).toBeVisible();
     await expect(page.getByText('Registre o que o cliente confirmou.')).toBeVisible();
 
-    await page.getByRole('button', { name: /Executar/ }).click();
+    await page.getByRole('button', { name: /Trabalho/ }).click();
     const fimDaSala = page.getByRole('button', { name: 'Ver acordo e portal' });
     await fimDaSala.scrollIntoViewIfNeeded();
     await expect(fimDaSala).toBeVisible();

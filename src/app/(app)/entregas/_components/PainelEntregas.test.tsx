@@ -120,6 +120,12 @@ describe('PainelEntregas', () => {
     );
     expect(screen.getByText('Registrar resultado')).toBeInTheDocument();
     expect(screen.getAllByText(/Atrasada há 1 dia/)).toHaveLength(2);
+
+    const trabalhoAtual = screen.getByRole('heading', { name: 'Clínica Horizonte' });
+    const posEntrega = screen.getByRole('heading', { name: '1 revisão pede atenção agora.' });
+    expect(
+      trabalhoAtual.compareDocumentPosition(posEntrega) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('mantém revisões já registradas apenas no histórico', () => {

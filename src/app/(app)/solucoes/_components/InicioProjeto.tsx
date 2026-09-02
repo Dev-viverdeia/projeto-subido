@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { definirPrazoProjeto, type EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
-import { ROTULO_STATUS_CALL, callPodeAbrir } from '@/lib/calls/tipos';
+import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { formatarReais } from '@/lib/propostas/schema';
 import styles from './InicioProjeto.module.css';
 
@@ -57,19 +57,22 @@ export function InicioProjeto({
   );
   const kickoff = projeto.kickoff;
   const kickoffPodeAbrir = kickoff ? callPodeAbrir(kickoff.status) : false;
+  const kickoffPronto = Boolean(
+    kickoff && (kickoff.status === 'processando' || kickoff.status === 'concluida'),
+  );
   const hrefKickoff = kickoff
     ? kickoffPodeAbrir
       ? `/sala/${kickoff.codigoPublico}`
-      : `/reunioes/${kickoff.id}`
+      : kickoff.status === 'cancelada'
+        ? `/reunioes?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`
+        : `/reunioes/${kickoff.id}`
     : `/reunioes?nova=1&oportunidade=${projeto.oportunidadeId}&tipo=kickoff`;
   const prazoDefinido = Boolean(projeto.prazoEm);
-  const prazoLiberado = briefingConfirmado && Boolean(kickoff);
-  const preparacaoCompleta = briefingConfirmado && Boolean(kickoff) && prazoDefinido;
-  const etapasProntas = [Boolean(kickoff), briefingConfirmado, prazoDefinido].filter(
-    Boolean,
-  ).length;
+  const prazoLiberado = briefingConfirmado && kickoffPronto;
+  const preparacaoCompleta = briefingConfirmado && kickoffPronto && prazoDefinido;
+  const etapasProntas = [kickoffPronto, briefingConfirmado, prazoDefinido].filter(Boolean).length;
   const pendencias = 3 - etapasProntas;
-  const etapaAtual = !kickoff
+  const etapaAtual = !kickoffPronto
     ? 'kickoff'
     : !briefingConfirmado
       ? 'briefing'
@@ -81,10 +84,14 @@ export function InicioProjeto({
     <section className={styles.inicio} aria-labelledby="inicio-projeto-titulo">
       <header className={styles.cabecalho}>
         <div>
-          <p>Passagem da venda</p>
-          <h2 id="inicio-projeto-titulo">Da proposta aprovada à primeira tarefa</h2>
+          <p>Início do projeto</p>
+          <h2 id="inicio-projeto-titulo">Venda confirmada. Prepare a entrega.</h2>
         </div>
-        <span>{etapasProntas}/3 etapas prontas</span>
+        <span>
+          {pendencias
+            ? `${pendencias} pendente${pendencias === 1 ? '' : 's'}`
+            : 'Pronto para executar'}
+        </span>
       </header>
 
       <div className={styles.vendaConfirmada}>
@@ -103,10 +110,6 @@ export function InicioProjeto({
         </div>
         <dl className={styles.vendaResumo}>
           <div>
-            <dt>Cliente</dt>
-            <dd>{projeto.empresa}</dd>
-          </div>
-          <div>
             <dt>Investimento</dt>
             <dd>{formatarReais(projeto.documento.investimento.valorCentavos)}</dd>
           </div>
@@ -120,35 +123,18 @@ export function InicioProjeto({
         </Link>
       </div>
 
-      <p className={styles.explicacao}>
-        O escopo aprovado já está aqui. Agora alinhe o início do projeto com o cliente e transforme
-        o combinado na primeira tarefa.
-      </p>
-
       <ol className={styles.passos}>
         <li
-          data-pronto={Boolean(kickoff) || undefined}
+          data-pronto={kickoffPronto || undefined}
           data-atual={etapaAtual === 'kickoff' || undefined}
         >
           <span className={styles.numero}>
-            {kickoff ? <Check size={13} aria-label="Concluído" /> : '01'}
+            {kickoffPronto ? <Check size={13} aria-label="Concluído" /> : '01'}
           </span>
-          <div className={styles.icone}>
-            <Video size={18} strokeWidth={1.8} aria-hidden="true" />
-          </div>
           <div className={styles.conteudo}>
             <p>Kickoff do projeto</p>
-            <strong>{kickoff ? ROTULO_STATUS_CALL[kickoff.status] : 'Ainda não agendado'}</strong>
-            <small>
-              {kickoff
-                ? DATA_HORA.format(new Date(kickoff.agendadaPara)).replace('.', '')
-                : 'Abra o projeto com o cliente e alinhe resultado, responsáveis e acessos.'}
-            </small>
+            <strong>{kickoff ? ROTULO_STATUS_CALL[kickoff.status] : 'Pendente'}</strong>
           </div>
-          <Link className={styles.acaoSecundaria} href={hrefKickoff}>
-            {kickoff ? (kickoffPodeAbrir ? 'Abrir sala' : 'Ver registro') : 'Agendar kickoff'}
-            <ArrowRight size={14} aria-hidden="true" />
-          </Link>
         </li>
 
         <li
@@ -158,24 +144,12 @@ export function InicioProjeto({
           <span className={styles.numero}>
             {briefingConfirmado ? <Check size={13} aria-label="Concluído" /> : '02'}
           </span>
-          <div className={styles.icone}>
-            <ClipboardCheck size={18} strokeWidth={1.8} aria-hidden="true" />
-          </div>
           <div className={styles.conteudo}>
             <p>Acordo do projeto</p>
             <strong>
-              {briefingConfirmado ? 'Combinado confirmado' : 'Revise o que ficou combinado'}
+              {briefingConfirmado ? 'Confirmado' : kickoff ? 'Pendente' : 'Bloqueado'}
             </strong>
-            <small>Resultado, responsáveis, acessos e limites organizados em quatro partes.</small>
           </div>
-          {kickoff || briefingConfirmado ? (
-            <a className={styles.acaoSecundaria} href="#briefing-kickoff">
-              {briefingConfirmado ? 'Revisar acordo' : 'Completar acordo'}
-              <ArrowRight size={14} aria-hidden="true" />
-            </a>
-          ) : (
-            <span className={styles.estado}>Depois do kickoff</span>
-          )}
         </li>
 
         <li
@@ -185,53 +159,10 @@ export function InicioProjeto({
           <span className={styles.numero}>
             {prazoDefinido ? <Check size={13} aria-label="Concluído" /> : '03'}
           </span>
-          <div className={styles.icone}>
-            <CalendarDays size={18} strokeWidth={1.8} aria-hidden="true" />
-          </div>
           <div className={styles.conteudo}>
             <p>Prazo da entrega</p>
-            <strong>
-              {projeto.prazoEm
-                ? 'Prazo definido'
-                : prazoLiberado
-                  ? 'Defina uma data realista'
-                  : 'Disponível depois do acordo'}
-            </strong>
-            {prazoLiberado && (
-              <form action={definirPrazo} className={styles.formPrazo}>
-                <input type="hidden" name="projeto" value={projeto.id} />
-                <input
-                  type="date"
-                  name="prazo"
-                  defaultValue={dataParaCampo(projeto.prazoEm)}
-                  aria-label="Prazo da entrega"
-                  required
-                />
-                <button type="submit" disabled={salvandoPrazo}>
-                  <Save size={14} aria-hidden="true" /> {salvandoPrazo ? 'Salvando…' : 'Salvar'}
-                </button>
-              </form>
-            )}
-            {estadoPrazo.erro && (
-              <small className={styles.retorno} role="alert">
-                {estadoPrazo.erro}
-              </small>
-            )}
-            {estadoPrazo.sucesso && (
-              <small className={styles.retorno} role="status">
-                {estadoPrazo.sucesso}
-              </small>
-            )}
+            <strong>{prazoDefinido ? 'Definido' : prazoLiberado ? 'Pendente' : 'Bloqueado'}</strong>
           </div>
-          <span className={styles.estado} data-pronto={Boolean(projeto.prazoEm) || undefined}>
-            {prazoDefinido ? (
-              <Check size={14} aria-label="Definido" />
-            ) : prazoLiberado ? (
-              'Pendente'
-            ) : (
-              'Depois do acordo'
-            )}
-          </span>
         </li>
 
         <li
@@ -240,29 +171,97 @@ export function InicioProjeto({
           data-atual={etapaAtual === 'execucao' || undefined}
         >
           <span className={styles.numero}>04</span>
-          <div className={styles.icone}>
-            <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-          </div>
           <div className={styles.conteudo}>
-            <p>Primeiro passo executável</p>
-            <strong>{primeiraTarefa || 'Revise o escopo do projeto'}</strong>
-            <small>
-              {preparacaoCompleta
-                ? 'Abra o passo a passo e registre o resultado de cada tarefa.'
-                : `${pendencias} ${pendencias === 1 ? 'pendência precisa' : 'pendências precisam'} ser resolvida${pendencias === 1 ? '' : 's'} antes de executar.`}
-            </small>
+            <p>Execução</p>
+            <strong>{preparacaoCompleta ? 'Pronta' : 'Bloqueada'}</strong>
           </div>
-          <button
-            type="button"
-            className={styles.acaoPrincipal}
-            onClick={onComecar}
-            disabled={!preparacaoCompleta}
-          >
-            {preparacaoCompleta ? 'Abrir primeira tarefa' : 'Conclua a preparação'}
-            <ArrowRight size={15} aria-hidden="true" />
-          </button>
         </li>
       </ol>
+
+      <section className={styles.proximoPasso} aria-labelledby="proximo-passo-inicio">
+        <span className={styles.proximoIcone} aria-hidden="true">
+          {etapaAtual === 'kickoff' ? (
+            <Video size={20} strokeWidth={1.8} />
+          ) : etapaAtual === 'briefing' ? (
+            <ClipboardCheck size={20} strokeWidth={1.8} />
+          ) : etapaAtual === 'prazo' ? (
+            <CalendarDays size={20} strokeWidth={1.8} />
+          ) : (
+            <ArrowRight size={20} strokeWidth={1.8} />
+          )}
+        </span>
+        <div>
+          <p>Próximo passo</p>
+          <h3 id="proximo-passo-inicio">
+            {etapaAtual === 'kickoff'
+              ? kickoffPodeAbrir
+                ? 'Entre no kickoff com o cliente'
+                : kickoff?.status === 'cancelada'
+                  ? 'Reagende o kickoff com o cliente'
+                  : 'Agende o kickoff com o cliente'
+              : etapaAtual === 'briefing'
+                ? 'Confirme o acordo do projeto'
+                : etapaAtual === 'prazo'
+                  ? 'Defina o prazo da entrega'
+                  : (primeiraTarefa ?? 'Abra a primeira tarefa')}
+          </h3>
+          <span>
+            {etapaAtual === 'kickoff'
+              ? kickoffPodeAbrir
+                ? `${DATA_HORA.format(new Date(kickoff!.agendadaPara)).replace('.', '')} · alinhe objetivo, responsáveis e acessos.`
+                : 'Alinhe objetivo, responsáveis e acessos.'
+              : etapaAtual === 'briefing'
+                ? 'Revise resultado, responsáveis, acessos e limites.'
+                : etapaAtual === 'prazo'
+                  ? 'Use a data combinada com o cliente.'
+                  : 'O escopo aprovado já está organizado no passo a passo.'}
+          </span>
+        </div>
+
+        {etapaAtual === 'kickoff' ? (
+          <Link className={styles.acaoPrincipal} href={hrefKickoff}>
+            {kickoffPodeAbrir
+              ? 'Abrir kickoff'
+              : kickoff?.status === 'cancelada'
+                ? 'Reagendar kickoff'
+                : 'Agendar kickoff'}{' '}
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        ) : etapaAtual === 'briefing' ? (
+          <a className={styles.acaoPrincipal} href="#briefing-kickoff">
+            Completar acordo <ArrowRight size={15} aria-hidden="true" />
+          </a>
+        ) : etapaAtual === 'prazo' ? (
+          <form action={definirPrazo} className={styles.formPrazo}>
+            <input type="hidden" name="projeto" value={projeto.id} />
+            <input
+              type="date"
+              name="prazo"
+              defaultValue={dataParaCampo(projeto.prazoEm)}
+              aria-label="Prazo da entrega"
+              required
+            />
+            <button type="submit" disabled={salvandoPrazo}>
+              <Save size={14} aria-hidden="true" /> {salvandoPrazo ? 'Salvando…' : 'Salvar prazo'}
+            </button>
+          </form>
+        ) : (
+          <button type="button" className={styles.acaoPrincipal} onClick={onComecar}>
+            Abrir primeira tarefa <ArrowRight size={15} aria-hidden="true" />
+          </button>
+        )}
+
+        {estadoPrazo.erro && (
+          <small className={styles.retorno} role="alert">
+            {estadoPrazo.erro}
+          </small>
+        )}
+        {estadoPrazo.sucesso && (
+          <small className={styles.retorno} role="status">
+            {estadoPrazo.sucesso}
+          </small>
+        )}
+      </section>
 
       <div className={styles.aviso}>
         <KeyRound size={16} strokeWidth={1.8} aria-hidden="true" />

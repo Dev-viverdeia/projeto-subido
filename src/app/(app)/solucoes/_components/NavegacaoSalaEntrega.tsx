@@ -48,7 +48,7 @@ export function NavegacaoSalaEntrega({
       >
         <Play size={17} aria-hidden="true" />
         <span>
-          <strong>Executar</strong>
+          <strong>Trabalho</strong>
           <small>{concluido ? 'Entrega encerrada' : (proximaTarefa ?? 'Aceite final')}</small>
         </span>
       </button>
@@ -74,7 +74,7 @@ export function NavegacaoSalaEntrega({
       >
         <UsersRound size={17} aria-hidden="true" />
         <span>
-          <strong>Cliente e escopo</strong>
+          <strong>Cliente</strong>
           <small>{rotuloCliente}</small>
         </span>
       </button>

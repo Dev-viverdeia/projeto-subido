@@ -232,32 +232,37 @@ export function PainelEntregas({
       <header className={styles.hero}>
         <div className={styles.heroTexto}>
           <h1>Entregas</h1>
-          <p>Execute o próximo passo de cada cliente.</p>
+          <p>Veja o próximo passo e mantenha o cliente acompanhando.</p>
         </div>
         <dl className={styles.resumo} aria-label="Resumo das entregas">
           <div>
-            <dt>Em execução</dt>
+            <dt>Ativas</dt>
             <dd>{ativos.length}</dd>
           </div>
           <div>
-            <dt>Pedem ação</dt>
-            <dd>{precisamAcao + aguardandoCliente}</dd>
+            <dt>Com o cliente</dt>
+            <dd>{aguardandoCliente}</dd>
           </div>
           <div>
-            <dt>Entregues</dt>
+            <dt>Concluídas</dt>
             <dd>{concluidos.length}</dd>
           </div>
         </dl>
       </header>
 
-      <RadarPosEntrega projetos={concluidos} agora={agora} />
-
       {principal ? (
         <section className={styles.emAndamento} aria-labelledby="titulo-em-andamento">
           <header className={styles.cabecalhoSecao}>
             <div>
-              <h2 id="titulo-em-andamento">Agora: {principal.empresa}</h2>
+              <p className={styles.eyebrow}>Próxima entrega</p>
+              <h2 id="titulo-em-andamento">{principal.empresa}</h2>
             </div>
+            {precisamAcao > 0 && (
+              <p>
+                {precisamAcao} {precisamAcao === 1 ? 'projeto precisa' : 'projetos precisam'} de
+                você agora.
+              </p>
+            )}
           </header>
 
           {prioridadePrincipal && (
@@ -291,6 +296,8 @@ export function PainelEntregas({
       ) : (
         <EstadoVazio temPosEntrega={concluidos.some((projeto) => projeto.evolucao)} />
       )}
+
+      <RadarPosEntrega projetos={concluidos} agora={agora} />
 
       {concluidos.length > 0 && (
         <details className={styles.concluidas}>
