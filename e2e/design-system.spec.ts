@@ -7,6 +7,7 @@ const TELAS = [
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Qual é o próximo movimento?'],
+  ['/preview/shell', 'Qual é o próximo movimento?'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
@@ -102,6 +103,46 @@ test.describe('fundação visual Viver de IA', () => {
     }));
     const limiteVertical = dimensoes.largura <= 599 ? dimensoes.viewport * 1.6 : dimensoes.viewport;
     expect(dimensoes.pagina).toBeLessThanOrEqual(limiteVertical + 1);
+
+    const resultado = await new AxeBuilder({ page }).analyze();
+    const graves = resultado.violations.filter(
+      (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+    );
+    expect(graves).toEqual([]);
+  });
+
+  test('o shell autenticado mantém navegação, cabeçalho e conteúdo no viewport', async ({
+    page,
+  }, testInfo) => {
+    await page.goto('/preview/shell');
+
+    await expect(page.getByRole('main')).toBeVisible();
+    const dock = page.getByRole('navigation', { name: 'Navegação principal' });
+
+    if (testInfo.project.name === 'desktop') {
+      await expect(dock).toBeHidden();
+      const lateral = page.getByRole('navigation', { name: 'Seções da plataforma' });
+      await expect(lateral).toBeVisible();
+      await expect(lateral.getByRole('link', { name: 'Início' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+    } else {
+      await expect(dock).toBeVisible();
+      await dock.getByRole('button', { name: 'Mais' }).click();
+      const menu = page.getByRole('dialog', { name: 'Mais' });
+      await expect(menu).toBeVisible();
+      await expect(menu.getByRole('link', { name: 'Propostas' })).toBeVisible();
+    }
+
+    const geometria = await page.evaluate(() => ({
+      larguraDocumento: document.documentElement.scrollWidth,
+      larguraViewport: window.innerWidth,
+      alturaCabecalho: document.querySelector('header')?.getBoundingClientRect().height ?? 0,
+    }));
+
+    expect(geometria.larguraDocumento).toBeLessThanOrEqual(geometria.larguraViewport + 1);
+    expect(geometria.alturaCabecalho).toBeGreaterThanOrEqual(56);
 
     const resultado = await new AxeBuilder({ page }).analyze();
     const graves = resultado.violations.filter(

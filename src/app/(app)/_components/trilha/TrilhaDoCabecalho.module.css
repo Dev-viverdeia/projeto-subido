@@ -6,7 +6,7 @@
   align-items: center;
   gap: var(--via-space-2);
   min-width: 0;
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-support);
   letter-spacing: var(--app-ls-sm);
 }
 
@@ -18,7 +18,9 @@
   /* O ícone encosta no texto: o `‹` é parte da palavra "voltar", não um botão
      separado ao lado dela. */
   margin-left: calc(var(--via-space-1) * -1);
-  padding: var(--via-space-1) var(--via-space-2);
+  min-height: 36px;
+  padding: var(--via-space-1) var(--via-space-2_5);
+  border: 1px solid transparent;
   border-radius: var(--app-radius-chip);
   color: var(--via-text-muted);
   text-decoration: none;
@@ -29,7 +31,8 @@
 
 .voltar:hover {
   color: var(--via-text-primary);
-  background: var(--via-navy-03);
+  border-color: var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-white) 58%, var(--via-navy-03));
 }
 
 .voltar:focus-visible {

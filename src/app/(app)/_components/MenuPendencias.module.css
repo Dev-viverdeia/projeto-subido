@@ -4,16 +4,18 @@
 }
 
 .gatilho {
-  min-height: 42px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
   padding: var(--via-space-1) var(--via-space-2) var(--via-space-1) var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: var(--via-blur-sm);
+  background: color-mix(in srgb, var(--via-white) 74%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 92%, transparent),
+    0 8px 20px -18px var(--via-navy-40);
+  backdrop-filter: blur(16px) saturate(145%);
   color: var(--via-text-body);
   font: inherit;
   font-size: var(--via-fs-sm);
@@ -26,9 +28,11 @@
 
 .gatilho:hover,
 .gatilho[aria-expanded='true'] {
-  border-color: var(--via-navy-25);
-  background: var(--via-surface);
-  box-shadow: var(--via-shadow-sm);
+  border-color: var(--via-navy-18);
+  background: color-mix(in srgb, var(--via-white) 90%, transparent);
+  box-shadow:
+    inset 0 1px 0 var(--via-white),
+    0 12px 26px -20px var(--via-navy-40);
 }
 
 .gatilho:focus-visible,
@@ -45,8 +49,9 @@
   place-items: center;
   padding-inline: 6px;
   border-radius: var(--via-radius-pill);
-  background: var(--via-navy);
-  color: var(--via-white);
+  border: 1px solid var(--via-navy-14);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-medium);
@@ -61,12 +66,10 @@
   width: min(420px, calc(100vw - 24px));
   max-height: min(680px, calc(100vh - 92px));
   overflow: hidden auto;
-  border: 1px solid color-mix(in srgb, var(--via-white) 64%, var(--via-border-soft));
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-surface);
-  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 84%, transparent),
-    var(--via-shadow-lg);
+  background: var(--app-shell-overlay-bg);
+  box-shadow: var(--app-shell-panel-shadow);
   backdrop-filter: blur(28px) saturate(155%);
   animation: entrar 150ms ease-out;
 }
@@ -130,8 +133,8 @@
 }
 
 .item:hover {
-  border-color: var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-white) 62%, var(--via-navy-04));
+  border-color: color-mix(in srgb, var(--via-white) 70%, var(--via-border));
+  background: color-mix(in srgb, var(--via-white) 68%, var(--via-navy-04));
   transform: translateX(2px);
 }
 
@@ -186,7 +189,7 @@
   gap: var(--via-space-3);
   padding: var(--via-space-3) var(--via-space-5);
   border-top: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-bg-2) 80%, transparent);
+  background: color-mix(in srgb, var(--via-bg-2) 58%, transparent);
 }
 
 .rodapePainel span {

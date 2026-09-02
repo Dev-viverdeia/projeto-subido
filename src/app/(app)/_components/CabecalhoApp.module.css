@@ -1,17 +1,19 @@
 .cabecalho {
   position: sticky;
-  top: 0;
+  top: var(--app-shell-inset);
   z-index: var(--via-z-sticky);
   display: flex;
   align-items: center;
   gap: var(--via-space-4);
   min-width: 0;
-  min-height: 66px;
-  padding-inline: var(--via-space-4);
-  border-bottom: 1px solid var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-surface) 84%, transparent);
-  backdrop-filter: blur(24px) saturate(155%);
-  box-shadow: 0 10px 26px -26px var(--via-navy-30);
+  min-height: var(--app-shell-header-h);
+  margin: var(--app-shell-inset) var(--app-shell-inset) 0;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--app-shell-panel-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-shell-panel-bg);
+  backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: var(--app-shell-panel-shadow);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -25,8 +27,15 @@
   align-items: center;
   flex: 0 0 auto;
   min-height: 44px;
+  padding-inline: var(--via-space-1);
+  border-radius: var(--app-radius-control);
   color: var(--via-text-primary);
   text-decoration: none;
+}
+
+.marca:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .esquerda {
@@ -44,8 +53,9 @@
 
 @media (min-width: 1080px) {
   .cabecalho {
-    min-height: 68px;
-    padding-inline: clamp(28px, 3vw, 52px);
+    margin-right: var(--app-shell-inset);
+    margin-left: 0;
+    padding-inline: var(--via-space-4);
   }
 
   .marca {
@@ -54,5 +64,14 @@
 
   .esquerda {
     display: flex;
+  }
+}
+
+@media (max-width: 599px) {
+  .cabecalho {
+    gap: var(--via-space-2);
+    margin: var(--via-space-2) var(--via-space-2) 0;
+    padding-inline: var(--via-space-2);
+    border-radius: var(--app-radius-control);
   }
 }

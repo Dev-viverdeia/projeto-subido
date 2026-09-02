@@ -1,11 +1,11 @@
 .pagina {
-  width: min(100%, 1240px);
+  width: min(100%, var(--app-canvas));
   margin-inline: auto;
 }
 
 .cabecalho {
   max-width: 720px;
-  padding-block: var(--via-space-8);
+  padding-block: var(--via-space-6);
 }
 
 .esqueleto {
@@ -58,10 +58,13 @@
 .cartao {
   min-height: 154px;
   padding: var(--via-space-5);
-  border: 1px solid var(--via-border-soft);
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--via-surface) 94%, var(--via-navy-03));
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  background: var(--app-glass-plane);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    0 18px 42px -38px var(--via-navy-30);
+  backdrop-filter: blur(18px) saturate(135%);
 }
 
 .cartaoPrincipal {
@@ -147,5 +150,11 @@
 @media (prefers-reduced-motion: reduce) {
   .esqueleto::after {
     animation: none;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
   }
 }
