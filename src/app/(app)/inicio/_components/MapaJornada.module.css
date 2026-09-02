@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(var(--via-space-7), 3.4vw, var(--via-space-9));
+  gap: clamp(var(--via-space-6), 2.7vw, var(--via-space-8));
   color: var(--via-text-primary);
 }
 
@@ -11,11 +11,11 @@
   position: relative;
   isolation: isolate;
   display: flex;
-  min-height: 168px;
+  min-height: 148px;
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
-  padding: clamp(var(--via-space-6), 3.8vw, var(--via-space-8));
+  padding: clamp(var(--via-space-5), 3vw, var(--via-space-7));
   border: 1px solid color-mix(in srgb, var(--via-white) 16%, transparent);
   border-radius: var(--app-radius-surface);
   background: var(--app-mesh-trilho);
@@ -63,7 +63,7 @@
 .areas {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
 }
 
 .areas h2 {
@@ -92,7 +92,7 @@
 .cartao {
   position: relative;
   display: grid;
-  min-height: 132px;
+  min-height: 122px;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-4);
@@ -215,7 +215,7 @@
 }
 
 .cartaoCompacto {
-  min-height: 78px;
+  min-height: 72px;
   padding-block: var(--via-space-4);
   background: color-mix(in srgb, var(--app-elev-1-bg) 62%, transparent);
   box-shadow:
