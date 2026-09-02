@@ -138,38 +138,44 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--via-space-2);
-  padding: var(--via-space-2);
+  padding: var(--via-space-3);
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--app-elev-1-line));
   border-radius: var(--app-radius-surface);
-  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
+  background: color-mix(in srgb, var(--via-surface) 56%, transparent);
   box-shadow:
-    var(--app-elev-1-shadow),
+    var(--app-elev-2-shadow),
     inset 0 1px 0 var(--via-edge-hi);
-  backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(145%);
 }
 
 .resumo article {
+  position: relative;
   display: grid;
   min-width: 0;
-  min-height: 108px;
+  min-height: 122px;
   align-content: start;
-  gap: var(--via-space-1);
+  gap: var(--via-space-1_5);
   padding: var(--app-pad-card-tight);
-  border-right: 1px solid var(--via-border-hairline);
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--via-white) 78%, var(--via-border-hairline));
+  border-radius: var(--app-radius-card);
+  background:
+    linear-gradient(136deg, color-mix(in srgb, var(--via-white) 72%, transparent), transparent 60%),
+    color-mix(in srgb, var(--via-surface) 66%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
 }
 
-.resumo article:last-child {
-  border-right: 0;
-}
-
-.resumo article[data-indicador='ganhos'] strong {
-  color: var(--via-navy);
+.resumo article[data-indicador='ganhos'] {
+  border-color: color-mix(in srgb, var(--via-navy) 18%, var(--via-border-soft));
+  background:
+    linear-gradient(136deg, color-mix(in srgb, var(--via-white) 76%, transparent), transparent 60%),
+    color-mix(in srgb, var(--via-navy-04) 72%, var(--via-surface));
 }
 
 .resumo span {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-medium);
 }
 
@@ -177,7 +183,7 @@
   margin-block: var(--via-space-1);
   color: var(--via-text-primary);
   font-family: var(--via-font-mono);
-  font-size: clamp(1.6rem, 2.5vw, 2.25rem);
+  font-size: clamp(1.85rem, 2.5vw, 2.4rem);
   font-weight: var(--via-fw-medium);
   line-height: 0.95;
   letter-spacing: var(--app-ls-h2);
@@ -188,14 +194,14 @@
 .resumo em {
   display: block;
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   font-style: normal;
   line-height: var(--via-lh-snug);
 }
 
 .resumo em {
   margin-top: auto;
-  padding-top: var(--via-space-2);
+  padding-top: var(--via-space-1_5);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--app-em-ink);
 }
@@ -422,7 +428,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
   gap: var(--app-gap-grid);
-  align-items: stretch;
+  align-items: start;
 }
 
 .diagnostico,
@@ -440,10 +446,9 @@
 
 .diagnostico {
   position: relative;
-  display: flex;
-  min-height: 280px;
-  flex-direction: column;
-  padding: clamp(24px, 3.2vw, 40px);
+  display: grid;
+  min-height: 0;
+  padding: clamp(24px, 3vw, 34px);
   overflow: hidden;
   background: var(--app-glass-plane-strong);
 }
@@ -470,7 +475,7 @@
 .perdas h2 {
   margin: var(--via-space-2) 0 0;
   color: var(--via-text-primary);
-  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-size: clamp(1.65rem, 2.5vw, 2.2rem);
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-h2);
@@ -481,7 +486,7 @@
   max-width: 62ch;
   margin: var(--via-space-4) 0 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }
@@ -498,7 +503,7 @@
   position: relative;
   padding-left: var(--via-space-4);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
 
@@ -519,7 +524,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  margin-top: auto;
+  margin-top: var(--via-space-2);
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
@@ -549,7 +554,7 @@
 .saude,
 .atividade,
 .perdas {
-  padding: clamp(22px, 3vw, 32px);
+  padding: clamp(22px, 3vw, 30px);
 }
 
 .saude {
@@ -567,14 +572,16 @@
 .saudeGrade article {
   display: grid;
   min-width: 0;
-  min-height: 112px;
+  min-height: 96px;
   align-content: space-between;
   gap: var(--via-space-2);
   padding: var(--app-pad-card-tight);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-surface) 66%, transparent);
-  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
 }
 
 .saudeGrade svg {
@@ -589,7 +596,7 @@
 .saudeGrade span,
 .saude footer span {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-snug);
 }
 
@@ -609,8 +616,9 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--via-space-3);
-  margin-top: auto;
-  padding-top: var(--via-space-5);
+  margin-top: var(--via-space-4);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .atividade,
@@ -776,14 +784,6 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .resumo article:nth-child(3n) {
-    border-right: 0;
-  }
-
-  .resumo article:nth-child(-n + 3) {
-    border-bottom: 1px solid var(--via-border-hairline);
-  }
-
   .gradeDiagnostico,
   .gradeDetalhes {
     grid-template-columns: minmax(0, 1fr);
@@ -851,18 +851,6 @@
 
   .resumo {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .resumo article:nth-child(3n) {
-    border-right: 1px solid var(--via-border-hairline);
-  }
-
-  .resumo article:nth-child(2n) {
-    border-right: 0;
-  }
-
-  .resumo article:nth-child(-n + 4) {
-    border-bottom: 1px solid var(--via-border-hairline);
   }
 
   .resumo article {

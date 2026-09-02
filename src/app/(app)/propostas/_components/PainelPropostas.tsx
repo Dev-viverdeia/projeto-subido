@@ -83,20 +83,22 @@ function CardProposta({ proposta }: { proposta: ResumoProposta }) {
   const leitura = leituraDaProposta(proposta);
 
   return (
-    <Link href={`/propostas/${proposta.id}`} className={styles.card}>
+    <Link href={`/propostas/${proposta.id}`} className={styles.card} data-status={proposta.status}>
       <div className={styles.cardPrincipal}>
-        <span className={styles.status} data-status={proposta.status}>
-          {ROTULO_STATUS_PROPOSTA[proposta.status]}
-        </span>
-        <div className={styles.cardTitulo}>
+        <div className={styles.cardMeta}>
+          <span className={styles.status} data-status={proposta.status}>
+            {ROTULO_STATUS_PROPOSTA[proposta.status]}
+          </span>
           <p>{proposta.empresa}</p>
+        </div>
+        <div className={styles.cardTitulo}>
           <h3>{proposta.titulo}</h3>
           <span>{proposta.projeto}</span>
         </div>
       </div>
 
       <div className={styles.cardValor}>
-        <span>Valor</span>
+        <span>Investimento</span>
         <strong>{formatarReais(proposta.valorCentavos)}</strong>
       </div>
 

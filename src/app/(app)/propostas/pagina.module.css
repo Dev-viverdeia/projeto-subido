@@ -18,11 +18,11 @@
 
 .arquivo {
   border: 1px solid var(--app-elev-2-line);
-  background: var(--app-elev-2-bg);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 82%, transparent);
   box-shadow:
     var(--app-elev-2-shadow),
     inset 0 1px 0 var(--via-edge-hi);
-  backdrop-filter: var(--via-glass-blur);
+  backdrop-filter: blur(24px) saturate(145%);
 }
 
 .nova,
@@ -76,7 +76,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-5);
-  padding: 0 clamp(22px, 3vw, 32px);
+  min-height: 66px;
+  padding: var(--via-space-2) clamp(22px, 3vw, 32px) 0;
   border-bottom: 1px solid var(--via-border-soft);
 }
 
@@ -85,12 +86,13 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   width: min(100%, 310px);
-  min-height: 44px;
+  min-height: 46px;
   margin-bottom: var(--via-space-2);
   padding: 0 var(--via-space-2) 0 var(--via-space-3);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 62%, transparent);
+  background: color-mix(in srgb, var(--via-white) 72%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
   color: var(--via-text-muted);
   transition:
     border-color var(--app-t-state),
@@ -111,7 +113,7 @@
   background: transparent;
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
 }
 
 .busca input::placeholder {
@@ -142,19 +144,25 @@
 
 .lista {
   display: grid;
-  padding: var(--via-space-2) clamp(12px, 2vw, 20px) var(--via-space-3);
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
 }
 
 .card {
   display: grid;
-  grid-template-columns: minmax(300px, 1.5fr) minmax(130px, 0.45fr) minmax(210px, 0.7fr) auto;
+  grid-template-columns: minmax(300px, 1.5fr) minmax(148px, 0.48fr) minmax(240px, 0.82fr) auto;
   align-items: center;
   gap: var(--via-space-5);
-  min-height: 116px;
-  padding: var(--via-space-4) clamp(10px, 1.5vw, 14px);
-  border: 1px solid transparent;
-  border-bottom-color: var(--via-border-soft);
-  border-radius: var(--app-radius-control);
+  min-height: 124px;
+  padding: var(--via-space-4) var(--via-space-5);
+  border: 1px solid color-mix(in srgb, var(--via-white) 78%, var(--app-elev-1-line));
+  border-radius: var(--app-radius-card);
+  background:
+    linear-gradient(132deg, color-mix(in srgb, var(--via-white) 70%, transparent), transparent 54%),
+    color-mix(in srgb, var(--via-surface) 64%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
   color: inherit;
   text-decoration: none;
   transition:
@@ -164,16 +172,11 @@
     box-shadow var(--app-t-touch);
 }
 
-.card:last-child {
-  border-bottom-color: transparent;
-}
-
 .card:hover {
   z-index: 1;
-  border-color: var(--app-elev-1-line);
-  background: color-mix(in srgb, var(--via-white) 58%, transparent);
-  box-shadow: var(--via-shadow-sm);
-  transform: translateY(-1px);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  transform: translateY(-2px);
 }
 
 .card:focus-visible {
@@ -186,21 +189,36 @@
 .cardPrincipal {
   min-width: 0;
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  align-items: start;
-  gap: var(--via-space-4);
+  gap: var(--via-space-2);
+}
+
+.cardMeta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.cardMeta p {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .status {
   width: fit-content;
-  max-width: 104px;
+  flex: 0 0 auto;
+  max-width: 112px;
   padding: 6px 9px;
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-chip);
   background: var(--via-bg-2);
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-micro);
   line-height: 1.2;
   text-transform: uppercase;
@@ -216,7 +234,7 @@
   min-width: 0;
 }
 
-.cardTitulo p,
+.cardMeta p,
 .cardTitulo h3,
 .cardTitulo span,
 .cardValor span,
@@ -226,24 +244,25 @@
   margin: 0;
 }
 
-.cardTitulo p,
 .cardTitulo span,
 .cardValor span,
 .cardProximoPasso small {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
 }
 
 .cardTitulo h3 {
-  margin-block: var(--via-space-1);
+  display: -webkit-box;
+  margin-bottom: var(--via-space-1);
   overflow: hidden;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-body);
+  font-size: var(--via-fs-h4);
   font-weight: var(--via-fw-semibold);
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-body);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .cardValor {
@@ -254,7 +273,7 @@
 .cardValor strong,
 .cardProximoPasso strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   font-weight: var(--via-fw-medium);
 }
 
@@ -267,13 +286,13 @@
 }
 
 .cardProximoIcone {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 58%, transparent);
+  background: color-mix(in srgb, var(--via-white) 72%, transparent);
   color: var(--via-navy);
 }
 
@@ -295,14 +314,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-width: 82px;
+  min-width: 116px;
   min-height: 44px;
   padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 58%, transparent);
+  background: color-mix(in srgb, var(--via-white) 72%, transparent);
   color: var(--via-navy);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-semibold);
 }
 
@@ -369,7 +388,7 @@
 
 @media (max-width: 899px) {
   .card {
-    grid-template-columns: minmax(260px, 1fr) minmax(130px, auto) auto;
+    grid-template-columns: minmax(260px, 1fr) minmax(148px, auto) auto;
   }
 
   .cardProximoPasso {
@@ -392,17 +411,14 @@
   .card {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--via-space-4);
-    margin-block: var(--via-space-1);
-    padding: var(--via-space-4);
-    border: 1px solid var(--via-border-soft);
+    padding: var(--via-space-5);
     border-radius: var(--app-radius-card);
     background: color-mix(in srgb, var(--via-white) 46%, transparent);
   }
 
   .cardPrincipal {
     grid-column: 1 / -1;
-    grid-template-columns: 1fr;
-    gap: var(--via-space-3);
+    gap: var(--via-space-2);
   }
 
   .cardProximoPasso {
@@ -411,7 +427,7 @@
   }
 
   .cardTitulo h3 {
-    white-space: normal;
+    -webkit-line-clamp: 3;
   }
 
   .cardValor {

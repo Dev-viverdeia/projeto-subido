@@ -37,13 +37,13 @@ function moeda(valorCentavos: number): string {
 }
 
 function comparacao(atual: number, anterior: number | undefined): string {
-  if (anterior === undefined) return 'desde o primeiro registro';
-  if (anterior === 0 && atual === 0) return 'sem atividade no período';
-  if (anterior === 0) return 'novo neste período';
+  if (anterior === undefined) return 'Primeiro período';
+  if (anterior === 0 && atual === 0) return 'Sem movimento';
+  if (anterior === 0) return 'Novo no período';
 
   const variacao = Math.round(((atual - anterior) / anterior) * 100);
-  if (variacao === 0) return 'mesmo volume anterior';
-  return `${variacao > 0 ? '+' : ''}${variacao}% vs. período anterior`;
+  if (variacao === 0) return 'Mesmo ritmo';
+  return `${variacao > 0 ? '+' : ''}${variacao}% no período`;
 }
 
 function taxa(valor: number | null, complemento: string): string {

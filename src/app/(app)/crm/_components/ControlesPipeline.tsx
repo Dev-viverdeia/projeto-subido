@@ -25,10 +25,11 @@ export function BarraPrioridades({
   return (
     <section className={styles.barraPrioridades} aria-labelledby="foco-crm-titulo">
       <div className={styles.leituraPrioridade}>
+        <span>Seu foco</span>
         <strong id="foco-crm-titulo">
           {contagens.atencao === 0
-            ? 'Todas têm um próximo passo'
-            : `${contagens.atencao} ${contagens.atencao === 1 ? 'venda precisa' : 'vendas precisam'} de ação`}
+            ? 'Todas as oportunidades têm um próximo passo'
+            : `${contagens.atencao} ${contagens.atencao === 1 ? 'oportunidade precisa' : 'oportunidades precisam'} de ação`}
         </strong>
       </div>
 
@@ -38,7 +39,7 @@ export function BarraPrioridades({
             [
               ['todas', 'Todas'],
               ['atencao', 'Ação pendente'],
-              ['sem_acao', 'Sem próxima ação'],
+              ['sem_acao', 'Sem ação'],
               ['proposta', 'Com proposta'],
             ] as const
           ).map(([id, rotulo]) => (

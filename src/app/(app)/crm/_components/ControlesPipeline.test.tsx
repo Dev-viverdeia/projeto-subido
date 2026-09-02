@@ -19,7 +19,7 @@ describe('ControlesPipeline', () => {
       />,
     );
 
-    expect(screen.getByText('3 vendas precisam de ação')).toBeInTheDocument();
+    expect(screen.getByText('3 oportunidades precisam de ação')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Todas: 8' })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -43,7 +43,7 @@ describe('ControlesPipeline', () => {
       />,
     );
 
-    expect(screen.getByText('Todas têm um próximo passo')).toBeInTheDocument();
+    expect(screen.getByText('Todas as oportunidades têm um próximo passo')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Limpar busca' }));
     expect(aoBuscar).toHaveBeenCalledWith('');
   });
