@@ -8,9 +8,11 @@ describe('MapaJornada', () => {
 
     expect(screen.getByText(/Rafael\.$/)).toBeVisible();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'O que você quer fazer agora?',
+      'Qual é o próximo movimento?',
     );
-    expect(screen.getByRole('heading', { name: 'Escolha uma área.' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Aprender e construir' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Vender' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Entregar' })).toBeVisible();
 
     const atalhos = screen.getByRole('navigation', { name: 'Atalhos da plataforma' });
     expect(within(atalhos).getAllByRole('link')).toHaveLength(9);

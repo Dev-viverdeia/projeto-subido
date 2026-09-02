@@ -21,7 +21,7 @@ import {
   type PlanoSubido,
   type RecursoPlano,
 } from '@/lib/planos/acessos';
-import styles from './MapaJornada.module.css';
+import styles from './MapaJornadaPremium.module.css';
 
 type Props = {
   nome: string | null;
@@ -37,86 +37,111 @@ type Atalho = {
   icone: ReactNode;
 };
 
-const ICONE = 23;
+type Grupo = {
+  titulo: string;
+  descricao: string;
+  variante: 'construir' | 'vender' | 'entregar';
+  atalhos: readonly Atalho[];
+};
+
+const ICONE = 22;
 const TRACO = 1.65;
 
-const ATALHOS_PRINCIPAIS: readonly Atalho[] = [
+const GRUPOS: readonly Grupo[] = [
   {
-    titulo: 'Formações',
-    descricao: 'Aprenda o método.',
-    acao: 'Ver formações',
-    href: '/formacoes',
-    recurso: 'aprendizado',
-    icone: <GraduationCap size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+    titulo: 'Aprender e construir',
+    descricao: 'Domine o método.',
+    variante: 'construir',
+    atalhos: [
+      {
+        titulo: 'Formações',
+        descricao: 'Aprender',
+        acao: 'Ver formações',
+        href: '/formacoes',
+        recurso: 'aprendizado',
+        icone: <GraduationCap size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Projetos',
+        descricao: 'Implementar',
+        acao: 'Ver projetos',
+        href: '/solucoes',
+        recurso: 'projetos',
+        icone: <BriefcaseBusiness size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Estúdio',
+        descricao: 'Personalizar',
+        acao: 'Abrir Estúdio',
+        href: '/builder',
+        recurso: 'estudio',
+        icone: <DraftingCompass size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Mentorias',
+        descricao: 'Destravar',
+        acao: 'Ver mentorias',
+        href: '/mentorias',
+        recurso: 'mentorias',
+        icone: <Users size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+    ],
   },
   {
-    titulo: 'Projetos',
-    descricao: 'Implemente passo a passo.',
-    acao: 'Ver projetos',
-    href: '/solucoes',
-    recurso: 'projetos',
-    icone: <BriefcaseBusiness size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+    titulo: 'Vender',
+    descricao: 'Do lead ao contrato.',
+    variante: 'vender',
+    atalhos: [
+      {
+        titulo: 'Prospecção',
+        descricao: 'Encontrar clientes',
+        acao: 'Buscar empresas',
+        href: '/prospeccao',
+        recurso: 'prospeccao',
+        icone: <Search size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Vendas',
+        descricao: 'Avançar oportunidades',
+        acao: 'Abrir vendas',
+        href: '/vendas',
+        recurso: 'vendas',
+        icone: <ContactRound size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Reuniões',
+        descricao: 'Conduzir calls',
+        acao: 'Ver reuniões',
+        href: '/reunioes',
+        recurso: 'reunioes',
+        icone: <Video size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+      {
+        titulo: 'Propostas',
+        descricao: 'Fechar',
+        acao: 'Ver propostas',
+        href: '/propostas',
+        recurso: 'propostas',
+        icone: <FileSignature size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+    ],
   },
   {
-    titulo: 'Prospecção',
-    descricao: 'Encontre potenciais clientes.',
-    acao: 'Buscar empresas',
-    href: '/prospeccao',
-    recurso: 'prospeccao',
-    icone: <Search size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+    titulo: 'Entregar',
+    descricao: 'Execute com método.',
+    variante: 'entregar',
+    atalhos: [
+      {
+        titulo: 'Entregas',
+        descricao: 'Executar projetos',
+        acao: 'Ver entregas',
+        href: '/entregas',
+        recurso: 'projetos',
+        icone: <FolderKanban size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+      },
+    ],
   },
-  {
-    titulo: 'Vendas',
-    descricao: 'Avance cada oportunidade.',
-    acao: 'Abrir vendas',
-    href: '/vendas',
-    recurso: 'vendas',
-    icone: <ContactRound size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-  {
-    titulo: 'Reuniões',
-    descricao: 'Conduza conversas melhores.',
-    acao: 'Ver reuniões',
-    href: '/reunioes',
-    recurso: 'reunioes',
-    icone: <Video size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-  {
-    titulo: 'Entregas',
-    descricao: 'Execute o projeto aprovado.',
-    acao: 'Ver entregas',
-    href: '/entregas',
-    recurso: 'projetos',
-    icone: <FolderKanban size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-];
-
-const ATALHOS_RAPIDOS: readonly Atalho[] = [
-  {
-    titulo: 'Estúdio',
-    descricao: 'Personalize um projeto.',
-    acao: 'Abrir Estúdio',
-    href: '/builder',
-    recurso: 'estudio',
-    icone: <DraftingCompass size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-  {
-    titulo: 'Mentorias',
-    descricao: 'Fale com especialistas.',
-    acao: 'Ver mentorias',
-    href: '/mentorias',
-    recurso: 'mentorias',
-    icone: <Users size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-  {
-    titulo: 'Propostas',
-    descricao: 'Crie e acompanhe.',
-    acao: 'Ver propostas',
-    href: '/propostas',
-    recurso: 'propostas',
-    icone: <FileSignature size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
-  },
-];
+] as const;
 
 function saudacaoAtual() {
   const hora = Number(
@@ -129,15 +154,7 @@ function saudacaoAtual() {
   return hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
 }
 
-function AtalhoJornada({
-  atalho,
-  plano,
-  compacto = false,
-}: {
-  atalho: Atalho;
-  plano: PlanoSubido;
-  compacto?: boolean;
-}) {
+function AtalhoJornada({ atalho, plano }: { atalho: Atalho; plano: PlanoSubido }) {
   const bloqueado = !planoTemRecurso(plano, atalho.recurso);
   const planoNecessario = PLANOS_SUBIDO[RECURSOS_SUBIDO[atalho.recurso].planoMinimo].nome;
   const destino = bloqueado ? destinoDeUpgrade(atalho.recurso, '/inicio') : atalho.href;
@@ -145,7 +162,7 @@ function AtalhoJornada({
   return (
     <Link
       href={destino}
-      className={`${styles.cartao} ${compacto ? styles.cartaoCompacto : ''}`}
+      className={styles.atalho}
       data-bloqueado={bloqueado || undefined}
       aria-label={
         bloqueado
@@ -154,14 +171,14 @@ function AtalhoJornada({
       }
     >
       <span className={styles.icone}>{atalho.icone}</span>
-      <span className={styles.conteudoCartao}>
+      <span className={styles.conteudoAtalho}>
         <strong>{atalho.titulo}</strong>
         <span>{atalho.descricao}</span>
       </span>
       <span className={styles.destino} aria-hidden="true">
         {bloqueado ? (
           <>
-            <LockKeyhole size={16} strokeWidth={1.8} />
+            <LockKeyhole size={15} strokeWidth={1.8} />
             <span>{planoNecessario}</span>
           </>
         ) : (
@@ -172,37 +189,41 @@ function AtalhoJornada({
   );
 }
 
-/** Guia direto das áreas da plataforma, com hierarquia e uma decisão por clique. */
+/** Painel de entrada: um clique para aprender, vender ou entregar um projeto de IA. */
 export function MapaJornada({ nome, plano }: Props) {
   const saudacao = saudacaoAtual();
 
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
-      <header className={`${styles.abertura} via-on-dark`} data-on-dark>
+      <header className={styles.abertura}>
         <span className={styles.saudacao}>
           {saudacao}
           {nome ? `, ${nome}` : ''}.
         </span>
-        <h1>O que você quer fazer agora?</h1>
+        <h1>Qual é o próximo movimento?</h1>
       </header>
 
-      <section className={styles.areas} aria-labelledby="titulo-areas-inicio">
-        <h2 id="titulo-areas-inicio">Escolha uma área.</h2>
+      <nav className={styles.painel} aria-label="Atalhos da plataforma">
+        {GRUPOS.map((grupo) => (
+          <section
+            key={grupo.titulo}
+            className={`${styles.etapa} ${styles[grupo.variante]}`}
+            data-on-dark={grupo.variante === 'vender' || undefined}
+            aria-labelledby={`titulo-${grupo.variante}`}
+          >
+            <header className={styles.cabecalhoEtapa}>
+              <h2 id={`titulo-${grupo.variante}`}>{grupo.titulo}</h2>
+              <p>{grupo.descricao}</p>
+            </header>
 
-        <nav className={styles.navegacao} aria-label="Atalhos da plataforma">
-          <div className={styles.gradePrincipal}>
-            {ATALHOS_PRINCIPAIS.map((atalho) => (
-              <AtalhoJornada key={atalho.titulo} atalho={atalho} plano={plano} />
-            ))}
-          </div>
-
-          <div className={styles.gradeRapida}>
-            {ATALHOS_RAPIDOS.map((atalho) => (
-              <AtalhoJornada key={atalho.titulo} atalho={atalho} plano={plano} compacto />
-            ))}
-          </div>
-        </nav>
-      </section>
+            <div className={styles.listaAtalhos}>
+              {grupo.atalhos.map((atalho) => (
+                <AtalhoJornada key={atalho.titulo} atalho={atalho} plano={plano} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </nav>
     </div>
   );
 }
