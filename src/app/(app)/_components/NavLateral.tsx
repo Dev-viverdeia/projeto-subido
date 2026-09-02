@@ -7,7 +7,7 @@ import { Grid2X2, LockKeyhole, X } from 'lucide-react';
 import { ROTULOS_GRUPO_NAV, type ItemNav } from './navegacao';
 import styles from './NavLateral.module.css';
 
-const ORDEM_GRUPOS: ItemNav['grupo'][] = ['aprendizado', 'operacao', 'gestao'];
+const ORDEM_GRUPOS: ItemNav['grupo'][] = ['inicio', 'aprendizado', 'operacao', 'gestao'];
 
 /**
  * Navegação — sidebar no desktop e dock com menu completo no mobile.
@@ -50,6 +50,7 @@ export function NavLateral({
 
   const itensPrioritarios = itens.filter((item) => item.noDock && !item.bloqueado).slice(0, 4);
   const hrefsPrioritarios = new Set(itensPrioritarios.map((item) => item.href));
+  const itensAdicionais = itens.filter((item) => !hrefsPrioritarios.has(item.href));
   const contaAtiva = Boolean(itemConta && estaAtivo(itemConta));
   const maisAtivo =
     contaAtiva || itens.some((item) => !hrefsPrioritarios.has(item.href) && estaAtivo(item));
@@ -190,11 +191,7 @@ export function NavLateral({
               aria-labelledby={tituloMenuId}
             >
               <header className={styles.cabecalhoMenu}>
-                <div>
-                  <span className={styles.sobretituloMenu}>Menu</span>
-                  <h2 id={tituloMenuId}>Navegação</h2>
-                  <p>Escolha uma área para continuar.</p>
-                </div>
+                <h2 id={tituloMenuId}>Mais</h2>
                 <button
                   ref={botaoFecharRef}
                   type="button"
@@ -205,6 +202,60 @@ export function NavLateral({
                   <X size={18} strokeWidth={1.8} aria-hidden="true" />
                 </button>
               </header>
+
+              <div className={styles.conteudoMenu}>
+                {ORDEM_GRUPOS.map((idGrupo) => {
+                  const itensDoGrupo = itensAdicionais.filter((item) => item.grupo === idGrupo);
+                  if (!itensDoGrupo.length) return null;
+
+                  return (
+                    <section className={styles.grupoMenu} key={idGrupo}>
+                      <h3>{ROTULOS_GRUPO_NAV[idGrupo]}</h3>
+                      <div className={styles.gradeMenu}>
+                        {itensDoGrupo.map((item) => {
+                          const ativo = estaAtivo(item);
+                          const destino = destinoDoItem(item);
+                          const carregando = destinoPendente === destino && !ativo;
+
+                          return (
+                            <Link
+                              href={destino}
+                              prefetch={destinosPreparados.has(destino)}
+                              className={styles.itemMenu}
+                              aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
+                              aria-current={ativo ? 'page' : undefined}
+                              aria-busy={carregando || undefined}
+                              data-bloqueado={item.bloqueado || undefined}
+                              data-loading={carregando || undefined}
+                              key={item.href}
+                              onMouseEnter={() => prepararDestino(item)}
+                              onFocus={() => prepararDestino(item)}
+                              onClick={(evento) => {
+                                iniciarNavegacao(evento, item);
+                                fecharMenu();
+                              }}
+                            >
+                              <span className={styles.iconeMenu} aria-hidden="true">
+                                {item.icone}
+                              </span>
+                              <span>{item.rotulo}</span>
+                              {item.bloqueado && (
+                                <small>
+                                  <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
+                                  Plano {item.planoNecessario ?? 'superior'}
+                                </small>
+                              )}
+                              {carregando && (
+                                <span className="sr-only">Carregando {item.rotulo}</span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
 
               {itemConta && (
                 <div className={styles.contaMenuArea}>
@@ -223,65 +274,13 @@ export function NavLateral({
                       {itemConta.icone}
                     </span>
                     <span>
-                      <small>Sua identidade</small>
+                      <small>Conta</small>
                       <strong>{itemConta.rotulo}</strong>
                     </span>
-                    <em>
-                      {contaAtiva ? 'Você está aqui' : contaCarregando ? 'Abrindo…' : 'Abrir'}
-                    </em>
+                    <em>{contaCarregando ? 'Abrindo…' : contaAtiva ? 'Atual' : 'Abrir'}</em>
                   </Link>
                 </div>
               )}
-
-              <div className={styles.conteudoMenu}>
-                {ORDEM_GRUPOS.map((idGrupo) => {
-                  const itensDoGrupo = itens.filter((item) => item.grupo === idGrupo);
-                  if (!itensDoGrupo.length) return null;
-
-                  return (
-                    <section className={styles.grupoMenu} key={idGrupo}>
-                      <h3>{ROTULOS_GRUPO_NAV[idGrupo]}</h3>
-                      <div className={styles.gradeMenu}>
-                        {itensDoGrupo.map((item) => {
-                          const ativo = estaAtivo(item);
-                          const destino = destinoDoItem(item);
-                          const carregando = destinoPendente === destino && !ativo;
-
-                          return (
-                            <Link
-                              href={destino}
-                              className={styles.itemMenu}
-                              aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
-                              aria-current={ativo ? 'page' : undefined}
-                              aria-busy={carregando || undefined}
-                              data-bloqueado={item.bloqueado || undefined}
-                              data-loading={carregando || undefined}
-                              key={item.href}
-                              onClick={(evento) => {
-                                iniciarNavegacao(evento, item);
-                                fecharMenu();
-                              }}
-                            >
-                              <span className={styles.iconeMenu} aria-hidden="true">
-                                {item.icone}
-                              </span>
-                              <span>{item.rotulo}</span>
-                              {item.bloqueado && (
-                                <small>
-                                  <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
-                                  Disponível no {item.planoNecessario ?? 'plano superior'}
-                                </small>
-                              )}
-                              {ativo && <small>Você está aqui</small>}
-                              {carregando && <small>Carregando…</small>}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
             </section>
           </>
         )}
@@ -343,10 +342,16 @@ export function NavLateral({
           if (!itensDoGrupo.length) return null;
 
           return (
-            <section className={styles.grupoLateral} key={`${grupo}-${idGrupo}`}>
-              <p className={styles.rotuloGrupo} aria-hidden="true">
-                {rotuloGrupo ?? ROTULOS_GRUPO_NAV[idGrupo]}
-              </p>
+            <section
+              className={styles.grupoLateral}
+              data-grupo={idGrupo}
+              key={`${grupo}-${idGrupo}`}
+            >
+              {idGrupo !== 'inicio' && (
+                <p className={styles.rotuloGrupo} aria-hidden="true">
+                  {rotuloGrupo ?? ROTULOS_GRUPO_NAV[idGrupo]}
+                </p>
+              )}
               {renderizarItens(itensDoGrupo)}
             </section>
           );

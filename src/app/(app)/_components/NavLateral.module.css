@@ -28,11 +28,10 @@
   position: absolute;
   z-index: 2;
   right: var(--via-space-3);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: 16px;
+  height: 2px;
+  border-radius: var(--app-radius-track);
   background: var(--via-navy);
-  box-shadow: 0 0 0 4px var(--via-navy-06);
   animation: destino-pendente 900ms var(--via-ease) infinite;
 }
 
@@ -93,7 +92,7 @@
 .grupos {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
   min-height: 0;
   overflow-y: auto;
   padding-right: 2px;
@@ -103,6 +102,11 @@
 
 .grupoLateral {
   min-width: 0;
+}
+
+.grupoLateral[data-grupo='inicio'] {
+  padding-bottom: var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-soft);
 }
 
 .rotuloGrupo {
@@ -201,15 +205,15 @@
   min-height: 62px;
   padding: var(--via-space-2) var(--via-space-1);
   border-radius: 0;
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   text-align: center;
 }
 
 .dock .item[data-loading='true']::after {
   top: 8px;
   right: calc(50% - 18px);
-  width: 5px;
-  height: 5px;
+  width: 12px;
+  height: 2px;
 }
 
 .botaoMais {
@@ -266,11 +270,12 @@
   flex-direction: column;
   max-height: calc(100dvh - 84px - env(safe-area-inset-bottom, 0px));
   overflow: hidden;
-  border: 1px solid var(--via-border-soft);
+  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
   border-bottom: 0;
   border-radius: var(--via-radius-xl) var(--via-radius-xl) 0 0;
-  background: linear-gradient(145deg, var(--via-navy-05), transparent 34%), var(--via-surface);
-  box-shadow: 0 -28px 70px -30px var(--via-navy-40);
+  background: var(--app-glass-plane-strong);
+  backdrop-filter: blur(28px) saturate(150%);
+  box-shadow: var(--app-elev-3-shadow);
   animation: revelarPainel 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -288,26 +293,15 @@
 
 .cabecalhoMenu {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  padding: var(--via-space-6) var(--via-space-5) var(--via-space-4);
+  min-height: 68px;
+  padding: var(--via-space-3) var(--via-space-5);
   border-bottom: 1px solid var(--via-border-soft);
 }
 
-.sobretituloMenu {
-  display: block;
-  margin-bottom: var(--via-space-1_5);
-  color: var(--via-text-soft);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
 .cabecalhoMenu h2,
-.cabecalhoMenu p,
 .grupoMenu h3 {
   margin: 0;
 }
@@ -319,27 +313,21 @@
   letter-spacing: var(--app-ls-h4);
 }
 
-.cabecalhoMenu p {
-  margin-top: var(--via-space-1);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-caption);
-  line-height: var(--via-lh-normal);
-}
-
 .contaMenuArea {
-  padding: var(--via-space-3) var(--via-space-5) 0;
+  padding: var(--via-space-3) var(--via-space-5) var(--via-space-4);
+  border-top: 1px solid var(--via-border-soft);
 }
 
 .contaMenu {
-  min-height: 66px;
+  min-height: 58px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-border-soft);
-  border-radius: var(--app-radius-card);
-  background: linear-gradient(135deg, var(--via-navy-05), var(--via-surface));
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
   color: var(--via-text-primary);
   text-decoration: none;
   transition:
@@ -349,8 +337,8 @@
 }
 
 .contaMenu:hover {
-  border-color: var(--via-border-strong-color);
-  transform: translateY(-1px);
+  border-color: var(--via-border-soft);
+  background: var(--via-navy-04);
 }
 
 .contaMenu:focus-visible {
@@ -359,7 +347,7 @@
 }
 
 .contaMenu[aria-current='page'] {
-  border-color: var(--via-navy-20);
+  border-color: var(--via-border-soft);
   background: var(--via-navy-06);
 }
 
@@ -369,13 +357,13 @@
 }
 
 .iconeConta {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
 }
 
 .contaMenu small,
@@ -394,13 +382,13 @@
 
 .contaMenu strong {
   margin-top: 2px;
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
 }
 
 .contaMenu em {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   font-style: normal;
   font-weight: var(--via-fw-medium);
 }
@@ -412,8 +400,8 @@
   height: 40px;
   padding: 0;
   border: 1px solid var(--via-border-soft);
-  border-radius: 50%;
-  background: var(--via-surface);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
   color: var(--via-text-primary);
   cursor: pointer;
   transition:
@@ -436,7 +424,7 @@
 .conteudoMenu {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--via-space-6);
   min-height: 0;
   padding: var(--via-space-5);
   overflow-y: auto;
@@ -456,23 +444,23 @@
 }
 
 .gradeMenu {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--via-space-2);
+  display: flex;
+  flex-direction: column;
 }
 
 .itemMenu {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--via-space-2_5);
-  min-height: 56px;
-  padding: var(--via-space-2_5) var(--via-space-3);
-  border: 1px solid var(--via-border-soft);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-surface) 92%, var(--via-navy-04));
+  gap: var(--via-space-2);
+  min-height: 48px;
+  padding: var(--via-space-2) var(--via-space-2_5);
+  border: 1px solid transparent;
+  border-bottom-color: var(--via-border-soft);
+  border-radius: 0;
+  background: transparent;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
   text-decoration: none;
@@ -483,9 +471,10 @@
 }
 
 .itemMenu:hover {
-  border-color: var(--via-border-strong-color);
+  border-color: transparent;
+  border-bottom-color: var(--via-border-soft);
+  border-radius: var(--app-radius-control);
   background: var(--via-navy-04);
-  transform: translateY(-1px);
 }
 
 .itemMenu:focus-visible {
@@ -494,7 +483,9 @@
 }
 
 .itemMenu[aria-current='page'] {
-  border-color: var(--via-navy-20);
+  border-color: transparent;
+  border-bottom-color: var(--via-border-soft);
+  border-radius: var(--app-radius-control);
   background: var(--via-navy-06);
 }
 
@@ -504,17 +495,17 @@
 }
 
 .itemMenu[data-bloqueado='true'] .iconeMenu {
-  background: color-mix(in srgb, var(--via-surface) 82%, transparent);
   color: var(--via-text-soft);
 }
 
 .itemMenu small {
-  grid-column: 2;
-  margin-top: calc(-1 * var(--via-space-2));
+  grid-column: 3;
+  margin: 0;
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   font-weight: var(--via-fw-regular);
+  white-space: nowrap;
 }
 
 .itemMenu small svg {
@@ -527,12 +518,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  grid-row: 1 / span 2;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--via-radius-md);
-  background: var(--via-navy-05);
+  width: 32px;
+  height: 32px;
+  color: var(--via-text-soft);
+}
+
+.itemMenu:hover .iconeMenu,
+.itemMenu[aria-current='page'] .iconeMenu {
   color: var(--via-navy);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .painelMenu {
+    background: var(--via-surface);
+  }
 }
 
 @keyframes revelarFundo {
