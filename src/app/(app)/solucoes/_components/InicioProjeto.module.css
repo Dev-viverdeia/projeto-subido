@@ -23,14 +23,16 @@
 .conteudo p,
 .conteudo strong,
 .conteudo small,
+.proximoPasso p,
+.proximoPasso h3,
+.proximoPasso span,
 .aviso p {
   margin: 0;
 }
 
 .cabecalho p,
 .conteudo p,
-.numero,
-.estado {
+.numero {
   font-family: var(--via-font-mono);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
@@ -38,7 +40,7 @@
 
 .cabecalho p {
   color: var(--via-accent-ink);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
 }
 
 .cabecalho h2 {
@@ -51,7 +53,7 @@
 
 .cabecalho > span {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
 }
 
 .vendaConfirmada {
@@ -86,15 +88,14 @@
 .vendaTexto small,
 .vendaResumo,
 .vendaResumo dt,
-.vendaResumo dd,
-.explicacao {
+.vendaResumo dd {
   margin: 0;
 }
 
 .vendaTexto p,
 .vendaResumo dt {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
@@ -117,13 +118,13 @@
 .vendaTexto small {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: 1.45;
 }
 
 .vendaResumo {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .vendaResumo div {
@@ -140,14 +141,14 @@
   overflow: hidden;
   margin-top: var(--via-space-1);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .verProposta {
-  min-height: 40px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -156,7 +157,7 @@
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   color: var(--via-text-primary);
-  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  font: var(--via-fw-semibold) var(--app-fs-meta) var(--via-font);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -166,16 +167,9 @@
   background: var(--via-navy-04);
 }
 
-.explicacao {
-  padding: 0 clamp(22px, 2.5vw, 30px) var(--via-space-4);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-  line-height: 1.55;
-}
-
 .passos {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   margin: 0;
   padding: 0;
@@ -185,12 +179,12 @@
 
 .passos li {
   position: relative;
-  min-height: 150px;
+  min-height: 88px;
   display: grid;
-  grid-template-columns: 24px 38px minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-5) clamp(22px, 2.5vw, 30px);
+  padding: var(--via-space-4) clamp(18px, 2vw, 24px);
   background: var(--app-glass-plane-strong);
   transition:
     background var(--app-t-state),
@@ -213,17 +207,6 @@
   font-size: var(--app-fs-micro);
 }
 
-.icone {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
-  color: var(--via-navy);
-}
-
 .conteudo {
   min-width: 0;
 }
@@ -237,7 +220,7 @@
   display: block;
   margin-top: 5px;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-body);
+  font-size: var(--app-fs-meta);
   line-height: 1.35;
 }
 
@@ -255,7 +238,7 @@
   gap: var(--via-space-1);
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   text-decoration: none;
 }
 
@@ -263,47 +246,17 @@
   color: var(--via-text-primary);
 }
 
-.estado {
-  width: fit-content;
-  grid-column: 3;
-  padding: 6px 9px;
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-chip);
-  color: var(--via-text-faint);
-  font-size: var(--app-fs-micro);
-}
-
-.estado[data-pronto] {
-  border-color: color-mix(in srgb, var(--via-accent-ink) 30%, var(--via-border));
-  background: color-mix(in srgb, var(--via-accent) 12%, var(--via-surface));
-  color: var(--via-accent-ink);
-}
-
-.acaoSecundaria,
 .acaoPrincipal,
 .formPrazo button {
-  min-height: 40px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
   border-radius: var(--app-radius-control);
-  font: var(--via-fw-semibold) var(--via-fs-xs) var(--via-font);
+  font: var(--via-fw-semibold) var(--app-fs-meta) var(--via-font);
   text-decoration: none;
   cursor: pointer;
-}
-
-.acaoSecundaria {
-  width: fit-content;
-  grid-column: 3;
-  padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-border);
-  color: var(--via-text-primary);
-}
-
-.acaoSecundaria:hover {
-  border-color: var(--via-navy);
-  background: var(--via-navy-04);
 }
 
 .formPrazo {
@@ -311,12 +264,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--via-space-2);
-  margin-top: var(--via-space-3);
+  margin: 0;
 }
 
 .formPrazo input,
 .formPrazo button {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid var(--via-border);
   background: var(--via-bg-2);
   color: var(--via-text-primary);
@@ -339,6 +292,7 @@
 }
 
 .retorno {
+  grid-column: 2 / -1;
   color: var(--via-accent-ink) !important;
 }
 
@@ -348,7 +302,6 @@
 
 .acaoPrincipal {
   width: fit-content;
-  grid-column: 3;
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   background: var(--via-navy);
@@ -371,12 +324,68 @@
   transform: none;
 }
 
-.acaoSecundaria:focus-visible,
 .acaoPrincipal:focus-visible,
 .formPrazo input:focus-visible,
 .formPrazo button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
+}
+
+.proximoPasso {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-4);
+  margin: var(--via-space-4) clamp(22px, 2.5vw, 30px);
+  padding: clamp(18px, 2.2vw, 24px);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-white) 78%, transparent);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+}
+
+.proximoIcone {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--via-white) 16%, transparent);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.proximoPasso > div {
+  min-width: 0;
+}
+
+.proximoPasso p {
+  color: var(--via-accent-ink);
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.proximoPasso h3 {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-family: var(--via-font-display);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: var(--app-ls-h4);
+  line-height: 1.15;
+}
+
+.proximoPasso > div > span {
+  display: block;
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+  line-height: 1.45;
 }
 
 .aviso {
@@ -396,7 +405,7 @@
 
 .aviso p {
   max-width: 82ch;
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: 1.55;
 }
 
@@ -421,17 +430,17 @@
     border-left: 0;
   }
 
-  .passos li {
-    min-height: 164px;
-  }
-
-  .icone {
-    width: 38px;
-    height: 38px;
-  }
-
   .passos {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .proximoPasso {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .proximoPasso > .acaoPrincipal,
+  .proximoPasso > .formPrazo {
+    grid-column: 2;
   }
 }
 
@@ -464,15 +473,34 @@
   }
 
   .formPrazo button,
-  .acaoSecundaria,
   .acaoPrincipal {
     width: 100%;
+  }
+
+  .passos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proximoPasso {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proximoIcone {
+    width: 44px;
+    height: 44px;
+  }
+
+  .proximoPasso > .acaoPrincipal,
+  .proximoPasso > .formPrazo,
+  .proximoPasso > .retorno {
+    grid-column: 1;
   }
 }
 
 @supports not (backdrop-filter: blur(1px)) {
   .inicio,
-  .passos li {
+  .passos li,
+  .proximoPasso {
     background: var(--via-surface);
   }
 }
