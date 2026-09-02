@@ -62,9 +62,8 @@
     height: 100dvh;
     padding: var(--via-space-5) var(--via-space-3) var(--via-space-4);
     overflow: hidden;
-    background:
-      linear-gradient(145deg, var(--via-navy-05) 0%, transparent 26%),
-      color-mix(in srgb, var(--via-surface) 96%, transparent);
+    background: var(--app-glass-plane-strong);
+    backdrop-filter: blur(24px) saturate(145%);
     border-right: 1px solid var(--via-border-soft);
     box-shadow: 14px 0 36px -34px var(--via-navy-30);
   }
@@ -82,36 +81,16 @@
 
 .marcaSidebar {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--via-space-2);
-  min-height: 106px;
-  padding: 2px var(--via-space-2) var(--via-space-5);
+  align-items: center;
+  min-height: 60px;
+  padding: 0 var(--via-space-2) var(--via-space-4);
   color: var(--via-text-primary);
   text-decoration: none;
   border-bottom: 1px solid var(--via-border-soft);
 }
 
-.marcaSidebar strong,
-.marcaSidebar small {
-  display: block;
-  max-width: 196px;
-}
-
-.marcaSidebar strong {
-  margin-top: var(--via-space-2);
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  line-height: 1.32;
-  letter-spacing: var(--app-ls-sm);
-}
-
-.marcaSidebar small {
-  color: var(--via-text-soft);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  line-height: 1.45;
-  letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
+@supports not (backdrop-filter: blur(1px)) {
+  .sidebar {
+    background: var(--via-surface);
+  }
 }

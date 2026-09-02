@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 describe('NavLateral no mobile', () => {
-  it('mantém o dock enxuto e oferece todas as áreas no menu Mais', async () => {
+  it('mantém o dock enxuto e oferece só as áreas adicionais no menu Mais', async () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />);
 
@@ -36,11 +36,14 @@ describe('NavLateral no mobile', () => {
 
     await usuario.click(screen.getByRole('button', { name: 'Mais' }));
 
-    expect(screen.getByRole('dialog', { name: 'Navegação' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Mais' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Propostas' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Entregas' })).toHaveAttribute('href', '/entregas');
     expect(screen.getByRole('link', { name: 'Métricas' })).toHaveAttribute('href', '/metricas');
-    expect(screen.getAllByRole('link', { name: 'Prospecção' })).toHaveLength(2);
+    expect(screen.getAllByRole('link', { name: 'Prospecção' })).toHaveLength(1);
+    expect(screen.getAllByRole('link', { name: 'Início' })).toHaveLength(1);
+    expect(screen.getAllByRole('link', { name: 'Vendas' })).toHaveLength(1);
+    expect(screen.getAllByRole('link', { name: 'Reuniões' })).toHaveLength(1);
     expect(screen.queryByRole('link', { name: 'Diagnósticos' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Sobral AI' })).toHaveAttribute('href', '/consultor');
     expect(screen.getByRole('link', { name: 'Formações' })).toBeInTheDocument();
@@ -73,7 +76,7 @@ describe('NavLateral no mobile', () => {
       'aria-current',
       'page',
     );
-    expect(screen.getByText('Você está aqui')).toBeInTheDocument();
+    expect(screen.getByText('Atual')).toBeInTheDocument();
   });
 });
 
@@ -94,6 +97,9 @@ describe('NavLateral no desktop', () => {
     expect(screen.getByRole('link', { name: 'Reuniões' })).toHaveAttribute('href', '/reunioes');
     expect(screen.getByRole('link', { name: 'Entregas' })).toHaveAttribute('href', '/entregas');
     expect(screen.getAllByText('Pro')).toHaveLength(4);
+    expect(screen.getByText('Aprender e construir')).toBeInTheDocument();
+    expect(screen.getByText('Vender e entregar')).toBeInTheDocument();
+    expect(screen.queryByText('Operação')).not.toBeInTheDocument();
   });
 
   it('só prepara a rota completa depois que a pessoa demonstra intenção', async () => {

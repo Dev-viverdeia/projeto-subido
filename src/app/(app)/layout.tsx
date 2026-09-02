@@ -101,8 +101,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <aside className={styles.sidebar}>
             <Link href="/inicio" className={styles.marcaSidebar} aria-label="Ir para o início">
               <SubidoLogo size={18} />
-              <strong>Sistema operacional do profissional de IA</strong>
-              <small>Em colaboração com Viver de IA</small>
             </Link>
 
             <NavLateral itens={itensComAcesso} variante="lateral" />

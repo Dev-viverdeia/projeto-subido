@@ -22,10 +22,10 @@ export type ItemNav = {
   rotulo: string;
   /** Elemento já renderizado no servidor — ver o porquê abaixo. */
   icone: React.ReactNode;
-  /** Concorre aos quatro atalhos do dock. O painel "Mais" sempre recebe a lista completa. */
+  /** Concorre aos quatro atalhos do dock. O painel "Mais" recebe só os destinos restantes. */
   noDock: boolean;
   /** Organiza a navegação pela jornada real, em vez de uma lista plana de ferramentas. */
-  grupo: 'aprendizado' | 'operacao' | 'gestao';
+  grupo: 'inicio' | 'aprendizado' | 'operacao' | 'gestao';
   /** Sinal calculado no servidor. O cliente só o usa para explicar o acesso. */
   bloqueado?: boolean;
   /** Destino calculado no servidor com o recurso e a origem corretos. */
@@ -35,8 +35,9 @@ export type ItemNav = {
 };
 
 export const ROTULOS_GRUPO_NAV = {
+  inicio: 'Início',
   aprendizado: 'Aprender e construir',
-  operacao: 'Operação',
+  operacao: 'Vender e entregar',
   gestao: 'Gestão',
 } satisfies Record<ItemNav['grupo'], string>;
 
@@ -61,7 +62,7 @@ export const ITENS_NAV: ItemNav[] = [
     rotulo: ROTULOS['/inicio'],
     icone: <House size={TAMANHO} strokeWidth={TRACO} />,
     noDock: true,
-    grupo: 'aprendizado',
+    grupo: 'inicio',
   },
   {
     href: '/consultor',
