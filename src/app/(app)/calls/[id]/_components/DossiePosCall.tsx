@@ -108,6 +108,8 @@ export function DossiePosCall({
     ? (ROTULO_SENTIMENTO[analise.sentimento] ?? analise.sentimento)
     : 'sem leitura suficiente';
   const temAnalise = estado.tipo === 'pronta';
+  const kickoff = posCall.reuniao.tipo === 'kickoff';
+  const briefingPronto = kickoff && Boolean(analise?.briefingOperacional);
   return (
     <div className={styles.pagina}>
       <nav className={styles.navegacao} aria-label="Navegação após a reunião">
@@ -126,7 +128,7 @@ export function DossiePosCall({
           <div className={styles.heroTitulo}>
             <div className={styles.sobretituloHero}>
               <IconeEstado tipo={estado.tipo} />
-              Resumo da reunião · {estado.rotulo}
+              {kickoff ? 'Acordo do projeto' : 'Resumo da reunião'} · {estado.rotulo}
             </div>
             <h1>{posCall.reuniao.titulo}</h1>
             <p>
@@ -142,16 +144,23 @@ export function DossiePosCall({
 
         <div className={styles.heroDecisao}>
           <div>
-            <small>{estado.tipo === 'processando' ? 'Agora' : 'Próxima ação sugerida'}</small>
+            <small>
+              {estado.tipo === 'processando' || kickoff ? 'Agora' : 'Próxima ação sugerida'}
+            </small>
             <strong>
               {estado.tipo === 'processando'
-                ? 'Aguarde o resumo antes de atualizar esta venda'
-                : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
+                ? kickoff
+                  ? 'Aguarde o acordo antes de iniciar a execução'
+                  : 'Aguarde o resumo antes de atualizar esta venda'
+                : briefingPronto
+                  ? 'Revise o acordo antes de iniciar a execução'
+                  : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
             </strong>
           </div>
           {estado.tipo !== 'processando' && (
-            <a href="#plano-da-call">
-              Revisar e atualizar a venda <ChevronRight size={15} aria-hidden="true" />
+            <a href={briefingPronto ? '#proximo-passo-pos-call' : '#plano-da-call'}>
+              {briefingPronto ? 'Revisar acordo do projeto' : 'Revisar e atualizar a venda'}{' '}
+              <ChevronRight size={15} aria-hidden="true" />
             </a>
           )}
         </div>
@@ -165,14 +174,15 @@ export function DossiePosCall({
             {posCall.contato?.cargo ?? 'Contato sem cargo informado'}
           </span>
           <span>
-            <Target size={14} aria-hidden="true" /> {ROTULO_ETAPA[posCall.oportunidade.etapa]}
+            <Target size={14} aria-hidden="true" />{' '}
+            {kickoff ? 'Projeto em execução' : ROTULO_ETAPA[posCall.oportunidade.etapa]}
           </span>
         </div>
       </header>
 
       <RetornoProximaAcao estado={estadoAcao} oportunidadeId={posCall.oportunidade.id} />
 
-      {estado.tipo === 'processando' && <AcompanharProcessamento />}
+      {estado.tipo === 'processando' && <AcompanharProcessamento tipo={posCall.reuniao.tipo} />}
 
       {estado.tipo !== 'processando' && !temAnalise && (
         <section className={styles.leitura} aria-labelledby="leitura-titulo">

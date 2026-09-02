@@ -294,6 +294,47 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toHaveCount(0);
   });
 
+  test('o kickoff conduz da sala ao acordo do projeto', async ({ page }) => {
+    await page.goto('/preview/sala-call?tipo=kickoff');
+    await expect(page.getByRole('heading', { name: 'Preparar kickoff' })).toBeVisible();
+    await expect(page.getByText('Resultado e sucesso')).toBeVisible();
+    await expect(page.getByText('Responsáveis e acessos')).toBeVisible();
+    await expect(page.getByText('Revise o acordo antes de iniciar a execução.')).toBeVisible();
+
+    await page.goto('/preview/live-coach?tipo=kickoff');
+    await expect(
+      page.getByRole('complementary', { name: 'Acordo do projeto privado' }),
+    ).toBeVisible();
+    await expect(page.getByText('Próximo ponto a confirmar')).toBeVisible();
+    await expect(page.getByText('Acordo pronto para revisão ao encerrar')).toBeAttached();
+
+    await page.goto('/preview/pos-call?tipo=kickoff');
+    await expect(page.getByRole('heading', { name: 'O que ficou combinado' })).toBeVisible();
+    await expect(page.getByText('Próximo marco do projeto')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Revisar o briefing/ })).toHaveAttribute(
+      'href',
+      '/entregas/projeto-preview#briefing-kickoff',
+    );
+  });
+
+  test('a preparação do kickoff permanece inteira no celular', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/preview/sala-call?tipo=kickoff');
+
+    await expect(page.getByRole('heading', { name: 'Preparar kickoff' })).toBeVisible();
+    const medidas = await page.evaluate(() => ({
+      largura: document.documentElement.scrollWidth,
+      viewport: document.documentElement.clientWidth,
+    }));
+    expect(medidas.largura).toBeLessThanOrEqual(medidas.viewport + 1);
+
+    const resultado = await new AxeBuilder({ page }).analyze();
+    const graves = resultado.violations.filter(
+      (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+    );
+    expect(graves).toEqual([]);
+  });
+
   test('Mentorias explica o custo antes de confirmar o check-in', async ({ page }) => {
     await page.goto('/preview/mentorias');
 

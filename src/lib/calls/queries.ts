@@ -23,6 +23,7 @@ export type { ReuniaoCall } from './reuniao-modelo';
 export type ConviteCall = {
   reuniaoId: string;
   titulo: string;
+  tipo: TipoCall;
   agendadaPara: string;
   duracaoMinutos: number;
   status: StatusCall;

@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, LoaderCircle } from 'lucide-react';
+import type { TipoCall } from '@/lib/calls/tipos';
 import styles from './AcompanharProcessamento.module.css';
 
-const ETAPAS = [
+const ETAPAS_REUNIAO = [
   { depois: 0, titulo: 'Salvando a conversa', apoio: 'Organizando áudio e transcrição.' },
   { depois: 8, titulo: 'Lendo os pontos principais', apoio: 'Separando fatos, dores e decisões.' },
   {
@@ -17,11 +18,32 @@ const ETAPAS = [
   { depois: 50, titulo: 'Finalizando a ficha', apoio: 'Conferindo o que será ligado à venda.' },
 ] as const;
 
-export function AcompanharProcessamento() {
+const ETAPAS_KICKOFF = [
+  { depois: 0, titulo: 'Salvando o kickoff', apoio: 'Organizando áudio e transcrição.' },
+  {
+    depois: 8,
+    titulo: 'Lendo as decisões',
+    apoio: 'Separando resultado, responsáveis e acessos.',
+  },
+  {
+    depois: 24,
+    titulo: 'Montando o acordo',
+    apoio: 'Organizando limites, responsáveis e próximos passos.',
+  },
+  {
+    depois: 50,
+    titulo: 'Preparando sua revisão',
+    apoio: 'Nada será confirmado no projeto sem você revisar.',
+  },
+] as const;
+
+export function AcompanharProcessamento({ tipo }: { tipo: TipoCall }) {
   const router = useRouter();
   const [segundos, setSegundos] = useState(0);
-  const etapa = [...ETAPAS].reverse().find((item) => segundos >= item.depois) ?? ETAPAS[0];
-  const indice = ETAPAS.indexOf(etapa);
+  const kickoff = tipo === 'kickoff';
+  const etapas = kickoff ? ETAPAS_KICKOFF : ETAPAS_REUNIAO;
+  const etapa = [...etapas].reverse().find((item) => segundos >= item.depois) ?? etapas[0];
+  const indice = etapas.findIndex((item) => item.titulo === etapa.titulo);
 
   useEffect(() => {
     const relogio = window.setInterval(() => setSegundos((atual) => atual + 1), 1_000);
@@ -38,15 +60,23 @@ export function AcompanharProcessamento() {
         <LoaderCircle size={28} />
       </div>
       <div className={styles.conteudo}>
-        <p>Reunião encerrada</p>
-        <h2>{segundos > 80 ? 'O resumo ainda está sendo preparado' : etapa.titulo}</h2>
+        <p>{kickoff ? 'Kickoff encerrado' : 'Reunião encerrada'}</p>
+        <h2>
+          {segundos > 80
+            ? kickoff
+              ? 'O acordo ainda está sendo preparado'
+              : 'O resumo ainda está sendo preparado'
+            : etapa.titulo}
+        </h2>
         <span>
           {segundos > 80
-            ? 'A conversa está salva. Você pode sair desta tela e voltar depois.'
+            ? kickoff
+              ? 'O kickoff está salvo. Você pode sair e revisar o acordo depois.'
+              : 'A conversa está salva. Você pode sair desta tela e voltar depois.'
             : etapa.apoio}
         </span>
-        <ol aria-label="Etapas do processamento">
-          {ETAPAS.map((item, posicao) => (
+        <ol aria-label={kickoff ? 'Etapas de preparação do acordo' : 'Etapas do processamento'}>
+          {etapas.map((item, posicao) => (
             <li
               key={item.titulo}
               data-estado={posicao < indice ? 'feito' : posicao === indice ? 'agora' : 'depois'}

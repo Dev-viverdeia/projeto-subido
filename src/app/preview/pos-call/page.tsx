@@ -172,16 +172,42 @@ export default async function PreviewPosCallPage({ searchParams }: PageProps<'/p
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
   const processando = parametros.estado === 'processando';
-  const posCall = processando
+  const kickoff = parametros.tipo === 'kickoff';
+  const base: PosCall = kickoff
     ? {
         ...POS_CALL,
-        reuniao: { ...POS_CALL.reuniao, status: 'processando' as const, encerradaEm: null },
-        analise: null,
-        transcricao: POS_CALL.transcricao
-          ? { ...POS_CALL.transcricao, status: 'processando' }
+        reuniao: {
+          ...POS_CALL.reuniao,
+          tipo: 'kickoff',
+          titulo: 'Kickoff do projeto de atendimento',
+        },
+        oportunidade: { ...POS_CALL.oportunidade, etapa: 'ganho' },
+        analise: POS_CALL.analise
+          ? {
+              ...POS_CALL.analise,
+              resumo:
+                'O projeto começa pela unidade principal, com a direção de operações como responsável e uma primeira validação em duas semanas.',
+              briefingOperacional: {
+                objetivo: 'Reduzir o tempo de primeira resposta no WhatsApp da unidade principal.',
+                criterio_sucesso: 'Responder 80% das mensagens em até cinco minutos.',
+                responsavel_cliente: 'Marina Alves',
+                responsavel_tecnico: 'Rafael Milagre',
+                acessos: ['WhatsApp da unidade', 'Amostra anonimizada de conversas'],
+                limites: ['Nenhuma orientação clínica sem revisão humana'],
+                proximos_passos: ['Marina libera a amostra até sexta-feira'],
+              },
+            }
           : null,
       }
     : POS_CALL;
+  const posCall = processando
+    ? {
+        ...base,
+        reuniao: { ...base.reuniao, status: 'processando' as const, encerradaEm: null },
+        analise: null,
+        transcricao: base.transcricao ? { ...base.transcricao, status: 'processando' } : null,
+      }
+    : base;
 
   return (
     <main className={styles.preview}>

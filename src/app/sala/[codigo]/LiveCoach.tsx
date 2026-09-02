@@ -11,6 +11,7 @@ import {
 } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import type { PlanoCall } from '@/lib/calls/plano';
+import type { TipoCall } from '@/lib/calls/tipos';
 import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import {
   CabineLiveCoach,
@@ -35,10 +36,12 @@ export function LiveCoach({
   reuniaoId,
   ativo,
   plano = null,
+  tipo = 'descoberta',
 }: {
   reuniaoId: string;
   ativo: boolean;
   plano?: PlanoCall | null;
+  tipo?: TipoCall;
 }) {
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
@@ -409,6 +412,7 @@ export function LiveCoach({
       falha={falha}
       gravacao={gravacao}
       plano={plano}
+      tipo={tipo}
     />
   );
 }

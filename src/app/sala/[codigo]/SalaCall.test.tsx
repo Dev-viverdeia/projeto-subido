@@ -33,6 +33,7 @@ import { SalaCall } from './SalaCall';
 const CONVITE: ConviteCall = {
   reuniaoId: 'reuniao-1',
   titulo: 'Descoberta do atendimento',
+  tipo: 'descoberta',
   agendadaPara: '2099-08-12T18:30:00-03:00',
   duracaoMinutos: 45,
   status: 'agendada',
@@ -97,5 +98,25 @@ describe('SalaCall', () => {
     expect(screen.queryByText('Preparando o resumo da reunião')).not.toBeInTheDocument();
 
     fetchMock.mockRestore();
+  });
+
+  it('prepara o kickoff como acordo do projeto e deixa a revisão explícita', () => {
+    render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={{ ...CONVITE, tipo: 'kickoff', titulo: 'Kickoff do projeto' }}
+        anfitriao
+        nomeSugerido="Rafael"
+        videoConfigurado
+      />,
+    );
+
+    expect(screen.getByText('Sala do kickoff')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Preparar kickoff' })).toBeInTheDocument();
+    expect(screen.getByText('Resultado e sucesso')).toBeInTheDocument();
+    expect(screen.getByText('Responsáveis e acessos')).toBeInTheDocument();
+    expect(screen.getByText('Acordo para revisar')).toBeInTheDocument();
+    expect(screen.getByText('Revise o acordo antes de iniciar a execução.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Entrar no kickoff' })).toBeDisabled();
   });
 });

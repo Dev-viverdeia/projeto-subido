@@ -58,6 +58,7 @@ export function CentralPlanoCall({
   const compromissos = posCall.analise?.compromissos ?? [];
   const planoAplicado = posCall.sincronizacao.acoesPlano.some((acao) => acao.status === 'pendente');
   const saida = montarSaidaPosCall(posCall);
+  const kickoff = posCall.reuniao.tipo === 'kickoff';
   const IconeSaida =
     saida.tipo === 'proposta'
       ? FileSignature
@@ -74,10 +75,14 @@ export function CentralPlanoCall({
       <div className={styles.centralAcaoContexto}>
         <div className={styles.contextoTopoCall}>
           <div>
-            <p className={styles.sobretitulo}>Resumo e próximos passos</p>
-            <h2 id="plano-da-call-titulo">O que ficou decidido</h2>
+            <p className={styles.sobretitulo}>
+              {kickoff ? 'Acordo do projeto' : 'Resumo e próximos passos'}
+            </p>
+            <h2 id="plano-da-call-titulo">
+              {kickoff ? 'O que ficou combinado' : 'O que ficou decidido'}
+            </h2>
           </div>
-          {nota !== null && (
+          {nota !== null && !kickoff && (
             <div className={styles.notaCentral} aria-label={`Leitura comercial ${nota} de 100`}>
               <strong>{nota}</strong>
               <span>/100</span>
@@ -85,7 +90,9 @@ export function CentralPlanoCall({
           )}
         </div>
         {resumo && <p className={styles.resumoCentral}>{resumo}</p>}
-        <small className={styles.sentimentoCentral}>Tom percebido: {sentimento}</small>
+        {!kickoff && (
+          <small className={styles.sentimentoCentral}>Tom percebido: {sentimento}</small>
+        )}
 
         <ol className={styles.fluxoSincronizacao}>
           <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
@@ -106,11 +113,13 @@ export function CentralPlanoCall({
               <GitBranch size={16} aria-hidden="true" />
             </span>
             <div>
-              <strong>Etapa da venda</strong>
+              <strong>{kickoff ? 'Projeto em execução' : 'Etapa da venda'}</strong>
               <small>
-                {etapaRecomendada === etapaAtual
-                  ? `Manter em ${ROTULO_ETAPA[etapaAtual]}`
-                  : `${ROTULO_ETAPA[etapaAtual]} → ${ROTULO_ETAPA[etapaRecomendada]}`}
+                {kickoff
+                  ? 'Venda concluída; agora o foco é entregar'
+                  : etapaRecomendada === etapaAtual
+                    ? `Manter em ${ROTULO_ETAPA[etapaAtual]}`
+                    : `${ROTULO_ETAPA[etapaAtual]} → ${ROTULO_ETAPA[etapaRecomendada]}`}
               </small>
             </div>
           </li>
@@ -140,6 +149,7 @@ export function CentralPlanoCall({
         etapaAtual={etapaAtual}
         etapaSugerida={etapaRecomendada}
         compromissos={compromissos}
+        modo={kickoff ? 'kickoff' : 'venda'}
       />
 
       <Link
