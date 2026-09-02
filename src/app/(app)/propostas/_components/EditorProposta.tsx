@@ -162,25 +162,42 @@ export function EditorProposta({
         />
       )}
 
-      <div className={styles.modos} role="tablist" aria-label="Área de trabalho da proposta">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={painelAtivo === 'editar'}
-          onClick={() => setPainelAtivo('editar')}
-        >
-          <Pencil size={15} strokeWidth={1.8} aria-hidden="true" />
-          Editar
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={painelAtivo === 'preview'}
-          onClick={() => setPainelAtivo('preview')}
-        >
-          <Eye size={16} strokeWidth={1.8} aria-hidden="true" />
-          Prévia em tempo real
-        </button>
+      <div className={styles.modos}>
+        <div className={styles.abasModo} role="tablist" aria-label="Área de trabalho da proposta">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={painelAtivo === 'editar'}
+            onClick={() => setPainelAtivo('editar')}
+          >
+            <Pencil size={15} strokeWidth={1.8} aria-hidden="true" />
+            Editar
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={painelAtivo === 'preview'}
+            onClick={() => setPainelAtivo('preview')}
+          >
+            <Eye size={16} strokeWidth={1.8} aria-hidden="true" />
+            Prévia em tempo real
+          </button>
+        </div>
+        <form action={acaoSalvar} className={styles.salvarMobile}>
+          <input type="hidden" name="id" value={id} />
+          <input type="hidden" name="titulo" value={titulo} />
+          <input type="hidden" name="documento" value={json} />
+          <button type="submit" disabled={salvando || !sujo} aria-live="polite">
+            {salvando ? (
+              <Spinner size="sm" tone="inverse" />
+            ) : !sujo ? (
+              <Check size={15} aria-hidden="true" />
+            ) : (
+              <Save size={15} aria-hidden="true" />
+            )}
+            {salvando ? 'Salvando' : sujo ? 'Salvar' : 'Salvo'}
+          </button>
+        </form>
       </div>
 
       <div className={styles.grade}>
