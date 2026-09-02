@@ -23,6 +23,9 @@ function tituloDa(mensagem: string, arquivos: readonly File[]): string {
 function conteudoDaMensagem(mensagem: string, arquivos: readonly File[]): string {
   const texto = mensagem.trim();
   if (texto) return texto;
+  if (arquivos.length === 1 && categoriaDoAnexo(arquivos[0]!.type) === 'audio') {
+    return 'Áudio enviado.';
+  }
   if (arquivos.length === 1) return `Analise o arquivo ${arquivos[0]!.name}.`;
   return `Analise estes ${arquivos.length} arquivos e me ajude com o que encontrar.`;
 }

@@ -28,6 +28,10 @@ const PROPOSTAS: ResumoProposta[] = [
     empresa: 'Clínica Aurora',
     projeto: 'Atendimento com IA',
     valorCentavos: 1850000,
+    compartilhadaEm: null,
+    ultimaVisualizacaoEm: null,
+    visualizacoes: 0,
+    decididaEm: null,
   },
   {
     id: '22222222-2222-4222-8222-222222222222',
@@ -39,6 +43,10 @@ const PROPOSTAS: ResumoProposta[] = [
     empresa: 'Moura Imóveis',
     projeto: 'Máquina de leads',
     valorCentavos: 2400000,
+    compartilhadaEm: '2026-08-07T20:00:00.000Z',
+    ultimaVisualizacaoEm: '2026-08-08T10:30:00.000Z',
+    visualizacoes: 3,
+    decididaEm: null,
   },
   {
     id: '33333333-3333-4333-8333-333333333333',
@@ -50,6 +58,10 @@ const PROPOSTAS: ResumoProposta[] = [
     empresa: 'Orbe Contabilidade',
     projeto: 'Copiloto de vendas',
     valorCentavos: 3200000,
+    compartilhadaEm: '2026-08-04T18:00:00.000Z',
+    ultimaVisualizacaoEm: '2026-08-06T14:00:00.000Z',
+    visualizacoes: 4,
+    decididaEm: '2026-08-06T18:00:00.000Z',
   },
 ];
 
@@ -67,10 +79,10 @@ export default function PreviewPropostasPage() {
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </span>
           <span>
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
           </span>
           <a className={styles.ativo} href="#conteudo">
             <FileSignature size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas

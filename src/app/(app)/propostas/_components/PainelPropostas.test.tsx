@@ -15,6 +15,10 @@ const PROPOSTAS: ResumoProposta[] = [
     empresa: 'Clínica Aurora',
     projeto: 'Atendimento com IA',
     valorCentavos: 1200000,
+    compartilhadaEm: null,
+    ultimaVisualizacaoEm: null,
+    visualizacoes: 0,
+    decididaEm: null,
   },
   {
     id: '22222222-2222-4222-8222-222222222222',
@@ -26,6 +30,10 @@ const PROPOSTAS: ResumoProposta[] = [
     empresa: 'Orbe',
     projeto: 'SDR com IA',
     valorCentavos: 2400000,
+    compartilhadaEm: '2026-08-19T12:00:00.000Z',
+    ultimaVisualizacaoEm: '2026-08-19T14:00:00.000Z',
+    visualizacoes: 2,
+    decididaEm: null,
   },
 ];
 
@@ -44,15 +52,16 @@ describe('PainelPropostas', () => {
     await usuario.click(screen.getByRole('tab', { name: 'Rascunhos, 1' }));
     expect(within(arquivo).getByText('Clínica Aurora')).toBeInTheDocument();
     expect(within(arquivo).queryByText('Orbe')).not.toBeInTheDocument();
-    expect(within(arquivo).getByText('Editar')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Editar proposta')).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('tab', { name: 'Enviadas, 1' }));
     expect(within(arquivo).getByText('Orbe')).toBeInTheDocument();
     expect(within(arquivo).getByText('Enviada')).toBeInTheDocument();
-    expect(within(arquivo).getByText('Abrir')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Cliente visualizou')).toBeInTheDocument();
+    expect(within(arquivo).getByText('Acompanhar decisão')).toBeInTheDocument();
 
     expect(screen.queryByText('Valor enviado')).not.toBeInTheDocument();
-    expect(screen.queryByText('Aprovadas')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Decididas, 0' })).toBeInTheDocument();
   });
 
   it('mostra um estado vazio útil sem duplicar a criação da primeira proposta', () => {

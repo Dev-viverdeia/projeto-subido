@@ -91,11 +91,13 @@ export function TelaSobral({
   conversa,
   contextoInicial,
   nome,
+  modoPreview = false,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
   contextoInicial?: ContextoSobralTarefa | null;
   nome?: string | null;
+  modoPreview?: boolean;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -204,7 +206,7 @@ export function TelaSobral({
             </div>
           ) : (
             <div className={styles.historico}>
-              <Mensagens mensagens={mensagens} />
+              <Mensagens mensagens={mensagens} modoPreview={modoPreview} />
             </div>
           )}
 

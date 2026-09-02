@@ -98,6 +98,12 @@
   gap: var(--via-space-2);
 }
 
+.audios {
+  width: min(100%, 430px);
+  display: grid;
+  gap: var(--via-space-2);
+}
+
 .anexos li {
   min-width: 0;
   max-width: min(100%, 280px);

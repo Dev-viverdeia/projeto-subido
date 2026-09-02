@@ -12,6 +12,7 @@ import {
   validarAnexosSobral,
 } from '@/lib/consultor/anexos-contrato';
 import { AnexoIcone } from './AnexoIcone';
+import { AudioMensagem } from './AudioMensagem';
 import { blocosDaResposta } from './resposta';
 import { useGravadorAudio } from './useGravadorAudio';
 import styles from './Conversa.module.css';
@@ -169,14 +170,9 @@ export function Conversa({
     if ((!mensagem && arquivos.length === 0) || ocupado || gravando) return;
 
     const anexosDaRodada = [...arquivos];
-    const textoDaRodada =
-      mensagem ||
-      (anexosDaRodada.length === 1
-        ? `Analise o arquivo ${anexosDaRodada[0]!.name}.`
-        : `Analise estes ${anexosDaRodada.length} arquivos.`);
     setErro(null);
     setRespostaEmVoo(null);
-    setEmVoo(textoDaRodada);
+    setEmVoo(mensagem || null);
     setArquivosEmVoo(anexosDaRodada);
     setTexto('');
     setArquivos([]);
@@ -208,14 +204,22 @@ export function Conversa({
       {(emVoo !== null || etapa || respostaEmVoo !== null) && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
           {arquivosEmVoo.length > 0 ? (
-            <ul className={styles.anexosEmVoo} aria-label="Arquivos enviados">
-              {arquivosEmVoo.map((arquivo) => (
-                <li key={`${arquivo.name}-${arquivo.size}`}>
-                  <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
-                  <span>{arquivo.name}</span>
-                </li>
-              ))}
-            </ul>
+            <div className={styles.anexosEmVoo} aria-label="Arquivos enviados">
+              {arquivosEmVoo.map((arquivo) =>
+                categoriaDoAnexo(arquivo.type) === 'audio' ? (
+                  <AudioMensagem
+                    key={`${arquivo.name}-${arquivo.size}`}
+                    arquivo={arquivo}
+                    estado="Enviando"
+                  />
+                ) : (
+                  <span className={styles.anexoEmVoo} key={`${arquivo.name}-${arquivo.size}`}>
+                    <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
+                    <span>{arquivo.name}</span>
+                  </span>
+                ),
+              )}
+            </div>
           ) : null}
           {emVoo !== null ? <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p> : null}
           {etapa ? (
@@ -273,26 +277,38 @@ export function Conversa({
         }}
       >
         {arquivos.length > 0 ? (
-          <ul className={styles.arquivosSelecionados} aria-label="Arquivos prontos para enviar">
-            {arquivos.map((arquivo, indice) => (
-              <li key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}>
-                <span className={styles.iconeArquivo} aria-hidden="true">
-                  <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
-                </span>
-                <span className={styles.dadosArquivo}>
-                  <strong>{arquivo.name}</strong>
-                  <small>{tamanhoLegivel(arquivo.size)}</small>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
-                  aria-label={`Remover ${arquivo.name}`}
+          <div className={styles.arquivosSelecionados} aria-label="Arquivos prontos para enviar">
+            {arquivos.map((arquivo, indice) =>
+              categoriaDoAnexo(arquivo.type) === 'audio' ? (
+                <AudioMensagem
+                  key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}
+                  arquivo={arquivo}
+                  estado="Pronto para enviar"
+                  aoRemover={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
+                />
+              ) : (
+                <div
+                  className={styles.arquivoSelecionado}
+                  key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}
                 >
-                  <X size={14} aria-hidden="true" />
-                </button>
-              </li>
-            ))}
-          </ul>
+                  <span className={styles.iconeArquivo} aria-hidden="true">
+                    <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
+                  </span>
+                  <span className={styles.dadosArquivo}>
+                    <strong>{arquivo.name}</strong>
+                    <small>{tamanhoLegivel(arquivo.size)}</small>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
+                    aria-label={`Remover ${arquivo.name}`}
+                  >
+                    <X size={14} aria-hidden="true" />
+                  </button>
+                </div>
+              ),
+            )}
+          </div>
         ) : null}
 
         <div className={styles.linhaCompositor}>

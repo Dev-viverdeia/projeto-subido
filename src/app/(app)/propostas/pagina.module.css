@@ -204,7 +204,7 @@
 
 .card {
   display: grid;
-  grid-template-columns: minmax(300px, 1.5fr) minmax(130px, 0.45fr) minmax(150px, 0.55fr) auto;
+  grid-template-columns: minmax(300px, 1.5fr) minmax(130px, 0.45fr) minmax(210px, 0.7fr) auto;
   align-items: center;
   gap: var(--via-space-5);
   min-height: 116px;
@@ -278,17 +278,15 @@
 .cardTitulo span,
 .cardValor span,
 .cardValor strong,
-.cardAtualizacao span,
-.cardAtualizacao strong,
-.cardAtualizacao small {
+.cardProximoPasso strong,
+.cardProximoPasso small {
   margin: 0;
 }
 
 .cardTitulo p,
 .cardTitulo span,
 .cardValor span,
-.cardAtualizacao span,
-.cardAtualizacao small {
+.cardProximoPasso small {
   color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
@@ -305,21 +303,47 @@
   white-space: nowrap;
 }
 
-.cardValor,
-.cardAtualizacao {
+.cardValor {
   display: grid;
   gap: var(--via-space-1);
 }
 
 .cardValor strong,
-.cardAtualizacao strong {
+.cardProximoPasso strong {
   color: var(--via-text-primary);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
 }
 
-.cardAtualizacao strong,
-.cardAtualizacao small {
+.cardProximoPasso {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.cardProximoIcone {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 58%, transparent);
+  color: var(--via-navy);
+}
+
+.cardProximoPasso > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.cardProximoPasso strong,
+.cardProximoPasso small {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -406,7 +430,7 @@
     grid-template-columns: minmax(260px, 1fr) minmax(130px, auto) auto;
   }
 
-  .cardAtualizacao {
+  .cardProximoPasso {
     display: none;
   }
 }
@@ -445,6 +469,11 @@
     grid-column: 1 / -1;
     grid-template-columns: 1fr;
     gap: var(--via-space-3);
+  }
+
+  .cardProximoPasso {
+    display: grid;
+    grid-column: 1 / -1;
   }
 
   .cardTitulo h3 {

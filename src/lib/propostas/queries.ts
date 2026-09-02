@@ -22,6 +22,10 @@ export type ResumoProposta = {
   empresa: string;
   projeto: string;
   valorCentavos: number | null;
+  compartilhadaEm: string | null;
+  ultimaVisualizacaoEm: string | null;
+  visualizacoes: number;
+  decididaEm: string | null;
 };
 
 export type PropostaCompleta = ResumoProposta & {
@@ -55,7 +59,9 @@ export const listarPropostas = cache(async (): Promise<ResumoProposta[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('propostas')
-    .select('id, titulo, status, versao, documento, atualizado_em, criado_em')
+    .select(
+      'id, titulo, status, versao, documento, atualizado_em, criado_em, compartilhada_em, ultima_visualizacao_em, visualizacoes, decidida_em',
+    )
     .order('atualizado_em', { ascending: false })
     .limit(100);
 
@@ -75,6 +81,10 @@ export const listarPropostas = cache(async (): Promise<ResumoProposta[]> => {
         empresa: documento.cliente.empresa,
         projeto: documento.projeto.titulo,
         valorCentavos: documento.investimento.valorCentavos,
+        compartilhadaEm: linha.compartilhada_em,
+        ultimaVisualizacaoEm: linha.ultima_visualizacao_em,
+        visualizacoes: linha.visualizacoes,
+        decididaEm: linha.decidida_em,
       },
     ];
   });
@@ -105,6 +115,10 @@ export const obterProposta = cache(async (id: string): Promise<PropostaCompleta 
     empresa: documento.cliente.empresa,
     projeto: documento.projeto.titulo,
     valorCentavos: documento.investimento.valorCentavos,
+    compartilhadaEm: data.compartilhada_em,
+    ultimaVisualizacaoEm: data.ultima_visualizacao_em,
+    visualizacoes: data.visualizacoes,
+    decididaEm: data.decidida_em,
     empresaId: data.empresa_id,
     oportunidadeId: data.oportunidade_id,
     projetoId: data.projeto_id,
