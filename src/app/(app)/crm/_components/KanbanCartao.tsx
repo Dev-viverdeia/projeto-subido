@@ -228,7 +228,6 @@ export function CartaoOportunidade({
         )}
       </div>
 
-      <p className={styles.projetoRotulo}>Projeto em negociação</p>
       <h3>{oportunidade.titulo}</h3>
 
       <div className={styles.contextoCartao}>
