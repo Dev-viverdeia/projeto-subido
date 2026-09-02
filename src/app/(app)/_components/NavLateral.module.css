@@ -273,7 +273,13 @@
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
   border-bottom: 0;
   border-radius: var(--via-radius-xl) var(--via-radius-xl) 0 0;
-  background: var(--app-glass-plane-strong);
+  background:
+    linear-gradient(
+      132deg,
+      color-mix(in srgb, var(--via-white) 78%, transparent) 0%,
+      transparent 58%
+    ),
+    color-mix(in srgb, var(--via-surface) 96%, var(--via-bg-2));
   backdrop-filter: blur(28px) saturate(150%);
   box-shadow: var(--app-elev-3-shadow);
   animation: revelarPainel 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
