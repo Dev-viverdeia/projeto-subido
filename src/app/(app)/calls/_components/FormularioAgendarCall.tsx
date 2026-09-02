@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { CalendarCheck2, CalendarPlus, Check, Layers3, Mail } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, Check, ClipboardCheck, Layers3, Mail } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
@@ -70,7 +70,9 @@ export function FormularioAgendarCall({
     disponiveis.find((item) => item.id === oportunidadeSelecionadaId) ??
     null;
   const [convidadoEmail, setConvidadoEmail] = useState(oportunidadeVinculada?.contatoEmail ?? '');
+  const [tipoSelecionado, setTipoSelecionado] = useState<TipoCall>(tipoInicial ?? 'descoberta');
   const precisaConfigurarCalendar = !calendar.conectado;
+  const ehKickoff = tipoSelecionado === 'kickoff';
   const podeAgendar = !precisaConfigurarCalendar && (!comercialLiberado || disponiveis.length > 0);
   const retornoCalendar = `/reunioes?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
   const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
@@ -118,15 +120,23 @@ export function FormularioAgendarCall({
       <ModalOperacao
         open={aberto}
         onClose={fechar}
-        title={precisaConfigurarCalendar ? 'Conectar Google Calendar' : 'Agendar reunião'}
+        title={
+          precisaConfigurarCalendar
+            ? 'Conectar Google Calendar'
+            : ehKickoff
+              ? 'Agendar kickoff'
+              : 'Agendar reunião'
+        }
         description={
           precisaConfigurarCalendar
             ? 'Conecte sua agenda uma vez para criar convites com a sala da Subido.'
-            : oportunidadeVinculada
-              ? 'Defina o horário. A reunião ficará ligada à ficha deste cliente.'
-              : comercialLiberado
-                ? 'Escolha o cliente e o horário. O convite será enviado pela sua agenda.'
-                : 'Informe quem participa e defina o horário da conversa.'
+            : ehKickoff && oportunidadeVinculada
+              ? 'Defina o horário. O convite abre a sala e liga o kickoff ao projeto deste cliente.'
+              : oportunidadeVinculada
+                ? 'Defina o horário. A reunião ficará ligada à ficha deste cliente.'
+                : comercialLiberado
+                  ? 'Escolha o cliente e o horário. O convite será enviado pela sua agenda.'
+                  : 'Informe quem participa e defina o horário da conversa.'
         }
         size="lg"
         blocked={pendente}
@@ -136,7 +146,12 @@ export function FormularioAgendarCall({
               <Button type="button" variant="secondary" onClick={fechar} disabled={pendente}>
                 Cancelar
               </Button>
-              <BotaoAgendar comConviteGoogle pending={pendente} form={FORMULARIO_ID} />
+              <BotaoAgendar
+                comConviteGoogle
+                kickoff={ehKickoff}
+                pending={pendente}
+                form={FORMULARIO_ID}
+              />
             </>
           ) : undefined
         }
@@ -185,7 +200,7 @@ export function FormularioAgendarCall({
               <div className={styles.contextoLead}>
                 <input type="hidden" name="oportunidade" value={oportunidadeVinculada.id} />
                 <div className={styles.contextoLeadTopo}>
-                  <span>Venda vinculada</span>
+                  <span>{ehKickoff ? 'Projeto vinculado' : 'Venda vinculada'}</span>
                   <Link href={`/vendas/${oportunidadeVinculada.id}`}>Abrir ficha</Link>
                 </div>
                 <strong>{oportunidadeVinculada.empresa}</strong>
@@ -240,6 +255,7 @@ export function FormularioAgendarCall({
                   name="tipo"
                   data-autofocus={Boolean(oportunidadeVinculada)}
                   defaultValue={estado.campos?.tipo ?? tipoInicial ?? 'descoberta'}
+                  onChange={(evento) => setTipoSelecionado(evento.currentTarget.value as TipoCall)}
                 >
                   {TIPOS_CALL.map((tipo) => (
                     <option key={tipo.id} value={tipo.id}>
@@ -279,12 +295,28 @@ export function FormularioAgendarCall({
                 id="calls-titulo"
                 name="titulo"
                 label="Título (opcional)"
-                placeholder="Ex.: Descoberta de atendimento"
+                placeholder={
+                  ehKickoff
+                    ? 'Ex.: Kickoff do projeto de atendimento'
+                    : 'Ex.: Descoberta de atendimento'
+                }
                 defaultValue={estado.campos?.titulo ?? ''}
                 error={erroVisivel('titulo')}
                 onChange={() => ocultarErro('titulo')}
               />
             </div>
+
+            {ehKickoff && (
+              <section className={styles.kickoffResumo} aria-label="Resultado esperado do kickoff">
+                <span aria-hidden="true">
+                  <ClipboardCheck size={18} strokeWidth={1.7} />
+                </span>
+                <div>
+                  <strong>O que precisa sair do kickoff</strong>
+                  <p>Resultado, responsáveis, acessos e limites confirmados com o cliente.</p>
+                </div>
+              </section>
+            )}
 
             <section className={styles.calendar} aria-labelledby="convite-google-titulo">
               <div className={styles.calendarTopo}>

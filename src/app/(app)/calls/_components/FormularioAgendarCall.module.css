@@ -78,7 +78,7 @@
 
 .setupResumo span {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -101,7 +101,7 @@
   gap: var(--via-space-2);
   margin-top: var(--via-space-4);
   color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -118,9 +118,50 @@
 
 .formulario > [role='alert'],
 .detalhesColunas,
+.kickoffResumo,
 .calendar,
 .coach {
   grid-column: 1 / -1;
+}
+
+.kickoffResumo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 78%, transparent);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.kickoffResumo > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+}
+
+.kickoffResumo strong,
+.kickoffResumo p {
+  margin: 0;
+}
+
+.kickoffResumo strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+}
+
+.kickoffResumo p {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+  line-height: var(--via-lh-normal);
 }
 
 .duasColunas,
@@ -180,7 +221,7 @@
 .contextoLeadTopo span {
   color: var(--via-accent-ink);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
@@ -222,7 +263,7 @@
 .contextoLead small {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
 }
 
 .erro {
@@ -270,7 +311,7 @@
 .calendarTopo p {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -279,7 +320,7 @@
   overflow: hidden;
   color: var(--via-text-faint);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -322,13 +363,13 @@
 
 .conviteAtivo strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
 }
 
 .conviteAtivo small {
   margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -371,7 +412,7 @@
 .coach small {
   margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
 }
 
 .semLead {

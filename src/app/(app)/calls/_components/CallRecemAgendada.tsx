@@ -29,11 +29,12 @@ export function CallRecemAgendada({
 }) {
   const conviteSincronizado = reuniao.googleSyncStatus === 'sincronizado';
   const conviteFalhou = reuniao.googleSyncStatus === 'falhou';
+  const kickoff = reuniao.tipo === 'kickoff';
 
   return (
     <section className={styles.callCriada} aria-labelledby="call-criada-titulo" aria-live="polite">
       <div className={styles.callCriadaContexto}>
-        <p>Reunião pronta</p>
+        <p>{kickoff ? 'Kickoff agendado' : 'Reunião pronta'}</p>
         <h2 id="call-criada-titulo">{reuniao.titulo}</h2>
         <span>
           {reuniao.empresa}
@@ -50,19 +51,27 @@ export function CallRecemAgendada({
           </dd>
         </div>
         <div>
-          <dt>Venda</dt>
+          <dt>{kickoff ? 'Projeto' : 'Venda'}</dt>
           <dd>{reuniao.oportunidade}</dd>
         </div>
         <div>
-          <dt>Memória</dt>
-          <dd>{reuniao.liveCoachAtivo ? 'Transcrição + Live Coach' : 'Transcrição da conversa'}</dd>
+          <dt>{kickoff ? 'Depois' : 'Memória'}</dt>
+          <dd>
+            {kickoff
+              ? 'Acordo do projeto'
+              : reuniao.liveCoachAtivo
+                ? 'Transcrição + Live Coach'
+                : 'Transcrição da conversa'}
+          </dd>
         </div>
       </dl>
 
       <div className={styles.callCriadaAcoes}>
         <p>
           {conviteSincronizado
-            ? `Convite enviado pelo Google Calendar${reuniao.convidadoEmail ? ` para ${reuniao.convidadoEmail}` : ''}.`
+            ? kickoff
+              ? `Convite enviado${reuniao.convidadoEmail ? ` para ${reuniao.convidadoEmail}` : ''}. O roteiro do kickoff já está pronto.`
+              : `Convite enviado pelo Google Calendar${reuniao.convidadoEmail ? ` para ${reuniao.convidadoEmail}` : ''}.`
             : conviteFalhou
               ? 'A sala foi criada, mas o convite do Google não foi enviado.'
               : comercialLiberado
@@ -70,7 +79,7 @@ export function CallRecemAgendada({
                 : 'O link foi criado e o histórico desta conversa ficará salvo.'}
         </p>
         <div>
-          <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} />
+          <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} tipo={reuniao.tipo} />
           {comercialLiberado && (
             <Link href={`/vendas/${reuniao.oportunidadeId}`} className={styles.abrirLead}>
               Abrir ficha <ArrowRight size={14} aria-hidden="true" />

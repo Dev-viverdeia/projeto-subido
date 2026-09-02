@@ -133,7 +133,16 @@ describe('FormularioAgendarCall', () => {
     expect(document.querySelector<HTMLInputElement>('input[name="oportunidade"]')).toHaveValue(
       OPORTUNIDADE.id,
     );
+    expect(screen.getByRole('dialog', { name: 'Agendar kickoff' })).toBeInTheDocument();
+    expect(screen.getByText('Projeto vinculado')).toBeInTheDocument();
+    expect(screen.queryByText('Venda vinculada')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Tipo de reunião')).toHaveValue('kickoff');
+    expect(screen.getByLabelText('Resultado esperado do kickoff')).toHaveTextContent(
+      'Resultado, responsáveis, acessos e limites confirmados com o cliente.',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Agendar kickoff e enviar convite' }),
+    ).toBeInTheDocument();
   });
 
   it('prepara o convite no Google com o e-mail que já está no CRM', () => {

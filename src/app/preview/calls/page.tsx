@@ -22,7 +22,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
   {
     id: '22222222-2222-4222-8222-222222222222',
     titulo: 'Automação do atendimento',
-    etapa: 'descoberta',
+    etapa: 'ganho',
     empresaId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
     empresa: 'Clínica Aurora',
     dominio: 'clinicaaurora.com.br',
@@ -32,7 +32,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     contato: 'Camila Rios',
     contatoEmail: 'camila@exemplo.com',
     valorCentavos: null,
-    proximaAcao: 'Realizar chamada de descoberta',
+    proximaAcao: 'Realizar kickoff do projeto',
     proximaAcaoEm: '2026-08-10T17:00:00.000Z',
     ganhaEm: null,
     perdidaEm: null,
@@ -89,8 +89,8 @@ const REUNIOES: ReuniaoCall[] = [
   },
   {
     id: '44444444-4444-4444-8444-444444444444',
-    titulo: 'Descoberta do atendimento',
-    tipo: 'descoberta',
+    titulo: 'Kickoff do projeto de atendimento',
+    tipo: 'kickoff',
     status: 'agendada',
     agendadaPara: '2026-08-10T17:00:00.000Z',
     duracaoMinutos: 45,
@@ -180,6 +180,7 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
           oportunidadeInicial={
             typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
           }
+          tipoInicial={parametros.tipo === 'kickoff' ? 'kickoff' : undefined}
         />
       </main>
     </div>

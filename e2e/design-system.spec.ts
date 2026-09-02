@@ -10,7 +10,7 @@ const TELAS = [
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
-  ['/preview/calls', 'Comece por aqui'],
+  ['/preview/calls', 'Início do projeto'],
   ['/preview/call-preparo', 'Confirmar se a perda de contatos'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
   ['/preview/live-coach', 'Dimensione o custo da espera'],
@@ -225,10 +225,52 @@ test.describe('fundação visual Viver de IA', () => {
   }) => {
     await page.goto('/preview/calls');
 
-    await expect(page.getByText('Comece por aqui', { exact: true })).toBeVisible();
+    await expect(page.getByText('Início do projeto', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Outras ações' }).first().click();
     await expect(page.getByRole('menuitem', { name: 'Copiar link da sala' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: 'Entrar na sala' })).toBeVisible();
+  });
+
+  test('o kickoff conecta a reunião ao início do projeto sem perder contexto', async ({ page }) => {
+    await page.goto('/preview/call-preparo?tipo=kickoff');
+
+    await expect(page.getByRole('heading', { name: 'Acordos essenciais' })).toBeVisible();
+    await expect(page.getByLabel('Continuidade do kickoff')).toContainText(
+      'As decisões confirmadas viram o acordo do projeto.',
+    );
+    await expect(page.getByText('SDR de atendimento para Clínica Horizonte')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Abrir projeto' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Entrar no kickoff' })).toBeVisible();
+
+    const temOverflowHorizontal = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
+    expect(temOverflowHorizontal).toBe(false);
+  });
+
+  test('o agendamento do kickoff permanece inteiro e rolável em qualquer tela', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/preview/calls?calendar=1&modal=1&oportunidade=22222222-2222-4222-8222-222222222222&tipo=kickoff',
+    );
+
+    const dialogo = page.getByRole('dialog', { name: 'Agendar kickoff' });
+    await expect(dialogo).toBeVisible();
+    await expect(dialogo.getByText('Projeto vinculado')).toBeVisible();
+    await expect(dialogo.getByLabel('Resultado esperado do kickoff')).toBeVisible();
+
+    const coach = dialogo.getByText('Live Coach', { exact: true });
+    await coach.scrollIntoViewIfNeeded();
+    await expect(coach).toBeVisible();
+    await expect(
+      dialogo.getByRole('button', { name: 'Agendar kickoff e enviar convite' }),
+    ).toBeVisible();
+
+    const temOverflowHorizontal = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
+    expect(temOverflowHorizontal).toBe(false);
   });
 
   test('a biblioteca comercial filtra propostas dentro de uma única superfície', async ({

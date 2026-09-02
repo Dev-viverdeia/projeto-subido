@@ -15,7 +15,7 @@
   min-height: 44px;
   padding-inline: var(--via-space-3);
   border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
   cursor: pointer;

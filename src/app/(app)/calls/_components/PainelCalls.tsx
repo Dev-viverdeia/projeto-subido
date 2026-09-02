@@ -85,6 +85,7 @@ export function PainelCalls({
     : ativas;
   const proxima = ativasNaAgenda[0];
   const seguintes = ativasNaAgenda.slice(1);
+  const proximaEhKickoff = proxima?.tipo === 'kickoff';
 
   return (
     <div className={styles.pagina}>
@@ -122,7 +123,7 @@ export function PainelCalls({
         <section className={styles.proximaCall} aria-labelledby="proxima-call-titulo">
           <div className={styles.proximaContexto}>
             <div className={styles.proximaLinha}>
-              <p>Comece por aqui</p>
+              <p>{proximaEhKickoff ? 'Início do projeto' : 'Comece por aqui'}</p>
               <span data-status={proxima.status}>
                 {proxima.status === 'ao_vivo' ? (
                   <Radio size={13} strokeWidth={1.9} aria-hidden="true" />
@@ -142,7 +143,8 @@ export function PainelCalls({
               <span>{ROTULO_TIPO_CALL[proxima.tipo]}</span>
               {proxima.liveCoachAtivo && (
                 <span>
-                  <Layers3 size={13} aria-hidden="true" /> Roteiro e coach prontos
+                  <Layers3 size={13} aria-hidden="true" />
+                  {proximaEhKickoff ? 'Roteiro do kickoff pronto' : 'Roteiro e coach prontos'}
                 </span>
               )}
             </div>
@@ -161,7 +163,12 @@ export function PainelCalls({
               <Clock3 size={15} strokeWidth={1.8} aria-hidden="true" />
               {proxima.duracaoMinutos} minutos
             </div>
-            <AcoesSala id={proxima.id} codigo={proxima.codigoPublico} destaque />
+            <AcoesSala
+              id={proxima.id}
+              codigo={proxima.codigoPublico}
+              tipo={proxima.tipo}
+              destaque
+            />
           </div>
         </section>
       )}
@@ -257,7 +264,7 @@ export function PainelCalls({
                       minutos
                     </small>
                   </div>
-                  <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} />
+                  <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} tipo={reuniao.tipo} />
                 </article>
               ))}
             </div>

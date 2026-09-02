@@ -22,10 +22,12 @@ const ETAPAS_CONVITE = [
 
 export function BotaoAgendar({
   comConviteGoogle,
+  kickoff = false,
   pending,
   form,
 }: {
   comConviteGoogle: boolean;
+  kickoff?: boolean;
   pending: boolean;
   form: string;
 }) {
@@ -34,9 +36,19 @@ export function BotaoAgendar({
       <EsperaOperacao
         key={pending ? 'agendando' : 'pronto'}
         aberto={pending}
-        rotulo="Agendamento em andamento"
-        titulo={comConviteGoogle ? 'Criando sua reunião e o convite' : 'Criando sua reunião'}
-        descricao="Estamos preparando a sala e ligando a conversa à ficha do cliente."
+        rotulo={kickoff ? 'Kickoff em preparação' : 'Agendamento em andamento'}
+        titulo={
+          kickoff
+            ? 'Criando o kickoff e o convite'
+            : comConviteGoogle
+              ? 'Criando sua reunião e o convite'
+              : 'Criando sua reunião'
+        }
+        descricao={
+          kickoff
+            ? 'Estamos preparando a sala e ligando o kickoff ao projeto do cliente.'
+            : 'Estamos preparando a sala e ligando a conversa à ficha do cliente.'
+        }
         etapas={comConviteGoogle ? ETAPAS_CONVITE : ETAPAS_SALA}
         intervalo={2_500}
         nota="Mantenha esta janela aberta até a confirmação."
@@ -45,12 +57,16 @@ export function BotaoAgendar({
       />
       <Button type="submit" form={form} variant="primary" loading={pending}>
         {pending
-          ? comConviteGoogle
-            ? 'Criando reunião e convite…'
-            : 'Criando sala…'
-          : comConviteGoogle
-            ? 'Criar reunião e enviar convite'
-            : 'Criar reunião e link'}
+          ? kickoff
+            ? 'Criando kickoff e convite…'
+            : comConviteGoogle
+              ? 'Criando reunião e convite…'
+              : 'Criando sala…'
+          : kickoff
+            ? 'Agendar kickoff e enviar convite'
+            : comConviteGoogle
+              ? 'Criar reunião e enviar convite'
+              : 'Criar reunião e link'}
       </Button>
     </>
   );

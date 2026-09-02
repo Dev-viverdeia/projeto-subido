@@ -8,6 +8,7 @@
 .navegacao,
 .cabecalho,
 .resumo,
+.continuidadeKickoff,
 .plano,
 .grade {
   min-width: 0;
@@ -38,7 +39,7 @@
 .navegacao > span {
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
@@ -69,7 +70,7 @@
 .plano p {
   margin: 0;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
@@ -152,16 +153,78 @@
   min-width: 0;
 }
 
+.continuidadeKickoff {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 76%, transparent);
+}
+
+.continuidadeIcone {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy-05);
+  color: var(--via-navy);
+}
+
+.continuidadeKickoff small,
+.continuidadeKickoff strong {
+  display: block;
+}
+
+.continuidadeKickoff small {
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-micro);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.continuidadeKickoff strong {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+
+.continuidadeKickoff a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-surface) 72%, transparent);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+}
+
+.continuidadeKickoff a:hover {
+  border-color: var(--via-text-faint);
+  color: var(--via-text-primary);
+}
+
 .resumo small {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
 }
 
 .resumo strong {
   margin-top: var(--via-space-1);
   overflow: hidden;
   color: var(--via-text-body);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -217,14 +280,14 @@
 .abertura small {
   color: var(--via-gray-400);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   text-transform: uppercase;
 }
 
 .abertura blockquote {
   margin: var(--via-space-2) 0 0;
   color: var(--via-gray-100);
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: var(--via-lh-loose);
 }
 
@@ -248,7 +311,7 @@
 .fechamento span {
   margin-top: var(--via-space-5);
   color: var(--via-gray-300);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-loose);
 }
 
@@ -296,7 +359,7 @@
 .perguntas > header > span {
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   text-transform: uppercase;
 }
 
@@ -327,7 +390,7 @@
   padding-top: 2px;
   color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
 }
 
 .perguntas li small,
@@ -339,7 +402,7 @@
 .perguntas li small {
   color: var(--via-accent-deep);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-micro);
   text-transform: uppercase;
 }
 
@@ -353,7 +416,7 @@
 .perguntas li p {
   margin: var(--via-space-1) 0 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -390,7 +453,7 @@
   padding-top: var(--via-space-3);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-text-body);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -420,7 +483,7 @@
   display: block;
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -445,19 +508,20 @@
 
 .coachPronto strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
 }
 
 .coachPronto span {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
 .navegacao a:focus-visible,
 .primaria:focus-visible,
 .secundaria:focus-visible,
+.continuidadeKickoff a:focus-visible,
 .estadoBase a:focus-visible {
   outline: none;
   border-radius: var(--app-radius-control);
@@ -467,6 +531,7 @@
 @supports not (backdrop-filter: blur(1px)) {
   .cabecalho,
   .resumo,
+  .continuidadeKickoff,
   .perguntas,
   .contexto > section {
     background: var(--via-surface);
@@ -540,6 +605,15 @@
   .acoesTopo {
     align-items: stretch;
     flex-direction: column-reverse;
+  }
+
+  .continuidadeKickoff {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .continuidadeKickoff a {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .perguntas li {
