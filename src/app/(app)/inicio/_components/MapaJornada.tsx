@@ -1,218 +1,102 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import {
-  ArrowRight,
-  BriefcaseBusiness,
-  CalendarDays,
-  ContactRound,
-  DraftingCompass,
-  FileSignature,
-  GraduationCap,
-  LockKeyhole,
-  Search,
-  UsersRound,
-  Video,
-} from 'lucide-react';
-import {
-  PLANOS_SUBIDO,
-  RECURSOS_SUBIDO,
-  destinoDeUpgrade,
-  planoTemRecurso,
-  type PlanoSubido,
-  type RecursoPlano,
-} from '@/lib/planos/acessos';
+import { ArrowRight, CalendarDays } from 'lucide-react';
+import type { PlanoJornada } from '@/lib/jornada/motor';
 import styles from './MapaJornada.module.css';
 
 type Props = {
   nome: string | null;
-  plano?: PlanoSubido;
+  prioridade: ReactNode;
   proximaMentoria?: ReactNode;
+  plano: PlanoJornada;
 };
 
-const AREAS_APRENDER = [
-  {
-    href: '/formacoes',
-    rotulo: 'Aprendizado',
-    titulo: 'Formações',
-    descricao: 'Aprenda os fundamentos e avance no seu ritmo.',
-    acao: 'Continuar aprendendo',
-    Icone: GraduationCap,
-  },
-  {
-    href: '/solucoes',
-    rotulo: 'Implementação',
-    titulo: 'Projetos',
-    descricao: 'Escolha o que vender e siga a entrega passo a passo.',
-    acao: 'Explorar projetos',
-    Icone: BriefcaseBusiness,
-  },
-  {
-    href: '/builder',
-    rotulo: 'Personalização',
-    titulo: 'Estúdio',
-    descricao: 'Transforme uma dor real em um projeto sob medida.',
-    acao: 'Criar um projeto',
-    Icone: DraftingCompass,
-    recurso: 'estudio',
-  },
-  {
-    href: '/mentorias',
-    rotulo: 'Ao vivo',
-    titulo: 'Mentorias',
-    descricao: 'Leve um desafio real e receba ajuda para avançar.',
-    acao: 'Ver encontros',
-    Icone: UsersRound,
-  },
-] as const;
-
-const AREAS_OPERAR = [
-  {
-    href: '/prospeccao',
-    rotulo: 'Encontrar clientes',
-    titulo: 'Prospecção',
-    descricao: 'Crie listas de empresas com contatos para abordar.',
-    acao: 'Buscar empresas',
-    Icone: Search,
-    recurso: 'prospeccao',
-  },
-  {
-    href: '/vendas',
-    rotulo: 'Conduzir a venda',
-    titulo: 'Vendas',
-    descricao: 'Trabalhe cada oportunidade com uma próxima ação clara.',
-    acao: 'Abrir oportunidades',
-    Icone: ContactRound,
-    recurso: 'vendas',
-  },
-  {
-    href: '/reunioes',
-    rotulo: 'Conversar',
-    titulo: 'Reuniões',
-    descricao: 'Agende, conduza e registre as conversas com seus clientes.',
-    acao: 'Ver reuniões',
-    Icone: Video,
-  },
-  {
-    href: '/propostas',
-    rotulo: 'Fechar o projeto',
-    titulo: 'Propostas',
-    descricao: 'Monte, apresente e acompanhe suas propostas comerciais.',
-    acao: 'Abrir propostas',
-    Icone: FileSignature,
-    recurso: 'propostas',
-  },
-] as const;
-
-type Area = (typeof AREAS_APRENDER)[number] | (typeof AREAS_OPERAR)[number];
-
-function CartoesAreas({
-  titulo,
-  sobretitulo,
-  areas,
-  plano,
-}: {
-  titulo: string;
-  sobretitulo: string;
-  areas: readonly Area[];
-  plano: PlanoSubido;
-}) {
-  const id = `area-${sobretitulo.toLowerCase().replaceAll(' ', '-')}`;
+function TrilhoDaJornada({ plano }: { plano: PlanoJornada }) {
   return (
-    <section className={styles.areas} aria-labelledby={id}>
-      <div className={styles.secaoCabecalho}>
-        <div>
-          <p>{sobretitulo}</p>
-          <h2 id={id}>{titulo}</h2>
-        </div>
-      </div>
-      <div className={styles.gradeAreas}>
-        {areas.map(({ href, rotulo, titulo: nomeArea, descricao, acao, Icone, ...area }) => {
-          const recurso = 'recurso' in area ? (area.recurso as RecursoPlano) : null;
-          const bloqueado = Boolean(recurso && !planoTemRecurso(plano, recurso));
-          const destino = bloqueado && recurso ? destinoDeUpgrade(recurso, href) : href;
-          const planoNecessario = recurso
-            ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recurso].planoMinimo].nome
-            : null;
-
-          return (
-            <Link
-              href={destino}
-              className={styles.cartaoArea}
-              data-bloqueado={bloqueado || undefined}
-              aria-label={bloqueado ? `${nomeArea}, disponível no ${planoNecessario}` : undefined}
-              key={href}
-            >
-              <span className={styles.areaTopo}>
-                <small>{rotulo}</small>
-                {bloqueado ? (
-                  <span className={styles.seloPro} aria-hidden="true">
-                    <LockKeyhole size={11} strokeWidth={1.9} /> {planoNecessario}
-                  </span>
-                ) : (
-                  <Icone size={18} strokeWidth={1.7} aria-hidden="true" />
-                )}
-              </span>
-              <strong>{nomeArea}</strong>
-              <p>{descricao}</p>
-              <span className={styles.areaAcao}>
-                {bloqueado ? 'Ver acesso do plano' : acao}{' '}
-                <ArrowRight size={15} strokeWidth={1.9} aria-hidden="true" />
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-    </section>
+    <ol className={styles.trilho} aria-label="Etapas do trabalho">
+      {plano.etapas.map((etapa) => (
+        <li
+          key={etapa.id}
+          data-status={etapa.status}
+          aria-current={etapa.id === plano.etapaAtual ? 'step' : undefined}
+          aria-label={`${etapa.titulo}${etapa.id === plano.etapaAtual ? ', etapa atual' : ''}`}
+        >
+          <span className={styles.segmento} aria-hidden="true" />
+          <span>{etapa.titulo}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
-export function MapaJornada({ nome, plano = 'pro', proximaMentoria }: Props) {
-  const dataLonga = new Date().toLocaleDateString('pt-BR', {
+/**
+ * A Início responde uma pergunta: o que merece atenção agora.
+ *
+ * Áreas e ferramentas continuam na navegação. Aqui ficam apenas a ação principal,
+ * a etapa que a explica e o próximo encontro ao vivo.
+ */
+export function MapaJornada({ nome, prioridade, proximaMentoria, plano }: Props) {
+  const data = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    timeZone: 'America/Sao_Paulo',
   });
+  const hora = Number(
+    new Intl.DateTimeFormat('pt-BR', {
+      hour: 'numeric',
+      hourCycle: 'h23',
+      timeZone: 'America/Sao_Paulo',
+    }).format(new Date()),
+  );
+  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
 
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
-      <section className={styles.abertura} aria-label="Resumo do dia">
-        <div className={styles.boasVindas}>
-          <span className={styles.eyebrow}>{dataLonga}</span>
-          <p>{nome ? `${nome},` : 'Olá,'}</p>
-          <h1>bem-vindo.</h1>
-          <strong>
-            {planoTemRecurso(plano, 'modulo_comercial')
-              ? 'Aprenda, encontre clientes, venda e entregue seus projetos de IA em um só lugar.'
-              : 'Aprenda, prepare e entregue projetos de IA com orientação em cada etapa.'}
-          </strong>
+      <header className={styles.topo}>
+        <div>
+          <span>{data}</span>
+          <p>
+            {saudacao}
+            {nome ? `, ${nome}` : ''}.
+          </p>
         </div>
+      </header>
 
-        <Link href="/mentorias" className={styles.mentoriaDestaque}>
-          <span className={styles.mentoriaTopo}>
-            <small>Próxima mentoria</small>
-            <em>Ver agenda</em>
-          </span>
-          <CalendarDays size={22} strokeWidth={1.65} aria-hidden="true" />
-          <strong>{proximaMentoria ?? 'Mentoria de implementação'}</strong>
-          <p>Leve uma dúvida real da sua venda ou entrega.</p>
-          <span className={styles.mentoriaAcao}>
-            Ver próxima sessão <ArrowRight size={15} aria-hidden="true" />
-          </span>
-        </Link>
+      <section className={styles.comando} aria-label="Próxima ação">
+        {prioridade}
+
+        <aside className={styles.progresso} aria-label="Progresso do trabalho">
+          <span>Progresso</span>
+          <strong>{plano.percentual}%</strong>
+          <p>
+            {plano.evidenciasConcluidas} de {plano.totalEvidencias} passos
+          </p>
+          <div
+            className={styles.progressoTrilho}
+            role="progressbar"
+            aria-label="Progresso do trabalho"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={plano.percentual}
+          >
+            <span style={{ width: `${plano.percentual}%` }} />
+          </div>
+        </aside>
+
+        <TrilhoDaJornada plano={plano} />
       </section>
 
-      <CartoesAreas
-        titulo="Aprenda e prepare o que você vai entregar."
-        sobretitulo="Aprender e construir"
-        areas={AREAS_APRENDER}
-        plano={plano}
-      />
-      <CartoesAreas
-        titulo="Encontre clientes e conduza cada venda."
-        sobretitulo="Operação comercial"
-        areas={AREAS_OPERAR}
-        plano={plano}
-      />
+      <Link href="/mentorias" className={styles.mentoria}>
+        <CalendarDays size={20} strokeWidth={1.7} aria-hidden="true" />
+        <span>
+          <small>Mentorias</small>
+          <strong>{proximaMentoria ?? 'Ver próximos encontros'}</strong>
+        </span>
+        <em>
+          Ver agenda <ArrowRight size={16} strokeWidth={1.9} aria-hidden="true" />
+        </em>
+      </Link>
     </div>
   );
 }
