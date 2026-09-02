@@ -238,7 +238,6 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {
     await page.goto('/preview/portal-cliente');
-    await page.getByText('Resultado e continuidade', { exact: true }).click();
 
     const encerramento = page.getByRole('heading', {
       name: 'Resultado, garantia e continuidade.',

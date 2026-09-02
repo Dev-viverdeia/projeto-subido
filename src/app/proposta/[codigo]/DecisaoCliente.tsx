@@ -1,11 +1,35 @@
 'use client';
 
 import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { ArrowUpRight, Check, X } from 'lucide-react';
 import { decidirPropostaCliente, type EstadoDecisaoProposta } from '@/lib/propostas/portal-actions';
 import styles from './proposta.module.css';
 
 const INICIAL: EstadoDecisaoProposta = {};
+
+function AcoesDecisao() {
+  const { pending, data } = useFormStatus();
+  const decisaoPendente = data?.get('decisao');
+
+  return (
+    <div className={styles.acoesDecisao}>
+      <button type="submit" name="decisao" value="aceita" disabled={pending}>
+        <Check size={17} aria-hidden="true" />
+        {pending && decisaoPendente === 'aceita' ? 'Aprovando…' : 'Aprovar proposta'}
+      </button>
+      <button
+        type="submit"
+        name="decisao"
+        value="recusada"
+        disabled={pending}
+        className={styles.recusar}
+      >
+        {pending && decisaoPendente === 'recusada' ? 'Enviando…' : 'Não aprovar agora'}
+      </button>
+    </div>
+  );
+}
 
 export function DecisaoCliente({
   codigo,
@@ -18,7 +42,7 @@ export function DecisaoCliente({
   emailInicial: string;
   linkPagamento: string | null;
 }) {
-  const [estado, acao, enviando] = useActionState(decidirPropostaCliente, INICIAL);
+  const [estado, acao] = useActionState(decidirPropostaCliente, INICIAL);
 
   if (estado.sucesso) {
     return (
@@ -107,21 +131,7 @@ export function DecisaoCliente({
         </p>
       )}
 
-      <div className={styles.acoesDecisao}>
-        <button type="submit" name="decisao" value="aceita" disabled={enviando}>
-          <Check size={17} aria-hidden="true" />
-          {enviando ? 'Registrando…' : 'Aprovar proposta'}
-        </button>
-        <button
-          type="submit"
-          name="decisao"
-          value="recusada"
-          disabled={enviando}
-          className={styles.recusar}
-        >
-          Não seguir agora
-        </button>
-      </div>
+      <AcoesDecisao />
       <small className={styles.segurancaDecisao}>
         Sua decisão fica vinculada a esta versão da proposta, com data, nome, e-mail e registro do
         aceite.

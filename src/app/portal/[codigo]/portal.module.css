@@ -1478,3 +1478,473 @@
     transition: none;
   }
 }
+
+/* O portal e uma central de acompanhamento do cliente: identidade do projeto,
+   acao pendente e detalhes sob demanda. O acabamento abaixo remove ornamento,
+   amplia a leitura e concentra o liquid glass nas superficies de trabalho. */
+.pagina {
+  padding-bottom: var(--via-space-6);
+  background: var(--via-bg-2);
+}
+
+.barra,
+.canvas,
+.rodape {
+  width: min(calc(100% - 40px), 1160px);
+}
+
+.barra {
+  min-height: 68px;
+}
+
+.barra > div {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.canvas {
+  overflow: clip;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 92%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+
+.hero,
+.hero[data-concluido] {
+  min-height: 300px;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  background: var(--via-navy-deep);
+}
+
+.heroTexto,
+.hero[data-concluido] .heroTexto {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(36px, 5vw, 56px);
+}
+
+.heroTexto > p {
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-xs);
+}
+
+.heroTexto h1,
+.hero[data-concluido] .heroTexto h1 {
+  max-width: 21ch;
+  margin-top: var(--via-space-2);
+  font-size: clamp(2.55rem, 5vw, 4rem);
+  line-height: 0.98;
+}
+
+.heroTexto blockquote,
+.hero[data-concluido] .heroTexto blockquote {
+  max-width: 58ch;
+  margin-top: var(--via-space-4);
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-body);
+  line-height: 1.55;
+}
+
+.heroTexto dl,
+.hero[data-concluido] .heroTexto dl {
+  margin-top: var(--via-space-5);
+}
+
+.heroTexto dt {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-xs);
+}
+
+.heroTexto dd {
+  color: var(--via-gray-100);
+  font-size: var(--via-fs-sm);
+}
+
+.progressoHero {
+  padding: var(--via-space-7);
+  background: color-mix(in srgb, var(--via-white) 5%, transparent);
+}
+
+.progressoHero > span,
+.hero[data-concluido] .progressoHero > span {
+  color: var(--via-white);
+  font-size: clamp(2.8rem, 5vw, 3.6rem);
+}
+
+.progressoHero strong {
+  color: var(--via-gray-100);
+  font-size: var(--via-fs-sm);
+}
+
+.progressoHero small {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-xs);
+}
+
+.centralDecisoes,
+.centralDecisoes[data-concluido] {
+  padding: clamp(28px, 4vw, 40px);
+  background: var(--app-glass-plane-strong);
+}
+
+.iconeDecisao,
+.centralDecisoes[data-concluido] .iconeDecisao,
+.acordo > header > span,
+.aprovacaoIcone,
+.andamento li > span,
+.marcaEntrega,
+.iconeEvento {
+  border-radius: var(--app-radius-control);
+}
+
+.centralDecisoes > header h2 {
+  margin-top: var(--via-space-1);
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+
+.centralDecisoes > header p,
+.pendenciaCliente p,
+.aprovacaoTopo p {
+  font-size: var(--via-fs-xs);
+}
+
+.centralDecisoes > header span {
+  max-width: 62ch;
+  font-size: var(--via-fs-sm);
+}
+
+.estadoDecisao,
+.centralDecisoes[data-concluido] .estadoDecisao {
+  margin-top: var(--via-space-4);
+  padding-top: var(--via-space-4);
+}
+
+.estadoDecisao span {
+  font-size: var(--via-fs-xs);
+}
+
+.estadoDecisao strong {
+  font-size: var(--via-fs-sm);
+}
+
+.listaAprovacoes {
+  margin-top: var(--via-space-5);
+}
+
+.pendenciaCliente {
+  padding: var(--app-pad-card);
+  border-color: var(--app-elev-1-line);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 86%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.pendenciaIcone {
+  width: 44px;
+  height: 44px;
+}
+
+.pendenciaCliente h3 {
+  font-size: var(--via-fs-body);
+}
+
+.pendenciaCliente div > span,
+.pendenciaCliente div > small {
+  font-size: var(--via-fs-sm);
+}
+
+.pendenciaCliente button {
+  min-height: 44px;
+  font-size: var(--via-fs-sm);
+}
+
+.grupoDetalhes {
+  background: color-mix(in srgb, var(--via-white) 90%, transparent);
+}
+
+.grupoDetalhes > summary {
+  min-height: 74px;
+  padding-inline: clamp(28px, 5vw, 52px);
+}
+
+.grupoDetalhes > summary strong {
+  font-size: var(--via-fs-body);
+}
+
+.grupoDetalhes > summary span {
+  font-size: var(--via-fs-sm);
+}
+
+.grupoConteudo {
+  background: var(--app-glass-plane-strong);
+}
+
+.acordo {
+  padding: clamp(28px, 4vw, 40px);
+}
+
+.acordo header p,
+.acordo article span,
+.acordo header em,
+.aprovacaoResumo > span,
+.aprovacao label > span,
+.andamento header p,
+.biblioteca header p,
+.arquivos header p,
+.linhaTempo header p {
+  font-size: var(--via-fs-xs);
+}
+
+.acordo article strong,
+.acordo article small,
+.acordo article ul {
+  font-size: var(--via-fs-sm);
+}
+
+.acordo article li::before {
+  top: 0.72em;
+  width: 6px;
+  height: 1px;
+  border-radius: 0;
+}
+
+.aprovacao {
+  border-color: var(--app-elev-1-line);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.aprovacaoTopo {
+  padding: var(--app-pad-card);
+}
+
+.aprovacaoTopo h3 {
+  font-size: 1.15rem;
+}
+
+.aprovacaoResumo,
+.aprovacao form,
+.termoAceite {
+  padding: var(--app-pad-card);
+}
+
+.entregavel,
+.criterioAceite p,
+.aprovacaoResumo blockquote,
+.aprovacaoResumo > small,
+.aprovacao textarea,
+.aprovacao form > p,
+.aprovacaoResumo > a {
+  font-size: var(--via-fs-sm);
+}
+
+.aprovacaoAcoes button {
+  min-height: 44px;
+  font-size: var(--via-fs-sm);
+}
+
+.painel,
+.posEntrega,
+.encerramentoPortal {
+  padding: clamp(28px, 5vw, 52px);
+}
+
+.painel {
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(28px, 5vw, 52px);
+}
+
+.andamento header h2,
+.biblioteca header h2,
+.arquivos header h2,
+.linhaTempo header h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+}
+
+.andamento header > span,
+.arquivos > header > span,
+.linhaTempo > header > span,
+.andamento li small,
+.biblioteca li small,
+.biblioteca li p,
+.biblioteca li a,
+.arquivos li small,
+.arquivos li p,
+.arquivos li em,
+.arquivos li a,
+.linhaTempo li strong,
+.linhaTempo li small,
+.linhaTempo li time,
+.linhaTempo li p,
+.vazio p,
+.vazioArquivo p {
+  font-size: var(--via-fs-sm);
+}
+
+.andamento li {
+  min-height: 72px;
+}
+
+.andamento li > span,
+.marcaEntrega {
+  width: 34px;
+  height: 34px;
+}
+
+.andamento li strong,
+.biblioteca li strong,
+.arquivos li strong {
+  font-size: var(--via-fs-body);
+}
+
+.arquivos,
+.linhaTempo {
+  padding: var(--app-pad-card);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-1-bg) 88%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.arquivos li {
+  border-color: var(--app-elev-1-line);
+}
+
+.iconeArquivo {
+  width: 44px;
+  height: 44px;
+}
+
+.rodape {
+  min-height: 76px;
+  font-size: var(--via-fs-xs);
+}
+
+@media (max-width: 899px) {
+  .hero,
+  .hero[data-concluido],
+  .painel,
+  .posEntrega,
+  .aprovacaoConteudo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .progressoHero {
+    border-top: 1px solid rgba(255, 255, 255, 0.11);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    padding-bottom: var(--via-space-4);
+  }
+
+  .barra,
+  .canvas,
+  .rodape {
+    width: min(calc(100% - 24px), 1160px);
+  }
+
+  .barra {
+    min-height: 62px;
+  }
+
+  .canvas {
+    border-radius: var(--app-radius-card);
+  }
+
+  .heroTexto,
+  .hero[data-concluido] .heroTexto,
+  .progressoHero,
+  .centralDecisoes,
+  .centralDecisoes[data-concluido],
+  .acordo,
+  .painel,
+  .posEntrega,
+  .encerramentoPortal {
+    padding: var(--via-space-6) var(--via-space-5);
+  }
+
+  .heroTexto h1,
+  .hero[data-concluido] .heroTexto h1 {
+    font-size: clamp(2.3rem, 11vw, 3.15rem);
+  }
+
+  .heroTexto blockquote,
+  .hero[data-concluido] .heroTexto blockquote {
+    font-size: var(--via-fs-sm);
+  }
+
+  .heroTexto dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .progressoHero {
+    min-height: 144px;
+  }
+
+  .centralDecisoes > header {
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .iconeDecisao {
+    width: 42px;
+    height: 42px;
+  }
+
+  .centralDecisoes > header h2 {
+    font-size: 1.6rem;
+  }
+
+  .estadoDecisao {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .grupoDetalhes > summary {
+    min-height: 72px;
+    padding-inline: var(--via-space-5);
+  }
+
+  .grupoDetalhes > summary span {
+    font-size: var(--via-fs-xs);
+  }
+
+  .pendenciaCliente {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .pendenciaCliente form {
+    grid-column: 1 / -1;
+  }
+
+  .aprovacaoResumo,
+  .aprovacao form,
+  .termoAceite,
+  .aprovacaoTopo {
+    padding: var(--via-space-5);
+  }
+
+  .andamento header,
+  .biblioteca > header,
+  .arquivos > header,
+  .linhaTempo > header {
+    gap: var(--via-space-2);
+  }
+
+  .arquivos,
+  .linhaTempo {
+    padding: var(--via-space-5);
+  }
+
+  .rodape {
+    min-height: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grupoDetalhes > summary svg {
+    transition: none;
+  }
+}
