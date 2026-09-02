@@ -22,14 +22,18 @@ export function NavLateral({
   itemConta,
   grupo = 'principal',
   rotuloGrupo,
+  caminhoAtual,
 }: {
   itens: ItemNav[];
   variante: 'lateral' | 'dock';
   itemConta?: ItemNav;
   grupo?: string;
   rotuloGrupo?: string;
+  /** Só a bancada visual controla a rota; no produto ela sempre vem do Next. */
+  caminhoAtual?: string;
 }) {
-  const caminho = usePathname();
+  const caminhoDaRota = usePathname();
+  const caminho = caminhoAtual ?? caminhoDaRota;
   const [menuAberto, setMenuAberto] = useState(false);
   const [destinoPendente, setDestinoPendente] = useState<string | null>(null);
   const [destinosPreparados, setDestinosPreparados] = useState<ReadonlySet<string>>(

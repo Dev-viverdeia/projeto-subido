@@ -4,16 +4,18 @@
 }
 
 .gatilho {
-  min-height: 42px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
   padding: var(--via-space-1) var(--via-space-2_5) var(--via-space-1) var(--via-space-1);
-  border: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: var(--via-blur-sm);
+  background: color-mix(in srgb, var(--via-white) 74%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 92%, transparent),
+    0 8px 20px -18px var(--via-navy-40);
+  backdrop-filter: blur(16px) saturate(145%);
   color: var(--via-text-body);
   font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
@@ -25,9 +27,11 @@
 
 .gatilho:hover,
 .gatilho[aria-expanded='true'] {
-  border-color: var(--via-navy-25);
-  background: var(--via-surface);
-  box-shadow: var(--via-shadow-sm);
+  border-color: var(--via-navy-18);
+  background: color-mix(in srgb, var(--via-white) 90%, transparent);
+  box-shadow:
+    inset 0 1px 0 var(--via-white),
+    0 12px 26px -20px var(--via-navy-40);
 }
 
 .gatilho:focus-visible {
@@ -46,7 +50,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-1_5);
-  min-height: 30px;
+  min-height: 32px;
   padding: 0 var(--via-space-2_5);
   border-right: 1px solid var(--via-border-hairline);
   font-family: var(--via-font-mono);
@@ -80,12 +84,13 @@
   top: calc(100% + var(--via-space-2));
   right: 0;
   z-index: var(--via-z-overlay);
-  width: min(326px, calc(100vw - 32px));
+  width: min(340px, calc(100vw - 32px));
   overflow: hidden;
-  border: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-surface);
-  background: var(--via-surface);
-  box-shadow: var(--via-shadow-lg);
+  background: var(--app-shell-overlay-bg);
+  box-shadow: var(--app-shell-panel-shadow);
+  backdrop-filter: blur(28px) saturate(150%);
   animation: entrar 150ms ease-out;
 }
 
@@ -104,10 +109,11 @@
   align-items: center;
   gap: var(--via-space-3);
   padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-soft);
   background:
-    linear-gradient(128deg, color-mix(in srgb, var(--via-white) 9%, transparent), transparent 38%),
-    var(--via-navy);
-  color: var(--via-white);
+    linear-gradient(124deg, color-mix(in srgb, var(--via-white) 90%, transparent), transparent 64%),
+    var(--via-navy-03);
+  color: var(--via-text-primary);
 }
 
 .textosIdentidade {
@@ -121,7 +127,7 @@
 }
 
 .sobretitulo {
-  color: color-mix(in srgb, var(--via-white) 52%, transparent);
+  color: var(--via-text-faint);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -131,9 +137,9 @@
 .nome {
   overflow: hidden;
   margin-top: 3px;
-  color: var(--via-white);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -141,8 +147,8 @@
 .email {
   overflow: hidden;
   margin-top: 2px;
-  color: color-mix(in srgb, var(--via-white) 60%, transparent);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -155,10 +161,10 @@
   gap: var(--via-space-2);
   margin-top: var(--via-space-1);
   padding: 5px 9px;
-  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  border: 1px solid var(--via-border-soft);
   border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-white) 7%, transparent);
-  color: color-mix(in srgb, var(--via-white) 72%, transparent);
+  background: color-mix(in srgb, var(--via-white) 64%, transparent);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -171,7 +177,7 @@
   font-size: var(--via-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--via-white) 62%, transparent);
+  color: var(--via-text-soft);
 }
 
 .itens {
@@ -200,8 +206,8 @@
 
 .item:hover,
 .item[aria-current='page'] {
-  border-color: var(--via-border-soft);
-  background: var(--via-bg-2);
+  border-color: color-mix(in srgb, var(--via-white) 70%, var(--via-border));
+  background: color-mix(in srgb, var(--via-white) 60%, var(--via-navy-04));
 }
 
 .item:focus-visible,
@@ -216,7 +222,8 @@
   display: grid;
   place-items: center;
   border-radius: var(--app-radius-control);
-  background: var(--via-navy-04);
+  border: 1px solid var(--via-border-soft);
+  background: color-mix(in srgb, var(--via-white) 72%, var(--via-navy-04));
   color: var(--via-navy);
 }
 
@@ -227,14 +234,14 @@
 
 .item strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
 }
 
 .item small {
   margin-top: 2px;
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
 }
 
 .indicador {
@@ -251,7 +258,7 @@
 .rodape {
   padding: var(--via-space-2);
   border-top: 1px solid var(--via-border-hairline);
-  background: var(--via-bg-2);
+  background: color-mix(in srgb, var(--via-bg-2) 58%, transparent);
 }
 
 .sair {
@@ -283,7 +290,7 @@
   }
 
   .nomeGatilho {
-    max-width: 11ch;
+    display: none;
   }
 
   .saldoRotulo {
@@ -296,7 +303,8 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .gatilho {
+  .gatilho,
+  .painel {
     background: var(--via-surface);
   }
 }

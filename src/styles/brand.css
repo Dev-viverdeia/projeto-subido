@@ -122,6 +122,35 @@
       transparent 70%
     ),
     color-mix(in srgb, var(--via-surface) 78%, transparent);
+
+  /* Shell autenticado. A moldura inteira usa a mesma família material para
+     sidebar, cabeçalho e dock: vidro claro, borda iluminada e sombra navy baixa.
+     Os números pertencem à geometria estrutural da aplicação, não a componentes. */
+  --app-shell-sidebar: 248px;
+  --app-shell-inset: 12px;
+  --app-shell-header-h: 58px;
+  --app-shell-panel-bg:
+    linear-gradient(
+      136deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.62) 42%,
+      rgba(247, 248, 250, 0.7) 100%
+    ),
+    color-mix(in srgb, var(--via-surface) 78%, transparent);
+  /* Menus carregam leitura e decisão. O brilho continua translúcido, mas a base
+     é opaca para o conteúdo da página nunca competir com o texto do overlay. */
+  --app-shell-overlay-bg:
+    linear-gradient(
+      136deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.54) 48%,
+      transparent 100%
+    ),
+    color-mix(in srgb, var(--via-surface) 97%, var(--via-bg-2));
+  --app-shell-panel-line: color-mix(in srgb, var(--via-white) 76%, var(--via-border));
+  --app-shell-panel-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 20px 52px -38px var(--via-navy-40),
+    0 6px 20px -18px var(--via-navy-20);
 }
 
 :root[data-theme='dark'] {
