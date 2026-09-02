@@ -41,6 +41,7 @@ export function ResolverReuniaoPendente({ reuniaoId }: { reuniaoId: string }) {
       <ModalOperacao
         open={aberto}
         onClose={() => setAberto(false)}
+        label="Reuniões"
         title="Resolver reunião pendente"
         description="Escolha se você quer reagendar ou encerrar este compromisso."
         size="sm"

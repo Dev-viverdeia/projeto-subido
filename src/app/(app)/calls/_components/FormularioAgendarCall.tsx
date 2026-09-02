@@ -120,6 +120,7 @@ export function FormularioAgendarCall({
       <ModalOperacao
         open={aberto}
         onClose={fechar}
+        label="Reuniões"
         title={
           precisaConfigurarCalendar
             ? 'Conectar Google Calendar'

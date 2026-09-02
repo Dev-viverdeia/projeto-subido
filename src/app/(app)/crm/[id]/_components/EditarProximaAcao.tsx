@@ -74,6 +74,7 @@ export function EditarProximaAcao({
       <ModalOperacao
         open={aberto}
         onClose={() => !pendente && setAberto(false)}
+        label="Ficha do cliente"
         title={acaoAtual ? 'Editar próxima ação' : 'Definir próxima ação'}
         description="Registre o próximo movimento concreto desta venda."
         size="md"

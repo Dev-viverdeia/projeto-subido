@@ -706,8 +706,9 @@
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--via-success) 9%, var(--via-surface));
+  border: 1px solid color-mix(in srgb, var(--via-success) 18%, var(--via-border));
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
   color: var(--via-success);
 }
 
@@ -738,8 +739,8 @@
   width: 48px;
   height: 48px;
   border: 1px solid color-mix(in srgb, var(--via-accent) 28%, var(--via-border));
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--via-accent) 7%, var(--via-surface));
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
   color: var(--via-accent-ink);
 }
 

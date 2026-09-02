@@ -15,7 +15,12 @@ describe('ModalOperacao', () => {
           <button type="button" onClick={() => setAberto(true)}>
             Abrir
           </button>
-          <ModalOperacao open={aberto} onClose={() => setAberto(false)} title="Editar cliente">
+          <ModalOperacao
+            open={aberto}
+            onClose={() => setAberto(false)}
+            label="Ficha do cliente"
+            title="Editar cliente"
+          >
             <input data-autofocus aria-label="Empresa" />
           </ModalOperacao>
         </>
@@ -27,6 +32,10 @@ describe('ModalOperacao', () => {
     await user.click(gatilho);
 
     expect(screen.getByRole('dialog', { name: 'Editar cliente' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog').parentElement?.parentElement).toHaveAttribute(
+      'data-label',
+      'Ficha do cliente',
+    );
     expect(screen.getByRole('dialog').parentElement?.parentElement?.parentElement).toBe(
       document.body,
     );

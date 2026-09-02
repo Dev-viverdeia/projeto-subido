@@ -113,8 +113,9 @@ export function FormularioEnriquecimento({
       <ModalOperacao
         open={aberto}
         onClose={fechar}
-        title="Enriquecer os dados deste cliente?"
-        description="A plataforma usa a ficha, as reuniões e fontes públicas. Você não precisa preencher nada de novo."
+        label="Dados do cliente"
+        title="Enriquecer esta oportunidade?"
+        description="Usaremos o que já está salvo e fontes públicas."
         size="md"
         blocked={enviando}
         footer={
@@ -135,7 +136,7 @@ export function FormularioEnriquecimento({
               disabled={!saldoSuficiente}
               onClick={() => void confirmar()}
             >
-              Confirmar por {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
+              Usar {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
             </Button>
           </>
         }

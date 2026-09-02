@@ -148,6 +148,146 @@ html {
     0 1px 2px var(--via-navy-04);
 }
 
+/* ---------------------------------------------------------------------------
+ * TRANSAÇÕES — campos, seletores e estados vazios do produto autenticado.
+ *
+ * A library continua intacta. Esta camada só redefine os componentes quando
+ * eles aparecem no shell ou em um modal operacional portado para o body.
+ * token-ok: o foco do campo é desenhado na moldura com :has(:focus-visible).
+ * ------------------------------------------------------------------------- */
+:is([data-app-shell], [data-app-modal]) .via-input-wrap {
+  gap: var(--via-space-2);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input__label,
+:is([data-app-shell], [data-app-modal]) .via-select__label {
+  color: var(--via-text-body);
+  font-size: var(--app-fs-support);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
+  line-height: var(--app-lh-ui);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input,
+:is([data-app-shell], [data-app-modal]) .via-select__trigger {
+  min-height: 46px;
+  border-color: var(--app-control-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
+  box-shadow: var(--app-control-shadow);
+  backdrop-filter: blur(16px) saturate(132%);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input::after {
+  display: none;
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input:hover,
+:is([data-app-shell], [data-app-modal]) .via-select__trigger:hover:not(:disabled) {
+  border-color: var(--via-navy-20);
+  background: var(--app-control-bg-hover);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input input,
+:is([data-app-shell], [data-app-modal]) .via-select__trigger {
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-regular);
+  line-height: var(--app-lh-ui);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input__msg,
+:is([data-app-shell], [data-app-modal]) .via-select__hint {
+  font-size: var(--app-fs-meta);
+  line-height: var(--app-lh-ui);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-select {
+  gap: var(--via-space-2);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-select__trigger:focus-visible,
+:is([data-app-shell], [data-app-modal]) .via-select__trigger.is-open {
+  outline: none;
+  border-color: var(--via-navy-40);
+  box-shadow: var(--app-ring), var(--app-control-shadow);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-select__list {
+  margin-top: var(--via-space-2);
+  padding: var(--via-space-2);
+  border-color: var(--app-elev-2-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-shell-overlay-bg);
+  box-shadow:
+    var(--app-elev-3-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(24px) saturate(138%);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-select__option {
+  min-height: 42px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border-radius: var(--app-radius-chip);
+  font-size: var(--app-fs-support);
+}
+
+[data-app-shell] .via-empty-state--soft {
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: clamp(24px, 4vw, 40px);
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-empty-bg);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  text-align: left;
+  backdrop-filter: blur(18px) saturate(130%);
+}
+
+[data-app-shell] .via-empty-state--soft::before {
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.56), transparent 38%),
+    linear-gradient(310deg, var(--via-navy-03), transparent 42%);
+}
+
+[data-app-shell] .via-empty-state__icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--via-space-1);
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
+}
+
+[data-app-shell] .via-empty-state__title {
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: var(--app-ls-h4);
+}
+
+[data-app-shell] .via-empty-state__description {
+  max-width: 48ch;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: var(--app-lh-reading);
+}
+
+[data-app-shell] .via-empty-state__actions {
+  justify-content: flex-start;
+  margin-top: var(--via-space-2);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  :is([data-app-shell], [data-app-modal]) .via-input,
+  :is([data-app-shell], [data-app-modal]) .via-select__trigger,
+  :is([data-app-shell], [data-app-modal]) .via-select__list,
+  [data-app-shell] .via-empty-state--soft {
+    background: var(--via-surface-elev);
+  }
+}
+
 /* Sobre banda escura o anel navy some; o contexto precisa de tinta clara. */
 .via-mesh-navy :where(a, button, input, [tabindex]):focus-visible,
 .via-glass-dark :where(a, button, input, [tabindex]):focus-visible {
@@ -227,9 +367,9 @@ a:hover {
 }
 
 .via-modal-scrim.via-modal-scrim {
-  background: radial-gradient(
-    circle at 50% 30%,
-    color-mix(in srgb, var(--via-navy-deep) 62%, transparent),
-    color-mix(in srgb, var(--via-navy-deep) 78%, transparent)
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--via-navy-deep) 66%, transparent),
+    color-mix(in srgb, var(--via-navy-deep) 80%, transparent)
   );
 }

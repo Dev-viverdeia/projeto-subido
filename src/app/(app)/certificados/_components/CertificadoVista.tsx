@@ -297,6 +297,7 @@ export function CertificadoVista({
       <ModalOperacao
         open={estadoEmissao !== 'fechado'}
         onClose={fecharEmissao}
+        label="Certificados"
         hideClose={estadoEmissao === 'processando'}
         title={
           estadoEmissao === 'processando'
