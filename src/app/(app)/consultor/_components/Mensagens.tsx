@@ -1,16 +1,30 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, FileText, Image as ImageIcon, Mic, Target } from 'lucide-react';
+import { ArrowRight, Bot, FileText, Image as ImageIcon, Target } from 'lucide-react';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import { BotaoCopiar } from '@/app/(app)/_components/BotaoCopiar';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
+import { AudioMensagem } from './AudioMensagem';
 import { blocosDaResposta } from './resposta';
 import styles from './Mensagens.module.css';
 
-function IconeAnexo({ categoria }: { categoria: 'imagem' | 'documento' | 'audio' }) {
+function IconeAnexo({ categoria }: { categoria: 'imagem' | 'documento' }) {
   if (categoria === 'imagem') return <ImageIcon size={15} strokeWidth={1.9} aria-hidden="true" />;
-  if (categoria === 'audio') return <Mic size={15} strokeWidth={1.9} aria-hidden="true" />;
   return <FileText size={15} strokeWidth={1.9} aria-hidden="true" />;
+}
+
+function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
+  if (
+    mensagem.anexos.length === 0 ||
+    mensagem.anexos.some((anexo) => anexo.categoria !== 'audio')
+  ) {
+    return false;
+  }
+  return (
+    mensagem.conteudo === 'Áudio enviado.' ||
+    mensagem.conteudo.startsWith('Analise o arquivo ') ||
+    mensagem.conteudo.startsWith('Analise estes ')
+  );
 }
 
 const ACAO_POR_TIPO = {
@@ -51,14 +65,32 @@ export function Mensagens({
         return (
           <li key={m.id} className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}>
             <div className={styles.corpo}>
-              {m.anexos.length > 0 ? (
+              {m.anexos.some((anexo) => anexo.categoria === 'audio') ? (
+                <div className={styles.audios} aria-label="Mensagens de áudio">
+                  {m.anexos
+                    .filter((anexo) => anexo.categoria === 'audio')
+                    .map((anexo) => (
+                      <AudioMensagem
+                        key={anexo.id}
+                        src={
+                          modoPreview
+                            ? 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA'
+                            : `/api/consultor/anexos/${anexo.id}`
+                        }
+                      />
+                    ))}
+                </div>
+              ) : null}
+              {m.anexos.some((anexo) => anexo.categoria !== 'audio') ? (
                 <ul className={styles.anexos} aria-label="Arquivos enviados">
-                  {m.anexos.map((anexo) => (
-                    <li key={anexo.id}>
-                      <IconeAnexo categoria={anexo.categoria} />
-                      <span>{anexo.nome}</span>
-                    </li>
-                  ))}
+                  {m.anexos
+                    .filter((anexo) => anexo.categoria !== 'audio')
+                    .map((anexo) => (
+                      <li key={anexo.id}>
+                        <IconeAnexo categoria={anexo.categoria as 'imagem' | 'documento'} />
+                        <span>{anexo.nome}</span>
+                      </li>
+                    ))}
                 </ul>
               ) : null}
               {m.papel === 'consultor' ? (
@@ -72,7 +104,7 @@ export function Mensagens({
                     <p key={`${m.id}-bloco-${indice}`}>{bloco}</p>
                   ))}
                 </div>
-              ) : (
+              ) : ehTextoAutomaticoDeAudio(m) ? null : (
                 <p className={styles.texto}>{m.conteudo}</p>
               )}
 

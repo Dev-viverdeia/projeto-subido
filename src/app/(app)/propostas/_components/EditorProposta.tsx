@@ -247,8 +247,8 @@ export function EditorProposta({
                 {status === 'apresentada' && (
                   <>
                     <p className={styles.automacaoEntrega}>
-                      Ao confirmar, a plataforma cria o Projeto, leva o escopo aprovado e abre a
-                      execução deste cliente.
+                      A aprovação cria o projeto com o escopo desta proposta e abre o trabalho do
+                      cliente.
                     </p>
                     <button
                       type="submit"
@@ -257,7 +257,7 @@ export function EditorProposta({
                       disabled={sujo || atualizandoStatus}
                       className={styles.avancar}
                     >
-                      Confirmar venda e iniciar Projeto
+                      Confirmar venda e abrir projeto
                     </button>
                     <button
                       type="submit"
@@ -266,7 +266,7 @@ export function EditorProposta({
                       disabled={sujo || atualizandoStatus}
                       className={styles.secundario}
                     >
-                      Não aprovada
+                      Registrar como não aprovada
                     </button>
                   </>
                 )}

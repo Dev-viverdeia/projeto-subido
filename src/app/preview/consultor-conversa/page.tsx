@@ -21,6 +21,25 @@ const thread: ThreadDoConsultor = {
 
 const mensagens: MensagemDoConsultor[] = [
   {
+    id: '77777777-7777-4777-8777-777777777777',
+    papel: 'usuario',
+    anexos: [
+      {
+        id: '88888888-8888-4888-8888-888888888888',
+        nome: 'gravacao.webm',
+        tipoMime: 'audio/webm',
+        tamanhoBytes: 248000,
+        categoria: 'audio',
+      },
+    ],
+    conteudo: 'Áudio enviado.',
+    cartoes: [],
+    direcao: null,
+    acaoConfirmada: null,
+    modelo: null,
+    criadoEm: '2026-08-10T17:58:00.000Z',
+  },
+  {
     id: '66666666-6666-4666-8666-666666666666',
     papel: 'usuario',
     anexos: [],
@@ -146,7 +165,7 @@ export default function PreviewConsultorConversaPage() {
       </aside>
 
       <main id="conteudo" className={shell.conteudo}>
-        <TelaSobral threads={[thread]} conversa={{ thread, mensagens }} />
+        <TelaSobral threads={[thread]} conversa={{ thread, mensagens }} modoPreview />
       </main>
     </div>
   );

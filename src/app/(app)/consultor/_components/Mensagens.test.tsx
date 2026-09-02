@@ -94,4 +94,36 @@ describe('Mensagens compactas do Sobral AI', () => {
     expect(screen.queryByText('Próximo passo recente')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copiar a resposta do Sobral AI' })).toBeVisible();
   });
+
+  it('mostra o áudio como player e remove a copy técnica do anexo', () => {
+    render(
+      <Mensagens
+        modoPreview
+        mensagens={[
+          {
+            ...base,
+            id: 'audio',
+            papel: 'usuario',
+            conteudo: 'Áudio enviado.',
+            anexos: [
+              {
+                id: '77777777-7777-4777-8777-777777777777',
+                nome: 'Audio Sobral AI 12-00.webm',
+                tipoMime: 'audio/webm',
+                tamanhoBytes: 12000,
+                categoria: 'audio',
+              },
+            ],
+            cartoes: [],
+            direcao: null,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Reproduzir áudio' })).toBeVisible();
+    expect(screen.getByText('Mensagem de áudio')).toBeVisible();
+    expect(screen.queryByText('Áudio enviado.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Audio Sobral AI 12-00.webm')).not.toBeInTheDocument();
+  });
 });

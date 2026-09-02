@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, FileText, Plus, Search, X } from 'lucide-react';
+import { ArrowRight, Check, Eye, FileText, Plus, Search, Send, X } from 'lucide-react';
 import type { ResumoProposta } from '@/lib/propostas/queries';
 import { formatarReais } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
 import styles from '../pagina.module.css';
 
-type FiltroProposta = 'todas' | 'rascunhos' | 'enviadas';
+type FiltroProposta = 'todas' | 'rascunhos' | 'enviadas' | 'decididas';
 
 function dataCurta(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
@@ -23,8 +23,63 @@ function ehRascunho(proposta: ResumoProposta): boolean {
   return proposta.status === 'rascunho' || proposta.status === 'pronta';
 }
 
+function foiDecidida(proposta: ResumoProposta): boolean {
+  return proposta.status === 'aceita' || proposta.status === 'recusada';
+}
+
+function leituraDaProposta(proposta: ResumoProposta) {
+  if (proposta.status === 'rascunho') {
+    return {
+      rotulo: 'Em construção',
+      detalhe: 'Complete o escopo e o investimento',
+      acao: 'Editar proposta',
+      Icone: FileText,
+    };
+  }
+  if (proposta.status === 'pronta') {
+    return {
+      rotulo: 'Pronta para enviar',
+      detalhe: 'Revise e compartilhe com o cliente',
+      acao: 'Compartilhar',
+      Icone: Send,
+    };
+  }
+  if (proposta.status === 'apresentada' && proposta.visualizacoes > 0) {
+    return {
+      rotulo: 'Cliente visualizou',
+      detalhe: `${proposta.visualizacoes} ${proposta.visualizacoes === 1 ? 'abertura' : 'aberturas'} · última em ${dataCurta(proposta.ultimaVisualizacaoEm ?? proposta.atualizadoEm)}`,
+      acao: 'Acompanhar decisão',
+      Icone: Eye,
+    };
+  }
+  if (proposta.status === 'apresentada') {
+    return {
+      rotulo: 'Aguardando abertura',
+      detalhe: proposta.compartilhadaEm
+        ? `Compartilhada em ${dataCurta(proposta.compartilhadaEm)}`
+        : 'Compartilhe o link com o cliente',
+      acao: 'Ver envio',
+      Icone: Send,
+    };
+  }
+  if (proposta.status === 'aceita') {
+    return {
+      rotulo: 'Venda confirmada',
+      detalhe: `Decisão em ${dataCurta(proposta.decididaEm ?? proposta.atualizadoEm)}`,
+      acao: 'Ver aprovação',
+      Icone: Check,
+    };
+  }
+  return {
+    rotulo: 'Decisão registrada',
+    detalhe: `Não aprovada em ${dataCurta(proposta.decididaEm ?? proposta.atualizadoEm)}`,
+    acao: 'Revisar proposta',
+    Icone: X,
+  };
+}
+
 function CardProposta({ proposta }: { proposta: ResumoProposta }) {
-  const rascunho = ehRascunho(proposta);
+  const leitura = leituraDaProposta(proposta);
 
   return (
     <Link href={`/propostas/${proposta.id}`} className={styles.card}>
@@ -44,14 +99,18 @@ function CardProposta({ proposta }: { proposta: ResumoProposta }) {
         <strong>{formatarReais(proposta.valorCentavos)}</strong>
       </div>
 
-      <div className={styles.cardAtualizacao}>
-        <span>Atualizada</span>
-        <strong>{dataCurta(proposta.atualizadoEm)}</strong>
-        <small>Versão {proposta.versao}</small>
+      <div className={styles.cardProximoPasso}>
+        <span className={styles.cardProximoIcone} aria-hidden="true">
+          <leitura.Icone size={16} strokeWidth={1.9} />
+        </span>
+        <span>
+          <strong>{leitura.rotulo}</strong>
+          <small>{leitura.detalhe}</small>
+        </span>
       </div>
 
       <span className={styles.cardAcao}>
-        {rascunho ? 'Editar' : 'Abrir'}
+        {leitura.acao}
         <ArrowRight size={16} strokeWidth={1.9} aria-hidden="true" />
       </span>
     </Link>
@@ -70,7 +129,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
   const [filtro, setFiltro] = useState<FiltroProposta>('todas');
   const [busca, setBusca] = useState('');
   const rascunhos = propostas.filter(ehRascunho);
-  const enviadas = propostas.filter((proposta) => !ehRascunho(proposta));
+  const enviadas = propostas.filter((proposta) => proposta.status === 'apresentada');
+  const decididas = propostas.filter(foiDecidida);
 
   const propostasVisiveis = useMemo(() => {
     const termo = normalizarBusca(busca);
@@ -78,7 +138,8 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       const noFiltro =
         filtro === 'todas' ||
         (filtro === 'rascunhos' && ehRascunho(proposta)) ||
-        (filtro === 'enviadas' && !ehRascunho(proposta));
+        (filtro === 'enviadas' && proposta.status === 'apresentada') ||
+        (filtro === 'decididas' && foiDecidida(proposta));
       if (!noFiltro) return false;
       if (!termo) return true;
       return normalizarBusca(`${proposta.empresa} ${proposta.titulo} ${proposta.projeto}`).includes(
@@ -94,12 +155,16 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
       ? 'Nenhuma proposta em rascunho'
       : filtro === 'enviadas'
         ? 'Nenhuma proposta enviada ainda'
-        : 'Nenhuma proposta criada ainda';
+        : filtro === 'decididas'
+          ? 'Nenhuma decisão registrada ainda'
+          : 'Nenhuma proposta criada ainda';
   const descricaoVazio = vazioPorBusca
     ? 'Tente buscar pelo nome da empresa, da proposta ou do projeto.'
     : filtro === 'enviadas'
-      ? 'Quando uma proposta for enviada, ela aparecerá aqui com a decisão do cliente.'
-      : 'Crie uma proposta para preparar escopo, prazo e investimento.';
+      ? 'As propostas compartilhadas aparecem aqui até o cliente decidir.'
+      : filtro === 'decididas'
+        ? 'Propostas aceitas ou não aprovadas aparecerão aqui.'
+        : 'Crie uma proposta para preparar escopo, prazo e investimento.';
 
   return (
     <div className={styles.pagina}>
@@ -107,7 +172,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
         <div className={styles.heroTexto}>
           <span className={styles.sobretitulo}>Propostas</span>
           <h1>Biblioteca comercial</h1>
-          <p>Crie, revise e acompanhe cada proposta.</p>
+          <p>Prepare, compartilhe e acompanhe a decisão do cliente.</p>
         </div>
         <Link href="/propostas/nova" className={styles.nova}>
           <Plus size={17} strokeWidth={2} aria-hidden="true" />
@@ -132,6 +197,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
               { id: 'todas', rotulo: 'Todas', total: propostas.length },
               { id: 'rascunhos', rotulo: 'Rascunhos', total: rascunhos.length },
               { id: 'enviadas', rotulo: 'Enviadas', total: enviadas.length },
+              { id: 'decididas', rotulo: 'Decididas', total: decididas.length },
             ]}
             ativa={filtro}
             aoMudar={(id) => setFiltro(id as FiltroProposta)}
@@ -176,7 +242,7 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
               <button type="button" className={styles.limparVazio} onClick={() => setBusca('')}>
                 Limpar busca
               </button>
-            ) : filtro !== 'enviadas' ? (
+            ) : filtro === 'todas' || filtro === 'rascunhos' ? (
               <Link href="/propostas/nova" className={styles.acaoVazia}>
                 Criar proposta <ArrowRight size={15} aria-hidden="true" />
               </Link>

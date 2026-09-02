@@ -1,0 +1,202 @@
+.player {
+  --audio-progresso: 0%;
+  width: min(100%, 430px);
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 84%, transparent),
+    var(--app-elev-1-shadow);
+  color: var(--via-text-primary);
+  backdrop-filter: blur(18px) saturate(136%);
+}
+
+.player audio {
+  display: none;
+}
+
+.reproduzir,
+.remover {
+  display: grid;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+}
+
+.reproduzir {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: var(--via-shadow-sm);
+  transition:
+    transform var(--app-t-touch),
+    background-color var(--app-t-state);
+}
+
+.reproduzir:hover:not(:disabled) {
+  background: var(--via-navy-deep);
+  transform: translateY(-1px);
+}
+
+.reproduzir:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.conteudo {
+  min-width: 0;
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.cabecalho {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+
+.cabecalho strong {
+  overflow: hidden;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-snug);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cabecalho span {
+  flex: 0 0 auto;
+  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+}
+
+.progresso {
+  display: grid;
+  grid-template-columns: auto minmax(80px, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.progresso span {
+  min-width: 36px;
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.progresso span:last-child {
+  text-align: right;
+}
+
+.progresso input {
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.progresso input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--via-radius-pill);
+  background: linear-gradient(
+    to right,
+    var(--via-navy) 0 var(--audio-progresso),
+    var(--via-navy-14) var(--audio-progresso) 100%
+  );
+}
+
+.progresso input::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  appearance: none;
+  border: 3px solid var(--via-surface);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  box-shadow: var(--via-shadow-xs);
+}
+
+.progresso input::-moz-range-track {
+  height: 4px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy-14);
+}
+
+.progresso input::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+}
+
+.progresso input::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 3px solid var(--via-surface);
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+}
+
+.remover {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+}
+
+.remover:hover {
+  background: var(--via-navy-08);
+  color: var(--via-text-primary);
+}
+
+.reproduzir:focus-visible,
+.remover:focus-visible,
+.progresso input:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.player[data-falhou] {
+  border-style: dashed;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .player {
+    background: var(--via-surface);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reproduzir {
+    transition: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .player {
+    width: 100%;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .cabecalho span {
+    display: none;
+  }
+
+  .remover {
+    width: 40px;
+  }
+}

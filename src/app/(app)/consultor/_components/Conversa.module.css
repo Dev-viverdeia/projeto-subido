@@ -73,7 +73,7 @@
   gap: var(--via-space-2);
 }
 
-.anexosEmVoo li {
+.anexoEmVoo {
   max-width: 280px;
   display: inline-flex;
   align-items: center;
@@ -86,7 +86,7 @@
   font-size: var(--via-fs-xs);
 }
 
-.anexosEmVoo li span {
+.anexoEmVoo > span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -249,7 +249,7 @@
   gap: var(--via-space-2);
 }
 
-.arquivosSelecionados li {
+.arquivoSelecionado {
   min-width: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -295,7 +295,7 @@
   font-size: var(--via-fs-micro);
 }
 
-.arquivosSelecionados li > button,
+.arquivoSelecionado > button,
 .ferramentas > button {
   display: inline-flex;
   align-items: center;
@@ -306,13 +306,13 @@
   cursor: pointer;
 }
 
-.arquivosSelecionados li > button {
+.arquivoSelecionado > button {
   width: 28px;
   height: 28px;
   border-radius: var(--via-radius-pill);
 }
 
-.arquivosSelecionados li > button:hover,
+.arquivoSelecionado > button:hover,
 .ferramentas > button:hover:not(:disabled) {
   background: var(--via-navy-08);
   color: var(--via-text-primary);
@@ -345,7 +345,7 @@
 }
 
 .ferramentas > button:focus-visible,
-.arquivosSelecionados li > button:focus-visible,
+.arquivoSelecionado > button:focus-visible,
 .erro button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);

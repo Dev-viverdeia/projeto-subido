@@ -30,6 +30,14 @@ describe('Conversa integrada à Início', () => {
       configurable: true,
       value: vi.fn(),
     });
+    Reflect.defineProperty(URL, 'createObjectURL', {
+      configurable: true,
+      value: vi.fn(() => 'blob:audio-preview'),
+    });
+    Reflect.defineProperty(URL, 'revokeObjectURL', {
+      configurable: true,
+      value: vi.fn(),
+    });
   });
 
   beforeEach(() => {
@@ -144,6 +152,23 @@ describe('Conversa integrada à Início', () => {
         'O que esta imagem revela sobre o atendimento?',
         [imagem],
       );
+    });
+  });
+
+  it('transforma o áudio anexado em player antes e durante o envio', async () => {
+    const { container } = render(<Conversa />);
+    const audio = new File(['audio'], 'gravacao.webm', { type: 'audio/webm' });
+    const entrada = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+    fireEvent.change(entrada, { target: { files: [audio] } });
+    expect(screen.getByText('Mensagem de áudio')).toBeVisible();
+    expect(screen.getByText('Pronto para enviar')).toBeVisible();
+    expect(screen.queryByText('gravacao.webm')).not.toBeInTheDocument();
+
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+
+    await waitFor(() => {
+      expect(dependencias.criarConversa).toHaveBeenCalledWith('', [audio]);
     });
   });
 });
