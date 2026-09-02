@@ -153,12 +153,17 @@
 }
 
 .abas {
+  position: sticky;
+  top: calc(var(--app-shell-header-h, 58px) + var(--via-space-3));
+  z-index: calc(var(--via-z-sticky) - 1);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   padding: 3px;
   border-bottom: 1px solid var(--via-border-hairline);
-  background: var(--via-bg-2);
+  background: var(--via-glass-bar);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--via-navy) 8%, transparent);
+  backdrop-filter: blur(22px) saturate(145%);
 }
 
 .abas button {
@@ -169,7 +174,7 @@
   background: transparent;
   color: var(--via-text-muted);
   font: inherit;
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   cursor: pointer;
   transition:
@@ -195,7 +200,7 @@
 }
 
 .painelAba {
-  padding: var(--via-space-5);
+  padding: clamp(20px, 2.5vw, 30px);
 }
 
 .gradeLeitura,
@@ -205,6 +210,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--via-space-4);
   align-items: start;
+}
+
+.gradeConversa {
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
 }
 
 .preparoCall {
@@ -289,7 +298,7 @@
   max-width: 62ch;
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }
@@ -773,7 +782,7 @@
 .perguntasCall strong {
   margin-top: var(--via-space-1);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
@@ -782,7 +791,7 @@
 .perguntasCall p {
   margin: var(--via-space-1) 0 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -811,7 +820,7 @@
 
 .projetos strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
 }
 
 .projetos dl {
@@ -840,7 +849,7 @@
 
 .projetos dd {
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   line-height: var(--via-lh-normal);
 }
 
@@ -1027,6 +1036,10 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
+  .gradeConversa {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .proximoPassoCall {
     grid-column: 1 / -1;
   }
@@ -1048,6 +1061,7 @@
 
   .abas {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    top: calc(var(--app-shell-header-h, 58px) + var(--via-space-2));
   }
 
   .abas button {
@@ -1057,7 +1071,7 @@
   }
 
   .painelAba {
-    padding: var(--via-space-3);
+    padding: var(--via-space-4);
   }
 
   .inteligenciaContato > header {

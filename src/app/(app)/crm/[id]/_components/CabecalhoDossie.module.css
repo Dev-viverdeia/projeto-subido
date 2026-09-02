@@ -85,7 +85,7 @@
   gap: var(--via-space-1);
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
 }
 
 .heroRodape {
@@ -112,7 +112,7 @@
   align-items: center;
   gap: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   text-decoration: none;
 }
 
@@ -149,7 +149,7 @@
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
   white-space: nowrap;
@@ -246,8 +246,12 @@
 
   .acoes {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
+  }
+
+  .acoes > :first-child {
+    grid-column: 1 / -1;
   }
 
   .acaoPrimaria,
@@ -255,6 +259,10 @@
   .acaoIndisponivel,
   .acoes > button {
     width: 100%;
+  }
+
+  .acoes > *:last-child:nth-child(even) {
+    grid-column: 1 / -1;
   }
 }
 

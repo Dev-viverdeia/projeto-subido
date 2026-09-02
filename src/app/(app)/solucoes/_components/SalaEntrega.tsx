@@ -258,6 +258,34 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           )}
 
           <div className={styles.corpo}>
+            <aside className={styles.lateral}>
+              <JornadaEntrega
+                estado={estadoJornada}
+                onAbrir={() => abrirAcaoJornada(estadoJornada.destino, estadoJornada.tarefaId)}
+              />
+
+              <section className={styles.resumoOperacional}>
+                <p>Resumo da entrega</p>
+                <dl>
+                  <div>
+                    <dt>Prazo</dt>
+                    <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
+                  </div>
+                  <div>
+                    <dt>Arquivos</dt>
+                    <dd>{projeto.arquivos.length}</dd>
+                  </div>
+                  <div>
+                    <dt>Cliente</dt>
+                    <dd>{projeto.portalAtivo ? 'Portal ativo' : 'Portal privado'}</dd>
+                  </div>
+                </dl>
+                <button type="button" onClick={() => setPainel('cliente')}>
+                  Ver acordo e portal <ArrowRight size={14} aria-hidden="true" />
+                </button>
+              </section>
+            </aside>
+
             <main className={styles.operacao}>
               <header className={styles.cabecalhoFase}>
                 <div>
@@ -330,34 +358,6 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                 </section>
               )}
             </main>
-
-            <aside className={styles.lateral}>
-              <JornadaEntrega
-                estado={estadoJornada}
-                onAbrir={() => abrirAcaoJornada(estadoJornada.destino, estadoJornada.tarefaId)}
-              />
-
-              <section className={styles.resumoOperacional}>
-                <p>Resumo da entrega</p>
-                <dl>
-                  <div>
-                    <dt>Prazo</dt>
-                    <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
-                  </div>
-                  <div>
-                    <dt>Arquivos</dt>
-                    <dd>{projeto.arquivos.length}</dd>
-                  </div>
-                  <div>
-                    <dt>Cliente</dt>
-                    <dd>{projeto.portalAtivo ? 'Portal ativo' : 'Portal privado'}</dd>
-                  </div>
-                </dl>
-                <button type="button" onClick={() => setPainel('cliente')}>
-                  Ver acordo e portal <ArrowRight size={14} aria-hidden="true" />
-                </button>
-              </section>
-            </aside>
           </div>
 
           <PlanoVivo projetoId={projeto.id} acoes={projeto.acoesPlano} />
