@@ -75,6 +75,40 @@ export function PortalProjeto({
       </header>
 
       <div className={styles.canvas}>
+        <section className={styles.hero} data-concluido={concluido || undefined}>
+          <div className={styles.heroTexto}>
+            <p>Projeto com {projeto.empresa}</p>
+            <h1>{projeto.titulo}</h1>
+            <blockquote>{projeto.resumo}</blockquote>
+
+            <dl>
+              <div>
+                <dt>Início</dt>
+                <dd>{formatarData(projeto.inicioEm)}</dd>
+              </div>
+              <div>
+                <dt>Previsão</dt>
+                <dd>{projeto.prazoEm ? formatarData(projeto.prazoEm) : 'Em definição'}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>{ROTULO_STATUS_PROJETO[projeto.status]}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className={styles.progressoHero}>
+            <span>{percentual}%</span>
+            <strong>{concluido ? 'entregue e aprovado' : 'concluído'}</strong>
+            <div aria-hidden="true">
+              <i style={{ transform: `scaleX(${percentual / 100})` }} />
+            </div>
+            <small>
+              {projeto.feitas} de {projeto.total} marcos
+            </small>
+          </div>
+        </section>
+
         <section
           className={styles.centralDecisoes}
           data-concluido={concluido || undefined}
@@ -133,45 +167,11 @@ export function PortalProjeto({
           )}
         </section>
 
-        <section className={styles.hero} data-concluido={concluido || undefined}>
-          <div className={styles.heroTexto}>
-            <p>Projeto em parceria com {projeto.empresa}</p>
-            <h1>{projeto.titulo}</h1>
-            <blockquote>{projeto.resumo}</blockquote>
-
-            <dl>
-              <div>
-                <dt>Início</dt>
-                <dd>{formatarData(projeto.inicioEm)}</dd>
-              </div>
-              <div>
-                <dt>Previsão</dt>
-                <dd>{projeto.prazoEm ? formatarData(projeto.prazoEm) : 'Em definição'}</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>{ROTULO_STATUS_PROJETO[projeto.status]}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className={styles.progressoHero}>
-            <span>{percentual}%</span>
-            <strong>{concluido ? 'entregue e aprovado' : 'do projeto concluído'}</strong>
-            <div aria-hidden="true">
-              <i style={{ transform: `scaleX(${percentual / 100})` }} />
-            </div>
-            <small>
-              {projeto.feitas} de {projeto.total} marcos executados
-            </small>
-          </div>
-        </section>
-
         <details className={styles.grupoDetalhes}>
           <summary>
             <div>
-              <strong>Escopo e combinados</strong>
-              <span>Objetivo, entregáveis e mudanças</span>
+              <strong>Sobre o projeto</strong>
+              <span>Objetivo e combinados</span>
             </div>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
@@ -181,10 +181,10 @@ export function PortalProjeto({
           </div>
         </details>
 
-        <details className={styles.grupoDetalhes}>
+        <details className={styles.grupoDetalhes} open={!totalAcoes && !concluido}>
           <summary>
             <div>
-              <strong>Andamento e entregas</strong>
+              <strong>Andamento</strong>
               <span>{projeto.feitas} marcos concluídos</span>
             </div>
             <ChevronDown size={17} aria-hidden="true" />
@@ -267,10 +267,10 @@ export function PortalProjeto({
           </div>
         </details>
 
-        <details className={styles.grupoDetalhes}>
+        <details className={styles.grupoDetalhes} open={concluido}>
           <summary>
             <div>
-              <strong>Resultado e continuidade</strong>
+              <strong>Resultados</strong>
               <span>{concluido ? 'Encerramento do projeto' : 'Próximos passos'}</span>
             </div>
             <ChevronDown size={17} aria-hidden="true" />

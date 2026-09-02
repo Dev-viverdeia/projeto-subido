@@ -867,7 +867,7 @@
     padding: 0 var(--via-space-4);
   }
 
-  .marca > span {
+  .marca > span:last-child {
     display: none;
   }
 
@@ -967,5 +967,630 @@
     justify-content: center;
     padding: var(--via-space-5);
     line-height: 1.5;
+  }
+}
+
+.pagina {
+  min-height: 100vh;
+  padding-bottom: var(--via-space-8);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+
+/* A proposta publica e uma tela de decisao, nao uma replica do editor. Esta
+   camada reduz a altura do documento, mantem o investimento ao alcance e usa
+   uma unica banda escura para preservar o ritmo light-first da marca. */
+.barra,
+.resumoFixo,
+.rodape,
+.canvas {
+  width: min(calc(100% - 40px), 1160px);
+}
+
+.resumoFixo {
+  position: sticky;
+  z-index: 20;
+  top: 12px;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--app-gap-grid);
+  align-items: center;
+  margin: 0 auto var(--via-space-4);
+  padding: 10px 12px 10px var(--app-pad-card);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: blur(22px) saturate(135%);
+}
+
+.resumoCliente,
+.resumoPreco {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.resumoCliente > span,
+.resumoPreco > span {
+  color: var(--via-text-muted);
+  font: var(--via-fs-xs) var(--via-font);
+}
+
+.resumoCliente > strong {
+  overflow: hidden;
+  color: var(--via-navy);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resumoAcao {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-4);
+}
+
+.resumoPreco {
+  min-width: 150px;
+  padding-right: var(--via-space-4);
+  border-right: 1px solid var(--via-border-hairline);
+  text-align: right;
+}
+
+.resumoPreco > strong {
+  color: var(--via-navy);
+  font: var(--via-fw-semibold) var(--via-fs-body) var(--via-font);
+}
+
+.resumoAcao > a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-5);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+  transition:
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.resumoAcao > a:hover {
+  box-shadow: var(--app-elev-2-shadow);
+  transform: translateY(-1px);
+}
+
+.resumoAcao > a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
+}
+
+.canvas {
+  overflow: clip;
+  border-color: var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.hero {
+  min-height: 360px;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  background: var(--via-navy-deep);
+}
+
+.heroTexto {
+  justify-content: center;
+  padding: clamp(44px, 6vw, 72px);
+}
+
+.heroTexto p {
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-xs);
+}
+
+.heroTexto h1 {
+  max-width: 18ch;
+  margin-top: var(--via-space-3);
+  font-size: clamp(3rem, 6vw, 4.65rem);
+  line-height: 0.96;
+}
+
+.heroTexto > span {
+  max-width: 56ch;
+  margin-top: var(--via-space-5);
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-body);
+  line-height: 1.55;
+}
+
+.heroMeta {
+  gap: var(--via-space-6);
+  padding: var(--via-space-7);
+  background: color-mix(in srgb, var(--via-white) 5%, transparent);
+}
+
+.heroMeta dt {
+  color: var(--via-gray-400);
+  font-size: var(--via-fs-xs);
+}
+
+.heroMeta dd {
+  font-size: var(--via-fs-body);
+}
+
+.heroMeta small {
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-xs);
+}
+
+.contexto {
+  padding: clamp(44px, 6vw, 68px);
+}
+
+.contexto > header {
+  margin-bottom: var(--app-gap-block);
+}
+
+.contexto header p,
+.entrega header p,
+.proximosPassos header p,
+.investimento p {
+  font-size: var(--via-fs-xs);
+}
+
+.contexto header h2 {
+  max-width: 18ch;
+  margin-top: var(--via-space-2);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+}
+
+.contextoGrade {
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: var(--app-gap-grid);
+  border-top: 0;
+}
+
+.contextoGrade article,
+.contextoGrade article:first-child,
+.contextoGrade article:last-child {
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.contextoGrade article:last-child {
+  border-left: 1px solid var(--app-elev-1-line);
+  background: var(--app-glass-plane-strong);
+}
+
+.contextoGrade article > span,
+.observacoes > span {
+  font-size: var(--via-fs-xs);
+}
+
+.contextoGrade article > p,
+.objetivo > p {
+  margin-top: var(--via-space-3);
+  font-size: var(--via-fs-body) !important;
+  line-height: 1.58 !important;
+}
+
+.objetivo > svg {
+  margin-bottom: var(--via-space-4);
+}
+
+.escopo {
+  padding: 0;
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-white);
+}
+
+.detalhesBloco {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.detalhesBloco > summary {
+  min-height: 84px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--via-space-4);
+  align-items: center;
+  padding-inline: clamp(32px, 6vw, 68px);
+  list-style: none;
+  cursor: pointer;
+}
+
+.detalhesBloco > summary::-webkit-details-marker {
+  display: none;
+}
+
+.detalhesBloco > summary::marker {
+  content: '';
+}
+
+.detalhesBloco > summary > div {
+  display: grid;
+  gap: 3px;
+}
+
+.detalhesBloco > summary span {
+  color: var(--via-accent-ink);
+  font: var(--via-fs-xs) var(--via-font-mono);
+  letter-spacing: var(--app-ls-eyebrow);
+  text-transform: uppercase;
+}
+
+.detalhesBloco > summary strong {
+  color: var(--via-navy);
+  font-size: 1.25rem;
+  font-weight: var(--via-fw-semibold);
+}
+
+.detalhesBloco > summary small {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.detalhesBloco > summary svg {
+  color: var(--via-text-muted);
+  transition: transform var(--app-t-state);
+}
+
+.detalhesBloco[open] > summary {
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.detalhesBloco[open] > summary svg {
+  transform: rotate(180deg);
+}
+
+.detalhesBloco > summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.escopoGrade {
+  gap: var(--app-gap-grid);
+  padding: clamp(28px, 5vw, 52px);
+  border: 0;
+  background: var(--app-glass-plane-strong);
+}
+
+.escopoGrade article {
+  min-height: 158px;
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.escopoGrade h3 {
+  font-size: var(--via-fs-body);
+}
+
+.escopoGrade p,
+.entrega ul li,
+.entrega ol strong {
+  font-size: var(--via-fs-sm);
+}
+
+.detalhesBloco .entrega {
+  gap: clamp(32px, 6vw, 72px);
+  padding: clamp(28px, 5vw, 52px);
+  background: var(--app-glass-plane-strong);
+}
+
+.entrega header {
+  margin-bottom: var(--via-space-5);
+}
+
+.entrega header h2 {
+  margin-top: var(--via-space-2);
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+}
+
+.entrega ol p {
+  font-size: var(--via-fs-xs);
+}
+
+.fechamento {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  gap: var(--app-gap-grid);
+  padding: clamp(32px, 6vw, 68px);
+  border-bottom: 1px solid var(--via-border-hairline);
+  background: var(--via-bg-2);
+}
+
+.fechamento .investimento,
+.fechamento .proximosPassos {
+  min-width: 0;
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-primary);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.fechamento .investimento {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--via-space-5);
+}
+
+.investimento p {
+  color: var(--via-accent-ink);
+}
+
+.investimento > div:first-child > strong {
+  margin-top: var(--via-space-3);
+  color: var(--via-navy);
+  font-size: clamp(2.35rem, 4.5vw, 3.65rem);
+  line-height: 1;
+}
+
+.investimento > div:first-child > span {
+  margin-top: var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.validade {
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: start;
+  gap: var(--via-space-3);
+  margin-top: auto;
+  padding: var(--via-space-4) 0 0;
+  border-top: 1px solid var(--via-border-hairline);
+  border-left: 0;
+}
+
+.validade svg,
+.validade span {
+  color: var(--via-text-muted);
+}
+
+.validade span {
+  font-size: var(--via-fs-xs);
+}
+
+.validade strong {
+  color: var(--via-navy);
+  font-size: var(--via-fs-body);
+}
+
+.proximosPassos > header {
+  margin-bottom: var(--via-space-5);
+}
+
+.proximosPassos header h2 {
+  margin-top: var(--via-space-2);
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+}
+
+.proximosPassos ol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border: 0;
+}
+
+.proximosPassos li {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+
+.proximosPassos li:first-child {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.proximosPassos li > span {
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 0;
+  background: transparent;
+  color: var(--via-accent-ink);
+  font-size: var(--via-fs-xs);
+}
+
+.proximosPassos li p,
+.observacoes p {
+  font-size: var(--via-fs-sm);
+}
+
+.ancoraDecisao {
+  scroll-margin-top: 96px;
+}
+
+.formDecisao,
+.estadoFinal,
+.decisaoConcluida {
+  padding: clamp(44px, 6vw, 68px);
+  background: var(--via-white);
+}
+
+.formTopo p,
+.estadoFinal p,
+.decisaoConcluida p {
+  font-size: var(--via-fs-xs);
+}
+
+.formTopo h2,
+.estadoFinal h2,
+.decisaoConcluida h2 {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+}
+
+.formTopo > span,
+.camposDecisao label > span,
+.aceiteTermos,
+.segurancaDecisao {
+  font-size: var(--via-fs-sm);
+}
+
+.decisaoConcluida > span,
+.estadoFinal > span {
+  border-radius: var(--app-radius-control);
+}
+
+@media (max-width: 899px) {
+  .hero,
+  .contextoGrade,
+  .detalhesBloco .entrega,
+  .fechamento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroTexto {
+    min-height: 330px;
+  }
+
+  .heroMeta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .pagina {
+    padding-bottom: var(--via-space-5);
+  }
+
+  .barra,
+  .resumoFixo,
+  .canvas,
+  .rodape {
+    width: min(calc(100% - 24px), 1160px);
+  }
+
+  .barra {
+    min-height: 64px;
+    padding: 0;
+  }
+
+  .resumoFixo {
+    top: 8px;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 62px;
+    padding: 8px;
+  }
+
+  .resumoCliente {
+    display: none;
+  }
+
+  .resumoAcao {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .resumoPreco {
+    min-width: 0;
+    padding-inline: var(--via-space-2) var(--via-space-3);
+    text-align: left;
+  }
+
+  .resumoAcao > a {
+    min-height: 46px;
+    padding-inline: var(--via-space-4);
+  }
+
+  .canvas {
+    border: 1px solid var(--app-elev-1-line);
+    border-radius: var(--app-radius-card);
+  }
+
+  .heroTexto {
+    min-height: 310px;
+    padding: var(--via-space-7) var(--via-space-5);
+  }
+
+  .heroTexto h1 {
+    font-size: clamp(2.45rem, 12vw, 3.45rem);
+  }
+
+  .heroTexto > span {
+    font-size: var(--via-fs-sm);
+  }
+
+  .heroMeta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-5);
+  }
+
+  .contexto,
+  .formDecisao,
+  .estadoFinal,
+  .decisaoConcluida {
+    padding: var(--via-space-7) var(--via-space-5);
+  }
+
+  .contextoGrade article:last-child {
+    padding: var(--app-pad-card);
+    border-top: 1px solid var(--app-elev-1-line);
+  }
+
+  .detalhesBloco > summary {
+    min-height: 78px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: var(--via-space-5);
+  }
+
+  .detalhesBloco > summary small {
+    display: none;
+  }
+
+  .escopoGrade,
+  .detalhesBloco .entrega,
+  .fechamento {
+    padding: var(--via-space-5);
+  }
+
+  .escopoGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fechamento .investimento,
+  .fechamento .proximosPassos {
+    padding: var(--via-space-5);
+  }
+
+  .camposDecisao {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comentario {
+    grid-column: auto;
+  }
+
+  .acoesDecisao {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .rodape {
+    min-height: 92px;
+    padding: 0;
   }
 }
