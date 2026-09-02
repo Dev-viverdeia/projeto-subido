@@ -6,7 +6,7 @@ const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
-  ['/preview/mapa-jornada', 'Um clique para continuar.'],
+  ['/preview/mapa-jornada', 'Escolha uma área.'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
@@ -74,7 +74,7 @@ test.describe('fundação visual Viver de IA', () => {
   test('a Início guia para as áreas da plataforma em um clique', async ({ page }) => {
     await page.goto('/preview/mapa-jornada');
 
-    await expect(page.getByRole('heading', { name: 'Um clique para continuar.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Escolha uma área.' })).toBeVisible();
     const atalhos = page.getByRole('navigation', { name: 'Atalhos da plataforma' });
     await expect(atalhos.getByRole('link')).toHaveCount(9);
     await expect(atalhos.getByRole('link', { name: 'Ver formações: Formações' })).toHaveAttribute(
@@ -94,6 +94,12 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Projeto principal', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Como vende', { exact: true })).toHaveCount(0);
+
+    const dimensoes = await page.evaluate(() => ({
+      pagina: document.documentElement.scrollHeight,
+      viewport: window.innerHeight,
+    }));
+    expect(dimensoes.pagina).toBeLessThanOrEqual(dimensoes.viewport + 1);
 
     const resultado = await new AxeBuilder({ page }).analyze();
     const graves = resultado.violations.filter(

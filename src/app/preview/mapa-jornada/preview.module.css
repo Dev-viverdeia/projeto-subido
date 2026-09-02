@@ -13,7 +13,8 @@
   grid-template-columns: 252px minmax(0, 1fr);
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse 70% 42% at 15% 0%, var(--via-navy-05), transparent 62%), var(--via-bg-2);
+    linear-gradient(128deg, var(--via-navy-04) 0%, transparent 24%),
+    linear-gradient(308deg, var(--via-navy-03) 0%, transparent 22%), var(--via-bg-2);
 }
 
 .shell :global(.via-btn--sm) {
@@ -40,9 +41,7 @@
   height: 100dvh;
   padding: var(--via-space-6) var(--via-space-4) var(--via-space-4);
   border-right: 1px solid var(--via-border-soft);
-  background:
-    radial-gradient(ellipse 110% 34% at 0% 0%, var(--via-navy-05), transparent 68%),
-    color-mix(in srgb, var(--via-surface) 94%, transparent);
+  background: color-mix(in srgb, var(--via-surface) 94%, transparent);
   box-shadow: 12px 0 32px -28px var(--via-navy-30);
   color: var(--via-text-primary);
 }

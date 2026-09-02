@@ -6,11 +6,15 @@ describe('MapaJornada', () => {
   it('guia o usuário Pro pelas áreas da plataforma em um clique', () => {
     render(<MapaJornada nome="Rafael" plano="pro" />);
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Rafael\.$/);
-    expect(screen.getByText('Escolha o que precisa fazer agora.')).toBeVisible();
+    expect(screen.getByText(/Rafael\.$/)).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'O que você quer fazer agora?',
+    );
+    expect(screen.getByRole('heading', { name: 'Escolha uma área.' })).toBeVisible();
 
     const atalhos = screen.getByRole('navigation', { name: 'Atalhos da plataforma' });
     expect(within(atalhos).getAllByRole('link')).toHaveLength(9);
+    expect(within(atalhos).queryByText('01')).not.toBeInTheDocument();
     expect(within(atalhos).getByRole('link', { name: 'Ver formações: Formações' })).toHaveAttribute(
       'href',
       '/formacoes',
