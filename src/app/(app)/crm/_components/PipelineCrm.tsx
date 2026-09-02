@@ -332,6 +332,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
       <ModalOperacao
         open={perdaPendente !== null}
         onClose={fecharPerda}
+        label="Vendas"
         title="Registrar venda perdida"
         description={
           perdaPendente ? `${perdaPendente.empresa} · ${perdaPendente.titulo}` : undefined

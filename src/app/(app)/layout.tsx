@@ -93,7 +93,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           dentro, e quem LÊ é o cabeçalho, aqui em cima. O progresso, por outro
           lado, mora apenas nas quatro áreas que realmente o consomem. */}
       <ProvedorDeTrilha>
-        <div className={styles.shell}>
+        <div className={styles.shell} data-app-shell>
           <a href="#conteudo" className="via-skip-link">
             Pular para o conteúdo
           </a>

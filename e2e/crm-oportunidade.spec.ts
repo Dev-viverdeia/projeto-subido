@@ -58,9 +58,9 @@ test.describe('Ficha do cliente em Vendas', () => {
     );
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();
 
-    const dialogo = page.getByRole('dialog', { name: 'Enriquecer os dados deste cliente?' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
     await expect(dialogo).toBeVisible();
-    await expect(dialogo.getByText(/usa a ficha, as reuniões e fontes públicas/)).toBeVisible();
+    await expect(dialogo.getByText(/Usaremos o que já está salvo e fontes públicas/)).toBeVisible();
     await expect(dialogo.getByText('3 créditos', { exact: true })).toBeVisible();
     await expect(dialogo.getByText('17')).toBeVisible();
     await dialogo.getByRole('button', { name: 'Cancelar' }).click();
@@ -103,7 +103,7 @@ test.describe('Ficha do cliente em Vendas', () => {
 
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();
     const camada = page.locator('.via-modal-root');
-    const dialogo = page.getByRole('dialog', { name: 'Enriquecer os dados deste cliente?' });
+    const dialogo = page.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
     await expect(camada).toBeVisible();
     await expect(dialogo).toBeVisible();
 
@@ -118,10 +118,8 @@ test.describe('Ficha do cliente em Vendas', () => {
     });
     expect(geometria).toEqual({ top: 0, left: 0, width: 1280, height: 720 });
 
-    await dialogo
-      .getByRole('button', { name: 'Confirmar por 3 créditos' })
-      .scrollIntoViewIfNeeded();
-    await expect(dialogo.getByRole('button', { name: 'Confirmar por 3 créditos' })).toBeVisible();
+    await dialogo.getByRole('button', { name: 'Usar 3 créditos' }).scrollIntoViewIfNeeded();
+    await expect(dialogo.getByRole('button', { name: 'Usar 3 créditos' })).toBeVisible();
   });
 
   test('diferencia etapas concluídas, futuras e o ponto em que uma venda foi encerrada', async ({

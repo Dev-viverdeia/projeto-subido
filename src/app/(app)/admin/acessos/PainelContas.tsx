@@ -150,6 +150,7 @@ export function PainelContas({
       <ModalOperacao
         open={Boolean(conta)}
         onClose={fechar}
+        label="Administração"
         title={conta ? nomeConta(conta) : 'Detalhes da conta'}
         description={conta?.email || 'Conta sem e-mail'}
         size="lg"

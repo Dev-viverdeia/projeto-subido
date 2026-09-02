@@ -67,8 +67,9 @@ export function FormularioNovoLead({
       <ModalOperacao
         open={aberto}
         onClose={fechar}
+        label="Vendas"
         title="Adicionar oportunidade"
-        description="Cadastre a empresa e o contato que você pretende abordar."
+        description="Informe empresa e contato. O projeto pode ser definido depois."
         size="md"
         blocked={pendente}
         footer={

@@ -20,7 +20,7 @@ export default function PreviewShellPage() {
 
   return (
     <ProvedorDeTrilha>
-      <div className={shellStyles.shell}>
+      <div className={shellStyles.shell} data-app-shell>
         <a href="#conteudo" className="via-skip-link">
           Pular para o conteúdo
         </a>

@@ -106,6 +106,7 @@ export function ModalOperacaoMentoria({
     <ModalOperacao
       open={sessao !== null}
       onClose={aoFechar}
+      label="Mentorias"
       title={titulo}
       size="sm"
       hideClose={fase === 'processando'}

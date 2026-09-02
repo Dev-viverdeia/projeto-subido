@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/design-system/via';
 import styles from './ModalOperacao.module.css';
@@ -22,6 +22,7 @@ const obterMontagemServidor = () => false;
 export function ModalOperacao({
   open,
   onClose,
+  label,
   title,
   description,
   size = 'md',
@@ -32,6 +33,7 @@ export function ModalOperacao({
 }: {
   open: boolean;
   onClose: () => void;
+  label?: string;
   title: string;
   description?: string;
   size?: TamanhoModal;
@@ -62,7 +64,16 @@ export function ModalOperacao({
   };
 
   return createPortal(
-    <div ref={portal} className={styles.portal} data-size={size}>
+    <div
+      ref={portal}
+      className={styles.portal}
+      data-app-modal
+      data-size={size}
+      data-has-label={Boolean(label)}
+      data-label={label}
+      data-blocked={blocked}
+      style={label ? ({ '--app-modal-label': `"${label}"` } as CSSProperties) : undefined}
+    >
       <Modal
         open
         onClose={fechar}

@@ -33,6 +33,7 @@ export function ModalDetalheMentoria({
     <ModalOperacao
       open={sessao !== null}
       onClose={aoFechar}
+      label="Mentorias"
       title={sessao?.titulo ?? 'Detalhes da mentoria'}
       size="md"
     >
