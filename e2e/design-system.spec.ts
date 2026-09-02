@@ -6,7 +6,7 @@ const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
-  ['/preview/mapa-jornada', 'Defina a próxima ação'],
+  ['/preview/mapa-jornada', 'Um clique para continuar.'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
@@ -71,17 +71,24 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('heading', { name: 'Confirmar o segundo projeto' })).toHaveCount(0);
   });
 
-  test('a Início mostra uma única ação e mantém o contexto essencial acessível', async ({
-    page,
-  }) => {
+  test('a Início guia para as áreas da plataforma em um clique', async ({ page }) => {
     await page.goto('/preview/mapa-jornada');
 
-    const comando = page.getByRole('region', { name: 'Próxima ação' });
-    await expect(comando).toBeVisible();
-    await expect(comando.getByRole('heading', { name: 'Defina a próxima ação' })).toBeVisible();
-    await expect(comando.getByRole('link', { name: 'Definir próxima ação' })).toBeVisible();
-    await expect(comando.getByRole('progressbar', { name: 'Progresso do trabalho' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Ver agenda/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Um clique para continuar.' })).toBeVisible();
+    const atalhos = page.getByRole('navigation', { name: 'Atalhos da plataforma' });
+    await expect(atalhos.getByRole('link')).toHaveCount(9);
+    await expect(atalhos.getByRole('link', { name: 'Ver formações: Formações' })).toHaveAttribute(
+      'href',
+      '/formacoes',
+    );
+    await expect(
+      atalhos.getByRole('link', { name: 'Buscar empresas: Prospecção' }),
+    ).toHaveAttribute('href', '/prospeccao');
+    await expect(atalhos.getByRole('link', { name: 'Ver entregas: Entregas' })).toHaveAttribute(
+      'href',
+      '/entregas',
+    );
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'O que já está na sua mesa.' })).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Continue de onde parou.' })).toHaveCount(0);
     await expect(page.getByText('Seu mercado', { exact: true })).toHaveCount(0);
