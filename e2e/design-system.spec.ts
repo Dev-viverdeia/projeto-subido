@@ -19,7 +19,7 @@ const TELAS = [
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/admin-acessos', 'Acessos e créditos'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/entregas', 'Veja o próximo passo e mantenha o cliente acompanhando.'],
+  ['/preview/entregas', 'Acompanhe a próxima tarefa de cada projeto.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],

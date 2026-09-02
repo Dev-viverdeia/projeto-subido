@@ -90,14 +90,20 @@ export function PainelCalls({
   return (
     <div className={styles.pagina}>
       <CabecalhoReunioes comercialLiberado={comercialLiberado}>
-        <FormularioAgendarCall
-          oportunidades={oportunidades}
-          comercialLiberado={comercialLiberado}
-          calendar={calendar}
-          abertoInicial={modalInicial}
-          oportunidadeInicial={oportunidadeInicial}
-          tipoInicial={tipoInicial}
-        />
+        {comercialLiberado && calendar.conectado && oportunidades.length === 0 ? (
+          <Link href="/vendas" className="via-btn via-btn--primary via-btn--md">
+            Adicionar oportunidade <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        ) : (
+          <FormularioAgendarCall
+            oportunidades={oportunidades}
+            comercialLiberado={comercialLiberado}
+            calendar={calendar}
+            abertoInicial={modalInicial}
+            oportunidadeInicial={oportunidadeInicial}
+            tipoInicial={tipoInicial}
+          />
+        )}
       </CabecalhoReunioes>
 
       <RetornosReunioes
@@ -221,19 +227,6 @@ export function PainelCalls({
                     : 'Informe quem será convidado. A plataforma organiza o histórico automaticamente.'}
                 </p>
               </div>
-              {comercialLiberado && oportunidades.length === 0 ? (
-                <Link href="/vendas" className={styles.acaoVazio}>
-                  Adicionar cliente <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-              ) : (
-                <FormularioAgendarCall
-                  oportunidades={oportunidades}
-                  comercialLiberado={comercialLiberado}
-                  calendar={calendar}
-                  oportunidadeInicial={oportunidadeInicial}
-                  tipoInicial={tipoInicial}
-                />
-              )}
             </div>
           ) : seguintes.length > 0 ? (
             <div className={styles.lista}>

@@ -45,6 +45,10 @@ describe('PainelPropostas', () => {
     render(<PainelPropostas propostas={PROPOSTAS} />);
 
     expect(screen.getByRole('heading', { name: 'Biblioteca comercial' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Nova proposta' })).toHaveAttribute(
+      'href',
+      '/propostas/nova',
+    );
     const arquivo = screen.getByRole('region', { name: 'Suas propostas' });
     expect(within(arquivo).getByText('Clínica Aurora')).toBeInTheDocument();
     expect(within(arquivo).getByText('Orbe')).toBeInTheDocument();
@@ -68,6 +72,7 @@ describe('PainelPropostas', () => {
     render(<PainelPropostas propostas={[]} />);
 
     expect(screen.getByText('Nenhuma proposta criada ainda')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Nova proposta' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Criar proposta/ })).toHaveAttribute(
       'href',
       '/propostas/nova',

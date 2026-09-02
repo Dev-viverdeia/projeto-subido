@@ -6,6 +6,7 @@ import { ArrowRight, Check, Eye, FileText, Plus, Search, Send, X } from 'lucide-
 import type { ResumoProposta } from '@/lib/propostas/queries';
 import { formatarReais } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
+import { CabecalhoOperacional } from '../../_components/CabecalhoOperacional';
 import { AbasFiltro } from '../../_components/filtros/AbasFiltro';
 import styles from '../pagina.module.css';
 
@@ -168,29 +169,20 @@ export function PainelPropostas({ propostas }: { propostas: ResumoProposta[] }) 
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.hero}>
-        <div className={styles.heroTexto}>
-          <span className={styles.sobretitulo}>Propostas</span>
-          <h1>Biblioteca comercial</h1>
-          <p>Prepare, compartilhe e acompanhe a decisão do cliente.</p>
-        </div>
-        <Link href="/propostas/nova" className={styles.nova}>
-          <Plus size={17} strokeWidth={2} aria-hidden="true" />
-          Nova proposta
-        </Link>
-      </header>
+      <CabecalhoOperacional
+        titulo="Biblioteca comercial"
+        descricao="Crie, envie e acompanhe suas propostas."
+        acao={
+          propostas.length > 0 ? (
+            <Link href="/propostas/nova" className={styles.nova}>
+              <Plus size={17} strokeWidth={2} aria-hidden="true" />
+              Nova proposta
+            </Link>
+          ) : undefined
+        }
+      />
 
-      <section className={styles.arquivo} aria-labelledby="titulo-arquivo-propostas">
-        <header className={styles.arquivoTopo}>
-          <div>
-            <span className={styles.sobretitulo}>Arquivo</span>
-            <h2 id="titulo-arquivo-propostas">Suas propostas</h2>
-          </div>
-          <span className={styles.totalArquivo}>
-            {propostas.length} {propostas.length === 1 ? 'proposta' : 'propostas'}
-          </span>
-        </header>
-
+      <section className={styles.arquivo} aria-label="Suas propostas">
         <div className={styles.ferramentas}>
           <AbasFiltro
             abas={[

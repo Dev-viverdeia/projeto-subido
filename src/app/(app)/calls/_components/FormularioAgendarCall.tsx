@@ -166,7 +166,7 @@ export function FormularioAgendarCall({
           <div className={styles.semLead}>
             <p>Uma reunião precisa estar ligada a uma venda real.</p>
             <Link href="/vendas" className="via-btn via-btn--primary via-btn--md">
-              Adicionar primeiro cliente
+              Adicionar oportunidade
             </Link>
           </div>
         ) : (

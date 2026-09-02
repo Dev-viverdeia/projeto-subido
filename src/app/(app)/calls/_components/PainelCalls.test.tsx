@@ -48,6 +48,24 @@ function reuniao(parcial: Partial<ReuniaoCall> & Pick<ReuniaoCall, 'id' | 'titul
 }
 
 describe('PainelCalls', () => {
+  it('leva à oportunidade antes do agendamento sem repetir o comando', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        reunioes={[]}
+        agora={new Date('2026-08-09T12:00:00.000Z')}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Agendar reunião' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /Adicionar oportunidade/ })).toHaveLength(1);
+    expect(screen.getByRole('link', { name: /Adicionar oportunidade/ })).toHaveAttribute(
+      'href',
+      '/vendas',
+    );
+  });
+
   it('coloca a próxima call em destaque sem duplicá-la na agenda', () => {
     render(
       <PainelCalls

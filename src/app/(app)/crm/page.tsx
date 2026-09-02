@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ArrowRight, Database } from 'lucide-react';
 import { listarPipeline } from '@/lib/crm/queries';
+import { CabecalhoOperacional } from '../_components/CabecalhoOperacional';
 import { RetornoOperacao } from '../_components/RetornoOperacao';
 import { FormularioNovoLead } from './_components/FormularioNovoLead';
 import { PipelineCrm } from './_components/PipelineCrm';
@@ -20,22 +21,20 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
 
   return (
     <div className={styles.pagina}>
-      <header className={styles.topo}>
-        <div className={styles.linhaTopo}>
-          <div className={styles.introducao}>
-            <p className={styles.sobretitulo}>Seus clientes em negociação</p>
-            <h1>Vendas</h1>
-            <p>Acompanhe cada projeto em negociação e saiba o que fazer em seguida.</p>
-          </div>
-          {oportunidades.length > 0 && (
+      <CabecalhoOperacional
+        titulo="Vendas"
+        descricao="Acompanhe cada oportunidade e o próximo passo."
+        acao={
+          oportunidades.length > 0 ? (
             <FormularioNovoLead
+              rotulo="Nova oportunidade"
               abertoInicial={abrirDoProjeto}
               tituloInicial={projetoDeOrigem}
               projetoSlug={projetoSlug}
             />
-          )}
-        </div>
-      </header>
+          ) : undefined
+        }
+      />
 
       {parametros.novo === 'ok' && (
         <RetornoOperacao
@@ -57,14 +56,10 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
               <span className={styles.primeiroLeadIcone}>
                 <Database size={24} strokeWidth={1.6} aria-hidden="true" />
               </span>
-              <p className={styles.sobretitulo}>Primeira venda</p>
-              <h3>Adicione uma empresa que você decidiu abordar.</h3>
-              <p>
-                Empresa e contato são suficientes. A plataforma ajuda a pesquisar o negócio e a
-                preparar o próximo passo.
-              </p>
+              <h3>Adicione sua primeira oportunidade.</h3>
+              <p>Cadastre a empresa e o contato. A ficha organiza os próximos passos.</p>
               <FormularioNovoLead
-                rotulo="Adicionar primeira empresa"
+                rotulo="Adicionar oportunidade"
                 abertoInicial={abrirDoProjeto}
                 tituloInicial={projetoDeOrigem}
                 projetoSlug={projetoSlug}
@@ -76,15 +71,13 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 <span>01</span>
                 <div>
                   <strong>Prepare a abordagem</strong>
-                  <p>Pesquise a empresa, o contato e o projeto que pode ser vendido.</p>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>
               <li>
                 <span>02</span>
                 <div>
-                  <strong>Faça a descoberta</strong>
-                  <p>Use a reunião para confirmar o problema, a prioridade e quem decide.</p>
+                  <strong>Descubra o problema</strong>
                 </div>
                 <ArrowRight size={17} aria-hidden="true" />
               </li>
@@ -92,7 +85,6 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
                 <span>03</span>
                 <div>
                   <strong>Envie a proposta</strong>
-                  <p>Monte o escopo, registre o follow-up e acompanhe a resposta.</p>
                 </div>
               </li>
             </ol>
