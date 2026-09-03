@@ -20,9 +20,11 @@ describe('KitOperacionalTarefa', () => {
     const user = userEvent.setup();
     render(<KitOperacionalTarefa kit={KIT} arquivosDaTarefa={0} onAbrirArquivos={vi.fn()} />);
 
+    expect(screen.queryByText('Perguntas aprovadas pelo cliente')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Abrir guia' }));
     expect(screen.getByText('Perguntas aprovadas pelo cliente')).toBeVisible();
     expect(screen.getByText('Registre a fonte de cada resposta')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Rever o minicurso/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Rever minicurso/i })).toHaveAttribute(
       'href',
       '/solucoes/sdr-atendimento-qualificacao',
     );
@@ -36,6 +38,7 @@ describe('KitOperacionalTarefa', () => {
     const abrirArquivos = vi.fn();
     render(<KitOperacionalTarefa kit={KIT} arquivosDaTarefa={0} onAbrirArquivos={abrirArquivos} />);
 
+    await user.click(screen.getByRole('button', { name: 'Abrir guia' }));
     await user.click(screen.getByRole('button', { name: 'Adicionar arquivo da tarefa' }));
     expect(abrirArquivos).toHaveBeenCalledOnce();
   });

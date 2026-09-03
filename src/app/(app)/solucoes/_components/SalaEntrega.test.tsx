@@ -257,19 +257,19 @@ describe('SalaEntrega', () => {
 
     expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeInTheDocument();
     expect(screen.getByText('33%')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'O que importa para Clínica Aurora' }),
-    ).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Confira o resultado desta tarefa' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Dez respostas estão aprovadas.' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Comprove e conclua' })).toBeVisible();
     expect(
       screen.getByRole('checkbox', { name: /Revisei o resultado usando o critério acima/i }),
     ).toBeVisible();
+
+    await user.click(screen.getByText('Contexto de Clínica Aurora'));
     expect(
       screen.getByText('A recepção recebe cada contato com o contexto completo.'),
     ).toBeVisible();
     expect(screen.getByText('Dúvidas clínicas seguem para a recepção')).toBeVisible();
     expect(screen.getByText('1 acesso · 0 arquivos no projeto')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Pedir ajuda nesta tarefa/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^Pedir ajuda$/i })).toHaveAttribute(
       'href',
       `/consultor?projeto=${PROJETO.id}&tarefa=${PROJETO.tarefas[1]!.id}`,
     );
@@ -338,7 +338,7 @@ describe('SalaEntrega', () => {
 
     const tarefaAtual = screen.getByRole('heading', { name: 'Montar a base', level: 2 });
     const planoVivo = screen.getByRole('region', {
-      name: 'Compromissos registrados com o cliente',
+      name: 'Compromissos com o cliente',
     });
     expect(planoVivo).toBeInTheDocument();
     expect(tarefaAtual.compareDocumentPosition(planoVivo) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(

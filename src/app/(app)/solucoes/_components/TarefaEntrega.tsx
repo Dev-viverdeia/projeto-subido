@@ -6,9 +6,10 @@ import {
   ArrowRight,
   Bot,
   Check,
-  CircleDot,
+  ChevronDown,
   Link2,
   LockKeyhole,
+  MessageSquareMore,
   Play,
   RotateCcw,
 } from 'lucide-react';
@@ -84,68 +85,76 @@ export function TarefaEntrega({
   return (
     <>
       <article id="tarefa-em-foco" className={styles.tarefa} data-status={tarefa.status}>
-        <div className={styles.fluxoTarefa} aria-label="Fluxo desta tarefa">
-          <span data-pronto={concluida || aguardandoCliente || aprovada || undefined}>
-            <i>01</i> Executar
-          </span>
-          <span data-pronto={Boolean(tarefa.evidencia) || undefined}>
-            <i>02</i> Registrar resultado
-          </span>
-          <span
-            data-ativo={(concluida && !aguardandoCliente && !aprovada) || undefined}
-            data-pronto={aguardandoCliente || aprovada || undefined}
-          >
-            <i>03</i> Validar com o cliente
-          </span>
-        </div>
-
-        <div className={styles.tarefaTopo}>
-          <span className={styles.marcadorTarefa}>
-            {concluida ? <Check size={17} /> : <CircleDot size={17} />}
-          </span>
-          <div>
-            <p>{rotuloMomento}</p>
+        <header className={styles.tarefaTopo} data-on-dark>
+          <div className={styles.tarefaTitulo}>
+            <p>
+              {tarefa.faseTitulo} · {rotuloMomento}
+            </p>
             <h2>{tarefa.titulo}</h2>
+            <strong>{tarefa.acao}</strong>
           </div>
-        </div>
+          <Link href={`/consultor?projeto=${projetoId}&tarefa=${tarefa.id}`}>
+            <Bot size={16} strokeWidth={1.8} aria-hidden="true" />
+            Pedir ajuda
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </header>
 
-        <div className={styles.comoExecutar}>
-          <p>Como executar</p>
-          <strong>{tarefa.acao}</strong>
-        </div>
+        <section className={styles.resultadoTarefa} aria-labelledby="resultado-tarefa-titulo">
+          <div>
+            <p>Pronto quando</p>
+            <h3 id="resultado-tarefa-titulo">{guiaValidacao.criterio}</h3>
+          </div>
+          <div>
+            <p>Comprove com</p>
+            <strong>{guiaValidacao.material}</strong>
+          </div>
+        </section>
 
-        <section className={styles.contextoTarefa} aria-labelledby="contexto-tarefa-titulo">
-          <header>
-            <div>
-              <p>Antes de começar</p>
-              <h3 id="contexto-tarefa-titulo">O que importa para {contexto.empresa}</h3>
-            </div>
+        {comAjustes && tarefa.clienteComentario ? (
+          <blockquote className={styles.retornoCliente}>
+            <MessageSquareMore size={18} aria-hidden="true" />
+            <span>
+              <strong>Pedido do cliente</strong>
+              {tarefa.clienteComentario}
+            </span>
+          </blockquote>
+        ) : null}
+
+        <details className={styles.contextoTarefa}>
+          <summary>
+            <span>
+              <strong>Contexto de {contexto.empresa}</strong>
+              <small>Objetivo, limites e materiais disponíveis</small>
+            </span>
+            <ChevronDown size={17} aria-hidden="true" />
+          </summary>
+          <div>
+            <dl>
+              <div>
+                <dt>Resultado do projeto</dt>
+                <dd>{contexto.criterioSucesso || contexto.objetivo}</dd>
+              </div>
+              <div>
+                <dt>Limite combinado</dt>
+                <dd>{contexto.limites[0] ?? 'Nenhum limite foi registrado no briefing.'}</dd>
+              </div>
+              <div>
+                <dt>Base disponível</dt>
+                <dd>
+                  {contexto.acessos.length} {contexto.acessos.length === 1 ? 'acesso' : 'acessos'} ·{' '}
+                  {contexto.arquivos.length}{' '}
+                  {contexto.arquivos.length === 1 ? 'arquivo' : 'arquivos'} no projeto
+                </dd>
+              </div>
+            </dl>
             <Link href={`/consultor?projeto=${projetoId}&tarefa=${tarefa.id}`}>
               <Bot size={16} strokeWidth={1.8} aria-hidden="true" />
-              Pedir ajuda nesta tarefa
+              Levar contexto ao Sobral AI
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
-          </header>
-
-          <dl>
-            <div>
-              <dt>Resultado esperado</dt>
-              <dd>{contexto.criterioSucesso || contexto.objetivo}</dd>
-            </div>
-            <div>
-              <dt>Cuidado combinado</dt>
-              <dd>{contexto.limites[0] ?? 'Nenhum limite foi registrado no briefing.'}</dd>
-            </div>
-            <div>
-              <dt>Base disponível</dt>
-              <dd>
-                {contexto.acessos.length} {contexto.acessos.length === 1 ? 'acesso' : 'acessos'} ·{' '}
-                {contexto.arquivos.length} {contexto.arquivos.length === 1 ? 'arquivo' : 'arquivos'}{' '}
-                no projeto
-              </dd>
-            </div>
-          </dl>
-        </section>
+          </div>
+        </details>
 
         {tarefa.kitOperacional ? (
           <KitOperacionalTarefa
@@ -158,22 +167,13 @@ export function TarefaEntrega({
         <section className={styles.validacaoTarefa} aria-labelledby="validacao-tarefa-titulo">
           <header>
             <div>
-              <p>Antes de concluir</p>
-              <h3 id="validacao-tarefa-titulo">Confira o resultado desta tarefa</h3>
+              <p>Registro da entrega</p>
+              <h3 id="validacao-tarefa-titulo">
+                {concluida ? 'Resultado registrado' : 'Comprove e conclua'}
+              </h3>
             </div>
-            <span>{concluida ? 'Resultado registrado' : '2 pontos para revisar'}</span>
+            <span>{concluida ? 'Concluído' : '1 comprovação'}</span>
           </header>
-
-          <dl className={styles.criterios}>
-            <div>
-              <dt>Critério de qualidade</dt>
-              <dd>{guiaValidacao.criterio}</dd>
-            </div>
-            <div>
-              <dt>Material para revisão</dt>
-              <dd>{guiaValidacao.material}</dd>
-            </div>
-          </dl>
 
           {concluida ? (
             <div className={styles.evidenciaRegistrada}>
@@ -206,7 +206,7 @@ export function TarefaEntrega({
                     ? 'O que está impedindo o avanço?'
                     : comAjustes
                       ? 'Como você testou o ajuste?'
-                      : 'Teste realizado e resultado'}
+                      : 'Resultado e teste realizado'}
                 </span>
                 <textarea
                   name="evidencia"
@@ -248,8 +248,8 @@ export function TarefaEntrega({
                   {pendente
                     ? 'Salvando…'
                     : tarefa.status === 'pendente'
-                      ? 'Começar tarefa'
-                      : 'Salvar andamento'}
+                      ? 'Iniciar tarefa'
+                      : 'Salvar'}
                 </button>
                 <button
                   type="submit"
@@ -259,9 +259,13 @@ export function TarefaEntrega({
                   disabled={pendente}
                 >
                   <Check size={16} aria-hidden="true" />
-                  {pendente ? 'Concluindo…' : comAjustes ? 'Concluir ajuste' : 'Concluir execução'}
+                  {pendente ? 'Concluindo…' : comAjustes ? 'Concluir ajuste' : 'Concluir tarefa'}
                 </button>
               </div>
+              <p className={styles.depoisTarefa}>
+                <ArrowRight size={14} aria-hidden="true" /> Depois, envie o resultado para o cliente
+                validar.
+              </p>
             </form>
           )}
         </section>

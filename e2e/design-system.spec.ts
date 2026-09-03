@@ -214,7 +214,7 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByText('Registre o que o cliente confirmou.')).toBeVisible();
 
     await page.getByRole('button', { name: /Trabalho/ }).click();
-    const fimDaSala = page.getByRole('button', { name: 'Ver acordo e portal' });
+    const fimDaSala = page.getByRole('link', { name: 'Abrir entregável compartilhado' });
     await fimDaSala.scrollIntoViewIfNeeded();
     await expect(fimDaSala).toBeVisible();
 
