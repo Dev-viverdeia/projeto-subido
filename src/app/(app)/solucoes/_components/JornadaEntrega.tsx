@@ -9,10 +9,23 @@ export function JornadaEntrega({
   estado: EstadoJornadaEntrega;
   onAbrir: () => void;
 }) {
+  const rotulo =
+    estado.tom === 'aprovado'
+      ? 'Cliente aprovou'
+      : estado.tom === 'ajuste'
+        ? 'Ajuste solicitado'
+        : estado.tom === 'aguardando'
+          ? 'Aguardando cliente'
+          : estado.tom === 'atrasado'
+            ? 'Atenção'
+            : estado.tom === 'concluido'
+              ? 'Projeto entregue'
+              : 'Próxima ação';
+
   return (
     <section className={styles.card} data-tom={estado.tom} aria-labelledby="jornada-titulo">
       <span className={styles.icone} aria-hidden="true">
-        {estado.tom === 'concluido' ? (
+        {estado.tom === 'concluido' || estado.tom === 'aprovado' ? (
           <Check size={17} />
         ) : estado.tom === 'ajuste' ? (
           <MessageSquareMore size={17} />
@@ -25,7 +38,7 @@ export function JornadaEntrega({
         )}
       </span>
       <div className={styles.conteudo}>
-        <p>Antes de continuar</p>
+        <p>{rotulo}</p>
         <strong className={styles.titulo} id="jornada-titulo">
           {estado.titulo}
         </strong>

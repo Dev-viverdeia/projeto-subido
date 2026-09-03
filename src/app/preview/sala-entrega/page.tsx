@@ -359,33 +359,35 @@ export default async function PreviewSalaEntregaPage({
       ? estados.prepararProjetoNoInicio(PROJETO)
       : estado === 'execucao'
         ? estados.prepararProjetoEmExecucao(PROJETO)
-        : estado === 'validacao'
-          ? estados.prepararProjetoEmValidacao(PROJETO)
-          : estado === 'ajustes'
-            ? estados.prepararProjetoComAjustes(PROJETO)
-            : estado === 'escopo'
-              ? {
-                  ...estados.prepararProjetoEmExecucao(PROJETO),
-                  mudancasEscopoParaAnalisar: 1,
-                  mudancasEscopo: [
-                    {
-                      id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
-                      titulo: 'Incluir atendimento pelo Instagram',
-                      descricao:
-                        'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
-                      solicitadoPor: 'cliente' as const,
-                      status: 'em_analise' as const,
-                      classificacao: null,
-                      resposta: null,
-                      impactoPrazoDias: null,
-                      impactoValorCentavos: null,
-                      criadoEm: '2026-08-30T13:40:00.000Z',
-                      analisadoEm: null,
-                      decididoEm: null,
-                    },
-                  ],
-                }
-              : PROJETO;
+        : estado === 'aprovacao'
+          ? estados.prepararProjetoAposAprovacao(PROJETO)
+          : estado === 'validacao'
+            ? estados.prepararProjetoEmValidacao(PROJETO)
+            : estado === 'ajustes'
+              ? estados.prepararProjetoComAjustes(PROJETO)
+              : estado === 'escopo'
+                ? {
+                    ...estados.prepararProjetoEmExecucao(PROJETO),
+                    mudancasEscopoParaAnalisar: 1,
+                    mudancasEscopo: [
+                      {
+                        id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+                        titulo: 'Incluir atendimento pelo Instagram',
+                        descricao:
+                          'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
+                        solicitadoPor: 'cliente' as const,
+                        status: 'em_analise' as const,
+                        classificacao: null,
+                        resposta: null,
+                        impactoPrazoDias: null,
+                        impactoValorCentavos: null,
+                        criadoEm: '2026-08-30T13:40:00.000Z',
+                        analisadoEm: null,
+                        decididoEm: null,
+                      },
+                    ],
+                  }
+                : PROJETO;
   return (
     <div className={styles.shell}>
       <PreviewSidebar />

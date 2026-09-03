@@ -16,7 +16,7 @@ type TarefaDaJornada = {
 
 export type EstadoJornadaEntrega = {
   momento: MomentoJornadaEntrega;
-  tom: 'normal' | 'aguardando' | 'ajuste' | 'atrasado' | 'concluido';
+  tom: 'normal' | 'aguardando' | 'aprovado' | 'ajuste' | 'atrasado' | 'concluido';
   titulo: string;
   descricao: string;
   rotuloAcao: string;
@@ -74,8 +74,8 @@ export function obterEstadoJornadaEntrega({
       momento: 'executar',
       tom: 'ajuste',
       titulo: 'O cliente pediu um ajuste.',
-      descricao: 'Abra o retorno, faça a correção e registre a nova versão antes de reenviar.',
-      rotuloAcao: 'Abrir ajuste',
+      descricao: 'O pedido já está na tarefa. Corrija, teste e reenvie a nova versão.',
+      rotuloAcao: 'Trabalhar ajuste',
       nomeAcessivelAcao: `Abrir ajuste solicitado em ${ajuste.titulo}`,
       destino: 'tarefa',
       tarefaId: ajuste.id,
@@ -193,7 +193,27 @@ export function obterEstadoJornadaEntrega({
     };
   }
 
-  const proximaTarefa = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
+  const indiceProximaTarefa = tarefas.findIndex((tarefa) => tarefa.status !== 'concluida');
+  const proximaTarefa = indiceProximaTarefa >= 0 ? tarefas[indiceProximaTarefa] : null;
+  const tarefaAnterior = indiceProximaTarefa > 0 ? tarefas[indiceProximaTarefa - 1] : null;
+
+  if (
+    proximaTarefa?.status === 'pendente' &&
+    tarefaAnterior?.status === 'concluida' &&
+    tarefaAnterior.clienteStatus === 'aprovada'
+  ) {
+    return {
+      momento: 'executar',
+      tom: 'aprovado',
+      titulo: `“${tarefaAnterior.titulo}” foi aprovada.`,
+      descricao: `A validação terminou. Agora, avance para “${proximaTarefa.titulo}”.`,
+      rotuloAcao: 'Ver próxima tarefa',
+      nomeAcessivelAcao: `Cliente aprovou ${tarefaAnterior.titulo}. Ver próxima tarefa ${proximaTarefa.titulo}`,
+      destino: 'tarefa',
+      tarefaId: proximaTarefa.id,
+    };
+  }
+
   if (proximaTarefa) {
     return {
       momento: 'executar',
