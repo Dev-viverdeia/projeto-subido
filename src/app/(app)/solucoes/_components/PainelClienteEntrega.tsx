@@ -36,7 +36,7 @@ export function PainelClienteEntrega({
         />
       )}
 
-      {briefingConfirmado && (
+      {briefingConfirmado && projeto.feitas > 0 && (
         <PreparacaoProjeto
           projetoId={projeto.id}
           acoes={projeto.acoesPlano}
@@ -45,7 +45,7 @@ export function PainelClienteEntrega({
         />
       )}
 
-      {(briefingConfirmado || projeto.feitas > 0) && (
+      {projeto.feitas > 0 && (
         <ContextoEntrega projeto={projeto} briefingConfirmado={briefingConfirmado} />
       )}
     </>

@@ -35,7 +35,11 @@ describe('decisão pública da proposta', () => {
 
     const resultado = await decidirPropostaCliente({}, formulario('aceita'));
 
-    expect(resultado).toMatchObject({ status: 'aceita' });
+    expect(resultado).toMatchObject({
+      status: 'aceita',
+      sucesso:
+        'Proposta aprovada. A entrega já está pronta e o responsável vai combinar o kickoff com você.',
+    });
     expect(registrarDecisaoProposta).toHaveBeenCalledWith({
       codigo: CODIGO,
       decisao: 'aceita',

@@ -14,7 +14,7 @@ describe('AcaoEntrega', () => {
   it('leva direto à execução quando o projeto já está ativo', () => {
     render(<AcaoEntrega propostaId={PROPOSTA_ID} execucaoId={PROJETO_ID} />);
 
-    expect(screen.getByRole('link', { name: /Continuar projeto/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Abrir entrega/i })).toHaveAttribute(
       'href',
       `/entregas/${PROJETO_ID}`,
     );
@@ -23,6 +23,6 @@ describe('AcaoEntrega', () => {
   it('mantém uma ação de recuperação quando o projeto ainda não existe', () => {
     render(<AcaoEntrega propostaId={PROPOSTA_ID} execucaoId={null} />);
 
-    expect(screen.getByRole('button', { name: /Abrir projeto ativo/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Criar projeto/i })).toBeEnabled();
   });
 });

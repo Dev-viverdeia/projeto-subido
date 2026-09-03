@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import type {
   ProjetoExecucaoCompleto,
   TarefaProjetoExecucao,
@@ -66,6 +67,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     if (projeto.status === 'concluido') return 'evolucao';
     return briefingConfirmado && projeto.feitas > 0 ? 'execucao' : 'cliente';
   });
+  const preparandoProjeto =
+    projeto.feitas === 0 && projeto.status !== 'concluido' && painel === 'cliente';
   const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
   const entregasAguardando = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'aguardando',
@@ -167,81 +170,103 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
 
   return (
     <div className={styles.sala}>
-      <header className={styles.hero} data-on-dark>
-        <div className={styles.heroTexto}>
-          <div className={styles.heroLinha}>
-            <p className={styles.eyebrow}>Entrega do cliente · {projeto.empresa}</p>
-            <span className={styles.statusProjeto} data-status={projeto.status}>
-              {ROTULO_STATUS_PROJETO[projeto.status]}
-            </span>
+      {preparandoProjeto ? (
+        <header className={styles.inicioHero}>
+          <div className={styles.inicioNavegacao}>
+            <Link href="/entregas">
+              <ArrowLeft size={16} aria-hidden="true" /> Entregas
+            </Link>
+            <span>Preparação</span>
           </div>
-          <h1>{projeto.titulo}</h1>
-          <p>{projeto.documento.projeto.resumo}</p>
-
-          <dl className={styles.heroMetadados}>
-            <div>
-              <dt>Início</dt>
-              <dd>{formatarDataProjeto(projeto.inicioEm)}</dd>
+          <div className={styles.inicioHeroCorpo}>
+            <div className={styles.inicioHeroTexto}>
+              <p>Entrega · {projeto.empresa}</p>
+              <h1>{projeto.titulo}</h1>
+              <span>O escopo aprovado já virou projeto. Confirme três pontos para começar.</span>
             </div>
-            <div>
-              <dt>Prazo</dt>
-              <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
-            </div>
-            <div>
-              <dt>Investimento</dt>
-              <dd>{formatarReais(investimentoAtual)}</dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className={styles.medida} aria-label={`${percentual}% da entrega concluída`}>
-          <span>{percentual}%</span>
-          <strong>
-            {projeto.feitas} de {projeto.total}
-          </strong>
-          <small>tarefas concluídas</small>
-          <div aria-hidden="true">
-            <span style={{ transform: `scaleX(${percentual / 100})` }} />
           </div>
-        </div>
+        </header>
+      ) : (
+        <header className={styles.hero} data-on-dark>
+          <div className={styles.heroTexto}>
+            <div className={styles.heroLinha}>
+              <p className={styles.eyebrow}>Entrega do cliente · {projeto.empresa}</p>
+              <span className={styles.statusProjeto} data-status={projeto.status}>
+                {ROTULO_STATUS_PROJETO[projeto.status]}
+              </span>
+            </div>
+            <h1>{projeto.titulo}</h1>
+            <p>{projeto.documento.projeto.resumo}</p>
 
-        <nav className={styles.fases} aria-label="Fases da entrega">
-          {fases.map((fase, indice) => {
-            const feitas = fase.tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
-            const completa = feitas === fase.tarefas.length;
-            const ativa = fase.id === faseAtual?.id;
-            return (
-              <button
-                type="button"
-                key={fase.id}
-                data-ativa={ativa || undefined}
-                data-completa={completa || undefined}
-                aria-current={ativa ? 'step' : undefined}
-                onClick={() => abrirFase(fase.id)}
-              >
-                <span>{completa ? <Check size={13} /> : String(indice + 1).padStart(2, '0')}</span>
-                <strong>{fase.titulo}</strong>
-                <small>
-                  {feitas}/{fase.tarefas.length}
-                </small>
-              </button>
-            );
-          })}
-        </nav>
-      </header>
+            <dl className={styles.heroMetadados}>
+              <div>
+                <dt>Início</dt>
+                <dd>{formatarDataProjeto(projeto.inicioEm)}</dd>
+              </div>
+              <div>
+                <dt>Prazo</dt>
+                <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
+              </div>
+              <div>
+                <dt>Investimento</dt>
+                <dd>{formatarReais(investimentoAtual)}</dd>
+              </div>
+            </dl>
+          </div>
 
-      <NavegacaoSalaEntrega
-        painel={painel}
-        concluido={projeto.status === 'concluido'}
-        evolucaoRegistrada={projeto.evolucao?.status === 'registrada'}
-        proximaTarefa={proxima?.titulo ?? null}
-        totalArquivos={projeto.arquivos.length}
-        rotuloCliente={rotuloCliente}
-        onChange={(proximoPainel) => {
-          if (proximoPainel === 'arquivos') setArquivoTarefaId(null);
-          setPainel(proximoPainel);
-        }}
-      />
+          <div className={styles.medida} aria-label={`${percentual}% da entrega concluída`}>
+            <span>{percentual}%</span>
+            <strong>
+              {projeto.feitas} de {projeto.total}
+            </strong>
+            <small>tarefas concluídas</small>
+            <div aria-hidden="true">
+              <span style={{ transform: `scaleX(${percentual / 100})` }} />
+            </div>
+          </div>
+
+          <nav className={styles.fases} aria-label="Fases da entrega">
+            {fases.map((fase, indice) => {
+              const feitas = fase.tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
+              const completa = feitas === fase.tarefas.length;
+              const ativa = fase.id === faseAtual?.id;
+              return (
+                <button
+                  type="button"
+                  key={fase.id}
+                  data-ativa={ativa || undefined}
+                  data-completa={completa || undefined}
+                  aria-current={ativa ? 'step' : undefined}
+                  onClick={() => abrirFase(fase.id)}
+                >
+                  <span>
+                    {completa ? <Check size={13} /> : String(indice + 1).padStart(2, '0')}
+                  </span>
+                  <strong>{fase.titulo}</strong>
+                  <small>
+                    {feitas}/{fase.tarefas.length}
+                  </small>
+                </button>
+              );
+            })}
+          </nav>
+        </header>
+      )}
+
+      {!preparandoProjeto && (
+        <NavegacaoSalaEntrega
+          painel={painel}
+          concluido={projeto.status === 'concluido'}
+          evolucaoRegistrada={projeto.evolucao?.status === 'registrada'}
+          proximaTarefa={proxima?.titulo ?? null}
+          totalArquivos={projeto.arquivos.length}
+          rotuloCliente={rotuloCliente}
+          onChange={(proximoPainel) => {
+            if (proximoPainel === 'arquivos') setArquivoTarefaId(null);
+            setPainel(proximoPainel);
+          }}
+        />
+      )}
 
       {painel === 'execucao' && (
         <>
