@@ -21,6 +21,7 @@ import { formatarDataProjeto } from '@/lib/projetos-execucao/prazo';
 import { formatarReais } from '@/lib/propostas/schema';
 import { CentralArquivos } from './CentralArquivos';
 import { EvolucaoProjeto } from './EvolucaoProjeto';
+import { FasesEntrega } from './FasesEntrega';
 import { JornadaEntrega } from './JornadaEntrega';
 import { NavegacaoSalaEntrega, type PainelSala } from './NavegacaoSalaEntrega';
 import { PainelClienteEntrega } from './PainelClienteEntrega';
@@ -95,6 +96,8 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     compromisso: proximoCompromisso?.titulo ?? null,
     dependencias: projeto.acoesPlano,
   });
+  const mostrarPrioridade =
+    estadoJornada.destino !== 'tarefa' || estadoJornada.tarefaId !== tarefaAtual?.id;
 
   function abrirFase(id: string) {
     const nova = fases.find((fase) => fase.id === id);
@@ -186,6 +189,44 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             </div>
           </div>
         </header>
+      ) : projeto.status !== 'concluido' ? (
+        <header className={styles.heroFoco}>
+          <div className={styles.heroFocoNavegacao}>
+            <Link href="/entregas">
+              <ArrowLeft size={16} aria-hidden="true" /> Entregas
+            </Link>
+            <span className={styles.statusProjetoFoco} data-status={projeto.status}>
+              {ROTULO_STATUS_PROJETO[projeto.status]}
+            </span>
+          </div>
+
+          <div className={styles.heroFocoPrincipal}>
+            <div className={styles.heroFocoTexto}>
+              <p>{projeto.empresa}</p>
+              <h1>{projeto.titulo}</h1>
+              <span>
+                Prazo: {projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'a definir'}
+              </span>
+            </div>
+            <div
+              className={styles.progressoFoco}
+              aria-label={`${percentual}% da entrega concluída`}
+            >
+              <div>
+                <span>Progresso</span>
+                <strong>{percentual}%</strong>
+              </div>
+              <small>
+                {projeto.feitas} de {projeto.total} tarefas
+              </small>
+              <div className={styles.progressoTrilho} aria-hidden="true">
+                <span style={{ transform: `scaleX(${percentual / 100})` }} />
+              </div>
+            </div>
+          </div>
+
+          <FasesEntrega fases={fases} faseAtualId={faseAtual?.id} onAbrir={abrirFase} />
+        </header>
       ) : (
         <header className={styles.hero} data-on-dark>
           <div className={styles.heroTexto}>
@@ -225,31 +266,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
             </div>
           </div>
 
-          <nav className={styles.fases} aria-label="Fases da entrega">
-            {fases.map((fase, indice) => {
-              const feitas = fase.tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
-              const completa = feitas === fase.tarefas.length;
-              const ativa = fase.id === faseAtual?.id;
-              return (
-                <button
-                  type="button"
-                  key={fase.id}
-                  data-ativa={ativa || undefined}
-                  data-completa={completa || undefined}
-                  aria-current={ativa ? 'step' : undefined}
-                  onClick={() => abrirFase(fase.id)}
-                >
-                  <span>
-                    {completa ? <Check size={13} /> : String(indice + 1).padStart(2, '0')}
-                  </span>
-                  <strong>{fase.titulo}</strong>
-                  <small>
-                    {feitas}/{fase.tarefas.length}
-                  </small>
-                </button>
-              );
-            })}
-          </nav>
+          <FasesEntrega fases={fases} faseAtualId={faseAtual?.id} onAbrir={abrirFase} />
         </header>
       )}
 
@@ -283,48 +300,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
           )}
 
           <div className={styles.corpo}>
-            <aside className={styles.lateral}>
+            {mostrarPrioridade && (
               <JornadaEntrega
                 estado={estadoJornada}
                 onAbrir={() => abrirAcaoJornada(estadoJornada.destino, estadoJornada.tarefaId)}
               />
-
-              <section className={styles.resumoOperacional}>
-                <p>Resumo da entrega</p>
-                <dl>
-                  <div>
-                    <dt>Prazo</dt>
-                    <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
-                  </div>
-                  <div>
-                    <dt>Arquivos</dt>
-                    <dd>{projeto.arquivos.length}</dd>
-                  </div>
-                  <div>
-                    <dt>Cliente</dt>
-                    <dd>{projeto.portalAtivo ? 'Portal ativo' : 'Portal privado'}</dd>
-                  </div>
-                </dl>
-                <button type="button" onClick={() => setPainel('cliente')}>
-                  Ver acordo e portal <ArrowRight size={14} aria-hidden="true" />
-                </button>
-              </section>
-            </aside>
+            )}
 
             <main className={styles.operacao}>
-              <header className={styles.cabecalhoFase}>
-                <div>
-                  <p>Trabalho de agora</p>
-                  <h2>{faseAtual?.titulo ?? 'Encerrar a entrega'}</h2>
-                </div>
-                {faseAtual && (
-                  <span>
-                    {faseAtual.tarefas.filter((tarefa) => tarefa.status === 'concluida').length}/
-                    {faseAtual.tarefas.length} prontas nesta fase
-                  </span>
-                )}
-              </header>
-
               {tarefaAtual ? (
                 <TarefaEntrega
                   key={tarefaAtual.id}
@@ -356,11 +339,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
               )}
 
               {faseAtual && faseAtual.tarefas.length > 1 && (
-                <section className={styles.fila} aria-labelledby="fila-titulo">
-                  <div className={styles.filaCabecalho}>
-                    <p>Sequência da fase</p>
-                    <h2 id="fila-titulo">Próximos passos</h2>
-                  </div>
+                <details className={styles.fila}>
+                  <summary>
+                    <span>
+                      <strong>Tarefas desta fase</strong>
+                      <small>{faseAtual.tarefas.length} etapas</small>
+                    </span>
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </summary>
                   <ol>
                     {faseAtual.tarefas.map((tarefa, indice) => (
                       <li key={tarefa.id}>
@@ -368,6 +354,11 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                           type="button"
                           data-ativa={tarefa.id === tarefaAtual?.id || undefined}
                           data-concluida={tarefa.status === 'concluida' || undefined}
+                          aria-label={
+                            tarefa.id === tarefaAtual?.id
+                              ? `Tarefa atual ${tarefa.titulo}`
+                              : `Abrir tarefa ${tarefa.titulo}`
+                          }
                           onClick={() => setTarefaId(tarefa.id)}
                         >
                           <span>
@@ -380,7 +371,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                       </li>
                     ))}
                   </ol>
-                </section>
+                </details>
               )}
             </main>
           </div>

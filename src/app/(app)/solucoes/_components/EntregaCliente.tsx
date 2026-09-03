@@ -8,7 +8,6 @@ import {
   ExternalLink,
   MailCheck,
   MailWarning,
-  MessageSquareMore,
   RefreshCw,
   Send,
   ShieldCheck,
@@ -73,16 +72,6 @@ export function EntregaCliente({
         </div>
         <span className={styles.selo}>{portalAtivo ? 'Portal ativo' : 'Portal privado'}</span>
       </header>
-
-      {tarefa.clienteStatus === 'ajustes' && tarefa.clienteComentario && (
-        <blockquote>
-          <MessageSquareMore size={16} aria-hidden="true" />
-          <span>
-            <strong>Retorno do cliente</strong>
-            {tarefa.clienteComentario}
-          </span>
-        </blockquote>
-      )}
 
       {decidida || tarefa.clienteStatus === 'aguardando' ? (
         <div

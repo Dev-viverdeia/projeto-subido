@@ -2,7 +2,15 @@
 
 import { useActionState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, CalendarDays, Check, ListChecks, RotateCcw, Video } from 'lucide-react';
+import {
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  ListChecks,
+  RotateCcw,
+  Video,
+} from 'lucide-react';
 import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import { atualizarAcaoPlano } from '@/lib/projetos-execucao/plano-actions';
 import type { AcaoPlanoProjeto } from '@/lib/projetos-execucao/queries';
@@ -82,35 +90,32 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
 
   return (
     <section className={styles.plano} aria-labelledby="plano-vivo-titulo">
-      <header>
-        <div className={styles.introducao}>
-          <span className={styles.icone} aria-hidden="true">
-            <ListChecks size={20} strokeWidth={1.7} />
-          </span>
-          <div>
-            <p>Acordos do projeto</p>
-            <h2 id="plano-vivo-titulo">Compromissos registrados com o cliente</h2>
+      <details>
+        <summary>
+          <div className={styles.introducao}>
+            <span className={styles.icone} aria-hidden="true">
+              <ListChecks size={18} strokeWidth={1.7} />
+            </span>
+            <div>
+              <p>Acordos do projeto</p>
+              <strong id="plano-vivo-titulo">Compromissos com o cliente</strong>
+            </div>
           </div>
-        </div>
-        <div className={styles.medida} aria-label={`${abertas} compromissos em aberto`}>
-          <strong>{abertas}</strong>
-          <span>{abertas === 1 ? 'em aberto' : 'em aberto'}</span>
-        </div>
-      </header>
+          <div className={styles.resumoAcordos}>
+            <span>{abertas} em aberto</span>
+            <ChevronDown size={17} aria-hidden="true" />
+          </div>
+        </summary>
 
-      <p className={styles.explicacao}>
-        Decisões confirmadas nas calls ficam aqui. As tarefas de implementação continuam logo
-        abaixo, com o critério de conclusão de cada uma.
-      </p>
-
-      <ol>
-        {compromissos
-          .filter((acao) => acao.status === 'pendente')
-          .slice(0, 5)
-          .map((acao) => (
-            <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
-          ))}
-      </ol>
+        <ol>
+          {compromissos
+            .filter((acao) => acao.status === 'pendente')
+            .slice(0, 5)
+            .map((acao) => (
+              <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
+            ))}
+        </ol>
+      </details>
     </section>
   );
 }
