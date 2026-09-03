@@ -22,7 +22,7 @@ const TELAS = [
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
   ['/preview/entregas', 'Acompanhe a próxima tarefa de cada projeto.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
-  ['/preview/portal-cliente', 'Projeto entregue e aprovado.'],
+  ['/preview/portal-cliente', 'Projeto concluído.'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
   ['/preview/certificados', 'Comprove o que você concluiu.'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
@@ -238,6 +238,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {
     await page.goto('/preview/portal-cliente');
+    await page.getByText('Resultados', { exact: true }).click();
 
     const encerramento = page.getByRole('heading', {
       name: 'Resultado, garantia e continuidade.',
