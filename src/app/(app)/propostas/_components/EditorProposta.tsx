@@ -83,8 +83,8 @@ export function EditorProposta({
         ? 'Registre a decisão do cliente. Ao aceitar, a plataforma cria o projeto e abre a execução.'
         : status === 'aceita'
           ? execucaoId
-            ? 'O projeto do cliente já está aberto com o escopo aprovado.'
-            : 'Venda confirmada. Abra o projeto para começar a entrega.'
+            ? 'O projeto está pronto com o escopo aprovado.'
+            : 'Venda confirmada. Crie o projeto para preparar a entrega.'
           : status === 'recusada'
             ? 'A recusa foi registrada na venda. Crie outra versão somente se a negociação mudar.'
             : 'Altere o status conforme a proposta avançar com o cliente.';

@@ -172,10 +172,8 @@ describe('SalaEntrega', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', { name: 'Venda confirmada. Prepare a entrega.' }),
-    ).toBeVisible();
-    expect(screen.getByText('Venda confirmada')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Prepare o projeto' })).toBeVisible();
+    expect(screen.getByText('Proposta aprovada')).toBeVisible();
     expect(screen.getByText('Proposta V02 aceita')).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver versão aceita/i })).toHaveAttribute(
       'href',
@@ -186,10 +184,11 @@ describe('SalaEntrega', () => {
       `/reunioes?nova=1&oportunidade=${PROJETO.oportunidadeId}&tipo=kickoff`,
     );
     expect(screen.queryByLabelText('Prazo da entrega')).toBeNull();
-    expect(screen.getByText('3 pendentes')).toBeVisible();
-    expect(screen.getByText('Agende o kickoff com o cliente')).toBeVisible();
+    expect(screen.getByText('0 de 3 concluídos')).toBeVisible();
+    expect(screen.getByText('Agende o kickoff')).toBeVisible();
     expect(screen.queryByRole('textbox', { name: 'Responsável do cliente' })).toBeNull();
     expect(screen.queryByRole('button', { name: /Abrir primeira tarefa/i })).toBeNull();
+    expect(screen.queryByRole('navigation', { name: 'Fases da entrega' })).toBeNull();
   });
 
   it('libera a primeira tarefa quando briefing, kickoff e prazo estão prontos', async () => {
@@ -215,7 +214,7 @@ describe('SalaEntrega', () => {
       />,
     );
 
-    expect(screen.getByText('Pronto para executar')).toBeVisible();
+    expect(screen.getByText('3 de 3 concluídos')).toBeVisible();
     const comecar = screen.getByRole('button', { name: /Abrir primeira tarefa/i });
     expect(comecar).toBeEnabled();
 

@@ -114,7 +114,7 @@
 .progresso span {
   display: block;
   margin-top: var(--via-space-2);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .progresso > div {
@@ -179,7 +179,7 @@
 }
 
 .etapas span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font: var(--via-fw-medium) var(--via-fs-micro) var(--via-font-mono);
 }
 
@@ -222,7 +222,7 @@
 }
 
 .formulario legend > span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .formulario legend strong,
@@ -253,7 +253,7 @@
 }
 
 .formulario label > span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-weight: var(--via-fw-regular);
 }
 
@@ -329,7 +329,7 @@
 .acoes small {
   display: block;
   margin-top: var(--via-space-1);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
 }
 
@@ -417,7 +417,7 @@
 }
 
 .objetivoResumo span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .objetivoResumo strong {
@@ -452,7 +452,7 @@
 }
 
 .resumoConfirmado dt {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .resumoConfirmado dd {
@@ -473,7 +473,7 @@
 }
 
 .rodapeResumo > span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 @media (max-width: 899px) {
