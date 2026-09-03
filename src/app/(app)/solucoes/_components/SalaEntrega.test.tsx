@@ -311,6 +311,30 @@ describe('SalaEntrega', () => {
     expect(screen.getByRole('heading', { name: 'Montar a base', level: 2 })).toBeVisible();
   });
 
+  it('mantém o pedido de ajuste visível quando a tarefa reaberta já está em foco', () => {
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          tarefas: PROJETO.tarefas.map((tarefa, indice) =>
+            indice === 1
+              ? {
+                  ...tarefa,
+                  clienteStatus: 'ajustes' as const,
+                  clienteComentario: 'Revise o texto antes de reenviar.',
+                }
+              : tarefa,
+          ),
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Ajuste solicitado')).toBeVisible();
+    expect(screen.getByText('O cliente pediu um ajuste.')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Abrir ajuste solicitado/i })).toBeVisible();
+    expect(screen.getByText('Revise o texto antes de reenviar.')).toBeVisible();
+  });
+
   it('mantém os compromissos da call separados das tarefas do método', () => {
     render(
       <SalaEntrega

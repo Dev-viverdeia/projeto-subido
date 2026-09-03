@@ -151,3 +151,33 @@ export function prepararProjetoComAjustes(
     })),
   };
 }
+
+export function prepararProjetoAposAprovacao(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  const feitas = 2;
+  return {
+    ...projeto,
+    status: 'em_execucao',
+    feitas,
+    proximaTarefa: projeto.tarefas[feitas]?.titulo ?? null,
+    acoesPlano: [],
+    tarefas: projeto.tarefas.map((tarefa, indice) => ({
+      ...tarefa,
+      status: indice < feitas ? 'concluida' : 'pendente',
+      evidencia: indice < feitas ? tarefa.evidencia || 'Execução registrada e revisada.' : null,
+      clienteStatus:
+        indice === feitas - 1
+          ? 'aprovada'
+          : indice < feitas
+            ? tarefa.clienteStatus
+            : 'nao_solicitada',
+      clienteNota: indice < feitas ? tarefa.clienteNota : null,
+      entregavelUrl: indice < feitas ? tarefa.entregavelUrl : null,
+      clienteSolicitadoEm: indice === feitas - 1 ? tarefa.clienteSolicitadoEm : null,
+      clienteRespondidoEm:
+        indice === feitas - 1 ? '2026-09-03T13:20:00.000Z' : tarefa.clienteRespondidoEm,
+      clienteComentario: null,
+    })),
+  };
+}

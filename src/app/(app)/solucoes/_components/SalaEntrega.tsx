@@ -97,7 +97,9 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     dependencias: projeto.acoesPlano,
   });
   const mostrarPrioridade =
-    estadoJornada.destino !== 'tarefa' || estadoJornada.tarefaId !== tarefaAtual?.id;
+    estadoJornada.tom !== 'normal' ||
+    estadoJornada.destino !== 'tarefa' ||
+    estadoJornada.tarefaId !== tarefaAtual?.id;
 
   function abrirFase(id: string) {
     const nova = fases.find((fase) => fase.id === id);

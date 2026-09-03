@@ -37,6 +37,56 @@ describe('obterEstadoJornadaEntrega', () => {
       tom: 'ajuste',
       destino: 'tarefa',
       tarefaId: 'tarefa-1',
+      rotuloAcao: 'Trabalhar ajuste',
+    });
+  });
+
+  it('transforma uma aprovação em passagem clara para a próxima tarefa', () => {
+    const estado = obterEstadoJornadaEntrega({
+      status: 'em_execucao',
+      briefingConfirmado: true,
+      tarefas: [
+        { ...tarefa, clienteStatus: 'aprovada' },
+        {
+          ...tarefa,
+          id: 'tarefa-2',
+          titulo: 'Configurar o atendimento',
+          status: 'pendente',
+        },
+      ],
+      compromisso: null,
+    });
+
+    expect(estado).toMatchObject({
+      momento: 'executar',
+      tom: 'aprovado',
+      titulo: '“Validar o atendimento” foi aprovada.',
+      rotuloAcao: 'Ver próxima tarefa',
+      destino: 'tarefa',
+      tarefaId: 'tarefa-2',
+    });
+  });
+
+  it('encerra a passagem da aprovação quando a próxima tarefa já começou', () => {
+    const estado = obterEstadoJornadaEntrega({
+      status: 'em_execucao',
+      briefingConfirmado: true,
+      tarefas: [
+        { ...tarefa, clienteStatus: 'aprovada' },
+        {
+          ...tarefa,
+          id: 'tarefa-2',
+          titulo: 'Configurar o atendimento',
+          status: 'em_andamento',
+        },
+      ],
+      compromisso: null,
+    });
+
+    expect(estado).toMatchObject({
+      tom: 'normal',
+      titulo: 'Configurar o atendimento',
+      tarefaId: 'tarefa-2',
     });
   });
 

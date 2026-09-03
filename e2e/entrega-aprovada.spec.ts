@@ -64,6 +64,8 @@ test.describe('proposta aprovada até a primeira tarefa', () => {
     const evidencia = page.getByRole('heading', { name: 'Comprove e conclua' });
 
     await expect(page.getByText('Pedido do cliente')).toBeVisible();
+    await expect(page.getByText('Ajuste solicitado', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Abrir ajuste solicitado/i })).toBeVisible();
     await expect(pedido).toBeVisible();
     await expect(pedido).toHaveCount(1);
     await expect(evidencia).toBeVisible();
@@ -79,5 +81,34 @@ test.describe('proposta aprovada até a primeira tarefa', () => {
       viewport: window.innerWidth,
     }));
     expect(largura.documento).toBeLessThanOrEqual(largura.viewport);
+  });
+
+  test('confirma a aprovação e aponta a próxima tarefa sem deixar a sala ambígua', async ({
+    page,
+  }) => {
+    await page.goto('/preview/sala-entrega?estado=aprovacao');
+
+    await expect(page.getByText('Cliente aprovou')).toBeVisible();
+    await expect(page.getByText('“Definir os limites da IA” foi aprovada.')).toBeVisible();
+    await expect(
+      page.getByRole('button', {
+        name: /Cliente aprovou Definir os limites da IA\. Ver próxima tarefa Montar a base aprovada/i,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Montar a base aprovada', level: 2 }),
+    ).toBeVisible();
+
+    const largura = await page.evaluate(() => ({
+      documento: document.documentElement.scrollWidth,
+      viewport: window.innerWidth,
+    }));
+    expect(largura.documento).toBeLessThanOrEqual(largura.viewport);
+
+    const resultado = await new AxeBuilder({ page }).analyze();
+    const graves = resultado.violations.filter(
+      (violacao) => violacao.impact === 'serious' || violacao.impact === 'critical',
+    );
+    expect(graves).toEqual([]);
   });
 });
