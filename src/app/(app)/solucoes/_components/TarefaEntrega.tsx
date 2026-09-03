@@ -37,6 +37,7 @@ export function TarefaEntrega({
   portalAtivo,
   clienteEmail,
   notificacaoCliente,
+  lembreteCliente,
   aceiteFinal,
   encerramento,
   contexto,
@@ -47,6 +48,7 @@ export function TarefaEntrega({
   portalAtivo: boolean;
   clienteEmail: string | null;
   notificacaoCliente: EventoProjetoExecucao | null;
+  lembreteCliente: EventoProjetoExecucao | null;
   aceiteFinal: boolean;
   encerramento: Encerramento | null;
   contexto: {
@@ -285,6 +287,7 @@ export function TarefaEntrega({
         portalAtivo={portalAtivo}
         clienteEmail={clienteEmail}
         notificacao={notificacaoCliente}
+        lembrete={lembreteCliente}
         aceiteFinal={aceiteFinal}
         encerramentoPronto={Boolean(encerramento)}
       />

@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import {
   ArrowRight,
+  BellRing,
   Check,
   Clock3,
   ExternalLink,
@@ -30,6 +31,7 @@ export function EntregaCliente({
   portalAtivo,
   clienteEmail,
   notificacao,
+  lembrete,
   aceiteFinal = false,
   encerramentoPronto = true,
 }: {
@@ -38,6 +40,7 @@ export function EntregaCliente({
   portalAtivo: boolean;
   clienteEmail: string | null;
   notificacao: EventoProjetoExecucao | null;
+  lembrete: EventoProjetoExecucao | null;
   aceiteFinal?: boolean;
   encerramentoPronto?: boolean;
 }) {
@@ -90,6 +93,7 @@ export function EntregaCliente({
               <NotificacaoCliente
                 projetoId={projetoId}
                 notificacao={notificacao}
+                lembrete={lembrete}
                 email={clienteEmail}
                 estado={estadoReenvio}
                 reenviando={reenviando}
@@ -212,6 +216,7 @@ export function EntregaCliente({
 function NotificacaoCliente({
   projetoId,
   notificacao,
+  lembrete,
   email,
   estado,
   reenviando,
@@ -219,6 +224,7 @@ function NotificacaoCliente({
 }: {
   projetoId: string;
   notificacao: EventoProjetoExecucao | null;
+  lembrete: EventoProjetoExecucao | null;
   email: string | null;
   estado: EstadoProjetoExecucao;
   reenviando: boolean;
@@ -258,6 +264,13 @@ function NotificacaoCliente({
       <div>
         <strong>{titulo}</strong>
         <p>{descricao}</p>
+        {lembrete ? <StatusLembrete lembrete={lembrete} /> : null}
+        {!lembrete && (concluida || emTransito) ? (
+          <p className={styles.lembretePrevisto}>
+            <BellRing size={14} aria-hidden="true" /> Se ainda faltar a resposta, enviaremos um
+            único lembrete após 48 horas.
+          </p>
+        ) : null}
       </div>
       {!concluida && !emTransito && notificacao && (
         <form action={action} className={styles.reenvio}>
@@ -283,5 +296,26 @@ function NotificacaoCliente({
         </form>
       )}
     </section>
+  );
+}
+
+function StatusLembrete({ lembrete }: { lembrete: EventoProjetoExecucao }) {
+  const falhou = ['nao_solicitado', 'falhou', 'devolvido', 'reclamado', 'suprimido'].includes(
+    lembrete.emailStatus ?? '',
+  );
+  const entregue = lembrete.emailStatus === 'entregue';
+  const preparando = lembrete.emailStatus === 'enviando';
+
+  return (
+    <p className={styles.lembreteEnviado} data-falhou={falhou || undefined}>
+      <BellRing size={14} aria-hidden="true" />
+      {falhou
+        ? 'O lembrete não saiu. A entrega continua disponível no portal.'
+        : entregue
+          ? 'Lembrete entregue ao cliente.'
+          : preparando
+            ? 'Preparando o lembrete ao cliente.'
+            : 'Lembrete enviado ao cliente.'}
+    </p>
   );
 }

@@ -303,6 +303,27 @@
   margin: 0;
 }
 
+.notificacao .lembretePrevisto,
+.notificacao .lembreteEnviado {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+}
+
+.notificacao .lembreteEnviado {
+  color: var(--via-accent-ink);
+  font-weight: var(--via-fw-semibold);
+}
+
+.notificacao .lembreteEnviado[data-falhou] {
+  color: var(--via-danger);
+}
+
 .notificacao strong {
   color: var(--via-text-primary);
   font-size: var(--via-fs-sm);

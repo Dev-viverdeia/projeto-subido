@@ -16,6 +16,7 @@ const ROTULO_EVENTO: Record<EventoProjetoExecucao['tipo'], string> = {
   portal_desativado: 'Portal do cliente pausado',
   link_rotacionado: 'Link protegido renovado',
   aprovacao_solicitada: 'Entrega enviada para aprovação',
+  lembrete_aprovacao: 'Cliente lembrado da validação',
   entrega_aprovada: 'Entrega aprovada pelo cliente',
   ajustes_solicitados: 'Cliente pediu um ajuste',
   arquivo_liberado: 'Arquivo liberado no portal',

@@ -5,6 +5,10 @@
     {
       "path": "/api/operacoes/processar",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/notificacoes/portal/lembretes",
+      "schedule": "0 13 * * *"
     }
   ]
 }

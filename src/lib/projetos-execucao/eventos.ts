@@ -3,6 +3,7 @@ export type TipoEventoProjeto =
   | 'portal_desativado'
   | 'link_rotacionado'
   | 'aprovacao_solicitada'
+  | 'lembrete_aprovacao'
   | 'entrega_aprovada'
   | 'ajustes_solicitados'
   | 'arquivo_liberado'

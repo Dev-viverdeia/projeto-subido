@@ -54,16 +54,16 @@ function montarLayout({
     <meta name="viewport" content="width=device-width" />
     <title>${seguro.titulo}</title>
   </head>
-  <body style="margin:0;background:#f3f6f8;color:#0c1b3a;font-family:Arial,Helvetica,sans-serif;">
+  <body style="margin:0;background:#f5f7f9;color:#0c1b3a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
     <span style="display:none;max-height:0;overflow:hidden;opacity:0;">${seguro.preCabecalho}</span>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f6f8;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f7f9;">
       <tr>
         <td align="center" style="padding:32px 16px;">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background:#ffffff;border:1px solid #dfe5ec;border-radius:22px;overflow:hidden;box-shadow:0 18px 45px rgba(12,27,58,.08);">
             <tr>
-              <td style="padding:28px 32px;background:#071c35;color:#ffffff;">
-                <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#9fdff7;">SUBIDO</div>
-                <div style="margin-top:8px;font-size:18px;font-weight:700;">Projetos de IA, do combinado à entrega.</div>
+              <td style="padding:24px 32px;background:#071c35;color:#ffffff;">
+                <div style="font-size:16px;font-weight:750;letter-spacing:-.01em;">Subido</div>
+                <div style="margin-top:5px;font-size:13px;line-height:1.45;color:#c9d3df;">Portal do cliente</div>
               </td>
             </tr>
             <tr>
@@ -78,7 +78,7 @@ function montarLayout({
                     </td>
                   </tr>
                 </table>
-                <p style="margin:28px 0 0;font-size:12px;line-height:1.6;color:#7b8799;">${seguro.rodape}</p>
+                <p style="margin:28px 0 0;font-size:13px;line-height:1.6;color:#7b8799;">${seguro.rodape}</p>
               </td>
             </tr>
           </table>
@@ -112,6 +112,32 @@ export function emailValidacaoSolicitada({
       rodape,
     }),
     texto: `${assunto}\n\n${mensagem}\n\n${nota || `Etapa concluída: ${tarefa}`}\n\nRevisar entrega: ${link}\n\n${rodape}`,
+  };
+}
+
+export function emailLembreteValidacao({
+  empresa,
+  projeto,
+  tarefa,
+  link,
+}: BaseEmail): ConteudoEmailEntrega {
+  const assunto = `${empresa}: uma entrega ainda espera sua validação`;
+  const mensagem = `A etapa ${tarefa}, do projeto ${projeto}, continua disponível no portal. Revise o material e escolha aprovar ou pedir um ajuste.`;
+  const rodape =
+    'Este é o único lembrete automático desta solicitação. O link abre somente o portal deste projeto.';
+
+  return {
+    assunto,
+    html: montarLayout({
+      preCabecalho: `A etapa ${tarefa} ainda espera sua resposta.`,
+      titulo: 'Sua validação continua pendente.',
+      mensagem,
+      destaque: `Entrega: ${tarefa}`,
+      rotuloBotao: 'Revisar entrega',
+      link,
+      rodape,
+    }),
+    texto: `${assunto}\n\n${mensagem}\n\nEntrega: ${tarefa}\n\nRevisar entrega: ${link}\n\n${rodape}`,
   };
 }
 
