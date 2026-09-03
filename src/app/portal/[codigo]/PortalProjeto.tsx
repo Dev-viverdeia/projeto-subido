@@ -9,7 +9,6 @@ import {
   LockKeyhole,
 } from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
-import { descreverProximaAcaoPortal } from '@/lib/portal-cliente/eventos';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { AprovacaoCliente } from './AprovacaoCliente';
@@ -19,6 +18,7 @@ import { ControleEscopoPortal, DecisaoMudancaEscopo } from './MudancaEscopoPorta
 import { TermoEncerramentoPortal } from './TermoEncerramentoPortal';
 import { PosEntregaPortal } from './PosEntregaPortal';
 import styles from './portal.module.css';
+import layout from './PortalProjeto.module.css';
 
 function formatarData(valor: string): string {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -63,23 +63,45 @@ export function PortalProjeto({
   );
   const faseAtual = fases.find((fase) => fase.feitas < fase.total) ?? fases.at(-1) ?? null;
   const concluido = projeto.status === 'concluido';
+  const apenasAprovacao = aprovacoes.length === totalAcoes && aprovacoes.length > 0;
+  const apenasDependencia = dependencias.length === totalAcoes && dependencias.length > 0;
+  const tituloDecisao = concluido
+    ? 'Projeto concluído.'
+    : !totalAcoes
+      ? 'Nenhuma ação pendente.'
+      : apenasAprovacao && totalAcoes === 1
+        ? 'Revise esta entrega.'
+        : mudancasAguardando.length === totalAcoes
+          ? 'Revise a mudança no projeto.'
+          : apenasDependencia
+            ? `${totalAcoes} ${totalAcoes === 1 ? 'item precisa' : 'itens precisam'} da sua confirmação.`
+            : `${totalAcoes} ${totalAcoes === 1 ? 'item aguarda' : 'itens aguardam'} sua resposta.`;
+  const descricaoDecisao = concluido
+    ? 'Materiais, suporte e próximos passos continuam disponíveis abaixo.'
+    : !totalAcoes
+      ? 'Avisaremos quando uma nova entrega estiver pronta para você.'
+      : apenasAprovacao
+        ? 'Confira o resultado e aprove ou descreva o ajuste necessário.'
+        : mudancasAguardando.length
+          ? 'Confira o impacto informado antes de decidir.'
+          : 'Confirme os itens concluídos para o projeto continuar.';
 
   return (
-    <main className={styles.pagina}>
-      <header className={styles.barra}>
+    <main className={layout.pagina}>
+      <header className={layout.barra}>
         <SubidoLogo size={19} />
         <div>
           <LockKeyhole size={13} aria-hidden="true" />
-          Portal protegido
+          Acesso protegido
         </div>
       </header>
 
-      <div className={styles.canvas}>
-        <section className={styles.hero} data-concluido={concluido || undefined}>
-          <div className={styles.heroTexto}>
-            <p>Projeto com {projeto.empresa}</p>
+      <div className={layout.canvas}>
+        <section className={layout.hero} data-concluido={concluido || undefined}>
+          <div className={layout.heroTexto}>
+            <p>{projeto.empresa}</p>
             <h1>{projeto.titulo}</h1>
-            <blockquote>{projeto.resumo}</blockquote>
+            <p className={layout.resumo}>{projeto.resumo}</p>
 
             <dl>
               <div>
@@ -97,25 +119,25 @@ export function PortalProjeto({
             </dl>
           </div>
 
-          <div className={styles.progressoHero}>
+          <div className={layout.progressoHero}>
             <span>{percentual}%</span>
-            <strong>{concluido ? 'entregue e aprovado' : 'concluído'}</strong>
+            <strong>{concluido ? 'concluído' : 'do projeto'}</strong>
             <div aria-hidden="true">
               <i style={{ transform: `scaleX(${percentual / 100})` }} />
             </div>
             <small>
-              {projeto.feitas} de {projeto.total} marcos
+              {projeto.feitas} de {projeto.total} etapas
             </small>
           </div>
         </section>
 
         <section
-          className={styles.centralDecisoes}
+          className={layout.centralDecisoes}
           data-concluido={concluido || undefined}
           aria-labelledby="decisoes-titulo"
         >
           <header>
-            <div className={styles.iconeDecisao} data-pendente={totalAcoes > 0 || undefined}>
+            <div className={layout.iconeDecisao} data-pendente={totalAcoes > 0 || undefined}>
               {concluido ? (
                 <BadgeCheck size={20} />
               ) : totalAcoes ? (
@@ -125,22 +147,14 @@ export function PortalProjeto({
               )}
             </div>
             <div>
-              <p>Sua próxima ação</p>
-              <h2 id="decisoes-titulo">
-                {concluido
-                  ? 'Projeto entregue e aprovado.'
-                  : totalAcoes
-                    ? `${totalAcoes} ${totalAcoes === 1 ? 'ação espera' : 'ações esperam'} por você.`
-                    : 'Tudo em dia por aqui.'}
-              </h2>
-              <span>
-                {descreverProximaAcaoPortal(concluido, totalAcoes, mudancasAguardando.length)}
-              </span>
+              <p>{totalAcoes ? 'Sua resposta' : 'Status do projeto'}</p>
+              <h2 id="decisoes-titulo">{tituloDecisao}</h2>
+              <span>{descricaoDecisao}</span>
             </div>
           </header>
 
           {totalAcoes ? (
-            <div className={styles.listaAprovacoes}>
+            <div className={layout.listaAprovacoes}>
               {mudancasAguardando.map((mudanca) => (
                 <DecisaoMudancaEscopo key={mudanca.id} codigo={codigo} mudanca={mudanca} />
               ))}
@@ -158,16 +172,18 @@ export function PortalProjeto({
               ))}
             </div>
           ) : (
-            <div className={styles.estadoDecisao}>
+            <div className={layout.estadoDecisao}>
               <span>
-                {concluido ? 'Aceite final registrado' : `Agora: ${faseAtual?.titulo ?? 'Entrega'}`}
+                {concluido
+                  ? 'Aceite registrado'
+                  : `Em andamento: ${faseAtual?.titulo ?? 'Entrega'}`}
               </span>
               <strong>{concluido ? projeto.titulo : projeto.objetivo}</strong>
             </div>
           )}
         </section>
 
-        <details className={styles.grupoDetalhes}>
+        <details className={layout.grupoDetalhes}>
           <summary>
             <div>
               <strong>Sobre o projeto</strong>
@@ -175,13 +191,13 @@ export function PortalProjeto({
             </div>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
-          <div className={styles.grupoConteudo}>
+          <div className={layout.grupoConteudo}>
             <AcordoProjetoPortal briefing={projeto.briefing} />
             <ControleEscopoPortal codigo={codigo} mudancas={projeto.mudancasEscopo} />
           </div>
         </details>
 
-        <details className={styles.grupoDetalhes} open={!totalAcoes && !concluido}>
+        <details className={layout.grupoDetalhes} open={!totalAcoes && !concluido}>
           <summary>
             <div>
               <strong>Andamento</strong>
@@ -189,7 +205,7 @@ export function PortalProjeto({
             </div>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
-          <div className={styles.painel}>
+          <div className={`${styles.painel} ${layout.painel}`}>
             <section className={styles.andamento} aria-labelledby="andamento-titulo">
               <header>
                 <div>
@@ -267,7 +283,7 @@ export function PortalProjeto({
           </div>
         </details>
 
-        <details className={styles.grupoDetalhes} open={concluido}>
+        <details className={layout.grupoDetalhes}>
           <summary>
             <div>
               <strong>Resultados</strong>
@@ -275,7 +291,7 @@ export function PortalProjeto({
             </div>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
-          <div className={styles.grupoConteudo}>
+          <div className={layout.grupoConteudo}>
             {concluido && projeto.encerramento ? (
               <div className={styles.encerramentoPortal}>
                 <TermoEncerramentoPortal encerramento={projeto.encerramento} />
@@ -287,9 +303,9 @@ export function PortalProjeto({
         </details>
       </div>
 
-      <footer className={styles.rodape}>
+      <footer className={layout.rodape}>
         <SubidoLogo size={16} />
-        <span>Portal protegido</span>
+        <span>Acesso protegido</span>
       </footer>
     </main>
   );

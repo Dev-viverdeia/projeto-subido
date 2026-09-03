@@ -1,12 +1,12 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { ArrowUpRight, Check, FileCheck2, MessageSquareMore } from 'lucide-react';
 import { decidirEntregaCliente, type EstadoPortalCliente } from '@/lib/portal-cliente/actions';
 import type { TarefaPortalCliente } from '@/lib/portal-cliente/servico';
 import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
 import { TermoEncerramentoPortal } from './TermoEncerramentoPortal';
-import styles from './portal.module.css';
+import styles from './AprovacaoCliente.module.css';
 
 const INICIAL: EstadoPortalCliente = {};
 
@@ -22,6 +22,8 @@ export function AprovacaoCliente({
   encerramento?: EncerramentoProjeto | null;
 }) {
   const [estado, acao, pendente] = useActionState(decidirEntregaCliente, INICIAL);
+  const [modoAjuste, setModoAjuste] = useState(false);
+  const [envio, setEnvio] = useState<'ajuste' | 'aprovacao' | null>(null);
 
   return (
     <article className={styles.aprovacao} data-final={aceiteFinal || undefined}>
@@ -37,44 +39,49 @@ export function AprovacaoCliente({
       </div>
 
       <div className={styles.aprovacaoConteudo}>
-        <div className={styles.aprovacaoResumo}>
-          <span>O que está sendo validado</span>
-          <p className={styles.entregavel}>{tarefa.entregavel}</p>
-          <div className={styles.criterioAceite}>
-            <span>Confira antes de aprovar</span>
-            <p>{tarefa.concluidoQuando}</p>
-          </div>
-          {tarefa.clienteNota && <blockquote>{tarefa.clienteNota}</blockquote>}
-          {tarefa.entregavelUrl && (
-            <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
-              Abrir o entregável <ArrowUpRight size={14} aria-hidden="true" />
-            </a>
-          )}
-          {aceiteFinal && (
-            <small>
-              Ao aprovar, você confirma o recebimento da entrega e encerra formalmente o projeto.
-            </small>
-          )}
-        </div>
-
         {aceiteFinal && encerramento ? (
           <div className={styles.termoAceite}>
             <TermoEncerramentoPortal encerramento={encerramento} compacto />
           </div>
         ) : null}
 
-        <form action={acao}>
+        <div className={styles.aprovacaoResumo}>
+          <div className={styles.validacaoGrid}>
+            <section>
+              <span>O que você recebeu</span>
+              <p className={styles.entregavel}>{tarefa.entregavel}</p>
+            </section>
+            <div className={styles.criterioAceite}>
+              <span>Aprovar quando</span>
+              <p>{tarefa.concluidoQuando}</p>
+            </div>
+          </div>
+          {tarefa.clienteNota && <blockquote>{tarefa.clienteNota}</blockquote>}
+          {tarefa.entregavelUrl && (
+            <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
+              Abrir entrega <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          )}
+          {aceiteFinal && <small>Esta aprovação confirma o recebimento e conclui o projeto.</small>}
+        </div>
+
+        <form action={acao} data-ajuste={modoAjuste || undefined}>
           <input type="hidden" name="codigo" value={codigo} />
           <input type="hidden" name="tarefa" value={tarefa.id} />
           <input type="hidden" name="final" value={aceiteFinal ? 'sim' : 'nao'} />
-          <label>
-            <span>Precisa de ajuste?</span>
-            <textarea
-              name="comentario"
-              maxLength={2000}
-              placeholder="Descreva objetivamente o que precisa mudar."
-            />
-          </label>
+
+          {modoAjuste ? (
+            <label className={styles.editorAjuste}>
+              <span>O que precisa mudar?</span>
+              <textarea
+                name="comentario"
+                maxLength={2000}
+                placeholder="Descreva o ajuste para a equipe."
+                required
+                autoFocus
+              />
+            </label>
+          ) : null}
 
           {estado.erro && <p role="alert">{estado.erro}</p>}
           {estado.sucesso && <p role="status">{estado.sucesso}</p>}
@@ -85,19 +92,50 @@ export function AprovacaoCliente({
           )}
 
           <div className={styles.aprovacaoAcoes}>
-            <button type="submit" name="decisao" value="ajustes" disabled={pendente}>
-              <MessageSquareMore size={15} aria-hidden="true" /> Pedir ajuste
-            </button>
-            <button
-              type="submit"
-              name="decisao"
-              value="aprovada"
-              className={styles.aprovar}
-              disabled={pendente}
-            >
-              <Check size={16} aria-hidden="true" />{' '}
-              {pendente ? 'Registrando…' : aceiteFinal ? 'Aprovar e concluir' : 'Aprovar entrega'}
-            </button>
+            {modoAjuste ? (
+              <>
+                <button type="button" onClick={() => setModoAjuste(false)} disabled={pendente}>
+                  Voltar
+                </button>
+                <button
+                  type="submit"
+                  name="decisao"
+                  value="ajustes"
+                  className={styles.enviarAjuste}
+                  disabled={pendente}
+                  onClick={() => setEnvio('ajuste')}
+                >
+                  <MessageSquareMore size={15} aria-hidden="true" />
+                  {pendente && envio === 'ajuste' ? 'Enviando…' : 'Enviar ajuste'}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  aria-expanded={modoAjuste}
+                  onClick={() => setModoAjuste(true)}
+                  disabled={pendente}
+                >
+                  <MessageSquareMore size={15} aria-hidden="true" /> Pedir ajuste
+                </button>
+                <button
+                  type="submit"
+                  name="decisao"
+                  value="aprovada"
+                  className={styles.aprovar}
+                  disabled={pendente}
+                  onClick={() => setEnvio('aprovacao')}
+                >
+                  <Check size={16} aria-hidden="true" />{' '}
+                  {pendente && envio === 'aprovacao'
+                    ? 'Aprovando…'
+                    : aceiteFinal
+                      ? 'Aprovar e concluir'
+                      : 'Aprovar entrega'}
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>

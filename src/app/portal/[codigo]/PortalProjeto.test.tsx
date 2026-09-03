@@ -124,7 +124,7 @@ describe('PortalProjeto', () => {
     ).toBeVisible();
     expect(screen.getByText('50%')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar entrega/i })).toBeVisible();
-    expect(screen.getByText('Confira antes de aprovar')).toBeVisible();
+    expect(screen.getByText('Aprovar quando')).toBeVisible();
     expect(
       screen.getByText('As respostas principais têm fonte e aprovação da responsável.'),
     ).toBeVisible();
@@ -139,7 +139,7 @@ describe('PortalProjeto', () => {
     expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'O que vamos entregar juntos.' })).toBeVisible();
-    const decisao = screen.getByRole('heading', { name: /1 ação espera por você/i });
+    const decisao = screen.getByRole('heading', { name: 'Revise esta entrega.' });
     const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
     const arquivos = screen.getByRole('heading', { name: /Arquivos do projeto/i });
     expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
@@ -148,6 +148,20 @@ describe('PortalProjeto', () => {
     expect(andamento.compareDocumentPosition(arquivos) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+  });
+
+  it('abre o campo de ajuste somente quando o cliente escolhe pedir uma correção', () => {
+    render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);
+
+    expect(screen.queryByRole('textbox', { name: 'O que precisa mudar?' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pedir ajuste' }));
+    expect(screen.getByRole('textbox', { name: 'O que precisa mudar?' })).toBeRequired();
+    expect(screen.getByRole('button', { name: 'Enviar ajuste' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Aprovar entrega' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }));
+    expect(screen.queryByRole('textbox', { name: 'O que precisa mudar?' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Aprovar entrega' })).toBeVisible();
   });
 
   it('apresenta o último aceite como encerramento formal do projeto', () => {
@@ -227,7 +241,9 @@ describe('PortalProjeto', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: '1 ação espera por você.' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: '1 item precisa da sua confirmação.' }),
+    ).toBeVisible();
     expect(
       screen.getByRole('heading', { name: 'Liberar o acesso ao WhatsApp Business' }),
     ).toBeVisible();
