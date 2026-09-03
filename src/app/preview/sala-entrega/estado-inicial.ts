@@ -86,11 +86,38 @@ export function prepararProjetoEmExecucao(
 export function prepararProjetoEmValidacao(
   projeto: ProjetoExecucaoCompleto,
 ): ProjetoExecucaoCompleto {
+  const tarefaFinal = projeto.tarefas.at(-1);
+  const convite = projeto.eventos.find(
+    (evento) => evento.tarefaId === tarefaFinal?.id && evento.tipo === 'aprovacao_solicitada',
+  );
+
   return {
     ...projeto,
     status: 'em_validacao',
     feitas: projeto.total,
     proximaTarefa: null,
+    eventos: convite
+      ? [
+          {
+            ...convite,
+            id: '77777777-7777-4777-8777-777777777777',
+            tipo: 'lembrete_aprovacao',
+            criadoEm: '2026-08-12T17:10:00.000Z',
+            emailDestinatario: 'camila@clinicaaurora.com.br',
+            emailStatus: 'entregue',
+            emailOrigemEventoId: convite.id,
+          },
+          ...projeto.eventos.map((evento) =>
+            evento.id === convite.id
+              ? {
+                  ...evento,
+                  emailDestinatario: 'camila@clinicaaurora.com.br',
+                  emailStatus: 'entregue' as const,
+                }
+              : evento,
+          ),
+        ]
+      : projeto.eventos,
     tarefas: projeto.tarefas.map((tarefa, indice, lista) => ({
       ...tarefa,
       status: 'concluida',

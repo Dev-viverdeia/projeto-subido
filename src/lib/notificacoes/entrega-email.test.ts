@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   emailDecisaoMudancaEscopo,
   emailDecisaoCliente,
+  emailLembreteValidacao,
   emailMudancaEscopoAnalisada,
   emailMudancaEscopoSolicitada,
   emailPendenciaResolvida,
@@ -37,6 +38,20 @@ describe('e-mails da entrega', () => {
     expect(email.html).not.toContain('<script>');
     expect(email.html).not.toContain('<img src=x');
     expect(email.html).toContain('&lt;img src=x');
+  });
+
+  it('lembra uma única vez sem criar urgência artificial', () => {
+    const email = emailLembreteValidacao({
+      empresa: 'Clínica Aurora',
+      projeto: 'SDR com IA',
+      tarefa: 'Validar atendimento',
+      link: 'https://subido.viverdeia.ai/portal/abc',
+    });
+
+    expect(email.assunto).toContain('ainda espera sua validação');
+    expect(email.html).toContain('Revisar entrega');
+    expect(email.texto).toContain('único lembrete automático');
+    expect(email.texto).not.toContain('urgente');
   });
 
   it('avisa o profissional quando uma pendência sai do caminho', () => {

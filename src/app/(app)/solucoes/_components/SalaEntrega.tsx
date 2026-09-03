@@ -316,6 +316,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                   portalAtivo={projeto.portalAtivo}
                   clienteEmail={contatoCliente.email}
                   notificacaoCliente={contatoCliente.evento}
+                  lembreteCliente={contatoCliente.lembrete}
                   contexto={{
                     empresa: projeto.empresa,
                     objetivo: projeto.briefing.objetivo || projeto.documento.objetivo,

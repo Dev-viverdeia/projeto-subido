@@ -8,5 +8,9 @@ export function obterContatoNotificacao(
   const evento =
     eventos.find((item) => item.tarefaId === tarefaId && item.tipo === 'aprovacao_solicitada') ??
     null;
-  return { evento, email: evento?.emailDestinatario ?? emailOriginal };
+  const lembrete =
+    eventos.find(
+      (item) => item.tipo === 'lembrete_aprovacao' && item.emailOrigemEventoId === evento?.id,
+    ) ?? null;
+  return { evento, lembrete, email: evento?.emailDestinatario ?? emailOriginal };
 }

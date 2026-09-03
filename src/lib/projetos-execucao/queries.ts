@@ -82,6 +82,7 @@ export type EventoProjetoExecucao = {
   emailTentativas?: number;
   emailEnviadoEm?: string | null;
   emailEntregueEm?: string | null;
+  emailOrigemEventoId?: string | null;
 };
 
 export type { MudancaEscopoProjeto, StatusMudancaEscopo } from './mudancas-escopo';
@@ -402,6 +403,7 @@ export const obterProjetoExecucao = cache(
               emailTentativas: evento.email_tentativas,
               emailEnviadoEm: evento.email_enviado_em,
               emailEntregueEm: evento.email_entregue_em,
+              emailOrigemEventoId: evento.email_origem_evento_id,
             },
           ];
         })

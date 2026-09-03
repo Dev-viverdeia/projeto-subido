@@ -2277,6 +2277,7 @@ export type Database = {
           email_entregue_em: string | null
           email_enviado_em: string | null
           email_erro: string | null
+          email_origem_evento_id: string | null
           email_provider_id: string | null
           email_status: string
           email_tentativas: number
@@ -2298,6 +2299,7 @@ export type Database = {
           email_entregue_em?: string | null
           email_enviado_em?: string | null
           email_erro?: string | null
+          email_origem_evento_id?: string | null
           email_provider_id?: string | null
           email_status?: string
           email_tentativas?: number
@@ -2319,6 +2321,7 @@ export type Database = {
           email_entregue_em?: string | null
           email_enviado_em?: string | null
           email_erro?: string | null
+          email_origem_evento_id?: string | null
           email_provider_id?: string | null
           email_status?: string
           email_tentativas?: number
@@ -2334,6 +2337,13 @@ export type Database = {
             columns: ["acao_id"]
             isOneToOne: false
             referencedRelation: "projeto_acoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projeto_portal_eventos_email_origem_evento_id_fkey"
+            columns: ["email_origem_evento_id"]
+            isOneToOne: true
+            referencedRelation: "projeto_portal_eventos"
             referencedColumns: ["id"]
           },
           {
@@ -3920,6 +3930,17 @@ export type Database = {
         Args: { p_codigo: string; p_descricao: string; p_titulo: string }
         Returns: string
       }
+      projeto_sistema_reservar_lembretes_aprovacao: {
+        Args: { p_limite?: number }
+        Returns: {
+          destinatario: string
+          empresa: string
+          evento_id: string
+          portal_codigo: string
+          projeto: string
+          tarefa: string
+        }[]
+      }
       proposta_portal_decidir: {
         Args: {
           p_aceite_termos?: boolean
@@ -4127,12 +4148,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4156,11 +4177,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4181,11 +4202,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4206,11 +4227,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4223,11 +4244,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
