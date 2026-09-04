@@ -181,3 +181,26 @@ export function prepararProjetoAposAprovacao(
     })),
   };
 }
+
+export function prepararProjetoComResultado(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  return {
+    ...projeto,
+    evolucao: projeto.evolucao
+      ? {
+          ...projeto.evolucao,
+          status: 'registrada',
+          resultadoObservado:
+            'A equipe passou a responder novos contatos em menos de um minuto durante o piloto.',
+          evidenciaResultadoUrl: 'https://example.com/resultado',
+          decisao: 'expandir',
+          proximoPasso: 'Definir o segundo canal com a diretora de operações.',
+          proximoPassoEm: '2026-09-15',
+          compartilharCliente: true,
+          registradaEm: '2026-09-09T14:00:00.000Z',
+          oportunidadeContinuidadeId: null,
+        }
+      : null,
+  };
+}

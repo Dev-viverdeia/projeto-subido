@@ -21,18 +21,16 @@ describe('ContinuidadeComercial', () => {
     const usuario = userEvent.setup();
     render(<ContinuidadeComercial {...BASE} oportunidadeId={null} />);
 
-    await usuario.click(screen.getByRole('button', { name: /Levar para Vendas/i }));
+    await usuario.click(screen.getByRole('button', { name: /Criar oportunidade/i }));
 
-    expect(screen.getByRole('dialog')).toBeVisible();
-    expect(
-      screen.getByRole('heading', { name: 'Levar este próximo passo para Vendas?' }),
-    ).toBeVisible();
+    const dialogo = screen.getByRole('dialog');
+    expect(dialogo).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Criar uma nova venda?' })).toBeVisible();
     expect(screen.getByText('Clínica Aurora')).toBeVisible();
     expect(screen.getByText('Expandir este projeto')).toBeVisible();
-    expect(
-      screen.getByText(/Um novo projeto só nasce depois que outra proposta for aceita/i),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Criar oportunidade' })).toBeVisible();
+    expect(screen.getByText(/Esta entrega continua concluída/i)).toBeVisible();
+    expect(dialogo).toHaveAccessibleDescription('Os dados desta entrega já serão aproveitados.');
+    expect(screen.getAllByRole('button', { name: 'Criar oportunidade' }).at(-1)).toBeVisible();
   });
 
   it('abre a oportunidade existente sem oferecer outra criação', () => {
@@ -40,10 +38,10 @@ describe('ContinuidadeComercial', () => {
       <ContinuidadeComercial {...BASE} oportunidadeId="22222222-2222-4222-8222-222222222222" />,
     );
 
-    expect(screen.getByRole('link', { name: /Abrir oportunidade em Vendas/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Abrir em Vendas/i })).toHaveAttribute(
       'href',
       '/vendas/22222222-2222-4222-8222-222222222222?origem=pos-entrega',
     );
-    expect(screen.queryByRole('button', { name: /Levar para Vendas/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Criar oportunidade/i })).not.toBeInTheDocument();
   });
 });

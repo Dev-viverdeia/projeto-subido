@@ -53,10 +53,10 @@ describe('EvolucaoProjeto', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Revisão de resultado' })).toBeVisible();
-    expect(screen.getByText('Agendada')).toBeVisible();
-    expect(screen.getByRole('group', { name: 'O que ficou combinado agora?' })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Salvar revisão/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Confirme o resultado.' })).toBeVisible();
+    expect(screen.getAllByText('09 de setembro de 2026').length).toBeGreaterThan(0);
+    expect(screen.getByRole('group', { name: 'O que acontece agora?' })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Registrar resultado/i })).toBeVisible();
   });
 
   it('oferece uma nova venda somente quando a decisão abre outro projeto', () => {
@@ -77,8 +77,8 @@ describe('EvolucaoProjeto', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Resultado registrado' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Resultado confirmado' })).toBeVisible();
     expect(screen.getByText('Expandir este projeto')).toBeVisible();
-    expect(screen.getByRole('button', { name: /Levar para Vendas/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Criar oportunidade/i })).toBeVisible();
   });
 });
