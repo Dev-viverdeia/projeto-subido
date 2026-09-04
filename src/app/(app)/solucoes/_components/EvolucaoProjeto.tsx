@@ -1,14 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import {
-  ArrowUpRight,
-  BadgeCheck,
-  CalendarClock,
-  ChartNoAxesCombined,
-  Check,
-  ShieldCheck,
-} from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CalendarClock, Check, Link2, ShieldCheck } from 'lucide-react';
 import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
 import {
@@ -26,36 +19,12 @@ import { ContinuidadeComercial } from './ContinuidadeComercial';
 
 const INICIAL: EstadoProjetoExecucao = {};
 
-const DECISOES: Array<{
-  id: DecisaoEvolucaoProjeto;
-  titulo: string;
-  descricao: string;
-}> = [
-  {
-    id: 'manter',
-    titulo: 'Manter a operação',
-    descricao: 'O resultado segue estável.',
-  },
-  {
-    id: 'ajustar_garantia',
-    titulo: 'Ajustar na garantia',
-    descricao: 'Há uma correção no escopo entregue.',
-  },
-  {
-    id: 'expandir',
-    titulo: 'Expandir este projeto',
-    descricao: 'O cliente quer uma nova etapa.',
-  },
-  {
-    id: 'novo_projeto',
-    titulo: 'Criar outro projeto',
-    descricao: 'Surgiu uma nova necessidade.',
-  },
-  {
-    id: 'encerrar',
-    titulo: 'Encerrar',
-    descricao: 'Não há outra ação combinada.',
-  },
+const DECISOES: Array<{ id: DecisaoEvolucaoProjeto; titulo: string }> = [
+  { id: 'manter', titulo: 'Manter como está' },
+  { id: 'ajustar_garantia', titulo: 'Corrigir na garantia' },
+  { id: 'expandir', titulo: 'Expandir este projeto' },
+  { id: 'novo_projeto', titulo: 'Vender outro projeto' },
+  { id: 'encerrar', titulo: 'Encerrar acompanhamento' },
 ];
 
 export function EvolucaoProjeto({
@@ -80,8 +49,8 @@ export function EvolucaoProjeto({
       <section className={styles.indisponivel} role="status">
         <ShieldCheck size={20} aria-hidden="true" />
         <div>
-          <strong>A evolução começa depois do aceite final.</strong>
-          <span>Conclua o encerramento com o cliente para marcar a revisão de resultado.</span>
+          <strong>A revisão aparece depois do aceite final.</strong>
+          <span>Conclua a entrega com o cliente para registrar o resultado.</span>
         </div>
       </section>
     );
@@ -96,75 +65,57 @@ export function EvolucaoProjeto({
   return (
     <section className={styles.evolucao} data-registrada={registrada || undefined}>
       <header className={styles.cabecalho}>
-        <div className={styles.titulo}>
-          <span className={styles.icone}>
-            <ChartNoAxesCombined size={19} aria-hidden="true" />
-          </span>
-          <div>
-            <p>Depois da entrega</p>
-            <h2>{registrada ? 'Resultado registrado' : 'Revisão de resultado'}</h2>
-          </div>
+        <div>
+          <p>Depois da entrega</p>
+          <h2>{registrada ? 'Resultado confirmado' : 'Confirme o resultado.'}</h2>
+          {!registrada && <span>Registre o que mudou e combine a próxima ação.</span>}
         </div>
         <span className={styles.status}>
           {registrada ? (
-            <>
-              <BadgeCheck size={14} aria-hidden="true" /> Registrada
-            </>
+            <BadgeCheck size={16} aria-hidden="true" />
           ) : (
-            <>
-              <CalendarClock size={14} aria-hidden="true" /> Agendada
-            </>
+            <CalendarClock size={16} aria-hidden="true" />
           )}
+          {registrada ? 'Revisão concluída' : 'Revisão pendente'}
         </span>
       </header>
-
-      <div className={styles.contexto}>
-        <div>
-          <span>Revisão de resultado</span>
-          <strong>{formatarDataEvolucao(evolucao.revisaoEm)}</strong>
-        </div>
-        <div>
-          <span>Garantia combinada</span>
-          <strong>
-            {encerramento.garantiaTerminaEm
-              ? `Até ${formatarDataEvolucao(encerramento.garantiaTerminaEm.slice(0, 10))}`
-              : 'Sem período adicional'}
-          </strong>
-        </div>
-        <div>
-          <span>Objetivo da conversa</span>
-          <strong>Fato, evidência e próximo passo</strong>
-        </div>
-      </div>
 
       {registrada ? (
         <div className={styles.resultado}>
           <div className={styles.resultadoPrincipal}>
-            <p>O que mudou na operação</p>
+            <span>Resultado confirmado pelo cliente</span>
             <h3>{evolucao.resultadoObservado}</h3>
             {evolucao.evidenciaResultadoUrl && (
               <a href={evolucao.evidenciaResultadoUrl} target="_blank" rel="noreferrer">
-                Ver evidência <ArrowUpRight size={14} aria-hidden="true" />
+                Abrir resultado <ArrowUpRight size={15} aria-hidden="true" />
               </a>
             )}
           </div>
-          <div className={styles.decisaoFinal}>
-            <span>Decisão</span>
-            <strong>
-              {evolucao.decisao ? ROTULO_DECISAO_EVOLUCAO[evolucao.decisao] : 'Registrada'}
-            </strong>
-            <p>{evolucao.proximoPasso}</p>
-            {evolucao.proximoPassoEm && (
-              <time dateTime={evolucao.proximoPassoEm}>
-                Próximo passo em {formatarDataEvolucao(evolucao.proximoPassoEm)}
-              </time>
-            )}
-          </div>
-          <footer>
+
+          <dl className={styles.proximaAcao}>
+            <div>
+              <dt>Decisão</dt>
+              <dd>{evolucao.decisao ? ROTULO_DECISAO_EVOLUCAO[evolucao.decisao] : 'Registrada'}</dd>
+            </div>
+            <div>
+              <dt>Próxima ação</dt>
+              <dd>
+                {evolucao.proximoPasso}
+                {evolucao.proximoPassoEm && (
+                  <time dateTime={evolucao.proximoPassoEm}>
+                    {formatarDataEvolucao(evolucao.proximoPassoEm)}
+                  </time>
+                )}
+              </dd>
+            </div>
+          </dl>
+
+          <footer className={styles.rodapeResultado}>
             <span>
+              <Check size={15} aria-hidden="true" />
               {evolucao.compartilharCliente
-                ? 'O resultado e o próximo passo também estão no portal do cliente.'
-                : 'Este registro ficou somente na sua operação.'}
+                ? 'Resultado disponível no portal do cliente'
+                : 'Resultado salvo somente na sua conta'}
             </span>
             {decisaoComercial && (
               <ContinuidadeComercial
@@ -180,48 +131,54 @@ export function EvolucaoProjeto({
         </div>
       ) : (
         <div className={styles.pendente}>
-          <form action={acaoAgenda} className={styles.agendamento}>
-            <input type="hidden" name="projeto" value={projetoId} />
-            <label>
-              <span>Quando revisar com o cliente</span>
-              <input type="date" name="revisaoEm" defaultValue={evolucao.revisaoEm} required />
-            </label>
-            <button type="submit" disabled={agendando}>
-              {agendando ? 'Atualizando…' : 'Atualizar data'}
-            </button>
-            {estadoAgenda.erro && <p role="alert">{estadoAgenda.erro}</p>}
-            {estadoAgenda.sucesso && <p role="status">{estadoAgenda.sucesso}</p>}
-          </form>
+          <div className={styles.agenda}>
+            <CalendarClock size={18} aria-hidden="true" />
+            <div>
+              <span>Revisão com o cliente</span>
+              <strong>{formatarDataEvolucao(evolucao.revisaoEm)}</strong>
+            </div>
+            <details>
+              <summary>Alterar data</summary>
+              <form action={acaoAgenda}>
+                <input type="hidden" name="projeto" value={projetoId} />
+                <label>
+                  <span className={styles.somenteLeitor}>Nova data da revisão</span>
+                  <input type="date" name="revisaoEm" defaultValue={evolucao.revisaoEm} required />
+                </label>
+                <button type="submit" disabled={agendando}>
+                  {agendando ? 'Salvando…' : 'Salvar data'}
+                </button>
+              </form>
+              {estadoAgenda.erro && <p role="alert">{estadoAgenda.erro}</p>}
+              {estadoAgenda.sucesso && <p role="status">{estadoAgenda.sucesso}</p>}
+            </details>
+          </div>
 
           <form action={acaoRegistro} className={styles.formulario}>
             <input type="hidden" name="projeto" value={projetoId} />
-            <div className={styles.instrucao}>
-              <Check size={17} aria-hidden="true" />
-              <div>
-                <strong>Registre o que o cliente confirmou.</strong>
-                <span>Use fatos e resultados que já foram validados.</span>
-              </div>
-            </div>
 
-            <div className={styles.gradeCampos}>
-              <label className={styles.campoResultado}>
-                <span>O que mudou na operação depois da entrega?</span>
-                <textarea
-                  name="resultado"
-                  maxLength={4000}
-                  required
-                  placeholder="Ex.: a equipe passou a atender os contatos no mesmo fluxo e confirmou menos conversas perdidas fora do horário."
-                />
-              </label>
+            <label className={styles.campoResultado}>
+              <span>Qual resultado o cliente confirmou?</span>
+              <textarea
+                name="resultado"
+                maxLength={4000}
+                required
+                placeholder="Ex.: a equipe passou a responder novos contatos em menos de um minuto."
+              />
+            </label>
+
+            <details className={styles.evidencia}>
+              <summary>
+                <Link2 size={15} aria-hidden="true" /> Adicionar link do resultado
+              </summary>
               <label>
-                <span>Link da evidência</span>
+                <span>Link do painel, relatório ou documento</span>
                 <input name="evidenciaUrl" type="url" maxLength={2048} placeholder="https://" />
-                <small>Opcional: painel, relatório ou documento aprovado.</small>
               </label>
-            </div>
+            </details>
 
             <fieldset className={styles.decisoes}>
-              <legend>O que ficou combinado agora?</legend>
+              <legend>O que acontece agora?</legend>
               <div>
                 {DECISOES.map((decisao, indice) => (
                   <label key={decisao.id}>
@@ -232,10 +189,7 @@ export function EvolucaoProjeto({
                       defaultChecked={indice === 0}
                     />
                     <span className={styles.marcaRadio} aria-hidden="true" />
-                    <span>
-                      <strong>{decisao.titulo}</strong>
-                      <small>{decisao.descricao}</small>
-                    </span>
+                    <strong>{decisao.titulo}</strong>
                   </label>
                 ))}
               </div>
@@ -243,16 +197,16 @@ export function EvolucaoProjeto({
 
             <div className={styles.gradeProximoPasso}>
               <label>
-                <span>Próximo passo combinado</span>
-                <textarea
+                <span>Próxima ação combinada</span>
+                <input
                   name="proximoPasso"
                   maxLength={2000}
                   required
-                  placeholder="Ex.: revisar os indicadores com a responsável e decidir a expansão para o segundo canal."
+                  placeholder="Ex.: revisar os indicadores com a responsável."
                 />
               </label>
               <label>
-                <span>Quando isso acontece</span>
+                <span>Quando</span>
                 <input
                   type="date"
                   name="proximoPassoEm"
@@ -264,10 +218,7 @@ export function EvolucaoProjeto({
 
             <label className={styles.compartilhar}>
               <input type="checkbox" name="compartilharCliente" defaultChecked />
-              <span>
-                <strong>Mostrar no portal do cliente</strong>
-                <small>Compartilha o resultado e o próximo passo.</small>
-              </span>
+              <span>Mostrar resultado e próxima ação no portal do cliente</span>
             </label>
 
             {estadoRegistro.erro && (
@@ -282,10 +233,10 @@ export function EvolucaoProjeto({
             )}
 
             <footer className={styles.rodapeFormulario}>
-              <span>Depois de registrar, a decisão fica vinculada a esta entrega.</span>
+              <span>Este registro encerra a revisão desta entrega.</span>
               <button type="submit" disabled={registrando}>
-                <BadgeCheck size={15} aria-hidden="true" />
-                {registrando ? 'Salvando revisão…' : 'Salvar revisão'}
+                <BadgeCheck size={16} aria-hidden="true" />
+                {registrando ? 'Registrando…' : 'Registrar resultado'}
               </button>
             </footer>
           </form>

@@ -210,8 +210,8 @@ test.describe('fundação visual Viver de IA', () => {
       'aria-current',
       'page',
     );
-    await expect(page.getByRole('heading', { name: 'Revisão de resultado' })).toBeVisible();
-    await expect(page.getByText('Registre o que o cliente confirmou.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirme o resultado.' })).toBeVisible();
+    await expect(page.getByText('Qual resultado o cliente confirmou?')).toBeVisible();
 
     await page.getByRole('button', { name: /Trabalho/ }).click();
     const fimDaSala = page.getByRole('link', { name: 'Abrir entregável compartilhado' });

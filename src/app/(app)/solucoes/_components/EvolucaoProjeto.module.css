@@ -2,9 +2,17 @@
 .indisponivel {
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: blur(22px) saturate(132%);
+  background:
+    linear-gradient(
+      128deg,
+      color-mix(in srgb, var(--via-white) 82%, transparent),
+      color-mix(in srgb, var(--via-white) 36%, transparent)
+    ),
+    var(--app-glass-plane-strong);
+  box-shadow:
+    inset 0 1px 0 var(--via-edge-hi),
+    var(--app-elev-2-shadow);
+  backdrop-filter: blur(24px) saturate(138%);
 }
 
 .evolucao {
@@ -13,278 +21,281 @@
 
 .cabecalho {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--via-space-4);
-  padding: var(--via-space-5);
+  gap: var(--via-space-5);
+  padding: var(--via-space-6);
   border-bottom: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
 }
 
-.titulo {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-}
-
-.icone {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--via-accent) 32%, var(--via-border));
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-accent-soft) 68%, var(--via-surface));
-  color: var(--via-accent-ink);
-}
-
-.titulo p,
-.titulo h2,
-.resultado p,
+.cabecalho p,
+.cabecalho h2,
+.cabecalho span,
 .resultado h3,
-.agendamento p,
-.formulario p {
+.agenda span,
+.agenda strong,
+.agenda p,
+.rodapeResultado span,
+.rodapeFormulario span {
   margin: 0;
 }
 
-.titulo p,
-.status,
-.contexto span,
-.resultadoPrincipal > p,
-.decisaoFinal > span,
-.formulario label > span,
-.decisoes legend {
-  font-family: var(--via-font-mono);
+.cabecalho p,
+.resultadoPrincipal > span,
+.proximaAcao dt {
+  color: var(--via-text-faint);
+  font: var(--via-fw-medium) var(--app-fs-micro) var(--via-font-mono);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
 }
 
-.titulo p {
-  color: var(--via-accent-ink);
-  font-size: var(--via-fs-micro);
+.cabecalho h2 {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h2);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
 }
 
-.titulo h2 {
-  margin-top: 3px;
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-h4);
+.cabecalho div > span {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
 }
 
 .status {
-  min-height: 32px;
+  min-height: var(--app-h-control);
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
-  gap: 7px;
-  padding-inline: 10px;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-3);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-chip);
-  background: rgba(255, 255, 255, 0.66);
+  background: color-mix(in srgb, var(--via-white) 66%, transparent);
   color: var(--via-text-muted);
-  font-size: var(--app-fs-micro);
+  font-size: var(--app-fs-meta);
+  font-weight: var(--via-fw-medium);
 }
 
 .evolucao[data-registrada] .status {
-  border-color: var(--via-navy-20);
-  color: var(--via-navy);
-}
-
-.contexto {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-bottom: 1px solid var(--via-border-hairline);
-}
-
-.contexto > div {
-  min-width: 0;
-  padding: var(--via-space-4) var(--via-space-5);
-  border-right: 1px solid var(--via-border-hairline);
-}
-
-.contexto > div:last-child {
-  border-right: 0;
-}
-
-.contexto span,
-.resultadoPrincipal > p,
-.decisaoFinal > span,
-.formulario label > span,
-.decisoes legend {
-  display: block;
-  color: var(--via-text-faint);
-  font-size: var(--app-fs-micro);
-}
-
-.contexto strong {
-  display: block;
-  margin-top: 7px;
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
-  line-height: 1.45;
+  border-color: color-mix(in srgb, var(--via-success) 25%, var(--via-border));
+  color: var(--via-success);
 }
 
 .pendente {
+  padding: var(--via-space-6);
+}
+
+.agenda {
+  position: relative;
+  z-index: 2;
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
-  align-items: start;
-}
-
-.agendamento {
-  display: grid;
-  gap: var(--via-space-3);
-  padding: var(--via-space-5);
-  border-right: 1px solid var(--via-border-hairline);
-}
-
-.agendamento label,
-.formulario label {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--via-space-2);
-}
-
-.agendamento label > span {
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-  font-weight: var(--via-fw-semibold);
-}
-
-.agendamento input,
-.formulario input,
-.formulario textarea {
-  width: 100%;
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.82);
-  color: var(--via-text-primary);
-  font: inherit;
-}
-
-.agendamento input,
-.formulario input {
-  min-height: 44px;
-  padding-inline: var(--via-space-3);
-}
-
-.formulario textarea {
-  min-height: 88px;
-  padding: var(--via-space-3);
-  line-height: 1.5;
-  resize: vertical;
-}
-
-.agendamento input:focus,
-.formulario input:focus,
-.formulario textarea:focus {
-  outline: none;
-  border-color: var(--via-accent-ink);
-  box-shadow: var(--app-ring);
-}
-
-.agendamento button,
-.rodapeFormulario button {
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--via-space-2);
-  border-radius: var(--app-radius-control);
-  font: 650 var(--via-fs-xs) var(--via-font);
-  cursor: pointer;
-}
-
-.agendamento button {
-  border: 1px solid var(--via-border);
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--via-text-primary);
-}
-
-.agendamento p {
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-  line-height: 1.4;
-}
-
-.formulario {
-  display: grid;
-  gap: var(--via-space-4);
-  padding: var(--via-space-5);
-}
-
-.instrucao {
-  display: flex;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--via-space-3);
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-navy-14);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-navy) 4%, rgba(255, 255, 255, 0.72));
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card) var(--app-radius-card) 0 0;
+  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
   color: var(--via-navy);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
 
-.instrucao strong,
-.instrucao span {
+.agenda div > span,
+.agenda div > strong {
   display: block;
 }
 
-.instrucao strong {
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
-}
-
-.instrucao span {
-  margin-top: 2px;
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-}
-
-.gradeCampos,
-.gradeProximoPasso {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
-  gap: var(--via-space-3);
-}
-
-.formulario label small {
+.agenda div > span {
   color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
+}
+
+.agenda div > strong {
+  margin-top: 2px;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+}
+
+.agenda details {
+  position: relative;
+}
+
+.agenda summary,
+.evidencia summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+  font-size: var(--app-fs-meta);
+  font-weight: var(--via-fw-semibold);
+  cursor: pointer;
+  list-style: none;
+}
+
+.agenda summary::-webkit-details-marker,
+.evidencia summary::-webkit-details-marker {
+  display: none;
+}
+
+.agenda summary:focus-visible,
+.evidencia summary:focus-visible {
+  border-radius: var(--app-radius-chip);
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.agenda details form {
+  position: absolute;
+  top: calc(100% + var(--via-space-3));
+  right: 0;
+  width: min(340px, calc(100vw - 64px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-3-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-3-bg);
+  box-shadow: var(--app-elev-3-shadow);
+}
+
+.agenda details > p {
+  position: absolute;
+  top: calc(100% + 82px);
+  right: 0;
+  width: 340px;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
+.formulario {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  display: grid;
+  gap: var(--via-space-5);
+  margin: 0 auto;
+  padding: var(--via-space-6);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: 0 0 var(--app-radius-surface) var(--app-radius-surface);
+  background: color-mix(in srgb, var(--via-surface) 76%, transparent);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.formulario label,
+.evidencia label {
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.formulario label > span,
+.evidencia label > span,
+.decisoes legend {
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-support);
+  font-weight: var(--via-fw-semibold);
+}
+
+.formulario input,
+.formulario textarea,
+.agenda input {
+  width: 100%;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-white) 82%, transparent);
+  color: var(--via-text-primary);
+  font: var(--app-fs-ui) var(--via-font);
+}
+
+.formulario input,
+.agenda input {
+  min-height: 46px;
+  padding-inline: var(--via-space-3);
+}
+
+.campoResultado textarea {
+  min-height: 122px;
+  padding: var(--via-space-4);
+  font-size: var(--app-fs-reading);
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.formulario input:focus-visible,
+.formulario textarea:focus-visible,
+.agenda input:focus-visible {
+  border-color: var(--via-navy);
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.evidencia {
+  width: fit-content;
+}
+
+.evidencia[open] {
+  width: 100%;
+}
+
+.evidencia label {
+  margin-top: var(--via-space-3);
 }
 
 .decisoes {
   min-width: 0;
   margin: 0;
-  padding: 0;
+  padding: var(--via-space-5) 0 0;
   border: 0;
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .decisoes legend {
-  margin-bottom: var(--via-space-2);
+  padding: 0;
 }
 
 .decisoes > div {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--via-space-2);
+  margin-top: var(--via-space-3);
 }
 
 .decisoes label {
-  min-height: 82px;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-content: start;
+  min-height: 42px;
+  display: inline-flex;
+  grid-auto-flow: column;
+  align-items: center;
   gap: var(--via-space-2);
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.54);
+  background: color-mix(in srgb, var(--via-white) 58%, transparent);
   cursor: pointer;
+  transition:
+    border-color var(--app-t-state),
+    background-color var(--app-t-state),
+    transform var(--app-t-touch);
+}
+
+.decisoes label:hover {
+  transform: translateY(-1px);
+  border-color: var(--via-border-strong);
 }
 
 .decisoes label:has(input:checked) {
   border-color: var(--via-navy);
-  background: color-mix(in srgb, var(--via-navy) 5%, rgba(255, 255, 255, 0.72));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--via-navy) 14%, transparent);
+  background: color-mix(in srgb, var(--via-navy) 6%, var(--via-surface));
+}
+
+.decisoes label:has(input:focus-visible) {
+  box-shadow: var(--app-ring);
 }
 
 .decisoes input {
@@ -298,7 +309,6 @@
 .marcaRadio {
   width: 15px;
   height: 15px;
-  margin-top: 1px;
   border: 1px solid var(--via-border-strong);
   border-radius: 50%;
   background: var(--via-surface);
@@ -308,81 +318,58 @@
   border: 4px solid var(--via-navy);
 }
 
-.decisoes label strong,
-.decisoes label small {
-  display: block;
-}
-
 .decisoes label strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
-  line-height: 1.35;
+  font-size: var(--app-fs-meta);
+  font-weight: var(--via-fw-medium);
 }
 
-.decisoes label > span:last-child {
-  font-family: var(--via-font);
-  letter-spacing: var(--app-ls-body);
-  text-transform: none;
-}
-
-.decisoes label small {
-  margin-top: 5px;
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-  line-height: 1.45;
+.gradeProximoPasso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.34fr);
+  gap: var(--via-space-3);
 }
 
 .compartilhar {
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex !important;
   align-items: center;
   gap: var(--via-space-3) !important;
-  padding: var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.48);
+  color: var(--via-text-muted);
 }
 
 .compartilhar input {
-  width: 17px;
+  width: 18px;
   min-height: auto;
-  height: 17px;
+  height: 18px;
+  flex: 0 0 auto;
   accent-color: var(--via-navy);
 }
 
-.compartilhar strong,
-.compartilhar small {
-  display: block;
-}
-
-.compartilhar strong {
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
-}
-
-.compartilhar small {
-  margin-top: 2px;
+.compartilhar > span {
+  color: var(--via-text-muted) !important;
+  font-weight: var(--via-fw-regular) !important;
 }
 
 .erro,
 .sucesso {
+  margin: 0;
   padding: var(--via-space-3);
   border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
 }
 
 .erro {
-  background: color-mix(in srgb, var(--via-danger) 9%, var(--via-surface));
+  background: color-mix(in srgb, var(--via-danger) 8%, var(--via-surface));
   color: var(--via-danger);
 }
 
 .sucesso {
-  background: color-mix(in srgb, var(--via-success) 9%, var(--via-surface));
+  background: color-mix(in srgb, var(--via-success) 8%, var(--via-surface));
   color: var(--via-success);
 }
 
 .rodapeFormulario,
-.resultado footer {
+.rodapeResultado {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -390,23 +377,65 @@
 }
 
 .rodapeFormulario {
-  padding-top: var(--via-space-2);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .rodapeFormulario > span,
-.resultado footer > span {
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+.rodapeResultado > span {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
+.rodapeResultado > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+
+.agenda button,
+.rodapeFormulario button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding-inline: var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  font: var(--via-fw-semibold) var(--app-fs-ui) var(--via-font);
+  cursor: pointer;
+}
+
+.agenda button {
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
 }
 
 .rodapeFormulario button {
-  padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
+  transition:
+    background-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    transform var(--app-t-touch);
 }
 
-.agendamento button:disabled,
+.rodapeFormulario button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
+}
+
+.agenda button:focus-visible,
+.rodapeFormulario button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.agenda button:disabled,
 .rodapeFormulario button:disabled {
   cursor: wait;
   opacity: 0.56;
@@ -414,12 +443,12 @@
 
 .resultado {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr);
 }
 
 .resultadoPrincipal,
-.decisaoFinal {
-  padding: var(--via-space-6);
+.proximaAcao {
+  padding: var(--via-space-7);
 }
 
 .resultadoPrincipal {
@@ -427,11 +456,14 @@
 }
 
 .resultadoPrincipal h3 {
-  max-width: 760px;
+  max-width: 34ch;
   margin-top: var(--via-space-3);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-h4);
-  line-height: 1.35;
+  font-size: var(--via-fs-h3);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h3);
+  line-height: 1.3;
+  text-wrap: pretty;
 }
 
 .resultadoPrincipal a {
@@ -439,41 +471,49 @@
   align-items: center;
   gap: var(--via-space-2);
   margin-top: var(--via-space-4);
-  color: var(--via-accent-ink);
-  font-size: var(--via-fs-xs);
+  color: var(--via-navy);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-semibold);
 }
 
-.decisaoFinal strong,
-.decisaoFinal p,
-.decisaoFinal time {
-  display: block;
+.resultadoPrincipal a:focus-visible {
+  border-radius: var(--app-radius-chip);
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
-.decisaoFinal strong {
-  margin-top: var(--via-space-3);
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-body);
+.proximaAcao {
+  display: grid;
+  align-content: center;
+  gap: var(--via-space-5);
+  margin: 0;
 }
 
-.decisaoFinal p {
-  margin-top: var(--via-space-3);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-  line-height: 1.55;
-}
-
-.decisaoFinal time {
-  margin-top: var(--via-space-3);
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
-}
-
-.resultado footer {
-  grid-column: 1 / -1;
-  padding: var(--via-space-4) var(--via-space-6);
+.proximaAcao div + div {
+  padding-top: var(--via-space-5);
   border-top: 1px solid var(--via-border-hairline);
-  background: rgba(255, 255, 255, 0.42);
+}
+
+.proximaAcao dd {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-semibold);
+  line-height: 1.45;
+}
+
+.proximaAcao time {
+  display: block;
+  margin-top: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
+.rodapeResultado {
+  grid-column: 1 / -1;
+  padding: var(--via-space-4) var(--via-space-7);
+  border-top: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-white) 38%, transparent);
 }
 
 .indisponivel {
@@ -481,7 +521,7 @@
   align-items: center;
   gap: var(--via-space-3);
   padding: var(--via-space-5);
-  color: var(--via-accent-ink);
+  color: var(--via-navy);
 }
 
 .indisponivel strong,
@@ -491,77 +531,135 @@
 
 .indisponivel strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
 }
 
 .indisponivel span {
   margin-top: 3px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
 }
 
-@media (max-width: 1080px) {
-  .pendente,
+.somenteLeitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .evolucao,
+  .indisponivel {
+    background: var(--via-surface);
+  }
+}
+
+@media (max-width: 900px) {
   .resultado {
     grid-template-columns: 1fr;
   }
 
-  .agendamento,
   .resultadoPrincipal {
     border-right: 0;
     border-bottom: 1px solid var(--via-border-hairline);
   }
 
-  .agendamento {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-  }
-
-  .agendamento p {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 880px) {
-  .decisoes > div {
+  .proximaAcao {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .proximaAcao div + div {
+    padding-top: 0;
+    padding-left: var(--via-space-5);
+    border-top: 0;
+    border-left: 1px solid var(--via-border-hairline);
+  }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 599px) {
   .cabecalho,
   .rodapeFormulario,
-  .resultado footer {
+  .rodapeResultado {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .cabecalho,
+  .pendente,
+  .resultadoPrincipal,
+  .proximaAcao {
+    padding: var(--via-space-5);
   }
 
   .status {
     align-self: flex-start;
   }
 
-  .contexto,
-  .gradeCampos,
+  .agenda {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .agenda details {
+    grid-column: 1 / -1;
+    padding-top: var(--via-space-3);
+    border-top: 1px solid var(--via-border-hairline);
+  }
+
+  .agenda details form,
+  .agenda details > p {
+    position: static;
+    width: 100%;
+    margin-top: var(--via-space-3);
+  }
+
+  .agenda details form,
   .gradeProximoPasso,
-  .agendamento,
-  .decisoes > div {
+  .proximaAcao {
     grid-template-columns: 1fr;
   }
 
-  .contexto > div {
-    border-right: 0;
-    border-bottom: 1px solid var(--via-border-hairline);
+  .formulario {
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
   }
 
-  .contexto > div:last-child {
-    border-bottom: 0;
+  .decisoes > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .agendamento p {
-    grid-column: auto;
+  .decisoes label:last-child {
+    grid-column: 1 / -1;
   }
 
-  .rodapeFormulario button {
+  .proximaAcao div + div {
+    padding-top: var(--via-space-4);
+    padding-left: 0;
+    border-top: 1px solid var(--via-border-hairline);
+    border-left: 0;
+  }
+
+  .rodapeFormulario button,
+  .rodapeResultado a,
+  .rodapeResultado button {
     width: 100%;
+  }
+
+  .rodapeResultado {
+    padding: var(--via-space-4) var(--via-space-5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decisoes label,
+  .rodapeFormulario button {
+    transition: none;
+  }
+
+  .decisoes label:hover,
+  .rodapeFormulario button:hover:not(:disabled) {
+    transform: none;
   }
 }

@@ -4,15 +4,7 @@ import Link from 'next/link';
 import { useActionState, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useFormStatus } from 'react-dom';
-import {
-  ArrowRight,
-  BadgeCheck,
-  BriefcaseBusiness,
-  CalendarClock,
-  Check,
-  LoaderCircle,
-  X,
-} from 'lucide-react';
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, Check, LoaderCircle, X } from 'lucide-react';
 import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import { iniciarContinuidadeComercial } from '@/lib/projetos-execucao/evolucao-actions';
 import {
@@ -36,7 +28,7 @@ function ConfirmarContinuacao() {
       ) : (
         <BriefcaseBusiness size={16} aria-hidden="true" />
       )}
-      {pending ? 'Criando oportunidade…' : 'Criar oportunidade'}
+      {pending ? 'Criando…' : 'Criar oportunidade'}
     </button>
   );
 }
@@ -92,9 +84,9 @@ export function ContinuidadeComercial({
         href={`/vendas/${oportunidadeId}?origem=pos-entrega`}
         className={styles.abrirOportunidade}
       >
-        <BadgeCheck size={15} aria-hidden="true" />
-        Abrir oportunidade em Vendas
-        <ArrowRight size={15} aria-hidden="true" />
+        <BadgeCheck size={16} aria-hidden="true" />
+        Abrir em Vendas
+        <ArrowRight size={16} aria-hidden="true" />
       </Link>
     );
   }
@@ -108,9 +100,9 @@ export function ContinuidadeComercial({
         onClick={() => setAberto(true)}
         aria-haspopup="dialog"
       >
-        <BriefcaseBusiness size={15} aria-hidden="true" />
-        Levar para Vendas
-        <ArrowRight size={15} aria-hidden="true" />
+        <BriefcaseBusiness size={16} aria-hidden="true" />
+        Criar oportunidade
+        <ArrowRight size={16} aria-hidden="true" />
       </button>
 
       {montado &&
@@ -149,15 +141,10 @@ export function ContinuidadeComercial({
               }}
             >
               <header className={styles.topo}>
-                <span className={styles.iconeTopo} aria-hidden="true">
-                  <BriefcaseBusiness size={21} />
-                </span>
                 <div>
-                  <p>Próximo ciclo comercial</p>
-                  <h2 id={tituloId}>Levar este próximo passo para Vendas?</h2>
-                  <span id={descricaoId}>
-                    A nova ficha nasce com o contexto que você confirmou nesta entrega.
-                  </span>
+                  <p>Nova oportunidade</p>
+                  <h2 id={tituloId}>Criar uma nova venda?</h2>
+                  <span id={descricaoId}>Os dados desta entrega já serão aproveitados.</span>
                 </div>
                 <button
                   type="button"
@@ -182,37 +169,27 @@ export function ContinuidadeComercial({
                     <dd>{empresa}</dd>
                   </div>
                   <div>
-                    <dt>Decisão</dt>
+                    <dt>Venda</dt>
                     <dd>{ROTULO_DECISAO_EVOLUCAO[decisao]}</dd>
                   </div>
-                  <div className={styles.proximoPasso}>
-                    <dt>Próximo passo combinado</dt>
-                    <dd>{proximoPasso}</dd>
-                    {proximoPassoEm && (
-                      <small>
-                        <CalendarClock size={13} aria-hidden="true" />
-                        {formatarDataEvolucao(proximoPassoEm)}
-                      </small>
-                    )}
+                  <div>
+                    <dt>Próxima ação</dt>
+                    <dd>
+                      {proximoPasso}
+                      {proximoPassoEm && <time>{formatarDataEvolucao(proximoPassoEm)}</time>}
+                    </dd>
                   </div>
                 </dl>
 
-                <div className={styles.garantia}>
-                  <Check size={17} aria-hidden="true" />
-                  <div>
-                    <strong>Isso cria apenas uma oportunidade em Vendas.</strong>
-                    <span>
-                      A entrega atual continua concluída. Um novo projeto só nasce depois que outra
-                      proposta for aceita.
-                    </span>
-                  </div>
-                </div>
+                <p className={styles.nota}>
+                  <Check size={16} aria-hidden="true" /> Esta entrega continua concluída.
+                </p>
               </div>
 
               <form action={acao} className={styles.acoes}>
                 <input type="hidden" name="projeto" value={projetoId} />
                 <button type="button" className={styles.cancelar} onClick={fechar}>
-                  Agora não
+                  Cancelar
                 </button>
                 <ConfirmarContinuacao />
               </form>
