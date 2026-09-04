@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Grid2X2, LockKeyhole, X } from 'lucide-react';
@@ -62,13 +63,23 @@ export function NavLateral({
     if (!menuAberto) return;
 
     const overflowAnterior = document.body.style.overflow;
+    const superficies = Array.from(document.querySelectorAll<HTMLElement>('[data-app-shell]'));
+    const estadosInert = superficies.map((superficie) => superficie.inert);
+    superficies.forEach((superficie) => (superficie.inert = true));
     document.body.style.overflow = 'hidden';
     botaoFecharRef.current?.focus();
+
+    // Ao voltar ao desktop, o dock some e não pode manter a página bloqueada.
+    const desktop = window.matchMedia('(min-width: 1080px)');
+    const aoMudarLargura = () => {
+      if (desktop.matches) setMenuAberto(false);
+    };
+    desktop.addEventListener('change', aoMudarLargura);
 
     function aoPressionar(evento: KeyboardEvent) {
       if (evento.key === 'Escape') {
         setMenuAberto(false);
-        botaoMaisRef.current?.focus();
+        requestAnimationFrame(() => botaoMaisRef.current?.focus());
         return;
       }
 
@@ -92,6 +103,10 @@ export function NavLateral({
     window.addEventListener('keydown', aoPressionar);
     return () => {
       document.body.style.overflow = overflowAnterior;
+      superficies.forEach(
+        (superficie, indice) => (superficie.inert = estadosInert[indice] ?? false),
+      );
+      desktop.removeEventListener('change', aoMudarLargura);
       window.removeEventListener('keydown', aoPressionar);
     };
   }, [menuAberto]);
@@ -176,118 +191,120 @@ export function NavLateral({
 
     return (
       <nav className={styles.dock} aria-label="Navegação principal">
-        {menuAberto && (
-          <>
-            <button
-              type="button"
-              className={styles.fundoMenu}
-              aria-label="Fechar navegação ao tocar fora"
-              tabIndex={-1}
-              onClick={() => fecharMenu(true)}
-            />
+        {menuAberto &&
+          createPortal(
+            <div className={styles.menuOverlay} data-app-modal>
+              <button
+                type="button"
+                className={styles.fundoMenu}
+                aria-label="Fechar navegação ao tocar fora"
+                tabIndex={-1}
+                onClick={() => fecharMenu(true)}
+              />
 
-            <section
-              ref={painelMenuRef}
-              id={painelMenuId}
-              className={styles.painelMenu}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={tituloMenuId}
-            >
-              <header className={styles.cabecalhoMenu}>
-                <h2 id={tituloMenuId}>Mais</h2>
-                <button
-                  ref={botaoFecharRef}
-                  type="button"
-                  className={styles.fecharMenu}
-                  aria-label="Fechar navegação"
-                  onClick={() => fecharMenu(true)}
-                >
-                  <X size={18} strokeWidth={1.8} aria-hidden="true" />
-                </button>
-              </header>
-
-              <div className={styles.conteudoMenu}>
-                {ORDEM_GRUPOS.map((idGrupo) => {
-                  const itensDoGrupo = itensAdicionais.filter((item) => item.grupo === idGrupo);
-                  if (!itensDoGrupo.length) return null;
-
-                  return (
-                    <section className={styles.grupoMenu} key={idGrupo}>
-                      <h3>{ROTULOS_GRUPO_NAV[idGrupo]}</h3>
-                      <div className={styles.gradeMenu}>
-                        {itensDoGrupo.map((item) => {
-                          const ativo = estaAtivo(item);
-                          const destino = destinoDoItem(item);
-                          const carregando = destinoPendente === destino && !ativo;
-
-                          return (
-                            <Link
-                              href={destino}
-                              prefetch={destinosPreparados.has(destino)}
-                              className={styles.itemMenu}
-                              aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
-                              aria-current={ativo ? 'page' : undefined}
-                              aria-busy={carregando || undefined}
-                              data-bloqueado={item.bloqueado || undefined}
-                              data-loading={carregando || undefined}
-                              key={item.href}
-                              onMouseEnter={() => prepararDestino(item)}
-                              onFocus={() => prepararDestino(item)}
-                              onClick={(evento) => {
-                                iniciarNavegacao(evento, item);
-                                fecharMenu();
-                              }}
-                            >
-                              <span className={styles.iconeMenu} aria-hidden="true">
-                                {item.icone}
-                              </span>
-                              <span>{item.rotulo}</span>
-                              {item.bloqueado && (
-                                <small>
-                                  <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
-                                  Plano {item.planoNecessario ?? 'superior'}
-                                </small>
-                              )}
-                              {carregando && (
-                                <span className="sr-only">Carregando {item.rotulo}</span>
-                              )}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-
-              {itemConta && (
-                <div className={styles.contaMenuArea}>
-                  <Link
-                    href={itemConta.href}
-                    className={styles.contaMenu}
-                    aria-current={contaAtiva ? 'page' : undefined}
-                    aria-busy={contaCarregando || undefined}
-                    data-loading={contaCarregando || undefined}
-                    onClick={(evento) => {
-                      iniciarNavegacao(evento, itemConta);
-                      fecharMenu();
-                    }}
+              <section
+                ref={painelMenuRef}
+                id={painelMenuId}
+                className={styles.painelMenu}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={tituloMenuId}
+              >
+                <header className={styles.cabecalhoMenu}>
+                  <h2 id={tituloMenuId}>Mais</h2>
+                  <button
+                    ref={botaoFecharRef}
+                    type="button"
+                    className={styles.fecharMenu}
+                    aria-label="Fechar navegação"
+                    onClick={() => fecharMenu(true)}
                   >
-                    <span className={styles.iconeConta} aria-hidden="true">
-                      {itemConta.icone}
-                    </span>
-                    <span>
-                      <small>Conta</small>
-                      <strong>{itemConta.rotulo}</strong>
-                    </span>
-                    <em>{contaCarregando ? 'Abrindo…' : contaAtiva ? 'Atual' : 'Abrir'}</em>
-                  </Link>
+                    <X size={18} strokeWidth={1.8} aria-hidden="true" />
+                  </button>
+                </header>
+
+                <div className={styles.conteudoMenu}>
+                  {ORDEM_GRUPOS.map((idGrupo) => {
+                    const itensDoGrupo = itensAdicionais.filter((item) => item.grupo === idGrupo);
+                    if (!itensDoGrupo.length) return null;
+
+                    return (
+                      <section className={styles.grupoMenu} key={idGrupo}>
+                        <h3>{ROTULOS_GRUPO_NAV[idGrupo]}</h3>
+                        <div className={styles.gradeMenu}>
+                          {itensDoGrupo.map((item) => {
+                            const ativo = estaAtivo(item);
+                            const destino = destinoDoItem(item);
+                            const carregando = destinoPendente === destino && !ativo;
+
+                            return (
+                              <Link
+                                href={destino}
+                                prefetch={destinosPreparados.has(destino)}
+                                className={styles.itemMenu}
+                                aria-label={item.bloqueado ? explicacaoDoBloqueio(item) : undefined}
+                                aria-current={ativo ? 'page' : undefined}
+                                aria-busy={carregando || undefined}
+                                data-bloqueado={item.bloqueado || undefined}
+                                data-loading={carregando || undefined}
+                                key={item.href}
+                                onMouseEnter={() => prepararDestino(item)}
+                                onFocus={() => prepararDestino(item)}
+                                onClick={(evento) => {
+                                  iniciarNavegacao(evento, item);
+                                  fecharMenu();
+                                }}
+                              >
+                                <span className={styles.iconeMenu} aria-hidden="true">
+                                  {item.icone}
+                                </span>
+                                <span>{item.rotulo}</span>
+                                {item.bloqueado && (
+                                  <small>
+                                    <LockKeyhole size={11} strokeWidth={1.9} aria-hidden="true" />
+                                    Plano {item.planoNecessario ?? 'superior'}
+                                  </small>
+                                )}
+                                {carregando && (
+                                  <span className="sr-only">Carregando {item.rotulo}</span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    );
+                  })}
                 </div>
-              )}
-            </section>
-          </>
-        )}
+
+                {itemConta && (
+                  <div className={styles.contaMenuArea}>
+                    <Link
+                      href={itemConta.href}
+                      className={styles.contaMenu}
+                      aria-current={contaAtiva ? 'page' : undefined}
+                      aria-busy={contaCarregando || undefined}
+                      data-loading={contaCarregando || undefined}
+                      onClick={(evento) => {
+                        iniciarNavegacao(evento, itemConta);
+                        fecharMenu();
+                      }}
+                    >
+                      <span className={styles.iconeConta} aria-hidden="true">
+                        {itemConta.icone}
+                      </span>
+                      <span>
+                        <small>Conta</small>
+                        <strong>{itemConta.rotulo}</strong>
+                      </span>
+                      <em>{contaCarregando ? 'Abrindo…' : contaAtiva ? 'Atual' : 'Abrir'}</em>
+                    </Link>
+                  </div>
+                )}
+              </section>
+            </div>,
+            document.body,
+          )}
 
         <ul className={`${styles.lista} ${styles.listaDock}`}>
           {itensPrioritarios.map((item) => {
@@ -351,7 +368,7 @@ export function NavLateral({
               data-grupo={idGrupo}
               key={`${grupo}-${idGrupo}`}
             >
-              {idGrupo !== 'inicio' && (
+              {idGrupo !== 'inicio' && grupo !== 'admin' && (
                 <p className={styles.rotuloGrupo} aria-hidden="true">
                   {rotuloGrupo ?? ROTULOS_GRUPO_NAV[idGrupo]}
                 </p>

@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Award, ChevronDown, Cloud, Coins, CreditCard, LogOut, UserRound } from 'lucide-react';
+import { Award, ChevronDown, Coins, CreditCard, LogOut, UserRound } from 'lucide-react';
 import { Avatar } from '@/design-system/via';
 import { sair } from '@/lib/auth/actions';
 import styles from './MenuPerfil.module.css';
@@ -105,22 +105,34 @@ export function MenuPerfil({
       </button>
 
       {aberto && (
-        <div className={styles.painel} id={idMenu} role="menu">
+        <div
+          className={styles.painel}
+          id={idMenu}
+          role="menu"
+          aria-label="Minha conta"
+          onKeyDown={(evento) => {
+            if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(evento.key)) return;
+            evento.preventDefault();
+            const itens = Array.from(
+              evento.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+            );
+            const atual = itens.indexOf(document.activeElement as HTMLElement);
+            const proximo =
+              evento.key === 'Home'
+                ? 0
+                : evento.key === 'End'
+                  ? itens.length - 1
+                  : (atual + (evento.key === 'ArrowDown' ? 1 : -1) + itens.length) % itens.length;
+            itens[proximo]?.focus();
+          }}
+        >
           <div className={styles.identidade}>
             <Avatar alt={nome} size="md" aria-hidden="true" />
             <div className={styles.textosIdentidade}>
-              <span className={styles.sobretitulo}>Sua conta</span>
               <strong className={styles.nome}>{nome}</strong>
               <span className={styles.email}>{email}</span>
             </div>
-            <span className={styles.sincronizada}>
-              <Cloud size={13} strokeWidth={1.8} aria-hidden="true" />
-              Sincronizada
-            </span>
-            <span className={styles.planoSaldo}>
-              {PLANOS_SUBIDO[plano].nome}
-              {saldoCreditos !== null ? ` · ${saldoCreditos} créditos` : ''}
-            </span>
+            <span className={styles.planoSaldo}>Plano {PLANOS_SUBIDO[plano].nome}</span>
           </div>
 
           <div className={styles.itens}>
@@ -154,11 +166,7 @@ export function MenuPerfil({
               </span>
               <span>
                 <strong>Créditos</strong>
-                <small>
-                  {saldoCreditos !== null
-                    ? `${saldoCreditos} disponíveis · ver extrato`
-                    : 'Saldo e extrato'}
-                </small>
+                <small>Saldo e extrato</small>
               </span>
               <span className={styles.indicador} aria-hidden="true" />
             </Link>

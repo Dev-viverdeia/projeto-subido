@@ -7,9 +7,7 @@ describe('MapaJornada', () => {
     render(<MapaJornada nome="Rafael" plano="pro" />);
 
     expect(screen.getByText(/Rafael\.$/)).toBeVisible();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Qual é o próximo movimento?',
-    );
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Rafael\.$/);
     expect(screen.getByRole('heading', { name: 'Aprender e construir' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Vender' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Entregar' })).toBeVisible();
@@ -30,6 +28,9 @@ describe('MapaJornada', () => {
     );
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.queryByText('O que já está na sua mesa.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Domine o método.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Destravar')).not.toBeInTheDocument();
+    expect(within(atalhos).queryByText('Sobral AI')).not.toBeInTheDocument();
   });
 
   it('explica o upgrade antes de enviar um usuário Starter a uma área Pro', () => {
@@ -46,6 +47,13 @@ describe('MapaJornada', () => {
     expect(screen.getByRole('link', { name: 'Ver reuniões: Reuniões' })).toHaveAttribute(
       'href',
       '/reunioes',
+    );
+  });
+
+  it('recebe quem ainda não cadastrou o nome sem mostrar nome vazio', () => {
+    render(<MapaJornada nome={null} plano="pro" />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      /^(Bom dia|Boa tarde|Boa noite)\.$/,
     );
   });
 });

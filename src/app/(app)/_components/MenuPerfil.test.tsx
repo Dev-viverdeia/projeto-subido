@@ -78,6 +78,19 @@ describe('MenuPerfil', () => {
     expect(gatilho).toHaveTextContent('42créditos');
   });
 
+  it('permite navegar entre os destinos com setas e ir ao primeiro ou último', async () => {
+    const usuario = userEvent.setup();
+    render(<MenuPerfil nome="QA Subido" email="qa@viverdeia.ai" />);
+    screen.getByRole('button', { name: 'QA Subido' }).focus();
+    await usuario.keyboard('{ArrowDown}{ArrowDown}');
+    expect(screen.getByRole('menuitem', { name: /Créditos/ })).toHaveFocus();
+    await usuario.keyboard('{End}');
+    expect(screen.getByRole('menuitem', { name: 'Encerrar sessão' })).toHaveFocus();
+    await usuario.keyboard('{Home}');
+    expect(screen.getByRole('menuitem', { name: /Minha conta/ })).toHaveFocus();
+    expect(screen.queryByText('Sincronizada')).not.toBeInTheDocument();
+  });
+
   it('indica a central de créditos quando ela é a página atual', async () => {
     caminho = '/conta/creditos';
     const usuario = userEvent.setup();

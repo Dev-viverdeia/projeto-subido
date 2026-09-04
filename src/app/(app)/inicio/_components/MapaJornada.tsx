@@ -39,7 +39,6 @@ type Atalho = {
 
 type Grupo = {
   titulo: string;
-  descricao: string;
   variante: 'construir' | 'vender' | 'entregar';
   atalhos: readonly Atalho[];
 };
@@ -50,12 +49,11 @@ const TRACO = 1.65;
 const GRUPOS: readonly Grupo[] = [
   {
     titulo: 'Aprender e construir',
-    descricao: 'Domine o método.',
     variante: 'construir',
     atalhos: [
       {
         titulo: 'Formações',
-        descricao: 'Aprender',
+        descricao: 'Aulas práticas',
         acao: 'Ver formações',
         href: '/formacoes',
         recurso: 'aprendizado',
@@ -63,7 +61,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Projetos',
-        descricao: 'Implementar',
+        descricao: 'Guias de implementação',
         acao: 'Ver projetos',
         href: '/solucoes',
         recurso: 'projetos',
@@ -71,7 +69,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Estúdio',
-        descricao: 'Personalizar',
+        descricao: 'Projetos personalizados',
         acao: 'Abrir Estúdio',
         href: '/builder',
         recurso: 'estudio',
@@ -79,7 +77,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Mentorias',
-        descricao: 'Destravar',
+        descricao: 'Encontros com especialistas',
         acao: 'Ver mentorias',
         href: '/mentorias',
         recurso: 'mentorias',
@@ -89,12 +87,11 @@ const GRUPOS: readonly Grupo[] = [
   },
   {
     titulo: 'Vender',
-    descricao: 'Do lead ao contrato.',
     variante: 'vender',
     atalhos: [
       {
         titulo: 'Prospecção',
-        descricao: 'Encontrar clientes',
+        descricao: 'Encontrar empresas',
         acao: 'Buscar empresas',
         href: '/prospeccao',
         recurso: 'prospeccao',
@@ -102,7 +99,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Vendas',
-        descricao: 'Avançar oportunidades',
+        descricao: 'Acompanhar oportunidades',
         acao: 'Abrir vendas',
         href: '/vendas',
         recurso: 'vendas',
@@ -110,7 +107,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Reuniões',
-        descricao: 'Conduzir calls',
+        descricao: 'Calls com Live Coach',
         acao: 'Ver reuniões',
         href: '/reunioes',
         recurso: 'reunioes',
@@ -118,7 +115,7 @@ const GRUPOS: readonly Grupo[] = [
       },
       {
         titulo: 'Propostas',
-        descricao: 'Fechar',
+        descricao: 'Criar e enviar propostas',
         acao: 'Ver propostas',
         href: '/propostas',
         recurso: 'propostas',
@@ -128,12 +125,11 @@ const GRUPOS: readonly Grupo[] = [
   },
   {
     titulo: 'Entregar',
-    descricao: 'Execute com método.',
     variante: 'entregar',
     atalhos: [
       {
         titulo: 'Entregas',
-        descricao: 'Executar projetos',
+        descricao: 'Acompanhar projetos de clientes',
         acao: 'Ver entregas',
         href: '/entregas',
         recurso: 'projetos',
@@ -162,6 +158,7 @@ function AtalhoJornada({ atalho, plano }: { atalho: Atalho; plano: PlanoSubido }
   return (
     <Link
       href={destino}
+      prefetch={false}
       className={styles.atalho}
       data-bloqueado={bloqueado || undefined}
       aria-label={
@@ -196,24 +193,21 @@ export function MapaJornada({ nome, plano }: Props) {
   return (
     <div className={`${styles.pagina} pagina-mapa-jornada`}>
       <header className={styles.abertura}>
-        <span className={styles.saudacao}>
+        <h1>
           {saudacao}
           {nome ? `, ${nome}` : ''}.
-        </span>
-        <h1>Qual é o próximo movimento?</h1>
+        </h1>
       </header>
 
       <nav className={styles.painel} aria-label="Atalhos da plataforma">
         {GRUPOS.map((grupo) => (
           <section
             key={grupo.titulo}
-            className={`${styles.etapa} ${styles[grupo.variante]}`}
-            data-on-dark={grupo.variante === 'vender' || undefined}
+            className={`${styles.etapa} ${grupo.variante === 'entregar' ? styles.entregar : ''}`}
             aria-labelledby={`titulo-${grupo.variante}`}
           >
-            <header className={styles.cabecalhoEtapa}>
+            <header className={grupo.variante === 'entregar' ? 'sr-only' : styles.cabecalhoEtapa}>
               <h2 id={`titulo-${grupo.variante}`}>{grupo.titulo}</h2>
-              <p>{grupo.descricao}</p>
             </header>
 
             <div className={styles.listaAtalhos}>

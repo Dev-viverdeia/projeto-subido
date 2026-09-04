@@ -1,11 +1,22 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { AnchorHTMLAttributes } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ITEM_CONTA, ITENS_NAV } from './navegacao';
 import { NavLateral } from './NavLateral';
 
 let caminho = '/inicio';
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  );
+});
 
 vi.mock('next/navigation', () => ({
   usePathname: () => caminho,
@@ -24,9 +35,30 @@ afterEach(() => {
   cleanup();
   caminho = '/inicio';
   document.body.style.overflow = '';
+  vi.unstubAllGlobals();
 });
 
 describe('NavLateral no mobile', () => {
+  it('abre fora do vidro do dock, isola o fundo e devolve o foco ao fechar', async () => {
+    const usuario = userEvent.setup();
+    const { container } = render(
+      <div data-app-shell>
+        <NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />
+      </div>,
+    );
+    const moldura = container.querySelector<HTMLElement>('[data-app-shell]')!;
+    const mais = screen.getByRole('button', { name: 'Mais' });
+    await usuario.click(mais);
+    const painel = screen.getByRole('dialog');
+    expect(container.contains(painel)).toBe(false);
+    expect(moldura.inert).toBe(true);
+    expect(screen.getByRole('button', { name: 'Fechar navegação' })).toHaveFocus();
+    await usuario.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(moldura.inert).toBeFalsy();
+    await vi.waitFor(() => expect(mais).toHaveFocus());
+  });
+
   it('mantém o dock enxuto e oferece só as áreas adicionais no menu Mais', async () => {
     const usuario = userEvent.setup();
     render(<NavLateral itens={ITENS_NAV} itemConta={ITEM_CONTA} variante="dock" />);
