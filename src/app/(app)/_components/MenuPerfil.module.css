@@ -65,8 +65,8 @@
 
 .saldoRotulo {
   font-family: var(--via-font);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-micro);
+  font-size: var(--app-fs-meta);
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-text-muted);
 }
 
@@ -85,7 +85,11 @@
   right: 0;
   z-index: var(--via-z-overlay);
   width: min(340px, calc(100vw - 32px));
-  overflow: hidden;
+  max-height: calc(100dvh - var(--app-shell-header-h) - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--via-navy-14) transparent;
   border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-surface);
   background: var(--app-shell-overlay-bg);
@@ -120,18 +124,9 @@
   min-width: 0;
 }
 
-.sobretitulo,
 .nome,
 .email {
   display: block;
-}
-
-.sobretitulo {
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
 }
 
 .nome {
@@ -153,30 +148,10 @@
   white-space: nowrap;
 }
 
-.sincronizada {
-  grid-column: 1 / -1;
-  width: fit-content;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  margin-top: var(--via-space-1);
-  padding: 5px 9px;
-  border: 1px solid var(--via-border-soft);
-  border-radius: var(--via-radius-pill);
-  background: color-mix(in srgb, var(--via-white) 64%, transparent);
-  color: var(--via-text-muted);
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
 .planoSaldo {
-  grid-column: 1 / -1;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  grid-column: 2;
+  font-size: var(--app-fs-meta);
+  letter-spacing: var(--app-ls-caption);
   color: var(--via-text-soft);
 }
 
@@ -240,8 +215,8 @@
 
 .item small {
   margin-top: 2px;
-  color: var(--via-text-faint);
-  font-size: var(--app-fs-meta);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
 .indicador {
@@ -263,7 +238,7 @@
 
 .sair {
   width: 100%;
-  min-height: 42px;
+  min-height: var(--app-h-control);
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
@@ -284,7 +259,7 @@
   color: var(--via-text-primary);
 }
 
-@media (max-width: 460px) {
+@media (max-width: 599px) {
   .saldoGatilho {
     padding-inline: var(--via-space-2);
   }

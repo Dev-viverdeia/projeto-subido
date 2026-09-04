@@ -141,6 +141,15 @@
     ),
     color-mix(in srgb, var(--via-surface) 78%, transparent);
 
+  /* Cards de acesso: reflexo interno + sombra curta mantêm o recorte visível
+     no canvas claro. A elevação não depende de blur em cada item da grade. */
+  --app-glass-card-shadow:
+    inset 0 1px 0 var(--via-white), inset 0 -1px 0 var(--via-navy-04),
+    0 3px 6px -4px var(--via-navy-14), 0 16px 28px -18px var(--via-navy-20);
+  --app-glass-card-shadow-raised:
+    inset 0 1px 0 var(--via-white), inset 0 -1px 0 var(--via-navy-04),
+    0 4px 8px -4px var(--via-navy-14), 0 22px 36px -18px var(--via-navy-20);
+
   /* Shell autenticado. A moldura inteira usa a mesma família material para
      sidebar, cabeçalho e dock: vidro claro, borda iluminada e sombra navy baixa.
      Os números pertencem à geometria estrutural da aplicação, não a componentes. */
@@ -150,11 +159,11 @@
   --app-shell-panel-bg:
     linear-gradient(
       136deg,
-      rgba(255, 255, 255, 0.94) 0%,
-      rgba(255, 255, 255, 0.62) 42%,
-      rgba(247, 248, 250, 0.7) 100%
+      rgba(255, 255, 255, 0.68) 0%,
+      rgba(255, 255, 255, 0.12) 42%,
+      rgba(247, 248, 250, 0.28) 100%
     ),
-    color-mix(in srgb, var(--via-surface) 78%, transparent);
+    color-mix(in srgb, var(--via-surface) 72%, transparent);
   /* Menus carregam leitura e decisão. O brilho continua translúcido, mas a base
      é opaca para o conteúdo da página nunca competir com o texto do overlay. */
   --app-shell-overlay-bg:
@@ -165,10 +174,10 @@
       transparent 100%
     ),
     color-mix(in srgb, var(--via-surface) 97%, var(--via-bg-2));
-  --app-shell-panel-line: color-mix(in srgb, var(--via-white) 76%, var(--via-border));
+  --app-shell-panel-line: color-mix(in srgb, var(--via-navy) 9%, var(--via-white));
   --app-shell-panel-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 20px 52px -38px var(--via-navy-40),
-    0 6px 20px -18px var(--via-navy-20);
+    0 1px 0 rgba(255, 255, 255, 0.92) inset, 0 -1px 0 var(--via-navy-04) inset,
+    0 20px 52px -38px var(--via-navy-40), 0 6px 20px -18px var(--via-navy-20);
 }
 
 :root[data-theme='dark'] {

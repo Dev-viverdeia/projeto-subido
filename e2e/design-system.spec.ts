@@ -6,8 +6,8 @@ const TELAS = [
   ['/', 'As empresas já'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
-  ['/preview/mapa-jornada', 'Qual é o próximo movimento?'],
-  ['/preview/shell', 'Qual é o próximo movimento?'],
+  ['/preview/mapa-jornada', 'Mateus.'],
+  ['/preview/shell', 'Mateus.'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
   ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
@@ -75,7 +75,7 @@ test.describe('fundação visual Viver de IA', () => {
   test('a Início guia para as áreas da plataforma em um clique', async ({ page }) => {
     await page.goto('/preview/mapa-jornada');
 
-    await expect(page.getByRole('heading', { name: 'Qual é o próximo movimento?' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Mateus\./ })).toBeVisible();
     const atalhos = page.getByRole('navigation', { name: 'Atalhos da plataforma' });
     await expect(atalhos.getByRole('link')).toHaveCount(9);
     await expect(atalhos.getByRole('link', { name: 'Ver formações: Formações' })).toHaveAttribute(

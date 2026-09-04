@@ -1,187 +1,93 @@
 .pagina {
-  width: min(100%, 1240px);
+  width: min(100%, 1200px);
   margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(var(--via-space-5), 2.2vw, var(--via-space-7));
   color: var(--via-text-primary);
 }
 
 .abertura {
-  display: flex;
-  flex-direction: column;
-  padding-inline: var(--via-space-1);
-}
-
-.saudacao {
-  margin-bottom: var(--via-space-2);
-  color: var(--via-text-muted);
-  font-size: var(--app-fs-ui);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-sm);
+  padding-block: var(--via-space-2) var(--via-space-7);
 }
 
 .abertura h1 {
-  max-width: 22ch;
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(2.45rem, 4.2vw, 4.2rem);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-display);
-  line-height: 0.98;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 550;
+  letter-spacing: var(--app-ls-h1);
+  line-height: 1.16;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
+/* Os acessos são os cards. O agrupamento não acrescenta outra caixa em volta
+   deles, nem um hero que empurre as ferramentas para baixo. */
 .painel {
-  position: relative;
-  isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(220px, 0.7fr);
-  gap: var(--via-space-3);
-  overflow: hidden;
-  padding: var(--via-space-3);
-  border: 1px solid color-mix(in srgb, var(--via-white) 80%, var(--app-elev-2-line));
-  border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 96%, transparent),
-    0 28px 80px -52px var(--via-navy-40),
-    var(--app-elev-2-shadow);
-  backdrop-filter: blur(30px) saturate(145%);
-}
-
-.painel::before {
-  position: absolute;
-  z-index: -1;
-  inset: -36% 46% 52% -10%;
-  transform: skewX(-18deg);
-  border-right: 1px solid color-mix(in srgb, var(--via-white) 72%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--via-white) 58%, transparent),
-    transparent 68%
-  );
-  content: '';
-  pointer-events: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-6) var(--via-space-7);
 }
 
 .etapa {
-  position: relative;
-  display: flex;
   min-width: 0;
-  min-height: 386px;
-  flex-direction: column;
-  overflow: hidden;
-  padding: clamp(var(--via-space-4), 2vw, var(--via-space-5));
-  border: 1px solid color-mix(in srgb, var(--via-white) 84%, var(--via-border-soft));
-  border-radius: calc(var(--app-radius-card) - 2px);
-  background: color-mix(in srgb, var(--via-surface) 62%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 92%, transparent),
-    var(--via-shadow-xs);
-}
-
-.etapa::after {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    138deg,
-    color-mix(in srgb, var(--via-white) 18%, transparent),
-    transparent 46%
-  );
-  content: '';
-  pointer-events: none;
-}
-
-.cabecalhoEtapa,
-.listaAtalhos {
-  position: relative;
-  z-index: 1;
 }
 
 .cabecalhoEtapa {
-  padding: var(--via-space-1) var(--via-space-1) var(--via-space-4);
+  margin-bottom: var(--via-space-3);
+  padding-inline: var(--via-space-1);
 }
 
 .cabecalhoEtapa h2 {
   margin: 0;
-  font-family: var(--via-font-display);
-  font-size: clamp(1.35rem, 1.7vw, 1.72rem);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  line-height: 1.08;
-}
-
-.cabecalhoEtapa p {
-  margin: var(--via-space-1) 0 0;
   color: var(--via-text-muted);
-  font-size: var(--app-fs-support);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-sm);
   line-height: var(--app-lh-ui);
 }
 
 .listaAtalhos {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--via-space-2);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
 }
 
 .atalho {
-  position: relative;
   display: grid;
-  min-height: 66px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--via-space-3);
-  padding: var(--via-space-3);
-  border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-white) 46%, transparent);
+  grid-template-areas: 'icone destino' 'conteudo conteudo';
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 42px auto;
+  align-content: start;
+  gap: var(--via-space-4);
+  min-width: 0;
+  min-height: 156px;
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-control-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
   color: var(--via-text-primary);
   text-decoration: none;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 78%, transparent);
+  box-shadow: var(--app-glass-card-shadow);
   transition:
     transform var(--app-t-touch),
     border-color var(--app-t-state),
-    background-color var(--app-t-state),
     box-shadow var(--app-t-touch);
 }
 
-.atalho:hover {
-  z-index: 2;
-  transform: translateY(-2px);
-  border-color: var(--via-border);
-  background: color-mix(in srgb, var(--via-white) 76%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 94%, transparent),
-    var(--via-shadow-sm);
-}
-
-.atalho:focus-visible {
-  z-index: 3;
-  outline: none;
-  box-shadow: var(--app-ring), var(--via-shadow-sm);
-}
-
-.atalho[data-bloqueado='true'] {
-  background: color-mix(in srgb, var(--app-elev-1-bg) 52%, transparent);
-}
-
 .icone {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid color-mix(in srgb, var(--via-white) 80%, var(--via-border-soft));
-  border-radius: calc(var(--app-radius-control) - 3px);
-  background: color-mix(in srgb, var(--via-white) 55%, transparent);
+  grid-area: icone;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--app-control-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
   color: var(--via-navy);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 92%, transparent);
+  box-shadow: var(--app-control-shadow);
 }
 
 .conteudoAtalho {
+  grid-area: conteudo;
   min-width: 0;
 }
 
@@ -191,287 +97,114 @@
 }
 
 .conteudoAtalho strong {
-  font-family: var(--via-font-display);
-  font-size: 1.025rem;
-  font-weight: 560;
+  font-size: var(--via-fs-h4);
+  font-weight: 550;
   letter-spacing: var(--app-ls-h4);
-  line-height: 1.18;
+  line-height: 1.25;
 }
 
 .conteudoAtalho > span {
-  margin-top: 2px;
+  margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--app-fs-meta);
+  font-size: var(--app-fs-support);
   line-height: var(--app-lh-ui);
+  text-wrap: pretty;
 }
 
 .destino {
+  grid-area: destino;
   display: inline-flex;
   align-items: center;
+  align-self: start;
   justify-content: center;
-  min-width: 30px;
-  min-height: 30px;
-  color: var(--via-text-soft);
-  transition:
-    color var(--app-t-state),
-    transform var(--app-t-touch);
-}
-
-.atalho:hover .destino {
-  transform: translate(2px, -2px);
-  color: var(--via-navy);
-}
-
-.atalho[data-bloqueado='true'] .destino {
   gap: var(--via-space-1);
+  min-height: 32px;
   color: var(--via-text-muted);
 }
 
 .destino > span {
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
+  font-size: var(--app-fs-meta);
+  line-height: var(--app-lh-ui);
 }
 
-.vender {
-  border-color: color-mix(in srgb, var(--via-white) 13%, transparent);
-  background: var(--app-mesh-trilho);
-  color: var(--via-white);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 15%, transparent),
-    0 24px 48px -34px var(--via-navy);
+.atalho[data-bloqueado='true'] .destino {
+  padding-inline: var(--via-space-2);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-bg-2);
 }
 
-.vender::before {
-  position: absolute;
-  inset: -18% -16% auto 42%;
-  height: 62%;
-  transform: skewX(-20deg);
-  border-left: 1px solid color-mix(in srgb, var(--via-white) 10%, transparent);
-  background: linear-gradient(
-    130deg,
-    color-mix(in srgb, var(--via-white) 8%, transparent),
-    transparent
-  );
-  content: '';
-  pointer-events: none;
+@media (hover: hover) {
+  .atalho:hover {
+    transform: translateY(-2px);
+    border-color: var(--via-navy-20);
+    box-shadow: var(--app-glass-card-shadow-raised);
+  }
 }
 
-.vender::after {
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--via-white) 6%, transparent),
-    transparent 45%
-  );
+.atalho:focus-visible {
+  outline: none;
+  border-color: var(--via-navy-20);
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
 }
 
-.vender .cabecalhoEtapa p,
-.vender .conteudoAtalho > span {
-  color: color-mix(in srgb, var(--via-white) 62%, transparent);
+.atalho:active {
+  transform: translateY(0);
 }
 
-.vender .atalho {
-  border-color: color-mix(in srgb, var(--via-white) 12%, transparent);
-  background: color-mix(in srgb, var(--via-white) 7%, transparent);
-  color: var(--via-white);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 7%, transparent);
-}
-
-.vender .atalho:hover {
-  border-color: color-mix(in srgb, var(--via-white) 28%, transparent);
-  background: color-mix(in srgb, var(--via-white) 13%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--via-white) 14%, transparent),
-    0 16px 34px -24px var(--via-navy-darker);
-}
-
-.vender .atalho:focus-visible {
-  box-shadow: var(--app-ring-onnavy);
-}
-
-.vender .icone {
-  border-color: color-mix(in srgb, var(--via-white) 15%, transparent);
-  background: color-mix(in srgb, var(--via-white) 9%, transparent);
-  color: var(--via-white);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--via-white) 9%, transparent);
-}
-
-.vender .destino,
-.vender .atalho:hover .destino,
-.vender .atalho[data-bloqueado='true'] .destino {
-  color: color-mix(in srgb, var(--via-white) 72%, transparent);
+.entregar {
+  grid-column: 1 / -1;
 }
 
 .entregar .listaAtalhos {
-  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .entregar .atalho {
-  min-height: 210px;
-  flex: 1;
-  grid-template-areas:
-    'icone destino'
-    'conteudo conteudo';
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr;
-  align-items: start;
-  padding: var(--via-space-4);
-  background: color-mix(in srgb, var(--via-white) 58%, transparent);
-}
-
-.entregar .icone {
-  grid-area: icone;
-}
-
-.entregar .conteudoAtalho {
-  grid-area: conteudo;
-  align-self: end;
-}
-
-.entregar .conteudoAtalho strong {
-  font-size: 1.3rem;
+  grid-template-areas: 'icone conteudo destino';
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto;
+  align-items: center;
+  min-height: 84px;
+  padding-block: var(--via-space-4);
 }
 
 .entregar .destino {
-  grid-area: destino;
+  align-self: center;
 }
 
-@media (max-width: 899px) {
-  .painel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .entregar {
-    min-height: auto;
-    grid-column: 1 / -1;
-  }
-
-  .entregar .atalho {
-    min-height: 78px;
-    grid-template-areas: none;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-rows: auto;
-    align-items: center;
-  }
-
-  .entregar .icone,
-  .entregar .conteudoAtalho,
-  .entregar .destino {
-    grid-area: auto;
-  }
-
-  .entregar .conteudoAtalho {
-    align-self: center;
-  }
-}
-
-@media (max-width: 599px) {
-  .pagina {
-    gap: var(--via-space-5);
-  }
-
-  .abertura h1 {
-    font-size: clamp(2.1rem, 10vw, 2.8rem);
-  }
-
+@media (max-width: 767px) {
   .painel {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--via-space-3);
-    padding: var(--via-space-2);
+    gap: var(--via-space-6);
   }
 
-  .etapa,
-  .entregar {
-    min-height: auto;
-    grid-column: auto;
-    padding: var(--via-space-4);
+  .abertura {
+    padding-block: var(--via-space-2) var(--via-space-6);
   }
 
-  .cabecalhoEtapa {
-    padding: 0 0 var(--via-space-3);
-  }
-
-  .cabecalhoEtapa h2 {
-    font-size: 1.35rem;
-  }
-
-  .listaAtalhos {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .atalho,
-  .entregar .atalho {
-    min-height: 94px;
-    grid-template-areas:
-      'icone destino'
-      'conteudo conteudo';
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto 1fr;
-    align-items: start;
-    padding: var(--via-space-3);
-  }
-
-  .icone,
-  .entregar .icone {
-    grid-area: icone;
-    width: 36px;
-    height: 36px;
-  }
-
-  .conteudoAtalho,
-  .entregar .conteudoAtalho {
-    grid-area: conteudo;
-    align-self: end;
-  }
-
-  .destino,
-  .entregar .destino {
-    grid-area: destino;
-  }
-
-  .conteudoAtalho strong,
-  .entregar .conteudoAtalho strong {
-    font-size: var(--app-fs-ui);
-  }
-
-  .conteudoAtalho > span {
-    display: none;
-  }
-
-  .entregar .listaAtalhos {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .entregar .atalho {
-    min-height: 76px;
-    grid-template-areas: 'icone conteudo destino';
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-rows: auto;
-    align-items: center;
-  }
-
-  .entregar .conteudoAtalho {
-    align-self: center;
-  }
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .painel,
-  .etapa,
   .atalho {
-    background: var(--via-surface);
+    min-height: 136px;
+    padding: var(--via-space-4);
+    gap: var(--via-space-3);
   }
 
-  .vender {
-    background: var(--via-navy);
+  .conteudoAtalho strong {
+    font-size: var(--app-fs-reading);
+  }
+
+  .entregar .atalho {
+    min-height: 84px;
+    padding-inline: var(--via-space-4);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .atalho,
-  .destino {
+  .atalho {
     transition: none;
+  }
+
+  .atalho:hover {
+    transform: none;
   }
 }

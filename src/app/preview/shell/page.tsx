@@ -4,8 +4,15 @@ import { notFound } from 'next/navigation';
 import { MapaJornada } from '@/app/(app)/inicio/_components/MapaJornada';
 import { CabecalhoApp } from '@/app/(app)/_components/CabecalhoApp';
 import { NavLateral } from '@/app/(app)/_components/NavLateral';
-import { ITEM_CONTA, ITENS_NAV } from '@/app/(app)/_components/navegacao';
-import { ProvedorDeTrilha } from '@/app/(app)/_components/trilha/contexto';
+import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from '@/app/(app)/_components/navegacao';
+import { DefinirTrilha, ProvedorDeTrilha } from '@/app/(app)/_components/trilha/contexto';
+import {
+  PLANOS_SUBIDO,
+  RECURSOS_SUBIDO,
+  destinoDeUpgrade,
+  planoPodeAcessarRota,
+  recursoDaRota,
+} from '@/lib/planos/acessos';
 import shellStyles from '@/app/(app)/layout.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 
@@ -15,11 +22,30 @@ export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
  * Bancada visual do shell autenticado. Usa os componentes e o CSS reais para a
  * validação local não aprovar uma moldura diferente da que chega ao usuário.
  */
-export default function PreviewShellPage() {
+export default async function PreviewShellPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plano?: string; nome?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const params = await searchParams;
+  const plano = params.plano === 'starter' ? 'starter' : 'pro';
+  const nome = params.nome === 'longo' ? 'Maria Aparecida de Albuquerque' : 'Mateus';
+  const itens = ITENS_NAV.map((item) => {
+    const recurso = recursoDaRota(item.href);
+    const bloqueado = !planoPodeAcessarRota(plano, item.href);
+    return {
+      ...item,
+      bloqueado,
+      destinoBloqueado: bloqueado && recurso ? destinoDeUpgrade(recurso, item.href) : undefined,
+      planoNecessario:
+        bloqueado && recurso ? PLANOS_SUBIDO[RECURSOS_SUBIDO[recurso].planoMinimo].nome : undefined,
+    };
+  });
 
   return (
     <ProvedorDeTrilha>
+      <DefinirTrilha atual="Início" />
       <div className={shellStyles.shell} data-app-shell>
         <a href="#conteudo" className="via-skip-link">
           Pular para o conteúdo
@@ -29,24 +55,32 @@ export default function PreviewShellPage() {
           <Link href="/inicio" className={shellStyles.marcaSidebar} aria-label="Ir para o início">
             <SubidoLogo size={18} />
           </Link>
-          <NavLateral itens={ITENS_NAV} variante="lateral" caminhoAtual="/inicio" />
+          <NavLateral itens={itens} variante="lateral" caminhoAtual="/inicio" />
+          <div className={shellStyles.rodapeSidebar}>
+            <NavLateral
+              itens={[ITEM_ADMIN]}
+              variante="lateral"
+              grupo="admin"
+              rotuloGrupo="Gestão"
+            />
+          </div>
         </aside>
 
         <CabecalhoApp
-          nome="Mateus"
+          nome={nome}
           email="mateus@exemplo.com"
           saldoCreditos={84}
-          plano="pro"
+          plano={plano}
           pendencias={[]}
           logo={<SubidoLogo size={17} />}
         />
 
         <main className={shellStyles.conteudo} id="conteudo">
-          <MapaJornada nome="Mateus" plano="pro" />
+          <MapaJornada nome={nome} plano={plano} />
         </main>
 
         <NavLateral
-          itens={ITENS_NAV}
+          itens={[...itens, ITEM_ADMIN]}
           itemConta={ITEM_CONTA}
           variante="dock"
           caminhoAtual="/inicio"
