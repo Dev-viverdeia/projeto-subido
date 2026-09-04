@@ -53,10 +53,12 @@ function IconeRede({ rede }: { rede: RedeSocial['rede'] }) {
 
 export function ModalDossie({
   lead: selecionado,
+  lista,
   onClose,
   retornarFoco,
 }: {
   lead: Lead;
+  lista?: string;
   onClose: () => void;
   retornarFoco: HTMLButtonElement | null;
 }) {
@@ -359,6 +361,7 @@ export function ModalDossie({
               <p>Adicione a empresa a Vendas com os contatos e decisores já preenchidos.</p>
               <BotaoEnviarCrm
                 lead={selecionado.id}
+                lista={lista}
                 oportunidade={selecionado.crm_oportunidade_id}
                 className={styles.crmAction}
               />

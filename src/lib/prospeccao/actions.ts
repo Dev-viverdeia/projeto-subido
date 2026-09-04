@@ -123,7 +123,10 @@ export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
   const oportunidade = z.uuid().safeParse(data);
   if (error || !oportunidade.success) {
     console.error(`[prospeccao:crm] ${error?.code ?? 'sem-id'}: ${error?.message ?? ''}`);
-    redirect('/prospeccao?crm=erro');
+    const lista = z.uuid().safeParse(formData.get('lista'));
+    const retorno = new URLSearchParams({ crm: 'erro' });
+    if (lista.success) retorno.set('lista', lista.data);
+    redirect(`/prospeccao?${retorno.toString()}`);
   }
 
   revalidatePath('/prospeccao');

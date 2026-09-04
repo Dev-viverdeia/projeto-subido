@@ -205,7 +205,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                   <p>Revise o recorte e crie uma nova lista. O saldo já foi restaurado.</p>
                 </div>
               ) : (
-                <ListaResultados leads={leads} />
+                <ListaResultados leads={leads} lista={listaAtual.id} />
               )}
             </>
           ) : (
