@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
 import { oportunidadeTemDescobertaConcluida } from '@/lib/calls/descoberta';
-import { obterPosCall } from '@/lib/calls/queries';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
@@ -16,11 +15,16 @@ import type { Json } from '@/lib/supabase/types.generated';
 import { montarDocumentoInicial, type OrigemProposta } from './montar';
 import { DocumentoPropostaSchema } from './schema';
 import { obterPropostaDaReuniao, type StatusProposta } from './queries';
+import { resolverReuniaoProposta } from './contexto-reuniao';
+import { retornoNovaProposta } from './retorno-nova';
 
 const NovaPropostaSchema = z.object({
   oportunidade: z.uuid(),
   origem: z.string().min(1).max(200),
-  reuniao: z.preprocess((valor) => (valor === '' ? undefined : valor), z.uuid().optional()),
+  reuniao: z.preprocess(
+    (valor) => (valor === '' || valor === null ? undefined : valor),
+    z.uuid().optional(),
+  ),
 });
 
 const SalvarSchema = z.object({
@@ -85,34 +89,31 @@ async function resolverOrigem(valor: string): Promise<OrigemProposta | null> {
 
 export async function criarProposta(formData: FormData): Promise<void> {
   await exigirRecurso('propostas');
-  const validacao = NovaPropostaSchema.safeParse({
+  const campos = {
     oportunidade: formData.get('oportunidade'),
     origem: formData.get('origem'),
     reuniao: formData.get('reuniao'),
-  });
-  if (!validacao.success) redirect('/propostas/nova?erro=campos');
+  };
+  const validacao = NovaPropostaSchema.safeParse(campos);
+  if (!validacao.success) redirect(retornoNovaProposta(campos, 'campos'));
 
   const descobertaConcluida = await oportunidadeTemDescobertaConcluida(validacao.data.oportunidade);
   if (!descobertaConcluida) {
-    const parametros = new URLSearchParams({
-      oportunidade: validacao.data.oportunidade,
-      erro: 'descoberta',
-    });
-    const [tipoOrigem, idOrigem] = validacao.data.origem.split(':', 2);
-    if (tipoOrigem === 'projeto' && idOrigem) parametros.set('projeto', idOrigem);
-    if (tipoOrigem === 'estudio' && idOrigem) parametros.set('builder', idOrigem);
-    redirect(`/propostas/nova?${parametros.toString()}`);
+    redirect(retornoNovaProposta(validacao.data, 'descoberta'));
   }
 
   const [{ supabase, user }, lead, origem, posCall, perfilComercial] = await Promise.all([
     usuarioAtual(),
     obterDossieLead(validacao.data.oportunidade),
     resolverOrigem(validacao.data.origem),
-    validacao.data.reuniao ? obterPosCall(validacao.data.reuniao) : Promise.resolve(null),
+    resolverReuniaoProposta(validacao.data.oportunidade, validacao.data.reuniao),
     obterPerfilComercial(),
   ]);
   if (!user) redirect('/entrar');
-  if (!lead || !origem) redirect('/propostas/nova?erro=indisponivel');
+  if (!lead || !origem) redirect(retornoNovaProposta(validacao.data, 'indisponivel'));
+  if (validacao.data.reuniao && !posCall) {
+    redirect(retornoNovaProposta({ ...validacao.data, reuniao: undefined }, 'reuniao'));
+  }
 
   const reuniaoId =
     posCall?.oportunidade.id === validacao.data.oportunidade ? posCall.reuniao.id : null;
@@ -163,7 +164,7 @@ export async function criarProposta(formData: FormData): Promise<void> {
       if (existente) redirect(`/propostas/${existente.id}?origem=call`);
     }
     console.error(`[propostas:criar] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`);
-    redirect('/propostas/nova?erro=salvar');
+    redirect(retornoNovaProposta({ ...validacao.data, reuniao: reuniaoId }, 'salvar'));
   }
 
   revalidatePath('/propostas');

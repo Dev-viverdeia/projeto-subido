@@ -74,7 +74,10 @@ export function FormularioAgendarCall({
   const precisaConfigurarCalendar = !calendar.conectado;
   const ehKickoff = tipoSelecionado === 'kickoff';
   const podeAgendar = !precisaConfigurarCalendar && (!comercialLiberado || disponiveis.length > 0);
-  const retornoCalendar = `/reunioes?nova=1${oportunidadeSelecionada?.id ? `&oportunidade=${oportunidadeSelecionada.id}` : ''}`;
+  const parametrosCalendar = new URLSearchParams({ nova: '1', tipo: tipoSelecionado });
+  if (oportunidadeSelecionada?.id)
+    parametrosCalendar.set('oportunidade', oportunidadeSelecionada.id);
+  const retornoCalendar = `/reunioes?${parametrosCalendar.toString()}`;
   const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
 
   useEffect(() => {

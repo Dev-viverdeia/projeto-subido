@@ -191,9 +191,32 @@ describe('FormularioAgendarCall', () => {
     expect(screen.getByRole('link', { name: /Conectar Google Calendar/ })).toHaveAttribute(
       'href',
       expect.stringContaining(
-        encodeURIComponent(`/reunioes?nova=1&oportunidade=${OPORTUNIDADE.id}`),
+        encodeURIComponent(`/reunioes?nova=1&tipo=descoberta&oportunidade=${OPORTUNIDADE.id}`),
       ),
     );
+  });
+
+  it('preserva o kickoff e o cliente no retorno da autorização do Google', () => {
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+        tipoInicial="kickoff"
+        calendar={{
+          configurado: true,
+          conectado: false,
+          email: null,
+          status: 'desconectada',
+          ultimoErro: null,
+        }}
+      />,
+    );
+    const href = screen
+      .getByRole('link', { name: /Conectar Google Calendar/ })
+      .getAttribute('href')!;
+    const retorno = new URL(href, 'https://teste.local').searchParams.get('retorno');
+    expect(retorno).toBe(`/reunioes?nova=1&tipo=kickoff&oportunidade=${OPORTUNIDADE.id}`);
   });
 
   it('bloqueia o formulário enquanto a integração do Calendar não estiver ativa', () => {

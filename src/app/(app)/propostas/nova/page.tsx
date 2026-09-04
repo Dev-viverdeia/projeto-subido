@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { obterPosCall } from '@/lib/calls/queries';
+import { resolverReuniaoProposta } from '@/lib/propostas/contexto-reuniao';
 import { listarOpcoesNovaProposta, obterPropostaDaReuniao } from '@/lib/propostas/queries';
 import { MontadorProposta } from './_components/MontadorProposta';
 import styles from './pagina.module.css';
@@ -18,14 +18,19 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
       ? `projeto:${parametros.projeto}`
       : typeof parametros.builder === 'string'
         ? `estudio:${parametros.builder}`
-        : '';
-  const reuniaoInicial = typeof parametros.reuniao === 'string' ? parametros.reuniao : '';
+        : parametros.origem === 'sem-base'
+          ? 'sem-base'
+          : '';
+  const reuniaoSolicitada = typeof parametros.reuniao === 'string' ? parametros.reuniao : '';
   const erro = typeof parametros.erro === 'string' ? parametros.erro : null;
-  const [opcoes, posCall, propostaExistente] = await Promise.all([
+  const [opcoes, posCall] = await Promise.all([
     listarOpcoesNovaProposta(),
-    reuniaoInicial ? obterPosCall(reuniaoInicial) : Promise.resolve(null),
-    reuniaoInicial ? obterPropostaDaReuniao(reuniaoInicial) : Promise.resolve(null),
+    oportunidadeInicial
+      ? resolverReuniaoProposta(oportunidadeInicial, reuniaoSolicitada)
+      : Promise.resolve(null),
   ]);
+  const reuniaoInicial = posCall?.reuniao.id ?? '';
+  const propostaExistente = reuniaoInicial ? await obterPropostaDaReuniao(reuniaoInicial) : null;
   if (propostaExistente) redirect(`/propostas/${propostaExistente.id}?origem=reuniao`);
   const analise =
     posCall?.oportunidade.id === oportunidadeInicial &&
@@ -44,36 +49,33 @@ export default async function NovaPropostaPage({ searchParams }: PageProps<'/pro
           oportunidadesProjeto: analise.oportunidadesProjeto,
         }
       : null;
-  const veioDaCall = Boolean(contextoCall);
+  const retorno =
+    reuniaoSolicitada && posCall
+      ? { href: `/reunioes/${posCall.reuniao.id}`, rotulo: 'Voltar à reunião' }
+      : opcoes.oportunidades.some((item) => item.id === oportunidadeInicial)
+        ? { href: `/vendas/${oportunidadeInicial}`, rotulo: 'Voltar à ficha' }
+        : { href: '/propostas', rotulo: 'Voltar às propostas' };
 
   return (
     <div className={styles.pagina}>
-      <Link href="/propostas" className={styles.voltar}>
+      <Link href={retorno.href} className={styles.voltar}>
         <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
-        Voltar às propostas
+        {retorno.rotulo}
       </Link>
 
       <header className={styles.hero}>
-        <div>
-          <p className={styles.sobretitulo}>
-            {veioDaCall ? 'Proposta a partir da reunião' : 'Nova proposta'}
-          </p>
-          <h1>{veioDaCall ? 'Criar proposta da reunião' : 'Criar proposta'}</h1>
-        </div>
-        <p>
-          {veioDaCall
-            ? 'Escolha o projeto. O rascunho já usa os fatos confirmados na reunião.'
-            : 'Escolha o cliente e o projeto. Você revisa o rascunho antes de apresentar.'}
-        </p>
+        <h1>Criar proposta</h1>
+        <p>Do que foi conversado ao que você vai entregar.</p>
       </header>
 
       <MontadorProposta
+        key={[oportunidadeInicial, origemInicial, reuniaoInicial, erro].join(':')}
         opcoes={opcoes}
         oportunidadeInicial={oportunidadeInicial}
         origemInicial={origemInicial}
         reuniaoInicial={reuniaoInicial}
         contextoCall={contextoCall}
-        erro={erro}
+        erro={erro || (reuniaoSolicitada && !posCall ? 'reuniao' : null)}
       />
     </div>
   );

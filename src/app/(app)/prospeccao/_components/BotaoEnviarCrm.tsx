@@ -23,11 +23,13 @@ function BotaoPendente({ compacto = false }: { compacto?: boolean }) {
 
 export function BotaoEnviarCrm({
   lead,
+  lista,
   oportunidade = null,
   compacto = false,
   className,
 }: {
   lead?: string;
+  lista?: string;
   oportunidade?: string | null;
   compacto?: boolean;
   className?: string;
@@ -48,6 +50,7 @@ export function BotaoEnviarCrm({
   return (
     <form action={enviarLeadAoCrm} className={className}>
       <input type="hidden" name="lead" value={lead} />
+      {lista && <input type="hidden" name="lista" value={lista} />}
       <BotaoPendente compacto={compacto} />
     </form>
   );

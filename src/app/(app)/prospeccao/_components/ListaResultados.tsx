@@ -70,7 +70,7 @@ function Canal({
   );
 }
 
-export function ListaResultados({ leads }: { leads: Lead[] }) {
+export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: string }) {
   const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [retornarFoco, setRetornarFoco] = useState<HTMLButtonElement | null>(null);
   const fecharModal = useCallback(() => setSelecionadoId(null), []);
@@ -237,6 +237,7 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
                 </button>
                 <BotaoEnviarCrm
                   lead={lead.id}
+                  lista={lista}
                   oportunidade={lead.crm_oportunidade_id}
                   compacto
                   className={styles.acaoCrmLead}
@@ -248,7 +249,12 @@ export function ListaResultados({ leads }: { leads: Lead[] }) {
       </div>
 
       {selecionado && (
-        <ModalDossie lead={selecionado} onClose={fecharModal} retornarFoco={retornarFoco} />
+        <ModalDossie
+          lead={selecionado}
+          lista={lista}
+          onClose={fecharModal}
+          retornarFoco={retornarFoco}
+        />
       )}
     </>
   );

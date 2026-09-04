@@ -48,8 +48,11 @@ const OPCOES: OpcoesNovaProposta = {
   ],
 };
 
-export default function PreviewNovaPropostaPage() {
+export default async function PreviewNovaPropostaPage({
+  searchParams,
+}: PageProps<'/preview/proposta-nova'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const { estado } = await searchParams;
 
   return (
     <div className={styles.shell}>
@@ -79,16 +82,15 @@ export default function PreviewNovaPropostaPage() {
       <main id="conteudo" className={styles.conteudo}>
         <div className={pagina.pagina}>
           <header className={pagina.hero}>
-            <div>
-              <p className={pagina.sobretitulo}>Nova proposta</p>
-              <h1>Criar proposta</h1>
-            </div>
-            <p>Escolha o projeto. O rascunho já usa os fatos confirmados na reunião.</p>
+            <h1>Criar proposta</h1>
+            <p>Do que foi conversado ao que você vai entregar.</p>
           </header>
           <MontadorProposta
-            opcoes={OPCOES}
-            oportunidadeInicial="11111111-1111-4111-8111-111111111111"
-            origemInicial=""
+            opcoes={estado === 'vazio' ? { ...OPCOES, oportunidades: [] } : OPCOES}
+            oportunidadeInicial={
+              estado === 'lista' || estado === 'vazio' ? '' : '11111111-1111-4111-8111-111111111111'
+            }
+            origemInicial={estado === 'erro' ? 'sem-base' : ''}
             reuniaoInicial="55555555-5555-4555-8555-555555555555"
             contextoCall={{
               titulo: 'Descoberta comercial · Clínica Aurora',
@@ -99,7 +101,7 @@ export default function PreviewNovaPropostaPage() {
               pontosAValidar: 2,
               oportunidadesProjeto: ['Atendimento com IA no WhatsApp'],
             }}
-            erro={null}
+            erro={estado === 'erro' ? 'salvar' : null}
           />
         </div>
       </main>
