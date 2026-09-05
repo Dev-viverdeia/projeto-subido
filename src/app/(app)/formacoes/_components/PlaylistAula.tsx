@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, Play, Circle } from 'lucide-react';
+import { BookOpen, Check, Play, Circle } from 'lucide-react';
 import { Button, Drawer } from '@/design-system/via';
 import type { FormacaoCompleta } from '@/lib/conteudo/queries';
 import { TrilhoProgresso } from '../../_components/TrilhoProgresso';
@@ -36,6 +36,7 @@ function Painel({
   onEscolher?: () => void;
 }) {
   const curriculo = useCurriculo(formacao);
+  const painelId = useId();
   const moduloDaAtual =
     formacao.modulos.find((m) => m.aulas.some((a) => a.id === aulaAtualId))?.id ?? null;
 
@@ -53,6 +54,8 @@ function Painel({
   const painelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Não desfaz a escolha de quem abriu outro módulo para revisar uma aula.
+    if (aberto !== moduloDaAtual) return;
     const painel =
       painelRef.current?.closest<HTMLElement>('.via-drawer__body') ?? painelRef.current;
     const linha = linhaAtualRef.current;
@@ -63,15 +66,16 @@ function Painel({
     if (item.top < area.top || item.bottom > area.bottom) {
       painel.scrollTop += item.top - area.top - (painel.clientHeight - item.height) / 2;
     }
-  }, [aulaAtualId, aberto]);
+  }, [aulaAtualId, aberto, moduloDaAtual]);
 
   return (
-    <div className={styles.painel} ref={painelRef}>
+    <div className={styles.painel}>
       <header className={styles.cabecalhoPainel}>
-        <p>Suas aulas</p>
-        <h2>{formacao.titulo}</h2>
-      </header>
-      <div className={styles.topo}>
+        <h2>
+          <Link href={`/formacoes/${formacao.slug}`} className={styles.voltarCurso}>
+            {formacao.titulo}
+          </Link>
+        </h2>
         <TrilhoProgresso
           itens={curriculo.planas}
           feitasIds={curriculo.feitasIds}
@@ -79,26 +83,37 @@ function Painel({
           unidade={{ singular: 'aula', plural: 'aulas' }}
           denso
         />
-      </div>
+      </header>
 
-      <div className={styles.modulos}>
-        {curriculo.modulos.map(({ modulo, aulas }, indice) => {
+      <div className={styles.modulos} ref={painelRef}>
+        {curriculo.modulos.map(({ modulo, aulas, completo }) => {
           const estaAberto = aberto === modulo.id;
+          const gatilhoId = `${painelId}-gatilho-${modulo.id}`;
+          const aulasId = `${painelId}-aulas-${modulo.id}`;
           return (
             <section key={modulo.id} className={styles.modulo}>
               <button
+                id={gatilhoId}
                 type="button"
                 className={styles.gatilho}
                 aria-expanded={estaAberto}
+                aria-controls={aulasId}
                 onClick={() => setAberto(estaAberto ? null : modulo.id)}
               >
-                <span className={styles.numero}>{String(indice + 1).padStart(2, '0')}</span>
+                <span
+                  className={styles.iconeModulo}
+                  data-completo={completo ? '' : undefined}
+                  aria-hidden="true"
+                >
+                  {completo ? <Check size={16} /> : <BookOpen size={18} />}
+                </span>
                 <span className={styles.nomeModulo}>{modulo.titulo}</span>
+                {completo && <span className="sr-only">Módulo concluído.</span>}
                 <svg
                   className={styles.chevron}
                   data-aberto={estaAberto ? '' : undefined}
-                  width="12"
-                  height="12"
+                  width="16"
+                  height="16"
                   viewBox="0 0 14 14"
                   fill="none"
                   aria-hidden="true"
@@ -113,7 +128,13 @@ function Painel({
               </button>
 
               <div className={styles.dobra} data-aberto={estaAberto ? '' : undefined}>
-                <div className={styles.aulas} inert={!estaAberto}>
+                <div
+                  id={aulasId}
+                  className={styles.aulas}
+                  role="region"
+                  aria-labelledby={gatilhoId}
+                  inert={!estaAberto}
+                >
                   {aulas.map(({ aula, status }) => {
                     const atual = aula.id === aulaAtualId;
                     const duracao = formatarDuracao(aula.duracao_seg);
@@ -131,6 +152,7 @@ function Painel({
                         <span
                           className={styles.pontoStatus}
                           data-status={status}
+                          data-atual={atual ? '' : undefined}
                           aria-hidden="true"
                         >
                           {status === 'concluida' ? (
@@ -142,6 +164,7 @@ function Painel({
                           )}
                         </span>
                         <span className={styles.tituloAula}>{aula.titulo}</span>
+                        {status === 'concluida' && <span className="sr-only">Aula concluída.</span>}
                         {duracao && <span className={styles.duracao}>{duracao}</span>}
                       </Link>
                     );

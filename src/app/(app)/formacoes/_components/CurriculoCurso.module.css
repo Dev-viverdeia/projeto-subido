@@ -39,17 +39,15 @@
 .iconeModulo {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--app-control-bg);
+  width: 28px;
+  height: 28px;
+  justify-self: center;
+  border-radius: var(--via-radius-pill);
   color: var(--via-text-muted);
-  box-shadow: var(--app-control-shadow);
 }
 
 .iconeModulo[data-completo] {
-  background: var(--app-mesh-trilho);
+  background: var(--via-navy);
   color: var(--via-white);
 }
 

@@ -58,10 +58,7 @@ export function NavAula({
           aria-label={`Aula anterior: ${anteriorTitulo}`}
         >
           <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
-          <span>
-            <small>Anterior</small>
-            <strong>{anteriorTitulo}</strong>
-          </span>
+          <span>Anterior</span>
         </Link>
       ) : (
         <span className={styles.limite} aria-hidden="true" />
@@ -69,7 +66,7 @@ export function NavAula({
 
       {concluida ? (
         <span className={styles.feita} role="status">
-          <svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
             <circle cx="9" cy="9" r="8" fill="currentColor" />
             <path
               d="m5.6 9.2 2.2 2.2 4.4-4.8"
@@ -92,16 +89,19 @@ export function NavAula({
           href={hrefAula(proximaId)}
           className={styles.vizinha}
           data-direcao="proxima"
+          data-destaque={concluida ? '' : undefined}
           aria-label={`Próxima aula: ${proximaTitulo}`}
         >
-          <span>
-            <small>Próxima</small>
-            <strong>{proximaTitulo}</strong>
-          </span>
+          <span>Próxima</span>
           <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
         </Link>
       ) : (
-        <Link href={`/formacoes/${formacaoSlug}`} className={styles.vizinha} data-direcao="proxima">
+        <Link
+          href={`/formacoes/${formacaoSlug}`}
+          className={styles.vizinha}
+          data-direcao="proxima"
+          data-destaque={concluida ? '' : undefined}
+        >
           Voltar à formação <ArrowRight size={15} aria-hidden="true" />
         </Link>
       )}

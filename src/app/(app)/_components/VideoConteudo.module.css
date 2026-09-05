@@ -7,7 +7,7 @@
   border: 1px solid var(--via-navy-22);
   border-radius: var(--via-radius-lg);
   background: var(--via-navy-deep);
-  box-shadow: var(--via-shadow-xl);
+  box-shadow: var(--app-glass-card-shadow);
 }
 
 /* Dentro de banda navy: a borda navy some e a sombra não tem o que escurecer.
@@ -27,8 +27,7 @@
   border: none;
 }
 
-/* Capa clicável: o orbe é o único ponto de cor — accent sobre escuro, onde ele
-   é legível (6,5:1). */
+/* Controle claro sobre o player navy; sem halo ou cromática paralela. */
 .capa {
   display: flex;
   flex-direction: column;
@@ -47,15 +46,18 @@
   width: 64px;
   height: 64px;
   border-radius: var(--via-radius-pill);
-  background: var(--via-accent);
+  border: 1px solid var(--via-white);
+  background: var(--app-glass-base);
   color: var(--via-navy-deep);
   padding-left: 4px;
-  box-shadow: var(--via-shadow-lg);
+  box-shadow: var(--app-control-shadow), var(--via-shadow-lg);
   transition: transform var(--app-t-touch);
 }
 
-.capa:hover .orbe {
-  transform: scale(1.06);
+@media (prefers-reduced-motion: no-preference) {
+  .capa:hover .orbe {
+    transform: scale(1.04);
+  }
 }
 
 .capa:focus-visible {
@@ -66,7 +68,7 @@
 }
 
 .assistir {
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   color: var(--via-white);
 }
@@ -84,10 +86,7 @@
 
 .vazioTexto {
   margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  font-size: var(--app-fs-support);
 }
 
 @media (prefers-reduced-motion: reduce) {
