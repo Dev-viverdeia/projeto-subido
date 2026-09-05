@@ -1,18 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import {
-  ArrowUpRight,
-  BriefcaseBusiness,
-  ContactRound,
-  DraftingCompass,
-  FileSignature,
-  FolderKanban,
-  GraduationCap,
-  LockKeyhole,
-  Search,
-  Users,
-  Video,
-} from 'lucide-react';
+import { ArrowUpRight, LockKeyhole } from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import {
   destinoDeUpgrade,
   PLANOS_SUBIDO,
@@ -43,8 +32,7 @@ type Grupo = {
   atalhos: readonly Atalho[];
 };
 
-const ICONE = 22;
-const TRACO = 1.65;
+const ICONE = 30;
 
 const GRUPOS: readonly Grupo[] = [
   {
@@ -57,7 +45,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver formações',
         href: '/formacoes',
         recurso: 'aprendizado',
-        icone: <GraduationCap size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="formacoes" tamanho={ICONE} />,
       },
       {
         titulo: 'Projetos',
@@ -65,7 +53,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver projetos',
         href: '/solucoes',
         recurso: 'projetos',
-        icone: <BriefcaseBusiness size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="projetos" tamanho={ICONE} />,
       },
       {
         titulo: 'Estúdio',
@@ -73,7 +61,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Abrir Estúdio',
         href: '/builder',
         recurso: 'estudio',
-        icone: <DraftingCompass size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="estudio" tamanho={ICONE} />,
       },
       {
         titulo: 'Mentorias',
@@ -81,7 +69,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver mentorias',
         href: '/mentorias',
         recurso: 'mentorias',
-        icone: <Users size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="mentorias" tamanho={ICONE} />,
       },
     ],
   },
@@ -95,7 +83,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Buscar empresas',
         href: '/prospeccao',
         recurso: 'prospeccao',
-        icone: <Search size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="prospeccao" tamanho={ICONE} />,
       },
       {
         titulo: 'Vendas',
@@ -103,7 +91,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Abrir vendas',
         href: '/vendas',
         recurso: 'vendas',
-        icone: <ContactRound size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="vendas" tamanho={ICONE} />,
       },
       {
         titulo: 'Reuniões',
@@ -111,7 +99,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver reuniões',
         href: '/reunioes',
         recurso: 'reunioes',
-        icone: <Video size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="reunioes" tamanho={ICONE} />,
       },
       {
         titulo: 'Propostas',
@@ -119,7 +107,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver propostas',
         href: '/propostas',
         recurso: 'propostas',
-        icone: <FileSignature size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="propostas" tamanho={ICONE} />,
       },
     ],
   },
@@ -133,7 +121,7 @@ const GRUPOS: readonly Grupo[] = [
         acao: 'Ver entregas',
         href: '/entregas',
         recurso: 'projetos',
-        icone: <FolderKanban size={ICONE} strokeWidth={TRACO} aria-hidden="true" />,
+        icone: <IconeProduto nome="entregas" tamanho={ICONE} />,
       },
     ],
   },

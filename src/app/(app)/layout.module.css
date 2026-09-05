@@ -14,9 +14,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 100dvh;
   isolation: isolate;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--via-white) 72%, transparent), transparent 34%),
-    linear-gradient(112deg, var(--via-navy-03), transparent 30%), var(--via-bg-2);
+  background: var(--app-canvas-bg);
 }
 
 /* Botão é ação, não metadado. O DS usava 12/13/14px nos três tamanhos; dentro
@@ -68,7 +66,7 @@
     border: 1px solid var(--app-shell-panel-line);
     border-radius: var(--app-radius-surface);
     background: var(--app-shell-panel-bg);
-    backdrop-filter: blur(24px) saturate(145%);
+    backdrop-filter: var(--app-glass-filter);
     box-shadow: var(--app-shell-panel-shadow);
   }
 

@@ -1,15 +1,6 @@
 import Link from 'next/link';
-import {
-  Bot,
-  BriefcaseBusiness,
-  CalendarDays,
-  ChevronDown,
-  ContactRound,
-  Database,
-  GraduationCap,
-  Plus,
-  ShieldCheck,
-} from 'lucide-react';
+import { ChevronDown, Database, Plus, ShieldCheck } from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
@@ -42,22 +33,22 @@ const FONTES_DO_CONTEXTO = [
   {
     titulo: 'Vendas',
     detalhe: 'clientes, etapas e próximos passos',
-    icone: ContactRound,
+    icone: <IconeProduto nome="vendas" tamanho={20} />,
   },
   {
     titulo: 'Reuniões',
     detalhe: 'agenda, registros e decisões',
-    icone: CalendarDays,
+    icone: <IconeProduto nome="reunioes" tamanho={20} />,
   },
   {
     titulo: 'Projetos',
     detalhe: 'tarefas, prazos e entregas',
-    icone: BriefcaseBusiness,
+    icone: <IconeProduto nome="projetos" tamanho={20} />,
   },
   {
     titulo: 'Aprendizado',
     detalhe: 'formações e projetos guiados',
-    icone: GraduationCap,
+    icone: <IconeProduto nome="formacoes" tamanho={20} />,
   },
 ] as const;
 
@@ -110,7 +101,7 @@ export function TelaSobral({
         <header className={styles.cabecalho}>
           <div className={styles.identidade}>
             <span className={styles.marca} aria-hidden="true">
-              <Bot size={18} strokeWidth={1.8} />
+              <IconeProduto nome="sobral" />
             </span>
             <div>
               <h1 id="titulo-sobral">
@@ -143,18 +134,15 @@ export function TelaSobral({
                   </div>
                 </div>
                 <ul className={styles.contextoFontes}>
-                  {FONTES_DO_CONTEXTO.map((fonte) => {
-                    const Icone = fonte.icone;
-                    return (
-                      <li key={fonte.titulo}>
-                        <Icone size={16} strokeWidth={1.8} aria-hidden="true" />
-                        <span>
-                          <strong>{fonte.titulo}</strong>
-                          <small>{fonte.detalhe}</small>
-                        </span>
-                      </li>
-                    );
-                  })}
+                  {FONTES_DO_CONTEXTO.map((fonte) => (
+                    <li key={fonte.titulo}>
+                      {fonte.icone}
+                      <span>
+                        <strong>{fonte.titulo}</strong>
+                        <small>{fonte.detalhe}</small>
+                      </span>
+                    </li>
+                  ))}
                 </ul>
                 <p className={styles.contextoPrivacidade}>
                   <ShieldCheck size={15} strokeWidth={1.8} aria-hidden="true" />
@@ -185,7 +173,7 @@ export function TelaSobral({
                 <p className={styles.eyebrow}>Tarefa de {contextoInicial.empresa}</p>
               ) : (
                 <span className={styles.assinatura} aria-hidden="true">
-                  <Bot size={24} strokeWidth={1.65} />
+                  <IconeProduto nome="sobral" tamanho={32} />
                 </span>
               )}
               <h2>

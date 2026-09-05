@@ -86,7 +86,7 @@
   height: 32px;
   border: 1px solid transparent;
   border-radius: var(--app-radius-chip);
-  color: var(--via-text-soft);
+  color: var(--via-text-muted);
   transition:
     color var(--app-t-state),
     background-color var(--app-t-state),
@@ -206,7 +206,7 @@
   border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-card);
   background: var(--app-shell-panel-bg);
-  backdrop-filter: blur(26px) saturate(155%);
+  backdrop-filter: var(--app-glass-filter);
   box-shadow: var(--app-shell-panel-shadow);
 }
 
@@ -310,7 +310,7 @@
   border: 1px solid color-mix(in srgb, var(--via-white) 72%, var(--via-border-soft));
   border-radius: var(--app-radius-surface);
   background: var(--app-shell-overlay-bg);
-  backdrop-filter: blur(28px) saturate(150%);
+  backdrop-filter: var(--app-glass-filter);
   box-shadow: var(--app-shell-panel-shadow);
   animation: revelarPainel var(--app-t-reveal) backwards;
 }

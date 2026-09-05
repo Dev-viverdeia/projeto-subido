@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { ArrowRight, ArrowUp, Bot, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import { responderPendente } from '@/lib/consultor/invocar';
 import { adicionarMensagem, criarConversa } from '@/lib/consultor/criar';
 import {
@@ -240,7 +241,7 @@ export function Conversa({
           {respostaEmVoo !== null ? (
             <div className={styles.respostaConsultor}>
               <span className={styles.autorResposta}>
-                <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
+                <IconeProduto nome="sobral" tamanho={20} /> Sobral AI
               </span>
               <div className={`${styles.balao} ${styles.doConsultor}`}>
                 {blocosDaResposta(respostaEmVoo).map((bloco, indice) => (

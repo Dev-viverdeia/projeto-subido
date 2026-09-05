@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import {
   ArrowRight,
-  Bot,
   Check,
   Circle,
   Database,
@@ -10,6 +9,7 @@ import {
   Radio,
   Target,
 } from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { HistoricoDropdown } from '@/app/(app)/_components/HistoricoDropdown';
 import entrada from '@/app/(app)/_components/entrada.module.css';
@@ -239,7 +239,7 @@ export function PainelSobralView({
       >
         <header className={styles.pergunteCabecalho}>
           <span className={styles.iconePergunta} aria-hidden="true">
-            <Bot size={22} strokeWidth={1.8} />
+            <IconeProduto nome="sobral" tamanho={24} />
           </span>
           <div>
             <p className={styles.eyebrow}>Pergunte ao Sobral AI</p>
