@@ -76,9 +76,21 @@ test('profundidade é progressiva e desliga ao pedir menos movimento', async ({ 
   await expect(midia.getByRole('img')).toBeVisible();
 });
 
-test('build de produção mantém conteúdo e âncoras sem JavaScript', async ({ browser }) => {
+test('build de produção mantém conteúdo e âncoras sem JavaScript', async ({
+  browser,
+  viewport,
+  isMobile,
+  hasTouch,
+  deviceScaleFactor,
+}) => {
   test.skip(!process.env.PLAYWRIGHT_BASE_URL, 'CSS sem JavaScript exige build de produção.');
-  const contexto = await browser.newContext({ javaScriptEnabled: false });
+  const contexto = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport,
+    isMobile,
+    hasTouch,
+    deviceScaleFactor,
+  });
   try {
     const page = await contexto.newPage();
     await page.goto(process.env.PLAYWRIGHT_BASE_URL!);

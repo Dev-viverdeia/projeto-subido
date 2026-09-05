@@ -43,6 +43,11 @@ dos CTAs, âncoras, contraste WCAG A/AA, fonte das notas, largura da página, fo
 tabela, suporte progressivo e mudança de preferência de movimento. Em build de produção,
 também valida HTML e âncoras com JavaScript desligado.
 
+Resultados locais: 659 testes unitários aprovados (4 pulados preexistentes),
+224 cenários E2E aprovados num servidor limpo (6 pulados, incluindo 2 exclusivos
+de produção) e 8 testes direcionados aprovados no build de produção. Gates de
+tipagem, lint, formatação, identidade, fronteira, DS e schema aprovados; `/` estática.
+
 O teste de setas usa Chrome em janela estreita; a emulação touch do iOS não executa a
 rolagem nativa por teclado físico. Nela verificamos foco e semântica, sem simular sucesso.
 
