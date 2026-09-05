@@ -1,253 +1,186 @@
 .cartao {
-  display: grid;
-  grid-template-columns: clamp(136px, 30%, 172px) minmax(0, 1fr);
-  min-height: 250px;
-  overflow: hidden;
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane);
-  box-shadow: var(--app-elev-1-shadow);
-  color: inherit;
-  text-decoration: none;
-  backdrop-filter: blur(20px) saturate(138%);
-  transition:
-    transform var(--app-t-touch),
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-touch);
-}
-
-.cartao:hover {
-  transform: translateY(-3px);
-  border-color: var(--via-border);
-  box-shadow: var(--app-elev-3-shadow);
-}
-
-.cartao:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
-}
-
-.capa {
-  position: relative;
-  isolation: isolate;
-  min-height: 100%;
-  overflow: hidden;
-  background: var(--via-navy);
-}
-
-.capa img {
-  width: 100%;
-  height: 100%;
-  min-height: 250px;
-  display: block;
-  object-fit: cover;
-  transition: transform var(--app-t-scene);
-}
-
-.cartao:hover .capa img {
-  transform: scale(1.035);
-}
-
-.capaFallback {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: var(--via-mesh-navy);
-  font-family: var(--via-font-mono);
-  font-size: clamp(2.75rem, 5vw, 4.5rem);
-  font-weight: 440;
-  color: color-mix(in srgb, var(--via-white) 24%, transparent);
-}
-
-.capaVela {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(180deg, transparent 52%, rgba(2, 22, 42, 0.72) 100%);
-  pointer-events: none;
-}
-
-.numero {
-  position: absolute;
-  z-index: 2;
-  left: var(--via-space-4);
-  bottom: var(--via-space-4);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-white);
-}
-
-.corpo {
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--via-space-5);
-  padding: clamp(20px, 2.5vw, 28px);
-}
-
-.topo,
-.rodape,
-.progressoTexto,
-.acao {
-  display: flex;
-  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: var(--via-space-6);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-glass-card-shadow);
+  color: var(--via-text-primary);
+  text-decoration: none;
+  transition: transform var(--app-t-touch);
 }
 
 .topo {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: var(--via-space-3);
 }
 
-.etapa {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-}
-
-.conteudo {
+.capa {
   display: grid;
-  gap: var(--via-space-2);
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: linear-gradient(145deg, var(--via-white), var(--via-navy-06));
+  box-shadow:
+    inset 0 1px 0 var(--via-white),
+    var(--via-shadow-xs);
+  color: var(--via-navy);
 }
 
-.conteudo h3,
-.conteudo p {
-  margin: 0;
+.capa img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.etapa,
+.recomendada {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+  line-height: 1.5;
+  text-align: right;
+}
+
+.recomendada {
+  padding: var(--via-space-1) var(--via-space-2_5);
+  border: 1px solid var(--via-navy-10);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-navy);
+}
+
+.cartao .estado {
+  font-family: var(--via-font);
+  font-size: var(--app-fs-meta);
+  letter-spacing: normal;
+  text-transform: none;
+  border-radius: var(--app-radius-chip);
+}
+
+.corpo {
+  display: grid;
+  gap: var(--via-space-5);
+  flex: 1;
 }
 
 .conteudo h3 {
-  font-size: clamp(var(--via-fs-h4), 2vw, 1.55rem);
-  font-weight: 570;
-  letter-spacing: var(--app-ls-h4);
-  line-height: var(--via-lh-snug);
+  margin: 0;
   color: var(--via-text-primary);
-  text-wrap: balance;
+  font-size: clamp(22px, 2vw, 26px);
+  font-weight: var(--via-fw-semibold);
+  line-height: 1.25;
+  letter-spacing: var(--app-ls-h3);
+  overflow-wrap: anywhere;
 }
 
 .conteudo p {
-  max-width: 47ch;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
+  margin: var(--via-space-2) 0 0;
   color: var(--via-text-muted);
-  text-wrap: pretty;
+  font-size: var(--app-fs-ui);
+  line-height: 1.55;
 }
 
 .rodape {
-  justify-content: space-between;
-  gap: var(--via-space-4);
-  margin-top: auto;
-  padding-top: var(--via-space-4);
-  border-top: 1px solid var(--via-border-hairline);
+  align-self: end;
 }
 
 .progresso {
-  min-width: 128px;
-  flex: 1;
   display: grid;
   gap: var(--via-space-2);
 }
 
 .progressoTexto {
-  justify-content: space-between;
-  gap: var(--via-space-3);
-  font-size: var(--via-fs-caption);
   color: var(--via-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.progressoTexto strong {
-  font-family: var(--via-font-mono);
-  color: var(--via-text-primary);
-  font-weight: var(--via-fw-medium);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
 }
 
 .trilho {
   height: 4px;
   overflow: hidden;
   border-radius: var(--app-radius-track);
-  background: var(--via-navy-10);
+  background: var(--via-navy-06);
 }
 
-.trilho span {
+.trilho > span {
   display: block;
   width: 100%;
   height: 100%;
   background: var(--via-navy);
   transform-origin: left;
-  transition: transform var(--app-t-scene);
 }
 
 .acao {
-  flex: none;
-  justify-content: flex-end;
-  gap: var(--via-space-2);
-  font-size: var(--via-fs-sm);
-  font-weight: 650;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  min-height: var(--app-h-control);
+  margin-top: auto;
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
   color: var(--via-navy);
-  white-space: nowrap;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
 }
 
-@supports not (backdrop-filter: blur(1px)) {
-  .cartao {
-    background: var(--via-surface);
+.seta {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  box-shadow: var(--via-shadow-xs);
+  transition: transform var(--app-t-touch);
+}
+
+.cartao[data-recomendada] .capa {
+  background: var(--app-mesh-trilho);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--via-white) 20%, transparent),
+    var(--via-shadow-sm);
+  color: var(--via-white);
+}
+
+.cartao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow-raised);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cartao:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--app-glass-card-shadow-raised);
+  }
+  .cartao:hover .seta {
+    transform: translateX(2px);
   }
 }
 
 @media (max-width: 599px) {
   .cartao {
-    grid-template-columns: 104px minmax(0, 1fr);
-    min-height: 236px;
-  }
-
-  .capa img {
-    min-height: 236px;
-  }
-
-  .corpo {
-    gap: var(--via-space-3);
-    padding: var(--via-space-4);
-  }
-
-  .conteudo h3 {
-    font-size: var(--via-fs-body);
-  }
-
-  .conteudo p {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-  }
-
-  .rodape {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--via-space-3);
-    padding-top: var(--via-space-3);
-  }
-
-  .progresso,
-  .acao {
-    width: 100%;
-  }
-
-  .acao {
-    justify-content: space-between;
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cartao,
-  .capa img,
-  .trilho span {
+  .seta {
     transition: none;
-  }
-
-  .cartao:hover,
-  .cartao:hover .capa img {
     transform: none;
   }
 }

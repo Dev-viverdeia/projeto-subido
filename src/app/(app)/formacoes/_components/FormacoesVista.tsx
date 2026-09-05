@@ -8,25 +8,19 @@ import styles from '../pagina.module.css';
 export function FormacoesVista({ formacoes }: { formacoes: FormacaoResumo[] }) {
   return (
     <div className={styles.pagina}>
-      <section className={`${styles.hero} ${entrada.bloco}`} aria-labelledby="formacoes-titulo">
+      <header className={`${styles.hero} ${entrada.bloco}`}>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Formações</p>
           <h1 id="formacoes-titulo" className={styles.titulo}>
-            Aprenda. Aplique no trabalho.
+            Formações
           </h1>
-          <p className={styles.descricao}>
-            Escolha uma formação e avance uma aula por vez. Seu progresso fica salvo na conta.
-          </p>
+          <p className={styles.descricao}>Aprenda as ferramentas para trabalhar com IA.</p>
         </div>
 
         <Link href="/solucoes" className={styles.atalhoProjetos}>
-          <span>Quer implementar para um cliente?</span>
-          <strong>
-            Ver projetos
-            <ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" />
-          </strong>
+          Ver projetos
+          <ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" />
         </Link>
-      </section>
+      </header>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>
         <TrilhaFormacoes formacoes={formacoes} />
