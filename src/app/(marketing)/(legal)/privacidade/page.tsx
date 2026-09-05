@@ -15,7 +15,7 @@ export default function Page() {
       </Link>
       <h1>Política de privacidade</h1>
 
-      <p>Última atualização: 19 de agosto de 2026.</p>
+      <p>Última atualização: 5 de setembro de 2026.</p>
 
       <p>
         Esta política explica como a Subido trata dados pessoais quando você cria uma conta, usa a
@@ -72,6 +72,24 @@ export default function Page() {
         A autorização é armazenada de forma cifrada. Você pode desconectar o Google Calendar a
         qualquer momento em <strong>Minha conta</strong>; ao desconectar, a Subido revoga o acesso e
         remove a credencial armazenada.
+      </p>
+      <p>
+        Os dados obtidos pelas APIs do Google Workspace, incluindo o Google Calendar, não são
+        usados, retidos ou compartilhados para desenvolver, melhorar ou treinar modelos
+        generalizados de inteligência artificial ou aprendizado de máquina. A integração de agenda
+        não envia esses dados aos modelos de IA da plataforma. Gravações e transcrições produzidas
+        na sala da Subido são recursos separados e não são importadas do Google Calendar.
+      </p>
+      <p>
+        O uso e a transferência de informações recebidas das APIs do Google seguem a{' '}
+        <a href="https://developers.google.com/terms/api-services-user-data-policy">
+          Política de Dados do Usuário dos Serviços de API do Google
+        </a>{' '}
+        e a{' '}
+        <a href="https://developers.google.com/workspace/workspace-api-user-data-developer-policy">
+          Política de Dados do Usuário do Google Workspace
+        </a>
+        , incluindo os requisitos de uso limitado.
       </p>
 
       <h2>5. Bases legais</h2>
