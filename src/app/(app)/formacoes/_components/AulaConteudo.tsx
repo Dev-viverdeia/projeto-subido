@@ -28,18 +28,18 @@ export function AulaConteudo({
   const duracao = formatarDuracao(aula.duracao_seg);
   return (
     <div className={styles.pagina}>
-      <header className={styles.cabecalho}>
-        <div className={styles.textos}>
-          <p className={styles.eyebrow}>
-            Aula {posicao} de {total}
-            {duracao ? ` · ${duracao}` : ''}
-          </p>
-          <h1 className={styles.titulo}>{aula.titulo}</h1>
-        </div>
-      </header>
       <div className={styles.grade}>
         <div className={styles.principal}>
-          <VideoConteudo videoUrl={videoUrl} titulo={aula.titulo} />
+          <header className={styles.cabecalho}>
+            <div className={styles.textos}>
+              <p className={styles.eyebrow}>
+                Aula {posicao} de {total}
+                {duracao ? ` · ${duracao}` : ''}
+              </p>
+              <h1 className={styles.titulo}>{aula.titulo}</h1>
+            </div>
+          </header>
+          <VideoConteudo key={aula.id} videoUrl={videoUrl} titulo={aula.titulo} />
           <NavAula
             formacaoSlug={formacao.slug}
             aulaId={aula.id}

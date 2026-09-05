@@ -1,7 +1,7 @@
 .lateral {
   position: sticky;
   top: calc(68px + var(--via-space-5));
-  max-height: calc(100vh - 68px - var(--via-space-7));
+  max-height: calc(100dvh - 68px - var(--via-space-10));
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@
   border-radius: var(--app-radius-card);
   background: var(--app-glass-plane-strong);
   box-shadow: var(--app-glass-card-shadow);
-  backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: var(--app-glass-filter);
 }
 
 .movel {
@@ -48,7 +48,7 @@
   color: var(--via-text-primary);
 }
 
-.portal .painel {
+.portal .modulos {
   overflow: visible;
 }
 
@@ -56,50 +56,57 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  overflow: hidden;
 }
 
 .cabecalhoPainel {
   display: grid;
-  gap: var(--via-space-2);
+  flex: none;
+  gap: var(--via-space-4);
   padding: var(--via-space-5);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
-.cabecalhoPainel p,
 .cabecalhoPainel h2 {
   margin: 0;
 }
 
-.cabecalhoPainel p {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-}
-
 .cabecalhoPainel h2 {
-  font-size: var(--via-fs-body);
+  font-size: var(--app-fs-reading);
   font-weight: 560;
   letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
-  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
-/* Só a moldura do topo do painel: o conteúdo é o `TrilhoProgresso` denso, que
-   traz o próprio espaçamento. As regras de eyebrow e contagem que moravam aqui
-   saíram junto com a versão local do progresso. */
-.topo {
-  padding: var(--via-space-5);
-  border-bottom: 1px solid var(--via-border-hairline);
+.voltarCurso {
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--app-radius-track);
+}
+
+.voltarCurso:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.voltarCurso:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .modulos {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-y: contain;
+}
+
+.modulo {
+  flex: none;
 }
 
 .modulo + .modulo {
@@ -111,8 +118,8 @@
   align-items: center;
   gap: var(--via-space-2);
   width: 100%;
-  min-height: 52px;
-  padding: var(--via-space-2_5) var(--via-space-5);
+  min-height: 60px;
+  padding: var(--via-space-3) var(--via-space-4);
   border: none;
   background: transparent;
   font-family: inherit;
@@ -125,11 +132,19 @@
   background: var(--via-navy-03);
 }
 
-.numero {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
+.iconeModulo {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  color: var(--via-text-muted);
+}
+
+.iconeModulo[data-completo] {
+  border-radius: var(--via-radius-pill);
+  background: var(--via-navy);
+  color: var(--via-white);
 }
 
 .nomeModulo {
@@ -168,13 +183,20 @@
   flex-direction: column;
 }
 
+.dobra[data-aberto] .aulas {
+  padding-bottom: var(--via-space-2);
+}
+
 .linha {
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--via-space-2_5);
-  min-height: 48px;
-  padding: var(--via-space-2) var(--via-space-5) var(--via-space-2) var(--via-space-6);
+  min-height: 56px;
+  margin: var(--via-space-1) var(--via-space-2) 0;
+  padding: var(--via-space-3) var(--via-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
   color: inherit;
   text-decoration: none;
   transition: background-color var(--via-t-fast);
@@ -185,17 +207,15 @@
 }
 
 .linha[data-atual] {
-  background: var(--via-navy-06);
+  border-color: var(--via-navy-18);
+  background: var(--app-glass-base);
+  box-shadow: var(--app-control-shadow), var(--via-shadow-sm);
 }
 
-.linha[data-atual]::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--via-navy);
+.gatilho:focus-visible,
+.linha:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: -3px;
 }
 
 .pontoStatus {
@@ -214,8 +234,10 @@
   color: var(--via-white);
 }
 
-.pontoStatus[data-status='atual'] {
-  border-color: var(--via-navy);
+.pontoStatus[data-atual]:not([data-status='concluida']) {
+  border-radius: var(--app-radius-chip);
+  background: var(--via-navy);
+  color: var(--via-white);
 }
 
 .tituloAula {
@@ -237,10 +259,10 @@
 }
 
 .duracao {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-faint);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -267,7 +289,9 @@
   }
 
   .dobra,
-  .chevron {
+  .chevron,
+  .gatilho,
+  .linha {
     transition: none;
   }
 }

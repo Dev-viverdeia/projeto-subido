@@ -13,9 +13,8 @@ export async function generateMetadata({
 }
 
 /**
- * A tela da aula. O header vive FORA do grid de propósito: assim o topo do card
- * da playlist alinha com o topo do vídeo — detalhe herdado da referência que
- * separa "montado" de "composto".
+ * A tela da aula. Título e player dividem a coluna principal; a playlist ocupa
+ * a altura disponível ao lado, mantendo curso e progresso visíveis na rolagem.
  *
  * O TOPO DIZIA A MESMA COISA TRÊS VEZES. A trilha do cabeçalho já mostra
  * `‹ Nome do curso / Módulo / Aula` em toda tela de detalhe; abaixo dela havia um

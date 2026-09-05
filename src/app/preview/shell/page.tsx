@@ -24,7 +24,7 @@ import {
   CarregandoCurso,
 } from '@/app/(app)/formacoes/_components/CarregandoAprendizado';
 import { ProjetoGuiado } from '@/app/(app)/solucoes/_components/ProjetoGuiado';
-import { FORMACOES_DEMO, FORMACAO_DEMO } from '../formacoes/fixture';
+import { FORMACOES_DEMO, FORMACAO_DEMO, FORMACAO_EXTENSA_DEMO } from '../formacoes/fixture';
 import {
   projetosPreview,
   projetoPreview,
@@ -63,14 +63,17 @@ export default async function PreviewShellPage({
         : tela === 'aula' || tela === 'formacoes' || tela === 'formacao'
           ? '/formacoes'
           : '/inicio';
-  const aulas = FORMACAO_DEMO.modulos.flatMap((modulo) => modulo.aulas);
+  const formacao = params.estado === 'extenso' ? FORMACAO_EXTENSA_DEMO : FORMACAO_DEMO;
+  const aulas = formacao.modulos.flatMap((modulo) => modulo.aulas);
   const feitas =
     params.estado === 'concluido'
       ? aulas.map((aula) => aula.id)
       : params.estado === 'andamento'
         ? aulas.slice(0, 3).map((aula) => aula.id)
-        : [];
-  const indiceAula = params.estado === 'andamento' ? 3 : 0;
+        : params.estado === 'extenso'
+          ? aulas.slice(0, 20).map((aula) => aula.id)
+          : [];
+  const indiceAula = params.estado === 'extenso' ? 20 : params.estado === 'andamento' ? 3 : 0;
   const itens = ITENS_NAV.map((item) => {
     const recurso = recursoDaRota(item.href);
     const bloqueado = !planoPodeAcessarRota(plano, item.href);
@@ -89,7 +92,7 @@ export default async function PreviewShellPage({
         atual={
           tela === 'sobral'
             ? 'Sobral AI'
-            : tela === 'formacoes'
+            : tela === 'formacoes' || tela === 'formacao' || tela === 'aula'
               ? 'Formações'
               : tela === 'projetos'
                 ? 'Projetos'
@@ -137,16 +140,18 @@ export default async function PreviewShellPage({
               params.estado === 'carregando' ? (
                 <CarregandoCurso />
               ) : (
-                <CursoConteudo formacao={FORMACAO_DEMO} />
+                <CursoConteudo formacao={formacao} />
               )
             ) : tela === 'aula' ? (
               params.estado === 'carregando' ? (
                 <CarregandoAula />
               ) : (
                 <AulaConteudo
-                  formacao={FORMACAO_DEMO}
+                  formacao={formacao}
                   aula={aulas[indiceAula]!}
-                  videoUrl={null}
+                  videoUrl={
+                    params.estado === 'video' ? 'https://video.exemplo.test/embed/aula' : null
+                  }
                   anterior={aulas[indiceAula - 1] ?? null}
                   proxima={aulas[indiceAula + 1] ?? null}
                   posicao={indiceAula + 1}

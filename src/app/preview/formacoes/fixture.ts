@@ -86,3 +86,20 @@ export const FORMACOES_DEMO: FormacaoResumo[] = [
         aulaIds: formacao.modulos.flatMap((modulo) => modulo.aulas.map((item) => item.id)),
       },
 );
+
+/** Curso longo para exercitar a rolagem interna sem dados ou progresso de clientes. */
+export const FORMACAO_EXTENSA_DEMO: FormacaoCompleta = {
+  ...FORMACAO_DEMO,
+  titulo: 'IA aplicada: da descoberta do problema à entrega do projeto para o cliente',
+  modulos: FORMACAO_DEMO.modulos.map((modulo, indiceModulo) => ({
+    ...modulo,
+    aulas: Array.from({ length: 12 }, (_, indice) =>
+      aula(
+        `extensa-${indiceModulo}-${indice}`,
+        `Aplicação ${indice + 1}: ${modulo.aulas[indice % modulo.aulas.length]!.titulo}`,
+        indice + 1,
+        900,
+      ),
+    ),
+  })),
+};

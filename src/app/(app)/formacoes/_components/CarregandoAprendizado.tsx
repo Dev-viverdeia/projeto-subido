@@ -50,12 +50,12 @@ export function CarregandoAula() {
   return (
     <div className={aula.pagina} role="status" aria-busy="true" aria-label="Carregando aula">
       <span className="sr-only">Carregando aula…</span>
-      <div className={aula.textos} aria-hidden="true">
-        <Skeleton variant="rect" width="85%" height={36} />
-        <Skeleton width={160} />
-      </div>
       <div className={aula.grade} aria-hidden="true">
         <div className={aula.principal}>
+          <div className={aula.textos}>
+            <Skeleton width={160} />
+            <Skeleton variant="rect" width="85%" height={36} />
+          </div>
           <div className={styles.video}>
             <Skeleton variant="rect" width="100%" height="100%" />
           </div>
