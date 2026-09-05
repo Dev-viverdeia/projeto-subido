@@ -113,10 +113,9 @@
 .note {
   margin: var(--via-space-8) 0 0;
   max-width: 53ch;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   padding-left: var(--via-space-4);
   border-left: 2px solid var(--via-coral);
 }

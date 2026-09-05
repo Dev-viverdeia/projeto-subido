@@ -93,6 +93,6 @@
   padding-top: var(--via-space-5);
   border-top: 1px solid var(--via-border-hairline);
   max-width: 53ch;
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-faint);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
 }

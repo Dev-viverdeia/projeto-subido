@@ -188,7 +188,7 @@
 
 .priceTodo {
   font-size: var(--via-fs-h3);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .featured .priceValue,

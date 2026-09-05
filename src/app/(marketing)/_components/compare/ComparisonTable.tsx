@@ -1,6 +1,6 @@
 import { Check, Minus } from 'lucide-react';
 import { COMPARISON } from '@/content/landing';
-import { Section, SectionHeader, Reveal } from '../primitives';
+import { Section, SectionHeader } from '../primitives';
 import styles from './ComparisonTable.module.css';
 
 /**
@@ -21,7 +21,12 @@ export function ComparisonTable() {
     <Section id="comparacao" labelledBy="comparacao-title">
       <SectionHeader id="comparacao-title" eyebrow={COMPARISON.eyebrow} title={COMPARISON.title} />
 
-      <Reveal className={styles.scroller}>
+      <div
+        className={styles.scroller}
+        tabIndex={0}
+        role="region"
+        aria-label="Comparação de recursos"
+      >
         <table className={styles.table}>
           <caption className={styles.caption}>
             Comparação entre as alternativas de mercado e esta assinatura.
@@ -68,7 +73,7 @@ export function ComparisonTable() {
             ))}
           </tbody>
         </table>
-      </Reveal>
+      </div>
     </Section>
   );
 }

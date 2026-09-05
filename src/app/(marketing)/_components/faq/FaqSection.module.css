@@ -37,7 +37,7 @@
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-xs);
   font-variant-numeric: tabular-nums;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .questionText {
