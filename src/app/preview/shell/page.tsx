@@ -15,6 +15,11 @@ import {
 } from '@/lib/planos/acessos';
 import shellStyles from '@/app/(app)/layout.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { FormacoesVista } from '@/app/(app)/formacoes/_components/FormacoesVista';
+import { CatalogoProjetos } from '@/app/(app)/solucoes/_components/CatalogoProjetos';
+import { FORMACOES_DEMO } from '../formacoes/fixture';
+import { projetosPreview } from '../projetos/fixture';
+import { ProgressoPreview } from '../ProgressoPreview';
 
 export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 
@@ -25,12 +30,14 @@ export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 export default async function PreviewShellPage({
   searchParams,
 }: {
-  searchParams: Promise<{ plano?: string; nome?: string }>;
+  searchParams: Promise<{ plano?: string; nome?: string; tela?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
   const plano = params.plano === 'starter' ? 'starter' : 'pro';
   const nome = params.nome === 'longo' ? 'Maria Aparecida de Albuquerque' : 'Mateus';
+  const tela = params.tela === 'formacoes' || params.tela === 'projetos' ? params.tela : 'inicio';
+  const caminho = tela === 'projetos' ? '/solucoes' : `/${tela}`;
   const itens = ITENS_NAV.map((item) => {
     const recurso = recursoDaRota(item.href);
     const bloqueado = !planoPodeAcessarRota(plano, item.href);
@@ -45,7 +52,9 @@ export default async function PreviewShellPage({
 
   return (
     <ProvedorDeTrilha>
-      <DefinirTrilha atual="Início" />
+      <DefinirTrilha
+        atual={tela === 'formacoes' ? 'Formações' : tela === 'projetos' ? 'Projetos' : 'Início'}
+      />
       <div className={shellStyles.shell} data-app-shell>
         <a href="#conteudo" className="via-skip-link">
           Pular para o conteúdo
@@ -55,7 +64,7 @@ export default async function PreviewShellPage({
           <Link href="/inicio" className={shellStyles.marcaSidebar} aria-label="Ir para o início">
             <SubidoLogo size={18} />
           </Link>
-          <NavLateral itens={itens} variante="lateral" caminhoAtual="/inicio" />
+          <NavLateral itens={itens} variante="lateral" caminhoAtual={caminho} />
           <div className={shellStyles.rodapeSidebar}>
             <NavLateral
               itens={[ITEM_ADMIN]}
@@ -76,14 +85,22 @@ export default async function PreviewShellPage({
         />
 
         <main className={shellStyles.conteudo} id="conteudo">
-          <MapaJornada nome={nome} plano={plano} />
+          <ProgressoPreview>
+            {tela === 'formacoes' ? (
+              <FormacoesVista formacoes={FORMACOES_DEMO} />
+            ) : tela === 'projetos' ? (
+              <CatalogoProjetos solucoes={projetosPreview} />
+            ) : (
+              <MapaJornada nome={nome} plano={plano} />
+            )}
+          </ProgressoPreview>
         </main>
 
         <NavLateral
           itens={[...itens, ITEM_ADMIN]}
           itemConta={ITEM_CONTA}
           variante="dock"
-          caminhoAtual="/inicio"
+          caminhoAtual={caminho}
         />
       </div>
     </ProvedorDeTrilha>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { BookOpen, Bot, Code2, Layers, MessageSquare } from 'lucide-react';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import {
   contarConcluidas,
@@ -13,12 +14,13 @@ import styles from './CartaoFormacao.module.css';
 
 type Props = {
   formacao: FormacaoResumo;
-  numero: number;
+  recomendada?: boolean;
   etapa: string;
   foco: string;
 };
 
 function rotuloAcao(feitas: number, total: number) {
+  if (total === 0) return 'Ver formação';
   if (total > 0 && feitas >= total) return 'Revisar formação';
   if (feitas > 0) return 'Retomar formação';
   return 'Começar formação';
@@ -38,31 +40,46 @@ function Seta() {
   );
 }
 
-export function CartaoFormacao({ formacao, numero, etapa, foco }: Props) {
+const ICONES: Record<string, typeof BookOpen> = {
+  'formacao-de-chatgpt': MessageSquare,
+  'formacao-de-gpt-agents': Bot,
+  'formacao-de-lovable': Layers,
+  'formacao-de-claude-code': Code2,
+};
+
+export function CartaoFormacao({ formacao, recomendada = false, etapa, foco }: Props) {
   const progresso = useProgresso();
   const feitas = contarConcluidas(progresso, formacao.aulaIds);
   const pct = percentual(feitas, formacao.aulas);
   const estado = estadoDoProgresso(feitas, formacao.aulas);
+  const Icone = ICONES[formacao.slug] ?? BookOpen;
 
   return (
-    <Link href={`/formacoes/${formacao.slug}`} className={styles.cartao}>
-      <div className={styles.capa} aria-hidden="true">
-        {formacao.capa_url ? (
-          // eslint-disable-next-line @next/next/no-img-element -- imagem publicada no Storage, sem domínio estável para next/image
-          <img src={formacao.capa_url} alt="" loading="lazy" />
+    <Link
+      href={`/formacoes/${formacao.slug}`}
+      className={styles.cartao}
+      data-estado={estado}
+      data-recomendada={recomendada || undefined}
+    >
+      <div className={styles.topo}>
+        <span className={styles.capa} aria-hidden="true">
+          {formacao.capa_url ? (
+            // eslint-disable-next-line @next/next/no-img-element -- imagem publicada no Storage, sem domínio estável para next/image
+            <img src={formacao.capa_url} alt="" loading="lazy" />
+          ) : (
+            <Icone size={24} strokeWidth={1.6} />
+          )}
+        </span>
+        {estado === 'concluida' || estado === 'em-andamento' ? (
+          <PillEstado estado={estado} className={styles.estado} />
+        ) : recomendada ? (
+          <span className={styles.recomendada}>Comece aqui</span>
         ) : (
-          <span className={styles.capaFallback}>{String(numero).padStart(2, '0')}</span>
+          <span className={styles.etapa}>{etapa}</span>
         )}
-        <span className={styles.capaVela} />
-        <span className={styles.numero}>{String(numero).padStart(2, '0')}</span>
       </div>
 
       <div className={styles.corpo}>
-        <div className={styles.topo}>
-          <span className={styles.etapa}>{etapa}</span>
-          {estado !== 'nao-iniciada' && <PillEstado estado={estado} />}
-        </div>
-
         <div className={styles.conteudo}>
           <h3>{formacao.titulo}</h3>
           <p>{foco}</p>
@@ -72,10 +89,10 @@ export function CartaoFormacao({ formacao, numero, etapa, foco }: Props) {
           <div className={styles.progresso}>
             <div className={styles.progressoTexto}>
               <span>
-                {formacao.modulos} {formacao.modulos === 1 ? 'módulo' : 'módulos'} ·{' '}
-                {formacao.aulas} {formacao.aulas === 1 ? 'aula' : 'aulas'}
+                {feitas > 0
+                  ? `${feitas} de ${formacao.aulas} aulas concluídas`
+                  : `${formacao.aulas} ${formacao.aulas === 1 ? 'aula' : 'aulas'} · ${formacao.modulos} ${formacao.modulos === 1 ? 'módulo' : 'módulos'}`}
               </span>
-              {feitas > 0 && <strong>{pct}%</strong>}
             </div>
             {feitas > 0 && (
               <div className={styles.trilho} aria-hidden="true">
@@ -83,13 +100,14 @@ export function CartaoFormacao({ formacao, numero, etapa, foco }: Props) {
               </div>
             )}
           </div>
-
-          <span className={styles.acao}>
-            {rotuloAcao(feitas, formacao.aulas)}
-            <Seta />
-          </span>
         </div>
       </div>
+      <span className={styles.acao}>
+        {rotuloAcao(feitas, formacao.aulas)}
+        <span className={styles.seta}>
+          <Seta />
+        </span>
+      </span>
     </Link>
   );
 }

@@ -26,7 +26,7 @@ const TELAS = [
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
   ['/preview/certificados', 'Comprove o que você concluiu.'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
-  ['/preview/formacoes', 'Aprenda. Aplique no trabalho.'],
+  ['/preview/formacoes', 'Aprenda as ferramentas para trabalhar com IA.'],
   ['/preview/formacao', 'ChatGPT para o trabalho'],
   ['/preview/aula', 'Como conversar com a IA para obter respostas úteis'],
   ['/preview/estudio', 'Adapte um projeto ao cliente.'],
@@ -440,11 +440,9 @@ test.describe('fundação visual Viver de IA', () => {
   }) => {
     await page.goto('/preview/formacoes');
 
-    await expect(
-      page.getByRole('heading', { name: 'Aprenda. Aplique no trabalho.' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Formações', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /Começar formação/ }).first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Todas as formações' })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Formações em ordem recomendada' })).toBeVisible();
     await expect(page.getByText('Uma ordem clara para evoluir.')).toHaveCount(0);
     await expect(page.getByText('Como usar Formações e Projetos')).toHaveCount(0);
 

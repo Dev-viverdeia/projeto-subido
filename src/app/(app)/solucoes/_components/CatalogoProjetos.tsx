@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Check, FolderOpen } from 'lucide-react';
+import { ArrowRight, Check, FolderOpen, Layers } from 'lucide-react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
 import {
   contarEtapasFeitas,
   estadoDoProgresso,
   percentual,
+  solucaoMaisRecente,
   useProgresso,
 } from '@/lib/progresso/local';
 import styles from './CatalogoProjetos.module.css';
@@ -52,14 +53,8 @@ export function CatalogoProjetos({
           <FolderOpen size={22} strokeWidth={1.7} />
         </span>
         <div>
-          <p className={styles.eyebrow}>Projetos</p>
-          <Titulo id="catalogo-vazio-titulo">
-            Os projetos guiados ainda não foram publicados.
-          </Titulo>
-          <p>
-            Enquanto isso, você pode continuar nas formações e aprender os fundamentos para a
-            primeira implementação.
-          </p>
+          <Titulo id="catalogo-vazio-titulo">Nenhum projeto disponível</Titulo>
+          <p>Enquanto os guias não chegam, explore as formações.</p>
         </div>
         <Link href="/formacoes" className={styles.acaoSecundaria}>
           Ver formações <ArrowRight size={16} aria-hidden="true" />
@@ -73,9 +68,18 @@ export function CatalogoProjetos({
     const feitas = contarEtapasFeitas(progresso, solucao.etapaIds);
     return { solucao, feitas, total, estado: estadoDoProgresso(feitas, total) };
   });
+  const recente = solucaoMaisRecente(progresso);
   const destaque =
+    projetos.find(
+      (projeto) => projeto.estado === 'em-andamento' && projeto.solucao.slug === recente,
+    ) ??
     projetos.find((projeto) => projeto.estado === 'em-andamento') ??
-    projetos.find((projeto) => projeto.solucao.projeto?.roteiro.perfil?.recomendadoParaComecar) ??
+    projetos.find(
+      (projeto) =>
+        projeto.estado === 'nao-iniciada' &&
+        projeto.solucao.projeto?.roteiro.perfil?.recomendadoParaComecar,
+    ) ??
+    projetos.find((projeto) => projeto.estado === 'nao-iniciada') ??
     projetos[0]!;
   const restantes = projetos.filter((projeto) => projeto.solucao.id !== destaque.solucao.id);
 
@@ -86,24 +90,38 @@ export function CatalogoProjetos({
           <Titulo id="titulo-projetos" className={styles.titulo}>
             Projetos
           </Titulo>
-          <p className={styles.apoio}>Escolha uma entrega e siga o método até o cliente.</p>
+          <p className={styles.apoio}>Guias para implementar IA para seus clientes.</p>
         </div>
-        <p className={styles.contagem}>{solucoes.length} projetos</p>
+        <p className={styles.contagem}>
+          {solucoes.length} {solucoes.length === 1 ? 'projeto' : 'projetos'}
+        </p>
       </header>
 
-      <section className={styles.secaoDestaque} aria-labelledby="projeto-destaque-titulo">
-        <div className={styles.secaoCabecalho}>
-          <h2 id="projeto-destaque-titulo">
-            {destaque.estado === 'em-andamento' ? 'Continue de onde parou' : 'Comece por aqui'}
-          </h2>
-        </div>
-
+      <section aria-labelledby="projeto-destaque-titulo">
         <Link
           href={`/solucoes/${destaque.solucao.slug}`}
           className={styles.destaque}
           data-estado={destaque.estado}
         >
           <div className={styles.destaquePrincipal}>
+            <div className={styles.destaqueIdentidade}>
+              <span className={styles.iconeDestaque} aria-hidden="true">
+                {destaque.estado === 'concluida' ? (
+                  <Check size={24} />
+                ) : (
+                  <Layers size={24} strokeWidth={1.6} />
+                )}
+              </span>
+              <h2 id="projeto-destaque-titulo" className={styles.rotuloDestaque}>
+                {destaque.estado === 'em-andamento'
+                  ? 'Continue de onde parou'
+                  : destaque.estado === 'concluida'
+                    ? 'Projeto concluído'
+                    : destaque.estado === 'sem-itens'
+                      ? 'Conheça o projeto'
+                      : 'Comece por aqui'}
+              </h2>
+            </div>
             <h3>{destaque.solucao.titulo}</h3>
             <p className={styles.resultado}>
               {destaque.solucao.projeto?.resultado ?? destaque.solucao.resumo}
@@ -120,11 +138,9 @@ export function CatalogoProjetos({
               ) : (
                 <span>Passo a passo guiado</span>
               )}
-              {destaque.estado !== 'nao-iniciada' ? (
+              {destaque.estado === 'em-andamento' ? (
                 <span>
-                  {destaque.estado === 'concluida'
-                    ? 'Projeto concluído'
-                    : `${destaque.feitas} de ${destaque.total} passos`}
+                  {destaque.feitas} de {destaque.total} passos
                 </span>
               ) : null}
             </div>
@@ -133,7 +149,7 @@ export function CatalogoProjetos({
             </span>
           </div>
 
-          {destaque.estado !== 'nao-iniciada' ? (
+          {destaque.feitas > 0 ? (
             <span className={styles.progresso} aria-hidden="true">
               <span
                 style={{
@@ -151,8 +167,8 @@ export function CatalogoProjetos({
             <h2 id="outros-projetos-titulo">Outros projetos</h2>
           </div>
 
-          <ol className={styles.grade}>
-            {restantes.map((projeto, indice) => {
+          <ul className={styles.grade} aria-label="Outros projetos">
+            {restantes.map((projeto) => {
               const perfil = projeto.solucao.projeto?.roteiro.perfil;
               return (
                 <li key={projeto.solucao.id}>
@@ -162,10 +178,13 @@ export function CatalogoProjetos({
                     data-estado={projeto.estado}
                   >
                     <div className={styles.cartaoTopo}>
-                      <span>{String(indice + 2).padStart(2, '0')}</span>
+                      <span className={styles.categoria}>
+                        <FolderOpen size={18} aria-hidden="true" />
+                        {projeto.solucao.categoria ?? 'Projeto guiado'}
+                      </span>
                       {projeto.estado === 'concluida' ? (
                         <span className={styles.concluido}>
-                          <Check size={12} aria-hidden="true" /> Concluído
+                          <Check size={16} aria-hidden="true" /> Concluído
                         </span>
                       ) : projeto.estado === 'em-andamento' ? (
                         <span className={styles.emAndamento}>
@@ -183,7 +202,7 @@ export function CatalogoProjetos({
                         {rotuloAcao(projeto)} <ArrowRight size={15} aria-hidden="true" />
                       </strong>
                     </footer>
-                    {projeto.estado !== 'nao-iniciada' ? (
+                    {projeto.feitas > 0 ? (
                       <span className={styles.progresso} aria-hidden="true">
                         <span
                           style={{
@@ -196,7 +215,7 @@ export function CatalogoProjetos({
                 </li>
               );
             })}
-          </ol>
+          </ul>
         </section>
       ) : null}
     </div>

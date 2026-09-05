@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, Play } from 'lucide-react';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import {
   contarConcluidas,
@@ -16,27 +16,27 @@ import styles from './TrilhaFormacoes.module.css';
 const PERFIL: Record<string, { etapa: string; foco: string }> = {
   'formacao-de-chatgpt': {
     etapa: 'Base de trabalho',
-    foco: 'Use IA com contexto, método e segurança nas tarefas do dia a dia.',
+    foco: 'Pesquisa, escrita e análise no dia a dia.',
   },
   'formacao-de-gpt-agents': {
     etapa: 'Automação guiada',
-    foco: 'Crie agentes com instruções claras, ferramentas e limites de atuação.',
+    foco: 'Agentes com ferramentas, memória e limites claros.',
   },
   'formacao-de-lovable': {
     etapa: 'Construção visual',
-    foco: 'Transforme uma necessidade em uma primeira versão funcional e publicável.',
+    foco: 'Aplicações funcionais, da ideia à publicação.',
   },
   'formacao-de-claude-code': {
     etapa: 'Desenvolvimento assistido',
-    foco: 'Construa automações e ferramentas com IA apoiando o trabalho técnico.',
+    foco: 'Código e automações com o apoio da IA.',
   },
 };
 
-function perfil(formacao: FormacaoResumo, indice: number) {
+function perfil(formacao: FormacaoResumo) {
   return (
     PERFIL[formacao.slug] ?? {
-      etapa: `Formação ${String(indice + 1).padStart(2, '0')}`,
-      foco: formacao.resumo ?? 'Desenvolva uma nova habilidade para o trabalho com IA.',
+      etapa: 'Aprendizado prático',
+      foco: formacao.resumo ?? 'Uma nova habilidade para trabalhar com IA.',
     }
   );
 }
@@ -59,8 +59,13 @@ export function selecionarProximaFormacao(
   return (
     formacoes.find((formacao) => {
       const feitas = contarConcluidas(progresso, formacao.aulaIds);
-      return estadoDoProgresso(feitas, formacao.aulas) !== 'concluida';
-    }) ?? null
+      return estadoDoProgresso(feitas, formacao.aulas) === 'em-andamento';
+    }) ??
+    formacoes.find((formacao) => {
+      const feitas = contarConcluidas(progresso, formacao.aulaIds);
+      return estadoDoProgresso(feitas, formacao.aulas) === 'nao-iniciada';
+    }) ??
+    null
   );
 }
 
@@ -68,7 +73,6 @@ export function TrilhaFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
   const progresso = useProgresso();
   const proxima = selecionarProximaFormacao(formacoes, progresso);
   const feitas = proxima ? contarConcluidas(progresso, proxima.aulaIds) : 0;
-  const perfilProxima = proxima ? perfil(proxima, formacoes.indexOf(proxima)) : null;
   const concluidas = formacoes.filter((formacao) => {
     const totalFeitas = contarConcluidas(progresso, formacao.aulaIds);
     return estadoDoProgresso(totalFeitas, formacao.aulas) === 'concluida';
@@ -76,57 +80,66 @@ export function TrilhaFormacoes({ formacoes }: { formacoes: FormacaoResumo[] }) 
 
   return (
     <section id="trilha-formacoes" className={styles.raiz} aria-labelledby="trilha-titulo">
-      {proxima && perfilProxima ? (
+      <h2 id="trilha-titulo" className={styles.srOnly}>
+        Todas as formações
+      </h2>
+      {proxima && feitas > 0 ? (
         <Link href={`/formacoes/${proxima.slug}`} className={styles.proxima}>
+          <span className={styles.sinal} aria-hidden="true">
+            <Play size={22} />
+          </span>
           <div className={styles.proximaIdentidade}>
-            <span className={styles.proximaRotulo}>
-              {feitas > 0 ? 'Continue aprendendo' : 'Comece por aqui'}
-            </span>
+            <span className={styles.proximaRotulo}>Continue de onde parou</span>
             <strong>{proxima.titulo}</strong>
-            <span>{perfilProxima.foco}</span>
+            <span>
+              {feitas} de {proxima.aulas} aulas concluídas
+            </span>
           </div>
           <div className={styles.proximaAcao}>
-            <span>
-              {feitas} de {proxima.aulas} aulas
-            </span>
-            <strong>
-              {feitas > 0 ? 'Retomar formação' : 'Começar formação'}
-              <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
-            </strong>
+            Retomar formação <ArrowRight size={18} aria-hidden="true" />
           </div>
         </Link>
-      ) : formacoes.length > 0 ? (
+      ) : concluidas > 0 && concluidas === formacoes.length ? (
         <div className={styles.conclusao} role="status">
+          <span className={styles.sinal} aria-hidden="true">
+            <Check size={22} />
+          </span>
           <div>
-            <span>Trilha concluída</span>
-            <strong>Você concluiu as {formacoes.length} formações disponíveis.</strong>
+            <strong>Formações concluídas</strong>
+            <span>Escolha um projeto para aplicar o que aprendeu.</span>
           </div>
-          <Link href="/solucoes">Escolher um projeto</Link>
+          <Link href="/solucoes">
+            Ver projetos <ArrowRight size={18} aria-hidden="true" />
+          </Link>
         </div>
       ) : null}
 
-      <header className={styles.cabecalho}>
-        <div>
-          <p className={styles.eyebrow}>Biblioteca</p>
-          <h2 id="trilha-titulo">Todas as formações</h2>
+      {formacoes.length === 0 ? (
+        <div className={styles.vazio}>
+          <span className={styles.sinal} aria-hidden="true">
+            <BookOpen size={24} />
+          </span>
+          <h3>Nenhuma formação disponível</h3>
+          <p>As aulas publicadas aparecerão aqui.</p>
         </div>
-        <p>
+      ) : (
+        <p className={styles.contagem}>
           {formacoes.length}{' '}
           {formacoes.length === 1 ? 'formação disponível' : 'formações disponíveis'}
           {concluidas > 0
             ? ` · ${concluidas} ${concluidas === 1 ? 'concluída' : 'concluídas'}`
             : ''}
         </p>
-      </header>
+      )}
 
       <ol className={styles.grade} aria-label="Formações em ordem recomendada">
-        {formacoes.map((formacao, indice) => {
-          const dados = perfil(formacao, indice);
+        {formacoes.map((formacao) => {
+          const dados = perfil(formacao);
           return (
             <li key={formacao.id}>
               <CartaoFormacao
                 formacao={formacao}
-                numero={indice + 1}
+                recomendada={feitas === 0 && proxima?.id === formacao.id}
                 etapa={dados.etapa}
                 foco={dados.foco}
               />
