@@ -49,8 +49,15 @@ describe('Navegação da aula', () => {
     expect(push).toHaveBeenCalledWith('/formacoes/formacao-lovable/aula/a3');
   });
 
-  it('na última aula deixa claro que a formação será concluída', () => {
+  it('conclui apenas a última aula, sem afirmar que aulas anteriores foram concluídas', async () => {
+    const user = userEvent.setup();
     render(<NavAula {...props} proximaId={null} proximaTitulo={null} />);
-    expect(screen.getByRole('button', { name: 'Concluir formação' })).toBeDefined();
+    await user.click(screen.getByRole('button', { name: 'Concluir aula' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Aula concluída');
+    expect(screen.getByRole('link', { name: /Voltar à formação/ })).toHaveAttribute(
+      'href',
+      '/formacoes/formacao-lovable',
+    );
+    expect(push).not.toHaveBeenCalled();
   });
 });

@@ -1,13 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { obterAula } from '@/lib/conteudo/queries';
-import { VideoConteudo } from '../../../../_components/VideoConteudo';
-import { formatarDuracao } from '../../../../_components/tempo';
-import entrada from '../../../../_components/entrada.module.css';
-import { NavAula } from '../../../_components/NavAula';
-import { PlaylistAula } from '../../../_components/PlaylistAula';
+import { AulaConteudo } from '../../../_components/AulaConteudo';
 import { DefinirTrilha } from '../../../../_components/trilha/contexto';
-import styles from './pagina.module.css';
 
 export async function generateMetadata({
   params,
@@ -33,10 +28,9 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
   if (!contexto) notFound();
 
   const { formacao, aula, modulo, anterior, proxima, posicao, total } = contexto;
-  const duracao = formatarDuracao(aula.duracao_seg);
 
   return (
-    <div className={styles.pagina}>
+    <>
       {/* Três degraus: a volta é para o CURSO, não para o catálogo — é de onde a
           pessoa veio e para onde ela continua depois desta aula. O módulo entra
           como recorte. */}
@@ -47,31 +41,15 @@ export default async function AulaPage({ params }: PageProps<'/formacoes/[slug]/
         atual={aula.titulo}
       />
 
-      <header className={`${styles.cabecalho} ${entrada.bloco}`}>
-        <div className={styles.textos}>
-          <p className={styles.eyebrow}>
-            Aula {posicao} de {total}
-          </p>
-          <h1 className={styles.titulo}>{aula.titulo}</h1>
-          {duracao && <p className={styles.duracao}>{duracao}</p>}
-        </div>
-      </header>
-
-      <div className={`${styles.grade} ${entrada.bloco} ${entrada.atraso1}`}>
-        <div className={styles.principal}>
-          <VideoConteudo videoUrl={aula.videoUrl} titulo={aula.titulo} />
-          <NavAula
-            formacaoSlug={slug}
-            aulaId={aula.id}
-            anteriorId={anterior?.id ?? null}
-            anteriorTitulo={anterior?.titulo ?? null}
-            proximaId={proxima?.id ?? null}
-            proximaTitulo={proxima?.titulo ?? null}
-          />
-        </div>
-
-        <PlaylistAula formacao={formacao} aulaAtualId={aula.id} />
-      </div>
-    </div>
+      <AulaConteudo
+        formacao={formacao}
+        aula={aula}
+        videoUrl={aula.videoUrl}
+        anterior={anterior}
+        proxima={proxima}
+        posicao={posicao}
+        total={total}
+      />
+    </>
   );
 }

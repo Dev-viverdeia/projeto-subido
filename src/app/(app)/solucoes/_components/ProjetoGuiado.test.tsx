@@ -233,10 +233,8 @@ describe('Projeto guiado', () => {
 
     const areas = screen.getByRole('tablist', { name: 'Áreas do projeto' });
     expect(within(areas).getAllByRole('tab')).toHaveLength(3);
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Entenda antes de construir' }),
-    ).toBeDefined();
-    expect(screen.getByText(/Assista à introdução e conclua uma aula por vez/)).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: 'Aulas do projeto' })).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Começar aprendizado' })).toBeNull();
     const progressoAprendizado = screen.getByRole('progressbar', {
       name: 'Progresso do aprendizado',
     });
@@ -267,12 +265,12 @@ describe('Projeto guiado', () => {
     expect(screen.queryByRole('heading', { level: 2, name: 'Entender' })).toBeNull();
 
     await user.click(within(navegacao).getByRole('button', { name: /Entregar/ }));
-    expect(screen.getByRole('link', { name: /Abrir kit de implementação/ })).toHaveAttribute(
-      'href',
-      '#kit-projeto',
+    await user.click(screen.getByRole('button', { name: /Abrir kit de implementação/ }));
+    expect(within(areas).getByRole('tab', { name: 'Materiais' })).toHaveAttribute(
+      'aria-selected',
+      'true',
     );
-
-    await user.click(within(areas).getByRole('tab', { name: 'Materiais' }));
+    expect(within(areas).getByRole('tab', { name: 'Materiais' })).toHaveFocus();
     expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Regras que protegem este projeto' }),

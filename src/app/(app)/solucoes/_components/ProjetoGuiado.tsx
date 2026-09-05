@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
@@ -53,6 +53,13 @@ export function ProjetoGuiado({
   const [abaAtiva, setAbaAtiva] = useState<'aprender' | 'implementar' | 'materiais'>(
     temAprendizado ? 'aprender' : 'implementar',
   );
+  const abasRef = useRef<HTMLElement>(null);
+  const abrirArea = (aba: typeof abaAtiva) => {
+    setAbaAtiva(aba);
+    const botao = abasRef.current?.querySelector<HTMLButtonElement>(`#aba-${aba}`);
+    botao?.focus({ preventScroll: true });
+    botao?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+  };
   const proximoPasso = roteiro.fases
     .flatMap((fase) =>
       fase.passos.map((passo) => ({
@@ -67,10 +74,15 @@ export function ProjetoGuiado({
     { id: 'implementar', rotulo: 'Implementar' },
     { id: 'materiais', rotulo: 'Materiais' },
   ] as const;
+  const mostrarAcaoCabecalho = abaAtiva !== 'aprender' || !proximoPasso;
 
   return (
     <div className={styles.raiz}>
-      <header className={styles.cabecalho} aria-labelledby="titulo-projeto">
+      <header
+        className={styles.cabecalho}
+        data-com-acao={mostrarAcaoCabecalho || undefined}
+        aria-labelledby="titulo-projeto"
+      >
         <div className={styles.cabecalhoTexto}>
           <h1 id="titulo-projeto">{titulo}</h1>
           <p className={styles.resultado}>{projeto.resultado}</p>
@@ -86,74 +98,101 @@ export function ProjetoGuiado({
             ) : null}
           </p>
         </div>
-        <div className={styles.cabecalhoAcao}>
-          <div
-            className={styles.progressoCabecalho}
-            role="progressbar"
-            aria-label="Progresso geral do projeto"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progressoGeral}
-          >
-            <p>
-              <strong>
-                {feitas} de {todosIds.length}
-              </strong>
-              <span>passos concluídos</span>
-            </p>
-            <span className={styles.progressoCabecalhoTrilho} aria-hidden="true">
-              <span style={{ transform: `scaleX(${progressoGeral / 100})` }} />
-            </span>
-          </div>
+        {mostrarAcaoCabecalho && (
+          <div className={styles.cabecalhoAcao}>
+            <div
+              className={styles.progressoCabecalho}
+              role="progressbar"
+              aria-label="Progresso da implementação"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progressoGeral}
+            >
+              <p>
+                <strong>
+                  {feitas} de {todosIds.length}
+                </strong>
+                <span>passos concluídos</span>
+              </p>
+              <span className={styles.progressoCabecalhoTrilho} aria-hidden="true">
+                <span style={{ transform: `scaleX(${progressoGeral / 100})` }} />
+              </span>
+            </div>
 
-          {proximoPasso ? (
-            <button
-              type="button"
-              onClick={() => setAbaAtiva('implementar')}
-              className={styles.acaoPrincipal}
-            >
-              <span>
-                <small>Próximo passo</small>
-                {proximoPasso.passo.titulo}
-              </span>
-              <ArrowRight size={17} aria-hidden="true" />
-            </button>
-          ) : !aprendizadoConcluido ? (
-            <button
-              type="button"
-              onClick={() => setAbaAtiva('aprender')}
-              className={styles.acaoPrincipal}
-            >
-              <span>
-                <small>Falta concluir</small>
-                Concluir aulas do projeto
-              </span>
-              <ArrowRight size={17} aria-hidden="true" />
-            </button>
-          ) : (
-            <Link href={`/certificados/solucao/${slug}`} className={styles.acaoPrincipal}>
-              <span>
-                <small>Projeto concluído</small>
-                Ver certificado
-              </span>
-              <ArrowRight size={17} aria-hidden="true" />
-            </Link>
-          )}
-        </div>
+            {!aprendizadoConcluido ? (
+              <button
+                type="button"
+                onClick={() => abrirArea('aprender')}
+                className={styles.acaoPrincipal}
+              >
+                <span>
+                  {!proximoPasso
+                    ? 'Concluir aulas do projeto'
+                    : aulasFeitas > 0
+                      ? 'Retomar aprendizado'
+                      : 'Começar aprendizado'}
+                </span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </button>
+            ) : proximoPasso ? (
+              <button
+                type="button"
+                onClick={() => abrirArea('implementar')}
+                className={styles.acaoPrincipal}
+              >
+                <span>
+                  <small>Próximo passo</small>
+                  {proximoPasso.passo.titulo}
+                </span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </button>
+            ) : (
+              <Link href={`/certificados/solucao/${slug}`} className={styles.acaoPrincipal}>
+                <span>
+                  <small>Projeto concluído</small>
+                  Ver certificado
+                </span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            )}
+          </div>
+        )}
       </header>
 
       <div className={styles.etapasProjeto}>
-        <nav className={styles.abasProjeto} aria-label="Áreas do projeto" role="tablist">
-          {abas.map((aba) => (
+        <nav
+          ref={abasRef}
+          className={styles.abasProjeto}
+          aria-label="Áreas do projeto"
+          role="tablist"
+        >
+          {abas.map((aba, indice) => (
             <button
               key={aba.id}
               type="button"
               role="tab"
               id={`aba-${aba.id}`}
               aria-selected={abaAtiva === aba.id}
-              aria-controls={`painel-${aba.id}`}
+              aria-controls="painel-projeto"
+              tabIndex={abaAtiva === aba.id ? 0 : -1}
               data-ativa={abaAtiva === aba.id ? '' : undefined}
               onClick={() => setAbaAtiva(aba.id)}
+              onKeyDown={(event) => {
+                const destino =
+                  event.key === 'ArrowRight'
+                    ? (indice + 1) % abas.length
+                    : event.key === 'ArrowLeft'
+                      ? (indice - 1 + abas.length) % abas.length
+                      : event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? abas.length - 1
+                          : null;
+                if (destino === null) return;
+                event.preventDefault();
+                const proximaAba = abas[destino];
+                if (proximaAba) abrirArea(proximaAba.id);
+              }}
             >
               {aba.rotulo}
             </button>
@@ -162,8 +201,9 @@ export function ProjetoGuiado({
 
         <div
           className={styles.painelProjeto}
-          id={`painel-${abaAtiva}`}
+          id="painel-projeto"
           role="tabpanel"
+          tabIndex={0}
           aria-labelledby={`aba-${abaAtiva}`}
         >
           {abaAtiva === 'aprender' && roteiro.trilhaDidatica ? (
@@ -172,11 +212,15 @@ export function ProjetoGuiado({
               titulo={titulo}
               trilha={roteiro.trilhaDidatica}
               videoUrl={videoUrl}
-              onIrImplementacao={() => setAbaAtiva('implementar')}
+              onIrImplementacao={() => abrirArea('implementar')}
             />
           ) : null}
           {abaAtiva === 'implementar' ? (
-            <ImplementacaoProjeto slug={slug} roteiro={roteiro} />
+            <ImplementacaoProjeto
+              slug={slug}
+              roteiro={roteiro}
+              onIrMateriais={() => abrirArea('materiais')}
+            />
           ) : null}
           {abaAtiva === 'materiais' ? (
             <>

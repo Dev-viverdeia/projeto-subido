@@ -13,8 +13,8 @@ import styles from './NavAula.module.css';
  * O botão do meio é o ÚNICO sólido da tela — é a ação que importa. Concluir grava
  * na conta e AVANÇA para a próxima; na última aula, apenas conclui.
  *
- * No mobile a barra gruda no rodapé com vidro — o aluno conclui sem rolar de
- * volta. Montar esta barra também "toca" a formação: é o que alimenta o
+ * A barra fica junto ao vídeo, sem disputar o rodapé com o menu mobile.
+ * Montar esta barra também "toca" a formação: é o que alimenta o
  * "continue de onde parou" mesmo para quem assiste sem concluir.
  */
 export function NavAula({
@@ -68,7 +68,7 @@ export function NavAula({
       )}
 
       {concluida ? (
-        <span className={styles.feita}>
+        <span className={styles.feita} role="status">
           <svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
             <circle cx="9" cy="9" r="8" fill="currentColor" />
             <path
@@ -82,8 +82,8 @@ export function NavAula({
           Aula concluída
         </span>
       ) : (
-        <Button variant="primary" onClick={concluir}>
-          {proximaId ? 'Concluir e avançar' : 'Concluir formação'}
+        <Button variant="primary" className={styles.concluir} onClick={concluir}>
+          {proximaId ? 'Concluir e avançar' : 'Concluir aula'}
         </Button>
       )}
 
@@ -101,7 +101,9 @@ export function NavAula({
           <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
         </Link>
       ) : (
-        <span className={styles.limite} aria-hidden="true" />
+        <Link href={`/formacoes/${formacaoSlug}`} className={styles.vizinha} data-direcao="proxima">
+          Voltar à formação <ArrowRight size={15} aria-hidden="true" />
+        </Link>
       )}
     </nav>
   );

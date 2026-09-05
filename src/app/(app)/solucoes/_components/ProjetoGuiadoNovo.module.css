@@ -1,7 +1,7 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-section);
+  gap: var(--via-space-6);
 }
 
 .eyebrow,
@@ -30,7 +30,7 @@
 
 .eyebrow {
   margin: 0 0 var(--via-space-3);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -38,17 +38,16 @@
 
 .cabecalho {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: var(--via-space-6);
+}
+
+.cabecalho[data-com-acao] {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
-  overflow: hidden;
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-surface);
-  background: color-mix(in srgb, var(--app-elev-2-bg) 88%, transparent);
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: blur(22px) saturate(132%);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .cabecalho,
   .aprendizado,
   .implementacao,
   .kitProjeto {
@@ -60,17 +59,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 196px;
-  padding: clamp(28px, 3.5vw, 44px);
+  padding: var(--via-space-2) var(--via-space-1);
 }
 
 .cabecalho h1 {
-  max-width: 18ch;
+  max-width: 30ch;
   margin: 0;
   font-family: var(--via-font-display);
-  font-size: clamp(2rem, 1.7rem + 1.2vw, 3rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 540;
-  line-height: 1.02;
+  line-height: 1.12;
   letter-spacing: var(--app-ls-h1);
   color: var(--via-text-primary);
   text-wrap: balance;
@@ -79,7 +77,7 @@
 .resultado {
   max-width: 66ch;
   margin: var(--via-space-3) 0 0;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   line-height: 1.52;
   color: var(--via-text-muted);
   text-wrap: pretty;
@@ -87,9 +85,8 @@
 
 .metaProjeto,
 .progressoCabecalho {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
 }
 
 .metaProjeto {
@@ -139,9 +136,11 @@
   flex-direction: column;
   justify-content: space-between;
   gap: var(--via-space-4);
-  padding: clamp(24px, 3vw, 34px);
-  border-left: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-surface) 54%, var(--via-navy-08));
+  padding: var(--via-space-5);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
 }
 
 .cabecalhoAcao dl {
@@ -161,7 +160,7 @@
 .cabecalhoAcao dt,
 .cabecalhoAcao dd {
   margin: 0;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
 }
 
 .cabecalhoAcao dt {
@@ -179,7 +178,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--via-space-4);
-  min-height: 68px;
+  min-height: 48px;
   padding: var(--via-space-3) var(--via-space-4);
   border: 0;
   border-radius: var(--app-radius-control);
@@ -200,14 +199,15 @@
   overflow: hidden;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-surface);
-  background: color-mix(in srgb, var(--app-elev-1-bg) 88%, transparent);
-  box-shadow: var(--app-elev-1-shadow);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-glass-card-shadow-raised);
   backdrop-filter: blur(20px) saturate(130%);
 }
 
 .abasProjeto {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--via-space-2);
   padding: var(--via-space-2);
   border-bottom: 1px solid var(--via-border-hairline);
@@ -215,7 +215,7 @@
 }
 
 .abasProjeto button {
-  min-height: var(--app-h-control);
+  min-height: 44px;
   border: 0;
   border-radius: var(--app-radius-control);
   background: transparent;
@@ -276,7 +276,7 @@
 
 .acaoPrincipal small {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-regular);
   color: var(--via-gray-300);
 }
@@ -305,10 +305,10 @@
 
 .secaoCabecalho {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--app-gap-section);
-  padding: clamp(26px, 3.5vw, 42px);
+  padding: var(--via-space-5) var(--via-space-6);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
@@ -319,7 +319,7 @@
 
 .secaoCabecalho h2 {
   font-family: var(--via-font-display);
-  font-size: clamp(1.65rem, 1.4rem + 0.9vw, 2.35rem);
+  font-size: var(--via-fs-h4);
   font-weight: 560;
   line-height: var(--via-lh-snug);
   letter-spacing: var(--app-ls-h2);
@@ -340,12 +340,16 @@
   display: grid;
   gap: var(--via-space-2);
   min-width: 220px;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
 }
 
 .progressoResumo strong {
   color: var(--via-text-primary);
+}
+
+.secaoCabecalho > .progressoResumo > span {
+  margin: 0;
 }
 
 .barra {
@@ -367,14 +371,13 @@
 
 .aprendizadoCorpo {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.36fr);
+  align-items: start;
 }
 
 .videoAbertura {
   min-width: 0;
-  padding: clamp(24px, 3vw, 36px);
-  border-right: 1px solid var(--via-border-hairline);
-  background: color-mix(in srgb, var(--via-navy) 3%, transparent);
+  padding: var(--via-space-6);
 }
 
 .videoRotulo {
@@ -384,7 +387,7 @@
 }
 
 .videoRotulo span {
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -397,15 +400,22 @@
 }
 
 .aulaFoco {
+  display: contents;
+}
+
+.aulaConteudo {
+  grid-column: 1 / -1;
   min-width: 0;
-  padding: clamp(24px, 3vw, 36px);
+  padding: var(--via-space-6);
+  border-top: 1px solid var(--via-border-hairline);
 }
 
 .aulaNavegacao {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--via-space-2);
-  margin-bottom: var(--via-space-6);
+  margin: 0;
+  padding: var(--via-space-6) var(--via-space-6) var(--via-space-6) 0;
 }
 
 .aulaNavegacao button {
@@ -452,26 +462,25 @@
   width: 22px;
   height: 22px;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
 }
 
 .aulaNavegacao strong,
 .aulaNavegacao small {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: var(--via-lh-snug);
 }
 
 .aulaNavegacao strong {
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
 }
 
 .aulaNavegacao small {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  color: var(--via-text-faint);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
 }
 
 .aulaNavegacao button[data-ativa] small {
@@ -484,7 +493,7 @@
 .passoTitulo p,
 .fundamentos header p {
   margin: 0 0 var(--via-space-2);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -534,7 +543,7 @@
 
 .aulaResumo h4 {
   margin: 0 0 var(--via-space-3);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -550,7 +559,7 @@
 .aulaResumo li,
 .aulaResumo p {
   margin: 0;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-body);
   line-height: 1.52;
   color: var(--via-text-muted);
 }
@@ -570,7 +579,7 @@
 .aulaConclusao p {
   max-width: 48ch;
   margin: 0;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: 1.5;
   color: var(--via-text-muted);
 }
@@ -578,7 +587,7 @@
 .aulaConclusao p span {
   display: block;
   margin-bottom: var(--via-space-1);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   color: var(--via-text-faint);
 }
 
@@ -588,14 +597,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: var(--app-h-control);
+  min-height: 44px;
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
   background: var(--via-navy);
   color: var(--via-white);
   font: inherit;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   cursor: pointer;
   white-space: nowrap;
@@ -648,7 +657,7 @@
 
 .detalheApoio > summary {
   min-height: 48px;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   color: var(--via-text-primary);
 }
@@ -690,7 +699,7 @@
 
 .aprendizadoConcluido p {
   margin-top: 2px;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
 }
 
@@ -700,7 +709,7 @@
   background: transparent;
   color: var(--via-navy);
   font: inherit;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   text-decoration: none;
   cursor: pointer;
@@ -733,7 +742,7 @@
 
 .bibliotecaApoio summary small,
 .kitProjeto summary small {
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-regular);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
@@ -791,7 +800,7 @@
 .demonstracao li > span,
 .fundamentos li > span {
   padding-top: 2px;
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   color: var(--via-text-faint);
 }
 
@@ -805,7 +814,7 @@
 
 .demonstracao li strong,
 .fundamentos li h3 {
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   color: var(--via-text-primary);
 }
@@ -813,7 +822,7 @@
 .demonstracao li p,
 .fundamentos li p {
   margin-top: var(--via-space-1);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: 1.5;
   color: var(--via-text-muted);
 }
@@ -847,13 +856,13 @@
 }
 
 .modelosAula article strong {
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   color: var(--via-text-primary);
 }
 
 .modelosAula article p {
   margin-top: 2px;
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   color: var(--via-text-muted);
 }
 
@@ -913,15 +922,13 @@
 .fases button > span,
 .fases button small {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
 }
 
 .fases button strong {
-  overflow: hidden;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .fases button small {
@@ -935,7 +942,7 @@
 .faseCorpo {
   display: grid;
   grid-template-columns: minmax(240px, 0.28fr) minmax(0, 0.72fr);
-  min-height: 560px;
+  min-height: 0;
 }
 
 .passosDaFase {
@@ -946,7 +953,7 @@
 
 .passosDaFase > p {
   margin: 0 0 var(--via-space-4);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -1002,11 +1009,11 @@
   width: 24px;
   height: 24px;
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
 }
 
 .passosDaFase button strong {
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   line-height: var(--via-lh-snug);
 }
@@ -1035,7 +1042,7 @@
   padding: var(--via-space-2) var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-chip);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   font-weight: var(--via-fw-medium);
   color: var(--via-text-muted);
 }
@@ -1059,7 +1066,7 @@
   align-items: center;
   gap: var(--via-space-2);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   color: var(--via-text-faint);
 }
 
@@ -1092,7 +1099,7 @@
 }
 
 .criteriosPasso dt {
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -1100,7 +1107,7 @@
 
 .criteriosPasso dd {
   margin-top: var(--via-space-2);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: 1.5;
   color: var(--via-text-muted);
 }
@@ -1122,14 +1129,14 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  min-height: var(--app-h-control);
+  min-height: 44px;
   padding-inline: var(--via-space-4);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   background: var(--via-surface);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   text-decoration: none;
   cursor: pointer;
@@ -1167,7 +1174,7 @@
 .resumoProjeto span {
   display: block;
   margin-bottom: var(--via-space-2);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-caption);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
   color: var(--via-text-faint);
@@ -1209,7 +1216,7 @@
 
 .estudio p {
   margin-top: var(--via-space-1);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
 }
 
@@ -1218,7 +1225,7 @@
   align-items: center;
   gap: var(--via-space-2);
   color: var(--via-navy);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   font-weight: 620;
   text-decoration: none;
 }
@@ -1230,6 +1237,7 @@
 
 @media (max-width: 1079px) {
   .cabecalho,
+  .cabecalho[data-com-acao],
   .aprendizadoCorpo,
   .faseCorpo {
     grid-template-columns: minmax(0, 1fr);
@@ -1240,7 +1248,6 @@
   }
 
   .cabecalhoAcao,
-  .videoAbertura,
   .passosDaFase {
     border-top: 1px solid var(--via-border-hairline);
     border-left: 0;
@@ -1251,13 +1258,17 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .aulaNavegacao {
+    padding: 0 var(--via-space-6) var(--via-space-6);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .faseCorpo {
     min-height: 0;
   }
 }
 
 @media (max-width: 899px) {
-  .secaoCabecalho,
   .passoFoco > header,
   .passoTitulo {
     align-items: start;
@@ -1265,8 +1276,21 @@
   }
 
   .progressoResumo {
-    width: 100%;
+    width: auto;
     min-width: 0;
+  }
+
+  .secaoCabecalho {
+    gap: var(--via-space-4);
+  }
+
+  .secaoCabecalho .progressoResumo {
+    max-width: 140px;
+    flex: 0 1 140px;
+  }
+
+  .secaoCabecalho .progressoResumo > span {
+    font-size: var(--via-fs-caption);
   }
 
   .fases {
@@ -1303,18 +1327,21 @@
   .cabecalhoAcao,
   .secaoCabecalho,
   .videoAbertura,
-  .aulaFoco,
+  .aulaConteudo,
   .passosDaFase,
   .passoFoco {
     padding: var(--via-space-5);
   }
 
   .cabecalho h1 {
-    font-size: clamp(2rem, 10vw, 2.75rem);
+    font-size: clamp(1.75rem, 6vw, 2rem);
+  }
+
+  .cabecalhoTexto {
+    padding: 0;
   }
 
   .abasProjeto {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow-x: auto;
   }
 
@@ -1327,6 +1354,10 @@
 
   .aulaNavegacao button {
     min-height: 50px;
+  }
+
+  .aulaNavegacao {
+    padding: 0 var(--via-space-5) var(--via-space-5);
   }
 
   .aulaConclusao,

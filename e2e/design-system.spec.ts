@@ -457,7 +457,7 @@ test.describe('fundação visual Viver de IA', () => {
     if ((page.viewportSize()?.width ?? 0) < 1080) {
       await expect(page.getByRole('button', { name: 'Ver as aulas do curso' })).toBeVisible();
     } else {
-      await expect(page.getByText('Conteúdo da formação', { exact: true })).toBeVisible();
+      await expect(page.getByRole('complementary', { name: 'Aulas do curso' })).toBeVisible();
     }
   });
 });

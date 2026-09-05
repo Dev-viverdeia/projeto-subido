@@ -1,7 +1,7 @@
 .raiz {
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-block);
+  gap: var(--via-space-6);
 }
 
 .hero {
@@ -9,23 +9,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(250px, 28%, 340px);
   align-items: end;
-  gap: var(--app-gap-section);
-  overflow: hidden;
-  padding: clamp(28px, 4vw, 48px);
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-surface);
-  background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: blur(24px) saturate(145%);
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: color-mix(in srgb, var(--via-white) 86%, transparent);
-  pointer-events: none;
+  gap: var(--via-space-6);
+  padding: var(--via-space-2) var(--via-space-1);
 }
 
 .heroTexto {
@@ -51,17 +36,17 @@
 }
 
 .selo {
-  margin-left: auto;
+  flex: none;
 }
 
 .titulo {
   margin: 0;
-  max-width: 22ch;
+  max-width: 30ch;
   font-family: var(--via-font-display);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-hero);
-  line-height: 1.02;
+  line-height: 1.12;
   color: var(--via-text-primary);
   text-wrap: balance;
 }
@@ -85,23 +70,23 @@
 }
 
 .meta {
-  padding: 6px var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-chip);
-  background: color-mix(in srgb, var(--via-white) 64%, transparent);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.meta + .meta::before {
+  content: '·';
+  margin-right: var(--via-space-2);
 }
 
 .progressoResumo {
   padding: var(--app-pad-card);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
 }
 
 .retomada,
@@ -112,12 +97,12 @@
   align-items: center;
   gap: var(--app-gap-section);
   overflow: hidden;
-  min-height: 132px;
-  padding: clamp(22px, 3vw, 32px);
-  border: 1px solid color-mix(in srgb, var(--via-white) 14%, transparent);
+  min-height: 96px;
+  padding: var(--via-space-5) var(--via-space-6);
+  border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-card);
-  background: var(--via-mesh-navy);
-  box-shadow: var(--via-glow-navy);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-glass-card-shadow-raised);
 }
 
 .retomada::after,
@@ -153,18 +138,16 @@
   font-family: var(--via-font-mono);
   letter-spacing: var(--app-ls-eyebrow);
   text-transform: uppercase;
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
 }
 
 .retomadaTexto strong {
-  overflow: hidden;
   max-width: 48ch;
-  font-size: clamp(var(--via-fs-h4), 2.2vw, var(--via-fs-h3));
+  font-size: var(--via-fs-h4);
   font-weight: 560;
   line-height: var(--via-lh-snug);
-  color: var(--via-white);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--via-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .conclusao .retomadaTexto strong {
@@ -172,7 +155,7 @@
 }
 
 .retomadaTexto small {
-  color: var(--via-gray-300);
+  color: var(--via-text-muted);
 }
 
 .cta,
@@ -182,7 +165,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: var(--app-h-control);
+  min-height: 44px;
   padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
   font-size: var(--via-fs-sm);
@@ -195,14 +178,15 @@
 }
 
 .cta {
-  background: var(--via-white);
-  color: var(--via-navy);
+  background: var(--via-mesh-navy);
+  color: var(--via-white);
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .ctaSecundario {
-  border: 1px solid color-mix(in srgb, var(--via-white) 22%, transparent);
-  background: color-mix(in srgb, var(--via-white) 9%, transparent);
-  color: var(--via-white);
+  border: 1px solid var(--via-border-hairline);
+  background: var(--app-glass-plane);
+  color: var(--via-text-primary);
 }
 
 .cta:hover,
@@ -211,7 +195,7 @@
 }
 
 .ctaSecundario:hover {
-  background: color-mix(in srgb, var(--via-white) 14%, transparent);
+  background: var(--via-surface);
 }
 
 .cta:focus-visible,
@@ -251,7 +235,7 @@
 }
 
 .cabecalhoSecao h2 {
-  font-size: clamp(var(--via-fs-h3), 3vw, var(--via-fs-h2));
+  font-size: var(--via-fs-h3);
   font-weight: 560;
   letter-spacing: var(--app-ls-h2);
   line-height: var(--via-lh-tight);
@@ -262,12 +246,6 @@
   font-size: var(--via-fs-sm);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .hero {
-    background: var(--via-surface);
-  }
 }
 
 @media (max-width: 899px) {

@@ -12,7 +12,15 @@ import {
 import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
 import styles from './ProjetoGuiadoNovo.module.css';
 
-export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro: RoteiroProjeto }) {
+export function ImplementacaoProjeto({
+  slug,
+  roteiro,
+  onIrMateriais,
+}: {
+  slug: string;
+  roteiro: RoteiroProjeto;
+  onIrMateriais: () => void;
+}) {
   const progresso = useProgresso();
   const { alternarEtapa } = useAcoesProgresso();
   const todosIds = idsPassosProjeto(slug, roteiro);
@@ -50,9 +58,12 @@ export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro:
     setPassoEscolhidoId(null);
     if (mover)
       requestAnimationFrame(() =>
-        document
-          .getElementById('implementacao-projeto')
-          ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+        document.getElementById('implementacao-projeto')?.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'auto'
+            : 'smooth',
+          block: 'start',
+        }),
       );
   };
 
@@ -64,9 +75,7 @@ export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro:
     >
       <header className={styles.secaoCabecalho}>
         <div>
-          <p className={styles.eyebrow}>2 · Implemente</p>
-          <h2 id="implementacao-titulo">Construa em cinco fases</h2>
-          <span>Abra uma fase, faça o passo em foco e marque quando estiver pronto.</span>
+          <h2 id="implementacao-titulo">Passo a passo</h2>
         </div>
         <div className={styles.progressoResumo}>
           <span>
@@ -96,7 +105,13 @@ export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro:
               aria-current={fase.id === faseAtiva?.id ? 'step' : undefined}
               onClick={() => abrirFase(fase.id)}
             >
-              <span>{concluidos === ids.length ? <Check size={13} /> : `0${indice + 1}`}</span>
+              <span>
+                {ids.length > 0 && concluidos === ids.length ? (
+                  <Check size={17} aria-label="Concluída" />
+                ) : (
+                  `0${indice + 1}`
+                )}
+              </span>
               <strong>{fase.titulo}</strong>
               <small>
                 {concluidos}/{ids.length}
@@ -119,6 +134,7 @@ export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro:
                     key={passo.id}
                     onClick={() => setPassoEscolhidoId(passo.id)}
                     data-ativo={passo.id === passoAtivo.id || undefined}
+                    aria-current={passo.id === passoAtivo.id ? 'step' : undefined}
                   >
                     <span>
                       {concluido ? <Check size={12} /> : String(indice + 1).padStart(2, '0')}
@@ -198,9 +214,9 @@ export function ImplementacaoProjeto({ slug, roteiro }: { slug: string; roteiro:
             {proximaFase.titulo} <ArrowRight size={15} aria-hidden="true" />
           </button>
         ) : (
-          <a href="#kit-projeto">
+          <button type="button" onClick={onIrMateriais}>
             Abrir kit de implementação <ArrowRight size={15} aria-hidden="true" />
-          </a>
+          </button>
         )}
       </nav>
     </section>

@@ -51,9 +51,8 @@
   font-weight: 560;
   letter-spacing: var(--app-ls-sm);
   color: var(--via-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: var(--via-lh-snug);
 }
 
 .metaModulo {
@@ -76,12 +75,10 @@
   transform: rotate(180deg);
 }
 
-/* Anima altura sem `height: auto`: a linha do grid vai de 0fr a 1fr e o filho
-   com `min-height: 0` acompanha. */
+/* A abertura não anima layout nem desloca o restante da página por vários frames. */
 .dobra {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--app-t-reveal);
 }
 
 .dobra[data-aberto] {
@@ -131,9 +128,8 @@
   max-width: 62ch;
   font-size: var(--via-fs-sm);
   color: var(--via-text-body);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: var(--via-lh-snug);
 }
 
 .aula[data-status='concluida'] .aulaTitulo {
