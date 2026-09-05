@@ -309,8 +309,7 @@ export function montarCicloCliente(lead: DossieLead): {
       decisao: {
         tipo: 'enriquecer',
         rotulo: 'Antes da primeira conversa',
-        titulo:
-          'Enriqueça a ficha para receber contexto, perguntas de descoberta e projetos para explorar.',
+        titulo: 'Conheça melhor a empresa antes da reunião.',
         href: null,
         acao: 'Enriquecer dados',
         prazo: null,

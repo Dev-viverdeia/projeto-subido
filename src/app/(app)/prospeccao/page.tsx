@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { DatabaseZap, Search, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Card, Pill, Spinner } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
@@ -9,6 +9,7 @@ import { AcompanhamentoBusca } from './_components/AcompanhamentoBusca';
 import { FormularioBusca } from './_components/FormularioBusca';
 import { HeroProspeccao } from './_components/HeroProspeccao';
 import { ListaResultados } from './_components/ListaResultados';
+import { ListasVazias } from './_components/ListasVazias';
 import { ResultadoBusca } from './_components/ResultadoBusca';
 import styles from './pagina.module.css';
 
@@ -121,25 +122,26 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
         }
       />
 
-      <Card
-        id="lista-resultados"
-        as="section"
-        variant="glass"
-        noPadding
-        className={styles.areaListas}
-        aria-labelledby="listas-titulo"
-      >
-        <aside className={styles.historico}>
-          <div className={styles.historicoTopo}>
-            <div>
-              <p className={styles.sobretitulo}>Suas buscas</p>
-              <h2 id="listas-titulo">Listas</h2>
+      {!listas.length ? (
+        <ListasVazias />
+      ) : (
+        <Card
+          id="lista-resultados"
+          as="section"
+          variant="glass"
+          noPadding
+          className={styles.areaListas}
+          aria-labelledby="listas-titulo"
+        >
+          <aside className={styles.historico}>
+            <div className={styles.historicoTopo}>
+              <div>
+                <h2 id="listas-titulo">Listas</h2>
+              </div>
+              <Pill size="sm" variant="default">
+                {listas.length} {listas.length === 1 ? 'lista' : 'listas'}
+              </Pill>
             </div>
-            <Pill size="sm" variant="default">
-              {listas.length} {listas.length === 1 ? 'lista' : 'listas'}
-            </Pill>
-          </div>
-          {listas.length ? (
             <nav aria-label="Listas de prospecção">
               {listas.map((lista) => (
                 <Link
@@ -160,78 +162,55 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                 </Link>
               ))}
             </nav>
-          ) : (
-            <div className={styles.semListas}>
-              <Search size={19} aria-hidden="true" />
-              <p>Sua primeira busca aparecerá aqui.</p>
-            </div>
-          )}
-        </aside>
+          </aside>
 
-        <div className={styles.resultados}>
-          {listaAtual ? (
-            <>
-              <header className={styles.resultadosTopo}>
-                <div>
-                  <p className={styles.sobretitulo}>Lista selecionada</p>
-                  <h2>{listaAtual.segmento}</h2>
-                  <span>{listaAtual.localizacao}</span>
-                </div>
-                <div className={styles.metricasLista}>
-                  <span>
-                    <strong>{listaAtual.creditos_consumidos}</strong>
-                    encontradas
-                  </span>
-                  <span>
-                    <strong>{listaAtual.quantidade_solicitada}</strong>
-                    solicitados
-                  </span>
-                </div>
-              </header>
-              {listaAtual.status === 'processando' ? (
-                <div className={styles.listaProcessando} role="status" aria-live="polite">
-                  <span aria-hidden="true">
-                    <Spinner size="md" tone="navy" />
-                  </span>
+          <div className={styles.resultados}>
+            {listaAtual ? (
+              <>
+                <header className={styles.resultadosTopo}>
                   <div>
-                    <h3>Estamos montando esta lista.</h3>
-                    <p>{progresso.detalhe ?? 'Buscando empresas novas para este recorte.'}</p>
+                    <h2>{listaAtual.segmento}</h2>
+                    <span>{listaAtual.localizacao}</span>
                   </div>
-                </div>
-              ) : listaAtual.status === 'falhou' ? (
-                <div className={styles.semResultados}>
-                  <SlidersHorizontal size={24} aria-hidden="true" />
-                  <h3>Esta busca não foi concluída.</h3>
-                  <p>Revise o recorte e crie uma nova lista. O saldo já foi restaurado.</p>
-                </div>
-              ) : (
-                <ListaResultados leads={leads} lista={listaAtual.id} />
-              )}
-            </>
-          ) : (
-            <div className={styles.primeiraBusca}>
-              <DatabaseZap size={28} strokeWidth={1.5} aria-hidden="true" />
-              <p className={styles.sobretitulo}>Primeira busca</p>
-              <h2>Encontre as primeiras empresas.</h2>
-              <p>
-                Informe o tipo de empresa e a região. A plataforma procura empresas novas, reúne os
-                contatos disponíveis e organiza a lista para você começar.
-              </p>
-              <ol>
-                <li>
-                  <span>01</span> Defina mercado e região
-                </li>
-                <li>
-                  <span>02</span> Veja os contatos encontrados
-                </li>
-                <li>
-                  <span>03</span> Leve os leads escolhidos para Vendas
-                </li>
-              </ol>
-            </div>
-          )}
-        </div>
-      </Card>
+                  <div className={styles.metricasLista}>
+                    <span>
+                      <strong>{listaAtual.creditos_consumidos}</strong>
+                      encontradas
+                    </span>
+                    <span>
+                      <strong>{listaAtual.quantidade_solicitada}</strong>
+                      solicitados
+                    </span>
+                  </div>
+                </header>
+                {listaAtual.status === 'processando' ? (
+                  <div className={styles.listaProcessando} role="status" aria-live="polite">
+                    <span aria-hidden="true">
+                      <Spinner size="md" tone="navy" />
+                    </span>
+                    <div>
+                      <h3>Estamos montando esta lista.</h3>
+                      <p>{progresso.detalhe ?? 'Buscando empresas novas para este recorte.'}</p>
+                    </div>
+                  </div>
+                ) : listaAtual.status === 'falhou' ? (
+                  <div className={styles.semResultados}>
+                    <SlidersHorizontal size={24} aria-hidden="true" />
+                    <h3>Esta busca não foi concluída.</h3>
+                    <p>Revise o recorte e crie uma nova lista. O saldo já foi restaurado.</p>
+                  </div>
+                ) : (
+                  <ListaResultados leads={leads} lista={listaAtual.id} />
+                )}
+              </>
+            ) : (
+              <div className={styles.semResultados}>
+                <h3>Selecione uma lista para ver as empresas.</h3>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

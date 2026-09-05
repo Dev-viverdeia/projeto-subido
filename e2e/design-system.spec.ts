@@ -9,7 +9,7 @@ const TELAS = [
   ['/preview/mapa-jornada', 'Mateus.'],
   ['/preview/shell', 'Mateus.'],
   ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
-  ['/preview/metricas', 'Veja o funil e o próximo ponto de atenção.'],
+  ['/preview/metricas', 'Funil de vendas'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
   ['/preview/calls', 'Início do projeto'],
   ['/preview/call-preparo', 'Confirmar se a perda de contatos'],

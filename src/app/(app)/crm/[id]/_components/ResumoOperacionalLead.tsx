@@ -31,6 +31,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
   const ganha = lead.oportunidade.etapa === 'ganho';
   const perdida = lead.oportunidade.etapa === 'perdido';
   const cicloConcluido = lead.projetoRecente?.status === 'concluido';
+  const etapaAtual = etapas.find(
+    (etapa) => etapa.estado === 'atual' || etapa.estado === 'encerrada',
+  );
   const IconeDecisao = ganha ? CheckCircle2 : perdida ? X : CalendarClock;
   const tituloSecao = cicloConcluido
     ? 'Ciclo concluído'
@@ -51,9 +54,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
     <section className={styles.operacao} aria-labelledby="operacao-titulo">
       <header className={styles.topo}>
         <div>
-          <p className={styles.sobretitulo}>Venda guiada</p>
           <h2 id="operacao-titulo">{tituloSecao}</h2>
-          <p>{descricaoSecao}</p>
         </div>
 
         <ol className={styles.metodo} aria-label="Jornada deste cliente">
@@ -85,15 +86,12 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                 </span>
                 <div>
                   <strong>{etapa.rotulo}</strong>
-                  <small className={styles.estadoEtapa}>{rotuloEstado}</small>
-                  {(estado === 'atual' || estado === 'encerrada') && (
-                    <small className={styles.descricaoEtapa}>{etapa.evidencia}</small>
-                  )}
                 </div>
               </li>
             );
           })}
         </ol>
+        {etapaAtual && <p className={styles.etapaAtual}>{etapaAtual.evidencia}</p>}
       </header>
 
       <div
@@ -159,6 +157,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
             {lead.totalCalls} {lead.totalCalls === 1 ? 'reunião' : 'reuniões'}
           </small>
         </summary>
+        <p className={styles.contextoHistorico}>{descricaoSecao}</p>
 
         <div className={styles.registros}>
           <section aria-labelledby="historico-titulo">
