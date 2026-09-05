@@ -33,6 +33,7 @@ import {
   rotaPreview,
 } from '../projetos/fixture';
 import { ProgressoPreview } from '../ProgressoPreview';
+import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 
 export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 
@@ -49,14 +50,19 @@ export default async function PreviewShellPage({
   const params = await searchParams;
   const plano = params.plano === 'starter' ? 'starter' : 'pro';
   const nome = params.nome === 'longo' ? 'Maria Aparecida de Albuquerque' : 'Mateus';
-  const tela = ['formacoes', 'projetos', 'formacao', 'aula', 'projeto'].includes(params.tela ?? '')
+  const tela = ['formacoes', 'projetos', 'formacao', 'aula', 'projeto', 'sobral'].includes(
+    params.tela ?? '',
+  )
     ? params.tela!
     : 'inicio';
-  const caminho = tela.startsWith('projeto')
-    ? '/solucoes'
-    : tela === 'aula' || tela.startsWith('formacao')
-      ? '/formacoes'
-      : '/inicio';
+  const caminho =
+    tela === 'sobral'
+      ? '/consultor'
+      : tela.startsWith('projeto')
+        ? '/solucoes'
+        : tela === 'aula' || tela.startsWith('formacao')
+          ? '/formacoes'
+          : '/inicio';
   const aulas = FORMACAO_DEMO.modulos.flatMap((modulo) => modulo.aulas);
   const feitas =
     params.estado === 'concluido'
@@ -80,7 +86,15 @@ export default async function PreviewShellPage({
   return (
     <ProvedorDeTrilha>
       <DefinirTrilha
-        atual={tela === 'formacoes' ? 'Formações' : tela === 'projetos' ? 'Projetos' : 'Início'}
+        atual={
+          tela === 'sobral'
+            ? 'Sobral AI'
+            : tela === 'formacoes'
+              ? 'Formações'
+              : tela === 'projetos'
+                ? 'Projetos'
+                : 'Início'
+        }
       />
       <div className={shellStyles.shell} data-app-shell>
         <a href="#conteudo" className="via-skip-link">
@@ -113,7 +127,9 @@ export default async function PreviewShellPage({
 
         <main className={shellStyles.conteudo} id="conteudo">
           <ProgressoPreview aulas={feitas}>
-            {tela === 'formacoes' ? (
+            {tela === 'sobral' ? (
+              <TelaSobral threads={[]} conversa={null} nome={nome} modoPreview />
+            ) : tela === 'formacoes' ? (
               <FormacoesVista formacoes={FORMACOES_DEMO} />
             ) : tela === 'projetos' ? (
               <CatalogoProjetos solucoes={projetosPreview} />

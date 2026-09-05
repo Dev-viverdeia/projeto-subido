@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, FileText, Image as ImageIcon, Target } from 'lucide-react';
+import { ArrowRight, FileText, Image as ImageIcon, Target } from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import { BotaoCopiar } from '@/app/(app)/_components/BotaoCopiar';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
@@ -95,7 +96,7 @@ export function Mensagens({
               ) : null}
               {m.papel === 'consultor' ? (
                 <span className={styles.autor}>
-                  <Bot size={15} strokeWidth={1.9} aria-hidden="true" /> Sobral AI
+                  <IconeProduto nome="sobral" tamanho={20} /> Sobral AI
                 </span>
               ) : null}
               {m.papel === 'consultor' ? (

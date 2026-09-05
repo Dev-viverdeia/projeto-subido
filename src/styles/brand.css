@@ -24,6 +24,21 @@
   --via-glow-navy: var(--via-shadow-lg);
   --via-glow-navy-strong: var(--via-shadow-xl);
 
+  /* Material neutro. O canvas medido no Início era rgb(247,248,250), já frio,
+     mas painéis entre 58–78% de opacidade e saturação de 145–185% herdavam a
+     cor do conteúdo atrás deles. O reflexo agora usa uma base branca/cinza
+     explícita; o vidro estrutural não amplifica a saturação das imagens. */
+  --app-canvas-bg: linear-gradient(180deg, var(--via-white), var(--via-gray-50) 480px);
+  --app-glass-base: linear-gradient(
+    155deg,
+    var(--via-white) 0%,
+    color-mix(in srgb, var(--via-white) 64%, var(--via-gray-50)) 64%,
+    var(--via-gray-50) 100%
+  );
+  --app-glass-filter: blur(24px) saturate(100%);
+  --via-glass-blur: blur(24px) saturate(100%);
+  --via-glass-blur-bar: blur(26px) saturate(100%);
+
   /* Largura de trabalho: ampla para CRM/calls, ainda legível em telas grandes. */
   --app-canvas: 1480px;
 
@@ -98,10 +113,10 @@
      genérico colocado sobre ele. */
   --app-control-bg:
     linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58)),
-    color-mix(in srgb, var(--via-surface) 82%, transparent);
+    var(--app-glass-base);
   --app-control-bg-hover:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.7)),
-    color-mix(in srgb, var(--via-surface) 88%, transparent);
+    var(--app-glass-base);
   --app-control-line: color-mix(in srgb, var(--via-navy) 12%, var(--via-white));
   --app-control-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 10px 24px -22px var(--via-navy-40);
@@ -131,7 +146,7 @@
       rgba(255, 255, 255, 0.3) 36%,
       transparent 68%
     ),
-    color-mix(in srgb, var(--via-surface) 70%, transparent);
+    var(--app-glass-base);
   --app-glass-plane-strong:
     linear-gradient(
       132deg,
@@ -139,7 +154,7 @@
       rgba(255, 255, 255, 0.4) 34%,
       transparent 70%
     ),
-    color-mix(in srgb, var(--via-surface) 78%, transparent);
+    var(--app-glass-base);
 
   /* Cards de acesso: reflexo interno + sombra curta mantêm o recorte visível
      no canvas claro. A elevação não depende de blur em cada item da grade. */
@@ -163,7 +178,7 @@
       rgba(255, 255, 255, 0.12) 42%,
       rgba(247, 248, 250, 0.28) 100%
     ),
-    color-mix(in srgb, var(--via-surface) 72%, transparent);
+    color-mix(in srgb, var(--via-white) 94%, var(--via-gray-50));
   /* Menus carregam leitura e decisão. O brilho continua translúcido, mas a base
      é opaca para o conteúdo da página nunca competir com o texto do overlay. */
   --app-shell-overlay-bg:
@@ -181,6 +196,9 @@
 }
 
 :root[data-theme='dark'] {
+  --app-canvas-bg: var(--via-bg);
+  --app-glass-base: linear-gradient(155deg, var(--via-surface-elev), var(--via-surface));
+  --app-shell-panel-bg: var(--via-surface);
   --app-elev-1-bg: var(--via-glass-card);
   --app-ring: 0 0 0 2px var(--via-bg), 0 0 0 4px var(--via-text-primary);
 }

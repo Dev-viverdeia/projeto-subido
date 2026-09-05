@@ -79,11 +79,9 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid var(--app-control-line);
-  border-radius: var(--app-radius-control);
-  background: var(--app-control-bg);
   color: var(--via-navy);
-  box-shadow: var(--app-control-shadow);
+  /* O pictograma identifica a área; não deve parecer um segundo botão.
+     O desenho de 30px ocupa a caixa de 42px sem outra moldura dentro do card. */
 }
 
 .conteudoAtalho {

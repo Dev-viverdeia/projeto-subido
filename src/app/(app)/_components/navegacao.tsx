@@ -1,20 +1,4 @@
-import {
-  Award,
-  Bot,
-  BriefcaseBusiness,
-  ChartNoAxesCombined,
-  ContactRound,
-  DraftingCompass,
-  FileSignature,
-  FolderKanban,
-  GraduationCap,
-  House,
-  Search,
-  ShieldCheck,
-  UserRound,
-  Users,
-  Video,
-} from 'lucide-react';
+import { IconeProduto } from '@/components/brand/IconeProduto';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
@@ -44,107 +28,100 @@ export const ROTULOS_GRUPO_NAV = {
 /**
  * Os destinos da plataforma, na ordem dos quatro pilares.
  *
- * OS ÍCONES SÃO ELEMENTOS, NÃO COMPONENTES — e isso é o que mantém o JS baixo.
- * Este módulo não tem `'use client'`, então roda no servidor e o `lucide-react`
- * nunca entra no bundle do browser: os `<Boxes />` viram nós já serializados no
- * payload RSC. Se aqui estivesse `icone: Boxes` (a referência ao componente), o
- * NavLateral — que é cliente por causa do `usePathname` — teria que importar a
- * biblioteca inteira para poder chamá-la.
- *
- * `strokeWidth` 1.8 acompanha o peso da Geist; o default 2 pesa demais ao lado dela.
+ * Elementos SVG serializados no servidor: a navegação cliente recebe o desenho,
+ * não importa o catálogo. A família é a mesma dos atalhos no Início.
+ * 22px corrige os pictogramas de 18px ao lado da navegação de 15px.
  */
-const TAMANHO = 18;
-const TRACO = 1.8;
 
 export const ITENS_NAV: ItemNav[] = [
   {
     href: '/inicio',
     rotulo: ROTULOS['/inicio'],
-    icone: <House size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="inicio" />,
     noDock: true,
     grupo: 'inicio',
   },
   {
     href: '/consultor',
     rotulo: ROTULOS['/consultor'],
-    icone: <Bot size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="sobral" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/formacoes',
     rotulo: ROTULOS['/formacoes'],
-    icone: <GraduationCap size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="formacoes" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/solucoes',
     rotulo: ROTULOS['/solucoes'],
-    icone: <BriefcaseBusiness size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="projetos" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/builder',
     rotulo: ROTULOS['/builder'],
-    icone: <DraftingCompass size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="estudio" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/mentorias',
     rotulo: ROTULOS['/mentorias'],
-    icone: <Users size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="mentorias" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/certificados',
     rotulo: ROTULOS['/certificados'],
-    icone: <Award size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="certificados" />,
     noDock: false,
     grupo: 'aprendizado',
   },
   {
     href: '/prospeccao',
     rotulo: ROTULOS['/prospeccao'],
-    icone: <Search size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="prospeccao" />,
     noDock: true,
     grupo: 'operacao',
   },
   {
     href: '/vendas',
     rotulo: ROTULOS['/vendas'],
-    icone: <ContactRound size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="vendas" />,
     noDock: true,
     grupo: 'operacao',
   },
   {
     href: '/metricas',
     rotulo: ROTULOS['/metricas'],
-    icone: <ChartNoAxesCombined size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="metricas" />,
     noDock: false,
     grupo: 'operacao',
   },
   {
     href: '/reunioes',
     rotulo: ROTULOS['/reunioes'],
-    icone: <Video size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="reunioes" />,
     noDock: true,
     grupo: 'operacao',
   },
   {
     href: '/propostas',
     rotulo: ROTULOS['/propostas'],
-    icone: <FileSignature size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="propostas" />,
     noDock: false,
     grupo: 'operacao',
   },
   {
     href: '/entregas',
     rotulo: ROTULOS['/entregas'],
-    icone: <FolderKanban size={TAMANHO} strokeWidth={TRACO} />,
+    icone: <IconeProduto nome="entregas" />,
     noDock: false,
     grupo: 'operacao',
   },
@@ -163,7 +140,7 @@ export const ITENS_NAV: ItemNav[] = [
 export const ITEM_ADMIN: ItemNav = {
   href: '/admin',
   rotulo: ROTULOS['/admin'],
-  icone: <ShieldCheck size={TAMANHO} strokeWidth={TRACO} />,
+  icone: <IconeProduto nome="admin" />,
   noDock: false,
   grupo: 'gestao',
 };
@@ -176,7 +153,7 @@ export const ITEM_ADMIN: ItemNav = {
 export const ITEM_CONTA: ItemNav = {
   href: '/conta',
   rotulo: 'Minha conta',
-  icone: <UserRound size={TAMANHO} strokeWidth={TRACO} />,
+  icone: <IconeProduto nome="conta" />,
   noDock: false,
   grupo: 'gestao',
 };
