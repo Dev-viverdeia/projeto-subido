@@ -109,3 +109,52 @@ test('formação concluída mostra certificado e revisão, não outra primeira a
     '/formacoes/formacao-de-chatgpt/aula/aula-1',
   );
 });
+
+test('currículo: conclusão explícita, próxima aula correta e expansão por teclado', async ({
+  page,
+  browserName,
+}) => {
+  await page.goto('/preview/shell?tela=formacao&estado=andamento');
+  const modulo = page.getByRole('button', { name: /Fundamentos para trabalhar com IA Concluído/ });
+  await expect(modulo).toHaveAttribute('aria-expanded', 'false');
+  const proxima = page.getByRole('link', { name: /Pesquisa e síntese para decisões Próxima aula/ });
+  await expect(proxima).toBeVisible();
+  await expect(proxima).not.toHaveAttribute('aria-current');
+  const progresso = page.getByRole('region', { name: 'Seu progresso' });
+  const contagem = progresso.getByText('3 de 5 aulas concluídas');
+  expect(
+    await contagem.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+  ).toBeGreaterThanOrEqual(14);
+
+  await modulo.focus();
+  await page.keyboard.press('Enter');
+  await expect(modulo).toHaveAttribute('aria-expanded', 'true');
+  await expect(
+    page.getByRole('link', { name: /Como conversar com a IA.*Aula concluída/ }),
+  ).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(modulo).toHaveAttribute('aria-expanded', 'false');
+  // WebKit usa Option+Tab para incluir botões na navegação sequencial.
+  await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await expect(page.getByRole('button', { name: /Aplicação no trabalho real/ })).toBeFocused();
+  const axe = await new AxeBuilder({ page }).analyze();
+  expect(axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual(
+    [],
+  );
+});
+
+for (const tela of ['formacao', 'aula']) {
+  test(`${tela}: carregamento mantém a anatomia do destino, não o catálogo`, async ({ page }) => {
+    await page.goto(`/preview/shell?tela=${tela}&estado=carregando`);
+    await expect(
+      page.getByRole('status', {
+        name: tela === 'formacao' ? 'Carregando formação' : 'Carregando aula',
+      }),
+    ).toBeVisible();
+    await expect(page.getByText('Carregando formações…', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Começar formação|Retomar aula/ })).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      page.viewportSize()!.width,
+    );
+  });
+}

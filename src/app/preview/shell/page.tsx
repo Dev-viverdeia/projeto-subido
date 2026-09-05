@@ -19,6 +19,10 @@ import { FormacoesVista } from '@/app/(app)/formacoes/_components/FormacoesVista
 import { CatalogoProjetos } from '@/app/(app)/solucoes/_components/CatalogoProjetos';
 import { CursoConteudo } from '@/app/(app)/formacoes/_components/CursoConteudo';
 import { AulaConteudo } from '@/app/(app)/formacoes/_components/AulaConteudo';
+import {
+  CarregandoAula,
+  CarregandoCurso,
+} from '@/app/(app)/formacoes/_components/CarregandoAprendizado';
 import { ProjetoGuiado } from '@/app/(app)/solucoes/_components/ProjetoGuiado';
 import { FORMACOES_DEMO, FORMACAO_DEMO } from '../formacoes/fixture';
 import {
@@ -114,17 +118,25 @@ export default async function PreviewShellPage({
             ) : tela === 'projetos' ? (
               <CatalogoProjetos solucoes={projetosPreview} />
             ) : tela === 'formacao' ? (
-              <CursoConteudo formacao={FORMACAO_DEMO} />
+              params.estado === 'carregando' ? (
+                <CarregandoCurso />
+              ) : (
+                <CursoConteudo formacao={FORMACAO_DEMO} />
+              )
             ) : tela === 'aula' ? (
-              <AulaConteudo
-                formacao={FORMACAO_DEMO}
-                aula={aulas[indiceAula]!}
-                videoUrl={null}
-                anterior={aulas[indiceAula - 1] ?? null}
-                proxima={aulas[indiceAula + 1] ?? null}
-                posicao={indiceAula + 1}
-                total={aulas.length}
-              />
+              params.estado === 'carregando' ? (
+                <CarregandoAula />
+              ) : (
+                <AulaConteudo
+                  formacao={FORMACAO_DEMO}
+                  aula={aulas[indiceAula]!}
+                  videoUrl={null}
+                  anterior={aulas[indiceAula - 1] ?? null}
+                  proxima={aulas[indiceAula + 1] ?? null}
+                  posicao={indiceAula + 1}
+                  total={aulas.length}
+                />
+              )
             ) : tela === 'projeto' ? (
               <ProjetoGuiado
                 slug="sdr-atendimento"

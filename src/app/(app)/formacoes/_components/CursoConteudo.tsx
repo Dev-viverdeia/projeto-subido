@@ -44,65 +44,71 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
 
   return (
     <div className={styles.raiz}>
-      <header className={styles.hero}>
-        <div className={styles.heroTexto}>
-          <div className={styles.identidade}>
-            <p className={styles.eyebrow}>Formação</p>
-            <PillEstado estado={estado} className={styles.selo} />
+      <div className={styles.apresentacao}>
+        <header className={styles.hero}>
+          <div className={styles.heroTexto}>
+            <div className={styles.identidade}>
+              <PillEstado estado={estado} className={styles.selo} />
+            </div>
+
+            <h1 className={styles.titulo}>{formacao.titulo}</h1>
+            {formacao.resumo && <p className={styles.resumo}>{formacao.resumo}</p>}
+
+            <ul className={styles.metas}>
+              {metas.map((m) => (
+                <li key={m} className={styles.meta}>
+                  {m}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <h1 className={styles.titulo}>{formacao.titulo}</h1>
-          {formacao.resumo && <p className={styles.resumo}>{formacao.resumo}</p>}
+          {curriculo.total > 0 && (
+            <div className={styles.progressoResumo}>
+              <TrilhoProgresso
+                itens={curriculo.planas}
+                feitasIds={curriculo.feitasIds}
+                proximo={curriculo.proxima}
+                unidade={{ singular: 'aula', plural: 'aulas' }}
+                denso
+              />
+            </div>
+          )}
+        </header>
 
-          <ul className={styles.metas}>
-            {metas.map((m) => (
-              <li key={m} className={styles.meta}>
-                {m}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className={styles.progressoResumo}>
-          <TrilhoProgresso
-            itens={curriculo.planas}
-            feitasIds={curriculo.feitasIds}
-            proximo={curriculo.proxima}
-            unidade={{ singular: 'aula', plural: 'aulas' }}
-            denso
-          />
-        </div>
-      </header>
-
-      {curriculo.concluiu ? (
-        <section className={styles.conclusao} role="status" aria-label="Próximo passo">
-          <div className={styles.retomadaTexto}>
-            <span>Próximo passo</span>
-            <strong>Aplique o que aprendeu em um projeto.</strong>
-            <small>Escolha um projeto ou compartilhe seu certificado.</small>
-          </div>
-          <div className={styles.acoesConclusao}>
-            <Link href="/solucoes" className={styles.cta}>
-              Escolher projeto
+        {curriculo.concluiu ? (
+          <section className={styles.conclusao} role="status" aria-label="Próximo passo">
+            <div className={styles.retomadaTexto}>
+              <span>Próximo passo</span>
+              <strong>Aplique o que aprendeu em um projeto.</strong>
+              <small>Escolha um projeto ou compartilhe seu certificado.</small>
+            </div>
+            <div className={styles.acoesConclusao}>
+              <Link href="/solucoes" className={styles.cta}>
+                Escolher projeto
+                <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
+              </Link>
+              <Link
+                href={`/certificados/formacao/${formacao.slug}`}
+                className={styles.ctaSecundario}
+              >
+                Ver certificado
+              </Link>
+            </div>
+          </section>
+        ) : hrefCta && aulaDoCta ? (
+          <section className={styles.retomada} aria-label="Próxima aula">
+            <div className={styles.retomadaTexto}>
+              <span>{rotuloDestino}</span>
+              <strong>{aulaDoCta.titulo}</strong>
+            </div>
+            <Link href={hrefCta} className={styles.cta}>
+              {rotuloCta}
               <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
             </Link>
-            <Link href={`/certificados/formacao/${formacao.slug}`} className={styles.ctaSecundario}>
-              Ver certificado
-            </Link>
-          </div>
-        </section>
-      ) : hrefCta && aulaDoCta ? (
-        <section className={styles.retomada} aria-label="Próxima aula">
-          <div className={styles.retomadaTexto}>
-            <span>{rotuloDestino}</span>
-            <strong>{aulaDoCta.titulo}</strong>
-          </div>
-          <Link href={hrefCta} className={styles.cta}>
-            {rotuloCta}
-            <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
-          </Link>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
+      </div>
 
       <section className={styles.curriculo} aria-labelledby="conteudo-formacao">
         <header className={styles.cabecalhoSecao}>

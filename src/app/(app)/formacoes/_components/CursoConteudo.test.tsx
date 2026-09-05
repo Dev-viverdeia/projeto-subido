@@ -190,4 +190,25 @@ describe('conteúdo do curso', () => {
       '/certificados/formacao/curso',
     );
   });
+
+  it('distingue módulos concluídos da próxima aula, sem dizer que a aula já está aberta', () => {
+    comProgresso(['a1']);
+    render(<Curso formacao={TRES_MODULOS} />);
+
+    expect(screen.getByRole('button', { name: /Módulo um/ })).toHaveTextContent('Concluído');
+    expect(screen.getByRole('link', { name: /Aula 2/ })).not.toHaveAttribute('aria-current');
+    expect(screen.queryByText('Você está aqui')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Módulo um/ }));
+    expect(screen.getByRole('link', { name: /Aula 1/ })).toHaveTextContent('Aula concluída.');
+  });
+
+  it('não confunde módulo vazio com módulo concluído', () => {
+    render(
+      <Curso formacao={curso([{ id: 'vazio', titulo: 'Em preparação', ordem: 1, aulas: [] }])} />,
+    );
+    expect(screen.getByRole('button', { name: /Em preparação/ })).toHaveTextContent('0 de 0 aulas');
+    expect(screen.queryByText('Concluído')).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Seu progresso' })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Começar formação/ })).toBeNull();
+  });
 });
