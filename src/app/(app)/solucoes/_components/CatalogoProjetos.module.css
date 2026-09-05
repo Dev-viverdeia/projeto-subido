@@ -47,7 +47,6 @@
   box-shadow: var(--app-glass-card-shadow);
   color: var(--via-text-primary);
   text-decoration: none;
-  transition: transform var(--app-t-touch);
 }
 
 .destaque {
@@ -112,7 +111,7 @@
 }
 
 .resultado {
-  max-width: 76ch;
+  max-width: 60ch;
   margin: 0;
   color: var(--via-text-muted);
   font-size: var(--app-fs-reading);
@@ -321,26 +320,44 @@
   line-height: 1.5;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .destaque:hover,
+  .cartao:hover {
+    border-color: var(--via-navy-20);
+    box-shadow: var(--app-glass-card-shadow-raised);
+  }
+  .acaoSecundaria:hover {
+    background: var(--via-navy);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  .acaoPrincipal svg,
+  .cartao footer strong svg {
+    transition: transform var(--app-t-touch);
+  }
+  .destaque:hover .acaoPrincipal svg,
+  .cartao:hover footer strong svg {
+    transform: translateX(2px);
+  }
+}
+
+.destaque:active,
+.cartao:active {
+  border-color: var(--via-navy-30);
+  box-shadow: var(--app-glass-card-shadow);
+}
+
 .destaque:focus-visible,
 .cartao:focus-visible {
   outline: none;
+  border-color: var(--via-navy-30);
   box-shadow: var(--app-ring), var(--app-glass-card-shadow-raised);
 }
 
 .acaoSecundaria:focus-visible {
   outline: none;
   box-shadow: var(--app-ring), var(--via-shadow-sm);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .destaque:hover,
-  .cartao:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--app-glass-card-shadow-raised);
-  }
-  .acaoSecundaria:hover {
-    background: var(--via-navy);
-  }
 }
 
 @media (max-width: 899px) {
@@ -390,13 +407,5 @@
   }
   .metadados > span + span {
     padding-left: var(--via-space-3);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .destaque,
-  .cartao {
-    transition: none;
-    transform: none;
   }
 }

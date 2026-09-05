@@ -126,7 +126,10 @@
   --app-modal-foot-bg: color-mix(in srgb, var(--via-surface-elev) 92%, transparent);
   --app-empty-bg: var(--app-glass-plane-strong);
 
-  --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--via-navy-40);
+  /* O navy a 40% media 2.48:1 sobre branco. A mistura opaca abaixo entrega
+     5.24:1; o separador branco mantém o contorno legível sobre botões navy. */
+  --app-focus-ring-color: color-mix(in srgb, var(--via-navy) 65%, var(--via-white));
+  --app-ring: 0 0 0 2px var(--via-white), 0 0 0 4px var(--app-focus-ring-color);
   --app-ring-onnavy: 0 0 0 2px var(--via-navy-deep), 0 0 0 4px var(--via-white);
   --app-em-ink: var(--via-text-muted);
 

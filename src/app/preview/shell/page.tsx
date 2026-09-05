@@ -60,7 +60,7 @@ export default async function PreviewShellPage({
       ? '/consultor'
       : tela.startsWith('projeto')
         ? '/solucoes'
-        : tela === 'aula' || tela.startsWith('formacao')
+        : tela === 'aula' || tela === 'formacoes' || tela === 'formacao'
           ? '/formacoes'
           : '/inicio';
   const aulas = FORMACAO_DEMO.modulos.flatMap((modulo) => modulo.aulas);

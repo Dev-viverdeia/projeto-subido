@@ -154,8 +154,6 @@
 
 .lateral .item:hover .icone {
   color: var(--via-navy);
-  border-color: var(--via-border-soft);
-  background: color-mix(in srgb, var(--via-white) 76%, var(--via-navy-04));
 }
 
 .lateral .item[data-bloqueado='true']:hover {
