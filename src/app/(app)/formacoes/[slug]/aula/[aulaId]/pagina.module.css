@@ -3,7 +3,7 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--app-gap-block);
+  gap: var(--via-space-5);
 }
 
 .cabecalho {
@@ -15,7 +15,7 @@
 .textos {
   display: grid;
   gap: var(--via-space-2);
-  max-width: 840px;
+  max-width: 1040px;
   min-width: 0;
 }
 
@@ -35,10 +35,10 @@
 
 .titulo {
   font-family: var(--via-font-display);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-hero);
-  line-height: 1.04;
+  line-height: 1.16;
   color: var(--via-text-primary);
   text-wrap: balance;
 }

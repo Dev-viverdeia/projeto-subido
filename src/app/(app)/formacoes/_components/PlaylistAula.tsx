@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Check, Play, Circle } from 'lucide-react';
 import { Button, Drawer } from '@/design-system/via';
 import type { FormacaoCompleta } from '@/lib/conteudo/queries';
 import { TrilhoProgresso } from '../../_components/TrilhoProgresso';
@@ -24,7 +26,15 @@ import styles from './PlaylistAula.module.css';
  * curso, ensina a pessoa a desconfiar dele. A aula aberta já é marcada por
  * `aria-current="page"` e por `data-atual`, que é o que ela significa.
  */
-function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtualId: string }) {
+function Painel({
+  formacao,
+  aulaAtualId,
+  onEscolher,
+}: {
+  formacao: FormacaoCompleta;
+  aulaAtualId: string;
+  onEscolher?: () => void;
+}) {
   const curriculo = useCurriculo(formacao);
   const moduloDaAtual =
     formacao.modulos.find((m) => m.aulas.some((a) => a.id === aulaAtualId))?.id ?? null;
@@ -40,19 +50,25 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
   const aberto = escolha.aulaId === aulaAtualId ? escolha.aberto : moduloDaAtual;
   const setAberto = (m: string | null) => setEscolha({ aulaId: aulaAtualId, aberto: m });
   const linhaAtualRef = useRef<HTMLAnchorElement>(null);
+  const painelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    linhaAtualRef.current?.scrollIntoView({
-      block: 'center',
-      behavior: reduzir ? 'auto' : 'smooth',
-    });
-  }, [aulaAtualId]);
+    const painel =
+      painelRef.current?.closest<HTMLElement>('.via-drawer__body') ?? painelRef.current;
+    const linha = linhaAtualRef.current;
+    if (!painel?.clientHeight || !linha?.getClientRects().length) return;
+    const area = painel.getBoundingClientRect();
+    const item = linha.getBoundingClientRect();
+    // Rola apenas a playlist. scrollIntoView também move a página e esconde o vídeo.
+    if (item.top < area.top || item.bottom > area.bottom) {
+      painel.scrollTop += item.top - area.top - (painel.clientHeight - item.height) / 2;
+    }
+  }, [aulaAtualId, aberto]);
 
   return (
-    <div className={styles.painel}>
+    <div className={styles.painel} ref={painelRef}>
       <header className={styles.cabecalhoPainel}>
-        <p>Conteúdo da formação</p>
+        <p>Suas aulas</p>
         <h2>{formacao.titulo}</h2>
       </header>
       <div className={styles.topo}>
@@ -110,12 +126,21 @@ function Painel({ formacao, aulaAtualId }: { formacao: FormacaoCompleta; aulaAtu
                         data-atual={atual ? '' : undefined}
                         data-status={status}
                         aria-current={atual ? 'page' : undefined}
+                        onClick={onEscolher}
                       >
                         <span
                           className={styles.pontoStatus}
                           data-status={status}
                           aria-hidden="true"
-                        />
+                        >
+                          {status === 'concluida' ? (
+                            <Check size={16} />
+                          ) : atual ? (
+                            <Play size={15} />
+                          ) : (
+                            <Circle size={12} />
+                          )}
+                        </span>
                         <span className={styles.tituloAula}>{aula.titulo}</span>
                         {duracao && <span className={styles.duracao}>{duracao}</span>}
                       </Link>
@@ -147,17 +172,37 @@ export function PlaylistAula({
       </aside>
 
       <div className={styles.movel}>
-        <Button variant="secondary" fullWidth onClick={() => setDrawerAberto(true)}>
+        <Button
+          variant="secondary"
+          fullWidth
+          aria-expanded={drawerAberto}
+          aria-haspopup="dialog"
+          onClick={(event) => {
+            // Safari não foca botões ao tocar. Registre o ponto de retorno antes do Drawer.
+            event.currentTarget.focus();
+            setDrawerAberto(true);
+          }}
+        >
           Ver as aulas do curso
         </Button>
-        <Drawer
-          open={drawerAberto}
-          onClose={() => setDrawerAberto(false)}
-          side="right"
-          title="Aulas do curso"
-        >
-          <Painel formacao={formacao} aulaAtualId={aulaAtualId} />
-        </Drawer>
+        {drawerAberto &&
+          createPortal(
+            <div className={styles.portal}>
+              <Drawer
+                open={drawerAberto}
+                onClose={() => setDrawerAberto(false)}
+                side="right"
+                title="Aulas do curso"
+              >
+                <Painel
+                  formacao={formacao}
+                  aulaAtualId={aulaAtualId}
+                  onEscolher={() => setDrawerAberto(false)}
+                />
+              </Drawer>
+            </div>,
+            document.body,
+          )}
       </div>
     </>
   );

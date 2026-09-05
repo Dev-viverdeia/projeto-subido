@@ -17,8 +17,17 @@ import shellStyles from '@/app/(app)/layout.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { FormacoesVista } from '@/app/(app)/formacoes/_components/FormacoesVista';
 import { CatalogoProjetos } from '@/app/(app)/solucoes/_components/CatalogoProjetos';
-import { FORMACOES_DEMO } from '../formacoes/fixture';
-import { projetosPreview } from '../projetos/fixture';
+import { CursoConteudo } from '@/app/(app)/formacoes/_components/CursoConteudo';
+import { AulaConteudo } from '@/app/(app)/formacoes/_components/AulaConteudo';
+import { ProjetoGuiado } from '@/app/(app)/solucoes/_components/ProjetoGuiado';
+import { FORMACOES_DEMO, FORMACAO_DEMO } from '../formacoes/fixture';
+import {
+  projetosPreview,
+  projetoPreview,
+  ferramentasPreview,
+  promptsPreview,
+  rotaPreview,
+} from '../projetos/fixture';
 import { ProgressoPreview } from '../ProgressoPreview';
 
 export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
@@ -30,14 +39,28 @@ export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 export default async function PreviewShellPage({
   searchParams,
 }: {
-  searchParams: Promise<{ plano?: string; nome?: string; tela?: string }>;
+  searchParams: Promise<{ plano?: string; nome?: string; tela?: string; estado?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
   const plano = params.plano === 'starter' ? 'starter' : 'pro';
   const nome = params.nome === 'longo' ? 'Maria Aparecida de Albuquerque' : 'Mateus';
-  const tela = params.tela === 'formacoes' || params.tela === 'projetos' ? params.tela : 'inicio';
-  const caminho = tela === 'projetos' ? '/solucoes' : `/${tela}`;
+  const tela = ['formacoes', 'projetos', 'formacao', 'aula', 'projeto'].includes(params.tela ?? '')
+    ? params.tela!
+    : 'inicio';
+  const caminho = tela.startsWith('projeto')
+    ? '/solucoes'
+    : tela === 'aula' || tela.startsWith('formacao')
+      ? '/formacoes'
+      : '/inicio';
+  const aulas = FORMACAO_DEMO.modulos.flatMap((modulo) => modulo.aulas);
+  const feitas =
+    params.estado === 'concluido'
+      ? aulas.map((aula) => aula.id)
+      : params.estado === 'andamento'
+        ? aulas.slice(0, 3).map((aula) => aula.id)
+        : [];
+  const indiceAula = params.estado === 'andamento' ? 3 : 0;
   const itens = ITENS_NAV.map((item) => {
     const recurso = recursoDaRota(item.href);
     const bloqueado = !planoPodeAcessarRota(plano, item.href);
@@ -85,11 +108,36 @@ export default async function PreviewShellPage({
         />
 
         <main className={shellStyles.conteudo} id="conteudo">
-          <ProgressoPreview>
+          <ProgressoPreview aulas={feitas}>
             {tela === 'formacoes' ? (
               <FormacoesVista formacoes={FORMACOES_DEMO} />
             ) : tela === 'projetos' ? (
               <CatalogoProjetos solucoes={projetosPreview} />
+            ) : tela === 'formacao' ? (
+              <CursoConteudo formacao={FORMACAO_DEMO} />
+            ) : tela === 'aula' ? (
+              <AulaConteudo
+                formacao={FORMACAO_DEMO}
+                aula={aulas[indiceAula]!}
+                videoUrl={null}
+                anterior={aulas[indiceAula - 1] ?? null}
+                proxima={aulas[indiceAula + 1] ?? null}
+                posicao={indiceAula + 1}
+                total={aulas.length}
+              />
+            ) : tela === 'projeto' ? (
+              <ProjetoGuiado
+                slug="sdr-atendimento"
+                titulo="SDR de Atendimento com IA"
+                resumo={projetoPreview.resultado}
+                categoria="Automação com IA"
+                projeto={projetoPreview}
+                ferramentas={ferramentasPreview}
+                prompts={promptsPreview}
+                videoUrl={null}
+                proxima={null}
+                rotaComercial={rotaPreview}
+              />
             ) : (
               <MapaJornada nome={nome} plano={plano} />
             )}

@@ -8,12 +8,48 @@
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-elev-2-shadow);
+  box-shadow: var(--app-glass-card-shadow);
   backdrop-filter: blur(22px) saturate(140%);
 }
 
 .movel {
   display: none;
+}
+
+.portal {
+  display: contents;
+}
+
+.portal :global(.via-drawer) {
+  background: var(--app-modal-bg);
+  box-shadow: var(--app-elev-3-shadow);
+}
+
+.portal :global(.via-drawer::before) {
+  background: none;
+}
+
+.portal :global(.via-drawer-scrim) {
+  background: color-mix(in srgb, var(--via-navy-deep) 60%, transparent);
+}
+
+.portal :global(.via-drawer__body) {
+  padding: 0;
+}
+
+.portal :global(.via-drawer__head) {
+  align-items: center;
+  padding: var(--via-space-4) var(--via-space-5);
+}
+
+.portal :global(.via-drawer__close) {
+  width: 44px;
+  height: 44px;
+  color: var(--via-text-primary);
+}
+
+.portal .painel {
+  overflow: visible;
 }
 
 .painel {
@@ -45,7 +81,7 @@
 }
 
 .cabecalhoPainel h2 {
-  font-size: var(--via-fs-h4);
+  font-size: var(--via-fs-body);
   font-weight: 560;
   letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
@@ -102,9 +138,8 @@
   font-size: var(--via-fs-sm);
   font-weight: 560;
   color: var(--via-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  line-height: var(--via-lh-snug);
 }
 
 .chevron {
@@ -120,7 +155,6 @@
 .dobra {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--app-t-reveal);
 }
 
 .dobra[data-aberto] {
@@ -165,17 +199,19 @@
 }
 
 .pontoStatus {
-  width: 8px;
-  height: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   flex: none;
   border-radius: var(--via-radius-pill);
-  border: 1.5px solid var(--via-border);
-  background: transparent;
+  color: var(--via-text-muted);
 }
 
 .pontoStatus[data-status='concluida'] {
   background: var(--via-navy);
-  border-color: var(--via-navy);
+  color: var(--via-white);
 }
 
 .pontoStatus[data-status='atual'] {
@@ -185,12 +221,10 @@
 .tituloAula {
   flex: 1;
   min-width: 0;
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-snug);
   color: var(--via-text-body);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .linha[data-status='concluida'] .tituloAula {
@@ -210,12 +244,13 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .lateral {
+  .lateral,
+  .portal :global(.via-drawer) {
     background: var(--via-surface);
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1079px) {
   .lateral {
     display: none;
   }
@@ -226,6 +261,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .portal :global(.via-drawer),
+  .portal :global(.via-drawer-scrim) {
+    animation: none;
+  }
+
   .dobra,
   .chevron {
     transition: none;

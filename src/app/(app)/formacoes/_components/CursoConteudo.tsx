@@ -96,10 +96,6 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
           <div className={styles.retomadaTexto}>
             <span>{rotuloDestino}</span>
             <strong>{aulaDoCta.titulo}</strong>
-            <small>
-              {curriculo.feitas} de {curriculo.total}{' '}
-              {curriculo.total === 1 ? 'aula concluída' : 'aulas concluídas'}
-            </small>
           </div>
           <Link href={hrefCta} className={styles.cta}>
             {rotuloCta}
@@ -110,14 +106,7 @@ export function CursoConteudo({ formacao }: { formacao: FormacaoCompleta }) {
 
       <section className={styles.curriculo} aria-labelledby="conteudo-formacao">
         <header className={styles.cabecalhoSecao}>
-          <div>
-            <p>Conteúdo</p>
-            <h2 id="conteudo-formacao">Aulas da formação</h2>
-          </div>
-          <span>
-            {curriculo.modulos.length} {curriculo.modulos.length === 1 ? 'módulo' : 'módulos'} ·{' '}
-            {curriculo.total} {curriculo.total === 1 ? 'aula' : 'aulas'}
-          </span>
+          <h2 id="conteudo-formacao">Aulas da formação</h2>
         </header>
         <CurriculoCurso
           formacaoSlug={formacao.slug}

@@ -39,11 +39,8 @@
 }
 
 .vizinha small {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
 }
 
 .vizinha strong {
@@ -73,7 +70,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  min-height: 40px;
+  min-height: 44px;
   padding-inline: var(--via-space-4);
   border-radius: var(--via-radius-pill);
   background: var(--via-navy-06);
@@ -82,20 +79,28 @@
   font-weight: var(--via-fw-medium);
 }
 
-/* No mobile a barra gruda no rodapé com vidro. `bottom` respeita o dock fixo do
-   shell (56px) + a área segura do iOS. */
+.concluir {
+  min-height: 44px;
+  font-size: var(--via-fs-sm);
+}
+
 @media (max-width: 767px) {
   .barra {
-    position: sticky;
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-    z-index: 20;
-    margin-inline: calc(var(--via-space-4) * -1);
-    padding: var(--via-space-2_5) var(--via-space-4);
-    background: var(--via-glass-bar);
-    backdrop-filter: blur(20px) saturate(1.4);
-    border: 0;
-    border-top: 1px solid var(--via-border-hairline);
-    border-radius: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--via-space-2);
+  }
+
+  .concluir,
+  .feita {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-content: center;
+  }
+
+  .vizinha,
+  .limite {
+    grid-row: 2;
+    font-size: var(--via-fs-sm);
   }
 
   .vizinha {

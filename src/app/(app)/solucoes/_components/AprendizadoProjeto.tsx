@@ -40,7 +40,8 @@ export function AprendizadoProjeto({
     0,
     trilha.aulas.findIndex((_, indice) => !progresso.etapas[idAulaProjeto(slug, indice)]),
   );
-  const [aulaEscolhida, setAulaEscolhida] = useState(primeiraPendente);
+  const [escolha, setAulaEscolhida] = useState<number | null>(null);
+  const aulaEscolhida = escolha ?? primeiraPendente;
   const aula = trilha.aulas[aulaEscolhida];
   const videoAbertura = videoUrl
     ? { videoUrl, titulo: `Aula de abertura · ${titulo}` }
@@ -66,9 +67,7 @@ export function AprendizadoProjeto({
     >
       <header className={styles.secaoCabecalho}>
         <div>
-          <p className={styles.eyebrow}>1 · Aprenda</p>
-          <h2 id="aprendizado-titulo">Entenda antes de construir</h2>
-          <span>Assista à introdução e conclua uma aula por vez.</span>
+          <h2 id="aprendizado-titulo">Aulas do projeto</h2>
         </div>
         <div className={styles.progressoResumo}>
           <span>
@@ -91,10 +90,6 @@ export function AprendizadoProjeto({
 
       <div className={styles.aprendizadoCorpo}>
         <div className={styles.videoAbertura}>
-          <div className={styles.videoRotulo}>
-            <span>Aula de abertura</span>
-            <strong>{videoAbertura?.titulo ?? titulo}</strong>
-          </div>
           <VideoConteudo
             videoUrl={videoAbertura?.videoUrl ?? null}
             titulo={videoAbertura?.titulo ?? titulo}
@@ -155,7 +150,7 @@ export function AprendizadoProjeto({
                 >
                   {progresso.etapas[idAulaProjeto(slug, aulaEscolhida)] ? (
                     <>
-                      <Check size={15} aria-hidden="true" /> Concluída
+                      <Check size={15} aria-hidden="true" /> Reabrir aula
                     </>
                   ) : (
                     'Concluir aula'
@@ -234,16 +229,18 @@ export function AprendizadoProjeto({
               ))}
             </div>
           </section>
-          {trilha.videosReferencia.map((video) => (
-            <section className={styles.videoReferencia} key={video.videoUrl}>
-              <header>
-                <p>Vídeo de referência</p>
-                <h3>{video.titulo}</h3>
-                <span>{video.descricao}</span>
-              </header>
-              <VideoConteudo videoUrl={video.videoUrl} titulo={video.titulo} />
-            </section>
-          ))}
+          {trilha.videosReferencia
+            .filter((video) => video.videoUrl !== videoAbertura?.videoUrl)
+            .map((video) => (
+              <section className={styles.videoReferencia} key={video.videoUrl}>
+                <header>
+                  <p>Vídeo de referência</p>
+                  <h3>{video.titulo}</h3>
+                  <span>{video.descricao}</span>
+                </header>
+                <VideoConteudo videoUrl={video.videoUrl} titulo={video.titulo} />
+              </section>
+            ))}
         </div>
       </details>
     </section>
