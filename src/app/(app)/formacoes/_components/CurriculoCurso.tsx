@@ -2,17 +2,15 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { BookOpen, Check } from 'lucide-react';
 import type { ModuloDoCurriculo, StatusAula } from './useCurriculo';
-import { MarcadorAqui } from '../../_components/MarcadorAqui';
 import { formatarDuracao } from '../../_components/tempo';
 import styles from './CurriculoCurso.module.css';
 
 /**
  * O currículo em módulos expansíveis — accordion CUSTOM, não o do DS: aqui são
- * múltiplos abertos ao mesmo tempo, o painel carrega conteúdo interativo e a
- * animação é `grid-template-rows: 0fr → 1fr` (anima altura sem `height: auto`).
- * O painel fechado recebe `inert` — os links saem do tab-order sem matar a
- * transição de fechamento.
+ * múltiplos abertos ao mesmo tempo. O painel fechado recebe `inert`, retirando
+ * seus links do teclado. A expansão não anima o layout.
  */
 function IconeStatus({ status }: { status: StatusAula }) {
   if (status === 'concluida') {
@@ -83,7 +81,7 @@ export function CurriculoCurso({
 
   return (
     <div className={styles.lista}>
-      {modulos.map(({ modulo, aulas, feitas, completo }, indice) => {
+      {modulos.map(({ modulo, aulas, feitas, completo }) => {
         const aberto = abertos.includes(modulo.id);
         const idPainel = `modulo-${modulo.id}`;
         const idGatilho = `gatilho-${modulo.id}`;
@@ -99,24 +97,18 @@ export function CurriculoCurso({
                 aria-controls={idPainel}
                 onClick={() => alternar(modulo.id)}
               >
-                <span className={styles.numero} aria-hidden="true">
-                  {String(indice + 1).padStart(2, '0')}
+                <span
+                  className={styles.iconeModulo}
+                  data-completo={completo || undefined}
+                  aria-hidden="true"
+                >
+                  {completo ? <Check size={18} /> : <BookOpen size={18} />}
                 </span>
                 <span className={styles.nome}>{modulo.titulo}</span>
                 <span className={styles.metaModulo}>
-                  {feitas}/{aulas.length}
-                  {completo && (
-                    <svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
-                      <circle cx="9" cy="9" r="8" fill="var(--via-navy)" />
-                      <path
-                        d="m5.6 9.2 2.2 2.2 4.4-4.8"
-                        stroke="var(--via-white)"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        fill="none"
-                      />
-                    </svg>
-                  )}
+                  {completo
+                    ? 'Concluído'
+                    : `${feitas} de ${aulas.length} ${aulas.length === 1 ? 'aula' : 'aulas'}`}
                 </span>
                 <svg
                   className={styles.chevron}
@@ -154,13 +146,13 @@ export function CurriculoCurso({
                       href={`/formacoes/${formacaoSlug}/aula/${aula.id}`}
                       className={styles.aula}
                       data-status={status}
-                      aria-current={status === 'atual' ? 'true' : undefined}
                     >
                       <IconeStatus status={status} />
                       <span className={styles.aulaTitulo}>{aula.titulo}</span>
-                      {/* O MESMO marcador da timeline de etapas: as duas listas
-                          respondem "onde eu parei?", e a resposta é uma só. */}
-                      {status === 'atual' && <MarcadorAqui />}
+                      {status === 'concluida' && (
+                        <span className={styles.srOnly}>Aula concluída.</span>
+                      )}
+                      {status === 'atual' && <span className={styles.proxima}>Próxima aula</span>}
                       {duracao && <span className={styles.duracao}>{duracao}</span>}
                     </Link>
                   );

@@ -1,0 +1,29 @@
+.modulo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 76px;
+  padding: var(--via-space-3) var(--via-space-5);
+}
+
+.video {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--app-radius-card);
+}
+
+.playlist {
+  display: grid;
+  gap: var(--via-space-5);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-shell-panel-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+
+@media (max-width: 1079px) {
+  .playlist {
+    display: none;
+  }
+}

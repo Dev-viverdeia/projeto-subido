@@ -24,17 +24,19 @@ export default function CarregandoFormacoes() {
           {Array.from({ length: 4 }, (_, indice) => (
             <div key={indice} className={cartao.cartao}>
               <div className={cartao.topo}>
-                <Skeleton variant="rect" width={52} height={52} />
-                <Skeleton width="30%" />
+                <Skeleton variant="rect" width={64} height={72} />
+                <div className={cartao.conteudo}>
+                  <Skeleton width="45%" />
+                  <Skeleton variant="rect" width="90%" height={28} />
+                </div>
               </div>
               <div className={cartao.corpo}>
-                <Skeleton variant="rect" width="78%" height={32} />
                 <Skeleton width="92%" />
                 <Skeleton width="40%" />
               </div>
               <div className={cartao.acao}>
                 <Skeleton width="42%" />
-                <Skeleton variant="rect" width={36} height={36} />
+                <Skeleton variant="rect" width={40} height={40} />
               </div>
             </div>
           ))}

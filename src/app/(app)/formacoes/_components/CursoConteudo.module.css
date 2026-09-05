@@ -4,13 +4,20 @@
   gap: var(--via-space-6);
 }
 
+.apresentacao {
+  border: 1px solid var(--app-shell-panel-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-shell-panel-bg);
+  box-shadow: var(--app-glass-card-shadow);
+}
+
 .hero {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(250px, 28%, 340px);
   align-items: end;
   gap: var(--via-space-6);
-  padding: var(--via-space-2) var(--via-space-1);
+  padding: var(--app-pad-card);
 }
 
 .heroTexto {
@@ -26,24 +33,19 @@
   gap: var(--via-space-3);
 }
 
-.eyebrow {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
-}
-
-.selo {
+.identidade .selo {
   flex: none;
+  font-family: var(--via-font);
+  font-size: var(--app-fs-meta);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .titulo {
   margin: 0;
   max-width: 30ch;
   font-family: var(--via-font-display);
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
   font-weight: 560;
   letter-spacing: var(--app-ls-hero);
   line-height: 1.12;
@@ -82,11 +84,8 @@
 }
 
 .progressoResumo {
-  padding: var(--app-pad-card);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane);
-  box-shadow: var(--app-glass-card-shadow);
+  padding: var(--via-space-2) 0 var(--via-space-2) var(--via-space-6);
+  border-left: 1px solid var(--via-border-hairline);
 }
 
 .retomada,
@@ -95,23 +94,11 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--app-gap-section);
-  overflow: hidden;
-  min-height: 96px;
+  gap: var(--via-space-5);
   padding: var(--via-space-5) var(--via-space-6);
-  border: 1px solid var(--app-elev-2-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-glass-card-shadow-raised);
-}
-
-.retomada::after,
-.conclusao::after {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  background: color-mix(in srgb, var(--via-white) 18%, transparent);
+  border-top: 1px solid var(--via-border-hairline);
+  border-radius: 0 0 var(--app-radius-surface) var(--app-radius-surface);
+  background: var(--app-glass-plane);
 }
 
 .acoesConclusao {
@@ -131,13 +118,10 @@
 
 .retomadaTexto span,
 .retomadaTexto small {
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
 }
 
 .retomadaTexto span {
-  font-family: var(--via-font-mono);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
   color: var(--via-text-muted);
 }
 
@@ -165,11 +149,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 44px;
+  min-height: var(--app-h-control);
   padding-inline: var(--via-space-4);
   border-radius: var(--app-radius-control);
-  font-size: var(--via-fs-sm);
-  font-weight: 650;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
   text-decoration: none;
   white-space: nowrap;
   transition:
@@ -178,9 +162,10 @@
 }
 
 .cta {
-  background: var(--via-mesh-navy);
+  border: 1px solid var(--via-navy);
+  background: var(--app-mesh-trilho);
   color: var(--via-white);
-  box-shadow: var(--app-elev-1-shadow);
+  box-shadow: var(--app-control-shadow), var(--via-shadow-sm);
 }
 
 .ctaSecundario {
@@ -200,8 +185,8 @@
 
 .cta:focus-visible,
 .ctaSecundario:focus-visible {
-  outline: 3px solid var(--via-accent);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: var(--app-ring), var(--via-shadow-sm);
 }
 
 .curriculo {
@@ -253,13 +238,24 @@
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
   }
+  .progressoResumo {
+    max-width: 420px;
+    padding: 0;
+    border: 0;
+  }
 }
 
 @media (max-width: 599px) {
+  .hero {
+    gap: var(--via-space-4);
+    padding: var(--via-space-5);
+  }
+
   .retomada,
   .conclusao {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--via-space-4);
+    padding: var(--via-space-5);
   }
 
   .retomadaTexto strong {

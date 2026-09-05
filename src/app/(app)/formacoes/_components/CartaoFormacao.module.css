@@ -1,13 +1,13 @@
 .cartao {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
+  gap: var(--via-space-4);
   width: 100%;
   min-width: 0;
   padding: var(--via-space-6);
-  border: 1px solid var(--via-border-hairline);
+  border: 1px solid var(--app-shell-panel-line);
   border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane-strong);
+  background: var(--app-shell-panel-bg);
   box-shadow: var(--app-glass-card-shadow);
   color: var(--via-text-primary);
   text-decoration: none;
@@ -15,17 +15,17 @@
 }
 
 .topo {
-  display: flex;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: var(--via-space-3);
+  gap: var(--via-space-4);
 }
 
 .capa {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 72px;
   flex-shrink: 0;
   overflow: hidden;
   border: 1px solid var(--via-border-hairline);
@@ -49,14 +49,11 @@
   color: var(--via-text-muted);
   font-size: var(--app-fs-meta);
   line-height: 1.5;
-  text-align: right;
 }
 
 .recomendada {
-  padding: var(--via-space-1) var(--via-space-2_5);
-  border: 1px solid var(--via-navy-10);
-  border-radius: var(--app-radius-chip);
   color: var(--via-navy);
+  font-weight: var(--via-fw-medium);
 }
 
 .cartao .estado {
@@ -69,22 +66,29 @@
 
 .corpo {
   display: grid;
-  gap: var(--via-space-5);
+  gap: var(--via-space-3);
   flex: 1;
+}
+
+.conteudo {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-1_5);
+  min-width: 0;
 }
 
 .conteudo h3 {
   margin: 0;
   color: var(--via-text-primary);
-  font-size: clamp(22px, 2vw, 26px);
+  font-size: clamp(22px, 2vw, 24px);
   font-weight: var(--via-fw-semibold);
   line-height: 1.25;
   letter-spacing: var(--app-ls-h3);
   overflow-wrap: anywhere;
 }
 
-.conteudo p {
-  margin: var(--via-space-2) 0 0;
+.descricao {
+  margin: 0;
   color: var(--via-text-muted);
   font-size: var(--app-fs-ui);
   line-height: 1.55;
@@ -127,7 +131,7 @@
   gap: var(--via-space-4);
   min-height: var(--app-h-control);
   margin-top: auto;
-  padding-top: var(--via-space-3);
+  padding-top: var(--via-space-2);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-navy);
   font-size: var(--app-fs-ui);
@@ -138,8 +142,8 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
   background: var(--via-white);
@@ -153,6 +157,13 @@
     inset 0 1px 0 color-mix(in srgb, var(--via-white) 20%, transparent),
     var(--via-shadow-sm);
   color: var(--via-white);
+}
+
+.cartao[data-recomendada] .seta {
+  border-color: var(--via-navy);
+  background: var(--app-mesh-trilho);
+  color: var(--via-white);
+  box-shadow: var(--app-control-shadow);
 }
 
 .cartao:focus-visible {

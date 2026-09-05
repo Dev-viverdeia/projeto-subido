@@ -70,20 +70,20 @@ export function CartaoFormacao({ formacao, recomendada = false, etapa, foco }: P
             <Icone size={24} strokeWidth={1.6} />
           )}
         </span>
-        {estado === 'concluida' || estado === 'em-andamento' ? (
-          <PillEstado estado={estado} className={styles.estado} />
-        ) : recomendada ? (
-          <span className={styles.recomendada}>Comece aqui</span>
-        ) : (
-          <span className={styles.etapa}>{etapa}</span>
-        )}
+        <div className={styles.conteudo}>
+          {estado === 'concluida' || estado === 'em-andamento' ? (
+            <PillEstado estado={estado} className={styles.estado} />
+          ) : recomendada ? (
+            <span className={styles.recomendada}>Comece aqui</span>
+          ) : (
+            <span className={styles.etapa}>{etapa}</span>
+          )}
+          <h3>{formacao.titulo}</h3>
+        </div>
       </div>
 
       <div className={styles.corpo}>
-        <div className={styles.conteudo}>
-          <h3>{formacao.titulo}</h3>
-          <p>{foco}</p>
-        </div>
+        <p className={styles.descricao}>{foco}</p>
 
         <div className={styles.rodape}>
           <div className={styles.progresso}>
