@@ -178,6 +178,10 @@
   max-width: none;
 }
 
+.title > span {
+  display: block;
+}
+
 .strong {
   color: var(--via-white);
 }

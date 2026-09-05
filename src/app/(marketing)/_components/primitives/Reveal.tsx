@@ -22,13 +22,9 @@ export interface RevealProps {
 /**
  * O primitivo de motion SEM biblioteca — ~40 linhas e um IntersectionObserver.
  *
- * Existe biblioteca de animação neste projeto (`motion`), mas ela é restrita ao
- * `Parallax`, que só roda abaixo da dobra. Este componente é o que atende tudo
- * acima dela: o reveal de entrada custaria 35–50 kB gz em `motion` para entregar
- * `opacity` e `translateY`, na página que recebe o clique pago.
- *
- * O vocabulário de motion da landing hoje é: este reveal, o mask reveal do hero
- * (CSS puro), o count-up da faixa de credibilidade e o parallax dos pilares.
+ * A abertura é estática. Abaixo dela, o vocabulário é este reveal, o mask reveal
+ * do CTA final, o count-up da faixa de credibilidade e o parallax CSS dos pilares.
+ * A biblioteca `motion` continua disponível na área logada, fora desta árvore.
  * Se você acrescentar um device novo, acrescente aqui também — comentário que
  * lista o que existe e erra a lista ensina o próximo agente a mentir sobre o repo.
  *

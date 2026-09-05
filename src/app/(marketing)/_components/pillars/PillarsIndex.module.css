@@ -64,7 +64,7 @@
   font-size: var(--via-fs-xs);
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--via-ls-wide);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   transition: color var(--app-t-state);
 }
 

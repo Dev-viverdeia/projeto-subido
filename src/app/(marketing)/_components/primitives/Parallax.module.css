@@ -1,0 +1,27 @@
+/* Aprimoramento opcional: nenhum JS, listener de scroll ou camada permanente.
+   A regra base fica visível e imóvel, inclusive em navegadores sem timeline. */
+.media {
+  transform: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .track {
+      view-timeline: --parallax block;
+    }
+
+    .media {
+      animation: drift linear;
+      animation-timeline: --parallax;
+    }
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--parallax-distance, 0px));
+  }
+}
