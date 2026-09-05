@@ -1,5 +1,3 @@
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 
 export function RetornosReunioes({
@@ -24,12 +22,7 @@ export function RetornosReunioes({
       <RetornoOperacao
         tom="erro"
         titulo="O convite não foi enviado"
-        descricao="A sala foi criada. Reconecte o Google Calendar antes de tentar de novo."
-        acao={
-          <Link href="/conta">
-            Conectar calendário <ArrowRight size={14} aria-hidden="true" />
-          </Link>
-        }
+        descricao="A sala foi criada. Confira a pendência na reunião abaixo."
       />
     );
   }

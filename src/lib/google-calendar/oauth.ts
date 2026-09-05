@@ -111,6 +111,7 @@ export async function renovarTokenGoogle(refreshToken: string) {
       grant_type: 'refresh_token',
     }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
   });
   if (!resposta.ok) {
     const corpo: unknown = await resposta.json().catch(() => null);

@@ -2,9 +2,14 @@
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { CalendarCheck2, CalendarPlus, Check, ClipboardCheck, Layers3, Mail } from 'lucide-react';
+import { CalendarCheck2, CalendarPlus, ClipboardCheck, Layers3 } from 'lucide-react';
 import { Alert, Button, Input } from '@/design-system/via';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
+import {
+  CAMPOS_RASCUNHO,
+  chaveRascunhoAgenda,
+  type RascunhoAgenda,
+} from '@/lib/calls/rascunho-agenda';
 import { TIPOS_CALL } from '@/lib/calls/tipos';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
@@ -13,6 +18,7 @@ import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { BotaoAgendar } from './BotaoAgendar';
 import { CamposParticipanteStarter } from './CamposParticipanteStarter';
+import { CamposConviteGoogle } from './CamposConviteGoogle';
 import { SetupGoogleCalendar } from './SetupGoogleCalendar';
 import styles from './FormularioAgendarCall.module.css';
 
@@ -38,6 +44,8 @@ export function FormularioAgendarCall({
   tipoInicial,
   calendar,
   comercialLiberado = true,
+  rascunhoDono,
+  rascunho,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
@@ -45,6 +53,8 @@ export function FormularioAgendarCall({
   tipoInicial?: TipoCall;
   calendar: EstadoGoogleCalendar;
   comercialLiberado?: boolean;
+  rascunhoDono?: string;
+  rascunho?: RascunhoAgenda;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const formulario = useRef<HTMLFormElement>(null);
@@ -56,21 +66,28 @@ export function FormularioAgendarCall({
   const [aberto, setAberto] = useState(abertoInicial);
   const offsetMinutos = montado ? new Date().getTimezoneOffset() : 0;
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
-  const [estado, acao, pendente] = useActionState(agendarReuniao, INICIAL);
+  const [estado, acao, pendente] = useActionState(
+    agendarReuniao,
+    rascunho ? { campos: rascunho } : INICIAL,
+  );
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
   const oportunidadePadrao = disponiveis.some((item) => item.id === oportunidadeInicial)
     ? oportunidadeInicial
     : '';
   const oportunidadeVinculada = disponiveis.find((item) => item.id === oportunidadeInicial);
   const [oportunidadeSelecionadaId, setOportunidadeSelecionadaId] = useState(
-    oportunidadeInicial ?? '',
+    oportunidadeInicial ?? rascunho?.oportunidade ?? '',
   );
   const oportunidadeSelecionada =
     oportunidadeVinculada ??
     disponiveis.find((item) => item.id === oportunidadeSelecionadaId) ??
     null;
-  const [convidadoEmail, setConvidadoEmail] = useState(oportunidadeVinculada?.contatoEmail ?? '');
-  const [tipoSelecionado, setTipoSelecionado] = useState<TipoCall>(tipoInicial ?? 'descoberta');
+  const [convidadoEmail, setConvidadoEmail] = useState(
+    rascunho?.convidadoEmail ?? oportunidadeVinculada?.contatoEmail ?? '',
+  );
+  const [tipoSelecionado, setTipoSelecionado] = useState<TipoCall>(
+    tipoInicial ?? (rascunho?.tipo as TipoCall) ?? 'descoberta',
+  );
   const precisaConfigurarCalendar = !calendar.conectado;
   const ehKickoff = tipoSelecionado === 'kickoff';
   const podeAgendar = !precisaConfigurarCalendar && (!comercialLiberado || disponiveis.length > 0);
@@ -99,7 +116,33 @@ export function FormularioAgendarCall({
 
   function fechar() {
     if (pendente) return;
+    if (rascunhoDono) {
+      try {
+        sessionStorage.removeItem(chaveRascunhoAgenda(rascunhoDono));
+      } catch {
+        /* Sem rascunho local. */
+      }
+    }
     setAberto(false);
+  }
+
+  function guardarRascunho() {
+    if (!rascunhoDono || !formulario.current) return;
+    const dados = new FormData(formulario.current);
+    const campos = Object.fromEntries(
+      CAMPOS_RASCUNHO.map((campo) => {
+        const valor = dados.get(campo);
+        return [campo, typeof valor === 'string' ? valor : ''];
+      }),
+    );
+    try {
+      sessionStorage.setItem(
+        chaveRascunhoAgenda(rascunhoDono),
+        JSON.stringify({ salvoEm: Date.now(), campos }),
+      );
+    } catch {
+      /* Não impede a reconexão em navegadores sem storage. */
+    }
   }
 
   return (
@@ -180,7 +223,14 @@ export function FormularioAgendarCall({
             action={acao}
             className={styles.formulario}
             noValidate
-            onSubmit={() => setErrosOcultos(new Set())}
+            onSubmit={() => {
+              setErrosOcultos(new Set());
+              const data =
+                formulario.current?.querySelector<HTMLInputElement>('[name="agendadaPara"]')?.value;
+              const offset =
+                formulario.current?.querySelector<HTMLInputElement>('[name="offsetMinutos"]');
+              if (data && offset) offset.value = String(new Date(data).getTimezoneOffset());
+            }}
           >
             <input type="hidden" name="offsetMinutos" value={offsetMinutos} readOnly />
 
@@ -189,6 +239,15 @@ export function FormularioAgendarCall({
                 <Alert tone="danger" size="compact">
                   {estado.erro}
                 </Alert>
+                {estado.reconectar && (
+                  <a
+                    href={conectarCalendarHref}
+                    onClick={guardarRascunho}
+                    className="via-btn via-btn--secondary via-btn--md"
+                  >
+                    Reconectar agenda
+                  </a>
+                )}
               </div>
             )}
 
@@ -322,49 +381,24 @@ export function FormularioAgendarCall({
               </section>
             )}
 
-            <section className={styles.calendar} aria-labelledby="convite-google-titulo">
-              <div className={styles.calendarTopo}>
-                <span className={styles.calendarIcone} aria-hidden="true">
-                  <CalendarCheck2 size={19} strokeWidth={1.7} />
-                </span>
-                <div>
-                  <h3 id="convite-google-titulo">Convite pelo Google Calendar</h3>
-                  <p>O evento chega por e-mail e leva o cliente direto para a sala da Subido.</p>
-                </div>
-                <small>{calendar.email}</small>
-              </div>
-
-              <div className={styles.calendarCorpo}>
-                <input type="hidden" name="enviarConviteGoogle" value="on" />
-                <div className={styles.conviteAtivo}>
-                  <span aria-hidden="true">
-                    <Check size={14} strokeWidth={2.2} />
-                  </span>
-                  <span>
-                    <strong>Convite automático</strong>
-                    <small>O acesso será pela sala da Subido.</small>
-                  </span>
-                </div>
-                <Input
-                  id="calls-convidado-email"
-                  name="convidadoEmail"
-                  type="email"
-                  label="E-mail do cliente"
-                  placeholder="cliente@empresa.com.br"
-                  iconLeft={<Mail size={16} strokeWidth={1.7} aria-hidden="true" />}
-                  value={convidadoEmail}
-                  error={erroVisivel('convidadoEmail')}
-                  onChange={(evento) => {
-                    setConvidadoEmail(evento.target.value);
-                    ocultarErro('convidadoEmail');
-                  }}
-                  required
-                />
-              </div>
-            </section>
+            <CamposConviteGoogle
+              emailAgenda={calendar.email}
+              email={convidadoEmail}
+              erro={erroVisivel('convidadoEmail')}
+              aoEditar={(email) => {
+                setConvidadoEmail(email);
+                ocultarErro('convidadoEmail');
+              }}
+            />
 
             <label className={styles.coach}>
-              <input type="checkbox" name="liveCoach" defaultChecked />
+              <input
+                type="checkbox"
+                name="liveCoach"
+                defaultChecked={
+                  estado.campos?.liveCoach !== undefined ? estado.campos.liveCoach === 'on' : true
+                }
+              />
               <span className={styles.coachIcone}>
                 <Layers3 size={17} strokeWidth={1.8} aria-hidden="true" />
               </span>

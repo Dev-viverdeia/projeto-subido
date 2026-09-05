@@ -21,6 +21,7 @@ export type ReuniaoCall = {
   googleEventUrl: string | null;
   googleSyncErro: string | null;
   criadaEm: string;
+  atualizadaEm?: string;
 };
 
 function statusGoogleValido(valor: string): valor is ReuniaoCall['googleSyncStatus'] {
@@ -44,7 +45,7 @@ export function montarReuniao(
     | 'google_event_url'
     | 'google_sync_erro'
     | 'criada_em'
-  >,
+  > & { atualizada_em?: string },
   oportunidade: { titulo: string; empresa: string; contato: string | null } | undefined,
 ): ReuniaoCall {
   return {
@@ -67,5 +68,6 @@ export function montarReuniao(
     googleEventUrl: linha.google_event_url,
     googleSyncErro: linha.google_sync_erro,
     criadaEm: linha.criada_em,
+    atualizadaEm: linha.atualizada_em,
   };
 }

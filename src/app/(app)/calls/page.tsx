@@ -5,6 +5,7 @@ import { tipoCallValido } from '@/lib/calls/tipos';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { obterAcessoRecurso } from '@/lib/planos/server';
+import { createClient } from '@/lib/supabase/server';
 import { PainelCalls } from './_components/PainelCalls';
 
 export const metadata: Metadata = { title: 'Reuniões' };
@@ -19,6 +20,9 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
     searchParams,
   ]);
   const agendada = z.uuid().safeParse(parametros.agendada);
+  const editar = z.uuid().safeParse(parametros.editar);
+  const supabase = await createClient();
+  const { data: sessao } = await supabase.auth.getClaims();
 
   return (
     <PainelCalls
@@ -27,6 +31,8 @@ export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
       comercialLiberado={comercialLiberado}
       calendar={calendar}
       agendadaId={agendada.success ? agendada.data : undefined}
+      editarId={editar.success ? editar.data : undefined}
+      rascunhoDono={sessao?.claims.sub}
       modalInicial={parametros.nova === '1'}
       oportunidadeInicial={
         typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined

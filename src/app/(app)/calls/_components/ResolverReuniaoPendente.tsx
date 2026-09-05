@@ -61,7 +61,7 @@ export function ResolverReuniaoPendente({ reuniaoId }: { reuniaoId: string }) {
         }
       >
         <div className={styles.conteudo}>
-          <p>Reagendar cancela o convite atual e mantém esta conversa ligada ao mesmo cliente.</p>
+          <p>Reagendar mantém a mesma sala e atualiza o convite com o novo horário.</p>
           <p>Encerrar não apaga nenhuma informação da ficha.</p>
         </div>
       </ModalOperacao>

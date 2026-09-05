@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight, ExternalLink } from 'lucide-react';
-import { reenviarConviteGoogle } from '@/lib/calls/actions';
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { AcoesSala } from './AcoesSala';
+import { GerenciarAgenda } from './GerenciarAgenda';
+import { EstadoConviteAgenda } from './EstadoConviteAgenda';
 import styles from '../pagina.module.css';
 
 const DATA_LONGA = new Intl.DateTimeFormat('pt-BR', {
@@ -20,7 +21,7 @@ const HORA = new Intl.DateTimeFormat('pt-BR', {
 
 export function CallRecemAgendada({
   reuniao,
-  calendar,
+  calendar: _calendar,
   comercialLiberado = true,
 }: {
   reuniao: ReuniaoCall;
@@ -95,24 +96,10 @@ export function CallRecemAgendada({
               Ver no Calendar <ExternalLink size={13} aria-hidden="true" />
             </a>
           )}
-          {conviteFalhou && calendar?.conectado && reuniao.convidadoEmail && (
-            <form action={reenviarConviteGoogle}>
-              <input type="hidden" name="reuniao" value={reuniao.id} />
-              <button type="submit" className={styles.abrirLead}>
-                Tentar enviar de novo
-              </button>
-            </form>
-          )}
-          {conviteFalhou && !calendar?.conectado && (
-            <Link
-              href={`/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(`/reunioes?agendada=${reuniao.id}`)}`}
-              className={styles.abrirLead}
-            >
-              Reconectar calendário <ExternalLink size={13} aria-hidden="true" />
-            </Link>
-          )}
+          <GerenciarAgenda reuniao={reuniao} />
         </div>
       </div>
+      <EstadoConviteAgenda reuniao={reuniao} />
     </section>
   );
 }

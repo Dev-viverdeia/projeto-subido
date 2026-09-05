@@ -52,7 +52,7 @@ export function BotaoAgendar({
         etapas={comConviteGoogle ? ETAPAS_CONVITE : ETAPAS_SALA}
         intervalo={2_500}
         nota="Mantenha esta janela aberta até a confirmação."
-        mensagemDemora="O Google está demorando para responder. A reunião não será duplicada."
+        mensagemDemora="O Google está demorando para responder. Aguarde a confirmação antes de tentar novamente."
         demoraApos={12_000}
       />
       <Button type="submit" form={form} variant="primary" loading={pending}>

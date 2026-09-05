@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
-import { removerCallDoGoogle, sincronizarCallNoGoogle } from '@/lib/google-calendar/eventos';
+import { executarAlteracaoAgenda } from './agenda-servico';
+import { dataLocalParaUtc } from './agenda-modelo';
 import { planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
 import { callPassouDaJanela, TIPOS_CALL } from './tipos';
 
@@ -62,27 +63,18 @@ type CampoAgendamento =
   | 'agendadaPara'
   | 'duracao'
   | 'convidadoEmail';
+type CamposPreservados = Partial<Record<CampoAgendamento | 'liveCoach', string>>;
 
 export type EstadoAgendamento = {
   erro?: string;
+  reconectar?: boolean;
   porCampo?: Partial<Record<CampoAgendamento, string>>;
-  campos?: Partial<Record<CampoAgendamento, string>>;
+  campos?: CamposPreservados;
 };
 
 function texto(formData: FormData, nome: string) {
   const valor = formData.get(nome);
   return typeof valor === 'string' ? valor : '';
-}
-
-function dataUtc(local: string, offsetMinutos: number) {
-  const partes = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local);
-  if (!partes) return new Date(Number.NaN);
-  const ano = Number(partes[1]!);
-  const mes = Number(partes[2]!);
-  const dia = Number(partes[3]!);
-  const horas = Number(partes[4]!);
-  const minutos = Number(partes[5]!);
-  return new Date(Date.UTC(ano, mes - 1, dia, horas, minutos) + offsetMinutos * 60_000);
 }
 
 export async function agendarReuniao(
@@ -98,6 +90,7 @@ export async function agendarReuniao(
     agendadaPara: texto(formData, 'agendadaPara'),
     duracao: texto(formData, 'duracao'),
     convidadoEmail: texto(formData, 'convidadoEmail'),
+    liveCoach: formData.get('liveCoach') === 'on' ? 'on' : '',
   };
 
   const validacao = agendarSchema.safeParse({
@@ -147,7 +140,8 @@ export async function agendarReuniao(
   if (erroCalendar || conexaoCalendar?.status !== 'ativa') {
     return {
       campos,
-      erro: 'Conecte seu Google Calendar antes de criar o primeiro agendamento.',
+      erro: 'Reconecte sua agenda para enviar o convite. Seu preenchimento será mantido.',
+      reconectar: true,
     };
   }
   if (!validacao.data.enviarConviteGoogle || !validacao.data.convidadoEmail) {
@@ -157,9 +151,9 @@ export async function agendarReuniao(
     };
   }
 
-  const quando = dataUtc(validacao.data.agendadaPara, validacao.data.offsetMinutos);
-  if (Number.isNaN(quando.getTime())) {
-    return { campos, porCampo: { agendadaPara: 'Escolha uma data válida.' } };
+  const quando = dataLocalParaUtc(validacao.data.agendadaPara, validacao.data.offsetMinutos);
+  if (!quando || quando.getTime() <= Date.now()) {
+    return { campos, porCampo: { agendadaPara: 'Escolha uma data e um horário futuros.' } };
   }
 
   const parametrosComuns = {
@@ -213,49 +207,25 @@ export async function agendarReuniao(
     };
   }
   if (validacao.data.enviarConviteGoogle && validacao.data.convidadoEmail) {
-    await supabase
+    const { error: erroConvite } = await supabase
       .from('calls_reunioes')
       .update({
         convidado_email: validacao.data.convidadoEmail,
-        google_sync_status: 'sincronizando',
+        google_sync_status: 'falhou',
         google_sync_erro: null,
       })
       .eq('id', reuniao.data.reuniao_id);
 
-    const { data: oportunidade, error: erroOportunidade } = await supabase
-      .from('crm_oportunidades')
-      .select(
-        `
-          titulo,
-          empresa:crm_empresas!crm_oportunidades_empresa_fk(nome),
-          contato:crm_contatos!crm_oportunidades_contato_fk(nome)
-        `,
-      )
-      .eq('id', oportunidadeId)
-      .maybeSingle();
-
-    if (erroOportunidade || !oportunidade) {
-      console.error('[google-calendar:contexto] Oportunidade não encontrada após criar a call.');
-      await supabase
-        .from('calls_reunioes')
-        .update({
-          google_sync_status: 'falhou',
-          google_sync_erro: 'Não foi possível preparar os dados do convite.',
-        })
-        .eq('id', reuniao.data.reuniao_id);
+    if (erroConvite) {
+      console.error('[google-calendar:contexto] Não foi possível salvar o destinatário.');
       calendar = 'falhou';
     } else {
-      const resultado = await sincronizarCallNoGoogle(supabase, {
+      const resultado = await executarAlteracaoAgenda(supabase, {
         reuniaoId: reuniao.data.reuniao_id,
-        codigoPublico: reuniao.data.codigo_publico,
-        titulo: validacao.data.titulo || oportunidade.titulo,
-        empresa: oportunidade.empresa?.nome ?? 'Cliente',
-        contato: oportunidade.contato?.nome ?? null,
-        convidadoEmail: validacao.data.convidadoEmail,
-        agendadaPara: quando.toISOString(),
-        duracaoMinutos: validacao.data.duracao,
+        dono: claims.claims.sub,
+        acao: 'sincronizar',
       });
-      calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
+      calendar = resultado.status === 'concluido' ? 'sincronizado' : 'falhou';
     }
   }
 
@@ -276,39 +246,15 @@ export async function reenviarConviteGoogle(formData: FormData): Promise<void> {
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) redirect('/entrar');
 
-  const { data: reuniao, error } = await supabase
-    .from('calls_reunioes')
-    .select(
-      `
-        id,
-        codigo_publico,
-        titulo,
-        agendada_para,
-        duracao_minutos,
-        convidado_email,
-        empresa:crm_empresas!calls_reunioes_empresa_fk(nome),
-        contato:crm_contatos!calls_reunioes_contato_fk(nome)
-      `,
-    )
-    .eq('id', reuniaoId.data)
-    .maybeSingle();
-
-  if (error || !reuniao?.convidado_email) redirect('/reunioes?calendar=falhou');
-
-  const resultado = await sincronizarCallNoGoogle(supabase, {
-    reuniaoId: reuniao.id,
-    codigoPublico: reuniao.codigo_publico,
-    titulo: reuniao.titulo,
-    empresa: reuniao.empresa?.nome ?? 'Cliente',
-    contato: reuniao.contato?.nome ?? null,
-    convidadoEmail: reuniao.convidado_email,
-    agendadaPara: reuniao.agendada_para,
-    duracaoMinutos: reuniao.duracao_minutos,
+  const resultado = await executarAlteracaoAgenda(supabase, {
+    reuniaoId: reuniaoId.data,
+    dono: claims.claims.sub,
+    acao: 'sincronizar',
   });
 
   revalidatePath('/calls');
-  const calendar = resultado.status === 'sincronizado' ? 'sincronizado' : 'falhou';
-  redirect(`/reunioes?agendada=${reuniao.id}&calendar=${calendar}`);
+  const calendar = resultado.status === 'concluido' ? 'sincronizado' : 'falhou';
+  redirect(`/reunioes?agendada=${reuniaoId.data}&calendar=${calendar}`);
 }
 
 export async function resolverReuniaoPendente(formData: FormData): Promise<void> {
@@ -324,9 +270,7 @@ export async function resolverReuniaoPendente(formData: FormData): Promise<void>
 
   const { data: reuniao, error } = await supabase
     .from('calls_reunioes')
-    .select(
-      'id, oportunidade_id, tipo, status, agendada_para, duracao_minutos, google_event_id, google_calendar_id',
-    )
+    .select('id, oportunidade_id, tipo, status, agendada_para, duracao_minutos, atualizada_em')
     .eq('id', validacao.data.reuniao)
     .maybeSingle();
 
@@ -342,39 +286,20 @@ export async function resolverReuniaoPendente(formData: FormData): Promise<void>
     redirect('/reunioes?pendencia=erro');
   }
 
-  const remocaoGoogle = await removerCallDoGoogle(supabase, {
+  if (validacao.data.destino === 'reagendar') redirect(`/reunioes?editar=${reuniao.id}`);
+  const resultado = await executarAlteracaoAgenda(supabase, {
     reuniaoId: reuniao.id,
-    eventoId: reuniao.google_event_id,
-    calendarId: reuniao.google_calendar_id,
+    dono: claims.claims.sub,
+    acao: 'cancelar',
+    versao: reuniao.atualizada_em,
   });
-  if (remocaoGoogle.status === 'falhou') {
-    redirect('/reunioes?pendencia=erro');
-  }
-
-  const { error: erroAtualizacao } = await supabase
-    .from('calls_reunioes')
-    .update({ status: 'cancelada', encerrada_em: new Date().toISOString() })
-    .eq('id', reuniao.id)
-    .in('status', ['agendada', 'aguardando', 'ao_vivo']);
-  if (erroAtualizacao) {
-    console.error(`[calls:resolver-pendencia] ${erroAtualizacao.code}: ${erroAtualizacao.message}`);
-    redirect('/reunioes?pendencia=erro');
-  }
+  if (resultado.status === 'erro') redirect('/reunioes?pendencia=erro');
 
   revalidatePath('/calls');
   revalidatePath('/crm');
   revalidatePath(`/crm/${reuniao.oportunidade_id}`);
   revalidarDirecaoOperacional();
 
-  if (validacao.data.destino === 'reagendar') {
-    const parametros = new URLSearchParams({
-      nova: '1',
-      oportunidade: reuniao.oportunidade_id,
-      tipo: reuniao.tipo,
-      pendencia: 'reagendar',
-    });
-    redirect(`/reunioes?${parametros.toString()}`);
-  }
   redirect('/reunioes?pendencia=cancelada');
 }
 

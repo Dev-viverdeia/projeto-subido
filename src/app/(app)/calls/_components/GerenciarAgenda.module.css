@@ -1,0 +1,70 @@
+.formulario {
+  display: grid;
+  gap: var(--via-space-5);
+}
+.resumo {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  background: var(--via-surface);
+  color: var(--via-text);
+}
+.resumo > svg {
+  flex-shrink: 0;
+}
+.resumo > div {
+  display: grid;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+.resumo strong {
+  font-size: var(--via-fs-body);
+  font-weight: 600;
+}
+.resumo span {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  overflow-wrap: anywhere;
+}
+.campos {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--via-space-4);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.formulario .campos input {
+  min-height: 48px;
+  font-size: 16px;
+  min-width: 0;
+}
+.nota {
+  margin: 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+.cancelar {
+  justify-self: start;
+  min-height: 44px;
+}
+.pendencia {
+  margin-top: var(--via-space-3);
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+@media (max-width: 600px) {
+  .campos {
+    grid-template-columns: 1fr;
+  }
+  .resumo {
+    padding: var(--via-space-3);
+  }
+}
