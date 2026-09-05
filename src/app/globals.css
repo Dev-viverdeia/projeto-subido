@@ -321,15 +321,18 @@ html {
  * comportamento de documento. Mesma especificidade da regra do DS (0,1,1) e mais
  * tarde na cascata, então esta ganha por ordem.
  *
- * E o sublinhado VOLTA onde ele é certo: dentro de parágrafo, item de lista ou
- * citação. Ali o link é mesmo uma palavra no meio do texto, e tirar a pista
- * deixaria o clicável indistinguível do resto da frase.
+ * Listas também contêm cards e navegação. Não usar `li a:hover`: esse seletor
+ * sublinha todos os descendentes do card. Na lista, links sem classe preservam
+ * a convenção de prosa; links de texto estilizados podem optar por data-link-texto.
+ * :where mantém a regra fraca para os estados próprios de cada componente.
  * ------------------------------------------------------------------------- */
 a:hover {
   text-decoration: none;
 }
 
-:is(p, li, dd, dt, blockquote, figcaption) a:hover {
+:where(p, dd, dt, blockquote, figcaption) a:hover,
+:where(li) a:where(:not([class]), [class='']):hover,
+a[data-link-texto]:hover {
   text-decoration: underline;
 }
 

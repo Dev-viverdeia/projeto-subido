@@ -1,0 +1,17 @@
+.texto {
+  font-weight: var(--via-fw-medium);
+}
+
+.navegacao {
+  display: flex;
+  align-items: center;
+  min-height: var(--app-h-control);
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane-strong);
+}
+
+.tintaFoco {
+  color: var(--app-focus-ring-color);
+}

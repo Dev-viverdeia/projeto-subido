@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpen, Bot, Code2, Layers, MessageSquare } from 'lucide-react';
+import { ArrowRight, BookOpen, Bot, Code2, Layers, MessageSquare } from 'lucide-react';
 import type { FormacaoResumo } from '@/lib/conteudo/queries';
 import {
   contarConcluidas,
@@ -24,20 +24,6 @@ function rotuloAcao(feitas: number, total: number) {
   if (total > 0 && feitas >= total) return 'Revisar formação';
   if (feitas > 0) return 'Retomar formação';
   return 'Começar formação';
-}
-
-function Seta() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 const ICONES: Record<string, typeof BookOpen> = {
@@ -105,7 +91,7 @@ export function CartaoFormacao({ formacao, recomendada = false, etapa, foco }: P
       <span className={styles.acao}>
         {rotuloAcao(feitas, formacao.aulas)}
         <span className={styles.seta}>
-          <Seta />
+          <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
         </span>
       </span>
     </Link>

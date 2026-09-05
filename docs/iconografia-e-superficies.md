@@ -26,3 +26,14 @@ dock e Sobral AI usam a mesma família. Os ícones não substituem o logo Subido
 
 Setas, fechar, copiar, busca dentro de campo e controles de áudio continuam no Lucide.
 Essas ações preservam convenções conhecidas; a assinatura própria fica nas áreas.
+
+## Interações
+
+- Cards de Formações e Projetos mantêm a posição no hover; borda e sombra respondem.
+- A seta indica a direção, sem parecer outro botão. Só ela se desloca, e apenas
+  quando o usuário não pediu movimento reduzido.
+- O foco de teclado vem depois de hover e active na cascata, preservando o anel.
+  `--app-ring` usa separador branco e tinta opaca com 5.24:1 contra o branco.
+- Cards e itens de navegação não recebem sublinhado. Links dentro de prosa sim.
+  Em listas, links de texto com classe devem usar `data-link-texto`; listas sem
+  classes de componente continuam com o comportamento padrão de prosa.
