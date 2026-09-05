@@ -5,6 +5,7 @@ import { BriefcaseBusiness, ContactRound, GraduationCap, House, Search } from 'l
 import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBusca';
 import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
 import { ListaResultados } from '@/app/(app)/prospeccao/_components/ListaResultados';
+import { ListasVazias } from '@/app/(app)/prospeccao/_components/ListasVazias';
 import { ProgressoBusca } from '@/app/(app)/prospeccao/_components/ProgressoBusca';
 import pagina from '@/app/(app)/prospeccao/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
@@ -133,7 +134,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
 export default async function PreviewProspeccaoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ espera?: string }>;
+  searchParams: Promise<{ espera?: string; vazio?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
@@ -170,60 +171,62 @@ export default async function PreviewProspeccaoPage({
 
           <FormularioBusca saldo={42} pronto />
 
-          <section className={pagina.areaListas} aria-labelledby="preview-listas-titulo">
-            <aside className={pagina.historico}>
-              <div className={pagina.historicoTopo}>
-                <div>
-                  <p className={pagina.sobretitulo}>Suas buscas</p>
-                  <h2 id="preview-listas-titulo">Listas</h2>
+          {parametros.vazio === '1' ? (
+            <ListasVazias />
+          ) : (
+            <section className={pagina.areaListas} aria-labelledby="preview-listas-titulo">
+              <aside className={pagina.historico}>
+                <div className={pagina.historicoTopo}>
+                  <div>
+                    <h2 id="preview-listas-titulo">Listas</h2>
+                  </div>
+                  <span>2</span>
                 </div>
-                <span>2</span>
-              </div>
-              <nav aria-label="Listas de prospecção">
-                <a href="#resultados" aria-current="page">
-                  <span>
-                    <strong>Clínicas odontológicas</strong>
-                    <small>Belo Horizonte, MG</small>
-                  </span>
-                  <span>
-                    <small>17 ago.</small>
-                    <em data-status="concluida">Concluída</em>
-                  </span>
-                </a>
-                <a href="#resultados">
-                  <span>
-                    <strong>Imobiliárias</strong>
-                    <small>Campinas, SP</small>
-                  </span>
-                  <span>
-                    <small>15 ago.</small>
-                    <em data-status="concluida">Concluída</em>
-                  </span>
-                </a>
-              </nav>
-            </aside>
+                <nav aria-label="Listas de prospecção">
+                  <a href="#resultados" aria-current="page">
+                    <span>
+                      <strong>Clínicas odontológicas</strong>
+                      <small>Belo Horizonte, MG</small>
+                    </span>
+                    <span>
+                      <small>17 ago.</small>
+                      <em data-status="concluida">Concluída</em>
+                    </span>
+                  </a>
+                  <a href="#resultados">
+                    <span>
+                      <strong>Imobiliárias</strong>
+                      <small>Campinas, SP</small>
+                    </span>
+                    <span>
+                      <small>15 ago.</small>
+                      <em data-status="concluida">Concluída</em>
+                    </span>
+                  </a>
+                </nav>
+              </aside>
 
-            <div className={pagina.resultados} id="resultados">
-              <header className={pagina.resultadosTopo}>
-                <div>
-                  <p className={pagina.sobretitulo}>Lista selecionada</p>
-                  <h2>Clínicas odontológicas</h2>
-                  <span>Belo Horizonte, MG</span>
-                </div>
-                <div className={pagina.metricasLista}>
-                  <span>
-                    <strong>3</strong>
-                    encontradas
-                  </span>
-                  <span>
-                    <strong>10</strong>
-                    solicitados
-                  </span>
-                </div>
-              </header>
-              <ListaResultados leads={LEADS} />
-            </div>
-          </section>
+              <div className={pagina.resultados} id="resultados">
+                <header className={pagina.resultadosTopo}>
+                  <div>
+                    <h2>Clínicas odontológicas</h2>
+                    <span>Belo Horizonte, MG</span>
+                  </div>
+                  <div className={pagina.metricasLista}>
+                    <span>
+                      <strong>3</strong>
+                      encontradas
+                    </span>
+                    <span>
+                      <strong>10</strong>
+                      solicitados
+                    </span>
+                  </div>
+                </header>
+                <ListaResultados leads={LEADS} />
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </div>

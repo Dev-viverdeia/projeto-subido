@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CalendarCheck2, CircleDollarSign, FileClock, ListTodo } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import {
   PERIODOS_METRICAS,
   type ContagemComercial,
@@ -7,91 +8,46 @@ import {
 } from '@/lib/metricas/modelo';
 import styles from '../pagina.module.css';
 
-const FORMATADOR_NUMERO = new Intl.NumberFormat('pt-BR');
-const FORMATADOR_MOEDA = new Intl.NumberFormat('pt-BR', {
+const NUMERO = new Intl.NumberFormat('pt-BR');
+const MOEDA = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
   maximumFractionDigits: 0,
 });
-
-type ChaveContagem = keyof ContagemComercial;
-
-const INDICADORES: Array<{
-  id: ChaveContagem;
-  rotulo: string;
-}> = [
-  { id: 'prospeccoes', rotulo: 'Prospecções' },
+const ETAPAS: { id: keyof ContagemComercial; rotulo: string }[] = [
+  { id: 'prospeccoes', rotulo: 'Empresas encontradas' },
   { id: 'abordagens', rotulo: 'Abordagens' },
   { id: 'oportunidades', rotulo: 'Oportunidades' },
-  { id: 'propostas', rotulo: 'Propostas' },
-  { id: 'ganhos', rotulo: 'Ganhos' },
-  { id: 'perdas', rotulo: 'Perdas' },
+  { id: 'propostas', rotulo: 'Propostas enviadas' },
+  { id: 'ganhos', rotulo: 'Vendas ganhas' },
 ];
+const INDICADORES = [...ETAPAS, { id: 'perdas' as const, rotulo: 'Vendas perdidas' }];
 
-function numero(valor: number): string {
-  return FORMATADOR_NUMERO.format(valor);
-}
-
-function moeda(valorCentavos: number): string {
-  return FORMATADOR_MOEDA.format(valorCentavos / 100);
-}
-
-function comparacao(atual: number, anterior: number | undefined): string {
-  if (anterior === undefined) return 'Primeiro período';
-  if (anterior === 0 && atual === 0) return 'Sem movimento';
-  if (anterior === 0) return 'Novo no período';
-
+function comparacao(atual: number, anterior: number): string {
+  if (anterior === 0) return atual === 0 ? 'Sem movimento' : 'Sem base anterior';
   const variacao = Math.round(((atual - anterior) / anterior) * 100);
-  if (variacao === 0) return 'Mesmo ritmo';
-  return `${variacao > 0 ? '+' : ''}${variacao}% no período`;
+  return variacao === 0 ? 'Sem mudança' : `${variacao > 0 ? '+' : ''}${variacao}%`;
 }
-
-function taxa(valor: number | null, complemento: string): string {
-  return valor === null ? 'sem base para calcular' : `${valor}% ${complemento}`;
+function percentual(valor: number | null): string {
+  return valor === null ? 'Sem base' : `${valor}%`;
 }
 
 export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
-  const etapasFunil = [
-    {
-      id: 'prospeccoes' as const,
-      numero: '01',
-      rotulo: 'Empresas encontradas',
-      conversao: 'base do período',
-    },
-    {
-      id: 'abordagens' as const,
-      numero: '02',
-      rotulo: 'Empresas abordadas',
-      conversao: taxa(metricas.taxas.abordagem, 'da lista'),
-    },
-    {
-      id: 'oportunidades' as const,
-      numero: '03',
-      rotulo: 'Oportunidades',
-      conversao: taxa(metricas.taxas.oportunidade, 'das abordagens'),
-    },
-    {
-      id: 'propostas' as const,
-      numero: '04',
-      rotulo: 'Propostas enviadas',
-      conversao: taxa(metricas.taxas.proposta, 'das oportunidades'),
-    },
-    {
-      id: 'ganhos' as const,
-      numero: '05',
-      rotulo: 'Vendas ganhas',
-      conversao: taxa(metricas.taxas.fechamento, 'das decisões'),
-    },
-  ];
+  // Escala comum de volumes, não uma coorte: entradas manuais podem superar
+  // as abordagens. Zero permanece sem preenchimento, sem largura decorativa.
+  const maiorVolume = Math.max(1, ...ETAPAS.map(({ id }) => metricas.funil[id]));
+  const anterior = metricas.periodoAnterior;
+  const relacoes = [
+    ['Abordagens / empresas encontradas', metricas.taxas.abordagem],
+    ['Oportunidades / abordagens', metricas.taxas.oportunidade],
+    ['Propostas / oportunidades', metricas.taxas.proposta],
+    ['Ganhos / empresas encontradas', metricas.taxas.total],
+  ] as const;
 
   return (
     <div className={styles.pagina}>
       <header className={styles.hero}>
-        <div className={styles.heroTexto}>
-          <h1>Métricas</h1>
-          <p>Veja o funil e o próximo ponto de atenção.</p>
-        </div>
-
+        <h1>Métricas</h1>
         <nav className={styles.periodos} aria-label="Período das métricas">
           {PERIODOS_METRICAS.map((periodo) => (
             <Link
@@ -105,142 +61,176 @@ export function PainelMetricas({ metricas }: { metricas: MetricasComerciais }) {
         </nav>
       </header>
 
-      <section className={styles.resumo} aria-label={`Resumo de ${metricas.rotuloPeriodo}`}>
-        {INDICADORES.map((indicador) => {
-          const valor = metricas.funil[indicador.id];
-          const anterior = metricas.periodoAnterior?.[indicador.id];
-          return (
-            <article key={indicador.id} data-indicador={indicador.id}>
-              <span>{indicador.rotulo}</span>
-              <strong>{numero(valor)}</strong>
-              <em>{comparacao(valor, anterior)}</em>
-            </article>
-          );
-        })}
-      </section>
-
-      <details className={styles.detalhesFunil}>
-        <summary>Ver funil de vendas</summary>
-        <section className={styles.funil} data-on-dark aria-labelledby="funil-titulo">
-          <header className={styles.funilTopo}>
-            <div>
-              <h2 id="funil-titulo">Da lista ao cliente</h2>
-            </div>
+      <div className={styles.principal}>
+        <section
+          className={styles.funil}
+          aria-labelledby="funil-titulo"
+          aria-describedby="funil-nota"
+        >
+          <header className={styles.topoSecao}>
+            <h2 id="funil-titulo">Funil de vendas</h2>
             <span>{metricas.rotuloPeriodo}</span>
           </header>
-
-          <ol className={styles.etapasFunil}>
-            {etapasFunil.map((etapa) => (
-              <li key={etapa.id}>
-                <span className={styles.numeroEtapa}>{etapa.numero}</span>
-                <strong>{numero(metricas.funil[etapa.id])}</strong>
-                <h3>{etapa.rotulo}</h3>
-                <small>{etapa.conversao}</small>
+          <ol className={styles.etapas}>
+            {ETAPAS.map(({ id, rotulo }) => (
+              <li key={id} data-indicador={id}>
+                <div>
+                  <span>{rotulo}</span>
+                  <strong>{NUMERO.format(metricas.funil[id])}</strong>
+                </div>
+                <div className={styles.trilho} aria-hidden="true">
+                  <span
+                    style={
+                      {
+                        '--volume': `${(metricas.funil[id] / maiorVolume) * 100}%`,
+                      } as CSSProperties
+                    }
+                  />
+                </div>
               </li>
             ))}
           </ol>
-
-          <footer className={styles.funilRodape}>
+          <p className={styles.nota} id="funil-nota">
+            Volumes do período, não etapas das mesmas empresas.
+          </p>
+          <dl className={styles.resultados}>
             <div>
-              <span>Conversão total</span>
-              <strong>
-                {metricas.taxas.total === null ? 'Sem base' : `${metricas.taxas.total}%`}
-              </strong>
-              <small>das empresas encontradas até a venda</small>
+              <dt>Vendas perdidas</dt>
+              <dd>{NUMERO.format(metricas.funil.perdas)}</dd>
             </div>
             <div>
-              <span>Vendas perdidas</span>
-              <strong>{numero(metricas.funil.perdas)}</strong>
-              <small>saídas registradas no período</small>
+              <dt>Ganhos entre decisões</dt>
+              <dd>{percentual(metricas.taxas.fechamento)}</dd>
             </div>
-          </footer>
-        </section>
-      </details>
-
-      <div className={styles.gradeDiagnostico}>
-        <section className={styles.diagnostico} aria-labelledby="diagnostico-titulo">
-          <div className={styles.diagnosticoCabecalho}>
-            <div>
-              <h2 id="diagnostico-titulo">{metricas.diagnostico.titulo}</h2>
-            </div>
-          </div>
-          <p className={styles.diagnosticoDescricao}>{metricas.diagnostico.descricao}</p>
-          <ul>
-            {metricas.diagnostico.observacoes.slice(0, 2).map((observacao) => (
-              <li key={observacao}>{observacao}</li>
-            ))}
-          </ul>
-          <Link href={metricas.diagnostico.acao.href} className={styles.acaoDiagnostico}>
-            {metricas.diagnostico.acao.rotulo}
-            <ArrowRight size={16} strokeWidth={1.9} aria-hidden="true" />
-          </Link>
+          </dl>
         </section>
 
-        <section className={styles.saude} aria-labelledby="saude-titulo">
-          <header>
-            <p className={styles.sobretitulo}>Agora</p>
-            <h2 id="saude-titulo">Saúde do pipeline</h2>
-          </header>
-          <div className={styles.saudeGrade}>
-            <article>
-              <CircleDollarSign size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>Valor em aberto</span>
-              <strong>{moeda(metricas.saude.valorPipelineCentavos)}</strong>
-            </article>
-            <article>
-              <ListTodo size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>Sem próxima ação</span>
-              <strong>{numero(metricas.saude.semProximaAcao)}</strong>
-            </article>
-            <article>
-              <FileClock size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>Aguardando resposta</span>
-              <strong>{numero(metricas.saude.propostasAguardando)}</strong>
-            </article>
-            <article>
-              <CalendarCheck2 size={18} strokeWidth={1.7} aria-hidden="true" />
-              <span>Reuniões concluídas</span>
-              <strong>{numero(metricas.saude.callsConcluidas)}</strong>
-            </article>
-          </div>
-          <footer>
-            <span>Ticket médio ganho</span>
-            <strong>
-              {metricas.saude.ticketMedioGanhoCentavos === null
-                ? 'Ainda sem base'
-                : moeda(metricas.saude.ticketMedioGanhoCentavos)}
-            </strong>
-          </footer>
-        </section>
+        <div className={styles.acompanhamento}>
+          <section className={styles.diagnostico} aria-labelledby="diagnostico-titulo">
+            <span className={styles.rotulo}>Próximo passo</span>
+            <h2 id="diagnostico-titulo">{metricas.diagnostico.titulo}</h2>
+            <p>{metricas.diagnostico.descricao}</p>
+            <Link href={metricas.diagnostico.acao.href} className={styles.acaoDiagnostico}>
+              {metricas.diagnostico.acao.rotulo}
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+            {metricas.diagnostico.observacoes.length > 0 && (
+              <details className={styles.motivo}>
+                <summary>
+                  Por que este passo?
+                  <ChevronDown size={17} aria-hidden="true" />
+                </summary>
+                <ul>
+                  {metricas.diagnostico.observacoes.map((observacao) => (
+                    <li key={observacao}>{observacao}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </section>
+          <section className={styles.saude} aria-label="Vendas em aberto">
+            <dl>
+              <div>
+                <dt>Valor em aberto</dt>
+                <dd>{MOEDA.format(metricas.saude.valorPipelineCentavos / 100)}</dd>
+              </div>
+              <div>
+                <dt>Sem próxima ação</dt>
+                <dd>{NUMERO.format(metricas.saude.semProximaAcao)}</dd>
+              </div>
+              <div>
+                <dt>Aguardando resposta</dt>
+                <dd>{NUMERO.format(metricas.saude.propostasAguardando)}</dd>
+              </div>
+              <div>
+                <dt>Reuniões no período</dt>
+                <dd>
+                  {NUMERO.format(metricas.saude.callsConcluidas)} <small>concluídas</small>
+                </dd>
+              </div>
+            </dl>
+          </section>
+        </div>
       </div>
 
-      <details className={styles.detalhesSecundarios}>
-        <summary>Ver motivos de perda</summary>
-        <section className={styles.perdas} aria-labelledby="perdas-titulo">
-          <header>
-            <h2 id="perdas-titulo">Motivos de perda</h2>
-          </header>
+      <details className={styles.detalhes}>
+        <summary>
+          Comparações e taxas
+          <ChevronDown size={18} aria-hidden="true" />
+        </summary>
+        <div className={styles.detalhesCorpo}>
+          {anterior ? (
+            <table className={styles.comparacoes}>
+              <caption>Comparação com o período anterior</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Indicador</th>
+                  <th scope="col">Anterior</th>
+                  <th scope="col">Atual</th>
+                  <th scope="col">Variação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {INDICADORES.map(({ id, rotulo }) => (
+                  <tr key={id}>
+                    <th scope="row">{rotulo}</th>
+                    <td>{NUMERO.format(anterior[id])}</td>
+                    <td>{NUMERO.format(metricas.funil[id])}</td>
+                    <td>{comparacao(metricas.funil[id], anterior[id])}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className={styles.nota}>
+              Todo o histórico selecionado. Não há período anterior para comparar.
+            </p>
+          )}
+          <h3>Relações entre volumes</h3>
+          <p className={styles.nota}>
+            Podem superar 100%: cada registro entra pela data da sua atividade, sem acompanhar um
+            mesmo grupo de empresas.
+          </p>
+          <dl className={styles.relacoes}>
+            {relacoes.map(([rotulo, valor]) => (
+              <div key={rotulo}>
+                <dt>{rotulo}</dt>
+                <dd>{percentual(valor)}</dd>
+              </div>
+            ))}
+          </dl>
+          <dl className={styles.relacoes}>
+            <div>
+              <dt>Ticket médio ganho</dt>
+              <dd>
+                {metricas.saude.ticketMedioGanhoCentavos === null
+                  ? 'Sem base'
+                  : MOEDA.format(metricas.saude.ticketMedioGanhoCentavos / 100)}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </details>
+      <details className={styles.detalhes}>
+        <summary>
+          Motivos de perda
+          <span className={styles.contagem}>{NUMERO.format(metricas.funil.perdas)}</span>
+          <ChevronDown size={18} aria-hidden="true" />
+        </summary>
+        <div className={styles.detalhesCorpo}>
           {metricas.perdasPorMotivo.length ? (
-            <ol>
+            <ul className={styles.motivosPerda}>
               {metricas.perdasPorMotivo.map((item) => (
                 <li key={item.motivo}>
                   <span>{item.motivo}</span>
-                  <strong>{numero(item.quantidade)}</strong>
-                  <progress
-                    max={Math.max(1, metricas.funil.perdas)}
-                    value={item.quantidade}
-                    aria-label={`${item.motivo}: ${item.quantidade}`}
-                  />
+                  <strong>{NUMERO.format(item.quantidade)}</strong>
                 </li>
               ))}
-            </ol>
+            </ul>
           ) : (
-            <div className={styles.semPerdas}>
-              <strong>Nenhuma perda registrada.</strong>
-              <p>Quando uma venda for encerrada, registre o motivo para orientar a consultoria.</p>
-            </div>
+            <p className={styles.nota}>Nenhuma perda registrada neste período.</p>
           )}
-        </section>
+        </div>
       </details>
     </div>
   );

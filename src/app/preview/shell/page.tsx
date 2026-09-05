@@ -35,6 +35,13 @@ import {
 import { ProgressoPreview } from '../ProgressoPreview';
 import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 import { ControlesPreview } from './ControlesPreview';
+import { PainelMetricas } from '@/app/(app)/metricas/_components/PainelMetricas';
+import CarregandoMetricas from '@/app/(app)/metricas/loading';
+import { criarMetricasPreview } from '../metricas/fixture';
+import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
+import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBusca';
+import { ListasVazias } from '@/app/(app)/prospeccao/_components/ListasVazias';
+import prospeccaoStyles from '@/app/(app)/prospeccao/pagina.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 
@@ -59,17 +66,23 @@ export default async function PreviewShellPage({
     'projeto',
     'sobral',
     'controles',
+    'metricas',
+    'prospeccao',
   ].includes(params.tela ?? '')
     ? params.tela!
     : 'inicio';
   const caminho =
-    tela === 'sobral'
-      ? '/consultor'
-      : tela.startsWith('projeto')
-        ? '/solucoes'
-        : tela === 'aula' || tela === 'formacoes' || tela === 'formacao'
-          ? '/formacoes'
-          : '/inicio';
+    tela === 'metricas'
+      ? '/metricas'
+      : tela === 'prospeccao'
+        ? '/prospeccao'
+        : tela === 'sobral'
+          ? '/consultor'
+          : tela.startsWith('projeto')
+            ? '/solucoes'
+            : tela === 'aula' || tela === 'formacoes' || tela === 'formacao'
+              ? '/formacoes'
+              : '/inicio';
   const formacao = params.estado === 'extenso' ? FORMACAO_EXTENSA_DEMO : FORMACAO_DEMO;
   const aulas = formacao.modulos.flatMap((modulo) => modulo.aulas);
   const feitas =
@@ -97,13 +110,17 @@ export default async function PreviewShellPage({
     <ProvedorDeTrilha>
       <DefinirTrilha
         atual={
-          tela === 'sobral'
-            ? 'Sobral AI'
-            : tela === 'formacoes' || tela === 'formacao' || tela === 'aula'
-              ? 'Formações'
-              : tela === 'projetos'
-                ? 'Projetos'
-                : 'Início'
+          tela === 'metricas'
+            ? 'Métricas'
+            : tela === 'prospeccao'
+              ? 'Prospecção'
+              : tela === 'sobral'
+                ? 'Sobral AI'
+                : tela === 'formacoes' || tela === 'formacao' || tela === 'aula'
+                  ? 'Formações'
+                  : tela === 'projetos'
+                    ? 'Projetos'
+                    : 'Início'
         }
       />
       <div className={shellStyles.shell} data-app-shell>
@@ -137,7 +154,19 @@ export default async function PreviewShellPage({
 
         <main className={shellStyles.conteudo} id="conteudo">
           <ProgressoPreview aulas={feitas}>
-            {tela === 'controles' ? (
+            {tela === 'metricas' ? (
+              params.estado === 'carregando' ? (
+                <CarregandoMetricas />
+              ) : (
+                <PainelMetricas metricas={criarMetricasPreview(params.estado)} />
+              )
+            ) : tela === 'prospeccao' ? (
+              <div className={prospeccaoStyles.pagina}>
+                <HeroProspeccao saldo={42} />
+                <FormularioBusca saldo={42} pronto />
+                <ListasVazias />
+              </div>
+            ) : tela === 'controles' ? (
               <ControlesPreview />
             ) : tela === 'sobral' ? (
               <TelaSobral threads={[]} conversa={null} nome={nome} modoPreview />

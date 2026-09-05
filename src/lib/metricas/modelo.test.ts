@@ -87,7 +87,7 @@ describe('métricas comerciais', () => {
       ticketMedioGanhoCentavos: 2_000_000,
     });
     expect(metricas.perdasPorMotivo).toEqual([{ motivo: 'Investimento', quantidade: 1 }]);
-    expect(metricas.diagnostico.titulo).toBe('O pipeline pede próximas ações.');
+    expect(metricas.diagnostico.titulo).toBe('Defina os próximos passos');
   });
 
   it('orienta a criar uma lista quando ainda não há atividade', () => {
@@ -96,7 +96,7 @@ describe('métricas comerciais', () => {
     expect(metricas.temAtividade).toBe(false);
     expect(metricas.periodoAnterior).toBeNull();
     expect(metricas.diagnostico).toMatchObject({
-      titulo: 'Ainda falta uma lista para analisar.',
+      titulo: 'Crie sua primeira lista',
       acao: { rotulo: 'Criar lista', href: '/prospeccao' },
     });
   });

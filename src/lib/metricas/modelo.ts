@@ -186,8 +186,8 @@ function criarDiagnostico(
 
   if (funil.prospeccoes === 0) {
     return {
-      titulo: 'Ainda falta uma lista para analisar.',
-      descricao: 'Crie uma prospecção para começar a medir abordagem, avanço no CRM e fechamento.',
+      titulo: 'Crie sua primeira lista',
+      descricao: 'Encontre empresas para começar a acompanhar suas vendas.',
       observacoes: ['Os indicadores passam a ser calculados assim que as empresas forem salvas.'],
       acao: { rotulo: 'Criar lista', href: '/prospeccao' },
     };
@@ -195,9 +195,8 @@ function criarDiagnostico(
 
   if (funil.abordagens === 0 || (taxas.abordagem !== null && taxas.abordagem < 35)) {
     return {
-      titulo: 'O gargalo está na primeira abordagem.',
-      descricao:
-        'Há empresas na lista, mas poucas receberam uma tentativa de contato. Trabalhe a lista antes de buscar mais volume.',
+      titulo: 'Retome os contatos da lista',
+      descricao: 'Há poucas abordagens. Trabalhe as empresas já encontradas.',
       observacoes: observacoes.slice(0, 3),
       acao: { rotulo: 'Trabalhar lista', href: '/prospeccao' },
     };
@@ -205,9 +204,8 @@ function criarDiagnostico(
 
   if (funil.oportunidades === 0 || (taxas.oportunidade !== null && taxas.oportunidade < 15)) {
     return {
-      titulo: 'As abordagens ainda não viraram oportunidades.',
-      descricao:
-        'Revise a mensagem inicial e leve para Vendas apenas as empresas que aceitaram conversar sobre um projeto.',
+      titulo: 'Revise a primeira abordagem',
+      descricao: 'Leve para Vendas as empresas que aceitaram conversar sobre um projeto.',
       observacoes: observacoes.slice(0, 3),
       acao: { rotulo: 'Revisar vendas', href: '/vendas' },
     };
@@ -215,9 +213,8 @@ function criarDiagnostico(
 
   if (funil.propostas === 0 || (taxas.proposta !== null && taxas.proposta < 25)) {
     return {
-      titulo: 'As oportunidades não estão chegando à proposta.',
-      descricao:
-        'Confira se as reuniões estão confirmando problema, prioridade, decisão e próximo passo antes de montar o documento.',
+      titulo: 'Prepare a proposta',
+      descricao: 'Confirme problema, prioridade e decisão na próxima reunião.',
       observacoes: observacoes.slice(0, 3),
       acao: { rotulo: 'Ver reuniões', href: '/reunioes' },
     };
@@ -225,9 +222,8 @@ function criarDiagnostico(
 
   if (funil.ganhos + funil.perdas === 0) {
     return {
-      titulo: 'As propostas precisam de uma decisão.',
-      descricao:
-        'Registre o próximo follow-up e confirme com o cliente quando a proposta será aprovada ou recusada.',
+      titulo: 'Retome as propostas enviadas',
+      descricao: 'Combine a data da resposta com cada cliente.',
       observacoes: observacoes.slice(0, 3),
       acao: { rotulo: 'Ver propostas', href: '/propostas' },
     };
@@ -235,18 +231,16 @@ function criarDiagnostico(
 
   if (saude.semProximaAcao > 0) {
     return {
-      titulo: 'O pipeline pede próximas ações.',
-      descricao:
-        'Antes de aumentar a prospecção, defina data e tarefa para cada oportunidade que continua aberta.',
+      titulo: 'Defina os próximos passos',
+      descricao: 'Adicione uma tarefa e uma data às vendas em aberto.',
       observacoes: observacoes.slice(0, 3),
       acao: { rotulo: 'Organizar vendas', href: '/vendas' },
     };
   }
 
   return {
-    titulo: 'O processo comercial está avançando.',
-    descricao:
-      'Use a consultoria para revisar as perdas, repetir o que gerou vendas e definir a próxima meta de atividade.',
+    titulo: 'Revise o que gerou vendas',
+    descricao: 'Use as perdas e os ganhos para planejar o próximo período.',
     observacoes: observacoes.slice(0, 3),
     acao: { rotulo: 'Revisar vendas', href: '/vendas' },
   };
