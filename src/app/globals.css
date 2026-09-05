@@ -175,34 +175,78 @@ html {
   border-radius: var(--app-radius-control);
   background: var(--app-control-bg);
   box-shadow: var(--app-control-shadow);
-  backdrop-filter: blur(16px) saturate(132%);
+  backdrop-filter: var(--app-glass-filter);
+  transition:
+    border-color var(--app-t-state),
+    box-shadow var(--app-t-state),
+    background-color var(--app-t-state);
 }
 
 :is([data-app-shell], [data-app-modal]) .via-input::after {
   display: none;
 }
 
-:is([data-app-shell], [data-app-modal]) .via-input:hover,
-:is([data-app-shell], [data-app-modal]) .via-select__trigger:hover:not(:disabled) {
+:is([data-app-shell], [data-app-modal]) .via-input:hover:where(:not(:has(input:disabled))),
+:is([data-app-shell], [data-app-modal]) .via-select__trigger:hover:where(:not(:disabled)) {
   border-color: var(--via-navy-20);
   background: var(--app-control-bg-hover);
 }
 
 :is([data-app-shell], [data-app-modal]) .via-input input,
 :is([data-app-shell], [data-app-modal]) .via-select__trigger {
+  min-width: 0;
   color: var(--via-text-primary);
   font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-regular);
   line-height: var(--app-lh-ui);
 }
 
+/* A regra de repouso empatava com :has(:focus-visible) e o Input carregado
+   depois recuperava o anel de 3px a 10% navy. O foco agora ganha pela
+   especificidade, sem depender da ordem dos chunks ou desaparecer no hover. */
+:is([data-app-shell], [data-app-modal]) .via-input:focus-within {
+  border-color: var(--via-navy-40);
+  box-shadow: var(--app-ring), var(--app-control-shadow);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input input::placeholder {
+  color: var(--via-text-muted);
+  opacity: 1;
+}
+
+/* O estado de erro também era apagado pelo repouso (borda idêntica à normal).
+   Mantém a tinta de erro do DS e a mensagem, sem pintar todo o campo de vermelho. */
+:is([data-app-shell], [data-app-modal]) .via-input.via-input--error {
+  border-color: var(--via-coral-deep);
+}
+
+/* :disabled inclui fieldsets desabilitados. Sem isso o campo continuava com
+   vidro, hover e cursor de edição, mesmo sem aceitar nenhuma interação. */
+:is([data-app-shell], [data-app-modal]) .via-input:has(input:disabled),
+:is([data-app-shell], [data-app-modal]) .via-select__trigger:disabled {
+  border-color: var(--via-border-soft);
+  background: var(--via-bg-2);
+  box-shadow: none;
+  backdrop-filter: none;
+  color: var(--via-text-muted);
+  cursor: not-allowed;
+}
+
+:is([data-app-shell], [data-app-modal]) .via-input input:disabled {
+  color: var(--via-text-muted);
+  -webkit-text-fill-color: var(--via-text-muted);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 :is([data-app-shell], [data-app-modal]) .via-input__msg,
 :is([data-app-shell], [data-app-modal]) .via-select__hint {
-  font-size: var(--app-fs-meta);
+  font-size: var(--app-fs-support);
   line-height: var(--app-lh-ui);
 }
 
 :is([data-app-shell], [data-app-modal]) .via-select {
+  min-width: 0;
   gap: var(--via-space-2);
 }
 
@@ -211,6 +255,10 @@ html {
   outline: none;
   border-color: var(--via-navy-40);
   box-shadow: var(--app-ring), var(--app-control-shadow);
+}
+
+:is([data-app-shell], [data-app-modal]) .via-select__trigger.has-error:where(:not(:disabled)) {
+  border-color: var(--via-coral-deep);
 }
 
 :is([data-app-shell], [data-app-modal]) .via-select__list {
@@ -222,14 +270,30 @@ html {
   box-shadow:
     var(--app-elev-3-shadow),
     inset 0 1px 0 var(--via-edge-hi);
-  backdrop-filter: blur(24px) saturate(138%);
+  backdrop-filter: var(--app-glass-filter);
 }
 
 :is([data-app-shell], [data-app-modal]) .via-select__option {
-  min-height: 42px;
+  min-height: var(--app-h-control);
   padding: var(--via-space-2) var(--via-space-3);
   border-radius: var(--app-radius-chip);
   font-size: var(--app-fs-support);
+}
+
+@media (max-width: 1079px) {
+  /* Os inputs estavam em 15px, abaixo do limiar de 16px do zoom automático
+     do Safari. A escala de leitura (17px) vale também nos diálogos portados. */
+  :is([data-app-shell], [data-app-modal]) .via-input input {
+    font-size: var(--app-fs-reading);
+  }
+
+  /* O foco e as âncoras não podem parar sob o dock. O espaçamento do conteúdo
+     usa a mesma reserva, incluindo a área segura do aparelho. */
+  html:has([data-app-shell]) {
+    scroll-padding-bottom: calc(
+      var(--via-space-20) + var(--via-space-6) + env(safe-area-inset-bottom, 0px)
+    );
+  }
 }
 
 [data-app-shell] .via-empty-state--soft {

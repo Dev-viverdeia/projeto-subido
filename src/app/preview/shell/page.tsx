@@ -34,6 +34,7 @@ import {
 } from '../projetos/fixture';
 import { ProgressoPreview } from '../ProgressoPreview';
 import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
+import { ControlesPreview } from './ControlesPreview';
 
 export const metadata: Metadata = { title: 'Preview · Shell da plataforma' };
 
@@ -50,9 +51,15 @@ export default async function PreviewShellPage({
   const params = await searchParams;
   const plano = params.plano === 'starter' ? 'starter' : 'pro';
   const nome = params.nome === 'longo' ? 'Maria Aparecida de Albuquerque' : 'Mateus';
-  const tela = ['formacoes', 'projetos', 'formacao', 'aula', 'projeto', 'sobral'].includes(
-    params.tela ?? '',
-  )
+  const tela = [
+    'formacoes',
+    'projetos',
+    'formacao',
+    'aula',
+    'projeto',
+    'sobral',
+    'controles',
+  ].includes(params.tela ?? '')
     ? params.tela!
     : 'inicio';
   const caminho =
@@ -130,7 +137,9 @@ export default async function PreviewShellPage({
 
         <main className={shellStyles.conteudo} id="conteudo">
           <ProgressoPreview aulas={feitas}>
-            {tela === 'sobral' ? (
+            {tela === 'controles' ? (
+              <ControlesPreview />
+            ) : tela === 'sobral' ? (
               <TelaSobral threads={[]} conversa={null} nome={nome} modoPreview />
             ) : tela === 'formacoes' ? (
               <FormacoesVista formacoes={FORMACOES_DEMO} />

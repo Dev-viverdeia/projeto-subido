@@ -1,0 +1,38 @@
+.pagina {
+  display: grid;
+  gap: var(--via-space-5);
+  max-width: var(--via-content);
+  margin-inline: auto;
+}
+
+.pagina h1 {
+  margin: 0;
+  font-size: var(--via-fs-h2);
+}
+
+.painel {
+  display: grid;
+  gap: var(--via-space-6);
+  padding: var(--via-space-6);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.campos {
+  display: grid;
+  gap: var(--via-space-5);
+}
+
+.grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.grupo legend {
+  margin-bottom: var(--via-space-3);
+  font-size: var(--app-fs-support);
+}

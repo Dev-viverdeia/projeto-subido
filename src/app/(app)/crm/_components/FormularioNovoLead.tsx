@@ -138,7 +138,7 @@ export function FormularioNovoLead({
             id="crm-titulo"
             name="titulo"
             label="Projeto de IA (opcional)"
-            placeholder="Ex.: Atendimento e qualificação com IA"
+            placeholder="Ex.: Assistente de atendimento"
             defaultValue={estado.campos?.titulo ?? tituloInicial}
             error={erroVisivel('titulo')}
             onChange={() => ocultarErro('titulo')}
