@@ -30,7 +30,12 @@ import { TarefaEntrega } from './TarefaEntrega';
 import { resumirEscopoSala } from './sala-entrega-resumo';
 import styles from './SalaEntrega.module.css';
 
-export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
+type PropsSalaEntrega = {
+  projeto: ProjetoExecucaoCompleto;
+  tarefaSolicitada?: string;
+};
+export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
+  const tarefaDoLink = projeto.tarefas.find((tarefa) => tarefa.id === tarefaSolicitada);
   const fases = useMemo(
     () =>
       projeto.tarefas.reduce<
@@ -46,16 +51,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const proxima = projeto.tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
   const proximoCompromisso = obterProximoCompromisso(projeto.acoesPlano);
   const faseInicial =
+    fases.find((fase) => fase.id === tarefaDoLink?.faseId) ??
     fases.find((fase) => fase.id === proxima?.faseId) ??
-    (projeto.feitas === projeto.total ? fases.at(-1) : fases[0]) ??
-    null;
+    (projeto.feitas === projeto.total ? fases.at(-1) : fases[0]);
   const [faseId, setFaseId] = useState(faseInicial?.id ?? '');
   const faseAtual = fases.find((fase) => fase.id === faseId) ?? faseInicial;
-  const tarefaInicial =
-    faseAtual?.tarefas.find((tarefa) => tarefa.status !== 'concluida') ??
-    faseAtual?.tarefas[0] ??
-    null;
-  const [tarefaId, setTarefaId] = useState(tarefaInicial?.id ?? '');
+  const [tarefaId, setTarefaId] = useState(
+    tarefaDoLink?.id ?? proxima?.id ?? faseAtual?.tarefas[0]?.id ?? '',
+  );
   const tarefaAtual =
     faseAtual?.tarefas.find((tarefa) => tarefa.id === tarefaId) ??
     faseAtual?.tarefas.find((tarefa) => tarefa.status !== 'concluida') ??
@@ -68,6 +71,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
     (tarefa) => tarefa.status !== 'pendente' || tarefa.clienteStatus !== 'nao_solicitada',
   );
   const [painel, setPainel] = useState<PainelSala>(() => {
+    if (tarefaDoLink) return 'execucao';
     if (projeto.status === 'concluido') return 'evolucao';
     return briefingConfirmado && trabalhoIniciado ? 'execucao' : 'cliente';
   });

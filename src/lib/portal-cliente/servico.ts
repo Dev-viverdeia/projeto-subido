@@ -340,7 +340,7 @@ export async function registrarDecisaoCliente({
       tarefa: tarefa.titulo,
       decisao,
       comentario,
-      link: `${env.NEXT_PUBLIC_SITE_URL}/entregas/${projeto.id}`,
+      link: `${env.NEXT_PUBLIC_SITE_URL}/entregas/${projeto.id}?tarefa=${tarefaId}#tarefa-em-foco`,
     }),
   });
 

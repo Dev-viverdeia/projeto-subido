@@ -29,7 +29,11 @@ export function AprovacaoCliente({
   const [comentario, setComentario] = useState('');
 
   return (
-    <article className={styles.aprovacao} data-final={aceiteFinal || undefined}>
+    <article
+      id={`entrega-${tarefa.id}`}
+      className={styles.aprovacao}
+      data-final={aceiteFinal || undefined}
+    >
       <div className={styles.aprovacaoTopo}>
         <span className={styles.aprovacaoIcone}>
           <FileCheck2 size={19} aria-hidden="true" />

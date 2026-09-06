@@ -2280,7 +2280,9 @@ export type Database = {
           email_entregue_em: string | null
           email_enviado_em: string | null
           email_erro: string | null
+          email_fingerprint: string | null
           email_origem_evento_id: string | null
+          email_primeira_tentativa_em: string | null
           email_provider_id: string | null
           email_status: string
           email_tentativas: number
@@ -2302,7 +2304,9 @@ export type Database = {
           email_entregue_em?: string | null
           email_enviado_em?: string | null
           email_erro?: string | null
+          email_fingerprint?: string | null
           email_origem_evento_id?: string | null
+          email_primeira_tentativa_em?: string | null
           email_provider_id?: string | null
           email_status?: string
           email_tentativas?: number
@@ -2324,7 +2328,9 @@ export type Database = {
           email_entregue_em?: string | null
           email_enviado_em?: string | null
           email_erro?: string | null
+          email_fingerprint?: string | null
           email_origem_evento_id?: string | null
+          email_primeira_tentativa_em?: string | null
           email_provider_id?: string | null
           email_status?: string
           email_tentativas?: number
@@ -3878,6 +3884,26 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      projeto_email_confirmar: {
+        Args: {
+          p_evento: string
+          p_fingerprint: string
+          p_ocorrido_em: string
+          p_provider_id: string
+          p_status: string
+          p_tentativa?: string
+        }
+        Returns: boolean
+      }
+      projeto_email_reservar: {
+        Args: {
+          p_assunto: string
+          p_destinatario: string
+          p_evento: string
+          p_fingerprint: string
+        }
+        Returns: Json
       }
       projeto_encerramento_enviar: {
         Args: { p_projeto_id: string; p_tarefa_id: string }

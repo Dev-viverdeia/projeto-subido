@@ -54,27 +54,27 @@ function montarLayout({
     <meta name="viewport" content="width=device-width" />
     <title>${seguro.titulo}</title>
   </head>
-  <body style="margin:0;background:#f5f7f9;color:#0c1b3a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+  <body style="margin:0;background:#f7f8fa;color:#0a1f3b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
     <span style="display:none;max-height:0;overflow:hidden;opacity:0;">${seguro.preCabecalho}</span>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f7f9;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f7f8fa;">
       <tr>
         <td align="center" style="padding:32px 16px;">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background:#ffffff;border:1px solid #dfe5ec;border-radius:22px;overflow:hidden;box-shadow:0 18px 45px rgba(12,27,58,.08);">
             <tr>
-              <td style="padding:24px 32px;background:#071c35;color:#ffffff;">
+              <td style="padding:24px 32px;background:#0a1f3b;color:#ffffff;">
                 <div style="font-size:16px;font-weight:750;letter-spacing:-.01em;">Subido</div>
                 <div style="margin-top:5px;font-size:13px;line-height:1.45;color:#c9d3df;">Portal do cliente</div>
               </td>
             </tr>
             <tr>
-              <td style="padding:34px 32px;">
-                <h1 style="margin:0;font-size:30px;line-height:1.15;letter-spacing:-.03em;color:#0c1b3a;">${seguro.titulo}</h1>
+              <td style="padding:28px 24px;">
+                <h1 style="margin:0;font-size:30px;line-height:1.15;letter-spacing:-.03em;color:#0a1f3b;">${seguro.titulo}</h1>
                 <p style="margin:18px 0 0;font-size:16px;line-height:1.65;color:#516078;">${seguro.mensagem}</p>
-                ${seguro.destaque ? `<div style="margin-top:22px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:14px;background:#f8fafc;font-size:15px;line-height:1.55;color:#0c1b3a;">${seguro.destaque}</div>` : ''}
+                ${seguro.destaque ? `<div style="margin-top:22px;padding:16px 18px;border:1px solid #dfe5ec;border-radius:14px;background:#f8fafc;font-size:15px;line-height:1.55;color:#0a1f3b;">${seguro.destaque}</div>` : ''}
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:28px;">
                   <tr>
-                    <td style="border-radius:12px;background:#071c35;">
-                      <a href="${seguro.link}" style="display:inline-block;padding:14px 20px;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">${seguro.rotuloBotao}</a>
+                    <td style="border-radius:12px;background:#0a1f3b;">
+                      <a href="${seguro.link}" style="display:inline-block;padding:14px 20px;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">${seguro.rotuloBotao}</a>
                     </td>
                   </tr>
                 </table>
@@ -98,7 +98,7 @@ export function emailValidacaoSolicitada({
   nota,
 }: BaseEmail & { profissional: string; nota: string | null }): ConteudoEmailEntrega {
   const assunto = `${empresa}: uma entrega está pronta para sua validação`;
-  const mensagem = `${profissional} concluiu uma etapa de ${projeto}. Abra o portal para conferir o material e aprovar ou pedir um ajuste.`;
+  const mensagem = `${profissional} concluiu uma etapa de ${projeto}. Revise o material e escolha aprovar ou pedir um ajuste.`;
   const rodape = 'Este link abre somente o portal deste projeto. Você não precisa criar uma conta.';
   return {
     assunto,

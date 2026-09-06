@@ -46,12 +46,13 @@ async function usuarioAtual() {
 }
 
 function nomeDoProfissional(user: {
-  email?: string | null;
-  user_metadata?: { full_name?: unknown };
+  user_metadata?: { nome?: unknown; full_name?: unknown; name?: unknown };
 }) {
-  return typeof user.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
-    ? user.user_metadata.full_name.trim()
-    : user.email?.split('@')[0] || 'Responsável pelo projeto';
+  const dados = user.user_metadata;
+  const nome = [dados?.nome, dados?.full_name, dados?.name].find(
+    (valor): valor is string => typeof valor === 'string' && Boolean(valor.trim()),
+  );
+  return nome?.trim() || 'O responsável pelo projeto';
 }
 
 export async function prepararEntregaCliente(
@@ -181,7 +182,7 @@ export async function prepararEntregaCliente(
           tarefa: tarefa.titulo,
           profissional: nomeDoProfissional(user),
           nota: validacao.data.nota || null,
-          link: `${env.NEXT_PUBLIC_SITE_URL}/portal/${projeto.portal_codigo}`,
+          link: `${env.NEXT_PUBLIC_SITE_URL}/portal/${projeto.portal_codigo}#entrega-${tarefa.id}`,
         }),
       });
     }
@@ -200,7 +201,7 @@ export async function prepararEntregaCliente(
         : 'Apresentação do cliente salva.',
     aviso:
       validacao.data.operacao === 'solicitar' && !emailEnviado
-        ? 'O e-mail não foi entregue. Você pode corrigir o endereço e tentar novamente sem perder a validação.'
+        ? 'O envio do e-mail ainda não foi confirmado. A validação continua disponível no portal.'
         : undefined,
   };
 }
@@ -266,14 +267,23 @@ export async function reenviarNotificacaoEntregaCliente(
       tarefa: tarefa.titulo,
       profissional: nomeDoProfissional(user),
       nota: tarefa.cliente_nota,
-      link: `${env.NEXT_PUBLIC_SITE_URL}/portal/${projeto.portal_codigo}`,
+      link: `${env.NEXT_PUBLIC_SITE_URL}/portal/${projeto.portal_codigo}#entrega-${evento.tarefa_id}`,
     }),
   });
 
   revalidatePath(`/entregas/${validacao.data.projeto}`);
   return resultado.status === 'falhou'
     ? {
-        erro: 'O e-mail ainda não saiu. A validação continua segura no portal; tente novamente em instantes.',
+        erro:
+          resultado.motivo === 'obsoleto'
+            ? 'Esta solicitação já foi respondida ou substituída. Atualize a página.'
+            : ['conteudo_alterado', 'verificacao_necessaria'].includes(resultado.motivo ?? '')
+              ? 'Precisamos conferir o envio anterior antes de tentar de novo. Compartilhe o link do portal enquanto isso.'
+              : resultado.motivo === 'corrigir_endereco'
+                ? 'Este endereço recusou o e-mail. Informe um endereço diferente.'
+                : resultado.motivo === 'bloqueado'
+                  ? 'O provedor bloqueou novos envios. Compartilhe o link do portal por outro canal.'
+                  : 'Envio ainda não confirmado. A validação continua disponível no portal.',
       }
-    : { sucesso: `E-mail enviado para ${validacao.data.email}.` };
+    : { sucesso: `E-mail enviado para ${resultado.destinatario}.` };
 }

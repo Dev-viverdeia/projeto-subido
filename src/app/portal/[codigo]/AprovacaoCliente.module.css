@@ -1,4 +1,5 @@
 .aprovacao {
+  scroll-margin-top: var(--via-space-6);
   overflow: hidden;
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);

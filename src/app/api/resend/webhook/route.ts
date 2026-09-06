@@ -68,17 +68,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ recebido: true });
   }
 
-  const agora = new Date().toISOString();
   const admin = createAdminClient();
-  const { error } = await admin
-    .from('projeto_portal_eventos')
-    .update({
-      email_status: estado.status,
-      email_erro: estado.erro?.slice(0, 500) ?? null,
-      ...(estado.entregue ? { email_entregue_em: evento.created_at || agora } : {}),
-      email_atualizado_em: evento.created_at || agora,
-    })
-    .eq('email_provider_id', evento.data.email_id);
+  const tags = 'tags' in evento.data ? evento.data.tags : undefined;
+  const eventoId = tags?.evento_id;
+  const fingerprint = tags?.fingerprint;
+  const tentativa = tags?.tentativa;
+  const identificado =
+    typeof eventoId === 'string' &&
+    /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(eventoId) &&
+    typeof fingerprint === 'string' &&
+    /^[a-f0-9]{64}$/.test(fingerprint);
+  if (!Number.isFinite(Date.parse(evento.created_at))) {
+    return NextResponse.json({ erro: 'data_invalida' }, { status: 400 });
+  }
+  const { error } = await admin.rpc('projeto_email_confirmar', {
+    // O gerador do Supabase não representa NULL em argumentos de funções SQL.
+    // @ts-expect-error NULL é previsto pela função para eventos legados sem tags.
+    p_evento: identificado ? eventoId : null,
+    // @ts-expect-error NULL é previsto pela função para eventos legados sem tags.
+    p_fingerprint: identificado ? fingerprint : null,
+    p_provider_id: evento.data.email_id,
+    p_status: estado.status,
+    p_ocorrido_em: evento.created_at,
+    p_tentativa:
+      typeof tentativa === 'string' && /^[a-f0-9]{32}$/.test(tentativa) ? tentativa : undefined,
+  });
 
   if (error) {
     console.error(`[resend:webhook-banco] ${error.code}: ${error.message}`);
