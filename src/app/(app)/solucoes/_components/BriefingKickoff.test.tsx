@@ -8,6 +8,7 @@ vi.mock('@/lib/projetos-execucao/briefing-actions', () => ({
 }));
 
 import { BriefingKickoff } from './BriefingKickoff';
+import { salvarBriefingKickoff } from '@/lib/projetos-execucao/briefing-actions';
 
 const BRIEFING: DadosBriefing = {
   objetivo: 'Responder novos contatos rapidamente.',
@@ -23,6 +24,25 @@ const BRIEFING: DadosBriefing = {
 };
 
 describe('BriefingKickoff', () => {
+  it('avançar para a última parte não confirma o acordo no mesmo clique', async () => {
+    vi.mocked(salvarBriefingKickoff).mockClear().mockResolvedValue({ sucesso: 'Acordo salvo' });
+    const user = userEvent.setup();
+    render(
+      <BriefingKickoff
+        projetoId="11111111-1111-4111-8111-111111111111"
+        briefing={BRIEFING}
+        origem="kickoff"
+      />,
+    );
+    for (let passo = 0; passo < 3; passo++) {
+      await user.click(screen.getByRole('button', { name: 'Próxima parte' }));
+    }
+    expect(screen.getByRole('button', { name: 'Confirmar acordo' })).toBeVisible();
+    expect(salvarBriefingKickoff).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Confirmar acordo' }));
+    expect(salvarBriefingKickoff).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(salvarBriefingKickoff).mock.calls[0]![1].get('operacao')).toBe('confirmar');
+  });
   it('mostra uma parte do acordo por vez e preserva os dados do kickoff', async () => {
     const user = userEvent.setup();
     render(

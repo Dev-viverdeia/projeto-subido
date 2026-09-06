@@ -1,8 +1,8 @@
 'use client';
 
-import { useActionState } from 'react';
 import { ArrowUpRight, Check, LifeBuoy, ShieldCheck } from 'lucide-react';
-import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { salvarEncerramentoProjeto } from '@/lib/projetos-execucao/encerramento-actions';
 import {
   formatarGarantia,
@@ -10,18 +10,15 @@ import {
 } from '@/lib/projetos-execucao/encerramento';
 import styles from './EncerramentoProjeto.module.css';
 
-const INICIAL: EstadoProjetoExecucao = {};
-
 export function EncerramentoProjeto({
   projetoId,
   encerramento,
-  evidenciaInicial,
 }: {
   projetoId: string;
   encerramento: Encerramento | null;
-  evidenciaInicial: string | null;
 }) {
-  const [estado, acao, pendente] = useActionState(salvarEncerramentoProjeto, INICIAL);
+  const { estado, enviar, editar, pendente, bloqueado } =
+    useFormularioEntrega(salvarEncerramentoProjeto);
   const editavel = !encerramento || encerramento.status === 'rascunho';
 
   if (!editavel && encerramento) {
@@ -79,7 +76,7 @@ export function EncerramentoProjeto({
         <span className={styles.selo}>{encerramento ? 'Rascunho salvo' : 'Obrigatório'}</span>
       </header>
 
-      <form action={acao}>
+      <form onSubmit={enviar} onChange={editar} aria-busy={pendente || undefined}>
         <input type="hidden" name="projeto" value={projetoId} />
         <div className={styles.introducao}>
           <div>
@@ -104,7 +101,7 @@ export function EncerramentoProjeto({
             <span>Principal resultado observado</span>
             <textarea
               name="resultado"
-              defaultValue={encerramento?.resultadoPrincipal ?? evidenciaInicial ?? ''}
+              defaultValue={encerramento?.resultadoPrincipal ?? ''}
               maxLength={4000}
               required
               placeholder="Ex.: atendimento testado em produção e equipe preparada para operar."
@@ -192,9 +189,11 @@ export function EncerramentoProjeto({
         </label>
 
         {estado.erro && (
-          <p className={styles.erro} role="alert">
-            {estado.erro}
-          </p>
+          <RetornoOperacao
+            tom="erro"
+            titulo="Encerramento não confirmado"
+            descricao={estado.erro}
+          />
         )}
         {estado.sucesso && (
           <p className={styles.sucesso} role="status">
@@ -204,7 +203,7 @@ export function EncerramentoProjeto({
 
         <footer>
           <span>Depois de salvar, revise a mensagem e envie o aceite final logo abaixo.</span>
-          <button type="submit" disabled={pendente}>
+          <button type="submit" disabled={bloqueado}>
             <Check size={15} aria-hidden="true" />
             {pendente
               ? 'Salvando…'

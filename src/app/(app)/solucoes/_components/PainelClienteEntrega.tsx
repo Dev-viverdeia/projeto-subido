@@ -10,16 +10,18 @@ export function PainelClienteEntrega({
   projeto,
   primeiraTarefa,
   onComecar,
+  trabalhoIniciado,
 }: {
   projeto: ProjetoExecucaoCompleto;
   primeiraTarefa: string | null;
   onComecar: () => void;
+  trabalhoIniciado: boolean;
 }) {
   const briefingConfirmado = Boolean(projeto.briefing.confirmadoEm);
 
   return (
     <>
-      {projeto.feitas === 0 && projeto.status !== 'concluido' && (
+      {!trabalhoIniciado && projeto.status !== 'concluido' && (
         <InicioProjeto
           projeto={projeto}
           briefingConfirmado={briefingConfirmado}
@@ -36,7 +38,7 @@ export function PainelClienteEntrega({
         />
       )}
 
-      {briefingConfirmado && projeto.feitas > 0 && (
+      {briefingConfirmado && trabalhoIniciado && (
         <PreparacaoProjeto
           projetoId={projeto.id}
           acoes={projeto.acoesPlano}
@@ -45,7 +47,7 @@ export function PainelClienteEntrega({
         />
       )}
 
-      {projeto.feitas > 0 && (
+      {trabalhoIniciado && (
         <ContextoEntrega projeto={projeto} briefingConfirmado={briefingConfirmado} />
       )}
     </>

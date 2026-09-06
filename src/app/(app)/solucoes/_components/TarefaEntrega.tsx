@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
 import {
   ArrowRight,
   Bot,
@@ -13,10 +12,9 @@ import {
   Play,
   RotateCcw,
 } from 'lucide-react';
-import {
-  atualizarTarefaProjeto,
-  type EstadoProjetoExecucao,
-} from '@/lib/projetos-execucao/actions';
+import { atualizarTarefaProjeto } from '@/lib/projetos-execucao/actions';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import type {
   ArquivoProjetoExecucao,
   EventoProjetoExecucao,
@@ -29,8 +27,6 @@ import { EncerramentoProjeto } from './EncerramentoProjeto';
 import { KitOperacionalTarefa } from './KitOperacionalTarefa';
 import styles from './SalaEntrega.module.css';
 
-const ESTADO_INICIAL: EstadoProjetoExecucao = {};
-
 export function TarefaEntrega({
   projetoId,
   tarefa,
@@ -42,6 +38,7 @@ export function TarefaEntrega({
   encerramento,
   contexto,
   onAbrirArquivos,
+  onAbrirPortal,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
@@ -60,8 +57,10 @@ export function TarefaEntrega({
     arquivos: ArquivoProjetoExecucao[];
   };
   onAbrirArquivos: (tarefaId: string) => void;
+  onAbrirPortal: () => void;
 }) {
-  const [estado, acao, pendente] = useActionState(atualizarTarefaProjeto, ESTADO_INICIAL);
+  const { estado, enviar, editar, pendente, bloqueado, operacao } =
+    useFormularioEntrega(atualizarTarefaProjeto);
   const concluida = tarefa.status === 'concluida';
   const aguardandoCliente = tarefa.clienteStatus === 'aguardando';
   const aprovada = tarefa.clienteStatus === 'aprovada';
@@ -186,19 +185,31 @@ export function TarefaEntrega({
                 <p>{tarefa.evidencia}</p>
               </div>
               {!aguardandoCliente && !aprovada && (
-                <form action={acao}>
+                <form onSubmit={enviar}>
                   <input type="hidden" name="projeto" value={projetoId} />
                   <input type="hidden" name="tarefa" value={tarefa.id} />
                   <input type="hidden" name="evidencia" value={tarefa.evidencia ?? ''} />
-                  <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                  <button type="submit" name="status" value="em_andamento" disabled={bloqueado}>
                     <RotateCcw size={15} aria-hidden="true" />
                     {pendente ? 'Reabrindo…' : 'Reabrir para ajustar'}
                   </button>
                 </form>
               )}
+              {estado.erro && (
+                <RetornoOperacao
+                  tom="erro"
+                  titulo="Alteração não confirmada"
+                  descricao={estado.erro}
+                />
+              )}
             </div>
           ) : (
-            <form action={acao} className={styles.evidencia}>
+            <form
+              onSubmit={enviar}
+              onChange={editar}
+              aria-busy={pendente || undefined}
+              className={styles.evidencia}
+            >
               <input type="hidden" name="projeto" value={projetoId} />
               <input type="hidden" name="tarefa" value={tarefa.id} />
               <label>
@@ -214,6 +225,7 @@ export function TarefaEntrega({
                   name="evidencia"
                   defaultValue={tarefa.evidencia ?? ''}
                   maxLength={10_000}
+                  disabled={pendente}
                   placeholder={
                     comAjustes
                       ? 'Descreva a correção, o novo teste e o resultado antes de reenviar.'
@@ -223,7 +235,7 @@ export function TarefaEntrega({
               </label>
 
               <label className={styles.confirmacaoCriterio}>
-                <input type="checkbox" name="criterioConfirmado" value="sim" />
+                <input type="checkbox" name="criterioConfirmado" value="sim" disabled={pendente} />
                 <span>
                   <strong>Revisei o resultado usando o critério acima.</strong>
                   <small>Esta confirmação será exigida somente ao concluir a tarefa.</small>
@@ -231,9 +243,11 @@ export function TarefaEntrega({
               </label>
 
               {estado.erro && (
-                <p className={styles.erro} role="alert">
-                  {estado.erro}
-                </p>
+                <RetornoOperacao
+                  tom="erro"
+                  titulo="Registro não confirmado"
+                  descricao={estado.erro}
+                />
               )}
               {estado.sucesso && (
                 <p className={styles.sucesso} role="status">
@@ -242,12 +256,13 @@ export function TarefaEntrega({
               )}
 
               <div className={styles.acoesTarefa}>
-                <button type="submit" name="status" value="bloqueada" disabled={pendente}>
-                  <LockKeyhole size={15} aria-hidden="true" /> Registrar bloqueio
+                <button type="submit" name="status" value="bloqueada" disabled={bloqueado}>
+                  <LockKeyhole size={15} aria-hidden="true" />{' '}
+                  {pendente && operacao === 'bloqueada' ? 'Registrando…' : 'Registrar bloqueio'}
                 </button>
-                <button type="submit" name="status" value="em_andamento" disabled={pendente}>
+                <button type="submit" name="status" value="em_andamento" disabled={bloqueado}>
                   <Play size={15} aria-hidden="true" />
-                  {pendente
+                  {pendente && operacao === 'em_andamento'
                     ? 'Salvando…'
                     : tarefa.status === 'pendente'
                       ? 'Iniciar tarefa'
@@ -258,10 +273,14 @@ export function TarefaEntrega({
                   name="status"
                   value="concluida"
                   className={styles.concluir}
-                  disabled={pendente}
+                  disabled={bloqueado}
                 >
                   <Check size={16} aria-hidden="true" />
-                  {pendente ? 'Concluindo…' : comAjustes ? 'Concluir ajuste' : 'Concluir tarefa'}
+                  {pendente && operacao === 'concluida'
+                    ? 'Concluindo…'
+                    : comAjustes
+                      ? 'Concluir ajuste'
+                      : 'Concluir tarefa'}
                 </button>
               </div>
               <p className={styles.depoisTarefa}>
@@ -274,14 +293,11 @@ export function TarefaEntrega({
       </article>
 
       {aceiteFinal && concluida && (
-        <EncerramentoProjeto
-          projetoId={projetoId}
-          encerramento={encerramento}
-          evidenciaInicial={tarefa.evidencia}
-        />
+        <EncerramentoProjeto projetoId={projetoId} encerramento={encerramento} />
       )}
 
       <EntregaCliente
+        onAbrirPortal={onAbrirPortal}
         projetoId={projetoId}
         tarefa={tarefa}
         portalAtivo={portalAtivo}

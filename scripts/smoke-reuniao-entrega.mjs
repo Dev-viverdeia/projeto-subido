@@ -6,7 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
-import { chromium, expect } from '@playwright/test';
+import { chromium, expect as expectBase } from '@playwright/test';
+import { validarAceiteCliente } from './qa-aceite-cliente.mjs';
+
+const expect = expectBase.configure({ timeout: 30_000 });
 
 if (!process.argv.includes('--confirmar-teste')) throw new Error('Use --confirmar-teste.');
 const app = process.env.SUBIDO_APP_URL || 'https://subido.viverdeia.ai';
@@ -131,6 +134,13 @@ try {
   page = await contexto.newPage();
   const erros = [];
   page.on('pageerror', (erro) => erros.push(`${new URL(page.url()).pathname}: ${erro.message}`));
+  page.on('console', (mensagem) => {
+    if (
+      mensagem.type() === 'error' &&
+      /hydrat|Minified React error|server rendered HTML/i.test(mensagem.text())
+    )
+      erros.push(mensagem.text());
+  });
   await page.goto(`${app}/reunioes/${reuniao.id}`);
   const acao = page.getByLabel('Próxima ação da venda');
   await acao.fill('Apresentar o escopo revisado com a direção');
@@ -208,6 +218,21 @@ try {
       'href',
       `/entregas/${entregaId}`,
     );
+  }
+  if (process.argv.includes('--validar-aceite')) {
+    await validarAceiteCliente({
+      app,
+      admin,
+      client,
+      browser,
+      page,
+      usuario,
+      empresa,
+      oportunidade,
+      entregaId,
+      pasta,
+      erros,
+    });
   }
   if (erros.length) throw new Error(`Erros no navegador: ${erros.join('; ')}`);
   console.log(

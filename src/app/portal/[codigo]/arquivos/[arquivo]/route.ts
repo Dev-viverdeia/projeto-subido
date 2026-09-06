@@ -27,6 +27,7 @@ export async function GET(
     .select('projeto_execucao_id, caminho_storage, nome_original')
     .eq('id', validacao.data.arquivo)
     .eq('visivel_cliente', true)
+    .not('publicado_em', 'is', null)
     .maybeSingle();
   if (error || !registro) return falha(404);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useActionState, useRef, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +16,7 @@ import {
   salvarBriefingKickoff,
   type EstadoBriefingKickoff,
 } from '@/lib/projetos-execucao/briefing-actions';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
 import type {
   BriefingKickoff as DadosBriefing,
   OrigemBriefingKickoff,
@@ -27,8 +28,6 @@ import {
 } from './briefing-kickoff-config';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import styles from './BriefingKickoff.module.css';
-
-const INICIAL: EstadoBriefingKickoff = {};
 
 function listaParaTexto(itens: string[]): string {
   return itens.join('\n');
@@ -48,13 +47,12 @@ export function BriefingKickoff({
   const [etapa, setEtapa] = useState<EtapaBriefingId>('resultado');
   const [erroLocal, setErroLocal] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const [estado, acao, pendente] = useActionState(
+  const { estado, enviar, editar, pendente, bloqueado, operacao } = useFormularioEntrega(
     async (estadoAnterior: EstadoBriefingKickoff, formData: FormData) => {
       const resultado = await salvarBriefingKickoff(estadoAnterior, formData);
       if (resultado.confirmado) setEditando(false);
       return resultado;
     },
-    INICIAL,
   );
   const etapaIndex = ETAPAS_BRIEFING.findIndex((item) => item.id === etapa);
   const etapaAtual = ETAPAS_BRIEFING[etapaIndex] ?? ETAPAS_BRIEFING[0];
@@ -92,11 +90,12 @@ export function BriefingKickoff({
   }
 
   function validarConfirmacao(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    if (submitter?.value !== 'confirmar') return;
+    if (submitter?.value !== 'confirmar') return enviar(event);
 
     const incompleta = ETAPAS_BRIEFING.find((item) => !validarEtapa(item));
-    if (!incompleta) return;
+    if (!incompleta) return enviar(event);
 
     event.preventDefault();
     setEtapa(incompleta.id);
@@ -204,10 +203,11 @@ export function BriefingKickoff({
 
       <form
         ref={formRef}
-        action={acao}
         className={styles.formulario}
         noValidate
         onSubmit={validarConfirmacao}
+        onChange={editar}
+        aria-busy={pendente || undefined}
       >
         <input type="hidden" name="projeto" value={projetoId} />
         <input type="hidden" name="fonteCallId" value={briefing.fonteCallId ?? ''} />
@@ -380,23 +380,25 @@ export function BriefingKickoff({
                 <ArrowLeft size={15} aria-hidden="true" /> Voltar
               </button>
             )}
-            <button type="submit" name="operacao" value="salvar" disabled={pendente}>
-              <Save size={15} aria-hidden="true" /> Salvar rascunho
+            <button type="submit" name="operacao" value="salvar" disabled={bloqueado}>
+              <Save size={15} aria-hidden="true" />{' '}
+              {pendente && operacao === 'salvar' ? 'Salvando…' : 'Salvar rascunho'}
             </button>
             {etapaIndex < ETAPAS_BRIEFING.length - 1 ? (
-              <button type="button" className={styles.confirmar} onClick={avancar}>
+              <button key="avancar" type="button" className={styles.confirmar} onClick={avancar}>
                 Próxima parte <ArrowRight size={15} aria-hidden="true" />
               </button>
             ) : (
               <button
+                key="confirmar"
                 type="submit"
                 name="operacao"
                 value="confirmar"
                 className={styles.confirmar}
-                disabled={pendente}
+                disabled={bloqueado}
               >
                 <UserRoundCheck size={15} aria-hidden="true" />
-                {pendente ? 'Confirmando…' : 'Confirmar acordo'}
+                {pendente && operacao === 'confirmar' ? 'Confirmando…' : 'Confirmar acordo'}
                 <ArrowRight size={15} aria-hidden="true" />
               </button>
             )}
