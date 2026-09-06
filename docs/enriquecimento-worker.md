@@ -6,7 +6,7 @@ As leituras continuam usando a sessão do usuário e RLS. Início, etapas e resu
 
 Preparar os arquivos da Edge e confirmar que não há enriquecimentos ativos antes do corte. A migration fecha a escrita antiga imediatamente; até concluir os passos seguintes, novas solicitações falham de forma segura, sem iniciar uma análise.
 
-1. Aplicar `20260906013000_enriquecimento_worker_seguro.sql` pelo processo de migrations.
+1. Aplicar `20260906013148_enriquecimento_worker_seguro.sql` pelo processo de migrations.
 2. Com `SUPABASE_PROJECT_REF` e `SUPABASE_ACCESS_TOKEN` no ambiente, executar `node scripts/configurar-worker-enriquecimento.mjs --confirmar-configuracao`. O script cria 256 bits aleatórios, configura o segredo na Edge por stdin e guarda somente SHA-256 em `private`. Não inserir a chave no terminal nem no histórico.
 3. Publicar a Edge `enriquecimento` com suas dependências. Preservar a configuração de autenticação existente e a verificação `auth.getUser()` dentro da função.
 4. Regenerar os tipos do banco, publicar o front-end e validar uma execução com conta descartável. Conferir débito, conclusão e publicação única.
