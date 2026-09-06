@@ -2,7 +2,8 @@ import 'server-only';
 
 import { cache } from 'react';
 import { handleError } from '@/lib/errors';
-import { lerDocumentoProposta, type DocumentoProposta } from '@/lib/propostas/schema';
+import { DocumentoPropostaSchema, lerDocumentoProposta } from '@/lib/propostas/schema';
+import type { DocumentoProposta } from '@/lib/propostas/schema';
 import { lerRoteiroProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
 import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
@@ -184,7 +185,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, documento, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status), projeto_evolucoes(*)',
+      'id, titulo, status, prazo_em, atualizado_em, cliente:documento->cliente, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status), projeto_evolucoes(*)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -193,8 +194,10 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   if (error) throw handleError(error, 'projetos-execucao:listar');
 
   return (data ?? []).flatMap((linha) => {
-    const documento = lerDocumentoProposta(linha.documento);
-    if (!documento) return [];
+    // Listagem e avisos só precisam do cliente. Escopo, condições comerciais e
+    // cronograma completos continuam sendo lidos apenas na ficha do projeto.
+    const cliente = DocumentoPropostaSchema.shape.cliente.safeParse(linha.cliente);
+    if (!cliente.success) return [];
     const tarefas = [...linha.projeto_tarefas].sort((a, b) => a.ordem - b.ordem);
     const feitas = tarefas.filter((tarefa) => tarefa.status === 'concluida').length;
     const proxima = tarefas.find((tarefa) => tarefa.status !== 'concluida') ?? null;
@@ -204,7 +207,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
       {
         id: linha.id,
         titulo: linha.titulo,
-        empresa: documento.cliente.empresa,
+        empresa: cliente.data.empresa,
         status: linha.status,
         prazoEm: linha.prazo_em,
         atualizadoEm: linha.atualizado_em,

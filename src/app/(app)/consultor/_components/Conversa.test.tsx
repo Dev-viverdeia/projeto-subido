@@ -42,6 +42,7 @@ describe('Conversa integrada à Início', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     dependencias.criarConversa.mockResolvedValue({
       threadId: 'thread-1',
       mensagemId: 'mensagem-1',
@@ -60,6 +61,33 @@ describe('Conversa integrada à Início', () => {
       dados: { thread_id: 'thread-1', resposta: 'Prepare a próxima conversa com o cliente.' },
       falha: null,
     });
+  });
+
+  it('preserva texto e áudio quando o celular está offline', async () => {
+    const { container } = render(<Conversa />);
+    const audio = new File(['audio'], 'gravacao.webm', { type: 'audio/webm' });
+    fireEvent.change(container.querySelector('input[type="file"]')!, {
+      target: { files: [audio] },
+    });
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Minha dúvida' } });
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sem conexão');
+    expect(screen.getByRole('textbox')).toHaveValue('Minha dúvida');
+    expect(screen.getByText('Pronto para enviar')).toBeVisible();
+    expect(dependencias.criarConversa).not.toHaveBeenCalled();
+  });
+
+  it('recupera o compositor quando o envio rejeita, sem repetir automaticamente', async () => {
+    dependencias.criarConversa.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    render(<Conversa />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Pedido preservado' } });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent('O envio não foi confirmado');
+    expect(screen.getByRole('textbox')).toHaveValue('Pedido preservado');
+    expect(screen.getByRole('button', { name: 'Enviar mensagem' })).toBeEnabled();
+    expect(dependencias.criarConversa).toHaveBeenCalledTimes(1);
+    expect(dependencias.responderPendente).not.toHaveBeenCalled();
   });
 
   it('mantém a resposta visível enquanto o histórico é atualizado', async () => {

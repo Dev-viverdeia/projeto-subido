@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useTransition } from 'react';
+import { unstable_rethrow } from 'next/navigation';
 import {
   DndContext,
   DragOverlay,
@@ -158,6 +159,14 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
     motivo?: MotivoPerdaCrm,
   ) {
     if (etapaVisivel(oportunidade.etapa) === etapa) return;
+    if (!navigator.onLine) {
+      publicarToast({
+        title: 'Sem conexão',
+        message: 'Reconecte para mudar a etapa. O card continua no lugar.',
+        variant: 'warning',
+      });
+      return;
+    }
 
     const etapaAnterior = oportunidade.etapa;
     const instante = new Date().toISOString();
@@ -187,11 +196,28 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
     );
 
     iniciarTransicao(async () => {
-      const resultado = await moverOportunidadeKanban({
-        id: oportunidade.id,
-        etapa,
-        motivoPerda: motivo,
-      });
+      let resultado;
+      try {
+        resultado = await moverOportunidadeKanban({
+          id: oportunidade.id,
+          etapa,
+          motivoPerda: motivo,
+        });
+      } catch (erro) {
+        unstable_rethrow(erro);
+        // A resposta pode se perder depois de o servidor salvar. Não afirmar
+        // estorno nem repetir a mutação automaticamente nesse caso.
+        setItens((atuais) =>
+          atuais.map((item) => (item.id === oportunidade.id ? oportunidade : item)),
+        );
+        publicarToast({
+          title: 'A alteração não foi confirmada',
+          message: 'Confira a conexão e atualize o quadro antes de tentar novamente.',
+          variant: 'warning',
+        });
+        setMovimentandoId(null);
+        return;
+      }
 
       if (!resultado.ok) {
         setItens((atuais) =>

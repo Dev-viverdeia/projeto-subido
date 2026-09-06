@@ -36,13 +36,15 @@ export function CabecalhoApp({
   saldoCreditos,
   plano,
   pendencias,
+  avisos,
   logo,
 }: {
   nome: string;
   email: string;
   saldoCreditos: number | null;
   plano: PlanoSubido;
-  pendencias: PendenciaEntrega[];
+  pendencias?: PendenciaEntrega[];
+  avisos?: ReactNode;
   logo: ReactNode;
 }) {
   return (
@@ -56,7 +58,7 @@ export function CabecalhoApp({
       </div>
 
       <div className={styles.direita}>
-        <MenuPendencias pendencias={pendencias} />
+        {avisos ?? <MenuPendencias pendencias={pendencias ?? []} />}
         <MenuPerfil nome={nome} email={email} saldoCreditos={saldoCreditos} plano={plano} />
       </div>
     </header>

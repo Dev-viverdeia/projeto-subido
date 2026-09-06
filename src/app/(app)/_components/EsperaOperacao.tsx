@@ -69,7 +69,11 @@ export function EsperaOperacao({
     const focoAnterior =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.body.style.overflow = 'hidden';
-    const quadro = requestAnimationFrame(() => dialogo.current?.focus());
+    const quadro = requestAnimationFrame(() => {
+      // Em dispositivo lento, Tab pode chegar antes deste frame. Não roubar
+      // o foco de quem já começou a interagir com o botão do próprio modal.
+      if (!dialogo.current?.contains(document.activeElement)) dialogo.current?.focus();
+    });
     return () => {
       cancelAnimationFrame(quadro);
       document.body.style.overflow = anterior;

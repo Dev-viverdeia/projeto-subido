@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { ArrowRight, Building2, MapPin, Search } from 'lucide-react';
 import { Alert, Button, Card, Input } from '@/design-system/via';
 import { criarListaProspeccao, type EstadoBuscaProspeccao } from '@/lib/prospeccao/actions';
-import { QUANTIDADES_PROSPECCAO } from '@/lib/prospeccao/schema';
+import { QUANTIDADES_PROSPECCAO } from '@/lib/prospeccao/quantidades';
 import styles from '../pagina.module.css';
 
 const INICIAL: EstadoBuscaProspeccao = {};
@@ -31,15 +31,50 @@ export function FormularioBusca({
         },
       }
     : INICIAL;
-  const [estado, acao, buscando] = useActionState(criarListaProspeccao, inicial);
+  const [estado, acao, buscando] = useActionState<EstadoBuscaProspeccao, FormData>(
+    async (anterior, dados) => {
+      try {
+        return await criarListaProspeccao(anterior, dados);
+      } catch (erro) {
+        // Falha de transporte do fetch; redirects e erros do Next seguem seu
+        // fluxo original. Não repetir automaticamente uma busca paga.
+        if (!(erro instanceof TypeError)) throw erro;
+        const texto = (nome: string) => {
+          const valor = dados.get(nome);
+          return typeof valor === 'string' ? valor : '';
+        };
+        return {
+          campos: {
+            segmento: texto('segmento'),
+            localizacao: texto('localizacao'),
+            quantidade: texto('quantidade') || '5',
+          },
+          erro: 'A busca não foi confirmada. Confira a conexão e suas listas antes de tentar novamente.',
+        };
+      }
+    },
+    inicial,
+  );
   const [quantidade, setQuantidade] = useState(
     Number(estado.campos?.quantidade) || QUANTIDADES_PROSPECCAO[0],
   );
+  const [erroConexao, setErroConexao] = useState<string | null>(null);
   const semSaldo = saldo < quantidade;
 
   return (
     <Card as="section" variant="atmospheric" noPadding className={styles.painelBusca}>
-      <form action={acao} className={styles.formulario} noValidate aria-busy={buscando}>
+      <form
+        action={acao}
+        className={styles.formulario}
+        noValidate
+        aria-busy={buscando}
+        onSubmit={(evento) => {
+          if (!navigator.onLine) {
+            evento.preventDefault();
+            setErroConexao('Sem conexão. Seus campos continuam aqui. Reconecte para buscar.');
+          } else setErroConexao(null);
+        }}
+      >
         <div className={styles.formularioTopo}>
           <div>
             <h2>Nova lista</h2>
@@ -54,10 +89,10 @@ export function FormularioBusca({
             </Alert>
           </div>
         )}
-        {estado.erro && (
-          <div className={styles.alertaFormulario} role="alert">
+        {(erroConexao || estado.erro) && (
+          <div className={styles.alertaFormulario}>
             <Alert tone="danger" size="compact">
-              {estado.erro}
+              {erroConexao || estado.erro}
             </Alert>
           </div>
         )}

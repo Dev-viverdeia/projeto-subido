@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
@@ -8,8 +8,6 @@ import { ROTA_ENTRAR } from '@/lib/routes';
 import { ehAdmin } from '@/lib/auth/papeis';
 import { concluiuIntroducaoSubido } from '@/lib/auth/introducao';
 import { obterSaldoCreditos } from '@/lib/creditos/queries';
-import { listarProjetosExecucao } from '@/lib/projetos-execucao/queries';
-import { montarPendenciasEntrega } from '@/lib/projetos-execucao/alertas';
 import {
   PLANOS_SUBIDO,
   RECURSOS_SUBIDO,
@@ -21,6 +19,7 @@ import {
 import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
+import { PendenciasDoCabecalho } from './_components/PendenciasDoCabecalho';
 import { ProvedorDeTrilha } from './_components/trilha/contexto';
 import styles from './layout.module.css';
 
@@ -44,14 +43,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   /* A leitura do papel não depende do resultado de `getClaims`: as duas usam a
      mesma sessão já validada pelo proxy. Iniciá-las juntas elimina uma viagem
      sequencial ao banco em toda navegação da área logada. */
-  const [{ data }, admin, saldoCreditos, projetosExecucao] = await Promise.all([
+  const [{ data }, admin, saldoCreditos] = await Promise.all([
     supabase.auth.getClaims(),
     ehAdmin(),
     obterSaldoCreditos(),
-    listarProjetosExecucao().catch((erro: unknown) => {
-      console.error('[app-layout:pendencias-entrega]', erro);
-      return [];
-    }),
   ]);
 
   if (!data) redirect(ROTA_ENTRAR);
@@ -72,7 +67,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     };
   });
   const concluiuIntroducao = concluiuIntroducaoSubido(metadata);
-  const pendenciasEntrega = montarPendenciasEntrega(projetosExecucao);
 
   /* A introdução é parte do produto, não uma página solta. O status fica no
      token autenticado para esta barreira não acrescentar uma consulta ao banco
@@ -122,7 +116,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             email={email}
             saldoCreditos={saldoCreditos}
             plano={plano}
-            pendencias={pendenciasEntrega}
+            avisos={
+              <Suspense fallback={null}>
+                <PendenciasDoCabecalho />
+              </Suspense>
+            }
             logo={<SubidoLogo size={17} />}
           />
 

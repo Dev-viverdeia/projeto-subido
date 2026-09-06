@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { QUANTIDADES_PROSPECCAO } from './quantidades';
 
-export const QUANTIDADES_PROSPECCAO = [5, 10, 20] as const;
+export { QUANTIDADES_PROSPECCAO } from './quantidades';
 
 export const BuscaProspeccaoSchema = z.object({
   segmento: z

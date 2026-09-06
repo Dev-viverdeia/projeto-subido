@@ -2,17 +2,14 @@ import 'server-only';
 
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
-import { obterSaldoProspeccao } from './admin';
+import { obterSaldoCreditos } from '@/lib/creditos/queries';
 
 export async function carregarProspeccao(listaPreferida?: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error('Sessão necessária para carregar a Prospecção.');
-
+  // Mesma leitura autenticada e request-scoped do cabeçalho. Não refaz o
+  // getUser nem consulta o saldo com service role para renderizar uma página.
   const [saldo, listas] = await Promise.all([
-    obterSaldoProspeccao(user.id),
+    obterSaldoCreditos(),
     supabase
       .from('prospeccao_listas')
       .select(
@@ -22,7 +19,7 @@ export async function carregarProspeccao(listaPreferida?: string) {
       .limit(30),
   ]);
 
-  if (saldo.error) throw handleError(saldo.error, 'prospeccao:saldo');
+  if (saldo === null) throw new Error('Não foi possível consultar o saldo. Tente novamente.');
   if (listas.error) throw handleError(listas.error, 'prospeccao:listas');
 
   const listaAtual =
@@ -40,7 +37,7 @@ export async function carregarProspeccao(listaPreferida?: string) {
   if (leads?.error) throw handleError(leads.error, 'prospeccao:leads');
 
   return {
-    saldo: saldo.data,
+    saldo,
     listas: listas.data,
     listaAtual,
     leads: leads?.data ?? [],
