@@ -15,6 +15,7 @@ import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
 import { chromium, webkit } from 'playwright';
 import { validarResilienciaAoVivo } from './lib/smoke-call-resiliencia.mjs';
+import { validarFicha, validarRecepcao } from './lib/smoke-call-qualidade.mjs';
 import {
   cookiesDaSessao,
   observarPagina,
@@ -202,6 +203,9 @@ async function entrarNaSala(page, nome) {
   // de o React assumir os eventos do HTML entregue pelo servidor.
   await page.waitForTimeout(600);
   await campoNome.fill(nome);
+  if (!(await page.getByRole('button', { name: 'Entrar na reunião' }).isDisabled())) {
+    throw new Error('A entrada foi liberada sem consentimento.');
+  }
   await page.getByRole('checkbox').check();
   const entrar = page.getByRole('button', { name: 'Entrar na reunião' });
   await page.waitForTimeout(250);
@@ -273,6 +277,8 @@ async function exercitarSala({ email, password }) {
     participantesVisiveis: 2,
     navegadorConvidado: convidadoWebkit ? 'webkit' : 'chromium',
   });
+
+  await validarRecepcao({ paginaHost, paginaConvidado, esperar, etapa });
 
   await validarTranscricaoVisivel({ paginaHost, eventos, esperar });
   await paginaHost.screenshot({ path: '/private/tmp/subido-call-smoke-host.png', fullPage: true });
@@ -406,6 +412,7 @@ async function validarPosCall(paginaHost) {
     gravacaoSegundos: resultado.gravacao.duracao_segundos,
     gravacaoBytes: resultado.gravacao.tamanho_bytes,
   });
+  await validarFicha({ paginaHost, admin, teste, resultado, erroSe, etapa });
 }
 
 async function limpar() {

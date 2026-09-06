@@ -1,9 +1,11 @@
 .painel {
   display: flex;
   min-width: 0;
+  min-height: 0;
   height: 100%;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-left: 1px solid color-mix(in srgb, var(--via-white) 16%, transparent);
   background: color-mix(in srgb, var(--via-surface) 94%, transparent);
   color: var(--via-text-primary);
@@ -11,7 +13,13 @@
   backdrop-filter: blur(28px) saturate(135%);
 }
 
+.painel:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: -2px;
+}
+
 .cabecalho {
+  flex-shrink: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -96,8 +104,8 @@
 }
 
 .recomendacao {
-  min-height: 320px;
-  flex: 1;
+  min-height: 0;
+  flex: 1 0 auto;
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
@@ -264,15 +272,20 @@
   color: var(--via-text-primary);
 }
 
-.transcricao small {
+.alerta {
   display: block;
-  margin-top: var(--via-space-3);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--via-space-3) var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-soft);
+  background: var(--via-bg-2);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
 }
 
 .painel footer {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -328,7 +341,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .painel {
     height: min(42dvh, 360px);
     border-top: 1px solid var(--via-border-soft);

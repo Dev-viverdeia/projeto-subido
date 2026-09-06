@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LiveKitRoom, RoomAudioRenderer, VideoConference } from '@livekit/components-react';
 import {
   CalendarClock,
   CheckCircle2,
@@ -20,7 +19,7 @@ import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
 import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
-import { LiveCoach } from './LiveCoach';
+import { SalaAoVivo } from './SalaAoVivo';
 import { RoteiroSala } from './RoteiroSala';
 import { EstadoFinalSala } from './EstadoFinalSala';
 import styles from './sala.module.css';
@@ -222,33 +221,13 @@ export function SalaCall({
 
   if (credenciais) {
     return (
-      <div className={styles.salaAoVivo} data-lk-theme="default">
-        <LiveKitRoom
-          token={credenciais.token}
-          serverUrl={credenciais.serverUrl}
-          connect
-          audio
-          video
-          onDisconnected={aoDesconectar}
-        >
-          {anfitriao ? (
-            <div className={styles.experienciaAnfitriao}>
-              <div className={styles.palcoVideo}>
-                <VideoConference />
-              </div>
-              <LiveCoach
-                reuniaoId={convite.reuniaoId}
-                ativo={convite.liveCoachAtivo}
-                plano={planoAnfitriao}
-                tipo={convite.tipo}
-              />
-            </div>
-          ) : (
-            <VideoConference />
-          )}
-          <RoomAudioRenderer />
-        </LiveKitRoom>
-      </div>
+      <SalaAoVivo
+        credenciais={credenciais}
+        convite={convite}
+        anfitriao={anfitriao}
+        plano={planoAnfitriao}
+        aoDesconectar={aoDesconectar}
+      />
     );
   }
 
@@ -294,11 +273,11 @@ export function SalaCall({
   return (
     <main className={styles.pagina}>
       <div className={styles.marca}>
-        <SubidoLogo size={18} variant="mono" />
+        <SubidoLogo size={18} />
         <span className={styles.marcaApoio}>{kickoff ? 'Sala do kickoff' : 'Sala da reunião'}</span>
       </div>
 
-      <section className={styles.cartao}>
+      <section className={styles.cartao} data-convidado={!anfitriao || undefined}>
         <div className={styles.contexto}>
           <p className={styles.sobretitulo}>
             {anfitriao ? (kickoff ? 'Seu kickoff' : 'Sua sala') : 'Você foi convidado'}
@@ -310,10 +289,12 @@ export function SalaCall({
             <small>{convite.duracaoMinutos} minutos</small>
           </div>
 
-          <div className={styles.memoria}>
-            <p>{kickoff ? 'O que precisa sair definido' : 'Durante a reunião'}</p>
-            <RoteiroSala kickoff={kickoff} mostrarCoach={convite.liveCoachAtivo && anfitriao} />
-          </div>
+          {anfitriao && (
+            <div className={styles.memoria}>
+              <p>{kickoff ? 'O que precisa sair definido' : 'Durante a reunião'}</p>
+              <RoteiroSala kickoff={kickoff} mostrarCoach={convite.liveCoachAtivo && anfitriao} />
+            </div>
+          )}
         </div>
 
         <div className={styles.entrada}>
@@ -321,12 +302,16 @@ export function SalaCall({
             <span>Estado da sala</span>
             <strong>{estadoSala}</strong>
           </div>
-          <h2>{kickoff ? 'Preparar kickoff' : 'Preparar entrada'}</h2>
-          <p>
-            {kickoff
-              ? 'Confirme seu nome. O acordo só será atualizado após sua revisão.'
-              : 'Confirme seu nome e autorize o registro.'}
-          </p>
+          {anfitriao && (
+            <>
+              <h2>{kickoff ? 'Preparar kickoff' : 'Preparar entrada'}</h2>
+              <p>
+                {kickoff
+                  ? 'Confirme seu nome. O acordo só será atualizado após sua revisão.'
+                  : 'Confirme seu nome e autorize o registro.'}
+              </p>
+            </>
+          )}
 
           <label className={styles.campo}>
             <span>Seu nome</span>
@@ -352,21 +337,23 @@ export function SalaCall({
             </span>
           </label>
 
-          <div className={styles.destinoDados}>
-            {kickoff ? (
-              <ClipboardCheck size={16} strokeWidth={1.8} aria-hidden="true" />
-            ) : (
-              <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
-            )}
-            <p>
-              <strong>{kickoff ? 'Ao encerrar' : 'Depois da reunião'}</strong>
-              <span>
-                {kickoff
-                  ? 'Revise o acordo antes de iniciar a execução.'
-                  : 'Revise o resumo antes de atualizar a ficha do cliente.'}
-              </span>
-            </p>
-          </div>
+          {anfitriao && (
+            <div className={styles.destinoDados}>
+              {kickoff ? (
+                <ClipboardCheck size={16} strokeWidth={1.8} aria-hidden="true" />
+              ) : (
+                <FileText size={16} strokeWidth={1.8} aria-hidden="true" />
+              )}
+              <p>
+                <strong>{kickoff ? 'Ao encerrar' : 'Depois da reunião'}</strong>
+                <span>
+                  {kickoff
+                    ? 'Revise o acordo antes de iniciar a execução.'
+                    : 'Revise o resumo antes de atualizar a ficha do cliente.'}
+                </span>
+              </p>
+            </div>
+          )}
 
           {!videoConfigurado && (
             <div className={styles.aviso}>
@@ -407,9 +394,15 @@ export function SalaCall({
             {carregando ? 'Abrindo sala…' : kickoff ? 'Entrar no kickoff' : 'Entrar na reunião'}
           </button>
 
+          {!anfitriao && (
+            <p className={styles.avisoConvidado}>
+              O organizador poderá revisar a gravação e o resumo.
+            </p>
+          )}
+
           <div className={styles.seguranca}>
             <LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" />
-            Link individual · acesso protegido
+            Entrada com consentimento
           </div>
         </div>
       </section>

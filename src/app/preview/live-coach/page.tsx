@@ -70,7 +70,13 @@ export default async function PreviewLiveCoachPage({
         </div>
         <CabineLiveCoach
           ativo
-          estado="escutando"
+          estado={parametros.falha === '1' ? 'indisponivel' : 'escutando'}
+          falha={
+            parametros.falha === '1'
+              ? 'Sua internet caiu. A conversa continua assim que a conexão voltar.'
+              : ''
+          }
+          gravacao={parametros.falha === '1' ? 'falhou' : 'gravando'}
           sugestao={sugestao}
           fala={
             kickoff
