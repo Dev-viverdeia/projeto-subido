@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusCall } from '@/lib/calls/tipos';
 import type { StatusEmailEntrega } from '@/lib/notificacoes/entrega';
+import { recuperacaoEmail, type RecuperacaoEmail } from '@/lib/notificacoes/estado-email';
 import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
 import {
   lerBriefingKickoff,
@@ -79,6 +80,7 @@ export type EventoProjetoExecucao = {
   criadoEm: string;
   emailDestinatario?: string | null;
   emailStatus?: StatusEmailEntrega;
+  emailRecuperacao?: RecuperacaoEmail;
   emailTentativas?: number;
   emailEnviadoEm?: string | null;
   emailEntregueEm?: string | null;
@@ -400,6 +402,7 @@ export const obterProjetoExecucao = cache(
               criadoEm: evento.criado_em,
               emailDestinatario: evento.email_destinatario,
               emailStatus: evento.email_status as StatusEmailEntrega,
+              emailRecuperacao: recuperacaoEmail(evento),
               emailTentativas: evento.email_tentativas,
               emailEnviadoEm: evento.email_enviado_em,
               emailEntregueEm: evento.email_entregue_em,

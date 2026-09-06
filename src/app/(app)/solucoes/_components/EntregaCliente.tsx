@@ -1,6 +1,7 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   BellRing,
@@ -17,15 +18,13 @@ import {
   prepararEntregaCliente,
   reenviarNotificacaoEntregaCliente,
 } from '@/lib/projetos-execucao/entrega-actions';
-import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
 import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
+import { tituloEmail } from '@/lib/notificacoes/estado-email';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import type { EventoProjetoExecucao, TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_CLIENTE } from '@/lib/projetos-execucao/status';
 import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
 import styles from './EntregaCliente.module.css';
-
-const INICIAL: EstadoProjetoExecucao = {};
 
 export function EntregaCliente({
   projetoId,
@@ -50,10 +49,6 @@ export function EntregaCliente({
 }) {
   const { estado, enviar, editar, pendente, bloqueado, operacao } =
     useFormularioEntrega(prepararEntregaCliente);
-  const [estadoReenvio, reenviar, reenviando] = useActionState(
-    reenviarNotificacaoEntregaCliente,
-    INICIAL,
-  );
   const concluida = tarefa.status === 'concluida';
   const decidida = tarefa.clienteStatus === 'aprovada';
   const guiaValidacao = montarGuiaValidacaoTarefa(tarefa);
@@ -100,9 +95,6 @@ export function EntregaCliente({
                 notificacao={notificacao}
                 lembrete={lembrete}
                 email={clienteEmail}
-                estado={estadoReenvio}
-                reenviando={reenviando}
-                action={reenviar}
               />
             </>
           )}
@@ -232,51 +224,59 @@ function NotificacaoCliente({
   notificacao,
   lembrete,
   email,
-  estado,
-  reenviando,
-  action,
 }: {
   projetoId: string;
   notificacao: EventoProjetoExecucao | null;
   lembrete: EventoProjetoExecucao | null;
   email: string | null;
-  estado: EstadoProjetoExecucao;
-  reenviando: boolean;
-  action: (formData: FormData) => void;
 }) {
+  const router = useRouter();
+  const [atualizando, atualizar] = useTransition();
+  const {
+    estado,
+    enviar,
+    editar,
+    pendente: reenviando,
+    bloqueado,
+  } = useFormularioEntrega(reenviarNotificacaoEntregaCliente);
   const status = notificacao?.emailStatus ?? 'nao_solicitado';
   const concluida = status === 'entregue';
   const emTransito = ['enviando', 'enviado', 'atrasado'].includes(status);
-  const titulo = concluida
-    ? 'E-mail entregue ao cliente'
-    : status === 'enviado'
-      ? 'E-mail enviado ao cliente'
-      : status === 'enviando'
-        ? 'Enviando o aviso por e-mail'
-        : status === 'atrasado'
-          ? 'A entrega do e-mail está demorando'
-          : status === 'devolvido'
-            ? 'O endereço recusou o e-mail'
-            : 'O aviso por e-mail não foi entregue';
+  const recuperacao =
+    notificacao?.emailRecuperacao ??
+    (concluida || emTransito
+      ? 'nenhuma'
+      : ['reclamado', 'suprimido'].includes(status)
+        ? 'bloqueado'
+        : 'tentar');
+  const podeRecuperar = ['tentar', 'corrigir', 'verificar'].includes(recuperacao);
   const descricao = concluida
-    ? `O provedor confirmou a entrega em ${notificacao?.emailDestinatario}.`
+    ? `Recebido pelo servidor de ${notificacao?.emailDestinatario}. Não confirma leitura.`
     : emTransito
       ? status === 'atrasado'
-        ? 'O provedor continuará tentando. A validação já está disponível no portal.'
-        : `A validação foi enviada para ${notificacao?.emailDestinatario ?? email}.`
-      : 'A validação continua segura no portal. Corrija o endereço, se necessário, e tente novamente.';
+        ? 'O provedor continuará tentando. Não é necessário reenviar.'
+        : `Destino: ${notificacao?.emailDestinatario ?? email ?? 'cliente'}. Aguardando confirmação de entrega.`
+      : recuperacao === 'bloqueado'
+        ? 'Compartilhe o link do portal. Novos envios estão pausados para sua segurança.'
+        : recuperacao === 'verificar'
+          ? 'Confira o envio anterior sem criar outro e-mail.'
+          : status === 'devolvido'
+            ? 'Informe outro endereço para enviar o aviso.'
+            : 'A validação está no portal. Você pode tentar enviar o aviso novamente.';
 
   return (
     <section className={styles.notificacao} data-status={status} aria-live="polite">
       <span className={styles.notificacaoIcone}>
-        {concluida || emTransito ? (
+        {concluida ? (
           <MailCheck size={17} aria-hidden="true" />
+        ) : emTransito ? (
+          <Clock3 size={17} aria-hidden="true" />
         ) : (
           <MailWarning size={17} aria-hidden="true" />
         )}
       </span>
       <div>
-        <strong>{titulo}</strong>
+        <strong>{tituloEmail(status)}</strong>
         <p>{descricao}</p>
         {lembrete ? <StatusLembrete lembrete={lembrete} /> : null}
         {!lembrete && (concluida || emTransito) ? (
@@ -286,24 +286,46 @@ function NotificacaoCliente({
           </p>
         ) : null}
       </div>
-      {!concluida && !emTransito && notificacao && (
-        <form action={action} className={styles.reenvio}>
+      {emTransito && recuperacao === 'nenhuma' && (
+        <button
+          type="button"
+          className={styles.atualizarStatus}
+          disabled={atualizando}
+          onClick={() => atualizar(() => router.refresh())}
+        >
+          <RefreshCw size={14} aria-hidden="true" />
+          {atualizando ? 'Atualizando…' : 'Atualizar status'}
+        </button>
+      )}
+      {podeRecuperar && notificacao && (
+        <form
+          onSubmit={enviar}
+          onChange={editar}
+          className={styles.reenvio}
+          aria-busy={reenviando || undefined}
+        >
           <input type="hidden" name="projeto" value={projetoId} />
           <input type="hidden" name="evento" value={notificacao.id} />
           <label>
-            <span>Novo endereço</span>
+            <span>{recuperacao === 'verificar' ? 'Endereço do envio' : 'Enviar para'}</span>
             <input
               type="email"
               name="email"
+              readOnly={recuperacao === 'verificar'}
+              disabled={reenviando}
               defaultValue={notificacao.emailDestinatario ?? email ?? ''}
               maxLength={320}
               required
               aria-label="E-mail para reenviar a validação"
             />
           </label>
-          <button type="submit" disabled={reenviando}>
+          <button type="submit" disabled={bloqueado}>
             <RefreshCw size={14} aria-hidden="true" />
-            {reenviando ? 'Tentando…' : 'Tentar novamente'}
+            {reenviando
+              ? 'Conferindo…'
+              : recuperacao === 'verificar'
+                ? 'Verificar envio'
+                : 'Tentar novamente'}
           </button>
           {estado.erro && <p role="alert">{estado.erro}</p>}
           {estado.sucesso && <p role="status">{estado.sucesso}</p>}
@@ -324,7 +346,7 @@ function StatusLembrete({ lembrete }: { lembrete: EventoProjetoExecucao }) {
     <p className={styles.lembreteEnviado} data-falhou={falhou || undefined}>
       <BellRing size={14} aria-hidden="true" />
       {falhou
-        ? 'O lembrete não saiu. A entrega continua disponível no portal.'
+        ? 'Envio do lembrete não confirmado. A entrega continua no portal.'
         : entregue
           ? 'Lembrete entregue ao cliente.'
           : preparando

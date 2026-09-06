@@ -1,4 +1,6 @@
-/** QA opt-in: reunião fictícia, jornada real pela UI, nenhum convite ou e-mail externo. */
+/** QA opt-in: reunião fictícia e jornada real. Sem invites de agenda.
+ * --validar-notificacoes envia quatro e-mails apenas ao destino de QA autorizado.
+ */
 /* global document, innerWidth */
 import { randomBytes } from 'node:crypto';
 import { mkdtemp } from 'node:fs/promises';
@@ -8,6 +10,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { chromium, expect as expectBase } from '@playwright/test';
 import { validarAceiteCliente } from './qa-aceite-cliente.mjs';
+import { validarNotificacoesEntrega } from './qa-notificacoes-entrega.mjs';
 
 const expect = expectBase.configure({ timeout: 30_000 });
 
@@ -36,7 +39,17 @@ function exigir(resposta) {
   return resposta.data;
 }
 const pasta = await mkdtemp(join(tmpdir(), 'subido-reuniao-entrega-qa-'));
-const email = `qa-reuniao-entrega-${Date.now()}@example.invalid`;
+const testarEmails = process.argv.includes('--validar-notificacoes');
+if (
+  testarEmails &&
+  !['rafael@viverdeia.ai', 'delivered@resend.dev'].includes(process.env.SUBIDO_QA_EMAIL)
+)
+  throw new Error('Configure o destinatário de QA autorizado.');
+const email = testarEmails
+  ? process.env.SUBIDO_QA_EMAIL === 'rafael@viverdeia.ai'
+    ? `rafael+subido-qa-${Date.now()}@viverdeia.ai`
+    : `delivered+subido-qa-${Date.now()}@resend.dev`
+  : `qa-reuniao-entrega-${Date.now()}@example.invalid`;
 const password = randomBytes(24).toString('base64url');
 let usuario;
 let browser;
@@ -234,6 +247,18 @@ try {
       erros,
     });
   }
+  if (testarEmails)
+    await validarNotificacoesEntrega({
+      app,
+      admin,
+      client,
+      browser,
+      page,
+      usuario,
+      entregaId,
+      pasta,
+      erros,
+    });
   if (erros.length) throw new Error(`Erros no navegador: ${erros.join('; ')}`);
   console.log(
     JSON.stringify({

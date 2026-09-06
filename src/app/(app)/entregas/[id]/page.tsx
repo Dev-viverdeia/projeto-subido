@@ -9,9 +9,15 @@ export async function generateMetadata({ params }: PageProps<'/entregas/[id]'>):
   return { title: projeto?.titulo ?? 'Entrega do cliente' };
 }
 
-export default async function EntregaPage({ params }: PageProps<'/entregas/[id]'>) {
+export default async function EntregaPage({ params, searchParams }: PageProps<'/entregas/[id]'>) {
   const { id } = await params;
   const projeto = await obterProjetoExecucao(id);
   if (!projeto) notFound();
-  return <SalaEntrega projeto={projeto} />;
+  const { tarefa } = await searchParams;
+  return (
+    <SalaEntrega
+      projeto={projeto}
+      tarefaSolicitada={typeof tarefa === 'string' ? tarefa : undefined}
+    />
+  );
 }

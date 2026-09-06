@@ -2,13 +2,18 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { EventoProjetoExecucao, TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+
 vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
   prepararEntregaCliente: vi.fn(),
   reenviarNotificacaoEntregaCliente: vi.fn(),
 }));
 
 import { EntregaCliente } from './EntregaCliente';
-import { prepararEntregaCliente } from '@/lib/projetos-execucao/entrega-actions';
+import {
+  prepararEntregaCliente,
+  reenviarNotificacaoEntregaCliente,
+} from '@/lib/projetos-execucao/entrega-actions';
 
 const TAREFA: TarefaProjetoExecucao = {
   id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -44,6 +49,70 @@ const CONVITE: EventoProjetoExecucao = {
 };
 
 describe('EntregaCliente', () => {
+  it('não confunde envio com recebimento e permite atualizar o status', () => {
+    render(
+      <EntregaCliente
+        projetoId="qa"
+        tarefa={TAREFA}
+        portalAtivo
+        clienteEmail={null}
+        notificacao={{ ...CONVITE, emailStatus: 'enviado', emailRecuperacao: 'nenhuma' }}
+        lembrete={null}
+      />,
+    );
+    expect(screen.getByText('E-mail enviado')).toBeVisible();
+    expect(screen.queryByText('Entrega confirmada')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Atualizar status' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).not.toBeInTheDocument();
+  });
+  it('preserva o endereço digitado se o reenvio falhar', async () => {
+    vi.mocked(reenviarNotificacaoEntregaCliente).mockResolvedValue({
+      erro: 'Envio não confirmado.',
+    });
+    render(
+      <EntregaCliente
+        projetoId="qa"
+        tarefa={TAREFA}
+        portalAtivo
+        clienteEmail={null}
+        notificacao={{ ...CONVITE, emailStatus: 'devolvido', emailRecuperacao: 'corrigir' }}
+        lembrete={null}
+      />,
+    );
+    const email = screen.getByLabelText('E-mail para reenviar a validação');
+    fireEvent.change(email, { target: { value: 'corrigido@example.com' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Envio não confirmado');
+    expect(email).toHaveValue('corrigido@example.com');
+  });
+  it('verifica uma tentativa incerta sem permitir troca de destinatário', () => {
+    render(
+      <EntregaCliente
+        projetoId="qa"
+        tarefa={TAREFA}
+        portalAtivo
+        clienteEmail={null}
+        notificacao={{ ...CONVITE, emailStatus: 'falhou', emailRecuperacao: 'verificar' }}
+        lembrete={null}
+      />,
+    );
+    expect(screen.getByLabelText('E-mail para reenviar a validação')).toHaveAttribute('readonly');
+    expect(screen.getByRole('button', { name: 'Verificar envio' })).toBeVisible();
+  });
+  it('não oferece outro disparo quando o provedor bloqueia o envio', () => {
+    render(
+      <EntregaCliente
+        projetoId="qa"
+        tarefa={TAREFA}
+        portalAtivo
+        clienteEmail={null}
+        notificacao={{ ...CONVITE, emailStatus: 'reclamado', emailRecuperacao: 'bloqueado' }}
+        lembrete={null}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Compartilhe o link do portal/)).toBeVisible();
+  });
   it('salva o rascunho sem destinatário e preserva a mensagem após falha', async () => {
     vi.mocked(prepararEntregaCliente).mockResolvedValue({ erro: 'Tente novamente.' });
     render(
