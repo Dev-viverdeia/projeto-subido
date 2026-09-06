@@ -1,21 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { from, getClaims, redirect, revalidatePath, rpc, executarAlteracaoAgenda } = vi.hoisted(
-  () => ({
+const { from, getClaims, getUser, redirect, revalidatePath, rpc, executarAlteracaoAgenda } =
+  vi.hoisted(() => ({
     from: vi.fn(),
     getClaims: vi.fn(),
+    getUser: vi.fn(),
     redirect: vi.fn(),
     revalidatePath: vi.fn(),
     rpc: vi.fn(),
     executarAlteracaoAgenda: vi.fn(),
-  }),
-);
+  }));
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
+  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims, getUser }, from, rpc })),
 }));
 vi.mock('@/lib/calls/agenda-servico', () => ({ executarAlteracaoAgenda }));
 
@@ -76,6 +76,9 @@ describe('agendarReuniao', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getClaims.mockResolvedValue({ data: { claims: { sub: 'usuario-1' } } });
+    getUser.mockResolvedValue({
+      data: { user: { id: 'usuario-1', app_metadata: { plano_subido: 'pro' } } },
+    });
     prepararBancoComCalendarAtivo();
     executarAlteracaoAgenda.mockResolvedValue({ status: 'concluido' });
   });
@@ -150,7 +153,10 @@ describe('agendarReuniao', () => {
 
   it('agenda no Starter sem exigir acesso ao módulo de Vendas', async () => {
     getClaims.mockResolvedValue({
-      data: { claims: { sub: 'usuario-1', app_metadata: { plano_subido: 'starter' } } },
+      data: { claims: { sub: 'usuario-1', app_metadata: { plano_subido: 'pro' } } },
+    });
+    getUser.mockResolvedValue({
+      data: { user: { id: 'usuario-1', app_metadata: { plano_subido: 'starter' } } },
     });
     const dados = dadosValidos();
     dados.set('oportunidade', '');

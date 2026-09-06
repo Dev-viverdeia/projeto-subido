@@ -20,6 +20,7 @@ export type MovimentoCredito = Pick<
 export type CarteiraCreditos = {
   saldo: number | null;
   movimentos: MovimentoCredito[];
+  extratoDisponivel: boolean;
 };
 
 /**
@@ -56,6 +57,7 @@ export async function obterCarteiraCreditos(limite = 12): Promise<CarteiraCredit
 
   return {
     saldo,
+    extratoDisponivel: !extrato.error,
     movimentos: extrato.error ? [] : (extrato.data ?? []),
   };
 }

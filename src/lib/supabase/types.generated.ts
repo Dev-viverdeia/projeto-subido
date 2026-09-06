@@ -3810,6 +3810,7 @@ export type Database = {
           taxa_sucesso: number
         }[]
       }
+      plano_subido_atual: { Args: never; Returns: string }
       progresso_conta_snapshot: {
         Args: never
         Returns: {

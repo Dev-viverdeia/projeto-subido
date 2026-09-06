@@ -48,9 +48,10 @@ describe('permissões dos planos', () => {
     expect(planoTemRecurso('enterprise', 'gestao_equipe')).toBe(true);
   });
 
-  it('preserva contas antigas como Pro quando não há plano explícito', () => {
-    expect(planoDosMetadados(undefined)).toBe('pro');
-    expect(planoDosMetadados({ plano_subido: 'desconhecido' })).toBe('pro');
+  it('não libera o Pro sem plano explícito; preserva os planos válidos', () => {
+    expect(planoDosMetadados(undefined)).toBe('starter');
+    expect(planoDosMetadados({ plano_subido: 'desconhecido' })).toBe('starter');
+    expect(planoDosMetadados({ plano_subido: 'pro' })).toBe('pro');
     expect(planoDosMetadados({ plano_subido: 'starter' })).toBe('starter');
     expect(planoDosMetadados({ plano_subido: 'enterprise' })).toBe('enterprise');
   });

@@ -14,7 +14,7 @@ export const obterAssinaturaAtual = cache(async () => {
 
   if (error) {
     console.error('[billing:assinatura:consulta]', error.code, error.message);
-    return null;
+    return { assinatura: null, indisponivel: true };
   }
-  return data;
+  return { assinatura: data, indisponivel: false };
 });

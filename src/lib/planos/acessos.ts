@@ -204,13 +204,13 @@ export const PACOTES_CREDITOS = [
  * administrado pelo produto. Nunca use `user_metadata` para permissões: a
  * própria pessoa pode editar esse segundo objeto ao atualizar o perfil.
  *
- * Contas antigas sem a chave continuam como Pro. Uma migration grava essa
- * escolha nelas e inclui Starter automaticamente em todo cadastro novo.
+ * Pro e Enterprise exigem um valor explícito. Contas legadas já receberam
+ * seu plano na migration; ausência ou valor inválido não libera recursos pagos.
  */
 export function planoDosMetadados(metadata: unknown): PlanoSubido {
-  if (!metadata || typeof metadata !== 'object') return 'pro';
+  if (!metadata || typeof metadata !== 'object') return 'starter';
   const valor = (metadata as Record<string, unknown>).plano_subido;
-  return valor === 'starter' || valor === 'enterprise' || valor === 'pro' ? valor : 'pro';
+  return valor === 'starter' || valor === 'enterprise' || valor === 'pro' ? valor : 'starter';
 }
 
 export function planoTemRecurso(plano: PlanoSubido, recurso: RecursoPlano): boolean {

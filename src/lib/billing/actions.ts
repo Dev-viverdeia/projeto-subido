@@ -7,11 +7,13 @@ import { env } from '@/lib/env';
 // eslint-disable-next-line no-restricted-imports
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { pacotePeloId } from './catalogo';
+import { buscarPreco, pacotePeloId } from './catalogo';
+import { STATUS_ASSINATURA_GERENCIAVEL } from './assinatura';
 import { identificadorIntegracao, obterConfiguracaoBilling, obterStripe } from './stripe';
 
 const PlanoSchema = z.enum(['starter', 'pro']);
 const PacoteSchema = z.enum(['essencial', 'crescimento', 'escala']);
+class SessaoExpirada extends Error {}
 
 function destinoConta(caminho: string): string {
   return new URL(caminho, env.NEXT_PUBLIC_SITE_URL).toString();
@@ -22,16 +24,18 @@ async function contextoUsuario() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/entrar?proximo=/conta/assinatura');
+  if (!user) throw new SessaoExpirada();
 
-  const [{ data: cliente }, { data: assinatura }] = await Promise.all([
-    supabase.from('billing_clientes').select('stripe_customer_id').maybeSingle(),
-    supabase
-      .from('billing_assinaturas')
-      .select('stripe_customer_id, status')
-      .in('status', ['active', 'trialing', 'past_due'])
-      .maybeSingle(),
-  ]);
+  const [{ data: cliente, error: erroCliente }, { data: assinatura, error: erroAssinatura }] =
+    await Promise.all([
+      supabase.from('billing_clientes').select('stripe_customer_id').maybeSingle(),
+      supabase
+        .from('billing_assinaturas')
+        .select('stripe_customer_id, status')
+        .in('status', STATUS_ASSINATURA_GERENCIAVEL)
+        .maybeSingle(),
+    ]);
+  if (erroCliente || erroAssinatura) throw new Error('consulta_cobranca_indisponivel');
 
   return {
     user,
@@ -70,7 +74,8 @@ export async function iniciarAssinatura(formData: FormData): Promise<void> {
       destino = await criarPortal(contexto.customerId);
     } else {
       const priceId = configuracao.planos[plano].priceId;
-      if (!priceId) throw new Error('preco_indisponivel');
+      if (!priceId || (await buscarPreco(priceId, 'mensal')) === null)
+        throw new Error('preco_indisponivel');
 
       const sessao = await stripe.checkout.sessions.create(
         {
@@ -83,7 +88,7 @@ export async function iniciarAssinatura(formData: FormData): Promise<void> {
               ? { customer_email: contexto.user.email }
               : {}),
           allow_promotion_codes: true,
-          success_url: destinoConta('/conta/assinatura?checkout=sucesso'),
+          success_url: `${destinoConta('/conta/assinatura?checkout=sucesso')}&session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: destinoConta('/conta/assinatura?checkout=cancelado'),
           metadata: {
             usuario_id: contexto.user.id,
@@ -105,7 +110,12 @@ export async function iniciarAssinatura(formData: FormData): Promise<void> {
       destino = sessao.url;
     }
   } catch (causa) {
-    console.error('[billing:checkout:assinatura]', causa instanceof Error ? causa.message : causa);
+    if (causa instanceof SessaoExpirada) destino = '/entrar?proximo=/conta/assinatura';
+    else
+      console.error(
+        '[billing:checkout:assinatura]',
+        causa instanceof Error ? causa.message : causa,
+      );
   }
 
   redirect(destino ?? '/conta/assinatura?checkout=indisponivel');
@@ -128,6 +138,7 @@ export async function comprarPacoteCreditos(formData: FormData): Promise<void> {
     }
 
     const contexto = await contextoUsuario();
+    if ((await buscarPreco(priceId, 'avulso')) === null) throw new Error('preco_indisponivel');
     const sessao = await stripe.checkout.sessions.create(
       {
         mode: 'payment',
@@ -139,7 +150,7 @@ export async function comprarPacoteCreditos(formData: FormData): Promise<void> {
               customer_creation: 'always',
               ...(contexto.user.email ? { customer_email: contexto.user.email } : {}),
             }),
-        success_url: destinoConta('/conta/creditos?checkout=sucesso'),
+        success_url: `${destinoConta('/conta/creditos?checkout=sucesso')}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: destinoConta('/conta/creditos?checkout=cancelado'),
         metadata: {
           usuario_id: contexto.user.id,
@@ -172,7 +183,9 @@ export async function comprarPacoteCreditos(formData: FormData): Promise<void> {
     }
     destino = sessao.url;
   } catch (causa) {
-    console.error('[billing:checkout:creditos]', causa instanceof Error ? causa.message : causa);
+    if (causa instanceof SessaoExpirada) destino = '/entrar?proximo=/conta/creditos';
+    else
+      console.error('[billing:checkout:creditos]', causa instanceof Error ? causa.message : causa);
   }
 
   redirect(destino ?? '/conta/creditos?checkout=indisponivel');
@@ -185,7 +198,8 @@ export async function abrirPortalCobranca(): Promise<void> {
     if (!contexto.customerId) throw new Error('cliente_sem_cobranca');
     destino = await criarPortal(contexto.customerId);
   } catch (causa) {
-    console.error('[billing:portal]', causa instanceof Error ? causa.message : causa);
+    if (causa instanceof SessaoExpirada) destino = '/entrar?proximo=/conta/assinatura';
+    else console.error('[billing:portal]', causa instanceof Error ? causa.message : causa);
   }
   redirect(destino ?? '/conta/assinatura?portal=indisponivel');
 }
