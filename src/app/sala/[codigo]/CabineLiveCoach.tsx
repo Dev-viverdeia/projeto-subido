@@ -66,6 +66,7 @@ export function CabineLiveCoach({
       className={styles.painel}
       data-tipo={kickoff ? 'kickoff' : undefined}
       aria-label={kickoff ? 'Acordo do projeto privado' : 'Live Coach privado'}
+      tabIndex={0}
     >
       <header className={styles.cabecalho}>
         <span className={`${styles.estado} ${intensidade}`} aria-hidden="true">

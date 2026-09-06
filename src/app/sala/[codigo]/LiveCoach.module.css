@@ -13,6 +13,11 @@
   backdrop-filter: blur(28px) saturate(135%);
 }
 
+.painel:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: -2px;
+}
+
 .cabecalho {
   flex-shrink: 0;
   display: grid;

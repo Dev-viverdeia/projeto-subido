@@ -25,6 +25,8 @@ test('convidado entra por uma tela clara e só avança com consentimento', async
 test('coach mantém falha e orientação acessíveis no celular', async ({ page }, info) => {
   await page.goto('/preview/live-coach?falha=1');
   const painel = page.getByRole('complementary', { name: 'Live Coach privado' });
+  await painel.focus();
+  await expect(painel).toBeFocused();
   const alerta = painel.getByRole('alert');
   await expect(alerta).toBeVisible();
   await expect(alerta).toContainText('Sua internet caiu');
@@ -40,6 +42,10 @@ test('coach mantém falha e orientação acessíveis no celular', async ({ page 
   await alerta.scrollIntoViewIfNeeded();
   await expect(alerta).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const auditoria = await new AxeBuilder({ page }).analyze();
+  expect(
+    auditoria.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')),
+  ).toEqual([]);
   await page.screenshot({ path: info.outputPath('coach-falha.png') });
 });
 
