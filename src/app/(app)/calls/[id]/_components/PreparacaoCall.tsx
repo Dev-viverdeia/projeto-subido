@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
+import { podeAlterarHorario } from '@/lib/calls/agenda-modelo';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import styles from './PreparacaoCall.module.css';
 
@@ -69,6 +70,11 @@ export function PreparacaoCall({ posCall }: { posCall: PosCall }) {
             </span>
           </div>
           <div className={styles.acoesTopo}>
+            {podeAlterarHorario(posCall.reuniao.status) && (
+              <Link href={`/reunioes?editar=${posCall.reuniao.id}`} className={styles.secundaria}>
+                Alterar reunião
+              </Link>
+            )}
             <Link href={`/vendas/${posCall.oportunidade.id}`} className={styles.secundaria}>
               Ficha do cliente <ArrowRight size={15} aria-hidden="true" />
             </Link>

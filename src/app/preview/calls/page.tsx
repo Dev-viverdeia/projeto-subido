@@ -163,7 +163,21 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
       </aside>
       <main id="conteudo" className={styles.conteudo}>
         <PainelCalls
-          reunioes={parametros.estado === 'vazio' ? [] : REUNIOES}
+          reunioes={
+            parametros.estado === 'vazio'
+              ? []
+              : REUNIOES.map((reuniao, indice) => ({
+                  ...reuniao,
+                  atualizadaEm: AGORA,
+                  ...(parametros.convite === 'falhou' && indice === 1
+                    ? {
+                        googleSyncStatus: 'falhou' as const,
+                        googleSyncErro:
+                          'O horário ficou salvo na Subido. Falta atualizar o convite no Google.',
+                      }
+                    : {}),
+                }))
+          }
           agora={new Date(AGORA)}
           oportunidades={OPORTUNIDADES}
           calendar={{
@@ -177,6 +191,8 @@ export default async function PreviewCallsPage({ searchParams }: PageProps<'/pre
             parametros.agendada === '1' ? '66666666-6666-4666-8666-666666666666' : undefined
           }
           modalInicial={parametros.modal === '1'}
+          editarId={parametros.editar === '1' ? REUNIOES[1]!.id : undefined}
+          rascunhoDono="preview-agenda"
           oportunidadeInicial={
             typeof parametros.oportunidade === 'string' ? parametros.oportunidade : undefined
           }

@@ -1,6 +1,7 @@
 import type { ReuniaoCall } from '@/lib/calls/queries';
 import { ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ResolverReuniaoPendente } from './ResolverReuniaoPendente';
+import { EstadoConviteAgenda } from './EstadoConviteAgenda';
 import styles from '../pagina.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -43,6 +44,7 @@ export function PendenciasReunioes({ reunioes }: { reunioes: ReuniaoCall[] }) {
                 {reuniao.empresa}
                 {reuniao.contato ? ` · ${reuniao.contato}` : ''}
               </p>
+              <EstadoConviteAgenda reuniao={reuniao} />
             </div>
             <ResolverReuniaoPendente reuniaoId={reuniao.id} />
           </article>

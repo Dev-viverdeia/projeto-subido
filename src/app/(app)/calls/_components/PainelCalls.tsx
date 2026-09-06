@@ -22,7 +22,9 @@ import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { AcoesSala } from './AcoesSala';
 import { CabecalhoReunioes } from './CabecalhoReunioes';
 import { CallRecemAgendada } from './CallRecemAgendada';
-import { FormularioAgendarCall } from './FormularioAgendarCall';
+import { FormularioAgendarComRascunho } from './FormularioAgendarComRascunho';
+import { GerenciarAgenda } from './GerenciarAgenda';
+import { EstadoConviteAgenda } from './EstadoConviteAgenda';
 import { PendenciasReunioes } from './PendenciasReunioes';
 import { RetornosReunioes } from './RetornosReunioes';
 import styles from '../pagina.module.css';
@@ -50,6 +52,8 @@ export function PainelCalls({
   comercialLiberado = true,
   calendar,
   agendadaId,
+  editarId,
+  rascunhoDono,
   modalInicial = false,
   oportunidadeInicial,
   tipoInicial,
@@ -62,6 +66,8 @@ export function PainelCalls({
   comercialLiberado?: boolean;
   calendar: EstadoGoogleCalendar;
   agendadaId?: string;
+  editarId?: string;
+  rascunhoDono?: string;
   modalInicial?: boolean;
   oportunidadeInicial?: string;
   tipoInicial?: TipoCall;
@@ -86,22 +92,26 @@ export function PainelCalls({
   const proxima = ativasNaAgenda[0];
   const seguintes = ativasNaAgenda.slice(1);
   const proximaEhKickoff = proxima?.tipo === 'kickoff';
+  const editar = reunioes.find((item) => item.id === editarId);
 
   return (
     <div className={styles.pagina}>
+      {editar && <GerenciarAgenda key={editar.id} reuniao={editar} abertoInicial apenasModal />}
       <CabecalhoReunioes comercialLiberado={comercialLiberado}>
         {comercialLiberado && calendar.conectado && oportunidades.length === 0 ? (
           <Link href="/vendas" className="via-btn via-btn--primary via-btn--md">
             Adicionar oportunidade <ArrowRight size={16} aria-hidden="true" />
           </Link>
         ) : (
-          <FormularioAgendarCall
+          <FormularioAgendarComRascunho
             oportunidades={oportunidades}
             comercialLiberado={comercialLiberado}
             calendar={calendar}
             abertoInicial={modalInicial}
             oportunidadeInicial={oportunidadeInicial}
             tipoInicial={tipoInicial}
+            rascunhoDono={rascunhoDono}
+            limparRascunho={Boolean(agendadaId)}
           />
         )}
       </CabecalhoReunioes>
@@ -154,6 +164,8 @@ export function PainelCalls({
                 </span>
               )}
             </div>
+            <GerenciarAgenda reuniao={proxima} />
+            <EstadoConviteAgenda reuniao={proxima} />
           </div>
 
           <div className={styles.proximaHorario} data-on-dark>
@@ -256,6 +268,8 @@ export function PainelCalls({
                       {DATA_LONGA.format(new Date(reuniao.agendadaPara))} · {reuniao.duracaoMinutos}{' '}
                       minutos
                     </small>
+                    <GerenciarAgenda reuniao={reuniao} />
+                    <EstadoConviteAgenda reuniao={reuniao} />
                   </div>
                   <AcoesSala id={reuniao.id} codigo={reuniao.codigoPublico} tipo={reuniao.tipo} />
                 </article>
@@ -305,9 +319,11 @@ export function PainelCalls({
                     </small>
                   </div>
                   <span>
-                    Abrir resumo <ArrowRight size={14} aria-hidden="true" />
+                    {reuniao.status === 'cancelada' ? 'Ver reunião' : 'Abrir resumo'}{' '}
+                    <ArrowRight size={14} aria-hidden="true" />
                   </span>
                 </Link>
+                <EstadoConviteAgenda reuniao={reuniao} />
               </article>
             ))}
           </div>

@@ -1,22 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const {
-  from,
-  getClaims,
-  redirect,
-  revalidatePath,
-  removerCallDoGoogle,
-  rpc,
-  sincronizarCallNoGoogle,
-} = vi.hoisted(() => ({
-  from: vi.fn(),
-  getClaims: vi.fn(),
-  redirect: vi.fn(),
-  revalidatePath: vi.fn(),
-  removerCallDoGoogle: vi.fn(),
-  rpc: vi.fn(),
-  sincronizarCallNoGoogle: vi.fn(),
-}));
+const { from, getClaims, redirect, revalidatePath, rpc, executarAlteracaoAgenda } = vi.hoisted(
+  () => ({
+    from: vi.fn(),
+    getClaims: vi.fn(),
+    redirect: vi.fn(),
+    revalidatePath: vi.fn(),
+    rpc: vi.fn(),
+    executarAlteracaoAgenda: vi.fn(),
+  }),
+);
 
 vi.mock('next/cache', () => ({ revalidatePath }));
 vi.mock('next/navigation', () => ({ redirect }));
@@ -24,7 +17,7 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve({ auth: { getClaims }, from, rpc })),
 }));
-vi.mock('@/lib/google-calendar/eventos', () => ({ removerCallDoGoogle, sincronizarCallNoGoogle }));
+vi.mock('@/lib/calls/agenda-servico', () => ({ executarAlteracaoAgenda }));
 
 import { agendarReuniao, resolverReuniaoPendente } from './actions';
 
@@ -37,7 +30,7 @@ function dadosValidos() {
   dados.set('oportunidade', OPORTUNIDADE_ID);
   dados.set('tipo', 'descoberta');
   dados.set('titulo', 'Descoberta do atendimento');
-  dados.set('agendadaPara', '2026-08-14T15:00');
+  dados.set('agendadaPara', '2099-08-14T15:00');
   dados.set('duracao', '45');
   dados.set('offsetMinutos', '180');
   dados.set('liveCoach', 'on');
@@ -84,7 +77,7 @@ describe('agendarReuniao', () => {
     vi.clearAllMocks();
     getClaims.mockResolvedValue({ data: { claims: { sub: 'usuario-1' } } });
     prepararBancoComCalendarAtivo();
-    sincronizarCallNoGoogle.mockResolvedValue({ status: 'sincronizado', eventoUrl: null });
+    executarAlteracaoAgenda.mockResolvedValue({ status: 'concluido' });
   });
 
   it('abre a confirmação da sala criada e revalida o lead', async () => {
@@ -98,7 +91,7 @@ describe('agendarReuniao', () => {
     expect(rpc).toHaveBeenCalledWith('calls_agendar_reuniao', {
       p_oportunidade: OPORTUNIDADE_ID,
       p_tipo: 'descoberta',
-      p_agendada_para: '2026-08-14T18:00:00.000Z',
+      p_agendada_para: '2099-08-14T18:00:00.000Z',
       p_duracao_minutos: 45,
       p_titulo: 'Descoberta do atendimento',
       p_live_coach_ativo: true,
@@ -129,7 +122,8 @@ describe('agendarReuniao', () => {
 
     const resposta = await agendarReuniao({}, dadosValidos());
 
-    expect(resposta.erro).toContain('Conecte seu Google Calendar');
+    expect(resposta.erro).toContain('Reconecte sua agenda');
+    expect(resposta.reconectar).toBe(true);
     expect(rpc).not.toHaveBeenCalledWith('calls_agendar_reuniao', expect.anything());
   });
 
@@ -143,12 +137,12 @@ describe('agendarReuniao', () => {
     });
     await agendarReuniao({}, dados);
 
-    expect(sincronizarCallNoGoogle).toHaveBeenCalledWith(
+    expect(executarAlteracaoAgenda).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
         reuniaoId: REUNIAO_ID,
-        codigoPublico: CODIGO_PUBLICO,
-        convidadoEmail: 'cliente@clinica.com.br',
+        dono: 'usuario-1',
+        acao: 'sincronizar',
       }),
     );
     expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
@@ -180,7 +174,7 @@ describe('agendarReuniao', () => {
       p_contato_nome: 'Marina Costa',
       p_contato_email: 'cliente@clinica.com.br',
       p_tipo: 'descoberta',
-      p_agendada_para: '2026-08-14T18:00:00.000Z',
+      p_agendada_para: '2099-08-14T18:00:00.000Z',
       p_duracao_minutos: 45,
       p_titulo: 'Descoberta do atendimento',
       p_live_coach_ativo: true,
@@ -213,8 +207,7 @@ describe('resolverReuniaoPendente', () => {
                   status: 'agendada',
                   agendada_para: '2026-08-20T15:00:00.000Z',
                   duracao_minutos: 45,
-                  google_event_id: 'evento-google',
-                  google_calendar_id: 'primary',
+                  atualizada_em: '2026-08-20T15:00:00.000Z',
                 },
                 error: null,
               }),
@@ -226,8 +219,8 @@ describe('resolverReuniaoPendente', () => {
     });
   });
 
-  it('não encerra a reunião quando o convite do Google não pôde ser cancelado', async () => {
-    removerCallDoGoogle.mockResolvedValue({ status: 'falhou' });
+  it('não altera a reunião quando o serviço rejeita o cancelamento', async () => {
+    executarAlteracaoAgenda.mockResolvedValue({ status: 'erro' });
     redirect.mockImplementationOnce(() => {
       throw new Error('NEXT_REDIRECT');
     });
@@ -241,23 +234,21 @@ describe('resolverReuniaoPendente', () => {
     expect(atualizar).not.toHaveBeenCalled();
   });
 
-  it('só encerra a reunião depois de cancelar o convite antigo', async () => {
-    removerCallDoGoogle.mockResolvedValue({ status: 'removido' });
+  it('delega o cancelamento ao serviço que mantém a pendência recuperável', async () => {
+    executarAlteracaoAgenda.mockResolvedValue({ status: 'pendente' });
     const dados = new FormData();
     dados.set('reuniao', REUNIAO_ID);
     dados.set('destino', 'cancelar');
 
     await resolverReuniaoPendente(dados);
 
-    const dadosAtualizacao = atualizar.mock.calls[0]?.[0] as {
-      status: string;
-      encerrada_em: string;
-    };
-    expect(dadosAtualizacao.status).toBe('cancelada');
-    expect(Date.parse(dadosAtualizacao.encerrada_em)).not.toBeNaN();
-    expect(removerCallDoGoogle.mock.invocationCallOrder[0]).toBeLessThan(
-      atualizar.mock.invocationCallOrder[0]!,
-    );
+    expect(executarAlteracaoAgenda).toHaveBeenCalledWith(expect.anything(), {
+      reuniaoId: REUNIAO_ID,
+      dono: 'usuario-1',
+      acao: 'cancelar',
+      versao: '2026-08-20T15:00:00.000Z',
+    });
+    expect(atualizar).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledWith('/reunioes?pendencia=cancelada');
   });
 });

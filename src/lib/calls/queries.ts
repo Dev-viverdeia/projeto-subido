@@ -145,7 +145,7 @@ export const listarReunioes = cache(async (): Promise<ReuniaoCall[]> => {
     supabase
       .from('calls_reunioes')
       .select(
-        'id, titulo, tipo, status, agendada_para, duracao_minutos, codigo_publico, live_coach_ativo, oportunidade_id, convidado_email, google_sync_status, google_event_url, google_sync_erro, criada_em',
+        'id, titulo, tipo, status, agendada_para, duracao_minutos, codigo_publico, live_coach_ativo, oportunidade_id, convidado_email, google_sync_status, google_event_url, google_sync_erro, criada_em, atualizada_em',
       )
       .order('agendada_para', { ascending: true })
       .limit(200),

@@ -6,6 +6,8 @@ vi.mock('@/lib/calls/actions', () => ({
   reenviarConviteGoogle: vi.fn(),
   resolverReuniaoPendente: vi.fn(),
 }));
+vi.mock('@/lib/calls/agenda-actions', () => ({ alterarAgendaReuniao: vi.fn() }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
 vi.mock('./FormularioAgendarCall', () => ({
   FormularioAgendarCall: () => <button type="button">Agendar reunião</button>,
