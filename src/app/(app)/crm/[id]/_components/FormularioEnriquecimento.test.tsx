@@ -69,4 +69,20 @@ describe('FormularioEnriquecimento', () => {
     expect(within(dialogo).getByRole('button', { name: 'Usar 3 créditos' })).toBeDisabled();
     expect(iniciarEnriquecimento).not.toHaveBeenCalled();
   });
+
+  it('recupera uma falha de rede sem prometer que nenhum crédito foi usado', async () => {
+    vi.mocked(iniciarEnriquecimento).mockRejectedValue(new Error('offline'));
+    render(
+      <FormularioEnriquecimento
+        oportunidadeId="22222222-2222-4222-8222-222222222222"
+        saldoCreditos={20}
+        temDossie={false}
+        abertoInicial
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
+    await screen.findByText(/Confira o andamento na ficha/);
+    expect(screen.queryByText(/Nenhum crédito foi usado/)).not.toBeInTheDocument();
+    expect(atualizar).toHaveBeenCalled();
+  });
 });

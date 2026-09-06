@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { CABECALHOS_CORS, clienteDoChamador, respostaJson } from '../_compartilhado/http.ts';
 import { gerarEGravar } from './gerar.ts';
 import { PedidoEnriquecimento } from './schema.ts';
+import { avancar } from './persistencia.ts';
 
 declare const EdgeRuntime: {
   waitUntil<T>(promise: Promise<T>): Promise<T>;
@@ -20,7 +21,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   if (!user) return respostaJson({ erro: 'Faça login para enriquecer uma oportunidade.' }, 401);
   // Permissão fica em app_metadata: é assinado pelo Supabase e não pode ser
   // promovido pelo próprio usuário ao editar o perfil.
-  if (!['pro', 'enterprise'].includes(String(user.app_metadata?.plano_subido))) {
+  if (!['pro', 'enterprise'].includes(user.app_metadata?.plano_subido)) {
     return respostaJson({ erro: 'O enriquecimento está disponível a partir do plano Pro.' }, 403);
   }
 
@@ -39,13 +40,28 @@ Deno.serve(async (req: Request): Promise<Response> => {
     );
   }
 
-  const { data: id, error } = await supabase.rpc('crm_iniciar_enriquecimento', {
+  const chave = Deno.env.get('CRM_ENRIQUECIMENTO_WORKER_KEY');
+  if (!chave || chave.length < 64) {
+    return respostaJson(
+      { erro: 'A pesquisa está indisponível no momento. Tente mais tarde.' },
+      503,
+    );
+  }
+  const { data: id, error } = await supabase.rpc('crm_worker_iniciar', {
     p_oportunidade: pedido.data.oportunidade_id,
+    p_chave: chave,
   });
 
   if (error) {
-    console.error(`[enriquecimento:iniciar] ${error.code}: ${error.message}`);
+    console.error(`[enriquecimento:iniciar] ${error.code}`);
     if (error.message.includes('enriquecimento_em_andamento')) {
+      const { data: existente } = await supabase
+        .from('crm_enriquecimentos')
+        .select('id, status')
+        .eq('oportunidade_id', pedido.data.oportunidade_id)
+        .in('status', ['na_fila', 'processando'])
+        .maybeSingle();
+      if (existente) return respostaJson(existente, 202);
       return respostaJson({ erro: 'Esta oportunidade já está sendo enriquecida.' }, 409);
     }
     if (error.message.includes('oportunidade_nao_encontrada')) {
@@ -74,24 +90,31 @@ Deno.serve(async (req: Request): Promise<Response> => {
     .eq('id', String(id))
     .single();
   if (erroExecucao || !execucao) {
-    await supabase
-      .from('crm_enriquecimentos')
-      .update({
-        status: 'falhou',
-        erro: 'Não foi possível carregar os dados da oportunidade.',
-        concluido_em: new Date().toISOString(),
-      })
-      .eq('id', String(id));
+    await avancar(
+      supabase,
+      String(id),
+      chave,
+      'falhou',
+      undefined,
+      'Não foi possível carregar os dados da oportunidade.',
+    ).catch(() => {
+      console.error('[enriquecimento] aguardando recuperação:', String(id));
+    });
     return respostaJson({ erro: 'Não foi possível carregar os dados da oportunidade.' }, 500);
   }
 
   EdgeRuntime.waitUntil(
-    gerarEGravar(supabase, String(id), {
-      oportunidade_id: pedido.data.oportunidade_id,
-      dominio: execucao.dominio ?? undefined,
-      linkedin_url: execucao.linkedin_url ?? undefined,
-      contexto: execucao.contexto ?? undefined,
-    }),
+    gerarEGravar(
+      supabase,
+      String(id),
+      {
+        oportunidade_id: pedido.data.oportunidade_id,
+        dominio: execucao.dominio ?? undefined,
+        linkedin_url: execucao.linkedin_url ?? undefined,
+        contexto: execucao.contexto ?? undefined,
+      },
+      chave,
+    ),
   );
   return respostaJson({ id, status: 'na_fila' }, 202);
 });

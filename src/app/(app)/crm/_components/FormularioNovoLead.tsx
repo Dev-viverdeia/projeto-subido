@@ -30,8 +30,11 @@ export function FormularioNovoLead({
 
   useEffect(() => {
     if (!aberto || !estado.porCampo) return;
+    const primeiroErro = formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
     const quadro = window.requestAnimationFrame(() => {
-      formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      // A pessoa pode começar a corrigir antes do frame; não deslocar o foco
+      // para o campo seguinte no meio da digitação.
+      if (primeiroErro?.getAttribute('aria-invalid') === 'true') primeiroErro.focus();
     });
     return () => window.cancelAnimationFrame(quadro);
   }, [aberto, estado]);

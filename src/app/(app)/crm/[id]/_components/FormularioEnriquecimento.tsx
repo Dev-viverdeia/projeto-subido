@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { Database, Globe2, Layers3, LoaderCircle } from 'lucide-react';
 import { Alert, Button } from '@/design-system/via';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
@@ -12,12 +12,8 @@ import styles from './FormularioEnriquecimento.module.css';
 
 const ETAPAS_CONFIRMACAO = [
   {
-    titulo: 'Reservando os créditos',
-    descricao: 'O valor fica protegido enquanto a solicitação é registrada.',
-  },
-  {
-    titulo: 'Preparando a ficha',
-    descricao: 'Estamos organizando os dados desta ficha antes da pesquisa.',
+    titulo: 'Registrando a solicitação',
+    descricao: 'Validando a ficha e a reserva de créditos.',
   },
 ] as const;
 
@@ -42,6 +38,8 @@ export function FormularioEnriquecimento({
   const [aberto, setAberto] = useState(abertoInicial);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [atualizando, atualizar] = useTransition();
+  const emCurso = useRef(false);
   const saldoSuficiente = saldoCreditos >= CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
   const saldoDepois = saldoCreditos - CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
 
@@ -52,32 +50,39 @@ export function FormularioEnriquecimento({
   }
 
   async function confirmar() {
-    if (!saldoSuficiente || enviando) return;
+    if (!saldoSuficiente || emCurso.current) return;
+    emCurso.current = true;
     setErro(null);
     setAberto(false);
     setEnviando(true);
-    const resposta = await iniciarEnriquecimento({ oportunidade_id: oportunidadeId });
-    if (resposta.falha) {
-      setEnviando(false);
+    try {
+      const resposta = await iniciarEnriquecimento({ oportunidade_id: oportunidadeId });
+      if (resposta.falha) {
+        setAberto(true);
+        setErro(resposta.falha);
+      }
+    } catch {
       setAberto(true);
-      setErro(resposta.falha);
-      return;
+      setErro(
+        'Não conseguimos confirmar o início. Confira o andamento na ficha antes de tentar novamente.',
+      );
+    } finally {
+      atualizar(() => router.refresh());
+      setEnviando(false);
+      emCurso.current = false;
     }
-
-    router.refresh();
-    setEnviando(false);
   }
 
   return (
     <>
-      {enviando && (
+      {(enviando || (atualizando && !aberto)) && (
         <EsperaOperacao
           aberto
           rotulo="Enriquecimento da ficha"
           titulo="Preparando a análise"
           descricao="A plataforma está reunindo os dados já salvos nesta ficha."
           etapas={ETAPAS_CONFIRMACAO}
-          intervalo={1_800}
+          etapaAtual={0}
           nota="Esta janela fecha assim que o enriquecimento for registrado."
         />
       )}
@@ -93,7 +98,7 @@ export function FormularioEnriquecimento({
         data-tom={tom}
         onClick={() => setAberto(true)}
         aria-haspopup="dialog"
-        disabled={desabilitado}
+        disabled={desabilitado || enviando || atualizando}
       >
         {desabilitado ? (
           <LoaderCircle
@@ -144,7 +149,7 @@ export function FormularioEnriquecimento({
         <div className={styles.conteudo}>
           {erro && (
             <Alert tone="danger" size="compact">
-              {erro} Nenhum crédito foi usado.
+              {erro}
             </Alert>
           )}
 
