@@ -10,6 +10,7 @@
 - Mensagens, foco por teclado e contrastes seguem a camada de design existente.
 - Uma queda de conexão informa que o salvamento não foi confirmado, sem afirmar que nada foi salvo. Repetir a confirmação reaproveita as ações existentes.
 - O seletor mantém a borda de erro no hover e no foco, independentemente da ordem de carregamento do CSS.
+- A prévia recebe uma referência de data única do servidor. Prévia, histórico e compartilhamento de propostas usam o fuso de Brasília, como o PDF, evitando divergência de hidratação entre servidor e navegador.
 
 ## Regressão automática
 

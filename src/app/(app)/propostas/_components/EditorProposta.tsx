@@ -33,6 +33,7 @@ export function EditorProposta({
   execucaoId,
   compartilhamentoInicial,
   siteUrl,
+  referenciaEm,
   alteracaoInicial = false,
 }: {
   id: string;
@@ -45,6 +46,7 @@ export function EditorProposta({
   execucaoId: string | null;
   compartilhamentoInicial: PropostaCompleta['compartilhamento'];
   siteUrl: string;
+  referenciaEm: string;
   alteracaoInicial?: boolean;
 }) {
   const [titulo, setTitulo] = useState(tituloInicial);
@@ -329,6 +331,7 @@ export function EditorProposta({
           data-painel-ativo={painelAtivo === 'preview' || undefined}
         >
           <PreviewProposta
+            referenciaEm={referenciaEm}
             documento={documento}
             titulo={titulo}
             versao={versao}

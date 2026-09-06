@@ -7,12 +7,13 @@ import { formatarReais, type DocumentoProposta } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import styles from './PreviewProposta.module.css';
 
-function dataDocumento(): string {
+function dataDocumento(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }).format(new Date());
+    timeZone: 'America/Sao_Paulo',
+  }).format(new Date(iso));
 }
 
 export function PreviewProposta({
@@ -21,12 +22,14 @@ export function PreviewProposta({
   versao,
   status,
   sujo,
+  referenciaEm,
 }: {
   documento: DocumentoProposta;
   titulo: string;
   versao: number;
   status: StatusProposta;
   sujo: boolean;
+  referenciaEm: string;
 }) {
   const subtitulo = subtituloVisivel(titulo, documento.projeto.titulo);
 
@@ -82,7 +85,7 @@ export function PreviewProposta({
             <div>
               <span>Documento</span>
               <strong>V{versao.toString().padStart(2, '0')}</strong>
-              <small>{dataDocumento()}</small>
+              <small>{dataDocumento(referenciaEm)}</small>
             </div>
           </div>
         </header>
