@@ -8,6 +8,9 @@ const dependencias = vi.hoisted(() => ({
   adicionarMensagem: vi.fn(),
   enviarMensagem: vi.fn(),
   responderPendente: vi.fn(),
+  enviarAnexos: vi.fn(),
+  criarEnvio: vi.fn(),
+  cancelar: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -20,6 +23,15 @@ vi.mock('@/lib/consultor/criar', () => ({
 vi.mock('@/lib/consultor/invocar', () => ({
   enviarMensagem: dependencias.enviarMensagem,
   responderPendente: dependencias.responderPendente,
+}));
+vi.mock('@/lib/consultor/envio-anexos', () => ({
+  EnvioAnexos: class {
+    executar = dependencias.enviarAnexos;
+    cancelar = dependencias.cancelar;
+    constructor(...args: unknown[]) {
+      dependencias.criarEnvio(...args);
+    }
+  },
 }));
 
 import { Conversa } from './Conversa';
@@ -48,6 +60,12 @@ describe('Conversa integrada à Início', () => {
       mensagemId: 'mensagem-1',
       falha: null,
     });
+    dependencias.enviarAnexos.mockResolvedValue({
+      threadId: 'thread-1',
+      mensagemId: 'mensagem-1',
+      falha: null,
+    });
+    dependencias.cancelar.mockResolvedValue(true);
     dependencias.adicionarMensagem.mockResolvedValue({
       threadId: 'thread-1',
       mensagemId: 'mensagem-2',
@@ -149,9 +167,6 @@ describe('Conversa integrada à Início', () => {
       expect(screen.getByRole('status')).toHaveTextContent(
         'Preparando uma resposta com seus dados',
       );
-      expect(screen.getByRole('status')).toHaveTextContent(
-        'Você pode continuar aqui assim que eu terminar.',
-      );
     });
     act(() => {
       concluir({
@@ -176,9 +191,11 @@ describe('Conversa integrada à Início', () => {
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
 
     await waitFor(() => {
-      expect(dependencias.criarConversa).toHaveBeenCalledWith(
+      expect(dependencias.criarEnvio).toHaveBeenCalledWith(
         'O que esta imagem revela sobre o atendimento?',
         [imagem],
+        undefined,
+        expect.any(Function),
       );
     });
   });
@@ -196,7 +213,54 @@ describe('Conversa integrada à Início', () => {
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
 
     await waitFor(() => {
-      expect(dependencias.criarConversa).toHaveBeenCalledWith('', [audio]);
+      expect(dependencias.criarEnvio).toHaveBeenCalledWith(
+        '',
+        [audio],
+        undefined,
+        expect.any(Function),
+      );
     });
+  });
+
+  it('mostra o progresso no player, pausa e retoma a mesma tentativa', async () => {
+    dependencias.enviarAnexos.mockImplementationOnce(() => {
+      const progresso = dependencias.criarEnvio.mock.lastCall![3] as (estado: unknown) => void;
+      progresso({
+        arquivos: [{ percentual: 42, concluido: false }],
+        confirmando: false,
+      });
+      return Promise.resolve({ threadId: null, falha: 'Envio interrompido.' });
+    });
+    const { container } = render(<Conversa />);
+    fireEvent.change(container.querySelector('input[type="file"]')!, {
+      target: { files: [new File(['audio'], 'a.webm', { type: 'audio/webm' })] },
+    });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    expect(await screen.findByText('42%')).toBeVisible();
+    expect(screen.getByText('Envio pausado')).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('value', '42');
+    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(dependencias.responderPendente).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Retomar envio' }));
+    expect(await screen.findByText('Enviado')).toBeVisible();
+    expect(dependencias.criarEnvio).toHaveBeenCalledTimes(1);
+    expect(dependencias.enviarAnexos).toHaveBeenCalledTimes(2);
+    expect(dependencias.responderPendente).toHaveBeenCalledTimes(1);
+  });
+
+  it('permite recuperar o rascunho antes da confirmação, sem perder o áudio', async () => {
+    dependencias.enviarAnexos.mockResolvedValueOnce({
+      threadId: null,
+      falha: 'Envio interrompido.',
+    });
+    const { container } = render(<Conversa textoInicial="Minha dúvida" />);
+    fireEvent.change(container.querySelector('input[type="file"]')!, {
+      target: { files: [new File(['audio'], 'a.webm', { type: 'audio/webm' })] },
+    });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    fireEvent.click(await screen.findByRole('button', { name: 'Voltar à edição' }));
+    expect(await screen.findByText('Pronto para enviar')).toBeVisible();
+    expect(screen.getByRole('textbox')).toHaveValue('Minha dúvida');
+    expect(screen.getByRole('textbox')).toBeEnabled();
   });
 });

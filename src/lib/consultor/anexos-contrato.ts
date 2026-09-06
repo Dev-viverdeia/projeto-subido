@@ -11,6 +11,7 @@ export type AnexoDoConsultor = {
   tipoMime: string;
   tamanhoBytes: number;
   categoria: CategoriaAnexoSobral;
+  transcricao?: string | null;
 };
 
 const IMAGENS = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);

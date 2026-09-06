@@ -2,18 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { ArrowRight, ArrowUp, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, LoaderCircle, Mic, Paperclip, Square } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { responderPendente } from '@/lib/consultor/invocar';
 import { registrarEnvio } from '@/lib/consultor/registrar-envio';
-import {
-  categoriaDoAnexo,
-  SOBRAL_ACCEPT_ANEXOS,
-  tamanhoLegivel,
-  validarAnexosSobral,
-} from '@/lib/consultor/anexos-contrato';
-import { AnexoIcone } from './AnexoIcone';
-import { AudioMensagem } from './AudioMensagem';
+import { SOBRAL_ACCEPT_ANEXOS, validarAnexosSobral } from '@/lib/consultor/anexos-contrato';
+import { AnexosDaRodada } from './AnexosDaRodada';
+import { useEnvioAnexos } from './useEnvioAnexos';
 import { blocosDaResposta } from './resposta';
 import { useGravadorAudio } from './useGravadorAudio';
 import styles from './Conversa.module.css';
@@ -29,8 +24,8 @@ export type ExemploDoConsultor = {
 type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | null;
 
 function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
-  if (etapa === 'enviando') return 'Recebendo o material';
-  if (etapa === 'lendo') return 'Lendo o que você enviou';
+  if (etapa === 'enviando') return 'Enviando mensagem';
+  if (etapa === 'lendo') return 'Analisando seus arquivos';
   if (comArquivos) return 'Preparando a resposta com seus dados';
   return 'Preparando uma resposta com seus dados';
 }
@@ -66,7 +61,8 @@ export function Conversa({
   const [erro, setErro] = useState<string | null>(null);
   const [navegando, iniciarNavegacao] = useTransition();
 
-  const ocupado = etapa !== null || navegando;
+  const envioAnexos = useEnvioAnexos();
+  const ocupado = etapa !== null || navegando || envioAnexos.pausado;
 
   useEffect(() => {
     if (emVoo || respostaEmVoo || etapa) fimRef.current?.scrollIntoView({ block: 'end' });
@@ -166,15 +162,16 @@ export function Conversa({
     });
   }
 
-  async function enviar() {
-    const mensagem = texto.trim();
-    if ((!mensagem && arquivos.length === 0) || ocupado || gravando) return;
+  async function enviar(retomar = false) {
+    const mensagem = retomar ? (emVoo ?? '') : texto.trim();
+    const anexosDaRodada = retomar ? arquivosEmVoo : [...arquivos];
+    if ((!mensagem && anexosDaRodada.length === 0) || (!retomar && ocupado) || etapa || gravando)
+      return;
     if (!navigator.onLine) {
       setErro('Sem conexão. Sua mensagem continua aqui. Reconecte para enviar.');
       return;
     }
 
-    const anexosDaRodada = [...arquivos];
     setErro(null);
     setRespostaEmVoo(null);
     setEmVoo(mensagem || null);
@@ -184,13 +181,16 @@ export function Conversa({
     setEtapa('enviando');
 
     const nova = !threadEmUso;
-    const registro = await registrarEnvio(mensagem, anexosDaRodada, threadEmUso);
+    const registro =
+      anexosDaRodada.length > 0
+        ? await envioAnexos.enviar(mensagem, anexosDaRodada, threadEmUso)
+        : await registrarEnvio(mensagem, anexosDaRodada, threadEmUso);
     if (registro.falha || !registro.threadId) {
       setErro(registro.falha ?? 'Não foi possível enviar a mensagem.');
-      setEmVoo(null);
-      setArquivosEmVoo([]);
-      setTexto(mensagem);
-      setArquivos(anexosDaRodada);
+      if (anexosDaRodada.length === 0) {
+        setEmVoo(null);
+        setTexto(mensagem);
+      }
       setEtapa(null);
       return;
     }
@@ -200,29 +200,34 @@ export function Conversa({
     await responder(registro.threadId, anexosDaRodada.length > 0, nova);
   }
 
+  async function voltarAEdicao() {
+    if (!(await envioAnexos.cancelar())) return;
+    setTexto(emVoo ?? '');
+    setArquivos(arquivosEmVoo);
+    setEmVoo(null);
+    setArquivosEmVoo([]);
+    setErro(null);
+  }
+
   return (
-    <div className={styles.conversa}>
+    <div
+      className={styles.conversa}
+      data-conversa-ativa={
+        Boolean(emVoo !== null || arquivosEmVoo.length > 0 || respostaEmVoo !== null) || undefined
+      }
+    >
       <div ref={fimAncora} aria-hidden="true" />
 
-      {(emVoo !== null || etapa || respostaEmVoo !== null) && (
+      {(emVoo !== null || arquivosEmVoo.length > 0 || etapa || respostaEmVoo !== null) && (
         <div className={styles.rodadaEmVoo} ref={fimRef}>
           {arquivosEmVoo.length > 0 ? (
-            <div className={styles.anexosEmVoo} aria-label="Arquivos enviados">
-              {arquivosEmVoo.map((arquivo) =>
-                categoriaDoAnexo(arquivo.type) === 'audio' ? (
-                  <AudioMensagem
-                    key={`${arquivo.name}-${arquivo.size}`}
-                    arquivo={arquivo}
-                    estado="Enviando"
-                  />
-                ) : (
-                  <span className={styles.anexoEmVoo} key={`${arquivo.name}-${arquivo.size}`}>
-                    <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
-                    <span>{arquivo.name}</span>
-                  </span>
-                ),
-              )}
-            </div>
+            <AnexosDaRodada
+              arquivos={arquivosEmVoo}
+              progresso={envioAnexos.progresso}
+              estado={
+                envioAnexos.pausado ? 'pausado' : etapa === 'enviando' ? 'enviando' : 'enviado'
+              }
+            />
           ) : null}
           {emVoo !== null ? <p className={`${styles.balao} ${styles.doUsuario}`}>{emVoo}</p> : null}
           {etapa ? (
@@ -234,8 +239,11 @@ export function Conversa({
                 aria-hidden="true"
               />
               <span>
-                <strong>{descricaoDaEtapa(etapa, arquivosEmVoo.length > 0)}</strong>
-                <small>Você pode continuar aqui assim que eu terminar.</small>
+                <strong>
+                  {envioAnexos.progresso?.confirmando
+                    ? 'Confirmando envio'
+                    : descricaoDaEtapa(etapa, arquivosEmVoo.length > 0)}
+                </strong>
               </span>
               <i aria-hidden="true" />
             </div>
@@ -258,6 +266,18 @@ export function Conversa({
       {erro ? (
         <div className={styles.erro} role="alert">
           <span>{erro}</span>
+          {envioAnexos.pausado ? (
+            <>
+              <button type="button" onClick={() => void enviar(true)}>
+                Retomar envio
+              </button>
+              {!envioAnexos.progresso?.confirmando ? (
+                <button type="button" onClick={() => void voltarAEdicao()}>
+                  Voltar à edição
+                </button>
+              ) : null}
+            </>
+          ) : null}
           {threadPendente && threadEmUso ? (
             <button
               type="button"
@@ -280,38 +300,11 @@ export function Conversa({
         }}
       >
         {arquivos.length > 0 ? (
-          <div className={styles.arquivosSelecionados} aria-label="Arquivos prontos para enviar">
-            {arquivos.map((arquivo, indice) =>
-              categoriaDoAnexo(arquivo.type) === 'audio' ? (
-                <AudioMensagem
-                  key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}
-                  arquivo={arquivo}
-                  estado="Pronto para enviar"
-                  aoRemover={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
-                />
-              ) : (
-                <div
-                  className={styles.arquivoSelecionado}
-                  key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}
-                >
-                  <span className={styles.iconeArquivo} aria-hidden="true">
-                    <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
-                  </span>
-                  <span className={styles.dadosArquivo}>
-                    <strong>{arquivo.name}</strong>
-                    <small>{tamanhoLegivel(arquivo.size)}</small>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
-                    aria-label={`Remover ${arquivo.name}`}
-                  >
-                    <X size={14} aria-hidden="true" />
-                  </button>
-                </div>
-              ),
-            )}
-          </div>
+          <AnexosDaRodada
+            arquivos={arquivos}
+            estado="rascunho"
+            aoRemover={(indice) => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
+          />
         ) : null}
 
         <div className={styles.linhaCompositor}>
@@ -342,6 +335,8 @@ export function Conversa({
               ref={arquivoRef}
               className="sr-only"
               type="file"
+              aria-label="Selecionar arquivos para a conversa"
+              tabIndex={-1}
               multiple
               accept={SOBRAL_ACCEPT_ANEXOS}
               onChange={(evento) => {
@@ -395,7 +390,12 @@ export function Conversa({
         </div>
       </form>
 
-      {exemplos && exemplos.length > 0 && arquivos.length === 0 ? (
+      {exemplos &&
+      exemplos.length > 0 &&
+      arquivos.length === 0 &&
+      !arquivosEmVoo.length &&
+      emVoo === null &&
+      respostaEmVoo === null ? (
         <ul className={styles.chips} aria-label="Exemplos de perguntas">
           {exemplos.map((exemplo) => (
             <li key={exemplo.rotulo}>

@@ -117,6 +117,16 @@ export async function POST(request: Request) {
     const preparados = await prepararAnexosParaModelo(admin, anexosAtuais);
     let leitura;
     try {
+      // O áudio já foi lido. Uma falha posterior ao gerar a resposta não deve
+      // obrigar o usuário a transcrever (e aguardar) o mesmo material de novo.
+      for (const { id, texto } of preparados.transcricoes) {
+        const { error } = await admin
+          .from('consultor_anexos')
+          .update({ transcricao: texto.slice(0, 24000) })
+          .eq('id', id)
+          .eq('dono', user.id);
+        if (error) console.error('[sobral:anexos] falha ao persistir transcrição:', error.code);
+      }
       leitura = await produzirLeituraSobral({
         supabase,
         usuarioId: user.id,
@@ -141,16 +151,6 @@ export async function POST(request: Request) {
     if (erroResposta) throw erroResposta;
 
     if (anexosAtuais.length > 0) {
-      for (const { id, texto } of preparados.transcricoes) {
-        const { error: erroTranscricao } = await admin
-          .from('consultor_anexos')
-          .update({ transcricao: texto })
-          .eq('id', id)
-          .eq('dono', user.id);
-        if (erroTranscricao) {
-          console.error('[sobral:anexos] falha ao persistir transcrição:', erroTranscricao);
-        }
-      }
       if (leitura.rodada.direcao.memoria_anexos) {
         const { error: erroContexto } = await admin
           .from('consultor_mensagens')

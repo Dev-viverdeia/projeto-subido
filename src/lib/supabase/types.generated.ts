@@ -3402,6 +3402,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      sobral_confirmar_anexos: {
+        Args: { p_thread: string; p_mensagem: string; p_titulo: string; p_conteudo: string; p_anexos: Json }
+        Returns: string
+      }
       admin_sistema_conceder_pacote: {
         Args: {
           p_admin: string

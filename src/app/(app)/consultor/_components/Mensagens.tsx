@@ -71,14 +71,22 @@ export function Mensagens({
                   {m.anexos
                     .filter((anexo) => anexo.categoria === 'audio')
                     .map((anexo) => (
-                      <AudioMensagem
-                        key={anexo.id}
-                        src={
-                          modoPreview
-                            ? 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA'
-                            : `/api/consultor/anexos/${anexo.id}`
-                        }
-                      />
+                      <div key={anexo.id} className={styles.audioComTranscricao}>
+                        <AudioMensagem
+                          estado="Enviado"
+                          src={
+                            modoPreview
+                              ? 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA'
+                              : `/api/consultor/anexos/${anexo.id}`
+                          }
+                        />
+                        {anexo.transcricao ? (
+                          <details className={styles.transcricao}>
+                            <summary>Ver transcrição</summary>
+                            <p>{anexo.transcricao}</p>
+                          </details>
+                        ) : null}
+                      </div>
                     ))}
                 </div>
               ) : null}

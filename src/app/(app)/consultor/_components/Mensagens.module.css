@@ -9,6 +9,30 @@
   gap: var(--via-space-8);
 }
 
+.audioComTranscricao {
+  width: min(100%, 430px);
+}
+.transcricao {
+  padding: var(--via-space-2) var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+.transcricao summary {
+  cursor: pointer;
+  padding-block: var(--via-space-2);
+}
+.transcricao summary:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-control);
+  box-shadow: var(--app-ring);
+}
+.transcricao p {
+  margin: var(--via-space-2) 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: var(--via-lh-normal);
+}
+
 .doUsuario,
 .doConsultor {
   min-width: 0;
