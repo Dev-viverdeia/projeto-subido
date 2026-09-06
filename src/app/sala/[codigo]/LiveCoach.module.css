@@ -100,7 +100,7 @@
 
 .recomendacao {
   min-height: 0;
-  flex: 1;
+  flex: 1 0 auto;
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
