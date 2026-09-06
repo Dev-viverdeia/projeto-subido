@@ -63,6 +63,22 @@ test('erro e indisponibilidade não parecem campos normais', async ({ page }, in
   await page.screenshot({ path: info.outputPath('estados-dos-campos.png'), fullPage: true });
 });
 
+test('erro do seletor prevalece quando o CSS da library carrega depois', async ({ page }, info) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/preview/shell?tela=controles');
+  const campo = page.getByRole('button', { name: 'Etapa pendente', exact: true });
+  const bordaErro = await campo.evaluate((el) => getComputedStyle(el).borderColor);
+  // Reproduz a ordem de chunks que apagava o erro no hover, sem alterar a library.
+  await page.addStyleTag({ path: 'src/design-system/via/components/Select/Select.css' });
+  if (info.project.name === 'desktop') await campo.hover();
+  await expect(campo).toHaveCSS('border-color', bordaErro);
+  await campo.focus();
+  await expect(campo).toHaveCSS('border-color', bordaErro);
+  await campo.click();
+  await expect(campo).toHaveAttribute('aria-expanded', 'true');
+  await expect(campo).toHaveCSS('border-color', bordaErro);
+});
+
 test('o último botão fica totalmente acima do dock em páginas longas', async ({ page }, info) => {
   test.skip(info.project.name !== 'mobile');
   for (const tela of ['aula&estado=andamento', 'controles']) {

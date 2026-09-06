@@ -6,17 +6,17 @@
 .iniciar,
 .abrir {
   width: 100%;
-  min-height: 42px;
+  min-height: var(--app-h-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
   padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-white);
+  border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
-  background: var(--via-white);
-  color: var(--via-navy);
-  font: 650 var(--via-fs-xs) var(--via-font);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: var(--via-fw-semibold) var(--app-fs-ui) var(--via-font);
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
@@ -38,20 +38,20 @@
 .iniciar:not(:disabled):hover,
 .abrir:hover {
   transform: translateY(-2px);
-  border-color: var(--via-gray-200);
-  background: var(--via-gray-100);
+  border-color: var(--via-navy-deep);
+  background: var(--via-navy-deep);
 }
 
 .iniciar:focus-visible,
 .abrir:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy);
+  box-shadow: var(--app-ring);
 }
 
 .raiz p {
   margin: var(--via-space-2) 0 0;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: var(--via-fs-xs);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-meta);
   line-height: 1.45;
 }
 

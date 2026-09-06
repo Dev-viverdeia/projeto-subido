@@ -375,7 +375,7 @@
   gap: 5px;
 }
 .investimento .rotulo {
-  color: color-mix(in srgb, var(--via-accent) 58%, var(--via-white));
+  color: var(--via-gray-300);
 }
 .investimento > div:first-child > strong {
   margin-block: 4px;
@@ -384,7 +384,7 @@
 }
 .investimento > div:first-child > span {
   max-width: 46ch;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--via-gray-300);
   font-size: 0.53rem;
   line-height: 1.4;
 }
@@ -392,7 +392,7 @@
   text-align: right;
 }
 .investimento > div:last-child > span {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--via-gray-300);
   font: 0.48rem var(--via-font-mono);
   text-transform: uppercase;
 }
@@ -400,7 +400,7 @@
   font-size: 0.76rem;
 }
 .investimento small {
-  color: color-mix(in srgb, var(--via-accent) 58%, var(--via-white));
+  color: var(--via-gray-300);
   font-size: 0.5rem;
 }
 

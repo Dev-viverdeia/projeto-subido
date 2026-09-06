@@ -80,11 +80,11 @@ export function EditorProposta({
     : status === 'pronta'
       ? 'Quando você apresentar ao cliente, registre aqui para atualizar a venda.'
       : status === 'apresentada'
-        ? 'Registre a decisão do cliente. Ao aceitar, a plataforma cria o projeto e abre a execução.'
+        ? 'Confirme a decisão do cliente para preparar a entrega.'
         : status === 'aceita'
           ? execucaoId
-            ? 'O projeto está pronto com o escopo aprovado.'
-            : 'Venda confirmada. Crie o projeto para preparar a entrega.'
+            ? 'O escopo aprovado está na entrega.'
+            : 'Venda confirmada. Prepare a entrega com o escopo aprovado.'
           : status === 'recusada'
             ? 'A recusa foi registrada na venda. Crie outra versão somente se a negociação mudar.'
             : 'Altere o status conforme a proposta avançar com o cliente.';
@@ -147,6 +147,26 @@ export function EditorProposta({
           </form>
         </div>
       </header>
+
+      {status === 'aceita' && !sujo && (
+        <section
+          className={styles.continuidadeEntrega}
+          aria-label="Próximo passo da proposta aceita"
+        >
+          <span className={styles.iconeAceite}>
+            <Check size={20} aria-hidden="true" />
+          </span>
+          <div>
+            <strong>Proposta aceita</strong>
+            <p>
+              {execucaoId
+                ? 'Continue a implementação com o escopo aprovado.'
+                : 'Prepare o espaço de trabalho deste cliente.'}
+            </p>
+          </div>
+          <AcaoEntrega propostaId={id} execucaoId={execucaoId} />
+        </section>
+      )}
 
       {(estadoSalvar.erro || estadoStatus.erro) && (
         <RetornoOperacao
@@ -264,8 +284,7 @@ export function EditorProposta({
                 {status === 'apresentada' && (
                   <>
                     <p className={styles.automacaoEntrega}>
-                      A aprovação cria o projeto com o escopo desta proposta e abre o trabalho do
-                      cliente.
+                      O escopo aprovado vira seu roteiro de implementação.
                     </p>
                     <button
                       type="submit"
@@ -274,7 +293,7 @@ export function EditorProposta({
                       disabled={sujo || atualizandoStatus}
                       className={styles.avancar}
                     >
-                      Confirmar venda e abrir projeto
+                      Confirmar venda e abrir entrega
                     </button>
                     <button
                       type="submit"
@@ -299,13 +318,14 @@ export function EditorProposta({
                   </button>
                 )}
               </form>
-              {status === 'aceita' && <AcaoEntrega propostaId={id} execucaoId={execucaoId} />}
             </div>
           </section>
         </main>
 
         <aside
           className={styles.previewArea}
+          aria-label="Prévia da proposta com rolagem"
+          tabIndex={0}
           data-painel-ativo={painelAtivo === 'preview' || undefined}
         >
           <PreviewProposta

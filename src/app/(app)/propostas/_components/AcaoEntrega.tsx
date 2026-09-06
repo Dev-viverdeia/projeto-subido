@@ -39,7 +39,7 @@ export function AcaoEntrega({
           ) : (
             <FolderKanban size={16} aria-hidden="true" />
           )}
-          {pendente ? 'Criando projeto…' : 'Criar projeto'}
+          {pendente ? 'Preparando entrega…' : 'Preparar entrega'}
         </button>
       </form>
       {estado.erro && <p role="alert">{estado.erro}</p>}

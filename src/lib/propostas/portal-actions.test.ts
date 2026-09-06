@@ -37,8 +37,7 @@ describe('decisão pública da proposta', () => {
 
     expect(resultado).toMatchObject({
       status: 'aceita',
-      sucesso:
-        'Proposta aprovada. A entrega já está pronta e o responsável vai combinar o kickoff com você.',
+      sucesso: 'Proposta aprovada. O responsável vai combinar o início do projeto com você.',
     });
     expect(registrarDecisaoProposta).toHaveBeenCalledWith({
       codigo: CODIGO,

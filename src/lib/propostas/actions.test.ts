@@ -115,7 +115,7 @@ describe('mudarStatusProposta', () => {
     const resultado = await mudarStatusProposta({}, formulario('aceita'));
 
     expect(resultado).toMatchObject({
-      sucesso: 'Venda confirmada. Abra a entrega pelo botão abaixo.',
+      sucesso: 'Venda confirmada. Use Preparar entrega para continuar.',
       status: 'aceita',
     });
     expect(redirect).not.toHaveBeenCalled();

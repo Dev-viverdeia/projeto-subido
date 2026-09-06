@@ -69,8 +69,12 @@ const DOCUMENTO: DocumentoProposta = {
   observacoes: 'Mensalidades das ferramentas contratadas pela clínica não estão inclusas.',
 };
 
-export default function PreviewEditorPropostaPage() {
+export default async function PreviewEditorPropostaPage({
+  searchParams,
+}: PageProps<'/preview/proposta-editor'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const parametros = await searchParams;
+  const aceita = parametros.estado === 'aceita' || parametros.estado === 'recuperar';
 
   return (
     <div className={styles.shell}>
@@ -102,11 +106,13 @@ export default function PreviewEditorPropostaPage() {
           id="11111111-1111-4111-8111-111111111111"
           tituloInicial="Automação do atendimento da Clínica Aurora"
           documentoInicial={DOCUMENTO}
-          statusInicial="apresentada"
+          statusInicial={aceita ? 'aceita' : 'apresentada'}
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
           reuniaoId="33333333-3333-4333-8333-333333333333"
-          execucaoId={null}
+          execucaoId={
+            parametros.estado === 'aceita' ? '55555555-5555-4555-8555-555555555555' : null
+          }
           compartilhamentoInicial={{
             codigo: '44444444-4444-4444-8444-444444444444',
             ativo: true,

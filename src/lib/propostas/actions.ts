@@ -272,7 +272,7 @@ export async function mudarStatusProposta(
         `[propostas:iniciar-projeto] ${erroProjeto?.code ?? 'sem-dados'}: ${erroProjeto?.message ?? ''}`,
       );
       return {
-        sucesso: 'Venda confirmada. Abra a entrega pelo botão abaixo.',
+        sucesso: 'Venda confirmada. Use Preparar entrega para continuar.',
         versao: data.versao,
         status: data.status,
         compartilhamentoCodigo: data.compartilhamento_codigo,
