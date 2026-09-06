@@ -64,8 +64,9 @@ export async function validarFicha({ paginaHost, admin, teste, resultado, erroSe
       .single();
   const antes = await consulta();
   erroSe(antes.error, 'ler próxima ação antes da revisão');
-  if (antes.data.proxima_acao !== 'Realizar call de descoberta') {
-    throw new Error('A próxima ação mudou antes da revisão humana.');
+  // Encerrar a reunião cria a tarefa de revisão; ainda não aplica o plano da IA.
+  if (antes.data.proxima_acao !== 'Revisar resumo e próximos passos da call') {
+    throw new Error('A ficha precisa pedir revisão antes de aplicar o plano da reunião.');
   }
   const acao = 'QA: revisar o roteiro de atendimento enviado pela gerente antes da proposta.';
   await paginaHost.getByLabel('Próxima ação da venda').fill(acao);
@@ -94,4 +95,10 @@ export async function validarRecepcao({ paginaHost, paginaConvidado, esperar, et
   if (await paginaConvidado.getByRole('complementary', { name: 'Live Coach privado' }).count()) {
     throw new Error('O convidado não pode ver o coach privado.');
   }
+  // Ambos recebem o mesmo WAV. Após provar os dois canais, deixe só uma voz
+  // falando: duas cópias simultâneas tornam a transcrição artificialmente ilegível.
+  await paginaConvidado.locator('button[data-lk-source="microphone"]').click();
+  await paginaConvidado
+    .locator('button[data-lk-source="microphone"][data-lk-enabled="false"]')
+    .waitFor();
 }
