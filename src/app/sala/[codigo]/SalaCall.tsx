@@ -22,6 +22,7 @@ import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconex
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { LiveCoach } from './LiveCoach';
 import { RoteiroSala } from './RoteiroSala';
+import { EstadoFinalSala } from './EstadoFinalSala';
 import styles from './sala.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -279,6 +280,17 @@ export function SalaCall({
     );
   }
 
+  if (!callPodeAbrir(convite.status) || passouDaJanela) {
+    return (
+      <EstadoFinalSala
+        convite={convite}
+        anfitriao={anfitriao}
+        passouDaJanela={passouDaJanela}
+        horario={DATA.format(new Date(convite.agendadaPara))}
+      />
+    );
+  }
+
   return (
     <main className={styles.pagina}>
       <div className={styles.marca}>
@@ -362,15 +374,8 @@ export function SalaCall({
               preservados.
             </div>
           )}
-          {videoConfigurado && !salaAberta && callPodeAbrir(convite.status) && (
-            <div className={styles.aviso}>
-              {passouDaJanela
-                ? 'O horário terminou sem esta reunião ser concluída. Organize a pendência em Reuniões.'
-                : 'A sala abre 30 minutos antes do horário agendado.'}
-            </div>
-          )}
-          {!callPodeAbrir(convite.status) && (
-            <div className={styles.aviso}>Esta reunião já foi encerrada.</div>
+          {videoConfigurado && !salaAberta && (
+            <div className={styles.aviso}>A sala abre 30 minutos antes do horário agendado.</div>
           )}
           {erro && (
             <div className={styles.erro} role="alert">
