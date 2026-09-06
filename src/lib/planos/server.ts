@@ -12,18 +12,18 @@ export type AcessoRecurso =
   | { permitido: false; motivo: 'plano'; plano: PlanoSubido };
 
 /**
- * Autoriza no servidor usando apenas os claims assinados da sessão.
+ * Autoriza pelo usuário atual no Auth, não pelo plano de um JWT antigo.
  *
  * A interface pode esconder ou sinalizar um item, mas isso nunca substitui a
  * checagem no ponto que lê ou altera dados. A ausência de sessão também não
- * pode cair no fallback legado Pro de `planoDosMetadados`.
+ * pode liberar recursos pagos.
  */
 export async function obterAcessoRecurso(recurso: RecursoPlano): Promise<AcessoRecurso> {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims) return { permitido: false, motivo: 'sessao' };
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) return { permitido: false, motivo: 'sessao' };
 
-  const plano = planoDosMetadados(data.claims.app_metadata);
+  const plano = planoDosMetadados(data.user.app_metadata);
   return planoTemRecurso(plano, recurso)
     ? { permitido: true, plano }
     : { permitido: false, motivo: 'plano', plano };

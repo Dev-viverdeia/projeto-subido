@@ -62,9 +62,9 @@
 
 .intro {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
+  grid-template-columns: 1fr;
   align-items: end;
-  gap: clamp(32px, 7vw, 110px);
+  gap: var(--via-space-2);
   padding-inline: 4px;
 }
 
@@ -94,14 +94,13 @@
 }
 
 .intro h1 {
-  max-width: 16ch;
-  margin-top: var(--via-space-3);
+  margin-top: 0;
   color: var(--via-text-primary);
   font-family: var(--via-font-display);
-  font-size: clamp(2.5rem, 3.7vw, 3.75rem);
+  font-size: clamp(2rem, 3vw, 2.75rem);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h1);
-  line-height: 0.98;
+  line-height: var(--via-lh-tight);
   text-wrap: balance;
 }
 
@@ -132,7 +131,7 @@
   display: flex;
   align-items: center;
   gap: clamp(20px, 3vw, 34px);
-  padding: clamp(28px, 4.5vw, 54px);
+  padding: var(--via-space-6);
 }
 
 .iconeSaldo {
@@ -162,10 +161,10 @@
   margin-top: var(--via-space-2);
   color: var(--via-text-primary);
   font-family: var(--via-font-mono);
-  font-size: clamp(3.5rem, 7vw, 6.6rem);
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
   font-weight: var(--via-fw-regular);
   letter-spacing: var(--app-ls-hero);
-  line-height: 0.86;
+  line-height: var(--via-lh-tight);
   font-variant-numeric: tabular-nums;
 }
 
@@ -181,7 +180,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(28px, 4.5vw, 54px);
+  padding: var(--via-space-6);
   border-left: 1px solid var(--via-border-hairline);
   background: color-mix(in srgb, var(--via-bg-2) 62%, transparent);
   backdrop-filter: var(--via-blur-sm) saturate(130%);
@@ -192,9 +191,9 @@
 }
 
 .regraSaldo strong {
-  margin-top: var(--via-space-3);
+  margin-top: 0;
   color: var(--via-text-primary);
-  font-size: clamp(var(--via-fs-h4), 2.2vw, var(--via-fs-h3));
+  font-size: var(--via-fs-sm);
   font-weight: 540;
   letter-spacing: var(--app-ls-h4);
   line-height: var(--via-lh-snug);
@@ -206,6 +205,17 @@
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
+}
+
+.regraSaldo a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  margin-top: var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-xs);
+  text-decoration: none;
 }
 
 .secao {
@@ -222,7 +232,7 @@
   align-items: end;
   justify-content: space-between;
   gap: var(--via-space-6);
-  padding: clamp(22px, 3vw, 32px);
+  padding: var(--via-space-5);
   border-bottom: 1px solid var(--via-border-hairline);
 }
 
@@ -230,7 +240,7 @@
   margin-top: var(--via-space-2);
   color: var(--via-text-primary);
   font-family: var(--via-font-display);
-  font-size: clamp(var(--via-fs-h3), 2.5vw, 2rem);
+  font-size: var(--via-fs-h4);
   font-weight: 540;
   letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-tight);
@@ -416,7 +426,7 @@
 .uso {
   position: relative;
   min-width: 0;
-  min-height: 250px;
+  min-height: 190px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto 1fr;
@@ -460,10 +470,14 @@
 }
 
 .uso > svg {
+  position: absolute;
+  right: var(--via-space-4);
+  top: var(--via-space-5);
   color: var(--via-text-faint);
 }
 
 .custoUso {
+  padding-right: var(--via-space-5);
   text-align: right;
 }
 
@@ -751,20 +765,53 @@
   }
 
   .intro h1 {
-    font-size: clamp(2.25rem, 11vw, 3.2rem);
+    font-size: 2rem;
   }
 
   .saldoPrincipal {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    padding: var(--via-space-5);
   }
 
   .uso {
-    min-height: 220px;
+    min-height: 100px;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    padding: var(--via-space-4);
+    gap: var(--via-space-3);
   }
 
-  .detalheMovimento em,
-  .extrato time {
+  .uso > svg,
+  .textoUso p {
+    display: none;
+  }
+  .textoUso {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+  .textoUso h3 {
+    font-size: var(--via-fs-sm);
+  }
+  .textoUso em {
+    margin-top: var(--via-space-1);
+    font-family: var(--via-font);
+    font-size: var(--via-fs-xs);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  .custoUso {
+    grid-column: 3;
+    grid-row: 1;
+    padding: 0;
+    max-width: 90px;
+  }
+  .custoUso strong {
+    font-size: var(--via-fs-sm);
+  }
+
+  .detalheMovimento em {
     display: none;
   }
 

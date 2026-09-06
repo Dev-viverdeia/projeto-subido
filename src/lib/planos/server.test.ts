@@ -1,14 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getClaims, redirect } = vi.hoisted(() => ({
+const { getClaims, getUser, redirect } = vi.hoisted(() => ({
   getClaims: vi.fn(),
+  getUser: vi.fn(),
   redirect: vi.fn(),
 }));
 
 vi.mock('server-only', () => ({}));
 vi.mock('next/navigation', () => ({ redirect }));
 vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims } })),
+  createClient: vi.fn(() => Promise.resolve({ auth: { getClaims, getUser } })),
 }));
 
 import { exigirRecurso, obterAcessoRecurso } from './server';
@@ -16,13 +17,14 @@ import { exigirRecurso, obterAcessoRecurso } from './server';
 describe('autorização de recursos no servidor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getClaims.mockResolvedValue({ data: { claims: { app_metadata: { plano_subido: 'pro' } } } });
     redirect.mockImplementation((destino: string) => {
       throw new Error(`redirect:${destino}`);
     });
   });
 
   it('não transforma ausência de sessão no fallback legado Pro', async () => {
-    getClaims.mockResolvedValue({ data: null, error: null });
+    getUser.mockResolvedValue({ data: { user: null }, error: null });
 
     await expect(obterAcessoRecurso('modulo_comercial')).resolves.toEqual({
       permitido: false,
@@ -32,8 +34,8 @@ describe('autorização de recursos no servidor', () => {
   });
 
   it('mantém o Live Coach no Starter e bloqueia a operação comercial', async () => {
-    getClaims.mockResolvedValue({
-      data: { claims: { app_metadata: { plano_subido: 'starter' } } },
+    getUser.mockResolvedValue({
+      data: { user: { app_metadata: { plano_subido: 'starter' } } },
       error: null,
     });
 
@@ -51,13 +53,24 @@ describe('autorização de recursos no servidor', () => {
 
   it('libera a operação comercial no Pro', async () => {
     getClaims.mockResolvedValue({
-      data: { claims: { app_metadata: { plano_subido: 'pro' } } },
+      data: { claims: { app_metadata: { plano_subido: 'starter' } } },
+    });
+    getUser.mockResolvedValue({
+      data: { user: { app_metadata: { plano_subido: 'pro' } } },
       error: null,
     });
 
     await expect(obterAcessoRecurso('modulo_comercial')).resolves.toEqual({
       permitido: true,
       plano: 'pro',
+    });
+  });
+
+  it('nega acesso quando a consulta de autorização falha', async () => {
+    getUser.mockResolvedValue({ data: { user: null }, error: new Error('indisponível') });
+    await expect(obterAcessoRecurso('prospeccao')).resolves.toEqual({
+      permitido: false,
+      motivo: 'sessao',
     });
   });
 });

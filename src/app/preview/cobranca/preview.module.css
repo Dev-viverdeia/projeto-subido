@@ -1,0 +1,6 @@
+.preview {
+  display: grid;
+  gap: var(--via-space-6);
+  width: min(1120px, calc(100% - 40px));
+  margin: 40px auto;
+}

@@ -118,9 +118,10 @@ export async function agendarReuniao(
   }
 
   const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  if (!claims) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
-  const plano = planoDosMetadados(claims.claims.app_metadata);
+  const { data: sessao, error: erroSessao } = await supabase.auth.getUser();
+  if (erroSessao || !sessao.user)
+    return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+  const plano = planoDosMetadados(sessao.user.app_metadata);
   const comercialLiberado = planoTemRecurso(plano, 'modulo_comercial');
 
   if (comercialLiberado && !validacao.data.oportunidade) {
@@ -222,7 +223,7 @@ export async function agendarReuniao(
     } else {
       const resultado = await executarAlteracaoAgenda(supabase, {
         reuniaoId: reuniao.data.reuniao_id,
-        dono: claims.claims.sub,
+        dono: sessao.user.id,
         acao: 'sincronizar',
       });
       calendar = resultado.status === 'concluido' ? 'sincronizado' : 'falhou';

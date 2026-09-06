@@ -28,8 +28,20 @@ export function pacotePeloId(pacoteId: string | null | undefined) {
   return PACOTES_CREDITOS.find((pacote) => pacote.id === pacoteId) ?? null;
 }
 
-function precoApresentavel(preco: Stripe.Price | null): string | null {
-  if (!preco?.unit_amount || !preco.currency) return null;
+function precoApresentavel(preco: Stripe.Price, modalidade: 'mensal' | 'avulso'): string | null {
+  if (!preco.active || preco.unit_amount === null || preco.billing_scheme !== 'per_unit')
+    return null;
+  if (
+    modalidade === 'mensal' &&
+    (preco.type !== 'recurring' ||
+      preco.recurring?.interval !== 'month' ||
+      preco.recurring.interval_count !== 1 ||
+      preco.recurring.usage_type !== 'licensed')
+  )
+    return null;
+  if (modalidade === 'avulso' && preco.type !== 'one_time') return null;
+  // O catálogo comercial desta plataforma é em reais; não supor centavos para outras moedas.
+  if (preco.currency !== 'brl') return null;
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: preco.currency.toUpperCase(),
@@ -37,11 +49,17 @@ function precoApresentavel(preco: Stripe.Price | null): string | null {
   }).format(preco.unit_amount / 100);
 }
 
-async function buscarPreco(priceId: string | null): Promise<string | null> {
+export async function buscarPreco(
+  priceId: string | null,
+  modalidade: 'mensal' | 'avulso',
+): Promise<string | null> {
   const stripe = obterStripe();
   if (!stripe || !priceId) return null;
   try {
-    return precoApresentavel(await stripe.prices.retrieve(priceId));
+    return precoApresentavel(
+      await stripe.prices.retrieve(priceId, {}, { timeout: 8_000, maxNetworkRetries: 1 }),
+      modalidade,
+    );
   } catch (causa) {
     console.error('[billing:catalogo:preco]', causa instanceof Error ? causa.message : causa);
     return null;
@@ -59,15 +77,15 @@ export const obterCatalogoBilling = cache(async () => {
   }
 
   const [starter, pro, essencial, crescimento, escala] = await Promise.all([
-    buscarPreco(configuracao.planos.starter.priceId),
-    buscarPreco(configuracao.planos.pro.priceId),
-    buscarPreco(configuracao.pacotes.essencial),
-    buscarPreco(configuracao.pacotes.crescimento),
-    buscarPreco(configuracao.pacotes.escala),
+    buscarPreco(configuracao.planos.starter.priceId, 'mensal'),
+    buscarPreco(configuracao.planos.pro.priceId, 'mensal'),
+    buscarPreco(configuracao.pacotes.essencial, 'avulso'),
+    buscarPreco(configuracao.pacotes.crescimento, 'avulso'),
+    buscarPreco(configuracao.pacotes.escala, 'avulso'),
   ]);
 
   return {
-    pronto: true,
+    pronto: [starter, pro, essencial, crescimento, escala].some((preco) => preco !== null),
     planos: { starter, pro },
     pacotes: { essencial, crescimento, escala },
   } as const;

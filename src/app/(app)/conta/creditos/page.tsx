@@ -1,323 +1,37 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  Check,
-  CircleAlert,
-  Coins,
-  ContactRound,
-  LockKeyhole,
-  RotateCcw,
-  Search,
-  Users,
-} from 'lucide-react';
-import { comprarPacoteCreditos } from '@/lib/billing/actions';
 import { obterCatalogoBilling } from '@/lib/billing/catalogo';
-import { createClient } from '@/lib/supabase/server';
 import { obterCarteiraCreditos } from '@/lib/creditos/queries';
-import { apresentarMovimentoCredito, formatarMovimentoCredito } from '@/lib/creditos/modelo';
-import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
-import {
-  PACOTES_CREDITOS,
-  destinoDeUpgrade,
-  planoDosMetadados,
-  planoTemRecurso,
-} from '@/lib/planos/acessos';
-import { BotaoBilling } from '../assinatura/BotaoBilling';
+import { planoDosMetadados } from '@/lib/planos/acessos';
+import { createClient } from '@/lib/supabase/server';
+import { RetornoCheckout } from '../_components/RetornoCheckout';
+import { PainelCreditos } from './PainelCreditos';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Créditos' };
 
-const DATA_HORA = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: 'America/Sao_Paulo',
-});
-
 export default async function CreditosPage({ searchParams }: PageProps<'/conta/creditos'>) {
   const supabase = await createClient();
   const [{ data }, carteira, catalogo, parametros] = await Promise.all([
-    supabase.auth.getClaims(),
+    supabase.auth.getUser(),
     obterCarteiraCreditos(10),
     obterCatalogoBilling(),
     searchParams,
   ]);
-  const plano = planoDosMetadados(data?.claims?.app_metadata);
-  const prospeccaoLiberada = planoTemRecurso(plano, 'prospeccao');
-  const enriquecimentoLiberado = planoTemRecurso(plano, 'enriquecimento');
-
-  const usos = [
-    {
-      titulo: 'Encontrar empresas',
-      detalhe: '1 crédito por empresa encontrada. O que não for usado volta para o saldo.',
-      custo: '1',
-      unidade: 'por empresa',
-      href: prospeccaoLiberada ? '/prospeccao' : destinoDeUpgrade('prospeccao', '/prospeccao'),
-      bloqueado: !prospeccaoLiberada,
-      Icone: Search,
-    },
-    {
-      titulo: 'Enriquecer uma oportunidade',
-      detalhe: 'Reúne dados públicos e prepara perguntas para a conversa comercial.',
-      custo: String(CUSTO_ENRIQUECIMENTO_OPORTUNIDADE),
-      unidade: 'por análise',
-      href: enriquecimentoLiberado ? '/vendas' : destinoDeUpgrade('enriquecimento', '/vendas'),
-      bloqueado: !enriquecimentoLiberado,
-      Icone: ContactRound,
-    },
-    {
-      titulo: 'Participar de mentorias',
-      detalhe: 'Cada sessão informa o custo antes do check-in. Ao cancelar, o valor volta.',
-      custo: 'variável',
-      unidade: 'por sessão',
-      href: '/mentorias',
-      bloqueado: false,
-      Icone: Users,
-    },
-  ] as const;
-
+  const retorno = typeof parametros.checkout === 'string' ? parametros.checkout : undefined;
+  const sessao = typeof parametros.session_id === 'string' ? parametros.session_id : undefined;
   return (
     <div className={styles.pagina}>
-      <Link href="/conta" className={styles.voltar}>
-        <ArrowLeft size={16} strokeWidth={1.8} aria-hidden="true" />
-        Voltar para a conta
-      </Link>
-
-      <header className={styles.intro}>
-        <div>
-          <p className={styles.sobretitulo}>Créditos</p>
-          <h1>Um saldo para toda a operação.</h1>
-        </div>
-        <p>Veja quanto você tem, onde usar e o que entrou ou saiu da sua conta.</p>
-      </header>
-
-      {parametros.checkout ? (
-        <div
-          className={styles.avisoCheckout}
-          data-tom={parametros.checkout === 'sucesso' ? 'sucesso' : 'neutro'}
-          role="status"
-        >
-          {parametros.checkout === 'sucesso' ? (
-            <Check size={19} strokeWidth={2} aria-hidden="true" />
-          ) : (
-            <CircleAlert size={19} strokeWidth={1.8} aria-hidden="true" />
-          )}
-          <span>
-            <strong>
-              {parametros.checkout === 'sucesso'
-                ? 'Pagamento recebido.'
-                : parametros.checkout === 'cancelado'
-                  ? 'Nenhuma cobrança foi feita.'
-                  : 'Não foi possível abrir o pagamento.'}
-            </strong>
-            {parametros.checkout === 'sucesso'
-              ? 'Os créditos entram no saldo assim que a Stripe confirmar o pagamento.'
-              : parametros.checkout === 'cancelado'
-                ? 'Seu saldo continua igual.'
-                : 'Seu saldo não mudou. Tente novamente em alguns instantes.'}
-          </span>
-        </div>
-      ) : null}
-
-      <section className={styles.saldo} aria-labelledby="titulo-saldo">
-        <div className={styles.saldoPrincipal}>
-          <span className={styles.iconeSaldo} aria-hidden="true">
-            <Coins size={24} strokeWidth={1.6} />
-          </span>
-          <div>
-            <p id="titulo-saldo">Saldo disponível</p>
-            <strong>{carteira.saldo ?? '—'}</strong>
-            <small>créditos</small>
-          </div>
-        </div>
-        <div className={styles.regraSaldo}>
-          <p>Como funciona</p>
-          <strong>Você confirma o custo antes de cada uso.</strong>
-          <span>
-            Quando uma operação falha ou é cancelada dentro da regra, os créditos são devolvidos
-            automaticamente e aparecem no extrato.
-          </span>
-        </div>
-      </section>
-
-      <section className={styles.secao} aria-labelledby="titulo-usar-creditos">
-        <header className={styles.cabecalhoSecao}>
-          <div>
-            <p>Onde usar</p>
-            <h2 id="titulo-usar-creditos">Onde usar seus créditos</h2>
-          </div>
-          <span>O valor sempre aparece antes da confirmação.</span>
-        </header>
-
-        <div className={styles.usos}>
-          {usos.map(({ titulo, detalhe, custo, unidade, href, bloqueado, Icone }) => (
-            <Link
-              href={href}
-              className={styles.uso}
-              data-bloqueado={bloqueado || undefined}
-              key={titulo}
-            >
-              <span className={styles.iconeUso} aria-hidden="true">
-                {bloqueado ? (
-                  <LockKeyhole size={19} strokeWidth={1.7} />
-                ) : (
-                  <Icone size={19} strokeWidth={1.7} />
-                )}
-              </span>
-              <div className={styles.custoUso}>
-                <strong>{custo}</strong>
-                <small>{unidade}</small>
-              </div>
-              <div className={styles.textoUso}>
-                <h3>{titulo}</h3>
-                <p>{detalhe}</p>
-                {bloqueado ? <em>Disponível no plano Pro</em> : null}
-              </div>
-              <ArrowUpRight size={17} strokeWidth={1.8} aria-hidden="true" />
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.secao} aria-labelledby="titulo-extrato">
-        <header className={styles.cabecalhoSecao}>
-          <div>
-            <p>Extrato</p>
-            <h2 id="titulo-extrato">Movimentações recentes</h2>
-          </div>
-          <span>Os registros mais novos aparecem primeiro.</span>
-        </header>
-
-        {carteira.movimentos.length > 0 ? (
-          <ol className={styles.extrato}>
-            {carteira.movimentos.map((movimento) => {
-              const apresentacao = apresentarMovimentoCredito(movimento);
-              const conteudo = (
-                <>
-                  <span
-                    className={styles.iconeMovimento}
-                    data-categoria={apresentacao.categoria}
-                    aria-hidden="true"
-                  >
-                    {apresentacao.categoria === 'devolucao' ? (
-                      <RotateCcw size={17} strokeWidth={1.8} />
-                    ) : (
-                      <Coins size={17} strokeWidth={1.8} />
-                    )}
-                  </span>
-                  <span className={styles.detalheMovimento}>
-                    <span>
-                      <strong>{apresentacao.titulo}</strong>
-                      <em data-categoria={apresentacao.categoria}>
-                        {apresentacao.rotuloCategoria}
-                      </em>
-                    </span>
-                    <small>{movimento.descricao}</small>
-                  </span>
-                  <time dateTime={movimento.criado_em}>
-                    {DATA_HORA.format(new Date(movimento.criado_em))}
-                  </time>
-                  <span className={styles.valorMovimento} data-categoria={apresentacao.categoria}>
-                    <strong>{formatarMovimentoCredito(movimento.movimento)}</strong>
-                    <small>saldo {movimento.saldo_apos}</small>
-                  </span>
-                  {apresentacao.href ? (
-                    <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-                  ) : null}
-                </>
-              );
-
-              return (
-                <li key={movimento.id}>
-                  {apresentacao.href ? (
-                    <Link href={apresentacao.href}>{conteudo}</Link>
-                  ) : (
-                    <div>{conteudo}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <div className={styles.extratoVazio}>
-            <Coins size={20} strokeWidth={1.6} aria-hidden="true" />
-            <div>
-              <strong>Nenhuma movimentação por aqui ainda.</strong>
-              <p>Faça um check-in para criar o primeiro registro no seu extrato.</p>
-              <Link href="/mentorias">
-                Ver mentorias
-                <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className={styles.secao} aria-labelledby="titulo-pacotes">
-        <header className={styles.cabecalhoSecao}>
-          <div>
-            <p>Recarregar saldo</p>
-            <h2 id="titulo-pacotes">Pacotes de créditos</h2>
-          </div>
-          <span>O saldo não expira enquanto sua conta estiver ativa.</span>
-        </header>
-
-        {catalogo.pronto ? (
-          <div className={styles.pacotes}>
-            {PACOTES_CREDITOS.map((pacote, indice) => {
-              const preco = catalogo.pacotes[pacote.id];
-              if (!preco) return null;
-              return (
-                <article
-                  className={styles.pacote}
-                  data-destaque={indice === 1 || undefined}
-                  key={pacote.id}
-                >
-                  <div className={styles.numeroPacote}>
-                    <Coins size={18} strokeWidth={1.7} aria-hidden="true" />
-                    <strong>{pacote.creditos}</strong>
-                    <span>créditos</span>
-                  </div>
-                  <div className={styles.textoPacote}>
-                    <p>{indice === 1 ? 'Mais escolhido' : 'Pacote'}</p>
-                    <h3>{pacote.nome}</h3>
-                    <span>{pacote.descricao}</span>
-                  </div>
-                  <div className={styles.precoPacote}>
-                    <strong>{preco}</strong>
-                    <small>pagamento único</small>
-                  </div>
-                  <div className={styles.acaoPacote}>
-                    <form action={comprarPacoteCreditos}>
-                      <input type="hidden" name="pacote" value={pacote.id} />
-                      <BotaoBilling
-                        texto={`Comprar ${pacote.nome}`}
-                        processando="Abrindo pagamento..."
-                        variante={indice === 1 ? 'primario' : 'secundario'}
-                      />
-                    </form>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className={styles.pacotesAviso} role="status">
-            <span className={styles.iconeUso} aria-hidden="true">
-              <Coins size={19} strokeWidth={1.7} />
-            </span>
-            <div>
-              <strong>Pacotes adicionais ainda não estão disponíveis.</strong>
-              <p>
-                Seu saldo atual continua funcionando normalmente em todos os recursos liberados.
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
+      <RetornoCheckout
+        key={`${retorno}:${sessao}`}
+        retorno={retorno}
+        sessao={sessao}
+        tipo="creditos"
+      />
+      <PainelCreditos
+        plano={planoDosMetadados(data.user?.app_metadata)}
+        carteira={carteira}
+        catalogo={catalogo}
+      />
     </div>
   );
 }
