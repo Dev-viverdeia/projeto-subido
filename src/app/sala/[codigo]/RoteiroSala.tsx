@@ -37,16 +37,15 @@ export function RoteiroSala({
       : ROTEIRO_REUNIAO;
 
   return (
-    <ol>
-      {itens.map((item, indice) => (
+    <ul>
+      {itens.map((item) => (
         <li key={item.titulo}>
-          <span>{String(indice + 1).padStart(2, '0')}</span>
           <div>
             <strong>{item.titulo}</strong>
             <small>{item.apoio}</small>
           </div>
         </li>
       ))}
-    </ol>
+    </ul>
   );
 }

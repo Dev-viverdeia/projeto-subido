@@ -1,8 +1,8 @@
 .pagina {
   min-height: 100dvh;
   padding: var(--via-space-5);
-  background: var(--app-mesh-trilho);
-  color: var(--via-white);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
 }
 
 .pagina[data-encerrada] {
@@ -216,23 +216,22 @@
 }
 
 .marcaApoio {
-  color: var(--via-gray-400);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
 .cartao {
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(380px, 0.82fr);
   width: min(1120px, 100%);
-  min-height: 520px;
+  min-height: 0;
   margin: clamp(28px, 6vh, 64px) auto 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: clamp(22px, 3vw, 32px);
-  box-shadow: 0 34px 90px -44px rgba(0, 0, 0, 0.82);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-glass-card), var(--via-surface);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--via-glass-blur);
 }
 
 .contexto {
@@ -240,30 +239,25 @@
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: clamp(34px, 5vw, 58px);
+  justify-content: flex-start;
+  padding: clamp(24px, 4vw, 44px);
   overflow: hidden;
-  background:
-    linear-gradient(155deg, rgba(29, 91, 255, 0.19), transparent 46%),
-    color-mix(in srgb, var(--via-navy) 86%, var(--via-navy-deep));
+  background: var(--via-glass-card);
 }
 
 .sobretitulo {
   margin: 0;
-  color: var(--via-gray-300);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
 .contexto h1 {
   max-width: 680px;
   margin: var(--via-space-3) 0 0;
-  color: var(--via-white);
-  font-size: clamp(2.2rem, 4.2vw, 4rem);
-  font-weight: 540;
-  line-height: 0.98;
+  color: var(--via-text-primary);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-tight);
   letter-spacing: var(--app-ls-h1);
   text-wrap: balance;
 }
@@ -274,18 +268,18 @@
   align-items: center;
   gap: var(--via-space-2);
   margin-top: var(--via-space-5);
-  color: var(--via-gray-100);
+  color: var(--via-text-body);
   font-size: var(--via-fs-sm);
 }
 
 .horario svg {
-  color: var(--via-accent);
+  color: var(--via-navy);
 }
 
 .horario small {
   padding-left: var(--via-space-2);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--via-gray-300);
+  border-left: 1px solid var(--via-border-soft);
+  color: var(--via-text-muted);
 }
 
 .memoria {
@@ -295,17 +289,14 @@
 
 .memoria > p {
   margin: 0 0 var(--via-space-3);
-  color: var(--via-gray-400);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
-.memoria ol {
+.memoria ul {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--via-space-2);
+  grid-template-columns: 1fr;
+  gap: var(--via-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -316,15 +307,7 @@
   align-items: flex-start;
   gap: var(--via-space-2);
   padding-top: var(--via-space-2);
-  border-top: 1px solid rgba(255, 255, 255, 0.11);
-}
-
-.memoria li > span {
-  flex: 0 0 auto;
-  padding-top: 2px;
-  color: var(--via-gray-500);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  border-top: 1px solid var(--via-border-soft);
 }
 
 .memoria strong,
@@ -333,16 +316,16 @@
 }
 
 .memoria strong {
-  color: var(--via-white);
-  font-size: var(--via-fs-caption);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-sm);
   font-weight: var(--via-fw-medium);
 }
 
 .memoria small {
   max-width: 46ch;
   margin-top: var(--via-space-1);
-  color: var(--via-gray-400);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
   line-height: 1.45;
 }
 
@@ -350,7 +333,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: clamp(28px, 4vw, 46px);
+  padding: clamp(24px, 4vw, 40px);
+  border-left: 1px solid var(--via-border-soft);
   background: var(--via-surface);
   color: var(--via-text-primary);
 }
@@ -362,10 +346,8 @@
   gap: var(--via-space-3);
   padding-bottom: var(--via-space-3);
   border-bottom: 1px solid var(--via-border-soft);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   letter-spacing: var(--app-ls-micro);
-  text-transform: uppercase;
 }
 
 .estado span {
@@ -397,6 +379,16 @@
   font-weight: var(--via-fw-medium);
 }
 
+.cartao[data-convidado] .campo {
+  margin-top: var(--via-space-4);
+}
+.avisoConvidado {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  line-height: var(--via-lh-normal);
+}
+
 .campo input {
   min-height: 48px;
   padding: 0 var(--via-space-4);
@@ -405,6 +397,7 @@
   background: var(--via-surface);
   color: var(--via-text-primary);
   font: inherit;
+  font-size: var(--via-fs-body);
 }
 
 .campo input:focus-visible,
@@ -421,7 +414,7 @@
   gap: var(--via-space-3);
   margin-top: var(--via-space-4);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-loose);
   cursor: pointer;
 }
@@ -464,7 +457,7 @@
 
 .destinoDados span {
   margin-top: var(--via-space-1);
-  font-size: var(--via-fs-micro);
+  font-size: var(--via-fs-sm);
   line-height: var(--via-lh-normal);
 }
 
@@ -614,11 +607,16 @@
   justify-content: center;
   gap: var(--via-space-2);
   margin-top: var(--via-space-5);
-  color: var(--via-gray-500);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
+  .cartao,
+  .terminal,
+  .avisoMidia {
+    background: var(--via-surface);
+  }
   .saidaCartao {
     background: var(--via-navy);
   }
@@ -630,14 +628,55 @@
 }
 
 .salaAoVivo :global(.lk-room-container) {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
+.salaAoVivo :global(.lk-room-container) > :global(.lk-video-conference) {
+  flex: 1;
+  min-height: 0;
+}
+
+.avisoMidia {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex: 0 0 auto;
+  padding: var(--via-space-3) var(--via-space-4);
+  background: var(--via-glass-card), var(--via-surface);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+  border-bottom: 1px solid var(--via-border-soft);
+  backdrop-filter: var(--via-glass-blur);
+}
+
+.avisoMidia > svg {
+  flex-shrink: 0;
+}
+.avisoMidia button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  height: 44px;
+  margin-left: auto;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+  cursor: pointer;
+}
+.avisoMidia button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
 .experienciaAnfitriao {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(390px, 430px);
   width: 100%;
-  height: 100%;
   min-height: 0;
 }
 
@@ -669,10 +708,15 @@
   }
 
   .contexto {
-    min-height: 410px;
+    min-height: 0;
   }
 
-  .memoria ol {
+  .entrada {
+    border-top: 1px solid var(--via-border-soft);
+    border-left: 0;
+  }
+
+  .memoria ul {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -705,19 +749,23 @@
   }
 
   .contexto h1 {
-    font-size: clamp(2rem, 11vw, 2.8rem);
+    font-size: var(--via-fs-h2);
+  }
+
+  .cartao[data-convidado] .contexto h1 {
+    font-size: var(--via-fs-h3);
   }
 
   .horario {
     margin-top: var(--via-space-4);
-    font-size: var(--via-fs-xs);
+    font-size: var(--via-fs-sm);
   }
 
   .memoria {
     padding-top: var(--via-space-5);
   }
 
-  .memoria ol {
+  .memoria ul {
     gap: var(--via-space-2);
   }
 

@@ -13,6 +13,21 @@ const SUGESTAO: SugestaoLive = {
 };
 
 describe('CabineLiveCoach', () => {
+  it('não promete transcrição quando áudio e transcrição estão indisponíveis', () => {
+    render(
+      <CabineLiveCoach
+        ativo
+        estado="indisponivel"
+        sugestao={null}
+        fala="Aguardando"
+        gravacao="falhou"
+        falha="Verifique sua conexão."
+      />,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Verifique sua conexão.');
+    expect(screen.queryByText('Somente transcrição')).not.toBeInTheDocument();
+    expect(screen.getByText('Gravação indisponível')).toBeInTheDocument();
+  });
   it('prioriza uma recomendação e explica a memória gerada', () => {
     render(
       <CabineLiveCoach

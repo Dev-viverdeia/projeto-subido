@@ -51,6 +51,9 @@ test.describe('Quadro de vendas', () => {
         steps: 16,
       });
       await page.mouse.up();
+      // O dnd-kit mantém seu bloqueio de cliques por 50 ms após o drop.
+      // Aguarde a lib liberar os eventos antes de simular a próxima ação humana.
+      await page.waitForTimeout(60);
     }
 
     const dialogo = page.getByRole('dialog', { name: 'Registrar venda perdida' });

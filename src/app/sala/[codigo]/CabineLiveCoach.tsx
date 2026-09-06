@@ -32,8 +32,8 @@ const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
   gravando: 'Gravação protegida',
   processando: 'Salvando gravação',
   concluida: 'Gravação preservada',
-  falhou: 'Somente transcrição',
-  indisponivel: 'Somente transcrição',
+  falhou: 'Gravação indisponível',
+  indisponivel: 'Gravação indisponível',
 };
 
 export function CabineLiveCoach({
@@ -81,6 +81,12 @@ export function CabineLiveCoach({
           <LockKeyhole size={13} strokeWidth={1.8} aria-hidden="true" /> Só você vê
         </span>
       </header>
+
+      {falha && (
+        <p className={styles.alerta} role="alert">
+          {falha}
+        </p>
+      )}
 
       <section
         className={styles.recomendacao}
@@ -150,7 +156,6 @@ export function CabineLiveCoach({
           Última fala
         </div>
         <p className={parcial ? styles.falaParcial : undefined}>{fala}</p>
-        {falha && <small role="status">{falha}</small>}
       </section>
 
       <footer>
