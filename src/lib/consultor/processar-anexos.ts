@@ -38,19 +38,34 @@ export type AnexosPreparados = {
 export async function prepararAnexosParaModelo(
   admin: SupabaseClient<Database>,
   anexos: readonly AnexoPersistidoSobral[],
+  signal?: AbortSignal,
 ): Promise<AnexosPreparados> {
   if (anexos.length === 0) {
     return { entradas: [], transcricoes: [], limpar: () => Promise.resolve() };
   }
 
   const { OPENAI_API_KEY } = openAIEnv();
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 2, timeout: 90_000 });
+  const openai = new OpenAI({
+    apiKey: OPENAI_API_KEY,
+    maxRetries: signal ? 0 : 2,
+    timeout: 90_000,
+  });
   const idsTemporarios: string[] = [];
   const entradas: EntradaAnexoModelo[] = [];
   const transcricoes: Array<{ id: string; texto: string }> = [];
 
   try {
     for (const anexo of anexos) {
+      signal?.throwIfAborted();
+      if (anexo.categoria === 'audio' && anexo.transcricao?.trim()) {
+        entradas.push({
+          id: anexo.id,
+          nome: anexo.nome,
+          categoria: 'audio',
+          transcricao: anexo.transcricao,
+        });
+        continue;
+      }
       const { data, error } = await admin.storage
         .from(SOBRAL_BUCKET_ANEXOS)
         .download(anexo.caminhoStorage);
@@ -62,12 +77,15 @@ export async function prepararAnexosParaModelo(
         const texto =
           anexo.transcricao?.trim() ||
           (
-            await openai.audio.transcriptions.create({
-              file: arquivo,
-              model: 'gpt-transcribe',
-              language: 'pt',
-              response_format: 'json',
-            })
+            await openai.audio.transcriptions.create(
+              {
+                file: arquivo,
+                model: 'gpt-transcribe',
+                language: 'pt',
+                response_format: 'json',
+              },
+              { signal },
+            )
           ).text.trim();
 
         if (!texto) throw new Error('transcricao-vazia');
@@ -81,11 +99,14 @@ export async function prepararAnexosParaModelo(
         continue;
       }
 
-      const temporario = await openai.files.create({
-        file: arquivo,
-        purpose: 'user_data',
-        expires_after: { anchor: 'created_at', seconds: 3600 },
-      });
+      const temporario = await openai.files.create(
+        {
+          file: arquivo,
+          purpose: 'user_data',
+          expires_after: { anchor: 'created_at', seconds: 3600 },
+        },
+        { signal },
+      );
       idsTemporarios.push(temporario.id);
       entradas.push({
         id: anexo.id,
@@ -96,6 +117,7 @@ export async function prepararAnexosParaModelo(
     }
   } catch (causa) {
     await Promise.allSettled(idsTemporarios.map((id) => openai.files.delete(id)));
+    if (signal?.aborted) throw causa;
     if (causa instanceof OpenAI.AuthenticationError) {
       throw new ErroSobral('A chave do Sobral AI foi recusada.', 'sem-chave');
     }

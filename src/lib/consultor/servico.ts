@@ -49,16 +49,26 @@ export async function produzirLeituraSobral({
   historico,
   pedido,
   anexos,
+  fluxo,
 }: {
   supabase: SupabaseClient<Database>;
   usuarioId: string;
   historico: MensagemModelo[];
   pedido: string;
   anexos?: readonly EntradaAnexoModelo[];
+  fluxo?: Parameters<typeof gerarRodadaSobral>[0]['fluxo'];
 }): Promise<LeituraSobral> {
   const sinais = await obterSinaisSobral(supabase);
   const etapa = detectarEtapaSobral(sinais);
-  const rodada = await gerarRodadaSobral({ usuarioId, etapa, sinais, historico, pedido, anexos });
+  const rodada = await gerarRodadaSobral({
+    usuarioId,
+    etapa,
+    sinais,
+    historico,
+    pedido,
+    anexos,
+    fluxo,
+  });
   const geradoEm = new Date().toISOString();
 
   return {

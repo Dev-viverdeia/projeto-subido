@@ -166,47 +166,45 @@ export function TelaSobral({
           </div>
         </header>
 
-        <div className={`${styles.areaChat} ${vazio ? styles.areaVazia : ''}`}>
-          {vazio ? (
-            <div className={styles.boasVindas}>
-              {contextoInicial ? (
-                <p className={styles.eyebrow}>Tarefa de {contextoInicial.empresa}</p>
-              ) : (
-                <span className={styles.assinatura} aria-hidden="true">
-                  <IconeProduto nome="sobral" tamanho={32} />
-                </span>
-              )}
-              <h2>
-                {contextoInicial ? (
-                  contextoInicial.tarefa
-                ) : (
-                  <>
-                    {nome ? `${saudacao()}, ${nome}.` : 'Vamos ao que importa.'}
-                    <span>O que precisa avançar?</span>
-                  </>
-                )}
-              </h2>
-              <p className={styles.apoio}>
-                {contextoInicial
-                  ? 'O pedido já traz o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie.'
-                  : 'Cruzo o que já está na plataforma para recomendar uma ação concreta.'}
-              </p>
-            </div>
-          ) : (
-            <div className={styles.historico}>
-              <Mensagens mensagens={mensagens} modoPreview={modoPreview} />
-            </div>
-          )}
-
-          <div className={styles.compositor}>
-            <Conversa
-              threadId={conversa?.thread.id}
-              pendente={ultima?.papel === 'usuario'}
-              ultimaMensagemId={ultima?.id}
-              exemplos={vazio && !contextoInicial ? EXEMPLOS : undefined}
-              textoInicial={contextoInicial?.mensagem}
-            />
-          </div>
+        <div className={styles.areaChat}>
+          <Conversa
+            threadId={conversa?.thread.id}
+            pendente={ultima?.papel === 'usuario'}
+            ultimaMensagemId={ultima?.id}
+            exemplos={vazio && !contextoInicial ? EXEMPLOS : undefined}
+            textoInicial={contextoInicial?.mensagem}
+            historico={
+              !vazio ? <Mensagens mensagens={mensagens} modoPreview={modoPreview} /> : undefined
+            }
+            boasVindas={
+              vazio ? (
+                <div className={styles.boasVindas}>
+                  {contextoInicial ? (
+                    <p className={styles.eyebrow}>Tarefa de {contextoInicial.empresa}</p>
+                  ) : (
+                    <span className={styles.assinatura} aria-hidden="true">
+                      <IconeProduto nome="sobral" tamanho={32} />
+                    </span>
+                  )}
+                  <h2>
+                    {contextoInicial ? (
+                      contextoInicial.tarefa
+                    ) : (
+                      <>
+                        {nome ? `${saudacao()}, ${nome}.` : 'Vamos ao que importa.'}
+                        <span>O que precisa avançar?</span>
+                      </>
+                    )}
+                  </h2>
+                  <p className={styles.apoio}>
+                    {contextoInicial
+                      ? 'O pedido já traz o briefing, o combinado com o cliente e os critérios desta tarefa. Revise e envie.'
+                      : 'Cruzo o que já está na plataforma para recomendar uma ação concreta.'}
+                  </p>
+                </div>
+              ) : undefined
+            }
+          />
         </div>
       </section>
     </div>

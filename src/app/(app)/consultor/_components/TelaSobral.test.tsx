@@ -11,7 +11,12 @@ vi.mock('@/app/(app)/_components/HistoricoDropdown', () => ({
 }));
 
 vi.mock('./Conversa', () => ({
-  Conversa: () => <div data-testid="compositor" />,
+  Conversa: ({ historico, boasVindas }: { historico?: ReactNode; boasVindas?: ReactNode }) => (
+    <div data-testid="compositor">
+      {historico}
+      {boasVindas}
+    </div>
+  ),
 }));
 
 vi.mock('./ListaConversas', () => ({
