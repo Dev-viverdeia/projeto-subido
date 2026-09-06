@@ -15,7 +15,12 @@ import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
 import { chromium, webkit } from 'playwright';
 import { validarResilienciaAoVivo } from './lib/smoke-call-resiliencia.mjs';
-import { cookiesDaSessao, observarPagina } from './lib/smoke-call-sessao.mjs';
+import {
+  cookiesDaSessao,
+  observarPagina,
+  removerCenarioCall,
+  validarTranscricaoVisivel,
+} from './lib/smoke-call-sessao.mjs';
 
 const CONFIRMACAO = '--confirmar-producao';
 const executar = process.argv.includes(CONFIRMACAO);
@@ -269,21 +274,7 @@ async function exercitarSala({ email, password }) {
     navegadorConvidado: convidadoWebkit ? 'webkit' : 'chromium',
   });
 
-  try {
-    await paginaHost.waitForFunction(
-      () => !globalThis.document.body.innerText.includes('Aguardando a primeira fala'),
-      undefined,
-      { timeout: 70_000 },
-    );
-  } catch {
-    await paginaHost.screenshot({
-      path: '/private/tmp/subido-call-smoke-sem-transcricao.png',
-      fullPage: true,
-    });
-    throw new Error(
-      `A transcrição não apareceu. APIs: ${JSON.stringify(eventos)}. Tela: ${(await paginaHost.locator('body').innerText()).slice(0, 2_000)}`,
-    );
-  }
+  await validarTranscricaoVisivel({ paginaHost, eventos, esperar });
   await paginaHost.screenshot({ path: '/private/tmp/subido-call-smoke-host.png', fullPage: true });
   etapa('transcricao_ao_vivo_visivel');
 
@@ -393,8 +384,12 @@ async function validarPosCall(paginaHost) {
 
   await paginaHost.reload({ waitUntil: 'domcontentloaded' });
   await paginaHost
-    .getByRole('heading', { name: 'Resumo e pontos principais' })
+    .getByRole('heading', { name: 'O que ficou decidido', exact: true })
     .waitFor({ timeout: 30_000 });
+  await paginaHost
+    .getByText(resultado.analise.resumo, { exact: true })
+    .waitFor({ timeout: 30_000 });
+  await paginaHost.locator('summary').filter({ hasText: 'Análise completa' }).click();
   await paginaHost.getByText('Transcrição da reunião').waitFor({ timeout: 30_000 });
   await paginaHost.screenshot({
     path: '/private/tmp/subido-call-smoke-pos-call.png',
@@ -419,8 +414,7 @@ async function limpar() {
   await browserConvidado?.close().catch(() => null);
   await browser?.close().catch(() => null);
   if (teste.usuario && !manterConta) {
-    const exclusao = await admin.auth.admin.deleteUser(teste.usuario);
-    erroSe(exclusao.error, 'remover conta descartável');
+    await removerCenarioCall({ admin, teste, erroSe });
     etapa('conta_descartavel_removida');
   }
 }
@@ -435,7 +429,10 @@ try {
   falha = causa;
   console.error(causa);
 } finally {
-  await limpar().catch((causa) => console.error('Falha na limpeza:', causa));
+  await limpar().catch((causa) => {
+    falha ||= causa;
+    console.error('Falha na limpeza:', causa);
+  });
 }
 
 if (falha) process.exit(1);
