@@ -167,6 +167,16 @@
   color: var(--via-text-faint);
 }
 
+/* O foco pertence à moldura. O botão visível de limpar já está no componente. */
+.busca input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.busca input::-webkit-search-cancel-button {
+  display: none;
+}
+
 .busca button {
   display: grid;
   width: 28px;

@@ -14,6 +14,8 @@ export function AtualizarEnriquecimentos({ ativo }: { ativo: boolean }) {
         window.clearInterval(intervalo);
         return;
       }
+      // Não gastar rede/bateria atualizando uma aba oculta ou sem internet.
+      if (document.visibilityState !== 'visible' || !navigator.onLine) return;
       router.refresh();
     }, 8_000);
     return () => window.clearInterval(intervalo);

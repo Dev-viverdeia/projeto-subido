@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { ArrowRight, ArrowUp, LoaderCircle, Mic, Paperclip, Square, X } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { responderPendente } from '@/lib/consultor/invocar';
-import { adicionarMensagem, criarConversa } from '@/lib/consultor/criar';
+import { registrarEnvio } from '@/lib/consultor/registrar-envio';
 import {
   categoriaDoAnexo,
   SOBRAL_ACCEPT_ANEXOS,
@@ -169,6 +169,10 @@ export function Conversa({
   async function enviar() {
     const mensagem = texto.trim();
     if ((!mensagem && arquivos.length === 0) || ocupado || gravando) return;
+    if (!navigator.onLine) {
+      setErro('Sem conexão. Sua mensagem continua aqui. Reconecte para enviar.');
+      return;
+    }
 
     const anexosDaRodada = [...arquivos];
     setErro(null);
@@ -180,9 +184,7 @@ export function Conversa({
     setEtapa('enviando');
 
     const nova = !threadEmUso;
-    const registro = nova
-      ? await criarConversa(mensagem, anexosDaRodada)
-      : await adicionarMensagem(threadEmUso, mensagem, anexosDaRodada);
+    const registro = await registrarEnvio(mensagem, anexosDaRodada, threadEmUso);
     if (registro.falha || !registro.threadId) {
       setErro(registro.falha ?? 'Não foi possível enviar a mensagem.');
       setEmVoo(null);

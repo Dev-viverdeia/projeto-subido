@@ -220,7 +220,7 @@
     color var(--app-t-state);
 }
 
-.quantidade button:hover:not(:disabled) {
+.quantidade button:hover:not(:disabled):not([data-ativo='true']) {
   color: var(--via-text-primary);
 }
 
