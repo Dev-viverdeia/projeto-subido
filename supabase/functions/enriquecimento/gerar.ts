@@ -5,6 +5,7 @@ import { zodTextFormat } from 'npm:openai@7.4.0/helpers/zod';
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.110.9';
 import { DossieGerado, DossieGeradoOpenAI, type DossieGerado as Dossie } from './schema.ts';
 import { lerPaginaPublica, normalizarSite, type PaginaPublica } from './site.ts';
+import { avancar } from './persistencia.ts';
 
 const MODELO_ANTHROPIC = 'claude-sonnet-5';
 const MODELO_OPENAI = 'gpt-5.6-luna';
@@ -124,15 +125,11 @@ export async function gerarEGravar(
   supabase: SupabaseClient,
   enriquecimentoId: string,
   entrada: Entrada,
+  chave: string,
 ): Promise<void> {
   let etapa = 'iniciar';
   try {
-    const inicio = new Date().toISOString();
-    const { error: erroInicio } = await supabase
-      .from('crm_enriquecimentos')
-      .update({ status: 'processando', iniciado_em: inicio, erro: null })
-      .eq('id', enriquecimentoId);
-    if (erroInicio) throw erroInicio;
+    if (!(await avancar(supabase, enriquecimentoId, chave, 'ler_contexto'))) return;
 
     etapa = 'ler_contexto';
     const contexto = await lerContexto(supabase, entrada.oportunidade_id);
@@ -144,6 +141,7 @@ export async function gerarEGravar(
 
     let pagina: PaginaPublica | null = null;
     etapa = 'ler_site';
+    if (!(await avancar(supabase, enriquecimentoId, chave, 'ler_site'))) return;
     const site = normalizarSite(entrada.dominio);
     if (site) {
       try {
@@ -172,27 +170,19 @@ export async function gerarEGravar(
     }
 
     etapa = 'gerar_dossie';
+    if (!(await avancar(supabase, enriquecimentoId, chave, 'gerar_dossie'))) return;
     const geracao = await gerarDossieComTolerancia({ contexto, entrada, pagina });
     const completo: DossieCompleto = {
       ...geracao.dossie,
       inteligenciaContato: extrairInteligenciaContato(contexto),
     };
     const seguro = limitarUrls(completo, fontes);
-    const concluido = new Date().toISOString();
-
     etapa = 'gravar_resultado';
-    const { error } = await supabase
-      .from('crm_enriquecimentos')
-      .update({
-        status: 'concluido',
-        resultado: seguro,
-        fontes,
-        modelo: geracao.modelo,
-        concluido_em: concluido,
-        erro: null,
-      })
-      .eq('id', enriquecimentoId);
-    if (error) throw error;
+    await avancar(supabase, enriquecimentoId, chave, 'concluido', {
+      resultado: seguro,
+      fontes,
+      modelo: geracao.modelo,
+    });
   } catch (erro) {
     const tipo =
       erro && typeof erro === 'object' && 'code' in erro
@@ -202,11 +192,14 @@ export async function gerarEGravar(
           : 'desconhecido';
     console.error(`[enriquecimento] ${enriquecimentoId} (${etapa}/${tipo}):`, erro);
     const mensagem = mensagemSegura(erro);
-    const { error } = await supabase
-      .from('crm_enriquecimentos')
-      .update({ status: 'falhou', erro: mensagem, concluido_em: new Date().toISOString() })
-      .eq('id', enriquecimentoId);
-    if (error) console.error('[enriquecimento] falha ao gravar erro:', error);
+    try {
+      await avancar(supabase, enriquecimentoId, chave, 'falhou', undefined, mensagem);
+    } catch {
+      console.error(
+        '[enriquecimento] falha ao persistir; recuperação pelo watchdog:',
+        enriquecimentoId,
+      );
+    }
   }
 }
 

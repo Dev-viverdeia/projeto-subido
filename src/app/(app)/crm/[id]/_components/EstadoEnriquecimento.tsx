@@ -1,31 +1,27 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { Check, CircleAlert, Database, Globe2, Layers3, ScanSearch, X } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { CircleAlert } from 'lucide-react';
+import { Button } from '@/design-system/via';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
+import { ModalOperacao } from '../../../_components/ModalOperacao';
 import styles from './EstadoEnriquecimento.module.css';
 
-const TENTATIVAS = 60;
-const INTERVALO = 4000;
-const escutarMontagem = () => () => undefined;
-const obterMontagemCliente = () => true;
-const obterMontagemServidor = () => false;
 const ETAPAS = [
   {
     titulo: 'Reunindo o histórico',
-    descricao: 'Lendo os dados da empresa, do contato, das reuniões e da Prospecção.',
+    descricao: 'Lendo a ficha, as reuniões e os dados da Prospecção.',
   },
   {
-    titulo: 'Pesquisando a empresa',
-    descricao: 'Consultando o site e outras fontes públicas disponíveis.',
+    titulo: 'Consultando fontes públicas',
+    descricao: 'Pesquisando a empresa a partir dos dados salvos.',
   },
   {
-    titulo: 'Preparando sua próxima conversa',
-    descricao: 'Organizando fatos, projetos possíveis e perguntas personalizadas para a reunião.',
+    titulo: 'Preparando a conversa',
+    descricao: 'Organizando fatos e perguntas para sua próxima reunião.',
   },
 ] as const;
 
@@ -33,122 +29,93 @@ export function EstadoEnriquecimento({
   status,
   erro,
   acao,
+  etapa,
 }: {
   status: StatusEnriquecimento;
   erro: string | null;
   acao?: ReactNode;
+  etapa?: string | null;
 }) {
   const router = useRouter();
-  const montado = useSyncExternalStore(
-    escutarMontagem,
-    obterMontagemCliente,
-    obterMontagemServidor,
-  );
-  const [tentativas, setTentativas] = useState(0);
+  const [consultas, setConsultas] = useState(0);
   const [mostrarModal, setMostrarModal] = useState(true);
   const [mostrarFalha, setMostrarFalha] = useState(true);
   const ativo = status === 'na_fila' || status === 'processando';
+  const indice = etapa === 'gerar_dossie' ? 2 : etapa === 'ler_site' ? 1 : 0;
 
   useEffect(() => {
-    if (!ativo || tentativas >= TENTATIVAS) return;
-    const timer = setTimeout(() => {
-      setTentativas((numero) => numero + 1);
-      router.refresh();
-    }, INTERVALO);
-    return () => clearTimeout(timer);
-  }, [ativo, router, tentativas]);
+    if (!ativo) return;
+    const timer = window.setTimeout(
+      () => {
+        setConsultas((total) => total + 1);
+        if (document.visibilityState !== 'hidden') router.refresh();
+      },
+      consultas < 15 ? 4000 : 15000,
+    );
+    return () => window.clearTimeout(timer);
+  }, [ativo, router, consultas]);
 
   useEffect(() => {
-    if (!montado || status !== 'falhou' || !mostrarFalha) return;
-    const anterior = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = anterior;
+    if (!ativo) return;
+    const retomar = () => {
+      if (document.visibilityState === 'visible') router.refresh();
     };
-  }, [montado, mostrarFalha, status]);
+    document.addEventListener('visibilitychange', retomar);
+    return () => document.removeEventListener('visibilitychange', retomar);
+  }, [ativo, router]);
 
   if (status === 'falhou') {
+    const mensagem = `${erro ?? 'O processamento não foi concluído.'} Os ${CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos foram devolvidos.`;
     return (
       <>
         <section className={styles.falha} role="alert" aria-labelledby="pesquisa-falhou-titulo">
-          <span className={styles.iconeFalha}>
-            <ScanSearch size={21} strokeWidth={1.7} aria-hidden="true" />
+          <span className={styles.iconeFalha} aria-hidden="true">
+            <CircleAlert size={22} />
           </span>
           <div>
-            <p className={styles.sobretitulo}>Enriquecimento interrompido</p>
             <h2 id="pesquisa-falhou-titulo">Não foi possível atualizar a ficha.</h2>
-            <p>
-              {erro ?? 'O processamento não foi concluído.'} Os {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE}{' '}
-              créditos foram devolvidos automaticamente.
-            </p>
+            <p>{mensagem}</p>
           </div>
-          {acao && !mostrarFalha && <div className={styles.acaoFalha}>{acao}</div>}
+          {!mostrarFalha && acao && <div className={styles.acaoFalha}>{acao}</div>}
         </section>
-
-        {montado &&
-          mostrarFalha &&
-          createPortal(
-            <div className={styles.scrimFalha}>
-              <section
-                className={styles.dialogoFalha}
-                role="alertdialog"
-                aria-modal="true"
-                aria-labelledby="enriquecimento-erro-titulo"
-                aria-describedby="enriquecimento-erro-descricao"
-              >
-                <button
-                  type="button"
-                  className={styles.fecharFalha}
-                  onClick={() => setMostrarFalha(false)}
-                  aria-label="Fechar aviso"
-                >
-                  <X size={18} strokeWidth={1.8} aria-hidden="true" />
-                </button>
-                <span className={styles.iconeDialogoFalha} aria-hidden="true">
-                  <CircleAlert size={24} strokeWidth={1.7} />
-                </span>
-                <p className={styles.sobretitulo}>Enriquecimento interrompido</p>
-                <h2 id="enriquecimento-erro-titulo">A ficha não foi atualizada.</h2>
-                <p id="enriquecimento-erro-descricao">
-                  {erro ?? 'O processamento não foi concluído.'} Seu saldo já recebeu de volta os{' '}
-                  {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos.
-                </p>
-                <div className={styles.acoesDialogoFalha}>
-                  <button type="button" onClick={() => setMostrarFalha(false)}>
-                    Voltar para a ficha
-                  </button>
-                  {acao}
-                </div>
-              </section>
-            </div>,
-            document.body,
-          )}
+        <ModalOperacao
+          open={mostrarFalha}
+          onClose={() => setMostrarFalha(false)}
+          label="Enriquecimento interrompido"
+          title="A ficha não foi atualizada."
+          description={mensagem}
+          size="sm"
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setMostrarFalha(false)} data-autofocus>
+                Voltar para a ficha
+              </Button>
+              {acao}
+            </>
+          }
+        />
       </>
     );
   }
-
   if (!ativo) return null;
 
   return (
     <>
       <EsperaOperacao
-        key={status}
         aberto={mostrarModal}
         rotulo="Enriquecimento em andamento"
         titulo={status === 'na_fila' ? 'Preparando a pesquisa' : 'Atualizando a ficha do cliente'}
-        descricao="A plataforma está transformando os dados desta ficha em contexto para vender o projeto de IA."
+        descricao="Usando os dados da ficha para preparar sua próxima conversa."
         etapas={ETAPAS}
-        etapaInicial={status === 'processando' ? 1 : 0}
-        intervalo={18_000}
-        nota="Você pode acompanhar aqui ou continuar usando a ficha. O processamento segue no servidor."
-        mensagemDemora="A pesquisa está levando mais tempo que o normal, mas continua ativa no servidor."
-        demoraApos={24_000}
+        etapaAtual={indice}
+        nota="Você pode sair desta janela. A análise continua em segundo plano."
+        mensagemDemora="Ainda aguardando o resultado. Você pode continuar usando a ficha."
+        demoraApos={45000}
         acaoSecundaria={{
           rotulo: 'Continuar usando a ficha',
           aoAcionar: () => setMostrarModal(false),
         }}
       />
-
       <section
         className={styles.estado}
         aria-live="polite"
@@ -157,13 +124,8 @@ export function EstadoEnriquecimento({
         <div className={styles.cabecalho}>
           <div>
             <p className={styles.sobretitulo}>Enriquecimento em andamento</p>
-            <h2>
-              {status === 'na_fila' ? 'Preparando a pesquisa' : 'Atualizando a ficha do cliente'}
-            </h2>
-            <p>
-              Você pode continuar trabalhando. A ficha será atualizada quando os novos dados
-              estiverem prontos.
-            </p>
+            <h2>{status === 'na_fila' ? 'Pesquisa na fila' : ETAPAS[indice].titulo}</h2>
+            <p>A ficha será atualizada quando os dados estiverem prontos.</p>
           </div>
           <button
             type="button"
@@ -173,35 +135,6 @@ export function EstadoEnriquecimento({
             Ver andamento
           </button>
         </div>
-
-        <ol className={styles.mapa} aria-label="Etapas do enriquecimento">
-          <li data-estado="concluida">
-            <span>
-              <Check size={14} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Reunir histórico</strong>
-              <small>Vendas, Prospecção e reuniões</small>
-            </div>
-            <Database size={16} aria-hidden="true" />
-          </li>
-          <li data-estado={status === 'processando' ? 'concluida' : 'atual'}>
-            <span>{status === 'processando' ? <Check size={14} aria-hidden="true" /> : '02'}</span>
-            <div>
-              <strong>Consultar fontes</strong>
-              <small>Site e dados públicos</small>
-            </div>
-            <Globe2 size={16} aria-hidden="true" />
-          </li>
-          <li data-estado={status === 'processando' ? 'atual' : 'futura'}>
-            <span>03</span>
-            <div>
-              <strong>Preparar a conversa</strong>
-              <small>Fatos, projetos e perguntas</small>
-            </div>
-            <Layers3 size={16} aria-hidden="true" />
-          </li>
-        </ol>
       </section>
     </>
   );

@@ -12,12 +12,18 @@
 .painel {
   position: relative;
   width: min(620px, 100%);
-  overflow: hidden;
+  max-height: calc(100dvh - var(--via-space-6));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: var(--via-glass-ring);
   border-radius: var(--app-radius-surface);
-  background: var(--via-glass-card);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--via-white) 96%, transparent),
+    color-mix(in srgb, var(--via-surface) 96%, transparent)
+  );
   box-shadow: var(--via-glass-shadow-lift);
-  backdrop-filter: var(--via-glass-blur);
+  backdrop-filter: blur(24px) saturate(140%);
   animation: entrar var(--app-t-scene) backwards;
 }
 
@@ -221,7 +227,7 @@
 
 .rodape button {
   flex: 0 0 auto;
-  min-height: 34px;
+  min-height: 44px;
   padding: var(--via-space-2) var(--via-space-3);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
@@ -276,6 +282,7 @@
   }
 
   .painel {
+    max-height: 96dvh;
     border-radius: var(--app-radius-surface) var(--app-radius-surface) 0 0;
   }
 
@@ -300,6 +307,9 @@
   }
 
   .rodape {
+    position: sticky;
+    bottom: 0;
+    background: var(--via-surface);
     align-items: stretch;
     flex-direction: column;
     padding-inline: var(--via-space-4);

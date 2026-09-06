@@ -66,10 +66,14 @@ export function EsperaOperacao({
   useEffect(() => {
     if (!montado || !aberto) return;
     const anterior = document.body.style.overflow;
+    const focoAnterior =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => dialogo.current?.focus());
+    const quadro = requestAnimationFrame(() => dialogo.current?.focus());
     return () => {
+      cancelAnimationFrame(quadro);
       document.body.style.overflow = anterior;
+      if (focoAnterior?.isConnected) focoAnterior.focus();
     };
   }, [aberto, montado]);
 
@@ -108,8 +112,10 @@ export function EsperaOperacao({
         onKeyDown={(evento) => {
           if (evento.key === 'Tab') {
             evento.preventDefault();
-            dialogo.current?.focus();
+            const botao = dialogo.current?.querySelector<HTMLButtonElement>('button');
+            (botao ?? dialogo.current)?.focus();
           }
+          if (evento.key === 'Escape') acaoSecundaria?.aoAcionar();
         }}
       >
         <div className={styles.atmosfera} aria-hidden="true" />

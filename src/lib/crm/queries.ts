@@ -80,7 +80,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     supabase
       .from('crm_enriquecimentos')
       .select(
-        'id, status, dominio, linkedin_url, erro, solicitado_em, concluido_em, resultado, fontes',
+        'id, status, etapa, dominio, linkedin_url, erro, solicitado_em, concluido_em, resultado, fontes',
       )
       .eq('oportunidade_id', id)
       .order('solicitado_em', { ascending: false })
@@ -232,6 +232,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       : null,
     continuidadePosEntrega,
     enriquecimentos: (enriquecimentos.data ?? []).map((execucao) => ({
+      etapa: execucao.etapa,
       id: execucao.id,
       status: execucao.status,
       dominio: execucao.dominio,

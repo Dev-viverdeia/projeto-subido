@@ -31,6 +31,7 @@ export type EventoDossie = {
 };
 
 export type ExecucaoEnriquecimento = {
+  etapa?: string | null;
   id: string;
   status: StatusEnriquecimento;
   dominio: string | null;

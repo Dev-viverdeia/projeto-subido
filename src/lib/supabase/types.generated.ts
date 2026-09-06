@@ -1038,6 +1038,7 @@ export type Database = {
           dono: string
           empresa_id: string
           erro: string | null
+          etapa: string | null
           fontes: Json
           id: string
           iniciado_em: string | null
@@ -1057,6 +1058,7 @@ export type Database = {
           dono: string
           empresa_id: string
           erro?: string | null
+          etapa?: string | null
           fontes?: Json
           id?: string
           iniciado_em?: string | null
@@ -1076,6 +1078,7 @@ export type Database = {
           dono?: string
           empresa_id?: string
           erro?: string | null
+          etapa?: string | null
           fontes?: Json
           id?: string
           iniciado_em?: string | null
@@ -3582,6 +3585,22 @@ export type Database = {
           p_oportunidade: string
         }
         Returns: boolean
+      }
+      crm_worker_avancar: {
+        Args: {
+          p_chave: string
+          p_erro?: string
+          p_etapa: string
+          p_fontes?: Json
+          p_id: string
+          p_modelo?: string
+          p_resultado?: Json
+        }
+        Returns: boolean
+      }
+      crm_worker_iniciar: {
+        Args: { p_chave: string; p_oportunidade: string }
+        Returns: string
       }
       diagnostico_aplicar_proxima_acao: {
         Args: { p_diagnostico: string }

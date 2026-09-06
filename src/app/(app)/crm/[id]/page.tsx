@@ -83,7 +83,14 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
 
       <ResumoOperacionalLead lead={lead} />
 
-      {emAndamento && <EstadoEnriquecimento status={emAndamento.status} erro={null} />}
+      {emAndamento && (
+        <EstadoEnriquecimento
+          key={emAndamento.id}
+          status={emAndamento.status}
+          etapa={emAndamento.etapa}
+          erro={null}
+        />
+      )}
 
       {falhaRecente && (
         <EstadoEnriquecimento
