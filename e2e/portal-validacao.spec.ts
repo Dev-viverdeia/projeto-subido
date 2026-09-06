@@ -16,6 +16,8 @@ test.describe('portal de validação do cliente', () => {
 
     const posicaoEntrega = await entrega.boundingBox();
     expect(posicaoEntrega?.y ?? Number.POSITIVE_INFINITY).toBeLessThan(900);
+    const posicaoDecisao = await titulo.boundingBox();
+    expect(posicaoDecisao?.y ?? Number.POSITIVE_INFINITY).toBeLessThan(500);
 
     const medidas = await page.evaluate(() => ({
       largura: document.documentElement.scrollWidth,
@@ -43,10 +45,13 @@ test.describe('portal de validação do cliente', () => {
     await expect(page.getByRole('button', { name: 'Enviar ajuste' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Voltar' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Aprovar entrega' })).toHaveCount(0);
+    await comentario.fill('Inclua o fluxo de transferência para a recepção.');
 
     await page.getByRole('button', { name: 'Voltar' }).click();
     await expect(comentario).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Aprovar entrega' })).toBeVisible();
+    await page.getByRole('button', { name: 'Pedir ajuste' }).click();
+    await expect(comentario).toHaveValue('Inclua o fluxo de transferência para a recepção.');
   });
 
   test('mantém resultados disponíveis sem alongar o estado concluído', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { EventoProjetoExecucao, TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 
@@ -8,6 +8,7 @@ vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
 }));
 
 import { EntregaCliente } from './EntregaCliente';
+import { prepararEntregaCliente } from '@/lib/projetos-execucao/entrega-actions';
 
 const TAREFA: TarefaProjetoExecucao = {
   id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -43,6 +44,45 @@ const CONVITE: EventoProjetoExecucao = {
 };
 
 describe('EntregaCliente', () => {
+  it('salva o rascunho sem destinatário e preserva a mensagem após falha', async () => {
+    vi.mocked(prepararEntregaCliente).mockResolvedValue({ erro: 'Tente novamente.' });
+    render(
+      <EntregaCliente
+        projetoId="11111111-1111-4111-8111-111111111111"
+        tarefa={{ ...TAREFA, clienteStatus: 'nao_solicitada' }}
+        portalAtivo
+        clienteEmail={null}
+        notificacao={null}
+        lembrete={null}
+      />,
+    );
+    expect(screen.getByLabelText('E-mail que receberá a validação')).not.toBeRequired();
+    const campo = screen.getByLabelText('Mensagem para o cliente');
+    fireEvent.change(campo, { target: { value: 'Revise o material preparado.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar mensagem' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Envio não confirmado');
+    expect(campo).toHaveValue('Revise o material preparado.');
+  });
+
+  it('abre a configuração do portal, sem apontar para uma âncora invisível', () => {
+    const abrir = vi.fn();
+    render(
+      <EntregaCliente
+        projetoId="11111111-1111-4111-8111-111111111111"
+        tarefa={{ ...TAREFA, clienteStatus: 'nao_solicitada' }}
+        portalAtivo={false}
+        clienteEmail={null}
+        notificacao={null}
+        lembrete={null}
+        onAbrirPortal={abrir}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Ative o portal para enviar esta validação' }),
+    );
+    expect(abrir).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Enviar para validação' })).toBeDisabled();
+  });
   it('mostra o lembrete automático no mesmo bloco da notificação', () => {
     render(
       <EntregaCliente

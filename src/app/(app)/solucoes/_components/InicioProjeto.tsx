@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
 import {
   ArrowRight,
   CalendarDays,
@@ -12,13 +11,12 @@ import {
   Save,
   Video,
 } from 'lucide-react';
-import { definirPrazoProjeto, type EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
+import { definirPrazoProjeto } from '@/lib/projetos-execucao/actions';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { formatarReais } from '@/lib/propostas/schema';
 import styles from './InicioProjeto.module.css';
-
-const ESTADO_INICIAL: EstadoProjetoExecucao = {};
 
 const DATA_HORA = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -50,10 +48,13 @@ export function InicioProjeto({
   primeiraTarefa: string | null;
   onComecar: () => void;
 }) {
-  const [estadoPrazo, definirPrazo, salvandoPrazo] = useActionState(
-    definirPrazoProjeto,
-    ESTADO_INICIAL,
-  );
+  const {
+    estado: estadoPrazo,
+    enviar: definirPrazo,
+    editar,
+    pendente: salvandoPrazo,
+    bloqueado,
+  } = useFormularioEntrega(definirPrazoProjeto);
   const kickoff = projeto.kickoff;
   const kickoffPodeAbrir = kickoff ? callPodeAbrir(kickoff.status) : false;
   const kickoffPronto = Boolean(
@@ -212,7 +213,12 @@ export function InicioProjeto({
                 Completar acordo <ArrowRight size={15} aria-hidden="true" />
               </a>
             ) : etapaAtual === 'prazo' ? (
-              <form action={definirPrazo} className={styles.formPrazo}>
+              <form
+                onSubmit={definirPrazo}
+                onChange={editar}
+                aria-busy={salvandoPrazo || undefined}
+                className={styles.formPrazo}
+              >
                 <input type="hidden" name="projeto" value={projeto.id} />
                 <input
                   type="date"
@@ -221,7 +227,7 @@ export function InicioProjeto({
                   aria-label="Prazo da entrega"
                   required
                 />
-                <button type="submit" disabled={salvandoPrazo}>
+                <button type="submit" disabled={bloqueado}>
                   <Save size={14} aria-hidden="true" />
                   {salvandoPrazo ? 'Salvando…' : 'Salvar prazo'}
                 </button>

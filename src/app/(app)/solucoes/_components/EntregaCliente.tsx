@@ -18,6 +18,8 @@ import {
   reenviarNotificacaoEntregaCliente,
 } from '@/lib/projetos-execucao/entrega-actions';
 import type { EstadoProjetoExecucao } from '@/lib/projetos-execucao/actions';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
+import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import type { EventoProjetoExecucao, TarefaProjetoExecucao } from '@/lib/projetos-execucao/queries';
 import { ROTULO_STATUS_CLIENTE } from '@/lib/projetos-execucao/status';
 import { montarGuiaValidacaoTarefa } from '@/lib/projetos-execucao/validacao-tarefa';
@@ -34,6 +36,7 @@ export function EntregaCliente({
   lembrete,
   aceiteFinal = false,
   encerramentoPronto = true,
+  onAbrirPortal,
 }: {
   projetoId: string;
   tarefa: TarefaProjetoExecucao;
@@ -43,8 +46,10 @@ export function EntregaCliente({
   lembrete: EventoProjetoExecucao | null;
   aceiteFinal?: boolean;
   encerramentoPronto?: boolean;
+  onAbrirPortal?: () => void;
 }) {
-  const [estado, acao, pendente] = useActionState(prepararEntregaCliente, INICIAL);
+  const { estado, enviar, editar, pendente, bloqueado, operacao } =
+    useFormularioEntrega(prepararEntregaCliente);
   const [estadoReenvio, reenviar, reenviando] = useActionState(
     reenviarNotificacaoEntregaCliente,
     INICIAL,
@@ -117,7 +122,7 @@ export function EntregaCliente({
           )}
         </div>
       ) : (
-        <form action={acao}>
+        <form onSubmit={enviar} onChange={editar} aria-busy={pendente || undefined}>
           <input type="hidden" name="projeto" value={projetoId} />
           <input type="hidden" name="tarefa" value={tarefa.id} />
           <section className={styles.criterioCliente} aria-label="Critério enviado ao cliente">
@@ -133,7 +138,7 @@ export function EntregaCliente({
               defaultValue={clienteEmail ?? ''}
               maxLength={320}
               autoComplete="email"
-              required={concluida}
+              disabled={pendente}
               placeholder="cliente@empresa.com.br"
             />
           </label>
@@ -143,6 +148,7 @@ export function EntregaCliente({
               name="nota"
               defaultValue={tarefa.clienteNota ?? guiaValidacao.mensagemCliente}
               maxLength={4000}
+              disabled={pendente}
               placeholder={
                 aceiteFinal
                   ? 'Resuma o resultado entregue, os materiais finais e como a operação continua.'
@@ -157,6 +163,7 @@ export function EntregaCliente({
               name="url"
               defaultValue={tarefa.entregavelUrl ?? ''}
               maxLength={2048}
+              disabled={pendente}
               placeholder="https://"
             />
           </label>
@@ -168,14 +175,21 @@ export function EntregaCliente({
           </p>
 
           {!portalAtivo && concluida && (
-            <a className={styles.portalPendente} href="#portal-cliente">
+            <button
+              type="button"
+              className={styles.portalPendente}
+              onClick={onAbrirPortal}
+              disabled={!onAbrirPortal}
+            >
               Ative o portal para enviar esta validação
               <ArrowRight size={14} aria-hidden="true" />
-            </a>
+            </button>
           )}
 
-          {estado.erro && <p role="alert">{estado.erro}</p>}
-          {estado.sucesso && <p role="status">{estado.sucesso}</p>}
+          {estado.erro && (
+            <RetornoOperacao tom="erro" titulo="Envio não confirmado" descricao={estado.erro} />
+          )}
+          {estado.sucesso && <RetornoOperacao tom="sucesso" titulo={estado.sucesso} />}
           {estado.aviso && (
             <p className={styles.aviso} role="alert">
               {estado.aviso}
@@ -183,19 +197,19 @@ export function EntregaCliente({
           )}
 
           <div className={styles.acoes}>
-            <button type="submit" name="operacao" value="salvar" disabled={pendente}>
-              {pendente ? 'Salvando…' : 'Salvar mensagem'}
+            <button type="submit" name="operacao" value="salvar" disabled={bloqueado}>
+              {pendente && operacao === 'salvar' ? 'Salvando…' : 'Salvar mensagem'}
             </button>
             {concluida ? (
               <button
                 type="submit"
                 name="operacao"
                 value="solicitar"
-                disabled={pendente || !portalAtivo || (aceiteFinal && !encerramentoPronto)}
+                disabled={bloqueado || !portalAtivo || (aceiteFinal && !encerramentoPronto)}
                 className={styles.enviar}
               >
                 <Send size={14} aria-hidden="true" />{' '}
-                {pendente
+                {pendente && operacao === 'solicitar'
                   ? 'Enviando…'
                   : aceiteFinal
                     ? encerramentoPronto

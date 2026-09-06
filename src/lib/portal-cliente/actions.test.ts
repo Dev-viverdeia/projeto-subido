@@ -102,12 +102,13 @@ describe('decidirEntregaCliente', () => {
     });
   });
 
-  it('confirma o encerramento quando o aceite é o último do projeto', async () => {
+  it('não usa o campo oculto final como prova de encerramento do projeto', async () => {
     registrarDecisaoCliente.mockResolvedValue({ decidiu: true, notificacao: 'enviada' });
 
     const resultado = await decidirEntregaCliente({}, formulario('aprovada', '', true));
 
-    expect(resultado.sucesso).toMatch(/projeto foi encerrado/i);
+    expect(resultado.sucesso).toMatch(/Entrega aprovada/i);
+    expect(resultado.sucesso).not.toMatch(/encerrado|garantia/i);
   });
 
   it('preserva a decisão quando o aviso por e-mail falha', async () => {

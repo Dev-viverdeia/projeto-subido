@@ -1,29 +1,32 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import { ArrowUpRight, Check, FileCheck2, MessageSquareMore } from 'lucide-react';
-import { decidirEntregaCliente, type EstadoPortalCliente } from '@/lib/portal-cliente/actions';
-import type { TarefaPortalCliente } from '@/lib/portal-cliente/servico';
+import { useState } from 'react';
+import { ArrowUpRight, Check, Download, FileCheck2, MessageSquareMore } from 'lucide-react';
+import { decidirEntregaCliente } from '@/lib/portal-cliente/actions';
+import type { ArquivoPortalCliente, TarefaPortalCliente } from '@/lib/portal-cliente/servico';
+import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
+import { RetornoOperacao } from '@/app/(app)/_components/RetornoOperacao';
 import type { EncerramentoProjeto } from '@/lib/projetos-execucao/encerramento';
 import { TermoEncerramentoPortal } from './TermoEncerramentoPortal';
 import styles from './AprovacaoCliente.module.css';
-
-const INICIAL: EstadoPortalCliente = {};
 
 export function AprovacaoCliente({
   codigo,
   tarefa,
   aceiteFinal = false,
   encerramento,
+  arquivos = [],
 }: {
   codigo: string;
   tarefa: TarefaPortalCliente;
   aceiteFinal?: boolean;
   encerramento?: EncerramentoProjeto | null;
+  arquivos?: ArquivoPortalCliente[];
 }) {
-  const [estado, acao, pendente] = useActionState(decidirEntregaCliente, INICIAL);
+  const { estado, enviar, editar, pendente, bloqueado, operacao } =
+    useFormularioEntrega(decidirEntregaCliente);
   const [modoAjuste, setModoAjuste] = useState(false);
-  const [envio, setEnvio] = useState<'ajuste' | 'aprovacao' | null>(null);
+  const [comentario, setComentario] = useState('');
 
   return (
     <article className={styles.aprovacao} data-final={aceiteFinal || undefined}>
@@ -62,10 +65,29 @@ export function AprovacaoCliente({
               Abrir entrega <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           )}
+          {arquivos.length > 0 && (
+            <ul className={styles.arquivos} aria-label="Arquivos desta entrega">
+              {arquivos.map((arquivo) => (
+                <li key={arquivo.id}>
+                  <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
+                    <Download size={17} aria-hidden="true" />
+                    <span>
+                      {arquivo.titulo} <small>Versão {arquivo.versao}</small>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
           {aceiteFinal && <small>Esta aprovação confirma o recebimento e conclui o projeto.</small>}
         </div>
 
-        <form action={acao} data-ajuste={modoAjuste || undefined}>
+        <form
+          onSubmit={enviar}
+          onChange={editar}
+          aria-busy={pendente || undefined}
+          data-ajuste={modoAjuste || undefined}
+        >
           <input type="hidden" name="codigo" value={codigo} />
           <input type="hidden" name="tarefa" value={tarefa.id} />
           <input type="hidden" name="final" value={aceiteFinal ? 'sim' : 'nao'} />
@@ -75,6 +97,10 @@ export function AprovacaoCliente({
               <span>O que precisa mudar?</span>
               <textarea
                 name="comentario"
+                value={comentario}
+                onChange={(evento) => setComentario(evento.target.value)}
+                disabled={pendente}
+                minLength={5}
                 maxLength={2000}
                 placeholder="Descreva o ajuste para a equipe."
                 required
@@ -83,60 +109,62 @@ export function AprovacaoCliente({
             </label>
           ) : null}
 
-          {estado.erro && <p role="alert">{estado.erro}</p>}
-          {estado.sucesso && <p role="status">{estado.sucesso}</p>}
+          {estado.erro && (
+            <RetornoOperacao tom="erro" titulo="Resposta não confirmada" descricao={estado.erro} />
+          )}
+          {estado.sucesso && <RetornoOperacao tom="sucesso" titulo={estado.sucesso} />}
           {estado.aviso && (
             <p className={styles.avisoAcao} role="status">
               {estado.aviso}
             </p>
           )}
 
-          <div className={styles.aprovacaoAcoes}>
-            {modoAjuste ? (
-              <>
-                <button type="button" onClick={() => setModoAjuste(false)} disabled={pendente}>
-                  Voltar
-                </button>
-                <button
-                  type="submit"
-                  name="decisao"
-                  value="ajustes"
-                  className={styles.enviarAjuste}
-                  disabled={pendente}
-                  onClick={() => setEnvio('ajuste')}
-                >
-                  <MessageSquareMore size={15} aria-hidden="true" />
-                  {pendente && envio === 'ajuste' ? 'Enviando…' : 'Enviar ajuste'}
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  aria-expanded={modoAjuste}
-                  onClick={() => setModoAjuste(true)}
-                  disabled={pendente}
-                >
-                  <MessageSquareMore size={15} aria-hidden="true" /> Pedir ajuste
-                </button>
-                <button
-                  type="submit"
-                  name="decisao"
-                  value="aprovada"
-                  className={styles.aprovar}
-                  disabled={pendente}
-                  onClick={() => setEnvio('aprovacao')}
-                >
-                  <Check size={16} aria-hidden="true" />{' '}
-                  {pendente && envio === 'aprovacao'
-                    ? 'Aprovando…'
-                    : aceiteFinal
-                      ? 'Aprovar e concluir'
-                      : 'Aprovar entrega'}
-                </button>
-              </>
-            )}
-          </div>
+          {!estado.sucesso && (
+            <div className={styles.aprovacaoAcoes}>
+              {modoAjuste ? (
+                <>
+                  <button type="button" onClick={() => setModoAjuste(false)} disabled={bloqueado}>
+                    Voltar
+                  </button>
+                  <button
+                    type="submit"
+                    name="decisao"
+                    value="ajustes"
+                    className={styles.enviarAjuste}
+                    disabled={bloqueado}
+                  >
+                    <MessageSquareMore size={15} aria-hidden="true" />
+                    {pendente && operacao === 'ajustes' ? 'Enviando…' : 'Enviar ajuste'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    aria-expanded={modoAjuste}
+                    onClick={() => setModoAjuste(true)}
+                    disabled={bloqueado}
+                  >
+                    <MessageSquareMore size={15} aria-hidden="true" /> Pedir ajuste
+                  </button>
+                  <button
+                    type="submit"
+                    name="decisao"
+                    value="aprovada"
+                    className={styles.aprovar}
+                    disabled={bloqueado}
+                  >
+                    <Check size={16} aria-hidden="true" />{' '}
+                    {pendente && operacao === 'aprovada'
+                      ? 'Aprovando…'
+                      : aceiteFinal
+                        ? 'Aprovar e concluir'
+                        : 'Aprovar entrega'}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </form>
       </div>
     </article>

@@ -55,7 +55,7 @@
 }
 
 .heroTexto {
-  padding: clamp(28px, 4vw, 40px);
+  padding: var(--app-pad-card);
 }
 
 .heroTexto > p,
@@ -77,14 +77,17 @@
 
 .heroTexto > p:first-child {
   color: var(--via-accent-ink);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
+  font-family: var(--via-font);
+  letter-spacing: var(--app-ls-body);
+  text-transform: none;
 }
 
 .heroTexto h1 {
   max-width: 26ch;
   margin-top: var(--via-space-2);
   color: var(--via-text-primary);
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: var(--via-fw-medium);
   line-height: 1;
   letter-spacing: var(--app-ls-h1);
@@ -113,13 +116,16 @@
 }
 
 .heroTexto dt {
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+  font-family: var(--via-font);
+  text-transform: none;
+  letter-spacing: var(--app-ls-body);
 }
 
 .heroTexto dd {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-medium);
 }
 
@@ -172,7 +178,7 @@
 }
 
 .centralDecisoes {
-  padding: clamp(24px, 4vw, 36px);
+  padding: var(--app-pad-card);
   border-radius: var(--app-radius-surface);
 }
 
@@ -210,7 +216,10 @@
 
 .centralDecisoes > header p {
   color: var(--via-accent-ink);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-meta);
+  font-family: var(--via-font);
+  letter-spacing: var(--app-ls-body);
+  text-transform: none;
 }
 
 .centralDecisoes > header h2 {
@@ -318,6 +327,21 @@
   background: var(--app-glass-plane-strong);
 }
 
+.resumoProjeto {
+  margin: 0;
+  padding: var(--app-pad-card) var(--app-pad-card) 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  line-height: 1.5;
+}
+
+.inicioProjeto {
+  margin: 0;
+  padding: var(--via-space-2) var(--app-pad-card);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
 .grupoConteudo > :last-child {
   border-bottom: 0;
 }
@@ -348,8 +372,29 @@
   }
 
   .progressoHero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--via-space-3);
+    padding: var(--app-pad-card-tight) var(--app-pad-card);
     border-top: 1px solid var(--via-border-hairline);
     border-left: 0;
+  }
+
+  .progressoHero > span {
+    grid-row: span 2;
+    font-size: var(--via-fs-h2);
+  }
+
+  .progressoHero strong,
+  .progressoHero small {
+    margin: 0;
+  }
+
+  .progressoHero > div {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: var(--via-space-3);
   }
 
   .painel {
@@ -384,7 +429,7 @@
   }
 
   .heroTexto h1 {
-    font-size: clamp(2rem, 10vw, 2.75rem);
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
   }
 
   .heroTexto .resumo {
@@ -398,7 +443,8 @@
   }
 
   .progressoHero {
-    min-height: 126px;
+    min-height: 0;
+    padding-block: var(--app-pad-card-tight);
   }
 
   .centralDecisoes > header {

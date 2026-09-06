@@ -64,12 +64,15 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   const percentual = projeto.total ? Math.round((projeto.feitas / projeto.total) * 100) : 0;
   const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const briefingConfirmado = Boolean(projeto.briefing.confirmadoEm);
+  const trabalhoIniciado = projeto.tarefas.some(
+    (tarefa) => tarefa.status !== 'pendente' || tarefa.clienteStatus !== 'nao_solicitada',
+  );
   const [painel, setPainel] = useState<PainelSala>(() => {
     if (projeto.status === 'concluido') return 'evolucao';
-    return briefingConfirmado && projeto.feitas > 0 ? 'execucao' : 'cliente';
+    return briefingConfirmado && trabalhoIniciado ? 'execucao' : 'cliente';
   });
   const preparandoProjeto =
-    projeto.feitas === 0 && projeto.status !== 'concluido' && painel === 'cliente';
+    !trabalhoIniciado && projeto.status !== 'concluido' && painel === 'cliente';
   const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
   const entregasAguardando = projeto.tarefas.filter(
     (tarefa) => tarefa.clienteStatus === 'aguardando',
@@ -113,11 +116,6 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
   }
 
   function abrirProximaAcao() {
-    if (proximoCompromisso) {
-      document.getElementById('plano-vivo-titulo')?.scrollIntoView?.({ behavior: 'smooth' });
-      return;
-    }
-
     const alvo = proxima ?? ultimaTarefa;
     if (!alvo) return;
 
@@ -328,6 +326,14 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
                     arquivos: projeto.arquivos,
                   }}
                   onAbrirArquivos={abrirArquivosDaTarefa}
+                  onAbrirPortal={() => {
+                    setPainel('cliente');
+                    requestAnimationFrame(() =>
+                      document
+                        .getElementById('portal-cliente')
+                        ?.scrollIntoView?.({ behavior: 'smooth' }),
+                    );
+                  }}
                   aceiteFinal={
                     tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
                   }
@@ -397,6 +403,7 @@ export function SalaEntrega({ projeto }: { projeto: ProjetoExecucaoCompleto }) {
       {painel === 'cliente' && (
         <div className={styles.painelCliente}>
           <PainelClienteEntrega
+            trabalhoIniciado={trabalhoIniciado}
             projeto={projeto}
             primeiraTarefa={proxima?.titulo ?? null}
             onComecar={abrirProximaAcao}

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
 
@@ -10,6 +10,7 @@ vi.mock('@/lib/portal-cliente/actions', () => ({
 }));
 
 import { PortalProjeto } from './PortalProjeto';
+import { decidirEntregaCliente } from '@/lib/portal-cliente/actions';
 
 const PROJETO: ProjetoPortalCliente = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -116,6 +117,73 @@ function abrirDetalhe(rotulo: string) {
 }
 
 describe('PortalProjeto', () => {
+  it('preserva o pedido de ajuste ao voltar e após falha no salvamento', async () => {
+    vi.mocked(decidirEntregaCliente).mockResolvedValueOnce({ erro: 'Tente novamente.' });
+    render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Pedir ajuste' }));
+    fireEvent.change(screen.getByLabelText('O que precisa mudar?'), {
+      target: { value: 'Incluir o caminho de transferência.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pedir ajuste' }));
+    expect(screen.getByLabelText('O que precisa mudar?')).toHaveValue(
+      'Incluir o caminho de transferência.',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar ajuste' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Resposta não confirmada');
+    expect(screen.getByLabelText('O que precisa mudar?')).toHaveValue(
+      'Incluir o caminho de transferência.',
+    );
+    expect(screen.getByRole('button', { name: 'Enviar ajuste' })).toBeEnabled();
+  });
+
+  it('confirma que recebeu o ajuste e não comunica conclusão antes do aceite', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{
+          ...PROJETO,
+          feitas: 2,
+          tarefas: PROJETO.tarefas.map((tarefa, indice) =>
+            indice === 1
+              ? {
+                  ...tarefa,
+                  clienteStatus: 'ajustes',
+                  comentario: 'Inclua a transferência para a recepção.',
+                }
+              : tarefa,
+          ),
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Seu pedido de ajuste foi recebido.' }),
+    ).toBeVisible();
+    expect(screen.getByText('100%')).toBeVisible();
+    expect(screen.getByText('executado', { exact: true })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Projeto concluído.' })).toBeNull();
+  });
+
+  it('apresenta junto do aceite somente os arquivos vinculados à tarefa em revisão', () => {
+    const arquivoDaEntrega = {
+      ...PROJETO.arquivos[0]!,
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2',
+      tarefaId: PROJETO.tarefas[1]!.id,
+      titulo: 'Base para revisar',
+    };
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{ ...PROJETO, arquivos: [...PROJETO.arquivos, arquivoDaEntrega] }}
+      />,
+    );
+    const materiais = within(screen.getByRole('list', { name: 'Arquivos desta entrega' }));
+    expect(materiais.getByRole('link', { name: 'Base para revisar Versão 2' })).toHaveAttribute(
+      'href',
+      '/portal/44444444-4444-4444-8444-444444444444/arquivos/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2',
+    );
+    expect(materiais.queryByRole('link', { name: /Mapa final/ })).toBeNull();
+  });
   it('mostra progresso e decisão sem expor o campo de evidência interna', () => {
     render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);
 

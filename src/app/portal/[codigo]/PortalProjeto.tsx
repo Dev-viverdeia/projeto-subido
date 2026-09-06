@@ -21,7 +21,12 @@ import styles from './portal.module.css';
 import layout from './PortalProjeto.module.css';
 
 function formatarData(valor: string): string {
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  })
     .format(new Date(valor))
     .replace('.', '');
 }
@@ -58,6 +63,7 @@ export function PortalProjeto({
     (mudanca) => mudanca.status === 'aguardando_cliente',
   );
   const totalAcoes = aprovacoes.length + dependencias.length + mudancasAguardando.length;
+  const ajustePendente = projeto.tarefas.find((tarefa) => tarefa.clienteStatus === 'ajustes');
   const compartilhadas = projeto.tarefas.filter((tarefa) =>
     ['aguardando', 'aprovada', 'ajustes'].includes(tarefa.clienteStatus),
   );
@@ -67,24 +73,28 @@ export function PortalProjeto({
   const apenasDependencia = dependencias.length === totalAcoes && dependencias.length > 0;
   const tituloDecisao = concluido
     ? 'Projeto concluído.'
-    : !totalAcoes
-      ? 'Nenhuma ação pendente.'
-      : apenasAprovacao && totalAcoes === 1
-        ? 'Revise esta entrega.'
-        : mudancasAguardando.length === totalAcoes
-          ? 'Revise a mudança no projeto.'
-          : apenasDependencia
-            ? `${totalAcoes} ${totalAcoes === 1 ? 'item precisa' : 'itens precisam'} da sua confirmação.`
-            : `${totalAcoes} ${totalAcoes === 1 ? 'item aguarda' : 'itens aguardam'} sua resposta.`;
+    : !totalAcoes && ajustePendente
+      ? 'Seu pedido de ajuste foi recebido.'
+      : !totalAcoes
+        ? 'Nenhuma ação pendente.'
+        : apenasAprovacao && totalAcoes === 1
+          ? 'Revise esta entrega.'
+          : mudancasAguardando.length === totalAcoes
+            ? 'Revise a mudança no projeto.'
+            : apenasDependencia
+              ? `${totalAcoes} ${totalAcoes === 1 ? 'item precisa' : 'itens precisam'} da sua confirmação.`
+              : `${totalAcoes} ${totalAcoes === 1 ? 'item aguarda' : 'itens aguardam'} sua resposta.`;
   const descricaoDecisao = concluido
     ? 'Materiais, suporte e próximos passos continuam disponíveis abaixo.'
-    : !totalAcoes
-      ? 'Avisaremos quando uma nova entrega estiver pronta para você.'
-      : apenasAprovacao
-        ? 'Confira o resultado e aprove ou descreva o ajuste necessário.'
-        : mudancasAguardando.length
-          ? 'Confira o impacto informado antes de decidir.'
-          : 'Confirme os itens concluídos para o projeto continuar.';
+    : !totalAcoes && ajustePendente
+      ? 'O responsável vai revisar o pedido e enviar a nova versão para você conferir.'
+      : !totalAcoes
+        ? 'Avisaremos quando uma nova entrega estiver pronta para você.'
+        : apenasAprovacao
+          ? 'Confira o resultado e aprove ou descreva o ajuste necessário.'
+          : mudancasAguardando.length
+            ? 'Confira o impacto informado antes de decidir.'
+            : 'Confirme os itens concluídos para o projeto continuar.';
 
   return (
     <main className={layout.pagina}>
@@ -101,13 +111,8 @@ export function PortalProjeto({
           <div className={layout.heroTexto}>
             <p>{projeto.empresa}</p>
             <h1>{projeto.titulo}</h1>
-            <p className={layout.resumo}>{projeto.resumo}</p>
 
             <dl>
-              <div>
-                <dt>Início</dt>
-                <dd>{formatarData(projeto.inicioEm)}</dd>
-              </div>
               <div>
                 <dt>Previsão</dt>
                 <dd>{projeto.prazoEm ? formatarData(projeto.prazoEm) : 'Em definição'}</dd>
@@ -121,12 +126,12 @@ export function PortalProjeto({
 
           <div className={layout.progressoHero}>
             <span>{percentual}%</span>
-            <strong>{concluido ? 'concluído' : 'do projeto'}</strong>
+            <strong>{concluido ? 'concluído' : 'executado'}</strong>
             <div aria-hidden="true">
               <i style={{ transform: `scaleX(${percentual / 100})` }} />
             </div>
             <small>
-              {projeto.feitas} de {projeto.total} etapas
+              {concluido ? 'Aceite confirmado' : `${projeto.feitas} de ${projeto.total} etapas`}
             </small>
           </div>
         </section>
@@ -168,6 +173,7 @@ export function PortalProjeto({
                   tarefa={tarefa}
                   aceiteFinal={tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
                   encerramento={projeto.encerramento}
+                  arquivos={projeto.arquivos.filter((arquivo) => arquivo.tarefaId === tarefa.id)}
                 />
               ))}
             </div>
@@ -178,7 +184,9 @@ export function PortalProjeto({
                   ? 'Aceite registrado'
                   : `Em andamento: ${faseAtual?.titulo ?? 'Entrega'}`}
               </span>
-              <strong>{concluido ? projeto.titulo : projeto.objetivo}</strong>
+              <strong>
+                {concluido ? projeto.titulo : (ajustePendente?.comentario ?? projeto.objetivo)}
+              </strong>
             </div>
           )}
         </section>
@@ -192,6 +200,8 @@ export function PortalProjeto({
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
           <div className={layout.grupoConteudo}>
+            <p className={layout.resumoProjeto}>{projeto.resumo}</p>
+            <p className={layout.inicioProjeto}>Iniciado em {formatarData(projeto.inicioEm)}</p>
             <AcordoProjetoPortal briefing={projeto.briefing} />
             <ControleEscopoPortal codigo={codigo} mudancas={projeto.mudancasEscopo} />
           </div>
@@ -201,7 +211,9 @@ export function PortalProjeto({
           <summary>
             <div>
               <strong>Andamento</strong>
-              <span>{projeto.feitas} marcos concluídos</span>
+              <span>
+                {projeto.feitas} {projeto.feitas === 1 ? 'marco concluído' : 'marcos concluídos'}
+              </span>
             </div>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
@@ -212,7 +224,7 @@ export function PortalProjeto({
                   <p>Visão do trabalho</p>
                   <h2 id="andamento-titulo">Da descoberta à entrega.</h2>
                 </div>
-                <span>Atualizado em tempo real</span>
+                <span>Último status registrado</span>
               </header>
 
               <ol>
