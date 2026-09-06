@@ -279,6 +279,7 @@ export async function validarAceiteCliente({
         await expect(page.locator('#tarefa-em-foco blockquote')).toContainText(
           'Inclua o caminho de transferência para a recepção no material.',
         );
+        await expect(page.getByLabel('Como você testou o ajuste?')).toBeVisible();
         await page.screenshot({ path: join(pasta, 'profissional-ajuste.png'), fullPage: true });
         await page
           .getByLabel('Como você testou o ajuste?')
