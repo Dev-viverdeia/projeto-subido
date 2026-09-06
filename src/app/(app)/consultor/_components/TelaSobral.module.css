@@ -401,6 +401,19 @@
   background: transparent;
 }
 
+/* A primeira mensagem já é conversa: a saudação não disputa espaço com o envio. */
+.areaVazia:has([data-conversa-ativa]) {
+  display: block;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding-top: var(--via-space-5);
+}
+
+.areaVazia:has([data-conversa-ativa]) .boasVindas {
+  display: none;
+}
+
 @supports not (backdrop-filter: blur(1px)) {
   .cabecalho,
   .contexto summary,

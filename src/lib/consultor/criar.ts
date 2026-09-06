@@ -1,13 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import {
-  categoriaDoAnexo,
-  mimeBaseDoAnexo,
-  nomeSeguroParaStorage,
-  SOBRAL_BUCKET_ANEXOS,
-  validarAnexosSobral,
-} from './anexos-contrato';
+import { categoriaDoAnexo, validarAnexosSobral } from './anexos-contrato';
 
 /** Mesmo corte do título usado desde a primeira versão: legível e sem quebrar
  * a lista de conversas. Quando o turno contém só arquivo, o nome vira o título. */
@@ -66,6 +60,23 @@ async function registrarMensagem({
     return { threadId: null, mensagemId: null, falha: 'Escreva uma mensagem ou envie um arquivo.' };
   }
 
+  if (arquivos.length > 0) {
+    const { EnvioAnexos } = await import('./envio-anexos');
+    const resultado = await new EnvioAnexos(
+      mensagem,
+      arquivos,
+      threadId,
+      () => undefined,
+    ).executar();
+    return resultado.threadId && !resultado.falha
+      ? { threadId: resultado.threadId, mensagemId: resultado.mensagemId, falha: null }
+      : {
+          threadId: null,
+          mensagemId: null,
+          falha: resultado.falha ?? 'Não foi possível confirmar o envio.',
+        };
+  }
+
   const supabase = createClient();
   const {
     data: { user },
@@ -104,51 +115,6 @@ async function registrarMensagem({
   if (erroMensagem || !mensagemCriada) {
     if (nova) await supabase.from('consultor_threads').delete().eq('id', conversaId);
     return { threadId: null, mensagemId: null, falha: 'Não foi possível enviar a mensagem.' };
-  }
-
-  if (arquivos.length === 0) {
-    return { threadId: conversaId, mensagemId: mensagemCriada.id, falha: null };
-  }
-
-  const caminhosEnviados: string[] = [];
-  try {
-    const linhas = [];
-    for (const arquivo of arquivos) {
-      const categoria = categoriaDoAnexo(arquivo.type);
-      if (!categoria) throw new Error('tipo-nao-suportado');
-      const tipoMime = mimeBaseDoAnexo(arquivo.type);
-
-      const caminho = `${user.id}/${conversaId}/${crypto.randomUUID()}-${nomeSeguroParaStorage(arquivo.name)}`;
-      const { error: erroUpload } = await supabase.storage
-        .from(SOBRAL_BUCKET_ANEXOS)
-        .upload(caminho, arquivo, { contentType: tipoMime, upsert: false });
-      if (erroUpload) throw erroUpload;
-      caminhosEnviados.push(caminho);
-      linhas.push({
-        mensagem_id: mensagemCriada.id,
-        dono: user.id,
-        nome: arquivo.name.slice(0, 240),
-        tipo_mime: tipoMime,
-        tamanho_bytes: arquivo.size,
-        categoria,
-        caminho_storage: caminho,
-      });
-    }
-
-    const { error: erroMetadados } = await supabase.from('consultor_anexos').insert(linhas);
-    if (erroMetadados) throw erroMetadados;
-  } catch (causa) {
-    if (caminhosEnviados.length > 0) {
-      await supabase.storage.from(SOBRAL_BUCKET_ANEXOS).remove(caminhosEnviados);
-    }
-    await supabase.from('consultor_mensagens').delete().eq('id', mensagemCriada.id);
-    if (nova) await supabase.from('consultor_threads').delete().eq('id', conversaId);
-    console.error('[sobral:anexos] falha ao enviar:', causa);
-    return {
-      threadId: null,
-      mensagemId: null,
-      falha: 'Não foi possível enviar os arquivos. Confira a conexão e tente novamente.',
-    };
   }
 
   return { threadId: conversaId, mensagemId: mensagemCriada.id, falha: null };

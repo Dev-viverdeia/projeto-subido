@@ -112,6 +112,7 @@ describe('Mensagens compactas do Sobral AI', () => {
                 tipoMime: 'audio/webm',
                 tamanhoBytes: 12000,
                 categoria: 'audio',
+                transcricao: 'Quero preparar minha primeira reunião com a clínica.',
               },
             ],
             cartoes: [],
@@ -125,5 +126,9 @@ describe('Mensagens compactas do Sobral AI', () => {
     expect(screen.getByText('Mensagem de áudio')).toBeVisible();
     expect(screen.queryByText('Áudio enviado.')).not.toBeInTheDocument();
     expect(screen.queryByText('Audio Sobral AI 12-00.webm')).not.toBeInTheDocument();
+    expect(screen.getByText('Ver transcrição').closest('details')).not.toHaveAttribute('open');
+    expect(
+      screen.getByText('Quero preparar minha primeira reunião com a clínica.'),
+    ).toBeInTheDocument();
   });
 });

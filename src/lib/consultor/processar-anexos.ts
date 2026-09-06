@@ -107,7 +107,7 @@ export async function prepararAnexosParaModelo(
     }
     console.error('[sobral:anexos] falha ao processar:', causa);
     throw new ErroSobral(
-      'Não consegui ler um dos arquivos. Confira o formato e tente enviá-lo novamente.',
+      'Não consegui analisar um dos arquivos. Eles continuam na conversa. Tente novamente.',
       'falha',
     );
   }
