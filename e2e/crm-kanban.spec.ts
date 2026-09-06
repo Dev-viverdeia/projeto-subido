@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Quadro de vendas', () => {
   test('separa ganho e perda e preserva o motivo no card', async ({ page }, testInfo) => {
+    const erros: string[] = [];
+    page.on('pageerror', (erro) => erros.push(erro.message));
     await page.goto('/preview/crm');
 
     await expect(page.getByRole('heading', { name: 'Preparar' })).toBeVisible();
@@ -17,6 +19,7 @@ test.describe('Quadro de vendas', () => {
     await page.getByText('Vendas encerradas', { exact: true }).click();
     await expect(page.getByText('Momento inadequado', { exact: true })).toBeVisible();
     await expect(page.getByText('Fechados', { exact: true })).toHaveCount(0);
+    expect(erros).toEqual([]);
   });
 
   test('o card inteiro move a venda e a perda exige contexto', async ({ page }, testInfo) => {

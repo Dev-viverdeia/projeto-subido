@@ -17,6 +17,7 @@ function dataCurta(iso: string): string {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
   }).format(new Date(iso));
 }
 

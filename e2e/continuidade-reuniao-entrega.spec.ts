@@ -1,6 +1,31 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+test('a data da prévia permanece igual em navegadores com fusos distintos', async ({
+  browser,
+  baseURL,
+  isMobile,
+}) => {
+  for (const timezoneId of ['UTC', 'Asia/Tokyo']) {
+    const contexto = await browser.newContext({ baseURL, timezoneId });
+    try {
+      const page = await contexto.newPage();
+      const erros: string[] = [];
+      page.on('pageerror', (erro) => erros.push(erro.message));
+      await page.goto('/preview/proposta-editor?estado=aceita');
+      if (isMobile) await page.getByRole('tab', { name: 'Prévia em tempo real' }).click();
+      await expect(page.getByText('05 de setembro de 2026', { exact: true })).toBeVisible();
+      if (isMobile) await page.getByRole('tab', { name: 'Editar', exact: true }).click();
+      await page.getByLabel('Título interno da proposta').fill('Referência preservada');
+      if (isMobile) await page.getByRole('tab', { name: 'Prévia em tempo real' }).click();
+      await expect(page.getByText('05 de setembro de 2026', { exact: true })).toBeVisible();
+      expect(erros).toEqual([]);
+    } finally {
+      await contexto.close();
+    }
+  }
+});
+
 test('falha de conexão preserva a revisão da reunião para tentar novamente', async ({ page }) => {
   await page.goto('/preview/pos-call');
   const acao = page.getByLabel('Próxima ação da venda');

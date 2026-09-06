@@ -55,6 +55,7 @@ describe('PreviewProposta', () => {
   it('mostra o documento inteiro, sem ocultar os últimos itens editáveis', () => {
     render(
       <PreviewProposta
+        referenciaEm="2026-09-06T02:30:00.000Z"
         documento={DOCUMENTO}
         titulo="Plano comercial da Clínica Aurora"
         versao={2}
@@ -65,6 +66,7 @@ describe('PreviewProposta', () => {
 
     const preview = within(screen.getByLabelText('Prévia visual da proposta'));
 
+    expect(preview.getByText('05 de setembro de 2026')).toBeInTheDocument();
     expect(preview.getByText('Marina Lopes · Diretora de operações')).toBeInTheDocument();
     expect(preview.getByText('marina@clinicaaurora.com.br')).toBeInTheDocument();
     expect(preview.getByText(DOCUMENTO.projeto.resumo)).toBeInTheDocument();
@@ -82,6 +84,7 @@ describe('EditorProposta', () => {
 
     render(
       <EditorProposta
+        referenciaEm="2026-09-06T02:30:00.000Z"
         id="11111111-1111-4111-8111-111111111111"
         tituloInicial="Plano comercial da Clínica Aurora"
         documentoInicial={DOCUMENTO}

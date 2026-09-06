@@ -113,7 +113,10 @@ try {
     }),
   );
   browser = await chromium.launch();
-  const contexto = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const contexto = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    timezoneId: 'America/Sao_Paulo',
+  });
   contexto.setDefaultTimeout(30_000);
   await contexto.addCookies(
     [...cookies.values()].map(({ name, value }) => ({
@@ -127,7 +130,7 @@ try {
   );
   page = await contexto.newPage();
   const erros = [];
-  page.on('pageerror', (erro) => erros.push(erro.message));
+  page.on('pageerror', (erro) => erros.push(`${new URL(page.url()).pathname}: ${erro.message}`));
   await page.goto(`${app}/reunioes/${reuniao.id}`);
   const acao = page.getByLabel('Próxima ação da venda');
   await acao.fill('Apresentar o escopo revisado com a direção');

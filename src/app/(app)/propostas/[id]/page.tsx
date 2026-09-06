@@ -26,9 +26,12 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
   const documentoCompleto = completarDocumentoComPerfil(proposta.documento, perfilComercial);
   const identidadePendente =
     JSON.stringify(documentoCompleto) !== JSON.stringify(proposta.documento);
+  // Servidor e navegador usam a mesma referência, inclusive na virada do dia.
+  const referenciaEm = new Date().toISOString();
 
   return (
     <EditorProposta
+      referenciaEm={referenciaEm}
       id={proposta.id}
       tituloInicial={proposta.titulo}
       documentoInicial={documentoCompleto}

@@ -28,6 +28,7 @@ import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from './PipelineCrm.module.css';
 
 const FORMATADOR_DATA = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
   day: '2-digit',
   month: 'short',
 });

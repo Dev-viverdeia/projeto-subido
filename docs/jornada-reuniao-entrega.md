@@ -3,6 +3,7 @@
 ## Comportamento esperado
 
 - A revisão da reunião mantém texto, data, etapa e compromissos se houver falha.
+- Os campos da revisão só permitem edição quando estão prontos no navegador, preservando também a primeira interação durante o carregamento inicial.
 - O resultado aparece no formulário, sem redirecionar para uma página que perca a revisão.
 - A próxima ação usa fatos persistidos: uma entrega ativa de uma venda ganha tem prioridade sobre a proposta antiga.
 - Uma proposta aceita mostra **Abrir entrega** antes do editor. Se a criação não terminou, oferece **Preparar entrega** no mesmo lugar.
@@ -10,6 +11,7 @@
 - Mensagens, foco por teclado e contrastes seguem a camada de design existente.
 - Uma queda de conexão informa que o salvamento não foi confirmado, sem afirmar que nada foi salvo. Repetir a confirmação reaproveita as ações existentes.
 - O seletor mantém a borda de erro no hover e no foco, independentemente da ordem de carregamento do CSS.
+- A prévia recebe uma referência de data única do servidor. Prévia, histórico e compartilhamento de propostas usam o fuso de Brasília, como o PDF, evitando divergência de hidratação entre servidor e navegador.
 
 ## Regressão automática
 
