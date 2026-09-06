@@ -5,6 +5,66 @@
   color: var(--via-white);
 }
 
+.pagina[data-encerrada] {
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.terminal {
+  width: min(640px, 100%);
+  margin: clamp(40px, 10vh, 100px) auto;
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-surface);
+  background: var(--via-glass-card), var(--via-surface);
+  color: var(--via-text-primary);
+  box-shadow: var(--via-shadow-lg);
+  backdrop-filter: var(--via-glass-blur);
+}
+
+.terminalIcone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+
+.terminal h1 {
+  margin: var(--via-space-5) 0 var(--via-space-4);
+  color: var(--via-text-primary);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h1);
+  line-height: var(--via-lh-tight);
+}
+
+.terminalReuniao {
+  margin: 0 0 var(--via-space-1);
+  color: var(--via-text-body);
+  font-size: var(--via-fs-body);
+  overflow-wrap: anywhere;
+}
+
+.terminal time {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+
+.terminalOrientacao {
+  margin: var(--via-space-5) 0 0;
+  color: var(--via-text-body);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+}
+
+.terminal > a {
+  margin-top: var(--via-space-5);
+}
+
 .saida {
   display: grid;
   place-items: center;

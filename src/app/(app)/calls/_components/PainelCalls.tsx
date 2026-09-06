@@ -85,7 +85,14 @@ export function PainelCalls({
     .filter((item) => !callPodeAbrir(item.status))
     .sort((a, b) => b.agendadaPara.localeCompare(a.agendadaPara));
   const comCoach = ativas.filter((item) => item.liveCoachAtivo).length;
+  const reuniaoDoRetorno = reunioes.find((item) => item.id === agendadaId);
   const recemAgendada = agendadaId ? ativas.find((item) => item.id === agendadaId) : undefined;
+  // A URL continua igual após uma Server Action. O estado salvo prevalece sobre o retorno antigo.
+  const conviteAtual = recemAgendada?.googleSyncStatus;
+  const resultadoAtual =
+    calendarResultado && (conviteAtual === 'sincronizado' || conviteAtual === 'falhou')
+      ? conviteAtual
+      : undefined;
   const ativasNaAgenda = recemAgendada
     ? ativas.filter((item) => item.id !== recemAgendada.id)
     : ativas;
@@ -117,7 +124,7 @@ export function PainelCalls({
       </CabecalhoReunioes>
 
       <RetornosReunioes
-        calendarResultado={calendarResultado}
+        calendarResultado={resultadoAtual}
         pendenciaResultado={pendenciaResultado}
       />
 
@@ -127,11 +134,14 @@ export function PainelCalls({
           calendar={calendar}
           comercialLiberado={comercialLiberado}
         />
-      ) : agendadaId ? (
+      ) : reuniaoDoRetorno?.status === 'cancelada' ? (
         <RetornoOperacao
-          tom="sucesso"
-          titulo="Reunião criada"
-          descricao="Atualize a página para abrir a sala preparada."
+          titulo="Reunião cancelada"
+          descricao={
+            reuniaoDoRetorno.googleSyncStatus === 'sincronizado'
+              ? 'A sala foi fechada e o cancelamento foi enviado pelo Google Calendar.'
+              : 'A sala foi fechada. Confira a atualização do convite no histórico.'
+          }
         />
       ) : null}
 

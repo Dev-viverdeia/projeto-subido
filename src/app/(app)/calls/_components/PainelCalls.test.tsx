@@ -50,6 +50,66 @@ function reuniao(parcial: Partial<ReuniaoCall> & Pick<ReuniaoCall, 'id' | 'titul
 }
 
 describe('PainelCalls', () => {
+  it.each(['sincronizado', 'falhou'] as const)(
+    'ignora o retorno antigo de %s depois de cancelar a reunião',
+    (calendarResultado) => {
+      render(
+        <PainelCalls
+          calendar={CALENDAR}
+          oportunidades={[]}
+          agendadaId="call-cancelada"
+          calendarResultado={calendarResultado}
+          reunioes={[
+            reuniao({
+              id: 'call-cancelada',
+              titulo: 'Descoberta cancelada',
+              status: 'cancelada',
+              googleSyncStatus: 'sincronizado',
+            }),
+          ]}
+          agora={new Date('2026-08-09T12:00:00.000Z')}
+        />,
+      );
+
+      expect(screen.getByText('Reunião cancelada')).toBeInTheDocument();
+      expect(screen.queryByText('Reunião criada')).not.toBeInTheDocument();
+      expect(screen.queryByText('O convite não foi enviado')).not.toBeInTheDocument();
+      expect(screen.queryByText(/Atualize a página para abrir/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Abrir sala' })).not.toBeInTheDocument();
+    },
+  );
+
+  it('não confirma uma criação que não está mais nos dados da agenda', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        reunioes={[]}
+        agendadaId="call-ausente"
+        calendarResultado="sincronizado"
+      />,
+    );
+    expect(screen.queryByText('Reunião criada')).not.toBeInTheDocument();
+    expect(screen.queryByText(/O convite foi enviado/)).not.toBeInTheDocument();
+  });
+
+  it('usa o resultado atual do convite, não o resultado antigo na URL', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        agendadaId="call-1"
+        calendarResultado="falhou"
+        reunioes={[
+          reuniao({ id: 'call-1', titulo: 'Descoberta', googleSyncStatus: 'sincronizado' }),
+        ]}
+        agora={new Date('2026-08-09T12:00:00.000Z')}
+      />,
+    );
+    expect(screen.getByText('O convite foi enviado pelo Google Calendar.')).toBeInTheDocument();
+    expect(screen.queryByText('O convite não foi enviado')).not.toBeInTheDocument();
+  });
+
   it('leva à oportunidade antes do agendamento sem repetir o comando', () => {
     render(
       <PainelCalls

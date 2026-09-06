@@ -9,7 +9,7 @@ const CONVITE: ConviteCall = {
   reuniaoId: 'preview-sala-call',
   titulo: 'Descoberta do atendimento da Clínica Rios',
   tipo: 'descoberta',
-  agendadaPara: '2026-08-12T18:30:00-03:00',
+  agendadaPara: '2099-08-12T18:30:00-03:00',
   duracaoMinutos: 45,
   status: 'agendada',
   liveCoachAtivo: true,
@@ -26,12 +26,14 @@ export default async function PreviewSalaCallPage({
   const convite: ConviteCall = kickoff
     ? { ...CONVITE, tipo: 'kickoff', titulo: 'Kickoff do projeto de atendimento' }
     : CONVITE;
+  const status = parametros.estado;
+  const estadoFinal = status === 'cancelada' || status === 'concluida' || status === 'processando';
 
   return (
     <SalaCall
       codigo="preview"
-      convite={convite}
-      anfitriao
+      convite={estadoFinal ? { ...convite, status } : convite}
+      anfitriao={parametros.convidado !== '1'}
       nomeSugerido="Rafael Milagre"
       videoConfigurado
       planoAnfitriao={

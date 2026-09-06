@@ -43,6 +43,63 @@ const CONVITE: ConviteCall = {
 };
 
 describe('SalaCall', () => {
+  it.each(['cancelada', 'concluida', 'processando'] as const)(
+    'mostra o estado %s sem pedir nome ou consentimento',
+    (status) => {
+      render(
+        <SalaCall
+          codigo="codigo-1"
+          convite={{ ...CONVITE, status }}
+          anfitriao={false}
+          nomeSugerido=""
+          videoConfigurado
+        />,
+      );
+      expect(
+        screen.getByRole('heading', {
+          name: status === 'cancelada' ? 'Reunião cancelada' : 'Reunião encerrada',
+        }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Entrar/ })).not.toBeInTheDocument();
+      expect(screen.queryByText('Durante a reunião')).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /reunião|reuniões/ })).not.toBeInTheDocument();
+    },
+  );
+
+  it('devolve o anfitrião à agenda depois do cancelamento', () => {
+    render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={{ ...CONVITE, status: 'cancelada' }}
+        anfitriao
+        nomeSugerido="Rafael"
+        videoConfigurado
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Voltar às reuniões' })).toHaveAttribute(
+      'href',
+      '/reunioes',
+    );
+    expect(screen.queryByText('Preparar entrada')).not.toBeInTheDocument();
+  });
+
+  it('orienta o convidado com horário vencido sem oferecer uma entrada impossível', () => {
+    render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={{ ...CONVITE, agendadaPara: '2020-01-01T15:00:00Z' }}
+        anfitriao={false}
+        nomeSugerido=""
+        videoConfigurado
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Horário encerrado' })).toBeInTheDocument();
+    expect(screen.getByText('Peça um novo horário ao organizador.')).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
   it('explica o registro e exige consentimento antes de liberar a entrada', async () => {
     const user = userEvent.setup();
     render(
