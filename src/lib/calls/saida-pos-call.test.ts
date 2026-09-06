@@ -118,7 +118,7 @@ describe('montarSaidaPosCall', () => {
 
     expect(montarSaidaPosCall(posCall)).toMatchObject({
       tipo: 'projeto',
-      acao: 'Abrir projeto',
+      acao: 'Abrir entrega',
       href: '/entregas/projeto-1#briefing-kickoff',
     });
   });
@@ -134,6 +134,36 @@ describe('montarSaidaPosCall', () => {
       tipo: 'crm',
       acao: 'Abrir ficha',
       href: '/vendas/oportunidade-1',
+    });
+  });
+
+  it('prioriza a entrega de uma venda ganha ao revisitar a reunião de origem', () => {
+    expect(
+      montarSaidaPosCall({
+        ...BASE,
+        oportunidade: { ...BASE.oportunidade, etapa: 'ganho' },
+        sincronizacao: {
+          ...BASE.sincronizacao,
+          projetoAtivo: { id: 'entrega-1', titulo: 'Atendimento' },
+          propostaDaCall: { id: 'proposta-1', titulo: 'Atendimento', status: 'aceita' },
+        },
+      }),
+    ).toMatchObject({ tipo: 'projeto', href: '/entregas/entrega-1' });
+  });
+
+  it('orienta a recuperar a entrega quando há aceite, mas o projeto ainda não existe', () => {
+    expect(
+      montarSaidaPosCall({
+        ...BASE,
+        sincronizacao: {
+          ...BASE.sincronizacao,
+          propostaDaCall: { id: 'proposta-1', titulo: 'Atendimento', status: 'aceita' },
+        },
+      }),
+    ).toMatchObject({
+      rotulo: 'Proposta aceita',
+      titulo: 'Preparar a entrega aprovada',
+      href: '/propostas/proposta-1?origem=call',
     });
   });
 });

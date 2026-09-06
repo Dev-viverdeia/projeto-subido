@@ -65,7 +65,7 @@ export async function decidirPropostaCliente(
       status: resultado.status,
       sucesso:
         resultado.status === 'aceita'
-          ? 'Proposta aprovada. A entrega já está pronta e o responsável vai combinar o kickoff com você.'
+          ? 'Proposta aprovada. O responsável vai combinar o início do projeto com você.'
           : 'Decisão registrada. O responsável recebeu o retorno em Vendas.',
     };
   } catch (erro) {

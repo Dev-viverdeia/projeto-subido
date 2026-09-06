@@ -1,11 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
 
-vi.mock('@/lib/calls/actions', () => ({
-  aplicarPlanoCall: vi.fn(),
+vi.mock('@/lib/calls/plano-actions', () => ({
+  salvarPlanoCall: vi.fn(),
 }));
 
+import { salvarPlanoCall } from '@/lib/calls/plano-actions';
 import { FormularioPlanoCall } from './FormularioPlanoCall';
+
+beforeEach(() => vi.clearAllMocks());
 
 describe('FormularioPlanoCall', () => {
   it('deixa o plano recomendado pronto para uma única confirmação', () => {
@@ -33,4 +37,52 @@ describe('FormularioPlanoCall', () => {
     compromissos.forEach((item) => expect(item).toBeChecked());
     expect(screen.getByRole('button', { name: 'Confirmar e atualizar a venda' })).toBeEnabled();
   });
+
+  it.each(['servidor', 'conexao'] as const)(
+    'mantém texto, data, etapa e seleção após falha de %s',
+    async (falha) => {
+      const user = userEvent.setup();
+      if (falha === 'servidor')
+        vi.mocked(salvarPlanoCall).mockResolvedValueOnce({ erro: 'Suas escolhas foram mantidas.' });
+      else vi.mocked(salvarPlanoCall).mockRejectedValueOnce(new Error('Network error'));
+      render(
+        <FormularioPlanoCall
+          reuniaoId="reuniao"
+          oportunidadeId="cliente"
+          acaoInicial="Ação sugerida"
+          dataInicial="2026-09-10"
+          etapaAtual="descoberta"
+          etapaSugerida="proposta"
+          compromissos={['Enviar amostra', 'Revisar o escopo']}
+        />,
+      );
+      await user.clear(screen.getByLabelText('Próxima ação da venda'));
+      await user.type(
+        screen.getByLabelText('Próxima ação da venda'),
+        'Apresentar escopo validado pela equipe',
+      );
+      await user.selectOptions(screen.getByLabelText('Próxima etapa da venda'), 'manter');
+      await user.click(screen.getAllByRole('checkbox')[1]!);
+      expect(screen.getAllByRole('checkbox')[1]).not.toBeChecked();
+      await user.click(screen.getByRole('button', { name: 'Confirmar e atualizar a venda' }));
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        falha === 'conexao' ? 'Salvamento não confirmado' : 'O plano não foi salvo',
+      );
+      expect(screen.getByLabelText('Próxima ação da venda')).toHaveValue(
+        'Apresentar escopo validado pela equipe',
+      );
+      expect(screen.getByLabelText('Data combinada')).toHaveValue('2026-09-10');
+      expect(screen.getByLabelText('Próxima etapa da venda')).toHaveValue('manter');
+      expect(screen.getAllByRole('checkbox')[1]).not.toBeChecked();
+      vi.mocked(salvarPlanoCall).mockResolvedValueOnce({
+        sucesso: 'Plano salvo na ficha do cliente.',
+      });
+      await user.click(screen.getByRole('button', { name: 'Confirmar e atualizar a venda' }));
+      expect(await screen.findByRole('status')).toHaveTextContent('Plano salvo');
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('Próxima ação da venda')).toHaveValue(
+        'Apresentar escopo validado pela equipe',
+      );
+    },
+  );
 });

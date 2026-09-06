@@ -23,6 +23,6 @@ describe('AcaoEntrega', () => {
   it('mantém uma ação de recuperação quando o projeto ainda não existe', () => {
     render(<AcaoEntrega propostaId={PROPOSTA_ID} execucaoId={null} />);
 
-    expect(screen.getByRole('button', { name: /Criar projeto/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Preparar entrega/i })).toBeEnabled();
   });
 });

@@ -13,6 +13,7 @@ import {
   Target,
 } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
+import { montarSaidaPosCall } from '@/lib/calls/saida-pos-call';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
 import { CentralPlanoCall } from './CentralPlanoCall';
@@ -110,6 +111,8 @@ export function DossiePosCall({
   const temAnalise = estado.tipo === 'pronta';
   const kickoff = posCall.reuniao.tipo === 'kickoff';
   const briefingPronto = kickoff && Boolean(analise?.briefingOperacional);
+  const saida = montarSaidaPosCall(posCall);
+  const continuarEntrega = saida.tipo === 'projeto' && !kickoff;
   return (
     <div className={styles.pagina}>
       <nav className={styles.navegacao} aria-label="Navegação após a reunião">
@@ -152,14 +155,28 @@ export function DossiePosCall({
                 ? kickoff
                   ? 'Aguarde o acordo antes de iniciar a execução'
                   : 'Aguarde o resumo antes de atualizar esta venda'
-                : briefingPronto
-                  ? 'Revise o acordo antes de iniciar a execução'
-                  : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
+                : continuarEntrega
+                  ? 'Continue a implementação deste cliente'
+                  : briefingPronto
+                    ? 'Revise o acordo antes de iniciar a execução'
+                    : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
             </strong>
           </div>
           {estado.tipo !== 'processando' && (
-            <a href={briefingPronto ? '#proximo-passo-pos-call' : '#plano-da-call'}>
-              {briefingPronto ? 'Revisar acordo do projeto' : 'Revisar e atualizar a venda'}{' '}
+            <a
+              href={
+                continuarEntrega
+                  ? saida.href
+                  : briefingPronto
+                    ? '#proximo-passo-pos-call'
+                    : '#plano-da-call'
+              }
+            >
+              {continuarEntrega
+                ? 'Abrir entrega'
+                : briefingPronto
+                  ? 'Revisar acordo do projeto'
+                  : 'Revisar e atualizar a venda'}{' '}
               <ChevronRight size={15} aria-hidden="true" />
             </a>
           )}

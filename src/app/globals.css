@@ -257,7 +257,8 @@ html {
   box-shadow: var(--app-ring), var(--app-control-shadow);
 }
 
-:is([data-app-shell], [data-app-modal]) .via-select__trigger.has-error:where(:not(:disabled)) {
+/* O erro deve vencer o hover do Select mesmo se o CSS da library chegar depois. */
+:is([data-app-shell], [data-app-modal]) .via-select__trigger.has-error:not(:disabled) {
   border-color: var(--via-coral-deep);
 }
 

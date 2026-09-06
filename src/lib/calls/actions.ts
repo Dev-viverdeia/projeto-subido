@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
-import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
 import { executarAlteracaoAgenda } from './agenda-servico';
 import { dataLocalParaUtc } from './agenda-modelo';
 import { planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
@@ -36,18 +35,6 @@ const agendarSchema = z
       });
     }
   });
-
-const proximaAcaoSchema = z.object({
-  reuniao: z.uuid(),
-  oportunidade: z.uuid(),
-  acao: z.string().trim().min(3).max(500),
-  quando: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
-  etapa: z.union([
-    z.literal('manter'),
-    z.enum(ETAPAS_CRM.map((item) => item.id) as [string, ...string[]]),
-  ]),
-  compromissos: z.array(z.string().trim().min(3).max(500)).max(8),
-});
 
 const pendenciaSchema = z.object({
   reuniao: z.uuid(),
@@ -302,48 +289,4 @@ export async function resolverReuniaoPendente(formData: FormData): Promise<void>
   revalidarDirecaoOperacional();
 
   redirect('/reunioes?pendencia=cancelada');
-}
-
-export async function aplicarPlanoCall(formData: FormData): Promise<void> {
-  const validacao = proximaAcaoSchema.safeParse({
-    reuniao: formData.get('reuniao'),
-    oportunidade: formData.get('oportunidade'),
-    acao: formData.get('acao'),
-    quando: formData.get('quando'),
-    etapa: formData.get('etapa'),
-    compromissos: formData.getAll('compromissos'),
-  });
-  const reuniao = texto(formData, 'reuniao');
-  if (!validacao.success) redirect(`/reunioes/${reuniao}?plano=erro`);
-
-  const supabase = await createClient();
-  const { data: claims } = await supabase.auth.getClaims();
-  if (!claims) redirect('/entrar');
-
-  const quando = validacao.data.quando ? `${validacao.data.quando}T12:00:00-03:00` : undefined;
-  const { data, error } = await supabase.rpc('calls_aplicar_plano', {
-    p_reuniao: validacao.data.reuniao,
-    p_acao: validacao.data.acao,
-    p_quando: quando,
-    p_etapa: validacao.data.etapa === 'manter' ? undefined : (validacao.data.etapa as EtapaCrm),
-    p_compromissos: validacao.data.compromissos,
-  });
-
-  if (error) {
-    console.error(`[calls:aplicar-plano] ${error.code}: ${error.message}`);
-    redirect(`/reunioes/${validacao.data.reuniao}?plano=erro`);
-  }
-
-  revalidatePath('/calls');
-  revalidatePath(`/calls/${validacao.data.reuniao}`);
-  revalidatePath('/crm');
-  revalidatePath(`/crm/${validacao.data.oportunidade}`);
-  revalidatePath('/solucoes');
-  revalidarDirecaoOperacional();
-  const aplicado = Boolean(
-    data && typeof data === 'object' && !Array.isArray(data) && data.aplicado,
-  );
-  redirect(
-    `/reunioes/${validacao.data.reuniao}?plano=${aplicado ? 'ok' : 'sem-alteracao'}#proximo-passo-pos-call`,
-  );
 }

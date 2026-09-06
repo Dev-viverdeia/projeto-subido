@@ -80,6 +80,29 @@ const POS_CALL: PosCall = {
 };
 
 describe('DossiePosCall', () => {
+  it('prioriza continuar a entrega ao retornar a uma reunião de uma venda ganha', () => {
+    render(
+      <DossiePosCall
+        posCall={{
+          ...POS_CALL,
+          oportunidade: { ...POS_CALL.oportunidade, etapa: 'ganho' },
+          sincronizacao: {
+            ...POS_CALL.sincronizacao,
+            projetoAtivo: { id: 'entrega-1', titulo: 'Atendimento' },
+            propostaDaCall: { id: 'proposta-1', titulo: 'Atendimento', status: 'aceita' },
+          },
+        }}
+        estadoAcao={null}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Abrir entrega' })).toHaveAttribute(
+      'href',
+      '/entregas/entrega-1',
+    );
+    expect(
+      screen.queryByRole('link', { name: 'Revisar e atualizar a venda' }),
+    ).not.toBeInTheDocument();
+  });
   it('prioriza resumo, revisão humana e só então o detalhamento', () => {
     render(<DossiePosCall posCall={POS_CALL} estadoAcao={null} />);
 

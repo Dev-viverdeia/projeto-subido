@@ -21,20 +21,12 @@ const CALLS_COMERCIAIS = new Set<PosCall['reuniao']['tipo']>([
  */
 export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
   const proposta = posCall.sincronizacao.propostaDaCall;
-  if (proposta) {
-    return {
-      tipo: 'proposta',
-      rotulo: 'Proposta conectada',
-      titulo: `Continuar ${proposta.titulo}`,
-      descricao: 'Este documento nasceu desta conversa e preserva os fatos usados no rascunho.',
-      acao: 'Abrir proposta',
-      href: `/propostas/${proposta.id}?origem=call`,
-    };
-  }
-
   const projeto = posCall.sincronizacao.projetoAtivo;
   const callDeEntrega = posCall.reuniao.tipo === 'kickoff' || posCall.reuniao.tipo === 'entrega';
-  if (projeto && (callDeEntrega || posCall.oportunidade.etapa === 'ganho')) {
+  if (
+    projeto &&
+    (callDeEntrega || posCall.oportunidade.etapa === 'ganho' || proposta?.status === 'aceita')
+  ) {
     const temBriefing =
       posCall.reuniao.tipo === 'kickoff' && Boolean(posCall.analise?.briefingOperacional);
     return {
@@ -46,8 +38,22 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
       descricao: temBriefing
         ? 'Objetivo, responsáveis, acessos e limites estão prontos para sua revisão no projeto.'
         : 'A conversa continua na execução, junto do escopo, das ações e das evidências do cliente.',
-      acao: 'Abrir projeto',
+      acao: 'Abrir entrega',
       href: `/entregas/${projeto.id}${temBriefing ? '#briefing-kickoff' : ''}`,
+    };
+  }
+
+  if (proposta) {
+    const aceita = proposta.status === 'aceita';
+    return {
+      tipo: 'proposta',
+      rotulo: aceita ? 'Proposta aceita' : 'Proposta conectada',
+      titulo: aceita ? 'Preparar a entrega aprovada' : `Continuar ${proposta.titulo}`,
+      descricao: aceita
+        ? 'A venda está confirmada. Abra a proposta para preparar a entrega.'
+        : 'Revise ou acompanhe a proposta desta reunião.',
+      acao: 'Abrir proposta',
+      href: `/propostas/${proposta.id}?origem=call`,
     };
   }
 
