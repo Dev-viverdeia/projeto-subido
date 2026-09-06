@@ -7,7 +7,10 @@ export async function lerFluxoSobral(response: Response, receber: (evento: Event
   const decoder = new TextDecoder();
   let buffer = '';
   const linha = (valor: string) => {
-    if (valor.trim()) receber(EventoSobralSchema.parse(JSON.parse(valor)));
+    if (!valor.trim()) return false;
+    const evento = EventoSobralSchema.parse(JSON.parse(valor));
+    receber(evento);
+    return evento.tipo === 'estado' && evento.geracao.estado !== 'gerando';
   };
   try {
     while (true) {
@@ -15,7 +18,9 @@ export async function lerFluxoSobral(response: Response, receber: (evento: Event
       buffer += decoder.decode(value, { stream: !done });
       const partes = buffer.split('\n');
       buffer = partes.pop() ?? '';
-      for (const parte of partes) linha(parte);
+      // O recibo já confirma a gravação. A limpeza de arquivos no servidor
+      // pode continuar sem manter o campo de mensagem bloqueado.
+      for (const parte of partes) if (linha(parte)) return;
       if (buffer.length > 24000) throw new Error('fluxo-invalido');
       if (done) {
         linha(buffer);
