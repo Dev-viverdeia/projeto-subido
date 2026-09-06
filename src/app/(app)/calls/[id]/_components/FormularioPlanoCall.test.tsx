@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { renderToString } from 'react-dom/server';
 
 vi.mock('@/lib/calls/plano-actions', () => ({
   salvarPlanoCall: vi.fn(),
@@ -12,6 +13,27 @@ import { FormularioPlanoCall } from './FormularioPlanoCall';
 beforeEach(() => vi.clearAllMocks());
 
 describe('FormularioPlanoCall', () => {
+  it('libera edição somente quando os campos controlados estão prontos no navegador', () => {
+    const formulario = (
+      <FormularioPlanoCall
+        reuniaoId="reuniao"
+        oportunidadeId="cliente"
+        acaoInicial="Revisar o escopo"
+        dataInicial="2026-09-10"
+        etapaAtual="descoberta"
+        etapaSugerida="proposta"
+        compromissos={['Enviar amostra']}
+      />
+    );
+    const servidor = new DOMParser().parseFromString(renderToString(formulario), 'text/html');
+    expect(servidor.querySelector('textarea')!.disabled).toBe(true);
+    expect(servidor.querySelector('select')!.disabled).toBe(true);
+    expect(servidor.querySelector('button')!.disabled).toBe(true);
+    render(formulario);
+    expect(screen.getByLabelText('Próxima ação da venda')).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Confirmar e atualizar a venda' })).toBeEnabled();
+  });
+
   it('deixa o plano recomendado pronto para uma única confirmação', () => {
     render(
       <FormularioPlanoCall

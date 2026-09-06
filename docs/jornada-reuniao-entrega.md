@@ -3,6 +3,7 @@
 ## Comportamento esperado
 
 - A revisão da reunião mantém texto, data, etapa e compromissos se houver falha.
+- Os campos da revisão só permitem edição quando estão prontos no navegador, preservando também a primeira interação durante o carregamento inicial.
 - O resultado aparece no formulário, sem redirecionar para uma página que perca a revisão.
 - A próxima ação usa fatos persistidos: uma entrega ativa de uma venda ganha tem prioridade sobre a proposta antiga.
 - Uma proposta aceita mostra **Abrir entrega** antes do editor. Se a criação não terminou, oferece **Preparar entrega** no mesmo lugar.
