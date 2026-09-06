@@ -22,6 +22,7 @@ import {
 } from './recomendacao';
 import { ErroSobral } from './erro';
 import type { EntradaAnexoModelo } from './processar-anexos';
+import { textoProgressivo } from './texto-progressivo';
 
 const TETO_HISTORICO = 20;
 
@@ -104,6 +105,7 @@ export async function gerarRodadaSobral({
   historico,
   pedido,
   anexos = [],
+  fluxo,
 }: {
   usuarioId: string;
   etapa: EtapaSobral;
@@ -111,9 +113,18 @@ export async function gerarRodadaSobral({
   historico: MensagemModelo[];
   pedido: string;
   anexos?: readonly EntradaAnexoModelo[];
+  fluxo?: {
+    signal: AbortSignal;
+    aoTexto: (texto: string) => void;
+    aoUso: (tokens: number) => void;
+  };
 }): Promise<RodadaSobral> {
   const { OPENAI_API_KEY, SOBRAL_AI_MODEL } = openAIEnv();
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 2, timeout: 120_000 });
+  const openai = new OpenAI({
+    apiKey: OPENAI_API_KEY,
+    maxRetries: fluxo ? 0 : 2,
+    timeout: 120_000,
+  });
 
   const contexto = `ETAPA ATUAL FIXA: ${etapa}\n\nFATOS DA OPERAÇÃO:\n${contextoParaModelo(sinais)}`;
   const recorte = historico.slice(-TETO_HISTORICO);
@@ -147,19 +158,36 @@ export async function gerarRodadaSobral({
   }
 
   try {
-    const resposta = await openai.responses.parse({
+    const parametros = {
       model: SOBRAL_AI_MODEL,
       instructions: `${INSTRUCOES}\n\n${contexto}`,
       input: mensagens,
-      reasoning: { effort: 'low' },
+      reasoning: { effort: 'low' as const },
       text: {
         format: zodTextFormat(RespostaEstruturadaSobralSchema, 'direcao_sobral'),
-        verbosity: 'medium',
+        verbosity: 'medium' as const,
       },
       max_output_tokens: 3200,
       store: false,
       safety_identifier: identificadorSeguro(usuarioId),
-    });
+    };
+    const resposta = await (async () => {
+      if (!fluxo) return openai.responses.parse(parametros);
+      const stream = openai.responses.stream(parametros, { signal: fluxo.signal });
+      let anterior = '';
+      stream.on('response.output_text.delta', (evento) => {
+        const texto = textoProgressivo(evento.snapshot);
+        if (texto && texto !== anterior) {
+          anterior = texto;
+          fluxo.aoTexto(texto);
+        }
+      });
+      stream.on('response.completed', (evento) => {
+        const uso = evento.response.usage;
+        if (uso) fluxo.aoUso(uso.input_tokens + uso.output_tokens);
+      });
+      return stream.finalResponse();
+    })();
 
     if (!resposta.output_parsed) {
       const recusou = resposta.output.some(
@@ -181,6 +209,7 @@ export async function gerarRodadaSobral({
       tokens,
     };
   } catch (erro) {
+    if (fluxo?.signal.aborted) throw erro;
     if (erro instanceof ErroSobral) throw erro;
     if (erro instanceof OpenAI.RateLimitError) {
       throw new ErroSobral(

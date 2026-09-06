@@ -1,36 +1,93 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { criarAdminSobral } from '@/lib/consultor/admin';
-import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
+import { executarGeracao } from '@/lib/consultor/executar-geracao';
+import { GeracaoSobralSchema, type EventoSobral } from '@/lib/consultor/geracao-contrato';
+import { obterUsoDoMes, TETO_TOKENS_SOBRAL_MES } from '@/lib/consultor/servico';
 import { createClient } from '@/lib/supabase/server';
-import type { Json } from '@/lib/supabase/types.generated';
-import { ErroSobral } from '@/lib/consultor/erro';
-import { resolverRecomendacoes } from '@/lib/consultor/conteudo';
-import {
-  direcaoDaMensagem,
-  obterUsoDoMes,
-  persistirPlanoSobral,
-  produzirLeituraSobral,
-  registrarUsoSobral,
-  TETO_TOKENS_SOBRAL_MES,
-} from '@/lib/consultor/servico';
-import { prepararAnexosParaModelo } from '@/lib/consultor/processar-anexos';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 180;
-
+const headers = { 'Cache-Control': 'no-store' };
 const Pedido = z.object({
   thread_id: z.uuid(),
-  mensagem: z.string().trim().min(1).max(8000).optional(),
+  mensagem_id: z.uuid().optional(),
+  tentativa: z.uuid().optional(),
+  repetir: z.boolean().default(false),
   pendente: z.boolean().optional(),
 });
+const Recibo = z.object({ executar: z.boolean(), geracao: GeracaoSobralSchema });
+const json = (dados: unknown, status = 200) => NextResponse.json(dados, { status, headers });
 
-function erro(mensagem: string, status: number, tipo = 'falha') {
-  return NextResponse.json(
-    { erro: mensagem, tipo },
-    { status, headers: { 'Cache-Control': 'no-store' } },
-  );
+/** Lê o recibo; não chama o modelo. */
+export async function GET(request: Request) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return json({ erro: 'Faça login para usar o Sobral AI.' }, 401);
+    const mensagem = z.uuid().safeParse(new URL(request.url).searchParams.get('mensagem_id'));
+    if (!mensagem.success) return json({ erro: 'Pergunta inválida.' }, 400);
+    const admin = criarAdminSobral();
+    // O worker termina antes da lease. Uma queda definitiva não prende o chat.
+    const { error: expirada } = await admin
+      .from('sobral_geracoes')
+      .update({ estado: 'interrompida', erro: 'Resposta interrompida.' })
+      .eq('mensagem_id', mensagem.data)
+      .eq('dono', user.id)
+      .eq('estado', 'gerando')
+      .lt('expira_em', new Date().toISOString());
+    if (expirada) throw expirada;
+    const { data, error } = await supabase
+      .from('sobral_geracoes')
+      .select('*')
+      .eq('mensagem_id', mensagem.data)
+      .maybeSingle();
+    if (error) throw error;
+    return data
+      ? json({ geracao: GeracaoSobralSchema.parse(data) })
+      : json({ erro: 'Resposta não encontrada.' }, 404);
+  } catch {
+    return json({ erro: 'Não foi possível conferir a resposta agora.' }, 503);
+  }
+}
+
+/** Um clique atrasado só pode parar sua própria tentativa. */
+export async function DELETE(request: Request) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return json({ erro: 'Faça login para usar o Sobral AI.' }, 401);
+    const pedido = z
+      .object({ mensagem_id: z.uuid(), tentativa: z.uuid() })
+      .safeParse(await request.json().catch(() => null));
+    if (!pedido.success) return json({ erro: 'Pedido inválido.' }, 400);
+    const admin = criarAdminSobral();
+    const { error } = await admin
+      .from('sobral_geracoes')
+      .update({ parar_em: new Date().toISOString() })
+      .eq('mensagem_id', pedido.data.mensagem_id)
+      .eq('tentativa', pedido.data.tentativa)
+      .eq('dono', user.id)
+      .eq('estado', 'gerando');
+    if (error) throw error;
+    const { data, error: erroLeitura } = await supabase
+      .from('sobral_geracoes')
+      .select('*')
+      .eq('mensagem_id', pedido.data.mensagem_id)
+      .eq('tentativa', pedido.data.tentativa)
+      .maybeSingle();
+    if (erroLeitura) throw erroLeitura;
+    return data
+      ? json({ geracao: GeracaoSobralSchema.parse(data) })
+      : json({ erro: 'Resposta não encontrada.' }, 404);
+  } catch {
+    return json({ erro: 'Não foi possível confirmar a interrupção. Tente novamente.' }, 503);
+  }
 }
 
 export async function POST(request: Request) {
@@ -39,163 +96,116 @@ export async function POST(request: Request) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return erro('Faça login para usar o Sobral AI.', 401);
-
-    const corpo = Pedido.safeParse(await request.json().catch(() => null));
-    if (!corpo.success) return erro('Pedido inválido.', 400);
-
-    const pendente = corpo.data.pendente === true;
-    const mensagem = corpo.data.mensagem?.trim() ?? null;
-    if (!pendente && !mensagem) return erro('Escreva uma pergunta para continuar.', 400);
-
-    const [thread, uso] = await Promise.all([
-      supabase.from('consultor_threads').select('id').eq('id', corpo.data.thread_id).maybeSingle(),
-      obterUsoDoMes(supabase),
-    ]);
-
-    if (thread.error) throw thread.error;
-    if (!thread.data) return erro('Conversa não encontrada.', 404);
-    if (uso >= TETO_TOKENS_SOBRAL_MES) {
-      return erro(
-        'Você atingiu o limite mensal do Sobral AI. Ele zera no primeiro dia do próximo mês.',
-        429,
-        'limite',
-      );
-    }
-
-    if (!pendente && mensagem) {
-      const { error: erroMensagem } = await supabase.from('consultor_mensagens').insert({
-        thread_id: corpo.data.thread_id,
-        papel: 'usuario',
-        conteudo: mensagem,
-      });
-      if (erroMensagem) throw erroMensagem;
-    }
-
-    const { data: ultimas, error: erroHistorico } = await supabase
+    if (!user) return json({ erro: 'Faça login para usar o Sobral AI.' }, 401);
+    const pedido = Pedido.safeParse(await request.json().catch(() => null));
+    if (!pedido.success) return json({ erro: 'Pedido inválido.' }, 400);
+    const { data: thread, error } = await supabase
+      .from('consultor_threads')
+      .select('id')
+      .eq('id', pedido.data.thread_id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!thread) return json({ erro: 'Conversa não encontrada.' }, 404);
+    const { data: ultima, error: erroUltima } = await supabase
       .from('consultor_mensagens')
-      .select(
-        'id, papel, conteudo, contexto_anexos, cartoes, consultor_anexos(id, nome, tipo_mime, categoria, caminho_storage, transcricao)',
-      )
-      .eq('thread_id', corpo.data.thread_id)
+      .select('id, papel, conteudo')
+      .eq('thread_id', thread.id)
       .order('criado_em', { ascending: false })
-      .limit(20);
-    if (erroHistorico) throw erroHistorico;
-
-    const ultima = ultimas?.[0];
-    if (pendente && ultima?.papel === 'consultor') {
-      return NextResponse.json(
-        {
-          thread_id: corpo.data.thread_id,
-          resposta: ultima.conteudo,
-          cartoes: ultima.cartoes ?? [],
-        },
-        { headers: { 'Cache-Control': 'no-store' } },
+      .order('id', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (erroUltima) throw erroUltima;
+    if (!pedido.data.mensagem_id && ultima?.papel === 'consultor')
+      return json({ thread_id: thread.id, resposta: ultima.conteudo });
+    const mensagemId = pedido.data.mensagem_id ?? ultima?.id;
+    if (!mensagemId) return json({ erro: 'Envie uma pergunta para continuar.' }, 400);
+    if ((await obterUsoDoMes(supabase)) >= TETO_TOKENS_SOBRAL_MES)
+      return json({ erro: 'Você atingiu o limite mensal do Sobral AI.', tipo: 'limite' }, 429);
+    const admin = criarAdminSobral();
+    const { data, error: erroInicio } = await admin.rpc('sobral_iniciar_geracao', {
+      p_dono: user.id,
+      p_thread: thread.id,
+      p_mensagem: mensagemId,
+      p_tentativa: pedido.data.tentativa ?? crypto.randomUUID(),
+      p_repetir: pedido.data.repetir,
+    });
+    if (erroInicio)
+      return json({ erro: 'Confira a resposta existente antes de enviar outra pergunta.' }, 409);
+    const recibo = Recibo.parse(data);
+    if (!recibo.executar)
+      return json(
+        { geracao: recibo.geracao, thread_id: thread.id, resposta: recibo.geracao.texto },
+        recibo.geracao.estado === 'gerando' ? 202 : 200,
+      );
+    const controle = new AbortController();
+    const interromper = () => controle.abort('conexao');
+    request.signal.addEventListener('abort', interromper, { once: true });
+    if (request.signal.aborted) interromper();
+    if (!request.headers.get('accept')?.includes('application/x-ndjson')) {
+      const geracao = await executarGeracao({
+        supabase,
+        dono: user.id,
+        geracao: recibo.geracao,
+        controle,
+        emitir: () => {},
+      });
+      request.signal.removeEventListener('abort', interromper);
+      return json(
+        { geracao, thread_id: thread.id, resposta: geracao?.texto ?? '' },
+        geracao?.estado === 'concluida' ? 200 : 503,
       );
     }
-    if (!ultima) return erro('A conversa está vazia.', 400);
-
-    const historico = [...(ultimas ?? [])].reverse().map((item) => ({
-      papel: item.papel as 'usuario' | 'consultor',
-      conteudo: item.contexto_anexos
-        ? `${item.conteudo}\n\nContexto preservado dos arquivos enviados:\n${item.contexto_anexos}`
-        : item.conteudo,
-    }));
-
-    const admin = criarAdminSobral();
-    const anexosAtuais =
-      ultima.papel === 'usuario'
-        ? (ultima.consultor_anexos ?? []).map((anexo) => ({
-            id: anexo.id,
-            nome: anexo.nome,
-            tipoMime: anexo.tipo_mime,
-            categoria: anexo.categoria as 'imagem' | 'documento' | 'audio',
-            caminhoStorage: anexo.caminho_storage,
-            transcricao: anexo.transcricao,
-          }))
-        : [];
-    const preparados = await prepararAnexosParaModelo(admin, anexosAtuais);
-    let leitura;
-    try {
-      // O áudio já foi lido. Uma falha posterior ao gerar a resposta não deve
-      // obrigar o usuário a transcrever (e aguardar) o mesmo material de novo.
-      for (const { id, texto } of preparados.transcricoes) {
-        const { error } = await admin
-          .from('consultor_anexos')
-          .update({ transcricao: texto.slice(0, 24000) })
-          .eq('id', id)
-          .eq('dono', user.id);
-        if (error) console.error('[sobral:anexos] falha ao persistir transcrição:', error.code);
-      }
-      leitura = await produzirLeituraSobral({
-        supabase,
-        usuarioId: user.id,
-        historico,
-        pedido: mensagem ?? ultima.conteudo,
-        anexos: preparados.entradas,
-      });
-    } finally {
-      await preparados.limpar();
-    }
-
-    const cartoes = resolverRecomendacoes(leitura.rodada.direcao.recomendacoes, leitura.sinais);
-
-    const { error: erroResposta } = await admin.from('consultor_mensagens').insert({
-      thread_id: corpo.data.thread_id,
-      papel: 'consultor',
-      conteudo: leitura.rodada.direcao.resposta,
-      cartoes: cartoes.length > 0 ? (cartoes as unknown as Json) : null,
-      direcao: direcaoDaMensagem(leitura),
-      modelo: leitura.rodada.modelo,
-    });
-    if (erroResposta) throw erroResposta;
-
-    if (anexosAtuais.length > 0) {
-      if (leitura.rodada.direcao.memoria_anexos) {
-        const { error: erroContexto } = await admin
-          .from('consultor_mensagens')
-          .update({ contexto_anexos: leitura.rodada.direcao.memoria_anexos })
-          .eq('id', ultima.id);
-        if (erroContexto) {
-          console.error('[sobral:anexos] falha ao persistir contexto:', erroContexto);
-        }
-      }
-    }
-
-    const [threadAtualizada, plano] = await Promise.allSettled([
-      admin
-        .from('consultor_threads')
-        .update({ atualizado_em: new Date().toISOString() })
-        .eq('id', corpo.data.thread_id)
-        .eq('dono', user.id),
-      persistirPlanoSobral(admin, user.id, leitura),
-    ]);
-    if (threadAtualizada.status === 'rejected') {
-      console.error('[sobral:thread] falha ao atualizar:', threadAtualizada.reason);
-    } else if (threadAtualizada.value.error) {
-      console.error('[sobral:thread] falha ao atualizar:', threadAtualizada.value.error);
-    }
-    if (plano.status === 'rejected') {
-      console.error('[sobral:plano] falha ao persistir:', plano.reason);
-    }
-    await registrarUsoSobral(admin, user.id, leitura.rodada.tokens);
-    revalidarDirecaoOperacional();
-
-    return NextResponse.json(
-      {
-        thread_id: corpo.data.thread_id,
-        resposta: leitura.rodada.direcao.resposta,
-        cartoes,
-        direcao: direcaoDaMensagem(leitura),
+    const encoder = new TextEncoder();
+    let aberta = true;
+    let terminar!: Promise<void>;
+    const stream = new ReadableStream<Uint8Array>({
+      start(destino) {
+        const emitir = (evento: EventoSobral) => {
+          if (!aberta) return;
+          try {
+            destino.enqueue(encoder.encode(`${JSON.stringify(evento)}\n`));
+          } catch {
+            aberta = false;
+            interromper();
+          }
+        };
+        emitir({ tipo: 'estado', geracao: recibo.geracao });
+        terminar = executarGeracao({
+          supabase,
+          dono: user.id,
+          geracao: recibo.geracao,
+          controle,
+          emitir,
+        })
+          .catch(() =>
+            emitir({
+              tipo: 'erro',
+              mensagem: 'Confira a resposta salva antes de tentar novamente.',
+            }),
+          )
+          .finally(() => {
+            request.signal.removeEventListener('abort', interromper);
+            if (aberta) {
+              aberta = false;
+              destino.close();
+            }
+          })
+          .then(() => {});
       },
-      { headers: { 'Cache-Control': 'no-store' } },
-    );
-  } catch (causa) {
-    if (causa instanceof ErroSobral) {
-      const status = causa.tipo === 'limite' ? 429 : causa.tipo === 'recusa' ? 400 : 503;
-      return erro(causa.message, status, causa.tipo);
-    }
-    console.error('[sobral:responder] falha:', causa);
-    return erro('Não foi possível responder agora. Tente de novo em instantes.', 500);
+      cancel() {
+        aberta = false;
+        interromper();
+      },
+    });
+    after(() => terminar);
+    return new Response(stream, {
+      headers: {
+        ...headers,
+        'Content-Type': 'application/x-ndjson; charset=utf-8',
+        'X-Accel-Buffering': 'no',
+      },
+    });
+  } catch {
+    return json({ erro: 'Não foi possível iniciar a resposta. Tente novamente.' }, 503);
   }
 }

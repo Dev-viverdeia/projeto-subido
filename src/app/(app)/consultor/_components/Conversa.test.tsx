@@ -116,7 +116,10 @@ describe('Conversa integrada à Início', () => {
 
     expect(await screen.findByText('Comece pela formação recomendada.')).toBeVisible();
     expect(dependencias.criarConversa).toHaveBeenCalledWith('O que faço agora?', []);
-    expect(dependencias.responderPendente).toHaveBeenCalledWith('thread-1');
+    expect(dependencias.responderPendente).toHaveBeenCalledWith(
+      'thread-1',
+      expect.objectContaining({ mensagemId: 'mensagem-1', repetir: false }),
+    );
     expect(dependencias.replace).toHaveBeenCalledWith('/consultor/thread-1');
   });
 

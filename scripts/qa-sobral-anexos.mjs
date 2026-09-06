@@ -176,7 +176,9 @@ try {
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Voltar à edição' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Retomar envio' }).click();
-  await expect(page.getByRole('button', { name: 'Tentar novamente', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Tentar novamente', exact: true })).toBeVisible({
+    timeout: 25000,
+  });
   const mensagens = exigir(
     await client
       .from('consultor_mensagens')
@@ -298,9 +300,29 @@ try {
     });
     await page.getByRole('button', { name: 'Enviar mensagem', exact: true }).click();
     const resposta = await retorno;
-    const corpo = await resposta.json();
-    if (!resposta.ok()) throw new Error(`IA: ${JSON.stringify(corpo)}`);
-    if (!/Aurora/i.test(corpo.resposta) || !/120/.test(corpo.resposta))
+    if (!resposta.ok()) throw new Error(`IA: HTTP ${resposta.status()}`);
+    // A navegação para a conversa pode descartar o corpo no navegador.
+    // O recibo persistido é a confirmação de conclusão, não a conexão HTTP.
+    const mensagem = resposta.request().postDataJSON().mensagem_id;
+    let recibo;
+    await expect
+      .poll(
+        async () => {
+          recibo = exigir(
+            await admin
+              .from('sobral_geracoes')
+              .select('estado,texto,erro')
+              .eq('mensagem_id', mensagem)
+              .single(),
+          );
+          if (['falhou', 'interrompida'].includes(recibo.estado))
+            throw new Error(`IA: ${recibo.estado}: ${recibo.erro || 'sem detalhe'}`);
+          return recibo.estado;
+        },
+        { timeout: 190_000, intervals: [1_000, 2_000] },
+      )
+      .toBe('concluida');
+    if (!/Aurora/i.test(recibo.texto) || !/120/.test(recibo.texto))
       throw new Error('Resposta não usou os fatos do documento.');
     await expect(page.getByText('Ver transcrição', { exact: true })).toBeVisible({
       timeout: 90_000,

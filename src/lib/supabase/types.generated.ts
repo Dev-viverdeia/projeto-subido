@@ -14,6 +14,73 @@ export type Database = {
   }
   public: {
     Tables: {
+      sobral_geracoes: {
+        Row: {
+          dono: string
+          erro: string | null
+          estado: string
+          expira_em: string
+          iniciado_em: string
+          mensagem_id: string
+          parar_em: string | null
+          resposta_id: string | null
+          tentativa: string
+          texto: string
+          thread_id: string
+          tokens: number | null
+        }
+        Insert: {
+          dono: string
+          erro?: string | null
+          estado: string
+          expira_em?: string
+          iniciado_em?: string
+          mensagem_id: string
+          parar_em?: string | null
+          resposta_id?: string | null
+          tentativa: string
+          texto?: string
+          thread_id: string
+          tokens?: number | null
+        }
+        Update: {
+          dono?: string
+          erro?: string | null
+          estado?: string
+          expira_em?: string
+          iniciado_em?: string
+          mensagem_id?: string
+          parar_em?: string | null
+          resposta_id?: string | null
+          tentativa?: string
+          texto?: string
+          thread_id?: string
+          tokens?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sobral_geracoes_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: true
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sobral_geracoes_resposta_id_fkey"
+            columns: ["resposta_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sobral_geracoes_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_acessos_eventos: {
         Row: {
           admin_id: string | null
@@ -3402,6 +3469,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      sobral_iniciar_geracao: {
+        Args: {
+          p_dono: string
+          p_mensagem: string
+          p_repetir: boolean
+          p_tentativa: string
+          p_thread: string
+        }
+        Returns: Json
+      }
+      sobral_finalizar_geracao: {
+        Args: {
+          p_dados: Json
+          p_dono: string
+          p_estado: string
+          p_mensagem: string
+          p_tentativa: string
+        }
+        Returns: Json
+      }
       sobral_confirmar_anexos: {
         Args: { p_thread: string; p_mensagem: string; p_titulo: string; p_conteudo: string; p_anexos: Json }
         Returns: string

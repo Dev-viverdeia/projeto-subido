@@ -280,7 +280,7 @@
 }
 
 .areaChat {
-  width: 100%;
+  width: min(100%, 1040px);
   max-width: 100%;
   height: 100%;
   min-width: 0;
@@ -290,7 +290,7 @@
     clamp(var(--via-space-3), 2vw, var(--via-space-6));
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--via-space-5);
 }
 
@@ -298,14 +298,6 @@
   .areaChat {
     max-width: 1240px;
   }
-}
-
-.areaVazia {
-  align-content: center;
-  grid-template-rows: auto auto;
-  gap: var(--via-space-6);
-  padding-top: clamp(var(--via-space-5), 6vh, 72px);
-  padding-bottom: clamp(var(--via-space-5), 6vh, 72px);
 }
 
 .boasVindas {
@@ -364,56 +356,6 @@
   text-wrap: pretty;
 }
 
-.historico {
-  width: min(100%, 980px);
-  min-width: 0;
-  min-height: 280px;
-  margin-inline: auto;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--via-space-6) 0 var(--via-space-8);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.historico::-webkit-scrollbar {
-  display: none;
-}
-
-.compositor {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  width: min(100%, 980px);
-  min-width: 0;
-  margin-inline: auto;
-  padding-top: var(--via-space-2);
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    color-mix(in srgb, var(--via-bg-2) 88%, transparent) 30%
-  );
-}
-
-.areaVazia .compositor {
-  position: static;
-  padding-top: 0;
-  background: transparent;
-}
-
-/* A primeira mensagem já é conversa: a saudação não disputa espaço com o envio. */
-.areaVazia:has([data-conversa-ativa]) {
-  display: block;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  padding-top: var(--via-space-5);
-}
-
-.areaVazia:has([data-conversa-ativa]) .boasVindas {
-  display: none;
-}
-
 @supports not (backdrop-filter: blur(1px)) {
   .cabecalho,
   .contexto summary,
@@ -445,18 +387,13 @@
   .areaChat {
     padding: var(--via-space-5) var(--via-space-4) var(--via-space-4);
   }
-
-  .areaVazia {
-    align-content: start;
-    padding-top: clamp(var(--via-space-7), 7vh, 56px);
-  }
 }
 
 @media (max-width: 599px) {
   .pagina {
     width: 100%;
     margin-inline: 0;
-    height: calc(100dvh - 104px);
+    height: calc(100dvh - 176px - env(safe-area-inset-bottom, 0px));
   }
 
   .cabecalho {
@@ -500,12 +437,7 @@
   }
 
   .areaChat {
-    padding: var(--via-space-4) var(--via-space-3) calc(68px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .areaVazia {
-    gap: var(--via-space-5);
-    padding-top: clamp(var(--via-space-7), 8vh, 64px);
+    padding: var(--via-space-4) var(--via-space-3) var(--via-space-2);
   }
 
   .boasVindas h2 {
@@ -515,13 +447,5 @@
 
   .apoio {
     font-size: var(--via-fs-sm);
-  }
-
-  .historico {
-    padding-inline: 0;
-  }
-
-  .compositor {
-    bottom: calc(var(--via-space-2) + env(safe-area-inset-bottom, 0px));
   }
 }

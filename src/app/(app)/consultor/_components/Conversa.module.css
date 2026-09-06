@@ -1,4 +1,3 @@
-.conversa,
 .rodadaEmVoo,
 .respostaConsultor {
   display: flex;
@@ -6,9 +5,39 @@
 }
 
 .conversa {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+  min-height: 0;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+
+.leitura {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--via-border) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--via-space-6);
+  padding: var(--via-space-3) var(--via-space-1);
+  overflow-wrap: anywhere;
+}
+
+.leitura > * {
+  flex-shrink: 0;
+}
+
+.boasVindas {
+  margin-block: auto;
+  padding-block: var(--via-space-6);
+}
+
+.conversa[data-conversa-ativa] .boasVindas {
+  display: none;
 }
 
 .conversa,
@@ -96,7 +125,8 @@
   position: relative;
   overflow: hidden;
   align-self: flex-start;
-  width: min(100%, 640px);
+  width: fit-content;
+  max-width: 100%;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
@@ -128,21 +158,13 @@
   font-size: 0.8125rem;
 }
 
-.processando i {
-  position: absolute;
-  inset: auto 0 0;
-  height: 2px;
-  overflow: hidden;
-  background: var(--via-navy-08);
+.estadoResposta {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
-.processando i::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  width: 40%;
-  background: var(--via-navy);
-  animation: sobral-progresso 1.5s var(--via-ease-out) infinite;
+.fimResposta {
+  height: 1px;
 }
 
 .girando {
@@ -153,15 +175,6 @@
 @keyframes sobral-girar {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes sobral-progresso {
-  from {
-    transform: translateX(-110%);
-  }
-  to {
-    transform: translateX(360%);
   }
 }
 
@@ -473,9 +486,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .girando,
-  .processando i::after {
-    animation-duration: 2.4s;
+  .girando {
+    animation: none;
   }
 
   .caixa,

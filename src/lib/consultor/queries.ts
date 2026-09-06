@@ -41,6 +41,7 @@ export type MensagemDoConsultor = {
   acaoConfirmada: z.infer<typeof AcaoConfirmadaCrmSchema> | null;
   modelo: string | null;
   criadoEm: string;
+  geracao?: { estado: string; texto: string } | null;
 };
 
 export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
@@ -131,7 +132,7 @@ export const obterConversa = cache(
     const { data: mensagens, error: erroMsgs } = await supabase
       .from('consultor_mensagens')
       .select(
-        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
+        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_geracoes!sobral_geracoes_mensagem_id_fkey(estado, texto), consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
       )
       .eq('thread_id', id)
       .order('criado_em')
@@ -185,6 +186,7 @@ export const obterConversa = cache(
           acaoConfirmada: acaoConfirmada.success ? acaoConfirmada.data : null,
           modelo: m.modelo,
           criadoEm: m.criado_em,
+          geracao: m.sobral_geracoes,
         };
       }),
     };

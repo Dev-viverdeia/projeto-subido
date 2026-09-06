@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Fragment } from 'react';
 import { ArrowRight, FileText, Image as ImageIcon, Target } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
@@ -64,119 +65,137 @@ export function Mensagens({
       {mensagens.map((m) => {
         const detalharResposta = !compacto || m.id === ultimaResposta;
         return (
-          <li key={m.id} className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}>
-            <div className={styles.corpo}>
-              {m.anexos.some((anexo) => anexo.categoria === 'audio') ? (
-                <div className={styles.audios} aria-label="Mensagens de áudio">
-                  {m.anexos
-                    .filter((anexo) => anexo.categoria === 'audio')
-                    .map((anexo) => (
-                      <div key={anexo.id} className={styles.audioComTranscricao}>
-                        <AudioMensagem
-                          estado="Enviado"
-                          src={
-                            modoPreview
-                              ? 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA'
-                              : `/api/consultor/anexos/${anexo.id}`
-                          }
-                        />
-                        {anexo.transcricao ? (
-                          <details className={styles.transcricao}>
-                            <summary>Ver transcrição</summary>
-                            <p>{anexo.transcricao}</p>
-                          </details>
-                        ) : null}
-                      </div>
+          <Fragment key={m.id}>
+            <li className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}>
+              <div className={styles.corpo}>
+                {m.anexos.some((anexo) => anexo.categoria === 'audio') ? (
+                  <div className={styles.audios} aria-label="Mensagens de áudio">
+                    {m.anexos
+                      .filter((anexo) => anexo.categoria === 'audio')
+                      .map((anexo) => (
+                        <div key={anexo.id} className={styles.audioComTranscricao}>
+                          <AudioMensagem
+                            estado="Enviado"
+                            src={
+                              modoPreview
+                                ? 'data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA'
+                                : `/api/consultor/anexos/${anexo.id}`
+                            }
+                          />
+                          {anexo.transcricao ? (
+                            <details className={styles.transcricao}>
+                              <summary>Ver transcrição</summary>
+                              <p>{anexo.transcricao}</p>
+                            </details>
+                          ) : null}
+                        </div>
+                      ))}
+                  </div>
+                ) : null}
+                {m.anexos.some((anexo) => anexo.categoria !== 'audio') ? (
+                  <ul className={styles.anexos} aria-label="Arquivos enviados">
+                    {m.anexos
+                      .filter((anexo) => anexo.categoria !== 'audio')
+                      .map((anexo) => (
+                        <li key={anexo.id}>
+                          <IconeAnexo categoria={anexo.categoria as 'imagem' | 'documento'} />
+                          <span>{anexo.nome}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : null}
+                {m.papel === 'consultor' ? (
+                  <span className={styles.autor}>
+                    <IconeProduto nome="sobral" tamanho={20} /> Sobral AI
+                  </span>
+                ) : null}
+                {m.papel === 'consultor' ? (
+                  <div className={styles.texto}>
+                    {blocosDaResposta(m.conteudo).map((bloco, indice) => (
+                      <p key={`${m.id}-bloco-${indice}`}>{bloco}</p>
                     ))}
-                </div>
-              ) : null}
-              {m.anexos.some((anexo) => anexo.categoria !== 'audio') ? (
-                <ul className={styles.anexos} aria-label="Arquivos enviados">
-                  {m.anexos
-                    .filter((anexo) => anexo.categoria !== 'audio')
-                    .map((anexo) => (
-                      <li key={anexo.id}>
-                        <IconeAnexo categoria={anexo.categoria as 'imagem' | 'documento'} />
-                        <span>{anexo.nome}</span>
+                  </div>
+                ) : ehTextoAutomaticoDeAudio(m) ? null : (
+                  <p className={styles.texto}>{m.conteudo}</p>
+                )}
+
+                {m.papel === 'consultor' && detalharResposta ? (
+                  <div className={styles.utilidadesResposta}>
+                    <BotaoCopiar texto={m.conteudo} rotuloDoQue="a resposta do Sobral AI" />
+                  </div>
+                ) : null}
+
+                {detalharResposta && m.direcao && !(compacto && m.direcao.contexto_acao) ? (
+                  <aside className={styles.direcao} aria-label="Plano gerado nesta resposta">
+                    <div className={styles.direcaoRotulo}>
+                      <Target size={14} strokeWidth={2} aria-hidden="true" />
+                      <span>
+                        Plano ·{' '}
+                        {ETAPAS_SOBRAL.find((etapa) => etapa.id === m.direcao?.etapa)?.titulo ??
+                          m.direcao.etapa}
+                      </span>
+                    </div>
+                    <strong>{m.direcao.proximo_passo.titulo}</strong>
+                    <p>{m.direcao.proximo_passo.evidencia}</p>
+                    <Link
+                      href={
+                        m.direcao.contexto_acao
+                          ? `/vendas/${m.direcao.contexto_acao.oportunidade_id}`
+                          : m.direcao.proximo_passo.destino
+                      }
+                      className={styles.direcaoAcao}
+                    >
+                      {m.direcao.contexto_acao ? 'Abrir ficha' : 'Fazer próxima ação'}
+                      <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
+                    </Link>
+                  </aside>
+                ) : null}
+
+                {detalharResposta && m.direcao?.contexto_acao ? (
+                  <ConfirmarAcaoCrm
+                    mensagemId={m.id}
+                    contexto={m.direcao.contexto_acao}
+                    confirmada={m.acaoConfirmada}
+                    modoPreview={modoPreview}
+                    gerarProximoPasso={m.id === ultimaAcao}
+                  />
+                ) : null}
+
+                {/* Conteúdo recomendado é validado contra o catálogo antes de ser
+                gravado. A tela só exibe caminhos que existem no produto. */}
+                {detalharResposta && m.cartoes.length > 0 && (
+                  <ul className={styles.cartoes}>
+                    {m.cartoes.map((c) => (
+                      <li key={`${c.tipo}:${c.chave}`}>
+                        <Link href={c.href} className={styles.cartao}>
+                          <span className={styles.cartaoRotulo}>{c.rotulo}</span>
+                          <span className={styles.cartaoTitulo}>{c.titulo}</span>
+                          <span className={styles.cartaoMotivo}>{c.motivo}</span>
+                          <span className={styles.cartaoAcao}>{ACAO_POR_TIPO[c.tipo]} →</span>
+                        </Link>
                       </li>
                     ))}
-                </ul>
-              ) : null}
-              {m.papel === 'consultor' ? (
-                <span className={styles.autor}>
-                  <IconeProduto nome="sobral" tamanho={20} /> Sobral AI
-                </span>
-              ) : null}
-              {m.papel === 'consultor' ? (
-                <div className={styles.texto}>
-                  {blocosDaResposta(m.conteudo).map((bloco, indice) => (
-                    <p key={`${m.id}-bloco-${indice}`}>{bloco}</p>
-                  ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+            {m.id !== mensagens.at(-1)?.id &&
+            m.geracao &&
+            ['interrompida', 'falhou'].includes(m.geracao.estado) ? (
+              <li className={styles.doConsultor}>
+                <div className={styles.corpo}>
+                  <span className={styles.autor}>Sobral AI · resposta interrompida</span>
+                  {m.geracao.texto ? (
+                    <div className={styles.texto}>
+                      {blocosDaResposta(m.geracao.texto).map((bloco, i) => (
+                        <p key={i}>{bloco}</p>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : ehTextoAutomaticoDeAudio(m) ? null : (
-                <p className={styles.texto}>{m.conteudo}</p>
-              )}
-
-              {m.papel === 'consultor' && detalharResposta ? (
-                <div className={styles.utilidadesResposta}>
-                  <BotaoCopiar texto={m.conteudo} rotuloDoQue="a resposta do Sobral AI" />
-                </div>
-              ) : null}
-
-              {detalharResposta && m.direcao && !(compacto && m.direcao.contexto_acao) ? (
-                <aside className={styles.direcao} aria-label="Plano gerado nesta resposta">
-                  <div className={styles.direcaoRotulo}>
-                    <Target size={14} strokeWidth={2} aria-hidden="true" />
-                    <span>
-                      Plano ·{' '}
-                      {ETAPAS_SOBRAL.find((etapa) => etapa.id === m.direcao?.etapa)?.titulo ??
-                        m.direcao.etapa}
-                    </span>
-                  </div>
-                  <strong>{m.direcao.proximo_passo.titulo}</strong>
-                  <p>{m.direcao.proximo_passo.evidencia}</p>
-                  <Link
-                    href={
-                      m.direcao.contexto_acao
-                        ? `/vendas/${m.direcao.contexto_acao.oportunidade_id}`
-                        : m.direcao.proximo_passo.destino
-                    }
-                    className={styles.direcaoAcao}
-                  >
-                    {m.direcao.contexto_acao ? 'Abrir ficha' : 'Fazer próxima ação'}
-                    <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
-                  </Link>
-                </aside>
-              ) : null}
-
-              {detalharResposta && m.direcao?.contexto_acao ? (
-                <ConfirmarAcaoCrm
-                  mensagemId={m.id}
-                  contexto={m.direcao.contexto_acao}
-                  confirmada={m.acaoConfirmada}
-                  modoPreview={modoPreview}
-                  gerarProximoPasso={m.id === ultimaAcao}
-                />
-              ) : null}
-
-              {/* Conteúdo recomendado é validado contra o catálogo antes de ser
-                gravado. A tela só exibe caminhos que existem no produto. */}
-              {detalharResposta && m.cartoes.length > 0 && (
-                <ul className={styles.cartoes}>
-                  {m.cartoes.map((c) => (
-                    <li key={`${c.tipo}:${c.chave}`}>
-                      <Link href={c.href} className={styles.cartao}>
-                        <span className={styles.cartaoRotulo}>{c.rotulo}</span>
-                        <span className={styles.cartaoTitulo}>{c.titulo}</span>
-                        <span className={styles.cartaoMotivo}>{c.motivo}</span>
-                        <span className={styles.cartaoAcao}>{ACAO_POR_TIPO[c.tipo]} →</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </li>
+              </li>
+            ) : null}
+          </Fragment>
         );
       })}
     </ol>
