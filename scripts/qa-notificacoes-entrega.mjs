@@ -169,6 +169,21 @@ export async function validarNotificacoesEntrega({
         await client.from('projeto_portal_eventos').select('*').eq('id', evento.id).single(),
       );
       ids.push(final.email_provider_id);
+      if (new URL(app).hostname === 'subido.viverdeia.ai') {
+        await expect
+          .poll(
+            async () =>
+              exigir(
+                await client
+                  .from('projeto_portal_eventos')
+                  .select('email_status')
+                  .eq('id', evento.id)
+                  .single(),
+              ).email_status,
+            { timeout: 45_000 },
+          )
+          .toBe('entregue');
+      }
       const antigo = exigir(
         await admin.rpc('projeto_email_reservar', {
           p_evento: convite.id,
