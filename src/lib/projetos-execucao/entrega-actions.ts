@@ -46,12 +46,13 @@ async function usuarioAtual() {
 }
 
 function nomeDoProfissional(user: {
-  email?: string | null;
-  user_metadata?: { full_name?: unknown };
+  user_metadata?: { nome?: unknown; full_name?: unknown; name?: unknown };
 }) {
-  return typeof user.user_metadata?.full_name === 'string' && user.user_metadata.full_name.trim()
-    ? user.user_metadata.full_name.trim()
-    : user.email?.split('@')[0] || 'Responsável pelo projeto';
+  const dados = user.user_metadata;
+  const nome = [dados?.nome, dados?.full_name, dados?.name].find(
+    (valor): valor is string => typeof valor === 'string' && Boolean(valor.trim()),
+  );
+  return nome?.trim() || 'O responsável pelo projeto';
 }
 
 export async function prepararEntregaCliente(
