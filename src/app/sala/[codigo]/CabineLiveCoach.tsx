@@ -1,6 +1,15 @@
 'use client';
 
-import { AudioLines, Circle, ClipboardCheck, Layers3, LockKeyhole, Radio } from 'lucide-react';
+import { useRef } from 'react';
+import {
+  AudioLines,
+  ChevronDown,
+  Circle,
+  History,
+  LockKeyhole,
+  MessageCircle,
+  X,
+} from 'lucide-react';
 import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
 import styles from './LiveCoach.module.css';
@@ -8,7 +17,6 @@ import styles from './LiveCoach.module.css';
 export type EstadoCoach = 'conectando' | 'escutando' | 'analisando' | 'indisponivel';
 export type EstadoGravacao = 'pendente' | 'gravando' | 'processando' | 'concluida' | 'falhou';
 export type EstadoGravacaoUi = 'iniciando' | EstadoGravacao | 'indisponivel';
-
 export type SugestaoLive = {
   id: string;
   categoria: string;
@@ -17,15 +25,15 @@ export type SugestaoLive = {
   metodologia: string | null;
   trecho_gatilho: string | null;
   prioridade: number;
+  criada_em?: string;
 };
 
 const ROTULO_ESTADO: Record<EstadoCoach, string> = {
   conectando: 'Conectando inteligência',
   escutando: 'Escutando a conversa',
   analisando: 'Lendo o momento',
-  indisponivel: 'Transcrição indisponível',
+  indisponivel: 'Orientação pausada',
 };
-
 const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
   iniciando: 'Preparando memória',
   pendente: 'Preparando memória',
@@ -46,6 +54,8 @@ export function CabineLiveCoach({
   gravacao = 'iniciando',
   plano = null,
   tipo = 'descoberta',
+  historico = [],
+  onOcultar,
 }: {
   ativo: boolean;
   estado: EstadoCoach;
@@ -56,20 +66,27 @@ export function CabineLiveCoach({
   gravacao?: EstadoGravacaoUi;
   plano?: PlanoCall | null;
   tipo?: TipoCall;
+  historico?: SugestaoLive[];
+  onOcultar?: () => void;
 }) {
   const kickoff = tipo === 'kickoff';
-  const intensidade =
-    estado === 'analisando' ? styles.intenso : estado === 'escutando' ? styles.ativo : '';
+  const comecou = Boolean(fala.trim()) && !fala.startsWith('Aguardando');
+  const abertura = !comecou && ativo ? plano?.perguntas[0]?.pergunta : null;
+  const anteriores = historico.filter((item) => item.id !== sugestao?.id);
+  const perguntaRef = useRef<HTMLHeadingElement>(null);
 
   return (
     <aside
       className={styles.painel}
-      data-tipo={kickoff ? 'kickoff' : undefined}
       aria-label={kickoff ? 'Acordo do projeto privado' : 'Live Coach privado'}
       tabIndex={0}
     >
       <header className={styles.cabecalho}>
-        <span className={`${styles.estado} ${intensidade}`} aria-hidden="true">
+        <span
+          className={styles.estado}
+          data-ativo={estado === 'escutando' || estado === 'analisando'}
+          aria-hidden="true"
+        >
           <i />
           <i />
           <i />
@@ -78,8 +95,9 @@ export function CabineLiveCoach({
           <p>{kickoff ? 'Acordo do projeto' : ativo ? 'Coach da reunião' : 'Memória da reunião'}</p>
           <span>{ROTULO_ESTADO[estado]}</span>
         </div>
-        <span className={styles.privado}>
-          <LockKeyhole size={13} strokeWidth={1.8} aria-hidden="true" /> Só você vê
+        <span className={styles.privado} title="Este painel não aparece para o cliente">
+          <LockKeyhole size={15} aria-hidden="true" />
+          <span>Só você vê</span>
         </span>
       </header>
 
@@ -89,87 +107,99 @@ export function CabineLiveCoach({
         </p>
       )}
 
-      <section
-        className={styles.recomendacao}
-        data-tipo={kickoff ? 'kickoff' : undefined}
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <div className={styles.rotuloSecao}>
-          {kickoff ? (
-            <ClipboardCheck size={15} strokeWidth={1.8} aria-hidden="true" />
-          ) : (
-            <Layers3 size={15} strokeWidth={1.8} aria-hidden="true" />
-          )}
-          {kickoff ? 'Próximo ponto a confirmar' : 'Próxima pergunta'}
-        </div>
-        {kickoff && (
-          <div className={styles.acordoGuia} aria-label="Pontos para confirmar no kickoff">
-            <span>Resultado</span>
-            <span>Responsáveis</span>
-            <span>Acessos</span>
-            <span>Limites</span>
+      <div className={styles.conteudo}>
+        <section className={styles.recomendacao} aria-label="Orientação atual">
+          <div className={styles.rotuloSecao}>
+            <MessageCircle size={17} aria-hidden="true" />
+            {abertura
+              ? 'Para abrir a conversa'
+              : kickoff
+                ? 'Próximo ponto a confirmar'
+                : 'Próxima pergunta'}
           </div>
-        )}
-        {sugestao ? (
-          <>
-            <div className={styles.metaSugestao}>
-              <span>{sugestao.categoria}</span>
-              {sugestao.metodologia && <span>{sugestao.metodologia}</span>}
+          <div aria-live="polite" aria-atomic="true">
+            <h2 ref={perguntaRef} tabIndex={-1}>
+              {sugestao?.sugestao ??
+                abertura ??
+                (ativo ? 'Dê espaço para o cliente.' : 'Foque na conversa.')}
+            </h2>
+            {!sugestao && !abertura && (
+              <p className={styles.apoio}>
+                {ativo
+                  ? 'Uma nova orientação aparece quando houver algo útil a explorar.'
+                  : 'Os trechos ficam na ficha ao encerrar.'}
+              </p>
+            )}
+          </div>
+          {sugestao && (
+            <div className={styles.acoes}>
+              <details key={sugestao.id} className={styles.motivo}>
+                <summary>
+                  Por que perguntar <ChevronDown size={15} aria-hidden="true" />
+                </summary>
+                <p>{sugestao.titulo}</p>
+                {sugestao.trecho_gatilho && <blockquote>“{sugestao.trecho_gatilho}”</blockquote>}
+              </details>
+              {onOcultar && (
+                <button
+                  type="button"
+                  className={styles.ocultar}
+                  onClick={() => {
+                    onOcultar();
+                    perguntaRef.current?.focus();
+                  }}
+                  aria-label="Ocultar orientação atual"
+                >
+                  <X size={16} aria-hidden="true" />
+                  <span>Ocultar</span>
+                </button>
+              )}
             </div>
-            <h2>{sugestao.titulo}</h2>
-            <p>{sugestao.sugestao}</p>
-            {sugestao.trecho_gatilho && (
-              <p className={styles.evidencia}>Baseado no que ouvi: “{sugestao.trecho_gatilho}”</p>
-            )}
-          </>
-        ) : (
-          <div className={styles.espera}>
-            {ativo && plano ? (
-              <>
-                <span className={styles.planoRotulo}>
-                  {kickoff ? 'Resultado do kickoff' : 'Objetivo da conversa'}
-                </span>
-                <h2>{plano.objetivo}</h2>
-                <p className={styles.primeiraPergunta}>
-                  Comece perguntando: “{plano.perguntas[0]?.pergunta}”
-                </p>
-              </>
-            ) : (
-              <>
-                <h2>
-                  {ativo ? 'Escute antes de conduzir.' : 'A conversa já está virando histórico.'}
-                </h2>
-                <p>
-                  {ativo
-                    ? 'Quando houver um sinal útil, uma única recomendação aparece aqui.'
-                    : 'Os trechos serão salvos na ficha ao encerrar.'}
-                </p>
-              </>
-            )}
-          </div>
-        )}
-      </section>
+          )}
+        </section>
 
-      <section className={styles.transcricao}>
-        <div className={styles.rotuloSecao}>
-          <AudioLines size={15} strokeWidth={1.8} aria-hidden="true" />
-          Última fala
-        </div>
-        <p className={parcial ? styles.falaParcial : undefined}>{fala}</p>
-      </section>
+        {anteriores.length > 0 && (
+          <details className={styles.detalhe}>
+            <summary>
+              <History size={17} aria-hidden="true" /> Orientações anteriores{' '}
+              <span className={styles.contagem}>{anteriores.length}</span>
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <ol className={styles.historico}>
+              {anteriores.map((item) => (
+                <li key={item.id}>{item.sugestao}</li>
+              ))}
+            </ol>
+          </details>
+        )}
+        <details className={styles.detalhe}>
+          <summary>
+            <AudioLines size={17} aria-hidden="true" /> Última fala{' '}
+            <ChevronDown size={16} aria-hidden="true" />
+          </summary>
+          <section aria-label="Trecho da conversa" className={styles.transcricao}>
+            <p className={parcial ? styles.falaParcial : undefined}>
+              {fala || 'Aguardando a primeira fala…'}
+            </p>
+          </section>
+        </details>
+        {ativo && plano && (
+          <details className={styles.detalhe}>
+            <summary>
+              Objetivo da conversa <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <p>{plano.objetivo}</p>
+            {kickoff && <p>Resultado · Responsáveis · Acessos · Limites</p>}
+          </details>
+        )}
+      </div>
 
       <footer>
         <span className={styles.gravacao} data-estado={gravacao}>
           <Circle size={8} fill="currentColor" strokeWidth={0} aria-hidden="true" />
           {ROTULO_GRAVACAO[gravacao]}
         </span>
-        <span>
-          <Radio size={13} strokeWidth={1.8} aria-hidden="true" />
-          {kickoff
-            ? 'Acordo pronto para revisão ao encerrar'
-            : 'Resumo e decisões na ficha ao encerrar'}
-        </span>
+        <span>{kickoff ? 'Acordo para revisar ao encerrar' : 'Resumo na ficha ao encerrar'}</span>
       </footer>
     </aside>
   );

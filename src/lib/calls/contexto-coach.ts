@@ -128,6 +128,10 @@ export function contextoCoachParaTexto(contexto: ContextoCoach): string {
       : null,
     '',
     'Plano preparado para esta conversa:',
+    ...contexto.plano.fatos
+      .slice(0, 4)
+      .map((fato) => `Fato pesquisado, ainda não confirmado na reunião: ${fato}`),
+    ...contexto.plano.hipoteses.slice(0, 3).map((hipotese) => `Hipótese a validar: ${hipotese}`),
     `Objetivo: ${contexto.plano.objetivo}`,
     `Abertura sugerida: ${contexto.plano.abertura}`,
     ...contexto.plano.perguntas.map(

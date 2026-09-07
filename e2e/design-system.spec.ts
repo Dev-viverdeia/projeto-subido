@@ -14,7 +14,7 @@ const TELAS = [
   ['/preview/calls', 'Início do projeto'],
   ['/preview/call-preparo', 'Confirmar se a perda de contatos'],
   ['/preview/sala-call', 'Descoberta do atendimento da Clínica Rios'],
-  ['/preview/live-coach', 'Dimensione o custo da espera'],
+  ['/preview/live-coach', 'Quando um paciente espera duas horas'],
   ['/preview/crm-dossie', 'Clínica Aurora'],
   ['/preview/pos-call', 'Descoberta do atendimento da Clínica Horizonte'],
   ['/preview/propostas', 'Biblioteca comercial'],
@@ -369,7 +369,7 @@ test.describe('fundação visual Viver de IA', () => {
       page.getByRole('complementary', { name: 'Acordo do projeto privado' }),
     ).toBeVisible();
     await expect(page.getByText('Próximo ponto a confirmar')).toBeVisible();
-    await expect(page.getByText('Acordo pronto para revisão ao encerrar')).toBeAttached();
+    await expect(page.getByText('Acordo para revisar ao encerrar')).toBeAttached();
 
     await page.goto('/preview/pos-call?tipo=kickoff');
     await expect(page.getByRole('heading', { name: 'O que ficou combinado' })).toBeVisible();

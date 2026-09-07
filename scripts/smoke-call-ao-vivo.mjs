@@ -20,7 +20,7 @@ import {
   cookiesDaSessao,
   observarPagina,
   removerCenarioCall,
-  validarTranscricaoVisivel,
+  validarAssistenciaVisivel,
 } from './lib/smoke-call-sessao.mjs';
 
 const CONFIRMACAO = '--confirmar-producao';
@@ -281,7 +281,7 @@ async function exercitarSala({ email, password }) {
 
   await validarRecepcao({ paginaHost, paginaConvidado, esperar, etapa });
 
-  await validarTranscricaoVisivel({ paginaHost, eventos, esperar });
+  await validarAssistenciaVisivel({ paginaHost, eventos, esperar, etapa });
   await paginaHost.screenshot({ path: '/private/tmp/subido-call-smoke-host.png', fullPage: true });
   etapa('transcricao_ao_vivo_visivel');
 

@@ -34,10 +34,10 @@ export const RespostaCoachSchema = z.object({
   intervir: z.boolean(),
   categoria: CategoriaCoachSchema,
   prioridade: z.number().int().min(1).max(3),
-  titulo: z.string().trim().min(3).max(100),
-  recomendacao: z.string().trim().min(10).max(360),
+  titulo: z.string().trim().min(3).max(70),
+  recomendacao: z.string().trim().min(10).max(220),
   metodologia: z.string().trim().min(2).max(100),
-  trecho_gatilho: z.string().trim().min(2).max(300),
+  trecho_gatilho: z.string().trim().min(2).max(180),
   confianca: z.number().min(0).max(1),
 });
 

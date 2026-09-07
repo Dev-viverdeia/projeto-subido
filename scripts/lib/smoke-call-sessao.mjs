@@ -28,12 +28,15 @@ export function observarPagina(page, papel, eventos) {
   });
 }
 
-export async function validarTranscricaoVisivel({ paginaHost, eventos, esperar }) {
+export async function validarAssistenciaVisivel({ paginaHost, eventos, esperar, etapa }) {
   try {
-    const ultimaFala = paginaHost
-      .locator('section')
-      .filter({ has: paginaHost.getByText('Última fala', { exact: true }) })
-      .locator('p');
+    const detalhe = paginaHost
+      .locator('details')
+      .filter({ has: paginaHost.getByText('Última fala', { exact: true }) });
+    if ((await detalhe.getAttribute('open')) === null) {
+      await detalhe.locator('summary').click();
+    }
+    const ultimaFala = paginaHost.getByRole('region', { name: 'Trecho da conversa' }).locator('p');
     await esperar({
       contexto: 'aguardar fala transcrita na tela',
       limiteMs: 70_000,
@@ -50,6 +53,28 @@ export async function validarTranscricaoVisivel({ paginaHost, eventos, esperar }
       `A transcrição não apareceu. APIs: ${JSON.stringify(eventos)}. Tela: ${(await paginaHost.locator('body').innerText()).slice(0, 2_000)}`,
     );
   }
+  await validarOrientacaoVisivel({ paginaHost, etapa });
+}
+
+async function validarOrientacaoVisivel({ paginaHost, etapa }) {
+  const painel = paginaHost.getByRole('complementary', { name: 'Live Coach privado' });
+  const motivo = painel.getByText('Por que perguntar', { exact: true });
+  await motivo.waitFor({ state: 'visible', timeout: 90_000 });
+  const pergunta = await painel.getByRole('heading').innerText();
+  if (pergunta.length > 220 || pergunta.length < 10)
+    throw new Error('A orientação não está no formato de leitura rápida.');
+  await motivo.click();
+  const evidencia = await painel.locator('blockquote').innerText();
+  if (evidencia.length < 12) throw new Error('A orientação veio sem evidência legível.');
+  await painel.getByRole('button', { name: 'Ocultar orientação atual' }).click();
+  await painel.getByRole('heading', { name: 'Dê espaço para o cliente.' }).waitFor();
+  await painel.getByText('Orientações anteriores').click();
+  await painel.getByRole('listitem').filter({ hasText: pergunta }).waitFor();
+  etapa('orientacao_contextual_validada', { pergunta, evidencia, ocultarPreservaHistorico: true });
+  await paginaHost.screenshot({
+    path: '/private/tmp/subido-coach-historico-producao.png',
+    fullPage: true,
+  });
 }
 
 export async function removerCenarioCall({ admin, teste, erroSe }) {

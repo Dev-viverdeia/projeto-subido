@@ -30,9 +30,7 @@ test('coach mantém falha e orientação acessíveis no celular', async ({ page 
   const alerta = painel.getByRole('alert');
   await expect(alerta).toBeVisible();
   await expect(alerta).toContainText('Sua internet caiu');
-  const ultimaOrientacao = await painel
-    .locator('section[aria-live="polite"] > h2 + p')
-    .boundingBox();
+  const ultimaOrientacao = await painel.getByRole('heading').boundingBox();
   const rodape = await painel.locator('footer').boundingBox();
   expect(ultimaOrientacao).not.toBeNull();
   expect(rodape).not.toBeNull();

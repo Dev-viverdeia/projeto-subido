@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Mic, MonitorUp, PhoneOff, Video } from 'lucide-react';
-import { CabineLiveCoach, type SugestaoLive } from '@/app/sala/[codigo]/LiveCoach';
+import type { SugestaoLive } from '@/app/sala/[codigo]/CabineLiveCoach';
+import { CoachPreview } from './CoachPreview';
 import styles from './preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Live Coach' };
@@ -10,8 +11,7 @@ const SUGESTAO: SugestaoLive = {
   id: 'preview',
   categoria: 'impacto',
   titulo: 'Dimensione o custo da espera.',
-  sugestao:
-    'Pergunte: “Quando um paciente espera duas horas, o que costuma acontecer com o agendamento?”',
+  sugestao: 'Quando um paciente espera duas horas, o que costuma acontecer com o agendamento?',
   metodologia: 'SPIN · implicação',
   trecho_gatilho: 'Às vezes a equipe só consegue responder depois de duas horas.',
   prioridade: 3,
@@ -28,8 +28,7 @@ export default async function PreviewLiveCoachPage({
         ...SUGESTAO,
         categoria: 'critério de sucesso',
         titulo: 'Torne o resultado verificável.',
-        sugestao:
-          'Pergunte: “Qual indicador precisa mudar para vocês considerarem este projeto bem-sucedido?”',
+        sugestao: 'Qual indicador precisa mudar para vocês considerarem este projeto bem-sucedido?',
         metodologia: 'acordo do projeto',
         trecho_gatilho: 'A gente quer melhorar o atendimento.',
       }
@@ -68,7 +67,7 @@ export default async function PreviewLiveCoachPage({
             </button>
           </div>
         </div>
-        <CabineLiveCoach
+        <CoachPreview
           ativo
           estado={parametros.falha === '1' ? 'indisponivel' : 'escutando'}
           falha={

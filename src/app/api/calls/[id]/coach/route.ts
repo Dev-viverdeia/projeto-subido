@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import {
-  obterAvaliacaoPorOrigem,
-  obterAvaliacaoRecente,
-  obterSugestaoRecente,
-  persistirSegmentos,
-  persistirSugestao,
-} from '@/lib/calls/admin';
+import { obterAvaliacaoPorOrigem, persistirSegmentos, persistirSugestao } from '@/lib/calls/admin';
 import { LoteSegmentosSchema } from '@/lib/calls/coach-schema';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
+import { obterMemoriaCoach } from '@/lib/calls/coach-memoria';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
 import { ErroModeloCoach, gerarSugestaoCoach } from '@/lib/calls/modelo-coach';
 import { createClient } from '@/lib/supabase/server';
@@ -49,49 +44,41 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
     if (!contexto.liveCoachAtivo) {
       return NextResponse.json({ estado: 'memoria', sugestao: null }, { headers: semCache() });
     }
-    const ultimo = corpo.data.segmentos.at(-1)!;
+    const ultimo = segmentos.at(-1)!;
     const jaAvaliada = await obterAvaliacaoPorOrigem({
       dono: contexto.dono,
       reuniaoId: contexto.reuniaoId,
       origemItemId: ultimo.itemId,
     });
-    const recente = await obterSugestaoRecente({
-      dono: contexto.dono,
-      reuniaoId: contexto.reuniaoId,
-    });
-    if (jaAvaliada) {
-      return NextResponse.json(
-        {
-          estado: jaAvaliada.status === 'dispensada' ? 'observando' : 'sugestao',
-          sugestao: jaAvaliada.status === 'dispensada' ? recente : jaAvaliada,
-        },
+    const memoria = await obterMemoriaCoach(supabase, contexto.dono, contexto.reuniaoId);
+    const observar = () =>
+      NextResponse.json(
+        { estado: 'observando', sugestao: memoria.vigente, historico: memoria.historico },
         { headers: semCache() },
       );
+    if (jaAvaliada) {
+      return observar();
     }
 
-    const ultimaAvaliacao = await obterAvaliacaoRecente({
-      dono: contexto.dono,
-      reuniaoId: contexto.reuniaoId,
-    });
+    const ultimaAvaliacao = memoria.ultima;
     if (
       ultimaAvaliacao &&
       Date.now() - new Date(ultimaAvaliacao.criada_em).getTime() < INTERVALO_SUGESTAO_MS
     ) {
-      return NextResponse.json(
-        { estado: 'observando', sugestao: recente },
-        { headers: semCache() },
-      );
+      return observar();
     }
 
-    const janela = segmentos.slice(-10);
+    const janela = segmentos.slice(-16);
     if (janela.reduce((total, segmento) => total + segmento.texto.length, 0) < 70) {
-      return NextResponse.json(
-        { estado: 'observando', sugestao: recente },
-        { headers: semCache() },
-      );
+      return observar();
     }
 
-    const rodada = await gerarSugestaoCoach({ usuarioId: user.id, contexto, segmentos: janela });
+    const rodada = await gerarSugestaoCoach({
+      usuarioId: user.id,
+      contexto,
+      segmentos: janela,
+      anteriores: memoria.historico,
+    });
     const salva = await persistirSugestao({
       dono: contexto.dono,
       reuniaoId: contexto.reuniaoId,
@@ -104,12 +91,15 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
 
     if (!rodada.sugestao.intervir) {
       return NextResponse.json(
-        { estado: 'observando', sugestao: recente },
+        { estado: 'observando', sugestao: null, historico: memoria.historico },
         { headers: semCache() },
       );
     }
 
-    return NextResponse.json({ estado: 'sugestao', sugestao: salva }, { headers: semCache() });
+    return NextResponse.json(
+      { estado: 'sugestao', sugestao: salva, historico: memoria.historico },
+      { headers: semCache() },
+    );
   } catch (causa) {
     if (causa instanceof ErroModeloCoach) return erro(causa.message, 503);
     console.error('[calls:coach] falha:', causa);
