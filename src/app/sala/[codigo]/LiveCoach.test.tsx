@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { CabineLiveCoach, type SugestaoLive } from './LiveCoach';
 
 const SUGESTAO: SugestaoLive = {
@@ -40,13 +40,16 @@ describe('CabineLiveCoach', () => {
 
     expect(screen.getByRole('complementary', { name: 'Live Coach privado' })).toBeInTheDocument();
     expect(screen.getByText('Próxima pergunta')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: SUGESTAO.titulo })).toBeInTheDocument();
-    expect(screen.getByText(/Baseado no que ouvi/)).toHaveTextContent(SUGESTAO.trecho_gatilho!);
+    expect(screen.getByRole('heading', { name: SUGESTAO.sugestao })).toBeInTheDocument();
+    expect(screen.getByText(SUGESTAO.titulo)).not.toBeVisible();
+    fireEvent.click(screen.getByText('Por que perguntar'));
+    expect(screen.getByText(SUGESTAO.titulo)).toBeVisible();
+    expect(screen.getByText(`“${SUGESTAO.trecho_gatilho}”`)).toBeVisible();
     expect(screen.getByText('Só você vê')).toBeInTheDocument();
-    expect(screen.getByText(/resumo e decisões na ficha ao encerrar/i)).toBeInTheDocument();
+    expect(screen.getByText(/resumo na ficha ao encerrar/i)).toBeInTheDocument();
   });
 
-  it('mostra o objetivo e a primeira pergunta antes da conversa começar', () => {
+  it('prioriza a primeira pergunta e deixa o objetivo sob demanda', () => {
     render(
       <CabineLiveCoach
         ativo
@@ -78,10 +81,10 @@ describe('CabineLiveCoach', () => {
     );
 
     expect(screen.getByText('Objetivo da conversa')).toBeInTheDocument();
+    expect(screen.getByText('Confirmar o impacto da demora no atendimento.')).not.toBeVisible();
     expect(
-      screen.getByRole('heading', { name: 'Confirmar o impacto da demora no atendimento.' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Quantas oportunidades são perdidas por mês/)).toBeInTheDocument();
+      screen.getByRole('heading', { name: 'Quantas oportunidades são perdidas por mês?' }),
+    ).toBeVisible();
   });
 
   it('orienta o kickoff pelos pontos do acordo sem marcar decisões não confirmadas', () => {
@@ -99,9 +102,44 @@ describe('CabineLiveCoach', () => {
       screen.getByRole('complementary', { name: 'Acordo do projeto privado' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Próximo ponto a confirmar')).toBeInTheDocument();
-    expect(screen.getByLabelText('Pontos para confirmar no kickoff')).toHaveTextContent(
-      'ResultadoResponsáveisAcessosLimites',
+    expect(screen.getByText(/acordo para revisar ao encerrar/i)).toBeInTheDocument();
+  });
+
+  it('permite ocultar a orientação e consultar anteriores sem misturar com a atual', () => {
+    const onOcultar = vi.fn();
+    render(
+      <CabineLiveCoach
+        ativo
+        estado="escutando"
+        sugestao={SUGESTAO}
+        fala="Tudo certo."
+        onOcultar={onOcultar}
+        historico={[
+          SUGESTAO,
+          { ...SUGESTAO, id: 'anterior', sugestao: 'Qual parte do atendimento mais trava hoje?' },
+        ]}
+      />,
     );
-    expect(screen.getByText(/acordo pronto para revisão ao encerrar/i)).toBeInTheDocument();
+    expect(screen.getByText('Qual parte do atendimento mais trava hoje?')).not.toBeVisible();
+    fireEvent.click(screen.getByText('Orientações anteriores'));
+    expect(screen.getByText('Qual parte do atendimento mais trava hoje?')).toBeVisible();
+    expect(screen.getAllByText(SUGESTAO.sugestao)).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Ocultar orientação atual' }));
+    expect(onOcultar).toHaveBeenCalledOnce();
+  });
+
+  it('não repete uma pergunta de abertura quando a conversa já começou', () => {
+    render(
+      <CabineLiveCoach
+        ativo
+        estado="escutando"
+        sugestao={null}
+        fala="Hoje recebemos quarenta mensagens."
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Dê espaço para o cliente.' })).toBeVisible();
+    expect(screen.getByText('Hoje recebemos quarenta mensagens.')).not.toBeVisible();
+    fireEvent.click(screen.getByText('Última fala'));
+    expect(screen.getByText('Hoje recebemos quarenta mensagens.')).toBeVisible();
   });
 });

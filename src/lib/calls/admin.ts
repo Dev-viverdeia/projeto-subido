@@ -197,29 +197,6 @@ export type SugestaoCoachSalva = {
   criada_em: string;
 };
 
-export async function obterSugestaoRecente({
-  dono,
-  reuniaoId,
-}: {
-  dono: string;
-  reuniaoId: string;
-}): Promise<SugestaoCoachSalva | null> {
-  const admin = createAdminClient();
-  const { data, error } = await admin
-    .from('calls_coach_sugestoes')
-    .select(
-      'id, categoria, titulo, sugestao, metodologia, trecho_gatilho, prioridade, confianca, status, criada_em',
-    )
-    .eq('dono', dono)
-    .eq('reuniao_id', reuniaoId)
-    .neq('status', 'dispensada')
-    .order('criada_em', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw handleError(error, 'calls:coach:recente');
-  return data;
-}
-
 export async function obterAvaliacaoPorOrigem({
   dono,
   reuniaoId,
@@ -240,26 +217,6 @@ export async function obterAvaliacaoPorOrigem({
     .eq('origem_item_id', origemItemId)
     .maybeSingle();
   if (error) throw handleError(error, 'calls:coach:origem');
-  return data;
-}
-
-export async function obterAvaliacaoRecente({
-  dono,
-  reuniaoId,
-}: {
-  dono: string;
-  reuniaoId: string;
-}): Promise<{ criada_em: string } | null> {
-  const admin = createAdminClient();
-  const { data, error } = await admin
-    .from('calls_coach_sugestoes')
-    .select('criada_em')
-    .eq('dono', dono)
-    .eq('reuniao_id', reuniaoId)
-    .order('criada_em', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw handleError(error, 'calls:coach:avaliacao-recente');
   return data;
 }
 

@@ -13,6 +13,7 @@ import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
+import { useOrientacoesCoach } from './useOrientacoesCoach';
 import {
   CabineLiveCoach,
   type EstadoCoach,
@@ -46,7 +47,7 @@ export function LiveCoach({
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
   const [estado, setEstado] = useState<EstadoCoach>('conectando');
-  const [sugestao, setSugestao] = useState<SugestaoLive | null>(null);
+  const { atual: sugestao, historico, receber, ocultar } = useOrientacoesCoach();
   const [parcial, setParcial] = useState('');
   const [ultimaFala, setUltimaFala] = useState('Aguardando a primeira fala…');
   const [falha, setFalha] = useState('');
@@ -159,9 +160,10 @@ export function LiveCoach({
       const resultado = (await response.json()) as {
         erro?: string;
         sugestao?: SugestaoLive | null;
+        historico?: SugestaoLive[];
       };
       if (!response.ok) throw new Error(resultado.erro || 'Não foi possível salvar este trecho.');
-      if (resultado.sugestao && ativo) setSugestao(resultado.sugestao);
+      if (ativo) receber(resultado.sugestao ?? null, resultado.historico);
       setFalha('');
       setEstado('escutando');
       concluido = true;
@@ -177,7 +179,7 @@ export function LiveCoach({
         setVersaoFila((versao) => versao + 1);
       }
     }
-  }, [ativo, reuniaoId]);
+  }, [ativo, receber, reuniaoId]);
 
   useEffect(() => {
     if (versaoFila === 0) return;
@@ -407,6 +409,8 @@ export function LiveCoach({
       ativo={ativo}
       estado={estado}
       sugestao={sugestao}
+      historico={historico}
+      onOcultar={ocultar}
       fala={parcial || ultimaFala}
       parcial={Boolean(parcial)}
       falha={falha}
