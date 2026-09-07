@@ -1,4 +1,4 @@
-import { Children, isValidElement } from 'react';
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react';
 import { expect, it, vi } from 'vitest';
 
 const carregar = vi.hoisted(() => vi.fn());
@@ -25,7 +25,7 @@ async function elementos(id: string, status = 'concluida') {
       provedores: {},
     },
   });
-  const pagina = await ProspeccaoPage({
+  const pagina: ReactElement<{ children: ReactNode }> = await ProspeccaoPage({
     params: Promise.resolve({}),
     searchParams: Promise.resolve({}),
   });
