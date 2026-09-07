@@ -922,7 +922,7 @@
 .fases button > span,
 .fases button small {
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-support);
 }
 
 .fases button strong {
@@ -932,7 +932,7 @@
 }
 
 .fases button small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 
 .fases button[data-ativa] small {
@@ -941,7 +941,7 @@
 
 .faseCorpo {
   display: grid;
-  grid-template-columns: minmax(240px, 0.28fr) minmax(0, 0.72fr);
+  grid-template-columns: minmax(220px, 0.24fr) minmax(0, 0.76fr);
   min-height: 0;
 }
 
@@ -951,12 +951,27 @@
   background: color-mix(in srgb, var(--via-navy) 3%, transparent);
 }
 
-.passosDaFase > p {
+.passosDaFase > h2 {
   margin: 0 0 var(--via-space-4);
-  font-size: var(--via-fs-caption);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+
+.objetivoFase {
+  margin-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.objetivoFase summary {
+  padding-block: var(--via-space-3);
+  color: var(--via-text-muted);
+  cursor: pointer;
+  font-size: var(--app-fs-support);
+}
+.objetivoFase p {
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+  color: var(--via-text-muted);
 }
 
 .passosDaFase nav {
@@ -1020,7 +1035,7 @@
 
 .passoFoco {
   min-width: 0;
-  padding: clamp(28px, 4vw, 48px);
+  padding: var(--via-space-6);
 }
 
 .passoFoco > header {
@@ -1052,7 +1067,7 @@
   align-items: end;
   justify-content: space-between;
   gap: var(--via-space-5);
-  margin-top: var(--via-space-7);
+  margin-top: 0;
 }
 
 .passoTitulo h3 {
@@ -1066,12 +1081,12 @@
   align-items: center;
   gap: var(--via-space-2);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-faint);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
 }
 
 .passoAcao {
-  max-width: 72ch;
+  max-width: 56ch;
   margin: var(--via-space-4) 0 0;
   font-size: var(--via-fs-body);
   line-height: 1.62;
@@ -1158,9 +1173,9 @@
   gap: var(--app-gap-grid);
 }
 
-.resumoProjeto > div {
+.resumoProjeto > details {
   min-width: 0;
-  padding: var(--app-pad-card);
+  padding: var(--via-space-2) var(--via-space-4);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-card);
   background: var(--via-surface);
@@ -1169,6 +1184,45 @@
 .resumoProjeto span,
 .resumoProjeto p {
   margin: 0;
+}
+
+.resumoProjeto summary,
+.fundamentos summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 44px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+}
+.resumoProjeto summary::-webkit-details-marker,
+.fundamentos summary::-webkit-details-marker {
+  display: none;
+}
+.resumoProjeto summary > svg,
+.fundamentos summary > svg {
+  flex: none;
+}
+.resumoProjeto details[open] summary > svg,
+.fundamentos details[open] summary > svg {
+  transform: rotate(180deg);
+}
+.resumoProjeto summary:focus-visible,
+.fundamentos summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.fundamentos li {
+  display: block;
+  padding-block: var(--via-space-1);
+}
+.fundamentos details > p {
+  margin-bottom: var(--via-space-4);
+  font-size: var(--app-fs-reading);
+  max-width: 58ch;
 }
 
 .resumoProjeto span {

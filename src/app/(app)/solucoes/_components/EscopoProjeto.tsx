@@ -1,73 +1,106 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  ArrowUpRight,
+  Check,
+  ClipboardList,
+  Clock3,
+  Gauge,
+  ShieldCheck,
+  Target,
+} from 'lucide-react';
 import type { RoteiroProjeto } from '@/lib/projetos/roteiro';
 import styles from './ProjetoGuiado.module.css';
+import visual from './LeituraProjeto.module.css';
 
 const ROTULO_NIVEL = {
   entrada: 'Entrada',
   intermediario: 'Intermediário',
   avancado: 'Avançado',
 } as const;
-
 type Perfil = NonNullable<RoteiroProjeto['perfil']>;
 type Escopo = NonNullable<RoteiroProjeto['escopo']>;
 type Artefatos = NonNullable<RoteiroProjeto['artefatosEntrega']>;
 
 export function FichaCampoProjeto({ perfil, escopo }: { perfil: Perfil; escopo: Escopo }) {
+  const [grupo, setGrupo] = useState<keyof Escopo>('inclui');
+  const grupos = [
+    { id: 'inclui', titulo: 'O piloto inclui', icone: <Check size={19} /> },
+    { id: 'preRequisitos', titulo: 'O cliente precisa ter', icone: <ClipboardList size={19} /> },
+    { id: 'naoInclui', titulo: 'Fora do piloto', icone: <ShieldCheck size={19} /> },
+    { id: 'evolucoes', titulo: 'Depois de validar', icone: <ArrowUpRight size={19} /> },
+  ] as const;
+  const ativo = grupos.find((item) => item.id === grupo)!;
   return (
-    <section className={styles.fichaCampo} aria-labelledby="ficha-campo-titulo">
-      <header className={styles.fichaCampoCabecalho}>
+    <section className={visual.escopo} aria-labelledby="ficha-campo-titulo">
+      <header className={visual.escopoTopo}>
         <div>
-          <p>Antes de vender</p>
-          <h2 id="ficha-campo-titulo">O combinado deste projeto</h2>
+          <h2 id="ficha-campo-titulo">Escopo do piloto</h2>
+          <p>{perfil.formatoPiloto}</p>
         </div>
-        {perfil.recomendadoParaComecar ? <span>Recomendado para começar</span> : null}
-      </header>
-
-      <div className={styles.fichaCampoResumo}>
-        <dl className={styles.indicadoresProjeto}>
+        <dl>
           <div>
-            <dt>Complexidade</dt>
-            <dd>{ROTULO_NIVEL[perfil.nivel]}</dd>
-          </div>
-          <div>
-            <dt>Prazo do piloto</dt>
+            <dt>
+              <Clock3 size={17} aria-hidden="true" />
+              Prazo
+            </dt>
             <dd>{perfil.prazo}</dd>
           </div>
           <div>
-            <dt>Formato inicial</dt>
-            <dd>{perfil.formatoPiloto}</dd>
+            <dt>
+              <Gauge size={17} aria-hidden="true" />
+              Complexidade
+            </dt>
+            <dd>{ROTULO_NIVEL[perfil.nivel]}</dd>
           </div>
         </dl>
-
-        <div className={styles.primeiraProva}>
-          <span>Primeiro teste</span>
+      </header>
+      {perfil.recomendadoParaComecar ? (
+        <p className={visual.recomendado}>Recomendado para começar</p>
+      ) : null}
+      <div className={visual.escopoCorpo}>
+        <nav aria-label="Partes do escopo" className={visual.partesEscopo}>
+          {grupos.map((item) => (
+            <button
+              type="button"
+              key={item.id}
+              aria-pressed={grupo === item.id}
+              onClick={() => setGrupo(item.id)}
+            >
+              <span aria-hidden="true">{item.icone}</span>
+              <span>
+                {item.titulo}
+                <small>
+                  {escopo[item.id].length} {escopo[item.id].length === 1 ? 'item' : 'itens'}
+                </small>
+              </span>
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </button>
+          ))}
+        </nav>
+        <section className={visual.listaEscopo} aria-label={ativo.titulo}>
+          <h3>{ativo.titulo}</h3>
+          <ul className={visual.lista} aria-label={ativo.titulo}>
+            {escopo[grupo].map((item) => (
+              <li key={item}>
+                <span className={visual.marcaItem} aria-hidden="true">
+                  {ativo.icone}
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+      <div className={visual.teste}>
+        <Target size={24} aria-hidden="true" />
+        <div>
+          <h3>Primeiro teste</h3>
           <p>{perfil.primeiraProva}</p>
         </div>
       </div>
-
-      <div className={styles.escopoProjeto}>
-        <ListaEscopo titulo="O piloto inclui" itens={escopo.inclui} />
-        <ListaEscopo titulo="O cliente precisa ter" itens={escopo.preRequisitos} />
-        <ListaEscopo titulo="Fica fora do piloto" itens={escopo.naoInclui} />
-      </div>
-
-      <div className={styles.evolucoesProjeto}>
-        <span>Depois de validar</span>
-        <p>{escopo.evolucoes.join(' · ')}</p>
-      </div>
     </section>
-  );
-}
-
-function ListaEscopo({ titulo, itens }: { titulo: string; itens: string[] }) {
-  return (
-    <article>
-      <span>{titulo}</span>
-      <ul>
-        {itens.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </article>
   );
 }
 

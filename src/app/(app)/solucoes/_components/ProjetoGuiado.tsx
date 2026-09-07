@@ -74,7 +74,7 @@ export function ProjetoGuiado({
     { id: 'implementar', rotulo: 'Implementar' },
     { id: 'materiais', rotulo: 'Materiais' },
   ] as const;
-  const mostrarAcaoCabecalho = abaAtiva !== 'aprender' || !proximoPasso;
+  const mostrarAcaoCabecalho = abaAtiva === 'materiais' || !proximoPasso;
 
   return (
     <div className={styles.raiz}>

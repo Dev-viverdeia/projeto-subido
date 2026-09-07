@@ -129,21 +129,27 @@ describe('PesquisaComercial', () => {
 
     expect(screen.getByRole('heading', { name: 'Leitura para a próxima reunião' })).toBeVisible();
     expect(screen.getByText(DOSSIE.resumo)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir a conversa' }));
     expect(screen.getByText(DOSSIE.roteiroCall!.objetivo)).toBeVisible();
     expect(screen.getByText(/Vi que o WhatsApp concentra a demanda/)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Explorar perguntas' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Dimensionar' }));
     expect(
-      screen.getByText('Quantas conversas deixam de virar agendamento em uma semana?'),
+      screen.getByRole('heading', {
+        name: 'Quantas conversas deixam de virar agendamento em uma semana?',
+      }),
     ).toBeVisible();
     expect(screen.getByText('Dimensionar')).toBeVisible();
     expect(
       screen.getByText('Dimensionar o impacto que o piloto precisaria demonstrar.'),
     ).toBeVisible();
-    expect(screen.getAllByText('SDR de Atendimento e Qualificação').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Projeto em análise: SDR de Atendimento e Qualificação/)).toBeVisible();
+    expect(screen.getByText('SDR de atendimento')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Combinar próximo passo' }));
     expect(
       screen.getByRole('heading', { name: 'Saia com um próximo passo combinado' }),
     ).toBeVisible();
     expect(screen.getByText(/Faz sentido mapearmos uma semana/)).toBeVisible();
-    expect(screen.getByText('SDR de atendimento')).toBeVisible();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Visão geral' }));
     expect(screen.getByText('WhatsApp em destaque')).toBeVisible();

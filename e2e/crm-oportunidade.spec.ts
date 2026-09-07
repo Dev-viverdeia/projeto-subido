@@ -24,18 +24,25 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(page.getByRole('heading', { name: 'Reuniões' })).toBeVisible();
 
     await page.getByRole('tab', { name: 'Preparar reunião' }).click();
+    await page.getByRole('button', { name: 'Abrir a conversa', exact: true }).click();
     await expect(
       page.getByText(
         'Confirmar se o volume e a demora no WhatsApp justificam um SDR de Atendimento e Qualificação, com um piloto pequeno e mensurável.',
       ),
     ).toBeVisible();
-    await expect(page.getByText('Perguntas na ordem da conversa')).toBeVisible();
+    await page.getByRole('button', { name: 'Explorar perguntas', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Roteiro da reunião' })).toBeVisible();
+    await page
+      .getByRole('navigation', { name: 'Etapas da conversa' })
+      .getByRole('button', { name: 'Dimensionar' })
+      .click();
     await expect(
-      page.getByText(
-        'Em uma semana comum, quantas conversas chegam e quantas deixam de virar agendamento?',
-      ),
+      page.getByRole('heading', {
+        name: 'Em uma semana comum, quantas conversas chegam e quantas deixam de virar agendamento?',
+      }),
     ).toBeVisible();
     await expect(page.getByText('Dimensionar', { exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Combinar próximo passo', exact: true }).click();
     await expect(page.getByText('Saia com um próximo passo combinado')).toBeVisible();
     await page.getByRole('tab', { name: 'Dados e fontes' }).click();
     await expect(page.getByText('Site da Clínica Aurora')).toBeVisible();

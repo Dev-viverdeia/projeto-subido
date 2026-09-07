@@ -153,9 +153,8 @@
 }
 
 .abas {
-  position: sticky;
-  top: calc(var(--app-shell-header-h, 58px) + var(--via-space-3));
-  z-index: calc(var(--via-z-sticky) - 1);
+  /* O roteiro agora cabe em uma leitura curta; a barra fixa cobria seus controles. */
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
@@ -1061,7 +1060,6 @@
 
   .abas {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    top: calc(var(--app-shell-header-h, 58px) + var(--via-space-2));
   }
 
   .abas button {
@@ -1139,6 +1137,7 @@
 }
 
 @supports not (backdrop-filter: blur(1px)) {
+  .abas,
   .briefing,
   .inteligenciaContato {
     background: var(--via-surface);

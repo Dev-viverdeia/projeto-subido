@@ -1,0 +1,438 @@
+.guia,
+.escopo {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+.guia {
+  margin-top: var(--via-space-5);
+}
+.modulos,
+.areasKit {
+  display: flex;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+.modulos button,
+.areasKit button,
+.navegar button {
+  display: inline-flex;
+  gap: var(--via-space-2);
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-muted);
+  background: transparent;
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+.modulos button {
+  flex: 1;
+}
+.modulos button[aria-pressed='true'],
+.areasKit button[aria-pressed='true'] {
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+  border-color: var(--via-navy-14);
+}
+.modulos button:hover,
+.areasKit button:hover,
+.navegar button:hover {
+  background: var(--via-navy-06);
+}
+.guia button:focus-visible,
+.escopo button:focus-visible,
+.areasKit button:focus-visible,
+.guia summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+.corpoGuia {
+  padding: var(--app-pad-card);
+}
+.corpoGuia h4,
+.listaEscopo h3 {
+  margin: 0 0 var(--via-space-4);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+}
+.corpoGuia p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-reading);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.acaoFoco > span {
+  display: block;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  font-variant-numeric: tabular-nums;
+}
+.acaoFoco p {
+  max-width: 52ch;
+  margin-top: var(--via-space-4);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+  line-height: 1.5;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-5);
+}
+.acoes button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-muted);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    color var(--app-t-state);
+}
+.acoes button:hover {
+  background: var(--via-navy-06);
+}
+.acoes button[aria-pressed='true'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+  border-color: var(--via-navy);
+}
+.navegar {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-3);
+}
+.navegar button {
+  color: var(--via-navy);
+}
+.navegar button:disabled {
+  color: var(--via-text-muted);
+  cursor: not-allowed;
+  background: var(--via-bg-2);
+}
+.detalhe {
+  margin-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.guia summary {
+  display: flex;
+  gap: var(--via-space-3);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  list-style: none;
+  cursor: pointer;
+}
+.guia summary::-webkit-details-marker {
+  display: none;
+}
+.guia summary svg {
+  flex: none;
+  transition: transform var(--app-t-touch);
+}
+.guia details[open] > summary svg {
+  transform: rotate(180deg);
+}
+.todasAcoes {
+  margin: 0;
+  padding-left: var(--via-space-5);
+}
+.todasAcoes li {
+  padding: var(--via-space-2) 0 var(--via-space-2) var(--via-space-2);
+  font-size: var(--app-fs-reading);
+  line-height: 1.6;
+  color: var(--via-text-body);
+}
+.lista {
+  display: grid;
+  gap: var(--via-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lista li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  font-size: var(--app-fs-reading);
+  line-height: 1.55;
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}
+.lista li + li {
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.lista li > svg,
+.marcaItem {
+  margin-top: 3px;
+  color: var(--via-navy);
+}
+.conferencia {
+  display: grid;
+  gap: var(--app-gap-block);
+  margin: 0;
+}
+.conferencia dt {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-navy);
+  font-size: var(--app-fs-ui);
+}
+.conferencia dd {
+  max-width: 54ch;
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--app-fs-reading);
+  line-height: 1.6;
+  color: var(--via-text-body);
+  text-wrap: pretty;
+}
+.modelo {
+  border-top: 1px solid var(--via-border-hairline);
+}
+.modelo summary {
+  padding: var(--via-space-3) var(--app-pad-card);
+  background: var(--via-navy-03);
+}
+.modelo small {
+  display: block;
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.modelo > div {
+  padding: var(--app-pad-card);
+}
+.modelo pre {
+  max-height: 320px;
+  overflow: auto;
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--app-fs-support);
+  line-height: 1.65;
+  color: var(--via-text-body);
+}
+.areasKit {
+  padding: var(--via-space-4) 0;
+  flex-wrap: wrap;
+}
+.escopoTopo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--app-gap-block);
+  align-items: center;
+  padding: var(--via-space-6);
+}
+.escopoTopo h2 {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h3);
+  line-height: 1.3;
+  letter-spacing: var(--app-ls-h3);
+  font-weight: 550;
+}
+.escopoTopo p {
+  margin: var(--via-space-3) 0 0;
+  max-width: 48ch;
+  color: var(--via-text-body);
+  font-size: var(--app-fs-reading);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.escopoTopo dl {
+  display: flex;
+  gap: var(--app-gap-block);
+  margin: 0;
+}
+.escopoTopo dt {
+  display: flex;
+  gap: var(--via-space-2);
+  align-items: center;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.escopoTopo dd {
+  margin: var(--via-space-3) 0 0;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  color: var(--via-text-primary);
+}
+.escopoCorpo {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 2fr);
+  gap: var(--app-gap-block);
+  padding: 0 var(--via-space-6) var(--via-space-6);
+}
+.partesEscopo {
+  display: grid;
+  gap: var(--via-space-2);
+  align-content: start;
+}
+.partesEscopo button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--via-space-3);
+  align-items: center;
+  min-height: 68px;
+  padding: var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  text-align: left;
+  font-size: var(--app-fs-ui);
+  cursor: pointer;
+  transition:
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
+}
+.partesEscopo button small {
+  display: block;
+  margin-top: 3px;
+  font-size: var(--app-fs-support);
+}
+.partesEscopo button:hover {
+  background: var(--via-navy-03);
+}
+.partesEscopo button[aria-pressed='true'] {
+  border-color: var(--app-elev-1-line);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-navy);
+}
+.partesEscopo button > span:first-child {
+  display: inline-flex;
+}
+.listaEscopo {
+  min-width: 0;
+  padding: var(--app-pad-card);
+  border-left: 1px solid var(--via-border-hairline);
+}
+.listaEscopo .lista li {
+  font-size: var(--app-fs-ui);
+}
+.teste {
+  display: flex;
+  gap: var(--via-space-4);
+  padding: var(--app-pad-card) var(--via-space-6);
+  background: var(--via-navy-03);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.teste > svg {
+  flex: none;
+  color: var(--via-navy);
+}
+.teste h3 {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+.teste p {
+  max-width: 65ch;
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+.recomendado {
+  padding-inline: var(--via-space-6);
+  margin-top: 0;
+  color: var(--via-navy);
+  font-size: var(--app-fs-support);
+}
+@media (max-width: 1079px) {
+  .escopoTopo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .escopoCorpo {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 var(--via-space-4) var(--via-space-4);
+  }
+  .escopoTopo {
+    padding: var(--via-space-4);
+  }
+  .partesEscopo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .partesEscopo button {
+    grid-template-columns: auto 1fr;
+    padding: var(--via-space-2);
+    font-size: var(--app-fs-support);
+  }
+  .partesEscopo button > svg {
+    display: none;
+  }
+  .listaEscopo {
+    border: 0;
+    padding: var(--via-space-2);
+  }
+  .teste {
+    padding: var(--via-space-4);
+  }
+}
+@media (max-width: 599px) {
+  .modulos {
+    gap: 0;
+  }
+  .modulos button {
+    flex-direction: column;
+    padding-inline: var(--via-space-2);
+    font-size: var(--app-fs-support);
+  }
+  .areasKit {
+    gap: var(--via-space-1);
+  }
+  .areasKit button {
+    flex: 1;
+    padding-inline: var(--via-space-2);
+    font-size: var(--app-fs-support);
+    line-height: 1.4;
+  }
+  .corpoGuia {
+    padding: var(--via-space-4);
+  }
+  .navegar button {
+    padding-inline: var(--via-space-2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .guia button,
+  .escopo button,
+  .areasKit button,
+  .guia summary svg {
+    transition: none;
+  }
+}
