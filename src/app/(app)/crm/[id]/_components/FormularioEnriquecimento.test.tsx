@@ -15,8 +15,24 @@ vi.mock('@/lib/crm/invocar-enriquecimento', () => ({
 
 describe('FormularioEnriquecimento', () => {
   beforeEach(() => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     atualizar.mockReset();
     vi.mocked(iniciarEnriquecimento).mockReset();
+  });
+
+  it('não envia uma solicitação paga sem conexão', async () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    render(
+      <FormularioEnriquecimento
+        oportunidadeId="22222222-2222-4222-8222-222222222222"
+        saldoCreditos={20}
+        temDossie={false}
+        abertoInicial
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Sem conexão');
+    expect(iniciarEnriquecimento).not.toHaveBeenCalled();
   });
 
   it('confirma o custo e envia somente a oportunidade', async () => {
@@ -82,7 +98,29 @@ describe('FormularioEnriquecimento', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
     await screen.findByText(/Confira o andamento na ficha/);
+    expect(screen.queryByRole('button', { name: 'Usar 3 créditos' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Conferir ficha' }));
+    expect(iniciarEnriquecimento).toHaveBeenCalledTimes(1);
     expect(screen.queryByText(/Nenhum crédito foi usado/)).not.toBeInTheDocument();
     expect(atualizar).toHaveBeenCalled();
+  });
+
+  it('cede o modal ao andamento confirmado pela ficha, sem sobrepor a confirmação', async () => {
+    vi.mocked(iniciarEnriquecimento).mockResolvedValue({
+      dados: null,
+      falha: 'Confira o andamento na ficha.',
+      incerto: true,
+    });
+    const props = {
+      oportunidadeId: '22222222-2222-4222-8222-222222222222',
+      saldoCreditos: 20,
+      temDossie: false,
+      abertoInicial: true,
+    };
+    const { rerender } = render(<FormularioEnriquecimento {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
+    await screen.findByText(/Confira o andamento/);
+    rerender(<FormularioEnriquecimento {...props} desabilitado />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

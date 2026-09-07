@@ -10,7 +10,6 @@ import { FormularioBusca } from './_components/FormularioBusca';
 import { HeroProspeccao } from './_components/HeroProspeccao';
 import { ListaResultados } from './_components/ListaResultados';
 import { ListasVazias } from './_components/ListasVazias';
-import { ResultadoBusca } from './_components/ResultadoBusca';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Prospecção' };
@@ -75,21 +74,21 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
     <div className={styles.pagina}>
       <HeroProspeccao saldo={saldo} />
 
-      {(parametros.busca === 'concluida' || parametros.busca === 'falhou') && listaAtual && (
-        <ResultadoBusca
-          estado={parametros.busca}
-          segmento={listaAtual.segmento}
-          localizacao={listaAtual.localizacao}
-          solicitadas={listaAtual.quantidade_solicitada}
-          encontradas={listaAtual.creditos_consumidos}
-        />
-      )}
-      {parametros.busca === 'processando' && listaAtual && (
+      {listaAtual && (
         <AcompanhamentoBusca
+          key={listaAtual.id}
           status={listaAtual.status}
           quantidade={listaAtual.quantidade_solicitada}
           etapa={progresso.etapa}
           detalhe={progresso.detalhe}
+          segmento={listaAtual.segmento}
+          localizacao={listaAtual.localizacao}
+          encontradas={listaAtual.creditos_consumidos}
+          minimizadoInicial={
+            parametros.busca !== 'processando' &&
+            parametros.busca !== 'concluida' &&
+            parametros.busca !== 'falhou'
+          }
         />
       )}
       {parametros.crm === 'erro' && (
@@ -101,13 +100,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       )}
 
       <FormularioBusca
-        key={
-          parametros.busca === 'falhou'
-            ? listaAtual?.id
-            : valoresRetomados
-              ? 'retomar-busca'
-              : 'nova-busca'
-        }
+        key={`${listaAtual?.id ?? 'sem-lista'}:${parametros.busca === 'falhou' ? 'falhou' : valoresRetomados ? 'retomar' : 'nova'}`}
         saldo={saldo}
         pronto={integracoes.pronto}
         autoFoco={Boolean(valoresRetomados)}

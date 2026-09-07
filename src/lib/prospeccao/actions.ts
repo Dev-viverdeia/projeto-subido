@@ -45,6 +45,8 @@ export async function criarListaProspeccao(
 ): Promise<EstadoBuscaProspeccao> {
   await exigirRecurso('prospeccao');
   const campos = camposDo(formData);
+  const pedido = z.uuid().safeParse(formData.get('pedido'));
+  if (!pedido.success) return { campos, erro: 'Atualize a página para iniciar uma nova busca.' };
   const validacao = BuscaProspeccaoSchema.safeParse(campos);
   if (!validacao.success) {
     const erros = z.flattenError(validacao.error).fieldErrors;
@@ -71,10 +73,9 @@ export async function criarListaProspeccao(
   } = await supabase.auth.getUser();
   if (!user) return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
 
-  const nome = `${validacao.data.segmento} · ${validacao.data.localizacao}`;
   const { data: lista, error: erroLista } = await reservarListaProspeccao(
     user.id,
-    nome,
+    pedido.data,
     validacao.data,
   );
 
@@ -91,20 +92,31 @@ export async function criarListaProspeccao(
     };
   }
 
-  const operacao = await enfileirarOperacao({
-    dono: user.id,
-    tipo: 'prospeccao',
-    chaveIdempotencia: `prospeccao:${lista}`,
-    referenciaTipo: 'prospeccao_lista',
-    referenciaId: lista,
-    payload: { dono: user.id, lista, busca: validacao.data },
-    prioridade: 10,
-    maxTentativas: 3,
-  });
+  // A reserva já criou a fila atomicamente. O upsert apenas recupera o mesmo job.
+  // Mesmo se esta leitura falhar, o cron pode processá-lo; o reenvio usa o mesmo pedido.
+  let operacao;
+  try {
+    operacao = await enfileirarOperacao({
+      dono: user.id,
+      tipo: 'prospeccao',
+      chaveIdempotencia: `prospeccao:${lista}`,
+      referenciaTipo: 'prospeccao_lista',
+      referenciaId: lista,
+      payload: { dono: user.id, lista, busca: validacao.data },
+      prioridade: 10,
+      maxTentativas: 3,
+    });
+  } catch {
+    return {
+      campos,
+      erro: 'A solicitação foi registrada. Tente novamente com os mesmos campos para acompanhar a lista.',
+    };
+  }
 
   // A primeira tentativa começa imediatamente para preservar a experiência.
   // Se a Function for interrompida, o cron encontra o mesmo job e o retoma.
-  after(() => processarOperacaoPorId(operacao.id));
+  const operacaoId = operacao.id;
+  after(() => processarOperacaoPorId(operacaoId));
   redirect(`/prospeccao?lista=${lista}&busca=processando`);
 }
 

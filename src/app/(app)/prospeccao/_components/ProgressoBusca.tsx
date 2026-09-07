@@ -42,12 +42,17 @@ export function ProgressoBusca({
   quantidade,
   etapa = 1,
   detalhe,
+  online = true,
+  minimizadoInicial = false,
 }: {
   quantidade: number;
   etapa?: number;
   detalhe?: string | null;
+  online?: boolean;
+  minimizadoInicial?: boolean;
 }) {
-  const [minimizado, setMinimizado] = useState(false);
+  const [minimizado, setMinimizado] = useState(minimizadoInicial);
+  const avisoConexao = 'Sem conexão. O andamento será atualizado quando a internet voltar.';
 
   if (minimizado) {
     return (
@@ -57,7 +62,11 @@ export function ProgressoBusca({
         </span>
         <div>
           <strong>Montando sua lista</strong>
-          <small>{detalhe ?? 'Você pode consultar outras listas enquanto a busca termina.'}</small>
+          <small>
+            {!online
+              ? avisoConexao
+              : (detalhe ?? 'Você pode consultar outras listas enquanto a busca termina.')}
+          </small>
         </div>
         <button type="button" onClick={() => setMinimizado(false)}>
           <Search size={14} aria-hidden="true" /> Ver andamento
@@ -75,8 +84,16 @@ export function ProgressoBusca({
       detalhe={`${quantidade} empresas solicitadas`}
       etapas={ETAPAS}
       etapaAtual={Math.max(0, Math.min(etapa - 1, ETAPAS.length - 1))}
-      nota={detalhe ?? 'Você pode acompanhar aqui ou continuar usando esta página.'}
-      mensagemDemora="Algumas fontes estão respondendo mais devagar. Você pode sair desta janela; a busca continua e os créditos são devolvidos se ela falhar."
+      nota={
+        !online
+          ? avisoConexao
+          : (detalhe ?? 'Você pode acompanhar aqui ou continuar usando esta página.')
+      }
+      mensagemDemora={
+        online
+          ? 'Ainda não recebemos o resultado. Você pode sair desta janela; a busca continua e os créditos são devolvidos se ela falhar.'
+          : undefined
+      }
       demoraApos={35_000}
       acaoSecundaria={{
         rotulo: 'Continuar na plataforma',

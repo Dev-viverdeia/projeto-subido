@@ -39,4 +39,26 @@ describe('Busca em conexão instável', () => {
     expect(screen.getByLabelText('Cidade ou região')).toHaveValue('Recife');
     expect(criar).toHaveBeenCalledTimes(1);
   });
+
+  it('reenvia a mesma solicitação após perder a resposta, mas muda a chave ao mudar o recorte', async () => {
+    const pedidos: unknown[] = [];
+    criar.mockImplementation((_estado, dados: FormData) => {
+      pedidos.push(dados.get('pedido'));
+      return Promise.reject(new TypeError('Failed to fetch'));
+    });
+    preencher();
+    const enviar = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Buscar empresas' }));
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Buscar empresas' })).toBeEnabled(),
+      );
+    };
+    await enviar();
+    await enviar();
+    expect(pedidos[0]).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+    expect(pedidos[1]).toBe(pedidos[0]);
+    fireEvent.change(screen.getByLabelText('Cidade ou região'), { target: { value: 'Olinda' } });
+    await enviar();
+    expect(pedidos[2]).not.toBe(pedidos[0]);
+  });
 });

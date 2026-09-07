@@ -97,7 +97,7 @@
   display: block;
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
 
@@ -136,14 +136,14 @@
 
 .agora strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-reading);
   font-weight: var(--via-fw-semibold);
 }
 
 .agora p {
   margin-top: var(--via-space-1);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
 
@@ -181,7 +181,7 @@
 
 .etapas strong {
   color: inherit;
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-meta);
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-normal);
 }
@@ -221,7 +221,7 @@
   max-width: 52ch;
   margin: 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
 
@@ -234,7 +234,7 @@
   background: var(--via-glass-card-2);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
   cursor: pointer;
   box-shadow: 0 1px 0 var(--via-edge-hi) inset;
@@ -275,7 +275,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599px) {
   .fundo {
     align-items: end;
     padding: 0;

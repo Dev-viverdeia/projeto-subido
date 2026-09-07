@@ -6,7 +6,7 @@ import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBu
 import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
 import { ListaResultados } from '@/app/(app)/prospeccao/_components/ListaResultados';
 import { ListasVazias } from '@/app/(app)/prospeccao/_components/ListasVazias';
-import { ProgressoBusca } from '@/app/(app)/prospeccao/_components/ProgressoBusca';
+import { AcompanhamentoBusca } from '@/app/(app)/prospeccao/_components/AcompanhamentoBusca';
 import pagina from '@/app/(app)/prospeccao/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import styles from '../mapa-jornada/preview.module.css';
@@ -134,7 +134,7 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
 export default async function PreviewProspeccaoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ espera?: string; vazio?: string }>;
+  searchParams: Promise<{ espera?: string; vazio?: string; resultado?: string; retomada?: string }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
@@ -165,7 +165,24 @@ export default async function PreviewProspeccaoPage({
       </aside>
 
       <main id="conteudo" className={styles.conteudo}>
-        {parametros.espera === '1' && <ProgressoBusca quantidade={10} />}
+        {(parametros.espera === '1' || parametros.resultado || parametros.retomada === '1') && (
+          <AcompanhamentoBusca
+            status={
+              parametros.resultado === 'falhou'
+                ? 'falhou'
+                : parametros.resultado === 'concluida'
+                  ? 'concluida'
+                  : 'processando'
+            }
+            quantidade={10}
+            etapa={2}
+            detalhe={null}
+            segmento="Clínicas odontológicas"
+            localizacao="Belo Horizonte, MG"
+            encontradas={7}
+            minimizadoInicial={parametros.retomada === '1'}
+          />
+        )}
         <div className={pagina.pagina}>
           <HeroProspeccao saldo={42} />
 

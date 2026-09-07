@@ -38,31 +38,29 @@
 
 .minimizado strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-xs);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
 }
 
 .minimizado small {
   margin-top: 2px;
-  overflow: hidden;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: var(--app-fs-support);
+  line-height: var(--app-lh-ui);
 }
 
 .minimizado button {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  min-height: 34px;
+  min-height: var(--app-h-control);
   padding: var(--via-space-2) var(--via-space-3);
   border: 1px solid var(--via-border-soft);
   border-radius: var(--app-radius-control);
   background: var(--via-glass-card-2);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
   cursor: pointer;
 }
@@ -75,20 +73,27 @@
 @keyframes entrar {
   from {
     transform: translateY(10px);
-    opacity: 0;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599px) {
   .minimizado {
     right: var(--via-space-3);
     bottom: var(--via-space-3);
     left: var(--via-space-3);
     width: auto;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .minimizado small {
-    display: none;
+  .minimizado button {
+    grid-column: 2;
+    justify-content: center;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .minimizado {
+    background: var(--via-surface-elev);
   }
 }
 

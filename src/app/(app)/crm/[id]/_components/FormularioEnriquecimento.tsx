@@ -38,6 +38,7 @@ export function FormularioEnriquecimento({
   const [aberto, setAberto] = useState(abertoInicial);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [incerto, setIncerto] = useState(false);
   const [atualizando, atualizar] = useTransition();
   const emCurso = useRef(false);
   const saldoSuficiente = saldoCreditos >= CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
@@ -46,11 +47,15 @@ export function FormularioEnriquecimento({
   function fechar() {
     if (enviando) return;
     setAberto(false);
-    setErro(null);
+    if (!incerto) setErro(null);
   }
 
   async function confirmar() {
-    if (!saldoSuficiente || emCurso.current) return;
+    if (!saldoSuficiente || emCurso.current || incerto) return;
+    if (!navigator.onLine) {
+      setErro('Sem conexão. Reconecte para enriquecer a ficha. Nenhuma solicitação foi enviada.');
+      return;
+    }
     emCurso.current = true;
     setErro(null);
     setAberto(false);
@@ -60,8 +65,10 @@ export function FormularioEnriquecimento({
       if (resposta.falha) {
         setAberto(true);
         setErro(resposta.falha);
+        setIncerto(resposta.incerto ?? false);
       }
     } catch {
+      setIncerto(true);
       setAberto(true);
       setErro(
         'Não conseguimos confirmar o início. Confira o andamento na ficha antes de tentar novamente.',
@@ -75,7 +82,7 @@ export function FormularioEnriquecimento({
 
   return (
     <>
-      {(enviando || (atualizando && !aberto)) && (
+      {!desabilitado && (enviando || (atualizando && !aberto)) && (
         <EsperaOperacao
           aberto
           rotulo="Enriquecimento da ficha"
@@ -116,11 +123,15 @@ export function FormularioEnriquecimento({
       </button>
 
       <ModalOperacao
-        open={aberto}
+        open={aberto && !desabilitado}
         onClose={fechar}
         label="Dados do cliente"
-        title="Enriquecer esta oportunidade?"
-        description="Usaremos o que já está salvo e fontes públicas."
+        title={incerto ? 'Não recebemos a confirmação' : 'Enriquecer esta oportunidade?'}
+        description={
+          incerto
+            ? (erro ?? 'Confira o andamento na ficha antes de tentar novamente.')
+            : 'Usaremos o que já está salvo e fontes públicas.'
+        }
         size="md"
         blocked={enviando}
         footer={
@@ -132,82 +143,97 @@ export function FormularioEnriquecimento({
               disabled={enviando}
               data-autofocus
             >
-              Cancelar
+              {incerto ? 'Fechar' : 'Cancelar'}
             </Button>
-            <Button
-              type="button"
-              variant="primary"
-              loading={enviando}
-              disabled={!saldoSuficiente}
-              onClick={() => void confirmar()}
-            >
-              Usar {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
-            </Button>
+            {incerto ? (
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  fechar();
+                  atualizar(() => router.refresh());
+                }}
+              >
+                Conferir ficha
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="primary"
+                loading={enviando}
+                disabled={!saldoSuficiente}
+                onClick={() => void confirmar()}
+              >
+                Usar {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos
+              </Button>
+            )}
           </>
         }
       >
-        <div className={styles.conteudo}>
-          {erro && (
-            <Alert tone="danger" size="compact">
-              {erro}
-            </Alert>
-          )}
+        {!incerto && (
+          <div className={styles.conteudo}>
+            {erro && (
+              <Alert tone="danger" size="compact">
+                {erro}
+              </Alert>
+            )}
 
-          {!saldoSuficiente && (
-            <Alert tone="attn" size="compact">
-              Seu saldo é de {saldoCreditos} {saldoCreditos === 1 ? 'crédito' : 'créditos'}. São
-              necessários {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos para enriquecer a ficha.
-            </Alert>
-          )}
+            {!saldoSuficiente && (
+              <Alert tone="attn" size="compact">
+                Seu saldo é de {saldoCreditos} {saldoCreditos === 1 ? 'crédito' : 'créditos'}. São
+                necessários {CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos para enriquecer a ficha.
+              </Alert>
+            )}
 
-          <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
-            <div>
-              <span aria-hidden="true">
-                <Database size={17} strokeWidth={1.7} aria-hidden="true" />
-              </span>
-              <p>
-                <strong>Ficha do cliente</strong>
-                <small>Empresa e contato</small>
-              </p>
+            <div className={styles.fontes} aria-label="Dados usados no enriquecimento">
+              <div>
+                <span aria-hidden="true">
+                  <Database size={17} strokeWidth={1.7} aria-hidden="true" />
+                </span>
+                <p>
+                  <strong>Ficha do cliente</strong>
+                  <small>Empresa e contato</small>
+                </p>
+              </div>
+              <div>
+                <span aria-hidden="true">
+                  <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
+                </span>
+                <p>
+                  <strong>Reuniões</strong>
+                  <small>Dores e próximos passos</small>
+                </p>
+              </div>
+              <div>
+                <span aria-hidden="true">
+                  <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
+                </span>
+                <p>
+                  <strong>Fontes públicas</strong>
+                  <small>Site e dados disponíveis</small>
+                </p>
+              </div>
             </div>
-            <div>
-              <span aria-hidden="true">
-                <Layers3 size={17} strokeWidth={1.7} aria-hidden="true" />
-              </span>
-              <p>
-                <strong>Reuniões</strong>
-                <small>Dores e próximos passos</small>
-              </p>
+
+            <div className={styles.creditos} aria-label="Custo do enriquecimento">
+              <div>
+                <small>Custo</small>
+                <strong>{CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos</strong>
+              </div>
+              <div>
+                <small>Saldo atual</small>
+                <strong>{saldoCreditos}</strong>
+              </div>
+              <div>
+                <small>Saldo depois</small>
+                <strong>{saldoSuficiente ? saldoDepois : '—'}</strong>
+              </div>
             </div>
-            <div>
-              <span aria-hidden="true">
-                <Globe2 size={17} strokeWidth={1.7} aria-hidden="true" />
-              </span>
-              <p>
-                <strong>Fontes públicas</strong>
-                <small>Site e dados disponíveis</small>
-              </p>
-            </div>
+            <p className={styles.garantia}>
+              Se a análise falhar, os créditos voltam automaticamente.
+            </p>
           </div>
-
-          <div className={styles.creditos} aria-label="Custo do enriquecimento">
-            <div>
-              <small>Custo</small>
-              <strong>{CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos</strong>
-            </div>
-            <div>
-              <small>Saldo atual</small>
-              <strong>{saldoCreditos}</strong>
-            </div>
-            <div>
-              <small>Saldo depois</small>
-              <strong>{saldoSuficiente ? saldoDepois : '—'}</strong>
-            </div>
-          </div>
-          <p className={styles.garantia}>
-            Se a análise falhar, os créditos voltam automaticamente.
-          </p>
-        </div>
+        )}
       </ModalOperacao>
     </>
   );
