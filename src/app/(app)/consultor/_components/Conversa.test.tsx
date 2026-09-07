@@ -96,6 +96,18 @@ describe('Conversa integrada à Início', () => {
     expect(dependencias.criarConversa).not.toHaveBeenCalled();
   });
 
+  it('dois envios no mesmo instante registram apenas uma mensagem', async () => {
+    dependencias.criarConversa.mockReturnValue(new Promise(() => {}));
+    render(<Conversa textoInicial="Minha dúvida" />);
+    const form = screen.getByRole('textbox').closest('form')!;
+    act(() => {
+      fireEvent.submit(form);
+      fireEvent.submit(form);
+    });
+    await waitFor(() => expect(dependencias.criarConversa).toHaveBeenCalled());
+    expect(dependencias.criarConversa).toHaveBeenCalledOnce();
+  });
+
   it('recupera o compositor quando o envio rejeita, sem repetir automaticamente', async () => {
     dependencias.criarConversa.mockRejectedValueOnce(new TypeError('Failed to fetch'));
     render(<Conversa />);

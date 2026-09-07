@@ -1,5 +1,5 @@
 /** Opt-in: conta descartável; uploads reais e falhas de rede controladas.
- * --com-ia executa uma única rodada curta com áudio/documento sintéticos. */
+ * --com-ia executa uma única rodada curta com áudio, documento e imagem sintéticos. */
 /* global document, innerWidth */
 import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdtemp, writeFile, readFile } from 'node:fs/promises';
@@ -85,7 +85,9 @@ try {
     }),
   ).user.id;
   exigir(await client.auth.signInWithPassword({ email, password }));
-  browser = await chromium.launch();
+  browser = await chromium.launch({
+    args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+  });
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     isMobile: true,
@@ -128,6 +130,18 @@ try {
   });
   await page.route('**/api/consultor/responder', (route) => route.abort('failed'));
   await page.goto(`${app}/consultor`, { waitUntil: 'networkidle' });
+  // Exercita MediaRecorder real com dispositivo sintético, nunca o microfone do operador.
+  await page.getByRole('button', { name: 'Gravar áudio', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Parar gravação' })).toBeVisible();
+  await page.getByRole('button', { name: 'Descartar gravação' }).click();
+  await expect(page.getByRole('button', { name: 'Reproduzir áudio' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Gravar áudio', exact: true }).click();
+  await expect(page.getByText('Gravando · 00:01', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Parar gravação' }).click();
+  await page.getByRole('button', { name: 'Reproduzir áudio' }).click();
+  await expect.poll(() => page.locator('audio').evaluate((a) => a.currentTime)).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Remover mensagem de áudio' }).click();
+  resultado.checks.push('gravação nativa descartável', 'áudio gravado reproduz antes de enviar');
   // WAV PCM válido, gerado localmente; nunca inclui material de usuários reais.
   const wav = join(pasta, 'duvida.wav');
   execFileSync('/usr/bin/say', [
@@ -175,7 +189,7 @@ try {
     page.getByText('Falta confirmar o envio. Tente novamente sem reenviar os arquivos.'),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Voltar à edição' })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Retomar envio' }).click();
+  await page.getByRole('button', { name: 'Confirmar envio' }).click();
   await expect(page.getByRole('button', { name: 'Tentar novamente', exact: true })).toBeVisible({
     timeout: 25000,
   });
@@ -278,7 +292,23 @@ try {
   await page.screenshot({ path: join(pasta, 'desktop-player-persistido.png'), fullPage: true });
   resultado.checks.push('player persistido reproduz', 'mobile sem overflow');
 
+  const documento = mensagens[0].consultor_anexos.find((a) => a.caminho_storage.endsWith('.txt'));
+  const respostaDocumento = await context.request.get(
+    `${app}/api/consultor/anexos/${documento.id}`,
+  );
+  expect(respostaDocumento.status()).toBe(200);
+  expect(respostaDocumento.headers()['content-disposition']).toContain('attachment');
+  resultado.checks.push('documento privado disponível para download');
+
   if (process.argv.includes('--com-ia')) {
+    const { default: sharp } = await import('sharp');
+    const imagem = await sharp(
+      Buffer.from(
+        '<svg width="1000" height="240" xmlns="http://www.w3.org/2000/svg"><rect width="1000" height="240" fill="white"/><text x="40" y="90" font-family="sans-serif" font-size="44" fill="black">42 faltas por mês</text><text x="40" y="170" font-family="sans-serif" font-size="36" fill="black">Canal principal: WhatsApp</text></svg>',
+      ),
+    )
+      .png()
+      .toBuffer();
     await page.unroute('**/api/consultor/responder');
     await page.unroute('**/rest/v1/rpc/sobral_confirmar_anexos');
     await page.goto(`${app}/consultor`, { waitUntil: 'networkidle' });
@@ -289,11 +319,12 @@ try {
         mimeType: 'application/pdf',
         buffer: pdfDeTeste(),
       },
+      { name: 'indicadores.png', mimeType: 'image/png', buffer: imagem },
     ]);
     await page
       .getByRole('textbox')
       .fill(
-        'Responda à dúvida do áudio usando o documento. Cite o nome da clínica e o volume de atendimentos.',
+        'Responda brevemente à dúvida do áudio usando o documento e a imagem. Cite o nome da clínica, o volume de atendimentos e o número de faltas mostrado na imagem.',
       );
     const retorno = page.waitForResponse((r) => r.url().includes('/api/consultor/responder'), {
       timeout: 200_000,
@@ -322,15 +353,22 @@ try {
         { timeout: 190_000, intervals: [1_000, 2_000] },
       )
       .toBe('concluida');
-    if (!/Aurora/i.test(recibo.texto) || !/120/.test(recibo.texto))
-      throw new Error('Resposta não usou os fatos do documento.');
+    if (!/Aurora/i.test(recibo.texto) || !/120/.test(recibo.texto) || !/42/.test(recibo.texto))
+      throw new Error('Resposta não usou os fatos do documento e da imagem.');
     await expect(page.getByText('Ver transcrição', { exact: true })).toBeVisible({
       timeout: 90_000,
     });
     await page.getByText('Ver transcrição', { exact: true }).click();
     await expect(page.locator('details[open]')).toContainText(/clínicas/i);
     await page.screenshot({ path: join(pasta, 'desktop-audio-processado.png'), fullPage: true });
-    resultado.checks.push('IA leu áudio e PDF', 'transcrição persistida e consultável');
+    const miniatura = page.getByRole('img', { name: 'indicadores.png' });
+    await expect(miniatura).toBeVisible();
+    await expect.poll(() => miniatura.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
+    resultado.checks.push(
+      'IA leu áudio, PDF e imagem',
+      'transcrição persistida e consultável',
+      'imagem persistida com prévia privada',
+    );
   }
   if (erros.length) throw new Error(`JavaScript: ${erros.join('; ')}`);
   resultado.checks.push('sem erros JavaScript');

@@ -1,7 +1,6 @@
-import { Check, X } from 'lucide-react';
-import { categoriaDoAnexo, tamanhoLegivel } from '@/lib/consultor/anexos-contrato';
+import { categoriaDoAnexo } from '@/lib/consultor/anexos-contrato';
 import type { ProgressoEnvio } from '@/lib/consultor/envio-anexos';
-import { AnexoIcone } from './AnexoIcone';
+import { ArquivoMensagem } from './ArquivoMensagem';
 import { AudioMensagem } from './AudioMensagem';
 import styles from './AnexosDaRodada.module.css';
 
@@ -29,11 +28,13 @@ export function AnexosDaRodada({
             ? 'Pronto para enviar'
             : estado === 'enviado'
               ? 'Enviado'
-              : item?.concluido
-                ? 'Upload concluído'
-                : estado === 'pausado'
-                  ? 'Envio pausado'
-                  : 'Enviando';
+              : progresso?.confirmando
+                ? 'Confirmando envio'
+                : item?.concluido
+                  ? 'Upload concluído'
+                  : estado === 'pausado'
+                    ? 'Envio pausado'
+                    : 'Enviando';
         return (
           <div
             key={`${arquivo.name}-${arquivo.size}-${arquivo.lastModified}`}
@@ -46,25 +47,14 @@ export function AnexosDaRodada({
                 aoRemover={aoRemover ? () => aoRemover(i) : undefined}
               />
             ) : (
-              <div className={styles.arquivo}>
-                <AnexoIcone categoria={categoriaDoAnexo(arquivo.type)} />
-                <div className={styles.dados}>
-                  <strong>{arquivo.name}</strong>
-                  <span>
-                    {tamanhoLegivel(arquivo.size)} · {rotulo}
-                  </span>
-                </div>
-                {estado === 'enviado' ? <Check size={18} aria-label="Enviado" /> : null}
-                {aoRemover ? (
-                  <button
-                    type="button"
-                    onClick={() => aoRemover(i)}
-                    aria-label={`Remover ${arquivo.name}`}
-                  >
-                    <X size={18} aria-hidden="true" />
-                  </button>
-                ) : null}
-              </div>
+              <ArquivoMensagem
+                arquivo={arquivo}
+                nome={arquivo.name}
+                tamanho={arquivo.size}
+                categoria={categoriaDoAnexo(arquivo.type) === 'imagem' ? 'imagem' : 'documento'}
+                estado={rotulo}
+                aoRemover={aoRemover ? () => aoRemover(i) : undefined}
+              />
             )}
             {estado === 'enviando' || estado === 'pausado' ? (
               <div className={styles.andamento}>

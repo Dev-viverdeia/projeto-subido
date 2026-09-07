@@ -224,6 +224,12 @@
   border-color: var(--via-accent-hairline);
   box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
+.caixa > div[aria-label='Arquivos prontos para enviar'] {
+  padding: var(--via-space-3);
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
 
 .linhaCompositor {
   display: flex;
@@ -350,13 +356,13 @@
 }
 
 .ferramentas > button {
-  min-width: 40px;
-  height: 40px;
+  min-width: 44px;
+  height: 44px;
   gap: var(--via-space-2);
   padding-inline: var(--via-space-2);
   border-radius: var(--app-radius-control);
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
 }
 
 .ferramentas > button:focus-visible,
@@ -388,6 +394,8 @@
   color: var(--via-text-primary);
   font-family: var(--via-font-mono);
   font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  white-space: normal;
 }
 
 .enviar {

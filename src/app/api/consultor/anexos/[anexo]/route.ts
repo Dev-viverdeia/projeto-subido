@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { SOBRAL_BUCKET_ANEXOS } from '@/lib/consultor/anexos-contrato';
+import { SOBRAL_BUCKET_ANEXOS, categoriaDoAnexo } from '@/lib/consultor/anexos-contrato';
 import { createClient } from '@/lib/supabase/server';
 
 const ParametrosSchema = z.object({ anexo: z.uuid() });
@@ -14,7 +14,7 @@ function falha(mensagem: string, status: number) {
 
 export async function GET(_: Request, { params }: { params: Promise<{ anexo: string }> }) {
   const validacao = ParametrosSchema.safeParse(await params);
-  if (!validacao.success) return falha('Áudio inválido.', 400);
+  if (!validacao.success) return falha('Arquivo inválido.', 400);
 
   const supabase = await createClient();
   const {
@@ -24,17 +24,32 @@ export async function GET(_: Request, { params }: { params: Promise<{ anexo: str
 
   const { data: registro, error } = await supabase
     .from('consultor_anexos')
-    .select('caminho_storage, categoria')
+    .select('caminho_storage, categoria, tipo_mime, nome')
     .eq('id', validacao.data.anexo)
     .eq('dono', user.id)
     .maybeSingle();
-  if (error || !registro) return falha('Áudio não encontrado.', 404);
-  if (registro.categoria !== 'audio') return falha('Este anexo não é um áudio.', 415);
+  if (error || !registro) return falha('Arquivo não encontrado.', 404);
+  const partes = registro.caminho_storage.split('/');
+  if (
+    partes.length !== 3 ||
+    partes[0] !== user.id ||
+    !z.uuid().safeParse(partes[1]).success ||
+    !partes[2]?.startsWith(`${validacao.data.anexo}-`) ||
+    !/^[a-zA-Z0-9._-]+$/.test(partes[2])
+  )
+    return falha('Arquivo não encontrado.', 404);
+  if (
+    !categoriaDoAnexo(registro.tipo_mime) ||
+    categoriaDoAnexo(registro.tipo_mime) !== registro.categoria
+  )
+    return falha('Formato de arquivo indisponível.', 415);
 
   const { data, error: erroUrl } = await supabase.storage
     .from(SOBRAL_BUCKET_ANEXOS)
-    .createSignedUrl(registro.caminho_storage, 90);
-  if (erroUrl || !data) return falha('Não foi possível carregar o áudio.', 503);
+    .createSignedUrl(registro.caminho_storage, 90, {
+      download: registro.categoria === 'documento' ? registro.nome : false,
+    });
+  if (erroUrl || !data) return falha('Não foi possível carregar o arquivo. Tente novamente.', 503);
 
   return NextResponse.redirect(data.signedUrl, {
     status: 307,

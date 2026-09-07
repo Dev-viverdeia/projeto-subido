@@ -1,19 +1,15 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { ArrowRight, FileText, Image as ImageIcon, Target } from 'lucide-react';
+import { ArrowRight, Target } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import { BotaoCopiar } from '@/app/(app)/_components/BotaoCopiar';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
 import { AudioMensagem } from './AudioMensagem';
+import { ArquivoMensagem } from './ArquivoMensagem';
 import { blocosDaResposta } from './resposta';
 import styles from './Mensagens.module.css';
-
-function IconeAnexo({ categoria }: { categoria: 'imagem' | 'documento' }) {
-  if (categoria === 'imagem') return <ImageIcon size={15} strokeWidth={1.9} aria-hidden="true" />;
-  return <FileText size={15} strokeWidth={1.9} aria-hidden="true" />;
-}
 
 function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
   if (
@@ -93,13 +89,18 @@ export function Mensagens({
                   </div>
                 ) : null}
                 {m.anexos.some((anexo) => anexo.categoria !== 'audio') ? (
-                  <ul className={styles.anexos} aria-label="Arquivos enviados">
+                  <ul className={styles.arquivosEnviados} aria-label="Arquivos enviados">
                     {m.anexos
                       .filter((anexo) => anexo.categoria !== 'audio')
                       .map((anexo) => (
                         <li key={anexo.id}>
-                          <IconeAnexo categoria={anexo.categoria as 'imagem' | 'documento'} />
-                          <span>{anexo.nome}</span>
+                          <ArquivoMensagem
+                            nome={anexo.nome}
+                            tamanho={anexo.tamanhoBytes}
+                            categoria={anexo.categoria as 'imagem' | 'documento'}
+                            estado="Enviado"
+                            src={modoPreview ? undefined : `/api/consultor/anexos/${anexo.id}`}
+                          />
                         </li>
                       ))}
                   </ul>

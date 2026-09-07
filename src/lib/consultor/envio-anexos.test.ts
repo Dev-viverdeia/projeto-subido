@@ -45,12 +45,29 @@ beforeEach(() => {
   deps.session.mockResolvedValue({
     data: { session: { user: { id: 'usuario' }, access_token: 'token' } },
   });
-  deps.rpc.mockResolvedValue({ data: 'recibo', error: null });
+  deps.rpc.mockImplementation((_nome: string, args: { p_mensagem: string }) =>
+    Promise.resolve({ data: args.p_mensagem, error: null }),
+  );
   deps.info.mockResolvedValue({ data: null });
   deps.remove.mockResolvedValue({ error: null });
 });
 
 describe('Envio retomável do Sobral', () => {
+  it.each([null, 'outro-recibo'])(
+    'não confirma uma mensagem com recibo inválido: %s',
+    async (recibo) => {
+      deps.rpc.mockResolvedValueOnce({ data: recibo, error: null });
+      const envio = new EnvioAnexos('Leia', [arquivo()], undefined, vi.fn());
+      const primeira = envio.executar();
+      await aguardar();
+      concluir(0);
+      expect((await primeira).falha).toContain('confirmar');
+      expect(await envio.cancelar()).toBe(false);
+      expect((await envio.executar()).falha).toBeNull();
+      expect(deps.rpc.mock.calls[0]).toEqual(deps.rpc.mock.calls[1]);
+      expect(deps.uploads[0]!.start).toHaveBeenCalledOnce();
+    },
+  );
   it('publica bytes reais e só confirma a mensagem depois do ACK do arquivo', async () => {
     const progresso = vi.fn();
     const envio = new EnvioAnexos('Leia', [arquivo()], undefined, progresso);

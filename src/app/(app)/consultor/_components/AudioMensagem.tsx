@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Pause, Play, X } from 'lucide-react';
+import { useRef, useState, type CSSProperties } from 'react';
+import { Pause, Play, RotateCw, X } from 'lucide-react';
+import { useArquivoLocal } from './useArquivoLocal';
 import styles from './AudioMensagem.module.css';
 
 function tempoLegivel(segundos: number): string {
@@ -21,21 +22,37 @@ export function AudioMensagem({
   estado?: string;
   aoRemover?: () => void;
 }) {
+  const local = useArquivoLocal(arquivo);
+  const origem = arquivo ? local : src;
+  return <PlayerAudio key={origem} origem={origem} estado={estado} aoRemover={aoRemover} />;
+}
+
+function PlayerAudio({
+  origem,
+  estado,
+  aoRemover,
+}: {
+  origem?: string;
+  estado?: string;
+  aoRemover?: () => void;
+}) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const origem = useMemo(
-    () => (arquivo ? URL.createObjectURL(arquivo) : (src ?? '')),
-    [arquivo, src],
-  );
   const [tocando, setTocando] = useState(false);
   const [duracao, setDuracao] = useState(0);
   const [posicao, setPosicao] = useState(0);
   const [falhou, setFalhou] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      if (arquivo) URL.revokeObjectURL(origem);
-    };
-  }, [arquivo, origem]);
+  function atualizarDuracao(audio: HTMLAudioElement) {
+    setDuracao(Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0);
+  }
+
+  function recarregar() {
+    setFalhou(false);
+    setTocando(false);
+    setPosicao(0);
+    setDuracao(0);
+    audioRef.current?.load();
+  }
 
   async function alternar() {
     const audio = audioRef.current;
@@ -57,8 +74,8 @@ export function AudioMensagem({
         ref={audioRef}
         src={origem || undefined}
         preload="metadata"
-        onLoadedMetadata={(evento) => setDuracao(evento.currentTarget.duration)}
-        onDurationChange={(evento) => setDuracao(evento.currentTarget.duration)}
+        onLoadedMetadata={(evento) => atualizarDuracao(evento.currentTarget)}
+        onDurationChange={(evento) => atualizarDuracao(evento.currentTarget)}
         onTimeUpdate={(evento) => setPosicao(evento.currentTarget.currentTime)}
         onPlay={() => setTocando(true)}
         onPause={() => setTocando(false)}
@@ -66,17 +83,24 @@ export function AudioMensagem({
           setTocando(false);
           setPosicao(0);
         }}
-        onError={() => setFalhou(true)}
+        onError={() => {
+          setFalhou(true);
+          setTocando(false);
+        }}
       />
 
       <button
         type="button"
         className={styles.reproduzir}
-        onClick={() => void alternar()}
-        disabled={!origem || falhou}
-        aria-label={tocando ? 'Pausar áudio' : 'Reproduzir áudio'}
+        onClick={() => (falhou ? recarregar() : void alternar())}
+        disabled={!origem}
+        aria-label={
+          falhou ? 'Tentar carregar áudio novamente' : tocando ? 'Pausar áudio' : 'Reproduzir áudio'
+        }
       >
-        {tocando ? (
+        {falhou ? (
+          <RotateCw size={19} aria-hidden="true" />
+        ) : tocando ? (
           <Pause size={17} fill="currentColor" aria-hidden="true" />
         ) : (
           <Play size={17} fill="currentColor" aria-hidden="true" />
@@ -85,8 +109,8 @@ export function AudioMensagem({
 
       <div className={styles.conteudo}>
         <div className={styles.cabecalho}>
-          <strong>{falhou ? 'Áudio indisponível' : 'Mensagem de áudio'}</strong>
-          {estado ? <span>{estado}</span> : null}
+          <strong>{falhou ? 'Não foi possível tocar' : 'Mensagem de áudio'}</strong>
+          {falhou ? <span>Toque para tentar de novo</span> : estado ? <span>{estado}</span> : null}
         </div>
         <div className={styles.progresso}>
           <span>{tempoLegivel(posicao)}</span>
