@@ -274,7 +274,9 @@ describe('Conversa integrada à Início', () => {
     });
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
     fireEvent.click(await screen.findByRole('button', { name: 'Voltar à edição' }));
-    expect(await screen.findByText('Pronto para enviar')).toBeVisible();
+    // O player troca de instância quando a URL local fica pronta; consulte o DOM
+    // atual dentro da espera, sem guardar um nó da instância anterior.
+    await waitFor(() => expect(screen.getByText('Pronto para enviar')).toBeVisible());
     expect(screen.getByRole('textbox')).toHaveValue('Minha dúvida');
     expect(screen.getByRole('textbox')).toBeEnabled();
   });
