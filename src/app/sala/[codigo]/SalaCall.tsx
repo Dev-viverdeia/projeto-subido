@@ -22,6 +22,8 @@ import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/cal
 import { SalaAoVivo } from './SalaAoVivo';
 import { RoteiroSala } from './RoteiroSala';
 import { EstadoFinalSala } from './EstadoFinalSala';
+import { PreparacaoMidia } from './PreparacaoMidia';
+import { MIDIA_INICIAL, usePreparacaoMidia, type EscolhasMidia } from './usePreparacaoMidia';
 import styles from './sala.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
@@ -61,6 +63,8 @@ export function SalaCall({
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
   const [saida, setSaida] = useState<'processando' | 'encerrada' | null>(null);
   const [recuperacao, setRecuperacao] = useState<Recuperacao | null>(null);
+  const midia = usePreparacaoMidia();
+  const [escolhasEntrada, setEscolhasEntrada] = useState<EscolhasMidia>(MIDIA_INICIAL);
   const kickoff = convite.tipo === 'kickoff';
   const passouDaJanela = callPassouDaJanela({
     status: convite.status,
@@ -158,13 +162,17 @@ export function SalaCall({
   }
 
   async function entrar() {
-    if (!podeEntrar) return;
+    if (!podeEntrar || carregando) return;
+    setEscolhasEntrada(midia.escolhas);
+    midia.liberar();
     setCarregando(true);
     setErro('');
 
     try {
       setCredenciais(await obterCredenciais());
     } catch (falha) {
+      midia.desligar('audio');
+      midia.desligar('video');
       setErro(falha instanceof Error ? falha.message : 'Não foi possível abrir a sala.');
     } finally {
       setCarregando(false);
@@ -227,6 +235,8 @@ export function SalaCall({
         anfitriao={anfitriao}
         plano={planoAnfitriao}
         aoDesconectar={aoDesconectar}
+        escolhas={escolhasEntrada}
+        aoMudarEscolhas={setEscolhasEntrada}
       />
     );
   }
@@ -289,11 +299,15 @@ export function SalaCall({
             <small>{convite.duracaoMinutos} minutos</small>
           </div>
 
+          {salaAberta && videoConfigurado && (
+            <PreparacaoMidia midia={midia} bloqueado={carregando} />
+          )}
+
           {anfitriao && (
-            <div className={styles.memoria}>
-              <p>{kickoff ? 'O que precisa sair definido' : 'Durante a reunião'}</p>
+            <details className={styles.memoria}>
+              <summary>{kickoff ? 'O que precisa sair definido' : 'Durante a reunião'}</summary>
               <RoteiroSala kickoff={kickoff} mostrarCoach={convite.liveCoachAtivo && anfitriao} />
-            </div>
+            </details>
           )}
         </div>
 
@@ -370,21 +384,6 @@ export function SalaCall({
             </div>
           )}
 
-          {carregando && (
-            <div className={styles.conectando} role="status" aria-live="polite">
-              <span className={styles.conectandoIcone} aria-hidden="true">
-                <LoaderCircle size={18} />
-              </span>
-              <span>
-                <strong>Preparando sua entrada</strong>
-                <small>Conectando acesso protegido, áudio e vídeo.</small>
-              </span>
-              <i aria-hidden="true">
-                <span />
-              </i>
-            </div>
-          )}
-
           <button type="button" onClick={() => void entrar()} disabled={!podeEntrar || carregando}>
             {carregando ? (
               <LoaderCircle className={styles.girando} size={17} aria-hidden="true" />
@@ -393,6 +392,18 @@ export function SalaCall({
             )}
             {carregando ? 'Abrindo sala…' : kickoff ? 'Entrar no kickoff' : 'Entrar na reunião'}
           </button>
+
+          {salaAberta && videoConfigurado && !carregando && (
+            <p className={styles.avisoConvidado}>
+              {midia.escolhas.audio
+                ? midia.escolhas.video
+                  ? 'Você entrará com câmera e microfone ligados.'
+                  : 'Você entrará com o microfone ligado e sem câmera.'
+                : midia.escolhas.video
+                  ? 'Você entrará com a câmera ligada e o microfone desligado.'
+                  : 'Você entrará com câmera e microfone desligados.'}
+            </p>
+          )}
 
           {!anfitriao && (
             <p className={styles.avisoConvidado}>

@@ -8,12 +8,16 @@ vi.mock('@livekit/components-react', () => ({
     children,
     onDisconnected,
     onMediaDeviceFailure,
+    audio,
+    video,
   }: {
     children: React.ReactNode;
     onDisconnected?: (reason?: number) => void;
     onMediaDeviceFailure?: (failure: string, kind: string) => void;
+    audio?: unknown;
+    video?: unknown;
   }) => (
-    <div data-testid="sala-livekit">
+    <div data-testid="sala-livekit" data-audio={Boolean(audio)} data-video={Boolean(video)}>
       {children}
       <button type="button" onClick={() => onDisconnected?.(9)}>
         Simular queda de conexão
@@ -37,6 +41,14 @@ vi.mock('@livekit/components-react', () => ({
 }));
 
 vi.mock('./LiveCoach', () => ({ LiveCoach: () => <aside>Live Coach</aside> }));
+vi.mock('./PalcoReuniao', () => ({
+  PalcoReuniao: () => (
+    <div>
+      Palco da reunião
+      <audio data-testid="audio-remoto" />
+    </div>
+  ),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
@@ -80,6 +92,8 @@ describe('SalaCall', () => {
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
     expect(await screen.findAllByTestId('audio-remoto')).toHaveLength(1);
+    expect(screen.getByTestId('sala-livekit')).toHaveAttribute('data-audio', 'false');
+    expect(screen.getByTestId('sala-livekit')).toHaveAttribute('data-video', 'false');
     await user.click(screen.getByRole('button', { name: 'Simular microfone bloqueado' }));
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Permita o microfone nas configurações deste site',

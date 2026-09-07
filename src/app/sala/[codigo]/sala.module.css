@@ -283,14 +283,15 @@
 }
 
 .memoria {
-  margin-top: auto;
-  padding-top: var(--via-space-6);
+  margin-top: var(--via-space-4);
 }
 
-.memoria > p {
+.memoria > summary {
   margin: 0 0 var(--via-space-3);
   color: var(--via-text-muted);
   font-size: var(--via-fs-sm);
+  cursor: pointer;
+  min-height: 32px;
 }
 
 .memoria ul {
@@ -332,7 +333,7 @@
 .entrada {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: clamp(24px, 4vw, 40px);
   border-left: 1px solid var(--via-border-soft);
   background: var(--via-surface);
@@ -741,11 +742,18 @@
 
   .contexto,
   .entrada {
-    padding: var(--via-space-5);
+    padding: var(--via-space-4);
   }
 
   .contexto {
     min-height: 0;
+  }
+
+  .cartao[data-convidado] .sobretitulo {
+    display: none;
+  }
+  .cartao[data-convidado] .contexto h1 {
+    margin-top: 0;
   }
 
   .contexto h1 {

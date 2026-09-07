@@ -15,7 +15,7 @@ import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
 import { chromium, webkit } from 'playwright';
 import { validarResilienciaAoVivo } from './lib/smoke-call-resiliencia.mjs';
-import { validarFicha, validarRecepcao } from './lib/smoke-call-qualidade.mjs';
+import { prepararMidia, validarFicha, validarRecepcao } from './lib/smoke-call-qualidade.mjs';
 import {
   cookiesDaSessao,
   observarPagina,
@@ -203,6 +203,7 @@ async function entrarNaSala(page, nome) {
   // de o React assumir os eventos do HTML entregue pelo servidor.
   await page.waitForTimeout(600);
   await campoNome.fill(nome);
+  await prepararMidia(page);
   if (!(await page.getByRole('button', { name: 'Entrar na reunião' }).isDisabled())) {
     throw new Error('A entrada foi liberada sem consentimento.');
   }

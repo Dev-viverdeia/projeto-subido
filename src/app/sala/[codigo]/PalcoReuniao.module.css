@@ -1,0 +1,370 @@
+.palco {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+.conteudo {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.grade {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  overflow: auto;
+  align-content: center;
+}
+.pessoa {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  min-height: 120px;
+  overflow: hidden;
+  border: 1px solid var(--via-navy-14);
+  border-radius: var(--app-radius-card);
+  background: var(--via-navy-deep);
+  color: var(--via-white);
+}
+.pessoa video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pessoa[data-lk-source='screen_share'] video {
+  object-fit: contain;
+}
+.pessoa[data-destaque] {
+  grid-column: 1 / -1;
+}
+.grade[data-foco] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+}
+.grade[data-foco] .pessoa:not([data-destaque]) {
+  min-height: 80px;
+}
+.semVideo {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--via-space-3);
+  height: 100%;
+  color: var(--via-gray-300);
+  font-size: var(--via-fs-body);
+}
+.nome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--via-space-2);
+  position: absolute;
+  inset: auto var(--via-space-2) var(--via-space-2);
+  padding-left: var(--via-space-3);
+  border: 1px solid color-mix(in srgb, var(--via-white) 20%, transparent);
+  border-radius: var(--app-radius-control);
+  background: color-mix(in srgb, var(--via-navy-deep) 88%, transparent);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+}
+.nome span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.nome button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-white);
+  cursor: pointer;
+}
+.nome button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring-onnavy);
+}
+.controles {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-shrink: 0;
+  padding: var(--via-space-3);
+  border-top: 1px solid var(--app-elev-2-line);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-glass-blur);
+}
+.controles > button,
+.dispositivos summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  cursor: pointer;
+  transition: background var(--app-t-state);
+}
+.controles > button svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+.controles > button:hover,
+.dispositivos summary:hover {
+  background: var(--via-bg-2);
+}
+.controles > button[aria-pressed='true'] {
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+.controles > button:focus-visible,
+.dispositivos summary:focus-visible,
+.opcoes select:focus-visible,
+.reproduzir:focus-visible,
+.chat button:focus-visible,
+.chat input:focus-visible,
+.grade:focus-visible,
+.mensagens:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.controles > .sair {
+  color: var(--via-danger);
+  border-color: color-mix(in srgb, var(--via-danger) 30%, var(--via-border));
+}
+.controles > button:disabled {
+  cursor: wait;
+}
+.dispositivos {
+  position: relative;
+}
+.dispositivos summary {
+  list-style: none;
+}
+.dispositivos summary::-webkit-details-marker {
+  display: none;
+}
+.opcoes {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: var(--via-space-3);
+  width: min(320px, calc(100vw - 32px));
+  max-height: 50dvh;
+  overflow: auto;
+  padding: var(--via-space-4);
+  border: 1px solid var(--app-elev-3-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-3-bg);
+  color: var(--via-text-primary);
+  box-shadow: var(--app-elev-3-shadow);
+  backdrop-filter: var(--via-glass-blur);
+}
+.opcoes label {
+  display: grid;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+}
+.opcoes select {
+  min-height: 44px;
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--via-space-2);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  font: inherit;
+  font-size: var(--via-fs-body);
+}
+.opcoes p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  line-height: var(--via-lh-normal);
+}
+.conexao,
+.reproduzir {
+  margin: 0;
+  padding: var(--via-space-3);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  text-align: center;
+  font: inherit;
+  font-size: var(--via-fs-sm);
+}
+.reproduzir {
+  border: 1px solid var(--via-border);
+  cursor: pointer;
+}
+.chat {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
+  min-height: 0;
+  border-left: 1px solid var(--via-border);
+  background: var(--via-surface);
+}
+.chat[hidden] {
+  display: none;
+}
+.chat header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border-soft);
+}
+.chat h2 {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+}
+.chat button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-body);
+  cursor: pointer;
+}
+.mensagens {
+  flex: 1;
+  overflow: auto;
+  padding: var(--via-space-3);
+}
+.mensagens p {
+  margin: 0 0 var(--via-space-4);
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.mensagens strong {
+  display: block;
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
+.mensagens p.avisoChat,
+.avisoChat {
+  padding: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+.chat form {
+  display: flex;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
+  border-top: 1px solid var(--via-border-soft);
+}
+.chat input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding-inline: var(--via-space-2);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-body);
+}
+@media (max-width: 1079px) {
+  .controles > button > span,
+  .dispositivos summary > span {
+    display: none;
+  }
+  .controles > button,
+  .dispositivos summary {
+    padding-inline: var(--via-space-3);
+  }
+  .chat {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    width: 100%;
+  }
+}
+@media (max-width: 599px) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--via-space-2);
+    padding: var(--via-space-2);
+  }
+  .pessoa {
+    min-height: 0;
+    aspect-ratio: 3 / 4;
+  }
+  .nome {
+    padding-left: var(--via-space-2);
+    font-size: var(--via-fs-caption);
+  }
+  .nome button {
+    width: 32px;
+  }
+  .controles {
+    gap: var(--via-space-1);
+    padding: var(--via-space-2);
+  }
+  .controles > button,
+  .dispositivos summary {
+    padding-inline: var(--via-space-2);
+    min-width: 44px;
+  }
+  .opcoes {
+    left: auto;
+    right: -48px;
+    transform: none;
+  }
+  .grade[data-foco] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grade[data-foco] .pessoa[data-destaque] {
+    aspect-ratio: 16 / 10;
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .controles,
+  .opcoes {
+    background: var(--via-surface);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .controles > button,
+  .dispositivos summary {
+    transition: none;
+  }
+}

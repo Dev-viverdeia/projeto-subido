@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { LiveKitRoom, VideoConference } from '@livekit/components-react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
+import { LiveKitRoom } from '@livekit/components-react';
 import { MediaDeviceFailure, type DisconnectReason } from 'livekit-client';
 import { MicOff, X } from 'lucide-react';
 import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
 import { LiveCoach } from './LiveCoach';
+import { PalcoReuniao } from './PalcoReuniao';
+import type { EscolhasMidia } from './usePreparacaoMidia';
 import styles from './sala.module.css';
 
 export function SalaAoVivo({
@@ -15,12 +17,16 @@ export function SalaAoVivo({
   anfitriao,
   plano,
   aoDesconectar,
+  escolhas,
+  aoMudarEscolhas,
 }: {
   credenciais: { token: string; serverUrl: string };
   convite: ConviteCall;
   anfitriao: boolean;
   plano: PlanoCall | null;
   aoDesconectar: (reason?: DisconnectReason) => void;
+  escolhas: EscolhasMidia;
+  aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
 }) {
   const [aviso, setAviso] = useState('');
 
@@ -46,8 +52,8 @@ export function SalaAoVivo({
         token={credenciais.token}
         serverUrl={credenciais.serverUrl}
         connect
-        audio
-        video
+        audio={escolhas.audio ? { deviceId: escolhas.microfoneId || undefined } : false}
+        video={escolhas.video ? { deviceId: escolhas.cameraId || undefined } : false}
         onDisconnected={aoDesconectar}
         onMediaDeviceFailure={avisarMidia}
       >
@@ -67,7 +73,12 @@ export function SalaAoVivo({
         {anfitriao ? (
           <div className={styles.experienciaAnfitriao}>
             <div className={styles.palcoVideo}>
-              <VideoConference />
+              <PalcoReuniao
+                anfitriao
+                escolhas={escolhas}
+                aoMudarEscolhas={aoMudarEscolhas}
+                aoFalhar={(erro, tipo) => avisarMidia(MediaDeviceFailure.getFailure(erro), tipo)}
+              />
             </div>
             <LiveCoach
               reuniaoId={convite.reuniaoId}
@@ -77,9 +88,14 @@ export function SalaAoVivo({
             />
           </div>
         ) : (
-          <VideoConference />
+          <PalcoReuniao
+            anfitriao={false}
+            escolhas={escolhas}
+            aoMudarEscolhas={aoMudarEscolhas}
+            aoFalhar={(erro, tipo) => avisarMidia(MediaDeviceFailure.getFailure(erro), tipo)}
+          />
         )}
-        {/* VideoConference já renderiza o áudio remoto. Não adicionar outro renderer. */}
+        {/* PalcoReuniao contém um único renderer de áudio remoto. */}
       </LiveKitRoom>
     </div>
   );

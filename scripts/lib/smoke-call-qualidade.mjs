@@ -1,4 +1,14 @@
 /** Verificações adicionais somente na conta descartável criada pelo smoke. */
+export async function prepararMidia(page) {
+  await page.getByRole('button', { name: 'Testar câmera e microfone' }).click();
+  await page.getByRole('button', { name: 'Desligar microfone', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Desligar câmera', exact: true }).waitFor();
+  await page.waitForFunction(() => {
+    const video = globalThis.document.querySelector('video[aria-label="Sua prévia de câmera"]');
+    return video && video.readyState >= 2 && video.videoWidth > 0;
+  });
+}
+
 export async function validarMidia({ page, esperar }) {
   return esperar({
     contexto: 'receber áudio e vídeo remoto sem reprodução duplicada',
@@ -95,6 +105,15 @@ export async function validarRecepcao({ paginaHost, paginaConvidado, esperar, et
   if (await paginaConvidado.getByRole('complementary', { name: 'Live Coach privado' }).count()) {
     throw new Error('O convidado não pode ver o coach privado.');
   }
+  await paginaHost.getByRole('button', { name: 'Mensagens da reunião', exact: true }).click();
+  await paginaHost.getByLabel('Mensagem para os participantes').fill('QA: podemos começar.');
+  await paginaHost.getByRole('button', { name: 'Enviar mensagem', exact: true }).click();
+  await paginaConvidado.getByRole('button', { name: 'Mensagens da reunião', exact: true }).click();
+  await paginaConvidado.getByText('QA: podemos começar.', { exact: true }).waitFor();
+  for (const pagina of [paginaHost, paginaConvidado]) {
+    await pagina.getByRole('button', { name: 'Fechar mensagens', exact: true }).click();
+  }
+  etapa('mensagem_entre_participantes_validada');
   // Ambos recebem o mesmo WAV. Após provar os dois canais, deixe só uma voz
   // falando: duas cópias simultâneas tornam a transcrição artificialmente ilegível.
   await paginaConvidado.locator('button[data-lk-source="microphone"]').click();

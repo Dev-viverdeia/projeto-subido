@@ -358,6 +358,8 @@ test.describe('fundação visual Viver de IA', () => {
   test('o kickoff conduz da sala ao acordo do projeto', async ({ page }) => {
     await page.goto('/preview/sala-call?tipo=kickoff');
     await expect(page.getByRole('heading', { name: 'Preparar kickoff' })).toBeVisible();
+    await expect(page.getByText('Resultado e sucesso')).toBeHidden();
+    await page.getByText('O que precisa sair definido', { exact: true }).click();
     await expect(page.getByText('Resultado e sucesso')).toBeVisible();
     await expect(page.getByText('Responsáveis e acessos')).toBeVisible();
     await expect(page.getByText('Revise o acordo antes de iniciar a execução.')).toBeVisible();
