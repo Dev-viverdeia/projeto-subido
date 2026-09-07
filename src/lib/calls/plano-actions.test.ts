@@ -37,13 +37,25 @@ function formulario() {
 }
 beforeEach(() => {
   vi.clearAllMocks();
-  getUser.mockResolvedValue({ data: { user: { id: 'dono-1' } }, error: null });
+  getUser.mockResolvedValue({
+    data: { user: { id: 'dono-1', app_metadata: { plano_subido: 'pro' } } },
+    error: null,
+  });
   eq.mockReturnValue({ eq, maybeSingle });
   maybeSingle.mockResolvedValue({ data: { oportunidade_id: OPORTUNIDADE }, error: null });
   rpc.mockResolvedValue({ data: { aplicado: true }, error: null });
 });
 
 describe('salvarPlanoCall', () => {
+  it('explica o limite do Starter sem tentar alterar a venda', async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: 'dono-1', app_metadata: { plano_subido: 'starter' } } },
+      error: null,
+    });
+    expect((await salvarPlanoCall({}, formulario())).tituloErro).toBe('Disponível no Pro');
+    expect(rpc).not.toHaveBeenCalled();
+    expect(maybeSingle).not.toHaveBeenCalled();
+  });
   it('salva com a sessão atual e devolve confirmação sem redirecionar', async () => {
     expect(await salvarPlanoCall({}, formulario())).toEqual({
       sucesso: 'Plano salvo na ficha do cliente.',

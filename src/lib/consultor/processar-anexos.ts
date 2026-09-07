@@ -31,17 +31,36 @@ export type AnexosPreparados = {
 };
 
 /**
- * Baixa arquivos privados como service role, transcreve áudio e cria arquivos
+ * Baixa arquivos privados com a sessão do usuário, transcreve áudio e cria arquivos
  * temporários na OpenAI para imagem/documento. Eles expiram em uma hora e são
  * apagados logo após a resposta; o original continua somente no Storage privado.
  */
 export async function prepararAnexosParaModelo(
-  admin: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database>,
   anexos: readonly AnexoPersistidoSobral[],
+  contexto: { dono: string; threadId: string },
   signal?: AbortSignal,
 ): Promise<AnexosPreparados> {
   if (anexos.length === 0) {
     return { entradas: [], transcricoes: [], limpar: () => Promise.resolve() };
+  }
+
+  // Valida também registros antigos e áudios com transcrição em cache. Não
+  // normalize URLs: fragmentos, escapes e segmentos extras devem falhar.
+  for (const anexo of anexos) {
+    const partes = anexo.caminhoStorage.split('/');
+    if (
+      partes.length !== 3 ||
+      partes[0] !== contexto.dono ||
+      partes[1] !== contexto.threadId ||
+      !partes[2]?.startsWith(`${anexo.id}-`) ||
+      !/^[a-zA-Z0-9._-]+$/.test(partes[2])
+    ) {
+      throw new ErroSobral(
+        'Não foi possível acessar este anexo. Envie o arquivo novamente.',
+        'falha',
+      );
+    }
   }
 
   const { OPENAI_API_KEY } = openAIEnv();
@@ -66,7 +85,7 @@ export async function prepararAnexosParaModelo(
         });
         continue;
       }
-      const { data, error } = await admin.storage
+      const { data, error } = await supabase.storage
         .from(SOBRAL_BUCKET_ANEXOS)
         .download(anexo.caminhoStorage);
       if (error || !data) throw error ?? new Error('arquivo-indisponivel');

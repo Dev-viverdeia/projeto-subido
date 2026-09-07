@@ -89,7 +89,12 @@ export async function executarGeracao({
       transcricao: a.transcricao,
     }));
     emitir({ tipo: 'etapa', etapa: anexos.length ? 'lendo' : 'pensando' });
-    preparados = await prepararAnexosParaModelo(admin, anexos, signal);
+    preparados = await prepararAnexosParaModelo(
+      supabase,
+      anexos,
+      { dono, threadId: geracao.thread_id },
+      signal,
+    );
     for (const transcricao of preparados.transcricoes) {
       const { error: erroTranscricao } = await admin
         .from('consultor_anexos')
