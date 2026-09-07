@@ -72,7 +72,11 @@ export async function encerrarSalaNoProvedor(dono: string, reuniaoId: string) {
         participantes.slice(i, i + 8).map(async ({ identidade_provedor }) => {
           if (!identidade_provedor) return;
           try {
-            await cliente.removeParticipant(reuniao.sala_provedor, identidade_provedor);
+            // O corte explícito também invalida tokens de quem nunca entrou.
+            // Não depender do comportamento implícito de remoção/not_found.
+            await cliente.removeParticipant(reuniao.sala_provedor, identidade_provedor, {
+              revokeTokenTs: BigInt(Math.floor(Date.now() / 1000) + 30),
+            });
           } catch (causa) {
             if (!naoEncontrado(causa)) throw causa;
           }
