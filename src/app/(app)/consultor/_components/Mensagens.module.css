@@ -367,3 +367,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.arquivosEnviados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  justify-items: end;
+  gap: var(--via-space-3);
+}
+.arquivosEnviados > li {
+  width: min(100%, 430px);
+}

@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
-import { ArrowRight, ArrowUp, Mic, Paperclip, Square } from 'lucide-react';
+import { ArrowRight, ArrowUp, Paperclip, Square } from 'lucide-react';
+import { ControlesGravacao } from './ControlesGravacao';
 import { RespostaEmAndamento } from './RespostaEmAndamento';
 import { useRespostaSobral } from './useRespostaSobral';
 import { registrarEnvio } from '@/lib/consultor/registrar-envio';
@@ -131,8 +132,10 @@ export function Conversa({
 
   const {
     gravando,
+    preparando,
     segundos,
     alternar: alternarGravacao,
+    cancelar: cancelarGravacao,
   } = useGravadorAudio({
     aoConcluir: (arquivo) => incluirArquivos([arquivo]),
     aoFalhar: setErro,
@@ -162,7 +165,13 @@ export function Conversa({
   async function enviar(retomar = false) {
     const mensagem = retomar ? (emVoo ?? '') : texto.trim();
     const anexosDaRodada = retomar ? arquivosEmVoo : [...arquivos];
-    if ((!mensagem && anexosDaRodada.length === 0) || (!retomar && ocupado) || etapa || gravando)
+    if (
+      (!mensagem && anexosDaRodada.length === 0) ||
+      (!retomar && ocupado) ||
+      etapa ||
+      gravando ||
+      preparando
+    )
       return;
     if (!navigator.onLine) {
       setErro('Sem conexão. Sua mensagem continua aqui. Reconecte para enviar.');
@@ -253,7 +262,7 @@ export function Conversa({
             {envioAnexos.pausado ? (
               <>
                 <button type="button" onClick={() => void enviar(true)}>
-                  Retomar envio
+                  {envioAnexos.progresso?.confirmando ? 'Confirmar envio' : 'Retomar envio'}
                 </button>
                 {!envioAnexos.progresso?.confirmando ? (
                   <button type="button" onClick={() => void voltarAEdicao()}>
@@ -299,7 +308,11 @@ export function Conversa({
           <AnexosDaRodada
             arquivos={arquivos}
             estado="rascunho"
-            aoRemover={(indice) => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))}
+            aoRemover={
+              ocupado
+                ? undefined
+                : (indice) => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))
+            }
           />
         ) : null}
 
@@ -343,36 +356,21 @@ export function Conversa({
             <button
               type="button"
               onClick={() => arquivoRef.current?.click()}
-              disabled={ocupado || gravando}
+              disabled={ocupado || gravando || preparando}
               aria-label="Anexar documento, imagem ou áudio"
               title="Anexar arquivo"
             >
               <Paperclip size={17} strokeWidth={1.9} aria-hidden="true" />
               <span>Arquivo</span>
             </button>
-            <button
-              type="button"
-              className={gravando ? styles.gravando : undefined}
-              onClick={() => void alternarGravacao()}
-              disabled={ocupado}
-              aria-label={gravando ? 'Parar gravação' : 'Gravar áudio'}
-              title={gravando ? 'Parar gravação' : 'Gravar áudio'}
-            >
-              {gravando ? (
-                <Square size={14} fill="currentColor" aria-hidden="true" />
-              ) : (
-                <Mic size={17} strokeWidth={1.9} aria-hidden="true" />
-              )}
-              <span>{gravando ? 'Parar' : 'Gravar'}</span>
-            </button>
-            {gravando ? (
-              <span className={styles.tempoGravacao} role="status">
-                Gravando · {String(Math.floor(segundos / 60)).padStart(2, '0')}:
-                {String(segundos % 60).padStart(2, '0')}
-              </span>
-            ) : (
-              <span className={styles.dicaAtalho}>Enter envia · Shift + Enter cria uma linha</span>
-            )}
+            <ControlesGravacao
+              gravando={gravando}
+              preparando={preparando}
+              segundos={segundos}
+              ocupado={ocupado}
+              alternar={alternarGravacao}
+              cancelar={cancelarGravacao}
+            />
           </div>
 
           {resposta.etapa && resposta.geracao ? (
@@ -390,7 +388,9 @@ export function Conversa({
             <button
               type="submit"
               className={styles.enviar}
-              disabled={(!texto.trim() && arquivos.length === 0) || ocupado || gravando}
+              disabled={
+                (!texto.trim() && arquivos.length === 0) || ocupado || gravando || preparando
+              }
               aria-label={ocupado ? 'Aguardando o Sobral AI' : 'Enviar mensagem'}
             >
               <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />

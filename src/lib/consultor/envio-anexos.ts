@@ -94,7 +94,7 @@ export class EnvioAnexos {
         (this.arquivos.every((a) => categoriaDoAnexo(a.type) === 'audio')
           ? 'Áudio enviado.'
           : `Analise estes ${this.arquivos.length} arquivos e me ajude com o que encontrar.`);
-      const { error } = await supabase.rpc('sobral_confirmar_anexos', {
+      const { data: recibo, error } = await supabase.rpc('sobral_confirmar_anexos', {
         p_thread: this.threadId,
         p_mensagem: this.mensagemId,
         p_titulo: titulo,
@@ -108,7 +108,7 @@ export class EnvioAnexos {
           caminho_storage: this.caminho(i),
         })),
       });
-      if (error)
+      if (error || recibo !== this.mensagemId)
         throw new Error('Falta confirmar o envio. Tente novamente sem reenviar os arquivos.');
       return { threadId: this.threadId, mensagemId: this.mensagemId, falha: null };
     } catch (erro) {

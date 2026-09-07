@@ -96,6 +96,18 @@ describe('Conversa integrada à Início', () => {
     expect(dependencias.criarConversa).not.toHaveBeenCalled();
   });
 
+  it('dois envios no mesmo instante registram apenas uma mensagem', async () => {
+    dependencias.criarConversa.mockReturnValue(new Promise(() => {}));
+    render(<Conversa textoInicial="Minha dúvida" />);
+    const form = screen.getByRole('textbox').closest('form')!;
+    act(() => {
+      fireEvent.submit(form);
+      fireEvent.submit(form);
+    });
+    await waitFor(() => expect(dependencias.criarConversa).toHaveBeenCalled());
+    expect(dependencias.criarConversa).toHaveBeenCalledOnce();
+  });
+
   it('recupera o compositor quando o envio rejeita, sem repetir automaticamente', async () => {
     dependencias.criarConversa.mockRejectedValueOnce(new TypeError('Failed to fetch'));
     render(<Conversa />);
@@ -262,7 +274,9 @@ describe('Conversa integrada à Início', () => {
     });
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
     fireEvent.click(await screen.findByRole('button', { name: 'Voltar à edição' }));
-    expect(await screen.findByText('Pronto para enviar')).toBeVisible();
+    // O player troca de instância quando a URL local fica pronta; consulte o DOM
+    // atual dentro da espera, sem guardar um nó da instância anterior.
+    await waitFor(() => expect(screen.getByText('Pronto para enviar')).toBeVisible());
     expect(screen.getByRole('textbox')).toHaveValue('Minha dúvida');
     expect(screen.getByRole('textbox')).toBeEnabled();
   });

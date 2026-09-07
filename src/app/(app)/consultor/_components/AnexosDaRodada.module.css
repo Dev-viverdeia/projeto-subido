@@ -32,9 +32,36 @@
   min-width: 0;
 }
 .dados strong {
-  font-size: var(--via-fs-sm);
+  font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   overflow-wrap: anywhere;
+}
+.miniatura {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  object-fit: contain;
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-bg-2);
+}
+.dados a {
+  width: fit-content;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-navy);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.dados a:hover {
+  text-decoration: underline;
+}
+.dados a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 .dados span,
 .andamento span {
