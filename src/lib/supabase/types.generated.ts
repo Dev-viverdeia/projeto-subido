@@ -4159,6 +4159,16 @@ export type Database = {
         }
         Returns: Json
       }
+      prospeccao_sistema_solicitar_lista: {
+        Args: {
+          p_dono: string
+          p_pedido: string
+          p_segmento: string
+          p_localizacao: string
+          p_quantidade: number
+        }
+        Returns: string
+      }
       registrar_uso_sobral: {
         Args: { p_dono: string; p_mes: string; p_tokens: number }
         Returns: number

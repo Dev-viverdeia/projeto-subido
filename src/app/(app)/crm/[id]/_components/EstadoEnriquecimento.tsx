@@ -1,13 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { CircleAlert } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
 import { ModalOperacao } from '../../../_components/ModalOperacao';
+import { useAcompanhamentoOperacao } from '../../../_components/useAcompanhamentoOperacao';
 import styles from './EstadoEnriquecimento.module.css';
 
 const ETAPAS = [
@@ -36,33 +36,11 @@ export function EstadoEnriquecimento({
   acao?: ReactNode;
   etapa?: string | null;
 }) {
-  const router = useRouter();
-  const [consultas, setConsultas] = useState(0);
   const [mostrarModal, setMostrarModal] = useState(true);
   const [mostrarFalha, setMostrarFalha] = useState(true);
   const ativo = status === 'na_fila' || status === 'processando';
+  const online = useAcompanhamentoOperacao(ativo);
   const indice = etapa === 'gerar_dossie' ? 2 : etapa === 'ler_site' ? 1 : 0;
-
-  useEffect(() => {
-    if (!ativo) return;
-    const timer = window.setTimeout(
-      () => {
-        setConsultas((total) => total + 1);
-        if (document.visibilityState !== 'hidden') router.refresh();
-      },
-      consultas < 15 ? 4000 : 15000,
-    );
-    return () => window.clearTimeout(timer);
-  }, [ativo, router, consultas]);
-
-  useEffect(() => {
-    if (!ativo) return;
-    const retomar = () => {
-      if (document.visibilityState === 'visible') router.refresh();
-    };
-    document.addEventListener('visibilitychange', retomar);
-    return () => document.removeEventListener('visibilitychange', retomar);
-  }, [ativo, router]);
 
   if (status === 'falhou') {
     const mensagem = `${erro ?? 'O processamento não foi concluído.'} Os ${CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos foram devolvidos.`;
@@ -108,8 +86,14 @@ export function EstadoEnriquecimento({
         descricao="Usando os dados da ficha para preparar sua próxima conversa."
         etapas={ETAPAS}
         etapaAtual={indice}
-        nota="Você pode sair desta janela. A análise continua em segundo plano."
-        mensagemDemora="Ainda aguardando o resultado. Você pode continuar usando a ficha."
+        nota={
+          online
+            ? 'Você pode sair desta janela. A análise continua em segundo plano.'
+            : 'Sem conexão. O andamento será atualizado quando a internet voltar.'
+        }
+        mensagemDemora={
+          online ? 'Ainda aguardando o resultado. Você pode continuar usando a ficha.' : undefined
+        }
         demoraApos={45000}
         acaoSecundaria={{
           rotulo: 'Continuar usando a ficha',
@@ -125,7 +109,11 @@ export function EstadoEnriquecimento({
           <div>
             <p className={styles.sobretitulo}>Enriquecimento em andamento</p>
             <h2>{status === 'na_fila' ? 'Pesquisa na fila' : ETAPAS[indice].titulo}</h2>
-            <p>A ficha será atualizada quando os dados estiverem prontos.</p>
+            <p>
+              {online
+                ? 'A ficha será atualizada quando os dados estiverem prontos.'
+                : 'Sem conexão. A consulta será retomada quando a internet voltar.'}
+            </p>
           </div>
           <button
             type="button"

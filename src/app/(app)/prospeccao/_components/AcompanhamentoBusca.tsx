@@ -1,35 +1,55 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAcompanhamentoOperacao } from '../../_components/useAcompanhamentoOperacao';
 import { ProgressoBusca } from './ProgressoBusca';
+import { ResultadoBusca } from './ResultadoBusca';
 
 export function AcompanhamentoBusca({
   status,
   quantidade,
   etapa,
   detalhe,
+  segmento,
+  localizacao,
+  encontradas,
+  minimizadoInicial = false,
 }: {
   status: string;
   quantidade: number;
   etapa: number;
   detalhe: string | null;
+  segmento: string;
+  localizacao: string;
+  encontradas: number;
+  minimizadoInicial?: boolean;
 }) {
-  const router = useRouter();
+  const [mostrarResultado, setMostrarResultado] = useState(
+    status === 'processando' || !minimizadoInicial,
+  );
+  const online = useAcompanhamentoOperacao(status === 'processando');
 
-  useEffect(() => {
-    if (status !== 'processando') return;
-    const atualizar = window.setInterval(() => router.refresh(), 2_500);
-    return () => window.clearInterval(atualizar);
-  }, [router, status]);
-
-  useEffect(() => {
-    if (status !== 'concluida' && status !== 'falhou') return;
-    const url = new URL(window.location.href);
-    url.searchParams.set('busca', status === 'concluida' ? 'concluida' : 'falhou');
-    router.replace(`${url.pathname}${url.search}`);
-  }, [router, status]);
-
+  if (status === 'concluida' || status === 'falhou') {
+    if (!mostrarResultado) return null;
+    return (
+      <ResultadoBusca
+        estado={status}
+        segmento={segmento}
+        localizacao={localizacao}
+        solicitadas={quantidade}
+        encontradas={encontradas}
+        onClose={() => setMostrarResultado(false)}
+      />
+    );
+  }
   if (status !== 'processando') return null;
-  return <ProgressoBusca quantidade={quantidade} etapa={etapa} detalhe={detalhe} />;
+  return (
+    <ProgressoBusca
+      quantidade={quantidade}
+      etapa={etapa}
+      detalhe={detalhe}
+      online={online}
+      minimizadoInicial={minimizadoInicial}
+    />
+  );
 }

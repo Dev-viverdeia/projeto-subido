@@ -17,6 +17,7 @@ type ResultadoBuscaProps = {
   localizacao: string;
   solicitadas: number;
   encontradas: number;
+  onClose?: () => void;
 };
 
 export function ResultadoBusca({
@@ -25,6 +26,7 @@ export function ResultadoBusca({
   localizacao,
   solicitadas,
   encontradas,
+  onClose,
 }: ResultadoBuscaProps) {
   const montado = useSyncExternalStore(
     escutarMontagem,
@@ -37,6 +39,7 @@ export function ResultadoBusca({
   const falhou = estado === 'falhou';
 
   const fechar = (destino?: 'formulario' | 'resultados') => {
+    onClose?.();
     const url = new URL(window.location.href);
     url.searchParams.delete('busca');
     if (destino === 'formulario') {

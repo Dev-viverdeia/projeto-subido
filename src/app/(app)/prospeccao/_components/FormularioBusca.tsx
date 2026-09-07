@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { ArrowRight, Building2, MapPin, Search } from 'lucide-react';
 import { Alert, Button, Card, Input } from '@/design-system/via';
 import { criarListaProspeccao, type EstadoBuscaProspeccao } from '@/lib/prospeccao/actions';
@@ -22,6 +22,7 @@ export function FormularioBusca({
   valoresIniciais?: ValoresIniciais;
   autoFoco?: boolean;
 }) {
+  const solicitacao = useRef<{ recorte: string; pedido: string } | null>(null);
   const inicial = valoresIniciais
     ? {
         campos: {
@@ -33,6 +34,15 @@ export function FormularioBusca({
     : INICIAL;
   const [estado, acao, buscando] = useActionState<EstadoBuscaProspeccao, FormData>(
     async (anterior, dados) => {
+      const recorte = JSON.stringify(
+        ['segmento', 'localizacao', 'quantidade'].map((nome) =>
+          typeof dados.get(nome) === 'string' ? (dados.get(nome) as string).trim() : '',
+        ),
+      );
+      if (solicitacao.current?.recorte !== recorte) {
+        solicitacao.current = { recorte, pedido: crypto.randomUUID() };
+      }
+      dados.set('pedido', solicitacao.current.pedido);
       try {
         return await criarListaProspeccao(anterior, dados);
       } catch (erro) {
@@ -49,7 +59,7 @@ export function FormularioBusca({
             localizacao: texto('localizacao'),
             quantidade: texto('quantidade') || '5',
           },
-          erro: 'A busca não foi confirmada. Confira a conexão e suas listas antes de tentar novamente.',
+          erro: 'A busca não foi confirmada. Tente novamente com os mesmos campos para recuperar a solicitação sem uma nova cobrança.',
         };
       }
     },

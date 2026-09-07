@@ -13,15 +13,17 @@ export async function obterSaldoProspeccao(dono: string) {
   return createAdminClient().rpc('prospeccao_sistema_obter_saldo', { p_dono: dono });
 }
 
-export async function reservarListaProspeccao(dono: string, nome: string, busca: BuscaProspeccao) {
-  return createAdminClient().rpc('prospeccao_sistema_criar_lista', {
+export async function reservarListaProspeccao(
+  dono: string,
+  pedido: string,
+  busca: BuscaProspeccao,
+) {
+  return createAdminClient().rpc('prospeccao_sistema_solicitar_lista', {
     p_dono: dono,
-    p_nome: nome,
+    p_pedido: pedido,
     p_segmento: busca.segmento,
     p_localizacao: busca.localizacao,
-    p_termos: [],
     p_quantidade: busca.quantidade,
-    p_filtros: { arquitetura: 'prospeccao-qualificada-v1' },
   });
 }
 
