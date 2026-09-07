@@ -100,13 +100,7 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
       )}
 
       <FormularioBusca
-        key={
-          parametros.busca === 'falhou'
-            ? listaAtual?.id
-            : valoresRetomados
-              ? 'retomar-busca'
-              : 'nova-busca'
-        }
+        key={`${listaAtual?.id ?? 'sem-lista'}:${parametros.busca === 'falhou' ? 'falhou' : valoresRetomados ? 'retomar' : 'nova'}`}
         saldo={saldo}
         pronto={integracoes.pronto}
         autoFoco={Boolean(valoresRetomados)}
