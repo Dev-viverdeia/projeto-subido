@@ -8,6 +8,8 @@ export async function validarResilienciaAoVivo({
   etapa,
 }) {
   if (simularReconexao) {
+    await paginaHost.getByRole('button', { name: 'Desligar câmera', exact: true }).click();
+    await paginaHost.getByRole('button', { name: 'Ativar câmera', exact: true }).waitFor();
     const sessoesRealtimeAntes = eventos.filter((evento) =>
       evento.includes('/realtime:201'),
     ).length;
@@ -26,7 +28,12 @@ export async function validarResilienciaAoVivo({
       pronto: (quantidade) => quantidade > sessoesRealtimeAntes,
     });
     await paginaHost.locator('.lk-video-conference').waitFor({ state: 'visible', timeout: 15_000 });
+    // Uma reconexão não pode religar uma câmera que a pessoa desligou.
+    await paginaHost.getByRole('button', { name: 'Ativar câmera', exact: true }).waitFor();
+    await paginaHost.getByRole('button', { name: 'Ativar câmera', exact: true }).click();
+    await paginaHost.getByRole('button', { name: 'Desligar câmera', exact: true }).waitFor();
     etapa('reconexao_validada', {
+      cameraDesligadaPreservada: true,
       sessoesRealtime: eventos.filter((evento) => evento.includes('/realtime:201')).length,
     });
   }
