@@ -2,6 +2,7 @@ import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import type { DossieLead } from './dossie-types';
+import { estaNoFluxo, ROTULO_SITUACAO } from './situacao';
 
 export type EstadoEtapaCiclo = 'concluida' | 'atual' | 'futura' | 'encerrada';
 
@@ -38,8 +39,8 @@ function estadoDaEtapa(indice: number, indiceAtual: number, encerrada: boolean):
 
 /**
  * Converte fatos de um único cliente em um ciclo verificável. Um rascunho de
- * proposta não substitui a descoberta: a plataforma só recomenda propor
- * depois que uma conversa de descoberta foi concluída.
+ * proposta pode nascer de uma conversa fora da plataforma. A reunião é contexto,
+ * não uma condição para elaborar a proposta.
  */
 export function montarCicloCliente(lead: DossieLead): {
   etapas: EtapaCicloCliente[];
@@ -69,7 +70,7 @@ export function montarCicloCliente(lead: DossieLead): {
   let indiceAtual = preparacaoPendente ? 0 : 1;
   if (concluido) indiceAtual = 4;
   else if (entregaIniciada || lead.oportunidade.etapa === 'ganho') indiceAtual = 3;
-  else if (descobertaConcluida) indiceAtual = 2;
+  else if (descobertaConcluida || proposta) indiceAtual = 2;
 
   if (encerrada) {
     if (proposta) indiceAtual = 2;
@@ -101,7 +102,9 @@ export function montarCicloCliente(lead: DossieLead): {
         ? 'Descoberta concluída'
         : proximaCall
           ? ROTULO_STATUS_CALL[proximaCall.status]
-          : 'Reunião pendente',
+          : proposta
+            ? 'Sem reunião registrada'
+            : 'Contexto a confirmar',
       href: descobertaConcluida
         ? destinoDaCall(descobertaConcluida)
         : proximaCall
@@ -162,6 +165,21 @@ export function montarCicloCliente(lead: DossieLead): {
   }
 
   const compromisso = lead.acoesPlano[0] ?? null;
+  if (!estaNoFluxo(lead.oportunidade)) {
+    return {
+      etapas,
+      decisao: {
+        tipo: 'encerrado',
+        rotulo: ROTULO_SITUACAO[lead.oportunidade.situacao!],
+        titulo: lead.oportunidade.motivoRetirada ?? 'Esta oportunidade está fora do fluxo.',
+        href: null,
+        acao: null,
+        prazo: null,
+        apoioHref: null,
+        apoioRotulo: null,
+      },
+    };
+  }
   if (compromisso && !lead.projetoAtivo) {
     return {
       etapas,
@@ -240,6 +258,38 @@ export function montarCicloCliente(lead: DossieLead): {
         prazo: lead.oportunidade.proximaAcaoEm ?? proximaCall.agendadaPara,
         apoioHref: null,
         apoioRotulo: null,
+      },
+    };
+  }
+
+  if (lead.oportunidade.etapa === 'ganho' && !proposta) {
+    return {
+      etapas,
+      decisao: {
+        tipo: 'navegacao',
+        rotulo: 'Venda ganha',
+        titulo: 'Registre o escopo combinado para preparar a entrega.',
+        href: `/propostas/nova?oportunidade=${lead.oportunidade.id}`,
+        acao: 'Registrar proposta',
+        prazo: null,
+        apoioHref: null,
+        apoioRotulo: null,
+      },
+    };
+  }
+
+  if (proposta && proposta.status !== 'recusada') {
+    return {
+      etapas,
+      decisao: {
+        tipo: 'navegacao',
+        rotulo: 'Proposta em andamento',
+        titulo: `Continuar ${proposta.titulo}`,
+        href: `/propostas/${proposta.id}`,
+        acao: 'Continuar proposta',
+        prazo: lead.oportunidade.proximaAcaoEm,
+        apoioHref: descobertaConcluida ? destinoDaCall(descobertaConcluida) : null,
+        apoioRotulo: descobertaConcluida ? 'Revisar descoberta' : null,
       },
     };
   }

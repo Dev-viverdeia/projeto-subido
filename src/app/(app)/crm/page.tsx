@@ -17,7 +17,8 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
   const [oportunidades, parametros] = await Promise.all([listarPipeline(), searchParams]);
   const projetoDeOrigem = primeiroParametro(parametros.projeto);
   const projetoSlug = primeiroParametro(parametros.projetoSlug);
-  const abrirDoProjeto = parametros.novo === 'projeto' && Boolean(projetoDeOrigem);
+  const abrirDoProjeto =
+    parametros.nova === '1' || (parametros.novo === 'projeto' && Boolean(projetoDeOrigem));
 
   return (
     <div className={styles.pagina}>

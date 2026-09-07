@@ -55,6 +55,7 @@ export async function obterContextoProximoPasso(
     .from('crm_oportunidades')
     .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
     .eq('id', oportunidadeId)
+    .eq('situacao', 'ativa')
     .maybeSingle();
 
   if (erroOportunidade) throw erroOportunidade;

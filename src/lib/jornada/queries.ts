@@ -74,6 +74,7 @@ export async function obterJornadaOperacionalComCliente(
       supabase
         .from('crm_oportunidades')
         .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
+        .eq('situacao', 'ativa')
         .limit(500),
       supabase
         .from('crm_enriquecimentos')

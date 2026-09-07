@@ -16,7 +16,10 @@ test.describe('Quadro de vendas', () => {
       await expect(page.getByRole('heading', { name: 'Descobrir' })).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Propor' })).toBeVisible();
     }
-    await page.getByText('Vendas encerradas', { exact: true }).click();
+    if (testInfo.project.name === 'mobile')
+      await page.getByRole('tab', { name: /^Ganho:/ }).click();
+    await expect(page.getByRole('heading', { name: 'Ganho', exact: true })).toBeVisible();
+    await page.getByText('Fora do fluxo', { exact: true }).click();
     await expect(page.getByText('Momento inadequado', { exact: true })).toBeVisible();
     await expect(page.getByText('Fechados', { exact: true })).toHaveCount(0);
     expect(erros).toEqual([]);
@@ -29,7 +32,7 @@ test.describe('Quadro de vendas', () => {
     await page.goto('/preview/crm');
 
     if (testInfo.project.name === 'mobile') {
-      await page.getByRole('button', { name: 'Ações de Automação do atendimento' }).click();
+      await page.getByRole('button', { name: 'Ações de Clínica Aurora', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Marcar como perdida' }).click();
     } else {
       const card = page.getByRole('group', {

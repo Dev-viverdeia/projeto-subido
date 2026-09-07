@@ -4,26 +4,18 @@ import { useCallback, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import { useDraggable } from '@dnd-kit/core';
 import {
+  Archive,
   ArrowRight,
+  Ban,
   CalendarClock,
   CheckCircle2,
-  FileText,
-  GripVertical,
-  Inbox,
   Layers3,
   LoaderCircle,
-  MessageSquareMore,
-  MoreHorizontal,
   XCircle,
 } from 'lucide-react';
-import { DropdownMenu } from '@/design-system/via';
-import {
-  etapaVisivel,
-  faseDaEtapa,
-  rotuloEtapaVisivel,
-  rotuloMotivoPerda,
-  type EtapaCrm,
-} from '@/lib/crm/etapas';
+import { AcoesOportunidade } from './AcoesOportunidade';
+import { estaNoFluxo, ROTULO_SITUACAO } from '@/lib/crm/situacao';
+import { faseDaEtapa, rotuloMotivoPerda, type EtapaCrm } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from './PipelineCrm.module.css';
 
@@ -38,12 +30,6 @@ const FORMATADOR_MOEDA = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
   maximumFractionDigits: 0,
 });
-
-const ICONES_ETAPA = {
-  novo_lead: Inbox,
-  descoberta: MessageSquareMore,
-  proposta: FileText,
-} as const;
 
 export type SolicitarMovimento = (oportunidade: OportunidadeCrm, etapa: EtapaCrm) => void;
 
@@ -98,76 +84,6 @@ function impedirArraste(evento: SyntheticEvent) {
   evento.stopPropagation();
 }
 
-function MenuMovimentacao({
-  oportunidade,
-  aoMover,
-  desabilitado,
-}: {
-  oportunidade: OportunidadeCrm;
-  aoMover: SolicitarMovimento;
-  desabilitado: boolean;
-}) {
-  const etapaAtual = etapaVisivel(oportunidade.etapa);
-  const itensAtivos = (['novo_lead', 'descoberta', 'proposta'] as const).map((etapa) => {
-    const Icone = ICONES_ETAPA[etapa];
-    return {
-      id: etapa,
-      label: rotuloEtapaVisivel(etapa),
-      icon: <Icone size={14} strokeWidth={1.9} />,
-      disabled: etapaAtual === etapa || desabilitado,
-      onSelect: () => aoMover(oportunidade, etapa),
-    };
-  });
-
-  return (
-    <div
-      className={styles.menuMovimentacao}
-      data-no-dnd
-      onMouseDown={impedirArraste}
-      onTouchStart={impedirArraste}
-      onKeyDown={impedirArraste}
-    >
-      <DropdownMenu
-        align="end"
-        ariaLabel={`Ações de ${oportunidade.titulo}`}
-        trigger={
-          <button
-            type="button"
-            className={styles.botaoAcoes}
-            disabled={desabilitado}
-            aria-label={`Ações de ${oportunidade.titulo}`}
-          >
-            <MoreHorizontal size={17} strokeWidth={1.9} aria-hidden="true" />
-          </button>
-        }
-        groups={[
-          { id: 'pipeline', label: 'Mover para', items: itensAtivos },
-          {
-            id: 'desfecho',
-            label: 'Registrar desfecho',
-            items: [
-              {
-                id: 'ganho',
-                label: 'Marcar como ganha',
-                icon: <CheckCircle2 size={14} strokeWidth={1.9} />,
-                disabled: etapaAtual === 'ganho' || desabilitado,
-                onSelect: () => aoMover(oportunidade, 'ganho'),
-              },
-              {
-                id: 'perdido',
-                label: 'Marcar como perdida',
-                icon: <XCircle size={14} strokeWidth={1.9} />,
-                disabled: etapaAtual === 'perdido' || desabilitado,
-                onSelect: () => aoMover(oportunidade, 'perdido'),
-              },
-            ],
-          },
-        ]}
-      />
-    </div>
-  );
-}
-
 export function CartaoOportunidade({
   oportunidade,
   aoMover,
@@ -212,19 +128,18 @@ export function CartaoOportunidade({
           <span>{oportunidade.empresa}</span>
           {valor && <strong>{valor}</strong>}
         </div>
-        {desabilitado ? (
+        <AcoesOportunidade
+          oportunidade={oportunidade}
+          aoMover={aoMover}
+          desabilitado={desabilitado}
+          compacto
+        />
+        {desabilitado && (
           <LoaderCircle
             className={styles.salvando}
             size={17}
             strokeWidth={1.8}
             aria-label="Salvando etapa"
-          />
-        ) : (
-          <GripVertical
-            className={styles.sinalArraste}
-            size={17}
-            strokeWidth={1.7}
-            aria-hidden="true"
           />
         )}
       </div>
@@ -277,11 +192,6 @@ export function CartaoOportunidade({
             {acao}
             <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
           </Link>
-          <MenuMovimentacao
-            oportunidade={oportunidade}
-            aoMover={aoMover}
-            desabilitado={desabilitado}
-          />
         </div>
       </footer>
     </article>
@@ -298,18 +208,38 @@ export function CartaoEncerrado({
   desabilitado: boolean;
 }) {
   const perdida = oportunidade.etapa === 'perdido';
-  const Icone = perdida ? XCircle : CheckCircle2;
-  const encerradaEm = oportunidade.perdidaEm ?? oportunidade.ganhaEm ?? oportunidade.atualizadoEm;
+  const foraDoFluxo = !estaNoFluxo(oportunidade);
+  const Icone =
+    oportunidade.situacao === 'arquivada'
+      ? Archive
+      : oportunidade.situacao === 'desclassificada'
+        ? Ban
+        : perdida
+          ? XCircle
+          : CheckCircle2;
+  const encerradaEm =
+    oportunidade.retiradaEm ??
+    oportunidade.perdidaEm ??
+    oportunidade.ganhaEm ??
+    oportunidade.atualizadoEm;
   const valor = valorDaOportunidade(oportunidade.valorCentavos);
 
   return (
-    <article className={styles.cartaoEncerrado} data-resultado={perdida ? 'perdido' : 'ganho'}>
+    <article
+      className={styles.cartaoEncerrado}
+      data-resultado={foraDoFluxo ? 'fora_do_fluxo' : perdida ? 'perdido' : 'ganho'}
+    >
       <header>
         <span className={styles.estadoEncerrado}>
           <Icone size={14} strokeWidth={2} aria-hidden="true" />
-          {perdida ? 'Venda perdida' : 'Venda ganha'}
+          {!estaNoFluxo(oportunidade)
+            ? ROTULO_SITUACAO[oportunidade.situacao!]
+            : perdida
+              ? 'Venda perdida'
+              : 'Venda ganha'}
         </span>
-        <MenuMovimentacao
+        <AcoesOportunidade
+          compacto
           oportunidade={oportunidade}
           aoMover={aoMover}
           desabilitado={desabilitado}
@@ -328,10 +258,23 @@ export function CartaoEncerrado({
           <strong>{rotuloMotivoPerda(oportunidade.motivoPerda)}</strong>
         </p>
       )}
+      {!estaNoFluxo(oportunidade) && (
+        <p className={styles.motivoPerda}>{oportunidade.motivoRetirada}</p>
+      )}
       <footer>
         <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
-        <Link href={`/vendas/${oportunidade.id}`}>
-          Abrir ficha
+        <Link
+          href={
+            estaNoFluxo(oportunidade) && oportunidade.entregaId
+              ? `/entregas/${oportunidade.entregaId}`
+              : `/vendas/${oportunidade.id}`
+          }
+        >
+          {estaNoFluxo(oportunidade) && !perdida
+            ? oportunidade.entregaId
+              ? 'Abrir entrega'
+              : 'Preparar entrega'
+            : 'Abrir ficha'}
           <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
         </Link>
       </footer>

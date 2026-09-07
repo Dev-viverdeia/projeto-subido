@@ -12,6 +12,36 @@ function fonteVazia(): FonteMetricasComerciais {
 }
 
 describe('métricas comerciais', () => {
+  it('retiradas não inflam o pipeline nem apagam resultados de vendas anteriores', () => {
+    const fonte = fonteVazia();
+    fonte.oportunidades = ['arquivada', 'desclassificada', 'ativa'].map((situacao) => ({
+      situacao,
+      etapa: 'novo_lead',
+      criadoEm: AGORA.toISOString(),
+      valorCentavos: 100000,
+      proximaAcao: null,
+      ganhaEm: null,
+      perdidaEm: null,
+      motivoPerda: null,
+    }));
+    fonte.oportunidades.push({
+      situacao: 'arquivada',
+      etapa: 'ganho',
+      criadoEm: AGORA.toISOString(),
+      valorCentavos: 500000,
+      proximaAcao: null,
+      ganhaEm: AGORA.toISOString(),
+      perdidaEm: null,
+      motivoPerda: null,
+    });
+    const resultado = montarMetricasComerciais(fonte, '30d', AGORA);
+    expect(resultado.saude).toMatchObject({
+      oportunidadesAbertas: 1,
+      semProximaAcao: 1,
+      valorPipelineCentavos: 100000,
+    });
+    expect(resultado.funil).toMatchObject({ oportunidades: 4, ganhos: 1, perdas: 0 });
+  });
   it('usa 30 dias como período seguro para valores desconhecidos', () => {
     expect(lerPeriodoMetricas(undefined)).toBe('30d');
     expect(lerPeriodoMetricas('invalido')).toBe('30d');

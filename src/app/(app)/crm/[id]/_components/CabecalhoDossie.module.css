@@ -56,6 +56,7 @@
 
 .heroLateral {
   display: grid;
+  gap: var(--via-space-3);
   min-width: 232px;
   justify-items: end;
 }

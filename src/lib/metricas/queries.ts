@@ -64,7 +64,7 @@ export const carregarMetricasComerciais = cache(
         return await supabase
           .from('crm_oportunidades')
           .select(
-            'criado_em, etapa, valor_centavos, proxima_acao, ganha_em, perdida_em, motivo_perda',
+            'criado_em, etapa, situacao, valor_centavos, proxima_acao, ganha_em, perdida_em, motivo_perda',
           )
           .order('criado_em', { ascending: true })
           .range(inicio, fim);
@@ -96,6 +96,7 @@ export const carregarMetricasComerciais = cache(
         oportunidades: oportunidades.map((oportunidade) => ({
           criadoEm: oportunidade.criado_em,
           etapa: oportunidade.etapa,
+          situacao: oportunidade.situacao,
           valorCentavos: oportunidade.valor_centavos,
           proximaAcao: oportunidade.proxima_acao,
           ganhaEm: oportunidade.ganha_em,

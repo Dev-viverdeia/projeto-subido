@@ -8,21 +8,23 @@ import {
 } from './etapas';
 
 describe('etapas do CRM', () => {
-  it('resume as sete etapas persistidas em quatro fases visíveis', () => {
+  it('separa quatro etapas do quadro e o histórico de perdas', () => {
     expect(FASES_CRM.map((fase) => fase.id)).toEqual([
       'entrada',
       'conversa',
       'proposta',
+      'ganho',
       'desfecho',
     ]);
     expect(faseDaEtapa('qualificacao')).toBe('entrada');
     expect(faseDaEtapa('negociacao')).toBe('proposta');
-    expect(faseDaEtapa('ganho')).toBe('desfecho');
+    expect(faseDaEtapa('ganho')).toBe('ganho');
     expect(faseDaEtapa('perdido')).toBe('desfecho');
     expect(FASES_CRM.map((fase) => fase.rotulo)).toEqual([
       'Preparar',
       'Descobrir',
       'Propor',
+      'Ganho',
       'Desfecho',
     ]);
   });

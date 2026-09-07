@@ -1264,12 +1264,15 @@ export type Database = {
           ganha_em: string | null
           id: string
           motivo_perda: string | null
+          motivo_retirada: string | null
           ordem: number
           origem: string
           perdida_em: string | null
           probabilidade: number | null
           proxima_acao: string | null
           proxima_acao_em: string | null
+          retirada_em: string | null
+          situacao: string
           titulo: string
           valor_centavos: number | null
         }
@@ -1283,12 +1286,15 @@ export type Database = {
           ganha_em?: string | null
           id?: string
           motivo_perda?: string | null
+          motivo_retirada?: string | null
           ordem?: number
           origem?: string
           perdida_em?: string | null
           probabilidade?: number | null
           proxima_acao?: string | null
           proxima_acao_em?: string | null
+          retirada_em?: string | null
+          situacao?: string
           titulo: string
           valor_centavos?: number | null
         }
@@ -1302,12 +1308,15 @@ export type Database = {
           ganha_em?: string | null
           id?: string
           motivo_perda?: string | null
+          motivo_retirada?: string | null
           ordem?: number
           origem?: string
           perdida_em?: string | null
           probabilidade?: number | null
           proxima_acao?: string | null
           proxima_acao_em?: string | null
+          retirada_em?: string | null
+          situacao?: string
           titulo?: string
           valor_centavos?: number | null
         }
@@ -3645,6 +3654,15 @@ export type Database = {
           p_tipo: string
         }
         Returns: number
+      }
+      crm_alterar_situacao: {
+        Args: {
+          p_anterior: string
+          p_motivo?: string
+          p_oportunidade: string
+          p_situacao: string
+        }
+        Returns: boolean
       }
       crm_aplicar_proxima_acao: {
         Args: { p_enriquecimento: string; p_oportunidade: string }

@@ -28,7 +28,7 @@ test.describe('proposta com contexto do cliente', () => {
     await page.getByRole('combobox', { name: /Projeto-base/ }).selectOption('sem-base');
     await page.getByRole('button', { name: 'Trocar cliente' }).click();
     await page
-      .getByRole('combobox', { name: /Cliente em negociação/ })
+      .getByRole('combobox', { name: /^Cliente/ })
       .selectOption('22222222-2222-4222-8222-222222222222');
     await expect(page.locator('input[name="reuniao"]')).toHaveValue('');
     await expect(page.getByText('Dados da reunião incluídos')).toHaveCount(0);
@@ -40,13 +40,13 @@ test.describe('proposta com contexto do cliente', () => {
     await page.goto('/preview/proposta-nova?estado=lista');
     await expect(page.getByRole('combobox', { name: /Projeto-base/ })).toBeDisabled();
     await page
-      .getByRole('combobox', { name: /Cliente em negociação/ })
+      .getByRole('combobox', { name: /^Cliente/ })
       .selectOption('22222222-2222-4222-8222-222222222222');
     await page.getByRole('combobox', { name: /Projeto-base/ }).selectOption('sem-base');
     await expect(page.getByRole('button', { name: 'Criar rascunho' })).toBeEnabled();
   });
 
-  test('a falha mantém escolhas e o vazio leva à descoberta', async ({ page }) => {
+  test('a falha mantém escolhas e o vazio leva ao cadastro do cliente', async ({ page }) => {
     await page.goto('/preview/proposta-nova?estado=erro');
     await expect(
       page.getByRole('alert').filter({ hasText: 'Suas escolhas foram mantidas' }),
@@ -54,10 +54,10 @@ test.describe('proposta com contexto do cliente', () => {
     await expect(page.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue('sem-base');
     await expect(page.getByRole('button', { name: 'Criar rascunho' })).toBeEnabled();
     await page.goto('/preview/proposta-nova?estado=vazio');
-    await expect(page.getByRole('heading', { name: 'Comece pela descoberta' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Ver reuniões/ })).toHaveAttribute(
+    await expect(page.getByRole('heading', { name: 'Para quem é a proposta?' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Adicionar cliente/ })).toHaveAttribute(
       'href',
-      '/reunioes',
+      '/vendas?nova=1',
     );
     await expect(page.getByRole('button', { name: 'Criar rascunho' })).toHaveCount(0);
   });

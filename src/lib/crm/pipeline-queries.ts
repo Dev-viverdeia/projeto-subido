@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusEnriquecimento } from './enriquecimento';
 import type { EtapaCrm } from './etapas';
+import type { SituacaoCrm } from './situacao';
 
 type LinhaOportunidade = Tables<'crm_oportunidades'>;
 
@@ -13,6 +14,10 @@ export type OportunidadeCrm = {
   id: string;
   titulo: string;
   etapa: EtapaCrm;
+  situacao?: SituacaoCrm;
+  motivoRetirada?: string | null;
+  retiradaEm?: string | null;
+  entregaId?: string | null;
   empresaId: string;
   empresa: string;
   dominio: string | null;
@@ -57,6 +62,7 @@ export const listarOportunidadesSeletor = cache(async (): Promise<OportunidadeSe
         contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
       `,
     )
+    .eq('situacao', 'ativa')
     .order('ordem', { ascending: false })
     .limit(300);
 
@@ -87,14 +93,14 @@ export const obterFocoLeveDoCrm = cache(async (): Promise<OportunidadeSeletor | 
 
 export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
   const supabase = await createClient();
-  const [oportunidades, eventos, enriquecimentos] = await Promise.all([
+  const [oportunidades, eventos, enriquecimentos, entregas] = await Promise.all([
     supabase
       .from('crm_oportunidades')
       .select(
         `
           id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos,
           proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda,
-          atualizado_em, criado_em, ordem,
+          atualizado_em, criado_em, ordem, situacao, retirada_em, motivo_retirada,
           empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio, enriquecido_em),
           contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
         `,
@@ -111,10 +117,16 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
       .select('oportunidade_id, status, solicitado_em')
       .order('solicitado_em', { ascending: false })
       .limit(500),
+    supabase
+      .from('projetos_execucao')
+      .select('id, oportunidade_id')
+      .order('criado_em', { ascending: false })
+      .limit(300),
   ]);
 
   if (oportunidades.error) throw handleError(oportunidades.error, 'crm:pipeline');
   if (eventos.error) throw handleError(eventos.error, 'crm:eventos');
+  if (entregas.error) throw handleError(entregas.error, 'crm:entregas');
   if (enriquecimentos.error) {
     throw handleError(enriquecimentos.error, 'crm:enriquecimentos');
   }
@@ -131,9 +143,10 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
     }
   }
 
-  return (oportunidades.data ?? []).map((linha) =>
-    montarOportunidade(linha, ultimoFato, statusEnriquecimento),
-  );
+  return (oportunidades.data ?? []).map((linha) => ({
+    ...montarOportunidade(linha, ultimoFato, statusEnriquecimento),
+    entregaId: entregas.data?.find((entrega) => entrega.oportunidade_id === linha.id)?.id ?? null,
+  }));
 });
 
 export function montarOportunidade(
@@ -153,6 +166,9 @@ export function montarOportunidade(
     | 'atualizado_em'
     | 'criado_em'
   > & {
+    situacao?: string;
+    retirada_em?: string | null;
+    motivo_retirada?: string | null;
     empresa: { nome: string; dominio: string | null; enriquecido_em: string | null } | null;
     contato: { nome: string; email: string | null } | null;
   },
@@ -165,6 +181,9 @@ export function montarOportunidade(
     id: linha.id,
     titulo: linha.titulo,
     etapa: linha.etapa,
+    situacao: (linha.situacao ?? 'ativa') as SituacaoCrm,
+    motivoRetirada: linha.motivo_retirada ?? null,
+    retiradaEm: linha.retirada_em ?? null,
     empresaId: linha.empresa_id,
     empresa: linha.empresa?.nome ?? 'Empresa não encontrada',
     dominio: linha.empresa?.dominio ?? null,
