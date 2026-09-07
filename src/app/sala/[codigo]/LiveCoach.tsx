@@ -1,19 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { useRoomContext, useTracks } from '@livekit/components-react';
-import {
-  ConnectionState,
-  RoomEvent,
-  Track,
-  type DisconnectReason,
-  type Participant,
-} from 'livekit-client';
+import { ConnectionState, RoomEvent, Track, type Participant } from 'livekit-client';
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
-import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { useOrientacoesCoach } from './useOrientacoesCoach';
+import { salvarSaida as persistirSaida } from './salvarSaida';
 import {
   CabineLiveCoach,
   type EstadoCoach,
@@ -38,11 +32,13 @@ export function LiveCoach({
   ativo,
   plano = null,
   tipo = 'descoberta',
+  encerramentoRef,
 }: {
   reuniaoId: string;
   ativo: boolean;
   plano?: PlanoCall | null;
   tipo?: TipoCall;
+  encerramentoRef?: RefObject<(() => Promise<void>) | null>;
 }) {
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
@@ -61,7 +57,6 @@ export function LiveCoach({
   const pendentesRef = useRef<SegmentoLive[]>([]);
   const parciaisRef = useRef(new Map<string, string>());
   const envioRef = useRef(false);
-  const finalizadaRef = useRef(false);
   const gravacaoIniciadaRef = useRef(false);
   const falanteAtualRef = useRef<Pick<SegmentoLive, 'falanteNome' | 'falantePapel'> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -378,31 +373,30 @@ export function LiveCoach({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assinaturaTrilhas]);
 
-  const finalizar = useCallback(() => {
-    if (finalizadaRef.current) return;
-    finalizadaRef.current = true;
-    const naoSalvos = [...segmentosRef.current.values()]
-      .sort((a, b) => a.ordinal - b.ordinal)
-      .slice(-24);
-    void fetch(`/api/calls/${reuniaoId}/finalizar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ segmentos: naoSalvos }),
-      keepalive: true,
-    });
-  }, [reuniaoId]);
+  const salvarSaida = useCallback(
+    async (encerrar = false) => {
+      const naoSalvos = [...segmentosRef.current.values()]
+        .sort((a, b) => a.ordinal - b.ordinal)
+        .slice(-24);
+      await persistirSaida(reuniaoId, naoSalvos, encerrar);
+    },
+    [reuniaoId],
+  );
 
   useEffect(() => {
-    const aoDesconectar = (reason?: DisconnectReason) => {
-      if (!desconexaoPermiteRetomar(reason)) finalizar();
+    // Refresh, saída local e queda de conexão apenas salvam os últimos trechos.
+    const aoDesconectar = () => {
+      void salvarSaida().catch(() => undefined);
     };
+    if (encerramentoRef) encerramentoRef.current = () => salvarSaida(true);
     room.on(RoomEvent.Disconnected, aoDesconectar);
-    window.addEventListener('pagehide', finalizar);
+    window.addEventListener('pagehide', aoDesconectar);
     return () => {
       room.off(RoomEvent.Disconnected, aoDesconectar);
-      window.removeEventListener('pagehide', finalizar);
+      window.removeEventListener('pagehide', aoDesconectar);
+      if (encerramentoRef) encerramentoRef.current = null;
     };
-  }, [finalizar, room]);
+  }, [salvarSaida, room, encerramentoRef]);
 
   return (
     <CabineLiveCoach

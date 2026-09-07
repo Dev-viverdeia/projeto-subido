@@ -1,6 +1,6 @@
 import type { Json } from '@/lib/supabase/types.generated';
 
-export type TipoOperacao = 'prospeccao' | 'enriquecimento' | 'pos_call';
+export type TipoOperacao = 'prospeccao' | 'enriquecimento' | 'pos_call' | 'encerramento_sala';
 export type StatusOperacao = 'pendente' | 'processando' | 'concluida' | 'falhou' | 'cancelada';
 
 export type OperacaoJob = {

@@ -1,7 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Check, Copy, ExternalLink, Eye, Mail } from 'lucide-react';
+import { useActionState, useMemo, useState } from 'react';
+import { Check, Copy, ExternalLink, Eye, Link2Off, Mail, RefreshCw } from 'lucide-react';
+import { Button } from '@/design-system/via';
+import { ModalOperacao } from '@/app/(app)/_components/ModalOperacao';
+import {
+  configurarLinkProposta,
+  type EstadoCompartilhamento,
+} from '@/lib/propostas/compartilhamento-actions';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import styles from './EditorProposta.module.css';
 
@@ -19,6 +25,7 @@ function dataCurta(valor: string | null): string | null {
 }
 
 export function CompartilharProposta({
+  propostaId,
   codigo,
   siteUrl,
   empresa,
@@ -27,6 +34,7 @@ export function CompartilharProposta({
   status,
   compartilhamento,
 }: {
+  propostaId: string;
   codigo: string;
   siteUrl: string;
   empresa: string;
@@ -36,17 +44,36 @@ export function CompartilharProposta({
   compartilhamento: Compartilhamento;
 }) {
   const [copiado, setCopiado] = useState(false);
-  const url = useMemo(() => new URL(`/proposta/${codigo}`, siteUrl).toString(), [codigo, siteUrl]);
+  const [operacao, setOperacao] = useState<'desativar' | 'renovar' | null>(null);
+  const [erroCopia, setErroCopia] = useState('');
+  const [estado, enviar, pendente] = useActionState<EstadoCompartilhamento, FormData>(
+    async (anterior, dados) => {
+      const resultado = await configurarLinkProposta(anterior, dados);
+      if (resultado.sucesso) setOperacao(null);
+      return resultado;
+    },
+    {},
+  );
+  const codigoAtual = estado.codigo ?? codigo;
+  const ativo = estado.ativo ?? compartilhamento.ativo;
+  const url = useMemo(
+    () => new URL(`/proposta/${codigoAtual}`, siteUrl).toString(),
+    [codigoAtual, siteUrl],
+  );
   const assunto = `Proposta comercial · ${projeto}`;
   const corpo = `Olá! Preparei a proposta do projeto ${projeto} para ${empresa}.\n\nVocê pode revisar o escopo, investimento e registrar sua decisão por este link seguro:\n${url}`;
   const mailto = `mailto:${email ?? ''}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
   const ultimaVisualizacao = dataCurta(compartilhamento.ultimaVisualizacaoEm);
 
   function copiar() {
-    void navigator.clipboard.writeText(url).then(() => {
-      setCopiado(true);
-      window.setTimeout(() => setCopiado(false), 2200);
-    });
+    setErroCopia('');
+    void navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        setCopiado(true);
+        window.setTimeout(() => setCopiado(false), 2200);
+      })
+      .catch(() => setErroCopia('Não foi possível copiar. Selecione o link e copie manualmente.'));
   }
 
   return (
@@ -57,7 +84,11 @@ export function CompartilharProposta({
           <h3>
             {status === 'apresentada' ? 'Proposta pronta para decisão' : 'Decisão registrada'}
           </h3>
-          <p>O cliente acessa sem login e a visualização entra automaticamente no histórico.</p>
+          <p>
+            {ativo
+              ? 'Acesso sem login. Compartilhe apenas com seu cliente.'
+              : 'Link desativado. O status e a decisão da proposta foram preservados.'}
+          </p>
         </div>
         <span className={styles.metricaVisualizacao}>
           <Eye size={15} aria-hidden="true" />
@@ -66,23 +97,89 @@ export function CompartilharProposta({
         </span>
       </div>
 
-      <div className={styles.linkPublico}>
-        <span>{url}</span>
-        <button type="button" onClick={copiar}>
-          {copiado ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
-          {copiado ? 'Copiado' : 'Copiar link'}
-        </button>
-      </div>
+      {ativo && (
+        <div className={styles.linkPublico}>
+          <span>{url}</span>
+          <button type="button" onClick={copiar}>
+            {copiado ? (
+              <Check size={15} aria-hidden="true" />
+            ) : (
+              <Copy size={15} aria-hidden="true" />
+            )}
+            {copiado ? 'Copiado' : 'Copiar link'}
+          </button>
+        </div>
+      )}
+      {erroCopia && <p role="alert">{erroCopia}</p>}
+      {!operacao && estado.sucesso && <p role="status">{estado.sucesso}</p>}
 
       <div className={styles.acoesCompartilhamento}>
-        <a href={mailto}>
-          <Mail size={15} aria-hidden="true" /> Preparar e-mail
-        </a>
-        <a href={url} target="_blank" rel="noreferrer">
-          <ExternalLink size={15} aria-hidden="true" /> Abrir como cliente
-        </a>
+        {ativo && (
+          <>
+            <a href={mailto}>
+              <Mail size={15} aria-hidden="true" /> Preparar e-mail
+            </a>
+            <a href={url} target="_blank" rel="noreferrer">
+              <ExternalLink size={15} aria-hidden="true" /> Abrir como cliente
+            </a>
+          </>
+        )}
+        <button
+          type="button"
+          onClick={(evento) => {
+            evento.currentTarget.focus();
+            setOperacao('renovar');
+          }}
+        >
+          <RefreshCw size={16} aria-hidden="true" /> {ativo ? 'Trocar link' : 'Criar novo link'}
+        </button>
+        {ativo && (
+          <button
+            type="button"
+            onClick={(evento) => {
+              evento.currentTarget.focus();
+              setOperacao('desativar');
+            }}
+          >
+            <Link2Off size={16} aria-hidden="true" /> Desativar link
+          </button>
+        )}
         {ultimaVisualizacao && <span>Última abertura em {ultimaVisualizacao}</span>}
       </div>
+      <ModalOperacao
+        open={operacao !== null}
+        onClose={() => setOperacao(null)}
+        title={operacao === 'desativar' ? 'Desativar acesso do cliente?' : 'Criar um novo link?'}
+        description={
+          operacao === 'desativar'
+            ? 'O link atual deixará de abrir a proposta. A venda não muda de status.'
+            : 'O link anterior deixará de funcionar. Envie o novo endereço ao cliente.'
+        }
+        size="sm"
+        blocked={pendente}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setOperacao(null)} disabled={pendente}>
+              Cancelar
+            </Button>
+            <Button form={`link-proposta-${propostaId}`} type="submit" disabled={pendente}>
+              {pendente
+                ? 'Salvando…'
+                : operacao === 'desativar'
+                  ? 'Desativar link'
+                  : 'Criar novo link'}
+            </Button>
+          </>
+        }
+      >
+        <form id={`link-proposta-${propostaId}`} action={enviar}>
+          <input type="hidden" name="id" value={propostaId} />
+          <input type="hidden" name="codigoAtual" value={codigoAtual} />
+          <input type="hidden" name="operacao" value={operacao ?? ''} />
+          <p>Quem já recebeu ou baixou a proposta continuará com essa cópia.</p>
+          {estado.erro && <p role="alert">{estado.erro}</p>}
+        </form>
+      </ModalOperacao>
 
       {compartilhamento.decisaoNome && (
         <div className={styles.retornoCliente}>

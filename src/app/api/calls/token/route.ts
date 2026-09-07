@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   const token = new AccessToken(configuracao.LIVEKIT_API_KEY, configuracao.LIVEKIT_API_SECRET, {
     identity: identidade,
     name: corpo.data.nome,
-    ttl: '2h',
+    ttl: '5m',
     metadata: JSON.stringify({
       reuniaoId: contexto.convite.reuniaoId,
       papel: contexto.anfitriao ? 'anfitriao' : 'convidado',
@@ -61,12 +61,14 @@ export async function POST(request: NextRequest) {
   token.addGrant({
     room: contexto.convite.salaProvedor,
     roomJoin: true,
-    roomAdmin: contexto.anfitriao,
     canPublish: true,
     canSubscribe: true,
     canPublishData: true,
   });
 
+  // Assine antes do registro serializado no banco, para o corte de revogação
+  // alcançar inclusive uma resposta de token que estava em trânsito.
+  const jwt = await token.toJwt();
   try {
     await registrarEntradaNaSala({
       dono: contexto.dono,
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json(
     {
       server_url: configuracao.LIVEKIT_URL,
-      participant_token: await token.toJwt(),
+      participant_token: jwt,
     },
     { status: 201, headers: { 'Cache-Control': 'private, no-store' } },
   );

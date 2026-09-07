@@ -673,8 +673,9 @@
 }
 
 .linkPublico button,
-.acoesCompartilhamento a {
-  min-height: 40px;
+.acoesCompartilhamento a,
+.acoesCompartilhamento button {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -700,8 +701,9 @@
   flex-wrap: wrap;
 }
 
-.acoesCompartilhamento a {
-  min-height: 36px;
+.acoesCompartilhamento a,
+.acoesCompartilhamento button {
+  min-height: 44px;
   padding: 0 var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   background: transparent;

@@ -51,6 +51,7 @@ export const obterPortalCliente = cache(
     const documento = lerDocumentoProposta(data.documento);
     if (!documento) return null;
     const briefing = lerBriefingKickoff(data.briefing_kickoff);
+    const encerramento = obterEncerramentoUnico(data.projeto_encerramentos);
 
     const tarefas = [...data.projeto_tarefas]
       .sort((a, b) => a.ordem - b.ordem)
@@ -174,7 +175,12 @@ export const obterPortalCliente = cache(
             proximosPassos: briefing.proximosPassos,
           }
         : null,
-      encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
+      // A fronteira é o DTO público, não a renderização: props de Client Components
+      // são serializadas mesmo quando o trecho correspondente não aparece no DOM.
+      encerramento:
+        encerramento && ['aguardando_aceite', 'encerrado'].includes(encerramento.status)
+          ? encerramento
+          : null,
       evolucao: obterEvolucaoUnica(data.projeto_evolucoes),
     };
   },

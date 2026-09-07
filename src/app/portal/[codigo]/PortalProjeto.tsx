@@ -172,7 +172,11 @@ export function PortalProjeto({
                   codigo={codigo}
                   tarefa={tarefa}
                   aceiteFinal={tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
-                  encerramento={projeto.encerramento}
+                  encerramento={
+                    tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total
+                      ? projeto.encerramento
+                      : null
+                  }
                   arquivos={projeto.arquivos.filter((arquivo) => arquivo.tarefaId === tarefa.id)}
                 />
               ))}

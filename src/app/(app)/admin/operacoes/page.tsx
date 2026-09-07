@@ -20,7 +20,7 @@ export const metadata: Metadata = { title: 'Operações do sistema' };
 export const dynamic = 'force-dynamic';
 
 const STATUS_VALIDOS = ['pendente', 'processando', 'concluida', 'falhou', 'cancelada'] as const;
-const TIPOS_VALIDOS = ['prospeccao', 'enriquecimento', 'pos_call'] as const;
+const TIPOS_VALIDOS = ['prospeccao', 'enriquecimento', 'pos_call', 'encerramento_sala'] as const;
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -47,9 +47,12 @@ function parametro<T extends readonly string[]>(valor: string | string[] | undef
 }
 
 function textoTipo(tipo: string) {
-  return { prospeccao: 'Prospecção', enriquecimento: 'Enriquecimento', pos_call: 'Pós-reunião' }[
-    tipo
-  ];
+  return {
+    prospeccao: 'Prospecção',
+    enriquecimento: 'Enriquecimento',
+    pos_call: 'Pós-reunião',
+    encerramento_sala: 'Encerramento da sala',
+  }[tipo];
 }
 
 function textoStatus(status: string) {
@@ -70,7 +73,7 @@ function valorPayload(payload: Json, chave: string) {
 
 function destino(tipo: string, referenciaId: string, payload: Json) {
   if (tipo === 'prospeccao') return `/prospeccao?lista=${referenciaId}`;
-  if (tipo === 'pos_call') return `/reunioes/${referenciaId}`;
+  if (tipo === 'pos_call' || tipo === 'encerramento_sala') return `/reunioes/${referenciaId}`;
   const oportunidade = valorPayload(payload, 'oportunidadeId');
   return oportunidade ? `/vendas/${oportunidade}` : null;
 }
@@ -208,6 +211,7 @@ export default async function OperacoesPage({
                   <option value="prospeccao">Prospecção</option>
                   <option value="enriquecimento">Enriquecimento</option>
                   <option value="pos_call">Pós-reunião</option>
+                  <option value="encerramento_sala">Encerramento da sala</option>
                 </select>
               </label>
               <label>

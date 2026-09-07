@@ -11,9 +11,13 @@ const mocks = vi.hoisted(() => ({
   falharListaProspeccao: vi.fn(),
   encerrarGravacao: vi.fn(),
   processarPosCall: vi.fn(),
+  encerrarSalaNoProvedor: vi.fn(),
+  reuniaoAguardaEncerramento: vi.fn(),
+  enfileirarOperacao: vi.fn(),
 }));
 
 vi.mock('./admin', () => ({
+  enfileirarOperacao: mocks.enfileirarOperacao,
   reivindicarOperacoes: mocks.reivindicarOperacoes,
   concluirOperacao: mocks.concluirOperacao,
   registrarFalhaOperacao: mocks.registrarFalhaOperacao,
@@ -27,6 +31,10 @@ vi.mock('@/lib/prospeccao/admin', () => ({
 }));
 vi.mock('@/lib/calls/gravacao', () => ({ encerrarGravacao: mocks.encerrarGravacao }));
 vi.mock('@/lib/calls/processamento', () => ({ processarPosCall: mocks.processarPosCall }));
+vi.mock('@/lib/calls/encerramento-sala', () => ({
+  encerrarSalaNoProvedor: mocks.encerrarSalaNoProvedor,
+  reuniaoAguardaEncerramento: mocks.reuniaoAguardaEncerramento,
+}));
 
 import { processarLoteOperacoes, processarOperacaoPorId } from './processar';
 import type { OperacaoJob } from './tipos';
@@ -70,11 +78,42 @@ function operacao(parcial: Partial<OperacaoJob> = {}): OperacaoJob {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.reuniaoAguardaEncerramento.mockResolvedValue(true);
   mocks.recuperarEnriquecimentosAbandonados.mockResolvedValue(0);
   mocks.concluirOperacao.mockResolvedValue(operacao({ status: 'concluida' }));
 });
 
 describe('fila durável de operações', () => {
+  it('webhook não para gravação nem analisa uma reunião ainda aberta', async () => {
+    mocks.reivindicarOperacoes.mockResolvedValue([
+      operacao({ tipo: 'pos_call', payload: { reuniaoId: LISTA } }),
+    ]);
+    mocks.reuniaoAguardaEncerramento.mockResolvedValue(false);
+    await processarOperacaoPorId(JOB);
+    expect(mocks.encerrarGravacao).not.toHaveBeenCalled();
+    expect(mocks.processarPosCall).not.toHaveBeenCalled();
+  });
+  it('fechamento tem intenção própria e agenda análise com chave independente', async () => {
+    mocks.reivindicarOperacoes.mockResolvedValue([
+      operacao({ tipo: 'encerramento_sala', payload: { reuniaoId: LISTA } }),
+    ]);
+    mocks.encerrarSalaNoProvedor.mockResolvedValue({ status: 'encerrada' });
+    await processarOperacaoPorId(JOB);
+    expect(mocks.encerrarSalaNoProvedor).toHaveBeenCalledWith(DONO, LISTA);
+    expect(mocks.enfileirarOperacao).toHaveBeenCalledWith(
+      expect.objectContaining({ chaveIdempotencia: `pos_call:encerrada:${LISTA}` }),
+    );
+  });
+  it('provedor indisponível mantém fechamento para retry, sem iniciar análise', async () => {
+    mocks.reivindicarOperacoes.mockResolvedValue([
+      operacao({ tipo: 'encerramento_sala', payload: { reuniaoId: LISTA } }),
+    ]);
+    mocks.encerrarSalaNoProvedor.mockRejectedValue(new Error('unavailable'));
+    mocks.registrarFalhaOperacao.mockResolvedValue(operacao({ status: 'pendente' }));
+    await processarOperacaoPorId(JOB);
+    expect(mocks.registrarFalhaOperacao).toHaveBeenCalledOnce();
+    expect(mocks.enfileirarOperacao).not.toHaveBeenCalled();
+  });
   it('conclui uma prospecção e guarda o tamanho entregue', async () => {
     mocks.reivindicarOperacoes.mockResolvedValue([operacao()]);
     mocks.processarListaProspeccao.mockResolvedValue({ empresas: 5 });

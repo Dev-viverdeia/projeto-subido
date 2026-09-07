@@ -1,10 +1,10 @@
 import { after, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { marcarReuniaoProcessando, persistirSegmentos } from '@/lib/calls/admin';
+import { persistirSegmentos } from '@/lib/calls/admin';
+import { solicitarEncerramentoSala } from '@/lib/calls/encerramento-sala';
 import { SegmentoLiveSchema } from '@/lib/calls/coach-schema';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
 import { requisicaoDaMesmaOrigem, semCache } from '@/lib/calls/http';
-import { enfileirarOperacao } from '@/lib/operacoes/admin';
 import { processarOperacaoPorId } from '@/lib/operacoes/processar';
 import { createClient } from '@/lib/supabase/server';
 
@@ -13,7 +13,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const IdSchema = z.uuid();
-const CorpoSchema = z.object({ segmentos: z.array(SegmentoLiveSchema).max(24).default([]) });
+const CorpoSchema = z.object({
+  segmentos: z.array(SegmentoLiveSchema).max(24).default([]),
+  encerrar: z.boolean().default(false),
+});
 
 function erro(mensagem: string, status: number) {
   return NextResponse.json({ erro: mensagem }, { status, headers: semCache() });
@@ -40,25 +43,19 @@ export async function POST(request: Request, rota: { params: Promise<{ id: strin
       dono: contexto.dono,
       reuniaoId: contexto.reuniaoId,
       segmentos: corpo.data.segmentos,
-      concluir: true,
+      concluir: corpo.data.encerrar,
     });
-    await marcarReuniaoProcessando({ dono: contexto.dono, reuniaoId: contexto.reuniaoId });
-
-    const operacao = await enfileirarOperacao({
-      dono: contexto.dono,
-      tipo: 'pos_call',
-      chaveIdempotencia: `pos_call:${contexto.reuniaoId}`,
-      referenciaTipo: 'call_reuniao',
-      referenciaId: contexto.reuniaoId,
-      payload: { reuniaoId: contexto.reuniaoId },
-      prioridade: 20,
-      maxTentativas: 6,
-    });
+    if (!corpo.data.encerrar)
+      return NextResponse.json({ estado: 'salvo' }, { headers: semCache() });
+    const operacao = await solicitarEncerramentoSala(contexto.dono, contexto.reuniaoId);
 
     after(() => processarOperacaoPorId(operacao.id));
 
     return NextResponse.json(
-      { estado: 'processando', mensagem: 'A conversa já foi salva no histórico.' },
+      {
+        estado: 'encerramento_solicitado',
+        mensagem: 'Encerramento solicitado. Novas entradas estão bloqueadas.',
+      },
       { status: 202, headers: semCache() },
     );
   } catch (causa) {

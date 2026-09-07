@@ -1,0 +1,76 @@
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: var(--via-space-6);
+  background: var(--via-bg-2);
+}
+
+.marca {
+  width: min(100%, 1120px);
+  margin-inline: auto;
+}
+
+.cartao {
+  align-self: center;
+  justify-self: center;
+  width: min(100%, 560px);
+  margin-block: var(--via-space-8);
+  padding: var(--via-space-8);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(20px);
+}
+
+.icone {
+  display: inline-flex;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  color: var(--via-navy);
+  background: var(--via-bg-2);
+}
+
+.cartao h1 {
+  margin: var(--via-space-5) 0 var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h2);
+  font-weight: 550;
+  letter-spacing: var(--app-ls-h2);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.cartao p,
+.orientacao {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-body);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.cartao p {
+  margin: 0;
+}
+
+.orientacao {
+  margin-top: var(--via-space-6);
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-soft);
+  color: var(--via-text-primary);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-bg);
+  }
+}
+
+@media (max-width: 599px) {
+  .pagina,
+  .cartao {
+    padding: var(--via-space-5);
+  }
+}

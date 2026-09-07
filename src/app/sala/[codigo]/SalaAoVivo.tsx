@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { LiveKitRoom } from '@livekit/components-react';
 import { MediaDeviceFailure, type DisconnectReason } from 'livekit-client';
 import { MicOff, X } from 'lucide-react';
@@ -8,6 +8,7 @@ import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
 import { LiveCoach } from './LiveCoach';
 import { PalcoReuniao } from './PalcoReuniao';
+import { salvarSaida } from './salvarSaida';
 import type { EscolhasMidia } from './usePreparacaoMidia';
 import styles from './sala.module.css';
 
@@ -29,6 +30,12 @@ export function SalaAoVivo({
   aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
 }) {
   const [aviso, setAviso] = useState('');
+  const encerramentoRef = useRef<(() => Promise<void>) | null>(null);
+  async function encerrar() {
+    if (encerramentoRef.current) return encerramentoRef.current();
+    // O controle de encerramento não depende da disponibilidade do Live Coach.
+    await salvarSaida(convite.reuniaoId, [], true);
+  }
 
   function avisarMidia(falha?: MediaDeviceFailure, tipo?: MediaDeviceKind) {
     const dispositivo =
@@ -75,12 +82,14 @@ export function SalaAoVivo({
             <div className={styles.palcoVideo}>
               <PalcoReuniao
                 anfitriao
+                aoEncerrar={encerrar}
                 escolhas={escolhas}
                 aoMudarEscolhas={aoMudarEscolhas}
                 aoFalhar={(erro, tipo) => avisarMidia(MediaDeviceFailure.getFailure(erro), tipo)}
               />
             </div>
             <LiveCoach
+              encerramentoRef={encerramentoRef}
               reuniaoId={convite.reuniaoId}
               ativo={convite.liveCoachAtivo}
               plano={plano}

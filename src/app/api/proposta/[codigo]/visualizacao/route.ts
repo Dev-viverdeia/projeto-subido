@@ -34,7 +34,8 @@ export async function POST(
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 30 * 60,
-      path: `/proposta/${codigo}`,
+      // O marcador precisa voltar ao endpoint que recebe a próxima abertura.
+      path: `/api/proposta/${codigo}/visualizacao`,
     });
     return resposta;
   } catch (erro) {
