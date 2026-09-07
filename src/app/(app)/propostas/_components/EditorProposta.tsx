@@ -261,13 +261,20 @@ export function EditorProposta({
             <div className={styles.controlesDecisao}>
               {compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status) && (
                 <CompartilharProposta
+                  key={`${compartilhamentoCodigo}:${status}`}
+                  propostaId={id}
                   codigo={compartilhamentoCodigo}
                   siteUrl={siteUrl}
                   empresa={documento.cliente.empresa}
                   email={documento.cliente.email}
                   projeto={documento.projeto.titulo}
                   status={status}
-                  compartilhamento={compartilhamentoInicial}
+                  compartilhamento={{
+                    ...compartilhamentoInicial,
+                    ativo: estadoStatus.compartilhamentoCodigo
+                      ? true
+                      : compartilhamentoInicial.ativo,
+                  }}
                 />
               )}
               <form action={acaoStatus} className={styles.acoesStatus}>

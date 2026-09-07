@@ -56,7 +56,7 @@ export async function enfileirarOperacao(entrada: NovaOperacao): Promise<Operaca
 
 export async function reivindicarOperacoes({
   limite = 4,
-  tipos = ['prospeccao', 'pos_call'],
+  tipos = ['encerramento_sala', 'prospeccao', 'pos_call'],
   jobId,
 }: {
   limite?: number;

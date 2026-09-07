@@ -129,15 +129,20 @@ export async function iniciarReuniao({
   iniciadaEm: string | null;
 }) {
   const admin = createAdminClient();
-  const { error } = await admin
+  const { data, error } = await admin
     .from('calls_reunioes')
     .update({
       status: 'ao_vivo',
       ...(iniciadaEm ? {} : { iniciada_em: new Date().toISOString() }),
     })
     .eq('id', reuniaoId)
-    .eq('dono', dono);
+    .eq('dono', dono)
+    .in('status', ['agendada', 'aguardando', 'ao_vivo'])
+    .is('encerramento_solicitado_em', null)
+    .select('id')
+    .maybeSingle();
   if (error) throw handleError(error, 'calls:iniciar');
+  if (!data) throw new Error('reuniao_encerrada');
 }
 
 const SegmentosSalvosSchema = z.array(SegmentoLiveSchema);

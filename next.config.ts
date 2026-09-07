@@ -10,6 +10,21 @@ const nextConfig: NextConfig = {
      cai silenciosamente para outra tipografia em produção. */
   outputFileTracingIncludes: {
     '/api/propostas/[id]/pdf': ['./src/assets/fonts/pdf/*.ttf'],
+    '/api/proposta/[codigo]/pdf': ['./src/assets/fonts/pdf/*.ttf'],
+  },
+  async headers() {
+    // Links com segredo não devem ir para buscadores nem acompanhar navegações
+    // no Referer. Cobre também arquivos e respostas de erro destas rotas.
+    return ['/proposta/:path*', '/portal/:path*', '/sala/:path*', '/api/proposta/:path*'].map(
+      (source) => ({
+        source,
+        headers: [
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+        ],
+      }),
+    );
   },
   images: {
     /* AVIF ANTES DE WEBP, e a ordem É a preferência de negociação: o Next serve o

@@ -671,6 +671,7 @@ export type Database = {
       }
       calls_reunioes: {
         Row: {
+          encerramento_solicitado_em: string | null
           agendada_para: string
           atualizada_em: string
           codigo_publico: string
@@ -700,6 +701,7 @@ export type Database = {
           agendada_para: string
           atualizada_em?: string
           codigo_publico?: string
+          encerramento_solicitado_em?: string | null
           contato_id?: string | null
           convidado_email?: string | null
           criada_em?: string
@@ -726,6 +728,7 @@ export type Database = {
           agendada_para?: string
           atualizada_em?: string
           codigo_publico?: string
+          encerramento_solicitado_em?: string | null
           contato_id?: string | null
           convidado_email?: string | null
           criada_em?: string
@@ -4226,7 +4229,7 @@ export type Database = {
         | "concluida"
         | "falhou"
         | "cancelada"
-      operacao_tipo: "prospeccao" | "enriquecimento" | "pos_call"
+      operacao_tipo: "prospeccao" | "enriquecimento" | "pos_call" | "encerramento_sala"
       papel_usuario: "membro" | "mentor" | "admin"
       projeto_acao_status: "pendente" | "concluida" | "cancelada"
       projeto_cliente_status:
@@ -4451,7 +4454,7 @@ export const Constants = {
         "falhou",
         "cancelada",
       ],
-      operacao_tipo: ["prospeccao", "enriquecimento", "pos_call"],
+      operacao_tipo: ["prospeccao", "enriquecimento", "pos_call", "encerramento_sala"],
       papel_usuario: ["membro", "mentor", "admin"],
       projeto_acao_status: ["pendente", "concluida", "cancelada"],
       projeto_cliente_status: [

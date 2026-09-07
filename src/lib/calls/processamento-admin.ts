@@ -32,3 +32,14 @@ export async function reivindicarAnalise({ dono, reuniaoId }: { dono: string; re
   if (error) throw handleError(error, 'calls:analise:reivindicar');
   return data;
 }
+
+export async function obterEstadoAnalise(dono: string, reuniaoId: string) {
+  const { data, error } = await createAdminClient()
+    .from('calls_analises')
+    .select('status')
+    .eq('dono', dono)
+    .eq('reuniao_id', reuniaoId)
+    .maybeSingle();
+  if (error) throw handleError(error, 'calls:analise:estado');
+  return data?.status ?? null;
+}

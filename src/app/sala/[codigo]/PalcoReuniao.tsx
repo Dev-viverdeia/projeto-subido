@@ -28,6 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import type { EscolhasMidia } from './usePreparacaoMidia';
+import { EncerrarReuniao } from './EncerrarReuniao';
 import styles from './PalcoReuniao.module.css';
 
 type Props = {
@@ -35,6 +36,7 @@ type Props = {
   escolhas: EscolhasMidia;
   aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
   aoFalhar: (erro: Error, tipo?: MediaDeviceKind) => void;
+  aoEncerrar?: () => Promise<void>;
 };
 
 function DispositivosSala({ escolhas, aoMudarEscolhas, aoFalhar }: Omit<Props, 'anfitriao'>) {
@@ -123,7 +125,13 @@ function DispositivosSala({ escolhas, aoMudarEscolhas, aoFalhar }: Omit<Props, '
   );
 }
 
-export function PalcoReuniao({ anfitriao, escolhas, aoMudarEscolhas, aoFalhar }: Props) {
+export function PalcoReuniao({
+  anfitriao,
+  escolhas,
+  aoMudarEscolhas,
+  aoFalhar,
+  aoEncerrar,
+}: Props) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -362,13 +370,14 @@ export function PalcoReuniao({ anfitriao, escolhas, aoMudarEscolhas, aoFalhar }:
             )}
           </button>
         )}
-        <DisconnectButton
-          className={styles.sair}
-          aria-label={anfitriao ? 'Encerrar reunião' : 'Sair da reunião'}
-        >
-          <PhoneOff size={20} aria-hidden="true" />
-          <span>{anfitriao ? 'Encerrar' : 'Sair'}</span>
-        </DisconnectButton>
+        {anfitriao ? (
+          <EncerrarReuniao aoEncerrar={aoEncerrar} />
+        ) : (
+          <DisconnectButton className={styles.sair} aria-label="Sair da reunião">
+            <PhoneOff size={20} aria-hidden="true" />
+            <span>Sair</span>
+          </DisconnectButton>
+        )}
       </div>
       <StartMediaButton label="Ativar som e vídeo da reunião" className={styles.reproduzir} />
       <RoomAudioRenderer />

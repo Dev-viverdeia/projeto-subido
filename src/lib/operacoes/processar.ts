@@ -3,11 +3,13 @@ import 'server-only';
 import { z } from 'zod';
 import { encerrarGravacao } from '@/lib/calls/gravacao';
 import { processarPosCall } from '@/lib/calls/processamento';
+import { encerrarSalaNoProvedor, reuniaoAguardaEncerramento } from '@/lib/calls/encerramento-sala';
 import { falharListaProspeccao } from '@/lib/prospeccao/admin';
 import { processarListaProspeccao } from '@/lib/prospeccao/processar';
 import { BuscaProspeccaoSchema } from '@/lib/prospeccao/schema';
 import {
   concluirOperacao,
+  enfileirarOperacao,
   recuperarEnriquecimentosAbandonados,
   registrarFalhaOperacao,
   reivindicarOperacoes,
@@ -30,6 +32,7 @@ async function executar(job: OperacaoJob): Promise<Record<string, string | numbe
 
   if (job.tipo === 'pos_call') {
     const { reuniaoId } = PayloadPosCallSchema.parse(job.payload);
+    if (!(await reuniaoAguardaEncerramento(reuniaoId))) return { status: 'reuniao_aberta' };
     await encerrarGravacao(reuniaoId);
     const status = await processarPosCall(reuniaoId);
 
@@ -46,6 +49,26 @@ async function executar(job: OperacaoJob): Promise<Record<string, string | numbe
       throw erro;
     }
     return { status };
+  }
+
+  if (job.tipo === 'encerramento_sala') {
+    const { reuniaoId } = PayloadPosCallSchema.parse(job.payload);
+    const resultado = await encerrarSalaNoProvedor(job.dono, reuniaoId);
+    if (resultado.status === 'encerrada') {
+      // Chave diferente da notificação de gravação: um webhook anterior não
+      // pode consumir a intenção de analisar a conversa ao encerrá-la de fato.
+      await enfileirarOperacao({
+        dono: job.dono,
+        tipo: 'pos_call',
+        chaveIdempotencia: `pos_call:encerrada:${reuniaoId}`,
+        referenciaTipo: 'call_reuniao',
+        referenciaId: reuniaoId,
+        payload: { reuniaoId },
+        prioridade: 20,
+        maxTentativas: 6,
+      });
+    }
+    return resultado;
   }
 
   throw new Error(`Tipo de operação não processável pelo worker: ${job.tipo}`);

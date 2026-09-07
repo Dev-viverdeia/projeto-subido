@@ -10,14 +10,24 @@ import {
 } from '@/lib/calls/admin';
 import { obterContextoCoach } from '@/lib/calls/contexto-coach';
 import { gerarAnaliseCall } from '@/lib/calls/modelo-coach';
-import { obterSegmentosPersistidos, reivindicarAnalise } from '@/lib/calls/processamento-admin';
+import { reuniaoAguardaEncerramento } from '@/lib/calls/encerramento-sala';
+import {
+  obterEstadoAnalise,
+  obterSegmentosPersistidos,
+  reivindicarAnalise,
+} from '@/lib/calls/processamento-admin';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 // Este worker só roda depois de autenticação ou webhook assinado.
 // eslint-disable-next-line no-restricted-imports
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export type ResultadoProcessamentoCall =
-  'concluida' | 'concluida_sem_analise' | 'ja_processando' | 'nao_encontrada' | 'falhou';
+  | 'concluida'
+  | 'concluida_sem_analise'
+  | 'ja_processando'
+  | 'nao_encontrada'
+  | 'falhou'
+  | 'reuniao_aberta';
 
 function revalidarCall(reuniaoId: string) {
   revalidatePath('/calls');
@@ -30,6 +40,9 @@ function revalidarCall(reuniaoId: string) {
  * webhook sem duplicar custo de IA nem fatos no CRM.
  */
 export async function processarPosCall(reuniaoId: string): Promise<ResultadoProcessamentoCall> {
+  // Um egress pode terminar durante refresh ou falha de mídia. Isso não é
+  // consentimento para encerrar a reunião dos participantes que continuam nela.
+  if (!(await reuniaoAguardaEncerramento(reuniaoId))) return 'reuniao_aberta';
   const contexto = await obterContextoCoach(createAdminClient(), reuniaoId);
   if (!contexto) return 'nao_encontrada';
 
@@ -37,7 +50,12 @@ export async function processarPosCall(reuniaoId: string): Promise<ResultadoProc
     dono: contexto.dono,
     reuniaoId: contexto.reuniaoId,
   });
-  if (!reservada) return 'ja_processando';
+  if (!reservada) {
+    const estado = await obterEstadoAnalise(contexto.dono, contexto.reuniaoId);
+    if (estado === 'concluida') return 'concluida';
+    if (estado === 'sem_conteudo') return 'concluida_sem_analise';
+    return 'ja_processando';
+  }
 
   try {
     await marcarReuniaoProcessando({

@@ -20,6 +20,7 @@ import type { PlanoCall } from '@/lib/calls/plano';
 import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { SalaAoVivo } from './SalaAoVivo';
+import { obterCredenciaisSala, salvarSaida } from './salvarSaida';
 import { RoteiroSala } from './RoteiroSala';
 import { EstadoFinalSala } from './EstadoFinalSala';
 import { PreparacaoMidia } from './PreparacaoMidia';
@@ -90,22 +91,7 @@ export function SalaCall({
     return () => window.clearTimeout(navegacao);
   }, [convite.reuniaoId, router, saida]);
 
-  async function obterCredenciais() {
-    const response = await fetch('/api/calls/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigo, nome: nome.trim(), consentiu }),
-    });
-    const resultado = (await response.json()) as {
-      erro?: string;
-      server_url?: string;
-      participant_token?: string;
-    };
-    if (!response.ok || !resultado.server_url || !resultado.participant_token) {
-      throw new Error(resultado.erro || 'Não foi possível abrir a sala.');
-    }
-    return { serverUrl: resultado.server_url, token: resultado.participant_token };
-  }
+  const obterCredenciais = () => obterCredenciaisSala(codigo, nome, consentiu);
 
   useEffect(() => {
     if (recuperacao?.estado !== 'tentando') return;
@@ -150,12 +136,17 @@ export function SalaCall({
 
   async function encerrarDepoisDaFalha() {
     if (anfitriao) {
-      await fetch(`/api/calls/${convite.reuniaoId}/finalizar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ segmentos: [] }),
-        keepalive: true,
-      }).catch(() => null);
+      setCarregando(true);
+      setErro('');
+      const confirmou = await salvarSaida(convite.reuniaoId, [], true).then(
+        () => true,
+        () => false,
+      );
+      setCarregando(false);
+      if (!confirmou) {
+        setErro('Não foi possível encerrar. Tente novamente.');
+        return;
+      }
     }
     setRecuperacao(null);
     setSaida(anfitriao ? 'processando' : 'encerrada');
@@ -216,12 +207,14 @@ export function SalaCall({
               <button
                 type="button"
                 className={styles.botaoEncerrar}
+                disabled={carregando}
                 onClick={() => void encerrarDepoisDaFalha()}
               >
-                {anfitriao ? 'Encerrar e salvar' : 'Sair da reunião'}
+                {carregando ? 'Encerrando…' : anfitriao ? 'Encerrar e salvar' : 'Sair da reunião'}
               </button>
             </div>
           )}
+          {erro && <p role="alert">{erro}</p>}
         </section>
       </main>
     );
