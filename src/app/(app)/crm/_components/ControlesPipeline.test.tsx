@@ -48,7 +48,7 @@ describe('ControlesPipeline', () => {
     expect(aoBuscar).toHaveBeenCalledWith('');
   });
 
-  it('mantém o método de três etapas navegável no celular', async () => {
+  it('mantém quatro etapas navegáveis no celular', async () => {
     const user = userEvent.setup();
     const aoSelecionar = vi.fn();
 
@@ -56,7 +56,7 @@ describe('ControlesPipeline', () => {
       <AbasPipelineMobile
         fases={FASES_CRM.filter((fase) => fase.id !== 'desfecho')}
         faseAtiva="entrada"
-        contagem={(fase) => ({ entrada: 4, conversa: 2, proposta: 1, desfecho: 0 })[fase]}
+        contagem={(fase) => ({ entrada: 4, conversa: 2, proposta: 1, ganho: 3, desfecho: 0 })[fase]}
         aoSelecionar={aoSelecionar}
       />,
     );

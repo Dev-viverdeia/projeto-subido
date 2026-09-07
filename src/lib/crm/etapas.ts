@@ -16,7 +16,7 @@ export const ETAPAS_CRM: ReadonlyArray<{
   { id: 'perdido', rotulo: 'Perdidos', descricao: 'Oportunidade encerrada' },
 ];
 
-export type IdFaseCrm = 'entrada' | 'conversa' | 'proposta' | 'desfecho';
+export type IdFaseCrm = 'entrada' | 'conversa' | 'proposta' | 'ganho' | 'desfecho';
 
 export const FASES_CRM: ReadonlyArray<{
   id: IdFaseCrm;
@@ -43,10 +43,16 @@ export const FASES_CRM: ReadonlyArray<{
     etapas: ['proposta', 'negociacao'],
   },
   {
+    id: 'ganho',
+    rotulo: 'Ganho',
+    descricao: 'Venda fechada · próxima parada: entrega',
+    etapas: ['ganho'],
+  },
+  {
     id: 'desfecho',
     rotulo: 'Desfecho',
     descricao: 'Decisão registrada',
-    etapas: ['ganho', 'perdido'],
+    etapas: ['perdido'],
   },
 ];
 

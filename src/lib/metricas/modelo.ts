@@ -15,6 +15,7 @@ export type LeadMetrica = {
 };
 
 export type OportunidadeMetrica = {
+  situacao?: string;
   criadoEm: string;
   etapa: string;
   valorCentavos: number | null;
@@ -255,7 +256,10 @@ export function montarMetricasComerciais(
   const funil = contarNaJanela(fonte, janelas.atual);
   const periodoAnterior = janelas.anterior ? contarNaJanela(fonte, janelas.anterior) : null;
   const oportunidadesAbertas = fonte.oportunidades.filter(
-    (item) => item.etapa !== 'ganho' && item.etapa !== 'perdido',
+    (item) =>
+      (!item.situacao || item.situacao === 'ativa') &&
+      item.etapa !== 'ganho' &&
+      item.etapa !== 'perdido',
   );
   const ganhosDoPeriodo = fonte.oportunidades.filter((item) =>
     estaNaJanela(item.ganhaEm, janelas.atual),

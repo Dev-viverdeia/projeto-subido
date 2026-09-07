@@ -30,6 +30,7 @@ export async function obterSinaisSobral(
     : supabase
         .from('crm_oportunidades')
         .select('id, empresa_id, titulo, etapa, proxima_acao, proxima_acao_em, atualizado_em')
+        .eq('situacao', 'ativa')
         .order('atualizado_em', { ascending: false })
         .limit(500);
   const callsConsulta = fatosCompartilhados

@@ -95,8 +95,26 @@ export function AbasPipelineMobile({
           role="tab"
           key={fase.id}
           aria-selected={faseAtiva === fase.id}
+          tabIndex={faseAtiva === fase.id ? 0 : -1}
           aria-label={`${fase.rotulo}: ${contagem(fase.id)}`}
           onClick={() => aoSelecionar(fase.id as FaseAtiva)}
+          onKeyDown={(evento) => {
+            const indice = fases.findIndex((item) => item.id === fase.id);
+            const destino =
+              evento.key === 'ArrowRight'
+                ? (indice + 1) % fases.length
+                : evento.key === 'ArrowLeft'
+                  ? (indice - 1 + fases.length) % fases.length
+                  : evento.key === 'Home'
+                    ? 0
+                    : evento.key === 'End'
+                      ? fases.length - 1
+                      : -1;
+            if (destino < 0) return;
+            evento.preventDefault();
+            aoSelecionar(fases[destino]!.id as FaseAtiva);
+            (evento.currentTarget.parentElement?.children[destino] as HTMLElement)?.focus();
+          }}
         >
           <span>{fase.rotulo}</span>
           <strong>{contagem(fase.id)}</strong>

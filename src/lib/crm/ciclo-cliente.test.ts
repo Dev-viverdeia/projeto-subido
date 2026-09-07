@@ -64,6 +64,16 @@ function descobertaConcluida(lead: DossieLead) {
 }
 
 describe('ciclo factual do cliente', () => {
+  it('não recomenda contato para uma oportunidade arquivada', () => {
+    const lead = leadBase();
+    lead.oportunidade.situacao = 'arquivada';
+    lead.oportunidade.motivoRetirada = 'Retomar mais adiante';
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      tipo: 'encerrado',
+      rotulo: 'Arquivada',
+      acao: null,
+    });
+  });
   it('começa pelo enriquecimento e mostra o ciclo completo', () => {
     const ciclo = montarCicloCliente(leadBase());
 
@@ -89,7 +99,7 @@ describe('ciclo factual do cliente', () => {
     });
   });
 
-  it('não deixa um rascunho pular a reunião de descoberta', () => {
+  it('permite trabalhar uma proposta originada fora da plataforma', () => {
     const lead = leadBase();
     lead.propostaRecente = {
       id: '55555555-5555-4555-8555-555555555555',
@@ -100,12 +110,12 @@ describe('ciclo factual do cliente', () => {
 
     const ciclo = montarCicloCliente(lead);
 
-    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Reunião pendente' });
-    expect(ciclo.etapas[2]).toMatchObject({ estado: 'futura', evidencia: 'Rascunho' });
+    expect(ciclo.etapas[1]).toMatchObject({ evidencia: 'Sem reunião registrada' });
+    expect(ciclo.etapas[2]).toMatchObject({ estado: 'atual', evidencia: 'Rascunho' });
     expect(ciclo.decisao).toMatchObject({
-      rotulo: 'Descoberta pendente',
-      acao: 'Agendar descoberta',
-      apoioRotulo: 'Abrir rascunho',
+      rotulo: 'Proposta em andamento',
+      acao: 'Continuar proposta',
+      apoioRotulo: null,
     });
   });
 
@@ -258,7 +268,7 @@ describe('ciclo factual do cliente', () => {
       estado: 'concluida',
       evidencia: 'Dados enriquecidos',
     });
-    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Reunião pendente' });
+    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Contexto a confirmar' });
     expect(ciclo.decisao).toMatchObject({
       rotulo: 'Expansão confirmada',
       titulo: 'Validar a expansão para os canais de Instagram e site.',

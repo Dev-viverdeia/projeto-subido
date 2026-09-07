@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { estaNoFluxo } from '@/lib/crm/situacao';
 import { obterSolucaoDoBuilder } from '@/lib/builder/queries';
-import { oportunidadeTemDescobertaConcluida } from '@/lib/calls/descoberta';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { obterSolucao } from '@/lib/conteudo/queries';
 import { obterDossieLead } from '@/lib/crm/queries';
@@ -97,11 +97,6 @@ export async function criarProposta(formData: FormData): Promise<void> {
   const validacao = NovaPropostaSchema.safeParse(campos);
   if (!validacao.success) redirect(retornoNovaProposta(campos, 'campos'));
 
-  const descobertaConcluida = await oportunidadeTemDescobertaConcluida(validacao.data.oportunidade);
-  if (!descobertaConcluida) {
-    redirect(retornoNovaProposta(validacao.data, 'descoberta'));
-  }
-
   const [{ supabase, user }, lead, origem, posCall, perfilComercial] = await Promise.all([
     usuarioAtual(),
     obterDossieLead(validacao.data.oportunidade),
@@ -110,7 +105,8 @@ export async function criarProposta(formData: FormData): Promise<void> {
     obterPerfilComercial(),
   ]);
   if (!user) redirect('/entrar');
-  if (!lead || !origem) redirect(retornoNovaProposta(validacao.data, 'indisponivel'));
+  if (!lead || !origem || !estaNoFluxo(lead.oportunidade) || lead.oportunidade.etapa === 'perdido')
+    redirect(retornoNovaProposta(validacao.data, 'indisponivel'));
   if (validacao.data.reuniao && !posCall) {
     redirect(retornoNovaProposta({ ...validacao.data, reuniao: undefined }, 'reuniao'));
   }

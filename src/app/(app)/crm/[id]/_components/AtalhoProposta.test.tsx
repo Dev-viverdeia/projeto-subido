@@ -15,11 +15,13 @@ function lead(parcial: Partial<DossieLead> = {}): DossieLead {
 }
 
 describe('AtalhoProposta', () => {
-  it('mantém a proposta visível, mas não permite pular a descoberta', () => {
+  it('permite criar proposta sem reunião registrada', () => {
     render(<AtalhoProposta lead={lead({ temDescobertaConcluida: false })} />);
 
-    expect(screen.getByText('Proposta após descoberta')).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByRole('link', { name: /Criar proposta/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Criar proposta' })).toHaveAttribute(
+      'href',
+      '/propostas/nova?oportunidade=oportunidade-1',
+    );
   });
 
   it('libera a proposta quando a descoberta foi concluída', () => {

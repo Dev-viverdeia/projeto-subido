@@ -12,9 +12,10 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(page.getByRole('link', { name: 'Abrir próxima reunião' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Atualizar dados' })).toBeVisible();
-    await expect(page.getByText('Preparar', { exact: true })).toBeVisible();
-    await expect(page.getByText('Descobrir', { exact: true }).last()).toBeVisible();
-    await expect(page.getByText('Propor', { exact: true })).toBeVisible();
+    const jornada = page.getByRole('list', { name: 'Jornada deste cliente' });
+    await expect(jornada.getByText('Preparar', { exact: true })).toBeVisible();
+    await expect(jornada.getByText('Descobrir', { exact: true })).toBeVisible();
+    await expect(jornada.getByText('Propor', { exact: true })).toBeVisible();
     await expect(
       page.getByText('Apresentar o diagnóstico do piloto para a diretoria.'),
     ).toBeVisible();
@@ -59,10 +60,7 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByText(/Venda adicionada\. A ficha do cliente/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
-    await expect(page.getByText('Proposta após descoberta', { exact: true })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
+    await expect(page.getByRole('link', { name: 'Criar proposta', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();
 
     const dialogo = page.getByRole('dialog', { name: 'Enriquecer esta oportunidade?' });
@@ -102,10 +100,7 @@ test.describe('Ficha do cliente em Vendas', () => {
     await page.goto('/preview/crm-dossie?pesquisa=pendente');
 
     await expect(page.getByRole('link', { name: 'Agendar reunião' }).first()).toBeVisible();
-    await expect(page.getByText('Proposta após descoberta', { exact: true })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
+    await expect(page.getByRole('link', { name: 'Criar proposta', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Enriquecer dados' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Enriquecer dados' }).click();

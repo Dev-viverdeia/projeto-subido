@@ -4,6 +4,8 @@ import { callPodeAbrir } from '@/lib/calls/tipos';
 import { etapaAberta, rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import type { DossieLead } from '@/lib/crm/queries';
 import { AtalhoProposta } from './AtalhoProposta';
+import { AcoesOportunidade } from '../../_components/AcoesOportunidade';
+import { estaNoFluxo, ROTULO_SITUACAO } from '@/lib/crm/situacao';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 import styles from './CabecalhoDossie.module.css';
 
@@ -19,9 +21,12 @@ export function CabecalhoDossie({
   projetoSlug?: string | null;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
-  const faseComercial = rotuloEtapaVisivel(lead.oportunidade.etapa);
+  const noFluxo = estaNoFluxo(lead.oportunidade);
+  const faseComercial = noFluxo
+    ? rotuloEtapaVisivel(lead.oportunidade.etapa)
+    : ROTULO_SITUACAO[lead.oportunidade.situacao!];
   const projetoDaJornada = projetoSlug ?? lead.empresa.projetoSugeridoSlug ?? null;
-  const oportunidadeAberta = etapaAberta(lead.oportunidade.etapa);
+  const oportunidadeAberta = noFluxo && etapaAberta(lead.oportunidade.etapa);
   const proximaReuniao = lead.calls
     .filter((call) => callPodeAbrir(call.status))
     .sort(
@@ -53,10 +58,11 @@ export function CabecalhoDossie({
         </div>
 
         <div className={styles.heroLateral}>
+          <AcoesOportunidade oportunidade={lead.oportunidade} />
           <div className={styles.estadoAtual}>
             <span>Etapa da venda</span>
             <strong>{faseComercial}</strong>
-            {!cicloEntregue && (
+            {!cicloEntregue && noFluxo && (
               <small data-estado={chavePesquisa}>
                 <Layers3 size={13} strokeWidth={1.8} aria-hidden="true" /> {estadoPesquisa}
               </small>
@@ -111,9 +117,11 @@ export function CabecalhoDossie({
           </nav>
         ) : (
           <p className={styles.encerradaNota}>
-            {lead.oportunidade.etapa === 'ganho'
-              ? 'Venda concluída. Abra um novo ciclo abaixo quando houver outro projeto.'
-              : 'Venda encerrada. O histórico e o motivo da perda continuam nesta ficha.'}
+            {!noFluxo
+              ? 'Fora do fluxo. O histórico está preservado; use Mais ações para restaurar.'
+              : lead.oportunidade.etapa === 'ganho'
+                ? 'Venda concluída. Abra um novo ciclo abaixo quando houver outro projeto.'
+                : 'Venda encerrada. O histórico e o motivo da perda continuam nesta ficha.'}
           </p>
         )}
       </div>

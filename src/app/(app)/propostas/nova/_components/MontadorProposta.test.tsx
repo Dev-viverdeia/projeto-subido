@@ -44,7 +44,7 @@ describe('MontadorProposta', () => {
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toBeDisabled();
 
     await user.selectOptions(
-      screen.getByRole('combobox', { name: /Cliente em negociação/ }),
+      screen.getByRole('combobox', { name: /Cliente/ }),
       '11111111-1111-4111-8111-111111111111',
     );
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toBeEnabled();
@@ -117,10 +117,7 @@ describe('MontadorProposta', () => {
       />,
     );
     await user.click(screen.getByRole('button', { name: 'Trocar cliente' }));
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Cliente em negociação/ }),
-      outro.id,
-    );
+    await user.selectOptions(screen.getByRole('combobox', { name: /Cliente/ }), outro.id);
     expect(document.querySelector('input[name="reuniao"]')).toHaveValue('');
     expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Criar rascunho' })).toBeDisabled();
@@ -156,7 +153,7 @@ describe('MontadorProposta', () => {
     });
   });
 
-  it('explica a descoberta obrigatória e devolve o usuário para a próxima ação', () => {
+  it('leva ao cadastro do cliente quando não há oportunidades', () => {
     render(
       <MontadorProposta
         opcoes={{ ...OPCOES, oportunidades: [] }}
@@ -164,14 +161,14 @@ describe('MontadorProposta', () => {
         origemInicial=""
         reuniaoInicial=""
         contextoCall={null}
-        erro="descoberta"
+        erro={null}
       />,
     );
 
-    expect(screen.getByText('Conclua a descoberta antes de criar a proposta.')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Agendar descoberta/ })).toHaveAttribute(
+    expect(screen.getByText('Para quem é a proposta?')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Adicionar cliente/ })).toHaveAttribute(
       'href',
-      '/reunioes?nova=1&oportunidade=11111111-1111-4111-8111-111111111111',
+      '/vendas?nova=1',
     );
   });
 });

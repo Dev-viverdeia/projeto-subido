@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { ArrowRight, Check, ChevronDown, ContactRound, Video } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ContactRound } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import { criarProposta } from '@/lib/propostas/actions';
 import type { OpcoesNovaProposta } from '@/lib/propostas/queries';
@@ -75,16 +75,7 @@ function CamposProposta({
         <legend className="sr-only">Dados da proposta</legend>
         <input type="hidden" name="reuniao" value={reuniao} />
 
-        {erro === 'descoberta' ? (
-          <div className={styles.erro} role="alert">
-            <strong>Conclua a descoberta antes de criar a proposta.</strong>
-            {oportunidadeInicial && (
-              <Link href={`/reunioes?nova=1&oportunidade=${oportunidadeInicial}`}>
-                Agendar descoberta <ArrowRight size={16} aria-hidden="true" />
-              </Link>
-            )}
-          </div>
-        ) : erro ? (
+        {erro ? (
           <p className={styles.erro} role="alert">
             {ERROS[erro] ?? ERROS.campos}
           </p>
@@ -92,11 +83,11 @@ function CamposProposta({
 
         {!opcoes.oportunidades.length ? (
           <div className={styles.semOpcao}>
-            <Video size={24} aria-hidden="true" />
-            <h2>Comece pela descoberta</h2>
-            <p>Conclua uma reunião com o cliente para preparar sua proposta.</p>
-            <Link href="/reunioes">
-              Ver reuniões <ArrowRight size={16} aria-hidden="true" />
+            <ContactRound size={24} aria-hidden="true" />
+            <h2>Para quem é a proposta?</h2>
+            <p>Adicione o cliente em Vendas para começar.</p>
+            <Link href="/vendas?nova=1">
+              Adicionar cliente <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         ) : (
@@ -122,7 +113,7 @@ function CamposProposta({
               </div>
             ) : (
               <label className={styles.campo}>
-                <span>Cliente em negociação</span>
+                <span>Cliente</span>
                 <select
                   name="oportunidade"
                   value={lead ? oportunidade : ''}
@@ -206,7 +197,7 @@ function CamposProposta({
 
       {opcoes.oportunidades.length > 0 && (
         <footer className={styles.rodape}>
-          <p>Nada será enviado ao cliente agora.</p>
+          <p>Reunião opcional. O rascunho não será enviado ao cliente.</p>
           <Button
             type="submit"
             variant="primary"

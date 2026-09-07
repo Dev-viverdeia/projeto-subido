@@ -11,12 +11,17 @@ const ETAPA_DA_FASE: Record<Exclude<IdFaseCrm, 'desfecho'>, EtapaCrm> = {
   entrada: 'novo_lead',
   conversa: 'descoberta',
   proposta: 'proposta',
+  ganho: 'ganho',
 };
 
 const TEXTO_VAZIO: Record<Exclude<IdFaseCrm, 'desfecho'>, { titulo: string; apoio: string }> = {
   entrada: {
     titulo: 'Nada para preparar',
     apoio: 'As novas vendas aparecem aqui.',
+  },
+  ganho: {
+    titulo: 'Sua próxima conquista fica aqui',
+    apoio: 'Marque como ganho quando o cliente fechar.',
   },
   conversa: {
     titulo: 'Nenhuma descoberta em andamento',
@@ -71,7 +76,13 @@ export function ColunaAtiva({
     >
       <header className={styles.colunaTopo}>
         <div>
-          <span className={styles.faseNumero}>Etapa {numero} de 3</span>
+          <span className={styles.faseNumero}>
+            {fase.id === 'ganho' ? (
+              <CheckCircle2 size={18} aria-label="Venda fechada" />
+            ) : (
+              `Etapa ${numero}`
+            )}
+          </span>
           <h2 id={`coluna-${fase.id}`}>{fase.rotulo}</h2>
           <p>{fase.descricao}</p>
         </div>
@@ -82,14 +93,23 @@ export function ColunaAtiva({
 
       <div className={styles.lista}>
         {oportunidades.length ? (
-          oportunidades.map((oportunidade) => (
-            <CartaoOportunidade
-              key={oportunidade.id}
-              oportunidade={oportunidade}
-              aoMover={aoMover}
-              desabilitado={movimentandoId !== null}
-            />
-          ))
+          oportunidades.map((oportunidade) =>
+            fase.id === 'ganho' ? (
+              <CartaoEncerrado
+                key={oportunidade.id}
+                oportunidade={oportunidade}
+                aoMover={aoMover}
+                desabilitado={movimentandoId !== null}
+              />
+            ) : (
+              <CartaoOportunidade
+                key={oportunidade.id}
+                oportunidade={oportunidade}
+                aoMover={aoMover}
+                desabilitado={movimentandoId !== null}
+              />
+            ),
+          )
         ) : (
           <Vazio fase={faseAtiva} />
         )}
@@ -118,7 +138,7 @@ function DestinoDesfecho({ etapa, total }: { etapa: 'ganho' | 'perdido'; total: 
       <Icone size={18} strokeWidth={1.8} aria-hidden="true" />
       <div>
         <strong>{perdida ? 'Perdida' : 'Ganha'}</strong>
-        <span>{perdida ? 'Registra o motivo' : 'Inicia a entrega'}</span>
+        <span>{perdida ? 'Registra o motivo' : 'Confirma a venda'}</span>
       </div>
       <small aria-label={`${total} vendas encerradas`}>{total}</small>
     </div>
@@ -157,18 +177,13 @@ export function HistoricoDesfechos({
       a.perdidaEm ?? a.ganhaEm ?? a.atualizadoEm,
     ),
   );
-  const ganhas = oportunidades.filter((item) => item.etapa === 'ganho').length;
-  const perdidas = oportunidades.length - ganhas;
 
   return (
     <details className={styles.historico}>
       <summary>
         <div>
-          <span>Vendas encerradas</span>
-          <small>
-            {ganhas} {ganhas === 1 ? 'ganha' : 'ganhas'} · {perdidas}{' '}
-            {perdidas === 1 ? 'perdida' : 'perdidas'}
-          </small>
+          <span>Fora do fluxo</span>
+          <small>{oportunidades.length} · Arquivadas, desclassificadas e perdidas</small>
         </div>
         <span className={styles.abrirHistorico}>
           Ver histórico

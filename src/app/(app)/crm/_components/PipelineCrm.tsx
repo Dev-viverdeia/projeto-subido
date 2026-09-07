@@ -30,6 +30,7 @@ import {
   type MotivoPerdaCrm,
 } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
+import { estaNoFluxo } from '@/lib/crm/situacao';
 import {
   AbasPipelineMobile,
   BarraPrioridades,
@@ -78,6 +79,11 @@ function normalizarBusca(valor: string): string {
 
 export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[] }) {
   const [itens, setItens] = useState(oportunidades);
+  const [originais, setOriginais] = useState(oportunidades);
+  if (originais !== oportunidades) {
+    setOriginais(oportunidades);
+    setItens(oportunidades);
+  }
   const [ativoId, setAtivoId] = useState<string | null>(null);
   const [movimentandoId, setMovimentandoId] = useState<string | null>(null);
   const [perdaPendente, setPerdaPendente] = useState<OportunidadeCrm | null>(null);
@@ -94,23 +100,27 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
     useSensor(KeyboardSensor),
   );
 
-  const abertas = useMemo(() => itens.filter((item) => etapaAberta(item.etapa)), [itens]);
+  const noQuadro = useMemo(
+    () => itens.filter((item) => estaNoFluxo(item) && item.etapa !== 'perdido'),
+    [itens],
+  );
+  const abertas = useMemo(() => noQuadro.filter((item) => etapaAberta(item.etapa)), [noQuadro]);
   const contagens = useMemo(
     () => ({
-      todas: abertas.length,
+      todas: noQuadro.length,
       atencao: abertas.filter(precisaDeAtencao).length,
       sem_acao: abertas.filter((item) => !item.proximaAcao).length,
       proposta: abertas.filter((item) => faseDaEtapa(item.etapa) === 'proposta').length,
     }),
-    [abertas],
+    [abertas, noQuadro],
   );
   const filtradas = useMemo(() => {
     const termo = normalizarBusca(busca);
-    return abertas.filter((oportunidade) => {
+    return noQuadro.filter((oportunidade) => {
       const correspondeAoFiltro =
         filtro === 'todas' ||
         (filtro === 'atencao' && precisaDeAtencao(oportunidade)) ||
-        (filtro === 'sem_acao' && !oportunidade.proximaAcao) ||
+        (filtro === 'sem_acao' && etapaAberta(oportunidade.etapa) && !oportunidade.proximaAcao) ||
         (filtro === 'proposta' && faseDaEtapa(oportunidade.etapa) === 'proposta');
       if (!correspondeAoFiltro) return false;
       if (!termo) return true;
@@ -118,7 +128,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
         [oportunidade.empresa, oportunidade.titulo, oportunidade.contato].filter(Boolean).join(' '),
       ).includes(termo);
     });
-  }, [abertas, busca, filtro]);
+  }, [noQuadro, busca, filtro]);
 
   const porFase = useMemo(() => {
     const mapa = new Map<IdFaseCrm, OportunidadeCrm[]>();
@@ -133,7 +143,7 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
   const ganhas = itens.filter((oportunidade) => oportunidade.etapa === 'ganho');
   const perdidas = itens.filter((oportunidade) => oportunidade.etapa === 'perdido');
   const encerradas = itens.filter(
-    (oportunidade) => oportunidade.etapa === 'ganho' || oportunidade.etapa === 'perdido',
+    (oportunidade) => !estaNoFluxo(oportunidade) || oportunidade.etapa === 'perdido',
   );
   const ativa = itens.find((oportunidade) => oportunidade.id === ativoId) ?? null;
 

@@ -239,18 +239,15 @@ describe('criarProposta', () => {
     );
   });
 
-  it('não deixa um link direto pular a descoberta', async () => {
+  it('cria proposta sem descoberta nem reunião, preservando vínculo com o cliente', async () => {
+    const { dados, consulta } = prepararCriacao();
     oportunidadeTemDescobertaConcluida.mockResolvedValue(false);
-    const dados = new FormData();
-    dados.set('oportunidade', OPORTUNIDADE_ID);
-    dados.set('origem', 'projeto:sdr-atendimento-qualificacao');
+    resolverReuniaoProposta.mockResolvedValue(null);
     dados.set('reuniao', '');
-
-    await expect(criarProposta(dados)).rejects.toThrow(
-      `redirect:/propostas/nova?oportunidade=${OPORTUNIDADE_ID}&erro=descoberta&projeto=sdr-atendimento-qualificacao`,
+    await expect(criarProposta(dados)).rejects.toThrow(`redirect:/propostas/${PROPOSTA_ID}`);
+    expect(consulta.insert).toHaveBeenCalledWith(
+      expect.objectContaining({ oportunidade_id: OPORTUNIDADE_ID, reuniao_id: null }),
     );
-
-    expect(oportunidadeTemDescobertaConcluida).toHaveBeenCalledWith(OPORTUNIDADE_ID);
-    expect(createClient).not.toHaveBeenCalled();
+    expect(oportunidadeTemDescobertaConcluida).not.toHaveBeenCalled();
   });
 });
