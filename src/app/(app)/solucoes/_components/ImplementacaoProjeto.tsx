@@ -37,9 +37,6 @@ export function ImplementacaoProjeto({
   const faseAtivaIndice = faseAtiva
     ? roteiro.fases.findIndex((fase) => fase.id === faseAtiva.id)
     : -1;
-  const idsFaseAtiva = faseAtiva
-    ? faseAtiva.passos.map((passo) => idPassoProjeto(slug, faseAtiva.id, passo.id))
-    : [];
   const passoAtivo = faseAtiva
     ? (faseAtiva.passos.find((passo) => passo.id === passoEscolhidoId) ??
       faseAtiva.passos.find(
@@ -123,7 +120,7 @@ export function ImplementacaoProjeto({
       {faseAtiva && passoAtivo && passoAtivoId ? (
         <div className={styles.faseCorpo}>
           <aside className={styles.passosDaFase}>
-            <p>Passos desta fase</p>
+            <h2>{faseAtiva.titulo}</h2>
             <nav aria-label={`Passos da fase ${faseAtiva.titulo}`}>
               {faseAtiva.passos.map((passo, indice) => {
                 const id = idPassoProjeto(slug, faseAtiva.id, passo.id);
@@ -144,21 +141,14 @@ export function ImplementacaoProjeto({
                 );
               })}
             </nav>
+            <details className={styles.objetivoFase}>
+              <summary>Objetivo desta fase</summary>
+              <p>{faseAtiva.objetivo}</p>
+            </details>
           </aside>
           <article className={styles.passoFoco}>
-            <header>
-              <div>
-                <p>Fase {String(faseAtivaIndice + 1).padStart(2, '0')}</p>
-                <h2>{faseAtiva.titulo}</h2>
-                <span>{faseAtiva.objetivo}</span>
-              </div>
-              <strong>
-                {contarEtapasFeitas(progresso, idsFaseAtiva)}/{idsFaseAtiva.length}
-              </strong>
-            </header>
             <div className={styles.passoTitulo}>
               <div>
-                <p>Passo em foco</p>
                 <h3>{passoAtivo.titulo}</h3>
               </div>
               {passoAtivo.duracao ? (
@@ -169,20 +159,10 @@ export function ImplementacaoProjeto({
             </div>
             <p className={styles.passoAcao}>{passoAtivo.acao}</p>
             <GuiaExecucaoPasso
+              key={passoAtivoId}
               passo={passoAtivo}
-              atual={proximoPasso?.id === passoAtivoId}
               concluido={Boolean(progresso.etapas[passoAtivoId])}
             />
-            <dl className={styles.criteriosPasso}>
-              <div>
-                <dt>Pronto quando</dt>
-                <dd>{passoAtivo.concluidoQuando}</dd>
-              </div>
-              <div>
-                <dt>Você entrega</dt>
-                <dd>{passoAtivo.entregavel}</dd>
-              </div>
-            </dl>
             <button
               type="button"
               className={styles.concluirPasso}

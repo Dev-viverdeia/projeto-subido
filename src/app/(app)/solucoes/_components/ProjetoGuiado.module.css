@@ -1391,9 +1391,9 @@
   border: 1px solid var(--via-border);
   border-radius: 50%;
   background: var(--via-surface);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-support);
   font-weight: var(--via-fw-medium);
   font-variant-numeric: tabular-nums;
 }

@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, ChevronDown, Layers3 } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
@@ -6,6 +9,7 @@ import { ArtefatosEntregaProjeto, FichaCampoProjeto } from './EscopoProjeto';
 import { Ferramentas, Prompts } from './KitSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
 import styles from './ProjetoGuiadoNovo.module.css';
+import visual from './LeituraProjeto.module.css';
 
 export function KitProjeto({
   slug,
@@ -24,65 +28,101 @@ export function KitProjeto({
   rotaComercial: ContextoRotaComercialProjeto;
   direto?: boolean;
 }) {
+  const [area, setArea] = useState('escopo');
   const roteiro = projeto.roteiro;
   const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const conteudo = (
     <div className={styles.kitCorpo}>
-      <section className={styles.resumoProjeto} aria-label="Resumo do projeto">
-        <div>
-          <span>Cliente ideal</span>
-          <p>{projeto.clienteIdeal}</p>
-        </div>
-        <div>
-          <span>Entrega final</span>
-          <p>{projeto.entregavelFinal}</p>
-        </div>
-      </section>
-      {roteiro.perfil && roteiro.escopo ? (
-        <FichaCampoProjeto perfil={roteiro.perfil} escopo={roteiro.escopo} />
+      <nav className={visual.areasKit} aria-label="Consultar materiais">
+        {[
+          { id: 'escopo', titulo: 'Escopo' },
+          { id: 'arquivos', titulo: 'Arquivos e ferramentas' },
+          { id: 'cliente', titulo: 'Aplicar no cliente' },
+        ].map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={area === item.id}
+            onClick={() => setArea(item.id)}
+          >
+            {item.titulo}
+          </button>
+        ))}
+      </nav>
+      {area === 'escopo' ? (
+        <>
+          <section className={styles.resumoProjeto} aria-label="Resumo do projeto">
+            <details>
+              <summary>
+                Cliente ideal
+                <ChevronDown size={17} aria-hidden="true" />
+              </summary>
+              <p>{projeto.clienteIdeal}</p>
+            </details>
+            <details>
+              <summary>
+                Entrega final
+                <ChevronDown size={17} aria-hidden="true" />
+              </summary>
+              <p>{projeto.entregavelFinal}</p>
+            </details>
+          </section>
+          {roteiro.perfil && roteiro.escopo ? (
+            <FichaCampoProjeto perfil={roteiro.perfil} escopo={roteiro.escopo} />
+          ) : null}
+          {roteiro.fundamentos.length > 0 ? (
+            <section className={styles.fundamentos} aria-labelledby="fundamentos-projeto">
+              <header>
+                <h2 id="fundamentos-projeto">Cuidados do projeto</h2>
+              </header>
+              <ol>
+                {roteiro.fundamentos.map((fundamento) => (
+                  <li key={fundamento.titulo}>
+                    <details>
+                      <summary>
+                        {fundamento.titulo}
+                        <ChevronDown size={17} aria-hidden="true" />
+                      </summary>
+                      <p>{fundamento.descricao}</p>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+        </>
       ) : null}
-      {roteiro.fundamentos.length > 0 ? (
-        <section className={styles.fundamentos} aria-labelledby="fundamentos-projeto">
-          <header>
-            <p>Antes de executar</p>
-            <h2 id="fundamentos-projeto">Regras que protegem este projeto</h2>
-          </header>
-          <ol>
-            {roteiro.fundamentos.map((fundamento, indice) => (
-              <li key={fundamento.titulo}>
-                <span>{String(indice + 1).padStart(2, '0')}</span>
-                <div>
-                  <h3>{fundamento.titulo}</h3>
-                  <p>{fundamento.descricao}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+      {area === 'arquivos' ? (
+        <>
+          {roteiro.artefatosEntrega ? (
+            <ArtefatosEntregaProjeto artefatos={roteiro.artefatosEntrega} />
+          ) : null}
+          <div className={styles.kitFerramentas}>
+            <Ferramentas itens={ferramentas} />
+            <Prompts itens={prompts} />
+          </div>
+        </>
       ) : null}
-      {roteiro.artefatosEntrega ? (
-        <ArtefatosEntregaProjeto artefatos={roteiro.artefatosEntrega} />
+      {area === 'cliente' ? (
+        <>
+          <RotaComercialProjeto
+            slug={slug}
+            titulo={titulo}
+            contexto={rotaComercial}
+            destinoNovoLead={destinoCrm}
+          />
+          <section className={styles.estudio}>
+            <Layers3 size={18} aria-hidden="true" />
+            <div>
+              <strong>Precisa adaptar o projeto?</strong>
+              <p>Use esta estrutura como base e ajuste o escopo no Estúdio.</p>
+            </div>
+            <Link href={`/builder?projeto=${encodeURIComponent(slug)}`}>
+              Personalizar no Estúdio <ArrowUpRight size={15} aria-hidden="true" />
+            </Link>
+          </section>
+        </>
       ) : null}
-      <div className={styles.kitFerramentas}>
-        <Ferramentas itens={ferramentas} />
-        <Prompts itens={prompts} />
-      </div>
-      <RotaComercialProjeto
-        slug={slug}
-        titulo={titulo}
-        contexto={rotaComercial}
-        destinoNovoLead={destinoCrm}
-      />
-      <section className={styles.estudio}>
-        <Layers3 size={18} aria-hidden="true" />
-        <div>
-          <strong>Precisa adaptar o projeto?</strong>
-          <p>Use esta estrutura como base e ajuste o escopo no Estúdio.</p>
-        </div>
-        <Link href={`/builder?projeto=${encodeURIComponent(slug)}`}>
-          Personalizar no Estúdio <ArrowUpRight size={15} aria-hidden="true" />
-        </Link>
-      </section>
     </div>
   );
 

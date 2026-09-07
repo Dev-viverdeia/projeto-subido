@@ -254,6 +254,7 @@ describe('Projeto guiado', () => {
     expect(within(navegacao).getAllByRole('button')).toHaveLength(5);
     expect(screen.getByRole('heading', { level: 2, name: 'Entender' })).toBeDefined();
     expect(screen.queryByRole('heading', { level: 2, name: 'Preparar' })).toBeNull();
+    await user.click(screen.getByText('Planilha de demanda', { exact: true }));
     expect(screen.getByRole('button', { name: 'Copiar Planilha de demanda' })).toBeDefined();
     expect(screen.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
       'aria-valuenow',
@@ -271,13 +272,11 @@ describe('Projeto guiado', () => {
       'true',
     );
     expect(within(areas).getByRole('tab', { name: 'Materiais' })).toHaveFocus();
-    expect(screen.getByText(projeto.entregavelFinal)).toBeDefined();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Regras que protegem este projeto' }),
-    ).toBeDefined();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'O combinado deste projeto' }),
-    ).toBeDefined();
+    await user.click(screen.getByText('Entrega final', { exact: true }));
+    expect(screen.getByText(projeto.entregavelFinal)).toBeVisible();
+    expect(screen.getByRole('heading', { level: 2, name: 'Cuidados do projeto' })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2, name: 'Escopo do piloto' })).toBeDefined();
+    await user.click(screen.getByRole('button', { name: 'Arquivos e ferramentas' }));
     expect(screen.getByRole('heading', { level: 3, name: 'Arquivos da entrega' })).toBeDefined();
   });
 
@@ -327,22 +326,17 @@ describe('Projeto guiado', () => {
     );
   });
 
-  it('leva a identidade do projeto ao Estúdio', async () => {
+  it('conecta o projeto ao Estúdio, ao primeiro lead e à proposta comercial', async () => {
     const user = userEvent.setup();
     montar();
+
     await user.click(screen.getByRole('tab', { name: 'Materiais' }));
+    await user.click(screen.getByRole('button', { name: 'Aplicar no cliente' }));
+
     expect(screen.getByRole('link', { name: /Personalizar no Estúdio/ })).toHaveAttribute(
       'href',
       '/builder?projeto=crm-comercial',
     );
-  });
-
-  it('conecta o projeto ao primeiro lead e à proposta comercial', async () => {
-    const user = userEvent.setup();
-    montar();
-
-    await user.click(screen.getByRole('tab', { name: 'Materiais' }));
-
     expect(screen.getByLabelText('Cliente em negociação')).toHaveValue(
       '11111111-1111-4111-8111-111111111111',
     );
@@ -384,6 +378,7 @@ describe('Projeto guiado', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Materiais' }));
 
+    await user.click(screen.getByRole('button', { name: 'Aplicar no cliente' }));
     expect(screen.getByText('Em execução')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Abrir entrega' })).toHaveAttribute(
       'href',

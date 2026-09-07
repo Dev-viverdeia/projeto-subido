@@ -2,34 +2,23 @@
 
 import { useState } from 'react';
 import {
-  ArrowRight,
   BadgeCheck,
-  BriefcaseBusiness,
   Building2,
-  CheckCircle2,
   CircleHelp,
   ExternalLink,
   FileSearch,
   Globe2,
   Lightbulb,
   Mail,
-  MessageSquareQuote,
   Phone,
-  Route,
-  Target,
 } from 'lucide-react';
-import {
-  obterRoteiroCall,
-  ROTULO_CONFIANCA,
-  ROTULO_ETAPA_CALL,
-  ROTULO_ORIGEM,
-  type DossieEnriquecido,
-} from '@/lib/crm/enriquecimento';
+import { ROTULO_CONFIANCA, ROTULO_ORIGEM, type DossieEnriquecido } from '@/lib/crm/enriquecimento';
 import { acaoParaFicha, resumoParaFicha, valorFatoParaFicha } from '@/lib/crm/apresentacao';
 import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
 import { AcaoPesquisaComercial } from './AcaoPesquisaComercial';
 import { InteligenciaDeContato } from './InteligenciaDeContato';
+import { PrepararConversa } from './PrepararConversa';
 import styles from './PesquisaComercial.module.css';
 
 type AbaPesquisa = 'leitura' | 'conversa' | 'fontes';
@@ -105,112 +94,6 @@ function ListaHipoteses({ dossie }: { dossie: DossieEnriquecido }) {
         <p className={styles.semDados}>Nenhuma hipótese útil foi gerada.</p>
       )}
     </section>
-  );
-}
-
-function PrepararConversa({ dossie }: { dossie: DossieEnriquecido }) {
-  const roteiro = obterRoteiroCall(dossie);
-
-  return (
-    <div className={styles.preparoCall}>
-      <section className={styles.briefingCall} aria-labelledby="objetivo-call-titulo">
-        <div className={styles.objetivoCall}>
-          <span className={styles.iconeCall} aria-hidden="true">
-            <Route size={19} strokeWidth={1.7} />
-          </span>
-          <div>
-            <p>Objetivo da reunião</p>
-            <h3 id="objetivo-call-titulo">O que esta reunião precisa esclarecer</h3>
-            <span>{roteiro.objetivo}</span>
-          </div>
-        </div>
-        <div className={styles.aberturaCall}>
-          <p>Como abrir</p>
-          <blockquote>“{roteiro.abertura}”</blockquote>
-        </div>
-      </section>
-
-      <div className={styles.gradeConversa}>
-        <section className={styles.painelLeitura} aria-labelledby="perguntas-titulo">
-          <header>
-            <div>
-              <p>Roteiro personalizado</p>
-              <h3 id="perguntas-titulo">Perguntas na ordem da conversa</h3>
-            </div>
-            <MessageSquareQuote size={18} strokeWidth={1.7} aria-hidden="true" />
-          </header>
-          <ol className={styles.perguntasCall}>
-            {roteiro.perguntas.map((pergunta, indice) => (
-              <li key={`${pergunta.pergunta}-${indice}`}>
-                <span className={styles.indicePergunta}>{String(indice + 1).padStart(2, '0')}</span>
-                <div>
-                  <span className={styles.etapaPergunta}>{ROTULO_ETAPA_CALL[pergunta.etapa]}</span>
-                  <strong>{pergunta.pergunta}</strong>
-                  <p>{pergunta.intencao}</p>
-                  {pergunta.projetoRelacionado && (
-                    <small>
-                      <BriefcaseBusiness size={12} strokeWidth={1.8} aria-hidden="true" />
-                      {pergunta.projetoRelacionado}
-                    </small>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className={styles.painelLeitura} aria-labelledby="projetos-titulo">
-          <header>
-            <div>
-              <p>Possibilidades de projeto</p>
-              <h3 id="projetos-titulo">Projetos para validar</h3>
-            </div>
-            <Target size={18} strokeWidth={1.7} aria-hidden="true" />
-          </header>
-          <div className={styles.projetos}>
-            {dossie.oportunidades.slice(0, 3).map((oportunidade, indice) => (
-              <article key={`${oportunidade.titulo}-${indice}`}>
-                <span>{String(indice + 1).padStart(2, '0')}</span>
-                <div>
-                  <strong>{oportunidade.titulo}</strong>
-                  <dl>
-                    <div>
-                      <dt>Sinal encontrado</dt>
-                      <dd>{oportunidade.porQueAgora}</dd>
-                    </div>
-                    <div>
-                      <dt>Valor a confirmar</dt>
-                      <dd>{oportunidade.impacto}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className={styles.fechamentoCall} aria-labelledby="fechamento-call-titulo">
-        <div className={styles.fechamentoResumo}>
-          <span className={styles.iconeFechamento} aria-hidden="true">
-            <CheckCircle2 size={19} strokeWidth={1.7} />
-          </span>
-          <div>
-            <p>Se houver aderência</p>
-            <h3 id="fechamento-call-titulo">Saia com um próximo passo combinado</h3>
-            <span>{roteiro.fechamento.sinalParaAvancar}</span>
-          </div>
-        </div>
-        <blockquote>“{roteiro.fechamento.frase}”</blockquote>
-        <div className={styles.proximoPassoCall}>
-          <div>
-            <small>Próximo passo indicado</small>
-            <strong>{roteiro.fechamento.proximoPasso}</strong>
-          </div>
-          <ArrowRight size={18} strokeWidth={1.7} aria-hidden="true" />
-        </div>
-      </section>
-    </div>
   );
 }
 
@@ -373,21 +256,45 @@ export function PesquisaComercial({
 
       <div className={styles.conteudoPesquisa}>
         <div className={styles.abas} role="tablist" aria-label="Dados enriquecidos da ficha">
-          {ABAS.map((item) => (
+          {ABAS.map((item, indice) => (
             <button
               type="button"
               role="tab"
               key={item.id}
+              id={`aba-pesquisa-${item.id}`}
+              tabIndex={aba === item.id ? 0 : -1}
               aria-selected={aba === item.id}
               aria-controls={`painel-pesquisa-${item.id}`}
               onClick={() => setAba(item.id)}
+              onKeyDown={(event) => {
+                const destino =
+                  event.key === 'ArrowRight'
+                    ? (indice + 1) % ABAS.length
+                    : event.key === 'ArrowLeft'
+                      ? (indice - 1 + ABAS.length) % ABAS.length
+                      : event.key === 'Home'
+                        ? 0
+                        : event.key === 'End'
+                          ? ABAS.length - 1
+                          : null;
+                if (destino === null) return;
+                event.preventDefault();
+                const proxima = ABAS[destino]!;
+                setAba(proxima.id);
+                document.getElementById(`aba-pesquisa-${proxima.id}`)?.focus();
+              }}
             >
               {item.rotulo}
             </button>
           ))}
         </div>
 
-        <div id={`painel-pesquisa-${aba}`} role="tabpanel" className={styles.painelAba}>
+        <div
+          id={`painel-pesquisa-${aba}`}
+          role="tabpanel"
+          aria-labelledby={`aba-pesquisa-${aba}`}
+          className={styles.painelAba}
+        >
           {aba === 'leitura' && (
             <div className={styles.gradeLeitura}>
               <ListaFatos dossie={dossie} />
