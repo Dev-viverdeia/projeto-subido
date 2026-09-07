@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { ETAPAS_CRM, type EtapaCrm } from '@/lib/crm/etapas';
+import { planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
 
 const schema = z.object({
   reuniao: z.uuid(),
@@ -41,6 +42,12 @@ export async function salvarPlanoCall(
   const { data: sessao, error: erroSessao } = await supabase.auth.getUser();
   if (erroSessao || !sessao.user) {
     return { erro: 'Sua sessão expirou. Entre novamente em outra aba e tente salvar aqui.' };
+  }
+  if (!planoTemRecurso(planoDosMetadados(sessao.user.app_metadata), 'vendas')) {
+    return {
+      tituloErro: 'Disponível no Pro',
+      erro: 'Salvar ações em Vendas exige o Pro. Sua reunião e o Live Coach continuam disponíveis.',
+    };
   }
   const dados = validacao.data;
   const { data: reuniao, error: erroReuniao } = await supabase
