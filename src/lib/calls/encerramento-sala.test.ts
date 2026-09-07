@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { from, remove, apagar, config } = vi.hoisted(() => ({
   from: vi.fn(),
-  remove: vi.fn(),
+  remove:
+    vi.fn<
+      (sala: string, identidade: string, opcoes?: { revokeTokenTs: bigint }) => Promise<void>
+    >(),
   apagar: vi.fn(),
   config: vi.fn(),
 }));
@@ -47,11 +50,16 @@ beforeEach(() => {
   apagar.mockResolvedValue(undefined);
 });
 describe('revogação da sala', () => {
-  it('revoga também tokens ainda não utilizados e depois fecha a sala do banco', async () => {
+  it('solicita corte explícito inclusive para tokens ainda não utilizados antes de fechar', async () => {
     const consulta = preparar();
+    const antes = BigInt(Math.floor(Date.now() / 1000) + 30);
     expect(await encerrarSalaNoProvedor('dono-qa', 'reuniao-qa')).toEqual({ status: 'encerrada' });
     expect(consulta.eq).toHaveBeenCalledWith('dono', 'dono-qa');
-    expect(remove).toHaveBeenCalledWith('sala-do-banco', 'guest-nunca-conectado');
+    const chamada = remove.mock.calls.find((item) => item[1] === 'guest-nunca-conectado');
+    expect(chamada?.[0]).toBe('sala-do-banco');
+    const corte = chamada?.[2]?.revokeTokenTs;
+    expect(corte).toBeGreaterThanOrEqual(antes);
+    expect(corte).toBeLessThanOrEqual(BigInt(Math.floor(Date.now() / 1000) + 30));
     expect(remove.mock.invocationCallOrder[1]).toBeLessThan(apagar.mock.invocationCallOrder[0]!);
   });
   it('não confunde encerramento da gravação com encerramento da sala', async () => {
