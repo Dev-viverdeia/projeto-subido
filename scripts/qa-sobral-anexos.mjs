@@ -281,6 +281,12 @@ try {
   });
   if (!cruzado.error) throw new Error('Anexo entrou na conversa de outra conta.');
   resultado.checks.push('isolamento entre duas contas', 'conversa alheia negada');
+  // Fixture legada: antes do envio retomável, o registro e o arquivo tinham UUIDs distintos.
+  // A alteração administrativa é limitada ao anexo sintético desta conta descartável.
+  const audioLegado = mensagens[0].consultor_anexos.find((a) => a.caminho_storage.endsWith('.wav'));
+  exigir(
+    await admin.from('consultor_anexos').update({ id: randomUUID() }).eq('id', audioLegado.id),
+  );
   await page.goto(`${app}/consultor/${mensagens[0].thread_id}`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: 'Reproduzir áudio' }).click();
   await expect.poll(() => page.locator('audio').evaluate((a) => a.currentTime)).toBeGreaterThan(0);
@@ -290,7 +296,7 @@ try {
   await page.screenshot({ path: join(pasta, 'mobile-player-persistido.png'), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: join(pasta, 'desktop-player-persistido.png'), fullPage: true });
-  resultado.checks.push('player persistido reproduz', 'mobile sem overflow');
+  resultado.checks.push('player persistido legado reproduz', 'mobile sem overflow');
 
   const documento = mensagens[0].consultor_anexos.find((a) => a.caminho_storage.endsWith('.txt'));
   const respostaDocumento = await context.request.get(

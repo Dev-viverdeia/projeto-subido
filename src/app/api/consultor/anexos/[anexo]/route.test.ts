@@ -30,6 +30,7 @@ beforeEach(() => {
       categoria: 'imagem',
       tipo_mime: 'image/png',
       nome: 'arquivo.png',
+      consultor_mensagens: { thread_id: '22222222-2222-4222-8222-222222222222' },
     },
     error: null,
   });
@@ -52,6 +53,7 @@ it('força o download de documentos sem renderizar seu conteúdo na plataforma',
       categoria: 'documento',
       tipo_mime: 'application/pdf',
       nome: 'escopo.pdf',
+      consultor_mensagens: { thread_id: '22222222-2222-4222-8222-222222222222' },
     },
     error: null,
   });
@@ -77,6 +79,35 @@ it('recusa um caminho fora da conta mesmo em registro legado', async () => {
       categoria: 'audio',
       tipo_mime: 'audio/webm',
       nome: 'fala.webm',
+    },
+    error: null,
+  });
+  expect((await pedir()).status).toBe(404);
+  expect(deps.assinar).not.toHaveBeenCalled();
+});
+it('mantém a abertura de anexos antigos cujo UUID do arquivo difere do registro', async () => {
+  const legado = caminho.replace(id, '44444444-4444-4444-8444-444444444444');
+  deps.registro.mockResolvedValue({
+    data: {
+      caminho_storage: legado,
+      categoria: 'audio',
+      tipo_mime: 'audio/webm',
+      nome: 'fala.webm',
+      consultor_mensagens: { thread_id: '22222222-2222-4222-8222-222222222222' },
+    },
+    error: null,
+  });
+  expect((await pedir()).status).toBe(307);
+  expect(deps.assinar).toHaveBeenCalledWith(legado, 90, { download: false });
+});
+it('recusa um arquivo de outra conversa mesmo dentro da pasta da conta', async () => {
+  deps.registro.mockResolvedValue({
+    data: {
+      caminho_storage: caminho,
+      categoria: 'imagem',
+      tipo_mime: 'image/png',
+      nome: 'arquivo.png',
+      consultor_mensagens: { thread_id: '44444444-4444-4444-8444-444444444444' },
     },
     error: null,
   });

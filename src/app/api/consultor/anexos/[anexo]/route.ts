@@ -24,17 +24,22 @@ export async function GET(_: Request, { params }: { params: Promise<{ anexo: str
 
   const { data: registro, error } = await supabase
     .from('consultor_anexos')
-    .select('caminho_storage, categoria, tipo_mime, nome')
+    .select('caminho_storage, categoria, tipo_mime, nome, consultor_mensagens!inner(thread_id)')
     .eq('id', validacao.data.anexo)
     .eq('dono', user.id)
     .maybeSingle();
   if (error || !registro) return falha('Arquivo não encontrado.', 404);
   const partes = registro.caminho_storage.split('/');
+  // Uploads antigos usavam um UUID próprio no nome do arquivo. A leitura valida
+  // a conta e a conversa de origem; as regras mais estritas de novos envios permanecem no banco.
   if (
     partes.length !== 3 ||
     partes[0] !== user.id ||
     !z.uuid().safeParse(partes[1]).success ||
-    !partes[2]?.startsWith(`${validacao.data.anexo}-`) ||
+    partes[1] !== registro.consultor_mensagens.thread_id ||
+    !z.uuid().safeParse(partes[2]?.slice(0, 36)).success ||
+    partes[2]?.[36] !== '-' ||
+    partes[2].length <= 37 ||
     !/^[a-zA-Z0-9._-]+$/.test(partes[2])
   )
     return falha('Arquivo não encontrado.', 404);
