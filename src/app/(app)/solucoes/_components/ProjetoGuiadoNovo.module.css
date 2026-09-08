@@ -1496,3 +1496,27 @@
     transform: none;
   }
 }
+.exemploAula {
+  margin-top: var(--via-space-6);
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+.praticaAula {
+  margin-top: var(--via-space-6);
+}
+.praticaAula h4 {
+  margin: 0 0 var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+.praticaAula p {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-reading);
+  line-height: 1.6;
+}

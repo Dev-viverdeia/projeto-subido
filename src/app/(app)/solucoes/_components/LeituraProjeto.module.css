@@ -40,6 +40,15 @@
 .modulos button {
   flex: 1;
 }
+@media (max-width: 599px) {
+  .modulos[data-com-exemplo] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .modulos[data-com-exemplo] button {
+    flex-direction: row;
+  }
+}
 .modulos button[aria-pressed='true'],
 .areasKit button[aria-pressed='true'] {
   background: var(--via-navy-06);

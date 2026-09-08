@@ -33,6 +33,8 @@ import {
   rotaPreview,
 } from '../projetos/fixture';
 import { ProgressoPreview } from '../ProgressoPreview';
+import ninaFixture from '../nina/fixture.json';
+import { lerRoteiroProjeto } from '@/lib/projetos/roteiro';
 import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 import { ControlesPreview } from './ControlesPreview';
 import { PainelMetricas } from '@/app/(app)/metricas/_components/PainelMetricas';
@@ -202,7 +204,11 @@ export default async function PreviewShellPage({
                 titulo="Atendimento no WhatsApp com IA"
                 resumo="Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe."
                 categoria="Automação com IA"
-                projeto={projetoPreview}
+                projeto={
+                  params.estado === 'nina'
+                    ? { ...ninaFixture, roteiro: lerRoteiroProjeto(ninaFixture.roteiro)! }
+                    : projetoPreview
+                }
                 ferramentas={ferramentasPreview}
                 prompts={promptsPreview}
                 videoUrl={null}

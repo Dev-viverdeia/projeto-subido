@@ -1,0 +1,514 @@
+{
+  "resultado": "Um SDR disponível no WhatsApp que atende, qualifica, agenda e transfere a oportunidade com todo o contexto para uma pessoa.",
+  "clienteIdeal": "Empresas que recebem leads pelo WhatsApp, demoram para responder, repetem as mesmas perguntas ou usam o tempo dos vendedores para descobrir se o contato tem perfil.",
+  "entregavelFinal": "Canal oficial, base aprovada, critérios de qualificação, agenda, CRM, passagem humana, testes, indicadores e manual de operação.",
+  "versao": 1,
+  "roteiro": {
+    "fases": [
+      {
+        "id": "entender",
+        "passos": [
+          {
+            "id": "mapear-jornada",
+            "acao": "Acompanhe uma semana de conversas e desenhe desde a primeira mensagem até resposta, qualificação, agenda, transferência ou encerramento.",
+            "modelo": {
+              "titulo": "Mapa da jornada do lead",
+              "conteudo": "Etapa | Gatilho de entrada | Pergunta ou ação | Informação necessária | Responsável | Prazo | Próximo estado | Evidência\nEntrada | nova mensagem | identificar motivo | nome e origem | atendimento | 5 min | triagem | evento registrado"
+            },
+            "titulo": "Mapear a conversa até a reunião",
+            "atencao": "Não desenhe a jornada a partir do processo oficial sem confrontá-lo com conversas reais; o fluxo praticado costuma ser diferente.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Conversas reais de sete dias",
+              "Agenda e etapas comerciais atuais",
+              "Uma pessoa do atendimento e uma de vendas"
+            ],
+            "execucao": [
+              "Exporte as conversas e retire dados pessoais desnecessários da amostra de trabalho.",
+              "Marque origem, horário, primeiro retorno, perguntas repetidas, abandono, agendamento e transferência.",
+              "Desenhe o caminho principal e as exceções que hoje dependem da memória da equipe.",
+              "Valide o mapa com atendimento e vendas e registre divergências antes de decidir o fluxo novo."
+            ],
+            "entregavel": "Mapa da jornada do lead.",
+            "concluidoQuando": "O mapa mostra origens, horários, assuntos, tempos, decisões, responsáveis e desfechos de uma semana real."
+          },
+          {
+            "id": "definir-qualificacao-limites",
+            "acao": "Converta o perfil ideal em critérios confirmáveis e liste tudo que exige uma pessoa, incluindo negociação, reclamação, dado sensível e pedido explícito.",
+            "modelo": {
+              "titulo": "Matriz de decisão do SDR",
+              "conteudo": "Critério | Pergunta natural | Evidência aceita | Peso | Se faltar\nPerfil da empresa | Em que tipo de operação será usado? | segmento declarado | 2 | perguntar\n\nGatilho de passagem | Destino | Prazo | Mensagem ao cliente\nPedido por pessoa | fila comercial | 5 min | Vou chamar uma pessoa e manter todo o contexto."
+            },
+            "titulo": "Definir qualificação e limites",
+            "atencao": "Não transforme BANT ou outro método em interrogatório. Pergunte apenas o necessário e distribua as perguntas ao longo da conversa.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Perfil ideal aprovado",
+              "Critérios usados pelos vendedores",
+              "Políticas e temas de risco"
+            ],
+            "execucao": [
+              "Liste no máximo seis critérios que realmente mudam a decisão comercial.",
+              "Para cada critério, escreva a pergunta e o dado objetivo que confirma a resposta.",
+              "Defina os estados pronto, precisa de informação e não avançar agora sem usar intuição como regra.",
+              "Liste gatilhos de transferência e nomeie fila, responsável e prazo de resposta para cada um."
+            ],
+            "entregavel": "Matriz de qualificação e passagem.",
+            "concluidoQuando": "Cada critério tem pergunta, evidência e efeito; cada limite tem gatilho, destino humano e prazo."
+          }
+        ],
+        "titulo": "Entender",
+        "objetivo": "Transformar atendimento e qualificação atuais em um mapa verificável antes de automatizar."
+      },
+      {
+        "id": "preparar",
+        "passos": [
+          {
+            "id": "configurar-canal-base",
+            "acao": "Valide a conta do WhatsApp, receba um evento de teste e transforme as dúvidas frequentes em respostas curtas, versionadas e ligadas às fontes.",
+            "modelo": {
+              "titulo": "Ficha de resposta aprovada",
+              "conteudo": "Pergunta canônica:\nVariações reais:\nResposta curta:\nAção permitida:\nQuando transferir:\nFonte:\nResponsável:\nAprovado em:\nRevisar em:\nVersão:"
+            },
+            "titulo": "Configurar canal e base aprovada",
+            "atencao": "Nunca coloque token, segredo ou documento privado em código público ou material entregue ao aluno.",
+            "duracao": "2–4 h",
+            "insumos": [
+              "Conta Meta Business do cliente",
+              "Número oficial e responsável pelo acesso",
+              "FAQ, políticas, serviços e horários"
+            ],
+            "execucao": [
+              "Confirme propriedade do número, conta, aplicativo, webhook e responsável pela renovação dos acessos.",
+              "Receba e registre um evento de mensagem e devolva uma resposta autorizada no ambiente de teste.",
+              "Escreva uma ficha curta para cada dúvida frequente com fonte, dono, versão e data de revisão.",
+              "Marque toda pergunta sem resposta aprovada como passagem obrigatória para uma pessoa."
+            ],
+            "entregavel": "Canal de teste e base versionada.",
+            "concluidoQuando": "Uma mensagem entra e recebe resposta de teste; as dez dúvidas principais têm resposta, fonte, dono e revisão."
+          },
+          {
+            "id": "preparar-crm-agenda",
+            "acao": "Defina o cadastro único do contato, os estados da conversa, os campos de qualificação e como o horário confirmado vira compromisso comercial.",
+            "modelo": {
+              "titulo": "Contrato mínimo do lead",
+              "conteudo": "contato_id:\ntelefone_normalizado:\norigem:\nconversa_estado:\ncriterios_confirmados: []\nlacunas: []\nscore_explicado:\noportunidade_id:\nresponsavel_humano:\nproxima_acao:\nagendamento_id:\nconsentimento_em:"
+            },
+            "titulo": "Preparar CRM, agenda e passagem",
+            "atencao": "Agendar não é apenas criar evento. Confirme fuso, participante, duração, responsável e mensagem de confirmação.",
+            "duracao": "90–150 min",
+            "insumos": [
+              "CRM ou banco do cliente",
+              "Calendários dos responsáveis",
+              "Matriz de qualificação e passagem"
+            ],
+            "execucao": [
+              "Defina a chave de deduplicação, os campos obrigatórios e o histórico que nunca pode ser sobrescrito.",
+              "Crie estados claros para IA atendendo, aguardando cliente, aguardando pessoa, agendado e encerrado.",
+              "Mapeie especialidade, agenda, duração, intervalo e regra de confirmação para cada tipo de reunião.",
+              "Simule contato já existente, horário indisponível e transferência fora do expediente."
+            ],
+            "entregavel": "Contrato de dados e roteamento.",
+            "concluidoQuando": "Um lead de teste percorre cadastro, qualificação, agenda e tarefa humana sem duplicar contato ou compromisso."
+          }
+        ],
+        "titulo": "Preparar",
+        "objetivo": "Organizar canal, conhecimento, agenda e dados para construir sem improviso."
+      },
+      {
+        "id": "construir",
+        "passos": [
+          {
+            "id": "registrar-responder",
+            "acao": "Valide cada evento, grave uma única vez, localize o contato, recupere fontes aprovadas e escolha entre responder, perguntar ou transferir.",
+            "modelo": {
+              "titulo": "Decisão estruturada do agente",
+              "conteudo": "{\n  \"intencao\": \"categoria aprovada\",\n  \"confianca\": 0.00,\n  \"risco\": false,\n  \"acao\": \"responder | perguntar | transferir\",\n  \"motivo\": \"fato curto\",\n  \"fontes\": [],\n  \"destino_humano\": null\n}"
+            },
+            "titulo": "Registrar e responder com segurança",
+            "atencao": "Responda rapidamente ao provedor e processe a IA fora do recebimento inicial para evitar reenvio por timeout.",
+            "duracao": "3–5 h",
+            "insumos": [
+              "Webhook de teste",
+              "Base aprovada",
+              "Estados da conversa",
+              "Chave de IA guardada no servidor"
+            ],
+            "execucao": [
+              "Valide assinatura e formato do evento antes de aceitar conteúdo no endereço público.",
+              "Registre o identificador do provedor; se já existir, encerre sem processar novamente.",
+              "Recupere apenas respostas aprovadas e exija fonte mínima para permitir uma resposta.",
+              "Mude o estado antes de transferir para impedir que a IA continue enquanto a pessoa assume."
+            ],
+            "entregavel": "Entrada idempotente e agente de atendimento.",
+            "concluidoQuando": "Repetir o evento não duplica mensagem e nenhuma resposta sem fonte suficiente é enviada."
+          },
+          {
+            "id": "qualificar-agendar",
+            "acao": "Faça perguntas naturais, registre a evidência de cada critério e, quando houver condição, ofereça horários e entregue o briefing ao vendedor.",
+            "modelo": {
+              "titulo": "Briefing para o vendedor",
+              "conteudo": "Objetivo declarado:\nEmpresa e contexto confirmados:\nCritérios atendidos e evidências:\nLacunas abertas:\nDúvidas ou objeções:\nReunião confirmada:\nCompromisso do lead:\nPróxima ação do vendedor:\nLink da conversa:"
+            },
+            "titulo": "Qualificar, agendar e passar o contexto",
+            "atencao": "Não esconda por que o lead foi priorizado. Um score sem fatos deixa o vendedor refém da automação.",
+            "duracao": "3–5 h",
+            "insumos": [
+              "Matriz de qualificação",
+              "Agenda conectada",
+              "Contato e conversa persistidos",
+              "Destino humano configurado"
+            ],
+            "execucao": [
+              "Escolha a próxima pergunta pela lacuna que mais muda a decisão e faça apenas uma por mensagem.",
+              "Grave resposta literal e critério associado antes de recalcular a prioridade.",
+              "Ao atingir o estado pronto, consulte horários reais, confirme a escolha e crie o evento uma única vez.",
+              "Crie oportunidade e tarefa humana com resumo factual, critérios, lacunas e compromisso já assumido."
+            ],
+            "entregavel": "Fluxo comercial do SDR ativo.",
+            "concluidoQuando": "O vendedor recebe reunião, respostas confirmadas, lacunas, histórico e motivo da prioridade no mesmo registro."
+          }
+        ],
+        "titulo": "Construir",
+        "objetivo": "Fazer cada mensagem virar histórico, resposta segura, qualificação e próxima ação."
+      },
+      {
+        "id": "validar",
+        "passos": [
+          {
+            "id": "testar-cenarios",
+            "acao": "Prepare casos comuns, ambíguos, comerciais, críticos e técnicos com resultado esperado antes de conversar com o SDR pelo canal real.",
+            "modelo": {
+              "titulo": "Matriz de cenários",
+              "conteudo": "ID | Categoria | Entrada | Contexto | Resultado esperado | Fonte | Critério esperado | Deve transferir? | Resultado real | Aprovado? | Evidência | Correção | Reteste"
+            },
+            "titulo": "Rodar vinte cenários completos",
+            "atencao": "Não mude o critério depois de ver a resposta. Isso transforma teste em justificativa do que já foi construído.",
+            "duracao": "90–150 min",
+            "insumos": [
+              "Canal completo em teste",
+              "Duas pessoas testando papéis diferentes",
+              "Critério objetivo por cenário"
+            ],
+            "execucao": [
+              "Escreva cinco dúvidas, cinco qualificações, cinco limites e cinco falhas antes do teste.",
+              "Registre entrada, resposta esperada, fonte, decisão, resultado real e evidência de cada caso.",
+              "Inclua evento duplicado, agenda indisponível, atendente offline e pedido explícito por pessoa.",
+              "Corrija base, regra ou integração conforme a causa e repita todos os casos críticos e reprovados."
+            ],
+            "entregavel": "Matriz de testes com evidências.",
+            "concluidoQuando": "Todos os casos críticos transferem, nenhum inventa informação e toda reprovação foi corrigida e repetida."
+          },
+          {
+            "id": "validar-com-equipe",
+            "acao": "Compare o SDR com leads históricos e faça a equipe concluir atendimentos, agendamentos e passagens usando seus próprios acessos.",
+            "modelo": {
+              "titulo": "Termo de calibração e aceite",
+              "conteudo": "Amostra histórica:\nConcordâncias:\nFalsos positivos:\nFalsos negativos:\nRegras ajustadas:\n\n[ ] assumir conversa\n[ ] reagendar reunião\n[ ] corrigir critério\n[ ] pausar automação\n\nResponsáveis:\nPendências:\nData do aceite:"
+            },
+            "titulo": "Calibrar com vendas e operação",
+            "atencao": "Assistir à demonstração não comprova autonomia. Quem vai operar precisa clicar e concluir a jornada.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Vinte leads históricos com desfecho",
+              "Atendente e vendedor do piloto",
+              "Acessos com permissões reais"
+            ],
+            "execucao": [
+              "Rode os vinte históricos sem mostrar o desfecho à automação e compare classificação com o resultado conhecido.",
+              "Revise falsos positivos e negativos com o líder sem ajustar regra para favorecer um caso isolado.",
+              "Faça a equipe assumir uma conversa, reagendar uma reunião e corrigir um critério usando a interface.",
+              "Registre aceite, divergências aceitas, pendências, dono e prazo de cada ajuste."
+            ],
+            "entregavel": "Aceite comercial e operacional.",
+            "concluidoQuando": "A concordância dos critérios está registrada e a equipe conclui três jornadas sem ajuda do implementador."
+          }
+        ],
+        "titulo": "Validar",
+        "objetivo": "Provar que atendimento, qualificação e passagem funcionam nos caminhos comuns e críticos."
+      },
+      {
+        "id": "entregar",
+        "passos": [
+          {
+            "id": "piloto-controlado",
+            "acao": "Escolha uma origem, horário ou equipe pequena, acompanhe as primeiras conversas e mantenha um caminho simples para pausar e voltar ao humano.",
+            "modelo": {
+              "titulo": "Plano do piloto",
+              "conteudo": "Recorte:\nData e horário:\nVolume esperado:\nResponsável técnico:\nResponsável operacional:\nCanal de incidente:\nPausar se:\nCritérios para ampliar:\nDecisão final: corrigir | repetir | ampliar"
+            },
+            "titulo": "Ativar um piloto controlado",
+            "atencao": "Não ligue toda a base fora do horário da equipe. O primeiro dia precisa de observação humana explícita.",
+            "duracao": "1 dia acompanhado",
+            "insumos": [
+              "Testes e aceite aprovados",
+              "Responsável humano disponível",
+              "Critérios para pausar, corrigir ou ampliar"
+            ],
+            "execucao": [
+              "Defina recorte, duração, volume esperado e responsáveis técnico e operacional.",
+              "Registre as condições que obrigam pausa imediata e teste o botão ou procedimento de contingência.",
+              "Acompanhe ao vivo as primeiras dez conversas, incluindo passagem e agenda.",
+              "Compare o lote com os critérios e decida formalmente entre corrigir, repetir ou ampliar."
+            ],
+            "entregavel": "Primeiro lote em produção.",
+            "concluidoQuando": "O lote termina sem conversa órfã, duplicidade, resposta sem fonte ou agendamento incorreto."
+          },
+          {
+            "id": "manual-indicadores",
+            "acao": "Passe acessos, responsabilidades, rotina, contingência e indicadores para o cliente e marque a primeira revisão da operação.",
+            "modelo": {
+              "titulo": "Índice do manual de operação",
+              "conteudo": "1. Escopo e resultado\n2. Canais e responsáveis\n3. Estados da conversa\n4. Base e revisão\n5. Qualificação e score\n6. Agenda e confirmação\n7. Passagem humana\n8. Contingência\n9. Indicadores\n10. Acessos e propriedade\n11. Pendências\n12. Próxima revisão"
+            },
+            "titulo": "Entregar manual e indicadores",
+            "atencao": "Código e login não são a entrega. O ativo é uma operação compreensível, mensurável e mantida por responsáveis reais.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Aprendizados do piloto",
+              "Lista final de acessos e responsáveis",
+              "Histórico de versões da base",
+              "Agenda do responsável"
+            ],
+            "execucao": [
+              "Documente em linguagem simples como a conversa entra, decide, agenda, transfere e encerra.",
+              "Entregue indicadores de volume, primeira resposta, qualificação, agenda, transferência, falha e assunto sem base.",
+              "Peça à equipe para revisar uma resposta, trocar um responsável e pausar o SDR usando apenas o manual.",
+              "Marque data, participantes e pauta da primeira revisão e registre pendências com dono e prazo."
+            ],
+            "entregavel": "Manual de operação e agenda de revisão.",
+            "concluidoQuando": "A equipe consegue revisar a base, assumir a fila, pausar o SDR e ler os indicadores sem o implementador."
+          }
+        ],
+        "titulo": "Entregar",
+        "objetivo": "Colocar no ar com um recorte controlado e deixar o cliente capaz de operar e melhorar."
+      }
+    ],
+    "escopo": {
+      "inclui": [
+        "Atendimento baseado somente em conhecimento aprovado",
+        "Qualificação por critérios confirmáveis e uma pergunta por vez",
+        "Agendamento e passagem para uma pessoa com contexto",
+        "Estados, eventos, auditoria e fila de exceções"
+      ],
+      "evolucoes": [
+        "Adicionar novas filas, unidades e agendas",
+        "Conectar outros canais mantendo o mesmo histórico",
+        "Criar inteligência de motivos, conversão e qualidade"
+      ],
+      "naoInclui": [
+        "Negociação, desconto ou fechamento comercial autônomo",
+        "Disparo em massa ou prospecção ativa pelo WhatsApp",
+        "Substituição completa do CRM ou da equipe de atendimento"
+      ],
+      "preRequisitos": [
+        "Acesso oficial ao WhatsApp Business Platform",
+        "FAQ, oferta, políticas e critérios comerciais aprovados",
+        "Uma pessoa responsável por receber transferências",
+        "Agenda e ambiente de testes separados da operação real"
+      ]
+    },
+    "perfil": {
+      "nivel": "avancado",
+      "prazo": "3 a 5 semanas",
+      "formatoPiloto": "Um número de WhatsApp, uma fila comercial e uma agenda de destino.",
+      "primeiraProva": "Vinte conversas reais concluídas sem resposta inventada, perda de contexto ou transferência sem responsável.",
+      "recomendadoParaComecar": false
+    },
+    "fundamentos": [
+      {
+        "titulo": "Uma conversa, um dono",
+        "descricao": "IA e atendente nunca disputam a mesma conversa. Toda passagem muda o estado e define uma pessoa responsável."
+      },
+      {
+        "titulo": "Fato antes de score",
+        "descricao": "A qualificação usa respostas confirmadas. Dado ausente permanece como lacuna e nunca vira pontuação positiva."
+      },
+      {
+        "titulo": "Fonte ou transferência",
+        "descricao": "O SDR responde somente com conhecimento aprovado. Sem fonte suficiente, pergunta ou transfere em vez de improvisar."
+      }
+    ],
+    "trilhaDidatica": {
+      "aulas": [
+        {
+          "titulo": "Desenhe a conversa antes de configurar o agente",
+          "duracao": "12 min",
+          "topicos": [
+            "Estados da conversa e próximo movimento permitido em cada um",
+            "Uma pergunta por vez e contexto preservado entre mensagens",
+            "Gatilhos objetivos para passagem humana e encerramento"
+          ],
+          "objetivo": "Entender a jornada real do lead e definir onde a IA responde, pergunta, espera ou entrega a conversa para uma pessoa.",
+          "recursos": [
+            {
+              "tipo": "mapa_mental",
+              "titulo": "Mapa da conversa da Nina",
+              "conteudo": "ENTRADA\n→ identificar canal, contato e intenção\n\nATENDIMENTO\n→ responder somente com fonte aprovada\n→ fazer uma pergunta por vez\n\nQUALIFICAÇÃO\n→ registrar fatos, evidências e lacunas\n\nAGENDA\n→ consultar disponibilidade real\n\nPASSAGEM HUMANA\n→ enviar resumo, histórico, responsável e prazo\n\nENCERRAMENTO\n→ registrar resultado e próximo passo",
+              "descricao": "Visualize os estados da conversa e o que precisa acontecer para o atendimento avançar com segurança."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "Você desenhou uma conversa segura?",
+              "conteudo": "1. Cada estado tem uma condição clara de entrada e saída?\n2. A Nina sabe quando não responder?\n3. Toda informação comercial aponta para uma fonte aprovada?\n4. A passagem humana carrega contexto, responsável e prazo?\n5. Uma falha de integração interrompe a conversa sem inventar um resultado?\n\nSe alguma resposta for não, corrija o desenho antes de construir.",
+              "descricao": "Use cinco perguntas rápidas para revisar a jornada antes de configurar qualquer ferramenta."
+            }
+          ],
+          "exercicio": "Selecione cinco conversas reais, marque o objetivo de cada trecho e desenhe o caminho entre entrada, qualificação, agendamento, passagem humana e encerramento.",
+          "prontoQuando": "Cada estado tem uma entrada verificável, uma saída permitida, um responsável e uma exceção que impede a automação de continuar sozinha."
+        },
+        {
+          "titulo": "Qualifique por fatos, não por intuição",
+          "duracao": "10 min",
+          "topicos": [
+            "Critério observável, pergunta correspondente e fonte da resposta",
+            "Diferença entre fato confirmado, inferência e dado ainda ausente",
+            "Efeito de cada critério na rota, sem esconder o motivo da decisão"
+          ],
+          "objetivo": "Converter o perfil de cliente ideal em perguntas, evidências e lacunas que a operação consegue registrar e revisar.",
+          "recursos": [
+            {
+              "tipo": "ebook",
+              "titulo": "Guia prático de qualificação por fatos",
+              "conteudo": "QUALIFICAÇÃO POR FATOS\n\nPara cada critério, documente:\n1. O fato que precisa ser conhecido.\n2. A pergunta usada para descobri-lo.\n3. A fonte ou evidência que confirma a resposta.\n4. O efeito daquele fato na rota comercial.\n5. O comportamento seguro quando o dado não aparecer.\n\nNunca complete uma lacuna com intuição. Marque o que ainda não foi confirmado e leve a pergunta para a próxima conversa.",
+              "descricao": "Transforme o perfil de cliente ideal em perguntas, respostas aceitas, evidências e decisões auditáveis."
+            },
+            {
+              "tipo": "modelo",
+              "titulo": "Matriz de qualificação copiável",
+              "conteudo": "Critério:\nPor que importa:\nPergunta que será feita:\nResposta aceita:\nEvidência necessária:\nEfeito na rota:\nSe o dado não aparecer:\nResponsável por revisar:\n\nRepita este bloco para cada critério do perfil de cliente ideal.",
+              "descricao": "Preencha o critério, a pergunta, a evidência exigida e o próximo movimento permitido na jornada."
+            }
+          ],
+          "exercicio": "Transforme os critérios do ICP em uma matriz com pergunta, resposta aceita, evidência necessária, impacto na rota e comportamento quando o dado não aparecer.",
+          "prontoQuando": "Uma segunda pessoa consegue ler a matriz e chegar à mesma classificação sem completar lacunas com opinião própria."
+        },
+        {
+          "titulo": "Valide a operação antes de abrir o canal",
+          "duracao": "15 min",
+          "topicos": [
+            "Base aprovada e resposta segura quando a fonte não resolve a dúvida",
+            "Cenários comuns, ambíguos, críticos e falhas de integração",
+            "Evidência, reteste e aceite humano antes da entrada em produção"
+          ],
+          "objetivo": "Aprender a testar respostas, integrações e exceções sem expor leads reais a uma automação ainda não aprovada.",
+          "recursos": [
+            {
+              "tipo": "modelo",
+              "titulo": "Matriz de testes do piloto",
+              "conteudo": "Cenário:\nTipo: comum, ambíguo, crítico ou falha de integração\nEntrada do contato:\nContexto disponível:\nResposta esperada:\nO que não pode acontecer:\nDeve passar para uma pessoa?\nEvidência registrada:\nResultado:\nCorreção aplicada:\nReteste aprovado por:",
+              "descricao": "Registre entrada, resposta esperada, limite de segurança, evidência, correção e reteste antes da ativação."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "Piloto pronto para um cliente real?",
+              "conteudo": "1. A base de conhecimento tem responsável e versão?\n2. Preço, agenda e políticas vêm de fontes reais?\n3. Os cenários críticos passam imediatamente para uma pessoa?\n4. O CRM evita contatos e eventos duplicados?\n5. Toda falha produz uma evidência reproduzível?\n6. O cliente aprovou os critérios de pausa?\n\nA ativação só acontece quando todas as respostas forem sim.",
+              "descricao": "Confirme os limites mínimos de segurança e operação antes de abrir o canal para contatos reais."
+            }
+          ],
+          "exercicio": "Rode três conversas controladas: uma comum, uma sem informação suficiente e uma que exige passagem imediata para uma pessoa.",
+          "prontoQuando": "Nenhum teste inventa preço, disponibilidade ou política, toda passagem chega com contexto e cada falha deixa uma evidência reproduzível."
+        }
+      ],
+      "materiais": [
+        {
+          "titulo": "Briefing de atendimento",
+          "conteudo": "BRIEFING DE ATENDIMENTO\n\nEmpresa e unidade:\nCanal do piloto:\nObjetivo do atendimento:\nPúblico atendido:\nPrincipais intenções de contato:\n\nOFERTA E FONTES\nProdutos ou serviços permitidos:\nFonte oficial de cada informação:\nPreços que podem ser informados:\nPolíticas que podem ser informadas:\nHorários e disponibilidade:\nLacunas conhecidas da base:\n\nLIMITES\nO agente nunca pode:\nSituações que exigem uma pessoa:\nDestino da transferência:\nResponsável principal:\nPrazo de resposta humana:\n\nOPERAÇÃO\nHorário de funcionamento:\nMensagem fora do horário:\nComo encerrar uma conversa:\nComo registrar opt-out:\nIndicador principal do piloto:\nData de revisão do briefing:",
+          "quandoUsar": "Na primeira reunião, para fechar as fontes, os limites e os responsáveis antes de discutir ferramenta."
+        },
+        {
+          "titulo": "Matriz de qualificação",
+          "conteudo": "MATRIZ DE QUALIFICAÇÃO\n\nCritério | Por que importa | Pergunta | Resposta aceita | Evidência | Efeito na rota | Se faltar dado\n\n1. Critério:\nPor que importa:\nPergunta:\nResposta aceita:\nEvidência exigida:\nEfeito na rota:\nComportamento se faltar:\n\n2. Critério:\nPor que importa:\nPergunta:\nResposta aceita:\nEvidência exigida:\nEfeito na rota:\nComportamento se faltar:\n\nREGRA FINAL\nO que define qualificado:\nO que define não aderente:\nO que exige revisão humana:\nVersão e responsável pela aprovação:",
+          "quandoUsar": "Antes de escrever prompts, para transformar o ICP em critérios que qualquer pessoa consegue auditar."
+        },
+        {
+          "titulo": "Contrato de passagem humana",
+          "conteudo": "CONTRATO DE PASSAGEM HUMANA\n\nGatilho da passagem:\nDestino responsável:\nHorário de cobertura:\nPrazo para assumir:\nEstado aceito pelo destino:\n\nPACOTE OBRIGATÓRIO\nIdentificação do contato:\nMotivo da conversa:\nFatos confirmados:\nDados ainda ausentes:\nPergunta que ficou aberta:\nÚltima mensagem do lead:\nPróxima ação sugerida:\nRisco ou urgência:\n\nCONFIRMAÇÃO\nComo o sistema confirma que uma pessoa assumiu:\nO que acontece se ninguém assumir no prazo:\nComo a conversa volta para automação:\nQuem revisa falhas de passagem:\nData da próxima revisão:",
+          "quandoUsar": "Na preparação, para impedir transferências sem dono, sem contexto ou fora do prazo combinado."
+        },
+        {
+          "titulo": "Roteiro de vinte conversas",
+          "conteudo": "ROTEIRO DE 20 CONVERSAS\n\nCaso | Tipo | Entrada | Contexto prévio | Resposta esperada | Deve perguntar? | Deve transferir? | Não pode acontecer | Evidência | Resultado | Correção | Reteste\n\nDISTRIBUIÇÃO MÍNIMA\n6 casos comuns\n4 casos com informação ausente\n3 casos ambíguos\n3 casos críticos\n2 falhas de integração\n1 opt-out\n1 retorno após passagem humana\n\nCRITÉRIOS GERAIS\n[ ] Não inventou informação\n[ ] Fez uma pergunta por vez\n[ ] Preservou o contexto\n[ ] Registrou fatos e lacunas\n[ ] Transferiu no gatilho correto\n[ ] Gerou evidência reproduzível",
+          "quandoUsar": "Na validação, para cobrir o cotidiano, as ambiguidades, os riscos e as integrações antes da ativação."
+        },
+        {
+          "titulo": "Checklist de entrada em produção",
+          "conteudo": "CHECKLIST DE ENTRADA EM PRODUÇÃO\n\nCANAL E ACESSO\n[ ] Número e conta oficial confirmados\n[ ] Webhook validado em ida e volta\n[ ] Chaves no servidor e permissões mínimas\n[ ] Ambiente de teste separado\n\nCONHECIMENTO E CONVERSA\n[ ] Base aprovada e versionada\n[ ] Lacunas conhecidas documentadas\n[ ] Limites de resposta testados\n[ ] Opt-out e encerramento funcionando\n\nINTEGRAÇÕES\n[ ] Agenda consulta disponibilidade real\n[ ] CRM evita duplicidade\n[ ] Retry não duplica mensagem ou evento\n[ ] Falha externa cria alerta\n\nPESSOAS E OPERAÇÃO\n[ ] Responsável de passagem disponível\n[ ] Prazo e contingência combinados\n[ ] Vinte conversas aprovadas\n[ ] Indicadores e rotina de revisão definidos\n\nAceite do cliente:\nResponsável técnico:\nData e janela da ativação:\nCritério de pausa imediata:",
+          "quandoUsar": "No aceite do piloto, para ativar somente quando canal, dados, exceções e pessoas estiverem realmente prontos."
+        }
+      ],
+      "tempoTotal": "35 a 45 minutos",
+      "demonstracao": {
+        "passos": [
+          {
+            "etapa": "Entrada registrada",
+            "evidencia": "Evento inbound com contato e horário",
+            "oQueAcontece": "A mensagem, o canal, a origem e o identificador do contato entram na linha do tempo antes da primeira resposta."
+          },
+          {
+            "etapa": "Resposta com fonte",
+            "evidencia": "Fonte citada e pergunta registrada",
+            "oQueAcontece": "O agente usa somente a base aprovada, responde o que está confirmado e faz uma única pergunta para avançar."
+          },
+          {
+            "etapa": "Fatos qualificados",
+            "evidencia": "Matriz com fatos e lacunas",
+            "oQueAcontece": "Necessidade, contexto, prazo e demais critérios são salvos como fatos; campos ausentes continuam explicitamente vazios."
+          },
+          {
+            "etapa": "Agenda consultada",
+            "evidencia": "Consulta e slot de origem",
+            "oQueAcontece": "A disponibilidade vem do calendário real e o horário só é apresentado quando a consulta retorna com sucesso."
+          },
+          {
+            "etapa": "Passagem humana",
+            "evidencia": "Dono, prazo e pacote de contexto",
+            "oQueAcontece": "Uma dúvida comercial fora do limite interrompe a automação e chega ao responsável com resumo, histórico e próxima ação sugerida."
+          },
+          {
+            "etapa": "CRM atualizado",
+            "evidencia": "Evento, responsável e próximo passo",
+            "oQueAcontece": "Contato, qualificação, reunião e compromisso confirmado aparecem na mesma linha do tempo sem ação comercial inventada."
+          }
+        ],
+        "titulo": "Do primeiro contato ao CRM, sem perder o contexto",
+        "contexto": "Um lead chega pelo WhatsApp perguntando preço e disponibilidade. O agente precisa entender a necessidade, qualificar o que for possível, consultar fontes reais e envolver uma pessoa quando necessário.",
+        "resultadoEsperado": "o agente não inventa preço ou agenda, a pessoa recebe todo o contexto e o CRM mostra com clareza o que aconteceu, quem assumiu e qual é o próximo passo."
+      },
+      "videosReferencia": [
+        {
+          "titulo": "Implementação de referência · Parte 1",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=d16274fc-5d9a-4729-825a-4080df4b9508",
+          "descricao": "Acompanhe a primeira parte da construção da Nina, a solução de SDR usada como referência técnica e visual para este projeto."
+        },
+        {
+          "titulo": "Implementação de referência · Parte 2",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=c250e539-a93c-4622-ac64-b2f0d0287a3e",
+          "descricao": "Continue a implementação e observe como a entrega deixa de ser uma conversa isolada para virar uma operação acompanhável."
+        }
+      ]
+    },
+    "artefatosEntrega": [
+      {
+        "titulo": "Mapa da jornada e exceções",
+        "descricao": "Caminho real da conversa, estados, responsáveis, prazos e situações que exigem uma pessoa."
+      },
+      {
+        "titulo": "Matriz de qualificação e passagem",
+        "descricao": "Critérios, perguntas, evidências, limites, destinos humanos e acordos de atendimento."
+      },
+      {
+        "titulo": "Base aprovada e contrato de resposta",
+        "descricao": "Fontes permitidas, lacunas conhecidas e comportamento seguro quando falta informação."
+      },
+      {
+        "titulo": "Suíte de vinte conversas",
+        "descricao": "Cenários comuns, ambíguos e críticos com resultado esperado, evidência e reteste."
+      },
+      {
+        "titulo": "Manual do piloto e da operação",
+        "descricao": "Ativação, monitoramento, passagem humana, contingência, indicadores e rotina de revisão."
+      }
+    ]
+  }
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { idAulaProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
+import { exemploAulaNina } from '@/lib/projetos/exemplos-nina';
 import {
   contarEtapasFeitas,
   percentual,
@@ -12,6 +13,7 @@ import {
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import { RecursosAula } from './RecursosAula';
+import { ExemploNina } from './ExemploNina';
 import styles from './ProjetoGuiadoNovo.module.css';
 
 type Trilha = NonNullable<RoteiroProjeto['trilhaDidatica']>;
@@ -43,6 +45,7 @@ export function AprendizadoProjeto({
   const [escolha, setAulaEscolhida] = useState<number | null>(null);
   const aulaEscolhida = escolha ?? primeiraPendente;
   const aula = trilha.aulas[aulaEscolhida];
+  const exemplo = aula ? exemploAulaNina(slug, aula.titulo) : null;
   const videoAbertura = videoUrl
     ? { videoUrl, titulo: `Aula de abertura · ${titulo}` }
     : (trilha.videosReferencia[0] ?? null);
@@ -122,22 +125,45 @@ export function AprendizadoProjeto({
               <header>
                 <p>Aula {String(aulaEscolhida + 1).padStart(2, '0')}</p>
                 <h3>{aula.titulo}</h3>
-                <span>{aula.objetivo}</span>
+                {!exemplo ? <span>{aula.objetivo}</span> : null}
               </header>
-              <div className={styles.aulaResumo}>
-                <section>
-                  <h4>Você vai aprender</h4>
-                  <ul>
-                    {aula.topicos.map((topico) => (
-                      <li key={topico}>{topico}</li>
-                    ))}
-                  </ul>
-                </section>
-                <section>
-                  <h4>Faça agora</h4>
-                  <p>{aula.exercicio}</p>
-                </section>
-              </div>
+              {exemplo ? (
+                <>
+                  <div className={styles.exemploAula}>
+                    <ExemploNina key={aula.titulo} exemplo={exemplo} />
+                  </div>
+                  <section className={styles.praticaAula}>
+                    <h4>Agora, com seu cliente</h4>
+                    <p>{aula.exercicio}</p>
+                  </section>
+                  <details className={styles.detalheApoio} key={aula.titulo}>
+                    <summary>
+                      O que aprender nesta aula <ChevronDown size={16} aria-hidden="true" />
+                    </summary>
+                    <p>{aula.objetivo}</p>
+                    <ul>
+                      {aula.topicos.map((topico) => (
+                        <li key={topico}>{topico}</li>
+                      ))}
+                    </ul>
+                  </details>
+                </>
+              ) : (
+                <div className={styles.aulaResumo}>
+                  <section>
+                    <h4>Você vai aprender</h4>
+                    <ul>
+                      {aula.topicos.map((topico) => (
+                        <li key={topico}>{topico}</li>
+                      ))}
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Faça agora</h4>
+                    <p>{aula.exercicio}</p>
+                  </section>
+                </div>
+              )}
               <div className={styles.aulaConclusao}>
                 <p>
                   <span>Pronto quando</span>
