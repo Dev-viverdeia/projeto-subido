@@ -16,8 +16,11 @@ const PROGRESSO: EstadoProgressoConta = {
   solucoes: {},
 };
 
-export default function PreviewCertificadoPage() {
+export default async function PreviewCertificadoPage({
+  searchParams,
+}: PageProps<'/preview/certificado'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const { longo } = await searchParams;
 
   return (
     <main className={styles.pagina}>
@@ -25,11 +28,15 @@ export default function PreviewCertificadoPage() {
         <CertificadoVista
           origem="formacao"
           slug="chatgpt-para-o-trabalho"
-          titulo="ChatGPT para o trabalho"
+          titulo={
+            longo
+              ? 'Inteligência artificial aplicada ao atendimento, qualificação de oportunidades e implementação de projetos para empresas'
+              : 'ChatGPT para o trabalho'
+          }
           aprendizadoIds={['aula-chatgpt-1', 'aula-chatgpt-2']}
           implementacaoIds={[]}
           hrefConteudo="/formacoes/chatgpt-para-o-trabalho"
-          nome="Rafael Milagre"
+          nome={longo ? 'Maria Fernanda Albuquerque de Oliveira e Vasconcelos' : 'Rafael Milagre'}
           codigoInicial="subido-preview-2026"
           siteUrl="https://subido.viverdeia.ai"
           progressoPreview={PROGRESSO}

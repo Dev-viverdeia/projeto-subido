@@ -1,235 +1,127 @@
-/* A galeria de certificados: diplomas navy no topo, progresso no meio, convite
-   quieto no fim — três temperaturas para três estados. */
-
-.galeria {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-section);
+.galeria,
+.secao {
+  display: grid;
+  gap: var(--app-gap-block);
+  min-width: 0;
 }
 
-.secao {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-4);
+.galeria {
+  gap: var(--app-gap-section);
+  container-type: inline-size;
 }
 
 .secaoTopo {
   display: flex;
   align-items: center;
-  gap: var(--via-space-2);
+  gap: var(--via-space-3);
 }
 
-/* Rótulo de seção isolado: 0.18em, o tracking de rótulo solto. */
-.secaoRotulo {
+.secaoTopo h2 {
   margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
   font-weight: var(--via-fw-medium);
-  letter-spacing: var(--via-ls-label);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+  letter-spacing: var(--app-ls-h3);
 }
 
-.secaoTotal {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding-inline: var(--via-space-1);
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy-08);
-  color: var(--via-navy);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-variant-numeric: tabular-nums;
+.secaoTopo > span,
+.rotulo {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
-/* ----------------------------------------------------------------- diplomas */
-
-/* Colunas FIXAS de 320: diploma é documento, não card de catálogo — esticar
-   até 1fr o engordava a 500+ no canvas. O auto-fill só decide a contagem. */
-.diplomas {
-  list-style: none;
+.diplomas,
+.lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-gap-block);
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 320px);
-  gap: var(--app-gap-grid);
+  list-style: none;
 }
 
-@media (max-width: 599px) {
-  .diplomas {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.card,
+.linha,
+.vazio {
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
 }
 
-/* O DIPLOMA: superfície navy com moldura interna — a gramática de documento,
-   na paleta da casa. Nada de dourado: o selo é o visto sobre navy. */
-.diploma {
-  position: relative;
-  overflow: hidden;
+.card {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-3);
-  padding: var(--app-pad-card);
-  border-radius: var(--app-radius-card);
-  border: 1px solid var(--via-navy-16);
-  background: linear-gradient(135deg, var(--via-navy) 0%, var(--via-navy-deep) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    var(--via-glow-navy);
+  min-width: 0;
+  padding: var(--via-space-3);
 }
 
-/* A moldura interna de hairline é o que faz "documento" sem nenhum ornamento:
-   um retângulo a 10px da borda, atravessando o card inteiro. */
-.moldura {
-  position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  /* Raio aninhado = externo − folga: 20 − 8 = 12. */
-  border-radius: calc(var(--app-radius-card) - 8px);
-  pointer-events: none;
+.previa {
+  flex: 1;
+  min-width: 0;
 }
 
-.diplomaTopo {
+.cardBase {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--via-space-3);
+  padding: var(--via-space-5) var(--via-space-2) var(--via-space-2);
 }
 
-.diplomaEyebrow {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-gray-400);
+.conquista {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
-/* O selo: anel de hairline com o visto dentro — conquista, sem semáforo. */
-.selo {
+.conquista svg {
+  color: var(--via-navy);
+}
+
+.abrir {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  flex-shrink: 0;
-  border-radius: var(--via-radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: var(--via-white);
-}
-
-.diplomaTitulo {
-  margin: 0;
-  min-height: 2lh; /* duas linhas reservadas: títulos de 1 e 2 linhas alinham a ficha */
-  font-size: var(--via-fs-body);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  line-height: var(--via-lh-snug);
-  color: var(--via-white);
-  text-wrap: balance;
-}
-
-.diplomaFicha {
-  margin: 0;
-  display: flex;
-  gap: var(--app-gap-block);
-}
-
-.diplomaDado {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.diplomaRotulo {
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  /* Sobre a navy a escala inverte: gray-400 (6,99:1), nunca text-faint. */
-  color: var(--via-gray-400);
-}
-
-.diplomaValor {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-sm);
-  letter-spacing: var(--app-ls-sm);
-  color: var(--via-white);
-  font-variant-numeric: tabular-nums;
-}
-
-.diplomaBase {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--via-space-3);
-  padding-top: var(--via-space-3);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-/* A marca assina o documento — minúscula, como no logotipo. */
-.marca {
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-semibold);
-  letter-spacing: -0.01em; /* token-ok: assinatura segue o desenho do logotipo, não a escala de texto */
-  color: var(--via-white);
-}
-
-/* O caminho para a folha — vivo, sobre a navy. */
-.baixar {
-  display: inline-flex;
-  align-items: center;
-  height: 28px;
-  padding-inline: var(--via-space-3);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  min-height: var(--app-h-control);
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--via-navy);
   border-radius: var(--app-radius-control);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--via-navy);
   color: var(--via-white);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
+  line-height: var(--app-lh-ui);
   text-decoration: none;
+  box-shadow: var(--app-control-shadow);
   transition:
     background-color var(--app-t-state),
-    border-color var(--app-t-state);
+    box-shadow var(--app-t-state);
 }
 
-.baixar:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.32);
+.abrir:hover {
+  background: var(--via-navy-deep);
+  box-shadow: var(--app-elev-2-shadow);
 }
 
-.baixar:focus-visible {
+.abrir:focus-visible,
+.linha:focus-visible,
+.explorar a:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring-onnavy);
-}
-
-/* ---------------------------------------------------------------- andamento */
-
-.lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
+  box-shadow: var(--app-ring);
 }
 
 .linha {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--app-gap-block);
-  padding: var(--via-space-4) var(--app-pad-card);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  flex-direction: column;
+  height: 100%;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card);
+  color: var(--via-text-primary);
   text-decoration: none;
   transition:
     border-color var(--app-t-state),
@@ -237,567 +129,170 @@
 }
 
 .linha:hover {
-  border-color: var(--app-elev-2-line);
+  border-color: var(--via-border-strong-color);
   box-shadow: var(--app-elev-2-shadow);
 }
 
-.linha:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
-}
-
-.linhaTextos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.linhaEyebrow {
+.linha h3 {
   margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.linhaTitulo {
-  margin: 0;
-  font-size: var(--via-fs-body);
+  font-size: var(--app-fs-section-title);
   font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
+  overflow-wrap: anywhere;
 }
 
-.linhaProgresso {
+.criterios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2) var(--via-space-4);
+  margin-top: auto;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+
+.progresso {
   display: flex;
   align-items: center;
   gap: var(--via-space-3);
-  flex-shrink: 0;
-}
-
-.linhaCriterios {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-2);
-}
-
-.linhaCriterios > span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding-inline: var(--via-space-2);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-chip);
-  background: var(--via-surface);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-muted);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-support);
   font-variant-numeric: tabular-nums;
 }
 
-.linhaCriterios > span[data-completo] {
-  border-color: var(--via-navy-16);
-  background: var(--via-navy-04);
-  color: var(--via-navy);
-}
-
-.trilhoBarra {
-  width: 160px;
-  height: 4px;
+.trilho {
+  display: block;
+  flex: 1;
+  height: 5px;
+  overflow: hidden;
   border-radius: var(--app-radius-track);
   background: var(--via-navy-08);
-  overflow: hidden;
 }
 
-.barra {
+.trilho > span {
   display: block;
   height: 100%;
   border-radius: inherit;
   background: var(--via-navy);
 }
 
-.linhaPct {
-  min-width: 4ch;
-  text-align: right;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-caption);
-  color: var(--via-text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.linhaAcao {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 32px;
-  padding-inline: var(--via-space-3);
-  border-left: 1px solid var(--via-border-hairline);
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-caption);
-  color: var(--via-navy);
-}
-
-/* ------------------------------------------------------------------ rodapé */
-
-/* Uma linha, não uma lista: os catálogos já listam o que não começou. */
-.rodape {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-muted);
-}
-
-.rodape a {
-  color: var(--via-accent-ink);
-  text-decoration: none;
-  font-weight: var(--via-fw-medium);
-}
-
-.rodape a:hover {
-  text-decoration: underline;
-}
-
-.rodape a:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-  border-radius: var(--app-radius-chip);
-}
-
-/* -------------------------------------------------------------------- vazio */
-
-.vazioEstado {
+.continuar {
   display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-section);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-soft);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
 }
 
 .vazio {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.58fr);
-  align-items: stretch;
-  gap: var(--app-gap-section);
-  padding: clamp(24px, 4vw, 40px);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-surface);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--via-surface) 96%, transparent),
-    color-mix(in srgb, var(--via-bg-2) 88%, transparent)
-  );
-  box-shadow: var(--app-elev-2-shadow);
-  backdrop-filter: var(--via-blur-md);
-  overflow: hidden;
-}
-
-.vazioConteudo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--via-space-3);
-  max-width: 50ch;
-}
-
-.vazioEyebrow,
-.vazioRegistroTitulo {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.vazioTitulo {
-  margin: 0;
-  font-size: clamp(var(--via-fs-h3), 2.8vw, var(--via-fs-h2));
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h2);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-  text-wrap: balance;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: var(--via-space-8);
+  padding: clamp(24px, 3vw, 48px);
 }
 
 .vazioTexto {
-  margin: 0;
-  font-size: var(--via-fs-body);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-  max-width: 44ch;
-  text-wrap: pretty;
-}
-
-.vazioAcoes {
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-3);
-  margin-top: var(--via-space-2);
-}
-
-.vazioCta {
-  display: inline-flex;
-  align-items: center;
-  height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  text-decoration: none;
-  box-shadow: var(--app-elev-1-shadow);
-  transition:
-    background-color var(--app-t-state),
-    box-shadow var(--app-t-state);
-}
-
-.vazioCta:hover {
-  background: var(--via-navy-deep);
-  box-shadow: var(--app-elev-2-shadow);
-}
-
-.vazioCta:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
-}
-
-.vazioCtaGhost {
-  display: inline-flex;
-  align-items: center;
-  height: var(--app-h-control);
-  padding-inline: var(--via-space-4);
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-control);
-  background: color-mix(in srgb, var(--via-surface) 78%, transparent);
-  color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  text-decoration: none;
-  transition:
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-state);
-}
-
-.vazioCtaGhost:hover {
-  border-color: var(--via-navy-25);
-  background: var(--via-navy-04);
-}
-
-.vazioCtaGhost:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
-.vazioRegistro {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--app-gap-block);
-  padding: var(--app-pad-card);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-card);
-  background: color-mix(in srgb, var(--via-surface) 74%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
-  backdrop-filter: var(--via-blur-sm);
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .vazioRegistro {
-    background: var(--via-surface);
-  }
-}
-
-.vazioDados {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.vazioDados > li {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: var(--via-space-4);
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
+  justify-items: start;
+  gap: var(--via-space-5);
 }
 
-.vazioDados > li + li {
-  margin-top: var(--via-space-3);
-}
-
-.vazioDados span {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.vazioDados p {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  color: var(--via-text-primary);
-  text-wrap: pretty;
-}
-
-/* A segunda metade do estado vazio resolve a pergunta que o painel escuro
-   deixava aberta: "qual caminho eu abro primeiro?". As duas recomendações
-   vêm do catálogo real e continuam sendo links completos, com foco visível. */
-.primeiroPasso {
-  display: grid;
-  grid-template-columns: minmax(240px, 0.58fr) minmax(0, 1fr);
-  gap: var(--app-gap-section);
-  align-items: start;
-}
-
-.primeiroPassoCabecalho {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-3);
-  padding: var(--via-space-2) var(--via-space-1);
-}
-
-.primeiroPassoEyebrow,
-.primeiroPassoCabecalho h2,
-.primeiroPassoCabecalho > p {
+.vazioTexto p,
+.vazioTexto h2 {
   margin: 0;
 }
 
-.primeiroPassoEyebrow {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--via-ls-label);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.primeiroPassoCabecalho h2 {
+.vazioTexto h2 {
   max-width: 18ch;
-  font-size: var(--via-fs-h3);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h3);
-  line-height: var(--via-lh-tight);
-  color: var(--via-text-primary);
-  text-wrap: balance;
-}
-
-.primeiroPassoCabecalho > p {
-  max-width: 40ch;
-  font-size: var(--via-fs-sm);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
+  color: var(--via-navy);
+  font-size: var(--via-fs-h2);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-snug);
+  letter-spacing: var(--app-ls-h2);
   text-wrap: pretty;
 }
 
-.recomendacoes {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--app-gap-grid);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.vazioTexto > p:not(.rotulo) {
+  max-width: 36ch;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-reading);
+  line-height: var(--app-lh-reading);
 }
 
-.recomendacao {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: 1fr auto;
-  gap: var(--via-space-3) var(--via-space-4);
-  min-height: 184px;
-  padding: var(--app-pad-card);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-  color: inherit;
-  text-decoration: none;
-  transition:
-    transform var(--app-t-touch),
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-touch);
-}
-
-.recomendacao:hover {
-  border-color: var(--app-elev-2-line);
-  box-shadow: var(--app-elev-2-shadow);
-  text-decoration: none;
-}
-
-.recomendacao:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
-}
-
-.recomendacaoIndice {
-  padding-top: 2px;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.recomendacaoConteudo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
+.modelo {
   min-width: 0;
 }
 
-.recomendacaoOrigem {
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+.explorar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--via-space-3) var(--via-space-6);
 }
 
-.recomendacaoConteudo strong {
-  font-size: var(--via-fs-body);
-  font-weight: 560;
-  letter-spacing: var(--app-ls-h4);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-  text-wrap: balance;
-}
-
-.recomendacaoResumo {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  font-size: var(--via-fs-caption);
-  line-height: var(--via-lh-normal);
-  letter-spacing: var(--app-ls-caption);
+.explorar a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: var(--app-h-control);
+  padding: var(--via-space-2);
+  border-radius: var(--app-radius-control);
   color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  text-decoration: none;
 }
 
-.recomendacaoMeta {
-  margin-top: auto;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.recomendacaoAcao {
-  grid-column: 2;
-  width: fit-content;
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
-  font-size: var(--via-fs-caption);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-caption);
+.explorar a:hover {
   color: var(--via-navy);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
-@media (max-width: 899px) {
-  .primeiroPasso {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--app-gap-block);
-  }
-
-  .primeiroPassoCabecalho h2 {
-    max-width: 24ch;
-  }
-}
-
-/* No telefone a linha de progresso quebra em duas: título em cima, barra
-   embaixo — a barra de 160 + contagem não cabem ao lado do título. */
-@media (max-width: 599px) {
+/* A lateral do app também ocupa espaço: a grade responde à área disponível. */
+@container (max-width: 960px) {
+  .diplomas,
   .vazio {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--app-gap-block);
-    padding: var(--app-pad-card);
   }
 
-  .vazioTitulo {
-    font-size: var(--via-fs-h3);
+  .vazioTexto h2 {
+    max-width: none;
   }
+}
 
-  .vazioAcoes {
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .vazioCta,
-  .vazioCtaGhost {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .vazioRegistro {
-    padding: var(--app-pad-card-tight);
-  }
-
-  .linha {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--via-space-3);
-  }
-
-  .linhaProgresso {
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-
-  .linhaCriterios {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .trilhoBarra {
-    flex: 1;
-    width: auto;
-  }
-
-  .linhaAcao {
-    min-height: 28px;
-    border-left: 0;
-    padding-inline: 0;
-  }
-
-  .primeiroPasso,
-  .recomendacoes {
+@media (max-width: 600px) {
+  .lista {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .primeiroPasso {
-    gap: var(--app-gap-block);
+  .cardBase {
+    padding-inline: var(--via-space-1);
   }
 
-  .primeiroPassoCabecalho {
-    padding-inline: 0;
+  .cardBase .abrir {
+    width: 100%;
   }
 
-  .recomendacao {
-    min-height: 168px;
+  .vazio {
+    padding: var(--via-space-4);
+  }
+
+  .vazioTexto {
+    padding: var(--via-space-2);
+  }
+
+  .galeria {
+    gap: var(--via-space-8);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .linha,
-  .baixar,
-  .vazioCta,
-  .vazioCtaGhost,
-  .recomendacao {
+  .abrir,
+  .linha {
     transition: none;
-  }
-
-  .recomendacao:hover {
-    transform: none;
   }
 }

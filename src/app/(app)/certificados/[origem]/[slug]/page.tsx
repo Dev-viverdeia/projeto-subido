@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { carregarCertificavel, type OrigemCertificado } from '@/lib/certificados/conteudo';
 import { createClient } from '@/lib/supabase/server';
-import { CabecalhoPagina } from '../../../_components/CabecalhoPagina';
 import { CertificadoVista } from '../../_components/CertificadoVista';
 
 /**
@@ -63,7 +62,6 @@ export default async function CertificadoPage({
 
   return (
     <>
-      <CabecalhoPagina titulo="Certificado" oculto />
       <CertificadoVista
         origem={origem}
         slug={slug}

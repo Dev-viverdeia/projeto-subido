@@ -32,7 +32,7 @@ export function ViverDeIaLogo({
         ['--via-logo-word' as string]: `${medida.word}px`,
       }}
       role="img"
-      aria-label="Viver de IA Subido"
+      aria-label={produto ? 'Viver de IA Subido' : 'Viver de IA'}
     >
       <Image
         src={`/brand/via/monogram-${claro ? 'white' : 'navy'}.png`}

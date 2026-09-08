@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { listarFormacoes, listarSolucoes } from '@/lib/conteudo/queries';
-import { EvolucaoProfissional } from '../_components/EvolucaoProfissional';
+import { CabecalhoPagina } from '../_components/CabecalhoPagina';
+import { createClient } from '@/lib/supabase/server';
 import entrada from '../_components/entrada.module.css';
 import { GaleriaCertificados } from './_components/GaleriaCertificados';
 import styles from './pagina.module.css';
@@ -19,20 +20,29 @@ export const metadata: Metadata = { title: 'Certificados' };
  * client porque reage às marcações otimistas sem esperar uma nova navegação.
  */
 export default async function CertificadosPage() {
-  const [formacoes, solucoes] = await Promise.all([listarFormacoes(), listarSolucoes()]);
+  const supabase = await createClient();
+  const [formacoes, solucoes, { data }] = await Promise.all([
+    listarFormacoes(),
+    listarSolucoes(),
+    supabase.auth.getClaims(),
+  ]);
+  const nomeMetadata: unknown = data?.claims?.user_metadata?.nome;
+  const nome =
+    typeof nomeMetadata === 'string' && nomeMetadata.trim()
+      ? nomeMetadata.trim()
+      : (data?.claims?.email ?? 'Seu nome');
 
   return (
     <div className={styles.pagina}>
       <div className={entrada.bloco}>
-        <EvolucaoProfissional
-          etapa="certificados"
-          titulo="Comprove o que você concluiu."
-          descricao="Cada certificado vira uma prova pública do que você aprendeu e implementou."
+        <CabecalhoPagina
+          titulo="Certificados"
+          descricao="Suas conquistas, prontas para compartilhar."
         />
       </div>
 
       <div className={`${entrada.bloco} ${entrada.atraso1}`}>
-        <GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />
+        <GaleriaCertificados formacoes={formacoes} solucoes={solucoes} nome={nome} />
       </div>
     </div>
   );
