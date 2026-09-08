@@ -17,7 +17,7 @@ describe('documento co-branded', () => {
     expect(screen.getByText('Certificado de demonstração')).toBeInTheDocument();
     expect(screen.getByText('Prévia ilustrativa · sem validade')).toBeInTheDocument();
     expect(screen.queryByText('Concluído em')).not.toBeInTheDocument();
-    expect(screen.queryByText(/pela conclusão/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/pela conclusão/i)).not.toBeInTheDocument();
   });
   it('preserva as marcas oficiais e os dados reais de verificação', () => {
     render(

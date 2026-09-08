@@ -185,7 +185,7 @@ describe('emissão de certificado', () => {
         (_conteudo, elemento) =>
           elemento?.tagName === 'P' &&
           elemento.textContent ===
-            'pela conclusão do aprendizado e da implementação guiada do projeto',
+            'Pela conclusão do aprendizado e da implementação guiada do projeto',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Aulas').parentElement).toHaveTextContent('1/1');

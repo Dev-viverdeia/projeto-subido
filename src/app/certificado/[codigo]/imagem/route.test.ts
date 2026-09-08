@@ -46,4 +46,21 @@ describe('imagem pública do certificado', () => {
     expect(resposta.headers.get('Cache-Control')).toBe('no-store');
     expect(await resposta.text()).not.toContain('detalhe interno');
   });
+  it('falha do PNG retorna uma resposta recuperável sem expor o renderer', async () => {
+    vi.mocked(buscarCertificadoPublico).mockResolvedValue({
+      nome: 'Pessoa Teste',
+      titulo: 'IA aplicada',
+      codigo: 'registro',
+      origem: 'formacao',
+      slug: 'ia',
+      concluido_em: '2026-09-08T12:00:00Z',
+      emitido_em: '2026-09-08T12:00:00Z',
+    });
+    vi.mocked(criarImagemCertificado).mockRejectedValue(new Error('erro interno do renderer'));
+    const resposta = await chamar();
+    expect(resposta.status).toBe(503);
+    expect(resposta.headers.get('Cache-Control')).toBe('no-store');
+    expect(resposta.headers.get('Retry-After')).toBe('30');
+    expect(await resposta.text()).not.toContain('erro interno');
+  });
 });

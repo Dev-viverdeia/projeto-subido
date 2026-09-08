@@ -16,15 +16,16 @@ type Dados = { nome: string; titulo: string; concluido_em: string; origem: strin
 export async function criarImagemCertificado(dados: Dados, modelo = false) {
   const apresentacao = apresentacaoCertificado(dados.nome);
   const ilustrativo = modelo || apresentacao.demonstracao;
-  const [monograma, wordmark] = await Promise.all([
+  const [monograma, wordmark, monogramaClaro] = await Promise.all([
     readFile(join(process.cwd(), 'public/brand/via/monogram-navy.png'), 'base64'),
     readFile(join(process.cwd(), 'public/brand/via/wordmark-navy.png'), 'base64'),
+    readFile(join(process.cwd(), 'public/brand/via/monogram-white.png'), 'base64'),
   ]);
   const data = new Intl.DateTimeFormat('pt-BR', {
     dateStyle: 'long',
     timeZone: 'America/Sao_Paulo',
   }).format(new Date(dados.concluido_em));
-  return new ImageResponse(
+  const imagem = new ImageResponse(
     <div
       style={{
         display: 'flex',
@@ -41,14 +42,44 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
           flexDirection: 'column',
           width: '100%',
           height: '100%',
-          padding: '38px 52px',
+          padding: '38px 242px 38px 52px',
           background: DOCUMENT.paper,
           border: `1px solid ${DOCUMENT.line}`,
-          borderLeft: `8px solid ${CST.navy}`,
-          borderRadius: 8,
+          borderRadius: 12,
+          position: 'relative',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 172,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '0 12px 12px 0',
+            background: `linear-gradient(155deg, ${CST.blue}, ${CST.navyDeep} 66%)`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              width: 124,
+              height: 124,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              border: `1px solid ${DOCUMENT.coverMid}`,
+              background: `linear-gradient(135deg, ${DOCUMENT.coverLine}, ${CST.navyDeep})`,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`data:image/png;base64,${monogramaClaro}`} width={76} height={42} alt="" />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 22, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <svg width="30" height="30" viewBox="0 0 64 64">
               <path
@@ -57,17 +88,18 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
               />
               <path d="M21 20h27v27H38V34L26 46l-8-8 12-12h-9V20Z" fill={CST.white} />
             </svg>
-            <span style={{ fontSize: 30, letterSpacing: -1.2 }}>subido</span>
+            <span style={{ fontSize: 30, letterSpacing: -1.2, fontWeight: 600 }}>subido</span>
           </div>
+          <div style={{ width: 1, height: 28, background: DOCUMENT.line }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {/* Satori requer img nativo; assets locais oficiais, nunca URL fornecida pelo usuário. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`data:image/png;base64,${monograma}`} width={51} height={28} alt="" />
+            <img src={`data:image/png;base64,${monograma}`} width={42} height={23} alt="" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`data:image/png;base64,${wordmark}`}
-              width={168}
-              height={14}
+              width={144}
+              height={12}
               alt="Viver de IA"
             />
           </div>
@@ -78,8 +110,8 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
             flex: 1,
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
+            alignItems: 'flex-start',
+            textAlign: 'left',
           }}
         >
           <div style={{ fontSize: 22, color: DOCUMENT.faint, marginBottom: 22 }}>
@@ -95,7 +127,7 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
                 apresentacao.nome.length > 90 ? 34 : apresentacao.nome.length > 45 ? 44 : 62,
               letterSpacing: -1.7,
               lineHeight: 1.12,
-              maxWidth: 990,
+              maxWidth: 846,
               wordBreak: 'break-word',
             }}
           >
@@ -113,7 +145,7 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
               marginTop: 8,
               fontSize: dados.titulo.length > 90 ? 26 : 32,
               lineHeight: 1.2,
-              maxWidth: 930,
+              maxWidth: 846,
               wordBreak: 'break-word',
             }}
           >
@@ -144,4 +176,10 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
       },
     },
   );
+  // Concluir o PNG antes de enviar headers permite que a rota devolva seu 503
+  // recuperável se o renderer falhar, em vez de interromper uma resposta 200.
+  return new Response(await imagem.arrayBuffer(), {
+    status: imagem.status,
+    headers: imagem.headers,
+  });
 }

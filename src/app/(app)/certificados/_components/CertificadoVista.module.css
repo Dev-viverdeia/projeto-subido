@@ -185,6 +185,13 @@
    impressora é desperdício, e navegadores descartam fundos por padrão. */
 .folha {
   min-width: 0;
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: calc(
+    var(--app-radius-control) + 12px
+  ); /* token-ok: cantos concêntricos com a folha e 12px de suporte */
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
 }
 
 .resumoConclusao {
@@ -412,6 +419,8 @@
     inset: 0;
     width: 297mm;
     height: 210mm;
+    padding: 0;
+    background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
@@ -436,6 +445,12 @@
 }
 
 @media screen and (max-width: 767px) {
+  .folha {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: none;
+  }
   .acoes {
     align-items: stretch;
     flex-direction: column;

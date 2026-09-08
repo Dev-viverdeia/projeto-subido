@@ -1,6 +1,7 @@
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
 import { BadgeCheck } from 'lucide-react';
+import Image from 'next/image';
 import { apresentacaoCertificado } from '@/lib/certificados/apresentacao';
 import styles from './DocumentoCertificado.module.css';
 
@@ -42,8 +43,20 @@ export function DocumentoCertificado({
       data-modelo={modelo || undefined}
       aria-label={modelo ? 'Modelo de certificado' : `Certificado de ${titulo}`}
     >
+      <div className={styles.assinaturaVisual} aria-hidden="true">
+        <div className={styles.placa}>
+          <Image
+            src="/brand/via/monogram-white.png"
+            width={434}
+            height={239}
+            alt=""
+            loading="eager"
+          />
+        </div>
+      </div>
       <header className={styles.marcas}>
-        <SubidoLogo size={compacto ? 18 : 24} className={styles.subidoMarca} />
+        <SubidoLogo size={compacto ? 16 : 20} className={styles.subidoMarca} />
+        <span className={styles.separadorMarcas} aria-hidden="true" />
         <ViverDeIaLogo className={styles.viaMarca} size="default" produto={false} />
       </header>
 
@@ -59,7 +72,7 @@ export function DocumentoCertificado({
           {apresentacao.nome}
         </p>
         <p className={styles.concluiu}>
-          {ilustrativo ? 'Prévia' : 'pela conclusão'}{' '}
+          {ilustrativo ? 'Prévia' : 'Pela conclusão'}{' '}
           {origem === 'formacao'
             ? 'da formação'
             : 'do aprendizado e da implementação guiada do projeto'}
@@ -68,22 +81,11 @@ export function DocumentoCertificado({
       </div>
 
       <footer className={styles.base}>
-        <div className={styles.emissor}>
-          <strong>Subido + Viver de IA</strong>
-          <span>
-            {origem === 'formacao'
-              ? 'Formação em inteligência artificial'
-              : 'Projeto aplicado de inteligência artificial'}
-          </span>
-        </div>
         {data ? (
           <div className={styles.data}>
             <span>{ilustrativo ? 'Data ilustrativa' : 'Concluído em'}</span>
             <time dateTime={concluidoEm!}>{data}</time>
           </div>
-        ) : null}
-        {ilustrativo ? (
-          <span className={styles.avisoModelo}>Prévia ilustrativa · sem validade</span>
         ) : null}
         {codigo ? (
           <div className={styles.codigo}>
@@ -93,6 +95,9 @@ export function DocumentoCertificado({
             </span>
             <code>{codigo}</code>
           </div>
+        ) : null}
+        {ilustrativo ? (
+          <span className={styles.avisoModelo}>Prévia ilustrativa · sem validade</span>
         ) : null}
       </footer>
     </article>
