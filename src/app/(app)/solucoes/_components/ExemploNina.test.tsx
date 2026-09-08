@@ -6,7 +6,7 @@ import { lerRoteiroProjeto } from '@/lib/projetos/roteiro';
 import { ContextoProgresso } from '@/lib/progresso/local';
 import { PROGRESSO_VAZIO } from '@/lib/progresso/estado';
 import { exemplosPassosNina, NINA_SLUG } from '@/lib/projetos/exemplos-nina';
-import { ExemploNina } from './ExemploNina';
+import { ExemploProjeto } from './ExemploProjeto';
 import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
 import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
@@ -17,7 +17,7 @@ const passo = roteiro.fases[0]!.passos[0]!;
 describe('Leitura visual da Nina', () => {
   it('troca cenários pelo teclado e identifica o conteúdo como exemplo', async () => {
     const user = userEvent.setup();
-    render(<ExemploNina exemplo={exemplosPassosNina['registrar-responder']} />);
+    render(<ExemploProjeto exemplo={exemplosPassosNina['registrar-responder']} />);
     expect(screen.getByText('Exemplo didático')).toBeVisible();
     const semFonte = screen.getByRole('button', { name: 'Sem fonte' });
     semFonte.focus();

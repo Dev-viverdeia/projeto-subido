@@ -34,6 +34,7 @@ import {
 } from '../projetos/fixture';
 import { ProgressoPreview } from '../ProgressoPreview';
 import ninaFixture from '../nina/fixture.json';
+import prospeccaoFixture from '../prospeccao-projeto/fixture.json';
 import { lerRoteiroProjeto } from '@/lib/projetos/roteiro';
 import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 import { ControlesPreview } from './ControlesPreview';
@@ -200,14 +201,31 @@ export default async function PreviewShellPage({
               )
             ) : tela === 'projeto' ? (
               <ProjetoGuiado
-                slug="sdr-atendimento-qualificacao"
-                titulo="Atendimento no WhatsApp com IA"
-                resumo="Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe."
+                slug={
+                  params.estado === 'prospeccao'
+                    ? 'maquina-prospeccao-b2b'
+                    : 'sdr-atendimento-qualificacao'
+                }
+                titulo={
+                  params.estado === 'prospeccao'
+                    ? 'Prospecção de clientes com IA'
+                    : 'Atendimento no WhatsApp com IA'
+                }
+                resumo={
+                  params.estado === 'prospeccao'
+                    ? 'Encontre empresas com perfil e prepare uma lista revisada para vendas.'
+                    : 'Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe.'
+                }
                 categoria="Automação com IA"
                 projeto={
                   params.estado === 'nina'
                     ? { ...ninaFixture, roteiro: lerRoteiroProjeto(ninaFixture.roteiro)! }
-                    : projetoPreview
+                    : params.estado === 'prospeccao'
+                      ? {
+                          ...prospeccaoFixture,
+                          roteiro: lerRoteiroProjeto(prospeccaoFixture.roteiro)!,
+                        }
+                      : projetoPreview
                 }
                 ferramentas={ferramentasPreview}
                 prompts={promptsPreview}

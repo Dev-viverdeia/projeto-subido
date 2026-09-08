@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { idAulaProjeto, type RoteiroProjeto } from '@/lib/projetos/roteiro';
-import { exemploAulaNina } from '@/lib/projetos/exemplos-nina';
+import { exemploAulaProjeto } from '@/lib/projetos/exemplos';
 import {
   contarEtapasFeitas,
   percentual,
@@ -13,7 +13,7 @@ import {
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { VideoConteudo } from '../../_components/VideoConteudo';
 import { RecursosAula } from './RecursosAula';
-import { ExemploNina } from './ExemploNina';
+import { ExemploProjeto } from './ExemploProjeto';
 import styles from './ProjetoGuiadoNovo.module.css';
 
 type Trilha = NonNullable<RoteiroProjeto['trilhaDidatica']>;
@@ -45,7 +45,7 @@ export function AprendizadoProjeto({
   const [escolha, setAulaEscolhida] = useState<number | null>(null);
   const aulaEscolhida = escolha ?? primeiraPendente;
   const aula = trilha.aulas[aulaEscolhida];
-  const exemplo = aula ? exemploAulaNina(slug, aula.titulo) : null;
+  const exemplo = aula ? exemploAulaProjeto(slug, aula.titulo) : null;
   const videoAbertura = videoUrl
     ? { videoUrl, titulo: `Aula de abertura · ${titulo}` }
     : (trilha.videosReferencia[0] ?? null);
@@ -130,7 +130,7 @@ export function AprendizadoProjeto({
               {exemplo ? (
                 <>
                   <div className={styles.exemploAula}>
-                    <ExemploNina key={aula.titulo} exemplo={exemplo} />
+                    <ExemploProjeto key={aula.titulo} exemplo={exemplo} />
                   </div>
                   <section className={styles.praticaAula}>
                     <h4>Agora, com seu cliente</h4>

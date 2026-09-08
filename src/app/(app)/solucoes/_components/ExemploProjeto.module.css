@@ -1,5 +1,5 @@
 .exemplo {
-  container: nina-exemplo / inline-size;
+  container: projeto-exemplo / inline-size;
   min-width: 0;
   color: var(--via-text-primary);
 }
@@ -165,6 +165,83 @@
   outline: none;
   box-shadow: var(--app-ring);
 }
+.analise {
+  overflow: hidden;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
+}
+.empresa {
+  display: grid;
+  gap: var(--via-space-2);
+  padding: var(--via-space-5);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+.empresa > span {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.empresa > strong {
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+}
+.criterios {
+  margin: 0;
+  padding: 0 var(--via-space-5);
+}
+.criterios > div {
+  padding: var(--via-space-4) 0;
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+.criterios dt {
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+  margin-bottom: var(--via-space-2);
+}
+.criterios dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin: 0;
+  font-size: var(--app-fs-ui);
+  line-height: 1.5;
+}
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  flex-shrink: 0;
+  padding: var(--via-space-1) var(--via-space-2);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.estado[data-estado='confirmado'] {
+  background: var(--via-navy-06);
+  color: var(--via-text-primary);
+}
+.estado[data-estado='desconhecido'] {
+  border-style: dashed;
+}
+.resultado {
+  padding: var(--via-space-5);
+  background: var(--via-navy-04);
+}
+.resultado strong {
+  font-size: var(--app-fs-reading);
+  font-weight: var(--via-fw-medium);
+}
+.exemplo .resultado p {
+  margin: var(--via-space-2) 0 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
 .conversa {
   display: grid;
   gap: var(--via-space-4);
@@ -262,7 +339,7 @@
   }
 }
 /* O menu lateral e a navegação de fases também consomem largura em notebooks. */
-@container nina-exemplo (max-width: 600px) {
+@container projeto-exemplo (max-width: 600px) {
   .fluxo {
     grid-template-columns: 1fr;
     gap: var(--via-space-5);
@@ -287,7 +364,7 @@
     color: var(--via-text-muted);
   }
 }
-@container nina-exemplo (max-width: 440px) {
+@container projeto-exemplo (max-width: 440px) {
   .ficha {
     grid-template-columns: 1fr;
   }
