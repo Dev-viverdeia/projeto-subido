@@ -10,6 +10,7 @@ import {
   useProgresso,
 } from '@/lib/progresso/local';
 import { GuiaExecucaoPasso } from './GuiaExecucaoPasso';
+import { exemploPassoNina } from '@/lib/projetos/exemplos-nina';
 import styles from './ProjetoGuiadoNovo.module.css';
 
 export function ImplementacaoProjeto({
@@ -157,8 +158,11 @@ export function ImplementacaoProjeto({
                 </span>
               ) : null}
             </div>
-            <p className={styles.passoAcao}>{passoAtivo.acao}</p>
+            {!exemploPassoNina(slug, passoAtivo.id) ? (
+              <p className={styles.passoAcao}>{passoAtivo.acao}</p>
+            ) : null}
             <GuiaExecucaoPasso
+              exemplo={exemploPassoNina(slug, passoAtivo.id)}
               key={passoAtivoId}
               passo={passoAtivo}
               concluido={Boolean(progresso.etapas[passoAtivoId])}

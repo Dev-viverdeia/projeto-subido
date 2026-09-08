@@ -9,27 +9,42 @@ import {
   ClipboardList,
   FileCheck2,
   Play,
+  PanelsTopLeft,
 } from 'lucide-react';
 import type { PassoProjeto } from '@/lib/projetos/roteiro';
+import type { ExemploNina as Exemplo } from '@/lib/projetos/exemplos-nina';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
+import { ExemploNina } from './ExemploNina';
 import styles from './LeituraProjeto.module.css';
 
 export function GuiaExecucaoPasso({
   passo,
   concluido,
+  exemplo,
 }: {
   passo: PassoProjeto;
   concluido: boolean;
+  exemplo?: Exemplo | null;
 }) {
-  const [aba, setAba] = useState<'insumos' | 'execucao' | 'conferencia'>(
-    concluido ? 'conferencia' : 'execucao',
+  const [aba, setAba] = useState<'exemplo' | 'insumos' | 'execucao' | 'conferencia'>(
+    concluido ? 'conferencia' : exemplo ? 'exemplo' : 'execucao',
   );
   const [acao, setAcao] = useState(0);
   const acoes = passo.execucao.length ? passo.execucao : [passo.acao];
 
   return (
     <section className={styles.guia} aria-label="Guia de execução">
-      <nav className={styles.modulos} aria-label="Como executar este passo">
+      <nav
+        className={styles.modulos}
+        data-com-exemplo={Boolean(exemplo) || undefined}
+        aria-label="Como executar este passo"
+      >
+        {exemplo ? (
+          <button type="button" aria-pressed={aba === 'exemplo'} onClick={() => setAba('exemplo')}>
+            <PanelsTopLeft size={18} aria-hidden="true" />
+            Exemplo
+          </button>
+        ) : null}
         <button type="button" aria-pressed={aba === 'insumos'} onClick={() => setAba('insumos')}>
           <ClipboardList size={18} aria-hidden="true" />
           Separar
@@ -48,7 +63,16 @@ export function GuiaExecucaoPasso({
         </button>
       </nav>
       <div className={styles.corpoGuia}>
-        {aba === 'insumos' ? (
+        {aba === 'exemplo' && exemplo ? (
+          <>
+            <ExemploNina exemplo={exemplo} />
+            <div className={styles.navegar}>
+              <button type="button" onClick={() => setAba('insumos')}>
+                Preparar este passo <ArrowRight size={17} aria-hidden="true" />
+              </button>
+            </div>
+          </>
+        ) : aba === 'insumos' ? (
           <section>
             <h4>Separe antes de começar</h4>
             {passo.insumos.length ? (
@@ -63,6 +87,13 @@ export function GuiaExecucaoPasso({
             ) : (
               <p>Este passo não pede materiais adicionais.</p>
             )}
+            {exemplo ? (
+              <div className={styles.navegar}>
+                <button type="button" onClick={() => setAba('execucao')}>
+                  Ir para execução <ArrowRight size={17} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
           </section>
         ) : aba === 'conferencia' ? (
           <dl className={styles.conferencia}>
@@ -140,6 +171,14 @@ export function GuiaExecucaoPasso({
                     <li key={i}>{item}</li>
                   ))}
                 </ol>
+              </details>
+            ) : null}
+            {exemplo ? (
+              <details className={styles.detalhe}>
+                <summary>
+                  Orientação deste passo <ChevronDown size={17} aria-hidden="true" />
+                </summary>
+                <p>{passo.acao}</p>
               </details>
             ) : null}
           </>
