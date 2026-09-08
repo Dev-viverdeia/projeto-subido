@@ -114,7 +114,7 @@
   gap: var(--via-space-2);
 }
 .identidade small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font: var(--app-fs-meta) var(--via-font-mono);
 }
 
@@ -340,7 +340,7 @@
   font-weight: var(--via-fw-medium);
 }
 .campo > span small {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-weight: 400;
 }
 .campo input,
@@ -397,7 +397,7 @@
   font-size: var(--via-fs-sm);
 }
 .listaTopo span {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
 .listaTopo button,
@@ -463,7 +463,7 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   cursor: pointer;
 }
 .itemEscopo > button {
@@ -564,7 +564,7 @@
   line-height: 1.5;
 }
 .decisao .sobretitulo {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
 }
 .acoesStatus {
   flex: 0 0 auto;
@@ -636,7 +636,7 @@
 
 .metricaVisualizacao small {
   grid-column: 1 / -1;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font: var(--via-fs-micro) var(--via-font-mono);
   text-align: right;
   text-transform: uppercase;
@@ -702,7 +702,7 @@
 
 .acoesCompartilhamento > span {
   margin-left: auto;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
 }
 
@@ -735,7 +735,7 @@
 
 .retornoCliente span {
   margin-top: 3px;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-micro);
 }
 
