@@ -1,138 +1,152 @@
-/* Papel com hierarquia própria; o vidro é o suporte, nunca a tinta do documento. */
+/* Folha editorial: conteúdo à esquerda e assinatura institucional à direita.
+   O monograma é identidade visual, não selo ou alegação de acreditação. */
 .documento {
   container: certificado / inline-size;
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-width: 0;
   aspect-ratio: 297 / 210;
   gap: var(--via-space-7);
-  padding: clamp(28px, 4vw, 56px);
+  padding: clamp(24px, 4vw, 56px);
+  padding-inline-end: 22%;
   border: 1px solid var(--via-border);
-  border-inline-start: 8px solid var(--via-navy);
-  border-radius: var(--app-radius-chip);
+  border-radius: var(--app-radius-control);
   background: var(--via-white);
   color: var(--via-navy);
   box-shadow: var(--app-elev-1-shadow);
 }
 
+.assinaturaVisual {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 15%;
+  border-radius: 0 var(--app-radius-control) var(--app-radius-control) 0;
+  background: linear-gradient(155deg, var(--via-blue), var(--via-navy-deep) 66%);
+  box-shadow: inset 1px 0 0 var(--via-navy-16);
+  pointer-events: none;
+}
+.placa {
+  display: grid;
+  place-items: center;
+  width: 76%;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--via-white) 30%, transparent);
+  border-radius: var(--app-radius-card);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--via-white) 16%, transparent),
+    color-mix(in srgb, var(--via-white) 4%, transparent)
+  );
+  box-shadow:
+    inset 1px 1px 0 color-mix(in srgb, var(--via-white) 16%, transparent),
+    0 12px 28px var(--via-navy-16);
+}
+.placa img {
+  display: block;
+  width: 60%;
+  height: auto;
+}
 .marcas {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--via-space-5);
   min-width: 0;
 }
-
+.separadorMarcas {
+  width: 1px;
+  height: 28px;
+  background: var(--via-border);
+}
 .subidoMarca svg {
   filter: none;
+  transform: none !important;
+}
+.viaMarca {
+  gap: var(--via-space-2);
 }
 .viaMarca img:first-child {
-  height: clamp(18px, 3.5cqi, 28px);
+  height: 23px;
 }
 .viaMarca img:last-child {
-  height: clamp(10px, 1.7cqi, 14px);
+  height: 12px;
 }
-
 .corpo {
   display: flex;
   flex: 1;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding-block: var(--via-space-5);
-  text-align: center;
+  text-align: start;
 }
-
 .documento p,
 .titulo {
   margin: 0;
 }
-
 .tipo {
   color: var(--via-text-muted);
-  font-size: clamp(16px, 2.8cqi, 24px); /* token-ok: escala proporcional à folha, não à viewport */
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-h3);
+  font-size: clamp(16px, 2.6cqi, 21px); /* token-ok: proporcional à área útil da folha */
+  font-weight: var(--via-fw-regular);
   line-height: var(--via-lh-snug);
 }
-
 .documento .nome {
-  max-width: 24ch;
-  margin-block: var(--via-space-7) var(--via-space-5);
+  max-width: 100%;
+  margin-block: var(--via-space-6) var(--via-space-5);
   color: var(--via-navy);
   font-family: var(--via-font-display);
-  font-size: clamp(28px, 7cqi, 64px); /* token-ok: nome é o protagonista do documento */
+  font-size: clamp(32px, 8.8cqi, 66px); /* token-ok: nome é o protagonista da credencial */
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h1);
   line-height: var(--via-lh-tight);
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
-
 .documento .nome[data-extenso] {
-  font-size: clamp(26px, 5.8cqi, 48px); /* token-ok: preserva nomes extensos sem corte */
+  font-size: clamp(28px, 6.4cqi, 48px); /* token-ok: nomes extensos permanecem inteiros */
 }
-
 .concluiu {
-  max-width: 48ch;
+  max-width: 44ch;
   color: var(--via-text-muted);
   font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }
-
 .documento .titulo {
-  max-width: 40ch;
+  max-width: 100%;
   margin-top: var(--via-space-3);
   color: var(--via-navy);
-  font-size: clamp(20px, 3.6cqi, 30px); /* token-ok: título editorial na proporção da folha */
+  font-size: clamp(21px, 4.2cqi, 30px); /* token-ok: assunto legível, subordinado ao nome */
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-snug);
   overflow-wrap: anywhere;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
-
 .base {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--via-space-4);
+  gap: var(--via-space-5);
   padding-top: var(--via-space-5);
   border-top: 1px solid var(--via-border);
   color: var(--via-text-muted);
   font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
-
-.emissor,
-.data {
+.data,
+.codigo {
   display: grid;
-  gap: var(--via-space-1);
+  gap: var(--via-space-2);
+  min-width: 0;
 }
-.emissor strong,
 .data time {
   color: var(--via-navy);
   font-weight: var(--via-fw-medium);
-}
-.data {
-  text-align: end;
-}
-.codigo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--via-space-2) var(--via-space-4);
-  flex-basis: 100%;
-  margin-top: var(--via-space-2);
-  padding-top: var(--via-space-4);
-  border-top: 1px solid var(--via-border);
-  font-size: var(--app-fs-support);
-  overflow-wrap: anywhere;
 }
 .codigo > span {
   display: inline-flex;
@@ -147,46 +161,40 @@
   color: var(--via-navy);
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-caption);
+  overflow-wrap: anywhere;
 }
 .avisoModelo {
   flex-basis: 100%;
   color: var(--via-navy);
-  text-align: center;
 }
-
 .documento[data-compacto] {
   height: 100%;
-  padding: var(--via-space-6);
   gap: var(--via-space-5);
-  border-inline-start-width: 5px;
+  padding: var(--via-space-6);
+  padding-inline-end: 22%;
 }
-
 [data-compacto] .corpo {
   padding-block: var(--via-space-4);
 }
 [data-compacto] .nome {
-  margin-block: var(--via-space-5) var(--via-space-3);
-}
-[data-compacto] .emissor,
-[data-compacto] .data > span {
-  display: none;
+  margin-block: var(--via-space-4) var(--via-space-3);
 }
 [data-compacto] .base {
-  justify-content: center;
   padding-top: var(--via-space-4);
 }
-
-@container certificado (max-width: 399px) {
+/* O card preserva as duas marcas; a placa não carrega informação. */
+@container certificado (max-width: 599px) {
   .marcas {
-    justify-content: center;
+    gap: var(--via-space-3);
     flex-wrap: wrap;
-    gap: var(--via-space-3) var(--via-space-5);
+  }
+  .subidoMarca,
+  .viaMarca,
+  .separadorMarcas {
+    flex-shrink: 0;
   }
   .subidoMarca {
-    --subido-logo-size: 16px !important; /* token-ok: mantém as duas marcas legíveis na folha estreita */
-  }
-  .viaMarca {
-    gap: var(--via-space-2);
+    --subido-logo-size: 16px !important; /* token-ok: as duas marcas cabem desde 320px */
   }
   .viaMarca img:first-child {
     height: 18px;
@@ -194,50 +202,55 @@
   .viaMarca img:last-child {
     height: 10px;
   }
+  .placa {
+    border-radius: var(--app-radius-control);
+  }
   .base {
-    justify-content: center;
-    text-align: center;
-  }
-  .data {
-    text-align: center;
-  }
-  .codigo {
-    justify-content: center;
-  }
-  .emissor > span {
-    max-width: 30ch;
+    gap: var(--via-space-4);
   }
 }
-
+/* Quando as marcas ocupam duas linhas, o filete deixa de separar conteúdos. */
+@container certificado (max-width: 280px) {
+  .separadorMarcas {
+    display: none;
+  }
+}
 @media screen and (max-width: 599px) {
   .documento,
   .documento[data-compacto] {
     aspect-ratio: auto;
-    padding: var(--via-space-5);
+    padding: var(--via-space-6) var(--via-space-5);
     gap: var(--via-space-6);
   }
+  .assinaturaVisual {
+    display: none;
+  }
+  .documento {
+    border-top: 4px solid var(--via-navy);
+  }
 }
-
 @media print {
   .documento:not([data-compacto]) {
     width: 297mm;
     height: 209mm;
     min-height: 0;
-    padding: 16mm 18mm;
+    padding: 16mm 62mm 16mm 18mm;
     gap: 6mm;
     border: 0;
-    border-inline-start: 3mm solid var(--via-navy);
     border-radius: 0;
     box-shadow: none;
     print-color-adjust: exact;
   }
+  .assinaturaVisual {
+    border-radius: 0;
+  }
   .documento:not([data-compacto]) .nome {
-    font-size: 38pt; /* token-ok: dimensão editorial para A4 */
+    font-size: 38pt; /* token-ok: dimensionamento A4 */
   }
   .documento:not([data-compacto]) .nome[data-extenso] {
-    font-size: 30pt; /* token-ok: nomes extensos em A4 sem clipping */
+    font-size: 30pt; /* token-ok: nomes extensos no mesmo A4 */
   }
   .documento:not([data-compacto]) .titulo {
-    font-size: 22pt; /* token-ok: dimensão editorial para A4 */
+    font-size: 22pt; /* token-ok: dimensionamento A4 */
   }
 }

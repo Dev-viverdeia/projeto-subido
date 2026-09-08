@@ -67,7 +67,6 @@ export default async function CertificadoPublicoPage({
   return (
     <main className={styles.pagina}>
       <header className={styles.topo}>
-        <p>{demonstracao ? 'Certificado de demonstração' : 'Certificado de conclusão'}</p>
         <span>
           <BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />
           {demonstracao ? 'Registro demonstrativo' : 'Registro verificado'}
