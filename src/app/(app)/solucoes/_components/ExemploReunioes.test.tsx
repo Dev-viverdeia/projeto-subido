@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fixture from '@/app/preview/reunioes-projeto/fixture.json';
@@ -11,6 +11,12 @@ import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
 
 const roteiro = lerRoteiroProjeto(fixture.roteiro)!;
+beforeEach(() => {
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: vi.fn(),
+  });
+});
 const contexto = (alternarEtapa = vi.fn()) => ({
   estado: PROGRESSO_VAZIO,
   acoes: { alternarEtapa, concluirAula: vi.fn(), tocarFormacao: vi.fn() },
