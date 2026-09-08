@@ -245,6 +245,104 @@
   display: grid;
   gap: var(--via-space-4);
 }
+.posCall {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-4);
+  align-items: start;
+}
+.transcricao,
+.saidasCall {
+  min-width: 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+}
+.transcricao {
+  padding: var(--via-space-5);
+  background: var(--via-navy-04);
+}
+.rotuloSaida {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
+}
+.rotuloSaida svg {
+  flex-shrink: 0;
+}
+.transcricao ol {
+  display: grid;
+  gap: var(--via-space-5);
+  margin: var(--via-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.autorTrecho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.autorTrecho > span:last-child {
+  font-variant-numeric: tabular-nums;
+}
+.transcricao blockquote {
+  margin: var(--via-space-2) 0 0;
+  padding: 0 0 0 var(--via-space-3);
+  border-left: 2px solid var(--via-navy-20);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-reading);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.saidasCall {
+  overflow: hidden;
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+.resumoCall,
+.tarefaCall {
+  padding: var(--via-space-5);
+}
+.exemplo .resumoCall p {
+  margin: var(--via-space-3) 0 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-reading);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.tarefaCall {
+  display: grid;
+  gap: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.tarefaCall > strong {
+  font-size: var(--app-fs-reading);
+  line-height: 1.5;
+  font-weight: var(--via-fw-medium);
+}
+.tarefaCall dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--via-space-3);
+  margin: 0;
+}
+.tarefaCall dt {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.tarefaCall dd {
+  margin: var(--via-space-1) 0 0;
+  font-size: var(--app-fs-ui);
+  line-height: 1.5;
+}
+.tarefaCall > .estado {
+  justify-self: start;
+}
 .mensagemEntrada,
 .mensagemSaida {
   width: fit-content;
@@ -339,6 +437,9 @@
 }
 /* O menu lateral e a navegação de fases também consomem largura em notebooks. */
 @container projeto-exemplo (max-width: 600px) {
+  .posCall {
+    grid-template-columns: 1fr;
+  }
   .fluxo {
     grid-template-columns: 1fr;
     gap: var(--via-space-5);
