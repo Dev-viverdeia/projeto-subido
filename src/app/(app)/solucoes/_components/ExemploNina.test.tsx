@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fixture from '@/app/preview/nina/fixture.json';
@@ -13,6 +13,13 @@ import { ImplementacaoProjeto } from './ImplementacaoProjeto';
 
 const roteiro = lerRoteiroProjeto(fixture.roteiro)!;
 const passo = roteiro.fases[0]!.passos[0]!;
+
+beforeEach(() => {
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: vi.fn(),
+  });
+});
 
 describe('Leitura visual da Nina', () => {
   it('troca cenários pelo teclado e identifica o conteúdo como exemplo', async () => {

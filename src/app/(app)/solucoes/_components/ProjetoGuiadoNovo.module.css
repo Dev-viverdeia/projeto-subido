@@ -372,6 +372,10 @@
   transition: transform var(--app-t-reveal);
 }
 
+.aprendizado {
+  container: aprendizado / inline-size;
+}
+
 .aprendizadoCorpo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.36fr);
@@ -381,6 +385,20 @@
 .videoAbertura {
   min-width: 0;
   padding: var(--via-space-6);
+}
+
+.videoLegenda {
+  margin: var(--via-space-2) 0 0;
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+
+.aulasLista {
+  min-width: 0;
+}
+
+.abrirAulas {
+  display: none;
 }
 
 .videoRotulo {
@@ -409,6 +427,9 @@
 .aulaConteudo {
   grid-column: 1 / -1;
   min-width: 0;
+  width: 100%;
+  max-width: 1080px;
+  justify-self: center;
   padding: var(--via-space-6);
   border-top: 1px solid var(--via-border-hairline);
 }
@@ -452,9 +473,15 @@
   color: var(--via-white);
 }
 
+.aulaNavegacao button[data-concluida]:not([data-ativa]) {
+  border-color: var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
 .aulaNavegacao button:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring);
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
 
 .aulaNavegacao button > span {
@@ -517,6 +544,24 @@
 .aulaConteudo > header h3 {
   font-size: var(--via-fs-h3);
   letter-spacing: var(--app-ls-h3);
+  max-width: 48ch;
+  /* Soma 16px ao scroll-padding de 88px do header global. */
+  scroll-margin-top: var(--via-space-4);
+}
+
+.aulaMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-3);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+
+.aulaMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
 }
 
 .aulaConteudo > header > span,
@@ -663,6 +708,24 @@
   font-size: var(--via-fs-sm);
   font-weight: 620;
   color: var(--via-text-primary);
+}
+
+.recursosEmFoco {
+  padding-inline: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.recursosEmFoco[open] {
+  padding-bottom: var(--via-space-4);
+}
+
+.recursosEmFoco > summary:focus-visible {
+  outline: none;
+  border-radius: var(--app-radius-chip);
+  box-shadow: var(--app-ring);
 }
 
 .detalheApoio[open] > summary svg,
@@ -1333,7 +1396,6 @@
 @media (max-width: 1079px) {
   .cabecalho,
   .cabecalho[data-com-acao],
-  .aprendizadoCorpo,
   .faseCorpo {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1350,11 +1412,6 @@
   }
 
   .passosDaFase nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .aulaNavegacao {
-    padding: 0 var(--via-space-6) var(--via-space-6);
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -1441,19 +1498,10 @@
     min-height: 48px;
   }
 
-  .aulaNavegacao,
   .aulaResumo,
   .criteriosPasso,
   .passosDaFase nav {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .aulaNavegacao button {
-    min-height: 50px;
-  }
-
-  .aulaNavegacao {
-    padding: 0 var(--via-space-5) var(--via-space-5);
   }
 
   .aulaConclusao,
@@ -1494,6 +1542,84 @@
   .navegacaoSequencial a {
     min-width: 0;
     padding-inline: var(--via-space-3);
+  }
+}
+
+@container aprendizado (max-width: 899px) {
+  .aprendizadoCorpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .videoAbertura {
+    padding: var(--via-space-5) var(--via-space-5) var(--via-space-3);
+  }
+
+  .aulasLista {
+    padding-inline: var(--via-space-5);
+    border-bottom: 1px solid var(--via-border-hairline);
+  }
+
+  .abrirAulas {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--via-space-3);
+    width: 100%;
+    min-height: 56px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--app-radius-control);
+    background: transparent;
+    color: var(--via-text-primary);
+    font: inherit;
+    font-size: var(--app-fs-ui);
+    cursor: pointer;
+  }
+
+  .abrirAulas strong {
+    font-weight: var(--via-fw-medium);
+  }
+
+  .abrirAulas > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--via-space-2);
+    font-size: var(--app-fs-support);
+    color: var(--via-text-muted);
+  }
+
+  .abrirAulas:focus-visible {
+    outline: none;
+    box-shadow: var(--app-ring);
+  }
+
+  .abrirAulas[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+
+  .aulasLista:not([data-aberta]) .aulaNavegacao,
+  .aulaMeta .aulaIndice {
+    display: none;
+  }
+
+  .aulaNavegacao {
+    padding: 0 0 var(--via-space-4);
+  }
+
+  .aulaConteudo {
+    padding: var(--via-space-5);
+    border-top: 0;
+  }
+}
+
+@container aprendizado (max-width: 349px) {
+  .navegacaoSequencial {
+    gap: var(--via-space-2);
+    padding-inline: var(--via-space-4);
+  }
+
+  .navegacaoSequencial button {
+    padding-inline: var(--via-space-2);
   }
 }
 
@@ -1667,7 +1793,7 @@
   font-weight: var(--via-fw-medium);
 }
 .praticaAula p {
-  max-width: 70ch;
+  max-width: 56ch;
   margin: 0;
   color: var(--via-text-muted);
   font-size: var(--app-fs-reading);
