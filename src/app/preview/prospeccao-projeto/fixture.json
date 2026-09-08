@@ -1,0 +1,490 @@
+{
+  "resultado": "Uma máquina que encontra empresas aderentes, identifica decisores, enriquece os dados e entrega contas priorizadas com fontes para o comercial.",
+  "clienteIdeal": "Empresas B2B que dependem de listas compradas, pesquisa manual ou indicações e não conseguem explicar por que uma conta deveria ser abordada agora.",
+  "entregavelFinal": "ICP operacional, fontes configuradas, cadastro deduplicado, enriquecimento, score explicado, primeiro lote validado e rotina de entrega ao CRM.",
+  "versao": 1,
+  "roteiro": {
+    "fases": [
+      {
+        "id": "entender",
+        "passos": [
+          {
+            "id": "traduzir-icp",
+            "acao": "Converta a descrição do cliente ideal em filtros pesquisáveis, critérios confirmáveis, exclusões e pesos que qualquer pessoa consiga aplicar.",
+            "modelo": {
+              "titulo": "Matriz do ICP",
+              "conteudo": "Critério | Tipo: obrigatório, desejável ou exclusão | Filtro | Fonte | Peso | Exemplo positivo | Exemplo negativo\nSegmento | obrigatório | CNAE ou descrição | site e Receita | 3 | ... | ..."
+            },
+            "titulo": "Traduzir o ICP em filtros",
+            "atencao": "Evite critérios como empresa inovadora ou em crescimento sem definir qual dado público comprova isso.",
+            "duracao": "60–90 min",
+            "insumos": ["Clientes ganhos e perdidos", "Tese atual de ICP", "Uma pessoa de vendas"],
+            "execucao": [
+              "Escolha dez clientes bons e dez contas que não deveriam ter avançado.",
+              "Compare segmento, porte, localização, tecnologia, modelo e problema até encontrar padrões verificáveis.",
+              "Defina critérios obrigatórios, desejáveis e de exclusão sem usar adjetivos vagos.",
+              "Aplique a matriz às vinte contas históricas e ajuste os critérios que não separam os grupos."
+            ],
+            "entregavel": "Matriz operacional do ICP.",
+            "concluidoQuando": "O ICP tem até oito critérios, fontes possíveis, pesos e exemplos claros de conta aderente e não aderente."
+          },
+          {
+            "id": "definir-sinais-limites",
+            "acao": "Liste eventos públicos que aumentam prioridade e documente quais dados, fontes, canais e práticas não serão usados.",
+            "modelo": {
+              "titulo": "Mapa de sinais e limites",
+              "conteudo": "Sinal | Fonte | Janela | Peso | Hipótese permitida | Pergunta para validar\n\nNão coletar:\nNão usar como score:\nCanais autorizados:\nAprovação necessária:\nRegra de opt-out:"
+            },
+            "titulo": "Definir sinais e limites de uso",
+            "atencao": "Notícia recente não prova intenção de compra. Ela apenas muda a ordem da pesquisa e a hipótese que será validada.",
+            "duracao": "45–60 min",
+            "insumos": [
+              "Ciclo de compra conhecido",
+              "Política comercial e de privacidade",
+              "Canais autorizados"
+            ],
+            "execucao": [
+              "Liste fatos recentes ligados ao problema, como contratação, expansão, nova unidade ou mudança de tecnologia.",
+              "Defina por quantos dias cada sinal permanece relevante e qual fonte pode confirmá-lo.",
+              "Separe dados profissionais necessários de dados pessoais ou sensíveis que não devem entrar.",
+              "Registre canal permitido, revisão humana, limite de frequência e condições de opt-out antes de qualquer contato."
+            ],
+            "entregavel": "Mapa de sinais e governança.",
+            "concluidoQuando": "Cada sinal tem janela, fonte e efeito; cada exclusão de privacidade ou abordagem está registrada e aprovada."
+          }
+        ],
+        "titulo": "Entender",
+        "objetivo": "Definir quem procurar e quais fatos tornam uma conta relevante para o cliente."
+      },
+      {
+        "id": "preparar",
+        "passos": [
+          {
+            "id": "modelar-conta",
+            "acao": "Defina empresa, pessoa, fonte, sinal, score e status como entidades separadas, com chaves que impedem duplicidade.",
+            "modelo": {
+              "titulo": "Contrato de dados da conta",
+              "conteudo": "empresa_id:\ncnpj:\ndominio_normalizado:\nrazao_social:\nsegmento:\nporte:\nfontes: []\ncriterios: []\nsinais: []\ndecisores: []\nscore_perfil:\nscore_momento:\nstatus_revisao:\natualizado_em:"
+            },
+            "titulo": "Criar o cadastro único",
+            "atencao": "Telefone ou e-mail sozinho não identifica uma empresa. Fusões, filiais e domínios diferentes precisam de revisão explícita.",
+            "duracao": "60–120 min",
+            "insumos": [
+              "Campos exigidos pelo CRM",
+              "Exemplos de respostas dos provedores",
+              "Matriz do ICP"
+            ],
+            "execucao": [
+              "Use CNPJ quando disponível e domínio normalizado como chave auxiliar da empresa.",
+              "Separe pessoa de empresa e relacione cargo, fonte e data de verificação sem sobrescrever histórico.",
+              "Modele critérios e sinais como ocorrências com fonte, valor e horário.",
+              "Prepare os estados encontrado, enriquecendo, revisar, aprovado, descartado e enviado ao CRM."
+            ],
+            "entregavel": "Modelo de dados da prospecção.",
+            "concluidoQuando": "Importar a mesma empresa e pessoa por duas fontes não duplica registros e preserva as duas evidências."
+          },
+          {
+            "id": "configurar-fontes-crm",
+            "acao": "Conecte uma fonte empresarial, uma fonte de pessoas e a leitura do site; depois mapeie somente os campos aprovados para o CRM.",
+            "modelo": {
+              "titulo": "Matriz de fontes",
+              "conteudo": "Campo | Fonte principal | Fonte alternativa | Validade | Custo | Se divergir\nEmpresa | ...\nDecisor | ...\nTelefone | ...\nE-mail | ...\nSinal | ..."
+            },
+            "titulo": "Configurar fontes e destino",
+            "atencao": "Não dependa de um único provedor para todos os campos. Também não combine fontes sem saber qual venceu quando houver conflito.",
+            "duracao": "2–4 h",
+            "insumos": [
+              "Contas dos provedores",
+              "Acesso de teste do CRM",
+              "Campos e limites aprovados"
+            ],
+            "execucao": [
+              "Teste cada provedor isoladamente com uma empresa conhecida e guarde resposta, custo e limite.",
+              "Normalize os retornos para o contrato de dados antes de combinar as fontes.",
+              "Defina precedência por campo sem apagar divergências; dado conflitante precisa de revisão.",
+              "Envie uma conta de teste ao CRM e confirme vínculo, fonte, proprietário e status inicial."
+            ],
+            "entregavel": "Pipeline de fontes conectado.",
+            "concluidoQuando": "Uma conta de teste passa pelas três fontes e chega ao ambiente de teste do CRM com origem e data de cada dado."
+          }
+        ],
+        "titulo": "Preparar",
+        "objetivo": "Escolher fontes, modelar o cadastro e preparar a passagem ao CRM."
+      },
+      {
+        "id": "construir",
+        "passos": [
+          {
+            "id": "buscar-enriquecer",
+            "acao": "Transforme filtros em buscas controladas, deduplique as empresas e colete apenas os dados necessários para confirmar ICP e decisor.",
+            "modelo": {
+              "titulo": "Log do enriquecimento",
+              "conteudo": "Lote:\nConsulta:\nFonte:\nIniciado em:\nEmpresas encontradas:\nDuplicatas unidas:\nContas com domínio:\nContas com decisor:\nCampos desconhecidos:\nCusto:\nErros e repetição:"
+            },
+            "titulo": "Buscar e enriquecer contas",
+            "atencao": "Não aumente o lote para esconder baixa cobertura. Primeiro meça onde cada fonte falha e se o dado faltante realmente muda a decisão.",
+            "duracao": "3–5 h",
+            "insumos": ["ICP operacional", "Fontes conectadas", "Contrato de dados"],
+            "execucao": [
+              "Execute uma busca pequena por filtro e registre consulta, página e custo antes de paginar.",
+              "Normalize empresa e domínio, una duplicatas e preserve as fontes que apontaram para o registro.",
+              "Leia páginas públicas relevantes e extraia somente trechos ligados aos critérios e sinais aprovados.",
+              "Procure pessoas apenas nas funções definidas; dados ausentes seguem vazios e entram na fila de revisão."
+            ],
+            "entregavel": "Lote enriquecido e rastreável.",
+            "concluidoQuando": "O lote bruto não tem duplicidades conhecidas e cada campo utilizado mostra fonte e horário."
+          },
+          {
+            "id": "pontuar-briefar",
+            "acao": "Calcule perfil e momento separadamente, explique o resultado com evidências e produza um briefing curto para revisão comercial.",
+            "modelo": {
+              "titulo": "Briefing da conta",
+              "conteudo": "Empresa:\nPor que se encaixa no ICP:\nCritérios confirmados e fontes:\nSinais recentes e datas:\nDecisor e fonte:\nLacunas:\nHipótese, não fato:\nPergunta para validar:\nScore de perfil:\nScore de momento:\nRevisado por:"
+            },
+            "titulo": "Priorizar e gerar o briefing",
+            "atencao": "Não transforme desconhecido em zero se isso penaliza a conta. Desconhecido pede pesquisa ou pergunta; negativo exige evidência.",
+            "duracao": "2–4 h",
+            "insumos": ["Lote enriquecido", "Pesos do ICP e sinais", "Campos de destino do CRM"],
+            "execucao": [
+              "Calcule o score de perfil apenas com critérios confirmados e registre a conta por item.",
+              "Calcule o score de momento em coluna separada usando somente sinais dentro da janela.",
+              "Gere o briefing com fatos, URLs, hipótese e pergunta de validação sem escrever uma falsa personalização.",
+              "Envie ao CRM somente contas aprovadas por uma pessoa e preserve as descartadas com motivo."
+            ],
+            "entregavel": "Fila priorizada com briefing.",
+            "concluidoQuando": "Toda conta priorizada tem score reproduzível, evidências, lacunas e uma hipótese rotulada para a conversa."
+          }
+        ],
+        "titulo": "Construir",
+        "objetivo": "Encontrar, enriquecer e priorizar contas de forma rastreável."
+      },
+      {
+        "id": "validar",
+        "passos": [
+          {
+            "id": "auditar-amostra",
+            "acao": "Selecione uma amostra variada e confira manualmente empresa, decisor, critérios, sinais, score e fontes sem olhar apenas as primeiras posições.",
+            "modelo": {
+              "titulo": "Auditoria da amostra",
+              "conteudo": "Conta | Campo | Valor coletado | Fonte | Verificação manual | Estado | Impacta score? | Causa | Correção | Reteste\n\nPrecisão por campo:\nCobertura por campo:\nCusto por conta válida:"
+            },
+            "titulo": "Auditar trinta contas",
+            "atencao": "Uma lista pode parecer boa porque nomes e sites estão corretos, enquanto cargo, sinal ou contato que orientam a venda estão errados.",
+            "duracao": "90–150 min",
+            "insumos": [
+              "Trinta contas do lote",
+              "Acesso às fontes originais",
+              "Pessoa comercial para revisar aderência"
+            ],
+            "execucao": [
+              "Sorteie contas entre alta, média e baixa prioridade em vez de revisar só as melhores.",
+              "Verifique cada campo usado no score diretamente na fonte e classifique correto, incorreto, desatualizado ou ausente.",
+              "Calcule precisão, cobertura e custo por conta validada e por decisor encontrado.",
+              "Corrija normalização, fonte ou regra e repita a amostra afetada antes de ampliar."
+            ],
+            "entregavel": "Relatório de qualidade do lote.",
+            "concluidoQuando": "Precisão e cobertura estão calculadas por campo e todos os erros relevantes têm causa e correção."
+          },
+          {
+            "id": "testar-falhas",
+            "acao": "Simule limite de API, fonte indisponível, site bloqueado, dado conflitante e repetição do mesmo lote sem criar registros ou custos desnecessários.",
+            "modelo": {
+              "titulo": "Registro de falhas",
+              "conteudo": "Cenário | Fonte | Conta afetada | Estado esperado | Estado real | Duplicou? | Cobrou novamente? | Mensagem visível | Retomada | Aprovado?"
+            },
+            "titulo": "Testar falhas e repetição",
+            "atencao": "Erro silencioso é pior que lote incompleto. A interface precisa dizer o que falhou, qual conta foi afetada e como repetir.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Ambiente de teste",
+              "Lote já processado",
+              "Limites conhecidos dos provedores"
+            ],
+            "execucao": [
+              "Interrompa cada fonte em um ponto controlado e confirme que o status não aparece como concluído.",
+              "Repita o lote e confirme que registros válidos são reutilizados dentro da validade definida.",
+              "Introduza dois valores conflitantes e valide que nenhum deles substitui o outro silenciosamente.",
+              "Teste exportação repetida ao CRM e bloqueie a criação da mesma conta ou tarefa duas vezes."
+            ],
+            "entregavel": "Suíte de resiliência da prospecção.",
+            "concluidoQuando": "O processo retoma do ponto correto, não duplica contas e deixa cada falha visível para revisão."
+          }
+        ],
+        "titulo": "Validar",
+        "objetivo": "Medir precisão, cobertura e custo antes de produzir volume."
+      },
+      {
+        "id": "entregar",
+        "passos": [
+          {
+            "id": "entregar-primeiro-lote",
+            "acao": "Revise com vendas um lote pequeno, envie somente as contas aceitas ao CRM e acompanhe o uso para descobrir se o briefing orienta uma boa conversa.",
+            "modelo": {
+              "titulo": "Termo do primeiro lote",
+              "conteudo": "Versão do ICP:\nContas revisadas:\nAprovadas:\nDescartadas por motivo:\nCom decisor confirmado:\nTempo de pesquisa adicional:\nDúvidas do comercial:\nAjustes para o próximo lote:\nAceite:"
+            },
+            "titulo": "Entregar o primeiro lote aprovado",
+            "atencao": "Quantidade entregue não é o resultado. O lote vale quando o comercial confia, entende a prioridade e sabe qual pergunta precisa validar.",
+            "duracao": "1 dia acompanhado",
+            "insumos": ["Lote auditado", "Revisor comercial", "CRM de destino"],
+            "execucao": [
+              "Escolha entre vinte e cinquenta contas para o primeiro lote e congele a versão dos critérios.",
+              "Faça o comercial aceitar, pedir revisão ou descartar cada conta registrando o motivo.",
+              "Envie as aprovadas com proprietário, briefing, fontes e próxima ação, sem disparar mensagens automaticamente.",
+              "Colete dúvidas e tempo de pesquisa adicional para melhorar a próxima entrega."
+            ],
+            "entregavel": "Primeiro lote no CRM.",
+            "concluidoQuando": "O comercial aceitou ou descartou cada conta com motivo e conseguiu usar os briefings sem pesquisa paralela obrigatória."
+          },
+          {
+            "id": "documentar-rotina",
+            "acao": "Entregue consultas, fontes, custos, revisão, exportação, indicadores e contingência para o cliente repetir a produção com controle.",
+            "modelo": {
+              "titulo": "Índice do playbook",
+              "conteudo": "1. ICP e exclusões\n2. Sinais e janelas\n3. Consultas\n4. Fontes, custos e limites\n5. Deduplicação\n6. Score explicado\n7. Revisão humana\n8. Envio ao CRM\n9. Opt-out e governança\n10. Indicadores\n11. Contingência\n12. Próxima revisão"
+            },
+            "titulo": "Documentar a rotina de prospecção",
+            "atencao": "Não deixe o processo preso ao implementador ou a uma consulta que ninguém entende. Toda mudança precisa ser reproduzível e versionada.",
+            "duracao": "60–90 min",
+            "insumos": ["Consultas finais", "Matriz de fontes e custos", "Aprendizados do lote"],
+            "execucao": [
+              "Documente como ajustar filtros sem alterar silenciosamente o ICP aprovado.",
+              "Explique validade, custo, limites e contingência de cada fonte.",
+              "Defina indicadores de precisão, cobertura, custo por conta válida, aceitação e conversão posterior.",
+              "Marque a próxima revisão dos critérios e registre acessos, propriedade, renovação e opt-out."
+            ],
+            "entregavel": "Playbook da máquina de prospecção.",
+            "concluidoQuando": "A equipe executa uma busca pequena, revisa uma conta e envia ao CRM usando somente o manual."
+          }
+        ],
+        "titulo": "Entregar",
+        "objetivo": "Entregar o primeiro lote útil e uma rotina que o cliente consegue repetir."
+      }
+    ],
+    "escopo": {
+      "inclui": [
+        "ICP, exclusões e sinais de aderência versionados",
+        "Busca, enriquecimento, validade e deduplicação de empresas",
+        "Score explicável com fontes e campos ainda ausentes",
+        "Revisão humana e envio controlado ao CRM"
+      ],
+      "evolucoes": [
+        "Adicionar sinais de intenção com janela de validade",
+        "Gerar briefing personalizado para a primeira conversa",
+        "Realimentar o score com aceite e conversão do comercial"
+      ],
+      "naoInclui": [
+        "Disparo automático de e-mail, WhatsApp ou LinkedIn",
+        "Compra ou uso de base sem origem e permissão verificáveis",
+        "Promessa de localizar todo decisor ou contato de uma empresa"
+      ],
+      "preRequisitos": [
+        "Oferta clara e histórico mínimo de clientes aderentes",
+        "Fontes licenciadas com custo, limite e validade conhecidos",
+        "CRM com responsável pelo aceite ou descarte das contas"
+      ]
+    },
+    "perfil": {
+      "nivel": "intermediario",
+      "prazo": "2 a 4 semanas",
+      "formatoPiloto": "Um ICP, duas fontes e um lote de vinte a cinquenta empresas.",
+      "primeiraProva": "Um lote pequeno aceito pelo comercial, com empresas deduplicadas, decisores confirmados, score explicado e fontes abertas.",
+      "recomendadoParaComecar": false
+    },
+    "fundamentos": [
+      {
+        "titulo": "Fonte em cada fato",
+        "descricao": "Todo dado enriquecido preserva origem e horário. Informação sem fonte fica como desconhecida e não influencia a prioridade."
+      },
+      {
+        "titulo": "Perfil não é intenção",
+        "descricao": "Aderência ao ICP e sinal de compra são medidas diferentes. Uma empresa adequada pode não estar pronta para abordagem."
+      },
+      {
+        "titulo": "Aprovação antes do contato",
+        "descricao": "A máquina prepara contas e contexto. Envio, canal e mensagem continuam sob decisão humana e respeitam opt-out."
+      }
+    ],
+    "trilhaDidatica": {
+      "aulas": [
+        {
+          "titulo": "Transforme o ICP em evidência pesquisável",
+          "duracao": "12 min",
+          "topicos": [
+            "Critérios de perfil, exclusões e sinais recentes tratados separadamente",
+            "Campo observável, fonte possível e validade esperada para cada critério",
+            "Exemplos positivos e negativos que reduzem interpretações diferentes"
+          ],
+          "objetivo": "Sair de descrições vagas como empresa boa ou empresa grande e criar critérios que uma fonte consegue confirmar, negar ou manter como desconhecidos.",
+          "recursos": [
+            {
+              "tipo": "mapa_mental",
+              "titulo": "Do ICP à lista pesquisável",
+              "conteudo": "OFERTA\n→ projeto que será vendido\n\nICP\n→ tipo de empresa\n→ região\n→ tamanho ou estrutura observável\n\nCRITÉRIOS\n→ campo que pode ser pesquisado\n→ fonte capaz de confirmar\n→ regra quando o dado não aparece\n\nEXCLUSÕES\n→ condição objetiva que remove a empresa\n\nSINAIS DE MOMENTO\n→ evento recente com data e validade\n\nLISTA\n→ empresa única\n→ critérios com evidência\n→ lacunas visíveis\n→ motivo para trabalhar ou descartar",
+              "descricao": "Veja como uma definição comercial vira filtro, fonte, evidência e decisão de entrada na lista."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "Seu ICP pode ser pesquisado?",
+              "conteudo": "1. O tipo de empresa está escrito sem adjetivos vagos?\n2. Cada critério aponta para um campo observável?\n3. Existe ao menos uma fonte possível para cada campo?\n4. As exclusões podem ser verificadas sem opinião?\n5. Dado ausente permanece como desconhecido?\n6. Perfil e sinal recente estão separados?\n\nSe alguma resposta for não, ajuste o ICP antes de iniciar a busca.",
+              "descricao": "Revise se os filtros podem ser confirmados por fontes públicas antes de consumir créditos."
+            }
+          ],
+          "exercicio": "Escolha cinco clientes aderentes e cinco contas que não deveriam entrar na lista. Compare os dois grupos e converta as diferenças em critérios observáveis, exclusões e sinais opcionais.",
+          "prontoQuando": "Cada critério tem uma definição objetiva, uma fonte possível, exemplos, peso e comportamento explícito quando não houver evidência suficiente."
+        },
+        {
+          "titulo": "Enriqueça sem perder origem, validade ou identidade",
+          "duracao": "12 min",
+          "topicos": [
+            "Domínio, CNPJ e identificadores usados para impedir empresas duplicadas",
+            "Fonte, URL, data de coleta e validade guardadas junto de cada campo",
+            "Dados profissionais permitidos e lacunas que nunca devem ser completadas por suposição"
+          ],
+          "objetivo": "Organizar busca, enriquecimento e deduplicação para que cada dado possa ser rastreado até a empresa certa e a fonte que o sustentou.",
+          "recursos": [
+            {
+              "tipo": "ebook",
+              "titulo": "Guia de dados com procedência",
+              "conteudo": "DADOS COM PROCEDÊNCIA\n\nIDENTIDADE PRIMEIRO\nUse domínio, CNPJ ou outro identificador estável antes de enriquecer. Nome comercial sozinho não impede duplicidade.\n\nCADA CAMPO PRECISA DE\n1. Valor encontrado.\n2. URL ou fonte de origem.\n3. Data da coleta.\n4. Prazo de validade esperado.\n5. Regra para divergência.\n\nQUANDO AS FONTES DISCORDAM\nPreserve os dois valores, identifique a fonte mais adequada ao campo e registre o motivo da escolha.\n\nQUANDO NÃO HÁ DADO\nMantenha o campo vazio e diga o que ainda precisa ser confirmado. Não use a IA para inventar porte, cargo, contato ou intenção.",
+              "descricao": "Organize identidade, fonte, validade e divergência sem completar lacunas com suposição."
+            },
+            {
+              "tipo": "modelo",
+              "titulo": "Ficha de identidade da empresa",
+              "conteudo": "EMPRESA\nNome comercial:\nNome legal:\nDomínio principal:\nCNPJ ou identificador:\nCidade e região:\n\nDEDUPLICAÇÃO\nChave principal:\nPossíveis duplicatas:\nDecisão e motivo:\n\nDADOS\nCampo | Valor | Fonte | Coletado em | Válido até | Divergência | Decisão\n\nLACUNAS\nDados ainda não encontrados:\nComo podem ser confirmados:\nResponsável pela revisão:",
+              "descricao": "Compare fontes, escolha a chave de deduplicação e registre cada dado usado na lista."
+            }
+          ],
+          "exercicio": "Pesquise a mesma empresa em duas fontes, normalize domínio e nome, compare divergências e registre qual valor será usado, com origem, data e motivo.",
+          "prontoQuando": "Uma segunda pessoa consegue reconstruir cada campo do registro, identificar divergências e repetir a deduplicação sem depender da memória de quem montou a lista."
+        },
+        {
+          "titulo": "Priorize, audite e entregue ao comercial",
+          "duracao": "15 min",
+          "topicos": [
+            "Aderência ao perfil separada de sinal de momento ou intenção",
+            "Cálculo aberto, evidência por critério e empate mantido quando faltam fatos",
+            "Aceite, descarte e correção do comercial usados para calibrar o próximo lote"
+          ],
+          "objetivo": "Criar um score explicável, revisar uma amostra e enviar ao CRM somente contas que o time comercial entende e aceita trabalhar.",
+          "recursos": [
+            {
+              "tipo": "modelo",
+              "titulo": "Score de conta reproduzível",
+              "conteudo": "CONTA:\nVERSÃO DO ICP:\n\nADERÊNCIA AO PERFIL\nCritério | Peso | Confirmado, não confirmado ou desconhecido | Evidência | Pontos\n\nSINAIS DE MOMENTO\nSinal | Peso | Data | Validade | Evidência | Pontos\n\nRESULTADO\nTotal de aderência:\nTotal de momento:\nCritérios desconhecidos:\nMotivo para trabalhar:\nMotivo para descartar:\nRequer revisão humana?\n\nREGRA\nDado desconhecido não soma ponto. Todo ponto precisa abrir a fonte correspondente.",
+              "descricao": "Calcule aderência e momento em blocos separados, sempre com a evidência ao lado."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "A lista está pronta para o CRM?",
+              "conteudo": "1. A empresa aparece uma única vez?\n2. O domínio e a localização pertencem à empresa correta?\n3. Todo critério pontuado tem fonte acessível?\n4. O contato profissional pertence à pessoa e à empresa indicadas?\n5. O score pode ser recalculado manualmente?\n6. As lacunas continuam visíveis?\n7. A lista explica por que trabalhar cada conta?\n8. Nada foi enviado ou abordado automaticamente?\n\nA empresa só entra no CRM quando todas as verificações aplicáveis estiverem concluídas.",
+              "descricao": "Confirme identidade, contato e justificativa antes de transformar uma empresa em oportunidade."
+            }
+          ],
+          "exercicio": "Calcule manualmente o score de cinco empresas, peça a outra pessoa para repetir a conta e revise todos os casos em que as duas leituras não chegaram ao mesmo resultado.",
+          "prontoQuando": "O comercial consegue abrir a conta, entender cada ponto do score, acessar as fontes e aceitar ou descartar sem descobrir um erro básico de identidade ou duplicidade."
+        }
+      ],
+      "materiais": [
+        {
+          "titulo": "Ficha de ICP observável",
+          "conteudo": "FICHA DE ICP OBSERVÁVEL\n\nOferta que será vendida:\nProblema que ela resolve:\nRecorte geográfico:\nTipo de empresa:\n\nCRITÉRIOS DE PERFIL\nCritério | Definição objetiva | Campo observável | Fonte possível | Peso | Se faltar evidência\n\n1. Critério:\nDefinição:\nCampo observável:\nFonte:\nPeso:\nSe faltar:\n\nEXCLUSÕES\nCondição | Como identificar | Fonte | Motivo da exclusão\n\nSINAIS DE MOMENTO\nSinal | Janela de validade | Fonte | Efeito na prioridade\n\nEXEMPLOS DE CALIBRAÇÃO\nCinco empresas aderentes:\nPor que cada uma entra:\nCinco empresas não aderentes:\nPor que cada uma não entra:\n\nVersão do ICP:\nResponsável pela aprovação:\nData da próxima revisão:",
+          "quandoUsar": "No diagnóstico, para converter o cliente ideal em critérios que podem ser pesquisados e auditados."
+        },
+        {
+          "titulo": "Matriz de fontes e dados",
+          "conteudo": "MATRIZ DE FONTES E DADOS\n\nCampo | Fonte primária | Fonte alternativa | Identificador | Validade | Custo | Limite | Uso permitido | Se falhar\n\nEMPRESA\nNome legal:\nNome comercial:\nDomínio:\nCNPJ ou identificador:\nSegmento:\nPorte:\nLocalização:\nNúmero de unidades:\nTecnologias ou canais:\n\nPESSOA PROFISSIONAL\nNome:\nCargo:\nÁrea:\nPerfil profissional:\nE-mail corporativo:\nTelefone corporativo:\n\nCONTROLE\nComo registrar URL de origem:\nComo registrar data de coleta:\nRegra de dado divergente:\nRegra de dado expirado:\nRegra de opt-out ou remoção:\nCusto máximo por conta:\nResponsável pelas fontes:",
+          "quandoUsar": "Na preparação, para definir de onde vem cada campo, quanto custa e quando deixa de ser confiável."
+        },
+        {
+          "titulo": "Calculadora de score explicável",
+          "conteudo": "CALCULADORA DE SCORE EXPLICÁVEL\n\nCONTA:\nDATA DA ANÁLISE:\nVERSÃO DO ICP:\n\nSCORE DE PERFIL\nCritério | Peso | Status: confirmado, não confirmado ou desconhecido | Evidência | Pontos\n1.\n2.\n3.\n4.\n5.\nSubtotal de perfil:\n\nSINAIS DE MOMENTO\nSinal | Peso | Data do sinal | Validade | Evidência | Pontos\n1.\n2.\nSubtotal de momento:\n\nRESULTADO\nScore de perfil:\nScore de momento:\nFaixa de prioridade:\nCritérios desconhecidos:\nMotivo resumido:\nRequer revisão humana?\n\nREGRAS\nAusência de evidência não soma pontos.\nPerfil e momento não são misturados.\nEmpate permanece empate sem novo fato.\nTodo ponto precisa abrir a fonte correspondente.",
+          "quandoUsar": "Antes do primeiro lote, para tornar a prioridade reproduzível e separar aderência de sinal de momento."
+        },
+        {
+          "titulo": "Auditoria do primeiro lote",
+          "conteudo": "AUDITORIA DO PRIMEIRO LOTE\n\nConta | Domínio correto? | Duplicada? | ICP confirmado? | Decisor confirmado? | Fontes abrem? | Dados válidos? | Score confere? | Decisão | Motivo | Correção\n\nAMOSTRA MÍNIMA\n[ ] Revisar as vinte primeiras contas\n[ ] Recalcular manualmente cinco scores\n[ ] Abrir todas as fontes das cinco maiores prioridades\n[ ] Conferir possíveis duplicatas por domínio e identificador\n[ ] Confirmar cargo e vínculo profissional dos decisores\n[ ] Verificar se dado desconhecido permaneceu desconhecido\n[ ] Remover informação pessoal ou sem uso permitido\n\nMEDIDAS\nContas recebidas:\nContas únicas:\nContas aderentes:\nContas com decisor confirmado:\nContas com fonte completa:\nFalsos positivos:\nCusto total e por conta aceita:\n\nAprovado por:\nPendências:\nData do reteste:",
+          "quandoUsar": "Na validação, para revisar identidade, aderência, contato e rastreabilidade antes de enviar ao CRM."
+        },
+        {
+          "titulo": "Pacote de passagem ao CRM",
+          "conteudo": "PACOTE DE PASSAGEM AO CRM\n\nEMPRESA\nNome:\nDomínio:\nIdentificador:\nSegmento e porte:\nLocalização:\nResumo factual da atividade:\n\nADERÊNCIA\nCritérios confirmados:\nCritérios não confirmados:\nCritérios desconhecidos:\nScore de perfil e cálculo:\n\nMOMENTO\nSinais recentes:\nData e validade dos sinais:\nScore de momento e cálculo:\n\nPESSOA PROFISSIONAL\nNome:\nCargo e área:\nFonte do vínculo:\nContato corporativo permitido:\n\nBRIEFING\nPor que esta conta entrou no lote:\nFatos que podem orientar a conversa:\nHipótese explicitamente rotulada:\nPergunta de abertura sugerida:\nRiscos ou lacunas:\nFontes principais:\n\nOPERAÇÃO\nDecisão do comercial: aceitar ou descartar\nMotivo da decisão:\nResponsável:\nPróxima ação sugerida, ainda não executada:\nData para revisar dados:\nOrigem e versão do lote:",
+          "quandoUsar": "Na entrega, para enviar somente contas aceitas com contexto suficiente e sem iniciar contato automaticamente."
+        }
+      ],
+      "tempoTotal": "35 a 45 minutos antes de montar o primeiro lote",
+      "demonstracao": {
+        "passos": [
+          {
+            "etapa": "ICP convertido em filtros",
+            "evidencia": "Versão do ICP, critérios e exclusões",
+            "oQueAcontece": "Redes com três ou mais unidades, atendimento por WhatsApp e presença em duas regiões entram como hipóteses pesquisáveis; clínicas individuais e franquias sem operação própria entram nas exclusões."
+          },
+          {
+            "etapa": "Empresas encontradas",
+            "evidencia": "Consulta, fonte e data de coleta",
+            "oQueAcontece": "As fontes retornam candidatas com nome, domínio e localização; cada consulta e cada limite do provedor ficam registrados para repetição do lote."
+          },
+          {
+            "etapa": "Identidade normalizada",
+            "evidencia": "Chave de deduplicação e possíveis duplicatas",
+            "oQueAcontece": "Domínio, nome legal e identificadores disponíveis são normalizados antes do enriquecimento para impedir que filiais ou grafias diferentes virem empresas duplicadas."
+          },
+          {
+            "etapa": "Conta enriquecida",
+            "evidencia": "Campo, valor, origem e coletado em",
+            "oQueAcontece": "Unidades, atividade, canais, decisores profissionais e sinais recentes são coletados com URL, data e validade; o que não aparece permanece desconhecido."
+          },
+          {
+            "etapa": "Score explicado",
+            "evidencia": "Critérios, pesos, evidências e soma",
+            "oQueAcontece": "Cada critério recebe confirmado, não confirmado ou desconhecido. O score de perfil e os sinais de momento aparecem separados, com cálculo aberto."
+          },
+          {
+            "etapa": "Lote aceito no CRM",
+            "evidencia": "Decisão, motivo, responsável e destino",
+            "oQueAcontece": "Uma revisão humana remove erros, o comercial aceita ou descarta cada conta e somente as aprovadas entram no CRM com briefing e próxima ação ainda não executada."
+          }
+        ],
+        "titulo": "De um ICP abstrato a vinte contas aceitas no CRM",
+        "contexto": "Um prestador quer vender um SDR de IA para redes de clínicas odontológicas. Em vez de comprar uma base genérica, ele precisa encontrar empresas compatíveis, provar cada critério e entregar um primeiro lote que o comercial consiga usar.",
+        "resultadoEsperado": "as vinte contas não têm duplicidade, cada dado importante abre sua fonte, o score pode ser refeito manualmente e o comercial entende por que trabalhar ou descartar cada empresa."
+      },
+      "videosReferencia": [
+        {
+          "titulo": "Prospecta.AI B2B",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=ba62ae7e-10ee-4148-a4c6-5d049e437c43",
+          "descricao": "Veja a solução de referência do Viver de IA para busca segmentada, coleta de empresas e preparação de uma lista B2B para exportação."
+        },
+        {
+          "titulo": "Enriquecimento de Leads no CRM",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=f4a54a84-9e8c-4eac-acc3-85399e0e0f8c",
+          "descricao": "Observe como dados da empresa, decisores e sinais públicos viram contexto organizado para o comercial, com o CRM como destino final."
+        }
+      ]
+    },
+    "artefatosEntrega": [
+      {
+        "titulo": "ICP, exclusões e sinais",
+        "descricao": "Critérios observáveis, exemplos, pesos, fontes e versão usada para produzir o lote."
+      },
+      {
+        "titulo": "Matriz de fontes e custos",
+        "descricao": "Campos, origem, validade, limites, custo esperado, contingência e regra de opt-out."
+      },
+      {
+        "titulo": "Esquema da conta e score",
+        "descricao": "Dados obrigatórios, evidências, lacunas e cálculo explicado sem esconder componentes."
+      },
+      {
+        "titulo": "Primeiro lote auditado",
+        "descricao": "Empresas revisadas, motivos de aceite ou descarte, briefing e próxima ação no CRM."
+      },
+      {
+        "titulo": "Playbook de repetição",
+        "descricao": "Consultas, revisão, exportação, indicadores, contingência e próxima calibração."
+      }
+    ]
+  }
+}

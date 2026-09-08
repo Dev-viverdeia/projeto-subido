@@ -8,6 +8,7 @@
   box-shadow: var(--app-glass-card-shadow);
 }
 .guia {
+  container: guia-projeto / inline-size;
   margin-top: var(--via-space-5);
 }
 .modulos,
@@ -41,6 +42,16 @@
   flex: 1;
 }
 @media (max-width: 599px) {
+  .modulos[data-com-exemplo] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .modulos[data-com-exemplo] button {
+    flex-direction: row;
+  }
+}
+/* Com o menu e a lista de passos a 1100px, o guia fica em 379px e quatro ações exigem 469px. */
+@container guia-projeto (max-width: 600px) {
   .modulos[data-com-exemplo] {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

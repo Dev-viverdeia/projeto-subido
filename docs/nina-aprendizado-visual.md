@@ -19,7 +19,7 @@ O texto de apoio permanece acessível sob demanda; exercícios, modelos e crité
 ## Onde manter
 
 - `src/lib/projetos/exemplos-nina.ts`: conteúdo editorial e correspondência.
-- `ExemploNina.tsx` e seu CSS Module: apresentação, sem dependências novas ou chamadas de rede.
+- `ExemploProjeto.tsx` e seu CSS Module: apresentação compartilhada, sem dependências novas ou chamadas de rede.
 - `/preview/nina`: página apenas de desenvolvimento, com snapshot do roteiro público em 08/09/2026. Não contém dados de alunos ou clientes.
 - Se o roteiro mudar, revisar exemplos e fixture juntos. Os testes verificam cobertura dos dez passos e das três aulas.
 

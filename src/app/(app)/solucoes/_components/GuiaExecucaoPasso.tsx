@@ -12,9 +12,9 @@ import {
   PanelsTopLeft,
 } from 'lucide-react';
 import type { PassoProjeto } from '@/lib/projetos/roteiro';
-import type { ExemploNina as Exemplo } from '@/lib/projetos/exemplos-nina';
+import type { ExemploProjeto as Exemplo } from '@/lib/projetos/exemplo-projeto';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
-import { ExemploNina } from './ExemploNina';
+import { ExemploProjeto } from './ExemploProjeto';
 import styles from './LeituraProjeto.module.css';
 
 export function GuiaExecucaoPasso({
@@ -65,7 +65,7 @@ export function GuiaExecucaoPasso({
       <div className={styles.corpoGuia}>
         {aba === 'exemplo' && exemplo ? (
           <>
-            <ExemploNina exemplo={exemplo} />
+            <ExemploProjeto exemplo={exemplo} />
             <div className={styles.navegar}>
               <button type="button" onClick={() => setAba('insumos')}>
                 Preparar este passo <ArrowRight size={17} aria-hidden="true" />

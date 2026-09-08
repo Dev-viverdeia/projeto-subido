@@ -1,27 +1,4 @@
-/** Exemplos editoriais, não dados do cliente nem evidências de implementação. */
-export type ExemploNina = {
-  titulo: string;
-  entrega: string;
-} & (
-  | {
-      tipo: 'fluxo';
-      etapas: { titulo: string; detalhe: string }[];
-      desvio: { quando: string; acao: string };
-    }
-  | {
-      tipo: 'ficha';
-      campos: { rotulo: string; valor: string; pendente?: boolean }[];
-    }
-  | {
-      tipo: 'conversa';
-      cenarios: {
-        nome: string;
-        entrada: string;
-        resposta: string;
-        decisao: string;
-      }[];
-    }
-);
+import type { ExemploProjeto as ExemploNina } from './exemplo-projeto';
 
 export const NINA_SLUG = 'sdr-atendimento-qualificacao';
 

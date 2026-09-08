@@ -7,15 +7,19 @@ import {
   CornerDownRight,
   FileCheck2,
   MessageSquareText,
+  Check,
+  Minus,
+  CircleHelp,
 } from 'lucide-react';
-import type { ExemploNina as Exemplo } from '@/lib/projetos/exemplos-nina';
-import styles from './ExemploNina.module.css';
+import type { ExemploProjeto as Exemplo } from '@/lib/projetos/exemplo-projeto';
+import styles from './ExemploProjeto.module.css';
 
 /** Leitura interativa apenas: nunca grava progresso, envia mensagens ou executa integrações. */
-export function ExemploNina({ exemplo }: { exemplo: Exemplo }) {
+export function ExemploProjeto({ exemplo }: { exemplo: Exemplo }) {
   const tituloId = useId();
   const [selecionado, selecionar] = useState(0);
   const cenario = exemplo.tipo === 'conversa' ? exemplo.cenarios[selecionado] : null;
+  const caso = exemplo.tipo === 'analise' ? exemplo.casos[selecionado] : null;
 
   return (
     <section className={styles.exemplo} aria-labelledby={tituloId}>
@@ -61,6 +65,57 @@ export function ExemploNina({ exemplo }: { exemplo: Exemplo }) {
             </div>
           ))}
         </dl>
+      ) : exemplo.tipo === 'analise' ? (
+        <>
+          <nav className={styles.cenarios} aria-label="Contas do exemplo">
+            {exemplo.casos.map((item, i) => (
+              <button
+                type="button"
+                key={item.nome}
+                aria-pressed={i === selecionado}
+                onClick={() => selecionar(i)}
+              >
+                {item.nome}
+              </button>
+            ))}
+          </nav>
+          {caso ? (
+            <div className={styles.analise} aria-live="polite" aria-atomic="true">
+              <div className={styles.empresa}>
+                <span>Empresa fictícia</span>
+                <strong>{caso.empresa}</strong>
+              </div>
+              <dl className={styles.criterios}>
+                {caso.criterios.map((criterio) => (
+                  <div key={criterio.rotulo}>
+                    <dt>{criterio.rotulo}</dt>
+                    <dd>
+                      <span>{criterio.dado}</span>
+                      <span className={styles.estado} data-estado={criterio.estado}>
+                        {criterio.estado === 'confirmado' ? (
+                          <Check size={16} aria-hidden="true" />
+                        ) : criterio.estado === 'nao_atende' ? (
+                          <Minus size={16} aria-hidden="true" />
+                        ) : (
+                          <CircleHelp size={16} aria-hidden="true" />
+                        )}
+                        {criterio.estado === 'confirmado'
+                          ? 'Confirmado'
+                          : criterio.estado === 'nao_atende'
+                            ? 'Fora do perfil'
+                            : 'A confirmar'}
+                      </span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <div className={styles.resultado}>
+                <strong>{caso.decisao}</strong>
+                <p>{caso.motivo}</p>
+              </div>
+            </div>
+          ) : null}
+        </>
       ) : (
         <>
           <nav className={styles.cenarios} aria-label="Cenários do exemplo">
@@ -78,13 +133,13 @@ export function ExemploNina({ exemplo }: { exemplo: Exemplo }) {
           {cenario ? (
             <div className={styles.conversa} aria-live="polite" aria-atomic="true">
               <div className={styles.mensagemEntrada}>
-                <span>Entrada</span>
+                <span>{exemplo.rotulos?.entrada ?? 'Entrada'}</span>
                 <p>{cenario.entrada}</p>
               </div>
               <div className={styles.mensagemSaida}>
                 <span>
                   <MessageSquareText size={16} aria-hidden="true" />
-                  Resposta esperada
+                  {exemplo.rotulos?.resposta ?? 'Resposta esperada'}
                 </span>
                 <p>{cenario.resposta}</p>
               </div>
