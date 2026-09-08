@@ -1,0 +1,496 @@
+{
+  "resultado": "Cada reunião comercial vira transcrição, fatos, coaching, tarefas, CRM atualizado, follow-up e contexto para a proposta.",
+  "clienteIdeal": "Times comerciais que fazem reuniões online, registram pouco no CRM e perdem dores, objeções, compromissos e próximos passos em notas dispersas.",
+  "entregavelFinal": "Captura consentida, transcrição, análise com evidências, Live Coach configurado, tarefas, CRM, follow-up, painel e rotina de qualidade.",
+  "versao": 1,
+  "roteiro": {
+    "fases": [
+      {
+        "id": "entender",
+        "passos": [
+          {
+            "id": "mapear-reuniao",
+            "acao": "Observe reuniões reais e desenhe preparação, abertura, descoberta, apresentação, objeções, compromissos e registro posterior.",
+            "modelo": {
+              "titulo": "Mapa da call",
+              "conteudo": "Momento | Objetivo | Pergunta esperada | Fato a capturar | Ação do vendedor | Evidência na call | Destino no CRM | Lacuna atual"
+            },
+            "titulo": "Mapear a reunião comercial",
+            "atencao": "Não comece pelos indicadores que a ferramenta consegue gerar. Comece pelas decisões que o time precisa tomar depois da reunião.",
+            "duracao": "60–90 min",
+            "insumos": [
+              "Três gravações autorizadas",
+              "Playbook atual",
+              "Vendedor e líder comercial"
+            ],
+            "execucao": [
+              "Escolha reuniões com desfechos diferentes e confirme autorização de uso da amostra.",
+              "Marque cada momento, informação esperada, fala real, decisão e registro feito depois.",
+              "Compare o playbook com a prática sem tratar diferença de estilo como erro automático.",
+              "Liste as cinco perdas de contexto que mais afetam follow-up, CRM ou proposta."
+            ],
+            "entregavel": "Mapa da jornada da call.",
+            "concluidoQuando": "O mapa mostra o que deve acontecer, o que acontece de fato e onde contexto ou próxima ação se perdem."
+          },
+          {
+            "id": "definir-leituras",
+            "acao": "Especifique o que a IA extrai, o que pode recomendar ao vivo e quais mudanças dependem de confirmação do vendedor.",
+            "modelo": {
+              "titulo": "Contrato de saída da call",
+              "conteudo": "Saída | Tipo: fato, inferência ou recomendação | Evidência obrigatória | Destino | Confirmação humana? | Responsável\nDor | fato | trecho e horário | nota CRM | não | sistema\nMover etapa | ação | critério de passagem | pipeline | sim | vendedor"
+            },
+            "titulo": "Definir fatos, coaching e indicadores",
+            "atencao": "Score único esconde erros. Preserve componentes e trechos para o líder discordar de uma leitura específica.",
+            "duracao": "60–90 min",
+            "insumos": ["Mapa da call", "Campos e etapas do CRM", "Playbook aprovado"],
+            "execucao": [
+              "Liste dores, necessidades, objeções, pessoas, decisões, compromissos e tarefas como fatos citáveis.",
+              "Defina sugestões do Live Coach que são úteis durante a conversa e limite a uma ação curta por vez.",
+              "Separe atualização segura, como criar uma nota, de ação confirmada, como mover etapa ou enviar e-mail.",
+              "Escolha indicadores ligados ao processo, como lacunas preenchidas, próximos passos com data e tempo de registro."
+            ],
+            "entregavel": "Contrato da inteligência comercial.",
+            "concluidoQuando": "Cada saída tem formato, fonte, destino, responsável e regra clara de confirmação."
+          }
+        ],
+        "titulo": "Entender",
+        "objetivo": "Mapear como a reunião produz decisão e quais informações realmente orientam a venda."
+      },
+      {
+        "id": "preparar",
+        "passos": [
+          {
+            "id": "preparar-captura",
+            "acao": "Configure a sala, informe gravação e transcrição, teste fontes de áudio separadas e defina retenção e acesso aos arquivos.",
+            "modelo": {
+              "titulo": "Checklist de captura",
+              "conteudo": "[ ] aviso antes da gravação\n[ ] consentimento registrado\n[ ] participante e track vinculados\n[ ] reconexão testada\n[ ] fala simultânea preservada\n[ ] acesso protegido\n[ ] retenção definida\n[ ] exclusão testada\n[ ] responsável nomeado"
+            },
+            "titulo": "Preparar sala, áudio e consentimento",
+            "atencao": "Misturar todas as vozes antes de identificar participantes reduz a utilidade e pode atribuir uma fala à pessoa errada.",
+            "duracao": "2–4 h",
+            "insumos": [
+              "Plataforma de calls",
+              "Política de privacidade e retenção",
+              "Dois participantes de teste"
+            ],
+            "execucao": [
+              "Defina a mensagem de consentimento e o comportamento quando alguém não aceitar.",
+              "Associe cada faixa ao participante pelo identificador da track, não pela ordem de chegada.",
+              "Grave entrada, saída, silêncio, reconexão e troca de dispositivo com horários confiáveis.",
+              "Proteja gravação e transcrição por dono e estabeleça prazo de retenção e exclusão."
+            ],
+            "entregavel": "Captura de reunião validada.",
+            "concluidoQuando": "Duas pessoas entram, consentem, falam simultaneamente e a gravação preserva identidade, horário e qualidade suficiente."
+          },
+          {
+            "id": "conectar-oportunidade",
+            "acao": "Exija oportunidade e participantes antes de gerar o link e carregue os campos, estágio e playbook corretos para orientar a análise.",
+            "modelo": {
+              "titulo": "Contexto mínimo da call",
+              "conteudo": "reuniao_id:\noportunidade_id:\nempresa_id:\nparticipantes: []\nobjetivo:\netapa_atual:\nultimos_fatos: []\nplaybook_id:\nplaybook_versao:\nconsentimento_status:"
+            },
+            "titulo": "Conectar call ao CRM e playbook",
+            "atencao": "Título parecido não é vínculo. Use identificadores do CRM para impedir que duas oportunidades da mesma empresa misturem contexto.",
+            "duracao": "90–150 min",
+            "insumos": ["CRM de teste", "Playbook versionado", "Oportunidade e contatos fictícios"],
+            "execucao": [
+              "Defina quem pode gerar o link e quais vínculos são obrigatórios antes da sala existir.",
+              "Carregue etapa, histórico, pessoas e objetivo sem enviar ao modelo dados que não ajudam a reunião.",
+              "Selecione a versão do playbook pela operação e registre qual versão orientou as recomendações.",
+              "Crie uma call de teste e confirme nota, tarefas e fonte_id na oportunidade correta."
+            ],
+            "entregavel": "Contexto comercial conectado.",
+            "concluidoQuando": "A reunião de teste nasce ligada à oportunidade e todos os resultados voltam para a mesma linha do tempo."
+          }
+        ],
+        "titulo": "Preparar",
+        "objetivo": "Organizar consentimento, captura, identidade da reunião e integrações antes da análise."
+      },
+      {
+        "id": "construir",
+        "passos": [
+          {
+            "id": "transcrever-coachear",
+            "acao": "Envie segmentos com identidade e horário, construa a transcrição incremental e mostre recomendações curtas baseadas no playbook e na conversa.",
+            "modelo": {
+              "titulo": "Saída do Live Coach",
+              "conteudo": "{\n  \"mostrar\": true,\n  \"tipo\": \"pergunta | alerta | lembrete\",\n  \"texto\": \"uma ação curta\",\n  \"motivo\": \"lacuna ou trecho atual\",\n  \"segmentos\": [\"ids\"],\n  \"expira_em_segundos\": 30\n}"
+            },
+            "titulo": "Transcrever e orientar em tempo real",
+            "atencao": "Coach que fala o tempo todo atrapalha. Silêncio também é uma decisão correta quando não existe recomendação útil.",
+            "duracao": "4–7 h",
+            "insumos": ["Captura validada", "Playbook versionado", "Serviço de transcrição e IA"],
+            "execucao": [
+              "Transcreva por participante e guarde início, fim, texto, confiança e origem de cada segmento.",
+              "Monte uma janela de contexto que preserve perguntas e respostas sem reenviar a reunião inteira.",
+              "Compare lacunas do playbook com o que já foi dito e gere no máximo uma sugestão acionável por vez.",
+              "Bloqueie repetição, recomendação baseada em fala antiga e orientação quando a confiança da transcrição estiver baixa."
+            ],
+            "entregavel": "Transcrição e Live Coach ativos.",
+            "concluidoQuando": "A transcrição acompanha a call e o coach mostra somente sugestões relevantes, com contexto suficiente e atraso aceitável."
+          },
+          {
+            "id": "gerar-pos-call",
+            "acao": "Ao encerrar, consolide a transcrição final, extraia fatos com citações, crie tarefas confirmáveis e prepare follow-up e briefing da proposta.",
+            "modelo": {
+              "titulo": "Revisão pós-call",
+              "conteudo": "Resumo factual:\nDores com trechos:\nObjeções com trechos:\nDecisões:\nCompromissos e datas:\nLacunas:\nTarefas propostas:\nMudança de etapa proposta:\nFollow-up para revisar:\nContexto da proposta:\nFalhas de transcrição:"
+            },
+            "titulo": "Gerar fatos, tarefas e follow-up",
+            "atencao": "Não transforme frases como depois conversamos em prazo. Datas e responsáveis ausentes continuam como lacunas para o vendedor completar.",
+            "duracao": "3–5 h",
+            "insumos": ["Transcrição final", "Contrato de saída", "Campos do CRM"],
+            "execucao": [
+              "Feche segmentos incompletos e marque falhas ou trechos inaudíveis antes da análise.",
+              "Extraia fatos, inferências e recomendações em grupos separados, sempre com segmento e horário.",
+              "Converta compromissos declarados em tarefas com responsável e data apenas quando aparecerem na conversa.",
+              "Apresente atualização do CRM, follow-up e contexto de proposta em revisão única antes de executar qualquer ação."
+            ],
+            "entregavel": "Revisão pós-call completa.",
+            "concluidoQuando": "O vendedor revisa uma tela com fatos, trechos, tarefas e rascunhos e confirma o que entra no CRM ou será enviado."
+          }
+        ],
+        "titulo": "Construir",
+        "objetivo": "Transformar áudio em orientação útil durante a call e trabalho organizado depois dela."
+      },
+      {
+        "id": "validar",
+        "passos": [
+          {
+            "id": "comparar-calls",
+            "acao": "Use reuniões com desfechos diferentes e faça vendedor e líder avaliarem fatos, trechos, sugestões, tarefas e rascunhos sem aceitar o resultado automaticamente.",
+            "modelo": {
+              "titulo": "Planilha de calibração",
+              "conteudo": "Reunião | Tipo de saída | IA | Gabarito | Trecho correto? | Fato correto? | Útil? | No tempo certo? | Gravidade | Causa | Correção | Reteste"
+            },
+            "titulo": "Comparar dez reuniões",
+            "atencao": "Média geral pode esconder uma falha grave, como tarefa inventada. Defina tipos que exigem precisão total antes do piloto.",
+            "duracao": "2–3 h",
+            "insumos": [
+              "Dez reuniões autorizadas",
+              "Gabarito humano independente",
+              "Critérios de precisão e utilidade"
+            ],
+            "execucao": [
+              "Crie o gabarito antes de mostrar a análise da IA para reduzir viés de confirmação.",
+              "Compare cada dor, objeção, tarefa e recomendação com a transcrição e o gabarito.",
+              "Meça precisão por tipo e marque também saída correta mas inútil ou tardia.",
+              "Ajuste prompt, contexto ou regra conforme a causa e repita todos os casos críticos."
+            ],
+            "entregavel": "Relatório de calibração comercial.",
+            "concluidoQuando": "Precisão e utilidade estão medidas por tipo de saída e todas as falhas críticas foram corrigidas e repetidas."
+          },
+          {
+            "id": "testar-ponta-a-ponta",
+            "acao": "Agende, realize, desconecte, encerre, revise, confirme e encontre todos os fatos no CRM usando perfis reais da equipe.",
+            "modelo": {
+              "titulo": "Roteiro ponta a ponta",
+              "conteudo": "Cenário | Link ligado à oportunidade? | Participantes corretos? | Transcrição completa? | Análise disponível? | Revisão preservada? | CRM correto? | Duplicidade? | Permissões? | Aprovado?"
+            },
+            "titulo": "Simular o dia comercial",
+            "atencao": "Status de processamento concluído não prova entrega. Confirme o conteúdo no CRM e a ação visível para quem trabalha.",
+            "duracao": "90–120 min",
+            "insumos": [
+              "Vendedor, líder e administrador",
+              "CRM e sala em teste",
+              "Cenários de falha definidos"
+            ],
+            "execucao": [
+              "Faça uma reunião comum, uma com reconexão e uma encerrada sem fala suficiente.",
+              "Revise parcialmente, saia da tela e retome sem perder decisões já confirmadas.",
+              "Confirme tarefas e follow-up, recuse mudança de etapa e verifique exatamente o que entrou no CRM.",
+              "Valide permissões para gravação, transcrição e análise com cada papel da operação."
+            ],
+            "entregavel": "Aceite ponta a ponta.",
+            "concluidoQuando": "Três jornadas terminam sem mistura de oportunidade, perda de transcrição, duplicidade de tarefa ou ação não confirmada."
+          }
+        ],
+        "titulo": "Validar",
+        "objetivo": "Comparar a IA com a leitura humana e provar o caminho completo até o CRM."
+      },
+      {
+        "id": "entregar",
+        "passos": [
+          {
+            "id": "piloto-vendedores",
+            "acao": "Escolha poucos vendedores e tipos de reunião, acompanhe as primeiras calls e permita voltar ao processo anterior sem perder a reunião.",
+            "modelo": {
+              "titulo": "Plano do piloto comercial",
+              "conteudo": "Vendedores:\nTipos de reunião:\nPeríodo:\nLinha de base:\nSuporte:\nPausar se:\nIndicadores:\nRitual diário:\nDecisão: corrigir | repetir | ampliar"
+            },
+            "titulo": "Ativar com vendedores piloto",
+            "atencao": "Não obrigue toda a equipe no primeiro dia. A confiança depende de corrigir rapidamente atribuições e tarefas erradas.",
+            "duracao": "3–5 dias",
+            "insumos": [
+              "Dois ou três vendedores",
+              "Líder acompanhando",
+              "Critérios de pausa e sucesso"
+            ],
+            "execucao": [
+              "Defina participantes, tipos de call, período, suporte e condições de pausa.",
+              "Observe as primeiras dez reuniões e registre atraso, falha, utilidade e taxa de revisão.",
+              "Colete discordâncias no próprio insight em vez de depender de mensagens soltas.",
+              "Compare tempo de registro, completude de próximos passos e uso do follow-up com a linha de base."
+            ],
+            "entregavel": "Piloto comercial em produção.",
+            "concluidoQuando": "O piloto termina sem falha crítica e os vendedores revisam o pós-call dentro do tempo combinado."
+          },
+          {
+            "id": "instituir-revisao",
+            "acao": "Documente operação, playbook, privacidade, confirmação e contingência e deixe uma amostra semanal de qualidade sob responsabilidade do líder.",
+            "modelo": {
+              "titulo": "Ritual semanal de qualidade",
+              "conteudo": "Amostra de calls:\nInsights corretos por tipo:\nInsights contestados:\nTarefas confirmadas:\nPróximos passos com data:\nTempo até revisão:\nFalhas de captura:\nMudanças propostas:\nVersão testada:\nResponsável e prazo:"
+            },
+            "titulo": "Entregar manual e revisão semanal",
+            "atencao": "Não deixe o modelo aprender silenciosamente com toda reunião. Mudança de playbook ou prompt precisa de versão, teste e responsável.",
+            "duracao": "60–90 min",
+            "insumos": ["Dados do piloto", "Acessos e responsáveis", "Playbook final"],
+            "execucao": [
+              "Documente agendamento, consentimento, sala, revisão pós-call, confirmação e correção de insight.",
+              "Entregue indicadores de uso, precisão, tarefas confirmadas, próximos passos com data e tempo economizado.",
+              "Treine o líder para revisar uma amostra, alterar o playbook e voltar uma versão.",
+              "Marque a revisão semanal e registre pendências, retenção dos dados e responsáveis por incidentes."
+            ],
+            "entregavel": "Manual e rotina de inteligência comercial.",
+            "concluidoQuando": "A equipe opera, corrige e mede a solução sem o implementador e a primeira revisão tem data e dono."
+          }
+        ],
+        "titulo": "Entregar",
+        "objetivo": "Ativar com um grupo pequeno e tornar a qualidade parte da rotina comercial."
+      }
+    ],
+    "escopo": {
+      "inclui": [
+        "Sala, consentimento, captura e transcrição por participante",
+        "Live Coach curto e orientado pelo playbook aprovado",
+        "Fatos, objeções, compromissos e tarefas com trechos",
+        "Revisão pós-call e atualização confirmada do CRM"
+      ],
+      "evolucoes": [
+        "Conectar a análise ao gerador de proposta",
+        "Criar coaching por tipo de reunião e etapa comercial",
+        "Ampliar indicadores para liderança e treinamento"
+      ],
+      "naoInclui": [
+        "Mover etapa do funil sem confirmação do vendedor",
+        "Enviar follow-up, proposta ou compromisso automaticamente",
+        "Avaliar pessoas por um score único sem trechos e contexto"
+      ],
+      "preRequisitos": [
+        "Política de consentimento, retenção e acesso às gravações",
+        "CRM com oportunidade e participantes identificados",
+        "Playbook comercial versionado e líder para calibrar a leitura",
+        "Vendedores disponíveis para um piloto acompanhado"
+      ]
+    },
+    "perfil": {
+      "nivel": "avancado",
+      "prazo": "4 a 6 semanas",
+      "formatoPiloto": "Dois ou três vendedores, um tipo de reunião e dez calls acompanhadas.",
+      "primeiraProva": "Dez reuniões com fatos citáveis, revisão preservada e tarefas corretas no CRM sem nenhuma ação comercial não confirmada.",
+      "recomendadoParaComecar": false
+    },
+    "fundamentos": [
+      {
+        "titulo": "Trecho sustenta insight",
+        "descricao": "Dor, objeção, compromisso e recomendação apontam para a fala e o horário que sustentam a leitura."
+      },
+      {
+        "titulo": "CRM recebe fatos",
+        "descricao": "A automação registra eventos e tarefas confirmadas. Inferências continuam rotuladas e não mudam o funil sozinhas."
+      },
+      {
+        "titulo": "Pessoa envia e decide",
+        "descricao": "Follow-up, proposta e mudança comercial permanecem sob revisão humana, mesmo quando a IA deixa tudo preparado."
+      }
+    ],
+    "trilhaDidatica": {
+      "aulas": [
+        {
+          "titulo": "Capture a reunião como evidência confiável",
+          "duracao": "15 min",
+          "topicos": [
+            "Call ligada à oportunidade e participantes identificados antes da entrada",
+            "Consentimento, acesso, retenção e exclusão definidos para gravação e transcrição",
+            "Áudio por participante e tempo preservados sem cruzar falas ou perder a origem"
+          ],
+          "objetivo": "Preparar consentimento, participantes, faixas de áudio e retenção para que cada leitura futura possa voltar à conversa que realmente aconteceu.",
+          "recursos": [
+            {
+              "tipo": "mapa_mental",
+              "titulo": "Linha do tempo confiável da call",
+              "conteudo": "OPORTUNIDADE\n→ empresa, contato, etapa e objetivo\n\nSALA\n→ participantes identificados\n→ consentimento registrado\n\nCAPTURA\n→ faixa de áudio por participante\n→ entrada, saída e falha como eventos\n\nTRANSCRIÇÃO\n→ fala, pessoa e horário preservados\n\nLEITURA\n→ fato ligado ao trecho de origem\n→ inferência separada\n\nREVISÃO\n→ vendedor confirma ou rejeita\n\nCRM\n→ somente fatos e ações confirmadas",
+              "descricao": "Acompanhe o caminho entre oportunidade, consentimento, áudio, transcrição e evidência comercial."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "A captura pode sustentar uma decisão?",
+              "conteudo": "1. A call está ligada à oportunidade correta?\n2. Todos os participantes foram identificados?\n3. O consentimento acontece antes da gravação?\n4. Cada fala preserva participante e horário?\n5. A política de acesso e retenção foi aprovada?\n6. Uma falha de áudio ou transcrição fica registrada?\n7. É possível voltar da informação extraída ao trecho original?\n\nSem essas respostas, a transcrição ainda não é uma fonte confiável para o CRM.",
+              "descricao": "Revise privacidade, identidade e rastreabilidade antes da primeira call piloto."
+            }
+          ],
+          "exercicio": "Simule uma sala com vendedor e lead, confirme o consentimento, grave uma fala de cada participante e verifique se transcrição, nome e horário continuam ligados à faixa correta.",
+          "prontoQuando": "É possível abrir uma frase transcrita, identificar quem falou, ouvir ou localizar o trecho correspondente e aplicar a política de acesso e retenção aprovada."
+        },
+        {
+          "titulo": "Faça o Live Coach ajudar sem tomar a reunião",
+          "duracao": "15 min",
+          "topicos": [
+            "Gatilho ligado ao diálogo e recomendação de uma ação por vez",
+            "Prioridade, expiração e silêncio correto quando a conversa já está avançando",
+            "Coaching de método sem inventar objeção, urgência ou julgar estilo pessoal"
+          ],
+          "objetivo": "Transformar um playbook aprovado em sugestões curtas, contextuais e temporárias que ajudam o vendedor somente quando existe uma lacuna real.",
+          "recursos": [
+            {
+              "tipo": "ebook",
+              "titulo": "Live Coach que sabe ficar em silêncio",
+              "conteudo": "LIVE COACH ÚTIL\n\nUMA DICA PRECISA DE\n1. Evidência no diálogo.\n2. Uma lacuna que ainda não foi resolvida.\n3. Uma ação curta e executável.\n4. Prioridade.\n5. Tempo de validade.\n6. Condição para ficar em silêncio.\n\nO COACH NÃO DEVE\nAvaliar personalidade, sotaque ou estilo. Inventar objeção ou urgência. Repetir uma dica já resolvida. Exibir várias ações ao mesmo tempo. Manter na tela uma sugestão que perdeu o momento.\n\nA REGRA MAIS IMPORTANTE\nSe a conversa está avançando e o vendedor já cobriu o ponto, o melhor coaching é não interromper.",
+              "descricao": "Converta o playbook em sugestões curtas que aparecem somente quando ajudam a conversa."
+            },
+            {
+              "tipo": "modelo",
+              "titulo": "Regra de sugestão do coach",
+              "conteudo": "MOMENTO DA CALL:\nEvidência necessária no diálogo:\nLacuna ainda aberta:\nSugestão em uma frase:\nPrioridade:\nExpira em quantos segundos:\nOcultar quando:\nNão sugerir se:\nPlaybook de origem:\nResponsável pela aprovação:\nResultado do teste: útil, tardia ou desnecessária\nCorreção e reteste:",
+              "descricao": "Documente o gatilho, a lacuna e o momento em que cada orientação deixa de ser útil."
+            }
+          ],
+          "exercicio": "Escolha cinco momentos de uma call real e compare o playbook com o diálogo. Escreva a sugestão que ajudaria, quando ela deve aparecer e em quantos segundos deixa de ser útil.",
+          "prontoQuando": "Cada sugestão cita a lacuna que a provocou, cabe em uma leitura rápida, expira sozinha e não interrompe quando o vendedor já resolveu o ponto."
+        },
+        {
+          "titulo": "Leve fatos confirmados ao CRM",
+          "duracao": "18 min",
+          "topicos": [
+            "Fala do lead, proposta do vendedor, inferência e compromisso tratados como coisas diferentes",
+            "Trecho, horário e participante anexados a cada fato ou ação sugerida",
+            "Revisão antes de mover etapa, criar tarefa, gerar proposta ou enviar follow-up"
+          ],
+          "objetivo": "Extrair dores, objeções, decisões, compromissos e tarefas com evidência, preservando a revisão humana antes de qualquer efeito comercial.",
+          "recursos": [
+            {
+              "tipo": "modelo",
+              "titulo": "Ficha factual pós-call",
+              "conteudo": "CALL\nEmpresa e oportunidade:\nData:\nParticipantes:\nObjetivo:\n\nFATOS CONFIRMADOS\nFato | Quem declarou | Trecho | Horário | Revisão\n\nINFERÊNCIAS\nHipótese | Evidência relacionada | Como confirmar\n\nCOMPROMISSOS\nAção | Responsável | Data declarada | Trecho | Confirmada?\n\nEFEITOS NO CRM\n[ ] Atualizar ficha do cliente\n[ ] Criar tarefa\n[ ] Mover etapa\n[ ] Preparar proposta\n[ ] Manter follow-up em rascunho\n\nRevisado por:\nAlterações humanas:\nPróxima ação aprovada:",
+              "descricao": "Revise cada saída da IA antes de atualizar etapa, tarefa, proposta ou follow-up."
+            },
+            {
+              "tipo": "quiz",
+              "titulo": "O CRM pode ser atualizado?",
+              "conteudo": "1. Cada fato cita participante, trecho e horário?\n2. Inferências estão separadas das falas?\n3. Datas e responsáveis foram realmente combinados?\n4. O pedido de proposta foi declarado pelo lead?\n5. A mudança de etapa foi revisada por uma pessoa?\n6. O follow-up continua como rascunho até o envio?\n7. Desconto, condição e prazo não foram inventados?\n\nAtualize o CRM apenas quando a resposta for sim para todos os itens aplicáveis.",
+              "descricao": "Confirme que cada alteração comercial nasceu da call e passou por revisão humana."
+            }
+          ],
+          "exercicio": "Analise uma transcrição curta, extraia cinco fatos e duas possíveis ações e peça a outra pessoa para abrir os trechos e decidir quais ações foram realmente combinadas.",
+          "prontoQuando": "O CRM recebe somente fatos citáveis e ações confirmadas; proposta, desconto, prazo ou follow-up que não foram combinados permanecem como rascunho para revisão."
+        }
+      ],
+      "materiais": [
+        {
+          "titulo": "Contrato da reunião e consentimento",
+          "conteudo": "CONTRATO DA REUNIÃO\n\nTipo de reunião:\nObjetivo:\nEtapa comercial relacionada:\nParticipantes esperados:\nOportunidade no CRM:\n\nCAPTURA E PRIVACIDADE\nTexto de consentimento:\nQuando a gravação pode começar:\nQuem pode acessar áudio e transcrição:\nPrazo de retenção:\nComo solicitar exclusão:\nComo tratar participante sem consentimento:\nDados que não devem ser extraídos:\n\nSAÍDAS ESPERADAS\nFatos sobre cenário atual:\nDores e impactos:\nCritérios de decisão:\nObjeções:\nCompromissos:\nPróximas ações:\nTarefas permitidas após revisão:\nSaídas que nunca podem ser automáticas:\n\nResponsável pela operação:\nResponsável pela privacidade:\nVersão e data de aprovação:",
+          "quandoUsar": "Na preparação, para fechar o que será capturado, quem poderá acessar e quais saídas a reunião deve produzir."
+        },
+        {
+          "titulo": "Playbook operacional do Live Coach",
+          "conteudo": "PLAYBOOK DO LIVE COACH\n\nMomento | Evidência no diálogo | Lacuna | Sugestão permitida | Prioridade | Expira em | Quando ficar em silêncio\n\n1. MOMENTO\nEvidência necessária:\nLacuna:\nSugestão em uma frase:\nPrioridade:\nTempo de validade:\nNão sugerir quando:\n\nREGRAS GERAIS\n[ ] Uma sugestão por vez\n[ ] Toda sugestão nasce de uma fala ou lacuna observável\n[ ] Dica expirada desaparece\n[ ] Não repetir ponto já resolvido\n[ ] Não inventar objeção, urgência ou intenção\n[ ] Não avaliar sotaque, personalidade ou estilo pessoal\n[ ] Situação sensível sai do coaching automático\n\nResponsável pelo playbook:\nVersão:\nData da próxima calibração:",
+          "quandoUsar": "Antes do piloto, para converter o método comercial em gatilhos úteis, curtos e temporários."
+        },
+        {
+          "titulo": "Contrato de fatos e ações pós-call",
+          "conteudo": "CONTRATO DE FATOS E AÇÕES PÓS-CALL\n\nTIPO DE SAÍDA | DEFINIÇÃO | EVIDÊNCIA OBRIGATÓRIA | DESTINO | EXIGE CONFIRMAÇÃO?\n\nDor declarada:\nImpacto declarado:\nProcesso atual:\nObjeção:\nCritério de decisão:\nPessoa envolvida:\nCompromisso do lead:\nCompromisso do vendedor:\nPróxima ação sugerida:\nTarefa confirmada:\n\nCAMPOS DE CADA SAÍDA\nParticipante que falou:\nTrecho literal:\nHorário inicial e final:\nInterpretação separada:\nConfiança:\nRevisor:\nAlteração humana:\nEstado: sugerido, confirmado, rejeitado ou corrigido\n\nNUNCA ASSUMIR\nPrazo não confirmado\nOrçamento não declarado\nAutoridade não comprovada\nDesconto ou condição\nEtapa comercial\nEnvio já realizado",
+          "quandoUsar": "Na construção, para definir exatamente o que a IA pode extrair e qual evidência cada saída precisa carregar."
+        },
+        {
+          "titulo": "Matriz de calibração de dez calls",
+          "conteudo": "MATRIZ DE CALIBRAÇÃO DE 10 CALLS\n\nCall | Tipo | Saída avaliada | IA | Vendedor | Líder | Trecho correto? | Participante correto? | Ação correta? | Decisão | Correção | Reteste\n\nCOBERTURA MÍNIMA\n[ ] Dez reuniões do mesmo tipo\n[ ] Calls curtas e longas\n[ ] Áudio limpo e com interrupção\n[ ] Objeção explícita e ambígua\n[ ] Compromisso confirmado e apenas sugerido\n[ ] Coach útil, tardio e desnecessário\n[ ] Falha parcial de transcrição\n\nMEDIDAS\nFatos corretos:\nFatos sem evidência:\nFatos importantes omitidos:\nParticipantes trocados:\nAções corretas:\nAções indevidas:\nDicas úteis:\nDicas ignoradas:\nDicas tardias:\n\nResponsável pela calibração:\nCorreções obrigatórias:\nCritério de aprovação:\nData do reteste:",
+          "quandoUsar": "Na validação, para comparar a leitura da IA com vendedor e liderança antes de ampliar o piloto."
+        },
+        {
+          "titulo": "Ficha de revisão e passagem ao CRM",
+          "conteudo": "REVISÃO E PASSAGEM AO CRM\n\nCALL\nData e horário:\nEmpresa e oportunidade:\nParticipantes:\nTipo e objetivo:\nLink da gravação conforme permissão:\n\nRESUMO FACTUAL\nCenário atual com trecho:\nDor e impacto com trecho:\nObjeção com trecho:\nCritérios de decisão com trecho:\nDecisões tomadas:\nLacunas ainda abertas:\n\nAÇÕES\nAção | Foi declarada? | Responsável | Data confirmada? | Trecho | Destino\n\nREVISÃO HUMANA\n[ ] Participantes e falas estão corretos\n[ ] Inferências estão separadas dos fatos\n[ ] Datas e responsáveis foram realmente combinados\n[ ] Etapa do CRM deve mudar\n[ ] Tarefas podem ser criadas\n[ ] Proposta precisa ser gerada ou atualizada\n[ ] Follow-up está apenas em rascunho\n\nALTERAÇÕES DO REVISOR\nCampo alterado:\nAntes:\nDepois:\nMotivo:\n\nRevisado por:\nConfirmado em:\nPróxima ação aprovada:\nItens rejeitados ou pendentes:",
+          "quandoUsar": "No pós-call, para revisar o resumo e confirmar cada efeito antes de atualizar a operação comercial."
+        }
+      ],
+      "tempoTotal": "45 a 60 minutos antes da primeira call piloto",
+      "demonstracao": {
+        "passos": [
+          {
+            "etapa": "Call ligada à oportunidade",
+            "evidencia": "Call, oportunidade e participantes",
+            "oQueAcontece": "Sala, vendedor, lead, empresa e objetivo da reunião são ligados ao registro correto do CRM antes da entrada dos participantes."
+          },
+          {
+            "etapa": "Consentimento e captura",
+            "evidencia": "Consentimento, faixa, participante e evento",
+            "oQueAcontece": "A gravação começa somente após o aviso aprovado; cada participante mantém sua fonte de áudio e o sistema registra entrada, saída e eventuais falhas."
+          },
+          {
+            "etapa": "Coaching no momento certo",
+            "evidencia": "Lacuna, sugestão, criação e expiração",
+            "oQueAcontece": "O lead descreve demora no WhatsApp, mas o impacto ainda não foi entendido. O coach sugere uma pergunta curta e remove a dica quando o vendedor avança."
+          },
+          {
+            "etapa": "Transcrição consolidada",
+            "evidencia": "Trecho original, revisão e horário",
+            "oQueAcontece": "Os trechos ao vivo são conciliados com a transcrição final; correções preservam o original e não trocam o participante que originou a fala."
+          },
+          {
+            "etapa": "Fatos e ações extraídos",
+            "evidencia": "Tipo de saída, trecho e confiança",
+            "oQueAcontece": "Dor, processo atual, objeção, critério de decisão e pedido de proposta são extraídos com citações. Uma data sugerida pelo vendedor não vira prazo confirmado."
+          },
+          {
+            "etapa": "Revisão e CRM atualizados",
+            "evidencia": "Revisor, alteração, confirmação e destino",
+            "oQueAcontece": "O vendedor corrige o resumo, confirma o envio da proposta como próxima ação e aprova a tarefa. O follow-up permanece em rascunho até o envio humano."
+          }
+        ],
+        "titulo": "Da sala ao próximo passo confirmado no CRM",
+        "contexto": "Um prestador apresenta um projeto de SDR com IA para uma rede de clínicas. A reunião precisa gerar orientação útil ao vivo, fatos citáveis depois da call e uma próxima ação confirmada, sem criar compromisso que o lead não assumiu.",
+        "resultadoEsperado": "a reunião permanece rastreável por participante e horário, o coach ajuda sem dominar a conversa e o CRM recebe fatos e ações confirmadas sem inventar prazo, desconto, etapa ou compromisso."
+      },
+      "videosReferencia": [
+        {
+          "titulo": "BriefBot · Plataforma de reuniões",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=17171fd9-22cd-4353-bf10-6a75d982c7ca",
+          "descricao": "Veja a referência do Viver de IA para sala online, gravação, transcrição, briefing e tarefas conectadas à reunião."
+        },
+        {
+          "titulo": "LiveCoach em tempo real",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=cf55fd01-4b35-4f0c-87ae-f06905b1b33e",
+          "descricao": "Observe como dicas treinadas no playbook podem acompanhar reuniões de vendas e CS enquanto a conversa acontece."
+        },
+        {
+          "titulo": "Relatório de Vendas com IA",
+          "videoUrl": "https://player-vz-d6ebf577-797.tv.pandavideo.com.br/embed/?v=e4408cdf-11db-4b7a-9a7e-f1cb93faaa48",
+          "descricao": "Complete a jornada vendo como dores, qualificação e desempenho da reunião viram uma leitura pós-call para o time comercial."
+        }
+      ]
+    },
+    "artefatosEntrega": [
+      {
+        "titulo": "Mapa da call e contrato de saída",
+        "descricao": "Momentos, fatos, evidências, sugestões, destinos e ações que exigem confirmação."
+      },
+      {
+        "titulo": "Checklist de captura e privacidade",
+        "descricao": "Consentimento, participantes, faixas de áudio, acesso, retenção, exclusão e contingência."
+      },
+      {
+        "titulo": "Playbook do Live Coach",
+        "descricao": "Lacunas, gatilhos, sugestões permitidas, silêncio correto e critérios de expiração."
+      },
+      {
+        "titulo": "Relatório de calibração",
+        "descricao": "Comparação por tipo de saída entre IA, transcrição, vendedor e líder comercial."
+      },
+      {
+        "titulo": "Manual do piloto comercial",
+        "descricao": "Papéis, jornada ponta a ponta, revisão, indicadores, pausa, correção e rotina semanal."
+      }
+    ]
+  }
+}

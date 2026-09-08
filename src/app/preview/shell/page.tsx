@@ -35,6 +35,7 @@ import {
 import { ProgressoPreview } from '../ProgressoPreview';
 import ninaFixture from '../nina/fixture.json';
 import prospeccaoFixture from '../prospeccao-projeto/fixture.json';
+import reunioesProjetoFixture from '../reunioes-projeto/fixture.json';
 import { lerRoteiroProjeto } from '@/lib/projetos/roteiro';
 import { TelaSobral } from '@/app/(app)/consultor/_components/TelaSobral';
 import { ControlesPreview } from './ControlesPreview';
@@ -204,17 +205,23 @@ export default async function PreviewShellPage({
                 slug={
                   params.estado === 'prospeccao'
                     ? 'maquina-prospeccao-b2b'
-                    : 'sdr-atendimento-qualificacao'
+                    : params.estado === 'reunioes'
+                      ? 'inteligencia-comercial-com-ia'
+                      : 'sdr-atendimento-qualificacao'
                 }
                 titulo={
                   params.estado === 'prospeccao'
                     ? 'Prospecção de clientes com IA'
-                    : 'Atendimento no WhatsApp com IA'
+                    : params.estado === 'reunioes'
+                      ? 'Assistente de reuniões com IA'
+                      : 'Atendimento no WhatsApp com IA'
                 }
                 resumo={
                   params.estado === 'prospeccao'
                     ? 'Encontre empresas com perfil e prepare uma lista revisada para vendas.'
-                    : 'Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe.'
+                    : params.estado === 'reunioes'
+                      ? 'Organize falas, decisões e próximas ações, com revisão antes de atualizar o CRM.'
+                      : 'Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe.'
                 }
                 categoria="Automação com IA"
                 projeto={
@@ -225,7 +232,12 @@ export default async function PreviewShellPage({
                           ...prospeccaoFixture,
                           roteiro: lerRoteiroProjeto(prospeccaoFixture.roteiro)!,
                         }
-                      : projetoPreview
+                      : params.estado === 'reunioes'
+                        ? {
+                            ...reunioesProjetoFixture,
+                            roteiro: lerRoteiroProjeto(reunioesProjetoFixture.roteiro)!,
+                          }
+                        : projetoPreview
                 }
                 ferramentas={ferramentasPreview}
                 prompts={promptsPreview}

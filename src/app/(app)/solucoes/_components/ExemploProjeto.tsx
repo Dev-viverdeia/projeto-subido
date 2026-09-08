@@ -10,6 +10,8 @@ import {
   Check,
   Minus,
   CircleHelp,
+  FileText,
+  ListChecks,
 } from 'lucide-react';
 import type { ExemploProjeto as Exemplo } from '@/lib/projetos/exemplo-projeto';
 import styles from './ExemploProjeto.module.css';
@@ -20,6 +22,7 @@ export function ExemploProjeto({ exemplo }: { exemplo: Exemplo }) {
   const [selecionado, selecionar] = useState(0);
   const cenario = exemplo.tipo === 'conversa' ? exemplo.cenarios[selecionado] : null;
   const caso = exemplo.tipo === 'analise' ? exemplo.casos[selecionado] : null;
+  const reuniao = exemplo.tipo === 'pos-call' ? exemplo.cenarios[selecionado] : null;
 
   return (
     <section className={styles.exemplo} aria-labelledby={tituloId}>
@@ -65,6 +68,86 @@ export function ExemploProjeto({ exemplo }: { exemplo: Exemplo }) {
             </div>
           ))}
         </dl>
+      ) : exemplo.tipo === 'pos-call' ? (
+        <>
+          <nav className={styles.cenarios} aria-label="Situações da reunião">
+            {exemplo.cenarios.map((item, i) => (
+              <button
+                type="button"
+                key={item.nome}
+                aria-pressed={i === selecionado}
+                onClick={() => selecionar(i)}
+              >
+                {item.nome}
+              </button>
+            ))}
+          </nav>
+          {reuniao ? (
+            <div aria-live="polite" aria-atomic="true">
+              <div className={styles.posCall}>
+                <div className={styles.transcricao}>
+                  <span className={styles.rotuloSaida}>
+                    <MessageSquareText size={18} aria-hidden="true" /> Na conversa
+                  </span>
+                  <ol aria-label="Trechos simulados da reunião">
+                    {reuniao.falas.map((fala) => (
+                      <li key={`${fala.pessoa}-${fala.horario}`}>
+                        <div className={styles.autorTrecho}>
+                          <span>{fala.pessoa}</span>
+                          <span aria-label={`${fala.horario} da gravação`}>{fala.horario}</span>
+                        </div>
+                        <blockquote>{fala.texto}</blockquote>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <div className={styles.saidasCall}>
+                  <div className={styles.resumoCall}>
+                    <span className={styles.rotuloSaida}>
+                      <FileText size={18} aria-hidden="true" /> Resumo com base no trecho
+                    </span>
+                    <p>{reuniao.resumo}</p>
+                  </div>
+                  <div className={styles.tarefaCall}>
+                    <span className={styles.rotuloSaida}>
+                      <ListChecks size={18} aria-hidden="true" /> Tarefa para revisão
+                    </span>
+                    <strong>{reuniao.tarefa}</strong>
+                    <dl>
+                      <div>
+                        <dt>Responsável</dt>
+                        <dd>{reuniao.responsavel}</dd>
+                      </div>
+                      <div>
+                        <dt>Prazo</dt>
+                        <dd>{reuniao.prazo}</dd>
+                      </div>
+                    </dl>
+                    <span
+                      className={styles.estado}
+                      data-estado={reuniao.estado === 'acordo' ? 'confirmado' : 'desconhecido'}
+                    >
+                      {reuniao.estado === 'acordo' ? (
+                        <Check size={16} aria-hidden="true" />
+                      ) : (
+                        <CircleHelp size={16} aria-hidden="true" />
+                      )}
+                      {reuniao.estado === 'acordo'
+                        ? 'Acordo na conversa'
+                        : reuniao.estado === 'pendente'
+                          ? 'Dados a confirmar'
+                          : 'Sem acordo'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.decisao}>
+                <strong>Antes de atualizar o CRM</strong>
+                <p>{reuniao.revisao}</p>
+              </div>
+            </div>
+          ) : null}
+        </>
       ) : exemplo.tipo === 'analise' ? (
         <>
           <nav className={styles.cenarios} aria-label="Contas do exemplo">
