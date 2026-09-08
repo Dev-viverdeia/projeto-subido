@@ -10,6 +10,8 @@ test('Prospecção: exemplos cabem na moldura real da plataforma', async ({ page
     await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
     const fluxo = page.getByRole('region', { name: 'Quem entra nesta lista?' });
     await expect(fluxo).toBeVisible();
+    const navegacao = page.getByRole('navigation', { name: 'Como executar este passo' });
+    expect(await navegacao.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
     expect(
       await fluxo
         .locator('dd')
@@ -170,13 +172,20 @@ test('Prospecção: abordagem e falhas são exemplos, sem envio ou gravação', 
   ).toBe(true);
   await page.getByRole('button', { name: /Priorizar e gerar o briefing/ }).click();
   await page.getByRole('button', { name: 'Sem sinal recente', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Sem sinal recente', exact: true })).toHaveCSS(
+    'background-color',
+    'rgb(10, 31, 59)',
+  );
   await expect(
     page.getByText('Como funciona o atendimento pelo WhatsApp entre as unidades hoje?', {
       exact: true,
     }),
   ).toBeVisible();
   await page.getByRole('region', { name: 'Do fato à primeira pergunta' }).scrollIntoViewIfNeeded();
-  await page.screenshot({ path: info.outputPath('prospeccao-abordagem.png') });
+  await page.screenshot({
+    path: info.outputPath('prospeccao-abordagem.png'),
+    animations: 'disabled',
+  });
   await page.getByRole('button', { name: 'Contato recusado', exact: true }).click();
   await expect(
     page.getByText('Não preparar um novo contato para envio.', { exact: true }),

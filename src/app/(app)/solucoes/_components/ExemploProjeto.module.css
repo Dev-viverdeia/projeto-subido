@@ -149,9 +149,8 @@
   font: inherit;
   font-size: var(--app-fs-ui);
   cursor: pointer;
-  transition:
-    background-color var(--app-t-state),
-    border-color var(--app-t-state);
+  /* Vidro e navy trocam juntos: interpolar só o fundo causava texto branco sobre claro. */
+  transition: border-color var(--app-t-state);
 }
 .cenarios button:hover {
   border-color: var(--via-navy-40);
