@@ -13,6 +13,21 @@
 
 ## Design e manutenção
 
+### Revisão de composição — 8 de setembro de 2026
+
+- Nome como foco da peça, composição central e marcas equilibradas no topo.
+- Moldura dupla removida; borda navy única e folha clara dentro do suporte de vidro.
+- Tipografia dimensionada pela largura do documento, não pela largura da tela.
+- Prévia inteira clicável, com uma única parada de teclado e foco na moldura.
+- Ações secundárias lado a lado no celular, preservando o espaço do documento.
+- Nome, título, data, critérios e código permanecem completos, inclusive na impressão.
+
+Validação desta revisão: 1.077 testes unitários aprovados (12 ignorados existentes),
+16 testes de navegador em desktop e WebKit móvel; nomes longos em A4 e largura de
+320 px. Um PDF de teste com uma única página, sem emissão de certificado real.
+
+### Estrutura compartilhada
+
 `DocumentoCertificado` é puro e não consulta dados nem emite certificados. Reutiliza
 as logos existentes, Geist e os tokens navy/branco da plataforma. O vidro e a sombra
 ficam nos cards externos; a folha mantém fundo branco para leitura e impressão.

@@ -118,3 +118,50 @@ test('ações têm alvo de toque e foco visível para teclado', async ({ page, i
   await expect(acao).toBeFocused();
   expect(await acao.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe('none');
 });
+
+test('clicar na prévia usa o mesmo destino do botão do certificado', async ({ page }) => {
+  await page.goto('/preview/certificados');
+  const link = page.getByRole('link', { name: /Ver certificado/ }).first();
+  const href = await link.getAttribute('href');
+  const folha = page.getByRole('article', { name: /^Certificado de / }).first();
+  const box = (await folha.boundingBox())!;
+  // Captura o clique nativo antes do roteador: verifica a área inteira sem
+  // depender de autenticação ou navegar para um certificado fictício.
+  await page.evaluate(() => {
+    document.addEventListener(
+      'click',
+      (event) => {
+        const link = (event.target as Element).closest('a');
+        if (!link) return;
+        document.body.dataset.destinoCertificado = link.getAttribute('href') ?? '';
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      },
+      { capture: true, once: true },
+    );
+  });
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator('body')).toHaveAttribute('data-destino-certificado', href!);
+});
+
+test('impressão mantém nome e título longos inteiros em uma folha A4', async ({ page }) => {
+  await page.goto('/preview/certificado?longo=1');
+  await page.emulateMedia({ media: 'print' });
+  const documento = page.getByRole('article', { name: /^Certificado de / });
+  const dimensoes = await documento.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    return {
+      largura: box.width,
+      altura: box.height,
+      conteudo: el.scrollHeight,
+      elementosDentro: Array.from(el.querySelectorAll('p,h1,footer,[role="img"]')).every((c) => {
+        const b = c.getBoundingClientRect();
+        return b.left >= box.left && b.right <= box.right && b.bottom <= box.bottom;
+      }),
+    };
+  });
+  expect(dimensoes.largura).toBeCloseTo(1122.52, 0);
+  expect(dimensoes.altura).toBeLessThanOrEqual(794);
+  expect(dimensoes.conteudo).toBeLessThanOrEqual(Math.ceil(dimensoes.altura));
+  expect(dimensoes.elementosDentro).toBe(true);
+});
