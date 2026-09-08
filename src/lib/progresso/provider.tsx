@@ -144,7 +144,7 @@ export function ProgressoProvider({
     () => ({ concluirAula, tocarFormacao, alternarEtapa }),
     [alternarEtapa, concluirAula, tocarFormacao],
   );
-  const valor = useMemo(() => ({ estado, acoes }), [acoes, estado]);
+  const valor = useMemo(() => ({ estado, acoes, sincronizacao }), [acoes, estado, sincronizacao]);
 
   return (
     <ContextoProgresso.Provider value={valor}>

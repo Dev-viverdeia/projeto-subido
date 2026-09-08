@@ -6,11 +6,16 @@ import preview from '../aprendizado.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Aula' };
 
-export default function PreviewAulaPage() {
+export default async function PreviewAulaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ultima?: string }>;
+}) {
   if (process.env.NODE_ENV === 'production') notFound();
-
-  const aula = FORMACAO_DEMO.modulos[0]?.aulas[0];
-  const proxima = FORMACAO_DEMO.modulos[0]?.aulas[1];
+  const { ultima } = await searchParams;
+  const aulas = FORMACAO_DEMO.modulos.flatMap((modulo) => modulo.aulas);
+  const indice = ultima === '1' ? aulas.length - 1 : 0;
+  const aula = aulas[indice];
   if (!aula) notFound();
 
   return (
@@ -19,10 +24,10 @@ export default function PreviewAulaPage() {
         formacao={FORMACAO_DEMO}
         aula={aula}
         videoUrl={null}
-        anterior={null}
-        proxima={proxima ?? null}
-        posicao={1}
-        total={5}
+        anterior={aulas[indice - 1] ?? null}
+        proxima={aulas[indice + 1] ?? null}
+        posicao={indice + 1}
+        total={aulas.length}
       />
     </main>
   );

@@ -1,16 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  Check,
-  CheckCircle2,
-  Circle,
-  Copy,
-  Link as LinkIcon,
-  LoaderCircle,
-  Printer,
-  Share2,
-} from 'lucide-react';
+import { Check, CheckCircle2, Circle, Copy, LoaderCircle, Printer, Share2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Alert, Button, Spinner } from '@/design-system/via';
 import { avaliarCertificado } from '@/lib/certificados/criterios';
@@ -71,12 +62,11 @@ export function CertificadoVista({
   const [emitidoEm, setEmitidoEm] = useState(registroInicial?.emitidoEm ?? null);
   const [emitindo, setEmitindo] = useState(false);
   const [erroEmissao, setErroEmissao] = useState<string | null>(null);
-  const [estadoEmissao, setEstadoEmissao] = useState<
-    'fechado' | 'processando' | 'sucesso' | 'erro'
-  >('fechado');
+  const [estadoEmissao, setEstadoEmissao] = useState<'fechado' | 'processando' | 'erro'>('fechado');
   const [linkCopiado, setLinkCopiado] = useState(false);
   const [compartilhando, setCompartilhando] = useState(false);
   const compartilharRef = useRef<HTMLButtonElement>(null);
+  const emissaoEmCurso = useRef(false);
 
   function fecharCompartilhamento() {
     setCompartilhando(false);
@@ -101,20 +91,30 @@ export function CertificadoVista({
   };
 
   async function gerarLink() {
+    if (emissaoEmCurso.current) return;
+    emissaoEmCurso.current = true;
     setEmitindo(true);
     setErroEmissao(null);
     setEstadoEmissao('processando');
     setLinkCopiado(false);
-    const resultado = await emitirCertificado(origem, slug);
-    setEmitindo(false);
-    if (!resultado.ok) {
-      setErroEmissao(resultado.mensagem);
+    try {
+      const resultado = await emitirCertificado(origem, slug);
+      if (!resultado.ok) {
+        setErroEmissao(resultado.mensagem);
+        setEstadoEmissao('erro');
+        return;
+      }
+      setCodigo(resultado.codigo);
+      setEmitidoEm(resultado.emitidoEm ?? null);
+      setEstadoEmissao('fechado');
+      setCompartilhando(true);
+    } catch {
+      setErroEmissao('Não foi possível preparar o certificado. Tente novamente.');
       setEstadoEmissao('erro');
-      return;
+    } finally {
+      emissaoEmCurso.current = false;
+      setEmitindo(false);
     }
-    setCodigo(resultado.codigo);
-    setEmitidoEm(resultado.emitidoEm ?? null);
-    setEstadoEmissao('sucesso');
   }
 
   async function copiarLink() {
@@ -131,6 +131,7 @@ export function CertificadoVista({
   function fecharEmissao() {
     if (estadoEmissao === 'processando') return;
     setEstadoEmissao('fechado');
+    window.requestAnimationFrame(() => compartilharRef.current?.focus());
   }
 
   if (!estado.concluido) {
@@ -208,45 +209,30 @@ export function CertificadoVista({
       <div className={styles.acoes}>
         <BotaoVoltar fallback="/certificados" rotulo="Certificados" />
         <div className={styles.acoesCertificado}>
+          <button
+            type="button"
+            ref={compartilharRef}
+            className={styles.linkedin}
+            disabled={emitindo}
+            onClick={() => (urlPublica ? setCompartilhando(true) : void gerarLink())}
+          >
+            {emitindo ? (
+              <LoaderCircle size={16} className={styles.girando} aria-hidden="true" />
+            ) : (
+              <Share2 size={16} strokeWidth={1.8} aria-hidden="true" />
+            )}
+            {emitindo ? 'Preparando…' : 'Compartilhar no LinkedIn'}
+          </button>
           {urlPublica ? (
-            <>
-              <button
-                type="button"
-                ref={compartilharRef}
-                className={styles.linkedin}
-                onClick={() => setCompartilhando(true)}
-              >
-                <Share2 size={16} strokeWidth={1.8} aria-hidden="true" />
-                Compartilhar no LinkedIn
-              </button>
-              <button
-                type="button"
-                className={styles.compartilhar}
-                onClick={() => void copiarLink()}
-              >
-                {linkCopiado ? (
-                  <Check size={15} strokeWidth={2.2} aria-hidden="true" />
-                ) : (
-                  <Copy size={15} strokeWidth={1.8} aria-hidden="true" />
-                )}
-                {linkCopiado ? 'Link copiado' : 'Copiar link'}
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className={styles.linkedin}
-              disabled={emitindo}
-              onClick={() => void gerarLink()}
-            >
-              {emitindo ? (
-                <LoaderCircle size={15} className={styles.girando} />
+            <button type="button" className={styles.compartilhar} onClick={() => void copiarLink()}>
+              {linkCopiado ? (
+                <Check size={15} strokeWidth={2.2} aria-hidden="true" />
               ) : (
-                <LinkIcon size={15} />
+                <Copy size={15} strokeWidth={1.8} aria-hidden="true" />
               )}
-              {emitindo ? 'Preparando…' : 'Preparar para compartilhar'}
+              {linkCopiado ? 'Link copiado' : 'Copiar link'}
             </button>
-          )}
+          ) : null}
           <button type="button" className={styles.imprimir} onClick={() => window.print()}>
             <Printer size={15} strokeWidth={1.8} />
             Salvar em PDF
@@ -254,7 +240,7 @@ export function CertificadoVista({
         </div>
       </div>
 
-      {erroEmissao ? (
+      {erroEmissao && estadoEmissao === 'fechado' ? (
         <p className={styles.erroEmissao} role="alert">
           {erroEmissao}
         </p>
@@ -286,7 +272,7 @@ export function CertificadoVista({
         ) : null}
         <div>
           <dt>Registro público</dt>
-          <dd>{codigo ? 'Disponível para compartilhar' : 'Prepare o link para compartilhar'}</dd>
+          <dd>{codigo ? 'Disponível para compartilhar' : 'Criado ao compartilhar'}</dd>
         </div>
       </dl>
 
@@ -310,43 +296,18 @@ export function CertificadoVista({
         title={
           estadoEmissao === 'processando'
             ? 'Preparando para compartilhar'
-            : estadoEmissao === 'sucesso'
-              ? 'Certificado pronto para compartilhar'
-              : 'Não foi possível gerar o link'
+            : 'Não foi possível preparar o certificado'
         }
         size="sm"
         footer={
           estadoEmissao === 'processando' ? undefined : (
             <div className={styles.modalAcoes}>
-              {estadoEmissao === 'erro' ? (
-                <>
-                  <Button variant="secondary" onClick={fecharEmissao}>
-                    Fechar
-                  </Button>
-                  <Button variant="primary" onClick={() => void gerarLink()}>
-                    Tentar novamente
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="secondary" onClick={() => void copiarLink()}>
-                    {linkCopiado ? 'Link copiado' : 'Copiar link'}
-                  </Button>
-                  {urlPublica ? (
-                    <button
-                      type="button"
-                      className={styles.linkedin}
-                      onClick={() => {
-                        fecharEmissao();
-                        setCompartilhando(true);
-                      }}
-                    >
-                      <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
-                      Compartilhar no LinkedIn
-                    </button>
-                  ) : null}
-                </>
-              )}
+              <Button variant="secondary" onClick={fecharEmissao}>
+                Fechar
+              </Button>
+              <Button variant="primary" onClick={() => void gerarLink()}>
+                Tentar novamente
+              </Button>
             </div>
           )
         }
@@ -354,12 +315,8 @@ export function CertificadoVista({
         {estadoEmissao === 'processando' ? (
           <div className={styles.estadoEmissao} aria-live="polite">
             <Spinner size="lg" label="Validando sua conclusão…" />
-            <p>Estamos registrando o certificado e criando o link público de verificação.</p>
+            <p>Criando seu link público de verificação.</p>
           </div>
-        ) : estadoEmissao === 'sucesso' ? (
-          <Alert tone="success" size="compact" title="Pronto para compartilhar">
-            Seu link público foi criado e pode ser verificado por qualquer pessoa.
-          </Alert>
         ) : erroEmissao ? (
           <Alert tone="danger" size="compact" title="O certificado não foi alterado">
             {erroEmissao}

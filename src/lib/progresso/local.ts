@@ -23,6 +23,7 @@ export type AcoesProgresso = {
 export type ValorContextoProgresso = {
   estado: EstadoProgressoConta;
   acoes: AcoesProgresso;
+  sincronizacao?: 'salvo' | 'sincronizando' | 'erro';
 };
 
 export const ContextoProgresso = createContext<ValorContextoProgresso | null>(null);
@@ -149,6 +150,11 @@ export function useProgresso(): EstadoProgressoConta {
 
 export function useAcoesProgresso(): AcoesProgresso {
   return useContext(ContextoProgresso)?.acoes ?? ACOES_LOCAIS;
+}
+
+/** A conclusão só pode ser anunciada depois da confirmação da conta. */
+export function useSincronizacaoProgresso() {
+  return useContext(ContextoProgresso)?.sincronizacao ?? 'salvo';
 }
 
 /* API antiga mantida para consumidores externos e testes isolados. Na árvore da

@@ -89,9 +89,10 @@ export default async function PreviewShellPage({
               : '/inicio';
   const formacao = params.estado === 'extenso' ? FORMACAO_EXTENSA_DEMO : FORMACAO_DEMO;
   const aulas = formacao.modulos.flatMap((modulo) => modulo.aulas);
-  const feitas =
-    params.estado === 'concluido'
-      ? aulas.map((aula) => aula.id)
+  const feitas = ['concluido', 'salvando-conclusao', 'erro-conclusao'].includes(params.estado ?? '')
+    ? aulas.map((aula) => aula.id)
+    : params.estado === 'aula-concluida'
+      ? aulas.slice(0, 1).map((aula) => aula.id)
       : params.estado === 'andamento'
         ? aulas.slice(0, 3).map((aula) => aula.id)
         : params.estado === 'extenso'
@@ -157,7 +158,16 @@ export default async function PreviewShellPage({
         />
 
         <main className={shellStyles.conteudo} id="conteudo">
-          <ProgressoPreview aulas={feitas}>
+          <ProgressoPreview
+            aulas={feitas}
+            sincronizacao={
+              params.estado === 'salvando-conclusao'
+                ? 'sincronizando'
+                : params.estado === 'erro-conclusao'
+                  ? 'erro'
+                  : 'salvo'
+            }
+          >
             {tela === 'metricas' ? (
               params.estado === 'carregando' ? (
                 <CarregandoMetricas />
