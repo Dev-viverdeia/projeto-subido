@@ -268,7 +268,7 @@ describe('Projeto guiado', () => {
     expect(screen.queryByRole('heading', { level: 2, name: 'Entender' })).toBeNull();
 
     await user.click(within(navegacao).getByRole('button', { name: /Entregar/ }));
-    await user.click(screen.getByRole('button', { name: /Abrir kit de implementação/ }));
+    await user.click(screen.getByRole('button', { name: 'Ver materiais' }));
     expect(within(areas).getByRole('tab', { name: 'Pré-requisitos e materiais' })).toHaveAttribute(
       'aria-selected',
       'true',
