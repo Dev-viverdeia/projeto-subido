@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { CalendarCheck2, CalendarClock, ExternalLink, Unplug } from 'lucide-react';
 import { desconectarGoogleCalendar } from '@/lib/google-calendar/actions';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
@@ -45,13 +44,14 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
 
         <div className={styles.integracaoAcoes}>
           {calendar.configurado && !calendar.conectado && (
-            <Link
+            // O OAuth precisa de navegação completa: prefetch regrava os cookies de state/PKCE.
+            <a
               href="/api/integracoes/google-calendar/conectar?retorno=%2Fconta"
               className="via-btn via-btn--primary via-btn--md"
             >
               {precisaReconectar ? 'Reconectar calendário' : 'Conectar Google Calendar'}
               <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
-            </Link>
+            </a>
           )}
           {calendar.conectado && (
             <form action={desconectarGoogleCalendar}>

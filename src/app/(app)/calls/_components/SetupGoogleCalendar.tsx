@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { CalendarCheck2, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Alert, Button } from '@/design-system/via';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
@@ -57,14 +56,11 @@ export function SetupGoogleCalendar({
               Conexão indisponível
             </Button>
           ) : (
-            <Link
-              href={conectarHref}
-              className="via-btn via-btn--primary via-btn--md"
-              data-autofocus
-            >
+            // O OAuth precisa de navegação completa: prefetch regrava os cookies de state/PKCE.
+            <a href={conectarHref} className="via-btn via-btn--primary via-btn--md" data-autofocus>
               {reconectar ? 'Reconectar Google Calendar' : 'Conectar Google Calendar'}
               <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
-            </Link>
+            </a>
           )}
         </div>
 
