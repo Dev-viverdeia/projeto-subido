@@ -7,6 +7,25 @@ import { ENCERRAMENTO_TESTE } from './SalaEntrega.test-mocks';
 import { SalaEntrega } from './SalaEntrega';
 
 describe('SalaEntrega', () => {
+  it('permite recuperar o briefing de uma entrega já iniciada sem kickoff', async () => {
+    const user = userEvent.setup();
+    render(
+      <SalaEntrega
+        projeto={{
+          ...PROJETO,
+          kickoff: null,
+          briefing: { ...PROJETO.briefing, confirmadoEm: null },
+        }}
+      />,
+    );
+    expect(document.getElementById('briefing-kickoff')).not.toBeNull();
+    await user.click(screen.getByRole('button', { name: /Trabalho/ }));
+    expect(screen.getAllByRole('button', { name: /Revisar briefing/ })).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'Revisar briefing do projeto' }));
+    expect(document.getElementById('briefing-kickoff')).not.toBeNull();
+    expect(screen.getByRole('textbox', { name: /Objetivo/ })).toBeVisible();
+  });
+
   it('abre o ajuste da primeira entrega sem voltar à preparação já concluída', () => {
     render(
       <SalaEntrega

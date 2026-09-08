@@ -291,18 +291,6 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
 
       {painel === 'execucao' && (
         <>
-          {!briefingConfirmado && (
-            <section className={styles.avisoBriefing} role="status">
-              <div>
-                <strong>Confirme o combinado antes de executar.</strong>
-                <span>Objetivo, responsáveis, acessos e limites precisam estar claros.</span>
-              </div>
-              <button type="button" onClick={() => setPainel('cliente')}>
-                Revisar briefing <ArrowRight size={15} aria-hidden="true" />
-              </button>
-            </section>
-          )}
-
           <div className={styles.corpo}>
             {mostrarPrioridade && (
               <JornadaEntrega

@@ -31,6 +31,7 @@ import {
 } from '@/lib/crm/etapas';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import { estaNoFluxo } from '@/lib/crm/situacao';
+import { filtrarPipeline, precisaDeAtencao, temPropostaNoPipeline } from '@/lib/crm/acao-pipeline';
 import {
   AbasPipelineMobile,
   BarraPrioridades,
@@ -56,25 +57,6 @@ function rotuloDaMovimentacao(etapa: EtapaCrm, anterior: EtapaCrm): string {
   if (etapa === 'perdido') return 'Oportunidade marcada como perdida.';
   if (anterior === 'ganho' || anterior === 'perdido') return 'Oportunidade reaberta.';
   return `Oportunidade movida para ${ROTULO_ETAPA[etapa].toLowerCase()}.`;
-}
-
-function prazoVencido(oportunidade: OportunidadeCrm): boolean {
-  if (!oportunidade.proximaAcaoEm) return false;
-  return Date.parse(oportunidade.proximaAcaoEm) < Date.now();
-}
-
-function precisaDeAtencao(oportunidade: OportunidadeCrm): boolean {
-  return (
-    etapaAberta(oportunidade.etapa) && (!oportunidade.proximaAcao || prazoVencido(oportunidade))
-  );
-}
-
-function normalizarBusca(valor: string): string {
-  return valor
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
 }
 
 export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[] }) {
@@ -110,25 +92,14 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
       todas: noQuadro.length,
       atencao: abertas.filter(precisaDeAtencao).length,
       sem_acao: abertas.filter((item) => !item.proximaAcao).length,
-      proposta: abertas.filter((item) => faseDaEtapa(item.etapa) === 'proposta').length,
+      proposta: abertas.filter(temPropostaNoPipeline).length,
     }),
     [abertas, noQuadro],
   );
-  const filtradas = useMemo(() => {
-    const termo = normalizarBusca(busca);
-    return noQuadro.filter((oportunidade) => {
-      const correspondeAoFiltro =
-        filtro === 'todas' ||
-        (filtro === 'atencao' && precisaDeAtencao(oportunidade)) ||
-        (filtro === 'sem_acao' && etapaAberta(oportunidade.etapa) && !oportunidade.proximaAcao) ||
-        (filtro === 'proposta' && faseDaEtapa(oportunidade.etapa) === 'proposta');
-      if (!correspondeAoFiltro) return false;
-      if (!termo) return true;
-      return normalizarBusca(
-        [oportunidade.empresa, oportunidade.titulo, oportunidade.contato].filter(Boolean).join(' '),
-      ).includes(termo);
-    });
-  }, [noQuadro, busca, filtro]);
+  const filtradas = useMemo(
+    () => filtrarPipeline(noQuadro, filtro, busca),
+    [noQuadro, busca, filtro],
+  );
 
   const porFase = useMemo(() => {
     const mapa = new Map<IdFaseCrm, OportunidadeCrm[]>();
@@ -148,8 +119,16 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
   const ativa = itens.find((oportunidade) => oportunidade.id === ativoId) ?? null;
 
   function selecionarFiltro(proximo: FiltroPipeline) {
-    setFiltro((atual) => (atual === proximo && proximo !== 'todas' ? 'todas' : proximo));
-    if (proximo === 'proposta') setFaseMobile('proposta');
+    const novo = filtro === proximo && proximo !== 'todas' ? 'todas' : proximo;
+    setFiltro(novo);
+    revelarResultados(novo, busca);
+  }
+
+  function revelarResultados(novoFiltro: FiltroPipeline, novaBusca: string) {
+    const resultados = filtrarPipeline(noQuadro, novoFiltro, novaBusca);
+    if (resultados.length && !resultados.some((item) => faseDaEtapa(item.etapa) === faseMobile)) {
+      setFaseMobile(faseDaEtapa(resultados[0]!.etapa) as FaseAtiva);
+    }
   }
 
   function publicarToast(toast: Omit<ToastItem, 'id'>) {
@@ -311,7 +290,10 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
             filtro={filtro}
             busca={busca}
             aoSelecionarFiltro={selecionarFiltro}
-            aoBuscar={setBusca}
+            aoBuscar={(termo) => {
+              setBusca(termo);
+              revelarResultados(filtro, termo);
+            }}
           />
 
           <AbasPipelineMobile
@@ -322,14 +304,6 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           />
 
           <div className={styles.quadroKanban} data-arrastando={ativoId !== null || undefined}>
-            <header className={styles.cabecalhoQuadro}>
-              <div>
-                <strong>
-                  {filtradas.length} {filtradas.length === 1 ? 'venda' : 'vendas'}
-                </strong>
-              </div>
-            </header>
-
             <div className={styles.rolagem}>
               <div className={styles.pipeline}>
                 {ativas.map((fase, indice) => (

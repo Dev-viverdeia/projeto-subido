@@ -30,7 +30,7 @@ export function PainelClienteEntrega({
         />
       )}
 
-      {(projeto.kickoff || briefingConfirmado) && (
+      {(projeto.kickoff || briefingConfirmado || trabalhoIniciado) && (
         <BriefingKickoff
           projetoId={projeto.id}
           briefing={projeto.briefing}
