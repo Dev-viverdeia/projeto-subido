@@ -71,7 +71,7 @@ describe('emissão de certificado', () => {
     expect(screen.getByText('Nome na emissão')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Título certificado');
     await user.click(screen.getByRole('button', { name: 'Compartilhar no LinkedIn' }));
-    await user.click(screen.getByRole('button', { name: 'Perfil', exact: true }));
+    await user.click(screen.getByRole('button', { name: 'Perfil' }));
     expect(screen.getByText('setembro de 2026')).toBeInTheDocument();
     expect(screen.queryByText('Nome atual da conta')).not.toBeInTheDocument();
     expect(emitirCertificado).not.toHaveBeenCalled();
