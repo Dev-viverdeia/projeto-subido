@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { emitirCertificado } from '@/lib/certificados/actions';
@@ -98,7 +98,11 @@ describe('emissão de certificado', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Preparar para compartilhar' }));
+    expect(emitirCertificado).not.toHaveBeenCalled();
+    const gatilho = screen.getByRole('button', { name: 'Compartilhar no LinkedIn' });
+    await user.click(gatilho);
+    fireEvent.click(gatilho);
+    expect(emitirCertificado).toHaveBeenCalledOnce();
 
     expect(
       await screen.findByRole('dialog', { name: 'Preparando para compartilhar' }),
@@ -110,14 +114,78 @@ describe('emissão de certificado', () => {
     });
 
     const sucesso = await screen.findByRole('dialog', {
-      name: 'Certificado pronto para compartilhar',
+      name: 'Compartilhar certificado',
     });
-    expect(sucesso).toHaveTextContent('Pronto para compartilhar');
-    await user.click(screen.getAllByRole('button', { name: 'Compartilhar no LinkedIn' }).at(-1)!);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(sucesso).toContainElement(document.activeElement as HTMLElement);
     expect(screen.getByRole('link', { name: 'Publicar no LinkedIn' })).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent('/certificado/certificado-publico')),
     );
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(gatilho).toHaveFocus());
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('recupera falhas de rede sem prender o loading e permite uma nova tentativa', async () => {
+    vi.mocked(emitirCertificado)
+      .mockRejectedValueOnce(new Error('Network failure'))
+      .mockResolvedValueOnce({ ok: true, codigo: 'certificado-recuperado' });
+    render(
+      <CertificadoVista
+        origem="formacao"
+        slug="curso"
+        titulo="Formação prática"
+        aprendizadoIds={['aula-1', 'aula-2']}
+        implementacaoIds={[]}
+        hrefConteudo="/formacoes/curso"
+        nome="Pessoa Teste"
+        codigoInicial={null}
+        siteUrl="https://subido.viverdeia.ai"
+      />,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Compartilhar no LinkedIn' }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent(
+      'Não foi possível preparar o certificado. Tente novamente.',
+    );
+    expect(screen.queryByText('Validando sua conclusão…')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(
+      await screen.findByRole('dialog', { name: 'Compartilhar certificado' }),
+    ).toBeInTheDocument();
+    expect(emitirCertificado).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('link', { name: 'Publicar no LinkedIn' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('certificado-recuperado'),
+    );
+  });
+
+  it('respeita a recusa do servidor e permite fechar o erro pelo teclado', async () => {
+    vi.mocked(emitirCertificado).mockResolvedValueOnce({
+      ok: false,
+      mensagem: 'Conclua todas as aulas para emitir o certificado.',
+    });
+    render(
+      <CertificadoVista
+        origem="formacao"
+        slug="curso"
+        titulo="Formação prática"
+        aprendizadoIds={['aula-1', 'aula-2']}
+        implementacaoIds={[]}
+        hrefConteudo="/formacoes/curso"
+        nome="Pessoa Teste"
+        codigoInicial={null}
+        siteUrl="https://subido.viverdeia.ai"
+      />,
+    );
+    const user = userEvent.setup();
+    const gatilho = screen.getByRole('button', { name: 'Compartilhar no LinkedIn' });
+    await user.click(gatilho);
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Conclua todas as aulas');
+    expect(screen.queryByRole('link', { name: 'Publicar no LinkedIn' })).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(gatilho).toHaveFocus());
   });
 
   it('explica o que falta quando as aulas terminaram mas a implementação não', () => {

@@ -37,7 +37,7 @@ test('aula: controles não se sobrepõem em notebook, tablet ou celular', async 
 test('aula concluída: conclusão explícita e próximo destino em destaque', async ({
   page,
 }, info) => {
-  await page.goto('/preview/shell?tela=aula&estado=concluido');
+  await page.goto('/preview/shell?tela=aula&estado=aula-concluida');
   const nav = page.getByRole('navigation', { name: 'Navegação da aula' });
   await expect(nav.getByRole('status')).toHaveText('Aula concluída');
   await expect(nav.getByRole('button', { name: 'Concluir e avançar' })).toHaveCount(0);

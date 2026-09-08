@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   concluirAulaConta,
@@ -13,6 +13,7 @@ import {
   limparProgressoLegado,
   useAcoesProgresso,
   useProgresso,
+  useSincronizacaoProgresso,
 } from './local';
 import { ProgressoProvider } from './provider';
 
@@ -27,10 +28,12 @@ const sucesso = { ok: true } as const;
 
 function Bancada() {
   const progresso = useProgresso();
+  const sincronizacao = useSincronizacaoProgresso();
   const { concluirAula, alternarEtapa } = useAcoesProgresso();
   return (
     <div>
       <output aria-label="aulas">{Object.keys(progresso.aulas).join(',')}</output>
+      <output aria-label="sincronização">{sincronizacao}</output>
       <output aria-label="etapas">{Object.keys(progresso.etapas).join(',')}</output>
       <button type="button" onClick={() => concluirAula('aula-1', 'formacao-base')}>
         Concluir aula
@@ -59,6 +62,31 @@ beforeEach(() => {
 });
 
 describe('sincronização do progresso', () => {
+  it('expõe o estado real até o servidor confirmar e após recuperar uma falha', async () => {
+    let concluir!: (resultado: { ok: false; mensagem: string }) => void;
+    vi.mocked(concluirAulaConta).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          concluir = resolve;
+        }),
+    );
+    montar();
+    await userEvent.click(screen.getByRole('button', { name: 'Concluir aula' }));
+    expect(screen.getByLabelText('aulas')).toHaveTextContent('aula-1');
+    expect(screen.getByLabelText('sincronização')).toHaveTextContent('sincronizando');
+    await act(async () => {
+      concluir({ ok: false, mensagem: 'Conexão indisponível' });
+      await Promise.resolve();
+    });
+    expect(screen.getByLabelText('sincronização')).toHaveTextContent('erro');
+    await userEvent.click(screen.getByRole('button', { name: 'Tentar agora' }));
+    await waitFor(() => expect(screen.getByLabelText('sincronização')).toHaveTextContent('salvo'));
+    expect(importarProgressoConta).toHaveBeenCalledOnce();
+    expect(vi.mocked(importarProgressoConta).mock.calls[0]?.[0]).toHaveProperty(
+      'aulas.aula-1',
+      expect.any(String),
+    );
+  });
   it('responde na hora e confirma a marcação na conta', async () => {
     const user = userEvent.setup();
     montar();

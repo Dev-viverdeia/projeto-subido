@@ -43,6 +43,7 @@ export function AulaConteudo({
           <NavAula
             formacaoSlug={formacao.slug}
             aulaId={aula.id}
+            aulaIds={formacao.modulos.flatMap((modulo) => modulo.aulas.map((item) => item.id))}
             anteriorId={anterior?.id ?? null}
             anteriorTitulo={anterior?.titulo ?? null}
             proximaId={proxima?.id ?? null}
