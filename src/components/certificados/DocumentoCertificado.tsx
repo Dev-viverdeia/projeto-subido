@@ -39,24 +39,20 @@ export function DocumentoCertificado({
       aria-label={modelo ? 'Modelo de certificado' : `Certificado de ${titulo}`}
     >
       <header className={styles.marcas}>
-        <SubidoLogo size={compacto ? 16 : 22} />
-        <span className={styles.divisor} aria-hidden="true" />
-        <ViverDeIaLogo
-          className={styles.viaMarca}
-          size={compacto ? 'compact' : 'default'}
-          produto={false}
-        />
+        <SubidoLogo size={compacto ? 18 : 24} className={styles.subidoMarca} />
+        <ViverDeIaLogo className={styles.viaMarca} size="default" produto={false} />
       </header>
 
       <div className={styles.corpo}>
         <p className={styles.tipo}>{modelo ? 'Modelo · ' : ''}Certificado de conclusão</p>
-        <p className={styles.intro}>Certificamos que</p>
-        <p className={styles.nome}>{nome}</p>
+        <p className={styles.nome} data-extenso={nome.length > 40 || undefined}>
+          {nome}
+        </p>
         <p className={styles.concluiu}>
-          concluiu{' '}
+          pela conclusão{' '}
           {origem === 'formacao'
-            ? 'a formação'
-            : 'o aprendizado e a implementação guiada do projeto'}
+            ? 'da formação'
+            : 'do aprendizado e da implementação guiada do projeto'}
         </p>
         <Titulo className={styles.titulo}>{titulo}</Titulo>
       </div>
@@ -64,9 +60,18 @@ export function DocumentoCertificado({
       <footer className={styles.base}>
         <div className={styles.emissor}>
           <strong>Subido + Viver de IA</strong>
-          <span>Aprendizado aplicado em inteligência artificial</span>
+          <span>
+            {origem === 'formacao'
+              ? 'Formação em inteligência artificial'
+              : 'Projeto aplicado de inteligência artificial'}
+          </span>
         </div>
-        {data ? <time dateTime={concluidoEm!}>{data}</time> : null}
+        {data ? (
+          <div className={styles.data}>
+            <span>Concluído em</span>
+            <time dateTime={concluidoEm!}>{data}</time>
+          </div>
+        ) : null}
         {modelo ? <span>Prévia ilustrativa · sem validade</span> : null}
         {codigo ? <p className={styles.codigo}>Código de verificação · {codigo}</p> : null}
       </footer>

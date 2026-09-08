@@ -1,49 +1,48 @@
-/* Papel claro; o liquidglass pertence à moldura da galeria, não à impressão. */
+/* Papel com hierarquia própria; o vidro é o suporte, nunca a tinta do documento. */
 .documento {
+  container: certificado / inline-size;
   position: relative;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--via-space-7);
   min-width: 0;
   aspect-ratio: 297 / 210;
-  padding: clamp(28px, 5vw, 64px);
+  gap: var(--via-space-7);
+  padding: clamp(28px, 4vw, 56px);
   border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-control);
+  border-inline-start: 8px solid var(--via-navy);
+  border-radius: var(--app-radius-chip);
   background: var(--via-white);
   color: var(--via-navy);
-  box-shadow: var(--app-elev-2-shadow);
-}
-
-.documento::before {
-  position: absolute;
-  inset: 14px;
-  z-index: -1;
-  border: 1px solid var(--via-border-soft);
-  border-inline-start: 3px solid var(--via-navy);
-  content: '';
-  pointer-events: none;
+  box-shadow: var(--app-elev-1-shadow);
 }
 
 .marcas {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
   gap: var(--via-space-5);
+  min-width: 0;
 }
 
-.divisor {
-  width: 1px;
-  height: 28px;
-  background: var(--via-border);
+.subidoMarca svg {
+  filter: none;
+}
+.viaMarca img:first-child {
+  height: clamp(18px, 3.5cqi, 28px);
+}
+.viaMarca img:last-child {
+  height: clamp(10px, 1.7cqi, 14px);
 }
 
 .corpo {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   padding-block: var(--via-space-5);
+  text-align: center;
 }
 
 .documento p,
@@ -52,53 +51,53 @@
 }
 
 .tipo {
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-h3);
+  color: var(--via-navy);
+  font-size: clamp(16px, 2.8cqi, 24px); /* token-ok: escala proporcional à folha, não à viewport */
   font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-caption);
-}
-
-.intro,
-.concluiu {
-  color: var(--via-text-muted);
-  font-size: var(--app-fs-reading);
-  line-height: var(--via-lh-normal);
-}
-
-.documento .intro {
-  margin-top: var(--via-space-7);
+  letter-spacing: var(--app-ls-h3);
+  line-height: var(--via-lh-snug);
 }
 
 .documento .nome {
-  margin-block: var(--via-space-2) var(--via-space-5);
+  max-width: 24ch;
+  margin-block: var(--via-space-7) var(--via-space-5);
   color: var(--via-navy);
   font-family: var(--via-font-display);
-  font-size: clamp(
-    28px,
-    4.6vw,
-    52px
-  ); /* token-ok: escala do documento impresso, independente da UI */
+  font-size: clamp(28px, 7cqi, 64px); /* token-ok: nome é o protagonista do documento */
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h1);
   line-height: var(--via-lh-tight);
   overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.documento .nome[data-extenso] {
+  font-size: clamp(26px, 5.8cqi, 48px); /* token-ok: preserva nomes extensos sem corte */
+}
+
+.concluiu {
+  max-width: 48ch;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
 }
 
 .documento .titulo {
-  max-width: 38ch;
-  margin-top: var(--via-space-2);
+  max-width: 40ch;
+  margin-top: var(--via-space-3);
   color: var(--via-navy);
-  font-size: var(--via-fs-h3);
-  font-weight: var(--via-fw-semibold);
+  font-size: clamp(20px, 3.6cqi, 30px); /* token-ok: título editorial na proporção da folha */
+  font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h3);
   line-height: var(--via-lh-snug);
   overflow-wrap: anywhere;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .base {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--via-space-4);
@@ -109,132 +108,107 @@
   line-height: var(--via-lh-normal);
 }
 
-.emissor {
+.emissor,
+.data {
   display: grid;
   gap: var(--via-space-1);
 }
-
-.emissor strong {
+.emissor strong,
+.data time {
   color: var(--via-navy);
   font-weight: var(--via-fw-medium);
 }
-
+.data {
+  text-align: end;
+}
 .codigo {
   flex-basis: 100%;
+  padding-top: var(--via-space-2);
+  font-size: var(--via-fs-caption);
   overflow-wrap: anywhere;
 }
 
 .documento[data-compacto] {
   height: 100%;
-  gap: var(--via-space-4);
-  padding: var(--via-space-7);
-}
-
-[data-compacto] .marcas {
-  gap: var(--via-space-3);
-}
-
-[data-compacto] .divisor {
-  height: 22px;
+  padding: var(--via-space-6);
+  gap: var(--via-space-5);
+  border-inline-start-width: 5px;
 }
 
 [data-compacto] .corpo {
-  padding-block: var(--via-space-3);
+  padding-block: var(--via-space-4);
 }
-
-[data-compacto] .intro {
-  margin-top: var(--via-space-4);
-}
-
 [data-compacto] .nome {
-  margin-bottom: var(--via-space-3);
-  font-size: var(--via-fs-h3);
+  margin-block: var(--via-space-5) var(--via-space-3);
 }
-
-[data-compacto] .titulo {
-  font-size: var(--app-fs-section-title);
-}
-
-[data-compacto] .intro,
-[data-compacto] .concluiu,
-[data-compacto] .base,
-[data-compacto] .tipo {
-  font-size: var(--app-fs-support);
-}
-
-[data-compacto] .emissor {
+[data-compacto] .emissor,
+[data-compacto] .data > span {
   display: none;
 }
+[data-compacto] .base {
+  justify-content: center;
+  padding-top: var(--via-space-4);
+}
 
-@media screen and (max-width: 600px) {
-  .documento,
-  .documento[data-compacto] {
-    aspect-ratio: auto;
-    padding: var(--via-space-6);
-    gap: var(--via-space-5);
-  }
-
+@container certificado (max-width: 399px) {
   .marcas {
-    gap: var(--via-space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--via-space-3) var(--via-space-5);
   }
-
-  .divisor {
-    display: none;
+  .subidoMarca {
+    --subido-logo-size: 16px !important; /* token-ok: mantém as duas marcas legíveis na folha estreita */
   }
-
-  .marcas {
-    flex-direction: column;
-    align-items: flex-start;
+  .viaMarca {
+    gap: var(--via-space-2);
   }
-
-  .viaMarca img {
-    height: 13px;
-  }
-
   .viaMarca img:first-child {
     height: 18px;
   }
-
-  .documento::before {
-    inset: 9px;
+  .viaMarca img:last-child {
+    height: 10px;
   }
-
-  .corpo {
-    padding-block: var(--via-space-3);
+  .base {
+    justify-content: center;
+    text-align: center;
   }
-
-  .documento .nome {
-    font-size: var(--via-fs-h3);
-    line-height: var(--via-lh-snug);
+  .data {
+    text-align: center;
   }
+  .emissor > span {
+    max-width: 30ch;
+  }
+}
 
-  .documento .titulo,
-  .documento:not([data-compacto]) .tipo {
-    font-size: var(--app-fs-section-title);
+@media screen and (max-width: 599px) {
+  .documento,
+  .documento[data-compacto] {
+    aspect-ratio: auto;
+    padding: var(--via-space-5);
+    gap: var(--via-space-6);
   }
 }
 
 @media print {
   .documento:not([data-compacto]) {
     width: 297mm;
-    height: 210mm;
-    padding: 18mm;
-    gap: 8mm;
+    height: 209mm;
+    min-height: 0;
+    padding: 16mm 18mm;
+    gap: 6mm;
     border: 0;
+    border-inline-start: 3mm solid var(--via-navy);
     border-radius: 0;
     box-shadow: none;
     print-color-adjust: exact;
   }
-
   .documento:not([data-compacto]) .nome {
-    font-size: 32pt; /* token-ok: dimensao editorial para A4 */
+    font-size: 38pt; /* token-ok: dimensão editorial para A4 */
   }
-
+  .documento:not([data-compacto]) .nome[data-extenso] {
+    font-size: 30pt; /* token-ok: nomes extensos em A4 sem clipping */
+  }
   .documento:not([data-compacto]) .titulo {
-    font-size: 18pt; /* token-ok: dimensao editorial para A4 */
-  }
-
-  .documento::before {
-    inset: 8mm;
+    font-size: 22pt; /* token-ok: dimensão editorial para A4 */
   }
 }

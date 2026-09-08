@@ -40,6 +40,10 @@
   list-style: none;
 }
 
+.diplomas {
+  align-items: stretch;
+}
+
 .card,
 .linha,
 .vazio {
@@ -50,10 +54,42 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: var(--via-space-3);
+  padding: var(--via-space-4);
+  background: var(--app-glass-plane);
+  backdrop-filter: var(--via-blur-sm);
+  transition:
+    box-shadow var(--app-t-state),
+    border-color var(--app-t-state);
+}
+
+.card:hover {
+  border-color: var(--via-border-strong-color);
+  box-shadow: var(--app-elev-3-shadow);
+}
+.card:focus-within {
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
+}
+.card .abrir {
+  border-color: transparent;
+  background: transparent;
+  color: var(--via-navy);
+  box-shadow: none;
+}
+.card .abrir::after {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--app-radius-surface);
+  content: '';
+}
+.card .abrir:hover {
+  background: var(--via-navy-04);
+}
+.card .abrir:focus-visible {
+  box-shadow: var(--app-ring);
 }
 
 .previa {
@@ -256,13 +292,15 @@
 }
 
 /* A lateral do app também ocupa espaço: a grade responde à área disponível. */
-@container (max-width: 920px) {
+@container (max-width: 899px) {
   .diplomas {
     grid-template-columns: minmax(0, 1fr);
+    max-width: 680px;
+    width: 100%;
   }
 }
 
-@container (max-width: 760px) {
+@container (max-width: 767px) {
   .vazio {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -272,7 +310,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 599px) {
   .lista {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -282,7 +320,12 @@
   }
 
   .cardBase .abrir {
-    width: 100%;
+    margin-left: auto;
+    padding-inline: var(--via-space-2);
+  }
+
+  .card {
+    padding: var(--via-space-3);
   }
 
   .vazio {
@@ -300,7 +343,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .abrir,
-  .linha {
+  .linha,
+  .card {
     transition: none;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .card {
+    background: var(--via-surface);
   }
 }
