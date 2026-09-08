@@ -101,22 +101,21 @@ describe('catálogo de projetos', () => {
     mostrarProjetos(projetosPreview[0]!.etapaIds);
     expect(screen.getByRole('link', { name: /Comece por aqui/ })).toHaveAttribute(
       'href',
-      '/solucoes/assistente-conhecimento',
+      '/solucoes/maquina-prospeccao-b2b',
     );
-    expect(screen.getByRole('link', { name: /Concluído.*SDR de Atendimento/ })).toHaveAttribute(
-      'href',
-      '/solucoes/sdr-atendimento',
-    );
+    expect(
+      screen.getByRole('link', { name: /Concluído.*Atendimento no WhatsApp/ }),
+    ).toHaveAttribute('href', '/solucoes/sdr-atendimento-qualificacao');
   });
 
   it('prioriza o projeto em andamento mais recente', () => {
     mostrarProjetos([projetosPreview[0]!.etapaIds[0]!, projetosPreview[1]!.etapaIds[0]!], {
-      'sdr-atendimento': '2026-09-04T12:00:00.000Z',
-      'assistente-conhecimento': '2026-09-05T12:00:00.000Z',
+      'sdr-atendimento-qualificacao': '2026-09-04T12:00:00.000Z',
+      'maquina-prospeccao-b2b': '2026-09-05T12:00:00.000Z',
     });
     expect(screen.getByRole('link', { name: /Continue de onde parou/ })).toHaveAttribute(
       'href',
-      '/solucoes/assistente-conhecimento',
+      '/solucoes/maquina-prospeccao-b2b',
     );
   });
 

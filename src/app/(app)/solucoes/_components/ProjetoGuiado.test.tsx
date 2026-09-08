@@ -232,7 +232,9 @@ describe('Projeto guiado', () => {
     montar();
 
     const areas = screen.getByRole('tablist', { name: 'Áreas do projeto' });
-    expect(within(areas).getAllByRole('tab')).toHaveLength(3);
+    expect(within(areas).getAllByRole('tab')).toHaveLength(4);
+    expect(screen.getByRole('tabpanel')).toHaveAccessibleName('Visão geral');
+    await user.click(screen.getByRole('button', { name: 'Ver aulas' }));
     expect(screen.getByRole('heading', { level: 2, name: 'Aulas do projeto' })).toBeDefined();
     expect(screen.queryByRole('button', { name: 'Começar aprendizado' })).toBeNull();
     const progressoAprendizado = screen.getByRole('progressbar', {
@@ -267,16 +269,17 @@ describe('Projeto guiado', () => {
 
     await user.click(within(navegacao).getByRole('button', { name: /Entregar/ }));
     await user.click(screen.getByRole('button', { name: /Abrir kit de implementação/ }));
-    expect(within(areas).getByRole('tab', { name: 'Materiais' })).toHaveAttribute(
+    expect(within(areas).getByRole('tab', { name: 'Pré-requisitos e materiais' })).toHaveAttribute(
       'aria-selected',
       'true',
     );
-    expect(within(areas).getByRole('tab', { name: 'Materiais' })).toHaveFocus();
-    await user.click(screen.getByText('Entrega final', { exact: true }));
-    expect(screen.getByText(projeto.entregavelFinal)).toBeVisible();
+    expect(within(areas).getByRole('tab', { name: 'Pré-requisitos e materiais' })).toHaveFocus();
+    expect(screen.getByRole('list', { name: 'Pré-requisitos do projeto' })).toBeVisible();
+    await user.click(screen.getByText('Escopo e limites do projeto'));
     expect(screen.getByRole('heading', { level: 2, name: 'Cuidados do projeto' })).toBeDefined();
     expect(screen.getByRole('heading', { level: 2, name: 'Escopo do piloto' })).toBeDefined();
     await user.click(screen.getByRole('button', { name: 'Arquivos e ferramentas' }));
+    await user.click(screen.getByText('Documentos para entregar ao cliente'));
     expect(screen.getByRole('heading', { level: 3, name: 'Arquivos da entrega' })).toBeDefined();
   });
 
@@ -294,6 +297,7 @@ describe('Projeto guiado', () => {
   it('salva a conclusão da aula sem misturar aprendizado com implementação', async () => {
     const user = userEvent.setup();
     montar();
+    await user.click(screen.getByRole('tab', { name: 'Aprender' }));
 
     await user.click(screen.getAllByRole('button', { name: 'Concluir aula' })[0]!);
 
@@ -311,6 +315,7 @@ describe('Projeto guiado', () => {
   it('mostra a conclusão do aprendizado e leva para a implementação', async () => {
     const user = userEvent.setup();
     montar();
+    await user.click(screen.getByRole('tab', { name: 'Aprender' }));
 
     await user.click(screen.getAllByRole('button', { name: 'Concluir aula' })[0]!);
     await user.click(screen.getByRole('button', { name: 'Concluir aula' }));
@@ -330,7 +335,7 @@ describe('Projeto guiado', () => {
     const user = userEvent.setup();
     montar();
 
-    await user.click(screen.getByRole('tab', { name: 'Materiais' }));
+    await user.click(screen.getByRole('tab', { name: 'Pré-requisitos e materiais' }));
     await user.click(screen.getByRole('button', { name: 'Aplicar no cliente' }));
 
     expect(screen.getByRole('link', { name: /Personalizar no Estúdio/ })).toHaveAttribute(
@@ -376,7 +381,7 @@ describe('Projeto guiado', () => {
       ],
     });
 
-    await user.click(screen.getByRole('tab', { name: 'Materiais' }));
+    await user.click(screen.getByRole('tab', { name: 'Pré-requisitos e materiais' }));
 
     await user.click(screen.getByRole('button', { name: 'Aplicar no cliente' }));
     expect(screen.getByText('Em execução')).toBeInTheDocument();

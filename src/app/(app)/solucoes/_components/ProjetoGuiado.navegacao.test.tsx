@@ -33,21 +33,24 @@ describe('Navegação e retomada do projeto', () => {
   it('permite navegar pelas áreas com setas, Home e End sem perder o foco', async () => {
     const user = userEvent.setup();
     montar();
-    screen.getByRole('tab', { name: 'Aprender' }).focus();
+    screen.getByRole('tab', { name: 'Visão geral' }).focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: 'Aprender' })).toHaveFocus();
     await user.keyboard('{ArrowRight}');
     expect(screen.getByRole('tab', { name: 'Implementar' })).toHaveFocus();
     expect(screen.getByRole('tabpanel')).toHaveAccessibleName('Implementar');
     await user.keyboard('{End}');
-    expect(screen.getByRole('tab', { name: 'Materiais' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Pré-requisitos e materiais' })).toHaveFocus();
     await user.keyboard('{Home}');
-    expect(screen.getByRole('tab', { name: 'Aprender' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Visão geral' })).toHaveFocus();
     await user.keyboard('{ArrowLeft}');
-    expect(screen.getByRole('tab', { name: 'Materiais' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Pré-requisitos e materiais' })).toHaveFocus();
   });
 
   it('acompanha o progresso recebido após abrir, sem sobrescrever a aula escolhida', async () => {
     const user = userEvent.setup();
     montar();
+    await user.click(screen.getByRole('tab', { name: 'Aprender' }));
     const { guardarProgressoLegado } = await import('@/lib/progresso/local');
     const { idAulaProjeto } = await import('@/lib/projetos/roteiro');
     act(() =>

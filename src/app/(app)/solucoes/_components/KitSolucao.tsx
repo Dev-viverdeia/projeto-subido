@@ -93,14 +93,19 @@ export function Prompts({ itens }: { itens: ItemSolucao[] }) {
                   `Carousel` do DS aplica exatamente esta correção. Copiar não
                   substitui ler. */}
               {item.conteudo && (
-                <pre
-                  className={styles.codigo}
-                  tabIndex={0}
-                  role="region"
-                  aria-label={`Texto do prompt: ${item.titulo}`}
-                >
-                  {item.conteudo}
-                </pre>
+                <details className={styles.leituraPrompt}>
+                  <summary>
+                    Ler prompt <span aria-hidden="true">+</span>
+                  </summary>
+                  <pre
+                    className={styles.codigo}
+                    tabIndex={0}
+                    role="region"
+                    aria-label={`Texto do prompt: ${item.titulo}`}
+                  >
+                    {item.conteudo}
+                  </pre>
+                </details>
               )}
             </li>
           ))}

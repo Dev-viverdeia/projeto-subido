@@ -75,7 +75,7 @@
 }
 
 .resultado {
-  max-width: 66ch;
+  max-width: 54ch;
   margin: var(--via-space-3) 0 0;
   font-size: var(--via-fs-body);
   line-height: 1.52;
@@ -206,8 +206,7 @@
 
 .abasProjeto {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(230px, 1.4fr);
   gap: var(--via-space-2);
   padding: var(--via-space-2);
   border-bottom: 1px solid var(--via-border-hairline);
@@ -227,6 +226,10 @@
   transition:
     background-color var(--app-t-state),
     color var(--app-t-state);
+}
+
+.abasProjeto[data-total='3'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(230px, 1.4fr);
 }
 
 .abasProjeto button:hover {
@@ -1395,8 +1398,14 @@
     padding: 0;
   }
 
-  .abasProjeto {
-    overflow-x: auto;
+  .abasProjeto,
+  .abasProjeto[data-total='3'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .abasProjeto button {
+    padding: var(--via-space-2);
+    min-height: 48px;
   }
 
   .aulaNavegacao,

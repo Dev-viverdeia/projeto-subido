@@ -66,7 +66,8 @@ test('leitura guiada: 320px, teclado e movimento reduzido sem recortes', async (
   expect(
     executarAxe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
   ).toEqual([]);
-  await page.getByRole('tab', { name: 'Materiais', exact: true }).click();
+  await page.getByRole('tab', { name: 'Pré-requisitos e materiais', exact: true }).click();
+  await page.locator('summary', { hasText: 'Escopo e limites do projeto' }).click();
   await page.getByRole('button', { name: /Fora do piloto/ }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   const escopoAxe = await new AxeBuilder({ page }).include('main').analyze();
@@ -99,7 +100,8 @@ test('projeto: executar, consultar e conferir não alteram a conclusão', async 
   await guia.getByRole('button', { name: 'Executar', exact: true }).click();
   await page.getByRole('navigation', { name: 'Fases do projeto' }).scrollIntoViewIfNeeded();
   await page.screenshot({ path: info.outputPath('projeto-executar.png') });
-  await page.getByRole('tab', { name: 'Materiais', exact: true }).click();
+  await page.getByRole('tab', { name: 'Pré-requisitos e materiais', exact: true }).click();
+  await page.locator('summary', { hasText: 'Escopo e limites do projeto' }).click();
   const escopo = page.getByRole('region', { name: 'Escopo do piloto' });
   await expect(escopo.getByRole('button', { name: /O cliente precisa ter/ })).toBeVisible();
   await escopo.getByRole('button', { name: /Fora do piloto/ }).click();
@@ -108,6 +110,7 @@ test('projeto: executar, consultar e conferir não alteram a conclusão', async 
   await escopo.scrollIntoViewIfNeeded();
   await page.screenshot({ path: info.outputPath('projeto-escopo.png') });
   await page.getByRole('button', { name: 'Arquivos e ferramentas', exact: true }).click();
+  await page.locator('summary', { hasText: 'Documentos para entregar ao cliente' }).click();
   await expect(page.getByRole('heading', { name: 'Arquivos da entrega' })).toBeVisible();
   await page.getByRole('button', { name: 'Aplicar no cliente', exact: true }).click();
   await expect(page.getByRole('link', { name: /Personalizar no Estúdio/ })).toBeVisible();

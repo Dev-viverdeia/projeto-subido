@@ -88,11 +88,51 @@ test('projeto: as cinco fases, o kit e o teclado levam ao conteúdo correto', as
     await expect(page.getByRole('heading', { level: 2, name: fase, exact: true })).toBeVisible();
   }
   await page.getByRole('button', { name: /Abrir kit de implementação/ }).click();
-  await expect(page.getByRole('tab', { name: 'Materiais' })).toBeFocused();
-  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Materiais');
+  await expect(page.getByRole('tab', { name: 'Pré-requisitos e materiais' })).toBeFocused();
+  await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Pré-requisitos e materiais');
   await page.keyboard.press('Home');
+  await expect(page.getByRole('tab', { name: 'Visão geral' })).toBeFocused();
+  await expect(page.getByRole('heading', { name: 'Como funciona' })).toBeVisible();
+  await page.keyboard.press('ArrowRight');
   await expect(aprender).toBeFocused();
   await expect(page.getByRole('heading', { name: 'Aulas do projeto' })).toBeVisible();
+});
+
+test('projeto: visão visual e materiais revelam detalhes sem avançar o progresso', async ({
+  page,
+}) => {
+  await page.goto('/preview/shell?tela=projeto');
+  const fluxo = page.getByRole('region', { name: 'Como funciona' });
+  await expect(fluxo.getByRole('button', { pressed: true })).toContainText('Mensagem no WhatsApp');
+  const qualificar = fluxo.getByRole('button', { name: /IA atende e qualifica/ });
+  await qualificar.focus();
+  await page.keyboard.press('Enter');
+  await expect(qualificar).toHaveAttribute('aria-pressed', 'true');
+  await expect(fluxo.getByText('Responde → pergunta → confirma o perfil')).toBeVisible();
+  await page.getByRole('tab', { name: 'Implementar' }).click();
+  await expect(page.getByRole('progressbar', { name: 'Progresso do projeto' })).toHaveAttribute(
+    'aria-valuenow',
+    '0',
+  );
+  await page.getByRole('tab', { name: 'Pré-requisitos e materiais' }).click();
+  await expect(page.getByRole('list', { name: 'Pré-requisitos do projeto' })).toBeVisible();
+  const limites = page
+    .locator('details')
+    .filter({ has: page.locator('summary', { hasText: 'Escopo e limites do projeto' }) })
+    .first();
+  await expect(limites).not.toHaveAttribute('open');
+  await page.getByRole('button', { name: 'Arquivos e ferramentas' }).click();
+  const prompt = page
+    .locator('details')
+    .filter({ has: page.locator('summary', { hasText: 'Ler prompt' }) })
+    .first();
+  await expect(prompt).not.toHaveAttribute('open');
+  await prompt.locator('summary').press('Enter');
+  await expect(prompt.locator('pre')).toBeVisible();
+  const axe = await new AxeBuilder({ page }).include('main').analyze();
+  expect(axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual(
+    [],
+  );
 });
 
 test('formação concluída mostra certificado e revisão, não outra primeira aula', async ({

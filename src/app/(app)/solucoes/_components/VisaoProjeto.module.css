@@ -1,0 +1,312 @@
+.visao {
+  display: grid;
+  gap: var(--app-gap-block);
+  padding: clamp(20px, 3vw, 32px);
+}
+
+.visaoGrade {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
+  gap: var(--app-gap-block);
+  align-items: start;
+}
+
+.tituloSecao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin-bottom: var(--via-space-4);
+}
+
+.tituloSecao h2,
+.resultadoFallback h2 {
+  margin: 0;
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-semibold);
+  letter-spacing: var(--app-ls-h3);
+  color: var(--via-text-primary);
+}
+
+.tituloSecao > span,
+.dadosVideo {
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+
+.aberturaVideo,
+.fluxo {
+  min-width: 0;
+}
+
+.dadosVideo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--via-space-2) var(--via-space-4);
+  margin-top: var(--via-space-4);
+  line-height: 1.5;
+}
+
+.movimentos {
+  display: grid;
+  gap: var(--via-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.movimentos li {
+  display: grid;
+  justify-items: center;
+  gap: var(--via-space-1);
+}
+
+.movimentos button {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  width: 100%;
+  padding: var(--via-space-3) var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+  color: var(--via-text-primary);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.movimentos button[aria-pressed='true'] {
+  background: var(--app-mesh-trilho);
+  border-color: var(--via-navy-30);
+  color: var(--via-white);
+}
+
+.movimentos button[aria-pressed='true'] small {
+  color: var(--via-gray-300);
+}
+
+.movimentos button > svg:last-child {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.iconeMovimento,
+.miniIcone {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--app-radius-chip);
+  border: 1px solid var(--via-navy-10);
+  background: color-mix(in srgb, var(--via-white) 10%, transparent);
+}
+
+.textoMovimento {
+  display: grid;
+  gap: var(--via-space-1);
+}
+
+.textoMovimento small,
+.exemplo > span {
+  font-size: var(--app-fs-meta);
+  color: var(--via-text-muted);
+}
+
+.textoMovimento strong {
+  font-size: var(--app-fs-ui);
+  line-height: 1.3;
+  font-weight: var(--via-fw-medium);
+}
+
+.conector {
+  color: var(--via-text-muted);
+}
+
+.exemplo {
+  display: grid;
+  gap: var(--via-space-2);
+  min-height: 150px;
+  margin-top: var(--via-space-4);
+  padding: var(--via-space-4);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  align-content: start;
+}
+
+.exemplo > strong {
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+
+.exemplo p,
+.consultas p,
+.resultadoFallback p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.consultas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-gap-stack);
+}
+
+.consultas details {
+  min-width: 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+
+.consultas summary {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  list-style: none;
+  border-radius: inherit;
+}
+
+.consultas summary::-webkit-details-marker {
+  display: none;
+}
+.consultas summary > svg:last-child {
+  margin-left: auto;
+}
+.consultas summary > svg {
+  flex-shrink: 0;
+}
+.consultas details[open] summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.consultas p {
+  padding: 0 var(--via-space-5) var(--via-space-5);
+}
+
+.miniFluxo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-4);
+  margin: 0;
+  padding: var(--via-space-5) var(--via-space-3);
+  list-style: none;
+  border-radius: var(--app-radius-control);
+  background: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--via-white) 80%, transparent),
+    var(--via-navy-04)
+  );
+  border: 1px solid var(--via-border-hairline);
+}
+
+.miniFluxo li {
+  display: grid;
+  position: relative;
+  align-content: start;
+  justify-items: center;
+  gap: var(--via-space-3);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-support);
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.miniIcone {
+  width: 44px;
+  height: 44px;
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-glass-card-shadow);
+  color: var(--via-navy);
+}
+
+.miniFluxo li:nth-child(2) .miniIcone {
+  background: var(--app-mesh-trilho);
+  color: var(--via-white);
+}
+
+.conectorMini {
+  position: absolute;
+  right: -16px;
+  top: 14px;
+  color: var(--via-text-muted);
+}
+
+.movimentos button:hover {
+  border-color: var(--via-navy-30);
+}
+.movimentos button:focus-visible,
+.consultas summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
+}
+
+@media (max-width: 1079px) {
+  .visaoGrade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .movimentos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--via-space-3);
+  }
+  .movimentos button {
+    height: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .movimentos button > svg:last-child,
+  .conector {
+    display: none;
+  }
+  .exemplo {
+    min-height: 125px;
+  }
+}
+
+@media (max-width: 599px) {
+  .visao {
+    padding: var(--via-space-4);
+  }
+  .tituloSecao {
+    flex-wrap: wrap;
+    gap: var(--via-space-1);
+  }
+  .consultas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .movimentos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-2);
+  }
+  .movimentos button {
+    flex-direction: row;
+    align-items: center;
+  }
+  .movimentos button > svg:last-child {
+    display: block;
+  }
+  .exemplo {
+    min-height: 0;
+  }
+  .miniFluxo {
+    gap: var(--via-space-3);
+    padding-inline: var(--via-space-2);
+  }
+  .conectorMini {
+    right: -14px;
+  }
+}
