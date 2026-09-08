@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fixture from '@/app/preview/prospeccao-projeto/fixture.json';
@@ -12,6 +12,13 @@ import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
 
 const roteiro = lerRoteiroProjeto(fixture.roteiro)!;
+
+beforeEach(() => {
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: vi.fn(),
+  });
+});
 
 describe('Leitura visual de prospecção', () => {
   it('distingue falta de perfil de informação ausente, inclusive pelo teclado', async () => {

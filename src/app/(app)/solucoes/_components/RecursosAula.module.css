@@ -407,6 +407,52 @@
   overflow-wrap: anywhere;
 }
 
+/* Dentro do painel da aula, uma lista evita repetir título e empilhar cartões. */
+.raiz[data-compacto] {
+  padding-top: 0;
+}
+
+.raiz[data-compacto] .grade {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.raiz[data-compacto] .cartao {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.raiz[data-compacto] .cartao + .cartao {
+  border-top: 1px solid var(--via-border-hairline);
+  margin-top: var(--via-space-3);
+}
+
+.raiz[data-compacto] .cartao > header {
+  padding: var(--via-space-4) 0 var(--via-space-2);
+}
+
+.raiz[data-compacto] .cartao small {
+  font-family: var(--via-font);
+  font-size: var(--app-fs-support);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.raiz[data-compacto] .cartao > a,
+.raiz[data-compacto] .detalhe > summary {
+  min-height: 44px;
+  padding-inline: 0;
+  border: 0;
+  background: transparent;
+}
+
+.raiz[data-compacto] .conteudo {
+  border: 1px solid var(--via-border-hairline);
+  border-radius: var(--app-radius-control);
+}
+
 @media (max-width: 899px) {
   .grade {
     grid-template-columns: 1fr;

@@ -32,6 +32,18 @@ const recursos = [
 ];
 
 describe('recursos da aula', () => {
+  it('usa uma lista compacta sem repetir o título e preserva o conteúdo', async () => {
+    const user = userEvent.setup();
+    render(<RecursosAula recursos={[recursos[0]!]} compacto />);
+    expect(screen.getByRole('region', { name: 'Recursos desta aula' })).toHaveAttribute(
+      'data-compacto',
+      'true',
+    );
+    expect(screen.queryByRole('heading', { name: 'Recursos desta aula' })).toBeNull();
+    await user.click(screen.getByText('Ver mapa'));
+    expect(screen.getByRole('list', { name: 'Etapas do mapa mental' })).toBeVisible();
+  });
+
   it('transforma o mapa mental em uma sequência visual', async () => {
     const user = userEvent.setup();
     render(<RecursosAula recursos={[recursos[0]!]} />);

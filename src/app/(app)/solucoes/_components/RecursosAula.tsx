@@ -238,19 +238,32 @@ function CartaoRecurso({ recurso }: { recurso: Recurso }) {
   );
 }
 
-export function RecursosAula({ recursos }: { recursos: Recurso[] }) {
+export function RecursosAula({
+  recursos,
+  compacto = false,
+}: {
+  recursos: Recurso[];
+  compacto?: boolean;
+}) {
   const tituloId = useId();
   if (recursos.length === 0) return null;
 
   return (
-    <section className={styles.raiz} aria-labelledby={tituloId}>
-      <header className={styles.cabecalho}>
-        <div>
-          <p>Para consultar e aplicar</p>
-          <h4 id={tituloId}>Recursos desta aula</h4>
-        </div>
-        <span>{recursos.length} recursos</span>
-      </header>
+    <section
+      className={styles.raiz}
+      data-compacto={compacto || undefined}
+      aria-labelledby={compacto ? undefined : tituloId}
+      aria-label={compacto ? 'Recursos desta aula' : undefined}
+    >
+      {!compacto ? (
+        <header className={styles.cabecalho}>
+          <div>
+            <p>Para consultar e aplicar</p>
+            <h4 id={tituloId}>Recursos desta aula</h4>
+          </div>
+          <span>{recursos.length} recursos</span>
+        </header>
+      ) : null}
       <div className={styles.grade}>
         {recursos.map((recurso) => (
           <CartaoRecurso key={`${recurso.tipo}-${recurso.titulo}`} recurso={recurso} />
