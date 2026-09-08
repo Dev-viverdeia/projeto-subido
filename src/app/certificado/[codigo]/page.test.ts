@@ -39,4 +39,22 @@ describe('prévia social verificável', () => {
     expect(metadata.openGraph).toBeUndefined();
     expect(metadata.robots).toEqual({ index: false, follow: false });
   });
+  it('mantém a demonstração explícita na prévia social', async () => {
+    vi.mocked(buscarCertificadoPublico).mockResolvedValue({
+      nome: 'Rafael Milagre — CERTIFICADO DE DEMONSTRAÇÃO',
+      titulo: 'Atendimento com IA',
+      codigo: 'demo12345678',
+      origem: 'solucao',
+      slug: 'atendimento',
+      concluido_em: '2026-09-08T12:00:00Z',
+      emitido_em: '2026-09-08T12:00:00Z',
+    });
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ codigo: 'demo12345678' }),
+      searchParams: Promise.resolve({}),
+    });
+    expect(metadata.title).toBe('Rafael Milagre · Demonstração · Atendimento com IA');
+    expect(metadata.description).toContain('Não comprova conclusão.');
+    expect(metadata.description).not.toContain('concluiu');
+  });
 });

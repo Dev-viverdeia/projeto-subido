@@ -21,6 +21,7 @@ import { DocumentoCertificado } from '@/components/certificados/DocumentoCertifi
 import styles from './CertificadoVista.module.css';
 import { emitirCertificado } from '@/lib/certificados/actions';
 import { CompartilharCertificado } from './CompartilharCertificado';
+import { apresentacaoCertificado } from '@/lib/certificados/apresentacao';
 
 /**
  * A FOLHA do certificado + as ações em volta dela.
@@ -297,6 +298,7 @@ export function CertificadoVista({
           urlPublica={urlPublica}
           data={emitidoEm}
           imagemPreview={imagemPreview}
+          demonstracao={apresentacaoCertificado(documento.nome).demonstracao}
         />
       ) : null}
 
