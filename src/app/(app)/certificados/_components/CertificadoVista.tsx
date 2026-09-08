@@ -11,7 +11,7 @@ import {
   Printer,
   Share2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Button, Spinner } from '@/design-system/via';
 import { avaliarCertificado } from '@/lib/certificados/criterios';
 import { useProgresso, type EstadoProgressoConta } from '@/lib/progresso/local';
@@ -20,6 +20,7 @@ import { ModalOperacao } from '../../_components/ModalOperacao';
 import { DocumentoCertificado } from '@/components/certificados/DocumentoCertificado';
 import styles from './CertificadoVista.module.css';
 import { emitirCertificado } from '@/lib/certificados/actions';
+import { CompartilharCertificado } from './CompartilharCertificado';
 
 /**
  * A FOLHA do certificado + as ações em volta dela.
@@ -47,6 +48,8 @@ export function CertificadoVista({
   codigoInicial,
   siteUrl,
   progressoPreview,
+  imagemPreview,
+  registroInicial,
 }: {
   origem: 'formacao' | 'solucao';
   slug: string;
@@ -58,16 +61,27 @@ export function CertificadoVista({
   codigoInicial: string | null;
   siteUrl: string;
   progressoPreview?: EstadoProgressoConta;
+  imagemPreview?: string;
+  registroInicial?: { nome: string; titulo: string; concluidoEm: string; emitidoEm: string };
 }) {
   const progressoConta = useProgresso();
   const progresso = progressoPreview ?? progressoConta;
   const [codigo, setCodigo] = useState(codigoInicial);
+  const [emitidoEm, setEmitidoEm] = useState(registroInicial?.emitidoEm ?? null);
   const [emitindo, setEmitindo] = useState(false);
   const [erroEmissao, setErroEmissao] = useState<string | null>(null);
   const [estadoEmissao, setEstadoEmissao] = useState<
     'fechado' | 'processando' | 'sucesso' | 'erro'
   >('fechado');
   const [linkCopiado, setLinkCopiado] = useState(false);
+  const [compartilhando, setCompartilhando] = useState(false);
+  const compartilharRef = useRef<HTMLButtonElement>(null);
+
+  function fecharCompartilhamento() {
+    setCompartilhando(false);
+    // Safari móvel não foca botões tocados. Retorna ao gatilho após desmontar o portal.
+    window.requestAnimationFrame(() => compartilharRef.current?.focus());
+  }
 
   const estado = avaliarCertificado(
     { aprendizadoIds, implementacaoIds },
@@ -78,6 +92,12 @@ export function CertificadoVista({
   );
 
   const urlPublica = codigo ? `${siteUrl.replace(/\/$/, '')}/certificado/${codigo}` : null;
+  const documento = registroInicial ?? {
+    nome,
+    titulo,
+    concluidoEm: estado.concluidoEm,
+    emitidoEm: estado.concluidoEm,
+  };
 
   async function gerarLink() {
     setEmitindo(true);
@@ -92,6 +112,7 @@ export function CertificadoVista({
       return;
     }
     setCodigo(resultado.codigo);
+    setEmitidoEm(resultado.emitidoEm ?? null);
     setEstadoEmissao('sucesso');
   }
 
@@ -188,15 +209,15 @@ export function CertificadoVista({
         <div className={styles.acoesCertificado}>
           {urlPublica ? (
             <>
-              <a
+              <button
+                type="button"
+                ref={compartilharRef}
                 className={styles.linkedin}
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
-                target="_blank"
-                rel="noreferrer"
+                onClick={() => setCompartilhando(true)}
               >
                 <Share2 size={16} strokeWidth={1.8} aria-hidden="true" />
                 Compartilhar no LinkedIn
-              </a>
+              </button>
               <button
                 type="button"
                 className={styles.compartilhar}
@@ -240,10 +261,10 @@ export function CertificadoVista({
 
       <div className={styles.folha}>
         <DocumentoCertificado
-          nome={nome}
-          titulo={titulo}
+          nome={documento.nome}
+          titulo={documento.titulo}
           origem={origem}
-          concluidoEm={estado.concluidoEm}
+          concluidoEm={documento.concluidoEm}
           codigo={codigo}
         />
       </div>
@@ -267,6 +288,17 @@ export function CertificadoVista({
           <dd>{codigo ? 'Disponível para compartilhar' : 'Prepare o link para compartilhar'}</dd>
         </div>
       </dl>
+
+      {compartilhando && urlPublica && codigo ? (
+        <CompartilharCertificado
+          onClose={fecharCompartilhamento}
+          titulo={documento.titulo}
+          codigo={codigo}
+          urlPublica={urlPublica}
+          data={emitidoEm}
+          imagemPreview={imagemPreview}
+        />
+      ) : null}
 
       <ModalOperacao
         open={estadoEmissao !== 'fechado'}
@@ -299,15 +331,17 @@ export function CertificadoVista({
                     {linkCopiado ? 'Link copiado' : 'Copiar link'}
                   </Button>
                   {urlPublica ? (
-                    <a
+                    <button
+                      type="button"
                       className={styles.linkedin}
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlPublica)}`}
-                      target="_blank"
-                      rel="noreferrer"
+                      onClick={() => {
+                        fecharEmissao();
+                        setCompartilhando(true);
+                      }}
                     >
                       <Share2 size={15} strokeWidth={1.8} aria-hidden="true" />
                       Compartilhar no LinkedIn
-                    </a>
+                    </button>
                   ) : null}
                 </>
               )}

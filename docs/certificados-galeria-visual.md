@@ -13,6 +13,25 @@
 
 ## Design e manutenção
 
+### Compartilhamento no LinkedIn — 8 de setembro de 2026
+
+- Modal com destinos Publicação e Perfil, sem sair da folha.
+- PNG próprio em 1200 × 627, gerado pelo registro público, com as duas marcas e sem fontes externas.
+- Metadados Open Graph/Twitter do certificado, com nome, conteúdo e imagem verificáveis sem sessão.
+- Download da imagem; o usuário confirma a publicação no LinkedIn. Nada é publicado pelo Subido.
+- Perfil: nome, emissor, data real de emissão, código e URL com cópia individual. Não há promessa de autofill.
+- A folha de um certificado já emitido usa seu registro original, mesmo se a conta ou o catálogo mudar.
+- Carregamento e recuperação da imagem, foco devolvido ao botão inclusive no Safari móvel.
+- Código inexistente retorna 404; falha de consulta retorna 503 sem cache. PNG válido tem cache de cinco minutos. Nenhuma chave administrativa na consulta pública.
+
+Referências oficiais: [prévia de links](https://www.linkedin.com/help/linkedin/answer/a525301),
+[Add to Profile e preenchimento manual](https://www.linkedin.com/help/linkedin/answer/a528030).
+
+Validação: 20 testes de navegador em Chromium e WebKit, incluindo PNG, download,
+cópia, recuperação, teclado, acessibilidade, nomes longos e impressão. A conferência
+com registro existente mantém sua identificação de demonstração; não altera ou
+publica dados no LinkedIn. A apresentação final e o cache no feed são controlados pelo LinkedIn.
+
 ### Revisão de composição — 8 de setembro de 2026
 
 - Nome como foco da peça, composição central e marcas equilibradas no topo.

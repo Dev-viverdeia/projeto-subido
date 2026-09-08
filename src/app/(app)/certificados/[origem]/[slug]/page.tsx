@@ -55,7 +55,7 @@ export default async function CertificadoPage({
         : '—';
   const { data: emissao } = await supabase
     .from('certificados_emitidos')
-    .select('codigo')
+    .select('codigo,nome,titulo,concluido_em,emitido_em')
     .eq('origem', origem)
     .eq('slug', slug)
     .maybeSingle();
@@ -71,6 +71,16 @@ export default async function CertificadoPage({
         hrefConteudo={conteudo.href}
         nome={nome}
         codigoInicial={emissao?.codigo ?? null}
+        registroInicial={
+          emissao
+            ? {
+                nome: emissao.nome,
+                titulo: emissao.titulo,
+                concluidoEm: emissao.concluido_em,
+                emitidoEm: emissao.emitido_em,
+              }
+            : undefined
+        }
         siteUrl={process.env.NEXT_PUBLIC_SITE_URL ?? 'https://projeto-subido.vercel.app'}
       />
     </>

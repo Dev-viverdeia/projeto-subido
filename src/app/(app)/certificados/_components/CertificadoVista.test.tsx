@@ -47,6 +47,36 @@ describe('emissão de certificado', () => {
     };
   });
 
+  it('a folha e o compartilhamento preservam o registro emitido se a conta ou o catálogo mudar', async () => {
+    const user = userEvent.setup();
+    render(
+      <CertificadoVista
+        origem="formacao"
+        slug="curso"
+        titulo="Título atual do catálogo"
+        aprendizadoIds={['aula-1', 'aula-2']}
+        implementacaoIds={[]}
+        hrefConteudo="/formacoes/curso"
+        nome="Nome atual da conta"
+        codigoInicial="registro-123"
+        siteUrl="https://subido.viverdeia.ai"
+        registroInicial={{
+          nome: 'Nome na emissão',
+          titulo: 'Título certificado',
+          concluidoEm: '2026-08-21T10:00:00Z',
+          emitidoEm: '2026-09-08T12:00:00Z',
+        }}
+      />,
+    );
+    expect(screen.getByText('Nome na emissão')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Título certificado');
+    await user.click(screen.getByRole('button', { name: 'Compartilhar no LinkedIn' }));
+    await user.click(screen.getByRole('button', { name: 'Perfil' }));
+    expect(screen.getByText('setembro de 2026')).toBeInTheDocument();
+    expect(screen.queryByText('Nome atual da conta')).not.toBeInTheDocument();
+    expect(emitirCertificado).not.toHaveBeenCalled();
+  });
+
   it('mostra o processamento e entrega o compartilhamento sem retirar o usuário da tela', async () => {
     const user = userEvent.setup();
     let concluir!: (resultado: { ok: true; codigo: string }) => void;
@@ -83,7 +113,8 @@ describe('emissão de certificado', () => {
       name: 'Certificado pronto para compartilhar',
     });
     expect(sucesso).toHaveTextContent('Pronto para compartilhar');
-    expect(screen.getAllByRole('link', { name: 'Compartilhar no LinkedIn' })[0]).toHaveAttribute(
+    await user.click(screen.getAllByRole('button', { name: 'Compartilhar no LinkedIn' }).at(-1)!);
+    expect(screen.getByRole('link', { name: 'Publicar no LinkedIn' })).toHaveAttribute(
       'href',
       expect.stringContaining(encodeURIComponent('/certificado/certificado-publico')),
     );

@@ -1,9 +1,23 @@
 .pagina {
-  max-width: 1128px;
+  max-width: 1152px;
   margin-inline: auto;
   padding: var(--via-space-8) var(--via-space-6);
   display: grid;
   gap: var(--via-space-6);
+}
+.suporte {
+  min-width: 0;
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-card);
+  background: color-mix(in srgb, var(--app-elev-2-bg) 86%, transparent);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-sm);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .suporte {
+    background: var(--via-white);
+  }
 }
 
 .topo {
@@ -31,9 +45,15 @@
   font-size: var(--app-fs-support);
   line-height: var(--app-lh-reading);
 }
-@media (max-width: 600px) {
+@media (max-width: 599px) {
   .pagina {
     padding: var(--via-space-5) var(--via-space-3);
+  }
+  .suporte {
+    padding: 0;
+    border: 0;
+    border-radius: var(--app-radius-chip);
+    box-shadow: none;
   }
 }
 @media print {
@@ -45,6 +65,13 @@
   .topo,
   .nota {
     display: none;
+  }
+  .suporte {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
   }
   @page {
     size: A4 landscape;
