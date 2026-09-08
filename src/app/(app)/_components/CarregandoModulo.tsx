@@ -71,7 +71,7 @@ const CONFIGURACAO: Record<
     descricao: 'Conferindo formações concluídas e documentos disponíveis.',
     metricas: 0,
     colunas: 2,
-    momentoEscuro: true,
+    momentoEscuro: false,
   },
   consultor: {
     modulo: 'Sobral AI',
@@ -173,7 +173,7 @@ export function CarregandoModulo({ anatomia }: { anatomia: Anatomia }) {
                 <Skeleton
                   variant="rect"
                   width="100%"
-                  height={anatomia === 'pipeline' ? 112 : anatomia === 'certificados' ? 132 : 82}
+                  height={anatomia === 'pipeline' ? 112 : anatomia === 'certificados' ? 330 : 82}
                 />
               </article>
             ))}

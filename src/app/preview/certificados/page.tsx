@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { EvolucaoProfissional } from '@/app/(app)/_components/EvolucaoProfissional';
+import { CabecalhoPagina } from '@/app/(app)/_components/CabecalhoPagina';
 import { GaleriaCertificados } from '@/app/(app)/certificados/_components/GaleriaCertificados';
 import type { FormacaoResumo, SolucaoResumo } from '@/lib/conteudo/queries';
 import type { EstadoProgressoConta } from '@/lib/progresso/local';
@@ -61,25 +61,31 @@ const PROGRESSO: EstadoProgressoConta = {
     'chatgpt-para-o-trabalho': '2026-08-29T12:00:00.000Z',
     'agentes-de-ia': '2026-08-30T12:00:00.000Z',
   },
-  etapas: {},
+  etapas: { 'nina-1': '2026-08-29T12:00:00.000Z', 'nina-2': '2026-08-30T12:00:00.000Z' },
   solucoes: {},
 };
 
-export default function PreviewCertificadosPage() {
+export default async function PreviewCertificadosPage({
+  searchParams,
+}: PageProps<'/preview/certificados'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const { estado } = await searchParams;
+  const vazio = estado === 'vazio';
 
   return (
     <main className={styles.pagina}>
       <div className={styles.conteudo}>
-        <EvolucaoProfissional
-          etapa="certificados"
-          titulo="Comprove o que você concluiu."
-          descricao="Cada certificado vira uma prova pública do que você aprendeu e implementou."
+        <CabecalhoPagina
+          titulo="Certificados"
+          descricao="Suas conquistas, prontas para compartilhar."
         />
         <GaleriaCertificados
           formacoes={FORMACOES}
           solucoes={SOLUCOES}
-          progressoPreview={PROGRESSO}
+          nome="Rafael Milagre"
+          progressoPreview={
+            vazio ? { aulas: {}, etapas: {}, formacoes: {}, solucoes: {} } : PROGRESSO
+          }
         />
       </div>
     </main>

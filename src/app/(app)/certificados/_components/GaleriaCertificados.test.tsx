@@ -60,17 +60,20 @@ describe('galeria de certificados', () => {
   it('transforma o estado vazio em uma escolha concreta de primeiro caminho', () => {
     render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
 
-    expect(screen.getByText('Como funciona')).toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Modelo de certificado' })).toHaveTextContent(
+      'sem validade',
+    );
     expect(
-      screen.getByRole('heading', { name: 'Escolha seu próximo caminho.' }),
+      screen.getByRole('heading', { name: 'Seu próximo certificado começa aqui.' }),
     ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ver certificado/ })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Começar formação/ })).toHaveAttribute(
       'href',
       '/formacoes/formacao-de-execucao',
     );
-    expect(screen.getByRole('link', { name: /Abrir projeto/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Explorar projetos/ })).toHaveAttribute(
       'href',
-      '/solucoes/atendimento-com-ia',
+      '/solucoes',
     );
   });
 
@@ -103,7 +106,7 @@ describe('galeria de certificados', () => {
 
     render(<GaleriaCertificados formacoes={formacoes} solucoes={solucoes} />);
 
-    expect(screen.getByRole('link', { name: 'Ver certificado' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver certificado/ })).toHaveAttribute(
       'href',
       '/certificados/formacao/formacao-de-execucao',
     );
@@ -149,6 +152,8 @@ describe('galeria de certificados', () => {
       'href',
       '/certificados/solucao/atendimento-com-ia',
     );
-    expect(screen.getByText('Implementação', { selector: 'dt' })).toBeInTheDocument();
+    expect(screen.getByText('Projeto concluído')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Subido' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Viver de IA' })).toBeInTheDocument();
   });
 });

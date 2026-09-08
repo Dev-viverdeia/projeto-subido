@@ -17,18 +17,16 @@ import { avaliarCertificado } from '@/lib/certificados/criterios';
 import { useProgresso, type EstadoProgressoConta } from '@/lib/progresso/local';
 import { BotaoVoltar } from '../../_components/BotaoVoltar';
 import { ModalOperacao } from '../../_components/ModalOperacao';
-import { Visto } from '../../_components/PillEstado';
-import { dataCurta } from '../../builder/_components/statusBuilder';
+import { DocumentoCertificado } from '@/components/certificados/DocumentoCertificado';
 import styles from './CertificadoVista.module.css';
 import { emitirCertificado } from '@/lib/certificados/actions';
 
 /**
  * A FOLHA do certificado + as ações em volta dela.
  *
- * A folha é papel: superfície CLARA em proporção A4 paisagem, moldura dupla de
- * hairline navy, tinta navy e mono para os dados — imprime bonito e sem
- * desperdício (fundo navy em impressora é tanque de tinta; navegador costuma
- * descartar fundos de qualquer jeito). O navy fica na moldura da tela.
+ * DocumentoCertificado mantém a mesma folha clara e as duas marcas oficiais
+ * na galeria, na impressão A4 e no registro público. A moldura da interface
+ * usa os tokens de vidro; o papel preserva contraste e legibilidade.
  *
  * "Salvar em PDF" é o diálogo de impressão do navegador (`window.print()`), e
  * o CSS de impressão isola a folha: tudo fica invisível menos ela, que assume
@@ -79,7 +77,6 @@ export function CertificadoVista({
     },
   );
 
-  const rotuloOrigem = origem === 'formacao' ? 'formação' : 'projeto';
   const urlPublica = codigo ? `${siteUrl.replace(/\/$/, '')}/certificado/${codigo}` : null;
 
   async function gerarLink() {
@@ -241,58 +238,35 @@ export function CertificadoVista({
         </p>
       ) : null}
 
-      {/* A FOLHA — o que sai na impressão é exatamente isto. */}
-      <article className={styles.folha} aria-label={`Certificado de ${titulo}`}>
-        <span className={styles.molduraExterna} aria-hidden="true" />
-        <span className={styles.molduraInterna} aria-hidden="true" />
-
-        <div className={styles.folhaMiolo}>
-          <header className={styles.folhaTopo}>
-            <span className={styles.marca}>subido</span>
-            <span className={styles.selo}>
-              <Visto tamanho={14} />
-            </span>
-          </header>
-
-          <div className={styles.folhaCentro}>
-            <p className={styles.eyebrow}>Certificado de conclusão · {rotuloOrigem}</p>
-            <p className={styles.certificamos}>Certificamos que</p>
-            <p className={styles.nome}>{nome}</p>
-            <p className={styles.concluiu}>
-              concluiu{' '}
-              {origem === 'formacao'
-                ? 'a formação'
-                : 'o aprendizado e a implementação guiada do projeto'}
-            </p>
-            <h1 className={styles.tituloConteudo}>{titulo}</h1>
-          </div>
-
-          <footer className={styles.folhaBase}>
-            <div className={styles.dado}>
-              <span className={styles.dadoRotulo}>Concluído em</span>
-              <span className={styles.dadoValor}>
-                {estado.concluidoEm ? dataCurta(estado.concluidoEm) : '—'}
-              </span>
-            </div>
-            <div className={styles.dado}>
-              <span className={styles.dadoRotulo}>Aulas</span>
-              <span className={styles.dadoValor}>
-                {estado.aprendizado.feitas}/{estado.aprendizado.total}
-              </span>
-            </div>
-            {estado.implementacao.total > 0 ? (
-              <div className={styles.dado}>
-                <span className={styles.dadoRotulo}>Implementação</span>
-                <span className={styles.dadoValor}>
-                  {estado.implementacao.feitas}/{estado.implementacao.total}
-                </span>
-              </div>
-            ) : null}
-            <p className={styles.origem}>Registro da conta · plataforma Subido</p>
-            {codigo ? <p className={styles.codigo}>Verificação · {codigo}</p> : null}
-          </footer>
+      <div className={styles.folha}>
+        <DocumentoCertificado
+          nome={nome}
+          titulo={titulo}
+          origem={origem}
+          concluidoEm={estado.concluidoEm}
+          codigo={codigo}
+        />
+      </div>
+      <dl className={styles.resumoConclusao} aria-label="Critérios concluídos">
+        <div>
+          <dt>Aulas</dt>
+          <dd>
+            {estado.aprendizado.feitas}/{estado.aprendizado.total}
+          </dd>
         </div>
-      </article>
+        {estado.implementacao.total > 0 ? (
+          <div>
+            <dt>Implementação</dt>
+            <dd>
+              {estado.implementacao.feitas}/{estado.implementacao.total}
+            </dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>Registro público</dt>
+          <dd>{codigo ? 'Disponível para compartilhar' : 'Prepare o link para compartilhar'}</dd>
+        </div>
+      </dl>
 
       <ModalOperacao
         open={estadoEmissao !== 'fechado'}

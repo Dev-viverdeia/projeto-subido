@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { BadgeCheck } from 'lucide-react';
-import { SubidoLogo } from '@/components/brand/SubidoLogo';
+import { DocumentoCertificado } from '@/components/certificados/DocumentoCertificado';
 import { createClient } from '@/lib/supabase/server';
 import styles from './page.module.css';
 
@@ -48,45 +48,26 @@ export default async function CertificadoPublicoPage({
   const certificado = await buscarCertificado(codigo);
   if (!certificado) notFound();
 
-  const concluido = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(
-    new Date(certificado.concluido_em),
-  );
-
   return (
     <main className={styles.pagina}>
       <header className={styles.topo}>
-        <SubidoLogo size={20} />
+        <p>Certificado de conclusão</p>
         <span>
           <BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />
           Registro verificado
         </span>
       </header>
 
-      <article className={styles.certificado}>
-        <div className={styles.marca} aria-hidden="true" />
-        <p className={styles.eyebrow}>Certificado de conclusão</p>
-        <p className={styles.intro}>A plataforma Subido certifica que</p>
-        <h1>{certificado.nome}</h1>
-        <p className={styles.concluiu}>
-          concluiu {certificado.origem === 'formacao' ? 'a formação' : 'o projeto'}
-        </p>
-        <h2>{certificado.titulo}</h2>
-
-        <dl>
-          <div>
-            <dt>Conclusão</dt>
-            <dd>{concluido}</dd>
-          </div>
-          <div>
-            <dt>Código</dt>
-            <dd>{certificado.codigo}</dd>
-          </div>
-        </dl>
-      </article>
+      <DocumentoCertificado
+        nome={certificado.nome}
+        titulo={certificado.titulo}
+        origem={certificado.origem === 'formacao' ? 'formacao' : 'solucao'}
+        concluidoEm={certificado.concluido_em}
+        codigo={certificado.codigo}
+      />
 
       <p className={styles.nota}>
-        Este registro foi emitido depois que os critérios de conclusão foram validados na conta do
-        profissional.
+        Autenticidade confirmada pelo registro de conclusão na plataforma Subido.
       </p>
     </main>
   );

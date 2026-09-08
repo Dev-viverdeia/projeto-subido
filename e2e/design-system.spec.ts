@@ -24,7 +24,7 @@ const TELAS = [
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto concluído.'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
-  ['/preview/certificados', 'Comprove o que você concluiu.'],
+  ['/preview/certificados', 'Certificados'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
   ['/preview/formacoes', 'Aprenda as ferramentas para trabalhar com IA.'],
   ['/preview/formacao', 'ChatGPT para o trabalho'],
@@ -429,7 +429,7 @@ test.describe('fundação visual Viver de IA', () => {
   test('Certificados prioriza a prova pública e o compartilhamento', async ({ page }) => {
     await page.goto('/preview/certificados');
     await expect(page.getByRole('heading', { name: 'Conquistados' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Ver certificado' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Ver certificado' }).first()).toBeVisible();
 
     await page.goto('/preview/certificado');
     await expect(page.getByRole('link', { name: 'Compartilhar no LinkedIn' })).toBeVisible();
