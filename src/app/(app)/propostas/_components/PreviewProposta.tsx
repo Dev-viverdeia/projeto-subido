@@ -1,4 +1,4 @@
-import { Check, Circle } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Image from 'next/image';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { StatusProposta } from '@/lib/propostas/queries';
@@ -37,16 +37,15 @@ export function PreviewProposta({
     <div className={styles.moldura} aria-label="Prévia visual da proposta">
       <div className={styles.molduraTopo}>
         <div>
-          <strong>Prévia em tempo real</strong>
-          <span>Atualiza enquanto você edita</span>
+          <strong>Prévia da proposta</strong>
         </div>
         <span className={styles.estadoPreview} data-sujo={sujo || undefined} aria-live="polite">
-          {sujo ? 'Prévia atualizada' : 'Versão salva'}
+          {sujo ? 'Alterações não salvas' : 'Versão salva'}
         </span>
       </div>
 
       <article className={styles.papel}>
-        <header className={styles.capa}>
+        <header className={styles.capa} data-secao-preview="cliente">
           <div className={styles.marca}>
             {documento.fornecedor?.logoUrl ? (
               <Image
@@ -62,9 +61,8 @@ export function PreviewProposta({
                 {documento.fornecedor.nomeNegocio ?? documento.fornecedor.nomeResponsavel}
               </strong>
             ) : (
-              <SubidoLogo size={9} variant="mono" />
+              <SubidoLogo size={14} variant="mono" />
             )}
-            <span className={styles.parceria}>CRIADO COM SUBIDO</span>
           </div>
           <div className={styles.capaTexto}>
             <p>Proposta comercial</p>
@@ -91,35 +89,21 @@ export function PreviewProposta({
         </header>
 
         <div className={styles.conteudo}>
-          <div className={styles.linhaDecisao}>
-            {['Contexto', 'Entrega', 'Prazo', 'Investimento', 'Decisão'].map((item, indice) => (
-              <div key={item}>
-                <span>{indice + 1}</span>
-                <small>{item}</small>
-              </div>
-            ))}
-          </div>
-
-          <section
-            className={styles.abertura}
-            data-contexto-longo={documento.desafio.length > 360 || undefined}
-          >
-            <p className={styles.rotulo}>O ponto de partida</p>
-            <h3>{documento.desafio}</h3>
+          <section className={styles.abertura} data-secao-preview="contexto">
+            <h3>Desafio e objetivo</h3>
+            <p>{documento.desafio}</p>
+            <strong className={styles.objetivo}>Objetivo do projeto</strong>
             <p>{documento.objetivo}</p>
           </section>
 
-          <section className={styles.resumoProjeto}>
-            <p className={styles.rotulo}>A solução proposta</p>
-            <h3>{documento.projeto.titulo}</h3>
+          <section className={styles.resumoProjeto} data-secao-preview="solucao">
+            <h3>A solução proposta</h3>
             <p>{documento.projeto.resumo}</p>
           </section>
 
-          <section className={styles.secao}>
+          <section className={styles.secao} data-secao-preview="escopo">
             <div className={styles.secaoTopo}>
-              <span>01</span>
               <div>
-                <p className={styles.rotulo}>Como vamos avançar</p>
                 <h3>Escopo do projeto</h3>
               </div>
             </div>
@@ -137,22 +121,21 @@ export function PreviewProposta({
           </section>
 
           <section className={styles.duasColunas}>
-            <div>
-              <p className={styles.rotulo}>Entregáveis</p>
+            <div data-secao-preview="entregaveis">
+              <h3>Entregáveis</h3>
               <ul>
                 {documento.entregaveis.map((item, indice) => (
                   <li key={`${item}-${indice}`}>
-                    <Check size={11} strokeWidth={2.2} aria-hidden="true" /> {item}
+                    <Check size={16} strokeWidth={1.8} aria-hidden="true" /> {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div>
-              <p className={styles.rotulo}>Cronograma</p>
+            <div data-secao-preview="cronograma">
+              <h3>Cronograma</h3>
               <ul>
                 {documento.cronograma.map((item, indice) => (
                   <li key={`${item.fase}-${indice}`}>
-                    <Circle size={8} fill="currentColor" aria-hidden="true" />
                     <span>
                       <strong>{item.fase}</strong>
                       <small>{item.duracao}</small>
@@ -164,12 +147,17 @@ export function PreviewProposta({
             </div>
           </section>
 
-          <section className={styles.investimento}>
+          <section className={styles.investimento} data-secao-preview="investimento">
             <div>
               <p className={styles.rotulo}>Investimento do projeto</p>
               <strong>{formatarReais(documento.investimento.valorCentavos)}</strong>
               <span>{documento.investimento.condicoes}</span>
-              {documento.investimento.linkPagamento && <small>Checkout configurado</small>}
+              {documento.investimento.linkPagamento && (
+                <div className={styles.linkPagamento}>
+                  <small>Link após aprovação</small>
+                  <span>{documento.investimento.linkPagamento}</span>
+                </div>
+              )}
             </div>
             <div>
               <span>Validade</span>
@@ -178,11 +166,9 @@ export function PreviewProposta({
             </div>
           </section>
 
-          <section className={styles.decisao}>
+          <section className={styles.decisao} data-secao-preview="decisao">
             <div className={styles.secaoTopo}>
-              <span>02</span>
               <div>
-                <p className={styles.rotulo}>Para começar</p>
                 <h3>Próximos passos</h3>
               </div>
             </div>
@@ -208,7 +194,7 @@ export function PreviewProposta({
                 documento.fornecedor?.nomeResponsavel ??
                 'Profissional de IA'}
             </span>
-            <span>CRIADO COM SUBIDO</span>
+            <span>Criado com Subido</span>
             <span>Proposta V{versao.toString().padStart(2, '0')}</span>
           </footer>
         </div>

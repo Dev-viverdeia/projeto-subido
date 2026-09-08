@@ -29,11 +29,9 @@ export function SecoesPrazoDecisao({
 
   return (
     <>
-      <details className={styles.bloco}>
+      <details className={styles.bloco} name="editar-proposta" data-previa="cronograma">
         <summary className={styles.blocoTopo}>
-          <span>03</span>
           <div>
-            <p>Prazo</p>
             <h2>Cronograma</h2>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
@@ -47,6 +45,7 @@ export function SecoesPrazoDecisao({
             <button
               type="button"
               disabled={documento.cronograma.length >= 8}
+              aria-label="Adicionar fase ao cronograma"
               onClick={() =>
                 mudar((atual) => ({
                   ...atual,
@@ -112,11 +111,9 @@ export function SecoesPrazoDecisao({
         </div>
       </details>
 
-      <details className={styles.bloco}>
+      <details className={styles.bloco} name="editar-proposta" data-previa="investimento">
         <summary className={styles.blocoTopo}>
-          <span>04</span>
           <div>
-            <p>Investimento</p>
             <h2>Valor e condições</h2>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
@@ -195,11 +192,9 @@ export function SecoesPrazoDecisao({
         </div>
       </details>
 
-      <details className={styles.bloco}>
+      <details className={styles.bloco} name="editar-proposta" data-previa="decisao">
         <summary className={styles.blocoTopo}>
-          <span>05</span>
           <div>
-            <p>Decisão</p>
             <h2>Próximos passos</h2>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />

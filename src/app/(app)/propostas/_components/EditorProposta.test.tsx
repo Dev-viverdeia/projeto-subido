@@ -1,7 +1,8 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { DocumentoProposta } from '@/lib/propostas/schema';
+import { salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import { EditorProposta } from './EditorProposta';
 import { PreviewProposta } from './PreviewProposta';
 
@@ -16,7 +17,10 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
   iniciarProjetoExecucao: vi.fn(() => Promise.resolve({ sucesso: 'Projeto criado.' })),
 }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 const DOCUMENTO: DocumentoProposta = {
   cliente: {
@@ -78,72 +82,147 @@ describe('PreviewProposta', () => {
   });
 });
 
+function montarEditor(alteracaoInicial = false) {
+  render(
+    <EditorProposta
+      referenciaEm="2026-09-06T02:30:00.000Z"
+      id="11111111-1111-4111-8111-111111111111"
+      tituloInicial="Plano comercial da Clínica Aurora"
+      documentoInicial={DOCUMENTO}
+      statusInicial="rascunho"
+      versaoInicial={2}
+      oportunidadeId="22222222-2222-4222-8222-222222222222"
+      reuniaoId={null}
+      execucaoId={null}
+      alteracaoInicial={alteracaoInicial}
+      compartilhamentoInicial={{
+        codigo: null,
+        ativo: false,
+        compartilhadaEm: null,
+        primeiraVisualizacaoEm: null,
+        ultimaVisualizacaoEm: null,
+        visualizacoes: 0,
+        decisaoNome: null,
+        decisaoEmail: null,
+        decisaoComentario: null,
+        decididaEm: null,
+      }}
+      siteUrl="https://subido.viverdeia.ai"
+    />,
+  );
+  return within(screen.getByLabelText('Prévia visual da proposta'));
+}
+
+function alterar(rotulo: string | RegExp, valor: string) {
+  fireEvent.change(screen.getByLabelText(rotulo), { target: { value: valor } });
+}
+
 describe('EditorProposta', () => {
-  it('reflete as alterações na prévia antes de salvar', async () => {
+  it('atualiza todos os campos da prévia, inclusive os últimos itens e o link opcional', () => {
+    const preview = montarEditor();
+    const campos: [string | RegExp, string, string?][] = [
+      ['Nome da proposta', 'Proposta Aurora 2026'],
+      ['Empresa', 'Aurora Saúde'],
+      ['Contato', 'Beatriz Souza'],
+      ['Cargo', 'Responsável pelo projeto'],
+      ['E-mail', 'beatriz@aurora.example'],
+      ['Desafio identificado', 'O atendimento precisa de uma fila única.'],
+      ['Objetivo do projeto', 'Centralizar os contatos e medir o tempo de resposta.'],
+      ['Nome do projeto', 'Assistente de triagem'],
+      ['Resumo da solução', 'Um fluxo simples para a equipe trabalhar.'],
+      ['Título da etapa 6', 'Treinamento da equipe'],
+      ['Descrição da etapa 6', 'Prática com casos reais aprovados.'],
+      ['Entregável 7', 'Manual do atendimento'],
+      ['Fase 6', 'Revisão assistida'],
+      ['Duração da fase 6', 'Quatro dias úteis'],
+      ['Descrição da fase 6', 'A equipe testa o fluxo acompanhada.'],
+      ['Valor do projeto (R$)', '29990,00', '29.990,00'],
+      ['Validade da proposta (dias)', '30', '30 dias'],
+      ['Condições de pagamento', 'Entrada e duas parcelas iguais.'],
+      [/Link de pagamento desta proposta/, 'https://checkout.example/projeto-atualizado'],
+      ['Próximo passo 2', 'Validar escopo com a diretoria'],
+      [/Observações finais/, 'Licenças não incluídas no valor.'],
+    ];
+    for (const [rotulo, valor, esperado] of campos) {
+      alterar(rotulo, valor);
+      expect(preview.getByText((texto) => texto.includes(esperado ?? valor))).toBeInTheDocument();
+    }
+    expect(preview.getByText('Alterações não salvas')).toBeInTheDocument();
+    expect(salvarProposta).not.toHaveBeenCalled();
+
+    alterar(/Link de pagamento desta proposta/, '');
+    alterar(/Observações finais/, '');
+    expect(preview.queryByText('Link após aprovação')).not.toBeInTheDocument();
+    expect(preview.queryByText('Licenças não incluídas no valor.')).not.toBeInTheDocument();
+  });
+
+  it('reflete inclusão e remoção das quatro listas sem precisar salvar', () => {
+    const preview = montarEditor();
+    const listas: [string, string, string][] = [
+      ['Adicionar etapa ao escopo', 'Nova etapa', 'Remover etapa 7'],
+      ['Adicionar entregável', 'Novo entregável', 'Remover entregável 8'],
+      ['Adicionar fase ao cronograma', 'Nova fase', 'Remover fase 7'],
+      ['Adicionar próximo passo', 'Novo próximo passo', 'Remover próximo passo 3'],
+    ];
+    for (const [adicionar, texto, remover] of listas) {
+      fireEvent.click(screen.getByRole('button', { name: adicionar, hidden: true }));
+      expect(preview.getByText(texto)).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: remover, hidden: true }));
+      expect(preview.queryByText(texto)).not.toBeInTheDocument();
+    }
+    expect(preview.getByText('Versão salva')).toBeInTheDocument();
+  });
+
+  it('mantém pendente o que foi digitado durante o salvamento', async () => {
     const user = userEvent.setup();
-
-    render(
-      <EditorProposta
-        referenciaEm="2026-09-06T02:30:00.000Z"
-        id="11111111-1111-4111-8111-111111111111"
-        tituloInicial="Plano comercial da Clínica Aurora"
-        documentoInicial={DOCUMENTO}
-        statusInicial="rascunho"
-        versaoInicial={2}
-        oportunidadeId="22222222-2222-4222-8222-222222222222"
-        reuniaoId={null}
-        execucaoId={null}
-        compartilhamentoInicial={{
-          codigo: null,
-          ativo: false,
-          compartilhadaEm: null,
-          primeiraVisualizacaoEm: null,
-          ultimaVisualizacaoEm: null,
-          visualizacoes: 0,
-          decisaoNome: null,
-          decisaoEmail: null,
-          decisaoComentario: null,
-          decididaEm: null,
-        }}
-        siteUrl="https://projeto-subido.vercel.app"
-      />,
+    let concluir!: (resultado: EstadoProposta) => void;
+    const salvamento = new Promise<EstadoProposta>((resolve) => {
+      concluir = resolve;
+    });
+    vi.mocked(salvarProposta).mockReturnValueOnce(salvamento);
+    const preview = montarEditor();
+    alterar('Nome da proposta', 'Versão enviada para salvar');
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(screen.getAllByRole('button', { name: 'Salvando' })[0]).toBeDisabled();
+    expect(vi.mocked(salvarProposta).mock.calls[0]?.[1].get('titulo')).toBe(
+      'Versão enviada para salvar',
     );
 
-    const preview = within(screen.getByLabelText('Prévia visual da proposta'));
+    alterar('Nome da proposta', 'Alteração feita durante a espera');
+    await act(async () => {
+      concluir({ sucesso: 'Proposta salva.', versao: 3, status: 'rascunho' });
+      await salvamento;
+    });
 
-    await user.clear(screen.getByLabelText('Título interno da proposta'));
-    await user.type(screen.getByLabelText('Título interno da proposta'), 'Proposta Aurora 2026');
-    expect(preview.getByText('Proposta Aurora 2026')).toBeInTheDocument();
+    expect(preview.getByText('Alteração feita durante a espera')).toBeInTheDocument();
+    expect(preview.getByText('Alterações não salvas')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
+    expect(screen.queryByRole('link', { name: 'PDF' })).not.toBeInTheDocument();
 
-    await user.clear(screen.getByLabelText('Empresa'));
-    await user.type(screen.getByLabelText('Empresa'), 'Aurora Saúde');
-    expect(preview.getByText('Aurora Saúde')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(preview.getByText('Versão salva')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'PDF' })).toBeInTheDocument();
+  });
 
-    await user.clear(screen.getByLabelText('Resumo da solução'));
-    await user.type(
-      screen.getByLabelText('Resumo da solução'),
-      'Resumo atualizado sem precisar salvar.',
-    );
-    expect(preview.getByText('Resumo atualizado sem precisar salvar.')).toBeInTheDocument();
+  it('preserva a edição após erro e permite tentar salvar novamente', async () => {
+    vi.mocked(salvarProposta).mockResolvedValueOnce({ erro: 'Não foi possível salvar agora.' });
+    const user = userEvent.setup();
+    const preview = montarEditor();
+    alterar('Empresa', 'Aurora revisada');
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(await screen.findByText('Não foi possível salvar agora.')).toBeInTheDocument();
+    expect(preview.getByText('Aurora revisada')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
+    expect(preview.getByText('Alterações não salvas')).toBeInTheDocument();
+  });
 
-    await user.clear(screen.getByLabelText('Descrição da fase 1'));
-    await user.type(screen.getByLabelText('Descrição da fase 1'), 'Nova entrega da primeira fase.');
-    expect(preview.getByText('Nova entrega da primeira fase.')).toBeInTheDocument();
-
-    await user.clear(screen.getByLabelText('Próximo passo 1'));
-    await user.type(screen.getByLabelText('Próximo passo 1'), 'Validar escopo com a diretoria');
-    expect(preview.getByText('Validar escopo com a diretoria')).toBeInTheDocument();
-
-    await user.clear(screen.getByLabelText(/Observações finais/));
-    await user.type(
-      screen.getByLabelText(/Observações finais/),
-      'Observação atualizada na mesma hora.',
-    );
-    expect(preview.getByText('Observação atualizada na mesma hora.')).toBeInTheDocument();
-
-    await user.clear(screen.getByLabelText('Valor do projeto (R$)'));
-    await user.type(screen.getByLabelText('Valor do projeto (R$)'), '29990,00');
-    expect(preview.getByText((conteudo) => conteudo.includes('29.990,00'))).toBeInTheDocument();
-    expect(preview.getByText('Prévia atualizada')).toBeInTheDocument();
-  }, 10_000);
+  it('reconhece quando uma alteração é desfeita e quando há dados iniciais pendentes', () => {
+    const preview = montarEditor();
+    alterar('Empresa', 'Nome temporário');
+    alterar('Empresa', DOCUMENTO.cliente.empresa);
+    expect(preview.getByText('Versão salva')).toBeInTheDocument();
+    cleanup();
+    montarEditor(true);
+    expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
+  });
 });

@@ -80,6 +80,14 @@ html {
   scroll-behavior: auto;
 }
 
+@supports (overflow: clip) {
+  /* Oculta vazamentos laterais sem criar no body um falso contêiner de
+     rolagem. Assim, barras e prévias sticky acompanham a rolagem da página. */
+  body {
+    overflow-x: clip;
+  }
+}
+
 /* Visível só para leitor de tela. `clip-path` em vez do antigo `clip`, e sem
    `display:none` — que removeria o texto da árvore de acessibilidade também. */
 .sr-only {
