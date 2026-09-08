@@ -2,14 +2,24 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, ChevronDown, Layers3 } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ChevronDown,
+  ClipboardCheck,
+  FileText,
+  KeyRound,
+  Layers3,
+  ShieldCheck,
+} from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao } from '@/lib/conteudo/queries';
 import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import { ArtefatosEntregaProjeto, FichaCampoProjeto } from './EscopoProjeto';
 import { Ferramentas, Prompts } from './KitSolucao';
 import { RotaComercialProjeto } from './RotaComercialProjeto';
+import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import styles from './ProjetoGuiadoNovo.module.css';
 import visual from './LeituraProjeto.module.css';
+import kit from './PreRequisitosMateriais.module.css';
 
 export function KitProjeto({
   slug,
@@ -28,14 +38,14 @@ export function KitProjeto({
   rotaComercial: ContextoRotaComercialProjeto;
   direto?: boolean;
 }) {
-  const [area, setArea] = useState('escopo');
+  const [area, setArea] = useState('preparar');
   const roteiro = projeto.roteiro;
   const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const conteudo = (
     <div className={styles.kitCorpo}>
-      <nav className={visual.areasKit} aria-label="Consultar materiais">
+      <nav className={visual.areasKit} aria-label="Consultar pré-requisitos e materiais">
         {[
-          { id: 'escopo', titulo: 'Escopo' },
+          { id: 'preparar', titulo: 'Antes de começar' },
           { id: 'arquivos', titulo: 'Arquivos e ferramentas' },
           { id: 'cliente', titulo: 'Aplicar no cliente' },
         ].map((item) => (
@@ -49,26 +59,40 @@ export function KitProjeto({
           </button>
         ))}
       </nav>
-      {area === 'escopo' ? (
-        <>
-          <section className={styles.resumoProjeto} aria-label="Resumo do projeto">
-            <details>
-              <summary>
-                Cliente ideal
-                <ChevronDown size={17} aria-hidden="true" />
-              </summary>
-              <p>{projeto.clienteIdeal}</p>
-            </details>
-            <details>
-              <summary>
-                Entrega final
-                <ChevronDown size={17} aria-hidden="true" />
-              </summary>
-              <p>{projeto.entregavelFinal}</p>
-            </details>
+      {area === 'preparar' ? (
+        <div className={kit.pilha}>
+          <section className={kit.requisitos} aria-labelledby="requisitos-projeto">
+            <header>
+              <KeyRound size={24} aria-hidden="true" />
+              <div>
+                <h2 id="requisitos-projeto">O que ter em mãos</h2>
+                <p>Confirme com o cliente antes de implementar.</p>
+              </div>
+            </header>
+            {roteiro.escopo?.preRequisitos.length ? (
+              <ul aria-label="Pré-requisitos do projeto">
+                {roteiro.escopo.preRequisitos.map((item) => (
+                  <li key={item}>
+                    <ClipboardCheck size={21} aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Consulte os materiais indicados em cada passo da implementação.</p>
+            )}
           </section>
           {roteiro.perfil && roteiro.escopo ? (
-            <FichaCampoProjeto perfil={roteiro.perfil} escopo={roteiro.escopo} />
+            <details className={kit.consulta}>
+              <summary>
+                <ShieldCheck size={22} aria-hidden="true" />
+                <span>Escopo e limites do projeto</span>
+                <ChevronDown size={18} aria-hidden="true" />
+              </summary>
+              <div>
+                <FichaCampoProjeto perfil={roteiro.perfil} escopo={roteiro.escopo} />
+              </div>
+            </details>
           ) : null}
           {roteiro.fundamentos.length > 0 ? (
             <section className={styles.fundamentos} aria-labelledby="fundamentos-projeto">
@@ -90,18 +114,52 @@ export function KitProjeto({
               </ol>
             </section>
           ) : null}
-        </>
+        </div>
       ) : null}
       {area === 'arquivos' ? (
-        <>
-          {roteiro.artefatosEntrega ? (
-            <ArtefatosEntregaProjeto artefatos={roteiro.artefatosEntrega} />
+        <div className={kit.pilha}>
+          {roteiro.trilhaDidatica?.materiais.length ? (
+            <section className={kit.modelos} aria-labelledby="modelos-projeto">
+              <header>
+                <h2 id="modelos-projeto">Modelos para usar</h2>
+              </header>
+              <div className={kit.gradeModelos}>
+                {roteiro.trilhaDidatica.materiais.map((material) => (
+                  <details className={kit.consulta} key={material.titulo}>
+                    <summary>
+                      <FileText size={22} aria-hidden="true" />
+                      <span>{material.titulo}</span>
+                      <ChevronDown size={18} aria-hidden="true" />
+                    </summary>
+                    <div className={kit.modeloConteudo}>
+                      <p>{material.quandoUsar}</p>
+                      <pre tabIndex={0} role="region" aria-label={`Modelo: ${material.titulo}`}>
+                        {material.conteudo}
+                      </pre>
+                      <BotaoCopiar texto={material.conteudo} rotuloDoQue={material.titulo} />
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </section>
           ) : null}
           <div className={styles.kitFerramentas}>
             <Ferramentas itens={ferramentas} />
             <Prompts itens={prompts} />
           </div>
-        </>
+          {roteiro.artefatosEntrega ? (
+            <details className={kit.consulta}>
+              <summary>
+                <ClipboardCheck size={22} aria-hidden="true" />
+                <span>Documentos para entregar ao cliente</span>
+                <ChevronDown size={18} aria-hidden="true" />
+              </summary>
+              <div>
+                <ArtefatosEntregaProjeto artefatos={roteiro.artefatosEntrega} />
+              </div>
+            </details>
+          ) : null}
+        </div>
       ) : null}
       {area === 'cliente' ? (
         <>
@@ -131,7 +189,7 @@ export function KitProjeto({
       <section
         id="kit-projeto"
         className={`${styles.kitProjeto} ${styles.kitProjetoDireto}`}
-        aria-label="Materiais do projeto"
+        aria-label="Pré-requisitos e materiais do projeto"
       >
         {conteudo}
       </section>
@@ -141,9 +199,7 @@ export function KitProjeto({
   return (
     <details id="kit-projeto" className={styles.kitProjeto}>
       <summary>
-        <span>
-          <small>Consulta e aplicação</small>Escopo, arquivos e uso comercial
-        </span>
+        <span>Pré-requisitos e materiais</span>
         <ChevronDown size={18} aria-hidden="true" />
       </summary>
       {conteudo}

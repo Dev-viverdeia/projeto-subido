@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { ArrowRight, Check, FolderOpen, Layers } from 'lucide-react';
 import type { SolucaoResumo } from '@/lib/conteudo/queries';
+import { obterVisaoVisual } from '@/lib/projetos/visao-visual';
+import { FluxoProjeto } from './FluxoProjeto';
 import {
   contarEtapasFeitas,
   estadoDoProgresso,
@@ -102,6 +104,7 @@ export function CatalogoProjetos({
           href={`/solucoes/${destaque.solucao.slug}`}
           className={styles.destaque}
           data-estado={destaque.estado}
+          data-com-fluxo={Boolean(obterVisaoVisual(destaque.solucao.slug)) || undefined}
         >
           <div className={styles.destaquePrincipal}>
             <div className={styles.destaqueIdentidade}>
@@ -123,10 +126,12 @@ export function CatalogoProjetos({
               </h2>
             </div>
             <h3>{destaque.solucao.titulo}</h3>
-            <p className={styles.resultado}>
-              {destaque.solucao.projeto?.resultado ?? destaque.solucao.resumo}
-            </p>
+            <p className={styles.resultado}>{destaque.solucao.resumo}</p>
           </div>
+
+          {obterVisaoVisual(destaque.solucao.slug) ? (
+            <FluxoProjeto visao={obterVisaoVisual(destaque.solucao.slug)!} compacto />
+          ) : null}
 
           <div className={styles.destaqueRodape}>
             <div className={styles.metadados}>
@@ -194,8 +199,11 @@ export function CatalogoProjetos({
                     </div>
                     <div className={styles.cartaoCorpo}>
                       <h3>{projeto.solucao.titulo}</h3>
-                      <p>{projeto.solucao.projeto?.resultado ?? projeto.solucao.resumo}</p>
+                      <p>{projeto.solucao.resumo}</p>
                     </div>
+                    {obterVisaoVisual(projeto.solucao.slug) ? (
+                      <FluxoProjeto visao={obterVisaoVisual(projeto.solucao.slug)!} compacto />
+                    ) : null}
                     <footer>
                       <span>{perfil?.prazo ?? 'Passo a passo guiado'}</span>
                       <strong>

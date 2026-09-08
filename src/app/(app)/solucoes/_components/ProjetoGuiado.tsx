@@ -11,6 +11,7 @@ import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
 import { KitProjeto } from './KitProjeto';
 import { ProximaSolucao } from './ProximaSolucao';
+import { VisaoProjeto } from './VisaoProjeto';
 import styles from './ProjetoGuiadoNovo.module.css';
 
 const ROTULO_NIVEL = {
@@ -22,6 +23,7 @@ const ROTULO_NIVEL = {
 export function ProjetoGuiado({
   slug,
   titulo,
+  resumo,
   categoria,
   projeto,
   ferramentas,
@@ -50,8 +52,8 @@ export function ProjetoGuiado({
   const aulasFeitas = contarEtapasFeitas(progresso, idsAulas);
   const aprendizadoConcluido = idsAulas.length === 0 || aulasFeitas === idsAulas.length;
   const temAprendizado = Boolean(roteiro.trilhaDidatica);
-  const [abaAtiva, setAbaAtiva] = useState<'aprender' | 'implementar' | 'materiais'>(
-    temAprendizado ? 'aprender' : 'implementar',
+  const [abaAtiva, setAbaAtiva] = useState<'visao' | 'aprender' | 'implementar' | 'materiais'>(
+    'visao',
   );
   const abasRef = useRef<HTMLElement>(null);
   const abrirArea = (aba: typeof abaAtiva) => {
@@ -70,11 +72,12 @@ export function ProjetoGuiado({
     .find(({ id }) => !progresso.etapas[id]);
 
   const abas = [
+    { id: 'visao', rotulo: 'Visão geral' },
     ...(temAprendizado ? ([{ id: 'aprender', rotulo: 'Aprender' }] as const) : []),
     { id: 'implementar', rotulo: 'Implementar' },
-    { id: 'materiais', rotulo: 'Materiais' },
+    { id: 'materiais', rotulo: 'Pré-requisitos e materiais' },
   ] as const;
-  const mostrarAcaoCabecalho = abaAtiva === 'materiais' || !proximoPasso;
+  const mostrarAcaoCabecalho = abaAtiva === 'visao' || abaAtiva === 'materiais' || !proximoPasso;
 
   return (
     <div className={styles.raiz}>
@@ -85,11 +88,13 @@ export function ProjetoGuiado({
       >
         <div className={styles.cabecalhoTexto}>
           <h1 id="titulo-projeto">{titulo}</h1>
-          <p className={styles.resultado}>{projeto.resultado}</p>
+          <p className={styles.resultado}>{resumo || projeto.resultado}</p>
           <p className={styles.metaProjeto}>
             {categoria ?? 'Projeto de IA'}
             <span aria-hidden="true">·</span>
-            {roteiro.trilhaDidatica?.tempoTotal ?? 'Comece pela implementação'}
+            {roteiro.trilhaDidatica
+              ? `${roteiro.trilhaDidatica.aulas.length} aulas`
+              : 'Passo a passo guiado'}
             {roteiro.perfil ? (
               <>
                 <span aria-hidden="true">·</span>
@@ -129,8 +134,8 @@ export function ProjetoGuiado({
                   {!proximoPasso
                     ? 'Concluir aulas do projeto'
                     : aulasFeitas > 0
-                      ? 'Retomar aprendizado'
-                      : 'Começar aprendizado'}
+                      ? 'Retomar aulas'
+                      : 'Ver aulas'}
                 </span>
                 <ArrowRight size={17} aria-hidden="true" />
               </button>
@@ -165,6 +170,7 @@ export function ProjetoGuiado({
           className={styles.abasProjeto}
           aria-label="Áreas do projeto"
           role="tablist"
+          data-total={abas.length}
         >
           {abas.map((aba, indice) => (
             <button
@@ -206,6 +212,9 @@ export function ProjetoGuiado({
           tabIndex={0}
           aria-labelledby={`aba-${abaAtiva}`}
         >
+          {abaAtiva === 'visao' ? (
+            <VisaoProjeto slug={slug} titulo={titulo} projeto={projeto} videoUrl={videoUrl} />
+          ) : null}
           {abaAtiva === 'aprender' && roteiro.trilhaDidatica ? (
             <AprendizadoProjeto
               slug={slug}

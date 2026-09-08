@@ -21,11 +21,11 @@ const ProjetoSchema = z.enum([
 ]);
 
 const TITULOS = {
-  'sdr-atendimento-qualificacao': 'SDR de Atendimento e Qualificação',
-  'maquina-prospeccao-b2b': 'Máquina de Prospecção B2B',
-  'inteligencia-comercial-com-ia': 'Inteligência Comercial com IA',
-  'operacao-conteudo-multicanal': 'Operação de Conteúdo Multicanal',
-  'radar-satisfacao-com-ia': 'Radar de Satisfação com IA',
+  'sdr-atendimento-qualificacao': 'Atendimento no WhatsApp com IA',
+  'maquina-prospeccao-b2b': 'Prospecção de clientes com IA',
+  'inteligencia-comercial-com-ia': 'Assistente de reuniões com IA',
+  'operacao-conteudo-multicanal': 'Criação de conteúdo com IA',
+  'radar-satisfacao-com-ia': 'Pesquisa de satisfação com IA',
 } as const;
 
 export const AnaliseOportunidadesSchema = z.object({

@@ -198,9 +198,9 @@ export default async function PreviewShellPage({
               )
             ) : tela === 'projeto' ? (
               <ProjetoGuiado
-                slug="sdr-atendimento"
-                titulo="SDR de Atendimento com IA"
-                resumo={projetoPreview.resultado}
+                slug="sdr-atendimento-qualificacao"
+                titulo="Atendimento no WhatsApp com IA"
+                resumo="Atenda, qualifique e agende conversas com a Nina, com passagem para a equipe."
                 categoria="Automação com IA"
                 projeto={projetoPreview}
                 ferramentas={ferramentasPreview}
