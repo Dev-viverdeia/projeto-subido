@@ -40,6 +40,7 @@ export default async function PreviewCertificadoPage({
           codigoInicial="subido-preview-2026"
           siteUrl="https://subido.viverdeia.ai"
           progressoPreview={PROGRESSO}
+          imagemPreview={`/preview/certificado/imagem${longo ? '?longo=1' : ''}`}
         />
       </div>
     </main>

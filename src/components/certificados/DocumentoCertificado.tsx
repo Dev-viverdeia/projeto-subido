@@ -1,5 +1,6 @@
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
+import { BadgeCheck } from 'lucide-react';
 import styles from './DocumentoCertificado.module.css';
 
 type Props = {
@@ -73,7 +74,15 @@ export function DocumentoCertificado({
           </div>
         ) : null}
         {modelo ? <span>Prévia ilustrativa · sem validade</span> : null}
-        {codigo ? <p className={styles.codigo}>Código de verificação · {codigo}</p> : null}
+        {codigo ? (
+          <div className={styles.codigo}>
+            <span>
+              <BadgeCheck size={17} strokeWidth={1.6} aria-hidden="true" />
+              Código de verificação
+            </span>
+            <code>{codigo}</code>
+          </div>
+        ) : null}
       </footer>
     </article>
   );

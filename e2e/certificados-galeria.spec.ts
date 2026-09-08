@@ -58,10 +58,12 @@ test('folha mantém compartilhamento, cópia e impressão acessíveis', async ({
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/preview/certificado');
   await expect(page.getByRole('img', { name: 'Viver de IA', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Compartilhar no LinkedIn' })).toHaveAttribute(
+  await page.getByRole('button', { name: 'Compartilhar no LinkedIn' }).click();
+  await expect(page.getByRole('link', { name: 'Publicar no LinkedIn' })).toHaveAttribute(
     'href',
     /linkedin\.com\/sharing\/share-offsite/,
   );
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Copiar link', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Link copiado' })).toBeVisible();
   if (browserName === 'chromium') {
@@ -164,4 +166,72 @@ test('impressão mantém nome e título longos inteiros em uma folha A4', async 
   expect(dimensoes.altura).toBeLessThanOrEqual(794);
   expect(dimensoes.conteudo).toBeLessThanOrEqual(Math.ceil(dimensoes.altura));
   expect(dimensoes.elementosDentro).toBe(true);
+});
+
+test('compartilhamento mostra PNG, download e campos copiáveis do perfil', async ({
+  page,
+  context,
+  browserName,
+}) => {
+  if (browserName === 'chromium')
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/preview/certificado?longo=1');
+  const gatilho = page.getByRole('button', { name: 'Compartilhar no LinkedIn' });
+  await gatilho.click();
+  const modal = page.getByRole('dialog', { name: 'Compartilhar certificado' });
+  const imagem = modal.getByRole('img', { name: /^Prévia do certificado/ });
+  await expect(imagem).toBeVisible();
+  await imagem.evaluate((el: HTMLImageElement) => el.decode());
+  expect(
+    await imagem.evaluate((el: HTMLImageElement) => [el.naturalWidth, el.naturalHeight]),
+  ).toEqual([1200, 627]);
+  await expect(modal.getByRole('link', { name: 'Publicar no LinkedIn' })).toHaveAttribute(
+    'target',
+    '_blank',
+  );
+  const baixar = page.waitForEvent('download');
+  await modal.getByRole('link', { name: 'Baixar imagem' }).click();
+  expect((await baixar).suggestedFilename()).toBe('certificado-subido.png');
+  await modal.getByRole('button', { name: 'Perfil', exact: true }).click();
+  await expect(modal.getByRole('button', { name: 'Perfil', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await modal.getByRole('button', { name: 'Copiar nome', exact: true }).click();
+  await expect(modal.getByRole('status')).toContainText('Nome: copiado.');
+  if (browserName === 'chromium')
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
+      'Inteligência artificial aplicada',
+    );
+  await expect(
+    modal.getByRole('link', { name: 'Adicionar ao perfil no LinkedIn' }),
+  ).toHaveAttribute('href', 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME');
+  const acessibilidade = await new AxeBuilder({ page }).analyze();
+  expect(
+    acessibilidade.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+  ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(modal).toHaveCount(0);
+  await expect(gatilho).toBeFocused();
+});
+
+test('erro de prévia permite recuperação sem bloquear o compartilhamento', async ({ page }) => {
+  await page.route('**/preview/certificado/imagem*', (route) => route.abort());
+  await page.goto('/preview/certificado');
+  await page.getByRole('button', { name: 'Compartilhar no LinkedIn' }).click();
+  const modal = page.getByRole('dialog', { name: 'Compartilhar certificado' });
+  await expect(
+    modal.getByText('A prévia não carregou. Seu link continua disponível.'),
+  ).toBeVisible();
+  await expect(modal.getByRole('link', { name: 'Publicar no LinkedIn' })).toBeVisible();
+  await page.unroute('**/preview/certificado/imagem*');
+  await modal.getByRole('button', { name: 'Recarregar prévia' }).click();
+  const imagem = modal.getByRole('img', { name: /^Prévia do certificado/ });
+  await imagem.evaluate((el: HTMLImageElement) => el.decode());
+  expect(await imagem.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1200);
 });

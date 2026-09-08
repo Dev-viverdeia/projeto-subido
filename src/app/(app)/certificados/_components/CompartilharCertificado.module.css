@@ -1,0 +1,197 @@
+.conteudo {
+  display: grid;
+  gap: var(--via-space-5);
+  min-width: 0;
+}
+.destinos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: var(--via-space-1);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+}
+.destinos button {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--app-radius-chip);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.destinos button[aria-pressed='true'] {
+  background: var(--via-white);
+  color: var(--via-navy);
+  box-shadow: var(--app-elev-1-shadow);
+}
+.destinos button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.previa {
+  margin: 0;
+  display: grid;
+  gap: var(--via-space-4);
+}
+.previa img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 627;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-bg-2);
+}
+.moldura {
+  position: relative;
+}
+.carregando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-bg-2);
+}
+.previa figcaption,
+.orientacao,
+.feedback {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+.utilitarios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+}
+.utilitarios a {
+  display: inline-flex;
+  gap: var(--via-space-2);
+  align-items: center;
+  min-height: 44px;
+  color: var(--via-navy);
+  font-size: var(--app-fs-support);
+  text-decoration: none;
+}
+.utilitarios a:hover {
+  text-decoration: underline;
+}
+.utilitarios a:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.primario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-3);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--via-space-3);
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  text-decoration: none;
+  box-shadow: var(--app-elev-1-shadow);
+}
+.primario:hover {
+  background: var(--via-navy-deep);
+}
+.primario:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+.campos {
+  display: grid;
+  margin: 0;
+}
+.campos > div {
+  padding-block: var(--via-space-3);
+  border-bottom: 1px solid var(--via-border);
+}
+.campos > div:first-child {
+  padding-top: 0;
+}
+.campos dt {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.campos dd {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  margin: 0;
+  color: var(--via-navy);
+  font-size: var(--app-fs-ui);
+  line-height: var(--via-lh-normal);
+}
+.campos dd span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.campos button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-navy);
+  cursor: pointer;
+}
+.campos button:hover {
+  background: var(--via-bg-2);
+}
+.campos button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.falhaImagem {
+  display: grid;
+  justify-items: center;
+  gap: var(--via-space-3);
+  padding: var(--via-space-5);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-card);
+  color: var(--via-text-muted);
+  text-align: center;
+}
+.falhaImagem p {
+  margin: 0;
+}
+.falhaImagem button {
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  font: inherit;
+  color: var(--via-navy);
+  background: var(--via-white);
+  cursor: pointer;
+}
+.falhaImagem button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+@media (max-width: 599px) {
+  .utilitarios {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+}

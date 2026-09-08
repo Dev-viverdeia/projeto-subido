@@ -51,7 +51,7 @@
 }
 
 .tipo {
-  color: var(--via-navy);
+  color: var(--via-text-muted);
   font-size: clamp(16px, 2.8cqi, 24px); /* token-ok: escala proporcional à folha, não à viewport */
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h3);
@@ -122,10 +122,31 @@
   text-align: end;
 }
 .codigo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-2) var(--via-space-4);
   flex-basis: 100%;
-  padding-top: var(--via-space-2);
-  font-size: var(--via-fs-caption);
+  margin-top: var(--via-space-2);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border);
+  font-size: var(--app-fs-support);
   overflow-wrap: anywhere;
+}
+.codigo > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+}
+.codigo svg {
+  flex-shrink: 0;
+  color: var(--via-navy);
+}
+.codigo code {
+  color: var(--via-navy);
+  font-family: var(--via-font-mono);
+  font-size: var(--via-fs-caption);
 }
 
 .documento[data-compacto] {
@@ -174,6 +195,9 @@
   }
   .data {
     text-align: center;
+  }
+  .codigo {
+    justify-content: center;
   }
   .emissor > span {
     max-width: 30ch;

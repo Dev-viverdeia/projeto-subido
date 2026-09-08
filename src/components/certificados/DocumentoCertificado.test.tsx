@@ -17,7 +17,9 @@ describe('documento co-branded', () => {
     expect(screen.getByRole('img', { name: 'Viver de IA' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('IA no trabalho');
     expect(screen.getByText('7 de setembro de 2026')).toBeInTheDocument();
-    expect(screen.getByText(/Código de verificação/)).toHaveTextContent('registro-real');
+    expect(screen.getByText(/Código de verificação/).parentElement).toHaveTextContent(
+      'registro-real',
+    );
   });
 
   it('não inventa código, data, carga horária ou validade no modelo', () => {

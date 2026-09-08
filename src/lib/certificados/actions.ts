@@ -16,7 +16,8 @@ const Slug = z
   .max(160)
   .regex(/^[a-z0-9-]+$/);
 
-export type ResultadoEmissao = { ok: true; codigo: string } | { ok: false; mensagem: string };
+export type ResultadoEmissao =
+  { ok: true; codigo: string; emitidoEm?: string } | { ok: false; mensagem: string };
 
 export async function emitirCertificado(
   origemBruta: OrigemCertificado,
@@ -84,11 +85,11 @@ export async function emitirCertificado(
       },
       { onConflict: 'dono,origem,slug' },
     )
-    .select('codigo')
+    .select('codigo,emitido_em')
     .single();
 
   if (error || !data) {
     return { ok: false, mensagem: 'Não foi possível gerar o link agora. Tente novamente.' };
   }
-  return { ok: true, codigo: data.codigo };
+  return { ok: true, codigo: data.codigo, emitidoEm: data.emitido_em };
 }

@@ -1,28 +1,23 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { cache } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { DocumentoCertificado } from '@/components/certificados/DocumentoCertificado';
-import { createClient } from '@/lib/supabase/server';
+import { buscarCertificadoPublico } from '@/lib/certificados/publico';
+import { TAMANHO_IMAGEM_CERTIFICADO } from '@/lib/certificados/compartilhamento';
 import styles from './page.module.css';
 
-const buscarCertificado = cache(async (codigo: string) => {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .rpc('certificado_publico', { p_codigo: codigo })
-    .maybeSingle();
-  if (error || !data) return null;
-  return data;
-});
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
 }: PageProps<'/certificado/[codigo]'>): Promise<Metadata> {
   const { codigo } = await params;
-  const certificado = await buscarCertificado(codigo);
-  const titulo = certificado ? `Certificado · ${certificado.titulo}` : 'Certificado';
+  const certificado = await buscarCertificadoPublico(codigo);
+  const titulo = certificado
+    ? `${certificado.nome} · ${certificado.titulo}`
+    : 'Certificado não encontrado';
   const descricao = certificado
-    ? `${certificado.nome} concluiu ${certificado.titulo} na plataforma Subido. Confira o registro público.`
+    ? `${certificado.nome} concluiu ${certificado.titulo}. Certificado Subido + Viver de IA, com registro público de verificação.`
     : 'Certificado emitido pela plataforma Subido.';
   return {
     title: titulo,
@@ -35,6 +30,22 @@ export async function generateMetadata({
           siteName: 'Subido',
           title: titulo,
           description: descricao,
+          images: [
+            {
+              url: `/certificado/${codigo}/imagem`,
+              ...TAMANHO_IMAGEM_CERTIFICADO,
+              type: 'image/png',
+              alt: `Certificado de ${certificado.nome} em ${certificado.titulo}`,
+            },
+          ],
+        }
+      : undefined,
+    twitter: certificado
+      ? {
+          card: 'summary_large_image',
+          title: titulo,
+          description: descricao,
+          images: [`/certificado/${codigo}/imagem`],
         }
       : undefined,
     robots: certificado ? { index: true, follow: true } : { index: false, follow: false },
@@ -45,7 +56,7 @@ export default async function CertificadoPublicoPage({
   params,
 }: PageProps<'/certificado/[codigo]'>) {
   const { codigo } = await params;
-  const certificado = await buscarCertificado(codigo);
+  const certificado = await buscarCertificadoPublico(codigo);
   if (!certificado) notFound();
 
   return (
@@ -58,13 +69,15 @@ export default async function CertificadoPublicoPage({
         </span>
       </header>
 
-      <DocumentoCertificado
-        nome={certificado.nome}
-        titulo={certificado.titulo}
-        origem={certificado.origem === 'formacao' ? 'formacao' : 'solucao'}
-        concluidoEm={certificado.concluido_em}
-        codigo={certificado.codigo}
-      />
+      <div className={styles.suporte}>
+        <DocumentoCertificado
+          nome={certificado.nome}
+          titulo={certificado.titulo}
+          origem={certificado.origem === 'formacao' ? 'formacao' : 'solucao'}
+          concluidoEm={certificado.concluido_em}
+          codigo={certificado.codigo}
+        />
+      </div>
 
       <p className={styles.nota}>
         Autenticidade confirmada pelo registro de conclusão na plataforma Subido.
