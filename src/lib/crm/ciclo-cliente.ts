@@ -284,9 +284,19 @@ export function montarCicloCliente(lead: DossieLead): {
       decisao: {
         tipo: 'navegacao',
         rotulo: 'Proposta em andamento',
-        titulo: `Continuar ${proposta.titulo}`,
+        titulo:
+          proposta.status === 'apresentada'
+            ? 'Acompanhe a resposta do cliente.'
+            : proposta.status === 'pronta'
+              ? 'Apresente o escopo e o investimento ao cliente.'
+              : 'Revise o escopo e finalize a proposta.',
         href: `/propostas/${proposta.id}`,
-        acao: 'Continuar proposta',
+        acao:
+          proposta.status === 'apresentada'
+            ? 'Acompanhar proposta'
+            : proposta.status === 'pronta'
+              ? 'Apresentar proposta'
+              : 'Continuar proposta',
         prazo: lead.oportunidade.proximaAcaoEm,
         apoioHref: descobertaConcluida ? destinoDaCall(descobertaConcluida) : null,
         apoioRotulo: descobertaConcluida ? 'Revisar descoberta' : null,

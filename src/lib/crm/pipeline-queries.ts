@@ -18,6 +18,7 @@ export type OportunidadeCrm = {
   motivoRetirada?: string | null;
   retiradaEm?: string | null;
   entregaId?: string | null;
+  propostaRecente?: Pick<Tables<'propostas'>, 'id' | 'status'> | null;
   empresaId: string;
   empresa: string;
   dominio: string | null;
@@ -102,9 +103,13 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
           proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda,
           atualizado_em, criado_em, ordem, situacao, retirada_em, motivo_retirada,
           empresa:crm_empresas!crm_oportunidades_empresa_fk(nome, dominio, enriquecido_em),
-          contato:crm_contatos!crm_oportunidades_contato_fk(nome, email)
+          contato:crm_contatos!crm_oportunidades_contato_fk(nome, email),
+          propostas:propostas!propostas_oportunidade_fk(id, status)
         `,
       )
+      .order('atualizado_em', { referencedTable: 'propostas', ascending: false })
+      .order('id', { referencedTable: 'propostas', ascending: false })
+      .limit(1, { referencedTable: 'propostas' })
       .order('ordem', { ascending: false })
       .limit(300),
     supabase
@@ -146,6 +151,7 @@ export const listarPipeline = cache(async (): Promise<OportunidadeCrm[]> => {
   return (oportunidades.data ?? []).map((linha) => ({
     ...montarOportunidade(linha, ultimoFato, statusEnriquecimento),
     entregaId: entregas.data?.find((entrega) => entrega.oportunidade_id === linha.id)?.id ?? null,
+    propostaRecente: linha.propostas?.[0] ?? null,
   }));
 });
 

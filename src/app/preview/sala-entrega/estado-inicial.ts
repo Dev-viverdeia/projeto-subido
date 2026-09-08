@@ -204,3 +204,14 @@ export function prepararProjetoComResultado(
       : null,
   };
 }
+
+export function prepararProjetoSemBriefing(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  return {
+    ...prepararProjetoEmExecucao(projeto),
+    kickoff: null,
+    briefing: { ...projeto.briefing, confirmadoEm: null },
+    portalAtivo: false,
+  };
+}

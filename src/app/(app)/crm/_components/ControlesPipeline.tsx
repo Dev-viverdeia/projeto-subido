@@ -4,7 +4,8 @@ import { Search, X } from 'lucide-react';
 import type { FaseCrm, IdFaseCrm } from '@/lib/crm/etapas';
 import styles from './PipelineCrm.module.css';
 
-export type FiltroPipeline = 'todas' | 'atencao' | 'sem_acao' | 'proposta';
+import type { FiltroPipeline } from '@/lib/crm/acao-pipeline';
+export type { FiltroPipeline } from '@/lib/crm/acao-pipeline';
 export type FaseAtiva = Exclude<IdFaseCrm, 'desfecho'>;
 
 type Contagens = Record<FiltroPipeline, number>;

@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { AcoesOportunidade } from './AcoesOportunidade';
 import { estaNoFluxo, ROTULO_SITUACAO } from '@/lib/crm/situacao';
-import { faseDaEtapa, rotuloMotivoPerda, type EtapaCrm } from '@/lib/crm/etapas';
+import { rotuloMotivoPerda, type EtapaCrm } from '@/lib/crm/etapas';
+import { acaoDoPipeline, tituloDoProjetoNoCard } from '@/lib/crm/acao-pipeline';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from './PipelineCrm.module.css';
 
@@ -70,16 +71,6 @@ function pesquisaDaOportunidade(oportunidade: OportunidadeCrm): {
   return { estado: 'pendente', rotulo: 'Enriquecimento disponível' };
 }
 
-function acaoDaOportunidade(oportunidade: OportunidadeCrm): string {
-  const pesquisa = pesquisaDaOportunidade(oportunidade);
-  const fase = faseDaEtapa(oportunidade.etapa);
-  if (pesquisa.estado === 'processando') return 'Ver enriquecimento';
-  if (fase === 'entrada' && pesquisa.estado !== 'pronta') return 'Enriquecer ficha';
-  if (fase === 'entrada') return 'Preparar abordagem';
-  if (fase === 'conversa') return 'Preparar reunião';
-  return 'Trabalhar proposta';
-}
-
 function impedirArraste(evento: SyntheticEvent) {
   evento.stopPropagation();
 }
@@ -108,7 +99,8 @@ export function CartaoOportunidade({
   const valor = valorDaOportunidade(oportunidade.valorCentavos);
   const prazo = prazoDaAcao(oportunidade.proximaAcaoEm);
   const pesquisa = pesquisaDaOportunidade(oportunidade);
-  const acao = acaoDaOportunidade(oportunidade);
+  const acao = acaoDoPipeline(oportunidade);
+  const fichaHref = `/vendas/${oportunidade.id}`;
 
   return (
     <article
@@ -124,10 +116,17 @@ export function CartaoOportunidade({
       data-atencao={!oportunidade.proximaAcao || prazo?.vencido || undefined}
     >
       <div className={styles.cartaoCabecalho}>
-        <div className={styles.empresa}>
-          <span>{oportunidade.empresa}</span>
-          {valor && <strong>{valor}</strong>}
-        </div>
+        <h3 className={styles.nomeEmpresa}>
+          <Link
+            href={fichaHref}
+            data-no-dnd
+            onMouseDown={impedirArraste}
+            onTouchStart={impedirArraste}
+            onKeyDown={impedirArraste}
+          >
+            {oportunidade.empresa}
+          </Link>
+        </h3>
         <AcoesOportunidade
           oportunidade={oportunidade}
           aoMover={aoMover}
@@ -144,12 +143,15 @@ export function CartaoOportunidade({
         )}
       </div>
 
-      <h3>{oportunidade.titulo}</h3>
+      <p className={styles.projetoCartao} title={oportunidade.titulo}>
+        {tituloDoProjetoNoCard(oportunidade.titulo, oportunidade.empresa)}
+      </p>
 
       <div className={styles.contextoCartao}>
-        <span>
-          {oportunidade.contato ? `Contato: ${oportunidade.contato}` : 'Contato a definir'}
-        </span>
+        <span>{oportunidade.contato ?? 'Contato a definir'}</span>
+      </div>
+      <div className={styles.metadadosCartao}>
+        {valor && <strong>{valor}</strong>}
         <span className={styles.pesquisa} data-estado={pesquisa.estado}>
           <Layers3 size={12} strokeWidth={1.8} aria-hidden="true" />
           {pesquisa.rotulo}
@@ -172,24 +174,17 @@ export function CartaoOportunidade({
       </div>
 
       <footer className={styles.rodapeCartao}>
-        <time
-          dateTime={oportunidade.ultimoFatoEm ?? oportunidade.criadoEm}
-          aria-label={`Atualizado em ${dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}`}
-          title={`Atualizado em ${dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}`}
-        >
-          {dataCurta(oportunidade.ultimoFatoEm ?? oportunidade.criadoEm)}
-        </time>
         <div className={styles.acoesCartao}>
           <Link
-            href={`/vendas/${oportunidade.id}`}
+            href={acao.href}
             className={styles.dossie}
-            aria-label={`${acao}: ${oportunidade.empresa}`}
+            aria-label={`${acao.rotulo}: ${oportunidade.empresa}`}
             data-no-dnd
             onMouseDown={impedirArraste}
             onTouchStart={impedirArraste}
             onKeyDown={impedirArraste}
           >
-            {acao}
+            {acao.rotulo}
             <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
           </Link>
         </div>
@@ -248,7 +243,9 @@ export function CartaoEncerrado({
       <div className={styles.encerradoTitulo}>
         <div>
           <span>{oportunidade.empresa}</span>
-          <h3>{oportunidade.titulo}</h3>
+          <h3 title={oportunidade.titulo}>
+            {tituloDoProjetoNoCard(oportunidade.titulo, oportunidade.empresa)}
+          </h3>
         </div>
         {valor && <strong>{valor}</strong>}
       </div>
@@ -263,18 +260,8 @@ export function CartaoEncerrado({
       )}
       <footer>
         <time dateTime={encerradaEm}>{dataCurta(encerradaEm)}</time>
-        <Link
-          href={
-            estaNoFluxo(oportunidade) && oportunidade.entregaId
-              ? `/entregas/${oportunidade.entregaId}`
-              : `/vendas/${oportunidade.id}`
-          }
-        >
-          {estaNoFluxo(oportunidade) && !perdida
-            ? oportunidade.entregaId
-              ? 'Abrir entrega'
-              : 'Preparar entrega'
-            : 'Abrir ficha'}
+        <Link href={acaoDoPipeline(oportunidade).href}>
+          {acaoDoPipeline(oportunidade).rotulo}
           <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
         </Link>
       </footer>

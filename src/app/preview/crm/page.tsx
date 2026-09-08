@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { FormularioNovoLead } from '@/app/(app)/crm/_components/FormularioNovoLead';
 import { PipelineCrm } from '@/app/(app)/crm/_components/PipelineCrm';
+import { CabecalhoOperacional } from '@/app/(app)/_components/CabecalhoOperacional';
 import pagina from '@/app/(app)/crm/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
@@ -51,6 +52,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     id: '22222222-2222-4222-8222-222222222222',
     titulo: 'Agente de qualificação de leads',
     etapa: 'descoberta',
+    propostaRecente: { id: '77777777-7777-4777-8777-777777777777', status: 'rascunho' },
     empresaId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
     empresa: 'Moura Imóveis',
     dominio: 'mouraimoveis.com.br',
@@ -74,6 +76,7 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
     id: '33333333-3333-4333-8333-333333333333',
     titulo: 'Copiloto comercial',
     etapa: 'proposta',
+    propostaRecente: { id: '88888888-8888-4888-8888-888888888888', status: 'apresentada' },
     empresaId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
     empresa: 'Orbe Contabilidade',
     dominio: null,
@@ -175,16 +178,16 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
 
       <main id="conteudo" className={styles.conteudo}>
         <div className={pagina.pagina}>
-          <header className={pagina.topo}>
-            <div className={pagina.linhaTopo}>
-              <div className={pagina.introducao}>
-                <p className={pagina.sobretitulo}>Suas vendas</p>
-                <h1>Clientes em negociação</h1>
-                <p>Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.</p>
-              </div>
-              <FormularioNovoLead abertoInicial={parametros.modal === '1'} />
-            </div>
-          </header>
+          <CabecalhoOperacional
+            titulo="Vendas"
+            descricao="Acompanhe cada oportunidade e o próximo passo."
+            acao={
+              <FormularioNovoLead
+                rotulo="Nova oportunidade"
+                abertoInicial={parametros.modal === '1'}
+              />
+            }
+          />
 
           <section className={pagina.quadro} aria-labelledby="preview-pipeline-titulo">
             <h2 id="preview-pipeline-titulo" className={pagina.tituloOculto}>
