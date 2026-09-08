@@ -225,6 +225,9 @@
 
 .modelo {
   min-width: 0;
+  width: 100%;
+  max-width: 620px;
+  justify-self: center;
 }
 
 .explorar {
@@ -253,8 +256,13 @@
 }
 
 /* A lateral do app também ocupa espaço: a grade responde à área disponível. */
-@container (max-width: 960px) {
-  .diplomas,
+@container (max-width: 920px) {
+  .diplomas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 760px) {
   .vazio {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -36,6 +36,19 @@ test('estado vazio diferencia o modelo de uma conquista real', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Conquistados' })).toHaveCount(0);
 });
 
+test('a moldura da plataforma não transforma o modelo em uma página gigante', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/preview/certificados?estado=vazio');
+  await page.locator('main > div').evaluate((el) => {
+    (el as HTMLElement).style.maxWidth = '956px';
+  });
+  const painel = page.getByRole('region', { name: 'Seu próximo certificado começa aqui.' });
+  expect((await painel.boundingBox())!.height).toBeLessThan(560);
+  const texto = await painel.getByRole('heading', { level: 2 }).boundingBox();
+  const modelo = await painel.getByRole('article').boundingBox();
+  expect(modelo!.x).toBeGreaterThan(texto!.x + texto!.width);
+});
+
 test('folha mantém compartilhamento, cópia e impressão acessíveis', async ({
   page,
   context,
