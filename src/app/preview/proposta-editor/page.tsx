@@ -87,10 +87,10 @@ export default async function PreviewEditorPropostaPage({
             <House size={18} strokeWidth={1.7} aria-hidden="true" /> Início
           </span>
           <span>
-            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> CRM
+            <ContactRound size={18} strokeWidth={1.7} aria-hidden="true" /> Vendas
           </span>
           <span>
-            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Calls
+            <Video size={18} strokeWidth={1.7} aria-hidden="true" /> Reuniões
           </span>
           <a className={styles.ativo} href="#conteudo">
             <FileSignature size={18} strokeWidth={1.7} aria-hidden="true" /> Propostas
@@ -107,7 +107,9 @@ export default async function PreviewEditorPropostaPage({
           id="11111111-1111-4111-8111-111111111111"
           tituloInicial="Automação do atendimento da Clínica Aurora"
           documentoInicial={DOCUMENTO}
-          statusInicial={aceita ? 'aceita' : 'apresentada'}
+          statusInicial={
+            aceita ? 'aceita' : parametros.estado === 'rascunho' ? 'rascunho' : 'apresentada'
+          }
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
           reuniaoId="33333333-3333-4333-8333-333333333333"

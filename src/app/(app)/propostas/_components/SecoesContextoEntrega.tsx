@@ -22,12 +22,10 @@ export function SecoesContextoEntrega({
 
   return (
     <>
-      <details className={styles.bloco}>
+      <details className={styles.bloco} name="editar-proposta" data-previa="cliente" open>
         <summary className={styles.blocoTopo}>
-          <span>01</span>
           <div>
-            <p>Cliente</p>
-            <h2>Dados do cliente</h2>
+            <h2>Cliente e objetivo</h2>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -87,7 +85,7 @@ export function SecoesContextoEntrega({
               />
             </label>
           </div>
-          <label className={styles.campo}>
+          <label className={styles.campo} data-previa="contexto">
             <span>Desafio identificado</span>
             <textarea
               rows={5}
@@ -96,7 +94,7 @@ export function SecoesContextoEntrega({
               onChange={(evento) => mudar((atual) => ({ ...atual, desafio: evento.target.value }))}
             />
           </label>
-          <label className={styles.campo}>
+          <label className={styles.campo} data-previa="contexto">
             <span>Objetivo do projeto</span>
             <textarea
               rows={3}
@@ -108,17 +106,15 @@ export function SecoesContextoEntrega({
         </div>
       </details>
 
-      <details className={styles.bloco}>
+      <details className={styles.bloco} name="editar-proposta" data-previa="escopo">
         <summary className={styles.blocoTopo}>
-          <span>02</span>
           <div>
-            <p>Entrega</p>
             <h2>Projeto e escopo</h2>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
         <div className={styles.blocoConteudo}>
-          <label className={styles.campo}>
+          <label className={styles.campo} data-previa="cliente">
             <span>Nome do projeto</span>
             <input
               value={documento.projeto.titulo}
@@ -131,7 +127,7 @@ export function SecoesContextoEntrega({
               }
             />
           </label>
-          <label className={styles.campo}>
+          <label className={styles.campo} data-previa="solucao">
             <span>Resumo da solução</span>
             <textarea
               rows={3}
@@ -154,6 +150,7 @@ export function SecoesContextoEntrega({
             <button
               type="button"
               disabled={documento.escopo.length >= 10}
+              aria-label="Adicionar etapa ao escopo"
               onClick={() =>
                 mudar((atual) => ({
                   ...atual,
@@ -214,6 +211,7 @@ export function SecoesContextoEntrega({
             <button
               type="button"
               disabled={documento.entregaveis.length >= 12}
+              aria-label="Adicionar entregável"
               onClick={() =>
                 mudar((atual) => ({
                   ...atual,
@@ -224,7 +222,7 @@ export function SecoesContextoEntrega({
               <Plus size={14} aria-hidden="true" /> Adicionar
             </button>
           </div>
-          <div className={styles.listaSimples}>
+          <div className={styles.listaSimples} data-previa="entregaveis">
             {documento.entregaveis.map((item, indice) => (
               <div key={indice}>
                 <Check size={14} aria-hidden="true" />

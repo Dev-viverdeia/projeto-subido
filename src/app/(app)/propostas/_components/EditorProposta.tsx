@@ -18,6 +18,7 @@ import { SecoesContextoEntrega } from './SecoesContextoEntrega';
 import { SecoesPrazoDecisao } from './SecoesPrazoDecisao';
 import { AcaoEntrega } from './AcaoEntrega';
 import { CompartilharProposta } from './CompartilharProposta';
+import { usePreviaProposta } from './usePreviaProposta';
 import styles from './EditorProposta.module.css';
 
 const INICIAL: EstadoProposta = {};
@@ -54,12 +55,19 @@ export function EditorProposta({
   const [valor, setValor] = useState(
     centavosParaCampo(documentoInicial.investimento.valorCentavos),
   );
-  const [sujo, setSujo] = useState(alteracaoInicial);
+  const [conteudoSalvo, setConteudoSalvo] = useState<string | null>(() =>
+    alteracaoInicial ? null : JSON.stringify([tituloInicial, JSON.stringify(documentoInicial)]),
+  );
+  const { previewRef, secaoPreviewRef, campoEmFocoRef, mostrarSecaoPreview, voltarParaEdicao } =
+    usePreviaProposta();
   const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
   const [estadoSalvar, acaoSalvar, salvando] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {
       const resultado = await salvarProposta(estado, dados);
-      if (resultado.sucesso) setSujo(false);
+      // A resposta confirma o conteúdo enviado, não o que foi digitado durante a espera.
+      if (resultado.sucesso) {
+        setConteudoSalvo(JSON.stringify([dados.get('titulo'), dados.get('documento')]));
+      }
       return resultado;
     },
     INICIAL,
@@ -76,6 +84,7 @@ export function EditorProposta({
   const compartilhamentoCodigo =
     estadoStatus.compartilhamentoCodigo ?? compartilhamentoInicial.codigo;
   const json = useMemo(() => JSON.stringify(documento), [documento]);
+  const sujo = JSON.stringify([titulo, json]) !== conteudoSalvo;
   const proximoStatus = PROXIMA_ACAO_STATUS[status];
   const descricaoEstado = sujo
     ? 'Salve as alterações antes de avançar ou baixar o PDF.'
@@ -93,7 +102,6 @@ export function EditorProposta({
 
   function mudar(mutacao: (atual: DocumentoProposta) => DocumentoProposta) {
     setDocumento((atual) => mutacao(atual));
-    setSujo(true);
   }
 
   return (
@@ -123,7 +131,7 @@ export function EditorProposta({
           <Link href={`/vendas/${oportunidadeId}`} className={styles.secundario}>
             Abrir ficha
           </Link>
-          {sujo ? (
+          {sujo || salvando ? (
             <span className={styles.downloadInativo} title="Salve antes de baixar">
               <Download size={15} aria-hidden="true" /> PDF
             </span>
@@ -138,13 +146,15 @@ export function EditorProposta({
             <input type="hidden" name="documento" value={json} />
             <button type="submit" className={styles.salvar} disabled={salvando || !sujo}>
               {salvando ? (
-                <Spinner size="sm" tone="inverse" />
+                <span aria-hidden="true">
+                  <Spinner size="sm" tone="inverse" />
+                </span>
               ) : !sujo ? (
                 <Check size={15} aria-hidden="true" />
               ) : (
                 <Save size={15} aria-hidden="true" />
               )}
-              {salvando ? 'Salvando' : sujo ? 'Salvar versão' : 'Salvo'}
+              {salvando ? 'Salvando' : sujo ? 'Salvar alterações' : 'Salvo'}
             </button>
           </form>
         </div>
@@ -185,24 +195,28 @@ export function EditorProposta({
       )}
 
       <div className={styles.modos}>
-        <div className={styles.abasModo} role="tablist" aria-label="Área de trabalho da proposta">
+        <div className={styles.abasModo} role="group" aria-label="Área de trabalho da proposta">
           <button
             type="button"
-            role="tab"
-            aria-selected={painelAtivo === 'editar'}
-            onClick={() => setPainelAtivo('editar')}
+            aria-pressed={painelAtivo === 'editar'}
+            onClick={() => {
+              setPainelAtivo('editar');
+              voltarParaEdicao();
+            }}
           >
             <Pencil size={15} strokeWidth={1.8} aria-hidden="true" />
             Editar
           </button>
           <button
             type="button"
-            role="tab"
-            aria-selected={painelAtivo === 'preview'}
-            onClick={() => setPainelAtivo('preview')}
+            aria-pressed={painelAtivo === 'preview'}
+            onClick={() => {
+              setPainelAtivo('preview');
+              requestAnimationFrame(() => mostrarSecaoPreview(secaoPreviewRef.current, true));
+            }}
           >
             <Eye size={16} strokeWidth={1.8} aria-hidden="true" />
-            Prévia em tempo real
+            Ver prévia
           </button>
         </div>
         <form action={acaoSalvar} className={styles.salvarMobile}>
@@ -211,7 +225,9 @@ export function EditorProposta({
           <input type="hidden" name="documento" value={json} />
           <button type="submit" disabled={salvando || !sujo} aria-live="polite">
             {salvando ? (
-              <Spinner size="sm" tone="inverse" />
+              <span aria-hidden="true">
+                <Spinner size="sm" tone="inverse" />
+              </span>
             ) : !sujo ? (
               <Check size={15} aria-hidden="true" />
             ) : (
@@ -223,21 +239,39 @@ export function EditorProposta({
       </div>
 
       <div className={styles.grade}>
-        <main className={styles.editor} data-painel-ativo={painelAtivo === 'editar' || undefined}>
+        <section
+          className={styles.editor}
+          aria-label="Editar proposta"
+          data-painel-ativo={painelAtivo === 'editar' || undefined}
+          onFocusCapture={(evento) => {
+            campoEmFocoRef.current = evento.target;
+            const secao = evento.target.closest<HTMLElement>('[data-previa]');
+            if (secao?.dataset.previa) mostrarSecaoPreview(secao.dataset.previa);
+          }}
+          onClickCapture={(evento) => {
+            const detalhe = (evento.target as HTMLElement).closest('summary')?.parentElement;
+            if (!(detalhe instanceof HTMLDetailsElement)) return;
+            requestAnimationFrame(() => {
+              if (detalhe.open && detalhe.dataset.previa)
+                mostrarSecaoPreview(detalhe.dataset.previa, true);
+            });
+          }}
+        >
           <section className={styles.abertura}>
-            <p className={styles.sobretitulo}>Documento de venda</p>
+            <label htmlFor="titulo-proposta" className={styles.rotuloTitulo}>
+              Nome da proposta
+            </label>
             <textarea
-              aria-label="Título interno da proposta"
+              id="titulo-proposta"
+              data-previa="cliente"
               className={styles.tituloDocumento}
               value={titulo}
               rows={2}
               maxLength={180}
               onChange={(evento) => {
                 setTitulo(evento.target.value);
-                setSujo(true);
               }}
             />
-            <p>Edite uma seção por vez. A prévia acompanha suas mudanças.</p>
           </section>
 
           <SecoesContextoEntrega documento={documento} mudar={mudar} />
@@ -284,7 +318,7 @@ export function EditorProposta({
                     type="submit"
                     name="status"
                     value={proximoStatus}
-                    disabled={sujo || atualizandoStatus}
+                    disabled={sujo || salvando || atualizandoStatus}
                     className={styles.avancar}
                   >
                     {ROTULO_ACAO_STATUS[status]}
@@ -299,7 +333,7 @@ export function EditorProposta({
                       type="submit"
                       name="status"
                       value="aceita"
-                      disabled={sujo || atualizandoStatus}
+                      disabled={sujo || salvando || atualizandoStatus}
                       className={styles.avancar}
                     >
                       Confirmar venda e abrir entrega
@@ -308,7 +342,7 @@ export function EditorProposta({
                       type="submit"
                       name="status"
                       value="recusada"
-                      disabled={sujo || atualizandoStatus}
+                      disabled={sujo || salvando || atualizandoStatus}
                       className={styles.secundario}
                     >
                       Registrar como não aprovada
@@ -320,7 +354,7 @@ export function EditorProposta({
                     type="submit"
                     name="status"
                     value="rascunho"
-                    disabled={sujo || atualizandoStatus}
+                    disabled={sujo || salvando || atualizandoStatus}
                     className={styles.secundario}
                   >
                     Criar nova versão
@@ -329,9 +363,10 @@ export function EditorProposta({
               </form>
             </div>
           </section>
-        </main>
+        </section>
 
         <aside
+          ref={previewRef}
           className={styles.previewArea}
           aria-label="Prévia da proposta com rolagem"
           tabIndex={0}
