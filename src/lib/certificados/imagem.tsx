@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
 import { CST, DOCUMENT, SUBIDO } from '@/lib/brand';
 import { TAMANHO_IMAGEM_CERTIFICADO } from './compartilhamento';
+import { apresentacaoCertificado } from './apresentacao';
 
 type Dados = { nome: string; titulo: string; concluido_em: string; origem: string };
 
@@ -13,6 +14,8 @@ type Dados = { nome: string; titulo: string; concluido_em: string; origem: strin
  * O renderer não lê CSS variables: tintas vêm exclusivamente do módulo canônico de marca.
  */
 export async function criarImagemCertificado(dados: Dados, modelo = false) {
+  const apresentacao = apresentacaoCertificado(dados.nome);
+  const ilustrativo = modelo || apresentacao.demonstracao;
   const [monograma, wordmark] = await Promise.all([
     readFile(join(process.cwd(), 'public/brand/via/monogram-navy.png'), 'base64'),
     readFile(join(process.cwd(), 'public/brand/via/wordmark-navy.png'), 'base64'),
@@ -80,23 +83,30 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
           }}
         >
           <div style={{ fontSize: 22, color: DOCUMENT.faint, marginBottom: 22 }}>
-            {modelo ? 'Modelo de certificado' : 'Certificado de conclusão'}
+            {apresentacao.demonstracao
+              ? 'Certificado de demonstração'
+              : modelo
+                ? 'Modelo de certificado'
+                : 'Certificado de conclusão'}
           </div>
           <div
             style={{
-              fontSize: dados.nome.length > 90 ? 34 : dados.nome.length > 45 ? 44 : 62,
+              fontSize:
+                apresentacao.nome.length > 90 ? 34 : apresentacao.nome.length > 45 ? 44 : 62,
               letterSpacing: -1.7,
               lineHeight: 1.12,
               maxWidth: 990,
               wordBreak: 'break-word',
             }}
           >
-            {dados.nome}
+            {apresentacao.nome}
           </div>
           <div style={{ marginTop: 18, fontSize: 18, color: DOCUMENT.faint }}>
-            {dados.origem === 'formacao'
-              ? 'Formação concluída'
-              : 'Aprendizado e implementação guiada concluídos'}
+            {ilustrativo
+              ? 'Prévia ilustrativa'
+              : dados.origem === 'formacao'
+                ? 'Formação concluída'
+                : 'Aprendizado e implementação guiada concluídos'}
           </div>
           <div
             style={{
@@ -120,7 +130,7 @@ export async function criarImagemCertificado(dados: Dados, modelo = false) {
             color: DOCUMENT.faint,
           }}
         >
-          <span>{modelo ? 'Prévia ilustrativa · sem validade' : 'Subido + Viver de IA'}</span>
+          <span>{ilustrativo ? 'Prévia ilustrativa · sem validade' : 'Subido + Viver de IA'}</span>
           <span>{data}</span>
         </div>
       </div>

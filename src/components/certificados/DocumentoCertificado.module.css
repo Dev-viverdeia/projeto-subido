@@ -148,6 +148,11 @@
   font-family: var(--via-font-mono);
   font-size: var(--via-fs-caption);
 }
+.avisoModelo {
+  flex-basis: 100%;
+  color: var(--via-navy);
+  text-align: center;
+}
 
 .documento[data-compacto] {
   height: 100%;

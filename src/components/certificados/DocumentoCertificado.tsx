@@ -1,6 +1,7 @@
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { ViverDeIaLogo } from '@/components/brand/ViverDeIaLogo';
 import { BadgeCheck } from 'lucide-react';
+import { apresentacaoCertificado } from '@/lib/certificados/apresentacao';
 import styles from './DocumentoCertificado.module.css';
 
 type Props = {
@@ -26,6 +27,8 @@ export function DocumentoCertificado({
   modelo = false,
 }: Props) {
   const Titulo = compacto ? 'h3' : 'h1';
+  const apresentacao = apresentacaoCertificado(nome);
+  const ilustrativo = modelo || apresentacao.demonstracao;
   const data = concluidoEm
     ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long', timeZone: 'America/Sao_Paulo' }).format(
         new Date(concluidoEm),
@@ -45,12 +48,18 @@ export function DocumentoCertificado({
       </header>
 
       <div className={styles.corpo}>
-        <p className={styles.tipo}>{modelo ? 'Modelo · ' : ''}Certificado de conclusão</p>
-        <p className={styles.nome} data-extenso={nome.length > 40 || undefined}>
-          {nome}
+        <p className={styles.tipo}>
+          {apresentacao.demonstracao
+            ? 'Certificado de demonstração'
+            : modelo
+              ? 'Modelo de certificado'
+              : 'Certificado de conclusão'}
+        </p>
+        <p className={styles.nome} data-extenso={apresentacao.nome.length > 40 || undefined}>
+          {apresentacao.nome}
         </p>
         <p className={styles.concluiu}>
-          pela conclusão{' '}
+          {ilustrativo ? 'Prévia' : 'pela conclusão'}{' '}
           {origem === 'formacao'
             ? 'da formação'
             : 'do aprendizado e da implementação guiada do projeto'}
@@ -69,11 +78,13 @@ export function DocumentoCertificado({
         </div>
         {data ? (
           <div className={styles.data}>
-            <span>Concluído em</span>
+            <span>{ilustrativo ? 'Data ilustrativa' : 'Concluído em'}</span>
             <time dateTime={concluidoEm!}>{data}</time>
           </div>
         ) : null}
-        {modelo ? <span>Prévia ilustrativa · sem validade</span> : null}
+        {ilustrativo ? (
+          <span className={styles.avisoModelo}>Prévia ilustrativa · sem validade</span>
+        ) : null}
         {codigo ? (
           <div className={styles.codigo}>
             <span>

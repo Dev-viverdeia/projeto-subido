@@ -235,3 +235,16 @@ test('erro de prévia permite recuperação sem bloquear o compartilhamento', as
   await imagem.evaluate((el: HTMLImageElement) => el.decode());
   expect(await imagem.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1200);
 });
+
+test('demonstração valoriza o nome, mantém o aviso e não sugere adicionar certificação ao perfil', async ({
+  page,
+}) => {
+  await page.goto('/preview/certificado?demonstracao=1');
+  await expect(page.getByText('Rafael Milagre', { exact: true })).toBeVisible();
+  await expect(page.getByText('Prévia ilustrativa · sem validade')).toBeVisible();
+  await page.getByRole('button', { name: 'Compartilhar no LinkedIn' }).click();
+  const modal = page.getByRole('dialog', { name: 'Compartilhar certificado' });
+  await expect(modal.getByText('Demonstração, sem validade de certificação.')).toBeVisible();
+  await expect(modal.getByRole('button', { name: 'Perfil', exact: true })).toHaveCount(0);
+  await expect(modal.getByRole('link', { name: 'Adicionar ao perfil no LinkedIn' })).toHaveCount(0);
+});

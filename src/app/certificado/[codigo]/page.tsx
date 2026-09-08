@@ -4,6 +4,7 @@ import { BadgeCheck } from 'lucide-react';
 import { DocumentoCertificado } from '@/components/certificados/DocumentoCertificado';
 import { buscarCertificadoPublico } from '@/lib/certificados/publico';
 import { TAMANHO_IMAGEM_CERTIFICADO } from '@/lib/certificados/compartilhamento';
+import { apresentacaoCertificado } from '@/lib/certificados/apresentacao';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -13,12 +14,15 @@ export async function generateMetadata({
 }: PageProps<'/certificado/[codigo]'>): Promise<Metadata> {
   const { codigo } = await params;
   const certificado = await buscarCertificadoPublico(codigo);
+  const apresentacao = apresentacaoCertificado(certificado?.nome ?? '');
   const titulo = certificado
-    ? `${certificado.nome} · ${certificado.titulo}`
+    ? `${apresentacao.nome}${apresentacao.demonstracao ? ' · Demonstração' : ''} · ${certificado.titulo}`
     : 'Certificado não encontrado';
-  const descricao = certificado
-    ? `${certificado.nome} concluiu ${certificado.titulo}. Certificado Subido + Viver de IA, com registro público de verificação.`
-    : 'Certificado emitido pela plataforma Subido.';
+  const descricao = apresentacao.demonstracao
+    ? 'Prévia ilustrativa de certificado Subido + Viver de IA. Não comprova conclusão.'
+    : certificado
+      ? `${certificado.nome} concluiu ${certificado.titulo}. Certificado Subido + Viver de IA, com registro público de verificação.`
+      : 'Certificado emitido pela plataforma Subido.';
   return {
     title: titulo,
     description: descricao,
@@ -58,14 +62,15 @@ export default async function CertificadoPublicoPage({
   const { codigo } = await params;
   const certificado = await buscarCertificadoPublico(codigo);
   if (!certificado) notFound();
+  const { demonstracao } = apresentacaoCertificado(certificado.nome);
 
   return (
     <main className={styles.pagina}>
       <header className={styles.topo}>
-        <p>Certificado de conclusão</p>
+        <p>{demonstracao ? 'Certificado de demonstração' : 'Certificado de conclusão'}</p>
         <span>
           <BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />
-          Registro verificado
+          {demonstracao ? 'Registro demonstrativo' : 'Registro verificado'}
         </span>
       </header>
 
@@ -80,7 +85,9 @@ export default async function CertificadoPublicoPage({
       </div>
 
       <p className={styles.nota}>
-        Autenticidade confirmada pelo registro de conclusão na plataforma Subido.
+        {demonstracao
+          ? 'Exemplo de apresentação de um certificado. Não comprova conclusão.'
+          : 'Autenticidade confirmada pelo registro de conclusão na plataforma Subido.'}
       </p>
     </main>
   );

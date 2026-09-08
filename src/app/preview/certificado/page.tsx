@@ -20,7 +20,7 @@ export default async function PreviewCertificadoPage({
   searchParams,
 }: PageProps<'/preview/certificado'>) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const { longo } = await searchParams;
+  const { longo, demonstracao } = await searchParams;
 
   return (
     <main className={styles.pagina}>
@@ -36,7 +36,13 @@ export default async function PreviewCertificadoPage({
           aprendizadoIds={['aula-chatgpt-1', 'aula-chatgpt-2']}
           implementacaoIds={[]}
           hrefConteudo="/formacoes/chatgpt-para-o-trabalho"
-          nome={longo ? 'Maria Fernanda Albuquerque de Oliveira e Vasconcelos' : 'Rafael Milagre'}
+          nome={
+            demonstracao
+              ? 'Rafael Milagre — CERTIFICADO DE DEMONSTRAÇÃO'
+              : longo
+                ? 'Maria Fernanda Albuquerque de Oliveira e Vasconcelos'
+                : 'Rafael Milagre'
+          }
           codigoInicial="subido-preview-2026"
           siteUrl="https://subido.viverdeia.ai"
           progressoPreview={PROGRESSO}

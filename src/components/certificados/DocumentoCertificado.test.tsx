@@ -3,6 +3,22 @@ import { describe, expect, it } from 'vitest';
 import { DocumentoCertificado } from './DocumentoCertificado';
 
 describe('documento co-branded', () => {
+  it('separa o aviso de demonstração do nome e não afirma uma conclusão real', () => {
+    render(
+      <DocumentoCertificado
+        nome="Rafael Milagre — CERTIFICADO DE DEMONSTRAÇÃO"
+        titulo="IA aplicada"
+        origem="formacao"
+        concluidoEm="2026-09-08T12:00:00Z"
+        codigo="registro-demo"
+      />,
+    );
+    expect(screen.getByText('Rafael Milagre', { exact: true })).toBeInTheDocument();
+    expect(screen.getByText('Certificado de demonstração')).toBeInTheDocument();
+    expect(screen.getByText('Prévia ilustrativa · sem validade')).toBeInTheDocument();
+    expect(screen.queryByText('Concluído em')).not.toBeInTheDocument();
+    expect(screen.queryByText(/pela conclusão/)).not.toBeInTheDocument();
+  });
   it('preserva as marcas oficiais e os dados reais de verificação', () => {
     render(
       <DocumentoCertificado

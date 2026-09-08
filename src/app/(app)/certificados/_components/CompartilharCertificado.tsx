@@ -18,6 +18,7 @@ export function CompartilharCertificado({
   urlPublica,
   data,
   imagemPreview,
+  demonstracao = false,
 }: {
   onClose: () => void;
   titulo: string;
@@ -25,6 +26,7 @@ export function CompartilharCertificado({
   urlPublica: string;
   data?: string | null;
   imagemPreview?: string;
+  demonstracao?: boolean;
 }) {
   const [destino, setDestino] = useState<'publicacao' | 'perfil'>('publicacao');
   const [copiado, setCopiado] = useState<string | null>(null);
@@ -65,22 +67,26 @@ export function CompartilharCertificado({
       }
     >
       <div className={styles.conteudo}>
-        <div className={styles.destinos} role="group" aria-label="Onde compartilhar">
-          <button
-            type="button"
-            aria-pressed={destino === 'publicacao'}
-            onClick={() => setDestino('publicacao')}
-          >
-            Publicação
-          </button>
-          <button
-            type="button"
-            aria-pressed={destino === 'perfil'}
-            onClick={() => setDestino('perfil')}
-          >
-            Perfil
-          </button>
-        </div>
+        {demonstracao ? (
+          <p className={styles.orientacao}>Demonstração, sem validade de certificação.</p>
+        ) : (
+          <div className={styles.destinos} role="group" aria-label="Onde compartilhar">
+            <button
+              type="button"
+              aria-pressed={destino === 'publicacao'}
+              onClick={() => setDestino('publicacao')}
+            >
+              Publicação
+            </button>
+            <button
+              type="button"
+              aria-pressed={destino === 'perfil'}
+              onClick={() => setDestino('perfil')}
+            >
+              Perfil
+            </button>
+          </div>
+        )}
 
         {destino === 'publicacao' ? (
           <>
