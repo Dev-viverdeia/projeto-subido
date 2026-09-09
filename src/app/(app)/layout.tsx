@@ -16,7 +16,7 @@ import {
   planoPodeAcessarRota,
   recursoDaRota,
 } from '@/lib/planos/acessos';
-import { ITEM_ADMIN, ITEM_CONTA, ITENS_NAV } from './_components/navegacao';
+import { ITEM_ADMIN, ITEM_CONTA, ITEM_AJUDA, ITENS_NAV } from './_components/navegacao';
 import { NavLateral } from './_components/NavLateral';
 import { CabecalhoApp } from './_components/CabecalhoApp';
 import { PendenciasDoCabecalho } from './_components/PendenciasDoCabecalho';
@@ -99,16 +99,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
             <NavLateral itens={itensComAcesso} variante="lateral" />
 
-            {admin && (
-              <div className={styles.rodapeSidebar}>
-                <NavLateral
-                  itens={[ITEM_ADMIN]}
-                  variante="lateral"
-                  grupo="admin"
-                  rotuloGrupo="Gestão"
-                />
-              </div>
-            )}
+            <div className={styles.rodapeSidebar}>
+              <NavLateral
+                itens={admin ? [ITEM_AJUDA, ITEM_ADMIN] : [ITEM_AJUDA]}
+                variante="lateral"
+                grupo="admin"
+                rotuloGrupo="Gestão"
+              />
+            </div>
           </aside>
 
           <CabecalhoApp
@@ -131,7 +129,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {/* No mobile, "Mais" dá acesso à navegação completa. O item de gestão
               só entra no payload de quem realmente é admin. */}
           <NavLateral
-            itens={admin ? [...itensComAcesso, ITEM_ADMIN] : itensComAcesso}
+            itens={
+              admin ? [...itensComAcesso, ITEM_AJUDA, ITEM_ADMIN] : [...itensComAcesso, ITEM_AJUDA]
+            }
             itemConta={ITEM_CONTA}
             variante="dock"
           />

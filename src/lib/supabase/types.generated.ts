@@ -3464,6 +3464,396 @@ export type Database = {
         }
         Relationships: []
       }
+      suporte_agentes: {
+        Row: {
+          criado_em: string
+          nome: string
+          notificar: boolean
+          usuario: string
+        }
+        Insert: {
+          criado_em?: string
+          nome: string
+          notificar?: boolean
+          usuario: string
+        }
+        Update: {
+          criado_em?: string
+          nome?: string
+          notificar?: boolean
+          usuario?: string
+        }
+        Relationships: []
+      }
+      suporte_arquivos: {
+        Row: {
+          bytes: number
+          caminho: string
+          criado_em: string
+          dono: string
+          id: string
+          mensagem: string | null
+          mime: string
+          nome: string
+        }
+        Insert: {
+          bytes: number
+          caminho: string
+          criado_em?: string
+          dono: string
+          id: string
+          mensagem?: string | null
+          mime: string
+          nome: string
+        }
+        Update: {
+          bytes?: number
+          caminho?: string
+          criado_em?: string
+          dono?: string
+          id?: string
+          mensagem?: string | null
+          mime?: string
+          nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_arquivos_mensagem_fkey"
+            columns: ["mensagem"]
+            isOneToOne: false
+            referencedRelation: "suporte_mensagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suporte_arquivos_remover: {
+        Row: {
+          caminho: string
+          criado_em: string
+        }
+        Insert: {
+          caminho: string
+          criado_em?: string
+        }
+        Update: {
+          caminho?: string
+          criado_em?: string
+        }
+        Relationships: []
+      }
+      suporte_artigos: {
+        Row: {
+          atualizado_em: string
+          categoria: string
+          destino: string
+          dica: string
+          passos: Json
+          publicado: boolean
+          resumo: string
+          slug: string
+          tags: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          categoria: string
+          destino?: string
+          dica?: string
+          passos?: Json
+          publicado?: boolean
+          resumo: string
+          slug: string
+          tags?: string
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          categoria?: string
+          destino?: string
+          dica?: string
+          passos?: Json
+          publicado?: boolean
+          resumo?: string
+          slug?: string
+          tags?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      suporte_atendimentos: {
+        Row: {
+          acesso_expira_em: string | null
+          acesso_hash: string | null
+          assunto: string
+          atualizado_em: string
+          avaliacao: number | null
+          categoria: string
+          criado_em: string
+          dono: string | null
+          email: string
+          id: string
+          lido_equipe_em: string | null
+          lido_usuario_em: string | null
+          numero: number
+          pagina: string | null
+          primeira_resposta_em: string | null
+          prioridade: string
+          reaberturas: number
+          resolvido_em: string | null
+          responsavel: string | null
+          status: string
+          verificado: boolean
+        }
+        Insert: {
+          acesso_expira_em?: string | null
+          acesso_hash?: string | null
+          assunto: string
+          atualizado_em?: string
+          avaliacao?: number | null
+          categoria: string
+          criado_em?: string
+          dono?: string | null
+          email: string
+          id?: string
+          lido_equipe_em?: string | null
+          lido_usuario_em?: string | null
+          numero?: never
+          pagina?: string | null
+          primeira_resposta_em?: string | null
+          prioridade?: string
+          reaberturas?: number
+          resolvido_em?: string | null
+          responsavel?: string | null
+          status?: string
+          verificado?: boolean
+        }
+        Update: {
+          acesso_expira_em?: string | null
+          acesso_hash?: string | null
+          assunto?: string
+          atualizado_em?: string
+          avaliacao?: number | null
+          categoria?: string
+          criado_em?: string
+          dono?: string | null
+          email?: string
+          id?: string
+          lido_equipe_em?: string | null
+          lido_usuario_em?: string | null
+          numero?: never
+          pagina?: string | null
+          primeira_resposta_em?: string | null
+          prioridade?: string
+          reaberturas?: number
+          resolvido_em?: string | null
+          responsavel?: string | null
+          status?: string
+          verificado?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_atendimentos_responsavel_fkey"
+            columns: ["responsavel"]
+            isOneToOne: false
+            referencedRelation: "suporte_agentes"
+            referencedColumns: ["usuario"]
+          },
+        ]
+      }
+      suporte_avaliacoes_artigos: {
+        Row: {
+          artigo: string
+          dono: string
+          util: boolean
+        }
+        Insert: {
+          artigo: string
+          dono: string
+          util: boolean
+        }
+        Update: {
+          artigo?: string
+          dono?: string
+          util?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_avaliacoes_artigos_artigo_fkey"
+            columns: ["artigo"]
+            isOneToOne: false
+            referencedRelation: "suporte_artigos"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      suporte_eventos: {
+        Row: {
+          antes: Json | null
+          atendimento: string
+          autor: string | null
+          criado_em: string
+          depois: Json | null
+          id: number
+          tipo: string
+        }
+        Insert: {
+          antes?: Json | null
+          atendimento: string
+          autor?: string | null
+          criado_em?: string
+          depois?: Json | null
+          id?: never
+          tipo: string
+        }
+        Update: {
+          antes?: Json | null
+          atendimento?: string
+          autor?: string | null
+          criado_em?: string
+          depois?: Json | null
+          id?: never
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_eventos_atendimento_fkey"
+            columns: ["atendimento"]
+            isOneToOne: false
+            referencedRelation: "suporte_atendimentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suporte_ia_uso: {
+        Row: {
+          criado_em: string
+          id: string
+          modelo: string
+          tokens: number
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          modelo: string
+          tokens: number
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          modelo?: string
+          tokens?: number
+        }
+        Relationships: []
+      }
+      suporte_limites: {
+        Row: {
+          chave: string
+          inicio: string
+          quantidade: number
+        }
+        Insert: {
+          chave: string
+          inicio: string
+          quantidade: number
+        }
+        Update: {
+          chave?: string
+          inicio?: string
+          quantidade?: number
+        }
+        Relationships: []
+      }
+      suporte_mensagens: {
+        Row: {
+          atendimento: string
+          autor: string | null
+          criado_em: string
+          id: string
+          interna: boolean
+          papel: string
+          texto: string
+        }
+        Insert: {
+          atendimento: string
+          autor?: string | null
+          criado_em?: string
+          id?: string
+          interna?: boolean
+          papel: string
+          texto: string
+        }
+        Update: {
+          atendimento?: string
+          autor?: string | null
+          criado_em?: string
+          id?: string
+          interna?: boolean
+          papel?: string
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_mensagens_atendimento_fkey"
+            columns: ["atendimento"]
+            isOneToOne: false
+            referencedRelation: "suporte_atendimentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suporte_notificacoes: {
+        Row: {
+          acesso_url: string | null
+          atendimento: string
+          atualizado_em: string
+          criado_em: string
+          destinatario: string
+          erro: string | null
+          estado: string
+          evento: string
+          id: string
+          provider_id: string | null
+          tentativas: number
+          tipo: string
+        }
+        Insert: {
+          acesso_url?: string | null
+          atendimento: string
+          atualizado_em?: string
+          criado_em?: string
+          destinatario: string
+          erro?: string | null
+          estado?: string
+          evento: string
+          id?: string
+          provider_id?: string | null
+          tentativas?: number
+          tipo: string
+        }
+        Update: {
+          acesso_url?: string | null
+          atendimento?: string
+          atualizado_em?: string
+          criado_em?: string
+          destinatario?: string
+          erro?: string | null
+          estado?: string
+          evento?: string
+          id?: string
+          provider_id?: string | null
+          tentativas?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_notificacoes_atendimento_fkey"
+            columns: ["atendimento"]
+            isOneToOne: false
+            referencedRelation: "suporte_atendimentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           criado_em: string
@@ -4240,6 +4630,100 @@ export type Database = {
           p_thread: string
         }
         Returns: Json
+      }
+      suporte_atualizar: {
+        Args: {
+          p_atribuir?: boolean
+          p_avaliacao?: number
+          p_id: string
+          p_prioridade?: string
+          p_responsavel?: string
+          p_status?: string
+        }
+        Returns: undefined
+      }
+      suporte_avaliar_artigo: {
+        Args: { p_slug: string; p_util: boolean }
+        Returns: undefined
+      }
+      suporte_criar: {
+        Args: {
+          p_anexos?: string[]
+          p_assunto: string
+          p_categoria: string
+          p_id: string
+          p_pagina: string
+          p_texto: string
+        }
+        Returns: string
+      }
+      suporte_limitar: {
+        Args: { p_chave: string; p_limite: number; p_segundos: number }
+        Returns: boolean
+      }
+      suporte_marcar_lido: { Args: { p_id: string }; Returns: undefined }
+      suporte_notificacoes_reservar: {
+        Args: never
+        Returns: {
+          acesso_url: string | null
+          atendimento: string
+          atualizado_em: string
+          criado_em: string
+          destinatario: string
+          erro: string | null
+          estado: string
+          evento: string
+          id: string
+          provider_id: string | null
+          tentativas: number
+          tipo: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "suporte_notificacoes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      suporte_preparar_limpeza: { Args: never; Returns: undefined }
+      suporte_publico_confirmar: {
+        Args: { p_hash: string; p_id: string }
+        Returns: boolean
+      }
+      suporte_publico_criar: {
+        Args: {
+          p_assunto: string
+          p_email: string
+          p_hash: string
+          p_id: string
+          p_texto: string
+          p_url: string
+        }
+        Returns: undefined
+      }
+      suporte_publico_renovar: {
+        Args: { p_email: string; p_hash: string; p_id: string; p_url: string }
+        Returns: undefined
+      }
+      suporte_publico_responder: {
+        Args: {
+          p_hash: string
+          p_id: string
+          p_mensagem: string
+          p_status?: string
+          p_texto: string
+        }
+        Returns: undefined
+      }
+      suporte_responder: {
+        Args: {
+          p_anexos?: string[]
+          p_atendimento: string
+          p_id: string
+          p_interna?: boolean
+          p_texto: string
+        }
+        Returns: string
       }
     }
     Enums: {

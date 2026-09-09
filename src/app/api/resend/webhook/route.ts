@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend, type WebhookEventPayload } from 'resend';
 import { resendEnv } from '@/lib/env';
+import { conciliarNotificacaoSuporte } from '@/lib/suporte/notificacoes';
 import type { StatusEmailEntrega } from '@/lib/notificacoes/entrega';
 // Endpoint estritamente server-only: o service role apenas concilia o ID do
 // provedor após validar criptograficamente a assinatura do Resend.
@@ -63,6 +64,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: 'assinatura_invalida' }, { status: 400 });
   }
 
+  try {
+    if (await conciliarNotificacaoSuporte(evento)) return NextResponse.json({ recebido: true });
+  } catch {
+    return NextResponse.json({ erro: 'conciliacao_indisponivel' }, { status: 503 });
+  }
   const estado = estadoDoEvento(evento);
   if (!estado || !('email_id' in evento.data)) {
     return NextResponse.json({ recebido: true });

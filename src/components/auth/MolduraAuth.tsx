@@ -49,7 +49,12 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
       </aside>
 
       <main className={styles.area} id="conteudo">
-        <div className={styles.caixa}>{children}</div>
+        <div className={styles.caixa}>
+          {children}
+          <Link href="/ajuda" className="via-btn via-btn--ghost via-btn--md">
+            Preciso de ajuda
+          </Link>
+        </div>
       </main>
     </div>
   );
