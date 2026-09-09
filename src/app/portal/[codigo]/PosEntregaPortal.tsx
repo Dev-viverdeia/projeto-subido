@@ -1,178 +1,73 @@
-import {
-  BadgeCheck,
-  Check,
-  Download,
-  FileCheck2,
-  FileUp,
-  Files,
-  History,
-  MessageSquareText,
-  Send,
-  ShieldCheck,
-} from 'lucide-react';
-import type { EventoPortalCliente, ProjetoPortalCliente } from '@/lib/portal-cliente/servico';
-import { RevisaoResultadoPortal } from './RevisaoResultadoPortal';
-import styles from './portal.module.css';
+import { ArrowUpRight, ChevronDown, LifeBuoy, ShieldCheck, UserRound } from 'lucide-react';
+import type { ProjetoPortalCliente } from '@/lib/portal-cliente/tipos';
+import { formatarGarantia } from '@/lib/projetos-execucao/encerramento';
+import styles from './MateriaisPortal.module.css';
 
-const ROTULO_EVENTO: Record<EventoPortalCliente['tipo'], string> = {
-  aprovacao_solicitada: 'Entrega pronta para sua revisão',
-  entrega_aprovada: 'Entrega aprovada por você',
-  ajustes_solicitados: 'Ajuste solicitado',
-  arquivo_liberado: 'Novo arquivo disponível',
-  pendencia_concluida: 'Pendência confirmada pelo cliente',
-  mudanca_escopo_solicitada: 'Mudança solicitada pelo cliente',
-  mudanca_escopo_incluida: 'Mudança confirmada no combinado',
-  mudanca_escopo_proposta: 'Impacto enviado para decisão',
-  mudanca_escopo_aprovada: 'Mudança aprovada pelo cliente',
-  mudanca_escopo_recusada: 'Combinado original mantido',
-  encerramento_enviado: 'Encerramento enviado para aceite',
-  projeto_encerrado: 'Projeto encerrado com aceite',
-  revisao_resultado_registrada: 'Resultado revisado com o cliente',
-};
-
-function formatarTamanho(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
-}
-
-function rotuloArquivo(mime: string): string {
-  if (mime.includes('spreadsheet') || mime.includes('excel') || mime === 'text/csv') {
-    return 'Planilha';
+// Canal é texto livre. Só um e-mail simples ou URL HTTPS vira link; nunca inferir um destino.
+export function linkSuporte(canal: string): string | null {
+  const valor = canal.trim();
+  if (/^[\w.+-]+@[\w.-]+\.[a-z]{2,}$/i.test(valor)) return `mailto:${valor}`;
+  if (/\s/.test(valor)) return null;
+  try {
+    const url = new URL(valor);
+    return url.protocol === 'https:' && !url.username && !url.password ? url.href : null;
+  } catch {
+    return null;
   }
-  if (mime.startsWith('image/')) return 'Imagem';
-  if (mime.startsWith('video/')) return 'Vídeo';
-  if (mime.startsWith('audio/')) return 'Áudio';
-  if (mime.includes('zip')) return 'Pacote';
-  return 'Documento';
 }
 
-function formatarMomento(valor: string): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-    .format(new Date(valor))
-    .replace('.', '');
-}
-
-function IconeEvento({ tipo }: { tipo: EventoPortalCliente['tipo'] }) {
-  if (tipo === 'entrega_aprovada' || tipo === 'projeto_encerrado') {
-    return <BadgeCheck size={17} aria-hidden="true" />;
-  }
-  if (tipo === 'ajustes_solicitados') return <MessageSquareText size={17} aria-hidden="true" />;
-  if (tipo === 'arquivo_liberado') return <FileUp size={17} aria-hidden="true" />;
-  if (tipo === 'pendencia_concluida') return <Check size={17} aria-hidden="true" />;
-  if (tipo.startsWith('mudanca_escopo')) return <FileCheck2 size={17} aria-hidden="true" />;
-  return <Send size={17} aria-hidden="true" />;
-}
-
-export function PosEntregaPortal({
-  codigo,
-  projeto,
-  concluido,
-}: {
-  codigo: string;
-  projeto: ProjetoPortalCliente;
-  concluido: boolean;
-}) {
+export function PosEntregaPortal({ projeto }: { projeto: ProjetoPortalCliente }) {
+  const encerramento = projeto.encerramento;
+  const canal = encerramento?.canalSuporte?.trim();
+  const destino = canal ? linkSuporte(canal) : null;
   return (
-    <div className={styles.posEntrega} data-concluido={concluido || undefined}>
-      {concluido && projeto.evolucao ? (
-        <div className={styles.revisaoPortal}>
-          <RevisaoResultadoPortal evolucao={projeto.evolucao} />
+    <aside className={styles.suporte} aria-labelledby="suporte-titulo">
+      <div className={styles.suporteTopo}>
+        <LifeBuoy size={23} aria-hidden="true" />
+        <h2 id="suporte-titulo">Suporte do projeto</h2>
+      </div>
+      {canal ? (
+        <>
+          <p className={styles.canal}>{canal}</p>
+          {destino && (
+            <a
+              className={styles.contato}
+              href={destino}
+              target={destino.startsWith('https:') ? '_blank' : undefined}
+              rel={destino.startsWith('https:') ? 'noreferrer' : undefined}
+            >
+              Falar com o suporte <ArrowUpRight size={17} aria-hidden="true" />
+            </a>
+          )}
+        </>
+      ) : (
+        <p className={styles.canal}>Use o contato combinado com o profissional.</p>
+      )}
+      {projeto.briefing?.responsavelTecnico && (
+        <div className={styles.responsavel}>
+          <UserRound size={18} aria-hidden="true" />
+          <div>
+            <span>Responsável pelo projeto</span>
+            <strong>{projeto.briefing.responsavelTecnico}</strong>
+          </div>
         </div>
-      ) : null}
-
-      <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
-        <header>
+      )}
+      {encerramento && (
+        <details className={styles.garantia}>
+          <summary>
+            <ShieldCheck size={18} aria-hidden="true" />
+            <span>Garantia e continuidade</span>
+            <ChevronDown size={16} aria-hidden="true" />
+          </summary>
           <div>
-            <p>{concluido ? 'Kit final do projeto' : 'Materiais liberados'}</p>
-            <h2 id="arquivos-titulo">
-              {concluido ? 'Tudo que fica com você.' : 'Arquivos do projeto'}
-            </h2>
+            <strong>{formatarGarantia(encerramento)}</strong>
+            <p>Cobre: {encerramento.garantiaCobre}</p>
+            <p>Não cobre: {encerramento.garantiaNaoCobre}</p>
+            <span>Continuidade: {encerramento.responsavelContinuidade}</span>
+            <p>{encerramento.orientacaoContinuidade}</p>
           </div>
-          <span>
-            <ShieldCheck size={14} /> Versões aprovadas para você
-          </span>
-        </header>
-
-        {projeto.arquivos.length ? (
-          <ol>
-            {projeto.arquivos.map((arquivo) => {
-              const tarefa = projeto.tarefas.find((item) => item.id === arquivo.tarefaId);
-              return (
-                <li key={arquivo.id}>
-                  <span className={styles.iconeArquivo}>
-                    <Files size={18} aria-hidden="true" />
-                  </span>
-                  <div>
-                    <small>
-                      {rotuloArquivo(arquivo.mimeType)} · versão {arquivo.versao}
-                    </small>
-                    <strong>{arquivo.titulo}</strong>
-                    {arquivo.descricao && <p>{arquivo.descricao}</p>}
-                    <em>
-                      {formatarTamanho(arquivo.tamanhoBytes)} ·{' '}
-                      {tarefa ? `${tarefa.faseTitulo} · ${tarefa.titulo}` : 'Projeto geral'}
-                    </em>
-                  </div>
-                  <a href={`/portal/${codigo}/arquivos/${arquivo.id}`}>
-                    <Download size={15} /> Baixar
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <div className={styles.vazioArquivo}>
-            <Files size={20} aria-hidden="true" />
-            <p>Os arquivos liberados para download aparecerão aqui.</p>
-          </div>
-        )}
-      </section>
-
-      <section className={styles.linhaTempo} aria-labelledby="linha-tempo-titulo">
-        <header>
-          <div>
-            <p>Linha do tempo</p>
-            <h2 id="linha-tempo-titulo">O que foi decidido.</h2>
-          </div>
-          <span>
-            <History size={14} /> Histórico compartilhado
-          </span>
-        </header>
-
-        {projeto.eventos.length ? (
-          <ol>
-            {projeto.eventos.slice(0, 8).map((evento) => {
-              const tarefa = projeto.tarefas.find((item) => item.id === evento.tarefaId);
-              const mudanca = projeto.mudancasEscopo.find(
-                (item) => item.id === evento.mudancaEscopoId,
-              );
-              return (
-                <li key={evento.id} data-cliente={evento.autor === 'cliente' || undefined}>
-                  <span className={styles.iconeEvento}>
-                    <IconeEvento tipo={evento.tipo} />
-                  </span>
-                  <div>
-                    <strong>{ROTULO_EVENTO[evento.tipo]}</strong>
-                    <small>{tarefa?.titulo ?? mudanca?.titulo ?? 'Projeto geral'}</small>
-                    {evento.comentario && <p>{evento.comentario}</p>}
-                  </div>
-                  <time dateTime={evento.criadoEm}>{formatarMomento(evento.criadoEm)}</time>
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <div className={styles.vazioArquivo}>
-            <History size={20} aria-hidden="true" />
-            <p>Validações e aprovações aparecerão aqui automaticamente.</p>
-          </div>
-        )}
-      </section>
-    </div>
+        </details>
+      )}
+    </aside>
   );
 }

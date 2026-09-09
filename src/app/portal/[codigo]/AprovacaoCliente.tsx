@@ -1,7 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowUpRight, Check, Download, FileCheck2, MessageSquareMore } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Check,
+  ChevronDown,
+  Download,
+  FileCheck2,
+  MessageSquareMore,
+} from 'lucide-react';
 import { decidirEntregaCliente } from '@/lib/portal-cliente/actions';
 import type { ArquivoPortalCliente, TarefaPortalCliente } from '@/lib/portal-cliente/servico';
 import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
@@ -42,7 +49,6 @@ export function AprovacaoCliente({
           <p>{aceiteFinal ? 'Aceite final do projeto' : tarefa.faseTitulo}</p>
           <h3>{tarefa.titulo}</h3>
         </div>
-        <span className={styles.aprovacaoSelo}>Aguardando você</span>
       </div>
 
       <div className={styles.aprovacaoConteudo}>
@@ -63,7 +69,14 @@ export function AprovacaoCliente({
               <p>{tarefa.concluidoQuando}</p>
             </div>
           </div>
-          {tarefa.clienteNota && <blockquote>{tarefa.clienteNota}</blockquote>}
+          {tarefa.clienteNota && (
+            <details className={styles.observacao}>
+              <summary>
+                Observação do profissional <ChevronDown size={15} aria-hidden="true" />
+              </summary>
+              <blockquote>{tarefa.clienteNota}</blockquote>
+            </details>
+          )}
           {tarefa.entregavelUrl && (
             <a href={tarefa.entregavelUrl} target="_blank" rel="noreferrer">
               Abrir entrega <ArrowUpRight size={14} aria-hidden="true" />

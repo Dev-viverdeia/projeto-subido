@@ -311,5 +311,45 @@ export default async function PreviewPortalClientePage({
             }
           : PROJETO;
 
-  return <PortalProjeto codigo={CODIGO} projeto={projeto} />;
+  const exibido: ProjetoPortalCliente =
+    estado === 'manual'
+      ? {
+          ...PROJETO,
+          feitas: 3,
+          encerramento: null,
+          evolucao: null,
+          tarefas: PROJETO.tarefas.map((item, indice) => ({
+            ...item,
+            status: indice < 3 ? 'concluida' : 'pendente',
+            clienteStatus: 'nao_solicitada',
+          })),
+        }
+      : estado === 'vazio'
+        ? {
+            ...PROJETO,
+            status: 'em_execucao',
+            feitas: 0,
+            total: 0,
+            tarefas: [],
+            arquivos: [],
+            eventos: [],
+            encerramento: null,
+            evolucao: null,
+            briefing: null,
+          }
+        : estado === 'muitos'
+          ? {
+              ...PROJETO,
+              titulo:
+                'Atendimento e qualificação de oportunidades para todas as unidades da Clínica Aurora',
+              arquivos: Array.from({ length: 12 }, (_, indice) => ({
+                ...PROJETO.arquivos[0]!,
+                id: `bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb${String(indice).padStart(2, '0')}`,
+                titulo: `Material ${indice + 1} da implementação`,
+                descricao:
+                  'Orientações completas para a equipe, com os procedimentos e os critérios de validação combinados.',
+              })),
+            }
+          : projeto;
+  return <PortalProjeto codigo={CODIGO} projeto={exibido} />;
 }
