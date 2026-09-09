@@ -362,7 +362,7 @@ export function ConversaAtendimento({
                   loading={pendente}
                   iconLeft={<Send size={17} />}
                 >
-                  {pendente ? 'Enviando…' : interna ? 'Salvar nota' : 'Enviar mensagem'}
+                  {pendente ? 'Aguarde…' : interna ? 'Salvar nota' : 'Enviar mensagem'}
                 </Button>
                 {caso.status === 'resolvido' &&
                   !interna &&
