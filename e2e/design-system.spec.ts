@@ -8,7 +8,7 @@ const TELAS = [
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Mateus.'],
   ['/preview/shell', 'Mateus.'],
-  ['/preview/crm', 'Acompanhe cada venda de projeto de IA e saiba o que fazer em seguida.'],
+  ['/preview/crm', 'Acompanhe cada oportunidade e o próximo passo.'],
   ['/preview/metricas', 'Funil de vendas'],
   ['/preview/prospeccao', 'Encontre empresas por segmento e região.'],
   ['/preview/calls', 'Início do projeto'],
@@ -22,7 +22,7 @@ const TELAS = [
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
   ['/preview/entregas', 'Acompanhe a próxima tarefa de cada projeto.'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
-  ['/preview/portal-cliente', 'Projeto concluído.'],
+  ['/preview/portal-cliente', 'Projeto concluído'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],
   ['/preview/certificados', 'Certificados'],
   ['/preview/certificado', 'ChatGPT para o trabalho'],
@@ -238,7 +238,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o portal mantém o encerramento acessível depois do aceite final', async ({ page }) => {
     await page.goto('/preview/portal-cliente');
-    await page.getByText('Resultados', { exact: true }).click();
+    await page.getByText('Resultados e aceite', { exact: true }).click();
 
     const encerramento = page.getByRole('heading', {
       name: 'Resultado, garantia e continuidade.',
@@ -249,8 +249,9 @@ test.describe('fundação visual Viver de IA', () => {
     const revisao = page.getByRole('heading', { name: 'Vamos revisar o resultado.' });
     await revisao.scrollIntoViewIfNeeded();
     await expect(revisao).toBeVisible();
-    await expect(page.getByText('Até 09 de setembro de 2026')).toBeVisible();
-    await expect(page.getByText('suporte@mateussilva.com.br')).toBeVisible();
+    const termo = page.locator('section').filter({ has: encerramento });
+    await expect(termo.getByText('Até 09 de setembro de 2026')).toBeVisible();
+    await expect(termo.getByText('suporte@mateussilva.com.br')).toBeVisible();
   });
 
   test('o pós-call preserva áudio e transcrição como fontes privadas', async ({ page }) => {

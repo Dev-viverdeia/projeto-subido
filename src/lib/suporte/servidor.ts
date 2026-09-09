@@ -65,7 +65,8 @@ export async function listarAtendimentos({
     .select('*', { count: 'exact' })
     .eq('verificado', true);
   if (!equipe) query = query.eq('dono', user.id);
-  if (status) query = query.eq('status', status);
+  if (status === 'pendentes') query = query.in('status', ['recebido', 'em_atendimento']);
+  else if (status) query = query.eq('status', status);
   if (busca) {
     const termo = busca.trim().slice(0, 120);
     query = /^#?\d{1,12}$/.test(termo)
@@ -74,8 +75,12 @@ export async function listarAtendimentos({
   }
   if (equipe && responsavel === 'meus') query = query.eq('responsavel', user.id);
   if (equipe && responsavel === 'sem') query = query.is('responsavel', null);
+  if (equipe && status === 'pendentes')
+    query = query
+      .order('prioridade')
+      .order('aguardando_equipe_desde', { ascending: true, nullsFirst: false });
   const { data, error, count } = await query
-    .order('atualizado_em', { ascending: false })
+    .order('atualizado_em', { ascending: equipe && status === 'pendentes' })
     .range(pagina * 30, pagina * 30 + 29);
   if (error) throw new Error('atendimentos_indisponiveis');
   return { casos: (data ?? []).map((a) => casoSeguro(a, equipe)), total: count ?? 0 };
@@ -96,6 +101,10 @@ export function casoSeguro(a: LinhaCaso, equipe = false): CasoSuporte {
     avaliacao: a.avaliacao,
     lido_usuario_em: a.lido_usuario_em,
     lido_equipe_em: a.lido_equipe_em,
+    ultima_resposta_equipe_em: a.ultima_resposta_equipe_em,
+    ultima_mensagem_cliente_em: a.ultima_mensagem_cliente_em,
+    ultima_mensagem_resumo: a.ultima_mensagem_resumo,
+    aguardando_equipe_desde: a.aguardando_equipe_desde,
     ...(equipe ? { email: a.email } : {}),
   };
 }
@@ -133,6 +142,8 @@ export async function detalheAtendimento(id: string, equipe = false, pagina = 0)
       interna: m.interna,
       criado_em: m.criado_em,
       arquivos: m.suporte_arquivos,
+      nome_autor: m.nome_autor,
+      canal: m.canal as 'plataforma' | 'email',
     })),
   };
 }

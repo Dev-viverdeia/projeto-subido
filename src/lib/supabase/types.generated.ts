@@ -3490,7 +3490,7 @@ export type Database = {
           bytes: number
           caminho: string
           criado_em: string
-          dono: string
+          dono: string | null
           id: string
           mensagem: string | null
           mime: string
@@ -3500,7 +3500,7 @@ export type Database = {
           bytes: number
           caminho: string
           criado_em?: string
-          dono: string
+          dono?: string | null
           id: string
           mensagem?: string | null
           mime: string
@@ -3510,7 +3510,7 @@ export type Database = {
           bytes?: number
           caminho?: string
           criado_em?: string
-          dono?: string
+          dono?: string | null
           id?: string
           mensagem?: string | null
           mime?: string
@@ -3530,14 +3530,17 @@ export type Database = {
         Row: {
           caminho: string
           criado_em: string
+          liberar_em: string
         }
         Insert: {
           caminho: string
           criado_em?: string
+          liberar_em?: string
         }
         Update: {
           caminho?: string
           criado_em?: string
+          liberar_em?: string
         }
         Relationships: []
       }
@@ -3584,6 +3587,7 @@ export type Database = {
         Row: {
           acesso_expira_em: string | null
           acesso_hash: string | null
+          aguardando_equipe_desde: string | null
           assunto: string
           atualizado_em: string
           avaliacao: number | null
@@ -3602,11 +3606,15 @@ export type Database = {
           resolvido_em: string | null
           responsavel: string | null
           status: string
+          ultima_mensagem_cliente_em: string | null
+          ultima_mensagem_resumo: string | null
+          ultima_resposta_equipe_em: string | null
           verificado: boolean
         }
         Insert: {
           acesso_expira_em?: string | null
           acesso_hash?: string | null
+          aguardando_equipe_desde?: string | null
           assunto: string
           atualizado_em?: string
           avaliacao?: number | null
@@ -3625,11 +3633,15 @@ export type Database = {
           resolvido_em?: string | null
           responsavel?: string | null
           status?: string
+          ultima_mensagem_cliente_em?: string | null
+          ultima_mensagem_resumo?: string | null
+          ultima_resposta_equipe_em?: string | null
           verificado?: boolean
         }
         Update: {
           acesso_expira_em?: string | null
           acesso_hash?: string | null
+          aguardando_equipe_desde?: string | null
           assunto?: string
           atualizado_em?: string
           avaliacao?: number | null
@@ -3648,6 +3660,9 @@ export type Database = {
           resolvido_em?: string | null
           responsavel?: string | null
           status?: string
+          ultima_mensagem_cliente_em?: string | null
+          ultima_mensagem_resumo?: string | null
+          ultima_resposta_equipe_em?: string | null
           verificado?: boolean
         }
         Relationships: [
@@ -3683,6 +3698,81 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "suporte_artigos"
             referencedColumns: ["slug"]
+          },
+        ]
+      }
+      suporte_configuracao: {
+        Row: {
+          atualizado_em: string
+          aviso: string
+          horario: string
+          id: boolean
+          meta_horas: number
+        }
+        Insert: {
+          atualizado_em?: string
+          aviso?: string
+          horario?: string
+          id?: boolean
+          meta_horas?: number
+        }
+        Update: {
+          atualizado_em?: string
+          aviso?: string
+          horario?: string
+          id?: boolean
+          meta_horas?: number
+        }
+        Relationships: []
+      }
+      suporte_email_recebidos: {
+        Row: {
+          atendimento: string | null
+          atualizado_em: string
+          criado_em: string
+          estado: string
+          id: string
+          mensagem: string | null
+          message_id: string | null
+          motivo: string | null
+          tentativas: number
+        }
+        Insert: {
+          atendimento?: string | null
+          atualizado_em?: string
+          criado_em?: string
+          estado?: string
+          id: string
+          mensagem?: string | null
+          message_id?: string | null
+          motivo?: string | null
+          tentativas?: number
+        }
+        Update: {
+          atendimento?: string | null
+          atualizado_em?: string
+          criado_em?: string
+          estado?: string
+          id?: string
+          mensagem?: string | null
+          message_id?: string | null
+          motivo?: string | null
+          tentativas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_email_recebidos_atendimento_fkey"
+            columns: ["atendimento"]
+            isOneToOne: false
+            referencedRelation: "suporte_atendimentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suporte_email_recebidos_mensagem_fkey"
+            columns: ["mensagem"]
+            isOneToOne: true
+            referencedRelation: "suporte_mensagens"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3767,28 +3857,37 @@ export type Database = {
         Row: {
           atendimento: string
           autor: string | null
+          canal: string
           criado_em: string
           id: string
           interna: boolean
+          nome_autor: string | null
           papel: string
+          resultado: string | null
           texto: string
         }
         Insert: {
           atendimento: string
           autor?: string | null
+          canal?: string
           criado_em?: string
           id?: string
           interna?: boolean
+          nome_autor?: string | null
           papel: string
+          resultado?: string | null
           texto: string
         }
         Update: {
           atendimento?: string
           autor?: string | null
+          canal?: string
           criado_em?: string
           id?: string
           interna?: boolean
+          nome_autor?: string | null
           papel?: string
+          resultado?: string | null
           texto?: string
         }
         Relationships: [
@@ -3847,6 +3946,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "suporte_notificacoes_atendimento_fkey"
+            columns: ["atendimento"]
+            isOneToOne: false
+            referencedRelation: "suporte_atendimentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suporte_transicoes: {
+        Row: {
+          anterior: string
+          atendimento: string
+          atual: string
+          criado_em: string
+          id: number
+        }
+        Insert: {
+          anterior: string
+          atendimento: string
+          atual: string
+          criado_em?: string
+          id?: never
+        }
+        Update: {
+          anterior?: string
+          atendimento?: string
+          atual?: string
+          criado_em?: string
+          id?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_transicoes_atendimento_fkey"
             columns: ["atendimento"]
             isOneToOne: false
             referencedRelation: "suporte_atendimentos"
@@ -4631,6 +4762,7 @@ export type Database = {
         }
         Returns: Json
       }
+      suporte_assumir: { Args: { p_id: string }; Returns: undefined }
       suporte_atualizar: {
         Args: {
           p_atribuir?: boolean
@@ -4657,11 +4789,60 @@ export type Database = {
         }
         Returns: string
       }
+      suporte_email_incorporar: {
+        Args: {
+          p_anexos?: Json
+          p_atendimento: string
+          p_email: string
+          p_message_id: string
+          p_remetente: string
+          p_texto: string
+        }
+        Returns: string
+      }
+      suporte_email_novo: {
+        Args: {
+          p_anexos?: Json
+          p_assunto: string
+          p_email: string
+          p_hash: string
+          p_message_id: string
+          p_remetente: string
+          p_texto: string
+          p_url: string
+        }
+        Returns: string
+      }
+      suporte_email_reservar: {
+        Args: never
+        Returns: {
+          atendimento: string | null
+          atualizado_em: string
+          criado_em: string
+          estado: string
+          id: string
+          mensagem: string | null
+          message_id: string | null
+          motivo: string | null
+          tentativas: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "suporte_email_recebidos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      suporte_indicadores: { Args: never; Returns: Json }
       suporte_limitar: {
         Args: { p_chave: string; p_limite: number; p_segundos: number }
         Returns: boolean
       }
       suporte_marcar_lido: { Args: { p_id: string }; Returns: undefined }
+      suporte_marcar_visto: {
+        Args: { p_id: string; p_mensagem: string }
+        Returns: undefined
+      }
       suporte_notificacoes_reservar: {
         Args: never
         Returns: {
@@ -4721,6 +4902,17 @@ export type Database = {
           p_atendimento: string
           p_id: string
           p_interna?: boolean
+          p_texto: string
+        }
+        Returns: string
+      }
+      suporte_responder_v2: {
+        Args: {
+          p_anexos?: string[]
+          p_atendimento: string
+          p_id: string
+          p_interna?: boolean
+          p_resultado?: string
           p_texto: string
         }
         Returns: string

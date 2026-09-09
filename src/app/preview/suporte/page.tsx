@@ -3,6 +3,7 @@ import { CentralAjuda } from '@/components/suporte/CentralAjuda';
 import { NovoAtendimento } from '@/components/suporte/NovoAtendimento';
 import { ConversaAtendimento } from '@/components/suporte/ConversaAtendimento';
 import { ChatAjuda } from '@/components/suporte/ChatAjuda';
+import { ListaAtendimentos } from '@/components/suporte/ListaAtendimentos';
 import { GUIAS_INICIAIS } from '@/lib/suporte/guias-iniciais';
 import type { CasoSuporte } from '@/lib/suporte/contrato';
 import s from '@/components/suporte/suporte.module.css';
@@ -20,6 +21,9 @@ const caso: CasoSuporte = {
   pagina: null,
   lido_equipe_em: null,
   lido_usuario_em: null,
+  ultima_resposta_equipe_em: '2026-09-08T14:00:00Z',
+  ultima_mensagem_resumo: 'Vamos conferir juntos. Apareceu algum aviso na sua conta?',
+  aguardando_equipe_desde: '2026-09-08T13:00:00Z',
 };
 export default async function PreviewSuporte({ searchParams }: PageProps<'/preview/suporte'>) {
   if (process.env.NODE_ENV === 'production') notFound();
@@ -28,10 +32,24 @@ export default async function PreviewSuporte({ searchParams }: PageProps<'/previ
     <main className={s.publico}>
       {tela === 'pedido' ? (
         <NovoAtendimento publico />
-      ) : tela === 'conversa' ? (
+      ) : tela === 'pedido-cliente' ? (
+        <NovoAtendimento usuario="exemplo" artigos={GUIAS_INICIAIS} />
+      ) : tela === 'fila' ? (
+        <div className={s.pagina}>
+          <h1 className={s.titulo}>Painel de suporte</h1>
+          <ListaAtendimentos
+            casos={[{ ...caso, status: 'em_atendimento', email: 'cliente@example.test' }]}
+            equipe
+            total={1}
+            pagina={0}
+            status="pendentes"
+          />
+        </div>
+      ) : tela === 'conversa' || tela === 'equipe' ? (
         <ConversaAtendimento
           caso={caso}
           preview
+          equipe={tela === 'equipe'}
           mensagens={[
             {
               id: '1',
@@ -55,7 +73,11 @@ export default async function PreviewSuporte({ searchParams }: PageProps<'/previ
       ) : tela === 'ia' ? (
         <ChatAjuda artigos={GUIAS_INICIAIS} />
       ) : (
-        <CentralAjuda artigos={GUIAS_INICIAIS} />
+        <CentralAjuda
+          artigos={GUIAS_INICIAIS}
+          autenticado={tela === 'cliente'}
+          atendimentos={tela === 'cliente' ? [caso] : []}
+        />
       )}
     </main>
   );

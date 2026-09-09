@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Quadro de vendas', () => {
   test('separa ganho e perda e preserva o motivo no card', async ({ page }, testInfo) => {
+    // Quatro colunas cabem no desktop largo; notebooks usam as mesmas abas do quadro compacto.
+    if (testInfo.project.name !== 'mobile')
+      await page.setViewportSize({ width: 1920, height: 1080 });
     const erros: string[] = [];
     page.on('pageerror', (erro) => erros.push(erro.message));
     await page.goto('/preview/crm');

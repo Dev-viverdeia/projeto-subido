@@ -18,9 +18,17 @@ const novo = (): Artigo => ({
   publicado: false,
   atualizado_em: new Date().toISOString(),
 });
-export function EditorGuias({ artigos }: { artigos: Artigo[] }) {
-  const [artigo, setArtigo] = useState<Artigo>(artigos[0] ?? novo());
-  const [novoGuia, setNovoGuia] = useState(!artigos.length);
+export function EditorGuias({
+  artigos,
+  categoriaInicial,
+}: {
+  artigos: Artigo[];
+  categoriaInicial?: Artigo['categoria'];
+}) {
+  const [artigo, setArtigo] = useState<Artigo>(
+    categoriaInicial ? { ...novo(), categoria: categoriaInicial } : (artigos[0] ?? novo()),
+  );
+  const [novoGuia, setNovoGuia] = useState(!!categoriaInicial || !artigos.length);
   const [passos, setPassos] = useState(artigo.passos.join('\n'));
   const [retorno, setRetorno] = useState('');
   const [pendente, iniciar] = useTransition();

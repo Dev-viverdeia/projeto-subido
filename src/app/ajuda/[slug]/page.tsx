@@ -2,6 +2,9 @@ import { LinkAcao } from '@/components/suporte/LinkAcao';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import pedirAjuda from '../../../../public/ajuda/pedir-ajuda.png';
+import acompanharResposta from '../../../../public/ajuda/acompanhar-resposta.png';
 import { ArrowLeft, Info } from 'lucide-react';
 import { artigosSuporte, usuarioSuporte } from '@/lib/suporte/servidor';
 import { CATEGORIAS } from '@/lib/suporte/contrato';
@@ -33,7 +36,23 @@ export default async function GuiaPage({ params }: PageProps<'/ajuda/[slug]'>) {
           {a.passos.map((passo, i) => (
             <li key={i} className={s.passo}>
               <span aria-hidden="true">{i + 1}</span>
-              <p>{passo}</p>
+              <div className={s.conteudoPasso}>
+                <p>{passo}</p>
+                {a.slug === 'pedir-e-acompanhar-ajuda' && i < 2 && (
+                  <figure className={s.capturaGuia}>
+                    <Image
+                      src={i === 0 ? pedirAjuda : acompanharResposta}
+                      alt={
+                        i === 0
+                          ? 'Formulário com assunto, descrição e opção de anexar um arquivo.'
+                          : 'Conversa com a pergunta do cliente e a resposta da equipe.'
+                      }
+                      sizes="(max-width: 767px) 85vw, 650px"
+                    />
+                    <figcaption>Exemplo na plataforma, com dados demonstrativos.</figcaption>
+                  </figure>
+                )}
+              </div>
             </li>
           ))}
         </ol>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { detalheAtendimento } from '@/lib/suporte/servidor';
+import { detalheAtendimento, usuarioSuporte } from '@/lib/suporte/servidor';
 import { ConversaAtendimento } from '@/components/suporte/ConversaAtendimento';
 import { paginaHistorico } from '@/lib/suporte/contrato';
 export const metadata = { title: 'Atender pedido' };
@@ -19,5 +19,6 @@ export default async function AtenderPage({
   if (!detalhe) notFound();
   const db = await createClient();
   const { data: agentes } = await db.from('suporte_agentes').select('usuario,nome,notificar');
-  return <ConversaAtendimento {...detalhe} agentes={agentes ?? []} equipe />;
+  const user = await usuarioSuporte();
+  return <ConversaAtendimento {...detalhe} usuario={user?.id} agentes={agentes ?? []} equipe />;
 }

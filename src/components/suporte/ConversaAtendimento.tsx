@@ -3,13 +3,14 @@ import { LinkAcao } from '@/components/suporte/LinkAcao';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Download, RefreshCw, Send } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Send } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import {
   atualizarAtendimento,
   marcarLido,
   responderAtendimento,
   responderPublico,
+  prepararRespostaSuporte,
 } from '@/lib/suporte/actions';
 import {
   CATEGORIAS,
@@ -24,6 +25,9 @@ import { EstadoAtendimento } from './ListaAtendimentos';
 import { AnexosSuporte } from './AnexosSuporte';
 import { DetalhesAtendimento } from './DetalhesAtendimento';
 import s from './suporte.module.css';
+import { useRascunho } from './useRascunho';
+import { MensagemAtendimento } from './MensagemAtendimento';
+import { SugestaoResposta } from './SugestaoResposta';
 
 export function ConversaAtendimento({
   caso,
@@ -34,6 +38,8 @@ export function ConversaAtendimento({
   preview = false,
   pagina = 0,
   totalMensagens = mensagens.length,
+  usuario = 'publico',
+  novo = false,
 }: {
   caso: CasoSuporte;
   mensagens: MensagemSuporte[];
@@ -43,24 +49,44 @@ export function ConversaAtendimento({
   preview?: boolean;
   pagina?: number;
   totalMensagens?: number;
+  usuario?: string;
+  novo?: boolean;
 }) {
   const router = useRouter();
-  const [texto, setTexto] = useState('');
   const [interna, setInterna] = useState(false);
+  const [rascunho, salvarRascunho] = useRascunho(
+    `suporte-rascunho:${usuario}:${caso.id}:${interna ? 'nota' : 'resposta'}`,
+  );
+  const [textos, setTextos] = useState<{ nota?: string; resposta?: string }>({});
+  const modo = interna ? 'nota' : 'resposta';
+  const texto = textos[modo] ?? rascunho;
+  const setTexto = (t: string) => {
+    setTextos((v) => ({ ...v, [modo]: t }));
+    salvarRascunho(t);
+    mensagemId.current = '';
+  };
+  const [sugestao, setSugestao] = useState<{ texto: string; fontes: string[] } | null>(null);
+  const [preparando, preparar] = useTransition();
+  const [resultado, setResultado] = useState<'em_atendimento' | 'aguardando_voce' | 'resolvido'>(
+    'em_atendimento',
+  );
   const [arquivos, setArquivos] = useState<ArquivoSuporte[]>([]);
   const [upload, setUpload] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
   const [pendente, iniciar] = useTransition();
   const mensagemId = useRef('');
+  const ultimaRecebida = mensagens.findLast(
+    (m) => !m.interna && m.papel === (equipe ? 'usuario' : 'equipe'),
+  )?.id;
   useEffect(() => {
     if (preview || pagina > 0) return;
-    if (!publico) void marcarLido(caso.id);
+    if (!publico && ultimaRecebida) void marcarLido(caso.id, ultimaRecebida);
     const timer = setInterval(() => {
       if (document.visibilityState === 'visible' && !pendente && !upload) router.refresh();
     }, 30_000);
     return () => clearInterval(timer);
-  }, [caso.id, caso.atualizado_em, router, publico, preview, pendente, upload, pagina]);
+  }, [caso.id, ultimaRecebida, router, publico, preview, pendente, upload, pagina]);
   const caminho = publico
     ? `/ajuda/atendimento/${caso.id}`
     : equipe
@@ -121,6 +147,7 @@ export function ConversaAtendimento({
           texto,
           interna,
           anexos: arquivos.map((a) => a.id),
+          resultado: equipe ? resultado : 'em_atendimento',
         };
         const result = publico
           ? await responderPublico(pedido)
@@ -138,6 +165,10 @@ export function ConversaAtendimento({
         setErro('A conexão falhou. Sua mensagem continua aqui para tentar novamente.');
       }
     });
+  }
+  function alternarModo(nota: boolean) {
+    setInterna(nota);
+    mensagemId.current = '';
   }
   return (
     <div className={s.pagina}>
@@ -167,6 +198,12 @@ export function ConversaAtendimento({
           </Button>
         </div>
       </header>
+      {novo && (
+        <div className={s.avisoResposta} role="status">
+          <strong>Pedido recebido · #{caso.numero}</strong>
+          <span>A resposta fica nesta conversa. Você também recebe um aviso por e-mail.</span>
+        </div>
+      )}
       <div className={s.conversa}>
         <div className={s.mensagens}>
           {totalMensagens > MENSAGENS_POR_PAGINA && (
@@ -189,56 +226,15 @@ export function ConversaAtendimento({
             </nav>
           )}
           <div className={s.mensagens} aria-label="Mensagens do atendimento">
-            {mensagens.map((m) =>
-              m.papel === 'sistema' ? (
-                <p className={s.sistema} key={m.id}>
-                  {m.texto}
-                </p>
-              ) : (
-                <article
-                  key={m.id}
-                  className={s.mensagem}
-                  data-papel={m.papel}
-                  data-interna={m.interna}
-                >
-                  <div className={s.acoes}>
-                    <span className={s.meta}>
-                      {m.interna
-                        ? 'Nota interna · só a equipe vê'
-                        : m.papel === 'equipe'
-                          ? 'Equipe Subido'
-                          : equipe
-                            ? 'Usuário'
-                            : 'Você'}
-                    </span>
-                    <time className={s.meta} dateTime={m.criado_em}>
-                      {new Date(m.criado_em).toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        timeZone: 'America/Sao_Paulo',
-                      })}
-                    </time>
-                  </div>
-                  <p>{m.texto}</p>
-                  {m.arquivos.length > 0 && (
-                    <div className={s.anexos}>
-                      {m.arquivos.map((a) => (
-                        <a
-                          className={s.arquivo}
-                          key={a.id}
-                          href={`/api/suporte/anexos/${a.id}${publico ? `?atendimento=${caso.id}` : ''}`}
-                        >
-                          <Download size={16} />
-                          <span>{a.nome}</span>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </article>
-              ),
-            )}
+            {mensagens.map((m) => (
+              <MensagemAtendimento
+                key={m.id}
+                mensagem={m}
+                equipe={equipe}
+                publico={publico}
+                atendimento={caso.id}
+              />
+            ))}
           </div>
           {pagina === 0 ? (
             <form
@@ -248,13 +244,72 @@ export function ConversaAtendimento({
                 enviar();
               }}
             >
+              {equipe && (
+                <div className={s.modoResposta} role="group" aria-label="Tipo de mensagem">
+                  <button
+                    type="button"
+                    aria-pressed={!interna}
+                    disabled={pendente || upload || arquivos.length > 0}
+                    onClick={() => alternarModo(false)}
+                  >
+                    Responder ao cliente
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={interna}
+                    disabled={pendente || upload || arquivos.length > 0}
+                    onClick={() => alternarModo(true)}
+                  >
+                    Nota interna
+                  </button>
+                </div>
+              )}
+              {interna && <p className={s.meta}>Só a equipe vê. Não envia e-mail ao cliente.</p>}
+              {equipe && !interna && (
+                <Button
+                  variant="secondary"
+                  type="button"
+                  loading={preparando}
+                  disabled={pendente || preview}
+                  onClick={() =>
+                    preparar(async () => {
+                      setErro('');
+                      try {
+                        const r = await prepararRespostaSuporte(caso.id);
+                        if (r.ok) setSugestao(r.sugestao);
+                        else setErro(r.erro);
+                      } catch {
+                        setErro(
+                          'Não foi possível preparar a sugestão. Você pode responder normalmente.',
+                        );
+                      }
+                    })
+                  }
+                >
+                  Preparar sugestão com IA
+                </Button>
+              )}
+              {sugestao && !interna && (
+                <SugestaoResposta
+                  sugestao={sugestao}
+                  ocupado={!!texto.trim()}
+                  usar={() => {
+                    setTexto(sugestao.texto);
+                    setSugestao(null);
+                  }}
+                  descartar={() => setSugestao(null)}
+                />
+              )}
               <label className={s.campo}>
-                {interna
-                  ? 'Nota interna'
-                  : caso.status === 'resolvido'
-                    ? 'Precisa de mais ajuda?'
-                    : 'Sua mensagem'}
+                <span id="suporte-rotulo-mensagem">
+                  {interna
+                    ? 'Nota interna'
+                    : caso.status === 'resolvido'
+                      ? 'Precisa de mais ajuda?'
+                      : 'Sua mensagem'}
+                </span>
                 <textarea
+                  aria-labelledby="suporte-rotulo-mensagem"
                   className={s.textarea}
                   value={texto}
                   onChange={(e) => setTexto(e.target.value)}
@@ -266,15 +321,19 @@ export function ConversaAtendimento({
                   disabled={pendente}
                 />
               </label>
-              {equipe && (
-                <label className={s.checkbox}>
-                  <input
-                    type="checkbox"
-                    checked={interna}
-                    disabled={pendente || upload}
-                    onChange={(e) => setInterna(e.target.checked)}
-                  />
-                  Nota interna, visível apenas à equipe
+              {equipe && !interna && (
+                <label className={s.campo}>
+                  Depois de responder
+                  <select
+                    className={s.select}
+                    value={resultado}
+                    disabled={pendente}
+                    onChange={(e) => setResultado(e.target.value as typeof resultado)}
+                  >
+                    <option value="em_atendimento">Continuar em atendimento</option>
+                    <option value="aguardando_voce">Aguardar resposta do cliente</option>
+                    <option value="resolvido">Marcar como resolvido</option>
+                  </select>
                 </label>
               )}
               {!publico && !preview && (
@@ -294,9 +353,11 @@ export function ConversaAtendimento({
                 >
                   {interna ? 'Salvar nota' : 'Enviar mensagem'}
                 </Button>
-                {caso.status === 'resolvido' && !interna && (
-                  <span className={s.meta}>Enviar uma mensagem reabre o atendimento.</span>
-                )}
+                {caso.status === 'resolvido' &&
+                  !interna &&
+                  (!equipe || resultado !== 'resolvido') && (
+                    <span className={s.meta}>Enviar uma mensagem reabre o atendimento.</span>
+                  )}
               </div>
               <span className={s.meta}>Não compartilhe senhas ou códigos de acesso.</span>
             </form>

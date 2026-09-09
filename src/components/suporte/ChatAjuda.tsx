@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowUp, BookOpen, MessageCircle } from 'lucide-react';
 import { Button } from '@/design-system/via';
-import { RespostaAjudaSchema, ErroSuporteSchema, type Artigo } from '@/lib/suporte/contrato';
+import {
+  RespostaAjudaSchema,
+  ErroSuporteSchema,
+  resumoTransferencia,
+  type Artigo,
+} from '@/lib/suporte/contrato';
 import { CHAVE_RASCUNHO_SUPORTE } from './NovoAtendimento';
 import { TextoAjuda } from './TextoAjuda';
 import s from './suporte.module.css';
@@ -62,14 +67,7 @@ export function ChatAjuda({
     }
   }
   function pedirAjuda() {
-    const resumo = [
-      ...mensagens
-        .slice(-6)
-        .map((m) => `${m.papel === 'ia' ? 'IA de ajuda' : 'Minha dúvida'}: ${m.texto}`),
-      ...(texto.trim() ? [`Minha dúvida: ${texto}`] : []),
-    ]
-      .join('\n\n')
-      .slice(0, 6000);
+    const resumo = resumoTransferencia(mensagens, texto);
     try {
       sessionStorage.setItem(CHAVE_RASCUNHO_SUPORTE, resumo);
     } catch {

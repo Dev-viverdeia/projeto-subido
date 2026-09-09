@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
   send: vi.fn(),
   config: vi.fn(),
+  receber: vi.fn(),
 }));
 vi.mock('server-only', () => ({}));
 vi.mock('node:timers/promises', () => ({ setTimeout: vi.fn(), default: { setTimeout: vi.fn() } }));
@@ -13,6 +14,7 @@ vi.mock('./servidor', () => ({ criarSistemaSuporte: () => mocks }));
 vi.mock('@/lib/env', () => ({
   env: { NEXT_PUBLIC_SITE_URL: 'https://subido.example' },
   resendEnv: mocks.config,
+  suporteEmailEnv: mocks.receber,
 }));
 vi.mock('resend', () => ({
   Resend: class {
@@ -25,6 +27,9 @@ const id = 'ce3902ad-83c7-4a2d-95fe-c964b40c121a';
 function banco() {
   const q = {
     select: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
     eq: vi.fn().mockReturnThis(),
     neq: vi.fn().mockReturnThis(),
     in: vi.fn().mockReturnThis(),
@@ -43,6 +48,7 @@ function evento(type: string, tags: Record<string, string> = { suporte_id: id })
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.config.mockReturnValue({ chave: 'teste', remetente: 'Subido <suporte@example.test>' });
+  mocks.receber.mockReturnValue(null);
   mocks.rpc.mockResolvedValue({
     data: [{ id, atendimento: id, tipo: 'usuario', destinatario: 'cliente@example.test' }],
     error: null,
@@ -69,6 +75,48 @@ describe('notificações do suporte', () => {
     mocks.send.mockResolvedValue({ data: null, error: { message: 'rate limit' } });
     expect(await processarNotificacoesSuporte()).toEqual({ enviadas: 0, falhas: 1 });
     expect(q.update).toHaveBeenCalledWith(expect.objectContaining({ estado: 'falhou' }));
+  });
+  it('inclui somente resposta pública, Reply-To opaco e encadeamento seguro', async () => {
+    const q = banco();
+    mocks.receber.mockReturnValue({ dominio: 'ajuda.subido.example', chave: 'a'.repeat(48) });
+    mocks.rpc.mockResolvedValue({
+      data: [
+        { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
+      ],
+      error: null,
+    });
+    q.maybeSingle
+      .mockResolvedValueOnce({
+        data: { texto: 'Mensagem da equipe <script>', papel: 'equipe', interna: false },
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: { message_id: '<anterior@example.test>' }, error: null });
+    await processarNotificacoesSuporte();
+    const enviado = mocks.send.mock.calls[0]![0] as {
+      replyTo: string;
+      text: string;
+      html: string;
+      headers: Record<string, string>;
+    };
+    expect(enviado.replyTo).toMatch(/^r-.*@ajuda\.subido\.example$/);
+    expect(enviado.text).toContain('Mensagem da equipe');
+    expect(enviado.html).toContain('&lt;script&gt;');
+    expect(enviado.headers['In-Reply-To']).toBe('<anterior@example.test>');
+  });
+  it('nunca inclui nota interna na notificação', async () => {
+    const q = banco();
+    mocks.rpc.mockResolvedValue({
+      data: [
+        { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
+      ],
+      error: null,
+    });
+    q.maybeSingle.mockResolvedValue({
+      data: { texto: 'SEGREDO INTERNO', papel: 'equipe', interna: true },
+      error: null,
+    });
+    await processarNotificacoesSuporte();
+    expect(JSON.stringify(mocks.send.mock.calls)).not.toContain('SEGREDO INTERNO');
   });
   it('rejeita link de confirmação que saia do domínio', async () => {
     banco();

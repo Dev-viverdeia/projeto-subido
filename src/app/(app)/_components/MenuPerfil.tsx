@@ -221,7 +221,18 @@ export function MenuPerfil({
           </div>
 
           <div className={styles.rodape}>
-            <form action={sair}>
+            <form
+              action={sair}
+              onSubmit={() => {
+                try {
+                  for (const key of Object.keys(sessionStorage))
+                    if (key.startsWith('suporte-rascunho:') || key === 'subido-pedido-ajuda')
+                      sessionStorage.removeItem(key);
+                } catch {
+                  /* Logout continua mesmo sem storage. */
+                }
+              }}
+            >
               <button type="submit" role="menuitem" className={styles.sair}>
                 <LogOut size={16} strokeWidth={1.8} aria-hidden="true" />
                 Encerrar sessão

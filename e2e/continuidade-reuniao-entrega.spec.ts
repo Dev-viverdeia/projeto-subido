@@ -7,17 +7,21 @@ test('a data da prévia permanece igual em navegadores com fusos distintos', asy
   isMobile,
 }) => {
   for (const timezoneId of ['UTC', 'Asia/Tokyo']) {
-    const contexto = await browser.newContext({ baseURL, timezoneId });
+    const contexto = await browser.newContext({
+      baseURL,
+      timezoneId,
+      viewport: isMobile ? { width: 390, height: 844 } : { width: 1920, height: 1080 },
+    });
     try {
       const page = await contexto.newPage();
       const erros: string[] = [];
       page.on('pageerror', (erro) => erros.push(erro.message));
       await page.goto('/preview/proposta-editor?estado=aceita');
-      if (isMobile) await page.getByRole('tab', { name: 'Prévia em tempo real' }).click();
+      if (isMobile) await page.getByRole('button', { name: 'Ver prévia' }).click();
       await expect(page.getByText('05 de setembro de 2026', { exact: true })).toBeVisible();
-      if (isMobile) await page.getByRole('tab', { name: 'Editar', exact: true }).click();
-      await page.getByLabel('Título interno da proposta').fill('Referência preservada');
-      if (isMobile) await page.getByRole('tab', { name: 'Prévia em tempo real' }).click();
+      if (isMobile) await page.getByRole('button', { name: 'Editar', exact: true }).click();
+      await page.getByLabel('Nome da proposta').fill('Referência preservada');
+      if (isMobile) await page.getByRole('button', { name: 'Ver prévia' }).click();
       await expect(page.getByText('05 de setembro de 2026', { exact: true })).toBeVisible();
       expect(erros).toEqual([]);
     } finally {
@@ -60,7 +64,7 @@ test('proposta aceita mostra a entrega antes do editor, inclusive no celular', a
   await expect(abrir).toHaveAttribute('href', '/entregas/55555555-5555-4555-8555-555555555555');
   await expect(page.getByRole('link', { name: /Abrir entrega/ })).toHaveCount(1);
   const superficie = await continuidade.boundingBox();
-  const editor = await page.getByLabel('Título interno da proposta').boundingBox();
+  const editor = await page.getByLabel('Nome da proposta').boundingBox();
   expect(superficie!.y).toBeLessThan(editor!.y);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const auditoria = await new AxeBuilder({ page }).analyze();

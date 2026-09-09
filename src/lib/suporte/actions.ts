@@ -4,7 +4,16 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { ehAdmin } from '@/lib/auth/papeis';
-import { usuarioSuporte, equipeSuporte, acessoPublico, criarSistemaSuporte } from './servidor';
+import {
+  usuarioSuporte,
+  equipeSuporte,
+  acessoPublico,
+  criarSistemaSuporte,
+  artigosSuporte,
+  detalheAtendimento,
+  limitarSuporte,
+} from './servidor';
+import { responderAjuda } from './ia';
 import {
   ArtigoSchema,
   CriarSchema,
@@ -57,12 +66,13 @@ export async function responderAtendimento(entrada: unknown): Promise<ResultadoS
   if (!(await usuarioSuporte()))
     return falha('Sua sessão terminou. Entre novamente antes de enviar.');
   const db = await createClient();
-  const { error } = await db.rpc('suporte_responder', {
+  const { error } = await db.rpc('suporte_responder_v2', {
     p_id: p.data.id,
     p_atendimento: p.data.atendimento,
     p_texto: p.data.texto,
     p_interna: p.data.interna,
     p_anexos: p.data.anexos,
+    p_resultado: p.data.resultado,
   });
   if (error) return falha();
   atualizar(p.data.atendimento);
@@ -93,10 +103,15 @@ export async function atualizarAtendimento(entrada: unknown): Promise<ResultadoS
   atualizar(p.data.id);
   return { ok: true };
 }
-export async function marcarLido(id: string): Promise<void> {
-  if (!z.uuid().safeParse(id).success || !(await usuarioSuporte())) return;
+export async function marcarLido(id: string, mensagem: string): Promise<void> {
+  if (
+    !z.uuid().safeParse(id).success ||
+    !z.uuid().safeParse(mensagem).success ||
+    !(await usuarioSuporte())
+  )
+    return;
   const db = await createClient();
-  await db.rpc('suporte_marcar_lido', { p_id: id });
+  await db.rpc('suporte_marcar_visto', { p_id: id, p_mensagem: mensagem });
 }
 export async function avaliarGuia(slug: string, util: boolean): Promise<ResultadoSuporte> {
   if (!(await usuarioSuporte())) return falha('Entre na conta para avaliar o guia.');
@@ -180,7 +195,36 @@ export async function assumirAtendimento(id: string): Promise<ResultadoSuporte> 
     .eq('usuario', user.id)
     .maybeSingle();
   if (!data) return falha('Adicione sua conta à equipe antes de assumir o atendimento.');
-  return atualizarAtendimento({ id, responsavel: user.id, status: 'em_atendimento' });
+  const { error } = await db.rpc('suporte_assumir', { p_id: id });
+  if (error)
+    return falha(
+      error.message === 'ja_atribuido'
+        ? 'Outra pessoa já assumiu. Atualize a conversa antes de transferir.'
+        : undefined,
+    );
+  atualizar(id);
+  return { ok: true };
+}
+
+export async function salvarConfiguracaoSuporte(entrada: unknown): Promise<ResultadoSuporte> {
+  if (!(await ehAdmin())) return falha('Somente administradores podem configurar o suporte.');
+  const p = z
+    .object({
+      horario: z.string().trim().max(180),
+      aviso: z.string().trim().max(300),
+      meta_horas: z.number().int().min(1).max(168),
+    })
+    .safeParse(entrada);
+  if (!p.success) return falha('Confira o horário, o aviso e a meta.');
+  const db = await createClient();
+  const { error } = await db
+    .from('suporte_configuracao')
+    .update({ ...p.data, atualizado_em: new Date().toISOString() })
+    .eq('id', true);
+  if (error) return falha();
+  atualizar();
+  revalidatePath('/ajuda');
+  return { ok: true };
 }
 
 export async function adicionarAgente(email: string): Promise<ResultadoSuporte> {
@@ -197,4 +241,47 @@ export async function adicionarAgente(email: string): Promise<ResultadoSuporte> 
     nome: data.nome || data.email?.split('@')[0] || 'Atendente',
     notificar: true,
   });
+}
+
+export async function prepararRespostaSuporte(
+  id: string,
+): Promise<
+  { ok: true; sugestao: { texto: string; fontes: string[] } } | { ok: false; erro: string }
+> {
+  const user = await usuarioSuporte();
+  if (!user || !z.uuid().safeParse(id).success || !(await equipeSuporte()))
+    return { ok: false, erro: 'Acesso indisponível.' };
+  if (!(await limitarSuporte(user.id, 'sugestao-equipe', 20, 3600)))
+    return { ok: false, erro: 'Limite de sugestões atingido. Você pode responder normalmente.' };
+  const caso = await detalheAtendimento(id, true);
+  const ultima = caso?.mensagens.filter((m) => !m.interna && m.papel === 'usuario').at(-1);
+  if (!ultima)
+    return { ok: false, erro: 'Ainda não há uma pergunta do cliente para orientar a sugestão.' };
+  const { resposta } = await responderAjuda(ultima.texto, [], await artigosSuporte());
+  return { ok: true, sugestao: { texto: resposta.resposta, fontes: resposta.fontes } };
+}
+
+export async function revisarEmailSuporte(
+  id: string,
+  acao: 'reprocessar' | 'ignorar',
+): Promise<ResultadoSuporte> {
+  if (
+    !z.uuid().safeParse(id).success ||
+    !['reprocessar', 'ignorar'].includes(acao) ||
+    !(await equipeSuporte())
+  )
+    return falha('Acesso indisponível.');
+  const { error } = await criarSistemaSuporte()
+    .from('suporte_email_recebidos')
+    .update({
+      estado: acao === 'reprocessar' ? 'pendente' : 'ignorado',
+      tentativas: 0,
+      motivo: acao === 'ignorar' ? 'Ignorado pela equipe.' : null,
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .in('estado', ['falhou', 'revisao']);
+  if (error) return falha();
+  atualizar();
+  return { ok: true };
 }
