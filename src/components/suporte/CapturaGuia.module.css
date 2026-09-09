@@ -1,0 +1,99 @@
+.figura {
+  margin: 0;
+  min-width: 0;
+}
+.miniatura {
+  display: grid;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-glass-card-shadow);
+  cursor: zoom-in;
+  color: var(--via-text);
+  font: inherit;
+}
+.miniatura img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.miniatura > span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--app-elev-1-line);
+  font-size: var(--app-fs-support);
+}
+.miniatura:hover {
+  border-color: var(--via-border);
+}
+.miniatura:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
+}
+.figura figcaption {
+  margin-top: 10px;
+  font-size: var(--app-fs-meta);
+  color: var(--via-text-soft);
+}
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.barra p {
+  margin: 0;
+  flex: 1 1 280px;
+  font-size: var(--app-fs-ui);
+  color: var(--via-text-soft);
+}
+.zoom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: var(--app-elev-1-bg);
+  color: var(--via-text);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  font: inherit;
+  font-size: var(--app-fs-support);
+  cursor: pointer;
+}
+.visualizador {
+  overflow: auto;
+  max-height: 65dvh;
+  overscroll-behavior: contain;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+}
+.visualizador img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.visualizador[data-ampliado='true'] img {
+  width: auto;
+  max-width: none;
+}
+.zoom:focus-visible,
+.visualizador:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.instrucao {
+  margin: 12px 0 0;
+  font-size: var(--app-fs-support);
+  color: var(--via-text-soft);
+}

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { IntegracaoGoogleCalendar } from '@/app/(app)/conta/_components/IntegracaoGoogleCalendar';
 import { SetupGoogleCalendar } from '@/app/(app)/calls/_components/SetupGoogleCalendar';
 import type { EstadoGoogleCalendar } from './queries';
+import styles from '@/app/(app)/conta/page.module.css';
 
 vi.mock('@/lib/google-calendar/actions', () => ({
   desconectarGoogleCalendar: vi.fn(),
@@ -36,7 +37,7 @@ describe('navegação do Google Calendar', () => {
       'href',
       '/api/integracoes/google-calendar/conectar?retorno=%2Fconta',
     );
-    expect(conectar).toHaveClass('via-btn', 'via-btn--primary', 'via-btn--md');
+    expect(conectar).toHaveClass(styles.integracaoBotao!);
     expect(conectar).not.toHaveAttribute('target');
   });
 
@@ -66,7 +67,13 @@ describe('navegação do Google Calendar', () => {
   it('não oferece conexão quando a integração não está configurada', () => {
     render(<IntegracaoGoogleCalendar calendar={{ ...desconectado, configurado: false }} />);
 
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Conectar Google Calendar' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Como conectar/ })).toHaveAttribute(
+      'href',
+      '/ajuda/conectar-google-agenda',
+    );
     expect(screen.getByText('Integração em configuração')).toBeInTheDocument();
   });
 

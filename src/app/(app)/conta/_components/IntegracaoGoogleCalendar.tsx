@@ -1,6 +1,7 @@
 import { CalendarCheck2, CalendarClock, ExternalLink, Unplug } from 'lucide-react';
 import { desconectarGoogleCalendar } from '@/lib/google-calendar/actions';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
+import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
 import styles from '../page.module.css';
 
 export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleCalendar }) {
@@ -47,7 +48,7 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
             // O OAuth precisa de navegação completa: prefetch regrava os cookies de state/PKCE.
             <a
               href="/api/integracoes/google-calendar/conectar?retorno=%2Fconta"
-              className="via-btn via-btn--primary via-btn--md"
+              className={styles.integracaoBotao}
             >
               {precisaReconectar ? 'Reconectar calendário' : 'Conectar Google Calendar'}
               <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
@@ -55,7 +56,7 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
           )}
           {calendar.conectado && (
             <form action={desconectarGoogleCalendar}>
-              <button type="submit" className="via-btn via-btn--secondary via-btn--md">
+              <button type="submit" className={styles.integracaoBotao} data-secundario>
                 <Unplug size={15} strokeWidth={1.8} aria-hidden="true" />
                 Desconectar
               </button>
@@ -63,6 +64,9 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
           )}
           {!calendar.configurado && (
             <span className={styles.integracaoPreparando}>Integração em configuração</span>
+          )}
+          {!calendar.conectado && (
+            <AtalhoGuia slug="conectar-google-agenda">Como conectar</AtalhoGuia>
           )}
         </div>
       </div>

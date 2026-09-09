@@ -915,21 +915,6 @@
   display: grid;
   gap: 20px;
 }
-.capturaGuia {
-  margin: 0;
-}
-.capturaGuia img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--via-radius-md);
-  border: 1px solid var(--app-elev-1-line);
-}
-.capturaGuia figcaption {
-  font-size: var(--app-fs-meta);
-  color: var(--via-text-soft);
-  margin-top: 10px;
-}
 .passo p {
   margin: 0;
   font-size: var(--app-fs-reading);

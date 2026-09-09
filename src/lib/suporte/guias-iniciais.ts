@@ -1,4 +1,5 @@
 import type { Artigo } from './contrato';
+import guiasVisuais from './guias-visuais.json';
 
 // Conteúdo inicial revisado contra as telas e ações atuais. A edição publicada no banco é a fonte em produção.
 export const GUIAS_INICIAIS: Artigo[] = [
@@ -179,12 +180,16 @@ export const GUIAS_INICIAIS: Artigo[] = [
     destino: '/suporte',
     tags: 'erro travado loading carregando branco lento falha pagina bug',
   },
-].map((artigo) => ({
-  ...artigo,
-  categoria: artigo.categoria as Artigo['categoria'],
-  publicado: true,
-  atualizado_em: '2026-09-08T19:00:00Z',
-}));
+].map((artigo) => {
+  const revisao = guiasVisuais.find((g) => g.slug === artigo.slug);
+  return {
+    ...artigo,
+    ...(revisao ? { resumo: revisao.resumo, passos: revisao.passos, dica: revisao.dica } : {}),
+    categoria: artigo.categoria as Artigo['categoria'],
+    publicado: true,
+    atualizado_em: revisao ? '2026-09-09T19:00:00Z' : '2026-09-08T19:00:00Z',
+  };
+});
 
 export const FAQ = [
   {

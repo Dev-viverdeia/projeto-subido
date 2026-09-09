@@ -10,6 +10,7 @@ import {
 } from '@/lib/projetos-execucao/gestao';
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { ModalOperacao } from '../../_components/ModalOperacao';
+import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
 import styles from './GestaoServico.module.css';
 
 type Acao = 'tipo' | 'concluir' | 'reabrir' | 'encerrar_recorrencia' | 'retomar_recorrencia';
@@ -208,6 +209,9 @@ export function GestaoServico({
                     </label>
                   ))}
                 </fieldset>
+                <AtalhoGuia slug="entrega-pontual-recorrente">
+                  Entender os tipos de entrega
+                </AtalhoGuia>
                 {concluido && tipo !== projeto.tipoServico && (
                   <p>
                     {tipo === 'recorrente'
