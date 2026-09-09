@@ -220,6 +220,7 @@ export function FormularioAgendarCall({
             ref={formulario}
             id={FORMULARIO_ID}
             action={acao}
+            onReset={(evento) => evento.preventDefault()}
             className={styles.formulario}
             noValidate
             onSubmit={() => {

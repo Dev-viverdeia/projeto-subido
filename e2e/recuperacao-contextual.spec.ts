@@ -57,6 +57,7 @@ test('agendamento mantém data, título, cliente e email na falha de conexão', 
     .getByLabel('Cliente em negociação')
     .selectOption('33333333-3333-4333-8333-333333333333');
   await page.getByLabel('Data e horário', { exact: true }).fill('2026-11-10T10:30');
+  await page.getByLabel('Duração (minutos)', { exact: true }).fill('60');
   await page.getByLabel('Título (opcional)', { exact: true }).fill('Conversa demonstrativa');
   await page.getByLabel('E-mail do cliente', { exact: true }).fill('cliente@example.test');
   await page.getByRole('button', { name: 'Criar reunião e enviar convite' }).click();
@@ -64,6 +65,10 @@ test('agendamento mantém data, título, cliente e email na falha de conexão', 
     'Confira suas reuniões',
   );
   await expect(page.getByLabel('Data e horário', { exact: true })).toHaveValue('2026-11-10T10:30');
+  await expect(page.getByLabel('Cliente em negociação')).toHaveValue(
+    '33333333-3333-4333-8333-333333333333',
+  );
+  await expect(page.getByLabel('Duração (minutos)', { exact: true })).toHaveValue('60');
   await expect(page.getByLabel('Título (opcional)', { exact: true })).toHaveValue(
     'Conversa demonstrativa',
   );
