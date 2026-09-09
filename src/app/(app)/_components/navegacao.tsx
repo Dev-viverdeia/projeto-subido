@@ -1,4 +1,5 @@
 import { IconeProduto } from '@/components/brand/IconeProduto';
+import { Headphones } from 'lucide-react';
 import { ROTULOS, type RotaApp } from '@/lib/routes';
 
 export type ItemNav = {
@@ -154,6 +155,14 @@ export const ITEM_CONTA: ItemNav = {
   href: '/conta',
   rotulo: 'Minha conta',
   icone: <IconeProduto nome="conta" />,
+  noDock: false,
+  grupo: 'gestao',
+};
+
+export const ITEM_AJUDA: ItemNav = {
+  href: '/suporte',
+  rotulo: 'Ajuda',
+  icone: <Headphones size={22} strokeWidth={1.6} />,
   noDock: false,
   grupo: 'gestao',
 };

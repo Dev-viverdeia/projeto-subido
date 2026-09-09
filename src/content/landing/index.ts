@@ -498,9 +498,8 @@ export const FOOTER = {
     {
       titulo: 'Falar com a gente',
       links: [
-        // TODO(contato): número e e-mail reais.
-        { label: 'WhatsApp do suporte', href: 'https://wa.me/5511900000000', external: true },
-        { label: 'suporte@subido.com.br', href: 'mailto:suporte@subido.com.br', external: true },
+        { label: 'Central de ajuda', href: '/ajuda' },
+        { label: 'Problema de acesso', href: '/ajuda/acesso' },
         { label: 'Sou empresa e quero contratar', href: '#hub' },
       ],
     },

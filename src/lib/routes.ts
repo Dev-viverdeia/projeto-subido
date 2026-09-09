@@ -22,6 +22,7 @@ export const ROTAS_APP = [
   '/mentorias',
   '/certificados',
   '/conta',
+  '/suporte',
   /* Área administrativa. Entra aqui — e não numa lista separada — porque para o
      proxy ela é igual às outras: exige sessão. Quem tem sessão mas não é admin é
      barrado depois, no layout de /admin, onde dá para consultar o papel. O proxy
@@ -59,6 +60,7 @@ export const ROTULOS: Record<RotaApp, string> = {
   '/mentorias': 'Mentorias',
   '/certificados': 'Certificados',
   '/conta': 'Conta',
+  '/suporte': 'Ajuda',
   '/admin': 'Administração',
 };
 

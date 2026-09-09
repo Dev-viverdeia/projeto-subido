@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Award, ChevronDown, Coins, CreditCard, LogOut, UserRound } from 'lucide-react';
+import { Award, ChevronDown, Coins, CreditCard, Headphones, LogOut, UserRound } from 'lucide-react';
 import { Avatar } from '@/design-system/via';
 import { sair } from '@/lib/auth/actions';
 import styles from './MenuPerfil.module.css';
@@ -203,6 +203,20 @@ export function MenuPerfil({
                 <small>Formações e projetos concluídos</small>
               </span>
               <span className={styles.indicador} aria-hidden="true" />
+            </Link>
+            <Link
+              href="/suporte"
+              role="menuitem"
+              className={styles.item}
+              onClick={() => setAberto(false)}
+            >
+              <span className={styles.iconeItem} aria-hidden="true">
+                <Headphones size={17} strokeWidth={1.8} />
+              </span>
+              <span>
+                <strong>Ajuda</strong>
+                <small>Guias e atendimentos</small>
+              </span>
             </Link>
           </div>
 

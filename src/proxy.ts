@@ -52,6 +52,7 @@ export const config = {
     '/mentorias/:path*',
     '/certificados/:path*',
     '/conta/:path*',
+    '/suporte/:path*',
     '/admin/:path*',
   ],
 };

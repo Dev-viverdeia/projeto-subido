@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, CircleAlert, LoaderCircle, RefreshCw } from 'lucide-react';
 import { sessaoCheckoutValida, type EstadoCheckout } from '@/lib/billing/checkout';
@@ -155,7 +156,7 @@ export function RetornoCheckout({
         </button>
       ) : null}
       {!ativo && !confirmado && retorno === 'sucesso' ? (
-        <a href="mailto:suporte@viverdeia.ai?subject=Pagamento%20Subido">Falar com suporte</a>
+        <Link href="/suporte/novo?origem=/conta">Falar com suporte</Link>
       ) : null}
     </section>
   );
