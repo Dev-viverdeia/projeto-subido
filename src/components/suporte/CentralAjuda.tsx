@@ -11,7 +11,13 @@ import {
   Search,
   X,
 } from 'lucide-react';
-import { buscarArtigos, CATEGORIAS, type Artigo } from '@/lib/suporte/contrato';
+import {
+  buscarArtigos,
+  CATEGORIAS,
+  temRespostaNova,
+  type CasoSuporte,
+  type Artigo,
+} from '@/lib/suporte/contrato';
 import { FAQ } from '@/lib/suporte/guias-iniciais';
 import s from './suporte.module.css';
 
@@ -19,10 +25,18 @@ export function CentralAjuda({
   artigos,
   autenticado = false,
   equipe = false,
+  atendimentos = [],
+  horario = '',
+  aviso = '',
+  emailAjuda = '',
 }: {
   artigos: Artigo[];
   autenticado?: boolean;
   equipe?: boolean;
+  atendimentos?: CasoSuporte[];
+  horario?: string;
+  aviso?: string;
+  emailAjuda?: string;
 }) {
   const [busca, setBusca] = useState('');
   const [categoria, setCategoria] = useState('');
@@ -51,6 +65,24 @@ export function CentralAjuda({
           </LinkAcao>
         </div>
       </header>
+      {aviso && (
+        <div className={s.avisoResposta} role="status">
+          <strong>Aviso da equipe</strong>
+          <span>{aviso}</span>
+        </div>
+      )}
+      {atendimentos
+        .filter(temRespostaNova)
+        .slice(0, 2)
+        .map((c) => (
+          <Link className={s.avisoResposta} key={c.id} href={`/suporte/${c.id}`}>
+            <span>
+              <strong>Nova resposta</strong>
+              <span>{c.assunto}</span>
+            </span>
+            <ArrowUpRight size={20} />
+          </Link>
+        ))}
       <section aria-label="Buscar ajuda">
         <div className={s.busca}>
           <Search size={22} />
@@ -147,6 +179,12 @@ export function CentralAjuda({
         </div>
       </section>
       <footer className={s.rodape}>
+        {emailAjuda && (
+          <a className={s.atalho} href={`mailto:${emailAjuda}`}>
+            {emailAjuda}
+          </a>
+        )}
+        {horario && <span className={s.meta}>{horario}</span>}
         <span className={s.meta}>Não compartilhe senhas ou códigos de acesso.</span>
         {equipe && (
           <Link href="/suporte/equipe" className={s.atalho}>

@@ -2,8 +2,9 @@ import 'server-only';
 import { setTimeout as esperar } from 'node:timers/promises';
 import { Resend, type WebhookEventPayload } from 'resend';
 import { z } from 'zod';
-import { env, resendEnv } from '@/lib/env';
+import { env, resendEnv, suporteEmailEnv } from '@/lib/env';
 import { criarSistemaSuporte } from './servidor';
+import { enderecoResposta, escaparHtml, idMensagemSeguro } from './email-contrato';
 
 export async function processarNotificacoesSuporte() {
   const db = criarSistemaSuporte();
@@ -11,6 +12,7 @@ export async function processarNotificacoesSuporte() {
   if (error) throw new Error('fila_indisponivel');
   const config = resendEnv();
   const resend = config ? new Resend(config.chave) : null;
+  const receber = suporteEmailEnv();
   let enviadas = 0;
   let falhas = 0;
   for (const item of fila ?? []) {
@@ -39,15 +41,53 @@ export async function processarNotificacoesSuporte() {
       const assunto = confirmar
         ? 'Confirme seu pedido de ajuda no Subido'
         : `Atualização no atendimento #${caso.numero} · Subido`;
+      let mensagem = '';
+      if (item.tipo === 'usuario' && z.uuid().safeParse(item.evento).success) {
+        const { data: m, error: erroMensagem } = await db
+          .from('suporte_mensagens')
+          .select('texto,papel,interna')
+          .eq('id', item.evento)
+          .eq('atendimento', item.atendimento)
+          .maybeSingle();
+        if (erroMensagem) throw erroMensagem;
+        if (m && !m.interna && m.papel === 'equipe') mensagem = m.texto;
+      }
+      const podeResponder = !!receber && item.tipo === 'usuario' && !confirmar;
+      let referencia: string | null = null;
+      if (podeResponder) {
+        const { data: ultimo, error: erroReferencia } = await db
+          .from('suporte_email_recebidos')
+          .select('message_id')
+          .eq('atendimento', item.atendimento)
+          .eq('estado', 'processado')
+          .order('criado_em', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (erroReferencia) throw erroReferencia;
+        referencia = idMensagemSeguro(ultimo?.message_id);
+      }
+      const orientacao = podeResponder
+        ? 'Você pode responder a este e-mail ou continuar pelo Subido.'
+        : 'Veja a conversa e responda pelo Subido.';
       const texto = confirmar
         ? `Recebemos um pedido de ajuda com este endereço. Abra o link para confirmar e acompanhar a conversa.\n\n${link}\n\nSe não foi você, ignore esta mensagem. Não pedimos senhas ou códigos. O link é pessoal e vale por 14 dias.`
-        : `Há uma atualização no atendimento #${caso.numero}.\n\nVeja a conversa e responda pelo Subido:\n${link}\n\nPara manter o histórico em um só lugar, responda pela plataforma. Este e-mail é uma notificação automática.`;
+        : `${mensagem || `Há uma atualização no atendimento #${caso.numero}.`}\n\n${orientacao}\n${link}\n\nEquipe Subido · Não compartilhe senhas ou códigos de acesso.`;
       const resultado = await resend.emails.send(
         {
-          from: config.remetente,
+          from: config.remetente.replace(/^Subido </, 'Equipe Subido <'),
           to: [item.destinatario],
           subject: assunto,
           text: texto,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:28px;line-height:1.65"><p><strong>Subido</strong> · Central de ajuda</p><h2 style="font-size:22px">${confirmar ? 'Confirme seu pedido de ajuda' : `Atendimento #${caso.numero}`}</h2><p style="white-space:pre-wrap;font-size:16px">${escaparHtml(confirmar ? 'Abra o link para confirmar e acompanhar seu pedido. Se não foi você, ignore este e-mail.' : mensagem || 'Há uma atualização na sua conversa.')}</p><p><a href="${escaparHtml(link)}">${confirmar ? 'Confirmar pedido' : 'Ver atendimento'}</a></p><p>${escaparHtml(confirmar ? 'O link é pessoal e vale por 14 dias.' : orientacao)}</p><hr><p>Equipe Subido · Não pedimos senhas ou códigos.</p></div>`,
+          ...(podeResponder && receber
+            ? { replyTo: enderecoResposta(item.atendimento, receber.dominio, receber.chave) }
+            : {}),
+          headers: {
+            'Auto-Submitted': 'auto-generated',
+            'X-Auto-Response-Suppress': 'All',
+            'Message-ID': `<suporte-${item.id}@subido.viverdeia.ai>`,
+            ...(referencia ? { 'In-Reply-To': referencia, References: referencia } : {}),
+          },
           tags: [{ name: 'suporte_id', value: item.id }],
         },
         { idempotencyKey: `suporte/${item.id}` },

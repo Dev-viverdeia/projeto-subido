@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { notFound } from 'next/navigation';
-import { detalheAtendimento } from '@/lib/suporte/servidor';
+import { detalheAtendimento, usuarioSuporte } from '@/lib/suporte/servidor';
 import { ConversaAtendimento } from '@/components/suporte/ConversaAtendimento';
 import { paginaHistorico } from '@/lib/suporte/contrato';
 export const metadata = { title: 'Atendimento' };
@@ -16,5 +16,8 @@ export default async function AtendimentoPage({
     paginaHistorico((await searchParams).historico),
   );
   if (!detalhe) notFound();
-  return <ConversaAtendimento {...detalhe} />;
+  const user = await usuarioSuporte();
+  return (
+    <ConversaAtendimento {...detalhe} usuario={user?.id} novo={(await searchParams).novo === '1'} />
+  );
 }

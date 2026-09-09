@@ -7,7 +7,15 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, Send } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import { criarAtendimento } from '@/lib/suporte/actions';
-import { CATEGORIAS, ErroSuporteSchema, type ArquivoSuporte } from '@/lib/suporte/contrato';
+import {
+  CATEGORIAS,
+  ErroSuporteSchema,
+  categoriaDaPagina,
+  buscarArtigos,
+  type Artigo,
+  type ArquivoSuporte,
+} from '@/lib/suporte/contrato';
+import { useRascunho } from './useRascunho';
 import { AnexosSuporte } from './AnexosSuporte';
 import s from './suporte.module.css';
 
@@ -25,25 +33,44 @@ export function NovoAtendimento({
   pagina = null,
   renovarId,
   linkInvalido = false,
+  usuario = 'publico',
+  artigos = [],
 }: {
   publico?: boolean;
   pagina?: string | null;
   renovarId?: string;
   linkInvalido?: boolean;
+  usuario?: string;
+  artigos?: Artigo[];
 }) {
   const router = useRouter();
   const rascunho = useSyncExternalStore(assinar, lerRascunho, () => '');
+  const [salvo, salvar] = useRascunho(`suporte-rascunho:${usuario}:novo`);
   const [texto, setTexto] = useState<string | null>(null);
-  const [assunto, setAssunto] = useState('');
-  const [email, setEmail] = useState('');
-  const [categoria, setCategoria] = useState('outros');
+  const [assuntoSalvo, salvarAssunto] = useRascunho(`suporte-rascunho:${usuario}:novo:assunto`);
+  const [emailSalvo, salvarEmail] = useRascunho(`suporte-rascunho:${usuario}:novo:email`);
+  const [assuntoLocal, setAssuntoLocal] = useState<string | null>(null);
+  const [emailLocal, setEmailLocal] = useState<string | null>(null);
+  const assunto = assuntoLocal ?? assuntoSalvo;
+  const email = emailLocal ?? emailSalvo;
+  const setAssunto = (v: string) => {
+    setAssuntoLocal(v);
+    salvarAssunto(v);
+  };
+  const setEmail = (v: string) => {
+    setEmailLocal(v);
+    salvarEmail(v);
+  };
+  const [categoria, setCategoria] = useState<string>(categoriaDaPagina(pagina));
   const [arquivos, setArquivos] = useState<ArquivoSuporte[]>([]);
   const [upload, setUpload] = useState(false);
   const [erro, setErro] = useState('');
   const [enviado, setEnviado] = useState(false);
   const [pendente, iniciar] = useTransition();
   const [id, setId] = useState('');
-  const conteudo = texto ?? rascunho;
+  const conteudo = texto ?? salvo ?? rascunho;
+  const descricao = conteudo || (texto === null ? rascunho : '');
+  const guias = assunto.trim().length > 3 ? buscarArtigos(artigos, assunto).slice(0, 2) : [];
   function enviar(form: FormData) {
     if (pendente || upload) return;
     iniciar(async () => {
@@ -59,7 +86,7 @@ export function NovoAtendimento({
               id: pedidoId,
               email,
               assunto: renovarId ? 'Reenviar acesso ao atendimento' : assunto,
-              texto: renovarId ? 'Solicito um novo link de acesso ao atendimento.' : conteudo,
+              texto: renovarId ? 'Solicito um novo link de acesso ao atendimento.' : descricao,
               site: form.get('site') ?? '',
               atendimento: renovarId,
             }),
@@ -73,6 +100,9 @@ export function NovoAtendimento({
             return;
           }
           setEnviado(true);
+          salvar('');
+          salvarAssunto('');
+          salvarEmail('');
           try {
             sessionStorage.removeItem(CHAVE_RASCUNHO_SUPORTE);
           } catch {
@@ -83,7 +113,7 @@ export function NovoAtendimento({
             id: pedidoId,
             assunto,
             categoria,
-            texto: conteudo,
+            texto: descricao,
             pagina,
             anexos: arquivos.map((a) => a.id),
           });
@@ -96,7 +126,10 @@ export function NovoAtendimento({
           } catch {
             /* O pedido já está salvo. */
           }
-          router.push(`/suporte/${result.id}`);
+          salvar('');
+          salvarAssunto('');
+          salvarEmail('');
+          router.push(`/suporte/${result.id}?novo=1`);
         }
       } catch {
         setErro('A conexão falhou. Seu texto continua aqui para tentar novamente.');
@@ -170,22 +203,27 @@ export function NovoAtendimento({
                 />
               </label>
               {!publico && (
-                <label className={s.campo}>
-                  Assunto
-                  <select
-                    className={s.select}
-                    aria-label="Assunto"
-                    value={categoria}
-                    disabled={pendente}
-                    onChange={(e) => setCategoria(e.target.value)}
-                  >
-                    {Object.entries(CATEGORIAS).map(([id, rotulo]) => (
-                      <option value={id} key={id}>
-                        {rotulo}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <details className={s.detalhesCompactos}>
+                  <summary>
+                    {CATEGORIAS[categoria as keyof typeof CATEGORIAS]} · Alterar assunto
+                  </summary>
+                  <label className={s.campo}>
+                    Área do produto
+                    <select
+                      className={s.select}
+                      aria-label="Assunto"
+                      value={categoria}
+                      disabled={pendente}
+                      onChange={(e) => setCategoria(e.target.value)}
+                    >
+                      {Object.entries(CATEGORIAS).map(([id, rotulo]) => (
+                        <option value={id} key={id}>
+                          {rotulo}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </details>
               )}
               <label className={s.campo}>
                 Descreva o que aconteceu
@@ -194,9 +232,12 @@ export function NovoAtendimento({
                   required
                   minLength={10}
                   maxLength={6000}
-                  value={conteudo}
+                  value={descricao}
                   disabled={pendente}
-                  onChange={(e) => setTexto(e.target.value)}
+                  onChange={(e) => {
+                    setTexto(e.target.value);
+                    salvar(e.target.value);
+                  }}
                   placeholder="O que você tentou fazer e o que apareceu?"
                 />
               </label>
@@ -209,6 +250,22 @@ export function NovoAtendimento({
               onBusy={setUpload}
               disabled={pendente}
             />
+          )}
+          {!!guias.length && (
+            <details className={s.detalhesCompactos}>
+              <summary>Orientações relacionadas</summary>
+              {guias.map((g) => (
+                <Link
+                  key={g.slug}
+                  className={s.atalho}
+                  href={`/ajuda/${g.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {g.titulo}
+                </Link>
+              ))}
+            </details>
           )}
           {publico && (
             <label className={s.oculto} aria-hidden="true">

@@ -2,8 +2,9 @@ import { timingSafeEqual } from 'node:crypto';
 import { cronEnv } from '@/lib/env';
 import { processarNotificacoesSuporte } from '@/lib/suporte/notificacoes';
 import { limparAnexosSuporte } from '@/lib/suporte/limpeza';
+import { processarEmailsSuporte } from '@/lib/suporte/email-recebido';
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 export async function GET(request: Request) {
   const config = cronEnv();
   const esperado = config ? `Bearer ${config.CRON_SECRET}` : '';
@@ -15,10 +16,11 @@ export async function GET(request: Request) {
   )
     return Response.json({ erro: 'Não autorizado.' }, { status: 401 });
   try {
+    const recebidos = await processarEmailsSuporte();
     const notificacoes = await processarNotificacoesSuporte();
     const removidos = await limparAnexosSuporte();
     return Response.json(
-      { ...notificacoes, removidos },
+      { ...notificacoes, ...recebidos, removidos },
       {
         headers: { 'Cache-Control': 'no-store' },
       },

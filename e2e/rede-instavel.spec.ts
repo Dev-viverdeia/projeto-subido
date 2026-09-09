@@ -11,12 +11,10 @@ test('Vendas mantém o card ao cair a conexão durante a mudança de etapa', asy
     await new Promise((resolve) => setTimeout(resolve, 500));
     await route.abort('internetdisconnected');
   });
-  await page.getByRole('button', { name: 'Ações de Automação do atendimento' }).click();
+  await page.getByRole('button', { name: 'Ações de Clínica Aurora' }).click();
   await page.getByRole('menuitem', { name: 'Descobrir', exact: true }).click();
   await expect(page.getByText('A alteração não foi confirmada', { exact: true })).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Ações de Automação do atendimento' }),
-  ).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Ações de Clínica Aurora' })).toBeEnabled();
   expect(pedidos).toBe(1);
   expect(erros).toEqual([]);
   await page.screenshot({ path: test.info().outputPath('vendas-recuperada.png') });

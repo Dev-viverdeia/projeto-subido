@@ -6,6 +6,9 @@ import {
   paginaHistorico,
   buscarArtigos,
   tipoRealArquivo,
+  temRespostaNova,
+  categoriaDaPagina,
+  resumoTransferencia,
 } from './contrato';
 import { GUIAS_INICIAIS } from './guias-iniciais';
 
@@ -67,5 +70,25 @@ describe('contrato da central de suporte', () => {
     expect(paginaHistorico('2')).toBe(2);
     for (const p of ['-1', 'NaN', 'Infinity', '1e7', ['1'], undefined])
       expect(paginaHistorico(p)).toBe(0);
+  });
+  it('não confunde leitura com estado e sugere assunto pela origem', () => {
+    const caso = { ultima_resposta_equipe_em: '2026-09-09T10:00:00Z', lido_usuario_em: null };
+    expect(temRespostaNova(caso)).toBe(true);
+    expect(temRespostaNova({ ...caso, lido_usuario_em: '2026-09-09T10:00:00Z' })).toBe(false);
+    expect(temRespostaNova({ ...caso, ultima_resposta_equipe_em: null })).toBe(false);
+    expect(categoriaDaPagina('/propostas/123')).toBe('vendas');
+    expect(categoriaDaPagina('/reunioes')).toBe('reunioes');
+  });
+  it('transferência separa relato de sugestão, sem afirmar solução', () => {
+    const resumo = resumoTransferencia(
+      [
+        { papel: 'usuario', texto: 'Agenda não conecta' },
+        { papel: 'ia', texto: 'Confira as permissões.' },
+      ],
+      '',
+    );
+    expect(resumo).toContain('Agenda não conecta');
+    expect(resumo).toContain('Confira as permissões.');
+    expect(resumo).not.toContain('Problema resolvido');
   });
 });

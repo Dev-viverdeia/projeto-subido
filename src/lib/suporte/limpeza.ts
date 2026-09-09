@@ -8,6 +8,7 @@ export async function limparAnexosSuporte() {
   const { data, error: consulta } = await db
     .from('suporte_arquivos_remover')
     .select('caminho')
+    .lte('liberar_em', new Date().toISOString())
     .order('criado_em')
     .limit(50);
   if (consulta) throw new Error('limpeza_indisponivel');

@@ -47,6 +47,7 @@ export const ResponderSchema = z.object({
   texto: z.string().trim().min(1).max(6000),
   interna: z.boolean().default(false),
   anexos: z.array(z.uuid()).max(3).default([]),
+  resultado: z.enum(['em_atendimento', 'aguardando_voce', 'resolvido']).default('em_atendimento'),
 });
 export const ArquivoSuporteSchema = z.object({
   id: z.uuid(),
@@ -69,6 +70,8 @@ export type MensagemSuporte = {
   interna: boolean;
   criado_em: string;
   arquivos: ArquivoSuporte[];
+  nome_autor?: string | null;
+  canal?: 'plataforma' | 'email';
 };
 export type CasoSuporte = {
   id: string;
@@ -85,7 +88,53 @@ export type CasoSuporte = {
   email?: string;
   lido_usuario_em: string | null;
   lido_equipe_em: string | null;
+  ultima_resposta_equipe_em?: string | null;
+  ultima_mensagem_cliente_em?: string | null;
+  ultima_mensagem_resumo?: string | null;
+  aguardando_equipe_desde?: string | null;
 };
+
+export function temRespostaNova(
+  caso: Pick<CasoSuporte, 'ultima_resposta_equipe_em' | 'lido_usuario_em'>,
+): boolean {
+  return (
+    !!caso.ultima_resposta_equipe_em &&
+    (!caso.lido_usuario_em || caso.ultima_resposta_equipe_em > caso.lido_usuario_em)
+  );
+}
+export function categoriaDaPagina(pagina?: string | null): keyof typeof CATEGORIAS {
+  if (/^\/(vendas|propostas|prospeccao)/.test(pagina ?? '')) return 'vendas';
+  if (/^\/reunioes/.test(pagina ?? '')) return 'reunioes';
+  if (/^\/(solucoes|entregas|formacoes|certificados)/.test(pagina ?? '')) return 'projetos';
+  if (/^\/consultor/.test(pagina ?? '')) return 'ia';
+  if (/^\/conta/.test(pagina ?? '')) return 'conta';
+  return 'outros';
+}
+export function resumoTransferencia(
+  mensagens: { papel: 'usuario' | 'ia'; texto: string }[],
+  texto: string,
+) {
+  const duvidas = mensagens
+    .filter((m) => m.papel === 'usuario')
+    .slice(-3)
+    .map((m) => m.texto);
+  if (texto.trim()) duvidas.push(texto.trim());
+  const orientacoes = mensagens
+    .filter((m) => m.papel === 'ia')
+    .slice(-2)
+    .map((m) => m.texto);
+  return [
+    `Problema\n${duvidas.map((t) => `Minha dúvida: ${t}`).join('\n')}`,
+    orientacoes.length
+      ? `Orientações da IA (não confirmam que executei os passos)\n${orientacoes.join('\n')}`
+      : '',
+    'O que já tentei\n[Complete ou remova antes de enviar]',
+    'O que falta resolver\n[Conte o que ainda não funcionou]',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
+    .slice(0, 6000);
+}
 export type AgenteSuporte = { usuario: string; nome: string; notificar: boolean };
 export type ResultadoSuporte = { ok: true; id?: string } | { ok: false; erro: string };
 export const MENSAGENS_POR_PAGINA = 50;

@@ -89,3 +89,57 @@ test('conversa legível sem barra horizontal ou alteração de dados na demonstr
       .violations,
   ).toEqual([]);
 });
+
+test('rascunho de nota interna fica separado da resposta pública, inclusive após recarregar', async ({
+  page,
+}) => {
+  await page.goto('/preview/suporte?tela=equipe');
+  await page.getByLabel('Sua mensagem', { exact: true }).fill('Resposta para o cliente.');
+  await page.getByRole('button', { name: 'Nota interna', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Nota interna' })).toHaveValue('');
+  await page.getByRole('textbox', { name: 'Nota interna' }).fill('Informação só para a equipe.');
+  await page.getByRole('button', { name: 'Responder ao cliente' }).click();
+  await expect(page.getByLabel('Sua mensagem', { exact: true })).toHaveValue(
+    'Resposta para o cliente.',
+  );
+  await page.reload();
+  await expect(page.getByLabel('Sua mensagem', { exact: true })).toHaveValue(
+    'Resposta para o cliente.',
+  );
+  await page.getByRole('button', { name: 'Nota interna', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Nota interna' })).toHaveValue(
+    'Informação só para a equipe.',
+  );
+  expect(
+    (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze())
+      .violations,
+  ).toEqual([]);
+});
+test('pedido recupera título, relato e e-mail sem perder campos após reload', async ({ page }) => {
+  await page.goto('/preview/suporte?tela=pedido');
+  await page.getByLabel('Seu e-mail', { exact: true }).fill('qa@example.invalid');
+  await page.getByLabel('O que você precisa resolver?').fill('Agenda não conecta');
+  await page
+    .getByLabel('Descreva o que aconteceu')
+    .fill('Voltei do Google e não consegui conectar.');
+  await page.reload();
+  await expect(page.getByLabel('Seu e-mail', { exact: true })).toHaveValue('qa@example.invalid');
+  await expect(page.getByLabel('O que você precisa resolver?')).toHaveValue('Agenda não conecta');
+  await expect(page.getByLabel('Descreva o que aconteceu')).toHaveValue(
+    'Voltei do Google e não consegui conectar.',
+  );
+});
+test('fila e nova resposta permanecem legíveis em larguras pequenas e grandes', async ({
+  page,
+}) => {
+  for (const width of [375, 768, 1280, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const tela of ['fila', 'cliente']) {
+      await page.goto(`/preview/suporte?tela=${tela}`);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+    }
+  }
+  await expect(page.getByRole('link', { name: /Nova resposta/ })).toBeVisible();
+});

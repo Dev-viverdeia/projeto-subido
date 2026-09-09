@@ -104,6 +104,25 @@ export function resendEnv() {
 }
 
 /** Segredo que autoriza exclusivamente o worker periódico da Vercel. */
+export function suporteEmailEnv() {
+  const p = z
+    .object({
+      dominio: z.string().regex(/^[a-z0-9.-]+$/),
+      chave: z.string().min(32),
+      api: z.string().regex(/^re_[A-Za-z0-9_]+$/),
+      webhook: z.string().regex(/^whsec_[A-Za-z0-9_+/=-]+$/),
+      ativo: z.literal('true'),
+    })
+    .safeParse({
+      dominio: process.env.SUPORTE_EMAIL_DOMINIO,
+      chave: process.env.SUPORTE_EMAIL_CHAVE,
+      api: process.env.SUPORTE_EMAIL_API_KEY,
+      webhook: process.env.SUPORTE_EMAIL_WEBHOOK_SECRET,
+      ativo: process.env.SUPORTE_EMAIL_ATIVO,
+    });
+  return p.success ? p.data : null;
+}
+
 export function cronEnv() {
   const parsed = z
     .object({ CRON_SECRET: z.string().min(32) })

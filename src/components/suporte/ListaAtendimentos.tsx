@@ -1,7 +1,7 @@
 import { LinkAcao } from '@/components/suporte/LinkAcao';
 import Link from 'next/link';
 import { Check, ChevronRight, MessageSquare } from 'lucide-react';
-import { CATEGORIAS, ESTADOS, type CasoSuporte } from '@/lib/suporte/contrato';
+import { CATEGORIAS, ESTADOS, temRespostaNova, type CasoSuporte } from '@/lib/suporte/contrato';
 import s from './suporte.module.css';
 
 export function EstadoAtendimento({ estado }: { estado: CasoSuporte['status'] }) {
@@ -66,6 +66,15 @@ export function ListaAtendimentos({
         )}
       </form>
       <nav className={s.categorias} aria-label="Filtrar atendimentos">
+        {equipe && (
+          <Link
+            className={s.chip}
+            aria-current={status === 'pendentes' ? 'page' : undefined}
+            href={href(0, 'pendentes')}
+          >
+            Precisa de resposta
+          </Link>
+        )}
         <Link className={s.chip} aria-current={!status ? 'page' : undefined} href={href(0, '')}>
           Todos
         </Link>
@@ -96,11 +105,21 @@ export function ListaAtendimentos({
         casos.map((c) => (
           <Link
             className={s.linha}
+            data-novo={!equipe && temRespostaNova(c)}
             href={`${equipe ? '/suporte/equipe' : '/suporte'}/${c.id}`}
             key={c.id}
           >
             <div>
               <strong>{c.assunto}</strong>
+              {equipe && (
+                <span className={s.meta}>
+                  {c.email}
+                  {c.prioridade === 'alta' ? ' · Prioridade alta' : ''}
+                </span>
+              )}
+              {c.ultima_mensagem_resumo && (
+                <p className={s.previaMensagem}>{c.ultima_mensagem_resumo}</p>
+              )}
               <span className={s.meta}>
                 #{c.numero} · {CATEGORIAS[c.categoria]} ·{' '}
                 {new Date(c.atualizado_em).toLocaleDateString('pt-BR', {
@@ -112,6 +131,19 @@ export function ListaAtendimentos({
               </span>
             </div>
             <div className={s.acoes}>
+              {!equipe && temRespostaNova(c) && <span className={s.estado}>Nova resposta</span>}
+              {equipe && c.aguardando_equipe_desde && (
+                <span className={s.meta}>
+                  Aguarda desde{' '}
+                  {new Date(c.aguardando_equipe_desde).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/Sao_Paulo',
+                  })}
+                </span>
+              )}
               <EstadoAtendimento estado={c.status} />
               <ChevronRight size={18} />
             </div>
