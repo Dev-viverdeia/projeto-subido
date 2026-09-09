@@ -53,3 +53,5 @@ A infraestrutura começa com dois recebidos por execução/minuto e até vinte n
 Horário, escala humana e meta de atendimento devem refletir a equipe. Os controles estão prontos, mas não foram inventados turnos ou compromissos de resposta. Suporte não consome créditos e não depende de pagamentos.
 
 O script `scripts/qa-suporte-caixas-reais.mjs` exige confirmação explícita, restringe as caixas de destino e remove somente seus próprios atendimentos/anexos/agente. Não registra senhas ou links pessoais. Registros mínimos de eventos processados podem permanecer para impedir reprocessamento de webhooks atrasados.
+
+Encerramento: os dois atendimentos, o anexo privado e o agente temporário foram removidos. Ficaram somente quatro identificadores de eventos ignorados, sem conteúdo, remetente ou vínculo com pessoa. A fila de notificações terminou sem pendências. O acabamento da PR #193 foi confirmado no domínio público (`3d40ba7611829a1f7a6b075b9f8892829de34b63`), incluindo autor, origem da mensagem e responsável.

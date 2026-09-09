@@ -106,6 +106,23 @@ if (modo === 'limpar') {
   );
   if (arquivos.length)
     exigir(await db.storage.from('suporte-privado').remove(arquivos.map((a) => a.caminho)));
+  // Desvincular antes do cascade: uma repetição tardia não deve recriar o teste.
+  // Só ficam identificadores do provedor, sem conteúdo ou vínculo com a pessoa.
+  exigir(
+    await db
+      .from('suporte_email_recebidos')
+      .update({
+        atendimento: null,
+        mensagem: null,
+        message_id: null,
+        estado: 'ignorado',
+        motivo: 'qa_removido',
+      })
+      .in(
+        'atendimento',
+        casos.map((c) => c.id),
+      ),
+  );
   exigir(
     await db
       .from('suporte_atendimentos')
