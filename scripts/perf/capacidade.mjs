@@ -71,7 +71,9 @@ try {
   );
   for (let n = 0; n < 30; n++) {
     try {
-      await docker('exec', container, 'pg_isready', '-U', 'postgres');
+      // O entrypoint sobe um servidor temporário só por socket antes do definitivo.
+      // Esperar TCP interno evita iniciar a fixture durante esse reinício.
+      await docker('exec', container, 'pg_isready', '-h', '127.0.0.1', '-U', 'postgres');
       break;
     } catch {
       if (n === 29) throw new Error('Banco local não iniciou');
