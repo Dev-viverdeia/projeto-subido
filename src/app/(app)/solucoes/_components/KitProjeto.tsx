@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowUpRight,
@@ -21,6 +20,8 @@ import styles from './ProjetoGuiadoNovo.module.css';
 import visual from './LeituraProjeto.module.css';
 import kit from './PreRequisitosMateriais.module.css';
 
+export type AreaKitProjeto = 'preparar' | 'arquivos' | 'cliente';
+
 export function KitProjeto({
   slug,
   titulo,
@@ -28,6 +29,8 @@ export function KitProjeto({
   ferramentas,
   prompts,
   rotaComercial,
+  area,
+  aoMudarArea,
   direto = false,
 }: {
   slug: string;
@@ -36,24 +39,27 @@ export function KitProjeto({
   ferramentas: ItemSolucao[];
   prompts: ItemSolucao[];
   rotaComercial: ContextoRotaComercialProjeto;
+  area: AreaKitProjeto;
+  aoMudarArea: (area: AreaKitProjeto) => void;
   direto?: boolean;
 }) {
-  const [area, setArea] = useState('preparar');
   const roteiro = projeto.roteiro;
   const destinoCrm = `/vendas?novo=projeto&projeto=${encodeURIComponent(titulo)}&projetoSlug=${encodeURIComponent(slug)}`;
   const conteudo = (
     <div className={styles.kitCorpo}>
       <nav className={visual.areasKit} aria-label="Consultar pré-requisitos e materiais">
-        {[
-          { id: 'preparar', titulo: 'Antes de começar' },
-          { id: 'arquivos', titulo: 'Arquivos e ferramentas' },
-          { id: 'cliente', titulo: 'Aplicar no cliente' },
-        ].map((item) => (
+        {(
+          [
+            { id: 'preparar', titulo: 'Antes de começar' },
+            { id: 'arquivos', titulo: 'Arquivos e ferramentas' },
+            { id: 'cliente', titulo: 'Aplicar no cliente' },
+          ] as const
+        ).map((item) => (
           <button
             key={item.id}
             type="button"
             aria-pressed={area === item.id}
-            onClick={() => setArea(item.id)}
+            onClick={() => aoMudarArea(item.id)}
           >
             {item.titulo}
           </button>

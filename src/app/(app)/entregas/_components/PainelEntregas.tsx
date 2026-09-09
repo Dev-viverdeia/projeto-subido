@@ -87,7 +87,11 @@ function CartaoEntrega({
 
         <div className={styles.identidade}>
           <p>{projeto.empresa}</p>
-          <h2>{projeto.titulo}</h2>
+          <h3>{projeto.titulo}</h3>
+          <span className={styles.abrirEntrega}>
+            {destaque ? 'Continuar entrega' : 'Abrir entrega'}
+            <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
+          </span>
         </div>
 
         <div className={styles.proximaAcao}>
@@ -111,10 +115,6 @@ function CartaoEntrega({
               <CalendarDays size={14} strokeWidth={1.7} aria-hidden="true" />
               {projeto.proximaAcaoPrazoEm ? 'Próxima ação' : 'Entrega'} ·{' '}
               {formatarPrazo(prazoOperacional)}
-            </span>
-            <span className={styles.abrirEntrega}>
-              {destaque ? 'Abrir próxima tarefa' : 'Abrir entrega'}
-              <ArrowUpRight size={15} strokeWidth={1.7} aria-hidden="true" />
             </span>
           </div>
         </footer>
@@ -239,7 +239,6 @@ export function PainelEntregas({
     <div className={styles.pagina}>
       <CabecalhoOperacional
         titulo="Entregas"
-        descricao="Acompanhe a próxima tarefa de cada projeto."
         resumo={
           <dl className={styles.resumo} aria-label="Resumo das entregas">
             <div>
@@ -262,15 +261,9 @@ export function PainelEntregas({
         <section className={styles.emAndamento} aria-labelledby="titulo-em-andamento">
           <header className={styles.cabecalhoSecao}>
             <div>
-              <p className={styles.eyebrow}>Próxima entrega</p>
-              <h2 id="titulo-em-andamento">{principal.empresa}</h2>
+              <h2 id="titulo-em-andamento">Para fazer agora</h2>
             </div>
-            {precisamAcao > 0 && (
-              <p>
-                {precisamAcao} {precisamAcao === 1 ? 'projeto precisa' : 'projetos precisam'} de
-                você agora.
-              </p>
-            )}
+            {precisamAcao > 0 && <p>{precisamAcao} com pendências</p>}
           </header>
 
           {prioridadePrincipal && (

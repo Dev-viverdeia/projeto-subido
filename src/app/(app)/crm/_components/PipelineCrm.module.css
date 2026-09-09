@@ -1388,7 +1388,7 @@
   .abasMobile button {
     display: flex;
     min-width: 0;
-    min-height: var(--app-h-control);
+    min-height: 48px;
     align-items: center;
     justify-content: center;
     gap: var(--via-space-2);
@@ -1413,7 +1413,7 @@
 
   .abasMobile span {
     overflow: hidden;
-    font-size: var(--via-fs-xs);
+    font-size: var(--app-fs-ui);
     font-weight: var(--via-fw-medium);
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1421,7 +1421,7 @@
 
   .abasMobile strong {
     font-family: var(--via-font-mono);
-    font-size: var(--via-fs-micro);
+    font-size: var(--app-fs-support);
     font-weight: var(--via-fw-medium);
     font-variant-numeric: tabular-nums;
   }
