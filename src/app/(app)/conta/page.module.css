@@ -380,6 +380,15 @@
   backdrop-filter: var(--via-glass-blur);
 }
 
+.integracaoCalendar > aside {
+  margin-top: var(--via-space-5);
+}
+
+.integracaoCalendar .cabecalhoCartao p {
+  color: var(--via-text-soft);
+  font-size: var(--app-fs-meta);
+}
+
 .integracaoBotao {
   display: inline-flex;
   align-items: center;

@@ -7,7 +7,7 @@ export function EstadoSistema({
   descricao,
   icone,
   acoes,
-  passos,
+  passos = [],
   urgente = false,
 }: {
   etiqueta: string;
@@ -15,7 +15,7 @@ export function EstadoSistema({
   descricao: string;
   icone: ReactNode;
   acoes: ReactNode;
-  passos: Array<{ rotulo: string; valor: string }>;
+  passos?: Array<{ rotulo: string; valor: string }>;
   urgente?: boolean;
 }) {
   return (
@@ -39,17 +39,19 @@ export function EstadoSistema({
 
       <div className={styles.acoes}>{acoes}</div>
 
-      <dl className={styles.passos}>
-        {passos.map((passo, indice) => (
-          <div key={passo.rotulo}>
-            <dt>
-              <span>{String(indice + 1).padStart(2, '0')}</span>
-              {passo.rotulo}
-            </dt>
-            <dd>{passo.valor}</dd>
-          </div>
-        ))}
-      </dl>
+      {passos.length > 0 && (
+        <dl className={styles.passos}>
+          {passos.map((passo, indice) => (
+            <div key={passo.rotulo}>
+              <dt>
+                <span>{String(indice + 1).padStart(2, '0')}</span>
+                {passo.rotulo}
+              </dt>
+              <dd>{passo.valor}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }

@@ -7,7 +7,8 @@ export default async function PreviewAgendaConta({
   searchParams,
 }: PageProps<'/preview/agenda-conta'>) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const conectado = (await searchParams).estado === 'conectado';
+  const { estado } = await searchParams;
+  const conectado = estado === 'conectado';
   return (
     <main className={s.publico}>
       <h1 className={s.titulo}>Minha conta</h1>
@@ -16,7 +17,7 @@ export default async function PreviewAgendaConta({
           configurado: true,
           conectado,
           email: conectado ? 'profissional@example.test' : null,
-          status: conectado ? 'ativa' : 'desconectada',
+          status: conectado ? 'ativa' : estado === 'erro' ? 'reconectar' : 'desconectada',
           ultimoErro: null,
         }}
       />

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { OportunidadeSeletor } from '@/lib/crm/queries';
@@ -31,6 +31,32 @@ const CALENDAR_CONECTADO = {
 };
 
 describe('FormularioAgendarCall', () => {
+  it('preserva os campos após falha de rede sem repetir o convite', async () => {
+    const user = userEvent.setup();
+    agendarReuniaoMock.mockRejectedValueOnce(new Error('private credential'));
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        calendar={CALENDAR_CONECTADO}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Data e horário'), {
+      target: { value: '2026-11-10T10:30' },
+    });
+    await user.clear(screen.getByLabelText('Duração (minutos)'));
+    await user.type(screen.getByLabelText('Duração (minutos)'), '60');
+    await user.click(screen.getByRole('button', { name: 'Criar reunião e enviar convite' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Confira suas reuniões');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('private credential');
+    expect(screen.getByLabelText('Data e horário')).toHaveValue('2026-11-10T10:30');
+    expect(screen.getByLabelText('Duração (minutos)')).toHaveValue(60);
+    expect(screen.getByLabelText('E-mail do cliente')).toHaveValue(OPORTUNIDADE.contatoEmail);
+    expect(screen.getByRole('checkbox')).toBeChecked();
+    expect(screen.getByRole('link', { name: 'Ver reuniões' })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
   it('abre um agendamento simples no Starter sem mandar a pessoa para Vendas', () => {
     agendarReuniaoMock.mockResolvedValue({});
     render(

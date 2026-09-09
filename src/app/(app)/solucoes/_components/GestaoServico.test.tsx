@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import './SalaEntrega.test-mocks';
 import { gerenciarEntrega } from '@/lib/projetos-execucao/gestao-actions';
@@ -7,6 +7,19 @@ import { PROJETO } from './SalaEntrega.test-fixtures';
 afterEach(cleanup);
 beforeEach(() => vi.mocked(gerenciarEntrega).mockResolvedValue({ sucesso: 'Entrega concluída.' }));
 describe('GestaoServico', () => {
+  it('preserva o aceite de pendências no formulário após falha e oferece conferência', async () => {
+    vi.mocked(gerenciarEntrega).mockRejectedValueOnce(new Error('private detail'));
+    render(<GestaoServico projeto={PROJETO} onConcluir={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Concluir entrega' }));
+    const d = within(screen.getByRole('dialog'));
+    fireEvent.click(d.getByRole('checkbox'));
+    fireEvent.click(d.getByRole('button', { name: 'Concluir entrega' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Confira os dados atuais');
+    expect(d.getByRole('checkbox')).toBeChecked();
+    await waitFor(() => expect(d.getByRole('button', { name: 'Atualizar dados' })).toBeEnabled());
+    expect(d.getByRole('link', { name: /Pedir ajuda/ })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('private detail');
+  });
   it('mostra a confirmação de pendências sem declarar aceite', () => {
     render(<GestaoServico projeto={PROJETO} onConcluir={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'Concluir entrega' }));

@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
+import { unstable_rethrow } from 'next/navigation';
 import { ArrowRight, Check, ChevronDown, ContactRound } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
+import { AjudaNaFalha } from '@/components/suporte/AjudaNaFalha';
 import { criarProposta } from '@/lib/propostas/actions';
 import type { OpcoesNovaProposta } from '@/lib/propostas/queries';
 import { sugerirProjetoBase } from '@/lib/propostas/sugestao';
@@ -34,13 +36,29 @@ const ERROS: Record<string, string> = {
   indisponivel: 'Este cliente ou projeto não está mais disponível. Escolha outro para continuar.',
   salvar: 'Não foi possível salvar. Suas escolhas foram mantidas; tente novamente.',
   reuniao: 'Esta reunião não está disponível para o cliente escolhido. Revise antes de continuar.',
+  conexao:
+    'Não foi possível confirmar a criação. Confira a Biblioteca comercial antes de tentar novamente.',
 };
 
 export function MontadorProposta(props: Props) {
+  const [falha, setFalha] = useState<string | null>(null);
+  async function criar(form: FormData) {
+    setFalha(null);
+    try {
+      await criarProposta(form);
+    } catch (erro) {
+      unstable_rethrow(erro);
+      setFalha('conexao');
+    }
+  }
   return (
     <>
-      <form action={criarProposta} className={styles.formulario}>
-        <CamposProposta {...props} />
+      <form
+        action={criar}
+        onReset={(evento) => evento.preventDefault()}
+        className={styles.formulario}
+      >
+        <CamposProposta {...props} erro={falha ?? props.erro} />
       </form>
       <AtalhoGuia slug="criar-proposta-sem-reuniao">Como criar uma proposta</AtalhoGuia>
     </>
@@ -56,6 +74,10 @@ function CamposProposta({
   erro,
 }: Props) {
   const { pending } = useFormStatus();
+  const campos = useRef<HTMLFieldSetElement>(null);
+  useEffect(() => {
+    if (erro) campos.current?.querySelector<HTMLElement>('[data-ajuda-falha]')?.focus();
+  }, [erro]);
   const [oportunidade, setOportunidade] = useState(oportunidadeInicial);
   const [origem, setOrigem] = useState(origemInicial);
   const [editarCliente, setEditarCliente] = useState(
@@ -75,14 +97,23 @@ function CamposProposta({
 
   return (
     <>
-      <fieldset className={styles.campos} disabled={pending} aria-busy={pending}>
+      <fieldset ref={campos} className={styles.campos} disabled={pending} aria-busy={pending}>
         <legend className="sr-only">Dados da proposta</legend>
         <input type="hidden" name="reuniao" value={reuniao} />
 
         {erro ? (
-          <p className={styles.erro} role="alert">
-            {ERROS[erro] ?? ERROS.campos}
-          </p>
+          <AjudaNaFalha
+            contexto="proposta"
+            titulo={erro === 'conexao' ? 'Confira se o rascunho foi criado' : 'Revise a proposta'}
+            descricao={ERROS[erro] ?? ERROS.campos}
+            acao={
+              erro === 'conexao' ? (
+                <a href="/propostas" target="_blank" rel="noopener noreferrer">
+                  Ver propostas
+                </a>
+              ) : undefined
+            }
+          />
         ) : null}
 
         {!opcoes.oportunidades.length ? (

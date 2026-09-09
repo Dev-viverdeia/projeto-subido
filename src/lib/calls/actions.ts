@@ -55,6 +55,8 @@ type CamposPreservados = Partial<Record<CampoAgendamento | 'liveCoach', string>>
 export type EstadoAgendamento = {
   erro?: string;
   reconectar?: boolean;
+  entrar?: boolean;
+  conferir?: boolean;
   porCampo?: Partial<Record<CampoAgendamento, string>>;
   campos?: CamposPreservados;
 };
@@ -107,7 +109,11 @@ export async function agendarReuniao(
   const supabase = await createClient();
   const { data: sessao, error: erroSessao } = await supabase.auth.getUser();
   if (erroSessao || !sessao.user)
-    return { campos, erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+    return {
+      campos,
+      entrar: true,
+      erro: 'Sua sessão expirou. Abra o acesso em outra aba e depois retome este formulário.',
+    };
   const plano = planoDosMetadados(sessao.user.app_metadata);
   const comercialLiberado = planoTemRecurso(plano, 'modulo_comercial');
 
@@ -179,6 +185,7 @@ export async function agendarReuniao(
     console.error('[calls:agendar] A call foi criada sem um identificador válido.');
     return {
       campos,
+      conferir: true,
       erro: 'A reunião foi criada, mas não conseguimos abrir a sala preparada. Atualize Reuniões.',
     };
   }
@@ -191,6 +198,7 @@ export async function agendarReuniao(
     console.error('[calls:agendar] A reunião foi criada sem vínculo interno válido.');
     return {
       campos,
+      conferir: true,
       erro: 'A reunião foi criada, mas não conseguimos preparar o histórico. Atualize Reuniões.',
     };
   }
