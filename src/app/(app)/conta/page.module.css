@@ -455,6 +455,16 @@
   align-items: center;
 }
 
+.integracaoAcoes {
+  flex-direction: column;
+  gap: var(--via-space-3);
+  max-width: 100%;
+}
+
+.integracaoAcoes > a {
+  justify-content: center;
+}
+
 .integracaoAcoes a,
 .integracaoAcoes button {
   gap: var(--via-space-2);
