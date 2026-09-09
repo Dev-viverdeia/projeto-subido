@@ -56,6 +56,26 @@ async function iniciar() {
   act(() => opts.aoEvento({ tipo: 'estado', geracao }));
 }
 describe('controles da resposta em tempo real', () => {
+  it('limite simultâneo permite tentar a mesma pergunta sem cadastrá-la de novo', async () => {
+    const mensagem =
+      'Você já tem respostas em andamento. Aguarde uma terminar; sua pergunta está salva.';
+    mocks.responder.mockResolvedValueOnce({ dados: null, falha: { mensagem } });
+    mocks.responder.mockResolvedValueOnce({
+      dados: { thread_id: 'thread', resposta: 'Comece pelo atendimento.' },
+      falha: null,
+    });
+    render(<Conversa threadId="thread" historico={<p>Histórico anterior</p>} />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Quero reduzir faltas.' } });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent(mensagem);
+    expect(screen.getByText('Quero reduzir faltas.')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await waitFor(() => expect(mocks.responder).toHaveBeenCalledTimes(2));
+    expect(mocks.registrar).toHaveBeenCalledOnce();
+    expect(mocks.responder.mock.calls[1]?.[1]).toEqual(
+      expect.objectContaining({ mensagemId: 'pergunta' }),
+    );
+  });
   it('mostra o trecho real, mantém histórico e troca enviar por Parar', async () => {
     await iniciar();
     act(() => opts.aoEvento({ tipo: 'texto', texto: 'Pergunte sobre as faltas.' }));

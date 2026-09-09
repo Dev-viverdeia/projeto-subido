@@ -6,5 +6,6 @@ import 'server-only';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export function criarAdminSobral() {
-  return createAdminClient();
+  // Pulso e confirmação final não podem esperar indefinidamente pelo banco.
+  return createAdminClient({ timeoutMs: 10_000 });
 }

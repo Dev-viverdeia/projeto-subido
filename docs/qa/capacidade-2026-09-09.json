@@ -1,0 +1,207 @@
+[
+  {
+    "modo": "baseline",
+    "ambiente": "PostgreSQL 17 local; esquema mínimo; sem provedores externos",
+    "contratos": {
+      "ia": {
+        "pedidos": 32,
+        "aceitos": 32,
+        "limitados": 0
+      },
+      "finalizacao": {
+        "respostas": 1,
+        "tokens": 100
+      },
+      "enriquecimento": {
+        "pedidos": 32,
+        "aceitos": 2
+      },
+      "estorno": {
+        "saldo": 1000,
+        "debitos": 2,
+        "estornos": 2
+      },
+      "email": {
+        "workers": 16,
+        "reservados": 100,
+        "duplicados": 0
+      }
+    },
+    "cenarios": {
+      "8": {
+        "conexoes": 8,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 34305,
+        "p50_ms": 5.817,
+        "p95_ms": 65.77,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 8\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 34305\nnumber of failed transactions: 0 (0.000%)\nlatency average = 13.991 ms\ninitial connection time = 17.939 ms\ntps = 571.800538 (without initial connection time)\n"
+      },
+      "32": {
+        "conexoes": 32,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 19043,
+        "p50_ms": 95.924,
+        "p95_ms": 204.583,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 32\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 19043\nnumber of failed transactions: 0 (0.000%)\nlatency average = 101.122 ms\ninitial connection time = 35.365 ms\ntps = 316.449533 (without initial connection time)\n"
+      }
+    }
+  },
+  {
+    "modo": "atual",
+    "ambiente": "PostgreSQL 17 local; esquema mínimo; sem provedores externos",
+    "contratos": {
+      "ia": {
+        "pedidos": 32,
+        "aceitos": 2,
+        "limitados": 30
+      },
+      "finalizacao": {
+        "respostas": 1,
+        "tokens": 100
+      },
+      "retomadaIA": {
+        "retomou": true,
+        "workerAntigoRecusado": true
+      },
+      "enriquecimento": {
+        "pedidos": 32,
+        "aceitos": 2
+      },
+      "estorno": {
+        "saldo": 1000,
+        "debitos": 2,
+        "estornos": 2
+      },
+      "resultadoAtrasadoRecusado": true,
+      "email": {
+        "workers": 16,
+        "reservados": 1,
+        "duplicados": 0
+      },
+      "retomadaEmail": {
+        "mesmoId": true,
+        "expirado": true
+      }
+    },
+    "cenarios": {
+      "8": {
+        "conexoes": 8,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 40696,
+        "p50_ms": 11.567,
+        "p95_ms": 15.822,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 8\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 40696\nnumber of failed transactions: 0 (0.000%)\nlatency average = 11.798 ms\ninitial connection time = 3.365 ms\ntps = 678.062999 (without initial connection time)\n"
+      },
+      "32": {
+        "conexoes": 32,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 29644,
+        "p50_ms": 59.413,
+        "p95_ms": 90.931,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 32\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 29644\nnumber of failed transactions: 0 (0.000%)\nlatency average = 64.829 ms\ninitial connection time = 14.981 ms\ntps = 493.609058 (without initial connection time)\n"
+      }
+    }
+  },
+  {
+    "modo": "baseline",
+    "ambiente": "PostgreSQL 17 local; esquema mínimo; sem provedores externos",
+    "contratos": {
+      "ia": {
+        "pedidos": 32,
+        "aceitos": 32,
+        "limitados": 0
+      },
+      "finalizacao": {
+        "respostas": 1,
+        "tokens": 100
+      },
+      "retomadaIA": {
+        "retomou": true,
+        "workerAntigoRecusado": true
+      },
+      "enriquecimento": {
+        "pedidos": 32,
+        "aceitos": 2
+      },
+      "estorno": {
+        "saldo": 1000,
+        "debitos": 2,
+        "estornos": 2
+      },
+      "resultadoAtrasadoRecusado": true,
+      "email": {
+        "workers": 16,
+        "reservados": 100,
+        "duplicados": 0
+      },
+      "retomadaEmail": {
+        "mesmoId": true,
+        "expirado": true
+      }
+    },
+    "cenarios": {
+      "8": {
+        "conexoes": 8,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 48169,
+        "p50_ms": 4.246,
+        "p95_ms": 61.077,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 8\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 48169\nnumber of failed transactions: 0 (0.000%)\nlatency average = 9.961 ms\ninitial connection time = 31.203 ms\ntps = 803.094444 (without initial connection time)\n"
+      }
+    }
+  },
+  {
+    "modo": "atual",
+    "ambiente": "PostgreSQL 17 local; esquema mínimo; sem provedores externos",
+    "contratos": {
+      "ia": {
+        "pedidos": 32,
+        "aceitos": 2,
+        "limitados": 30
+      },
+      "finalizacao": {
+        "respostas": 1,
+        "tokens": 100
+      },
+      "retomadaIA": {
+        "retomou": true,
+        "workerAntigoRecusado": true
+      },
+      "enriquecimento": {
+        "pedidos": 32,
+        "aceitos": 2
+      },
+      "estorno": {
+        "saldo": 1000,
+        "debitos": 2,
+        "estornos": 2
+      },
+      "resultadoAtrasadoRecusado": true,
+      "email": {
+        "workers": 16,
+        "reservados": 1,
+        "duplicados": 0
+      },
+      "retomadaEmail": {
+        "mesmoId": true,
+        "expirado": true
+      }
+    },
+    "cenarios": {
+      "8": {
+        "conexoes": 8,
+        "aquecimento_segundos": 10,
+        "duracao_segundos": 60,
+        "transacoes": 33047,
+        "p50_ms": 14.35,
+        "p95_ms": 18.503,
+        "pgbench": "pgbench (17.10)\ntransaction type: /tmp/carga.sql\nscaling factor: 1\nquery mode: simple\nnumber of clients: 8\nnumber of threads: 2\nmaximum number of tries: 1\nduration: 60 s\nnumber of transactions actually processed: 33047\nnumber of failed transactions: 0 (0.000%)\nlatency average = 14.529 ms\ninitial connection time = 3.803 ms\ntps = 550.604836 (without initial connection time)\n"
+      }
+    }
+  }
+]

@@ -45,14 +45,17 @@ function banco() {
 function evento(type: string, tags: Record<string, string> = { suporte_id: id }) {
   return { type, data: { email_id: 'email-teste', tags } } as WebhookEventPayload;
 }
+function fila(data: unknown[]) {
+  mocks.rpc
+    .mockReset()
+    .mockResolvedValue({ data: [], error: null })
+    .mockResolvedValueOnce({ data, error: null });
+}
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   mocks.config.mockReturnValue({ chave: 'teste', remetente: 'Subido <suporte@example.test>' });
   mocks.receber.mockReturnValue(null);
-  mocks.rpc.mockResolvedValue({
-    data: [{ id, atendimento: id, tipo: 'usuario', destinatario: 'cliente@example.test' }],
-    error: null,
-  });
+  fila([{ id, atendimento: id, tipo: 'usuario', destinatario: 'cliente@example.test' }]);
   mocks.send.mockResolvedValue({ data: { id: 'email-teste' }, error: null });
 });
 describe('notificações do suporte', () => {
@@ -79,12 +82,9 @@ describe('notificações do suporte', () => {
   it('inclui somente resposta pública, Reply-To opaco e encadeamento seguro', async () => {
     const q = banco();
     mocks.receber.mockReturnValue({ dominio: 'ajuda.subido.example', chave: 'a'.repeat(48) });
-    mocks.rpc.mockResolvedValue({
-      data: [
-        { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
-      ],
-      error: null,
-    });
+    fila([
+      { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
+    ]);
     q.maybeSingle
       .mockResolvedValueOnce({
         data: { texto: 'Mensagem da equipe <script>', papel: 'equipe', interna: false },
@@ -105,12 +105,9 @@ describe('notificações do suporte', () => {
   });
   it('nunca inclui nota interna na notificação', async () => {
     const q = banco();
-    mocks.rpc.mockResolvedValue({
-      data: [
-        { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
-      ],
-      error: null,
-    });
+    fila([
+      { id, atendimento: id, evento: id, tipo: 'usuario', destinatario: 'cliente@example.test' },
+    ]);
     q.maybeSingle.mockResolvedValue({
       data: { texto: 'SEGREDO INTERNO', papel: 'equipe', interna: true },
       error: null,
@@ -120,10 +117,7 @@ describe('notificações do suporte', () => {
   });
   it('rejeita link de confirmação que saia do domínio', async () => {
     banco();
-    mocks.rpc.mockResolvedValue({
-      data: [{ id, atendimento: id, tipo: 'verificar', acesso_url: 'https://evil.test/' }],
-      error: null,
-    });
+    fila([{ id, atendimento: id, tipo: 'verificar', acesso_url: 'https://evil.test/' }]);
     expect(await processarNotificacoesSuporte()).toEqual({ enviadas: 0, falhas: 1 });
     expect(mocks.send).not.toHaveBeenCalled();
   });
@@ -131,6 +125,39 @@ describe('notificações do suporte', () => {
     banco();
     expect(await conciliarNotificacaoSuporte(evento('email.delivered', {}))).toBe(false);
     expect(mocks.from).not.toHaveBeenCalled();
+  });
+  it('só reserva o próximo envio depois de confirmar o anterior', async () => {
+    banco();
+    let confirmar!: (value: unknown) => void;
+    mocks.send.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          confirmar = resolve;
+        }),
+    );
+    const trabalho = processarNotificacoesSuporte();
+    await vi.waitFor(() => expect(mocks.send).toHaveBeenCalledOnce());
+    expect(mocks.rpc).toHaveBeenCalledTimes(1);
+    confirmar({ data: { id: 'enviado' }, error: null });
+    expect(await trabalho).toEqual({ enviadas: 1, falhas: 0 });
+    expect(mocks.rpc).toHaveBeenCalledTimes(2);
+  });
+  it('não reserva nada quando o ciclo expirou', async () => {
+    banco();
+    await expect(processarNotificacoesSuporte(AbortSignal.abort())).rejects.toThrow();
+    expect(mocks.rpc).not.toHaveBeenCalled();
+    expect(mocks.send).not.toHaveBeenCalled();
+  });
+  it('ACK perdido reutiliza a mesma chave na retomada', async () => {
+    banco();
+    mocks.send.mockRejectedValueOnce(new Error('conexão caiu após aceite'));
+    expect(await processarNotificacoesSuporte()).toEqual({ enviadas: 0, falhas: 1 });
+    fila([{ id, atendimento: id, tipo: 'usuario', destinatario: 'cliente@example.test' }]);
+    expect(await processarNotificacoesSuporte()).toEqual({ enviadas: 1, falhas: 0 });
+    expect(mocks.send.mock.calls.map((call) => call[1] as unknown)).toEqual([
+      { idempotencyKey: `suporte/${id}` },
+      { idempotencyKey: `suporte/${id}` },
+    ]);
   });
   it('distingue entrega confirmada de aceite e não rebaixa uma entrega com evento sent tardio', async () => {
     const q = banco();

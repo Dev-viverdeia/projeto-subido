@@ -88,6 +88,11 @@ jobs:
       - name: Testes
         run: npm test
 
+      # PostgreSQL descartável, sem portas ou credenciais. Reproduz disputas
+      # entre conexões; não é um teste de carga no banco de produção.
+      - name: Concorrência e retomadas
+        run: node scripts/perf/capacidade.mjs --contratos
+
       - name: Build
         run: npm run build
 

@@ -26,6 +26,14 @@ afterEach(() => {
 });
 
 describe('recuperação da resposta', () => {
+  it('limite de concorrência preserva a pergunta e não repete POST automaticamente', async () => {
+    const mensagem =
+      'Você já tem respostas em andamento. Aguarde uma terminar; sua pergunta está salva.';
+    const fetch = vi.fn().mockResolvedValue(Response.json({ erro: mensagem }, { status: 429 }));
+    vi.stubGlobal('fetch', fetch);
+    expect((await responderPendente(base.thread_id, opcoes())).falha?.mensagem).toBe(mensagem);
+    expect(fetch).toHaveBeenCalledOnce();
+  });
   it('entrega texto antes da confirmação final', async () => {
     let stream!: ReadableStreamDefaultController<Uint8Array>;
     vi.stubGlobal(

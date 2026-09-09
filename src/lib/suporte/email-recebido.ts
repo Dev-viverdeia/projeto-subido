@@ -1,7 +1,7 @@
 import 'server-only';
 import { randomBytes, createHash } from 'node:crypto';
 import { setTimeout as esperar } from 'node:timers/promises';
-import { Resend } from 'resend';
+import { ResendSuporte } from './resend-worker';
 import { env, suporteEmailEnv } from '@/lib/env';
 import { corpoLimitado } from './http';
 import { criarSistemaSuporte, hashAcesso, limitarSuporte } from './servidor';
@@ -15,11 +15,14 @@ import {
 import { remetenteAutentico } from './email-autenticidade';
 import { MAX_ARQUIVO, tipoRealArquivo } from './contrato';
 
-async function baixar(url: string, limite: number) {
+async function baixar(url: string, limite: number, signal: AbortSignal) {
   // Apenas URLs retornadas pela API autenticada, nunca links do corpo do e-mail.
   const u = new URL(url);
   if (u.protocol !== 'https:' || u.username || u.password) throw new Error('url_invalida');
-  const r = await fetch(u, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
+  const r = await fetch(u, {
+    redirect: 'error',
+    signal: AbortSignal.any([signal, AbortSignal.timeout(10_000)]),
+  });
   if (!r.ok) throw new Error('download');
   return corpoLimitado(
     new Request(u, { method: 'POST', body: r.body, duplex: 'half' } as RequestInit),
@@ -30,16 +33,19 @@ function uuidArquivo(email: string, id: string) {
   const h = createHash('sha256').update(`${email}:${id}`).digest('hex');
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`;
 }
-export async function processarEmailsSuporte() {
+export async function processarEmailsSuporte(signal = AbortSignal.timeout(55_000)) {
+  signal.throwIfAborted();
   const config = suporteEmailEnv();
-  if (!config) return { incorporados: 0, revisao: 0 };
-  const db = criarSistemaSuporte();
-  const resend = new Resend(config.api);
+  if (!config) return { incorporados: 0, revisao: 0, falhasRecebimento: 0 };
+  const db = criarSistemaSuporte({ signal });
+  const resend = new ResendSuporte(config.api, signal);
   const { data: fila, error } = await db.rpc('suporte_email_reservar');
   if (error) throw new Error('fila_email');
   let incorporados = 0,
-    revisao = 0;
+    revisao = 0,
+    falhasRecebimento = 0;
   for (const item of fila ?? []) {
+    signal.throwIfAborted();
     const situacao = async (
       estado: 'revisao' | 'ignorado' | 'falhou',
       motivo: string,
@@ -58,7 +64,7 @@ export async function processarEmailsSuporte() {
       if (erro) throw erro;
     };
     try {
-      await esperar(600);
+      await esperar(600, undefined, { signal });
       const { data: email, error: erro } = await resend.emails.receiving.get(item.id, {
         html_format: 'cid',
       });
@@ -97,19 +103,20 @@ export async function processarEmailsSuporte() {
         }
       }
       if (!email.raw?.download_url) throw new Error('original_indisponivel');
-      const raw = Buffer.from(await baixar(email.raw.download_url, 14_000_000));
+      const raw = Buffer.from(await baixar(email.raw.download_url, 14_000_000, signal));
       if (!(await remetenteAutentico(raw, remetente))) {
         await situacao('revisao', 'Não foi possível confirmar a autenticidade do remetente.', caso);
         revisao++;
         continue;
       }
       if (
-        (novo && !(await limitarSuporte('entrada-email', 'novos-total', 100, 3600))) ||
+        (novo && !(await limitarSuporte('entrada-email', 'novos-total', 100, 3600, signal))) ||
         !(await limitarSuporte(
           remetente,
           novo ? 'email-novo' : 'email-resposta',
           novo ? 8 : 60,
           3600,
+          signal,
         ))
       ) {
         await situacao('revisao', 'Limite de mensagens atingido.', caso);
@@ -145,13 +152,13 @@ export async function processarEmailsSuporte() {
           recusados++;
           continue;
         }
-        await esperar(600);
+        await esperar(600, undefined, { signal });
         const { data: anexo, error: erroAnexo } = await resend.emails.receiving.attachments.get({
           emailId: item.id,
           id: arquivo.id,
         });
         if (erroAnexo || !anexo) throw new Error('anexo_provedor');
-        const bytes = await baixar(anexo.download_url, MAX_ARQUIVO);
+        const bytes = await baixar(anexo.download_url, MAX_ARQUIVO, signal);
         const mime = tipoRealArquivo(bytes);
         if (!mime || mime !== arquivo.content_type || !bytes.length) {
           recusados++;
@@ -214,8 +221,10 @@ export async function processarEmailsSuporte() {
       }
       incorporados++;
     } catch {
+      signal.throwIfAborted();
       await situacao('falhou', 'Não foi possível processar. O original continua no provedor.');
+      falhasRecebimento++;
     }
   }
-  return { incorporados, revisao };
+  return { incorporados, revisao, falhasRecebimento };
 }

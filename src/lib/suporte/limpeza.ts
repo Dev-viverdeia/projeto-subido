@@ -1,8 +1,8 @@
 import 'server-only';
 import { criarSistemaSuporte } from './servidor';
 
-export async function limparAnexosSuporte() {
-  const db = criarSistemaSuporte();
+export async function limparAnexosSuporte(signal = AbortSignal.timeout(10_000)) {
+  const db = criarSistemaSuporte({ signal });
   const { error } = await db.rpc('suporte_preparar_limpeza');
   if (error) throw new Error('limpeza_indisponivel');
   const { data, error: consulta } = await db
