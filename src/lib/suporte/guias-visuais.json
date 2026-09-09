@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "conectar-google-agenda",
+    "resumo": "Conecte sua conta do Google antes de criar o primeiro convite.",
+    "passos": [
+      "Abra Minha conta. Na seção Google Calendar, escolha Conectar Google Calendar.",
+      "Na tela do Google, escolha a conta que enviará os convites e revise as permissões antes de autorizar.",
+      "De volta à plataforma, confira Calendário conectado e o e-mail da agenda. Agora você pode agendar uma reunião."
+    ],
+    "dica": "Apareceu um bloqueio do Google ou a agenda não conectou? Peça ajuda à equipe e envie o aviso, sem senhas ou códigos. Não considere a autorização concluída enquanto a plataforma não confirmar.",
+    "capturas": [
+      {
+        "passo": 0,
+        "arquivo": "agenda-desconectado",
+        "alt": "Seção Google Calendar em Minha conta, com o botão Conectar Google Calendar."
+      },
+      {
+        "passo": 2,
+        "arquivo": "agenda-conectado",
+        "alt": "Estado Calendário conectado com o e-mail demonstrativo da agenda autorizada."
+      }
+    ]
+  },
+  {
+    "slug": "agendar-reuniao",
+    "resumo": "Crie o convite pela sua agenda. O cliente entra pela sala pública da Subido.",
+    "passos": [
+      "Com a agenda conectada, abra Reuniões e escolha Agendar reunião. Você também pode agendar pela ficha do cliente em Vendas.",
+      "Escolha o cliente, o tipo e a duração da reunião. Confira Data e horário e o E-mail do cliente. O horário usa o fuso do seu dispositivo.",
+      "Escolha Criar reunião e enviar convite. Ao terminar, confira a confirmação de envio pelo Google Calendar. Para compartilhar a sala, abra Outras ações e escolha Copiar link da sala."
+    ],
+    "dica": "A reunião foi salva, mas o convite falhou? Confira o aviso da reunião e a conexão da agenda antes de tentar novamente. Não crie outra reunião para corrigir o mesmo convite.",
+    "capturas": [
+      {
+        "passo": 1,
+        "arquivo": "agendar-reuniao",
+        "alt": "Formulário de agendamento com cliente, data, duração, e-mail e botão Criar reunião e enviar convite."
+      }
+    ]
+  },
+  {
+    "slug": "criar-proposta-sem-reuniao",
+    "resumo": "Use o que você já combinou por WhatsApp, telefone ou pessoalmente.",
+    "passos": [
+      "Abra Propostas e escolha Nova proposta (ou Criar proposta, se a lista estiver vazia). Você também pode criar pela ficha do cliente em Vendas. Cadastre o cliente primeiro, se necessário.",
+      "Confirme o cliente e escolha um Projeto-base ou Começar sem um projeto-base. Clique em Criar rascunho. Nada será enviado ao cliente.",
+      "Edite objetivo, escopo, prazo e investimento. Confira a prévia ao lado; no celular, use Ver prévia. Salve as alterações antes de apresentar.",
+      "Use Marcar como pronta e depois Marcar como enviada para liberar o link. Copie e compartilhe com o cliente. Marcar como enviada não substitui o envio do link."
+    ],
+    "dica": "Não precisa registrar uma reunião para criar a proposta. Antes de compartilhar, confira os valores e o que está incluído no serviço. O aceite do cliente é uma etapa separada.",
+    "capturas": [
+      {
+        "passo": 1,
+        "arquivo": "proposta-sem-reuniao",
+        "alt": "Criação de proposta sem reunião, com cliente, projeto-base e botão Criar rascunho."
+      }
+    ]
+  },
+  {
+    "slug": "entrega-pontual-recorrente",
+    "resumo": "Finalize um projeto pontual ou mantenha o acompanhamento de um serviço recorrente.",
+    "passos": [
+      "Abra Entregas e entre no projeto do cliente. Confira as tarefas, os materiais e as aprovações antes de concluir.",
+      "Na barra de gestão da entrega, clique em Pontual ou Recorrente. Se a entrega já terminou, use Gerenciar. Escolha o tipo e clique em Salvar tipo de projeto.",
+      "Clique em Concluir entrega e revise a confirmação. Um projeto pontual vai para Concluídas. Um recorrente continua em Recorrentes, com o histórico preservado.",
+      "Se o serviço recorrente terminar, use Encerrar acompanhamento. Para voltar a executar um projeto concluído, abra Gerenciar e escolha Reabrir execução."
+    ],
+    "dica": "Concluir a entrega não registra o aceite do cliente nem cria cobranças. Revise qualquer tarefa ou aprovação pendente antes de confirmar.",
+    "capturas": [
+      {
+        "passo": 1,
+        "arquivo": "entrega-tipo",
+        "alt": "Escolha entre Pontual, entregar e concluir, e Recorrente, entregar e continuar acompanhando."
+      },
+      {
+        "passo": 2,
+        "arquivo": "entrega-gestao",
+        "alt": "Barra de gestão com tipo Pontual e botão Concluir entrega."
+      }
+    ]
+  }
+]

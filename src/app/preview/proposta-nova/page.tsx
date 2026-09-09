@@ -91,16 +91,20 @@ export default async function PreviewNovaPropostaPage({
               estado === 'lista' || estado === 'vazio' ? '' : '11111111-1111-4111-8111-111111111111'
             }
             origemInicial={estado === 'erro' ? 'sem-base' : ''}
-            reuniaoInicial="55555555-5555-4555-8555-555555555555"
-            contextoCall={{
-              titulo: 'Descoberta comercial · Clínica Aurora',
-              resumo:
-                'A recepção confirmou perda de contexto nas trocas de turno e demora para responder novos contatos fora do horário comercial.',
-              decisoes: 2,
-              compromissos: 1,
-              pontosAValidar: 2,
-              oportunidadesProjeto: ['Atendimento com IA no WhatsApp'],
-            }}
+            reuniaoInicial={estado === 'sem-reuniao' ? '' : '55555555-5555-4555-8555-555555555555'}
+            contextoCall={
+              estado === 'sem-reuniao'
+                ? null
+                : {
+                    titulo: 'Descoberta comercial · Clínica Aurora',
+                    resumo:
+                      'A recepção confirmou perda de contexto nas trocas de turno e demora para responder novos contatos fora do horário comercial.',
+                    decisoes: 2,
+                    compromissos: 1,
+                    pontosAValidar: 2,
+                    oportunidadesProjeto: ['Atendimento com IA no WhatsApp'],
+                  }
+            }
             erro={estado === 'erro' ? 'salvar' : null}
           />
         </div>

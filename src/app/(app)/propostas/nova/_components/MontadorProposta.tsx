@@ -5,6 +5,7 @@ import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { ArrowRight, Check, ChevronDown, ContactRound } from 'lucide-react';
 import { Button } from '@/design-system/via';
+import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
 import { criarProposta } from '@/lib/propostas/actions';
 import type { OpcoesNovaProposta } from '@/lib/propostas/queries';
 import { sugerirProjetoBase } from '@/lib/propostas/sugestao';
@@ -37,9 +38,12 @@ const ERROS: Record<string, string> = {
 
 export function MontadorProposta(props: Props) {
   return (
-    <form action={criarProposta} className={styles.formulario}>
-      <CamposProposta {...props} />
-    </form>
+    <>
+      <form action={criarProposta} className={styles.formulario}>
+        <CamposProposta {...props} />
+      </form>
+      <AtalhoGuia slug="criar-proposta-sem-reuniao">Como criar uma proposta</AtalhoGuia>
+    </>
   );
 }
 

@@ -380,6 +380,35 @@
   backdrop-filter: var(--via-glass-blur);
 }
 
+.integracaoBotao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--via-navy);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: inherit;
+  font-size: var(--app-fs-reading);
+  text-decoration: none;
+  cursor: pointer;
+}
+.integracaoBotao[data-secundario] {
+  background: var(--app-elev-1-bg);
+  border-color: var(--app-elev-1-line);
+  color: var(--via-text);
+}
+.integracaoBotao:hover {
+  box-shadow: var(--app-glass-card-shadow);
+}
+.integracaoBotao:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
+}
+
 .integracaoCorpo {
   display: flex;
   align-items: center;
