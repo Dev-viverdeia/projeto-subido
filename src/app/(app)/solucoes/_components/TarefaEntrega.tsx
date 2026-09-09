@@ -11,6 +11,8 @@ import {
   MessageSquareMore,
   Play,
   RotateCcw,
+  FileCheck2,
+  Target,
 } from 'lucide-react';
 import { atualizarTarefaProjeto } from '@/lib/projetos-execucao/actions';
 import { useFormularioEntrega } from '@/lib/projetos-execucao/use-formulario-entrega';
@@ -86,7 +88,7 @@ export function TarefaEntrega({
   return (
     <>
       <article id="tarefa-em-foco" className={styles.tarefa} data-status={tarefa.status}>
-        <header className={styles.tarefaTopo} data-on-dark>
+        <header className={styles.tarefaTopo}>
           <div className={styles.tarefaTitulo}>
             <p>
               {tarefa.faseTitulo} · {rotuloMomento}
@@ -103,11 +105,15 @@ export function TarefaEntrega({
 
         <section className={styles.resultadoTarefa} aria-labelledby="resultado-tarefa-titulo">
           <div>
-            <p>Pronto quando</p>
+            <p>
+              <Target size={18} aria-hidden="true" /> Pronto quando
+            </p>
             <h3 id="resultado-tarefa-titulo">{guiaValidacao.criterio}</h3>
           </div>
           <div>
-            <p>Comprove com</p>
+            <p>
+              <FileCheck2 size={18} aria-hidden="true" /> Comprove com
+            </p>
             <strong>{guiaValidacao.material}</strong>
           </div>
         </section>
@@ -126,7 +132,6 @@ export function TarefaEntrega({
           <summary>
             <span>
               <strong>Contexto de {contexto.empresa}</strong>
-              <small>Objetivo, limites e materiais disponíveis</small>
             </span>
             <ChevronDown size={17} aria-hidden="true" />
           </summary>
@@ -138,7 +143,11 @@ export function TarefaEntrega({
               </div>
               <div>
                 <dt>Limite combinado</dt>
-                <dd>{contexto.limites[0] ?? 'Nenhum limite foi registrado no briefing.'}</dd>
+                <dd>
+                  {contexto.limites.length
+                    ? contexto.limites.join(' · ')
+                    : 'Nenhum limite foi registrado no briefing.'}
+                </dd>
               </div>
               <div>
                 <dt>Base disponível</dt>
@@ -168,12 +177,15 @@ export function TarefaEntrega({
         <section className={styles.validacaoTarefa} aria-labelledby="validacao-tarefa-titulo">
           <header>
             <div>
-              <p>Registro da entrega</p>
               <h3 id="validacao-tarefa-titulo">
                 {concluida ? 'Resultado registrado' : 'Comprove e conclua'}
               </h3>
             </div>
-            <span>{concluida ? 'Concluído' : '1 comprovação'}</span>
+            {concluida && (
+              <span>
+                <Check size={16} aria-hidden="true" /> Concluído
+              </span>
+            )}
           </header>
 
           {concluida ? (
@@ -238,7 +250,7 @@ export function TarefaEntrega({
                 <input type="checkbox" name="criterioConfirmado" value="sim" disabled={pendente} />
                 <span>
                   <strong>Revisei o resultado usando o critério acima.</strong>
-                  <small>Esta confirmação será exigida somente ao concluir a tarefa.</small>
+                  <small>Necessário para concluir.</small>
                 </span>
               </label>
 

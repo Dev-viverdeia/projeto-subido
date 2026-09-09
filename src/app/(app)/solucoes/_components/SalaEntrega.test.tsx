@@ -7,6 +7,18 @@ import { ENCERRAMENTO_TESTE } from './SalaEntrega.test-mocks';
 import { SalaEntrega } from './SalaEntrega';
 
 describe('SalaEntrega', () => {
+  it('não confunde ausência de tarefas com entrega concluída', async () => {
+    const user = userEvent.setup();
+    render(
+      <SalaEntrega
+        projeto={{ ...PROJETO, status: 'concluido', tarefas: [], total: 0, feitas: 0 }}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: /Trabalho/ }));
+    expect(screen.getByRole('heading', { name: 'Nenhuma tarefa disponível' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Entrega concluída' })).toBeNull();
+  });
+
   it('permite recuperar o briefing de uma entrega já iniciada sem kickoff', async () => {
     const user = userEvent.setup();
     render(
