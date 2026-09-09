@@ -5,10 +5,15 @@ import Link from 'next/link';
 import {
   ArrowUpRight,
   BookOpen,
+  CalendarDays,
+  ChevronRight,
   ChevronDown,
+  GraduationCap,
   Headphones,
   MessageCircle,
   Search,
+  UserRound,
+  Waypoints,
   X,
 } from 'lucide-react';
 import {
@@ -20,6 +25,14 @@ import {
 } from '@/lib/suporte/contrato';
 import { FAQ } from '@/lib/suporte/guias-iniciais';
 import s from './suporte.module.css';
+
+const iconesGuia = {
+  conta: UserRound,
+  vendas: Waypoints,
+  reunioes: CalendarDays,
+  projetos: GraduationCap,
+  ia: MessageCircle,
+};
 
 export function CentralAjuda({
   artigos,
@@ -47,11 +60,11 @@ export function CentralAjuda({
   const base = autenticado ? '/suporte' : '/ajuda';
   const visiveis = busca || categoria || expandido ? encontrados : encontrados.slice(0, 6);
   return (
-    <div className={s.pagina}>
+    <div className={`${s.pagina} ${s.central}`}>
       <header className={s.cabecalho}>
         <div>
           <h1 className={s.titulo}>Central de ajuda</h1>
-          <p className={s.subtitulo}>Encontre uma resposta ou fale com a equipe.</p>
+          <p className={s.subtitulo}>O que você precisa resolver?</p>
         </div>
         <div className={s.acoes}>
           {autenticado && (
@@ -83,12 +96,12 @@ export function CentralAjuda({
             <ArrowUpRight size={20} />
           </Link>
         ))}
-      <section aria-label="Buscar ajuda">
+      <section className={s.entradaAjuda} aria-label="Buscar ajuda">
         <div className={s.busca}>
           <Search size={22} />
           <input
             aria-label="Buscar nos guias"
-            placeholder="Busque pelo que você precisa fazer"
+            placeholder="Buscar uma orientação"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
@@ -98,48 +111,76 @@ export function CentralAjuda({
             </button>
           )}
         </div>
-        <div className={s.categorias} aria-label="Assuntos">
-          <button className={s.chip} aria-pressed={!categoria} onClick={() => setCategoria('')}>
-            Todos
-          </button>
-          {Object.entries(CATEGORIAS)
-            .filter(([id]) => id !== 'outros')
-            .map(([id, nome]) => (
-              <button
-                key={id}
-                className={s.chip}
-                aria-pressed={categoria === id}
-                onClick={() => setCategoria(categoria === id ? '' : id)}
-              >
-                {nome}
-              </button>
-            ))}
-        </div>
+        <Link className={s.entradaIA} href={`${base}/ia`}>
+          <span className={s.iconeAjuda}>
+            <MessageCircle size={23} />
+          </span>
+          <span>
+            <strong>Perguntar à IA</strong>
+            <span className={s.meta}>Ajuda com os guias · sem créditos</span>
+          </span>
+          <ArrowUpRight size={19} />
+        </Link>
       </section>
-      <div className={s.principal}>
+      <div>
         <section aria-labelledby="guias-titulo">
-          <h2 id="guias-titulo" className={s.secaoTitulo}>
-            {busca || categoria ? 'Resultados' : 'Guias para o dia a dia'}
-          </h2>
+          <div className={s.cabecalhoGuias}>
+            <h2 id="guias-titulo" className={s.secaoTitulo}>
+              {busca || categoria ? 'Resultados' : 'Guias para o dia a dia'}
+            </h2>
+            <label className={s.filtroGuias}>
+              <span className={s.oculto}>Filtrar guias por área</span>
+              <select
+                className={s.select}
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
+              >
+                <option value="">Todas as áreas</option>
+                {Object.entries(CATEGORIAS)
+                  .filter(([id]) => id !== 'outros')
+                  .map(([id, nome]) => (
+                    <option key={id} value={id}>
+                      {nome}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          </div>
           <div aria-live="polite">
             <span className={s.oculto}>{encontrados.length} guias encontrados</span>
           </div>
           {encontrados.length ? (
             <div className={s.guias}>
-              {visiveis.map((a) => (
-                <Link key={a.slug} href={`/ajuda/${a.slug}`} className={s.guia}>
-                  <BookOpen size={21} />
-                  <span>
-                    <strong>{a.titulo}</strong>
-                    <span className={s.meta}>{CATEGORIAS[a.categoria]}</span>
-                  </span>
-                </Link>
-              ))}
+              {visiveis.map((a) => {
+                const Icone = iconesGuia[a.categoria as keyof typeof iconesGuia] || BookOpen;
+                return (
+                  <Link key={a.slug} href={`/ajuda/${a.slug}`} className={s.guia}>
+                    <span className={s.iconeAjuda}>
+                      <Icone size={21} />
+                    </span>
+                    <span>
+                      <strong>{a.titulo}</strong>
+                      <span className={s.meta}>{CATEGORIAS[a.categoria]}</span>
+                    </span>
+                    <ChevronRight size={17} />
+                  </Link>
+                );
+              })}
             </div>
           ) : (
             <div className={s.vazio}>
-              Não encontramos um guia com esses termos. Tente uma palavra diferente ou envie sua
-              dúvida à equipe.
+              <Search size={24} aria-hidden="true" />
+              <strong>Nenhum guia encontrado</strong>
+              <span>Tente outra palavra ou consulte todas as áreas.</span>
+              <button
+                className={s.chip}
+                onClick={() => {
+                  setBusca('');
+                  setCategoria('');
+                }}
+              >
+                Limpar filtros
+              </button>
             </div>
           )}
           {!busca && !categoria && encontrados.length > 6 && (
@@ -148,18 +189,6 @@ export function CentralAjuda({
             </button>
           )}
         </section>
-        <aside className={s.assistente}>
-          <MessageCircle size={30} strokeWidth={1.5} />
-          <h2>Prefere perguntar?</h2>
-          <p>A IA de ajuda consulta os guias e explica como usar o Subido.</p>
-          <LinkAcao variant="secondary" href={`${base}/ia`}>
-            Perguntar à IA <ArrowUpRight size={17} />
-          </LinkAcao>
-          <span className={s.meta}>Sem consumo de créditos.</span>
-          <Link href="/ajuda/acesso" className={s.atalho}>
-            Problema de acesso
-          </Link>
-        </aside>
       </div>
       <section aria-labelledby="faq-titulo">
         <h2 id="faq-titulo" className={s.secaoTitulo}>
@@ -185,6 +214,9 @@ export function CentralAjuda({
           </a>
         )}
         {horario && <span className={s.meta}>{horario}</span>}
+        <Link href="/ajuda/acesso" className={s.atalho}>
+          Problema de acesso
+        </Link>
         <span className={s.meta}>Não compartilhe senhas ou códigos de acesso.</span>
         {equipe && (
           <Link href="/suporte/equipe" className={s.atalho}>

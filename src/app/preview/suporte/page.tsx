@@ -27,7 +27,7 @@ const caso: CasoSuporte = {
 };
 export default async function PreviewSuporte({ searchParams }: PageProps<'/preview/suporte'>) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const { tela } = await searchParams;
+  const { tela, estado, longo } = await searchParams;
   return (
     <main className={s.publico}>
       {tela === 'pedido' ? (
@@ -47,7 +47,16 @@ export default async function PreviewSuporte({ searchParams }: PageProps<'/previ
         </div>
       ) : tela === 'conversa' || tela === 'equipe' ? (
         <ConversaAtendimento
-          caso={caso}
+          caso={{
+            ...caso,
+            ...(estado === 'resolvido' ? { status: 'resolvido' } : {}),
+            ...(longo
+              ? {
+                  assunto:
+                    'Preciso de ajuda para conectar a agenda da minha equipe e recuperar o acesso à reunião com o cliente',
+                }
+              : {}),
+          }}
           preview
           equipe={tela === 'equipe'}
           mensagens={[

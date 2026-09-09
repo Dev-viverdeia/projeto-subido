@@ -137,7 +137,7 @@ export function NovoAtendimento({
     });
   }
   return (
-    <div className={s.pagina}>
+    <div className={`${s.pagina} ${s.paginaPedido}`}>
       <Link href={publico ? '/ajuda' : '/suporte'} className={s.atalho}>
         <ArrowLeft size={18} />
         Central de ajuda
@@ -149,7 +149,7 @@ export function NovoAtendimento({
         <p className={s.subtitulo}>
           {publico
             ? 'Confirme seu e-mail para conversar com a equipe, mesmo sem entrar na conta.'
-            : 'Conte o que aconteceu. A resposta fica salva no seu atendimento.'}
+            : 'Conte o que aconteceu. Vamos ajudar você por aqui.'}
         </p>
       </header>
       {enviado ? (
@@ -205,13 +205,13 @@ export function NovoAtendimento({
               {!publico && (
                 <details className={s.detalhesCompactos}>
                   <summary>
-                    {CATEGORIAS[categoria as keyof typeof CATEGORIAS]} · Alterar assunto
+                    Área: {CATEGORIAS[categoria as keyof typeof CATEGORIAS]} · Alterar
                   </summary>
                   <label className={s.campo}>
                     Área do produto
                     <select
                       className={s.select}
-                      aria-label="Assunto"
+                      aria-label="Área do produto"
                       value={categoria}
                       disabled={pendente}
                       onChange={(e) => setCategoria(e.target.value)}
@@ -282,16 +282,16 @@ export function NovoAtendimento({
               {erro}
             </p>
           )}
-          <div className={s.acoes}>
+          <div className={s.rodapeResposta}>
+            <span className={s.meta}>Sem consumo de créditos</span>
             <Button
               type="submit"
               loading={pendente}
               disabled={upload}
               iconLeft={<Send size={17} />}
             >
-              {publico ? 'Receber link por e-mail' : 'Enviar pedido'}
+              {pendente ? 'Enviando…' : publico ? 'Receber link por e-mail' : 'Enviar pedido'}
             </Button>
-            <span className={s.meta}>Sem consumo de créditos</span>
           </div>
         </form>
       )}

@@ -30,8 +30,11 @@ export function DetalhesAtendimento({
   mudarEstado: (status: CasoSuporte['status']) => void;
 }) {
   return (
-    <aside className={s.lateral}>
-      <h2>{equipe ? 'Atendimento' : 'Acompanhe por aqui'}</h2>
+    <aside
+      className={equipe ? s.lateral : s.encerrarAtendimento}
+      aria-label={equipe ? 'Detalhes do atendimento' : 'Resolução do atendimento'}
+    >
+      {equipe && <h2>Atendimento</h2>}
       {equipe ? (
         <>
           <p>{caso.email}</p>
@@ -104,10 +107,14 @@ export function DetalhesAtendimento({
         </>
       ) : (
         <>
-          <p>
-            Você recebe um aviso por e-mail quando houver uma atualização. A conversa completa fica
-            nesta página.
-          </p>
+          <div>
+            <h2>{caso.status === 'resolvido' ? 'Atendimento resolvido' : 'Tudo resolvido?'}</h2>
+            <p>
+              {caso.status === 'resolvido'
+                ? 'Você pode retomar esta conversa quando precisar.'
+                : 'As respostas ficam aqui e você recebe um aviso por e-mail.'}
+            </p>
+          </div>
           <Button
             variant="secondary"
             disabled={pendente}
@@ -119,7 +126,7 @@ export function DetalhesAtendimento({
             {caso.status === 'resolvido' ? 'Reabrir atendimento' : 'Marcar como resolvido'}
           </Button>
           {caso.status === 'resolvido' && !publico && (
-            <div className={s.lista}>
+            <div className={`${s.lista} ${s.avaliacaoAtendimento}`}>
               <p>Como foi o atendimento?</p>
               <div className={s.acoes}>
                 {[1, 2, 3, 4, 5].map((n) => (

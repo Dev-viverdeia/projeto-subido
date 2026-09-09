@@ -99,6 +99,11 @@ export function ListaAtendimentos({
                 ? 'Nenhum pedido na fila. Novos atendimentos aparecerão aqui.'
                 : 'Você ainda não tem atendimentos. Quando precisar de ajuda, acompanhe a resposta por aqui.'}
           </p>
+          {(status || busca || responsavel) && (
+            <Link className={s.chip} href={`${base}?status=`}>
+              Limpar filtros
+            </Link>
+          )}
           {!equipe && <LinkAcao href="/suporte/novo">Pedir ajuda</LinkAcao>}
         </div>
       ) : (

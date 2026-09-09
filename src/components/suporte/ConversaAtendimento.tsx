@@ -3,7 +3,7 @@ import { LinkAcao } from '@/components/suporte/LinkAcao';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, RefreshCw, Send } from 'lucide-react';
+import { ArrowLeft, LockKeyhole, MessageCircle, RefreshCw, Send } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import {
   atualizarAtendimento,
@@ -76,6 +76,7 @@ export function ConversaAtendimento({
   const [sucesso, setSucesso] = useState('');
   const [pendente, iniciar] = useTransition();
   const mensagemId = useRef('');
+  const resposta = useRef<HTMLTextAreaElement>(null);
   const ultimaRecebida = mensagens.findLast(
     (m) => !m.interna && m.papel === (equipe ? 'usuario' : 'equipe'),
   )?.id;
@@ -171,7 +172,7 @@ export function ConversaAtendimento({
     mensagemId.current = '';
   }
   return (
-    <div className={s.pagina}>
+    <div className={`${s.pagina} ${s.paginaConversa}`} data-equipe={equipe}>
       <header className={s.cabecalho}>
         <div>
           <Link
@@ -181,21 +182,28 @@ export function ConversaAtendimento({
             <ArrowLeft size={18} />
             {equipe ? 'Fila de atendimento' : publico ? 'Central de ajuda' : 'Meus atendimentos'}
           </Link>
-          <h1 className={s.titulo}>{caso.assunto}</h1>
+          <h1 className={`${s.titulo} ${s.tituloConversa}`}>{caso.assunto}</h1>
           <p className={s.subtitulo}>
             Atendimento #{caso.numero} · {CATEGORIAS[caso.categoria]}
           </p>
         </div>
         <div className={s.acoes}>
           <EstadoAtendimento estado={caso.status} />
+          {pagina === 0 && (
+            <Button
+              variant="secondary"
+              iconLeft={<MessageCircle size={18} />}
+              onClick={() => resposta.current?.focus()}
+            >
+              Responder
+            </Button>
+          )}
           <Button
             variant="ghost"
             aria-label="Atualizar conversa"
             onClick={() => router.refresh()}
             iconLeft={<RefreshCw size={18} />}
-          >
-            Atualizar
-          </Button>
+          />
         </div>
       </header>
       {novo && (
@@ -238,7 +246,8 @@ export function ConversaAtendimento({
           </div>
           {pagina === 0 ? (
             <form
-              className={s.form}
+              className={`${s.form} ${s.respostaForm}`}
+              data-interna={interna}
               onSubmit={(e) => {
                 e.preventDefault();
                 enviar();
@@ -260,7 +269,7 @@ export function ConversaAtendimento({
                     disabled={pendente || upload || arquivos.length > 0}
                     onClick={() => alternarModo(true)}
                   >
-                    Nota interna
+                    <LockKeyhole size={15} aria-hidden="true" /> Nota interna
                   </button>
                 </div>
               )}
@@ -309,6 +318,7 @@ export function ConversaAtendimento({
                       : 'Sua mensagem'}
                 </span>
                 <textarea
+                  ref={resposta}
                   aria-labelledby="suporte-rotulo-mensagem"
                   className={s.textarea}
                   value={texto}
@@ -344,14 +354,15 @@ export function ConversaAtendimento({
                   disabled={pendente}
                 />
               )}
-              <div className={s.acoes}>
+              <div className={s.rodapeResposta}>
+                <span className={s.meta}>Não compartilhe senhas ou códigos de acesso.</span>
                 <Button
                   type="submit"
                   disabled={!texto.trim() || upload}
                   loading={pendente}
                   iconLeft={<Send size={17} />}
                 >
-                  {interna ? 'Salvar nota' : 'Enviar mensagem'}
+                  {pendente ? 'Enviando…' : interna ? 'Salvar nota' : 'Enviar mensagem'}
                 </Button>
                 {caso.status === 'resolvido' &&
                   !interna &&
@@ -359,7 +370,6 @@ export function ConversaAtendimento({
                     <span className={s.meta}>Enviar uma mensagem reabre o atendimento.</span>
                   )}
               </div>
-              <span className={s.meta}>Não compartilhe senhas ou códigos de acesso.</span>
             </form>
           ) : (
             <LinkAcao href={caminho}>Voltar à conversa para responder</LinkAcao>

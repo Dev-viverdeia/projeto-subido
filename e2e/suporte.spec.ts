@@ -143,3 +143,83 @@ test('fila e nova resposta permanecem legíveis em larguras pequenas e grandes',
   }
   await expect(page.getByRole('link', { name: /Nova resposta/ })).toBeVisible();
 });
+
+test('central traz IA antes dos guias e permite recuperar uma busca vazia', async ({ page }) => {
+  await page.goto('/preview/suporte?tela=cliente');
+  const ia = page.getByRole('link', { name: /Perguntar à IA/ });
+  const guia = page.getByRole('link', { name: /Entrar na sua conta/ });
+  expect((await ia.boundingBox())!.y).toBeLessThan((await guia.boundingBox())!.y);
+  await expect(ia).toHaveAttribute('href', '/suporte/ia');
+  await page.getByLabel('Filtrar guias por área').selectOption('reunioes');
+  await expect(page.getByRole('link', { name: /Conectar o Google Agenda/ })).toBeVisible();
+  await expect(guia).toHaveCount(0);
+  await page.getByLabel('Buscar nos guias').fill('zzzzzz');
+  await expect(page.getByText('Nenhum guia encontrado', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Limpar filtros' }).click();
+  await expect(page.getByLabel('Filtrar guias por área')).toHaveValue('');
+  await expect(page.getByLabel('Buscar nos guias')).toHaveValue('');
+  await expect(guia).toBeVisible();
+  await guia.focus();
+  expect(await guia.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe('none');
+});
+
+test('responder foca o campo e resolução não fica antes da conversa no celular', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/preview/suporte?tela=conversa&longo=1');
+  const campo = page.getByLabel('Sua mensagem', { exact: true });
+  const fim = page.getByRole('complementary', { name: 'Resolução do atendimento' });
+  expect((await fim.boundingBox())!.y).toBeGreaterThan((await campo.boundingBox())!.y);
+  await page.getByRole('button', { name: 'Responder', exact: true }).click();
+  await expect(campo).toBeFocused();
+  await campo.fill('Consegui conectar minha agenda. Obrigado!');
+  await page.getByRole('button', { name: 'Enviar mensagem', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('nenhuma mensagem foi enviada');
+  await expect(campo).toHaveValue('Consegui conectar minha agenda. Obrigado!');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('atendimento resolvido oferece reabertura e avaliação acessível', async ({ page }) => {
+  await page.goto('/preview/suporte?tela=conversa&estado=resolvido');
+  await expect(page.getByRole('heading', { name: 'Atendimento resolvido' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reabrir atendimento' })).toBeVisible();
+  const nota = page.getByRole('button', { name: 'Nota 5 de 5' });
+  const box = await nota.boundingBox();
+  expect(box!.height).toBeGreaterThanOrEqual(44);
+  await expect(page.getByLabel('Precisa de mais ajuda?')).toBeVisible();
+  expect(
+    (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze())
+      .violations,
+  ).toEqual([]);
+});
+
+test('IA mostra a pergunta enquanto consulta e recupera rascunho em falha', async ({ page }) => {
+  let liberar!: () => void;
+  const espera = new Promise<void>((resolve) => {
+    liberar = resolve;
+  });
+  await page.route('**/api/suporte/ia', async (route) => {
+    await espera;
+    await route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ erro: 'Não foi possível consultar agora.' }),
+    });
+  });
+  await page.goto('/preview/suporte?tela=ia');
+  await page.getByLabel('Sua pergunta').fill('Como conecto minha agenda?');
+  await page.getByRole('button', { name: 'Perguntar', exact: true }).click();
+  await expect(
+    page.getByRole('article').filter({ hasText: 'Como conecto minha agenda?' }),
+  ).toBeVisible();
+  await expect(page.getByRole('status')).toHaveText('Consultando os guias do Subido…');
+  await expect(page.getByLabel('Sua pergunta')).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Pedir ajuda à equipe' })).toBeDisabled();
+  liberar();
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Não foi possível consultar agora.' }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Sua pergunta')).toHaveValue('Como conecto minha agenda?');
+  await expect(page.getByLabel('Sua pergunta')).toBeEnabled();
+});
