@@ -1750,6 +1750,30 @@ export type Database = {
         }
         Relationships: []
       }
+      operacoes_pulsos: {
+        Row: {
+          conferido_em: string
+          falhas_seguidas: number
+          falhou: boolean
+          fase: string
+          iniciado_em: string
+        }
+        Insert: {
+          conferido_em?: string
+          falhas_seguidas?: number
+          falhou: boolean
+          fase: string
+          iniciado_em: string
+        }
+        Update: {
+          conferido_em?: string
+          falhas_seguidas?: number
+          falhou?: boolean
+          fase?: string
+          iniciado_em?: string
+        }
+        Relationships: []
+      }
       perfis_comerciais: {
         Row: {
           atualizado_em: string
@@ -4287,6 +4311,11 @@ export type Database = {
           inscritos: number
           mentoria_id: string
         }[]
+      }
+      operacoes_atendimento_resumo: { Args: never; Returns: Json }
+      operacoes_registrar_pulso: {
+        Args: { p_falhou: boolean; p_fase: string; p_inicio: string }
+        Returns: undefined
       }
       operacoes_sistema_concluir: {
         Args: { p_bloqueio: string; p_job: string; p_resultado?: Json }

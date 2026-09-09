@@ -4,6 +4,9 @@ import 'server-only';
 // eslint-disable-next-line no-restricted-imports
 import { createAdminClient } from '@/lib/supabase/admin';
 import { avaliarSaudeOperacional } from '@/lib/operacoes/saude';
+import { ResumoAtendimentoSchema } from '@/lib/operacoes/atendimento';
+import { ehAdmin } from '@/lib/auth/papeis';
+import { notFound } from 'next/navigation';
 import type { OperacaoJob, StatusOperacao, TipoOperacao } from '@/lib/operacoes/tipos';
 
 export type FiltroOperacoes = {
@@ -12,7 +15,9 @@ export type FiltroOperacoes = {
 };
 
 export async function obterPainelOperacoes(filtros: FiltroOperacoes = {}) {
-  const admin = createAdminClient();
+  // O layout pode renderizar em paralelo. Autoriza antes de consultar com service role.
+  if (!(await ehAdmin())) notFound();
+  const admin = createAdminClient({ timeoutMs: 10000 });
 
   let consulta = admin
     .from('operacoes_jobs')
@@ -22,9 +27,13 @@ export async function obterPainelOperacoes(filtros: FiltroOperacoes = {}) {
   if (filtros.status) consulta = consulta.eq('status', filtros.status);
   if (filtros.tipo) consulta = consulta.eq('tipo', filtros.tipo);
 
-  const [lista, resumoOperacional] = await Promise.all([
+  const [lista, resumoOperacional, atendimento] = await Promise.all([
     consulta,
     admin.rpc('operacoes_sistema_resumo', { p_janela_horas: 24 }).single(),
+    admin.rpc('operacoes_atendimento_resumo').then(
+      (r) => (r.error ? null : ResumoAtendimentoSchema.safeParse(r.data).data),
+      () => null,
+    ),
   ]);
 
   if (lista.error) throw lista.error;
@@ -51,5 +60,6 @@ export async function obterPainelOperacoes(filtros: FiltroOperacoes = {}) {
     })),
     resumo,
     saude: avaliarSaudeOperacional(resumo),
+    atendimento: atendimento ?? null,
   };
 }

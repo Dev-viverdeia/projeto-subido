@@ -6,6 +6,9 @@ vi.mock('@/lib/env', () => ({ cronEnv: () => ({ CRON_SECRET: 'cron-teste' }) }))
 vi.mock('@/lib/suporte/notificacoes', () => ({ processarNotificacoesSuporte: mocks.enviar }));
 vi.mock('@/lib/suporte/email-recebido', () => ({ processarEmailsSuporte: mocks.receber }));
 vi.mock('@/lib/suporte/limpeza', () => ({ limparAnexosSuporte: mocks.limpar }));
+vi.mock('@/lib/operacoes/pulso', () => ({
+  observarSuporte: (_fase: string, executar: () => Promise<unknown>) => executar(),
+}));
 import { GET } from './route';
 
 beforeEach(() => {
