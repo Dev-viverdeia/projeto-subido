@@ -47,14 +47,6 @@
   letter-spacing: var(--app-ls-h4);
 }
 
-.aprovacaoSelo {
-  padding: var(--via-space-2) var(--via-space-3);
-  border: 1px solid color-mix(in srgb, var(--via-white) 16%, transparent);
-  border-radius: var(--app-radius-chip);
-  color: var(--via-gray-300);
-  font-size: var(--app-fs-meta);
-}
-
 .aprovacaoConteudo {
   background: color-mix(in srgb, var(--via-white) 82%, transparent);
 }
@@ -100,13 +92,33 @@
   font-weight: var(--via-fw-semibold);
 }
 
-.aprovacaoResumo blockquote {
+.observacao {
+  margin-top: var(--via-space-3);
+}
+.observacao summary {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  cursor: pointer;
+  list-style: none;
+}
+.observacao summary::-webkit-details-marker {
+  display: none;
+}
+.observacao summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.observacao blockquote {
   max-width: 68ch;
-  margin: var(--via-space-4) 0 0;
+  margin: 0;
   padding-left: var(--via-space-3);
   border-left: 2px solid var(--via-navy);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-reading);
   line-height: 1.55;
 }
 
@@ -302,7 +314,7 @@
 
   .aprovacaoTopo {
     grid-template-columns: 40px minmax(0, 1fr);
-    padding: var(--via-space-5);
+    padding: var(--app-pad-card-tight);
   }
 
   .aprovacaoIcone {
@@ -310,15 +322,10 @@
     height: 40px;
   }
 
-  .aprovacaoSelo {
-    grid-column: 2;
-    justify-self: start;
-  }
-
   .termoAceite,
   .aprovacaoResumo,
   .aprovacao form {
-    padding: var(--via-space-5);
+    padding: var(--app-pad-card-tight);
   }
 
   .validacaoGrid > section,
@@ -328,10 +335,14 @@
 
   .aprovacaoAcoes {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .aprovacaoAcoes button {
     width: 100%;
+    min-width: 0;
+    padding-inline: var(--via-space-2);
+    font-size: var(--app-fs-support);
+    gap: var(--via-space-1);
   }
 }

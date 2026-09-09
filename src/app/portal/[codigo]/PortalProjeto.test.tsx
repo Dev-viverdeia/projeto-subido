@@ -223,18 +223,14 @@ describe('PortalProjeto', () => {
     );
     expect(screen.queryByText(/Evidência da execução/i)).toBeNull();
     abrirDetalhe('Sobre o projeto');
-    abrirDetalhe('Andamento');
-    abrirDetalhe('Resultados');
-    expect(screen.getByRole('heading', { name: 'O que foi decidido.' })).toBeVisible();
+    abrirDetalhe('Histórico');
+    expect(screen.getByRole('list', { name: 'Histórico do projeto' })).toBeVisible();
     expect(screen.getByText('Documento aprovado.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'O que vamos entregar juntos.' })).toBeVisible();
     const decisao = screen.getByRole('heading', { name: 'Revise esta entrega.' });
-    const andamento = screen.getByRole('heading', { name: /Da descoberta à entrega/i });
+    expect(screen.getByRole('list', { name: 'Andamento por fase' })).toBeVisible();
     const arquivos = screen.getByRole('heading', { name: /Arquivos do projeto/i });
-    expect(decisao.compareDocumentPosition(andamento) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    expect(andamento.compareDocumentPosition(arquivos) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+    expect(decisao.compareDocumentPosition(arquivos) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });
@@ -267,8 +263,11 @@ describe('PortalProjeto', () => {
     );
 
     expect(screen.getByText('Aceite final do projeto')).toBeVisible();
-    expect(screen.getByText('Resultado, garantia e continuidade.')).toBeVisible();
-    expect(screen.getByText('30 dias a partir do aceite final')).toBeVisible();
+    const aprovacao = within(
+      screen.getByRole('button', { name: /Aprovar e concluir/i }).closest('article')!,
+    );
+    expect(aprovacao.getByText('Resultado, garantia e continuidade.')).toBeVisible();
+    expect(aprovacao.getByText('30 dias a partir do aceite final')).toBeVisible();
     expect(screen.getByRole('button', { name: /Aprovar e concluir/i })).toBeVisible();
   });
 
@@ -298,7 +297,7 @@ describe('PortalProjeto', () => {
       />,
     );
 
-    abrirDetalhe('Resultados');
+    abrirDetalhe('Resultados e aceite');
     expect(screen.getByRole('heading', { name: 'O resultado e o próximo passo.' })).toBeVisible();
     expect(
       screen.getByText('A recepção passou a receber cada contato com contexto.'),

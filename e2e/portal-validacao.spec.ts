@@ -25,7 +25,10 @@ test.describe('portal de validação do cliente', () => {
       altura: document.documentElement.scrollHeight,
     }));
     expect(medidas.largura).toBeLessThanOrEqual(medidas.viewport);
-    expect(medidas.altura).toBeLessThan(1900);
+    // Materiais ficam visíveis, com cards compactos no celular e detalhes recolhidos.
+    expect(medidas.altura).toBeLessThan(2400);
+    const aprovar = await page.getByRole('button', { name: 'Aprovar entrega' }).boundingBox();
+    expect(aprovar!.y).toBeLessThan(900);
 
     const resultado = await new AxeBuilder({ page }).analyze();
     const graves = resultado.violations.filter(
@@ -57,12 +60,12 @@ test.describe('portal de validação do cliente', () => {
   test('mantém resultados disponíveis sem alongar o estado concluído', async ({ page }) => {
     await page.goto('/preview/portal-cliente');
 
-    await expect(page.getByRole('heading', { name: 'Projeto concluído.' })).toBeVisible();
+    await expect(page.getByText('Projeto concluído', { exact: true })).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Resultado, garantia e continuidade.' }),
-    ).toHaveCount(0);
+    ).not.toBeVisible();
 
-    await page.getByText('Resultados', { exact: true }).click();
+    await page.getByText('Resultados e aceite', { exact: true }).click();
     await expect(
       page.getByRole('heading', { name: 'Resultado, garantia e continuidade.' }),
     ).toBeVisible();
