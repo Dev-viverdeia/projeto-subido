@@ -96,6 +96,7 @@ const PROJETOS: ResumoProjetoExecucao[] = [
   {
     id: '55555555-5555-4555-8555-555555555555',
     titulo: 'Triagem inteligente de solicitações',
+    tipoServico: 'recorrente',
     empresa: 'Almeida Contabilidade',
     status: 'concluido',
     prazoEm: '2026-08-15T12:00:00.000Z',

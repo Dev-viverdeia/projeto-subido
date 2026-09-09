@@ -1,0 +1,328 @@
+.faixa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-4);
+  padding: 20px 24px;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  backdrop-filter: blur(24px) saturate(130%);
+}
+.situacao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.situacao > div {
+  display: grid;
+  gap: 4px;
+}
+.situacao strong {
+  font-size: var(--app-fs-reading);
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-semibold);
+}
+.situacao span:not(.icone) {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
+}
+.icone {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  height: 44px;
+  background: var(--via-surface);
+  border: 1px solid var(--via-border-hairline);
+  border-radius: 14px;
+  color: var(--via-text-primary);
+}
+.acoes,
+.rodape,
+.opcoesGestao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.primario,
+.secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: var(--app-radius-control);
+  font: var(--via-fw-medium) var(--app-fs-ui)/1.4 var(--via-font-display);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    box-shadow var(--app-t-state);
+}
+.primario {
+  color: var(--via-white);
+  border: 1px solid var(--via-navy);
+  background: var(--via-navy);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+}
+.secundario {
+  color: var(--via-text-primary);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border);
+}
+.primario:hover {
+  background: var(--via-navy-deep);
+}
+.secundario:hover {
+  background: var(--via-bg-2);
+}
+.primario svg,
+.secundario svg {
+  color: inherit;
+  flex-shrink: 0;
+}
+.primario:focus-visible,
+.secundario:focus-visible,
+.formulario input:focus-visible {
+  outline: 2px solid var(--via-accent-ink);
+  outline-offset: 3px;
+}
+.primario:disabled,
+.secundario:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.formulario {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.formulario p {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+}
+.tipos {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.tipos legend {
+  margin-bottom: 12px;
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+.tipos label {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  padding: 20px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--via-border);
+  background: var(--via-surface);
+  cursor: pointer;
+  color: var(--via-text-primary);
+}
+.tipos label[data-selecionado] {
+  border-color: var(--via-accent-ink);
+  background: var(--via-bg-2);
+  box-shadow: inset 0 0 0 1px var(--via-accent-ink);
+}
+.tipos label > input {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--via-accent-ink);
+}
+.tipos strong {
+  font-size: var(--app-fs-reading);
+}
+.tipos span {
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
+  color: var(--via-text-muted);
+}
+.pendencias {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: var(--via-bg-2);
+  border: 1px solid var(--via-border);
+  border-radius: 16px;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+}
+.pendencias > span {
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+.pendencias label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+  padding-block: 6px;
+  cursor: pointer;
+}
+.pendencias input {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  accent-color: var(--via-accent-ink);
+}
+.formulario .nota {
+  font-size: var(--app-fs-support);
+}
+.formulario .erro {
+  color: var(--via-danger);
+}
+.rodape {
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--via-border-hairline);
+}
+.retorno {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-support);
+}
+.carregando {
+  animation: girar 900ms linear infinite;
+}
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 768px) {
+  .faixa {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+  .faixa:not([data-concluido]) {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .faixa:not([data-concluido]) .situacao {
+    display: none;
+  }
+  .acoes > button {
+    flex: 1;
+  }
+  .rodape > button {
+    flex: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .carregando {
+    animation: none;
+  }
+  .primario,
+  .secundario {
+    transition: none;
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .faixa {
+    background: var(--via-surface);
+  }
+}
+.acompanhamento {
+  display: grid;
+  gap: 20px;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-glass-plane-strong);
+  box-shadow:
+    var(--app-elev-2-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+}
+.acompanhamentoTopo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.acompanhamentoTopo h2 {
+  margin: 0;
+  font-size: var(--app-fs-section-title);
+  color: var(--via-text-primary);
+}
+.acompanhamentoTopo p {
+  margin: 6px 0 0;
+  font-size: var(--app-fs-ui);
+  color: var(--via-text-muted);
+}
+.semAcao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 120px;
+  border: 1px dashed var(--via-border);
+  border-radius: 18px;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+}
+.campo {
+  display: grid;
+  gap: 8px;
+  font-size: var(--app-fs-ui);
+  color: var(--via-text-primary);
+  min-width: 0;
+}
+.campo input {
+  min-width: 0;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  background: var(--via-surface);
+  font: inherit;
+}
+.historico {
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+  color: var(--via-text-muted);
+}
+.historico summary {
+  cursor: pointer;
+  padding-block: 10px;
+}
+.historico summary:focus-visible {
+  outline: 2px solid var(--via-accent-ink);
+  outline-offset: 2px;
+}
+.historico li {
+  padding-block: 6px;
+}
+@media (max-width: 600px) {
+  .acompanhamentoTopo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .campo input {
+    font-size: 16px;
+  }
+}

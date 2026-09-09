@@ -14,73 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      sobral_geracoes: {
-        Row: {
-          dono: string
-          erro: string | null
-          estado: string
-          expira_em: string
-          iniciado_em: string
-          mensagem_id: string
-          parar_em: string | null
-          resposta_id: string | null
-          tentativa: string
-          texto: string
-          thread_id: string
-          tokens: number | null
-        }
-        Insert: {
-          dono: string
-          erro?: string | null
-          estado: string
-          expira_em?: string
-          iniciado_em?: string
-          mensagem_id: string
-          parar_em?: string | null
-          resposta_id?: string | null
-          tentativa: string
-          texto?: string
-          thread_id: string
-          tokens?: number | null
-        }
-        Update: {
-          dono?: string
-          erro?: string | null
-          estado?: string
-          expira_em?: string
-          iniciado_em?: string
-          mensagem_id?: string
-          parar_em?: string | null
-          resposta_id?: string | null
-          tentativa?: string
-          texto?: string
-          thread_id?: string
-          tokens?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sobral_geracoes_mensagem_id_fkey"
-            columns: ["mensagem_id"]
-            isOneToOne: true
-            referencedRelation: "consultor_mensagens"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sobral_geracoes_resposta_id_fkey"
-            columns: ["resposta_id"]
-            isOneToOne: false
-            referencedRelation: "consultor_mensagens"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sobral_geracoes_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "consultor_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       admin_acessos_eventos: {
         Row: {
           admin_id: string | null
@@ -671,7 +604,6 @@ export type Database = {
       }
       calls_reunioes: {
         Row: {
-          encerramento_solicitado_em: string | null
           agendada_para: string
           atualizada_em: string
           codigo_publico: string
@@ -682,6 +614,7 @@ export type Database = {
           duracao_minutos: number
           empresa_id: string
           encerrada_em: string | null
+          encerramento_solicitado_em: string | null
           google_calendar_id: string | null
           google_event_id: string | null
           google_event_url: string | null
@@ -701,7 +634,6 @@ export type Database = {
           agendada_para: string
           atualizada_em?: string
           codigo_publico?: string
-          encerramento_solicitado_em?: string | null
           contato_id?: string | null
           convidado_email?: string | null
           criada_em?: string
@@ -709,6 +641,7 @@ export type Database = {
           duracao_minutos?: number
           empresa_id: string
           encerrada_em?: string | null
+          encerramento_solicitado_em?: string | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           google_event_url?: string | null
@@ -728,7 +661,6 @@ export type Database = {
           agendada_para?: string
           atualizada_em?: string
           codigo_publico?: string
-          encerramento_solicitado_em?: string | null
           contato_id?: string | null
           convidado_email?: string | null
           criada_em?: string
@@ -736,6 +668,7 @@ export type Database = {
           duracao_minutos?: number
           empresa_id?: string
           encerrada_em?: string | null
+          encerramento_solicitado_em?: string | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           google_event_url?: string | null
@@ -2594,6 +2527,7 @@ export type Database = {
           documento: Json
           dono: string
           empresa_id: string
+          encerramento_manual_em: string | null
           id: string
           inicio_em: string
           oportunidade_id: string
@@ -2603,7 +2537,9 @@ export type Database = {
           prazo_em: string | null
           projeto_id: string | null
           proposta_id: string
+          recorrencia_encerrada_em: string | null
           status: Database["public"]["Enums"]["projeto_execucao_status"]
+          tipo_servico: string
           titulo: string
         }
         Insert: {
@@ -2615,6 +2551,7 @@ export type Database = {
           documento: Json
           dono: string
           empresa_id: string
+          encerramento_manual_em?: string | null
           id?: string
           inicio_em?: string
           oportunidade_id: string
@@ -2624,7 +2561,9 @@ export type Database = {
           prazo_em?: string | null
           projeto_id?: string | null
           proposta_id: string
+          recorrencia_encerrada_em?: string | null
           status?: Database["public"]["Enums"]["projeto_execucao_status"]
+          tipo_servico?: string
           titulo: string
         }
         Update: {
@@ -2636,6 +2575,7 @@ export type Database = {
           documento?: Json
           dono?: string
           empresa_id?: string
+          encerramento_manual_em?: string | null
           id?: string
           inicio_em?: string
           oportunidade_id?: string
@@ -2645,7 +2585,9 @@ export type Database = {
           prazo_em?: string | null
           projeto_id?: string | null
           proposta_id?: string
+          recorrencia_encerrada_em?: string | null
           status?: Database["public"]["Enums"]["projeto_execucao_status"]
+          tipo_servico?: string
           titulo?: string
         }
         Relationships: [
@@ -3264,6 +3206,73 @@ export type Database = {
           },
         ]
       }
+      sobral_geracoes: {
+        Row: {
+          dono: string
+          erro: string | null
+          estado: string
+          expira_em: string
+          iniciado_em: string
+          mensagem_id: string
+          parar_em: string | null
+          resposta_id: string | null
+          tentativa: string
+          texto: string
+          thread_id: string
+          tokens: number | null
+        }
+        Insert: {
+          dono: string
+          erro?: string | null
+          estado: string
+          expira_em?: string
+          iniciado_em?: string
+          mensagem_id: string
+          parar_em?: string | null
+          resposta_id?: string | null
+          tentativa: string
+          texto?: string
+          thread_id: string
+          tokens?: number | null
+        }
+        Update: {
+          dono?: string
+          erro?: string | null
+          estado?: string
+          expira_em?: string
+          iniciado_em?: string
+          mensagem_id?: string
+          parar_em?: string | null
+          resposta_id?: string | null
+          tentativa?: string
+          texto?: string
+          thread_id?: string
+          tokens?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sobral_geracoes_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: true
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sobral_geracoes_resposta_id_fkey"
+            columns: ["resposta_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sobral_geracoes_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sobral_planos: {
         Row: {
           acoes: Json
@@ -3481,30 +3490,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      sobral_iniciar_geracao: {
-        Args: {
-          p_dono: string
-          p_mensagem: string
-          p_repetir: boolean
-          p_tentativa: string
-          p_thread: string
-        }
-        Returns: Json
-      }
-      sobral_finalizar_geracao: {
-        Args: {
-          p_dados: Json
-          p_dono: string
-          p_estado: string
-          p_mensagem: string
-          p_tentativa: string
-        }
-        Returns: Json
-      }
-      sobral_confirmar_anexos: {
-        Args: { p_thread: string; p_mensagem: string; p_titulo: string; p_conteudo: string; p_anexos: Json }
-        Returns: string
-      }
       admin_sistema_conceder_pacote: {
         Args: {
           p_admin: string
@@ -3957,6 +3942,15 @@ export type Database = {
           solucoes: Json
         }[]
       }
+      projeto_agendar_acompanhamento: {
+        Args: {
+          p_acao_id: string
+          p_prazo: string
+          p_projeto_id: string
+          p_titulo: string
+        }
+        Returns: boolean
+      }
       projeto_arquivo_definir_visibilidade: {
         Args: { p_arquivo_id: string; p_visivel: boolean }
         Returns: boolean
@@ -4055,6 +4049,15 @@ export type Database = {
           p_resultado_observado: string
         }
         Returns: string
+      }
+      projeto_gerenciar_entrega: {
+        Args: {
+          p_acao: string
+          p_atualizado_em: string
+          p_confirmar_pendencias?: boolean
+          p_projeto_id: string
+        }
+        Returns: boolean
       }
       projeto_iniciar: { Args: { p_proposta_id: string }; Returns: string }
       projeto_mudanca_escopo_analisar: {
@@ -4180,10 +4183,10 @@ export type Database = {
       prospeccao_sistema_solicitar_lista: {
         Args: {
           p_dono: string
-          p_pedido: string
-          p_segmento: string
           p_localizacao: string
+          p_pedido: string
           p_quantidade: number
+          p_segmento: string
         }
         Returns: string
       }
@@ -4195,9 +4198,29 @@ export type Database = {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: boolean
       }
+      sobral_confirmar_anexos: {
+        Args: {
+          p_anexos: Json
+          p_conteudo: string
+          p_mensagem: string
+          p_thread: string
+          p_titulo: string
+        }
+        Returns: string
+      }
       sobral_confirmar_recomendacao_crm: {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: string
+      }
+      sobral_finalizar_geracao: {
+        Args: {
+          p_dados: Json
+          p_dono: string
+          p_estado: string
+          p_mensagem: string
+          p_tentativa: string
+        }
+        Returns: Json
       }
       sobral_gerenciar_acao_crm: {
         Args: {
@@ -4207,6 +4230,16 @@ export type Database = {
           p_quando?: string
         }
         Returns: string
+      }
+      sobral_iniciar_geracao: {
+        Args: {
+          p_dono: string
+          p_mensagem: string
+          p_repetir: boolean
+          p_tentativa: string
+          p_thread: string
+        }
+        Returns: Json
       }
     }
     Enums: {
@@ -4257,7 +4290,11 @@ export type Database = {
         | "concluida"
         | "falhou"
         | "cancelada"
-      operacao_tipo: "prospeccao" | "enriquecimento" | "pos_call" | "encerramento_sala"
+      operacao_tipo:
+        | "prospeccao"
+        | "enriquecimento"
+        | "pos_call"
+        | "encerramento_sala"
       papel_usuario: "membro" | "mentor" | "admin"
       projeto_acao_status: "pendente" | "concluida" | "cancelada"
       projeto_cliente_status:
@@ -4482,7 +4519,12 @@ export const Constants = {
         "falhou",
         "cancelada",
       ],
-      operacao_tipo: ["prospeccao", "enriquecimento", "pos_call", "encerramento_sala"],
+      operacao_tipo: [
+        "prospeccao",
+        "enriquecimento",
+        "pos_call",
+        "encerramento_sala",
+      ],
       papel_usuario: ["membro", "mentor", "admin"],
       projeto_acao_status: ["pendente", "concluida", "cancelada"],
       projeto_cliente_status: [

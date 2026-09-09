@@ -81,7 +81,15 @@ function ItemPlano({ projetoId, acao }: { projetoId: string; acao: AcaoPlanoProj
   );
 }
 
-export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: AcaoPlanoProjeto[] }) {
+export function PlanoVivo({
+  projetoId,
+  acoes,
+  aberto = false,
+}: {
+  projetoId: string;
+  acoes: AcaoPlanoProjeto[];
+  aberto?: boolean;
+}) {
   const compromissos = acoes.filter((acao) => !['acesso', 'dependencia'].includes(acao.categoria));
   if (!compromissos.length) return null;
 
@@ -90,7 +98,7 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
 
   return (
     <section className={styles.plano} aria-labelledby="plano-vivo-titulo">
-      <details>
+      <details open={aberto || undefined}>
         <summary>
           <div className={styles.introducao}>
             <span className={styles.icone} aria-hidden="true">
@@ -110,7 +118,7 @@ export function PlanoVivo({ projetoId, acoes }: { projetoId: string; acoes: Acao
         <ol>
           {compromissos
             .filter((acao) => acao.status === 'pendente')
-            .slice(0, 5)
+            .slice(0, aberto ? undefined : 5)
             .map((acao) => (
               <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
             ))}

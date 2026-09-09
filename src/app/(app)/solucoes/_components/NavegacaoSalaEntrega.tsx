@@ -7,6 +7,8 @@ export function NavegacaoSalaEntrega({
   painel,
   concluido,
   evolucaoRegistrada,
+  recorrente = false,
+  mostrarEvolucao = concluido,
   proximaTarefa,
   totalArquivos,
   rotuloCliente,
@@ -15,6 +17,8 @@ export function NavegacaoSalaEntrega({
   painel: PainelSala;
   concluido: boolean;
   evolucaoRegistrada: boolean;
+  recorrente?: boolean;
+  mostrarEvolucao?: boolean;
   proximaTarefa: string | null;
   totalArquivos: number;
   rotuloCliente: string;
@@ -24,9 +28,9 @@ export function NavegacaoSalaEntrega({
     <nav
       className={styles.paineis}
       aria-label="Áreas da entrega"
-      data-evolucao={concluido || undefined}
+      data-evolucao={mostrarEvolucao || undefined}
     >
-      {concluido && (
+      {mostrarEvolucao && (
         <button
           type="button"
           data-ativo={painel === 'evolucao' || undefined}
@@ -35,8 +39,14 @@ export function NavegacaoSalaEntrega({
         >
           <ChartNoAxesCombined size={17} aria-hidden="true" />
           <span>
-            <strong>Evolução</strong>
-            <small>{evolucaoRegistrada ? 'Resultado confirmado' : 'Revisão pós-entrega'}</small>
+            <strong>{recorrente ? 'Acompanhamento' : 'Evolução'}</strong>
+            <small>
+              {recorrente
+                ? 'Próximas ações'
+                : evolucaoRegistrada
+                  ? 'Resultado confirmado'
+                  : 'Revisão pós-entrega'}
+            </small>
           </span>
         </button>
       )}

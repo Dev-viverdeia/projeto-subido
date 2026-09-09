@@ -47,6 +47,38 @@ const EVOLUCAO_AGENDADA = {
 afterEach(cleanup);
 
 describe('PainelEntregas', () => {
+  it('mantém recorrentes entregues visíveis fora do histórico de concluídas', () => {
+    render(
+      <PainelEntregas
+        projetos={[
+          {
+            ...CONCLUIDO,
+            tipoServico: 'recorrente',
+            proximaTarefa: 'Revisar indicadores',
+            proximaAcaoPrazoEm: '2026-09-20T15:00:00Z',
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Em acompanhamento' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Acompanhar Grupo Norte' })).toHaveAttribute(
+      'href',
+      `/entregas/${CONCLUIDO.id}`,
+    );
+    expect(screen.queryByRole('heading', { name: 'Entregas concluídas' })).not.toBeInTheDocument();
+    expect(screen.getByText('Revisar indicadores')).toBeInTheDocument();
+  });
+  it('retira do acompanhamento o recorrente explicitamente encerrado', () => {
+    render(
+      <PainelEntregas
+        projetos={[
+          { ...CONCLUIDO, tipoServico: 'recorrente', recorrenciaEncerradaEm: '2026-09-08' },
+        ]}
+      />,
+    );
+    expect(screen.queryByRole('heading', { name: 'Em acompanhamento' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Entregas concluídas' })).toBeInTheDocument();
+  });
   it('leva o profissional à próxima ação da entrega real', () => {
     render(
       <PainelEntregas

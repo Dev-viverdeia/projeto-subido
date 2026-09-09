@@ -1,5 +1,49 @@
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 
+export function prepararProjetoComEscopo(
+  projeto: ProjetoExecucaoCompleto,
+): ProjetoExecucaoCompleto {
+  return {
+    ...prepararProjetoEmExecucao(projeto),
+    mudancasEscopoParaAnalisar: 1,
+    mudancasEscopo: [
+      {
+        id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
+        titulo: 'Incluir atendimento pelo Instagram',
+        descricao:
+          'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
+        solicitadoPor: 'cliente',
+        status: 'em_analise',
+        classificacao: null,
+        resposta: null,
+        impactoPrazoDias: null,
+        impactoValorCentavos: null,
+        criadoEm: '2026-08-30T13:40:00.000Z',
+        analisadoEm: null,
+        decididoEm: null,
+      },
+    ],
+  };
+}
+
+export function prepararGestaoProjeto(
+  projeto: ProjetoExecucaoCompleto,
+  base: ProjetoExecucaoCompleto,
+  estado?: string,
+): ProjetoExecucaoCompleto {
+  if (!['recorrente', 'pontual-concluido', 'recorrente-encerrado'].includes(estado ?? ''))
+    return base;
+  return {
+    ...projeto,
+    tipoServico: estado === 'pontual-concluido' ? 'pontual' : 'recorrente',
+    concluidoEm: '2026-09-08T12:00:00Z',
+    encerramentoManualEm: '2026-09-08T12:00:00Z',
+    recorrenciaEncerradaEm: estado === 'recorrente-encerrado' ? '2026-09-08T12:00:00Z' : null,
+    encerramento: null,
+    evolucao: null,
+  };
+}
+
 export function prepararProjetoNoInicio(projeto: ProjetoExecucaoCompleto): ProjetoExecucaoCompleto {
   return {
     ...projeto,

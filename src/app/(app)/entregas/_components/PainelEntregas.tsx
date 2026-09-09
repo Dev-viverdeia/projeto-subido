@@ -10,6 +10,7 @@ import {
   Clock3,
   FolderKanban,
   MessageSquareMore,
+  Repeat2,
   ShieldCheck,
 } from 'lucide-react';
 import type { ResumoProjetoExecucao } from '@/lib/projetos-execucao/queries';
@@ -20,6 +21,7 @@ import {
 } from '@/lib/projetos-execucao/prioridade';
 import { classificarRevisaoEvolucao } from '@/lib/projetos-execucao/radar-evolucao';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
+import { estaEmAcompanhamento } from '@/lib/projetos-execucao/gestao';
 import { CabecalhoOperacional } from '../../_components/CabecalhoOperacional';
 import styles from './PainelEntregas.module.css';
 import { RadarPosEntrega } from './RadarPosEntrega';
@@ -75,6 +77,7 @@ function CartaoEntrega({
           </span>
           <span className={styles.estado} data-status={projeto.status}>
             {ROTULO_STATUS_PROJETO[projeto.status]}
+            {projeto.tipoServico === 'recorrente' ? ' · Recorrente' : ''}
           </span>
           <span className={styles.sinal} data-grupo={prioridade.grupo}>
             <IconePrioridade prioridade={prioridade} />
@@ -214,15 +217,19 @@ export function PainelEntregas({
     projetos.filter((projeto) => projeto.status !== 'concluido'),
     agora,
   );
-  const concluidos = projetos.filter((projeto) => projeto.status === 'concluido');
+  const recorrentes = projetos.filter(estaEmAcompanhamento).sort((a, b) => {
+    if (!a.proximaAcaoPrazoEm) return b.proximaAcaoPrazoEm ? -1 : 0;
+    if (!b.proximaAcaoPrazoEm) return 1;
+    return a.proximaAcaoPrazoEm.localeCompare(b.proximaAcaoPrazoEm);
+  });
+  const concluidos = projetos.filter(
+    (projeto) => projeto.status === 'concluido' && !estaEmAcompanhamento(projeto),
+  );
   const prioridades = new Map(
     ativos.map((projeto) => [projeto.id, classificarPrioridadeEntrega(projeto, agora)]),
   );
   const precisamAcao = ativos.filter(
     (projeto) => prioridades.get(projeto.id)?.grupo === 'acao',
-  ).length;
-  const aguardandoCliente = ativos.filter(
-    (projeto) => prioridades.get(projeto.id)?.grupo === 'cliente',
   ).length;
   const principal = ativos[0] ?? null;
   const prioridadePrincipal = principal ? prioridades.get(principal.id) : null;
@@ -236,12 +243,12 @@ export function PainelEntregas({
         resumo={
           <dl className={styles.resumo} aria-label="Resumo das entregas">
             <div>
-              <dt>Ativas</dt>
+              <dt>Em execução</dt>
               <dd>{ativos.length}</dd>
             </div>
             <div>
-              <dt>Com o cliente</dt>
-              <dd>{aguardandoCliente}</dd>
+              <dt>Recorrentes</dt>
+              <dd>{recorrentes.length}</dd>
             </div>
             <div>
               <dt>Concluídas</dt>
@@ -294,8 +301,44 @@ export function PainelEntregas({
             </div>
           )}
         </section>
-      ) : (
+      ) : recorrentes.length === 0 ? (
         <EstadoVazio temPosEntrega={concluidos.some((projeto) => projeto.evolucao)} />
+      ) : null}
+
+      {recorrentes.length > 0 && (
+        <section className={styles.recorrentes} aria-labelledby="titulo-recorrentes">
+          <header className={styles.cabecalhoRecorrentes}>
+            <div>
+              <h2 id="titulo-recorrentes">Em acompanhamento</h2>
+              <p>Projetos entregues que continuam com você.</p>
+            </div>
+            <Repeat2 size={23} aria-hidden="true" />
+          </header>
+          <ul className={styles.listaRecorrentes}>
+            {recorrentes.map((projeto) => (
+              <li key={projeto.id}>
+                <Link href={`/entregas/${projeto.id}`} aria-label={`Acompanhar ${projeto.empresa}`}>
+                  <div className={styles.clienteRecorrente}>
+                    <span>{projeto.empresa}</span>
+                    <strong>{projeto.titulo}</strong>
+                  </div>
+                  <div className={styles.acaoRecorrente}>
+                    <span>Próxima ação</span>
+                    <strong>{projeto.proximaTarefa ?? 'Agende o próximo cuidado'}</strong>
+                    {projeto.proximaAcaoPrazoEm && (
+                      <time dateTime={projeto.proximaAcaoPrazoEm}>
+                        {formatarPrazo(projeto.proximaAcaoPrazoEm)}
+                      </time>
+                    )}
+                  </div>
+                  <span className={styles.abrirRecorrente}>
+                    Acompanhar <ArrowUpRight size={17} aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <RadarPosEntrega projetos={concluidos} agora={agora} />

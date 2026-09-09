@@ -354,7 +354,7 @@ export default async function PreviewSalaEntregaPage({
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const estado = (await searchParams).estado;
-  const projeto =
+  const projetoBase =
     estado === 'sem-briefing'
       ? estados.prepararProjetoSemBriefing(PROJETO)
       : estado === 'resultado'
@@ -370,28 +370,9 @@ export default async function PreviewSalaEntregaPage({
                 : estado === 'ajustes'
                   ? estados.prepararProjetoComAjustes(PROJETO)
                   : estado === 'escopo'
-                    ? {
-                        ...estados.prepararProjetoEmExecucao(PROJETO),
-                        mudancasEscopoParaAnalisar: 1,
-                        mudancasEscopo: [
-                          {
-                            id: 'dddddddd-dddd-4ddd-8ddd-ddddddddddd1',
-                            titulo: 'Incluir atendimento pelo Instagram',
-                            descricao:
-                              'Queremos usar a mesma triagem também nas mensagens que chegam pelo Instagram da clínica.',
-                            solicitadoPor: 'cliente' as const,
-                            status: 'em_analise' as const,
-                            classificacao: null,
-                            resposta: null,
-                            impactoPrazoDias: null,
-                            impactoValorCentavos: null,
-                            criadoEm: '2026-08-30T13:40:00.000Z',
-                            analisadoEm: null,
-                            decididoEm: null,
-                          },
-                        ],
-                      }
+                    ? estados.prepararProjetoComEscopo(PROJETO)
                     : PROJETO;
+  const projeto = estados.prepararGestaoProjeto(PROJETO, projetoBase, estado);
   return (
     <div className={styles.shell}>
       <PreviewSidebar />
