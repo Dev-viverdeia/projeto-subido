@@ -1,7 +1,9 @@
 # Central de ajuda: plano de evolução
 
 Data: 9 de setembro de 2026.
-Status: blocos 1 a 4 implementados; publicação e validação nas caixas reais em andamento.
+Status: blocos 1 a 4 implementados e fluxo de e-mail validado no domínio público.
+
+Evidências: [validação de produção](validacao-suporte-2026-09-09.md). A meta experimental de 60 segundos não é uma promessa: recebimento medido entre 4 e 63 segundos no cron normal, e a saída também aguarda sua fila. Não foi feita certificação de capacidade ou garantia de entrega em qualquer caixa.
 
 Implementação: conversa única, rascunhos separados, fila por espera, respostas e notas privadas, entrada de e-mail autenticada, configuração da equipe, indicadores e guia ilustrado. A referência operacional atual é [Central de suporte](central-suporte.md). O diagnóstico abaixo registra o ponto de partida, não as limitações da versão nova.
 

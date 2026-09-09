@@ -67,7 +67,7 @@ Desligamento seguro: definir `SUPORTE_EMAIL_ATIVO=false` e publicar; desabilitar
 
 ## IA para a equipe
 
-O atendente pode pedir uma sugestão de resposta baseada no histórico público e em guias publicados. Notas internas não são enviadas ao modelo. A sugestão mostra referências, não substitui rascunho existente e só é enviada após revisão humana. Categorias recorrentes ajudam a priorizar guias; não publicam conteúdo de clientes automaticamente.
+O atendente pode pedir uma sugestão de resposta baseada na última pergunta pública do cliente e em guias publicados. Notas internas não são enviadas ao modelo. A sugestão mostra referências, não substitui rascunho existente e só é enviada após revisão humana. Categorias recorrentes ajudam a priorizar guias; não publicam conteúdo de clientes automaticamente.
 
 ## Verificação
 

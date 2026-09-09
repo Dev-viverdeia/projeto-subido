@@ -77,13 +77,15 @@ export function DetalhesAtendimento({
               ))}
             </select>
           </label>
-          <Button
-            variant="secondary"
-            disabled={pendente || preview}
-            onClick={() => acao(() => assumirAtendimento(caso.id))}
-          >
-            Assumir atendimento
-          </Button>
+          {!caso.responsavel && (
+            <Button
+              variant="secondary"
+              disabled={pendente || preview}
+              onClick={() => acao(() => assumirAtendimento(caso.id))}
+            >
+              Assumir atendimento
+            </Button>
+          )}
           <label className={s.campo}>
             Prioridade
             <select
