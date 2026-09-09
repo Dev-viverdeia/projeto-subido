@@ -13,7 +13,8 @@ concorrência e falhas. Não aumentar limites de provedores por estimativa.
   a chave de idempotência, o limite de 20 envios por ciclo e a janela de 23 horas.
   Cada chamada ao Resend tem prazo de 12 segundos. Uma lease abandonada volta a
   ficar elegível depois de cinco minutos; ultrapassada a janela segura, exige revisão.
-- Entrada, envio e limpeza têm ciclos independentes: 55, 40 e 10 segundos. O
+- No cron, entrada, envio e limpeza têm ciclos independentes: 50, 35 e 8 segundos,
+  mais até três segundos por confirmação operacional. O
   cancelamento alcança o transporte HTTP, o banco e os downloads. Não usa corrida
   de promises que deixe trabalho continuar sem acompanhamento. Uma fila indisponível
   não impede as outras; o cron sinaliza 503 e preserva o motivo por fila.
@@ -94,9 +95,9 @@ Vercel, rede, modelos ou quotas dos provedores. Também não representam o núme
 de usuários simultâneos que a plataforma suporta.
 
 Os limites globais de modelos, o volume sustentado de entrada de e-mails e o tempo
-real de espera precisam ser acompanhados em produção. A próxima evolução deve
-integrar Sobral AI e suporte ao painel operacional existente, com alertas de fila
-parada e falhas repetidas, antes de elevar limites.
+real de espera precisam ser acompanhados em produção. Sobral AI e suporte estão
+integrados ao [painel de saúde](saude-ia-suporte.md), com alertas visuais de fila
+parada e falhas repetidas. Esses sinais devem orientar a decisão antes de elevar limites.
 
 ## Publicação e reversão
 

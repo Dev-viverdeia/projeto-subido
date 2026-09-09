@@ -219,6 +219,16 @@ try {
       'expirado',
   };
   console.log(JSON.stringify(relatorio.contratos, null, 2));
+  if (soContratos && modo === 'atual') {
+    await sql(
+      'create table suporte_email_recebidos(id uuid primary key default gen_random_uuid(),estado text,criado_em timestamptz default now());',
+    );
+    await sql(
+      await readFile(join(raiz, 'supabase/migrations/20260909172709_saude_ia_suporte.sql'), 'utf8'),
+    );
+    await sql(await readFile(join(raiz, 'scripts/perf/saude-contratos.sql'), 'utf8'));
+    console.log('Saúde: permissões, retomadas, períodos e deduplicação de pulsos aprovados.');
+  }
   if (!soContratos) {
     // Carga mista de transações reais. Falha/retry sintéticos; sem IA, rede externa ou envio.
     await sql(await readFile(join(raiz, 'scripts/perf/capacidade-carga.sql'), 'utf8'));

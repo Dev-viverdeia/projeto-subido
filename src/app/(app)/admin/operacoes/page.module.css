@@ -1,8 +1,8 @@
 .pagina {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-5);
-  width: min(100%, 1180px);
+  gap: var(--app-gap-block);
+  width: min(100%, 1300px);
 }
 
 .hero,
@@ -15,7 +15,6 @@
   background: var(--via-glass-card);
   box-shadow: var(--via-glass-shadow);
   backdrop-filter: var(--via-glass-blur);
-  -webkit-backdrop-filter: var(--via-glass-blur);
 }
 
 .hero::before,
@@ -35,7 +34,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--via-space-8);
   align-items: end;
-  padding: clamp(28px, 4vw, 48px);
+  padding: var(--via-space-6);
   border-radius: var(--app-radius-surface);
 }
 
@@ -45,21 +44,18 @@
   align-items: center;
   gap: var(--via-space-2);
   margin: 0;
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--via-ls-label);
-  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
 }
 
 .hero h1 {
   max-width: 760px;
-  margin: var(--via-space-3) 0 var(--via-space-4);
+  margin: var(--via-space-3) 0;
   color: var(--via-text-primary);
-  font-size: clamp(2rem, 4.5vw, 4rem);
+  font-size: var(--via-fs-h1);
   font-weight: 520;
   line-height: 1;
-  letter-spacing: var(--via-ls-tight);
+  letter-spacing: var(--app-ls-h1);
 }
 
 .hero > div > span {
@@ -91,16 +87,8 @@
   font-size: var(--via-fs-h4);
 }
 
-.sinal[data-nivel='saudavel'] strong {
-  color: var(--via-success);
-}
-
-.sinal[data-nivel='atencao'] strong {
-  color: var(--via-warning);
-}
-
 .sinal[data-nivel='critico'] strong {
-  color: var(--via-danger);
+  color: var(--via-navy);
 }
 
 .indicadores {
@@ -415,7 +403,7 @@
   font-size: var(--via-fs-sm);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .hero,
   .painel > header {
     grid-template-columns: 1fr;
@@ -446,6 +434,99 @@
   .acoes {
     grid-column: 1 / -1;
     justify-content: start;
+  }
+}
+
+.grupo {
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+}
+.grupo > summary {
+  cursor: pointer;
+  padding: var(--app-pad-card);
+  min-height: 60px;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+}
+.grupo > summary span {
+  margin-left: var(--via-space-4);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+.grupo[open] > summary {
+  border-bottom: 1px solid var(--via-border-soft);
+}
+.grupo > section {
+  box-shadow: none;
+  border: 0;
+}
+.atualizar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg);
+  color: var(--via-text-primary);
+  cursor: pointer;
+}
+.atualizar:hover {
+  background: var(--via-bg-2);
+}
+.atualizar:focus-visible,
+.grupo > summary:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+}
+.alertas a {
+  color: var(--via-text-primary);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.alertas article {
+  flex-wrap: wrap;
+}
+.filtros select,
+.filtros button,
+.acoes a,
+.acoes button {
+  min-height: 44px;
+  font-size: var(--via-fs-sm);
+}
+.identidade small,
+.estado small,
+.detalhe p,
+.metricasEscala small,
+.indicadores small {
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+.sinal strong {
+  font-family: var(--via-font);
+}
+.indicadores article[data-alerta='true'] > svg,
+.indicadores article[data-alerta='true'] strong,
+.alertas article[data-nivel='atencao'] > svg,
+.alertas article[data-nivel='critico'] > svg,
+.estado[data-status='falhou'] > span,
+.estado[data-status='concluida'] > span {
+  color: var(--via-text-primary);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .hero,
+  .indicadores article,
+  .escala,
+  .painel {
+    background: var(--via-bg);
   }
 }
 
