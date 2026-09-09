@@ -26,6 +26,18 @@ export async function criarHarness() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const anon = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const publico = app.startsWith('https:');
+  if (publico) {
+    const equipeAtiva = exigir(
+      await admin.from('suporte_agentes').select('usuario').eq('notificar', true).limit(1),
+    );
+    if (equipeAtiva.length)
+      throw new Error('Use um ambiente isolado: há atendentes reais recebendo avisos.');
+  }
+  const emailQA = (nome) =>
+    publico
+      ? `delivered+qa-suporte-${nome}-${Date.now()}@resend.dev`
+      : `qa-suporte-${nome}-${Date.now()}@example.invalid`;
   const browser = await chromium.launch();
   const usuarios = [],
     casos = [],
@@ -33,7 +45,7 @@ export async function criarHarness() {
   const erros = [];
   const pasta = await mkdtemp(join(tmpdir(), 'subido-suporte-qa-'));
   async function conta(nome, agente = false) {
-    const email = `qa-suporte-${nome}-${Date.now()}@example.invalid`;
+    const email = emailQA(nome);
     const password = randomBytes(24).toString('base64url');
     const user = exigir(
       await admin.auth.admin.createUser({
@@ -123,5 +135,5 @@ export async function criarHarness() {
     for (const id of usuarios) exigir(await admin.auth.admin.deleteUser(id));
     await browser.close();
   }
-  return { app, admin, anon, browser, conta, visual, limpar, pasta, casos, caminhos };
+  return { app, admin, anon, browser, conta, visual, limpar, pasta, casos, caminhos, emailQA };
 }

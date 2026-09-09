@@ -3,7 +3,7 @@ import { exigir, expect } from './qa-suporte-harness.mjs';
 export async function testarSuportePublico(h, equipe) {
   const ctx = await h.browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await ctx.newPage();
-  const email = `qa-suporte-publico-${Date.now()}@example.invalid`;
+  const email = h.emailQA('publico');
   await page.goto(`${h.app}/ajuda/acesso`);
   await page.getByLabel('Seu e-mail', { exact: true }).fill(email);
   await page.getByLabel('O que você precisa resolver?').fill('QA: não consigo entrar');
@@ -17,6 +17,19 @@ export async function testarSuportePublico(h, equipe) {
   );
   h.casos.push(caso.id);
   expect(caso.verificado).toBe(false);
+  exigir(
+    await h.admin.rpc('suporte_publico_criar', {
+      p_id: caso.id,
+      p_email: email,
+      p_assunto: 'QA: não consigo entrar',
+      p_texto: 'Não consigo acessar a conta. Preciso de ajuda para entrar.',
+      p_hash: 'f'.repeat(64),
+      p_url: `${h.app}/ajuda`,
+    }),
+  );
+  expect(
+    exigir(await h.admin.from('suporte_notificacoes').select('id').eq('atendimento', caso.id)),
+  ).toHaveLength(1);
   expect(
     exigir(await equipe.db.from('suporte_atendimentos').select('id').eq('id', caso.id)),
   ).toEqual([]);

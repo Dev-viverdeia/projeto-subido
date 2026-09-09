@@ -1,4 +1,4 @@
-/** Teste opt-in: cria e apaga apenas contas/chamados de QA. Não envia e-mails. */
+/** Teste opt-in: cria e apaga apenas contas/chamados de QA. Em produção o cron pode enviar avisos aos endereços de teste do Resend. */
 import { criarHarness, exigir, expect } from './qa-suporte-harness.mjs';
 import { testarSuportePublico, testarIASuporte } from './qa-suporte-publico.mjs';
 const h = await criarHarness();
