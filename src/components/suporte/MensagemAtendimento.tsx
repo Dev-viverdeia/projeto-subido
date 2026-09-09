@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Download, LockKeyhole } from 'lucide-react';
 import type { MensagemSuporte } from '@/lib/suporte/contrato';
 import s from './suporte.module.css';
 
@@ -16,8 +16,9 @@ export function MensagemAtendimento({
   if (m.papel === 'sistema') return <p className={s.sistema}>{m.texto}</p>;
   return (
     <article className={s.mensagem} data-papel={m.papel} data-interna={m.interna}>
-      <div className={s.acoes}>
-        <span className={s.meta}>
+      <div className={s.autorMensagem}>
+        <strong>
+          {m.interna && <LockKeyhole size={15} aria-hidden="true" />}
           {m.interna
             ? 'Nota interna · só a equipe vê'
             : m.papel === 'equipe'
@@ -25,7 +26,7 @@ export function MensagemAtendimento({
               : equipe
                 ? 'Usuário'
                 : 'Você'}
-        </span>
+        </strong>
         <time className={s.meta} dateTime={m.criado_em}>
           {new Date(m.criado_em).toLocaleString('pt-BR', {
             day: '2-digit',

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowUp, BookOpen, MessageCircle } from 'lucide-react';
+import { ArrowLeft, ArrowUp, BookOpen, LoaderCircle, MessageCircle } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import {
   RespostaAjudaSchema,
@@ -85,12 +85,12 @@ export function ChatAjuda({
           </Link>
           <h1 className={s.titulo}>IA de ajuda</h1>
         </div>
-        <Button variant="secondary" onClick={pedirAjuda}>
+        <Button variant="secondary" disabled={pendente} onClick={pedirAjuda}>
           Pedir ajuda à equipe
         </Button>
       </header>
       <div className={s.chat}>
-        {!mensagens.length && (
+        {!mensagens.length && !pendente && (
           <div className={s.inicioChat}>
             <MessageCircle size={36} strokeWidth={1.5} />
             <h2>O que você quer fazer no Subido?</h2>
@@ -147,9 +147,16 @@ export function ChatAjuda({
           ))}
         </div>
         {pendente && (
-          <p className={s.meta} role="status">
-            Consultando os guias do Subido…
-          </p>
+          <div className={s.mensagens}>
+            <article className={s.mensagem} data-papel="usuario">
+              <span className={s.meta}>Você</span>
+              <p>{texto}</p>
+            </article>
+            <div className={s.aguardandoIA} role="status">
+              <LoaderCircle size={20} aria-hidden="true" />
+              <span>Consultando os guias do Subido…</span>
+            </div>
+          </div>
         )}
         <form
           className={s.compositor}
@@ -164,7 +171,7 @@ export function ChatAjuda({
           <textarea
             id="pergunta-ia"
             className={s.textarea}
-            value={texto}
+            value={pendente ? '' : texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder="Conte sua dúvida sobre a plataforma"
             maxLength={2000}
@@ -189,10 +196,7 @@ export function ChatAjuda({
             </p>
           )}
         </form>
-        <p className={s.meta}>
-          A IA pode errar. Confira os guias citados. Ao pedir ajuda à equipe, você poderá revisar a
-          conversa antes de enviar.
-        </p>
+        <p className={s.meta}>A IA pode errar. Confira os guias citados.</p>
       </div>
     </div>
   );

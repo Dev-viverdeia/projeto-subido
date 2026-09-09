@@ -71,9 +71,10 @@ export function AnexosSuporte({
         className={s.oculto}
         ref={input}
         type="file"
+        tabIndex={-1}
         accept="image/png,image/jpeg,image/webp,application/pdf"
         aria-label="Escolher anexo"
-        disabled={disabled || enviando}
+        disabled={disabled || enviando || arquivos.length >= 3}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) void anexar(file);

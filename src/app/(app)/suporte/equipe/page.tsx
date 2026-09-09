@@ -80,10 +80,15 @@ export default async function FilaSuportePage({ searchParams }: PageProps<'/supo
       </header>
       <div className={s.numeros}>
         {contagens.map((c) => (
-          <div className={s.numero} key={c.estado}>
+          <Link
+            className={s.numero}
+            key={c.estado}
+            href={`/suporte/equipe?status=${c.estado}`}
+            aria-current={status === c.estado ? 'page' : undefined}
+          >
             <strong>{c.quantidade ?? '—'}</strong>
             <span className={s.meta}>{ESTADOS[c.estado as keyof typeof ESTADOS]}</span>
-          </div>
+          </Link>
         ))}
       </div>
       {!agentes?.some((a) => a.notificar) && (
@@ -92,8 +97,6 @@ export default async function FilaSuportePage({ searchParams }: PageProps<'/supo
           acompanhe a fila por aqui.
         </p>
       )}
-      {admin && <EquipeSuporte agentes={agentes ?? []} />}
-      {admin && configuracao && <ConfiguracaoSuporte {...configuracao} />}
       {!!foraMeta && (
         <Link className={s.avisoResposta} href="/suporte/equipe?status=pendentes">
           <strong>
@@ -120,6 +123,8 @@ export default async function FilaSuportePage({ searchParams }: PageProps<'/supo
         busca={busca}
         responsavel={responsavel}
       />
+      {admin && <EquipeSuporte agentes={agentes ?? []} />}
+      {admin && configuracao && <ConfiguracaoSuporte {...configuracao} />}
       <details className={s.pergunta}>
         <summary>Qualidade do atendimento · últimos 30 dias</summary>
         <div className={s.gestao}>
