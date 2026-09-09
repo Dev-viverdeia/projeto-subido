@@ -55,7 +55,9 @@ describe('MontadorProposta', () => {
       'href',
       expect.stringContaining('contexto=proposta'),
     );
-    expect(screen.getByRole('button', { name: 'Criar rascunho' })).toBeEnabled();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Criar rascunho' })).toBeEnabled(),
+    );
   });
   it('escolhe cliente e projeto na mesma tela, sem uma etapa intermediária', async () => {
     const user = userEvent.setup();

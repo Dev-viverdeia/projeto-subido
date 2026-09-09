@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import './SalaEntrega.test-mocks';
 import { gerenciarEntrega } from '@/lib/projetos-execucao/gestao-actions';
@@ -16,7 +16,7 @@ describe('GestaoServico', () => {
     fireEvent.click(d.getByRole('button', { name: 'Concluir entrega' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Confira os dados atuais');
     expect(d.getByRole('checkbox')).toBeChecked();
-    expect(d.getByRole('button', { name: 'Atualizar dados' })).toBeEnabled();
+    await waitFor(() => expect(d.getByRole('button', { name: 'Atualizar dados' })).toBeEnabled());
     expect(d.getByRole('link', { name: /Pedir ajuda/ })).toHaveAttribute('target', '_blank');
     expect(screen.getByRole('alert')).not.toHaveTextContent('private detail');
   });
