@@ -38,6 +38,8 @@ export default async function AtendimentoPublicoPage({
     interna: false,
     criado_em: m.criado_em,
     arquivos: m.suporte_arquivos,
+    nome_autor: m.nome_autor,
+    canal: m.canal as MensagemSuporte['canal'],
   }));
   return (
     <ConversaAtendimento
