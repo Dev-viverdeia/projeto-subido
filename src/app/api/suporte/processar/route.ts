@@ -15,17 +15,28 @@ export async function GET(request: Request) {
     !timingSafeEqual(Buffer.from(enviado), Buffer.from(esperado))
   )
     return Response.json({ erro: 'Não autorizado.' }, { status: 401 });
-  try {
-    const recebidos = await processarEmailsSuporte();
-    const notificacoes = await processarNotificacoesSuporte();
-    const removidos = await limparAnexosSuporte();
-    return Response.json(
-      { ...notificacoes, ...recebidos, removidos },
-      {
-        headers: { 'Cache-Control': 'no-store' },
-      },
-    );
-  } catch {
-    return Response.json({ erro: 'Fila indisponível.' }, { status: 503 });
-  }
+  // Ciclos independentes e sequenciais: 55 + 40 + 10s, dentro dos 120s da rota.
+  // Uma falha de entrada não impede o envio nem a limpeza. Sem Promise.race:
+  // o prazo cancela as requisições reais em vez de abandoná-las em segundo plano.
+  const falhas: string[] = [];
+  const recebidos = await processarEmailsSuporte().catch(() => {
+    falhas.push('recebimento');
+    // O ciclo pode ter processado parte do lote antes da falha. Não inventa zero.
+    return { incorporados: null, revisao: null, falhasRecebimento: 1 };
+  });
+  const notificacoes = await processarNotificacoesSuporte().catch(() => {
+    falhas.push('envio');
+    return { enviadas: null, falhas: 1 };
+  });
+  const removidos = await limparAnexosSuporte().catch(() => {
+    falhas.push('limpeza');
+    return 0;
+  });
+  return Response.json(
+    { ...notificacoes, ...recebidos, removidos, filasIndisponiveis: falhas },
+    {
+      status: falhas.length || notificacoes.falhas || recebidos.falhasRecebimento ? 503 : 200,
+      headers: { 'Cache-Control': 'no-store' },
+    },
+  );
 }

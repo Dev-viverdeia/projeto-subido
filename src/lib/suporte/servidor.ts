@@ -180,15 +180,19 @@ export async function limitarSuporte(
   acao: string,
   limite: number,
   segundos: number,
+  signal?: AbortSignal,
 ) {
   const chave = createHmac('sha256', serverEnv().SUPABASE_SECRET_KEY)
     .update(`${acao}:${identidade}`)
     .digest('hex');
-  const { data, error } = await criarSistemaSuporte().rpc('suporte_limitar', {
-    p_chave: chave,
-    p_limite: limite,
-    p_segundos: segundos,
-  });
+  const { data, error } = await criarSistemaSuporte(signal ? { signal } : undefined).rpc(
+    'suporte_limitar',
+    {
+      p_chave: chave,
+      p_limite: limite,
+      p_segundos: segundos,
+    },
+  );
   return !error && data === true;
 }
 export function ipSuporte(request: Request) {

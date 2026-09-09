@@ -1,25 +1,30 @@
 import 'server-only';
 import { setTimeout as esperar } from 'node:timers/promises';
-import { Resend, type WebhookEventPayload } from 'resend';
+import type { WebhookEventPayload } from 'resend';
 import { z } from 'zod';
 import { env, resendEnv, suporteEmailEnv } from '@/lib/env';
 import { criarSistemaSuporte } from './servidor';
 import { enderecoResposta, escaparHtml, idMensagemSeguro } from './email-contrato';
+import { ResendSuporte } from './resend-worker';
 
-export async function processarNotificacoesSuporte() {
-  const db = criarSistemaSuporte();
-  const { data: fila, error } = await db.rpc('suporte_notificacoes_reservar');
-  if (error) throw new Error('fila_indisponivel');
+export async function processarNotificacoesSuporte(signal = AbortSignal.timeout(40_000)) {
+  const db = criarSistemaSuporte({ signal });
   const config = resendEnv();
-  const resend = config ? new Resend(config.chave) : null;
+  if (!config) throw new Error('configuracao');
+  const resend = new ResendSuporte(config.chave, signal);
   const receber = suporteEmailEnv();
   let enviadas = 0;
   let falhas = 0;
-  for (const item of fila ?? []) {
-    // No máximo 20 envios por execução; respeita o limite padrão do provedor.
-    if (enviadas + falhas > 0) await esperar(600);
+  for (let indice = 0; indice < 20; indice++) {
+    signal.throwIfAborted();
+    // Só reserva o próximo item quando pode processá-lo. A RPC também protege
+    // contra cron sobreposto; 650ms dá margem ao intervalo global de 600ms.
+    if (indice > 0) await esperar(650, undefined, { signal });
+    const { data: fila, error } = await db.rpc('suporte_notificacoes_reservar');
+    if (error) throw new Error('fila_indisponivel');
+    const item = fila?.[0];
+    if (!item) break;
     try {
-      if (!resend || !config) throw new Error('configuracao');
       const { data: caso, error: erroCaso } = await db
         .from('suporte_atendimentos')
         .select('numero,dono')
@@ -106,6 +111,9 @@ export async function processarNotificacoesSuporte() {
       if (salvar) throw salvar;
       enviadas++;
     } catch {
+      // Com o ciclo esgotado, a lease permite retomada. Não inicia outra escrita
+      // sem confirmação nem muda a chave de idempotência do envio.
+      signal.throwIfAborted();
       await db
         .from('suporte_notificacoes')
         .update({

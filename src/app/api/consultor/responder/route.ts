@@ -129,6 +129,13 @@ export async function POST(request: Request) {
       p_tentativa: pedido.data.tentativa ?? crypto.randomUUID(),
       p_repetir: pedido.data.repetir,
     });
+    if (erroInicio?.message === 'limite_sobral_simultaneo')
+      return NextResponse.json(
+        {
+          erro: 'Você já tem respostas em andamento. Aguarde uma terminar; sua pergunta está salva.',
+        },
+        { status: 429, headers: { ...headers, 'Retry-After': '10' } },
+      );
     if (erroInicio)
       return json({ erro: 'Confira a resposta existente antes de enviar outra pergunta.' }, 409);
     const recibo = Recibo.parse(data);

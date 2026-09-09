@@ -19,10 +19,32 @@ import type { Database } from './types.generated';
  * Nunca para "simplificar" uma consulta que a RLS reprovou: se a policy reprovou,
  * ou a policy está errada, ou a consulta está.
  */
-export function createAdminClient() {
+export function createAdminClient(opcoes?: { signal?: AbortSignal; timeoutMs?: number }) {
   const { SUPABASE_SECRET_KEY } = serverEnv();
 
   return createSupabaseClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY, {
+    ...(opcoes
+      ? {
+          global: {
+            fetch: async (url: RequestInfo | URL, init?: RequestInit) => {
+              const signal = AbortSignal.any([
+                AbortSignal.timeout(opcoes.timeoutMs ?? 10_000),
+                ...(opcoes.signal ? [opcoes.signal] : []),
+                ...(init?.signal ? [init.signal] : []),
+              ]);
+              try {
+                return await fetch(url, { ...init, signal });
+              } catch (erro) {
+                // PostgREST reconhece AbortError, mas repetiria TimeoutError.
+                // Não reinicia o prazo nem o GET depois do cancelamento do ciclo.
+                if (signal.aborted)
+                  throw new DOMException('Prazo da operação atingido.', 'AbortError');
+                throw erro;
+              }
+            },
+          },
+        }
+      : {}),
     auth: {
       /* Sem sessão: este cliente não representa um usuário, representa o sistema.
          Persistir ou renovar token aqui só criaria estado que ninguém lê. */

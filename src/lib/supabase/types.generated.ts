@@ -1647,6 +1647,7 @@ export type Database = {
           pos_calls_globais_processando: number
           prospeccoes_ativas_por_usuario: number
           prospeccoes_globais_processando: number
+          sobral_geracoes_ativas_por_usuario: number
         }
         Insert: {
           alerta_custo_diario_usd_micros?: number
@@ -1658,6 +1659,7 @@ export type Database = {
           pos_calls_globais_processando?: number
           prospeccoes_ativas_por_usuario?: number
           prospeccoes_globais_processando?: number
+          sobral_geracoes_ativas_por_usuario?: number
         }
         Update: {
           alerta_custo_diario_usd_micros?: number
@@ -1669,6 +1671,7 @@ export type Database = {
           pos_calls_globais_processando?: number
           prospeccoes_ativas_por_usuario?: number
           prospeccoes_globais_processando?: number
+          sobral_geracoes_ativas_por_usuario?: number
         }
         Relationships: []
       }

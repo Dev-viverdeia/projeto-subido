@@ -1,0 +1,37 @@
+-- Laboratório descartável. Esquema mínimo; NÃO representa RLS nem latência de provedores.
+create schema auth;
+create schema private;
+create schema extensions;
+create extension pgcrypto with schema extensions;
+create role anon;
+create role authenticated;
+create role service_role bypassrls;
+create function auth.uid() returns uuid language sql stable as $$
+  select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid;
+$$;
+create table auth.users(id uuid primary key,raw_app_meta_data jsonb default '{"plano_subido":"pro"}');
+create table public.consultor_threads(id uuid primary key,dono uuid references auth.users,atualizado_em timestamptz default now());
+create table public.consultor_mensagens(id uuid primary key default gen_random_uuid(),thread_id uuid references consultor_threads on delete cascade,papel text,conteudo text,cartoes jsonb,direcao jsonb,modelo text,contexto_anexos text,criado_em timestamptz default now());
+create index on consultor_mensagens(thread_id,criado_em desc,id desc);
+create table public.consultor_uso(dono uuid,mes date,tokens bigint,atualizado_em timestamptz,primary key(dono,mes));
+create table operacoes_configuracao(id boolean primary key,enriquecimentos_ativos_por_usuario integer default 2);
+insert into operacoes_configuracao values(true,2);
+create table crm_empresas(id uuid primary key,dono uuid,dominio text);
+create table crm_contatos(id uuid primary key,empresa_id uuid,dono uuid,linkedin_url text);
+create table crm_oportunidades(id uuid primary key,dono uuid,empresa_id uuid,contato_principal_id uuid);
+create type crm_enriquecimento_status as enum('na_fila','processando','concluido','falhou');
+create table crm_enriquecimentos(id uuid primary key default gen_random_uuid(),dono uuid,empresa_id uuid,contato_id uuid,oportunidade_id uuid,dominio text,linkedin_url text,contexto text,status crm_enriquecimento_status default 'na_fila',iniciado_em timestamptz,concluido_em timestamptz,resultado jsonb,fontes jsonb,modelo text,erro text);
+create index on crm_enriquecimentos(dono,status);
+create unique index on crm_enriquecimentos(oportunidade_id) where status in ('na_fila','processando');
+create table prospeccao_carteiras(dono uuid primary key,saldo integer default 30);
+create table prospeccao_movimentos(id uuid primary key default gen_random_uuid(),dono uuid,enriquecimento_id uuid,tipo text,movimento integer,saldo_apos integer,descricao text);
+create unique index on prospeccao_movimentos(dono,tipo) where tipo='credito_inicial';
+create index on prospeccao_movimentos(dono,enriquecimento_id,tipo);
+create table suporte_notificacoes(id uuid primary key default gen_random_uuid(),atendimento uuid,evento text,destinatario text,tipo text,acesso_url text,estado text default 'pendente',tentativas integer default 0,provider_id text,erro text,criado_em timestamptz default now(),atualizado_em timestamptz default now(),unique(evento,destinatario));
+create index on suporte_notificacoes(estado,criado_em);
+create schema perf;
+create table perf.contas as select n,gen_random_uuid() dono from generate_series(0,63) n;
+insert into auth.users(id) select dono from perf.contas;
+insert into crm_empresas select dono,dono,'empresa.example.test' from perf.contas;
+insert into crm_oportunidades(id,dono,empresa_id) select dono,dono,dono from perf.contas;
+insert into prospeccao_carteiras select dono,1000 from perf.contas;
