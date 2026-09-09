@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import './SalaEntrega.test-mocks';
 import { agendarAcompanhamento } from '@/lib/projetos-execucao/gestao-actions';
@@ -51,9 +51,12 @@ describe('acompanhamento recorrente', () => {
     expect(screen.getByLabelText('O que você vai fazer?')).toHaveValue('Revisar os indicadores');
     expect(screen.getByLabelText('Quando')).toHaveValue('2026-10-15');
     const primeiro = vi.mocked(agendarAcompanhamento).mock.calls[0]![1];
-    fireEvent.click(
-      within(screen.getByRole('dialog')).getByRole('button', { name: 'Agendar ação' }),
-    );
+    // O erro pode aparecer antes de o React encerrar a transição de salvamento.
+    const repetir = await within(screen.getByRole('dialog')).findByRole('button', {
+      name: 'Agendar ação',
+    });
+    await waitFor(() => expect(repetir).toBeEnabled());
+    fireEvent.click(repetir);
     expect(await screen.findByRole('status')).toHaveTextContent('Próxima ação agendada.');
     const segundo = vi.mocked(agendarAcompanhamento).mock.calls[1]![1];
     expect(segundo.get('acao')).toBe(primeiro.get('acao'));
