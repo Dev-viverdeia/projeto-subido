@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { ArrowRight, BookOpen, ChevronDown, Clock3, FolderUp } from 'lucide-react';
 import type { KitOperacionalTarefa as DadosKit } from '@/lib/projetos-execucao/kit-operacional';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
@@ -22,12 +22,31 @@ export function KitOperacionalTarefa({
   const [aba, setAba] = useState<AbaKit>(temRoteiro ? 'roteiro' : 'modelo');
   const [aberto, setAberto] = useState(false);
 
+  function navegarAbas(event: KeyboardEvent<HTMLDivElement>) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    const abas = Array.from(
+      event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+    );
+    const atual = abas.indexOf(document.activeElement as HTMLButtonElement);
+    if (atual < 0) return;
+    event.preventDefault();
+    const proxima =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? abas.length - 1
+          : (atual + (event.key === 'ArrowRight' ? 1 : -1) + abas.length) % abas.length;
+    abas[proxima]?.focus();
+    abas[proxima]?.click();
+  }
+
   return (
     <section className={styles.kit} aria-labelledby="kit-operacional-titulo">
       <header className={styles.cabecalho}>
         <div>
-          <p>Guia desta tarefa</p>
-          <h3 id="kit-operacional-titulo">Passo a passo e modelo prontos</h3>
+          <h3 id="kit-operacional-titulo">
+            <BookOpen size={19} aria-hidden="true" /> Guia da tarefa
+          </h3>
         </div>
         <div className={styles.controles}>
           {kit.duracao ? (
@@ -50,7 +69,12 @@ export function KitOperacionalTarefa({
       {aberto ? (
         <>
           <div className={styles.barra}>
-            <div className={styles.abas} role="tablist" aria-label="Conteúdo do kit">
+            <div
+              className={styles.abas}
+              role="tablist"
+              aria-label="Conteúdo do kit"
+              onKeyDown={navegarAbas}
+            >
               {temRoteiro ? (
                 <button
                   type="button"
@@ -58,6 +82,7 @@ export function KitOperacionalTarefa({
                   role="tab"
                   aria-selected={aba === 'roteiro'}
                   aria-controls="painel-roteiro-tarefa"
+                  tabIndex={aba === 'roteiro' ? 0 : -1}
                   onClick={() => setAba('roteiro')}
                 >
                   Passo a passo
@@ -71,6 +96,7 @@ export function KitOperacionalTarefa({
                   role="tab"
                   aria-selected={aba === 'modelo'}
                   aria-controls="painel-modelo-tarefa"
+                  tabIndex={aba === 'modelo' ? 0 : -1}
                   onClick={() => setAba('modelo')}
                 >
                   Modelo pronto
@@ -90,6 +116,7 @@ export function KitOperacionalTarefa({
               id="painel-roteiro-tarefa"
               role="tabpanel"
               aria-labelledby="aba-roteiro-tarefa"
+              tabIndex={0}
             >
               {kit.insumos.length > 0 ? (
                 <section className={styles.insumos}>
@@ -131,6 +158,7 @@ export function KitOperacionalTarefa({
               id="painel-modelo-tarefa"
               role="tabpanel"
               aria-labelledby="aba-modelo-tarefa"
+              tabIndex={0}
             >
               <header>
                 <div>

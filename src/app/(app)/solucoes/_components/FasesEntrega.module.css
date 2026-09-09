@@ -1,0 +1,201 @@
+.fases {
+  min-width: 0;
+  align-self: start;
+  padding: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(20px) saturate(125%);
+}
+
+.trilha h2 {
+  margin: var(--via-space-3) var(--via-space-3) var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+
+.trilha ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trilha > ol > li + li {
+  margin-top: var(--via-space-2);
+}
+
+.fase {
+  width: 100%;
+  min-height: var(--app-h-control);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fase > span {
+  display: flex;
+}
+
+.fase strong {
+  font-size: var(--app-fs-ui);
+}
+
+.fase small {
+  font-size: var(--app-fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.fase[data-completa] {
+  color: var(--via-accent-ink);
+}
+
+.fase[data-ativa] {
+  background: var(--via-navy);
+  color: var(--via-white);
+  box-shadow: inset 0 1px 0 var(--via-edge-hi);
+}
+
+.fase[data-ativa] strong,
+.fase[data-ativa] small,
+.fase[data-ativa] svg {
+  color: inherit;
+}
+
+.trilha .tarefas {
+  display: grid;
+  gap: var(--via-space-1);
+  padding-block: var(--via-space-3);
+}
+
+.tarefas button {
+  width: 100%;
+  min-height: var(--app-h-control);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tarefas button[aria-current] {
+  border-color: var(--app-elev-2-line);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text-primary);
+}
+
+.marca {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-track);
+}
+
+[aria-current] > .marca {
+  border: 5px solid var(--via-navy);
+}
+
+[data-concluida] > .marca {
+  border: 0;
+  background: var(--via-accent-ink);
+  color: var(--via-white);
+}
+
+.tarefas strong,
+.tarefas small {
+  display: block;
+}
+
+.tarefas strong {
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tarefas small {
+  margin-top: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
+.fase:hover:not([data-ativa]),
+.tarefas button:hover:not([aria-current]) {
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+}
+
+.fases :is(button, select):focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+
+.compacta {
+  display: none;
+}
+
+@media (max-width: 1079px) {
+  .trilha {
+    display: none;
+  }
+
+  .compacta {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.6fr) minmax(0, 1.4fr);
+    gap: var(--via-space-3);
+  }
+
+  .compacta label {
+    display: grid;
+    gap: var(--via-space-2);
+    min-width: 0;
+    color: var(--via-text-muted);
+    font-size: var(--app-fs-support);
+  }
+
+  .compacta select {
+    width: 100%;
+    min-width: 0;
+    min-height: var(--app-h-control);
+    padding-inline: var(--via-space-3);
+    border: 1px solid var(--via-border);
+    border-radius: var(--app-radius-control);
+    background: var(--via-surface);
+    color: var(--via-text-primary);
+    font: inherit;
+    font-size: var(--app-fs-ui);
+  }
+}
+
+@media (max-width: 599px) {
+  .compacta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .fases {
+    background: var(--via-surface);
+  }
+}

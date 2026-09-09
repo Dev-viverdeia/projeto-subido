@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ListTodo } from 'lucide-react';
 import type {
   ProjetoExecucaoCompleto,
   TarefaProjetoExecucao,
@@ -11,7 +11,7 @@ import {
   obterEstadoJornadaEntrega,
   type DestinoJornadaEntrega,
 } from '@/lib/projetos-execucao/jornada-entrega';
-import { ROTULO_STATUS_PROJETO, ROTULO_STATUS_TAREFA } from '@/lib/projetos-execucao/status';
+import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { obterContatoNotificacao } from '@/lib/projetos-execucao/notificacao-cliente';
 import {
   contarDependenciasPendentes,
@@ -36,6 +36,16 @@ type PropsSalaEntrega = {
   projeto: ProjetoExecucaoCompleto;
   tarefaSolicitada?: string;
 };
+
+function revelarSecao(id: string) {
+  requestAnimationFrame(() => {
+    const reduzirMovimento = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    document
+      .getElementById(id)
+      ?.scrollIntoView?.({ behavior: reduzirMovimento ? 'auto' : 'smooth' });
+  });
+}
+
 export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
   const tarefaDoLink = projeto.tarefas.find((tarefa) => tarefa.id === tarefaSolicitada);
   const fases = useMemo(
@@ -140,25 +150,19 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     setPainel('execucao');
     setFaseId(alvo.faseId);
     setTarefaId(alvo.id);
-    requestAnimationFrame(() =>
-      document.getElementById('tarefa-em-foco')?.scrollIntoView?.({ behavior: 'smooth' }),
-    );
+    revelarSecao('tarefa-em-foco');
   }
 
   function abrirAcaoJornada(destino: DestinoJornadaEntrega, tarefaAlvo: string | null) {
     if (destino === 'briefing') {
       setPainel('cliente');
-      requestAnimationFrame(() =>
-        document.getElementById('briefing-kickoff')?.scrollIntoView?.({ behavior: 'smooth' }),
-      );
+      revelarSecao('briefing-kickoff');
       return;
     }
 
     if (destino === 'preparacao') {
       setPainel('cliente');
-      requestAnimationFrame(() =>
-        document.getElementById('preparacao-titulo')?.scrollIntoView?.({ behavior: 'smooth' }),
-      );
+      revelarSecao('preparacao-titulo');
       return;
     }
 
@@ -169,7 +173,7 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     }
 
     if (destino === 'compromisso') {
-      document.getElementById('plano-vivo-titulo')?.scrollIntoView?.({ behavior: 'smooth' });
+      revelarSecao('plano-vivo-titulo');
       return;
     }
 
@@ -179,9 +183,7 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     setPainel('execucao');
     setFaseId(alvo.faseId);
     setTarefaId(alvo.id);
-    requestAnimationFrame(() =>
-      document.getElementById('tarefa-em-foco')?.scrollIntoView?.({ behavior: 'smooth' }),
-    );
+    revelarSecao('tarefa-em-foco');
   }
 
   function abrirArquivosDaTarefa(tarefaAlvo: string) {
@@ -242,8 +244,6 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
               </div>
             </div>
           </div>
-
-          <FasesEntrega fases={fases} faseAtualId={faseAtual?.id} onAbrir={abrirFase} />
         </header>
       ) : (
         <header className={styles.heroFoco}>
@@ -268,11 +268,6 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
           </div>
         </header>
       )}
-
-      <GestaoServico
-        projeto={projeto}
-        onConcluir={() => setPainel(projeto.tipoServico === 'recorrente' ? 'evolucao' : 'arquivos')}
-      />
 
       {!preparandoProjeto && (
         <NavegacaoSalaEntrega
@@ -301,82 +296,53 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
               />
             )}
 
-            <main className={styles.operacao}>
-              {tarefaAtual ? (
-                <TarefaEntrega
-                  key={tarefaAtual.id}
-                  projetoId={projeto.id}
-                  tarefa={tarefaAtual}
-                  portalAtivo={projeto.portalAtivo}
-                  clienteEmail={contatoCliente.email}
-                  notificacaoCliente={contatoCliente.evento}
-                  lembreteCliente={contatoCliente.lembrete}
-                  contexto={{
-                    empresa: projeto.empresa,
-                    objetivo: projeto.briefing.objetivo || projeto.documento.objetivo,
-                    criterioSucesso: projeto.briefing.criterioSucesso,
-                    acessos: projeto.briefing.acessos,
-                    limites: projeto.briefing.limites,
-                    arquivos: projeto.arquivos,
-                  }}
-                  onAbrirArquivos={abrirArquivosDaTarefa}
-                  onAbrirPortal={() => {
-                    setPainel('cliente');
-                    requestAnimationFrame(() =>
-                      document
-                        .getElementById('portal-cliente')
-                        ?.scrollIntoView?.({ behavior: 'smooth' }),
-                    );
-                  }}
-                  aceiteFinal={
-                    tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
-                  }
-                  encerramento={projeto.encerramento}
+            <div className={styles.mesa}>
+              {fases.length > 0 && (
+                <FasesEntrega
+                  fases={fases}
+                  faseAtualId={faseAtual?.id}
+                  tarefaAtualId={tarefaAtual?.id}
+                  onAbrir={abrirFase}
+                  onAbrirTarefa={setTarefaId}
                 />
-              ) : (
-                <div className={styles.semTarefa}>
-                  <Check size={24} aria-hidden="true" />
-                  <h2>Entrega concluída</h2>
-                  <p>Todas as tarefas foram executadas e registradas.</p>
-                </div>
               )}
-
-              {faseAtual && faseAtual.tarefas.length > 1 && (
-                <details className={styles.fila}>
-                  <summary>
-                    <span>
-                      <strong>Tarefas desta fase</strong>
-                      <small>{faseAtual.tarefas.length} etapas</small>
-                    </span>
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </summary>
-                  <ol>
-                    {faseAtual.tarefas.map((tarefa, indice) => (
-                      <li key={tarefa.id}>
-                        <button
-                          type="button"
-                          data-ativa={tarefa.id === tarefaAtual?.id || undefined}
-                          data-concluida={tarefa.status === 'concluida' || undefined}
-                          aria-label={
-                            tarefa.id === tarefaAtual?.id
-                              ? `Tarefa atual ${tarefa.titulo}`
-                              : `Abrir tarefa ${tarefa.titulo}`
-                          }
-                          onClick={() => setTarefaId(tarefa.id)}
-                        >
-                          <span>
-                            {tarefa.status === 'concluida' ? <Check size={13} /> : indice + 1}
-                          </span>
-                          <strong>{tarefa.titulo}</strong>
-                          <small>{ROTULO_STATUS_TAREFA[tarefa.status]}</small>
-                          <ArrowRight size={15} aria-hidden="true" />
-                        </button>
-                      </li>
-                    ))}
-                  </ol>
-                </details>
-              )}
-            </main>
+              <section className={styles.operacao} aria-label="Tarefa em foco">
+                {tarefaAtual ? (
+                  <TarefaEntrega
+                    key={tarefaAtual.id}
+                    projetoId={projeto.id}
+                    tarefa={tarefaAtual}
+                    portalAtivo={projeto.portalAtivo}
+                    clienteEmail={contatoCliente.email}
+                    notificacaoCliente={contatoCliente.evento}
+                    lembreteCliente={contatoCliente.lembrete}
+                    contexto={{
+                      empresa: projeto.empresa,
+                      objetivo: projeto.briefing.objetivo || projeto.documento.objetivo,
+                      criterioSucesso: projeto.briefing.criterioSucesso,
+                      acessos: projeto.briefing.acessos,
+                      limites: projeto.briefing.limites,
+                      arquivos: projeto.arquivos,
+                    }}
+                    onAbrirArquivos={abrirArquivosDaTarefa}
+                    onAbrirPortal={() => {
+                      setPainel('cliente');
+                      revelarSecao('portal-cliente');
+                    }}
+                    aceiteFinal={
+                      tarefaAtual.id === ultimaTarefa?.id && projeto.feitas === projeto.total
+                    }
+                    encerramento={projeto.encerramento}
+                  />
+                ) : (
+                  <div className={styles.semTarefa}>
+                    <ListTodo size={24} aria-hidden="true" />
+                    <h2>Nenhuma tarefa disponível</h2>
+                    <p>Consulte o escopo e os arquivos deste projeto.</p>
+                  </div>
+                )}
+              </section>
+            </div>
           </div>
 
           <PlanoVivo projetoId={projeto.id} acoes={projeto.acoesPlano} />
@@ -417,6 +383,11 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
           />
         )
       )}
+
+      <GestaoServico
+        projeto={projeto}
+        onConcluir={() => setPainel(projeto.tipoServico === 'recorrente' ? 'evolucao' : 'arquivos')}
+      />
     </div>
   );
 }

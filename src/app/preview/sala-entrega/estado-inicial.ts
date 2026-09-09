@@ -123,6 +123,24 @@ export function prepararProjetoEmExecucao(
       clienteNota: indice < feitas ? tarefa.clienteNota : null,
       entregavelUrl: indice < feitas ? tarefa.entregavelUrl : null,
       clienteComentario: null,
+      kitOperacional:
+        indice === feitas
+          ? {
+              projetoSlug: 'sdr-atendimento-qualificacao',
+              duracao: '45 min',
+              insumos: ['Perguntas frequentes e políticas aprovadas pelo cliente'],
+              checklist: [
+                'Organize as respostas por assunto.',
+                'Registre a fonte e a data de revisão.',
+                'Teste dez perguntas com o responsável antes de publicar.',
+              ],
+              cuidado: 'Não publique respostas sem a aprovação do responsável.',
+              modelo: {
+                titulo: 'Base de respostas',
+                conteudo: 'Pergunta:\nResposta aprovada:\nFonte:\nRevisado em:',
+              },
+            }
+          : tarefa.kitOperacional,
     })),
   };
 }

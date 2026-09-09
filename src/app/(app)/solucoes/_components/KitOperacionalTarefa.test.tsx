@@ -42,4 +42,21 @@ describe('KitOperacionalTarefa', () => {
     await user.click(screen.getByRole('button', { name: 'Adicionar arquivo da tarefa' }));
     expect(abrirArquivos).toHaveBeenCalledOnce();
   });
+
+  it('navega entre roteiro e modelo pelo teclado e mantém uma única aba no Tab', async () => {
+    const user = userEvent.setup();
+    render(<KitOperacionalTarefa kit={KIT} arquivosDaTarefa={0} onAbrirArquivos={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: 'Abrir guia' }));
+    const roteiro = screen.getByRole('tab', { name: /Passo a passo/ });
+    const modelo = screen.getByRole('tab', { name: 'Modelo pronto' });
+    roteiro.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(modelo).toHaveFocus();
+    expect(modelo).toHaveAttribute('aria-selected', 'true');
+    expect(roteiro).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByRole('tabpanel', { name: 'Modelo pronto' })).toBeVisible();
+    await user.keyboard('{Home}');
+    expect(roteiro).toHaveFocus();
+    expect(modelo).toHaveAttribute('tabindex', '-1');
+  });
 });
