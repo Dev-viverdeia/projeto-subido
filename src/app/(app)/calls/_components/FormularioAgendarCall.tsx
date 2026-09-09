@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { CalendarCheck2, CalendarPlus, ClipboardCheck, Layers3 } from 'lucide-react';
-import { Alert, Button, Input } from '@/design-system/via';
-import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
+import { Button, Input } from '@/design-system/via';
 import {
   CAMPOS_RASCUNHO,
   chaveRascunhoAgenda,
@@ -20,9 +19,10 @@ import { BotaoAgendar } from './BotaoAgendar';
 import { CamposParticipanteStarter } from './CamposParticipanteStarter';
 import { CamposConviteGoogle } from './CamposConviteGoogle';
 import { SetupGoogleCalendar } from './SetupGoogleCalendar';
+import { ErroAgendamento } from './ErroAgendamento';
+import { useAgendamento } from './useAgendamento';
 import styles from './FormularioAgendarCall.module.css';
 
-const INICIAL: EstadoAgendamento = {};
 type CampoAgendamento =
   | 'oportunidade'
   | 'empresa'
@@ -66,10 +66,7 @@ export function FormularioAgendarCall({
   const [aberto, setAberto] = useState(abertoInicial);
   const offsetMinutos = montado ? new Date().getTimezoneOffset() : 0;
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
-  const [estado, acao, pendente] = useActionState(
-    agendarReuniao,
-    rascunho ? { campos: rascunho } : INICIAL,
-  );
+  const [estado, acao, pendente] = useAgendamento(rascunho);
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
   const oportunidadePadrao = disponiveis.some((item) => item.id === oportunidadeInicial)
     ? oportunidadeInicial
@@ -98,9 +95,11 @@ export function FormularioAgendarCall({
   const conectarCalendarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent(retornoCalendar)}`;
 
   useEffect(() => {
-    if (!aberto || !estado.porCampo) return;
+    if (!aberto || (!estado.porCampo && !estado.erro)) return;
     const quadro = window.requestAnimationFrame(() => {
-      formulario.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      formulario.current
+        ?.querySelector<HTMLElement>('[aria-invalid="true"], [data-ajuda-falha]')
+        ?.focus();
     });
     return () => window.cancelAnimationFrame(quadro);
   }, [aberto, estado]);
@@ -234,22 +233,11 @@ export function FormularioAgendarCall({
           >
             <input type="hidden" name="offsetMinutos" value={offsetMinutos} readOnly />
 
-            {estado.erro && (
-              <div role="alert">
-                <Alert tone="danger" size="compact">
-                  {estado.erro}
-                </Alert>
-                {estado.reconectar && (
-                  <a
-                    href={conectarCalendarHref}
-                    onClick={guardarRascunho}
-                    className="via-btn via-btn--secondary via-btn--md"
-                  >
-                    Reconectar agenda
-                  </a>
-                )}
-              </div>
-            )}
+            <ErroAgendamento
+              estado={estado}
+              conectarHref={conectarCalendarHref}
+              guardarRascunho={guardarRascunho}
+            />
 
             {!comercialLiberado ? (
               <CamposParticipanteStarter

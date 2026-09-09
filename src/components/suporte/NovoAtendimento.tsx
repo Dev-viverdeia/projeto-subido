@@ -35,6 +35,7 @@ export function NovoAtendimento({
   linkInvalido = false,
   usuario = 'publico',
   artigos = [],
+  assuntoInicial = '',
 }: {
   publico?: boolean;
   pagina?: string | null;
@@ -42,6 +43,7 @@ export function NovoAtendimento({
   linkInvalido?: boolean;
   usuario?: string;
   artigos?: Artigo[];
+  assuntoInicial?: string;
 }) {
   const router = useRouter();
   const rascunho = useSyncExternalStore(assinar, lerRascunho, () => '');
@@ -51,7 +53,7 @@ export function NovoAtendimento({
   const [emailSalvo, salvarEmail] = useRascunho(`suporte-rascunho:${usuario}:novo:email`);
   const [assuntoLocal, setAssuntoLocal] = useState<string | null>(null);
   const [emailLocal, setEmailLocal] = useState<string | null>(null);
-  const assunto = assuntoLocal ?? assuntoSalvo;
+  const assunto = assuntoLocal ?? (assuntoSalvo || assuntoInicial);
   const email = emailLocal ?? emailSalvo;
   const setAssunto = (v: string) => {
     setAssuntoLocal(v);

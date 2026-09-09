@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, ChevronDown, LoaderCircle, PackageCheck, Repeat2, RotateCcw } from 'lucide-react';
-import { gerenciarEntrega } from '@/lib/projetos-execucao/gestao-actions';
+import { gerenciarEntrega, type EstadoGestaoEntrega } from '@/lib/projetos-execucao/gestao-actions';
 import {
   estaEmAcompanhamento,
   rotuloGestao,
@@ -11,6 +12,7 @@ import {
 import type { ProjetoExecucaoCompleto } from '@/lib/projetos-execucao/queries';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
+import { AjudaNaFalha } from '@/components/suporte/AjudaNaFalha';
 import styles from './GestaoServico.module.css';
 
 type Acao = 'tipo' | 'concluir' | 'reabrir' | 'encerrar_recorrencia' | 'retomar_recorrencia';
@@ -36,11 +38,17 @@ export function GestaoServico({
   projeto: ProjetoExecucaoCompleto;
   onConcluir: () => void;
 }) {
+  const router = useRouter();
   const [acao, setAcao] = useState<Acao | null>(null);
   const [tipo, setTipo] = useState<TipoServico>(projeto.tipoServico ?? 'pontual');
   const [erro, setErro] = useState<string>();
+  const [recuperacao, setRecuperacao] = useState<EstadoGestaoEntrega['recuperacao']>();
   const [sucesso, setSucesso] = useState<string>();
   const [pendente, iniciar] = useTransition();
+  const formulario = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (erro) formulario.current?.querySelector<HTMLElement>('[data-ajuda-falha]')?.focus();
+  }, [erro]);
   const enviando = useRef(false);
   const faixa = useRef<HTMLElement>(null);
   const gatilho = useRef<HTMLButtonElement | null>(null);
@@ -58,6 +66,7 @@ export function GestaoServico({
     if (enviando.current) return;
     setTipo(projeto.tipoServico ?? 'pontual');
     setErro(undefined);
+    setRecuperacao(undefined);
     setSucesso(undefined);
     setAcao(proxima);
   }
@@ -77,6 +86,7 @@ export function GestaoServico({
     if (enviando.current || !acao) return;
     enviando.current = true;
     setErro(undefined);
+    setRecuperacao(undefined);
     const operacao = acao;
     form.set('projeto', projeto.id);
     form.set('atualizadoEm', projeto.atualizadoEm);
@@ -86,6 +96,7 @@ export function GestaoServico({
         const resultado = await gerenciarEntrega({}, form);
         if (resultado.erro) {
           setErro(resultado.erro);
+          setRecuperacao(resultado.recuperacao);
           return;
         }
         setSucesso(resultado.sucesso);
@@ -93,7 +104,10 @@ export function GestaoServico({
         fechar();
         if (operacao === 'concluir') onConcluir();
       } catch {
-        setErro('A conexão falhou. Tente novamente.');
+        setErro(
+          'Não foi possível confirmar a alteração. Confira os dados atuais antes de tentar novamente.',
+        );
+        setRecuperacao('atualizar');
       } finally {
         enviando.current = false;
       }
@@ -181,7 +195,15 @@ export function GestaoServico({
         blocked={pendente}
       >
         {acao && (
-          <form action={enviar} className={styles.formulario} aria-busy={pendente}>
+          <form
+            ref={formulario}
+            onSubmit={(event) => {
+              event.preventDefault();
+              enviar(new FormData(event.currentTarget));
+            }}
+            className={styles.formulario}
+            aria-busy={pendente}
+          >
             {acao === 'tipo' ? (
               <>
                 <fieldset className={styles.tipos} disabled={pendente}>
@@ -288,9 +310,32 @@ export function GestaoServico({
               </>
             )}
             {erro && (
-              <p className={styles.erro} role="alert">
-                {erro}
-              </p>
+              <AjudaNaFalha
+                contexto="entrega"
+                pagina={`/entregas/${projeto.id}`}
+                titulo="Confira antes de salvar"
+                descricao={erro}
+                acao={
+                  recuperacao === 'atualizar' ? (
+                    <button
+                      type="button"
+                      disabled={pendente}
+                      onClick={() =>
+                        iniciar(() => {
+                          router.refresh();
+                          setErro(undefined);
+                        })
+                      }
+                    >
+                      Atualizar dados
+                    </button>
+                  ) : recuperacao === 'entrar' ? (
+                    <a href="/entrar" target="_blank" rel="noopener noreferrer">
+                      Entrar novamente
+                    </a>
+                  ) : undefined
+                }
+              />
             )}
             <footer className={styles.rodape}>
               <button

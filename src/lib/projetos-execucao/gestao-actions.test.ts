@@ -47,7 +47,9 @@ describe('gestão autorizada', () => {
   });
   it('não permite operação sem sessão', async () => {
     getUser.mockResolvedValue({ data: { user: null } });
-    expect((await gerenciarEntrega({}, form())).erro).toContain('sessão expirou');
+    const resultado = await gerenciarEntrega({}, form());
+    expect(resultado.erro).toContain('sessão expirou');
+    expect(resultado.recuperacao).toBe('entrar');
     expect(rpc).not.toHaveBeenCalled();
   });
   it('valida entradas antes de acessar o banco', async () => {
@@ -60,11 +62,14 @@ describe('gestão autorizada', () => {
     expect(r.erro).toBeTruthy();
     expect(r.sucesso).toBeUndefined();
     expect(r.erro).not.toContain('private');
+    expect(r.recuperacao).toBe(code === '40001' ? 'atualizar' : undefined);
     expect(revalidatePath).not.toHaveBeenCalled();
   });
   it('recupera falha de conexão sem derrubar a tela', async () => {
     rpc.mockRejectedValue(new Error('network secret'));
-    expect((await gerenciarEntrega({}, form())).erro).toContain('conexão falhou');
+    const resultado = await gerenciarEntrega({}, form());
+    expect(resultado.erro).toContain('conexão falhou');
+    expect(resultado.recuperacao).toBe('atualizar');
   });
   it('agenda compromisso com identificador estável, sem convite externo', async () => {
     const f = new FormData();

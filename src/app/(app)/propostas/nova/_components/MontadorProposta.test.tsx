@@ -26,6 +26,37 @@ const OPCOES: OpcoesNovaProposta = {
 };
 
 describe('MontadorProposta', () => {
+  it('mantém escolhas após falha de rede e orienta a conferir antes de repetir', async () => {
+    const user = userEvent.setup();
+    vi.mocked(criarProposta).mockRejectedValueOnce(new Error('private provider detail'));
+    render(
+      <MontadorProposta
+        opcoes={OPCOES}
+        oportunidadeInicial=""
+        origemInicial=""
+        reuniaoInicial=""
+        erro={null}
+      />,
+    );
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /Cliente/ }),
+      OPCOES.oportunidades[0]!.id,
+    );
+    await user.selectOptions(screen.getByRole('combobox', { name: /Projeto-base/ }), 'sem-base');
+    await user.click(screen.getByRole('button', { name: 'Criar rascunho' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Confira a Biblioteca comercial');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('private');
+    expect(screen.getByRole('combobox', { name: /Cliente/ })).toHaveValue(
+      OPCOES.oportunidades[0]!.id,
+    );
+    expect(screen.getByRole('combobox', { name: /Projeto-base/ })).toHaveValue('sem-base');
+    expect(screen.getByRole('link', { name: 'Ver propostas' })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('link', { name: /Pedir ajuda/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('contexto=proposta'),
+    );
+    expect(screen.getByRole('button', { name: 'Criar rascunho' })).toBeEnabled();
+  });
   it('escolhe cliente e projeto na mesma tela, sem uma etapa intermediária', async () => {
     const user = userEvent.setup();
     render(

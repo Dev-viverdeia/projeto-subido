@@ -35,13 +35,21 @@ function revalidar(projeto: string) {
   revalidarDirecaoOperacional();
 }
 
-function mensagemErro(erro: { code?: string; message?: string } | null): EstadoProjetoExecucao {
+export type EstadoGestaoEntrega = EstadoProjetoExecucao & { recuperacao?: 'atualizar' | 'entrar' };
+
+function mensagemErro(erro: { code?: string; message?: string } | null): EstadoGestaoEntrega {
   if (erro?.code === '40001')
-    return { erro: 'O projeto mudou em outra ação. Atualize a página e tente novamente.' };
+    return {
+      erro: 'O projeto mudou em outra ação. Confira a versão atual antes de salvar.',
+      recuperacao: 'atualizar',
+    };
   if (erro?.message === 'pendencias_na_entrega')
     return { erro: 'Ainda há pendências. Revise e confirme antes de concluir.' };
   if (erro?.message === 'recorrencia_indisponivel')
-    return { erro: 'O acompanhamento não está ativo. Atualize a página para conferir.' };
+    return {
+      erro: 'O acompanhamento não está ativo. Atualize os dados para conferir.',
+      recuperacao: 'atualizar',
+    };
   if (erro?.code === 'P0002') return { erro: 'Este projeto não está disponível na sua conta.' };
   return { erro: 'Não conseguimos salvar agora. Tente novamente.' };
 }
@@ -49,20 +57,25 @@ function mensagemErro(erro: { code?: string; message?: string } | null): EstadoP
 export async function gerenciarEntrega(
   _estado: EstadoProjetoExecucao,
   form: FormData,
-): Promise<EstadoProjetoExecucao> {
+): Promise<EstadoGestaoEntrega> {
   const dados = GestaoSchema.safeParse({
     projeto: form.get('projeto'),
     acao: form.get('acao'),
     atualizadoEm: form.get('atualizadoEm'),
     confirmarPendencias: form.get('confirmarPendencias') === 'sim',
   });
-  if (!dados.success) return { erro: 'Revise a ação ou atualize a página para continuar.' };
+  if (!dados.success)
+    return { erro: 'Revise a ação ou atualize os dados para continuar.', recuperacao: 'atualizar' };
   try {
     const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+    if (!user)
+      return {
+        erro: 'Sua sessão expirou. Entre em outra aba e depois retome esta confirmação.',
+        recuperacao: 'entrar',
+      };
     const { data, error } = await supabase.rpc('projeto_gerenciar_entrega', {
       p_projeto_id: dados.data.projeto,
       p_acao: dados.data.acao,
@@ -82,7 +95,10 @@ export async function gerenciarEntrega(
       }[dados.data.acao],
     };
   } catch {
-    return { erro: 'A conexão falhou. Tente novamente; a ação não será duplicada.' };
+    return {
+      erro: 'A conexão falhou. Confira os dados atuais antes de tentar novamente.',
+      recuperacao: 'atualizar',
+    };
   }
 }
 

@@ -2,6 +2,7 @@ import { CalendarCheck2, CalendarClock, ExternalLink, Unplug } from 'lucide-reac
 import { desconectarGoogleCalendar } from '@/lib/google-calendar/actions';
 import type { EstadoGoogleCalendar } from '@/lib/google-calendar/queries';
 import { AtalhoGuia } from '@/components/suporte/AtalhoGuia';
+import { AjudaNaFalha } from '@/components/suporte/AjudaNaFalha';
 import styles from '../page.module.css';
 
 export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleCalendar }) {
@@ -40,7 +41,6 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
               ? `As novas calls podem entrar na agenda ${calendar.email ?? ''} e convidar o cliente automaticamente.`
               : 'O Google cuida do evento e do convite. O acesso da reunião continua sendo a sala pública da Subido.'}
           </p>
-          {calendar.ultimoErro && <small>{calendar.ultimoErro}</small>}
         </div>
 
         <div className={styles.integracaoAcoes}>
@@ -70,6 +70,13 @@ export function IntegracaoGoogleCalendar({ calendar }: { calendar: EstadoGoogleC
           )}
         </div>
       </div>
+      {!calendar.conectado && (precisaReconectar || calendar.ultimoErro) && (
+        <AjudaNaFalha
+          contexto="agenda"
+          titulo="A agenda ainda não está conectada"
+          descricao="Tente conectar novamente. Se o Google mostrar um bloqueio, confira o guia ou peça ajuda à equipe."
+        />
+      )}
     </section>
   );
 }

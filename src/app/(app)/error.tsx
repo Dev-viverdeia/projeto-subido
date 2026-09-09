@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { CloudOff } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { linkAjudaNaFalha } from '@/lib/suporte/recuperacao';
 import { Button } from '@/design-system/via';
 import { EstadoSistema } from './_components/EstadoSistema';
 
@@ -25,6 +27,7 @@ export default function ErroApp({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const pagina = usePathname();
   useEffect(() => {
     /* O log de servidor tem o cru; este espelho de cliente ajuda quando o erro
        nasce no browser (hidratação, chunk). */
@@ -37,19 +40,18 @@ export default function ErroApp({
       icone={<CloudOff size={30} strokeWidth={1.6} />}
       etiqueta="Não foi possível carregar"
       titulo="Esta página não abriu."
-      descricao="Tente novamente. Se o problema continuar, volte ao início e abra outra área."
+      descricao="Tente carregar novamente. Se o problema continuar, peça ajuda à equipe."
       acoes={
         <>
           <Button variant="primary" onClick={reset}>
             Tentar novamente
           </Button>
           <Link href="/inicio">Voltar ao início</Link>
+          <a href={linkAjudaNaFalha('pagina', pagina)} target="_blank" rel="noopener noreferrer">
+            Pedir ajuda
+          </a>
         </>
       }
-      passos={[
-        { rotulo: 'Primeiro', valor: 'Tente carregar a tela mais uma vez.' },
-        { rotulo: 'Se persistir', valor: 'Volte ao início e abra outra área.' },
-      ]}
     />
   );
 }

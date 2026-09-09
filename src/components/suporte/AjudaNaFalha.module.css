@@ -1,0 +1,81 @@
+.quadro {
+  min-width: 0;
+  padding: var(--via-space-4);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text-primary);
+}
+.quadro:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+.mensagem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+}
+.mensagem > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--via-navy);
+}
+.mensagem > div {
+  min-width: 0;
+}
+.mensagem strong {
+  font-size: var(--app-fs-reading);
+  font-weight: 550;
+  line-height: 1.5;
+}
+.mensagem p {
+  margin: var(--via-space-1) 0 0;
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+  color: var(--via-text-soft);
+  text-wrap: pretty;
+}
+.acoes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-2) var(--via-space-4);
+  margin-top: var(--via-space-3);
+}
+.acoes a,
+.acoes button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  color: var(--via-navy);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  text-decoration: none;
+  cursor: pointer;
+}
+.acoes > a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.principal {
+  max-width: 100%;
+}
+.principal a,
+.principal button {
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  text-align: center;
+}
+.acoes a:focus-visible,
+.acoes button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.acoes button:disabled {
+  cursor: wait;
+}
