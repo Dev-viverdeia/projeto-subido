@@ -432,7 +432,7 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(page.getByRole('link', { name: 'Ver certificado' }).first()).toBeVisible();
 
     await page.goto('/preview/certificado');
-    await expect(page.getByRole('link', { name: 'Compartilhar no LinkedIn' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Compartilhar no LinkedIn' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Copiar link' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Salvar em PDF' })).toBeVisible();
   });

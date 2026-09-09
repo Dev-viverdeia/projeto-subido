@@ -1488,6 +1488,26 @@
     padding: 0;
   }
 
+  /* A ação curta deixa o vídeo mais próximo da primeira dobra sem reduzir a leitura. */
+  .cabecalhoAcao[data-acao-curta] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--via-space-3);
+    padding: var(--via-space-4);
+  }
+
+  .cabecalhoAcao[data-acao-curta] .progressoCabecalho p {
+    flex-wrap: wrap;
+    gap: 0 var(--via-space-2);
+  }
+
+  .cabecalhoAcao[data-acao-curta] .acaoPrincipal {
+    gap: var(--via-space-2);
+    max-width: 145px;
+    font-size: var(--app-fs-ui);
+  }
+
   .abasProjeto,
   .abasProjeto[data-total='3'] {
     grid-template-columns: repeat(2, minmax(0, 1fr));

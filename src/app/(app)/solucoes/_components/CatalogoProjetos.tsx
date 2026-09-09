@@ -129,10 +129,6 @@ export function CatalogoProjetos({
             <p className={styles.resultado}>{destaque.solucao.resumo}</p>
           </div>
 
-          {obterVisaoVisual(destaque.solucao.slug) ? (
-            <FluxoProjeto visao={obterVisaoVisual(destaque.solucao.slug)!} compacto />
-          ) : null}
-
           <div className={styles.destaqueRodape}>
             <div className={styles.metadados}>
               {destaque.solucao.projeto?.roteiro.perfil ? (
@@ -153,6 +149,12 @@ export function CatalogoProjetos({
               {rotuloAcao(destaque)} <ArrowRight size={17} aria-hidden="true" />
             </span>
           </div>
+
+          {obterVisaoVisual(destaque.solucao.slug) ? (
+            <div className={styles.destaqueFluxo}>
+              <FluxoProjeto visao={obterVisaoVisual(destaque.solucao.slug)!} compacto />
+            </div>
+          ) : null}
 
           {destaque.feitas > 0 ? (
             <span className={styles.progresso} aria-hidden="true">

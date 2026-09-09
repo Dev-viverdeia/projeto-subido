@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Copy, Download, ExternalLink, ImageOff } from 'lucide-react';
 import { Spinner } from '@/design-system/via';
 import { ModalOperacao } from '../../_components/ModalOperacao';
@@ -34,8 +34,58 @@ export function CompartilharCertificado({
   const [imagemFalhou, setImagemFalhou] = useState(false);
   const [imagemCarregando, setImagemCarregando] = useState(true);
   const [tentativa, setTentativa] = useState(0);
+  const [baixando, setBaixando] = useState(false);
+  const [erroDownload, setErroDownload] = useState<string | null>(null);
+  const pedidoDownload = useRef<AbortController | null>(null);
   const imagem = imagemPreview ?? `/certificado/${codigo}/imagem`;
   const campos = dadosPerfilCertificado(titulo, codigo, urlPublica, data);
+
+  useEffect(
+    () => () => {
+      pedidoDownload.current?.abort();
+      pedidoDownload.current = null;
+    },
+    [],
+  );
+
+  async function baixarImagem() {
+    if (pedidoDownload.current) return;
+    const pedido = new AbortController();
+    pedidoDownload.current = pedido;
+    setBaixando(true);
+    setErroDownload(null);
+    const timeout = setTimeout(() => pedido.abort(), 30_000);
+    try {
+      const resposta = await fetch(imagem, { signal: pedido.signal, cache: 'no-store' });
+      if (!resposta.ok || !resposta.headers.get('content-type')?.startsWith('image/png')) {
+        throw new Error('imagem_indisponivel');
+      }
+      const arquivo = await resposta.blob();
+      const assinatura = new Uint8Array(await arquivo.slice(0, 8).arrayBuffer());
+      if (![137, 80, 78, 71, 13, 10, 26, 10].every((byte, i) => assinatura[i] === byte)) {
+        throw new Error('imagem_invalida');
+      }
+      if (pedido.signal.aborted) throw new Error('download_interrompido');
+      const url = URL.createObjectURL(arquivo);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'certificado-subido.png';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      if (pedidoDownload.current === pedido) {
+        setErroDownload('Não foi possível baixar a imagem. Tente novamente ou compartilhe o link.');
+      }
+    } finally {
+      clearTimeout(timeout);
+      if (pedidoDownload.current === pedido) {
+        pedidoDownload.current = null;
+        setBaixando(false);
+      }
+    }
+  }
 
   async function copiar(rotulo: string, valor: string) {
     try {
@@ -131,15 +181,30 @@ export function CompartilharCertificado({
               <figcaption>Você revisa a publicação no LinkedIn antes de postar.</figcaption>
             </figure>
             <div className={styles.utilitarios}>
-              <a href={imagem} download="certificado-subido.png">
-                <Download size={17} aria-hidden="true" />
-                Baixar imagem
-              </a>
+              <button
+                type="button"
+                onClick={() => void baixarImagem()}
+                disabled={baixando}
+                aria-busy={baixando}
+                aria-label="Baixar imagem"
+              >
+                {baixando ? (
+                  <Spinner size="sm" label="Preparando imagem" />
+                ) : (
+                  <Download size={17} aria-hidden="true" />
+                )}
+                {baixando ? 'Preparando imagem' : 'Baixar imagem'}
+              </button>
               <a href={urlPublica} target="_blank" rel="noopener noreferrer">
                 Ver registro público
                 <ExternalLink size={15} aria-hidden="true" />
               </a>
             </div>
+            {erroDownload && (
+              <p className={styles.feedback} role="alert">
+                {erroDownload}
+              </p>
+            )}
           </>
         ) : (
           <>

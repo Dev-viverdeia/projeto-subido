@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { escolherFase, escolherPasso, escolherAula } from './helpers/projeto';
 import fixture from '../src/app/preview/nina/fixture.json';
 import { exemploPassoNina, NINA_SLUG } from '../src/lib/projetos/exemplos-nina';
 
@@ -30,15 +31,9 @@ test('Nina: dez exemplos, instruções preservadas e conclusão explícita', asy
   await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
   const guia = page.getByRole('region', { name: 'Guia de execução' });
   for (const fase of fixture.roteiro.fases) {
-    await page
-      .getByRole('navigation', { name: 'Fases do projeto' })
-      .getByRole('button', { name: new RegExp(fase.titulo) })
-      .click();
+    await escolherFase(page, fase.titulo);
     for (const passo of fase.passos) {
-      await page
-        .getByRole('navigation', { name: `Passos da fase ${fase.titulo}` })
-        .getByRole('button', { name: new RegExp(passo.titulo) })
-        .click();
+      await escolherPasso(page, fase.titulo, new RegExp(passo.titulo));
       await expect(guia.getByRole('button', { name: 'Exemplo', exact: true })).toHaveAttribute(
         'aria-pressed',
         'true',
@@ -71,14 +66,8 @@ test('Nina: dez exemplos, instruções preservadas e conclusão explícita', asy
   );
   await page.reload();
   await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
-  await page
-    .getByRole('navigation', { name: 'Fases do projeto' })
-    .getByRole('button', { name: /Entregar/ })
-    .click();
-  await page
-    .getByRole('navigation', { name: 'Passos da fase Entregar' })
-    .getByRole('button', { name: /Entregar manual/ })
-    .click();
+  await escolherFase(page, 'Entregar');
+  await escolherPasso(page, 'Entregar', /Entregar manual/);
   await expect(guia.getByRole('button', { name: 'Conferir', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -88,9 +77,8 @@ test('Nina: dez exemplos, instruções preservadas e conclusão explícita', asy
 test('Nina: três aulas, cenários interativos e recursos acessíveis', async ({ page }, info) => {
   await page.goto('/preview/nina');
   await page.getByRole('tab', { name: 'Aprender', exact: true }).click();
-  const aulas = page.getByRole('navigation', { name: 'Aulas do projeto' });
   for (const [i, aula] of fixture.roteiro.trilhaDidatica.aulas.entries()) {
-    await aulas.getByRole('button', { name: `Aula ${i + 1}: ${aula.titulo}` }).click();
+    await escolherAula(page, `Aula ${i + 1}: ${aula.titulo}`);
     await expect(page.getByText('Exemplo didático', { exact: true })).toBeVisible();
     await expect(page.getByText(aula.exercicio, { exact: true })).toBeVisible();
   }

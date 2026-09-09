@@ -98,7 +98,7 @@ test('projeto: executar, consultar e conferir não alteram a conclusão', async 
     '0',
   );
   await guia.getByRole('button', { name: 'Executar', exact: true }).click();
-  await page.getByRole('navigation', { name: 'Fases do projeto' }).scrollIntoViewIfNeeded();
+  await page.getByRole('heading', { name: 'Passo a passo', exact: true }).scrollIntoViewIfNeeded();
   await page.screenshot({ path: info.outputPath('projeto-executar.png') });
   await page.getByRole('tab', { name: 'Pré-requisitos e materiais', exact: true }).click();
   await page.locator('summary', { hasText: 'Escopo e limites do projeto' }).click();

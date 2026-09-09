@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { escolherFase, escolherPasso, escolherAula } from './helpers/projeto';
 import fixture from '../src/app/preview/prospeccao-projeto/fixture.json';
 import { exemploPassoProspeccao, PROSPECCAO_SLUG } from '../src/lib/projetos/exemplos-prospeccao';
 
@@ -34,15 +35,9 @@ test('Prospecção: dez exemplos, instruções preservadas e conclusão explíci
   await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
   const guia = page.getByRole('region', { name: 'Guia de execução' });
   for (const fase of fixture.roteiro.fases) {
-    await page
-      .getByRole('navigation', { name: 'Fases do projeto' })
-      .getByRole('button', { name: new RegExp(fase.titulo) })
-      .click();
+    await escolherFase(page, fase.titulo);
     for (const passo of fase.passos) {
-      await page
-        .getByRole('navigation', { name: `Passos da fase ${fase.titulo}` })
-        .getByRole('button', { name: new RegExp(passo.titulo) })
-        .click();
+      await escolherPasso(page, fase.titulo, new RegExp(passo.titulo));
       await expect(guia.getByRole('button', { name: 'Exemplo', exact: true })).toHaveAttribute(
         'aria-pressed',
         'true',
@@ -77,14 +72,8 @@ test('Prospecção: dez exemplos, instruções preservadas e conclusão explíci
   );
   await page.reload();
   await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
-  await page
-    .getByRole('navigation', { name: 'Fases do projeto' })
-    .getByRole('button', { name: /Entregar/ })
-    .click();
-  await page
-    .getByRole('navigation', { name: 'Passos da fase Entregar' })
-    .getByRole('button', { name: /Documentar a rotina/ })
-    .click();
+  await escolherFase(page, 'Entregar');
+  await escolherPasso(page, 'Entregar', /Documentar a rotina/);
   await expect(guia.getByRole('button', { name: 'Conferir', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -96,9 +85,8 @@ test('Prospecção: três aulas, cenários interativos e recursos acessíveis', 
 }, info) => {
   await page.goto('/preview/prospeccao-projeto');
   await page.getByRole('tab', { name: 'Aprender', exact: true }).click();
-  const aulas = page.getByRole('navigation', { name: 'Aulas do projeto' });
   for (const [i, aula] of fixture.roteiro.trilhaDidatica.aulas.entries()) {
-    await aulas.getByRole('button', { name: `Aula ${i + 1}: ${aula.titulo}` }).click();
+    await escolherAula(page, `Aula ${i + 1}: ${aula.titulo}`);
     await expect(page.getByText('Exemplo didático', { exact: true })).toBeVisible();
     await expect(page.getByText(aula.exercicio, { exact: true })).toBeVisible();
   }
@@ -161,8 +149,7 @@ test('Prospecção: abordagem e falhas são exemplos, sem envio ou gravação', 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method())) mutacoes.push(request.url());
   });
   await page.getByRole('tab', { name: 'Implementar', exact: true }).click();
-  const fases = page.getByRole('navigation', { name: 'Fases do projeto' });
-  await fases.getByRole('button', { name: /Construir/ }).click();
+  await escolherFase(page, 'Construir');
   const fluxo = page.getByRole('list', { name: 'Caminho esperado' });
   await expect(fluxo).toBeVisible();
   expect(
@@ -170,12 +157,11 @@ test('Prospecção: abordagem e falhas são exemplos, sem envio ou gravação', 
       .locator('li > div')
       .evaluateAll((els) => els.every((e) => e.scrollWidth <= e.clientWidth + 1)),
   ).toBe(true);
-  await page.getByRole('button', { name: /Priorizar e gerar o briefing/ }).click();
+  await escolherPasso(page, 'Construir', /Priorizar e gerar o briefing/);
   await page.getByRole('button', { name: 'Sem sinal recente', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Sem sinal recente', exact: true })).toHaveCSS(
-    'background-color',
-    'rgb(10, 31, 59)',
-  );
+  await expect(
+    page.getByRole('button', { name: 'Sem sinal recente', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await expect(
     page.getByText('Como funciona o atendimento pelo WhatsApp entre as unidades hoje?', {
       exact: true,
@@ -190,8 +176,8 @@ test('Prospecção: abordagem e falhas são exemplos, sem envio ou gravação', 
   await expect(
     page.getByText('Não preparar um novo contato para envio.', { exact: true }),
   ).toBeVisible();
-  await fases.getByRole('button', { name: /Validar/ }).click();
-  await page.getByRole('button', { name: /Testar falhas e repetição/ }).click();
+  await escolherFase(page, 'Validar');
+  await escolherPasso(page, 'Validar', /Testar falhas e repetição/);
   await page.getByRole('button', { name: 'Fontes divergem', exact: true }).click();
   await expect(
     page.getByText('Guardar ambos os valores e encaminhar para revisão.', { exact: true }),

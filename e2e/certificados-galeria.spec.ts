@@ -190,7 +190,7 @@ test('compartilhamento mostra PNG, download e campos copiáveis do perfil', asyn
     '_blank',
   );
   const baixar = page.waitForEvent('download');
-  await modal.getByRole('link', { name: 'Baixar imagem' }).click();
+  await modal.getByRole('button', { name: 'Baixar imagem' }).click();
   expect((await baixar).suggestedFilename()).toBe('certificado-subido.png');
   await modal.getByRole('button', { name: 'Perfil', exact: true }).click();
   await expect(modal.getByRole('button', { name: 'Perfil', exact: true })).toHaveAttribute(
@@ -218,6 +218,74 @@ test('compartilhamento mostra PNG, download e campos copiáveis do perfil', asyn
   await page.keyboard.press('Escape');
   await expect(modal).toHaveCount(0);
   await expect(gatilho).toBeFocused();
+});
+
+test('falha no download fica no modal e permite tentar novamente', async ({ page }) => {
+  await page.goto('/preview/certificado');
+  await page.getByRole('button', { name: 'Compartilhar no LinkedIn' }).click();
+  const modal = page.getByRole('dialog', { name: 'Compartilhar certificado' });
+  await modal
+    .getByRole('img', { name: /^Prévia do certificado/ })
+    .evaluate((el: HTMLImageElement) => el.decode());
+  const baixar = modal.getByRole('button', { name: 'Baixar imagem' });
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  // Nem um erro do servidor nem uma resposta HTML/corrompida pode virar um PNG salvo.
+  for (const resposta of [
+    { status: 503, contentType: 'text/plain', body: 'indisponível' },
+    { status: 200, contentType: 'text/html', body: '<html>erro</html>' },
+    { status: 200, contentType: 'image/png', body: 'arquivo inválido' },
+  ]) {
+    await page.route('**/preview/certificado/imagem*', (route) => route.fulfill(resposta));
+    await baixar.click();
+    await expect(modal.getByRole('alert')).toHaveText(
+      'Não foi possível baixar a imagem. Tente novamente ou compartilhe o link.',
+    );
+    await expect(baixar).toBeEnabled();
+    await expect(modal.getByRole('link', { name: 'Publicar no LinkedIn' })).toBeVisible();
+    await page.unroute('**/preview/certificado/imagem*');
+  }
+  expect(downloads).toBe(0);
+  const download = page.waitForEvent('download');
+  await baixar.click();
+  expect((await download).suggestedFilename()).toBe('certificado-subido.png');
+  await expect(modal.getByRole('alert')).toHaveCount(0);
+});
+
+test('download indica espera, evita repetição e pode ser interrompido ao fechar', async ({
+  page,
+}) => {
+  await page.goto('/preview/certificado');
+  const gatilho = page.getByRole('button', { name: 'Compartilhar no LinkedIn' });
+  await gatilho.click();
+  const modal = page.getByRole('dialog', { name: 'Compartilhar certificado' });
+  await modal
+    .getByRole('img', { name: /^Prévia do certificado/ })
+    .evaluate((el: HTMLImageElement) => el.decode());
+  let liberar!: () => void;
+  let pedidos = 0;
+  const espera = new Promise<void>((resolve) => {
+    liberar = resolve;
+  });
+  await page.route('**/preview/certificado/imagem*', async (route) => {
+    pedidos++;
+    await espera;
+    await route.abort().catch(() => undefined);
+  });
+  const baixar = modal.getByRole('button', { name: 'Baixar imagem' });
+  await baixar.click();
+  await expect(baixar).toBeDisabled();
+  await expect(baixar).toHaveAttribute('aria-busy', 'true');
+  await expect(baixar).toContainText('Preparando imagem');
+  await expect.poll(() => pedidos).toBe(1);
+  await page.keyboard.press('Escape');
+  await expect(modal).toHaveCount(0);
+  await expect(gatilho).toBeFocused();
+  liberar();
+  await page.unrouteAll({ behavior: 'wait' });
+  await gatilho.click();
+  await expect(modal.getByRole('button', { name: 'Baixar imagem' })).toBeEnabled();
+  await expect(modal.getByRole('alert')).toHaveCount(0);
 });
 
 test('erro de prévia permite recuperação sem bloquear o compartilhamento', async ({ page }) => {
