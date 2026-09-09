@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { projetoPreview, rotaPreview } from '@/app/preview/projetos/fixture';
 import type { ProjetoGuiado } from './ProjetoGuiado';
@@ -30,6 +30,30 @@ function montar() {
 }
 
 describe('Navegação e retomada do projeto', () => {
+  it('abre a aplicação no cliente com um clique, transfere o foco e preserva a consulta', async () => {
+    const user = userEvent.setup();
+    montar();
+    await user.click(screen.getByRole('button', { name: 'Usar com cliente' }));
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Usar com cliente' })).toHaveFocus(),
+    );
+    expect(screen.getByRole('button', { name: 'Aplicar no cliente' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('link', { name: 'Adicionar empresa' })).toHaveAttribute(
+      'href',
+      '/vendas?novo=projeto&projeto=SDR%20de%20Atendimento%20com%20IA&projetoSlug=sdr-atendimento',
+    );
+    await user.click(screen.getByRole('button', { name: 'Arquivos e ferramentas' }));
+    await user.click(screen.getByRole('tab', { name: 'Visão geral' }));
+    await user.click(screen.getByRole('tab', { name: 'Pré-requisitos e materiais' }));
+    expect(screen.getByRole('button', { name: 'Arquivos e ferramentas' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
   it('permite navegar pelas áreas com setas, Home e End sem perder o foco', async () => {
     const user = userEvent.setup();
     montar();

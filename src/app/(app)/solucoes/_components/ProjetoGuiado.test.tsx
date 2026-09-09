@@ -342,9 +342,7 @@ describe('Projeto guiado', () => {
       'href',
       '/builder?projeto=crm-comercial',
     );
-    expect(screen.getByLabelText('Cliente em negociação')).toHaveValue(
-      '11111111-1111-4111-8111-111111111111',
-    );
+    expect(screen.getByLabelText('Cliente')).toHaveValue('11111111-1111-4111-8111-111111111111');
     expect(screen.getByRole('link', { name: 'Usar com outra empresa' })).toHaveAttribute(
       'href',
       '/vendas?novo=projeto&projeto=CRM%20Comercial%20com%20IA&projetoSlug=crm-comercial',
@@ -353,11 +351,7 @@ describe('Projeto guiado', () => {
       'href',
       '/propostas/nova?oportunidade=11111111-1111-4111-8111-111111111111&projeto=crm-comercial',
     );
-    expect(
-      screen.getByText(
-        /Escolha um cliente em negociação para criar a proposta e acompanhar a entrega/,
-      ),
-    ).toBeVisible();
+    expect(screen.getByText('Da empresa à entrega, sem cadastrar tudo de novo.')).toBeVisible();
   });
 
   it('retoma a entrega existente sem fazer o profissional criar outra proposta', async () => {

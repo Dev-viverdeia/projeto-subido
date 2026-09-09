@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import {
   projetoPreview,
   rotaPreview,
@@ -10,7 +11,24 @@ import {
 import { obterVisaoVisual } from '@/lib/projetos/visao-visual';
 import { VisaoProjeto } from './VisaoProjeto';
 import { FluxoProjeto } from './FluxoProjeto';
-import { KitProjeto } from './KitProjeto';
+import { KitProjeto, type AreaKitProjeto } from './KitProjeto';
+
+function KitEmUso() {
+  const [area, setArea] = useState<AreaKitProjeto>('preparar');
+  return (
+    <KitProjeto
+      slug="sdr-atendimento-qualificacao"
+      titulo="Atendimento no WhatsApp com IA"
+      projeto={projetoPreview}
+      ferramentas={ferramentasPreview}
+      prompts={promptsPreview}
+      rotaComercial={rotaPreview}
+      area={area}
+      aoMudarArea={setArea}
+      direto
+    />
+  );
+}
 
 describe('Visão visual dos projetos', () => {
   it.each([
@@ -79,17 +97,7 @@ describe('Visão visual dos projetos', () => {
 
   it('mostra requisitos primeiro, guarda os modelos completos e recolhe prompts longos', async () => {
     const user = userEvent.setup();
-    render(
-      <KitProjeto
-        slug="sdr-atendimento-qualificacao"
-        titulo="Atendimento no WhatsApp com IA"
-        projeto={projetoPreview}
-        ferramentas={ferramentasPreview}
-        prompts={promptsPreview}
-        rotaComercial={rotaPreview}
-        direto
-      />,
-    );
+    render(<KitEmUso />);
     const requisitos = screen.getByRole('list', { name: 'Pré-requisitos do projeto' });
     projetoPreview.roteiro.escopo!.preRequisitos.forEach((item) =>
       expect(within(requisitos).getByText(item)).toBeVisible(),

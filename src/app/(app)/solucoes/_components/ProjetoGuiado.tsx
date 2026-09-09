@@ -2,14 +2,14 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
 import type { DadosRoteiroProjeto, ItemSolucao, VizinhaSolucao } from '@/lib/conteudo/queries';
 import type { ContextoRotaComercialProjeto } from '@/lib/projetos/rota-comercial-modelo';
 import { idsAulasProjeto, idsPassosProjeto } from '@/lib/projetos/roteiro';
 import { contarEtapasFeitas, percentual, useProgresso } from '@/lib/progresso/local';
 import { AprendizadoProjeto } from './AprendizadoProjeto';
 import { ImplementacaoProjeto } from './ImplementacaoProjeto';
-import { KitProjeto } from './KitProjeto';
+import { KitProjeto, type AreaKitProjeto } from './KitProjeto';
 import { ProximaSolucao } from './ProximaSolucao';
 import { VisaoProjeto } from './VisaoProjeto';
 import styles from './ProjetoGuiadoNovo.module.css';
@@ -56,12 +56,22 @@ export function ProjetoGuiado({
     'visao',
   );
   const abasRef = useRef<HTMLElement>(null);
+  const [areaKit, setAreaKit] = useState<AreaKitProjeto>('preparar');
   const abrirArea = (aba: typeof abaAtiva) => {
     setAbaAtiva(aba);
     const botao = abasRef.current?.querySelector<HTMLButtonElement>(`#aba-${aba}`);
     botao?.focus({ preventScroll: true });
     botao?.scrollIntoView({ block: 'nearest', behavior: 'auto' });
   };
+  function abrirCliente() {
+    setAreaKit('cliente');
+    setAbaAtiva('materiais');
+    requestAnimationFrame(() => {
+      const tituloCliente = document.getElementById('rota-projeto-titulo');
+      tituloCliente?.focus({ preventScroll: true });
+      tituloCliente?.scrollIntoView({ block: 'start', behavior: 'auto' });
+    });
+  }
   const proximoPasso = roteiro.fases
     .flatMap((fase) =>
       fase.passos.map((passo) => ({
@@ -102,6 +112,11 @@ export function ProjetoGuiado({
               </>
             ) : null}
           </p>
+          <button type="button" className={styles.acaoCliente} onClick={abrirCliente}>
+            <BriefcaseBusiness size={18} aria-hidden="true" />
+            Usar com cliente
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
         </div>
         {mostrarAcaoCabecalho && (
           <div
@@ -243,6 +258,8 @@ export function ProjetoGuiado({
                 ferramentas={ferramentas}
                 prompts={prompts}
                 rotaComercial={rotaComercial}
+                area={areaKit}
+                aoMudarArea={setAreaKit}
                 direto
               />
               {proxima ? <ProximaSolucao proxima={proxima} /> : null}

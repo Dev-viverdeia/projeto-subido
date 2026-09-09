@@ -1334,7 +1334,7 @@
 }
 
 .rotaProjeto header h2 {
-  margin-top: var(--via-space-2);
+  scroll-margin-top: 100px;
   font-family: var(--via-font-display);
   font-size: var(--via-fs-h4);
   font-weight: 560;
@@ -1346,7 +1346,7 @@
 .rotaProjeto header p {
   margin-top: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   line-height: var(--via-lh-normal);
   text-wrap: pretty;
 }
@@ -1412,7 +1412,7 @@
 .rotaEtapas li strong {
   margin: 0;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   white-space: nowrap;
 }
@@ -1427,13 +1427,13 @@
   display: grid;
   gap: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
 }
 
 .rotaContexto select {
   width: 100%;
-  min-height: var(--app-h-control);
+  min-height: 48px;
   padding: var(--via-space-2) calc(var(--via-space-5) + var(--via-space-2)) var(--via-space-2)
     var(--via-space-3);
   border: 1px solid var(--via-border);
@@ -1441,7 +1441,7 @@
   background-color: var(--via-surface);
   color: var(--via-text-primary);
   font: inherit;
-  font-size: var(--via-fs-caption);
+  font-size: var(--via-fs-body);
   cursor: pointer;
   transition:
     border-color var(--app-t-state),
@@ -1488,7 +1488,7 @@
 .rotaEstado strong {
   overflow: hidden;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1497,7 +1497,7 @@
 .rotaEstado small {
   margin-top: 2px;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-support);
 }
 
 .rotaVazia {
@@ -1505,7 +1505,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--via-space-3);
   align-items: start;
-  margin: var(--via-space-4) var(--app-pad-card) 0;
+  margin: var(--via-space-4) var(--app-pad-card);
   padding: var(--via-space-3);
   border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-control);
@@ -1521,12 +1521,12 @@
 
 .rotaVazia strong {
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
 }
 
 .rotaVazia p {
   margin-top: var(--via-space-1);
-  font-size: var(--via-fs-micro);
+  font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
 }
 
@@ -1537,18 +1537,24 @@
   padding: 0 var(--app-pad-card) var(--via-space-3);
 }
 
+@media (max-width: 599px) {
+  .rotaAcoes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .rotaAcoes a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--via-space-2);
-  min-height: 42px;
+  min-height: 44px;
   padding: var(--via-space-2) var(--via-space-3);
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   background: var(--via-surface);
   color: var(--via-text-primary);
-  font-size: var(--via-fs-caption);
+  font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-semibold);
   text-decoration: none;
   transition:
@@ -1582,7 +1588,8 @@
   padding: var(--via-space-3) var(--app-pad-card);
   border-top: 1px solid var(--via-border-hairline);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-micro);
+  min-height: 44px;
+  font-size: var(--app-fs-ui);
   text-decoration: none;
   transition:
     color var(--app-t-state),

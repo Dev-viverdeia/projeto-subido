@@ -14,7 +14,7 @@ export function CabecalhoOperacional({
   resumo,
 }: {
   titulo: string;
-  descricao: string;
+  descricao?: string;
   acao?: ReactNode;
   resumo?: ReactNode;
 }) {
@@ -22,7 +22,7 @@ export function CabecalhoOperacional({
     <header className={styles.cabecalho}>
       <div className={styles.textos}>
         <h1>{titulo}</h1>
-        <p>{descricao}</p>
+        {descricao && <p>{descricao}</p>}
       </div>
 
       {(resumo || acao) && (

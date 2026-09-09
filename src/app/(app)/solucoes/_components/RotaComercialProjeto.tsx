@@ -57,9 +57,10 @@ export function RotaComercialProjeto({
   return (
     <section className={styles.rotaProjeto} aria-labelledby="rota-projeto-titulo">
       <header>
-        <span>Leve ao cliente</span>
-        <h2 id="rota-projeto-titulo">Venda este projeto a um cliente.</h2>
-        <p>Escolha um cliente em negociação para criar a proposta e acompanhar a entrega.</p>
+        <h2 id="rota-projeto-titulo" tabIndex={-1}>
+          Usar com cliente
+        </h2>
+        <p>Da empresa à entrega, sem cadastrar tudo de novo.</p>
       </header>
 
       <ol className={styles.rotaEtapas} aria-label="Fluxo comercial deste Projeto">
@@ -87,7 +88,7 @@ export function RotaComercialProjeto({
       {contexto.oportunidades.length ? (
         <div className={styles.rotaContexto}>
           <label htmlFor={`oportunidade-${slug}`}>
-            Cliente em negociação
+            Cliente
             <select
               id={`oportunidade-${slug}`}
               value={oportunidadeId}
@@ -129,8 +130,8 @@ export function RotaComercialProjeto({
         <div className={styles.rotaVazia}>
           <Building2 size={19} strokeWidth={1.7} aria-hidden="true" />
           <div>
-            <strong>Comece por uma empresa real.</strong>
-            <p>O título de {titulo} já entra na nova venda.</p>
+            <strong>Adicione sua primeira empresa</strong>
+            <p>A nova venda já vem com o projeto {titulo}.</p>
           </div>
         </div>
       )}
