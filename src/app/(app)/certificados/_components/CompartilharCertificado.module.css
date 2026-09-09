@@ -71,7 +71,8 @@
   justify-content: space-between;
   gap: var(--via-space-3);
 }
-.utilitarios a {
+.utilitarios a,
+.utilitarios button {
   display: inline-flex;
   gap: var(--via-space-2);
   align-items: center;
@@ -80,10 +81,22 @@
   font-size: var(--app-fs-support);
   text-decoration: none;
 }
+.utilitarios button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+.utilitarios button:disabled {
+  color: var(--via-text-muted);
+  cursor: wait;
+}
 .utilitarios a:hover {
   text-decoration: underline;
 }
-.utilitarios a:focus-visible {
+.utilitarios a:focus-visible,
+.utilitarios button:focus-visible {
   outline: none;
   box-shadow: var(--app-ring);
 }

@@ -104,7 +104,10 @@ export function ProjetoGuiado({
           </p>
         </div>
         {mostrarAcaoCabecalho && (
-          <div className={styles.cabecalhoAcao}>
+          <div
+            className={styles.cabecalhoAcao}
+            data-acao-curta={(!aprendizadoConcluido && Boolean(proximoPasso)) || undefined}
+          >
             <div
               className={styles.progressoCabecalho}
               role="progressbar"

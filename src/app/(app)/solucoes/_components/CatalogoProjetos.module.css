@@ -52,12 +52,14 @@
 .destaque {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'principal' 'acao';
   gap: var(--via-space-6);
   padding: clamp(24px, 3vw, 32px);
   border-radius: var(--app-radius-surface);
 }
 
 .destaquePrincipal {
+  grid-area: principal;
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr);
   gap: var(--via-space-2) var(--via-space-4);
@@ -65,6 +67,13 @@
 
 .destaque[data-com-fluxo] {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  grid-template-areas: 'principal fluxo' 'acao fluxo';
+}
+
+.destaqueFluxo {
+  grid-area: fluxo;
+  align-self: center;
+  min-width: 0;
 }
 
 .destaqueIdentidade {
@@ -125,7 +134,7 @@
 }
 
 .destaqueRodape {
-  grid-column: 1 / -1;
+  grid-area: acao;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -371,6 +380,9 @@
   .destaque,
   .destaque[data-com-fluxo] {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .destaque[data-com-fluxo] {
+    grid-template-areas: 'principal' 'acao' 'fluxo';
   }
   .destaqueRodape {
     flex-wrap: wrap;

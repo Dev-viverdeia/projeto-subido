@@ -43,6 +43,9 @@ test('permissão negada mantém a entrada disponível e explica como recuperar',
 }, info) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      // O adaptador WebRTC do Safari envolve este método; o mock não pode torná-lo readonly.
+      writable: true,
+      configurable: true,
       value: () => Promise.reject(new DOMException('Bloqueado no teste', 'NotAllowedError')),
     });
   });

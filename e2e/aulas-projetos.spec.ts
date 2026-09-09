@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { escolherFase, escolherPasso } from './helpers/projeto';
 
 for (const tela of ['formacao', 'aula', 'projeto']) {
   test(`${tela}: legível dentro do shell, sem recortes ou erros de acessibilidade`, async ({
@@ -82,12 +83,11 @@ test('projeto: as cinco fases, o kit e o teclado levam ao conteúdo correto', as
   await aprender.focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Implementar');
-  const fases = page.getByRole('navigation', { name: 'Fases do projeto' });
   for (const fase of ['Entender', 'Preparar', 'Construir', 'Validar', 'Entregar']) {
-    await fases.getByRole('button', { name: new RegExp(fase) }).click();
-    await expect(page.getByRole('heading', { level: 2, name: fase, exact: true })).toBeVisible();
+    await escolherFase(page, fase);
   }
-  await page.getByRole('button', { name: /Abrir kit de implementação/ }).click();
+  await escolherPasso(page, 'Entregar', 'Ativar e treinar');
+  await page.getByRole('button', { name: 'Ver materiais', exact: true }).click();
   await expect(page.getByRole('tab', { name: 'Pré-requisitos e materiais' })).toBeFocused();
   await expect(page.getByRole('tabpanel')).toHaveAccessibleName('Pré-requisitos e materiais');
   await page.keyboard.press('Home');
