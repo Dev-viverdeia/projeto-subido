@@ -18,7 +18,9 @@ import {
   obterProximoCompromisso,
 } from '@/lib/projetos-execucao/plano';
 import { formatarDataProjeto } from '@/lib/projetos-execucao/prazo';
-import { formatarReais } from '@/lib/propostas/schema';
+import { estaEmAcompanhamento } from '@/lib/projetos-execucao/gestao';
+import { GestaoServico } from './GestaoServico';
+import { AcompanhamentoEntrega } from './AcompanhamentoEntrega';
 import { CentralArquivos } from './CentralArquivos';
 import { EvolucaoProjeto } from './EvolucaoProjeto';
 import { FasesEntrega } from './FasesEntrega';
@@ -70,11 +72,23 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
   const trabalhoIniciado = projeto.tarefas.some(
     (tarefa) => tarefa.status !== 'pendente' || tarefa.clienteStatus !== 'nao_solicitada',
   );
-  const [painel, setPainel] = useState<PainelSala>(() => {
+  const [painelSalvo, setPainel] = useState<PainelSala>(() => {
     if (tarefaDoLink) return 'execucao';
-    if (projeto.status === 'concluido') return 'evolucao';
+    if (projeto.status === 'concluido')
+      return estaEmAcompanhamento(projeto) || projeto.encerramento?.status === 'encerrado'
+        ? 'evolucao'
+        : 'arquivos';
     return briefingConfirmado && trabalhoIniciado ? 'execucao' : 'cliente';
   });
+  const podeMostrarEvolucao =
+    projeto.status === 'concluido' &&
+    (estaEmAcompanhamento(projeto) || projeto.encerramento?.status === 'encerrado');
+  const painel =
+    painelSalvo === 'evolucao' && !podeMostrarEvolucao
+      ? projeto.status === 'concluido'
+        ? 'arquivos'
+        : 'execucao'
+      : painelSalvo;
   const preparandoProjeto =
     !trabalhoIniciado && projeto.status !== 'concluido' && painel === 'cliente';
   const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
@@ -85,7 +99,7 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     (tarefa) => tarefa.clienteStatus === 'ajustes',
   ).length;
   const dependenciasPendentes = contarDependenciasPendentes(projeto.acoesPlano);
-  const { investimentoAtual, rotuloCliente } = resumirEscopoSala({
+  const { rotuloCliente } = resumirEscopoSala({
     mudancas: projeto.mudancasEscopo,
     investimentoBase: projeto.documento.investimento.valorCentavos,
     briefingConfirmado,
@@ -232,53 +246,41 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
           <FasesEntrega fases={fases} faseAtualId={faseAtual?.id} onAbrir={abrirFase} />
         </header>
       ) : (
-        <header className={styles.hero} data-on-dark>
-          <div className={styles.heroTexto}>
-            <div className={styles.heroLinha}>
-              <p className={styles.eyebrow}>Entrega do cliente · {projeto.empresa}</p>
-              <span className={styles.statusProjeto} data-status={projeto.status}>
-                {ROTULO_STATUS_PROJETO[projeto.status]}
-              </span>
-            </div>
-            <h1>{projeto.titulo}</h1>
-            <p>{projeto.documento.projeto.resumo}</p>
-
-            <dl className={styles.heroMetadados}>
-              <div>
-                <dt>Início</dt>
-                <dd>{formatarDataProjeto(projeto.inicioEm)}</dd>
-              </div>
-              <div>
-                <dt>Prazo</dt>
-                <dd>{projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'A definir'}</dd>
-              </div>
-              <div>
-                <dt>Investimento</dt>
-                <dd>{formatarReais(investimentoAtual)}</dd>
-              </div>
-            </dl>
+        <header className={styles.heroFoco}>
+          <div className={styles.heroFocoNavegacao}>
+            <Link href="/entregas">
+              <ArrowLeft size={16} aria-hidden="true" /> Entregas
+            </Link>
+            <span>
+              {projeto.encerramento?.status === 'encerrado'
+                ? 'Aceite registrado'
+                : 'Entrega registrada por você'}
+            </span>
           </div>
-
-          <div className={styles.medida} aria-label={`${percentual}% da entrega concluída`}>
-            <span>{percentual}%</span>
-            <strong>
-              {projeto.feitas} de {projeto.total}
-            </strong>
-            <small>tarefas concluídas</small>
-            <div aria-hidden="true">
-              <span style={{ transform: `scaleX(${percentual / 100})` }} />
+          <div className={styles.inicioHeroCorpo}>
+            <div className={styles.heroFocoTexto}>
+              <p>{projeto.empresa}</p>
+              <h1>{projeto.titulo}</h1>
+              {projeto.concluidoEm && (
+                <span>Entregue em {formatarDataProjeto(projeto.concluidoEm)}</span>
+              )}
             </div>
           </div>
-
-          <FasesEntrega fases={fases} faseAtualId={faseAtual?.id} onAbrir={abrirFase} />
         </header>
       )}
+
+      <GestaoServico
+        projeto={projeto}
+        onConcluir={() => setPainel(projeto.tipoServico === 'recorrente' ? 'evolucao' : 'arquivos')}
+      />
 
       {!preparandoProjeto && (
         <NavegacaoSalaEntrega
           painel={painel}
           concluido={projeto.status === 'concluido'}
           evolucaoRegistrada={projeto.evolucao?.status === 'registrada'}
+          recorrente={estaEmAcompanhamento(projeto)}
+          mostrarEvolucao={podeMostrarEvolucao}
           proximaTarefa={proxima?.titulo ?? null}
           totalArquivos={projeto.arquivos.length}
           rotuloCliente={rotuloCliente}
@@ -403,13 +405,17 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
         </div>
       )}
 
-      {painel === 'evolucao' && (
-        <EvolucaoProjeto
-          projetoId={projeto.id}
-          empresa={projeto.empresa}
-          encerramento={projeto.encerramento}
-          evolucao={projeto.evolucao}
-        />
+      {painel === 'evolucao' && estaEmAcompanhamento(projeto) ? (
+        <AcompanhamentoEntrega projeto={projeto} />
+      ) : (
+        painel === 'evolucao' && (
+          <EvolucaoProjeto
+            projetoId={projeto.id}
+            empresa={projeto.empresa}
+            encerramento={projeto.encerramento}
+            evolucao={projeto.evolucao}
+          />
+        )
       )}
     </div>
   );

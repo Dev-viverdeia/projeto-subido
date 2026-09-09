@@ -26,6 +26,10 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
   excluirArquivoProjeto: vi.fn(),
   registrarArquivoProjeto: vi.fn(),
 }));
+vi.mock('@/lib/projetos-execucao/gestao-actions', () => ({
+  gerenciarEntrega: vi.fn(() => Promise.resolve({ sucesso: 'Entrega concluída.' })),
+  agendarAcompanhamento: vi.fn(() => Promise.resolve({ sucesso: 'Próxima ação agendada.' })),
+}));
 vi.mock('@/lib/projetos-execucao/entrega-actions', () => ({
   prepararEntregaCliente: vi.fn(),
   reenviarNotificacaoEntregaCliente: vi.fn(),

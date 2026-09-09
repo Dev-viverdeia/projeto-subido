@@ -69,32 +69,35 @@ export function PortalProjeto({
   );
   const faseAtual = fases.find((fase) => fase.feitas < fase.total) ?? fases.at(-1) ?? null;
   const concluido = projeto.status === 'concluido';
+  const aceiteConfirmado = projeto.encerramento?.status === 'encerrado';
   const apenasAprovacao = aprovacoes.length === totalAcoes && aprovacoes.length > 0;
   const apenasDependencia = dependencias.length === totalAcoes && dependencias.length > 0;
-  const tituloDecisao = concluido
-    ? 'Projeto concluído.'
-    : !totalAcoes && ajustePendente
-      ? 'Seu pedido de ajuste foi recebido.'
-      : !totalAcoes
-        ? 'Nenhuma ação pendente.'
-        : apenasAprovacao && totalAcoes === 1
-          ? 'Revise esta entrega.'
-          : mudancasAguardando.length === totalAcoes
-            ? 'Revise a mudança no projeto.'
-            : apenasDependencia
-              ? `${totalAcoes} ${totalAcoes === 1 ? 'item precisa' : 'itens precisam'} da sua confirmação.`
-              : `${totalAcoes} ${totalAcoes === 1 ? 'item aguarda' : 'itens aguardam'} sua resposta.`;
-  const descricaoDecisao = concluido
-    ? 'Materiais, suporte e próximos passos continuam disponíveis abaixo.'
-    : !totalAcoes && ajustePendente
-      ? 'O responsável vai revisar o pedido e enviar a nova versão para você conferir.'
-      : !totalAcoes
-        ? 'Avisaremos quando uma nova entrega estiver pronta para você.'
-        : apenasAprovacao
-          ? 'Confira o resultado e aprove ou descreva o ajuste necessário.'
-          : mudancasAguardando.length
-            ? 'Confira o impacto informado antes de decidir.'
-            : 'Confirme os itens concluídos para o projeto continuar.';
+  const tituloDecisao =
+    concluido && !totalAcoes
+      ? 'Projeto concluído.'
+      : !totalAcoes && ajustePendente
+        ? 'Seu pedido de ajuste foi recebido.'
+        : !totalAcoes
+          ? 'Nenhuma ação pendente.'
+          : apenasAprovacao && totalAcoes === 1
+            ? 'Revise esta entrega.'
+            : mudancasAguardando.length === totalAcoes
+              ? 'Revise a mudança no projeto.'
+              : apenasDependencia
+                ? `${totalAcoes} ${totalAcoes === 1 ? 'item precisa' : 'itens precisam'} da sua confirmação.`
+                : `${totalAcoes} ${totalAcoes === 1 ? 'item aguarda' : 'itens aguardam'} sua resposta.`;
+  const descricaoDecisao =
+    concluido && !totalAcoes
+      ? 'Materiais, suporte e próximos passos continuam disponíveis abaixo.'
+      : !totalAcoes && ajustePendente
+        ? 'O responsável vai revisar o pedido e enviar a nova versão para você conferir.'
+        : !totalAcoes
+          ? 'Avisaremos quando uma nova entrega estiver pronta para você.'
+          : apenasAprovacao
+            ? 'Confira o resultado e aprove ou descreva o ajuste necessário.'
+            : mudancasAguardando.length
+              ? 'Confira o impacto informado antes de decidir.'
+              : 'Confirme os itens concluídos para o projeto continuar.';
 
   return (
     <main className={layout.pagina}>
@@ -131,7 +134,9 @@ export function PortalProjeto({
               <i style={{ transform: `scaleX(${percentual / 100})` }} />
             </div>
             <small>
-              {concluido ? 'Aceite confirmado' : `${projeto.feitas} de ${projeto.total} etapas`}
+              {concluido && aceiteConfirmado
+                ? 'Aceite confirmado'
+                : `${projeto.feitas} de ${projeto.total} etapas registradas`}
             </small>
           </div>
         </section>
@@ -185,7 +190,9 @@ export function PortalProjeto({
             <div className={layout.estadoDecisao}>
               <span>
                 {concluido
-                  ? 'Aceite registrado'
+                  ? aceiteConfirmado
+                    ? 'Aceite registrado'
+                    : 'Entrega registrada pelo profissional'
                   : `Em andamento: ${faseAtual?.titulo ?? 'Entrega'}`}
               </span>
               <strong>

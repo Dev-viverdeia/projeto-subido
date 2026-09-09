@@ -117,6 +117,27 @@ function abrirDetalhe(rotulo: string) {
 }
 
 describe('PortalProjeto', () => {
+  it('não confunde conclusão do profissional com aprovação do cliente', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{ ...PROJETO, status: 'concluido', tarefas: [] }}
+      />,
+    );
+    expect(screen.getByText('Entrega registrada pelo profissional')).toBeInTheDocument();
+    expect(screen.queryByText('Aceite confirmado')).not.toBeInTheDocument();
+    expect(screen.queryByText('Aceite registrado')).not.toBeInTheDocument();
+  });
+  it('mantém uma aprovação pendente como ação mesmo após conclusão manual', () => {
+    render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{ ...PROJETO, status: 'concluido' }}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Revise esta entrega.' })).toBeInTheDocument();
+    expect(screen.queryByText('Aceite confirmado')).not.toBeInTheDocument();
+  });
   it('preserva o pedido de ajuste ao voltar e após falha no salvamento', async () => {
     vi.mocked(decidirEntregaCliente).mockResolvedValueOnce({ erro: 'Tente novamente.' });
     render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);

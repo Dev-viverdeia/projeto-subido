@@ -1,5 +1,7 @@
 import 'server-only';
 
+import type { GestaoEntrega } from './gestao';
+
 import { cache } from 'react';
 import { handleError } from '@/lib/errors';
 import { DocumentoPropostaSchema, lerDocumentoProposta } from '@/lib/propostas/schema';
@@ -9,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Tables } from '@/lib/supabase/types.generated';
 import type { StatusCall } from '@/lib/calls/tipos';
 import type { StatusEmailEntrega } from '@/lib/notificacoes/entrega';
-import { recuperacaoEmail, type RecuperacaoEmail } from '@/lib/notificacoes/estado-email';
+import type { RecuperacaoEmail } from '@/lib/notificacoes/estado-email';
 import type { StatusClienteProjeto, StatusProjetoExecucao, StatusTarefaProjeto } from './status';
 import {
   lerBriefingKickoff,
@@ -28,7 +30,7 @@ import {
 } from './plano';
 import { obterEncerramentoUnico, type EncerramentoProjeto } from './encerramento';
 import { obterEvolucaoUnica, type EvolucaoProjeto } from './evolucao';
-import type { TipoEventoProjeto } from './eventos';
+import { mapearEventosProjeto, type TipoEventoProjeto } from './eventos';
 
 export type { AcaoPlanoProjeto } from './plano';
 export type { TipoEventoProjeto } from './eventos';
@@ -90,7 +92,7 @@ export type EventoProjetoExecucao = {
 
 export type { MudancaEscopoProjeto, StatusMudancaEscopo } from './mudancas-escopo';
 
-export type ResumoProjetoExecucao = {
+export type ResumoProjetoExecucao = GestaoEntrega & {
   id: string;
   titulo: string;
   empresa: string;
@@ -185,7 +187,7 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
   const { data, error } = await supabase
     .from('projetos_execucao')
     .select(
-      'id, titulo, status, prazo_em, atualizado_em, cliente:documento->cliente, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status), projeto_evolucoes(*)',
+      'id, titulo, status, tipo_servico, encerramento_manual_em, recorrencia_encerrada_em, concluido_em, prazo_em, atualizado_em, cliente:documento->cliente, projeto_tarefas(status, titulo, ordem, cliente_status), projeto_acoes(*), projeto_mudancas_escopo(status), projeto_evolucoes(*)',
     )
     .eq('projeto_acoes.status', 'pendente')
     .order('atualizado_em', { ascending: false })
@@ -209,11 +211,16 @@ export const listarProjetosExecucao = cache(async (): Promise<ResumoProjetoExecu
         titulo: linha.titulo,
         empresa: cliente.data.empresa,
         status: linha.status,
+        tipoServico: linha.tipo_servico === 'recorrente' ? 'recorrente' : 'pontual',
+        encerramentoManualEm: linha.encerramento_manual_em,
+        recorrenciaEncerradaEm: linha.recorrencia_encerrada_em,
+        concluidoEm: linha.concluido_em,
         prazoEm: linha.prazo_em,
         atualizadoEm: linha.atualizado_em,
         feitas,
         total: tarefas.length,
-        proximaTarefa: compromisso?.titulo ?? proxima?.titulo ?? null,
+        proximaTarefa:
+          compromisso?.titulo ?? (linha.status === 'concluido' ? null : proxima?.titulo) ?? null,
         proximaAcaoPrazoEm: compromisso?.prazoEm ?? null,
         tarefasBloqueadas: tarefas.filter((tarefa) => tarefa.status === 'bloqueada').length,
         validacoesAguardando: tarefas.filter((tarefa) => tarefa.cliente_status === 'aguardando')
@@ -333,6 +340,10 @@ export const obterProjetoExecucao = cache(
       titulo: data.titulo,
       empresa: documento.cliente.empresa,
       status: data.status,
+      tipoServico: data.tipo_servico === 'recorrente' ? 'recorrente' : 'pontual',
+      encerramentoManualEm: data.encerramento_manual_em,
+      recorrenciaEncerradaEm: data.recorrencia_encerrada_em,
+      concluidoEm: data.concluido_em,
       prazoEm: data.prazo_em,
       atualizadoEm: data.atualizado_em,
       feitas,
@@ -389,31 +400,7 @@ export const obterProjetoExecucao = cache(
             codigoPublico: kickoff.codigo_publico,
           }
         : null,
-      eventos: data.projeto_portal_eventos
-        .flatMap((evento) => {
-          const tipo = evento.tipo as TipoEventoProjeto;
-          const autor = evento.autor as EventoProjetoExecucao['autor'];
-          if (!['prestador', 'cliente'].includes(autor)) return [];
-          return [
-            {
-              id: evento.id,
-              tarefaId: evento.tarefa_id,
-              mudancaEscopoId: evento.mudanca_escopo_id,
-              tipo,
-              autor,
-              comentario: evento.comentario,
-              criadoEm: evento.criado_em,
-              emailDestinatario: evento.email_destinatario,
-              emailStatus: evento.email_status as StatusEmailEntrega,
-              emailRecuperacao: recuperacaoEmail(evento),
-              emailTentativas: evento.email_tentativas,
-              emailEnviadoEm: evento.email_enviado_em,
-              emailEntregueEm: evento.email_entregue_em,
-              emailOrigemEventoId: evento.email_origem_evento_id,
-            },
-          ];
-        })
-        .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
+      eventos: mapearEventosProjeto(data.projeto_portal_eventos),
       mudancasEscopo: mapearMudancasEscopo(data.projeto_mudancas_escopo),
       encerramento: obterEncerramentoUnico(data.projeto_encerramentos),
       evolucao: obterEvolucaoUnica(data.projeto_evolucoes),
