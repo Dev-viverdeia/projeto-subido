@@ -71,6 +71,17 @@ test('conexão com Google é navegação completa e botão tem estilo independen
     'href',
     '/ajuda/conectar-google-agenda',
   );
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const botao = (await conectar.boundingBox())!;
+    const ajuda = (await page.getByRole('link', { name: /Como conectar/ }).boundingBox())!;
+    expect(ajuda.y - (botao.y + botao.height)).toBeGreaterThanOrEqual(8);
+    expect(botao.width).toBeGreaterThan(200);
+    expect(botao.x + botao.width).toBeLessThanOrEqual(width);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  }
 });
 
 test('gestão de entrega oferece orientação sem fechar a escolha em andamento', async ({ page }) => {
