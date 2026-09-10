@@ -26,6 +26,7 @@ export default tseslint.config(
       'out/**',
       'build/**',
       'node_modules/**',
+      'public/vendor/pdfjs/**', // Assets gerados da dependência fixada no lockfile.
       'next-env.d.ts',
       // Estado de ferramenta, não código do projeto. Contém worktrees git em commits
       // antigos, com configs desatualizadas que quebram o lint da raiz.

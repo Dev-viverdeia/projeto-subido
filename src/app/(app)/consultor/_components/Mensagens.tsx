@@ -91,6 +91,7 @@ export function Mensagens({
                           <ArquivoMensagem
                             nome={anexo.nome}
                             tamanho={anexo.tamanhoBytes}
+                            tipoMime={anexo.tipoMime}
                             categoria={anexo.categoria as 'imagem' | 'documento'}
                             estado="Enviado"
                             src={modoPreview ? undefined : `/api/consultor/anexos/${anexo.id}`}

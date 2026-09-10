@@ -87,6 +87,17 @@
   outline: none;
   box-shadow: var(--app-ring);
 }
+.dados button.abrir {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: 0 var(--via-space-2);
+  margin-left: calc(-1 * var(--via-space-2));
+  color: var(--via-navy);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+}
 .andamento {
   display: flex;
   align-items: center;

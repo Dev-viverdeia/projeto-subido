@@ -40,7 +40,7 @@ test('imagem e documento ficam no rascunho quando a conexão cai', async ({ page
     { name: 'resumo.txt', mimeType: 'text/plain', buffer: Buffer.from('Resumo da reunião') },
   ]);
   await expect(page.getByRole('img', { name: 'referencia.png' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Abrir referencia.png' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Visualizar referencia.png' })).toBeVisible();
   await context.setOffline(true);
   await page.getByRole('button', { name: 'Enviar mensagem', exact: true }).click();
   await expect(
