@@ -1,4 +1,5 @@
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
+import { sinaisClienteQualidade } from '@/lib/consultor/cliente-qualidade';
 
 export const TEXTO_LONGO = [
   'Comece pelo atendimento no WhatsApp. Antes de propor uma automação para a Clínica Aurora, confirme onde as conversas param e quem assume o próximo contato. A primeira entrega deve resolver um problema pequeno, com resultado que você e o cliente consigam acompanhar.',
@@ -14,7 +15,7 @@ export function exemploLeitura(
   return {
     ...mensagem,
     conteudo:
-      variante === 'curta'
+      variante === 'curta' || variante === 'ficha'
         ? 'Revise o escopo e confirme a data da decisão com o cliente.'
         : TEXTO_LONGO,
     acaoConfirmada: null,
@@ -24,6 +25,8 @@ export function exemploLeitura(
         : mensagem.direcao
           ? {
               ...mensagem.direcao,
+              ficha_consultada:
+                variante === 'ficha' ? sinaisClienteQualidade().cliente?.ficha : null,
               contexto_acao: variante === 'geral' ? null : mensagem.direcao.contexto_acao,
             }
           : null,

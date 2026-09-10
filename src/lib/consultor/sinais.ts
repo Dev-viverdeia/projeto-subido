@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EtapaSobralSchema } from './etapas';
+import { ClienteSobralSchema } from './cliente';
 
 const FocoSchema = z
   .object({
@@ -134,6 +135,7 @@ export const SinaisSobralSchema = z.object({
     )
     .default([]),
   foco: FocoSchema,
+  cliente: ClienteSobralSchema.optional(),
 });
 
 export type SinaisSobral = z.infer<typeof SinaisSobralSchema>;

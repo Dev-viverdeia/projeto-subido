@@ -8,6 +8,7 @@ import { TextoResposta } from './TextoResposta';
 import { ProximaAcaoResposta } from './ProximaAcaoResposta';
 import { RecomendacoesResposta } from './RecomendacoesResposta';
 import { SalvarResposta } from './SalvarResposta';
+import { FichaConsultadaResposta } from './FichaConsultadaResposta';
 import styles from './Mensagens.module.css';
 
 function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
@@ -127,6 +128,10 @@ export function Mensagens({
                     {dono && <SalvarResposta mensagem={m.id} dono={dono} salva={m.salva} />}
                   </div>
                 ) : null}
+
+                {detalharResposta && (
+                  <FichaConsultadaResposta ficha={m.direcao?.ficha_consultada} />
+                )}
 
                 {detalharResposta && m.direcao ? (
                   <ProximaAcaoResposta

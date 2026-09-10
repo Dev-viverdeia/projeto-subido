@@ -104,9 +104,14 @@ export async function gerarRodadaSobral({
   }
 
   try {
+    const avisoDaLeitura = sinais.cliente?.ficha?.incompleta
+      ? '\nA leitura desta rodada foi parcial. Comece a resposta com: "Consegui ler apenas parte da ficha." Depois responda usando somente os registros disponíveis, sem afirmar que os demais não existem.'
+      : sinais.cliente?.estado === 'indisponivel'
+        ? '\nA consulta de registros falhou nesta rodada. Avise que não conseguiu consultar a ficha agora e use somente o que o usuário informou.'
+        : '';
     const parametros = {
       model: SOBRAL_AI_MODEL,
-      instructions: `${INSTRUCOES_SOBRAL}\n\nEtapa factual da conta: ${etapa}.`,
+      instructions: `${INSTRUCOES_SOBRAL}\n\nEtapa factual da conta: ${etapa}.${avisoDaLeitura}`,
       input: [{ role: 'user' as const, content: contexto }, ...mensagens],
       reasoning: { effort: 'low' as const },
       text: {
