@@ -30,6 +30,8 @@ test('Sobral preserva a mensagem offline e permite continuar editando', async ({
   await context.setOffline(true);
   await page.getByRole('button', { name: 'Enviar mensagem' }).click();
   await expect(page.getByRole('alert').filter({ hasText: 'Sem conexão' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Vamos ao que importa/ })).toBeHidden();
+  await expect(page.getByRole('list', { name: 'Exemplos de perguntas' })).toBeHidden();
   await expect(campo).toHaveValue('Como preparo a conversa com o cliente?');
   await page.screenshot({ path: test.info().outputPath('sobral-offline.png') });
   await context.setOffline(false);

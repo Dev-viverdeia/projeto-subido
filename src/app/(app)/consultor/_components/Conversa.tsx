@@ -242,7 +242,8 @@ export function Conversa({
     <div
       className={styles.conversa}
       data-conversa-ativa={
-        Boolean(emVoo !== null || arquivosEmVoo.length > 0 || respostaEmVoo !== null) || undefined
+        Boolean(erro || emVoo !== null || arquivosEmVoo.length > 0 || respostaEmVoo !== null) ||
+        undefined
       }
     >
       <div className={styles.leitura} ref={leituraRef} data-leitura-conversa>
@@ -402,6 +403,7 @@ export function Conversa({
       </form>
 
       {exemplos &&
+      !erro &&
       exemplos.length > 0 &&
       arquivos.length === 0 &&
       !arquivosEmVoo.length &&
