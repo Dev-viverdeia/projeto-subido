@@ -60,6 +60,15 @@ it('força o download de documentos sem renderizar seu conteúdo na plataforma',
   expect((await pedir()).status).toBe(307);
   expect(deps.assinar).toHaveBeenCalledWith(caminho, 90, { download: 'escopo.pdf' });
 });
+it('baixa uma imagem com nome original apenas depois de validar a conta', async () => {
+  const resposta = await GET(new Request('https://example.test/anexo?download=1'), {
+    params: Promise.resolve({ anexo: id }),
+  });
+  expect(resposta.status).toBe(307);
+  expect(resposta.headers.get('cache-control')).toBe('private, no-store');
+  expect(deps.eq).toHaveBeenCalledWith('dono', dono);
+  expect(deps.assinar).toHaveBeenCalledWith(caminho, 90, { download: 'arquivo.png' });
+});
 it('não emite URL para uma conta sem sessão', async () => {
   deps.user.mockResolvedValue({ data: { user: null } });
   expect((await pedir()).status).toBe(401);

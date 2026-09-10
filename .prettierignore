@@ -3,6 +3,7 @@ src/design-system/via/
 src/lib/supabase/types.generated.ts
 .next/
 node_modules/
+public/vendor/pdfjs/
 package-lock.json
 
 # Estado de ferramenta (inclui worktrees git em commits antigos).

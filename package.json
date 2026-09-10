@@ -14,6 +14,8 @@
     "npm": ">=11"
   },
   "scripts": {
+    "predev": "node scripts/preparar-leitor-pdf.mjs",
+    "prebuild": "node scripts/preparar-leitor-pdf.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -69,6 +71,7 @@
     "motion": "12.42.2",
     "next": "16.3.4",
     "openai": "7.4.0",
+    "pdfjs-dist": "6.3.289",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "6.25.0",

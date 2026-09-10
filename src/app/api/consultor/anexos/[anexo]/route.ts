@@ -12,7 +12,7 @@ function falha(mensagem: string, status: number) {
   );
 }
 
-export async function GET(_: Request, { params }: { params: Promise<{ anexo: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ anexo: string }> }) {
   const validacao = ParametrosSchema.safeParse(await params);
   if (!validacao.success) return falha('Arquivo inválido.', 400);
 
@@ -52,7 +52,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ anexo: str
   const { data, error: erroUrl } = await supabase.storage
     .from(SOBRAL_BUCKET_ANEXOS)
     .createSignedUrl(registro.caminho_storage, 90, {
-      download: registro.categoria === 'documento' ? registro.nome : false,
+      download:
+        registro.categoria === 'documento' ||
+        new URL(request.url).searchParams.get('download') === '1'
+          ? registro.nome
+          : false,
     });
   if (erroUrl || !data) return falha('Não foi possível carregar o arquivo. Tente novamente.', 503);
 
