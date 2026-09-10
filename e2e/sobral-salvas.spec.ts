@@ -61,6 +61,7 @@ test('salvas sob demanda, busca e paginação, sem tirar espaço nem perder o ra
     `/consultor/${respostas[0]!.conversa}?mensagem=${respostas[0]!.id}`,
   );
   await expect(link).toHaveAttribute('target', '_blank');
+  await expect(link).toHaveAccessibleDescription(respostas[0]!.trecho);
   await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   expect(
     (

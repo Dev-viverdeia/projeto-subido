@@ -76,12 +76,13 @@ export function RespostasSalvas({ dono }: { dono: string }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Abrir resposta de ${r.titulo} em nova aba`}
+                  aria-describedby={`salva-trecho-${r.id}`}
                 >
                   <span className={styles.origem}>
                     {r.titulo}
                     <ExternalLink size={15} aria-hidden="true" />
                   </span>
-                  <p>{r.trecho}</p>
+                  <p id={`salva-trecho-${r.id}`}>{r.trecho}</p>
                 </a>
                 <div className={styles.itemRodape}>
                   <span className={styles.data}>
