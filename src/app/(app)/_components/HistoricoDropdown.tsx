@@ -27,6 +27,7 @@ export function HistoricoDropdown({
   children,
   painelClassName,
   emPortal = false,
+  compactoNoCelular = false,
 }: {
   total: number;
   /** "Seus projetos" no Builder, "Suas conversas" no Consultor. */
@@ -35,6 +36,8 @@ export function HistoricoDropdown({
   painelClassName?: string;
   /** Sobral usa portal para sair dos filtros do cabeçalho e acomodar o teclado móvel. */
   emPortal?: boolean;
+  /** No celular usa ícone com nome e contagem acessíveis, sem reduzir o alvo de toque. */
+  compactoNoCelular?: boolean;
 }) {
   const [aberto, setAberto] = useState(false);
   const idPainel = useId();
@@ -102,14 +105,31 @@ export function HistoricoDropdown({
       <button
         ref={gatilho}
         type="button"
-        className={styles.gatilho}
+        className={`${styles.gatilho} ${compactoNoCelular ? styles.compacto : ''}`}
         aria-expanded={aberto}
         aria-controls={idPainel}
+        title={rotulo}
         onClick={() => {
           if (emPortal && !aberto) posicionar();
           setAberto((v) => !v);
         }}
       >
+        {compactoNoCelular ? (
+          <svg
+            className={styles.iconeCompacto}
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 11a9 9 0 1 1 2.6 7.4M3 4v7h7M12 7v5l3 2" />
+          </svg>
+        ) : null}
         <span className={styles.rotulo}>{rotulo}</span>
         <span className={styles.total}>{total}</span>
 

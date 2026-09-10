@@ -43,6 +43,13 @@
 .busca input::-webkit-search-cancel-button {
   display: none;
 }
+/* O foco pertence à moldura; o campo interno não desenha um segundo anel. */
+.busca input:focus,
+.busca input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+}
 .busca input::placeholder {
   color: var(--via-text-muted);
 }

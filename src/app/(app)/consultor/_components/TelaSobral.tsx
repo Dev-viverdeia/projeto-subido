@@ -8,6 +8,7 @@ import type { ExemploDoConsultor } from './Conversa';
 import { Conversa } from './Conversa';
 import { ListaConversas } from './ListaConversas';
 import { ArquivosConversa } from './ArquivosConversa';
+import { BuscaMensagens } from './BuscaMensagens';
 import historicoStyles from './ListaConversas.module.css';
 import { Mensagens } from './Mensagens';
 import styles from './TelaSobral.module.css';
@@ -124,6 +125,13 @@ export function TelaSobral({
 
           <div className={styles.acoes}>
             {conversa && dono ? (
+              <BuscaMensagens
+                key={`busca:${dono}:${conversa.thread.id}`}
+                conversa={conversa.thread.id}
+                dono={dono}
+              />
+            ) : null}
+            {conversa && dono ? (
               <ArquivosConversa
                 key={`${dono}:${conversa.thread.id}`}
                 conversa={conversa.thread.id}
@@ -176,6 +184,7 @@ export function TelaSobral({
             ) : null}
             <HistoricoDropdown
               emPortal
+              compactoNoCelular={Boolean(conversa && dono)}
               total={totalConversas}
               rotulo="Conversas"
               painelClassName={historicoStyles.painel}
