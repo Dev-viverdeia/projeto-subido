@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Award, ChevronDown, Coins, CreditCard, Headphones, LogOut, UserRound } from 'lucide-react';
 import { Avatar } from '@/design-system/via';
 import { sair } from '@/lib/auth/actions';
+import { limparRascunhosSobral } from '@/lib/consultor/rascunhos';
 import styles from './MenuPerfil.module.css';
 import { PLANOS_SUBIDO, type PlanoSubido } from '@/lib/planos/acessos';
 
@@ -224,6 +225,7 @@ export function MenuPerfil({
             <form
               action={sair}
               onSubmit={() => {
+                limparRascunhosSobral();
                 try {
                   for (const key of Object.keys(sessionStorage))
                     if (key.startsWith('suporte-rascunho:') || key === 'subido-pedido-ajuda')

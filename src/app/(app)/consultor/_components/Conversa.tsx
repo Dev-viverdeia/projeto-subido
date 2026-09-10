@@ -2,14 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState, useTransition, type ReactNode } from 'react';
-import { ArrowUp, Paperclip, Square } from 'lucide-react';
-import { ControlesGravacao } from './ControlesGravacao';
+import { BarraCompositor } from './BarraCompositor';
 import { RespostaEmAndamento } from './RespostaEmAndamento';
 import { RecuperarConversa } from './RecuperarConversa';
 import { useRespostaSobral } from './useRespostaSobral';
 import { useEnvioTexto } from './useEnvioTexto';
+import { useRascunhoTexto } from './useRascunhoTexto';
+import { AvisoRascunho } from './AvisoRascunho';
+import { CampoMensagem } from './CampoMensagem';
 import { ExemplosConversa } from './ExemplosConversa';
-import { SOBRAL_ACCEPT_ANEXOS, validarAnexosSobral } from '@/lib/consultor/anexos-contrato';
+import { validarAnexosSobral } from '@/lib/consultor/anexos-contrato';
 import { AnexosDaRodada } from './AnexosDaRodada';
 import { useEnvioAnexos } from './useEnvioAnexos';
 import { useGravadorAudio } from './useGravadorAudio';
@@ -31,6 +33,8 @@ export function Conversa({
   textoInicial = '',
   historico,
   boasVindas,
+  dono,
+  chaveRascunho,
 }: {
   threadId?: string;
   pendente?: boolean;
@@ -39,11 +43,12 @@ export function Conversa({
   textoInicial?: string;
   historico?: ReactNode;
   boasVindas?: ReactNode;
+  dono?: string;
+  chaveRascunho?: string;
 }) {
   const router = useRouter();
   const leituraRef = useRef<HTMLDivElement>(null);
   const campoRef = useRef<HTMLTextAreaElement>(null);
-  const arquivoRef = useRef<HTMLInputElement>(null);
   const fimRef = useRef<HTMLDivElement>(null);
   const fimAncora = useRef<HTMLDivElement>(null);
   const versaoDoHistorico = useRef(ultimaMensagemId);
@@ -67,9 +72,16 @@ export function Conversa({
   const [navegando, iniciarNavegacao] = useTransition();
 
   const envioAnexos = useEnvioAnexos();
-  const envioTexto = useEnvioTexto();
+  const rascunho = useRascunhoTexto(dono, threadId ?? chaveRascunho ?? 'nova');
+  const envioTexto = useEnvioTexto(rascunho.guardarTentativa, dono);
   const ocupado =
-    etapa !== null || navegando || envioAnexos.pausado || verificar || Boolean(envioTexto.pendente);
+    !rascunho.pronto ||
+    rascunho.bloqueado ||
+    etapa !== null ||
+    navegando ||
+    envioAnexos.pausado ||
+    verificar ||
+    Boolean(envioTexto.pendente);
   const rodadaAtiva = emVoo !== null || arquivosEmVoo.length || respostaEmVoo !== null;
 
   useLayoutEffect(() => {
@@ -116,13 +128,6 @@ export function Conversa({
     if (threadEmUso) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
   }, [threadEmUso]);
 
-  useEffect(() => {
-    const campo = campoRef.current;
-    if (!campo) return;
-    campo.style.height = 'auto';
-    campo.style.height = `${Math.min(campo.scrollHeight, 180)}px`;
-  }, [texto]);
-
   function incluirArquivos(novos: readonly File[]) {
     const combinados = [...arquivos];
     for (const arquivo of novos) {
@@ -141,6 +146,7 @@ export function Conversa({
     }
     setErro(null);
     setArquivos(combinados);
+    rascunho.salvar(texto, combinados.length > 0);
   }
 
   const {
@@ -212,6 +218,8 @@ export function Conversa({
     setEtapaEnvio(envioTexto.pendente === 'conferir' ? 'conferindo-envio' : 'enviando');
 
     const nova = !threadEmUso;
+    // O protocolo de anexos continua em memória. Não restaurar seu texto como novo envio.
+    if (anexosDaRodada.length) rascunho.limpar();
     const registro =
       anexosDaRodada.length > 0
         ? await envioAnexos.enviar(mensagem, anexosDaRodada, threadEmUso)
@@ -223,12 +231,14 @@ export function Conversa({
       if (anexosDaRodada.length === 0 && !('pendente' in registro && registro.pendente)) {
         setEmVoo(null);
         setTexto(mensagem);
+        rascunho.salvar(mensagem);
       }
       setEtapaEnvio(null);
       return;
     }
 
     setThreadEmUso(registro.threadId);
+    rascunho.limpar();
     perguntaRef.current = registro.mensagemId;
     setThreadPendente(true);
     setEtapaEnvio(null);
@@ -242,13 +252,33 @@ export function Conversa({
     setEmVoo(null);
     setArquivosEmVoo([]);
     setErro(null);
+    rascunho.salvar(emVoo ?? '', arquivosEmVoo.length > 0);
   }
+
+  function retomarRascunho() {
+    const salvo = rascunho.disponivel;
+    if (!salvo || !rascunho.retomar(salvo)) return;
+    if (salvo.tentativa) {
+      envioTexto.restaurar(salvo.tentativa);
+      setEmVoo(salvo.texto);
+      setTexto('');
+      setErro('Falta confirmar o envio.');
+    } else {
+      setTexto(salvo.texto);
+      if (salvo.anexos) setErro('Adicione os arquivos ou grave o áudio novamente antes de enviar.');
+      campoRef.current?.focus();
+    }
+  }
+
+  if (rascunho.bloqueado)
+    return <p role="status">Sua sessão mudou. Reabra o Sobral AI para continuar.</p>;
 
   return (
     <div
       className={styles.conversa}
       data-conversa-ativa={Boolean(erro || rodadaAtiva) || undefined}
       data-envio-incerto={Boolean(envioTexto.pendente) || undefined}
+      data-rascunho-ativo={Boolean(rascunho.disponivel || rascunho.recuperado) || undefined}
     >
       <div className={styles.leitura} ref={leituraRef} data-leitura-conversa>
         {historico}
@@ -287,6 +317,7 @@ export function Conversa({
             pausado={envioAnexos.pausado}
             confirmando={Boolean(envioAnexos.progresso?.confirmando)}
             envioTexto={envioTexto.pendente}
+            rascunhoSeguro={envioTexto.guardado}
             retomar={() => void enviar(true)}
             editar={() => void voltarAEdicao()}
             responder={
@@ -312,6 +343,18 @@ export function Conversa({
           void enviar();
         }}
       >
+        <AvisoRascunho
+          disponivel={
+            (!texto || texto === textoInicial) && !ocupado && !arquivos.length
+              ? rascunho.disponivel
+              : undefined
+          }
+          recuperado={rascunho.recuperado && !ocupado}
+          guardado={Boolean(dono && texto && rascunho.guardado && !ocupado)}
+          falhou={rascunho.falhou}
+          retomar={retomarRascunho}
+          descartar={rascunho.descartar}
+        />
         {arquivos.length > 0 ? (
           <AnexosDaRodada
             arquivos={arquivos}
@@ -319,96 +362,45 @@ export function Conversa({
             aoRemover={
               ocupado
                 ? undefined
-                : (indice) => setArquivos((atuais) => atuais.filter((_, i) => i !== indice))
+                : (indice) => {
+                    const restantes = arquivos.filter((_, i) => i !== indice);
+                    setArquivos(restantes);
+                    rascunho.salvar(texto, restantes.length > 0);
+                  }
             }
           />
         ) : null}
 
-        <div className={styles.linhaCompositor}>
-          <label className="sr-only" htmlFor="mensagem-consultor">
-            Sua pergunta para o Sobral AI
-          </label>
-          <textarea
-            id="mensagem-consultor"
-            ref={campoRef}
-            className={styles.campo}
-            value={texto}
-            onChange={(evento) => setTexto(evento.target.value.slice(0, MAXIMO))}
-            onKeyDown={(evento) => {
-              if (evento.key === 'Enter' && !evento.shiftKey) {
-                evento.preventDefault();
-                void enviar();
-              }
-            }}
-            disabled={ocupado}
-            rows={2}
-            placeholder="Conte o que você precisa resolver…"
-          />
-        </div>
+        <CampoMensagem
+          campoRef={campoRef}
+          texto={texto}
+          ocupado={ocupado}
+          alterar={(valor) => {
+            setTexto(valor);
+            rascunho.salvar(valor, arquivos.length > 0);
+          }}
+          enviar={() => void enviar()}
+        />
 
-        <div className={styles.barraCompositor}>
-          <div className={styles.ferramentas}>
-            <input
-              ref={arquivoRef}
-              className="sr-only"
-              type="file"
-              aria-label="Selecionar arquivos para a conversa"
-              tabIndex={-1}
-              multiple
-              accept={SOBRAL_ACCEPT_ANEXOS}
-              onChange={(evento) => {
-                incluirArquivos(Array.from(evento.target.files ?? []));
-                evento.target.value = '';
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => arquivoRef.current?.click()}
-              disabled={ocupado || gravando || preparando}
-              aria-label="Anexar documento, imagem ou áudio"
-              title="Anexar arquivo"
-            >
-              <Paperclip size={17} strokeWidth={1.9} aria-hidden="true" />
-              <span>Arquivo</span>
-            </button>
-            <ControlesGravacao
-              gravando={gravando}
-              preparando={preparando}
-              segundos={segundos}
-              ocupado={ocupado}
-              alternar={alternarGravacao}
-              cancelar={cancelarGravacao}
-            />
-          </div>
-
-          {resposta.etapa && resposta.geracao ? (
-            <button
-              type="button"
-              className={styles.enviar}
-              onClick={() => void resposta.parar()}
-              disabled={resposta.parando}
-              aria-label={resposta.parando ? 'Interrompendo resposta' : 'Parar resposta'}
-              title="Parar resposta"
-            >
-              <Square size={14} fill="currentColor" aria-hidden="true" />
-            </button>
-          ) : (
-            <button
-              type="submit"
-              className={styles.enviar}
-              disabled={
-                (!texto.trim() && arquivos.length === 0) || ocupado || gravando || preparando
-              }
-              aria-label={ocupado ? 'Aguardando o Sobral AI' : 'Enviar mensagem'}
-            >
-              <ArrowUp size={17} strokeWidth={2.2} aria-hidden="true" />
-            </button>
-          )}
-        </div>
+        <BarraCompositor
+          ocupado={ocupado}
+          gravando={gravando}
+          preparando={preparando}
+          segundos={segundos}
+          incluir={incluirArquivos}
+          alternar={alternarGravacao}
+          cancelar={cancelarGravacao}
+          podeEnviar={Boolean(texto.trim() || arquivos.length)}
+          gerando={Boolean(resposta.etapa && resposta.geracao)}
+          parando={resposta.parando}
+          parar={resposta.parar}
+        />
       </form>
 
       {exemplos &&
       !erro &&
+      !rascunho.disponivel &&
+      !rascunho.recuperado &&
       exemplos.length > 0 &&
       arquivos.length === 0 &&
       !arquivosEmVoo.length &&
@@ -419,6 +411,7 @@ export function Conversa({
           ocupado={ocupado}
           escolher={(valor) => {
             setTexto(valor);
+            rascunho.salvar(valor, arquivos.length > 0);
             campoRef.current?.focus();
           }}
         />

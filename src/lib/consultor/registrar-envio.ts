@@ -29,15 +29,15 @@ export function novaTentativaTexto(mensagem: string, threadId?: string): Tentati
   };
 }
 
-/** SDK fora do carregamento inicial. O recibo permanece na instância da tela,
- * não no armazenamento do navegador. Reconectar nunca dispara este método. */
+/** SDK fora do carregamento inicial. Reconectar nunca dispara este método. */
 export async function registrarEnvio(
   tentativa: TentativaTexto,
   somenteConferir = false,
+  antesDeEnviar?: (tentativa: TentativaTexto) => void,
 ): Promise<RegistroTexto> {
   try {
     const { confirmarTexto } = await import('./envio-texto');
-    return await confirmarTexto(tentativa, somenteConferir);
+    return await confirmarTexto(tentativa, somenteConferir, antesDeEnviar);
   } catch {
     return {
       threadId: null,
