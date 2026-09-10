@@ -18,6 +18,8 @@
 
 .convite {
   padding: var(--via-space-5);
+  background: var(--app-glass-plane);
+  backdrop-filter: blur(18px) saturate(132%);
 }
 
 .registro {
@@ -86,6 +88,25 @@
   white-space: nowrap;
 }
 
+.conviteCorpo strong {
+  overflow: visible;
+  font-size: var(--via-fs-body);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.conviteCorpo small {
+  font-family: var(--via-font-display);
+  font-size: var(--via-fs-caption);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--via-text-muted);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .convite {
+    background: var(--via-surface);
+  }
+}
+
 .conviteCorpo em,
 .comprovanteCorpo em {
   overflow: hidden;
@@ -94,6 +115,10 @@
   font-style: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.conviteCorpo em {
+  font-size: var(--via-fs-sm);
 }
 
 .revisar,

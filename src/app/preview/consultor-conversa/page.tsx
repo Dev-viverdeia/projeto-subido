@@ -6,6 +6,7 @@ import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import { DirecaoMensagemSchema } from '@/lib/consultor/direcao';
 import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/queries';
 import shell from '../mapa-jornada/preview.module.css';
+import { exemploLeitura } from './leitura.fixture';
 
 export const metadata: Metadata = { title: 'Preview · Ação do Sobral AI' };
 
@@ -137,7 +138,14 @@ export default async function PreviewConsultorConversaPage({
   searchParams,
 }: PageProps<'/preview/consultor-conversa'>) {
   if (process.env.NODE_ENV === 'production') notFound();
-  const pendente = (await searchParams).pendente === '1';
+  const parametros = await searchParams;
+  const pendente = parametros.pendente === '1';
+  const variante = typeof parametros.leitura === 'string' ? parametros.leitura : null;
+  const mensagensDaTela = variante
+    ? mensagens
+        .filter((m) => m.anexos.length === 0)
+        .map((m) => (m.papel === 'consultor' ? exemploLeitura(m, variante) : m))
+    : mensagens;
 
   return (
     <div className={shell.shell}>
@@ -170,7 +178,7 @@ export default async function PreviewConsultorConversaPage({
       <main id="conteudo" className={shell.conteudo}>
         <TelaSobral
           threads={[thread]}
-          conversa={{ thread, mensagens: pendente ? mensagens.slice(0, 2) : mensagens }}
+          conversa={{ thread, mensagens: pendente ? mensagens.slice(0, 2) : mensagensDaTela }}
           modoPreview
         />
       </main>

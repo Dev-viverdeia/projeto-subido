@@ -1,6 +1,6 @@
 import { LoaderCircle } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
-import { blocosDaResposta } from './resposta';
+import { TextoResposta } from './TextoResposta';
 import styles from './Conversa.module.css';
 type EtapaProcessamento =
   'enviando' | 'conferindo-envio' | 'lendo' | 'pensando' | 'finalizando' | 'conferindo' | null;
@@ -54,11 +54,7 @@ export function RespostaEmAndamento({
           <span className={styles.autorResposta}>
             <IconeProduto nome="sobral" tamanho={20} /> Sobral AI
           </span>
-          <div className={`${styles.balao} ${styles.doConsultor}`}>
-            {blocosDaResposta(texto).map((bloco, indice) => (
-              <p key={`resposta-em-voo-${indice}`}>{bloco}</p>
-            ))}
-          </div>
+          <TextoResposta texto={texto} completa />
         </div>
       ) : null}
       {texto && etapa ? (

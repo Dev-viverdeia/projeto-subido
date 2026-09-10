@@ -1,14 +1,12 @@
-import Link from 'next/link';
 import { Fragment } from 'react';
-import { ArrowRight, Target } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
-import { ETAPAS_SOBRAL } from '@/lib/consultor/direcao';
 import { BotaoCopiar } from '@/app/(app)/_components/BotaoCopiar';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
-import { ConfirmarAcaoCrm } from './ConfirmarAcaoCrm';
 import { AudioMensagem } from './AudioMensagem';
 import { ArquivoMensagem } from './ArquivoMensagem';
-import { blocosDaResposta } from './resposta';
+import { TextoResposta } from './TextoResposta';
+import { ProximaAcaoResposta } from './ProximaAcaoResposta';
+import { RecomendacoesResposta } from './RecomendacoesResposta';
 import styles from './Mensagens.module.css';
 
 function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
@@ -24,13 +22,6 @@ function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
     mensagem.conteudo.startsWith('Analise estes ')
   );
 }
-
-const ACAO_POR_TIPO = {
-  aula: 'Abrir aula',
-  formacao: 'Abrir formação',
-  projeto: 'Abrir projeto',
-  ferramenta: 'Ver no projeto',
-} as const;
 
 /**
  * O histórico gravado — Server Component puro: o texto vem do banco pelo RSC e
@@ -62,7 +53,10 @@ export function Mensagens({
         const detalharResposta = !compacto || m.id === ultimaResposta;
         return (
           <Fragment key={m.id}>
-            <li className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}>
+            <li
+              className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}
+              data-resposta-sobral={m.papel === 'consultor' ? '' : undefined}
+            >
               <div className={styles.corpo}>
                 {m.anexos.some((anexo) => anexo.categoria === 'audio') ? (
                   <div className={styles.audios} aria-label="Mensagens de áudio">
@@ -111,11 +105,7 @@ export function Mensagens({
                   </span>
                 ) : null}
                 {m.papel === 'consultor' ? (
-                  <div className={styles.texto}>
-                    {blocosDaResposta(m.conteudo).map((bloco, indice) => (
-                      <p key={`${m.id}-bloco-${indice}`}>{bloco}</p>
-                    ))}
-                  </div>
+                  <TextoResposta texto={m.conteudo} />
                 ) : ehTextoAutomaticoDeAudio(m) ? null : (
                   <p className={styles.texto}>{m.conteudo}</p>
                 )}
@@ -126,37 +116,9 @@ export function Mensagens({
                   </div>
                 ) : null}
 
-                {detalharResposta && m.direcao && !(compacto && m.direcao.contexto_acao) ? (
-                  <aside className={styles.direcao} aria-label="Plano gerado nesta resposta">
-                    <div className={styles.direcaoRotulo}>
-                      <Target size={14} strokeWidth={2} aria-hidden="true" />
-                      <span>
-                        Plano ·{' '}
-                        {ETAPAS_SOBRAL.find((etapa) => etapa.id === m.direcao?.etapa)?.titulo ??
-                          m.direcao.etapa}
-                      </span>
-                    </div>
-                    <strong>{m.direcao.proximo_passo.titulo}</strong>
-                    <p>{m.direcao.proximo_passo.evidencia}</p>
-                    <Link
-                      href={
-                        m.direcao.contexto_acao
-                          ? `/vendas/${m.direcao.contexto_acao.oportunidade_id}`
-                          : m.direcao.proximo_passo.destino
-                      }
-                      className={styles.direcaoAcao}
-                    >
-                      {m.direcao.contexto_acao ? 'Abrir ficha' : 'Fazer próxima ação'}
-                      <ArrowRight size={14} strokeWidth={2.2} aria-hidden="true" />
-                    </Link>
-                  </aside>
-                ) : null}
-
-                {detalharResposta && m.direcao?.contexto_acao ? (
-                  <ConfirmarAcaoCrm
-                    mensagemId={m.id}
-                    contexto={m.direcao.contexto_acao}
-                    confirmada={m.acaoConfirmada}
+                {detalharResposta && m.direcao ? (
+                  <ProximaAcaoResposta
+                    mensagem={m}
                     modoPreview={modoPreview}
                     gerarProximoPasso={m.id === ultimaAcao}
                   />
@@ -165,18 +127,7 @@ export function Mensagens({
                 {/* Conteúdo recomendado é validado contra o catálogo antes de ser
                 gravado. A tela só exibe caminhos que existem no produto. */}
                 {detalharResposta && m.cartoes.length > 0 && (
-                  <ul className={styles.cartoes}>
-                    {m.cartoes.map((c) => (
-                      <li key={`${c.tipo}:${c.chave}`}>
-                        <Link href={c.href} className={styles.cartao}>
-                          <span className={styles.cartaoRotulo}>{c.rotulo}</span>
-                          <span className={styles.cartaoTitulo}>{c.titulo}</span>
-                          <span className={styles.cartaoMotivo}>{c.motivo}</span>
-                          <span className={styles.cartaoAcao}>{ACAO_POR_TIPO[c.tipo]} →</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                  <RecomendacoesResposta cartoes={m.cartoes} />
                 )}
               </div>
             </li>
@@ -186,13 +137,7 @@ export function Mensagens({
               <li className={styles.doConsultor}>
                 <div className={styles.corpo}>
                   <span className={styles.autor}>Sobral AI · resposta interrompida</span>
-                  {m.geracao.texto ? (
-                    <div className={styles.texto}>
-                      {blocosDaResposta(m.geracao.texto).map((bloco, i) => (
-                        <p key={i}>{bloco}</p>
-                      ))}
-                    </div>
-                  ) : null}
+                  {m.geracao.texto ? <TextoResposta texto={m.geracao.texto} completa /> : null}
                 </div>
               </li>
             ) : null}

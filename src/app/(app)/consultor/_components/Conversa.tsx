@@ -125,7 +125,19 @@ export function Conversa({
   }, []);
 
   useEffect(() => {
-    if (threadEmUso) fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
+    if (!threadEmUso) return;
+    // Ao reabrir, a resposta começa visível; não só os cartões no fim dela.
+    const leitura = leituraRef.current;
+    const ultimaResposta = leitura?.querySelector('[data-resposta-sobral]:last-child');
+    if (leitura && ultimaResposta) {
+      leitura.scrollTo({
+        top:
+          leitura.scrollTop +
+          ultimaResposta.getBoundingClientRect().top -
+          leitura.getBoundingClientRect().top,
+        behavior: 'instant',
+      });
+    } else fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
   }, [threadEmUso]);
 
   function incluirArquivos(novos: readonly File[]) {
