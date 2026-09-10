@@ -7,6 +7,7 @@ import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/que
 import type { ExemploDoConsultor } from './Conversa';
 import { Conversa } from './Conversa';
 import { ListaConversas } from './ListaConversas';
+import { BibliotecaConversas } from './BibliotecaConversas';
 import { ArquivosConversa } from './ArquivosConversa';
 import { BuscaMensagens } from './BuscaMensagens';
 import historicoStyles from './ListaConversas.module.css';
@@ -189,13 +190,15 @@ export function TelaSobral({
               rotulo="Conversas"
               painelClassName={historicoStyles.painel}
             >
-              <ListaConversas
-                key={dono ?? 'preview'}
-                dono={dono}
-                total={totalConversas}
-                threads={threads}
-                atualId={conversa?.thread.id}
-              />
+              <BibliotecaConversas dono={dono}>
+                <ListaConversas
+                  key={dono ?? 'preview'}
+                  dono={dono}
+                  total={totalConversas}
+                  threads={threads}
+                  atualId={conversa?.thread.id}
+                />
+              </BibliotecaConversas>
             </HistoricoDropdown>
           </div>
         </header>
@@ -214,6 +217,7 @@ export function TelaSobral({
             historico={
               !vazio ? (
                 <Mensagens
+                  dono={dono}
                   mensagens={mensagens}
                   modoPreview={modoPreview}
                   mensagemAvulsa={conversa?.mensagemAvulsa}

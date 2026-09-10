@@ -42,6 +42,7 @@ export type MensagemDoConsultor = {
   modelo: string | null;
   criadoEm: string;
   geracao?: { estado: string; texto: string } | null;
+  salva?: boolean;
 };
 
 export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
@@ -138,7 +139,7 @@ export const obterConversa = cache(
       supabase
         .from('consultor_mensagens')
         .select(
-          'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_geracoes!sobral_geracoes_mensagem_id_fkey(estado, texto), consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
+          'id, papel, conteudo, cartoes, direcao, modelo, criado_em, consultor_respostas_salvas(mensagem_id), sobral_geracoes!sobral_geracoes_mensagem_id_fkey(estado, texto), consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
         )
         .eq('thread_id', id);
     const { data: recentes, error: erroMsgs } = await selecionarMensagens()
@@ -195,6 +196,7 @@ export const obterConversa = cache(
         const acaoConfirmada = AcaoConfirmadaCrmSchema.safeParse(recibo);
         return {
           id: m.id,
+          salva: (m.consultor_respostas_salvas ?? []).length > 0,
           papel: m.papel as 'usuario' | 'consultor',
           conteudo: m.conteudo,
           anexos: (m.consultor_anexos ?? []).map((anexo) => ({

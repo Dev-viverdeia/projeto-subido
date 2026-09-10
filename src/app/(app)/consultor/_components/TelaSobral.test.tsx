@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+vi.mock('@/lib/consultor/salvar-resposta', () => ({ salvarResposta: vi.fn() }));
 
 vi.mock('@/app/(app)/_components/CabecalhoPagina', () => ({
   CabecalhoPagina: () => <div data-testid="cabecalho-global" />,

@@ -72,10 +72,18 @@
   text-wrap: pretty;
 }
 .utilidadesResposta {
-  min-height: 32px;
+  min-height: 44px;
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
   align-items: center;
   padding-left: var(--via-space-1);
+}
+.utilidadesResposta > button {
+  min-height: 44px;
+  font-size: var(--via-fs-sm);
+  padding-inline: var(--via-space-3);
+  border-radius: var(--app-radius-control);
 }
 .corpo {
   display: flex;

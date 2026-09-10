@@ -7,6 +7,7 @@ import { ArquivoMensagem } from './ArquivoMensagem';
 import { TextoResposta } from './TextoResposta';
 import { ProximaAcaoResposta } from './ProximaAcaoResposta';
 import { RecomendacoesResposta } from './RecomendacoesResposta';
+import { SalvarResposta } from './SalvarResposta';
 import styles from './Mensagens.module.css';
 
 function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
@@ -36,11 +37,13 @@ export function Mensagens({
   modoPreview = false,
   compacto = false,
   mensagemAvulsa,
+  dono,
 }: {
   mensagens: MensagemDoConsultor[];
   modoPreview?: boolean;
   compacto?: boolean;
   mensagemAvulsa?: string;
+  dono?: string;
 }) {
   const ultimaAcao = [...mensagens]
     .reverse()
@@ -121,6 +124,7 @@ export function Mensagens({
                 {m.papel === 'consultor' && detalharResposta ? (
                   <div className={styles.utilidadesResposta}>
                     <BotaoCopiar texto={m.conteudo} rotuloDoQue="a resposta do Sobral AI" />
+                    {dono && <SalvarResposta mensagem={m.id} dono={dono} salva={m.salva} />}
                   </div>
                 ) : null}
 

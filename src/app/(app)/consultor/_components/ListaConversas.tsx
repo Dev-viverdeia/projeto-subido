@@ -23,7 +23,8 @@ export function ListaConversas({
   const [aviso, setAviso] = useState('');
   const historico = useBuscaConversas({ threads, total, mais: total > threads.length }, dono);
   useEffect(() => {
-    campo.current?.focus({ preventScroll: true });
+    if (document.activeElement?.getAttribute('role') !== 'tab')
+      campo.current?.focus({ preventScroll: true });
   }, []);
   const vazio = !historico.dados.threads.length;
   return (
