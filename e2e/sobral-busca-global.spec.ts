@@ -123,6 +123,8 @@ test('teclado, 320px, zoom 200% e movimento reduzido sem corte lateral', async (
   const rect = await painel.boundingBox();
   expect(rect!.x).toBeGreaterThanOrEqual(0);
   expect(rect!.x + rect!.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
+  expect(rect!.y + rect!.height).toBeLessThanOrEqual(page.viewportSize()!.height + 1);
+  await expect(page.getByRole('tabpanel').getByRole('status')).toBeInViewport();
   await expect(buscar).toBeInViewport();
   await page.screenshot({ path: info.outputPath('busca-acessivel.png') });
 });
