@@ -35,10 +35,12 @@ export function Mensagens({
   mensagens,
   modoPreview = false,
   compacto = false,
+  mensagemAvulsa,
 }: {
   mensagens: MensagemDoConsultor[];
   modoPreview?: boolean;
   compacto?: boolean;
+  mensagemAvulsa?: string;
 }) {
   const ultimaAcao = [...mensagens]
     .reverse()
@@ -54,6 +56,9 @@ export function Mensagens({
         return (
           <Fragment key={m.id}>
             <li
+              id={`sobral-mensagem-${m.id}`}
+              tabIndex={-1}
+              aria-label={m.papel === 'usuario' ? 'Sua mensagem' : 'Resposta do Sobral AI'}
               className={m.papel === 'usuario' ? styles.doUsuario : styles.doConsultor}
               data-resposta-sobral={m.papel === 'consultor' ? '' : undefined}
             >
@@ -132,6 +137,11 @@ export function Mensagens({
                 )}
               </div>
             </li>
+            {m.id === mensagemAvulsa ? (
+              <li className={styles.intervalo}>
+                Conversa recente abaixo · outras mensagens ficam entre estes trechos
+              </li>
+            ) : null}
             {m.id !== mensagens.at(-1)?.id &&
             m.geracao &&
             ['interrompida', 'falhou'].includes(m.geracao.estado) ? (

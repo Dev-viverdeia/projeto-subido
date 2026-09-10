@@ -41,6 +41,7 @@ let opts: OpcoesResposta;
 beforeEach(() => {
   vi.clearAllMocks();
   Element.prototype.scrollIntoView = vi.fn();
+  Element.prototype.scrollTo = vi.fn();
   mocks.registrar.mockResolvedValue({ threadId: 'thread', mensagemId: 'pergunta', falha: null });
   mocks.responder.mockImplementation((_id: string, o: OpcoesResposta) => {
     opts = o;

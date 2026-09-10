@@ -118,7 +118,12 @@ export const obterPainelSobral = cache(
 export const obterConversa = cache(
   async (
     id: string,
-  ): Promise<{ thread: ThreadDoConsultor; mensagens: MensagemDoConsultor[] } | null> => {
+    mensagemAlvo?: string,
+  ): Promise<{
+    thread: ThreadDoConsultor;
+    mensagens: MensagemDoConsultor[];
+    mensagemAvulsa?: string;
+  } | null> => {
     const supabase = await createClient();
 
     const { data: thread, error } = await supabase
@@ -129,24 +134,43 @@ export const obterConversa = cache(
     if (error) throw handleError(error, 'consultor:obter');
     if (!thread) return null;
 
-    const { data: mensagens, error: erroMsgs } = await supabase
-      .from('consultor_mensagens')
-      .select(
-        'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_geracoes!sobral_geracoes_mensagem_id_fkey(estado, texto), consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
-      )
-      .eq('thread_id', id)
-      .order('criado_em')
+    const selecionarMensagens = () =>
+      supabase
+        .from('consultor_mensagens')
+        .select(
+          'id, papel, conteudo, cartoes, direcao, modelo, criado_em, sobral_geracoes!sobral_geracoes_mensagem_id_fkey(estado, texto), consultor_anexos(id, nome, tipo_mime, tamanho_bytes, categoria, transcricao), sobral_acoes_crm(acao, quando, confirmada_em, atualizado_em, status, concluida_em, sobral_acoes_crm_eventos(tipo, acao_anterior, acao_nova, quando_anterior, quando_novo, criado_em), sobral_recomendacoes_crm(acao, motivo, fatos, quando, status, modelo, gerada_em, confirmada_em))',
+        )
+        .eq('thread_id', id);
+    const { data: recentes, error: erroMsgs } = await selecionarMensagens()
+      .order('criado_em', { ascending: false })
+      .order('id', { ascending: false })
       .limit(200);
     if (erroMsgs) throw handleError(erroMsgs, 'consultor:mensagens');
 
+    // A última rodada precisa continuar sendo a mais recente, inclusive ao acessar
+    // um arquivo antigo. A origem adicional é lida pela mesma RLS e mesma thread.
+    const mensagens = [...(recentes ?? [])].reverse();
+    let mensagemAvulsa: string | undefined;
+    if (mensagemAlvo && !mensagens.some((m) => m.id === mensagemAlvo)) {
+      const { data: origem, error: erroOrigem } = await selecionarMensagens()
+        .eq('id', mensagemAlvo)
+        .maybeSingle();
+      if (erroOrigem) throw handleError(erroOrigem, 'consultor:mensagem-origem');
+      if (origem) {
+        mensagens.unshift(origem);
+        mensagemAvulsa = origem.id;
+      }
+    }
+
     return {
+      mensagemAvulsa,
       thread: {
         id: thread.id,
         titulo: thread.titulo,
         criadoEm: thread.criado_em,
         atualizadoEm: thread.atualizado_em,
       },
-      mensagens: (mensagens ?? []).map((m) => {
+      mensagens: mensagens.map((m) => {
         /* `safeParse` no JSONB, como o Builder faz com o documento: cartão em
            formato inesperado vira lista vazia, nunca estouro em `.map`. */
         const cartoes = CartoesProdutoPersistidosSchema.safeParse(m.cartoes);

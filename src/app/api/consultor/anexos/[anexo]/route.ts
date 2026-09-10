@@ -49,18 +49,22 @@ export async function GET(request: Request, { params }: { params: Promise<{ anex
   )
     return falha('Formato de arquivo indisponível.', 415);
 
+  const nomeDownload =
+    registro.categoria === 'documento' || new URL(request.url).searchParams.get('download') === '1'
+      ? registro.nome
+      : false;
   const { data, error: erroUrl } = await supabase.storage
     .from(SOBRAL_BUCKET_ANEXOS)
     .createSignedUrl(registro.caminho_storage, 90, {
-      download:
-        registro.categoria === 'documento' ||
-        new URL(request.url).searchParams.get('download') === '1'
-          ? registro.nome
-          : false,
+      download: nomeDownload,
     });
   if (erroUrl || !data) return falha('Não foi possível carregar o arquivo. Tente novamente.', 503);
 
-  return NextResponse.redirect(data.signedUrl, {
+  // O SDK codifica a query duas vezes. Repor apenas o nome preserva acentos e %
+  // sem tocar no token assinado nem transferir o arquivo pelo servidor da aplicação.
+  const destino = new URL(data.signedUrl);
+  if (nomeDownload) destino.searchParams.set('download', nomeDownload);
+  return NextResponse.redirect(destino, {
     status: 307,
     headers: { 'Cache-Control': 'private, no-store' },
   });

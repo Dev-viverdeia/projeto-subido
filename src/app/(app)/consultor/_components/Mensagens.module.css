@@ -39,6 +39,22 @@
 .doUsuario {
   justify-content: flex-end;
 }
+.doUsuario:focus,
+.doConsultor:focus {
+  outline: none;
+}
+.doUsuario:focus .corpo,
+.doConsultor:focus .corpo {
+  border-radius: var(--app-radius-card);
+  box-shadow: var(--app-ring);
+}
+.intervalo {
+  border-top: 1px solid var(--via-border-hairline);
+  padding-top: var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  text-align: center;
+}
 .texto {
   margin: 0;
   max-width: 52ch;
