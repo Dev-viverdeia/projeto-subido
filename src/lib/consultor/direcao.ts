@@ -12,6 +12,8 @@ const DestinoSobralAtualSchema = z.enum([
   '/formacoes',
   '/solucoes',
   '/vendas',
+  '/prospeccao',
+  '/entregas',
   '/reunioes',
   '/propostas',
   '/propostas/nova',
@@ -49,11 +51,28 @@ export const RespostaEstruturadaSobralSchema = z.object({
   diagnostico: z.string().trim().min(20).max(1200),
   foco: z.string().trim().min(3).max(180),
   proximo_passo: AcaoSobralSchema,
-  acoes: z.array(AcaoSobralSchema).length(3),
+  acoes: z.array(AcaoSobralSchema).min(1).max(3),
+  usar_venda_em_foco: z.boolean(),
   recomendacoes: z.array(RecomendacaoConteudoSobralSchema).max(3),
 });
 
 export type RespostaEstruturadaSobral = z.infer<typeof RespostaEstruturadaSobralSchema>;
+
+/** A ação visível e o plano salvo precisam começar pelo mesmo passo. */
+export function alinharRespostaSobral(
+  resposta: RespostaEstruturadaSobral,
+): RespostaEstruturadaSobral {
+  const principal = resposta.proximo_passo;
+  const acoes = [principal, ...resposta.acoes]
+    .filter(
+      (acao, indice, todas) =>
+        todas.findIndex(
+          (outra) => outra.titulo === acao.titulo && outra.destino === acao.destino,
+        ) === indice,
+    )
+    .slice(0, 3);
+  return { ...resposta, acoes };
+}
 
 export const ContextoAcaoCrmSchema = z.object({
   oportunidade_id: z.uuid(),
@@ -103,6 +122,7 @@ export const DirecaoMensagemSchema = z.object({
   acoes: z.array(AcaoSobralSchema).min(1).max(3),
   gerado_em: z.string(),
   contexto_acao: ContextoAcaoCrmSchema.nullable().optional(),
+  oportunidade_alvo: z.uuid().nullable().optional(),
 });
 
 export type DirecaoMensagem = z.infer<typeof DirecaoMensagemSchema>;

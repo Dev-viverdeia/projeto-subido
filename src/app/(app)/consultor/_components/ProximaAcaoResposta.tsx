@@ -9,6 +9,8 @@ const DESTINOS = {
   '/formacoes': 'Ver formações',
   '/solucoes': 'Escolher projeto',
   '/vendas': 'Ver vendas',
+  '/prospeccao': 'Abrir prospecção',
+  '/entregas': 'Ver entregas',
   '/reunioes': 'Ver reuniões',
   '/propostas': 'Ver propostas',
   '/propostas/nova': 'Criar proposta',
@@ -27,6 +29,13 @@ export function ProximaAcaoResposta({
 }) {
   if (!mensagem.direcao) return null;
   const { proximo_passo: passo, contexto_acao: contexto } = mensagem.direcao;
+  const alvo = mensagem.direcao.oportunidade_alvo;
+  const destino =
+    alvo && (passo.destino === '/propostas/nova' || passo.destino === '/builder')
+      ? `${passo.destino}?oportunidade=${encodeURIComponent(alvo)}`
+      : alvo && passo.destino === '/reunioes'
+        ? `/reunioes?nova=1&oportunidade=${encodeURIComponent(alvo)}`
+        : passo.destino;
   const detalhes = (
     <details className={styles.motivo}>
       <summary>
@@ -61,7 +70,7 @@ export function ProximaAcaoResposta({
           <span className={styles.rotulo}>Próximo passo</span>
           <strong>{passo.titulo}</strong>
         </div>
-        <Link href={passo.destino} className={styles.acaoPrincipal}>
+        <Link href={destino} className={styles.acaoPrincipal}>
           {DESTINOS[passo.destino]} <ArrowRight size={17} aria-hidden="true" />
         </Link>
       </div>

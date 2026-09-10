@@ -43,6 +43,12 @@ function acao(destino: AcaoSobral['destino']): AcaoSobral {
 }
 
 describe('resolverAcaoSobral', () => {
+  it.each(['/propostas/nova', '/builder', '/reunioes', '/vendas'] as const)(
+    'não preenche outro cliente em %s quando o pedido não usa a venda em foco',
+    (destino) => {
+      expect(resolverAcaoSobral(acao(destino), sinais(), false).destino).toBe(destino);
+    },
+  );
   it('abre a proposta existente em vez da página geral', () => {
     const contexto = sinais({
       radar: [
