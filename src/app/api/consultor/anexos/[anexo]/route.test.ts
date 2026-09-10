@@ -75,6 +75,29 @@ it('não emite URL para uma conta sem sessão', async () => {
   expect(deps.registro).not.toHaveBeenCalled();
   expect(deps.assinar).not.toHaveBeenCalled();
 });
+it('preserva acentos e percentuais no nome sem alterar o token assinado', async () => {
+  deps.registro.mockResolvedValue({
+    data: {
+      caminho_storage: caminho,
+      categoria: 'documento',
+      tipo_mime: 'application/pdf',
+      nome: 'Revisão 20%_final.pdf',
+      consultor_mensagens: { thread_id: '22222222-2222-4222-8222-222222222222' },
+    },
+    error: null,
+  });
+  deps.assinar.mockResolvedValue({
+    data: {
+      signedUrl:
+        'https://storage.example.test/privado?token=assinatura-original&download=Revis%25C3%25A3o+20%2525_final.pdf',
+    },
+    error: null,
+  });
+  const resposta = await pedir();
+  const destino = new URL(resposta.headers.get('location')!);
+  expect(destino.searchParams.get('download')).toBe('Revisão 20%_final.pdf');
+  expect(destino.searchParams.get('token')).toBe('assinatura-original');
+});
 it('não emite URL quando o registro é de outra conta ou não existe', async () => {
   deps.registro.mockResolvedValue({ data: null, error: null });
   expect((await pedir()).status).toBe(404);

@@ -7,6 +7,7 @@ import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/que
 import type { ExemploDoConsultor } from './Conversa';
 import { Conversa } from './Conversa';
 import { ListaConversas } from './ListaConversas';
+import { ArquivosConversa } from './ArquivosConversa';
 import historicoStyles from './ListaConversas.module.css';
 import { Mensagens } from './Mensagens';
 import styles from './TelaSobral.module.css';
@@ -56,6 +57,7 @@ const FONTES_DO_CONTEXTO = [
 type ConversaCarregada = {
   thread: ThreadDoConsultor;
   mensagens: MensagemDoConsultor[];
+  mensagemAvulsa?: string;
 } | null;
 
 function tituloLegivel(titulo: string): string {
@@ -87,6 +89,7 @@ export function TelaSobral({
   dono,
   chaveRascunho,
   totalConversas = threads.length,
+  mensagemEmFoco,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
@@ -96,6 +99,7 @@ export function TelaSobral({
   dono?: string;
   chaveRascunho?: string;
   totalConversas?: number;
+  mensagemEmFoco?: string;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -119,6 +123,13 @@ export function TelaSobral({
           </div>
 
           <div className={styles.acoes}>
+            {conversa && dono ? (
+              <ArquivosConversa
+                key={`${dono}:${conversa.thread.id}`}
+                conversa={conversa.thread.id}
+                dono={dono}
+              />
+            ) : null}
             <details className={styles.contexto}>
               <summary aria-label="Ver o que o Sobral AI usa da sua conta">
                 <Database size={14} strokeWidth={1.8} aria-hidden="true" />
@@ -188,10 +199,17 @@ export function TelaSobral({
             threadId={conversa?.thread.id}
             pendente={ultima?.papel === 'usuario'}
             ultimaMensagemId={ultima?.id}
+            mensagemEmFoco={mensagemEmFoco}
             exemplos={vazio && !contextoInicial ? EXEMPLOS : undefined}
             textoInicial={contextoInicial?.mensagem}
             historico={
-              !vazio ? <Mensagens mensagens={mensagens} modoPreview={modoPreview} /> : undefined
+              !vazio ? (
+                <Mensagens
+                  mensagens={mensagens}
+                  modoPreview={modoPreview}
+                  mensagemAvulsa={conversa?.mensagemAvulsa}
+                />
+              ) : undefined
             }
             boasVindas={
               vazio ? (

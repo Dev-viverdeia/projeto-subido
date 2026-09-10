@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Download, FileWarning, LoaderCircle, ZoomIn, ZoomOut } from 'lucide-react';
+import { ArrowLeft, Download, FileWarning, LoaderCircle, ZoomIn, ZoomOut } from 'lucide-react';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { tamanhoLegivel } from '@/lib/consultor/anexos-contrato';
 import styles from './PreviaAnexo.module.css';
@@ -34,12 +34,14 @@ export function PreviaAnexo({
   tamanho,
   pdf,
   aoFechar,
+  aoVoltar,
 }: {
   src: string;
   nome: string;
   tamanho: number;
   pdf: boolean;
   aoFechar: () => void;
+  aoVoltar?: () => void;
 }) {
   const [tentativa, setTentativa] = useState(0);
   const download = src.startsWith('/api/consultor/anexos/') ? `${src}?download=1` : src;
@@ -50,10 +52,18 @@ export function PreviaAnexo({
       title={pdf ? 'Ler PDF' : 'Ver imagem'}
       size="xl"
       footer={
-        <a className={styles.baixar} href={download} download={nome}>
-          <Download size={18} aria-hidden="true" />
-          Baixar arquivo
-        </a>
+        <>
+          {aoVoltar ? (
+            <button type="button" className={styles.baixar} onClick={aoVoltar}>
+              <ArrowLeft size={18} aria-hidden="true" />
+              Voltar aos arquivos
+            </button>
+          ) : null}
+          <a className={styles.baixar} href={download} download={nome}>
+            <Download size={18} aria-hidden="true" />
+            Baixar arquivo
+          </a>
+        </>
       }
     >
       <div className={styles.identidade}>

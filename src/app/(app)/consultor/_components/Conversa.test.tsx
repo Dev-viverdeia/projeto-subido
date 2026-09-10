@@ -46,6 +46,7 @@ import { Conversa } from './Conversa';
 
 describe('Conversa do Sobral AI', () => {
   beforeAll(() => {
+    Element.prototype.scrollTo = vi.fn();
     Reflect.defineProperty(Element.prototype, 'scrollIntoView', {
       configurable: true,
       value: vi.fn(),

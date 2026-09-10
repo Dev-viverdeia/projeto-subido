@@ -15,6 +15,7 @@ beforeEach(() => {
   localStorage.clear();
   vi.clearAllMocks();
   Element.prototype.scrollIntoView = vi.fn();
+  Element.prototype.scrollTo = vi.fn();
   mocks.responder.mockResolvedValue({
     dados: null,
     falha: { tipo: 'sessao', mensagem: 'Entre na conta.' },

@@ -177,6 +177,7 @@ export default async function PreviewConsultorConversaPage({
 
       <main id="conteudo" className={shell.conteudo}>
         <TelaSobral
+          dono={parametros.arquivos === '1' ? '11111111-1111-4111-8111-111111111111' : undefined}
           threads={[thread]}
           conversa={{ thread, mensagens: pendente ? mensagens.slice(0, 2) : mensagensDaTela }}
           modoPreview

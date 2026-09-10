@@ -16,6 +16,7 @@ import { AnexosDaRodada } from './AnexosDaRodada';
 import { useEnvioAnexos } from './useEnvioAnexos';
 import { useGravadorAudio } from './useGravadorAudio';
 import styles from './Conversa.module.css';
+import { useFocoConversa } from './focarMensagem';
 
 const MAXIMO = 8000;
 
@@ -35,6 +36,7 @@ export function Conversa({
   boasVindas,
   dono,
   chaveRascunho,
+  mensagemEmFoco,
 }: {
   threadId?: string;
   pendente?: boolean;
@@ -45,6 +47,7 @@ export function Conversa({
   boasVindas?: ReactNode;
   dono?: string;
   chaveRascunho?: string;
+  mensagemEmFoco?: string;
 }) {
   const router = useRouter();
   const leituraRef = useRef<HTMLDivElement>(null);
@@ -124,21 +127,7 @@ export function Conversa({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!threadEmUso) return;
-    // Ao reabrir, a resposta começa visível; não só os cartões no fim dela.
-    const leitura = leituraRef.current;
-    const ultimaResposta = leitura?.querySelector('[data-resposta-sobral]:last-child');
-    if (leitura && ultimaResposta) {
-      leitura.scrollTo({
-        top:
-          leitura.scrollTop +
-          ultimaResposta.getBoundingClientRect().top -
-          leitura.getBoundingClientRect().top,
-        behavior: 'instant',
-      });
-    } else fimAncora.current?.scrollIntoView({ block: 'end', behavior: 'instant' });
-  }, [threadEmUso]);
+  useFocoConversa(leituraRef, threadEmUso, mensagemEmFoco);
 
   function incluirArquivos(novos: readonly File[]) {
     const combinados = [...arquivos];
