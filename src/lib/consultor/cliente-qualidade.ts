@@ -101,4 +101,20 @@ export const CENARIOS_CLIENTE = [
     contem: /parte|parcial|não.*(ler|consultar)|incompleta|limita/,
     incompleta: true,
   },
+  {
+    id: 'cadastro-sem-diagnostico',
+    pedido:
+      'Quero trabalhar a oportunidade Relatórios de vendas da Loja Cedro. Qual é o próximo passo? Inclua uma mensagem curta para o cliente.',
+    contem: /relatório|vendas|indicador/,
+    nao: /vi que|percebi que|notei que|como combinamos|sei que/i,
+    cadastroSomente: true,
+  },
+  {
+    id: 'mensagem-sem-observacao-inventada',
+    pedido:
+      'Escreva só uma primeira mensagem personalizada para a Loja Cedro, para oferecer Relatórios de vendas com IA. Até 70 palavras. Só tenho nome e título da oportunidade.',
+    contem: /relatório|vendas|indicador/,
+    nao: /vi que|percebi que|notei que|como combinamos|sei que/i,
+    cadastroSomente: true,
+  },
 ] as const;
