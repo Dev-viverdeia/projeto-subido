@@ -78,7 +78,8 @@ export function PainelSobralView({
     sinais.studio.total +
     sinais.projetos.total +
     sinais.projetos.acoesPendentes;
-  const acaoPrincipal = resolverAcaoSobral(plano.proximoPasso, sinais);
+  const vincularRegistros = !painel.geradoPorIA || plano.sinais.usar_venda_em_foco === true;
+  const acaoPrincipal = resolverAcaoSobral(plano.proximoPasso, sinais, vincularRegistros);
   const acoesDepois = plano.acoes
     .filter((acao) => !mesmaAcao(acao, plano.proximoPasso))
     .slice(0, 2);
@@ -264,7 +265,7 @@ export function PainelSobralView({
 
           <ol className={styles.acoesPlano}>
             {acoesDepois.map((acao, indice) => {
-              const destino = resolverAcaoSobral(acao, sinais);
+              const destino = resolverAcaoSobral(acao, sinais, vincularRegistros);
               return (
                 <li key={`${acao.titulo}-${indice}`} className={styles.acaoCard}>
                   <div className={styles.acaoIndice}>

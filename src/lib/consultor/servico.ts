@@ -82,7 +82,7 @@ export async function produzirLeituraSobral({
       foco: rodada.direcao.foco,
       proximoPasso: rodada.direcao.proximo_passo,
       acoes: rodada.direcao.acoes,
-      sinais,
+      sinais: { ...sinais, usar_venda_em_foco: rodada.direcao.usar_venda_em_foco },
       modelo: rodada.modelo,
       geradoEm,
     },
@@ -90,7 +90,8 @@ export async function produzirLeituraSobral({
 }
 
 export function direcaoDaMensagem(leitura: LeituraSobral): Json {
-  const oportunidade = leitura.sinais.foco;
+  // IDs vêm exclusivamente do snapshot autenticado, nunca da resposta do modelo.
+  const oportunidade = leitura.rodada.direcao.usar_venda_em_foco ? leitura.sinais.foco : null;
   return {
     etapa: leitura.etapa,
     diagnostico: leitura.plano.diagnostico,
@@ -98,15 +99,17 @@ export function direcaoDaMensagem(leitura: LeituraSobral): Json {
     proximo_passo: leitura.plano.proximoPasso as unknown as Json,
     acoes: leitura.plano.acoes as unknown as Json,
     gerado_em: leitura.plano.geradoEm,
-    contexto_acao: oportunidade
-      ? {
-          oportunidade_id: oportunidade.oportunidadeId,
-          empresa: oportunidade.empresa,
-          acao_sugerida: leitura.plano.proximoPasso.titulo,
-          acao_atual: oportunidade.proximaAcao,
-          prazo_atual: oportunidade.proximaAcaoEm,
-        }
-      : null,
+    oportunidade_alvo: oportunidade?.oportunidadeId ?? null,
+    contexto_acao:
+      oportunidade && leitura.plano.proximoPasso.destino === '/vendas'
+        ? {
+            oportunidade_id: oportunidade.oportunidadeId,
+            empresa: oportunidade.empresa,
+            acao_sugerida: leitura.plano.proximoPasso.titulo,
+            acao_atual: oportunidade.proximaAcao,
+            prazo_atual: oportunidade.proximaAcaoEm,
+          }
+        : null,
   };
 }
 
@@ -123,7 +126,7 @@ export async function persistirPlanoSobral(
       foco: leitura.plano.foco,
       proximo_passo: leitura.plano.proximoPasso as unknown as Json,
       acoes: leitura.plano.acoes as unknown as Json,
-      sinais: leitura.sinais as unknown as Json,
+      sinais: leitura.plano.sinais as unknown as Json,
       contexto_hash: leitura.contextoHash,
       modelo: leitura.rodada.modelo,
       gerado_em: leitura.plano.geradoEm,

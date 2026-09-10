@@ -19,6 +19,8 @@ const ROTULO_POR_DESTINO: Record<AcaoSobral['destino'], string> = {
   '/formacoes': 'Abrir formação',
   '/solucoes': 'Abrir Projetos',
   '/vendas': 'Abrir Vendas',
+  '/prospeccao': 'Abrir prospecção',
+  '/entregas': 'Ver entregas',
   '/reunioes': 'Agendar reunião',
   '/propostas': 'Abrir propostas',
   '/propostas/nova': 'Criar proposta',
@@ -41,7 +43,13 @@ const ROTULO_REGISTRO: Partial<Record<DominioRadarSobral, string>> = {
  * fatos do banco: quando já existe algo para retomar, abre o registro exato;
  * quando a ação precisa nascer, leva o cliente em foco para o formulário.
  */
-export function resolverAcaoSobral(acao: AcaoSobral, sinais: SinaisSobral): AcaoExecutavelSobral {
+export function resolverAcaoSobral(
+  acao: AcaoSobral,
+  sinais: SinaisSobral,
+  vincularRegistros = true,
+): AcaoExecutavelSobral {
+  if (!vincularRegistros)
+    return { destino: acao.destino, rotulo: ROTULO_POR_DESTINO[acao.destino] };
   const foco = sinais.foco;
 
   if (acao.destino === '/propostas/nova') {

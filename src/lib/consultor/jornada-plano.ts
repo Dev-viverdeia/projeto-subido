@@ -5,6 +5,8 @@ function destinoDaJornada(destino: string): AcaoSobral['destino'] {
   if (destino.startsWith('/formacoes')) return '/formacoes';
   if (destino.startsWith('/solucoes')) return '/solucoes';
   if (destino.startsWith('/vendas')) return '/vendas';
+  if (destino.startsWith('/prospeccao')) return '/prospeccao';
+  if (destino.startsWith('/entregas')) return '/entregas';
   if (destino.startsWith('/reunioes')) return '/reunioes';
   if (destino.startsWith('/propostas/nova')) return '/propostas/nova';
   if (destino.startsWith('/propostas')) return '/propostas';
