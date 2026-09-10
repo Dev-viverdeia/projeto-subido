@@ -10,6 +10,7 @@ import { EstadoEnriquecimento } from './_components/EstadoEnriquecimento';
 import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento';
 import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
+import { ResumoSalvoMaterial } from './_components/ResumoSalvoMaterial';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Ficha do cliente · Vendas' };
@@ -81,6 +82,9 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
         <ContextoPosEntrega continuidade={lead.continuidadePosEntrega} />
       )}
 
+      {typeof parametros.resumo === 'string' && (
+        <ResumoSalvoMaterial oportunidade={id} registro={parametros.resumo} />
+      )}
       <ResumoOperacionalLead lead={lead} />
 
       {emAndamento && (

@@ -178,6 +178,13 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                     <div>
                       <strong>{evento.titulo}</strong>
                       {evento.descricao && <p>{evento.descricao}</p>}
+                      {evento.fonte === 'sobral_material' && (
+                        <Link
+                          href={`/vendas/${lead.oportunidade.id}?resumo=${evento.id}#resumo-material`}
+                        >
+                          Ver resumo <ArrowUpRight size={14} aria-hidden="true" />
+                        </Link>
+                      )}
                     </div>
                   </li>
                 ))}

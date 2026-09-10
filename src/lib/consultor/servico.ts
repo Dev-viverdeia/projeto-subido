@@ -13,6 +13,7 @@ import {
 } from './direcao';
 import { gerarRodadaSobral, type RodadaSobral } from './modelo';
 import type { EntradaAnexoModelo } from './processar-anexos';
+import { MaterialDaMensagemSchema, type MaterialDaMensagem } from './material';
 
 export const TETO_TOKENS_SOBRAL_MES = 500_000;
 
@@ -22,6 +23,7 @@ type MensagemModelo = {
 };
 
 export type LeituraSobral = {
+  material?: MaterialDaMensagem | null;
   etapa: EtapaSobral;
   sinais: SinaisSobral;
   contextoHash: string;
@@ -79,6 +81,14 @@ export async function produzirLeituraSobral({
   const geradoEm = new Date().toISOString();
 
   return {
+    material:
+      rodada.resumoMaterial && anexos?.length
+        ? MaterialDaMensagemSchema.parse({
+            resumo: rodada.resumoMaterial,
+            fontes: anexos.map(({ id, nome }) => ({ id, nome })),
+            oportunidade: sinais.cliente?.ficha?.oportunidadeId ?? null,
+          })
+        : null,
     etapa,
     sinais,
     contextoHash: hashDoContexto(sinais),
@@ -108,6 +118,7 @@ export function direcaoDaMensagem(leitura: LeituraSobral): Json {
     gerado_em: leitura.plano.geradoEm,
     oportunidade_alvo: oportunidade?.oportunidadeId ?? null,
     ficha_consultada: leitura.sinais.cliente?.ficha ?? null,
+    material: leitura.material ?? null,
     contexto_acao:
       oportunidade && leitura.plano.proximoPasso.destino === '/vendas'
         ? {

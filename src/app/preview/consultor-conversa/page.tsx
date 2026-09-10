@@ -141,11 +141,37 @@ export default async function PreviewConsultorConversaPage({
   const parametros = await searchParams;
   const pendente = parametros.pendente === '1';
   const variante = typeof parametros.leitura === 'string' ? parametros.leitura : null;
-  const mensagensDaTela = variante
-    ? mensagens
-        .filter((m) => m.anexos.length === 0)
-        .map((m) => (m.papel === 'consultor' ? exemploLeitura(m, variante) : m))
-    : mensagens;
+  const mensagensDaTela =
+    parametros.material === '1'
+      ? mensagens
+          .filter((m) => m.papel === 'consultor')
+          .map((m) => ({
+            ...m,
+            conteudo:
+              'Separei o escopo, as decisões e o que ainda precisa de confirmação. Revise o resumo antes de salvar na ficha.',
+            acaoConfirmada: null,
+            direcao: {
+              ...m.direcao!,
+              contexto_acao: null,
+              material: {
+                oportunidade: OPORTUNIDADE,
+                resumo: {
+                  titulo: 'Atendimento da Clínica Aurora',
+                  escopo:
+                    'Triagem no WhatsApp e resposta a dúvidas frequentes, com passagem para a equipe.',
+                  decisoes: 'O piloto usará apenas conteúdo aprovado pela clínica.',
+                  tarefas: 'Ana enviará a lista de perguntas frequentes.',
+                  pendencias: 'Orçamento e prazo ainda não definidos.',
+                },
+                fontes: [{ id: MENSAGEM, nome: 'Conversa inicial com a Clínica Aurora.pdf' }],
+              },
+            },
+          }))
+      : variante
+        ? mensagens
+            .filter((m) => m.anexos.length === 0)
+            .map((m) => (m.papel === 'consultor' ? exemploLeitura(m, variante) : m))
+        : mensagens;
 
   return (
     <div className={shell.shell}>

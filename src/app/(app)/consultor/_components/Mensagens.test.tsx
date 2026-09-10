@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { MensagemDoConsultor } from '@/lib/consultor/queries';
 vi.mock('@/lib/consultor/salvar-resposta', () => ({ salvarResposta: vi.fn() }));
+vi.mock('@/lib/consultor/material-actions', () => ({
+  prepararRevisaoMaterial: vi.fn(),
+  salvarResumoMaterial: vi.fn(),
+}));
 
 vi.mock('./ConfirmarAcaoCrm', () => ({
   ConfirmarAcaoCrm: ({ mensagemId }: { mensagemId: string }) => (

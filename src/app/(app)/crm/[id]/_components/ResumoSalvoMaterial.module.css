@@ -1,0 +1,62 @@
+.registro {
+  scroll-margin-top: 100px;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  padding: var(--app-pad-card);
+  color: var(--via-text-primary);
+}
+.registro header {
+  display: flex;
+  gap: var(--via-space-4);
+  align-items: center;
+  padding-bottom: var(--via-space-5);
+}
+.registro:focus {
+  outline: none;
+}
+.registro:focus-visible {
+  box-shadow: var(--app-ring);
+}
+.registro header svg {
+  flex-shrink: 0;
+}
+.registro header span,
+.registro footer {
+  font-size: var(--via-fs-caption);
+  color: var(--via-text-muted);
+}
+.registro h2 {
+  margin: var(--via-space-1) 0 0;
+  font-size: var(--via-fs-h3);
+  overflow-wrap: anywhere;
+}
+.campos {
+  display: grid;
+  gap: var(--via-space-2);
+}
+.campos details {
+  border-top: 1px solid var(--app-elev-1-line);
+}
+.campos summary {
+  min-height: 48px;
+  align-content: center;
+  cursor: pointer;
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-medium);
+}
+.campos summary:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--app-ring);
+}
+.campos p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font-size: var(--via-fs-body);
+  line-height: var(--via-lh-normal);
+  margin: 0 0 var(--via-space-4);
+}
+.registro footer {
+  margin-top: var(--via-space-4);
+}

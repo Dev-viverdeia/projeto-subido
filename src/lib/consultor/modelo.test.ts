@@ -55,5 +55,59 @@ describe('pedido enviado ao modelo', () => {
     expect(parametros.safety_identifier).not.toContain('id-teste');
     expect(parametros.text.format.schema.properties).toHaveProperty('usar_venda_em_foco');
     expect(rodada.tokens).toBe(70);
+    expect(parametros.text.format.schema.properties).not.toHaveProperty('resumo_material');
+    expect(rodada.resumoMaterial).toBeNull();
+  });
+
+  it('pede resumo estruturado somente com anexos novos, sem incluir nomes de arquivo nas instruções', async () => {
+    const resumo = {
+      titulo: 'Resumo da conversa',
+      escopo: 'Triagem no WhatsApp.',
+      decisoes: '',
+      tarefas: '',
+      pendencias: 'Confirmar preço.',
+    };
+    const acao = {
+      titulo: 'Revisar o resumo',
+      detalhe: 'Confira o conteúdo antes de salvar na ficha.',
+      evidencia: 'Resumo revisado pelo usuário.',
+      destino: '/vendas',
+    };
+    parse.mockResolvedValue({
+      output_parsed: {
+        resposta: 'Revise o resumo antes de salvar.',
+        resumo_material: resumo,
+        proximo_passo: acao,
+        acoes: [],
+      },
+      id: 'resposta',
+      usage: {},
+    });
+    const resultado = await gerarRodadaSobral({
+      usuarioId: 'qa',
+      etapa: 'vender',
+      sinais: sinaisDeQualidade(),
+      historico: [],
+      pedido: 'Analise o áudio.',
+      anexos: [
+        {
+          id: '11111111-1111-4111-8111-111111111111',
+          nome: 'NOME-NAO-CONFIAVEL.webm',
+          categoria: 'audio',
+          transcricao: 'Só triagem.',
+        },
+      ],
+    });
+    const pedido = parse.mock.calls[0]?.[0] as {
+      instructions: string;
+      input: unknown[];
+      text: { format: { schema: { properties: Record<string, unknown> } } };
+    };
+    expect(pedido.text.format.schema.properties).toHaveProperty('resumo_material');
+    expect(pedido.instructions).toContain('RESUMO DO MATERIAL PARA REVISÃO');
+    expect(pedido.instructions).not.toContain('NOME-NAO-CONFIAVEL');
+    expect(JSON.stringify(pedido.input.at(-1))).toContain('Só triagem.');
+    expect(resultado.resumoMaterial).toEqual(resumo);
+    expect(parse).toHaveBeenCalledOnce();
   });
 });
