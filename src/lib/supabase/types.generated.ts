@@ -891,6 +891,32 @@ export type Database = {
           },
         ]
       }
+      consultor_respostas_salvas: {
+        Row: {
+          criado_em: string
+          dono: string
+          mensagem_id: string
+        }
+        Insert: {
+          criado_em?: string
+          dono: string
+          mensagem_id: string
+        }
+        Update: {
+          criado_em?: string
+          dono?: string
+          mensagem_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_respostas_salvas_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "consultor_mensagens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultor_threads: {
         Row: {
           atualizado_em: string
