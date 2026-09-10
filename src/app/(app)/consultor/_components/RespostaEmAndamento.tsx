@@ -2,12 +2,13 @@ import { LoaderCircle } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { blocosDaResposta } from './resposta';
 import styles from './Conversa.module.css';
-type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | 'finalizando' | null;
+type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | 'finalizando' | 'conferindo' | null;
 
 function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
   if (etapa === 'enviando') return 'Enviando mensagem';
   if (etapa === 'lendo') return 'Analisando seus arquivos';
   if (etapa === 'finalizando') return 'Salvando resposta';
+  if (etapa === 'conferindo') return 'Conferindo a resposta salva';
   if (comArquivos) return 'Preparando a resposta com seus dados';
   return 'Preparando uma resposta com seus dados';
 }
@@ -38,6 +39,7 @@ export function RespostaEmAndamento({
                   ? 'Confirmando envio'
                   : descricaoDaEtapa(etapa, comArquivos)}
             </strong>
+            {etapa === 'conferindo' && <small>Sem gerar uma nova resposta.</small>}
           </span>
         </div>
       ) : null}
@@ -61,9 +63,11 @@ export function RespostaEmAndamento({
         <span className={styles.estadoResposta} role="status">
           {parando
             ? 'Interrompendo…'
-            : etapa === 'finalizando'
-              ? 'Salvando resposta…'
-              : 'Respondendo…'}
+            : etapa === 'conferindo'
+              ? 'Conferindo a resposta salva…'
+              : etapa === 'finalizando'
+                ? 'Salvando resposta…'
+                : 'Respondendo…'}
         </span>
       ) : null}
     </>

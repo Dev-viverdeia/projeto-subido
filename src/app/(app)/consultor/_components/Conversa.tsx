@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import { ArrowRight, ArrowUp, Paperclip, Square } from 'lucide-react';
 import { ControlesGravacao } from './ControlesGravacao';
 import { RespostaEmAndamento } from './RespostaEmAndamento';
+import { RecuperarConversa } from './RecuperarConversa';
 import { useRespostaSobral } from './useRespostaSobral';
 import { registrarEnvio } from '@/lib/consultor/registrar-envio';
 import { SOBRAL_ACCEPT_ANEXOS, validarAnexosSobral } from '@/lib/consultor/anexos-contrato';
@@ -60,15 +61,21 @@ export function Conversa({
   const etapa = etapaEnvio ?? resposta.etapa;
   const [verificar, setVerificar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [tipoFalha, setTipoFalha] = useState<string>();
+  const registrando = useRef(false);
   const [navegando, iniciarNavegacao] = useTransition();
 
   const envioAnexos = useEnvioAnexos();
   const ocupado = etapa !== null || navegando || envioAnexos.pausado || verificar;
 
-  useEffect(() => {
-    if (acompanhar.current && (emVoo || respostaEmVoo || etapa))
-      fimRef.current?.scrollIntoView({ block: 'end' });
-  }, [emVoo, respostaEmVoo, etapa]);
+  useLayoutEffect(() => {
+    if (acompanhar.current && (emVoo || respostaEmVoo || etapa || erro)) {
+      const destino = erro
+        ? leituraRef.current?.querySelector('[data-ajuda-falha]')
+        : fimRef.current;
+      destino?.scrollIntoView({ block: 'end' });
+    }
+  }, [emVoo, respostaEmVoo, etapa, erro]);
 
   useEffect(() => {
     if (!fimRef.current || typeof IntersectionObserver === 'undefined') return;
@@ -94,7 +101,8 @@ export function Conversa({
   }, [ultimaMensagemId]);
 
   useEffect(() => {
-    if (pendente && threadId && ultimaMensagemId) void responder(threadId, ultimaMensagemId, false);
+    if (pendente && threadId && ultimaMensagemId)
+      void responder(threadId, ultimaMensagemId, false, false, true);
     // A pendência pertence à montagem desta conversa.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -141,14 +149,22 @@ export function Conversa({
     aoFalhar: setErro,
   });
 
-  async function responder(conversaId: string, mensagemId: string, nova: boolean, repetir = false) {
+  async function responder(
+    conversaId: string,
+    mensagemId: string,
+    nova: boolean,
+    repetir = false,
+    somenteConferir = verificar,
+  ) {
     setErro(null);
-    const resultado = await resposta.responder(conversaId, mensagemId, repetir, verificar);
+    setTipoFalha(undefined);
+    const resultado = await resposta.responder(conversaId, mensagemId, repetir, somenteConferir);
     if (!resultado) return;
     const { falha } = resultado;
     if (falha) {
       setErro(falha.mensagem);
-      setVerificar(falha.tipo === 'pendente');
+      setTipoFalha(falha.tipo);
+      setVerificar(falha.tipo === 'pendente' || falha.tipo === 'sessao');
       setThreadPendente(true);
       if (nova && falha.tipo && ['interrompida', 'falhou'].includes(falha.tipo))
         iniciarNavegacao(() => router.replace(`/consultor/${conversaId}`));
@@ -169,6 +185,7 @@ export function Conversa({
       (!mensagem && anexosDaRodada.length === 0) ||
       (!retomar && ocupado) ||
       etapa ||
+      registrando.current ||
       gravando ||
       preparando
     )
@@ -179,6 +196,8 @@ export function Conversa({
     }
 
     setErro(null);
+    setTipoFalha(undefined);
+    registrando.current = true;
     resposta.limpar();
     acompanhar.current = true;
     setEmVoo(mensagem || null);
@@ -192,6 +211,7 @@ export function Conversa({
       anexosDaRodada.length > 0
         ? await envioAnexos.enviar(mensagem, anexosDaRodada, threadEmUso)
         : await registrarEnvio(mensagem, anexosDaRodada, threadEmUso);
+    registrando.current = false;
     if (registro.falha || !registro.threadId || !registro.mensagemId) {
       setErro(registro.falha ?? 'Não foi possível enviar a mensagem.');
       if (anexosDaRodada.length === 0) {
@@ -254,39 +274,21 @@ export function Conversa({
         )}
 
         {erro && !etapa ? (
-          <div
-            className={styles.erro}
-            role={resposta.geracao?.estado === 'interrompida' ? 'status' : 'alert'}
-          >
-            <span>{erro}</span>
-            {envioAnexos.pausado ? (
-              <>
-                <button type="button" onClick={() => void enviar(true)}>
-                  {envioAnexos.progresso?.confirmando ? 'Confirmar envio' : 'Retomar envio'}
-                </button>
-                {!envioAnexos.progresso?.confirmando ? (
-                  <button type="button" onClick={() => void voltarAEdicao()}>
-                    Voltar à edição
-                  </button>
-                ) : null}
-              </>
-            ) : null}
-            {threadPendente && threadEmUso && perguntaRef.current ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setErro(null);
-                  void responder(threadEmUso, perguntaRef.current!, !threadId, true);
-                }}
-              >
-                {verificar
-                  ? 'Verificar resposta'
-                  : resposta.geracao?.estado === 'interrompida'
-                    ? 'Gerar novamente'
-                    : 'Tentar novamente'}
-              </button>
-            ) : null}
-          </div>
+          <RecuperarConversa
+            mensagem={erro}
+            tipo={tipoFalha}
+            threadId={threadEmUso}
+            verificar={verificar}
+            pausado={envioAnexos.pausado}
+            confirmando={Boolean(envioAnexos.progresso?.confirmando)}
+            retomar={() => void enviar(true)}
+            editar={() => void voltarAEdicao()}
+            responder={
+              threadPendente && threadEmUso && perguntaRef.current
+                ? () => void responder(threadEmUso, perguntaRef.current!, !threadId, true)
+                : undefined
+            }
+          />
         ) : null}
         {resposta.erroParar ? (
           <p className={styles.erro} role="alert">

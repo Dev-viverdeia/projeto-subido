@@ -28,9 +28,7 @@ describe('EstadoEnriquecimento', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Voltar para a ficha' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('alert', { name: 'Não foi possível atualizar a ficha.' }),
-    ).toBeVisible();
+    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível atualizar a ficha.');
   });
 
   it('abre o progresso acima da ficha e permite continuar trabalhando', () => {

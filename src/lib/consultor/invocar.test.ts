@@ -18,6 +18,7 @@ const opcoes = (): OpcoesResposta => ({
   tentativa: base.tentativa,
   signal: new AbortController().signal,
   aoEvento: vi.fn(),
+  aoConferir: vi.fn(),
 });
 const completo = { ...base, estado: 'concluida', texto: 'Pergunte sobre o atendimento atual.' };
 afterEach(() => {
@@ -26,6 +27,30 @@ afterEach(() => {
 });
 
 describe('recuperação da resposta', () => {
+  it('409 confere o resultado em vez de autorizar uma nova geração', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json({ erro: 'Confira a resposta existente.' }, { status: 409 }),
+      )
+      .mockResolvedValueOnce(Response.json({ geracao: completo }));
+    vi.stubGlobal('fetch', fetch);
+    const opts = opcoes();
+    expect((await responderPendente(base.thread_id, opts)).dados?.resposta).toBe(completo.texto);
+    expect(opts.aoConferir).toHaveBeenCalledOnce();
+    expect(fetch.mock.calls.map((c) => (c[1] as RequestInit).method ?? 'GET')).toEqual([
+      'POST',
+      'GET',
+    ]);
+  });
+  it('sessão expirada durante recuperação pede login sem novo POST', async () => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({ erro: 'Login' }, { status: 401 }));
+    vi.stubGlobal('fetch', fetch);
+    expect(
+      (await responderPendente(base.thread_id, { ...opcoes(), somenteConferir: true })).falha?.tipo,
+    ).toBe('sessao');
+    expect(fetch.mock.calls.every((c) => !(c[1] as RequestInit).method)).toBe(true);
+  });
   it('limite de concorrência preserva a pergunta e não repete POST automaticamente', async () => {
     const mensagem =
       'Você já tem respostas em andamento. Aguarde uma terminar; sua pergunta está salva.';

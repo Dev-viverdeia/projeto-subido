@@ -8,7 +8,9 @@ export function useRespostaSobral() {
   const controle = useRef<AbortController | null>(null);
   const [texto, setTexto] = useState<string | null>(null);
   const [geracao, setGeracao] = useState<GeracaoSobral | null>(null);
-  const [etapa, setEtapa] = useState<'lendo' | 'pensando' | 'finalizando' | null>(null);
+  const [etapa, setEtapa] = useState<'lendo' | 'pensando' | 'finalizando' | 'conferindo' | null>(
+    null,
+  );
   const [parando, setParando] = useState(false);
   const [erroParar, setErroParar] = useState<string | null>(null);
   useEffect(() => () => controle.current?.abort(), []);
@@ -19,12 +21,13 @@ export function useRespostaSobral() {
     repetir = false,
     somenteConferir = false,
   ) {
+    if (controle.current && !controle.current.signal.aborted) return null;
     controle.current?.abort();
     const atual = new AbortController();
     controle.current = atual;
     setParando(false);
     setErroParar(null);
-    setEtapa('pensando');
+    setEtapa(somenteConferir ? 'conferindo' : 'pensando');
     if (!somenteConferir) {
       setTexto(null);
       setGeracao(null);
@@ -35,6 +38,9 @@ export function useRespostaSobral() {
       repetir,
       somenteConferir,
       signal: atual.signal,
+      aoConferir: () => {
+        if (!atual.signal.aborted) setEtapa('conferindo');
+      },
       aoEvento: (evento) => {
         if (atual.signal.aborted) return;
         if (evento.tipo === 'texto') setTexto(evento.texto);
@@ -46,6 +52,7 @@ export function useRespostaSobral() {
         }
       },
     });
+    if (controle.current === atual) controle.current = null;
     if (atual.signal.aborted) return null;
     if (resultado.dados) setTexto(resultado.dados.resposta);
     setEtapa(null);

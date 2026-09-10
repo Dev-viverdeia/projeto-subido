@@ -116,6 +116,37 @@ describe('controles da resposta em tempo real', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Verificar resposta' }));
     await waitFor(() => expect(mocks.responder).toHaveBeenCalledTimes(2));
     expect(opts.somenteConferir).toBe(true);
+    expect(screen.getByRole('status')).toHaveTextContent('Conferindo a resposta salva');
+    expect(mocks.registrar).toHaveBeenCalledOnce();
+  });
+  it('sessão expirada oferece login em outra aba e volta à mesma pergunta por leitura', async () => {
+    await iniciar();
+    act(() => concluir({ dados: null, falha: { mensagem: 'Entre novamente.', tipo: 'sessao' } }));
+    expect(await screen.findByRole('link', { name: /Entrar na conta/ })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Verificar resposta' }));
+    await waitFor(() => expect(mocks.responder).toHaveBeenCalledTimes(2));
+    expect(opts.somenteConferir).toBe(true);
+    expect(mocks.registrar).toHaveBeenCalledOnce();
+  });
+  it('conferência mantém o trecho parcial visível e não envia duas solicitações por clique duplo', async () => {
+    await iniciar();
+    act(() => {
+      opts.aoEvento({ tipo: 'texto', texto: 'Trecho preservado.' });
+      opts.aoConferir?.();
+    });
+    expect(screen.getByText('Trecho preservado.')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Conferindo a resposta salva');
+    act(() => concluir({ dados: null, falha: { mensagem: 'A conexão caiu.', tipo: 'pendente' } }));
+    const botao = await screen.findByRole('button', { name: 'Verificar resposta' });
+    act(() => {
+      fireEvent.click(botao);
+      fireEvent.click(botao);
+    });
+    await waitFor(() => expect(mocks.responder).toHaveBeenCalledTimes(2));
+    expect(screen.getByText('Trecho preservado.')).toBeVisible();
   });
   it('falha ao parar é visível e permite repetir apenas a interrupção', async () => {
     mocks.parar.mockRejectedValueOnce(new Error('rede'));

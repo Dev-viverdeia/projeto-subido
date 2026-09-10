@@ -16,6 +16,7 @@ export type OpcoesResposta = {
   somenteConferir?: boolean;
   signal: AbortSignal;
   aoEvento: (evento: EventoSobral) => void;
+  aoConferir?: () => void;
 };
 const URL_RESPOSTA = '/api/consultor/responder';
 const CorpoGeracao = z.object({ geracao: GeracaoSobralSchema });
@@ -94,8 +95,14 @@ export async function responderPendente(
         signal: AbortSignal.any([opcoes.signal, AbortSignal.timeout(175_000)]),
       });
       if (!response.ok) {
-        if (response.status < 500)
-          return { dados: null, falha: { mensagem: await mensagemDoCorpo(response) } };
+        if (response.status < 500 && response.status !== 409)
+          return {
+            dados: null,
+            falha: {
+              mensagem: await mensagemDoCorpo(response),
+              tipo: response.status === 401 ? 'sessao' : 'recusada',
+            },
+          };
         throw new Error('conferir-recibo');
       }
       if (response.headers.get('content-type')?.includes('application/x-ndjson'))
@@ -113,7 +120,7 @@ export async function responderPendente(
   // A atribuição vem do callback de streaming; TypeScript não acompanha a mutação.
   let atual = geracao as GeracaoSobral | null;
   if (atual && atual.estado !== 'gerando') return resultado(atual);
-  receber({ tipo: 'etapa', etapa: 'pensando' });
+  opcoes.aoConferir?.();
   const limite = Date.now() + 250_000;
   let falhas = 0;
   let ausentes = 0;
@@ -127,7 +134,10 @@ export async function responderPendente(
         },
       );
       if (response.status === 401)
-        return { dados: null, falha: { mensagem: 'Faça login para recuperar a conversa.' } };
+        return {
+          dados: null,
+          falha: { mensagem: 'Entre novamente para conferir sua resposta.', tipo: 'sessao' },
+        };
       if (response.status === 404 && ++ausentes >= 3)
         return {
           dados: null,
@@ -152,6 +162,6 @@ export async function responderPendente(
   }
   return {
     dados: null,
-    falha: { mensagem: 'A conexão caiu. Confira a resposta antes de reenviar.', tipo: 'pendente' },
+    falha: { mensagem: 'Não foi possível confirmar a resposta.', tipo: 'pendente' },
   };
 }

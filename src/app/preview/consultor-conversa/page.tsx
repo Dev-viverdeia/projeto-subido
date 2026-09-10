@@ -133,8 +133,11 @@ const mensagens: MensagemDoConsultor[] = [
   },
 ];
 
-export default function PreviewConsultorConversaPage() {
+export default async function PreviewConsultorConversaPage({
+  searchParams,
+}: PageProps<'/preview/consultor-conversa'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const pendente = (await searchParams).pendente === '1';
 
   return (
     <div className={shell.shell}>
@@ -165,7 +168,11 @@ export default function PreviewConsultorConversaPage() {
       </aside>
 
       <main id="conteudo" className={shell.conteudo}>
-        <TelaSobral threads={[thread]} conversa={{ thread, mensagens }} modoPreview />
+        <TelaSobral
+          threads={[thread]}
+          conversa={{ thread, mensagens: pendente ? mensagens.slice(0, 2) : mensagens }}
+          modoPreview
+        />
       </main>
     </div>
   );

@@ -94,6 +94,7 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
 
       {falhaRecente && (
         <EstadoEnriquecimento
+          oportunidadeId={lead.oportunidade.id}
           status={falhaRecente.status}
           erro={falhaRecente.erro}
           acao={
