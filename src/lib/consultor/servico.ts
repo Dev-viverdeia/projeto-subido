@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Json } from '@/lib/supabase/types.generated';
 import type { Database } from '@/lib/supabase/types.generated';
 import { hashDoContexto, obterSinaisSobral } from './contexto';
+import { completarSinaisComCliente } from './cliente-contexto';
 import {
   detectarEtapaSobral,
   type EtapaSobral,
@@ -58,7 +59,13 @@ export async function produzirLeituraSobral({
   anexos?: readonly EntradaAnexoModelo[];
   fluxo?: Parameters<typeof gerarRodadaSobral>[0]['fluxo'];
 }): Promise<LeituraSobral> {
-  const sinais = await obterSinaisSobral(supabase);
+  const sinais = await completarSinaisComCliente(
+    supabase,
+    usuarioId,
+    await obterSinaisSobral(supabase),
+    pedido,
+    historico,
+  );
   const etapa = detectarEtapaSobral(sinais);
   const rodada = await gerarRodadaSobral({
     usuarioId,
@@ -100,6 +107,7 @@ export function direcaoDaMensagem(leitura: LeituraSobral): Json {
     acoes: leitura.plano.acoes as unknown as Json,
     gerado_em: leitura.plano.geradoEm,
     oportunidade_alvo: oportunidade?.oportunidadeId ?? null,
+    ficha_consultada: leitura.sinais.cliente?.ficha ?? null,
     contexto_acao:
       oportunidade && leitura.plano.proximoPasso.destino === '/vendas'
         ? {

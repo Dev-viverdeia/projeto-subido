@@ -245,6 +245,16 @@ export function contextoParaModelo(sinais: SinaisSobral): string {
   return JSON.stringify(
     {
       momento: sinais.momento,
+      cliente_consultado: sinais.cliente
+        ? {
+            estado: sinais.cliente.estado,
+            opcoes_para_esclarecer: sinais.cliente.opcoes,
+            empresa: sinais.cliente.ficha?.empresa ?? null,
+            consultada_em: sinais.cliente.ficha?.consultadaEm ?? null,
+            leitura_incompleta: sinais.cliente.ficha?.incompleta ?? false,
+            registros: sinais.cliente.fatos,
+          }
+        : null,
       etapa_da_venda_em_foco: sinais.foco?.etapa ?? null,
       venda_em_foco: sinais.foco
         ? {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DirecaoMensagemSchema, type AcaoSobral } from './direcao';
 import { direcaoDaMensagem, type LeituraSobral } from './servico';
 import { sinaisDeQualidade } from './qualidade-cenarios';
+import { sinaisClienteQualidade } from './cliente-qualidade';
 vi.mock('server-only', () => ({}));
 
 function leitura(destino: AcaoSobral['destino'], usarFoco: boolean): LeituraSobral {
@@ -41,6 +42,13 @@ function leitura(destino: AcaoSobral['destino'], usarFoco: boolean): LeituraSobr
 }
 
 describe('associação da resposta ao cliente correto', () => {
+  it('recibo da ficha é produzido pelo servidor, não pelo modelo', () => {
+    const dados = leitura('/vendas', false);
+    dados.sinais = sinaisClienteQualidade();
+    const mensagem = DirecaoMensagemSchema.parse(direcaoDaMensagem(dados));
+    expect(mensagem.ficha_consultada).toEqual(dados.sinais.cliente?.ficha);
+    expect(mensagem.contexto_acao).toBeNull();
+  });
   it.each(['/formacoes', '/solucoes', '/entregas', '/prospeccao', '/propostas/nova'] as const)(
     'não vincula %s à venda automática da conta',
     (destino) => {
