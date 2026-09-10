@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
 vi.mock('next/navigation', () => ({ useRouter: vi.fn() }));
-import { TrechoEncontrado } from './BuscaMensagens';
+import { TrechoEncontrado } from './TrechoEncontrado';
 it('destaca todas as ocorrências literais sem executar HTML ou regex', () => {
   const { container } = render(
     <TrechoEncontrado texto={'<script>20%_[x]</script> e 20%_[x]'} busca="20%_[x]" />,

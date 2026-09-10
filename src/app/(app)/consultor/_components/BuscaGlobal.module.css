@@ -1,0 +1,19 @@
+.resultado mark {
+  background: var(--via-navy-08);
+  color: var(--via-navy);
+  border-radius: 3px;
+  box-decoration-break: clone;
+}
+.metadados {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  font-size: var(--via-fs-caption);
+  line-height: var(--via-lh-normal);
+  color: var(--via-text-muted);
+}
+.rodape {
+  flex-wrap: wrap;
+  font-size: var(--via-fs-caption);
+}
