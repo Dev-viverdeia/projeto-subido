@@ -1,22 +1,51 @@
 'use client';
 
-/** Carrega o SDK só no envio. Falha de rede ou de download do módulo devolve
- * o compositor à edição; a UI preserva texto/anexos e não repete uma mutação. */
+export type TentativaTexto = {
+  threadId: string;
+  mensagemId: string;
+  mensagem: string;
+  nova: boolean;
+  dono?: string;
+  solicitado: boolean;
+};
+export type RegistroTexto =
+  | { threadId: string; mensagemId: string; falha: null }
+  | {
+      threadId: null;
+      mensagemId: null;
+      falha: string;
+      pendente: boolean;
+      tipo?: 'sessao';
+      ausente?: boolean;
+    };
+
+export function novaTentativaTexto(mensagem: string, threadId?: string): TentativaTexto {
+  return {
+    threadId: threadId ?? crypto.randomUUID(),
+    mensagemId: crypto.randomUUID(),
+    mensagem: mensagem.trim(),
+    nova: !threadId,
+    solicitado: false,
+  };
+}
+
+/** SDK fora do carregamento inicial. O recibo permanece na instância da tela,
+ * não no armazenamento do navegador. Reconectar nunca dispara este método. */
 export async function registrarEnvio(
-  mensagem: string,
-  arquivos: readonly File[],
-  threadId?: string,
-) {
+  tentativa: TentativaTexto,
+  somenteConferir = false,
+): Promise<RegistroTexto> {
   try {
-    const { criarConversa, adicionarMensagem } = await import('./criar');
-    return threadId
-      ? await adicionarMensagem(threadId, mensagem, arquivos)
-      : await criarConversa(mensagem, arquivos);
+    const { confirmarTexto } = await import('./envio-texto');
+    return await confirmarTexto(tentativa, somenteConferir);
   } catch {
     return {
       threadId: null,
-      falha:
-        'O envio não foi confirmado. Sua mensagem continua aqui. Confira a conexão e o histórico antes de reenviar.',
+      mensagemId: null,
+      falha: tentativa.solicitado
+        ? 'Falta confirmar o envio.'
+        : 'Não foi possível iniciar o envio. Sua pergunta continua aqui.',
+      pendente: tentativa.solicitado,
     };
   }
 }

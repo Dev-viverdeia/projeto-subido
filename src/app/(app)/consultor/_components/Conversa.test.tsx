@@ -1,11 +1,16 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type * as Registro from '@/lib/consultor/registrar-envio';
 
 const dependencias = vi.hoisted(() => ({
   refresh: vi.fn(),
   replace: vi.fn(),
-  criarConversa: vi.fn(),
-  adicionarMensagem: vi.fn(),
+  criarConversa:
+    vi.fn<(texto: string, arquivos: readonly File[]) => Promise<Registro.RegistroTexto>>(),
+  adicionarMensagem:
+    vi.fn<
+      (thread: string, texto: string, arquivos: readonly File[]) => Promise<Registro.RegistroTexto>
+    >(),
   enviarMensagem: vi.fn(),
   responderPendente: vi.fn(),
   enviarAnexos: vi.fn(),
@@ -16,9 +21,12 @@ const dependencias = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: dependencias.refresh, replace: dependencias.replace }),
 }));
-vi.mock('@/lib/consultor/criar', () => ({
-  criarConversa: dependencias.criarConversa,
-  adicionarMensagem: dependencias.adicionarMensagem,
+vi.mock('@/lib/consultor/registrar-envio', async (original) => ({
+  ...(await original<typeof Registro>()),
+  registrarEnvio: (tentativa: Registro.TentativaTexto) =>
+    tentativa.nova
+      ? dependencias.criarConversa(tentativa.mensagem, [])
+      : dependencias.adicionarMensagem(tentativa.threadId, tentativa.mensagem, []),
 }));
 vi.mock('@/lib/consultor/invocar', () => ({
   enviarMensagem: dependencias.enviarMensagem,
@@ -36,7 +44,7 @@ vi.mock('@/lib/consultor/envio-anexos', () => ({
 
 import { Conversa } from './Conversa';
 
-describe('Conversa integrada à Início', () => {
+describe('Conversa do Sobral AI', () => {
   beforeAll(() => {
     Reflect.defineProperty(Element.prototype, 'scrollIntoView', {
       configurable: true,
@@ -108,12 +116,17 @@ describe('Conversa integrada à Início', () => {
     expect(dependencias.criarConversa).toHaveBeenCalledOnce();
   });
 
-  it('recupera o compositor quando o envio rejeita, sem repetir automaticamente', async () => {
-    dependencias.criarConversa.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+  it('recupera o compositor se o registro não chegou a iniciar, sem repetir automaticamente', async () => {
+    dependencias.criarConversa.mockResolvedValueOnce({
+      threadId: null,
+      mensagemId: null,
+      falha: 'Não foi possível iniciar o envio.',
+      pendente: false,
+    });
     render(<Conversa />);
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Pedido preservado' } });
     fireEvent.submit(screen.getByRole('textbox').closest('form')!);
-    expect(await screen.findByRole('alert')).toHaveTextContent('O envio não foi confirmado');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível iniciar o envio');
     expect(screen.getByRole('textbox')).toHaveValue('Pedido preservado');
     expect(screen.getByRole('button', { name: 'Enviar mensagem' })).toBeEnabled();
     expect(dependencias.criarConversa).toHaveBeenCalledTimes(1);

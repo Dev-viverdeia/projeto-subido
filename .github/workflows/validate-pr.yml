@@ -93,6 +93,9 @@ jobs:
       - name: Concorrência e retomadas
         run: node scripts/perf/capacidade.mjs --contratos
 
+      - name: Primeiro envio do Sobral AI
+        run: node scripts/test-sobral-texto.mjs
+
       - name: Build
         run: npm run build
 

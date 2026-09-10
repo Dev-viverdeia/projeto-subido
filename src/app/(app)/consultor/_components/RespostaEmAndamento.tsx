@@ -2,10 +2,12 @@ import { LoaderCircle } from 'lucide-react';
 import { IconeProduto } from '@/components/brand/IconeProduto';
 import { blocosDaResposta } from './resposta';
 import styles from './Conversa.module.css';
-type EtapaProcessamento = 'enviando' | 'lendo' | 'pensando' | 'finalizando' | 'conferindo' | null;
+type EtapaProcessamento =
+  'enviando' | 'conferindo-envio' | 'lendo' | 'pensando' | 'finalizando' | 'conferindo' | null;
 
 function descricaoDaEtapa(etapa: EtapaProcessamento, comArquivos: boolean): string {
   if (etapa === 'enviando') return 'Enviando mensagem';
+  if (etapa === 'conferindo-envio') return 'Conferindo envio';
   if (etapa === 'lendo') return 'Analisando seus arquivos';
   if (etapa === 'finalizando') return 'Salvando resposta';
   if (etapa === 'conferindo') return 'Conferindo a resposta salva';

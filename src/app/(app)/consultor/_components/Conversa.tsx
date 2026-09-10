@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState, useTransition, type ReactNode } from 'react';
-import { ArrowRight, ArrowUp, Paperclip, Square } from 'lucide-react';
+import { ArrowUp, Paperclip, Square } from 'lucide-react';
 import { ControlesGravacao } from './ControlesGravacao';
 import { RespostaEmAndamento } from './RespostaEmAndamento';
 import { RecuperarConversa } from './RecuperarConversa';
 import { useRespostaSobral } from './useRespostaSobral';
-import { registrarEnvio } from '@/lib/consultor/registrar-envio';
+import { useEnvioTexto } from './useEnvioTexto';
+import { ExemplosConversa } from './ExemplosConversa';
 import { SOBRAL_ACCEPT_ANEXOS, validarAnexosSobral } from '@/lib/consultor/anexos-contrato';
 import { AnexosDaRodada } from './AnexosDaRodada';
 import { useEnvioAnexos } from './useEnvioAnexos';
@@ -57,7 +58,7 @@ export function Conversa({
   const [emVoo, setEmVoo] = useState<string | null>(null);
   const resposta = useRespostaSobral();
   const respostaEmVoo = resposta.texto;
-  const [etapaEnvio, setEtapaEnvio] = useState<'enviando' | null>(null);
+  const [etapaEnvio, setEtapaEnvio] = useState<'enviando' | 'conferindo-envio' | null>(null);
   const etapa = etapaEnvio ?? resposta.etapa;
   const [verificar, setVerificar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -66,7 +67,9 @@ export function Conversa({
   const [navegando, iniciarNavegacao] = useTransition();
 
   const envioAnexos = useEnvioAnexos();
-  const ocupado = etapa !== null || navegando || envioAnexos.pausado || verificar;
+  const envioTexto = useEnvioTexto();
+  const ocupado =
+    etapa !== null || navegando || envioAnexos.pausado || verificar || Boolean(envioTexto.pendente);
   const rodadaAtiva = emVoo !== null || arquivosEmVoo.length || respostaEmVoo !== null;
 
   useLayoutEffect(() => {
@@ -75,6 +78,7 @@ export function Conversa({
         ? leituraRef.current?.querySelector('[data-ajuda-falha]')
         : fimRef.current;
       destino?.scrollIntoView({ block: 'end' });
+      if (erro && destino instanceof HTMLElement) destino.focus({ preventScroll: true });
     }
   }, [emVoo, respostaEmVoo, etapa, erro]);
 
@@ -205,17 +209,18 @@ export function Conversa({
     setArquivosEmVoo(anexosDaRodada);
     setTexto('');
     setArquivos([]);
-    setEtapaEnvio('enviando');
+    setEtapaEnvio(envioTexto.pendente === 'conferir' ? 'conferindo-envio' : 'enviando');
 
     const nova = !threadEmUso;
     const registro =
       anexosDaRodada.length > 0
         ? await envioAnexos.enviar(mensagem, anexosDaRodada, threadEmUso)
-        : await registrarEnvio(mensagem, anexosDaRodada, threadEmUso);
+        : await envioTexto.enviar(mensagem, threadEmUso);
     registrando.current = false;
     if (registro.falha || !registro.threadId || !registro.mensagemId) {
       setErro(registro.falha ?? 'Não foi possível enviar a mensagem.');
-      if (anexosDaRodada.length === 0) {
+      if ('tipo' in registro && typeof registro.tipo === 'string') setTipoFalha(registro.tipo);
+      if (anexosDaRodada.length === 0 && !('pendente' in registro && registro.pendente)) {
         setEmVoo(null);
         setTexto(mensagem);
       }
@@ -243,6 +248,7 @@ export function Conversa({
     <div
       className={styles.conversa}
       data-conversa-ativa={Boolean(erro || rodadaAtiva) || undefined}
+      data-envio-incerto={Boolean(envioTexto.pendente) || undefined}
     >
       <div className={styles.leitura} ref={leituraRef} data-leitura-conversa>
         {historico}
@@ -280,6 +286,7 @@ export function Conversa({
             verificar={verificar}
             pausado={envioAnexos.pausado}
             confirmando={Boolean(envioAnexos.progresso?.confirmando)}
+            envioTexto={envioTexto.pendente}
             retomar={() => void enviar(true)}
             editar={() => void voltarAEdicao()}
             responder={
@@ -407,25 +414,14 @@ export function Conversa({
       !arquivosEmVoo.length &&
       emVoo === null &&
       respostaEmVoo === null ? (
-        <ul className={styles.chips} aria-label="Exemplos de perguntas">
-          {exemplos.map((exemplo) => (
-            <li key={exemplo.rotulo}>
-              <button
-                type="button"
-                disabled={ocupado}
-                onClick={() => {
-                  setTexto(exemplo.texto);
-                  campoRef.current?.focus();
-                }}
-              >
-                <span className={styles.chipTexto}>
-                  <strong>{exemplo.rotulo}</strong>
-                </span>
-                <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-              </button>
-            </li>
-          ))}
-        </ul>
+        <ExemplosConversa
+          exemplos={exemplos}
+          ocupado={ocupado}
+          escolher={(valor) => {
+            setTexto(valor);
+            campoRef.current?.focus();
+          }}
+        />
       ) : null}
     </div>
   );

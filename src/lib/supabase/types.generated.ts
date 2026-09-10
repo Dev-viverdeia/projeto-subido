@@ -4751,6 +4751,10 @@ export type Database = {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: boolean
       }
+      sobral_confirmar_texto: {
+        Args: { p_thread: string; p_mensagem: string; p_conteudo: string; p_nova: boolean };
+        Returns: string;
+      };
       sobral_confirmar_anexos: {
         Args: {
           p_anexos: Json
