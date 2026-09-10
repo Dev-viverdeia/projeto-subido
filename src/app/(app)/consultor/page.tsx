@@ -34,6 +34,8 @@ export default async function ConsultorPage({
 
   return (
     <TelaSobral
+      dono={data?.claims.sub}
+      chaveRascunho={projeto && tarefa ? `tarefa:${projeto.id}:${tarefa.id}` : undefined}
       threads={threads}
       conversa={null}
       contextoInicial={contextoInicial}

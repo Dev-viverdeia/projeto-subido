@@ -6,6 +6,7 @@ import type { RegistroTexto, TentativaTexto } from './registrar-envio';
 export async function confirmarTexto(
   tentativa: TentativaTexto,
   somenteConferir: boolean,
+  antesDeEnviar?: (tentativa: TentativaTexto) => void,
 ): Promise<RegistroTexto> {
   const falha = (
     mensagem: string,
@@ -52,6 +53,7 @@ export async function confirmarTexto(
   } else {
     // Marcado ANTES do POST: timeout, erro de rede e ACK inválido são ambíguos.
     tentativa.solicitado = true;
+    antesDeEnviar?.(tentativa);
     const { data, error, status } = await supabase
       .rpc('sobral_confirmar_texto', {
         p_thread: tentativa.threadId,

@@ -516,6 +516,10 @@
 }
 
 @media (max-width: 599px) {
+  /* Em 320px a saudação competia com os controles de retomada. */
+  .conversa[data-rascunho-ativo] .boasVindas {
+    display: none;
+  }
   /* Em 390 × 664 o compositor inativo ocupava 147px e cortava o aviso.
      Enquanto o texto aguarda confirmação, a ação fica na própria conversa. */
   .conversa[data-envio-incerto] .caixa {

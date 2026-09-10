@@ -13,6 +13,7 @@ export function RecuperarConversa({
   editar,
   responder,
   envioTexto,
+  rascunhoSeguro = false,
 }: {
   mensagem: string;
   tipo?: string;
@@ -24,6 +25,7 @@ export function RecuperarConversa({
   editar: () => void;
   responder?: () => void;
   envioTexto?: 'conferir' | 'retomar' | null;
+  rascunhoSeguro?: boolean;
 }) {
   const sessao = tipo === 'sessao';
   return (
@@ -36,7 +38,9 @@ export function RecuperarConversa({
         sessao
           ? 'Abra o login em outra aba e volte aqui. Não precisa reenviar sua pergunta.'
           : envioTexto
-            ? 'Mantenha esta aba aberta até confirmar.'
+            ? rascunhoSeguro
+              ? 'Você pode sair e retomar esta pergunta neste navegador.'
+              : 'Mantenha esta aba aberta até confirmar.'
             : verificar
               ? 'Verificar não inicia uma nova geração.'
               : undefined

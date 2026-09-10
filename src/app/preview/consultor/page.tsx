@@ -53,7 +53,7 @@ export default function PreviewConsultorPage() {
         </nav>
       </aside>
       <main id="conteudo" className={styles.conteudo}>
-        <TelaSobral threads={[]} conversa={null} />
+        <TelaSobral dono="11111111-1111-4111-8111-111111111111" threads={[]} conversa={null} />
       </main>
     </div>
   );

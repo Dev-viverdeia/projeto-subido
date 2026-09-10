@@ -1,0 +1,38 @@
+.aviso {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) var(--via-space-4);
+  border-bottom: 1px solid var(--via-border-hairline);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+.aviso p {
+  flex: 1;
+  margin: 0;
+  min-width: 160px;
+  text-wrap: pretty;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+.acoes button {
+  min-height: 44px;
+  padding: var(--via-space-2);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+.acoes button:hover {
+  background: var(--via-navy-04);
+}
+.acoes button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}

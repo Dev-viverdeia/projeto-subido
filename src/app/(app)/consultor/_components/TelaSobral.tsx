@@ -83,12 +83,16 @@ export function TelaSobral({
   contextoInicial,
   nome,
   modoPreview = false,
+  dono,
+  chaveRascunho,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
   contextoInicial?: ContextoSobralTarefa | null;
   nome?: string | null;
   modoPreview?: boolean;
+  dono?: string;
+  chaveRascunho?: string;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -168,6 +172,9 @@ export function TelaSobral({
 
         <div className={styles.areaChat}>
           <Conversa
+            key={`${dono ?? 'preview'}:${conversa?.thread.id ?? chaveRascunho ?? 'nova'}`}
+            dono={dono}
+            chaveRascunho={chaveRascunho}
             threadId={conversa?.thread.id}
             pendente={ultima?.papel === 'usuario'}
             ultimaMensagemId={ultima?.id}
