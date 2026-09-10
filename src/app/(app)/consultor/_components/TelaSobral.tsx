@@ -7,6 +7,7 @@ import type { MensagemDoConsultor, ThreadDoConsultor } from '@/lib/consultor/que
 import type { ExemploDoConsultor } from './Conversa';
 import { Conversa } from './Conversa';
 import { ListaConversas } from './ListaConversas';
+import historicoStyles from './ListaConversas.module.css';
 import { Mensagens } from './Mensagens';
 import styles from './TelaSobral.module.css';
 import type { ContextoSobralTarefa } from '@/lib/projetos-execucao/contexto-sobral';
@@ -85,6 +86,7 @@ export function TelaSobral({
   modoPreview = false,
   dono,
   chaveRascunho,
+  totalConversas = threads.length,
 }: {
   threads: ThreadDoConsultor[];
   conversa: ConversaCarregada;
@@ -93,6 +95,7 @@ export function TelaSobral({
   modoPreview?: boolean;
   dono?: string;
   chaveRascunho?: string;
+  totalConversas?: number;
 }) {
   const mensagens = conversa?.mensagens ?? [];
   const ultima = mensagens[mensagens.length - 1];
@@ -160,12 +163,19 @@ export function TelaSobral({
                 Nova conversa
               </Link>
             ) : null}
-            <HistoricoDropdown total={threads.length} rotulo="Conversas">
-              {threads.length > 0 ? (
-                <ListaConversas threads={threads} atualId={conversa?.thread.id} />
-              ) : (
-                <p className={styles.semHistorico}>Suas conversas aparecerão aqui.</p>
-              )}
+            <HistoricoDropdown
+              emPortal
+              total={totalConversas}
+              rotulo="Conversas"
+              painelClassName={historicoStyles.painel}
+            >
+              <ListaConversas
+                key={dono ?? 'preview'}
+                dono={dono}
+                total={totalConversas}
+                threads={threads}
+                atualId={conversa?.thread.id}
+              />
             </HistoricoDropdown>
           </div>
         </header>

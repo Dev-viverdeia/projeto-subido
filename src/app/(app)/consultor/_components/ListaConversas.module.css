@@ -1,57 +1,257 @@
+.painel[data-painel-historico] {
+  width: min(440px, calc(100vw - 48px));
+  max-height: min(560px, calc(100dvh - 240px));
+  padding: 0;
+  overflow: hidden;
+  background: var(--app-elev-3-bg);
+  backdrop-filter: blur(24px);
+  /* Opacidade no ancestral cancela o vidro. O painel do Sobral não usa a cascata genérica. */
+  animation: none;
+}
+.painel[data-painel-historico] li {
+  animation: none;
+}
+.historico {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  min-height: 0;
+}
+.busca {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-3) var(--via-space-4);
+  border-bottom: 1px solid var(--app-elev-1-line);
+  color: var(--via-text-muted);
+}
+.busca input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: var(--via-fs-body);
+  color: var(--via-text-primary);
+  border-radius: var(--app-radius-chip);
+  padding-inline: var(--via-space-2);
+}
+.busca input::-webkit-search-cancel-button {
+  display: none;
+}
+.busca input::placeholder {
+  color: var(--via-text-muted);
+  opacity: 1;
+}
+.resultados {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--via-space-2);
+  min-height: 0;
+}
 .lista {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+.linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: var(--via-space-1);
+  border-radius: var(--app-radius-card);
+}
+.linha + .linha {
+  margin-top: var(--via-space-1);
+}
+.conversa {
   display: flex;
   flex-direction: column;
   gap: var(--via-space-1);
-}
-
-.conversa {
-  display: flex;
-  align-items: baseline;
-  gap: var(--via-space-3);
   padding: var(--via-space-3);
+  min-width: 0;
   border-radius: var(--app-radius-control);
   text-decoration: none;
   transition: background-color var(--app-t-state);
 }
-
-.conversa:hover {
+.conversa:hover,
+.icone:hover {
   background: var(--via-navy-04);
   text-decoration: none;
 }
-
-.conversa:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
 .conversa[aria-current='page'] {
   background: var(--via-navy-08);
 }
-
 .titulo {
-  flex: 1;
   min-width: 0;
-  font-size: var(--via-fs-sm);
+  font-size: var(--via-fs-body);
   color: var(--via-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
-
 .data {
-  flex-shrink: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  color: var(--via-text-faint);
+  font-size: var(--via-fs-xs);
+  color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
-
+.icone {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--via-text-muted);
+  border-radius: var(--app-radius-control);
+  cursor: pointer;
+  transition: background-color var(--app-t-state);
+}
+.rodape {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-2) var(--via-space-4);
+  border-top: 1px solid var(--app-elev-1-line);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  min-height: 48px;
+}
+.rodape button,
+.estado button,
+.edicaoAcoes button {
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-sm);
+  cursor: pointer;
+}
+.rodape button {
+  white-space: nowrap;
+}
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  padding: var(--via-space-5) var(--via-space-3);
+  min-height: 150px;
+  text-align: center;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+}
+.estado p {
+  margin: 0;
+}
+.estado strong {
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+.edicao {
+  grid-column: 1 / -1;
+  padding: var(--via-space-3);
+  display: grid;
+  gap: var(--via-space-2);
+}
+.linha:has(.edicao) > .conversa {
+  display: none;
+}
+.edicao label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--via-space-2);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+}
+.edicao input {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  font: inherit;
+  font-size: var(--via-fs-body);
+  color: var(--via-text-primary);
+  background: var(--via-bg);
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-control);
+}
+.edicaoAcoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--via-space-2);
+  flex-wrap: wrap;
+}
+.edicao label span {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+.edicaoAcoes button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-1);
+}
+.edicaoAcoes .salvar {
+  background: var(--via-navy);
+  color: var(--via-white);
+  border-color: var(--via-navy);
+}
+.erro {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-sm);
+  line-height: 1.5;
+}
+.historico :is(button, input, a):focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.historico .salvar:focus-visible {
+  box-shadow: var(--app-ring);
+}
+.historico button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.girando {
+  animation: girar 1s linear infinite;
+}
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .painel[data-painel-historico] {
+    background: var(--via-bg);
+  }
+}
+/* QA WebKit a 320px expôs texto atrás mesmo com blur(24px) no computed.
+   No celular, a base sólida mantém leitura estável independentemente do motor. */
+@media (max-width: 599px) {
+  .painel[data-painel-historico] {
+    background: var(--via-surface-elev);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .conversa {
+  .historico * {
+    animation: none;
     transition: none;
   }
 }

@@ -16,8 +16,24 @@ import styles from '../mapa-jornada/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Sobral AI' };
 
-export default function PreviewConsultorPage() {
+export default async function PreviewConsultorPage({
+  searchParams,
+}: PageProps<'/preview/consultor'>) {
   if (process.env.NODE_ENV === 'production') notFound();
+  const mostrarHistorico = (await searchParams).historico === '1';
+  const threads = mostrarHistorico
+    ? Array.from({ length: 40 }, (_, i) => ({
+        id: `33333333-3333-4333-8333-${String(i + 1).padStart(12, '0')}`,
+        titulo:
+          i === 0
+            ? 'Proposta para Clínica Horizonte'
+            : i === 1
+              ? 'Plano de entrega'
+              : `Projeto de atendimento ${i + 1}`,
+        criadoEm: '2026-09-09T12:00:00Z',
+        atualizadoEm: '2026-09-10T12:00:00Z',
+      }))
+    : [];
 
   return (
     <div className={styles.shell}>
@@ -53,7 +69,12 @@ export default function PreviewConsultorPage() {
         </nav>
       </aside>
       <main id="conteudo" className={styles.conteudo}>
-        <TelaSobral dono="11111111-1111-4111-8111-111111111111" threads={[]} conversa={null} />
+        <TelaSobral
+          dono="11111111-1111-4111-8111-111111111111"
+          threads={threads}
+          totalConversas={mostrarHistorico ? 43 : 0}
+          conversa={null}
+        />
       </main>
     </div>
   );
