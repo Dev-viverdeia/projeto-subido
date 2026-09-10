@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OpcoesResposta } from '@/lib/consultor/invocar';
 import type { GeracaoSobral } from '@/lib/consultor/geracao-contrato';
+import type * as Registro from '@/lib/consultor/registrar-envio';
 const mocks = vi.hoisted(() => ({
   responder: vi.fn(),
   parar: vi.fn(),
@@ -15,7 +16,10 @@ vi.mock('@/lib/consultor/invocar', () => ({
   responderPendente: mocks.responder,
   pararResposta: mocks.parar,
 }));
-vi.mock('@/lib/consultor/registrar-envio', () => ({ registrarEnvio: mocks.registrar }));
+vi.mock('@/lib/consultor/registrar-envio', async (original) => ({
+  ...(await original<typeof Registro>()),
+  registrarEnvio: mocks.registrar,
+}));
 vi.mock('./useEnvioAnexos', () => ({ useEnvioAnexos: () => ({ pausado: false }) }));
 import { Conversa } from './Conversa';
 const geracao: GeracaoSobral = {
@@ -56,6 +60,68 @@ async function iniciar() {
   act(() => opts.aoEvento({ tipo: 'estado', geracao }));
 }
 describe('controles da resposta em tempo real', () => {
+  it('primeiro envio incerto mantém a pergunta e confere o mesmo recibo sem registrar outra', async () => {
+    mocks.registrar.mockResolvedValueOnce({
+      threadId: null,
+      mensagemId: null,
+      falha: 'Envio não confirmado.',
+      pendente: true,
+    });
+    render(<Conversa boasVindas={<h1>Conversa nova</h1>} />);
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Quero vender meu primeiro projeto.' },
+    });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    const botao = await screen.findByRole('button', { name: 'Conferir envio' });
+    expect(screen.getByText('Quero vender meu primeiro projeto.')).toBeVisible();
+    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(mocks.responder).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: 'Voltar à edição' })).toBeNull();
+    fireEvent.click(botao);
+    await waitFor(() => expect(mocks.responder).toHaveBeenCalledOnce());
+    expect(mocks.registrar.mock.calls[0]?.[0]).toBe(mocks.registrar.mock.calls[1]?.[0]);
+    expect(mocks.registrar.mock.calls[1]?.[1]).toBe(true);
+  });
+  it('recibo ausente só retoma por escolha do usuário e mantém os mesmos IDs', async () => {
+    mocks.registrar.mockResolvedValueOnce({ falha: 'Envio não confirmado.', pendente: true });
+    mocks.registrar.mockResolvedValueOnce({
+      falha: 'Envio não localizado.',
+      pendente: true,
+      ausente: true,
+    });
+    render(<Conversa />);
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Minha primeira pergunta.' },
+    });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    fireEvent.click(await screen.findByRole('button', { name: 'Conferir envio' }));
+    const retomar = await screen.findByRole('button', { name: 'Retomar envio' });
+    expect(mocks.responder).not.toHaveBeenCalled();
+    expect(mocks.registrar).toHaveBeenCalledTimes(2);
+    act(() => {
+      fireEvent.click(retomar);
+      fireEvent.click(retomar);
+    });
+    await waitFor(() => expect(mocks.responder).toHaveBeenCalledOnce());
+    expect(mocks.registrar).toHaveBeenCalledTimes(3);
+    expect(mocks.registrar.mock.calls[2]?.[0]).toBe(mocks.registrar.mock.calls[0]?.[0]);
+    expect(mocks.registrar.mock.calls[2]?.[1]).toBe(false);
+  });
+  it('falha anterior ao POST mantém edição e não obriga conferir um envio inexistente', async () => {
+    mocks.registrar.mockResolvedValueOnce({
+      falha: 'Entre na conta.',
+      pendente: false,
+      tipo: 'sessao',
+    });
+    render(<Conversa />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Minha pergunta.' } });
+    fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Entre na conta.');
+    expect(screen.getByRole('textbox')).toHaveValue('Minha pergunta.');
+    expect(screen.getByRole('textbox')).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Conferir envio' })).toBeNull();
+    expect(mocks.responder).not.toHaveBeenCalled();
+  });
   it('limite simultâneo permite tentar a mesma pergunta sem cadastrá-la de novo', async () => {
     const mensagem =
       'Você já tem respostas em andamento. Aguarde uma terminar; sua pergunta está salva.';

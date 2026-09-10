@@ -516,6 +516,12 @@
 }
 
 @media (max-width: 599px) {
+  /* Em 390 × 664 o compositor inativo ocupava 147px e cortava o aviso.
+     Enquanto o texto aguarda confirmação, a ação fica na própria conversa. */
+  .conversa[data-envio-incerto] .caixa {
+    display: none;
+  }
+
   .balao {
     max-width: calc(100% - var(--via-space-5));
     font-size: var(--via-fs-body);

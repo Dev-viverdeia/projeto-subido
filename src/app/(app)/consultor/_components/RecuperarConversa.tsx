@@ -12,6 +12,7 @@ export function RecuperarConversa({
   retomar,
   editar,
   responder,
+  envioTexto,
 }: {
   mensagem: string;
   tipo?: string;
@@ -22,6 +23,7 @@ export function RecuperarConversa({
   retomar: () => void;
   editar: () => void;
   responder?: () => void;
+  envioTexto?: 'conferir' | 'retomar' | null;
 }) {
   const sessao = tipo === 'sessao';
   return (
@@ -33,9 +35,11 @@ export function RecuperarConversa({
       descricao={
         sessao
           ? 'Abra o login em outra aba e volte aqui. Não precisa reenviar sua pergunta.'
-          : verificar
-            ? 'Verificar não inicia uma nova geração.'
-            : undefined
+          : envioTexto
+            ? 'Mantenha esta aba aberta até confirmar.'
+            : verificar
+              ? 'Verificar não inicia uma nova geração.'
+              : undefined
       }
       acao={
         <>
@@ -60,6 +64,11 @@ export function RecuperarConversa({
                 </button>
               )}
             </>
+          )}
+          {envioTexto && (
+            <button type="button" onClick={retomar}>
+              {envioTexto === 'conferir' ? 'Conferir envio' : 'Retomar envio'}
+            </button>
           )}
           {responder && (
             <button type="button" onClick={responder}>
