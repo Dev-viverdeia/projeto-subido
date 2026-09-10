@@ -18,6 +18,8 @@
   justify-content: center;
   gap: var(--via-space-2);
   min-height: 44px;
+  min-width: 0;
+  padding: var(--via-space-2);
   border: 1px solid transparent;
   border-radius: var(--app-radius-control);
   font: inherit;
@@ -152,6 +154,11 @@
 }
 .girando {
   animation: girar 1s linear infinite;
+}
+@media (max-width: 599px) {
+  .abas button svg {
+    display: none;
+  }
 }
 @keyframes girar {
   to {

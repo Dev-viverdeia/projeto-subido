@@ -109,7 +109,7 @@ test('abas por teclado, respostas tardias ignoradas e painel cabe em telas peque
   if (info.project.name === 'mobile') await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole('button', { name: /Conversas/ }).click();
   await page.getByRole('tab', { name: 'Recentes' }).focus();
-  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowLeft');
   const salvas = page.getByRole('tab', { name: 'Salvas' });
   await expect(salvas).toBeFocused();
   await expect(salvas).toHaveAttribute('aria-selected', 'true');

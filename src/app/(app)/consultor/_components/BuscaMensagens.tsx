@@ -1,38 +1,15 @@
 'use client';
 
-import { Fragment, useRef, useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, LoaderCircle, Search, X } from 'lucide-react';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { useBuscaMensagens } from './useBuscaMensagens';
 import { anunciarBuscaMensagem, focarMensagem } from './focarMensagem';
+import { TrechoEncontrado } from './TrechoEncontrado';
 import compartilhado from './ArquivosConversa.module.css';
 import styles from './BuscaMensagens.module.css';
 
-/** Destaque feito com nós React, nunca HTML interpretado nem expressão regular do usuário. */
-export function TrechoEncontrado({ texto, busca }: { texto: string; busca: string }) {
-  const termo = busca.trim().toLowerCase();
-  if (!termo) return <>{texto}</>;
-  const partes = [];
-  let inicio = 0;
-  let posicao = texto.toLowerCase().indexOf(termo);
-  while (posicao >= 0) {
-    partes.push(
-      <Fragment key={posicao}>
-        {texto.slice(inicio, posicao)}
-        <mark>{texto.slice(posicao, posicao + termo.length)}</mark>
-      </Fragment>,
-    );
-    inicio = posicao + termo.length;
-    posicao = texto.toLowerCase().indexOf(termo, inicio);
-  }
-  return (
-    <>
-      {partes}
-      {texto.slice(inicio)}
-    </>
-  );
-}
 const dataLegivel = (valor: string) =>
   new Intl.DateTimeFormat('pt-BR', {
     day: 'numeric',

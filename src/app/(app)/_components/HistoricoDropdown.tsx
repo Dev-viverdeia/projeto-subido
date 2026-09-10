@@ -44,17 +44,21 @@ export function HistoricoDropdown({
   const raiz = useRef<HTMLDivElement>(null);
   const gatilho = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
-  const [posicao, setPosicao] = useState({ top: 0, right: 0, maxHeight: 560 });
+  const [posicao, setPosicao] = useState({ top: 0, right: 0, maxHeight: 560, maxWidth: 440 });
 
   function posicionar() {
     const rect = gatilho.current?.getBoundingClientRect();
     if (!rect) return;
-    const altura = window.visualViewport?.height ?? window.innerHeight;
-    const top = Math.max(16, Math.min(rect.bottom + 8, altura - 240));
+    // getBoundingClientRect mede pixels já ampliados por zoom CSS. O portal usa
+    // unidades de layout; sem converter, o deslocamento e a altura dobram a 200%.
+    const escala = Number.parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const altura = (window.visualViewport?.height ?? window.innerHeight) / escala;
+    const top = Math.max(16, Math.min(rect.bottom / escala + 8, altura - 240));
     setPosicao({
       top,
-      right: Math.max(16, window.innerWidth - rect.right),
+      right: Math.max(16, (window.innerWidth - rect.right) / escala),
       maxHeight: Math.min(560, altura - top - 16),
+      maxWidth: window.innerWidth / escala - 32,
     });
   }
 
