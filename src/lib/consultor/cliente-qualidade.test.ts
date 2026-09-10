@@ -24,6 +24,22 @@ describe.skipIf(process.env.SUBIDO_AVALIAR_SOBRAL !== '1')('IA real com ficha fi
         };
       }
       if ('incompleta' in cenario) sinais.cliente!.ficha!.incompleta = true;
+      if ('cadastroSomente' in cenario) {
+        sinais.foco = { ...sinais.foco!, empresa: 'Loja Cedro', titulo: 'Relatórios de vendas' };
+        sinais.cliente!.ficha = {
+          ...sinais.cliente!.ficha!,
+          empresa: 'Loja Cedro',
+          fontes: [{ nome: 'Cadastro', registros: 1, atualizadaEm: sinais.momento }],
+        };
+        sinais.cliente!.fatos = [
+          {
+            fonte: 'Cadastro',
+            natureza: 'registro',
+            texto: 'Loja Cedro · Relatórios de vendas · etapa: descoberta · situação: ativa',
+            data: sinais.momento,
+          },
+        ];
+      }
       const inicio = Date.now();
       const rodada = await gerarRodadaSobral({
         usuarioId: '00000000-0000-4000-8000-000000000001',

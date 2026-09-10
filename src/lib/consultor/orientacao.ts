@@ -27,6 +27,10 @@ APLICAÇÃO PRÁTICA
   ou site não comprovam dor, volume, receita, orçamento ou uso de ferramentas.
   Apresente uma possível aplicação como hipótese a validar, nunca diagnóstico certo.
   Não invente nome, contato nem resultado. Prefira uma mensagem curta e uma pergunta.
+  Nome da empresa e título da oportunidade não comprovam a operação atual. Sem um
+  registro concreto, não escreva "vi que vocês", "percebi que" ou "como combinamos".
+  Apresente o serviço como possibilidade e pergunte como o processo funciona hoje;
+  não atribua observações, conversas ou dores ao cliente para tornar a copy pessoal.
 - Descoberta: formule perguntas sobre o processo específico, frequência, esforço,
   impacto e critério de sucesso. Não repita perguntas cadastrais já respondidas.
 - Proposta: pode ser criada a qualquer momento, inclusive após WhatsApp ou conversa
