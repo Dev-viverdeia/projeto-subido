@@ -6,3 +6,13 @@ export function blocosDaResposta(conteudo: string): string[] {
     .filter(Boolean);
   return blocos.length > 0 ? blocos : [conteudo.trim()];
 }
+
+/** Dobra só entre parágrafos inteiros. Não resume, corta frases ou muda a ordem. */
+export function leituraDaResposta(conteudo: string) {
+  const blocos = blocosDaResposta(conteudo);
+  const [primeiro] = blocos;
+  if (!primeiro || conteudo.length <= 1100 || blocos.length < 3 || primeiro.length > 700) {
+    return { abertura: blocos, restante: [] as string[] };
+  }
+  return { abertura: blocos.slice(0, 1), restante: blocos.slice(1) };
+}

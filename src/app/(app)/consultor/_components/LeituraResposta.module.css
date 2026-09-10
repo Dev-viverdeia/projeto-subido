@@ -1,0 +1,239 @@
+.resposta,
+.proximoPasso,
+.recomendacao {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text-primary);
+  backdrop-filter: blur(18px) saturate(132%);
+  overflow-wrap: anywhere;
+}
+.resposta {
+  padding: var(--via-space-5) var(--via-space-6);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+.prosa p {
+  max-width: 58ch;
+  margin: 0;
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+.prosa p + p {
+  margin-top: var(--via-space-5);
+}
+.continuacao,
+.motivo,
+.maisRecomendacoes {
+  min-width: 0;
+}
+.continuacao {
+  margin-top: var(--via-space-3);
+}
+.continuacao summary,
+.motivo summary,
+.maisRecomendacoes > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  min-height: 44px;
+  padding-block: var(--via-space-2);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-normal);
+  cursor: pointer;
+  list-style: none;
+}
+.continuacao summary::-webkit-details-marker,
+.motivo summary::-webkit-details-marker,
+.maisRecomendacoes > summary::-webkit-details-marker {
+  display: none;
+}
+.continuacao summary:hover,
+.motivo summary:hover,
+.maisRecomendacoes > summary:hover {
+  color: var(--via-text-primary);
+}
+.continuacao summary:focus-visible,
+.motivo summary:focus-visible,
+.maisRecomendacoes > summary:focus-visible,
+.recurso:focus-visible,
+.linkDiscreto:focus-visible,
+.acaoPrincipal:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+.continuacao[open] > summary svg,
+.motivo[open] > summary svg,
+.maisRecomendacoes[open] > summary svg {
+  transform: rotate(180deg);
+}
+.quandoAberto {
+  display: none;
+}
+.continuacao[open] > summary .quandoAberto,
+.maisRecomendacoes[open] > summary .quandoAberto {
+  display: inline;
+}
+.continuacao[open] > summary .quandoFechado,
+.maisRecomendacoes[open] > summary .quandoFechado {
+  display: none;
+}
+.continuacao > .prosa {
+  padding-top: var(--via-space-3);
+}
+.proximoPasso {
+  padding: var(--via-space-5) var(--via-space-6);
+}
+.acaoCabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-5);
+}
+.acaoCabecalho > div,
+.recursoTexto {
+  display: grid;
+  min-width: 0;
+  gap: var(--via-space-1);
+}
+.acaoCabecalho strong,
+.recursoTexto strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-body);
+  font-weight: var(--via-fw-semibold);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+.rotulo {
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-caption);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-normal);
+}
+.acaoPrincipal {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-semibold);
+  text-decoration: none;
+}
+.acaoPrincipal:hover {
+  background: var(--via-navy-deep);
+  color: var(--via-white);
+  text-decoration: none;
+}
+.motivo {
+  grid-column: 1 / -1;
+}
+.motivo p {
+  max-width: 62ch;
+  margin: 0 0 var(--via-space-3);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.motivo p strong {
+  display: block;
+  color: var(--via-text-primary);
+  font-weight: var(--via-fw-medium);
+}
+.linkDiscreto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: var(--via-space-2);
+  border-radius: var(--app-radius-control);
+  font-size: var(--via-fs-sm);
+  color: var(--via-text-primary);
+}
+.recomendacoes {
+  min-width: 0;
+}
+.recomendacao {
+  padding: var(--via-space-4) var(--via-space-5);
+}
+.recurso {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 52px;
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  text-decoration: none;
+}
+.recurso:hover {
+  color: var(--via-text-primary);
+  text-decoration: none;
+}
+.recurso:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.icone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 48px;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-navy);
+}
+.recomendacao .motivo {
+  margin-left: calc(44px + var(--via-space-3));
+}
+.maisRecomendacoes > summary {
+  padding-inline: var(--via-space-4);
+  margin-top: var(--via-space-1);
+}
+.maisRecomendacoes > ul {
+  display: grid;
+  gap: var(--via-space-3);
+  margin: var(--via-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .resposta,
+  .proximoPasso,
+  .recomendacao {
+    background: var(--via-surface);
+  }
+}
+@media (max-width: 599px) {
+  .resposta,
+  .proximoPasso,
+  .recomendacao {
+    padding: var(--via-space-4);
+  }
+  .resposta {
+    font-size: var(--via-fs-body);
+  }
+  .acaoCabecalho {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--via-space-3);
+  }
+  .recomendacao .motivo {
+    margin-left: 0;
+  }
+}

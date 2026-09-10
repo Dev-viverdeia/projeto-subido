@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, type ReactNode } from 'react';
 import { Check, ClipboardCheck, LoaderCircle, PencilLine, X } from 'lucide-react';
 import { confirmarAcaoCrm, type EstadoConfirmarAcaoCrm } from '@/lib/consultor/actions';
 import type { AcaoConfirmadaCrm, ContextoAcaoCrm } from '@/lib/consultor/direcao';
@@ -31,12 +31,14 @@ export function ConfirmarAcaoCrm({
   confirmada = null,
   modoPreview = false,
   gerarProximoPasso = false,
+  detalhes,
 }: {
   mensagemId: string;
   contexto: ContextoAcaoCrm;
   confirmada?: AcaoConfirmadaCrm | null;
   modoPreview?: boolean;
   gerarProximoPasso?: boolean;
+  detalhes?: ReactNode;
 }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
@@ -96,13 +98,14 @@ export function ConfirmarAcaoCrm({
           <ClipboardCheck size={17} strokeWidth={1.9} />
         </span>
         <span className={styles.conviteCorpo}>
-          <small>Ação pronta para a ficha</small>
+          <small>Próximo passo · Vendas</small>
           <strong>{contexto.acao_sugerida}</strong>
           <em>{contexto.empresa}</em>
         </span>
         <button type="button" className={styles.revisar} onClick={() => setAberto(true)}>
           Revisar <PencilLine size={14} strokeWidth={2} aria-hidden="true" />
         </button>
+        {detalhes}
       </aside>
     );
   }

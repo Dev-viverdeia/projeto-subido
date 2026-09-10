@@ -8,7 +8,6 @@
   flex-direction: column;
   gap: var(--via-space-8);
 }
-
 .audioComTranscricao {
   width: min(100%, 430px);
 }
@@ -32,340 +31,61 @@
   overflow-wrap: anywhere;
   line-height: var(--via-lh-normal);
 }
-
 .doUsuario,
 .doConsultor {
   min-width: 0;
   display: flex;
 }
-
 .doUsuario {
   justify-content: flex-end;
 }
-
 .texto {
   margin: 0;
-  max-width: 70ch;
+  max-width: 52ch;
   padding: var(--via-space-4) var(--via-space-5);
   border-radius: var(--app-radius-card);
+  background: var(--via-navy);
+  color: var(--via-white);
   font-size: 1.0625rem;
   line-height: 1.62;
   white-space: pre-wrap;
   text-wrap: pretty;
 }
-
-.doUsuario .texto {
-  max-width: 52ch;
-  background: var(--via-navy);
-  color: var(--via-white);
-}
-
-.doConsultor .texto {
-  padding: var(--via-space-5) var(--via-space-6);
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-glass-plane);
-  color: var(--via-text-primary);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: blur(18px) saturate(132%);
-}
-
-.doConsultor .texto p {
-  margin: 0;
-}
-
-.doConsultor .texto p + p {
-  margin-top: var(--via-space-3);
-  padding-top: var(--via-space-3);
-  border-top: 1px solid var(--via-border-hairline);
-}
-
 .utilidadesResposta {
   min-height: 32px;
   display: flex;
   align-items: center;
   padding-left: var(--via-space-1);
 }
-
 .corpo {
   display: flex;
   flex-direction: column;
-  gap: var(--via-space-2);
+  gap: var(--via-space-3);
   min-width: 0;
-  max-width: min(100%, 900px);
+  max-width: min(100%, 820px);
 }
-
 .doUsuario .corpo {
   align-items: flex-end;
 }
-
 .doConsultor .corpo {
-  width: min(100%, 900px);
+  width: min(100%, 820px);
 }
-
 .autor {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
-  letter-spacing: var(--app-ls-micro);
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
 }
-
-.anexos {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--via-space-2);
-}
-
 .audios {
   width: min(100%, 430px);
   display: grid;
   gap: var(--via-space-2);
 }
-
-.anexos li {
-  min-width: 0;
-  max-width: min(100%, 280px);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--via-space-2);
-  padding: var(--via-space-2) var(--via-space-3);
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.anexos li span {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.compacta .corpo {
-  max-width: min(100%, 900px);
-}
-
 .compacta .texto {
-  max-width: 64ch;
   padding: var(--via-space-3) var(--via-space-4);
   font-size: var(--via-fs-body);
-}
-
-.compacta .cartoes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-}
-
-.compacta .cartaoMotivo {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.direcao {
-  overflow: hidden;
-  position: relative;
-  display: grid;
-  gap: var(--via-space-2);
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--via-space-5);
-  padding: var(--via-space-5) var(--via-space-6);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-card);
-  background: var(--app-glass-plane);
-  color: var(--via-text-primary);
-  box-shadow: var(--app-elev-1-shadow);
-  backdrop-filter: blur(18px) saturate(132%);
-}
-
-.direcao::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 2px;
-  background: var(--via-navy);
-}
-
-.direcaoRotulo {
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--via-space-1);
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.direcao > strong {
-  grid-column: 1;
-  font-size: var(--via-fs-body);
-  line-height: var(--via-lh-snug);
-}
-
-.direcao > p {
-  grid-column: 1;
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-muted);
-}
-
-.direcaoAcao {
-  grid-column: 2;
-  grid-row: 1 / span 3;
-  display: inline-flex;
-  align-items: center;
-  justify-self: start;
-  gap: var(--via-space-1);
-  min-height: 42px;
-  padding-inline: var(--via-space-4);
-  border-radius: var(--app-radius-control);
-  background: var(--via-navy);
-  color: var(--via-white);
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-semibold);
-  text-decoration: none;
-}
-
-.direcaoAcao:hover {
-  background: var(--via-navy-deep);
-  color: var(--via-white);
-  text-decoration: none;
-}
-
-.direcaoAcao:focus-visible {
-  border-radius: var(--app-radius-control);
-  outline: none;
-  box-shadow: var(--app-ring-onnavy);
-}
-
-.cartoes {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--via-space-3);
-}
-
-/* O cartão herda a gramática do card da casa: superfície ergue no hover, o
-   raio é o de card, e a hierarquia é rótulo mono → título → ação em accent-ink. */
-.cartao {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-  padding: var(--via-space-5);
-  border-radius: var(--app-radius-card);
-  border: 1px solid var(--app-elev-1-line);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-  text-decoration: none;
-  transition:
-    border-color var(--app-t-state),
-    box-shadow var(--app-t-state);
-}
-
-.cartao:hover {
-  border-color: var(--app-elev-2-line);
-  box-shadow: var(--app-elev-2-shadow);
-  text-decoration: none;
-}
-
-.cartao:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
-}
-
-.cartaoRotulo {
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.cartaoTitulo {
-  font-size: 0.9375rem;
-  font-weight: var(--via-fw-medium);
-  color: var(--via-text-primary);
-}
-
-.cartaoMotivo {
-  color: var(--via-text-muted);
-  font-size: 0.8125rem;
-  line-height: var(--via-lh-normal);
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.cartaoAcao {
-  margin-top: var(--via-space-1);
-  font-size: 0.8125rem;
-  font-weight: var(--via-fw-medium);
-  color: var(--via-accent-ink);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cartao {
-    transition: none;
-  }
-}
-
-@supports not (backdrop-filter: blur(1px)) {
-  .doConsultor .texto,
-  .direcao {
-    background: var(--via-surface);
-  }
-}
-
-@media (max-width: 599px) {
-  .corpo {
-    max-width: calc(100% - var(--via-space-6));
-  }
-
-  .texto {
-    padding: var(--via-space-4);
-    font-size: var(--via-fs-body);
-    line-height: 1.6;
-  }
-
-  .compacta .corpo {
-    max-width: calc(100% - var(--via-space-4));
-  }
-
-  .compacta .cartoes {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .direcao {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .direcaoAcao {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: stretch;
-    justify-content: center;
-  }
-
-  .cartoes {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 .arquivosEnviados {
   list-style: none;
@@ -377,4 +97,11 @@
 }
 .arquivosEnviados > li {
   width: min(100%, 430px);
+}
+@media (max-width: 599px) {
+  .texto {
+    padding: var(--via-space-4);
+    font-size: var(--via-fs-body);
+    line-height: 1.6;
+  }
 }

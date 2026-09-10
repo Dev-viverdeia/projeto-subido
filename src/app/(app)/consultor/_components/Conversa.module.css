@@ -48,17 +48,16 @@
 .respostaConsultor {
   align-items: flex-start;
   gap: var(--via-space-2);
+  width: min(100%, 820px);
 }
 
 .autorResposta {
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  color: var(--via-text-faint);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-xs);
-  letter-spacing: var(--app-ls-label);
-  text-transform: uppercase;
+  color: var(--via-text-muted);
+  font-size: var(--via-fs-sm);
+  font-weight: var(--via-fw-medium);
 }
 
 .balao {
@@ -76,19 +75,6 @@
   align-self: flex-end;
   background: var(--via-navy);
   color: var(--via-white);
-}
-
-.doConsultor {
-  padding: 0;
-  color: var(--via-text-primary);
-}
-
-.doConsultor p {
-  margin: 0;
-}
-
-.doConsultor p + p {
-  margin-top: var(--via-space-3);
 }
 
 .anexosEmVoo {
