@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './HistoricoDropdown.module.css';
 
 /**
@@ -24,25 +25,45 @@ export function HistoricoDropdown({
   total,
   rotulo = 'Seus projetos',
   children,
+  painelClassName,
+  emPortal = false,
 }: {
   total: number;
   /** "Seus projetos" no Builder, "Suas conversas" no Consultor. */
   rotulo?: string;
   children: ReactNode;
+  painelClassName?: string;
+  /** Sobral usa portal para sair dos filtros do cabeçalho e acomodar o teclado móvel. */
+  emPortal?: boolean;
 }) {
   const [aberto, setAberto] = useState(false);
   const idPainel = useId();
   const raiz = useRef<HTMLDivElement>(null);
   const gatilho = useRef<HTMLButtonElement>(null);
+  const painel = useRef<HTMLDivElement>(null);
+  const [posicao, setPosicao] = useState({ top: 0, right: 0, maxHeight: 560 });
+
+  function posicionar() {
+    const rect = gatilho.current?.getBoundingClientRect();
+    if (!rect) return;
+    const altura = window.visualViewport?.height ?? window.innerHeight;
+    const top = Math.max(16, Math.min(rect.bottom + 8, altura - 240));
+    setPosicao({
+      top,
+      right: Math.max(16, window.innerWidth - rect.right),
+      maxHeight: Math.min(560, altura - top - 16),
+    });
+  }
 
   useEffect(() => {
     if (!aberto) return;
 
     const aoClicar = (e: MouseEvent) => {
-      if (raiz.current && !raiz.current.contains(e.target as Node)) setAberto(false);
+      const alvo = e.target as Node;
+      if (!raiz.current?.contains(alvo) && !painel.current?.contains(alvo)) setAberto(false);
     };
     const aoTeclar = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !e.defaultPrevented) {
         setAberto(false);
         /* O foco volta para quem abriu — sem isso, Esc joga o foco no body e a
            próxima tabulação recomeça do topo da página. */
@@ -52,11 +73,29 @@ export function HistoricoDropdown({
 
     document.addEventListener('mousedown', aoClicar);
     document.addEventListener('keydown', aoTeclar);
+    if (emPortal) {
+      window.addEventListener('resize', posicionar);
+      window.visualViewport?.addEventListener('resize', posicionar);
+    }
     return () => {
       document.removeEventListener('mousedown', aoClicar);
       document.removeEventListener('keydown', aoTeclar);
+      window.removeEventListener('resize', posicionar);
+      window.visualViewport?.removeEventListener('resize', posicionar);
     };
-  }, [aberto]);
+  }, [aberto, emPortal]);
+
+  const conteudo = aberto ? (
+    <div
+      ref={painel}
+      id={idPainel}
+      data-painel-historico
+      className={`${styles.painel} ${painelClassName ?? ''}`}
+      style={emPortal ? { position: 'fixed', ...posicao, zIndex: 100 } : undefined}
+    >
+      {children}
+    </div>
+  ) : null;
 
   return (
     <div ref={raiz} className={styles.canto}>
@@ -66,7 +105,10 @@ export function HistoricoDropdown({
         className={styles.gatilho}
         aria-expanded={aberto}
         aria-controls={idPainel}
-        onClick={() => setAberto((v) => !v)}
+        onClick={() => {
+          if (emPortal && !aberto) posicionar();
+          setAberto((v) => !v);
+        }}
       >
         <span className={styles.rotulo}>{rotulo}</span>
         <span className={styles.total}>{total}</span>
@@ -94,11 +136,7 @@ export function HistoricoDropdown({
 
       {/* Desmonta ao fechar: a cascata roda de novo a cada abertura e nenhum
           card fica no fluxo de tabulação de um painel fechado. */}
-      {aberto ? (
-        <div id={idPainel} className={styles.painel}>
-          {children}
-        </div>
-      ) : null}
+      {aberto && emPortal ? createPortal(conteudo, document.body) : conteudo}
     </div>
   );
 }

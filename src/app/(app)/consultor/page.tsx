@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { listarThreads } from '@/lib/consultor/queries';
+import { obterHistorico } from '@/lib/consultor/historico-queries';
 import { montarContextoSobralTarefa } from '@/lib/projetos-execucao/contexto-sobral';
 import { obterProjetoExecucao } from '@/lib/projetos-execucao/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -13,8 +13,8 @@ export default async function ConsultorPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const supabase = await createClient();
-  const [threads, parametros, { data }] = await Promise.all([
-    listarThreads(),
+  const [historico, parametros, { data }] = await Promise.all([
+    obterHistorico(),
     searchParams,
     supabase.auth.getClaims(),
   ]);
@@ -36,7 +36,8 @@ export default async function ConsultorPage({
     <TelaSobral
       dono={data?.claims.sub}
       chaveRascunho={projeto && tarefa ? `tarefa:${projeto.id}:${tarefa.id}` : undefined}
-      threads={threads}
+      threads={historico?.threads ?? []}
+      totalConversas={historico?.total ?? 0}
       conversa={null}
       contextoInicial={contextoInicial}
       nome={primeiroNome}

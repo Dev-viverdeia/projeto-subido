@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { listarThreads, obterConversa } from '@/lib/consultor/queries';
+import { obterConversa } from '@/lib/consultor/queries';
+import { obterHistorico } from '@/lib/consultor/historico-queries';
 import { TelaSobral } from '../_components/TelaSobral';
 import { createClient } from '@/lib/supabase/server';
 
@@ -15,13 +16,20 @@ export async function generateMetadata({
 export default async function ConversaDoConsultorPage({ params }: PageProps<'/consultor/[id]'>) {
   const { id } = await params;
   const supabase = await createClient();
-  const [conversa, threads, { data }] = await Promise.all([
+  const [conversa, historico, { data }] = await Promise.all([
     obterConversa(id),
-    listarThreads(),
+    obterHistorico(),
     supabase.auth.getClaims(),
   ]);
 
   if (!conversa) notFound();
 
-  return <TelaSobral dono={data?.claims.sub} threads={threads} conversa={conversa} />;
+  return (
+    <TelaSobral
+      dono={data?.claims.sub}
+      threads={historico?.threads ?? []}
+      totalConversas={historico?.total ?? 0}
+      conversa={conversa}
+    />
+  );
 }
