@@ -4777,10 +4777,6 @@ export type Database = {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
         Returns: boolean
       }
-      sobral_confirmar_texto: {
-        Args: { p_thread: string; p_mensagem: string; p_conteudo: string; p_nova: boolean };
-        Returns: string;
-      };
       sobral_confirmar_anexos: {
         Args: {
           p_anexos: Json
@@ -4793,6 +4789,15 @@ export type Database = {
       }
       sobral_confirmar_recomendacao_crm: {
         Args: { p_acao: string; p_mensagem: string; p_quando?: string }
+        Returns: string
+      }
+      sobral_confirmar_texto: {
+        Args: {
+          p_conteudo: string
+          p_mensagem: string
+          p_nova: boolean
+          p_thread: string
+        }
         Returns: string
       }
       sobral_finalizar_geracao: {
@@ -4822,6 +4827,10 @@ export type Database = {
           p_tentativa: string
           p_thread: string
         }
+        Returns: Json
+      }
+      sobral_salvar_material: {
+        Args: { p_mensagem: string; p_oportunidade: string; p_resumo: Json }
         Returns: Json
       }
       suporte_assumir: { Args: { p_id: string }; Returns: undefined }

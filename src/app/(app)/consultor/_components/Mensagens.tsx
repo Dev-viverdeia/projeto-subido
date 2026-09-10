@@ -9,6 +9,7 @@ import { ProximaAcaoResposta } from './ProximaAcaoResposta';
 import { RecomendacoesResposta } from './RecomendacoesResposta';
 import { SalvarResposta } from './SalvarResposta';
 import { FichaConsultadaResposta } from './FichaConsultadaResposta';
+import { ResumoMaterial } from './ResumoMaterial';
 import styles from './Mensagens.module.css';
 
 function ehTextoAutomaticoDeAudio(mensagem: MensagemDoConsultor): boolean {
@@ -133,7 +134,16 @@ export function Mensagens({
                   <FichaConsultadaResposta ficha={m.direcao?.ficha_consultada} />
                 )}
 
-                {detalharResposta && m.direcao ? (
+                {m.papel === 'consultor' && m.direcao?.material && (
+                  <ResumoMaterial
+                    mensagem={m.id}
+                    material={m.direcao.material}
+                    salvo={m.resumoSalvo}
+                    modoPreview={modoPreview}
+                  />
+                )}
+
+                {detalharResposta && m.direcao && !m.direcao.material ? (
                   <ProximaAcaoResposta
                     mensagem={m}
                     modoPreview={modoPreview}

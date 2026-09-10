@@ -43,7 +43,7 @@ it('falha mantém o estado e permite repetir sem perder o aviso acessível', asy
   fireEvent.click(screen.getByRole('button'));
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Confira sua conexão.'));
   expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
-  expect(screen.getByRole('button')).not.toBeDisabled();
+  await waitFor(() => expect(screen.getByRole('button')).not.toBeDisabled());
   expect(salvarResposta).toHaveBeenCalledWith({ ...props, salvar: false });
   fireEvent.click(screen.getByRole('button'));
   await waitFor(() =>

@@ -4,6 +4,7 @@ import { alinharAcoesComJornada } from './jornada-plano';
 import { EventoAcaoCrmSchema, RecomendacaoProximaAcaoSchema } from './recomendacao';
 import type { SinaisSobral } from './sinais';
 import { FichaConsultadaSchema } from './cliente';
+import { MaterialDaMensagemSchema } from './material';
 
 export { ETAPAS_SOBRAL, EtapaSobralSchema, indiceDaEtapa, type EtapaSobral } from './etapas';
 export { SinaisSobralSchema, type SinaisSobral } from './sinais';
@@ -125,6 +126,7 @@ export const DirecaoMensagemSchema = z.object({
   contexto_acao: ContextoAcaoCrmSchema.nullable().optional(),
   oportunidade_alvo: z.uuid().nullable().optional(),
   ficha_consultada: FichaConsultadaSchema.nullable().optional(),
+  material: MaterialDaMensagemSchema.nullable().optional(),
 });
 
 export type DirecaoMensagem = z.infer<typeof DirecaoMensagemSchema>;

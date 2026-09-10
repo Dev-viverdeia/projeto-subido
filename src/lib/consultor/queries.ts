@@ -18,6 +18,7 @@ import {
 import { RecomendacaoProximaAcaoSchema } from './recomendacao';
 import { CartoesProdutoPersistidosSchema, type CartaoProduto } from './conteudo';
 import type { AnexoDoConsultor } from './anexos-contrato';
+import type { ResumoSalvo } from './material';
 
 /**
  * Leituras do Consultor — RSC only, mesma disciplina do builder/queries.ts:
@@ -43,6 +44,7 @@ export type MensagemDoConsultor = {
   criadoEm: string;
   geracao?: { estado: string; texto: string } | null;
   salva?: boolean;
+  resumoSalvo?: ResumoSalvo | null;
 };
 
 export const listarThreads = cache(async (): Promise<ThreadDoConsultor[]> => {
@@ -163,6 +165,27 @@ export const obterConversa = cache(
       }
     }
 
+    const comMaterial = mensagens
+      .filter((m) => DirecaoMensagemSchema.safeParse(m.direcao).data?.material)
+      .map((m) => m.id);
+    const recibos = new Map<string, ResumoSalvo>();
+    if (comMaterial.length) {
+      const { data, error: erroRecibos } = await supabase
+        .from('crm_eventos')
+        .select('id,fonte_id,oportunidade_id,criado_em,titulo')
+        .eq('fonte', 'sobral_material')
+        .in('fonte_id', comMaterial);
+      if (erroRecibos) throw handleError(erroRecibos, 'consultor:resumos');
+      for (const r of data ?? [])
+        if (r.fonte_id)
+          recibos.set(r.fonte_id, {
+            id: r.id,
+            oportunidade: r.oportunidade_id,
+            salvoEm: r.criado_em,
+            titulo: r.titulo,
+          });
+    }
+
     return {
       mensagemAvulsa,
       thread: {
@@ -197,6 +220,7 @@ export const obterConversa = cache(
         return {
           id: m.id,
           salva: (m.consultor_respostas_salvas ?? []).length > 0,
+          resumoSalvo: recibos.get(m.id) ?? null,
           papel: m.papel as 'usuario' | 'consultor',
           conteudo: m.conteudo,
           anexos: (m.consultor_anexos ?? []).map((anexo) => ({
