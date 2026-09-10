@@ -67,6 +67,7 @@ export function Conversa({
 
   const envioAnexos = useEnvioAnexos();
   const ocupado = etapa !== null || navegando || envioAnexos.pausado || verificar;
+  const rodadaAtiva = emVoo !== null || arquivosEmVoo.length || respostaEmVoo !== null;
 
   useLayoutEffect(() => {
     if (acompanhar.current && (emVoo || respostaEmVoo || etapa || erro)) {
@@ -241,9 +242,7 @@ export function Conversa({
   return (
     <div
       className={styles.conversa}
-      data-conversa-ativa={
-        Boolean(emVoo !== null || arquivosEmVoo.length > 0 || respostaEmVoo !== null) || undefined
-      }
+      data-conversa-ativa={Boolean(erro || rodadaAtiva) || undefined}
     >
       <div className={styles.leitura} ref={leituraRef} data-leitura-conversa>
         {historico}
@@ -402,6 +401,7 @@ export function Conversa({
       </form>
 
       {exemplos &&
+      !erro &&
       exemplos.length > 0 &&
       arquivos.length === 0 &&
       !arquivosEmVoo.length &&
