@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
+import { conferirEnriquecimento, iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 
 const atualizar = vi.fn();
@@ -11,6 +11,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/crm/invocar-enriquecimento', () => ({
   iniciarEnriquecimento: vi.fn(),
+  conferirEnriquecimento: vi.fn(),
 }));
 
 describe('FormularioEnriquecimento', () => {
@@ -18,6 +19,7 @@ describe('FormularioEnriquecimento', () => {
     vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(true);
     atualizar.mockReset();
     vi.mocked(iniciarEnriquecimento).mockReset();
+    vi.mocked(conferirEnriquecimento).mockReset().mockResolvedValue(null);
   });
 
   it('não envia uma solicitação paga sem conexão', async () => {
@@ -97,9 +99,10 @@ describe('FormularioEnriquecimento', () => {
       />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
-    await screen.findByText(/Confira o andamento na ficha/);
+    await screen.findByText('Confirmação pendente');
     expect(screen.queryByRole('button', { name: 'Usar 3 créditos' })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Conferir ficha' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Conferir andamento' }));
+    expect(await screen.findByText(/Ainda não encontramos/)).toBeVisible();
     expect(iniciarEnriquecimento).toHaveBeenCalledTimes(1);
     expect(screen.queryByText(/Nenhum crédito foi usado/)).not.toBeInTheDocument();
     expect(atualizar).toHaveBeenCalled();
@@ -119,7 +122,7 @@ describe('FormularioEnriquecimento', () => {
     };
     const { rerender } = render(<FormularioEnriquecimento {...props} />);
     fireEvent.click(screen.getByRole('button', { name: 'Usar 3 créditos' }));
-    await screen.findByText(/Confira o andamento/);
+    await screen.findByText('Confirmação pendente');
     rerender(<FormularioEnriquecimento {...props} desabilitado />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

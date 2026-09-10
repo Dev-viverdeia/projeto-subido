@@ -8,6 +8,7 @@ import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import { iniciarEnriquecimento } from '@/lib/crm/invocar-enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
 import { ModalOperacao } from '../../../_components/ModalOperacao';
+import { RecuperarEnriquecimento } from './RecuperarEnriquecimento';
 import styles from './FormularioEnriquecimento.module.css';
 
 const ETAPAS_CONFIRMACAO = [
@@ -39,6 +40,7 @@ export function FormularioEnriquecimento({
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [incerto, setIncerto] = useState(false);
+  const [anteriorId, setAnteriorId] = useState<string | null>();
   const [atualizando, atualizar] = useTransition();
   const emCurso = useRef(false);
   const saldoSuficiente = saldoCreditos >= CUSTO_ENRIQUECIMENTO_OPORTUNIDADE;
@@ -66,6 +68,7 @@ export function FormularioEnriquecimento({
         setAberto(true);
         setErro(resposta.falha);
         setIncerto(resposta.incerto ?? false);
+        setAnteriorId(resposta.anteriorId);
       }
     } catch {
       setIncerto(true);
@@ -119,19 +122,17 @@ export function FormularioEnriquecimento({
         )}
         {desabilitado
           ? 'Enriquecendo dados'
-          : (rotulo ?? (temDossie ? 'Atualizar dados' : 'Enriquecer dados'))}
+          : incerto
+            ? 'Conferir análise'
+            : (rotulo ?? (temDossie ? 'Atualizar dados' : 'Enriquecer dados'))}
       </button>
 
       <ModalOperacao
         open={aberto && !desabilitado}
         onClose={fechar}
         label="Dados do cliente"
-        title={incerto ? 'Não recebemos a confirmação' : 'Enriquecer esta oportunidade?'}
-        description={
-          incerto
-            ? (erro ?? 'Confira o andamento na ficha antes de tentar novamente.')
-            : 'Usaremos o que já está salvo e fontes públicas.'
-        }
+        title={incerto ? 'Andamento da análise' : 'Enriquecer esta oportunidade?'}
+        description={incerto ? undefined : 'Usaremos o que já está salvo e fontes públicas.'}
         size="md"
         blocked={enviando}
         footer={
@@ -145,18 +146,7 @@ export function FormularioEnriquecimento({
             >
               {incerto ? 'Fechar' : 'Cancelar'}
             </Button>
-            {incerto ? (
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => {
-                  fechar();
-                  atualizar(() => router.refresh());
-                }}
-              >
-                Conferir ficha
-              </Button>
-            ) : (
+            {!incerto && (
               <Button
                 type="button"
                 variant="primary"
@@ -170,6 +160,16 @@ export function FormularioEnriquecimento({
           </>
         }
       >
+        {incerto && (
+          <RecuperarEnriquecimento
+            oportunidadeId={oportunidadeId}
+            anteriorId={anteriorId}
+            aoAbrirFicha={() => {
+              fechar();
+              atualizar(() => router.refresh());
+            }}
+          />
+        )}
         {!incerto && (
           <div className={styles.conteudo}>
             {erro && (

@@ -10,17 +10,21 @@ export function AjudaNaFalha({
   descricao,
   acao,
   pagina,
+  aviso = 'alert',
+  icone,
 }: {
   contexto: ContextoFalha;
   titulo: string;
   descricao?: string;
   acao?: ReactNode;
   pagina?: string;
+  aviso?: 'alert' | 'status';
+  icone?: ReactNode;
 }) {
   return (
     <aside className={s.quadro} aria-label="Ajuda para continuar" tabIndex={-1} data-ajuda-falha>
-      <div className={s.mensagem} role="alert" aria-atomic="true">
-        <CircleAlert size={21} aria-hidden="true" />
+      <div className={s.mensagem} role={aviso} aria-atomic="true">
+        {icone ?? <CircleAlert size={21} aria-hidden="true" />}
         <div>
           <strong>{titulo}</strong>
           {descricao && <p>{descricao}</p>}

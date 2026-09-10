@@ -1,6 +1,16 @@
 import { paginaSegura } from './contrato';
 
 export const CONTEXTOS_FALHA = {
+  enriquecimento: {
+    pagina: '/vendas',
+    guia: 'enriquecer-oportunidade',
+    assunto: 'Problema ao enriquecer a ficha',
+  },
+  sobral: {
+    pagina: '/consultor',
+    guia: 'enviar-arquivos-sobral',
+    assunto: 'Problema em uma conversa do Sobral AI',
+  },
   agenda: {
     pagina: '/conta',
     guia: 'conectar-google-agenda',

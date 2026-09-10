@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { CircleAlert } from 'lucide-react';
 import { Button } from '@/design-system/via';
+import { AjudaNaFalha } from '@/components/suporte/AjudaNaFalha';
 import { CUSTO_ENRIQUECIMENTO_OPORTUNIDADE } from '@/lib/crm/creditos';
 import type { StatusEnriquecimento } from '@/lib/crm/enriquecimento';
 import { EsperaOperacao } from '../../../_components/EsperaOperacao';
@@ -30,11 +30,13 @@ export function EstadoEnriquecimento({
   erro,
   acao,
   etapa,
+  oportunidadeId,
 }: {
   status: StatusEnriquecimento;
   erro: string | null;
   acao?: ReactNode;
   etapa?: string | null;
+  oportunidadeId?: string;
 }) {
   const [mostrarModal, setMostrarModal] = useState(true);
   const [mostrarFalha, setMostrarFalha] = useState(true);
@@ -46,16 +48,15 @@ export function EstadoEnriquecimento({
     const mensagem = `${erro ?? 'O processamento não foi concluído.'} Os ${CUSTO_ENRIQUECIMENTO_OPORTUNIDADE} créditos foram devolvidos.`;
     return (
       <>
-        <section className={styles.falha} role="alert" aria-labelledby="pesquisa-falhou-titulo">
-          <span className={styles.iconeFalha} aria-hidden="true">
-            <CircleAlert size={22} />
-          </span>
-          <div>
-            <h2 id="pesquisa-falhou-titulo">Não foi possível atualizar a ficha.</h2>
-            <p>{mensagem}</p>
-          </div>
-          {!mostrarFalha && acao && <div className={styles.acaoFalha}>{acao}</div>}
-        </section>
+        {!mostrarFalha && (
+          <AjudaNaFalha
+            contexto="enriquecimento"
+            pagina={oportunidadeId ? `/vendas/${oportunidadeId}` : undefined}
+            titulo="Não foi possível atualizar a ficha."
+            descricao={mensagem}
+            acao={acao}
+          />
+        )}
         <ModalOperacao
           open={mostrarFalha}
           onClose={() => setMostrarFalha(false)}

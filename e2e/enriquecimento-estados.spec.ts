@@ -33,7 +33,7 @@ test('falha aparece no modal e continua visível na ficha após fechar', async (
   await page.keyboard.press('Escape');
   await expect(dialogo).toBeHidden();
   await expect(
-    page.getByRole('alert', { name: 'Não foi possível atualizar a ficha.' }),
+    page.getByRole('alert').filter({ hasText: 'Não foi possível atualizar a ficha.' }),
   ).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
