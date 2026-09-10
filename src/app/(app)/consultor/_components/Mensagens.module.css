@@ -48,6 +48,10 @@
   border-radius: var(--app-radius-card);
   box-shadow: var(--app-ring);
 }
+.doUsuario:focus:has([data-trecho-encontrado]) .corpo,
+.doConsultor:focus:has([data-trecho-encontrado]) .corpo {
+  box-shadow: none;
+}
 .intervalo {
   border-top: 1px solid var(--via-border-hairline);
   padding-top: var(--via-space-4);
@@ -120,4 +124,14 @@
     font-size: var(--via-fs-body);
     line-height: 1.6;
   }
+}
+.lista [data-trecho-encontrado] {
+  background: var(--via-navy-08);
+  border-radius: var(--app-radius-chip);
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
+}
+.doUsuario [data-trecho-encontrado] {
+  background: var(--via-navy);
+  border-radius: var(--app-radius-card);
 }

@@ -113,7 +113,9 @@ export function Mensagens({
                 {m.papel === 'consultor' ? (
                   <TextoResposta texto={m.conteudo} />
                 ) : ehTextoAutomaticoDeAudio(m) ? null : (
-                  <p className={styles.texto}>{m.conteudo}</p>
+                  <p className={styles.texto} data-texto-usuario>
+                    {m.conteudo}
+                  </p>
                 )}
 
                 {m.papel === 'consultor' && detalharResposta ? (
