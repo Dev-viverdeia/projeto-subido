@@ -100,7 +100,7 @@ describe('Navegação da implementação', () => {
     expect(concluir).not.toHaveBeenCalled();
   });
 
-  it('concluir atualiza o progresso e apresenta a tarefa seguinte sem perder o foco', async () => {
+  it('concluir atualiza o progresso, mantém o resultado e só avança com ação explícita', async () => {
     const user = userEvent.setup();
     montar();
     await user.click(screen.getByRole('button', { name: `Concluir: ${tarefas[0]!.titulo}` }));
@@ -110,8 +110,12 @@ describe('Navegação da implementação', () => {
       '1 de 10 passos concluídos',
     );
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 3, name: tarefas[1]!.titulo })).toHaveFocus(),
+      expect(screen.getByRole('heading', { level: 3, name: tarefas[0]!.titulo })).toHaveFocus(),
     );
+    expect(screen.getByRole('status')).toHaveTextContent('Passo concluído');
+    await user.click(screen.getByRole('button', { name: 'Próximo passo' }));
+    expect(screen.getByRole('heading', { level: 3, name: tarefas[1]!.titulo })).toBeVisible();
+    expect(concluir).toHaveBeenCalledTimes(1);
   });
 
   it('distingue fases concluídas e permite reabrir somente o passo escolhido', async () => {

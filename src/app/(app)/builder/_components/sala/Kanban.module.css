@@ -1,291 +1,347 @@
 .raiz {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-block);
-}
-
-/* A RÉGUA DE FASES — cards, não abas. A diferença é de peso: a fase carrega
-   rótulo, resumo implícito e contagem, e uma aba tipográfica não comporta três
-   linhas. Cards também deixam a fase ativa ler como "onde estou no plano", que é
-   a pergunta que ela responde. */
-.fases {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--via-space-2);
-}
-
-.fase {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--app-pad-card-tight);
-  border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  border: 1px solid var(--app-elev-1-line);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background var(--app-t-state),
-    border-color var(--app-t-state);
-}
-
-.fase:hover {
-  border-color: var(--via-navy-22);
-}
-
-.fase:focus-visible {
-  outline: none;
-  box-shadow: var(--app-ring);
-}
-
-/* A ativa é NAVY SÓLIDA — hierarquia por peso e cor sólida, nunca por borda. */
-.fase[data-ativa] {
-  background: var(--via-navy);
-  border-color: var(--via-navy);
-}
-
-.faseEyebrow {
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
-}
-
-.fase[data-ativa] .faseEyebrow {
-  /* Sobre navy a escala inverte: `--via-text-faint` daria 2,5:1. */
-  color: var(--via-gray-400);
-}
-
-.faseRotulo {
-  font-size: var(--app-fs-support);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-caption);
-  line-height: var(--via-lh-snug);
-  color: var(--via-text-primary);
-}
-
-.fase[data-ativa] .faseRotulo {
-  color: var(--via-white);
-}
-
-.faseContagem {
-  margin-top: 2px;
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  color: var(--via-text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.fase[data-ativa] .faseContagem {
-  color: var(--via-gray-300);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fase {
-    transition: none;
-  }
-}
-
-.quadro {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--app-gap-grid);
-  align-items: start;
-}
-
-/* A coluna é superfície RECUADA — o mesmo trilho do controle segmentado. É o que
-   faz os cards lerem como peças POSTAS sobre ela, e não como itens de lista. */
-.coluna {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-gap-stack);
   min-width: 0;
-  padding: var(--app-pad-card-tight);
-  border-radius: var(--app-radius-card);
-  background: var(--via-bg-2);
-  border: 1px solid var(--via-border-hairline);
+  container: tarefas-estudio / inline-size;
 }
-
-.colunaTopo {
+.filtros {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--via-space-2);
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-bottom: var(--app-gap-block);
 }
-
-.colunaRotulo {
-  margin: 0;
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--via-text-faint);
+.estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-1);
 }
-
-.colunaTotal {
+.estados button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: 5px;
-  border-radius: var(--via-radius-pill);
-  background: var(--via-navy-06);
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  cursor: pointer;
+}
+.estados button span {
   font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
+  font-size: var(--app-fs-support);
+  font-variant-numeric: tabular-nums;
+}
+.estados button[aria-pressed='true'] {
+  background: var(--via-navy-06);
+  border-color: var(--via-navy-14);
+  color: var(--via-text-primary);
+}
+.estados button:hover {
+  background: var(--via-navy-04);
+}
+.filtros select {
+  min-height: 44px;
+  max-width: 100%;
+  padding: var(--via-space-2) var(--via-space-3);
+  background: var(--via-surface);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+}
+.mesa {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 0.68fr);
+  gap: var(--app-gap-block);
+  align-items: start;
+}
+.indice {
+  min-width: 0;
+}
+.indice nav {
+  display: grid;
+  gap: var(--via-space-1);
+}
+.indice nav button {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  min-height: 64px;
+  padding: var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.indice nav button[aria-current='step'] {
+  background: var(--app-elev-1-bg);
+  border-color: var(--app-elev-1-line);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text-primary);
+}
+.indice nav button:hover {
+  background: var(--via-navy-04);
+}
+.indice strong {
+  display: block;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.indice small {
+  display: block;
+  margin-top: var(--via-space-1);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+.marcador {
+  display: grid;
+  place-items: center;
+  min-height: 24px;
+  color: var(--via-text-muted);
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-support);
+}
+.tarefa {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane);
+  box-shadow: var(--app-glass-card-shadow);
+}
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-bottom: var(--via-space-4);
+}
+.estado {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.estado[data-concluida] {
+  color: var(--via-navy);
+}
+.posicao {
+  font-family: var(--via-font-mono);
+  font-size: var(--app-fs-support);
   color: var(--via-text-muted);
   font-variant-numeric: tabular-nums;
 }
-
-.vazio {
+.tarefa h2,
+.vazio h2 {
   margin: 0;
-  padding: var(--via-space-6) var(--via-space-3);
-  border: 1px dashed var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  font-size: var(--app-fs-support);
-  line-height: var(--via-lh-normal);
-  color: var(--via-text-faint);
-  text-align: center;
-  text-wrap: pretty;
-}
-
-.lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-}
-
-/* Raio 12 dentro da coluna de 20 com 8 de folga: cantos concêntricos. */
-.tarefa {
-  display: flex;
-  flex-direction: column;
-  gap: var(--via-space-2);
-  padding: var(--app-pad-card-tight);
-  border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  border: 1px solid var(--app-elev-1-line);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.tarefaTitulo {
-  margin: 0;
-  font-size: var(--via-fs-sm);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-sm);
-  line-height: var(--via-lh-snug);
   color: var(--via-text-primary);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h3);
+  line-height: 1.3;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.instrucao {
+  max-width: 52ch;
+  margin: var(--via-space-5) 0 0;
+  font-size: var(--app-fs-reading);
+  line-height: 1.7;
+  color: var(--via-text-body);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
   text-wrap: pretty;
 }
-
-.tarefaTexto {
-  margin: 0;
-  font-size: var(--app-fs-support);
-  letter-spacing: var(--app-ls-caption);
-  line-height: var(--via-lh-loose);
-  color: var(--via-text-muted);
-  /* Quatro linhas: o card precisa caber na coluna sem virar parágrafo. */
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-wrap: pretty;
-}
-
-.marcas {
-  list-style: none;
+.ferramentas {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin: 0;
+  gap: var(--via-space-2);
+  margin: var(--via-space-5) 0 0;
   padding: 0;
+  list-style: none;
 }
-
-.marca {
-  padding: 2px var(--via-space-2);
+.ferramentas li {
+  padding: var(--via-space-2) var(--via-space-3);
+  border: 1px solid var(--via-border-hairline);
   border-radius: var(--app-radius-chip);
-  background: var(--via-navy-06);
-  font-family: var(--via-font-mono);
-  font-size: var(--app-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
   color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
-
+.rodape {
+  margin-top: var(--app-gap-block);
+  padding-top: var(--app-gap-block);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.rodape > p {
+  margin: 0 0 var(--via-space-4);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
+}
 .acoes {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--via-space-2);
-  margin-top: var(--via-space-1);
 }
-
-.avancar,
-.voltar {
-  display: inline-flex;
-  align-items: center;
+.acoes button[aria-label^='Copiar'] {
   min-height: 44px;
   padding-inline: var(--via-space-4);
+  font-size: var(--app-fs-ui);
   border-radius: var(--app-radius-control);
-  font-family: inherit;
-  font-size: var(--app-fs-meta);
-  font-weight: var(--via-fw-medium);
-  letter-spacing: var(--app-ls-caption);
+}
+.principal,
+.secundario,
+.proxima,
+.abrirLista {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--app-fs-ui);
   cursor: pointer;
   transition:
-    background var(--app-t-state),
-    border-color var(--app-t-state),
-    color var(--app-t-state);
+    background-color var(--app-t-state),
+    border-color var(--app-t-state);
 }
-
-.avancar {
-  border: 1px solid var(--via-navy);
+.principal {
   background: var(--via-navy);
+  border-color: var(--via-navy);
   color: var(--via-white);
 }
-
-.avancar:hover:not(:disabled) {
+.principal:hover:not(:disabled) {
   background: var(--via-navy-deep);
-  border-color: var(--via-navy-deep);
 }
-
-.voltar {
-  border: 1px solid var(--via-border);
-  background: none;
-  color: var(--via-text-muted);
-}
-
-.voltar:hover:not(:disabled) {
+.secundario:hover {
   background: var(--via-navy-04);
-  color: var(--via-text-primary);
 }
-
-.avancar:focus-visible,
-.voltar:focus-visible {
+.proxima {
+  margin-top: var(--via-space-4);
+  background: var(--via-navy);
+  border-color: var(--via-navy);
+  color: var(--via-white);
+}
+.proxima:hover {
+  background: var(--via-navy-deep);
+}
+.abrirLista {
+  display: none;
+}
+.raiz button:focus-visible,
+.raiz select:focus-visible {
   outline: none;
-  box-shadow: var(--app-ring);
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
 }
-
-.avancar:disabled,
-.voltar:disabled {
-  opacity: 0.6;
+.raiz button:disabled {
   cursor: progress;
 }
-
-@media (max-width: 899px) {
-  .quadro {
-    grid-template-columns: minmax(0, 1fr);
+.rodape > .erro {
+  margin-top: var(--via-space-4);
+  margin-bottom: 0;
+  padding: var(--via-space-3);
+  color: var(--via-text-primary);
+  border-left: 2px solid var(--via-navy);
+  background: var(--via-bg-2);
+}
+.conclusao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--via-space-3);
+  padding: var(--app-pad-card);
+  margin: var(--app-gap-block) 0 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
+}
+.conclusao svg {
+  flex: none;
+  margin-top: 3px;
+}
+.vazio {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-4);
+  padding: var(--via-space-6);
+}
+.spinner {
+  animation: tarefa-giro 1s linear infinite;
+}
+@keyframes tarefa-giro {
+  to {
+    transform: rotate(360deg);
   }
 }
-
+@container tarefas-estudio (max-width: 767px) {
+  .mesa {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--via-space-4);
+  }
+  .indice:not([data-aberta]) nav {
+    display: none;
+  }
+  .abrirLista {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .indice nav {
+    margin-top: var(--via-space-2);
+  }
+  .estados {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .estados button {
+    padding-inline: var(--via-space-2);
+    gap: var(--via-space-1);
+    white-space: nowrap;
+  }
+  .tarefa {
+    padding: var(--via-space-4) 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .acoes {
+    align-items: stretch;
+  }
+  .acoes .principal {
+    flex: 1 0 100%;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .avancar,
-  .voltar {
+  .principal,
+  .secundario,
+  .proxima,
+  .abrirLista {
     transition: none;
+  }
+  .spinner {
+    animation: none;
   }
 }

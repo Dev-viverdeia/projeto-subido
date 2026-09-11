@@ -33,7 +33,11 @@ export function GuiaExecucaoPasso({
   const acoes = passo.execucao.length ? passo.execucao : [passo.acao];
 
   return (
-    <section className={styles.guia} aria-label="Guia de execução">
+    <section
+      className={styles.guia}
+      aria-label="Guia de execução"
+      data-concluido={concluido || undefined}
+    >
       <nav
         className={styles.modulos}
         data-com-exemplo={Boolean(exemplo) || undefined}
@@ -193,6 +197,15 @@ export function GuiaExecucaoPasso({
           </details>
         ) : null}
       </div>
+      {aba !== 'conferencia' ? (
+        <div className={styles.criterioVisivel}>
+          <FileCheck2 size={20} aria-hidden="true" />
+          <div>
+            <strong>Pronto quando</strong>
+            <p>{passo.concluidoQuando}</p>
+          </div>
+        </div>
+      ) : null}
       {passo.modelo ? (
         <details className={styles.modelo}>
           <summary>

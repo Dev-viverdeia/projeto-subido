@@ -87,31 +87,36 @@ export function ProjetoGuiado({
     { id: 'implementar', rotulo: 'Implementar' },
     { id: 'materiais', rotulo: 'Pré-requisitos e materiais' },
   ] as const;
-  const mostrarAcaoCabecalho = abaAtiva === 'visao' || abaAtiva === 'materiais' || !proximoPasso;
+  const mostrarAcaoCabecalho = abaAtiva === 'visao' || abaAtiva === 'materiais';
 
   return (
     <div className={styles.raiz}>
       <header
         className={styles.cabecalho}
         data-com-acao={mostrarAcaoCabecalho || undefined}
+        data-em-trabalho={!mostrarAcaoCabecalho || undefined}
         aria-labelledby="titulo-projeto"
       >
         <div className={styles.cabecalhoTexto}>
           <h1 id="titulo-projeto">{titulo}</h1>
-          <p className={styles.resultado}>{resumo || projeto.resultado}</p>
-          <p className={styles.metaProjeto}>
-            {categoria ?? 'Projeto de IA'}
-            <span aria-hidden="true">·</span>
-            {roteiro.trilhaDidatica
-              ? `${roteiro.trilhaDidatica.aulas.length} aulas`
-              : 'Passo a passo guiado'}
-            {roteiro.perfil ? (
-              <>
-                <span aria-hidden="true">·</span>
-                {ROTULO_NIVEL[roteiro.perfil.nivel]}
-              </>
-            ) : null}
-          </p>
+          {mostrarAcaoCabecalho ? (
+            <p className={styles.resultado}>{resumo || projeto.resultado}</p>
+          ) : null}
+          {mostrarAcaoCabecalho ? (
+            <p className={styles.metaProjeto}>
+              {categoria ?? 'Projeto de IA'}
+              <span aria-hidden="true">·</span>
+              {roteiro.trilhaDidatica
+                ? `${roteiro.trilhaDidatica.aulas.length} aulas`
+                : 'Passo a passo guiado'}
+              {roteiro.perfil ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  {ROTULO_NIVEL[roteiro.perfil.nivel]}
+                </>
+              ) : null}
+            </p>
+          ) : null}
           <button type="button" className={styles.acaoCliente} onClick={abrirCliente}>
             <BriefcaseBusiness size={18} aria-hidden="true" />
             Usar com cliente
