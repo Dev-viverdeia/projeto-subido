@@ -10,6 +10,8 @@ Esse orçamento de entrada não substitui medições de tráfego real, capacidad
 
 O Lighthouse usa três execuções fixas, cada uma com navegador novo, e a mediana por categoria: desempenho ≥85, acessibilidade ≥90 e boas práticas ≥95. Nenhuma amostra pode ter erro de navegação ou CLS acima de 0,1. Os três relatórios e o resumo são preservados, inclusive quando o orçamento reprova. Não há repetição até obter aprovação. A amostragem reduz oscilações de CPU do runner: na primeira publicação deste controle, o mesmo código marcou 98 no PR e 81 no merge; a trava manteve o domínio na versão anterior.
 
+O build também testa a entrada em 412, 768 e 1440 px, com CPU desacelerada 8× e sem retentativas. Esse teste reproduziu um salto de layout de 0,20: a moldura centralizava o formulário pela altura parcial durante o carregamento. A posição agora depende da tela, não da altura que ainda está mudando. Os links auxiliares da entrada não pré-carregam outras páginas antes de serem usados. Layout, foco e destinos continuam verificados; capturas ficam junto ao relatório de qualidade.
+
 ## Arquivos e convidados
 
 - Downloads de entregáveis aceitam somente a chave canônica `dono/projeto/arquivo`. O banco também confere a existência e a propriedade do objeto enviado. Registros antigos passam novamente pela validação antes de qualquer assinatura.

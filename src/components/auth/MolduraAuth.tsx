@@ -28,7 +28,12 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
   return (
     <div className={styles.grade}>
       <aside className={`${styles.painel} via-mesh-navy via-noise`}>
-        <Link href="/" className={styles.marca} aria-label="Voltar para a página inicial">
+        <Link
+          href="/"
+          prefetch={false}
+          className={styles.marca}
+          aria-label="Voltar para a página inicial"
+        >
           {/* 16 e não 18: o wordmark tem proporção ~12:1, então cada px de altura
               custa 12 de largura. A 18 o lockup ocupava 82% da tela em 375px e a
               faixa escura virava um banner de marca. */}
@@ -51,7 +56,7 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
       <main className={styles.area} id="conteudo">
         <div className={styles.caixa}>
           {children}
-          <Link href="/ajuda" className="via-btn via-btn--ghost via-btn--md">
+          <Link href="/ajuda" prefetch={false} className="via-btn via-btn--ghost via-btn--md">
             Preciso de ajuda
           </Link>
         </div>
