@@ -137,11 +137,13 @@ const normalizar = (texto: string) => texto.replace(/[–—−‑]/g, '-').repl
 
 async function inspecionar(proposta = PROPOSTA, amostra?: string) {
   const { renderizarPropostaPdf } = await import('./pdf');
+  const antes = structuredClone(proposta);
   const pdf = await renderizarPropostaPdf({
     proposta,
     profissional: 'Estúdio Horizonte',
     geradoEm: new Date('2026-09-11T18:00:00-03:00'),
   });
+  expect(proposta).toEqual(antes);
   expect(pdf.subarray(0, 4).toString()).toBe('%PDF');
   // Pesos com o mesmo nome PostScript colapsam numa fonte só no arquivo final.
   expect(pdf.toString('latin1')).toContain('Geist-Regular');
@@ -205,7 +207,7 @@ function conferirConteudo(
     ...d.cronograma.flatMap((item) => [item.fase, item.duracao, item.descricao]),
     d.investimento.condicoes,
     formatarReais(d.investimento.valorCentavos),
-    `${d.validadeDias} dias`,
+    `${d.validadeDias} ${d.validadeDias === 1 ? 'dia' : 'dias'}`,
     ...d.proximosPassos,
     d.observacoes,
     d.fornecedor?.nomeResponsavel,
@@ -263,8 +265,9 @@ describe('PDF da proposta', () => {
     async (valorCentavos) => {
       const proposta = structuredClone(PROPOSTA);
       proposta.documento.investimento.valorCentavos = valorCentavos;
+      proposta.documento.validadeDias = valorCentavos === 0 ? 1 : 15;
       proposta.documento.fornecedor = null;
-      proposta.documento.cliente.contato = null;
+      proposta.documento.cliente.contato = valorCentavos === 0 ? '' : null;
       proposta.documento.cliente.cargo = null;
       proposta.documento.cliente.email = null;
       proposta.documento.observacoes = null;
@@ -273,6 +276,10 @@ describe('PDF da proposta', () => {
       const primeiraPagina = normalizar(resultado.paginas[0]!.corpo);
       expect(primeiraPagina).toContain(normalizar(formatarReais(valorCentavos)));
       if (valorCentavos !== null) expect(primeiraPagina).not.toContain('Adefinir');
+      if (valorCentavos === 0) {
+        expect(primeiraPagina).not.toContain('1dias');
+        expect(resultado.paginas.at(-1)?.corpo).toContain('Aprovação do cliente Clínica Horizonte');
+      }
     },
   );
 

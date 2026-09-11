@@ -139,7 +139,9 @@ function PropostaPdf({
             </View>
             <View style={e.validade}>
               <Text style={e.rotulo}>Validade</Text>
-              <Text style={e.validadeValor}>{d.validadeDias} dias</Text>
+              <Text style={e.validadeValor}>
+                {d.validadeDias} {d.validadeDias === 1 ? 'dia' : 'dias'}
+              </Text>
             </View>
           </View>
           <Text style={e.condicoes} orphans={3} widows={3}>
@@ -241,7 +243,7 @@ function PropostaPdf({
             <View style={e.assinaturaLinha} />
             <Text style={e.rotulo}>Aprovação do cliente</Text>
             <Text style={e.assinaturaNome}>
-              {textoPdf(d.cliente.contato ?? d.cliente.empresa, 20)}
+              {textoPdf(d.cliente.contato || d.cliente.empresa, 20)}
             </Text>
           </View>
         </View>
