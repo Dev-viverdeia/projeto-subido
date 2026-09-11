@@ -139,7 +139,8 @@ describe('PortalProjeto', () => {
     const enviado = vi.mocked(solicitarMudancaEscopoCliente).mock.calls.at(-1)![1];
     expect(enviado.get('codigo')).toBe('44444444-4444-4444-8444-444444444444');
     expect(enviado.get('titulo')).toBe('Adicionar novo canal');
-    expect(screen.getByRole('button', { name: 'Enviar para análise' })).toBeEnabled();
+    // A mensagem pode aparecer antes de useTransition encerrar o estado pendente.
+    expect(await screen.findByRole('button', { name: 'Enviar para análise' })).toBeEnabled();
   });
   it('abre apenas a primeira revisão e mantém todos os formulários montados', () => {
     const { container } = render(
