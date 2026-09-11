@@ -326,3 +326,24 @@
     font-size: 16px;
   }
 }
+.faixa[data-compacto] {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.faixa[data-compacto] .acoes {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .faixa[data-compacto] .acoes button {
+    padding-inline: 12px;
+  }
+  .faixa[data-compacto] .acoes button:first-child {
+    flex: 0 0 auto;
+  }
+}

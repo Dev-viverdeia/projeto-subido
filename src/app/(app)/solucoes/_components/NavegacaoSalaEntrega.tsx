@@ -1,93 +1,65 @@
-import { ChartNoAxesCombined, FolderOpen, Play, UsersRound } from 'lucide-react';
-import styles from './SalaEntrega.module.css';
+import { ChartNoAxesCombined, FolderOpen, ListTodo, Repeat2, UsersRound } from 'lucide-react';
+import styles from './NavegacaoSalaEntrega.module.css';
 
 export type PainelSala = 'execucao' | 'arquivos' | 'cliente' | 'evolucao';
 
 export function NavegacaoSalaEntrega({
   painel,
   concluido,
-  evolucaoRegistrada,
   recorrente = false,
   mostrarEvolucao = concluido,
-  proximaTarefa,
   totalArquivos,
-  rotuloCliente,
+  pendenciasCliente,
   onChange,
 }: {
   painel: PainelSala;
   concluido: boolean;
-  evolucaoRegistrada: boolean;
   recorrente?: boolean;
   mostrarEvolucao?: boolean;
-  proximaTarefa: string | null;
   totalArquivos: number;
-  rotuloCliente: string;
+  pendenciasCliente: number;
   onChange: (painel: PainelSala) => void;
 }) {
+  const itens = [
+    ...(mostrarEvolucao
+      ? [
+          {
+            id: 'evolucao' as const,
+            nome: recorrente ? 'Acompanhar' : 'Evolução',
+            Icone: recorrente ? Repeat2 : ChartNoAxesCombined,
+            quantidade: 0,
+          },
+        ]
+      : []),
+    { id: 'execucao' as const, nome: 'Trabalho', Icone: ListTodo, quantidade: 0 },
+    { id: 'cliente' as const, nome: 'Cliente', Icone: UsersRound, quantidade: pendenciasCliente },
+    { id: 'arquivos' as const, nome: 'Arquivos', Icone: FolderOpen, quantidade: totalArquivos },
+  ];
   return (
     <nav
-      className={styles.paineis}
+      className={styles.navegacao}
       aria-label="Áreas da entrega"
       data-evolucao={mostrarEvolucao || undefined}
     >
-      {mostrarEvolucao && (
+      {itens.map(({ id, nome, Icone, quantidade }) => (
         <button
+          key={id}
           type="button"
-          data-ativo={painel === 'evolucao' || undefined}
-          aria-current={painel === 'evolucao' ? 'page' : undefined}
-          onClick={() => onChange('evolucao')}
+          aria-current={painel === id ? 'page' : undefined}
+          onClick={() => onChange(id)}
         >
-          <ChartNoAxesCombined size={17} aria-hidden="true" />
-          <span>
-            <strong>{recorrente ? 'Acompanhamento' : 'Evolução'}</strong>
-            <small>
-              {recorrente
-                ? 'Próximas ações'
-                : evolucaoRegistrada
-                  ? 'Resultado confirmado'
-                  : 'Revisão pós-entrega'}
-            </small>
-          </span>
+          <Icone size={18} aria-hidden="true" />
+          <span>{nome}</span>
+          {quantidade > 0 && (
+            <span
+              className={styles.contagem}
+              aria-label={`${quantidade} ${id === 'cliente' ? (quantidade === 1 ? 'pendência com o cliente' : 'pendências com o cliente') : quantidade === 1 ? 'arquivo' : 'arquivos'}`}
+            >
+              {quantidade}
+            </span>
+          )}
         </button>
-      )}
-      <button
-        type="button"
-        data-ativo={painel === 'execucao' || undefined}
-        aria-current={painel === 'execucao' ? 'page' : undefined}
-        onClick={() => onChange('execucao')}
-      >
-        <Play size={17} aria-hidden="true" />
-        <span>
-          <strong>Trabalho</strong>
-          <small>{concluido ? 'Entrega encerrada' : (proximaTarefa ?? 'Aceite final')}</small>
-        </span>
-      </button>
-      <button
-        type="button"
-        data-ativo={painel === 'arquivos' || undefined}
-        aria-current={painel === 'arquivos' ? 'page' : undefined}
-        onClick={() => onChange('arquivos')}
-      >
-        <FolderOpen size={17} aria-hidden="true" />
-        <span>
-          <strong>Arquivos</strong>
-          <small>
-            {totalArquivos} {totalArquivos === 1 ? 'arquivo' : 'arquivos'}
-          </small>
-        </span>
-      </button>
-      <button
-        type="button"
-        data-ativo={painel === 'cliente' || undefined}
-        aria-current={painel === 'cliente' ? 'page' : undefined}
-        onClick={() => onChange('cliente')}
-      >
-        <UsersRound size={17} aria-hidden="true" />
-        <span>
-          <strong>Cliente</strong>
-          <small>{rotuloCliente}</small>
-        </span>
-      </button>
+      ))}
     </nav>
   );
 }

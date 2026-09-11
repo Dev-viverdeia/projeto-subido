@@ -3,7 +3,7 @@ import type { AcaoPlanoProjeto } from './plano';
 import { prazoEstaAtrasado, rotuloPrazoOperacional } from './prazo';
 
 export type DestinoJornadaEntrega =
-  'briefing' | 'preparacao' | 'tarefa' | 'validacao' | 'compromisso' | 'arquivos';
+  'briefing' | 'preparacao' | 'tarefa' | 'validacao' | 'compromisso' | 'arquivos' | 'escopo';
 
 export type MomentoJornadaEntrega = 'alinhar' | 'executar' | 'validar' | 'entregar';
 
@@ -27,6 +27,7 @@ export type EstadoJornadaEntrega = {
 
 export function obterEstadoJornadaEntrega({
   status,
+  aceiteConfirmado = false,
   briefingConfirmado,
   tarefas,
   compromisso,
@@ -34,6 +35,7 @@ export function obterEstadoJornadaEntrega({
   agora = new Date(),
 }: {
   status: StatusProjetoExecucao;
+  aceiteConfirmado?: boolean;
   briefingConfirmado: boolean;
   tarefas: TarefaDaJornada[];
   compromisso: string | null;
@@ -46,11 +48,15 @@ export function obterEstadoJornadaEntrega({
     return {
       momento: 'entregar',
       tom: 'concluido',
-      titulo: 'Entrega aprovada e encerrada.',
-      descricao: 'A entrega final foi aprovada e o histórico ficou guardado nesta sala.',
-      rotuloAcao: 'Revisar encerramento',
-      nomeAcessivelAcao: 'Projeto concluído Entrega aceita pelo cliente',
-      destino: 'validacao',
+      titulo: aceiteConfirmado ? 'Entrega aprovada pelo cliente.' : 'Entrega concluída por você.',
+      descricao: aceiteConfirmado
+        ? 'O aceite e os materiais continuam disponíveis nesta ficha.'
+        : 'A conclusão foi registrada. Ela não substitui o aceite do cliente.',
+      rotuloAcao: aceiteConfirmado ? 'Revisar encerramento' : 'Ver arquivos',
+      nomeAcessivelAcao: aceiteConfirmado
+        ? 'Projeto concluído Entrega aceita pelo cliente'
+        : 'Ver arquivos da entrega concluída',
+      destino: aceiteConfirmado ? 'validacao' : 'arquivos',
       tarefaId: ultimaTarefa?.id ?? null,
     };
   }
@@ -124,10 +130,10 @@ export function obterEstadoJornadaEntrega({
     return {
       momento: 'alinhar',
       tom: 'aguardando',
-      titulo: `O cliente ainda precisa resolver “${atrasadaComCliente.titulo}”.`,
+      titulo: atrasadaComCliente.titulo,
       descricao: atrasadaComCliente.prazoEm
-        ? `${rotuloPrazoOperacional(atrasadaComCliente.prazoEm, agora)}. O portal mostra esta pendência em destaque.`
-        : 'O portal mostra esta pendência em destaque.',
+        ? rotuloPrazoOperacional(atrasadaComCliente.prazoEm, agora)
+        : 'Este item está com o cliente.',
       rotuloAcao: 'Ver pendência do cliente',
       nomeAcessivelAcao: `Ver pendência do cliente ${atrasadaComCliente.titulo}`,
       destino: 'preparacao',
@@ -170,8 +176,10 @@ export function obterEstadoJornadaEntrega({
     return {
       momento: 'alinhar',
       tom: 'aguardando',
-      titulo: `Aguardando “${pendenciaCliente.titulo}”.`,
-      descricao: 'O cliente pode confirmar este item diretamente pelo portal do projeto.',
+      titulo: pendenciaCliente.titulo,
+      descricao: pendenciaCliente.responsavelNome
+        ? `Responsável: ${pendenciaCliente.responsavelNome}`
+        : 'Este item está com o cliente.',
       rotuloAcao: 'Ver preparação',
       nomeAcessivelAcao: `Ver preparação aguardando ${pendenciaCliente.titulo}`,
       destino: 'preparacao',
@@ -231,8 +239,7 @@ export function obterEstadoJornadaEntrega({
     momento: 'validar',
     tom: 'normal',
     titulo: 'Tudo pronto para o aceite final.',
-    descricao:
-      'Envie a última entrega pelo portal. O projeto só será encerrado depois da aprovação do cliente.',
+    descricao: 'Envie a última entrega pelo portal para registrar a aprovação do cliente.',
     rotuloAcao: 'Formalizar a entrega final',
     nomeAcessivelAcao: 'Formalizar a entrega final',
     destino: 'validacao',

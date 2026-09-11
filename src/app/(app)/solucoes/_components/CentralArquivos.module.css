@@ -117,7 +117,7 @@
   justify-content: flex-end;
   gap: var(--via-space-2);
   margin: 0;
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--via-fs-xs);
 }
 
@@ -138,7 +138,7 @@
 }
 
 .metricas dt {
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -199,7 +199,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--via-space-2);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--app-fs-micro);
   letter-spacing: var(--app-ls-eyebrow);
@@ -490,7 +490,7 @@
   padding: 6px 8px;
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-chip);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-family: var(--via-font-mono);
   font-size: var(--app-fs-micro);
   text-transform: uppercase;
@@ -515,8 +515,8 @@
 }
 
 .contextoArquivo span {
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
 .contextoArquivo span + span::before {
@@ -589,8 +589,8 @@
 
 .versoes small {
   margin-top: 3px;
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
 .versoes em {
@@ -635,8 +635,8 @@
   padding: var(--via-space-3) var(--via-space-5);
   border-top: 1px solid var(--via-border-hairline);
   background: var(--via-bg-2);
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-micro);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
 }
 
 .vazio {

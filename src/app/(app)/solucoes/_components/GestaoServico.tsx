@@ -34,9 +34,11 @@ const BOTOES: Record<Acao, string> = {
 export function GestaoServico({
   projeto,
   onConcluir,
+  compacto = false,
 }: {
   projeto: ProjetoExecucaoCompleto;
   onConcluir: () => void;
+  compacto?: boolean;
 }) {
   const router = useRouter();
   const [acao, setAcao] = useState<Acao | null>(null);
@@ -121,28 +123,31 @@ export function GestaoServico({
         className={styles.faixa}
         aria-label="Gestão da entrega"
         data-concluido={concluido || undefined}
+        data-compacto={compacto || undefined}
       >
-        <div className={styles.situacao}>
-          <span className={styles.icone} aria-hidden="true">
-            {acompanhando ? (
-              <Repeat2 size={21} />
-            ) : concluido ? (
-              <Check size={21} />
-            ) : (
-              <PackageCheck size={21} />
-            )}
-          </span>
-          <div>
-            <strong>{rotuloGestao(projeto)}</strong>
-            <span>
-              {acompanhando
-                ? 'A entrega terminou. O cuidado continua.'
-                : concluido
-                  ? 'Arquivos e histórico continuam disponíveis.'
-                  : 'Você define quando a entrega está pronta.'}
+        {!compacto && (
+          <div className={styles.situacao}>
+            <span className={styles.icone} aria-hidden="true">
+              {acompanhando ? (
+                <Repeat2 size={21} />
+              ) : concluido ? (
+                <Check size={21} />
+              ) : (
+                <PackageCheck size={21} />
+              )}
             </span>
+            <div>
+              <strong>{rotuloGestao(projeto)}</strong>
+              <span>
+                {acompanhando
+                  ? 'A entrega terminou. O cuidado continua.'
+                  : concluido
+                    ? 'Arquivos e histórico continuam disponíveis.'
+                    : 'Você define quando a entrega está pronta.'}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
         <div className={styles.acoes}>
           <button
             className={styles.secundario}
@@ -157,7 +162,7 @@ export function GestaoServico({
           </button>
           {!concluido && (
             <button
-              className={styles.primario}
+              className={temPendencias ? styles.secundario : styles.primario}
               type="button"
               onClick={(event) => {
                 gatilho.current = event.currentTarget;

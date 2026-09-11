@@ -14,7 +14,6 @@
     inset 0 1px 0 var(--via-edge-hi),
     var(--app-elev-2-shadow);
   backdrop-filter: blur(24px) saturate(145%);
-  -webkit-backdrop-filter: blur(24px) saturate(145%);
 }
 
 .card[data-tom='ajuste'],
@@ -62,16 +61,14 @@
 
 .conteudo p {
   color: var(--via-accent-ink);
-  font: var(--via-fw-semibold) var(--app-fs-micro) var(--via-font-mono);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
+  font: var(--via-fw-medium) var(--app-fs-support) var(--via-font);
 }
 
 .titulo {
   display: block;
   margin-top: 3px;
   color: var(--via-text-primary);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
   line-height: 1.35;
 }
 
@@ -79,7 +76,7 @@
   display: block;
   margin-top: 3px;
   color: var(--via-text-muted);
-  font-size: var(--app-fs-meta);
+  font-size: var(--app-fs-support);
   line-height: 1.45;
 }
 
@@ -131,13 +128,9 @@
   }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 599px) {
   .card {
     gap: var(--via-space-3);
-  }
-
-  .descricao {
-    display: none;
   }
 }
 

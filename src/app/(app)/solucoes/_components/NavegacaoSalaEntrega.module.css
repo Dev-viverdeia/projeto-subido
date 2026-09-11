@@ -1,0 +1,85 @@
+.navegacao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  padding: 5px;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--via-glass-bar);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+.navegacao button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--app-radius-card) - 5px);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: var(--via-fw-medium) var(--app-fs-ui) var(--via-font);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state),
+    color var(--app-t-state);
+}
+.navegacao button:hover {
+  background: var(--app-glass-plane-strong);
+  color: var(--via-text-primary);
+}
+.navegacao button[aria-current] {
+  border-color: var(--app-elev-1-line);
+  background: var(--app-glass-plane-strong);
+  box-shadow:
+    var(--app-elev-1-shadow),
+    inset 0 1px 0 var(--via-edge-hi);
+  color: var(--via-text-primary);
+}
+.navegacao button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.navegacao svg {
+  flex-shrink: 0;
+}
+.contagem {
+  min-width: 22px;
+  padding: 2px 6px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-chip);
+  background: var(--via-surface);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-primary);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .navegacao {
+    background: var(--via-surface);
+  }
+}
+@media (max-width: 599px) {
+  .navegacao {
+    gap: 2px;
+  }
+  .navegacao button {
+    padding: 10px 6px;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .navegacao button > svg {
+    display: none;
+  }
+  .navegacao[data-evolucao] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navegacao button {
+    transition: none;
+  }
+}

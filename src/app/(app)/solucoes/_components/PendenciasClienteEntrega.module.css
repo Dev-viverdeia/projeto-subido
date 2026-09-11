@@ -1,0 +1,88 @@
+.pendencias {
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-1-shadow);
+  padding: var(--via-space-5);
+}
+.pendencias header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--via-space-3);
+  flex-wrap: wrap;
+}
+.pendencias h2 {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+}
+.pendencias header > span,
+.pendencias li > div > span {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.pendencias ul {
+  margin: var(--via-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pendencias li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--via-space-3);
+  padding-block: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.pendencias li strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.icone {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-muted);
+  background: var(--via-surface);
+}
+.pendencias button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: var(--via-fw-medium) var(--app-fs-ui) var(--via-font);
+  cursor: pointer;
+}
+.pendencias button:hover {
+  border-color: var(--via-text-muted);
+}
+.pendencias button:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+@media (max-width: 599px) {
+  .pendencias {
+    padding: var(--via-space-4);
+  }
+  .pendencias li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .pendencias button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

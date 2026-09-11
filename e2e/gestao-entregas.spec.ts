@@ -48,7 +48,8 @@ test.describe('gestão simples das entregas', () => {
   });
   test('pontual concluído não bloqueia os arquivos atrás do aceite formal', async ({ page }) => {
     await page.goto('/preview/sala-entrega?estado=pontual-concluido');
-    await expect(page.getByText('Concluído', { exact: true })).toBeVisible();
+    await expect(page.getByText('Entrega concluída', { exact: true })).toBeVisible();
+    await expect(page.getByText('Conclusão por você · sem aceite final')).toBeVisible();
     await expect(page.getByText('A revisão aparece depois do aceite final.')).toHaveCount(0);
     await page.getByRole('button', { name: 'Gerenciar', exact: true }).click();
     await expect(page.getByRole('radio', { name: /Pontual/ })).toBeChecked();
