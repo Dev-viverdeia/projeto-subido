@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 
 export function usePreviaProposta() {
+  const editorRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLElement>(null);
   const secaoPreviewRef = useRef('cliente');
   const campoEmFocoRef = useRef<HTMLElement | null>(null);
@@ -35,10 +36,33 @@ export function usePreviaProposta() {
         painel.scrollTop +
         alvo.getBoundingClientRect().top -
         painel.getBoundingClientRect().top -
-        64,
+        (painel.querySelector<HTMLElement>('[data-cabecalho-preview]')?.offsetHeight ?? 56) -
+        12,
       behavior: 'instant',
     });
   }
 
-  return { previewRef, secaoPreviewRef, campoEmFocoRef, mostrarSecaoPreview, voltarParaEdicao };
+  function editarSecao(secao: string) {
+    requestAnimationFrame(() => {
+      const campo = editorRef.current?.querySelector<HTMLElement>(
+        `[data-campo-preview="${secao}"]`,
+      );
+      if (!campo) return;
+      const bloco = campo.closest('details');
+      if (bloco) bloco.open = true;
+      campoEmFocoRef.current = campo;
+      campo.scrollIntoView({ block: 'center', behavior: 'instant' });
+      campo.focus({ preventScroll: true });
+    });
+  }
+
+  return {
+    editorRef,
+    previewRef,
+    secaoPreviewRef,
+    campoEmFocoRef,
+    mostrarSecaoPreview,
+    voltarParaEdicao,
+    editarSecao,
+  };
 }

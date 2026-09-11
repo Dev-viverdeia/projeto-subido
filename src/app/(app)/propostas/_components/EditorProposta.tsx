@@ -58,8 +58,15 @@ export function EditorProposta({
   const [conteudoSalvo, setConteudoSalvo] = useState<string | null>(() =>
     alteracaoInicial ? null : JSON.stringify([tituloInicial, JSON.stringify(documentoInicial)]),
   );
-  const { previewRef, secaoPreviewRef, campoEmFocoRef, mostrarSecaoPreview, voltarParaEdicao } =
-    usePreviaProposta();
+  const {
+    editorRef,
+    previewRef,
+    secaoPreviewRef,
+    campoEmFocoRef,
+    mostrarSecaoPreview,
+    voltarParaEdicao,
+    editarSecao,
+  } = usePreviaProposta();
   const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
   const [estadoSalvar, acaoSalvar, salvando] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {
@@ -124,8 +131,12 @@ export function EditorProposta({
 
         <div className={styles.acoesTopo}>
           {reuniaoId && (
-            <Link href={`/reunioes/${reuniaoId}`} className={styles.secundario}>
-              <Video size={15} aria-hidden="true" /> Reunião de origem
+            <Link
+              href={`/reunioes/${reuniaoId}`}
+              className={styles.secundario}
+              aria-label="Reunião de origem"
+            >
+              <Video size={15} aria-hidden="true" /> Reunião
             </Link>
           )}
           <Link href={`/vendas/${oportunidadeId}`} className={styles.secundario}>
@@ -240,6 +251,7 @@ export function EditorProposta({
 
       <div className={styles.grade}>
         <section
+          ref={editorRef}
           className={styles.editor}
           aria-label="Editar proposta"
           data-painel-ativo={painelAtivo === 'editar' || undefined}
@@ -373,6 +385,10 @@ export function EditorProposta({
           data-painel-ativo={painelAtivo === 'preview' || undefined}
         >
           <PreviewProposta
+            onEditar={(secao) => {
+              setPainelAtivo('editar');
+              editarSecao(secao);
+            }}
             referenciaEm={referenciaEm}
             documento={documento}
             titulo={titulo}
