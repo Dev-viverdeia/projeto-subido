@@ -5,6 +5,7 @@ import { readFile, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { verificarBaseConfiavel } from './base-confiavel.mjs';
 
 const executar = promisify(executarCallback);
 const raiz = resolve(import.meta.dirname, '../..');
@@ -230,6 +231,7 @@ try {
     );
     await sql(await readFile(join(raiz, 'scripts/perf/saude-contratos.sql'), 'utf8'));
     console.log('Saúde: permissões, retomadas, períodos e deduplicação de pulsos aprovados.');
+    await verificarBaseConfiavel({ sql, funcao, raiz });
   }
   if (!soContratos) {
     // Carga mista de transações reais. Falha/retry sintéticos; sem IA, rede externa ou envio.

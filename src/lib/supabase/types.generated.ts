@@ -3434,6 +3434,36 @@ export type Database = {
           },
         ]
       }
+      sobral_uso_reservas: {
+        Row: {
+          criado_em: string
+          dono: string
+          id: string
+          liquidado_em: string | null
+          mes: string
+          realizado: number | null
+          reservado: number
+        }
+        Insert: {
+          criado_em?: string
+          dono: string
+          id: string
+          liquidado_em?: string | null
+          mes: string
+          realizado?: number | null
+          reservado: number
+        }
+        Update: {
+          criado_em?: string
+          dono?: string
+          id?: string
+          liquidado_em?: string | null
+          mes?: string
+          realizado?: number | null
+          reservado?: number
+        }
+        Relationships: []
+      }
       solucao_itens: {
         Row: {
           conteudo: string
@@ -4142,6 +4172,22 @@ export type Database = {
           saldo: number
         }[]
       }
+      builder_finalizar_geracao: {
+        Args: {
+          p_chave: string
+          p_documento?: Json
+          p_erro?: string
+          p_id: string
+          p_modelo?: string
+          p_tentativa: string
+        }
+        Returns: boolean
+      }
+      builder_iniciar_geracao: {
+        Args: { p_chave: string; p_id: string; p_respostas: Json }
+        Returns: Json
+      }
+      builder_recuperar_geracao: { Args: { p_id: string }; Returns: boolean }
       calls_agendar_reuniao: {
         Args: {
           p_agendada_para: string
@@ -4828,6 +4874,14 @@ export type Database = {
           p_thread: string
         }
         Returns: Json
+      }
+      sobral_liquidar_uso: {
+        Args: { p_dono: string; p_id: string; p_tokens: number }
+        Returns: boolean
+      }
+      sobral_reservar_uso: {
+        Args: { p_dono: string; p_id: string; p_tokens: number }
+        Returns: boolean
       }
       sobral_salvar_material: {
         Args: { p_mensagem: string; p_oportunidade: string; p_resumo: Json }

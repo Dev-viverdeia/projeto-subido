@@ -6,6 +6,7 @@ import { openAIEnv } from '@/lib/env';
 import type { Database } from '@/lib/supabase/types.generated';
 import { SOBRAL_BUCKET_ANEXOS, type CategoriaAnexoSobral } from './anexos-contrato';
 import { ErroSobral } from './erro';
+import { comOrcamentoSobral } from './orcamento';
 
 export type AnexoPersistidoSobral = {
   id: string;
@@ -54,7 +55,7 @@ export async function prepararAnexosParaModelo(
       partes[0] !== contexto.dono ||
       partes[1] !== contexto.threadId ||
       !partes[2]?.startsWith(`${anexo.id}-`) ||
-      !/^[a-zA-Z0-9._-]+$/.test(partes[2])
+      /[^a-zA-Z0-9._-]/.test(partes[2])
     ) {
       throw new ErroSobral(
         'Não foi possível acessar este anexo. Envie o arquivo novamente.',
@@ -66,7 +67,7 @@ export async function prepararAnexosParaModelo(
   const { OPENAI_API_KEY } = openAIEnv();
   const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
-    maxRetries: signal ? 0 : 2,
+    maxRetries: 0,
     timeout: 90_000,
   });
   const idsTemporarios: string[] = [];
@@ -93,10 +94,13 @@ export async function prepararAnexosParaModelo(
       const arquivo = await toFile(await data.arrayBuffer(), anexo.nome, { type: anexo.tipoMime });
 
       if (anexo.categoria === 'audio') {
-        const texto =
-          anexo.transcricao?.trim() ||
-          (
-            await openai.audio.transcriptions.create(
+        // Áudio também é trabalho pago. Reserva antes de chamar o provedor,
+        // inclusive quando o usuário cancela. Não debita a carteira de créditos.
+        const transcricao = await comOrcamentoSobral(
+          contexto.dono,
+          128_000,
+          async (informarUso) => {
+            const resposta = await openai.audio.transcriptions.create(
               {
                 file: arquivo,
                 model: 'gpt-transcribe',
@@ -104,8 +108,13 @@ export async function prepararAnexosParaModelo(
                 response_format: 'json',
               },
               { signal },
-            )
-          ).text.trim();
+            );
+            if (resposta.usage?.type === 'tokens') informarUso(resposta.usage.total_tokens);
+            return resposta;
+          },
+          signal,
+        );
+        const texto = transcricao.text.trim();
 
         if (!texto) throw new Error('transcricao-vazia');
         entradas.push({
@@ -137,6 +146,7 @@ export async function prepararAnexosParaModelo(
   } catch (causa) {
     await Promise.allSettled(idsTemporarios.map((id) => openai.files.delete(id)));
     if (signal?.aborted) throw causa;
+    if (causa instanceof ErroSobral) throw causa;
     if (causa instanceof OpenAI.AuthenticationError) {
       throw new ErroSobral('A chave do Sobral AI foi recusada.', 'sem-chave');
     }

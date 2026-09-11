@@ -31,8 +31,9 @@ describe('download do portal', () => {
     vi.clearAllMocks();
     arquivo.maybeSingle.mockResolvedValue({
       data: {
+        dono: 'dono',
         projeto_execucao_id: 'projeto-1',
-        caminho_storage: 'dono/projeto/arquivo.txt',
+        caminho_storage: 'dono/projeto-1/arquivo.txt',
         nome_original: 'arquivo.txt',
       },
       error: null,
@@ -50,7 +51,8 @@ describe('download do portal', () => {
     expect(projeto.eq).toHaveBeenCalledWith('id', 'projeto-1');
     expect(projeto.eq).toHaveBeenCalledWith('portal_codigo', codigo);
     expect(projeto.eq).toHaveBeenCalledWith('portal_ativo', true);
-    expect(assinar).toHaveBeenCalledWith('dono/projeto/arquivo.txt', 60, {
+    expect(projeto.eq).toHaveBeenCalledWith('dono', 'dono');
+    expect(assinar).toHaveBeenCalledWith('dono/projeto-1/arquivo.txt', 60, {
       download: 'arquivo.txt',
     });
     expect(resposta.status).toBe(307);
@@ -71,4 +73,20 @@ describe('download do portal', () => {
     assinar.mockResolvedValue({ data: null, error: { message: 'unavailable' } });
     expect((await abrir()).status).toBe(503);
   });
+  it.each(['../../vitima/projeto/segredo.pdf', '%2e%2e', 'a\\b', '/arquivo.txt'])(
+    'não assina registro legado com caminho inseguro %s',
+    async (nome) => {
+      arquivo.maybeSingle.mockResolvedValue({
+        data: {
+          dono: 'dono',
+          projeto_execucao_id: 'projeto-1',
+          caminho_storage: `dono/projeto-1/${nome}`,
+          nome_original: 'arquivo.txt',
+        },
+        error: null,
+      });
+      expect((await abrir()).status).toBe(404);
+      expect(assinar).not.toHaveBeenCalled();
+    },
+  );
 });

@@ -8,9 +8,8 @@ import type { DocumentoSolucao } from '@/lib/builder/schema';
 import { Visto } from '../../../_components/PillEstado';
 import styles from './EtapaCriacao.module.css';
 
-/** ~4 minutos de tentativas. Além disso a geração não voltou mais — e insistir
- *  em silêncio é pior que dizer que parou. */
-const TENTATIVAS = 40;
+/** A recuperação respeita a reserva de 7 minutos do worker no banco. */
+const TENTATIVAS = 70;
 const INTERVALO = 6000;
 
 /**
@@ -92,8 +91,8 @@ export function EtapaCriacao({
     return (
       <div className={styles.falha}>
         <p className={styles.falhaTexto}>
-          A geração ficou marcada como em andamento por tempo demais, o que normalmente significa
-          que a chamada morreu no meio. Suas respostas continuam salvas.
+          O projeto não ficou pronto no prazo esperado. Suas respostas estão salvas para tentar de
+          novo.
         </p>
         <form action={voltarParaEntrevista} className={styles.acoes}>
           <input type="hidden" name="id" value={id} />

@@ -26,6 +26,7 @@ import type { EntradaAnexoModelo } from './processar-anexos';
 import { textoProgressivo } from './texto-progressivo';
 import { INSTRUCOES_SOBRAL } from './orientacao';
 import { INSTRUCOES_MATERIAL, ResumoMaterialSchema, type ResumoMaterial } from './material';
+import { comOrcamentoSobral } from './orcamento';
 
 const TETO_HISTORICO = 20;
 
@@ -70,7 +71,7 @@ export async function gerarRodadaSobral({
   const { OPENAI_API_KEY, SOBRAL_AI_MODEL } = openAIEnv();
   const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
-    maxRetries: fluxo ? 0 : 2,
+    maxRetries: 0,
     timeout: 120_000,
   });
 
@@ -125,23 +126,57 @@ export async function gerarRodadaSobral({
       store: false,
       safety_identifier: identificadorSeguro(usuarioId),
     };
-    const resposta = await (async () => {
-      if (!fluxo) return openai.responses.parse(parametros);
-      const stream = openai.responses.stream(parametros, { signal: fluxo.signal });
-      let anterior = '';
-      stream.on('response.output_text.delta', (evento) => {
-        const texto = textoProgressivo(evento.snapshot);
-        if (texto && texto !== anterior) {
-          anterior = texto;
-          fluxo.aoTexto(texto);
+    // Texto: bytes UTF-8 são um teto conservador, incluindo o schema. Arquivos
+    // precisam da contagem do provedor: o tamanho do file_id não representa o PDF.
+    const entrada = anexos.some((a) => a.fileId)
+      ? (
+          await openai.responses.inputTokens.count(
+            {
+              model: parametros.model,
+              input: parametros.input,
+              instructions: parametros.instructions,
+              reasoning: parametros.reasoning,
+              text: parametros.text,
+            },
+            { signal: fluxo?.signal },
+          )
+        ).input_tokens
+      : Buffer.byteLength(JSON.stringify(parametros), 'utf8');
+    const resposta = await comOrcamentoSobral(
+      usuarioId,
+      entrada + parametros.max_output_tokens,
+      async (informarUso) => {
+        if (!fluxo) {
+          const completa = await openai.responses.parse(parametros);
+          if (completa.usage)
+            informarUso(completa.usage.input_tokens + completa.usage.output_tokens);
+          return completa;
         }
-      });
-      stream.on('response.completed', (evento) => {
-        const uso = evento.response.usage;
-        if (uso) fluxo.aoUso(uso.input_tokens + uso.output_tokens);
-      });
-      return stream.finalResponse();
-    })();
+        const stream = openai.responses.stream(parametros, { signal: fluxo.signal });
+        let anterior = '';
+        stream.on('response.output_text.delta', (evento) => {
+          const texto = textoProgressivo(evento.snapshot);
+          if (texto && texto !== anterior) {
+            anterior = texto;
+            fluxo.aoTexto(texto);
+          }
+        });
+        const registrar = (evento: {
+          response: { usage?: { input_tokens: number; output_tokens: number } | null };
+        }) => {
+          const uso = evento.response.usage;
+          if (uso) {
+            informarUso(uso.input_tokens + uso.output_tokens);
+            fluxo.aoUso(uso.input_tokens + uso.output_tokens);
+          }
+        };
+        stream.on('response.completed', registrar);
+        stream.on('response.incomplete', registrar);
+        stream.on('response.failed', registrar);
+        return stream.finalResponse();
+      },
+      fluxo?.signal,
+    );
 
     if (!resposta.output_parsed) {
       const recusou = resposta.output.some(
@@ -215,22 +250,31 @@ export async function gerarProximaAcaoDoLead({
   contexto: ContextoRecomendacao;
 }): Promise<RecomendacaoGerada> {
   const { OPENAI_API_KEY, SOBRAL_AI_MODEL } = openAIEnv();
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 2, timeout: 120_000 });
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 0, timeout: 120_000 });
 
   try {
-    const resposta = await openai.responses.parse({
+    const parametros = {
       model: SOBRAL_AI_MODEL,
       instructions: INSTRUCOES_PROXIMO_PASSO,
       input: contextoProximoPassoParaModelo(contexto),
-      reasoning: { effort: 'low' },
+      reasoning: { effort: 'low' as const },
       text: {
         format: zodTextFormat(SaidaRecomendacaoModeloSchema, 'proxima_acao_do_lead'),
-        verbosity: 'low',
+        verbosity: 'low' as const,
       },
       max_output_tokens: 1200,
       store: false,
       safety_identifier: identificadorSeguro(usuarioId),
-    });
+    };
+    const resposta = await comOrcamentoSobral(
+      usuarioId,
+      Buffer.byteLength(JSON.stringify(parametros), 'utf8') + parametros.max_output_tokens,
+      async (informarUso) => {
+        const completa = await openai.responses.parse(parametros);
+        if (completa.usage) informarUso(completa.usage.input_tokens + completa.usage.output_tokens);
+        return completa;
+      },
+    );
 
     if (!resposta.output_parsed) {
       throw new ErroSobral('A recomendação voltou incompleta.', 'falha');

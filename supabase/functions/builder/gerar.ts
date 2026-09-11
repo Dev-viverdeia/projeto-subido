@@ -52,42 +52,35 @@ export async function gerar(req: Request): Promise<Response> {
 
     const { id, respostas } = corpo.data;
 
-    /* A ideia vem do BANCO, não do corpo do pedido. É o que impede alguém de
-       gravar um rascunho curto e mandar gerar com outro texto — e o que garante
-       que o documento corresponde à ideia registrada. A RLS já limita a linha ao
-       dono; `maybeSingle()` devolve `null` para id alheio ou inexistente, sem
-       distinguir os dois casos. */
-    const { data: linha, error: erroLeitura } = await supabase
-      .from('builder_solucoes')
-      .select('ideia_original, status')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (erroLeitura) {
-      console.error('[builder:gerar] leitura:', erroLeitura);
-      return respostaJson({ erro: 'Não foi possível ler o rascunho.', tipo: 'falha' }, 500);
-    }
-    if (!linha) return respostaJson({ erro: 'Solução não encontrada.', tipo: 'falha' }, 404);
-
-    /* Duas gerações simultâneas na mesma linha desperdiçariam uma chamada paga e
-       a última a terminar sobrescreveria a outra. O estado no banco é a trava. */
-    if (linha.status === 'gerando') {
-      return respostaJson({ id, jaGerando: true }, 202);
-    }
-
-    const { error: erroStatus } = await supabase
-      .from('builder_solucoes')
-      .update({ status: 'gerando', respostas, erro: null })
-      .eq('id', id);
-
+    const chave = Deno.env.get('BUILDER_WORKER_KEY');
+    if (!chave) return respostaJson({ erro: 'O Estúdio está indisponível agora.' }, 503);
+    // Claim e insumos são decididos na mesma transação. O JWT conserva dono/RLS;
+    // a credencial privada impede chamar a finalização diretamente pelo browser.
+    const { data: reserva, error: erroStatus } = await supabase.rpc('builder_iniciar_geracao', {
+      p_id: id,
+      p_respostas: respostas,
+      p_chave: chave,
+    });
     if (erroStatus) {
-      console.error('[builder:gerar] status:', erroStatus);
-      return respostaJson({ erro: 'Não foi possível iniciar a geração.', tipo: 'falha' }, 500);
+      console.error('[builder:gerar] reserva recusada', erroStatus.code);
+      return respostaJson(
+        {
+          erro:
+            erroStatus.message === 'limite_builder_simultaneo'
+              ? 'Você já tem projetos sendo preparados. Aguarde um terminar.'
+              : 'Não foi possível iniciar o projeto. Tente novamente.',
+          tipo: 'falha',
+        },
+        erroStatus.message === 'limite_builder_simultaneo' ? 429 : 409,
+      );
     }
+    if (!reserva?.executar) return respostaJson({ id, jaGerando: true }, 202);
 
     /* A partir daqui o trabalho é de fundo. Nada do que acontecer nele chega ao
        cliente por esta resposta — chega pelo BANCO, que é o que a tela lê. */
-    EdgeRuntime.waitUntil(gerarEGravar(supabase, id, linha.ideia_original, respostas));
+    EdgeRuntime.waitUntil(
+      gerarEGravar(supabase, id, reserva.tentativa, chave, reserva.ideia, respostas),
+    );
 
     return respostaJson({ id }, 202);
   } catch (erro) {
@@ -106,22 +99,21 @@ export async function gerar(req: Request): Promise<Response> {
 async function gerarEGravar(
   supabase: SupabaseClient,
   id: string,
+  tentativa: string,
+  chave: string,
   ideia: string,
   respostas: RespostaClarificacao[],
 ): Promise<void> {
   try {
     const documento = await gerarDocumento(ideia, respostas);
 
-    const { error } = await supabase
-      .from('builder_solucoes')
-      .update({
-        status: 'pronta',
-        documento,
-        titulo: documento.titulo,
-        modelo: MODELO,
-        erro: null,
-      })
-      .eq('id', id);
+    const { error } = await supabase.rpc('builder_finalizar_geracao', {
+      p_id: id,
+      p_tentativa: tentativa,
+      p_chave: chave,
+      p_documento: documento,
+      p_modelo: MODELO,
+    });
 
     if (error) throw new ErroDoBuilder('O projeto foi gerado mas não pôde ser salvo.', 'falha');
   } catch (erro) {
@@ -133,10 +125,12 @@ async function gerarEGravar(
       console.error(`[builder:gerar] ${id}: erro original —`, erro);
     }
 
-    const { error } = await supabase
-      .from('builder_solucoes')
-      .update({ status: 'falhou', erro: traduzido.message })
-      .eq('id', id);
+    const { error } = await supabase.rpc('builder_finalizar_geracao', {
+      p_id: id,
+      p_tentativa: tentativa,
+      p_chave: chave,
+      p_erro: traduzido.message,
+    });
 
     /* Se nem a gravação da falha funcionar, o único lugar que resta é o log. A
        solução fica em `gerando`, e é para isso que a tela tem a saída manual de

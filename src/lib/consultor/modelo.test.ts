@@ -5,15 +5,32 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/lib/env', () => ({
   openAIEnv: () => ({ OPENAI_API_KEY: 'chave-sintetica', SOBRAL_AI_MODEL: 'modelo-teste' }),
 }));
-const { parse } = vi.hoisted(() => ({ parse: vi.fn() }));
+const { parse, count, reservar, informar } = vi.hoisted(() => ({
+  parse: vi.fn(),
+  count: vi.fn(),
+  reservar: vi.fn(),
+  informar: vi.fn(),
+}));
+vi.mock('./orcamento', () => ({ comOrcamentoSobral: reservar }));
 vi.mock('openai', () => ({
   default: class {
-    responses = { parse };
+    static RateLimitError = class extends Error {};
+    static AuthenticationError = class extends Error {};
+    static APIError = class extends Error {};
+    responses = { parse, inputTokens: { count } };
   },
 }));
 describe('pedido enviado ao modelo', () => {
   beforeEach(() => {
     parse.mockReset();
+    count.mockReset();
+    informar.mockReset();
+    reservar
+      .mockReset()
+      .mockImplementation(
+        (_dono, _teto, gerar: (informar: (n: number) => void) => Promise<unknown>) =>
+          gerar(informar),
+      );
   });
   it('mantém cadastros fora das instruções e o pedido do usuário por último', async () => {
     const sinais = sinaisDeQualidade();
@@ -56,7 +73,41 @@ describe('pedido enviado ao modelo', () => {
     expect(parametros.text.format.schema.properties).toHaveProperty('usar_venda_em_foco');
     expect(rodada.tokens).toBe(70);
     expect(parametros.text.format.schema.properties).not.toHaveProperty('resumo_material');
+    expect(informar).toHaveBeenCalledWith(70);
     expect(rodada.resumoMaterial).toBeNull();
+  });
+
+  it('conta arquivos com o contrato de inputTokens e reserva antes de gerar', async () => {
+    count.mockResolvedValue({ input_tokens: 4200 });
+    parse.mockResolvedValue({
+      id: 'r',
+      usage: { input_tokens: 4200, output_tokens: 10 },
+      output_parsed: {
+        resposta: 'Arquivo recebido.',
+        proximo_passo: {
+          titulo: 'Revisar o documento',
+          detalhe: 'Confira o arquivo recebido.',
+          evidencia: 'Documento revisado.',
+          destino: '/vendas',
+        },
+        acoes: [],
+      },
+    });
+    await gerarRodadaSobral({
+      usuarioId: 'qa',
+      etapa: 'aprender',
+      sinais: sinaisDeQualidade(),
+      historico: [],
+      pedido: 'Leia este PDF.',
+      anexos: [
+        { id: 'a', nome: 'documento.pdf', categoria: 'documento', fileId: 'file-sintetico' },
+      ],
+    });
+    expect(Object.keys(count.mock.calls[0]![0] as object).sort()).toEqual(
+      ['model', 'input', 'instructions', 'reasoning', 'text'].sort(),
+    );
+    expect(reservar).toHaveBeenCalledWith('qa', 7400, expect.any(Function), undefined);
+    expect(reservar.mock.invocationCallOrder[0]).toBeLessThan(parse.mock.invocationCallOrder[0]!);
   });
 
   it('pede resumo estruturado somente com anexos novos, sem incluir nomes de arquivo nas instruções', async () => {

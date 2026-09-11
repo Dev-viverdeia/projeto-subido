@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { criarAdminSobral } from '@/lib/consultor/admin';
 import { gerarProximaAcaoDoLead } from '@/lib/consultor/modelo';
 import { ErroSobral } from '@/lib/consultor/erro';
 import { obterContextoProximoPasso } from '@/lib/consultor/proximo-passo';
 import { criarRecomendacaoFallback } from '@/lib/consultor/recomendacao';
-import { obterUsoDoMes, registrarUsoSobral, TETO_TOKENS_SOBRAL_MES } from '@/lib/consultor/servico';
+import { obterUsoDoMes, TETO_TOKENS_SOBRAL_MES } from '@/lib/consultor/servico';
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/types.generated';
 
@@ -86,10 +85,6 @@ export async function POST(request: Request) {
       { onConflict: 'mensagem_id' },
     );
     if (erroInsert) throw erroInsert;
-
-    if (recomendacao.tokens > 0) {
-      await registrarUsoSobral(criarAdminSobral(), user.id, recomendacao.tokens);
-    }
 
     return NextResponse.json({ status: 'pronta' }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (erro) {

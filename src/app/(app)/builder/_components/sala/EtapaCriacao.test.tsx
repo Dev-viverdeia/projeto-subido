@@ -96,11 +96,12 @@ describe('etapa de criação', () => {
     expect(screen.getByText('1 prompts · 1 riscos mapeados')).toBeDefined();
   });
 
-  it('depois de ~4 minutos sem resposta, oferece saída em vez de girar em silêncio', () => {
+  it('só oferece retomada depois de expirar a reserva do worker', () => {
     render(<EtapaCriacao id="p1" documento={null} />);
     avancarCiclos(41, 6000);
-
-    expect(screen.getByText(/tempo demais/)).toBeDefined();
+    expect(screen.queryByRole('button', { name: /Voltar à entrevista/ })).toBeNull();
+    avancarCiclos(30, 6000);
+    expect(screen.getByText(/não ficou pronto no prazo/)).toBeDefined();
     expect(screen.getByRole('button', { name: /Voltar à entrevista/ })).toBeDefined();
     expect(screen.queryByText('Arquitetura')).toBeNull();
   });

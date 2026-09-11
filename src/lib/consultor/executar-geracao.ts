@@ -143,6 +143,7 @@ export async function executarGeracao({
   }
   // Repetir o mesmo payload após perda de ACK não repete resposta nem contabilização.
   const dados: Json = {
+    uso_reservado: true,
     texto,
     tokens,
     erro,
