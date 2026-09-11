@@ -1,21 +1,35 @@
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { ArrowUpRight, Check, X } from 'lucide-react';
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
+import { ArrowUpRight, Check, LoaderCircle, X } from 'lucide-react';
 import { decidirPropostaCliente, type EstadoDecisaoProposta } from '@/lib/propostas/portal-actions';
+import { formatarReais } from '@/lib/propostas/schema';
 import styles from './proposta.module.css';
 
 const INICIAL: EstadoDecisaoProposta = {};
 
-function AcoesDecisao() {
-  const { pending, data } = useFormStatus();
-  const decisaoPendente = data?.get('decisao');
-
+function AcoesDecisao({ pending, decisaoPendente }: { pending: boolean; decisaoPendente: string }) {
   return (
     <div className={styles.acoesDecisao}>
-      <button type="submit" name="decisao" value="aceita" disabled={pending}>
-        <Check size={17} aria-hidden="true" />
+      <button
+        className={styles.botaoPrimario}
+        type="submit"
+        name="decisao"
+        value="aceita"
+        disabled={pending}
+      >
+        {pending && decisaoPendente === 'aceita' ? (
+          <LoaderCircle size={18} className={styles.carregando} aria-hidden="true" />
+        ) : (
+          <Check size={18} aria-hidden="true" />
+        )}
         {pending && decisaoPendente === 'aceita' ? 'Aprovando…' : 'Aprovar proposta'}
       </button>
       <button
@@ -23,9 +37,9 @@ function AcoesDecisao() {
         name="decisao"
         value="recusada"
         disabled={pending}
-        className={styles.recusar}
+        className={styles.botaoSecundario}
       >
-        {pending && decisaoPendente === 'recusada' ? 'Enviando…' : 'Não aprovar agora'}
+        {pending && decisaoPendente === 'recusada' ? 'Registrando…' : 'Não aprovar proposta'}
       </button>
     </div>
   );
@@ -36,28 +50,75 @@ export function DecisaoCliente({
   nomeInicial,
   emailInicial,
   linkPagamento,
+  valorCentavos,
+  submitAction = decidirPropostaCliente,
 }: {
   codigo: string;
   nomeInicial: string;
   emailInicial: string;
   linkPagamento: string | null;
+  valorCentavos: number | null;
+  submitAction?: typeof decidirPropostaCliente;
 }) {
-  const [estado, acao] = useActionState(decidirPropostaCliente, INICIAL);
+  // React limpa inputs não controlados mesmo quando a ação retorna um erro.
+  // A decisão permanece preenchida para corrigir ou repetir o envio com segurança.
+  const [nome, setNome] = useState(nomeInicial);
+  const [email, setEmail] = useState(emailInicial);
+  const [comentario, setComentario] = useState('');
+  const [aceite, setAceite] = useState(false);
+  const [decisaoPendente, setDecisaoPendente] = useState('');
+  const travaEnvio = useRef(false);
+  const erroRef = useRef<HTMLParagraphElement>(null);
+  const [estado, acao, pendente] = useActionState(
+    async (anterior: EstadoDecisaoProposta, dados: FormData) => {
+      try {
+        return await submitAction(anterior, dados);
+      } catch {
+        return {
+          erro: 'Não foi possível confirmar sua decisão. Seus dados continuam aqui. Tente novamente.',
+        };
+      } finally {
+        travaEnvio.current = false;
+      }
+    },
+    INICIAL,
+  );
+
+  useEffect(() => {
+    if (estado.erro) erroRef.current?.focus();
+  }, [estado]);
+
+  function enviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    if (travaEnvio.current) return;
+    const botao = (evento.nativeEvent as SubmitEvent).submitter;
+    if (!(botao instanceof HTMLButtonElement) || botao.name !== 'decisao') return;
+    const dados = new FormData(evento.currentTarget);
+    dados.set('decisao', botao.value);
+    travaEnvio.current = true;
+    setDecisaoPendente(botao.value);
+    startTransition(() => acao(dados));
+  }
 
   if (estado.sucesso) {
     return (
       <div className={styles.decisaoConcluida} data-status={estado.status} role="status">
-        <span>
+        <span className={styles.iconeEstado}>
           {estado.status === 'aceita' ? <Check aria-hidden="true" /> : <X aria-hidden="true" />}
         </span>
         <div>
-          <p>Decisão registrada</p>
-          <h2>{estado.status === 'aceita' ? 'Projeto aprovado.' : 'Retorno enviado.'}</h2>
-          <span>{estado.sucesso}</span>
+          <h2>{estado.status === 'aceita' ? 'Proposta aprovada' : 'Proposta não aprovada'}</h2>
+          <p>{estado.sucesso}</p>
           {estado.status === 'aceita' && linkPagamento && (
             <div className={styles.proximoPagamento}>
-              <a href={linkPagamento} target="_blank" rel="noopener noreferrer">
-                Abrir pagamento <ArrowUpRight size={16} aria-hidden="true" />
+              <a
+                className={styles.botaoPrimario}
+                href={linkPagamento}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Abrir pagamento
+                <ArrowUpRight size={18} aria-hidden="true" />
               </a>
               <span>
                 Você será levado ao checkout do prestador. A Subido não processa este pagamento.
@@ -70,23 +131,36 @@ export function DecisaoCliente({
   }
 
   return (
-    <form action={acao} className={styles.formDecisao}>
+    <form
+      action={acao}
+      onSubmit={enviar}
+      className={styles.formDecisao}
+      aria-label="Responder à proposta"
+      aria-busy={pendente}
+    >
       <input type="hidden" name="codigo" value={codigo} />
       <div className={styles.formTopo}>
-        <p>05 · Decisão</p>
-        <h2>Pronto para avançar?</h2>
-        <span>
-          Confirme seus dados e registre a decisão. A equipe recebe o retorno imediatamente.
-        </span>
+        <div>
+          <h2>Sua decisão</h2>
+          <p>Confira a proposta e registre seu retorno para o responsável.</p>
+        </div>
+        <div className={styles.revisaoValor}>
+          <strong>{formatarReais(valorCentavos)}</strong>
+          <a href="#investimento">
+            Rever condições
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+        </div>
       </div>
-
       <div className={styles.camposDecisao}>
         <label>
           <span>Seu nome</span>
           <input
             name="nome"
             type="text"
-            defaultValue={nomeInicial}
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            readOnly={pendente}
             minLength={2}
             maxLength={120}
             autoComplete="name"
@@ -98,7 +172,9 @@ export function DecisaoCliente({
           <input
             name="email"
             type="email"
-            defaultValue={emailInicial}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            readOnly={pendente}
             maxLength={254}
             autoComplete="email"
             required
@@ -110,31 +186,37 @@ export function DecisaoCliente({
           </span>
           <textarea
             name="comentario"
+            value={comentario}
+            onChange={(e) => setComentario(e.target.value)}
+            readOnly={pendente}
             rows={3}
             maxLength={2000}
-            placeholder="Inclua uma observação, condição ou motivo da decisão."
+            placeholder="Deixe uma observação para o responsável."
           />
         </label>
       </div>
-
       <label className={styles.aceiteTermos}>
-        <input type="checkbox" name="aceiteTermos" value="sim" />
+        <input
+          type="checkbox"
+          name="aceiteTermos"
+          value="sim"
+          checked={aceite}
+          onChange={(e) => setAceite(e.target.checked)}
+          disabled={pendente}
+        />
         <span>
           Li esta versão da proposta e concordo com o escopo, o investimento, as condições e os
-          próximos passos apresentados. <small>Obrigatório para aprovar.</small>
+          próximos passos apresentados.<small>Obrigatório para aprovar.</small>
         </span>
       </label>
-
       {estado.erro && (
-        <p className={styles.erroDecisao} role="alert">
+        <p ref={erroRef} tabIndex={-1} className={styles.erroDecisao} role="alert">
           {estado.erro}
         </p>
       )}
-
-      <AcoesDecisao />
+      <AcoesDecisao pending={pendente} decisaoPendente={decisaoPendente} />
       <small className={styles.segurancaDecisao}>
-        Sua decisão fica vinculada a esta versão da proposta, com data, nome, e-mail e registro do
-        aceite.
+        Ao enviar, sua decisão fica registrada nesta versão com nome, e-mail, data e aceite.
       </small>
     </form>
   );
