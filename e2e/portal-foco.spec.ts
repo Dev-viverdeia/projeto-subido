@@ -2,12 +2,27 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('link do e-mail revela a revisão mesmo quando ela começa recolhida', async ({ page }) => {
+  const erros: string[] = [];
+  page.on('pageerror', (erro) => erros.push(erro.message));
+  page.on('console', (mensagem) => {
+    if (mensagem.type() === 'error') erros.push(mensagem.text());
+  });
   await page.goto(
     '/preview/portal-cliente?estado=revisoes#entrega-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3',
   );
   const entrega = page.getByRole('article', { name: 'Montar a base aprovada' });
   await expect(entrega).toBeVisible();
   await expect(entrega.getByRole('button', { name: 'Aprovar entrega' })).toBeInViewport();
+  await entrega.getByRole('button', { name: 'Pedir ajuste' }).click();
+  const ajuste = entrega.getByLabel('O que precisa mudar?');
+  await expect(ajuste).toBeVisible();
+  await ajuste.fill('Validar as respostas antes de publicar.');
+  const resumo = page.locator('details > summary').filter({ hasText: 'Montar a base aprovada' });
+  await resumo.click();
+  await expect(entrega).not.toBeVisible();
+  await resumo.press('Enter');
+  await expect(ajuste).toHaveValue('Validar as respostas antes de publicar.');
+  expect(erros).toEqual([]);
 });
 
 test('organiza revisões sem esconder os materiais nem perder o ajuste digitado', async ({

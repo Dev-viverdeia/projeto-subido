@@ -18,7 +18,9 @@ export function RevisaoPortal({
 }) {
   if (!agrupar) return children;
   return (
-    <details className={styles.revisao} open={primeira}>
+    // O navegador pode abrir este details antes da hidratação ao seguir #entrega-…
+    // ou ao buscar na página. Preservamos esse estado nativo; a exceção é só aqui.
+    <details className={styles.revisao} open={primeira} suppressHydrationWarning>
       <summary>
         <span className={styles.revisaoIcone} aria-hidden="true">
           {tipo === 'entrega' ? <FileCheck2 size={21} /> : <FileDiff size={21} />}

@@ -40,3 +40,9 @@ Sobre o projeto · Resultados e aceite · Histórico
 ## Validação
 
 Desktop e celular; revisão única e múltipla, ajuste preservado, impacto financeiro, arquivos, vazio, conclusão manual, teclado, contraste e movimento reduzido. As simulações locais não enviam decisões para clientes reais. Rotas de preview permanecem indisponíveis em produção.
+
+### Links diretos das notificações
+
+O fragmento `#entrega-…` faz o navegador revelar o `details` ancestral antes da hidratação. Esse estado é nativo e deve ser preservado, inclusive na busca da página. A exceção `suppressHydrationWarning` fica somente no elemento `details`, não no conteúdo nem na página: não alteramos HTML, aprovação ou dados para contornar o aviso. Referências: [revelação de fragmentos no HTML](https://html.spec.whatwg.org/dev/browsing-the-web.html) e [atributo específico no React](https://react.dev/reference/react-dom/components/common).
+
+O teste captura erros de console e de página, abre o link direto, interage com o formulário, recolhe/reabre a revisão e verifica que o texto foi mantido. Antes da correção, falhou em Chromium e WebKit pelo atributo `open` alterado pelo navegador.
