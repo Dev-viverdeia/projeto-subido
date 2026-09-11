@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type FormEvent,
 } from 'react';
 import { ArrowUpRight, Check, LoaderCircle, X } from 'lucide-react';
@@ -14,8 +15,19 @@ import { formatarReais } from '@/lib/propostas/schema';
 import styles from './proposta.module.css';
 
 const INICIAL: EstadoDecisaoProposta = {};
+const assinarProntidao = () => () => {};
+const formularioPronto = () => true;
+const formularioNoServidor = () => false;
 
-function AcoesDecisao({ pending, decisaoPendente }: { pending: boolean; decisaoPendente: string }) {
+function AcoesDecisao({
+  pending,
+  pronto,
+  decisaoPendente,
+}: {
+  pending: boolean;
+  pronto: boolean;
+  decisaoPendente: string;
+}) {
   return (
     <div className={styles.acoesDecisao}>
       <button
@@ -23,7 +35,7 @@ function AcoesDecisao({ pending, decisaoPendente }: { pending: boolean; decisaoP
         type="submit"
         name="decisao"
         value="aceita"
-        disabled={pending}
+        disabled={pending || !pronto}
       >
         {pending && decisaoPendente === 'aceita' ? (
           <LoaderCircle size={18} className={styles.carregando} aria-hidden="true" />
@@ -36,7 +48,7 @@ function AcoesDecisao({ pending, decisaoPendente }: { pending: boolean; decisaoP
         type="submit"
         name="decisao"
         value="recusada"
-        disabled={pending}
+        disabled={pending || !pronto}
         className={styles.botaoSecundario}
       >
         {pending && decisaoPendente === 'recusada' ? 'Registrando…' : 'Não aprovar proposta'}
@@ -67,6 +79,9 @@ export function DecisaoCliente({
   const [comentario, setComentario] = useState('');
   const [aceite, setAceite] = useState(false);
   const [decisaoPendente, setDecisaoPendente] = useState('');
+  // Antes de hidratar, o HTML já aparece, mas ainda não recebe os eventos React.
+  // Só liberamos a edição quando ela puder ser preservada, inclusive em conexões lentas.
+  const pronto = useSyncExternalStore(assinarProntidao, formularioPronto, formularioNoServidor);
   const travaEnvio = useRef(false);
   const erroRef = useRef<HTMLParagraphElement>(null);
   const [estado, acao, pendente] = useActionState(
@@ -90,7 +105,7 @@ export function DecisaoCliente({
 
   function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
-    if (travaEnvio.current) return;
+    if (!pronto || travaEnvio.current) return;
     const botao = (evento.nativeEvent as SubmitEvent).submitter;
     if (!(botao instanceof HTMLButtonElement) || botao.name !== 'decisao') return;
     const dados = new FormData(evento.currentTarget);
@@ -136,7 +151,7 @@ export function DecisaoCliente({
       onSubmit={enviar}
       className={styles.formDecisao}
       aria-label="Responder à proposta"
-      aria-busy={pendente}
+      aria-busy={pendente || !pronto}
     >
       <input type="hidden" name="codigo" value={codigo} />
       <div className={styles.formTopo}>
@@ -160,7 +175,7 @@ export function DecisaoCliente({
             type="text"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            readOnly={pendente}
+            readOnly={pendente || !pronto}
             minLength={2}
             maxLength={120}
             autoComplete="name"
@@ -174,7 +189,7 @@ export function DecisaoCliente({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            readOnly={pendente}
+            readOnly={pendente || !pronto}
             maxLength={254}
             autoComplete="email"
             required
@@ -188,7 +203,7 @@ export function DecisaoCliente({
             name="comentario"
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
-            readOnly={pendente}
+            readOnly={pendente || !pronto}
             rows={3}
             maxLength={2000}
             placeholder="Deixe uma observação para o responsável."
@@ -202,7 +217,7 @@ export function DecisaoCliente({
           value="sim"
           checked={aceite}
           onChange={(e) => setAceite(e.target.checked)}
-          disabled={pendente}
+          disabled={pendente || !pronto}
         />
         <span>
           Li esta versão da proposta e concordo com o escopo, o investimento, as condições e os
@@ -214,7 +229,7 @@ export function DecisaoCliente({
           {estado.erro}
         </p>
       )}
-      <AcoesDecisao pending={pendente} decisaoPendente={decisaoPendente} />
+      <AcoesDecisao pending={pendente} pronto={pronto} decisaoPendente={decisaoPendente} />
       <small className={styles.segurancaDecisao}>
         Ao enviar, sua decisão fica registrada nesta versão com nome, e-mail, data e aceite.
       </small>

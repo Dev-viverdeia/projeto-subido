@@ -64,6 +64,7 @@ test('erro de envio conserva os dados e a concordância do cliente', async ({ pa
   await page.getByLabel('Seu nome', { exact: true }).fill('Camila Souza');
   await page.getByLabel('Comentário', { exact: false }).fill('Iniciar na segunda-feira.');
   await page.getByRole('checkbox').check();
+  await expect(page.getByLabel('Seu nome', { exact: true })).toHaveValue('Camila Souza');
   await page.getByRole('button', { name: 'Aprovar proposta', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Aprovando…' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Não aprovar proposta' })).toBeDisabled();
@@ -77,6 +78,39 @@ test('erro de envio conserva os dados e a concordância do cliente', async ({ pa
   );
   await expect(page.getByRole('checkbox')).toBeChecked();
   await expect(page.getByRole('button', { name: 'Aprovar proposta', exact: true })).toBeEnabled();
+});
+
+test('conexão lenta só libera a edição quando pode preservar os dados', async ({ page }) => {
+  let liberar!: () => void;
+  const javascriptDisponivel = new Promise<void>((resolve) => {
+    liberar = resolve;
+  });
+  await page.route(/\/_next\/static\/chunks\/.*\.js(?:\?.*)?$/, async (route) => {
+    await javascriptDisponivel;
+    await route.continue();
+  });
+  try {
+    await page.goto('/preview/proposta-cliente?estado=erro#decisao', { waitUntil: 'commit' });
+    await expect(page.getByLabel('Seu nome', { exact: true })).toHaveAttribute('readonly');
+    await expect(
+      page.getByRole('button', { name: 'Aprovar proposta', exact: true }),
+    ).toBeDisabled();
+    await expect(page.getByRole('checkbox')).toBeDisabled();
+  } finally {
+    liberar();
+  }
+  await page.getByLabel('Seu nome', { exact: true }).fill('Camila Souza');
+  await page.getByLabel('Seu e-mail', { exact: true }).fill('camila.souza@example.com');
+  await page.getByLabel('Comentário', { exact: false }).fill('Revisar na segunda-feira.');
+  await page.getByRole('button', { name: 'Não aprovar proposta' }).click();
+  await expect(page.getByRole('form').getByRole('alert')).toBeFocused();
+  await expect(page.getByLabel('Seu nome', { exact: true })).toHaveValue('Camila Souza');
+  await expect(page.getByLabel('Seu e-mail', { exact: true })).toHaveValue(
+    'camila.souza@example.com',
+  );
+  await expect(page.getByLabel('Comentário', { exact: false })).toHaveValue(
+    'Revisar na segunda-feira.',
+  );
 });
 
 test('aprovação simulada exige aceite e só então oferece o pagamento', async ({ page }) => {
