@@ -234,18 +234,26 @@ export function ImplementacaoProjeto({
               aria-pressed={Boolean(progresso.etapas[passoAtivoId])}
               aria-label={`${progresso.etapas[passoAtivoId] ? 'Reabrir' : 'Concluir'}: ${passoAtivo.titulo}`}
               onClick={() => {
+                // Concluir não troca o conteúdo enquanto a pessoa confere o resultado.
+                setFaseEscolhidaId(faseAtiva.id);
+                setPassoEscolhidoId(passoAtivo.id);
                 alternarEtapa(passoAtivoId, slug);
                 focarPasso();
               }}
             >
               {progresso.etapas[passoAtivoId] ? (
                 <>
-                  <Check size={15} aria-hidden="true" /> Passo concluído
+                  <Check size={15} aria-hidden="true" /> Reabrir passo
                 </>
               ) : (
                 'Concluir passo'
               )}
             </button>
+            <p className={styles.estadoPasso} role="status">
+              {progresso.etapas[passoAtivoId]
+                ? 'Passo concluído. Você pode revisar ou abrir o próximo.'
+                : null}
+            </p>
           </article>
         </div>
       ) : null}

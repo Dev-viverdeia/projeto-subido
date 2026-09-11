@@ -97,44 +97,50 @@ const Stack = z.enum(['lovable_supabase', 'lovable_cloud', 'claude_code_supabase
  * A RLS é a barreira: a policy exige que o projeto seja do chamador, então um
  * `solucao_id` alheio afeta zero linhas em vez de vazar existência.
  */
-export async function moverTarefa(formData: FormData): Promise<void> {
+export async function moverTarefa(formData: FormData): Promise<{ ok: boolean }> {
   const id = Id.safeParse(formData.get('id'));
   const indice = z.coerce.number().int().min(0).safeParse(formData.get('indice'));
   const estado = EstadoTarefa.safeParse(formData.get('estado'));
-  if (!id.success || !indice.success || !estado.success) return;
+  if (!id.success || !indice.success || !estado.success) return { ok: false };
 
   const supabase = await clienteAutenticado();
-  /* Sem sessão não há o que fazer — e o retorno silencioso é o mesmo desfecho que
-     a RLS produziria com um id alheio: nada acontece, nada é revelado. */
-  if (!supabase) return;
+  // A UI recebe apenas sucesso/falha; nenhum dado de outra conta é retornado.
+  if (!supabase) return { ok: false };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('builder_tarefas')
     .upsert(
       { solucao_id: id.data, etapa_indice: indice.data, estado: estado.data },
       { onConflict: 'solucao_id,etapa_indice' },
-    );
+    )
+    .select('solucao_id')
+    .maybeSingle();
 
   if (error) throw handleError(error, 'builder:mover-tarefa');
+  if (!data) return { ok: false };
   revalidatePath(`/builder/${id.data}`);
+  return { ok: true };
 }
 
 /** Onde construir. Um valor por projeto — por isso coluna, não tabela. */
-export async function escolherStack(formData: FormData): Promise<void> {
+export async function escolherStack(formData: FormData): Promise<{ ok: boolean }> {
   const id = Id.safeParse(formData.get('id'));
   const stack = Stack.safeParse(formData.get('stack'));
-  if (!id.success || !stack.success) return;
+  if (!id.success || !stack.success) return { ok: false };
 
   const supabase = await clienteAutenticado();
-  /* Sem sessão não há o que fazer — e o retorno silencioso é o mesmo desfecho que
-     a RLS produziria com um id alheio: nada acontece, nada é revelado. */
-  if (!supabase) return;
+  // Sessão expirada ou projeto indisponível não pode aparecer como salvo.
+  if (!supabase) return { ok: false };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('builder_solucoes')
     .update({ stack: stack.data })
-    .eq('id', id.data);
+    .eq('id', id.data)
+    .select('id')
+    .maybeSingle();
 
   if (error) throw handleError(error, 'builder:escolher-stack');
+  if (!data) return { ok: false };
   revalidatePath(`/builder/${id.data}`);
+  return { ok: true };
 }

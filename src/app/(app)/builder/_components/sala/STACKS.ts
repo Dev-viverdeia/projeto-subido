@@ -34,7 +34,7 @@ export const STACKS: OpcaoStack[] = [
     passos: [
       'Crie um projeto novo no lovable.dev e conecte o Supabase (menu Integrations).',
       'Cole o prompt abaixo na conversa do Lovable.',
-      'Siga as tarefas do quadro, uma de cada vez, copiando o prompt de cada uma.',
+      'Abra Executar e siga uma tarefa por vez. Copie a instrução quando precisar.',
     ],
   },
   {
@@ -45,7 +45,7 @@ export const STACKS: OpcaoStack[] = [
     passos: [
       'Crie um projeto novo no lovable.dev e ative o Lovable Cloud.',
       'Cole o prompt abaixo na conversa.',
-      'Siga as tarefas do quadro, uma de cada vez.',
+      'Abra Executar e siga uma tarefa por vez.',
     ],
   },
   {
@@ -56,7 +56,7 @@ export const STACKS: OpcaoStack[] = [
     passos: [
       'Crie o projeto do Supabase e guarde a URL e a chave.',
       'Abra o Claude Code na pasta do projeto e cole o prompt abaixo.',
-      'Siga as tarefas do quadro, uma de cada vez.',
+      'Abra Executar e siga uma tarefa por vez.',
     ],
   },
 ];

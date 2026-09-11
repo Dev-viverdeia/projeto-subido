@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useId, useRef, useState, useTransition } from 'react';
 import type { DocumentoSolucao } from '@/lib/builder/schema';
 import type { EstadoStack } from '@/lib/builder/queries';
 import { escolherStack } from '@/lib/builder/actions';
@@ -10,45 +10,40 @@ import { montarKit } from '@/lib/builder/kit';
 import { STACKS, acharStack, promptDePartida } from './STACKS';
 import styles from './EtapaKit.module.css';
 
-/**
- * SEU KIT — o que você vai usar, e por onde começa.
- *
- * A ESCOLHA VEM ANTES DO PROMPT, e essa ordem é o conteúdo da etapa. O prompt de
- * partida depende de onde a pessoa vai construir; mostrá-lo antes da escolha
- * seria dar a instrução errada para dois terços de quem lê. Enquanto não escolhe,
- * a etapa mostra as três saídas e nada mais — e a etapa "Construir" fica travada,
- * dizendo exatamente isso.
- *
- * O ZIP EXISTE E DIZ O QUE TEM DENTRO. São cinco arquivos derivados do documento
- * — não onze. A referência gera onze porque roda três agentes que escrevem coisas
- * diferentes; aqui há uma geração e um documento, e recortá-lo em fatias menores
- * só para chegar a onze seria inflar número.
- *
- * A LISTA DOS ARQUIVOS FICA VISÍVEL ANTES DO DOWNLOAD, e não num accordion de
- * "curiosidade opcional": é ela que diz por que baixar em vez de copiar da tela.
- * Baixar às cegas é o que faz um botão de download parecer opcional.
- *
- * Continua sem "Versão em PDF": o PDF exigiria renderizar layout no servidor, e
- * o kit é feito para uma IA ler — Markdown é o formato certo para isso.
- */
+/** Ferramenta primeiro; instruções e arquivos permanecem disponíveis por contexto. */
 export function EtapaKit({
   id,
   documento,
   stack,
+  salvar = escolherStack,
 }: {
   id: string;
   documento: DocumentoSolucao;
   stack: EstadoStack;
+  salvar?: (dados: FormData) => Promise<{ ok: boolean }>;
 }) {
   const [salvando, iniciar] = useTransition();
+  const [erro, setErro] = useState(false);
+  const bloqueado = useRef(false);
+  const grupo = useId();
   const escolhida = acharStack(stack);
 
   const escolher = (novo: string) => {
+    if (bloqueado.current || novo === stack) return;
+    bloqueado.current = true;
+    setErro(false);
     const dados = new FormData();
     dados.set('id', id);
     dados.set('stack', novo);
-    iniciar(() => {
-      void escolherStack(dados);
+    iniciar(async () => {
+      try {
+        const resultado = await salvar(dados);
+        if (!resultado.ok) setErro(true);
+      } catch {
+        setErro(true);
+      } finally {
+        bloqueado.current = false;
+      }
     });
   };
 
@@ -56,10 +51,85 @@ export function EtapaKit({
 
   return (
     <div className={styles.kit}>
+      <section aria-labelledby="kit-onde">
+        <h2 id="kit-onde" className={styles.secaoTitulo}>
+          Escolha onde construir
+        </h2>
+
+        <div role="radiogroup" aria-labelledby="kit-onde" className={styles.opcoes}>
+          {STACKS.map((s) => {
+            const ativa = stack === s.id;
+            return (
+              <label key={s.id} className={styles.opcao} data-ativa={ativa ? '' : undefined}>
+                <input
+                  type="radio"
+                  name={grupo}
+                  value={s.id}
+                  checked={ativa}
+                  disabled={salvando}
+                  aria-label={s.titulo}
+                  onChange={() => escolher(s.id)}
+                />
+                <span className={styles.opcaoTopo}>
+                  <span className={styles.opcaoEyebrow}>{s.eyebrow}</span>
+                  <span className={styles.marca} aria-hidden="true">
+                    {ativa ? <Visto tamanho={11} /> : null}
+                  </span>
+                </span>
+                <span className={styles.opcaoTitulo}>{s.titulo}</span>
+                <span className={styles.opcaoTexto}>{s.descricao}</span>
+              </label>
+            );
+          })}
+        </div>
+        {salvando ? (
+          <p role="status" className={styles.baixarNota}>
+            Salvando escolha…
+          </p>
+        ) : null}
+        {erro ? (
+          <p role="alert" className={styles.baixarNota}>
+            Não foi possível salvar. Tente escolher novamente.
+          </p>
+        ) : null}
+      </section>
+
+      {escolhida && (
+        <section aria-labelledby="kit-comece" className={styles.comece}>
+          <h2 id="kit-comece" className={styles.secaoTitulo}>
+            Comece no {escolhida.titulo}
+          </h2>
+
+          <ol className={styles.passos}>
+            {escolhida.passos.map((passo, i) => (
+              <li key={passo} className={styles.passo}>
+                <span className={styles.passoNumero} aria-hidden="true">
+                  {String.fromCharCode(97 + i)}
+                </span>
+                {passo}
+              </li>
+            ))}
+          </ol>
+
+          <details className={styles.detalhe}>
+            <summary>Prompt de partida</summary>
+            <div className={styles.prompt}>
+              <pre className={styles.promptTexto}>
+                {promptDePartida(documento.titulo, documento.arquitetura)}
+              </pre>
+              <BotaoCopiar
+                texto={promptDePartida(documento.titulo, documento.arquitetura)}
+                rotuloDoQue="o prompt de partida"
+              />
+            </div>
+          </details>
+        </section>
+      )}
+
       <section aria-labelledby="kit-baixar">
-        <h3 id="kit-baixar" className={styles.secaoTitulo}>
+        <h2 id="kit-baixar" className={styles.secaoTitulo}>
           Baixe o kit do projeto
-        </h3>
+        </h2>
 
         <div className={styles.baixar}>
           {/* `<a download>` e não botão: o download é uma navegação com resposta
@@ -82,72 +152,8 @@ export function EtapaKit({
         </ul>
       </section>
 
-      <section aria-labelledby="kit-onde">
-        <h3 id="kit-onde" className={styles.secaoTitulo}>
-          Escolha onde construir
-        </h3>
-
-        <div role="radiogroup" aria-labelledby="kit-onde" className={styles.opcoes}>
-          {STACKS.map((s) => {
-            const ativa = stack === s.id;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                role="radio"
-                aria-checked={ativa}
-                className={styles.opcao}
-                data-ativa={ativa ? '' : undefined}
-                disabled={salvando}
-                onClick={() => escolher(s.id)}
-              >
-                <span className={styles.opcaoTopo}>
-                  <span className={styles.opcaoEyebrow}>{s.eyebrow}</span>
-                  <span className={styles.marca} aria-hidden="true">
-                    {ativa ? <Visto tamanho={11} /> : null}
-                  </span>
-                </span>
-                <span className={styles.opcaoTitulo}>{s.titulo}</span>
-                <span className={styles.opcaoTexto}>{s.descricao}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {escolhida && (
-        <section aria-labelledby="kit-comece" className={styles.comece}>
-          <h3 id="kit-comece" className={styles.secaoTitulo}>
-            Comece no {escolhida.titulo}
-          </h3>
-
-          <ol className={styles.passos}>
-            {escolhida.passos.map((passo, i) => (
-              <li key={passo} className={styles.passo}>
-                <span className={styles.passoNumero} aria-hidden="true">
-                  {String.fromCharCode(97 + i)}
-                </span>
-                {passo}
-              </li>
-            ))}
-          </ol>
-
-          <div className={styles.prompt}>
-            <pre className={styles.promptTexto}>
-              {promptDePartida(documento.titulo, documento.arquitetura)}
-            </pre>
-            <BotaoCopiar
-              texto={promptDePartida(documento.titulo, documento.arquitetura)}
-              rotuloDoQue="o prompt de partida"
-            />
-          </div>
-        </section>
-      )}
-
-      <section aria-labelledby="kit-ferramentas">
-        <h3 id="kit-ferramentas" className={styles.secaoTitulo}>
-          Ferramentas do projeto
-        </h3>
+      <details className={styles.detalhe}>
+        <summary>Ferramentas do projeto</summary>
         <ul className={styles.ferramentas}>
           {documento.ferramentas.map((f) => (
             <li key={f.nome} className={styles.ferramenta}>
@@ -156,21 +162,23 @@ export function EtapaKit({
             </li>
           ))}
         </ul>
-      </section>
+      </details>
 
       {documento.prompts.length > 0 && (
         <section aria-labelledby="kit-prompts">
-          <h3 id="kit-prompts" className={styles.secaoTitulo}>
+          <h2 id="kit-prompts" className={styles.secaoTitulo}>
             Prompts prontos
-          </h3>
+          </h2>
           <ul className={styles.listaPrompts}>
             {documento.prompts.map((p) => (
-              <li key={p.titulo} className={styles.itemPrompt}>
-                <div className={styles.itemPromptTopo}>
-                  <p className={styles.ferramentaNome}>{p.titulo}</p>
-                  <BotaoCopiar texto={p.conteudo} rotuloDoQue={p.titulo} />
-                </div>
-                <pre className={styles.promptTexto}>{p.conteudo}</pre>
+              <li key={p.titulo}>
+                <details className={styles.detalhe}>
+                  <summary>{p.titulo}</summary>
+                  <div className={styles.itemPromptTopo}>
+                    <BotaoCopiar texto={p.conteudo} rotuloDoQue={p.titulo} />
+                  </div>
+                  <pre className={styles.promptTexto}>{p.conteudo}</pre>
+                </details>
               </li>
             ))}
           </ul>

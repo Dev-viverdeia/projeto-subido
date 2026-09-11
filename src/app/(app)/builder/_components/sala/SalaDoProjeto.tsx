@@ -1,30 +1,12 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
+import { ArrowRight, Check, LockKeyhole } from 'lucide-react';
 import type { SolucaoBuilder } from '@/lib/builder/queries';
-import { Visto } from '../../../_components/PillEstado';
 import { ETAPAS, contarTarefas, etapaInicial, motivoDoCadeado, type IdEtapa } from './etapas';
-import entrada from '../../../_components/entrada.module.css';
 import styles from './SalaDoProjeto.module.css';
 
-/**
- * A SALA DO PROJETO — o Builder deixa de ser um documento e vira um percurso.
- *
- * O QUE MUDOU DE CONCEITO. A tela anterior entregava a ficha inteira de uma vez:
- * viabilidade, arquitetura, ferramentas, etapas, prompts e riscos, tudo numa
- * rolagem só. Estava correta e era ilegível como PLANO — a pessoa saía com um
- * documento, não com um próximo passo. A sala quebra o mesmo material em quatro
- * momentos, e cada um responde uma pergunta diferente: o que é isto, o que vou
- * usar, por onde começo, o que falta.
- *
- * O TRAVAMENTO É DERIVADO DO DADO, nunca gravado — ver `etapas.ts`. E cada
- * cadeado DIZ o motivo: um ícone de cadeado sem frase é a interface informando
- * que a pessoa não pode e escondendo por quê.
- *
- * O PROGRESSO DO HERO É REAL. São as etapas do documento marcadas como `feito` no
- * kanban, contadas do banco. Enquanto não houver documento não há denominador, e
- * o hero mostra o status em vez de um `0 / 0` que finge medir.
- */
+/** Painéis recebidos do servidor; navegação não registra conclusão. */
 export function SalaDoProjeto({
   solucao,
   criacao,
@@ -33,149 +15,148 @@ export function SalaDoProjeto({
   construir,
 }: {
   solucao: SolucaoBuilder;
-  /* Os quatro painéis chegam prontos do servidor: assim o documento inteiro não
-     precisa atravessar a fronteira como prop serializada. */
   criacao: ReactNode;
   entender: ReactNode;
   kit: ReactNode;
   construir: ReactNode;
 }) {
-  const [etapa, setEtapa] = useState<IdEtapa>(() => etapaInicial(solucao));
+  const [escolhida, setEscolhida] = useState<IdEtapa | null>(() => etapaInicial(solucao));
+  const etapa = escolhida ?? etapaInicial(solucao);
+  const uid = useId();
+  const abas = useRef<HTMLDivElement>(null);
   const { feitas, total } = contarTarefas(solucao);
-
   const paineis: Record<IdEtapa, ReactNode> = { criacao, entender, kit, construir };
-  const indice = ETAPAS.findIndex((e) => e.id === etapa);
-  const atual = ETAPAS[indice] ?? ETAPAS[0]!;
+  const indice = ETAPAS.findIndex((item) => item.id === etapa);
   const cadeadoAtual = motivoDoCadeado(etapa, solucao);
-
-  /* O AVANÇO EXPLÍCITO, que o stepper sozinho não dá. Clicar num degrau é
-     navegação; terminar uma etapa e seguir é conclusão, e são gestos diferentes.
-     Só existe quando a próxima está DESTRAVADA — um "continuar" que esbarra num
-     cadeado é a promessa que a etapa acabou de negar. */
   const proxima = ETAPAS[indice + 1];
-  const podeAvancar = proxima && motivoDoCadeado(proxima.id, solucao) === null;
+
+  const abrir = (id: IdEtapa) => {
+    if (motivoDoCadeado(id, solucao)) return;
+    setEscolhida(id);
+    abas.current?.querySelector<HTMLButtonElement>('[data-etapa="' + id + '"]')?.focus();
+  };
 
   return (
     <div className={styles.sala}>
-      <header className={`${styles.hero} via-noise`} data-on-dark>
+      <header className={styles.hero}>
         <div className={styles.heroTexto}>
-          <p className={styles.eyebrow}>Estúdio · Sala do projeto</p>
-          {/* Enquanto não há título, a ideia entra como CITAÇÃO compacta — aspas
-              e clamp de 3 linhas — e não como display: 318 caracteres em corpo de
-              h1 eram uma torre navy que empurrava a criação para fora da dobra. */}
-          {solucao.titulo ? (
-            <h1 className={styles.titulo}>{solucao.titulo}</h1>
-          ) : (
-            <h1 className={styles.tituloCitacao}>“{solucao.ideiaOriginal}”</h1>
-          )}
-          <p className={styles.resumo}>
-            {solucao.documento
-              ? 'Execute uma etapa por vez. O progresso fica salvo na sua conta.'
-              : 'O plano está sendo preparado. Você pode fechar esta página e voltar depois.'}
-          </p>
+          <h1 className={styles.titulo}>{solucao.titulo || 'Seu projeto personalizado'}</h1>
+          {!solucao.documento ? (
+            <p className={styles.resumo}>Preparando o plano. Você pode voltar depois.</p>
+          ) : null}
         </div>
-
-        {/* O contrapeso do hero enquanto não há medida: o estado AO VIVO, com o
-            dot pulsando em accent — que só é legível justamente sobre a navy. */}
-        {!solucao.documento && solucao.status === 'gerando' && (
-          <p className={styles.aoVivo}>
-            <span className={styles.aoVivoDot} aria-hidden="true" />
-            preparando plano
-          </p>
-        )}
-
-        {/* Só existe medida quando existe documento. Sem ele, `0 / 0` seria um
-            medidor fingindo medir. */}
-        {total > 0 && (
-          <div className={styles.medida}>
+        {total > 0 ? (
+          <div
+            className={styles.medida}
+            role="progressbar"
+            aria-label="Tarefas do Estúdio"
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-valuenow={feitas}
+            aria-valuetext={feitas + ' de ' + total + ' tarefas concluídas'}
+          >
             <p className={styles.contagem}>
-              {feitas} / {total} tarefas
+              <strong>
+                {feitas} de {total}
+              </strong>{' '}
+              tarefas concluídas
             </p>
             <div className={styles.trilho} aria-hidden="true">
               <span
                 className={styles.preenchido}
-                style={{ transform: `scaleX(${total === 0 ? 0 : feitas / total})` }}
+                style={{ transform: 'scaleX(' + feitas / total + ')' }}
               />
             </div>
           </div>
-        )}
+        ) : null}
       </header>
 
-      {/* O STEPPER É UMA TABLIST de verdade: as setas do teclado funcionam porque
-          o papel promete isso. Etapa travada continua no tab-order e anuncia o
-          motivo — esconder o degrau faria a pessoa perder a noção do percurso. */}
-      <div role="tablist" aria-label="Etapas do projeto" className={styles.stepper}>
-        {ETAPAS.map((e, i) => {
-          const travada = motivoDoCadeado(e.id, solucao) !== null;
-          const concluida = !travada && ETAPAS.findIndex((x) => x.id === etapa) > i;
-          const ativa = e.id === etapa;
-
-          return (
-            <button
-              key={e.id}
-              role="tab"
-              type="button"
-              aria-selected={ativa}
-              aria-disabled={travada}
-              className={styles.degrau}
-              data-ativa={ativa ? '' : undefined}
-              data-travada={travada ? '' : undefined}
-              onClick={() => !travada && setEtapa(e.id)}
-            >
-              <span className={styles.marcador} aria-hidden="true">
-                {concluida ? <Visto tamanho={13} /> : travada ? <Cadeado /> : e.numero.slice(1)}
-              </span>
-              <span className={styles.degrauRotulo}>{e.rotulo}</span>
-            </button>
-          );
-        })}
+      <div className={styles.superficie}>
+        <div ref={abas} role="tablist" aria-label="Etapas do projeto" className={styles.stepper}>
+          {ETAPAS.map((item, i) => {
+            const motivo = motivoDoCadeado(item.id, solucao);
+            const ativa = item.id === etapa;
+            // Só fatos persistidos recebem um visto; abrir Entender não prova leitura.
+            const fato =
+              item.id === 'criacao' && solucao.documento
+                ? 'Plano disponível'
+                : item.id === 'kit' && solucao.stack
+                  ? 'Ferramenta escolhida'
+                  : item.id === 'construir' && total > 0 && feitas === total
+                    ? 'Tarefas concluídas'
+                    : null;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                data-etapa={item.id}
+                id={uid + '-' + item.id}
+                aria-controls={uid + '-painel'}
+                aria-selected={ativa}
+                aria-disabled={Boolean(motivo)}
+                tabIndex={ativa ? 0 : -1}
+                aria-describedby={motivo ? uid + '-motivo-' + item.id : undefined}
+                className={styles.degrau}
+                data-ativa={ativa || undefined}
+                onClick={() => abrir(item.id)}
+                onKeyDown={(event) => {
+                  const destino =
+                    event.key === 'ArrowRight'
+                      ? (i + 1) % ETAPAS.length
+                      : event.key === 'ArrowLeft'
+                        ? (i - 1 + ETAPAS.length) % ETAPAS.length
+                        : event.key === 'Home'
+                          ? 0
+                          : event.key === 'End'
+                            ? ETAPAS.length - 1
+                            : null;
+                  if (destino === null) return;
+                  event.preventDefault();
+                  const alvo = ETAPAS[destino]!;
+                  // Abas indisponíveis recebem foco e motivo, não um painel vazio.
+                  if (motivoDoCadeado(alvo.id, solucao))
+                    abas.current
+                      ?.querySelector<HTMLButtonElement>('[data-etapa="' + alvo.id + '"]')
+                      ?.focus();
+                  else abrir(alvo.id);
+                }}
+              >
+                {motivo ? (
+                  <LockKeyhole size={16} aria-hidden="true" />
+                ) : fato ? (
+                  <Check size={17} aria-hidden="true" />
+                ) : null}
+                {item.rotulo}
+                {fato ? <span className={styles.srOnly}>{fato}</span> : null}
+                {motivo ? (
+                  <span id={uid + '-motivo-' + item.id} className={styles.srOnly}>
+                    {motivo}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+        <section
+          key={etapa}
+          id={uid + '-painel'}
+          role="tabpanel"
+          tabIndex={0}
+          aria-labelledby={uid + '-' + etapa}
+          className={styles.painel}
+        >
+          {cadeadoAtual ? <p className={styles.resumo}>{cadeadoAtual}</p> : paineis[etapa]}
+          {!cadeadoAtual && proxima && !motivoDoCadeado(proxima.id, solucao) ? (
+            <div className={styles.avancoLinha}>
+              <button className={styles.avanco} type="button" onClick={() => abrir(proxima.id)}>
+                {proxima.id === 'construir' ? 'Abrir tarefas' : 'Abrir ' + proxima.rotulo}
+                <ArrowRight size={18} aria-hidden="true" />
+              </button>
+            </div>
+          ) : null}
+        </section>
       </div>
-
-      {/* `key` na etapa: mudar de degrau remonta o painel, e o remonte é o que
-          dispara a entrada — ver `entrada.troca`. */}
-      <section key={etapa} className={`${styles.painel} ${entrada.troca}`} aria-live="polite">
-        <p className={styles.painelEyebrow}>
-          <span className={styles.painelNumero} aria-hidden="true">
-            {atual.numero}
-          </span>
-          {atual.rotulo}
-        </p>
-
-        {cadeadoAtual ? (
-          <p className={styles.travado}>
-            <Cadeado />
-            {cadeadoAtual}
-          </p>
-        ) : (
-          paineis[etapa]
-        )}
-
-        {!cadeadoAtual && podeAvancar && proxima && (
-          <div className={styles.avancoLinha}>
-            <button type="button" className={styles.avanco} onClick={() => setEtapa(proxima.id)}>
-              {proxima.id === 'construir' ? 'Começar a execução' : `Abrir ${proxima.rotulo}`}
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path
-                  d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        )}
-      </section>
     </div>
-  );
-}
-
-function Cadeado() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="3.5" y="7" width="9" height="6.5" rx="1.6" stroke="currentColor" strokeWidth="1.4" />
-      <path d="M5.75 7V5.25a2.25 2.25 0 1 1 4.5 0V7" stroke="currentColor" strokeWidth="1.4" />
-    </svg>
   );
 }

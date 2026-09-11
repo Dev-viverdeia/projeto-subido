@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { CST } from '../src/lib/brand';
 
 const TELAS = [
-  ['/', 'As empresas já'],
+  ['/', 'Entrar'],
   ['/entrar', 'Entrar'],
   ['/preview/boas-vindas', 'Conheça o caminho até seu primeiro projeto de IA.'],
   ['/preview/mapa-jornada', 'Mateus.'],
@@ -20,7 +20,7 @@ const TELAS = [
   ['/preview/propostas', 'Biblioteca comercial'],
   ['/preview/admin-acessos', 'Acessos e créditos'],
   ['/preview/proposta-editor', 'Proposta pronta para decisão'],
-  ['/preview/entregas', 'Acompanhe a próxima tarefa de cada projeto.'],
+  ['/preview/entregas', 'Para fazer agora'],
   ['/preview/sala-entrega', 'Atendimento com IA para clínicas'],
   ['/preview/portal-cliente', 'Projeto concluído'],
   ['/preview/mentorias', 'Leve um caso. Saia com direção.'],

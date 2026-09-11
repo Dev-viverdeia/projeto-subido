@@ -283,7 +283,7 @@ describe('Projeto guiado', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Arquivos da entrega' })).toBeDefined();
   });
 
-  it('marca o passo e move a retomada para o seguinte', async () => {
+  it('marca o passo e mantém o resultado até avançar explicitamente', async () => {
     const user = userEvent.setup();
     montar();
     await user.click(screen.getByRole('tab', { name: 'Implementar' }));
@@ -291,6 +291,9 @@ describe('Projeto guiado', () => {
     expect(
       screen.getByRole('progressbar', { name: 'Progresso do projeto' }).parentElement,
     ).toHaveTextContent('1 de 5 passos');
+    expect(screen.getByRole('button', { name: 'Reabrir: Mapear o cenário atual' })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 2, name: 'Entender' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Próximo passo' }));
     expect(screen.getByRole('heading', { level: 2, name: 'Preparar' })).toBeDefined();
   });
 
