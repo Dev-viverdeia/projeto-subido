@@ -1,5 +1,6 @@
 .registro {
-  scroll-margin-top: 100px;
+  /* O cabeçalho já reserva 88px no scroll-padding global. */
+  scroll-margin-top: var(--via-space-4);
   border: 1px solid var(--app-elev-1-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-1-bg);
