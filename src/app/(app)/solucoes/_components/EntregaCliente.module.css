@@ -1,9 +1,15 @@
 .entrega {
+  scroll-margin-top: 100px;
   overflow: hidden;
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-surface);
   background: var(--app-elev-1-bg);
   box-shadow: var(--app-elev-1-shadow);
+}
+
+.entrega:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
 }
 
 .entrega[data-final] {
@@ -62,7 +68,7 @@
   padding: 5px 8px;
   border-radius: var(--app-radius-chip);
   background: var(--via-surface);
-  color: var(--via-text-faint);
+  color: var(--via-text-muted);
   font-size: var(--app-fs-micro);
 }
 

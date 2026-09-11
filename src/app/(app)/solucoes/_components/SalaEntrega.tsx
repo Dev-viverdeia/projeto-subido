@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, ListTodo } from 'lucide-react';
+import { ListTodo } from 'lucide-react';
 import type {
   ProjetoExecucaoCompleto,
   TarefaProjetoExecucao,
@@ -11,15 +10,12 @@ import {
   obterEstadoJornadaEntrega,
   type DestinoJornadaEntrega,
 } from '@/lib/projetos-execucao/jornada-entrega';
-import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
 import { obterContatoNotificacao } from '@/lib/projetos-execucao/notificacao-cliente';
-import {
-  contarDependenciasPendentes,
-  obterProximoCompromisso,
-} from '@/lib/projetos-execucao/plano';
-import { formatarDataProjeto } from '@/lib/projetos-execucao/prazo';
+import { obterProximoCompromisso } from '@/lib/projetos-execucao/plano';
 import { estaEmAcompanhamento } from '@/lib/projetos-execucao/gestao';
 import { GestaoServico } from './GestaoServico';
+import { CabecalhoEntrega } from './CabecalhoEntrega';
+import { PendenciasClienteEntrega, contarPendenciasCliente } from './PendenciasClienteEntrega';
 import { AcompanhamentoEntrega } from './AcompanhamentoEntrega';
 import { CentralArquivos } from './CentralArquivos';
 import { EvolucaoProjeto } from './EvolucaoProjeto';
@@ -29,7 +25,6 @@ import { NavegacaoSalaEntrega, type PainelSala } from './NavegacaoSalaEntrega';
 import { PainelClienteEntrega } from './PainelClienteEntrega';
 import { PlanoVivo } from './PlanoVivo';
 import { TarefaEntrega } from './TarefaEntrega';
-import { resumirEscopoSala } from './sala-entrega-resumo';
 import styles from './SalaEntrega.module.css';
 
 type PropsSalaEntrega = {
@@ -40,9 +35,13 @@ type PropsSalaEntrega = {
 function revelarSecao(id: string) {
   requestAnimationFrame(() => {
     const reduzirMovimento = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    document
-      .getElementById(id)
-      ?.scrollIntoView?.({ behavior: reduzirMovimento ? 'auto' : 'smooth' });
+    const alvo = document.getElementById(id);
+    if (!alvo) return;
+    const detalhes = alvo.closest('details');
+    if (detalhes) detalhes.open = true;
+    alvo.setAttribute('tabindex', '-1');
+    alvo.focus({ preventScroll: true });
+    alvo.scrollIntoView?.({ behavior: reduzirMovimento ? 'auto' : 'smooth', block: 'start' });
   });
 }
 
@@ -76,7 +75,6 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     faseAtual?.tarefas.find((tarefa) => tarefa.status !== 'concluida') ??
     faseAtual?.tarefas[0] ??
     null;
-  const percentual = projeto.total ? Math.round((projeto.feitas / projeto.total) * 100) : 0;
   const ultimaTarefa = projeto.tarefas.at(-1) ?? null;
   const briefingConfirmado = Boolean(projeto.briefing.confirmadoEm);
   const trabalhoIniciado = projeto.tarefas.some(
@@ -102,26 +100,11 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
   const preparandoProjeto =
     !trabalhoIniciado && projeto.status !== 'concluido' && painel === 'cliente';
   const [arquivoTarefaId, setArquivoTarefaId] = useState<string | null>(null);
-  const entregasAguardando = projeto.tarefas.filter(
-    (tarefa) => tarefa.clienteStatus === 'aguardando',
-  ).length;
-  const ajustesSolicitados = projeto.tarefas.filter(
-    (tarefa) => tarefa.clienteStatus === 'ajustes',
-  ).length;
-  const dependenciasPendentes = contarDependenciasPendentes(projeto.acoesPlano);
-  const { rotuloCliente } = resumirEscopoSala({
-    mudancas: projeto.mudancasEscopo,
-    investimentoBase: projeto.documento.investimento.valorCentavos,
-    briefingConfirmado,
-    ajustes: ajustesSolicitados,
-    dependencias: dependenciasPendentes,
-    validacoes: entregasAguardando,
-    portalAtivo: projeto.portalAtivo,
-  });
   // prettier-ignore
   const contatoCliente = obterContatoNotificacao(projeto.eventos, tarefaAtual?.id, projeto.documento.cliente.email);
   const estadoJornada = obterEstadoJornadaEntrega({
     status: projeto.status,
+    aceiteConfirmado: projeto.encerramento?.status === 'encerrado',
     briefingConfirmado,
     tarefas: projeto.tarefas,
     compromisso: proximoCompromisso?.titulo ?? null,
@@ -162,7 +145,13 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
 
     if (destino === 'preparacao') {
       setPainel('cliente');
-      revelarSecao('preparacao-titulo');
+      revelarSecao(briefingConfirmado ? 'preparacao-titulo' : 'briefing-kickoff');
+      return;
+    }
+
+    if (destino === 'escopo') {
+      setPainel('cliente');
+      revelarSecao('mudancas-escopo-titulo');
       return;
     }
 
@@ -173,6 +162,7 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     }
 
     if (destino === 'compromisso') {
+      setPainel('execucao');
       revelarSecao('plano-vivo-titulo');
       return;
     }
@@ -183,7 +173,11 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
     setPainel('execucao');
     setFaseId(alvo.faseId);
     setTarefaId(alvo.id);
-    revelarSecao('tarefa-em-foco');
+    revelarSecao(
+      destino === 'validacao' && alvo.clienteStatus === 'aguardando'
+        ? 'validacao-cliente'
+        : 'tarefa-em-foco',
+    );
   }
 
   function abrirArquivosDaTarefa(tarefaAlvo: string) {
@@ -193,92 +187,24 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
 
   return (
     <div className={styles.sala}>
-      {preparandoProjeto ? (
-        <header className={styles.inicioHero}>
-          <div className={styles.inicioNavegacao}>
-            <Link href="/entregas">
-              <ArrowLeft size={16} aria-hidden="true" /> Entregas
-            </Link>
-            <span>Preparação</span>
-          </div>
-          <div className={styles.inicioHeroCorpo}>
-            <div className={styles.inicioHeroTexto}>
-              <p>Entrega · {projeto.empresa}</p>
-              <h1>{projeto.titulo}</h1>
-              <span>O escopo aprovado já virou projeto. Confirme três pontos para começar.</span>
-            </div>
-          </div>
-        </header>
-      ) : projeto.status !== 'concluido' ? (
-        <header className={styles.heroFoco}>
-          <div className={styles.heroFocoNavegacao}>
-            <Link href="/entregas">
-              <ArrowLeft size={16} aria-hidden="true" /> Entregas
-            </Link>
-            <span className={styles.statusProjetoFoco} data-status={projeto.status}>
-              {ROTULO_STATUS_PROJETO[projeto.status]}
-            </span>
-          </div>
-
-          <div className={styles.heroFocoPrincipal}>
-            <div className={styles.heroFocoTexto}>
-              <p>{projeto.empresa}</p>
-              <h1>{projeto.titulo}</h1>
-              <span>
-                Prazo: {projeto.prazoEm ? formatarDataProjeto(projeto.prazoEm) : 'a definir'}
-              </span>
-            </div>
-            <div
-              className={styles.progressoFoco}
-              aria-label={`${percentual}% da entrega concluída`}
-            >
-              <div>
-                <span>Progresso</span>
-                <strong>{percentual}%</strong>
-              </div>
-              <small>
-                {projeto.feitas} de {projeto.total} tarefas
-              </small>
-              <div className={styles.progressoTrilho} aria-hidden="true">
-                <span style={{ transform: `scaleX(${percentual / 100})` }} />
-              </div>
-            </div>
-          </div>
-        </header>
-      ) : (
-        <header className={styles.heroFoco}>
-          <div className={styles.heroFocoNavegacao}>
-            <Link href="/entregas">
-              <ArrowLeft size={16} aria-hidden="true" /> Entregas
-            </Link>
-            <span>
-              {projeto.encerramento?.status === 'encerrado'
-                ? 'Aceite registrado'
-                : 'Entrega registrada por você'}
-            </span>
-          </div>
-          <div className={styles.inicioHeroCorpo}>
-            <div className={styles.heroFocoTexto}>
-              <p>{projeto.empresa}</p>
-              <h1>{projeto.titulo}</h1>
-              {projeto.concluidoEm && (
-                <span>Entregue em {formatarDataProjeto(projeto.concluidoEm)}</span>
-              )}
-            </div>
-          </div>
-        </header>
-      )}
+      <CabecalhoEntrega projeto={projeto} preparando={preparandoProjeto}>
+        <GestaoServico
+          compacto
+          projeto={projeto}
+          onConcluir={() =>
+            setPainel(projeto.tipoServico === 'recorrente' ? 'evolucao' : 'arquivos')
+          }
+        />
+      </CabecalhoEntrega>
 
       {!preparandoProjeto && (
         <NavegacaoSalaEntrega
           painel={painel}
           concluido={projeto.status === 'concluido'}
-          evolucaoRegistrada={projeto.evolucao?.status === 'registrada'}
           recorrente={estaEmAcompanhamento(projeto)}
           mostrarEvolucao={podeMostrarEvolucao}
-          proximaTarefa={proxima?.titulo ?? null}
           totalArquivos={projeto.arquivos.length}
-          rotuloCliente={rotuloCliente}
+          pendenciasCliente={contarPendenciasCliente(projeto)}
           onChange={(proximoPainel) => {
             if (proximoPainel === 'arquivos') setArquivoTarefaId(null);
             setPainel(proximoPainel);
@@ -362,6 +288,7 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
 
       {painel === 'cliente' && (
         <div className={styles.painelCliente}>
+          <PendenciasClienteEntrega projeto={projeto} onAbrir={abrirAcaoJornada} />
           <PainelClienteEntrega
             trabalhoIniciado={trabalhoIniciado}
             projeto={projeto}
@@ -383,11 +310,6 @@ export function SalaEntrega({ projeto, tarefaSolicitada }: PropsSalaEntrega) {
           />
         )
       )}
-
-      <GestaoServico
-        projeto={projeto}
-        onConcluir={() => setPainel(projeto.tipoServico === 'recorrente' ? 'evolucao' : 'arquivos')}
-      />
     </div>
   );
 }

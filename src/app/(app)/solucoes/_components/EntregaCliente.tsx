@@ -57,6 +57,8 @@ export function EntregaCliente({
 
   return (
     <section
+      id="validacao-cliente"
+      tabIndex={-1}
       className={styles.entrega}
       data-status={tarefa.clienteStatus}
       data-final={aceiteFinal || undefined}

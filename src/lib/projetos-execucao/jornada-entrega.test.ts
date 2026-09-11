@@ -140,7 +140,7 @@ describe('obterEstadoJornadaEntrega', () => {
     });
   });
 
-  it('só encerra a jornada depois do aceite final', () => {
+  it('distingue o aceite final do trabalho ainda em validação', () => {
     const antes = obterEstadoJornadaEntrega({
       status: 'em_validacao',
       briefingConfirmado: true,
@@ -149,6 +149,7 @@ describe('obterEstadoJornadaEntrega', () => {
     });
     const depois = obterEstadoJornadaEntrega({
       status: 'concluido',
+      aceiteConfirmado: true,
       briefingConfirmado: true,
       tarefas: [{ ...tarefa, clienteStatus: 'aprovada' }],
       compromisso: null,
@@ -156,5 +157,20 @@ describe('obterEstadoJornadaEntrega', () => {
 
     expect(antes.rotuloAcao).toBe('Formalizar a entrega final');
     expect(depois).toMatchObject({ momento: 'entregar', tom: 'concluido', destino: 'validacao' });
+  });
+
+  it('não declara aprovação do cliente quando a conclusão foi manual', () => {
+    const estado = obterEstadoJornadaEntrega({
+      status: 'concluido',
+      briefingConfirmado: true,
+      tarefas: [tarefa],
+      compromisso: null,
+    });
+    expect(estado).toMatchObject({
+      titulo: 'Entrega concluída por você.',
+      destino: 'arquivos',
+      rotuloAcao: 'Ver arquivos',
+    });
+    expect(estado.nomeAcessivelAcao).not.toContain('aceita pelo cliente');
   });
 });
