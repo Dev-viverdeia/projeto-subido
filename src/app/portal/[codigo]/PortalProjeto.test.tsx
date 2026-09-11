@@ -10,7 +10,7 @@ vi.mock('@/lib/portal-cliente/actions', () => ({
 }));
 
 import { PortalProjeto } from './PortalProjeto';
-import { decidirEntregaCliente } from '@/lib/portal-cliente/actions';
+import { decidirEntregaCliente, solicitarMudancaEscopoCliente } from '@/lib/portal-cliente/actions';
 
 const PROJETO: ProjetoPortalCliente = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -117,6 +117,52 @@ function abrirDetalhe(rotulo: string) {
 }
 
 describe('PortalProjeto', () => {
+  it('mantém o pedido de mudança preenchido quando o envio falha', async () => {
+    vi.mocked(solicitarMudancaEscopoCliente).mockResolvedValueOnce({
+      erro: 'Não foi possível confirmar o pedido. Tente novamente.',
+    });
+    render(<PortalProjeto codigo="44444444-4444-4444-8444-444444444444" projeto={PROJETO} />);
+    abrirDetalhe('Sobre o projeto');
+    fireEvent.click(screen.getByRole('button', { name: 'Pedir uma mudança' }));
+    fireEvent.change(screen.getByLabelText('Resumo do pedido'), {
+      target: { value: 'Adicionar novo canal' },
+    });
+    fireEvent.change(screen.getByLabelText('Explique a necessidade'), {
+      target: { value: 'Precisamos atender também pelo Instagram da clínica.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar para análise' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Tente novamente.');
+    expect(screen.getByLabelText('Resumo do pedido')).toHaveValue('Adicionar novo canal');
+    expect(screen.getByLabelText('Explique a necessidade')).toHaveValue(
+      'Precisamos atender também pelo Instagram da clínica.',
+    );
+    const enviado = vi.mocked(solicitarMudancaEscopoCliente).mock.calls.at(-1)![1];
+    expect(enviado.get('codigo')).toBe('44444444-4444-4444-8444-444444444444');
+    expect(enviado.get('titulo')).toBe('Adicionar novo canal');
+    expect(screen.getByRole('button', { name: 'Enviar para análise' })).toBeEnabled();
+  });
+  it('abre apenas a primeira revisão e mantém todos os formulários montados', () => {
+    const { container } = render(
+      <PortalProjeto
+        codigo="44444444-4444-4444-8444-444444444444"
+        projeto={{
+          ...PROJETO,
+          tarefas: PROJETO.tarefas.map((tarefa) => ({ ...tarefa, clienteStatus: 'aguardando' })),
+        }}
+      />,
+    );
+    const revisoes = screen
+      .getByRole('region', { name: '2 itens aguardam sua resposta.' })
+      .querySelectorAll('details:has(> summary strong)');
+    expect(revisoes).toHaveLength(2);
+    expect(revisoes[0]).toHaveAttribute('open');
+    expect(revisoes[1]).not.toHaveAttribute('open');
+    expect(container.querySelectorAll('button[value="aprovada"]')).toHaveLength(2);
+    expect(screen.getByRole('link', { name: 'Arquivos' })).toHaveAttribute(
+      'href',
+      '#arquivos-titulo',
+    );
+  });
   it('não confunde conclusão do profissional com aprovação do cliente', () => {
     render(
       <PortalProjeto

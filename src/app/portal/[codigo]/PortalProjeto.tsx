@@ -13,6 +13,7 @@ import { ArquivosPortal } from './ArquivosPortal';
 import { EntregasPortal } from './EntregasPortal';
 import { HistoricoPortal } from './HistoricoPortal';
 import { RevisaoResultadoPortal } from './RevisaoResultadoPortal';
+import { RevisaoPortal } from './RevisaoPortal';
 import layout from './PortalProjeto.module.css';
 
 export function PortalProjeto({
@@ -29,6 +30,7 @@ export function PortalProjeto({
     (mudanca) => mudanca.status === 'aguardando_cliente',
   );
   const totalAcoes = aprovacoes.length + dependencias.length + mudancasAguardando.length;
+  const agruparRevisoes = aprovacoes.length + mudancasAguardando.length > 1;
   const ajustePendente = projeto.tarefas.find((tarefa) => tarefa.clienteStatus === 'ajustes');
   const concluido = projeto.status === 'concluido';
 
@@ -56,25 +58,45 @@ export function PortalProjeto({
               <h2 id="decisoes-titulo">{tituloDecisao}</h2>
             </header>
             <div className={layout.listaAprovacoes}>
-              {mudancasAguardando.map((mudanca) => (
-                <DecisaoMudancaEscopo key={mudanca.id} codigo={codigo} mudanca={mudanca} />
+              {mudancasAguardando.map((mudanca, indice) => (
+                <RevisaoPortal
+                  key={mudanca.id}
+                  titulo={mudanca.titulo}
+                  tipo="mudanca"
+                  primeira={indice === 0}
+                  agrupar={agruparRevisoes}
+                >
+                  <DecisaoMudancaEscopo
+                    codigo={codigo}
+                    mudanca={mudanca}
+                    emFila={agruparRevisoes}
+                  />
+                </RevisaoPortal>
+              ))}
+              {aprovacoes.map((tarefa, indice) => (
+                <RevisaoPortal
+                  key={tarefa.id}
+                  titulo={tarefa.titulo}
+                  tipo="entrega"
+                  primeira={mudancasAguardando.length === 0 && indice === 0}
+                  agrupar={agruparRevisoes}
+                >
+                  <AprovacaoCliente
+                    codigo={codigo}
+                    tarefa={tarefa}
+                    emFila={agruparRevisoes}
+                    aceiteFinal={tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
+                    encerramento={
+                      tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total
+                        ? projeto.encerramento
+                        : null
+                    }
+                    arquivos={projeto.arquivos.filter((arquivo) => arquivo.tarefaId === tarefa.id)}
+                  />
+                </RevisaoPortal>
               ))}
               {dependencias.map((acao) => (
                 <PendenciaCliente key={acao.id} codigo={codigo} acao={acao} />
-              ))}
-              {aprovacoes.map((tarefa) => (
-                <AprovacaoCliente
-                  key={tarefa.id}
-                  codigo={codigo}
-                  tarefa={tarefa}
-                  aceiteFinal={tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total}
-                  encerramento={
-                    tarefa.id === ultimaTarefa?.id && projeto.feitas === projeto.total
-                      ? projeto.encerramento
-                      : null
-                  }
-                  arquivos={projeto.arquivos.filter((arquivo) => arquivo.tarefaId === tarefa.id)}
-                />
               ))}
             </div>
           </section>

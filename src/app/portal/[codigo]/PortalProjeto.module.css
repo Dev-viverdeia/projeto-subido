@@ -107,13 +107,43 @@
   color: var(--via-text-primary);
   font-weight: var(--via-fw-medium);
 }
+.heroRodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.atalhoArquivos {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  margin-left: auto;
+  padding-inline: var(--via-space-3);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-navy);
+  font-size: var(--app-fs-ui);
+  text-decoration: none;
+}
+.atalhoArquivos:hover {
+  background: var(--via-bg-2);
+}
+.atalhoArquivos:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
 .fases {
   display: flex;
   flex-wrap: wrap;
-  grid-column: 1 / -1;
   margin: 0;
-  padding: var(--via-space-4) 0 0;
-  border-top: 1px solid var(--via-border-hairline);
+  padding: 0;
   list-style: none;
   gap: var(--via-space-2) var(--via-space-5);
 }
@@ -167,8 +197,82 @@
 }
 .listaAprovacoes {
   display: grid;
-  gap: var(--app-gap-block);
+  gap: var(--via-space-3);
   min-width: 0;
+}
+.revisao {
+  min-width: 0;
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-glass-plane-strong);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--app-glass-filter);
+}
+.revisao > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-3);
+  min-height: 88px;
+  padding: var(--app-pad-card-tight) var(--app-pad-card);
+  border-radius: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+.revisao > summary::-webkit-details-marker {
+  display: none;
+}
+.revisao > summary:hover {
+  background: var(--via-navy-04);
+}
+.revisao > summary:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
+.revisaoIcone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--app-radius-control);
+  border: 1px solid var(--app-elev-1-line);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-navy);
+}
+.revisaoTitulo {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: var(--via-space-1);
+  overflow-wrap: anywhere;
+}
+.revisaoTitulo > span {
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+.revisaoTitulo > strong {
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  line-height: 1.4;
+  color: var(--via-text-primary);
+}
+.revisao > summary > svg {
+  flex-shrink: 0;
+  color: var(--via-text-muted);
+  transition: transform var(--app-t-state);
+}
+.revisao[open] > summary > svg {
+  transform: rotate(180deg);
+}
+.revisao[open] > summary {
+  border-bottom: 1px solid var(--via-border-hairline);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.revisaoCorpo {
+  overflow: hidden;
+  border-radius: 0 0 var(--app-radius-card) var(--app-radius-card);
 }
 .trabalho {
   display: grid;
@@ -189,6 +293,10 @@
   font-size: var(--app-fs-section-title);
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h4);
+  scroll-margin-top: var(--via-space-5);
+}
+.tituloSecao h2:focus {
+  outline: none;
 }
 .tituloSecao > span {
   font-size: var(--app-fs-support);
@@ -420,7 +528,8 @@
   display: none;
 }
 @supports not (backdrop-filter: blur(1px)) {
-  .hero {
+  .hero,
+  .revisao {
     background: var(--via-white);
   }
 }
@@ -473,6 +582,16 @@
   .fases {
     gap: var(--via-space-2) var(--via-space-4);
   }
+  .heroRodape {
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: var(--via-space-2);
+  }
+  .atalhoArquivos {
+    flex-shrink: 0;
+    padding-inline: var(--via-space-2);
+    font-size: var(--app-fs-support);
+  }
   .entrega {
     column-gap: var(--via-space-2);
   }
@@ -487,6 +606,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .revisao > summary > svg,
   .grupoDetalhes > summary > svg,
   .nota summary > svg,
   .mais summary > svg {

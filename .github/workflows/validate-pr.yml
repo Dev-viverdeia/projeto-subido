@@ -107,7 +107,7 @@ jobs:
         run: npx playwright install --with-deps chromium webkit
 
       - name: Jornadas essenciais no desktop e celular
-        run: npx playwright test e2e/links-publicos.spec.ts e2e/sobral-primeiro-envio.spec.ts e2e/jornada-vendas.spec.ts e2e/crm-oportunidade.spec.ts e2e/crm-kanban.spec.ts e2e/projetos-estudio-foco.spec.ts e2e/entrega-ficha-clara.spec.ts --workers=2
+        run: npx playwright test e2e/links-publicos.spec.ts e2e/sobral-primeiro-envio.spec.ts e2e/jornada-vendas.spec.ts e2e/crm-oportunidade.spec.ts e2e/crm-kanban.spec.ts e2e/projetos-estudio-foco.spec.ts e2e/entrega-ficha-clara.spec.ts e2e/portal-foco.spec.ts --workers=2
 
       - name: Evidências de interface em caso de falha
         if: failure()
