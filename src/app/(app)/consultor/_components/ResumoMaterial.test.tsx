@@ -85,7 +85,10 @@ it('erro de gravação não apaga rascunho nem mostra sucesso', async () => {
   await screen.findByRole('alert');
   expect(screen.getByLabelText('Escopo')).toHaveValue(material.resumo.escopo);
   expect(screen.queryByText('Resumo registrado.')).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Salvar na ficha' })).toBeEnabled();
+  // O alerta pode ser renderizado antes de useTransition liberar o formulário.
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'Salvar na ficha' })).toBeEnabled(),
+  );
 });
 it('distingue carregamento, erro recuperável e plano sem vendas', async () => {
   preparar.mockRejectedValueOnce(new Error('offline'));
