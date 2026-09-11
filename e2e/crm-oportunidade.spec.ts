@@ -8,11 +8,11 @@ test.describe('Ficha do cliente em Vendas', () => {
 
     await expect(page.getByText('Ficha do cliente', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Clínica Aurora' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Progresso do cliente' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Etapas da venda' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Abrir próxima reunião' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Criar proposta' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Atualizar dados' })).toBeVisible();
-    const jornada = page.getByRole('list', { name: 'Jornada deste cliente' });
+    const jornada = page.getByRole('list', { name: 'Etapas da venda' });
     await expect(jornada.getByText('Preparar', { exact: true })).toBeVisible();
     await expect(jornada.getByText('Descobrir', { exact: true })).toBeVisible();
     await expect(jornada.getByText('Propor', { exact: true })).toBeVisible();
@@ -124,27 +124,30 @@ test.describe('Ficha do cliente em Vendas', () => {
     await expect(dialogo.getByRole('button', { name: 'Usar 3 créditos' })).toBeVisible();
   });
 
-  test('diferencia etapas concluídas, futuras e o ponto em que uma venda foi encerrada', async ({
-    page,
-  }) => {
+  test('diferencia venda ganha de perda sem inventar a etapa do encerramento', async ({ page }) => {
     await page.goto('/preview/crm-dossie?resultado=ganho');
 
-    await expect(page.getByRole('heading', { name: 'Cliente em entrega' })).toBeVisible();
-    const jornadaCliente = page.getByRole('list', { name: 'Jornada deste cliente' });
-    await expect(jornadaCliente.getByRole('listitem', { name: /: Concluída$/ })).toHaveCount(3);
-    await expect(page.getByText(/Venda concluída\. Abra um novo ciclo/)).toBeVisible();
+    const ficha = page.getByRole('region', { name: 'Clínica Aurora', exact: true });
+    await expect(ficha.getByRole('strong').filter({ hasText: /^Ganho$/ })).toBeVisible();
+    const jornadaCliente = page.getByRole('list', { name: 'Etapas da venda' });
+    await expect(jornadaCliente.getByRole('listitem', { name: /: Concluída$/ })).toHaveCount(4);
+    await expect(jornadaCliente.locator('[aria-current="step"]')).toHaveCount(0);
+    await expect(ficha.getByRole('link', { name: 'Registrar proposta' })).toHaveAttribute(
+      'href',
+      /\/propostas\/nova\?oportunidade=/,
+    );
     await expect(page.getByText('Pesquisa arquivada')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar reunião' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Usar como próxima ação' })).toHaveCount(0);
 
     await page.goto('/preview/crm-dossie?resultado=perdido');
 
-    await expect(page.getByRole('heading', { name: 'Venda encerrada' })).toBeVisible();
-    await expect(jornadaCliente.getByRole('listitem', { name: /: Concluída$/ })).toHaveCount(1);
-    await expect(
-      jornadaCliente.getByRole('listitem', { name: 'Descobrir: Encerrada aqui' }),
-    ).toBeVisible();
-    await expect(jornadaCliente.getByRole('listitem', { name: /: Próxima etapa$/ })).toHaveCount(3);
+    await expect(page.getByText('Venda encerrada', { exact: true })).toBeVisible();
+    await expect(jornadaCliente.getByRole('listitem', { name: /: Concluída$/ })).toHaveCount(0);
+    await expect(jornadaCliente.locator('[aria-current="step"]')).toHaveCount(0);
+    await expect(jornadaCliente.getByRole('listitem', { name: /: Sem confirmação$/ })).toHaveCount(
+      4,
+    );
     await expect(page.getByText('Pesquisa arquivada')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Agendar reunião' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Usar como próxima ação' })).toHaveCount(0);

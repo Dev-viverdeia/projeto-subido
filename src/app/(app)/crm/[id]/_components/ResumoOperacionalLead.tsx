@@ -59,7 +59,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                   ? 'Em andamento'
                   : estado === 'encerrada'
                     ? 'Encerrada aqui'
-                    : 'Próxima etapa';
+                    : perdida
+                      ? 'Sem confirmação'
+                      : 'Próxima etapa';
             return (
               <li
                 key={etapa.id}

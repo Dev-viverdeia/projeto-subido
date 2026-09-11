@@ -80,8 +80,8 @@ test.describe('Leitura essencial', () => {
 
   test('jornada compacta mantém etapa atual e conclusão explícitas', async ({ page }, testInfo) => {
     await page.goto('/preview/crm-dossie?entrada=1');
-    const jornada = page.getByRole('list', { name: 'Jornada deste cliente' });
-    await expect(jornada.getByRole('listitem')).toHaveCount(5);
+    const jornada = page.getByRole('list', { name: 'Etapas da venda' });
+    await expect(jornada.getByRole('listitem')).toHaveCount(4);
     await expect(jornada.locator('[aria-current="step"]')).toHaveCount(1);
     const rotulosInteiros = await jornada
       .locator('strong')
@@ -99,13 +99,13 @@ test.describe('Leitura essencial', () => {
     await jornada.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath('jornada-essencial.png') });
     await page.goto('/preview/crm-dossie?resultado=ganho');
-    await expect(jornada.locator('[data-estado="concluida"]')).toHaveCount(3);
-    await expect(jornada.locator('[data-estado="concluida"] svg')).toHaveCount(3);
+    await expect(jornada.locator('[data-estado="concluida"]')).toHaveCount(4);
+    await expect(jornada.locator('[data-estado="concluida"] svg')).toHaveCount(4);
     await page.goto('/preview/crm-dossie?resultado=perdido');
-    await expect(
-      jornada.getByRole('listitem', { name: 'Descobrir: Encerrada aqui' }),
-    ).toBeVisible();
-    await expect(jornada.locator('[data-estado="encerrada"] svg')).toBeVisible();
+    await expect(jornada.locator('[aria-current="step"]')).toHaveCount(0);
+    await expect(jornada.locator('[data-estado="concluida"]')).toHaveCount(0);
+    await expect(jornada.getByRole('listitem', { name: /: Sem confirmação$/ })).toHaveCount(4);
+    await expect(page.getByText('Venda encerrada', { exact: true })).toBeVisible();
     await semOverflow(page);
   });
 
