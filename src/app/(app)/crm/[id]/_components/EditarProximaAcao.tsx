@@ -60,7 +60,10 @@ export function EditarProximaAcao({
       <button
         type="button"
         className={styles.gatilho}
-        onClick={() => setAberto(true)}
+        onClick={(evento) => {
+          evento.currentTarget.focus();
+          setAberto(true);
+        }}
         aria-haspopup="dialog"
       >
         {salva ? (
@@ -109,7 +112,7 @@ export function EditarProximaAcao({
               placeholder="Ex.: Enviar o escopo revisado e combinar a data da decisão."
               aria-invalid={Boolean(estado.porCampo?.acao)}
               aria-describedby={estado.porCampo?.acao ? 'erro-proxima-acao' : undefined}
-              autoFocus
+              data-autofocus
               required
             />
             {estado.porCampo?.acao && (

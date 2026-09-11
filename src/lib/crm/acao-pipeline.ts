@@ -1,4 +1,5 @@
 import type { OportunidadeCrm } from './pipeline-queries';
+import { ROTULO_ABRIR_PROPOSTA } from '@/lib/propostas/status';
 import { etapaAberta, faseDaEtapa } from './etapas';
 import { estaNoFluxo } from './situacao';
 
@@ -14,14 +15,13 @@ export function acaoDoPipeline(oportunidade: OportunidadeCrm): {
   }
   const proposta = oportunidade.propostaRecente;
   if (proposta) {
-    const rotulos = {
-      rascunho: 'Continuar proposta',
-      pronta: 'Apresentar proposta',
-      apresentada: 'Acompanhar proposta',
-      aceita: 'Preparar entrega',
-      recusada: 'Revisar proposta',
-    } as const;
-    return { rotulo: rotulos[proposta.status], href: `/propostas/${proposta.id}` };
+    return { rotulo: ROTULO_ABRIR_PROPOSTA[proposta.status], href: `/propostas/${proposta.id}` };
+  }
+  if (oportunidade.etapa === 'ganho') {
+    return {
+      rotulo: 'Registrar proposta',
+      href: `/propostas/nova?oportunidade=${oportunidade.id}`,
+    };
   }
   if (faseDaEtapa(oportunidade.etapa) === 'proposta') {
     return {

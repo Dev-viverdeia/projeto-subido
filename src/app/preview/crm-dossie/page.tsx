@@ -13,6 +13,7 @@ import { PreviewSidebar } from './PreviewSidebar';
 import { criarLeadContinuidade } from './criarLeadContinuidade';
 import { criarLeadEncerrado } from './criarLeadEncerrado';
 import { criarLeadNovo } from './criarLeadNovo';
+import { criarCenarioVenda } from './criarCenarioVenda';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -340,15 +341,18 @@ export default async function PreviewDossiePage({
   const enriquecendo = parametros.enriquecimento === 'processando';
   const enriquecimentoFalhou = parametros.enriquecimento === 'falhou';
   const posEntrega = parametros['pos-entrega'] === '1';
-  const lead = posEntrega
-    ? LEAD_CONTINUIDADE
-    : parametros.resultado === 'ganho'
-      ? LEAD_GANHO
-      : parametros.resultado === 'perdido'
-        ? LEAD_PERDIDO
-        : entrada || pesquisaPendente
-          ? LEAD_NOVO
-          : LEAD_OPERACIONAL;
+  const lead =
+    typeof parametros.cenario === 'string'
+      ? criarCenarioVenda(LEAD_OPERACIONAL, parametros.cenario)
+      : posEntrega
+        ? LEAD_CONTINUIDADE
+        : parametros.resultado === 'ganho'
+          ? LEAD_GANHO
+          : parametros.resultado === 'perdido'
+            ? LEAD_PERDIDO
+            : entrada || pesquisaPendente
+              ? LEAD_NOVO
+              : LEAD_OPERACIONAL;
   const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
 
   return (

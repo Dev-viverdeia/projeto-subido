@@ -47,7 +47,7 @@ describe('criarLead', () => {
       p_contato_email: 'camila@clinicaaurora.com.br',
       p_oportunidade_titulo: 'Automação do atendimento',
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
     expect(redirect).toHaveBeenCalledWith(`/vendas/${OPORTUNIDADE_ID}?novo=1`);
   });
@@ -91,7 +91,7 @@ describe('iniciarNovoCicloCliente', () => {
     expect(rpc).toHaveBeenCalledWith('crm_iniciar_novo_ciclo', {
       p_oportunidade: OPORTUNIDADE_ID,
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
     expect(redirect).toHaveBeenCalledWith(`/vendas/${NOVA_OPORTUNIDADE}?novo=1`);
   });
 });
@@ -115,8 +115,8 @@ describe('moverOportunidadeKanban', () => {
       p_etapa: 'perdido',
       p_motivo_perda: 'sem_prioridade',
     });
-    expect(revalidatePath).toHaveBeenCalledWith('/vendas');
-    expect(revalidatePath).toHaveBeenCalledWith(`/vendas/${OPORTUNIDADE_ID}`);
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
   });
 
   it('recusa encerrar como perdido sem contexto', async () => {

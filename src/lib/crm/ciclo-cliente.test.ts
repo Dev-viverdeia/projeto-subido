@@ -63,217 +63,219 @@ function descobertaConcluida(lead: DossieLead) {
   ];
 }
 
-describe('ciclo factual do cliente', () => {
-  it('não recomenda contato para uma oportunidade arquivada', () => {
-    const lead = leadBase();
-    lead.oportunidade.situacao = 'arquivada';
-    lead.oportunidade.motivoRetirada = 'Retomar mais adiante';
-    expect(montarCicloCliente(lead).decisao).toMatchObject({
-      tipo: 'encerrado',
-      rotulo: 'Arquivada',
-      acao: null,
-    });
-  });
-  it('começa pelo enriquecimento e mostra o ciclo completo', () => {
-    const ciclo = montarCicloCliente(leadBase());
+describe('etapa registrada e próximo passo independente', () => {
+  it.each([
+    ['novo_lead', 'Preparar'],
+    ['qualificacao', 'Preparar'],
+    ['descoberta', 'Descobrir'],
+    ['proposta', 'Propor'],
+    ['negociacao', 'Propor'],
+  ] as const)(
+    'preserva %s mesmo depois de enriquecer ou criar proposta offline',
+    (etapa, rotulo) => {
+      const lead = leadBase();
+      lead.oportunidade.etapa = etapa;
+      lead.oportunidade.enriquecidoEm = '2026-09-10T12:00:00Z';
+      lead.propostaRecente = {
+        id: 'proposta',
+        titulo: 'Proposta',
+        status: 'rascunho',
+        reuniaoId: null,
+      };
+      const ciclo = montarCicloCliente(lead);
+      expect(ciclo.etapas.map((e) => e.rotulo)).toEqual([
+        'Preparar',
+        'Descobrir',
+        'Propor',
+        'Ganho',
+      ]);
+      expect(ciclo.etapas.filter((e) => e.estado === 'atual').map((e) => e.rotulo)).toEqual([
+        rotulo,
+      ]);
+      expect(ciclo.decisao).toMatchObject({
+        acao: 'Continuar proposta',
+        href: '/propostas/proposta',
+      });
+    },
+  );
 
-    expect(ciclo.etapas.map((etapa) => etapa.rotulo)).toEqual([
-      'Preparar',
-      'Descobrir',
-      'Propor',
-      'Entregar',
-      'Concluir',
-    ]);
-    expect(ciclo.etapas.map((etapa) => etapa.estado)).toEqual([
+  it('enriquecer não conclui a preparação', () => {
+    const lead = leadBase();
+    lead.oportunidade.enriquecidoEm = '2026-09-10T12:00:00Z';
+    expect(montarCicloCliente(lead).etapas.map((e) => e.estado)).toEqual([
       'atual',
       'futura',
       'futura',
       'futura',
-      'futura',
     ]);
-    expect(ciclo.etapas[0]).toMatchObject({ evidencia: 'Enriquecimento recomendado' });
-    expect(ciclo.decisao).toMatchObject({
+  });
+
+  it('sugere enriquecimento sem torná-lo uma condição para agendar', () => {
+    expect(montarCicloCliente(leadBase()).decisao).toMatchObject({
       tipo: 'enriquecer',
       acao: 'Enriquecer dados',
-      apoioRotulo: 'Agendar sem enriquecer',
+      apoioRotulo: 'Agendar reunião',
     });
   });
 
-  it('permite trabalhar uma proposta originada fora da plataforma', () => {
+  it.each(['arquivada', 'desclassificada'] as const)('não recomenda ações para %s', (situacao) => {
     const lead = leadBase();
+    lead.oportunidade.situacao = situacao;
+    const ciclo = montarCicloCliente(lead);
+    expect(ciclo.decisao).toMatchObject({ tipo: 'encerrado', acao: null, href: null });
+    expect(ciclo.etapas.some((e) => e.estado === 'atual')).toBe(false);
+  });
+
+  it('não inventa etapas concluídas para uma venda perdida', () => {
+    const lead = leadBase();
+    lead.oportunidade.etapa = 'perdido';
+    expect(montarCicloCliente(lead).etapas.every((e) => e.estado === 'futura')).toBe(true);
+    expect(montarCicloCliente(lead).decisao.tipo).toBe('encerrado');
+  });
+
+  it('não encerra venda reaberta porque a proposta anterior foi recusada', () => {
+    const lead = leadBase();
+    lead.oportunidade.etapa = 'proposta';
     lead.propostaRecente = {
-      id: '55555555-5555-4555-8555-555555555555',
-      titulo: 'Proposta de atendimento',
+      id: 'proposta',
+      titulo: 'Proposta',
+      status: 'recusada',
+      reuniaoId: null,
+    };
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      tipo: 'navegacao',
+      acao: 'Revisar proposta',
+      href: '/propostas/proposta',
+    });
+    expect(montarCicloCliente(lead).etapas[2]!.estado).toBe('atual');
+  });
+
+  it('mantém a próxima ação definida mesmo com enriquecimento, reunião e rascunho', () => {
+    const lead = leadBase();
+    descobertaConcluida(lead);
+    lead.oportunidade.proximaAcao = 'Enviar escopo pelo WhatsApp';
+    lead.oportunidade.proximaAcaoEm = '2026-09-12T12:00:00Z';
+    lead.propostaRecente = {
+      id: 'proposta',
+      titulo: 'Proposta',
       status: 'rascunho',
       reuniaoId: null,
     };
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[1]).toMatchObject({ evidencia: 'Sem reunião registrada' });
-    expect(ciclo.etapas[2]).toMatchObject({ estado: 'atual', evidencia: 'Rascunho' });
-    expect(ciclo.decisao).toMatchObject({
-      rotulo: 'Proposta em andamento',
-      acao: 'Continuar proposta',
-      apoioRotulo: null,
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      tipo: 'definida',
+      titulo: 'Enviar escopo pelo WhatsApp',
+      prazo: '2026-09-12T12:00:00Z',
+      href: null,
+      acao: null,
     });
   });
 
-  it('abre a reunião já agendada antes de sugerir uma proposta', () => {
+  it('não cria link circular para um compromisso sem reunião', () => {
     const lead = leadBase();
+    lead.acoesPlano = [{ id: 'acao', titulo: 'Revisar escopo', prazoEm: null, reuniaoId: null }];
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      tipo: 'definida',
+      titulo: 'Revisar escopo',
+      href: null,
+    });
+  });
+
+  it('abre a reunião mais próxima e usa a data dela, não a de outra ação', () => {
+    const lead = leadBase();
+    descobertaConcluida(lead);
+    const call = lead.calls[0]!;
     lead.calls = [
       {
-        id: '33333333-3333-4333-8333-333333333333',
-        titulo: 'Descoberta com Camila',
-        tipo: 'descoberta',
+        ...call,
+        id: 'tardia',
+        codigoPublico: 'tardia',
         status: 'agendada',
-        agendadaPara: '2026-08-14T12:00:00.000Z',
-        iniciadaEm: null,
-        encerradaEm: null,
-        duracaoMinutos: 45,
-        codigoPublico: '44444444-4444-4444-8444-444444444444',
+        agendadaPara: '2026-10-20T12:00:00Z',
       },
+      {
+        ...call,
+        id: 'cedo',
+        codigoPublico: 'cedo',
+        status: 'agendada',
+        agendadaPara: '2026-10-12T12:00:00Z',
+      },
+      call,
     ];
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.decisao).toMatchObject({
-      titulo: 'Prepare Descoberta com Camila',
-      href: `/sala/${lead.calls[0]!.codigoPublico}`,
+    lead.oportunidade.proximaAcaoEm = '2026-12-10T12:00:00Z';
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      href: '/sala/cedo',
+      prazo: '2026-10-12T12:00:00Z',
       acao: 'Abrir reunião',
     });
   });
 
-  it('leva a descoberta concluída para uma proposta ligada à mesma reunião', () => {
+  it('preserva a reunião e o projeto recomendado ao criar a proposta', () => {
     const lead = leadBase();
     descobertaConcluida(lead);
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[1]).toMatchObject({ estado: 'concluida' });
-    expect(ciclo.etapas[2]).toMatchObject({ estado: 'atual' });
-    expect(ciclo.decisao).toMatchObject({
-      acao: 'Montar proposta',
-      href: `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}`,
-      apoioRotulo: 'Revisar descoberta',
-    });
-  });
-
-  it('preserva na proposta o projeto recomendado pela prospecção', () => {
-    const lead = leadBase();
     lead.empresa.projetoSugeridoSlug = 'sdr-atendimento-qualificacao';
-    descobertaConcluida(lead);
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.decisao.href).toBe(
+    expect(montarCicloCliente(lead).decisao.href).toBe(
       `/propostas/nova?oportunidade=${lead.oportunidade.id}&reuniao=${lead.calls[0]!.id}&projeto=sdr-atendimento-qualificacao`,
     );
+    expect(montarCicloCliente(lead).etapas[0]!.estado).toBe('atual');
   });
 
-  it('só recomenda continuar a proposta depois da descoberta', () => {
+  it('usa o histórico completo mesmo quando a descoberta não está nas reuniões recentes', () => {
     const lead = leadBase();
-    descobertaConcluida(lead);
-    lead.propostaRecente = {
-      id: '55555555-5555-4555-8555-555555555555',
-      titulo: 'Proposta de atendimento',
-      status: 'rascunho',
-      reuniaoId: lead.calls[0]!.id,
-    };
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.decisao).toMatchObject({
-      rotulo: 'Proposta em andamento',
-      acao: 'Continuar proposta',
-      apoioRotulo: 'Revisar descoberta',
+    lead.temDescobertaConcluida = true;
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      acao: 'Criar proposta',
+      href: `/propostas/nova?oportunidade=${lead.oportunidade.id}`,
     });
   });
 
-  it('leva uma proposta aceita para o início da entrega quando o projeto ainda não existe', () => {
+  it('permite criar proposta na etapa Propor sem nenhuma reunião ou enriquecimento', () => {
+    const lead = leadBase();
+    lead.oportunidade.etapa = 'proposta';
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      acao: 'Criar proposta',
+      href: `/propostas/nova?oportunidade=${lead.oportunidade.id}`,
+    });
+  });
+
+  it('mostra a venda ganha como concluída, sem confundi-la com a entrega', () => {
     const lead = leadBase();
     lead.oportunidade.etapa = 'ganho';
+    lead.oportunidade.proximaAcao = 'Compromisso antigo';
+    expect(montarCicloCliente(lead).etapas.every((e) => e.estado === 'concluida')).toBe(true);
+    expect(montarCicloCliente(lead).decisao.acao).toBe('Registrar proposta');
     lead.propostaRecente = {
-      id: '55555555-5555-4555-8555-555555555555',
-      titulo: 'Proposta aceita',
+      id: 'proposta',
+      titulo: 'Proposta',
       status: 'aceita',
       reuniaoId: null,
     };
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[3]).toMatchObject({ estado: 'atual' });
-    expect(ciclo.decisao).toMatchObject({
-      acao: 'Iniciar entrega',
-      href: `/propostas/${lead.propostaRecente.id}`,
+    expect(montarCicloCliente(lead).decisao).toMatchObject({
+      acao: 'Preparar entrega',
+      href: '/propostas/proposta',
     });
   });
 
-  it('mantém a entrega ativa como próxima ação', () => {
-    const lead = leadBase();
-    lead.projetoAtivo = {
-      id: '66666666-6666-4666-8666-666666666666',
-      titulo: 'SDR de Atendimento',
-      status: 'em_execucao',
-      atualizadoEm: '2026-08-13T15:00:00.000Z',
-    };
-    lead.projetoRecente = lead.projetoAtivo;
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[3]).toMatchObject({ estado: 'atual', evidencia: 'Em execução' });
-    expect(ciclo.decisao).toMatchObject({ acao: 'Continuar entrega' });
-  });
-
-  it('preserva a entrega concluída e abre um novo ciclo', () => {
-    const lead = leadBase();
-    lead.oportunidade.etapa = 'ganho';
-    lead.projetoRecente = {
-      id: '66666666-6666-4666-8666-666666666666',
-      titulo: 'SDR de Atendimento',
-      status: 'concluido',
-      atualizadoEm: '2026-08-13T15:00:00.000Z',
-    };
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[4]).toMatchObject({ estado: 'atual', evidencia: 'Entrega comprovada' });
-    expect(ciclo.decisao).toMatchObject({
-      tipo: 'novo-ciclo',
-      apoioHref: `/entregas/${lead.projetoRecente.id}`,
-    });
-  });
-
-  it('usa o resultado da entrega para guiar a primeira conversa do novo ciclo', () => {
-    const lead = leadBase();
-    lead.oportunidade.proximaAcao = 'Validar a expansão para os canais de Instagram e site.';
-    lead.oportunidade.proximaAcaoEm = '2026-09-09T15:00:00.000Z';
-    lead.continuidadePosEntrega = {
-      projetoId: '66666666-6666-4666-8666-666666666666',
-      projetoTitulo: 'SDR de Atendimento',
-      resumoEntrega: 'SDR implantado e validado pelo cliente.',
-      resultadoPrincipal: 'Tempo de resposta reduzido.',
-      resultadoObservado: 'O tempo médio de resposta caiu de 18 para 4 minutos.',
-      evidenciaResultadoUrl: null,
-      decisao: 'expandir',
-      proximoPasso: 'Validar a expansão para os canais de Instagram e site.',
-      proximoPassoEm: '2026-09-09',
-      aceitaEm: '2026-08-01T12:00:00.000Z',
-      registradaEm: '2026-08-31T13:00:00.000Z',
-    };
-
-    const ciclo = montarCicloCliente(lead);
-
-    expect(ciclo.etapas[0]).toMatchObject({
-      estado: 'concluida',
-      evidencia: 'Dados enriquecidos',
-    });
-    expect(ciclo.etapas[1]).toMatchObject({ estado: 'atual', evidencia: 'Contexto a confirmar' });
-    expect(ciclo.decisao).toMatchObject({
-      rotulo: 'Expansão confirmada',
-      titulo: 'Validar a expansão para os canais de Instagram e site.',
-      acao: 'Agendar reunião',
-      apoioHref: `/entregas/${lead.continuidadePosEntrega.projetoId}`,
-    });
-  });
+  it.each(['em_execucao', 'concluido', 'pausado'] as const)(
+    'retoma a entrega existente (%s)',
+    (status) => {
+      const lead = leadBase();
+      lead.oportunidade.etapa = 'ganho';
+      lead.acoesPlano = [
+        { id: 'antigo', titulo: 'Apresentar proposta', prazoEm: null, reuniaoId: null },
+      ];
+      lead.projetoRecente = {
+        id: 'entrega',
+        titulo: 'Atendimento com IA',
+        status,
+        atualizadoEm: '2026-09-11T12:00:00Z',
+      };
+      const ciclo = montarCicloCliente(lead);
+      expect(ciclo.etapas[3]!.estado).toBe('concluida');
+      if (status === 'concluido') {
+        expect(ciclo.decisao).toMatchObject({ tipo: 'novo-ciclo', apoioHref: '/entregas/entrega' });
+      } else {
+        expect(ciclo.decisao).toMatchObject({ acao: 'Abrir entrega', href: '/entregas/entrega' });
+      }
+    },
+  );
 });

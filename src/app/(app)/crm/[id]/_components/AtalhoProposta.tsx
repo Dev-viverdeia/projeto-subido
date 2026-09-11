@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BriefcaseBusiness, FileSignature } from 'lucide-react';
 import type { DossieLead } from '@/lib/crm/queries';
+import { ROTULO_ABRIR_PROPOSTA } from '@/lib/propostas/status';
 import styles from './CabecalhoDossie.module.css';
 
 export function AtalhoProposta({
@@ -26,17 +27,17 @@ export function AtalhoProposta({
         )}
         <Link href={`/entregas/${projeto.id}`} className={styles.acaoPrimaria}>
           <BriefcaseBusiness size={16} strokeWidth={1.8} aria-hidden="true" />
-          {projeto.status === 'concluido' ? 'Ver entrega' : 'Abrir projeto'}
+          Abrir entrega
         </Link>
       </>
     );
   }
 
-  if (lead.propostaRecente && lead.propostaRecente.status !== 'recusada') {
+  if (lead.propostaRecente) {
     return (
       <Link href={`/propostas/${lead.propostaRecente.id}`} className={classeAcao}>
         <FileSignature size={16} strokeWidth={1.8} aria-hidden="true" />
-        Ver proposta
+        {ROTULO_ABRIR_PROPOSTA[lead.propostaRecente.status]}
       </Link>
     );
   }
@@ -47,7 +48,7 @@ export function AtalhoProposta({
   return (
     <Link href={`/propostas/nova?${parametros.toString()}`} className={classeAcao}>
       <FileSignature size={16} strokeWidth={1.8} aria-hidden="true" />
-      {lead.propostaRecente ? 'Nova proposta' : 'Criar proposta'}
+      {lead.oportunidade.etapa === 'ganho' ? 'Registrar proposta' : 'Criar proposta'}
     </Link>
   );
 }

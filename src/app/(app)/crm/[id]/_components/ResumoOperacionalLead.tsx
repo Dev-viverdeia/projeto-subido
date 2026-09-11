@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowUpRight, CalendarClock, Check, CheckCircle2, History, Video, X } from 'lucide-react';
 import { callPodeAbrir, ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { montarCicloCliente } from '@/lib/crm/ciclo-cliente';
+import { estaNoFluxo } from '@/lib/crm/situacao';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoNovoCiclo } from './BotaoNovoCiclo';
 import { EditarProximaAcao } from './EditarProximaAcao';
@@ -31,17 +32,8 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
   const ganha = lead.oportunidade.etapa === 'ganho';
   const perdida = lead.oportunidade.etapa === 'perdido';
   const cicloConcluido = lead.projetoRecente?.status === 'concluido';
-  const etapaAtual = etapas.find(
-    (etapa) => etapa.estado === 'atual' || etapa.estado === 'encerrada',
-  );
   const IconeDecisao = ganha ? CheckCircle2 : perdida ? X : CalendarClock;
-  const tituloSecao = cicloConcluido
-    ? 'Ciclo concluído'
-    : ganha
-      ? 'Cliente em entrega'
-      : perdida
-        ? 'Venda encerrada'
-        : 'Progresso do cliente';
+  const tituloSecao = 'Etapas da venda';
   const descricaoSecao = cicloConcluido
     ? 'A venda e a entrega ficam conectadas nesta ficha para você repetir o que funcionou.'
     : ganha
@@ -57,7 +49,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
           <h2 id="operacao-titulo">{tituloSecao}</h2>
         </div>
 
-        <ol className={styles.metodo} aria-label="Jornada deste cliente">
+        <ol className={styles.metodo} aria-label="Etapas da venda">
           {etapas.map((etapa) => {
             const estado = etapa.estado;
             const rotuloEstado =
@@ -67,7 +59,9 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
                   ? 'Em andamento'
                   : estado === 'encerrada'
                     ? 'Encerrada aqui'
-                    : 'Próxima etapa';
+                    : perdida
+                      ? 'Sem confirmação'
+                      : 'Próxima etapa';
             return (
               <li
                 key={etapa.id}
@@ -91,7 +85,6 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
             );
           })}
         </ol>
-        {etapaAtual && <p className={styles.etapaAtual}>{etapaAtual.evidencia}</p>}
       </header>
 
       <div
@@ -139,7 +132,7 @@ export function ResumoOperacionalLead({ lead }: { lead: DossieLead }) {
               {movimento.apoioRotulo}
             </Link>
           )}
-          {!ganha && !perdida && (
+          {!ganha && !perdida && estaNoFluxo(lead.oportunidade) && (
             <EditarProximaAcao
               oportunidadeId={lead.oportunidade.id}
               acaoAtual={lead.oportunidade.proximaAcao}
