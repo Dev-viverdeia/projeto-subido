@@ -106,6 +106,16 @@ test.describe('uma etapa, o mesmo próximo passo', () => {
         Math.max(...positions.map((p) => p.y)) - Math.min(...positions.map((p) => p.y)),
       ).toBeLessThan(4);
       expect(positions[3]!.x).toBeGreaterThan(positions[0]!.x + 500);
+      const linhasRodape = await quadro
+        .locator('[data-resultado="ganho"] footer > time, [data-resultado="ganho"] footer > a')
+        .evaluateAll((elementos) =>
+          elementos.map((elemento) => {
+            const texto = document.createRange();
+            texto.selectNodeContents(elemento.firstChild!);
+            return texto.getClientRects().length;
+          }),
+        );
+      expect(linhasRodape).toEqual([1, 1]);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
