@@ -8,6 +8,8 @@ A branch `main` exige pull request e o check `validate`, inclusive para administ
 
 Esse orçamento de entrada não substitui medições de tráfego real, capacidade de provedores ou testes das páginas autenticadas.
 
+O Lighthouse usa três execuções fixas, cada uma com navegador novo, e a mediana por categoria: desempenho ≥85, acessibilidade ≥90 e boas práticas ≥95. Nenhuma amostra pode ter erro de navegação ou CLS acima de 0,1. Os três relatórios e o resumo são preservados, inclusive quando o orçamento reprova. Não há repetição até obter aprovação. A amostragem reduz oscilações de CPU do runner: na primeira publicação deste controle, o mesmo código marcou 98 no PR e 81 no merge; a trava manteve o domínio na versão anterior.
+
 ## Arquivos e convidados
 
 - Downloads de entregáveis aceitam somente a chave canônica `dono/projeto/arquivo`. O banco também confere a existência e a propriedade do objeto enviado. Registros antigos passam novamente pela validação antes de qualquer assinatura.

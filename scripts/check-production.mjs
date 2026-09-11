@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdir, readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout as esperar } from 'node:timers/promises';
 import assert from 'node:assert/strict';
 
@@ -41,43 +41,59 @@ try {
     401,
     'API deve exigir sessão',
   );
-  const auditoria = spawn(
-    'npm',
-    [
-      'exec',
-      '--yes',
-      '--package=lighthouse@13.4.1',
-      '--',
-      'lighthouse',
-      `${origem}/entrar`,
-      '--chrome-flags=--headless --no-sandbox',
-      '--only-categories=performance,accessibility,best-practices',
-      '--output=json',
-      `--output-path=${pasta}/lighthouse.json`,
-      '--quiet',
-    ],
-    { stdio: 'inherit' },
-  );
-  assert.equal(
-    await new Promise((resolve) => auditoria.once('exit', resolve)),
-    0,
-    'Lighthouse não concluiu',
-  );
-  const resultado = JSON.parse(await readFile(`${pasta}/lighthouse.json`, 'utf8'));
-  assert.ok(!resultado.runtimeError, 'Lighthouse encontrou erro de navegação');
+  // Amostra fixa, nunca repetir até passar. Cada CLI abre um navegador novo.
+  // A mediana reduz ruído de CPU do runner sem reduzir os limites do produto.
+  const resultados = [];
+  for (let amostra = 1; amostra <= 3; amostra++) {
+    const auditoria = spawn(
+      'npm',
+      [
+        'exec',
+        '--yes',
+        '--package=lighthouse@13.4.1',
+        '--',
+        'lighthouse',
+        `${origem}/entrar`,
+        '--chrome-flags=--headless --no-sandbox',
+        '--only-categories=performance,accessibility,best-practices',
+        '--output=json',
+        `--output-path=${pasta}/lighthouse-${amostra}.json`,
+        '--quiet',
+      ],
+      { stdio: 'inherit' },
+    );
+    assert.equal(
+      await new Promise((resolve) => auditoria.once('exit', resolve)),
+      0,
+      'Lighthouse não concluiu',
+    );
+    const resultado = JSON.parse(await readFile(`${pasta}/lighthouse-${amostra}.json`, 'utf8'));
+    assert.ok(!resultado.runtimeError, `Erro de navegação na amostra ${amostra}`);
+    assert.ok(
+      resultado.audits['cumulative-layout-shift'].numericValue <= 0.1,
+      `Deslocamento de layout acima do limite na amostra ${amostra}`,
+    );
+    resultados.push(resultado);
+  }
+  const resumo = { amostras: resultados.length, categorias: {} };
   for (const [categoria, minimo] of [
     ['performance', 0.85],
     ['accessibility', 0.9],
     ['best-practices', 0.95],
   ]) {
-    const nota = resultado.categories[categoria].score;
-    console.log(`${categoria}: ${Math.round(nota * 100)}/100 (mínimo ${minimo * 100})`);
-    assert.ok(typeof nota === 'number' && nota >= minimo, `Regressão em ${categoria}`);
+    const notas = resultados.map((resultado) => resultado.categories[categoria].score);
+    assert.ok(notas.every((nota) => Number.isFinite(nota) && nota >= 0 && nota <= 1));
+    const mediana = [...notas].sort((a, b) => a - b)[1];
+    resumo.categorias[categoria] = { notas, mediana, minimo };
+    console.log(
+      `${categoria}: ${notas.map((nota) => Math.round(nota * 100)).join(', ')}; mediana ${Math.round(mediana * 100)}/100 (mínimo ${minimo * 100})`,
+    );
   }
-  assert.ok(
-    resultado.audits['cumulative-layout-shift'].numericValue <= 0.1,
-    'Deslocamento de layout acima do limite',
-  );
+  // Preservar também a amostra reprovada no artifact para diagnóstico.
+  await writeFile(`${pasta}/resumo.json`, `${JSON.stringify(resumo, null, 2)}\n`);
+  for (const [categoria, { mediana, minimo }] of Object.entries(resumo.categorias)) {
+    assert.ok(mediana >= minimo, `Regressão em ${categoria}`);
+  }
   console.log('Build público: acesso, previews, autenticação e orçamento de qualidade aprovados.');
 } finally {
   servidor.kill('SIGTERM');
