@@ -23,12 +23,14 @@ export function AprovacaoCliente({
   aceiteFinal = false,
   encerramento,
   arquivos = [],
+  emFila = false,
 }: {
   codigo: string;
   tarefa: TarefaPortalCliente;
   aceiteFinal?: boolean;
   encerramento?: EncerramentoProjeto | null;
   arquivos?: ArquivoPortalCliente[];
+  emFila?: boolean;
 }) {
   const { estado, enviar, editar, pendente, bloqueado, operacao } =
     useFormularioEntrega(decidirEntregaCliente);
@@ -40,18 +42,23 @@ export function AprovacaoCliente({
       id={`entrega-${tarefa.id}`}
       className={styles.aprovacao}
       data-final={aceiteFinal || undefined}
+      data-em-fila={emFila || undefined}
+      aria-label={emFila ? tarefa.titulo : undefined}
     >
-      <div className={styles.aprovacaoTopo}>
-        <span className={styles.aprovacaoIcone}>
-          <FileCheck2 size={19} aria-hidden="true" />
-        </span>
-        <div>
-          <p>{aceiteFinal ? 'Aceite final do projeto' : tarefa.faseTitulo}</p>
-          <h3>{tarefa.titulo}</h3>
+      {!emFila && (
+        <div className={styles.aprovacaoTopo}>
+          <span className={styles.aprovacaoIcone}>
+            <FileCheck2 size={19} aria-hidden="true" />
+          </span>
+          <div>
+            <p>{aceiteFinal ? 'Aceite final do projeto' : tarefa.faseTitulo}</p>
+            <h3>{tarefa.titulo}</h3>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className={styles.aprovacaoConteudo}>
+        {emFila && aceiteFinal && <p className={styles.rotuloFinal}>Aceite final do projeto</p>}
         {aceiteFinal && encerramento ? (
           <div className={styles.termoAceite}>
             <TermoEncerramentoPortal encerramento={encerramento} compacto />

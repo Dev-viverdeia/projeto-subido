@@ -9,6 +9,7 @@ import {
 } from '@/lib/portal-cliente/actions';
 import type { MudancaEscopoProjeto } from '@/lib/projetos-execucao/queries';
 import { formatarReais } from '@/lib/propostas/schema';
+import { ModalOperacao } from '@/app/(app)/_components/ModalOperacao';
 import styles from './MudancaEscopoPortal.module.css';
 
 const INICIAL: EstadoPortalCliente = {};
@@ -27,25 +28,34 @@ function impacto(mudanca: MudancaEscopoProjeto) {
 export function DecisaoMudancaEscopo({
   codigo,
   mudanca,
+  emFila = false,
 }: {
   codigo: string;
   mudanca: MudancaEscopoProjeto;
+  emFila?: boolean;
 }) {
   const [estado, decidir, pendente] = useActionState(decidirMudancaEscopoCliente, INICIAL);
   const impactos = impacto(mudanca);
 
   return (
-    <article className={styles.decisao} aria-labelledby={`mudanca-${mudanca.id}`}>
-      <header>
-        <span>
-          <FileDiff size={17} aria-hidden="true" />
-        </span>
-        <div>
-          <p>Mudança no combinado</p>
-          <h3 id={`mudanca-${mudanca.id}`}>{mudanca.titulo}</h3>
-        </div>
-        <em>Sua decisão</em>
-      </header>
+    <article
+      className={styles.decisao}
+      data-em-fila={emFila || undefined}
+      aria-label={emFila ? mudanca.titulo : undefined}
+      aria-labelledby={emFila ? undefined : `mudanca-${mudanca.id}`}
+    >
+      {!emFila && (
+        <header>
+          <span>
+            <FileDiff size={17} aria-hidden="true" />
+          </span>
+          <div>
+            <p>Mudança no combinado</p>
+            <h3 id={`mudanca-${mudanca.id}`}>{mudanca.titulo}</h3>
+          </div>
+          <em>Sua decisão</em>
+        </header>
+      )}
       <div className={styles.decisaoCorpo}>
         <div>
           <p>{mudanca.descricao}</p>
@@ -102,6 +112,8 @@ export function ControleEscopoPortal({
 }) {
   const [aberto, setAberto] = useState(false);
   const [estado, setEstado] = useState<EstadoPortalCliente>(INICIAL);
+  const [tituloPedido, setTituloPedido] = useState('');
+  const [descricaoPedido, setDescricaoPedido] = useState('');
   const [pendente, iniciarTransicao] = useTransition();
   const ativa = mudancas.find((item) => ['em_analise', 'aguardando_cliente'].includes(item.status));
   const historico = mudancas.filter(
@@ -110,6 +122,8 @@ export function ControleEscopoPortal({
 
   function abrirPedido() {
     setEstado(INICIAL);
+    setTituloPedido('');
+    setDescricaoPedido('');
     setAberto(true);
   }
 
@@ -133,7 +147,14 @@ export function ControleEscopoPortal({
           </span>
         </div>
         {!ativa && (
-          <button type="button" onClick={abrirPedido}>
+          <button
+            type="button"
+            onClick={(evento) => {
+              // Safari não foca botões por clique; registra o gatilho para o retorno do diálogo.
+              evento.currentTarget.focus();
+              abrirPedido();
+            }}
+          >
             <Plus size={15} aria-hidden="true" /> Pedir uma mudança
           </button>
         )}
@@ -196,65 +217,70 @@ export function ControleEscopoPortal({
         </ol>
       )}
 
-      {aberto && (
-        <div className={styles.modalFundo} role="presentation" onMouseDown={() => setAberto(false)}>
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="nova-mudanca-titulo"
-            className={styles.modal}
-            onMouseDown={(evento) => evento.stopPropagation()}
-          >
-            <header>
-              <div>
-                <p>Novo pedido</p>
-                <h2 id="nova-mudanca-titulo">O que precisa mudar?</h2>
-                <span>Nada será alterado antes da análise do responsável.</span>
-              </div>
-              <button type="button" onClick={() => setAberto(false)} aria-label="Fechar pedido">
-                <X size={18} aria-hidden="true" />
-              </button>
-            </header>
-            <form action={solicitar}>
-              <input type="hidden" name="codigo" value={codigo} />
-              <label>
-                Resumo do pedido
-                <input
-                  name="titulo"
-                  minLength={3}
-                  maxLength={160}
-                  required
-                  placeholder="Ex.: Incluir atendimento pelo Instagram"
-                />
-              </label>
-              <label>
-                Explique a necessidade
-                <textarea
-                  name="descricao"
-                  minLength={10}
-                  maxLength={4000}
-                  required
-                  placeholder="Conte o que mudou e o resultado que você espera."
-                />
-              </label>
-              {estado.erro && (
-                <p className={styles.erro} role="alert">
-                  {estado.erro}
-                </p>
-              )}
-              <div className={styles.modalAcoes}>
-                <button type="button" onClick={() => setAberto(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className={styles.aprovar} disabled={pendente}>
-                  {pendente ? 'Enviando pedido…' : 'Enviar para análise'}
-                  {!pendente && <ArrowRight size={15} aria-hidden="true" />}
-                </button>
-              </div>
-            </form>
-          </section>
-        </div>
-      )}
+      <ModalOperacao
+        open={aberto}
+        onClose={() => setAberto(false)}
+        blocked={pendente}
+        title="O que precisa mudar?"
+        description="O responsável analisa o pedido antes de alterar o combinado."
+        footer={
+          <div className={styles.modalAcoes}>
+            <button type="button" onClick={() => setAberto(false)} disabled={pendente}>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              form="pedido-mudanca-portal"
+              className={styles.aprovar}
+              disabled={pendente}
+            >
+              {pendente ? 'Enviando pedido…' : 'Enviar para análise'}
+              {!pendente && <ArrowRight size={15} aria-hidden="true" />}
+            </button>
+          </div>
+        }
+      >
+        <form
+          id="pedido-mudanca-portal"
+          className={styles.formPedido}
+          action={solicitar}
+          aria-busy={pendente || undefined}
+        >
+          <input type="hidden" name="codigo" value={codigo} />
+          <label>
+            Resumo do pedido
+            <input
+              name="titulo"
+              value={tituloPedido}
+              onChange={(evento) => setTituloPedido(evento.target.value)}
+              data-autofocus
+              disabled={pendente}
+              minLength={3}
+              maxLength={160}
+              required
+              placeholder="Ex.: Incluir atendimento pelo Instagram"
+            />
+          </label>
+          <label>
+            Explique a necessidade
+            <textarea
+              name="descricao"
+              value={descricaoPedido}
+              onChange={(evento) => setDescricaoPedido(evento.target.value)}
+              disabled={pendente}
+              minLength={10}
+              maxLength={4000}
+              required
+              placeholder="Conte o que mudou e o resultado que você espera."
+            />
+          </label>
+          {estado.erro && (
+            <p className={styles.erro} role="alert">
+              {estado.erro}
+            </p>
+          )}
+        </form>
+      </ModalOperacao>
     </section>
   );
 }

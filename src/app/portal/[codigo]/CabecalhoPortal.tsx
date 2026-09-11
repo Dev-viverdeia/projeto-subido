@@ -1,4 +1,12 @@
-import { BadgeCheck, CalendarDays, Check, Clock3, FolderCheck, LockKeyhole } from 'lucide-react';
+import {
+  ArrowDown,
+  BadgeCheck,
+  CalendarDays,
+  Check,
+  Clock3,
+  FolderCheck,
+  LockKeyhole,
+} from 'lucide-react';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ProjetoPortalCliente } from '@/lib/portal-cliente/tipos';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
@@ -83,29 +91,34 @@ export function CabecalhoPortal({ projeto }: { projeto: ProjetoPortalCliente }) 
             )}
           </div>
         </div>
-        {!concluido && fases.length > 0 && (
-          <ol className={styles.fases} aria-label="Andamento por fase">
-            {fases.map((fase) => (
-              <li
-                key={fase.id}
-                data-completa={fase.completa || undefined}
-                aria-current={fase.id === atual ? 'step' : undefined}
-              >
-                <span aria-hidden="true">
-                  {fase.completa ? <Check size={15} /> : <span className={styles.marco} />}
-                </span>
-                {fase.titulo}
-                <span className={styles.srOnly}>
-                  {fase.completa
-                    ? ': concluída'
-                    : fase.id === atual
-                      ? ': em andamento'
-                      : ': pendente'}
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
+        <div className={styles.heroRodape}>
+          {!concluido && fases.length > 0 && (
+            <ol className={styles.fases} aria-label="Andamento por fase">
+              {fases.map((fase) => (
+                <li
+                  key={fase.id}
+                  data-completa={fase.completa || undefined}
+                  aria-current={fase.id === atual ? 'step' : undefined}
+                >
+                  <span aria-hidden="true">
+                    {fase.completa ? <Check size={15} /> : <span className={styles.marco} />}
+                  </span>
+                  {fase.titulo}
+                  <span className={styles.srOnly}>
+                    {fase.completa
+                      ? ': concluída'
+                      : fase.id === atual
+                        ? ': em andamento'
+                        : ': pendente'}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+          <a className={styles.atalhoArquivos} href="#arquivos-titulo">
+            Arquivos <ArrowDown size={16} aria-hidden="true" />
+          </a>
+        </div>
       </section>
     </>
   );

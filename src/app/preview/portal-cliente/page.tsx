@@ -351,5 +351,25 @@ export default async function PreviewPortalClientePage({
               })),
             }
           : projeto;
-  return <PortalProjeto codigo={CODIGO} projeto={exibido} />;
+  const fila =
+    estado === 'revisoes'
+      ? {
+          ...PROJETO,
+          status: 'em_validacao' as const,
+          feitas: 3,
+          encerramento: null,
+          evolucao: null,
+          dependencias: DEPENDENCIAS_PENDENTES.slice(0, 1),
+          tarefas: PROJETO.tarefas.map((item, indice) => ({
+            ...item,
+            status: indice < 3 ? ('concluida' as const) : ('pendente' as const),
+            clienteStatus: indice < 3 ? ('aguardando' as const) : ('nao_solicitada' as const),
+            clienteNota: indice < 3 ? item.clienteNota : null,
+            entregavelUrl: indice < 3 ? item.entregavelUrl : null,
+            respondidoEm: null,
+            comentario: null,
+          })),
+        }
+      : exibido;
+  return <PortalProjeto codigo={CODIGO} projeto={fila} />;
 }

@@ -82,7 +82,9 @@ export function ArquivosPortal({
   return (
     <section className={styles.arquivos} aria-labelledby="arquivos-titulo">
       <header className={layout.tituloSecao}>
-        <h2 id="arquivos-titulo">Arquivos do projeto</h2>
+        <h2 id="arquivos-titulo" tabIndex={-1}>
+          Arquivos do projeto
+        </h2>
         <span>{projeto.arquivos.length}</span>
       </header>
       {projeto.arquivos.length ? (
