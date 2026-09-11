@@ -22,10 +22,11 @@ export function SecoesContextoEntrega({
 
   return (
     <>
-      <details className={styles.bloco} name="editar-proposta" data-previa="cliente" open>
+      <details className={styles.bloco} name="editar-proposta" data-previa="cliente">
         <summary className={styles.blocoTopo}>
           <div>
             <h2>Cliente e objetivo</h2>
+            <p className={styles.resumoBloco}>{documento.cliente.empresa}</p>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -34,6 +35,7 @@ export function SecoesContextoEntrega({
             <label className={styles.campo}>
               <span>Empresa</span>
               <input
+                data-campo-preview="cliente"
                 value={documento.cliente.empresa}
                 maxLength={160}
                 onChange={(evento) =>
@@ -88,6 +90,7 @@ export function SecoesContextoEntrega({
           <label className={styles.campo} data-previa="contexto">
             <span>Desafio identificado</span>
             <textarea
+              data-campo-preview="contexto"
               rows={5}
               value={documento.desafio}
               maxLength={4000}
@@ -110,6 +113,10 @@ export function SecoesContextoEntrega({
         <summary className={styles.blocoTopo}>
           <div>
             <h2>Projeto e escopo</h2>
+            <p className={styles.resumoBloco}>
+              {documento.escopo.length} {documento.escopo.length === 1 ? 'etapa' : 'etapas'} de
+              escopo
+            </p>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -130,6 +137,7 @@ export function SecoesContextoEntrega({
           <label className={styles.campo} data-previa="solucao">
             <span>Resumo da solução</span>
             <textarea
+              data-campo-preview="solucao"
               rows={3}
               value={documento.projeto.resumo}
               maxLength={1200}
@@ -173,6 +181,7 @@ export function SecoesContextoEntrega({
                 <span>{(indice + 1).toString().padStart(2, '0')}</span>
                 <div>
                   <input
+                    data-campo-preview={indice === 0 ? 'escopo' : undefined}
                     aria-label={`Título da etapa ${indice + 1}`}
                     value={item.titulo}
                     maxLength={140}
@@ -227,6 +236,7 @@ export function SecoesContextoEntrega({
               <div key={indice}>
                 <Check size={14} aria-hidden="true" />
                 <input
+                  data-campo-preview={indice === 0 ? 'entregaveis' : undefined}
                   aria-label={`Entregável ${indice + 1}`}
                   value={item}
                   maxLength={300}

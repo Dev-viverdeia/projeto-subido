@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import { Bot, ContactRound, FileSignature, House, Video } from 'lucide-react';
 import { EditorProposta } from '@/app/(app)/propostas/_components/EditorProposta';
@@ -77,7 +78,7 @@ export default async function PreviewEditorPropostaPage({
   const aceita = parametros.estado === 'aceita' || parametros.estado === 'recuperar';
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} style={{ '--app-shell-header-h': '0px' } as CSSProperties}>
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
           <SubidoLogo size={18} />

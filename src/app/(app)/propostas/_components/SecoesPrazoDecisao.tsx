@@ -1,5 +1,5 @@
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
-import { reaisParaCentavos, type DocumentoProposta } from '@/lib/propostas/schema';
+import { formatarReais, reaisParaCentavos, type DocumentoProposta } from '@/lib/propostas/schema';
 import type { MudarDocumento } from './SecoesContextoEntrega';
 import styles from './EditorProposta.module.css';
 
@@ -33,6 +33,10 @@ export function SecoesPrazoDecisao({
         <summary className={styles.blocoTopo}>
           <div>
             <h2>Cronograma</h2>
+            <p className={styles.resumoBloco}>
+              {documento.cronograma.length} {documento.cronograma.length === 1 ? 'fase' : 'fases'}{' '}
+              de entrega
+            </p>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -69,6 +73,7 @@ export function SecoesPrazoDecisao({
                 <span>{(indice + 1).toString().padStart(2, '0')}</span>
                 <div className={styles.camposCronograma}>
                   <input
+                    data-campo-preview={indice === 0 ? 'cronograma' : undefined}
                     aria-label={`Fase ${indice + 1}`}
                     value={item.fase}
                     maxLength={120}
@@ -115,6 +120,9 @@ export function SecoesPrazoDecisao({
         <summary className={styles.blocoTopo}>
           <div>
             <h2>Valor e condições</h2>
+            <p className={styles.resumoBloco}>
+              {formatarReais(documento.investimento.valorCentavos)}
+            </p>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -123,6 +131,7 @@ export function SecoesPrazoDecisao({
             <label className={styles.campo}>
               <span>Valor do projeto (R$)</span>
               <input
+                data-campo-preview="investimento"
                 inputMode="decimal"
                 placeholder="0,00"
                 value={valor}
@@ -196,6 +205,7 @@ export function SecoesPrazoDecisao({
         <summary className={styles.blocoTopo}>
           <div>
             <h2>Próximos passos</h2>
+            <p className={styles.resumoBloco}>Aprovação e início do projeto</p>
           </div>
           <ChevronDown className={styles.blocoSeta} size={18} aria-hidden="true" />
         </summary>
@@ -205,6 +215,7 @@ export function SecoesPrazoDecisao({
               <div key={indice}>
                 <span className={styles.passo}>{indice + 1}</span>
                 <input
+                  data-campo-preview={indice === 0 ? 'decisao' : undefined}
                   aria-label={`Próximo passo ${indice + 1}`}
                   value={item}
                   maxLength={300}
