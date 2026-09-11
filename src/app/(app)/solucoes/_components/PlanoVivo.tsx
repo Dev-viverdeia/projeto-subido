@@ -118,7 +118,6 @@ export function PlanoVivo({
         <ol>
           {compromissos
             .filter((acao) => acao.status === 'pendente')
-            .slice(0, aberto ? undefined : 5)
             .map((acao) => (
               <ItemPlano key={acao.id} projetoId={projetoId} acao={acao} />
             ))}

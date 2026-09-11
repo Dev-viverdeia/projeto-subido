@@ -90,4 +90,32 @@ describe('ficha clara de entrega', () => {
     expect(screen.getByText('Entrega concluída por você.')).toBeVisible();
     expect(screen.queryByText('Entrega aprovada e encerrada.')).toBeNull();
   });
+
+  it('revela compromissos além dos cinco primeiros ao abrir uma pendência', async () => {
+    const user = userEvent.setup();
+    const projeto = {
+      ...PROJETO,
+      acoesPlano: Array.from({ length: 6 }, (_, i) => ({
+        id: `compromisso-${i}`,
+        titulo: `Confirmar item ${i + 1}`,
+        prazoEm: null,
+        status: 'pendente' as const,
+        origem: 'briefing',
+        categoria: 'compromisso' as const,
+        reuniaoId: null,
+        responsavelTipo: 'cliente' as const,
+        responsavelNome: 'Camila',
+        visivelCliente: true,
+        concluidaEm: null,
+        atualizadoEm: '2026-09-11T12:00:00Z',
+      })),
+    };
+    render(<SalaEntrega projeto={projeto} />);
+    await user.click(screen.getByRole('button', { name: /Cliente.*6 pendências/ }));
+    await user.click(screen.getByRole('button', { name: 'Ver compromisso: Confirmar item 6' }));
+    await waitFor(() => expect(document.getElementById('plano-vivo-titulo')).toHaveFocus());
+    const plano = screen.getByRole('region', { name: 'Compromissos com o cliente' });
+    expect(within(plano).getByText('Confirmar item 6')).toBeVisible();
+    expect(plano.querySelector('details')).toHaveAttribute('open');
+  });
 });
