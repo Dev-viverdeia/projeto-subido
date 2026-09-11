@@ -33,7 +33,7 @@ Font.register({
 });
 Font.registerHyphenationCallback((palavra) => [palavra]);
 
-/** Normaliza apenas espaços e traços, sem resumir condições ou conteúdo do snapshot. */
+/** Prepara o texto para a largura disponível, sem resumir conteúdo do snapshot. */
 function textoPdf(valor: string, limiteToken = 40): string {
   return (
     valor
@@ -42,7 +42,7 @@ function textoPdf(valor: string, limiteToken = 40): string {
       // URLs/identificadores longos precisam de quebras explícitas: o renderer
       // pode cortá-los e pontos de quebra invisíveis acrescentam hífens no PDF.
       // Só o texto renderizado muda de linha; o snapshot original é preservado.
-      .replace(/\S{40,}/gu, (palavra) => {
+      .replace(new RegExp(`\\S{${limiteToken},}`, 'gu'), (palavra) => {
         const caracteres = Array.from(palavra);
         const linhas = [];
         for (let i = 0; i < caracteres.length; i += limiteToken) {

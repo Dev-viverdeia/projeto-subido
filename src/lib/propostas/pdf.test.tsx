@@ -312,14 +312,20 @@ describe('PDF da proposta', () => {
     conferirConteudo(proposta, resultado.paginas);
   }, 20_000);
 
-  it('mantém links e palavras longas dentro da página sem cortar informação', async () => {
-    const proposta = structuredClone(PROPOSTA);
-    proposta.documento.fornecedor!.site = `https://example.com/${'a'.repeat(900)}`;
-    proposta.documento.projeto.titulo = 'Implementação ' + 'X'.repeat(150);
-    proposta.documento.escopo[0]!.descricao = 'Identificador: ' + 'Y'.repeat(400);
-    const resultado = await inspecionar(proposta, 'proposta-comercial-links-longos');
-    conferirConteudo(proposta, resultado.paginas);
-  });
+  it.each([150, 31])(
+    'mantém links e títulos com %i caracteres sem cortar informação',
+    async (tamanho) => {
+      const proposta = structuredClone(PROPOSTA);
+      proposta.documento.fornecedor!.site = `https://example.com/${'a'.repeat(900)}`;
+      proposta.documento.projeto.titulo = 'Implementação ' + 'W'.repeat(tamanho);
+      proposta.documento.fornecedor!.nomeResponsavel = 'W'.repeat(25);
+      proposta.documento.cliente.contato = 'W'.repeat(25);
+      proposta.documento.cronograma[0]!.fase = 'W'.repeat(39);
+      proposta.documento.escopo[0]!.descricao = 'Identificador: ' + 'Y'.repeat(400);
+      const resultado = await inspecionar(proposta, `proposta-comercial-links-longos-${tamanho}`);
+      conferirConteudo(proposta, resultado.paginas);
+    },
+  );
 
   it('preserva condições com muitas linhas sem deixar o card maior que a página', async () => {
     const proposta = structuredClone(PROPOSTA);
