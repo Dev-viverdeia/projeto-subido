@@ -41,6 +41,26 @@ try {
     401,
     'API deve exigir sessão',
   );
+  const estabilidade = spawn(
+    'npm',
+    [
+      'exec',
+      '--',
+      'playwright',
+      'test',
+      'e2e/entrada-estavel.spec.ts',
+      '--project=desktop',
+      '--workers=1',
+      '--retries=0',
+      `--output=${pasta}/entrada`,
+    ],
+    { stdio: 'inherit', env: { ...process.env, PLAYWRIGHT_BASE_URL: origem } },
+  );
+  assert.equal(
+    await new Promise((resolve) => estabilidade.once('exit', resolve)),
+    0,
+    'Entrada instável no build público',
+  );
   // Amostra fixa, nunca repetir até passar. Cada CLI abre um navegador novo.
   // A mediana reduz ruído de CPU do runner sem reduzir os limites do produto.
   const resultados = [];

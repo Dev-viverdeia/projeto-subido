@@ -84,7 +84,7 @@ export function FormularioEntrar({
           {/* Abaixo do campo, alinhado à direita: acima colidiria com o rótulo que o
               Input do DS renderiza por conta própria. */}
           <div className={styles.linhaAtalho}>
-            <Link href={ROTA_RECUPERAR_SENHA} className={styles.atalho}>
+            <Link href={ROTA_RECUPERAR_SENHA} prefetch={false} className={styles.atalho}>
               Esqueci minha senha
             </Link>
           </div>
@@ -94,7 +94,10 @@ export function FormularioEntrar({
       </form>
 
       <p className={styles.alternativa}>
-        Ainda não tem conta? <Link href={ROTA_CRIAR_CONTA}>Criar conta</Link>
+        Ainda não tem conta?{' '}
+        <Link href={ROTA_CRIAR_CONTA} prefetch={false}>
+          Criar conta
+        </Link>
       </p>
     </>
   );

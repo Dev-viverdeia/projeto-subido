@@ -74,7 +74,9 @@
 
 .area {
   display: flex;
-  align-items: center;
+  /* O formulário chega progressivamente. Centralizar pela altura do conteúdo
+     fazia o título saltar quando os campos terminavam de aparecer. */
+  align-items: flex-start;
   justify-content: center;
   padding: var(--via-space-10) var(--via-space-5) var(--via-space-16);
   background: var(--via-bg);
@@ -105,5 +107,7 @@
 
   .area {
     padding: var(--via-space-12);
+    /* Respiro estável, baseado na tela e não na altura mutável do formulário. */
+    padding-top: clamp(var(--via-space-12), 15svh, var(--via-space-32));
   }
 }
