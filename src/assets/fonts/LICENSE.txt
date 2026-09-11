@@ -1,9 +1,15 @@
-Duas famílias vivem nesta pasta, ambas sob a MESMA licença (SIL OFL 1.1), com
+Três famílias vivem nesta pasta, sob a MESMA licença (SIL OFL 1.1), com
 detentores de copyright diferentes:
 
-  Outfit-Variable.woff2   (texto e display — a fonte do produto)
+  Outfit-Variable.woff2   (arquivo legado)
   Copyright (c) 2020 The Outfit Project Authors
   https://github.com/Outfitio/Outfit-Fonts
+
+  Geist-Variable.woff2 e pdf/Geist-{Regular,SemiBold}.ttf (texto e display)
+  Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
+  As fontes TTF são instâncias estáticas dos pesos 400 e 600 do WOFF2 local,
+  geradas com fontTools.varLib.instancer 4.63.0 (updateFontNames=True).
+  Cada peso tem seu nome PostScript; autoria e licença originais são preservadas.
 
   GeistMono-Variable.woff2   (números, rótulos e eyebrows)
   Copyright (c) 2023 Vercel, in collaboration with basement.studio
