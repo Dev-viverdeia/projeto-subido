@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { caminhoArquivoDoProjeto } from '@/lib/projetos-execucao/caminho-arquivo';
 import { createClient } from '@/lib/supabase/server';
 
 const ParametrosSchema = z.object({ arquivo: z.uuid(), projeto: z.uuid() });
@@ -33,6 +34,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ arqu
     .eq('dono', user.id)
     .maybeSingle();
   if (error || !registro) return falha('Arquivo não encontrado.', 404);
+  if (!caminhoArquivoDoProjeto(registro.caminho_storage, user.id, validacao.data.projeto))
+    return falha('Arquivo não encontrado.', 404);
 
   const { data, error: erroUrl } = await supabase.storage
     .from('projeto-entregaveis')

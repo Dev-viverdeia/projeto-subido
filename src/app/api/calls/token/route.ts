@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { registrarEntradaNaSala } from '@/lib/calls/admin';
-import { resolverIdConvidado } from '@/lib/calls/identidade';
+import { DURACAO_SESSAO_CONVIDADO, resolverSessaoConvidado } from '@/lib/calls/identidade';
 import { obterContextoDaSala } from '@/lib/calls/queries';
 import { callPodeAbrir } from '@/lib/calls/tipos';
 import { livekitEnv } from '@/lib/env';
@@ -43,11 +43,15 @@ export async function POST(request: NextRequest) {
   }
 
   const cookieConvidado = `subido_call_${corpo.data.codigo.replaceAll('-', '')}`;
-  const idConvidado = resolverIdConvidado(request.cookies.get(cookieConvidado)?.value);
+  const convidado = resolverSessaoConvidado(
+    request.cookies.get(cookieConvidado)?.value,
+    contexto.convite.reuniaoId,
+    configuracao.LIVEKIT_API_SECRET,
+  );
   const identidade =
     contexto.anfitriao && contexto.usuarioId
       ? `host-${contexto.usuarioId}`
-      : `guest-${idConvidado}`;
+      : `guest-${convidado.id}`;
 
   const token = new AccessToken(configuracao.LIVEKIT_API_KEY, configuracao.LIVEKIT_API_SECRET, {
     identity: identidade,
@@ -90,12 +94,12 @@ export async function POST(request: NextRequest) {
     { status: 201, headers: { 'Cache-Control': 'private, no-store' } },
   );
   if (!contexto.anfitriao) {
-    response.cookies.set(cookieConvidado, idConvidado, {
+    response.cookies.set(cookieConvidado, convidado.cookie, {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/api/calls/token',
-      maxAge: 60 * 60 * 2,
+      maxAge: DURACAO_SESSAO_CONVIDADO,
     });
   }
   return response;

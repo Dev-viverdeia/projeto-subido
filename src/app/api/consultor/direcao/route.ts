@@ -7,7 +7,6 @@ import {
   obterUsoDoMes,
   persistirPlanoSobral,
   produzirLeituraSobral,
-  registrarUsoSobral,
   TETO_TOKENS_SOBRAL_MES,
 } from '@/lib/consultor/servico';
 
@@ -47,7 +46,6 @@ export async function POST() {
     });
     const admin = criarAdminSobral();
     await persistirPlanoSobral(admin, user.id, leitura);
-    await registrarUsoSobral(admin, user.id, leitura.rodada.tokens);
     revalidarDirecaoOperacional();
 
     return NextResponse.json(

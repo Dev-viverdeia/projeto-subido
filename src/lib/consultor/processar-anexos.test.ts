@@ -9,7 +9,10 @@ const mocks = vi.hoisted(() => ({
   apagar: vi.fn(),
   chave: vi.fn(),
   download: vi.fn(),
+  reservar: vi.fn(),
+  informar: vi.fn(),
 }));
+vi.mock('./orcamento', () => ({ comOrcamentoSobral: mocks.reservar }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/env', () => ({ openAIEnv: mocks.chave }));
 vi.mock('openai', () => ({
@@ -45,6 +48,12 @@ beforeEach(() => {
   mocks.transcrever.mockResolvedValue({ text: 'Resumo da reunião' });
   mocks.criar.mockResolvedValue({ id: 'temporario' });
   mocks.apagar.mockResolvedValue({});
+  mocks.reservar
+    .mockReset()
+    .mockImplementation(
+      (_dono, _teto, gerar: (informar: (n: number) => void) => Promise<unknown>) =>
+        gerar(mocks.informar),
+    );
 });
 
 describe('fronteira dos anexos privados do Sobral', () => {
@@ -82,10 +91,25 @@ describe('fronteira dos anexos privados do Sobral', () => {
     expect(mocks.transcrever).not.toHaveBeenCalled();
   });
   it('usa o cliente recebido para baixar e transcrever o áudio da própria conversa', async () => {
+    mocks.transcrever.mockResolvedValue({
+      text: 'Resumo da reunião',
+      usage: { type: 'tokens', total_tokens: 240 },
+    });
     const preparado = await prepararAnexosParaModelo(cliente, [anexo], contexto);
     expect(storageFrom).toHaveBeenCalledWith('sobral-anexos');
     expect(mocks.download).toHaveBeenCalledWith(caminho);
     expect(preparado.transcricoes).toEqual([{ id, texto: 'Resumo da reunião' }]);
+    expect(mocks.reservar.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.transcrever.mock.invocationCallOrder[0]!,
+    );
+    expect(mocks.informar).toHaveBeenCalledWith(240);
+  });
+  it('não transcreve áudio novo quando a reserva é recusada', async () => {
+    mocks.reservar.mockRejectedValue(new Error('limite_sobral_mensal'));
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(prepararAnexosParaModelo(cliente, [anexo], contexto)).rejects.toThrow();
+    expect(mocks.transcrever).not.toHaveBeenCalled();
+    log.mockRestore();
   });
   it('não envia nada ao modelo quando o Storage nega a leitura', async () => {
     mocks.download.mockResolvedValue({ data: null, error: new Error('RLS denied') });
@@ -94,6 +118,7 @@ describe('fronteira dos anexos privados do Sobral', () => {
       'Não consegui analisar',
     );
     expect(mocks.transcrever).not.toHaveBeenCalled();
+    expect(mocks.reservar).not.toHaveBeenCalled();
     expect(mocks.criar).not.toHaveBeenCalled();
     log.mockRestore();
   });

@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { criarAdminSobral } from '@/lib/consultor/admin';
 import { executarGeracao } from '@/lib/consultor/executar-geracao';
 import { GeracaoSobralSchema, type EventoSobral } from '@/lib/consultor/geracao-contrato';
-import { obterUsoDoMes, TETO_TOKENS_SOBRAL_MES } from '@/lib/consultor/servico';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -119,8 +118,6 @@ export async function POST(request: Request) {
       return json({ thread_id: thread.id, resposta: ultima.conteudo });
     const mensagemId = pedido.data.mensagem_id ?? ultima?.id;
     if (!mensagemId) return json({ erro: 'Envie uma pergunta para continuar.' }, 400);
-    if ((await obterUsoDoMes(supabase)) >= TETO_TOKENS_SOBRAL_MES)
-      return json({ erro: 'Você atingiu o limite mensal do Sobral AI.', tipo: 'limite' }, 429);
     const admin = criarAdminSobral();
     const { data, error: erroInicio } = await admin.rpc('sobral_iniciar_geracao', {
       p_dono: user.id,

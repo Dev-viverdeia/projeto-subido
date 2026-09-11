@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { caminhoArquivoDoProjeto } from '@/lib/projetos-execucao/caminho-arquivo';
 // O link secreto do portal e a visibilidade deliberada são validados antes de
 // assinar o download. Nenhuma policy anônima é criada no bucket.
 // eslint-disable-next-line no-restricted-imports
@@ -24,17 +25,22 @@ export async function GET(
   const admin = createAdminClient();
   const { data: registro, error } = await admin
     .from('projeto_arquivos')
-    .select('projeto_execucao_id, caminho_storage, nome_original')
+    .select('dono, projeto_execucao_id, caminho_storage, nome_original')
     .eq('id', validacao.data.arquivo)
     .eq('visivel_cliente', true)
     .not('publicado_em', 'is', null)
     .maybeSingle();
   if (error || !registro) return falha(404);
+  if (
+    !caminhoArquivoDoProjeto(registro.caminho_storage, registro.dono, registro.projeto_execucao_id)
+  )
+    return falha(404);
 
   const { data: projeto } = await admin
     .from('projetos_execucao')
     .select('id')
     .eq('id', registro.projeto_execucao_id)
+    .eq('dono', registro.dono)
     .eq('portal_codigo', validacao.data.codigo)
     .eq('portal_ativo', true)
     .maybeSingle();

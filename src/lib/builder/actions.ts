@@ -39,8 +39,8 @@ async function clienteAutenticado() {
  * a entrevista em `rascunho` ou `falhou`. Era um beco sem saída com instrução
  * de saída escrita.
  *
- * Não há trava contra a geração original terminar depois e gravar `pronta` por
- * cima. É o desfecho certo: se o documento chegou, ele vale mais que o rascunho.
+ * A recuperação só acontece após a reserva expirar. A tentativa antiga fica
+ * invalidada e não pode substituir o resultado de uma nova geração.
  */
 export async function voltarParaEntrevista(formData: FormData): Promise<void> {
   const id = Id.safeParse(formData.get('id'));
@@ -49,13 +49,7 @@ export async function voltarParaEntrevista(formData: FormData): Promise<void> {
   const supabase = await clienteAutenticado();
   if (!supabase) return;
 
-  const { error } = await supabase
-    .from('builder_solucoes')
-    .update({ status: 'rascunho', erro: null })
-    .eq('id', id.data)
-    /* Só destrava o que está travado. Sem este filtro, um clique atrasado
-       rebaixaria para rascunho uma solução que acabou de ficar pronta. */
-    .eq('status', 'gerando');
+  const { error } = await supabase.rpc('builder_recuperar_geracao', { p_id: id.data });
 
   if (error) throw handleError(error, 'builder:destravar');
 
