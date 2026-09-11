@@ -139,7 +139,7 @@ export async function criarLead(
     };
   }
 
-  revalidatePath('/vendas');
+  revalidatePath('/crm');
   revalidarDirecaoOperacional();
   const projeto = validacao.data.projeto
     ? `&projeto=${encodeURIComponent(validacao.data.projeto)}`
@@ -166,7 +166,7 @@ export async function moverOportunidade(formData: FormData): Promise<void> {
     return;
   }
 
-  revalidatePath('/vendas');
+  revalidatePath('/crm');
   revalidarDirecaoOperacional();
 }
 
@@ -212,8 +212,8 @@ export async function moverOportunidadeKanban(
     };
   }
 
-  revalidatePath('/vendas');
-  revalidatePath(`/vendas/${validacao.data.id}`);
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.id}`);
   revalidarDirecaoOperacional();
   return { ok: true, movida: Boolean(data) };
 }
@@ -268,8 +268,8 @@ export async function definirProximaAcao(
     };
   }
 
-  revalidatePath('/vendas');
-  revalidatePath(`/vendas/${validacao.data.oportunidade}`);
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidarDirecaoOperacional();
   return { status: 'sucesso', mensagem: 'Próxima ação salva na ficha e no quadro de vendas.' };
 }
@@ -303,8 +303,8 @@ export async function aplicarProximaAcao(
     };
   }
 
-  revalidatePath('/vendas');
-  revalidatePath(`/vendas/${validacao.data.oportunidade}`);
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.oportunidade}`);
   revalidatePath('/solucoes');
   revalidarDirecaoOperacional();
   return { ok: true, mensagem: 'Próxima ação salva no quadro de vendas.' };
@@ -334,7 +334,7 @@ export async function iniciarNovoCicloCliente(formData: FormData): Promise<void>
     redirect(`/vendas/${validacao.data.oportunidade}?novo-ciclo=erro`);
   }
 
-  revalidatePath('/vendas');
+  revalidatePath('/crm');
   revalidarDirecaoOperacional();
   redirect(`/vendas/${oportunidade.data}?novo=1`);
 }

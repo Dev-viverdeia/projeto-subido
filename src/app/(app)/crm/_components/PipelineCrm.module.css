@@ -454,7 +454,9 @@
 }
 
 .faseNumero {
-  display: block;
+  display: flex;
+  min-height: 22px;
+  align-items: center;
   margin-bottom: var(--via-space-1);
   color: var(--via-navy);
   font-family: var(--via-font-mono);
@@ -1201,7 +1203,7 @@
   }
 }
 
-@container (min-width: 1100px) {
+@container vendas (min-width: 900px) {
   .pipeline {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -1246,9 +1248,8 @@
   }
 }
 
-/* Em notebooks, as quatro etapas continuam acessíveis sem empilhar dois
-   quadros longos. Telas amplas mantêm o kanban com as quatro colunas. */
-@container vendas (max-width: 1131px) {
+/* Abaixo da largura útil do quadro, navegação por etapa sem comprimir os cards. */
+@container vendas (max-width: 899px) {
   .abasMobile {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

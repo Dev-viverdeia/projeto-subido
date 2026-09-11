@@ -48,7 +48,7 @@ describe('AtalhoProposta', () => {
       />,
     );
 
-    expect(screen.getByRole('link', { name: 'Ver proposta' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Continuar proposta' })).toHaveAttribute(
       'href',
       '/propostas/proposta-1',
     );

@@ -30,7 +30,8 @@ const AcompanhamentoSchema = z.object({
 function revalidar(projeto: string) {
   revalidatePath(`/entregas/${projeto}`);
   revalidatePath('/entregas');
-  revalidatePath('/vendas');
+  revalidatePath('/crm');
+  revalidatePath('/crm/[id]', 'page');
   revalidatePath('/portal/[codigo]', 'page');
   revalidarDirecaoOperacional();
 }

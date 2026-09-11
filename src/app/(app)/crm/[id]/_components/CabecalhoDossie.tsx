@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { CalendarPlus, ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
-import { callPodeAbrir } from '@/lib/calls/tipos';
 import { etapaAberta, rotuloEtapaVisivel } from '@/lib/crm/etapas';
+import { proximaReuniaoDoLead } from '@/lib/crm/ciclo-cliente';
+import { tituloDoProjetoNoCard } from '@/lib/crm/acao-pipeline';
 import type { DossieLead } from '@/lib/crm/queries';
 import { AtalhoProposta } from './AtalhoProposta';
 import { AcoesOportunidade } from '../../_components/AcoesOportunidade';
@@ -23,16 +24,13 @@ export function CabecalhoDossie({
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
   const noFluxo = estaNoFluxo(lead.oportunidade);
   const faseComercial = noFluxo
-    ? rotuloEtapaVisivel(lead.oportunidade.etapa)
+    ? lead.oportunidade.etapa === 'ganho'
+      ? 'Ganho'
+      : rotuloEtapaVisivel(lead.oportunidade.etapa)
     : ROTULO_SITUACAO[lead.oportunidade.situacao!];
   const projetoDaJornada = projetoSlug ?? lead.empresa.projetoSugeridoSlug ?? null;
   const oportunidadeAberta = noFluxo && etapaAberta(lead.oportunidade.etapa);
-  const proximaReuniao = lead.calls
-    .filter((call) => callPodeAbrir(call.status))
-    .sort(
-      (primeira, segunda) =>
-        new Date(primeira.agendadaPara).getTime() - new Date(segunda.agendadaPara).getTime(),
-    )[0];
+  const proximaReuniao = proximaReuniaoDoLead(lead);
   const hrefReuniao = proximaReuniao
     ? `/sala/${proximaReuniao.codigoPublico}`
     : `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`;
@@ -54,7 +52,7 @@ export function CabecalhoDossie({
         <div className={styles.identidade}>
           <p className={styles.sobretitulo}>Ficha do cliente</p>
           <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
-          <p>{lead.oportunidade.titulo}</p>
+          <p>{tituloDoProjetoNoCard(lead.oportunidade.titulo, lead.empresa.nome)}</p>
         </div>
 
         <div className={styles.heroLateral}>
@@ -115,13 +113,15 @@ export function CabecalhoDossie({
               />
             )}
           </nav>
+        ) : noFluxo && lead.oportunidade.etapa === 'ganho' ? (
+          <nav className={styles.acoes} aria-label="Ações da ficha do cliente">
+            <AtalhoProposta lead={lead} projetoSlug={projetoDaJornada} />
+          </nav>
         ) : (
           <p className={styles.encerradaNota}>
             {!noFluxo
               ? 'Fora do fluxo. O histórico está preservado; use Mais ações para restaurar.'
-              : lead.oportunidade.etapa === 'ganho'
-                ? 'Venda concluída. Abra um novo ciclo abaixo quando houver outro projeto.'
-                : 'Venda encerrada. O histórico e o motivo da perda continuam nesta ficha.'}
+              : 'Venda encerrada. O histórico e o motivo da perda continuam nesta ficha.'}
           </p>
         )}
       </div>

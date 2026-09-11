@@ -40,8 +40,8 @@ export async function alterarSituacaoOportunidade(entrada: {
           ? 'Esta venda mudou em outra tela. Atualize a página antes de continuar.'
           : 'Não foi possível atualizar a venda. Tente novamente.',
     };
-  revalidatePath('/crm', 'layout');
-  revalidatePath('/vendas', 'layout');
+  revalidatePath('/crm');
+  revalidatePath(`/crm/${validacao.data.id}`);
   revalidatePath('/metricas');
   revalidatePath('/propostas/nova');
   revalidarDirecaoOperacional();

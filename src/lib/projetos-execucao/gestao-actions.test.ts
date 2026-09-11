@@ -36,6 +36,8 @@ describe('gestão autorizada', () => {
       p_confirmar_pendencias: true,
     });
     expect(revalidatePath).toHaveBeenCalledWith('/entregas');
+    expect(revalidatePath).toHaveBeenCalledWith('/crm');
+    expect(revalidatePath).toHaveBeenCalledWith('/crm/[id]', 'page');
     expect(revalidatePath).toHaveBeenCalledWith('/portal/[codigo]', 'page');
   });
   it('não presume ciência das pendências', async () => {

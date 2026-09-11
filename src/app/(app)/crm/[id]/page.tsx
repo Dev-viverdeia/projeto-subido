@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
+import { etapaAberta } from '@/lib/crm/etapas';
+import { estaNoFluxo } from '@/lib/crm/situacao';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { CabecalhoDossie } from './_components/CabecalhoDossie';
 import { ContextoPosEntrega } from './_components/ContextoPosEntrega';
@@ -102,13 +104,15 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
           status={falhaRecente.status}
           erro={falhaRecente.erro}
           acao={
-            <FormularioEnriquecimento
-              oportunidadeId={lead.oportunidade.id}
-              saldoCreditos={lead.saldoCreditos ?? 30}
-              temDossie={Boolean(dossie)}
-              rotulo="Tentar novamente"
-              tom="secundario"
-            />
+            estaNoFluxo(lead.oportunidade) && etapaAberta(lead.oportunidade.etapa) ? (
+              <FormularioEnriquecimento
+                oportunidadeId={lead.oportunidade.id}
+                saldoCreditos={lead.saldoCreditos ?? 30}
+                temDossie={Boolean(dossie)}
+                rotulo="Tentar novamente"
+                tom="secundario"
+              />
+            ) : undefined
           }
         />
       )}

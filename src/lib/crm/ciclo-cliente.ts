@@ -1,13 +1,13 @@
 import { callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { ROTULO_STATUS_PROJETO } from '@/lib/projetos-execucao/status';
-import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
+import { ROTULO_ABRIR_PROPOSTA, ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import type { DossieLead } from './dossie-types';
+import { faseDaEtapa, rotuloMotivoPerda } from './etapas';
 import { estaNoFluxo, ROTULO_SITUACAO } from './situacao';
 
 export type EstadoEtapaCiclo = 'concluida' | 'atual' | 'futura' | 'encerrada';
-
 export type EtapaCicloCliente = {
-  id: 'preparar' | 'descobrir' | 'propor' | 'entregar' | 'concluir';
+  id: 'preparar' | 'descobrir' | 'propor' | 'ganho';
   numero: string;
   rotulo: string;
   descricao: string;
@@ -15,9 +15,8 @@ export type EtapaCicloCliente = {
   evidencia: string;
   href: string | null;
 };
-
 export type DecisaoCicloCliente = {
-  tipo: 'navegacao' | 'enriquecer' | 'encerrado' | 'novo-ciclo';
+  tipo: 'navegacao' | 'enriquecer' | 'encerrado' | 'novo-ciclo' | 'definida';
   rotulo: string;
   titulo: string;
   href: string | null;
@@ -31,51 +30,47 @@ function destinoDaCall(call: DossieLead['calls'][number]): string {
   return callPodeAbrir(call.status) ? `/sala/${call.codigoPublico}` : `/reunioes/${call.id}`;
 }
 
-function estadoDaEtapa(indice: number, indiceAtual: number, encerrada: boolean): EstadoEtapaCiclo {
-  if (indice < indiceAtual) return 'concluida';
-  if (indice === indiceAtual) return encerrada ? 'encerrada' : 'atual';
-  return 'futura';
+/** A lista recebida pode estar em ordem de criação, não de agendamento. */
+export function proximaReuniaoDoLead(lead: Pick<DossieLead, 'calls'>) {
+  return (
+    lead.calls
+      .filter((call) => callPodeAbrir(call.status))
+      .sort((a, b) => Date.parse(a.agendadaPara) - Date.parse(b.agendadaPara))[0] ?? null
+  );
 }
 
 /**
- * Converte fatos de um único cliente em um ciclo verificável. Um rascunho de
- * proposta pode nascer de uma conversa fora da plataforma. A reunião é contexto,
- * não uma condição para elaborar a proposta.
+ * A etapa vem do registro, como no Kanban. Evidências e sugestões não alteram
+ * esse progresso: uma proposta pode nascer de WhatsApp ou de uma conversa offline.
  */
 export function montarCicloCliente(lead: DossieLead): {
   etapas: EtapaCicloCliente[];
   decisao: DecisaoCicloCliente;
 } {
+  const oportunidade = lead.oportunidade;
   const proposta = lead.propostaRecente;
-  const projeto = lead.projetoRecente;
-  const descobertaConcluida =
-    lead.calls.find((call) => call.tipo === 'descoberta' && call.status === 'concluida') ?? null;
-  const proximaCall =
-    lead.calls.find((call) => call.status !== 'concluida' && call.status !== 'cancelada') ?? null;
-  const conversaDeOrigem =
-    (proposta?.reuniaoId ? lead.calls.find((call) => call.id === proposta.reuniaoId) : undefined) ??
-    descobertaConcluida;
-  const contextoEnriquecido = Boolean(
-    lead.oportunidade.enriquecidoEm ||
-    lead.enriquecimentos.some((execucao) => execucao.status === 'concluido') ||
-    lead.continuidadePosEntrega,
+  const projeto = lead.projetoAtivo ?? lead.projetoRecente;
+  const descoberta = lead.calls.find(
+    (call) => call.tipo === 'descoberta' && call.status === 'concluida',
   );
-  const concluido = projeto?.status === 'concluido';
-  const entregaIniciada = Boolean(lead.projetoAtivo || proposta?.status === 'aceita');
-  const propostaAprovada = proposta?.status === 'aceita';
-  const encerrada = lead.oportunidade.etapa === 'perdido' || proposta?.status === 'recusada';
-  const preparacaoPendente =
-    !contextoEnriquecido && !proximaCall && !descobertaConcluida && !proposta && !encerrada;
+  const temDescoberta = Boolean(lead.temDescobertaConcluida || descoberta);
+  const reuniao = proximaReuniaoDoLead(lead);
+  const enriquecida = Boolean(
+    oportunidade.enriquecidoEm ||
+    lead.enriquecimentos.some((execucao) => execucao.status === 'concluido'),
+  );
+  const foraDoFluxo = !estaNoFluxo(oportunidade);
+  const perdida = oportunidade.etapa === 'perdido';
+  const ganha = oportunidade.etapa === 'ganho';
+  const fase = faseDaEtapa(oportunidade.etapa);
+  const indiceAtual = ['entrada', 'conversa', 'proposta', 'ganho'].indexOf(fase);
 
-  let indiceAtual = preparacaoPendente ? 0 : 1;
-  if (concluido) indiceAtual = 4;
-  else if (entregaIniciada || lead.oportunidade.etapa === 'ganho') indiceAtual = 3;
-  else if (descobertaConcluida || proposta) indiceAtual = 2;
-
-  if (encerrada) {
-    if (proposta) indiceAtual = 2;
-    else if (descobertaConcluida) indiceAtual = 1;
-    else indiceAtual = 0;
+  function estado(indice: number): EstadoEtapaCiclo {
+    // A etapa anterior à perda não é conhecida. Não inventar etapas concluídas.
+    if (perdida) return 'futura';
+    if (indice === indiceAtual && foraDoFluxo) return 'encerrada';
+    if (indice < indiceAtual || (indice === indiceAtual && ganha)) return 'concluida';
+    return indice === indiceAtual ? 'atual' : 'futura';
   }
 
   const etapas: EtapaCicloCliente[] = [
@@ -84,315 +79,196 @@ export function montarCicloCliente(lead: DossieLead): {
       numero: '01',
       rotulo: 'Preparar',
       descricao: 'Empresa, contato e contexto',
-      estado: estadoDaEtapa(0, indiceAtual, encerrada),
-      evidencia: contextoEnriquecido
+      estado: estado(0),
+      evidencia: enriquecida
         ? 'Dados enriquecidos'
-        : preparacaoPendente
-          ? 'Enriquecimento recomendado'
+        : lead.continuidadePosEntrega
+          ? 'Histórico de entrega disponível'
           : 'Ficha criada',
-      href: `/vendas/${lead.oportunidade.id}`,
+      href: `/vendas/${oportunidade.id}`,
     },
     {
       id: 'descobrir',
       numero: '02',
       rotulo: 'Descobrir',
       descricao: 'Problema, impacto e decisão',
-      estado: estadoDaEtapa(1, indiceAtual, encerrada),
-      evidencia: descobertaConcluida
+      estado: estado(1),
+      evidencia: temDescoberta
         ? 'Descoberta concluída'
-        : proximaCall
-          ? ROTULO_STATUS_CALL[proximaCall.status]
-          : proposta
-            ? 'Sem reunião registrada'
-            : 'Contexto a confirmar',
-      href: descobertaConcluida
-        ? destinoDaCall(descobertaConcluida)
-        : proximaCall
-          ? destinoDaCall(proximaCall)
-          : null,
+        : reuniao
+          ? ROTULO_STATUS_CALL[reuniao.status]
+          : 'Sem reunião registrada',
+      href: descoberta ? destinoDaCall(descoberta) : reuniao ? destinoDaCall(reuniao) : null,
     },
     {
       id: 'propor',
       numero: '03',
       rotulo: 'Propor',
       descricao: 'Escopo, proposta e decisão',
-      estado: estadoDaEtapa(2, indiceAtual, encerrada),
-      evidencia: proposta ? ROTULO_STATUS_PROPOSTA[proposta.status] : 'Ainda não criada',
+      estado: estado(2),
+      evidencia: proposta ? ROTULO_STATUS_PROPOSTA[proposta.status] : 'Proposta a criar',
       href: proposta ? `/propostas/${proposta.id}` : null,
     },
     {
-      id: 'entregar',
+      id: 'ganho',
       numero: '04',
-      rotulo: 'Entregar',
-      descricao: 'Kickoff, execução e validação',
-      estado: estadoDaEtapa(3, indiceAtual, encerrada),
+      rotulo: 'Ganho',
+      descricao: 'Venda concluída',
+      estado: estado(3),
       evidencia: projeto
         ? ROTULO_STATUS_PROJETO[projeto.status]
-        : propostaAprovada
-          ? 'Projeto pronto para iniciar'
+        : ganha
+          ? 'Venda ganha'
           : 'Aguardando a venda',
       href: projeto
         ? `/entregas/${projeto.id}`
-        : propostaAprovada && proposta
+        : proposta?.status === 'aceita'
           ? `/propostas/${proposta.id}`
           : null,
     },
-    {
-      id: 'concluir',
-      numero: '05',
-      rotulo: 'Concluir',
-      descricao: 'Aceite, resultado e próximo ciclo',
-      estado: estadoDaEtapa(4, indiceAtual, encerrada),
-      evidencia: concluido ? 'Entrega comprovada' : 'Ainda não concluída',
-      href: concluido && projeto ? `/entregas/${projeto.id}` : null,
-    },
   ];
 
-  if (encerrada) {
+  function resultado(
+    decisao: Partial<DecisaoCicloCliente> & Pick<DecisaoCicloCliente, 'tipo' | 'titulo'>,
+  ) {
     return {
       etapas,
       decisao: {
-        tipo: 'encerrado',
-        rotulo: 'Venda encerrada',
-        titulo: 'O motivo da perda fica salvo para orientar uma abordagem futura.',
-        href: null,
-        acao: null,
-        prazo: null,
-        apoioHref: proposta ? `/propostas/${proposta.id}` : null,
-        apoioRotulo: proposta ? 'Revisar proposta' : null,
-      },
-    };
-  }
-
-  const compromisso = lead.acoesPlano[0] ?? null;
-  if (!estaNoFluxo(lead.oportunidade)) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'encerrado',
-        rotulo: ROTULO_SITUACAO[lead.oportunidade.situacao!],
-        titulo: lead.oportunidade.motivoRetirada ?? 'Esta oportunidade está fora do fluxo.',
+        rotulo: 'Próximo passo sugerido',
         href: null,
         acao: null,
         prazo: null,
         apoioHref: null,
         apoioRotulo: null,
-      },
-    };
-  }
-  if (compromisso && !lead.projetoAtivo) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Compromisso confirmado',
-        titulo: compromisso.titulo,
-        href: compromisso.reuniaoId
-          ? `/reunioes/${compromisso.reuniaoId}`
-          : `/vendas/${lead.oportunidade.id}`,
-        acao: compromisso.reuniaoId ? 'Abrir reunião' : 'Abrir em Vendas',
-        prazo: compromisso.prazoEm,
-        apoioHref: null,
-        apoioRotulo: null,
-      },
+        ...decisao,
+      } satisfies DecisaoCicloCliente,
     };
   }
 
-  if (lead.projetoAtivo) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Entrega em andamento',
-        titulo: `Continuar ${lead.projetoAtivo.titulo}`,
-        href: `/entregas/${lead.projetoAtivo.id}`,
-        acao: 'Continuar entrega',
-        prazo: null,
-        apoioHref: proposta ? `/propostas/${proposta.id}` : null,
-        apoioRotulo: proposta ? 'Revisar proposta' : null,
-      },
-    };
-  }
-
-  if (concluido && projeto) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'novo-ciclo',
-        rotulo: 'Primeiro ciclo concluído',
-        titulo: `A entrega de ${lead.empresa.nome} está salva. Abra outra venda quando houver um novo projeto.`,
-        href: null,
-        acao: null,
-        prazo: null,
-        apoioHref: `/entregas/${projeto.id}`,
-        apoioRotulo: 'Revisar entrega',
-      },
-    };
-  }
-
-  if (propostaAprovada && proposta) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Venda confirmada',
-        titulo: 'Abra a proposta aceita para iniciar a entrega do projeto.',
-        href: `/propostas/${proposta.id}`,
-        acao: 'Iniciar entrega',
-        prazo: null,
-        apoioHref: conversaDeOrigem ? destinoDaCall(conversaDeOrigem) : null,
-        apoioRotulo: conversaDeOrigem ? 'Revisar reunião' : null,
-      },
-    };
-  }
-
-  if (proximaCall) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Próxima conversa',
-        titulo: `Prepare ${proximaCall.titulo}`,
-        href: destinoDaCall(proximaCall),
-        acao: 'Abrir reunião',
-        prazo: lead.oportunidade.proximaAcaoEm ?? proximaCall.agendadaPara,
-        apoioHref: null,
-        apoioRotulo: null,
-      },
-    };
-  }
-
-  if (lead.oportunidade.etapa === 'ganho' && !proposta) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Venda ganha',
-        titulo: 'Registre o escopo combinado para preparar a entrega.',
-        href: `/propostas/nova?oportunidade=${lead.oportunidade.id}`,
-        acao: 'Registrar proposta',
-        prazo: null,
-        apoioHref: null,
-        apoioRotulo: null,
-      },
-    };
-  }
-
-  if (proposta && proposta.status !== 'recusada') {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Proposta em andamento',
-        titulo:
-          proposta.status === 'apresentada'
-            ? 'Acompanhe a resposta do cliente.'
-            : proposta.status === 'pronta'
-              ? 'Apresente o escopo e o investimento ao cliente.'
-              : 'Revise o escopo e finalize a proposta.',
-        href: `/propostas/${proposta.id}`,
-        acao:
-          proposta.status === 'apresentada'
-            ? 'Acompanhar proposta'
-            : proposta.status === 'pronta'
-              ? 'Apresentar proposta'
-              : 'Continuar proposta',
-        prazo: lead.oportunidade.proximaAcaoEm,
-        apoioHref: descobertaConcluida ? destinoDaCall(descobertaConcluida) : null,
-        apoioRotulo: descobertaConcluida ? 'Revisar descoberta' : null,
-      },
-    };
-  }
-
-  if (descobertaConcluida) {
-    if (proposta) {
-      return {
-        etapas,
-        decisao: {
-          tipo: 'navegacao',
-          rotulo: 'Proposta em andamento',
-          titulo: `Continuar ${proposta.titulo}`,
-          href: `/propostas/${proposta.id}`,
-          acao: 'Continuar proposta',
-          prazo: lead.oportunidade.proximaAcaoEm,
-          apoioHref: destinoDaCall(descobertaConcluida),
-          apoioRotulo: 'Revisar descoberta',
-        },
-      };
-    }
-
-    const parametrosProposta = new URLSearchParams({
-      oportunidade: lead.oportunidade.id,
-      reuniao: descobertaConcluida.id,
+  if (foraDoFluxo)
+    return resultado({
+      tipo: 'encerrado',
+      rotulo: ROTULO_SITUACAO[oportunidade.situacao!],
+      titulo: oportunidade.motivoRetirada ?? 'Esta oportunidade está fora do fluxo.',
     });
-    if (lead.empresa.projetoSugeridoSlug) {
-      parametrosProposta.set('projeto', lead.empresa.projetoSugeridoSlug);
-    }
-
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo: 'Descoberta concluída',
-        titulo: 'Use o que foi confirmado na reunião para montar a proposta.',
-        href: `/propostas/nova?${parametrosProposta.toString()}`,
-        acao: 'Montar proposta',
-        prazo: lead.oportunidade.proximaAcaoEm,
-        apoioHref: destinoDaCall(descobertaConcluida),
-        apoioRotulo: 'Revisar descoberta',
-      },
-    };
-  }
-
-  if (lead.continuidadePosEntrega) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'navegacao',
-        rotulo:
-          lead.continuidadePosEntrega.decisao === 'expandir'
-            ? 'Expansão confirmada'
-            : 'Novo projeto sinalizado',
-        titulo: lead.continuidadePosEntrega.proximoPasso,
-        href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
-        acao: 'Agendar reunião',
-        prazo: lead.oportunidade.proximaAcaoEm,
-        apoioHref: `/entregas/${lead.continuidadePosEntrega.projetoId}`,
-        apoioRotulo: 'Revisar entrega',
-      },
-    };
-  }
-
-  if (!contextoEnriquecido && !proposta) {
-    return {
-      etapas,
-      decisao: {
-        tipo: 'enriquecer',
-        rotulo: 'Antes da primeira conversa',
-        titulo: 'Conheça melhor a empresa antes da reunião.',
-        href: null,
-        acao: 'Enriquecer dados',
-        prazo: null,
-        apoioHref: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
-        apoioRotulo: 'Agendar sem enriquecer',
-      },
-    };
-  }
-
-  return {
-    etapas,
-    decisao: {
-      tipo: 'navegacao',
-      rotulo: proposta ? 'Descoberta pendente' : 'Primeira conversa',
-      titulo: proposta
-        ? 'O rascunho está salvo. Faça a descoberta antes de apresentar uma solução.'
-        : (lead.oportunidade.proximaAcao ??
-          'Agende uma conversa para entender o problema, o impacto e quem decide.'),
-      href: `/reunioes?nova=1&oportunidade=${lead.oportunidade.id}`,
-      acao: 'Agendar descoberta',
-      prazo: lead.oportunidade.proximaAcaoEm,
+  if (perdida)
+    return resultado({
+      tipo: 'encerrado',
+      rotulo: 'Venda encerrada',
+      titulo: oportunidade.motivoPerda
+        ? rotuloMotivoPerda(oportunidade.motivoPerda)
+        : 'O histórico desta venda está preservado.',
       apoioHref: proposta ? `/propostas/${proposta.id}` : null,
-      apoioRotulo: proposta ? 'Abrir rascunho' : null,
-    },
-  };
+      apoioRotulo: proposta ? 'Revisar proposta' : null,
+    });
+
+  // A entrega existente tem prioridade sobre compromissos antigos da venda.
+  if (projeto?.status === 'concluido')
+    return resultado({
+      tipo: 'novo-ciclo',
+      rotulo: 'Entrega concluída',
+      titulo: 'Tudo entregue. Um novo projeto pode começar em outra venda.',
+      apoioHref: `/entregas/${projeto.id}`,
+      apoioRotulo: 'Revisar entrega',
+    });
+  if (projeto)
+    return resultado({
+      tipo: 'navegacao',
+      rotulo: ROTULO_STATUS_PROJETO[projeto.status],
+      titulo: projeto.titulo,
+      href: `/entregas/${projeto.id}`,
+      acao: 'Abrir entrega',
+    });
+  if (proposta?.status === 'aceita')
+    return resultado({
+      tipo: 'navegacao',
+      rotulo: 'Proposta aceita',
+      titulo: 'Prepare a entrega do projeto aprovado.',
+      href: `/propostas/${proposta.id}`,
+      acao: ROTULO_ABRIR_PROPOSTA[proposta.status],
+    });
+
+  if (!ganha && oportunidade.proximaAcao?.trim())
+    return resultado({
+      tipo: 'definida',
+      rotulo: 'Próxima ação definida',
+      titulo: oportunidade.proximaAcao,
+      prazo: oportunidade.proximaAcaoEm,
+    });
+  const compromisso = lead.acoesPlano[0];
+  if (!ganha && compromisso)
+    return resultado({
+      tipo: compromisso.reuniaoId ? 'navegacao' : 'definida',
+      rotulo: 'Compromisso confirmado',
+      titulo: compromisso.titulo,
+      prazo: compromisso.prazoEm,
+      href: compromisso.reuniaoId ? `/reunioes/${compromisso.reuniaoId}` : null,
+      acao: compromisso.reuniaoId ? 'Abrir reunião' : null,
+    });
+  if (!ganha && reuniao)
+    return resultado({
+      tipo: 'navegacao',
+      rotulo: 'Próxima reunião',
+      titulo: reuniao.titulo,
+      href: destinoDaCall(reuniao),
+      acao: 'Abrir reunião',
+      prazo: reuniao.agendadaPara,
+    });
+  if (proposta)
+    return resultado({
+      tipo: 'navegacao',
+      rotulo: ROTULO_STATUS_PROPOSTA[proposta.status],
+      titulo:
+        proposta.status === 'apresentada'
+          ? 'Acompanhe a resposta do cliente.'
+          : proposta.status === 'pronta'
+            ? 'Apresente o escopo e o investimento.'
+            : proposta.status === 'recusada'
+              ? 'Revise o que precisa mudar na proposta.'
+              : 'Retome a proposta de onde parou.',
+      href: `/propostas/${proposta.id}`,
+      acao: ROTULO_ABRIR_PROPOSTA[proposta.status],
+      apoioHref: descoberta ? destinoDaCall(descoberta) : null,
+      apoioRotulo: descoberta ? 'Revisar reunião' : null,
+    });
+
+  if (ganha || fase === 'proposta' || temDescoberta) {
+    const parametros = new URLSearchParams({ oportunidade: oportunidade.id });
+    if (descoberta) parametros.set('reuniao', descoberta.id);
+    if (lead.empresa.projetoSugeridoSlug)
+      parametros.set('projeto', lead.empresa.projetoSugeridoSlug);
+    return resultado({
+      tipo: 'navegacao',
+      titulo: ganha
+        ? 'Registre o escopo combinado para preparar a entrega.'
+        : 'Transforme o que foi combinado em uma proposta.',
+      href: `/propostas/nova?${parametros.toString()}`,
+      acao: ganha ? 'Registrar proposta' : 'Criar proposta',
+      apoioHref: descoberta ? destinoDaCall(descoberta) : null,
+      apoioRotulo: descoberta ? 'Revisar reunião' : null,
+    });
+  }
+  if (lead.continuidadePosEntrega)
+    return resultado({
+      tipo: 'definida',
+      rotulo: 'Próxima ação definida',
+      titulo: lead.continuidadePosEntrega.proximoPasso,
+      prazo: oportunidade.proximaAcaoEm,
+      apoioHref: `/entregas/${lead.continuidadePosEntrega.projetoId}`,
+      apoioRotulo: 'Revisar entrega',
+    });
+  if (!enriquecida && fase === 'entrada')
+    return resultado({
+      tipo: 'enriquecer',
+      titulo: 'Conheça melhor a empresa antes da conversa.',
+      acao: 'Enriquecer dados',
+      apoioHref: `/reunioes?nova=1&oportunidade=${oportunidade.id}`,
+      apoioRotulo: 'Agendar reunião',
+    });
+  return resultado({
+    tipo: 'navegacao',
+    titulo: 'Converse com o cliente sobre o problema e a prioridade.',
+    href: `/reunioes?nova=1&oportunidade=${oportunidade.id}`,
+    acao: 'Agendar reunião',
+  });
 }

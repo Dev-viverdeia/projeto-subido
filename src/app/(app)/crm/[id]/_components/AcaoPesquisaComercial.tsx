@@ -1,5 +1,6 @@
 import type { DossieEnriquecido } from '@/lib/crm/enriquecimento';
 import { etapaAberta } from '@/lib/crm/etapas';
+import { estaNoFluxo } from '@/lib/crm/situacao';
 import type { DossieLead } from '@/lib/crm/queries';
 import { BotaoProximaAcao } from './BotaoProximaAcao';
 import styles from './PesquisaComercial.module.css';
@@ -15,7 +16,7 @@ export function AcaoPesquisaComercial({
   enriquecimentoId: string;
   acaoVisivel: string;
 }) {
-  const oportunidadeAberta = etapaAberta(lead.oportunidade.etapa);
+  const oportunidadeAberta = estaNoFluxo(lead.oportunidade) && etapaAberta(lead.oportunidade.etapa);
   const salva = lead.oportunidade.proximaAcao === dossie.proximaAcao.acao;
 
   return (

@@ -69,30 +69,34 @@ export async function iniciarProjetoExecucao(
   const validacao = IniciarSchema.safeParse({ proposta: formData.get('proposta') });
   if (!validacao.success) return { erro: 'Não foi possível identificar esta proposta.' };
 
-  const { supabase, user } = await usuarioAtual();
-  if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
+  let entregaId: string;
+  try {
+    const { supabase, user } = await usuarioAtual();
+    if (!user) return { erro: 'Sua sessão expirou. Entre novamente para continuar.' };
 
-  const { data, error } = await supabase.rpc('projeto_iniciar', {
-    p_proposta_id: validacao.data.proposta,
-  });
-
-  if (error || !data) {
-    console.error(
-      `[projetos-execucao:iniciar] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`,
-    );
-    return {
-      erro:
-        error?.message === 'proposta_precisa_estar_aceita'
-          ? 'A proposta precisa estar aceita antes de iniciar a entrega.'
-          : 'Não foi possível abrir a entrega agora.',
-    };
+    const { data, error } = await supabase.rpc('projeto_iniciar', {
+      p_proposta_id: validacao.data.proposta,
+    });
+    if (error || !data)
+      return {
+        erro:
+          error?.message === 'proposta_precisa_estar_aceita'
+            ? 'A proposta precisa estar aceita antes de iniciar a entrega.'
+            : 'Não foi possível abrir a entrega. Tente novamente.',
+      };
+    entregaId = data;
+  } catch {
+    // A mesma proposta identifica a entrega no banco; repetir não cria outra.
+    return { erro: 'A conexão falhou. Tente novamente para abrir a entrega.' };
   }
 
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.proposta}`);
   revalidatePath('/entregas');
+  revalidatePath('/crm');
+  revalidatePath('/crm/[id]', 'page');
   revalidarDirecaoOperacional();
-  redirect(`/entregas/${data}`);
+  redirect(`/entregas/${entregaId}`);
 }
 
 export async function atualizarTarefaProjeto(
