@@ -51,6 +51,9 @@ try {
   );
   assert.equal(acompanhamento.status, 401, 'Acompanhamento de proposta deve exigir sessão');
   assert.match(acompanhamento.headers.get('cache-control') ?? '', /no-store/);
+  const edicao = await fetch(`${origem}/api/propostas/11111111-1111-4111-8111-111111111111/edicao`);
+  assert.equal(edicao.status, 401, 'Leitura de edição deve exigir sessão');
+  assert.match(edicao.headers.get('cache-control') ?? '', /no-store/);
   const estabilidade = spawn(
     'npm',
     [

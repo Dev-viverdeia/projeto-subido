@@ -17,6 +17,7 @@ import { DocumentoPropostaSchema } from './schema';
 import { obterPropostaDaReuniao, type StatusProposta } from './queries';
 import { resolverReuniaoProposta } from './contexto-reuniao';
 import { retornoNovaProposta } from './retorno-nova';
+import { EdicaoPropostaSchema, type EdicaoProposta } from './edicao';
 
 const NovaPropostaSchema = z.object({
   oportunidade: z.uuid(),
@@ -29,12 +30,14 @@ const NovaPropostaSchema = z.object({
 
 const SalvarSchema = z.object({
   id: z.uuid(),
+  versao: z.coerce.number().int().positive(),
   titulo: z.string().trim().min(3).max(180),
   documento: z.string().max(250_000),
 });
 
 const MudarStatusSchema = z.object({
   id: z.uuid(),
+  versao: z.coerce.number().int().positive(),
   status: z.enum(['rascunho', 'pronta', 'apresentada', 'aceita', 'recusada']),
 });
 
@@ -47,12 +50,32 @@ const TRANSICOES_STATUS: Record<StatusProposta, readonly StatusProposta[]> = {
 };
 
 export type EstadoProposta = {
+  conflito?: EdicaoProposta;
+  edicao?: EdicaoProposta;
   erro?: string;
   sucesso?: string;
   versao?: number;
   status?: StatusProposta;
   compartilhamentoCodigo?: string | null;
 };
+
+async function conflitoDeEdicao(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  id: string,
+  dono: string,
+): Promise<EstadoProposta> {
+  const { data, error } = await supabase
+    .from('propostas')
+    .select('id, titulo, documento, versao, status')
+    .eq('id', id)
+    .eq('dono', dono)
+    .maybeSingle();
+  if (error) return { erro: 'Não foi possível conferir a versão salva. Tente novamente.' };
+  const edicao = EdicaoPropostaSchema.safeParse(data);
+  if (!edicao.success)
+    return { erro: 'A proposta não está disponível. Sua edição continua nesta aba.' };
+  return { conflito: edicao.data };
+}
 
 async function usuarioAtual() {
   const supabase = await createClient();
@@ -177,6 +200,7 @@ export async function salvarProposta(
   await exigirRecurso('propostas');
   const validacao = SalvarSchema.safeParse({
     id: formData.get('id'),
+    versao: formData.get('versao'),
     titulo: formData.get('titulo'),
     documento: formData.get('documento'),
   });
@@ -201,18 +225,26 @@ export async function salvarProposta(
       documento: documento.data,
     })
     .eq('id', validacao.data.id)
-    .select('versao, status')
+    .eq('dono', user.id)
+    .eq('versao', validacao.data.versao)
+    .select('id, titulo, documento, versao, status')
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
     console.error(`[propostas:salvar] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`);
     return { erro: 'Não foi possível salvar agora. Tente novamente em instantes.' };
   }
+  if (!data) return conflitoDeEdicao(supabase, validacao.data.id, user.id);
 
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.id}`);
   revalidarDirecaoOperacional();
-  return { sucesso: 'Proposta salva.', versao: data.versao, status: data.status };
+  return {
+    sucesso: 'Proposta salva.',
+    versao: data.versao,
+    status: data.status,
+    edicao: EdicaoPropostaSchema.parse(data),
+  };
 }
 
 export async function mudarStatusProposta(
@@ -222,6 +254,7 @@ export async function mudarStatusProposta(
   await exigirRecurso('propostas');
   const validacao = MudarStatusSchema.safeParse({
     id: formData.get('id'),
+    versao: formData.get('versao'),
     status: formData.get('status'),
   });
   if (!validacao.success) return { erro: 'Não foi possível atualizar o status.' };
@@ -231,10 +264,13 @@ export async function mudarStatusProposta(
 
   const atual = await supabase
     .from('propostas')
-    .select('status')
+    .select('status, versao')
     .eq('id', validacao.data.id)
+    .eq('dono', user.id)
     .maybeSingle();
   if (atual.error || !atual.data) return { erro: 'Não encontramos esta proposta.' };
+  if (atual.data.versao !== validacao.data.versao)
+    return conflitoDeEdicao(supabase, validacao.data.id, user.id);
   if (!TRANSICOES_STATUS[atual.data.status].includes(validacao.data.status)) {
     return { erro: 'Esse avanço não está disponível no estado atual da proposta.' };
   }
@@ -243,14 +279,17 @@ export async function mudarStatusProposta(
     .from('propostas')
     .update({ status: validacao.data.status })
     .eq('id', validacao.data.id)
+    .eq('dono', user.id)
+    .eq('versao', validacao.data.versao)
     .eq('status', atual.data.status)
     .select('versao, status, oportunidade_id, compartilhamento_codigo')
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
     console.error(`[propostas:status] ${error?.code ?? 'sem-dados'}: ${error?.message ?? ''}`);
     return { erro: 'Não foi possível atualizar agora. Tente novamente.' };
   }
+  if (!data) return conflitoDeEdicao(supabase, validacao.data.id, user.id);
 
   revalidatePath('/propostas');
   revalidatePath(`/propostas/${validacao.data.id}`);

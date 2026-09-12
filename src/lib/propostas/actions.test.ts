@@ -48,6 +48,7 @@ function formulario(status: 'rascunho' | 'pronta' | 'apresentada' | 'aceita' | '
   const dados = new FormData();
   dados.set('id', PROPOSTA_ID);
   dados.set('status', status);
+  dados.set('versao', '3');
   return dados;
 }
 
@@ -55,7 +56,7 @@ function consultaAtual(status = 'apresentada') {
   return {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    maybeSingle: vi.fn().mockResolvedValue({ data: { status }, error: null }),
+    maybeSingle: vi.fn().mockResolvedValue({ data: { status, versao: 3 }, error: null }),
   };
 }
 
