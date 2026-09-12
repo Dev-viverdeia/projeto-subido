@@ -75,7 +75,10 @@ export default async function PreviewEditorPropostaPage({
 }: PageProps<'/preview/proposta-editor'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
-  const aceita = parametros.estado === 'aceita' || parametros.estado === 'recuperar';
+  const aceita = ['aceita', 'aceita-cliente', 'recuperar'].includes(String(parametros.estado));
+  const recusada = ['recusada', 'recusada-cliente'].includes(String(parametros.estado));
+  const respondeu = ['aceita-cliente', 'recusada-cliente'].includes(String(parametros.estado));
+  const semVisualizacoes = parametros.estado === 'sem-visualizacoes';
 
   return (
     <div className={styles.shell} style={{ '--app-shell-header-h': '0px' } as CSSProperties}>
@@ -109,27 +112,39 @@ export default async function PreviewEditorPropostaPage({
           tituloInicial="Automação do atendimento da Clínica Aurora"
           documentoInicial={DOCUMENTO}
           statusInicial={
-            aceita ? 'aceita' : parametros.estado === 'rascunho' ? 'rascunho' : 'apresentada'
+            aceita
+              ? 'aceita'
+              : recusada
+                ? 'recusada'
+                : parametros.estado === 'rascunho'
+                  ? 'rascunho'
+                  : parametros.estado === 'pronta'
+                    ? 'pronta'
+                    : 'apresentada'
           }
           versaoInicial={2}
           oportunidadeId="22222222-2222-4222-8222-222222222222"
           reuniaoId="33333333-3333-4333-8333-333333333333"
           execucaoId={
-            parametros.estado === 'aceita' ? '55555555-5555-4555-8555-555555555555' : null
+            aceita && parametros.estado !== 'recuperar'
+              ? '55555555-5555-4555-8555-555555555555'
+              : null
           }
           compartilhamentoInicial={{
             codigo: '44444444-4444-4444-8444-444444444444',
-            ativo: true,
+            ativo: parametros.estado !== 'desativada',
             compartilhadaEm: '2026-08-14T14:00:00.000Z',
-            primeiraVisualizacaoEm: '2026-08-14T14:20:00.000Z',
-            ultimaVisualizacaoEm: '2026-08-14T16:10:00.000Z',
-            visualizacoes: 3,
-            decisaoNome: null,
-            decisaoEmail: null,
-            decisaoComentario: null,
-            decididaEm: null,
+            primeiraVisualizacaoEm: semVisualizacoes ? null : '2026-08-14T14:20:00.000Z',
+            ultimaVisualizacaoEm: semVisualizacoes ? null : '2026-08-14T16:10:00.000Z',
+            visualizacoes: semVisualizacoes ? 0 : 3,
+            decisaoNome: respondeu ? 'Camila Rios' : null,
+            decisaoEmail: respondeu ? 'camila@example.test' : null,
+            decisaoComentario: respondeu
+              ? 'Revisamos o projeto com a equipe. Gostamos do escopo e vamos conversar sobre o cronograma e os acessos.\n\nPrecisamos alinhar os horários de treinamento com a recepção para manter o atendimento durante a implementação.'
+              : null,
+            decididaEm: respondeu ? '2026-08-14T17:00:00.000Z' : null,
           }}
-          siteUrl="https://projeto-subido.vercel.app"
+          siteUrl="https://subido.viverdeia.ai"
         />
       </main>
     </div>

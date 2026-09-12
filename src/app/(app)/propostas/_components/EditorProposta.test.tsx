@@ -2,7 +2,8 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { DocumentoProposta } from '@/lib/propostas/schema';
-import { salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
+import type { StatusProposta } from '@/lib/propostas/queries';
+import { salvarProposta, mudarStatusProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import { EditorProposta } from './EditorProposta';
 import { PreviewProposta } from './PreviewProposta';
 
@@ -82,22 +83,22 @@ describe('PreviewProposta', () => {
   });
 });
 
-function montarEditor(alteracaoInicial = false) {
+function montarEditor(alteracaoInicial = false, statusInicial: StatusProposta = 'rascunho') {
   render(
     <EditorProposta
       referenciaEm="2026-09-06T02:30:00.000Z"
       id="11111111-1111-4111-8111-111111111111"
       tituloInicial="Plano comercial da Clínica Aurora"
       documentoInicial={DOCUMENTO}
-      statusInicial="rascunho"
+      statusInicial={statusInicial}
       versaoInicial={2}
       oportunidadeId="22222222-2222-4222-8222-222222222222"
       reuniaoId={null}
       execucaoId={null}
       alteracaoInicial={alteracaoInicial}
       compartilhamentoInicial={{
-        codigo: null,
-        ativo: false,
+        codigo: statusInicial === 'apresentada' ? '44444444-4444-4444-8444-444444444444' : null,
+        ativo: statusInicial === 'apresentada',
         compartilhadaEm: null,
         primeiraVisualizacaoEm: null,
         ultimaVisualizacaoEm: null,
@@ -118,6 +119,29 @@ function alterar(rotulo: string | RegExp, valor: string) {
 }
 
 describe('EditorProposta', () => {
+  it('registra uma resposta externa somente após abrir a ação e confirmar', async () => {
+    const user = userEvent.setup();
+    montarEditor(false, 'apresentada');
+    expect(
+      screen.getByRole('button', { name: 'Confirmar venda e abrir entrega', hidden: true }),
+    ).not.toBeVisible();
+    await user.click(screen.getByText('Registrar resposta', { exact: true }));
+    expect(mudarStatusProposta).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Registrar como não aprovada' }));
+    const dados = vi.mocked(mudarStatusProposta).mock.calls[0]![1];
+    expect(dados.get('id')).toBe('11111111-1111-4111-8111-111111111111');
+    expect(dados.get('status')).toBe('recusada');
+  });
+
+  it('impede registrar a decisão enquanto houver alterações não salvas', async () => {
+    const user = userEvent.setup();
+    montarEditor(true, 'apresentada');
+    await user.click(screen.getByText('Registrar resposta', { exact: true }));
+    expect(screen.getByRole('button', { name: 'Confirmar venda e abrir entrega' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Copiar link' })).toBeDisabled();
+    expect(mudarStatusProposta).not.toHaveBeenCalled();
+  });
+
   it('atualiza todos os campos da prévia, inclusive os últimos itens e o link opcional', () => {
     const preview = montarEditor();
     const campos: [string | RegExp, string, string?][] = [
