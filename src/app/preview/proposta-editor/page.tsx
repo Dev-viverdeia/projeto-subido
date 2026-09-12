@@ -107,6 +107,7 @@ export default async function PreviewEditorPropostaPage({
 
       <main id="conteudo" className={styles.conteudo}>
         <EditorProposta
+          sincronizar={parametros.sincronizar === 'sim'}
           referenciaEm="2026-09-06T02:30:00.000Z"
           id="11111111-1111-4111-8111-111111111111"
           tituloInicial="Automação do atendimento da Clínica Aurora"

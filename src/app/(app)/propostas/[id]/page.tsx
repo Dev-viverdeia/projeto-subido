@@ -31,6 +31,7 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
 
   return (
     <EditorProposta
+      key={proposta.id}
       referenciaEm={referenciaEm}
       id={proposta.id}
       tituloInicial={proposta.titulo}

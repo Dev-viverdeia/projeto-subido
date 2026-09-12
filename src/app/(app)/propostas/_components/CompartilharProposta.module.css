@@ -114,7 +114,9 @@
   font: var(--via-fw-medium) var(--app-fs-support) var(--via-font);
   cursor: pointer;
 }
-.linkPublico button:disabled {
+.linkPublico button:disabled,
+.novoLink:disabled,
+.opcoesAcesso button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -251,6 +253,48 @@
   box-shadow: var(--app-ring);
 }
 
+.atualizacao {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px var(--via-space-3);
+  color: var(--via-text-body);
+  font-size: var(--app-fs-support);
+  line-height: 1.5;
+}
+.atualizacao[data-visivel] {
+  padding: var(--via-space-3) var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+  background: color-mix(in srgb, var(--via-bg-2) 72%, transparent);
+}
+.atualizacao > span {
+  flex: 1;
+  min-width: 0;
+}
+.atualizacao :is(button, a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--app-radius-chip);
+  background: transparent;
+  color: var(--via-navy);
+  font: inherit;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.atualizacao :is(button, a):focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--app-ring);
+}
+.atualizacao button:disabled {
+  color: var(--via-text-muted);
+  cursor: wait;
+}
+
 @media (max-width: 899px) {
   .principal {
     grid-template-columns: minmax(0, 1fr);
@@ -265,6 +309,9 @@
   }
 }
 @media (max-width: 599px) {
+  .atualizacao[data-falha] > span {
+    flex-basis: 100%;
+  }
   .principal {
     padding: var(--via-space-4);
   }

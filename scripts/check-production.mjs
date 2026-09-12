@@ -46,6 +46,11 @@ try {
     401,
     'API deve exigir sessão',
   );
+  const acompanhamento = await fetch(
+    `${origem}/api/propostas/11111111-1111-4111-8111-111111111111/acompanhamento`,
+  );
+  assert.equal(acompanhamento.status, 401, 'Acompanhamento de proposta deve exigir sessão');
+  assert.match(acompanhamento.headers.get('cache-control') ?? '', /no-store/);
   const estabilidade = spawn(
     'npm',
     [

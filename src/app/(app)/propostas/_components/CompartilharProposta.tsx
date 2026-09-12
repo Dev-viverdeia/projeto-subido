@@ -44,7 +44,11 @@ export function CompartilharProposta({
   status,
   compartilhamento,
   alteracoesPendentes = false,
+  semAcesso = false,
   acoes,
+  atualizacao,
+  aoIniciarAlteracao,
+  aoConcluirAlteracao,
 }: {
   propostaId: string;
   codigo: string;
@@ -55,16 +59,23 @@ export function CompartilharProposta({
   status: StatusProposta;
   compartilhamento: Compartilhamento;
   alteracoesPendentes?: boolean;
+  semAcesso?: boolean;
   acoes?: ReactNode;
+  atualizacao?: ReactNode;
+  aoIniciarAlteracao?: () => void;
+  aoConcluirAlteracao?: (resultado?: EstadoCompartilhamento) => void;
 }) {
   const [copiado, setCopiado] = useState<string | null>(null);
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [operacao, setOperacao] = useState<'desativar' | 'renovar' | null>(null);
+  const [codigoConfirmacao, setCodigoConfirmacao] = useState(codigo);
   const [erroCopia, setErroCopia] = useState('');
   const [estado, enviar, pendente] = useActionState<EstadoCompartilhamento, FormData>(
     async (anterior, dados) => {
+      aoIniciarAlteracao?.();
+      let resultado: EstadoCompartilhamento | undefined;
       try {
-        const resultado = await configurarLinkProposta(anterior, dados);
+        resultado = await configurarLinkProposta(anterior, dados);
         if (resultado.sucesso) setOperacao(null);
         return { ...anterior, sucesso: undefined, erro: undefined, ...resultado };
       } catch {
@@ -73,12 +84,18 @@ export function CompartilharProposta({
           sucesso: undefined,
           erro: 'Não conseguimos confirmar a alteração. Tente novamente.',
         };
+      } finally {
+        aoConcluirAlteracao?.(resultado);
       }
     },
     {},
   );
-  const codigoAtual = estado.codigo ?? codigo;
-  const ativo = estado.ativo ?? compartilhamento.ativo;
+  // Quando o editor acompanha a proposta, ele é a fonte única dos metadados.
+  const codigoAtual = aoConcluirAlteracao ? codigo : (estado.codigo ?? codigo);
+  const ativo = aoConcluirAlteracao
+    ? compartilhamento.ativo
+    : (estado.ativo ?? compartilhamento.ativo);
+  const linkMudou = operacao !== null && codigoConfirmacao !== codigoAtual;
   const url = useMemo(
     () => new URL(`/proposta/${codigoAtual}`, siteUrl).toString(),
     [codigoAtual, siteUrl],
@@ -161,7 +178,7 @@ export function CompartilharProposta({
                   onClick={() => {
                     void copiar();
                   }}
-                  disabled={alteracoesPendentes}
+                  disabled={alteracoesPendentes || semAcesso}
                   aria-live="polite"
                 >
                   {copiado === url ? (
@@ -178,7 +195,7 @@ export function CompartilharProposta({
                 </p>
               )}
               <div className={styles.acoesLink}>
-                {!alteracoesPendentes && (
+                {!alteracoesPendentes && !semAcesso && (
                   <a href={mailto}>
                     <Mail size={16} aria-hidden="true" /> Preparar e-mail
                   </a>
@@ -199,8 +216,10 @@ export function CompartilharProposta({
               <button
                 type="button"
                 className={styles.novoLink}
+                disabled={semAcesso}
                 onClick={(evento) => {
                   evento.currentTarget.focus();
+                  setCodigoConfirmacao(codigoAtual);
                   setOperacao('renovar');
                 }}
               >
@@ -220,6 +239,7 @@ export function CompartilharProposta({
           )}
         </div>
       </div>
+      {atualizacao}
       <div className={styles.rodape}>
         {acoes && <div className={styles.acoesVenda}>{acoes}</div>}
         <details className={styles.acesso}>
@@ -230,8 +250,10 @@ export function CompartilharProposta({
             <p>O link abre sem login. Compartilhe apenas com seu cliente.</p>
             <button
               type="button"
+              disabled={semAcesso}
               onClick={(evento) => {
                 evento.currentTarget.focus();
+                setCodigoConfirmacao(codigoAtual);
                 setOperacao('renovar');
               }}
             >
@@ -240,8 +262,10 @@ export function CompartilharProposta({
             {ativo && (
               <button
                 type="button"
+                disabled={semAcesso}
                 onClick={(evento) => {
                   evento.currentTarget.focus();
+                  setCodigoConfirmacao(codigoAtual);
                   setOperacao('desativar');
                 }}
               >
@@ -288,7 +312,11 @@ export function CompartilharProposta({
             <Button variant="secondary" onClick={() => setOperacao(null)} disabled={pendente}>
               Cancelar
             </Button>
-            <Button form={`link-proposta-${propostaId}`} type="submit" disabled={pendente}>
+            <Button
+              form={`link-proposta-${propostaId}`}
+              type="submit"
+              disabled={pendente || linkMudou || semAcesso}
+            >
               {pendente
                 ? 'Salvando…'
                 : operacao === 'desativar'
@@ -300,9 +328,14 @@ export function CompartilharProposta({
       >
         <form id={`link-proposta-${propostaId}`} action={enviar}>
           <input type="hidden" name="id" value={propostaId} />
-          <input type="hidden" name="codigoAtual" value={codigoAtual} />
+          <input type="hidden" name="codigoAtual" value={codigoConfirmacao} />
           <input type="hidden" name="operacao" value={operacao ?? ''} />
           <p>Quem já recebeu ou baixou a proposta continuará com essa cópia.</p>
+          {linkMudou && (
+            <p role="alert">
+              O link mudou em outra aba. Feche esta confirmação e confira o novo endereço.
+            </p>
+          )}
           {estado.erro && <p role="alert">{estado.erro}</p>}
         </form>
       </ModalOperacao>
