@@ -2,21 +2,28 @@
 
 import { useActionState, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Check, Download, Eye, FileCheck2, Pencil, Save, Video } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  Download,
+  Eye,
+  FileCheck2,
+  Pencil,
+  Save,
+  Video,
+} from 'lucide-react';
 import { Spinner } from '@/design-system/via';
 import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
-import {
-  PROXIMA_ACAO_STATUS,
-  ROTULO_ACAO_STATUS,
-  ROTULO_STATUS_PROPOSTA,
-} from '@/lib/propostas/status';
+import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import { PreviewProposta } from './PreviewProposta';
 import { SecoesContextoEntrega } from './SecoesContextoEntrega';
 import { SecoesPrazoDecisao } from './SecoesPrazoDecisao';
 import { AcaoEntrega } from './AcaoEntrega';
+import { AcoesStatusProposta } from './AcoesStatusProposta';
 import { CompartilharProposta } from './CompartilharProposta';
 import { usePreviaProposta } from './usePreviaProposta';
 import styles from './EditorProposta.module.css';
@@ -92,7 +99,9 @@ export function EditorProposta({
     estadoStatus.compartilhamentoCodigo ?? compartilhamentoInicial.codigo;
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const sujo = JSON.stringify([titulo, json]) !== conteudoSalvo;
-  const proximoStatus = PROXIMA_ACAO_STATUS[status];
+  const acompanhar = Boolean(
+    compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status),
+  );
   const descricaoEstado = sujo
     ? 'Salve as alterações antes de avançar ou baixar o PDF.'
     : status === 'pronta'
@@ -110,6 +119,39 @@ export function EditorProposta({
   function mudar(mutacao: (atual: DocumentoProposta) => DocumentoProposta) {
     setDocumento((atual) => mutacao(atual));
   }
+
+  const continuidadeEntrega = status === 'aceita' && !sujo && (
+    <section
+      className={styles.continuidadeEntrega}
+      data-integrada={acompanhar || undefined}
+      aria-label="Próximo passo da proposta aceita"
+    >
+      {!acompanhar && (
+        <span className={styles.iconeAceite}>
+          <Check size={20} aria-hidden="true" />
+        </span>
+      )}
+      <div>
+        <strong>{acompanhar ? 'Próximo passo' : 'Proposta aceita'}</strong>
+        <p>
+          {execucaoId
+            ? 'Continue com o escopo aprovado.'
+            : 'Prepare o espaço de trabalho deste cliente.'}
+        </p>
+      </div>
+      <AcaoEntrega propostaId={id} execucaoId={execucaoId} />
+    </section>
+  );
+
+  const formularioStatus = (
+    <AcoesStatusProposta
+      id={id}
+      status={status}
+      acao={acaoStatus}
+      bloqueado={sujo || salvando}
+      pendente={atualizandoStatus}
+    />
+  );
 
   return (
     <div className={styles.pagina}>
@@ -171,24 +213,36 @@ export function EditorProposta({
         </div>
       </header>
 
-      {status === 'aceita' && !sujo && (
-        <section
-          className={styles.continuidadeEntrega}
-          aria-label="Próximo passo da proposta aceita"
-        >
-          <span className={styles.iconeAceite}>
-            <Check size={20} aria-hidden="true" />
-          </span>
-          <div>
-            <strong>Proposta aceita</strong>
-            <p>
-              {execucaoId
-                ? 'Continue a implementação com o escopo aprovado.'
-                : 'Prepare o espaço de trabalho deste cliente.'}
-            </p>
-          </div>
-          <AcaoEntrega propostaId={id} execucaoId={execucaoId} />
-        </section>
+      {acompanhar && compartilhamentoCodigo ? (
+        <CompartilharProposta
+          key={`${compartilhamentoCodigo}:${status}`}
+          propostaId={id}
+          codigo={compartilhamentoCodigo}
+          siteUrl={siteUrl}
+          empresa={documento.cliente.empresa}
+          email={documento.cliente.email}
+          projeto={documento.projeto.titulo}
+          status={status}
+          alteracoesPendentes={sujo || salvando}
+          compartilhamento={{
+            ...compartilhamentoInicial,
+            ativo: estadoStatus.compartilhamentoCodigo ? true : compartilhamentoInicial.ativo,
+          }}
+          acoes={
+            <>
+              {continuidadeEntrega}
+              <details className={styles.respostaManual}>
+                <summary>
+                  {status === 'apresentada' ? 'Registrar resposta' : 'Outras opções'}{' '}
+                  <ChevronDown size={16} aria-hidden="true" />
+                </summary>
+                {formularioStatus}
+              </details>
+            </>
+          }
+        />
+      ) : (
+        continuidadeEntrega
       )}
 
       {(estadoSalvar.erro || estadoStatus.erro) && (
@@ -294,87 +348,20 @@ export function EditorProposta({
             setValor={setValor}
           />
 
-          <section className={styles.decisao}>
-            <div className={styles.estadoDocumento}>
-              <FileCheck2 size={21} strokeWidth={1.7} aria-hidden="true" />
-              <div>
-                <p className={styles.sobretitulo}>Estado do documento</p>
-                <h2>{ROTULO_STATUS_PROPOSTA[status]}</h2>
-                <p>{descricaoEstado}</p>
+          {!acompanhar && (
+            <section className={styles.decisao}>
+              <div className={styles.estadoDocumento}>
+                <FileCheck2 size={21} strokeWidth={1.7} aria-hidden="true" />
+                <div>
+                  <p className={styles.sobretitulo}>Estado do documento</p>
+                  <h2>{ROTULO_STATUS_PROPOSTA[status]}</h2>
+                  <p>{descricaoEstado}</p>
+                </div>
               </div>
-            </div>
 
-            <div className={styles.controlesDecisao}>
-              {compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status) && (
-                <CompartilharProposta
-                  key={`${compartilhamentoCodigo}:${status}`}
-                  propostaId={id}
-                  codigo={compartilhamentoCodigo}
-                  siteUrl={siteUrl}
-                  empresa={documento.cliente.empresa}
-                  email={documento.cliente.email}
-                  projeto={documento.projeto.titulo}
-                  status={status}
-                  compartilhamento={{
-                    ...compartilhamentoInicial,
-                    ativo: estadoStatus.compartilhamentoCodigo
-                      ? true
-                      : compartilhamentoInicial.ativo,
-                  }}
-                />
-              )}
-              <form action={acaoStatus} className={styles.acoesStatus}>
-                <input type="hidden" name="id" value={id} />
-                {proximoStatus && (
-                  <button
-                    type="submit"
-                    name="status"
-                    value={proximoStatus}
-                    disabled={sujo || salvando || atualizandoStatus}
-                    className={styles.avancar}
-                  >
-                    {ROTULO_ACAO_STATUS[status]}
-                  </button>
-                )}
-                {status === 'apresentada' && (
-                  <>
-                    <p className={styles.automacaoEntrega}>
-                      O escopo aprovado vira seu roteiro de implementação.
-                    </p>
-                    <button
-                      type="submit"
-                      name="status"
-                      value="aceita"
-                      disabled={sujo || salvando || atualizandoStatus}
-                      className={styles.avancar}
-                    >
-                      Confirmar venda e abrir entrega
-                    </button>
-                    <button
-                      type="submit"
-                      name="status"
-                      value="recusada"
-                      disabled={sujo || salvando || atualizandoStatus}
-                      className={styles.secundario}
-                    >
-                      Registrar como não aprovada
-                    </button>
-                  </>
-                )}
-                {(status === 'aceita' || status === 'recusada') && (
-                  <button
-                    type="submit"
-                    name="status"
-                    value="rascunho"
-                    disabled={sujo || salvando || atualizandoStatus}
-                    className={styles.secundario}
-                  >
-                    Criar nova versão
-                  </button>
-                )}
-              </form>
-            </div>
-          </section>
+              <div className={styles.controlesDecisao}>{formularioStatus}</div>
+            </section>
+          )}
         </section>
 
         <aside
