@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { DocumentoProposta } from '@/lib/propostas/schema';
@@ -6,8 +6,11 @@ import type { StatusProposta } from '@/lib/propostas/queries';
 import { salvarProposta, mudarStatusProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import { EditorProposta } from './EditorProposta';
 import { PreviewProposta } from './PreviewProposta';
+import { listarRascunhosProposta } from '@/lib/propostas/rascunho-local';
+const donoRascunho = '77777777-7777-4777-8777-777777777777';
 
 vi.mock('server-only', () => ({}));
+HTMLElement.prototype.scrollIntoView = vi.fn();
 
 vi.mock('@/lib/propostas/actions', () => ({
   salvarProposta: vi.fn(() => Promise.resolve({ sucesso: 'Proposta salva.' })),
@@ -20,6 +23,7 @@ vi.mock('@/lib/projetos-execucao/actions', () => ({
 
 afterEach(() => {
   cleanup();
+  localStorage.clear();
   vi.clearAllMocks();
 });
 
@@ -83,9 +87,14 @@ describe('PreviewProposta', () => {
   });
 });
 
-function montarEditor(alteracaoInicial = false, statusInicial: StatusProposta = 'rascunho') {
+function montarEditor(
+  alteracaoInicial = false,
+  statusInicial: StatusProposta = 'rascunho',
+  rascunhoDono?: string,
+) {
   render(
     <EditorProposta
+      rascunhoDono={rascunhoDono}
       referenciaEm="2026-09-06T02:30:00.000Z"
       id="11111111-1111-4111-8111-111111111111"
       tituloInicial="Plano comercial da Clínica Aurora"
@@ -260,7 +269,7 @@ describe('EditorProposta', () => {
       concluir = resolve;
     });
     vi.mocked(salvarProposta).mockReturnValueOnce(salvamento);
-    const preview = montarEditor();
+    const preview = montarEditor(false, 'rascunho', donoRascunho);
     alterar('Nome da proposta', 'Versão enviada para salvar');
     await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
     expect(screen.getAllByRole('button', { name: 'Salvando' })[0]).toBeDisabled();
@@ -278,22 +287,33 @@ describe('EditorProposta', () => {
     expect(preview.getByText('Alterações não salvas')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
     expect(screen.queryByRole('link', { name: 'PDF' })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(listarRascunhosProposta(donoRascunho)[0]?.titulo).toBe(
+        'Alteração feita durante a espera',
+      ),
+    );
 
     await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
     expect(preview.getByText('Versão salva')).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: 'PDF' })).toBeInTheDocument();
+    await waitFor(() => expect(listarRascunhosProposta(donoRascunho)).toHaveLength(0));
   });
 
   it('preserva a edição após erro e permite tentar salvar novamente', async () => {
     vi.mocked(salvarProposta).mockResolvedValueOnce({ erro: 'Não foi possível salvar agora.' });
     const user = userEvent.setup();
-    const preview = montarEditor();
+    const preview = montarEditor(false, 'rascunho', donoRascunho);
     alterar('Empresa', 'Aurora revisada');
     await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
     expect(await screen.findByText('Não foi possível salvar agora.')).toBeInTheDocument();
     expect(preview.getByText('Aurora revisada')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
     expect(preview.getByText('Alterações não salvas')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(listarRascunhosProposta(donoRascunho)[0]?.documento.cliente.empresa).toBe(
+        'Aurora revisada',
+      ),
+    );
   });
 
   it('reconhece quando uma alteração é desfeita e quando há dados iniciais pendentes', () => {

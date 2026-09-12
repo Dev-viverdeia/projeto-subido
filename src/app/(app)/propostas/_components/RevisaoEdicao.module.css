@@ -73,6 +73,26 @@
   color: var(--via-text-muted);
   font-size: var(--app-fs-support);
 }
+.seletor {
+  display: grid;
+  gap: var(--via-space-2);
+  font-size: var(--app-fs-support);
+  color: var(--via-text-primary);
+}
+.seletor select {
+  min-height: 44px;
+  max-width: 100%;
+  padding: var(--via-space-2);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-white);
+  color: var(--via-text-primary);
+  font: inherit;
+}
+.seletor select:focus-visible {
+  outline: none;
+  box-shadow: var(--app-ring);
+}
 .orientacao {
   margin-block: var(--via-space-4);
   max-width: 65ch;

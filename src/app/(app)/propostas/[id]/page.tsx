@@ -6,6 +6,7 @@ import { env } from '@/lib/env';
 import { obterPerfilComercial } from '@/lib/perfil-comercial/queries';
 import { completarDocumentoComPerfil } from '@/lib/propostas/perfil';
 import { EditorProposta } from '../_components/EditorProposta';
+import { createClient } from '@/lib/supabase/server';
 
 export async function generateMetadata({
   params,
@@ -28,12 +29,15 @@ export default async function PropostaPage({ params }: PageProps<'/propostas/[id
     JSON.stringify(documentoCompleto) !== JSON.stringify(proposta.documento);
   // Servidor e navegador usam a mesma referência, inclusive na virada do dia.
   const referenciaEm = new Date().toISOString();
+  const supabase = await createClient();
+  const { data: sessao } = await supabase.auth.getClaims();
 
   return (
     <EditorProposta
       key={proposta.id}
       referenciaEm={referenciaEm}
       id={proposta.id}
+      rascunhoDono={sessao?.claims.sub}
       tituloInicial={proposta.titulo}
       documentoInicial={documentoCompleto}
       alteracaoInicial={identidadePendente}

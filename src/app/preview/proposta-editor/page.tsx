@@ -107,6 +107,7 @@ export default async function PreviewEditorPropostaPage({
 
       <main id="conteudo" className={styles.conteudo}>
         <EditorProposta
+          rascunhoDono="77777777-7777-4777-8777-777777777777"
           sincronizar={parametros.sincronizar === 'sim'}
           referenciaEm="2026-09-06T02:30:00.000Z"
           id="11111111-1111-4111-8111-111111111111"

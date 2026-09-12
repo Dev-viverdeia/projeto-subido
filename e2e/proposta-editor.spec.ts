@@ -30,28 +30,36 @@ test('edição começa compacta e mantém o investimento antes do escopo', async
   await page.screenshot({ path: testInfo.outputPath('editor-inicial.png') });
 });
 
-test('cada atalho da prévia abre o trecho correto e devolve o foco', async ({ page, isMobile }) => {
-  await page.goto('/preview/proposta-editor?estado=rascunho');
-  const trechos = [
-    ['cliente', 'Empresa'],
-    ['desafio e objetivo', 'Desafio identificado'],
-    ['solução', 'Resumo da solução'],
-    ['escopo', 'Título da etapa 1'],
-    ['entregáveis', 'Entregável 1'],
-    ['cronograma', 'Fase 1'],
-    ['investimento', 'Valor do projeto (R$)'],
-    ['próximos passos', 'Próximo passo 1'],
-  ];
-  for (const [trecho, campo] of trechos) {
-    if (isMobile) await page.getByRole('button', { name: 'Ver prévia', exact: true }).click();
-    await page.getByRole('button', { name: `Editar ${trecho} na proposta`, exact: true }).click();
-    await expect(page.getByRole('textbox', { name: campo, exact: true })).toBeFocused();
-    await expect(page.getByRole('textbox', { name: campo, exact: true })).toBeInViewport();
-    await expect(
-      page.getByRole('region', { name: 'Editar proposta', exact: true }).locator('details[open]'),
-    ).toHaveCount(1);
-  }
-});
+const trechos = [
+  ['cliente', 'Empresa'],
+  ['desafio e objetivo', 'Desafio identificado'],
+  ['solução', 'Resumo da solução'],
+  ['escopo', 'Título da etapa 1'],
+  ['entregáveis', 'Entregável 1'],
+  ['cronograma', 'Fase 1'],
+  ['investimento', 'Valor do projeto (R$)'],
+  ['próximos passos', 'Próximo passo 1'],
+];
+
+// Cada destino é um cenário independente. Mantém todas as verificações e a troca
+// de seção, sem somar oito jornadas ao mesmo limite total de 30 s no WebKit do CI.
+for (const [indice, [trecho, campo]] of trechos.entries()) {
+  test(`atalho de ${trecho} abre o campo correto e devolve o foco`, async ({ page, isMobile }) => {
+    await page.goto('/preview/proposta-editor?estado=rascunho');
+    const anterior = trechos[(indice + trechos.length - 1) % trechos.length];
+    for (const [destino, nomeCampo] of [anterior, [trecho, campo]]) {
+      if (isMobile) await page.getByRole('button', { name: 'Ver prévia', exact: true }).click();
+      await page
+        .getByRole('button', { name: `Editar ${destino} na proposta`, exact: true })
+        .click();
+      await expect(page.getByRole('textbox', { name: nomeCampo, exact: true })).toBeFocused();
+      await expect(page.getByRole('textbox', { name: nomeCampo, exact: true })).toBeInViewport();
+      await expect(
+        page.getByRole('region', { name: 'Editar proposta', exact: true }).locator('details[open]'),
+      ).toHaveCount(1);
+    }
+  });
+}
 
 test('valor, condições e validade aparecem ao digitar, sem salvar nem perder a edição', async ({
   page,
