@@ -1,12 +1,13 @@
 'use client';
 
 import { useRef } from 'react';
-import { ChevronDown, FileDiff } from 'lucide-react';
+import { FileDiff } from 'lucide-react';
 import { Spinner } from '@/design-system/via';
 import { compararEdicoes, type ConteudoEdicao } from '@/lib/propostas/edicao';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import type { useEdicaoSegura } from './useEdicaoSegura';
+import { ComparacaoConteudo } from './ComparacaoConteudo';
 import styles from './RevisaoEdicao.module.css';
 
 export function RevisaoEdicao({
@@ -131,26 +132,7 @@ export function RevisaoEdicao({
                     : ''}
                   .
                 </p>
-                <div className={styles.diferencas}>
-                  {diferencas.map((item, indice) => (
-                    <details key={item.rotulo} open={indice === 0}>
-                      <summary>
-                        {item.rotulo}
-                        <ChevronDown size={17} aria-hidden="true" />
-                      </summary>
-                      <div className={styles.comparacao}>
-                        <div>
-                          <h3>Sua edição</h3>
-                          <p>{item.local || 'Não preenchido'}</p>
-                        </div>
-                        <div>
-                          <h3>Versão salva</h3>
-                          <p>{item.salva || 'Não preenchido'}</p>
-                        </div>
-                      </div>
-                    </details>
-                  ))}
-                </div>
+                <ComparacaoConteudo local={local} salva={remota} />
               </>
             )}
           </>

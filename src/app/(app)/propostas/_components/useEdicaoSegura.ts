@@ -153,5 +153,14 @@ export function useEdicaoSegura(
     tentar: () => {
       void consultar();
     },
+    recuperarBase: (anterior: EdicaoProposta) => {
+      interromper();
+      const atual = remota ?? base;
+      const mudou = !mesmoConteudo(anterior, atual);
+      setBase(mudou ? anterior : atual);
+      setRemota(mudou ? atual : null);
+      setErro(null);
+      setAberto(false);
+    },
   };
 }

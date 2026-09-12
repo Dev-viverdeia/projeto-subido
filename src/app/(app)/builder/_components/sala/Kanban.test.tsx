@@ -104,9 +104,9 @@ describe('Tarefa em foco no Estúdio', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Concluir tarefa' }));
     expect(screen.getByRole('heading', { name: 'Construir o fluxo' })).toBeVisible();
     expect(gravar).toHaveBeenLastCalledWith('2', 'feito');
-    await userEvent.click(screen.getByRole('button', { name: 'Reabrir tarefa' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Reabrir tarefa' }));
     expect(gravar).toHaveBeenLastCalledWith('2', 'fazendo');
-    expect(screen.getByRole('button', { name: 'Concluir tarefa' })).toBeEnabled();
+    expect(await screen.findByRole('button', { name: 'Concluir tarefa' })).toBeEnabled();
   });
 
   it('conclusão do plano não é apresentada como aceite do cliente', () => {

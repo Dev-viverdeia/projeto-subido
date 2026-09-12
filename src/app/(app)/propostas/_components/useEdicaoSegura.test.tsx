@@ -20,6 +20,19 @@ const montar = () =>
     initialProps: { versao: 2 },
   });
 
+it('recuperação antiga exige comparar antes de salvar; status sozinho mantém a versão atual', () => {
+  const atual = { ...base, titulo: 'Documento mais recente', versao: 4 };
+  const { result } = renderHook(() => useEdicaoSegura(atual, 4, aplicar, preservar));
+  act(() => result.current.recuperarBase(base));
+  expect(result.current.base.versao).toBe(2);
+  expect(result.current.remota).toEqual(atual);
+  expect(result.current.bloqueado).toBe(true);
+  expect(aplicar).not.toHaveBeenCalled();
+  act(() => result.current.recuperarBase({ ...atual, status: 'pronta', versao: 3 }));
+  expect(result.current.base.versao).toBe(4);
+  expect(result.current.bloqueado).toBe(false);
+});
+
 it('não busca documento sem nova versão; status sozinho atualiza a base sem aplicar conteúdo', async () => {
   fetchMock.mockResolvedValue(resposta({ ...base, versao: 3, status: 'aceita' }));
   const { result, rerender } = montar();

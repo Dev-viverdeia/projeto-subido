@@ -1,20 +1,24 @@
 'use client';
 
-import { useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 export function usePreviaProposta() {
   const editorRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLElement>(null);
   const secaoPreviewRef = useRef('cliente');
   const campoEmFocoRef = useRef<HTMLElement | null>(null);
+  const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
+  const [destino, setDestino] = useState<{ painel: 'editar' | 'preview'; secao?: string } | null>(
+    null,
+  );
 
   function voltarParaEdicao() {
-    requestAnimationFrame(() => {
-      const campo = campoEmFocoRef.current;
-      if (!campo || !campo.isConnected) return;
-      campo.scrollIntoView({ block: 'center', behavior: 'instant' });
-      campo.focus({ preventScroll: true });
-    });
+    setPainelAtivo('editar');
+    setDestino({ painel: 'editar' });
+  }
+  function verPrevia() {
+    setPainelAtivo('preview');
+    setDestino({ painel: 'preview' });
   }
 
   function mostrarSecaoPreview(secao: string, forcar = false) {
@@ -43,18 +47,28 @@ export function usePreviaProposta() {
   }
 
   function editarSecao(secao: string) {
-    requestAnimationFrame(() => {
-      const campo = editorRef.current?.querySelector<HTMLElement>(
-        `[data-campo-preview="${secao}"]`,
-      );
-      if (!campo) return;
-      const bloco = campo.closest('details');
-      if (bloco) bloco.open = true;
-      campoEmFocoRef.current = campo;
-      campo.scrollIntoView({ block: 'center', behavior: 'instant' });
-      campo.focus({ preventScroll: true });
-    });
+    setPainelAtivo('editar');
+    setDestino({ painel: 'editar', secao });
   }
+
+  // O foco só muda depois que React tornou o painel visível. Um rAF pode executar
+  // antes desse commit, sobretudo no WebKit, e tentar focar um campo oculto.
+  useLayoutEffect(() => {
+    if (!destino) return;
+    if (destino.painel === 'preview') {
+      mostrarSecaoPreview(secaoPreviewRef.current, true);
+      return;
+    }
+    const campo = destino.secao
+      ? editorRef.current?.querySelector<HTMLElement>(`[data-campo-preview="${destino.secao}"]`)
+      : campoEmFocoRef.current;
+    if (!campo?.isConnected) return;
+    const bloco = campo.closest('details');
+    if (bloco) bloco.open = true;
+    campoEmFocoRef.current = campo;
+    campo.scrollIntoView({ block: 'center', behavior: 'instant' });
+    campo.focus({ preventScroll: true });
+  }, [destino]);
 
   return {
     editorRef,
@@ -64,5 +78,7 @@ export function usePreviaProposta() {
     mostrarSecaoPreview,
     voltarParaEdicao,
     editarSecao,
+    painelAtivo,
+    verPrevia,
   };
 }

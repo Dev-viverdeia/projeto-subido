@@ -2,16 +2,7 @@
 
 import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  Check,
-  ChevronDown,
-  Download,
-  Eye,
-  FileCheck2,
-  Pencil,
-  Video,
-} from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Download, FileCheck2, Video } from 'lucide-react';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
@@ -30,6 +21,9 @@ import { usePosicaoEdicao } from './usePosicaoEdicao';
 import { useEdicaoSegura } from './useEdicaoSegura';
 import { RevisaoEdicao } from './RevisaoEdicao';
 import { SalvarEdicao } from './SalvarEdicao';
+import { useRascunhoProposta } from './useRascunhoProposta';
+import { RecuperarRascunho } from './RecuperarRascunho';
+import { ModosEdicao } from './ModosEdicao';
 import type { EdicaoProposta } from '@/lib/propostas/edicao';
 import styles from './EditorProposta.module.css';
 
@@ -51,6 +45,7 @@ export function EditorProposta({
   referenciaEm,
   alteracaoInicial = false,
   sincronizar = true,
+  rascunhoDono,
 }: {
   id: string;
   tituloInicial: string;
@@ -65,6 +60,7 @@ export function EditorProposta({
   referenciaEm: string;
   alteracaoInicial?: boolean;
   sincronizar?: boolean;
+  rascunhoDono?: string;
 }) {
   const pronto = useSyncExternalStore(assinarProntidao, editorPronto, editorNoServidor);
   const [titulo, setTitulo] = useState(tituloInicial);
@@ -78,13 +74,13 @@ export function EditorProposta({
   const {
     editorRef,
     previewRef,
-    secaoPreviewRef,
     campoEmFocoRef,
     mostrarSecaoPreview,
     voltarParaEdicao,
     editarSecao,
+    painelAtivo,
+    verPrevia,
   } = usePreviaProposta();
-  const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
   const preservarPosicao = usePosicaoEdicao(editorRef);
   const acompanhamento = useAcompanhamentoProposta(
     {
@@ -103,12 +99,9 @@ export function EditorProposta({
       setDocumento(edicao.documento);
       setValor(centavosParaCampo(edicao.documento.investimento.valorCentavos));
       setConteudoSalvo(JSON.stringify([edicao.titulo, JSON.stringify(edicao.documento)]));
-      setPainelAtivo('editar');
-      requestAnimationFrame(() =>
-        editorRef.current?.querySelector<HTMLTextAreaElement>('#titulo-proposta')?.focus(),
-      );
+      editarSecao('titulo');
     },
-    [editorRef],
+    [editarSecao],
   );
   const edicao = useEdicaoSegura(
     {
@@ -130,6 +123,12 @@ export function EditorProposta({
   const semAcesso = acompanhamento.falha === 'sessao' || acompanhamento.falha === 'acesso';
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const sujo = JSON.stringify([titulo, json]) !== conteudoSalvo;
+  const rascunho = useRascunhoProposta(
+    rascunhoDono,
+    edicao.base,
+    { titulo, documento, valor },
+    sujo,
+  );
   const salvamento = {
     id,
     versao: edicao.base.versao,
@@ -138,7 +137,7 @@ export function EditorProposta({
     acao: acaoSalvar,
     salvando,
     sujo,
-    bloqueado: atualizandoStatus || !pronto || semAcesso || edicao.bloqueado,
+    bloqueado: atualizandoStatus || !pronto || semAcesso || edicao.bloqueado || rascunho.bloqueado,
   };
   const acompanhar = Boolean(
     compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status),
@@ -190,7 +189,7 @@ export function EditorProposta({
       versao={edicao.base.versao}
       status={status}
       acao={acaoStatus}
-      bloqueado={sujo || salvando || !pronto || semAcesso || edicao.bloqueado}
+      bloqueado={sujo || salvando || !pronto || semAcesso || edicao.bloqueado || rascunho.bloqueado}
       pendente={atualizandoStatus}
     />
   );
@@ -239,12 +238,25 @@ export function EditorProposta({
         </div>
       </header>
 
+      <RecuperarRascunho
+        focarEditor={() => editarSecao('titulo')}
+        rascunho={rascunho}
+        local={{ titulo, documento }}
+        ocupado={salvando || atualizandoStatus || edicao.aberto}
+        recuperar={(r) => {
+          setTitulo(r.titulo);
+          setDocumento(r.documento);
+          setValor(r.valor);
+          edicao.recuperarBase(r.base);
+          editarSecao('titulo');
+        }}
+      />
       <RevisaoEdicao
         edicao={edicao}
         local={{ titulo, documento }}
         salvar={acaoSalvar}
         salvando={salvando || atualizandoStatus}
-        semAcesso={semAcesso}
+        semAcesso={semAcesso || rascunho.bloqueado}
       />
 
       {acompanhar && compartilhamentoCodigo ? (
@@ -296,33 +308,13 @@ export function EditorProposta({
         />
       )}
 
-      <div className={styles.modos}>
-        <div className={styles.abasModo} role="group" aria-label="Área de trabalho da proposta">
-          <button
-            type="button"
-            aria-pressed={painelAtivo === 'editar'}
-            onClick={() => {
-              setPainelAtivo('editar');
-              voltarParaEdicao();
-            }}
-          >
-            <Pencil size={15} strokeWidth={1.8} aria-hidden="true" />
-            Editar
-          </button>
-          <button
-            type="button"
-            aria-pressed={painelAtivo === 'preview'}
-            onClick={() => {
-              setPainelAtivo('preview');
-              requestAnimationFrame(() => mostrarSecaoPreview(secaoPreviewRef.current, true));
-            }}
-          >
-            <Eye size={16} strokeWidth={1.8} aria-hidden="true" />
-            Ver prévia
-          </button>
-        </div>
-        <SalvarEdicao {...salvamento} mobile />
-      </div>
+      <ModosEdicao
+        painel={painelAtivo}
+        pronto={pronto}
+        editar={voltarParaEdicao}
+        verPrevia={verPrevia}
+        salvar={<SalvarEdicao {...salvamento} mobile />}
+      />
 
       <div className={styles.grade}>
         <section
@@ -352,6 +344,7 @@ export function EditorProposta({
               </label>
               <textarea
                 id="titulo-proposta"
+                data-campo-preview="titulo"
                 data-previa="cliente"
                 className={styles.tituloDocumento}
                 value={titulo}
@@ -396,10 +389,7 @@ export function EditorProposta({
           data-painel-ativo={painelAtivo === 'preview' || undefined}
         >
           <PreviewProposta
-            onEditar={(secao) => {
-              setPainelAtivo('editar');
-              editarSecao(secao);
-            }}
+            onEditar={pronto ? editarSecao : undefined}
             referenciaEm={referenciaEm}
             documento={documento}
             titulo={titulo}
