@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import type { AcompanhamentoProposta } from '../src/lib/propostas/acompanhamento';
+import { EdicaoPropostaSchema } from '../src/lib/propostas/edicao';
 
 const BASE: AcompanhamentoProposta = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -36,6 +37,17 @@ async function abrir(
   await page.clock.install();
   await page.goto('/preview/proposta-editor?estado=sem-visualizacoes&sincronizar=sim');
   await expect(page.getByLabel('Nome da proposta')).toBeEditable();
+  const edicao = EdicaoPropostaSchema.parse({
+    id: BASE.id,
+    titulo: await page.getByLabel('Nome da proposta').inputValue(),
+    documento: JSON.parse(await page.locator('input[name="documento"]').first().inputValue()),
+    versao: 2,
+    status: 'apresentada',
+  });
+  await page.route('**/api/propostas/*/edicao', async (route) => {
+    const { dados = BASE } = resposta();
+    await route.fulfill({ json: { ...edicao, versao: dados.versao, status: dados.status } });
+  });
   return escritas;
 }
 

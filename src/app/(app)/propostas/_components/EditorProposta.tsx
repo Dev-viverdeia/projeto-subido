@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -10,10 +10,8 @@ import {
   Eye,
   FileCheck2,
   Pencil,
-  Save,
   Video,
 } from 'lucide-react';
-import { Spinner } from '@/design-system/via';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
@@ -29,6 +27,10 @@ import { useAcompanhamentoProposta } from './useAcompanhamentoProposta';
 import { AtualizacaoProposta } from './AtualizacaoProposta';
 import { useOperacoesProposta } from './useOperacoesProposta';
 import { usePosicaoEdicao } from './usePosicaoEdicao';
+import { useEdicaoSegura } from './useEdicaoSegura';
+import { RevisaoEdicao } from './RevisaoEdicao';
+import { SalvarEdicao } from './SalvarEdicao';
+import type { EdicaoProposta } from '@/lib/propostas/edicao';
 import styles from './EditorProposta.module.css';
 
 const assinarProntidao = () => () => undefined;
@@ -95,14 +97,49 @@ export function EditorProposta({
     sincronizar,
     preservarPosicao,
   );
+  const aplicarEdicao = useCallback(
+    (edicao: EdicaoProposta) => {
+      setTitulo(edicao.titulo);
+      setDocumento(edicao.documento);
+      setValor(centavosParaCampo(edicao.documento.investimento.valorCentavos));
+      setConteudoSalvo(JSON.stringify([edicao.titulo, JSON.stringify(edicao.documento)]));
+      setPainelAtivo('editar');
+      requestAnimationFrame(() =>
+        editorRef.current?.querySelector<HTMLTextAreaElement>('#titulo-proposta')?.focus(),
+      );
+    },
+    [editorRef],
+  );
+  const edicao = useEdicaoSegura(
+    {
+      id,
+      titulo: tituloInicial,
+      documento: documentoInicial,
+      versao: versaoInicial,
+      status: statusInicial,
+    },
+    acompanhamento.dados.versao,
+    aplicarEdicao,
+    preservarPosicao,
+  );
   const { estadoSalvar, acaoSalvar, salvando, estadoStatus, acaoStatus, atualizandoStatus } =
-    useOperacoesProposta(acompanhamento, setConteudoSalvo);
+    useOperacoesProposta(acompanhamento, setConteudoSalvo, edicao);
 
   const { status, versao, execucaoId, compartilhamento } = acompanhamento.dados;
   const compartilhamentoCodigo = compartilhamento.codigo;
   const semAcesso = acompanhamento.falha === 'sessao' || acompanhamento.falha === 'acesso';
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const sujo = JSON.stringify([titulo, json]) !== conteudoSalvo;
+  const salvamento = {
+    id,
+    versao: edicao.base.versao,
+    titulo,
+    documento: json,
+    acao: acaoSalvar,
+    salvando,
+    sujo,
+    bloqueado: atualizandoStatus || !pronto || semAcesso || edicao.bloqueado,
+  };
   const acompanhar = Boolean(
     compartilhamentoCodigo && ['apresentada', 'aceita', 'recusada'].includes(status),
   );
@@ -150,9 +187,10 @@ export function EditorProposta({
   const formularioStatus = (
     <AcoesStatusProposta
       id={id}
+      versao={edicao.base.versao}
       status={status}
       acao={acaoStatus}
-      bloqueado={sujo || salvando || !pronto || semAcesso}
+      bloqueado={sujo || salvando || !pronto || semAcesso || edicao.bloqueado}
       pendente={atualizandoStatus}
     />
   );
@@ -188,7 +226,7 @@ export function EditorProposta({
           <Link href={`/vendas/${oportunidadeId}`} className={styles.secundario}>
             Abrir ficha
           </Link>
-          {sujo || salvando ? (
+          {sujo || salvando || edicao.bloqueado ? (
             <span className={styles.downloadInativo} title="Salve antes de baixar">
               <Download size={15} aria-hidden="true" /> PDF
             </span>
@@ -197,29 +235,17 @@ export function EditorProposta({
               <Download size={15} aria-hidden="true" /> PDF
             </a>
           )}
-          <form action={acaoSalvar}>
-            <input type="hidden" name="id" value={id} />
-            <input type="hidden" name="titulo" value={titulo} />
-            <input type="hidden" name="documento" value={json} />
-            <button
-              type="submit"
-              className={styles.salvar}
-              disabled={salvando || !sujo || !pronto || semAcesso}
-            >
-              {salvando ? (
-                <span aria-hidden="true">
-                  <Spinner size="sm" tone="inverse" />
-                </span>
-              ) : !sujo ? (
-                <Check size={15} aria-hidden="true" />
-              ) : (
-                <Save size={15} aria-hidden="true" />
-              )}
-              {salvando ? 'Salvando' : sujo ? 'Salvar alterações' : 'Salvo'}
-            </button>
-          </form>
+          <SalvarEdicao {...salvamento} />
         </div>
       </header>
+
+      <RevisaoEdicao
+        edicao={edicao}
+        local={{ titulo, documento }}
+        salvar={acaoSalvar}
+        salvando={salvando || atualizandoStatus}
+        semAcesso={semAcesso}
+      />
 
       {acompanhar && compartilhamentoCodigo ? (
         <CompartilharProposta
@@ -230,7 +256,7 @@ export function EditorProposta({
           email={documento.cliente.email}
           projeto={documento.projeto.titulo}
           status={status}
-          alteracoesPendentes={sujo || salvando}
+          alteracoesPendentes={sujo || salvando || edicao.bloqueado}
           semAcesso={semAcesso}
           compartilhamento={compartilhamento}
           aoIniciarAlteracao={acompanhamento.iniciarAlteracao}
@@ -256,14 +282,14 @@ export function EditorProposta({
         </>
       )}
 
-      {(estadoSalvar.erro || estadoStatus.erro) && (
+      {(estadoSalvar.erro || estadoStatus.erro) && !edicao.aberto && !edicao.bloqueado && (
         <RetornoOperacao
           tom="erro"
           titulo="A proposta não foi atualizada"
           descricao={estadoSalvar.erro ?? estadoStatus.erro}
         />
       )}
-      {(estadoSalvar.sucesso || estadoStatus.sucesso) && !sujo && (
+      {(estadoSalvar.sucesso || estadoStatus.sucesso) && !sujo && !edicao.bloqueado && (
         <RetornoOperacao
           tom="sucesso"
           titulo={estadoSalvar.sucesso ?? estadoStatus.sucesso ?? 'Proposta atualizada'}
@@ -295,27 +321,7 @@ export function EditorProposta({
             Ver prévia
           </button>
         </div>
-        <form action={acaoSalvar} className={styles.salvarMobile}>
-          <input type="hidden" name="id" value={id} />
-          <input type="hidden" name="titulo" value={titulo} />
-          <input type="hidden" name="documento" value={json} />
-          <button
-            type="submit"
-            disabled={salvando || !sujo || !pronto || semAcesso}
-            aria-live="polite"
-          >
-            {salvando ? (
-              <span aria-hidden="true">
-                <Spinner size="sm" tone="inverse" />
-              </span>
-            ) : !sujo ? (
-              <Check size={15} aria-hidden="true" />
-            ) : (
-              <Save size={15} aria-hidden="true" />
-            )}
-            {salvando ? 'Salvando' : sujo ? 'Salvar' : 'Salvo'}
-          </button>
-        </form>
+        <SalvarEdicao {...salvamento} mobile />
       </div>
 
       <div className={styles.grade}>

@@ -7,12 +7,14 @@ import styles from './EditorProposta.module.css';
 
 export function AcoesStatusProposta({
   id,
+  versao,
   status,
   acao,
   bloqueado,
   pendente,
 }: {
   id: string;
+  versao: number;
   status: StatusProposta;
   acao: (dados: FormData) => void;
   bloqueado: boolean;
@@ -22,6 +24,7 @@ export function AcoesStatusProposta({
   return (
     <form action={acao} className={styles.acoesStatus}>
       <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="versao" value={versao} />
       {proximoStatus && (
         <button
           type="submit"

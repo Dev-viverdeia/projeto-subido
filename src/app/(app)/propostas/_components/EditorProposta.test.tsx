@@ -119,6 +119,62 @@ function alterar(rotulo: string | RegExp, valor: string) {
 }
 
 describe('EditorProposta', () => {
+  it('preserva o rascunho no conflito e só substitui os campos após escolha explícita', async () => {
+    const user = userEvent.setup();
+    const conflito = {
+      id: '11111111-1111-4111-8111-111111111111',
+      titulo: 'Revisão salva em outro dispositivo',
+      documento: DOCUMENTO,
+      versao: 3,
+      status: 'rascunho' as const,
+    };
+    vi.mocked(salvarProposta).mockResolvedValueOnce({ conflito });
+    montarEditor();
+    alterar('Nome da proposta', 'Minha revisão ainda não salva');
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    let modal = within(await screen.findByRole('dialog', { name: 'Revisar alteração' }));
+    expect(screen.getByLabelText('Nome da proposta')).toHaveValue('Minha revisão ainda não salva');
+    expect(modal.getByText(conflito.titulo)).toBeVisible();
+    await user.click(modal.getByRole('button', { name: 'Voltar à edição' }));
+    expect(screen.getByLabelText('Nome da proposta')).toHaveValue('Minha revisão ainda não salva');
+    await user.click(screen.getByRole('button', { name: 'Revisar alteração' }));
+    modal = within(screen.getByRole('dialog', { name: 'Revisar alteração' }));
+    await user.click(modal.getByRole('button', { name: 'Usar versão salva' }));
+    expect(screen.getByLabelText('Nome da proposta')).toHaveValue(conflito.titulo);
+    expect(salvarProposta).toHaveBeenCalledTimes(1);
+  });
+
+  it('salva a edição local somente contra a versão comparada e pede nova revisão se mudar outra vez', async () => {
+    const user = userEvent.setup();
+    const conflito = {
+      id: '11111111-1111-4111-8111-111111111111',
+      titulo: 'Outra edição salva',
+      documento: DOCUMENTO,
+      versao: 3,
+      status: 'rascunho' as const,
+    };
+    vi.mocked(salvarProposta)
+      .mockResolvedValueOnce({ conflito })
+      .mockResolvedValueOnce({
+        conflito: { ...conflito, versao: 4, titulo: 'Mudança mais recente' },
+      })
+      .mockResolvedValueOnce({ sucesso: 'Proposta salva.', versao: 5, status: 'rascunho' });
+    montarEditor();
+    alterar('Nome da proposta', 'Minha edição escolhida');
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));
+    const modal = within(await screen.findByRole('dialog', { name: 'Revisar alteração' }));
+    await user.click(await modal.findByRole('button', { name: 'Salvar minha edição' }));
+    expect(vi.mocked(salvarProposta).mock.calls[1]?.[1].get('versao')).toBe('3');
+    expect(await modal.findByRole('alert')).toHaveTextContent('mudou novamente');
+    expect(screen.getByLabelText('Nome da proposta')).toHaveValue('Minha edição escolhida');
+    await user.click(await modal.findByRole('button', { name: 'Salvar minha edição' }));
+    expect(vi.mocked(salvarProposta).mock.calls[2]?.[1].get('versao')).toBe('4');
+    expect(vi.mocked(salvarProposta).mock.calls[2]?.[1].get('titulo')).toBe(
+      'Minha edição escolhida',
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('registra uma resposta externa somente após abrir a ação e confirmar', async () => {
     const user = userEvent.setup();
     montarEditor(false, 'apresentada');

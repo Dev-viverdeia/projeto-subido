@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import type { useAcompanhamentoProposta } from './useAcompanhamentoProposta';
+import type { useEdicaoSegura } from './useEdicaoSegura';
 
 const INICIAL: EstadoProposta = {};
 
@@ -12,10 +13,12 @@ export function useOperacoesProposta(
     'iniciarAlteracao' | 'concluirAlteracao'
   >,
   confirmarConteudo: (conteudo: string) => void,
+  edicao: Pick<ReturnType<typeof useEdicaoSegura>, 'iniciar' | 'concluir'>,
 ) {
   const [estadoSalvar, acaoSalvar, salvando] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {
       acompanhamento.iniciarAlteracao();
+      edicao.iniciar();
       let resultado: EstadoProposta | undefined;
       try {
         resultado = await salvarProposta(estado, dados);
@@ -24,7 +27,11 @@ export function useOperacoesProposta(
           confirmarConteudo(JSON.stringify([dados.get('titulo'), dados.get('documento')]));
         }
         return resultado;
+      } catch {
+        resultado = { erro: 'Não foi possível confirmar o salvamento. Sua edição continua aqui.' };
+        return resultado;
       } finally {
+        edicao.concluir(resultado);
         acompanhamento.concluirAlteracao(resultado);
       }
     },
@@ -33,11 +40,13 @@ export function useOperacoesProposta(
   const [estadoStatus, acaoStatus, atualizandoStatus] = useActionState(
     async (estado: EstadoProposta, dados: FormData) => {
       acompanhamento.iniciarAlteracao();
+      edicao.iniciar();
       let resultado: EstadoProposta | undefined;
       try {
         resultado = await mudarStatusProposta(estado, dados);
         return resultado;
       } finally {
+        edicao.concluir(resultado);
         acompanhamento.concluirAlteracao(resultado);
       }
     },
