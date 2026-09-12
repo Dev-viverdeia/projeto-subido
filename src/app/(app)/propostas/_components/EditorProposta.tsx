@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useMemo, useState, useSyncExternalStore } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -14,7 +14,6 @@ import {
   Video,
 } from 'lucide-react';
 import { Spinner } from '@/design-system/via';
-import { mudarStatusProposta, salvarProposta, type EstadoProposta } from '@/lib/propostas/actions';
 import type { PropostaCompleta, StatusProposta } from '@/lib/propostas/queries';
 import { centavosParaCampo, type DocumentoProposta } from '@/lib/propostas/schema';
 import { ROTULO_STATUS_PROPOSTA } from '@/lib/propostas/status';
@@ -26,9 +25,12 @@ import { AcaoEntrega } from './AcaoEntrega';
 import { AcoesStatusProposta } from './AcoesStatusProposta';
 import { CompartilharProposta } from './CompartilharProposta';
 import { usePreviaProposta } from './usePreviaProposta';
+import { useAcompanhamentoProposta } from './useAcompanhamentoProposta';
+import { AtualizacaoProposta } from './AtualizacaoProposta';
+import { useOperacoesProposta } from './useOperacoesProposta';
+import { usePosicaoEdicao } from './usePosicaoEdicao';
 import styles from './EditorProposta.module.css';
 
-const INICIAL: EstadoProposta = {};
 const assinarProntidao = () => () => undefined;
 const editorPronto = () => true;
 const editorNoServidor = () => false;
@@ -41,11 +43,12 @@ export function EditorProposta({
   versaoInicial,
   oportunidadeId,
   reuniaoId,
-  execucaoId,
+  execucaoId: execucaoIdInicial,
   compartilhamentoInicial,
   siteUrl,
   referenciaEm,
   alteracaoInicial = false,
+  sincronizar = true,
 }: {
   id: string;
   tituloInicial: string;
@@ -59,6 +62,7 @@ export function EditorProposta({
   siteUrl: string;
   referenciaEm: string;
   alteracaoInicial?: boolean;
+  sincronizar?: boolean;
 }) {
   const pronto = useSyncExternalStore(assinarProntidao, editorPronto, editorNoServidor);
   const [titulo, setTitulo] = useState(tituloInicial);
@@ -79,28 +83,24 @@ export function EditorProposta({
     editarSecao,
   } = usePreviaProposta();
   const [painelAtivo, setPainelAtivo] = useState<'editar' | 'preview'>('editar');
-  const [estadoSalvar, acaoSalvar, salvando] = useActionState(
-    async (estado: EstadoProposta, dados: FormData) => {
-      const resultado = await salvarProposta(estado, dados);
-      // A resposta confirma o conteúdo enviado, não o que foi digitado durante a espera.
-      if (resultado.sucesso) {
-        setConteudoSalvo(JSON.stringify([dados.get('titulo'), dados.get('documento')]));
-      }
-      return resultado;
+  const preservarPosicao = usePosicaoEdicao(editorRef);
+  const acompanhamento = useAcompanhamentoProposta(
+    {
+      id,
+      status: statusInicial,
+      versao: versaoInicial,
+      execucaoId: execucaoIdInicial,
+      compartilhamento: compartilhamentoInicial,
     },
-    INICIAL,
+    sincronizar,
+    preservarPosicao,
   );
-  const [estadoStatus, acaoStatus, atualizandoStatus] = useActionState(
-    mudarStatusProposta,
-    INICIAL,
-  );
+  const { estadoSalvar, acaoSalvar, salvando, estadoStatus, acaoStatus, atualizandoStatus } =
+    useOperacoesProposta(acompanhamento, setConteudoSalvo);
 
-  const estadoAtual =
-    (estadoStatus.versao ?? 0) > (estadoSalvar.versao ?? 0) ? estadoStatus : estadoSalvar;
-  const status = estadoAtual.status ?? statusInicial;
-  const versao = estadoAtual.versao ?? versaoInicial;
-  const compartilhamentoCodigo =
-    estadoStatus.compartilhamentoCodigo ?? compartilhamentoInicial.codigo;
+  const { status, versao, execucaoId, compartilhamento } = acompanhamento.dados;
+  const compartilhamentoCodigo = compartilhamento.codigo;
+  const semAcesso = acompanhamento.falha === 'sessao' || acompanhamento.falha === 'acesso';
   const json = useMemo(() => JSON.stringify(documento), [documento]);
   const sujo = JSON.stringify([titulo, json]) !== conteudoSalvo;
   const acompanhar = Boolean(
@@ -152,7 +152,7 @@ export function EditorProposta({
       id={id}
       status={status}
       acao={acaoStatus}
-      bloqueado={sujo || salvando || !pronto}
+      bloqueado={sujo || salvando || !pronto || semAcesso}
       pendente={atualizandoStatus}
     />
   );
@@ -201,7 +201,11 @@ export function EditorProposta({
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="titulo" value={titulo} />
             <input type="hidden" name="documento" value={json} />
-            <button type="submit" className={styles.salvar} disabled={salvando || !sujo || !pronto}>
+            <button
+              type="submit"
+              className={styles.salvar}
+              disabled={salvando || !sujo || !pronto || semAcesso}
+            >
               {salvando ? (
                 <span aria-hidden="true">
                   <Spinner size="sm" tone="inverse" />
@@ -219,7 +223,6 @@ export function EditorProposta({
 
       {acompanhar && compartilhamentoCodigo ? (
         <CompartilharProposta
-          key={`${compartilhamentoCodigo}:${status}`}
           propostaId={id}
           codigo={compartilhamentoCodigo}
           siteUrl={siteUrl}
@@ -228,10 +231,11 @@ export function EditorProposta({
           projeto={documento.projeto.titulo}
           status={status}
           alteracoesPendentes={sujo || salvando}
-          compartilhamento={{
-            ...compartilhamentoInicial,
-            ativo: estadoStatus.compartilhamentoCodigo ? true : compartilhamentoInicial.ativo,
-          }}
+          semAcesso={semAcesso}
+          compartilhamento={compartilhamento}
+          aoIniciarAlteracao={acompanhamento.iniciarAlteracao}
+          aoConcluirAlteracao={acompanhamento.concluirAlteracao}
+          atualizacao={<AtualizacaoProposta acompanhamento={acompanhamento} />}
           acoes={
             <>
               {continuidadeEntrega}
@@ -246,7 +250,10 @@ export function EditorProposta({
           }
         />
       ) : (
-        continuidadeEntrega
+        <>
+          {continuidadeEntrega}
+          <AtualizacaoProposta acompanhamento={acompanhamento} />
+        </>
       )}
 
       {(estadoSalvar.erro || estadoStatus.erro) && (
@@ -292,7 +299,11 @@ export function EditorProposta({
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="titulo" value={titulo} />
           <input type="hidden" name="documento" value={json} />
-          <button type="submit" disabled={salvando || !sujo || !pronto} aria-live="polite">
+          <button
+            type="submit"
+            disabled={salvando || !sujo || !pronto || semAcesso}
+            aria-live="polite"
+          >
             {salvando ? (
               <span aria-hidden="true">
                 <Spinner size="sm" tone="inverse" />
