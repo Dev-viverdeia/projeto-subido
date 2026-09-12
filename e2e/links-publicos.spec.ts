@@ -32,6 +32,7 @@ test.describe('links do cliente', () => {
   }
   test('desativar link pede confirmação em modal ancorado à tela', async ({ page }) => {
     await page.goto('/preview/proposta-editor');
+    await page.getByText('Gerenciar acesso', { exact: true }).click();
     const abrir = page.getByRole('button', { name: 'Desativar link', exact: true });
     await abrir.click();
     const modal = page.getByRole('dialog');

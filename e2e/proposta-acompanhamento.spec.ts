@@ -52,16 +52,8 @@ test('gerenciar acesso abre confirmação sem cortar o modal e devolve o foco', 
   await expect(page.getByLabel('Link da proposta')).toBeVisible();
 });
 
-test('a versão não salva não é apresentada como compartilhada', async ({ page, isMobile }) => {
+test('a versão não salva não é apresentada como compartilhada', async ({ page }) => {
   await page.goto('/preview/proposta-editor');
-  if (isMobile) {
-    await page.getByRole('button', { name: 'Ver prévia', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Ver prévia', exact: true })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    await page.getByRole('button', { name: 'Editar', exact: true }).click();
-  }
   await page.getByLabel('Nome da proposta').fill('Nova versão ainda em edição');
   const painel = page.getByRole('region', { name: 'Acompanhar proposta' });
   await expect(painel.getByRole('button', { name: 'Copiar link' })).toBeDisabled();
@@ -71,6 +63,29 @@ test('a versão não salva não é apresentada como compartilhada', async ({ pag
   await expect(
     painel.getByRole('button', { name: 'Confirmar venda e abrir entrega' }),
   ).toBeDisabled();
+});
+
+test('o primeiro carregamento protege a digitação antes do JavaScript estar pronto', async ({
+  page,
+}) => {
+  let liberar!: () => void;
+  const javascriptDisponivel = new Promise<void>((resolve) => {
+    liberar = resolve;
+  });
+  await page.route(/\/_next\/static\/chunks\/.*\.js(?:\?.*)?$/, async (route) => {
+    await javascriptDisponivel;
+    await route.continue();
+  });
+  try {
+    await page.goto('/preview/proposta-editor', { waitUntil: 'commit' });
+    await expect(page.getByLabel('Nome da proposta')).toBeDisabled();
+    await expect(page.getByLabel('Empresa', { exact: true })).toBeDisabled();
+  } finally {
+    liberar();
+  }
+  await page.getByLabel('Nome da proposta').fill('Proposta editada após carregar');
+  await expect(page.getByLabel('Nome da proposta')).toHaveValue('Proposta editada após carregar');
+  await expect(page.getByRole('button', { name: 'Copiar link' })).toBeDisabled();
 });
 
 test('o painel permanece utilizável em telas estreitas e tablets', async ({ page, isMobile }) => {

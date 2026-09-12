@@ -244,6 +244,13 @@
   container: campos-proposta / inline-size;
 }
 
+.camposEditaveis {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 .previewArea:focus-visible {
   outline: none;
   box-shadow: var(--via-glass-shadow), var(--app-ring);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useMemo, useState } from 'react';
+import { useActionState, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -29,6 +29,9 @@ import { usePreviaProposta } from './usePreviaProposta';
 import styles from './EditorProposta.module.css';
 
 const INICIAL: EstadoProposta = {};
+const assinarProntidao = () => () => undefined;
+const editorPronto = () => true;
+const editorNoServidor = () => false;
 
 export function EditorProposta({
   id,
@@ -57,6 +60,7 @@ export function EditorProposta({
   referenciaEm: string;
   alteracaoInicial?: boolean;
 }) {
+  const pronto = useSyncExternalStore(assinarProntidao, editorPronto, editorNoServidor);
   const [titulo, setTitulo] = useState(tituloInicial);
   const [documento, setDocumento] = useState(documentoInicial);
   const [valor, setValor] = useState(
@@ -148,7 +152,7 @@ export function EditorProposta({
       id={id}
       status={status}
       acao={acaoStatus}
-      bloqueado={sujo || salvando}
+      bloqueado={sujo || salvando || !pronto}
       pendente={atualizandoStatus}
     />
   );
@@ -197,7 +201,7 @@ export function EditorProposta({
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="titulo" value={titulo} />
             <input type="hidden" name="documento" value={json} />
-            <button type="submit" className={styles.salvar} disabled={salvando || !sujo}>
+            <button type="submit" className={styles.salvar} disabled={salvando || !sujo || !pronto}>
               {salvando ? (
                 <span aria-hidden="true">
                   <Spinner size="sm" tone="inverse" />
@@ -288,7 +292,7 @@ export function EditorProposta({
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="titulo" value={titulo} />
           <input type="hidden" name="documento" value={json} />
-          <button type="submit" disabled={salvando || !sujo} aria-live="polite">
+          <button type="submit" disabled={salvando || !sujo || !pronto} aria-live="polite">
             {salvando ? (
               <span aria-hidden="true">
                 <Spinner size="sm" tone="inverse" />
@@ -323,45 +327,48 @@ export function EditorProposta({
             });
           }}
         >
-          <section className={styles.abertura}>
-            <label htmlFor="titulo-proposta" className={styles.rotuloTitulo}>
-              Nome da proposta
-            </label>
-            <textarea
-              id="titulo-proposta"
-              data-previa="cliente"
-              className={styles.tituloDocumento}
-              value={titulo}
-              rows={2}
-              maxLength={180}
-              onChange={(evento) => {
-                setTitulo(evento.target.value);
-              }}
-            />
-          </section>
-
-          <SecoesContextoEntrega documento={documento} mudar={mudar} />
-          <SecoesPrazoDecisao
-            documento={documento}
-            mudar={mudar}
-            valor={valor}
-            setValor={setValor}
-          />
-
-          {!acompanhar && (
-            <section className={styles.decisao}>
-              <div className={styles.estadoDocumento}>
-                <FileCheck2 size={21} strokeWidth={1.7} aria-hidden="true" />
-                <div>
-                  <p className={styles.sobretitulo}>Estado do documento</p>
-                  <h2>{ROTULO_STATUS_PROPOSTA[status]}</h2>
-                  <p>{descricaoEstado}</p>
-                </div>
-              </div>
-
-              <div className={styles.controlesDecisao}>{formularioStatus}</div>
+          <fieldset className={styles.camposEditaveis} disabled={!pronto} aria-busy={!pronto}>
+            <legend className="sr-only">Conteúdo da proposta</legend>
+            <section className={styles.abertura}>
+              <label htmlFor="titulo-proposta" className={styles.rotuloTitulo}>
+                Nome da proposta
+              </label>
+              <textarea
+                id="titulo-proposta"
+                data-previa="cliente"
+                className={styles.tituloDocumento}
+                value={titulo}
+                rows={2}
+                maxLength={180}
+                onChange={(evento) => {
+                  setTitulo(evento.target.value);
+                }}
+              />
             </section>
-          )}
+
+            <SecoesContextoEntrega documento={documento} mudar={mudar} />
+            <SecoesPrazoDecisao
+              documento={documento}
+              mudar={mudar}
+              valor={valor}
+              setValor={setValor}
+            />
+
+            {!acompanhar && (
+              <section className={styles.decisao}>
+                <div className={styles.estadoDocumento}>
+                  <FileCheck2 size={21} strokeWidth={1.7} aria-hidden="true" />
+                  <div>
+                    <p className={styles.sobretitulo}>Estado do documento</p>
+                    <h2>{ROTULO_STATUS_PROPOSTA[status]}</h2>
+                    <p>{descricaoEstado}</p>
+                  </div>
+                </div>
+
+                <div className={styles.controlesDecisao}>{formularioStatus}</div>
+              </section>
+            )}
+          </fieldset>
         </section>
 
         <aside
