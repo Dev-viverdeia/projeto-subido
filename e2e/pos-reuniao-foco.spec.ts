@@ -97,8 +97,8 @@ test('decisões adicionais são acessíveis sem perder texto nem inventar conclu
 
 for (const [estado, mensagem] of [
   ['vazio', 'Nenhuma decisão explícita registrada. Defina o próximo passo com o cliente.'],
-  ['falhou', 'A transcrição foi salva, mas a análise automática falhou.'],
-  ['cancelada', 'Esta reunião foi cancelada antes de gerar conteúdo.'],
+  ['falhou', 'Não foi possível concluir o resumo.'],
+  ['cancelada', 'Esta reunião foi cancelada.'],
 ] as const) {
   test(`estado ${estado}: sem fatos fabricados e com revisão manual disponível`, async ({
     page,
@@ -117,9 +117,73 @@ for (const [estado, mensagem] of [
 test('processamento não expõe decisões parciais ou formulário prematuro', async ({ page }) => {
   await page.goto('/preview/pos-call?estado=processando');
   await expect(page.getByRole('status')).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Preparando o resumo da conversa.' }),
+  ).toBeVisible();
   await expect(page.getByLabel('Próxima ação da venda')).toHaveCount(0);
   await expect(page.getByText('Análise completa', { exact: true })).toHaveCount(0);
 });
+
+for (const [estado, titulo] of [
+  ['sem-resumo', 'Esta reunião ainda não tem resumo.'],
+  ['demorada', 'O resumo está demorando mais que o esperado.'],
+  ['indisponivel', 'Não conseguimos consultar o andamento.'],
+] as const) {
+  test(`${estado}: saída manual e suporte sem disparar IA ou cobrar`, async ({ page }, info) => {
+    const mutacoes: string[] = [];
+    page.on('request', (r) => {
+      if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(r.method())) mutacoes.push(r.url());
+    });
+    await page.goto(`/preview/pos-call?estado=${estado}`);
+    await expect(page.getByRole('heading', { name: titulo })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveCount(0);
+    await expect(page.getByLabel('Próxima ação da venda')).toBeEditable();
+    await expect(page.getByText('Análise completa', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Pedir ajuda' })).toHaveAttribute(
+      'href',
+      '/suporte/novo?origem=%2Freunioes%2F11111111-1111-4111-8111-111111111111&contexto=resumo_reuniao',
+    );
+    const verificar = page.getByRole('button', { name: 'Verificar novamente' });
+    await expect(verificar).toHaveCSS('font-family', /Geist/i);
+    expect(
+      await verificar.evaluate((el) => parseFloat(getComputedStyle(el).borderRadius)),
+    ).toBeGreaterThan(8);
+    await verificar.focus();
+    await page.keyboard.press('Enter');
+    await expect(verificar).toBeEnabled();
+    await expect(page.getByRole('heading', { name: titulo })).toBeVisible();
+    expect(mutacoes).toEqual([]);
+    expect((await new AxeBuilder({ page }).include('main').analyze()).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    await page.screenshot({ path: info.outputPath(`resumo-${estado}.png`), fullPage: true });
+  });
+}
+
+for (const [estado, titulo] of [
+  ['fila', 'Aguardando o processamento.'],
+  ['retentativa', 'Uma nova tentativa já está na fila.'],
+] as const) {
+  test(`${estado}: status factual sem progresso simulado, também em 320px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.goto(`/preview/pos-call?estado=${estado}`);
+    await expect(page.getByRole('status')).toContainText(titulo);
+    await expect(page.getByLabel('Etapas do processamento')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Abrir ficha do cliente' })).toBeVisible();
+    for (const alvo of await page.locator('main a, main button').all()) {
+      if (await alvo.isVisible())
+        expect((await alvo.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    expect((await new AxeBuilder({ page }).include('main').analyze()).violations).toEqual([]);
+    await page.screenshot({ path: info.outputPath(`resumo-${estado}-320.png`), fullPage: true });
+  });
+}
 
 for (const [params, acao, href] of [
   ['tipo=kickoff', 'Revisar acordo do projeto', '/entregas/projeto-preview#briefing-kickoff'],

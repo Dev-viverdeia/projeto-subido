@@ -348,14 +348,6 @@ test.describe('fundação visual Viver de IA', () => {
     await expect(arquivo.getByText('Enviada', { exact: true }).first()).toBeVisible();
   });
 
-  test('o pós-call em processamento mostra avanço sem expor um resumo vazio', async ({ page }) => {
-    await page.goto('/preview/pos-call?estado=processando');
-
-    await expect(page.getByRole('status')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Salvando a conversa' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toHaveCount(0);
-  });
-
   test('o kickoff conduz da sala ao acordo do projeto', async ({ page }) => {
     await page.goto('/preview/sala-call?tipo=kickoff');
     await expect(page.getByRole('heading', { name: 'Preparar kickoff' })).toBeVisible();

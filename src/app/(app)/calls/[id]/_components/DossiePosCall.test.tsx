@@ -13,6 +13,7 @@ vi.mock('./FormularioPlanoCall', () => ({
 import { DossiePosCall } from './DossiePosCall';
 
 const POS_CALL: PosCall = {
+  operacoes: [],
   reuniao: {
     id: 'call-1',
     titulo: 'Descoberta da Clínica Horizonte',
@@ -80,6 +81,32 @@ const POS_CALL: PosCall = {
 };
 
 describe('DossiePosCall', () => {
+  it('reunião concluída sem análise e sem job não fica processando nem afirma ter salvo conteúdo', () => {
+    render(<DossiePosCall posCall={{ ...POS_CALL, analise: null }} estadoAcao={null} />);
+    expect(
+      screen.getByRole('heading', { name: 'Esta reunião ainda não tem resumo.' }),
+    ).toBeVisible();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Aplicar plano da call' })).toBeVisible();
+    expect(screen.queryByText('Resumo salvo na ficha do cliente')).not.toBeInTheDocument();
+    expect(screen.queryByText('Análise completa')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Pedir ajuda' })).toBeVisible();
+  });
+  it('falha não oferece hipóteses, resumo parcial ou compromissos antigos como prontos', () => {
+    render(
+      <DossiePosCall
+        posCall={{ ...POS_CALL, analise: { ...POS_CALL.analise!, status: 'falhou' } }}
+        estadoAcao={null}
+      />,
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Não foi possível concluir o resumo.' }),
+    ).toBeVisible();
+    expect(screen.queryByText(POS_CALL.analise!.resumo!)).not.toBeInTheDocument();
+    expect(screen.queryByText('Resumo salvo na ficha do cliente')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Criar proposta' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Abrir ficha' })).toBeVisible();
+  });
   it('não trata resumo como decisão nem inventa uma conclusão quando não houve acordo', () => {
     render(
       <DossiePosCall
@@ -200,12 +227,22 @@ describe('DossiePosCall', () => {
           ...POS_CALL,
           reuniao: { ...POS_CALL.reuniao, status: 'processando' },
           analise: null,
+          operacoes: [
+            {
+              tipo: 'pos_call',
+              status: 'processando',
+              tentativas: 1,
+              disponivelEm: new Date().toISOString(),
+              atualizadaEm: new Date().toISOString(),
+              bloqueadoAte: new Date(Date.now() + 60_000).toISOString(),
+            },
+          ],
         }}
         estadoAcao={null}
       />,
     );
 
-    expect(screen.getByRole('status')).toHaveTextContent('Salvando a conversa');
+    expect(screen.getByRole('status')).toHaveTextContent('Preparando o resumo da conversa.');
     expect(
       screen.queryByRole('heading', { name: 'O que ainda falta saber' }),
     ).not.toBeInTheDocument();

@@ -72,16 +72,12 @@ export function montarSaidaPosCall(posCall: PosCall): SaidaPosCall {
     };
   }
 
-  const processando =
-    posCall.reuniao.status === 'processando' ||
-    (!posCall.analise && posCall.reuniao.status === 'concluida');
   return {
     tipo: 'crm',
     rotulo: 'Próxima ação da venda',
-    titulo: processando ? 'Aguardar a análise antes de propor' : 'Registrar o próximo contato',
-    descricao: processando
-      ? 'A conversa já foi salva. Assim que a análise terminar, você poderá decidir o próximo passo.'
-      : 'Use o histórico e o plano da reunião para acompanhar o cliente antes de criar uma proposta.',
+    titulo: 'Registrar o próximo contato',
+    descricao:
+      'Continue pela ficha do cliente. Você pode criar uma proposta mesmo sem o resumo da reunião.',
     acao: 'Abrir ficha',
     href: `/vendas/${posCall.oportunidade.id}`,
   };

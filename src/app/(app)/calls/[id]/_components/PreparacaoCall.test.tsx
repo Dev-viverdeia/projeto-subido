@@ -4,6 +4,7 @@ import type { PosCall } from '@/lib/calls/queries';
 import { PreparacaoCall } from './PreparacaoCall';
 
 const POS_CALL = {
+  operacoes: [],
   reuniao: {
     id: 'call-1',
     titulo: 'Descoberta da Clínica Horizonte',

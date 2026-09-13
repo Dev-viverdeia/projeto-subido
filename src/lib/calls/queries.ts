@@ -17,6 +17,8 @@ import { montarPlanoCall, type PlanoCall } from './plano';
 import { montarReuniao, type ReuniaoCall } from './reuniao-modelo';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
+import { obterOperacoesResumo } from './operacoes-resumo-query';
+import type { OperacaoResumoCall } from './estado-resumo';
 
 export type { ReuniaoCall } from './reuniao-modelo';
 
@@ -45,6 +47,7 @@ export type SugestaoCoachHistorico = {
 };
 
 export type PosCall = {
+  operacoes: OperacaoResumoCall[] | null;
   reuniao: {
     id: string;
     titulo: string;
@@ -193,6 +196,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
     projetoAtivo,
     propostaDaCall,
     enriquecimento,
+    operacoes,
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
@@ -268,6 +272,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
       .order('concluido_em', { ascending: false })
       .limit(1)
       .maybeSingle(),
+    obterOperacoesResumo(supabase, reuniao.id),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'calls:pos-call:empresa');
@@ -291,6 +296,7 @@ export const obterPosCall = cache(async (id: string): Promise<PosCall | null> =>
   const dossie = lerDossie(enriquecimento.data?.resultado ?? null);
 
   return {
+    operacoes,
     reuniao: {
       id: reuniao.id,
       titulo: reuniao.titulo,

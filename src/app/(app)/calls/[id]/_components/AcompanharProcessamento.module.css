@@ -1,136 +1,119 @@
 .painel {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(20px, 3vw, 34px);
-  padding: clamp(26px, 4vw, 42px);
+  align-items: start;
+  gap: var(--via-space-5);
+  padding: clamp(20px, 3vw, 32px);
   border: 1px solid var(--app-elev-2-line);
   border-radius: var(--app-radius-card);
   background: var(--app-elev-2-bg);
   box-shadow: var(--app-elev-2-shadow);
   backdrop-filter: var(--via-glass-blur);
 }
-
 .icone {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border: 1px solid var(--via-border);
   border-radius: var(--app-radius-control);
   background: var(--via-surface);
   color: var(--via-navy);
   box-shadow: inset 0 1px 0 var(--via-edge-hi);
 }
-
-.icone svg {
-  animation: processamento-girar 1.4s linear infinite;
-}
-
 .conteudo {
   min-width: 0;
 }
-
-.conteudo > p,
-.conteudo h2,
-.conteudo > span {
-  margin: 0;
-}
-
-.conteudo > p {
-  color: var(--via-accent-ink);
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-  letter-spacing: var(--app-ls-eyebrow);
-  text-transform: uppercase;
-}
-
 .conteudo h2 {
-  margin-top: var(--via-space-2);
+  margin: 0;
   color: var(--via-text-primary);
-  font-size: clamp(1.45rem, 3vw, 2.2rem);
-  font-weight: 560;
-  line-height: var(--via-lh-tight);
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 600;
+  line-height: 1.35;
   text-wrap: balance;
 }
-
-.conteudo > span {
-  display: block;
-  margin-top: var(--via-space-2);
+.conteudo p {
+  max-width: 64ch;
+  margin: var(--via-space-2) 0 0;
   color: var(--via-text-muted);
-  font-size: var(--via-fs-sm);
+  font-size: var(--app-fs-ui);
+  line-height: 1.6;
 }
-
-.conteudo ol {
+.acoes {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--via-space-2) var(--via-space-4);
-  margin: var(--via-space-5) 0 0;
-  padding: 0;
-  list-style: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--via-space-1);
 }
-
-.conteudo li {
+.acoes > button {
+  min-height: 44px;
+  font-size: var(--app-fs-ui);
+  white-space: normal;
+  text-align: center;
+}
+.link {
   display: inline-flex;
   align-items: center;
-  gap: var(--via-space-2);
-  color: var(--via-text-faint);
-  font-size: var(--via-fs-xs);
-}
-
-.conteudo li > span {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--via-border);
-  border-radius: 50%;
-  font-family: var(--via-font-mono);
-  font-size: var(--via-fs-micro);
-}
-
-.conteudo li[data-estado='feito'],
-.conteudo li[data-estado='agora'] {
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--via-space-3);
   color: var(--via-text-body);
+  font-size: var(--app-fs-ui);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  border-radius: var(--app-radius-control);
 }
-
-.conteudo li[data-estado='agora'] > span {
-  border-color: var(--via-navy);
-  background: var(--via-navy);
-  color: var(--via-white);
+.acoes > :focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
 }
-
+.girando {
+  animation: processamento-girar 1.4s linear infinite;
+}
 @keyframes processamento-girar {
   to {
     transform: rotate(360deg);
   }
 }
-
+@supports not (backdrop-filter: blur(1px)) {
+  .painel {
+    background: var(--via-surface);
+  }
+}
 @media (max-width: 768px) {
   .painel {
     grid-template-columns: auto minmax(0, 1fr);
   }
-
-  .painel > a {
+  .acoes {
     grid-column: 1 / -1;
-    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 }
-
-@media (max-width: 600px) {
+@media (max-width: 420px) {
   .painel {
     grid-template-columns: 1fr;
+    gap: var(--via-space-3);
   }
-
-  .icone {
-    width: 52px;
-    height: 52px;
+  .acoes {
+    flex-direction: column;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .icone svg {
+  .girando {
     animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .painel,
+  .icone {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+  .link {
+    color: LinkText;
+  }
+  .acoes > :focus-visible {
+    outline-color: Highlight;
   }
 }

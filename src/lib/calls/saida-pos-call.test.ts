@@ -3,6 +3,7 @@ import type { PosCall } from './queries';
 import { montarSaidaPosCall } from './saida-pos-call';
 
 const BASE: PosCall = {
+  operacoes: [],
   reuniao: {
     id: 'call-1',
     titulo: 'Descoberta',

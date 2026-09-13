@@ -46,48 +46,59 @@ export function CentralPlanoCall({
   const decisoes = posCall.analise?.status === 'concluida' ? posCall.analise.decisoes : [];
 
   return (
-    <section id="plano-da-call" className={styles.central} aria-label="Decisões e próximos passos">
-      <div className={styles.decisoes}>
-        <h2>{kickoff ? 'O que ficou combinado' : 'O que ficou decidido'}</h2>
-        <p className={styles.apoio}>Extraído da conversa. Confira com o que foi combinado.</p>
-        {decisoes.length ? (
-          <ul className={styles.listaDecisoes}>
-            {decisoes.slice(0, 3).map((decisao, indice) => (
-              <li key={indice}>{decisao}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className={styles.vazio}>
-            Nenhuma decisão explícita registrada. Defina o próximo passo com o cliente.
-          </p>
-        )}
-        {decisoes.length > 3 && (
-          <details className={styles.detalhe}>
-            <summary>
-              Mais {decisoes.length - 3} {decisoes.length === 4 ? 'decisão' : 'decisões'}{' '}
-              <ChevronRight size={18} aria-hidden="true" />
-            </summary>
+    <section
+      id="plano-da-call"
+      className={styles.central}
+      aria-label="Decisões e próximos passos"
+      data-sem-analise={!posCall.analise || undefined}
+    >
+      {posCall.analise && (
+        <div className={styles.decisoes}>
+          <h2>{kickoff ? 'O que ficou combinado' : 'O que ficou decidido'}</h2>
+          {posCall.analise && (
+            <p className={styles.apoio}>Extraído da conversa. Confira com o que foi combinado.</p>
+          )}
+          {decisoes.length ? (
             <ul className={styles.listaDecisoes}>
-              {decisoes.slice(3).map((decisao, indice) => (
+              {decisoes.slice(0, 3).map((decisao, indice) => (
                 <li key={indice}>{decisao}</li>
               ))}
             </ul>
-          </details>
-        )}
-        {resumo && (
-          <details className={styles.detalhe}>
-            <summary>
-              Resumo da conversa <ChevronRight size={18} aria-hidden="true" />
-            </summary>
-            <p className={styles.resumo}>{resumo}</p>
-          </details>
-        )}
-        <p className={styles.registro}>
-          {posCall.sincronizacao.historicoCrm
-            ? 'Resumo salvo na ficha do cliente'
-            : 'Resumo ainda não registrado na ficha'}
-        </p>
-      </div>
+          ) : (
+            <p className={styles.vazio}>
+              Nenhuma decisão explícita registrada. Defina o próximo passo com o cliente.
+            </p>
+          )}
+          {decisoes.length > 3 && (
+            <details className={styles.detalhe}>
+              <summary>
+                Mais {decisoes.length - 3} {decisoes.length === 4 ? 'decisão' : 'decisões'}{' '}
+                <ChevronRight size={18} aria-hidden="true" />
+              </summary>
+              <ul className={styles.listaDecisoes}>
+                {decisoes.slice(3).map((decisao, indice) => (
+                  <li key={indice}>{decisao}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {resumo && (
+            <details className={styles.detalhe}>
+              <summary>
+                Resumo da conversa <ChevronRight size={18} aria-hidden="true" />
+              </summary>
+              <p className={styles.resumo}>{resumo}</p>
+            </details>
+          )}
+          {posCall.analise && (
+            <p className={styles.registro}>
+              {posCall.sincronizacao.historicoCrm
+                ? 'Resumo salvo na ficha do cliente'
+                : 'Resumo ainda não registrado na ficha'}
+            </p>
+          )}
+        </div>
+      )}
 
       <FormularioPlanoCall
         reuniaoId={posCall.reuniao.id}

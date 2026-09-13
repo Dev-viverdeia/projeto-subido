@@ -1,6 +1,11 @@
 import { paginaSegura } from './contrato';
 
 export const CONTEXTOS_FALHA = {
+  resumo_reuniao: {
+    pagina: '/reunioes',
+    guia: 'pagina-ou-operacao-com-erro',
+    assunto: 'Problema com o resumo de uma reunião',
+  },
   enriquecimento: {
     pagina: '/vendas',
     guia: 'enriquecer-oportunidade',
