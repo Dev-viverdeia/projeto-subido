@@ -54,7 +54,8 @@ export function SalaAoVivo({
   }
 
   return (
-    <div className={styles.salaAoVivo} data-lk-theme="default">
+    <main className={styles.salaAoVivo} data-lk-theme="default">
+      <h1 className="sr-only">{convite.titulo}</h1>
       <LiveKitRoom
         token={credenciais.token}
         serverUrl={credenciais.serverUrl}
@@ -106,6 +107,6 @@ export function SalaAoVivo({
         )}
         {/* PalcoReuniao contém um único renderer de áudio remoto. */}
       </LiveKitRoom>
-    </div>
+    </main>
   );
 }

@@ -47,6 +47,11 @@ try {
     'O roteiro simulado não pode abrir em produção',
   );
   assert.equal(
+    (await fetch(`${origem}/preview/roteiro-sala`)).status,
+    404,
+    'A sala simulada com roteiro não pode abrir em produção',
+  );
+  assert.equal(
     (await fetch(`${origem}/api/consultor/responder`)).status,
     401,
     'API deve exigir sessão',
