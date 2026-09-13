@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PreparacaoCall } from '@/app/(app)/calls/[id]/_components/PreparacaoCall';
 import type { PosCall } from '@/lib/calls/queries';
+import { montarPlanoCall } from '@/lib/calls/plano';
+import { tipoCallValido } from '@/lib/calls/tipos';
 import styles from '../pos-call/preview.module.css';
 
 export const metadata: Metadata = { title: 'Preview · Preparação da reunião' };
@@ -73,11 +75,7 @@ const POS_CALL: PosCall = {
         frase: 'Faz sentido organizarmos o escopo de um piloto para uma unidade?',
         proximoPasso: 'Desenhar um piloto para uma unidade.',
       },
-      fatos: [
-        'Canal principal: WhatsApp',
-        'Atendimento: duas equipes em turnos',
-        'Decisora provável: Diretora de Operações',
-      ],
+      fatos: ['Canal principal: WhatsApp', 'Atendimento: duas equipes em turnos', 'Unidades: duas'],
       hipoteses: ['Contatos sem responsável durante a troca de turno'],
       projetos: ['SDR de atendimento com IA'],
     },
@@ -166,9 +164,66 @@ export default async function PreviewCallPreparoPage({
 }: PageProps<'/preview/call-preparo'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
+  let posCall = parametros.tipo === 'kickoff' ? POS_CALL_KICKOFF : POS_CALL;
+  const tipo = tipoCallValido(parametros.tipo) ? parametros.tipo : posCall.reuniao.tipo;
+  if (parametros.estado === 'essencial' || !['descoberta', 'kickoff'].includes(tipo)) {
+    posCall = {
+      ...posCall,
+      reuniao: { ...posCall.reuniao, tipo, liveCoachAtivo: false },
+      contato: null,
+      preparacao: {
+        temEnriquecimento: false,
+        plano: montarPlanoCall({
+          tipo,
+          empresa: posCall.empresa.nome,
+          oportunidade: posCall.oportunidade.titulo,
+          proximaAcao: posCall.oportunidade.proximaAcao,
+          dossie: null,
+        }),
+      },
+    };
+  }
+  if (parametros.estado === 'vazio') {
+    posCall = {
+      ...posCall,
+      preparacao: {
+        ...posCall.preparacao,
+        plano: { ...posCall.preparacao.plano, perguntas: [], fatos: [] },
+      },
+    };
+  }
+  if (parametros.estado === 'extenso') {
+    posCall = {
+      ...posCall,
+      reuniao: {
+        ...posCall.reuniao,
+        titulo:
+          'Descoberta do atendimento e da passagem de responsáveis entre todas as unidades da Clínica Horizonte',
+      },
+      preparacao: {
+        ...posCall.preparacao,
+        plano: {
+          ...posCall.preparacao.plano,
+          perguntas: posCall.preparacao.plano.perguntas.map((item) => ({
+            ...item,
+            pergunta: `${item.pergunta} Considere os turnos da manhã e da noite, os diferentes canais de atendimento e quem assume as mensagens que ainda não foram respondidas.`,
+            intencao: `${item.intencao} Confirme os responsáveis, as ferramentas utilizadas e uma situação real antes de recomendar mudanças no atendimento.`,
+          })),
+          fatos: [
+            ...posCall.preparacao.plano.fatos,
+            'Atendimento compartilhado entre a unidade Centro e a unidade Norte, com equipes próprias e uma coordenação em comum.',
+          ],
+          hipoteses: [
+            ...posCall.preparacao.plano.hipoteses,
+            'A divisão entre canais pode estar dificultando a consulta ao histórico completo do atendimento.',
+          ],
+        },
+      },
+    };
+  }
   return (
     <main className={styles.preview}>
-      <PreparacaoCall posCall={parametros.tipo === 'kickoff' ? POS_CALL_KICKOFF : POS_CALL} />
+      <PreparacaoCall posCall={posCall} />
     </main>
   );
 }

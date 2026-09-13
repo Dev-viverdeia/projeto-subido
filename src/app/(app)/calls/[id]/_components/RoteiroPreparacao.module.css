@@ -1,0 +1,276 @@
+.roteiro {
+  min-width: 0;
+  border: 1px solid var(--app-elev-2-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-2-bg);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--via-blur-sm);
+  overflow-wrap: anywhere;
+}
+.momentos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--via-space-1);
+  padding: var(--via-space-2);
+  border-bottom: 1px solid var(--via-border-hairline);
+}
+.momentos button {
+  min-height: 48px;
+  padding: var(--via-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-card);
+  background: transparent;
+  color: var(--via-text-muted);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  cursor: pointer;
+  transition:
+    background var(--app-t-state) var(--via-ease-out),
+    color var(--app-t-state) var(--via-ease-out);
+}
+.momentos button:hover {
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+.momentos button[aria-pressed='true'] {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+.painel {
+  padding: var(--app-pad-card);
+}
+.cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+}
+.painel h2 {
+  margin: 0;
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h3);
+}
+.cabecalho > span {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+.pergunta {
+  margin-top: var(--via-space-4);
+}
+.etapa {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  margin: 0 0 var(--via-space-3);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+}
+.etapa span {
+  font-variant-numeric: tabular-nums;
+}
+.pergunta h3,
+.fala blockquote,
+.fechamento blockquote {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--via-text-primary);
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: var(--via-fw-medium);
+  line-height: var(--via-lh-normal);
+  letter-spacing: var(--app-ls-h3);
+  text-wrap: pretty;
+}
+.pergunta h3 {
+  min-height: 2lh;
+}
+.intencao {
+  margin-top: var(--via-space-2);
+}
+.intencao summary,
+.lista summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--via-space-3);
+  min-height: 44px;
+  padding-block: var(--via-space-2);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  cursor: pointer;
+  list-style: none;
+}
+.intencao summary::-webkit-details-marker,
+.lista summary::-webkit-details-marker {
+  display: none;
+}
+.intencao summary svg,
+.lista summary svg {
+  flex-shrink: 0;
+  transition: transform var(--app-t-state) var(--via-ease-out);
+}
+.intencao[open] > summary svg,
+.lista[open] > summary svg {
+  transform: rotate(180deg);
+}
+.intencao p,
+.condicao,
+.vazio,
+.proximo p {
+  max-width: 56ch;
+  color: var(--via-text-body);
+  font-size: var(--app-fs-reading);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+.intencao p {
+  margin: var(--via-space-2) 0;
+}
+.intencao .relacao {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+}
+.navegar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
+  margin-top: var(--via-space-2);
+}
+.botao {
+  min-height: 44px;
+  height: auto;
+  font-size: var(--app-fs-ui);
+}
+.lista {
+  margin-top: var(--via-space-3);
+  padding-top: var(--via-space-3);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.lista summary {
+  color: var(--via-text-body);
+}
+.lista ol {
+  margin: var(--via-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lista li + li {
+  margin-top: var(--via-space-2);
+}
+.lista li button {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-2);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--via-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-control);
+  background: transparent;
+  color: var(--via-text-body);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  line-height: var(--via-lh-normal);
+  text-align: left;
+  cursor: pointer;
+}
+.lista li button[aria-current] {
+  border-color: var(--via-border);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+.lista li button:hover {
+  background: var(--via-bg-2);
+}
+.lista li button > span:first-child {
+  color: var(--via-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.fala,
+.fechamento {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-5);
+}
+.fala blockquote,
+.fechamento blockquote {
+  border-left: 2px solid var(--via-navy);
+  padding-left: var(--via-space-4);
+}
+.condicao {
+  margin: 0;
+}
+.proximo {
+  width: 100%;
+  padding-top: var(--via-space-5);
+  border-top: 1px solid var(--via-border-hairline);
+}
+.proximo h3 {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+.proximo p {
+  margin: var(--via-space-2) 0 0;
+}
+.roteiro button:focus-visible,
+.roteiro summary:focus-visible,
+.pergunta h3:focus {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 4px;
+  box-shadow: var(--app-ring);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .roteiro {
+    background: var(--via-surface);
+  }
+}
+@media (max-width: 599px) {
+  .painel {
+    padding: var(--app-pad-card-tight);
+  }
+  .momentos {
+    padding: var(--via-space-2);
+  }
+  .momentos button {
+    font-size: var(--app-fs-ui);
+    padding-inline: var(--via-space-1);
+  }
+  .pergunta {
+    margin-top: var(--via-space-5);
+  }
+  .pergunta h3 {
+    min-height: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roteiro *,
+  .roteiro *::before,
+  .roteiro *::after {
+    transition: none;
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .momentos button[aria-pressed='true'] {
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  .roteiro button:focus-visible,
+  .roteiro summary:focus-visible,
+  .pergunta h3:focus {
+    outline-color: Highlight;
+  }
+}

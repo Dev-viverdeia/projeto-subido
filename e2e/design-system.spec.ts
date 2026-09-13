@@ -297,9 +297,7 @@ test.describe('fundação visual Viver de IA', () => {
     await page.goto('/preview/call-preparo?tipo=kickoff');
 
     await expect(page.getByRole('heading', { name: 'Acordos essenciais' })).toBeVisible();
-    await expect(page.getByLabel('Continuidade do kickoff')).toContainText(
-      'As decisões confirmadas viram o acordo do projeto.',
-    );
+    await expect(page.getByLabel('Continuidade do kickoff')).toContainText('Projeto em execução');
     await expect(page.getByText('SDR de atendimento para Clínica Horizonte')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Abrir projeto' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Entrar no kickoff' })).toBeVisible();
