@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { conferirContrasteDasEtapas } from './helpers/estudio-contraste';
 
 async function semOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
@@ -114,6 +115,72 @@ test('Estúdio: 320px, tablet e desktop sem cortes e com contraste', async ({ pa
     expect(resultado.violations).toEqual([]);
     await page.screenshot({ path: info.outputPath('preparar-' + width + '.png'), fullPage: true });
   }
+});
+
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`Estúdio: contraste preservado durante a troca de etapas (${reducedMotion})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion });
+    await page.goto('/preview/estudio-sala?estado=execucao');
+    const abas = page.getByRole('tablist', { name: 'Etapas do projeto' }).getByRole('tab');
+    await page.getByRole('tab', { name: /Preparar/ }).click();
+    await conferirContrasteDasEtapas(abas);
+    await page.keyboard.press('ArrowRight');
+    await conferirContrasteDasEtapas(abas);
+    await expect(page.getByRole('tab', { name: /Executar/ })).toBeFocused();
+    await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2');
+  });
+}
+
+test('Estúdio: foco, hover e bloqueio preservam a etapa selecionada', async ({ page }) => {
+  await page.goto('/preview/estudio-sala?estado=preparar');
+  const preparar = page.getByRole('tab', { name: /^Preparar/ });
+  const executar = page.getByRole('tab', { name: /Executar/ });
+  await preparar.click();
+  await expect(preparar).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await page.keyboard.press('ArrowRight');
+  await expect(executar).toBeFocused();
+  expect(await executar.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+  await expect(executar).not.toHaveCSS('box-shadow', 'none');
+  await executar.hover();
+  await expect(executar).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.keyboard.press('Enter');
+  await expect(preparar).toHaveAttribute('aria-selected', 'true');
+  await expect(executar).toHaveAttribute('aria-selected', 'false');
+  await page.keyboard.press('ArrowLeft');
+  await expect(preparar).toBeFocused();
+  await expect(preparar).not.toHaveCSS('box-shadow', 'none');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('tabpanel')).toBeFocused();
+  const medidas = await page.getByRole('tab').evaluateAll((abas) =>
+    abas.map((aba) => {
+      const { width, height } = aba.getBoundingClientRect();
+      return { width, height };
+    }),
+  );
+  expect(medidas.every(({ width, height }) => width >= 44 && height >= 44)).toBe(true);
+});
+
+test('Estúdio: seleção e foco continuam distintos em alto contraste', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'Emulação de forced-colors usa Chromium.');
+  await page.emulateMedia({ forcedColors: 'active' });
+  await page.goto('/preview/estudio-sala?estado=execucao');
+  const executar = page.getByRole('tab', { name: /Executar/ });
+  await executar.click();
+  await page.keyboard.press('ArrowLeft');
+  const preparar = page.getByRole('tab', { name: /Preparar/ });
+  await expect(preparar).toBeFocused();
+  await expect(preparar).toHaveCSS('outline-style', 'solid');
+  await expect(preparar).toHaveCSS('outline-width', '2px');
+  const bordas = await preparar.evaluate((el) => ({
+    selecionada: getComputedStyle(el).borderTopColor,
+    inativas: Array.from(el.parentElement!.querySelectorAll('[aria-selected="false"]')).map(
+      (aba) => getComputedStyle(aba).borderTopColor,
+    ),
+  }));
+  expect(bordas.inativas.every((cor) => cor !== bordas.selecionada)).toBe(true);
+  await page.screenshot({ path: info.outputPath('estudio-alto-contraste.png'), fullPage: true });
 });
 
 test('Projetos: tarefa em destaque, critério visível e conclusão sem saltar', async ({
