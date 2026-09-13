@@ -11,8 +11,13 @@ test('consulta roteiro sem Coach, preserva pergunta e não inicia APIs ou mídia
   });
   page.on('pageerror', (e) => erros.push(e.message));
   await page.addInitScript(() => {
+    const auditoriaMidia = { chamadas: 0 };
+    Object.assign(window, { auditoriaMidia });
     Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      configurable: true,
+      writable: true,
       value: () => {
+        auditoriaMidia.chamadas += 1;
         throw new Error('Permissão de mídia não deveria ser solicitada');
       },
     });
@@ -41,6 +46,11 @@ test('consulta roteiro sem Coach, preserva pergunta e não inicia APIs ou mídia
     (await painel.getByRole('status').boundingBox())!.y,
   );
   expect(chamadas).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => (window as Window & { auditoriaMidia: { chamadas: number } }).auditoriaMidia.chamadas,
+    ),
+  ).toBe(0);
   expect(erros).toEqual([]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: info.outputPath('roteiro-sala.png'), fullPage: true });
