@@ -84,26 +84,29 @@
   align-items: center;
   gap: var(--via-space-2);
   padding: var(--via-space-2);
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--app-radius-control);
   background: transparent;
   color: var(--via-text-muted);
   font: inherit;
   font-size: var(--app-fs-ui);
   cursor: pointer;
-  transition:
-    background-color var(--app-t-state),
-    color var(--app-t-state);
+  /* A inversão claro/navy deve ser atômica. Interpolar tinta e fundo produzia
+     contraste de 1,32:1 durante a troca; os pares finais passam de 7:1. */
+  transition-property: none;
 }
 .degrau svg {
   flex: none;
 }
-.degrau:hover {
+.degrau[aria-selected='false']:not([aria-disabled='true']):hover {
   background: var(--via-navy-04);
 }
-.degrau[data-ativa] {
+.degrau[aria-selected='true'] {
   background: var(--via-navy);
   color: var(--via-white);
+}
+.degrau[aria-selected='true']:hover {
+  background: var(--via-navy-deep);
 }
 .degrau[aria-disabled='true'] {
   cursor: not-allowed;
@@ -182,8 +185,20 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .preenchido,
-  .degrau {
+  .preenchido {
     transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .degrau[aria-selected='false'] {
+    border-color: Canvas;
+  }
+  .degrau[aria-selected='true'] {
+    border-color: Highlight;
+  }
+  .degrau:focus-visible,
+  .avanco:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
   }
 }
