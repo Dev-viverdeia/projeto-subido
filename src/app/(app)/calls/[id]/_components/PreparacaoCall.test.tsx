@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import type { PosCall } from '@/lib/calls/queries';
 import { PreparacaoCall } from './PreparacaoCall';
@@ -69,7 +70,9 @@ describe('PreparacaoCall', () => {
     expect(
       screen.getByRole('heading', { name: POS_CALL.preparacao.plano.objetivo }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Como os contatos são distribuídos hoje?')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Como os contatos são distribuídos hoje?' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Canal principal: WhatsApp')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Ficha do cliente/ })).toHaveAttribute(
       'href',
@@ -79,7 +82,7 @@ describe('PreparacaoCall', () => {
       'href',
       '/sala/sala-horizonte',
     );
-    expect(screen.getByText('Live Coach preparado')).toBeInTheDocument();
+    expect(screen.getByText('Live Coach ativado para esta reunião')).toBeInTheDocument();
   });
 
   it('liga o kickoff ao acordo e ao projeto que começa depois da reunião', () => {
@@ -98,7 +101,7 @@ describe('PreparacaoCall', () => {
     expect(screen.getByText('Acordo que precisa sair da reunião')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Acordos essenciais' })).toBeInTheDocument();
     expect(screen.getByLabelText('Continuidade do kickoff')).toHaveTextContent(
-      'As decisões confirmadas viram o acordo do projeto.',
+      'Projeto em execução',
     );
     expect(screen.getByText('SDR da Clínica Horizonte')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Abrir projeto/ })).toHaveAttribute(
@@ -110,4 +113,90 @@ describe('PreparacaoCall', () => {
       '/sala/sala-horizonte',
     );
   });
+
+  it('não diz que o coach está ativado quando foi desligado e mantém a edição', () => {
+    render(
+      <PreparacaoCall
+        posCall={{
+          ...POS_CALL,
+          contato: null,
+          reuniao: { ...POS_CALL.reuniao, liveCoachAtivo: false },
+        }}
+      />,
+    );
+    expect(screen.queryByText(/Live Coach/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Cargo não informado')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alterar reunião' })).toHaveAttribute(
+      'href',
+      '/reunioes?editar=call-1',
+    );
+    expect(screen.getByText(/Brasília/)).toHaveTextContent('14:00');
+  });
+
+  it('revela todos os fatos e mantém hipóteses e projetos separados', async () => {
+    const user = userEvent.setup();
+    render(
+      <PreparacaoCall
+        posCall={{
+          ...POS_CALL,
+          preparacao: {
+            ...POS_CALL.preparacao,
+            plano: {
+              ...POS_CALL.preparacao.plano,
+              fatos: [
+                'WhatsApp oficial',
+                'Duas equipes',
+                'Terceiro fato completo',
+                'Quarto fato completo',
+              ],
+            },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByText('Terceiro fato completo')).not.toBeVisible();
+    await user.click(screen.getByText('Mais informações'));
+    expect(screen.getByText('Terceiro fato completo')).toBeVisible();
+    expect(screen.getByText('Quarto fato completo')).toBeVisible();
+    expect(screen.getByText('Perda de leads fora do horário')).not.toBeVisible();
+    await user.click(screen.getByText('Hipóteses a confirmar'));
+    expect(screen.getByText('Perda de leads fora do horário')).toBeVisible();
+    expect(screen.getByText('SDR de atendimento com IA')).not.toBeVisible();
+    await user.click(screen.getByText('Projetos em análise'));
+    expect(screen.getByText('SDR de atendimento com IA')).toBeVisible();
+  });
+
+  it.each([false, true])(
+    'a ausência de fatos não presume pesquisa inexistente: enriquecida=%s',
+    (temEnriquecimento) => {
+      render(
+        <PreparacaoCall
+          posCall={{
+            ...POS_CALL,
+            preparacao: {
+              temEnriquecimento,
+              plano: {
+                ...POS_CALL.preparacao.plano,
+                origem: temEnriquecimento ? 'enriquecimento' : 'base',
+                fatos: [],
+              },
+            },
+          }}
+        />,
+      );
+      expect(
+        screen.getByText(
+          temEnriquecimento
+            ? 'Ainda não há informações no roteiro.'
+            : 'A ficha ainda não foi enriquecida.',
+        ),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('link', {
+          name: temEnriquecimento ? 'Consultar ficha' : 'Enriquecer na ficha',
+        }),
+      ).toHaveAttribute('href', '/vendas/oportunidade-1');
+      expect(screen.getByRole('link', { name: 'Entrar na reunião' })).toBeVisible();
+    },
+  );
 });
