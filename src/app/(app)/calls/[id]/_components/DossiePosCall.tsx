@@ -6,11 +6,9 @@ import {
   CircleAlert,
   CircleHelp,
   Clock3,
-  ContactRound,
   Lightbulb,
   MessageSquareQuote,
   Radar,
-  Target,
 } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
 import { montarSaidaPosCall } from '@/lib/calls/saida-pos-call';
@@ -23,6 +21,7 @@ import { ListaFactual, MapaFactual } from './MapaFactual';
 import { RetornoProximaAcao } from './RetornoProximaAcao';
 import { TranscricaoCall } from './TranscricaoCall';
 import styles from '../pagina.module.css';
+import foco from './PosCallFoco.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
@@ -112,10 +111,9 @@ export function DossiePosCall({
   const kickoff = posCall.reuniao.tipo === 'kickoff';
   const briefingPronto = kickoff && Boolean(analise?.briefingOperacional);
   const saida = montarSaidaPosCall(posCall);
-  const continuarEntrega = saida.tipo === 'projeto' && !kickoff;
   return (
-    <div className={styles.pagina}>
-      <nav className={styles.navegacao} aria-label="Navegação após a reunião">
+    <div className={foco.pagina}>
+      <nav className={foco.navegacao} aria-label="Navegação após a reunião">
         <Link href="/reunioes">
           <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
           Voltar às reuniões
@@ -126,75 +124,42 @@ export function DossiePosCall({
         </span>
       </nav>
 
-      <header className={styles.hero} data-on-dark>
-        <div className={styles.heroTopo}>
-          <div className={styles.heroTitulo}>
-            <div className={styles.sobretituloHero}>
-              <IconeEstado tipo={estado.tipo} />
-              {kickoff ? 'Acordo do projeto' : 'Resumo da reunião'} · {estado.rotulo}
-            </div>
-            <h1>{posCall.reuniao.titulo}</h1>
-            <p>
-              {posCall.empresa.nome}
-              {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
-            </p>
+      <header className={foco.cabecalho}>
+        <div className={foco.identificacao}>
+          <div className={foco.estado}>
+            <IconeEstado tipo={estado.tipo} />
+            {kickoff ? 'Acordo do projeto' : 'Resumo da reunião'} · {estado.rotulo}
           </div>
-          <div className={styles.heroEstado}>
-            <small>{ROTULO_TIPO_CALL[posCall.reuniao.tipo]}</small>
-            <strong>{ROTULO_STATUS_CALL[posCall.reuniao.status]}</strong>
+          <h1>{posCall.reuniao.titulo}</h1>
+          <p>
+            {posCall.empresa.nome}
+            {posCall.contato ? ` · ${posCall.contato.nome}` : ''}
+          </p>
+          <div className={foco.metadados}>
+            <span>
+              <Clock3 size={14} aria-hidden="true" /> {duracao(posCall)}
+            </span>
+            <span>
+              {ROTULO_TIPO_CALL[posCall.reuniao.tipo]} ·{' '}
+              {ROTULO_STATUS_CALL[posCall.reuniao.status]}
+            </span>
+            <span>
+              {kickoff
+                ? 'Projeto em execução'
+                : `Venda: ${ROTULO_ETAPA[posCall.oportunidade.etapa]}`}
+            </span>
           </div>
         </div>
-
-        <div className={styles.heroDecisao}>
-          <div>
-            <small>
-              {estado.tipo === 'processando' || kickoff ? 'Agora' : 'Próxima ação sugerida'}
-            </small>
-            <strong>
-              {estado.tipo === 'processando'
-                ? kickoff
-                  ? 'Aguarde o acordo antes de iniciar a execução'
-                  : 'Aguarde o resumo antes de atualizar esta venda'
-                : continuarEntrega
-                  ? 'Continue a implementação deste cliente'
-                  : briefingPronto
-                    ? 'Revise o acordo antes de iniciar a execução'
-                    : acaoSugerida || 'Defina a próxima ação antes de atualizar a venda'}
-            </strong>
-          </div>
-          {estado.tipo !== 'processando' && (
-            <a
-              href={
-                continuarEntrega
-                  ? saida.href
-                  : briefingPronto
-                    ? '#proximo-passo-pos-call'
-                    : '#plano-da-call'
-              }
-            >
-              {continuarEntrega
-                ? 'Abrir entrega'
-                : briefingPronto
-                  ? 'Revisar acordo do projeto'
-                  : 'Revisar e atualizar a venda'}{' '}
-              <ChevronRight size={15} aria-hidden="true" />
-            </a>
-          )}
-        </div>
-
-        <div className={styles.heroMeta}>
-          <span>
-            <Clock3 size={14} aria-hidden="true" /> {duracao(posCall)}
-          </span>
-          <span>
-            <ContactRound size={14} aria-hidden="true" />{' '}
-            {posCall.contato?.cargo ?? 'Contato sem cargo informado'}
-          </span>
-          <span>
-            <Target size={14} aria-hidden="true" />{' '}
-            {kickoff ? 'Projeto em execução' : ROTULO_ETAPA[posCall.oportunidade.etapa]}
-          </span>
-        </div>
+        {estado.tipo !== 'processando' && (
+          <Link id="proximo-passo-pos-call" className={foco.saida} href={saida.href}>
+            {briefingPronto
+              ? 'Revisar acordo do projeto'
+              : saida.acao === 'Preparar proposta'
+                ? 'Criar proposta'
+                : saida.acao}
+            <ChevronRight size={18} aria-hidden="true" />
+          </Link>
+        )}
       </header>
 
       <RetornoProximaAcao estado={estadoAcao} oportunidadeId={posCall.oportunidade.id} />
@@ -262,8 +227,6 @@ export function DossiePosCall({
           posCall={posCall}
           acaoSugerida={acaoSugerida}
           resumo={analise?.resumo ?? null}
-          nota={nota ?? null}
-          sentimento={sentimento}
         />
       )}
 
@@ -272,10 +235,20 @@ export function DossiePosCall({
           <summary>
             <div>
               <strong>Análise completa</strong>
-              <span>Fatos, lacunas, oportunidades e transcrição</span>
+              <span>Dores, objeções e hipóteses de projeto</span>
             </div>
             <ChevronRight size={18} aria-hidden="true" />
           </summary>
+          {temAnalise && (
+            <div className={foco.leituraIA}>
+              <span>Leitura da IA · {sentimento}</span>
+              {nota !== null && nota !== undefined && (
+                <span aria-label={`Leitura comercial ${nota} de 100`}>
+                  Avaliação comercial: {nota}/100
+                </span>
+              )}
+            </div>
+          )}
           <div className={styles.gradeOperacional}>
             <aside className={styles.lateral}>
               <section className={styles.lacunas} aria-labelledby="lacunas-titulo">
@@ -372,11 +345,22 @@ export function DossiePosCall({
                   </div>
                 </details>
               )}
-
-              {posCall.gravacao && <GravacaoCall gravacao={posCall.gravacao} />}
-
-              {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
             </div>
+          </div>
+        </details>
+      )}
+      {estado.tipo !== 'processando' && (posCall.gravacao || posCall.transcricao) && (
+        <details className={styles.analiseCompleta}>
+          <summary>
+            <div>
+              <strong>Transcrição e gravação</strong>
+              <span>Conteúdo privado da reunião</span>
+            </div>
+            <ChevronRight size={18} aria-hidden="true" />
+          </summary>
+          <div className={foco.fontes}>
+            {posCall.gravacao && <GravacaoCall gravacao={posCall.gravacao} />}
+            {posCall.transcricao && <TranscricaoCall transcricao={posCall.transcricao} />}
           </div>
         </details>
       )}

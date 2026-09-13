@@ -27,7 +27,7 @@ export function GravacaoCall({ gravacao }: { gravacao: NonNullable<PosCall['grav
         <p>Fonte original</p>
         <h2 id="gravacao-call-titulo">Gravação privada da reunião</h2>
         {pronta ? (
-          <audio controls preload="metadata" src={gravacao.urlTemporaria ?? undefined}>
+          <audio controls preload="none" src={gravacao.urlTemporaria ?? undefined}>
             Seu navegador não conseguiu reproduzir o áudio desta reunião.
           </audio>
         ) : (

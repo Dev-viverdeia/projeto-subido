@@ -1,18 +1,8 @@
-import Link from 'next/link';
-import {
-  ArrowRight,
-  BadgeCheck,
-  BriefcaseBusiness,
-  FileSignature,
-  GitBranch,
-  ListChecks,
-  Target,
-} from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
-import { montarSaidaPosCall } from '@/lib/calls/saida-pos-call';
-import { etapaVisivel, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
+import { etapaVisivel, type EtapaCrm } from '@/lib/crm/etapas';
 import { FormularioPlanoCall } from './FormularioPlanoCall';
-import styles from '../pagina.module.css';
+import styles from './PosCallFoco.module.css';
 
 function dataInput(iso: string | null): string {
   if (!iso) return '';
@@ -44,101 +34,59 @@ export function CentralPlanoCall({
   posCall,
   acaoSugerida,
   resumo,
-  nota,
-  sentimento,
 }: {
   posCall: PosCall;
   acaoSugerida: string;
   resumo: string | null;
-  nota: number | null;
-  sentimento: string;
 }) {
   const etapaAtual = etapaVisivel(posCall.oportunidade.etapa);
   const etapaRecomendada = sugerirEtapa(posCall);
   const compromissos = posCall.analise?.compromissos ?? [];
-  const planoAplicado = posCall.sincronizacao.acoesPlano.some((acao) => acao.status === 'pendente');
-  const saida = montarSaidaPosCall(posCall);
   const kickoff = posCall.reuniao.tipo === 'kickoff';
-  const IconeSaida =
-    saida.tipo === 'proposta'
-      ? FileSignature
-      : saida.tipo === 'projeto'
-        ? BriefcaseBusiness
-        : Target;
+  const decisoes = posCall.analise?.status === 'concluida' ? posCall.analise.decisoes : [];
 
   return (
-    <section
-      id="plano-da-call"
-      className={styles.centralAcao}
-      aria-labelledby="plano-da-call-titulo"
-    >
-      <div className={styles.centralAcaoContexto}>
-        <div className={styles.contextoTopoCall}>
-          <div>
-            <p className={styles.sobretitulo}>
-              {kickoff ? 'Acordo do projeto' : 'Resumo e próximos passos'}
-            </p>
-            <h2 id="plano-da-call-titulo">
-              {kickoff ? 'O que ficou combinado' : 'O que ficou decidido'}
-            </h2>
-          </div>
-          {nota !== null && !kickoff && (
-            <div className={styles.notaCentral} aria-label={`Leitura comercial ${nota} de 100`}>
-              <strong>{nota}</strong>
-              <span>/100</span>
-            </div>
-          )}
-        </div>
-        {resumo && <p className={styles.resumoCentral}>{resumo}</p>}
-        {!kickoff && (
-          <small className={styles.sentimentoCentral}>Tom percebido: {sentimento}</small>
+    <section id="plano-da-call" className={styles.central} aria-label="Decisões e próximos passos">
+      <div className={styles.decisoes}>
+        <h2>{kickoff ? 'O que ficou combinado' : 'O que ficou decidido'}</h2>
+        <p className={styles.apoio}>Extraído da conversa. Confira com o que foi combinado.</p>
+        {decisoes.length ? (
+          <ul className={styles.listaDecisoes}>
+            {decisoes.slice(0, 3).map((decisao, indice) => (
+              <li key={indice}>{decisao}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className={styles.vazio}>
+            Nenhuma decisão explícita registrada. Defina o próximo passo com o cliente.
+          </p>
         )}
-
-        <ol className={styles.fluxoSincronizacao}>
-          <li data-concluido={posCall.sincronizacao.historicoCrm || undefined}>
-            <span>
-              <BadgeCheck size={16} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>Resumo na ficha</strong>
-              <small>
-                {posCall.sincronizacao.historicoCrm
-                  ? 'Já registrado na ficha'
-                  : 'Registro em processamento'}
-              </small>
-            </div>
-          </li>
-          <li>
-            <span>
-              <GitBranch size={16} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>{kickoff ? 'Projeto em execução' : 'Etapa da venda'}</strong>
-              <small>
-                {kickoff
-                  ? 'Venda concluída; agora o foco é entregar'
-                  : etapaRecomendada === etapaAtual
-                    ? `Manter em ${ROTULO_ETAPA[etapaAtual]}`
-                    : `${ROTULO_ETAPA[etapaAtual]} → ${ROTULO_ETAPA[etapaRecomendada]}`}
-              </small>
-            </div>
-          </li>
-          <li data-concluido={planoAplicado || undefined}>
-            <span>
-              <ListChecks size={16} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>{planoAplicado ? 'Compromissos salvos' : 'Compromissos da reunião'}</strong>
-              <small>
-                {planoAplicado
-                  ? 'Ações já criadas na ficha'
-                  : `${compromissos.length} para revisar antes de salvar`}
-              </small>
-            </div>
-          </li>
-        </ol>
-
-        <p className={styles.garantiaRevisao}>Você revisa antes de salvar na ficha.</p>
+        {decisoes.length > 3 && (
+          <details className={styles.detalhe}>
+            <summary>
+              Mais {decisoes.length - 3} {decisoes.length === 4 ? 'decisão' : 'decisões'}{' '}
+              <ChevronRight size={18} aria-hidden="true" />
+            </summary>
+            <ul className={styles.listaDecisoes}>
+              {decisoes.slice(3).map((decisao, indice) => (
+                <li key={indice}>{decisao}</li>
+              ))}
+            </ul>
+          </details>
+        )}
+        {resumo && (
+          <details className={styles.detalhe}>
+            <summary>
+              Resumo da conversa <ChevronRight size={18} aria-hidden="true" />
+            </summary>
+            <p className={styles.resumo}>{resumo}</p>
+          </details>
+        )}
+        <p className={styles.registro}>
+          {posCall.sincronizacao.historicoCrm
+            ? 'Resumo salvo na ficha do cliente'
+            : 'Resumo ainda não registrado na ficha'}
+        </p>
       </div>
 
       <FormularioPlanoCall
@@ -151,25 +99,6 @@ export function CentralPlanoCall({
         compromissos={compromissos}
         modo={kickoff ? 'kickoff' : 'venda'}
       />
-
-      <Link
-        id="proximo-passo-pos-call"
-        className={styles.proximaSaidaCall}
-        href={saida.href}
-        data-tipo={saida.tipo}
-      >
-        <span className={styles.proximaSaidaIcone}>
-          <IconeSaida size={18} strokeWidth={1.7} aria-hidden="true" />
-        </span>
-        <span className={styles.proximaSaidaTexto}>
-          <small>{saida.rotulo}</small>
-          <strong>{saida.titulo}</strong>
-          <span>{saida.descricao}</span>
-        </span>
-        <span className={styles.proximaSaidaAcao}>
-          {saida.acao} <ArrowRight size={15} aria-hidden="true" />
-        </span>
-      </Link>
     </section>
   );
 }

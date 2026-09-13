@@ -80,6 +80,37 @@ const POS_CALL: PosCall = {
 };
 
 describe('DossiePosCall', () => {
+  it('não trata resumo como decisão nem inventa uma conclusão quando não houve acordo', () => {
+    render(
+      <DossiePosCall
+        posCall={{ ...POS_CALL, analise: { ...POS_CALL.analise!, decisoes: [] } }}
+        estadoAcao={null}
+      />,
+    );
+    expect(
+      screen.getByText(
+        'Nenhuma decisão explícita registrada. Defina o próximo passo com o cliente.',
+      ),
+    ).toBeVisible();
+    expect(screen.getByText(POS_CALL.analise!.resumo!)).not.toBeVisible();
+    fireEvent.click(screen.getByText('Resumo da conversa'));
+    expect(screen.getByText(POS_CALL.analise!.resumo!)).toBeVisible();
+  });
+
+  it('preserva todas as decisões, deixando somente as três primeiras abertas', () => {
+    const decisoes = ['Uma unidade', 'Revisão humana', 'Validar segurança', 'Conferir integrações'];
+    render(
+      <DossiePosCall
+        posCall={{ ...POS_CALL, analise: { ...POS_CALL.analise!, decisoes } }}
+        estadoAcao={null}
+      />,
+    );
+    expect(screen.getAllByText('Uma unidade')[0]).toBeVisible();
+    expect(screen.getAllByText('Conferir integrações')[0]).not.toBeVisible();
+    fireEvent.click(screen.getByText('Mais 1 decisão'));
+    expect(screen.getAllByText('Conferir integrações')[0]).toBeVisible();
+  });
+
   it('prioriza continuar a entrega ao retornar a uma reunião de uma venda ganha', () => {
     render(
       <DossiePosCall
@@ -107,13 +138,14 @@ describe('DossiePosCall', () => {
     render(<DossiePosCall posCall={POS_CALL} estadoAcao={null} />);
 
     expect(screen.getByRole('heading', { name: 'O que ficou decidido' })).toBeInTheDocument();
-    expect(screen.getByText('Já registrado na ficha')).toBeInTheDocument();
-    expect(screen.getByText('Descoberta → Proposta')).toBeInTheDocument();
-    expect(screen.getByLabelText('Leitura comercial 76 de 100')).toBeInTheDocument();
-    expect(screen.getByText('Você revisa antes de salvar na ficha.')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: /Criar uma proposta a partir desta conversa/ }),
-    ).toHaveAttribute('href', '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1');
+    expect(screen.getByText('Resumo salvo na ficha do cliente')).toBeVisible();
+    expect(screen.getAllByText('O piloto começará em uma unidade.')[0]).toBeVisible();
+    expect(screen.getByLabelText('Leitura comercial 76 de 100')).not.toBeVisible();
+    expect(screen.getByText('Resumo da conversa').closest('details')).not.toHaveAttribute('open');
+    expect(screen.getByRole('link', { name: 'Criar proposta' })).toHaveAttribute(
+      'href',
+      '/propostas/nova?oportunidade=oportunidade-1&reuniao=call-1',
+    );
     expect(screen.queryByText('Criar proposta com esta call')).not.toBeInTheDocument();
 
     const plano = screen.getByRole('heading', { name: 'O que ficou decidido' });
@@ -145,6 +177,11 @@ describe('DossiePosCall', () => {
         estadoAcao={null}
       />,
     );
+
+    expect(screen.getByText('Transcrição e gravação').closest('details')).not.toHaveAttribute(
+      'open',
+    );
+    fireEvent.click(screen.getByText('Transcrição e gravação'));
 
     expect(
       screen.getByRole('heading', { name: 'Gravação privada da reunião' }),
@@ -209,8 +246,9 @@ describe('DossiePosCall', () => {
 
     expect(screen.getByText(/Acordo do projeto · Leitura pronta/)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'O que ficou combinado' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: /Revisar o briefing em Atendimento assistido/ }),
-    ).toHaveAttribute('href', '/entregas/projeto-1#briefing-kickoff');
+    expect(screen.getByRole('link', { name: 'Revisar acordo do projeto' })).toHaveAttribute(
+      'href',
+      '/entregas/projeto-1#briefing-kickoff',
+    );
   });
 });
