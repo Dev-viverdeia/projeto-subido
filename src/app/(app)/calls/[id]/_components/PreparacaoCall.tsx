@@ -4,7 +4,7 @@ import type { PosCall } from '@/lib/calls/queries';
 import { ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { podeAlterarHorario } from '@/lib/calls/agenda-modelo';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
-import { RoteiroPreparacao } from './RoteiroPreparacao';
+import { RoteiroPreparacao } from '@/components/calls/RoteiroPreparacao';
 import styles from './PreparacaoCall.module.css';
 
 const DATA = new Intl.DateTimeFormat('pt-BR', {

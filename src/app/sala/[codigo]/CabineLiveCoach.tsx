@@ -34,7 +34,7 @@ const ROTULO_ESTADO: Record<EstadoCoach, string> = {
   analisando: 'Lendo o momento',
   indisponivel: 'Orientação pausada',
 };
-const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
+export const ROTULO_GRAVACAO: Record<EstadoGravacaoUi, string> = {
   iniciando: 'Preparando memória',
   pendente: 'Preparando memória',
   gravando: 'Gravação protegida',
@@ -56,6 +56,7 @@ export function CabineLiveCoach({
   tipo = 'descoberta',
   historico = [],
   onOcultar,
+  embutido = false,
 }: {
   ativo: boolean;
   estado: EstadoCoach;
@@ -68,6 +69,7 @@ export function CabineLiveCoach({
   tipo?: TipoCall;
   historico?: SugestaoLive[];
   onOcultar?: () => void;
+  embutido?: boolean;
 }) {
   const kickoff = tipo === 'kickoff';
   const comecou = Boolean(fala.trim()) && !fala.startsWith('Aguardando');
@@ -95,10 +97,12 @@ export function CabineLiveCoach({
           <p>{kickoff ? 'Acordo do projeto' : ativo ? 'Coach da reunião' : 'Memória da reunião'}</p>
           <span>{ROTULO_ESTADO[estado]}</span>
         </div>
-        <span className={styles.privado} title="Este painel não aparece para o cliente">
-          <LockKeyhole size={15} aria-hidden="true" />
-          <span>Só você vê</span>
-        </span>
+        {!embutido && (
+          <span className={styles.privado} title="Este painel não aparece para o cliente">
+            <LockKeyhole size={15} aria-hidden="true" />
+            <span>Só você vê</span>
+          </span>
+        )}
       </header>
 
       {falha && (
@@ -194,13 +198,15 @@ export function CabineLiveCoach({
         )}
       </div>
 
-      <footer>
-        <span className={styles.gravacao} data-estado={gravacao}>
-          <Circle size={8} fill="currentColor" strokeWidth={0} aria-hidden="true" />
-          {ROTULO_GRAVACAO[gravacao]}
-        </span>
-        <span>{kickoff ? 'Acordo para revisar ao encerrar' : 'Resumo na ficha ao encerrar'}</span>
-      </footer>
+      {!embutido && (
+        <footer>
+          <span className={styles.gravacao} data-estado={gravacao}>
+            <Circle size={8} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+            {ROTULO_GRAVACAO[gravacao]}
+          </span>
+          <span>{kickoff ? 'Acordo para revisar ao encerrar' : 'Resumo na ficha ao encerrar'}</span>
+        </footer>
+      )}
     </aside>
   );
 }

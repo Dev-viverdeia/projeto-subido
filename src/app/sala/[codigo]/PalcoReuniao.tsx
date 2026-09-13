@@ -184,7 +184,7 @@ export function PalcoReuniao({
   }
 
   return (
-    <div className={`lk-video-conference ${styles.palco}`}>
+    <div className={`lk-video-conference ${styles.palco}`} data-anfitriao={anfitriao || undefined}>
       {conexao !== ConnectionState.Connected && (
         <p className={styles.conexao} role="status">
           {conexao === ConnectionState.Connecting

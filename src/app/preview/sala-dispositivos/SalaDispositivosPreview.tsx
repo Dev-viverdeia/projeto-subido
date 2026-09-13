@@ -5,11 +5,20 @@ import { Room } from 'livekit-client';
 import { RoomContext } from '@livekit/components-react';
 import { PalcoReuniao } from '@/app/sala/[codigo]/PalcoReuniao';
 import { CabineLiveCoach } from '@/app/sala/[codigo]/CabineLiveCoach';
+import { PainelPrivadoSala } from '@/app/sala/[codigo]/PainelPrivadoSala';
+import type { PlanoCall } from '@/lib/calls/plano';
+import type { TipoCall } from '@/lib/calls/tipos';
 import { MIDIA_INICIAL } from '@/app/sala/[codigo]/usePreparacaoMidia';
 import styles from '@/app/sala/[codigo]/sala.module.css';
 
 /** Fixture somente em desenvolvimento: nenhuma conexão ou permissão de mídia. */
-export function SalaDispositivosPreview() {
+export function SalaDispositivosPreview({
+  roteiro,
+  convidado = false,
+}: {
+  roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
+  convidado?: boolean;
+}) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
   useEffect(() => {
@@ -50,25 +59,50 @@ export function SalaDispositivosPreview() {
   if (!room) return <p role="status">Preparando a prévia da sala…</p>;
   return (
     <main className={styles.salaAoVivo} data-lk-theme="default">
+      <h1 className="sr-only">Reunião de demonstração</h1>
       <div className="lk-room-container">
         <RoomContext.Provider value={room}>
-          <div className={styles.experienciaAnfitriao}>
+          <div
+            className={styles.experienciaAnfitriao}
+            style={convidado ? { gridTemplateColumns: 'minmax(0, 1fr)' } : undefined}
+          >
             <div className={styles.palcoVideo}>
               <PalcoReuniao
-                anfitriao
+                anfitriao={!convidado}
                 escolhas={escolhas}
                 aoMudarEscolhas={setEscolhas}
                 aoFalhar={() => {}}
               />
             </div>
-            <CabineLiveCoach
-              ativo
-              estado="escutando"
-              gravacao="gravando"
-              sugestao={null}
-              fala="Aguardando a primeira fala…"
-              tipo="descoberta"
-            />
+            {!convidado &&
+              (roteiro ? (
+                <PainelPrivadoSala
+                  plano={roteiro.plano}
+                  tipo={roteiro.tipo}
+                  ativo={roteiro.ativo}
+                  gravacao="indisponivel"
+                >
+                  <CabineLiveCoach
+                    embutido
+                    ativo={roteiro.ativo}
+                    estado="indisponivel"
+                    gravacao="indisponivel"
+                    plano={roteiro.plano}
+                    sugestao={null}
+                    fala="Aguardando a primeira fala…"
+                    tipo={roteiro.tipo}
+                  />
+                </PainelPrivadoSala>
+              ) : (
+                <CabineLiveCoach
+                  ativo
+                  estado="escutando"
+                  gravacao="gravando"
+                  sugestao={null}
+                  fala="Aguardando a primeira fala…"
+                  tipo="descoberta"
+                />
+              ))}
           </div>
         </RoomContext.Provider>
       </div>

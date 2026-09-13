@@ -328,6 +328,10 @@
     min-height: 0;
     aspect-ratio: 3 / 4;
   }
+  /* Com o apoio privado aberto, quadros quadrados cabem acima dos controles a 390×664. */
+  .palco[data-anfitriao] .pessoa:not([data-destaque]) {
+    aspect-ratio: 1;
+  }
   .nome {
     padding-left: var(--via-space-2);
     font-size: var(--via-fs-caption);

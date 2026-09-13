@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { ConviteCall } from '@/lib/calls/queries';
+import { montarPlanoCall } from '@/lib/calls/plano';
 
 vi.mock('@livekit/components-react', () => ({
   LiveKitRoom: ({
@@ -69,6 +70,39 @@ const CONVITE: ConviteCall = {
 };
 
 describe('SalaCall', () => {
+  it('não monta o apoio privado na sala do convidado, mesmo se um plano for passado por engano', async () => {
+    const user = userEvent.setup();
+    const mock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(
+          JSON.stringify({ server_url: 'wss://livekit.example.test', participant_token: 'teste' }),
+          { status: 201 },
+        ),
+      );
+    render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={CONVITE}
+        anfitriao={false}
+        nomeSugerido="Convidado"
+        videoConfigurado
+        planoAnfitriao={montarPlanoCall({
+          tipo: 'descoberta',
+          empresa: 'Confidencial',
+          oportunidade: 'Privado',
+          proximaAcao: null,
+          dossie: null,
+        })}
+      />,
+    );
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+    expect(await screen.findByTestId('sala-livekit')).toBeVisible();
+    expect(screen.queryByText('Live Coach')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Confidencial/)).not.toBeInTheDocument();
+    mock.mockRestore();
+  });
   it('reproduz o áudio remoto apenas uma vez', async () => {
     const user = userEvent.setup();
     const mock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(

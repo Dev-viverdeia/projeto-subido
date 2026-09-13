@@ -21,20 +21,41 @@ const ETAPAS = {
 export function RoteiroPreparacao({
   plano,
   kickoff,
+  compacto = false,
 }: {
   plano: Pick<PlanoCall, 'abertura' | 'perguntas' | 'fechamento'>;
   kickoff: boolean;
+  compacto?: boolean;
 }) {
   const id = useId();
   const [momento, setMomento] = useState<(typeof MOMENTOS)[number]['id']>('perguntas');
   const [indice, setIndice] = useState(0);
   const perguntaRef = useRef<HTMLHeadingElement>(null);
+  const roteiroRef = useRef<HTMLElement>(null);
   const listaRef = useRef<HTMLDetailsElement>(null);
   const posicao = Math.min(indice, Math.max(0, plano.perguntas.length - 1));
   const pergunta = plano.perguntas[posicao];
 
+  function escolherMomento(valor: (typeof MOMENTOS)[number]['id']) {
+    setMomento(valor);
+    if (compacto)
+      requestAnimationFrame(() => roteiroRef.current?.scrollIntoView?.({ block: 'start' }));
+  }
+  function escolherPergunta(valor: number) {
+    setIndice(valor);
+    if (compacto)
+      requestAnimationFrame(() => {
+        perguntaRef.current?.scrollIntoView?.({ block: 'nearest' });
+      });
+  }
+
   return (
-    <section className={styles.roteiro} aria-label="Roteiro da reunião">
+    <section
+      ref={roteiroRef}
+      className={styles.roteiro}
+      data-compacto={compacto || undefined}
+      aria-label="Roteiro da reunião"
+    >
       <nav className={styles.momentos} aria-label="Momentos do roteiro">
         {MOMENTOS.map((item) => (
           <button
@@ -42,7 +63,7 @@ export function RoteiroPreparacao({
             key={item.id}
             aria-pressed={momento === item.id}
             aria-controls={`${id}-painel`}
-            onClick={() => setMomento(item.id)}
+            onClick={() => escolherMomento(item.id)}
           >
             {item.rotulo}
           </button>
@@ -56,7 +77,7 @@ export function RoteiroPreparacao({
             <Button
               variant="secondary"
               className={styles.botao}
-              onClick={() => setMomento('perguntas')}
+              onClick={() => escolherMomento('perguntas')}
               iconRight={<ArrowRight size={18} aria-hidden="true" />}
             >
               Ir para as perguntas
@@ -114,7 +135,7 @@ export function RoteiroPreparacao({
                     variant="secondary"
                     className={styles.botao}
                     disabled={posicao === 0}
-                    onClick={() => setIndice(posicao - 1)}
+                    onClick={() => escolherPergunta(posicao - 1)}
                     aria-label="Pergunta anterior"
                     iconLeft={<ArrowLeft size={18} aria-hidden="true" />}
                   >
@@ -123,7 +144,7 @@ export function RoteiroPreparacao({
                   {posicao < plano.perguntas.length - 1 ? (
                     <Button
                       className={styles.botao}
-                      onClick={() => setIndice(posicao + 1)}
+                      onClick={() => escolherPergunta(posicao + 1)}
                       aria-label="Próxima pergunta"
                       iconRight={<ArrowRight size={18} aria-hidden="true" />}
                     >
@@ -132,7 +153,7 @@ export function RoteiroPreparacao({
                   ) : (
                     <Button
                       className={styles.botao}
-                      onClick={() => setMomento('fechamento')}
+                      onClick={() => escolherMomento('fechamento')}
                       iconRight={<ArrowRight size={18} aria-hidden="true" />}
                     >
                       Ver fechamento
@@ -151,7 +172,7 @@ export function RoteiroPreparacao({
                           type="button"
                           aria-current={i === posicao ? 'step' : undefined}
                           onClick={() => {
-                            setIndice(i);
+                            escolherPergunta(i);
                             if (listaRef.current) listaRef.current.open = false;
                             perguntaRef.current?.focus();
                           }}

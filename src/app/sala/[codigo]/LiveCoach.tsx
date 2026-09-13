@@ -7,6 +7,7 @@ import type { SegmentoLive } from '@/lib/calls/coach-schema';
 import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { useOrientacoesCoach } from './useOrientacoesCoach';
+import { PainelPrivadoSala } from './PainelPrivadoSala';
 import { salvarSaida as persistirSaida } from './salvarSaida';
 import {
   CabineLiveCoach,
@@ -399,18 +400,21 @@ export function LiveCoach({
   }, [salvarSaida, room, encerramentoRef]);
 
   return (
-    <CabineLiveCoach
-      ativo={ativo}
-      estado={estado}
-      sugestao={sugestao}
-      historico={historico}
-      onOcultar={ocultar}
-      fala={parcial || ultimaFala}
-      parcial={Boolean(parcial)}
-      falha={falha}
-      gravacao={gravacao}
-      plano={plano}
-      tipo={tipo}
-    />
+    <PainelPrivadoSala plano={plano} tipo={tipo} ativo={ativo} gravacao={gravacao}>
+      <CabineLiveCoach
+        embutido
+        ativo={ativo}
+        estado={estado}
+        sugestao={sugestao}
+        historico={historico}
+        onOcultar={ocultar}
+        fala={parcial || ultimaFala}
+        parcial={Boolean(parcial)}
+        falha={falha}
+        gravacao={gravacao}
+        plano={plano}
+        tipo={tipo}
+      />
+    </PainelPrivadoSala>
   );
 }
