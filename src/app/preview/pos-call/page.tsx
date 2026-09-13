@@ -1,3 +1,4 @@
+import { operacaoPreview } from './operacao-preview';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { DossiePosCall } from '@/app/(app)/calls/[id]/_components/DossiePosCall';
@@ -7,6 +8,7 @@ import styles from './preview.module.css';
 export const metadata: Metadata = { title: 'Preview · Resumo da reunião' };
 
 const POS_CALL: PosCall = {
+  operacoes: [],
   reuniao: {
     id: '11111111-1111-4111-8111-111111111111',
     titulo: 'Descoberta do atendimento da Clínica Horizonte',
@@ -205,6 +207,7 @@ export default async function PreviewPosCallPage({ searchParams }: PageProps<'/p
         ...base,
         reuniao: { ...base.reuniao, status: 'processando' as const, encerradaEm: null },
         analise: null,
+        operacoes: operacaoPreview('processando'),
         transcricao: base.transcricao ? { ...base.transcricao, status: 'processando' } : null,
       }
     : base;
@@ -237,6 +240,21 @@ export default async function PreviewPosCallPage({ searchParams }: PageProps<'/p
       transcricao: null,
       gravacao: null,
       coach: [],
+    };
+  }
+  if (
+    ['sem-resumo', 'demorada', 'fila', 'retentativa', 'indisponivel'].includes(
+      String(parametros.estado),
+    )
+  ) {
+    posCall = {
+      ...base,
+      analise: null,
+      transcricao: null,
+      gravacao: null,
+      coach: [],
+      operacoes: operacaoPreview(String(parametros.estado)),
+      sincronizacao: { ...base.sincronizacao, historicoCrm: false },
     };
   }
   if (parametros.estado === 'ganha') {

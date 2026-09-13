@@ -11,6 +11,7 @@ import {
   Radar,
 } from 'lucide-react';
 import type { PosCall } from '@/lib/calls/queries';
+import { estadoDoResumo } from '@/lib/calls/estado-resumo';
 import { montarSaidaPosCall } from '@/lib/calls/saida-pos-call';
 import { ROTULO_STATUS_CALL, ROTULO_TIPO_CALL } from '@/lib/calls/tipos';
 import { ROTULO_ETAPA } from '@/lib/crm/etapas';
@@ -64,23 +65,7 @@ function minuto(segundo: number | null): string {
   return `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
 }
 
-function estadoDaAnalise(posCall: PosCall) {
-  if (posCall.analise?.status === 'concluida' && posCall.analise.resumo) {
-    return { rotulo: 'Leitura pronta', tipo: 'pronta' } as const;
-  }
-  if (posCall.analise?.status === 'falhou') {
-    return { rotulo: 'Revisão manual', tipo: 'falhou' } as const;
-  }
-  if (posCall.analise?.status === 'sem_conteudo') {
-    return { rotulo: 'Sem conteúdo', tipo: 'sem_conteudo' } as const;
-  }
-  if (posCall.reuniao.status === 'cancelada') {
-    return { rotulo: 'Reunião cancelada', tipo: 'indisponivel' } as const;
-  }
-  return { rotulo: 'Processando', tipo: 'processando' } as const;
-}
-
-function IconeEstado({ tipo }: { tipo: ReturnType<typeof estadoDaAnalise>['tipo'] }) {
+function IconeEstado({ tipo }: { tipo: ReturnType<typeof estadoDoResumo>['tipo'] }) {
   if (tipo === 'pronta') return <BadgeCheck size={14} aria-hidden="true" />;
   if (tipo === 'falhou') return <CircleAlert size={14} aria-hidden="true" />;
   if (tipo === 'sem_conteudo') return <CircleHelp size={14} aria-hidden="true" />;
@@ -95,8 +80,8 @@ export function DossiePosCall({
   posCall: PosCall;
   estadoAcao: string | null;
 }) {
-  const analise = posCall.analise;
-  const estado = estadoDaAnalise(posCall);
+  const estado = estadoDoResumo(posCall);
+  const analise = estado.tipo === 'pronta' ? posCall.analise : null;
   const pontosAbertos = analise?.lacunas.length ?? 0;
   const acaoJaSincronizada = posCall.sincronizacao.acoesPlano.find(
     (acao) => acao.categoria === 'proxima_acao',
@@ -110,7 +95,7 @@ export function DossiePosCall({
   const temAnalise = estado.tipo === 'pronta';
   const kickoff = posCall.reuniao.tipo === 'kickoff';
   const briefingPronto = kickoff && Boolean(analise?.briefingOperacional);
-  const saida = montarSaidaPosCall(posCall);
+  const saida = montarSaidaPosCall({ ...posCall, analise });
   return (
     <div className={foco.pagina}>
       <nav className={foco.navegacao} aria-label="Navegação após a reunião">
@@ -150,7 +135,7 @@ export function DossiePosCall({
             </span>
           </div>
         </div>
-        {estado.tipo !== 'processando' && (
+        {!estado.acompanhar && (
           <Link id="proximo-passo-pos-call" className={foco.saida} href={saida.href}>
             {briefingPronto
               ? 'Revisar acordo do projeto'
@@ -164,73 +149,24 @@ export function DossiePosCall({
 
       <RetornoProximaAcao estado={estadoAcao} oportunidadeId={posCall.oportunidade.id} />
 
-      {estado.tipo === 'processando' && <AcompanharProcessamento tipo={posCall.reuniao.tipo} />}
-
-      {estado.tipo !== 'processando' && !temAnalise && (
-        <section className={styles.leitura} aria-labelledby="leitura-titulo">
-          <div className={styles.leituraCorpo}>
-            <div className={styles.leituraTopo}>
-              <div>
-                <h2 id="leitura-titulo">Resumo da reunião</h2>
-              </div>
-              {nota !== null && nota !== undefined && (
-                <div className={styles.nota} aria-label={`Leitura comercial ${nota} de 100`}>
-                  <strong>{nota}</strong>
-                  <span>/100</span>
-                </div>
-              )}
-            </div>
-            {estado.tipo === 'falhou' ? (
-              <div className={styles.estadoLeitura}>
-                <CircleAlert size={19} aria-hidden="true" />
-                <div>
-                  <strong>A transcrição foi salva, mas a análise automática falhou.</strong>
-                  <p>
-                    {analise?.erro ?? 'Use a transcrição abaixo para revisar os fatos manualmente.'}
-                  </p>
-                </div>
-              </div>
-            ) : estado.tipo === 'sem_conteudo' ? (
-              <div className={styles.estadoLeitura}>
-                <CircleHelp size={19} aria-hidden="true" />
-                <div>
-                  <strong>A reunião terminou sem conversa suficiente para uma leitura.</strong>
-                  <p>A transcrição foi salva, mas não há conteúdo suficiente para resumir.</p>
-                </div>
-              </div>
-            ) : estado.tipo === 'indisponivel' ? (
-              <div className={styles.estadoLeitura}>
-                <CircleAlert size={19} aria-hidden="true" />
-                <div>
-                  <strong>Esta reunião foi cancelada antes de gerar conteúdo.</strong>
-                  <p>A reunião continua no histórico do cliente.</p>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.estadoLeitura}>
-                <Radar size={19} aria-hidden="true" />
-                <div>
-                  <strong>A análise da reunião está em andamento.</strong>
-                  <p>O resumo e as próximas ações aparecerão quando o processamento terminar.</p>
-                </div>
-              </div>
-            )}
-            <div className={styles.leituraRodape}>
-              <span>Tom percebido: {sentimento}</span>
-            </div>
-          </div>
-        </section>
+      {!temAnalise && (
+        <AcompanharProcessamento
+          key={posCall.reuniao.id}
+          estado={estado}
+          reuniaoId={posCall.reuniao.id}
+          oportunidadeId={posCall.oportunidade.id}
+        />
       )}
 
-      {estado.tipo !== 'processando' && (
+      {!estado.acompanhar && (
         <CentralPlanoCall
-          posCall={posCall}
+          posCall={{ ...posCall, analise }}
           acaoSugerida={acaoSugerida}
           resumo={analise?.resumo ?? null}
         />
       )}
 
-      {estado.tipo !== 'processando' && (
+      {temAnalise && (
         <details className={styles.analiseCompleta}>
           <summary>
             <div>
@@ -349,7 +285,7 @@ export function DossiePosCall({
           </div>
         </details>
       )}
-      {estado.tipo !== 'processando' && (posCall.gravacao || posCall.transcricao) && (
+      {(posCall.gravacao || posCall.transcricao) && (
         <details className={styles.analiseCompleta}>
           <summary>
             <div>

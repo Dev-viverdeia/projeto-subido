@@ -125,6 +125,14 @@
   padding: var(--app-pad-card);
 }
 
+.central[data-sem-analise] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.central[data-sem-analise] > form {
+  border-left: 0;
+}
+
 .decisoes h2 {
   margin: 0;
   color: var(--via-text-primary);

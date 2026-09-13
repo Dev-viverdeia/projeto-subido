@@ -7,6 +7,7 @@ import styles from '../pos-call/preview.module.css';
 export const metadata: Metadata = { title: 'Preview · Preparação da reunião' };
 
 const POS_CALL: PosCall = {
+  operacoes: [],
   reuniao: {
     id: '11111111-1111-4111-8111-111111111111',
     titulo: 'Descoberta do atendimento da Clínica Horizonte',
