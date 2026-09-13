@@ -1,11 +1,11 @@
 'use client';
 
 import { startTransition, useActionState, useState, useSyncExternalStore } from 'react';
-import { Check, CheckCircle2, ListChecks } from 'lucide-react';
+import { Check, CheckCircle2, ChevronDown, ListChecks } from 'lucide-react';
 import { salvarPlanoCall, type EstadoPlanoCall } from '@/lib/calls/plano-actions';
 import { RetornoOperacao } from '../../../_components/RetornoOperacao';
 import { ETAPAS_MOVIMENTO_CRM, ROTULO_ETAPA, type EtapaCrm } from '@/lib/crm/etapas';
-import styles from '../pagina.module.css';
+import styles from './FormularioPlanoCall.module.css';
 
 const assinarMontagem = () => () => {};
 const montadoNoCliente = () => true;
@@ -94,18 +94,6 @@ export function FormularioPlanoCall({
       <input type="hidden" name="reuniao" value={reuniaoId} />
       <input type="hidden" name="oportunidade" value={oportunidadeId} />
 
-      <header className={styles.formularioTopo}>
-        <div>
-          <span>{kickoff ? 'Próximos passos' : 'Revisão antes de salvar'}</span>
-          <p>
-            {kickoff
-              ? 'Ajuste o próximo marco antes de revisar o acordo.'
-              : 'A IA sugere. Você ajusta e confirma.'}
-          </p>
-        </div>
-        <small>Você confirma</small>
-      </header>
-
       <label className={styles.campoAcao}>
         <span>{kickoff ? 'Próximo marco do projeto' : 'Próxima ação da venda'}</span>
         <textarea
@@ -129,32 +117,40 @@ export function FormularioPlanoCall({
       <div className={styles.acaoCampos}>
         <label>
           <span>Data combinada</span>
-          <input
-            type="date"
-            name="quando"
-            value={quando}
-            onChange={(evento) => setQuando(evento.target.value)}
-            disabled={pendente || !pronto}
-          />
+          <span className={styles.data}>
+            <input
+              type="date"
+              name="quando"
+              aria-label="Data combinada"
+              aria-description={quando ? undefined : 'Sem data definida'}
+              value={quando}
+              onChange={(evento) => setQuando(evento.target.value)}
+              disabled={pendente || !pronto}
+            />
+            {!quando && <span aria-hidden="true">Sem data definida</span>}
+          </span>
         </label>
         {kickoff ? (
           <input type="hidden" name="etapa" value="manter" />
         ) : (
           <label>
             <span>Próxima etapa da venda</span>
-            <select
-              name="etapa"
-              value={etapa}
-              onChange={(evento) => setEtapa(evento.target.value)}
-              disabled={pendente || !pronto}
-            >
-              <option value="manter">Manter em {ROTULO_ETAPA[etapaAtual]}</option>
-              {ETAPAS_MOVIMENTO_CRM.filter((etapa) => etapa.id !== etapaAtual).map((etapa) => (
-                <option key={etapa.id} value={etapa.id}>
-                  Mover para {etapa.rotulo}
-                </option>
-              ))}
-            </select>
+            <span className={styles.seletor}>
+              <select
+                name="etapa"
+                value={etapa}
+                onChange={(evento) => setEtapa(evento.target.value)}
+                disabled={pendente || !pronto}
+              >
+                <option value="manter">Manter em {ROTULO_ETAPA[etapaAtual]}</option>
+                {ETAPAS_MOVIMENTO_CRM.filter((etapa) => etapa.id !== etapaAtual).map((etapa) => (
+                  <option key={etapa.id} value={etapa.id}>
+                    Mover para {etapa.rotulo}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={18} aria-hidden="true" />
+            </span>
           </label>
         )}
       </div>
@@ -166,7 +162,9 @@ export function FormularioPlanoCall({
               <ListChecks size={16} aria-hidden="true" />{' '}
               {kickoff ? 'Compromissos do kickoff' : 'Compromissos que serão salvos'}
             </span>
-            <small>{compromissos.length} detectados</small>
+            <small>
+              {selecionados.length} de {compromissos.length} selecionados
+            </small>
           </legend>
           <div>
             {compromissos.map((compromisso, indice) => (
@@ -194,6 +192,9 @@ export function FormularioPlanoCall({
             ))}
           </div>
         </fieldset>
+      )}
+      {compromissos.length === 0 && (
+        <p className={styles.vazio}>Nenhum compromisso registrado nesta reunião.</p>
       )}
 
       {estado.erro && !pendente && (

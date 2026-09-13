@@ -256,7 +256,7 @@ test.describe('fundação visual Viver de IA', () => {
 
   test('o pós-call preserva áudio e transcrição como fontes privadas', async ({ page }) => {
     await page.goto('/preview/pos-call');
-    await page.getByText('Análise completa', { exact: true }).click();
+    await page.getByText('Transcrição e gravação', { exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'Gravação privada da reunião' })).toBeVisible();
     await expect(page.getByText('Somente sua conta')).toBeVisible();
@@ -375,7 +375,7 @@ test.describe('fundação visual Viver de IA', () => {
     await page.goto('/preview/pos-call?tipo=kickoff');
     await expect(page.getByRole('heading', { name: 'O que ficou combinado' })).toBeVisible();
     await expect(page.getByText('Próximo marco do projeto')).toBeVisible();
-    await expect(page.getByRole('link', { name: /Revisar o briefing/ })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Revisar acordo do projeto' })).toHaveAttribute(
       'href',
       '/entregas/projeto-preview#briefing-kickoff',
     );

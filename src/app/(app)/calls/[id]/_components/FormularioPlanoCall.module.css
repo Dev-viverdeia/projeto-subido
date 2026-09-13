@@ -1,0 +1,284 @@
+.formularioAcao {
+  min-width: 0;
+  display: grid;
+  gap: var(--via-space-5);
+  padding: var(--app-pad-card);
+  border-left: 1px solid var(--via-border-hairline);
+}
+
+.campoAcao,
+.acaoCampos label {
+  min-width: 0;
+  display: grid;
+  gap: var(--via-space-2);
+}
+
+.campoAcao > span {
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-section-title);
+  font-weight: var(--via-fw-medium);
+  line-height: 1.35;
+  letter-spacing: var(--app-ls-h3);
+}
+
+.acaoCampos label > span {
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-support);
+}
+
+.formularioAcao textarea,
+.formularioAcao input[type='date'],
+.formularioAcao select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid var(--app-control-line);
+  border-radius: var(--app-radius-control);
+  background: var(--app-control-bg);
+  box-shadow: var(--app-control-shadow);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--app-fs-reading);
+}
+
+.formularioAcao textarea {
+  min-height: 100px;
+  padding: var(--via-space-3);
+  resize: vertical;
+  line-height: var(--app-lh-reading);
+}
+
+.formularioAcao input[type='date'],
+.formularioAcao select {
+  min-height: var(--app-h-control);
+  padding: var(--via-space-2) var(--via-space-3);
+}
+
+.formularioAcao textarea:focus-visible,
+.formularioAcao input:focus-visible,
+.formularioAcao select:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 2px;
+}
+
+.acaoCampos {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--via-space-4);
+}
+
+.seletor {
+  position: relative;
+  min-width: 0;
+}
+
+.data {
+  position: relative;
+  min-width: 0;
+}
+
+/* O campo vazio do Safari desenha a data atual sem tê-la selecionado. O
+   placeholder cobre só a área de texto, preservando calendário e edição nativos. */
+.data > span {
+  position: absolute;
+  inset: 1px var(--via-space-10) 1px var(--via-space-3);
+  display: flex;
+  align-items: center;
+  background: var(--via-surface);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  pointer-events: none;
+}
+
+.data:focus-within > span {
+  visibility: hidden;
+}
+
+/* Safari limita o menu nativo a 27px mesmo com min-height. A aparência local
+   preserva o select nativo e leva o alvo medido ao mínimo de 44px. */
+.seletor select {
+  appearance: none;
+  padding-right: var(--via-space-10);
+}
+
+.seletor > svg {
+  position: absolute;
+  right: var(--via-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.formularioAcao[data-modo='kickoff'] .acaoCampos {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.compromissosCall {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.compromissosCall legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--via-space-2) var(--via-space-4);
+  margin-bottom: var(--via-space-2);
+}
+
+.compromissosCall legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  color: var(--via-text-primary);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+
+.compromissosCall legend small {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-meta);
+}
+
+.compromissosCall label {
+  position: relative;
+  min-height: var(--app-h-control);
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--via-space-3);
+  padding: var(--via-space-3) 0;
+  cursor: pointer;
+}
+
+.compromissosCall label + label {
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.compromissosCall input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.compromissosCall label > span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--via-text-muted);
+  border-radius: var(--app-radius-track);
+  background: var(--via-surface);
+  color: transparent;
+}
+
+.compromissosCall input:checked + span {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+
+.compromissosCall input:focus-visible + span {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+}
+
+.compromissosCall p {
+  margin: 0;
+  color: var(--via-text-body);
+  font-size: var(--app-fs-ui);
+  line-height: var(--app-lh-reading);
+  overflow-wrap: anywhere;
+}
+
+.vazio,
+.formularioRodape > small {
+  margin: 0;
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  line-height: var(--app-lh-ui);
+}
+
+.formularioRodape {
+  display: grid;
+  justify-items: start;
+  gap: var(--via-space-3);
+  padding-top: var(--via-space-4);
+  border-top: 1px solid var(--via-border-hairline);
+}
+
+.formularioAcao button {
+  min-height: var(--app-h-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  border: 0;
+  border-radius: var(--app-radius-control);
+  background: var(--via-navy);
+  color: var(--via-white);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  padding: var(--via-space-3) var(--via-space-5);
+  cursor: pointer;
+  box-shadow: var(--app-elev-1-shadow);
+  transition: background-color var(--app-t-state);
+}
+
+.formularioAcao button:hover:not(:disabled) {
+  background: var(--via-navy-deep);
+}
+
+.formularioAcao button:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+  box-shadow: var(--app-elev-1-shadow);
+}
+
+.formularioAcao button:disabled {
+  cursor: wait;
+}
+
+@media (max-width: 899px) {
+  .formularioAcao {
+    border-left: 0;
+    border-top: 1px solid var(--via-border-hairline);
+  }
+}
+
+@media (max-width: 599px) {
+  .formularioAcao {
+    padding: var(--app-pad-card-tight);
+  }
+
+  .acaoCampos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .formularioRodape button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .formularioAcao button {
+    transition-property: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .formularioAcao button {
+    border: 1px solid ButtonText;
+  }
+
+  .compromissosCall input:checked + span {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}

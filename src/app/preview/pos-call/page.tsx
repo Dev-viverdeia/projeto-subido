@@ -200,7 +200,7 @@ export default async function PreviewPosCallPage({ searchParams }: PageProps<'/p
           : null,
       }
     : POS_CALL;
-  const posCall = processando
+  let posCall: PosCall = processando
     ? {
         ...base,
         reuniao: { ...base.reuniao, status: 'processando' as const, encerradaEm: null },
@@ -208,6 +208,54 @@ export default async function PreviewPosCallPage({ searchParams }: PageProps<'/p
         transcricao: base.transcricao ? { ...base.transcricao, status: 'processando' } : null,
       }
     : base;
+  if (parametros.estado === 'vazio' || parametros.estado === 'falhou') {
+    posCall = {
+      ...base,
+      analise: base.analise
+        ? {
+            ...base.analise,
+            status: parametros.estado === 'falhou' ? 'falhou' : 'concluida',
+            resumo:
+              parametros.estado === 'falhou'
+                ? null
+                : 'A conversa não registrou decisões ou compromissos explícitos.',
+            decisoes: [],
+            compromissos: [],
+            proximosPassos: [],
+            sinaisCompra: [],
+            oportunidadesProjeto: [],
+            notaComercial: null,
+          }
+        : null,
+    };
+  }
+  if (parametros.estado === 'cancelada') {
+    posCall = {
+      ...base,
+      reuniao: { ...base.reuniao, status: 'cancelada' },
+      analise: null,
+      transcricao: null,
+      gravacao: null,
+      coach: [],
+    };
+  }
+  if (parametros.estado === 'ganha') {
+    posCall = { ...base, oportunidade: { ...base.oportunidade, etapa: 'ganho' } };
+  }
+  if (parametros.estado === 'extenso' && base.analise) {
+    posCall = {
+      ...base,
+      analise: {
+        ...base.analise,
+        decisoes: [
+          ...base.analise.decisoes,
+          'A equipe acompanhará as primeiras conversas antes de ampliar o atendimento.',
+          'O diagnóstico incluirá os riscos e as responsabilidades de cada participante.',
+          'Uma nova unidade só será incluída após a revisão dos resultados.',
+        ],
+      },
+    };
+  }
 
   return (
     <main className={styles.preview}>
