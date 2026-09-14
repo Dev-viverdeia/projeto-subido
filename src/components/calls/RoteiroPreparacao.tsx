@@ -4,6 +4,7 @@ import { useId, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { Button } from '@/design-system/via';
 import type { PlanoCall } from '@/lib/calls/plano';
+import type { PontoRoteiro } from '@/lib/calls/posicao-roteiro';
 import styles from './RoteiroPreparacao.module.css';
 
 const MOMENTOS = [
@@ -22,14 +23,17 @@ export function RoteiroPreparacao({
   plano,
   kickoff,
   compacto = false,
+  navegacao,
 }: {
   plano: Pick<PlanoCall, 'abertura' | 'perguntas' | 'fechamento'>;
   kickoff: boolean;
   compacto?: boolean;
+  navegacao?: { posicao: PontoRoteiro; aoMudar: (posicao: PontoRoteiro) => void };
 }) {
   const id = useId();
-  const [momento, setMomento] = useState<(typeof MOMENTOS)[number]['id']>('perguntas');
-  const [indice, setIndice] = useState(0);
+  const [local, setLocal] = useState<PontoRoteiro>({ momento: 'perguntas', indice: 0 });
+  const { momento, indice } = navegacao?.posicao ?? local;
+  const atualizar = navegacao?.aoMudar ?? setLocal;
   const perguntaRef = useRef<HTMLHeadingElement>(null);
   const roteiroRef = useRef<HTMLElement>(null);
   const listaRef = useRef<HTMLDetailsElement>(null);
@@ -37,12 +41,12 @@ export function RoteiroPreparacao({
   const pergunta = plano.perguntas[posicao];
 
   function escolherMomento(valor: (typeof MOMENTOS)[number]['id']) {
-    setMomento(valor);
+    atualizar({ momento: valor, indice });
     if (compacto)
       requestAnimationFrame(() => roteiroRef.current?.scrollIntoView?.({ block: 'start' }));
   }
   function escolherPergunta(valor: number) {
-    setIndice(valor);
+    atualizar({ momento, indice: valor });
     if (compacto)
       requestAnimationFrame(() => {
         perguntaRef.current?.scrollIntoView?.({ block: 'nearest' });

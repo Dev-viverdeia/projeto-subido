@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ConviteCall } from '@/lib/calls/queries';
 import { DisconnectReason } from 'livekit-client';
 import type * as Reconexao from '@/lib/calls/reconexao';
+import { montarPlanoCall } from '@/lib/calls/plano';
+import { limparPosicoesRoteiro } from '@/lib/calls/posicao-roteiro-local';
 
 const conexao = vi.hoisted(() => ({ desconectar: (_reason?: number) => {}, navegar: vi.fn() }));
 
@@ -43,16 +45,24 @@ vi.mock('@livekit/components-react', () => ({
     );
   },
   RoomAudioRenderer: () => <audio data-testid="audio-remoto" />,
-  // O prefab já inclui RoomAudioRenderer. Uma segunda instância duplica a voz remota.
-  VideoConference: () => (
-    <div>
-      Palco da reunião
-      <audio data-testid="audio-remoto" />
-    </div>
-  ),
 }));
 
-vi.mock('./LiveCoach', () => ({ LiveCoach: () => <aside>Live Coach</aside> }));
+vi.mock('./LiveCoach', async () => {
+  const { PainelPrivadoSala } = await import('./PainelPrivadoSala');
+  return {
+    LiveCoach: ({ reuniaoId, plano, tipo }: React.ComponentProps<typeof PainelPrivadoSala>) => (
+      <PainelPrivadoSala
+        reuniaoId={reuniaoId}
+        plano={plano}
+        tipo={tipo}
+        ativo={false}
+        gravacao="indisponivel"
+      >
+        <p>Live Coach simulado, sem captura</p>
+      </PainelPrivadoSala>
+    ),
+  };
+});
 vi.mock('./PalcoReuniao', () => ({
   PalcoReuniao: ({
     aoSair,
@@ -105,6 +115,70 @@ const CONVITE: ConviteCall = {
 };
 
 describe('SalaCall', () => {
+  it('retoma roteiro na reconexão e na reentrada local, sem iniciar mídia', async () => {
+    limparPosicoesRoteiro();
+    const user = userEvent.setup();
+    const plano = montarPlanoCall({
+      tipo: 'descoberta',
+      empresa: 'Horizonte',
+      oportunidade: 'Atendimento',
+      proximaAcao: null,
+      dossie: null,
+    });
+    // Cada entrada precisa de uma Response nova, pois o corpo só pode ser lido uma vez.
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            server_url: 'wss://livekit.example.test',
+            participant_token: 'teste',
+          }),
+          { status: 201 },
+        ),
+      ),
+    );
+    const view = render(
+      <SalaCall
+        codigo="continuidade"
+        convite={CONVITE}
+        anfitriao
+        nomeSugerido="Rafael"
+        videoConfigurado
+        planoAnfitriao={plano}
+      />,
+    );
+    try {
+      await user.click(screen.getByRole('checkbox'));
+      await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+      await user.click(await screen.findByRole('button', { name: 'Próxima pergunta' }));
+      await user.click(screen.getByRole('button', { name: 'Simular queda de conexão' }));
+      expect(
+        await screen.findByRole('heading', { name: plano.perguntas[1]!.pergunta }),
+      ).toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Como fechar' }));
+      await user.click(screen.getByRole('button', { name: 'Simular saída voluntária' }));
+      await user.click(await screen.findByRole('button', { name: 'Voltar à entrada' }));
+      await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+      expect(
+        await screen.findByRole('heading', { name: 'Combinar o próximo passo' }),
+      ).toBeVisible();
+      expect(screen.getByTestId('sala-livekit')).toHaveAttribute('data-audio', 'false');
+      expect(screen.getByTestId('sala-livekit')).toHaveAttribute('data-video', 'false');
+      expect(
+        fetchMock.mock.calls.filter(([url]) => typeof url === 'string' && url.endsWith('/token')),
+      ).toHaveLength(3);
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+      const saida = fetchMock.mock.calls.find(
+        ([url]) => typeof url === 'string' && url.endsWith('/finalizar'),
+      );
+      expect(saida).toBeDefined();
+      expect(JSON.parse(saida![1]?.body as string)).toMatchObject({ encerrar: false });
+    } finally {
+      view.unmount();
+      fetchMock.mockRestore();
+      limparPosicoesRoteiro();
+    }
+  });
   it('volta à entrada sem reutilizar a câmera e o microfone da participação anterior', async () => {
     const user = userEvent.setup();
     const original = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');

@@ -2,6 +2,8 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MenuPerfil } from './MenuPerfil';
+import { sair } from '@/lib/auth/actions';
+import { PREFIXO_POSICAO_ROTEIRO } from '@/lib/calls/posicao-roteiro-local';
 
 let caminho = '/conta';
 
@@ -19,6 +21,16 @@ afterEach(() => {
 });
 
 describe('MenuPerfil', () => {
+  it('apaga a posição privada do roteiro ao encerrar a sessão', async () => {
+    const chave = PREFIXO_POSICAO_ROTEIRO + 'reuniao-teste';
+    sessionStorage.setItem(chave, 'marcador de leitura');
+    const usuario = userEvent.setup();
+    render(<MenuPerfil nome="QA Subido" email="qa@viverdeia.ai" />);
+    await usuario.click(screen.getByRole('button', { name: 'QA Subido' }));
+    await usuario.click(screen.getByRole('menuitem', { name: 'Encerrar sessão' }));
+    expect(sessionStorage.getItem(chave)).toBeNull();
+    expect(sair).toHaveBeenCalled();
+  });
   it('reúne identidade, continuidade e saída segura', async () => {
     const usuario = userEvent.setup();
     render(<MenuPerfil nome="QA Subido" email="qa@viverdeia.ai" />);

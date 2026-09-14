@@ -1,12 +1,13 @@
 'use client';
 
-import { useId, useState, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { LockKeyhole } from 'lucide-react';
 import { RoteiroPreparacao } from '@/components/calls/RoteiroPreparacao';
 import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { ROTULO_GRAVACAO, type EstadoGravacaoUi } from './CabineLiveCoach';
 import styles from './PainelPrivadoSala.module.css';
+import { usePosicaoRoteiro } from './usePosicaoRoteiro';
 
 /** Consulta local: não inicia mídia, não gera perguntas e não registra respostas. */
 export function PainelPrivadoSala({
@@ -15,15 +16,19 @@ export function PainelPrivadoSala({
   children,
   ativo,
   gravacao,
+  reuniaoId,
 }: {
   plano: PlanoCall | null;
   tipo: TipoCall;
   children: ReactNode;
   ativo: boolean;
   gravacao: EstadoGravacaoUi;
+  reuniaoId?: string;
 }) {
   const id = useId();
-  const [consulta, setConsulta] = useState<'roteiro' | 'ao-vivo'>('roteiro');
+  const { posicao, atualizar } = usePosicaoRoteiro(reuniaoId, plano, tipo);
+  const { consulta } = posicao;
+  const setConsulta = (valor: typeof consulta) => atualizar({ consulta: valor });
 
   return (
     <aside className={styles.painel} aria-label="Apoio privado da reunião">
@@ -57,7 +62,12 @@ export function PainelPrivadoSala({
       <div className={styles.conteudo} id={`${id}-roteiro`} hidden={consulta !== 'roteiro'}>
         {plano ? (
           <>
-            <RoteiroPreparacao plano={plano} kickoff={tipo === 'kickoff'} compacto />
+            <RoteiroPreparacao
+              plano={plano}
+              kickoff={tipo === 'kickoff'}
+              compacto
+              navegacao={{ posicao, aoMudar: atualizar }}
+            />
             <details className={styles.objetivo}>
               <summary>Objetivo da reunião</summary>
               <p>{plano.objetivo}</p>

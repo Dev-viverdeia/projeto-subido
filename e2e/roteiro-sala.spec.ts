@@ -31,9 +31,16 @@ test('consulta roteiro sem Coach, preserva pergunta e não inicia APIs ou mídia
     .getByRole('heading', { level: 3 })
     .innerText();
   await painel.getByRole('button', { name: 'Ao vivo', exact: true }).click();
+  await page.reload();
+  await expect(painel.getByRole('button', { name: 'Ao vivo', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await expect(painel.getByRole('region', { name: 'Roteiro da reunião' })).toBeHidden();
   await expect(painel.getByRole('status')).toHaveText('Gravação indisponível');
   await painel.getByRole('button', { name: 'Roteiro', exact: true }).click();
+  await expect(painel.getByRole('heading', { name: pergunta, exact: true })).toBeVisible();
+  await page.reload();
   await expect(painel.getByRole('heading', { name: pergunta, exact: true })).toBeVisible();
   const perguntaCaixa = await painel
     .getByRole('heading', { name: pergunta, exact: true })
@@ -54,6 +61,50 @@ test('consulta roteiro sem Coach, preserva pergunta e não inicia APIs ou mídia
   expect(erros).toEqual([]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: info.outputPath('roteiro-sala.png'), fullPage: true });
+});
+
+test('retoma fechamento, separa reuniões e reinicia quando o roteiro muda', async ({ page }) => {
+  await page.goto('/preview/roteiro-sala');
+  await page.getByRole('button', { name: 'Como fechar', exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'Combinar o próximo passo', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Como fechar', exact: true })).not.toBeFocused();
+  await page.goto('/preview/roteiro-sala?reuniao=outra');
+  await expect(
+    page.getByRole('heading', { name: 'Perguntas essenciais', exact: true }),
+  ).toBeVisible();
+  await page.goto('/preview/roteiro-sala');
+  await expect(
+    page.getByRole('heading', { name: 'Combinar o próximo passo', exact: true }),
+  ).toBeVisible();
+  await page.goto('/preview/roteiro-sala?estado=extenso');
+  await expect(
+    page.getByRole('heading', { name: 'Perguntas essenciais', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: 'Roteiro da reunião' }).getByRole('heading', { level: 3 }),
+  ).toContainText('Considere os turnos');
+});
+
+test('armazenamento bloqueado não impede navegar e arquivo corrompido não quebra a sala', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('subido-roteiro-sala:preview-roteiro-sala', '{invalido');
+    Storage.prototype.setItem = () => {
+      throw new Error('Armazenamento bloqueado');
+    };
+  });
+  await page.goto('/preview/roteiro-sala');
+  const roteiro = page.getByRole('region', { name: 'Roteiro da reunião' });
+  await expect(roteiro.getByText('1 de 4', { exact: true })).toBeVisible();
+  await roteiro.getByRole('button', { name: 'Próxima pergunta' }).click();
+  await expect(roteiro.getByText('2 de 4', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Ao vivo', exact: true }).click();
+  await page.getByRole('button', { name: 'Roteiro', exact: true }).click();
+  await expect(roteiro.getByText('2 de 4', { exact: true })).toBeVisible();
 });
 
 test('rolagem do painel preserva controles da sala em 320px e perguntas completas', async ({

@@ -400,7 +400,13 @@ export function LiveCoach({
   }, [salvarSaida, room, encerramentoRef]);
 
   return (
-    <PainelPrivadoSala plano={plano} tipo={tipo} ativo={ativo} gravacao={gravacao}>
+    <PainelPrivadoSala
+      reuniaoId={reuniaoId}
+      plano={plano}
+      tipo={tipo}
+      ativo={ativo}
+      gravacao={gravacao}
+    >
       <CabineLiveCoach
         embutido
         ativo={ativo}
