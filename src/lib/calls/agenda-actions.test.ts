@@ -20,6 +20,7 @@ function formulario() {
     agendadaPara: '2099-10-10T15:00',
     duracao: '45',
     offsetMinutos: '180',
+    fusoHorario: 'America/Sao_Paulo',
     dono: 'atacante',
   }))
     form.set(campo, valor);
@@ -51,6 +52,7 @@ describe('fronteira de alteração da reunião', () => {
         dono: 'dono-autenticado',
         agendadaPara: '2099-10-10T18:00:00.000Z',
         duracaoMinutos: 45,
+        fusoHorario: 'America/Sao_Paulo',
       }),
     );
     expect(revalidar).toHaveBeenCalledWith('/reunioes/11111111-1111-4111-8111-111111111111');

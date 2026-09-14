@@ -157,6 +157,7 @@ export async function agendarReuniao(
     inicio: quando.toISOString(),
     duracao: validacao.data.duracao,
     confirmacao: texto(formData, 'confirmacaoHorario'),
+    fuso: texto(formData, 'fusoHorario'),
   });
   if (conferencia.erro || conferencia.conflito) return { campos, ...conferencia };
 

@@ -7,6 +7,10 @@ export default async function PreviewConflitos({
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
   return (
-    <ConflitosPreview reagendar={params.modo === 'reagendar'} varios={params.varios === '1'} />
+    <ConflitosPreview
+      reagendar={params.modo === 'reagendar'}
+      varios={params.varios === '1'}
+      alternativas={typeof params.alternativas === 'string' ? params.alternativas : undefined}
+    />
   );
 }

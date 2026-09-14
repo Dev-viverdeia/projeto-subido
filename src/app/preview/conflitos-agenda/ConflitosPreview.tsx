@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import type { ConflitoHorario } from '@/lib/calls/conflitos-modelo';
 import type { ReuniaoCall } from '@/lib/calls/reuniao-modelo';
 import { FormularioAgendarCall } from '@/app/(app)/calls/_components/FormularioAgendarCall';
@@ -28,8 +29,19 @@ const reuniao: ReuniaoCall = {
 };
 
 /** Somente transporte local de teste. A página é 404 no build de produção. */
-export function ConflitosPreview({ reagendar, varios }: { reagendar: boolean; varios: boolean }) {
+export function ConflitosPreview({
+  reagendar,
+  varios,
+  alternativas,
+}: {
+  reagendar: boolean;
+  varios: boolean;
+  alternativas?: string;
+}) {
+  const opcoes = useRef<string[]>([]);
+  const [consultas, setConsultas] = useState(0);
   async function conferir(form: FormData): Promise<ConflitoHorario | undefined> {
+    setConsultas((valor) => valor + 1);
     await new Promise((resolve) => setTimeout(resolve, 350));
     const data = form.get('agendadaPara');
     if (typeof data !== 'string') throw new Error('Horário ausente no teste');
@@ -37,11 +49,24 @@ export function ConflitosPreview({ reagendar, varios }: { reagendar: boolean; va
     const duracao = Number(form.get('duracao'));
     const confirmacao = `${inicio}:${duracao}`;
     if (form.get('confirmacaoHorario') === confirmacao) return;
+    if (alternativas === 'sim' && opcoes.current.includes(inicio)) return;
+    opcoes.current = Array.from({ length: 3 }, (_, i) => {
+      const horario = new Date(data);
+      horario.setDate(horario.getDate() + 2);
+      horario.setHours(9, i * 30, 0, 0);
+      return horario.toISOString();
+    });
     return {
       inicio,
       duracao,
       confirmacao,
       total: varios ? 9 : 1,
+      alternativas:
+        alternativas === 'vazio'
+          ? []
+          : alternativas === 'sim' || alternativas === 'ocupou'
+            ? opcoes.current
+            : undefined,
       reunioes: Array.from({ length: varios ? 5 : 1 }, (_, i) => ({
         id: String(i),
         titulo:
@@ -56,6 +81,7 @@ export function ConflitosPreview({ reagendar, varios }: { reagendar: boolean; va
   return (
     <main className={styles.conteudo}>
       <h1>Reuniões</h1>
+      <output aria-label="Consultas simuladas">{consultas}</output>
       {reagendar ? (
         <GerenciarAgenda
           reuniao={reuniao}

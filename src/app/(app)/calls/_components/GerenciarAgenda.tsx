@@ -5,19 +5,16 @@ import { useRouter } from 'next/navigation';
 import { CalendarClock, CalendarX2 } from 'lucide-react';
 import { Button, Input } from '@/design-system/via';
 import type { ReuniaoCall } from '@/lib/calls/reuniao-modelo';
-import { podeAlterarHorario } from '@/lib/calls/agenda-modelo';
+import { horarioLocal, podeAlterarHorario } from '@/lib/calls/agenda-modelo';
 import { conflitoDoHorario } from '@/lib/calls/conflitos-modelo';
 import { AvisoConflitoHorario } from './AvisoConflitoHorario';
+import { CamposFusoAgenda } from './CamposFusoAgenda';
 import { alterarAgendaReuniao, type EstadoAlteracaoAgenda } from '@/lib/calls/agenda-actions';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
 import styles from './GerenciarAgenda.module.css';
 
 const INICIAL: EstadoAlteracaoAgenda = { status: 'erro' };
-function horarioLocal(iso: string) {
-  const data = new Date(iso);
-  return new Date(data.getTime() - data.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
-}
 
 export function GerenciarAgenda({
   reuniao,
@@ -128,11 +125,7 @@ function EditorAgenda({
         <input type="hidden" name="reuniao" value={reuniao.id} />
         <input type="hidden" name="versao" value={reuniao.atualizadaEm ?? ''} />
         <input type="hidden" name="acao" value={cancelar ? 'cancelar' : 'reagendar'} />
-        <input
-          type="hidden"
-          name="offsetMinutos"
-          value={Number.isFinite(Date.parse(quando)) ? new Date(quando).getTimezoneOffset() : 0}
-        />
+        <CamposFusoAgenda quando={quando} />
         <div className={styles.resumo}>
           <CalendarClock size={22} strokeWidth={1.7} aria-hidden="true" />
           <div>
@@ -190,6 +183,10 @@ function EditorAgenda({
                 key={conflito.confirmacao}
                 conflito={conflito}
                 pendente={pendente}
+                aoEscolher={(inicio) => {
+                  setQuando(horarioLocal(inicio));
+                  requestAnimationFrame(() => document.getElementById(`${id}-data`)?.focus());
+                }}
               />
             )}
             <p className={styles.nota}>

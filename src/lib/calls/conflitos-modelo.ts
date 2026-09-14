@@ -6,6 +6,7 @@ export type ConflitoHorario = {
   confirmacao: string;
   total: number;
   reunioes: { id: string; titulo: string; inicio: string; duracao: number }[];
+  alternativas?: string[];
 };
 
 export function conflitoDoHorario(

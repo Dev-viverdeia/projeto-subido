@@ -63,6 +63,7 @@ export async function alterarAgendaReuniao(
           agendadaPara: quando!.toISOString(),
           duracaoMinutos: duracao,
           confirmacaoHorario: ler('confirmacaoHorario'),
+          fusoHorario: ler('fusoHorario'),
         }
       : {}),
   });
