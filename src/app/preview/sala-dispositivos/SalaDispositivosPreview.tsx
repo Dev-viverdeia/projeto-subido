@@ -19,12 +19,14 @@ export function SalaDispositivosPreview({
   falharSaida = false,
   reuniaoId,
   mensagens,
+  continuarChat = false,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
   falharSaida?: boolean;
   reuniaoId?: string;
   mensagens?: string[];
+  continuarChat?: boolean;
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
@@ -82,7 +84,9 @@ export function SalaDispositivosPreview({
       data-encerramentos={encerramentos}
     >
       <h1 className="sr-only">Reunião de demonstração</h1>
-      {mensagens && <MensagensSimuladas room={room} mensagens={mensagens} />}
+      {mensagens && (
+        <MensagensSimuladas room={room} mensagens={mensagens} continuar={continuarChat} />
+      )}
       <div className="lk-room-container">
         <RoomContext.Provider value={room}>
           <div

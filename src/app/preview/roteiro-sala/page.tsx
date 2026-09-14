@@ -10,16 +10,25 @@ export default async function PreviewRoteiroSala({
 }: PageProps<'/preview/roteiro-sala'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
-  const mensagens = params.chat
-    ? [
-        'Segue a proposta:\nhttps://subido.viverdeia.ai/p/demonstracao?versao=2#escopo\nPodemos revisar o escopo juntos.',
-        params.chat === 'extenso'
-          ? `Material: https://exemplo.test/guia?token=${'a'.repeat(600)}`
-          : 'O material de apoio está aqui: (https://exemplo.test/guia_(final)).',
-      ]
-    : undefined;
+  const continuarChat = params.chat === 'leitura';
+  const mensagens = continuarChat
+    ? Array.from(
+        { length: 24 },
+        (_, i) =>
+          `Mensagem ${i + 1}. Vamos conferir o atendimento atual, o responsável por cada etapa e os critérios do projeto antes de preparar a proposta.`,
+      )
+    : params.chat
+      ? [
+          'Segue a proposta:\nhttps://subido.viverdeia.ai/p/demonstracao?versao=2#escopo\nPodemos revisar o escopo juntos.',
+          params.chat === 'extenso'
+            ? `Material: https://exemplo.test/guia?token=${'a'.repeat(600)}`
+            : 'O material de apoio está aqui: (https://exemplo.test/guia_(final)).',
+        ]
+      : undefined;
   if (params.papel === 'convidado')
-    return <SalaDispositivosPreview convidado mensagens={mensagens} />;
+    return (
+      <SalaDispositivosPreview convidado mensagens={mensagens} continuarChat={continuarChat} />
+    );
   const tipo = tipoCallValido(params.tipo) ? params.tipo : 'descoberta';
   const plano = montarPlanoCall({
     tipo,
@@ -37,6 +46,7 @@ export default async function PreviewRoteiroSala({
       reuniaoId={params.reuniao === 'outra' ? 'preview-outra-reuniao' : 'preview-roteiro-sala'}
       falharSaida={params.saida === 'erro'}
       mensagens={mensagens}
+      continuarChat={continuarChat}
       roteiro={{
         plano: params.estado === 'indisponivel' ? null : plano,
         tipo,

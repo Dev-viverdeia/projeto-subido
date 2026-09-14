@@ -4,21 +4,33 @@ import { useState } from 'react';
 import { RoomEvent, type Room } from 'livekit-client';
 
 /** Injeta recebimento no SDK local. Não publica mensagens ou acessa um servidor. */
-export function MensagensSimuladas({ room, mensagens }: { room: Room; mensagens: string[] }) {
-  const [carregadas, setCarregadas] = useState(false);
-  if (carregadas) return null;
+export function MensagensSimuladas({
+  room,
+  mensagens,
+  continuar = false,
+}: {
+  room: Room;
+  mensagens: string[];
+  continuar?: boolean;
+}) {
+  const [rodada, setRodada] = useState(0);
+  if (rodada > 0 && !continuar) return null;
   return (
     <button
       type="button"
       onClick={() => {
         const participante = [...room.remoteParticipants.values()][0];
-        mensagens.forEach((message, i) =>
+        const recebidas =
+          rodada === 0
+            ? mensagens
+            : [`Mensagem nova ${rodada}. Podemos revisar o material atualizado.`];
+        recebidas.forEach((message, i) =>
           room.emit(
             RoomEvent.DataReceived,
             new TextEncoder().encode(
               JSON.stringify({
-                id: `preview-chat-${i}`,
-                timestamp: 1_800_000_000_000 + i,
+                id: `preview-chat-${rodada}-${i}`,
+                timestamp: 1_800_000_000_000 + rodada * 100 + i,
                 message,
               }),
             ),
@@ -27,10 +39,10 @@ export function MensagensSimuladas({ room, mensagens }: { room: Room; mensagens:
             'lk-chat-topic',
           ),
         );
-        setCarregadas(true);
+        setRodada((n) => n + 1);
       }}
     >
-      Simular mensagens
+      {rodada === 0 ? 'Simular mensagens' : 'Receber mensagem simulada'}
     </button>
   );
 }
