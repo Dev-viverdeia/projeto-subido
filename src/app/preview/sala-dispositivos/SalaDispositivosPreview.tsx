@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Room } from 'livekit-client';
 import { RoomContext } from '@livekit/components-react';
 import { PalcoReuniao } from '@/app/sala/[codigo]/PalcoReuniao';
@@ -15,12 +15,24 @@ import styles from '@/app/sala/[codigo]/sala.module.css';
 export function SalaDispositivosPreview({
   roteiro,
   convidado = false,
+  falharSaida = false,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
+  falharSaida?: boolean;
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
+  const [saidas, setSaidas] = useState(0);
+  const [encerramentos, setEncerramentos] = useState(0);
+  const tentativas = useRef(0);
+  async function simularSaida(encerrar: boolean) {
+    tentativas.current += 1;
+    if (encerrar) setEncerramentos((n) => n + 1);
+    else setSaidas((n) => n + 1);
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    if (falharSaida && tentativas.current === 1) throw new Error('Falha simulada');
+  }
   useEffect(() => {
     const sala = new Room();
     let cancelado = false;
@@ -58,7 +70,12 @@ export function SalaDispositivosPreview({
   }, []);
   if (!room) return <p role="status">Preparando a prévia da sala…</p>;
   return (
-    <main className={styles.salaAoVivo} data-lk-theme="default">
+    <main
+      className={styles.salaAoVivo}
+      data-lk-theme="default"
+      data-saidas={saidas}
+      data-encerramentos={encerramentos}
+    >
       <h1 className="sr-only">Reunião de demonstração</h1>
       <div className="lk-room-container">
         <RoomContext.Provider value={room}>
@@ -72,6 +89,8 @@ export function SalaDispositivosPreview({
                 escolhas={escolhas}
                 aoMudarEscolhas={setEscolhas}
                 aoFalhar={() => {}}
+                aoSair={() => simularSaida(false)}
+                aoEncerrar={() => simularSaida(true)}
               />
             </div>
             {!convidado &&

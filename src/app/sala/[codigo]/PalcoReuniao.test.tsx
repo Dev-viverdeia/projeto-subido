@@ -61,10 +61,11 @@ describe('controles da sala em português', () => {
     expect(screen.getByText('Dispositivos')).toBeInTheDocument();
     expect(screen.getAllByTestId('audio-remoto')).toHaveLength(1);
   });
-  it('distingue encerrar como anfitrião de sair como convidado', () => {
+  it('oferece a escolha de encerramento só para o anfitrião', async () => {
     abrir(true);
-    expect(screen.getByRole('button', { name: 'Encerrar reunião' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Sair da reunião' })).not.toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Sair da reunião' }));
+    expect(screen.getByRole('button', { name: 'Encerrar para todos' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Sair da sala' })).toBeVisible();
   });
   it('envia mensagem e devolve o foco ao controle ao fechar com Escape', async () => {
     const user = userEvent.setup();

@@ -20,8 +20,9 @@ describe('encerramento explícito da sala', () => {
     );
     render(<EncerrarReuniao aoEncerrar={aoEncerrar} />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Encerrar reunião' }));
-    expect(screen.getByRole('button', { name: 'Encerrar reunião' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Sair da reunião' }));
+    await user.click(screen.getByRole('button', { name: 'Encerrar para todos' }));
+    expect(screen.getByRole('button', { name: 'Encerrar para todos' })).toBeDisabled();
     expect(estado.desconectar).not.toHaveBeenCalled();
     concluir();
     await waitFor(() => expect(estado.desconectar).toHaveBeenCalledOnce());
@@ -33,10 +34,11 @@ describe('encerramento explícito da sala', () => {
       .mockResolvedValue(undefined);
     render(<EncerrarReuniao aoEncerrar={aoEncerrar} />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Encerrar reunião' }));
+    await user.click(screen.getByRole('button', { name: 'Sair da reunião' }));
+    await user.click(screen.getByRole('button', { name: 'Encerrar para todos' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Tente novamente');
     expect(estado.desconectar).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: 'Encerrar reunião' }));
+    await user.click(screen.getByRole('button', { name: 'Encerrar para todos' }));
     await waitFor(() => expect(estado.desconectar).toHaveBeenCalledOnce());
   });
 });

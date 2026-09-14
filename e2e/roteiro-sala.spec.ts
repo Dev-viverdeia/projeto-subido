@@ -78,7 +78,7 @@ test('rolagem do painel preserva controles da sala em 320px e perguntas completa
       await button.evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
     ).toBeGreaterThanOrEqual(15);
   }
-  const sair = page.getByRole('button', { name: 'Encerrar reunião', exact: true });
+  const sair = page.getByRole('button', { name: 'Sair da reunião', exact: true });
   await expect(sair).toBeInViewport();
   for (const video of await page.getByRole('article').all()) {
     const caixa = await video.boundingBox();

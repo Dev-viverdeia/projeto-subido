@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   CalendarClock,
@@ -13,7 +13,7 @@ import {
   Video,
   WifiOff,
 } from 'lucide-react';
-import type { DisconnectReason } from 'livekit-client';
+import { DisconnectReason } from 'livekit-client';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
@@ -22,8 +22,10 @@ import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/cal
 import { SalaAoVivo } from './SalaAoVivo';
 import { obterCredenciaisSala, salvarSaida } from './salvarSaida';
 import { RoteiroSala } from './RoteiroSala';
+import { EstadoSaidaReuniao } from './EstadoSaidaReuniao';
 import { EstadoFinalSala } from './EstadoFinalSala';
 import { PreparacaoMidia } from './PreparacaoMidia';
+import { SaidaReuniao } from './SaidaReuniao';
 import { MIDIA_INICIAL, usePreparacaoMidia, type EscolhasMidia } from './usePreparacaoMidia';
 import styles from './sala.module.css';
 
@@ -62,7 +64,8 @@ export function SalaCall({
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
-  const [saida, setSaida] = useState<'processando' | 'encerrada' | null>(null);
+  const [saida, setSaida] = useState<'processando' | 'encerrada' | 'saiu' | null>(null);
+  const encerramentoConfirmado = useRef(false);
   const [recuperacao, setRecuperacao] = useState<Recuperacao | null>(null);
   const midia = usePreparacaoMidia();
   const [escolhasEntrada, setEscolhasEntrada] = useState<EscolhasMidia>(MIDIA_INICIAL);
@@ -127,26 +130,21 @@ export function SalaCall({
 
   function aoDesconectar(reason?: DisconnectReason) {
     setCredenciais(null);
+    if (encerramentoConfirmado.current && anfitriao) {
+      setSaida('processando');
+      return;
+    }
     if (desconexaoPermiteRetomar(reason)) {
       setRecuperacao({ estado: 'tentando', tentativa: 1 });
       return;
     }
-    setSaida(anfitriao ? 'processando' : 'encerrada');
+    setSaida(reason === DisconnectReason.CLIENT_INITIATED ? 'saiu' : 'encerrada');
   }
 
   async function encerrarDepoisDaFalha() {
     if (anfitriao) {
-      setCarregando(true);
-      setErro('');
-      const confirmou = await salvarSaida(convite.reuniaoId, [], true).then(
-        () => true,
-        () => false,
-      );
-      setCarregando(false);
-      if (!confirmou) {
-        setErro('Não foi possível encerrar. Tente novamente.');
-        return;
-      }
+      await salvarSaida(convite.reuniaoId, [], true);
+      encerramentoConfirmado.current = true;
     }
     setRecuperacao(null);
     setSaida(anfitriao ? 'processando' : 'encerrada');
@@ -160,7 +158,9 @@ export function SalaCall({
     setErro('');
 
     try {
-      setCredenciais(await obterCredenciais());
+      const novasCredenciais = await obterCredenciais();
+      encerramentoConfirmado.current = false;
+      setCredenciais(novasCredenciais);
     } catch (falha) {
       midia.desligar('audio');
       midia.desligar('video');
@@ -204,14 +204,28 @@ export function SalaCall({
               >
                 <RotateCcw size={16} aria-hidden="true" /> Tentar novamente
               </button>
-              <button
-                type="button"
-                className={styles.botaoEncerrar}
-                disabled={carregando}
-                onClick={() => void encerrarDepoisDaFalha()}
-              >
-                {carregando ? 'Encerrando…' : anfitriao ? 'Encerrar e salvar' : 'Sair da reunião'}
-              </button>
+              {anfitriao ? (
+                <SaidaReuniao
+                  className={styles.botaoEncerrar}
+                  aoEncerrar={encerrarDepoisDaFalha}
+                  aoSair={async () => {
+                    await salvarSaida(convite.reuniaoId, [], false);
+                    setRecuperacao(null);
+                    setSaida('saiu');
+                  }}
+                />
+              ) : (
+                <button
+                  type="button"
+                  className={styles.botaoEncerrar}
+                  onClick={() => {
+                    setRecuperacao(null);
+                    setSaida('saiu');
+                  }}
+                >
+                  Sair da reunião
+                </button>
+              )}
             </div>
           )}
           {erro && <p role="alert">{erro}</p>}
@@ -230,35 +244,24 @@ export function SalaCall({
         aoDesconectar={aoDesconectar}
         escolhas={escolhasEntrada}
         aoMudarEscolhas={setEscolhasEntrada}
+        aoConfirmarEncerramento={() => {
+          encerramentoConfirmado.current = true;
+        }}
       />
     );
   }
 
   if (saida) {
     return (
-      <main className={styles.saida}>
-        <section className={styles.saidaCartao} role="status" aria-live="polite">
-          <span className={styles.saidaIcone} aria-hidden="true">
-            {saida === 'processando' ? <LoaderCircle size={28} /> : <CheckCircle2 size={28} />}
-          </span>
-          <p>{saida === 'processando' ? 'Conversa salva' : 'Reunião encerrada'}</p>
-          <h1>
-            {saida === 'processando'
-              ? kickoff
-                ? 'Organizando o acordo do projeto'
-                : 'Preparando o resumo da reunião'
-              : 'Obrigado por participar'}
-          </h1>
-          <span>
-            {saida === 'processando'
-              ? kickoff
-                ? 'Você será levado para revisar resultado, responsáveis, acessos, limites e próximos passos.'
-                : 'Você será levado para revisar os fatos e o próximo passo desta venda.'
-              : 'Você já pode fechar esta página com segurança.'}
-          </span>
-          {saida === 'processando' && <i aria-hidden="true" />}
-        </section>
-      </main>
+      <EstadoSaidaReuniao
+        estado={saida}
+        anfitriao={anfitriao}
+        reuniaoId={convite.reuniaoId}
+        aoVoltar={() => {
+          setErro('');
+          setSaida(null);
+        }}
+      />
     );
   }
 

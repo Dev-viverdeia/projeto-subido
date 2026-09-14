@@ -8,7 +8,7 @@ test('controles em português não sobrepõem a sala no celular', async ({ page 
   for (const label of [
     'Ativar microfone',
     'Ativar câmera',
-    'Encerrar reunião',
+    'Sair da reunião',
     'Mensagens da reunião',
   ]) {
     const botao = page.getByRole('button', { name: label, exact: true });
