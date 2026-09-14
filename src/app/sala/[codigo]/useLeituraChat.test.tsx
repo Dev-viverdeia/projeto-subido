@@ -63,11 +63,36 @@ function montar() {
   const view = render(<Harness aberto quantidade={10} />);
   const lista = screen.getByTestId('lista');
   Object.defineProperty(lista, 'scrollHeight', { configurable: true, value: 1000 });
+  lista.scrollTop = 1000;
   avisarFim(true);
   return { ...view, lista };
 }
 
 describe('leitura contínua do chat', () => {
+  it('não puxa a leitura quando o resize chega antes do evento de interseção', () => {
+    const { lista } = montar();
+    lista.scrollTop = 180;
+    act(() => notificarTamanho([], {} as ResizeObserver));
+    expect(lista.scrollTop).toBe(180);
+    expect(screen.getByRole('status')).toHaveTextContent('acima');
+    avisarFim(true); // Evento atrasado, medido antes da rolagem da pessoa.
+    expect(screen.getByRole('status')).toHaveTextContent('acima');
+  });
+  it('respeita rolagem anterior ao recebimento mesmo com interseção atrasada', () => {
+    const { rerender, lista } = montar();
+    lista.scrollTop = 180;
+    rerender(<Harness aberto quantidade={11} />);
+    expect(lista.scrollTop).toBe(180);
+    avisarFim(false);
+    expect(screen.getByRole('status')).toHaveTextContent('1 novas; acima');
+  });
+  it('acompanha o fim quando aumentar a janela limita o scrollTop automaticamente', () => {
+    const { lista } = montar();
+    Object.defineProperty(lista, 'clientHeight', { configurable: true, value: 200 });
+    lista.scrollTop = 800;
+    act(() => notificarTamanho([], {} as ResizeObserver));
+    expect(screen.getByRole('status')).toHaveTextContent('fim');
+  });
   it('acompanha novas mensagens quando o fim está visível', async () => {
     const { rerender, lista } = montar();
     rerender(<Harness aberto quantidade={11} />);
@@ -101,9 +126,9 @@ describe('leitura contínua do chat', () => {
     act(() => screen.getByText('Recentes').click());
     expect(lista.scrollTop).toBe(1000);
     expect(screen.getByRole('status')).toHaveTextContent('0 novas; fim');
-    lista.scrollTop = 500;
+    Object.defineProperty(lista, 'scrollHeight', { configurable: true, value: 1200 });
     rerender(<Harness aberto quantidade={13} />);
-    expect(lista.scrollTop).toBe(1000);
+    expect(lista.scrollTop).toBe(1200);
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('0 novas; fim'));
   });
   it('considera lidas ao chegar manualmente ao fim', () => {
