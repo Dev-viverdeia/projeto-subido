@@ -21,7 +21,6 @@ import {
   MessageSquare,
   Minimize2,
   PhoneOff,
-  Send,
   VideoOff,
   X,
 } from 'lucide-react';
@@ -30,6 +29,7 @@ import { EncerrarReuniao } from './EncerrarReuniao';
 import { DispositivosSala } from './DispositivosSala';
 import { MensagemReuniao } from './MensagemReuniao';
 import { useLeituraChat } from './useLeituraChat';
+import { EscreverMensagemReuniao } from './EscreverMensagemReuniao';
 import styles from './PalcoReuniao.module.css';
 
 type Props = {
@@ -61,13 +61,11 @@ export function PalcoReuniao({
   const conexao = useConnectionState();
   const [fixado, setFixado] = useState<string | null>(null);
   const [chatAberto, setChatAberto] = useState(false);
-  const [mensagem, setMensagem] = useState('');
-  const [erroChat, setErroChat] = useState('');
   const { chatMessages, send, isSending } = useChat();
   const { mensagens, conteudo, fim, afastado, novas, guardarPosicao, irParaRecentes } =
     useLeituraChat(chatAberto, chatMessages.length);
   const avisoNovasId = useId();
-  const campoChat = useRef<HTMLInputElement>(null);
+  const campoChat = useRef<HTMLTextAreaElement>(null);
   const botaoChat = useRef<HTMLButtonElement>(null);
   const chave = (track: (typeof tracks)[number]) => `${track.participant.identity}:${track.source}`;
   const tela = tracks.find((t) => t.source === Track.Source.ScreenShare);
@@ -75,20 +73,6 @@ export function PalcoReuniao({
   const permite = (source: number) =>
     permissoes?.canPublish &&
     (!permissoes.canPublishSources.length || permissoes.canPublishSources.includes(source));
-
-  async function enviar(e: React.FormEvent) {
-    e.preventDefault();
-    if (!mensagem.trim() || isSending) return;
-    setErroChat('');
-    try {
-      await send(mensagem.trim());
-      setMensagem('');
-      irParaRecentes();
-      campoChat.current?.focus();
-    } catch {
-      setErroChat('A mensagem não foi enviada. Confira sua conexão e tente novamente.');
-    }
-  }
 
   function fecharChat() {
     guardarPosicao();
@@ -171,7 +155,7 @@ export function PalcoReuniao({
           hidden={!chatAberto}
           aria-label="Mensagens da reunião"
           onKeyDown={(e) => {
-            if (e.key === 'Escape') fecharChat();
+            if (e.key === 'Escape' && !e.nativeEvent.isComposing) fecharChat();
           }}
         >
           <header>
@@ -225,29 +209,14 @@ export function PalcoReuniao({
               ? `${novas} ${novas === 1 ? 'mensagem não lida' : 'mensagens não lidas'}`
               : ''}
           </span>
-          {erroChat && (
-            <p role="alert" className={styles.avisoChat}>
-              {erroChat}
-            </p>
-          )}
-          <form onSubmit={(e) => void enviar(e)}>
-            <input
-              ref={campoChat}
-              aria-label="Mensagem para os participantes"
-              value={mensagem}
-              maxLength={2000}
-              onChange={(e) => setMensagem(e.target.value)}
-              placeholder="Escreva uma mensagem"
-              disabled={isSending}
-            />
-            <button
-              type="submit"
-              disabled={!mensagem.trim() || isSending}
-              aria-label={isSending ? 'Enviando mensagem' : 'Enviar mensagem'}
-            >
-              <Send size={18} aria-hidden="true" />
-            </button>
-          </form>
+          <EscreverMensagemReuniao
+            aberto={chatAberto}
+            conectado={conexao === ConnectionState.Connected}
+            campoRef={campoChat}
+            enviar={send}
+            enviando={isSending}
+            aoEnviar={irParaRecentes}
+          />
         </section>
       </div>
       <div className={styles.controles} aria-label="Controles da reunião">

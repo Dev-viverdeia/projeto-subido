@@ -52,6 +52,11 @@ try {
     'A sala simulada com roteiro não pode abrir em produção',
   );
   assert.equal(
+    (await fetch(`${origem}/preview/roteiro-sala?envio=teste&chat=leitura`)).status,
+    404,
+    'O transporte simulado do chat não pode abrir em produção',
+  );
+  assert.equal(
     (await fetch(`${origem}/api/consultor/responder`)).status,
     401,
     'API deve exigir sessão',

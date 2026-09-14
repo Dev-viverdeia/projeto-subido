@@ -145,8 +145,7 @@
 .dispositivos summary:focus-visible,
 .opcoes select:focus-visible,
 .reproduzir:focus-visible,
-.chat button:focus-visible,
-.chat input:focus-visible,
+.chat header button:focus-visible,
 .grade:focus-visible,
 .mensagens:focus-visible {
   outline: none;
@@ -255,7 +254,8 @@
   font-size: var(--via-fs-h4);
   font-weight: var(--via-fw-medium);
 }
-.chat button {
+.chat header button,
+.chat .recentes {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -298,7 +298,9 @@
   height: auto;
   min-height: 44px;
   padding: var(--via-space-2) var(--via-space-4);
-  background: var(--app-elev-2-bg);
+  /* No Safari, as letras atrás do CTA atravessavam a camada de 84%.
+     A base sólida preserva a leitura; brilho e sombra mantêm o acabamento. */
+  background: var(--via-glass-card), var(--via-surface);
   border-color: var(--app-elev-2-line);
   box-shadow: var(--app-elev-2-shadow);
   backdrop-filter: var(--app-glass-filter);
@@ -325,36 +327,6 @@
   font-size: var(--app-fs-support);
   line-height: var(--via-lh-normal);
   color: var(--via-text-muted);
-}
-.chat form {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--via-space-2);
-  padding: var(--via-space-3);
-  border-top: 1px solid var(--via-border-soft);
-}
-.chat button[type='submit'] {
-  background: var(--via-navy);
-  color: var(--via-white);
-  border-color: var(--via-navy);
-}
-.chat button:disabled {
-  background: var(--via-bg-2);
-  color: var(--via-text-muted);
-  border-color: var(--via-border);
-  cursor: default;
-}
-.chat input {
-  width: 100%;
-  min-width: 0;
-  min-height: 44px;
-  padding-inline: var(--via-space-2);
-  border: 1px solid var(--via-border);
-  border-radius: var(--app-radius-control);
-  background: var(--via-surface);
-  color: var(--via-text-primary);
-  font: inherit;
-  font-size: var(--via-fs-body);
 }
 @media (max-width: 1079px) {
   .controles > button > span,
@@ -423,9 +395,8 @@
   }
 }
 @media (forced-colors: active) {
-  .chat button:focus-visible,
+  .chat header button:focus-visible,
   .chat .recentes:focus-visible,
-  .chat input:focus-visible,
   .mensagens:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
