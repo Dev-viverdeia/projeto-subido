@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { limparPosicoesRoteiro } from '@/lib/calls/posicao-roteiro-local';
 import { montarPlanoCall } from '@/lib/calls/plano';
 import { PainelPrivadoSala } from './PainelPrivadoSala';
 
@@ -14,6 +15,37 @@ const plano = montarPlanoCall({
 });
 
 describe('consulta privada do roteiro', () => {
+  beforeEach(() => limparPosicoesRoteiro());
+  it('retoma após remount sem mover foco, rolar automaticamente ou concluir perguntas', async () => {
+    const user = userEvent.setup();
+    const painel = (
+      <PainelPrivadoSala
+        reuniaoId="a"
+        plano={plano}
+        tipo="descoberta"
+        ativo={false}
+        gravacao="gravando"
+      >
+        <p>Acompanhamento</p>
+      </PainelPrivadoSala>
+    );
+    const first = render(painel);
+    await user.click(screen.getByRole('button', { name: 'Próxima pergunta' }));
+    await user.click(screen.getByRole('button', { name: 'Como fechar' }));
+    await user.click(screen.getByRole('button', { name: 'Ao vivo' }));
+    first.unmount();
+    render(painel);
+    expect(screen.getByRole('button', { name: 'Ao vivo' })).toHaveAttribute('aria-pressed', 'true');
+    expect(document.activeElement).toBe(document.body);
+    await user.click(screen.getByRole('button', { name: 'Roteiro' }));
+    expect(screen.getByRole('button', { name: 'Como fechar' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(screen.getByRole('button', { name: 'Perguntas' }));
+    expect(screen.getByRole('heading', { name: plano.perguntas[1]!.pergunta })).toBeVisible();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
   it('funciona com coach desligado, mantém posição e não chama APIs', async () => {
     const fetch = vi.spyOn(globalThis, 'fetch');
     const montar = vi.fn();

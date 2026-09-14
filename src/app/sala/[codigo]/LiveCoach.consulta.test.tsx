@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRef } from 'react';
 import { montarPlanoCall } from '@/lib/calls/plano';
+import { limparPosicoesRoteiro } from '@/lib/calls/posicao-roteiro-local';
 const { sala } = vi.hoisted(() => ({ sala: { state: 'connected', on: vi.fn(), off: vi.fn() } }));
 vi.mock('@livekit/components-react', () => ({ useRoomContext: () => sala, useTracks: () => [] }));
 import { LiveCoach } from './LiveCoach';
@@ -16,6 +17,7 @@ const plano = montarPlanoCall({
 });
 describe('consulta não reinicia os processos da sala', () => {
   beforeEach(() => {
+    limparPosicoesRoteiro();
     vi.clearAllMocks();
   });
   it('permite salvar uma saída local sem encerrar e mantém o encerramento explícito', async () => {

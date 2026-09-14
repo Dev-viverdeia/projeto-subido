@@ -16,10 +16,12 @@ export function SalaDispositivosPreview({
   roteiro,
   convidado = false,
   falharSaida = false,
+  reuniaoId,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
   falharSaida?: boolean;
+  reuniaoId?: string;
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
@@ -96,6 +98,7 @@ export function SalaDispositivosPreview({
             {!convidado &&
               (roteiro ? (
                 <PainelPrivadoSala
+                  reuniaoId={reuniaoId}
                   plano={roteiro.plano}
                   tipo={roteiro.tipo}
                   ativo={roteiro.ativo}
