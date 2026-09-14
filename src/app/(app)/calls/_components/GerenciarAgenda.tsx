@@ -6,6 +6,8 @@ import { CalendarClock, CalendarX2 } from 'lucide-react';
 import { Button, Input } from '@/design-system/via';
 import type { ReuniaoCall } from '@/lib/calls/reuniao-modelo';
 import { podeAlterarHorario } from '@/lib/calls/agenda-modelo';
+import { conflitoDoHorario } from '@/lib/calls/conflitos-modelo';
+import { AvisoConflitoHorario } from './AvisoConflitoHorario';
 import { alterarAgendaReuniao, type EstadoAlteracaoAgenda } from '@/lib/calls/agenda-actions';
 import { ModalOperacao } from '../../_components/ModalOperacao';
 import { RetornoOperacao } from '../../_components/RetornoOperacao';
@@ -21,10 +23,12 @@ export function GerenciarAgenda({
   reuniao,
   abertoInicial = false,
   apenasModal = false,
+  alterarAction = alterarAgendaReuniao,
 }: {
   reuniao: ReuniaoCall;
   abertoInicial?: boolean;
   apenasModal?: boolean;
+  alterarAction?: typeof alterarAgendaReuniao;
 }) {
   const [aberto, setAberto] = useState(abertoInicial);
   return (
@@ -39,12 +43,26 @@ export function GerenciarAgenda({
           Alterar reunião
         </Button>
       )}
-      {aberto && <EditorAgenda reuniao={reuniao} aoFechar={() => setAberto(false)} />}
+      {aberto && (
+        <EditorAgenda
+          reuniao={reuniao}
+          aoFechar={() => setAberto(false)}
+          alterarAction={alterarAction}
+        />
+      )}
     </>
   );
 }
 
-function EditorAgenda({ reuniao, aoFechar }: { reuniao: ReuniaoCall; aoFechar: () => void }) {
+function EditorAgenda({
+  reuniao,
+  aoFechar,
+  alterarAction,
+}: {
+  reuniao: ReuniaoCall;
+  aoFechar: () => void;
+  alterarAction: typeof alterarAgendaReuniao;
+}) {
   const router = useRouter();
   const id = useId();
   const [cancelar, setCancelar] = useState(false);
@@ -53,7 +71,7 @@ function EditorAgenda({ reuniao, aoFechar }: { reuniao: ReuniaoCall; aoFechar: (
   const [estado, acao, pendente] = useActionState(
     async (anterior: EstadoAlteracaoAgenda, form: FormData) => {
       try {
-        const resultado = await alterarAgendaReuniao(anterior, form);
+        const resultado = await alterarAction(anterior, form);
         if (resultado.status !== 'erro') router.refresh();
         return resultado;
       } catch {
@@ -67,6 +85,7 @@ function EditorAgenda({ reuniao, aoFechar }: { reuniao: ReuniaoCall; aoFechar: (
     INICIAL,
   );
   const finalizado = estado.status !== 'erro';
+  const conflito = conflitoDoHorario(estado.conflito, quando, duracao);
   const tituloSucesso = cancelar ? 'Reunião cancelada' : 'Horário atualizado';
   const reconectarHref = `/api/integracoes/google-calendar/conectar?retorno=${encodeURIComponent('/reunioes')}`;
   return (
@@ -166,6 +185,13 @@ function EditorAgenda({ reuniao, aoFechar }: { reuniao: ReuniaoCall; aoFechar: (
                 required
               />
             </fieldset>
+            {conflito && (
+              <AvisoConflitoHorario
+                key={conflito.confirmacao}
+                conflito={conflito}
+                pendente={pendente}
+              />
+            )}
             <p className={styles.nota}>
               Horário no seu fuso. O convite será atualizado para o cliente.
             </p>

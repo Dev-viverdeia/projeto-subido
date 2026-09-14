@@ -4094,6 +4094,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calls_conferir_horario: {
+        Args: { p_inicio: string; p_duracao_minutos: number; p_ignorar?: string }
+        Returns: {
+          id: string
+          titulo: string
+          agendada_para: string
+          duracao_minutos: number
+          total: number
+          versao: string
+        }[]
+      }
       calls_listar_agenda: {
         Args: {
           p_visao?: string

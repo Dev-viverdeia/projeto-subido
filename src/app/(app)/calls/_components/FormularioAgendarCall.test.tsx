@@ -31,6 +31,53 @@ const CALENDAR_CONECTADO = {
 };
 
 describe('FormularioAgendarCall', () => {
+  it('confere antes do convite, mostra o conflito e descarta confirmação quando a data muda', async () => {
+    const data = '2099-11-10T10:30';
+    agendarReuniaoMock.mockResolvedValue({
+      conflito: {
+        inicio: new Date(data).toISOString(),
+        duracao: 45,
+        total: 1,
+        confirmacao: 'assinatura',
+        reunioes: [
+          {
+            id: 'outra',
+            titulo: 'Reunião Aurora',
+            inicio: new Date(data).toISOString(),
+            duracao: 45,
+          },
+        ],
+      },
+    });
+    render(
+      <FormularioAgendarCall
+        oportunidades={[OPORTUNIDADE]}
+        calendar={CALENDAR_CONECTADO}
+        abertoInicial
+        oportunidadeInicial={OPORTUNIDADE.id}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Data e horário'), { target: { value: data } });
+    await userEvent.click(screen.getByRole('button', { name: 'Criar reunião e enviar convite' }));
+    const aviso = await screen.findByRole('region', {
+      name: 'Você já tem uma reunião neste horário',
+    });
+    await waitFor(() => expect(aviso).toHaveFocus());
+    expect(screen.getByLabelText('E-mail do cliente')).toHaveValue(OPORTUNIDADE.contatoEmail);
+    const aceite = screen.getByRole('checkbox', { name: 'Manter este horário mesmo assim' });
+    expect(aceite).not.toBeChecked();
+    await userEvent.click(aceite);
+    fireEvent.change(screen.getByLabelText('Data e horário'), {
+      target: { value: '2099-11-10T16:00' },
+    });
+    expect(
+      screen.queryByRole('region', { name: 'Você já tem uma reunião neste horário' }),
+    ).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Data e horário'), { target: { value: data } });
+    expect(
+      screen.getByRole('checkbox', { name: 'Manter este horário mesmo assim' }),
+    ).not.toBeChecked();
+  });
   it('preserva os campos após falha de rede sem repetir o convite', async () => {
     const user = userEvent.setup();
     agendarReuniaoMock.mockRejectedValueOnce(new Error('private credential'));

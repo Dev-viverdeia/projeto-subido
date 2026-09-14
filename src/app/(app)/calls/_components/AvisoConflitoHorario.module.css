@@ -1,0 +1,111 @@
+.aviso {
+  padding: var(--app-pad-card);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-card);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  color: var(--via-text);
+}
+
+.aviso:focus {
+  outline: none;
+  box-shadow: var(--app-ring), var(--app-elev-1-shadow);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .aviso {
+    backdrop-filter: blur(12px);
+  }
+}
+
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--app-gap-stack);
+}
+
+.cabecalho svg {
+  flex-shrink: 0;
+  color: var(--via-navy);
+}
+.cabecalho h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.reunioes {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reunioes li {
+  display: grid;
+  grid-template-columns: minmax(104px, max-content) 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--via-border);
+}
+.horario {
+  display: grid;
+  gap: 4px;
+}
+.horario span {
+  font-size: 14px;
+  color: var(--via-text-muted);
+}
+.horario strong {
+  font-family: var(--via-font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.titulo {
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.confirmacao {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 48px;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.confirmacao input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--via-navy);
+}
+.confirmacao input:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+}
+.nota {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--via-text-muted);
+  text-wrap: pretty;
+}
+
+@media (max-width: 599px) {
+  .aviso {
+    padding: var(--app-pad-card-tight);
+  }
+  .reunioes li {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .horario {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+}

@@ -4,11 +4,11 @@ import { unstable_rethrow } from 'next/navigation';
 import { agendarReuniao, type EstadoAgendamento } from '@/lib/calls/actions';
 import { CAMPOS_RASCUNHO, type RascunhoAgenda } from '@/lib/calls/rascunho-agenda';
 
-export function useAgendamento(rascunho?: RascunhoAgenda) {
+export function useAgendamento(rascunho?: RascunhoAgenda, agendarAction = agendarReuniao) {
   return useActionState(
     async (anterior: EstadoAgendamento, form: FormData): Promise<EstadoAgendamento> => {
       try {
-        return await agendarReuniao(anterior, form);
+        return await agendarAction(anterior, form);
       } catch (erro) {
         unstable_rethrow(erro);
         const campos = Object.fromEntries(

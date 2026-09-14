@@ -8,6 +8,8 @@ import { aplicarEventoGoogle } from '@/lib/google-calendar/transporte-evento';
 import { decifrarTokenGoogle } from '@/lib/google-calendar/tokens';
 import { GoogleCalendarPrecisaReconectar, renovarTokenGoogle } from '@/lib/google-calendar/oauth';
 import { podeAlterarHorario, sincronizacaoEmAndamento } from './agenda-modelo';
+import { conferirHorario } from './conflitos-servico';
+import type { ConflitoHorario } from './conflitos-modelo';
 export type AlteracaoAgenda = {
   reuniaoId: string;
   dono: string;
@@ -15,11 +17,13 @@ export type AlteracaoAgenda = {
   versao?: string;
   agendadaPara?: string;
   duracaoMinutos?: number;
+  confirmacaoHorario?: string;
 };
 export type ResultadoAgenda = {
   status: 'erro' | 'pendente' | 'concluido';
   mensagem?: string;
   reconectar?: boolean;
+  conflito?: ConflitoHorario;
 };
 const CredencialSchema = z.object({
   refresh_token_cifrado: z.string().min(40),
@@ -81,6 +85,16 @@ export async function executarAlteracaoAgenda(
       status: 'erro',
       mensagem: 'Escolha um horário futuro e uma duração entre 15 e 240 minutos.',
     };
+  }
+  if (alteracao.acao === 'reagendar') {
+    const conferencia = await conferirHorario(supabase, {
+      inicio: alteracao.agendadaPara!,
+      duracao: alteracao.duracaoMinutos!,
+      ignorar: reuniao.id,
+      confirmacao: alteracao.confirmacaoHorario,
+    });
+    if (conferencia.erro || conferencia.conflito)
+      return { status: 'erro', mensagem: conferencia.erro, conflito: conferencia.conflito };
   }
   const cancelar = alteracao.acao === 'cancelar' || reuniao.status === 'cancelada';
   const temEvento = Boolean(reuniao.google_event_id || reuniao.convidado_email);

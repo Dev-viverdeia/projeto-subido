@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { conferirHorario } from './conflitos-servico';
+vi.mock('./conflitos-servico', () => ({ conferirHorario: vi.fn() }));
 
 const { from, getClaims, getUser, redirect, revalidatePath, rpc, executarAlteracaoAgenda } =
   vi.hoisted(() => ({
@@ -80,6 +82,7 @@ describe('agendarReuniao', () => {
       data: { user: { id: 'usuario-1', app_metadata: { plano_subido: 'pro' } } },
     });
     prepararBancoComCalendarAtivo();
+    vi.mocked(conferirHorario).mockResolvedValue({});
     executarAlteracaoAgenda.mockResolvedValue({ status: 'concluido' });
   });
 
@@ -102,6 +105,50 @@ describe('agendarReuniao', () => {
     expect(revalidatePath).toHaveBeenCalledWith(`/crm/${OPORTUNIDADE_ID}`);
     expect(revalidatePath).toHaveBeenCalledWith('/inicio');
     expect(redirect).toHaveBeenCalledWith(`/reunioes?agendada=${REUNIAO_ID}&calendar=sincronizado`);
+  });
+
+  it.each(['pro', 'starter'])('avisa antes de criar sala ou convite no plano %s', async (plano) => {
+    getUser.mockResolvedValue({
+      data: { user: { id: 'usuario-1', app_metadata: { plano_subido: plano } } },
+    });
+    const conflito = {
+      inicio: '2099-08-14T18:00:00.000Z',
+      duracao: 45,
+      total: 1,
+      confirmacao: 'assinatura',
+      reunioes: [],
+    };
+    vi.mocked(conferirHorario).mockResolvedValue({ conflito });
+    const dados = dadosValidos();
+    dados.set('empresa', 'Empresa');
+    dados.set('contato', 'Ana');
+    const resposta = await agendarReuniao({}, dados);
+    expect(resposta.conflito).toEqual(conflito);
+    expect(resposta.campos?.agendadaPara).toBe('2099-08-14T15:00');
+    expect(rpc).not.toHaveBeenCalled();
+    expect(executarAlteracaoAgenda).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('reconfere o horário e transmite somente a confirmação enviada no formulário', async () => {
+    vi.mocked(conferirHorario).mockResolvedValue({
+      erro: 'Não foi possível conferir os horários.',
+    });
+    const dados = dadosValidos();
+    dados.set('confirmacaoHorario', 'assinatura-atual');
+    await agendarReuniao({}, dados);
+    expect(conferirHorario).toHaveBeenCalledWith(expect.anything(), {
+      inicio: '2099-08-14T18:00:00.000Z',
+      duracao: 45,
+      confirmacao: 'assinatura-atual',
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('não consulta horários sem sessão', async () => {
+    getUser.mockResolvedValue({ data: { user: null } });
+    expect((await agendarReuniao({}, dadosValidos())).entrar).toBe(true);
+    expect(conferirHorario).not.toHaveBeenCalled();
   });
 
   it('não navega quando a call volta sem identificador', async () => {

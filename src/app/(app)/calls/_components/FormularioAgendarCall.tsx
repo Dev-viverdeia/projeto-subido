@@ -21,17 +21,11 @@ import { CamposConviteGoogle } from './CamposConviteGoogle';
 import { SetupGoogleCalendar } from './SetupGoogleCalendar';
 import { ErroAgendamento } from './ErroAgendamento';
 import { useAgendamento } from './useAgendamento';
+import type { agendarReuniao, CampoAgendamento } from '@/lib/calls/actions';
+import { conflitoDoHorario } from '@/lib/calls/conflitos-modelo';
+import { AvisoConflitoHorario } from './AvisoConflitoHorario';
 import styles from './FormularioAgendarCall.module.css';
 
-type CampoAgendamento =
-  | 'oportunidade'
-  | 'empresa'
-  | 'contato'
-  | 'tipo'
-  | 'titulo'
-  | 'agendadaPara'
-  | 'duracao'
-  | 'convidadoEmail';
 const escutarMontagem = () => () => undefined;
 const obterMontagemCliente = () => true;
 const obterMontagemServidor = () => false;
@@ -46,6 +40,7 @@ export function FormularioAgendarCall({
   comercialLiberado = true,
   rascunhoDono,
   rascunho,
+  agendarAction,
 }: {
   oportunidades: OportunidadeSeletor[];
   abertoInicial?: boolean;
@@ -55,6 +50,7 @@ export function FormularioAgendarCall({
   comercialLiberado?: boolean;
   rascunhoDono?: string;
   rascunho?: RascunhoAgenda;
+  agendarAction?: typeof agendarReuniao;
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const formulario = useRef<HTMLFormElement>(null);
@@ -66,7 +62,10 @@ export function FormularioAgendarCall({
   const [aberto, setAberto] = useState(abertoInicial);
   const offsetMinutos = montado ? new Date().getTimezoneOffset() : 0;
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
-  const [estado, acao, pendente] = useAgendamento(rascunho);
+  const [estado, acao, pendente] = useAgendamento(rascunho, agendarAction);
+  const [quando, setQuando] = useState(rascunho?.agendadaPara ?? '');
+  const [duracao, setDuracao] = useState(rascunho?.duracao ?? '45');
+  const conflito = conflitoDoHorario(estado.conflito, quando, duracao);
   const disponiveis = oportunidades.filter((item) => item.etapa !== 'perdido');
   const oportunidadePadrao = disponiveis.some((item) => item.id === oportunidadeInicial)
     ? oportunidadeInicial
@@ -324,9 +323,12 @@ export function FormularioAgendarCall({
                 max={240}
                 step={15}
                 label="Duração (minutos)"
-                defaultValue={estado.campos?.duracao ?? '45'}
+                value={duracao}
                 error={erroVisivel('duracao')}
-                onChange={() => ocultarErro('duracao')}
+                onChange={(e) => {
+                  setDuracao(e.target.value);
+                  ocultarErro('duracao');
+                }}
                 required
               />
             </div>
@@ -337,9 +339,12 @@ export function FormularioAgendarCall({
                 name="agendadaPara"
                 type="datetime-local"
                 label="Data e horário"
-                defaultValue={estado.campos?.agendadaPara ?? ''}
+                value={quando}
                 error={erroVisivel('agendadaPara')}
-                onChange={() => ocultarErro('agendadaPara')}
+                onChange={(e) => {
+                  setQuando(e.target.value);
+                  ocultarErro('agendadaPara');
+                }}
                 required
               />
 
@@ -357,6 +362,14 @@ export function FormularioAgendarCall({
                 onChange={() => ocultarErro('titulo')}
               />
             </div>
+
+            {conflito && (
+              <AvisoConflitoHorario
+                key={conflito.confirmacao}
+                conflito={conflito}
+                pendente={pendente}
+              />
+            )}
 
             {ehKickoff && (
               <section className={styles.kickoffResumo} aria-label="Resultado esperado do kickoff">
