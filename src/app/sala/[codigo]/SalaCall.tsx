@@ -258,6 +258,8 @@ export function SalaCall({
         anfitriao={anfitriao}
         reuniaoId={convite.reuniaoId}
         aoVoltar={() => {
+          midia.desligar('audio');
+          midia.desligar('video');
           setErro('');
           setSaida(null);
         }}
