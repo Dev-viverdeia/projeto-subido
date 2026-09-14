@@ -26,6 +26,11 @@ try {
     await esperar(500);
   }
   assert.ok(pronta, 'Entrada indisponível no build de produção');
+  assert.equal(
+    (await fetch(`${origem}/preview/agenda?visao=historico&busca=Camila`)).status,
+    404,
+    'Agenda simulada não pode abrir em produção',
+  );
   for (const host of ['subido.viverdeia.ai', 'projeto-subido.vercel.app']) {
     const r = await fetch(`${origem}/`, { redirect: 'manual', headers: { host } });
     assert.equal(r.status, 307);

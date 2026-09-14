@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { z } from 'zod';
-import { listarReunioes } from '@/lib/calls/queries';
+import { listarPaginaAgenda, listarRetornosAgenda } from '@/lib/calls/agenda-queries';
+import { lerFiltrosAgenda } from '@/lib/calls/agenda-filtros';
 import { tipoCallValido } from '@/lib/calls/tipos';
 import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import { obterEstadoGoogleCalendar } from '@/lib/google-calendar/queries';
@@ -13,20 +14,29 @@ export const metadata: Metadata = { title: 'Reuniões' };
 export default async function CallsPage({ searchParams }: PageProps<'/calls'>) {
   const acessoComercial = await obterAcessoRecurso('modulo_comercial');
   const comercialLiberado = acessoComercial.permitido;
-  const [reunioes, oportunidades, calendar, parametros] = await Promise.all([
-    listarReunioes(),
-    comercialLiberado ? listarOportunidadesSeletor() : Promise.resolve([]),
-    obterEstadoGoogleCalendar(),
-    searchParams,
-  ]);
+  const parametros = await searchParams;
+  const filtros = lerFiltrosAgenda(parametros);
   const agendada = z.uuid().safeParse(parametros.agendada);
   const editar = z.uuid().safeParse(parametros.editar);
+  const agora = new Date();
+  const [agenda, retornos, oportunidades, calendar] = await Promise.all([
+    listarPaginaAgenda(filtros, agora),
+    listarRetornosAgenda([
+      ...(agendada.success ? [agendada.data] : []),
+      ...(editar.success ? [editar.data] : []),
+    ]),
+    comercialLiberado ? listarOportunidadesSeletor() : Promise.resolve([]),
+    obterEstadoGoogleCalendar(),
+  ]);
   const supabase = await createClient();
   const { data: sessao } = await supabase.auth.getClaims();
 
   return (
     <PainelCalls
-      reunioes={reunioes}
+      reunioes={agenda.reunioes}
+      retornos={retornos}
+      navegacao={{ filtros, proximoCursor: agenda.proximoCursor }}
+      agora={agora}
       oportunidades={oportunidades}
       comercialLiberado={comercialLiberado}
       calendar={calendar}

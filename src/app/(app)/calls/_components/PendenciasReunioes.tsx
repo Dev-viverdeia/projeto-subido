@@ -15,19 +15,31 @@ const HORA = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
 });
 
-export function PendenciasReunioes({ reunioes }: { reunioes: ReuniaoCall[] }) {
+export function PendenciasReunioes({
+  reunioes,
+  paginado = false,
+}: {
+  reunioes: ReuniaoCall[];
+  paginado?: boolean;
+}) {
   if (reunioes.length === 0) return null;
   return (
     <section className={styles.pendencias} aria-labelledby="pendencias-reunioes-titulo">
       <header className={styles.secaoTopo}>
         <div>
-          <p className={styles.sobretitulo}>Agenda para revisar</p>
+          {!paginado && <p className={styles.sobretitulo}>Agenda para revisar</p>}
           <h2 id="pendencias-reunioes-titulo">
-            {reunioes.length === 1
-              ? 'Uma reunião precisa de uma decisão'
-              : `${reunioes.length} reuniões precisam de uma decisão`}
+            {paginado
+              ? 'Horários para revisar'
+              : reunioes.length === 1
+                ? 'Uma reunião precisa de uma decisão'
+                : `${reunioes.length} reuniões precisam de uma decisão`}
           </h2>
-          <p>Os horários passaram, mas essas reuniões não foram concluídas.</p>
+          <p>
+            {paginado
+              ? 'Confirme o que aconteceu ou escolha outro horário.'
+              : 'Os horários passaram, mas essas reuniões não foram concluídas.'}
+          </p>
         </div>
       </header>
       <div className={styles.pendenciasLista}>

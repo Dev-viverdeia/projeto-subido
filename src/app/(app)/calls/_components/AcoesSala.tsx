@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Check, Copy, ListChecks, MoreHorizontal, Video } from 'lucide-react';
+import { CalendarDays, Check, Copy, ListChecks, MoreHorizontal, Video } from 'lucide-react';
 import { DropdownMenu } from '@/design-system/via';
 import type { TipoCall } from '@/lib/calls/tipos';
+import type { ReuniaoCall } from '@/lib/calls/reuniao-modelo';
+import { podeAlterarHorario } from '@/lib/calls/agenda-modelo';
+import { GerenciarAgenda } from './GerenciarAgenda';
 import styles from './AcoesSala.module.css';
 
 export function AcoesSala({
@@ -13,14 +16,17 @@ export function AcoesSala({
   codigo,
   tipo,
   destaque = false,
+  reuniao,
 }: {
   id: string;
   codigo: string;
   tipo?: TipoCall;
   destaque?: boolean;
+  reuniao?: ReuniaoCall;
 }) {
   const router = useRouter();
   const [copiado, setCopiado] = useState(false);
+  const [edicao, setEdicao] = useState(0);
   const caminho = `/sala/${codigo}`;
   const kickoff = tipo === 'kickoff';
   const rotuloPreparar = kickoff ? 'Preparar kickoff' : 'Preparar reunião';
@@ -35,6 +41,9 @@ export function AcoesSala({
   if (!destaque) {
     return (
       <div className={`${styles.acoes} ${styles.compactas}`}>
+        {reuniao && edicao > 0 && (
+          <GerenciarAgenda key={edicao} reuniao={reuniao} abertoInicial apenasModal />
+        )}
         <Link href={`/reunioes/${id}`} className={styles.preparar}>
           <ListChecks size={16} aria-hidden="true" /> {rotuloPreparar}
         </Link>
@@ -47,6 +56,16 @@ export function AcoesSala({
             </button>
           }
           items={[
+            ...(reuniao && podeAlterarHorario(reuniao.status)
+              ? [
+                  {
+                    id: 'editar',
+                    label: 'Alterar reunião',
+                    icon: <CalendarDays size={16} />,
+                    onSelect: () => setEdicao((valor) => valor + 1),
+                  },
+                ]
+              : []),
             {
               id: 'copiar',
               label: copiado ? 'Link copiado' : 'Copiar link da sala',

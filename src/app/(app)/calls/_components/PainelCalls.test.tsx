@@ -50,6 +50,46 @@ function reuniao(parcial: Partial<ReuniaoCall> & Pick<ReuniaoCall, 'id' | 'titul
 }
 
 describe('PainelCalls', () => {
+  it('preserva confirmação fora da página e não mistura a reunião com os resultados', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        reunioes={[]}
+        retornos={[reuniao({ id: 'nova', titulo: 'Conversa recém-agendada' })]}
+        agendadaId="nova"
+        agora={new Date('2026-08-09T12:00:00Z')}
+        navegacao={{ filtros: { visao: 'historico', busca: 'Outro cliente' } }}
+      />,
+    );
+    expect(screen.getByRole('region', { name: 'Conversa recém-agendada' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Nenhuma reunião encontrada' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Agenda' })).not.toBeInTheDocument();
+  });
+
+  it('não chama a primeira reunião da segunda página de próxima reunião', () => {
+    render(
+      <PainelCalls
+        calendar={CALENDAR}
+        oportunidades={[]}
+        reunioes={[reuniao({ id: 'posterior', titulo: 'Conversa posterior' })]}
+        agora={new Date('2026-08-09T12:00:00Z')}
+        navegacao={{
+          filtros: {
+            visao: 'proximas',
+            busca: '',
+            cursor: { data: '2026-08-09T13:00:00Z', id: 'anterior' },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByText('Conversa posterior')).toBeInTheDocument();
+    expect(screen.queryByText('Próxima reunião')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Voltar ao início da lista' })).toHaveAttribute(
+      'href',
+      '/reunioes',
+    );
+  });
   it.each(['sincronizado', 'falhou'] as const)(
     'ignora o retorno antigo de %s depois de cancelar a reunião',
     (calendarResultado) => {
@@ -161,9 +201,7 @@ describe('PainelCalls', () => {
     expect(within(agenda).getByText('Proposta Horizonte')).toBeInTheDocument();
     expect(within(agenda).queryByText('Descoberta Horizonte')).not.toBeInTheDocument();
 
-    expect(screen.getByLabelText('Memória das reuniões')).toHaveTextContent(
-      'A conversa vira resumo, decisões e próximo passo na ficha do cliente.',
-    );
+    expect(screen.queryByLabelText('Memória das reuniões')).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Histórico' })).toHaveTextContent(
       'Kickoff concluído',
     );
