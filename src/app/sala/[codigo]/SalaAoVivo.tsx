@@ -20,6 +20,7 @@ export function SalaAoVivo({
   aoDesconectar,
   escolhas,
   aoMudarEscolhas,
+  aoConfirmarEncerramento,
 }: {
   credenciais: { token: string; serverUrl: string };
   convite: ConviteCall;
@@ -28,13 +29,18 @@ export function SalaAoVivo({
   aoDesconectar: (reason?: DisconnectReason) => void;
   escolhas: EscolhasMidia;
   aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
+  aoConfirmarEncerramento: () => void;
 }) {
   const [aviso, setAviso] = useState('');
-  const encerramentoRef = useRef<(() => Promise<void>) | null>(null);
+  const encerramentoRef = useRef<((encerrar?: boolean) => Promise<void>) | null>(null);
+  async function persistir(encerrar: boolean) {
+    if (encerramentoRef.current) await encerramentoRef.current(encerrar);
+    else await salvarSaida(convite.reuniaoId, [], encerrar);
+  }
   async function encerrar() {
-    if (encerramentoRef.current) return encerramentoRef.current();
     // O controle de encerramento não depende da disponibilidade do Live Coach.
-    await salvarSaida(convite.reuniaoId, [], true);
+    await persistir(true);
+    aoConfirmarEncerramento();
   }
 
   function avisarMidia(falha?: MediaDeviceFailure, tipo?: MediaDeviceKind) {
@@ -84,6 +90,7 @@ export function SalaAoVivo({
               <PalcoReuniao
                 anfitriao
                 aoEncerrar={encerrar}
+                aoSair={() => persistir(false)}
                 escolhas={escolhas}
                 aoMudarEscolhas={aoMudarEscolhas}
                 aoFalhar={(erro, tipo) => avisarMidia(MediaDeviceFailure.getFailure(erro), tipo)}

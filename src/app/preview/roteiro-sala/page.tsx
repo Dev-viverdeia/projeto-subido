@@ -25,6 +25,7 @@ export default async function PreviewRoteiroSala({
       ' Considere os turnos da manhã e da noite, as mensagens que chegam fora do horário e os contatos que dependem da aprovação de outra pessoa para receber uma resposta.';
   return (
     <SalaDispositivosPreview
+      falharSaida={params.saida === 'erro'}
       roteiro={{
         plano: params.estado === 'indisponivel' ? null : plano,
         tipo,

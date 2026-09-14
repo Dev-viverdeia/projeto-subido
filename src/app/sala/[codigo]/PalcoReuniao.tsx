@@ -37,6 +37,7 @@ type Props = {
   aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
   aoFalhar: (erro: Error, tipo?: MediaDeviceKind) => void;
   aoEncerrar?: () => Promise<void>;
+  aoSair?: () => Promise<void>;
 };
 
 function DispositivosSala({ escolhas, aoMudarEscolhas, aoFalhar }: Omit<Props, 'anfitriao'>) {
@@ -131,6 +132,7 @@ export function PalcoReuniao({
   aoMudarEscolhas,
   aoFalhar,
   aoEncerrar,
+  aoSair,
 }: Props) {
   const tracks = useTracks(
     [
@@ -371,7 +373,7 @@ export function PalcoReuniao({
           </button>
         )}
         {anfitriao ? (
-          <EncerrarReuniao aoEncerrar={aoEncerrar} />
+          <EncerrarReuniao aoEncerrar={aoEncerrar} aoSair={aoSair} />
         ) : (
           <DisconnectButton className={styles.sair} aria-label="Sair da reunião">
             <PhoneOff size={20} aria-hidden="true" />

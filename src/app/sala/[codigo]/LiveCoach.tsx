@@ -39,7 +39,7 @@ export function LiveCoach({
   ativo: boolean;
   plano?: PlanoCall | null;
   tipo?: TipoCall;
-  encerramentoRef?: RefObject<(() => Promise<void>) | null>;
+  encerramentoRef?: RefObject<((encerrar?: boolean) => Promise<void>) | null>;
 }) {
   const room = useRoomContext();
   const referencias = useTracks([Track.Source.Microphone]);
@@ -389,7 +389,7 @@ export function LiveCoach({
     const aoDesconectar = () => {
       void salvarSaida().catch(() => undefined);
     };
-    if (encerramentoRef) encerramentoRef.current = () => salvarSaida(true);
+    if (encerramentoRef) encerramentoRef.current = (encerrar = true) => salvarSaida(encerrar);
     room.on(RoomEvent.Disconnected, aoDesconectar);
     window.addEventListener('pagehide', aoDesconectar);
     return () => {
