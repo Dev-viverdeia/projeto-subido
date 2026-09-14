@@ -105,6 +105,76 @@ const CONVITE: ConviteCall = {
 };
 
 describe('SalaCall', () => {
+  it('volta à entrada sem reutilizar a câmera e o microfone da participação anterior', async () => {
+    const user = userEvent.setup();
+    const original = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');
+    const track = Object.assign(new EventTarget(), {
+      stop: vi.fn(),
+      getSettings: () => ({ deviceId: 'dispositivo-teste' }),
+    });
+    const getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => [track] });
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: Object.assign(new EventTarget(), {
+        getUserMedia,
+        enumerateDevices: vi.fn().mockResolvedValue([]),
+      }),
+    });
+    const playMock = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            server_url: 'wss://livekit.example.test',
+            participant_token: 'teste',
+          }),
+          { status: 201 },
+        ),
+      ),
+    );
+    const view = render(
+      <SalaCall
+        codigo="codigo-1"
+        convite={CONVITE}
+        anfitriao={false}
+        nomeSugerido="Camila"
+        videoConfigurado
+      />,
+    );
+    try {
+      await user.click(screen.getByRole('button', { name: 'Testar câmera e microfone' }));
+      expect(await screen.findByRole('button', { name: 'Desligar câmera' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(screen.getByRole('button', { name: 'Desligar microfone' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      await user.click(screen.getByRole('checkbox'));
+      await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+      const primeiraEntrada = await screen.findByTestId('sala-livekit');
+      expect(primeiraEntrada).toHaveAttribute('data-audio', 'true');
+      expect(primeiraEntrada).toHaveAttribute('data-video', 'true');
+      await user.click(screen.getByRole('button', { name: 'Simular saída voluntária' }));
+      await user.click(await screen.findByRole('button', { name: 'Voltar à entrada' }));
+      expect(screen.getByText('Câmera desligada')).toBeVisible();
+      expect(screen.getByLabelText('Sua prévia de câmera')).not.toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Entrar na reunião' }));
+      const segundaEntrada = await screen.findByTestId('sala-livekit');
+      expect(segundaEntrada).toHaveAttribute('data-audio', 'false');
+      expect(segundaEntrada).toHaveAttribute('data-video', 'false');
+      expect(getUserMedia).toHaveBeenCalledTimes(2);
+      expect(track.stop).toHaveBeenCalled();
+    } finally {
+      view.unmount();
+      fetchMock.mockRestore();
+      playMock.mockRestore();
+      if (original) Object.defineProperty(navigator, 'mediaDevices', original);
+      else Reflect.deleteProperty(navigator, 'mediaDevices');
+    }
+  });
+
   it('mesmo após falha de reconexão exige a escolha explícita para encerrar', async () => {
     const user = userEvent.setup();
     let entradas = 0;
