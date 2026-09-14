@@ -139,7 +139,7 @@ describe('CompartilharProposta', () => {
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Desativar link' }),
     );
     expect(vi.mocked(configurarLinkProposta).mock.calls[1]![1].get('codigoAtual')).toBe(novoCodigo);
-    expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(
       'Não conseguimos confirmar',
     );
     expect(screen.getByLabelText('Link da proposta')).toHaveValue(

@@ -698,6 +698,15 @@
     grid-template-rows: minmax(0, 1fr) auto;
   }
 
+  /* O roteiro ocupava até 60dvh, deixando só ~70px para ler mensagens a 390×664.
+     Ocultar só durante a consulta do chat preserva a instância e a pergunta selecionada. */
+  .experienciaAnfitriao:has([data-chat-aberto]) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .experienciaAnfitriao:has([data-chat-aberto]) > aside {
+    display: none;
+  }
+
   .pagina {
     padding: var(--via-space-4);
   }

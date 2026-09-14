@@ -10,7 +10,16 @@ export default async function PreviewRoteiroSala({
 }: PageProps<'/preview/roteiro-sala'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
-  if (params.papel === 'convidado') return <SalaDispositivosPreview convidado />;
+  const mensagens = params.chat
+    ? [
+        'Segue a proposta:\nhttps://subido.viverdeia.ai/p/demonstracao?versao=2#escopo\nPodemos revisar o escopo juntos.',
+        params.chat === 'extenso'
+          ? `Material: https://exemplo.test/guia?token=${'a'.repeat(600)}`
+          : 'O material de apoio está aqui: (https://exemplo.test/guia_(final)).',
+      ]
+    : undefined;
+  if (params.papel === 'convidado')
+    return <SalaDispositivosPreview convidado mensagens={mensagens} />;
   const tipo = tipoCallValido(params.tipo) ? params.tipo : 'descoberta';
   const plano = montarPlanoCall({
     tipo,
@@ -27,6 +36,7 @@ export default async function PreviewRoteiroSala({
     <SalaDispositivosPreview
       reuniaoId={params.reuniao === 'outra' ? 'preview-outra-reuniao' : 'preview-roteiro-sala'}
       falharSaida={params.saida === 'erro'}
+      mensagens={mensagens}
       roteiro={{
         plano: params.estado === 'indisponivel' ? null : plano,
         tipo,

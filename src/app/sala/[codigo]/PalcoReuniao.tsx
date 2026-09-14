@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import type { EscolhasMidia } from './usePreparacaoMidia';
 import { EncerrarReuniao } from './EncerrarReuniao';
+import { MensagemReuniao } from './MensagemReuniao';
 import styles from './PalcoReuniao.module.css';
 
 type Props = {
@@ -186,7 +187,11 @@ export function PalcoReuniao({
   }
 
   return (
-    <div className={`lk-video-conference ${styles.palco}`} data-anfitriao={anfitriao || undefined}>
+    <div
+      className={`lk-video-conference ${styles.palco}`}
+      data-anfitriao={anfitriao || undefined}
+      data-chat-aberto={chatAberto || undefined}
+    >
       {conexao !== ConnectionState.Connected && (
         <p className={styles.conexao} role="status">
           {conexao === ConnectionState.Connecting
@@ -276,10 +281,12 @@ export function PalcoReuniao({
               Visíveis para quem está na sala. Não ficam salvas após sair.
             </p>
             {chatMessages.map((msg) => (
-              <p key={msg.id}>
-                <strong>{msg.from?.name || 'Participante'}</strong>
-                <span>{msg.message}</span>
-              </p>
+              <MensagemReuniao
+                key={msg.id}
+                autor={msg.from?.name || 'Participante'}
+                texto={msg.message}
+                propria={msg.from?.isLocal}
+              />
             ))}
           </div>
           {erroChat && (
