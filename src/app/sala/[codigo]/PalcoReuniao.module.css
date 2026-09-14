@@ -225,6 +225,8 @@
   cursor: pointer;
 }
 .chat {
+  /* O SDK usa system-ui no tema da sala. Aqui a leitura segue a Geist do produto. */
+  font-family: var(--via-font);
   display: flex;
   flex-direction: column;
   width: 360px;

@@ -101,6 +101,7 @@ test('link extenso não esconde o envio ou a saída da sala em 320px', async ({ 
   expect(
     await link.evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
   ).toBeGreaterThanOrEqual(17);
+  expect(await link.evaluate((e) => getComputedStyle(e).fontFamily)).toMatch(/^"?geist"?[, ]/i);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await chat.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
   expect(await chat.getByRole('log').evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
