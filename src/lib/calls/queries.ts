@@ -2,7 +2,6 @@ import 'server-only';
 
 import { cache } from 'react';
 import { lerDossie } from '@/lib/crm/enriquecimento';
-import { listarOportunidadesSeletor } from '@/lib/crm/queries';
 import type { EtapaCrm } from '@/lib/crm/etapas';
 import { handleError } from '@/lib/errors';
 import { createClient } from '@/lib/supabase/server';
@@ -14,7 +13,6 @@ import {
 } from './coach-schema';
 import { obterGravacaoPosCall, type GravacaoPosCall } from './gravacao-query';
 import { montarPlanoCall, type PlanoCall } from './plano';
-import { montarReuniao, type ReuniaoCall } from './reuniao-modelo';
 import type { StatusCall, TipoCall } from './tipos';
 import { lerSalaPeloCodigo } from './admin';
 import { obterOperacoesResumo } from './operacoes-resumo-query';
@@ -141,29 +139,6 @@ function briefingDeDados(valor: unknown) {
   );
   return leitura.success ? leitura.data : null;
 }
-
-export const listarReunioes = cache(async (): Promise<ReuniaoCall[]> => {
-  const supabase = await createClient();
-  const [reunioes, pipeline] = await Promise.all([
-    supabase
-      .from('calls_reunioes')
-      .select(
-        'id, titulo, tipo, status, agendada_para, duracao_minutos, codigo_publico, live_coach_ativo, oportunidade_id, convidado_email, google_sync_status, google_event_url, google_sync_erro, criada_em, atualizada_em',
-      )
-      .order('agendada_para', { ascending: true })
-      .limit(200),
-    listarOportunidadesSeletor(),
-  ]);
-
-  if (reunioes.error) throw handleError(reunioes.error, 'calls:listar');
-
-  const oportunidadePorId = new Map(pipeline.map((item) => [item.id, item]));
-
-  return (reunioes.data ?? []).map((linha) => {
-    const oportunidade = oportunidadePorId.get(linha.oportunidade_id);
-    return montarReuniao(linha, oportunidade);
-  });
-});
 
 /**
  * Dossiê privado de uma reunião. A primeira leitura acontece com a sessão do

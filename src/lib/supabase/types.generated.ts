@@ -4094,6 +4094,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calls_listar_agenda: {
+        Args: {
+          p_visao?: string
+          p_busca?: string
+          p_cursor_data?: string
+          p_cursor_id?: string
+          p_agora?: string
+        }
+        Returns: {
+          id: string
+          titulo: string
+          tipo: Database["public"]["Enums"]["calls_tipo"]
+          status: Database["public"]["Enums"]["calls_status"]
+          agendada_para: string
+          duracao_minutos: number
+          codigo_publico: string
+          live_coach_ativo: boolean
+          oportunidade_id: string
+          convidado_email: string | null
+          google_sync_status: string
+          google_event_url: string | null
+          google_sync_erro: string | null
+          criada_em: string
+          atualizada_em: string
+          empresa: string | null
+          contato: string | null
+          oportunidade: string | null
+        }[]
+      }
       admin_sistema_conceder_pacote: {
         Args: {
           p_admin: string

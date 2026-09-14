@@ -7,6 +7,7 @@ import { resolve, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { verificarBaseConfiavel } from './base-confiavel.mjs';
 import { verificarEdicaoProposta } from './proposta-edicao.mjs';
+import { verificarAgendaReunioes } from './agenda-reunioes.mjs';
 
 const executar = promisify(executarCallback);
 const raiz = resolve(import.meta.dirname, '../..');
@@ -234,6 +235,7 @@ try {
     console.log('Saúde: permissões, retomadas, períodos e deduplicação de pulsos aprovados.');
     await verificarBaseConfiavel({ sql, funcao, raiz });
     await verificarEdicaoProposta({ sql, funcao });
+    await verificarAgendaReunioes({ sql });
   }
   if (!soContratos) {
     // Carga mista de transações reais. Falha/retry sintéticos; sem IA, rede externa ou envio.
