@@ -30,6 +30,7 @@ import { DispositivosSala } from './DispositivosSala';
 import { MensagemReuniao } from './MensagemReuniao';
 import { useLeituraChat } from './useLeituraChat';
 import { EscreverMensagemReuniao } from './EscreverMensagemReuniao';
+import { useRascunhoReuniao } from './RascunhoReuniao';
 import styles from './PalcoReuniao.module.css';
 
 type Props = {
@@ -60,7 +61,7 @@ export function PalcoReuniao({
   const permissoes = useLocalParticipantPermissions();
   const conexao = useConnectionState();
   const [fixado, setFixado] = useState<string | null>(null);
-  const [chatAberto, setChatAberto] = useState(false);
+  const { aberto: chatAberto, setAberto: setChatAberto } = useRascunhoReuniao();
   const { chatMessages, send, isSending } = useChat();
   const { mensagens, conteudo, fim, afastado, novas, guardarPosicao, irParaRecentes } =
     useLeituraChat(chatAberto, chatMessages.length);

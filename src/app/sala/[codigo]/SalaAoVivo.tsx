@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { LiveKitRoom } from '@livekit/components-react';
-import { MediaDeviceFailure, type DisconnectReason } from 'livekit-client';
+import { ConnectionError, MediaDeviceFailure, type DisconnectReason } from 'livekit-client';
 import { MicOff, X } from 'lucide-react';
 import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
@@ -18,6 +18,8 @@ export function SalaAoVivo({
   anfitriao,
   plano,
   aoDesconectar,
+  aoConectar,
+  aoFalharConexao,
   escolhas,
   aoMudarEscolhas,
   aoConfirmarEncerramento,
@@ -27,6 +29,8 @@ export function SalaAoVivo({
   anfitriao: boolean;
   plano: PlanoCall | null;
   aoDesconectar: (reason?: DisconnectReason) => void;
+  aoConectar: () => void;
+  aoFalharConexao: () => void;
   escolhas: EscolhasMidia;
   aoMudarEscolhas: Dispatch<SetStateAction<EscolhasMidia>>;
   aoConfirmarEncerramento: () => void;
@@ -43,7 +47,7 @@ export function SalaAoVivo({
     aoConfirmarEncerramento();
   }
 
-  function avisarMidia(falha?: MediaDeviceFailure, tipo?: MediaDeviceKind) {
+  const avisarMidia = useCallback((falha?: MediaDeviceFailure, tipo?: MediaDeviceKind) => {
     const dispositivo =
       tipo === 'audioinput'
         ? 'o microfone'
@@ -57,7 +61,16 @@ export function SalaAoVivo({
           ? `Outro aplicativo pode estar usando ${dispositivo}. Feche-o e tente ativar o controle novamente.`
           : `Não foi possível acessar ${dispositivo}. Confira o dispositivo e tente ativar o controle na sala.`,
     );
-  }
+  }, []);
+  const tratarErro = useCallback(
+    (erro: Error) => {
+      // LiveKit usa onError tanto para conexão quanto para publicação da câmera/microfone.
+      // Negar uma permissão de mídia não pode derrubar a sala inteira.
+      if (erro instanceof ConnectionError) aoFalharConexao();
+      else avisarMidia(MediaDeviceFailure.getFailure(erro));
+    },
+    [aoFalharConexao, avisarMidia],
+  );
 
   return (
     <main className={styles.salaAoVivo} data-lk-theme="default">
@@ -69,6 +82,8 @@ export function SalaAoVivo({
         audio={escolhas.audio ? { deviceId: escolhas.microfoneId || undefined } : false}
         video={escolhas.video ? { deviceId: escolhas.cameraId || undefined } : false}
         onDisconnected={aoDesconectar}
+        onConnected={aoConectar}
+        onError={tratarErro}
         onMediaDeviceFailure={avisarMidia}
       >
         {aviso && (

@@ -56,6 +56,13 @@ try {
     404,
     'O transporte simulado do chat não pode abrir em produção',
   );
+  for (const papel of ['anfitriao', 'convidado']) {
+    assert.equal(
+      (await fetch(`${origem}/preview/retomada-reuniao?papel=${papel}`)).status,
+      404,
+      'A simulação de reconexão não pode abrir em produção',
+    );
+  }
   assert.equal(
     (await fetch(`${origem}/api/consultor/responder`)).status,
     401,

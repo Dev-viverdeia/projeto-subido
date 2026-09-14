@@ -1,0 +1,122 @@
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--via-space-5);
+  background: var(--via-bg-2);
+  color: var(--via-text-primary);
+}
+.cartao {
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  min-width: 0;
+  padding: clamp(24px, 5vw, 40px);
+  border: 1px solid var(--app-elev-1-line);
+  border-radius: var(--app-radius-surface);
+  background: var(--app-elev-1-bg);
+  box-shadow: var(--app-elev-1-shadow);
+  backdrop-filter: var(--app-glass-filter);
+}
+.reuniao {
+  margin: 0 0 var(--via-space-6);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+  overflow-wrap: anywhere;
+}
+.icone {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--via-border-soft);
+  border-radius: var(--app-radius-control);
+  background: var(--via-bg-2);
+  color: var(--via-navy);
+}
+.cartao h1 {
+  margin: var(--via-space-5) 0 var(--via-space-3);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: var(--via-fw-medium);
+  letter-spacing: var(--app-ls-h2);
+  line-height: var(--via-lh-tight);
+  text-wrap: balance;
+}
+.cartao h1:focus {
+  outline: none;
+}
+.orientacao {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--via-text-body);
+  font-size: var(--app-fs-reading);
+  line-height: var(--via-lh-normal);
+  text-wrap: pretty;
+}
+.rascunho {
+  display: flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  margin: var(--via-space-5) 0 0;
+  font-size: var(--app-fs-support);
+  color: var(--via-text-muted);
+}
+.rascunho svg {
+  flex-shrink: 0;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--via-space-2);
+  margin-top: var(--via-space-6);
+}
+.tentar,
+.sair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--via-space-2);
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  border: 1px solid var(--via-border);
+  border-radius: var(--app-radius-control);
+  background: var(--via-surface);
+  color: var(--via-text-primary);
+  font: inherit;
+  font-size: var(--via-fs-body);
+  cursor: pointer;
+}
+.tentar {
+  border-color: var(--via-navy);
+  background: var(--via-navy);
+  color: var(--via-white);
+}
+.tentar:focus-visible,
+.sair:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+  box-shadow: var(--app-ring);
+}
+.girando {
+  animation: girar 1s linear infinite;
+}
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .cartao {
+    background: var(--via-surface);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .girando {
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .tentar:focus-visible,
+  .sair:focus-visible {
+    outline-color: Highlight;
+  }
+}

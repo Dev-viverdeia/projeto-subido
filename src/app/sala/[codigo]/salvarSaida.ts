@@ -1,7 +1,13 @@
 import type { SegmentoLive } from '@/lib/calls/coach-schema';
 
-export async function obterCredenciaisSala(codigo: string, nome: string, consentiu: boolean) {
+export async function obterCredenciaisSala(
+  codigo: string,
+  nome: string,
+  consentiu: boolean,
+  signal?: AbortSignal,
+) {
   const response = await fetch('/api/calls/token', {
+    signal,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ codigo, nome: nome.trim(), consentiu }),
