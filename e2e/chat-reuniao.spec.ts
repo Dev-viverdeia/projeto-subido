@@ -166,6 +166,7 @@ for (const papel of ['anfitriao', 'convidado']) {
     await page.addInitScript(() => {
       Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
         configurable: true,
+        writable: true,
         value: () => {
           throw new Error('Ler mensagens não deve ativar câmera ou microfone');
         },

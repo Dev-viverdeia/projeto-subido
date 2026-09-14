@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { RoomEvent, type Room } from 'livekit-client';
+import { Button } from '@/design-system/via';
 
 /** Injeta recebimento no SDK local. Não publica mensagens ou acessa um servidor. */
 export function MensagensSimuladas({
@@ -16,8 +17,9 @@ export function MensagensSimuladas({
   const [rodada, setRodada] = useState(0);
   if (rodada > 0 && !continuar) return null;
   return (
-    <button
+    <Button
       type="button"
+      variant="secondary"
       onClick={() => {
         const participante = [...room.remoteParticipants.values()][0];
         const recebidas =
@@ -43,6 +45,6 @@ export function MensagensSimuladas({
       }}
     >
       {rodada === 0 ? 'Simular mensagens' : 'Receber mensagem simulada'}
-    </button>
+    </Button>
   );
 }
