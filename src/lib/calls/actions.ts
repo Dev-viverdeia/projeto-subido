@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidarDirecaoOperacional } from '@/lib/consultor/revalidacao';
 import { executarAlteracaoAgenda } from './agenda-servico';
 import { dataLocalParaUtc } from './agenda-modelo';
+import { conferirHorario } from './conflitos-servico';
+import type { ConflitoHorario } from './conflitos-modelo';
 import { planoDosMetadados, planoTemRecurso } from '@/lib/planos/acessos';
 import { callPassouDaJanela, TIPOS_CALL } from './tipos';
 
@@ -41,7 +43,7 @@ const pendenciaSchema = z.object({
   destino: z.enum(['reagendar', 'cancelar']),
 });
 
-type CampoAgendamento =
+export type CampoAgendamento =
   | 'oportunidade'
   | 'empresa'
   | 'contato'
@@ -53,6 +55,7 @@ type CampoAgendamento =
 type CamposPreservados = Partial<Record<CampoAgendamento | 'liveCoach', string>>;
 
 export type EstadoAgendamento = {
+  conflito?: ConflitoHorario;
   erro?: string;
   reconectar?: boolean;
   entrar?: boolean;
@@ -149,6 +152,13 @@ export async function agendarReuniao(
   if (!quando || quando.getTime() <= Date.now()) {
     return { campos, porCampo: { agendadaPara: 'Escolha uma data e um horário futuros.' } };
   }
+
+  const conferencia = await conferirHorario(supabase, {
+    inicio: quando.toISOString(),
+    duracao: validacao.data.duracao,
+    confirmacao: texto(formData, 'confirmacaoHorario'),
+  });
+  if (conferencia.erro || conferencia.conflito) return { campos, ...conferencia };
 
   const parametrosComuns = {
     p_tipo: validacao.data.tipo as (typeof TIPOS_CALL)[number]['id'],

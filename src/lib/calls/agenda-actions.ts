@@ -59,9 +59,14 @@ export async function alterarAgendaReuniao(
     acao: leitura.data.acao,
     versao: leitura.data.versao,
     ...(leitura.data.acao === 'reagendar'
-      ? { agendadaPara: quando!.toISOString(), duracaoMinutos: duracao }
+      ? {
+          agendadaPara: quando!.toISOString(),
+          duracaoMinutos: duracao,
+          confirmacaoHorario: ler('confirmacaoHorario'),
+        }
       : {}),
   });
+  if (resultado.conflito) return { ...resultado, campos };
   revalidatePath('/reunioes');
   revalidatePath('/calls');
   revalidatePath(`/reunioes/${leitura.data.reuniao}`);

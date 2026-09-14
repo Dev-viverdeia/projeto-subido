@@ -8,6 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { verificarBaseConfiavel } from './base-confiavel.mjs';
 import { verificarEdicaoProposta } from './proposta-edicao.mjs';
 import { verificarAgendaReunioes } from './agenda-reunioes.mjs';
+import { verificarConflitosAgenda } from './conflitos-agenda.mjs';
 
 const executar = promisify(executarCallback);
 const raiz = resolve(import.meta.dirname, '../..');
@@ -236,6 +237,7 @@ try {
     await verificarBaseConfiavel({ sql, funcao, raiz });
     await verificarEdicaoProposta({ sql, funcao });
     await verificarAgendaReunioes({ sql });
+    await verificarConflitosAgenda({ sql });
   }
   if (!soContratos) {
     // Carga mista de transações reais. Falha/retry sintéticos; sem IA, rede externa ou envio.

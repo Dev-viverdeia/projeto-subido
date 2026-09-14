@@ -65,7 +65,7 @@ function banco(
                   ],
             error: null,
           }
-        : { data: null, error: null };
+        : { data: nome === 'calls_conferir_horario' ? [] : null, error: null };
     }),
     from: () => {
       const filtros: Array<[string, unknown]> = [];
@@ -100,6 +100,7 @@ function banco(
   };
   return {
     cliente: cliente as unknown as Awaited<ReturnType<typeof createClient>>,
+    rpc: cliente.rpc,
     ler: () => linha,
   };
 }
@@ -107,6 +108,49 @@ function banco(
 afterEach(() => vi.unstubAllGlobals());
 
 describe('alterações persistidas antes de chamar o Google', () => {
+  it.each(['conflito', 'falha'])(
+    'não altera horário nem chama Google quando há %s na conferência',
+    async (cenario) => {
+      const db = banco();
+      const fetchGoogle = vi.fn();
+      vi.stubGlobal('fetch', fetchGoogle);
+      db.rpc.mockResolvedValueOnce(
+        cenario === 'falha'
+          ? ({ data: null, error: { code: 'offline', message: 'segredo' } } as never)
+          : ({
+              data: [
+                {
+                  id: '11111111-1111-4111-8111-111111111111',
+                  titulo: 'Outra reunião',
+                  agendada_para: '2099-12-11T18:00:00+00:00',
+                  duracao_minutos: 45,
+                  total: 1,
+                  versao: 'a'.repeat(32),
+                },
+              ],
+              error: null,
+            } as never),
+      );
+      const resultado = await executarAlteracaoAgenda(db.cliente, {
+        reuniaoId: ID,
+        dono: DONO,
+        acao: 'reagendar',
+        versao: VERSAO,
+        agendadaPara: '2099-12-11T18:00:00.000Z',
+        duracaoMinutos: 45,
+      });
+      expect(resultado.status).toBe('erro');
+      if (cenario === 'conflito') expect(resultado.conflito?.total).toBe(1);
+      else expect(resultado.mensagem).toContain('Nada foi alterado');
+      expect(db.ler()).toEqual(inicial);
+      expect(db.rpc).toHaveBeenCalledExactlyOnceWith('calls_conferir_horario', {
+        p_inicio: '2099-12-11T18:00:00.000Z',
+        p_duracao_minutos: 45,
+        p_ignorar: ID,
+      });
+      expect(fetchGoogle).not.toHaveBeenCalled();
+    },
+  );
   it('mantém cancelamento e referência ao evento quando o Google falha, permitindo nova tentativa', async () => {
     await Promise.resolve();
     const db = banco();

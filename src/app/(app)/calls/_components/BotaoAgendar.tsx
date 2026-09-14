@@ -1,22 +1,12 @@
 import { Button } from '@/design-system/via';
 import { EsperaOperacao } from '../../_components/EsperaOperacao';
 
-const ETAPAS_SALA = [
+// A ação retorna um resultado único. O tempo decorrido não comprova etapas concluídas.
+const ETAPAS = [
   {
-    titulo: 'Criando a sala da Subido',
-    descricao: 'Gerando o acesso público e ligando a reunião à ficha do cliente.',
-  },
-  {
-    titulo: 'Salvando na ficha',
-    descricao: 'Registrando a reunião no histórico deste cliente.',
-  },
-] as const;
-
-const ETAPAS_CONVITE = [
-  ...ETAPAS_SALA,
-  {
-    titulo: 'Enviando o convite',
-    descricao: 'Criando o evento no Google Calendar com o link da sala.',
+    titulo: 'Aguardando confirmação',
+    descricao:
+      'Se houver outra reunião neste horário, você poderá escolher o que fazer antes do convite.',
   },
 ] as const;
 
@@ -37,31 +27,16 @@ export function BotaoAgendar({
         key={pending ? 'agendando' : 'pronto'}
         aberto={pending}
         rotulo={kickoff ? 'Kickoff em preparação' : 'Agendamento em andamento'}
-        titulo={
-          kickoff
-            ? 'Criando o kickoff e o convite'
-            : comConviteGoogle
-              ? 'Criando sua reunião e o convite'
-              : 'Criando sua reunião'
-        }
-        descricao={
-          kickoff
-            ? 'Estamos preparando a sala e ligando o kickoff ao projeto do cliente.'
-            : 'Estamos preparando a sala e ligando a conversa à ficha do cliente.'
-        }
-        etapas={comConviteGoogle ? ETAPAS_CONVITE : ETAPAS_SALA}
-        intervalo={2_500}
+        titulo="Conferindo seu agendamento"
+        descricao="Antes de criar a sala e enviar o convite, conferimos as reuniões deste horário."
+        etapas={ETAPAS}
         nota="Mantenha esta janela aberta até a confirmação."
-        mensagemDemora="O Google está demorando para responder. Aguarde a confirmação antes de tentar novamente."
+        mensagemDemora="O agendamento está demorando mais que o esperado. Aguarde a confirmação antes de tentar novamente."
         demoraApos={12_000}
       />
       <Button type="submit" form={form} variant="primary" loading={pending}>
         {pending
-          ? kickoff
-            ? 'Criando kickoff e convite…'
-            : comConviteGoogle
-              ? 'Criando reunião e convite…'
-              : 'Criando sala…'
+          ? 'Processando agendamento…'
           : kickoff
             ? 'Agendar kickoff e enviar convite'
             : comConviteGoogle

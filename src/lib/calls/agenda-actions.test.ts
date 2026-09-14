@@ -31,6 +31,18 @@ beforeEach(() => {
   getClaims.mockResolvedValue({ data: { claims: { sub: 'dono-autenticado' } } });
 });
 describe('fronteira de alteração da reunião', () => {
+  it('passa a confirmação atual e mantém o formulário quando há conflito', async () => {
+    const form = formulario();
+    form.set('confirmacaoHorario', 'assinatura');
+    const conflito = { total: 1 };
+    executar.mockResolvedValue({ status: 'erro', conflito });
+    expect((await alterarAgendaReuniao({ status: 'erro' }, form)).conflito).toEqual(conflito);
+    expect(executar).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ confirmacaoHorario: 'assinatura' }),
+    );
+    expect(revalidar).not.toHaveBeenCalled();
+  });
   it('usa o dono autenticado, converte o horário e atualiza a ficha', async () => {
     expect((await alterarAgendaReuniao({ status: 'erro' }, formulario())).status).toBe('concluido');
     expect(executar).toHaveBeenCalledWith(

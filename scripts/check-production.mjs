@@ -27,6 +27,11 @@ try {
   }
   assert.ok(pronta, 'Entrada indisponível no build de produção');
   assert.equal(
+    (await fetch(`${origem}/preview/conflitos-agenda?modo=reagendar&varios=1`)).status,
+    404,
+    'Simulação de conflitos não pode abrir em produção',
+  );
+  assert.equal(
     (await fetch(`${origem}/preview/agenda?visao=historico&busca=Camila`)).status,
     404,
     'Agenda simulada não pode abrir em produção',
