@@ -1,7 +1,8 @@
 'use client';
 
-import { useId, useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { useId, useLayoutEffect, type RefObject } from 'react';
 import { LoaderCircle, RotateCcw, Send } from 'lucide-react';
+import { useRascunhoReuniao } from './RascunhoReuniao';
 import styles from './EscreverMensagemReuniao.module.css';
 
 type Props = {
@@ -33,9 +34,14 @@ export function EscreverMensagemReuniao({
   enviando,
   aoEnviar,
 }: Props) {
-  const [texto, setTexto] = useState('');
-  const [estado, setEstado] = useState<'pronto' | 'enviando' | 'enviado' | 'erro'>('pronto');
-  const emCurso = useRef(false);
+  const {
+    texto,
+    setTexto,
+    estado,
+    setEstado,
+    emCurso: emCursoRef,
+    versaoEnvio: versaoEnvioRef,
+  } = useRascunhoReuniao();
   const ajudaId = useId();
   const ocupado = estado === 'enviando' || enviando;
   const excedeu = texto.length > 2000;
@@ -60,36 +66,45 @@ export function EscreverMensagemReuniao({
   }, [aberto, campoRef]);
 
   async function enviarMensagem() {
-    if (emCurso.current || ocupado || !valido || !conectado) return;
-    emCurso.current = true;
+    if (emCursoRef.current || ocupado || !valido || !conectado) return;
+    emCursoRef.current = true;
+    const versao = ++versaoEnvioRef.current;
     setEstado('enviando');
     try {
       await enviar(texto.trim());
+      if (versao !== versaoEnvioRef.current) return;
       setTexto('');
       setEstado('enviado');
       aoEnviar();
     } catch {
-      setEstado('erro');
+      if (versao === versaoEnvioRef.current) setEstado('erro');
     } finally {
-      emCurso.current = false;
-      const campo = campoRef.current;
-      // Quem fechou o painel ou foi a outro controle não perde o foco ao terminar o envio.
-      if (campo?.getClientRects().length && campo.closest('form')?.contains(document.activeElement))
-        campo.focus({ preventScroll: true });
+      if (versao === versaoEnvioRef.current) {
+        emCursoRef.current = false;
+        const campo = campoRef.current;
+        // Quem fechou o painel ou foi a outro controle não perde o foco ao terminar o envio.
+        if (
+          campo?.getClientRects().length &&
+          campo.closest('form')?.contains(document.activeElement)
+        )
+          campo.focus({ preventScroll: true });
+      }
     }
   }
 
   const retorno = ocupado
     ? 'Enviando…'
-    : estado === 'erro'
-      ? 'A mensagem não foi enviada. Tente novamente.'
-      : excedeu
-        ? 'Use até 2.000 caracteres.'
-        : !conectado
-          ? 'Reconectando. Seu texto foi mantido.'
-          : estado === 'enviado'
-            ? 'Enviada'
-            : '';
+    : estado === 'incerto'
+      ? 'Envio interrompido. Confira com os participantes antes de reenviar.'
+      : estado === 'erro'
+        ? 'A mensagem não foi enviada. Tente novamente.'
+        : excedeu
+          ? 'Use até 2.000 caracteres.'
+          : !conectado
+            ? 'Reconectando. Seu texto foi mantido.'
+            : estado === 'enviado'
+              ? 'Enviada'
+              : '';
 
   return (
     <form
@@ -133,14 +148,14 @@ export function EscreverMensagemReuniao({
           aria-label={
             ocupado
               ? 'Enviando mensagem'
-              : estado === 'erro'
+              : estado === 'erro' || estado === 'incerto'
                 ? 'Tentar novamente'
                 : 'Enviar mensagem'
           }
         >
           {ocupado ? (
             <LoaderCircle size={20} className={styles.carregando} aria-hidden="true" />
-          ) : estado === 'erro' ? (
+          ) : estado === 'erro' || estado === 'incerto' ? (
             <RotateCcw size={20} aria-hidden="true" />
           ) : (
             <Send size={20} aria-hidden="true" />
@@ -148,7 +163,11 @@ export function EscreverMensagemReuniao({
         </button>
       </div>
       <div className={styles.apoio}>
-        <p id={ajudaId} role={estado === 'erro' || excedeu ? 'alert' : 'status'} aria-atomic="true">
+        <p
+          id={ajudaId}
+          role={estado === 'erro' || estado === 'incerto' || excedeu ? 'alert' : 'status'}
+          aria-atomic="true"
+        >
           {retorno || <span className={styles.atalho}>Shift+Enter para nova linha</span>}
         </p>
         {texto.length >= 1800 && <span className={styles.contagem}>{texto.length} / 2.000</span>}

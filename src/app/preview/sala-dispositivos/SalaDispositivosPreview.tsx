@@ -22,6 +22,7 @@ export function SalaDispositivosPreview({
   mensagens,
   continuarChat = false,
   simularEnvio = false,
+  aoPronta,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
@@ -30,6 +31,7 @@ export function SalaDispositivosPreview({
   mensagens?: string[];
   continuarChat?: boolean;
   simularEnvio?: boolean;
+  aoPronta?: () => void;
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
@@ -81,13 +83,14 @@ export function SalaDispositivosPreview({
           canManageAgentSession: false,
         } as unknown as Parameters<typeof sala.localParticipant.setPermissions>[0]);
         setRoom(sala);
+        aoPronta?.();
       });
     return () => {
       cancelado = true;
       responderEnvio.current?.(true);
       void sala.disconnect();
     };
-  }, [simularEnvio]);
+  }, [simularEnvio, aoPronta]);
   if (!room) return <p role="status">Preparando a prévia da sala…</p>;
   return (
     <main

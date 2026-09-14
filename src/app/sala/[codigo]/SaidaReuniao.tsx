@@ -11,10 +11,12 @@ export function SaidaReuniao({
   aoSair,
   aoEncerrar,
   className,
+  aoMudarAbertura,
 }: {
   aoSair: () => Promise<void>;
   aoEncerrar: () => Promise<void>;
   className?: string;
+  aoMudarAbertura?: (aberta: boolean) => void;
 }) {
   const [aberto, setAberto] = useState(false);
   const [acao, setAcao] = useState<'sair' | 'encerrar' | null>(null);
@@ -22,6 +24,10 @@ export function SaidaReuniao({
   const ocupado = useRef(false);
   const id = useId();
   const estado = useRef<HTMLParagraphElement>(null);
+  function mudarAbertura(valor: boolean) {
+    setAberto(valor);
+    aoMudarAbertura?.(valor);
+  }
   useEffect(() => {
     if (acao || erro) estado.current?.focus();
   }, [acao, erro]);
@@ -33,7 +39,7 @@ export function SaidaReuniao({
     setErro('');
     try {
       await (escolha === 'sair' ? aoSair() : aoEncerrar());
-      setAberto(false);
+      mudarAbertura(false);
     } catch {
       setErro(
         escolha === 'sair'
@@ -58,7 +64,7 @@ export function SaidaReuniao({
           // Safari não foca botões ao tocar. O modal precisa saber para onde devolver o foco.
           evento.currentTarget.focus();
           setErro('');
-          setAberto(true);
+          mudarAbertura(true);
         }}
       >
         <PhoneOff size={20} aria-hidden="true" />
@@ -66,7 +72,7 @@ export function SaidaReuniao({
       </button>
       <ModalOperacao
         open={aberto}
-        onClose={() => setAberto(false)}
+        onClose={() => mudarAbertura(false)}
         title="Sair da reunião"
         size="sm"
         blocked={acao !== null}
@@ -75,7 +81,7 @@ export function SaidaReuniao({
             variant="secondary"
             data-autofocus
             disabled={acao !== null}
-            onClick={() => setAberto(false)}
+            onClick={() => mudarAbertura(false)}
           >
             Voltar à reunião
           </Button>

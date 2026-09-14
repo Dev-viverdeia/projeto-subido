@@ -266,7 +266,9 @@ describe('SalaCall', () => {
     await user.click(await screen.findByRole('button', { name: 'Simular queda de conexão' }));
 
     expect(screen.getByRole('heading', { name: 'Reconectando à reunião' })).toBeInTheDocument();
-    expect(screen.getByText('Tentativa 1 de 3')).toBeInTheDocument();
+    expect(
+      screen.getByText('Aguarde um instante. Estamos tentando conectar você novamente.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Preparando o resumo da reunião')).not.toBeInTheDocument();
 
     fetchMock.mockRestore();

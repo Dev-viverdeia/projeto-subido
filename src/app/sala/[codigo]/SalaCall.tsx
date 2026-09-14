@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   CalendarClock,
@@ -9,15 +9,13 @@ import {
   FileText,
   LoaderCircle,
   LockKeyhole,
-  RotateCcw,
   Video,
-  WifiOff,
 } from 'lucide-react';
 import { DisconnectReason } from 'livekit-client';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { ConviteCall } from '@/lib/calls/queries';
 import type { PlanoCall } from '@/lib/calls/plano';
-import { atrasoDaReconexao, desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
+import { desconexaoPermiteRetomar } from '@/lib/calls/reconexao';
 import { callPassouDaJanela, callPodeAbrir, ROTULO_STATUS_CALL } from '@/lib/calls/tipos';
 import { SalaAoVivo } from './SalaAoVivo';
 import { obterCredenciaisSala, salvarSaida } from './salvarSaida';
@@ -26,6 +24,10 @@ import { EstadoSaidaReuniao } from './EstadoSaidaReuniao';
 import { EstadoFinalSala } from './EstadoFinalSala';
 import { PreparacaoMidia } from './PreparacaoMidia';
 import { SaidaReuniao } from './SaidaReuniao';
+import { RascunhoReuniao, useRascunhoReuniao } from './RascunhoReuniao';
+import { useRetomadaReuniao } from './useRetomadaReuniao';
+import { RetomadaReuniao } from './RetomadaReuniao';
+import retomadaStyles from './RetomadaReuniao.module.css';
 import { MIDIA_INICIAL, usePreparacaoMidia, type EscolhasMidia } from './usePreparacaoMidia';
 import styles from './sala.module.css';
 
@@ -38,35 +40,54 @@ const DATA = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
 });
 
-type Credenciais = { serverUrl: string; token: string };
-type Recuperacao = { estado: 'tentando' | 'falhou'; tentativa: number; mensagem?: string };
-
-const MAX_TENTATIVAS_RECONEXAO = 3;
-
-export function SalaCall({
-  codigo,
-  convite,
-  anfitriao,
-  nomeSugerido,
-  videoConfigurado,
-  planoAnfitriao = null,
-}: {
+type Props = {
   codigo: string;
   convite: ConviteCall;
   anfitriao: boolean;
   nomeSugerido: string;
   videoConfigurado: boolean;
   planoAnfitriao?: PlanoCall | null;
-}) {
+};
+
+export function SalaCall(props: Props) {
+  return (
+    <RascunhoReuniao key={props.codigo}>
+      <ParticipacaoReuniao {...props} />
+    </RascunhoReuniao>
+  );
+}
+
+function ParticipacaoReuniao({
+  codigo,
+  convite,
+  anfitriao,
+  nomeSugerido,
+  videoConfigurado,
+  planoAnfitriao = null,
+}: Props) {
   const router = useRouter();
   const [nome, setNome] = useState(nomeSugerido);
   const [consentiu, setConsentiu] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
-  const [credenciais, setCredenciais] = useState<Credenciais | null>(null);
   const [saida, setSaida] = useState<'processando' | 'encerrada' | 'saiu' | null>(null);
   const encerramentoConfirmado = useRef(false);
-  const [recuperacao, setRecuperacao] = useState<Recuperacao | null>(null);
+  const { texto, interromper, limpar } = useRascunhoReuniao();
+  const [escolhendoSaida, setEscolhendoSaida] = useState(false);
+  const obterCredenciais = useCallback(
+    (signal?: AbortSignal) => obterCredenciaisSala(codigo, nome, consentiu, signal),
+    [codigo, nome, consentiu],
+  );
+  const {
+    estado: conexao,
+    dispatch,
+    online,
+  } = useRetomadaReuniao(obterCredenciais, escolhendoSaida);
+  const { credenciais, geracao } = conexao;
+  const geracaoAtiva = useRef(geracao);
+  useLayoutEffect(() => {
+    geracaoAtiva.current = geracao;
+  }, [geracao]);
   const midia = usePreparacaoMidia();
   const [escolhasEntrada, setEscolhasEntrada] = useState<EscolhasMidia>(MIDIA_INICIAL);
   const kickoff = convite.tipo === 'kickoff';
@@ -94,59 +115,40 @@ export function SalaCall({
     return () => window.clearTimeout(navegacao);
   }, [convite.reuniaoId, router, saida]);
 
-  const obterCredenciais = () => obterCredenciaisSala(codigo, nome, consentiu);
+  const aoDesconectar = useCallback(
+    (reason?: DisconnectReason) => {
+      if (geracaoAtiva.current !== geracao) return;
+      geracaoAtiva.current = -1;
+      if (encerramentoConfirmado.current && anfitriao) {
+        dispatch({ tipo: 'sair' });
+        limpar();
+        setSaida('processando');
+        return;
+      }
+      if (desconexaoPermiteRetomar(reason)) {
+        interromper();
+        dispatch({ tipo: 'queda', geracao });
+        return;
+      }
+      dispatch({ tipo: 'sair' });
+      limpar();
+      setSaida(reason === DisconnectReason.CLIENT_INITIATED ? 'saiu' : 'encerrada');
+    },
+    [anfitriao, dispatch, geracao, interromper, limpar],
+  );
 
-  useEffect(() => {
-    if (recuperacao?.estado !== 'tentando') return;
-    let cancelado = false;
-    const timer = window.setTimeout(() => {
-      void (async () => {
-        try {
-          const novasCredenciais = await obterCredenciais();
-          if (cancelado) return;
-          setCredenciais(novasCredenciais);
-          setRecuperacao(null);
-        } catch (falha) {
-          if (cancelado) return;
-          if (recuperacao.tentativa < MAX_TENTATIVAS_RECONEXAO) {
-            setRecuperacao({ estado: 'tentando', tentativa: recuperacao.tentativa + 1 });
-            return;
-          }
-          setRecuperacao({
-            estado: 'falhou',
-            tentativa: recuperacao.tentativa,
-            mensagem: falha instanceof Error ? falha.message : 'Não foi possível retomar a sala.',
-          });
-        }
-      })();
-    }, atrasoDaReconexao(recuperacao.tentativa));
-    return () => {
-      cancelado = true;
-      window.clearTimeout(timer);
-    };
-    // Nome e consentimento não mudam enquanto a pessoa está dentro da reunião.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recuperacao]);
-
-  function aoDesconectar(reason?: DisconnectReason) {
-    setCredenciais(null);
-    if (encerramentoConfirmado.current && anfitriao) {
-      setSaida('processando');
-      return;
-    }
-    if (desconexaoPermiteRetomar(reason)) {
-      setRecuperacao({ estado: 'tentando', tentativa: 1 });
-      return;
-    }
-    setSaida(reason === DisconnectReason.CLIENT_INITIATED ? 'saiu' : 'encerrada');
-  }
+  const aoConectar = useCallback(() => {
+    if (geracaoAtiva.current === geracao) dispatch({ tipo: 'conectou', geracao });
+  }, [dispatch, geracao]);
+  const aoFalharConexao = useCallback(() => aoDesconectar(), [aoDesconectar]);
 
   async function encerrarDepoisDaFalha() {
     if (anfitriao) {
       await salvarSaida(convite.reuniaoId, [], true);
       encerramentoConfirmado.current = true;
     }
-    setRecuperacao(null);
+    dispatch({ tipo: 'sair' });
+    limpar();
     setSaida(anfitriao ? 'processando' : 'encerrada');
   }
 
@@ -160,7 +162,7 @@ export function SalaCall({
     try {
       const novasCredenciais = await obterCredenciais();
       encerramentoConfirmado.current = false;
-      setCredenciais(novasCredenciais);
+      dispatch({ tipo: 'entrar', credenciais: novasCredenciais });
     } catch (falha) {
       midia.desligar('audio');
       midia.desligar('video');
@@ -170,78 +172,56 @@ export function SalaCall({
     }
   }
 
-  if (recuperacao) {
-    const tentando = recuperacao.estado === 'tentando';
+  if (conexao.fase === 'recuperando' || conexao.fase === 'falhou') {
     return (
-      <main className={styles.saida}>
-        <section className={styles.saidaCartao} role="status" aria-live="assertive">
-          <span className={styles.saidaIcone} aria-hidden="true">
-            {tentando ? (
-              <LoaderCircle className="lucide-loader-circle" size={28} />
-            ) : (
-              <WifiOff size={28} />
-            )}
-          </span>
-          <p>
-            {tentando
-              ? `Tentativa ${recuperacao.tentativa} de ${MAX_TENTATIVAS_RECONEXAO}`
-              : 'Conexão interrompida'}
-          </p>
-          <h1>{tentando ? 'Reconectando à reunião' : 'A reunião continua protegida'}</h1>
-          <span>
-            {tentando
-              ? 'Aguarde um instante. Você volta para a mesma conversa automaticamente.'
-              : recuperacao.mensagem || 'Confira sua internet e tente entrar novamente.'}
-          </span>
-          {tentando ? (
-            <i aria-hidden="true" />
-          ) : (
-            <div className={styles.recuperacaoAcoes}>
-              <button
-                type="button"
-                className={styles.botaoRetomar}
-                onClick={() => setRecuperacao({ estado: 'tentando', tentativa: 1 })}
-              >
-                <RotateCcw size={16} aria-hidden="true" /> Tentar novamente
-              </button>
-              {anfitriao ? (
-                <SaidaReuniao
-                  className={styles.botaoEncerrar}
-                  aoEncerrar={encerrarDepoisDaFalha}
-                  aoSair={async () => {
-                    await salvarSaida(convite.reuniaoId, [], false);
-                    setRecuperacao(null);
-                    setSaida('saiu');
-                  }}
-                />
-              ) : (
-                <button
-                  type="button"
-                  className={styles.botaoEncerrar}
-                  onClick={() => {
-                    setRecuperacao(null);
-                    setSaida('saiu');
-                  }}
-                >
-                  Sair da reunião
-                </button>
-              )}
-            </div>
-          )}
-          {erro && <p role="alert">{erro}</p>}
-        </section>
-      </main>
+      <RetomadaReuniao
+        titulo={convite.titulo}
+        offline={!online}
+        falhou={conexao.fase === 'falhou'}
+        rascunho={!!texto}
+        aoTentar={() => dispatch({ tipo: 'tentar' })}
+      >
+        {anfitriao ? (
+          <SaidaReuniao
+            aoMudarAbertura={setEscolhendoSaida}
+            className={retomadaStyles.sair}
+            aoEncerrar={encerrarDepoisDaFalha}
+            aoSair={async () => {
+              // Sem internet, sair só desta participação é local; não encerra a reunião.
+              if (online) await salvarSaida(convite.reuniaoId, [], false);
+              dispatch({ tipo: 'sair' });
+              limpar();
+              setSaida('saiu');
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            className={retomadaStyles.sair}
+            onClick={() => {
+              dispatch({ tipo: 'sair' });
+              limpar();
+              setSaida('saiu');
+            }}
+          >
+            Sair da reunião
+          </button>
+        )}
+      </RetomadaReuniao>
     );
   }
 
   if (credenciais) {
     return (
       <SalaAoVivo
+        key={geracao}
         credenciais={credenciais}
         convite={convite}
         anfitriao={anfitriao}
         plano={planoAnfitriao}
         aoDesconectar={aoDesconectar}
+        aoConectar={aoConectar}
+        aoFalharConexao={aoFalharConexao}
         escolhas={escolhasEntrada}
         aoMudarEscolhas={setEscolhasEntrada}
         aoConfirmarEncerramento={() => {
