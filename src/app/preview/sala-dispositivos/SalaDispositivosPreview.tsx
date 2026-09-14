@@ -10,6 +10,7 @@ import type { PlanoCall } from '@/lib/calls/plano';
 import type { TipoCall } from '@/lib/calls/tipos';
 import { MIDIA_INICIAL } from '@/app/sala/[codigo]/usePreparacaoMidia';
 import styles from '@/app/sala/[codigo]/sala.module.css';
+import { MensagensSimuladas } from './MensagensSimuladas';
 
 /** Fixture somente em desenvolvimento: nenhuma conexão ou permissão de mídia. */
 export function SalaDispositivosPreview({
@@ -17,11 +18,13 @@ export function SalaDispositivosPreview({
   convidado = false,
   falharSaida = false,
   reuniaoId,
+  mensagens,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
   falharSaida?: boolean;
   reuniaoId?: string;
+  mensagens?: string[];
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
@@ -79,6 +82,7 @@ export function SalaDispositivosPreview({
       data-encerramentos={encerramentos}
     >
       <h1 className="sr-only">Reunião de demonstração</h1>
+      {mensagens && <MensagensSimuladas room={room} mensagens={mensagens} />}
       <div className="lk-room-container">
         <RoomContext.Provider value={room}>
           <div

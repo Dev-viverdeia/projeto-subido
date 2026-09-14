@@ -1,0 +1,70 @@
+.mensagem {
+  padding: var(--via-space-3);
+  margin-bottom: var(--via-space-3);
+  border-radius: var(--app-radius-control);
+  color: var(--via-text-primary);
+  overflow-wrap: anywhere;
+}
+.mensagem[data-propria] {
+  background: var(--via-bg-2);
+}
+.mensagem strong {
+  display: block;
+  margin-bottom: var(--via-space-1);
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+}
+.mensagem p {
+  margin: 0;
+  font-size: var(--app-fs-reading);
+  line-height: var(--via-lh-normal);
+  white-space: pre-wrap;
+}
+.mensagem a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  max-width: 100%;
+  min-height: 44px;
+  padding-block: var(--via-space-1);
+  border-radius: var(--app-radius-chip);
+  color: var(--via-navy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  vertical-align: middle;
+  transition: background var(--app-t-state) var(--via-ease-out);
+}
+.mensagem a > span:first-child {
+  min-width: 0;
+  /* Tokens extensos não tomam a conversa. O href, nome acessível e title ficam completos. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.mensagem a svg {
+  flex-shrink: 0;
+}
+.mensagem a:hover {
+  background: var(--via-navy-06);
+}
+.mensagem a:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+  box-shadow: var(--app-ring);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mensagem a {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .mensagem a {
+    color: LinkText;
+  }
+  .mensagem a:focus-visible {
+    outline-color: Highlight;
+  }
+}
