@@ -11,6 +11,7 @@ import { podeAlterarHorario, sincronizacaoEmAndamento } from './agenda-modelo';
 import { conferirHorario } from './conflitos-servico';
 import type { ConflitoHorario } from './conflitos-modelo';
 export type AlteracaoAgenda = {
+  fusoHorario?: string;
   reuniaoId: string;
   dono: string;
   acao: 'cancelar' | 'reagendar' | 'sincronizar';
@@ -92,6 +93,7 @@ export async function executarAlteracaoAgenda(
       duracao: alteracao.duracaoMinutos!,
       ignorar: reuniao.id,
       confirmacao: alteracao.confirmacaoHorario,
+      fuso: alteracao.fusoHorario,
     });
     if (conferencia.erro || conferencia.conflito)
       return { status: 'erro', mensagem: conferencia.erro, conflito: conferencia.conflito };

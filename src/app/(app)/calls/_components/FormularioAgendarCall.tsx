@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CalendarCheck2, CalendarPlus, ClipboardCheck, Layers3 } from 'lucide-react';
 import { Button, Input } from '@/design-system/via';
 import {
@@ -24,11 +24,10 @@ import { useAgendamento } from './useAgendamento';
 import type { agendarReuniao, CampoAgendamento } from '@/lib/calls/actions';
 import { conflitoDoHorario } from '@/lib/calls/conflitos-modelo';
 import { AvisoConflitoHorario } from './AvisoConflitoHorario';
+import { CamposFusoAgenda } from './CamposFusoAgenda';
+import { horarioLocal } from '@/lib/calls/agenda-modelo';
 import styles from './FormularioAgendarCall.module.css';
 
-const escutarMontagem = () => () => undefined;
-const obterMontagemCliente = () => true;
-const obterMontagemServidor = () => false;
 const FORMULARIO_ID = 'form-agendar-reuniao';
 
 export function FormularioAgendarCall({
@@ -54,13 +53,7 @@ export function FormularioAgendarCall({
 }) {
   const gatilho = useRef<HTMLButtonElement>(null);
   const formulario = useRef<HTMLFormElement>(null);
-  const montado = useSyncExternalStore(
-    escutarMontagem,
-    obterMontagemCliente,
-    obterMontagemServidor,
-  );
   const [aberto, setAberto] = useState(abertoInicial);
-  const offsetMinutos = montado ? new Date().getTimezoneOffset() : 0;
   const [errosOcultos, setErrosOcultos] = useState<Set<CampoAgendamento>>(new Set());
   const [estado, acao, pendente] = useAgendamento(rascunho, agendarAction);
   const [quando, setQuando] = useState(rascunho?.agendadaPara ?? '');
@@ -222,16 +215,9 @@ export function FormularioAgendarCall({
             onReset={(evento) => evento.preventDefault()}
             className={styles.formulario}
             noValidate
-            onSubmit={() => {
-              setErrosOcultos(new Set());
-              const data =
-                formulario.current?.querySelector<HTMLInputElement>('[name="agendadaPara"]')?.value;
-              const offset =
-                formulario.current?.querySelector<HTMLInputElement>('[name="offsetMinutos"]');
-              if (data && offset) offset.value = String(new Date(data).getTimezoneOffset());
-            }}
+            onSubmit={() => setErrosOcultos(new Set())}
           >
-            <input type="hidden" name="offsetMinutos" value={offsetMinutos} readOnly />
+            <CamposFusoAgenda quando={quando} />
 
             <ErroAgendamento
               estado={estado}
@@ -368,6 +354,11 @@ export function FormularioAgendarCall({
                 key={conflito.confirmacao}
                 conflito={conflito}
                 pendente={pendente}
+                aoEscolher={(inicio) => {
+                  setQuando(horarioLocal(inicio));
+                  ocultarErro('agendadaPara');
+                  requestAnimationFrame(() => document.getElementById('calls-data')?.focus());
+                }}
               />
             )}
 

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { createClient } from '@/lib/supabase/server';
 import type { ConflitoHorario } from './conflitos-modelo';
+import { buscarHorariosAlternativos } from './horarios-alternativos';
 
 const Linhas = z
   .array(
@@ -21,7 +22,7 @@ type Conferencia = { conflito?: ConflitoHorario; erro?: string };
 
 export async function conferirHorario(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  dados: { inicio: string; duracao: number; ignorar?: string; confirmacao?: string },
+  dados: { inicio: string; duracao: number; ignorar?: string; confirmacao?: string; fuso?: string },
 ): Promise<Conferencia> {
   try {
     const { data, error } = await supabase.rpc('calls_conferir_horario', {
@@ -45,6 +46,7 @@ export async function conferirHorario(
         duracao: dados.duracao,
         total,
         confirmacao,
+        alternativas: await buscarHorariosAlternativos(supabase, dados),
         reunioes: resultado.data.map((r) => ({
           id: r.id,
           titulo: r.titulo,

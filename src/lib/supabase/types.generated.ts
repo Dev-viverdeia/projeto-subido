@@ -4105,6 +4105,10 @@ export type Database = {
           versao: string
         }[]
       }
+      calls_sugerir_horarios: {
+        Args: { p_inicio: string; p_duracao_minutos: number; p_fuso: string; p_ignorar?: string }
+        Returns: { inicio: string }[]
+      }
       calls_listar_agenda: {
         Args: {
           p_visao?: string

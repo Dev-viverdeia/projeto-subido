@@ -1,3 +1,9 @@
+/** Converte o instante para o campo datetime-local, incluindo o offset da data escolhida. */
+export function horarioLocal(iso: string): string {
+  const data = new Date(iso);
+  return new Date(data.getTime() - data.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+}
+
 /** Valida o calendário civil antes de aplicar o deslocamento informado pelo navegador. */
 export function dataLocalParaUtc(local: string, offset: number): Date | null {
   if (!Number.isInteger(offset) || Math.abs(offset) > 840) return null;

@@ -3,14 +3,17 @@
 import { useEffect, useId, useRef } from 'react';
 import { CalendarClock } from 'lucide-react';
 import type { ConflitoHorario } from '@/lib/calls/conflitos-modelo';
+import { AlternativasHorario } from './AlternativasHorario';
 import styles from './AvisoConflitoHorario.module.css';
 
 export function AvisoConflitoHorario({
   conflito,
   pendente = false,
+  aoEscolher,
 }: {
   conflito: ConflitoHorario;
   pendente?: boolean;
+  aoEscolher?: (inicio: string) => void;
 }) {
   const id = useId();
   const aviso = useRef<HTMLElement>(null);
@@ -55,6 +58,14 @@ export function AvisoConflitoHorario({
         <p className={styles.nota}>
           E mais {conflito.total - conflito.reunioes.length} reuniões nesse intervalo.
         </p>
+      )}
+      {aoEscolher && (
+        <AlternativasHorario
+          horarios={conflito.alternativas}
+          duracao={conflito.duracao}
+          pendente={pendente}
+          aoEscolher={aoEscolher}
+        />
       )}
       <label className={styles.confirmacao}>
         <input

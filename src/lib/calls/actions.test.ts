@@ -136,11 +136,13 @@ describe('agendarReuniao', () => {
     });
     const dados = dadosValidos();
     dados.set('confirmacaoHorario', 'assinatura-atual');
+    dados.set('fusoHorario', 'America/Sao_Paulo');
     await agendarReuniao({}, dados);
     expect(conferirHorario).toHaveBeenCalledWith(expect.anything(), {
       inicio: '2099-08-14T18:00:00.000Z',
       duracao: 45,
       confirmacao: 'assinatura-atual',
+      fuso: 'America/Sao_Paulo',
     });
     expect(rpc).not.toHaveBeenCalled();
   });
