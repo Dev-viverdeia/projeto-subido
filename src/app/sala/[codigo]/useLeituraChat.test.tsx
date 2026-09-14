@@ -69,6 +69,18 @@ function montar() {
 }
 
 describe('leitura contínua do chat', () => {
+  it('crescimento do campo não interrompe a leitura quando a interseção chega antes do resize', () => {
+    const { lista } = montar();
+    Object.defineProperty(lista, 'clientHeight', { configurable: true, value: 300 });
+    lista.scrollTop = 700;
+    avisarFim(true);
+    Object.defineProperty(lista, 'clientHeight', { configurable: true, value: 100 });
+    avisarFim(false);
+    expect(lista.scrollTop).toBe(1000);
+    expect(screen.getByRole('status')).toHaveTextContent('fim');
+    act(() => notificarTamanho([], {} as ResizeObserver));
+    expect(screen.getByRole('status')).toHaveTextContent('fim');
+  });
   it('não puxa a leitura quando o resize chega antes do evento de interseção', () => {
     const { lista } = montar();
     lista.scrollTop = 180;
@@ -121,6 +133,7 @@ describe('leitura contínua do chat', () => {
   });
   it('limpa o aviso ao voltar pelo controle e volta a acompanhar', async () => {
     const { rerender, lista } = montar();
+    lista.scrollTop = 180;
     avisarFim(false);
     rerender(<Harness aberto quantidade={12} />);
     act(() => screen.getByText('Recentes').click());
@@ -132,9 +145,11 @@ describe('leitura contínua do chat', () => {
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('0 novas; fim'));
   });
   it('considera lidas ao chegar manualmente ao fim', () => {
-    const { rerender } = montar();
+    const { rerender, lista } = montar();
+    lista.scrollTop = 180;
     avisarFim(false);
     rerender(<Harness aberto quantidade={14} />);
+    lista.scrollTop = 1000;
     avisarFim(true);
     expect(screen.getByRole('status')).toHaveTextContent('0 novas; fim');
   });
@@ -142,8 +157,8 @@ describe('leitura contínua do chat', () => {
     const { lista } = montar();
     act(() => notificarTamanho([], {} as ResizeObserver));
     expect(lista.scrollTop).toBe(1000);
-    avisarFim(false);
     lista.scrollTop = 120;
+    avisarFim(false);
     act(() => notificarTamanho([], {} as ResizeObserver));
     expect(lista.scrollTop).toBe(120);
   });

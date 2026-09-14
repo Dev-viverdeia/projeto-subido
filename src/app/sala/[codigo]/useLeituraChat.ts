@@ -47,8 +47,15 @@ export function useLeituraChat(aberto: boolean, quantidade: number) {
     const observer = new IntersectionObserver(
       ([entrada]) => {
         if (!atual.current.aberto) return;
-        const noFim =
-          Boolean(entrada?.isIntersecting) && !recuouNaLeitura(lista, ultimoFim.current);
+        const recuou = recuouNaLeitura(lista, ultimoFim.current);
+        // O campo pode crescer antes de o ResizeObserver rodar. Perder o fim por
+        // mudança de altura não significa que a pessoa voltou para ler acima.
+        if (!entrada?.isIntersecting && acompanhar.current && !recuou) {
+          lista.scrollTop = lista.scrollHeight;
+          ultimoFim.current = lista.scrollTop;
+          return;
+        }
+        const noFim = Boolean(entrada?.isIntersecting) && !recuou;
         acompanhar.current = noFim;
         setAfastado(!noFim);
         if (noFim) {

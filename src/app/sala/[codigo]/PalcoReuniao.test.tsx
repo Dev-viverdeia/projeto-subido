@@ -71,7 +71,10 @@ describe('controles da sala em português', () => {
     const user = userEvent.setup();
     abrir();
     await user.click(screen.getByRole('button', { name: 'Mensagens da reunião' }));
-    await user.type(screen.getByLabelText('Mensagem para os participantes'), 'Podemos começar?');
+    const campo = screen.getByLabelText('Mensagem para os participantes');
+    // JSDOM não calcula layout. A restauração de foco só ocorre no campo visível.
+    vi.spyOn(campo, 'getClientRects').mockReturnValue([{}] as unknown as DOMRectList);
+    await user.type(campo, 'Podemos começar?');
     await user.click(screen.getByRole('button', { name: 'Enviar mensagem' }));
     expect(state.send).toHaveBeenCalledWith('Podemos começar?');
     await waitFor(() =>

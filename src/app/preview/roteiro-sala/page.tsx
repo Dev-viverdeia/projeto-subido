@@ -10,6 +10,7 @@ export default async function PreviewRoteiroSala({
 }: PageProps<'/preview/roteiro-sala'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const params = await searchParams;
+  const simularEnvio = params.envio === 'teste';
   const continuarChat = params.chat === 'leitura';
   const mensagens = continuarChat
     ? Array.from(
@@ -27,7 +28,12 @@ export default async function PreviewRoteiroSala({
       : undefined;
   if (params.papel === 'convidado')
     return (
-      <SalaDispositivosPreview convidado mensagens={mensagens} continuarChat={continuarChat} />
+      <SalaDispositivosPreview
+        convidado
+        mensagens={mensagens}
+        continuarChat={continuarChat && !simularEnvio}
+        simularEnvio={simularEnvio}
+      />
     );
   const tipo = tipoCallValido(params.tipo) ? params.tipo : 'descoberta';
   const plano = montarPlanoCall({
@@ -46,7 +52,8 @@ export default async function PreviewRoteiroSala({
       reuniaoId={params.reuniao === 'outra' ? 'preview-outra-reuniao' : 'preview-roteiro-sala'}
       falharSaida={params.saida === 'erro'}
       mensagens={mensagens}
-      continuarChat={continuarChat}
+      continuarChat={continuarChat && !simularEnvio}
+      simularEnvio={simularEnvio}
       roteiro={{
         plano: params.estado === 'indisponivel' ? null : plano,
         tipo,

@@ -11,6 +11,7 @@ import type { TipoCall } from '@/lib/calls/tipos';
 import { MIDIA_INICIAL } from '@/app/sala/[codigo]/usePreparacaoMidia';
 import styles from '@/app/sala/[codigo]/sala.module.css';
 import { MensagensSimuladas } from './MensagensSimuladas';
+import { EnvioChatSimulado, prepararEnvioChatSimulado } from './EnvioChatSimulado';
 
 /** Fixture somente em desenvolvimento: nenhuma conexão ou permissão de mídia. */
 export function SalaDispositivosPreview({
@@ -20,6 +21,7 @@ export function SalaDispositivosPreview({
   reuniaoId,
   mensagens,
   continuarChat = false,
+  simularEnvio = false,
 }: {
   roteiro?: { plano: PlanoCall | null; tipo: TipoCall; ativo: boolean };
   convidado?: boolean;
@@ -27,12 +29,16 @@ export function SalaDispositivosPreview({
   reuniaoId?: string;
   mensagens?: string[];
   continuarChat?: boolean;
+  simularEnvio?: boolean;
 }) {
   const [room, setRoom] = useState<Room | null>(null);
   const [escolhas, setEscolhas] = useState(MIDIA_INICIAL);
   const [saidas, setSaidas] = useState(0);
   const [encerramentos, setEncerramentos] = useState(0);
   const tentativas = useRef(0);
+  const [tentativasEnvio, setTentativasEnvio] = useState(0);
+  const [envioPendente, setEnvioPendente] = useState(false);
+  const responderEnvio = useRef<((falhar: boolean) => void) | null>(null);
   async function simularSaida(encerrar: boolean) {
     tentativas.current += 1;
     if (encerrar) setEncerramentos((n) => n + 1);
@@ -43,6 +49,12 @@ export function SalaDispositivosPreview({
   useEffect(() => {
     const sala = new Room();
     let cancelado = false;
+    if (simularEnvio)
+      responderEnvio.current = prepararEnvioChatSimulado(sala, (pendente) => {
+        if (cancelado) return;
+        if (pendente) setTentativasEnvio((n) => n + 1);
+        setEnvioPendente(pendente);
+      });
     void sala
       .simulateParticipants({
         participants: { count: 2, video: false, audio: false },
@@ -72,9 +84,10 @@ export function SalaDispositivosPreview({
       });
     return () => {
       cancelado = true;
+      responderEnvio.current?.(true);
       void sala.disconnect();
     };
-  }, []);
+  }, [simularEnvio]);
   if (!room) return <p role="status">Preparando a prévia da sala…</p>;
   return (
     <main
@@ -84,6 +97,13 @@ export function SalaDispositivosPreview({
       data-encerramentos={encerramentos}
     >
       <h1 className="sr-only">Reunião de demonstração</h1>
+      {simularEnvio && (
+        <EnvioChatSimulado
+          tentativas={tentativasEnvio}
+          pendente={envioPendente}
+          aoResponder={(falhar) => responderEnvio.current?.(falhar)}
+        />
+      )}
       {mensagens && (
         <MensagensSimuladas room={room} mensagens={mensagens} continuar={continuarChat} />
       )}
