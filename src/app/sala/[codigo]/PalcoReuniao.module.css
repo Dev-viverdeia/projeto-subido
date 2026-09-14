@@ -107,7 +107,7 @@
   flex-shrink: 0;
   padding: var(--via-space-3);
   border-top: 1px solid var(--app-elev-2-line);
-  background: var(--app-elev-2-bg);
+  background: var(--app-elev-3-bg);
   box-shadow: var(--app-elev-2-shadow);
   backdrop-filter: var(--via-glass-blur);
 }
@@ -267,6 +267,13 @@
   color: var(--via-text-body);
   cursor: pointer;
 }
+.leituraChat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
 .mensagens {
   flex: 1;
   min-height: 0;
@@ -274,6 +281,43 @@
   overscroll-behavior: contain;
   scrollbar-width: thin;
   padding: var(--via-space-2);
+}
+.fimMensagens {
+  height: 1px;
+}
+.chat .recentes {
+  position: absolute;
+  bottom: var(--via-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--via-space-2);
+  width: max-content;
+  max-width: calc(100% - 24px);
+  height: auto;
+  min-height: 44px;
+  padding: var(--via-space-2) var(--via-space-4);
+  background: var(--app-elev-2-bg);
+  border-color: var(--app-elev-2-line);
+  box-shadow: var(--app-elev-2-shadow);
+  backdrop-filter: var(--app-glass-filter);
+  color: var(--via-navy);
+  font: inherit;
+  font-size: var(--app-fs-ui);
+  font-weight: var(--via-fw-medium);
+  transition: background var(--app-t-state) var(--via-ease-out);
+}
+.recentes svg {
+  flex-shrink: 0;
+}
+.chat .recentes:hover {
+  background: var(--via-bg-2);
+}
+.chat .recentes:focus-visible {
+  outline: 2px solid var(--via-navy);
+  outline-offset: 3px;
+  box-shadow: var(--app-ring), var(--app-elev-2-shadow);
 }
 .avisoChat {
   margin: 0;
@@ -373,12 +417,14 @@
 @supports not (backdrop-filter: blur(1px)) {
   .controles,
   .opcoes,
-  .chat header {
+  .chat header,
+  .chat .recentes {
     background: var(--via-surface);
   }
 }
 @media (forced-colors: active) {
   .chat button:focus-visible,
+  .chat .recentes:focus-visible,
   .chat input:focus-visible,
   .mensagens:focus-visible {
     outline: 2px solid Highlight;
@@ -387,6 +433,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .controles > button,
+  .chat .recentes,
   .dispositivos summary {
     transition: none;
   }

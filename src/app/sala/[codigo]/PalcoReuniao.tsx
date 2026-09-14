@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useId, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   RoomAudioRenderer,
   VideoTrack,
@@ -11,25 +11,25 @@ import {
   useTracks,
   useLocalParticipant,
   useLocalParticipantPermissions,
-  useRoomContext,
   useConnectionState,
   useChat,
 } from '@livekit/components-react';
 import { ConnectionState, Track } from 'livekit-client';
 import {
-  ChevronDown,
+  ArrowDown,
   Maximize2,
   MessageSquare,
   Minimize2,
   PhoneOff,
   Send,
-  Settings2,
   VideoOff,
   X,
 } from 'lucide-react';
 import type { EscolhasMidia } from './usePreparacaoMidia';
 import { EncerrarReuniao } from './EncerrarReuniao';
+import { DispositivosSala } from './DispositivosSala';
 import { MensagemReuniao } from './MensagemReuniao';
+import { useLeituraChat } from './useLeituraChat';
 import styles from './PalcoReuniao.module.css';
 
 type Props = {
@@ -40,92 +40,6 @@ type Props = {
   aoEncerrar?: () => Promise<void>;
   aoSair?: () => Promise<void>;
 };
-
-function DispositivosSala({ escolhas, aoMudarEscolhas, aoFalhar }: Omit<Props, 'anfitriao'>) {
-  const room = useRoomContext();
-  const [aberto, setAberto] = useState(false);
-  const [lista, setLista] = useState<MediaDeviceInfo[]>([]);
-  const [ocupado, setOcupado] = useState(false);
-  useEffect(() => {
-    if (!aberto) return;
-    let cancelado = false;
-    const atualizar = async () => {
-      try {
-        const dados = await navigator.mediaDevices.enumerateDevices();
-        if (!cancelado) setLista(dados);
-      } catch {
-        /* Não solicita permissões adicionais ao abrir configurações. */
-      }
-    };
-    void atualizar();
-    const aoTrocar = () => {
-      void atualizar();
-    };
-    navigator.mediaDevices?.addEventListener('devicechange', aoTrocar);
-    return () => {
-      cancelado = true;
-      navigator.mediaDevices?.removeEventListener('devicechange', aoTrocar);
-    };
-  }, [aberto]);
-
-  async function selecionar(tipo: 'audioinput' | 'videoinput', id: string) {
-    setOcupado(true);
-    try {
-      if (!(await room.switchActiveDevice(tipo, id))) throw new Error('Dispositivo indisponível');
-      aoMudarEscolhas((atual) => ({
-        ...atual,
-        [tipo === 'audioinput' ? 'microfoneId' : 'cameraId']: id,
-      }));
-    } catch (erro) {
-      aoFalhar(erro instanceof Error ? erro : new Error('Dispositivo indisponível'), tipo);
-    } finally {
-      setOcupado(false);
-    }
-  }
-
-  return (
-    <details
-      className={styles.dispositivos}
-      onToggle={(e) => setAberto(e.currentTarget.open)}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          e.currentTarget.open = false;
-          e.currentTarget.querySelector('summary')?.focus();
-        }
-      }}
-    >
-      <summary aria-label="Configurar câmera e microfone">
-        <Settings2 size={20} aria-hidden="true" />
-        <span>Dispositivos</span>
-        <ChevronDown size={14} aria-hidden="true" />
-      </summary>
-      <div className={styles.opcoes}>
-        {(['audioinput', 'videoinput'] as const).map((tipo) => {
-          const id = tipo === 'audioinput' ? escolhas.microfoneId : escolhas.cameraId;
-          const itens = lista.filter((d) => d.kind === tipo && d.deviceId);
-          return (
-            <label key={tipo}>
-              {tipo === 'audioinput' ? 'Microfone da reunião' : 'Câmera da reunião'}
-              <select
-                disabled={ocupado}
-                value={itens.some((d) => d.deviceId === id) ? id : ''}
-                onChange={(e) => void selecionar(tipo, e.target.value)}
-              >
-                <option value="">Padrão do dispositivo</option>
-                {itens.map((d, i) => (
-                  <option key={d.deviceId} value={d.deviceId}>
-                    {d.label || `Dispositivo ${i + 1}`}
-                  </option>
-                ))}
-              </select>
-            </label>
-          );
-        })}
-        <p>Ative o microfone ou a câmera para liberar os nomes dos dispositivos.</p>
-      </div>
-    </details>
-  );
-}
 
 export function PalcoReuniao({
   anfitriao,
@@ -150,22 +64,17 @@ export function PalcoReuniao({
   const [mensagem, setMensagem] = useState('');
   const [erroChat, setErroChat] = useState('');
   const { chatMessages, send, isSending } = useChat();
-  const mensagens = useRef<HTMLDivElement>(null);
+  const { mensagens, conteudo, fim, afastado, novas, guardarPosicao, irParaRecentes } =
+    useLeituraChat(chatAberto, chatMessages.length);
+  const avisoNovasId = useId();
   const campoChat = useRef<HTMLInputElement>(null);
   const botaoChat = useRef<HTMLButtonElement>(null);
-  const [lidas, setLidas] = useState(0);
   const chave = (track: (typeof tracks)[number]) => `${track.participant.identity}:${track.source}`;
   const tela = tracks.find((t) => t.source === Track.Source.ScreenShare);
   const destaque = tracks.find((t) => chave(t) === fixado) ?? tela;
   const permite = (source: number) =>
     permissoes?.canPublish &&
     (!permissoes.canPublishSources.length || permissoes.canPublishSources.includes(source));
-
-  useEffect(() => {
-    if (chatAberto) {
-      if (mensagens.current) mensagens.current.scrollTop = mensagens.current.scrollHeight;
-    }
-  }, [chatAberto, chatMessages.length]);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -174,6 +83,7 @@ export function PalcoReuniao({
     try {
       await send(mensagem.trim());
       setMensagem('');
+      irParaRecentes();
       campoChat.current?.focus();
     } catch {
       setErroChat('A mensagem não foi enviada. Confira sua conexão e tente novamente.');
@@ -181,7 +91,7 @@ export function PalcoReuniao({
   }
 
   function fecharChat() {
-    setLidas(chatMessages.length);
+    guardarPosicao();
     setChatAberto(false);
     botaoChat.current?.focus();
   }
@@ -270,25 +180,51 @@ export function PalcoReuniao({
               <X size={20} aria-hidden="true" />
             </button>
           </header>
-          <div
-            ref={mensagens}
-            className={styles.mensagens}
-            role="log"
-            aria-label="Conversa da reunião"
-            tabIndex={0}
-          >
-            <p className={styles.avisoChat}>
-              Visíveis para quem está na sala. Não ficam salvas após sair.
-            </p>
-            {chatMessages.map((msg) => (
-              <MensagemReuniao
-                key={msg.id}
-                autor={msg.from?.name || 'Participante'}
-                texto={msg.message}
-                propria={msg.from?.isLocal}
-              />
-            ))}
+          <div className={styles.leituraChat}>
+            <div
+              ref={mensagens}
+              className={styles.mensagens}
+              role="log"
+              aria-live={afastado ? 'off' : 'polite'}
+              aria-label="Conversa da reunião"
+              tabIndex={0}
+            >
+              <div ref={conteudo}>
+                <p className={styles.avisoChat}>
+                  Visíveis para quem está na sala. Não ficam salvas após sair.
+                </p>
+                {chatMessages.map((msg) => (
+                  <MensagemReuniao
+                    key={msg.id}
+                    autor={msg.from?.name || 'Participante'}
+                    texto={msg.message}
+                    propria={msg.from?.isLocal}
+                  />
+                ))}
+                <div ref={fim} className={styles.fimMensagens} aria-hidden="true" />
+              </div>
+            </div>
+            {afastado && (
+              <button
+                type="button"
+                className={styles.recentes}
+                onClick={() => {
+                  irParaRecentes();
+                  mensagens.current?.focus({ preventScroll: true });
+                }}
+              >
+                {novas > 0
+                  ? `${novas} ${novas === 1 ? 'nova mensagem' : 'novas mensagens'}`
+                  : 'Ver recentes'}
+                <ArrowDown size={18} aria-hidden="true" />
+              </button>
+            )}
           </div>
+          <span id={avisoNovasId} className="sr-only" role="status" aria-atomic="true">
+            {novas > 0
+              ? `${novas} ${novas === 1 ? 'mensagem não lida' : 'mensagens não lidas'}`
+              : ''}
+          </span>
           {erroChat && (
             <p role="alert" className={styles.avisoChat}>
               {erroChat}
@@ -365,18 +301,19 @@ export function PalcoReuniao({
             ref={botaoChat}
             type="button"
             aria-label="Mensagens da reunião"
+            aria-describedby={novas > 0 ? avisoNovasId : undefined}
             aria-expanded={chatAberto}
             onClick={() => {
-              setLidas(chatMessages.length);
-              setChatAberto(!chatAberto);
-              if (!chatAberto) requestAnimationFrame(() => campoChat.current?.focus());
+              if (chatAberto) fecharChat();
+              else {
+                setChatAberto(true);
+                requestAnimationFrame(() => campoChat.current?.focus());
+              }
             }}
           >
             <MessageSquare size={20} aria-hidden="true" />
             <span>Mensagens</span>
-            {!chatAberto && chatMessages.length > lidas && (
-              <small>{chatMessages.length - lidas}</small>
-            )}
+            {!chatAberto && novas > 0 && <small>{novas}</small>}
           </button>
         )}
         {anfitriao ? (
