@@ -17,6 +17,11 @@
 .entradaAjuda .busca {
   box-shadow: var(--app-glass-card-shadow);
   background: var(--app-glass-plane-strong);
+  backdrop-filter: var(--app-glass-filter);
+}
+
+.entradaAjuda .busca:focus-within {
+  box-shadow: var(--app-ring), var(--app-glass-card-shadow);
 }
 .entradaIA {
   display: flex;
@@ -27,6 +32,7 @@
   border-radius: var(--app-radius-card);
   background: var(--app-glass-plane-strong);
   box-shadow: var(--app-glass-card-shadow);
+  backdrop-filter: var(--app-glass-filter);
   color: var(--via-text);
   text-decoration: none;
   transition:
@@ -62,11 +68,10 @@
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border: 1px solid var(--app-elev-1-line);
+  border: 1px solid transparent;
   border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
+  background: var(--via-navy-05);
   color: var(--via-navy);
-  box-shadow: var(--app-elev-1-shadow);
 }
 .cabecalhoGuias {
   display: flex;
@@ -89,7 +94,7 @@
   min-height: 96px;
   padding: 18px;
   background: var(--app-glass-plane-strong);
-  box-shadow: var(--app-glass-card-shadow);
+  box-shadow: var(--app-elev-1-shadow);
 }
 .central .guia:focus-visible {
   outline: none;
@@ -1040,7 +1045,9 @@
   accent-color: var(--via-navy);
 }
 @supports not (backdrop-filter: blur(1px)) {
-  .assistente {
+  .assistente,
+  .entradaAjuda .busca,
+  .entradaIA {
     background: var(--via-surface);
   }
 }

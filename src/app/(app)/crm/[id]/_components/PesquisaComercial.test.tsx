@@ -127,7 +127,7 @@ describe('PesquisaComercial', () => {
   it('separa a leitura, o preparo da conversa e as fontes', () => {
     render(<PesquisaComercial lead={LEAD} execucao={EXECUCAO} dossie={DOSSIE} />);
 
-    expect(screen.getByRole('heading', { name: 'Leitura para a próxima reunião' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Prepare sua conversa' })).toBeVisible();
     expect(screen.getByText(DOSSIE.resumo)).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Abrir a conversa' }));
     expect(screen.getByText(DOSSIE.roteiroCall!.objetivo)).toBeVisible();
@@ -158,5 +158,30 @@ describe('PesquisaComercial', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Dados e fontes' }));
     expect(screen.getByText('Site da empresa')).toBeVisible();
     expect(screen.getByText('O volume ainda não foi confirmado.')).toBeVisible();
+  });
+
+  it('mantém a sugestão acessível sem competir com uma ação já definida', () => {
+    render(
+      <PesquisaComercial
+        lead={{
+          ...LEAD,
+          oportunidade: { ...LEAD.oportunidade, proximaAcao: 'Enviar diagnóstico' },
+        }}
+        execucao={EXECUCAO}
+        dossie={DOSSIE}
+      />,
+    );
+    const resumo = screen.getByText('Sugestão da IA para o próximo passo');
+    expect(resumo.closest('details')).not.toHaveAttribute('open');
+    expect(screen.getByText(DOSSIE.proximaAcao.acao)).not.toBeVisible();
+    fireEvent.click(resumo);
+    expect(screen.getByText(DOSSIE.proximaAcao.acao)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Usar como próxima ação' })).toBeVisible();
+  });
+
+  it('mostra a sugestão diretamente quando ainda não há próximo passo', () => {
+    render(<PesquisaComercial lead={LEAD} execucao={EXECUCAO} dossie={DOSSIE} />);
+    expect(screen.queryByText('Sugestão da IA para o próximo passo')).not.toBeInTheDocument();
+    expect(screen.getByText(DOSSIE.proximaAcao.acao)).toBeVisible();
   });
 });

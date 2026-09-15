@@ -81,6 +81,15 @@
 .diagnostico {
   padding: var(--via-space-6);
 }
+
+/* Diagnóstico é o destaque; números e explicações pedem uma base estável. */
+.funil,
+.saude,
+.detalhes {
+  background: var(--via-surface);
+  box-shadow: none;
+  backdrop-filter: none;
+}
 .topoSecao h2 {
   margin: 0;
   font-size: var(--app-fs-section-title);

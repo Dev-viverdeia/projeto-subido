@@ -19,7 +19,7 @@
 .convite {
   padding: var(--via-space-5);
   background: var(--app-glass-plane);
-  backdrop-filter: blur(18px) saturate(132%);
+  backdrop-filter: var(--app-glass-filter);
 }
 
 .registro {
@@ -79,13 +79,12 @@
 
 .conviteCorpo strong,
 .comprovanteCorpo strong {
-  overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--via-text-primary);
   font-size: 0.9375rem;
   font-weight: var(--via-fw-medium);
   line-height: var(--via-lh-snug);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .conviteCorpo strong {

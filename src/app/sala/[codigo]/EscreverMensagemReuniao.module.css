@@ -65,7 +65,7 @@
   background: var(--via-navy);
   color: var(--via-white);
   cursor: pointer;
-  transition: background var(--app-t-state) var(--via-ease-out);
+  transition: background-color var(--app-t-state);
 }
 .enviar:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--via-navy-deep);

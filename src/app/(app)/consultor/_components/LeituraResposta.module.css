@@ -8,10 +8,12 @@
   background: var(--app-glass-plane);
   box-shadow: var(--app-elev-1-shadow);
   color: var(--via-text-primary);
-  backdrop-filter: blur(18px) saturate(132%);
   overflow-wrap: anywhere;
 }
 .resposta {
+  /* Prosa é superfície de leitura, não uma camada de navegação translúcida. */
+  background: var(--via-surface);
+  box-shadow: none;
   padding: var(--via-space-5) var(--via-space-6);
   font-size: 1.0625rem;
   line-height: 1.65;
@@ -90,6 +92,7 @@
 }
 .proximoPasso {
   padding: var(--via-space-5) var(--via-space-6);
+  backdrop-filter: var(--app-glass-filter);
 }
 .acaoCabecalho {
   display: flex;
@@ -165,9 +168,14 @@
 }
 .recomendacoes {
   min-width: 0;
+  border-top: 1px solid var(--via-border-hairline);
 }
 .recomendacao {
   padding: var(--via-space-4) var(--via-space-5);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .recurso {
   display: grid;
@@ -191,11 +199,10 @@
   display: grid;
   place-items: center;
   width: 44px;
-  height: 48px;
-  border: 1px solid var(--app-elev-1-line);
+  height: 44px;
+  border: 1px solid transparent;
   border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
+  background: var(--via-navy-05);
   color: var(--via-navy);
 }
 .recomendacao .motivo {
@@ -207,10 +214,14 @@
 }
 .maisRecomendacoes > ul {
   display: grid;
-  gap: var(--via-space-3);
+  gap: 0;
   margin: var(--via-space-2) 0 0;
   padding: 0;
   list-style: none;
+}
+
+.maisRecomendacoes > ul > li {
+  border-top: 1px solid var(--via-border-hairline);
 }
 @supports not (backdrop-filter: blur(1px)) {
   .resposta,

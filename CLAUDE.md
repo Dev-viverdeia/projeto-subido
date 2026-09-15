@@ -143,8 +143,8 @@ em qualquer lugar da regra — a casa não proíbe desviar, proíbe desviar **se
 
 | Token            |       | Para                                          |
 | ---------------- | ----- | --------------------------------------------- |
-| `--app-t-state`  | 120ms | cor, opacidade, borda — nada se desloca       |
-| `--app-t-touch`  | 180ms | hover e press — deslocamento de 2–8px         |
+| `--app-t-state`  | 140ms | cor, opacidade, borda — nada se desloca       |
+| `--app-t-touch`  | 200ms | hover e press — deslocamento de 2–8px         |
 | `--app-t-reveal` | 320ms | entrada, layout, accordion — o elemento chega |
 | `--app-t-scene`  | 480ms | overlay, drawer, percurso longo               |
 
@@ -152,17 +152,23 @@ A regra que faz disso linguagem: **estado e entrada nunca compartilham duração
 e uma revelação levam o mesmo tempo, a interface lê chapada — tudo responde igual, nada tem peso
 diferente. Os pares já carregam o easing (`snap` responde ao dedo, `out` desacelera e para).
 
+`--app-t-*` é duração **e curva**, para shorthand. Em `animation-duration`,
+`transition-duration` ou `*-delay`, use `--app-motion-*`, que contém apenas tempo.
+Nunca acrescente outra curva a um `--app-t-*`. O gate verifica esses dois erros.
+Entradas de interfaces operacionais usam `backwards`, sem reter transformações ao terminar;
+movimento reduzido deve cancelar a animação inclusive nos seletores locais de maior especificidade.
+
 **E há TRÊS categorias de movimento; só uma é sistemática.** `transition` é interação — é o
 vocabulário de resposta que a pessoa aprende, e tem que ser o mesmo em toda parte. `animation`
 é ambiente (o pulso de "ao vivo") ou coreografia (a cascata da landing): **autoral**, governado
 pela regra oposta — cada ato recebe uma micro-interação diferente, ou nenhuma. Por isso o gate
-cobre `transition` e não toca em `animation`.
+cobre a escala de `transition`; a validade dos tokens compostos é verificada também em `animation`.
 
 **2 · Tipografia — o tracking é função do TAMANHO, não escolha por componente.**
-`--app-ls-hero` (−0.034em) … `--app-ls-micro` (+0.012em), um por degrau da escala. Corpo grande
+`--app-ls-hero` (−0.04em) … `--app-ls-micro` (+0.03em), um por degrau da escala. Corpo grande
 precisa de negativo, corpo pequeno de positivo; `--app-ls-caption` (13px) é onde a curva vira.
 
-- **Mono caixa-alta tem dois valores, e a diferença é de PAPEL:** `--app-ls-eyebrow` (0.14em)
+- **Mono caixa-alta tem dois valores, e a diferença é de PAPEL:** `--app-ls-eyebrow` (0.06em)
   dentro de card, `--via-ls-label` (0.18em) para rótulo de seção isolado. A 0.18em dentro de um
   card o rótulo já lê como pill decorativa, que a seção de Voz bane.
 - **Caixa-alta por CONTEÚDO conta como caixa-alta.** `HOJE · 19:00 · 90 MIN · 12/30 VAGAS` não
@@ -181,8 +187,8 @@ E a regra que mais separa acabamento de descuido, porque quase ninguém a enunci
 um card de raio 28 com 8px de folga está certo (28−8=20); o mesmo pôster com raio 28 está errado,
 e o olho percebe antes de a pessoa saber dizer o quê.
 
-**4 · Densidade:** `--app-pad-card` (20) · `-tight` (16) · `--app-gap-stack` (12) · `-block` (24)
-· `-grid` (20) · `-section` (40) · `--app-h-control` (38px). Espaço escolhido livremente dentro
+**4 · Densidade:** `--app-pad-card` (24) · `-tight` (16) · `--app-gap-stack` (12) · `-block` (24)
+· `-grid` (20) · `-section` (40) · `--app-h-control` (44px). Espaço escolhido livremente dentro
 de uma escala de 14 degraus não é escala, são 14 opções.
 
 **5 · Elevação é um TRIPLO.** O que separa "premium" de "ok" não é a sombra: é a sombra, a
@@ -252,7 +258,7 @@ justificar por que vira um quarto momento de decisão.
 | `content` (760) | prosa editorial, FAQ — coisas que precisam de linha curta |
 | `narrow` (560)  | desqualificador, garantia — coisas que precisam de foco   |
 
-**Na ÁREA LOGADA a largura é `--app-canvas` (1600), não `--via-container`.** O 1280 do DS foi
+**Na ÁREA LOGADA a largura é `--app-canvas` (1480), não `--via-container`.** O 1280 do DS foi
 dimensionado para a landing, onde a página ocupa a viewport inteira; na plataforma o trilho já
 come 240px antes de o conteúdo começar. Medido: a 1920 sobravam **336px** de calha morta à
 direita, a 2560 sobravam 976. Formulário e prosa (`/conta`, `/admin`) ficam em `--via-content` —
