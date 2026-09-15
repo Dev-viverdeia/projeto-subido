@@ -162,10 +162,14 @@ export function BandejaDesfecho({ ganhas, perdidas }: { ganhas: number; perdidas
 }
 
 export function HistoricoDesfechos({
+  aberto,
+  aoAbrir,
   oportunidades,
   aoMover,
   movimentandoId,
 }: {
+  aberto: boolean;
+  aoAbrir: (aberto: boolean) => void;
   oportunidades: OportunidadeCrm[];
   aoMover: SolicitarMovimento;
   movimentandoId: string | null;
@@ -179,7 +183,13 @@ export function HistoricoDesfechos({
   );
 
   return (
-    <details className={styles.historico}>
+    <details
+      className={styles.historico}
+      open={aberto}
+      onToggle={(evento) => {
+        if (evento.currentTarget.open !== aberto) aoAbrir(evento.currentTarget.open);
+      }}
+    >
       <summary>
         <div>
           <span>Fora do fluxo</span>

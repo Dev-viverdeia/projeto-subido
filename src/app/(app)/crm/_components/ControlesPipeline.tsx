@@ -11,12 +11,14 @@ export type FaseAtiva = Exclude<IdFaseCrm, 'desfecho'>;
 type Contagens = Record<FiltroPipeline, number>;
 
 export function BarraPrioridades({
+  pronto,
   contagens,
   filtro,
   busca,
   aoSelecionarFiltro,
   aoBuscar,
 }: {
+  pronto: boolean;
   contagens: Contagens;
   filtro: FiltroPipeline;
   busca: string;
@@ -24,7 +26,11 @@ export function BarraPrioridades({
   aoBuscar: (busca: string) => void;
 }) {
   return (
-    <section className={styles.barraPrioridades} aria-labelledby="foco-crm-titulo">
+    <section
+      className={styles.barraPrioridades}
+      aria-labelledby="foco-crm-titulo"
+      aria-busy={!pronto || undefined}
+    >
       <div className={styles.leituraPrioridade}>
         <span>Seu foco</span>
         <strong id="foco-crm-titulo">
@@ -47,6 +53,7 @@ export function BarraPrioridades({
             <button
               type="button"
               key={id}
+              disabled={!pronto}
               aria-pressed={filtro === id}
               aria-label={`${rotulo}: ${contagens[id]}`}
               onClick={() => aoSelecionarFiltro(id)}
@@ -62,6 +69,9 @@ export function BarraPrioridades({
           <span className={styles.rotuloOculto}>Buscar vendas</span>
           <input
             type="search"
+            disabled={!pronto}
+            aria-label="Buscar vendas"
+            maxLength={160}
             value={busca}
             onChange={(evento) => aoBuscar(evento.target.value)}
             placeholder="Buscar empresa ou contato"
@@ -78,11 +88,13 @@ export function BarraPrioridades({
 }
 
 export function AbasPipelineMobile({
+  pronto,
   fases,
   faseAtiva,
   contagem,
   aoSelecionar,
 }: {
+  pronto: boolean;
   fases: ReadonlyArray<FaseCrm>;
   faseAtiva: FaseAtiva;
   contagem: (fase: IdFaseCrm) => number;
@@ -95,6 +107,7 @@ export function AbasPipelineMobile({
           type="button"
           role="tab"
           key={fase.id}
+          disabled={!pronto}
           aria-selected={faseAtiva === fase.id}
           tabIndex={faseAtiva === fase.id ? 0 : -1}
           aria-label={`${fase.rotulo}: ${contagem(fase.id)}`}

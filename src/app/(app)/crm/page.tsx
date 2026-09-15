@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Database } from 'lucide-react';
 import { listarPipeline } from '@/lib/crm/queries';
 import { CabecalhoOperacional } from '../_components/CabecalhoOperacional';
@@ -14,7 +16,13 @@ function primeiroParametro(valor: string | string[] | undefined): string {
 }
 
 export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
-  const [oportunidades, parametros] = await Promise.all([listarPipeline(), searchParams]);
+  const supabase = await createClient();
+  const [oportunidades, parametros, { data }] = await Promise.all([
+    listarPipeline(),
+    searchParams,
+    supabase.auth.getClaims(),
+  ]);
+  if (!data?.claims.sub) redirect('/entrar');
   const projetoDeOrigem = primeiroParametro(parametros.projeto);
   const projetoSlug = primeiroParametro(parametros.projetoSlug);
   const abrirDoProjeto =
@@ -50,7 +58,11 @@ export default async function CrmPage({ searchParams }: PageProps<'/crm'>) {
           Quadro de vendas
         </h2>
         {oportunidades.length ? (
-          <PipelineCrm oportunidades={oportunidades} />
+          <PipelineCrm
+            oportunidades={oportunidades}
+            contaId={data.claims.sub}
+            key={data.claims.sub}
+          />
         ) : (
           <div className={styles.primeiroLead}>
             <div className={styles.primeiroLeadConteudo}>

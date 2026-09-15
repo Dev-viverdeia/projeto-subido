@@ -40,6 +40,7 @@ import {
 } from './ControlesPipeline';
 import { CartaoOverlay } from './KanbanCartao';
 import { BandejaDesfecho, ColunaAtiva, HistoricoDesfechos } from './KanbanColunas';
+import { useQuadroVendas } from './useQuadroVendas';
 import styles from './PipelineCrm.module.css';
 
 const detectarDestino: CollisionDetection = (argumentos) => {
@@ -59,7 +60,15 @@ function rotuloDaMovimentacao(etapa: EtapaCrm, anterior: EtapaCrm): string {
   return `Oportunidade movida para ${ROTULO_ETAPA[etapa].toLowerCase()}.`;
 }
 
-export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[] }) {
+export function PipelineCrm({
+  oportunidades,
+  contaId,
+}: {
+  oportunidades: OportunidadeCrm[];
+  contaId: string;
+}) {
+  const { estado, atualizar, raiz, guardarSaida, pronto } = useQuadroVendas(contaId);
+  const { filtro, busca, fase: faseMobile } = estado;
   const [itens, setItens] = useState(oportunidades);
   const [originais, setOriginais] = useState(oportunidades);
   if (originais !== oportunidades) {
@@ -72,9 +81,6 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
   const [motivoPerda, setMotivoPerda] = useState<MotivoPerdaCrm | ''>('');
   const [erroMotivo, setErroMotivo] = useState('');
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const [filtro, setFiltro] = useState<FiltroPipeline>('todas');
-  const [busca, setBusca] = useState('');
-  const [faseMobile, setFaseMobile] = useState<FaseAtiva>('entrada');
   const [, iniciarTransicao] = useTransition();
   const sensores = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -120,15 +126,22 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
 
   function selecionarFiltro(proximo: FiltroPipeline) {
     const novo = filtro === proximo && proximo !== 'todas' ? 'todas' : proximo;
-    setFiltro(novo);
-    revelarResultados(novo, busca);
+    atualizar({ filtro: novo, fase: faseDosResultados(novo, busca), retorno: null });
   }
 
-  function revelarResultados(novoFiltro: FiltroPipeline, novaBusca: string) {
+  function limparFiltros() {
+    atualizar({ busca: '', filtro: 'todas', retorno: null });
+    raiz.current
+      ?.querySelector<HTMLButtonElement>('[aria-label="Filtrar vendas"] button')
+      ?.focus({ preventScroll: true });
+  }
+
+  function faseDosResultados(novoFiltro: FiltroPipeline, novaBusca: string): FaseAtiva {
     const resultados = filtrarPipeline(noQuadro, novoFiltro, novaBusca);
     if (resultados.length && !resultados.some((item) => faseDaEtapa(item.etapa) === faseMobile)) {
-      setFaseMobile(faseDaEtapa(resultados[0]!.etapa) as FaseAtiva);
+      return faseDaEtapa(resultados[0]!.etapa) as FaseAtiva;
     }
+    return faseMobile;
   }
 
   function publicarToast(toast: Omit<ToastItem, 'id'>) {
@@ -284,42 +297,57 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           },
         }}
       >
-        <div className={styles.experienciaKanban} aria-label="Quadro de vendas">
+        <div
+          ref={raiz}
+          onClickCapture={guardarSaida}
+          className={styles.experienciaKanban}
+          aria-label="Quadro de vendas"
+        >
           <BarraPrioridades
+            pronto={pronto}
             contagens={contagens}
             filtro={filtro}
             busca={busca}
             aoSelecionarFiltro={selecionarFiltro}
             aoBuscar={(termo) => {
-              setBusca(termo);
-              revelarResultados(filtro, termo);
+              atualizar({ busca: termo, fase: faseDosResultados(filtro, termo), retorno: null });
             }}
           />
 
           <AbasPipelineMobile
+            pronto={pronto}
             fases={ativas}
             faseAtiva={faseMobile}
             contagem={(fase) => porFase.get(fase)?.length ?? 0}
-            aoSelecionar={setFaseMobile}
+            aoSelecionar={(fase) => atualizar({ fase, retorno: null })}
           />
 
-          <div className={styles.quadroKanban} data-arrastando={ativoId !== null || undefined}>
-            <div className={styles.rolagem}>
-              <div className={styles.pipeline}>
-                {ativas.map((fase, indice) => (
-                  <ColunaAtiva
-                    key={fase.id}
-                    fase={fase}
-                    numero={indice + 1}
-                    oportunidades={porFase.get(fase.id) ?? []}
-                    aoMover={solicitarMovimento}
-                    movimentandoId={movimentandoId}
-                    ativaNoMobile={faseMobile === fase.id}
-                  />
-                ))}
+          {filtradas.length === 0 && (busca || filtro !== 'todas') ? (
+            <div className={styles.semResultados}>
+              <p role="status">Nenhuma venda encontrada</p>
+              <Button variant="secondary" onClick={limparFiltros}>
+                Limpar filtros
+              </Button>
+            </div>
+          ) : (
+            <div className={styles.quadroKanban} data-arrastando={ativoId !== null || undefined}>
+              <div className={styles.rolagem}>
+                <div className={styles.pipeline}>
+                  {ativas.map((fase, indice) => (
+                    <ColunaAtiva
+                      key={fase.id}
+                      fase={fase}
+                      numero={indice + 1}
+                      oportunidades={porFase.get(fase.id) ?? []}
+                      aoMover={solicitarMovimento}
+                      movimentandoId={movimentandoId}
+                      ativaNoMobile={faseMobile === fase.id}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {ativoId && (
             <div className={styles.desfechoFlutuante}>
@@ -328,6 +356,8 @@ export function PipelineCrm({ oportunidades }: { oportunidades: OportunidadeCrm[
           )}
 
           <HistoricoDesfechos
+            aberto={estado.historico}
+            aoAbrir={(historico) => atualizar({ historico })}
             oportunidades={encerradas}
             aoMover={solicitarMovimento}
             movimentandoId={movimentandoId}
