@@ -20,6 +20,7 @@ import {
   redesDo,
   rotuloRede,
   telefonesDo,
+  temTelefonesLegadosOcultos,
   type Lead,
 } from './dossie';
 import styles from './ModalProspeccao.module.css';
@@ -142,6 +143,11 @@ export function ContatosEmpresa({ lead }: { lead: Lead }) {
             {extras.map(linha)}
           </ul>
         </details>
+      )}
+      {temTelefonesLegadosOcultos(lead) && (
+        <p className={styles.contactNote}>
+          Telefones de uma coleta antiga foram ocultados. Confira os canais no site da empresa.
+        </p>
       )}
       {telefones.some((contato) => telefoneDe(contato.valor)?.whatsapp) && (
         <p className={styles.contactNote}>Disponibilidade no WhatsApp não verificada.</p>

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { VERSAO_COLETA_TELEFONES } from './contatos';
 import {
   emailsValidos,
   qualificar,
@@ -188,6 +189,7 @@ export async function enriquecerSite(
         site_resumo: resumo,
         paginas_consultadas: paginas.length,
         site_contatos: {
+          versao_telefones: VERSAO_COLETA_TELEFONES,
           emails: contatos.emails,
           telefones: contatos.telefones,
           redes_sociais: contatos.redes,

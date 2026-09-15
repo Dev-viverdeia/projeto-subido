@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { decisoresDo, emailsDo, fonteDoContato, redesDo, telefonesDo, type Lead } from './dossie';
+import {
+  decisoresDo,
+  emailsDo,
+  fonteDoContato,
+  redesDo,
+  telefonesDo,
+  temTelefonesLegadosOcultos,
+  type Lead,
+} from './dossie';
 
 function lead(dados: Partial<Lead>): Lead {
   return {
@@ -15,6 +23,42 @@ function lead(dados: Partial<Lead>): Lead {
 }
 
 describe('curadoria de contatos já salvos', () => {
+  it('não promove IDs de uma coleta antiga a telefone mesmo quando o formato é plausível', () => {
+    const salvo = lead({
+      telefone: '+554830289989',
+      telefones: ['1847894818', '+551847894818', '554830289989'],
+      dados: { site_contatos: { telefones: ['1847894818'] } },
+    });
+    const antes = JSON.stringify(salvo);
+    expect(telefonesDo(salvo)).toEqual(['(48) 3028-9989']);
+    expect(temTelefonesLegadosOcultos(salvo)).toBe(true);
+    expect(JSON.stringify(salvo)).toBe(antes);
+  });
+  it('preserva o canal com evidência do Maps mesmo quando também consta no site antigo', () => {
+    const salvo = lead({
+      telefone: '+554830289989',
+      dados: {
+        site_contatos: { telefones: ['4830289989'] },
+        mapa_contatos: { telefones: ['+55 48 3028-9989'] },
+      },
+    });
+    expect(telefonesDo(salvo)).toEqual(['(48) 3028-9989']);
+    expect(temTelefonesLegadosOcultos(salvo)).toBe(false);
+  });
+  it('aceita os canais coletados pelo extrator atual e não confunde a versão antiga', () => {
+    const salvo = lead({
+      telefone: '(48) 3028-9989',
+      dados: { site_contatos: { versao_telefones: 2, telefones: ['4830289989'] } },
+    });
+    expect(telefonesDo(salvo)).toEqual(['(48) 3028-9989']);
+    expect(temTelefonesLegadosOcultos(salvo)).toBe(false);
+    expect(
+      telefonesDo({
+        ...salvo,
+        dados: { site_contatos: { versao_telefones: 1, telefones: ['4830289989'] } },
+      }),
+    ).toEqual([]);
+  });
   it('oculta formatos inválidos e duplicações sem mutar o registro', () => {
     const salvo = lead({
       telefone: '123',

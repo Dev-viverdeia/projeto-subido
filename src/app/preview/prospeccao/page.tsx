@@ -210,6 +210,7 @@ export default async function PreviewProspeccaoPage({
               '0800 123 4567',
               '529.982.247-25',
               '31333344449999',
+              '1847894818',
             ],
             emails: [
               ' CONTATO@CLINICAAURORA.COM.BR ',
@@ -218,7 +219,10 @@ export default async function PreviewProspeccaoPage({
             ],
             dados: {
               mapa_contatos: { telefones: ['3133334444'] },
-              site_contatos: { emails: ['contato@clinicaaurora.com.br'] },
+              site_contatos: {
+                emails: ['contato@clinicaaurora.com.br'],
+                telefones: ['1847894818'],
+              },
             },
           }
         : lead.id === parametros.criado

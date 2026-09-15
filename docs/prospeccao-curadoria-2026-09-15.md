@@ -49,3 +49,7 @@ Testar duplicidades, DDD 55, 0800, internacional explícito, números inválidos
 - Vendor do design system preservado: 108 arquivos idênticos ao pin original.
 
 Limites: a validação não confirma titularidade, linha ativa ou WhatsApp. Contatos legados sem evidência por campo mostram “Fonte não informada”. Nenhum dado de cliente foi regravado e nenhum serviço pago foi acionado para os testes.
+
+### Ajuste após conferência pública
+
+A lista real expôs uma lacuna que não aparecia apenas nos testes de formato: o extrator antigo havia recortado IDs em sequências que coincidiam com DDD e tamanho válidos. Telefones identificados em `site_contatos` de coletas antigas ficam fora dos canais acionáveis até nova coleta, exceto quando também têm evidência específica do Maps. Um aviso curto explica a omissão; não há exclusão ou regravação do cadastro. A coleta atual registra `versao_telefones: 2`, sem sugerir linha ativa ou titularidade. Incluído um caso de regressão na prévia, testes de unidade e nos três navegadores.

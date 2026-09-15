@@ -199,6 +199,7 @@ describe('provedores da prospecção', () => {
       ],
       dados: {
         site_contatos: {
+          versao_telefones: 2,
           emails: ['comercial@aurora.example.com'],
         },
       },

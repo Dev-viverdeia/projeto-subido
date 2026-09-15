@@ -57,6 +57,10 @@ test.describe('Estação de Prospecção', () => {
     await expect(principais.getByText('Site da empresa', { exact: true })).toBeVisible();
     await expect(principais.getByText('Fonte não informada', { exact: true })).toBeVisible();
     await expect(dialogo.getByText('529.982.247-25', { exact: true })).toHaveCount(0);
+    await expect(dialogo.getByText('(18) 4789-4818', { exact: true })).toHaveCount(0);
+    await expect(
+      dialogo.getByText('Telefones de uma coleta antiga foram ocultados.', { exact: false }),
+    ).toBeVisible();
     const extras = dialogo.getByRole('list', { name: 'Outros contatos' });
     await expect(extras).toBeHidden();
     await dialogo.locator('summary').filter({ hasText: 'Outros contatos' }).click();
@@ -118,6 +122,10 @@ test.describe('Estação de Prospecção', () => {
       await page.getByRole('button', { name: 'Ver detalhes' }).last().click();
       const dialogo = page.getByRole('dialog');
       await expect(dialogo.getByRole('button', { name: 'Criar oportunidade' })).toBeInViewport();
+      // Medir a geometria final, sem arredondamento fracionário da translação de entrada.
+      await dialogo.evaluate((el) =>
+        Promise.all(el.getAnimations().map((animation) => animation.finished)),
+      );
       const geometria = await dialogo.evaluate((el) => ({
         width: el.scrollWidth,
         client: el.clientWidth,
