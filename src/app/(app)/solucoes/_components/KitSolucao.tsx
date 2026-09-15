@@ -65,7 +65,7 @@ export function Ferramentas({
                       href={destino}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`Abrir ${item.titulo} (nova aba)`}
+                      aria-label={`Abrir ferramenta: ${item.titulo} (nova aba)`}
                     >
                       Abrir ferramenta <span aria-hidden="true">↗</span>
                     </a>

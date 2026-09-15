@@ -75,14 +75,13 @@ test('download contém o material original e não muda a página', async ({ page
 test('ferramentas abrem apenas destinos oficiais e avisam nova aba', async ({ page }) => {
   const kit = await abrirKit(page);
   await kit.getByRole('button', { name: 'Arquivos e ferramentas', exact: true }).click();
-  const supabase = kit.getByRole('link', { name: 'Abrir Supabase (nova aba)' });
+  const supabase = kit.getByRole('link', { name: 'Abrir ferramenta: Supabase (nova aba)' });
   await expect(supabase).toHaveAttribute('href', 'https://supabase.com/dashboard');
   await expect(supabase).toHaveAttribute('rel', 'noopener noreferrer');
   await expect(supabase).toHaveAttribute('target', '_blank');
-  await expect(kit.getByRole('link', { name: 'Abrir OpenAI (nova aba)' })).toHaveAttribute(
-    'href',
-    'https://platform.openai.com/',
-  );
+  await expect(
+    kit.getByRole('link', { name: 'Abrir ferramenta: OpenAI (nova aba)' }),
+  ).toHaveAttribute('href', 'https://platform.openai.com/');
 });
 
 test('320px: rótulos, contraste, toque e foco preservados nas duas áreas', async ({ page }) => {
