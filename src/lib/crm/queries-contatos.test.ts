@@ -25,9 +25,11 @@ const { resultados, consultas, from } = vi.hoisted(() => {
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/supabase/server', () => ({ createClient: () => Promise.resolve({ from }) }));
 vi.mock('@/lib/calls/descoberta', () => ({
-  oportunidadeTemDescobertaConcluida: async () => false,
+  oportunidadeTemDescobertaConcluida: () => Promise.resolve(false),
 }));
-vi.mock('./continuidade-pos-entrega', () => ({ obterContinuidadePosEntrega: async () => null }));
+vi.mock('./continuidade-pos-entrega', () => ({
+  obterContinuidadePosEntrega: () => Promise.resolve(null),
+}));
 vi.mock('@/lib/errors', () => ({ handleError: () => new Error('Falha na leitura') }));
 
 import { obterDossieLead } from './queries';
@@ -81,16 +83,19 @@ describe('leitura de contatos da ficha pela sessão', () => {
     expect(JSON.stringify(ficha)).not.toContain('payload-bruto-nao-deve-sair');
   });
   it('usa a cópia importada da empresa se a lista vinculada não existe', async () => {
-    resultados.crm_empresas.data = {
-      nome: 'Empresa',
-      dominio: null,
-      enriquecimento: {
-        origem: 'prospeccao',
-        emails: ['contato@empresa.com.br'],
-        dados_publicos: {
-          site_contatos: { emails: ['contato@empresa.com.br'] },
+    resultados.crm_empresas = {
+      error: null,
+      data: {
+        nome: 'Empresa',
+        dominio: null,
+        enriquecimento: {
+          origem: 'prospeccao',
+          emails: ['contato@empresa.com.br'],
+          dados_publicos: {
+            site_contatos: { emails: ['contato@empresa.com.br'] },
+          },
+          site_url: 'https://empresa.com.br',
         },
-        site_url: 'https://empresa.com.br',
       },
     };
     const ficha = await obterDossieLead('venda-1');
@@ -100,7 +105,7 @@ describe('leitura de contatos da ficha pela sessão', () => {
     });
   });
   it('não procura contatos se a oportunidade não está visível para a sessão', async () => {
-    resultados.crm_oportunidades.data = null;
+    resultados.crm_oportunidades = { data: null, error: null };
     expect(await obterDossieLead('outra-conta')).toBeNull();
     expect(from).toHaveBeenCalledTimes(1);
     expect(from).not.toHaveBeenCalledWith('prospeccao_leads');
