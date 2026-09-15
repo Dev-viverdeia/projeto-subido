@@ -3,7 +3,14 @@ import { expect, type Locator } from '@playwright/test';
 /** Amostra a transição real sem alterar CSS ou esperar que a falha desapareça. */
 export async function conferirContrasteDasEtapas(abas: Locator) {
   const amostras = await abas.evaluateAll((elementos) => {
-    const rgb = (cor: string) => cor.match(/[\d.]+/g)!.map(Number);
+    const rgb = (cor: string) => {
+      const canais = cor.match(/[\d.]+/g)!.map(Number);
+      // color-mix retorna color(srgb 1 1 1 / alfa), não rgb(255, 255, 255).
+      // Normalizar a escala evita interpretar a superfície branca como preta.
+      return cor.startsWith('color(srgb ')
+        ? canais.map((canal, i) => (i < 3 ? canal * 255 : canal))
+        : canais;
+    };
     const luminosidade = (canais: number[]) =>
       canais.slice(0, 3).reduce((total, canal, i) => {
         const valor = canal / 255;
