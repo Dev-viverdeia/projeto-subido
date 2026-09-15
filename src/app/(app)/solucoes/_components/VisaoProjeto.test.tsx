@@ -112,8 +112,10 @@ describe('Visão visual dos projetos', () => {
     expect(screen.getByRole('button', { name: `Copiar ${material.titulo}` })).toBeVisible();
     expect(
       screen.queryByRole('region', { name: `Texto do prompt: ${promptsPreview[0]!.titulo}` }),
-    ).not.toBeVisible();
-    await user.click(screen.getByText('Ler prompt'));
+    ).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: `Ler prompt: ${promptsPreview[0]!.titulo}` }),
+    );
     expect(
       screen.getByRole('region', { name: `Texto do prompt: ${promptsPreview[0]!.titulo}` }),
     ).toHaveTextContent(promptsPreview[0]!.conteudo);

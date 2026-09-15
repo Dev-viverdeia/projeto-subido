@@ -4,7 +4,7 @@ import base from './playwright.config';
 // Matriz pequena e isolada: não altera as premissas desktop/mobile da suíte existente.
 export default defineConfig({
   ...base,
-  testMatch: 'acabamento-operacional.spec.ts',
+  testMatch: ['acabamento-operacional.spec.ts', 'kit-projeto.spec.ts'],
   projects: [
     ...base.projects!,
     {
