@@ -15,6 +15,10 @@ test('entrada e cadastro mantêm campos legíveis no celular', async ({ page }) 
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       391,
     );
+    const acessibilidade = await new AxeBuilder({ page }).analyze();
+    expect(
+      acessibilidade.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+    ).toEqual([]);
   }
 });
 
