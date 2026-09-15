@@ -35,3 +35,4 @@ O wireframe ilustra os tipos disponíveis, não quatro itens obrigatórios por a
 - Modelos usam o controle já existente no kit; o mesmo texto completo alimenta leitura, cópia e download `.txt`.
 - A suíte de três navegadores passou a cobrir os recursos. Testes de larguras do kit foram separados para não somar quatro navegações no mesmo limite de tempo.
 - Antes da publicação: CI completo obrigatório, incluindo build, jornadas existentes e acessibilidade. Testes de navegador não equivalem a validação manual com leitor de tela ou dispositivo físico.
+- A execução 34924051297 isolou o custo da instrumentação no WebKit Linux: 81 testes passaram, dois oscilaram por tempo e um excedeu 30s na captura, após medir os controles. Recursos agora têm orçamento total de 60s apenas no WebKit, ações limitadas a 10s e capturas em pixels CSS, preservando DPR, regras de acessibilidade, cenários e quantidade de tentativas. Não é uma mudança de timeout da aplicação.

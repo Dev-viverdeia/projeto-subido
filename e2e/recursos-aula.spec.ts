@@ -2,6 +2,14 @@ import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import nina from '../src/app/preview/nina/fixture.json';
 
+// No runner Linux, auditoria e captura Retina do WebKit somaram mais de 30s
+// mesmo com as interações aprovadas (run 34924051297). O orçamento maior é
+// só desta suíte; cada interação continua limitada a 10s, sem novos retries.
+test.use({ actionTimeout: 10_000 });
+test.beforeEach(({ browserName }, info) => {
+  if (browserName === 'webkit') info.setTimeout(60_000);
+});
+
 async function abrirAula(page: Page, indice = 0) {
   await page.goto('/preview/shell?tela=projeto&estado=nina');
   await page.getByRole('tab', { name: 'Aprender', exact: true }).click();
@@ -148,6 +156,12 @@ for (const width of [320, 768, 1440]) {
     await recursos
       .getByRole('heading', { name: 'Recursos desta aula', exact: true })
       .scrollIntoViewIfNeeded();
-    await page.screenshot({ path: info.outputPath(`recursos-${width}.png`) });
+    // Um pixel por CSS pixel mantém a evidência de layout sem gerar um PNG
+    // nove vezes maior no iPhone emulado. O DPR do navegador não é alterado.
+    await page.screenshot({
+      path: info.outputPath(`recursos-${width}.png`),
+      scale: 'css',
+      timeout: 45_000,
+    });
   });
 }
