@@ -122,6 +122,10 @@ test.describe('Estação de Prospecção', () => {
       await page.getByRole('button', { name: 'Ver detalhes' }).last().click();
       const dialogo = page.getByRole('dialog');
       await expect(dialogo.getByRole('button', { name: 'Criar oportunidade' })).toBeInViewport();
+      // Medir a geometria final, sem arredondamento fracionário da translação de entrada.
+      await dialogo.evaluate((el) =>
+        Promise.all(el.getAnimations().map((animation) => animation.finished)),
+      );
       const geometria = await dialogo.evaluate((el) => ({
         width: el.scrollWidth,
         client: el.clientWidth,
