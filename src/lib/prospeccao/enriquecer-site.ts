@@ -6,7 +6,6 @@ import {
   redesDeUrls,
   telefonesUnicos,
   texto,
-  unicos,
   type Registro,
 } from './normalizacao';
 import type { UsoProvedorProspeccao } from './custos';
@@ -29,29 +28,58 @@ function resumoDoMarkdown(markdown: string): string | null {
   return limpo ? limpo.slice(0, 900) : null;
 }
 
-function contatosDoSite(markdown: string, links: string[]) {
+export function contatosDoSite(markdown: string, links: string[]) {
   const emailsEmLinks = links
     .filter((link) => link.toLowerCase().startsWith('mailto:'))
     .map((link) => link.slice(7).split('?')[0] ?? '');
   const emailsNoTexto = markdown.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/gi) ?? [];
   const telefonesEmLinks = links.flatMap((link) => {
     const normalizado = link.toLowerCase();
-    if (normalizado.startsWith('tel:')) return [link.slice(4).split('?')[0] ?? ''];
     try {
+      if (normalizado.startsWith('tel:'))
+        return [decodeURIComponent(link.slice(4).split(/[?;]/)[0] ?? '')];
       const url = new URL(link);
-      if (url.hostname === 'wa.me' || url.hostname.endsWith('.wa.me')) return [url.pathname];
-      if (url.hostname.endsWith('whatsapp.com')) return [url.searchParams.get('phone')];
+      if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return [];
+      if (url.hostname === 'wa.me' || url.hostname === 'www.wa.me')
+        return [`+${url.pathname.replace(/^\/+|\/+$/g, '')}`];
+      if (url.hostname === 'whatsapp.com' || url.hostname.endsWith('.whatsapp.com')) {
+        const numero = url.searchParams.get('phone')?.trim();
+        return numero ? [numero.startsWith('+') ? numero : `+${numero}`] : [];
+      }
     } catch {
       return [];
     }
     return [];
   });
-  const telefonesNoTexto =
-    markdown.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?(?:9?\d{4})[-.\s]?\d{4}/g) ?? [];
+  // URLs/IDs de assets e documentos não são canais de contato. Números soltos
+  // precisam de rótulo de telefone; não recortar um trecho de uma sequência maior.
+  const textoContato = markdown
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/https?:\/\/[^\s<>)]*/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b|\b\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}\b/g, ' ');
+  const formatados =
+    textoContato.match(
+      /(?<![\w\d])(?:\+55[ \t.-]*)?(?:\([1-9]\d\)[ \t]*|[1-9]\d[ \t.-]+)[2-59]\d{3,4}[ \t.-]\d{4}(?![\w\d])/g,
+    ) ?? [];
+  const atendimento =
+    textoContato.match(
+      /(?<![\w\d])(?:0[3589]00[ \t.-]+\d{3}[ \t.-]+\d{4}|[34]00[34][ \t.-]+\d{4})(?![\w\d])/g,
+    ) ?? [];
+  const rotulados = [
+    ...textoContato.matchAll(
+      /\b(?:telefone|tel|fone|celular|whatsapp)\s*:\s*(\+?\d{10,15})(?!\w)/gi,
+    ),
+  ].map((item) => item[1]);
   const urlsNoTexto = markdown.match(/https?:\/\/[^\s)\]}>'"]+/gi) ?? [];
   return {
     emails: emailsValidos([...emailsEmLinks, ...emailsNoTexto]),
-    telefones: telefonesUnicos([...telefonesEmLinks, ...telefonesNoTexto]).slice(0, 12),
+    telefones: telefonesUnicos([
+      ...telefonesEmLinks,
+      ...formatados,
+      ...atendimento,
+      ...rotulados,
+    ]).slice(0, 12),
     redes: redesDeUrls([...links, ...urlsNoTexto]),
   };
 }
@@ -140,9 +168,13 @@ export async function enriquecerSite(
     const contatos = contatosDoSite(markdown, links);
     const atualizado = {
       ...lead,
-      telefone: lead.telefone ?? contatos.telefones[0] ?? null,
-      telefones: telefonesUnicos([...lead.telefones, ...contatos.telefones]).slice(0, 12),
-      emails: unicos([...lead.emails, ...contatos.emails]).slice(0, 12),
+      telefone:
+        telefonesUnicos([lead.telefone, ...lead.telefones, ...contatos.telefones])[0] ?? null,
+      telefones: telefonesUnicos([lead.telefone, ...lead.telefones, ...contatos.telefones]).slice(
+        0,
+        12,
+      ),
+      emails: emailsValidos([...lead.emails, ...contatos.emails]).slice(0, 12),
       redes_sociais: redesDeUrls([
         ...lead.redes_sociais.map((rede) => rede.url),
         ...contatos.redes.map((rede) => rede.url),

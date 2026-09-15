@@ -2,7 +2,38 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { redesDeUrls } from './normalizacao';
+import { origemApify, origemSerp, redesDeUrls } from './normalizacao';
+
+describe('fontes dos contatos na coleta', () => {
+  it('registra a origem do telefone do Maps e não guarda números inválidos', () => {
+    expect(
+      origemSerp({ title: 'Empresa', phone: '+55 48 99628-1475' })?.dados.mapa_contatos,
+    ).toEqual({ telefones: ['+55 48 99628-1475'] });
+    expect(origemSerp({ title: 'Empresa', phone: '123' })).toMatchObject({
+      telefone: null,
+      telefones: [],
+      dados: { mapa_contatos: { telefones: [] } },
+    });
+  });
+  it('recupera o telefone não formatado quando o campo principal é inválido', () => {
+    expect(
+      origemApify({
+        title: 'Empresa',
+        phone: '123',
+        phoneUnformatted: '+5548996281475',
+        phones: ['(48) 99628-1475'],
+        emails: [' CONTATO@EMPRESA.COM.BR ', 'contato@empresa.com.br'],
+      }),
+    ).toMatchObject({
+      telefone: '+5548996281475',
+      telefones: ['+5548996281475'],
+      emails: ['contato@empresa.com.br'],
+      dados: {
+        mapa_contatos: { telefones: ['+5548996281475'] },
+      },
+    });
+  });
+});
 
 describe('normalização de perfis sociais', () => {
   it('aceita apenas páginas de perfil e reduz links profundos ao perfil', () => {

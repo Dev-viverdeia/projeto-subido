@@ -70,7 +70,7 @@ describe('resultados da prospecção', () => {
     render(<ListaResultados leads={[LEAD]} />);
 
     expect(
-      screen.getByRole('link', { name: 'Telefone / WhatsApp: +55 31 3333-4444' }),
+      screen.getByRole('link', { name: 'Telefone / WhatsApp: (31) 3333-4444' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'E-mail da empresa: contato@clinica-aurora.example.com' }),
@@ -237,8 +237,8 @@ describe('resultados da prospecção', () => {
     const copiar = vi.spyOn(navigator.clipboard, 'writeText');
     vi.mocked(registrarTentativaContato).mockClear();
     render(<ListaResultados leads={[LEAD]} />);
-    await user.click(screen.getByRole('button', { name: `Copiar ${LEAD.telefone}` }));
-    expect(copiar).toHaveBeenCalledWith(LEAD.telefone);
+    await user.click(screen.getByRole('button', { name: 'Copiar (31) 3333-4444' }));
+    expect(copiar).toHaveBeenCalledWith('(31) 3333-4444');
     expect(screen.getByRole('button', { name: 'Contato copiado' })).toBeInTheDocument();
     expect(registrarTentativaContato).not.toHaveBeenCalled();
     await user.click(screen.getByRole('link', { name: `E-mail da empresa: ${LEAD.emails[0]}` }));
