@@ -62,6 +62,8 @@ export function BarraPrioridades({
           <span className={styles.rotuloOculto}>Buscar vendas</span>
           <input
             type="search"
+            aria-label="Buscar vendas"
+            maxLength={160}
             value={busca}
             onChange={(evento) => aoBuscar(evento.target.value)}
             placeholder="Buscar empresa ou contato"

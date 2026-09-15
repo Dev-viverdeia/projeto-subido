@@ -105,6 +105,7 @@ export function CartaoOportunidade({
   return (
     <article
       ref={definirRef}
+      data-venda-id={oportunidade.id}
       className={styles.cartao}
       data-arrastando={isDragging || undefined}
       {...attributes}
@@ -222,6 +223,7 @@ export function CartaoEncerrado({
   return (
     <article
       className={styles.cartaoEncerrado}
+      data-venda-id={oportunidade.id}
       data-resultado={foraDoFluxo ? 'fora_do_fluxo' : perdida ? 'perdido' : 'ganho'}
     >
       <header>

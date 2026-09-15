@@ -9,6 +9,7 @@ import { sair } from '@/lib/auth/actions';
 import { limparRascunhosSobral } from '@/lib/consultor/rascunhos';
 import { limparRascunhosProposta } from '@/lib/propostas/rascunho-local';
 import { limparPosicoesRoteiro } from '@/lib/calls/posicao-roteiro-local';
+import { limparQuadrosVendas } from '@/lib/crm/quadro-local';
 import styles from './MenuPerfil.module.css';
 import { PLANOS_SUBIDO, type PlanoSubido } from '@/lib/planos/acessos';
 
@@ -230,6 +231,7 @@ export function MenuPerfil({
                 limparRascunhosSobral();
                 limparRascunhosProposta();
                 limparPosicoesRoteiro();
+                limparQuadrosVendas();
                 try {
                   for (const key of Object.keys(sessionStorage))
                     if (key.startsWith('suporte-rascunho:') || key === 'subido-pedido-ajuda')

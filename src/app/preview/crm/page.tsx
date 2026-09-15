@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   Bot,
@@ -15,6 +16,7 @@ import pagina from '@/app/(app)/crm/pagina.module.css';
 import { SubidoLogo } from '@/components/brand/SubidoLogo';
 import type { OportunidadeCrm } from '@/lib/crm/queries';
 import styles from '../mapa-jornada/preview.module.css';
+import { NavegacaoPreview } from './NavegacaoPreview';
 
 export const metadata: Metadata = { title: 'Preview · Vendas' };
 
@@ -147,6 +149,29 @@ const OPORTUNIDADES: OportunidadeCrm[] = [
 export default async function PreviewCrmPage({ searchParams }: PageProps<'/preview/crm'>) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
+  const oportunidades =
+    parametros.volume === '1'
+      ? [
+          ...OPORTUNIDADES,
+          ...Array.from({ length: 36 }, (_, i) => ({
+            ...OPORTUNIDADES[i % 3]!,
+            id: `66666666-6666-4666-8666-${String(i).padStart(12, '0')}`,
+            empresa: `${OPORTUNIDADES[i % 3]!.empresa} ${i + 1}`,
+          })),
+        ]
+      : OPORTUNIDADES;
+  if (typeof parametros.ficha === 'string') {
+    return (
+      <main className={pagina.pagina}>
+        <Link href="/preview/crm?volume=1">Voltar para Vendas</Link>
+        <h1>Ficha do cliente</h1>
+        <p>Ficha de teste. Nenhum dado real é alterado.</p>
+        <Link href={`/preview/crm?volume=1&removida=${encodeURIComponent(parametros.ficha)}`}>
+          Simular venda removida
+        </Link>
+      </main>
+    );
+  }
 
   return (
     <div className={styles.shell}>
@@ -193,7 +218,12 @@ export default async function PreviewCrmPage({ searchParams }: PageProps<'/previ
             <h2 id="preview-pipeline-titulo" className={pagina.tituloOculto}>
               Quadro de vendas
             </h2>
-            <PipelineCrm oportunidades={OPORTUNIDADES} />
+            <NavegacaoPreview>
+              <PipelineCrm
+                oportunidades={oportunidades.filter((item) => item.id !== parametros.removida)}
+                contaId="preview-crm"
+              />
+            </NavegacaoPreview>
           </section>
         </div>
       </main>
