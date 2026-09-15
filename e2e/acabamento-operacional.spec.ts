@@ -61,7 +61,15 @@ test('Tab circula no formulário e mantém o foco visível', async ({ page, brow
     const corpo = dialogo.locator('.via-modal__body');
     await expect(corpo).toBeFocused();
     expect(await corpo.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
-    await expect(corpo).not.toHaveCSS('box-shadow', 'none');
+    expect(
+      await corpo.evaluate((el) => {
+        const estilo = getComputedStyle(el);
+        return (
+          (estilo.outlineStyle !== 'none' && parseFloat(estilo.outlineWidth) > 0) ||
+          estilo.boxShadow !== 'none'
+        );
+      }),
+    ).toBe(true);
     await corpo.press('Tab');
   }
   await expect(dialogo.getByRole('textbox', { name: 'Empresa', exact: true })).toBeFocused();
