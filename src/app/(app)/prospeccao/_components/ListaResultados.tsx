@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness,
   Building2,
   Camera,
+  Globe,
   MapPin,
   Phone,
   RefreshCw,
@@ -25,7 +26,7 @@ import {
   identificadorRede,
   qualificacaoDo,
   redesDo,
-  rotuloCompletude,
+  rotuloRede,
   telefonesDo,
   urlWhatsapp,
   type Lead,
@@ -52,19 +53,21 @@ function Canal({
 }) {
   return (
     <div className={styles.canalLead}>
-      <span className={styles.canalIcone}>{icone}</span>
-      <div>
-        <small>{rotulo}</small>
-        <LinkContatoProspeccao
-          lead={lead}
-          canal={canal}
-          href={href}
-          target={href.startsWith('http') ? '_blank' : undefined}
-          rel="noreferrer"
-        >
-          {valor}
-        </LinkContatoProspeccao>
-      </div>
+      <LinkContatoProspeccao
+        lead={lead}
+        canal={canal}
+        href={href}
+        aria-label={`${rotulo}: ${valor}`}
+        target={href.startsWith('http') ? '_blank' : undefined}
+        rel="noreferrer"
+      >
+        <span className={styles.canalIcone}>{icone}</span>
+        <span className={styles.canalConteudo}>
+          <small>{rotulo}</small>
+          <span>{valor}</span>
+        </span>
+        <ArrowUpRight size={16} aria-hidden="true" />
+      </LinkContatoProspeccao>
       <CopiarContato valor={valorCopiar} className={styles.copiarCanal} />
     </div>
   );
@@ -107,8 +110,8 @@ export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: strin
         </span>
       </div>
 
-      <div className={styles.gradeLeads} role="list">
-        {leads.map((lead, indice) => {
+      <div className={styles.gradeLeads} role="list" aria-label="Empresas encontradas">
+        {leads.map((lead) => {
           const telefones = telefonesDo(lead);
           const emails = emailsDo(lead);
           const redes = redesDo(lead);
@@ -119,108 +122,115 @@ export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: strin
           const email = decisor?.email ?? emails[0] ?? null;
           const linkedin =
             decisor?.linkedin_url ?? redes.find((rede) => rede.rede === 'linkedin')?.url ?? null;
-          const instagram = redes.find((rede) => rede.rede === 'instagram') ?? null;
-          const qualificacao = qualificacaoDo(lead);
-          const oportunidade = qualificacao.oportunidade;
+          const oportunidade = qualificacaoDo(lead).oportunidade;
+          const canais: Omit<Parameters<typeof Canal>[0], 'lead'>[] = [];
+          if (telefone) {
+            const whatsapp = urlWhatsapp(telefone);
+            canais.push({
+              canal: whatsapp ? 'whatsapp' : 'telefone',
+              icone: <Phone size={18} aria-hidden="true" />,
+              rotulo: decisor?.telefone ? `Telefone · ${decisor.nome}` : 'Telefone / WhatsApp',
+              valor: telefone,
+              href: whatsapp ?? `tel:${telefone}`,
+            });
+          }
+          if (email) {
+            canais.push({
+              canal: 'email',
+              icone: <AtSign size={18} aria-hidden="true" />,
+              rotulo: decisor?.email ? `E-mail · ${decisor.nome}` : 'E-mail da empresa',
+              valor: email,
+              href: `mailto:${email}`,
+            });
+          }
+          if (linkedin) {
+            canais.push({
+              canal: 'linkedin',
+              icone: <BriefcaseBusiness size={18} aria-hidden="true" />,
+              rotulo: 'LinkedIn',
+              valor: decisor?.linkedin_url ? decisor.nome : 'Perfil da empresa',
+              href: linkedin,
+              valorCopiar: linkedin,
+            });
+          }
+          for (const rede of redes) {
+            if (canais.some((canal) => canal.canal === rede.rede)) continue;
+            canais.push({
+              canal: rede.rede,
+              icone:
+                rede.rede === 'instagram' ? (
+                  <Camera size={18} aria-hidden="true" />
+                ) : (
+                  <Globe size={18} aria-hidden="true" />
+                ),
+              rotulo: rotuloRede(rede.rede),
+              valor: identificadorRede(rede),
+              href: rede.url,
+              valorCopiar: rede.url,
+            });
+          }
+          // A sugestão só muda a ordem de canais realmente presentes na ficha.
+          // Telefone e WhatsApp compartilham o mesmo número, sem atestar que ele tem WhatsApp.
+          const preferido = oportunidade?.melhor_canal;
+          const ehPreferido = (canal: (typeof canais)[number]) =>
+            canal.canal === preferido || (preferido === 'telefone' && canal.canal === 'whatsapp');
+          const canaisVisiveis = canais
+            .toSorted((a, b) => Number(ehPreferido(b)) - Number(ehPreferido(a)))
+            .slice(0, 2);
+          const local = [lead.cidade, lead.estado].filter(Boolean).join(', ');
 
           return (
-            <article className={styles.cartaoLead} role="listitem" key={lead.id}>
-              <div className={styles.cartaoLeadTopo}>
-                <span className={styles.numeroLead}>{String(indice + 1).padStart(2, '0')}</span>
-                <span className={styles.qualidadeLead} data-alta={qualificacao.completude >= 80}>
-                  {rotuloCompletude(qualificacao.completude)}
-                </span>
-              </div>
-
-              <div className={styles.empresaLead}>
-                <h3>{lead.nome}</h3>
-                <p>{lead.categoria ?? 'Empresa local'}</p>
-                <span>
-                  <MapPin size={13} aria-hidden="true" />
-                  {[lead.cidade, lead.estado].filter(Boolean).join(', ') ||
-                    lead.endereco ||
-                    'Região a confirmar'}
-                </span>
-              </div>
-
-              {oportunidade && (
-                <div className={styles.oportunidadeLead}>
-                  <div className={styles.oportunidadeLeadTitulo}>
+            <article
+              className={styles.cartaoLead}
+              role="listitem"
+              key={lead.id}
+              aria-labelledby={`empresa-${lead.id}`}
+            >
+              <div className={styles.cartaoConteudo}>
+                <div className={styles.empresaLead}>
+                  <h3 id={`empresa-${lead.id}`}>{lead.nome}</h3>
+                  <p>{lead.categoria ?? 'Empresa local'}</p>
+                  {local && (
                     <span>
-                      <Target size={14} aria-hidden="true" /> Projeto indicado
+                      <MapPin size={14} aria-hidden="true" />
+                      {local}
                     </span>
-                    <small data-confianca={oportunidade.confianca}>
-                      {oportunidade.confianca === 'alta'
-                        ? 'Boa aderência'
-                        : oportunidade.confianca === 'media'
-                          ? 'Aderência provável'
-                          : 'Hipótese inicial'}
-                    </small>
+                  )}
+                </div>
+                <div className={styles.canaisLead}>
+                  {canaisVisiveis.map((canal) => (
+                    <Canal key={canal.canal} lead={lead.id} {...canal} />
+                  ))}
+                  {!canais.length && (
+                    <div className={styles.semCanalLead}>
+                      <Phone size={18} aria-hidden="true" />
+                      <span>
+                        {enriquecimentoDeContatosEmAndamento(lead)
+                          ? 'Buscando canais de contato…'
+                          : 'Contato ainda não encontrado'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {decisor && (
+                  <div className={styles.contatoPrincipalLead}>
+                    <UserRound size={16} aria-hidden="true" />
+                    <p>
+                      <span>Possível contato</span> <strong>{decisor.nome}</strong>
+                      {decisor.cargo && ` · ${decisor.cargo}`}
+                    </p>
                   </div>
-                  <strong>{oportunidade.projeto_titulo}</strong>
-                </div>
-              )}
+                )}
 
-              <div className={styles.contatoPrincipalLead} data-encontrado={Boolean(decisor)}>
-                <span className={styles.contatoPrincipalIcone}>
-                  <UserRound size={15} aria-hidden="true" />
-                </span>
-                <div>
-                  <small>{decisor ? 'Decisor encontrado' : 'Decisor a confirmar'}</small>
-                  <strong>{decisor?.nome ?? 'Responsável a identificar'}</strong>
-                  <span>
-                    {decisor?.cargo ?? 'Peça pelo responsável da área ao iniciar o contato.'}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.canaisLead}>
-                {telefone && (
-                  <Canal
-                    lead={lead.id}
-                    canal={urlWhatsapp(telefone) ? 'whatsapp' : 'telefone'}
-                    icone={<Phone size={15} aria-hidden="true" />}
-                    rotulo={decisor?.telefone ? 'Telefone do decisor' : 'Telefone / WhatsApp'}
-                    valor={telefone}
-                    href={urlWhatsapp(telefone) ?? `tel:${telefone}`}
-                  />
-                )}
-                {email && (
-                  <Canal
-                    lead={lead.id}
-                    canal="email"
-                    icone={<AtSign size={15} aria-hidden="true" />}
-                    rotulo={decisor?.email ? 'E-mail do decisor' : 'E-mail da empresa'}
-                    valor={email}
-                    href={`mailto:${email}`}
-                  />
-                )}
-                {linkedin && (!telefone || !email) && (
-                  <Canal
-                    lead={lead.id}
-                    canal="linkedin"
-                    icone={<BriefcaseBusiness size={15} aria-hidden="true" />}
-                    rotulo={decisor?.linkedin_url ? 'LinkedIn do decisor' : 'LinkedIn'}
-                    valor={decisor ? decisor.nome : 'Abrir perfil'}
-                    href={linkedin}
-                    valorCopiar={linkedin}
-                  />
-                )}
-                {instagram && !linkedin && (!telefone || !email) && (
-                  <Canal
-                    lead={lead.id}
-                    canal="instagram"
-                    icone={<Camera size={15} aria-hidden="true" />}
-                    rotulo="Instagram"
-                    valor={identificadorRede(instagram)}
-                    href={instagram.url}
-                    valorCopiar={instagram.url}
-                  />
-                )}
-                {!telefone && !email && !linkedin && !instagram && (
-                  <p className={styles.semCanalLead}>
-                    Abra os detalhes para consultar os demais canais encontrados.
-                  </p>
+                {oportunidade && (
+                  <div className={styles.oportunidadeLead}>
+                    <Target size={17} aria-hidden="true" />
+                    <div>
+                      <span>Projeto para validar</span>
+                      <strong>{oportunidade.projeto_titulo}</strong>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -239,7 +249,6 @@ export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: strin
                   lead={lead.id}
                   lista={lista}
                   oportunidade={lead.crm_oportunidade_id}
-                  compacto
                   className={styles.acaoCrmLead}
                 />
               </footer>
