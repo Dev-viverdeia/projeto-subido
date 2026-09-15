@@ -486,10 +486,10 @@
   color: var(--via-white);
   font: 600 var(--via-fs-xs) / 1 var(--via-font);
   cursor: pointer;
+  touch-action: manipulation;
   transition:
     transform var(--app-t-touch),
-    box-shadow var(--app-t-touch),
-    background-color var(--app-t-state);
+    box-shadow var(--app-t-touch);
 }
 
 .conclusaoAula button[aria-pressed='true'] {
@@ -498,9 +498,11 @@
   color: var(--via-navy);
 }
 
-.conclusaoAula button:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--app-elev-2-shadow);
+@media (hover: hover) and (pointer: fine) {
+  .conclusaoAula button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--app-elev-2-shadow);
+  }
 }
 
 .conclusaoAula button:focus-visible {

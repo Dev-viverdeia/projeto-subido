@@ -255,18 +255,20 @@
   font-size: var(--via-fs-sm);
   font-weight: 620;
   cursor: pointer;
-  transition:
-    background-color var(--app-t-state),
-    color var(--app-t-state);
+  touch-action: manipulation;
+  /* Seleção navy/branco precisa ser atômica, inclusive ao desmarcar. */
+  transition: box-shadow var(--app-t-state);
 }
 
 .abasProjeto[data-total='3'] {
   grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(230px, 1.4fr);
 }
 
-.abasProjeto button:hover {
-  background: var(--via-navy-08);
-  color: var(--via-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .abasProjeto button:hover {
+    background: var(--via-navy-08);
+    color: var(--via-text-primary);
+  }
 }
 
 .abasProjeto button[data-ativa] {
@@ -688,16 +690,21 @@
   font-weight: 620;
   cursor: pointer;
   white-space: nowrap;
+  touch-action: manipulation;
   transition:
     transform var(--app-t-touch),
-    background-color var(--app-t-state),
     box-shadow var(--app-t-touch);
 }
 
-.aulaConclusao button:hover,
-.concluirPasso:hover {
-  transform: translateY(-1px);
-  background: var(--via-navy-deep);
+@media (hover: hover) and (pointer: fine) {
+  .aulaConclusao button:hover,
+  .concluirPasso:hover {
+    transform: translateY(-1px);
+  }
+  .aulaConclusao button:hover:not([aria-pressed='true']),
+  .concluirPasso:hover:not([aria-pressed='true']) {
+    background: var(--via-navy-deep);
+  }
 }
 
 .aulaConclusao button:focus-visible,
@@ -1790,6 +1797,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .abasProjeto button,
   .acaoPrincipal,
   .barra > span,
   .aulaNavegacao button,

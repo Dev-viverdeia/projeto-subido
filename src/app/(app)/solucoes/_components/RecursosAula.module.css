@@ -37,13 +37,16 @@
 }
 .detalhe > summary {
   cursor: pointer;
+  touch-action: manipulation;
   transition: background-color var(--app-t-state);
 }
 .detalhe > summary::-webkit-details-marker {
   display: none;
 }
-.detalhe > summary:hover {
-  background: var(--via-bg-2);
+@media (hover: hover) and (pointer: fine) {
+  .detalhe > summary:hover {
+    background: var(--via-bg-2);
+  }
 }
 .detalhe > summary > svg {
   transition: transform var(--app-t-touch);
@@ -113,6 +116,7 @@
   font: 500 var(--app-fs-ui) / 1.45 var(--via-font);
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
   transition: background-color var(--app-t-state);
 }
 .download,
@@ -123,10 +127,12 @@
 .detalhe[open] ~ .linkExterno {
   margin-top: var(--via-space-3);
 }
-.download:hover,
-.linkExterno:hover,
-.refazer:hover {
-  background: var(--via-bg-2);
+@media (hover: hover) and (pointer: fine) {
+  .download:hover,
+  .linkExterno:hover,
+  .refazer:hover {
+    background: var(--via-bg-2);
+  }
 }
 .cartao summary:focus-visible,
 .download:focus-visible,
@@ -264,6 +270,7 @@
   background: var(--via-surface);
   font: 500 var(--app-fs-ui) / 1.45 var(--via-font);
   cursor: pointer;
+  touch-action: manipulation;
 }
 .respostas button:hover {
   border-color: var(--via-navy);

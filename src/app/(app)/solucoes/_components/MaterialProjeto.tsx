@@ -76,6 +76,7 @@ export function MaterialProjeto({
                 void copiar();
               }}
               disabled={estado === 'copiando'}
+              aria-busy={estado === 'copiando'}
               aria-label={`${estado === 'copiado' ? 'Copiado' : estado === 'copiando' ? 'Copiando' : 'Copiar'} ${titulo}`}
             >
               {estado === 'copiado' ? (
