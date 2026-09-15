@@ -87,104 +87,92 @@ export function ProjetoGuiado({
     { id: 'implementar', rotulo: 'Implementar' },
     { id: 'materiais', rotulo: 'Pré-requisitos e materiais' },
   ] as const;
-  const mostrarAcaoCabecalho = abaAtiva === 'visao' || abaAtiva === 'materiais';
 
   return (
     <div className={styles.raiz}>
-      <header
-        className={styles.cabecalho}
-        data-com-acao={mostrarAcaoCabecalho || undefined}
-        data-em-trabalho={!mostrarAcaoCabecalho || undefined}
-        aria-labelledby="titulo-projeto"
-      >
+      <header className={styles.cabecalho} aria-labelledby="titulo-projeto">
         <div className={styles.cabecalhoTexto}>
           <h1 id="titulo-projeto">{titulo}</h1>
-          {mostrarAcaoCabecalho ? (
-            <p className={styles.resultado}>{resumo || projeto.resultado}</p>
-          ) : null}
-          {mostrarAcaoCabecalho ? (
-            <p className={styles.metaProjeto}>
-              {categoria ?? 'Projeto de IA'}
-              <span aria-hidden="true">·</span>
-              {roteiro.trilhaDidatica
-                ? `${roteiro.trilhaDidatica.aulas.length} aulas`
-                : 'Passo a passo guiado'}
-              {roteiro.perfil ? (
-                <>
-                  <span aria-hidden="true">·</span>
-                  {ROTULO_NIVEL[roteiro.perfil.nivel]}
-                </>
-              ) : null}
-            </p>
-          ) : null}
+          <p className={styles.resultado}>{resumo || projeto.resultado}</p>
+          <p className={styles.metaProjeto}>
+            {categoria ?? 'Projeto de IA'}
+            <span aria-hidden="true">·</span>
+            {roteiro.trilhaDidatica
+              ? `${roteiro.trilhaDidatica.aulas.length} aulas`
+              : 'Passo a passo guiado'}
+            {roteiro.perfil ? (
+              <>
+                <span aria-hidden="true">·</span>
+                {ROTULO_NIVEL[roteiro.perfil.nivel]}
+              </>
+            ) : null}
+          </p>
           <button type="button" className={styles.acaoCliente} onClick={abrirCliente}>
             <BriefcaseBusiness size={18} aria-hidden="true" />
             Usar com cliente
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
-        {mostrarAcaoCabecalho && (
+        <div
+          className={styles.cabecalhoAcao}
+          data-acao-curta={(!aprendizadoConcluido && Boolean(proximoPasso)) || undefined}
+        >
           <div
-            className={styles.cabecalhoAcao}
-            data-acao-curta={(!aprendizadoConcluido && Boolean(proximoPasso)) || undefined}
+            className={styles.progressoCabecalho}
+            role="progressbar"
+            aria-label="Progresso da implementação"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressoGeral}
           >
-            <div
-              className={styles.progressoCabecalho}
-              role="progressbar"
-              aria-label="Progresso da implementação"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={progressoGeral}
-            >
-              <p>
-                <strong>
-                  {feitas} de {todosIds.length}
-                </strong>
-                <span>passos concluídos</span>
-              </p>
-              <span className={styles.progressoCabecalhoTrilho} aria-hidden="true">
-                <span style={{ transform: `scaleX(${progressoGeral / 100})` }} />
-              </span>
-            </div>
-
-            {!aprendizadoConcluido ? (
-              <button
-                type="button"
-                onClick={() => abrirArea('aprender')}
-                className={styles.acaoPrincipal}
-              >
-                <span>
-                  {!proximoPasso
-                    ? 'Concluir aulas do projeto'
-                    : aulasFeitas > 0
-                      ? 'Retomar aulas'
-                      : 'Ver aulas'}
-                </span>
-                <ArrowRight size={17} aria-hidden="true" />
-              </button>
-            ) : proximoPasso ? (
-              <button
-                type="button"
-                onClick={() => abrirArea('implementar')}
-                className={styles.acaoPrincipal}
-              >
-                <span>
-                  <small>Próximo passo</small>
-                  {proximoPasso.passo.titulo}
-                </span>
-                <ArrowRight size={17} aria-hidden="true" />
-              </button>
-            ) : (
-              <Link href={`/certificados/solucao/${slug}`} className={styles.acaoPrincipal}>
-                <span>
-                  <small>Projeto concluído</small>
-                  Ver certificado
-                </span>
-                <ArrowRight size={17} aria-hidden="true" />
-              </Link>
-            )}
+            <p>
+              <strong>
+                {feitas} de {todosIds.length}
+              </strong>
+              <span>passos concluídos</span>
+            </p>
+            <span className={styles.progressoCabecalhoTrilho} aria-hidden="true">
+              <span style={{ transform: `scaleX(${progressoGeral / 100})` }} />
+            </span>
           </div>
-        )}
+
+          {!aprendizadoConcluido ? (
+            <button
+              type="button"
+              onClick={() => abrirArea('aprender')}
+              className={styles.acaoPrincipal}
+            >
+              <span>
+                {!proximoPasso
+                  ? 'Concluir aulas do projeto'
+                  : aulasFeitas > 0
+                    ? 'Retomar aulas'
+                    : 'Ver aulas'}
+              </span>
+              <ArrowRight size={17} aria-hidden="true" />
+            </button>
+          ) : proximoPasso ? (
+            <button
+              type="button"
+              onClick={() => abrirArea('implementar')}
+              className={styles.acaoPrincipal}
+            >
+              <span>
+                <small>Próximo passo</small>
+                {proximoPasso.passo.titulo}
+              </span>
+              <ArrowRight size={17} aria-hidden="true" />
+            </button>
+          ) : (
+            <Link href={`/certificados/solucao/${slug}`} className={styles.acaoPrincipal}>
+              <span>
+                <small>Projeto concluído</small>
+                Ver certificado
+              </span>
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          )}
+        </div>
       </header>
 
       <div className={styles.etapasProjeto}>

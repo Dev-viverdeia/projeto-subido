@@ -40,8 +40,8 @@
   font-weight: var(--via-fw-medium);
   cursor: pointer;
   transition:
-    background var(--app-t-state) var(--via-ease-out),
-    color var(--app-t-state) var(--via-ease-out);
+    background-color var(--app-t-state),
+    color var(--app-t-state);
 }
 .momentos button:hover {
   background: var(--via-bg-2);
@@ -127,7 +127,7 @@
 .intencao summary svg,
 .lista summary svg {
   flex-shrink: 0;
-  transition: transform var(--app-t-state) var(--via-ease-out);
+  transition: transform var(--app-t-touch);
 }
 .intencao[open] > summary svg,
 .lista[open] > summary svg {

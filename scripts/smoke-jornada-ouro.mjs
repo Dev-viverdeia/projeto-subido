@@ -666,7 +666,9 @@ async function verificarRotas(email, password) {
     const corpo = await resposta.text();
     if (
       resposta.status !== 200 ||
-      /Application error|Internal Server Error|A plataforma perdeu o fio/i.test(corpo)
+      /Application error|Internal Server Error|A plataforma perdeu o fio|Não foi possível carregar a página/i.test(
+        corpo,
+      )
     ) {
       falhas.push(`rota inválida: ${rota} (HTTP ${resposta.status})`);
       continue;

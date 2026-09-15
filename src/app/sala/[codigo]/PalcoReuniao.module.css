@@ -308,7 +308,7 @@
   font: inherit;
   font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
-  transition: background var(--app-t-state) var(--via-ease-out);
+  transition: background-color var(--app-t-state);
 }
 .recentes svg {
   flex-shrink: 0;

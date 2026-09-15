@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { projetoPreview, rotaPreview } from '@/app/preview/projetos/fixture';
 import type { ProjetoGuiado } from './ProjetoGuiado';
@@ -30,6 +30,22 @@ function montar() {
 }
 
 describe('Navegação e retomada do projeto', () => {
+  it('preserva o cabeçalho, o progresso e os atalhos ao trocar de área', async () => {
+    const user = userEvent.setup();
+    montar();
+    const titulo = screen.getByRole('heading', { name: 'SDR de Atendimento com IA' });
+    const progresso = screen.getByRole('progressbar', { name: 'Progresso da implementação' });
+    for (const area of ['Aprender', 'Implementar', 'Pré-requisitos e materiais', 'Visão geral']) {
+      await user.click(screen.getByRole('tab', { name: area }));
+      expect(screen.getByRole('heading', { name: 'SDR de Atendimento com IA' })).toBe(titulo);
+      expect(screen.getByRole('progressbar', { name: 'Progresso da implementação' })).toBe(
+        progresso,
+      );
+      expect(within(titulo.closest('header')!).getByText(projetoPreview.resultado)).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Usar com cliente' })).toBeVisible();
+    }
+  });
+
   it('abre a aplicação no cliente com um clique, transfere o foco e preserva a consulta', async () => {
     const user = userEvent.setup();
     montar();

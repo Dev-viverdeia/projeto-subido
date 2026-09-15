@@ -34,7 +34,7 @@
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
   vertical-align: middle;
-  transition: background var(--app-t-state) var(--via-ease-out);
+  transition: background-color var(--app-t-state);
 }
 .mensagem a > span:first-child {
   min-width: 0;

@@ -24,24 +24,19 @@ export default function ErroGlobal({
         <main className={styles.pagina}>
           <header className={styles.marca}>
             <SubidoLogo size={18} />
-            <span>Recuperação segura</span>
           </header>
 
           <EstadoSistema
             urgente
             icone={<CloudOff size={30} strokeWidth={1.6} />}
             etiqueta="Falha temporária"
-            titulo="A plataforma perdeu o fio por um instante."
-            descricao="O que já foi salvo continua protegido. Tente reconstruir a tela agora; se a conexão não voltar, recarregue a página."
+            titulo="Não foi possível carregar a página."
+            descricao="Tente novamente. Se o problema continuar, recarregue a página."
             acoes={
               <Button variant="primary" onClick={reset}>
-                Reconstruir tela
+                Tentar novamente
               </Button>
             }
-            passos={[
-              { rotulo: 'Primeiro', valor: 'Refaça a tentativa sem sair da tela.' },
-              { rotulo: 'Depois', valor: 'Recarregue o navegador para reiniciar a sessão.' },
-            ]}
           />
         </main>
       </body>

@@ -74,8 +74,8 @@
   font-weight: var(--via-fw-medium);
   cursor: pointer;
   transition:
-    background var(--app-t-state) var(--via-ease-out),
-    color var(--app-t-state) var(--via-ease-out);
+    background-color var(--app-t-state),
+    color var(--app-t-state);
 }
 .consultas button:hover {
   background: var(--via-bg-2);

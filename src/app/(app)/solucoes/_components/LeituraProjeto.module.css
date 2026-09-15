@@ -21,9 +21,8 @@
   align-items: flex-start;
   gap: var(--via-space-3);
   padding: var(--app-pad-card-tight);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
+  border-left: 2px solid var(--via-navy-20);
+  background: var(--via-navy-03);
   color: var(--via-text-primary);
 }
 
@@ -77,10 +76,8 @@
 }
 
 .modulos {
-  border: 1px solid var(--via-border-hairline);
-  border-radius: var(--app-radius-control);
-  background: var(--via-bg-2);
-  padding: var(--via-space-1);
+  border-bottom: 1px solid var(--via-border-hairline);
+  padding: 0 0 var(--via-space-2);
 }
 @media (max-width: 599px) {
   .modulos[data-com-exemplo] {
@@ -158,9 +155,9 @@
 .acoes button {
   width: 44px;
   height: 44px;
-  border: 1px solid var(--via-border);
+  border: 1px solid transparent;
   border-radius: var(--app-radius-control);
-  background: var(--via-surface);
+  background: transparent;
   color: var(--via-text-muted);
   font: inherit;
   font-size: var(--app-fs-ui);
@@ -173,9 +170,9 @@
   background: var(--via-navy-06);
 }
 .acoes button[aria-pressed='true'] {
-  background: var(--via-navy);
-  color: var(--via-white);
-  border-color: var(--via-navy);
+  background: var(--via-navy-06);
+  color: var(--via-navy);
+  border-color: var(--via-navy-20);
 }
 .navegar {
   display: flex;

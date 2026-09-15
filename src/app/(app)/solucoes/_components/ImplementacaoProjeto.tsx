@@ -151,7 +151,7 @@ export function ImplementacaoProjeto({
               <small>
                 {ids.length > 0 && concluidos === ids.length
                   ? 'Concluída'
-                  : `${concluidos} de ${ids.length} passos`}
+                  : `${concluidos} de ${ids.length} ${ids.length === 1 ? 'passo' : 'passos'}`}
               </small>
             </button>
           );

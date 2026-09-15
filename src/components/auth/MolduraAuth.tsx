@@ -32,7 +32,7 @@ export function MolduraAuth({ children }: { children: ReactNode }) {
           href="/"
           prefetch={false}
           className={styles.marca}
-          aria-label="Voltar para a página inicial"
+          aria-label="Subido — voltar para a página inicial"
         >
           {/* 16 e não 18: o wordmark tem proporção ~12:1, então cada px de altura
               custa 12 de largura. A 18 o lockup ocupava 82% da tela em 375px e a

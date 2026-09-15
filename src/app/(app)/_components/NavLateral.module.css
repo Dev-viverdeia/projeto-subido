@@ -293,7 +293,7 @@
   background: color-mix(in srgb, var(--via-navy-deep) 46%, transparent);
   backdrop-filter: blur(3px);
   cursor: default;
-  animation: revelarFundo var(--app-t-state) ease-out both;
+  animation: revelarFundo var(--app-t-state) backwards;
 }
 
 .painelMenu {

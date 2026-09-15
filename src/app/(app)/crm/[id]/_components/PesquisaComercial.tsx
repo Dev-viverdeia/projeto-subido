@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   Building2,
   CircleHelp,
+  ChevronDown,
   ExternalLink,
   FileSearch,
   Globe2,
@@ -227,31 +228,44 @@ export function PesquisaComercial({
   dossie: DossieEnriquecido;
 }) {
   const [aba, setAba] = useState<AbaPesquisa>('conversa');
+  const temProximoPasso = Boolean(lead.oportunidade.proximaAcao);
+  const sugestao = (
+    <AcaoPesquisaComercial
+      lead={lead}
+      dossie={dossie}
+      enriquecimentoId={execucao.id}
+      acaoVisivel={acaoParaFicha(dossie.proximaAcao.acao)}
+    />
+  );
 
   return (
     <section className={styles.pesquisa} aria-labelledby="pesquisa-comercial-titulo">
-      <div className={styles.briefing}>
+      <div className={styles.briefing} data-acao-definida={temProximoPasso || undefined}>
         <div className={styles.leituraPrincipal}>
           <span className={styles.iconePesquisa}>
             <FileSearch size={20} strokeWidth={1.7} aria-hidden="true" />
           </span>
           <div>
             <p>Ficha enriquecida</p>
-            <h2 id="pesquisa-comercial-titulo">Leitura para a próxima reunião</h2>
+            <h2 id="pesquisa-comercial-titulo">Prepare sua conversa</h2>
             <p className={styles.resumoDossie}>{resumoParaFicha(dossie.resumo)}</p>
             <small>
-              Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)}. Fatos
-              confirmados e pontos a validar ficam separados.
+              Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)}
             </small>
           </div>
         </div>
 
-        <AcaoPesquisaComercial
-          lead={lead}
-          dossie={dossie}
-          enriquecimentoId={execucao.id}
-          acaoVisivel={acaoParaFicha(dossie.proximaAcao.acao)}
-        />
+        {temProximoPasso ? (
+          <details className={styles.sugestaoAlternativa}>
+            <summary>
+              Sugestão da IA para o próximo passo
+              <ChevronDown size={18} aria-hidden="true" />
+            </summary>
+            {sugestao}
+          </details>
+        ) : (
+          sugestao
+        )}
       </div>
 
       <div className={styles.conteudoPesquisa}>

@@ -29,6 +29,7 @@ import { readFileSync } from 'node:fs';
 import { globSync } from 'node:fs';
 import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validarMovimento } from './lib/validar-movimento.mjs';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 
@@ -228,6 +229,19 @@ const DEFINIDOS = tokensDefinidos();
 const achados = [];
 for (const rel of arquivos) {
   const linhas = readFileSync(new URL(rel, new URL('..', import.meta.url)), 'utf8').split('\n');
+
+  for (const achado of validarMovimento(linhas.join('\n'))) {
+    achados.push({
+      arquivo: rel,
+      linha: achado.linha,
+      trecho: achado.trecho,
+      regra: {
+        id: 'movimento-invalido',
+        porque: 'token composto usado como tempo puro ou com uma segunda curva',
+        use: '--app-motion-* em duração/delay; --app-t-* sozinho no shorthand',
+      },
+    });
+  }
 
   /* Comentário não é código — e comentário AQUI tem muitas linhas de propósito:
      é onde moram as medições de contraste, que citam hex e duração o tempo todo.

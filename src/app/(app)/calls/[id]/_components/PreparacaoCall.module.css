@@ -108,7 +108,7 @@
   font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   text-decoration: none;
-  transition: transform var(--app-t-touch) var(--via-ease-out);
+  transition: transform var(--app-t-touch);
 }
 
 .entrar:hover {
@@ -226,7 +226,7 @@
 }
 .detalhe summary > svg {
   flex-shrink: 0;
-  transition: transform var(--app-t-state) var(--via-ease-out);
+  transition: transform var(--app-t-touch);
 }
 .detalhe[open] > summary > svg {
   transform: rotate(180deg);

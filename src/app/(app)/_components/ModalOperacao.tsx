@@ -1,6 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/design-system/via';
 import styles from './ModalOperacao.module.css';
@@ -43,24 +51,68 @@ export function ModalOperacao({
   blocked?: boolean;
 }) {
   const portal = useRef<HTMLDivElement>(null);
+  const escapeDoControle = useRef(false);
+  const descricaoId = useId();
   const montado = useSyncExternalStore(
     escutarMontagem,
     obterMontagemCliente,
     obterMontagemServidor,
   );
 
+  useLayoutEffect(() => {
+    if (!open || !montado) return;
+    const focoAnterior = document.activeElement as HTMLElement | null;
+    return () => {
+      // O vendor restaura o foco antes de o efeito que isola o fundo terminar.
+      // Espera a liberação de inert, sem disputar foco com outra ação do usuário.
+      window.requestAnimationFrame(() => {
+        if (
+          document.activeElement === document.body &&
+          focoAnterior?.isConnected &&
+          !focoAnterior.closest('[inert]')
+        ) {
+          focoAnterior.focus({ preventScroll: true });
+        }
+      });
+    };
+  }, [open, montado]);
+
   useEffect(() => {
-    if (!open) return;
+    if (!open || !montado) return;
+    const superficies = Array.from(document.querySelectorAll<HTMLElement>('[data-app-shell]'));
+    const estadosInert = superficies.map((superficie) => superficie.hasAttribute('inert'));
+    superficies.forEach((superficie) => superficie.setAttribute('inert', ''));
     const quadro = window.requestAnimationFrame(() => {
       portal.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus();
     });
-    return () => window.cancelAnimationFrame(quadro);
-  }, [open]);
+    return () => {
+      window.cancelAnimationFrame(quadro);
+      superficies.forEach((superficie, indice) => {
+        if (!estadosInert[indice]) superficie.removeAttribute('inert');
+      });
+    };
+  }, [open, montado]);
+
+  useEffect(() => {
+    if (!open || !montado) return;
+    // O vendor não expõe aria-describedby. Relaciona a descrição que já está
+    // visível, sem duplicar a copy ou alterar o componente gerado.
+    const dialogo = portal.current?.querySelector('[role="dialog"]');
+    const descricao = portal.current?.querySelector('.via-modal__head p');
+    if (description && descricao) {
+      descricao.id = descricaoId;
+      dialogo?.setAttribute('aria-describedby', descricaoId);
+    } else {
+      dialogo?.removeAttribute('aria-describedby');
+    }
+  }, [open, montado, description, descricaoId]);
 
   if (!montado || !open) return null;
 
   const fechar = () => {
-    if (!blocked) onClose();
+    const preservarControle = escapeDoControle.current;
+    escapeDoControle.current = false;
+    if (!blocked && !preservarControle) onClose();
   };
 
   return createPortal(
@@ -72,6 +124,20 @@ export function ModalOperacao({
       data-has-label={Boolean(label)}
       data-label={label}
       data-blocked={blocked}
+      onKeyDownCapture={(evento) => {
+        // Select/Combobox do vendor também tratam Escape no document. Sem
+        // esta guarda, uma tecla fecha a lista E descarta o formulário.
+        escapeDoControle.current =
+          evento.key === 'Escape' &&
+          Boolean(
+            portal.current?.querySelector(
+              '[aria-haspopup][aria-expanded="true"], [role="combobox"][aria-expanded="true"]',
+            ),
+          );
+      }}
+      onClickCapture={() => {
+        escapeDoControle.current = false;
+      }}
       style={label ? ({ '--app-modal-label': `"${label}"` } as CSSProperties) : undefined}
     >
       <Modal
