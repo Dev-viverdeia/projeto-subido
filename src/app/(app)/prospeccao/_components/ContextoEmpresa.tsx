@@ -9,9 +9,7 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
     <section className={styles.research} aria-labelledby="pesquisa-titulo">
       <div className={styles.sectionHeading}>
         <div>
-          <p className={styles.eyebrow}>Pesquisa da empresa</p>
-          <h3 id="pesquisa-titulo">Pesquise antes de abordar</h3>
-          <span>Esses links ajudam a preparar a mensagem, mas não contam como contato.</span>
+          <h3 id="pesquisa-titulo">Sobre a empresa</h3>
         </div>
         <Building2 size={20} aria-hidden="true" />
       </div>
@@ -20,7 +18,7 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
           <a href={lead.site_url} target="_blank" rel="noreferrer">
             <Globe2 size={18} aria-hidden="true" />
             <span>
-              <small>Site oficial</small>
+              <small>Site da empresa</small>
               <strong>{lead.dominio ?? 'Abrir site'}</strong>
             </span>
             <ExternalLink size={14} aria-hidden="true" />
@@ -39,12 +37,6 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
       </div>
 
       <dl className={styles.companyFacts}>
-        <div>
-          <dt>Sobre</dt>
-          <dd>
-            {lead.descricao ?? 'Não encontramos uma descrição pública confiável para este negócio.'}
-          </dd>
-        </div>
         <div>
           <dt>Endereço</dt>
           <dd>{lead.endereco ?? 'Não encontrado'}</dd>
@@ -77,6 +69,12 @@ export function ContextoEmpresa({ lead }: { lead: Lead }) {
           </div>
         )}
       </dl>
+      {lead.descricao && (
+        <details className={styles.companyDescription}>
+          <summary>Descrição da empresa</summary>
+          <p>{lead.descricao}</p>
+        </details>
+      )}
     </section>
   );
 }

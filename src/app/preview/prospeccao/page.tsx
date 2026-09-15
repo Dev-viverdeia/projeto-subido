@@ -172,6 +172,7 @@ export default async function PreviewProspeccaoPage({
     resultado?: string;
     retomada?: string;
     cartoes?: string;
+    contatos?: string;
     navegacao?: string;
     ficha?: string;
     origem?: string;
@@ -198,9 +199,31 @@ export default async function PreviewProspeccaoPage({
   const leads = (parametros.cartoes === '1' ? [...leadsDaLista, ...VARIANTES] : leadsDaLista)
     .filter((lead) => lead.id !== parametros.removida)
     .map((lead) =>
-      lead.id === parametros.criado
-        ? { ...lead, crm_oportunidade_id: '99999999-9999-4999-8999-999999999999' }
-        : lead,
+      parametros.contatos === '1' && lead.id === LEADS[0]!.id
+        ? {
+            ...lead,
+            telefone: '123',
+            telefones: [
+              '+55 31 3333-4444',
+              '(31) 3333-4444',
+              '3133334444',
+              '0800 123 4567',
+              '529.982.247-25',
+              '31333344449999',
+            ],
+            emails: [
+              ' CONTATO@CLINICAAURORA.COM.BR ',
+              'contato@clinicaaurora.com.br',
+              'relacionamento.corporativo@clinica-modelo-de-atendimento.example.com',
+            ],
+            dados: {
+              mapa_contatos: { telefones: ['3133334444'] },
+              site_contatos: { emails: ['contato@clinicaaurora.com.br'] },
+            },
+          }
+        : lead.id === parametros.criado
+          ? { ...lead, crm_oportunidade_id: '99999999-9999-4999-8999-999999999999' }
+          : lead,
     );
 
   if (parametros.ficha === '1')

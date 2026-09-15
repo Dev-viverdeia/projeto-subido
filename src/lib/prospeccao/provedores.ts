@@ -19,7 +19,8 @@ import {
   type ExposicaoProspeccao,
   type MemoriaProspeccao,
 } from './memoria';
-import { qualificar, unicos } from './normalizacao';
+import { combinar } from './combinar-leads';
+import { qualificar } from './normalizacao';
 import type { BuscaProspeccao, LeadProspeccaoEntrada } from './schema';
 
 export type ResultadoProvedores = {
@@ -49,59 +50,6 @@ export class ErroConfiguracaoProspeccao extends Error {
     super('As integrações de Prospecção ainda estão sendo configuradas.');
     this.name = 'ErroConfiguracaoProspeccao';
   }
-}
-
-function identidadeDeCombinacao(lead: LeadProspeccaoEntrada) {
-  const dominio = dominioNormalizado(lead.dominio);
-  if (dominio) return `dominio:${dominio}`;
-  const telefone = lead.telefones[0]?.replace(/\D/g, '') ?? lead.telefone?.replace(/\D/g, '');
-  if (telefone && telefone.length >= 10) return `telefone:${telefone}`;
-  return `empresa:${identidadeDaEmpresa(lead)}`;
-}
-
-function combinar(principal: LeadProspeccaoEntrada[], complemento: LeadProspeccaoEntrada[]) {
-  const porChave = new Map<string, LeadProspeccaoEntrada>();
-  for (const lead of [...principal, ...complemento]) {
-    const identidade = identidadeDeCombinacao(lead);
-    const existente = porChave.get(identidade);
-    if (!existente) {
-      porChave.set(identidade, lead);
-      continue;
-    }
-    const combinado = {
-      ...existente,
-      categoria: existente.categoria ?? lead.categoria,
-      endereco: existente.endereco ?? lead.endereco,
-      cidade: existente.cidade ?? lead.cidade,
-      estado: existente.estado ?? lead.estado,
-      site_url: existente.site_url ?? lead.site_url,
-      dominio: existente.dominio ?? lead.dominio,
-      telefone: existente.telefone ?? lead.telefone,
-      telefones: unicos([...existente.telefones, ...lead.telefones]).slice(0, 12),
-      emails: unicos([...existente.emails, ...lead.emails]).slice(0, 12),
-      redes_sociais: [...existente.redes_sociais, ...lead.redes_sociais].filter(
-        (rede, indice, todas) => todas.findIndex((item) => item.url === rede.url) === indice,
-      ),
-      decisores: [...existente.decisores, ...lead.decisores].filter(
-        (decisor, indice, todos) =>
-          todos.findIndex(
-            (item) =>
-              item.linkedin_url === decisor.linkedin_url ||
-              item.nome.toLocaleLowerCase('pt-BR') === decisor.nome.toLocaleLowerCase('pt-BR'),
-          ) === indice,
-      ),
-      horarios: existente.horarios.length ? existente.horarios : lead.horarios,
-      maps_url: existente.maps_url ?? lead.maps_url,
-      imagem_url: existente.imagem_url ?? lead.imagem_url,
-      avaliacao: existente.avaliacao ?? lead.avaliacao,
-      total_avaliacoes: existente.total_avaliacoes ?? lead.total_avaliacoes,
-      descricao: existente.descricao ?? lead.descricao,
-      fontes: [...new Set([...existente.fontes, ...lead.fontes])],
-      dados: { ...lead.dados, ...existente.dados },
-    } satisfies LeadProspeccaoEntrada;
-    porChave.set(identidade, { ...combinado, qualificacao: qualificar(combinado) });
-  }
-  return [...porChave.values()];
 }
 
 function jaConhecido(lead: LeadProspeccaoEntrada, memoria: MemoriaProspeccao | null) {

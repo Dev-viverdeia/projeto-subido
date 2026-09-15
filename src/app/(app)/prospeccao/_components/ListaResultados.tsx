@@ -19,6 +19,7 @@ import { BotaoEnviarCrm } from './BotaoEnviarCrm';
 import { CopiarContato } from './CopiarContato';
 import { LinkContatoProspeccao } from './LinkContatoProspeccao';
 import type { CanalContatoProspeccao } from '@/lib/prospeccao/schema';
+import { telefoneDe } from '@/lib/prospeccao/contatos';
 import {
   decisoresDo,
   emailsDo,
@@ -150,9 +151,13 @@ export function ListaResultados({
             canais.push({
               canal: whatsapp ? 'whatsapp' : 'telefone',
               icone: <Phone size={18} aria-hidden="true" />,
-              rotulo: decisor?.telefone ? `Telefone · ${decisor.nome}` : 'Telefone / WhatsApp',
+              rotulo: decisor?.telefone
+                ? `Telefone · ${decisor.nome}`
+                : whatsapp
+                  ? 'Telefone / WhatsApp'
+                  : 'Telefone',
               valor: telefone,
-              href: whatsapp ?? `tel:${telefone}`,
+              href: whatsapp ?? telefoneDe(telefone)!.tel,
             });
           }
           if (email) {

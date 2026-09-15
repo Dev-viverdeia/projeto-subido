@@ -9,7 +9,7 @@ test.describe('Resultados de Prospecção legíveis', () => {
     const resultados = page.getByRole('list', { name: 'Empresas encontradas' });
     const aurora = resultados.getByRole('listitem', { name: 'Clínica Aurora', exact: true });
     await expect(
-      aurora.getByRole('link', { name: 'Telefone / WhatsApp: +55 31 3333-4444' }),
+      aurora.getByRole('link', { name: 'Telefone / WhatsApp: (31) 3333-4444' }),
     ).toHaveAttribute('href', 'https://wa.me/553133334444');
     await expect(
       aurora.getByRole('link', { name: 'E-mail da empresa: contato@clinicaaurora.com.br' }),

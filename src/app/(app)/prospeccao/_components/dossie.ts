@@ -1,4 +1,11 @@
 import type { Json, Tables } from '@/lib/supabase/types.generated';
+import {
+  emailDe,
+  emailsSemDuplicatas,
+  telefoneDe,
+  telefonesSemDuplicatas,
+} from '@/lib/prospeccao/contatos';
+import { redesDeUrls } from '@/lib/prospeccao/redes-sociais';
 
 export type Lead = Pick<
   Tables<'prospeccao_leads'>,
@@ -87,17 +94,13 @@ export function fontesDo(lead: Lead) {
 }
 
 export function telefonesDo(lead: Lead) {
-  const porNumero = new Map<string, string>();
-  for (const telefone of [lead.telefone, ...stringsDo(lead.telefones)]) {
-    if (!telefone) continue;
-    const digitos = telefone.replace(/\D/g, '');
-    if (digitos.length >= 10 && !porNumero.has(digitos)) porNumero.set(digitos, telefone);
-  }
-  return [...porNumero.values()];
+  return telefonesSemDuplicatas([lead.telefone, ...stringsDo(lead.telefones)]).map(
+    (valor) => telefoneDe(valor)!.exibicao,
+  );
 }
 
 export function emailsDo(lead: Lead) {
-  return stringsDo(lead.emails);
+  return emailsSemDuplicatas(stringsDo(lead.emails));
 }
 
 export function redesDo(lead: Lead): RedeSocial[] {
@@ -127,8 +130,9 @@ export function redesDo(lead: Lead): RedeSocial[] {
     'pinterest',
   ];
   return ordem.flatMap((rede) => {
-    const perfil = encontradas.find((item) => item.rede === rede);
-    return perfil ? [perfil] : [];
+    return redesDeUrls(
+      encontradas.filter((item) => item.rede === rede).map((item) => item.url),
+    ).filter((item) => item.rede === rede);
   });
 }
 
@@ -149,8 +153,8 @@ export function decisoresDo(lead: Lead): Decisor[] {
         senioridade: opcional('senioridade'),
         linkedin_url: opcional('linkedin_url'),
         localizacao: opcional('localizacao'),
-        email: opcional('email'),
-        telefone: opcional('telefone'),
+        email: emailDe(opcional('email')),
+        telefone: telefoneDe(opcional('telefone'))?.exibicao ?? null,
         fonte: opcional('fonte') ?? 'Perfil profissional público',
       },
     ];
@@ -255,11 +259,7 @@ export function rotuloRede(rede: RedeSocial['rede']) {
 }
 
 export function urlWhatsapp(telefone: string) {
-  let digitos = telefone.replace(/\D/g, '');
-  if ((digitos.length === 10 || digitos.length === 11) && !digitos.startsWith('55')) {
-    digitos = `55${digitos}`;
-  }
-  return digitos.length >= 12 && digitos.length <= 13 ? `https://wa.me/${digitos}` : null;
+  return telefoneDe(telefone)?.whatsapp ?? null;
 }
 
 export function identificadorRede(rede: RedeSocial) {
@@ -279,17 +279,28 @@ function contatosDoSite(lead: Lead) {
 }
 
 export function fonteDoContato(lead: Lead, tipo: 'telefone' | 'email' | 'rede', valor: string) {
-  const site = contatosDoSite(lead);
-  const campo =
-    tipo === 'telefone' ? site.telefones : tipo === 'email' ? site.emails : site.redes_sociais;
-  const encontradoNoSite = Array.isArray(campo)
-    ? campo.some((item) => {
-        if (typeof item === 'string') return item === valor;
-        const registro = item && typeof item === 'object' && !Array.isArray(item) ? item : null;
-        return registro?.url === valor;
+  const chave = (item: string) =>
+    tipo === 'telefone'
+      ? telefoneDe(item)?.numero
+      : tipo === 'email'
+        ? emailDe(item)
+        : redesDeUrls([item])[0]?.url;
+  const corresponde = (fonte: Record<string, Json | undefined>) => {
+    const campo =
+      tipo === 'telefone' ? fonte.telefones : tipo === 'email' ? fonte.emails : fonte.redes_sociais;
+    return (
+      Array.isArray(campo) &&
+      campo.some((item) => {
+        const texto = typeof item === 'string' ? item : objeto(item).url;
+        return typeof texto === 'string' && Boolean(chave(texto)) && chave(texto) === chave(valor);
       })
-    : false;
-  return encontradoNoSite ? 'Site oficial' : 'Google Maps';
+    );
+  };
+  const origens = [];
+  if (corresponde(contatosDoSite(lead))) origens.push('Site da empresa');
+  const mapa = objeto(objeto(lead.dados).mapa_contatos ?? null);
+  if (corresponde(mapa)) origens.push('Google Maps');
+  return origens.length ? origens.join(' · ') : 'Fonte não informada';
 }
 
 export function totalCanaisAcionaveis(lead: Lead) {

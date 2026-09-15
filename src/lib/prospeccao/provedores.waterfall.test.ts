@@ -16,6 +16,7 @@ vi.mock('@/lib/env', () => ({
 
 import { buscarSerpApi } from './descoberta';
 import { prospectarEmpresas } from './provedores';
+import { telefoneDe } from './contatos';
 
 function respostaJson(valor: unknown) {
   return new Response(JSON.stringify(valor), {
@@ -25,6 +26,63 @@ function respostaJson(valor: unknown) {
 }
 
 describe('descoberta híbrida da prospecção', () => {
+  it('combina formatos entre provedores sem duplicar contatos nem atribuir e-mails ao Maps', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url: string | URL) => {
+        const endereco = String(url);
+        if (endereco.includes('api.apify.com/v2/acts/'))
+          return Promise.resolve(
+            respostaJson({ data: { id: 'run', defaultDatasetId: 'dataset', status: 'SUCCEEDED' } }),
+          );
+        if (endereco.includes('api.apify.com/v2/datasets/'))
+          return Promise.resolve(
+            respostaJson([
+              {
+                title: 'Empresa',
+                website: 'https://empresa.example.com',
+                phone: '(31) 3333-4444',
+                phones: ['3133334444', '+5531988881010'],
+                emails: [' CONTATO@EMPRESA.COM.BR ', 'contato@empresa.com.br'],
+              },
+            ]),
+          );
+        if (endereco.includes('serpapi.com/search.json'))
+          return Promise.resolve(
+            respostaJson({
+              local_results: [
+                {
+                  title: 'Empresa',
+                  website: 'https://empresa.example.com',
+                  phone: '+553133334444',
+                  place_id: 'empresa',
+                },
+              ],
+            }),
+          );
+        throw new Error('URL inesperada');
+      }),
+    );
+    const resultado = await prospectarEmpresas({
+      segmento: 'Clínicas',
+      localizacao: 'Belo Horizonte',
+      quantidade: 5,
+    });
+    expect(resultado.leads).toHaveLength(1);
+    expect(resultado.leads[0]!.telefones.map((telefone) => telefoneDe(telefone)?.numero)).toEqual([
+      '553133334444',
+      '5531988881010',
+    ]);
+    expect(resultado.leads[0]!.emails).toEqual(['contato@empresa.com.br']);
+    const mapa = resultado.leads[0]!.dados.mapa_contatos as {
+      telefones: string[];
+      emails?: string[];
+    };
+    expect(mapa.telefones.map((telefone) => telefoneDe(telefone)?.numero)).toEqual([
+      '553133334444',
+    ]);
+    expect(mapa.emails).toBeUndefined();
+  });
   it('usa SerpAPI como radar e Apify como aprofundamento no mesmo lote', async () => {
     const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
       const endereco = String(url);

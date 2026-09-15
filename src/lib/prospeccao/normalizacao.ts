@@ -2,6 +2,7 @@ import 'server-only';
 
 import { LeadProspeccaoSchema, type LeadProspeccaoEntrada } from './schema';
 import { redesDeUrls } from './redes-sociais';
+import { emailsSemDuplicatas, telefonesSemDuplicatas } from './contatos';
 
 export { redesDeUrls } from './redes-sociais';
 
@@ -25,7 +26,7 @@ export function comoRegistro(valor: unknown): Registro | null {
   return valor && typeof valor === 'object' && !Array.isArray(valor) ? (valor as Registro) : null;
 }
 
-function textos(valor: unknown): string[] {
+export function textos(valor: unknown): string[] {
   const valores = Array.isArray(valor) ? valor : [valor];
   return valores.map(texto).filter((item): item is string => Boolean(item));
 }
@@ -91,24 +92,11 @@ export function unicos(valores: Array<string | null | undefined>): string[] {
 }
 
 export function emailsValidos(valor: unknown): string[] {
-  return unicos(
-    textos(valor).map((email) => {
-      const normalizado = email.toLocaleLowerCase('pt-BR');
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizado) ? normalizado : null;
-    }),
-  ).slice(0, 12);
+  return emailsSemDuplicatas(textos(valor)).slice(0, 12);
 }
 
 export function telefonesUnicos(valores: Array<string | null | undefined>): string[] {
-  const vistos = new Set<string>();
-  return valores.flatMap((valor) => {
-    const recebido = texto(valor);
-    if (!recebido) return [];
-    const digitos = recebido.replace(/\D/g, '');
-    if (digitos.length < 10 || digitos.length > 13 || vistos.has(digitos)) return [];
-    vistos.add(digitos);
-    return [recebido];
-  });
+  return telefonesSemDuplicatas(valores);
 }
 
 function redesDo(registroFonte: Registro): RedeSocial[] {
@@ -225,7 +213,7 @@ export function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
   if (!nome) return null;
   const site = siteOficial(registro.website);
   const endereco = texto(registro.address);
-  const telefone = texto(registro.phone);
+  const telefone = telefonesUnicos([texto(registro.phone)])[0] ?? null;
   const base = {
     chave_externa: chaveDo(registro, nome, endereco, site),
     nome,
@@ -248,6 +236,7 @@ export function origemSerp(registro: Registro): LeadProspeccaoEntrada | null {
     descricao: texto(registro.description),
     fontes: ['Google Maps · dados públicos'],
     dados: {
+      mapa_contatos: { telefones: unicos([telefone]) },
       place_id: texto(registro.place_id),
       data_id: texto(registro.data_id),
       horario: registro.operating_hours ?? null,
@@ -267,8 +256,11 @@ export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
   const categorias = Array.isArray(registro.categories)
     ? registro.categories.filter((item): item is string => typeof item === 'string')
     : [];
-  const telefone = texto(registro.phone) ?? texto(registro.phoneUnformatted);
-  const telefones = telefonesUnicos([telefone, ...textos(registro.phones)]).slice(0, 12);
+  const telefones = telefonesUnicos([
+    texto(registro.phone),
+    texto(registro.phoneUnformatted),
+    ...textos(registro.phones),
+  ]).slice(0, 12);
   const base = {
     chave_externa: chaveDo(registro, nome, endereco, site),
     nome,
@@ -278,7 +270,7 @@ export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
     estado: texto(registro.state),
     site_url: site,
     dominio: dominioDe(site),
-    telefone: telefone ?? telefones[0] ?? null,
+    telefone: telefones[0] ?? null,
     telefones,
     emails: emailsValidos(registro.emails),
     redes_sociais: redesDo(registro),
@@ -291,6 +283,11 @@ export function origemApify(registro: Registro): LeadProspeccaoEntrada | null {
     descricao: texto(registro.description),
     fontes: ['Google Maps · dados públicos'],
     dados: {
+      mapa_contatos: {
+        // O ator também rastreia sites. Só o campo do estabelecimento tem
+        // origem Maps conhecida; e-mails e perfis exigem evidência do site.
+        telefones: telefonesUnicos([texto(registro.phone), texto(registro.phoneUnformatted)]),
+      },
       place_id: texto(registro.placeId),
       categoria_secundaria: categorias[1] ?? null,
       categorias,
