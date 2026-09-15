@@ -113,6 +113,12 @@ test('320px: rótulos, contraste, toque e foco preservados nas duas áreas', asy
   }
   const ler = kit.getByRole('button', { name: 'Ler modelo: Briefing de atendimento' });
   await ler.focus();
+  // focus() depois de cliques não ativa necessariamente :focus-visible no Firefox.
+  // Chega ao controle pelo teclado real antes de exigir o anel de foco.
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(ler).toBeFocused();
+  expect(await ler.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
   await page.keyboard.press('Enter');
   await expect(ler).toBeFocused();
   expect(await ler.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe('none');
