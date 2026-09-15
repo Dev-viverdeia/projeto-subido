@@ -78,16 +78,33 @@ test.describe('Retomar o trabalho no quadro', () => {
     test(`preserva busca, filtro, etapa, posição e foco ao voltar pelo ${retorno}`, async ({
       page,
       isMobile,
+      browserName,
     }) => {
       await page.goto('/preview/crm?volume=1');
       await page.getByRole('searchbox', { name: 'Buscar vendas' }).fill('Orbe');
       await page.getByRole('button', { name: 'Com proposta: 26', exact: true }).click();
       const link = page.getByRole('link', { name: 'Orbe Contabilidade 21', exact: true });
-      await link.scrollIntoViewIfNeeded();
-      const antes = await link.evaluate(
-        (el) => el.closest('[data-venda-id]')!.getBoundingClientRect().top,
-      );
+      // Simular a leitura do card, fora da barra fixa e das bordas do viewport.
+      await link.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      let antes: number | null = null;
+      await page.exposeFunction('registrarTopoSaida', (topo: number) => {
+        antes = topo;
+      });
+      // WebKit pode reposicionar o alvo ao clicar. Observar o DOM no clique real,
+      // sem ler o storage ou reutilizar a posição calculada pela implementação.
+      await link.evaluate((el) => {
+        el.addEventListener(
+          'click',
+          () => {
+            void (
+              window as Window & { registrarTopoSaida: (topo: number) => Promise<void> }
+            ).registrarTopoSaida(el.closest('[data-venda-id]')!.getBoundingClientRect().top);
+          },
+          { once: true, capture: true },
+        );
+      });
       await link.click();
+      await expect.poll(() => antes).not.toBeNull();
       await expect(
         page.getByRole('heading', { name: 'Ficha do cliente', exact: true }),
       ).toBeVisible();
@@ -110,11 +127,12 @@ test.describe('Retomar o trabalho no quadro', () => {
           Math.abs(
             (await link.evaluate(
               (el) => el.closest('[data-venda-id]')!.getBoundingClientRect().top,
-            )) - antes,
+            )) - antes!,
           ),
         )
         .toBeLessThan(4);
-      await page.keyboard.press('Tab');
+      // Safari usa Option+Tab para percorrer todos os controles, incluindo botões.
+      await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
       await expect(
         page.getByRole('button', { name: 'Ações de Orbe Contabilidade 21', exact: true }),
       ).toBeFocused();
