@@ -3,6 +3,8 @@ import type { DossieEnriquecido } from '@/lib/crm/enriquecimento';
 import type { DossieLead } from '@/lib/crm/queries';
 import { montarContatosFicha, type CanalFicha } from '@/lib/crm/contatos-ficha';
 import { CopiarCanal } from './CopiarCanal';
+import { EditarContato } from './EditarContato';
+import type { ReactNode } from 'react';
 import styles from './InteligenciaDeContato.module.css';
 
 const ROTULOS: Record<CanalFicha['tipo'], string> = {
@@ -63,9 +65,11 @@ function LinhaCanal({ canal }: { canal: CanalFicha }) {
 export function InteligenciaDeContato({
   lead,
   dossie = null,
+  edicao,
 }: {
   lead: DossieLead;
   dossie?: DossieEnriquecido | null;
+  edicao?: ReactNode;
 }) {
   const contatos = lead.contatos ?? montarContatosFicha(lead, dossie);
   const site = contatos.canais.find((canal) => canal.tipo === 'site');
@@ -82,12 +86,27 @@ export function InteligenciaDeContato({
     <section className={styles.contatos} aria-labelledby="contatos-ficha-titulo">
       <header className={styles.topo}>
         <h2 id="contatos-ficha-titulo">Contatos</h2>
-        {site && (
-          <a href={site.href} target="_blank" rel="noreferrer" tabIndex={0}>
-            <Globe2 size={18} aria-hidden="true" /> Site da empresa{' '}
-            <ExternalLink size={15} aria-hidden="true" />
-          </a>
-        )}
+        <div className={styles.acoesTopo}>
+          {site && (
+            <a href={site.href} target="_blank" rel="noreferrer" tabIndex={0}>
+              <Globe2 size={18} aria-hidden="true" /> Site da empresa{' '}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          )}
+          {edicao ??
+            (lead.edicaoContato && (
+              <EditarContato
+                inicial={{
+                  oportunidade: lead.oportunidade.id,
+                  contatoId: lead.edicaoContato.id,
+                  revisao: lead.edicaoContato.revisao,
+                  nome: lead.contato?.nome ?? '',
+                  telefone: lead.contato?.telefone ?? '',
+                  email: lead.contato?.email ?? '',
+                }}
+              />
+            ))}
+        </div>
       </header>
       {principais.length ? (
         <ul className={styles.lista} aria-label="Contatos principais">
@@ -160,7 +179,9 @@ export function InteligenciaDeContato({
           <ul className={styles.fontes}>
             {comFonte.map((canal) => (
               <li key={canal.href}>
-                <strong>{canal.valor}</strong>
+                <strong>
+                  {ROTULOS[canal.tipo]} · {canal.valor}
+                </strong>
                 {canal.fontes
                   .filter((fonte) => fonte.url)
                   .map((fonte) => (

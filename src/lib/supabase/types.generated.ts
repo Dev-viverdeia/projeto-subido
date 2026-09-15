@@ -964,6 +964,8 @@ export type Database = {
       }
       crm_contatos: {
         Row: {
+          revisao: number
+          telefone_manual: boolean
           atualizado_em: string
           cargo: string | null
           criado_em: string
@@ -976,6 +978,8 @@ export type Database = {
           telefone: string | null
         }
         Insert: {
+          revisao?: number
+          telefone_manual?: boolean
           atualizado_em?: string
           cargo?: string | null
           criado_em?: string
@@ -988,6 +992,8 @@ export type Database = {
           telefone?: string | null
         }
         Update: {
+          revisao?: number
+          telefone_manual?: boolean
           atualizado_em?: string
           cargo?: string | null
           criado_em?: string
@@ -4328,6 +4334,17 @@ export type Database = {
       }
       crm_definir_proxima_acao: {
         Args: { p_acao: string; p_oportunidade: string; p_quando?: string }
+        Returns: boolean
+      }
+      crm_editar_contato: {
+        Args: {
+          p_oportunidade: string
+          p_nome: string
+          p_telefone: string
+          p_email: string
+          p_contato?: string
+          p_revisao?: number
+        }
         Returns: boolean
       }
       crm_iniciar_enriquecimento: {

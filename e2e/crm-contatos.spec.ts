@@ -2,6 +2,83 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test.describe('Contatos da ficha', () => {
+  test('edita em modal, bloqueia repetição e atualiza os canais', async ({ page }) => {
+    await page.goto('/preview/crm-dossie?edicao=1');
+    const secao = page.getByRole('region', { name: 'Contatos', exact: true });
+    const abrir = secao.getByRole('button', { name: 'Editar contato' });
+    await abrir.click();
+    const modal = page.getByRole('dialog', { name: 'Contato principal' });
+    await expect(modal.getByLabel('Nome', { exact: true })).toBeFocused();
+    await modal.getByLabel('Nome', { exact: true }).fill('Ana Lima');
+    await modal.getByLabel('Telefone', { exact: true }).fill('(48) 99999-1234');
+    await modal.getByLabel('E-mail', { exact: true }).fill('ana@exemplo.com');
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .include('[role="dialog"]')
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
+    expect(
+      await modal
+        .getByLabel('Nome', { exact: true })
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeGreaterThanOrEqual(16);
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal.getByRole('button', { name: 'Salvando…' })).toBeDisabled();
+    await page.keyboard.press('Escape');
+    await expect(modal).toBeVisible();
+    await expect(modal).toBeHidden();
+    await expect(secao.getByRole('status').filter({ hasText: 'Contato salvo' })).toBeVisible();
+    await expect(secao.getByRole('link', { name: 'Ligar', exact: true })).toHaveAttribute(
+      'href',
+      'tel:+5548999991234',
+    );
+    await expect(secao.getByText('ana@exemplo.com', { exact: true })).toBeVisible();
+    await expect(abrir).toBeFocused();
+    await abrir.click();
+    await expect(modal.getByLabel('Nome', { exact: true })).toHaveValue('Ana Lima');
+    await modal.getByLabel('Nome', { exact: true }).fill('Não salvar');
+    await modal.getByRole('button', { name: 'Cancelar' }).click();
+    await abrir.click();
+    await expect(modal.getByLabel('Nome', { exact: true })).toHaveValue('Ana Lima');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+  });
+  test('validação e falha preservam edição e permitem tentar de novo', async ({ page }) => {
+    await page.goto('/preview/crm-dossie?edicao=erro');
+    await page.getByRole('button', { name: 'Editar contato' }).click();
+    const modal = page.getByRole('dialog', { name: 'Contato principal' });
+    await modal.getByLabel('E-mail', { exact: true }).fill('invalido');
+    await expect(modal.getByLabel('E-mail', { exact: true })).toHaveValue('invalido');
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal.getByLabel('E-mail', { exact: true })).toBeFocused();
+    await expect(modal.getByText('Digite um e-mail válido.')).toBeVisible();
+    await modal.getByLabel('E-mail', { exact: true }).fill('novo@exemplo.com');
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal.getByRole('alert')).toHaveText('Não foi possível salvar. Tente novamente.');
+    await expect(modal.getByLabel('E-mail', { exact: true })).toHaveValue('novo@exemplo.com');
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal).toBeHidden();
+  });
+  test('adiciona sem nome inventado e bloqueia sobrescrita em conflito', async ({ page }) => {
+    await page.goto('/preview/crm-dossie?edicao=1&contatos=vazio');
+    await page.getByRole('button', { name: 'Adicionar contato' }).click();
+    const modal = page.getByRole('dialog', { name: 'Contato principal' });
+    await modal.getByLabel('Telefone', { exact: true }).fill('(48) 99999-1234');
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Editar contato' })).toBeVisible();
+    await page.goto('/preview/crm-dossie?edicao=conflito');
+    await page.getByRole('button', { name: 'Editar contato' }).click();
+    await modal.getByLabel('Nome', { exact: true }).fill('Ana');
+    await modal.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(modal.getByRole('alert')).toContainText('mudou em outra edição');
+    await expect(modal.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
+    await expect(modal.getByLabel('Nome', { exact: true })).toHaveValue('Ana');
+  });
   test('cadastro acessível sem pesquisa, alternativas e pessoas sob demanda', async ({ page }) => {
     await page.goto('/preview/crm-dossie?pesquisa=pendente');
     const contatos = page.getByRole('region', { name: 'Contatos', exact: true });

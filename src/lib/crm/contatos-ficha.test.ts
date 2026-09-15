@@ -23,6 +23,23 @@ const dossie = (canais: NonNullable<DossieEnriquecido['inteligenciaContato']>['c
   ({ inteligenciaContato: { canais, pessoas: [] } }) as unknown as DossieEnriquecido;
 
 describe('contatos acionáveis da ficha', () => {
+  it('prioriza telefone corrigido manualmente sem validar a coleta antiga', () => {
+    const atual = {
+      ...lead,
+      contato: { ...lead.contato, telefone: '1847894818', telefoneManual: true },
+    };
+    const resultado = montarContatosFicha(atual, null, {
+      telefones: ['1847894818', '1833331234'],
+      dados: { site_contatos: { telefones: ['1847894818', '1833331234'] } },
+    });
+    expect(resultado.canais.filter((canal) => canal.tipo === 'telefone')).toEqual([
+      expect.objectContaining({
+        valor: '(18) 4789-4818',
+        fontes: [{ nome: 'Cadastrado na ficha', url: null }],
+      }),
+    ]);
+    expect(resultado.telefonesOcultos).toBe(true);
+  });
   it('mostra cadastro sem exigir enriquecimento e mantém DDD 55', () => {
     const resultado = montarContatosFicha(lead);
     expect(resultado.canais.map((item) => item.tipo)).toEqual(['telefone', 'email', 'site']);
