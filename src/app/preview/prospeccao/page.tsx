@@ -131,10 +131,44 @@ const LEADS: ComponentProps<typeof ListaResultados>['leads'] = [
   },
 ];
 
+const VARIANTES: ComponentProps<typeof ListaResultados>['leads'] = [
+  {
+    ...LEADS[2]!,
+    id: '55555555-5555-4555-8555-555555555555',
+    nome: 'Empresa sem contato',
+    telefone: null,
+    telefones: [],
+    cidade: null,
+    estado: null,
+  },
+  {
+    ...LEADS[2]!,
+    id: '66666666-6666-4666-8666-666666666666',
+    nome: 'Empresa nas redes',
+    telefone: null,
+    telefones: [],
+    redes_sociais: [{ rede: 'facebook', url: 'https://facebook.com/empresa-ficticia' }],
+  },
+  {
+    ...LEADS[2]!,
+    id: '77777777-7777-4777-8777-777777777777',
+    nome: 'Clínica Modelo de Atendimento Integrado, Reabilitação e Cuidados Especializados',
+    telefone: null,
+    telefones: [],
+    emails: ['relacionamento.corporativo@clinica-modelo-de-atendimento.example.com'],
+  },
+];
+
 export default async function PreviewProspeccaoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ espera?: string; vazio?: string; resultado?: string; retomada?: string }>;
+  searchParams: Promise<{
+    espera?: string;
+    vazio?: string;
+    resultado?: string;
+    retomada?: string;
+    cartoes?: string;
+  }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
@@ -240,7 +274,9 @@ export default async function PreviewProspeccaoPage({
                     </span>
                   </div>
                 </header>
-                <ListaResultados leads={LEADS} />
+                <ListaResultados
+                  leads={parametros.cartoes === '1' ? [...LEADS, ...VARIANTES] : LEADS}
+                />
               </div>
             </section>
           )}

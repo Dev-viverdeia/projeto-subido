@@ -9,6 +9,7 @@ export default defineConfig({
     'kit-projeto.spec.ts',
     'recursos-aula.spec.ts',
     'controles-contraste.spec.ts',
+    'prospeccao-resultados.spec.ts',
   ],
   projects: [
     ...base.projects!,
