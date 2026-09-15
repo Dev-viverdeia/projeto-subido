@@ -4,6 +4,7 @@ import {
   emailsSemDuplicatas,
   telefoneDe,
   telefonesSemDuplicatas,
+  VERSAO_COLETA_TELEFONES,
 } from '@/lib/prospeccao/contatos';
 import { redesDeUrls } from '@/lib/prospeccao/redes-sociais';
 
@@ -94,8 +95,28 @@ export function fontesDo(lead: Lead) {
 }
 
 export function telefonesDo(lead: Lead) {
-  return telefonesSemDuplicatas([lead.telefone, ...stringsDo(lead.telefones)]).map(
-    (valor) => telefoneDe(valor)!.exibicao,
+  const dados = objeto(lead.dados);
+  const site = objeto(dados.site_contatos ?? null);
+  const mapa = objeto(dados.mapa_contatos ?? null);
+  // O extrator antigo podia recortar IDs de imagens como telefones. Um formato
+  // plausível não recupera a evidência perdida; não oferecer esses números como canal.
+  const antigos = new Set(
+    site.versao_telefones === VERSAO_COLETA_TELEFONES
+      ? []
+      : stringsDo(site.telefones ?? []).map((valor) => telefoneDe(valor)?.numero),
+  );
+  const doMapa = new Set(stringsDo(mapa.telefones ?? []).map((valor) => telefoneDe(valor)?.numero));
+  return telefonesSemDuplicatas([lead.telefone, ...stringsDo(lead.telefones)])
+    .filter(
+      (valor) => !antigos.has(telefoneDe(valor)?.numero) || doMapa.has(telefoneDe(valor)?.numero),
+    )
+    .map((valor) => telefoneDe(valor)!.exibicao);
+}
+
+export function temTelefonesLegadosOcultos(lead: Lead) {
+  return (
+    telefonesSemDuplicatas([lead.telefone, ...stringsDo(lead.telefones)]).length >
+    telefonesDo(lead).length
   );
 }
 
