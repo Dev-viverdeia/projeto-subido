@@ -126,8 +126,8 @@ test('320px: rótulos, contraste, toque e foco preservados nas duas áreas', asy
   expect(scanAberto.violations).toEqual([]);
 });
 
-test('larguras intermediárias mantêm conteúdo e botões sem corte', async ({ page }, info) => {
-  for (const width of [390, 768, 1100, 1440]) {
+for (const width of [390, 768, 1100, 1440]) {
+  test(`${width}px: kit mantém conteúdo e botões sem corte`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: 900 });
     const kit = await abrirKit(page);
     await kit.getByRole('button', { name: 'Arquivos e ferramentas', exact: true }).click();
@@ -142,5 +142,5 @@ test('larguras intermediárias mantêm conteúdo e botões sem corte', async ({ 
       await kit.scrollIntoViewIfNeeded();
       await page.screenshot({ path: info.outputPath(`kit-${width}.png`) });
     }
-  }
-});
+  });
+}

@@ -101,7 +101,7 @@ describe('Leitura visual de reuniões', () => {
       'true',
     );
     expect(screen.getByText(roteiro.trilhaDidatica!.aulas[2]!.exercicio)).toBeVisible();
-    await user.click(screen.getByText('Recursos desta aula', { selector: 'summary' }));
+    expect(screen.getByRole('region', { name: 'Recursos desta aula' })).toBeVisible();
     expect(screen.getByText('Ficha factual pós-call')).toBeVisible();
     expect(valor.acoes.alternarEtapa).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Concluir aula' }));

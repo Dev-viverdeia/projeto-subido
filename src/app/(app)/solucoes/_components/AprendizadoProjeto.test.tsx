@@ -64,8 +64,7 @@ function montar(concluidas: number[] = []) {
 
 const titulo = (indice: number) =>
   screen.getByRole('heading', { level: 3, name: trilha.aulas[indice]!.titulo });
-const recursos = () =>
-  screen.getByText('Recursos desta aula', { selector: 'summary' }).closest('details')!;
+const recursos = () => screen.getByRole('region', { name: 'Recursos desta aula' });
 
 describe('Aula em foco', () => {
   it('navega em ordem sem concluir aulas e traz o foco ao título', async () => {
@@ -85,8 +84,9 @@ describe('Aula em foco', () => {
   it('fecha o índice ao escolher uma aula e reinicia os recursos da nova aula', async () => {
     const user = userEvent.setup();
     montar();
-    await user.click(within(recursos()).getByText('Recursos desta aula', { selector: 'summary' }));
-    expect(recursos()).toHaveAttribute('open');
+    const mapa = within(recursos()).getByText('Mapa da conversa da Nina');
+    await user.click(mapa);
+    expect(mapa.closest('details')).toHaveAttribute('open');
     // JSDOM não calcula container queries. A visibilidade móvel é conferida no navegador.
     const abrir = screen.getByText('Ver aulas').closest('button')!;
     await user.click(abrir);
@@ -97,7 +97,8 @@ describe('Aula em foco', () => {
       'false',
     );
     expect(screen.getByText('Ver aulas').closest('button')).toHaveTextContent('Aula 2 de 3');
-    expect(recursos()).not.toHaveAttribute('open');
+    expect(recursos().querySelector('details[open]')).toBeNull();
+    expect(within(recursos()).queryByText('Mapa da conversa da Nina')).toBeNull();
     await waitFor(() => expect(titulo(1)).toHaveFocus());
     expect(salvar).not.toHaveBeenCalled();
   });

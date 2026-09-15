@@ -1,19 +1,30 @@
 'use client';
 
 import { useId, useMemo, useState } from 'react';
-import { BookOpenText, Check, ExternalLink, FileText, ListChecks, Network } from 'lucide-react';
+import {
+  BookOpenText,
+  Check,
+  ChevronDown,
+  Download,
+  ExternalLink,
+  FileText,
+  ListChecks,
+  Network,
+  RotateCcw,
+} from 'lucide-react';
 import type { RoteiroProjeto } from '@/lib/projetos/roteiro';
-import { BotaoCopiar } from '../../_components/BotaoCopiar';
+import { nomeArquivoMaterial } from '@/lib/projetos/kit-visual';
+import { MaterialProjeto } from './MaterialProjeto';
 import styles from './RecursosAula.module.css';
 
 type Trilha = NonNullable<RoteiroProjeto['trilhaDidatica']>;
 type Recurso = Trilha['aulas'][number]['recursos'][number];
 
 const ROTULOS = {
-  mapa_mental: { rotulo: 'Mapa mental', acao: 'Ver mapa', Icone: Network },
-  quiz: { rotulo: 'Quiz', acao: 'Responder quiz', Icone: ListChecks },
-  ebook: { rotulo: 'E-book', acao: 'Ler guia', Icone: BookOpenText },
-  modelo: { rotulo: 'Modelo', acao: 'Usar modelo', Icone: FileText },
+  mapa_mental: { rotulo: 'Mapa mental', Icone: Network },
+  quiz: { rotulo: 'Autoavaliação', Icone: ListChecks },
+  ebook: { rotulo: 'Guia', Icone: BookOpenText },
+  modelo: { rotulo: 'Modelo', Icone: FileText },
 } as const;
 
 type EtapaMapa = { titulo: string; detalhes: string[] };
@@ -104,13 +115,14 @@ function Quiz({ titulo, conteudo }: { titulo: string; conteudo: string }) {
 
   return (
     <div className={styles.quiz}>
+      {orientacao.length > 0 ? <p className={styles.orientacao}>{orientacao.join('\n')}</p> : null}
       <div className={styles.quizProgresso}>
         <span>
-          <strong>{respondidas}</strong> de {perguntas.length} respondidas
+          <strong>{respondidas}</strong> de {perguntas.length} respondidas · sem nota
         </span>
         <span
           role="progressbar"
-          aria-label={`Progresso do quiz ${titulo}`}
+          aria-label={`Progresso da autoavaliação ${titulo}`}
           aria-valuemin={0}
           aria-valuemax={perguntas.length}
           aria-valuenow={respondidas}
@@ -131,6 +143,7 @@ function Quiz({ titulo, conteudo }: { titulo: string; conteudo: string }) {
                   aria-pressed={respostas[indice] === true}
                   onClick={() => setRespostas((atual) => ({ ...atual, [indice]: true }))}
                 >
+                  {respostas[indice] === true ? <Check size={16} aria-hidden="true" /> : null}
                   Sim
                 </button>
                 <button
@@ -138,6 +151,7 @@ function Quiz({ titulo, conteudo }: { titulo: string; conteudo: string }) {
                   aria-pressed={respostas[indice] === false}
                   onClick={() => setRespostas((atual) => ({ ...atual, [indice]: false }))}
                 >
+                  {respostas[indice] === false ? <Check size={16} aria-hidden="true" /> : null}
                   Ainda não
                 </button>
               </div>
@@ -147,17 +161,21 @@ function Quiz({ titulo, conteudo }: { titulo: string; conteudo: string }) {
       </ol>
 
       {completo ? (
-        <output className={styles.resultadoQuiz} data-ajustes={ajustes > 0 || undefined}>
-          <Check size={17} strokeWidth={1.8} aria-hidden="true" />
-          <span>
+        <div className={styles.resultadoQuiz}>
+          <output>
             <strong>
               {ajustes === 0
-                ? 'Revisão concluída. Você pode seguir.'
-                : `${ajustes} ${ajustes === 1 ? 'ponto pede' : 'pontos pedem'} ajuste.`}
+                ? 'Você marcou todos os pontos como prontos.'
+                : `${ajustes} ${ajustes === 1 ? 'ponto para revisar.' : 'pontos para revisar.'}`}
             </strong>
-            {ajustes > 0 && orientacao.length > 0 ? <small>{orientacao.join(' ')}</small> : null}
-          </span>
-        </output>
+            <span>Essa revisão não conclui a aula.</span>
+          </output>
+        </div>
+      ) : null}
+      {respondidas > 0 ? (
+        <button type="button" className={styles.refazer} onClick={() => setRespostas({})}>
+          <RotateCcw size={16} aria-hidden="true" /> Refazer autoavaliação
+        </button>
       ) : null}
     </div>
   );
@@ -196,46 +214,91 @@ function ConteudoRecurso({ recurso }: { recurso: Recurso }) {
   }
   if (recurso.tipo === 'ebook') return <TextoLongo conteudo={recurso.conteudo} />;
 
-  return (
-    <div className={styles.modelo}>
-      <BotaoCopiar texto={recurso.conteudo} rotuloDoQue={recurso.titulo} />
-      <pre>{recurso.conteudo}</pre>
-    </div>
-  );
+  return null;
 }
 
 function CartaoRecurso({ recurso }: { recurso: Recurso }) {
-  const { rotulo, acao, Icone } = ROTULOS[recurso.tipo];
+  const { rotulo, Icone } = ROTULOS[recurso.tipo];
+  const id = useId();
+  const temConteudo = Boolean(recurso.conteudo?.trim());
+  const url = enderecoRecurso(recurso.url);
+  const cabecalho = (
+    <>
+      <span className={styles.icone} aria-hidden="true">
+        <Icone size={22} strokeWidth={1.7} />
+      </span>
+      <span className={styles.titulo}>
+        <small>{rotulo}</small>
+        <strong id={id}>{recurso.titulo}</strong>
+      </span>
+    </>
+  );
+  const origem = url ? (
+    <a className={styles.linkExterno} href={url} target="_blank" rel="noopener noreferrer">
+      Abrir arquivo original <ExternalLink size={16} aria-hidden="true" />
+      <span className={styles.srOnly}> (nova aba)</span>
+    </a>
+  ) : null;
+
+  if (recurso.tipo === 'modelo' && temConteudo) {
+    return (
+      <div className={styles.modelo}>
+        <MaterialProjeto
+          nivelTitulo={5}
+          titulo={recurso.titulo}
+          conteudo={recurso.conteudo!}
+          quandoUsar={recurso.descricao}
+        />
+        {origem}
+      </div>
+    );
+  }
 
   return (
-    <article className={styles.cartao} data-tipo={recurso.tipo}>
-      <header>
-        <span className={styles.icone} aria-hidden="true">
-          <Icone size={18} strokeWidth={1.7} />
-        </span>
-        <div>
-          <small>{rotulo}</small>
-          <strong>{recurso.titulo}</strong>
-          <p>{recurso.descricao}</p>
-        </div>
-      </header>
-
-      {recurso.url ? (
-        <a href={recurso.url} target="_blank" rel="noreferrer">
-          {acao} <ExternalLink size={14} strokeWidth={1.8} aria-hidden="true" />
-        </a>
-      ) : null}
-
-      {recurso.conteudo ? (
+    <article className={styles.cartao} data-tipo={recurso.tipo} aria-labelledby={id}>
+      {temConteudo ? (
         <details className={styles.detalhe}>
-          <summary>{acao}</summary>
+          <summary>
+            {cabecalho}
+            <ChevronDown size={19} aria-hidden="true" />
+          </summary>
           <div className={styles.conteudo}>
+            {recurso.descricao ? <p className={styles.descricao}>{recurso.descricao}</p> : null}
             <ConteudoRecurso recurso={recurso} />
           </div>
         </details>
+      ) : (
+        <header className={styles.semConteudo}>{cabecalho}</header>
+      )}
+      {recurso.tipo === 'ebook' && temConteudo ? (
+        <a
+          className={styles.download}
+          href={`data:text/plain;charset=utf-8,${encodeURIComponent(recurso.conteudo!)}`}
+          download={nomeArquivoMaterial(recurso.titulo)}
+          aria-label={`Baixar .txt: ${recurso.titulo}`}
+        >
+          <Download size={17} aria-hidden="true" />
+          Baixar .txt
+        </a>
+      ) : null}
+      {origem}
+      {!temConteudo ? (
+        <p className={styles.vazio}>
+          {url ? recurso.descricao : 'O conteúdo deste recurso ainda não foi adicionado.'}
+        </p>
       ) : null}
     </article>
   );
+}
+
+function enderecoRecurso(valor?: string) {
+  if (!valor) return null;
+  try {
+    const url = new URL(valor);
+    return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
+  } catch {
+    return null;
+  }
 }
 
 export function RecursosAula({
@@ -250,6 +313,7 @@ export function RecursosAula({
 
   return (
     <section
+      data-recursos-aula
       className={styles.raiz}
       data-compacto={compacto || undefined}
       aria-labelledby={compacto ? undefined : tituloId}
@@ -257,11 +321,7 @@ export function RecursosAula({
     >
       {!compacto ? (
         <header className={styles.cabecalho}>
-          <div>
-            <p>Para consultar e aplicar</p>
-            <h4 id={tituloId}>Recursos desta aula</h4>
-          </div>
-          <span>{recursos.length} recursos</span>
+          <h4 id={tituloId}>Recursos desta aula</h4>
         </header>
       ) : null}
       <div className={styles.grade}>
