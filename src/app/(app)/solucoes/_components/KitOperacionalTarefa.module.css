@@ -124,10 +124,9 @@
   border-radius: var(--app-radius-control);
   font: 600 var(--via-fs-xs) var(--via-font);
   cursor: pointer;
+  touch-action: manipulation;
   transition:
     border-color var(--app-t-state),
-    background-color var(--app-t-state),
-    color var(--app-t-state),
     transform var(--app-t-touch);
 }
 

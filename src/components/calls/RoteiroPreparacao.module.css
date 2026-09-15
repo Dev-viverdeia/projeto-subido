@@ -39,18 +39,22 @@
   font-size: var(--app-fs-ui);
   font-weight: var(--via-fw-medium);
   cursor: pointer;
-  transition:
-    background-color var(--app-t-state),
-    color var(--app-t-state);
+  touch-action: manipulation;
+  /* Inverter fundo e texto por interpolação produzia 2.33:1 durante a seleção.
+     As cores mudam juntas; só a elevação acompanha o gesto. */
+  transition: box-shadow var(--app-t-state);
 }
-.momentos button:hover {
-  background: var(--via-bg-2);
-  color: var(--via-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .momentos button:hover {
+    background: var(--via-bg-2);
+    color: var(--via-text-primary);
+  }
 }
 .momentos button[aria-pressed='true'] {
   border-color: var(--via-navy);
   background: var(--via-navy);
   color: var(--via-white);
+  box-shadow: var(--via-shadow-sm);
 }
 .painel {
   padding: var(--app-pad-card);
@@ -237,6 +241,7 @@
 .proximo p {
   margin: var(--via-space-2) 0 0;
 }
+.momentos button:focus-visible,
 .roteiro button:focus-visible,
 .roteiro summary:focus-visible,
 .pergunta h3:focus {

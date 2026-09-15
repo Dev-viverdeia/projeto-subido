@@ -81,9 +81,21 @@ describe('Material pronto para usar', () => {
     const botao = screen.getByRole('button', { name: `Copiar ${material.titulo}` });
     await user.click(botao);
     expect(botao).toBeDisabled();
+    expect(botao).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('link')).toBeVisible();
     unmount();
     resolver();
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
+  });
+  it('encerra o estado ocupado ao copiar e continua permitindo ler o material', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+    render(<MaterialProjeto {...material} />);
+    const botao = screen.getByRole('button', { name: `Copiar ${material.titulo}` });
+    await user.click(botao);
+    expect(botao).toHaveAttribute('aria-busy', 'false');
+    expect(botao).not.toBeDisabled();
+    await user.click(screen.getByRole('button', { name: `Ler modelo: ${material.titulo}` }));
+    expect(screen.getByRole('region').textContent).toBe(material.conteudo);
   });
 });
