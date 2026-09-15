@@ -33,3 +33,5 @@ Cobrir ficha existente, criação e falha, ida pelo modal, voltar da ficha, volt
 Validação local: 72 execuções aprovadas (8 cenários em Chrome, Safari e Firefox, repetidos três vezes, sem retries). A criação é simulada na prévia isolada, sem POST nem alteração de registros. O redirecionamento da ação real possui teste unitário separado. A matriz de acabamento do CI passa a incluir estes cenários.
 
 A revisão encontrou e corrigiu uma segunda rolagem quando a lista em cache era confirmada pelo servidor. O alvo já restaurado não é reposicionado; uma nova saída continua registrando uma nova posição. Há um teste de regressão para essa sequência.
+
+CI 34984196852: 1.856 testes unitários, 132 verificações de interface/acessibilidade e 327 de jornadas aprovados, sem testes intermitentes reportados. O job atingiu o limite total de 30 minutos no Lighthouse, depois de compilar. A janela total do job passou a 40 minutos, sem alterar limites individuais, retries, budgets ou gates. A publicação continua condicionada a uma execução integral aprovada.
