@@ -12,6 +12,7 @@ async function selecaoLegivel(controles: Locator) {
         .map((p) => p.trim()),
     })),
   );
+  expect(transicoes.length).toBeGreaterThan(0);
   for (const controle of transicoes) {
     for (const propriedade of ['all', 'color', 'background', 'background-color']) {
       expect(controle.propriedades, controle.nome ?? '').not.toContain(propriedade);
@@ -54,8 +55,10 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
     const aulas = page.getByRole('navigation', { name: 'Aulas do projeto', exact: true });
     for (const numero of [2, 1]) {
       const menu = page.getByRole('button', { name: /^Aula \d de \d/ });
-      if (await menu.isVisible()) await menu.click();
+      if (!(await aulas.isVisible())) await menu.click();
       await aulas.getByRole('button', { name: new RegExp(`^Aula ${numero}:`) }).click();
+      // No celular, escolher fecha a lista. Reabra antes de medir os controles.
+      if (!(await aulas.isVisible())) await menu.click();
       await selecaoLegivel(aulas.getByRole('button'));
     }
     await selecaoLegivel(page.getByRole('button', { name: 'Concluir aula', exact: true }));
