@@ -18,8 +18,13 @@ import {
 } from '@/lib/crm/quadro-local';
 
 const noServidor = () => '';
+const observarMontagem = () => () => {};
+const noCliente = () => true;
+const antesDaMontagem = () => false;
 
 export function useQuadroVendas(contaId: string) {
+  // O HTML inicial não pode aceitar uma busca antes de os handlers assumirem o campo.
+  const pronto = useSyncExternalStore(observarMontagem, noCliente, antesDaMontagem);
   const snapshot = useCallback(() => lerQuadro(contaId), [contaId]);
   const raw = useSyncExternalStore(observarQuadro, snapshot, noServidor);
   const estado = useMemo(() => interpretarQuadro(raw), [raw]);
@@ -100,5 +105,5 @@ export function useQuadroVendas(contaId: string) {
     return () => cancelAnimationFrame(frame);
   }, [estado.retorno, estado.fase, atualizar]);
 
-  return { estado, atualizar, raiz, guardarSaida };
+  return { estado, atualizar, raiz, guardarSaida, pronto };
 }

@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { renderToString } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { limparQuadrosVendas } from '@/lib/crm/quadro-local';
 import type { OportunidadeCrm } from '@/lib/crm/pipeline-queries';
@@ -35,6 +36,20 @@ const VENDA: OportunidadeCrm = {
 
 describe('Jornada do kanban', () => {
   beforeEach(() => limparQuadrosVendas());
+  it('só aceita busca e filtros quando o quadro está pronto para responder', () => {
+    const html = document.createElement('div');
+    html.innerHTML = renderToString(<PipelineCrm oportunidades={[VENDA]} contaId="teste-crm" />);
+    expect(html.querySelector('input[type="search"]')).toBeDisabled();
+    for (const controle of html.querySelectorAll(
+      '[aria-label="Filtrar vendas"] button, [role="tab"]',
+    )) {
+      expect(controle).toBeDisabled();
+    }
+    render(<PipelineCrm oportunidades={[VENDA]} contaId="teste-crm" />);
+    expect(screen.getByRole('searchbox')).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Todas: 1' })).toBeEnabled();
+    expect(screen.getByRole('tab', { name: 'Preparar: 0' })).toBeEnabled();
+  });
   it('mostra rascunhos no filtro e seleciona a etapa com resultados no celular', async () => {
     const user = userEvent.setup();
     render(

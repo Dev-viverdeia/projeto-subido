@@ -23,6 +23,8 @@ Preferências temporárias por conta e aba, com validade de oito horas e limpeza
 Sem banco, cookies novos, consultas por tecla ou dados comerciais na URL. Armazenar somente
 busca limitada, enums, ID do card e posição; nunca copiar a lista de clientes para o storage.
 Storage bloqueado não pode impedir busca ou navegação. Links diretos continuam funcionando.
+Busca, filtros e etapas só ficam editáveis após a hidratação: o HTML inicial não deve aceitar
+uma interação que ainda não consegue processar. Sem spinner ou espera artificial.
 Não alterar propostas, oportunidades, créditos nem progresso de contas reais na validação.
 
 ## Verificação

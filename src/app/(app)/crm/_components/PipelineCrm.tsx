@@ -67,7 +67,7 @@ export function PipelineCrm({
   oportunidades: OportunidadeCrm[];
   contaId: string;
 }) {
-  const { estado, atualizar, raiz, guardarSaida } = useQuadroVendas(contaId);
+  const { estado, atualizar, raiz, guardarSaida, pronto } = useQuadroVendas(contaId);
   const { filtro, busca, fase: faseMobile } = estado;
   const [itens, setItens] = useState(oportunidades);
   const [originais, setOriginais] = useState(oportunidades);
@@ -304,6 +304,7 @@ export function PipelineCrm({
           aria-label="Quadro de vendas"
         >
           <BarraPrioridades
+            pronto={pronto}
             contagens={contagens}
             filtro={filtro}
             busca={busca}
@@ -314,6 +315,7 @@ export function PipelineCrm({
           />
 
           <AbasPipelineMobile
+            pronto={pronto}
             fases={ativas}
             faseAtiva={faseMobile}
             contagem={(fase) => porFase.get(fase)?.length ?? 0}

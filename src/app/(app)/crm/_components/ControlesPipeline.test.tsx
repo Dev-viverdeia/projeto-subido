@@ -11,6 +11,7 @@ describe('ControlesPipeline', () => {
 
     render(
       <BarraPrioridades
+        pronto
         contagens={{ todas: 8, atencao: 3, sem_acao: 2, proposta: 1 }}
         filtro="todas"
         busca=""
@@ -35,6 +36,7 @@ describe('ControlesPipeline', () => {
 
     render(
       <BarraPrioridades
+        pronto
         contagens={{ todas: 1, atencao: 0, sem_acao: 0, proposta: 0 }}
         filtro="todas"
         busca="Aurora"
@@ -54,6 +56,7 @@ describe('ControlesPipeline', () => {
 
     render(
       <AbasPipelineMobile
+        pronto
         fases={FASES_CRM.filter((fase) => fase.id !== 'desfecho')}
         faseAtiva="entrada"
         contagem={(fase) => ({ entrada: 4, conversa: 2, proposta: 1, ganho: 3, desfecho: 0 })[fase]}
