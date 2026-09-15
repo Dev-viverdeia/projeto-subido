@@ -1,16 +1,13 @@
 import type { ItemSolucao } from '@/lib/conteudo/queries';
 import { BotaoCopiar } from '../../_components/BotaoCopiar';
 import { iniciais } from '../../_components/iniciais';
+import { destinoFerramenta } from '@/lib/projetos/kit-visual';
 import styles from './KitSolucao.module.css';
 
 /**
  * Ferramentas e prompts — o kit de implantação.
  *
- * SEM ÍCONE DE BIBLIOTECA, e a razão é de bundle: estes blocos vivem dentro da
- * `FichaSolucao`, que é cliente por causa do progresso. Um `lucide` importado
- * aqui arrastaria a biblioteca inteira para o navegador por causa de uma chave
- * inglesa. A sigla derivada do nome informa mais que o ícone genérico informava —
- * e é o mesmo tratamento que o card do catálogo dá à mesma ferramenta.
+ * A sigla identifica a ferramenta sem simular um logotipo oficial.
  *
  * O BLOCO DO PROMPT É ESCURO porque é CÓDIGO: monoespaçado sobre navy-deep é a
  * convenção que a pessoa já reconhece de qualquer editor, e a tinta clara sobre
@@ -33,7 +30,13 @@ function VazioCompacto({ texto }: { texto: string }) {
   return <p className={styles.vazio}>{texto}</p>;
 }
 
-export function Ferramentas({ itens }: { itens: ItemSolucao[] }) {
+export function Ferramentas({
+  itens,
+  comLinks = false,
+}: {
+  itens: ItemSolucao[];
+  comLinks?: boolean;
+}) {
   return (
     <section aria-labelledby="ferramentas-titulo" className={styles.secao}>
       <div id="ferramentas-titulo">
@@ -41,22 +44,36 @@ export function Ferramentas({ itens }: { itens: ItemSolucao[] }) {
       </div>
 
       {itens.length === 0 ? (
-        <VazioCompacto texto="Este projeto não depende de ferramenta externa." />
+        <VazioCompacto texto="Nenhuma ferramenta foi listada neste projeto." />
       ) : (
         <ul className={styles.listaFerramentas}>
-          {itens.map((item) => (
-            <li key={item.id} className={styles.ferramenta}>
-              {/* A sigla é decorativa — quem carrega o significado é o nome ao
+          {itens.map((item) => {
+            const destino = comLinks ? destinoFerramenta(item.titulo) : null;
+            return (
+              <li key={item.id} className={styles.ferramenta}>
+                {/* A sigla é decorativa — quem carrega o significado é o nome ao
                   lado. Repeti-la em voz alta não informaria nada. */}
-              <span className={styles.sigla} aria-hidden="true">
-                {iniciais(item.titulo)}
-              </span>
-              <div className={styles.textos}>
-                <p className={styles.nome}>{item.titulo}</p>
-                {item.conteudo && <p className={styles.papel}>{item.conteudo}</p>}
-              </div>
-            </li>
-          ))}
+                <span className={styles.sigla} aria-hidden="true">
+                  {iniciais(item.titulo)}
+                </span>
+                <div className={styles.textos}>
+                  <p className={styles.nome}>{item.titulo}</p>
+                  {item.conteudo && <p className={styles.papel}>{item.conteudo}</p>}
+                  {destino ? (
+                    <a
+                      className={styles.abrir}
+                      href={destino}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Abrir ferramenta: ${item.titulo} (nova aba)`}
+                    >
+                      Abrir ferramenta <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
