@@ -35,7 +35,8 @@ test('autoavaliação preserva respostas ao recolher e não conclui aula', async
   const recursos = await abrirAula(page);
   const abrir = recursos.getByText('Você desenhou uma conversa segura?', { exact: true });
   await abrir.click();
-  const grupos = recursos.getByRole('group');
+  // <details> também possui o papel implícito group. Conte somente as respostas.
+  const grupos = recursos.getByRole('group', { name: /^Resposta:/ });
   const total = await grupos.count();
   expect(total).toBe(5);
   for (let i = 0; i < total; i++) {
@@ -119,7 +120,11 @@ for (const width of [320, 768, 1440]) {
       expect(alvo.largura, alvo.nome ?? '').toBeGreaterThanOrEqual(44);
       expect(alvo.cabe, alvo.nome ?? '').toBe(true);
     }
-    await recursos.scrollIntoViewIfNeeded();
+    // A região aberta pode ser maior que a viewport. Enquadre seu início, não
+    // tente centralizar todo o conteúdo para a captura no WebKit móvel.
+    await recursos
+      .getByRole('heading', { name: 'Recursos desta aula', exact: true })
+      .scrollIntoViewIfNeeded();
     await page.screenshot({ path: info.outputPath(`recursos-${width}.png`) });
   });
 }
