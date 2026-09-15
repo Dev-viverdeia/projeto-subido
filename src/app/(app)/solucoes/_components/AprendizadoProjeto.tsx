@@ -187,12 +187,7 @@ export function AprendizadoProjeto({
                 </div>
                 {!exemplo ? <span>{aula.objetivo}</span> : null}
               </header>
-              <details className={`${styles.detalheApoio} ${styles.recursosEmFoco}`}>
-                <summary>
-                  Recursos desta aula <ChevronDown size={16} aria-hidden="true" />
-                </summary>
-                <RecursosAula recursos={aula.recursos} compacto />
-              </details>
+              <RecursosAula recursos={aula.recursos} />
               {exemplo ? (
                 <>
                   <div className={styles.exemploAula}>

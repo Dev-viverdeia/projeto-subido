@@ -742,24 +742,6 @@
   color: var(--via-text-primary);
 }
 
-.recursosEmFoco {
-  padding-inline: var(--via-space-4);
-  border: 1px solid var(--app-elev-1-line);
-  border-radius: var(--app-radius-control);
-  background: var(--app-elev-1-bg);
-  box-shadow: var(--app-elev-1-shadow);
-}
-
-.recursosEmFoco[open] {
-  padding-bottom: var(--via-space-4);
-}
-
-.recursosEmFoco > summary:focus-visible {
-  outline: none;
-  border-radius: var(--app-radius-chip);
-  box-shadow: var(--app-ring);
-}
-
 .detalheApoio[open] > summary svg,
 .bibliotecaApoio[open] > summary svg,
 .kitProjeto[open] > summary svg {

@@ -242,7 +242,7 @@ describe('Projeto guiado', () => {
     });
     expect(progressoAprendizado.parentElement).toHaveTextContent('0 de 2 aulas');
     expect(progressoAprendizado).toHaveAttribute('aria-valuenow', '0');
-    await user.click(screen.getAllByText('Recursos desta aula')[0]!);
+    expect(screen.getByRole('region', { name: 'Recursos desta aula' })).toBeVisible();
     expect(screen.getByText('Mapa da conversa')).toBeDefined();
 
     await user.click(screen.getByText('Ver caso de referência e modelos'));

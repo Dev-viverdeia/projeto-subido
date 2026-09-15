@@ -11,12 +11,15 @@ export function MaterialProjeto({
   conteudo,
   quandoUsar,
   tipo = 'modelo',
+  nivelTitulo = 3,
 }: {
   titulo: string;
   conteudo: string;
   quandoUsar?: string;
   tipo?: 'modelo' | 'prompt';
+  nivelTitulo?: 3 | 5;
 }) {
+  const Titulo = nivelTitulo === 5 ? 'h5' : 'h3';
   const id = useId();
   const [aberto, setAberto] = useState(false);
   const [estado, setEstado] = useState<'pronto' | 'copiando' | 'copiado' | 'erro'>('pronto');
@@ -48,7 +51,7 @@ export function MaterialProjeto({
         <span className={kit.documento} aria-hidden="true">
           {tipo === 'prompt' ? <MessageSquareText size={24} /> : <FileText size={24} />}
         </span>
-        <h3 id={`${id}-titulo`}>
+        <Titulo id={`${id}-titulo`}>
           {temConteudo ? (
             <button
               type="button"
@@ -64,7 +67,7 @@ export function MaterialProjeto({
           ) : (
             titulo
           )}
-        </h3>
+        </Titulo>
         {temConteudo ? (
           <div className={kit.acoesMaterial}>
             <button
