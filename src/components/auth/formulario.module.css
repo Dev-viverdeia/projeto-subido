@@ -25,6 +25,20 @@
   gap: var(--via-space-5);
 }
 
+/* A entrada ainda renderizava campos em 14px no celular, fora da escala
+   confortável de preenchimento. A regra serve também a cadastro e recuperação. */
+.campos :global(.via-input input) {
+  font-size: var(--via-fs-body);
+}
+
+.campos :global(.via-input) {
+  min-height: 48px;
+}
+
+.campos :global(.via-input__label) {
+  font-size: var(--app-fs-support);
+}
+
 .separador {
   display: flex;
   align-items: center;

@@ -87,6 +87,11 @@
   max-width: 400px;
 }
 
+.caixa :global(.via-btn) {
+  min-height: 48px;
+  font-size: var(--app-fs-ui);
+}
+
 @media (min-width: 900px) {
   .grade {
     grid-template-rows: none;

@@ -1,6 +1,23 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+test('entrada e cadastro mantêm campos legíveis no celular', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const rota of ['/entrar', '/criar-conta', '/recuperar-senha']) {
+    await page.goto(rota);
+    const campos = page.locator('main input:not([type="hidden"])');
+    expect(await campos.count()).toBeGreaterThan(0);
+    for (const campo of await campos.all()) {
+      expect(
+        await campo.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+      ).toBeGreaterThanOrEqual(16);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      391,
+    );
+  }
+});
+
 test('Escape recolhe a lista antes de fechar o formulário', async ({ page }) => {
   await page.goto('/preview/shell?tela=controles');
   const abrir = page.getByRole('button', { name: 'Editar dados', exact: true });
@@ -24,7 +41,7 @@ test('Escape recolhe a lista antes de fechar o formulário', async ({ page }) =>
   expect(await page.locator('body').evaluate((el) => el.style.overflow)).toBe('');
 });
 
-test('Tab circula no formulário e mantém o foco visível', async ({ page }) => {
+test('Tab circula no formulário e mantém o foco visível', async ({ page, browserName }) => {
   await page.goto('/preview/shell?tela=controles');
   await page.getByRole('button', { name: 'Editar dados', exact: true }).click();
   const dialogo = page.getByRole('dialog', { name: 'Editar dados', exact: true });
@@ -38,6 +55,15 @@ test('Tab circula no formulário e mantém o foco visível', async ({ page }) =>
   expect(await fechar.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
   await expect(fechar).not.toHaveCSS('box-shadow', 'none');
   await fechar.press('Tab');
+  if (browserName === 'firefox') {
+    // O Firefox inclui regiões roláveis na ordem nativa do teclado. Preserva
+    // esse acesso e verifica que o foco continua visível e dentro do modal.
+    const corpo = dialogo.locator('.via-modal__body');
+    await expect(corpo).toBeFocused();
+    expect(await corpo.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+    await expect(corpo).not.toHaveCSS('box-shadow', 'none');
+    await corpo.press('Tab');
+  }
   await expect(dialogo.getByRole('textbox', { name: 'Empresa', exact: true })).toBeFocused();
 });
 

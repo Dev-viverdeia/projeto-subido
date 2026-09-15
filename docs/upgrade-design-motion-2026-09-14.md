@@ -77,6 +77,8 @@ Na homologação foram reproduzidos e corrigidos dois defeitos que os testes de 
 
 O fundo do aplicativo fica inerte durante o modal e recupera seu estado ao fechar. O foco retorna ao botão de origem depois dessa liberação. A descrição visível passa a ser associada ao diálogo por `aria-describedby`, sem repetir texto na tela. A biblioteca vendorizada continua intacta.
 
-Há testes de regressão de componente e uma matriz dedicada de 24 verificações em Chromium desktop, WebKit móvel e Firefox desktop, integrada ao CI. Ela cobre Escape, Tab, foco, tela curta, movimento reduzido, convite completo, estabilidade do cabeçalho de Projetos e análise automatizada de acessibilidade de Projetos e Suporte.
+Na versão de homologação, os campos de entrada foram medidos em 14px no celular. A moldura de entrada, cadastro e recuperação agora usa campos de 16px e controles de 48px, sem mudar o fluxo de autenticação.
+
+Há testes de regressão de componente e uma matriz dedicada de 27 verificações em Chromium desktop, WebKit móvel e Firefox desktop, integrada ao CI. Ela cobre Escape, Tab, foco, tela curta, movimento reduzido, convite completo, leitura dos campos de entrada, estabilidade do cabeçalho de Projetos e análise automatizada de acessibilidade de Projetos e Suporte. A suíte local completa da continuação aprovou 1.785 testes, com as 34 exclusões pré-existentes preservadas.
 
 **Limite:** a matriz é automação de navegador, não um teste em iPhone físico, VoiceOver ou uma certificação integral de acessibilidade. A publicação continua condicionada aos gates do repositório.
