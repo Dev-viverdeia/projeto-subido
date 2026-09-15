@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import { obterDossieLead } from '@/lib/crm/queries';
 import { etapaAberta } from '@/lib/crm/etapas';
 import { estaNoFluxo } from '@/lib/crm/situacao';
@@ -13,6 +11,7 @@ import { FormularioEnriquecimento } from './_components/FormularioEnriquecimento
 import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import { ResumoSalvoMaterial } from './_components/ResumoSalvoMaterial';
+import { VoltarDaFicha } from './_components/VoltarDaFicha';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Ficha do cliente · Vendas' };
@@ -40,10 +39,7 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       : null;
   return (
     <div className={styles.pagina}>
-      <Link href="/vendas" className={styles.voltar}>
-        <ArrowLeft size={15} strokeWidth={1.9} aria-hidden="true" />
-        Voltar para Vendas
-      </Link>
+      <VoltarDaFicha parametros={parametros} />
 
       <CabecalhoDossie
         lead={lead}

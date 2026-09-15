@@ -16,6 +16,7 @@ import {
   reservarListaProspeccao,
 } from './admin';
 import { BuscaProspeccaoSchema, CanalContatoProspeccaoSchema } from './schema';
+import { hrefFichaProspeccao, origemProspeccao } from './retorno';
 
 export type EstadoBuscaProspeccao = {
   erro?: string;
@@ -144,7 +145,13 @@ export async function enviarLeadAoCrm(formData: FormData): Promise<void> {
   revalidatePath('/prospeccao');
   revalidatePath('/crm');
   revalidarDirecaoOperacional();
-  redirect(`/vendas/${oportunidade.data}?novo=1&origem=prospeccao`);
+  redirect(
+    hrefFichaProspeccao(
+      oportunidade.data,
+      origemProspeccao(formData.get('lista'), lead.data),
+      true,
+    ),
+  );
 }
 
 const registrarTentativaSchema = z.object({

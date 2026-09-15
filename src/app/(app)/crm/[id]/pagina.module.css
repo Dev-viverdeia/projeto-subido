@@ -10,10 +10,11 @@
 .voltar {
   display: inline-flex;
   width: fit-content;
+  min-height: var(--app-h-control);
   align-items: center;
   gap: var(--via-space-2);
   color: var(--via-text-muted);
-  font-size: var(--via-fs-xs);
+  font-size: var(--via-fs-sm);
   text-decoration: none;
 }
 

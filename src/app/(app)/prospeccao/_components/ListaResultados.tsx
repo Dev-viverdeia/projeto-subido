@@ -32,6 +32,7 @@ import {
   type Lead,
 } from './dossie';
 import { ModalDossie } from './ModalDossie';
+import { useRetornoProspeccao } from './useRetornoProspeccao';
 import styles from '../pagina.module.css';
 
 function Canal({
@@ -73,7 +74,16 @@ function Canal({
   );
 }
 
-export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: string }) {
+export function ListaResultados({
+  leads,
+  lista,
+  retomarEmpresa,
+}: {
+  leads: Lead[];
+  lista?: string;
+  retomarEmpresa?: string;
+}) {
+  const raiz = useRetornoProspeccao(lista, retomarEmpresa);
   const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
   const [retornarFoco, setRetornarFoco] = useState<HTMLButtonElement | null>(null);
   const fecharModal = useCallback(() => setSelecionadoId(null), []);
@@ -84,7 +94,12 @@ export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: strin
 
   if (!leads.length) {
     return (
-      <div className={styles.semResultados}>
+      <div
+        ref={raiz}
+        className={styles.semResultados}
+        tabIndex={-1}
+        aria-label="Resultados da Prospecção"
+      >
         <Building2 size={25} strokeWidth={1.5} aria-hidden="true" />
         <h3>Não encontramos empresas novas neste recorte.</h3>
         <p>
@@ -110,7 +125,13 @@ export function ListaResultados({ leads, lista }: { leads: Lead[]; lista?: strin
         </span>
       </div>
 
-      <div className={styles.gradeLeads} role="list" aria-label="Empresas encontradas">
+      <div
+        ref={raiz}
+        className={styles.gradeLeads}
+        role="list"
+        aria-label="Empresas encontradas"
+        tabIndex={-1}
+      >
         {leads.map((lead) => {
           const telefones = telefonesDo(lead);
           const emails = emailsDo(lead);

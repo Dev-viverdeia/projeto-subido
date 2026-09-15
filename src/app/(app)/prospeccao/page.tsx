@@ -4,6 +4,7 @@ import { SlidersHorizontal } from 'lucide-react';
 import { Card, Pill, Spinner } from '@/design-system/via';
 import { prospeccaoEnv } from '@/lib/env';
 import { carregarProspeccao } from '@/lib/prospeccao/queries';
+import { origemProspeccao } from '@/lib/prospeccao/retorno';
 import { RetornoOperacao } from '../_components/RetornoOperacao';
 import { AcompanhamentoBusca } from './_components/AcompanhamentoBusca';
 import { FormularioBusca } from './_components/FormularioBusca';
@@ -193,7 +194,16 @@ export default async function ProspeccaoPage({ searchParams }: PageProps<'/prosp
                     <p>Revise o recorte e crie uma nova lista. O saldo já foi restaurado.</p>
                   </div>
                 ) : (
-                  <ListaResultados leads={leads} lista={listaAtual.id} />
+                  <ListaResultados
+                    key={listaAtual.id}
+                    leads={leads}
+                    lista={listaAtual.id}
+                    retomarEmpresa={
+                      listaPreferida === listaAtual.id
+                        ? origemProspeccao(parametros.lista, parametros.empresa)?.empresa
+                        : undefined
+                    }
+                  />
                 )}
               </>
             ) : (
