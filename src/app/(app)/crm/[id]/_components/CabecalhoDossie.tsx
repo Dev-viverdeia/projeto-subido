@@ -9,6 +9,7 @@ import { AcoesOportunidade } from '../../_components/AcoesOportunidade';
 import { estaNoFluxo, ROTULO_SITUACAO } from '@/lib/crm/situacao';
 import { FormularioEnriquecimento } from './FormularioEnriquecimento';
 import styles from './CabecalhoDossie.module.css';
+import { urlContatoPublica } from '@/lib/crm/contatos-ficha';
 
 export function CabecalhoDossie({
   lead,
@@ -22,6 +23,7 @@ export function CabecalhoDossie({
   projetoSlug?: string | null;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
+  const site = urlContatoPublica(lead.empresa.dominio);
   const noFluxo = estaNoFluxo(lead.oportunidade);
   const faseComercial = noFluxo
     ? lead.oportunidade.etapa === 'ganho'
@@ -84,8 +86,8 @@ export function CabecalhoDossie({
               <MapPin size={14} aria-hidden="true" /> {local}
             </span>
           )}
-          {lead.empresa.dominio && (
-            <a href={`https://${lead.empresa.dominio}`} target="_blank" rel="noreferrer">
+          {site && (
+            <a href={site} target="_blank" rel="noreferrer">
               <Globe2 size={14} aria-hidden="true" /> {lead.empresa.dominio}
             </a>
           )}

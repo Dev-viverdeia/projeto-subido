@@ -4,8 +4,8 @@ import {
   emailsSemDuplicatas,
   telefoneDe,
   telefonesSemDuplicatas,
-  VERSAO_COLETA_TELEFONES,
 } from '@/lib/prospeccao/contatos';
+import { origensDoContato, telefoneLegadoSemEvidencia } from '@/lib/prospeccao/contatos-evidencias';
 import { redesDeUrls } from '@/lib/prospeccao/redes-sociais';
 
 export type Lead = Pick<
@@ -95,21 +95,8 @@ export function fontesDo(lead: Lead) {
 }
 
 export function telefonesDo(lead: Lead) {
-  const dados = objeto(lead.dados);
-  const site = objeto(dados.site_contatos ?? null);
-  const mapa = objeto(dados.mapa_contatos ?? null);
-  // O extrator antigo podia recortar IDs de imagens como telefones. Um formato
-  // plausível não recupera a evidência perdida; não oferecer esses números como canal.
-  const antigos = new Set(
-    site.versao_telefones === VERSAO_COLETA_TELEFONES
-      ? []
-      : stringsDo(site.telefones ?? []).map((valor) => telefoneDe(valor)?.numero),
-  );
-  const doMapa = new Set(stringsDo(mapa.telefones ?? []).map((valor) => telefoneDe(valor)?.numero));
   return telefonesSemDuplicatas([lead.telefone, ...stringsDo(lead.telefones)])
-    .filter(
-      (valor) => !antigos.has(telefoneDe(valor)?.numero) || doMapa.has(telefoneDe(valor)?.numero),
-    )
+    .filter((valor) => !telefoneLegadoSemEvidencia(valor, lead.dados))
     .map((valor) => telefoneDe(valor)!.exibicao);
 }
 
@@ -294,33 +281,8 @@ export function identificadorRede(rede: RedeSocial) {
   }
 }
 
-function contatosDoSite(lead: Lead) {
-  const dados = objeto(lead.dados);
-  return objeto(dados.site_contatos ?? null);
-}
-
 export function fonteDoContato(lead: Lead, tipo: 'telefone' | 'email' | 'rede', valor: string) {
-  const chave = (item: string) =>
-    tipo === 'telefone'
-      ? telefoneDe(item)?.numero
-      : tipo === 'email'
-        ? emailDe(item)
-        : redesDeUrls([item])[0]?.url;
-  const corresponde = (fonte: Record<string, Json | undefined>) => {
-    const campo =
-      tipo === 'telefone' ? fonte.telefones : tipo === 'email' ? fonte.emails : fonte.redes_sociais;
-    return (
-      Array.isArray(campo) &&
-      campo.some((item) => {
-        const texto = typeof item === 'string' ? item : objeto(item).url;
-        return typeof texto === 'string' && Boolean(chave(texto)) && chave(texto) === chave(valor);
-      })
-    );
-  };
-  const origens = [];
-  if (corresponde(contatosDoSite(lead))) origens.push('Site da empresa');
-  const mapa = objeto(objeto(lead.dados).mapa_contatos ?? null);
-  if (corresponde(mapa)) origens.push('Google Maps');
+  const origens = origensDoContato(lead.dados, tipo, valor);
   return origens.length ? origens.join(' · ') : 'Fonte não informada';
 }
 

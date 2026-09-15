@@ -12,6 +12,7 @@ import { PesquisaComercial } from './_components/PesquisaComercial';
 import { ResumoOperacionalLead } from './_components/ResumoOperacionalLead';
 import { ResumoSalvoMaterial } from './_components/ResumoSalvoMaterial';
 import { VoltarDaFicha } from './_components/VoltarDaFicha';
+import { InteligenciaDeContato } from './_components/InteligenciaDeContato';
 import styles from './pagina.module.css';
 
 export const metadata: Metadata = { title: 'Ficha do cliente · Vendas' };
@@ -83,6 +84,7 @@ export default async function OportunidadePage({ params, searchParams }: PagePro
       {typeof parametros.resumo === 'string' && (
         <ResumoSalvoMaterial oportunidade={id} registro={parametros.resumo} />
       )}
+      <InteligenciaDeContato lead={lead} dossie={dossie} />
       <ResumoOperacionalLead lead={lead} />
 
       {emAndamento && (

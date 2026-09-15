@@ -10,15 +10,12 @@ import {
   FileSearch,
   Globe2,
   Lightbulb,
-  Mail,
-  Phone,
 } from 'lucide-react';
 import { ROTULO_CONFIANCA, ROTULO_ORIGEM, type DossieEnriquecido } from '@/lib/crm/enriquecimento';
 import { acaoParaFicha, resumoParaFicha, valorFatoParaFicha } from '@/lib/crm/apresentacao';
 import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
 import { AcaoPesquisaComercial } from './AcaoPesquisaComercial';
-import { InteligenciaDeContato } from './InteligenciaDeContato';
 import { PrepararConversa } from './PrepararConversa';
 import styles from './PesquisaComercial.module.css';
 
@@ -109,12 +106,11 @@ function DadosEFontes({
 }) {
   return (
     <div className={styles.gradeDados}>
-      <InteligenciaDeContato lead={lead} dossie={dossie} />
       <section className={styles.painelLeitura} aria-labelledby="empresa-titulo">
         <header>
           <div>
             <p>Dados cadastrais</p>
-            <h3 id="empresa-titulo">Empresa e contato</h3>
+            <h3 id="empresa-titulo">Sobre a empresa</h3>
           </div>
           <Building2 size={18} strokeWidth={1.7} aria-hidden="true" />
         </header>
@@ -138,22 +134,6 @@ function DadosEFontes({
             </div>
           )}
         </dl>
-        {lead.contato && (
-          <div className={styles.contato}>
-            <strong>{lead.contato.nome}</strong>
-            {lead.contato.cargo && <span>{lead.contato.cargo}</span>}
-            {lead.contato.email && (
-              <a href={`mailto:${lead.contato.email}`}>
-                <Mail size={14} aria-hidden="true" /> {lead.contato.email}
-              </a>
-            )}
-            {lead.contato.telefone && (
-              <a href={`tel:${lead.contato.telefone}`}>
-                <Phone size={14} aria-hidden="true" /> {lead.contato.telefone}
-              </a>
-            )}
-          </div>
-        )}
       </section>
 
       <section className={styles.painelLeitura} aria-labelledby="fontes-titulo">

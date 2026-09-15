@@ -9,6 +9,8 @@ import { lerDossie, lerFontes, type StatusEnriquecimento } from './enriqueciment
 import type { DossieLead, ProjetoDossie } from './dossie-types';
 import { montarOportunidade } from './pipeline-queries';
 import { projetoSugeridoDaProspeccao } from './projeto-sugerido';
+import { montarContatosFicha } from './contatos-ficha';
+import { registroContato } from '@/lib/prospeccao/contatos-evidencias';
 
 export type {
   AcaoPlanoDossie,
@@ -58,6 +60,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     propostaRecente,
     carteira,
     continuidadePosEntrega,
+    contatosProspeccao,
   ] = await Promise.all([
     supabase
       .from('crm_empresas')
@@ -118,6 +121,13 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       .maybeSingle(),
     supabase.from('prospeccao_carteiras').select('saldo').maybeSingle(),
     obterContinuidadePosEntrega(id),
+    supabase
+      .from('prospeccao_leads')
+      .select('telefone, telefones, emails, redes_sociais, decisores, site_url, maps_url, dados')
+      .eq('crm_oportunidade_id', id)
+      .order('enviado_crm_em', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (empresa.error) throw handleError(empresa.error, 'crm:dossie-empresa');
@@ -131,6 +141,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   if (projetosRecentes.error) throw handleError(projetosRecentes.error, 'crm:dossie-projetos');
   if (propostaRecente.error) throw handleError(propostaRecente.error, 'crm:dossie-proposta');
   if (carteira.error) throw handleError(carteira.error, 'crm:dossie-creditos');
+  if (contatosProspeccao.error) throw handleError(contatosProspeccao.error, 'crm:dossie-canais');
 
   const empresaLinha = empresa.data;
   if (!empresaLinha) return null;
@@ -161,7 +172,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   const projetoAtivo =
     projetosRecentes.data?.find((projeto) => projeto.status !== 'concluido') ?? null;
 
-  return {
+  const lead: DossieLead = {
     saldoCreditos: carteira.data?.saldo ?? 30,
     oportunidade: montarOportunidade(
       {
@@ -245,4 +256,11 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
     })),
     totalCalls: calls.count ?? 0,
   };
+  const snapshot = registroContato(empresaLinha.enriquecimento);
+  lead.contatos = montarContatosFicha(
+    lead,
+    lead.enriquecimentos.find((item) => item.status === 'concluido' && item.dossie)?.dossie ?? null,
+    contatosProspeccao.data ?? (snapshot.origem === 'prospeccao' ? snapshot : null),
+  );
+  return lead;
 });
