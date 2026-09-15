@@ -35,7 +35,8 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
       await expect(nav.getByRole('button', { pressed: true })).toHaveCount(1);
       await selecaoLegivel(nav.getByRole('button'));
     }
-    await expect(page.getByRole('heading', { name: 'Combinar o próximo passo' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirmar o acordo' })).toBeVisible();
+    await expect(page.getByText('Confirmar o acordo e iniciar a primeira tarefa.')).toBeVisible();
   });
 
   test(`projeto: abas e conclusão sem inversão intermediária (${reducedMotion})`, async ({
