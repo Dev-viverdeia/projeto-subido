@@ -58,11 +58,24 @@ test('autoavaliação preserva respostas ao recolher e não conclui aula', async
   await expect(
     page.getByRole('progressbar', { name: 'Progresso do aprendizado', exact: true }),
   ).toHaveAttribute('aria-valuenow', '0');
-  const scan = await new AxeBuilder({ page }).include('[data-recursos-aula]').analyze();
-  expect(scan.violations).toEqual([]);
   await recursos.getByRole('button', { name: 'Refazer autoavaliação' }).click();
   await expect(recursos.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
   await expect(recursos.getByRole('button', { pressed: true })).toHaveCount(0);
+});
+
+test('autoavaliação: contraste e semântica das respostas e do resultado', async ({ page }) => {
+  const recursos = await abrirAula(page);
+  await recursos.getByText('Você desenhou uma conversa segura?', { exact: true }).click();
+  const respostas = recursos.getByRole('group', { name: /^Resposta:/ });
+  for (let i = 0; i < 5; i++) {
+    await respostas
+      .nth(i)
+      .getByRole('button', { name: i === 0 ? 'Ainda não' : 'Sim', exact: true })
+      .click();
+  }
+  await expect(recursos.getByRole('status')).toBeVisible();
+  const scan = await new AxeBuilder({ page }).include('[data-recursos-aula]').analyze();
+  expect(scan.violations).toEqual([]);
 });
 
 test('modelo e guia baixam o texto original sem abrir nem concluir a aula', async ({ page }) => {
@@ -92,7 +105,7 @@ test('modelo e guia baixam o texto original sem abrir nem concluir a aula', asyn
 });
 
 for (const width of [320, 768, 1440]) {
-  test(`${width}px: recursos com contraste, toque e leitura sem corte`, async ({ page }, info) => {
+  test(`${width}px: contraste e semântica do guia e do modelo abertos`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const recursos = await abrirAula(page, 1);
@@ -102,6 +115,16 @@ for (const width of [320, 768, 1440]) {
       .click();
     const scan = await new AxeBuilder({ page }).include('[data-recursos-aula]').analyze();
     expect(scan.violations).toEqual([]);
+  });
+
+  test(`${width}px: toque e leitura sem corte`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const recursos = await abrirAula(page, 1);
+    await recursos.getByText('Guia prático de qualificação por fatos', { exact: true }).click();
+    await recursos
+      .getByRole('button', { name: 'Ler modelo: Matriz de qualificação copiável' })
+      .click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
