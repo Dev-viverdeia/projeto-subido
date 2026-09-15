@@ -80,6 +80,8 @@ export type PropostaDossie = {
 };
 
 export type DossieLead = {
+  /** Presente somente quando a leitura do vínculo atual foi concluída. */
+  edicaoContato?: { id: string | null; revisao: number | null };
   /** Canais curados no servidor; não envia o payload bruto dos provedores ao navegador. */
   contatos?: ContatosFicha;
   /** Saldo operacional carregado apenas nas telas que exibem uma operação paga. */
@@ -98,6 +100,7 @@ export type DossieLead = {
     nome: string;
     email: string | null;
     telefone: string | null;
+    telefoneManual?: boolean;
     cargo: string | null;
     linkedinUrl: string | null;
   } | null;

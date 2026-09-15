@@ -108,7 +108,10 @@ export function montarContatosFicha(
     if (tipo === 'telefone') {
       const telefone = telefoneDe(valor);
       if (!telefone) return;
-      if (telefoneLegadoSemEvidencia(valor, dados)) {
+      if (
+        !(origemCanal === 'crm' && lead.contato?.telefoneManual) &&
+        telefoneLegadoSemEvidencia(valor, dados)
+      ) {
         telefonesOcultos = true;
         return;
       }
@@ -144,13 +147,16 @@ export function montarContatosFicha(
             tipo === 'telefone' || tipo === 'email' ? tipo : 'rede',
             canal.href.startsWith('http') ? canal.href : valor,
           );
-    const nomes = fontes.length
-      ? fontes
-      : [
-          origemCanal === 'prospeccao' || doImportado(tipo, valor)
-            ? 'Prospecção · fonte não informada'
-            : 'Cadastrado na ficha',
-        ];
+    const nomes =
+      origemCanal === 'crm' && tipo === 'telefone' && lead.contato?.telefoneManual
+        ? ['Cadastrado na ficha']
+        : fontes.length
+          ? fontes
+          : [
+              origemCanal === 'prospeccao' || doImportado(tipo, valor)
+                ? 'Prospecção · fonte não informada'
+                : 'Cadastrado na ficha',
+            ];
     const fontesDoCanal = nomes.map((nome) => ({
       nome,
       url:

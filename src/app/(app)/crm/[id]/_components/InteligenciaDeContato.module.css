@@ -23,6 +23,12 @@
   font-weight: var(--via-fw-medium);
   letter-spacing: var(--app-ls-h3);
 }
+.acoesTopo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--via-space-2);
+}
 .contatos a,
 .contatos button {
   display: inline-flex;
