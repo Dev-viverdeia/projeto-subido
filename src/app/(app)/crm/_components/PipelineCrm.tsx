@@ -129,6 +129,13 @@ export function PipelineCrm({
     atualizar({ filtro: novo, fase: faseDosResultados(novo, busca), retorno: null });
   }
 
+  function limparFiltros() {
+    atualizar({ busca: '', filtro: 'todas', retorno: null });
+    raiz.current
+      ?.querySelector<HTMLButtonElement>('[aria-label="Filtrar vendas"] button')
+      ?.focus({ preventScroll: true });
+  }
+
   function faseDosResultados(novoFiltro: FiltroPipeline, novaBusca: string): FaseAtiva {
     const resultados = filtrarPipeline(noQuadro, novoFiltro, novaBusca);
     if (resultados.length && !resultados.some((item) => faseDaEtapa(item.etapa) === faseMobile)) {
@@ -316,10 +323,7 @@ export function PipelineCrm({
           {filtradas.length === 0 && (busca || filtro !== 'todas') ? (
             <div className={styles.semResultados}>
               <p role="status">Nenhuma venda encontrada</p>
-              <Button
-                variant="secondary"
-                onClick={() => atualizar({ busca: '', filtro: 'todas', retorno: null })}
-              >
+              <Button variant="secondary" onClick={limparFiltros}>
                 Limpar filtros
               </Button>
             </div>

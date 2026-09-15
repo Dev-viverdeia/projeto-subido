@@ -120,5 +120,6 @@ describe('Jornada do kanban', () => {
     await user.click(screen.getByRole('button', { name: 'Limpar filtros' }));
     expect(screen.getByRole('searchbox')).toHaveValue('');
     expect(screen.getByRole('link', { name: 'Clínica Aurora' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Todas: 1', exact: true })).toHaveFocus();
   });
 });

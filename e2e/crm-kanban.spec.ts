@@ -169,6 +169,7 @@ test.describe('Retomar o trabalho no quadro', () => {
     await expect(page.getByRole('button', { name: 'Todas: 39', exact: true })).toBeFocused();
     await page.getByRole('button', { name: 'Limpar filtros' }).click();
     await expect(page.getByRole('searchbox')).toHaveValue('');
+    await expect(page.getByRole('button', { name: 'Todas: 39', exact: true })).toBeFocused();
     await expect(page.getByRole('link', { name: 'Orbe Contabilidade', exact: true })).toBeVisible();
   });
 
