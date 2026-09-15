@@ -10,6 +10,7 @@ export default defineConfig({
     'recursos-aula.spec.ts',
     'controles-contraste.spec.ts',
     'prospeccao-resultados.spec.ts',
+    'prospeccao-ficha-retorno.spec.ts',
   ],
   projects: [
     ...base.projects!,

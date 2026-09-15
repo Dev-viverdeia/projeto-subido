@@ -47,6 +47,26 @@ describe('da prospecção à ficha', () => {
       `redirect:/prospeccao?crm=erro&lista=${lista}`,
     );
   });
+  it('preserva a empresa e a lista depois de criar a oportunidade', async () => {
+    enviarLeadProspeccaoAoCrm.mockResolvedValue({ data: id, error: null });
+    const dados = new FormData();
+    dados.set('lead', id);
+    dados.set('lista', lista);
+    await expect(enviarLeadAoCrm(dados)).rejects.toThrow(
+      `redirect:/vendas/${id}?novo=1&origem=prospeccao&lista=${lista}&empresa=${id}`,
+    );
+    expect(enviarLeadProspeccaoAoCrm).toHaveBeenCalledExactlyOnceWith('usuario', id);
+  });
+  it('não usa uma URL de retorno ou lista livre enviada pelo formulário', async () => {
+    enviarLeadProspeccaoAoCrm.mockResolvedValue({ data: id, error: null });
+    const dados = new FormData();
+    dados.set('lead', id);
+    dados.set('lista', '//externo.com');
+    dados.set('retorno', 'javascript:alert(1)');
+    await expect(enviarLeadAoCrm(dados)).rejects.toThrow(
+      `redirect:/vendas/${id}?novo=1&origem=prospeccao`,
+    );
+  });
   it('não propaga lista inválida no retorno', async () => {
     enviarLeadProspeccaoAoCrm.mockResolvedValue({ data: null, error: { code: 'XX000' } });
     const dados = new FormData();

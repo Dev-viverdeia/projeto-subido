@@ -1,6 +1,10 @@
 import type { ComponentProps } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { VoltarDaFicha } from '@/app/(app)/crm/[id]/_components/VoltarDaFicha';
+import { origemProspeccao } from '@/lib/prospeccao/retorno';
+import { NavegacaoPreview } from './NavegacaoPreview';
 import { BriefcaseBusiness, ContactRound, GraduationCap, House, Search } from 'lucide-react';
 import { FormularioBusca } from '@/app/(app)/prospeccao/_components/FormularioBusca';
 import { HeroProspeccao } from '@/app/(app)/prospeccao/_components/HeroProspeccao';
@@ -168,10 +172,54 @@ export default async function PreviewProspeccaoPage({
     resultado?: string;
     retomada?: string;
     cartoes?: string;
+    navegacao?: string;
+    ficha?: string;
+    origem?: string;
+    lista?: string;
+    empresa?: string;
+    novo?: string;
+    criado?: string;
+    removida?: string;
   }>;
 }) {
   if (process.env.NODE_ENV === 'production') notFound();
   const parametros = await searchParams;
+  const primeiraLista = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  const segundaLista = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  const lista = parametros.lista === segundaLista ? segundaLista : primeiraLista;
+  const contexto = origemProspeccao(parametros.lista, parametros.empresa);
+  const segunda = lista === segundaLista;
+  const leadsDaLista = segunda
+    ? LEADS.map((lead, indice) => ({
+        ...lead,
+        nome: ['Imobiliária Orbe', 'Imobiliária Porto', 'Imobiliária Horizonte'][indice]!,
+      }))
+    : LEADS;
+  const leads = (parametros.cartoes === '1' ? [...leadsDaLista, ...VARIANTES] : leadsDaLista)
+    .filter((lead) => lead.id !== parametros.removida)
+    .map((lead) =>
+      lead.id === parametros.criado
+        ? { ...lead, crm_oportunidade_id: '99999999-9999-4999-8999-999999999999' }
+        : lead,
+    );
+
+  if (parametros.ficha === '1')
+    return (
+      <main className={styles.conteudo}>
+        <NavegacaoPreview>
+          <VoltarDaFicha parametros={parametros} />
+          <h1>Ficha do cliente</h1>
+          <p>{leads.find((lead) => lead.id === parametros.empresa)?.nome}</p>
+          {contexto && (
+            <Link
+              href={`/prospeccao?${new URLSearchParams({ ...contexto, removida: contexto.empresa })}`}
+            >
+              Simular empresa removida
+            </Link>
+          )}
+        </NavegacaoPreview>
+      </main>
+    );
 
   return (
     <div className={styles.shell}>
@@ -225,60 +273,79 @@ export default async function PreviewProspeccaoPage({
           {parametros.vazio === '1' ? (
             <ListasVazias />
           ) : (
-            <section className={pagina.areaListas} aria-labelledby="preview-listas-titulo">
-              <aside className={pagina.historico}>
-                <div className={pagina.historicoTopo}>
-                  <div>
-                    <h2 id="preview-listas-titulo">Listas</h2>
+            <NavegacaoPreview>
+              <section className={pagina.areaListas} aria-labelledby="preview-listas-titulo">
+                <aside className={pagina.historico}>
+                  <div className={pagina.historicoTopo}>
+                    <div>
+                      <h2 id="preview-listas-titulo">Listas</h2>
+                    </div>
+                    <span>2</span>
                   </div>
-                  <span>2</span>
-                </div>
-                <nav aria-label="Listas de prospecção">
-                  <a href="#resultados" aria-current="page">
-                    <span>
-                      <strong>Clínicas odontológicas</strong>
-                      <small>Belo Horizonte, MG</small>
-                    </span>
-                    <span>
-                      <small>17 ago.</small>
-                      <em data-status="concluida">Concluída</em>
-                    </span>
-                  </a>
-                  <a href="#resultados">
-                    <span>
-                      <strong>Imobiliárias</strong>
-                      <small>Campinas, SP</small>
-                    </span>
-                    <span>
-                      <small>15 ago.</small>
-                      <em data-status="concluida">Concluída</em>
-                    </span>
-                  </a>
-                </nav>
-              </aside>
+                  <nav aria-label="Listas de prospecção">
+                    <Link
+                      href={
+                        parametros.navegacao === '1'
+                          ? `/preview/prospeccao?navegacao=1&lista=${primeiraLista}`
+                          : '#resultados'
+                      }
+                      aria-current={!segunda ? 'page' : undefined}
+                    >
+                      <span>
+                        <strong>Clínicas odontológicas</strong>
+                        <small>Belo Horizonte, MG</small>
+                      </span>
+                      <span>
+                        <small>17 ago.</small>
+                        <em data-status="concluida">Concluída</em>
+                      </span>
+                    </Link>
+                    <Link
+                      href={
+                        parametros.navegacao === '1'
+                          ? `/preview/prospeccao?navegacao=1&lista=${segundaLista}`
+                          : '#resultados'
+                      }
+                      aria-current={segunda ? 'page' : undefined}
+                    >
+                      <span>
+                        <strong>Imobiliárias</strong>
+                        <small>Campinas, SP</small>
+                      </span>
+                      <span>
+                        <small>15 ago.</small>
+                        <em data-status="concluida">Concluída</em>
+                      </span>
+                    </Link>
+                  </nav>
+                </aside>
 
-              <div className={pagina.resultados} id="resultados">
-                <header className={pagina.resultadosTopo}>
-                  <div>
-                    <h2>Clínicas odontológicas</h2>
-                    <span>Belo Horizonte, MG</span>
-                  </div>
-                  <div className={pagina.metricasLista}>
-                    <span>
-                      <strong>3</strong>
-                      encontradas
-                    </span>
-                    <span>
-                      <strong>10</strong>
-                      solicitados
-                    </span>
-                  </div>
-                </header>
-                <ListaResultados
-                  leads={parametros.cartoes === '1' ? [...LEADS, ...VARIANTES] : LEADS}
-                />
-              </div>
-            </section>
+                <div className={pagina.resultados} id="resultados">
+                  <header className={pagina.resultadosTopo}>
+                    <div>
+                      <h2>{segunda ? 'Imobiliárias' : 'Clínicas odontológicas'}</h2>
+                      <span>{segunda ? 'Campinas, SP' : 'Belo Horizonte, MG'}</span>
+                    </div>
+                    <div className={pagina.metricasLista}>
+                      <span>
+                        <strong>3</strong>
+                        encontradas
+                      </span>
+                      <span>
+                        <strong>10</strong>
+                        solicitados
+                      </span>
+                    </div>
+                  </header>
+                  <ListaResultados
+                    key={lista}
+                    leads={leads}
+                    lista={parametros.navegacao === '1' ? lista : undefined}
+                    retomarEmpresa={contexto?.lista === lista ? contexto.empresa : undefined}
+                  />
+                </div>
+              </section>
+            </NavegacaoPreview>
           )}
         </div>
       </main>

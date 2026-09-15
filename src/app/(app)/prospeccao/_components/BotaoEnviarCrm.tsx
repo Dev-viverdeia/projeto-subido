@@ -5,12 +5,15 @@ import { ArrowRight, Check, Plus } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/design-system/via';
 import { enviarLeadAoCrm } from '@/lib/prospeccao/actions';
+import { hrefFichaProspeccao, origemProspeccao } from '@/lib/prospeccao/retorno';
+import { guardarRetornoProspeccao } from '@/lib/prospeccao/retorno-local';
 
 function BotaoPendente({ compacto = false }: { compacto?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
+      data-retorno-ficha
       size={compacto ? 'sm' : 'md'}
       variant="primary"
       loading={pending}
@@ -38,9 +41,19 @@ export function BotaoEnviarCrm({
   // somente o botão submit e o campo oculto continua no formulário pai.
   if (!lead) return <BotaoPendente compacto={compacto} />;
 
+  const origem = origemProspeccao(lista, lead);
+  const guardarSaida = () => {
+    if (origem) guardarRetornoProspeccao(origem);
+  };
+
   if (oportunidade) {
     return (
-      <Link className={className} href={`/vendas/${oportunidade}`}>
+      <Link
+        className={className}
+        href={hrefFichaProspeccao(oportunidade, origem)}
+        onNavigate={guardarSaida}
+        data-retorno-ficha
+      >
         <Check size={15} aria-hidden="true" /> Abrir ficha{' '}
         <ArrowRight size={14} aria-hidden="true" />
       </Link>
@@ -48,7 +61,7 @@ export function BotaoEnviarCrm({
   }
 
   return (
-    <form action={enviarLeadAoCrm} className={className}>
+    <form action={enviarLeadAoCrm} className={className} onSubmit={guardarSaida}>
       <input type="hidden" name="lead" value={lead} />
       {lista && <input type="hidden" name="lista" value={lista} />}
       <BotaoPendente compacto={compacto} />
