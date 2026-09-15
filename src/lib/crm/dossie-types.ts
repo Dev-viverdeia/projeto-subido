@@ -6,6 +6,7 @@ import type {
   StatusEnriquecimento,
 } from './enriquecimento';
 import type { OportunidadeCrm } from './queries';
+import type { ContatosFicha } from './contatos-ficha';
 
 export type ContinuidadePosEntregaDossie = {
   projetoId: string;
@@ -79,6 +80,8 @@ export type PropostaDossie = {
 };
 
 export type DossieLead = {
+  /** Canais curados no servidor; não envia o payload bruto dos provedores ao navegador. */
+  contatos?: ContatosFicha;
   /** Saldo operacional carregado apenas nas telas que exibem uma operação paga. */
   saldoCreditos?: number;
   oportunidade: OportunidadeCrm;

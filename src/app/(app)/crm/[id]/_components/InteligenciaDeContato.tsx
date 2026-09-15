@@ -1,14 +1,14 @@
-import { AtSign, ExternalLink, Globe2, Mail, Phone, Send, UserRoundSearch } from 'lucide-react';
+import { AtSign, ChevronDown, ExternalLink, Globe2, Mail, Phone, UserRound } from 'lucide-react';
 import type { DossieEnriquecido } from '@/lib/crm/enriquecimento';
 import type { DossieLead } from '@/lib/crm/queries';
-import styles from './PesquisaComercial.module.css';
+import { montarContatosFicha, type CanalFicha } from '@/lib/crm/contatos-ficha';
+import { CopiarCanal } from './CopiarCanal';
+import styles from './InteligenciaDeContato.module.css';
 
-type CanalContato = NonNullable<DossieEnriquecido['inteligenciaContato']>['canais'][number];
-
-const ROTULO_CANAL: Record<CanalContato['tipo'], string> = {
-  telefone: 'Telefone / WhatsApp',
+const ROTULOS: Record<CanalFicha['tipo'], string> = {
+  telefone: 'Telefone',
   email: 'E-mail',
-  site: 'Site',
+  site: 'Site da empresa',
   instagram: 'Instagram',
   facebook: 'Facebook',
   linkedin: 'LinkedIn',
@@ -18,182 +18,179 @@ const ROTULO_CANAL: Record<CanalContato['tipo'], string> = {
   pinterest: 'Pinterest',
 };
 
-function IconeCanal({ tipo }: { tipo: CanalContato['tipo'] }) {
-  const Icone =
-    tipo === 'telefone'
-      ? Phone
-      : tipo === 'email'
-        ? Mail
-        : tipo === 'site'
-          ? Globe2
-          : tipo === 'instagram' || tipo === 'facebook' || tipo === 'linkedin'
-            ? AtSign
-            : Send;
-  return <Icone size={17} strokeWidth={1.7} aria-hidden="true" />;
-}
-
-function urlWhatsapp(telefone: string): string | null {
-  let digitos = telefone.replace(/\D/g, '');
-  if ((digitos.length === 10 || digitos.length === 11) && !digitos.startsWith('55')) {
-    digitos = `55${digitos}`;
-  }
-  return digitos.length >= 12 && digitos.length <= 13 ? `https://wa.me/${digitos}` : null;
+function LinhaCanal({ canal }: { canal: CanalFicha }) {
+  const Icone = canal.tipo === 'telefone' ? Phone : canal.tipo === 'email' ? Mail : AtSign;
+  return (
+    <li className={styles.canal}>
+      <span className={styles.icone}>
+        <Icone size={20} strokeWidth={1.7} aria-hidden="true" />
+      </span>
+      <div className={styles.valor}>
+        <span>
+          {ROTULOS[canal.tipo]}
+          {canal.pessoa && ` · ${canal.pessoa}`}
+        </span>
+        <strong>{canal.valor}</strong>
+        <small>{canal.fontes.map((fonte) => fonte.nome).join(' · ')}</small>
+      </div>
+      <div className={styles.acoes}>
+        <CopiarCanal
+          valor={canal.tipo === 'telefone' || canal.tipo === 'email' ? canal.valor : canal.href}
+        />
+        {canal.whatsapp && (
+          <a href={canal.whatsapp} target="_blank" rel="noreferrer" tabIndex={0}>
+            WhatsApp
+          </a>
+        )}
+        <a
+          href={canal.href}
+          tabIndex={0}
+          target={canal.href.startsWith('http') ? '_blank' : undefined}
+          rel="noreferrer"
+        >
+          {canal.tipo === 'telefone'
+            ? 'Ligar'
+            : canal.tipo === 'email'
+              ? 'Escrever'
+              : 'Abrir perfil'}
+          {canal.href.startsWith('http') && <ExternalLink size={15} aria-hidden="true" />}
+        </a>
+      </div>
+    </li>
+  );
 }
 
 export function InteligenciaDeContato({
   lead,
-  dossie,
+  dossie = null,
 }: {
   lead: DossieLead;
-  dossie: DossieEnriquecido;
+  dossie?: DossieEnriquecido | null;
 }) {
-  const encontrada = dossie.inteligenciaContato;
-  const canais: CanalContato[] = encontrada?.canais ?? [
-    ...(lead.contato?.telefone
-      ? [
-          {
-            tipo: 'telefone' as const,
-            valor: lead.contato.telefone,
-            url: `tel:${lead.contato.telefone.replace(/\D/g, '')}`,
-            origem: 'crm' as const,
-          },
-        ]
-      : []),
-    ...(lead.contato?.email
-      ? [
-          {
-            tipo: 'email' as const,
-            valor: lead.contato.email,
-            url: `mailto:${lead.contato.email}`,
-            origem: 'crm' as const,
-          },
-        ]
-      : []),
-    ...(lead.empresa.dominio
-      ? [
-          {
-            tipo: 'site' as const,
-            valor: lead.empresa.dominio,
-            url: `https://${lead.empresa.dominio.replace(/^https?:\/\//, '')}`,
-            origem: 'crm' as const,
-          },
-        ]
-      : []),
-  ];
-  const pessoas = encontrada?.pessoas ?? [];
+  const contatos = lead.contatos ?? montarContatosFicha(lead, dossie);
+  const site = contatos.canais.find((canal) => canal.tipo === 'site');
+  const diretos = contatos.canais.filter((canal) => canal.tipo !== 'site');
+  const principais = [
+    diretos.find((canal) => canal.tipo === 'telefone'),
+    diretos.find((canal) => canal.tipo === 'email'),
+  ].filter((canal): canal is CanalFicha => Boolean(canal));
+  if (!principais.length && diretos[0]) principais.push(diretos[0]);
+  const extras = diretos.filter((canal) => !principais.includes(canal));
+  const comFonte = diretos.filter((canal) => canal.fontes.some((fonte) => fonte.url));
 
   return (
-    <section className={styles.inteligenciaContato} aria-labelledby="contatos-encontrados-titulo">
-      <header>
-        <div>
-          <p>Pronto para abordar</p>
-          <h3 id="contatos-encontrados-titulo">Canais e pessoas encontradas</h3>
-          <span>Dados públicos e cadastrais reunidos, com fatos e hipóteses separados.</span>
-        </div>
-        <div className={styles.resumoInteligencia}>
-          <span>
-            <strong>{canais.length}</strong> {canais.length === 1 ? 'canal' : 'canais'}
-          </span>
-          <span>
-            <strong>{pessoas.length}</strong> {pessoas.length === 1 ? 'pessoa' : 'pessoas'}
-          </span>
-        </div>
+    <section className={styles.contatos} aria-labelledby="contatos-ficha-titulo">
+      <header className={styles.topo}>
+        <h2 id="contatos-ficha-titulo">Contatos</h2>
+        {site && (
+          <a href={site.href} target="_blank" rel="noreferrer" tabIndex={0}>
+            <Globe2 size={18} aria-hidden="true" /> Site da empresa{' '}
+            <ExternalLink size={15} aria-hidden="true" />
+          </a>
+        )}
       </header>
-
-      <div className={styles.corpoInteligencia}>
-        <div className={styles.canaisEncontrados}>
-          <p>Canais para começar o contato</p>
-          {canais.length ? (
-            <div className={styles.gradeCanais}>
-              {canais.map((canal, indice) => {
-                const whatsapp = canal.tipo === 'telefone' ? urlWhatsapp(canal.valor) : null;
-                return (
-                  <article key={`${canal.tipo}-${canal.valor}-${indice}`}>
-                    <span className={styles.iconeCanal}>
-                      <IconeCanal tipo={canal.tipo} />
-                    </span>
-                    <div>
-                      <small>{ROTULO_CANAL[canal.tipo]}</small>
-                      <strong>{canal.valor}</strong>
-                      <span>
-                        {canal.origem === 'prospeccao'
-                          ? 'Encontrado na Prospecção'
-                          : 'Já estava na ficha'}
-                      </span>
-                    </div>
-                    <div className={styles.acoesCanal}>
-                      {whatsapp && (
-                        <a href={whatsapp} target="_blank" rel="noreferrer">
-                          WhatsApp
-                        </a>
-                      )}
-                      {canal.url && (
-                        <a
-                          href={canal.url}
-                          target={canal.url.startsWith('http') ? '_blank' : undefined}
-                          rel="noreferrer"
-                        >
-                          {canal.tipo === 'telefone'
-                            ? 'Ligar'
-                            : canal.tipo === 'email'
-                              ? 'Escrever'
-                              : 'Abrir'}
-                          <ExternalLink size={12} aria-hidden="true" />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ) : (
-            <p className={styles.estadoContatoVazio}>
-              Nenhum canal direto foi confirmado. Use o site ou a primeira reunião para localizar o
-              contato certo.
+      {principais.length ? (
+        <ul className={styles.lista} aria-label="Contatos principais">
+          {principais.map((canal) => (
+            <LinhaCanal key={canal.href} canal={canal} />
+          ))}
+        </ul>
+      ) : (
+        <div className={styles.vazio}>
+          <Phone size={22} aria-hidden="true" />
+          <div>
+            <strong>Nenhum contato disponível</strong>
+            <p>
+              {site
+                ? 'Consulte o site da empresa para encontrar um canal.'
+                : 'Enriqueça os dados da ficha para buscar um canal de contato.'}
             </p>
-          )}
+          </div>
         </div>
-
-        <div className={styles.pessoasEncontradas}>
-          <p>Quem pode participar da decisão</p>
-          {pessoas.length ? (
-            <div className={styles.listaPessoas}>
-              {pessoas.map((pessoa, indice) => (
-                <article key={`${pessoa.nome}-${indice}`}>
-                  <span className={styles.iconePessoa}>
-                    <UserRoundSearch size={18} strokeWidth={1.7} aria-hidden="true" />
-                  </span>
-                  <div>
-                    <span className={styles.estadoPessoa} data-status={pessoa.status}>
-                      {pessoa.status === 'confirmada' ? 'Contato confirmado' : 'Possível decisor'}
-                    </span>
-                    <strong>{pessoa.nome}</strong>
-                    <small>{pessoa.cargo ?? pessoa.evidencia}</small>
-                  </div>
-                  {pessoa.linkedinUrl && (
+      )}
+      {extras.length > 0 && (
+        <details className={styles.detalhes}>
+          <summary>
+            Outros canais <span>{extras.length}</span>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <ul className={styles.lista} aria-label="Outros canais">
+            {extras.map((canal) => (
+              <LinhaCanal key={canal.href} canal={canal} />
+            ))}
+          </ul>
+        </details>
+      )}
+      {contatos.pessoas.length > 0 && (
+        <details className={styles.detalhes}>
+          <summary>
+            Pessoas envolvidas <span>{contatos.pessoas.length}</span>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <ul className={styles.pessoas}>
+            {contatos.pessoas.map((pessoa) => (
+              <li key={pessoa.nome}>
+                <UserRound size={20} aria-hidden="true" />
+                <div>
+                  <strong>{pessoa.nome}</strong>
+                  {pessoa.cargo && <span>{pessoa.cargo}</span>}
+                  <small>{pessoa.origem}</small>
+                </div>
+                {pessoa.linkedin && (
+                  <a
+                    href={pessoa.linkedin}
+                    tabIndex={0}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Abrir LinkedIn de ${pessoa.nome}`}
+                  >
+                    LinkedIn <ExternalLink size={15} aria-hidden="true" />
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {comFonte.length > 0 && (
+        <details className={styles.detalhes}>
+          <summary>
+            Fontes dos contatos <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <ul className={styles.fontes}>
+            {comFonte.map((canal) => (
+              <li key={canal.href}>
+                <strong>{canal.valor}</strong>
+                {canal.fontes
+                  .filter((fonte) => fonte.url)
+                  .map((fonte) => (
                     <a
-                      href={pessoa.linkedinUrl}
+                      key={fonte.nome}
+                      href={fonte.url!}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label={`Abrir LinkedIn de ${pessoa.nome}`}
+                      tabIndex={0}
                     >
-                      <ExternalLink size={15} strokeWidth={1.7} aria-hidden="true" />
+                      {fonte.nome} <ExternalLink size={15} aria-hidden="true" />
                     </a>
-                  )}
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.estadoPessoaVazio}>
-              <UserRoundSearch size={19} strokeWidth={1.7} aria-hidden="true" />
-              <div>
-                <strong>A pessoa certa ainda não foi confirmada.</strong>
-                <span>Pergunte quem lidera o processo e quem aprova um piloto.</span>
-              </div>
-            </div>
+                  ))}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+      {(contatos.telefonesOcultos || diretos.some((canal) => canal.whatsapp)) && (
+        <footer className={styles.notas}>
+          {contatos.telefonesOcultos && (
+            <p>
+              Telefones de uma coleta antiga foram ocultados. Os dados salvos foram preservados.
+            </p>
           )}
-        </div>
-      </div>
+          {diretos.some((canal) => canal.whatsapp) && (
+            <p>Disponibilidade no WhatsApp não verificada.</p>
+          )}
+        </footer>
+      )}
     </section>
   );
 }

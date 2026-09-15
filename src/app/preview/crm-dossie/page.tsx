@@ -6,6 +6,7 @@ import { ContextoPosEntrega } from '@/app/(app)/crm/[id]/_components/ContextoPos
 import { EstadoEnriquecimento } from '@/app/(app)/crm/[id]/_components/EstadoEnriquecimento';
 import { PesquisaComercial } from '@/app/(app)/crm/[id]/_components/PesquisaComercial';
 import { ResumoOperacionalLead } from '@/app/(app)/crm/[id]/_components/ResumoOperacionalLead';
+import { InteligenciaDeContato } from '@/app/(app)/crm/[id]/_components/InteligenciaDeContato';
 import pagina from '@/app/(app)/crm/[id]/pagina.module.css';
 import type { DossieLead } from '@/lib/crm/queries';
 import shell from '../mapa-jornada/preview.module.css';
@@ -14,6 +15,7 @@ import { criarLeadContinuidade } from './criarLeadContinuidade';
 import { criarLeadEncerrado } from './criarLeadEncerrado';
 import { criarLeadNovo } from './criarLeadNovo';
 import { criarCenarioVenda } from './criarCenarioVenda';
+import { criarContatosPreview } from './criarContatosPreview';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -341,7 +343,7 @@ export default async function PreviewDossiePage({
   const enriquecendo = parametros.enriquecimento === 'processando';
   const enriquecimentoFalhou = parametros.enriquecimento === 'falhou';
   const posEntrega = parametros['pos-entrega'] === '1';
-  const lead =
+  const base =
     typeof parametros.cenario === 'string'
       ? criarCenarioVenda(LEAD_OPERACIONAL, parametros.cenario)
       : posEntrega
@@ -354,6 +356,10 @@ export default async function PreviewDossiePage({
               ? LEAD_NOVO
               : LEAD_OPERACIONAL;
   const execucao = LEAD_OPERACIONAL.enriquecimentos[0]!;
+  const lead =
+    typeof parametros.contatos === 'string'
+      ? criarContatosPreview(base, parametros.contatos)
+      : base;
 
   return (
     <div className={shell.shell}>
@@ -386,6 +392,10 @@ export default async function PreviewDossiePage({
           {lead.continuidadePosEntrega && (
             <ContextoPosEntrega continuidade={lead.continuidadePosEntrega} />
           )}
+          <InteligenciaDeContato
+            lead={lead}
+            dossie={entrada || pesquisaPendente ? null : execucao.dossie}
+          />
           <ResumoOperacionalLead lead={lead} />
           {!entrada && !pesquisaPendente && (
             <PesquisaComercial lead={lead} execucao={execucao} dossie={execucao.dossie!} />
