@@ -490,15 +490,17 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+  touch-action: manipulation;
   transition:
-    background-color var(--app-t-state),
     border-color var(--app-t-state),
     transform var(--app-t-touch);
 }
 
-.aulaNavegacao button:hover {
-  transform: translateY(-1px);
-  border-color: var(--via-border);
+@media (hover: hover) and (pointer: fine) {
+  .aulaNavegacao button:hover {
+    transform: translateY(-1px);
+    border-color: var(--via-border);
+  }
 }
 
 .aulaNavegacao button[data-ativa] {

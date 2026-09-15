@@ -51,6 +51,13 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
       await expect(aba).toHaveAttribute('aria-selected', 'true');
       await selecaoLegivel(nav.getByRole('tab'));
     }
+    const aulas = page.getByRole('navigation', { name: 'Aulas do projeto', exact: true });
+    for (const numero of [2, 1]) {
+      const menu = page.getByRole('button', { name: /^Aula \d de \d/ });
+      if (await menu.isVisible()) await menu.click();
+      await aulas.getByRole('button', { name: new RegExp(`^Aula ${numero}:`) }).click();
+      await selecaoLegivel(aulas.getByRole('button'));
+    }
     await selecaoLegivel(page.getByRole('button', { name: 'Concluir aula', exact: true }));
     await expect(
       page.getByRole('progressbar', { name: 'Progresso do aprendizado', exact: true }),
