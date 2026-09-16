@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, useState, useTransition } from 'react';
+import { useEffect, useId, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, PencilLine } from 'lucide-react';
 import { Button } from '@/design-system/via';
@@ -25,12 +25,22 @@ export function EditarEmpresa({
   const router = useRouter();
   const id = useId();
   const form = useRef<HTMLFormElement>(null);
+  const botaoEditar = useRef<HTMLButtonElement>(null);
   const enviando = useRef(false);
   const [aberto, setAberto] = useState(false);
   const [campos, setCampos] = useState(inicial);
   const [falha, setFalha] = useState<Falha | null>(null);
   const [salvo, setSalvo] = useState(false);
   const [pendente, iniciar] = useTransition();
+  useEffect(() => {
+    if (!salvo || pendente) return;
+    // A atualização da ficha pode substituir o gatilho após o modal devolver o foco.
+    const quadro = window.requestAnimationFrame(() => {
+      if (document.activeElement === document.body)
+        botaoEditar.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(quadro);
+  }, [salvo, pendente]);
   const fechar = () => {
     if (!enviando.current) setAberto(false);
   };
@@ -50,6 +60,7 @@ export function EditarEmpresa({
           )}
         </span>
         <Button
+          ref={botaoEditar}
           type="button"
           variant="secondary"
           aria-haspopup="dialog"
