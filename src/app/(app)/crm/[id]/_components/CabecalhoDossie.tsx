@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { EditarEmpresa } from './EditarEmpresa';
 import { CalendarPlus, ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
 import { etapaAberta, rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import { proximaReuniaoDoLead } from '@/lib/crm/ciclo-cliente';
@@ -16,11 +18,13 @@ export function CabecalhoDossie({
   enriquecimentoEmAndamento,
   temDossie,
   projetoSlug = null,
+  edicaoEmpresa,
 }: {
   lead: DossieLead;
   enriquecimentoEmAndamento: boolean;
   temDossie: boolean;
   projetoSlug?: string | null;
+  edicaoEmpresa?: ReactNode;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
   const site = urlContatoPublica(lead.empresa.dominio);
@@ -52,7 +56,21 @@ export function CabecalhoDossie({
     <section className={styles.hero} aria-labelledby="dossie-titulo">
       <div className={styles.heroTopo}>
         <div className={styles.identidade}>
-          <p className={styles.sobretitulo}>Ficha do cliente</p>
+          <div className={styles.identidadeTopo}>
+            <p className={styles.sobretitulo}>Ficha do cliente</p>
+            {edicaoEmpresa ??
+              (lead.edicaoEmpresa && (
+                <EditarEmpresa
+                  inicial={{
+                    oportunidade: lead.oportunidade.id,
+                    empresaId: lead.edicaoEmpresa.id,
+                    revisao: lead.edicaoEmpresa.revisao,
+                    nome: lead.empresa.nome,
+                    site: lead.empresa.dominio ?? '',
+                  }}
+                />
+              ))}
+          </div>
           <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
           <p>{tituloDoProjetoNoCard(lead.oportunidade.titulo, lead.empresa.nome)}</p>
         </div>

@@ -21,6 +21,14 @@
 
 .identidade {
   min-width: 0;
+  flex: 1;
+}
+
+.identidadeTopo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--via-space-3);
 }
 
 .identidade h1,
@@ -28,7 +36,7 @@
   margin: 0;
 }
 
-.identidade > p:first-child,
+.sobretitulo,
 .estadoAtual > span {
   color: var(--via-text-muted);
   font-size: var(--app-fs-support);

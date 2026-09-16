@@ -80,6 +80,7 @@ export type PropostaDossie = {
 };
 
 export type DossieLead = {
+  edicaoEmpresa?: { id: string; revisao: number };
   /** Presente somente quando a leitura do vínculo atual foi concluída. */
   edicaoContato?: { id: string | null; revisao: number | null };
   /** Canais curados no servidor; não envia o payload bruto dos provedores ao navegador. */
@@ -88,6 +89,8 @@ export type DossieLead = {
   saldoCreditos?: number;
   oportunidade: OportunidadeCrm;
   empresa: {
+    cadastroEditadoEm?: string | null;
+    siteManual?: boolean;
     nome: string;
     dominio: string | null;
     setor: string | null;

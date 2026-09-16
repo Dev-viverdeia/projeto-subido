@@ -216,7 +216,7 @@ async function lerContexto(supabase: SupabaseClient, oportunidadeId: string) {
   const [empresa, contato, eventos, reunioes, propostas, prospeccao] = await Promise.all([
     supabase
       .from('crm_empresas')
-      .select('nome, dominio, setor, porte, cidade, estado, resumo, enriquecimento')
+      .select('nome, dominio, setor, porte, cidade, estado, resumo, enriquecimento, site_manual')
       .eq('id', oportunidade.empresa_id)
       .single(),
     oportunidade.contato_principal_id
@@ -630,7 +630,7 @@ function limitarUrls(dossie: DossieCompleto, fontes: Fonte[]): DossieCompleto {
   };
 }
 
-function extrairInteligenciaContato(contexto: unknown): InteligenciaContato {
+export function extrairInteligenciaContato(contexto: unknown): InteligenciaContato {
   const raiz = objeto(contexto);
   const empresa = objeto(raiz.empresa);
   const contato = objeto(raiz.contato);
@@ -661,8 +661,9 @@ function extrairInteligenciaContato(contexto: unknown): InteligenciaContato {
   if (emailCrm) adicionarCanal('email', emailCrm, `mailto:${emailCrm}`, 'crm');
   if (linkedinCrm) adicionarCanal('linkedin', linkedinCrm, linkedinCrm, 'crm');
 
-  const site = urlOuNula(prospeccao.site_url) ?? urlDoDominio(empresa.dominio);
-  if (site) adicionarCanal('site', site, site, prospeccao.site_url ? 'prospeccao' : 'crm');
+  const siteCrm = urlDoDominio(empresa.dominio);
+  const site = empresa.site_manual ? siteCrm : (siteCrm ?? urlOuNula(prospeccao.site_url));
+  if (site) adicionarCanal('site', site, site, siteCrm ? 'crm' : 'prospeccao');
 
   const telefones = unicas([
     ...strings(prospeccao.telefones),

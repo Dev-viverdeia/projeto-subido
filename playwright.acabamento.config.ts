@@ -13,6 +13,7 @@ export default defineConfig({
     'prospeccao-dossie.spec.ts',
     'prospeccao-ficha-retorno.spec.ts',
     'crm-contatos.spec.ts',
+    'crm-empresa.spec.ts',
   ],
   projects: [
     ...base.projects!,

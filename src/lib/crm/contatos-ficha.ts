@@ -222,7 +222,8 @@ export function montarContatosFicha(
   for (const item of dossie?.inteligenciaContato?.canais ?? []) {
     // O snapshot do enriquecimento não substitui um contato que o usuário alterou depois.
     if (item.origem === 'crm' && ['telefone', 'email', 'site'].includes(item.tipo)) continue;
-    if (item.tipo === 'site' && (lead.empresa.dominio || fonte.site_url)) continue;
+    if (item.tipo === 'site' && (lead.empresa.siteManual || lead.empresa.dominio || fonte.site_url))
+      continue;
     if (
       item.origem === 'prospeccao' &&
       ('telefones' in fonte || 'emails' in fonte) &&
@@ -234,7 +235,7 @@ export function montarContatosFicha(
   }
   adicionar(
     'site',
-    lead.empresa.dominio ?? fonte.site_url,
+    lead.empresa.siteManual ? lead.empresa.dominio : (lead.empresa.dominio ?? fonte.site_url),
     null,
     lead.empresa.dominio ? 'crm' : 'prospeccao',
   );

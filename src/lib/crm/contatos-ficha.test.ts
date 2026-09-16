@@ -23,6 +23,31 @@ const dossie = (canais: NonNullable<DossieEnriquecido['inteligenciaContato']>['c
   ({ inteligenciaContato: { canais, pessoas: [] } }) as unknown as DossieEnriquecido;
 
 describe('contatos acionáveis da ficha', () => {
+  it('site corrigido prevalece e site removido não reaparece pela pesquisa', () => {
+    const pesquisa = dossie([
+      {
+        tipo: 'site',
+        valor: 'https://antigo.com.br',
+        url: 'https://antigo.com.br',
+        origem: 'prospeccao',
+      },
+    ]);
+    const origem = { site_url: 'https://antigo.com.br' };
+    expect(
+      montarContatosFicha(
+        { ...lead, empresa: { ...lead.empresa, dominio: 'novo.com.br', siteManual: true } },
+        pesquisa,
+        origem,
+      ).canais.filter((c) => c.tipo === 'site'),
+    ).toEqual([expect.objectContaining({ href: 'https://novo.com.br/' })]);
+    expect(
+      montarContatosFicha(
+        { ...lead, empresa: { ...lead.empresa, dominio: null, siteManual: true } },
+        pesquisa,
+        origem,
+      ).canais.filter((c) => c.tipo === 'site'),
+    ).toEqual([]);
+  });
   it('prioriza telefone corrigido manualmente sem validar a coleta antiga', () => {
     const atual = {
       ...lead,
