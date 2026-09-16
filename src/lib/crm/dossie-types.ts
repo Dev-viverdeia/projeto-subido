@@ -80,6 +80,7 @@ export type PropostaDossie = {
 };
 
 export type DossieLead = {
+  edicaoVenda?: { revisao: number };
   edicaoEmpresa?: { id: string; revisao: number };
   /** Presente somente quando a leitura do vínculo atual foi concluída. */
   edicaoContato?: { id: string | null; revisao: number | null };

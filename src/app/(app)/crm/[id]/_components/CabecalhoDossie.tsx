@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { EditarEmpresa } from './EditarEmpresa';
+import { EditarVenda } from './EditarVenda';
+import { valorPrevistoCampo } from '@/lib/crm/venda-schema';
 import { CalendarPlus, ContactRound, Globe2, Layers3, MapPin, Video } from 'lucide-react';
 import { etapaAberta, rotuloEtapaVisivel } from '@/lib/crm/etapas';
 import { proximaReuniaoDoLead } from '@/lib/crm/ciclo-cliente';
@@ -19,12 +21,14 @@ export function CabecalhoDossie({
   temDossie,
   projetoSlug = null,
   edicaoEmpresa,
+  edicaoVenda,
 }: {
   lead: DossieLead;
   enriquecimentoEmAndamento: boolean;
   temDossie: boolean;
   projetoSlug?: string | null;
   edicaoEmpresa?: ReactNode;
+  edicaoVenda?: ReactNode;
 }) {
   const local = [lead.empresa.cidade, lead.empresa.estado].filter(Boolean).join(' · ');
   const site = urlContatoPublica(lead.empresa.dominio);
@@ -72,7 +76,30 @@ export function CabecalhoDossie({
               ))}
           </div>
           <h1 id="dossie-titulo">{lead.empresa.nome}</h1>
-          <p>{tituloDoProjetoNoCard(lead.oportunidade.titulo, lead.empresa.nome)}</p>
+          <p className={styles.nomeProjeto}>
+            {tituloDoProjetoNoCard(lead.oportunidade.titulo, lead.empresa.nome)}
+          </p>
+          <div className={styles.venda}>
+            <p className={styles.valorVenda}>
+              <span>Valor previsto</span>
+              <strong>
+                {lead.oportunidade.valorCentavos === null
+                  ? 'A definir'
+                  : `R$ ${valorPrevistoCampo(lead.oportunidade.valorCentavos)}`}
+              </strong>
+            </p>
+            {edicaoVenda ??
+              (lead.edicaoVenda && (
+                <EditarVenda
+                  inicial={{
+                    oportunidade: lead.oportunidade.id,
+                    revisao: lead.edicaoVenda.revisao,
+                    titulo: lead.oportunidade.titulo,
+                    valor: valorPrevistoCampo(lead.oportunidade.valorCentavos),
+                  }}
+                />
+              ))}
+          </div>
         </div>
 
         <div className={styles.heroLateral}>

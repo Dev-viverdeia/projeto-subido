@@ -40,7 +40,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
   const { data: linha, error } = await supabase
     .from('crm_oportunidades')
     .select(
-      'id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos, proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda, atualizado_em, criado_em, situacao, retirada_em, motivo_retirada',
+      'id, titulo, etapa, empresa_id, contato_principal_id, valor_centavos, revisao_comercial, proxima_acao, proxima_acao_em, ganha_em, perdida_em, motivo_perda, atualizado_em, criado_em, situacao, retirada_em, motivo_retirada',
     )
     .eq('id', id)
     .maybeSingle();
@@ -200,6 +200,7 @@ export const obterDossieLead = cache(async (id: string): Promise<DossieLead | nu
       estado: empresaLinha.estado,
       projetoSugeridoSlug: projetoSugeridoDaProspeccao(empresaLinha.enriquecimento),
     },
+    edicaoVenda: { revisao: linha.revisao_comercial },
     edicaoEmpresa: { id: empresaLinha.id, revisao: empresaLinha.revisao },
     edicaoContato: {
       id: contato.data?.id ?? null,

@@ -14,6 +14,7 @@ export default defineConfig({
     'prospeccao-ficha-retorno.spec.ts',
     'crm-contatos.spec.ts',
     'crm-empresa.spec.ts',
+    'crm-venda.spec.ts',
   ],
   projects: [
     ...base.projects!,

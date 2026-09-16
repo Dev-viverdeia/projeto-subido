@@ -12,6 +12,7 @@ import { verificarConflitosAgenda } from './conflitos-agenda.mjs';
 import { verificarHorariosAlternativos } from './horarios-alternativos.mjs';
 import { verificarEdicaoContato } from './edicao-contato.mjs';
 import { verificarEdicaoEmpresa } from './edicao-empresa.mjs';
+import { verificarEdicaoVenda } from './edicao-venda.mjs';
 
 const executar = promisify(executarCallback);
 const raiz = resolve(import.meta.dirname, '../..');
@@ -244,6 +245,7 @@ try {
     await verificarHorariosAlternativos({ sql });
     relatorio.contratos.edicaoContato = await verificarEdicaoContato({ sql });
     relatorio.contratos.edicaoEmpresa = await verificarEdicaoEmpresa({ sql });
+    relatorio.contratos.edicaoVenda = await verificarEdicaoVenda({ sql });
   }
   if (!soContratos) {
     // Carga mista de transações reais. Falha/retry sintéticos; sem IA, rede externa ou envio.

@@ -53,10 +53,37 @@
   text-wrap: balance;
 }
 
-.identidade > p:last-child {
+.identidade > .nomeProjeto {
   margin-top: var(--via-space-3);
   color: var(--via-text-muted);
   font-size: var(--via-fs-body);
+}
+
+.venda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-gap-grid);
+  margin-top: var(--via-space-4);
+}
+
+.valorVenda {
+  display: grid;
+  gap: var(--via-space-1);
+  min-width: 0;
+}
+
+.valorVenda span {
+  color: var(--via-text-muted);
+  font-size: var(--app-fs-support);
+}
+
+.valorVenda strong {
+  color: var(--via-text-primary);
+  font-size: var(--via-fs-h4);
+  font-weight: var(--via-fw-medium);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 .heroLateral {

@@ -18,6 +18,7 @@ import { criarCenarioVenda } from './criarCenarioVenda';
 import { criarContatosPreview } from './criarContatosPreview';
 import { ContatosEditaveisPreview } from './ContatosEditaveisPreview';
 import { EmpresaEditavelPreview } from './EmpresaEditavelPreview';
+import { VendaEditavelPreview } from './VendaEditavelPreview';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -63,7 +64,9 @@ export default async function PreviewDossiePage({
           <span className={pagina.voltar}>
             <ArrowLeft size={15} aria-hidden="true" /> Voltar ao pipeline
           </span>
-          {typeof parametros.empresa === 'string' ? (
+          {typeof parametros.venda === 'string' ? (
+            <VendaEditavelPreview lead={lead} cenario={parametros.venda} />
+          ) : typeof parametros.empresa === 'string' ? (
             <EmpresaEditavelPreview lead={lead} cenario={parametros.empresa} />
           ) : (
             <CabecalhoDossie

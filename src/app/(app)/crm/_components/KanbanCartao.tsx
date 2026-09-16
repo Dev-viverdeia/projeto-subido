@@ -29,7 +29,9 @@ const FORMATADOR_DATA = new Intl.DateTimeFormat('pt-BR', {
 const FORMATADOR_MOEDA = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
-  maximumFractionDigits: 0,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  trailingZeroDisplay: 'stripIfInteger',
 });
 
 export type SolicitarMovimento = (oportunidade: OportunidadeCrm, etapa: EtapaCrm) => void;

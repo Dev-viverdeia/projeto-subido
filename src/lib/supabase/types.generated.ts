@@ -1246,6 +1246,7 @@ export type Database = {
           proxima_acao: string | null
           proxima_acao_em: string | null
           retirada_em: string | null
+          revisao_comercial: number
           situacao: string
           titulo: string
           valor_centavos: number | null
@@ -1268,6 +1269,7 @@ export type Database = {
           proxima_acao?: string | null
           proxima_acao_em?: string | null
           retirada_em?: string | null
+          revisao_comercial?: number
           situacao?: string
           titulo: string
           valor_centavos?: number | null
@@ -1290,6 +1292,7 @@ export type Database = {
           proxima_acao?: string | null
           proxima_acao_em?: string | null
           retirada_em?: string | null
+          revisao_comercial?: number
           situacao?: string
           titulo?: string
           valor_centavos?: number | null
@@ -4363,6 +4366,15 @@ export type Database = {
           p_revisao: number
           p_nome: string
           p_dominio: string
+        }
+        Returns: boolean
+      }
+      crm_editar_venda: {
+        Args: {
+          p_oportunidade: string
+          p_revisao: number
+          p_titulo: string
+          p_valor_centavos?: number
         }
         Returns: boolean
       }
