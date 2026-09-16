@@ -235,8 +235,7 @@ export function PesquisaComercial({
             </small>
             {pesquisaAnteriorAoCadastro(lead.empresa.cadastroEditadoEm, execucao.solicitadoEm) && (
               <p className={styles.resumoDossie}>
-                Esta pesquisa é anterior à edição da empresa. Use Atualizar dados para pesquisar o
-                cadastro atual.
+                Pesquisa anterior à edição da empresa. Revise os dados abaixo antes de usar.
               </p>
             )}
           </div>
