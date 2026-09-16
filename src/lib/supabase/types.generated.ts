@@ -1017,6 +1017,9 @@ export type Database = {
       }
       crm_empresas: {
         Row: {
+          revisao: number
+          cadastro_editado_em: string | null
+          site_manual: boolean
           atualizado_em: string
           cidade: string | null
           criado_em: string
@@ -1032,6 +1035,9 @@ export type Database = {
           setor: string | null
         }
         Insert: {
+          revisao?: number
+          cadastro_editado_em?: string | null
+          site_manual?: boolean
           atualizado_em?: string
           cidade?: string | null
           criado_em?: string
@@ -1047,6 +1053,9 @@ export type Database = {
           setor?: string | null
         }
         Update: {
+          revisao?: number
+          cadastro_editado_em?: string | null
+          site_manual?: boolean
           atualizado_em?: string
           cidade?: string | null
           criado_em?: string
@@ -4344,6 +4353,16 @@ export type Database = {
           p_email: string
           p_contato?: string
           p_revisao?: number
+        }
+        Returns: boolean
+      }
+      crm_editar_empresa: {
+        Args: {
+          p_oportunidade: string
+          p_empresa: string
+          p_revisao: number
+          p_nome: string
+          p_dominio: string
         }
         Returns: boolean
       }

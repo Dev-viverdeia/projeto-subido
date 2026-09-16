@@ -17,6 +17,7 @@ import type { DossieLead, ExecucaoEnriquecimento } from '@/lib/crm/queries';
 import { dataCompleta } from '../datas';
 import { AcaoPesquisaComercial } from './AcaoPesquisaComercial';
 import { PrepararConversa } from './PrepararConversa';
+import { pesquisaAnteriorAoCadastro } from '@/lib/crm/empresa-schema';
 import styles from './PesquisaComercial.module.css';
 
 type AbaPesquisa = 'leitura' | 'conversa' | 'fontes';
@@ -232,6 +233,11 @@ export function PesquisaComercial({
             <small>
               Atualizada em {dataCompleta(execucao.concluidoEm ?? execucao.solicitadoEm)}
             </small>
+            {pesquisaAnteriorAoCadastro(lead.empresa.cadastroEditadoEm, execucao.solicitadoEm) && (
+              <p className={styles.resumoDossie}>
+                Pesquisa anterior à edição da empresa. Revise os dados abaixo antes de usar.
+              </p>
+            )}
           </div>
         </div>
 

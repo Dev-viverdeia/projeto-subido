@@ -17,6 +17,7 @@ import { criarLeadNovo } from './criarLeadNovo';
 import { criarCenarioVenda } from './criarCenarioVenda';
 import { criarContatosPreview } from './criarContatosPreview';
 import { ContatosEditaveisPreview } from './ContatosEditaveisPreview';
+import { EmpresaEditavelPreview } from './EmpresaEditavelPreview';
 
 export const metadata: Metadata = { title: 'Preview · Ficha do cliente' };
 
@@ -62,11 +63,15 @@ export default async function PreviewDossiePage({
           <span className={pagina.voltar}>
             <ArrowLeft size={15} aria-hidden="true" /> Voltar ao pipeline
           </span>
-          <CabecalhoDossie
-            lead={lead}
-            enriquecimentoEmAndamento={enriquecendo}
-            temDossie={!entrada && !pesquisaPendente}
-          />
+          {typeof parametros.empresa === 'string' ? (
+            <EmpresaEditavelPreview lead={lead} cenario={parametros.empresa} />
+          ) : (
+            <CabecalhoDossie
+              lead={lead}
+              enriquecimentoEmAndamento={enriquecendo}
+              temDossie={!entrada && !pesquisaPendente}
+            />
+          )}
 
           {enriquecendo && <EstadoEnriquecimento status="processando" erro={null} />}
           {enriquecimentoFalhou && (

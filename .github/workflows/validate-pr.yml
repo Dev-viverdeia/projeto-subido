@@ -104,7 +104,7 @@ jobs:
           deno-version: v2.9.2
 
       - name: Limites do enriquecimento
-        run: deno test --no-config --node-modules-dir=none supabase/functions/enriquecimento/site_test.ts
+        run: deno test --no-config --node-modules-dir=none supabase/functions/enriquecimento/site_test.ts supabase/functions/enriquecimento/empresa_test.ts
 
       - name: Navegadores de teste
         run: npx playwright install --with-deps chromium webkit firefox
