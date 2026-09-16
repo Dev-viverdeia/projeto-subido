@@ -38,7 +38,7 @@ afterEach(cleanup);
 describe('Foco após editar empresa', () => {
   it('devolve o foco ao botão atual quando a atualização deixa o body ativo', async () => {
     const usuario = userEvent.setup();
-    render(<EditarEmpresa inicial={inicial} salvar={async () => ({ ok: true })} />);
+    render(<EditarEmpresa inicial={inicial} salvar={() => Promise.resolve({ ok: true })} />);
     const abrir = screen.getByRole('button', { name: 'Editar empresa' });
     await usuario.click(abrir);
     await usuario.click(screen.getByRole('button', { name: 'Salvar alterações' }));
@@ -65,6 +65,7 @@ describe('Foco após editar empresa', () => {
     await usuario.click(outraAcao);
     await act(async () => {
       concluir({ ok: true });
+      await Promise.resolve();
     });
     await screen.findByText('Empresa salva');
     await act(async () => {
